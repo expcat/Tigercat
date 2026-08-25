@@ -220,6 +220,17 @@ describe('TreeSelect', () => {
       const clearBtn = container.querySelector('[aria-label="Clear selection"]')
       expect(clearBtn).not.toBeInTheDocument()
     })
+
+    it('renders clear as a sibling button of the combobox trigger', () => {
+      const { container } = render(
+        <TreeSelect treeData={treeData} value="apple" clearable defaultExpandAll />
+      )
+      const trigger = container.querySelector('[role="combobox"]')!
+      const clearBtn = container.querySelector('[data-tiger-treeselect-clear]')
+      expect(clearBtn).toBeTruthy()
+      expect(clearBtn?.tagName).toBe('BUTTON')
+      expect(trigger.contains(clearBtn)).toBe(false)
+    })
   })
 
   describe('Search', () => {
@@ -300,6 +311,20 @@ describe('TreeSelect', () => {
       trigger.focus()
       await user.keyboard('{Enter}')
       expect(getByRole('listbox')).toBeInTheDocument()
+    })
+
+    it('selects Apple with ArrowDown then Enter when defaultExpandAll', async () => {
+      const onChange = vi.fn()
+      const { container, queryByRole } = render(
+        <TreeSelect treeData={treeData} defaultExpandAll onChange={onChange} />
+      )
+      const trigger = container.querySelector('button')!
+      fireEvent.click(trigger)
+      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      fireEvent.keyDown(trigger, { key: 'Enter' })
+
+      expect(onChange).toHaveBeenCalledWith('apple')
+      expect(queryByRole('listbox')).not.toBeInTheDocument()
     })
 
     it('should have no accessibility violations', async () => {

@@ -1,7 +1,9 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { BarChart } from '@expcat/tigercat-react/BarChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent, waitFor } from '@testing-library/react'
+import { MockResizeObserver } from '../utils/mock-observers'
+import { installFrameScheduler } from '../utils/frame-scheduler'
 
 const defaultSize = { width: 240, height: 160 }
 
@@ -187,6 +189,117 @@ describe('BarChart', () => {
       fireEvent.mouseEnter(rect)
       fireEvent.mouseLeave(rect)
       expect(onHoveredIndexChange).toHaveBeenLastCalledWith(null)
+    })
+
+    it('opens the default tooltip on hover without hoverable', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10 },
+          { x: 'B', y: 20 }
+        ],
+        ...defaultSize
+      })
+
+      fireEvent.mouseEnter(container.querySelector('rect[data-bar-index]')!)
+      const tooltip = document.body.querySelector('[data-chart-tooltip]')
+      expect(tooltip).toBeTruthy()
+      expect(tooltip).toHaveAttribute('role', 'tooltip')
+      expect(tooltip?.className).not.toContain('opacity-0')
+      expect(tooltip?.textContent).toContain('A: 10')
+    })
+
+    it('does not open a tooltip when showTooltip is false', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 10 }],
+        showTooltip: false,
+        ...defaultSize
+      })
+
+      fireEvent.mouseEnter(container.querySelector('rect[data-bar-index]')!)
+      const tooltip = document.body.querySelector('[data-chart-tooltip]')
+      expect(tooltip).toBeNull()
+    })
+  })
+
+  describe('responsive plot scale', () => {
+    afterEach(() => {
+      MockResizeObserver.reset()
+      vi.unstubAllGlobals()
+    })
+
+    const pagesLikeData = [
+      { x: 'A', y: 10 },
+      { x: 'B', y: 20 },
+      { x: 'C', y: 30 }
+    ]
+
+    it('recomputes bar geometry after observing the parent size', async () => {
+      vi.stubGlobal('ResizeObserver', MockResizeObserver)
+      const frames = installFrameScheduler()
+      const { container } = renderWithProps(BarChart, {
+        data: pagesLikeData,
+        width: 420,
+        height: 240,
+        responsive: true
+      })
+
+      await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+      const svg = container.querySelector('svg')
+      const observer = MockResizeObserver.instances[0]
+
+      act(() => {
+        observer.trigger(926, 688)
+      })
+      act(() => {
+        frames.flush()
+      })
+
+      expect(svg).toHaveAttribute('width', '926')
+      expect(svg).toHaveAttribute('height', '688')
+      expect(svg).toHaveAttribute('viewBox', '0 0 926 688')
+
+      await waitFor(() => {
+        const bars = container.querySelectorAll('rect[data-bar-index]')
+        const last = bars[bars.length - 1]
+        const lastRight = Number(last.getAttribute('x')) + Number(last.getAttribute('width'))
+        const tallest = Math.max(...[...bars].map((bar) => Number(bar.getAttribute('height'))))
+        expect(lastRight).toBeGreaterThan(500)
+        expect(tallest).toBeGreaterThan(300)
+      })
+    })
+
+    it('does not move bar geometry off the prop innerRect when responsive is false', async () => {
+      vi.stubGlobal('ResizeObserver', MockResizeObserver)
+      const frames = installFrameScheduler()
+      const { container } = renderWithProps(BarChart, {
+        data: pagesLikeData,
+        width: 420,
+        height: 240,
+        responsive: false
+      })
+
+      const svg = container.querySelector('svg')
+      expect(svg).toHaveAttribute('width', '420')
+      expect(svg).toHaveAttribute('height', '240')
+
+      const observer = MockResizeObserver.instances[0]
+      if (observer) {
+        act(() => {
+          observer.trigger(926, 688)
+        })
+        act(() => {
+          frames.flush()
+        })
+      }
+
+      expect(svg).toHaveAttribute('width', '420')
+      expect(svg).toHaveAttribute('height', '240')
+      const bars = container.querySelectorAll('rect[data-bar-index]')
+      const last = bars[bars.length - 1]
+      const lastRight = Number(last.getAttribute('x')) + Number(last.getAttribute('width'))
+      const tallest = Math.max(...[...bars].map((bar) => Number(bar.getAttribute('height'))))
+      expect(lastRight).toBeLessThan(400)
+      expect(tallest).toBeLessThan(200)
     })
   })
 })

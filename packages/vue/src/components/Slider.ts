@@ -15,6 +15,7 @@ import {
 
 export interface VueSliderProps {
   value?: number | [number, number]
+  modelValue?: number | [number, number]
   defaultValue?: number | [number, number]
   min?: number
   max?: number
@@ -35,6 +36,12 @@ export const Slider = defineComponent({
      * Slider value (for v-model:value) - controlled mode
      */
     value: {
+      type: [Number, Array] as PropType<number | [number, number]>
+    },
+    /**
+     * Slider value (for default v-model) - controlled mode
+     */
+    modelValue: {
       type: [Number, Array] as PropType<number | [number, number]>
     },
     /**
@@ -131,14 +138,27 @@ export const Slider = defineComponent({
     'update:value': (value: number | [number, number]) =>
       typeof value === 'number' || Array.isArray(value),
     /**
+     * Emitted when value changes (for default v-model)
+     */
+    'update:modelValue': (value: number | [number, number]) =>
+      typeof value === 'number' || Array.isArray(value),
+    /**
      * Emitted when value changes
      */
     change: (value: number | [number, number]) => typeof value === 'number' || Array.isArray(value)
   },
   setup(props, { emit, attrs }) {
-    // Initialize internal value
-    const getInitialValue = (): number | [number, number] => {
+    // Prefer explicit `value` (v-model:value) over default `modelValue` (v-model).
+    // An undefined sibling must not wipe a defined bound value.
+    const resolveBoundValue = (): number | [number, number] | undefined => {
       if (props.value !== undefined) return props.value
+      if (props.modelValue !== undefined) return props.modelValue
+      return undefined
+    }
+
+    const getInitialValue = (): number | [number, number] => {
+      const bound = resolveBoundValue()
+      if (bound !== undefined) return bound
       if (props.defaultValue !== undefined) return props.defaultValue
       return props.range ? [props.min, props.max] : props.min
     }
@@ -149,12 +169,12 @@ export const Slider = defineComponent({
     const showTooltip = ref(false)
     const trackElement = ref<HTMLElement | null>(null)
 
-    // Watch for external value changes
     watch(
-      () => props.value,
-      (newValue) => {
-        if (newValue !== undefined) {
-          internalValue.value = newValue
+      () => [props.value, props.modelValue] as const,
+      () => {
+        const bound = resolveBoundValue()
+        if (bound !== undefined) {
+          internalValue.value = bound
         }
       }
     )
@@ -176,6 +196,7 @@ export const Slider = defineComponent({
     const updateValue = (newValue: number | [number, number]) => {
       internalValue.value = newValue
       emit('update:value', newValue)
+      emit('update:modelValue', newValue)
       emit('change', newValue)
     }
 

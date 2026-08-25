@@ -76,6 +76,47 @@ export const koKR: TigerLocale = defineLocale({
     dragHintText: '드래그하여 이동',
     boardAriaLabel: '작업 보드'
   },
+  chatWindow: {
+    emptyText: '메시지가 없습니다',
+    sendText: '보내기',
+    placeholder: '메시지를 입력하세요',
+    sendingText: '보내는 중',
+    sentText: '전송됨',
+    failedText: '보내기 실패'
+  },
+  code: {
+    copyLabel: '복사',
+    copiedLabel: '복사됨',
+    copyFailedLabel: '복사 실패'
+  },
+  commentThread: {
+    emptyText: '댓글이 없습니다',
+    replyPlaceholder: '답글을 작성하세요...',
+    replyButtonText: '답글',
+    cancelReplyText: '취소',
+    likeText: '좋아요',
+    likedText: '좋아요 함',
+    replyText: '답글',
+    moreText: '더보기',
+    loadMoreText: '더 불러오기',
+    collapseRepliesText: '▾ 답글 접기',
+    expandRepliesText: '▸ 답글 {count}개 펼치기'
+  },
+  activityFeed: {
+    emptyText: '활동이 없습니다',
+    loadingText: '로딩 중...'
+  },
+  notificationCenter: {
+    title: '알림',
+    emptyText: '알림이 없습니다',
+    loadingText: '로딩 중...',
+    allLabel: '전체',
+    unreadLabel: '읽지 않음',
+    readLabel: '읽음',
+    markAllReadText: '모두 읽음으로 표시',
+    markReadText: '읽음으로 표시',
+    markUnreadText: '읽지 않음으로 표시'
+  },
   select: {
     doneText: '완료'
   },

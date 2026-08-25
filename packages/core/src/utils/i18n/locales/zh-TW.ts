@@ -76,6 +76,47 @@ export const zhTW: TigerLocale = defineLocale({
     dragHintText: '拖曳以移動',
     boardAriaLabel: '任務看板'
   },
+  chatWindow: {
+    emptyText: '暫無訊息',
+    sendText: '傳送',
+    placeholder: '請輸入訊息',
+    sendingText: '傳送中',
+    sentText: '已送達',
+    failedText: '傳送失敗'
+  },
+  code: {
+    copyLabel: '複製',
+    copiedLabel: '已複製',
+    copyFailedLabel: '複製失敗'
+  },
+  commentThread: {
+    emptyText: '暫無評論',
+    replyPlaceholder: '寫下回覆...',
+    replyButtonText: '回覆',
+    cancelReplyText: '取消',
+    likeText: '點讚',
+    likedText: '已讚',
+    replyText: '回覆',
+    moreText: '更多',
+    loadMoreText: '載入更多',
+    collapseRepliesText: '▾ 收合回覆',
+    expandRepliesText: '▸ 展開 {count} 則回覆'
+  },
+  activityFeed: {
+    emptyText: '暫無動態',
+    loadingText: '載入中...'
+  },
+  notificationCenter: {
+    title: '通知中心',
+    emptyText: '暫無通知',
+    loadingText: '載入中...',
+    allLabel: '全部',
+    unreadLabel: '未讀',
+    readLabel: '已讀',
+    markAllReadText: '全部標記已讀',
+    markReadText: '標記已讀',
+    markUnreadText: '標記未讀'
+  },
   select: {
     doneText: '完成'
   },

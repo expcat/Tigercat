@@ -69,6 +69,7 @@ export const HeatmapChart = defineComponent({
       wrapperClasses: _wrapperClasses
     } = useChartInteraction<HeatmapChartDatum>({
       hoverable: computed(() => props.hoverable),
+      showTooltip: computed(() => props.showTooltip),
       hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
       selectedIndexProp: () => props.selectedIndex,
@@ -212,6 +213,7 @@ export const HeatmapChart = defineComponent({
 
     return () => {
       const interactive = props.hoverable || props.selectable
+      const pointerInteractive = interactive || props.showTooltip
       const rect = innerRect.value
 
       const chart = h(
@@ -320,15 +322,14 @@ export const HeatmapChart = defineComponent({
         }
       )
 
-      const tooltip =
-        props.showTooltip && props.hoverable
-          ? h(ChartTooltip, {
-              content: tooltipContent.value,
-              open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
-              x: tooltipPosition.value.x,
-              y: tooltipPosition.value.y
-            })
-          : null
+      const tooltip = props.showTooltip
+        ? h(ChartTooltip, {
+            content: tooltipContent.value,
+            open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
+            x: tooltipPosition.value.x,
+            y: tooltipPosition.value.y
+          })
+        : null
 
       const canvas = shouldRenderCanvas.value
         ? h('canvas', {
@@ -342,12 +343,12 @@ export const HeatmapChart = defineComponent({
               top: `${rect.y}px`,
               width: `${rect.width}px`,
               height: `${rect.height}px`,
-              pointerEvents: interactive ? 'auto' : 'none'
+              pointerEvents: pointerInteractive ? 'auto' : 'none'
             },
             'data-heatmap-canvas': 'true',
             'data-heatmap-render-mode': resolvedRenderMode.value,
-            onMousemove: interactive ? handleCanvasMouseMove : undefined,
-            onMouseleave: interactive ? handleMouseLeave : undefined,
+            onMousemove: pointerInteractive ? handleCanvasMouseMove : undefined,
+            onMouseleave: pointerInteractive ? handleMouseLeave : undefined,
             onClick: interactive ? handleCanvasClick : undefined
           })
         : null

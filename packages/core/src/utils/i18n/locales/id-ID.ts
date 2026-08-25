@@ -76,6 +76,47 @@ export const idID: TigerLocale = defineLocale({
     dragHintText: 'Seret untuk memindahkan',
     boardAriaLabel: 'Papan Tugas'
   },
+  chatWindow: {
+    emptyText: 'Tidak ada pesan',
+    sendText: 'Kirim',
+    placeholder: 'Tulis pesan',
+    sendingText: 'Mengirim',
+    sentText: 'Terkirim',
+    failedText: 'Gagal mengirim'
+  },
+  code: {
+    copyLabel: 'Salin',
+    copiedLabel: 'Disalin',
+    copyFailedLabel: 'Gagal menyalin'
+  },
+  commentThread: {
+    emptyText: 'Tidak ada komentar',
+    replyPlaceholder: 'Tulis balasan...',
+    replyButtonText: 'Balas',
+    cancelReplyText: 'Batal',
+    likeText: 'Suka',
+    likedText: 'Disukai',
+    replyText: 'Balas',
+    moreText: 'Lainnya',
+    loadMoreText: 'Muat lebih banyak',
+    collapseRepliesText: '▾ Ciutkan balasan',
+    expandRepliesText: '▸ Perluas {count} balasan'
+  },
+  activityFeed: {
+    emptyText: 'Tidak ada aktivitas',
+    loadingText: 'Memuat...'
+  },
+  notificationCenter: {
+    title: 'Notifikasi',
+    emptyText: 'Tidak ada notifikasi',
+    loadingText: 'Memuat...',
+    allLabel: 'Semua',
+    unreadLabel: 'Belum dibaca',
+    readLabel: 'Sudah dibaca',
+    markAllReadText: 'Tandai semua sudah dibaca',
+    markReadText: 'Tandai sudah dibaca',
+    markUnreadText: 'Tandai belum dibaca'
+  },
   select: {
     doneText: 'Selesai'
   },

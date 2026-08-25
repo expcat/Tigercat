@@ -30,7 +30,7 @@ describe('NotificationCenter ARIA roles', () => {
   it('React: has role=region and aria-label from title prop', () => {
     renderReact(<ReactNotificationCenter items={notificationItems} />)
     const region = reactScreen.getByRole('region')
-    expect(region).toHaveAttribute('aria-label', '通知中心')
+    expect(region).toHaveAttribute('aria-label', 'Notifications')
   })
 
   it('React: respects custom aria-label', () => {
@@ -42,7 +42,7 @@ describe('NotificationCenter ARIA roles', () => {
   it('Vue: has role=region and aria-label from title prop', () => {
     renderVue(VueNotificationCenter, { props: { items: notificationItems } })
     const region = vueScreen.getByRole('region')
-    expect(region).toHaveAttribute('aria-label', '通知中心')
+    expect(region).toHaveAttribute('aria-label', 'Notifications')
   })
 
   it('Vue: respects custom title prop as aria-label', () => {
@@ -60,7 +60,7 @@ describe('ActivityFeed ARIA roles', () => {
   it('React: has role=feed and default aria-label', () => {
     renderReact(<ReactActivityFeed items={[{ id: 1, title: 'Activity', type: '更新' }]} />)
     const feed = reactScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-label', '动态')
+    expect(feed).toHaveAttribute('aria-label', 'Activity')
   })
 
   it('React: loading state has aria-busy', () => {
@@ -74,7 +74,7 @@ describe('ActivityFeed ARIA roles', () => {
       props: { items: [{ id: 1, title: 'Activity', type: '更新' }] }
     })
     const feed = vueScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-label', '动态')
+    expect(feed).toHaveAttribute('aria-label', 'Activity')
   })
 
   it('Vue: loading state has aria-busy', () => {
@@ -90,13 +90,13 @@ describe('CommentThread ARIA roles', () => {
   it('React: has role=feed and default aria-label', () => {
     renderReact(<ReactCommentThread nodes={commentNodes} />)
     const feed = reactScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-label', '评论线程')
+    expect(feed).toHaveAttribute('aria-label', 'Comment thread')
   })
 
   it('Vue: has role=feed and default aria-label', () => {
     renderVue(VueCommentThread, { props: { nodes: commentNodes } })
     const feed = vueScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-label', '评论线程')
+    expect(feed).toHaveAttribute('aria-label', 'Comment thread')
   })
 })
 

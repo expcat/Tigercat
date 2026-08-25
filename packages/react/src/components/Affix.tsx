@@ -139,19 +139,29 @@ export const Affix: React.FC<AffixProps> = ({
     />
   )
 
-  if (state.affixed) {
+  const content = (
+    <div ref={wrapperRef} className={wrapperClasses} style={wrapperStyle} {...props}>
+      {children}
+    </div>
+  )
+
+  const placeholder = state.affixed ? (
+    <div
+      style={{
+        width: originalRectRef.current?.width ?? 0,
+        height: originalRectRef.current?.height ?? 0
+      }}
+    />
+  ) : null
+
+  // offsetTop: sentinel before content (original top). offsetBottom: after
+  // the wrapper, or after the placeholder when affixed (content bottom).
+  if (offsetBottom !== undefined) {
     return (
       <div>
+        {placeholder}
+        {content}
         {sentinel}
-        <div
-          style={{
-            width: originalRectRef.current?.width ?? 0,
-            height: originalRectRef.current?.height ?? 0
-          }}
-        />
-        <div ref={wrapperRef} className={wrapperClasses} style={wrapperStyle} {...props}>
-          {children}
-        </div>
       </div>
     )
   }
@@ -159,9 +169,8 @@ export const Affix: React.FC<AffixProps> = ({
   return (
     <div>
       {sentinel}
-      <div ref={wrapperRef} className={wrapperClasses} style={wrapperStyle} {...props}>
-        {children}
-      </div>
+      {placeholder}
+      {content}
     </div>
   )
 }

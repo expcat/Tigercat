@@ -160,6 +160,47 @@ export const enUS: TigerLocale = {
     dragHintText: 'Drag to move',
     boardAriaLabel: 'Task Board'
   },
+  chatWindow: {
+    emptyText: 'No messages',
+    sendText: 'Send',
+    placeholder: 'Type a message',
+    sendingText: 'Sending',
+    sentText: 'Delivered',
+    failedText: 'Failed to send'
+  },
+  code: {
+    copyLabel: 'Copy',
+    copiedLabel: 'Copied',
+    copyFailedLabel: 'Copy failed'
+  },
+  commentThread: {
+    emptyText: 'No comments',
+    replyPlaceholder: 'Write a reply...',
+    replyButtonText: 'Reply',
+    cancelReplyText: 'Cancel',
+    likeText: 'Like',
+    likedText: 'Liked',
+    replyText: 'Reply',
+    moreText: 'More',
+    loadMoreText: 'Load more',
+    collapseRepliesText: '▾ Collapse replies',
+    expandRepliesText: '▸ Expand {count} replies'
+  },
+  activityFeed: {
+    emptyText: 'No activity',
+    loadingText: 'Loading...'
+  },
+  notificationCenter: {
+    title: 'Notifications',
+    emptyText: 'No notifications',
+    loadingText: 'Loading...',
+    allLabel: 'All',
+    unreadLabel: 'Unread',
+    readLabel: 'Read',
+    markAllReadText: 'Mark all as read',
+    markReadText: 'Mark as read',
+    markUnreadText: 'Mark as unread'
+  },
   select: {
     doneText: 'Done'
   },

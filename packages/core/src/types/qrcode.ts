@@ -1,15 +1,11 @@
 /**
- * QRCode error correction level
- */
-export type QRCodeLevel = 'L' | 'M' | 'Q' | 'H'
-
-/**
  * QRCode status
  */
 export type QRCodeStatus = 'active' | 'expired' | 'loading'
 
 /**
- * Shared QRCode props (framework-agnostic)
+ * Shared QRCode props (framework-agnostic).
+ * Renders a decorative hash matrix, not a scannable QR.
  */
 export interface QRCodeProps {
   /** Text / URL to encode */
@@ -20,8 +16,6 @@ export interface QRCodeProps {
   color?: string
   /** Background color */
   bgColor?: string
-  /** Error correction level */
-  level?: QRCodeLevel
   /** Status */
   status?: QRCodeStatus
   /** Custom class name */

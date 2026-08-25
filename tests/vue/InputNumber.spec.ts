@@ -165,5 +165,32 @@ describe('InputNumber (Vue)', () => {
       const { container } = render(InputNumber)
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('forwards leftover attrs onto the spinbutton, not the wrapper', async () => {
+      const { container } = render(InputNumber, {
+        attrs: {
+          'aria-label': 'Quantity',
+          'data-testid': 'qty',
+          'data-foo': 'bar',
+          class: 'extra-wrap'
+        }
+      })
+
+      const spinbutton = screen.getByRole('spinbutton', { name: 'Quantity' })
+      expect(spinbutton).toHaveAttribute('data-testid', 'qty')
+      expect(spinbutton).toHaveAttribute('data-foo', 'bar')
+      expect(spinbutton).not.toHaveClass('extra-wrap')
+
+      const wrapper = container.firstElementChild as HTMLElement
+      expect(wrapper).not.toHaveAttribute('aria-label')
+      expect(wrapper).not.toHaveAttribute('data-testid')
+      expect(wrapper).not.toHaveAttribute('data-foo')
+      expect(wrapper).toHaveClass('extra-wrap')
+
+      expect(screen.getByLabelText('Increase')).toBeInTheDocument()
+      expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
+
+      await expectNoA11yViolationsIsolated(container)
+    })
   })
 })

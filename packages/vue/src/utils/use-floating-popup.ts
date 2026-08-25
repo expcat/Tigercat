@@ -6,10 +6,11 @@
  * Floating UI positioning, click-outside dismiss, escape-key dismiss,
  * trigger → event-handler mapping, floating styles.
  */
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 import { useVueAnchoredOverlay } from './overlay'
 import {
   buildTriggerHandlerMap,
+  createFloatingHoverDelayController,
   restoreFocus,
   type FloatingPlacement,
   type FloatingTrigger
@@ -106,6 +107,11 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     emit('open-change', next)
   }
 
+  const hoverController = createFloatingHoverDelayController({
+    show: () => setVisible(true),
+    hide: () => setVisible(false)
+  })
+
   // ─── Element refs ────────────────────────────────────────────────────
   const containerRef = ref<HTMLElement | null>(null)
   const triggerRef = ref<HTMLElement | null>(null)
@@ -124,7 +130,7 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
   }
 
   const closeAndRestoreFocus = () => {
-    setVisible(false)
+    hoverController.closeNow()
     restoreTriggerFocus()
   }
 
@@ -145,7 +151,7 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
       if (reason === 'escape') {
         closeAndRestoreFocus()
       } else {
-        setVisible(false)
+        hoverController.closeNow()
       }
     }
   })
@@ -155,14 +161,49 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
 
   // ─── Trigger handlers ────────────────────────────────────────────────
   const handleToggle = () => {
-    if (!props.disabled) setVisible(!currentVisible.value)
+    if (props.disabled) return
+    hoverController.cancel()
+    setVisible(!currentVisible.value)
   }
   const handleShow = () => {
-    if (!props.disabled) setVisible(true)
+    if (props.disabled) return
+    if (effectiveTrigger.value === 'hover') {
+      hoverController.enter()
+      return
+    }
+    hoverController.cancel()
+    setVisible(true)
   }
   const handleHide = () => {
-    if (!props.disabled) setVisible(false)
+    if (props.disabled) return
+    if (effectiveTrigger.value === 'hover') {
+      hoverController.leave()
+      return
+    }
+    hoverController.closeNow()
   }
+
+  // Trigger + floating share one hover group so the pointer can cross the
+  // offset gap into the teleported layer before hideDelay fires.
+  watch(
+    () => [floatingRef.value, currentVisible.value, effectiveTrigger.value] as const,
+    ([el, visible, trigger], _prev, onCleanup) => {
+      if (!multiTrigger || trigger !== 'hover' || !visible || !el) return
+      const handleEnter = () => hoverController.enter()
+      const handleLeave = () => hoverController.leave()
+      el.addEventListener('mouseenter', handleEnter)
+      el.addEventListener('mouseleave', handleLeave)
+      onCleanup(() => {
+        el.removeEventListener('mouseenter', handleEnter)
+        el.removeEventListener('mouseleave', handleLeave)
+      })
+    },
+    { flush: 'post', immediate: true }
+  )
+
+  onBeforeUnmount(() => {
+    hoverController.dispose()
+  })
 
   const triggerHandlers = computed<Record<string, unknown>>(() => {
     if (!multiTrigger) {

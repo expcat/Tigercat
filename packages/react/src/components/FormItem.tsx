@@ -34,11 +34,41 @@ type FieldLikeProps = {
   errorMessage?: string
   _shakeTrigger?: number
   onBlur?: React.FocusEventHandler<unknown>
-  onChange?: React.ChangeEventHandler<unknown>
+  onChange?: (...args: unknown[]) => void
   disabled?: boolean
   'aria-invalid'?: boolean | 'true' | 'false'
   'aria-describedby'?: string
   'aria-required'?: boolean | 'true' | 'false'
+}
+
+type ExtractedFormChange = { found: true; value: unknown } | { found: false }
+
+function isEventTarget(value: unknown): value is {
+  type?: unknown
+  checked?: unknown
+  value?: unknown
+} {
+  return value !== null && typeof value === 'object'
+}
+
+/** Event target → checked/value; bare 0/'' count; undefined does not wipe. */
+function extractFormChangeValue(argument: unknown): ExtractedFormChange {
+  if (argument === undefined) {
+    return { found: false }
+  }
+
+  if (argument !== null && typeof argument === 'object' && 'target' in argument) {
+    const target = (argument as { target: unknown }).target
+    if (isEventTarget(target)) {
+      const type = typeof target.type === 'string' ? target.type.toLowerCase() : ''
+      if (type === 'checkbox' || type === 'radio') {
+        return { found: true, value: target.checked }
+      }
+      return { found: true, value: target.value }
+    }
+  }
+
+  return { found: true, value: argument }
 }
 
 function hasRequiredRule(maybeRules: FormRule | FormRule[] | undefined): boolean {
@@ -185,11 +215,20 @@ export const FormItem: React.FC<FormItemProps> = ({
     }
   }, [name, formContext, rules])
 
-  const handleChange = useCallback(() => {
-    if (name && formContext) {
+  const handleChange = useCallback(
+    (argument?: unknown) => {
+      if (!name || !formContext) {
+        return
+      }
+
+      const extracted = extractFormChangeValue(argument)
+      if (extracted.found) {
+        formContext.updateValue(name, extracted.value)
+      }
       formContext.validateField(name, rules, 'change')
-    }
-  }, [name, formContext, rules])
+    },
+    [name, formContext, rules]
+  )
 
   const hasError = !!errorMessage
   const popupErrorVisible = showMessage && hasError && errorDisplayMode === 'popup'
@@ -234,9 +273,9 @@ export const FormItem: React.FC<FormItemProps> = ({
         onlyChild.props.onBlur?.(event)
         handleBlur()
       },
-      onChange: (event) => {
-        onlyChild.props.onChange?.(event)
-        handleChange()
+      onChange: (...args: unknown[]) => {
+        onlyChild.props.onChange?.(...args)
+        handleChange(args[0])
       }
     }
 

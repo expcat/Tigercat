@@ -200,6 +200,71 @@ describe('date-utils calendar month cache', () => {
   })
 })
 
+describe('parseDate', () => {
+  it('treats YYYY-MM-DD as local calendar midnight', () => {
+    const parsed = parseDate('2026-01-01')
+
+    expect(parsed).not.toBeNull()
+    expect(parsed!.getFullYear()).toBe(2026)
+    expect(parsed!.getMonth()).toBe(0)
+    expect(parsed!.getDate()).toBe(1)
+    expect(parsed!.getHours()).toBe(0)
+    expect(parsed!.getMinutes()).toBe(0)
+    expect(parsed!.getSeconds()).toBe(0)
+    expect(parsed!.getMilliseconds()).toBe(0)
+    expect(parsed!.getTime()).toBe(new Date(2026, 0, 1).getTime())
+  })
+
+  it('parses a mid-year date-only string as the local calendar day', () => {
+    expect(parseDate('2024-06-15')?.getTime()).toBe(new Date(2024, 5, 15).getTime())
+  })
+
+  it('rejects impossible calendar dates instead of overflowing', () => {
+    expect(parseDate('2024-02-30')).toBeNull()
+    expect(parseDate('2024-13-01')).toBeNull()
+    expect(parseDate('2023-02-29')).toBeNull()
+  })
+
+  it('accepts leap-year February 29 as a local calendar day', () => {
+    const leap = parseDate('2024-02-29')
+
+    expect(leap).not.toBeNull()
+    expect(leap!.getFullYear()).toBe(2024)
+    expect(leap!.getMonth()).toBe(1)
+    expect(leap!.getDate()).toBe(29)
+    expect(leap!.getTime()).toBe(new Date(2024, 1, 29).getTime())
+  })
+
+  it('trims surrounding whitespace on date-only ISO', () => {
+    expect(parseDate('  2026-01-01  ')?.getTime()).toBe(new Date(2026, 0, 1).getTime())
+  })
+
+  it('keeps existing invalid, identity, and year contracts', () => {
+    const date = new Date(2024, 0, 5)
+
+    expect(parseDate(undefined)).toBeNull()
+    expect(parseDate(null)).toBeNull()
+    expect(parseDate('')).toBeNull()
+    expect(parseDate('not-a-date')).toBeNull()
+    expect(parseDate(new Date(Number.NaN))).toBeNull()
+    expect(parseDate(date)).toBe(date)
+    expect(parseDate('2024-01-05')?.getFullYear()).toBe(2024)
+  })
+
+  it('still parses ISO datetime strings that include a time component', () => {
+    const withTime = parseDate('2024-01-05T12:00:00')
+    const withZ = parseDate('2024-01-05T00:00:00Z')
+    const withOffset = parseDate('2024-01-05T00:00:00-08:00')
+
+    expect(withTime).not.toBeNull()
+    expect(withTime!.getTime()).not.toBeNaN()
+    expect(withZ).not.toBeNull()
+    expect(withZ!.getTime()).not.toBeNaN()
+    expect(withOffset).not.toBeNull()
+    expect(withOffset!.getTime()).not.toBeNaN()
+  })
+})
+
 describe('date-utils arithmetic', () => {
   it('adds and subtracts days immutably across month boundaries', () => {
     const base = new Date(2024, 0, 31)

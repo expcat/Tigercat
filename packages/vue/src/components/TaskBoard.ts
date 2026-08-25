@@ -25,11 +25,14 @@ import {
   kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
   filterColumns,
+  filterCards,
   groupBySwimlane,
   getColumnCardCount,
   moveCard,
+  mapVisibleCardIndexToSource,
   reorderColumns,
   isWipExceeded,
+  appendDefaultTaskBoardCard,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
   type TaskBoardColumn,
@@ -176,6 +179,13 @@ export const TaskBoard = defineComponent({
       emit('update:columns', next)
     }
 
+    const addCardToColumn = (columnId: string | number) => {
+      emit('card-add', columnId)
+      if (props.onCardAdd == null) {
+        updateColumns(appendDefaultTaskBoardCard(currentColumns.value, columnId))
+      }
+    }
+
     // ----- drag controller (unified DnD + touch + keyboard) -----
     const dragSnap = ref<TaskBoardDragSnapshot>(createDefaultDragSnapshot())
     const boardRef = ref<HTMLElement | null>(null)
@@ -190,7 +200,16 @@ export const TaskBoard = defineComponent({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const result = moveCard(currentColumns.value, cardId, fromColumnId, toColumnId, toIdx, {
+      const sourceCol = currentColumns.value.find((c) => c.id === toColumnId)
+      const mappedIdx =
+        sourceCol == null
+          ? toIdx
+          : mapVisibleCardIndexToSource(
+              sourceCol.cards,
+              filterCards(sourceCol.cards, props.filterText || ''),
+              toIdx
+            )
+      const result = moveCard(currentColumns.value, cardId, fromColumnId, toColumnId, mappedIdx, {
         enforceWipLimit: props.enforceWipLimit
       })
       if (!result) return
@@ -513,12 +532,12 @@ export const TaskBoard = defineComponent({
                 role: 'button',
                 tabindex: 0,
                 onClick: () => {
-                  emit('card-add', column.id)
+                  addCardToColumn(column.id)
                 },
                 onKeydown: (e: KeyboardEvent) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
-                    emit('card-add', column.id)
+                    addCardToColumn(column.id)
                   }
                 }
               },

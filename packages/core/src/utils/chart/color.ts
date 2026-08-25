@@ -41,10 +41,12 @@ export const DEFAULT_CHART_COLORS = [
 
 /**
  * Default split area colors for radar / polar grids (subtle alternating fills).
+ * Optional `--tiger-chart-split-*` overrides; fallbacks mix `--tiger-text` so
+ * bands follow light/dark instead of a black-alpha wash.
  */
 export const RADAR_SPLIT_AREA_COLORS = [
-  'var(--tiger-chart-split-1,rgba(0,0,0,0.02))',
-  'var(--tiger-chart-split-2,rgba(0,0,0,0.05))'
+  'var(--tiger-chart-split-1,color-mix(in oklab, var(--tiger-text) 4%, transparent))',
+  'var(--tiger-chart-split-2,color-mix(in oklab, var(--tiger-text) 10%, transparent))'
 ]
 
 // ----------------------------------------------------------------------------
@@ -118,7 +120,7 @@ export function getScatterHoverSize(baseSize: number): number {
  * CSS animation keyframes and class for scatter entrance animation.
  * Inject once via <style> tag.
  */
-export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}@media (prefers-reduced-motion: reduce){.tiger-scatter-entrance{animation-duration:0ms;animation-delay:0ms}}`
+export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}.tiger-scatter-entrance{transform-box:fill-box;transform-origin:center}@media (prefers-reduced-motion: reduce){.tiger-scatter-entrance{animation-duration:0ms;animation-delay:0ms}}`
 export const SCATTER_ENTRANCE_CLASS = 'tiger-scatter-entrance'
 
 /**

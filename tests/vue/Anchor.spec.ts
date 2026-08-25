@@ -394,4 +394,65 @@ describe('Anchor', () => {
       expect(latestObservedIds()).not.toContain('section1')
     })
   })
+
+  describe('Click lock', () => {
+    beforeEach(() => {
+      MockIntersectionObserver.reset()
+      vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+      const first = document.getElementById('section1')
+      const last = document.getElementById('section2')
+      vi.spyOn(first as HTMLElement, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(0, 0, 100, 40)
+      )
+      vi.spyOn(last as HTMLElement, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(0, 800, 100, 40)
+      )
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it('keeps the clicked last link active while a first-href IO update fires', async () => {
+      const onChange = vi.fn()
+      render(Anchor, {
+        props: {
+          getContainer: () => scrollContainer,
+          affix: false,
+          onChange
+        },
+        slots: {
+          default: () => [
+            h(AnchorLink, { href: '#section1', title: 'Link 1' }),
+            h(AnchorLink, { href: '#section2', title: 'Link 2' })
+          ]
+        }
+      })
+
+      await waitFor(() => {
+        expect(MockIntersectionObserver.instances.length).toBeGreaterThan(0)
+      })
+
+      await fireEvent.click(screen.getByText('Link 2'))
+      expect(screen.getByText('Link 2')).toHaveClass('font-medium')
+      expect(screen.getByText('Link 1')).not.toHaveClass('font-medium')
+      const changeCallsAfterClick = onChange.mock.calls.length
+
+      const observer = MockIntersectionObserver.instances.at(-1)
+      observer?.trigger([
+        {
+          target: document.getElementById('section1') as Element,
+          isIntersecting: true
+        },
+        {
+          target: document.getElementById('section2') as Element,
+          isIntersecting: true
+        }
+      ])
+
+      expect(screen.getByText('Link 2')).toHaveClass('font-medium')
+      expect(screen.getByText('Link 1')).not.toHaveClass('font-medium')
+      expect(onChange.mock.calls.length).toBe(changeCallsAfterClick)
+    })
+  })
 })

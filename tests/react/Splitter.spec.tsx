@@ -47,6 +47,14 @@ describe('Splitter', () => {
   })
 
   describe('Gutter', () => {
+    function gutterVar(container: HTMLElement): string {
+      const root = container.firstElementChild as HTMLElement
+      const fromRoot = root.style.getPropertyValue('--tiger-splitter-gutter')
+      if (fromRoot) return fromRoot
+      const gutter = container.querySelector('[role="separator"]') as HTMLElement | null
+      return gutter?.style.getPropertyValue('--tiger-splitter-gutter') ?? ''
+    }
+
     it('should have separator role', () => {
       const { container } = renderSplitter()
       const gutter = container.querySelector('[role="separator"]')
@@ -62,6 +70,21 @@ describe('Splitter', () => {
       const { container } = renderSplitter()
       const gutter = container.querySelector('[role="separator"]')
       expect(gutter?.getAttribute('tabindex')).toBe('0')
+    })
+
+    it('defaults visible gutter thickness to 4px', () => {
+      const { container } = renderSplitter()
+      expect(gutterVar(container)).toBe('4px')
+    })
+
+    it('sets visible gutter thickness from gutterSize', () => {
+      const { container } = renderSplitter({ gutterSize: 8 })
+      expect(gutterVar(container)).toBe('8px')
+    })
+
+    it('sets vertical gutter thickness from gutterSize', () => {
+      const { container } = renderSplitter({ gutterSize: 8, direction: 'vertical' })
+      expect(gutterVar(container)).toBe('8px')
     })
   })
 
@@ -114,6 +137,63 @@ describe('Splitter', () => {
       expect(gutter.classList.contains(draggingClass)).toBe(false)
       fireEvent.mouseDown(gutter, { clientX: 400 })
       expect(gutter.classList.contains(draggingClass)).toBe(true)
+    })
+  })
+
+  describe('Initial sizes', () => {
+    function paneWidth(el: Element): number {
+      return parseFloat((el as HTMLElement).style.width)
+    }
+
+    it('clamps numeric sizes to min on mount (Pages [30, 70] + min 100)', () => {
+      const { container } = renderSplitter({ sizes: [30, 70], min: 100 })
+      const panes = container.querySelectorAll('.tiger-splitter-pane')
+      expect(panes).toHaveLength(2)
+      expect((panes[0] as HTMLElement).style.width).not.toBe('30px')
+      expect((panes[1] as HTMLElement).style.width).not.toBe('70px')
+      expect(paneWidth(panes[0])).toBeGreaterThanOrEqual(100)
+      expect(paneWidth(panes[1])).toBeGreaterThanOrEqual(100)
+    })
+
+    it('keeps pixel sizes when min is 0', () => {
+      const { container } = renderSplitter({ sizes: [400, 400] })
+      const panes = container.querySelectorAll('.tiger-splitter-pane')
+      expect((panes[0] as HTMLElement).style.width).toBe('400px')
+      expect((panes[1] as HTMLElement).style.width).toBe('400px')
+    })
+
+    it('does not collapse to [0, 100] on first ArrowRight from [30, 70] + min 100', () => {
+      const onResize = vi.fn()
+      const { container } = renderSplitter({
+        sizes: [30, 70],
+        min: 100,
+        onResize
+      })
+      const gutter = container.querySelector('[role="separator"]')!
+      fireEvent.keyDown(gutter, { key: 'ArrowRight' })
+      expect(onResize).toHaveBeenCalled()
+      const sizes = onResize.mock.calls[0][0].sizes as number[]
+      expect(sizes[0]).toBeGreaterThanOrEqual(100)
+      expect(sizes[1]).toBeGreaterThanOrEqual(100)
+    })
+
+    it('resolves percentage sizes against the measured container', () => {
+      const desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+        configurable: true,
+        get: () => 1004
+      })
+      try {
+        const { container } = renderSplitter({ sizes: ['30%', '70%'] })
+        const panes = container.querySelectorAll('.tiger-splitter-pane')
+        expect(panes).toHaveLength(2)
+        expect(paneWidth(panes[0])).toBeCloseTo(300, 0)
+        expect(paneWidth(panes[1])).toBeCloseTo(700, 0)
+      } finally {
+        if (desc) {
+          Object.defineProperty(HTMLElement.prototype, 'clientWidth', desc)
+        }
+      }
     })
   })
 })

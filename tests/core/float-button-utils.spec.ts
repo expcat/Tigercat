@@ -6,7 +6,9 @@ import {
   floatButtonTypeClasses,
   floatButtonDisabledClasses,
   floatButtonGroupClasses,
-  floatButtonIconSizeClasses
+  floatButtonIconSizeClasses,
+  floatButtonPlusIconPath,
+  getFloatButtonGroupClasses
 } from '@expcat/tigercat-core'
 
 describe('float-button-utils', () => {
@@ -35,8 +37,34 @@ describe('float-button-utils', () => {
     expect(floatButtonDisabledClasses).toContain('pointer-events-none')
   })
 
-  it('group classes include fixed positioning', () => {
-    expect(floatButtonGroupClasses).toContain('fixed')
+  it('group stack chrome does not hardcode a viewport corner', () => {
+    expect(floatButtonGroupClasses).toContain('flex')
+    expect(floatButtonGroupClasses).toContain('flex-col-reverse')
+    expect(floatButtonGroupClasses).toContain('gap')
+    expect(floatButtonGroupClasses).not.toContain('fixed')
+    expect(floatButtonGroupClasses).not.toContain('right-6')
+    expect(floatButtonGroupClasses).not.toContain('bottom-6')
+  })
+
+  it('portal-on group classes are fixed to a corner', () => {
+    const classes = getFloatButtonGroupClasses({ placement: 'bottom-right', portal: true })
+    expect(classes).toContain('fixed')
+    expect(classes).toContain('bottom-0')
+    expect(classes).toContain('right-0')
+    expect(classes).not.toContain('absolute')
+  })
+
+  it('portal-off group classes are absolute to a corner', () => {
+    const classes = getFloatButtonGroupClasses({ placement: 'bottom-left', portal: false })
+    expect(classes).toContain('absolute')
+    expect(classes).toContain('bottom-0')
+    expect(classes).toContain('left-0')
+    expect(classes).not.toContain('fixed')
+  })
+
+  it('plus icon path is a non-empty M path', () => {
+    expect(floatButtonPlusIconPath.startsWith('M')).toBe(true)
+    expect(floatButtonPlusIconPath.length).toBeGreaterThan(1)
   })
 
   it('icon size classes match button sizes', () => {

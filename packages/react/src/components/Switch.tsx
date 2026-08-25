@@ -4,11 +4,16 @@ import {
   getSwitchClasses,
   getSwitchThumbClasses
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface SwitchProps
   extends
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'children'>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'children' | 'defaultChecked'>,
     CoreSwitchProps {
+  /**
+   * Default checked state (uncontrolled mode)
+   */
+  defaultChecked?: boolean
   /**
    * Change event handler
    */
@@ -16,7 +21,8 @@ export interface SwitchProps
 }
 
 export const Switch: React.FC<SwitchProps> = ({
-  checked = false,
+  checked: checkedProp,
+  defaultChecked,
   disabled = false,
   size = 'md',
   onChange,
@@ -26,13 +32,15 @@ export const Switch: React.FC<SwitchProps> = ({
   tabIndex,
   ...props
 }) => {
+  const [checked, setChecked] = useControlledState(checkedProp, defaultChecked ?? false, onChange)
+
   const switchClasses = getSwitchClasses(size, checked, disabled, className)
 
   const thumbClasses = getSwitchThumbClasses(size, checked)
 
   const toggle = () => {
     if (disabled) return
-    onChange?.(!checked)
+    setChecked(!checked)
   }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

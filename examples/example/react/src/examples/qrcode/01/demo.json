@@ -1,7 +1,7 @@
 {
   "id": "qrcode-01",
   "title": "代表配置",
-  "description": "单个 QRCode 组合 size、前景色、背景色和 H 纠错等级；status 还支持 expired 与 loading。",
+  "description": "单个 QRCode 组合 size、前景色与背景色；图案为装饰性哈希矩阵，不可扫描。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }

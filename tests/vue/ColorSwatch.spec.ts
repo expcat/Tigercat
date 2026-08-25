@@ -51,6 +51,20 @@ describe('ColorSwatch', () => {
     expect(onChange).toHaveBeenCalledWith('#222222', expect.objectContaining({ value: '#222222' }))
   })
 
+  it('selects a color without modelValue', async () => {
+    renderWithProps(ColorSwatch, { colors: ['#111111', '#222222'] })
+
+    await fireEvent.click(screen.getByRole('radio', { name: '#222222' }))
+
+    expect(screen.getByRole('radio', { name: '#222222' })).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('seeds the selected color from defaultValue', () => {
+    renderWithProps(ColorSwatch, { defaultValue: '#111111', colors: ['#111111', '#222222'] })
+
+    expect(screen.getByRole('radio', { name: '#111111' })).toHaveAttribute('aria-checked', 'true')
+  })
+
   it('does not select disabled colors', async () => {
     const onChange = vi.fn()
     render(ColorSwatch, {

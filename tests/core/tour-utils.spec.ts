@@ -7,6 +7,7 @@ import {
   getActiveTourStepPosition,
   getActiveTourSteps,
   getCurrentActiveTourStep,
+  getTourMaskHoleStyle,
   getTourPopoverPosition
 } from '@expcat/tigercat-core'
 import type { TourStep } from '@expcat/tigercat-core'
@@ -52,5 +53,14 @@ describe('tour utilities', () => {
 
     expect(position.left).toBe(8)
     expect(position.top).toBeGreaterThanOrEqual(8)
+  })
+
+  it('builds an evenodd clip-path hole from the target rect', () => {
+    const style = getTourMaskHoleStyle({ top: 100, left: 200, width: 50, height: 30 })
+
+    expect(style.clipPath).toBeTruthy()
+    expect(style.clipPath).toContain('evenodd')
+    expect(style.clipPath).toContain('196px 96px')
+    expect(style.clipPath).toContain('254px 134px')
   })
 })

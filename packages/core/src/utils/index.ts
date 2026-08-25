@@ -59,7 +59,14 @@ export type { ActivityTimelineItem } from './activity-feed-utils'
 export { sortNotificationGroups, buildNotificationGroups } from './notification-center-utils'
 
 // CommentThread utilities
-export { buildCommentTree, clipCommentTreeDepth } from './comment-thread-utils'
+export {
+  buildCommentTree,
+  clipCommentTreeDepth,
+  resolveCommentLikeState,
+  nextCommentLikeState,
+  writeCommentLikeOverlay
+} from './comment-thread-utils'
+export type { CommentLikeOverlay, CommentLikeState } from './comment-thread-utils'
 
 // Composite time helpers
 export * from './composite-time-utils'

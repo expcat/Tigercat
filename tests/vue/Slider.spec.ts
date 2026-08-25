@@ -85,6 +85,22 @@ describe('Slider', () => {
       expect(onChange).toHaveBeenCalled()
     })
 
+    it('should emit update:modelValue with the same payload as update:value', async () => {
+      const onUpdateValue = vi.fn()
+      const onUpdateModelValue = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          'onUpdate:value': onUpdateValue,
+          'onUpdate:modelValue': onUpdateModelValue
+        }
+      })
+      await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
+      expect(onUpdateValue).toHaveBeenCalled()
+      expect(onUpdateModelValue).toHaveBeenCalled()
+      expect(onUpdateModelValue.mock.calls[0][0]).toEqual(onUpdateValue.mock.calls[0][0])
+    })
+
     it('should not emit events when disabled', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
@@ -127,6 +143,18 @@ describe('Slider', () => {
     it('should use defaultValue when value is not provided', () => {
       const { container } = render(Slider, { props: { defaultValue: 75 } })
       expect(getThumb(container)).toHaveAttribute('aria-valuenow', '75')
+    })
+
+    it('should initialize aria-valuenow from modelValue (default v-model)', () => {
+      const { container } = render(Slider, { props: { modelValue: 40 } })
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', '40')
+    })
+
+    it('should update aria-valuenow when the modelValue prop changes', async () => {
+      const { container, rerender } = render(Slider, { props: { modelValue: 30 } })
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', '30')
+      await rerender({ modelValue: 70 })
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', '70')
     })
   })
 

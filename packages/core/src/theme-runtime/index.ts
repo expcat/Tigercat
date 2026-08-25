@@ -7,6 +7,7 @@ export * from './checkbox'
 export * from './switch'
 export * from './slider'
 
+import type { ThemeSemanticColors } from '../types/theme'
 import { isBrowser } from '../utils/env'
 
 /**
@@ -80,6 +81,10 @@ export const THEME_CSS_VARS = {
   chart4: '--tiger-chart-4',
   chart5: '--tiger-chart-5',
   chart6: '--tiger-chart-6',
+  // Aliases of existing semantic tokens (not a third color system)
+  textMuted: '--tiger-text-muted',
+  fill: '--tiger-fill',
+  bg: '--tiger-bg',
   // Breakpoints
   breakpointXs: '--tiger-breakpoint-xs',
   breakpointSm: '--tiger-breakpoint-sm',
@@ -87,6 +92,37 @@ export const THEME_CSS_VARS = {
   breakpointLg: '--tiger-breakpoint-lg',
   breakpointXl: '--tiger-breakpoint-xl'
 } as const
+
+/** Canonical semantic keys that alias CSS names resolve through. */
+const THEME_CSS_VAR_ALIAS_SOURCES = {
+  textMuted: 'textSecondary',
+  fill: 'surfaceMuted',
+  bg: 'surface'
+} as const satisfies Record<string, keyof typeof THEME_CSS_VARS>
+
+/**
+ * Map semantic colors to CSS custom properties, then emit alias names as `var()`
+ * references so they follow preset / runtime changes to the canonical tokens.
+ */
+export function semanticColorsToCssVars(
+  colors: Partial<ThemeSemanticColors> = {}
+): Record<string, string> {
+  const vars: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(colors)) {
+    const varName = THEME_CSS_VARS[key as keyof typeof THEME_CSS_VARS]
+    if (varName && value) vars[varName] = value
+  }
+
+  for (const aliasKey of Object.keys(THEME_CSS_VAR_ALIAS_SOURCES) as Array<
+    keyof typeof THEME_CSS_VAR_ALIAS_SOURCES
+  >) {
+    const sourceKey = THEME_CSS_VAR_ALIAS_SOURCES[aliasKey]
+    vars[THEME_CSS_VARS[aliasKey]] = `var(${THEME_CSS_VARS[sourceKey]})`
+  }
+
+  return vars
+}
 
 const cssVarCache = new WeakMap<HTMLElement, Map<string, string>>()
 

@@ -67,7 +67,7 @@ export interface LoadingProps {
 
   /**
    * Custom background color (for fullscreen mode)
-   * @default 'rgba(255, 255, 255, 0.9)'
+   * @default 'var(--tiger-loading-mask, color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent))'
    */
   background?: string
 

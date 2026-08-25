@@ -91,6 +91,47 @@ export const deDE: TigerLocale = defineLocale({
     dragHintText: 'Zum Verschieben ziehen',
     boardAriaLabel: 'Aufgabenboard'
   },
+  chatWindow: {
+    emptyText: 'Keine Nachrichten',
+    sendText: 'Senden',
+    placeholder: 'Nachricht eingeben',
+    sendingText: 'Senden...',
+    sentText: 'Zugestellt',
+    failedText: 'Senden fehlgeschlagen'
+  },
+  code: {
+    copyLabel: 'Kopieren',
+    copiedLabel: 'Kopiert',
+    copyFailedLabel: 'Kopieren fehlgeschlagen'
+  },
+  commentThread: {
+    emptyText: 'Keine Kommentare',
+    replyPlaceholder: 'Antwort schreiben...',
+    replyButtonText: 'Antworten',
+    cancelReplyText: 'Abbrechen',
+    likeText: 'Gefällt mir',
+    likedText: 'Gefällt dir',
+    replyText: 'Antworten',
+    moreText: 'Mehr',
+    loadMoreText: 'Mehr laden',
+    collapseRepliesText: '▾ Antworten ausblenden',
+    expandRepliesText: '▸ {count} Antworten anzeigen'
+  },
+  activityFeed: {
+    emptyText: 'Keine Aktivität',
+    loadingText: 'Wird geladen...'
+  },
+  notificationCenter: {
+    title: 'Benachrichtigungen',
+    emptyText: 'Keine Benachrichtigungen',
+    loadingText: 'Wird geladen...',
+    allLabel: 'Alle',
+    unreadLabel: 'Ungelesen',
+    readLabel: 'Gelesen',
+    markAllReadText: 'Alle als gelesen markieren',
+    markReadText: 'Als gelesen markieren',
+    markUnreadText: 'Als ungelesen markieren'
+  },
   select: {
     doneText: 'Fertigstellen'
   },

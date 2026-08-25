@@ -94,6 +94,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     wrapperClasses
   } = useChartInteraction<TreeMapChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -221,15 +222,14 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip =
-    showTooltip && hoverable ? (
-      <ChartTooltip
-        content={tooltipContent}
-        open={resolvedHoveredIndex !== null && tooltipContent !== ''}
-        x={tooltipPosition.x}
-        y={tooltipPosition.y}
-      />
-    ) : null
+  const tooltip = showTooltip ? (
+    <ChartTooltip
+      content={tooltipContent}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
+      x={tooltipPosition.x}
+      y={tooltipPosition.y}
+    />
+  ) : null
 
   if (!showLegend) {
     return (

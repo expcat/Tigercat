@@ -169,6 +169,34 @@ describe('ScrollSpy', () => {
       fireEvent.click(screen.getByText('Intro'))
       expect(onActiveKeyChange).not.toHaveBeenCalled()
     })
+
+    it('keeps aria-current on the clicked last item while a scroll update would pick the first', () => {
+      const intro = document.getElementById('intro') as HTMLElement
+      const usage = document.getElementById('usage') as HTMLElement
+      const api = document.getElementById('api') as HTMLElement
+      Object.defineProperty(intro, 'offsetTop', { value: 10, configurable: true })
+      Object.defineProperty(usage, 'offsetTop', { value: 500, configurable: true })
+      Object.defineProperty(api, 'offsetTop', { value: 900, configurable: true })
+      Object.defineProperty(intro, 'offsetParent', { value: scrollContainer, configurable: true })
+      Object.defineProperty(usage, 'offsetParent', { value: scrollContainer, configurable: true })
+      Object.defineProperty(api, 'offsetParent', { value: scrollContainer, configurable: true })
+      scrollContainer.scrollTop = 0
+
+      const onActiveKeyChange = vi.fn()
+      renderScrollSpy({ onActiveKeyChange })
+
+      fireEvent.click(screen.getByText('API'))
+      expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
+      const changeCalls = onActiveKeyChange.mock.calls.length
+
+      act(() => {
+        scrollContainer.dispatchEvent(new Event('scroll'))
+      })
+
+      expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
+      expect(screen.getByText('Intro')).not.toHaveAttribute('aria-current')
+      expect(onActiveKeyChange.mock.calls.length).toBe(changeCalls)
+    })
   })
 
   describe('Accessibility', () => {

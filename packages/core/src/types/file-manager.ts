@@ -42,8 +42,13 @@ export interface FileManagerProps {
   files?: FileItem[]
   /** View mode */
   viewMode?: FileViewMode
-  /** Currently selected file keys */
+  /** Currently selected file keys (controlled) */
   selectedKeys?: (string | number)[]
+  /**
+   * Default selected file keys (uncontrolled).
+   * Used when `selectedKeys` is omitted.
+   */
+  defaultSelectedKeys?: (string | number)[]
   /** Allow multiple selection */
   multiple?: boolean
   /** Which columns to show in list view */

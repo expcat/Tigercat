@@ -64,6 +64,18 @@ describe('Stepper', () => {
     }
   })
 
+  it('increments the displayed value without value', () => {
+    const { container } = render(<Stepper />)
+    const buttons = container.querySelectorAll('button')
+    fireEvent.click(buttons[1])
+    expect(container.querySelector('input')).toHaveValue('1')
+  })
+
+  it('starts at defaultValue', () => {
+    const { container } = render(<Stepper defaultValue={5} />)
+    expect(container.querySelector('input')).toHaveValue('5')
+  })
+
   // --- Disabled ---
   it('disables all controls when disabled', () => {
     const { container } = render(<Stepper disabled />)

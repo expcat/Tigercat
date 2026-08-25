@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   createPaginationIdleValidationScheduler,
+  defaultTotalText,
   formatPageAriaLabel,
   formatPaginationTotal,
   getTimePickerLabels,
@@ -63,6 +64,11 @@ describe('pagination-utils', () => {
     expect(formatPageAriaLabel('الصفحة {page}', 12, 'ar-SA')).toBe(
       `الصفحة ${new Intl.NumberFormat('ar-SA').format(12)}`
     )
+  })
+
+  it('defaultTotalText uses English Total N items, not Chinese', () => {
+    expect(defaultTotalText(240, [1, 20])).toBe('Total 240 items')
+    expect(defaultTotalText(240, [1, 20])).not.toBe('共 240 条')
   })
 
   it('resolves TimePicker labels for new locale codes', () => {

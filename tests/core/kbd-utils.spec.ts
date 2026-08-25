@@ -104,7 +104,11 @@ describe('kbd-utils', () => {
       const classes = getKbdRootClasses()
       expect(classes).toContain(kbdBaseClasses)
       expect(classes).toContain(tagSizeClasses.md)
-      expect(classes).toContain('bg-[var(--tiger-tag-default-bg')
+      expect(classes).toContain('--tiger-tag-default-bg')
+      expect(classes).toContain('--tiger-surface-muted')
+      expect(classes).toContain('--tiger-text')
+      expect(classes).not.toContain('--tiger-fill')
+      expect(classes).not.toContain('#f3f4f6')
     })
 
     it('applies the subtle variant and extra class names', () => {

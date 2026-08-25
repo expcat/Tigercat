@@ -3,7 +3,9 @@ import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
   classNames,
+  createCircleRingPath,
   createPolygonPath,
+  createPolygonRingPath,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -143,6 +145,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     wrapperClasses
   } = useChartInteraction<RadarChartSeries>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -170,11 +173,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const handlePointEnter = useCallback(
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
-      if (!hoverable) return
+      if (!hoverable && !showTooltip) return
       setHoveredPoint({ seriesIndex, pointIndex })
       handleHoverEnter(seriesIndex, event)
     },
-    [hoverable, handleHoverEnter]
+    [hoverable, showTooltip, handleHoverEnter]
   )
 
   const handlePointMove = useCallback(
@@ -467,53 +470,60 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             })}
         </defs>
       )}
-      {/* Split areas */}
+      {/* Split areas: evenodd ring, transparent inner */}
       {splitAreaPaths.map((area, index) => {
         if (area.type === 'circle-ring') {
-          return (
-            <g key={`split-${index}`}>
-              <circle
-                cx={area.cx}
-                cy={area.cy}
-                r={area.outerRadius}
+          if (area.innerRadius > 0) {
+            return (
+              <path
+                key={`split-${index}`}
+                d={createCircleRingPath(area.cx, area.cy, area.outerRadius, area.innerRadius)}
                 fill={area.color}
                 fillOpacity={splitAreaOpacity}
+                fillRule="evenodd"
                 stroke="none"
                 data-radar-split-area="true"
               />
-              {area.innerRadius > 0 ? (
-                <circle
-                  cx={area.cx}
-                  cy={area.cy}
-                  r={area.innerRadius}
-                  fill="var(--tiger-bg,#fff)"
-                  stroke="none"
-                />
-              ) : null}
-            </g>
+            )
+          }
+          return (
+            <circle
+              key={`split-${index}`}
+              cx={area.cx}
+              cy={area.cy}
+              r={area.outerRadius}
+              fill={area.color}
+              fillOpacity={splitAreaOpacity}
+              stroke="none"
+              data-radar-split-area="true"
+            />
           )
         }
+        if (area.innerPoints.length > 0) {
+          const ringPath = createPolygonRingPath(area.outerPoints, area.innerPoints)
+          return ringPath ? (
+            <path
+              key={`split-${index}`}
+              d={ringPath}
+              fill={area.color}
+              fillOpacity={splitAreaOpacity}
+              fillRule="evenodd"
+              stroke="none"
+              data-radar-split-area="true"
+            />
+          ) : null
+        }
         const outerPath = createPolygonPath(area.outerPoints)
-        return (
-          <g key={`split-${index}`}>
-            {outerPath ? (
-              <path
-                d={outerPath}
-                fill={area.color}
-                fillOpacity={splitAreaOpacity}
-                stroke="none"
-                data-radar-split-area="true"
-              />
-            ) : null}
-            {area.innerPoints.length > 0 ? (
-              <path
-                d={createPolygonPath(area.innerPoints)}
-                fill="var(--tiger-bg,#fff)"
-                stroke="none"
-              />
-            ) : null}
-          </g>
-        )
+        return outerPath ? (
+          <path
+            key={`split-${index}`}
+            d={outerPath}
+            fill={area.color}
+            fillOpacity={splitAreaOpacity}
+            stroke="none"
+            data-radar-split-area="true"
+          />
+        ) : null
       })}
       {/* Grid lines */}
       {gridPaths.map((grid, index) =>
@@ -650,12 +660,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       data-series-key={item.seriesKey}
                       data-point-index={point.index}
                       onMouseEnter={
-                        showTooltip && hoverable
+                        showTooltip || hoverable
                           ? (e: React.MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
                           : undefined
                       }
-                      onMouseMove={showTooltip && hoverable ? handlePointMove : undefined}
-                      onMouseLeave={showTooltip && hoverable ? handlePointLeave : undefined}
+                      onMouseMove={showTooltip || hoverable ? handlePointMove : undefined}
+                      onMouseLeave={showTooltip || hoverable ? handlePointLeave : undefined}
                       onFocus={
                         showTooltip && hoverable
                           ? (e: React.FocusEvent<SVGCircleElement>) =>
@@ -712,15 +722,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip =
-    showTooltip && hoverable ? (
-      <ChartTooltip
-        content={tooltipContent}
-        open={hoveredPoint !== null && tooltipContent !== ''}
-        x={tooltipPosition.x}
-        y={tooltipPosition.y}
-      />
-    ) : null
+  const tooltip = showTooltip ? (
+    <ChartTooltip
+      content={tooltipContent}
+      open={hoveredPoint !== null && tooltipContent !== ''}
+      x={tooltipPosition.x}
+      y={tooltipPosition.y}
+    />
+  ) : null
 
   if (!showLegend) {
     return (

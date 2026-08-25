@@ -51,13 +51,14 @@ export const buttonGroupVerticalClasses = 'flex-col'
 export const buttonGroupHorizontalClasses = 'flex-row'
 
 /**
- * Classes to merge adjacent button borders in a horizontal group
+ * Child-selector classes for a horizontal ButtonGroup root (InputGroup compact
+ * pattern). `!` overrides Button's `rounded-[var(--tiger-radius-md)]`.
  */
 export const buttonGroupItemClasses =
-  '[&:not(:first-child):not(:last-child)]:rounded-none [&:first-child]:rounded-r-none [&:last-child]:rounded-l-none [&:not(:first-child)]:-ml-px'
+  '[&>*:not(:first-child):not(:last-child)]:!rounded-none [&>*:first-child]:!rounded-r-none [&>*:last-child]:!rounded-l-none [&>*:not(:first-child)]:-ml-px [&>*:focus]:z-10 [&>*:focus]:relative'
 
 /**
- * Classes to merge adjacent button borders in a vertical group
+ * Child-selector classes for a vertical ButtonGroup root. `!` same as horizontal.
  */
 export const buttonGroupItemVerticalClasses =
-  '[&:not(:first-child):not(:last-child)]:rounded-none [&:first-child]:rounded-b-none [&:last-child]:rounded-t-none [&:not(:first-child)]:-mt-px'
+  '[&>*:not(:first-child):not(:last-child)]:!rounded-none [&>*:first-child]:!rounded-b-none [&>*:last-child]:!rounded-t-none [&>*:not(:first-child)]:-mt-px [&>*:focus]:z-10 [&>*:focus]:relative'

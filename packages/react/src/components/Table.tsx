@@ -28,6 +28,7 @@ import {
   type ExpandableConfig,
   type TableCardLayoutItem,
   type TableColumn,
+  type PaginationConfig,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
@@ -48,6 +49,15 @@ import type { TableProps } from './Table/types'
 
 export type { TableProps } from './Table/types'
 
+const DEFAULT_TABLE_PAGINATION: PaginationConfig = {
+  defaultCurrent: 1,
+  defaultPageSize: 10,
+  total: 0,
+  pageSizeOptions: [10, 20, 50, 100],
+  showSizeChanger: true,
+  showTotal: true
+}
+
 export function Table<T extends Record<string, unknown> = Record<string, unknown>>({
   columns,
   columnLockable = false,
@@ -66,14 +76,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   locale,
   labels,
   emptyText,
-  pagination = {
-    current: 1,
-    pageSize: 10,
-    total: 0,
-    pageSizeOptions: [10, 20, 50, 100],
-    showSizeChanger: true,
-    showTotal: true
-  },
+  pagination = DEFAULT_TABLE_PAGINATION,
   rowSelection,
   expandable,
   rowKey = 'id',
@@ -307,18 +310,12 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   )
 
   const wrapperStyle = useMemo(() => {
-    if (effectiveVirtual) {
-      return {
-        height: typeof virtualHeight === 'number' ? `${virtualHeight}px` : virtualHeight,
-        overflow: 'auto' as const
-      }
-    }
     return maxHeight
       ? {
           maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight
         }
       : undefined
-  }, [effectiveVirtual, maxHeight, virtualHeight])
+  }, [maxHeight])
 
   useEffect(() => {
     if (!shouldObserveGeometry) {
@@ -345,19 +342,97 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     return () => controller.disconnect()
   }, [shouldObserveGeometry, ctx.displayColumns.length, ctx.paginatedData.length])
 
+  const tableInner = (
+    <table
+      ref={tableRef}
+      className={classNames(
+        tableBaseClasses,
+        getTableResponsiveTableClasses(responsiveMode, cardBreakpoint),
+        tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
+        className
+      )}
+      {...props}
+      style={
+        ctx.fixedColumnsInfo.hasFixedColumns && ctx.fixedColumnsInfo.minTableWidth
+          ? {
+              ...(props as React.HTMLAttributes<HTMLTableElement>).style,
+              minWidth: `${ctx.fixedColumnsInfo.minTableWidth}px`
+            }
+          : (props as React.HTMLAttributes<HTMLTableElement>).style
+      }>
+      {(columnLockable || ctx.fixedColumnsInfo.hasFixedColumns) && (
+        <colgroup>
+          {getTableColgroup({
+            columns: ctx.displayColumns,
+            frozenWidths: ctx.frozenColumnWidths,
+            size,
+            hasSelectionColumn:
+              !!internalRowSelection && internalRowSelection.showCheckbox !== false,
+            expand: internalExpandable
+              ? internalExpandable.expandIconPosition === 'end'
+                ? 'end'
+                : 'start'
+              : false
+          }).map((entry, index) => (
+            <col
+              key={`${entry.key}-${index}`}
+              style={entry.width ? { width: entry.width } : undefined}
+            />
+          ))}
+        </colgroup>
+      )}
+      {renderTableHeader(ctx, {
+        size,
+        stickyHeader,
+        rowSelection: internalRowSelection,
+        expandable: internalExpandable,
+        columnLockable,
+        columnDraggable,
+        lockColumnAriaLabel: tableLabels.lockColumnAriaLabel,
+        unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel,
+        labels: tableLabels
+      })}
+      {renderTableBody(ctx, {
+        size,
+        hoverable,
+        striped,
+        loading,
+        emptyText: tableLabels.emptyText,
+        rowSelection: internalRowSelection,
+        expandable: internalExpandable,
+        labels: tableLabels,
+        rowClassName: internalRowClassName,
+        rowDraggable,
+        interactiveRows: !!onRowClick || !!internalRowSelection,
+        virtualWindow
+      })}
+      {renderSummaryRow(ctx, {
+        size,
+        rowSelection: internalRowSelection,
+        expandable: internalExpandable,
+        summaryRow
+      })}
+    </table>
+  )
+
+  const tableContent = effectiveVirtual ? (
+    <div
+      style={{
+        height: typeof virtualHeight === 'number' ? `${virtualHeight}px` : virtualHeight,
+        overflow: 'auto'
+      }}
+      onScroll={(e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)}>
+      {tableInner}
+    </div>
+  ) : (
+    tableInner
+  )
+
   return (
     <div
       ref={wrapperRef}
-      className={getTableWrapperClasses(
-        bordered,
-        maxHeight || (virtual ? virtualHeight : undefined)
-      )}
+      className={getTableWrapperClasses(bordered, maxHeight)}
       style={wrapperStyle}
-      onScroll={
-        effectiveVirtual
-          ? (e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)
-          : undefined
-      }
       data-tiger-virtual={virtualRecommendation.enabled ? 'enabled' : undefined}
       data-tiger-virtual-recommended={virtualRecommendation.recommended ? 'true' : undefined}
       data-tiger-virtual-threshold={
@@ -381,76 +456,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         </div>
       )}
 
-      <table
-        ref={tableRef}
-        className={classNames(
-          tableBaseClasses,
-          getTableResponsiveTableClasses(responsiveMode, cardBreakpoint),
-          tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
-          className
-        )}
-        {...props}
-        style={
-          ctx.fixedColumnsInfo.hasFixedColumns && ctx.fixedColumnsInfo.minTableWidth
-            ? {
-                ...(props as React.HTMLAttributes<HTMLTableElement>).style,
-                minWidth: `${ctx.fixedColumnsInfo.minTableWidth}px`
-              }
-            : (props as React.HTMLAttributes<HTMLTableElement>).style
-        }>
-        {(columnLockable || ctx.fixedColumnsInfo.hasFixedColumns) && (
-          <colgroup>
-            {getTableColgroup({
-              columns: ctx.displayColumns,
-              frozenWidths: ctx.frozenColumnWidths,
-              size,
-              hasSelectionColumn:
-                !!internalRowSelection && internalRowSelection.showCheckbox !== false,
-              expand: internalExpandable
-                ? internalExpandable.expandIconPosition === 'end'
-                  ? 'end'
-                  : 'start'
-                : false
-            }).map((entry, index) => (
-              <col
-                key={`${entry.key}-${index}`}
-                style={entry.width ? { width: entry.width } : undefined}
-              />
-            ))}
-          </colgroup>
-        )}
-        {renderTableHeader(ctx, {
-          size,
-          stickyHeader,
-          rowSelection: internalRowSelection,
-          expandable: internalExpandable,
-          columnLockable,
-          columnDraggable,
-          lockColumnAriaLabel: tableLabels.lockColumnAriaLabel,
-          unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel,
-          labels: tableLabels
-        })}
-        {renderTableBody(ctx, {
-          size,
-          hoverable,
-          striped,
-          loading,
-          emptyText: tableLabels.emptyText,
-          rowSelection: internalRowSelection,
-          expandable: internalExpandable,
-          labels: tableLabels,
-          rowClassName: internalRowClassName,
-          rowDraggable,
-          interactiveRows: !!onRowClick || !!internalRowSelection,
-          virtualWindow
-        })}
-        {renderSummaryRow(ctx, {
-          size,
-          rowSelection: internalRowSelection,
-          expandable: internalExpandable,
-          summaryRow
-        })}
-      </table>
+      {tableContent}
 
       {responsiveMode === 'card' && (
         <div

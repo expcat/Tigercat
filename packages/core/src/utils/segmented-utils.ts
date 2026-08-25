@@ -25,7 +25,7 @@ export function getSegmentedContainerClasses(size: ComponentSize, block: boolean
 
   return classNames(
     'relative inline-grid overflow-hidden rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-segmented-bg,var(--tiger-fill,#f3f4f6))]',
+    'bg-[var(--tiger-segmented-bg,var(--tiger-surface-muted,#f9fafb))]',
     sizeClasses[size],
     block ? 'w-full' : ''
   )
@@ -46,7 +46,7 @@ export function getSegmentedIndicatorClasses(size: ComponentSize): string {
 
   return classNames(
     'pointer-events-none absolute z-0 rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-segmented-active-bg,var(--tiger-surface,#ffffff))] shadow-sm',
+    'bg-[var(--tiger-segmented-active-bg,var(--tiger-surface-raised,#ffffff))] shadow-sm',
     'transition-transform duration-200 ease-out will-change-transform',
     insetClasses[size]
   )

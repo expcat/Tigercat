@@ -431,9 +431,74 @@ describe('Table', () => {
 
       expect(container.querySelector('[data-tiger-virtual="enabled"]')).toBeTruthy()
     })
+
+    it('keeps virtual overflow on an inner scroller around the table, not export or Pagination', () => {
+      const rows = Array.from({ length: 15 }, (_, index) => ({
+        id: index,
+        name: `User ${index}`,
+        age: index,
+        email: `user${index}@example.com`
+      }))
+
+      const { container, getByText } = renderWithProps(Table, {
+        columns,
+        dataSource: rows,
+        virtual: true,
+        virtualHeight: 320,
+        exportable: true
+      })
+
+      const wrapper = container.querySelector('[data-tiger-virtual="enabled"]') as HTMLElement
+      expect(wrapper).toBeTruthy()
+      expect(wrapper.style.overflow).not.toMatch(/^(auto|scroll)$/)
+      expect(wrapper.style.height).not.toBe('320px')
+      expect(wrapper.className.split(/\s+/)).not.toContain('overflow-y-auto')
+
+      const table = wrapper.querySelector('table')
+      expect(table).toBeTruthy()
+      const scroller = table!.parentElement as HTMLElement
+      expect(scroller).not.toBe(wrapper)
+      expect(scroller.style.height).toBe('320px')
+      expect(scroller.style.overflow).toBe('auto')
+      expect(scroller.contains(table)).toBe(true)
+
+      const exportButton = getByText('Export CSV')
+      expect(wrapper.contains(exportButton)).toBe(true)
+      expect(scroller.contains(exportButton)).toBe(false)
+
+      const pagination = wrapper.querySelector('nav[role="navigation"]')
+      expect(pagination).toBeTruthy()
+      expect(wrapper.contains(pagination)).toBe(true)
+      expect(scroller.contains(pagination)).toBe(false)
+    })
   })
 
   describe('Sorting', () => {
+    it('renders a real sort button on sortable headers for keyboard access', () => {
+      const sortableColumns = [
+        { key: 'name', title: 'Name', sortable: true },
+        { key: 'age', title: 'Age' }
+      ]
+
+      const { getByText } = renderWithProps(Table, {
+        columns: sortableColumns,
+        dataSource
+      })
+
+      const nameHeaderCell = getByText('Name').closest('th')!
+      const sortButton = nameHeaderCell.querySelector<HTMLButtonElement>(
+        'button[type="button"][data-tiger-table-sort]'
+      )
+      expect(sortButton).not.toBeNull()
+      expect(sortButton).not.toBeDisabled()
+      expect(sortButton).not.toHaveAttribute('tabindex', '-1')
+      expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
+      expect(nameHeaderCell).toHaveAttribute('data-tiger-table-column-key', 'name')
+
+      const ageHeaderCell = getByText('Age').closest('th')!
+      expect(ageHeaderCell.querySelector('[data-tiger-table-sort]')).toBeNull()
+    })
+
     it('should emit sort-change event when clicking sortable column', async () => {
       const sortableColumns = [
         { key: 'name', title: 'Name', sortable: true },
@@ -454,9 +519,10 @@ describe('Table', () => {
 
       const nameHeader = getByText('Name')
       const nameHeaderCell = nameHeader.closest('th')!
+      const sortButton = nameHeaderCell.querySelector('[data-tiger-table-sort]')!
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
 
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
 
       expect(onSortChange).toHaveBeenCalledWith({
@@ -483,11 +549,12 @@ describe('Table', () => {
       })
 
       const nameHeaderCell = getByText('Name').closest('th')!
+      const sortButton = nameHeaderCell.querySelector('[data-tiger-table-sort]')!
 
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
 
       // First click - asc
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
       expect(onSortChange).toHaveBeenCalledWith({
         key: 'name',
@@ -496,7 +563,7 @@ describe('Table', () => {
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'ascending')
 
       // Second click - desc
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
       expect(onSortChange).toHaveBeenCalledWith({
         key: 'name',
@@ -505,13 +572,42 @@ describe('Table', () => {
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'descending')
 
       // Third click - null (clear sort)
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
       expect(onSortChange).toHaveBeenCalledWith({
         key: null,
         direction: null
       })
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
+    })
+
+    it('sorts and filters by dataKey when it differs from key', async () => {
+      const splitColumns: TableColumn[] = [
+        { key: 'nameCol', title: 'Name', dataKey: 'name', sortable: true },
+        { key: 'ageCol', title: 'Age', dataKey: 'age', filter: { type: 'text' } }
+      ]
+
+      const { container, getByText } = renderWithProps(Table, {
+        columns: splitColumns,
+        dataSource,
+        pagination: false
+      })
+
+      const nameHeaderCell = getByText('Name').closest('th')!
+      const sortButton = nameHeaderCell.querySelector('[data-tiger-table-sort]')!
+      await fireEvent.click(sortButton)
+      await nextTick()
+
+      const firstCell = container.querySelector('tbody tr td')
+      expect(firstCell).toHaveTextContent('Bob Johnson')
+
+      const filterInput = container.querySelector('thead input[type="text"]') as HTMLInputElement
+      await fireEvent.input(filterInput, { target: { value: '32' } })
+      await nextTick()
+
+      const rows = container.querySelectorAll('tbody tr')
+      expect(rows).toHaveLength(1)
+      expect(rows[0]).toHaveTextContent('Jane Smith')
     })
   })
 
@@ -576,7 +672,7 @@ describe('Table', () => {
         email: `person${i + 1}@example.com`
       }))
 
-      const { getByRole } = render(Table, {
+      const { getByRole, getByText, queryByText } = render(Table, {
         props: {
           columns,
           dataSource: largeDataSource
@@ -586,6 +682,9 @@ describe('Table', () => {
         }
       })
 
+      expect(getByText('Person 1')).toBeInTheDocument()
+      expect(queryByText('Person 11')).not.toBeInTheDocument()
+
       const nextButton = getByRole('button', { name: 'Next page' })
       await fireEvent.click(nextButton)
 
@@ -593,6 +692,33 @@ describe('Table', () => {
         current: 2,
         pageSize: 10
       })
+      expect(getByText('Person 11')).toBeInTheDocument()
+      expect(queryByText('Person 1')).not.toBeInTheDocument()
+    })
+
+    it('should show all rows when default page size is changed via the size select', async () => {
+      const largeDataSource = Array.from({ length: 15 }, (_, i) => ({
+        id: i + 1,
+        name: `Person ${i + 1}`,
+        age: 20 + i,
+        email: `person${i + 1}@example.com`
+      }))
+
+      const { getByLabelText, getByText, queryByText } = render(Table, {
+        props: {
+          columns,
+          dataSource: largeDataSource
+        }
+      })
+
+      expect(getByText('Person 1')).toBeInTheDocument()
+      expect(queryByText('Person 11')).not.toBeInTheDocument()
+
+      await fireEvent.update(getByLabelText('/ page'), '20')
+
+      expect(getByText('Person 1')).toBeInTheDocument()
+      expect(getByText('Person 11')).toBeInTheDocument()
+      expect(getByText('Person 15')).toBeInTheDocument()
     })
     it('should respect controlled pagination on rerender', async () => {
       const { rerender, getByText, queryByText } = render(Table, {
@@ -1075,7 +1201,7 @@ describe('Table', () => {
       })
 
       const nameHeader = getByText('Name')
-      await fireEvent.click(nameHeader.closest('th')!)
+      await fireEvent.click(nameHeader.closest('th')!.querySelector('[data-tiger-table-sort]')!)
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({

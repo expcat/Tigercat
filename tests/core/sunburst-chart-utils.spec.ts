@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeSunburstArcs } from '@expcat/tigercat-core'
+import { computeSunburstArcs, getSunburstLabelPoint } from '@expcat/tigercat-core'
 
 const baseOpts = { cx: 100, cy: 100, innerRadius: 30, outerRadius: 90 }
 
@@ -149,5 +149,46 @@ describe('computeSunburstArcs', () => {
 
     expect(arcs.map((arc) => arc.value)).toEqual([0, 0, 10])
     expect(arcs.every((arc) => !arc.path.includes('NaN'))).toBe(true)
+  })
+
+  it('stores ring radii and places nested labels on distinct mid-angles and mid-radii', () => {
+    const data = [
+      {
+        label: '亚洲',
+        value: 60,
+        children: [
+          { label: '中国', value: 35 },
+          { label: '日本', value: 15 },
+          { label: '印度', value: 10 }
+        ]
+      },
+      { label: '欧洲', value: 25 },
+      { label: '美洲', value: 15 }
+    ]
+    const arcs = computeSunburstArcs(data, baseOpts)
+
+    for (const arc of arcs) {
+      expect(arc.innerRadius).toBeLessThan(arc.outerRadius)
+    }
+
+    const asia = arcs.find((a) => a.label === '亚洲')
+    const china = arcs.find((a) => a.label === '中国')
+    expect(asia).toBeDefined()
+    expect(china).toBeDefined()
+    expect(asia!.depth).toBe(0)
+    expect(china!.depth).toBe(1)
+
+    const asiaMidRadius = (asia!.innerRadius + asia!.outerRadius) / 2
+    const chinaMidRadius = (china!.innerRadius + china!.outerRadius) / 2
+    expect(asiaMidRadius).toBeLessThan(chinaMidRadius)
+    expect(asia!.midAngle).not.toBeCloseTo(china!.midAngle)
+
+    const asiaPoint = getSunburstLabelPoint(asia!, baseOpts.cx, baseOpts.cy)
+    const chinaPoint = getSunburstLabelPoint(china!, baseOpts.cx, baseOpts.cy)
+    expect(Number.isFinite(asiaPoint.x)).toBe(true)
+    expect(Number.isFinite(asiaPoint.y)).toBe(true)
+    expect(Number.isFinite(chinaPoint.x)).toBe(true)
+    expect(Number.isFinite(chinaPoint.y)).toBe(true)
+    expect(asiaPoint).not.toEqual(chinaPoint)
   })
 })

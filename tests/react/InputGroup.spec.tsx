@@ -56,6 +56,50 @@ describe('InputGroup', () => {
     expect(screen.getByLabelText('plain textarea').className).toContain('py-3')
     expect(screen.getByRole('spinbutton').className).toContain('text-lg')
   })
+
+  it('uses focus-within so nested field focus raises compact z-index', () => {
+    render(<InputGroup compact>content</InputGroup>)
+    const group = screen.getByRole('group')
+    expect(group.className).toContain('focus-within')
+    expect(group.className).not.toContain('[&>*:focus]:z-10')
+  })
+
+  it('joins compact Input chrome on the group-child root, not a nested capsule', () => {
+    render(
+      <InputGroup compact>
+        <Input aria-label="q" />
+        <button type="button">Go</button>
+      </InputGroup>
+    )
+    const group = screen.getByRole('group')
+    const first = group.firstElementChild as HTMLElement
+    const last = group.lastElementChild as HTMLElement
+    const input = screen.getByLabelText('q')
+
+    expect(group.className).toContain('[&>*:first-child]:!rounded-r-none')
+    expect(group.className).toContain('[&>*:last-child]:!rounded-l-none')
+    expect(first).toBe(input.parentElement)
+    expect(first.className).toContain('border')
+    expect(first.className).toContain('rounded-[var(--tiger-radius-md')
+    expect(input.className).not.toContain('rounded-[var(--tiger-radius-md')
+    expect(last.tagName).toBe('BUTTON')
+    expect(last).toBe(group.lastElementChild)
+  })
+
+  it('makes compact Textarea the chrome group child when showCount is off', () => {
+    render(
+      <InputGroup compact>
+        <Textarea aria-label="notes" />
+        <button type="button">Go</button>
+      </InputGroup>
+    )
+    const group = screen.getByRole('group')
+    const textarea = screen.getByLabelText('notes')
+    expect(group.firstElementChild).toBe(textarea)
+    expect(textarea.className).toContain('border')
+    expect(textarea.className).toContain('rounded-[var(--tiger-radius-md')
+    expect(textarea.parentElement).toBe(group)
+  })
 })
 
 describe('InputGroupAddon', () => {

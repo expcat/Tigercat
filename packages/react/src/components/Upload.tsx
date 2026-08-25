@@ -163,6 +163,16 @@ export const Upload: React.FC<UploadProps> = ({
     // to avoid overwriting previous files when selecting multiple at once.
     let nextFileList = [...fileList]
 
+    // Progress/success/error mutate the same uploadFile then notify with a new
+    // array so controlled parents (fileList + onChange) redraw. Do not pass
+    // Upload onChange into useControlledState: hook onChange is (fileList) =>
+    // void, Upload onChange is (file, fileList) => void.
+    const notifyFileList = (file: UploadFile) => {
+      const nextList = [...nextFileList]
+      updateFileList(nextList)
+      onChange?.(file, nextList)
+    }
+
     for (const file of prepared.acceptedFiles) {
       const uploadFile = fileToUploadFile(file)
 
@@ -175,7 +185,7 @@ export const Upload: React.FC<UploadProps> = ({
       }
 
       if (autoUpload && !queue) {
-        await uploadOne(file, uploadFile, () => updateFileList([...nextFileList]))
+        await uploadOne(file, uploadFile, () => notifyFileList(uploadFile))
       }
     }
 
@@ -189,7 +199,7 @@ export const Upload: React.FC<UploadProps> = ({
         async (item) => {
           const uploadFile = nextFileList.find((candidate) => candidate.uid === item.id)
           if (!uploadFile) return
-          await uploadOne(item.file, uploadFile, () => updateFileList([...nextFileList]))
+          await uploadOne(item.file, uploadFile, () => notifyFileList(uploadFile))
         },
         { concurrency: maxConcurrent, onChange: onQueueChange }
       )
@@ -348,34 +358,38 @@ export const Upload: React.FC<UploadProps> = ({
           tabIndex={disabled ? -1 : 0}
           aria-disabled={disabled}
           aria-label={labels.dragAreaAriaLabel}>
-          <svg
-            className="w-12 h-12 mb-3 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-            />
-          </svg>
-          <p className="mb-2 text-sm">
-            <span className="font-semibold">{labels.clickToUploadText}</span>{' '}
-            {labels.dragAndDropText}
-          </p>
-          {accept && (
-            <p className="text-xs text-gray-500">
-              {interpolateUploadLabel(labels.acceptInfoText, { accept })}
-            </p>
-          )}
-          {maxSize && (
-            <p className="text-xs text-gray-500">
-              {interpolateUploadLabel(labels.maxSizeInfoText, {
-                maxSize: formatFileSize(maxSize)
-              })}
-            </p>
+          {children || (
+            <>
+              <svg
+                className="w-12 h-12 mb-3 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <p className="mb-2 text-sm">
+                <span className="font-semibold">{labels.clickToUploadText}</span>{' '}
+                {labels.dragAndDropText}
+              </p>
+              {accept && (
+                <p className="text-xs text-gray-500">
+                  {interpolateUploadLabel(labels.acceptInfoText, { accept })}
+                </p>
+              )}
+              {maxSize && (
+                <p className="text-xs text-gray-500">
+                  {interpolateUploadLabel(labels.maxSizeInfoText, {
+                    maxSize: formatFileSize(maxSize)
+                  })}
+                </p>
+              )}
+            </>
           )}
         </div>
       )

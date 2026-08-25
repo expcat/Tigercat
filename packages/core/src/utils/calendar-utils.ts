@@ -52,13 +52,28 @@ export function getCalendarDayClasses(
   )
 }
 
-export function getCalendarMonthClasses(isSelected: boolean): string {
+export function getCalendarMonthClasses(isSelected: boolean, isDisabled?: boolean): string {
   return classNames(
-    'inline-flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] py-2 px-3 text-sm transition-colors cursor-pointer',
+    'inline-flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] py-2 px-3 text-sm transition-colors',
+    isDisabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer',
     isSelected
       ? 'bg-[var(--tiger-calendar-selected-bg,var(--tiger-primary,#2563eb))] text-white'
       : 'text-[var(--tiger-calendar-day,var(--tiger-text,#111827))] hover:bg-[var(--tiger-calendar-day-hover,var(--tiger-fill-hover,#e5e7eb))]'
   )
+}
+
+/** True when every calendar day of `year`/`month` (0-indexed) is disabled. */
+export function isCalendarMonthDisabled(
+  year: number,
+  month: number,
+  disabledDate?: (date: Date) => boolean
+): boolean {
+  if (!disabledDate) return false
+  const lastDay = new Date(year, month + 1, 0).getDate()
+  for (let day = 1; day <= lastDay; day++) {
+    if (!disabledDate(new Date(year, month, day))) return false
+  }
+  return true
 }
 
 /* ------------------------------------------------------------------ */

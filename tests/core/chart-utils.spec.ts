@@ -19,6 +19,8 @@ import {
   getRadarAngles,
   getRadarPoints,
   createPolygonPath,
+  createPolygonRingPath,
+  createCircleRingPath,
   getRadarLabelAlign,
   RADAR_SPLIT_AREA_COLORS,
   createLinePath,
@@ -547,6 +549,59 @@ describe('chart-utils', () => {
     })
   })
 
+  describe('createPolygonRingPath', () => {
+    const outer = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 10 },
+      { x: 0, y: 10 }
+    ]
+    const inner = [
+      { x: 2, y: 2 },
+      { x: 8, y: 2 },
+      { x: 8, y: 8 },
+      { x: 2, y: 8 }
+    ]
+
+    it('returns empty string for empty outer', () => {
+      expect(createPolygonRingPath([])).toBe('')
+    })
+
+    it('returns a simple polygon when inner is empty', () => {
+      expect(createPolygonRingPath(outer)).toBe(createPolygonPath(outer))
+    })
+
+    it('combines outer and reversed inner as two subpaths', () => {
+      const path = createPolygonRingPath(outer, inner)
+      expect(path.length).toBeGreaterThan(0)
+      expect(path.length).toBeGreaterThan(createPolygonPath(outer).length)
+      expect(path.match(/M /g)?.length).toBe(2)
+      expect(path).toMatch(/Z M /)
+      expect(path).toBe(`${createPolygonPath(outer)} ${createPolygonPath(inner.slice().reverse())}`)
+    })
+  })
+
+  describe('createCircleRingPath', () => {
+    it('returns empty string when outer radius is not positive', () => {
+      expect(createCircleRingPath(50, 50, 0, 10)).toBe('')
+    })
+
+    it('returns a non-empty disk path when inner radius is 0', () => {
+      const path = createCircleRingPath(50, 50, 40, 0)
+      expect(path.length).toBeGreaterThan(0)
+      expect(path).toContain('A')
+      expect(path.match(/M /g)?.length).toBe(1)
+    })
+
+    it('adds a second subpath when inner radius is positive', () => {
+      const disk = createCircleRingPath(50, 50, 40, 0)
+      const ring = createCircleRingPath(50, 50, 40, 20)
+      expect(ring.length).toBeGreaterThan(disk.length)
+      expect(ring.match(/M /g)?.length).toBe(2)
+      expect(ring).toMatch(/Z M /)
+    })
+  })
+
   describe('getRadarLabelAlign', () => {
     it('returns middle text-anchor for top position (-PI/2)', () => {
       const result = getRadarLabelAlign(-Math.PI / 2)
@@ -578,6 +633,16 @@ describe('chart-utils', () => {
     it('exports default split area colors', () => {
       expect(RADAR_SPLIT_AREA_COLORS).toHaveLength(2)
       expect(RADAR_SPLIT_AREA_COLORS[0]).toContain('var(')
+    })
+
+    it('follows theme text instead of black-alpha wash', () => {
+      expect(RADAR_SPLIT_AREA_COLORS).toHaveLength(2)
+      for (const entry of RADAR_SPLIT_AREA_COLORS) {
+        expect(entry).toContain('var(')
+      }
+      const joined = RADAR_SPLIT_AREA_COLORS.join(' ')
+      expect(joined).not.toMatch(/rgba\(\s*0\s*,\s*0\s*,\s*0/)
+      expect(joined).toContain('--tiger-text')
     })
   })
 

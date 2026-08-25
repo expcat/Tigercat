@@ -1,7 +1,7 @@
 import plugin from 'tailwindcss/plugin'
 import type { PluginAPI } from 'tailwindcss/plugin'
-import type { ThemePreset, ThemeSemanticColors } from './types/theme'
-import { THEME_CSS_VARS } from './theme-runtime'
+import type { ThemePreset } from './types/theme'
+import { semanticColorsToCssVars } from './theme-runtime'
 import {
   MODERN_BASE_TOKENS_LIGHT,
   MODERN_BASE_TOKENS_DARK,
@@ -11,22 +11,11 @@ import {
 } from './themes/modern/tokens'
 import { defaultThemeDarkColors, defaultThemeLightColors } from './themes/default/theme'
 
-function presetToVars(colors: Partial<ThemeSemanticColors>): Record<string, string> {
-  const vars: Record<string, string> = {}
-  for (const [key, value] of Object.entries(colors)) {
-    const varName = THEME_CSS_VARS[key as keyof ThemeSemanticColors]
-    if (varName && value) {
-      vars[varName] = value
-    }
-  }
-  return vars
-}
-
 /** Default theme colors for Tigercat. */
-export const tigercatTheme = presetToVars(defaultThemeLightColors)
+export const tigercatTheme = semanticColorsToCssVars(defaultThemeLightColors)
 
 /** Dark mode theme overrides. */
-export const tigercatDarkTheme = presetToVars(defaultThemeDarkColors)
+export const tigercatDarkTheme = semanticColorsToCssVars(defaultThemeDarkColors)
 
 const tigercatDirectionBase = {
   '[dir="rtl"] .tiger-rtl-mirror, [data-tiger-dir="rtl"] .tiger-rtl-mirror': {
@@ -113,9 +102,13 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
   return plugin(function ({ addBase }: PluginAPI) {
     const preset = options.preset
 
-    const lightVars = preset?.light?.colors ? presetToVars(preset.light.colors) : tigercatTheme
+    const lightVars = preset?.light?.colors
+      ? semanticColorsToCssVars(preset.light.colors)
+      : tigercatTheme
 
-    const darkVars = preset?.dark?.colors ? presetToVars(preset.dark.colors) : tigercatDarkTheme
+    const darkVars = preset?.dark?.colors
+      ? semanticColorsToCssVars(preset.dark.colors)
+      : tigercatDarkTheme
 
     addBase({
       ':root': { ...lightVars, ...MODERN_BASE_TOKENS_LIGHT },

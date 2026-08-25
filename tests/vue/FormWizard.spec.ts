@@ -112,6 +112,85 @@ describe('FormWizard (Vue)', () => {
       expect(screen.getByText('Content 3')).toBeInTheDocument()
     })
 
+    it('clicking a skipped step title walks forward to the next unskipped step', async () => {
+      const stepsWithSkip: WizardStep[] = [
+        { title: 'Step 1' },
+        { title: 'Step 2', skipCondition: () => true },
+        { title: 'Step 3' }
+      ]
+
+      render(FormWizard, {
+        props: { steps: stepsWithSkip, clickable: true },
+        slots: {
+          step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+        }
+      })
+
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('button', { name: 'Step 2' }))
+      expect(screen.getByText('Content 3')).toBeInTheDocument()
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+    })
+
+    it('clicking a skipped step title walks backward to the previous unskipped step', async () => {
+      const stepsWithSkip: WizardStep[] = [
+        { title: 'Step 1' },
+        { title: 'Step 2', skipCondition: () => true },
+        { title: 'Step 3' }
+      ]
+
+      render(FormWizard, {
+        props: { steps: stepsWithSkip, clickable: true, defaultCurrent: 2 },
+        slots: {
+          step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+        }
+      })
+
+      expect(screen.getByText('Content 3')).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('button', { name: 'Step 2' }))
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+    })
+
+    it('clicking a later non-skipped step lands there even if a middle step is skipped', async () => {
+      const stepsWithSkip: WizardStep[] = [
+        { title: 'Step 1' },
+        { title: 'Step 2', skipCondition: () => true },
+        { title: 'Step 3' }
+      ]
+
+      render(FormWizard, {
+        props: { steps: stepsWithSkip, clickable: true },
+        slots: {
+          step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+        }
+      })
+
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('button', { name: 'Step 3' }))
+      expect(screen.getByText('Content 3')).toBeInTheDocument()
+    })
+
+    it('stays on the current step when clicking a skipped last step with nothing after', async () => {
+      const stepsWithSkipLast: WizardStep[] = [
+        { title: 'Step 1' },
+        { title: 'Step 2' },
+        { title: 'Step 3', skipCondition: () => true }
+      ]
+
+      render(FormWizard, {
+        props: { steps: stepsWithSkipLast, clickable: true },
+        slots: {
+          step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+        }
+      })
+
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('button', { name: 'Step 3' }))
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      expect(screen.queryByText('Content 3')).not.toBeInTheDocument()
+    })
+
     it('calls autoSave on step change', async () => {
       const autoSave = vi.fn()
 

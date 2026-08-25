@@ -6,7 +6,9 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { ActivityFeed } from '@expcat/tigercat-react/ActivityFeed'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import type { ActivityGroup } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ActivityFeed (React)', () => {
@@ -94,6 +96,26 @@ describe('ActivityFeed (React)', () => {
     expect(screen.queryByText('今天')).not.toBeInTheDocument()
     expect(screen.getByText('A')).toBeInTheDocument()
   })
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN empty copy when emptyText is omitted', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <ActivityFeed items={[]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('暂无动态')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN loading text when loading', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <ActivityFeed loading />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('加载中...')).toBeInTheDocument()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<ActivityFeed />)

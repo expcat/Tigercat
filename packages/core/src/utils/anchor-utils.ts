@@ -206,6 +206,33 @@ export function scrollToAnchor(
 }
 
 /**
+ * Last href in document order whose section top is at or above `offsetLine`.
+ *
+ * Offset line is `rootTop + offsetTop + bounds` (viewport/rect space) or
+ * `scrollTop + targetOffset + bounds` (container scroll space). Sections whose
+ * top cannot be resolved are skipped. If none qualify, the first link.
+ */
+export function findActiveAnchorAtOffsetLine(
+  links: string[],
+  getSectionTop: (href: string) => number | null,
+  offsetLine: number
+): string {
+  if (links.length === 0) {
+    return ''
+  }
+
+  for (let i = links.length - 1; i >= 0; i--) {
+    const href = links[i]
+    const top = getSectionTop(href)
+    if (top !== null && top <= offsetLine) {
+      return href
+    }
+  }
+
+  return links[0] || ''
+}
+
+/**
  * Find current active anchor based on scroll position
  */
 export function findActiveAnchor(
@@ -223,23 +250,134 @@ export function findActiveAnchor(
   }
 
   const scrollTop = getContainerScrollTop(container)
+  const offsetLine = scrollTop + targetOffset + bounds
 
-  // Find the first visible anchor
-  for (let i = links.length - 1; i >= 0; i--) {
-    const href = links[i]
-    const element = getAnchorTargetElement(href)
-
-    if (element) {
-      const offsetTop = getElementOffsetTop(element, container) - targetOffset - bounds
-
-      if (scrollTop >= offsetTop) {
-        return href
+  return findActiveAnchorAtOffsetLine(
+    links,
+    (href) => {
+      const element = getAnchorTargetElement(href)
+      if (!element) {
+        return null
       }
+      return getElementOffsetTop(element, container)
+    },
+    offsetLine
+  )
+}
+
+const DEFAULT_SCROLL_LOCK_IDLE_MS = 150
+const DEFAULT_SCROLL_LOCK_TIMEOUT_MS = 2000
+
+export interface ProgrammaticScrollLock {
+  isLocked: () => boolean
+  lock: () => void
+  unlock: () => void
+  dispose: () => void
+}
+
+export interface ProgrammaticScrollLockOptions {
+  /** Idle ms with no scroll events before unlocking (no-scrollend fallback). @default 150 */
+  idleMs?: number
+  /** Safety timeout so the lock cannot stick forever. @default 2000 */
+  timeoutMs?: number
+}
+
+/**
+ * Ignore observer/scroll-source updates until a programmatic `scrollTo` finishes.
+ *
+ * Unlocks on `scrollend` when the event exists, otherwise after a short idle
+ * with no `scroll` events. A safety timeout always fires so the lock cannot stick.
+ * Rapid `lock()` calls reset timers; last click wins.
+ */
+export function createProgrammaticScrollLock(
+  getTarget: () => HTMLElement | Window,
+  options: ProgrammaticScrollLockOptions = {}
+): ProgrammaticScrollLock {
+  const idleMs = options.idleMs ?? DEFAULT_SCROLL_LOCK_IDLE_MS
+  const timeoutMs = options.timeoutMs ?? DEFAULT_SCROLL_LOCK_TIMEOUT_MS
+
+  let locked = false
+  let idleTimer: ReturnType<typeof setTimeout> | null = null
+  let safetyTimer: ReturnType<typeof setTimeout> | null = null
+  let attachedTarget: EventTarget | null = null
+  let listeningScrollEnd = false
+
+  const clearTimers = (): void => {
+    if (idleTimer !== null) {
+      clearTimeout(idleTimer)
+      idleTimer = null
+    }
+    if (safetyTimer !== null) {
+      clearTimeout(safetyTimer)
+      safetyTimer = null
     }
   }
 
-  // Default to first link if no anchor is visible
-  return links[0] || ''
+  const onScroll = (): void => {
+    scheduleIdle()
+  }
+
+  const onScrollEnd = (): void => {
+    unlock()
+  }
+
+  const detach = (): void => {
+    if (!attachedTarget) {
+      return
+    }
+    attachedTarget.removeEventListener('scroll', onScroll)
+    if (listeningScrollEnd) {
+      attachedTarget.removeEventListener('scrollend', onScrollEnd)
+    }
+    attachedTarget = null
+    listeningScrollEnd = false
+  }
+
+  const unlock = (): void => {
+    locked = false
+    clearTimers()
+    detach()
+  }
+
+  const scheduleIdle = (): void => {
+    if (idleTimer !== null) {
+      clearTimeout(idleTimer)
+    }
+    idleTimer = setTimeout(() => {
+      idleTimer = null
+      unlock()
+    }, idleMs)
+  }
+
+  const lock = (): void => {
+    clearTimers()
+    detach()
+    locked = true
+
+    if (isBrowser()) {
+      const container = getTarget()
+      const target: EventTarget = container === window ? window : (container as HTMLElement)
+      attachedTarget = target
+      listeningScrollEnd = 'onscrollend' in window
+      target.addEventListener('scroll', onScroll, { passive: true })
+      if (listeningScrollEnd) {
+        target.addEventListener('scrollend', onScrollEnd)
+      }
+    }
+
+    scheduleIdle()
+    safetyTimer = setTimeout(() => {
+      safetyTimer = null
+      unlock()
+    }, timeoutMs)
+  }
+
+  return {
+    isLocked: () => locked,
+    lock,
+    unlock,
+    dispose: unlock
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -247,8 +385,13 @@ export function findActiveAnchor(
 // ---------------------------------------------------------------------------
 
 export interface AnchorObserverOptions {
-  /** Distance from top of root that defines the "active zone" */
+  /** Distance from top of root that defines the offset line */
   offsetTop?: number
+  /**
+   * Extra pixels added to the offset line.
+   * @default 5
+   */
+  bounds?: number
   /** Scroll root. `null` = viewport. */
   root?: Element | null
   /** Called whenever the active anchor changes. Empty string when none active. */
@@ -258,10 +401,9 @@ export interface AnchorObserverOptions {
 /**
  * Create an IntersectionObserver-based active-anchor tracker.
  *
- * Observes each link target and tracks which sections currently intersect a
- * thin band at the top of the scroll root (just below `offsetTop`). The first
- * intersecting section in document order is reported as active. Falls back to
- * the last section that has scrolled past `offsetTop` when nothing intersects.
+ * IO is the change trigger. The winner is the last link in document order whose
+ * section top is at or above `rootTop + offsetTop + bounds` (same rule as
+ * `findActiveAnchor`). Visibility / `isIntersecting` order does not decide.
  *
  * Returns a teardown function. Safe when `IntersectionObserver` is unavailable
  * (returns no-op) or no targets resolve.
@@ -270,7 +412,7 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   if (!isBrowser()) return () => {}
   if (typeof IntersectionObserver === 'undefined') return () => {}
 
-  const { offsetTop = 0, root = null, onChange } = options
+  const { offsetTop = 0, bounds = 5, root = null, onChange } = options
 
   const targets = new Map<Element, string>()
   for (const href of links) {
@@ -279,35 +421,25 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   }
   if (targets.size === 0) return () => {}
 
-  const visible = new Set<string>()
-
   const computeActive = (): string => {
-    // Topmost visible section in document order
-    for (const href of links) {
-      if (visible.has(href)) return href
-    }
-    // Otherwise: the last one that has scrolled past the offset line.
-    // Use container-relative coordinates so fallback matches the observer's root.
     const rootTop = root ? root.getBoundingClientRect().top : 0
-    let fallback = ''
-    for (const href of links) {
-      const el = getAnchorTargetElement(href)
-      if (el && el.getBoundingClientRect().top - rootTop <= offsetTop + 1) {
-        fallback = href
-      }
-    }
-    return fallback
+    const offsetLine = rootTop + offsetTop + bounds
+    return findActiveAnchorAtOffsetLine(
+      links,
+      (href) => {
+        const el = getAnchorTargetElement(href)
+        if (!el) {
+          return null
+        }
+        return el.getBoundingClientRect().top
+      },
+      offsetLine
+    )
   }
 
   let last = ''
   const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        const href = targets.get(entry.target)
-        if (!href) continue
-        if (entry.isIntersecting) visible.add(href)
-        else visible.delete(href)
-      }
+    () => {
       const next = computeActive()
       if (next !== last) {
         last = next
@@ -316,18 +448,16 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
     },
     {
       root,
-      // Active zone: from `offsetTop` down to ~40% of viewport height.
-      // Sections fully below this band are considered "below".
-      rootMargin: `-${offsetTop}px 0px -60% 0px`,
+      // Top inset at the offset line; 0 bottom so last sections still notify.
+      rootMargin: `-${offsetTop}px 0px 0px 0px`,
       threshold: [0, 1]
     }
   )
 
   for (const target of targets.keys()) observer.observe(target)
 
-  // Initial synchronous emit using fallback computation. IO callbacks may
-  // not fire on mount in all environments (e.g. test shims) and consumers
-  // generally expect an initial active-anchor signal.
+  // Initial synchronous emit using the same last-at-offset-line rule. IO
+  // callbacks may not fire on mount in all environments (e.g. test shims).
   const initial = computeActive()
   if (initial) {
     last = initial

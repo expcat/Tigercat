@@ -318,14 +318,11 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     [handleNext, handlePrev, touchSwipeThreshold]
   )
 
-  const handleMaskClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (maskClosable && e.target === e.currentTarget) {
-        handleClose()
-      }
-    },
-    [maskClosable, handleClose]
-  )
+  const handleMaskClick = useCallback(() => {
+    if (maskClosable) {
+      handleClose()
+    }
+  }, [maskClosable, handleClose])
 
   const transform = useMemo(
     () => `${calculateTransform(scale, offsetX, offsetY)} rotate(${rotation}deg)`,
@@ -343,9 +340,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={labels.previewDialogAriaLabel}
-      onClick={handleMaskClick}
       onWheel={handleWheel}>
-      <div className={imagePreviewMaskClasses} aria-hidden="true" />
+      <div className={imagePreviewMaskClasses} aria-hidden="true" onClick={handleMaskClick} />
       <img
         src={currentSrc}
         className={imagePreviewImgClasses}

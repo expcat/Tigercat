@@ -287,22 +287,23 @@ export const Textarea = defineComponent({
         })
       ]
 
-      // Add character count if enabled
-      if (props.showCount) {
-        const countText = props.maxLength
-          ? `${currentLength.value}/${props.maxLength}`
-          : `${currentLength.value}`
-
-        children.push(
-          h(
-            'div',
-            {
-              class: 'mt-1 text-sm text-gray-500 text-right'
-            },
-            countText
-          )
-        )
+      if (!props.showCount) {
+        return children[0]
       }
+
+      const countText = props.maxLength
+        ? `${currentLength.value}/${props.maxLength}`
+        : `${currentLength.value}`
+
+      children.push(
+        h(
+          'div',
+          {
+            class: 'mt-1 text-sm text-gray-500 text-right'
+          },
+          countText
+        )
+      )
 
       return h('div', { class: 'w-full' }, children)
     }

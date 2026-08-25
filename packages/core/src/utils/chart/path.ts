@@ -294,6 +294,49 @@ export function createPolygonPath(points: Array<{ x: number; y: number }>): stri
 }
 
 /**
+ * Closed evenodd ring: outer polygon plus reversed inner polygon.
+ * Pair with `fill-rule="evenodd"` so the inner is a transparent hole.
+ */
+export function createPolygonRingPath(
+  outerPoints: Array<{ x: number; y: number }>,
+  innerPoints: Array<{ x: number; y: number }> = []
+): string {
+  const outer = createPolygonPath(outerPoints)
+  if (!outer) return ''
+  if (innerPoints.length === 0) return outer
+  const inner = createPolygonPath(innerPoints.slice().reverse())
+  if (!inner) return outer
+  return `${outer} ${inner}`
+}
+
+/**
+ * Closed evenodd annulus (two opposite-winding circles).
+ * Pair with `fill-rule="evenodd"` so the inner disk is transparent.
+ */
+export function createCircleRingPath(
+  cx: number,
+  cy: number,
+  outerRadius: number,
+  innerRadius = 0
+): string {
+  if (outerRadius <= 0) return ''
+  const outer = [
+    `M ${cx} ${cy - outerRadius}`,
+    `A ${outerRadius} ${outerRadius} 0 1 1 ${cx} ${cy + outerRadius}`,
+    `A ${outerRadius} ${outerRadius} 0 1 1 ${cx} ${cy - outerRadius}`,
+    'Z'
+  ].join(' ')
+  if (innerRadius <= 0) return outer
+  const inner = [
+    `M ${cx} ${cy - innerRadius}`,
+    `A ${innerRadius} ${innerRadius} 0 1 0 ${cx} ${cy + innerRadius}`,
+    `A ${innerRadius} ${innerRadius} 0 1 0 ${cx} ${cy - innerRadius}`,
+    'Z'
+  ].join(' ')
+  return `${outer} ${inner}`
+}
+
+/**
  * Compute text-anchor and dominant-baseline for a radar label based on its angle.
  * Mimics ECharts indicator name positioning for natural readability.
  */

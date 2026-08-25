@@ -91,6 +91,47 @@ export const ptBR: TigerLocale = defineLocale({
     dragHintText: 'Arraste para mover',
     boardAriaLabel: 'Quadro de tarefas'
   },
+  chatWindow: {
+    emptyText: 'Nenhuma mensagem',
+    sendText: 'Enviar',
+    placeholder: 'Digite uma mensagem',
+    sendingText: 'Enviando',
+    sentText: 'Entregue',
+    failedText: 'Falha ao enviar'
+  },
+  code: {
+    copyLabel: 'Copiar',
+    copiedLabel: 'Copiado',
+    copyFailedLabel: 'Falha ao copiar'
+  },
+  commentThread: {
+    emptyText: 'Nenhum comentário',
+    replyPlaceholder: 'Escreva uma resposta...',
+    replyButtonText: 'Responder',
+    cancelReplyText: 'Cancelar',
+    likeText: 'Curtir',
+    likedText: 'Curtido',
+    replyText: 'Responder',
+    moreText: 'Mais',
+    loadMoreText: 'Carregar mais',
+    collapseRepliesText: '▾ Recolher respostas',
+    expandRepliesText: '▸ Expandir {count} respostas'
+  },
+  activityFeed: {
+    emptyText: 'Nenhuma atividade',
+    loadingText: 'Carregando...'
+  },
+  notificationCenter: {
+    title: 'Notificações',
+    emptyText: 'Nenhuma notificação',
+    loadingText: 'Carregando...',
+    allLabel: 'Todas',
+    unreadLabel: 'Não lidas',
+    readLabel: 'Lidas',
+    markAllReadText: 'Marcar todas como lidas',
+    markReadText: 'Marcar como lida',
+    markUnreadText: 'Marcar como não lida'
+  },
   select: {
     doneText: 'Concluir'
   },

@@ -9,8 +9,10 @@ import {
   getMarkdownToolbarButtonClasses,
   getMarkdownToolbarButtons,
   isMarkdownToolbarSeparator,
+  markdownEditorBodyClasses,
   markdownEditorContainerBase,
   markdownEditorContainerDisabled,
+  markdownEditorToolbarClasses,
   markdownHotkeyMatches,
   renderMarkdownInline,
   renderMarkdownToHtml
@@ -69,6 +71,40 @@ describe('MarkdownEditor utilities', () => {
     it('returns split body classes', () => {
       expect(getMarkdownBodyClasses('split')).toContain('md:grid-cols-2')
       expect(getMarkdownBodyClasses('edit')).toContain('grid-cols-1')
+    })
+
+    it('lands container fill on registered surface/text, not locked white or bg aliases', () => {
+      expect(markdownEditorContainerBase).toContain('--tiger-surface')
+      expect(markdownEditorContainerBase).toContain('--tiger-text')
+      expect(markdownEditorContainerBase).toContain('--tiger-md-bg,var(--tiger-surface')
+      expect(markdownEditorContainerBase).toContain('text-[var(--tiger-text,#111827)]')
+      expect(markdownEditorContainerBase).not.toContain('bg-[var(--tiger-bg,#ffffff)]')
+      expect(markdownEditorContainerBase).not.toContain('--tiger-bg')
+      expect(markdownEditorContainerBase).not.toContain('--tiger-fill')
+      expect(markdownEditorContainerBase).not.toContain('--tiger-surface-muted')
+
+      const overrideIdx = markdownEditorContainerBase.indexOf('--tiger-md-bg')
+      const semanticIdx = markdownEditorContainerBase.indexOf('--tiger-surface')
+      expect(overrideIdx).toBeGreaterThan(-1)
+      expect(semanticIdx).toBeGreaterThan(overrideIdx)
+    })
+
+    it('lands body fill on the same registered surface chain', () => {
+      expect(markdownEditorBodyClasses).toContain('--tiger-surface')
+      expect(markdownEditorBodyClasses).toContain('--tiger-md-bg,var(--tiger-surface')
+      expect(markdownEditorBodyClasses).not.toContain('bg-[var(--tiger-bg,#ffffff)]')
+      expect(markdownEditorBodyClasses).not.toContain('--tiger-bg')
+      expect(markdownEditorBodyClasses).not.toContain('--tiger-fill')
+    })
+
+    it('lands toolbar fill on registered surface-muted, not locked bg-secondary', () => {
+      expect(markdownEditorToolbarClasses).toContain('--tiger-surface-muted')
+      expect(markdownEditorToolbarClasses).toContain(
+        '--tiger-md-toolbar-bg,var(--tiger-surface-muted'
+      )
+      expect(markdownEditorToolbarClasses).not.toContain('--tiger-bg-secondary')
+      expect(markdownEditorToolbarClasses).not.toContain('--tiger-bg')
+      expect(markdownEditorToolbarClasses).not.toContain('--tiger-fill')
     })
   })
 

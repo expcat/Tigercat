@@ -21,6 +21,7 @@ import {
   getPickerOptionAria,
   getPickerTriggerKeyAction,
   getPickerNavigationIndex,
+  getPickerOptionId,
   findFirstEnabledIndex,
   coerceClassValue,
   classNames,
@@ -252,23 +253,22 @@ export const TreeSelect = defineComponent({
         commitActiveIndex(-1)
         return
       }
-      if (!props.virtual) return
       commitActiveIndex(resolveActiveIndex())
       nextTick(() => alignVirtualScroll(activeIndex.value))
     })
 
     watch(activeIndex, (idx) => {
-      if (!props.virtual || !isOpen.value) return
+      if (!isOpen.value) return
       nextTick(() => alignVirtualScroll(idx))
     })
 
     watch(searchQuery, () => {
-      if (!props.virtual || !isOpen.value) return
+      if (!isOpen.value) return
       commitActiveIndex(resolveActiveIndex())
     })
 
     watch([expandedKeys, () => props.treeData], () => {
-      if (!props.virtual || !isOpen.value) return
+      if (!isOpen.value) return
       const remapped = getTreeSelectVisibleIndex(visibleNodes.value, lastActiveKey.value)
       if (remapped >= 0) activeIndex.value = remapped
     })
@@ -348,7 +348,56 @@ export const TreeSelect = defineComponent({
       emit('change', val)
     }
 
+    function handleOpenListKeyDown(e: KeyboardEvent, fromSearchInput = false): boolean {
+      const key = e.key
+      if (fromSearchInput && key === ' ') return false
+
+      if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+        e.preventDefault()
+        e.stopPropagation()
+        commitActiveIndex(
+          getPickerNavigationIndex(visibleNodes.value, activeIndex.value, key, isNodeDisabled)
+        )
+        return true
+      }
+
+      if (key === 'Enter' || key === ' ') {
+        e.preventDefault()
+        e.stopPropagation()
+        const item = visibleNodes.value[activeIndex.value]
+        if (item && !item.node.disabled) {
+          handleNodeSelect(item.node)
+        }
+        return true
+      }
+
+      if (key === 'ArrowRight') {
+        e.preventDefault()
+        e.stopPropagation()
+        const item = visibleNodes.value[activeIndex.value]
+        if (item?.hasChildren && !item.isExpanded) {
+          toggleExpand(item.node.key)
+        }
+        return true
+      }
+
+      if (key === 'ArrowLeft') {
+        e.preventDefault()
+        e.stopPropagation()
+        const item = visibleNodes.value[activeIndex.value]
+        if (item?.hasChildren && item.isExpanded) {
+          toggleExpand(item.node.key)
+        }
+        return true
+      }
+
+      return false
+    }
+
     function handleKeyDown(e: KeyboardEvent) {
+      if (props.disabled) return
+      if (isOpen.value && handleOpenListKeyDown(e)) return
+
       const action = getPickerTriggerKeyAction(e.key, isOpen.value)
       if (action === 'none') return
 
@@ -363,17 +412,49 @@ export const TreeSelect = defineComponent({
       }
     }
 
-    function renderFlatNode(flatNode: FlatTreeSelectNode) {
+    function handleDropdownKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement) return
+      if (!isOpen.value) return
+      handleOpenListKeyDown(e)
+    }
+
+    function handleSearchKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case ' ':
+          e.stopPropagation()
+          return
+        case 'ArrowDown':
+        case 'ArrowUp':
+        case 'Enter':
+          handleOpenListKeyDown(e, true)
+          return
+        case 'Escape':
+          e.preventDefault()
+          e.stopPropagation()
+          closeDropdown()
+          nextTick(() => {
+            ;(triggerRef.value as HTMLButtonElement | null)?.focus()
+          })
+          return
+        default:
+          return
+      }
+    }
+
+    function renderFlatNode(flatNode: FlatTreeSelectNode, index: number) {
       const { node, level, hasChildren, isExpanded } = flatNode
       const selected = isSelected(node.key)
+      const isActive = index === activeIndex.value
       const indent = level * 20
 
       return h(
         'div',
         {
           key: node.key,
+          id: getPickerOptionId(listboxId, index),
+          'data-active': isActive || undefined,
           ...getPickerOptionAria({ selected, disabled: !!node.disabled }),
-          class: getTreeSelectNodeClasses(selected, !!node.disabled, props.size),
+          class: getTreeSelectNodeClasses(selected || isActive, !!node.disabled, props.size),
           style: { paddingLeft: `${indent + 8}px`, height: props.virtual ? '100%' : undefined },
           onClick: (e: MouseEvent) => {
             e.stopPropagation()
@@ -428,8 +509,15 @@ export const TreeSelect = defineComponent({
           {
             ref: triggerRef,
             type: 'button',
-            class: getTreeSelectTriggerClasses(props.size, props.disabled, isOpen.value),
-            ...getPickerComboboxAria({ expanded: isOpen.value, listboxId }),
+            class: classNames(
+              getTreeSelectTriggerClasses(props.size, props.disabled, isOpen.value),
+              showClearButton.value ? 'pr-14' : undefined
+            ),
+            ...getPickerComboboxAria({
+              expanded: isOpen.value,
+              listboxId,
+              activeIndex: isOpen.value ? activeIndex.value : -1
+            }),
             disabled: props.disabled,
             onClick: toggleDropdown,
             onKeydown: handleKeyDown
@@ -446,15 +534,21 @@ export const TreeSelect = defineComponent({
                 )
               },
               displayLabel.value || props.placeholder
-            ),
-
-            // Clear or chevron
+            )
+          ]
+        ),
+        h(
+          'span',
+          { class: 'pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1' },
+          [
             showClearButton.value
               ? h(
-                  'span',
+                  'button',
                   {
+                    type: 'button',
                     class:
-                      'absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-treeselect-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-treeselect-clear-hover,var(--tiger-text,#111827))]',
+                      'pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-treeselect-ring,var(--tiger-primary,#2563eb))] text-[var(--tiger-treeselect-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-treeselect-clear-hover,var(--tiger-text,#111827))]',
+                    'data-tiger-treeselect-clear': '',
                     'aria-label': resolveLocaleText(
                       'Clear selection',
                       mergedLocale.value?.common?.clearText
@@ -463,14 +557,18 @@ export const TreeSelect = defineComponent({
                   },
                   [ClearIcon]
                 )
-              : h(
-                  'span',
-                  {
-                    class:
-                      'absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-text-muted,#9ca3af)] pointer-events-none'
-                  },
-                  [ChevronDownIcon]
-                )
+              : null,
+            h(
+              'span',
+              {
+                class: classNames(
+                  'inline-flex text-[var(--tiger-text-muted,#9ca3af)]',
+                  isOpen.value && 'rotate-180'
+                ),
+                'aria-hidden': 'true'
+              },
+              [ChevronDownIcon]
+            )
           ]
         ),
 
@@ -487,7 +585,8 @@ export const TreeSelect = defineComponent({
                     overlay.floatingClasses.value
                   ),
                   style: overlay.floatingStyles.value,
-                  'data-positioned': overlay.positioned.value
+                  'data-positioned': overlay.positioned.value,
+                  onKeydown: handleDropdownKeyDown
                 },
                 [
                   // Search
@@ -505,7 +604,8 @@ export const TreeSelect = defineComponent({
                           mergedLocale.value?.common?.searchPlaceholder
                         ),
                         onInput: (e: Event) =>
-                          updateSearchValue((e.target as HTMLInputElement).value)
+                          updateSearchValue((e.target as HTMLInputElement).value),
+                        onKeydown: handleSearchKeyDown
                       })
                     : null,
 
@@ -531,13 +631,13 @@ export const TreeSelect = defineComponent({
                               {
                                 default: ({ index }: { index: number }) => {
                                   const item = visibleNodes.value[index]
-                                  return item ? renderFlatNode(item) : null
+                                  return item ? renderFlatNode(item, index) : null
                                 }
                               }
                             )
                           ]
                         )
-                      : visibleNodes.value.map((flatNode) => renderFlatNode(flatNode))
+                      : visibleNodes.value.map((flatNode, index) => renderFlatNode(flatNode, index))
                     : h(
                         'div',
                         { class: treeSelectEmptyClasses },

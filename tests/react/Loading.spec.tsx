@@ -1,6 +1,7 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import React from 'react'
+import { DEFAULT_LOADING_BACKGROUND } from '@expcat/tigercat-core'
 import { Loading } from '../../packages/react/src/components/Loading'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -66,6 +67,26 @@ describe('Loading (React)', () => {
     unmount()
 
     expect(document.body.style.overflow).toBe('')
+  })
+
+  it('applies the shared surface mask when fullscreen has no background', () => {
+    expect(DEFAULT_LOADING_BACKGROUND).toContain('--tiger-surface')
+    expect(DEFAULT_LOADING_BACKGROUND).toContain('--tiger-loading-mask')
+    expect(DEFAULT_LOADING_BACKGROUND).not.toBe('rgba(255, 255, 255, 0.9)')
+
+    render(<Loading fullscreen />)
+    const wrapper = screen.getByRole('status')
+    const reactPropsKey = Object.getOwnPropertyNames(wrapper).find((key) =>
+      key.startsWith('__reactProps$')
+    )
+    const reactProps = reactPropsKey
+      ? (wrapper as unknown as Record<string, { style?: { backgroundColor?: string } }>)[
+          reactPropsKey
+        ]
+      : undefined
+
+    // happy-dom drops color-mix on CSSStyleDeclaration; React props still have the value.
+    expect(reactProps?.style?.backgroundColor).toBe(DEFAULT_LOADING_BACKGROUND)
   })
 
   it('allows fullscreen loading without scroll lock', () => {

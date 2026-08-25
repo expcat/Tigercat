@@ -4,6 +4,9 @@ import {
   createUploadChunks,
   createUploadQueueItem,
   formatFileSize,
+  getDragAreaClasses,
+  getPictureCardClasses,
+  getUploadButtonClasses,
   getUploadResumeKey,
   handleUploadDragLeave,
   handleUploadDragOver,
@@ -108,5 +111,31 @@ describe('upload-utils chunk and queue helpers', () => {
     expect(formatFileSize(1024)).toBe('1.00 KB')
     expect(formatFileSize(1024 * 1024 * 2.5)).toBe('2.50 MB')
     expect(formatFileSize(Number.NaN)).toBe('0 B')
+  })
+})
+
+describe('upload-utils chrome tokens', () => {
+  it('uses theme tokens on idle drag area instead of hardcoded gray/white', () => {
+    const classes = getDragAreaClasses(false, false)
+    expect(classes).not.toContain('border-gray-300')
+    expect(classes).not.toContain('bg-white')
+    expect(classes).toContain('--tiger-border')
+  })
+
+  it('uses theme tokens on enabled upload button instead of hardcoded gray/white', () => {
+    const classes = getUploadButtonClasses(false)
+    expect(classes).not.toContain('bg-white')
+    expect(classes).not.toContain('border-gray-300')
+    expect(classes).toContain('--tiger-surface')
+    expect(classes).toContain('--tiger-border')
+  })
+
+  it('uses theme border token on picture-card ready and success chrome', () => {
+    const ready = getPictureCardClasses('ready')
+    const success = getPictureCardClasses('success')
+    expect(ready).not.toContain('border-gray-300')
+    expect(success).not.toContain('border-gray-300')
+    expect(ready).toContain('--tiger-border')
+    expect(success).toContain('--tiger-border')
   })
 })

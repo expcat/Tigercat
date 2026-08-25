@@ -27,6 +27,7 @@ import {
   type FileItem,
   type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface FileManagerProps extends CoreFileManagerProps {
@@ -37,7 +38,8 @@ export interface FileManagerProps extends CoreFileManagerProps {
 export const FileManager: React.FC<FileManagerProps> = ({
   files = [],
   viewMode = 'list',
-  selectedKeys = [],
+  selectedKeys,
+  defaultSelectedKeys,
   multiple = false,
   columns,
   sortField = 'name',
@@ -70,6 +72,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const contentRef = useRef<HTMLDivElement>(null)
   const dragFromIndex = useRef<number | null>(null)
   const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
+  const [keys, setKeys] = useControlledState(
+    selectedKeys,
+    defaultSelectedKeys ?? [],
+    onSelectedKeysChange
+  )
 
   // Which meta columns the list view shows (name is always rendered).
   const metaColumns = columns ?? ['size', 'modified']
@@ -82,13 +89,13 @@ export const FileManager: React.FC<FileManagerProps> = ({
       deriveFileManagerModel({
         files,
         currentPath,
-        selectedKeys,
+        selectedKeys: keys,
         sortField,
         sortOrder,
         showHidden,
         searchText: localSearch || searchText
       }),
-    [files, currentPath, selectedKeys, sortField, sortOrder, showHidden, localSearch, searchText]
+    [files, currentPath, keys, sortField, sortOrder, showHidden, localSearch, searchText]
   )
 
   const containerClasses = useMemo(() => getFileManagerContainerClasses(className), [className])
@@ -97,10 +104,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
     (item: FileItem) => {
       if (item.disabled) return
       onSelect?.(item)
-      const keys = toggleFileSelection(selectedKeys, item.key, multiple)
-      onSelectedKeysChange?.(keys)
+      setKeys(toggleFileSelection(keys, item.key, multiple))
     },
-    [selectedKeys, multiple, onSelect, onSelectedKeysChange]
+    [keys, multiple, onSelect, setKeys]
   )
 
   const handleOpen = useCallback(

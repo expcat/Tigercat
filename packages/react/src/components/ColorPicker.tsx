@@ -6,15 +6,26 @@ import {
   colorPickerPanelClasses,
   colorPickerInputClasses,
   colorPickerPresetClasses,
-  hexToRgb,
   rgbToHex,
   rgbToHsv,
   hsvToRgb,
   formatColorString,
   parseColorInput,
+  parseColorParts,
   classNames
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+
+function rgbFromValue(value: string): { r: number; g: number; b: number } {
+  const parts = parseColorParts(value)
+  return parts ? { r: parts.r, g: parts.g, b: parts.b } : { r: 0, g: 0, b: 0 }
+}
+
+function explicitAlphaFromValue(value: string): number | null {
+  if (!/^(rgba|hsla)\(/i.test(value.trim())) return null
+  const parts = parseColorParts(value)
+  return parts ? parts.a : null
+}
 
 export interface ColorPickerProps extends CoreColorPickerProps {
   /** Controlled color value (hex) */
@@ -34,7 +45,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   onChange
 }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [alpha, setAlpha] = useState(1)
+  const [alpha, setAlpha] = useState(() => explicitAlphaFromValue(value) ?? 1)
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -51,8 +62,13 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     onDismiss: () => setIsOpen(false)
   })
 
-  const rgb = useMemo(() => hexToRgb(value), [value])
+  const rgb = useMemo(() => rgbFromValue(value), [value])
   const hsv = useMemo(() => rgbToHsv(rgb.r, rgb.g, rgb.b), [rgb])
+
+  useEffect(() => {
+    const next = explicitAlphaFromValue(value)
+    if (next !== null) setAlpha(next)
+  }, [value])
 
   // Value rendered in the panel input / preview, honoring `format` (and `showAlpha`).
   const displayValue = useMemo(
@@ -93,14 +109,18 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value
     setInputValue(val)
-    const hex = parseColorInput(val)
-    if (hex) {
-      onChange?.(hex)
+    const parsed = parseColorInput(val)
+    if (parsed) {
+      onChange?.(parsed)
     }
   }
 
   function handleAlphaChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setAlpha(Number(e.target.value) / 100)
+    const nextAlpha = Number(e.target.value) / 100
+    setAlpha(nextAlpha)
+    const emitFormat = format === 'hex' ? 'rgb' : format
+    const next = formatColorString(rgb.r, rgb.g, rgb.b, emitFormat, nextAlpha)
+    onChange?.(next)
   }
 
   function handlePresetClick(color: string) {

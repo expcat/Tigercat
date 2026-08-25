@@ -3,7 +3,6 @@ import {
   classNames,
   createLinearScale,
   getChartElementOpacity,
-  getChartInnerRect,
   getNumberExtent,
   getStableChartGradientPrefix,
   getScatterHoverShadow,
@@ -33,6 +32,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface ScatterChartProps extends CoreScatterChartProps {
@@ -162,6 +162,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     wrapperClasses
   } = useChartInteraction<ScatterChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -177,9 +178,11 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     callbacks: { onClick: onPointClick }
   })
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
   const xValues = useMemo(() => data.map((item) => item.x), [data])
   const yValues = useMemo(() => data.map((item) => item.y), [data])
@@ -269,7 +272,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      className={classNames(className)}
+      onResolvedSizeChange={onResolvedSizeChange}>
       {/* Radial gradient defs */}
       {gradient && (
         <defs>
@@ -380,20 +384,19 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             )
           }
 
+          // CSS entrance `transform:scale()` would override an SVG transform on
+          // the same <path>; keep translate on a wrapper so scale stays in place.
           return (
-            <path
-              key={`point-${index}`}
-              d={getScatterPointPath(pointStyle, point.r)}
-              transform={`translate(${point.cx},${point.cy})`}
-              {...sharedProps}
-            />
+            <g key={`point-${index}`} transform={`translate(${point.cx},${point.cy})`}>
+              <path d={getScatterPointPath(pointStyle, point.r)} {...sharedProps} />
+            </g>
           )
         })}
       </ChartSeries>
     </ChartCanvas>
   )
 
-  const tooltip = showTooltip && hoverable && (
+  const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
       open={resolvedHoveredIndex !== null && tooltipContent !== ''}

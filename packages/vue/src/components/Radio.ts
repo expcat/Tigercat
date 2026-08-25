@@ -119,10 +119,7 @@ export const Radio = defineComponent({
     const isInGroup = computed(() => !!groupContext.value)
 
     const actualSize = computed<ComponentSize>(() => props.size || groupContext.value?.size || 'md')
-    const actualDisabled = computed(() => {
-      if (props.disabled !== undefined) return props.disabled
-      return groupContext.value?.disabled || false
-    })
+    const actualDisabled = computed(() => props.disabled || groupContext.value?.disabled || false)
     const actualName = computed(() => props.name || groupContext.value?.name)
 
     const isChecked = computed(() => {

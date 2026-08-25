@@ -56,7 +56,7 @@ export function getImageAnnotationToolButtonClasses(active: boolean): string {
     imageAnnotationToolButtonClasses,
     active
       ? 'border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary,#2563eb)] text-white'
-      : 'border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#ffffff)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-bg-muted,#f3f4f6)]'
+      : 'border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-annotation-tool-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-annotation-tool-text,var(--tiger-text,#111827))] hover:bg-[var(--tiger-surface-muted,#f3f4f6)]'
   )
 }
 

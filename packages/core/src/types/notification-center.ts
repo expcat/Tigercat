@@ -2,6 +2,8 @@
  * NotificationCenter composite component types
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Notification read filter
  */
@@ -142,6 +144,15 @@ export interface NotificationCenterProps {
    * Mark as unread button text
    */
   markUnreadText?: string
+  /**
+   * Locale overrides for NotificationCenter UI text
+   */
+  locale?: Partial<TigerLocale>
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<import('./locale').TigerLocaleNotificationCenter>
   /**
    * Group change callback
    */

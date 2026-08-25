@@ -6,12 +6,40 @@ import {
   getImageAnnotationCenter,
   getImageAnnotationPathData,
   getImageAnnotationPointFromClient,
+  getImageAnnotationToolButtonClasses,
   getNextImageAnnotationTool,
   normalizeImageAnnotationBox,
   shouldCommitImageAnnotationBox
 } from '@expcat/tigercat-core'
 
 describe('image-annotation-utils', () => {
+  it('lands inactive tool buttons on registered surface/text, not locked white or bg aliases', () => {
+    const inactive = getImageAnnotationToolButtonClasses(false)
+    expect(inactive).toContain('--tiger-surface')
+    expect(inactive).toContain('--tiger-text')
+    expect(inactive).toContain('--tiger-annotation-tool-bg,var(--tiger-surface')
+    expect(inactive).toContain('--tiger-annotation-tool-text,var(--tiger-text')
+    expect(inactive).toContain('hover:bg-[var(--tiger-surface-muted')
+    expect(inactive).not.toContain('bg-[var(--tiger-bg,#ffffff)]')
+    expect(inactive).not.toContain('--tiger-bg')
+    expect(inactive).not.toContain('--tiger-fill')
+    expect(inactive).not.toContain('text-white')
+
+    const overrideIdx = inactive.indexOf('--tiger-annotation-tool-bg')
+    const semanticIdx = inactive.indexOf('--tiger-surface')
+    expect(overrideIdx).toBeGreaterThan(-1)
+    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+  })
+
+  it('keeps active tool buttons on primary with white text', () => {
+    const active = getImageAnnotationToolButtonClasses(true)
+    expect(active).toContain('bg-[var(--tiger-primary,#2563eb)]')
+    expect(active).toContain('border-[var(--tiger-primary,#2563eb)]')
+    expect(active).toContain('text-white')
+    expect(active).not.toContain('--tiger-annotation-tool-bg')
+    expect(active).not.toContain('bg-[var(--tiger-bg,#ffffff)]')
+  })
+
   it('clamps normalized points into image bounds', () => {
     expect(clampImageAnnotationPoint({ x: -0.2, y: 1.4 })).toEqual({ x: 0, y: 1 })
     expect(clampImageAnnotationPoint({ x: Number.NaN, y: Number.POSITIVE_INFINITY })).toEqual({

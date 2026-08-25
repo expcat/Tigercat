@@ -95,6 +95,21 @@ describe('Switch', () => {
     })
   })
 
+  describe('Uncontrolled', () => {
+    it('toggles aria-checked on click without modelValue', async () => {
+      const { container } = render(Switch)
+      const el = getSwitch(container)
+      expect(el).toHaveAttribute('aria-checked', 'false')
+      await fireEvent.click(el)
+      expect(el).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('starts checked when defaultValue is true', () => {
+      const { container } = renderWithProps(Switch, { defaultValue: true })
+      expect(getSwitch(container)).toHaveAttribute('aria-checked', 'true')
+    })
+  })
+
   describe('States', () => {
     it('marks the disabled state and removes it from the tab order', () => {
       const { container } = renderWithProps(Switch, { disabled: true })

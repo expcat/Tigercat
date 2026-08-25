@@ -7,24 +7,42 @@ import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 
 /**
- * Base input classes that apply to all inputs
+ * Field-only classes (padding, type, disabled text). Chrome lives on the
+ * group-child root via {@link getInputChromeClasses}.
  */
-const BASE_INPUT_CLASSES = [
+const INPUT_FIELD_BASE_CLASSES = [
   'w-full',
-  'border',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'bg-[var(--tiger-surface,#ffffff)]',
+  'bg-transparent',
   'text-[var(--tiger-text,#111827)]',
   'focus:outline-none',
-  'focus:ring-2',
-  'transition-colors',
-  'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]',
   'disabled:text-[var(--tiger-text-muted,#6b7280)]',
   'disabled:cursor-not-allowed',
   'placeholder:text-[var(--tiger-text-muted,#6b7280)]'
 ] as const
 
-const STATUS_CLASSES: Record<InputStatus, string> = {
+/**
+ * Border / radius / surface for a chrome node. Native fields that ARE the
+ * chrome node (Textarea, MaskInput) keep `focus:`; Input's wrapper uses
+ * `focus-within:` because the focused node is nested.
+ */
+const INPUT_CHROME_BASE_CLASSES = [
+  'border',
+  'rounded-[var(--tiger-radius-md,0.5rem)]',
+  'bg-[var(--tiger-surface,#ffffff)]',
+  'transition-colors'
+] as const
+
+const NATIVE_CHROME_FOCUS_CLASSES = [
+  'focus:ring-2',
+  'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+] as const
+
+const WRAPPER_CHROME_FOCUS_CLASSES = [
+  'focus-within:ring-2',
+  'has-[:disabled]:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+] as const
+
+const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
   default:
     'border-[var(--tiger-border,#e5e7eb)] focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:border-transparent',
   error: 'border-red-500 focus:ring-red-500 focus:border-red-500 text-red-900 placeholder-red-300',
@@ -32,6 +50,21 @@ const STATUS_CLASSES: Record<InputStatus, string> = {
     'border-green-500 focus:ring-green-500 focus:border-green-500 text-green-900 placeholder-green-300',
   warning:
     'border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-yellow-900 placeholder-yellow-300'
+}
+
+const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
+  default:
+    'border-[var(--tiger-border,#e5e7eb)] focus-within:ring-[var(--tiger-primary,#2563eb)]/40 focus-within:border-transparent',
+  error: 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500',
+  success: 'border-green-500 focus-within:ring-green-500 focus-within:border-green-500',
+  warning: 'border-yellow-500 focus-within:ring-yellow-500 focus-within:border-yellow-500'
+}
+
+const FIELD_STATUS_CLASSES: Record<InputStatus, string> = {
+  default: '',
+  error: 'text-red-900 placeholder-red-300',
+  success: 'text-green-900 placeholder-green-300',
+  warning: 'text-yellow-900 placeholder-yellow-300'
 }
 
 const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
@@ -42,11 +75,42 @@ const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
 
 const INPUT_PADDING: Record<
   ComponentSize,
-  { left: string; right: string; prefixLeft: string; suffixRight: string }
+  {
+    left: string
+    right: string
+    prefixLeft: string
+    suffixRight: string
+    dualSuffixRight: string
+  }
 > = {
-  sm: { left: 'pl-2', right: 'pr-2', prefixLeft: 'pl-8', suffixRight: 'pr-8' },
-  md: { left: 'pl-3', right: 'pr-3', prefixLeft: 'pl-10', suffixRight: 'pr-10' },
-  lg: { left: 'pl-4', right: 'pr-4', prefixLeft: 'pl-12', suffixRight: 'pr-12' }
+  sm: {
+    left: 'pl-2',
+    right: 'pr-2',
+    prefixLeft: 'pl-8',
+    suffixRight: 'pr-8',
+    dualSuffixRight: 'pr-16'
+  },
+  md: {
+    left: 'pl-3',
+    right: 'pr-3',
+    prefixLeft: 'pl-10',
+    suffixRight: 'pr-10',
+    dualSuffixRight: 'pr-20'
+  },
+  lg: {
+    left: 'pl-4',
+    right: 'pr-4',
+    prefixLeft: 'pl-12',
+    suffixRight: 'pr-12',
+    dualSuffixRight: 'pr-24'
+  }
+}
+
+/** One affix-slot inset so a second trailing button sits beside `right-0`. */
+const INPUT_SUFFIX_SLOT_INSET: Record<ComponentSize, string> = {
+  sm: 'right-8',
+  md: 'right-10',
+  lg: 'right-12'
 }
 
 export interface GetInputClassesOptions {
@@ -54,26 +118,78 @@ export interface GetInputClassesOptions {
   status?: InputStatus
   hasPrefix?: boolean
   hasSuffix?: boolean
+  /** Two trailing actions (clear + password) — double-slot right padding. @default false */
+  hasDualSuffix?: boolean
 }
 
-/**
- * Get complete input class string
- */
-export function getInputClasses(options: GetInputClassesOptions = {}): string {
-  const { size = 'md', status = 'default', hasPrefix, hasSuffix } = options
+export interface GetInputTrailingButtonOptions {
+  /** Shift one affix-slot left of `right-0`. @default false */
+  offset?: boolean
+}
+
+function getInputLayoutClasses(options: GetInputClassesOptions = {}): string {
+  const { size = 'md', hasPrefix, hasSuffix, hasDualSuffix } = options
   const pad = INPUT_PADDING[size]
 
   return classNames(
-    ...BASE_INPUT_CLASSES,
     INPUT_SIZE_CLASSES[size],
-    STATUS_CLASSES[status],
     hasPrefix ? pad.prefixLeft : pad.left,
-    hasSuffix ? pad.suffixRight : pad.right
+    hasDualSuffix ? pad.dualSuffixRight : hasSuffix ? pad.suffixRight : pad.right
   )
 }
 
-export function getInputWrapperClasses(): string {
-  return 'relative w-full'
+/**
+ * Chrome (border / radius / surface / status / focus ring) for a group-child
+ * root. Uses `focus-within` so a nested native field still raises the ring.
+ */
+export function getInputChromeClasses(status: InputStatus = 'default'): string {
+  return classNames(
+    ...INPUT_CHROME_BASE_CLASSES,
+    ...WRAPPER_CHROME_FOCUS_CLASSES,
+    WRAPPER_STATUS_CLASSES[status]
+  )
+}
+
+/**
+ * Native field classes without border / radius / ring. Padding, type color,
+ * placeholder, and disabled text stay here.
+ */
+export function getInputFieldClasses(options: GetInputClassesOptions = {}): string {
+  const { status = 'default' } = options
+  return classNames(
+    ...INPUT_FIELD_BASE_CLASSES,
+    FIELD_STATUS_CLASSES[status],
+    getInputLayoutClasses(options)
+  )
+}
+
+/**
+ * Complete classes when the native control IS the chrome node (Textarea,
+ * MaskInput). Input uses {@link getInputChromeClasses} on the wrapper plus
+ * {@link getInputFieldClasses} on the `<input>`.
+ */
+export function getInputClasses(options: GetInputClassesOptions = {}): string {
+  const { status = 'default' } = options
+
+  return classNames(
+    'w-full',
+    ...INPUT_CHROME_BASE_CLASSES,
+    'text-[var(--tiger-text,#111827)]',
+    'focus:outline-none',
+    ...NATIVE_CHROME_FOCUS_CLASSES,
+    'disabled:text-[var(--tiger-text-muted,#6b7280)]',
+    'disabled:cursor-not-allowed',
+    'placeholder:text-[var(--tiger-text-muted,#6b7280)]',
+    NATIVE_STATUS_CLASSES[status],
+    getInputLayoutClasses(options)
+  )
+}
+
+export function getInputWrapperClasses(status?: InputStatus): string {
+  return classNames(
+    'relative w-full',
+    status !== undefined ? getInputChromeClasses(status) : undefined
+  )
 }
 
 export function getInputAffixClasses(
@@ -91,11 +207,20 @@ export function getInputAffixClasses(
   return classNames(base, posClass, widthClass)
 }
 
-export function getInputErrorClasses(size: ComponentSize = 'md'): string {
+/**
+ * Error message classes — below the field (not an in-field overlay).
+ * `size` is unused; kept so existing callers do not break.
+ */
+export function getInputErrorClasses(_size: ComponentSize = 'md'): string {
+  return classNames('text-red-500 text-sm mt-1 text-left break-words')
+}
+
+function getInputTrailingButtonClasses(size: ComponentSize, rightClass: string): string {
   return classNames(
-    'absolute inset-y-0 right-0 flex items-center pointer-events-none',
-    INPUT_PADDING[size].right,
-    'text-red-500 text-sm'
+    'absolute inset-y-0 flex items-center cursor-pointer',
+    rightClass,
+    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
+    INPUT_PADDING[size].right
   )
 }
 
@@ -103,12 +228,12 @@ export function getInputErrorClasses(size: ComponentSize = 'md'): string {
  * Clear button classes — positioned inside the input on the right
  * @since 0.5.0
  */
-export function getInputClearButtonClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    'absolute inset-y-0 right-0 flex items-center cursor-pointer',
-    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
-    INPUT_PADDING[size].right
-  )
+export function getInputClearButtonClasses(
+  size: ComponentSize = 'md',
+  options: GetInputTrailingButtonOptions = {}
+): string {
+  const rightClass = options.offset ? INPUT_SUFFIX_SLOT_INSET[size] : 'right-0'
+  return getInputTrailingButtonClasses(size, rightClass)
 }
 
 /**
@@ -116,11 +241,7 @@ export function getInputClearButtonClasses(size: ComponentSize = 'md'): string {
  * @since 0.5.0
  */
 export function getInputPasswordToggleClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    'absolute inset-y-0 right-0 flex items-center cursor-pointer',
-    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
-    INPUT_PADDING[size].right
-  )
+  return getInputTrailingButtonClasses(size, 'right-0')
 }
 
 /**

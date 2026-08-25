@@ -3,6 +3,9 @@ import {
   classNames,
   buildNotificationGroups,
   formatActivityTime,
+  getNotificationCenterLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   type NotificationCenterProps as CoreNotificationCenterProps,
   type NotificationGroup,
   type NotificationItem,
@@ -40,6 +43,7 @@ import { List } from './List'
 import { Text } from './Text'
 import { Button } from './Button'
 import { Loading } from './Loading'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface NotificationCenterProps
   extends CoreNotificationCenterProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
@@ -67,15 +71,17 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   readFilter,
   defaultReadFilter = 'all',
   loading = false,
-  loadingText = '加载中...',
-  emptyText = '暂无通知',
-  title = '通知中心',
-  allLabel = '全部',
-  unreadLabel = '未读',
-  readLabel = '已读',
-  markAllReadText = '全部标记已读',
-  markReadText = '标记已读',
-  markUnreadText = '标记未读',
+  loadingText,
+  emptyText,
+  title,
+  allLabel,
+  unreadLabel,
+  readLabel,
+  markAllReadText,
+  markReadText,
+  markUnreadText,
+  locale,
+  labels: labelsOverride,
   manageReadState = false,
   onGroupChange,
   onReadFilterChange,
@@ -85,6 +91,25 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   className,
   ...props
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getNotificationCenterLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const resolvedTitle = resolveLocaleText(labels.title, title)
+  const resolvedEmptyText = resolveLocaleText(labels.emptyText, emptyText)
+  const resolvedLoadingText = resolveLocaleText(labels.loadingText, loadingText)
+  const resolvedAllLabel = resolveLocaleText(labels.allLabel, allLabel)
+  const resolvedUnreadLabel = resolveLocaleText(labels.unreadLabel, unreadLabel)
+  const resolvedReadLabel = resolveLocaleText(labels.readLabel, readLabel)
+  const resolvedMarkAllReadText = resolveLocaleText(labels.markAllReadText, markAllReadText)
+  const resolvedMarkReadText = resolveLocaleText(labels.markReadText, markReadText)
+  const resolvedMarkUnreadText = resolveLocaleText(labels.markUnreadText, markUnreadText)
+
   const resolvedGroups = useMemo(
     () => buildNotificationGroups(items, groups, groupBy, groupOrder),
     [items, groups, groupBy, groupOrder]
@@ -179,11 +204,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const filterButtons = useMemo<Array<{ key: NotificationReadFilter; label: string }>>(
     () => [
-      { key: 'all', label: allLabel },
-      { key: 'unread', label: unreadLabel },
-      { key: 'read', label: readLabel }
+      { key: 'all', label: resolvedAllLabel },
+      { key: 'unread', label: resolvedUnreadLabel },
+      { key: 'read', label: resolvedReadLabel }
     ],
-    [allLabel, unreadLabel, readLabel]
+    [resolvedAllLabel, resolvedUnreadLabel, resolvedReadLabel]
   )
 
   const groupTabData = useMemo(
@@ -285,7 +310,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             }
             onItemReadChange?.(item, !isRead)
           }}>
-          {isRead ? markUnreadText : markReadText}
+          {isRead ? resolvedMarkUnreadText : resolvedMarkReadText}
         </Button>
       </div>
     )
@@ -310,7 +335,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </svg>
           </div>
           <Text tag="div" size="sm" color="muted" className={notificationCenterEmptyTextClasses}>
-            {emptyText}
+            {resolvedEmptyText}
           </Text>
         </div>
       )
@@ -322,7 +347,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         split
         bordered="divided"
         hoverable
-        emptyText={emptyText}
+        emptyText={resolvedEmptyText}
         onItemClick={(item, index) => onItemClick?.(item, index)}
         renderItem={renderItem}
       />
@@ -331,7 +356,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const content = loading ? (
     <div className="flex items-center justify-center py-16">
-      <Loading text={loadingText} className={notificationCenterLoadingClasses} />
+      <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
     </div>
   ) : resolvedGroups.length > 0 ? (
     <div className="-mx-4 -mb-4">
@@ -355,7 +380,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     <div
       className={wrapperClasses}
       role={props.role ?? 'region'}
-      aria-label={props['aria-label'] ?? (props['aria-labelledby'] ? undefined : title)}
+      aria-label={props['aria-label'] ?? (props['aria-labelledby'] ? undefined : resolvedTitle)}
       {...props}
       data-tiger-notification-center>
       <Card
@@ -370,7 +395,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   size="base"
                   weight="bold"
                   className={notificationCenterTitleClasses}>
-                  {title}
+                  {resolvedTitle}
                 </Text>
                 {totalUnread > 0 ? (
                   <span className={notificationCenterUnreadBadgeClasses}>{totalUnread}</span>
@@ -387,7 +412,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                     ? notificationCenterMarkAllEnabledClasses
                     : notificationCenterMarkAllDisabledClasses
                 )}>
-                {markAllReadText}
+                {resolvedMarkAllReadText}
               </Button>
             </div>
             <div className={notificationCenterFilterGroupClasses}>

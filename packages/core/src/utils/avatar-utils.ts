@@ -51,10 +51,11 @@ export const avatarDefaultTextColor =
 export const avatarImageClasses = 'w-full h-full object-cover'
 
 /**
- * Get initials from a name
- * @param name - Full name
+ * Get initials from a name or short token
+ * @param name - Full name or initials token
  * @returns Initials (max 2 characters)
  * @example
+ * getInitials('TC') // 'TC'
  * getInitials('John Doe') // 'JD'
  * getInitials('Alice') // 'A'
  * getInitials('张三') // '张三'
@@ -67,6 +68,11 @@ export function getInitials(name: string): string {
 
   if (words.length === 1) {
     const firstWord = words[0]
+    // No-space token of length <= 2: keep both chars (uppercased). Logo tokens
+    // like "TC" and CJK names like "张三" must not drop to first-letter only.
+    if (firstWord.length <= 2) {
+      return firstWord.toUpperCase()
+    }
     // Check if contains non-ASCII characters (Unicode range above 0x007F)
     const hasNonASCII = /[^\x20-\x7E]/.test(firstWord)
     return hasNonASCII ? firstWord.slice(0, 2).toUpperCase() : firstWord.charAt(0).toUpperCase()

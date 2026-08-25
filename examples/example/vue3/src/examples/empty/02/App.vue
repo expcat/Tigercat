@@ -5,7 +5,7 @@ const presets = ['default', 'simple', 'no-data', 'no-results', 'error'] as const
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="grid min-h-full grid-cols-1 gap-6 overflow-auto sm:grid-cols-3">
     <div
       v-for="preset in presets"
       :key="preset"

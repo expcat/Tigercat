@@ -50,31 +50,31 @@ export interface MessageColorScheme {
  */
 export const defaultMessageThemeColors: Record<MessageType, MessageColorScheme> = {
   info: {
-    bg: 'bg-[var(--tiger-message-info-bg,#eff6ff)]',
-    border: 'border-[var(--tiger-message-info-border,#bfdbfe)]',
-    text: 'text-[var(--tiger-message-info-text,#1e40af)]',
-    icon: 'text-[var(--tiger-message-info-icon,#3b82f6)]'
+    bg: 'bg-[var(--tiger-message-info-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-message-info-border,var(--tiger-border,#e5e7eb))]',
+    text: 'text-[var(--tiger-message-info-text,var(--tiger-info,#3b82f6))]',
+    icon: 'text-[var(--tiger-message-info-icon,var(--tiger-info,#3b82f6))]'
   },
   success: {
-    bg: 'bg-[var(--tiger-message-success-bg,#f0fdf4)]',
-    border: 'border-[var(--tiger-message-success-border,#bbf7d0)]',
-    text: 'text-[var(--tiger-message-success-text,#166534)]',
-    icon: 'text-[var(--tiger-message-success-icon,#22c55e)]'
+    bg: 'bg-[var(--tiger-message-success-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-message-success-border,var(--tiger-border,#e5e7eb))]',
+    text: 'text-[var(--tiger-message-success-text,var(--tiger-success,#16a34a))]',
+    icon: 'text-[var(--tiger-message-success-icon,var(--tiger-success,#16a34a))]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-message-warning-bg,#fffbeb)]',
-    border: 'border-[var(--tiger-message-warning-border,#fde68a)]',
-    text: 'text-[var(--tiger-message-warning-text,#92400e)]',
-    icon: 'text-[var(--tiger-message-warning-icon,#f59e0b)]'
+    bg: 'bg-[var(--tiger-message-warning-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-message-warning-border,var(--tiger-border,#e5e7eb))]',
+    text: 'text-[var(--tiger-message-warning-text,var(--tiger-warning,#d97706))]',
+    icon: 'text-[var(--tiger-message-warning-icon,var(--tiger-warning,#d97706))]'
   },
   error: {
-    bg: 'bg-[var(--tiger-message-error-bg,#fef2f2)]',
-    border: 'border-[var(--tiger-message-error-border,#fecaca)]',
-    text: 'text-[var(--tiger-message-error-text,#991b1b)]',
-    icon: 'text-[var(--tiger-message-error-icon,#ef4444)]'
+    bg: 'bg-[var(--tiger-message-error-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-message-error-border,var(--tiger-border,#e5e7eb))]',
+    text: 'text-[var(--tiger-message-error-text,var(--tiger-error,#dc2626))]',
+    icon: 'text-[var(--tiger-message-error-icon,var(--tiger-error,#dc2626))]'
   },
   loading: {
-    bg: 'bg-[var(--tiger-message-loading-bg,var(--tiger-surface-muted,#f3f4f6))]',
+    bg: 'bg-[var(--tiger-message-loading-bg,var(--tiger-surface-muted,#f9fafb))]',
     border: 'border-[var(--tiger-message-loading-border,var(--tiger-border,#e5e7eb))]',
     text: 'text-[var(--tiger-message-loading-text,var(--tiger-text,#111827))]',
     icon: 'text-[var(--tiger-message-loading-icon,var(--tiger-text-muted,#6b7280))]'

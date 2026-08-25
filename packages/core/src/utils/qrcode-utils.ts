@@ -23,10 +23,8 @@ export const qrcodeRefreshClasses = classNames(
 )
 
 /**
- * Minimal QR code matrix generator.
- * Implements a simplified encoding for display purposes
- * (real production usage should use a proper QR library).
- * This generates a deterministic dot-matrix based on the input string.
+ * Deterministic hash matrix for display (not a scannable QR).
+ * `level` is not an input; the second argument is matrix size (default 21).
  */
 export function generateQRMatrix(value: string, size: number = 21): boolean[][] {
   // Simple hash-based pseudo QR matrix for visual representation

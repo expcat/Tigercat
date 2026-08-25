@@ -5,8 +5,11 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
+import { getEmptyDescription } from '@expcat/tigercat-core'
 import { Empty } from '@expcat/tigercat-vue/Empty'
 import { expectNoA11yViolationsIsolated } from '../utils'
+
+const galleryPresets = ['default', 'simple', 'no-data', 'no-results', 'error'] as const
 
 describe('Empty (Vue)', () => {
   describe('Rendering', () => {
@@ -85,6 +88,11 @@ describe('Empty (Vue)', () => {
     it('renders with default preset', () => {
       render(Empty, { props: { preset: 'default' } })
       expect(screen.getByText('No data')).toBeInTheDocument()
+    })
+
+    it.each(galleryPresets)('renders empty/02 gallery preset "%s"', (preset) => {
+      render(Empty, { props: { preset } })
+      expect(screen.getByText(getEmptyDescription(preset))).toBeInTheDocument()
     })
   })
   describe('Accessibility', () => {

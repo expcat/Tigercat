@@ -11,7 +11,9 @@ const open = ref(false)
     <FloatButtonGroup
       v-model:open="open"
       trigger="click"
-      :style="{ position: 'absolute', right: '24px', bottom: '24px' }">
+      :portal="false"
+      placement="bottom-right"
+      :offset="24">
       <template #trigger>
         <FloatButton aria-label="打开操作组" tooltip="操作" />
       </template>

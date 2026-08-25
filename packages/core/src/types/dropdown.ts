@@ -90,6 +90,11 @@ export interface DropdownItemProps {
    */
   divided?: boolean
   /**
+   * When set, overrides the parent Dropdown `closeOnClick`.
+   * Omitted inherits the parent (default inherit).
+   */
+  closeOnClick?: boolean
+  /**
    * Icon for the dropdown item
    */
   icon?: unknown

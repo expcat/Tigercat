@@ -54,17 +54,21 @@ interface InternalLayoutNode {
 export const orgChartNodeClasses =
   'transition-[filter,opacity,stroke] duration-150 ease-out focus:outline-none'
 
+/** Node fill: optional `--tiger-org-node-bg`, then registered `--tiger-surface`. */
 export const orgChartNodeRectClasses =
-  'stroke-[var(--tiger-border,#d1d5db)] fill-[var(--tiger-bg,#ffffff)] drop-shadow-sm'
+  'stroke-[var(--tiger-border,#d1d5db)] fill-[var(--tiger-org-node-bg,var(--tiger-surface,#ffffff))] drop-shadow-sm'
 
+/** Name: optional `--tiger-org-label`, then registered `--tiger-text`. */
 export const orgChartNodeLabelClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text,#111827)] text-sm font-semibold'
+  'pointer-events-none select-none fill-[var(--tiger-org-label,var(--tiger-text,#111827))] text-sm font-semibold'
 
+/** Job title: optional `--tiger-org-title`, then registered `--tiger-text-secondary`. */
 export const orgChartNodeTitleClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text-muted,#6b7280)] text-xs'
+  'pointer-events-none select-none fill-[var(--tiger-org-title,var(--tiger-text-secondary,#6b7280))] text-xs'
 
+/** Subtitle: optional `--tiger-org-subtitle`, then registered `--tiger-text-secondary`. */
 export const orgChartNodeSubtitleClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text-muted,#6b7280)] text-[11px]'
+  'pointer-events-none select-none fill-[var(--tiger-org-subtitle,var(--tiger-text-secondary,#6b7280))] text-[11px]'
 
 export const orgChartLinkClasses = 'fill-none stroke-[var(--tiger-border,#d1d5db)] stroke-2'
 
@@ -213,9 +217,7 @@ function flipLayoutNode(node: OrgChartLayoutNode): OrgChartLayoutNode {
   return {
     ...node,
     x: node.y,
-    y: node.x,
-    width: node.height,
-    height: node.width
+    y: node.x
   }
 }
 

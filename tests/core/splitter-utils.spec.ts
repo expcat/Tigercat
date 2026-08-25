@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest'
 import {
   getSplitterContainerClasses,
   getSplitterGutterClasses,
+  getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
   parsePaneSize,
   calculateInitialSizes,
   clampPaneSize,
+  resolveInitialPaneSizes,
   resizePanes,
   getPaneStyle,
   sizesToPercentages,
@@ -40,6 +42,14 @@ describe('splitter-utils', () => {
       expect(classes).toContain('cursor-col-resize')
     })
 
+    it('uses a theme token instead of hardcoded gray-200', () => {
+      const classes = getSplitterGutterClasses('horizontal', false, false)
+      expect(classes).not.toContain('bg-gray-200')
+      expect(classes.includes('--tiger-border') || classes.includes('--tiger-surface-muted')).toBe(
+        true
+      )
+    })
+
     it('should return vertical gutter classes', () => {
       const classes = getSplitterGutterClasses('vertical', false, false)
       expect(classes).toContain('cursor-row-resize')
@@ -64,6 +74,12 @@ describe('splitter-utils', () => {
   })
 
   describe('getSplitterGutterHandleClasses', () => {
+    it('uses a theme token instead of hardcoded gray-400', () => {
+      const classes = getSplitterGutterHandleClasses('horizontal')
+      expect(classes).not.toContain('bg-gray-400')
+      expect(classes).toContain('var(--tiger-')
+    })
+
     it('should return horizontal handle classes', () => {
       const classes = getSplitterGutterHandleClasses('horizontal')
       expect(classes).toContain('w-0.5')
@@ -74,6 +90,17 @@ describe('splitter-utils', () => {
       const classes = getSplitterGutterHandleClasses('vertical')
       expect(classes).toContain('h-0.5')
       expect(classes).toContain('w-6')
+    })
+  })
+
+  describe('getSplitterGutterCssVars', () => {
+    it('returns 8px for gutterSize 8', () => {
+      expect(getSplitterGutterCssVars(8)).toEqual({ '--tiger-splitter-gutter': '8px' })
+    })
+
+    it('returns 4px for 4 and default', () => {
+      expect(getSplitterGutterCssVars(4)).toEqual({ '--tiger-splitter-gutter': '4px' })
+      expect(getSplitterGutterCssVars()).toEqual({ '--tiger-splitter-gutter': '4px' })
     })
   })
 
@@ -165,6 +192,32 @@ describe('splitter-utils', () => {
 
     it('should handle min = max', () => {
       expect(clampPaneSize(500, 200, 200)).toBe(200)
+    })
+  })
+
+  describe('resolveInitialPaneSizes', () => {
+    it('parses percentage sizes against available space', () => {
+      const sizes = resolveInitialPaneSizes(2, 1000, 4, ['30%', '70%'])
+      const available = 1000 - 4
+      expect(sizes).not.toBeNull()
+      expect(sizes![0]).toBeCloseTo(0.3 * available)
+      expect(sizes![1]).toBeCloseTo(0.7 * available)
+    })
+
+    it('clamps numeric sizes to min when container is unavailable', () => {
+      const sizes = resolveInitialPaneSizes(2, 0, 4, [30, 70], 100)
+      expect(sizes).not.toBeNull()
+      expect(sizes![0]).toBeGreaterThanOrEqual(100)
+      expect(sizes![1]).toBeGreaterThanOrEqual(100)
+      expect(sizes).toEqual([100, 100])
+    })
+
+    it('keeps [400, 400] unchanged when min is 0', () => {
+      expect(resolveInitialPaneSizes(2, 0, 4, [400, 400], 0)).toEqual([400, 400])
+    })
+
+    it('returns null for percentage sizes when container is 0', () => {
+      expect(resolveInitialPaneSizes(2, 0, 4, ['30%', '70%'])).toBeNull()
     })
   })
 

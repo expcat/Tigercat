@@ -120,22 +120,45 @@ describe('Input', () => {
       const { container } = render(Input, {
         props: { status: 'error' }
       })
+      const wrapper = container.firstChild as HTMLElement
       const input = container.querySelector('input')
-      expect(input).toHaveClass('border-red-500')
+      expect(wrapper).toHaveClass('border-red-500')
+      expect(input).not.toHaveClass('border-red-500')
     })
 
-    it('should render error message inside input wrapper', () => {
+    it('puts border and radius on the wrapper, not the native input', () => {
+      const { container } = render(Input)
+      const wrapper = container.firstChild as HTMLElement
+      const input = container.querySelector('input')
+      expect(wrapper.className).toContain('border')
+      expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md')
+      expect(input?.className).not.toContain('rounded-[var(--tiger-radius-md')
+    })
+
+    it('should render error message below the chrome field', () => {
       const { container } = render(Input, {
         props: { status: 'error', errorMessage: 'Bad input' }
       })
+      const input = container.querySelector('input')!
+      const chrome = input.parentElement!
+      const describedBy = input.getAttribute('aria-describedby')
+      const errorEl = document.getElementById(describedBy!)
+
       expect(container).toHaveTextContent('Bad input')
+      expect(chrome.className).toContain('border-red-500')
+      expect(errorEl).toBeInTheDocument()
+      expect(errorEl?.textContent).toBe('Bad input')
+      expect(chrome.contains(errorEl)).toBe(false)
+      expect(errorEl?.className).not.toContain('inset-y-0')
+      expect(errorEl?.className.split(/\s+/)).not.toContain('absolute')
     })
 
-    it('should hide suffix when error message is shown', () => {
+    it('should keep suffix when error message is shown', () => {
       const { container } = render(Input, {
-        props: { status: 'error', errorMessage: 'Bad input', suffix: 'Should hide' }
+        props: { status: 'error', errorMessage: 'Bad input', suffix: 'Still visible' }
       })
-      expect(container).not.toHaveTextContent('Should hide')
+      expect(container).toHaveTextContent('Bad input')
+      expect(container).toHaveTextContent('Still visible')
     })
 
     it('should show suffix when status is error but no errorMessage', () => {
@@ -636,6 +659,77 @@ describe('Input', () => {
     })
   })
 
+  describe('clearable + showPassword', () => {
+    const classTokens = (el: Element): string[] => el.className.split(/\s+/)
+
+    it('renders both buttons offset on the right edge', () => {
+      const { container } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: 'secret' }
+      })
+      const input = container.querySelector('input')!
+      const clearBtn = screen.getByLabelText('Clear input')
+      const eyeBtn = screen.getByLabelText('Show password')
+
+      expect(clearBtn).toBeInTheDocument()
+      expect(eyeBtn).toBeInTheDocument()
+      expect(classTokens(clearBtn)).toContain('right-10')
+      expect(classTokens(clearBtn)).not.toContain('right-0')
+      expect(classTokens(eyeBtn)).toContain('right-0')
+      expect(classTokens(eyeBtn)).not.toContain('right-10')
+      expect(classTokens(input)).toContain('pr-20')
+      expect(classTokens(input)).not.toContain('pr-10')
+    })
+
+    it('clears value when the offset clear button is clicked', async () => {
+      const { emitted } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: 'secret' }
+      })
+
+      await fireEvent.click(screen.getByLabelText('Clear input'))
+      expect(emitted()['update:modelValue']).toBeTruthy()
+      expect(emitted()['update:modelValue'][0]).toEqual([''])
+      expect(emitted()['clear']).toBeTruthy()
+    })
+
+    it('toggles input type when the offset password button is clicked', async () => {
+      const { container } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: 'secret' }
+      })
+      const input = container.querySelector('input')!
+
+      expect(input).toHaveAttribute('type', 'password')
+      await fireEvent.click(screen.getByLabelText('Show password'))
+      expect(input).toHaveAttribute('type', 'text')
+      expect(screen.getByLabelText('Hide password')).toBeInTheDocument()
+    })
+
+    it('shows only the password toggle at right-0 when the value is empty', () => {
+      const { container } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: '' }
+      })
+      const input = container.querySelector('input')!
+      const eyeBtn = screen.getByLabelText('Show password')
+
+      expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
+      expect(classTokens(eyeBtn)).toContain('right-0')
+      expect(classTokens(input)).toContain('pr-10')
+      expect(classTokens(input)).not.toContain('pr-20')
+    })
+
+    it('shows only the clear button at right-0 without showPassword', () => {
+      const { container } = render(Input, {
+        props: { type: 'text', clearable: true, modelValue: 'hello' }
+      })
+      const input = container.querySelector('input')!
+      const clearBtn = screen.getByLabelText('Clear input')
+
+      expect(screen.queryByLabelText('Show password')).not.toBeInTheDocument()
+      expect(classTokens(clearBtn)).toContain('right-0')
+      expect(classTokens(input)).toContain('pr-10')
+      expect(classTokens(input)).not.toContain('pr-20')
+    })
+  })
+
   describe('showCount', () => {
     it('shows character count', () => {
       render(Input, {
@@ -672,12 +766,84 @@ describe('Input', () => {
       const errorEl = document.getElementById(describedBy!)
       expect(errorEl).toBeInTheDocument()
       expect(errorEl?.textContent).toBe('Required field')
+      expect(errorEl).toHaveAttribute('aria-live', 'polite')
+    })
+
+    it('does not set aria-describedby when there is no errorMessage', () => {
+      const { container } = render(Input, {
+        props: { status: 'error' }
+      })
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+      expect(input).not.toHaveAttribute('aria-describedby')
+      expect(container.querySelector('[aria-live]')).toBeNull()
     })
 
     it('does not set aria-invalid when status is default', () => {
       render(Input)
       const input = screen.getByRole('textbox')
       expect(input).not.toHaveAttribute('aria-invalid')
+    })
+  })
+
+  describe('errorMessage placement', () => {
+    const longMessage = 'This username is already taken, please choose another'
+
+    it('keeps the input value readable when a long error sits below the field', () => {
+      const { container } = render(Input, {
+        props: { status: 'error', errorMessage: longMessage, modelValue: 'alice' }
+      })
+      const input = screen.getByRole('textbox') as HTMLInputElement
+      const describedBy = input.getAttribute('aria-describedby')
+      const errorEl = document.getElementById(describedBy!)
+
+      expect(input.value).toBe('alice')
+      expect(container).toHaveTextContent(longMessage)
+      expect(errorEl?.className).not.toContain('inset-y-0')
+      expect(input.parentElement?.contains(errorEl)).toBe(false)
+    })
+
+    it('keeps the clear button when errorMessage is shown', () => {
+      render(Input, {
+        props: {
+          status: 'error',
+          errorMessage: 'Bad',
+          clearable: true,
+          modelValue: 'x'
+        }
+      })
+      expect(screen.getByLabelText('Clear input')).toBeInTheDocument()
+      expect(screen.getByText('Bad')).toBeInTheDocument()
+    })
+
+    it('keeps clear, password toggle, and error text with dual-suffix offsets', () => {
+      const { container } = render(Input, {
+        props: {
+          type: 'password',
+          clearable: true,
+          showPassword: true,
+          modelValue: 'secret',
+          status: 'error',
+          errorMessage: 'Weak'
+        }
+      })
+      const input = container.querySelector('input')!
+      const clearBtn = screen.getByLabelText('Clear input')
+      const eyeBtn = screen.getByLabelText('Show password')
+
+      expect(screen.getByText('Weak')).toBeInTheDocument()
+      expect(clearBtn.className.split(/\s+/)).toContain('right-10')
+      expect(clearBtn.className.split(/\s+/)).not.toContain('right-0')
+      expect(eyeBtn.className.split(/\s+/)).toContain('right-0')
+      expect(input.className.split(/\s+/)).toContain('pr-20')
+    })
+
+    it('does not render a live region when status is error without errorMessage', () => {
+      const { container } = render(Input, {
+        props: { status: 'error', suffix: 'Visible suffix' }
+      })
+      expect(container.querySelector('[aria-live]')).toBeNull()
+      expect(container).toHaveTextContent('Visible suffix')
     })
   })
 })

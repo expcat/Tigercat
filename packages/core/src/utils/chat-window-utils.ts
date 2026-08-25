@@ -4,6 +4,8 @@
 
 import type { ChatMessageStatus } from '../types/composite'
 import type { BadgeVariant } from '../types/badge'
+import type { TigerLocaleChatWindow } from '../types/locale'
+import { DEFAULT_CHAT_WINDOW_LABELS } from './locale-utils'
 
 export interface ChatMessageStatusInfo {
   text: string
@@ -11,9 +13,37 @@ export interface ChatMessageStatusInfo {
 }
 
 export const defaultChatMessageStatusInfo: Record<ChatMessageStatus, ChatMessageStatusInfo> = {
-  sending: { text: '发送中', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
-  sent: { text: '已送达', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
-  failed: { text: '发送失败', className: 'text-[var(--tiger-danger,#ef4444)]' }
+  sending: {
+    text: DEFAULT_CHAT_WINDOW_LABELS.sendingText,
+    className: 'text-[var(--tiger-text-muted,#6b7280)]'
+  },
+  sent: {
+    text: DEFAULT_CHAT_WINDOW_LABELS.sentText,
+    className: 'text-[var(--tiger-text-muted,#6b7280)]'
+  },
+  failed: {
+    text: DEFAULT_CHAT_WINDOW_LABELS.failedText,
+    className: 'text-[var(--tiger-danger,#ef4444)]'
+  }
+}
+
+export function buildChatMessageStatusInfo(
+  labels: Pick<TigerLocaleChatWindow, 'sendingText' | 'sentText' | 'failedText'>
+): Record<ChatMessageStatus, ChatMessageStatusInfo> {
+  return {
+    sending: {
+      text: labels.sendingText ?? defaultChatMessageStatusInfo.sending.text,
+      className: defaultChatMessageStatusInfo.sending.className
+    },
+    sent: {
+      text: labels.sentText ?? defaultChatMessageStatusInfo.sent.text,
+      className: defaultChatMessageStatusInfo.sent.className
+    },
+    failed: {
+      text: labels.failedText ?? defaultChatMessageStatusInfo.failed.text,
+      className: defaultChatMessageStatusInfo.failed.className
+    }
+  }
 }
 
 export function getChatMessageStatusInfo(

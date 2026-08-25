@@ -4,8 +4,33 @@
 
 import type { DateFormat } from '../types/datepicker'
 
+/** Date-only ISO (`YYYY-MM-DD`) with optional surrounding whitespace. */
+const DATE_ONLY_ISO_RE = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/
+
 /**
- * Parse a date string or Date object to a Date instance
+ * Parse `YYYY-MM-DD` as local calendar midnight (`Date(year, monthIndex, day)`).
+ * Returns `undefined` when the string is not date-only so callers can fall through;
+ * returns `null` for an impossible calendar day (Feb 30, month 13, non-leap Feb 29).
+ */
+function parseDateOnlyLocal(value: string): Date | null | undefined {
+  const match = DATE_ONLY_ISO_RE.exec(value)
+  if (!match) return undefined
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  const local = new Date(year, month - 1, day)
+  if (local.getFullYear() !== year || local.getMonth() !== month - 1 || local.getDate() !== day) {
+    return null
+  }
+  return local
+}
+
+/**
+ * Parse a date string or Date object to a Date instance.
+ * Date-only ISO (`YYYY-MM-DD`, optional surrounding whitespace) is local calendar
+ * midnight, not UTC midnight — equivalent to `new Date(year, monthIndex, day)`.
+ * Impossible calendar dates (e.g. 2024-02-30, 2023-02-29) return null.
+ * ISO datetimes with a time or offset still go through `new Date(value)`.
  * @param value - Date string, Date object, or null/undefined
  * @returns Date instance or null if invalid
  */
@@ -14,6 +39,8 @@ export function parseDate(value: Date | string | null | undefined): Date | null 
   if (value instanceof Date) {
     return isNaN(value.getTime()) ? null : value
   }
+  const dateOnly = parseDateOnlyLocal(value)
+  if (dateOnly !== undefined) return dateOnly
   const parsed = new Date(value)
   return isNaN(parsed.getTime()) ? null : parsed
 }

@@ -2703,6 +2703,7 @@
       "selectSearchInputClasses",
       "SelectValue",
       "SelectValues",
+      "semanticColorsToCssVars",
       "SemanticTokenCategory",
       "semanticTokens",
       "sendIcon",

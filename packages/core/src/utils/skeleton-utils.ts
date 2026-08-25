@@ -5,15 +5,16 @@
 
 import type { SkeletonVariant, SkeletonAnimation, SkeletonShape } from '../types/skeleton'
 
+/** Bar fill: optional `--tiger-skeleton-bg`, then registered `--tiger-surface-muted`. */
 export const skeletonBaseClasses =
-  'bg-[var(--tiger-skeleton-bg,#e5e7eb)] rounded-[var(--tiger-radius-sm,0.375rem)]'
+  'bg-[var(--tiger-skeleton-bg,var(--tiger-surface-muted,#f9fafb))] rounded-[var(--tiger-radius-sm,0.375rem)]'
 
 /**
  * Animation classes for skeleton
  */
 export const skeletonAnimationClasses: Record<SkeletonAnimation, string> = {
   pulse: 'animate-pulse',
-  wave: 'animate-pulse bg-gradient-to-r from-[var(--tiger-skeleton-bg,#e5e7eb)] via-[var(--tiger-skeleton-bg-alt,#d1d5db)] to-[var(--tiger-skeleton-bg,#e5e7eb)] bg-[length:200%_100%]',
+  wave: 'animate-pulse bg-gradient-to-r from-[var(--tiger-skeleton-bg,var(--tiger-surface-muted,#f9fafb))] via-[var(--tiger-skeleton-bg-alt,var(--tiger-border,#e5e7eb))] to-[var(--tiger-skeleton-bg,var(--tiger-surface-muted,#f9fafb))] bg-[length:200%_100%]',
   none: ''
 } as const
 

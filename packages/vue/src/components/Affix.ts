@@ -142,9 +142,10 @@ export const Affix = defineComponent({
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const children = slots.default?.()
+      const useBottom = props.offsetBottom !== undefined
 
-      // The sentinel is always rendered at the original DOM position so the
-      // IntersectionObserver can detect when scroll passes it.
+      // offsetTop: sentinel before content (original top). offsetBottom: after
+      // the wrapper, or after the placeholder when affixed (content bottom).
       const sentinel = h('div', {
         ref: sentinelRef,
         'aria-hidden': 'true',
@@ -152,41 +153,39 @@ export const Affix = defineComponent({
       })
 
       if (state.value.affixed) {
-        return h('div', [
-          sentinel,
-          // placeholder reserves layout space
-          h('div', {
-            style: {
-              width: `${originalRect.value?.width ?? 0}px`,
-              height: `${originalRect.value?.height ?? 0}px`
-            }
-          }),
-          h(
-            'div',
-            {
-              ref: wrapperRef,
-              ...attrs,
-              class: classNames(props.className, coerceClassValue(attrsRecord.class)),
-              style: mergeStyleValues(state.value.style, props.style)
-            },
-            children
-          )
-        ])
-      }
-
-      return h('div', [
-        sentinel,
-        h(
+        const placeholder = h('div', {
+          style: {
+            width: `${originalRect.value?.width ?? 0}px`,
+            height: `${originalRect.value?.height ?? 0}px`
+          }
+        })
+        const content = h(
           'div',
           {
             ref: wrapperRef,
             ...attrs,
             class: classNames(props.className, coerceClassValue(attrsRecord.class)),
-            style: mergeStyleValues(attrsRecord.style, props.style)
+            style: mergeStyleValues(state.value.style, props.style)
           },
           children
         )
-      ])
+        return h(
+          'div',
+          useBottom ? [placeholder, content, sentinel] : [sentinel, placeholder, content]
+        )
+      }
+
+      const content = h(
+        'div',
+        {
+          ref: wrapperRef,
+          ...attrs,
+          class: classNames(props.className, coerceClassValue(attrsRecord.class)),
+          style: mergeStyleValues(attrsRecord.style, props.style)
+        },
+        children
+      )
+      return h('div', useBottom ? [content, sentinel] : [sentinel, content])
     }
   }
 })

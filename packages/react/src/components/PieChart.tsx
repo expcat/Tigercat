@@ -90,6 +90,7 @@ export const PieChart: React.FC<PieChartProps> = ({
     wrapperClasses
   } = useChartInteraction<PieChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -316,7 +317,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
-      open={hoverable && resolvedHoveredIndex !== null && tooltipContent !== ''}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />

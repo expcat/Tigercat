@@ -7,6 +7,7 @@ import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Anchor, AnchorLink } from '@expcat/tigercat-react/Anchor'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { MockIntersectionObserver } from '../utils/mock-observers'
 
 describe('Anchor', () => {
   let scrollContainer: HTMLDivElement
@@ -328,6 +329,62 @@ describe('Anchor', () => {
 
       // Link should render properly when context is provided
       expect(screen.getByText('Link')).toBeInTheDocument()
+    })
+  })
+
+  describe('Click lock', () => {
+    beforeEach(() => {
+      MockIntersectionObserver.reset()
+      vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+      const first = document.getElementById('section1')
+      const last = document.getElementById('section2')
+      vi.spyOn(first as HTMLElement, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(0, 0, 100, 40)
+      )
+      vi.spyOn(last as HTMLElement, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(0, 800, 100, 40)
+      )
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it('keeps the clicked last link active while a first-href IO update fires', async () => {
+      const onChange = vi.fn()
+      render(
+        <Anchor affix={false} onChange={onChange} getContainer={() => scrollContainer}>
+          <AnchorLink href="#section1" title="Link 1" />
+          <AnchorLink href="#section2" title="Link 2" />
+        </Anchor>
+      )
+
+      await waitFor(() => {
+        expect(MockIntersectionObserver.instances.length).toBeGreaterThan(0)
+      })
+
+      await fireEvent.click(screen.getByText('Link 2'))
+      expect(screen.getByText('Link 2')).toHaveClass('font-medium')
+      expect(screen.getByText('Link 1')).not.toHaveClass('font-medium')
+      const changeCallsAfterClick = onChange.mock.calls.length
+
+      const observer = MockIntersectionObserver.instances.at(-1)
+      await act(async () => {
+        observer?.trigger([
+          {
+            target: document.getElementById('section1') as Element,
+            isIntersecting: true
+          },
+          {
+            target: document.getElementById('section2') as Element,
+            isIntersecting: true
+          }
+        ])
+      })
+
+      expect(screen.getByText('Link 2')).toHaveClass('font-medium')
+      expect(screen.getByText('Link 1')).not.toHaveClass('font-medium')
+      expect(onChange.mock.calls.length).toBe(changeCallsAfterClick)
     })
   })
 })

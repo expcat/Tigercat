@@ -6,7 +6,5 @@ const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6
 export default function App() {
   const [date, setDate] = useState<Date | undefined>(new Date())
 
-  return (
-    <Calendar value={date} mode="year" fullscreen disabledDate={isWeekend} onChange={setDate} />
-  )
+  return <Calendar value={date} fullscreen disabledDate={isWeekend} onChange={setDate} />
 }

@@ -50,6 +50,14 @@ export const loadingContainerBaseClasses = 'inline-flex flex-col items-center ju
 export const loadingFullscreenBaseClasses = 'fixed inset-0 z-50 flex items-center justify-center'
 
 /**
+ * Default fullscreen mask: 90% of `--tiger-surface`.
+ * Optional `--tiger-loading-mask` is a first-level override, not a registered theme var.
+ * Last-resort `#ffffff` applies only when `--tiger-surface` is unresolved.
+ */
+export const DEFAULT_LOADING_BACKGROUND =
+  'var(--tiger-loading-mask, color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent))'
+
+/**
  * Base classes for spinner animation
  */
 export const loadingSpinnerBaseClasses = 'animate-spin'

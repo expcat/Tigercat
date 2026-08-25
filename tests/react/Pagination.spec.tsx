@@ -7,6 +7,9 @@ import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Pagination } from '@expcat/tigercat-react/Pagination'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Pagination', () => {
@@ -141,6 +144,45 @@ describe('Pagination', () => {
   it('applies size classes', () => {
     const { container } = render(<Pagination total={100} pageSize={10} size="small" />)
     expect(container.querySelector('button')).toHaveClass('h-7')
+  })
+
+  it('renders English Total N items by default without ConfigProvider', () => {
+    render(<Pagination total={240} pageSize={20} />)
+    expect(screen.getByText('Total 240 items')).toBeInTheDocument()
+    expect(screen.queryByText('共 240 条')).not.toBeInTheDocument()
+  })
+
+  it('renders Chinese total under ConfigProvider zhCN', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <Pagination total={240} pageSize={20} />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('共 240 条')).toBeInTheDocument()
+  })
+
+  it('renders English total under ConfigProvider enUS', () => {
+    render(
+      <ConfigProvider locale={enUS}>
+        <Pagination total={240} pageSize={20} />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('Total 240 items')).toBeInTheDocument()
+  })
+
+  it('lets explicit totalText win under zh-CN', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <Pagination total={240} pageSize={20} totalText={(total) => `Custom ${total}`} />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('Custom 240')).toBeInTheDocument()
+    expect(screen.queryByText('共 240 条')).not.toBeInTheDocument()
+  })
+
+  it('formats labels.totalText template', () => {
+    render(<Pagination total={240} pageSize={20} labels={{ totalText: 'All {total}' }} />)
+    expect(screen.getByText('All 240')).toBeInTheDocument()
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {

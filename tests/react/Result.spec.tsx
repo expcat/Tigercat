@@ -62,6 +62,28 @@ describe('Result (React)', () => {
       render(<Result status="500" title="Server Error" />)
       expect(screen.getByText('500')).toBeInTheDocument()
     })
+
+    it('renders the six-status gallery including 403 and 500', () => {
+      const statuses = ['info', 'warning', 'error', '404', '403', '500'] as const
+      render(
+        <>
+          {statuses.map((status) => (
+            <Result
+              key={status}
+              status={status}
+              title={`状态：${status}`}
+              subTitle="状态决定图标与配色"
+            />
+          ))}
+        </>
+      )
+      for (const status of statuses) {
+        expect(screen.getByText(`状态：${status}`)).toBeInTheDocument()
+      }
+      expect(screen.getByText('403')).toBeInTheDocument()
+      expect(screen.getByText('500')).toBeInTheDocument()
+      expect(screen.getByText('404')).toBeInTheDocument()
+    })
   })
 
   describe('Custom content', () => {

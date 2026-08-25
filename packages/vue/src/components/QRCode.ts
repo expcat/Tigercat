@@ -6,7 +6,7 @@ import {
   resolveLocaleText,
   mergeTigerLocale
 } from '@expcat/tigercat-core'
-import type { QRCodeLevel, QRCodeStatus, TigerLocale } from '@expcat/tigercat-core'
+import type { QRCodeStatus, TigerLocale } from '@expcat/tigercat-core'
 import {
   qrcodeContainerClasses,
   qrcodeOverlayClasses,
@@ -16,12 +16,12 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
+/** QRCode renders a decorative hash matrix (not a real/scannable QR). */
 export interface VueQRCodeProps {
   value: string
   size?: number
   color?: string
   bgColor?: string
-  level?: QRCodeLevel
   status?: QRCodeStatus
   className?: string
   locale?: Partial<TigerLocale>
@@ -35,7 +35,6 @@ export const QRCode = defineComponent({
     size: { type: Number, default: 128 },
     color: { type: String, default: '#000000' },
     bgColor: { type: String, default: '#ffffff' },
-    level: { type: String as PropType<QRCodeLevel>, default: 'M' },
     status: { type: String as PropType<QRCodeStatus>, default: 'active' },
     className: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }

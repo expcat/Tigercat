@@ -2,8 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getChatMessageStatusInfo,
+  buildChatMessageStatusInfo,
   getChatStatusBarClasses,
   formatChatTime,
+  getChatWindowLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   type ChatMessage,
   type ChatWindowProps as CoreChatWindowProps
 } from '@expcat/tigercat-core'
@@ -13,6 +17,7 @@ import { Input } from './Input'
 import { Button } from './Button'
 import { VirtualList } from './VirtualList'
 import { Empty } from './Empty'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ChatWindowProps
   extends
@@ -28,11 +33,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   messages = [],
   value,
   defaultValue = '',
-  placeholder = '请输入消息',
+  placeholder,
   disabled = false,
   maxLength,
-  emptyText = '暂无消息',
-  sendText = '发送',
+  emptyText,
+  sendText,
+  locale,
+  labels: labelsOverride,
   messageListAriaLabel,
   inputAriaLabel,
   sendAriaLabel,
@@ -57,6 +64,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   className,
   ...props
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChatWindowLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const statusMap = useMemo(() => buildChatMessageStatusInfo(labels), [labels])
+  const resolvedPlaceholder = resolveLocaleText(labels.placeholder, placeholder)
+  const resolvedEmptyText = resolveLocaleText(labels.emptyText, emptyText)
+  const resolvedSendText = resolveLocaleText(labels.sendText, sendText)
+
   const [innerValue, setInnerValue] = useState<string>(value ?? defaultValue)
 
   useEffect(() => {
@@ -119,7 +140,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const renderMessageItem = useCallback(
     (message: ChatMessage, index: number) => {
       const isSelf = message.direction === 'self'
-      const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
+      const statusInfo = message.status
+        ? getChatMessageStatusInfo(message.status, statusMap)
+        : undefined
       const timeText = showTime ? formatChatTime(message.time) : ''
 
       return (
@@ -171,7 +194,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       )
     },
-    [renderMessage, showAvatar, showName, showTime]
+    [renderMessage, showAvatar, showName, showTime, statusMap]
   )
 
   const messageListRef = useRef<HTMLDivElement | null>(null)
@@ -197,7 +220,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           role="log"
           aria-live="polite"
           aria-relevant="additions text"
-          aria-label={messageListAriaLabel ?? '消息列表'}>
+          aria-label={messageListAriaLabel ?? 'Message list'}>
           <VirtualList
             itemCount={messages.length}
             itemHeight={virtualItemHeight}
@@ -212,10 +235,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           role="log"
           aria-live="polite"
           aria-relevant="additions text"
-          aria-label={messageListAriaLabel ?? '消息列表'}>
+          aria-label={messageListAriaLabel ?? 'Message list'}>
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center py-8">
-              <Empty description={emptyText} />
+              <Empty description={resolvedEmptyText} />
             </div>
           ) : (
             messages.map(renderMessageItem)
@@ -228,28 +251,31 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           {inputType === 'input' ? (
             <Input
               value={inputValue}
-              placeholder={placeholder}
+              placeholder={resolvedPlaceholder}
               disabled={disabled}
               maxLength={maxLength}
-              aria-label={inputAriaLabel ?? placeholder ?? '消息输入'}
+              aria-label={inputAriaLabel ?? resolvedPlaceholder}
               onChange={(event) => handleValueChange(event.currentTarget.value)}
               onKeyDown={handleKeyDown}
             />
           ) : (
             <Textarea
               value={inputValue}
-              placeholder={placeholder}
+              placeholder={resolvedPlaceholder}
               disabled={disabled}
               maxLength={maxLength}
               rows={inputRows}
-              aria-label={inputAriaLabel ?? placeholder ?? '消息输入'}
+              aria-label={inputAriaLabel ?? resolvedPlaceholder}
               onChange={(event) => handleValueChange(event.currentTarget.value)}
               onKeyDown={handleKeyDown}
             />
           )}
         </div>
-        <Button disabled={!canSend} onClick={handleSend} aria-label={sendAriaLabel ?? sendText}>
-          {sendText}
+        <Button
+          disabled={!canSend}
+          onClick={handleSend}
+          aria-label={sendAriaLabel ?? resolvedSendText}>
+          {resolvedSendText}
         </Button>
       </div>
     </div>

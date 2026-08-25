@@ -92,4 +92,50 @@ describe('ColorPicker', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+
+  it('paints the trigger swatch from rgba modelValue (not black)', () => {
+    const { container } = renderWithProps(ColorPicker, {
+      modelValue: 'rgba(37, 99, 235, 0.8)',
+      showAlpha: true
+    })
+    const trigger = container.querySelector('[role="button"]') as HTMLElement
+    const bg = (trigger.style.backgroundColor || '').replace(/\s+/g, '').toLowerCase()
+    expect(bg).not.toMatch(/rgb\(0,0,0\)|#000/)
+    expect(bg).toMatch(/37/)
+    expect(bg).toMatch(/99/)
+    expect(bg).toMatch(/235/)
+    expect(bg).toMatch(/0\.8/)
+  })
+
+  it('emits an alpha-bearing string when the Alpha slider changes', async () => {
+    const onUpdate = vi.fn()
+    const onChange = vi.fn()
+    const { container } = render(ColorPicker, {
+      props: {
+        modelValue: 'rgba(37, 99, 235, 0.8)',
+        showAlpha: true,
+        format: 'rgb',
+        'onUpdate:modelValue': onUpdate,
+        onChange
+      }
+    })
+    await fireEvent.click(container.querySelector('[role="button"]')!)
+    const slider = document.body.querySelector('input[aria-label="Alpha"]') as HTMLInputElement
+    expect(slider).toBeTruthy()
+    await fireEvent.update(slider, '50')
+    expect(onUpdate).toHaveBeenCalled()
+    const emitted = String(onUpdate.mock.calls[0][0])
+    expect(emitted).toMatch(/rgba?\(|hsla?\(/)
+    expect(emitted).not.toMatch(/^#[0-9a-fA-F]{6}$/)
+    expect(onChange).toHaveBeenCalledWith(emitted)
+  })
+
+  it('does not render the Alpha slider when showAlpha is false', async () => {
+    const { container } = renderWithProps(ColorPicker, {
+      modelValue: '#2563eb',
+      showAlpha: false
+    })
+    await fireEvent.click(container.querySelector('[role="button"]')!)
+    expect(document.body.querySelector('input[aria-label="Alpha"]')).not.toBeInTheDocument()
+  })
 })

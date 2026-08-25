@@ -23,11 +23,14 @@ import {
   kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
   filterColumns,
+  filterCards,
   groupBySwimlane,
   getColumnCardCount,
   moveCard,
+  mapVisibleCardIndexToSource,
   reorderColumns,
   isWipExceeded,
+  appendDefaultTaskBoardCard,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
   type TaskBoardProps as CoreTaskBoardProps,
@@ -476,6 +479,18 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     [onColumnsChange]
   )
 
+  const consumerOnCardAdd = onCardAdd
+  const showAddCard = Boolean(allowAddCard || consumerOnCardAdd)
+  const handleCardAdd = useCallback(
+    (columnId: string | number) => {
+      if (consumerOnCardAdd == null) {
+        updateColumns(appendDefaultTaskBoardCard(columnsRef.current, columnId))
+      }
+      consumerOnCardAdd?.(columnId)
+    },
+    [consumerOnCardAdd, updateColumns]
+  )
+
   // ---- drag controller (unified DnD + touch + keyboard) ----
   const [dragSnap, setDragSnap] = useState<TaskBoardDragSnapshot>(createDefaultDragSnapshot)
 
@@ -492,6 +507,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onColumnMoveRef.current = onColumnMove
   const enforceWipLimitRef = useRef(enforceWipLimit)
   enforceWipLimitRef.current = enforceWipLimit
+  const filterTextRef = useRef(filterText)
+  filterTextRef.current = filterText
 
   const applyCardMove = useCallback(
     async (
@@ -500,7 +517,16 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, toIdx, {
+      const sourceCol = columnsRef.current.find((c) => c.id === toColumnId)
+      const mappedIdx =
+        sourceCol == null
+          ? toIdx
+          : mapVisibleCardIndexToSource(
+              sourceCol.cards,
+              filterCards(sourceCol.cards, filterTextRef.current),
+              toIdx
+            )
+      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, mappedIdx, {
         enforceWipLimit: enforceWipLimitRef.current
       })
       if (!result) return
@@ -601,7 +627,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             renderColumnHeader={renderColumnHeader}
             renderColumnFooter={renderColumnFooter}
             renderEmptyColumn={renderEmptyColumn}
-            onCardAdd={onCardAdd}
+            onCardAdd={showAddCard ? handleCardAdd : undefined}
             dragType={dragType}
             dragCtrl={dragCtrl}
             dragStateId={dragStateId}

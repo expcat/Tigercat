@@ -733,6 +733,12 @@ export function getSortIconClasses(active: boolean): string {
 }
 
 /**
+ * Reset native button chrome so a sortable header still looks like a `<th>` label.
+ */
+export const tableSortButtonClasses =
+  'inline-flex items-center appearance-none border-0 bg-transparent p-0 font-[inherit] text-inherit cursor-pointer'
+
+/**
  * Get empty state classes
  */
 export const tableEmptyStateClasses = 'text-center py-12 text-[var(--tiger-text-muted,#6b7280)]'
@@ -776,21 +782,37 @@ export function defaultSortFn(a: unknown, b: unknown): number {
 }
 
 /**
- * Sort data array by column
+ * Record field used by cells, sort, filter, and export: `dataKey` if set, else `key`.
+ */
+export function getTableColumnDataKey<T = Record<string, unknown>>(
+  column: Pick<TableColumn<T>, 'key' | 'dataKey'>
+): string {
+  return column.dataKey || column.key
+}
+
+/**
+ * Sort data array by column.
+ *
+ * Looks up `record[key]` unless `columns` contains a column whose `key` matches —
+ * then the field is {@link getTableColumnDataKey} (`dataKey` else `key`).
  */
 export function sortData<T>(
   data: T[],
   key: string,
   direction: SortDirection,
-  sortFn?: (a: unknown, b: unknown) => number
+  sortFn?: (a: unknown, b: unknown) => number,
+  columns?: TableColumn<T>[]
 ): T[] {
   if (!direction || !key) {
     return data
   }
 
+  const column = columns?.find((col) => col.key === key)
+  const fieldKey = column ? getTableColumnDataKey(column) : key
+
   const sortedData = [...data].sort((a, b) => {
-    const aValue = (a as Record<string, unknown>)[key]
-    const bValue = (b as Record<string, unknown>)[key]
+    const aValue = (a as Record<string, unknown>)[fieldKey]
+    const bValue = (b as Record<string, unknown>)[fieldKey]
 
     const compareResult = sortFn ? sortFn(aValue, bValue) : defaultSortFn(aValue, bValue)
 
@@ -801,7 +823,9 @@ export function sortData<T>(
 }
 
 /**
- * Filter data array by filter values
+ * Filter data array by filter values.
+ *
+ * Looks up `record[filtersKey]`. Prefer {@link filterTableData} when columns may define `dataKey`.
  */
 export function filterData<T>(data: T[], filters: Record<string, unknown>): T[] {
   if (!filters || Object.keys(filters).length === 0) {
@@ -831,6 +855,8 @@ export function filterData<T>(data: T[], filters: Record<string, unknown>): T[] 
  * Like {@link filterData}, but a column's `filter.filterFn(cellValue, filterValue)`
  * (when provided) overrides the default substring/equality matching for that key.
  * Columns without a custom `filterFn` fall back to the default behavior.
+ * Filter state keys stay `column.key`; the record field is {@link getTableColumnDataKey}.
+ * If no column matches a filters key, the lookup falls back to that key.
  */
 export function filterTableData<T>(
   data: T[],
@@ -841,8 +867,10 @@ export function filterTableData<T>(
     return data
   }
 
+  const columnByKey = new Map<string, TableColumn<T>>()
   const filterFnByKey = new Map<string, (value: unknown, filterValue: unknown) => boolean>()
   for (const column of columns) {
+    columnByKey.set(column.key, column)
     if (column.filter?.filterFn) {
       filterFnByKey.set(column.key, column.filter.filterFn)
     }
@@ -854,7 +882,9 @@ export function filterTableData<T>(
         return true
       }
 
-      const cellValue = (record as Record<string, unknown>)[key]
+      const column = columnByKey.get(key)
+      const fieldKey = column ? getTableColumnDataKey(column) : key
+      const cellValue = (record as Record<string, unknown>)[fieldKey]
 
       const customFn = filterFnByKey.get(key)
       if (customFn) {

@@ -15,6 +15,7 @@ import {
   getAnchorLinkClasses,
   getAnchorLinkListClasses,
   createAnchorObserver,
+  createProgrammaticScrollLock,
   scrollToAnchor,
   type AnchorDirection,
   type AnchorProps as CoreAnchorProps
@@ -157,7 +158,7 @@ export interface AnchorProps extends Omit<CoreAnchorProps, 'style'> {
 
 export const Anchor: React.FC<AnchorProps> = ({
   affix = true,
-  bounds: _bounds = 5,
+  bounds = 5,
   offsetTop = 0,
   showInkInFixed = false,
   targetOffset,
@@ -174,11 +175,10 @@ export const Anchor: React.FC<AnchorProps> = ({
   const [links, setLinks] = useState<string[]>([])
   const anchorRef = useRef<HTMLDivElement>(null)
   const inkRef = useRef<HTMLDivElement>(null)
-  const isScrollingRef = useRef(false)
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Cache getContainer to avoid recreating on every render
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
+  const scrollLockRef = useRef(createProgrammaticScrollLock(() => getContainerRef.current()))
   const getCurrentAnchorRef = useRef(getCurrentAnchor)
   getCurrentAnchorRef.current = getCurrentAnchor
   const onChangeRef = useRef(onChange)
@@ -217,18 +217,10 @@ export const Anchor: React.FC<AnchorProps> = ({
       // Note: preventDefault is called by AnchorLink before invoking this handler
       onClick?.(event, href)
 
-      // Prevent observer from running during programmatic scroll
-      isScrollingRef.current = true
+      scrollLockRef.current.lock()
       setActiveLink(href)
 
       scrollTo(href)
-
-      // Clear previous timeout to avoid premature reset on rapid clicks
-      if (scrollTimeoutRef.current !== null) clearTimeout(scrollTimeoutRef.current)
-      scrollTimeoutRef.current = setTimeout(() => {
-        isScrollingRef.current = false
-        scrollTimeoutRef.current = null
-      }, 500)
     },
     [onClick, scrollTo]
   )
@@ -243,9 +235,10 @@ export const Anchor: React.FC<AnchorProps> = ({
       const root = container === window ? null : (container as Element)
       stop = createAnchorObserver(links, {
         offsetTop: scrollOffset,
+        bounds,
         root,
         onChange: (newActiveLink) => {
-          if (isScrollingRef.current) return
+          if (scrollLockRef.current.isLocked()) return
           const finalActiveLink = getCurrentAnchorRef.current
             ? getCurrentAnchorRef.current(newActiveLink)
             : newActiveLink
@@ -263,11 +256,14 @@ export const Anchor: React.FC<AnchorProps> = ({
     return () => {
       clearTimeout(timeoutId)
       stop?.()
-      if (scrollTimeoutRef.current !== null) {
-        clearTimeout(scrollTimeoutRef.current)
-      }
     }
-  }, [links, scrollOffset])
+  }, [bounds, links, scrollOffset])
+
+  useEffect(() => {
+    return () => {
+      scrollLockRef.current.dispose()
+    }
+  }, [])
 
   // Update ink position
   useEffect(() => {

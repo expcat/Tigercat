@@ -48,6 +48,15 @@ describe('ImagePreview', () => {
     expect(img).toHaveAttribute('src', '/img2.jpg')
   })
 
+  it('constrains the open preview image to 90vh / 90vw', () => {
+    render(<ImagePreview open images={images} />)
+
+    const img = document.querySelector('[role="dialog"] img')
+    expect(img).toBeInTheDocument()
+    expect(img?.className).toContain('max-h-[90vh]')
+    expect(img?.className).toContain('max-w-[90vw]')
+  })
+
   it('renders navigation buttons for multiple images', () => {
     render(<ImagePreview open images={images} />)
 
@@ -102,6 +111,36 @@ describe('ImagePreview', () => {
     fireEvent.keyDown(document, { key: 'Escape' })
 
     expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('calls onOpenChange when the mask is clicked (maskClosable default true)', () => {
+    const onOpenChange = vi.fn()
+    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+
+    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
+    fireEvent.click(mask)
+
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('does not call onOpenChange when the mask is clicked with maskClosable false', () => {
+    const onOpenChange = vi.fn()
+    render(<ImagePreview open images={images} maskClosable={false} onOpenChange={onOpenChange} />)
+
+    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
+    fireEvent.click(mask)
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('does not call onOpenChange when the preview image is clicked', () => {
+    const onOpenChange = vi.fn()
+    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLElement
+    fireEvent.click(img)
+
+    expect(onOpenChange).not.toHaveBeenCalled()
   })
 
   it('updates current image from navigation button clicks', () => {

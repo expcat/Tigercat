@@ -7,6 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Rate } from '@expcat/tigercat-react/Rate'
+import { rateHalfStarInnerClasses } from '@expcat/tigercat-core'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -107,6 +108,30 @@ describe('Rate', () => {
     fireEvent.click(getStars(container)[2])
     expect(onChange).toHaveBeenCalledWith(0)
   })
+
+  // --- Half-star clip (Pages /rate readonly 4.5) ---
+  it('clips the left half of a full-width glyph at 4.5', () => {
+    const { container } = render(<Rate value={4.5} allowHalf disabled />)
+    const stars = getStars(container)
+    expect(stars).toHaveLength(5)
+
+    for (let i = 0; i < 4; i++) {
+      expect(stars[i].querySelector('.overflow-hidden')).toBeNull()
+    }
+
+    const fifth = stars[4]
+    expect(fifth.children).toHaveLength(2)
+
+    const clip = fifth.querySelector('.overflow-hidden') as HTMLElement | null
+    expect(clip).not.toBeNull()
+    expect(clip!.style.width).toBe('50%')
+
+    const glyph = clip!.querySelector('svg') ?? clip!.firstElementChild
+    expect(glyph).not.toBeNull()
+    expect(glyph!.getAttribute('class')).toContain(rateHalfStarInnerClasses)
+    expect(glyph!.getAttribute('class')).toContain('w-[200%]')
+  })
+
   // --- Accessibility ---
   it('has aria-label and value bounds on the slider', () => {
     const { container } = render(<Rate value={2} count={5} />)

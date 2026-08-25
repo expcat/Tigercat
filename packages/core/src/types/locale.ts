@@ -230,6 +230,53 @@ export interface TigerLocaleTaskBoard {
   boardAriaLabel?: string
 }
 
+export interface TigerLocaleChatWindow {
+  emptyText?: string
+  sendText?: string
+  placeholder?: string
+  sendingText?: string
+  sentText?: string
+  failedText?: string
+}
+
+export interface TigerLocaleCode {
+  copyLabel?: string
+  copiedLabel?: string
+  copyFailedLabel?: string
+}
+
+export interface TigerLocaleCommentThread {
+  emptyText?: string
+  replyPlaceholder?: string
+  replyButtonText?: string
+  cancelReplyText?: string
+  likeText?: string
+  likedText?: string
+  replyText?: string
+  moreText?: string
+  loadMoreText?: string
+  collapseRepliesText?: string
+  /** Template: supports {count} */
+  expandRepliesText?: string
+}
+
+export interface TigerLocaleActivityFeed {
+  emptyText?: string
+  loadingText?: string
+}
+
+export interface TigerLocaleNotificationCenter {
+  title?: string
+  emptyText?: string
+  loadingText?: string
+  allLabel?: string
+  unreadLabel?: string
+  readLabel?: string
+  markAllReadText?: string
+  markReadText?: string
+  markUnreadText?: string
+}
+
 export interface TigerLocaleSelect {
   /** Mobile dropdown completion action text */
   doneText?: string
@@ -420,6 +467,11 @@ export interface TigerLocale {
   imageEditor?: TigerLocaleImageEditor
   status?: TigerLocaleStatus
   taskBoard?: TigerLocaleTaskBoard
+  chatWindow?: TigerLocaleChatWindow
+  code?: TigerLocaleCode
+  commentThread?: TigerLocaleCommentThread
+  activityFeed?: TigerLocaleActivityFeed
+  notificationCenter?: TigerLocaleNotificationCenter
   select?: TigerLocaleSelect
   tabs?: TigerLocaleTabs
   rate?: TigerLocaleRate

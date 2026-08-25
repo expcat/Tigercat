@@ -188,6 +188,7 @@ export const PieChart = defineComponent({
       wrapperClasses
     } = useChartInteraction<PieChartDatum>({
       hoverable: computed(() => props.hoverable),
+      showTooltip: computed(() => props.showTooltip),
       hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
       selectedIndexProp: () => props.selectedIndex,
@@ -433,15 +434,14 @@ export const PieChart = defineComponent({
         }
       )
 
-      const tooltip =
-        props.showTooltip && props.hoverable
-          ? h(ChartTooltip, {
-              content: tooltipContent.value,
-              open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
-              x: tooltipPosition.value.x,
-              y: tooltipPosition.value.y
-            })
-          : null
+      const tooltip = props.showTooltip
+        ? h(ChartTooltip, {
+            content: tooltipContent.value,
+            open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
+            x: tooltipPosition.value.x,
+            y: tooltipPosition.value.y
+          })
+        : null
 
       if (!props.showLegend) {
         return h('div', { class: 'inline-block relative' }, [chart, tooltip])

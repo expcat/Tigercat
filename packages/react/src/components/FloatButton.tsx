@@ -8,9 +8,12 @@ import {
   floatButtonSizeClasses,
   floatButtonTypeClasses,
   floatButtonDisabledClasses,
-  floatButtonGroupClasses,
+  floatButtonIconSizeClasses,
+  floatButtonPlusIconPath,
+  getFloatButtonGroupClasses,
   getViewportOffsetStyle,
   type FloatButtonShape,
+  type FloatButtonSize,
   type FloatButtonProps as CoreFloatButtonProps,
   type FloatButtonGroupProps as CoreFloatButtonGroupProps,
   viewportFloatingBaseClasses,
@@ -32,6 +35,19 @@ export interface FloatButtonProps
   /** Click handler */
   onClick?: React.MouseEventHandler<HTMLButtonElement>
 }
+
+const DefaultPlusIcon: React.FC<{ size: FloatButtonSize }> = ({ size }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+    className={floatButtonIconSizeClasses[size]}
+    aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d={floatButtonPlusIconPath} />
+  </svg>
+)
 
 export const FloatButton: React.FC<FloatButtonProps> = ({
   shape,
@@ -78,11 +94,11 @@ export const FloatButton: React.FC<FloatButtonProps> = ({
       type="button"
       disabled={disabled}
       style={buttonStyle}
-      aria-label={ariaLabel ?? tooltip}
+      aria-label={children != null ? (ariaLabel ?? tooltip) : (ariaLabel ?? tooltip ?? 'Add')}
       title={tooltip}
       onClick={disabled ? undefined : onClick}
       {...props}>
-      {children}
+      {children ?? <DefaultPlusIcon size={size} />}
     </button>
   )
 }
@@ -109,6 +125,10 @@ export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
   children,
   className,
   onOpenChange,
+  placement = 'bottom-right',
+  offset,
+  portal = true,
+  style,
   ...props
 }) => {
   const groupContextValue = useMemo(() => ({ shape: groupShape }), [groupShape])
@@ -131,14 +151,23 @@ export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
     onOpenChange?.(false)
   }, [onOpenChange])
 
-  const groupClasses = useMemo(() => classNames(floatButtonGroupClasses, className), [className])
+  const groupClasses = useMemo(
+    () => classNames(getFloatButtonGroupClasses({ placement, portal }), className),
+    [placement, portal, className]
+  )
 
-  if (!isBrowser()) return null
+  const groupStyle = useMemo(
+    () => ({ ...getViewportOffsetStyle(placement, offset), ...style }),
+    [placement, offset, style]
+  )
+
+  if (portal && !isBrowser()) return null
 
   const content = (
     <FloatButtonGroupContext.Provider value={groupContextValue}>
       <div
         className={groupClasses}
+        style={groupStyle}
         onMouseEnter={trigger === 'hover' ? handleMouseEnter : undefined}
         onMouseLeave={trigger === 'hover' ? handleMouseLeave : undefined}
         {...props}>
@@ -148,5 +177,5 @@ export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
     </FloatButtonGroupContext.Provider>
   )
 
-  return ReactDOM.createPortal(content, document.body)
+  return portal ? ReactDOM.createPortal(content, document.body) : content
 }

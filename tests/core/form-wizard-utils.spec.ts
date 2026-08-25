@@ -52,6 +52,21 @@ describe('form-wizard-utils', () => {
       const steps = [step(), step({ skipCondition: () => false }), step()]
       expect(findNextUnskippedStep(1, 1, steps, 0)).toBe(1)
     })
+
+    it('lands on from when that step is unskipped (click later step past a skip)', () => {
+      const steps = [step(), step({ skipCondition: () => true }), step()]
+      expect(findNextUnskippedStep(2, 1, steps, 0)).toBe(2)
+    })
+
+    it('skips skipCondition backward from the clicked index', () => {
+      const steps = [step(), step({ skipCondition: () => true }), step()]
+      expect(findNextUnskippedStep(1, -1, steps, 2)).toBe(0)
+    })
+
+    it('returns fallback when the clicked last step is skipped with nothing after', () => {
+      const steps = [step(), step(), step({ skipCondition: () => true })]
+      expect(findNextUnskippedStep(2, 1, steps, 0)).toBe(0)
+    })
   })
 
   describe('runStepValidation', () => {

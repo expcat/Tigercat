@@ -4,7 +4,14 @@ import {
   buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  getCommentThreadLabels,
+  mergeTigerLocale,
+  nextCommentLikeState,
+  resolveCommentLikeState,
+  resolveLocaleText,
+  writeCommentLikeOverlay,
   type CommentAction,
+  type CommentLikeOverlay,
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps
 } from '@expcat/tigercat-core'
@@ -35,6 +42,7 @@ import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface CommentThreadProps
   extends CoreCommentThreadProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
@@ -46,15 +54,19 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   maxReplies = 3,
   defaultExpandedKeys = [],
   expandedKeys,
-  emptyText = '暂无评论',
-  replyPlaceholder = '写下回复...',
-  replyButtonText = '回复',
-  cancelReplyText = '取消',
-  likeText = '点赞',
-  likedText = '已赞',
-  replyText = '回复',
-  moreText = '更多',
-  loadMoreText = '加载更多',
+  emptyText,
+  replyPlaceholder,
+  replyButtonText,
+  cancelReplyText,
+  likeText,
+  likedText,
+  replyText,
+  moreText,
+  loadMoreText,
+  collapseRepliesText,
+  expandRepliesText,
+  locale,
+  labels: labelsOverride,
   showAvatar = true,
   showDivider = true,
   showLike = true,
@@ -69,9 +81,20 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   className,
   ...divProps
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getCommentThreadLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+
   const [innerExpandedKeys, setInnerExpandedKeys] =
     useState<Array<string | number>>(defaultExpandedKeys)
   const [expandedAllKeys, setExpandedAllKeys] = useState<Set<string | number>>(new Set())
+  const [likeOverlay, setLikeOverlay] = useState<CommentLikeOverlay>(() => new Map())
   const [replyingTo, setReplyingTo] = useState<string | number | null>(null)
   const [replyValue, setReplyValue] = useState('')
 
@@ -109,6 +132,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     onLoadMore?.(node)
   }
 
+  const handleLike = (node: CommentNode) => {
+    const next = nextCommentLikeState(node, likeOverlay)
+    setLikeOverlay(writeCommentLikeOverlay(likeOverlay, node.id, next))
+    onLike?.(node, next.liked)
+  }
+
   const handleReplySubmit = (node: CommentNode) => {
     const trimmed = replyValue.trim()
     if (!trimmed) return
@@ -139,8 +168,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     const actions: React.ReactNode[] = []
 
     if (showLike) {
-      const likeLabel = node.liked ? likedText : likeText
-      const likeCount = node.likes ? ` ${node.likes}` : ''
+      const { liked, likes } = resolveCommentLikeState(node, likeOverlay)
+      const likeLabel = liked
+        ? resolveLocaleText(labels.likedText, likedText)
+        : resolveLocaleText(labels.likeText, likeText)
+      const likeCount = likes ? ` ${likes}` : ''
       actions.push(
         <Button
           key="like"
@@ -149,13 +181,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           className={classNames(
             commentThreadActionButtonClasses,
             commentThreadLikeButtonClasses,
-            node.liked && commentThreadLikedButtonClasses
+            liked && commentThreadLikedButtonClasses
           )}
-          onClick={() => onLike?.(node, !node.liked)}>
+          onClick={() => handleLike(node)}>
           <svg
             className={classNames(
               commentThreadLikeIconClasses,
-              node.liked ? 'fill-current' : 'stroke-current fill-none'
+              liked ? 'fill-current' : 'stroke-current fill-none'
             )}
             viewBox="0 0 24 24"
             strokeWidth="2">
@@ -193,7 +225,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
             />
           </svg>
-          <span>{replyText}</span>
+          <span>{resolveLocaleText(labels.replyText, replyText)}</span>
         </Button>
       )
     }
@@ -221,7 +253,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
             />
           </svg>
-          <span>{moreText}</span>
+          <span>{resolveLocaleText(labels.moreText, moreText)}</span>
         </Button>
       )
     }
@@ -313,7 +345,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 <Textarea
                   rows={3}
                   value={replyValue}
-                  placeholder={replyPlaceholder}
+                  placeholder={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
                   className={commentThreadReplyTextareaClasses}
                   onChange={(event) => setReplyValue(event.target.value)}
                 />
@@ -326,14 +358,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                       setReplyingTo(null)
                       setReplyValue('')
                     }}>
-                    {cancelReplyText}
+                    {resolveLocaleText(labels.cancelReplyText, cancelReplyText)}
                   </Button>
                   <Button
                     size="sm"
                     variant="primary"
                     className={commentThreadSubmitButtonClasses}
                     onClick={() => handleReplySubmit(node)}>
-                    {replyButtonText}
+                    {resolveLocaleText(labels.replyButtonText, replyButtonText)}
                   </Button>
                 </div>
               </div>
@@ -347,7 +379,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 aria-expanded={isExpanded}
                 aria-controls={repliesId}
                 onClick={() => toggleExpanded(node.id)}>
-                {isExpanded ? '▾ 收起回复' : `▸ 展开 ${children.length} 条回复`}
+                {isExpanded
+                  ? resolveLocaleText(labels.collapseRepliesText, collapseRepliesText)
+                  : resolveLocaleText(labels.expandRepliesText, expandRepliesText).replace(
+                      '{count}',
+                      String(children.length)
+                    )}
               </Button>
             ) : null}
 
@@ -362,7 +399,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                     variant="ghost"
                     className={commentThreadPrimaryButtonClasses}
                     onClick={() => handleLoadMore(node)}>
-                    {loadMoreText}
+                    {resolveLocaleText(labels.loadMoreText, loadMoreText)}
                   </Button>
                 ) : null}
               </div>
@@ -378,7 +415,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       className={classNames('tiger-comment-thread flex flex-col', className)}
       role={divProps.role ?? 'feed'}
       data-tiger-comment-thread
-      aria-label={divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')}
+      aria-label={
+        divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : 'Comment thread')
+      }
       {...divProps}>
       {resolvedNodes.length === 0 ? (
         <div className={commentThreadEmptyClasses}>
@@ -395,7 +434,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             />
           </svg>
           <Text tag="div" size="sm" color="muted" className="font-medium">
-            {emptyText}
+            {resolveLocaleText(labels.emptyText, emptyText)}
           </Text>
         </div>
       ) : (

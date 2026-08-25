@@ -134,6 +134,15 @@ export const DropdownItem = defineComponent({
       default: false
     },
     /**
+     * When set, overrides the parent Dropdown `closeOnClick`.
+     * Omitted inherits the parent. Must default to undefined (not false): a
+     * bare Boolean would coerce omitted to false and break parent inheritance.
+     */
+    closeOnClick: {
+      type: Boolean,
+      default: undefined
+    },
+    /**
      * Additional CSS classes
      */
     className: {
@@ -161,8 +170,9 @@ export const DropdownItem = defineComponent({
 
       emit('click', event)
 
-      if (context?.closeOnClick) {
-        context.handleItemClick()
+      const shouldClose = props.closeOnClick ?? context?.closeOnClick ?? true
+      if (shouldClose) {
+        context?.handleItemClick()
       }
     }
 
@@ -364,7 +374,7 @@ export const Dropdown = defineComponent({
     }
 
     const handleItemClick = () => {
-      if (props.closeOnClick) setVisible(false)
+      setVisible(false)
     }
 
     let hoverTimer: ReturnType<typeof setTimeout> | null = null

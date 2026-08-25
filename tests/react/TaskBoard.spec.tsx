@@ -176,6 +176,41 @@ describe('TaskBoard (React)', () => {
       expect(onCardAdd).toHaveBeenCalledWith('doing')
       expect(onCardAdd).toHaveBeenCalledWith('done')
     })
+
+    it('inserts a default card when allowAddCard is on and no handler is provided', async () => {
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return <TaskBoard columns={cols} onColumnsChange={setCols} allowAddCard />
+      }
+      const { container } = render(<Bound />)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(screen.getByText('New task')).toBeInTheDocument()
+    })
+
+    it('does not insert a default card when onCardAdd is provided', async () => {
+      const onCardAdd = vi.fn()
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return (
+          <TaskBoard columns={cols} onColumnsChange={setCols} allowAddCard onCardAdd={onCardAdd} />
+        )
+      }
+      const { container } = render(<Bound />)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(onCardAdd).toHaveBeenCalledWith('todo')
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      expect(screen.queryByText('New task')).not.toBeInTheDocument()
+    })
+
+    it('inserts a default card from inner state when only defaultColumns is provided', async () => {
+      const { container } = render(<TaskBoard defaultColumns={columns} allowAddCard />)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(screen.getByText('New task')).toBeInTheDocument()
+    })
   })
 
   describe('Draggable prop', () => {
@@ -264,6 +299,96 @@ describe('TaskBoard (React)', () => {
       await waitFor(() => expect(beforeCardMove).toHaveBeenCalled())
       expect(onCardMove).not.toHaveBeenCalled()
       expect(onColumnsChange).not.toHaveBeenCalled()
+    })
+
+    const filterDropColumns: TaskBoardColumn[] = [
+      {
+        id: 'todo',
+        title: 'To Do',
+        cards: [
+          { id: 'a', title: '发布设计' },
+          { id: 'b', title: '开发任务' },
+          { id: 'c', title: '发布文档' },
+          { id: 'd', title: '测试计划' }
+        ]
+      },
+      {
+        id: 'doing',
+        title: 'In Progress',
+        // description matches filterText so the source card stays in the DOM
+        cards: [{ id: 'e', title: '代码审查', description: '发布' }]
+      }
+    ]
+
+    it('maps a filterText drop index back to the source column', async () => {
+      const onCardMove = vi.fn()
+      const onColumnsChange = vi.fn()
+      const { container } = render(
+        <TaskBoard
+          defaultColumns={filterDropColumns}
+          filterText="发布"
+          onCardMove={onCardMove}
+          onColumnsChange={onColumnsChange}
+        />
+      )
+
+      const card = container.querySelector('[data-tiger-taskboard-card-id="e"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[0]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'e', columnId: 'doing', index: 0 })
+
+      fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      fireEvent.dragOver(targetBody, { clientY: 150 })
+      fireEvent.drop(targetBody, { dataTransfer: { getData: () => dragData, effectAllowed: '' } })
+
+      await waitFor(() => {
+        expect(onCardMove).toHaveBeenCalledWith(
+          expect.objectContaining({
+            cardId: 'e',
+            fromColumnId: 'doing',
+            toColumnId: 'todo',
+            toIndex: 3
+          })
+        )
+      })
+      const next = onColumnsChange.mock.calls[0][0] as TaskBoardColumn[]
+      expect(next[0].cards.map((c) => c.id)).toEqual(['a', 'b', 'c', 'e', 'd'])
+    })
+
+    it('appends at the source length when dropping last without filterText', async () => {
+      const onCardMove = vi.fn()
+      const onColumnsChange = vi.fn()
+      const { container } = render(
+        <TaskBoard
+          defaultColumns={filterDropColumns}
+          onCardMove={onCardMove}
+          onColumnsChange={onColumnsChange}
+        />
+      )
+
+      const card = container.querySelector('[data-tiger-taskboard-card-id="e"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[0]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'e', columnId: 'doing', index: 0 })
+
+      fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      fireEvent.dragOver(targetBody, { clientY: 150 })
+      fireEvent.drop(targetBody, { dataTransfer: { getData: () => dragData, effectAllowed: '' } })
+
+      await waitFor(() => {
+        expect(onCardMove).toHaveBeenCalledWith(
+          expect.objectContaining({
+            cardId: 'e',
+            fromColumnId: 'doing',
+            toColumnId: 'todo',
+            toIndex: 4
+          })
+        )
+      })
+      const next = onColumnsChange.mock.calls[0][0] as TaskBoardColumn[]
+      expect(next[0].cards.map((c) => c.id)).toEqual(['a', 'b', 'c', 'd', 'e'])
     })
 
     it('calls onColumnMove after column drag and drop', () => {

@@ -60,6 +60,10 @@ export interface RgbColor {
   b: number // 0-255
 }
 
+export interface ParsedColorParts extends RgbColor {
+  a: number // 0-1
+}
+
 export function hexToRgb(hex: string): RgbColor {
   const clean = hex.replace('#', '')
   const full =
@@ -183,16 +187,119 @@ export function isValidHex(value: string): boolean {
   return /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)
 }
 
+function clampByte(n: number): number {
+  return Math.max(0, Math.min(255, Math.round(n)))
+}
+
+function clampUnit(n: number): number {
+  return Math.max(0, Math.min(1, n))
+}
+
+function parseOptionalAlpha(raw: string | undefined): number {
+  if (raw === undefined || raw === '') return 1
+  const n = Number(raw)
+  if (!Number.isFinite(n)) return 1
+  return clampUnit(n)
+}
+
+function hslToRgb(h: number, s: number, l: number): RgbColor {
+  const hue = ((h % 360) + 360) % 360
+  const ss = Math.max(0, Math.min(100, s)) / 100
+  const ll = Math.max(0, Math.min(100, l)) / 100
+  const c = (1 - Math.abs(2 * ll - 1)) * ss
+  const x = c * (1 - Math.abs(((hue / 60) % 2) - 1))
+  const m = ll - c / 2
+
+  let r = 0
+  let g = 0
+  let b = 0
+  if (hue < 60) {
+    r = c
+    g = x
+    b = 0
+  } else if (hue < 120) {
+    r = x
+    g = c
+    b = 0
+  } else if (hue < 180) {
+    r = 0
+    g = c
+    b = x
+  } else if (hue < 240) {
+    r = 0
+    g = x
+    b = c
+  } else if (hue < 300) {
+    r = x
+    g = 0
+    b = c
+  } else {
+    r = c
+    g = 0
+    b = x
+  }
+
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255)
+  }
+}
+
+/**
+ * Parse a CSS color string into RGB channels plus alpha in 0..1.
+ * Accepts hex (3/6), rgb/rgba, and hsl/hsla. Returns null when the string is empty or invalid.
+ */
+export function parseColorParts(raw: string): ParsedColorParts | null {
+  const value = raw.trim()
+  if (!value) return null
+
+  if (isValidHex(value)) {
+    const rgb = hexToRgb(value)
+    return { r: rgb.r, g: rgb.g, b: rgb.b, a: 1 }
+  }
+
+  const rgbMatch = value.match(
+    /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)?\s*$/i
+  )
+  if (rgbMatch) {
+    return {
+      r: clampByte(Number(rgbMatch[1])),
+      g: clampByte(Number(rgbMatch[2])),
+      b: clampByte(Number(rgbMatch[3])),
+      a: parseOptionalAlpha(rgbMatch[4])
+    }
+  }
+
+  const hslMatch = value.match(
+    /^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)?\s*$/i
+  )
+  if (hslMatch) {
+    const rgb = hslToRgb(Number(hslMatch[1]), Number(hslMatch[2]), Number(hslMatch[3]))
+    return {
+      r: rgb.r,
+      g: rgb.g,
+      b: rgb.b,
+      a: parseOptionalAlpha(hslMatch[4])
+    }
+  }
+
+  return null
+}
+
 export function parseColorInput(raw: string): string | null {
   const value = raw.trim()
   if (isValidHex(value)) {
     return value.startsWith('#') ? value : `#${value}`
   }
 
-  const rgbMatch = value.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
-  if (!rgbMatch) {
-    return null
+  const parts = parseColorParts(value)
+  if (!parts) return null
+
+  if (parts.a < 1) {
+    const format = /^hsla?\(/i.test(value) ? 'hsl' : 'rgb'
+    return formatColorString(parts.r, parts.g, parts.b, format, parts.a)
   }
 
-  return rgbToHex(Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3]))
+  return rgbToHex(parts.r, parts.g, parts.b)
 }

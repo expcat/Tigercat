@@ -3,7 +3,9 @@ import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
   classNames,
+  createCircleRingPath,
   createPolygonPath,
+  createPolygonRingPath,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -282,6 +284,7 @@ export const RadarChart = defineComponent({
       wrapperClasses
     } = useChartInteraction<RadarChartSeries>({
       hoverable: computed(() => props.hoverable),
+      showTooltip: computed(() => props.showTooltip),
       hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
       selectedIndexProp: () => props.selectedIndex,
@@ -300,7 +303,7 @@ export const RadarChart = defineComponent({
     const hoveredPoint = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
 
     const handlePointEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
-      if (!props.hoverable) return
+      if (!props.hoverable && !props.showTooltip) return
       hoveredPoint.value = { seriesIndex, pointIndex }
       handleHoverEnter(seriesIndex, event)
     }
@@ -626,52 +629,36 @@ export const RadarChart = defineComponent({
                       : [])
                   ])
                 : null,
-              // Split area (alternating fills – ECharts splitArea style)
+              // Split area (alternating fills – evenodd ring, transparent inner)
               ...splitAreaPaths.value.map((area, index) => {
-                if (area.type === 'circle-ring') {
-                  // For circle grid: use two concentric circles via clipPath or just draw filled circles
-                  // Simpler: draw filled circle then overlay inner circle with background
-                  return h('g', { key: `split-${index}` }, [
-                    h('circle', {
-                      cx: area.cx,
-                      cy: area.cy,
-                      r: area.outerRadius,
-                      fill: area.color,
-                      'fill-opacity': props.splitAreaOpacity,
-                      stroke: 'none',
-                      'data-radar-split-area': 'true'
-                    }),
-                    area.innerRadius > 0
-                      ? h('circle', {
-                          cx: area.cx,
-                          cy: area.cy,
-                          r: area.innerRadius,
-                          fill: 'var(--tiger-bg,#fff)',
-                          stroke: 'none'
-                        })
-                      : null
-                  ])
+                const shared = {
+                  key: `split-${index}`,
+                  fill: area.color,
+                  'fill-opacity': props.splitAreaOpacity,
+                  stroke: 'none',
+                  'data-radar-split-area': 'true'
                 }
-                // Polygon ring
-                const outerPath = createPolygonPath(area.outerPoints)
-                return h('g', { key: `split-${index}` }, [
-                  outerPath
-                    ? h('path', {
-                        d: outerPath,
-                        fill: area.color,
-                        'fill-opacity': props.splitAreaOpacity,
-                        stroke: 'none',
-                        'data-radar-split-area': 'true'
-                      })
-                    : null,
-                  area.innerPoints.length > 0
-                    ? h('path', {
-                        d: createPolygonPath(area.innerPoints),
-                        fill: 'var(--tiger-bg,#fff)',
-                        stroke: 'none'
-                      })
-                    : null
-                ])
+                if (area.type === 'circle-ring') {
+                  if (area.innerRadius > 0) {
+                    return h('path', {
+                      ...shared,
+                      d: createCircleRingPath(area.cx, area.cy, area.outerRadius, area.innerRadius),
+                      'fill-rule': 'evenodd'
+                    })
+                  }
+                  return h('circle', {
+                    ...shared,
+                    cx: area.cx,
+                    cy: area.cy,
+                    r: area.outerRadius
+                  })
+                }
+                if (area.innerPoints.length > 0) {
+                  const d = createPolygonRingPath(area.outerPoints, area.innerPoints)
+                  return d ? h('path', { ...shared, d, 'fill-rule': 'evenodd' }) : null
+                }
+                const d = createPolygonPath(area.outerPoints)
+                return d ? h('path', { ...shared, d }) : null
               }),
               // Grid lines
               ...gridPaths.value.map((grid, index) =>
@@ -814,13 +801,13 @@ export const RadarChart = defineComponent({
                               'data-series-key': item.seriesKey,
                               'data-point-index': point.index,
                               onMouseenter:
-                                props.showTooltip && props.hoverable
+                                props.showTooltip || props.hoverable
                                   ? (e: MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
                                   : undefined,
                               onMousemove:
-                                props.showTooltip && props.hoverable ? handlePointMove : undefined,
+                                props.showTooltip || props.hoverable ? handlePointMove : undefined,
                               onMouseleave:
-                                props.showTooltip && props.hoverable ? handlePointLeave : undefined,
+                                props.showTooltip || props.hoverable ? handlePointLeave : undefined,
                               onFocus:
                                 props.showTooltip && props.hoverable
                                   ? (e: FocusEvent) =>
@@ -887,15 +874,14 @@ export const RadarChart = defineComponent({
         }
       )
 
-      const tooltip =
-        props.showTooltip && props.hoverable
-          ? h(ChartTooltip, {
-              content: tooltipContent.value,
-              open: hoveredPoint.value !== null && tooltipContent.value !== '',
-              x: tooltipPosition.value.x,
-              y: tooltipPosition.value.y
-            })
-          : null
+      const tooltip = props.showTooltip
+        ? h(ChartTooltip, {
+            content: tooltipContent.value,
+            open: hoveredPoint.value !== null && tooltipContent.value !== '',
+            x: tooltipPosition.value.x,
+            y: tooltipPosition.value.y
+          })
+        : null
 
       if (!props.showLegend) {
         return h('div', { class: 'inline-block relative' }, [chart, tooltip])

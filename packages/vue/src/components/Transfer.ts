@@ -116,7 +116,13 @@ export const Transfer = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change'],
+  emits: [
+    'update:modelValue',
+    'update:targetKeys',
+    'update:searchValue',
+    'change',
+    'search-change'
+  ],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -196,6 +202,16 @@ export const Transfer = defineComponent({
       targetSelectedKeys.value = next
     }
 
+    function updateTargetKeys(
+      newTargetKeys: (string | number)[],
+      direction: 'left' | 'right',
+      movedKeys: (string | number)[]
+    ) {
+      emit('update:modelValue', newTargetKeys)
+      emit('update:targetKeys', newTargetKeys)
+      emit('change', newTargetKeys, direction, movedKeys)
+    }
+
     function moveRight() {
       if (!canMoveRight.value) return
       const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
@@ -205,8 +221,7 @@ export const Transfer = defineComponent({
         props.dataSource
       )
       sourceSelectedKeys.value = new Set()
-      emit('update:modelValue', newTargetKeys)
-      emit('change', newTargetKeys, 'right', movedKeys)
+      updateTargetKeys(newTargetKeys, 'right', movedKeys)
     }
 
     function moveLeft() {
@@ -218,8 +233,7 @@ export const Transfer = defineComponent({
         props.dataSource
       )
       targetSelectedKeys.value = new Set()
-      emit('update:modelValue', newTargetKeys)
-      emit('change', newTargetKeys, 'left', movedKeys)
+      updateTargetKeys(newTargetKeys, 'left', movedKeys)
     }
 
     function renderPanel(

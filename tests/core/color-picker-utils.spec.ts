@@ -11,7 +11,9 @@ import {
   rgbToHsv,
   hsvToRgb,
   formatColorString,
-  isValidHex
+  isValidHex,
+  parseColorInput,
+  parseColorParts
 } from '@expcat/tigercat-core'
 import type { ComponentSize } from '@expcat/tigercat-core'
 
@@ -200,6 +202,78 @@ describe('color-picker-utils — formatColorString', () => {
 
   it('hsl handles white (l=100 branch)', () => {
     expect(formatColorString(255, 255, 255, 'hsl')).toBe('hsl(0, 0%, 100%)')
+  })
+})
+
+describe('color-picker-utils — parseColorParts', () => {
+  it('parses hex into rgb with implicit alpha 1', () => {
+    expect(parseColorParts('#2563eb')).toEqual({ r: 37, g: 99, b: 235, a: 1 })
+    expect(parseColorParts('ff0000')).toEqual({ r: 255, g: 0, b: 0, a: 1 })
+    expect(parseColorParts('#fff')).toEqual({ r: 255, g: 255, b: 255, a: 1 })
+  })
+
+  it('parses rgba including alpha', () => {
+    expect(parseColorParts('rgba(37, 99, 235, 0.8)')).toEqual({ r: 37, g: 99, b: 235, a: 0.8 })
+  })
+
+  it('parses rgb with implicit alpha 1', () => {
+    expect(parseColorParts('rgb(37, 99, 235)')).toEqual({ r: 37, g: 99, b: 235, a: 1 })
+  })
+
+  it('parses hsla into rgb + alpha', () => {
+    const parts = parseColorParts('hsla(221, 83%, 53%, 0.8)')
+    expect(parts).not.toBeNull()
+    expect(parts!.a).toBe(0.8)
+    expect(parts!.r).toBeGreaterThan(30)
+    expect(parts!.r).toBeLessThan(45)
+    expect(parts!.g).toBeGreaterThan(90)
+    expect(parts!.g).toBeLessThan(110)
+    expect(parts!.b).toBeGreaterThan(225)
+  })
+
+  it('returns null for empty or invalid input', () => {
+    expect(parseColorParts('')).toBeNull()
+    expect(parseColorParts('   ')).toBeNull()
+    expect(parseColorParts('not-a-color')).toBeNull()
+  })
+})
+
+describe('color-picker-utils — parseColorInput', () => {
+  it('keeps existing hex normalization', () => {
+    expect(parseColorInput('ff0000')).toBe('#ff0000')
+    expect(parseColorInput('#fff')).toBe('#fff')
+    expect(parseColorInput('#2563eb')).toBe('#2563eb')
+  })
+
+  it('parses rgb() (hex or rgb string is fine)', () => {
+    const parsed = parseColorInput('rgb(37, 99, 235)')
+    expect(parsed).not.toBeNull()
+    expect(parsed).toMatch(/#2563eb|rgb\(\s*37\s*,\s*99\s*,\s*235\s*\)/i)
+  })
+
+  it('keeps alpha when parsing rgba', () => {
+    const parsed = parseColorInput('rgba(37, 99, 235, 0.8)')
+    expect(parsed).not.toBeNull()
+    expect(parsed).not.toBe('#2563eb')
+    expect(parsed).toMatch(/37/)
+    expect(parsed).toMatch(/99/)
+    expect(parsed).toMatch(/235/)
+    expect(parsed).toMatch(/0\.8/)
+  })
+
+  it('keeps alpha when parsing hsla', () => {
+    const parsed = parseColorInput('hsla(221, 83%, 53%, 0.8)')
+    expect(parsed).not.toBeNull()
+    expect(parsed).toMatch(/rgba?\(|hsla?\(/)
+    expect(parsed).toMatch(/0\.8/)
+    const parts = parseColorParts(parsed!)
+    expect(parts?.a).toBeCloseTo(0.8)
+  })
+
+  it('returns null for invalid or empty input', () => {
+    expect(parseColorInput('')).toBeNull()
+    expect(parseColorInput('not-a-color')).toBeNull()
+    expect(parseColorInput('rgb()')).toBeNull()
   })
 })
 

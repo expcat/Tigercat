@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, nextTick, PropType } from 'vue'
+import { defineComponent, h, ref, computed, nextTick, watch, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -60,6 +60,9 @@ export const FileManager = defineComponent({
       default: 'list'
     },
     selectedKeys: {
+      type: Array as PropType<(string | number)[]>
+    },
+    defaultSelectedKeys: {
       type: Array as PropType<(string | number)[]>,
       default: () => []
     },
@@ -107,6 +110,20 @@ export const FileManager = defineComponent({
     const focusedIndex = ref(0)
     const contentRef = ref<HTMLElement | null>(null)
     let dragFromIndex: number | null = null
+    const innerSelectedKeys = ref<(string | number)[]>([...(props.defaultSelectedKeys ?? [])])
+    const isControlled = computed(() => props.selectedKeys !== undefined)
+    const resolvedKeys = computed(() =>
+      isControlled.value ? (props.selectedKeys ?? []) : innerSelectedKeys.value
+    )
+
+    watch(
+      () => props.selectedKeys,
+      (value) => {
+        if (value !== undefined) {
+          innerSelectedKeys.value = [...value]
+        }
+      }
+    )
 
     function handleDragStart(event: DragEvent, item: FileItem, index: number) {
       if (!props.draggable || item.disabled) return
@@ -145,7 +162,7 @@ export const FileManager = defineComponent({
       deriveFileManagerModel({
         files: props.files,
         currentPath: props.currentPath,
-        selectedKeys: props.selectedKeys,
+        selectedKeys: resolvedKeys.value,
         sortField: props.sortField,
         sortOrder: props.sortOrder,
         showHidden: props.showHidden,
@@ -160,7 +177,10 @@ export const FileManager = defineComponent({
     function handleSelect(item: FileItem) {
       if (item.disabled) return
       emit('select', item)
-      const keys = toggleFileSelection(props.selectedKeys, item.key, props.multiple)
+      const keys = toggleFileSelection(resolvedKeys.value, item.key, props.multiple)
+      if (!isControlled.value) {
+        innerSelectedKeys.value = keys
+      }
       emit('update:selectedKeys', keys)
     }
 

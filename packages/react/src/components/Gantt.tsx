@@ -1,8 +1,11 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  applyGanttTaskDateOverlay,
   classNames,
+  clampGanttDragDeltaX,
   computeGanttLayout,
   ganttAxisTextClasses,
+  ganttDateValuesEqual,
   ganttDependencyClasses,
   ganttLabelClasses,
   ganttProgressClasses,
@@ -11,12 +14,34 @@ import {
   getChartInnerRect,
   getGanttTaskAriaLabel,
   getGanttTaskClasses,
+  isBrowser,
+  moveGanttTaskByPx,
   type ChartPadding,
   type GanttLayoutTask,
   type GanttProps as CoreGanttProps,
-  type GanttTask
+  type GanttTask,
+  type GanttTaskDateOverlayEntry
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+
+const GANTT_BAR_CLICK_PX = 4
+
+interface GanttBarDragSession {
+  pointerId: number
+  startClientX: number
+  scale: number
+  task: GanttLayoutTask
+  sourceTask: GanttTask
+  barX: number
+  barWidth: number
+  taskLabelWidth: number
+  layoutWidth: number
+  minMs: number
+  maxMs: number
+  timelineWidth: number
+  deltaX: number
+  captureTarget: Element | null
+}
 
 export interface GanttProps extends Omit<CoreGanttProps, 'className'> {
   padding?: ChartPadding
@@ -24,6 +49,8 @@ export interface GanttProps extends Omit<CoreGanttProps, 'className'> {
   onTaskClick?: (task: GanttTask) => void
   onTaskHover?: (task: GanttTask | null) => void
   onSelectedIdChange?: (id: string | number | null) => void
+  onTaskChange?: (task: GanttTask) => void
+  onDataChange?: (data: GanttTask[]) => void
 }
 
 export function Gantt({
@@ -55,18 +82,71 @@ export function Gantt({
   className,
   onTaskClick,
   onTaskHover,
-  onSelectedIdChange
+  onSelectedIdChange,
+  onTaskChange,
+  onDataChange
 }: GanttProps): React.ReactElement {
   const [innerSelectedId, setInnerSelectedId] = useState<string | number | null>(null)
   const [hoveredId, setHoveredId] = useState<string | number | null>(null)
+  const [dateOverlay, setDateOverlay] = useState<Map<string | number, GanttTaskDateOverlayEntry>>(
+    () => new Map()
+  )
+  const [dragPreview, setDragPreview] = useState<{ id: string | number; deltaX: number } | null>(
+    null
+  )
+  const dragSessionRef = useRef<GanttBarDragSession | null>(null)
+  const documentPointerListeningRef = useRef(false)
+  const suppressClickRef = useRef(false)
+  const dragFnsRef = useRef({
+    move: (_event: PointerEvent) => {},
+    finish: (_event: PointerEvent) => {}
+  })
+  const onDocumentPointerMove = useRef((event: PointerEvent) => {
+    dragFnsRef.current.move(event)
+  }).current
+  const onDocumentPointerEnd = useRef((event: PointerEvent) => {
+    dragFnsRef.current.finish(event)
+  }).current
+  const dataRef = useRef(data)
+  dataRef.current = data
+  const dateOverlayRef = useRef(dateOverlay)
+  dateOverlayRef.current = dateOverlay
+  const onTaskChangeRef = useRef(onTaskChange)
+  onTaskChangeRef.current = onTaskChange
+  const onDataChangeRef = useRef(onDataChange)
+  onDataChangeRef.current = onDataChange
+  const onTaskClickRef = useRef(onTaskClick)
+  onTaskClickRef.current = onTaskClick
+  const onSelectedIdChangeRef = useRef(onSelectedIdChange)
+  onSelectedIdChangeRef.current = onSelectedIdChange
+  const selectedIdRef = useRef(selectedId)
+  selectedIdRef.current = selectedId
+  const selectableRef = useRef(selectable)
+  selectableRef.current = selectable
   const resolvedSelectedId = selectedId === undefined ? innerSelectedId : selectedId
+  const resolvedSelectedIdRef = useRef(resolvedSelectedId)
+  resolvedSelectedIdRef.current = resolvedSelectedId
+  useEffect(
+    () => () => {
+      if (!documentPointerListeningRef.current || !isBrowser()) return
+      document.removeEventListener('pointermove', onDocumentPointerMove)
+      document.removeEventListener('pointerup', onDocumentPointerEnd)
+      document.removeEventListener('pointercancel', onDocumentPointerEnd)
+      documentPointerListeningRef.current = false
+    },
+    [onDocumentPointerEnd, onDocumentPointerMove]
+  )
+  const resolvedData = useMemo(
+    () => applyGanttTaskDateOverlay(data, dateOverlay),
+    [data, dateOverlay]
+  )
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [height, padding, width]
   )
   const layout = useMemo(
     () =>
-      computeGanttLayout(data, {
+      computeGanttLayout(resolvedData, {
         width: innerRect.width,
         rowHeight,
         barHeight,
@@ -83,12 +163,12 @@ export function Gantt({
     [
       barHeight,
       colors,
-      data,
       dateFormatter,
       innerRect.width,
       maxDate,
       minBarWidth,
       minDate,
+      resolvedData,
       rowHeight,
       scale,
       showToday,
@@ -99,12 +179,12 @@ export function Gantt({
   const activeId = resolvedSelectedId ?? hoveredId
 
   const selectTask = (task: GanttLayoutTask) => {
-    if (selectable && !task.task.disabled) {
-      const nextId = resolvedSelectedId === task.id ? null : task.id
-      if (selectedId === undefined) setInnerSelectedId(nextId)
-      onSelectedIdChange?.(nextId)
+    if (selectableRef.current && !task.task.disabled) {
+      const nextId = resolvedSelectedIdRef.current === task.id ? null : task.id
+      if (selectedIdRef.current === undefined) setInnerSelectedId(nextId)
+      onSelectedIdChangeRef.current?.(nextId)
     }
-    onTaskClick?.(task.task)
+    onTaskClickRef.current?.(task.task)
   }
 
   const setHoveredTask = (task: GanttLayoutTask | null) => {
@@ -116,6 +196,153 @@ export function Gantt({
   const getTaskOpacity = (task: GanttLayoutTask) => {
     if (activeId === null) return activeOpacity
     return activeId === task.id ? activeOpacity : inactiveOpacity
+  }
+
+  const pointerScale = (currentTarget: EventTarget | null): number => {
+    const svg =
+      currentTarget instanceof SVGElement
+        ? (currentTarget.ownerSVGElement ?? currentTarget.closest('svg'))
+        : currentTarget instanceof Element
+          ? currentTarget.closest('svg')
+          : null
+    const clientWidth = svg?.clientWidth ?? 0
+    if (!(clientWidth > 0)) return 1
+    const viewBoxWidth = svg?.viewBox?.baseVal?.width
+    const resolvedViewBox =
+      typeof viewBoxWidth === 'number' && viewBoxWidth > 0 ? viewBoxWidth : width
+    return resolvedViewBox / clientWidth
+  }
+
+  const captureBarPointer = (target: EventTarget | null, pointerId: number) => {
+    if (!(target instanceof Element) || typeof target.setPointerCapture !== 'function') return
+    try {
+      target.setPointerCapture(pointerId)
+    } catch {
+      // happy-dom / detached node
+    }
+  }
+
+  const releaseBarPointer = (target: Element | null, pointerId: number) => {
+    if (!target || typeof target.releasePointerCapture !== 'function') return
+    try {
+      target.releasePointerCapture(pointerId)
+    } catch {
+      // already released / happy-dom
+    }
+  }
+
+  const moveBarDrag = (event: PointerEvent) => {
+    const session = dragSessionRef.current
+    if (!session || event.pointerId !== session.pointerId) return
+    const rawDelta = (event.clientX - session.startClientX) * session.scale
+    const deltaX = clampGanttDragDeltaX(
+      rawDelta,
+      session.barX,
+      session.barWidth,
+      session.taskLabelWidth,
+      session.layoutWidth
+    )
+    session.deltaX = deltaX
+    setDragPreview({ id: session.task.id, deltaX })
+  }
+
+  const detachDocumentPointerListeners = () => {
+    if (!documentPointerListeningRef.current || !isBrowser()) return
+    document.removeEventListener('pointermove', onDocumentPointerMove)
+    document.removeEventListener('pointerup', onDocumentPointerEnd)
+    document.removeEventListener('pointercancel', onDocumentPointerEnd)
+    documentPointerListeningRef.current = false
+  }
+
+  const finishBarDrag = (event: PointerEvent) => {
+    const session = dragSessionRef.current
+    if (!session || event.pointerId !== session.pointerId) return
+    moveBarDrag(event)
+    const deltaX = session.deltaX
+    dragSessionRef.current = null
+    setDragPreview(null)
+    detachDocumentPointerListeners()
+    releaseBarPointer(session.captureTarget, session.pointerId)
+    suppressClickRef.current = true
+
+    if (Math.abs(deltaX) < GANTT_BAR_CLICK_PX) {
+      selectTask(session.task)
+      return
+    }
+
+    const nextTask = moveGanttTaskByPx(session.sourceTask, deltaX, {
+      minMs: session.minMs,
+      maxMs: session.maxMs,
+      timelineWidth: session.timelineWidth
+    })
+    if (
+      ganttDateValuesEqual(nextTask.start, session.sourceTask.start) &&
+      ganttDateValuesEqual(nextTask.end, session.sourceTask.end)
+    ) {
+      selectTask(session.task)
+      return
+    }
+
+    const incoming = dataRef.current.find((item) => item.id === nextTask.id)
+    const previous = dateOverlayRef.current.get(nextTask.id)
+    const nextOverlay = new Map(dateOverlayRef.current)
+    nextOverlay.set(nextTask.id, {
+      start: nextTask.start,
+      end: nextTask.end,
+      baseStart: previous?.baseStart ?? incoming?.start ?? session.sourceTask.start,
+      baseEnd: previous?.baseEnd ?? incoming?.end ?? session.sourceTask.end
+    })
+    setDateOverlay(nextOverlay)
+    const nextData = applyGanttTaskDateOverlay(dataRef.current, nextOverlay)
+    onTaskChangeRef.current?.(nextTask)
+    onDataChangeRef.current?.(nextData)
+  }
+
+  dragFnsRef.current.move = moveBarDrag
+  dragFnsRef.current.finish = finishBarDrag
+
+  const attachDocumentPointerListeners = () => {
+    if (documentPointerListeningRef.current || !isBrowser()) return
+    document.addEventListener('pointermove', onDocumentPointerMove)
+    document.addEventListener('pointerup', onDocumentPointerEnd)
+    document.addEventListener('pointercancel', onDocumentPointerEnd)
+    documentPointerListeningRef.current = true
+  }
+
+  const startBarDrag = (event: React.PointerEvent<SVGGElement>, task: GanttLayoutTask) => {
+    if (task.task.disabled || dragSessionRef.current) return
+    if (event.button !== undefined && event.button !== 0) return
+    event.preventDefault()
+    const captureTarget = event.currentTarget instanceof Element ? event.currentTarget : null
+    dragSessionRef.current = {
+      pointerId: event.pointerId,
+      startClientX: event.clientX,
+      scale: pointerScale(event.currentTarget),
+      task,
+      sourceTask: task.task,
+      barX: task.x,
+      barWidth: task.width,
+      taskLabelWidth,
+      layoutWidth: layout.width,
+      minMs: layout.minMs,
+      maxMs: layout.maxMs,
+      timelineWidth: layout.timelineWidth,
+      deltaX: 0,
+      captureTarget
+    }
+    setDragPreview({ id: task.id, deltaX: 0 })
+    captureBarPointer(event.currentTarget, event.pointerId)
+    attachDocumentPointerListeners()
+  }
+
+  const handleBarClick = (event: React.MouseEvent<SVGGElement>, task: GanttLayoutTask) => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+    selectTask(task)
   }
 
   return (
@@ -190,19 +417,28 @@ export function Gantt({
           {layout.tasks.map((task) => {
             const selected = resolvedSelectedId === task.id
             const interactive = (hoverable || selectable) && !task.task.disabled
+            const movable = !task.task.disabled
+            const grabbing = dragPreview?.id === task.id
+            const previewDeltaX = grabbing ? (dragPreview?.deltaX ?? 0) : 0
             return (
               <g key={task.id} opacity={getTaskOpacity(task)}>
                 <text x={0} y={task.y + task.height / 2 + 4} className={ganttLabelClasses}>
                   {task.task.label}
                 </text>
                 <g
-                  className={getGanttTaskClasses(interactive, selected)}
+                  className={getGanttTaskClasses(interactive, selected, movable, grabbing)}
                   role={interactive ? 'button' : 'group'}
                   tabIndex={interactive ? 0 : undefined}
                   aria-label={getGanttTaskAriaLabel(task.task)}
+                  data-gantt-task-id={task.id}
+                  transform={previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined}
                   onMouseEnter={() => setHoveredTask(task)}
                   onMouseLeave={() => setHoveredTask(null)}
-                  onClick={() => selectTask(task)}
+                  onPointerDown={(event) => startBarDrag(event, task)}
+                  onPointerMove={(event) => moveBarDrag(event.nativeEvent)}
+                  onPointerUp={(event) => finishBarDrag(event.nativeEvent)}
+                  onPointerCancel={(event) => finishBarDrag(event.nativeEvent)}
+                  onClick={(event) => handleBarClick(event, task)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()

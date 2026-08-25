@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { HeatmapChart } from '@expcat/tigercat-react/HeatmapChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
-import { render } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 
 const data = [
   { x: 'A', y: 'One', value: 1 },
@@ -129,5 +129,16 @@ describe('HeatmapChart', () => {
       const { container } = render(<HeatmapChart {...defaultProps} />)
       await expectNoA11yViolationsIsolated(container)
     })
+  })
+
+  it('opens the default tooltip on cell hover without hoverable', () => {
+    const { container } = renderWithProps(HeatmapChart, defaultProps)
+
+    fireEvent.mouseEnter(container.querySelector('rect')!)
+    const tooltip = document.body.querySelector('[data-chart-tooltip]')
+    expect(tooltip).toBeTruthy()
+    expect(tooltip).toHaveAttribute('role', 'tooltip')
+    expect(tooltip?.className).not.toContain('opacity-0')
+    expect(tooltip?.textContent).toContain('A × One: 1')
   })
 })

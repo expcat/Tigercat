@@ -13,6 +13,11 @@ import {
 export interface UseChartInteractionOptions<T = unknown> {
   /** Enable hover highlight */
   hoverable: boolean | Ref<boolean>
+  /**
+   * Track hover for ChartTooltip without requiring highlight.
+   * Default true when omitted. Independent of `hoverable`.
+   */
+  showTooltip?: boolean | Ref<boolean>
   /** Getter for controlled hovered index from props (e.g. () => props.hoveredIndex) */
   hoveredIndexProp?: () => number | null | undefined
   /** Enable click selection */
@@ -95,6 +100,9 @@ export function useChartInteraction<T = unknown>(
   options: UseChartInteractionOptions<T>
 ): UseChartInteractionReturn {
   const { emit, getData, eventNames } = options
+  const isHoverable = () => unref(options.hoverable)
+  const isShowTooltip = () =>
+    options.showTooltip === undefined ? true : unref(options.showTooltip)
 
   // Local state
   const localHoveredIndex = ref<number | null>(null)
@@ -140,11 +148,13 @@ export function useChartInteraction<T = unknown>(
 
   // Event handlers
   const handleMouseEnter = (index: number, event: MouseEvent) => {
-    if (!unref(options.hoverable)) return
+    const hoverable = isHoverable()
+    if (!hoverable && !isShowTooltip()) return
     if (options.hoveredIndexProp?.() === undefined) {
       localHoveredIndex.value = index
     }
     tooltipPosition.value = { x: event.clientX, y: event.clientY }
+    if (!hoverable) return
     emit('update:hoveredIndex', index)
     if (eventNames?.hover && getData) {
       emit(eventNames.hover, index, getData(index))
@@ -157,10 +167,12 @@ export function useChartInteraction<T = unknown>(
 
   const handleMouseLeave = () => {
     tooltipScheduler.cancel()
-    if (!unref(options.hoverable)) return
+    const hoverable = isHoverable()
+    if (!hoverable && !isShowTooltip()) return
     if (options.hoveredIndexProp?.() === undefined) {
       localHoveredIndex.value = null
     }
+    if (!hoverable) return
     emit('update:hoveredIndex', null)
     if (eventNames?.hover) {
       emit(eventNames.hover, null, null)

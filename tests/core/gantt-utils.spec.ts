@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import {
+  applyGanttTaskDateOverlay,
   computeGanttLayout,
   createGanttTimelineTicks,
   formatGanttDate,
   getGanttDependencyPath,
   getGanttTaskAriaLabel,
-  normalizeGanttDate
+  ganttPxToMs,
+  moveGanttTaskByPx,
+  normalizeGanttDate,
+  shiftGanttTaskDates
 } from '@expcat/tigercat-core'
 import type { GanttTask } from '@expcat/tigercat-core'
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 const tasks: GanttTask[] = [
   {
@@ -122,5 +128,111 @@ describe('gantt-utils', () => {
 
     const ticks = createGanttTimelineTicks(Number.NaN, Number.POSITIVE_INFINITY, 100, 0, 'day')
     expect(ticks.every((tick) => Number.isFinite(tick.x))).toBe(true)
+  })
+
+  it('maps pixel deltas to the timeline range', () => {
+    expect(ganttPxToMs(10, 0, 100, 50)).toBe(20)
+    expect(ganttPxToMs(10, 0, 100, 0)).toBe(0)
+    expect(ganttPxToMs(10, 50, 50, 100)).toBe(0)
+    expect(ganttPxToMs(Number.NaN, 0, 100, 50)).toBe(0)
+  })
+
+  it('shifts YYYY-MM-DD tasks by whole local days and keeps duration', () => {
+    const next = shiftGanttTaskDates(tasks[0], DAY_MS)
+    expect(next.start).toBe('2026-01-02')
+    expect(next.end).toBe('2026-01-06')
+    expect(next.id).toBe('design')
+    expect(next.progress).toBe(50)
+    expect(next.color).toBe('#2563eb')
+  })
+
+  it('preserves Date and number value kinds when shifting', () => {
+    const startDate = new Date(2026, 0, 1, 9, 30)
+    const endDate = new Date(2026, 0, 5, 9, 30)
+    const fromDate = shiftGanttTaskDates(
+      { id: 'dated', label: 'Dated', start: startDate, end: endDate },
+      DAY_MS
+    )
+    expect(fromDate.start).toBeInstanceOf(Date)
+    expect((fromDate.start as Date).getDate()).toBe(2)
+    expect((fromDate.start as Date).getHours()).toBe(9)
+    expect((fromDate.end as Date).getDate()).toBe(6)
+
+    const startMs = new Date(2026, 0, 1).getTime()
+    const endMs = new Date(2026, 0, 5).getTime()
+    const fromNumber = shiftGanttTaskDates(
+      { id: 'ms', label: 'Ms', start: startMs, end: endMs },
+      DAY_MS
+    )
+    expect(typeof fromNumber.start).toBe('number')
+    expect(fromNumber.start).toBe(new Date(2026, 0, 2).getTime())
+    expect(fromNumber.end).toBe(new Date(2026, 0, 6).getTime())
+  })
+
+  it('clamps moved windows without shrinking duration', () => {
+    const task: GanttTask = {
+      id: 'design',
+      label: 'Design',
+      start: '2026-01-01',
+      end: '2026-01-05'
+    }
+    const minMs = normalizeGanttDate('2026-01-01')
+    const maxMs = normalizeGanttDate('2026-01-31')
+    const left = shiftGanttTaskDates(task, -10 * DAY_MS, { minMs, maxMs })
+    expect(left.start).toBe('2026-01-01')
+    expect(left.end).toBe('2026-01-05')
+
+    const right = shiftGanttTaskDates(task, 40 * DAY_MS, { minMs, maxMs })
+    expect(right.start).toBe('2026-01-27')
+    expect(right.end).toBe('2026-01-31')
+
+    const long: GanttTask = {
+      id: 'long',
+      label: 'Long',
+      start: '2026-01-01',
+      end: '2026-03-01'
+    }
+    const pinned = shiftGanttTaskDates(long, 10 * DAY_MS, { minMs, maxMs })
+    expect(pinned.start).toBe('2026-01-01')
+    expect(normalizeGanttDate(pinned.end) - normalizeGanttDate(pinned.start)).toBe(
+      normalizeGanttDate(long.end) - normalizeGanttDate(long.start)
+    )
+  })
+
+  it('snaps zero and sub-day deltas to the same calendar day', () => {
+    const next = shiftGanttTaskDates(tasks[0], 0.4 * DAY_MS)
+    expect(next.start).toBe('2026-01-01')
+    expect(next.end).toBe('2026-01-05')
+
+    const layout = computeGanttLayout([tasks[0]], {
+      width: 712,
+      taskLabelWidth: 140,
+      minDate: '2026-01-01',
+      maxDate: '2026-01-31'
+    })
+    const moved = moveGanttTaskByPx(tasks[0], 4, layout)
+    expect(moved.start).toBe('2026-01-01')
+    expect(moved.end).toBe('2026-01-05')
+  })
+
+  it('applies a date overlay only while incoming dates still match the base', () => {
+    const overlay = new Map([
+      [
+        'design',
+        {
+          start: '2026-01-02',
+          end: '2026-01-06',
+          baseStart: '2026-01-01',
+          baseEnd: '2026-01-05'
+        }
+      ]
+    ])
+    expect(applyGanttTaskDateOverlay(tasks, overlay)[0].start).toBe('2026-01-02')
+    expect(
+      applyGanttTaskDateOverlay(
+        [{ ...tasks[0], start: '2026-01-08', end: '2026-01-12' }],
+        overlay
+      )[0].start
+    ).toBe('2026-01-08')
   })
 })

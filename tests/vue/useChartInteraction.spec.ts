@@ -132,13 +132,31 @@ describe('useChartInteraction (Vue)', () => {
     it('should not update when hoverable is false', () => {
       const emit = createMockEmit()
       const options = createTestOptions({ hoverable: false, emit })
-      const { localHoveredIndex, handleMouseEnter } = useChartInteraction(options)
+      const { localHoveredIndex, tooltipPosition, activeIndex, handleMouseEnter } =
+        useChartInteraction(options)
+
+      const mockEvent = new MouseEvent('mouseenter', { clientX: 100, clientY: 200 })
+      handleMouseEnter(1, mockEvent)
+
+      expect(localHoveredIndex.value).toBe(1)
+      expect(tooltipPosition.value).toEqual({ x: 100, y: 200 })
+      expect(activeIndex.value).toBe(null)
+      expect(emit).not.toHaveBeenCalledWith('update:hoveredIndex', expect.anything())
+      expect(emit).not.toHaveBeenCalledWith('series-hover', expect.anything(), expect.anything())
+    })
+
+    it('should not track hover when hoverable and showTooltip are false', () => {
+      const emit = createMockEmit()
+      const options = createTestOptions({ hoverable: false, showTooltip: false, emit })
+      const { localHoveredIndex, tooltipPosition, handleMouseEnter } = useChartInteraction(options)
 
       const mockEvent = new MouseEvent('mouseenter', { clientX: 100, clientY: 200 })
       handleMouseEnter(1, mockEvent)
 
       expect(localHoveredIndex.value).toBe(null)
+      expect(tooltipPosition.value).toEqual({ x: 0, y: 0 })
       expect(emit).not.toHaveBeenCalledWith('update:hoveredIndex', expect.anything())
+      expect(emit).not.toHaveBeenCalledWith('series-hover', expect.anything(), expect.anything())
     })
 
     it('should support hoverable as ref', async () => {
@@ -149,14 +167,16 @@ describe('useChartInteraction (Vue)', () => {
 
       const mockEvent = new MouseEvent('mouseenter', { clientX: 100, clientY: 200 })
 
-      // Should not update when false
+      // Default showTooltip still tracks hover index without public events
       handleMouseEnter(1, mockEvent)
-      expect(localHoveredIndex.value).toBe(null)
+      expect(localHoveredIndex.value).toBe(1)
+      expect(emit).not.toHaveBeenCalledWith('update:hoveredIndex', 1)
 
-      // Enable hoverable
+      // Enable hoverable — public events fire
       hoverableRef.value = true
       handleMouseEnter(1, mockEvent)
       expect(localHoveredIndex.value).toBe(1)
+      expect(emit).toHaveBeenCalledWith('update:hoveredIndex', 1)
     })
   })
 

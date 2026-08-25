@@ -77,6 +77,40 @@ describe('FileManager (Vue)', () => {
     expect(wrapper.emitted('select')?.[0]).toBeTruthy()
   })
 
+  it('selects README.md without selectedKeys (uncontrolled)', async () => {
+    const wrapper = render(FileManager, {
+      props: { files }
+    })
+    await fireEvent.click(wrapper.getByText('README.md'))
+    expect(wrapper.getByText('README.md').closest('[role="option"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+    expect(wrapper.emitted('update:selectedKeys')?.[0]?.[0]).toEqual(['readme'])
+  })
+
+  it('seeds selection from defaultSelectedKeys', () => {
+    const { getByText } = render(FileManager, {
+      props: { files, defaultSelectedKeys: ['readme'] }
+    })
+    expect(getByText('README.md').closest('[role="option"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+  })
+
+  it('keeps explicit selectedKeys=[] controlled empty after click', async () => {
+    const wrapper = render(FileManager, {
+      props: { files, selectedKeys: [] }
+    })
+    await fireEvent.click(wrapper.getByText('README.md'))
+    expect(wrapper.emitted('update:selectedKeys')?.[0]?.[0]).toEqual(['readme'])
+    expect(wrapper.getByText('README.md').closest('[role="option"]')).toHaveAttribute(
+      'aria-selected',
+      'false'
+    )
+  })
+
   it('shows empty text when folder is empty', () => {
     const { getByText } = render(FileManager, {
       props: { files: [], emptyText: 'Nothing here' }

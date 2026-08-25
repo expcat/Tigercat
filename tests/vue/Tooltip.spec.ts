@@ -2,9 +2,11 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { waitFor } from '@testing-library/vue'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
+import { fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
+import { nextTick } from 'vue'
+import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from '@expcat/tigercat-core'
 import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -73,6 +75,67 @@ describe('Tooltip', () => {
 
     await user.unhover(trigger)
     await waitFor(() => expect(queryByText('Tooltip content')).toBeNull())
+  })
+
+  describe('hover delay and floating hover group', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('keeps content visible after trigger mouseLeave until hideDelay', async () => {
+      const { getByText, queryByText, container } = renderWithSlots(
+        Tooltip,
+        { default: '<button>Trigger</button>' },
+        { content: 'Tooltip content' }
+      )
+
+      const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
+      await fireEvent.mouseEnter(trigger)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      await fireEvent.mouseLeave(trigger)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS - 1)
+      await nextTick()
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      vi.advanceTimersByTime(1)
+      await nextTick()
+      expect(queryByText('Tooltip content')).toBeNull()
+    })
+
+    it('stays open when the pointer enters the floating layer before hideDelay', async () => {
+      const { getByText, queryByText, container } = renderWithSlots(
+        Tooltip,
+        { default: '<button>Trigger</button>' },
+        { content: 'Tooltip content' }
+      )
+
+      const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
+      await fireEvent.mouseEnter(trigger)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      await fireEvent.mouseLeave(trigger)
+      const floating = document.querySelector('[role="tooltip"]')?.parentElement as HTMLElement
+      expect(floating).toBeTruthy()
+
+      await fireEvent.mouseEnter(floating)
+      vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS)
+      await nextTick()
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      await fireEvent.mouseLeave(floating)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS)
+      await nextTick()
+      expect(queryByText('Tooltip content')).toBeNull()
+    })
   })
 
   it('supports content slot', async () => {

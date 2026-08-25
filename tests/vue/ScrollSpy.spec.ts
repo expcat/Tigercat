@@ -3,7 +3,8 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
+import { nextTick } from 'vue'
 import { ScrollSpy } from '@expcat/tigercat-vue/ScrollSpy'
 import type { ScrollSpyItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -180,6 +181,34 @@ describe('ScrollSpy', () => {
       const result = renderScrollSpy()
       await fireEvent.click(screen.getByText('Intro'))
       expect(result.emitted('change')).toBeUndefined()
+    })
+
+    it('keeps aria-current on the clicked last item while a scroll update would pick the first', async () => {
+      const intro = document.getElementById('intro') as HTMLElement
+      const usage = document.getElementById('usage') as HTMLElement
+      const api = document.getElementById('api') as HTMLElement
+      Object.defineProperty(intro, 'offsetTop', { value: 10, configurable: true })
+      Object.defineProperty(usage, 'offsetTop', { value: 500, configurable: true })
+      Object.defineProperty(api, 'offsetTop', { value: 900, configurable: true })
+      Object.defineProperty(intro, 'offsetParent', { value: scrollContainer, configurable: true })
+      Object.defineProperty(usage, 'offsetParent', { value: scrollContainer, configurable: true })
+      Object.defineProperty(api, 'offsetParent', { value: scrollContainer, configurable: true })
+      scrollContainer.scrollTop = 0
+
+      const result = renderScrollSpy()
+      await nextTick()
+      await nextTick()
+
+      await fireEvent.click(screen.getByText('API'))
+      expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
+      const changeCalls = result.emitted('change')?.length ?? 0
+
+      scrollContainer.dispatchEvent(new Event('scroll'))
+      await waitFor(() => {
+        expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
+      })
+      expect(screen.getByText('Intro')).not.toHaveAttribute('aria-current')
+      expect(result.emitted('change')?.length ?? 0).toBe(changeCalls)
     })
   })
 

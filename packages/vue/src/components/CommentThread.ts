@@ -6,9 +6,18 @@ import {
   buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  getCommentThreadLabels,
+  mergeTigerLocale,
+  nextCommentLikeState,
+  resolveCommentLikeState,
+  resolveLocaleText,
+  writeCommentLikeOverlay,
   type CommentAction,
+  type CommentLikeOverlay,
   type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps
+  type CommentThreadProps as CoreCommentThreadProps,
+  type TigerLocale,
+  type TigerLocaleCommentThread
 } from '@expcat/tigercat-core'
 import {
   commentThreadActionButtonClasses,
@@ -37,6 +46,7 @@ import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
+import { useTigerConfig } from './ConfigProvider'
 
 /**
  * Vue CommentThread props. The React-only `onExpandedChange` callback is
@@ -77,39 +87,55 @@ export const CommentThread = defineComponent({
     },
     emptyText: {
       type: String,
-      default: '暂无评论'
+      default: undefined
     },
     replyPlaceholder: {
       type: String,
-      default: '写下回复...'
+      default: undefined
     },
     replyButtonText: {
       type: String,
-      default: '回复'
+      default: undefined
     },
     cancelReplyText: {
       type: String,
-      default: '取消'
+      default: undefined
     },
     likeText: {
       type: String,
-      default: '点赞'
+      default: undefined
     },
     likedText: {
       type: String,
-      default: '已赞'
+      default: undefined
     },
     replyText: {
       type: String,
-      default: '回复'
+      default: undefined
     },
     moreText: {
       type: String,
-      default: '更多'
+      default: undefined
     },
     loadMoreText: {
       type: String,
-      default: '加载更多'
+      default: undefined
+    },
+    collapseRepliesText: {
+      type: String,
+      default: undefined
+    },
+    expandRepliesText: {
+      type: String,
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleCommentThread>>,
+      default: undefined
     },
     showAvatar: {
       type: Boolean,
@@ -142,8 +168,13 @@ export const CommentThread = defineComponent({
   },
   emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getCommentThreadLabels(mergedLocale.value, props.labels))
+
     const innerExpandedKeys = ref<Array<string | number>>([...props.defaultExpandedKeys])
     const expandedAllKeys = ref(new Set<string | number>())
+    const likeOverlay = ref<CommentLikeOverlay>(new Map())
     const replyingTo = ref<string | number | null>(null)
     const replyValue = ref('')
 
@@ -187,6 +218,12 @@ export const CommentThread = defineComponent({
       emit('load-more', node)
     }
 
+    const handleLike = (node: CommentNode) => {
+      const next = nextCommentLikeState(node, likeOverlay.value)
+      likeOverlay.value = writeCommentLikeOverlay(likeOverlay.value, node.id, next)
+      emit('like', node, next.liked)
+    }
+
     const handleReplySubmit = (node: CommentNode) => {
       const trimmed = replyValue.value.trim()
       if (!trimmed) return
@@ -221,8 +258,11 @@ export const CommentThread = defineComponent({
       const actions: Array<ReturnType<typeof h>> = []
 
       if (props.showLike) {
-        const likeLabel = node.liked ? props.likedText : props.likeText
-        const likeCount = node.likes ? ` ${node.likes}` : ''
+        const { liked, likes } = resolveCommentLikeState(node, likeOverlay.value)
+        const likeLabel = liked
+          ? resolveLocaleText(labels.value.likedText, props.likedText)
+          : resolveLocaleText(labels.value.likeText, props.likeText)
+        const likeCount = likes ? ` ${likes}` : ''
         actions.push(
           h(
             Button,
@@ -233,9 +273,9 @@ export const CommentThread = defineComponent({
               className: classNames(
                 commentThreadActionButtonClasses,
                 commentThreadLikeButtonClasses,
-                node.liked && commentThreadLikedButtonClasses
+                liked && commentThreadLikedButtonClasses
               ),
-              onClick: () => emit('like', node, !node.liked)
+              onClick: () => handleLike(node)
             },
             {
               default: () =>
@@ -245,7 +285,7 @@ export const CommentThread = defineComponent({
                     {
                       class: classNames(
                         commentThreadLikeIconClasses,
-                        node.liked ? 'fill-current' : 'stroke-current fill-none'
+                        liked ? 'fill-current' : 'stroke-current fill-none'
                       ),
                       viewBox: '0 0 24 24',
                       strokeWidth: '2'
@@ -302,7 +342,7 @@ export const CommentThread = defineComponent({
                       })
                     ]
                   ),
-                  h('span', props.replyText)
+                  h('span', resolveLocaleText(labels.value.replyText, props.replyText))
                 ])
             }
           )
@@ -343,7 +383,7 @@ export const CommentThread = defineComponent({
                       })
                     ]
                   ),
-                  h('span', props.moreText)
+                  h('span', resolveLocaleText(labels.value.moreText, props.moreText))
                 ])
             }
           )
@@ -480,7 +520,10 @@ export const CommentThread = defineComponent({
                       h(Textarea, {
                         rows: 3,
                         modelValue: replyValue.value,
-                        placeholder: props.replyPlaceholder,
+                        placeholder: resolveLocaleText(
+                          labels.value.replyPlaceholder,
+                          props.replyPlaceholder
+                        ),
                         className: commentThreadReplyTextareaClasses,
                         'onUpdate:modelValue': (value: string) => {
                           replyValue.value = value
@@ -498,7 +541,10 @@ export const CommentThread = defineComponent({
                               replyValue.value = ''
                             }
                           },
-                          { default: () => props.cancelReplyText }
+                          {
+                            default: () =>
+                              resolveLocaleText(labels.value.cancelReplyText, props.cancelReplyText)
+                          }
                         ),
                         h(
                           Button,
@@ -508,7 +554,10 @@ export const CommentThread = defineComponent({
                             className: commentThreadSubmitButtonClasses,
                             onClick: () => handleReplySubmit(node)
                           },
-                          { default: () => props.replyButtonText }
+                          {
+                            default: () =>
+                              resolveLocaleText(labels.value.replyButtonText, props.replyButtonText)
+                          }
                         )
                       ])
                     ]
@@ -530,7 +579,15 @@ export const CommentThread = defineComponent({
                     },
                     {
                       default: () =>
-                        isExpanded ? '▾ 收起回复' : `▸ 展开 ${children.length} 条回复`
+                        isExpanded
+                          ? resolveLocaleText(
+                              labels.value.collapseRepliesText,
+                              props.collapseRepliesText
+                            )
+                          : resolveLocaleText(
+                              labels.value.expandRepliesText,
+                              props.expandRepliesText
+                            ).replace('{count}', String(children.length))
                     }
                   )
                 : null,
@@ -554,7 +611,10 @@ export const CommentThread = defineComponent({
                               className: commentThreadPrimaryButtonClasses,
                               onClick: () => handleLoadMore(node)
                             },
-                            { default: () => props.loadMoreText }
+                            {
+                              default: () =>
+                                resolveLocaleText(labels.value.loadMoreText, props.loadMoreText)
+                            }
                           )
                         : null
                     ]
@@ -569,7 +629,7 @@ export const CommentThread = defineComponent({
     return () => {
       const ariaLabel =
         (attrs['aria-label'] as string | undefined) ??
-        (attrs['aria-labelledby'] ? undefined : '评论线程')
+        (attrs['aria-labelledby'] ? undefined : 'Comment thread')
 
       const children =
         resolvedNodes.value.length === 0
@@ -600,7 +660,9 @@ export const CommentThread = defineComponent({
                   h(
                     Text,
                     { tag: 'div', size: 'sm', color: 'muted', class: 'font-medium' },
-                    { default: () => props.emptyText }
+                    {
+                      default: () => resolveLocaleText(labels.value.emptyText, props.emptyText)
+                    }
                   )
                 ]
               )

@@ -29,7 +29,7 @@ export const imageViewerImgClasses =
  * ImageViewer toolbar classes
  */
 export const imageViewerToolbarClasses =
-  'fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-[var(--tiger-surface,rgba(0,0,0,0.6))] backdrop-blur-sm rounded-[var(--tiger-radius-md,0.5rem)] px-4 py-2'
+  'fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] backdrop-blur-sm rounded-[var(--tiger-radius-md,0.5rem)] px-4 py-2'
 
 /**
  * ImageViewer toolbar button classes
@@ -41,7 +41,7 @@ export const imageViewerToolbarBtnClasses =
  * ImageViewer navigation button classes
  */
 export const imageViewerNavBtnClasses =
-  'fixed top-1/2 -translate-y-1/2 z-50 p-3 text-white bg-[var(--tiger-surface,rgba(0,0,0,0.4))] hover:bg-[var(--tiger-surface,rgba(0,0,0,0.6))] rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
+  'fixed top-1/2 -translate-y-1/2 z-50 p-3 text-white bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] hover:bg-white/20 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
 /**
  * ImageViewer close button classes
@@ -53,7 +53,7 @@ export const imageViewerCloseBtnClasses =
  * ImageViewer counter classes
  */
 export const imageViewerCounterClasses =
-  'fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white text-sm bg-[var(--tiger-surface,rgba(0,0,0,0.4))] rounded-full px-3 py-1'
+  'fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white text-sm bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] rounded-full px-3 py-1'
 
 /**
  * SVG icon paths for ImageViewer.

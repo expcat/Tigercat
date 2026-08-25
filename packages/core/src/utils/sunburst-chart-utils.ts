@@ -4,8 +4,7 @@
  */
 
 import type { SunburstChartDatum } from '../types/chart'
-import { DEFAULT_CHART_COLORS } from './chart-utils'
-import { createPieArcPath } from './chart-utils'
+import { DEFAULT_CHART_COLORS, createPieArcPath, polarToCartesian } from './chart-utils'
 
 export interface SunburstArc {
   /** Flat list index */
@@ -26,6 +25,22 @@ export interface SunburstArc {
   path: string
   /** Midpoint angle (for labels) */
   midAngle: number
+  /** Inner radius of this ring */
+  innerRadius: number
+  /** Outer radius of this ring */
+  outerRadius: number
+}
+
+/**
+ * Label anchor at the ring midpoint along `midAngle`.
+ */
+export function getSunburstLabelPoint(
+  arc: Pick<SunburstArc, 'innerRadius' | 'outerRadius' | 'midAngle'>,
+  cx: number,
+  cy: number
+): { x: number; y: number } {
+  const midRadius = (arc.innerRadius + arc.outerRadius) / 2
+  return polarToCartesian(cx, cy, midRadius, arc.midAngle)
 }
 
 function sumValue(d: SunburstChartDatum): number {
@@ -121,7 +136,9 @@ export function computeSunburstArcs(
         endAngle: ea,
         color,
         path,
-        midAngle: (sa + ea) / 2
+        midAngle: (sa + ea) / 2,
+        innerRadius: iR,
+        outerRadius: oR
       })
 
       if (item.children && item.children.length > 0) {

@@ -19,7 +19,9 @@ import {
   floatButtonSizeClasses,
   floatButtonTypeClasses,
   floatButtonDisabledClasses,
-  floatButtonGroupClasses,
+  floatButtonIconSizeClasses,
+  floatButtonPlusIconPath,
+  getFloatButtonGroupClasses,
   getViewportOffsetStyle,
   viewportFloatingBaseClasses,
   viewportPlacementClasses,
@@ -28,6 +30,28 @@ import {
   type ViewportOffset,
   type ViewportPlacement
 } from '@expcat/tigercat-core'
+
+function renderDefaultPlusIcon(size: FloatButtonSize) {
+  return h(
+    'svg',
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      class: floatButtonIconSizeClasses[size],
+      'aria-hidden': 'true'
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: floatButtonPlusIconPath
+      })
+    ]
+  )
+}
 
 // Group → child shape inheritance (child's own shape still wins)
 const FloatButtonGroupShapeKey = Symbol('FloatButtonGroupShape')
@@ -127,6 +151,7 @@ export const FloatButton = defineComponent({
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
+      const content = slots.default ? slots.default() : renderDefaultPlusIcon(props.size)
       const btn = h(
         'button',
         {
@@ -139,11 +164,13 @@ export const FloatButton = defineComponent({
           ),
           type: 'button',
           disabled: props.disabled,
-          'aria-label': props.ariaLabel ?? props.tooltip,
+          'aria-label': slots.default
+            ? (props.ariaLabel ?? props.tooltip)
+            : (props.ariaLabel ?? props.tooltip ?? 'Add'),
           title: props.tooltip,
           onClick: handleClick
         },
-        slots.default?.()
+        content
       )
 
       return btn
@@ -157,6 +184,9 @@ export interface VueFloatButtonGroupProps {
   open?: boolean
   className?: string
   style?: Record<string, string | number>
+  placement?: ViewportPlacement
+  offset?: ViewportOffset
+  portal?: boolean
 }
 
 export const FloatButtonGroup = defineComponent({
@@ -182,6 +212,18 @@ export const FloatButtonGroup = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    placement: {
+      type: String as PropType<ViewportPlacement>,
+      default: 'bottom-right' as ViewportPlacement
+    },
+    offset: {
+      type: [Number, String, Object] as PropType<ViewportOffset>,
+      default: undefined
+    },
+    portal: {
+      type: Boolean,
+      default: true
     }
   },
   emits: ['update:open'],
@@ -203,7 +245,10 @@ export const FloatButtonGroup = defineComponent({
 
     const groupClasses = computed(() =>
       classNames(
-        floatButtonGroupClasses,
+        getFloatButtonGroupClasses({
+          placement: props.placement,
+          portal: props.portal
+        }),
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -228,31 +273,35 @@ export const FloatButtonGroup = defineComponent({
         }
       }
 
-      return h(Teleport, { to: 'body' }, [
-        h(
-          'div',
-          {
-            ...attrs,
-            class: groupClasses.value,
-            style: mergeStyleValues(attrsRecord.style, props.style),
-            onMouseenter:
-              props.trigger === 'hover'
-                ? () => {
-                    internalOpen.value = true
-                    emit('update:open', true)
-                  }
-                : undefined,
-            onMouseleave:
-              props.trigger === 'hover'
-                ? () => {
-                    internalOpen.value = false
-                    emit('update:open', false)
-                  }
-                : undefined
-          },
-          children
-        )
-      ])
+      const groupRoot = h(
+        'div',
+        {
+          ...attrs,
+          class: groupClasses.value,
+          style: mergeStyleValues(
+            getViewportOffsetStyle(props.placement, props.offset),
+            attrsRecord.style,
+            props.style
+          ),
+          onMouseenter:
+            props.trigger === 'hover'
+              ? () => {
+                  internalOpen.value = true
+                  emit('update:open', true)
+                }
+              : undefined,
+          onMouseleave:
+            props.trigger === 'hover'
+              ? () => {
+                  internalOpen.value = false
+                  emit('update:open', false)
+                }
+              : undefined
+        },
+        children
+      )
+
+      return props.portal ? h(Teleport, { to: 'body' }, [groupRoot]) : groupRoot
     }
   }
 })

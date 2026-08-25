@@ -86,4 +86,36 @@ describe('ColorPicker', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+
+  it('paints the trigger swatch from rgba value (not black)', () => {
+    const { container } = render(<ColorPicker value="rgba(37, 99, 235, 0.8)" showAlpha />)
+    const trigger = container.querySelector('[role="button"]') as HTMLElement
+    const bg = (trigger.style.backgroundColor || '').replace(/\s+/g, '').toLowerCase()
+    expect(bg).not.toMatch(/rgb\(0,0,0\)|#000/)
+    expect(bg).toMatch(/37/)
+    expect(bg).toMatch(/99/)
+    expect(bg).toMatch(/235/)
+    expect(bg).toMatch(/0\.8/)
+  })
+
+  it('emits an alpha-bearing string when the Alpha slider changes', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <ColorPicker value="rgba(37, 99, 235, 0.8)" showAlpha format="rgb" onChange={onChange} />
+    )
+    fireEvent.click(container.querySelector('[role="button"]')!)
+    const slider = document.body.querySelector('input[aria-label="Alpha"]') as HTMLInputElement
+    expect(slider).toBeTruthy()
+    fireEvent.change(slider, { target: { value: '50' } })
+    expect(onChange).toHaveBeenCalled()
+    const emitted = String(onChange.mock.calls[0][0])
+    expect(emitted).toMatch(/rgba?\(|hsla?\(/)
+    expect(emitted).not.toMatch(/^#[0-9a-fA-F]{6}$/)
+  })
+
+  it('does not render the Alpha slider when showAlpha is false', () => {
+    const { container } = render(<ColorPicker value="#2563eb" showAlpha={false} />)
+    fireEvent.click(container.querySelector('[role="button"]')!)
+    expect(document.body.querySelector('input[aria-label="Alpha"]')).not.toBeInTheDocument()
+  })
 })

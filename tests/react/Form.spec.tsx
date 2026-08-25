@@ -462,6 +462,136 @@ describe('Form', () => {
       }
     })
 
+    it('does not show required error after the first keystroke (Pages 02 / Input, no Form onChange)', async () => {
+      function Demo() {
+        const [model, setModel] = useState({ email: '' })
+        const rules: FormRules = {
+          email: [{ required: true, message: 'Email is required' }]
+        }
+        return (
+          <Form model={model} rules={rules}>
+            <FormItem name="email" label="Email">
+              <Input
+                aria-label="email"
+                value={model.email}
+                onChange={(event) => setModel({ email: event.target.value })}
+              />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+      const input = screen.getByLabelText('email')
+
+      fireEvent.change(input, { target: { value: 'a' } })
+
+      await waitFor(() => {
+        expect(input).toHaveValue('a')
+      })
+      expect(screen.queryByText('Email is required')).not.toBeInTheDocument()
+    })
+
+    it('does not show required error after the first native-input keystroke', async () => {
+      function Demo() {
+        const [model, setModel] = useState({ name: '' })
+        const rules: FormRules = {
+          name: [{ required: true, message: 'Name is required' }]
+        }
+        return (
+          <Form model={model} rules={rules}>
+            <FormItem name="name" label="Name">
+              <input
+                aria-label="name"
+                value={model.name}
+                onChange={(event) => setModel({ name: event.target.value })}
+              />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+      const input = screen.getByLabelText('name')
+
+      fireEvent.change(input, { target: { value: 'J' } })
+
+      await waitFor(() => {
+        expect(input).toHaveValue('J')
+      })
+      expect(screen.queryByText('Name is required')).not.toBeInTheDocument()
+    })
+
+    it('clears a required error on the first valid character without an extra blur', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      function Demo() {
+        const [model, setModel] = useState({ email: '' })
+        const rules: FormRules = {
+          email: [{ required: true, message: 'Email is required' }]
+        }
+        return (
+          <Form ref={formRef} model={model} rules={rules}>
+            <FormItem name="email" label="Email">
+              <Input
+                aria-label="email"
+                value={model.email}
+                onChange={(event) => setModel({ email: event.target.value })}
+              />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+      const input = screen.getByLabelText('email')
+
+      await act(async () => {
+        await formRef.current?.validateField('email')
+      })
+      expect(await screen.findByText('Email is required')).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: 'a' } })
+
+      await waitFor(() => {
+        expect(screen.queryByText('Email is required')).not.toBeInTheDocument()
+      })
+
+      fireEvent.change(input, { target: { value: '' } })
+
+      expect(await screen.findByText('Email is required')).toBeInTheDocument()
+    })
+
+    it('writes nested name paths before change-triggered validation', async () => {
+      function Demo() {
+        const [model, setModel] = useState({ user: { email: '' } })
+        const rules: FormRules = {
+          'user.email': [{ required: true, message: 'Email is required' }]
+        }
+        return (
+          <Form model={model} rules={rules}>
+            <FormItem name="user.email" label="Email">
+              <input
+                aria-label="email"
+                value={model.user.email}
+                onChange={(event) => setModel({ user: { email: event.target.value } })}
+              />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+      const input = screen.getByLabelText('email')
+
+      fireEvent.change(input, { target: { value: 'a' } })
+
+      await waitFor(() => {
+        expect(input).toHaveValue('a')
+      })
+      expect(screen.queryByText('Email is required')).not.toBeInTheDocument()
+    })
+
     it('clears error when valid value is entered', async () => {
       const user = userEvent.setup()
       const formRef = React.createRef<FormHandle>()

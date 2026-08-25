@@ -16,7 +16,7 @@ export const splitterVerticalClasses = 'flex-col'
 export const splitterPaneBaseClasses = 'relative overflow-auto'
 
 export const splitterGutterBaseClasses =
-  'relative flex-shrink-0 bg-gray-200 transition-colors duration-150 hover:bg-[var(--tiger-primary,#2563eb)] z-10'
+  'relative flex-shrink-0 bg-[var(--tiger-border,#e5e7eb)] transition-colors duration-150 hover:bg-[var(--tiger-primary,#2563eb)] z-10'
 
 export const splitterGutterHorizontalClasses =
   'cursor-col-resize w-[var(--tiger-splitter-gutter,4px)] h-full'
@@ -29,7 +29,7 @@ export const splitterGutterDraggingClasses = 'bg-[var(--tiger-primary,#2563eb)]'
 export const splitterGutterDisabledClasses = 'cursor-default opacity-50 pointer-events-none'
 
 export const splitterGutterHandleClasses =
-  'absolute rounded bg-gray-400 transition-colors duration-150'
+  'absolute rounded bg-[var(--tiger-text-muted,#9ca3af)] transition-colors duration-150'
 
 export const splitterGutterHandleHorizontalClasses =
   'w-0.5 h-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
@@ -78,6 +78,18 @@ export function getSplitterGutterHandleClasses(direction: SplitDirection): strin
       ? splitterGutterHandleHorizontalClasses
       : splitterGutterHandleVerticalClasses
   ].join(' ')
+}
+
+/**
+ * Per-instance CSS vars for visible gutter thickness.
+ * `gutterSize` is the public prop (default 4); not a theme color.
+ */
+export function getSplitterGutterCssVars(gutterSize = 4): {
+  '--tiger-splitter-gutter': string
+} {
+  return {
+    '--tiger-splitter-gutter': `${gutterSize}px`
+  }
 }
 
 /**
@@ -130,6 +142,42 @@ export function clampPaneSize(size: number, min: number, max?: number): number {
     result = Math.min(result, max)
   }
   return result
+}
+
+function isPercentagePaneSize(size: number | string): boolean {
+  return typeof size === 'string' && size.trim().endsWith('%')
+}
+
+/**
+ * Parse initial pane sizes (px numbers or `'30%'` / `'200px'` strings) and clamp each to min/max.
+ * When `containerSize` is 0 or negative:
+ * - numeric / px / bare-number sizes still resolve as pixels and are clamped
+ * - percentage strings are not parsed against a 0/negative available space; returns null
+ * - equal-split (no sizes) returns null until a real container measure exists
+ */
+export function resolveInitialPaneSizes(
+  paneCount: number,
+  containerSize: number,
+  gutterSize: number,
+  sizes?: (number | string)[],
+  min = 0,
+  max?: number
+): number[] | null {
+  if (paneCount <= 0) return null
+
+  const provided = sizes && sizes.length === paneCount ? sizes : undefined
+  const hasPercent = provided != null && provided.some(isPercentagePaneSize)
+
+  if (containerSize <= 0) {
+    if (hasPercent || !provided) return null
+    return calculateInitialSizes(paneCount, 0, gutterSize, provided).map((s) =>
+      clampPaneSize(s, min, max)
+    )
+  }
+
+  return calculateInitialSizes(paneCount, containerSize, gutterSize, provided).map((s) =>
+    clampPaneSize(s, min, max)
+  )
 }
 
 /**

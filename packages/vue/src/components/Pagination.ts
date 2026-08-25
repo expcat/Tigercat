@@ -16,7 +16,6 @@ import {
   getPageRange,
   validateCurrentPage,
   getPageNumbers,
-  defaultTotalText,
   formatPaginationTotal,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
@@ -467,10 +466,8 @@ export const Pagination = defineComponent({
       if (props.showTotal) {
         const totalTextFn =
           props.totalText ||
-          (props.labels?.totalText || mergedLocale.value?.pagination?.totalText
-            ? (value: number, range: [number, number]) =>
-                formatPaginationTotal(labels.value.totalText, value, range, localeCode.value)
-            : defaultTotalText)
+          ((value: number, range: [number, number]) =>
+            formatPaginationTotal(labels.value.totalText, value, range, localeCode.value))
         elements.push(
           h('span', { class: getTotalTextClasses(size) }, totalTextFn(props.total, pageRange.value))
         )

@@ -7,7 +7,6 @@ import {
   createPointScale,
   getStableChartGradientPrefix,
   getChartElementOpacity,
-  getChartInnerRect,
   getNumberExtent,
   linePointTransitionClasses,
   stackSeriesData,
@@ -35,6 +34,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 
 export interface VueAreaChartProps extends CoreAreaChartProps {
   data?: LineChartDatum[]
@@ -272,7 +272,12 @@ export const AreaChart = defineComponent({
     // Unique gradient prefix for area fills
     const gradientPrefix = getStableChartGradientPrefix('area', useId())
 
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
 
     // Normalize series data. Single-series colors (`areaColor`/`pointColor`)
     // seed the synthesized series so they apply when only `data` is provided.
@@ -297,6 +302,7 @@ export const AreaChart = defineComponent({
       wrapperClasses
     } = useChartInteraction<AreaChartSeries>({
       hoverable: computed(() => props.hoverable),
+      showTooltip: computed(() => props.showTooltip),
       hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
       selectedIndexProp: () => props.selectedIndex,
@@ -456,12 +462,14 @@ export const AreaChart = defineComponent({
     const handlePointMouseEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
       hoveredPointInfo.value = { seriesIndex, pointIndex }
       tooltipPosition.value = { x: event.clientX, y: event.clientY }
-      emit(
-        'point-hover',
-        seriesIndex,
-        pointIndex,
-        resolvedSeries.value[seriesIndex]?.data[pointIndex]
-      )
+      if (props.hoverable) {
+        emit(
+          'point-hover',
+          seriesIndex,
+          pointIndex,
+          resolvedSeries.value[seriesIndex]?.data[pointIndex]
+        )
+      }
     }
 
     const handlePointMouseMove = (event: MouseEvent) => {
@@ -470,7 +478,9 @@ export const AreaChart = defineComponent({
 
     const handlePointMouseLeave = () => {
       hoveredPointInfo.value = null
-      emit('point-hover', null, null, null)
+      if (props.hoverable) {
+        emit('point-hover', null, null, null)
+      }
     }
 
     // Keyboard/focus tooltip: synthesize a pointer position from the point's
@@ -510,10 +520,12 @@ export const AreaChart = defineComponent({
     }
 
     return () => {
-      // Point-level interaction is gated: hover/tooltip on `hoverable`, click on
-      // `selectable` or an explicit point-click listener (C26-2).
+      // Point-level interaction is gated: tooltip tracking on `showTooltip` or
+      // `hoverable`; highlight/hover events on `hoverable`; click on `selectable`
+      // or an explicit point-click listener (C26-2). Default points stay `role="img"`.
       const pointClickable =
         props.selectable || typeof instance?.vnode.props?.onPointClick === 'function'
+      const trackPointHover = props.showTooltip || props.hoverable
       const reversedSeriesData = [...seriesData.value].reverse()
 
       const chart = h(
@@ -525,7 +537,8 @@ export const AreaChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          className: classNames(props.className),
+          onResolvedSizeChange
         },
         {
           default: () =>
@@ -775,12 +788,12 @@ export const AreaChart = defineComponent({
                         tabindex: pointInteractive ? 0 : undefined,
                         'data-point-index': point.pointIndex,
                         'data-series-key': sd.seriesKey,
-                        onMouseenter: props.hoverable
+                        onMouseenter: trackPointHover
                           ? (e: MouseEvent) =>
                               handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
                           : undefined,
-                        onMousemove: props.hoverable ? handlePointMouseMove : undefined,
-                        onMouseleave: props.hoverable ? handlePointMouseLeave : undefined,
+                        onMousemove: trackPointHover ? handlePointMouseMove : undefined,
+                        onMouseleave: trackPointHover ? handlePointMouseLeave : undefined,
                         onClick: pointClickable
                           ? (e: MouseEvent) => {
                               e.stopPropagation()

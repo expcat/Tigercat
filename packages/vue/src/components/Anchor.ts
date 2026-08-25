@@ -22,6 +22,7 @@ import {
   getAnchorLinkClasses,
   getAnchorLinkListClasses,
   createAnchorObserver,
+  createProgrammaticScrollLock,
   scrollToAnchor,
   type AnchorDirection
 } from '@expcat/tigercat-core'
@@ -248,12 +249,10 @@ export const Anchor = defineComponent({
     const links = ref<string[]>([])
     const anchorRef = ref<HTMLElement | null>(null)
     const inkRef = ref<HTMLElement | null>(null)
-    const isScrolling = ref(false)
-
-    let scrollTimeoutId: ReturnType<typeof setTimeout> | null = null
 
     // Get current container (call fresh each time to handle lazy refs)
     const getContainer = () => props.getContainer()
+    const scrollLock = createProgrammaticScrollLock(getContainer)
 
     // Scroll offset: targetOffset takes priority, falling back to offsetTop
     const scrollOffset = computed(() => props.targetOffset ?? props.offsetTop)
@@ -279,9 +278,10 @@ export const Anchor = defineComponent({
       const root = container === window ? null : (container as Element)
       stopObserver = createAnchorObserver(links.value, {
         offsetTop: scrollOffset.value,
+        bounds: props.bounds,
         root,
         onChange: (newActiveLink) => {
-          if (isScrolling.value) return
+          if (scrollLock.isLocked()) return
           const finalActiveLink = props.getCurrentAnchor
             ? props.getCurrentAnchor(newActiveLink)
             : newActiveLink
@@ -302,18 +302,10 @@ export const Anchor = defineComponent({
     const handleLinkClick = (href: string, event: Event) => {
       emit('click', event, href)
 
-      // Prevent scroll handler from running during programmatic scroll
-      isScrolling.value = true
+      scrollLock.lock()
       activeLink.value = href
 
       scrollTo(href)
-
-      // Clear previous timeout to avoid premature reset on rapid clicks
-      if (scrollTimeoutId !== null) clearTimeout(scrollTimeoutId)
-      scrollTimeoutId = setTimeout(() => {
-        isScrolling.value = false
-        scrollTimeoutId = null
-      }, 500)
     }
 
     // Update ink position
@@ -360,16 +352,14 @@ export const Anchor = defineComponent({
       })
     })
 
-    // Re-setup observer when links list or offset changes
-    watch([links, scrollOffset, () => props.getContainer], () => {
+    // Re-setup observer when links list, offset, or bounds change
+    watch([links, scrollOffset, () => props.getContainer, () => props.bounds], () => {
       nextTick(() => setupObserver())
     })
 
     onBeforeUnmount(() => {
       stopObserver?.()
-      if (scrollTimeoutId !== null) {
-        clearTimeout(scrollTimeoutId)
-      }
+      scrollLock.dispose()
     })
 
     // Computed classes

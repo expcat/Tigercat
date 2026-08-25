@@ -207,7 +207,6 @@ export const MaskInput: React.FC<MaskInputProps> = ({
         placeholder={placeholder}
         disabled={disabled}
         readOnly={readonly}
-        name={name}
         id={id}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
@@ -221,8 +220,9 @@ export const MaskInput: React.FC<MaskInputProps> = ({
         onFocus={onFocus}
         onBlur={onBlur}
       />
+      {name ? <input type="hidden" name={name} value={rawValue} /> : null}
       {activeError ? (
-        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)}>
+        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
           {errorMessage}
         </div>
       ) : (

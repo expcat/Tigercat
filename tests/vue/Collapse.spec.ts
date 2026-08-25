@@ -468,6 +468,40 @@ describe('Collapse', () => {
       expect(screen.getByText('Extra Content')).toBeInTheDocument()
     })
 
+    it('should not toggle the panel when extra content is clicked', async () => {
+      const onChange = vi.fn()
+
+      render(Collapse, {
+        props: {
+          defaultActiveKey: '1',
+          onChange
+        },
+        slots: {
+          default: () => [
+            h(
+              CollapsePanel,
+              { panelKey: '1', header: 'Panel 1' },
+              {
+                default: () => 'Content 1',
+                extra: () => '已更新'
+              }
+            )
+          ]
+        }
+      })
+
+      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      expect(panelHeader).toHaveAttribute('aria-expanded', 'true')
+
+      await fireEvent.click(screen.getByText('已更新'))
+      expect(panelHeader).toHaveAttribute('aria-expanded', 'true')
+      expect(onChange).not.toHaveBeenCalled()
+
+      await fireEvent.click(panelHeader!)
+      expect(panelHeader).toHaveAttribute('aria-expanded', 'false')
+      expect(onChange).toHaveBeenCalled()
+    })
+
     it('should render custom header slot', () => {
       render(Collapse, {
         slots: {
@@ -519,6 +553,54 @@ describe('Collapse', () => {
       const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
       expect(panelHeader).toHaveAttribute('tabindex', '-1')
       expect(panelHeader).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('should mark a default-collapsed panel content wrapper as inert and aria-hidden', () => {
+      render(Collapse, {
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const wrapper = getContentWrapper('Content 1')
+      expect(wrapper).toHaveAttribute('inert')
+      expect(wrapper).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('should not mark a default-expanded panel content wrapper as inert or aria-hidden', () => {
+      render(Collapse, {
+        props: { defaultActiveKey: '1' },
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const wrapper = getContentWrapper('Content 1')
+      expect(wrapper).not.toHaveAttribute('inert')
+      expect(wrapper.getAttribute('aria-hidden')).not.toBe('true')
+    })
+
+    it('should update inert and aria-hidden when a panel is toggled', async () => {
+      render(Collapse, {
+        props: { defaultActiveKey: '1' },
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const wrapper = getContentWrapper('Content 1')
+
+      expect(wrapper).not.toHaveAttribute('inert')
+      expect(wrapper.getAttribute('aria-hidden')).not.toBe('true')
+
+      await fireEvent.click(panelHeader!)
+      expect(wrapper).toHaveAttribute('inert')
+      expect(wrapper).toHaveAttribute('aria-hidden', 'true')
+
+      await fireEvent.click(panelHeader!)
+      expect(wrapper).not.toHaveAttribute('inert')
+      expect(wrapper.getAttribute('aria-hidden')).not.toBe('true')
     })
 
     it('should have no accessibility violations', async () => {

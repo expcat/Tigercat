@@ -48,6 +48,18 @@ describe('group-utils', () => {
     expect(getButtonGroupClasses(true)).toContain('-mt-px')
   })
 
+  it('targets child buttons with [&>*:…] selectors, not self [&:first-child]', () => {
+    const horizontal = getButtonGroupClasses(false)
+    expect(horizontal).toContain('[&>*:first-child]')
+    expect(horizontal).toContain('-ml-px')
+    expect(horizontal).not.toContain('[&:first-child]')
+
+    const vertical = getButtonGroupClasses(true)
+    expect(vertical).toContain('[&>*:first-child]')
+    expect(vertical).toContain('-mt-px')
+    expect(vertical).not.toContain('[&:first-child]')
+  })
+
   it('returns image group classes with backward compatible custom class behavior', () => {
     expect(getImageGroupClasses()).toBe(imageGroupBaseClasses)
     expect(getImageGroupClasses('custom-image-group')).toBe('custom-image-group')

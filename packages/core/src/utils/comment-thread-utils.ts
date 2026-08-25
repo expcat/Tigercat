@@ -1,5 +1,42 @@
 import type { CommentNode } from '../types/composite'
 
+export interface CommentLikeState {
+  liked: boolean
+  likes: number
+}
+
+export type CommentLikeOverlay = Map<string | number, CommentLikeState>
+
+type CommentLikeNode = Pick<CommentNode, 'id' | 'liked' | 'likes'>
+
+export const resolveCommentLikeState = (
+  node: CommentLikeNode,
+  overlay?: ReadonlyMap<string | number, CommentLikeState> | null
+): CommentLikeState => {
+  const entry = overlay?.get(node.id)
+  if (entry) return { liked: entry.liked, likes: entry.likes }
+  return { liked: !!node.liked, likes: node.likes ?? 0 }
+}
+
+export const nextCommentLikeState = (
+  node: CommentLikeNode,
+  overlay?: ReadonlyMap<string | number, CommentLikeState> | null
+): CommentLikeState => {
+  const current = resolveCommentLikeState(node, overlay)
+  const liked = !current.liked
+  return { liked, likes: Math.max(0, current.likes + (liked ? 1 : -1)) }
+}
+
+export const writeCommentLikeOverlay = (
+  overlay: ReadonlyMap<string | number, CommentLikeState> | null | undefined,
+  id: string | number,
+  state: CommentLikeState
+): CommentLikeOverlay => {
+  const next = new Map(overlay ?? undefined)
+  next.set(id, { liked: state.liked, likes: state.likes })
+  return next
+}
+
 export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
   if (!items || items.length === 0) return []
 

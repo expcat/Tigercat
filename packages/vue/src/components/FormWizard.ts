@@ -269,12 +269,15 @@ export const FormWizard = defineComponent({
     }
 
     const handleStepChange = async (nextIndex: number) => {
-      if (nextIndex === currentIndex.value || props.steps[nextIndex]?.disabled) return
-      if (nextIndex > currentIndex.value) {
+      if (nextIndex === currentIndex.value) return
+      const direction: 1 | -1 = nextIndex > currentIndex.value ? 1 : -1
+      if (direction === 1) {
         const ok = await runBeforeNext()
         if (!ok) return
       }
-      setCurrent(nextIndex)
+      const target = findNextUnskipped(nextIndex, direction)
+      if (target === currentIndex.value) return
+      setCurrent(target)
     }
 
     const renderContent = () => {

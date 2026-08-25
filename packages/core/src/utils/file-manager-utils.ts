@@ -11,11 +11,13 @@ import { formatBytes, getFileExtensionName } from './file-utils'
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
+/** Container fill: optional `--tiger-file-manager-bg`, then registered `--tiger-surface`. */
 export const fileManagerContainerClasses =
-  'tiger-file-manager relative flex flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)] overflow-hidden'
+  'tiger-file-manager relative flex flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-file-manager-bg,var(--tiger-surface,#ffffff))] overflow-hidden'
 
+/** Toolbar fill: optional `--tiger-file-manager-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const fileManagerToolbarClasses =
-  'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-bg-secondary,#f9fafb)]'
+  'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-file-manager-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
 
 export const fileManagerBreadcrumbClasses =
   'flex items-center gap-1 text-sm text-[var(--tiger-text-secondary,#6b7280)]'
@@ -49,11 +51,13 @@ export const fileManagerItemMetaClasses = 'text-xs text-[var(--tiger-text-muted,
 export const fileManagerEmptyClasses =
   'flex items-center justify-center py-12 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
 
+/** Loading overlay: same surface chain as the container, at 60% opacity. */
 export const fileManagerLoadingClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-bg,#ffffff)]/60 z-10'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-file-manager-bg,var(--tiger-surface,#ffffff))]/60 z-10'
 
+/** Search field fill: same surface chain as the container. */
 export const fileManagerSearchClasses =
-  'px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/30'
+  'px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-file-manager-bg,var(--tiger-surface,#ffffff))] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/30'
 
 // ─── File operations ──────────────────────────────────────────────
 

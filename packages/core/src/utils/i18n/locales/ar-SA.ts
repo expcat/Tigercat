@@ -91,6 +91,47 @@ export const arSA: TigerLocale = defineLocale({
     dragHintText: 'اسحب للنقل',
     boardAriaLabel: 'لوحة المهام'
   },
+  chatWindow: {
+    emptyText: 'لا توجد رسائل',
+    sendText: 'إرسال',
+    placeholder: 'اكتب رسالة',
+    sendingText: 'جارٍ الإرسال',
+    sentText: 'تم التسليم',
+    failedText: 'فشل الإرسال'
+  },
+  code: {
+    copyLabel: 'نسخ',
+    copiedLabel: 'تم النسخ',
+    copyFailedLabel: 'فشل النسخ'
+  },
+  commentThread: {
+    emptyText: 'لا توجد تعليقات',
+    replyPlaceholder: 'اكتب ردًا...',
+    replyButtonText: 'رد',
+    cancelReplyText: 'إلغاء',
+    likeText: 'إعجاب',
+    likedText: 'تم الإعجاب',
+    replyText: 'رد',
+    moreText: 'المزيد',
+    loadMoreText: 'تحميل المزيد',
+    collapseRepliesText: '▾ طي الردود',
+    expandRepliesText: '▸ توسيع {count} من الردود'
+  },
+  activityFeed: {
+    emptyText: 'لا يوجد نشاط',
+    loadingText: 'جارٍ التحميل...'
+  },
+  notificationCenter: {
+    title: 'الإشعارات',
+    emptyText: 'لا توجد إشعارات',
+    loadingText: 'جارٍ التحميل...',
+    allLabel: 'الكل',
+    unreadLabel: 'غير مقروء',
+    readLabel: 'مقروء',
+    markAllReadText: 'وضع علامة مقروء على الكل',
+    markReadText: 'وضع علامة مقروء',
+    markUnreadText: 'وضع علامة غير مقروء'
+  },
   select: {
     doneText: 'إنهاء'
   },

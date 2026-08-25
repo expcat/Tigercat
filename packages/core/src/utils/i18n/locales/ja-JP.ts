@@ -76,6 +76,47 @@ export const jaJP: TigerLocale = defineLocale({
     dragHintText: 'ドラッグして移動',
     boardAriaLabel: 'タスクボード'
   },
+  chatWindow: {
+    emptyText: 'メッセージはありません',
+    sendText: '送信',
+    placeholder: 'メッセージを入力',
+    sendingText: '送信中',
+    sentText: '配信済み',
+    failedText: '送信に失敗しました'
+  },
+  code: {
+    copyLabel: 'コピー',
+    copiedLabel: 'コピーしました',
+    copyFailedLabel: 'コピーに失敗しました'
+  },
+  commentThread: {
+    emptyText: 'コメントはありません',
+    replyPlaceholder: '返信を書く...',
+    replyButtonText: '返信',
+    cancelReplyText: 'キャンセル',
+    likeText: 'いいね',
+    likedText: 'いいね済み',
+    replyText: '返信',
+    moreText: 'その他',
+    loadMoreText: 'もっと読み込む',
+    collapseRepliesText: '▾ 返信を折りたたむ',
+    expandRepliesText: '▸ {count} 件の返信を展開'
+  },
+  activityFeed: {
+    emptyText: 'アクティビティはありません',
+    loadingText: '読み込み中...'
+  },
+  notificationCenter: {
+    title: '通知',
+    emptyText: '通知はありません',
+    loadingText: '読み込み中...',
+    allLabel: 'すべて',
+    unreadLabel: '未読',
+    readLabel: '既読',
+    markAllReadText: 'すべて既読にする',
+    markReadText: '既読にする',
+    markUnreadText: '未読にする'
+  },
   select: {
     doneText: '完了'
   },

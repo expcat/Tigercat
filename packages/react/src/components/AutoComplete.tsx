@@ -10,6 +10,7 @@ import {
   getAutoCompleteInputClasses,
   getAutoCompleteOptionClasses,
   filterAutoCompleteOptions,
+  resolveAutoCompleteDisplayValue,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
   getPickerListboxAria,
@@ -103,7 +104,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
-    String(searchValue ?? value ?? defaultSearchValue ?? '')
+    searchValue ?? resolveAutoCompleteDisplayValue(value, options, defaultSearchValue)
   )
   const inputValue = searchValue ?? uncontrolledSearchValue
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -124,13 +125,13 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     onDismiss: closeDropdown
   })
 
-  // Sync external value
+  // Sync external value / options into the input display
   useEffect(() => {
     if (searchValue !== undefined) {
       return
     }
-    setUncontrolledSearchValue(String(value ?? defaultSearchValue ?? ''))
-  }, [defaultSearchValue, searchValue, value])
+    setUncontrolledSearchValue(resolveAutoCompleteDisplayValue(value, options, defaultSearchValue))
+  }, [defaultSearchValue, options, searchValue, value])
 
   const filteredOptions = useMemo(
     () => filterAutoCompleteOptions(options, inputValue, filterOption),

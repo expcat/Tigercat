@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Rate } from '@expcat/tigercat-vue/Rate'
+import { rateHalfStarInnerClasses } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 /** The interactive star spans are the direct children of the slider. */
@@ -87,6 +88,34 @@ describe('Rate', () => {
     await fireEvent.click(getStars(container)[2])
     expect(onChange).toHaveBeenCalledWith(0)
   })
+
+  // --- Half-star clip (Pages /rate readonly 4.5) ---
+  it('clips the left half of a full-width glyph at 4.5', () => {
+    const { container } = renderWithProps(Rate, {
+      modelValue: 4.5,
+      allowHalf: true,
+      disabled: true
+    })
+    const stars = getStars(container)
+    expect(stars).toHaveLength(5)
+
+    for (let i = 0; i < 4; i++) {
+      expect(stars[i].querySelector('.overflow-hidden')).toBeNull()
+    }
+
+    const fifth = stars[4]
+    expect(fifth.children).toHaveLength(2)
+
+    const clip = fifth.querySelector('.overflow-hidden') as HTMLElement | null
+    expect(clip).not.toBeNull()
+    expect(clip!.style.width).toBe('50%')
+
+    const glyph = clip!.querySelector('svg') ?? clip!.firstElementChild
+    expect(glyph).not.toBeNull()
+    expect(glyph!.getAttribute('class')).toContain(rateHalfStarInnerClasses)
+    expect(glyph!.getAttribute('class')).toContain('w-[200%]')
+  })
+
   // --- Accessibility ---
   it('has aria-label and value bounds on the slider', () => {
     const { container } = renderWithProps(Rate, { modelValue: 2, count: 5 })

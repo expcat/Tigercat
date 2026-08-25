@@ -2,6 +2,7 @@ import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
   computeSunburstArcs,
+  getSunburstLabelPoint,
   getChartElementOpacity,
   getChartInnerRect,
   getStableChartGradientPrefix,
@@ -74,6 +75,7 @@ export const SunburstChart = defineComponent({
       wrapperClasses
     } = useChartInteraction<SunburstChartDatum>({
       hoverable: computed(() => props.hoverable),
+      showTooltip: computed(() => props.showTooltip),
       hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
       selectedIndexProp: () => props.selectedIndex,
@@ -180,58 +182,76 @@ export const SunburstChart = defineComponent({
                 )
               : null
 
+            const paths = arcs.value.map((arc) => {
+              const opacity = getChartElementOpacity(arc.index, activeIndex.value, {
+                activeOpacity: props.activeOpacity,
+                inactiveOpacity: props.inactiveOpacity
+              })
+              return h('path', {
+                key: `arc-${arc.index}`,
+                d: arc.path,
+                fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
+                opacity,
+                stroke: 'var(--tiger-surface,#ffffff)',
+                'stroke-width': 1,
+                class: classNames(interactive && 'cursor-pointer'),
+                style: {
+                  transition:
+                    'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
+                  filter:
+                    activeIndex.value === arc.index
+                      ? 'var(--tiger-chart-block-active-filter, none)'
+                      : 'none'
+                },
+                tabindex: props.selectable ? 0 : undefined,
+                role: props.selectable ? 'button' : 'img',
+                'aria-label': arc.label,
+                onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
+                onMousemove: handleMouseMove,
+                onMouseleave: handleMouseLeave,
+                onClick: () => handleClick(arc.index)
+              })
+            })
+
+            const labels = props.showLabels
+              ? arcs.value.map((arc) => {
+                  const { x, y } = getSunburstLabelPoint(arc, cx.value, cy.value)
+                  return h(
+                    'text',
+                    {
+                      key: `label-${arc.index}`,
+                      x,
+                      y,
+                      'text-anchor': 'middle',
+                      'dominant-baseline': 'middle',
+                      class: 'fill-white text-xs',
+                      style: { pointerEvents: 'none' },
+                      'aria-hidden': 'true'
+                    },
+                    arc.label
+                  )
+                })
+              : []
+
             return h(
               ChartSeries,
               { data: arcs.value, type: 'sunburst' },
               {
-                default: () => [
-                  gradientDefs,
-                  ...arcs.value.map((arc) => {
-                    const opacity = getChartElementOpacity(arc.index, activeIndex.value, {
-                      activeOpacity: props.activeOpacity,
-                      inactiveOpacity: props.inactiveOpacity
-                    })
-                    return h('path', {
-                      key: `arc-${arc.index}`,
-                      d: arc.path,
-                      fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
-                      opacity,
-                      stroke: 'var(--tiger-surface,#ffffff)',
-                      'stroke-width': 1,
-                      class: classNames(interactive && 'cursor-pointer'),
-                      style: {
-                        transition:
-                          'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
-                        filter:
-                          activeIndex.value === arc.index
-                            ? 'var(--tiger-chart-block-active-filter, none)'
-                            : 'none'
-                      },
-                      tabindex: props.selectable ? 0 : undefined,
-                      role: props.selectable ? 'button' : 'img',
-                      'aria-label': arc.label,
-                      onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
-                      onMousemove: handleMouseMove,
-                      onMouseleave: handleMouseLeave,
-                      onClick: () => handleClick(arc.index)
-                    })
-                  })
-                ]
+                default: () => [gradientDefs, ...paths, ...labels]
               }
             )
           }
         }
       )
 
-      const tooltip =
-        props.showTooltip && props.hoverable
-          ? h(ChartTooltip, {
-              content: tooltipContent.value,
-              open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
-              x: tooltipPosition.value.x,
-              y: tooltipPosition.value.y
-            })
-          : null
+      const tooltip = props.showTooltip
+        ? h(ChartTooltip, {
+            content: tooltipContent.value,
+            open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
+            x: tooltipPosition.value.x,
+            y: tooltipPosition.value.y
+          })
+        : null
 
       if (!props.showLegend) {
         return h('div', { class: 'inline-block relative' }, [chart, tooltip])

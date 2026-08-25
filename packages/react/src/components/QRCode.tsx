@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { classNames, mergeTigerLocale, resolveLocaleText } from '@expcat/tigercat-core'
-import type { QRCodeLevel, QRCodeStatus, TigerLocale } from '@expcat/tigercat-core'
+import type { QRCodeStatus, TigerLocale } from '@expcat/tigercat-core'
 import {
   qrcodeContainerClasses,
   qrcodeOverlayClasses,
@@ -10,12 +10,12 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
+/** QRCode renders a decorative hash matrix (not a real/scannable QR). */
 export interface QRCodeProps {
   value: string
   size?: number
   color?: string
   bgColor?: string
-  level?: QRCodeLevel
   status?: QRCodeStatus
   onRefresh?: () => void
   className?: string
@@ -27,7 +27,6 @@ export const QRCode: React.FC<QRCodeProps> = ({
   size = 128,
   color = '#000000',
   bgColor = '#ffffff',
-  level: _level = 'M',
   status = 'active',
   onRefresh,
   className,

@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { HeatmapChart } from '@expcat/tigercat-vue/HeatmapChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
-import { render } from '@testing-library/vue'
+import { fireEvent, render } from '@testing-library/vue'
 
 const data = [
   { x: 'A', y: 'One', value: 1 },
@@ -135,5 +135,16 @@ describe('HeatmapChart', () => {
       })
       await expectNoA11yViolationsIsolated(container)
     })
+  })
+
+  it('opens the default tooltip on cell hover without hoverable', async () => {
+    const { container } = renderWithProps(HeatmapChart, defaultProps)
+
+    await fireEvent.mouseEnter(container.querySelector('rect')!)
+    const tooltip = document.body.querySelector('[data-chart-tooltip]')
+    expect(tooltip).toBeTruthy()
+    expect(tooltip).toHaveAttribute('role', 'tooltip')
+    expect(tooltip?.classList.contains('opacity-0')).toBe(false)
+    expect(tooltip?.textContent).toContain('A × One: 1')
   })
 })

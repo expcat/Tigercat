@@ -299,8 +299,8 @@ export const ImagePreview = defineComponent({
       pinchState = createPinchState()
     }
 
-    const handleMaskClick = (e: MouseEvent) => {
-      if (props.maskClosable && e.target === e.currentTarget) {
+    const handleMaskClick = () => {
+      if (props.maskClosable) {
         handleClose()
       }
     }
@@ -341,7 +341,8 @@ export const ImagePreview = defineComponent({
 
       const mask = h('div', {
         class: imagePreviewMaskClasses,
-        'aria-hidden': 'true'
+        'aria-hidden': 'true',
+        onClick: handleMaskClick
       })
 
       const img = h('img', {
@@ -465,7 +466,6 @@ export const ImagePreview = defineComponent({
           role: 'dialog',
           'aria-modal': 'true',
           'aria-label': labels.value.previewDialogAriaLabel,
-          onClick: handleMaskClick,
           onWheel: handleWheel
         },
         [mask, img, closeBtn, prevBtn, nextBtn, toolbar]

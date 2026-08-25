@@ -88,16 +88,37 @@ describe('Input', () => {
   describe('Validation', () => {
     it('should render error status style', () => {
       const { container } = render(<Input status="error" />)
+      const wrapper = container.firstChild as HTMLElement
       const input = container.querySelector('input')
-      expect(input?.className).toContain('border-red-500')
+      expect(wrapper.className).toContain('border-red-500')
+      expect(input?.className).not.toContain('border-red-500')
     })
 
-    it('should render error message', () => {
-      const { getByText, queryByText } = render(
-        <Input status="error" errorMessage="Bad input" suffix="HiddenSuffix" />
+    it('puts border and radius on the wrapper, not the native input', () => {
+      const { container } = render(<Input />)
+      const wrapper = container.firstChild as HTMLElement
+      const input = container.querySelector('input')
+      expect(wrapper.className).toContain('border')
+      expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md')
+      expect(input?.className).not.toContain('rounded-[var(--tiger-radius-md')
+    })
+
+    it('should render error message below the chrome field and keep suffix', () => {
+      const { container, getByText } = render(
+        <Input status="error" errorMessage="Bad input" suffix="Still visible" />
       )
+      const input = container.querySelector('input')!
+      const chrome = input.parentElement!
+      const describedBy = input.getAttribute('aria-describedby')
+      const errorEl = document.getElementById(describedBy!)
+
       expect(getByText('Bad input')).toBeInTheDocument()
-      expect(queryByText('HiddenSuffix')).not.toBeInTheDocument()
+      expect(getByText('Still visible')).toBeInTheDocument()
+      expect(chrome.className).toContain('border-red-500')
+      expect(errorEl).toBeInTheDocument()
+      expect(chrome.contains(errorEl)).toBe(false)
+      expect(errorEl?.className).not.toContain('inset-y-0')
+      expect(errorEl?.className.split(/\s+/)).not.toContain('absolute')
     })
 
     it('should show suffix when status is error but no errorMessage', () => {
@@ -558,12 +579,51 @@ describe('Input', () => {
       const errorEl = document.getElementById(describedBy!)
       expect(errorEl).toBeInTheDocument()
       expect(errorEl?.textContent).toBe('Required field')
+      expect(errorEl).toHaveAttribute('aria-live', 'polite')
+    })
+
+    it('does not set aria-describedby when there is no errorMessage', () => {
+      const { container } = render(<Input status="error" />)
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+      expect(input).not.toHaveAttribute('aria-describedby')
+      expect(container.querySelector('[aria-live]')).toBeNull()
     })
 
     it('does not set aria-invalid when status is default', () => {
       render(<Input />)
       const input = screen.getByRole('textbox')
       expect(input).not.toHaveAttribute('aria-invalid')
+    })
+  })
+
+  describe('errorMessage placement', () => {
+    const longMessage = 'This username is already taken, please choose another'
+
+    it('keeps the input value readable when a long error sits below the field', () => {
+      const { container } = render(
+        <Input status="error" errorMessage={longMessage} value="alice" />
+      )
+      const input = screen.getByRole('textbox') as HTMLInputElement
+      const describedBy = input.getAttribute('aria-describedby')
+      const errorEl = document.getElementById(describedBy!)
+
+      expect(input.value).toBe('alice')
+      expect(container).toHaveTextContent(longMessage)
+      expect(errorEl?.className).not.toContain('inset-y-0')
+      expect(input.parentElement?.contains(errorEl)).toBe(false)
+    })
+
+    it('keeps the clear button when errorMessage is shown', () => {
+      render(<Input status="error" errorMessage="Bad" clearable value="x" />)
+      expect(screen.getByLabelText('Clear input')).toBeInTheDocument()
+      expect(screen.getByText('Bad')).toBeInTheDocument()
+    })
+
+    it('does not render a live region when status is error without errorMessage', () => {
+      const { container } = render(<Input status="error" suffix="Visible" />)
+      expect(container.querySelector('[aria-live]')).toBeNull()
+      expect(container).toHaveTextContent('Visible')
     })
   })
 })

@@ -31,6 +31,9 @@ export function getRateStarClasses(
   )
 }
 
+/** Inner glyph of a 50% overflow clip: 200% of the clip equals the parent star box. */
+export const rateHalfStarInnerClasses = 'w-[200%] h-full'
+
 export const rateActiveColor = 'text-[var(--tiger-rate-active,var(--tiger-warning,#f59e0b))]'
 export const rateInactiveColor = 'text-[var(--tiger-rate-inactive,var(--tiger-border,#d1d5db))]'
 export const rateHoverColor = 'text-[var(--tiger-rate-hover,var(--tiger-warning,#fbbf24))]'

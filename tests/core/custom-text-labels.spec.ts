@@ -6,12 +6,30 @@ import {
   getFormWizardLabels,
   getTaskBoardLabels,
   getSelectLabels,
+  getChatWindowLabels,
+  getCodeLabels,
+  getCommentThreadLabels,
+  getActivityFeedLabels,
+  getNotificationCenterLabels,
+  getChatMessageStatusInfo,
+  buildChatMessageStatusInfo,
   DEFAULT_PAGINATION_LABELS,
   DEFAULT_TABLE_LABELS,
   DEFAULT_FORM_WIZARD_LABELS,
   DEFAULT_TASK_BOARD_LABELS,
-  DEFAULT_SELECT_LABELS
+  DEFAULT_SELECT_LABELS,
+  DEFAULT_CHAT_WINDOW_LABELS,
+  DEFAULT_CODE_LABELS,
+  DEFAULT_COMMENT_THREAD_LABELS,
+  DEFAULT_ACTIVITY_FEED_LABELS,
+  DEFAULT_NOTIFICATION_CENTER_LABELS,
+  ZH_CN_CHAT_WINDOW_LABELS,
+  ZH_CN_CODE_LABELS,
+  ZH_CN_COMMENT_THREAD_LABELS,
+  ZH_CN_ACTIVITY_FEED_LABELS,
+  ZH_CN_NOTIFICATION_CENTER_LABELS
 } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 describe('custom-text overrides on label resolvers', () => {
   describe('getPaginationLabels', () => {
@@ -80,6 +98,134 @@ describe('custom-text overrides on label resolvers', () => {
       expect(labels.emptyColumnText).toBe('Nothing here')
       expect(labels.addCardText).toBe('locale-add')
       expect(labels.boardAriaLabel).toBe(DEFAULT_TASK_BOARD_LABELS.boardAriaLabel)
+    })
+  })
+
+  describe('getChatWindowLabels', () => {
+    it('falls back to English defaults with no locale', () => {
+      expect(getChatWindowLabels()).toEqual(DEFAULT_CHAT_WINDOW_LABELS)
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getChatWindowLabels({ locale: 'zh-CN' }).sendText).toBe('发送')
+      expect(getChatWindowLabels(zhCN).emptyText).toBe('暂无消息')
+      expect(getChatWindowLabels(zhCN)).toEqual(ZH_CN_CHAT_WINDOW_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getChatWindowLabels(
+        { chatWindow: { sendText: 'locale-send', emptyText: 'locale-empty' } },
+        { sendText: 'override-send' }
+      )
+      expect(labels.sendText).toBe('override-send')
+      expect(labels.emptyText).toBe('locale-empty')
+      expect(labels.placeholder).toBe(DEFAULT_CHAT_WINDOW_LABELS.placeholder)
+    })
+  })
+
+  describe('getCodeLabels', () => {
+    it('falls back to English Copy / Copied / Copy failed with no locale', () => {
+      expect(getCodeLabels()).toEqual(DEFAULT_CODE_LABELS)
+      expect(getCodeLabels(undefined).copyLabel).toBe('Copy')
+      expect(getCodeLabels(undefined).copiedLabel).toBe('Copied')
+      expect(getCodeLabels(undefined).copyFailedLabel).toBe('Copy failed')
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getCodeLabels({ locale: 'zh-CN' }).copyLabel).toBe('复制')
+      expect(getCodeLabels({ locale: 'zh-CN' }).copiedLabel).toBe('已复制')
+      expect(getCodeLabels({ locale: 'zh-CN' }).copyFailedLabel).toBe('复制失败')
+      expect(getCodeLabels(zhCN)).toEqual(ZH_CN_CODE_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getCodeLabels(
+        { code: { copyLabel: 'locale-copy', copiedLabel: 'locale-copied' } },
+        { copyLabel: 'Clone' }
+      )
+      expect(labels.copyLabel).toBe('Clone')
+      expect(labels.copiedLabel).toBe('locale-copied')
+      expect(labels.copyFailedLabel).toBe(DEFAULT_CODE_LABELS.copyFailedLabel)
+    })
+  })
+
+  describe('getCommentThreadLabels', () => {
+    it('falls back to English defaults with no locale', () => {
+      expect(getCommentThreadLabels()).toEqual(DEFAULT_COMMENT_THREAD_LABELS)
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getCommentThreadLabels({ locale: 'zh-CN' }).likeText).toBe('点赞')
+      expect(getCommentThreadLabels(zhCN).expandRepliesText).toBe('▸ 展开 {count} 条回复')
+      expect(getCommentThreadLabels(zhCN)).toEqual(ZH_CN_COMMENT_THREAD_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getCommentThreadLabels(
+        { commentThread: { likeText: 'locale-like', replyText: 'locale-reply' } },
+        { likeText: 'override-like' }
+      )
+      expect(labels.likeText).toBe('override-like')
+      expect(labels.replyText).toBe('locale-reply')
+      expect(labels.emptyText).toBe(DEFAULT_COMMENT_THREAD_LABELS.emptyText)
+    })
+  })
+
+  describe('getActivityFeedLabels', () => {
+    it('falls back to English defaults with no locale', () => {
+      expect(getActivityFeedLabels()).toEqual(DEFAULT_ACTIVITY_FEED_LABELS)
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getActivityFeedLabels({ locale: 'zh-CN' }).emptyText).toBe('暂无动态')
+      expect(getActivityFeedLabels(zhCN)).toEqual(ZH_CN_ACTIVITY_FEED_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getActivityFeedLabels(
+        { activityFeed: { emptyText: 'locale-empty', loadingText: 'locale-loading' } },
+        { emptyText: 'override-empty' }
+      )
+      expect(labels.emptyText).toBe('override-empty')
+      expect(labels.loadingText).toBe('locale-loading')
+    })
+  })
+
+  describe('getNotificationCenterLabels', () => {
+    it('falls back to English defaults with no locale', () => {
+      expect(getNotificationCenterLabels()).toEqual(DEFAULT_NOTIFICATION_CENTER_LABELS)
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getNotificationCenterLabels({ locale: 'zh-CN' }).title).toBe('通知中心')
+      expect(getNotificationCenterLabels(zhCN).markAllReadText).toBe('全部标记已读')
+      expect(getNotificationCenterLabels(zhCN)).toEqual(ZH_CN_NOTIFICATION_CENTER_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getNotificationCenterLabels(
+        { notificationCenter: { title: 'locale-title', markAllReadText: 'locale-mark' } },
+        { title: 'override-title' }
+      )
+      expect(labels.title).toBe('override-title')
+      expect(labels.markAllReadText).toBe('locale-mark')
+      expect(labels.emptyText).toBe(DEFAULT_NOTIFICATION_CENTER_LABELS.emptyText)
+    })
+  })
+
+  describe('getChatMessageStatusInfo', () => {
+    it('uses English Delivered by default', () => {
+      expect(getChatMessageStatusInfo('sent').text).toBe('Delivered')
+      expect(getChatMessageStatusInfo('sending').text).toBe('Sending')
+      expect(getChatMessageStatusInfo('failed').text).toBe('Failed to send')
+    })
+
+    it('uses Chinese status text when given a zh labels map', () => {
+      const zhMap = buildChatMessageStatusInfo(getChatWindowLabels({ locale: 'zh-CN' }))
+      expect(getChatMessageStatusInfo('sent', zhMap).text).toBe('已送达')
+      expect(getChatMessageStatusInfo('sending', zhMap).text).toBe('发送中')
+      expect(getChatMessageStatusInfo('failed', zhMap).text).toBe('发送失败')
+      expect(zhMap.sent.className).toBe(getChatMessageStatusInfo('sent').className)
     })
   })
 

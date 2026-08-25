@@ -295,7 +295,7 @@ export function getUploadButtonClasses(disabled: boolean): string {
     'px-4',
     'py-2',
     'border',
-    'border-gray-300',
+    'border-[var(--tiger-border,#d1d5db)]',
     'rounded-[var(--tiger-radius-md,0.5rem)]',
     'text-sm',
     'font-medium',
@@ -306,7 +306,7 @@ export function getUploadButtonClasses(disabled: boolean): string {
   const stateClasses = disabled
     ? ['bg-gray-100', 'text-gray-400', 'cursor-not-allowed']
     : [
-        'bg-white',
+        'bg-[var(--tiger-surface,#ffffff)]',
         'text-gray-700',
         'hover:bg-gray-50',
         'focus:outline-none',
@@ -360,7 +360,7 @@ export function getDragAreaClasses(isDragging: boolean, disabled: boolean): stri
     ]
   } else {
     stateClasses = [
-      'border-gray-300',
+      'border-[var(--tiger-border,#d1d5db)]',
       'hover:border-[var(--tiger-primary,#2563eb)]',
       'hover:bg-gray-50',
       'cursor-pointer',
@@ -385,9 +385,9 @@ const FILE_LIST_STATUS_CLASSES: Record<NonNullable<UploadFileStatus>, string[]> 
  * Picture card status classes (constant for performance)
  */
 const PICTURE_CARD_STATUS_CLASSES: Record<NonNullable<UploadFileStatus>, string[]> = {
-  ready: ['border-gray-300'],
+  ready: ['border-[var(--tiger-border,#d1d5db)]'],
   uploading: ['border-blue-400', 'bg-blue-50'],
-  success: ['border-gray-300', 'hover:border-blue-400'],
+  success: ['border-[var(--tiger-border,#d1d5db)]', 'hover:border-blue-400'],
   error: ['border-red-400', 'bg-red-50']
 }
 

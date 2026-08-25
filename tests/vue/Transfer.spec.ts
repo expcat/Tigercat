@@ -52,6 +52,64 @@ describe('Transfer', () => {
       expect(emitted()['update:modelValue']).toBeTruthy()
     })
 
+    it('should emit update:targetKeys with the same payload as update:modelValue on move-right', async () => {
+      const { container, getByLabelText, emitted } = render(Transfer, {
+        props: { dataSource }
+      })
+
+      const checkbox = container.querySelector('input[type="checkbox"]')!
+      await fireEvent.update(checkbox, true)
+
+      await fireEvent.click(getByLabelText('Move selected to target'))
+
+      const modelValue = emitted()['update:modelValue']
+      const targetKeys = emitted()['update:targetKeys']
+      expect(modelValue).toBeTruthy()
+      expect(targetKeys).toBeTruthy()
+      expect(targetKeys[0][0]).toEqual(modelValue[0][0])
+    })
+
+    it('should emit update:targetKeys with the same payload as update:modelValue on move-left', async () => {
+      const { getByText, getByLabelText, emitted } = render(Transfer, {
+        props: { dataSource, targetKeys: ['1'] }
+      })
+
+      const checkbox = getByText('Item 1')
+        .closest('label')!
+        .querySelector('input[type="checkbox"]')!
+      await fireEvent.update(checkbox, true)
+
+      await fireEvent.click(getByLabelText('Move selected to source'))
+
+      const modelValue = emitted()['update:modelValue']
+      const targetKeys = emitted()['update:targetKeys']
+      expect(modelValue).toBeTruthy()
+      expect(targetKeys).toBeTruthy()
+      expect(targetKeys[0][0]).toEqual(modelValue[0][0])
+    })
+
+    it('should show seeded targetKeys in the target panel', () => {
+      const pagesData = [
+        { key: 'design', label: '设计' },
+        { key: 'frontend', label: '前端' },
+        { key: 'backend', label: '后端' },
+        { key: 'qa', label: '测试' }
+      ]
+      const { container } = render(Transfer, {
+        props: {
+          dataSource: pagesData,
+          targetKeys: ['frontend'],
+          sourceTitle: '可选团队',
+          targetTitle: '已选团队'
+        }
+      })
+
+      const panels = container.querySelectorAll('[role="group"]')
+      expect(panels[1].textContent).toContain('已选团队 (1)')
+      expect(panels[1].textContent).toContain('前端')
+      expect(panels[0].textContent).not.toContain('前端')
+    })
+
     it('should disable move buttons when no items selected', () => {
       const { getByLabelText } = render(Transfer, {
         props: { dataSource }

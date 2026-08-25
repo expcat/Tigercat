@@ -5,7 +5,7 @@ const statuses = ['info', 'warning', 'error', '404', '403', '500'] as const
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="grid min-h-full grid-cols-1 gap-4 overflow-auto sm:grid-cols-3">
     <div
       v-for="status in statuses"
       :key="status"

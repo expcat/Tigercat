@@ -126,6 +126,31 @@ describe('ChartCanvas', () => {
     expect(group).toHaveAttribute('transform', 'translate(12, 8)')
   })
 
+  it('reports resolved size after ResizeObserver and rAF', async () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    const frames = installFrameScheduler()
+    const onResolvedSizeChange = vi.fn()
+    renderWithProps(ChartCanvas, {
+      width: 300,
+      height: 160,
+      responsive: true,
+      onResolvedSizeChange
+    })
+
+    await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+    const observer = MockResizeObserver.instances[0]
+
+    act(() => {
+      observer.trigger(360, 180)
+      observer.trigger(480, 260)
+    })
+    act(() => {
+      frames.flush()
+    })
+
+    expect(onResolvedSizeChange).toHaveBeenCalledWith({ width: 480, height: 260 })
+  })
+
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(ChartCanvas, {})
     await expectNoA11yViolationsIsolated(container)

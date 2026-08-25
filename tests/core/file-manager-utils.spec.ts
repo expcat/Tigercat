@@ -17,12 +17,18 @@ import {
   toFileDragItem,
   applyFileDragReorder,
   fileManagerContainerClasses,
+  fileManagerToolbarClasses,
+  fileManagerLoadingClasses,
+  fileManagerSearchClasses,
   fileManagerListItemClasses,
   fileManagerListItemSelectedClasses,
   fileManagerGridItemClasses,
   fileManagerGridItemSelectedClasses,
   type FileItem
 } from '@expcat/tigercat-core'
+
+const OLD_LOCKED_FM_BG = 'bg-[var(--tiger-bg,#ffffff)]'
+const OLD_LOCKED_FM_TOOLBAR_BG = 'bg-[var(--tiger-bg-secondary,#f9fafb)]'
 
 const makeFile = (name: string, overrides?: Partial<FileItem>): FileItem => ({
   key: name,
@@ -223,6 +229,51 @@ describe('file-manager-utils', () => {
     it('appends className', () => {
       const cls = getFileManagerContainerClasses('custom')
       expect(cls).toContain('custom')
+    })
+
+    it('lands container fill on registered surface, not locked white or bg/fill aliases', () => {
+      expect(fileManagerContainerClasses).toContain('--tiger-surface')
+      expect(fileManagerContainerClasses).toContain('--tiger-file-manager-bg,var(--tiger-surface')
+      expect(fileManagerContainerClasses).toContain('overflow-hidden')
+      expect(fileManagerContainerClasses).toContain('--tiger-radius-md')
+      expect(fileManagerContainerClasses).not.toContain(OLD_LOCKED_FM_BG)
+      expect(fileManagerContainerClasses).not.toContain('--tiger-bg')
+      expect(fileManagerContainerClasses).not.toContain('--tiger-fill')
+      expect(fileManagerContainerClasses).not.toContain('--tiger-surface-muted')
+
+      const overrideIdx = fileManagerContainerClasses.indexOf('--tiger-file-manager-bg')
+      const semanticIdx = fileManagerContainerClasses.indexOf('--tiger-surface')
+      expect(overrideIdx).toBeGreaterThan(-1)
+      expect(semanticIdx).toBeGreaterThan(overrideIdx)
+    })
+
+    it('lands toolbar fill on registered surface-muted, not locked bg-secondary', () => {
+      expect(fileManagerToolbarClasses).toContain('--tiger-surface-muted')
+      expect(fileManagerToolbarClasses).toContain(
+        '--tiger-file-manager-toolbar-bg,var(--tiger-surface-muted'
+      )
+      expect(fileManagerToolbarClasses).not.toContain(OLD_LOCKED_FM_TOOLBAR_BG)
+      expect(fileManagerToolbarClasses).not.toContain('--tiger-bg-secondary')
+      expect(fileManagerToolbarClasses).not.toContain('--tiger-bg')
+      expect(fileManagerToolbarClasses).not.toContain('--tiger-fill')
+
+      const overrideIdx = fileManagerToolbarClasses.indexOf('--tiger-file-manager-toolbar-bg')
+      const semanticIdx = fileManagerToolbarClasses.indexOf('--tiger-surface-muted')
+      expect(overrideIdx).toBeGreaterThan(-1)
+      expect(semanticIdx).toBeGreaterThan(overrideIdx)
+    })
+
+    it('lands loading overlay and search field on the same registered surface chain', () => {
+      expect(fileManagerLoadingClasses).toContain('--tiger-file-manager-bg,var(--tiger-surface')
+      expect(fileManagerLoadingClasses).toContain('/60')
+      expect(fileManagerLoadingClasses).not.toContain(OLD_LOCKED_FM_BG)
+      expect(fileManagerLoadingClasses).not.toContain('--tiger-bg')
+      expect(fileManagerLoadingClasses).not.toContain('--tiger-fill')
+
+      expect(fileManagerSearchClasses).toContain('--tiger-file-manager-bg,var(--tiger-surface')
+      expect(fileManagerSearchClasses).not.toContain(OLD_LOCKED_FM_BG)
+      expect(fileManagerSearchClasses).not.toContain('--tiger-bg')
+      expect(fileManagerSearchClasses).not.toContain('--tiger-fill')
     })
   })
 

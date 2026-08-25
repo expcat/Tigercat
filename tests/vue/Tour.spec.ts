@@ -91,8 +91,9 @@ describe('Tour', () => {
     })
   })
 
-  it('should show Finish on the last step and emit finish + update:open(false)', async () => {
+  it('should show Finish on the last step and emit finish + close + update:open(false)', async () => {
     const onFinish = vi.fn()
+    const onClose = vi.fn()
     const onUpdateOpen = vi.fn()
     render(Tour, {
       props: {
@@ -100,6 +101,7 @@ describe('Tour', () => {
         open: true,
         current: 2,
         onFinish,
+        onClose,
         'onUpdate:open': onUpdateOpen
       }
     })
@@ -108,6 +110,7 @@ describe('Tour', () => {
     await fireEvent.click(screen.getByText('Finish'))
 
     expect(onFinish).toHaveBeenCalled()
+    expect(onClose).toHaveBeenCalled()
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
@@ -218,8 +221,9 @@ describe('Tour', () => {
 
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
 
-    const mask = document.querySelector('div.fixed.inset-0.bg-black\\/45')
+    const mask = document.querySelector('[data-tiger-tour-mask]')
     expect(mask).toBeInTheDocument()
+    expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).toBe(mask)
     await fireEvent.click(mask!)
 
     expect(onClose).toHaveBeenCalled()
@@ -234,6 +238,7 @@ describe('Tour', () => {
       }
     })
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    expect(document.querySelector('[data-tiger-tour-mask]')).not.toBeInTheDocument()
     expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).not.toBeInTheDocument()
   })
 
@@ -262,9 +267,51 @@ describe('Tour', () => {
     })
 
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
-    // Spotlight overlay uses inline style with box-shadow; presence indicates target rect resolved.
+    // Overlay is the clip-path mask (aria-hidden); presence indicates target rect resolved.
     const overlay = document.querySelector('[aria-hidden="true"]')
     expect(overlay).toBeInTheDocument()
+    expect(overlay).toHaveAttribute('data-tiger-tour-mask')
+  })
+
+  it('should close when clicking the mask when a target exists', async () => {
+    const target = document.createElement('div')
+    target.id = 'tour-target'
+    target.getBoundingClientRect = () =>
+      ({
+        top: 100,
+        left: 200,
+        width: 50,
+        height: 30,
+        right: 250,
+        bottom: 130,
+        x: 200,
+        y: 100,
+        toJSON: () => ({})
+      }) as DOMRect
+    document.body.appendChild(target)
+
+    const onClose = vi.fn()
+    const onUpdateOpen = vi.fn()
+    render(Tour, {
+      props: {
+        steps: [{ title: 'With target', description: '...', target: '#tour-target' }],
+        open: true,
+        onClose,
+        'onUpdate:open': onUpdateOpen
+      }
+    })
+
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    const mask = await waitFor(() => {
+      const node = document.querySelector('[data-tiger-tour-mask]') as HTMLElement | null
+      expect(node).toBeInTheDocument()
+      expect(node?.style.clipPath).toContain('evenodd')
+      return node!
+    })
+    await fireEvent.click(mask)
+
+    expect(onClose).toHaveBeenCalled()
+    expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
   it('should apply custom className to the popover', async () => {

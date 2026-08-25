@@ -245,6 +245,47 @@ describe('Affix', () => {
     expect(screen.getByTestId('affix-bot-style')).toHaveStyle({ bottom: '16px', zIndex: '50' })
   })
 
+  it('pins offsetBottom to the custom target container bottom, not the viewport', async () => {
+    const root = document.createElement('div')
+    root.id = 'affix-bottom-root'
+    vi.spyOn(root, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 20, 320, 160))
+    document.body.appendChild(root)
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 200 })
+
+    render(Affix, {
+      props: {
+        target: '#affix-bottom-root',
+        offsetBottom: 8
+      },
+      attrs: { 'data-testid': 'affix-target-bottom' },
+      slots: { default: 'Bottom pinned' }
+    })
+
+    const content = screen.getByTestId('affix-target-bottom')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(10, 140, 200, 40))
+    const sentinel = content.nextElementSibling as HTMLElement
+    expect(sentinel).toHaveAttribute('aria-hidden', 'true')
+
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: false,
+      boundingClientRect: new DOMRect(0, 190, 0, 0),
+      rootBounds: new DOMRect(0, 20, 320, 160)
+    })
+
+    await waitFor(() =>
+      expect(screen.getByTestId('affix-target-bottom').style.position).toBe('fixed')
+    )
+    expect(screen.getByTestId('affix-target-bottom')).toHaveStyle({ bottom: '28px' })
+    expect(screen.getByTestId('affix-target-bottom')).not.toHaveStyle({ bottom: '8px' })
+
+    const affixed = screen.getByTestId('affix-target-bottom')
+    expect(affixed.nextElementSibling).toHaveAttribute('aria-hidden', 'true')
+
+    document.body.removeChild(root)
+  })
+
   it('uses default offsetTop of 0 when no offset is specified', async () => {
     render(Affix, {
       attrs: { 'data-testid': 'affix-default' },

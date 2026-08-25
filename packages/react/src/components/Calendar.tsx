@@ -9,6 +9,7 @@ import {
   calendarWeekdayClasses,
   getCalendarDayClasses,
   getCalendarMonthClasses,
+  isCalendarMonthDisabled,
   isSameDay,
   getMonthDays,
   getShortDayNames,
@@ -97,10 +98,13 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   const selectMonth = useCallback(
     (monthIdx: number) => {
+      if (isCalendarMonthDisabled(viewYear, monthIdx, disabledDate)) return
       setViewMonth(monthIdx)
-      onPanelChange?.(new Date(viewYear, monthIdx, 1), mode)
+      const date = new Date(viewYear, monthIdx, 1)
+      onChange?.(date)
+      onPanelChange?.(date, 'month')
     },
-    [viewYear, mode, onPanelChange]
+    [viewYear, disabledDate, onChange, onPanelChange]
   )
 
   // ----- Keyboard navigation (roving focus stays in the framework layer) -----
@@ -282,14 +286,16 @@ export const Calendar: React.FC<CalendarProps> = ({
             <div key={ri} className="grid grid-cols-3 gap-2" role="row">
               {row.map((m, ci) => {
                 const i = ri * 3 + ci
+                const isDisabled = isCalendarMonthDisabled(viewYear, i, disabledDate)
                 return (
                   <button
                     key={i}
                     type="button"
                     role="gridcell"
                     aria-selected={viewMonth === i}
-                    tabIndex={rovingMonthIdx === i ? 0 : -1}
-                    className={getCalendarMonthClasses(viewMonth === i)}
+                    disabled={isDisabled}
+                    tabIndex={rovingMonthIdx === i && !isDisabled ? 0 : -1}
+                    className={getCalendarMonthClasses(viewMonth === i, isDisabled)}
                     onClick={() => selectMonth(i)}
                     onFocus={() => setActiveMonthIdx(i)}
                     onKeyDown={(e) => handleMonthKeyDown(e, i)}>

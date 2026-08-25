@@ -86,31 +86,34 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const currentLength = currentValue?.length ?? 0
 
+    const textarea = (
+      <textarea
+        ref={setRefs}
+        className={textareaClasses}
+        value={currentValue}
+        disabled={disabled}
+        readOnly={readonly}
+        required={required}
+        placeholder={placeholder}
+        rows={rows}
+        maxLength={maxLength}
+        minLength={minLength}
+        onInput={handleInput}
+        onChange={handleChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        {...props}
+      />
+    )
+
+    if (!showCount) return textarea
+
     return (
       <div className="w-full">
-        <textarea
-          ref={setRefs}
-          className={textareaClasses}
-          value={currentValue}
-          disabled={disabled}
-          readOnly={readonly}
-          required={required}
-          placeholder={placeholder}
-          rows={rows}
-          maxLength={maxLength}
-          minLength={minLength}
-          onInput={handleInput}
-          onChange={handleChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          {...props}
-        />
-
-        {showCount && (
-          <div className="mt-1 text-sm text-gray-500 text-right">
-            {maxLength ? `${currentLength}/${maxLength}` : currentLength}
-          </div>
-        )}
+        {textarea}
+        <div className="mt-1 text-sm text-gray-500 text-right">
+          {maxLength ? `${currentLength}/${maxLength}` : currentLength}
+        </div>
       </div>
     )
   }

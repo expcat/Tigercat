@@ -2,11 +2,13 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent, waitFor } from '@testing-library/react'
 import { LineChart } from '@expcat/tigercat-react/LineChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { MockResizeObserver } from '../utils/mock-observers'
+import { installFrameScheduler } from '../utils/frame-scheduler'
 
 const basicData = [
   { x: 'Jan', y: 30 },
@@ -154,5 +156,60 @@ describe('LineChart', () => {
     expect(clickablePoint).toHaveAttribute('tabindex', '0')
     fireEvent.keyDown(clickablePoint, { key: 'Enter' })
     expect(onPointClick).toHaveBeenCalledWith(0, 0, expect.any(Object))
+  })
+
+  it('opens the default tooltip on point hover without hoverable', () => {
+    const { container } = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: true,
+      ...defaultSize
+    })
+
+    fireEvent.mouseEnter(container.querySelector('circle[data-point-index="0"]')!)
+    const tooltip = document.body.querySelector('[data-chart-tooltip]')
+    expect(tooltip).toBeTruthy()
+    expect(tooltip).toHaveAttribute('role', 'tooltip')
+    expect(tooltip?.className).not.toContain('opacity-0')
+    expect(tooltip?.textContent).toContain('Jan: 30')
+  })
+
+  describe('responsive plot scale', () => {
+    afterEach(() => {
+      MockResizeObserver.reset()
+      vi.unstubAllGlobals()
+    })
+
+    it('recomputes point positions after observing the parent size', async () => {
+      vi.stubGlobal('ResizeObserver', MockResizeObserver)
+      const frames = installFrameScheduler()
+      const { container } = renderWithProps(LineChart, {
+        data: basicData,
+        showPoints: true,
+        width: 420,
+        height: 240,
+        responsive: true
+      })
+
+      await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+      const svg = container.querySelector('svg')
+      const observer = MockResizeObserver.instances[0]
+
+      act(() => {
+        observer.trigger(800, 400)
+      })
+      act(() => {
+        frames.flush()
+      })
+
+      expect(svg).toHaveAttribute('width', '800')
+      expect(svg).toHaveAttribute('height', '400')
+      expect(svg).toHaveAttribute('viewBox', '0 0 800 400')
+
+      await waitFor(() => {
+        const points = container.querySelectorAll('circle[data-point-index]')
+        const last = points[points.length - 1]
+        expect(Number(last.getAttribute('cx'))).toBeGreaterThan(500)
+      })
+    })
   })
 })

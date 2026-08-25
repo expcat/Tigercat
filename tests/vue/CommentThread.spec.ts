@@ -4,8 +4,12 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { defineComponent, h, ref } from 'vue'
 import { CommentThread } from '@expcat/tigercat-vue/CommentThread'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { CommentNode } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('CommentThread (Vue)', () => {
@@ -50,7 +54,7 @@ describe('CommentThread (Vue)', () => {
       }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: /展开/ }))
+    await fireEvent.click(screen.getByRole('button', { name: /Expand/ }))
 
     expect(onUpdateExpandedKeys).toHaveBeenCalledWith([1])
   })
@@ -74,7 +78,7 @@ describe('CommentThread (Vue)', () => {
       }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: '回复' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Reply' }))
 
     const input = screen.getByPlaceholderText('写下回复') as HTMLTextAreaElement
     await fireEvent.update(input, 'Hello')
@@ -130,14 +134,14 @@ describe('CommentThread (Vue)', () => {
       attrs: { onLoadMore }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: '加载更多' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Load more' }))
 
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
   })
   it('renders empty state when no nodes provided', () => {
     render(CommentThread, { props: { nodes: [] } })
-    expect(screen.getByRole('feed', { name: '评论线程' })).toBeInTheDocument()
+    expect(screen.getByRole('feed', { name: 'Comment thread' })).toBeInTheDocument()
   })
 
   it('renders emptyText when nodes is empty', () => {
@@ -209,7 +213,7 @@ describe('CommentThread (Vue)', () => {
       props: { nodes, cancelReplyText: '取消回复', replyPlaceholder: '写下回复' }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: '回复' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Reply' }))
     expect(screen.getByPlaceholderText('写下回复')).toBeInTheDocument()
 
     await fireEvent.click(screen.getByRole('button', { name: '取消回复' }))
@@ -253,7 +257,131 @@ describe('CommentThread (Vue)', () => {
     ]
 
     render(CommentThread, { props: { nodes, showLike: true } })
-    expect(screen.getByRole('button', { name: /点赞\s+5/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Like\s+5/ })).toBeInTheDocument()
+  })
+
+  describe('like overlay', () => {
+    const likeNodes: CommentNode[] = [{ id: 1, content: 'Root', user: { name: 'A' }, likes: 3 }]
+
+    it('updates Like 3 to Liked 4 without a parent write-back', async () => {
+      render(CommentThread, { props: { nodes: likeNodes } })
+
+      await fireEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+      expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
+
+      await fireEvent.click(screen.getByRole('button', { name: /Liked\s+4/ }))
+      expect(screen.getByRole('button', { name: /Like\s+3/ })).toBeInTheDocument()
+    })
+
+    it('emits like and still shows Liked 4 from the overlay', async () => {
+      const onLike = vi.fn()
+      render(CommentThread, { props: { nodes: likeNodes, onLike } })
+
+      await fireEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+
+      expect(onLike).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }), true)
+      expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
+    })
+
+    it('does not double-count when the parent writes liked/likes back', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const comments = ref<CommentNode[]>([{ ...likeNodes[0] }])
+          const onLike = (node: CommentNode, liked: boolean) => {
+            comments.value = comments.value.map((item) =>
+              item.id === node.id
+                ? {
+                    ...item,
+                    liked,
+                    likes: Math.max(0, (item.likes ?? 0) + (liked ? 1 : -1))
+                  }
+                : item
+            )
+          }
+          return () => h(CommentThread, { nodes: comments.value, onLike })
+        }
+      })
+
+      render(Wrapper)
+      await fireEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+      expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Liked\s+5/ })).not.toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN overlay copy 点赞 3 → 已赞 4', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () => h(CommentThread, { nodes: likeNodes }))
+        }
+      })
+      render(Wrapper)
+      await fireEvent.click(screen.getByRole('button', { name: /点赞\s+3/ }))
+      expect(screen.getByRole('button', { name: /已赞\s+4/ })).toBeInTheDocument()
+    })
+  })
+
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN for like and expand replies', () => {
+      const nodes: CommentNode[] = [
+        {
+          id: 1,
+          content: 'Root comment',
+          user: { name: 'A' },
+          likes: 2,
+          children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+        }
+      ]
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(CommentThread, { nodes }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: /点赞/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /展开 1 条回复/ })).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider en-US for like and expand replies', () => {
+      const nodes: CommentNode[] = [
+        {
+          id: 1,
+          content: 'Root comment',
+          user: { name: 'A' },
+          likes: 2,
+          children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+        }
+      ]
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: enUS }, () => h(CommentThread, { nodes }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: /Like/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Expand 1 replies/ })).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN collapse copy when expanded', () => {
+      const nodes: CommentNode[] = [
+        {
+          id: 1,
+          content: 'Root comment',
+          user: { name: 'A' },
+          children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+        }
+      ]
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(CommentThread, { nodes, defaultExpandedKeys: [1] })
+            )
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: /收起回复/ })).toBeInTheDocument()
+    })
   })
 
   describe('Accessibility', () => {

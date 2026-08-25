@@ -1,5 +1,6 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
+import { DEFAULT_LOADING_BACKGROUND } from '@expcat/tigercat-core'
 import { Loading } from '../../packages/vue/src/components/Loading'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -81,6 +82,21 @@ describe('Loading (Vue)', () => {
     unmount()
 
     expect(document.body.style.overflow).toBe('')
+  })
+
+  it('applies the shared surface mask when fullscreen has no background', () => {
+    expect(Loading.props.background.default).toBe(DEFAULT_LOADING_BACKGROUND)
+    expect(DEFAULT_LOADING_BACKGROUND).toContain('--tiger-surface')
+    expect(DEFAULT_LOADING_BACKGROUND).toContain('--tiger-loading-mask')
+    expect(DEFAULT_LOADING_BACKGROUND).not.toBe('rgba(255, 255, 255, 0.9)')
+
+    render(Loading, { props: { fullscreen: true } })
+    const wrapper = screen.getByRole('status') as HTMLElement & {
+      __vnode?: { props?: { style?: { backgroundColor?: string } } }
+    }
+
+    // happy-dom drops color-mix on CSSStyleDeclaration; the vnode still has the value.
+    expect(wrapper.__vnode?.props?.style?.backgroundColor).toBe(DEFAULT_LOADING_BACKGROUND)
   })
 
   it('allows fullscreen loading without scroll lock', () => {

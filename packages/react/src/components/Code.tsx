@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   codeBlockPreClasses,
   copyTextToClipboard,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses,
+  getCodeLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
+  type CodeCopyButtonStatus,
   type CodeProps as CoreCodeProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type CodeProps = CoreCodeProps &
   Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreCodeProps | 'onCopy'> & {
@@ -15,34 +20,58 @@ export type CodeProps = CoreCodeProps &
 export const Code: React.FC<CodeProps> = ({
   code,
   copyable = true,
-  copyLabel = '复制',
-  copiedLabel = '已复制',
+  copyLabel,
+  copiedLabel,
+  copyFailedLabel,
+  locale,
+  labels: labelsOverride,
   onCopy,
   className,
   ...props
 }) => {
-  const [isCopied, setIsCopied] = useState(false)
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getCodeLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const resolvedCopyLabel = resolveLocaleText(labels.copyLabel, copyLabel)
+  const resolvedCopiedLabel = resolveLocaleText(labels.copiedLabel, copiedLabel)
+  const resolvedCopyFailedLabel = resolveLocaleText(labels.copyFailedLabel, copyFailedLabel)
+
+  const [copyStatus, setCopyStatus] = useState<CodeCopyButtonStatus>('idle')
 
   useEffect(() => {
-    if (!isCopied) return
+    if (copyStatus === 'idle') return
     const timer = window.setTimeout(() => {
-      setIsCopied(false)
+      setCopyStatus('idle')
     }, 1500)
 
     return () => window.clearTimeout(timer)
-  }, [isCopied])
+  }, [copyStatus])
 
   const handleCopy = async () => {
     if (!copyable) return
     const ok = await copyTextToClipboard(code)
-    if (!ok) return
-
-    setIsCopied(true)
-    onCopy?.(code)
+    if (ok) {
+      setCopyStatus('copied')
+      onCopy?.(code)
+    } else {
+      setCopyStatus('failed')
+    }
   }
 
   const containerClasses = getCodeBlockContainerClasses(className)
-  const copyButtonClasses = getCodeBlockCopyButtonClasses(isCopied)
+  const copyButtonClasses = getCodeBlockCopyButtonClasses(copyStatus)
+  const buttonLabel =
+    copyStatus === 'failed'
+      ? resolvedCopyFailedLabel
+      : copyStatus === 'copied'
+        ? resolvedCopiedLabel
+        : resolvedCopyLabel
 
   return (
     <div className={containerClasses} {...props}>
@@ -54,8 +83,8 @@ export const Code: React.FC<CodeProps> = ({
           type="button"
           className={copyButtonClasses}
           onClick={handleCopy}
-          aria-label={isCopied ? copiedLabel : copyLabel}>
-          {isCopied ? copiedLabel : copyLabel}
+          aria-label={buttonLabel}>
+          {buttonLabel}
         </button>
       )}
     </div>
