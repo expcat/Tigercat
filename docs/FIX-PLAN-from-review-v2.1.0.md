@@ -42,7 +42,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #13 | Rate half-star clip | done | this commit | 2026-08-25 |
 | #14 | Avatar getInitials short token | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
-| #15–#16, #18–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
+| #15–#16, #19–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -382,3 +383,18 @@ QRCode public `level` removed; matrix stays hash-based decorative:
 Pages `/qrcode` no longer advertises L/M/Q/H. Refresh a11y / overlay / quiet zone / ImagePreview left.
 
 Next: Phase D #18 ImagePreview maskClosable (click mask closes, align ImageViewer).
+
+## #18 notes
+
+ImagePreview maskClosable closes from the dedicated mask child (Vue + React):
+
+- mask node (`imagePreviewMaskClasses`, `aria-hidden`) owns `onClick` / `handleMaskClick`
+- `maskClosable` true (default): mask click calls existing `handleClose` (`update:open` false / `onOpenChange(false)`)
+- wrapper no longer uses `e.target === e.currentTarget` (that check never held because the mask sibling ate the click)
+- image / toolbar / nav / close are siblings of the mask, so they do not take the mask path
+- `maskClosable={false}` ignores mask clicks; close button and Escape still close
+- classes / ImageViewer / ImageGroup / #20 img max-h untouched
+
+Pages `/image` ImageGroup / ImagePreview dark area can dismiss. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #28 ColorPicker (`parseColorInput` accepts rgba/hsla; `showAlpha` must emit).

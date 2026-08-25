@@ -104,6 +104,36 @@ describe('ImagePreview', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it('calls onOpenChange when the mask is clicked (maskClosable default true)', () => {
+    const onOpenChange = vi.fn()
+    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+
+    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
+    fireEvent.click(mask)
+
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('does not call onOpenChange when the mask is clicked with maskClosable false', () => {
+    const onOpenChange = vi.fn()
+    render(<ImagePreview open images={images} maskClosable={false} onOpenChange={onOpenChange} />)
+
+    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
+    fireEvent.click(mask)
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('does not call onOpenChange when the preview image is clicked', () => {
+    const onOpenChange = vi.fn()
+    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLElement
+    fireEvent.click(img)
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
   it('updates current image from navigation button clicks', () => {
     const onCurrentIndexChange = vi.fn()
     render(

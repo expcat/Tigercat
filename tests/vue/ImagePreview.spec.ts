@@ -169,6 +169,50 @@ describe('ImagePreview', () => {
     expect(emitted()['update:open'][0]).toEqual([false])
   })
 
+  it('emits update:open when the mask is clicked (maskClosable default true)', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
+    await fireEvent.click(mask)
+
+    expect(emitted()['update:open']).toBeTruthy()
+    expect(emitted()['update:open'][0]).toEqual([false])
+  })
+
+  it('does not emit update:open when the mask is clicked with maskClosable false', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images,
+        maskClosable: false
+      }
+    })
+
+    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
+    await fireEvent.click(mask)
+
+    expect(emitted()['update:open']).toBeUndefined()
+  })
+
+  it('does not emit update:open when the preview image is clicked', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLElement
+    await fireEvent.click(img)
+
+    expect(emitted()['update:open']).toBeUndefined()
+  })
+
   it('updates current image from navigation button clicks', async () => {
     const { emitted } = render(ImagePreview, {
       props: {
