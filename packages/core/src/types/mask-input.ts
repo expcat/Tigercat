@@ -100,7 +100,8 @@ export interface MaskInputProps {
   clearable?: boolean
 
   /**
-   * Input name attribute (the submitted value is the raw value)
+   * Input name attribute. When set, a hidden input with this name submits the
+   * raw (unmasked) value; the visible field displays the mask and has no name.
    */
   name?: string
 

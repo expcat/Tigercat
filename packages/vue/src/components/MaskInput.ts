@@ -65,7 +65,10 @@ export const MaskInput = defineComponent({
     readonly: Boolean,
     /** Whether to show a clear button when the input has value */
     clearable: Boolean,
-    /** Input name attribute */
+    /**
+     * Input name attribute. When set, a hidden input with this name submits the
+     * raw (unmasked) value; the visible field displays the mask and has no name.
+     */
     name: String,
     /** Input id attribute */
     id: String,
@@ -221,7 +224,6 @@ export const MaskInput = defineComponent({
           placeholder: props.placeholder,
           disabled: props.disabled,
           readonly: props.readonly,
-          name: props.name,
           id: props.id,
           autocomplete: props.autoComplete,
           autofocus: props.autoFocus,
@@ -235,6 +237,17 @@ export const MaskInput = defineComponent({
           onBlur: handleBlur
         })
       ]
+
+      if (props.name) {
+        children.push(
+          h('input', {
+            key: 'hidden',
+            type: 'hidden',
+            name: props.name,
+            value: rawValue.value
+          })
+        )
+      }
 
       if (activeError) {
         children.push(
