@@ -162,6 +162,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     wrapperClasses
   } = useChartInteraction<ScatterChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -392,7 +393,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip = showTooltip && hoverable && (
+  const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
       open={resolvedHoveredIndex !== null && tooltipContent !== ''}

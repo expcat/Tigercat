@@ -180,8 +180,31 @@ describe('useChartInteraction (React)', () => {
         result.current.handleMouseEnter(1, mockEvent)
       })
 
-      expect(result.current.localHoveredIndex).toBe(null)
+      expect(result.current.localHoveredIndex).toBe(1)
+      expect(result.current.tooltipPosition).toEqual({ x: 100, y: 200 })
+      expect(result.current.activeIndex).toBe(null)
       expect(callbacks.onHoveredIndexChange).not.toHaveBeenCalled()
+      expect(callbacks.onHover).not.toHaveBeenCalled()
+    })
+
+    it('should not track hover when hoverable and showTooltip are false', () => {
+      const callbacks = createMockCallbacks()
+      const { result } = renderHook(() =>
+        useChartInteraction(createTestOptions(callbacks, { hoverable: false, showTooltip: false }))
+      )
+
+      act(() => {
+        const mockEvent = new MouseEvent('mouseenter', {
+          clientX: 100,
+          clientY: 200
+        }) as unknown as React.MouseEvent
+        result.current.handleMouseEnter(1, mockEvent)
+      })
+
+      expect(result.current.localHoveredIndex).toBe(null)
+      expect(result.current.tooltipPosition).toEqual({ x: 0, y: 0 })
+      expect(callbacks.onHoveredIndexChange).not.toHaveBeenCalled()
+      expect(callbacks.onHover).not.toHaveBeenCalled()
     })
   })
 

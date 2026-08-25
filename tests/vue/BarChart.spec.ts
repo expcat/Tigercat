@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { fireEvent } from '@testing-library/vue'
 import { BarChart } from '@expcat/tigercat-vue/BarChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -153,6 +154,34 @@ describe('BarChart', () => {
       })
 
       expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+    })
+
+    it('opens the default tooltip on hover without hoverable', async () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10 },
+          { x: 'B', y: 20 }
+        ],
+        ...defaultSize
+      })
+
+      await fireEvent.mouseEnter(container.querySelector('rect[data-bar-index]')!)
+      const tooltip = document.body.querySelector('[data-chart-tooltip]')
+      expect(tooltip).toBeTruthy()
+      expect(tooltip).toHaveAttribute('role', 'tooltip')
+      expect(tooltip?.classList.contains('opacity-0')).toBe(false)
+      expect(tooltip?.textContent).toContain('A: 10')
+    })
+
+    it('does not open a tooltip when showTooltip is false', async () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 10 }],
+        showTooltip: false,
+        ...defaultSize
+      })
+
+      await fireEvent.mouseEnter(container.querySelector('rect[data-bar-index]')!)
+      expect(document.body.querySelector('[data-chart-tooltip]')).toBeNull()
     })
   })
 })

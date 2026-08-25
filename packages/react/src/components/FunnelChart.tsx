@@ -74,6 +74,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     wrapperClasses
   } = useChartInteraction<FunnelChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -207,15 +208,14 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip =
-    showTooltip && hoverable ? (
-      <ChartTooltip
-        content={tooltipContent}
-        open={resolvedHoveredIndex !== null && tooltipContent !== ''}
-        x={tooltipPosition.x}
-        y={tooltipPosition.y}
-      />
-    ) : null
+  const tooltip = showTooltip ? (
+    <ChartTooltip
+      content={tooltipContent}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
+      x={tooltipPosition.x}
+      y={tooltipPosition.y}
+    />
+  ) : null
 
   if (!showLegend) {
     return (

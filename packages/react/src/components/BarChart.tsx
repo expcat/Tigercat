@@ -123,6 +123,7 @@ export const BarChart: React.FC<BarChartProps> = ({
     wrapperClasses
   } = useChartInteraction<BarChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -369,7 +370,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
-      open={hoverable && resolvedHoveredIndex !== null && tooltipContent !== ''}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />

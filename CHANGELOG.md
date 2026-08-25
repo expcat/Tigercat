@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Chart `showTooltip` 默认悬停出框，不再要求 `hoverable`**：`showTooltip`（默认 true）悬停数据点即打开 ChartTooltip；`hoverable`（默认仍 false）只控制高亮 / 透明度 / 公开 hover 事件。`showTooltip={false}` 仍不出现浮层。Pages `/bar-chart` 02、`/heatmap-chart` 02 悬停可见 `A: 10` / 格值框。Vue/React。公开行为修复。无新公开 prop。`responsive` / tooltip chrome 未改。
 - **Gantt 拖条改 `start`/`end`（保时长、本地日吸附、夹到 min/max）**：非 disabled 条 pointer 拖动；松手按像素换算日期（`ganttPxToMs` / `shiftGanttTaskDates` / `moveGanttTaskByPx`）。Vue `update:data` + `task-change`；React `onDataChange` + `onTaskChange`。未回写的 `data`（Pages `/gantt` 01/02 静态数组）用内部 overlay 保住新日期，条 `x` 会动。零位移仍走原 click/select。无新 `draggable` prop。行斑马/轴文案未改（A0 已把 `--tiger-fill` / `--tiger-text-muted` 别名到 surface-muted / text-secondary）。Vue/React。公开 API 增补 + 行为修复。
 - **Table 排序键盘可达，`sortData` / `filterTableData` 读 `dataKey`**：可排序表头改为真实 `<button type="button">`（`data-tiger-table-sort`，Tab/Enter/Space），`aria-sort` 仍在 `<th>`；`sortData`（可选第 5 参 `columns`）与 `filterTableData` 按 `dataKey` 否则 `key` 取值，对齐单元格/导出。Vue/React。公开行为修复。无新公开 Table prop。
 - **Tour 有 target 时点遮罩可关，Vue 最后一步也发 `close`**：dimmed mask 改为全屏可点节点（`data-tiger-tour-mask`）并用 clip-path 挖洞露出 target，不再靠 `pointer-events:none` 的 box-shadow spotlight；无 target 的 fallback 与 `step.mask === false` 不变。Vue 最后一步 Finish 在 `finish` 之外兼发 `close`（对齐 React `onClose`）。Vue/React。公开行为修复。无新公开 prop。

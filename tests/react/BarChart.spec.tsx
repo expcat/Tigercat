@@ -188,5 +188,34 @@ describe('BarChart', () => {
       fireEvent.mouseLeave(rect)
       expect(onHoveredIndexChange).toHaveBeenLastCalledWith(null)
     })
+
+    it('opens the default tooltip on hover without hoverable', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10 },
+          { x: 'B', y: 20 }
+        ],
+        ...defaultSize
+      })
+
+      fireEvent.mouseEnter(container.querySelector('rect[data-bar-index]')!)
+      const tooltip = document.body.querySelector('[data-chart-tooltip]')
+      expect(tooltip).toBeTruthy()
+      expect(tooltip).toHaveAttribute('role', 'tooltip')
+      expect(tooltip?.className).not.toContain('opacity-0')
+      expect(tooltip?.textContent).toContain('A: 10')
+    })
+
+    it('does not open a tooltip when showTooltip is false', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 10 }],
+        showTooltip: false,
+        ...defaultSize
+      })
+
+      fireEvent.mouseEnter(container.querySelector('rect[data-bar-index]')!)
+      const tooltip = document.body.querySelector('[data-chart-tooltip]')
+      expect(tooltip).toBeNull()
+    })
   })
 })

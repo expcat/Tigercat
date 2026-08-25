@@ -163,6 +163,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     wrapperClasses
   } = useChartInteraction<AreaChartSeries>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -340,9 +341,11 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
       setHoveredPointInfo({ seriesIndex, pointIndex })
       setTooltipPosition({ x: event.clientX, y: event.clientY })
-      onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
+      if (hoverable) {
+        onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
+      }
     },
-    [onPointHover, resolvedSeries]
+    [hoverable, onPointHover, resolvedSeries]
   )
 
   const handlePointMouseMove = useCallback((event: React.MouseEvent) => {
@@ -351,8 +354,10 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   const handlePointMouseLeave = useCallback(() => {
     setHoveredPointInfo(null)
-    onPointHover?.(null, null, null)
-  }, [onPointHover])
+    if (hoverable) {
+      onPointHover?.(null, null, null)
+    }
+  }, [hoverable, onPointHover])
 
   // Keyboard/focus tooltip: synthesize a pointer position from the point's
   // on-screen rect so focused points show the same tooltip as hovered ones.
@@ -385,9 +390,11 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     [selectable, handleSeriesSelect]
   )
 
-  // Point-level interaction is gated: hover/tooltip on `hoverable`, click on
-  // `selectable` or an explicit point-click callback (C26-2).
+  // Point-level interaction is gated: tooltip tracking on `showTooltip` or
+  // `hoverable`; highlight/hover events on `hoverable`; click on `selectable`
+  // or an explicit point-click callback (C26-2). Default points stay `role="img"`.
   const pointClickable = selectable || !!onPointClick
+  const trackPointHover = showTooltip || hoverable
 
   // Reverse for proper stacking visual
   const reversedSeriesData = useMemo(() => [...seriesData].reverse(), [seriesData])
@@ -580,12 +587,12 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     data-point-index={point.pointIndex}
                     data-series-key={sd.seriesKey}
                     onMouseEnter={
-                      hoverable
+                      trackPointHover
                         ? (e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
                         : undefined
                     }
-                    onMouseMove={hoverable ? handlePointMouseMove : undefined}
-                    onMouseLeave={hoverable ? handlePointMouseLeave : undefined}
+                    onMouseMove={trackPointHover ? handlePointMouseMove : undefined}
+                    onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}
                     onClick={
                       pointClickable
                         ? (e) => {

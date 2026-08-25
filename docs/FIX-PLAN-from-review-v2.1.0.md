@@ -76,7 +76,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-7 | Tour mask close + Vue last-step onClose | done | this commit | 2026-08-25 |
 | P2-8 | Table sort keyboard + dataKey | done | this commit | 2026-08-25 |
 | P2-9 | Gantt drag (wire bar drag to dates) | done | this commit | 2026-08-25 |
-| P2-10..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-10 | Chart showTooltip / hoverable | done | this commit | 2026-08-25 |
+| P2-11..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -889,3 +890,18 @@ Gantt bar drag wires to dates (Vue + React):
 Row fill / axis tokens: T1 A0 already aliases `--tiger-fill` → `--tiger-surface-muted` and `--tiger-text-muted` → `--tiger-text-secondary`. `ganttRowClasses` stays `fill-[var(--tiger-fill,#f9fafb)]`; last-resort hex not restyled (not a drag blocker).
 
 Next: P2-10 Chart `showTooltip` / `hoverable` (default tooltip without requiring `hoverable`). T1 A0-A10 did not cover Chart tooltip gating, so do not skip.
+
+## P2-10 notes
+
+Chart `showTooltip` default tooltip without `hoverable` (Vue + React):
+
+- `useChartInteraction`: track `localHoveredIndex` + tooltip position when `hoverable || showTooltip` (showTooltip default true)
+- Public hover events (`onHoveredIndexChange` / `onBarHover` / Vue `update:hoveredIndex` / `bar-hover` / `onPointHover`) and `activeIndex` highlight stay `hoverable`-only
+- ChartTooltip mount/open is `showTooltip` only — no `showTooltip && hoverable`
+- Heatmap canvas overlay receives pointer events when `showTooltip` even if not hoverable
+- Line/Area mouse tooltip when `showTooltip || hoverable`; `role` / tabindex stay `hoverable || pointClickable`
+- Radar mouse tooltip without hoverable; cursor/role/tabIndex stay `showTooltip && hoverable`
+
+T1 A0-A10 did not cover Chart tooltip gating. No new public prop. `responsive` not changed.
+
+Next: P2-11 Chart `responsive` scale (recompute scale after observing parent; do not only stretch SVG). T1 A0-A10 did not cover ChartCanvas resize vs prop scale, so do not skip.

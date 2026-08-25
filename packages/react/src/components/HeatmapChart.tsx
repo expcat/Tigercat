@@ -66,6 +66,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     handleClick
   } = useChartInteraction<HeatmapChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -120,6 +121,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   )
 
   const interactive = hoverable || selectable
+  const pointerInteractive = interactive || showTooltip
   const rect = innerRect
   const cellW = (rect.width - cellGap * (xLabels.length - 1)) / xLabels.length
   const cellH = (rect.height - cellGap * (yLabels.length - 1)) / yLabels.length
@@ -320,15 +322,14 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip =
-    showTooltip && hoverable ? (
-      <ChartTooltip
-        content={tooltipContent}
-        open={resolvedHoveredIndex !== null && tooltipContent !== ''}
-        x={tooltipPosition.x}
-        y={tooltipPosition.y}
-      />
-    ) : null
+  const tooltip = showTooltip ? (
+    <ChartTooltip
+      content={tooltipContent}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
+      x={tooltipPosition.x}
+      y={tooltipPosition.y}
+    />
+  ) : null
 
   return (
     <div className="inline-block relative">
@@ -347,10 +348,10 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
             top: `${rect.y}px`,
             width: `${rect.width}px`,
             height: `${rect.height}px`,
-            pointerEvents: interactive ? 'auto' : 'none'
+            pointerEvents: pointerInteractive ? 'auto' : 'none'
           }}
-          onMouseMove={interactive ? handleCanvasMouseMove : undefined}
-          onMouseLeave={interactive ? handleMouseLeave : undefined}
+          onMouseMove={pointerInteractive ? handleCanvasMouseMove : undefined}
+          onMouseLeave={pointerInteractive ? handleMouseLeave : undefined}
           onClick={interactive ? handleCanvasClick : undefined}
         />
       )}

@@ -107,6 +107,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     wrapperClasses
   } = useChartInteraction<SunburstChartDatum>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -233,15 +234,14 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip =
-    showTooltip && hoverable ? (
-      <ChartTooltip
-        content={tooltipContent}
-        open={resolvedHoveredIndex !== null && tooltipContent !== ''}
-        x={tooltipPosition.x}
-        y={tooltipPosition.y}
-      />
-    ) : null
+  const tooltip = showTooltip ? (
+    <ChartTooltip
+      content={tooltipContent}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
+      x={tooltipPosition.x}
+      y={tooltipPosition.y}
+    />
+  ) : null
 
   if (!showLegend) {
     return (

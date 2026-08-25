@@ -155,4 +155,19 @@ describe('LineChart', () => {
     fireEvent.keyDown(clickablePoint, { key: 'Enter' })
     expect(onPointClick).toHaveBeenCalledWith(0, 0, expect.any(Object))
   })
+
+  it('opens the default tooltip on point hover without hoverable', () => {
+    const { container } = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: true,
+      ...defaultSize
+    })
+
+    fireEvent.mouseEnter(container.querySelector('circle[data-point-index="0"]')!)
+    const tooltip = document.body.querySelector('[data-chart-tooltip]')
+    expect(tooltip).toBeTruthy()
+    expect(tooltip).toHaveAttribute('role', 'tooltip')
+    expect(tooltip?.className).not.toContain('opacity-0')
+    expect(tooltip?.textContent).toContain('Jan: 30')
+  })
 })

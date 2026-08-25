@@ -143,6 +143,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     wrapperClasses
   } = useChartInteraction<RadarChartSeries>({
     hoverable,
+    showTooltip,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -170,11 +171,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const handlePointEnter = useCallback(
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
-      if (!hoverable) return
+      if (!hoverable && !showTooltip) return
       setHoveredPoint({ seriesIndex, pointIndex })
       handleHoverEnter(seriesIndex, event)
     },
-    [hoverable, handleHoverEnter]
+    [hoverable, showTooltip, handleHoverEnter]
   )
 
   const handlePointMove = useCallback(
@@ -650,12 +651,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       data-series-key={item.seriesKey}
                       data-point-index={point.index}
                       onMouseEnter={
-                        showTooltip && hoverable
+                        showTooltip || hoverable
                           ? (e: React.MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
                           : undefined
                       }
-                      onMouseMove={showTooltip && hoverable ? handlePointMove : undefined}
-                      onMouseLeave={showTooltip && hoverable ? handlePointLeave : undefined}
+                      onMouseMove={showTooltip || hoverable ? handlePointMove : undefined}
+                      onMouseLeave={showTooltip || hoverable ? handlePointLeave : undefined}
                       onFocus={
                         showTooltip && hoverable
                           ? (e: React.FocusEvent<SVGCircleElement>) =>
@@ -712,15 +713,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     </ChartCanvas>
   )
 
-  const tooltip =
-    showTooltip && hoverable ? (
-      <ChartTooltip
-        content={tooltipContent}
-        open={hoveredPoint !== null && tooltipContent !== ''}
-        x={tooltipPosition.x}
-        y={tooltipPosition.y}
-      />
-    ) : null
+  const tooltip = showTooltip ? (
+    <ChartTooltip
+      content={tooltipContent}
+      open={hoveredPoint !== null && tooltipContent !== ''}
+      x={tooltipPosition.x}
+      y={tooltipPosition.y}
+    />
+  ) : null
 
   if (!showLegend) {
     return (

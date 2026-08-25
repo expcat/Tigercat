@@ -282,6 +282,7 @@ export const RadarChart = defineComponent({
       wrapperClasses
     } = useChartInteraction<RadarChartSeries>({
       hoverable: computed(() => props.hoverable),
+      showTooltip: computed(() => props.showTooltip),
       hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
       selectedIndexProp: () => props.selectedIndex,
@@ -300,7 +301,7 @@ export const RadarChart = defineComponent({
     const hoveredPoint = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
 
     const handlePointEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
-      if (!props.hoverable) return
+      if (!props.hoverable && !props.showTooltip) return
       hoveredPoint.value = { seriesIndex, pointIndex }
       handleHoverEnter(seriesIndex, event)
     }
@@ -814,13 +815,13 @@ export const RadarChart = defineComponent({
                               'data-series-key': item.seriesKey,
                               'data-point-index': point.index,
                               onMouseenter:
-                                props.showTooltip && props.hoverable
+                                props.showTooltip || props.hoverable
                                   ? (e: MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
                                   : undefined,
                               onMousemove:
-                                props.showTooltip && props.hoverable ? handlePointMove : undefined,
+                                props.showTooltip || props.hoverable ? handlePointMove : undefined,
                               onMouseleave:
-                                props.showTooltip && props.hoverable ? handlePointLeave : undefined,
+                                props.showTooltip || props.hoverable ? handlePointLeave : undefined,
                               onFocus:
                                 props.showTooltip && props.hoverable
                                   ? (e: FocusEvent) =>
@@ -887,15 +888,14 @@ export const RadarChart = defineComponent({
         }
       )
 
-      const tooltip =
-        props.showTooltip && props.hoverable
-          ? h(ChartTooltip, {
-              content: tooltipContent.value,
-              open: hoveredPoint.value !== null && tooltipContent.value !== '',
-              x: tooltipPosition.value.x,
-              y: tooltipPosition.value.y
-            })
-          : null
+      const tooltip = props.showTooltip
+        ? h(ChartTooltip, {
+            content: tooltipContent.value,
+            open: hoveredPoint.value !== null && tooltipContent.value !== '',
+            x: tooltipPosition.value.x,
+            y: tooltipPosition.value.y
+          })
+        : null
 
       if (!props.showLegend) {
         return h('div', { class: 'inline-block relative' }, [chart, tooltip])

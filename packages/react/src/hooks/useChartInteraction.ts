@@ -14,6 +14,11 @@ import {
 export interface UseChartInteractionOptions<T = unknown> {
   /** Enable hover highlight */
   hoverable: boolean
+  /**
+   * Track hover for ChartTooltip without requiring highlight.
+   * Default true. Independent of `hoverable`.
+   */
+  showTooltip?: boolean
   /** Controlled hovered index from props */
   hoveredIndexProp?: number | null
   /** Enable click selection */
@@ -92,6 +97,7 @@ export function useChartInteraction<T = unknown>(
 ): UseChartInteractionReturn {
   const {
     hoverable,
+    showTooltip = true,
     hoveredIndexProp,
     selectable,
     selectedIndexProp,
@@ -148,17 +154,18 @@ export function useChartInteraction<T = unknown>(
   // Event handlers
   const handleMouseEnter = useCallback(
     (index: number, event: React.MouseEvent) => {
-      if (!hoverable) return
+      if (!hoverable && !showTooltip) return
       if (hoveredIndexProp === undefined) {
         setLocalHoveredIndex(index)
       }
       setTooltipPosition({ x: event.clientX, y: event.clientY })
+      if (!hoverable) return
       onHoveredIndexChange?.(index)
       if (callbacks?.onHover && getData) {
         callbacks.onHover(index, getData(index) ?? null)
       }
     },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange, callbacks, getData]
+    [hoverable, showTooltip, hoveredIndexProp, onHoveredIndexChange, callbacks, getData]
   )
 
   const handleMouseMove = useCallback(
@@ -170,13 +177,14 @@ export function useChartInteraction<T = unknown>(
 
   const handleMouseLeave = useCallback(() => {
     tooltipScheduler.cancel()
-    if (!hoverable) return
+    if (!hoverable && !showTooltip) return
     if (hoveredIndexProp === undefined) {
       setLocalHoveredIndex(null)
     }
+    if (!hoverable) return
     onHoveredIndexChange?.(null)
     callbacks?.onHover?.(null, null)
-  }, [hoverable, tooltipScheduler, hoveredIndexProp, onHoveredIndexChange, callbacks])
+  }, [hoverable, showTooltip, tooltipScheduler, hoveredIndexProp, onHoveredIndexChange, callbacks])
 
   const handleClick = useCallback(
     (index: number) => {

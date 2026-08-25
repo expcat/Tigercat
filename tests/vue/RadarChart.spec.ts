@@ -116,6 +116,21 @@ describe('RadarChart', () => {
     })
   })
 
+  it('opens the tooltip on point hover without hoverable', async () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      showTooltip: true
+    })
+
+    const point = container.querySelector('circle[data-radar-point][data-point-index="0"]')!
+    expect(point.getAttribute('class') || '').not.toContain('cursor-pointer')
+    await fireEvent.mouseEnter(point)
+    const tooltip = document.body.querySelector('[data-chart-tooltip]')
+    expect(tooltip).toBeTruthy()
+    expect(tooltip).toHaveAttribute('role', 'tooltip')
+    expect(tooltip?.classList.contains('opacity-0')).toBe(false)
+  })
+
   it('selects series on click when selectable', async () => {
     const user = userEvent.setup()
     const { container } = renderWithProps(RadarChart, {
