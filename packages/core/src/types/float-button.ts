@@ -101,4 +101,23 @@ export interface FloatButtonGroupProps {
    * Additional CSS class name
    */
   className?: string
+
+  /**
+   * Viewport corner used for the group.
+   * @default 'bottom-right'
+   */
+  placement?: ViewportPlacement
+
+  /**
+   * Viewport offset used with placement.
+   * @default 24
+   */
+  offset?: ViewportOffset
+
+  /**
+   * Whether to portal the group to `document.body`.
+   * When false, the group is positioned `absolute` in place so a relative ancestor can contain it.
+   * @default true
+   */
+  portal?: boolean
 }

@@ -62,7 +62,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #30 | Affix offsetBottom relative to target | done | this commit | 2026-08-25 |
 | #31 | DropdownItem close-on-click | done | this commit | 2026-08-25 |
 | #32 | Anchor / ScrollSpy current item | done | this commit | 2026-08-25 |
-| #19–#20, #33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #33 | FloatButton default plus + Group placement/offset/portal | done | this commit | 2026-08-25 |
+| #19–#20, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -696,3 +697,19 @@ Anchor / ScrollSpy current item is last-at-offset-line (Vue + React via core hel
 Pages /anchor 「容器滚动」点「发布」and /scroll-spy last item keep the highlight. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #33 FloatButton (default plus icon; Group placement/offset, optional portal; do not touch iframe/T5).
+
+## #33 notes
+
+FloatButton default plus + Group placement/offset/portal (Vue + React via core helpers):
+
+- Empty default slot / children render `floatButtonPlusIconPath` (`M12 5v14M5 12h14`) in an `aria-hidden` SVG sized by `floatButtonIconSizeClasses`
+- Explicit children / default slot still win; last-resort `aria-label` is `ariaLabel ?? tooltip ?? 'Add'` only on the default-icon path
+- Group public `placement` (default `bottom-right`) / `offset` (default 24) use `viewportPlacementClasses` + `getViewportOffsetStyle`
+- Group public `portal` (default true) still Teleports / createPortals to body as `fixed`; `portal={false}` is in-place `absolute`
+- `floatButtonGroupClasses` no longer hardcodes `fixed right-6 bottom-6`; `getFloatButtonGroupClasses` keeps Vue/React aligned
+- float-button/01 Vue+React set `portal={false}` inside the existing `relative h-56` shell
+- iframe/T5, DemoBlock, Vue aria-label-vs-tooltip P2, #20, #35, #38 left alone
+
+Pages /float-button 「悬浮按钮组」 stays in the h-56 box; empty circle/square is no longer icon-less. Public API addition + behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #35 Table virtual scroll box (React overflow only around the table body, not export/Pagination; do not touch iframe/T5).

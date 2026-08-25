@@ -11,8 +11,10 @@ export default function App() {
         trigger="click"
         open={open}
         onOpenChange={setOpen}
-        triggerNode={<FloatButton ariaLabel="打开操作组" tooltip="操作" />}
-        style={{ position: 'absolute', right: 24, bottom: 24 }}>
+        portal={false}
+        placement="bottom-right"
+        offset={24}
+        triggerNode={<FloatButton ariaLabel="打开操作组" tooltip="操作" />}>
         <FloatButton type="default" ariaLabel="编辑" tooltip="编辑" />
         <FloatButton type="default" ariaLabel="分享" tooltip="分享" />
       </FloatButtonGroup>

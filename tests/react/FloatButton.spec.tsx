@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
+import { floatButtonPlusIconPath } from '@expcat/tigercat-core'
 import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-react/FloatButton'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -18,6 +19,20 @@ describe('FloatButton (React)', () => {
     it('renders children', () => {
       render(<FloatButton>Action</FloatButton>)
       expect(screen.getByText('Action')).toBeInTheDocument()
+    })
+
+    it('renders a plus SVG when children are omitted', () => {
+      const { container } = render(<FloatButton />)
+      const svg = container.querySelector('svg')
+      expect(svg).not.toBeNull()
+      expect(svg).toHaveAttribute('aria-hidden', 'true')
+      expect(svg?.querySelector('path')?.getAttribute('d')).toBe(floatButtonPlusIconPath)
+    })
+
+    it('does not render the plus path when children are provided', () => {
+      const { container } = render(<FloatButton>Action</FloatButton>)
+      expect(screen.getByText('Action')).toBeInTheDocument()
+      expect(container.querySelector('path')?.getAttribute('d')).not.toBe(floatButtonPlusIconPath)
     })
 
     it('has type="button"', () => {
@@ -177,6 +192,51 @@ describe('FloatButtonGroup (React)', () => {
     )
     const group = document.querySelector('.custom-group')
     expect(group).toBeInTheDocument()
+  })
+
+  it('portals to document.body as fixed when portal is omitted', () => {
+    render(
+      <FloatButtonGroup className="portal-default-group" triggerNode={<button>Open</button>} />
+    )
+    const group = document.body.querySelector('.portal-default-group')
+    expect(group).toBeTruthy()
+    expect(group).toHaveClass('fixed')
+    expect(group?.parentElement).toBe(document.body)
+  })
+
+  it('renders in place with absolute when portal is false', () => {
+    const { container } = render(
+      <div className="relative" data-testid="shell">
+        <FloatButtonGroup
+          portal={false}
+          className="in-place-group"
+          triggerNode={<button>Open</button>}
+        />
+      </div>
+    )
+    const shell = container.querySelector('[data-testid="shell"]')
+    const group = shell?.querySelector('.in-place-group')
+    expect(group).toBeTruthy()
+    expect(group).toHaveClass('absolute')
+    expect(group).not.toHaveClass('fixed')
+    expect(group?.parentElement).not.toBe(document.body)
+  })
+
+  it('applies placement and offset styles', () => {
+    render(
+      <FloatButtonGroup
+        portal={false}
+        placement="bottom-left"
+        offset={{ x: 32, y: '3rem' }}
+        className="placed-group"
+        triggerNode={<button>Open</button>}
+      />
+    )
+    const group = document.querySelector('.placed-group') as HTMLElement | null
+    expect(group).toHaveClass('bottom-0')
+    expect(group).toHaveClass('left-0')
+    expect(group?.style.left).toBe('32px')
+    expect(group?.style.bottom).toBe('3rem')
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {

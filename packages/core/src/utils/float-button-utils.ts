@@ -4,6 +4,9 @@
  */
 
 import type { FloatButtonShape, FloatButtonSize } from '../types/float-button'
+import type { ViewportPlacement } from '../types/viewport'
+import { classNames } from './class-names'
+import { viewportFloatingBaseClasses, viewportPlacementClasses } from './viewport-floating-utils'
 
 // ---------------------------------------------------------------------------
 // Base classes
@@ -36,10 +39,24 @@ export const floatButtonDisabledClasses = 'opacity-50 cursor-not-allowed pointer
 // Group classes
 // ---------------------------------------------------------------------------
 
-export const floatButtonGroupClasses =
-  'fixed right-6 bottom-6 z-50 flex flex-col-reverse items-center gap-3'
+export const floatButtonGroupClasses = 'z-50 flex flex-col-reverse items-center gap-3'
 
 export const floatButtonGroupExpandClasses = 'transition-all duration-200 ease-in-out'
+
+export function getFloatButtonGroupClasses(
+  options: {
+    placement?: ViewportPlacement
+    portal?: boolean
+  } = {}
+): string {
+  const placement = options.placement ?? 'bottom-right'
+  const portal = options.portal ?? true
+  return classNames(
+    portal ? viewportFloatingBaseClasses : 'absolute z-50',
+    viewportPlacementClasses[placement],
+    floatButtonGroupClasses
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Icon size
@@ -50,3 +67,6 @@ export const floatButtonIconSizeClasses: Record<FloatButtonSize, string> = {
   md: 'h-5 w-5',
   lg: 'h-6 w-6'
 }
+
+/** Default plus glyph (24 viewBox stroke), used when FloatButton has no children. */
+export const floatButtonPlusIconPath = 'M12 5v14M5 12h14'
