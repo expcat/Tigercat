@@ -168,14 +168,17 @@ export const FormWizard: React.FC<FormWizardProps> = ({
 
   const handleStepChange = useCallback(
     async (nextIndex: number) => {
-      if (nextIndex === currentIndex || steps[nextIndex]?.disabled) return
-      if (nextIndex > currentIndex) {
+      if (nextIndex === currentIndex) return
+      const direction: 1 | -1 = nextIndex > currentIndex ? 1 : -1
+      if (direction === 1) {
         const ok = await runBeforeNext()
         if (!ok) return
       }
-      setCurrent(nextIndex)
+      const target = findNextUnskipped(nextIndex, direction)
+      if (target === currentIndex) return
+      setCurrent(target)
     },
-    [currentIndex, runBeforeNext, setCurrent, steps]
+    [currentIndex, runBeforeNext, setCurrent, findNextUnskipped]
   )
 
   const contentNode = useMemo(() => {

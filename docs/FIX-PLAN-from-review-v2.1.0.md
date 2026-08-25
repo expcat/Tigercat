@@ -79,7 +79,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-10 | Chart showTooltip / hoverable | done | this commit | 2026-08-25 |
 | P2-11 | Chart responsive scale | done | this commit | 2026-08-25 |
 | P2-12 | Chat / Comment / Activity / Notification copy to locale | done | this commit | 2026-08-25 |
-| P2-13..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-13 | FormWizard skipCondition handleStepChange | done | this commit | 2026-08-25 |
+| P2-14..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -933,3 +934,17 @@ Chat / Comment / Activity / Notification default copy goes through locale (Vue +
 - T1 A0-A10 did not cover these strings. No new required prop. skipCondition / like write-back / manageReadState not in this commit
 
 Next: P2-13 FormWizard skipCondition (handleStepChange should use findNextUnskippedStep like Next). T1 A0-A10 did not cover skipCondition, so do not skip.
+
+
+## P2-13 notes
+
+FormWizard clickable handleStepChange uses findNextUnskippedStep like Next/Prev (Vue + React):
+
+- direction is +1 when the clicked index is ahead, else -1
+- forward still runs beforeNext / runStepValidation
+- landing is findNextUnskippedStep(clickedIndex, direction, steps, current); no-op if that is current
+- skipCondition and disabled both walk past; disabled-only early-return is gone
+- clickable default stays false; Next/Prev unchanged
+- T1 A0-A10 did not cover skipCondition. No new public prop.
+
+Next: P2-14 Pagination Chinese-English mix (共 N 条 through locale; showTotal default must not hardcode Chinese). T1 A0-A10 did not cover Pagination copy, so do not skip.
