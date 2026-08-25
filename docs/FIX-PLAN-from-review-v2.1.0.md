@@ -83,7 +83,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-14 | Pagination Chinese-English mix (showTotal through locale) | done | this commit | 2026-08-25 |
 | P2-15 | Code clipboard failure state + locale | done | this commit | 2026-08-25 |
 | P2-16 | Upload drag slot (honor default slot; drop bg-white / border-gray-300) | done | this commit | 2026-08-25 |
-| P2-17..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-17 | Splitter gutter (bg-gray-200 to token; gutterSize to visual width) | done | this commit | 2026-08-25 |
+| P2-18..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -988,4 +989,16 @@ Upload drag mode honors the default slot / children and drag/button chrome uses 
 
 Next: P2-17 Splitter gutter (bg-gray-200 to token; gutterSize to visual width). T1 A0-A10 did not cover gutter chrome or gutterSize visual width, so do not skip.
 
+## P2-17 notes
+
+Splitter gutter chrome uses theme tokens and public gutterSize sets visible thickness (Vue + React):
+
+- gutter bg-gray-200 -> token --tiger-border; handle bg-gray-400 -> --tiger-text-muted
+- getSplitterGutterCssVars writes --tiger-splitter-gutter from gutterSize onto the root
+- existing w-/h- var(--tiger-splitter-gutter,4px) classes now see the assigned var
+- THEME_CSS_VARS not registered (per-instance size, not a theme color)
+- controlled sizes overwrite / React children deps left for a later P2
+- T1 A0-A10 did not cover gutter chrome or gutterSize visual width. No new required prop.
+
+Next: P2-18 Radar split disk (do not punch --tiger-bg,#ffffff; splitArea follows dark). Check T1 A0-A10 before skipping.
 

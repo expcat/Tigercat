@@ -3,6 +3,7 @@ import {
   classNames,
   getSplitterContainerClasses,
   getSplitterGutterClasses,
+  getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
   getPaneStyle,
   resizePanes,
@@ -175,7 +176,11 @@ export const Splitter: React.FC<SplitterProps> = ({
   )
 
   return (
-    <div ref={containerRef} className={containerClasses} style={style} data-direction={direction}>
+    <div
+      ref={containerRef}
+      className={containerClasses}
+      style={{ ...style, ...getSplitterGutterCssVars(gutterSize) }}
+      data-direction={direction}>
       {childArray.map((child, i) => {
         const size = paneSizes[i]
         const paneStyle = size != null ? getPaneStyle(size, direction) : undefined

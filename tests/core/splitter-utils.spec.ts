@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   getSplitterContainerClasses,
   getSplitterGutterClasses,
+  getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
   parsePaneSize,
   calculateInitialSizes,
@@ -41,6 +42,14 @@ describe('splitter-utils', () => {
       expect(classes).toContain('cursor-col-resize')
     })
 
+    it('uses a theme token instead of hardcoded gray-200', () => {
+      const classes = getSplitterGutterClasses('horizontal', false, false)
+      expect(classes).not.toContain('bg-gray-200')
+      expect(classes.includes('--tiger-border') || classes.includes('--tiger-surface-muted')).toBe(
+        true
+      )
+    })
+
     it('should return vertical gutter classes', () => {
       const classes = getSplitterGutterClasses('vertical', false, false)
       expect(classes).toContain('cursor-row-resize')
@@ -65,6 +74,12 @@ describe('splitter-utils', () => {
   })
 
   describe('getSplitterGutterHandleClasses', () => {
+    it('uses a theme token instead of hardcoded gray-400', () => {
+      const classes = getSplitterGutterHandleClasses('horizontal')
+      expect(classes).not.toContain('bg-gray-400')
+      expect(classes).toContain('var(--tiger-')
+    })
+
     it('should return horizontal handle classes', () => {
       const classes = getSplitterGutterHandleClasses('horizontal')
       expect(classes).toContain('w-0.5')
@@ -75,6 +90,17 @@ describe('splitter-utils', () => {
       const classes = getSplitterGutterHandleClasses('vertical')
       expect(classes).toContain('h-0.5')
       expect(classes).toContain('w-6')
+    })
+  })
+
+  describe('getSplitterGutterCssVars', () => {
+    it('returns 8px for gutterSize 8', () => {
+      expect(getSplitterGutterCssVars(8)).toEqual({ '--tiger-splitter-gutter': '8px' })
+    })
+
+    it('returns 4px for 4 and default', () => {
+      expect(getSplitterGutterCssVars(4)).toEqual({ '--tiger-splitter-gutter': '4px' })
+      expect(getSplitterGutterCssVars()).toEqual({ '--tiger-splitter-gutter': '4px' })
     })
   })
 

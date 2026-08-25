@@ -47,6 +47,14 @@ describe('Splitter', () => {
   })
 
   describe('Gutter', () => {
+    function gutterVar(container: HTMLElement): string {
+      const root = container.firstElementChild as HTMLElement
+      const fromRoot = root.style.getPropertyValue('--tiger-splitter-gutter')
+      if (fromRoot) return fromRoot
+      const gutter = container.querySelector('[role="separator"]') as HTMLElement | null
+      return gutter?.style.getPropertyValue('--tiger-splitter-gutter') ?? ''
+    }
+
     it('should have separator role', () => {
       const { container } = renderSplitter()
       const gutter = container.querySelector('[role="separator"]')
@@ -62,6 +70,21 @@ describe('Splitter', () => {
       const { container } = renderSplitter()
       const gutter = container.querySelector('[role="separator"]')
       expect(gutter?.getAttribute('tabindex')).toBe('0')
+    })
+
+    it('defaults visible gutter thickness to 4px', () => {
+      const { container } = renderSplitter()
+      expect(gutterVar(container)).toBe('4px')
+    })
+
+    it('sets visible gutter thickness from gutterSize', () => {
+      const { container } = renderSplitter({ gutterSize: 8 })
+      expect(gutterVar(container)).toBe('8px')
+    })
+
+    it('sets vertical gutter thickness from gutterSize', () => {
+      const { container } = renderSplitter({ gutterSize: 8, direction: 'vertical' })
+      expect(gutterVar(container)).toBe('8px')
     })
   })
 

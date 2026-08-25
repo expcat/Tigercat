@@ -4,6 +4,7 @@ import {
   coerceClassValue,
   getSplitterContainerClasses,
   getSplitterGutterClasses,
+  getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
   getPaneStyle,
   resizePanes,
@@ -250,7 +251,10 @@ export const Splitter = defineComponent({
         {
           ref: containerRef,
           class: containerClasses.value,
-          style: props.style,
+          style: {
+            ...props.style,
+            ...getSplitterGutterCssVars(props.gutterSize)
+          },
           'data-direction': props.direction
         },
         nodes
