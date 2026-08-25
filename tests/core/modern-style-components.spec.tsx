@@ -88,9 +88,14 @@ function expectButtonModernClasses(button: HTMLElement): void {
 }
 
 function expectInputModernClasses(input: HTMLElement): void {
-  expect(input.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-  expect(input.className).toContain('bg-[var(--tiger-surface,#ffffff)]')
-  expect(input.className).toContain('border-[var(--tiger-border,#e5e7eb)]')
+  const chrome = input.parentElement
+  expect(chrome).not.toBeNull()
+  expect(chrome!.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
+  expect(chrome!.className).toContain('bg-[var(--tiger-surface,#ffffff)]')
+  expect(chrome!.className).toContain('border-[var(--tiger-border,#e5e7eb)]')
+  expect(input.className).not.toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
+  expect(input.className).not.toContain('bg-[var(--tiger-surface,#ffffff)]')
+  expect(input.className).not.toContain('border-[var(--tiger-border,#e5e7eb)]')
 }
 
 function expectCardModernClasses(card: HTMLElement): void {
