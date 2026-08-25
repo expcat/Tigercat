@@ -232,15 +232,6 @@ export const Input = defineComponent({
       () => effectiveStatus.value === 'error' && !!effectiveErrorMessage.value
     )
 
-    const inputClasses = computed(() =>
-      getInputClasses({
-        size: effectiveSize.value,
-        status: effectiveStatus.value,
-        hasPrefix: hasPrefix.value,
-        hasSuffix: hasSuffix.value
-      })
-    )
-
     const effectiveType = computed(() => {
       if (props.showPassword && props.type === 'password') {
         return passwordVisible.value ? 'text' : 'password'
@@ -277,6 +268,14 @@ export const Input = defineComponent({
       const showClear =
         props.clearable && !props.disabled && !props.readonly && currentValStr.length > 0
       const showPasswordToggle = props.showPassword && props.type === 'password' && !props.disabled
+      const dualSuffix = !activeError.value && showClear && showPasswordToggle
+      const inputClasses = getInputClasses({
+        size: effectiveSize.value,
+        status: effectiveStatus.value,
+        hasPrefix: hasPrefix.value,
+        hasSuffix: hasSuffix.value,
+        hasDualSuffix: dualSuffix
+      })
 
       const suffixNodes: ReturnType<typeof h>[] = []
 
@@ -295,7 +294,10 @@ export const Input = defineComponent({
               'button',
               {
                 type: 'button',
-                class: getInputClearButtonClasses(effectiveSize.value),
+                class: getInputClearButtonClasses(
+                  effectiveSize.value,
+                  dualSuffix ? { offset: true } : undefined
+                ),
                 onClick: handleClear,
                 'aria-label': 'Clear input',
                 tabindex: -1
@@ -340,7 +342,7 @@ export const Input = defineComponent({
         h('input', {
           ...restAttrs,
           ref: inputRef,
-          class: inputClasses.value,
+          class: inputClasses,
           type: effectiveType.value,
           value: localValue.value,
           placeholder: props.placeholder,

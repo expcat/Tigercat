@@ -43,6 +43,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #14 | Avatar getInitials short token | done | this commit | 2026-08-25 |
 | #15 | Empty 预设一览 preview grid | done | this commit | 2026-08-25 |
 | #16 | Result 状态一览 preview grid | done | this commit | 2026-08-25 |
+| #22 | Input Vue dual buttons | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
@@ -52,7 +53,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #19–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #19–#21, #23–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -535,3 +536,17 @@ Result 状态一览 (result/02, Vue + React) no longer clips the last-row 403/50
 Pages /result 「状态一览」 shows all six statuses. Shared DemoBlock overflow-hidden / default 180 left for T5.
 
 Next: Phase D #22 Input Vue dual buttons (clearable + showPassword overlap; do not touch iframe/T5).
+
+## #22 notes
+
+Vue Input clearable + showPassword no longer stack on the same right-0:
+
+- Password toggle stays `right-0` + size `pr-2`/`pr-3`/`pr-4`
+- Clear shifts one affix slot: `right-8` sm / `right-10` md / `right-12` lg (`getInputClearButtonClasses(size, { offset: true })`)
+- Both visible → field uses double-slot `pr-16`/`pr-20`/`pr-24` via `getInputClasses({ hasDualSuffix: true })`
+- Single visible button (empty value hides clear; type !== password hides eye) stays `right-0` + one-slot `pr-*`
+- React still mutexes (clear preferred); InputGroup compact and in-field errorMessage left for #21 / #23
+
+Pages callers that set both flags can click either control. Public visual/behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #21 InputGroup compact (border/radius on Input root or compact `:focus-within`; do not touch iframe/T5).

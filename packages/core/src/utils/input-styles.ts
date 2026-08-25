@@ -42,11 +42,42 @@ const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
 
 const INPUT_PADDING: Record<
   ComponentSize,
-  { left: string; right: string; prefixLeft: string; suffixRight: string }
+  {
+    left: string
+    right: string
+    prefixLeft: string
+    suffixRight: string
+    dualSuffixRight: string
+  }
 > = {
-  sm: { left: 'pl-2', right: 'pr-2', prefixLeft: 'pl-8', suffixRight: 'pr-8' },
-  md: { left: 'pl-3', right: 'pr-3', prefixLeft: 'pl-10', suffixRight: 'pr-10' },
-  lg: { left: 'pl-4', right: 'pr-4', prefixLeft: 'pl-12', suffixRight: 'pr-12' }
+  sm: {
+    left: 'pl-2',
+    right: 'pr-2',
+    prefixLeft: 'pl-8',
+    suffixRight: 'pr-8',
+    dualSuffixRight: 'pr-16'
+  },
+  md: {
+    left: 'pl-3',
+    right: 'pr-3',
+    prefixLeft: 'pl-10',
+    suffixRight: 'pr-10',
+    dualSuffixRight: 'pr-20'
+  },
+  lg: {
+    left: 'pl-4',
+    right: 'pr-4',
+    prefixLeft: 'pl-12',
+    suffixRight: 'pr-12',
+    dualSuffixRight: 'pr-24'
+  }
+}
+
+/** One affix-slot inset so a second trailing button sits beside `right-0`. */
+const INPUT_SUFFIX_SLOT_INSET: Record<ComponentSize, string> = {
+  sm: 'right-8',
+  md: 'right-10',
+  lg: 'right-12'
 }
 
 export interface GetInputClassesOptions {
@@ -54,13 +85,20 @@ export interface GetInputClassesOptions {
   status?: InputStatus
   hasPrefix?: boolean
   hasSuffix?: boolean
+  /** Two trailing actions (clear + password) — double-slot right padding. @default false */
+  hasDualSuffix?: boolean
+}
+
+export interface GetInputTrailingButtonOptions {
+  /** Shift one affix-slot left of `right-0`. @default false */
+  offset?: boolean
 }
 
 /**
  * Get complete input class string
  */
 export function getInputClasses(options: GetInputClassesOptions = {}): string {
-  const { size = 'md', status = 'default', hasPrefix, hasSuffix } = options
+  const { size = 'md', status = 'default', hasPrefix, hasSuffix, hasDualSuffix } = options
   const pad = INPUT_PADDING[size]
 
   return classNames(
@@ -68,7 +106,7 @@ export function getInputClasses(options: GetInputClassesOptions = {}): string {
     INPUT_SIZE_CLASSES[size],
     STATUS_CLASSES[status],
     hasPrefix ? pad.prefixLeft : pad.left,
-    hasSuffix ? pad.suffixRight : pad.right
+    hasDualSuffix ? pad.dualSuffixRight : hasSuffix ? pad.suffixRight : pad.right
   )
 }
 
@@ -99,16 +137,25 @@ export function getInputErrorClasses(size: ComponentSize = 'md'): string {
   )
 }
 
+function getInputTrailingButtonClasses(size: ComponentSize, rightClass: string): string {
+  return classNames(
+    'absolute inset-y-0 flex items-center cursor-pointer',
+    rightClass,
+    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
+    INPUT_PADDING[size].right
+  )
+}
+
 /**
  * Clear button classes — positioned inside the input on the right
  * @since 0.5.0
  */
-export function getInputClearButtonClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    'absolute inset-y-0 right-0 flex items-center cursor-pointer',
-    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
-    INPUT_PADDING[size].right
-  )
+export function getInputClearButtonClasses(
+  size: ComponentSize = 'md',
+  options: GetInputTrailingButtonOptions = {}
+): string {
+  const rightClass = options.offset ? INPUT_SUFFIX_SLOT_INSET[size] : 'right-0'
+  return getInputTrailingButtonClasses(size, rightClass)
 }
 
 /**
@@ -116,11 +163,7 @@ export function getInputClearButtonClasses(size: ComponentSize = 'md'): string {
  * @since 0.5.0
  */
 export function getInputPasswordToggleClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    'absolute inset-y-0 right-0 flex items-center cursor-pointer',
-    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
-    INPUT_PADDING[size].right
-  )
+  return getInputTrailingButtonClasses(size, 'right-0')
 }
 
 /**

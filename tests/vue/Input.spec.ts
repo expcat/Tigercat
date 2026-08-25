@@ -636,6 +636,77 @@ describe('Input', () => {
     })
   })
 
+  describe('clearable + showPassword', () => {
+    const classTokens = (el: Element): string[] => el.className.split(/\s+/)
+
+    it('renders both buttons offset on the right edge', () => {
+      const { container } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: 'secret' }
+      })
+      const input = container.querySelector('input')!
+      const clearBtn = screen.getByLabelText('Clear input')
+      const eyeBtn = screen.getByLabelText('Show password')
+
+      expect(clearBtn).toBeInTheDocument()
+      expect(eyeBtn).toBeInTheDocument()
+      expect(classTokens(clearBtn)).toContain('right-10')
+      expect(classTokens(clearBtn)).not.toContain('right-0')
+      expect(classTokens(eyeBtn)).toContain('right-0')
+      expect(classTokens(eyeBtn)).not.toContain('right-10')
+      expect(classTokens(input)).toContain('pr-20')
+      expect(classTokens(input)).not.toContain('pr-10')
+    })
+
+    it('clears value when the offset clear button is clicked', async () => {
+      const { emitted } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: 'secret' }
+      })
+
+      await fireEvent.click(screen.getByLabelText('Clear input'))
+      expect(emitted()['update:modelValue']).toBeTruthy()
+      expect(emitted()['update:modelValue'][0]).toEqual([''])
+      expect(emitted()['clear']).toBeTruthy()
+    })
+
+    it('toggles input type when the offset password button is clicked', async () => {
+      const { container } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: 'secret' }
+      })
+      const input = container.querySelector('input')!
+
+      expect(input).toHaveAttribute('type', 'password')
+      await fireEvent.click(screen.getByLabelText('Show password'))
+      expect(input).toHaveAttribute('type', 'text')
+      expect(screen.getByLabelText('Hide password')).toBeInTheDocument()
+    })
+
+    it('shows only the password toggle at right-0 when the value is empty', () => {
+      const { container } = render(Input, {
+        props: { type: 'password', clearable: true, showPassword: true, modelValue: '' }
+      })
+      const input = container.querySelector('input')!
+      const eyeBtn = screen.getByLabelText('Show password')
+
+      expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
+      expect(classTokens(eyeBtn)).toContain('right-0')
+      expect(classTokens(input)).toContain('pr-10')
+      expect(classTokens(input)).not.toContain('pr-20')
+    })
+
+    it('shows only the clear button at right-0 without showPassword', () => {
+      const { container } = render(Input, {
+        props: { type: 'text', clearable: true, modelValue: 'hello' }
+      })
+      const input = container.querySelector('input')!
+      const clearBtn = screen.getByLabelText('Clear input')
+
+      expect(screen.queryByLabelText('Show password')).not.toBeInTheDocument()
+      expect(classTokens(clearBtn)).toContain('right-0')
+      expect(classTokens(input)).toContain('pr-10')
+      expect(classTokens(input)).not.toContain('pr-20')
+    })
+  })
+
   describe('showCount', () => {
     it('shows character count', () => {
       render(Input, {
