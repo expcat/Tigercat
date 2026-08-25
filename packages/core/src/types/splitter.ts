@@ -49,10 +49,12 @@ export interface SplitterProps {
    */
   direction?: SplitDirection
   /**
-   * Initial sizes of each pane in pixels.
+   * Initial sizes of each pane in pixels or percentage / px strings (`'30%'`, `'200px'`).
+   * Numbers are pixels. `'30%'` is a percent of available space (container minus gutters).
+   * `'200px'` and bare numeric strings (`'250'`) are pixels.
    * If not provided, panes split equally.
    */
-  sizes?: number[]
+  sizes?: (number | string)[]
   /**
    * Minimum size of any pane in pixels
    * @default 0

@@ -6,6 +6,7 @@ import {
   getSplitterGutterHandleClasses,
   getPaneStyle,
   resizePanes,
+  resolveInitialPaneSizes,
   createDocumentDragSession,
   type DocumentDragSession,
   type SplitterProps as CoreSplitterProps
@@ -60,25 +61,21 @@ export const Splitter: React.FC<SplitterProps> = ({
   // Initialize / sync sizes from container dimensions
   useEffect(() => {
     const el = containerRef.current
-    if (!el) return
     const paneCount = React.Children.count(children)
     if (paneCount === 0) return
-    const totalGutter = (paneCount - 1) * gutterSize
-    const total =
-      direction === 'horizontal' ? el.clientWidth - totalGutter : el.clientHeight - totalGutter
-
-    if (controlledSizes && controlledSizes.length > 0) {
-      // `sizes` are pixel values (per the documented contract); use them as-is
-      // instead of proportionally re-normalizing to the container, so the
-      // semantics match Vue and the public docs.
-      setPaneSizes([...controlledSizes])
-    } else {
-      if (total > 0) {
-        const eachSize = total / paneCount
-        setPaneSizes(Array.from({ length: paneCount }, () => eachSize))
-      }
+    const containerSize = el ? (direction === 'horizontal' ? el.clientWidth : el.clientHeight) : 0
+    const resolved = resolveInitialPaneSizes(
+      paneCount,
+      containerSize,
+      gutterSize,
+      controlledSizes,
+      min,
+      max
+    )
+    if (resolved) {
+      setPaneSizes(resolved)
     }
-  }, [children, direction, gutterSize, controlledSizes])
+  }, [children, direction, gutterSize, controlledSizes, min, max])
 
   const paneCount = paneSizes.length
   const mins = useMemo(() => Array.from({ length: paneCount }, () => min), [paneCount, min])

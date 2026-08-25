@@ -6,6 +6,7 @@ import {
   parsePaneSize,
   calculateInitialSizes,
   clampPaneSize,
+  resolveInitialPaneSizes,
   resizePanes,
   getPaneStyle,
   sizesToPercentages,
@@ -165,6 +166,32 @@ describe('splitter-utils', () => {
 
     it('should handle min = max', () => {
       expect(clampPaneSize(500, 200, 200)).toBe(200)
+    })
+  })
+
+  describe('resolveInitialPaneSizes', () => {
+    it('parses percentage sizes against available space', () => {
+      const sizes = resolveInitialPaneSizes(2, 1000, 4, ['30%', '70%'])
+      const available = 1000 - 4
+      expect(sizes).not.toBeNull()
+      expect(sizes![0]).toBeCloseTo(0.3 * available)
+      expect(sizes![1]).toBeCloseTo(0.7 * available)
+    })
+
+    it('clamps numeric sizes to min when container is unavailable', () => {
+      const sizes = resolveInitialPaneSizes(2, 0, 4, [30, 70], 100)
+      expect(sizes).not.toBeNull()
+      expect(sizes![0]).toBeGreaterThanOrEqual(100)
+      expect(sizes![1]).toBeGreaterThanOrEqual(100)
+      expect(sizes).toEqual([100, 100])
+    })
+
+    it('keeps [400, 400] unchanged when min is 0', () => {
+      expect(resolveInitialPaneSizes(2, 0, 4, [400, 400], 0)).toEqual([400, 400])
+    })
+
+    it('returns null for percentage sizes when container is 0', () => {
+      expect(resolveInitialPaneSizes(2, 0, 4, ['30%', '70%'])).toBeNull()
     })
   })
 

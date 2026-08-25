@@ -132,6 +132,42 @@ export function clampPaneSize(size: number, min: number, max?: number): number {
   return result
 }
 
+function isPercentagePaneSize(size: number | string): boolean {
+  return typeof size === 'string' && size.trim().endsWith('%')
+}
+
+/**
+ * Parse initial pane sizes (px numbers or `'30%'` / `'200px'` strings) and clamp each to min/max.
+ * When `containerSize` is 0 or negative:
+ * - numeric / px / bare-number sizes still resolve as pixels and are clamped
+ * - percentage strings are not parsed against a 0/negative available space; returns null
+ * - equal-split (no sizes) returns null until a real container measure exists
+ */
+export function resolveInitialPaneSizes(
+  paneCount: number,
+  containerSize: number,
+  gutterSize: number,
+  sizes?: (number | string)[],
+  min = 0,
+  max?: number
+): number[] | null {
+  if (paneCount <= 0) return null
+
+  const provided = sizes && sizes.length === paneCount ? sizes : undefined
+  const hasPercent = provided != null && provided.some(isPercentagePaneSize)
+
+  if (containerSize <= 0) {
+    if (hasPercent || !provided) return null
+    return calculateInitialSizes(paneCount, 0, gutterSize, provided).map((s) =>
+      clampPaneSize(s, min, max)
+    )
+  }
+
+  return calculateInitialSizes(paneCount, containerSize, gutterSize, provided).map((s) =>
+    clampPaneSize(s, min, max)
+  )
+}
+
 /**
  * Resize two adjacent panes based on a drag delta.
  * Returns new sizes array or null if resize is invalid.

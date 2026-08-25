@@ -7,6 +7,7 @@ import {
   getSplitterGutterHandleClasses,
   getPaneStyle,
   resizePanes,
+  resolveInitialPaneSizes,
   createDocumentDragSession,
   type DocumentDragSession,
   type SplitDirection
@@ -14,7 +15,7 @@ import {
 
 export interface VueSplitterProps {
   direction?: SplitDirection
-  sizes?: number[]
+  sizes?: (number | string)[]
   min?: number
   max?: number
   gutterSize?: number
@@ -31,7 +32,7 @@ export const Splitter = defineComponent({
       default: 'horizontal' as SplitDirection
     },
     sizes: {
-      type: Array as PropType<number[]>,
+      type: Array as PropType<(number | string)[]>,
       default: undefined
     },
     min: {
@@ -68,35 +69,48 @@ export const Splitter = defineComponent({
     const startSizes = ref<number[]>([])
     let dragSession: DocumentDragSession | null = null
 
-    // Sync controlled sizes
-    watch(
-      () => props.sizes,
-      (newSizes) => {
-        if (newSizes) paneSizes.value = [...newSizes]
-      },
-      { immediate: true }
-    )
-
-    const initSizes = () => {
-      if (props.sizes && props.sizes.length > 0) {
-        paneSizes.value = [...props.sizes]
-        return
-      }
+    const getPaneCount = (): number => {
+      if (props.sizes && props.sizes.length > 0) return props.sizes.length
       const el = containerRef.value
-      if (!el) return
-      const slotChildren = slots.default?.() || []
-      const paneCount = slotChildren.length
-      if (paneCount === 0) return
-      const totalGutter = (paneCount - 1) * props.gutterSize
-      const total =
-        props.direction === 'horizontal'
-          ? el.clientWidth - totalGutter
-          : el.clientHeight - totalGutter
-      const eachSize = total / paneCount
-      paneSizes.value = Array.from({ length: paneCount }, () => eachSize)
+      if (!el) return 0
+      let n = 0
+      for (let i = 0; i < el.children.length; i++) {
+        if (el.children[i].classList.contains('tiger-splitter-pane')) n++
+      }
+      return n
     }
 
-    onMounted(initSizes)
+    const resolveAndApplySizes = () => {
+      const paneCount = getPaneCount()
+      if (paneCount === 0) return
+      const el = containerRef.value
+      const containerSize = el
+        ? props.direction === 'horizontal'
+          ? el.clientWidth
+          : el.clientHeight
+        : 0
+      const resolved = resolveInitialPaneSizes(
+        paneCount,
+        containerSize,
+        props.gutterSize,
+        props.sizes,
+        props.min,
+        props.max
+      )
+      if (resolved) {
+        paneSizes.value = resolved
+      }
+    }
+
+    watch(
+      () => [props.sizes, props.min, props.max, props.gutterSize, props.direction] as const,
+      () => {
+        resolveAndApplySizes()
+      },
+      { immediate: true, deep: true }
+    )
+
+    onMounted(resolveAndApplySizes)
 
     const containerClasses = computed(() =>
       classNames(

@@ -6,7 +6,7 @@ import { Splitter } from '@expcat/tigercat-vue/Splitter'
   <div class="min-w-0">
     <Splitter
       direction="horizontal"
-      :sizes="[30, 70]"
+      :sizes="['30%', '70%']"
       :min="100"
       style="height: 200px; border: 1px solid #e5e7eb; border-radius: 8px">
       <div class="p-4">左侧面板（最小 100px）</div>
