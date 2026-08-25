@@ -181,6 +181,15 @@ describe('QRCode', () => {
     expect(rects1).toBeGreaterThan(1)
     expect(rects2).toBeGreaterThan(1)
   })
+
+  it('renders the same module-rect count for the same value and size', () => {
+    const { container: a } = renderWithProps(QRCode, { value: 'https://tigercat.dev', size: 128 })
+    const { container: b } = renderWithProps(QRCode, { value: 'https://tigercat.dev', size: 128 })
+    const countA = a.querySelectorAll('svg rect').length
+    const countB = b.querySelectorAll('svg rect').length
+    expect(countA).toBe(countB)
+    expect(countA).toBeGreaterThan(1)
+  })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(QRCode, {

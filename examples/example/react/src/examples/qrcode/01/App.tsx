@@ -7,7 +7,6 @@ export default function App() {
       size={160}
       color="#2563eb"
       bgColor="#eff6ff"
-      level="H"
     />
   )
 }

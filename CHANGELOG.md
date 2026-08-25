@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **QRCode 移除未使用的 level**：Vue / React / core 去掉未使用的 `level` prop 与 `QRCodeLevel` 类型；剩余 QRCode 是装饰性哈希矩阵（不可扫描）；Pages `/qrcode` 不再宣传 L/M/Q/H 纠错级别。公开 API 删除，无主题变量变化。
 - **Avatar getInitials 短 token 原样显示**：Vue / React 经 core `getInitials` 对无空格且长度 ≤2 的 `text` 原样（再 `toUpperCase`）显示，`text="TC"` 不再只剩 **T**。Pages `/avatar`「代表外观」方块 logo 与示例一致。公开视觉/行为修复，无主题变量变化。
 - **Rate 半星左半裁剪**：Vue / React 半星层保持 `overflow-hidden` 宽 50%，内部 glyph 使用 `w-[200%] h-full`（core `rateHalfStarInnerClasses`），裁出满宽星的左半而不是把 SVG 压进半宽盒。Pages `/rate` 只读 4.5 第 5 颗星不再变瘦。公开视觉/行为修复，无主题变量变化。
 - **ButtonGroup 子按钮组选择器**：Vue / React 经 core `buttonGroupItemClasses` / `buttonGroupItemVerticalClasses` 把组根上的 `[&:first-child]` 自选择器改为 `[&>*:first-child]` / last / middle（对齐 InputGroup compact），并用 `!` 覆盖 Button 的 `rounded-[var(--tiger-radius-md)]`，相邻按钮共享直边与 `-ml-px` / `-mt-px` 叠缝，不再各自胶囊。公开视觉/行为修复，无主题变量变化。

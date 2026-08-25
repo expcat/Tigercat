@@ -41,7 +41,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #12 | ButtonGroup child selectors | done | this commit | 2026-08-25 |
 | #13 | Rate half-star clip | done | this commit | 2026-08-25 |
 | #14 | Avatar getInitials short token | done | this commit | 2026-08-25 |
-| #15–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
+| #15–#16, #18–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -366,3 +367,18 @@ Avatar getInitials short token in core `avatar-utils.ts`:
 Pages `/avatar` 代表外观 `text="TC"` shows TC, not T. Public visual/behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #15 Empty 预设一览 (preview shell min-h / overflow-auto so the 5th card is not clipped).
+
+
+## #17 notes
+
+QRCode public `level` removed; matrix stays hash-based decorative:
+
+- core `QRCodeProps` drops `level`; `QRCodeLevel` type removed
+- Vue/React drop the unused `level` prop / `_level` binding
+- `generateQRMatrix` algorithm unchanged; JSDoc marks decorative / not scannable
+- examples 01 drop `level="H"`; 02 drop the L/M/Q/H row; demo.json no longer claims ECC
+- CHANGELOG unpublished records the public API removal
+
+Pages `/qrcode` no longer advertises L/M/Q/H. Refresh a11y / overlay / quiet zone / ImagePreview left.
+
+Next: Phase D #18 ImagePreview maskClosable (click mask closes, align ImageViewer).
