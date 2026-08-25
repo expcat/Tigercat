@@ -66,7 +66,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #35 | Table virtual scroll box overflow only around body | done | this commit | 2026-08-25 |
 | #38 | Sunburst showLabels midAngle labels | done | this commit | 2026-08-25 |
 | #20 | ImagePreview/ImageViewer iframe (Phase E T5) | done | this commit | 2026-08-25 |
-| T5 | Pages sandbox viewport | pending | | |
+| T5 | Pages sandbox viewport | done | this commit | 2026-08-25 |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
 ## A0 notes
@@ -753,4 +753,21 @@ ImagePreview / ImageViewer iframe first cut (Phase E T5 / C table #20):
 
 Public visual fix recorded in CHANGELOG unpublished.
 
-Next: leftover T5 / P2-1 Pages sandbox viewport (DatePicker/Modal/Tour/Spotlight/CropUpload stretch or raise; do not blindly raise every iframe). Then Phase F 5.2.3 P2-2..20 (skip if T1 already covers). P2-15 clipboard / allow-same-origin is a later T5 slice.
+Next: leftover T5 / P2-1 landed in this T5 second cut. Phase F starts at P2-2 Message / Alert token (T1 did not cover message/alert chrome). P2-15 clipboard / allow-same-origin and srcdoc dark: sync stay later leftover T5 slices, not a third viewport knife.
+
+
+## T5 notes
+
+Pages sandbox viewport second cut (Phase E T5 leftover / P2-1 overlay demos):
+
+- datepicker/01-03, timepicker/01-02, cascader/01-02, modal/01-04, drawer/01-03, tour/01-02, loading/02-03, spotlight/01-02, dropdown/01-02, crop-upload/01-02 (Vue+React) `viewport.minHeight` 560, `mode: auto`, `maxHeight` 720, no frozen `height`
+- tour/02 had no viewport; the auto 560/720 object was added
+- loading/01 inline stays 120; loading-bar / message / notification / context-menu / navigation-menu / #20 image demos not bulk-bumped
+- DemoBlock, sandbox.ts, allow-same-origin, srcdoc dark: sync, /container, /back-top left alone
+- #20 ImagePreview 90vh/90vw + preview demo floors already landed
+
+Viewport-raising for preview + named overlays is complete. No third T5 viewport knife. Leftover T5 theme slices (not this row): srcdoc `dark:` sync; P2-15 clipboard / `allow-same-origin`; P3 `/container` and `/back-top` → `/backtop`.
+
+Example-only / Pages visual fix recorded in CHANGELOG unpublished.
+
+Next: Phase F Review 5.2.3 P2-2 Message / Alert token (write `--tiger-message-*` / `--tiger-alert-*` or bg follow surface). T1 A0-A10 did not cover Message/Alert chrome, so do not skip P2-2. Then P2-3 Menu `theme="light"` (skip later P2 rows only if T1 already covers that row).
