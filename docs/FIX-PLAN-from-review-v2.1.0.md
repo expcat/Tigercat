@@ -67,7 +67,9 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #38 | Sunburst showLabels midAngle labels | done | this commit | 2026-08-25 |
 | #20 | ImagePreview/ImageViewer iframe (Phase E T5) | done | this commit | 2026-08-25 |
 | T5 | Pages sandbox viewport | done | this commit | 2026-08-25 |
-| P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
+| P2-1 | Pages sandbox viewport (T5 leftover overlays) | done | this commit | 2026-08-25 |
+| P2-2 | Message / Alert token | done | this commit | 2026-08-25 |
+| P2-3..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -771,3 +773,21 @@ Viewport-raising for preview + named overlays is complete. No third T5 viewport 
 Example-only / Pages visual fix recorded in CHANGELOG unpublished.
 
 Next: Phase F Review 5.2.3 P2-2 Message / Alert token (write `--tiger-message-*` / `--tiger-alert-*` or bg follow surface). T1 A0-A10 did not cover Message/Alert chrome, so do not skip P2-2. Then P2-3 Menu `theme="light"` (skip later P2 rows only if T1 already covers that row).
+
+
+## P2-2 notes
+
+Message / Alert chrome in `packages/core/src/utils/message-utils.ts` `defaultMessageThemeColors` and `packages/core/src/theme-runtime/colors.ts` `defaultAlertThemeColors`:
+
+- Message info/success/warning/error bg: `--tiger-message-*-bg` -> `--tiger-surface` (`#ffffff` last-resort)
+- Message text/icon: `--tiger-message-*-text/icon` -> `--tiger-info` / `--tiger-success` / `--tiger-warning` / `--tiger-error`
+- Message border: `--tiger-message-*-border` -> `--tiger-border` (`#e5e7eb` last-resort)
+- Message loading bg last-resort aligned `#f3f4f6` -> `#f9fafb` (still `--tiger-surface-muted`)
+- Alert bg: `--tiger-alert-*-bg` -> `--tiger-surface` (`#ffffff` last-resort)
+- Alert title/icon/close/focus: registered status tokens
+- Alert description: `--tiger-text-secondary` (`#6b7280` last-resort)
+- Alert closeButtonHover: `--tiger-surface-muted` (`#f9fafb` last-resort)
+
+`--tiger-message-*` / `--tiger-alert-*` stay optional first `var()` overrides only; not registered in `THEME_CSS_VARS`. Vue/React consume the core maps. Dark default surface is `#111827` + status ink (`#4ade80` / `#fbbf24` / `#f87171` / `#60a5fa`).
+
+Next: P2-3 Menu `theme="light"` (default follow `html.dark`, do not lock `--tiger-surface` to `#ffffff`). T1 A0-A10 did not cover Menu theme lock, so do not skip.

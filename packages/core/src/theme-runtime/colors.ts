@@ -721,44 +721,50 @@ export interface AlertThemeColors {
  */
 export const defaultAlertThemeColors: AlertThemeColors = {
   success: {
-    bg: 'bg-[var(--tiger-alert-success-bg,#f0fdf4)]',
-    border: 'border-[var(--tiger-alert-success-border,#bbf7d0)]',
-    icon: 'text-[var(--tiger-alert-success-icon,#22c55e)]',
-    title: 'text-[var(--tiger-alert-success-title,#166534)]',
-    description: 'text-[var(--tiger-alert-success-description,#15803d)]',
-    closeButton: 'text-[var(--tiger-alert-success-close,#22c55e)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-alert-success-close-hover-bg,#dcfce7)]',
-    focus: 'focus:ring-[color:var(--tiger-alert-success-ring,#22c55e)]'
+    bg: 'bg-[var(--tiger-alert-success-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-alert-success-border,var(--tiger-border,#e5e7eb))]',
+    icon: 'text-[var(--tiger-alert-success-icon,var(--tiger-success,#16a34a))]',
+    title: 'text-[var(--tiger-alert-success-title,var(--tiger-success,#16a34a))]',
+    description:
+      'text-[var(--tiger-alert-success-description,var(--tiger-text-secondary,#6b7280))]',
+    closeButton: 'text-[var(--tiger-alert-success-close,var(--tiger-success,#16a34a))]',
+    closeButtonHover:
+      'hover:bg-[var(--tiger-alert-success-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
+    focus: 'focus:ring-[color:var(--tiger-alert-success-ring,var(--tiger-success,#16a34a))]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-alert-warning-bg,#fefce8)]',
-    border: 'border-[var(--tiger-alert-warning-border,#fef08a)]',
-    icon: 'text-[var(--tiger-alert-warning-icon,#eab308)]',
-    title: 'text-[var(--tiger-alert-warning-title,#854d0e)]',
-    description: 'text-[var(--tiger-alert-warning-description,#a16207)]',
-    closeButton: 'text-[var(--tiger-alert-warning-close,#eab308)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-alert-warning-close-hover-bg,#fef9c3)]',
-    focus: 'focus:ring-[color:var(--tiger-alert-warning-ring,#eab308)]'
+    bg: 'bg-[var(--tiger-alert-warning-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-alert-warning-border,var(--tiger-border,#e5e7eb))]',
+    icon: 'text-[var(--tiger-alert-warning-icon,var(--tiger-warning,#d97706))]',
+    title: 'text-[var(--tiger-alert-warning-title,var(--tiger-warning,#d97706))]',
+    description:
+      'text-[var(--tiger-alert-warning-description,var(--tiger-text-secondary,#6b7280))]',
+    closeButton: 'text-[var(--tiger-alert-warning-close,var(--tiger-warning,#d97706))]',
+    closeButtonHover:
+      'hover:bg-[var(--tiger-alert-warning-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
+    focus: 'focus:ring-[color:var(--tiger-alert-warning-ring,var(--tiger-warning,#d97706))]'
   },
   error: {
-    bg: 'bg-[var(--tiger-alert-error-bg,#fef2f2)]',
-    border: 'border-[var(--tiger-alert-error-border,#fecaca)]',
-    icon: 'text-[var(--tiger-alert-error-icon,#ef4444)]',
-    title: 'text-[var(--tiger-alert-error-title,#991b1b)]',
-    description: 'text-[var(--tiger-alert-error-description,#b91c1c)]',
-    closeButton: 'text-[var(--tiger-alert-error-close,#ef4444)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-alert-error-close-hover-bg,#fee2e2)]',
-    focus: 'focus:ring-[color:var(--tiger-alert-error-ring,#ef4444)]'
+    bg: 'bg-[var(--tiger-alert-error-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-alert-error-border,var(--tiger-border,#e5e7eb))]',
+    icon: 'text-[var(--tiger-alert-error-icon,var(--tiger-error,#dc2626))]',
+    title: 'text-[var(--tiger-alert-error-title,var(--tiger-error,#dc2626))]',
+    description: 'text-[var(--tiger-alert-error-description,var(--tiger-text-secondary,#6b7280))]',
+    closeButton: 'text-[var(--tiger-alert-error-close,var(--tiger-error,#dc2626))]',
+    closeButtonHover:
+      'hover:bg-[var(--tiger-alert-error-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
+    focus: 'focus:ring-[color:var(--tiger-alert-error-ring,var(--tiger-error,#dc2626))]'
   },
   info: {
-    bg: 'bg-[var(--tiger-alert-info-bg,#eff6ff)]',
-    border: 'border-[var(--tiger-alert-info-border,#bfdbfe)]',
-    icon: 'text-[var(--tiger-alert-info-icon,#3b82f6)]',
-    title: 'text-[var(--tiger-alert-info-title,#1e40af)]',
-    description: 'text-[var(--tiger-alert-info-description,#1d4ed8)]',
-    closeButton: 'text-[var(--tiger-alert-info-close,#3b82f6)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-alert-info-close-hover-bg,#dbeafe)]',
-    focus: 'focus:ring-[color:var(--tiger-alert-info-ring,#3b82f6)]'
+    bg: 'bg-[var(--tiger-alert-info-bg,var(--tiger-surface,#ffffff))]',
+    border: 'border-[var(--tiger-alert-info-border,var(--tiger-border,#e5e7eb))]',
+    icon: 'text-[var(--tiger-alert-info-icon,var(--tiger-info,#3b82f6))]',
+    title: 'text-[var(--tiger-alert-info-title,var(--tiger-info,#3b82f6))]',
+    description: 'text-[var(--tiger-alert-info-description,var(--tiger-text-secondary,#6b7280))]',
+    closeButton: 'text-[var(--tiger-alert-info-close,var(--tiger-info,#3b82f6))]',
+    closeButtonHover:
+      'hover:bg-[var(--tiger-alert-info-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
+    focus: 'focus:ring-[color:var(--tiger-alert-info-ring,var(--tiger-info,#3b82f6))]'
   }
 }
 
