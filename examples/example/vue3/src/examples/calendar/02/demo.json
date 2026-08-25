@@ -1,7 +1,7 @@
 {
   "id": "calendar-02",
-  "title": "年视图与禁用日期",
-  "description": "年视图组合展示全屏模式和禁用日期。",
+  "title": "禁用日期",
+  "description": "全屏月视图，周末不可选。",
   "entry": "App.vue",
   "order": 2
 }

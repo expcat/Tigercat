@@ -13,6 +13,7 @@ import {
   calendarWeekdayClasses,
   getCalendarDayClasses,
   getCalendarMonthClasses,
+  isCalendarMonthDisabled,
   isSameDay,
   getMonthDays,
   getShortDayNames,
@@ -100,8 +101,12 @@ export const Calendar = defineComponent({
     }
 
     function selectMonth(monthIdx: number) {
+      if (isCalendarMonthDisabled(viewYear.value, monthIdx, props.disabledDate)) return
       viewMonth.value = monthIdx
-      emit('panel-change', new Date(viewYear.value, monthIdx, 1), props.mode)
+      const date = new Date(viewYear.value, monthIdx, 1)
+      emit('update:modelValue', date)
+      emit('change', date)
+      emit('panel-change', date, 'month')
     }
 
     // ----- Keyboard navigation (roving focus stays in the framework layer) -----
@@ -300,6 +305,7 @@ export const Calendar = defineComponent({
               { key: ri, class: 'grid grid-cols-3 gap-2', role: 'row' },
               row.map((m, ci) => {
                 const i = ri * 3 + ci
+                const isDisabled = isCalendarMonthDisabled(viewYear.value, i, props.disabledDate)
                 return h(
                   'button',
                   {
@@ -307,8 +313,9 @@ export const Calendar = defineComponent({
                     type: 'button',
                     role: 'gridcell',
                     'aria-selected': viewMonth.value === i,
-                    tabindex: rovingMonthIdx === i ? 0 : -1,
-                    class: getCalendarMonthClasses(viewMonth.value === i),
+                    disabled: isDisabled,
+                    tabindex: rovingMonthIdx === i && !isDisabled ? 0 : -1,
+                    class: getCalendarMonthClasses(viewMonth.value === i, isDisabled),
                     onClick: () => selectMonth(i),
                     onFocus: () => (activeMonthIdx.value = i),
                     onKeydown: (e: KeyboardEvent) => handleMonthKeyDown(e, i)

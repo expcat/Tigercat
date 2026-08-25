@@ -107,6 +107,65 @@ describe('Calendar', () => {
     expect(screen.getByText('2025')).toBeInTheDocument()
   })
 
+  it("year mode: clicking a month emits that month's 1st", () => {
+    const onChange = vi.fn()
+    const onPanelChange = vi.fn()
+    render(
+      <Calendar mode="year" value={testDate} onChange={onChange} onPanelChange={onPanelChange} />
+    )
+    fireEvent.click(screen.getByRole('gridcell', { name: 'Mar' }))
+    expect(onChange).toHaveBeenCalled()
+    const picked = onChange.mock.calls[0][0] as Date
+    expect(picked.getFullYear()).toBe(2024)
+    expect(picked.getMonth()).toBe(2)
+    expect(picked.getDate()).toBe(1)
+    expect(onPanelChange).toHaveBeenCalled()
+  })
+
+  it('year mode: disables a month when every day is disabled', () => {
+    const onChange = vi.fn()
+    const onPanelChange = vi.fn()
+    render(
+      <Calendar
+        mode="year"
+        value={testDate}
+        disabledDate={(d) => d.getMonth() === 2}
+        onChange={onChange}
+        onPanelChange={onPanelChange}
+      />
+    )
+    const mar = screen.getByRole('gridcell', { name: 'Mar' })
+    expect(mar).toBeDisabled()
+    fireEvent.click(mar)
+    fireEvent.keyDown(mar, { key: 'Enter' })
+    expect(onChange).not.toHaveBeenCalled()
+    expect(onPanelChange).not.toHaveBeenCalled()
+
+    const jun = screen.getByRole('gridcell', { name: 'Jun' })
+    expect(jun).not.toBeDisabled()
+    fireEvent.click(jun)
+    expect(onChange).toHaveBeenCalled()
+    const picked = onChange.mock.calls[0][0] as Date
+    expect(picked.getFullYear()).toBe(2024)
+    expect(picked.getMonth()).toBe(5)
+    expect(picked.getDate()).toBe(1)
+  })
+
+  it('year mode: weekend-only disabledDate does not disable any month', () => {
+    render(
+      <Calendar
+        mode="year"
+        value={testDate}
+        disabledDate={(d) => d.getDay() === 0 || d.getDay() === 6}
+      />
+    )
+    const cells = screen.getAllByRole('gridcell')
+    expect(cells).toHaveLength(12)
+    for (const cell of cells) {
+      expect(cell).not.toBeDisabled()
+    }
+  })
+
   // --- Keyboard navigation (C16-2) ---
   describe('Keyboard navigation', () => {
     it('renders day cells as gridcell buttons with a single roving tab-stop', () => {
@@ -158,8 +217,11 @@ describe('Calendar', () => {
     })
 
     it('year mode: months are keyboard-navigable gridcell buttons', () => {
+      const onChange = vi.fn()
       const onPanelChange = vi.fn()
-      render(<Calendar mode="year" value={testDate} onPanelChange={onPanelChange} />)
+      render(
+        <Calendar mode="year" value={testDate} onChange={onChange} onPanelChange={onPanelChange} />
+      )
       const jun = screen.getByRole('gridcell', { name: 'Jun' })
       expect(jun).toHaveAttribute('tabindex', '0')
       act(() => jun.focus())
@@ -167,6 +229,11 @@ describe('Calendar', () => {
       expect(screen.getByRole('gridcell', { name: 'Jul' })).toHaveFocus()
       fireEvent.keyDown(document.activeElement!, { key: 'Enter' })
       expect(onPanelChange).toHaveBeenCalled()
+      expect(onChange).toHaveBeenCalled()
+      const picked = onChange.mock.calls[0][0] as Date
+      expect(picked.getFullYear()).toBe(2024)
+      expect(picked.getMonth()).toBe(6)
+      expect(picked.getDate()).toBe(1)
     })
   })
   describe('Accessibility', () => {

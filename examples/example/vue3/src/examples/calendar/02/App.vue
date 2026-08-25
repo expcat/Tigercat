@@ -7,5 +7,5 @@ const isWeekend = (value: Date) => value.getDay() === 0 || value.getDay() === 6
 </script>
 
 <template>
-  <Calendar v-model="date" mode="year" fullscreen :disabled-date="isWeekend" />
+  <Calendar v-model="date" fullscreen :disabled-date="isWeekend" />
 </template>

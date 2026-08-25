@@ -45,7 +45,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
 | #29 | Splitter sizes parse + init min | done | this commit | 2026-08-25 |
-| #15–#16, #19–#27, #30–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #34 | Calendar mode=year month emit + disabledDate | done | this commit | 2026-08-25 |
+| #15–#16, #19–#27, #30–#33, #35–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -427,5 +428,19 @@ Splitter sizes parse + init min (Vue + React) via core `resolveInitialPaneSizes`
 
 Pages `/splitter` 水平/垂直/嵌套 show ratios. Public API widening + behavior fix recorded in CHANGELOG unpublished.
 
-Next: Phase D #34 Calendar `mode="year"` (click month emits that month's 1st or switches back to month).
+Next: Phase D #34 Calendar mode=year (click month emits that month 1st or switches back to month).
 
+
+## #34 notes
+
+Calendar year-mode month chips emit + disabledDate (Vue + React) via core isCalendarMonthDisabled:
+
+- Year-mode month click / Enter / Space emits that month 1st (local Date(viewYear, monthIdx, 1)) via update:modelValue + change / onChange
+- Still emits panel-change / onPanelChange (second arg month; mode prop stays parent-controlled)
+- disabledDate disables a month iff every local day 1..last of that month is disabled; weekend-only does not disable any month
+- Disabled chips: disabled + getCalendarMonthClasses selected, true (opacity-30 cursor-not-allowed); selectMonth is a no-op
+- example 02 is fullscreen month view + weekend disabledDate; demo.json title 禁用日期
+
+Pages /calendar second block shows Sat/Sun disabled. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #36 OrgChart direction=horizontal (flipLayoutNode only swap x/y, keep nodeWidth x nodeHeight).
