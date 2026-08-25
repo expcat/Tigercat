@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
   emptyBaseClasses,
@@ -46,6 +48,21 @@ describe('empty-utils', () => {
 
     it('returns correct text for error preset', () => {
       expect(getEmptyDescription('error')).toBe('Something went wrong')
+    })
+  })
+
+  describe('empty/02 demo viewport', () => {
+    it.each([
+      'examples/example/vue3/src/examples/empty/02/demo.json',
+      'examples/example/react/src/examples/empty/02/demo.json'
+    ])('%s minHeight fits two rows and does not freeze height', (relativePath) => {
+      const demo = JSON.parse(readFileSync(resolve(process.cwd(), relativePath), 'utf-8')) as {
+        viewport: { mode: string; minHeight: number; maxHeight: number; height?: number }
+      }
+      expect(demo.viewport.mode).toBe('auto')
+      expect(demo.viewport.minHeight).toBeGreaterThanOrEqual(480)
+      expect(demo.viewport.maxHeight).toBeGreaterThanOrEqual(720)
+      expect(demo.viewport).not.toHaveProperty('height')
     })
   })
 

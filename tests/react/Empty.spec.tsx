@@ -5,8 +5,11 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
+import { getEmptyDescription } from '@expcat/tigercat-core'
 import { Empty } from '@expcat/tigercat-react/Empty'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+
+const galleryPresets = ['default', 'simple', 'no-data', 'no-results', 'error'] as const
 
 describe('Empty (React)', () => {
   describe('Rendering', () => {
@@ -63,6 +66,11 @@ describe('Empty (React)', () => {
     it('renders with default preset', () => {
       render(<Empty preset="default" />)
       expect(screen.getByText('No data')).toBeInTheDocument()
+    })
+
+    it.each(galleryPresets)('renders empty/02 gallery preset "%s"', (preset) => {
+      render(<Empty preset={preset} />)
+      expect(screen.getByText(getEmptyDescription(preset))).toBeInTheDocument()
     })
   })
   describe('Accessibility', () => {
