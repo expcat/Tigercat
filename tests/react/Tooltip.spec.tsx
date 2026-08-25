@@ -2,9 +2,10 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
+import { act, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from '@expcat/tigercat-core'
 import { Tooltip } from '@expcat/tigercat-react/Tooltip'
 import { renderWithProps, renderWithChildren, expectNoA11yViolationsIsolated } from '../utils/react'
 import React from 'react'
@@ -46,6 +47,71 @@ describe('Tooltip', () => {
 
     await user.unhover(trigger)
     await waitFor(() => expect(queryByText('Tooltip content')).toBeNull())
+  })
+
+  describe('hover delay and floating hover group', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('keeps content visible after trigger mouseLeave until hideDelay', () => {
+      const { getByText, queryByText, container } = renderWithChildren(
+        Tooltip,
+        { content: 'Tooltip content' },
+        <button>Trigger</button>
+      )
+
+      const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
+      fireEvent.mouseEnter(trigger)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      fireEvent.mouseLeave(trigger)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      act(() => {
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS - 1)
+      })
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      act(() => {
+        vi.advanceTimersByTime(1)
+      })
+      expect(queryByText('Tooltip content')).toBeNull()
+    })
+
+    it('stays open when the pointer enters the floating layer before hideDelay', () => {
+      const { getByText, queryByText, container } = renderWithChildren(
+        Tooltip,
+        { content: 'Tooltip content' },
+        <button>Trigger</button>
+      )
+
+      const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
+      fireEvent.mouseEnter(trigger)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      fireEvent.mouseLeave(trigger)
+      const floating = document.querySelector('[role="tooltip"]')?.parentElement as HTMLElement
+      expect(floating).toBeTruthy()
+
+      fireEvent.mouseEnter(floating)
+      act(() => {
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS)
+      })
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      fireEvent.mouseLeave(floating)
+      expect(getByText('Tooltip content')).toBeVisible()
+
+      act(() => {
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS)
+      })
+      expect(queryByText('Tooltip content')).toBeNull()
+    })
   })
 
   it('supports custom ReactNode content', async () => {

@@ -2,10 +2,11 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/vue'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
+import { fireEvent, render, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { h } from 'vue'
+import { h, nextTick } from 'vue'
+import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from '@expcat/tigercat-core'
 import { Popover } from '@expcat/tigercat-vue/Popover'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
@@ -305,6 +306,127 @@ describe('Popover', () => {
         },
         { timeout: 2000 }
       )
+    })
+
+    describe('hover delay and floating hover group', () => {
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
+
+      afterEach(() => {
+        vi.useRealTimers()
+      })
+
+      it('keeps content visible after trigger mouseLeave until hideDelay', async () => {
+        const { getByText, queryByText, container } = renderWithProps(
+          Popover,
+          {
+            trigger: 'hover',
+            content: 'Hover content'
+          },
+          {
+            slots: {
+              default: '<button>Hover trigger</button>'
+            }
+          }
+        )
+
+        const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
+        await fireEvent.mouseEnter(trigger)
+        expect(getByText('Hover content')).toBeVisible()
+
+        await fireEvent.mouseLeave(trigger)
+        expect(getByText('Hover content')).toBeVisible()
+
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS - 1)
+        await nextTick()
+        expect(getByText('Hover content')).toBeVisible()
+
+        vi.advanceTimersByTime(1)
+        await nextTick()
+        expect(queryByText('Hover content')).toBeNull()
+      })
+
+      it('stays open when the pointer enters the floating layer before hideDelay', async () => {
+        const { getByText, queryByText, container } = renderWithProps(
+          Popover,
+          {
+            trigger: 'hover',
+            content: 'Hover content'
+          },
+          {
+            slots: {
+              default: '<button>Hover trigger</button>'
+            }
+          }
+        )
+
+        const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
+        await fireEvent.mouseEnter(trigger)
+        expect(getByText('Hover content')).toBeVisible()
+
+        await fireEvent.mouseLeave(trigger)
+        const floating = document.querySelector('[role="dialog"]')?.parentElement as HTMLElement
+        expect(floating).toBeTruthy()
+
+        await fireEvent.mouseEnter(floating)
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS)
+        await nextTick()
+        expect(getByText('Hover content')).toBeVisible()
+
+        await fireEvent.mouseLeave(floating)
+        expect(getByText('Hover content')).toBeVisible()
+
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS)
+        await nextTick()
+        expect(queryByText('Hover content')).toBeNull()
+      })
+
+      it('opens immediately on click without waiting for hover delay', async () => {
+        const { getByText, container } = renderWithProps(
+          Popover,
+          {
+            trigger: 'click',
+            content: 'Click content'
+          },
+          {
+            slots: {
+              default: '<button>Click trigger</button>'
+            }
+          }
+        )
+
+        const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
+        await fireEvent.click(trigger)
+        expect(getByText('Click content')).toBeVisible()
+      })
+    })
+
+    it('closes immediately on Escape while hover-open', async () => {
+      const user = userEvent.setup()
+      const { getByText, queryByText, container } = renderWithProps(
+        Popover,
+        {
+          trigger: 'hover',
+          content: 'Hover content'
+        },
+        {
+          slots: {
+            default: '<button>Hover trigger</button>'
+          }
+        }
+      )
+
+      const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
+      await user.hover(trigger)
+      await waitFor(() => {
+        expect(getByText('Hover content')).toBeVisible()
+      })
+
+      await user.keyboard('{Escape}')
+      await waitFor(() => {
+        expect(queryByText('Hover content')).toBeNull()
+      })
     })
 
     it('should show/hide on focus when trigger is "focus"', async () => {

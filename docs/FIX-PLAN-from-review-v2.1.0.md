@@ -86,7 +86,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-17 | Splitter gutter (bg-gray-200 to token; gutterSize to visual width) | done | this commit | 2026-08-25 |
 | P2-18 | Radar split disk (no --tiger-bg,#ffffff hole; splitArea follows dark) | done | this commit | 2026-08-25 |
 | P2-19 | CommentThread 01 like (inner liked overlay; same root as FileManager 01) | done | this commit | 2026-08-25 |
-| P2-20 | Tooltip / Popover hover (delay; pointer can enter floating layer) | pending | | |
+| P2-20 | Tooltip / Popover hover (delay; pointer can enter floating layer) | done | this commit | 2026-08-25 |
 
 ## A0 notes
 
@@ -1030,5 +1030,18 @@ CommentThread like keeps an inner liked/likes overlay (Vue + React via core help
 - examples 01/02 not rewritten (01 stays unbound, same as FileManager 01)
 - T1 A0-A10 did not cover like write-back; P2-12 only moved 点赞 copy to locale. No new required prop.
 
-Next: P2-20 Tooltip / Popover hover (add delay; pointer can enter the floating layer before close). T1 A0-A10 did not cover hover close, so do not skip.
+Next: P2-20 Tooltip / Popover hover landed in this commit. Phase F P2-1..20 complete.
+
+## P2-20 notes
+
+Tooltip / Popover hover uses a hide delay and treats trigger + floating as one hover group (Vue + React):
+
+- DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS = 100; show delay 0
+- createFloatingHoverDelayController enter/leave/cancel/closeNow
+- Vue use-floating-popup + React use-popup attach mouseenter/mouseleave on floatingRef when trigger is hover
+- pointer can leave trigger, enter teleported/portaled layer, cancel hide
+- click / Esc / focus / manual stay immediate; Popconfirm stays click-only (multiTrigger false)
+- T1 A0-A10 did not cover hover close. No new required prop.
+
+Phase F P2-1..20 all done. Leftovers not in this 20: srcdoc dark: sync, P3 /container and /back-top routing, remaining Review P2/P3 outside 5.2.3.
 
