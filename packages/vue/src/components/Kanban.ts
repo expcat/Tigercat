@@ -7,8 +7,9 @@
  *
  * All drag-and-drop logic (HTML5, touch, keyboard) is handled by TaskBoard.
  */
-import { defineComponent, h, PropType } from 'vue'
+import { defineComponent, h, PropType, ref } from 'vue'
 import {
+  appendDefaultTaskBoardCard,
   type TaskBoardColumn,
   type KanbanSwimlane,
   type TaskBoardCardMoveEvent,
@@ -94,9 +95,19 @@ export const Kanban = defineComponent({
   },
   emits: ['card-move', 'column-move', 'update:columns', 'card-add', 'column-add'],
   setup(props, { emit, attrs, slots }) {
-    // Merge onCardAdd prop callback + card-add emit into one handler
-    // to avoid Vue h() key collision between 'onCardAdd' prop and 'onCard-add' listener
+    // Re-emitting card-add requires a TaskBoard listener, and Vue 3 folds
+    // onCardAdd / @card-add into the same prop — that would look like a
+    // consumer handler and skip TaskBoard's default insert. Insert here
+    // when the Kanban consumer did not pass onCardAdd / @card-add.
+    const pendingColumns = ref<TaskBoardColumn[] | undefined>(undefined)
+
     const handleCardAdd = (colId: string | number) => {
+      if (props.onCardAdd == null) {
+        const source = props.columns ?? pendingColumns.value ?? props.defaultColumns
+        const next = appendDefaultTaskBoardCard(source, colId)
+        pendingColumns.value = next
+        emit('update:columns', next)
+      }
       props.onCardAdd?.(colId)
       emit('card-add', colId)
     }
@@ -106,14 +117,13 @@ export const Kanban = defineComponent({
         TaskBoard,
         {
           ...attrs,
-          columns: props.columns,
+          columns: props.columns !== undefined ? props.columns : pendingColumns.value,
           defaultColumns: props.defaultColumns,
           draggable: props.draggable,
           columnDraggable: props.columnDraggable,
           enforceWipLimit: props.enforceWipLimit,
           beforeCardMove: props.beforeCardMove,
           beforeColumnMove: props.beforeColumnMove,
-          // Only set onCardAdd when needed — its presence affects button visibility
           onCardAdd: props.allowAddCard || props.onCardAdd ? handleCardAdd : undefined,
           filterText: props.filterText,
           hiddenColumns: props.hiddenColumns,
@@ -127,7 +137,10 @@ export const Kanban = defineComponent({
           style: props.style,
           'onCard-move': (e: TaskBoardCardMoveEvent) => emit('card-move', e),
           'onColumn-move': (e: TaskBoardColumnMoveEvent) => emit('column-move', e),
-          'onUpdate:columns': (cols: TaskBoardColumn[]) => emit('update:columns', cols),
+          'onUpdate:columns': (cols: TaskBoardColumn[]) => {
+            pendingColumns.value = cols
+            emit('update:columns', cols)
+          },
           'onColumn-add': () => emit('column-add')
         },
         slots

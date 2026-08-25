@@ -175,6 +175,44 @@ describe('Kanban', () => {
       const addBtns = container.querySelectorAll('[role="button"]')
       expect(addBtns.length).toBe(0)
     })
+
+    it('inserts a default card when allowAddCard is on and no handler is provided', () => {
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return <Kanban columns={cols} onColumnsChange={setCols} allowAddCard />
+      }
+      const { container } = render(<Bound />)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      const addBtns = container.querySelectorAll('[role="button"]')
+      fireEvent.click(addBtns[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(container.textContent).toContain('New task')
+    })
+
+    it('does not insert a default card when onCardAdd is provided', () => {
+      const onCardAdd = vi.fn()
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return (
+          <Kanban columns={cols} onColumnsChange={setCols} allowAddCard onCardAdd={onCardAdd} />
+        )
+      }
+      const { container } = render(<Bound />)
+      const addBtns = container.querySelectorAll('[role="button"]')
+      fireEvent.click(addBtns[0])
+      expect(onCardAdd).toHaveBeenCalledWith('todo')
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      expect(container.textContent).not.toContain('New task')
+    })
+
+    it('inserts a default card from inner state when only defaultColumns is provided', () => {
+      const { container } = render(<Kanban defaultColumns={columns} allowAddCard />)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      const addBtns = container.querySelectorAll('[role="button"]')
+      fireEvent.click(addBtns[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(container.textContent).toContain('New task')
+    })
   })
 
   describe('Add column', () => {

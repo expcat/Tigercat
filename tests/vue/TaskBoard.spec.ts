@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { h } from 'vue'
+import { h, defineComponent, ref } from 'vue'
 import { TaskBoard } from '@expcat/tigercat-vue/TaskBoard'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -185,6 +185,59 @@ describe('TaskBoard (Vue)', () => {
 
       expect(emitted()['card-add']).toEqual([['doing'], ['done']])
     })
+
+    it('inserts a default card when allowAddCard is on and no handler is provided', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const cols = ref(columns)
+          return () =>
+            h(TaskBoard, {
+              columns: cols.value,
+              allowAddCard: true,
+              'onUpdate:columns': (next: TaskBoardColumn[]) => {
+                cols.value = next
+              }
+            })
+        }
+      })
+      const { container } = render(Wrapper)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(screen.getByText('New task')).toBeInTheDocument()
+    })
+
+    it('does not insert a default card when onCardAdd is provided', async () => {
+      const onCardAdd = vi.fn()
+      const Wrapper = defineComponent({
+        setup() {
+          const cols = ref(columns)
+          return () =>
+            h(TaskBoard, {
+              columns: cols.value,
+              allowAddCard: true,
+              onCardAdd,
+              'onUpdate:columns': (next: TaskBoardColumn[]) => {
+                cols.value = next
+              }
+            })
+        }
+      })
+      const { container } = render(Wrapper)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      expect(screen.queryByText('New task')).not.toBeInTheDocument()
+    })
+
+    it('inserts a default card from inner state when only defaultColumns is provided', async () => {
+      const { container } = render(TaskBoard, {
+        props: { defaultColumns: columns, allowAddCard: true }
+      })
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(screen.getByText('New task')).toBeInTheDocument()
+    })
   })
 
   describe('DnD events', () => {
@@ -318,12 +371,13 @@ describe('TaskBoard (Vue)', () => {
   describe('Add card emit-only', () => {
     it('only emits card-add, does not call onCardAdd prop directly', async () => {
       const onCardAdd = vi.fn()
-      const { emitted } = render(TaskBoard, { props: { columns, onCardAdd } })
+      const { container, emitted } = render(TaskBoard, { props: { columns, onCardAdd } })
       const addBtns = screen.getAllByText('Add task')
       await fireEvent.click(addBtns[0])
-      // The emit should fire
       expect(emitted()['card-add']).toBeTruthy()
       expect(emitted()['card-add'][0]).toEqual(['todo'])
+      expect(emitted()['update:columns']).toBeFalsy()
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
     })
   })
 

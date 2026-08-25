@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
+import { defineComponent, h, ref } from 'vue'
 import { Kanban } from '@expcat/tigercat-vue/Kanban'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -183,6 +184,63 @@ describe('Kanban', () => {
       // No add buttons (unless allowAddColumn is true)
       const addBtns = container.querySelectorAll('[role="button"]')
       expect(addBtns.length).toBe(0)
+    })
+
+    it('inserts a default card when allowAddCard is on and no handler is provided', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const cols = ref(columns)
+          return () =>
+            h(Kanban, {
+              columns: cols.value,
+              allowAddCard: true,
+              'onUpdate:columns': (next: TaskBoardColumn[]) => {
+                cols.value = next
+              }
+            })
+        }
+      })
+      const { container } = render(Wrapper)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      const addBtns = container.querySelectorAll('[role="button"]')
+      await fireEvent.click(addBtns[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(container.textContent).toContain('New task')
+    })
+
+    it('does not insert a default card when onCardAdd is provided', async () => {
+      const onCardAdd = vi.fn()
+      const Wrapper = defineComponent({
+        setup() {
+          const cols = ref(columns)
+          return () =>
+            h(Kanban, {
+              columns: cols.value,
+              allowAddCard: true,
+              onCardAdd,
+              'onUpdate:columns': (next: TaskBoardColumn[]) => {
+                cols.value = next
+              }
+            })
+        }
+      })
+      const { container } = render(Wrapper)
+      const addBtns = container.querySelectorAll('[role="button"]')
+      await fireEvent.click(addBtns[0])
+      expect(onCardAdd).toHaveBeenCalledWith('todo')
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      expect(container.textContent).not.toContain('New task')
+    })
+
+    it('inserts a default card from inner state when only defaultColumns is provided', async () => {
+      const { container } = render(Kanban, {
+        props: { defaultColumns: columns, allowAddCard: true }
+      })
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      const addBtns = container.querySelectorAll('[role="button"]')
+      await fireEvent.click(addBtns[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(container.textContent).toContain('New task')
     })
   })
 

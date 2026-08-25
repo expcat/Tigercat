@@ -37,7 +37,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #8 | Pagination React pageSize example | done | this commit | 2026-08-25 |
 | #9 | Table default pagination uncontrolled | done | this commit | 2026-08-25 |
 | #10 | FileManager selectedKeys inner state | done | this commit | 2026-08-25 |
-| #11 | Kanban allowAddCard insert | pending | | |
+| #11 | Kanban allowAddCard insert | done | this commit | 2026-08-25 |
 | #12–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
@@ -310,3 +310,16 @@ Public API addition (defaultSelectedKeys) recorded in CHANGELOG unpublished.
 
 Next: Phase C #11 Kanban allowAddCard insert.
 
+## #11 notes
+
+TaskBoard / Kanban insert a default card when allowAddCard is on and the consumer has no card-add handler:
+
+- Core `appendDefaultTaskBoardCard(columns, columnId, title='New task')` copies columns/cards and appends `{ id: card-N, title }` (ids do not collide with demo `'1'|'2'|'3'`). Unknown columnId returns columns unchanged.
+- Vue TaskBoard: click / Enter / Space always emit `card-add`; if `props.onCardAdd == null`, insert via the helper and `updateColumns` (inner + `update:columns`). Does not call `props.onCardAdd`. Vue `@card-add` folds onto the declared prop, so task-board/01 does not double-insert.
+- React TaskBoard: parent wrapper inserts only when consumer `onCardAdd` is missing, then `onCardAdd?.(columnId)`. Visibility uses the consumer handler, not the wrapper.
+- Vue Kanban still injects a synthetic `onCardAdd` to re-emit `card-add` (prop/listener collision). That would block TaskBoard insert, so the wrapper inserts when `!props.onCardAdd`, emits `update:columns`, and keeps `pendingColumns` for uncontrolled `defaultColumns`. React Kanban is pass-through.
+- kanban/01 stays unbound (no `@card-add` / `onCardAdd`); click 3 → 4 via component insert + existing v-model / onColumnsChange. task-board/01 left alone.
+
+Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D remaining P1 from Review 5.2.2 C (#12–#40).

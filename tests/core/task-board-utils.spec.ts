@@ -3,6 +3,7 @@ import {
   moveCard,
   reorderColumns,
   isWipExceeded,
+  appendDefaultTaskBoardCard,
   getDropIndex,
   getColumnDropIndex,
   createCardDragData,
@@ -296,6 +297,62 @@ describe('isWipExceeded', () => {
     expect(
       isWipExceeded({ id: 'a', title: 'A', wipLimit: 0, cards: [{ id: '1', title: '' }] })
     ).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// appendDefaultTaskBoardCard
+// ---------------------------------------------------------------------------
+
+describe('appendDefaultTaskBoardCard', () => {
+  it('appends a default card to the matching column', () => {
+    const cols = makeCols()
+    const result = appendDefaultTaskBoardCard(cols, 'todo')
+    expect(result[0].cards).toHaveLength(4)
+    expect(result[0].cards[3].title).toBe('New task')
+    expect(result[0].cards[3].id).toBe('card-1')
+    expect(result[1].cards).toHaveLength(1)
+  })
+
+  it('does not collide with demo ids 1|2|3', () => {
+    const cols: TaskBoardColumn[] = [
+      {
+        id: 'todo',
+        title: 'To Do',
+        cards: [
+          { id: '1', title: '设计界面' },
+          { id: '2', title: '补充文档' },
+          { id: '3', title: '实现看板' }
+        ]
+      }
+    ]
+    const result = appendDefaultTaskBoardCard(cols, 'todo')
+    expect(result[0].cards.map((c) => String(c.id))).toEqual(['1', '2', '3', 'card-1'])
+  })
+
+  it('skips ids that are already used', () => {
+    const cols: TaskBoardColumn[] = [
+      {
+        id: 'todo',
+        title: 'To Do',
+        cards: [{ id: 'card-1', title: 'Existing' }]
+      }
+    ]
+    const result = appendDefaultTaskBoardCard(cols, 'todo', 'Extra')
+    expect(result[0].cards[1]).toEqual({ id: 'card-2', title: 'Extra' })
+  })
+
+  it('returns the same array when columnId is unknown', () => {
+    const cols = makeCols()
+    expect(appendDefaultTaskBoardCard(cols, 'missing')).toBe(cols)
+  })
+
+  it('does not mutate the original columns or cards', () => {
+    const cols = makeCols()
+    const original = JSON.parse(JSON.stringify(cols))
+    appendDefaultTaskBoardCard(cols, 'todo')
+    expect(cols).toEqual(original)
+    expect(cols[0].cards).toHaveLength(3)
   })
 })
 

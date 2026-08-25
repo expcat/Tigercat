@@ -28,6 +28,7 @@ import {
   moveCard,
   reorderColumns,
   isWipExceeded,
+  appendDefaultTaskBoardCard,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
   type TaskBoardProps as CoreTaskBoardProps,
@@ -476,6 +477,18 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     [onColumnsChange]
   )
 
+  const consumerOnCardAdd = onCardAdd
+  const showAddCard = Boolean(allowAddCard || consumerOnCardAdd)
+  const handleCardAdd = useCallback(
+    (columnId: string | number) => {
+      if (consumerOnCardAdd == null) {
+        updateColumns(appendDefaultTaskBoardCard(columnsRef.current, columnId))
+      }
+      consumerOnCardAdd?.(columnId)
+    },
+    [consumerOnCardAdd, updateColumns]
+  )
+
   // ---- drag controller (unified DnD + touch + keyboard) ----
   const [dragSnap, setDragSnap] = useState<TaskBoardDragSnapshot>(createDefaultDragSnapshot)
 
@@ -601,7 +614,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             renderColumnHeader={renderColumnHeader}
             renderColumnFooter={renderColumnFooter}
             renderEmptyColumn={renderEmptyColumn}
-            onCardAdd={onCardAdd}
+            onCardAdd={showAddCard ? handleCardAdd : undefined}
             dragType={dragType}
             dragCtrl={dragCtrl}
             dragStateId={dragStateId}

@@ -30,6 +30,7 @@ import {
   moveCard,
   reorderColumns,
   isWipExceeded,
+  appendDefaultTaskBoardCard,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
   type TaskBoardColumn,
@@ -174,6 +175,13 @@ export const TaskBoard = defineComponent({
     const updateColumns = (next: TaskBoardColumn[]) => {
       innerColumns.value = next
       emit('update:columns', next)
+    }
+
+    const addCardToColumn = (columnId: string | number) => {
+      emit('card-add', columnId)
+      if (props.onCardAdd == null) {
+        updateColumns(appendDefaultTaskBoardCard(currentColumns.value, columnId))
+      }
     }
 
     // ----- drag controller (unified DnD + touch + keyboard) -----
@@ -513,12 +521,12 @@ export const TaskBoard = defineComponent({
                 role: 'button',
                 tabindex: 0,
                 onClick: () => {
-                  emit('card-add', column.id)
+                  addCardToColumn(column.id)
                 },
                 onKeydown: (e: KeyboardEvent) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
-                    emit('card-add', column.id)
+                    addCardToColumn(column.id)
                   }
                 }
               },

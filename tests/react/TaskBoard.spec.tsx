@@ -176,6 +176,41 @@ describe('TaskBoard (React)', () => {
       expect(onCardAdd).toHaveBeenCalledWith('doing')
       expect(onCardAdd).toHaveBeenCalledWith('done')
     })
+
+    it('inserts a default card when allowAddCard is on and no handler is provided', async () => {
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return <TaskBoard columns={cols} onColumnsChange={setCols} allowAddCard />
+      }
+      const { container } = render(<Bound />)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(screen.getByText('New task')).toBeInTheDocument()
+    })
+
+    it('does not insert a default card when onCardAdd is provided', async () => {
+      const onCardAdd = vi.fn()
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return (
+          <TaskBoard columns={cols} onColumnsChange={setCols} allowAddCard onCardAdd={onCardAdd} />
+        )
+      }
+      const { container } = render(<Bound />)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(onCardAdd).toHaveBeenCalledWith('todo')
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      expect(screen.queryByText('New task')).not.toBeInTheDocument()
+    })
+
+    it('inserts a default card from inner state when only defaultColumns is provided', async () => {
+      const { container } = render(<TaskBoard defaultColumns={columns} allowAddCard />)
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
+      expect(screen.getByText('New task')).toBeInTheDocument()
+    })
   })
 
   describe('Draggable prop', () => {

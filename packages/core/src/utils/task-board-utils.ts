@@ -237,6 +237,43 @@ export function isWipExceeded(column: TaskBoardColumn): boolean {
   return column.cards.length > column.wipLimit
 }
 
+const DEFAULT_TASK_BOARD_NEW_CARD_TITLE = 'New task'
+
+function nextDefaultTaskBoardCardId(columns: TaskBoardColumn[]): string {
+  const used = new Set<string>()
+  for (const column of columns) {
+    for (const card of column.cards) {
+      used.add(String(card.id))
+    }
+  }
+  let n = 1
+  let id = `card-${n}`
+  while (used.has(id)) {
+    n += 1
+    id = `card-${n}`
+  }
+  return id
+}
+
+/**
+ * Append a default card to the column identified by `columnId`.
+ * Returns a **new** columns array — the original is not mutated.
+ * Unknown `columnId` returns `columns` unchanged.
+ */
+export function appendDefaultTaskBoardCard(
+  columns: TaskBoardColumn[],
+  columnId: string | number,
+  title = DEFAULT_TASK_BOARD_NEW_CARD_TITLE
+): TaskBoardColumn[] {
+  const colIdx = columns.findIndex((c) => c.id === columnId)
+  if (colIdx === -1) return columns
+
+  const card = { id: nextDefaultTaskBoardCardId(columns), title }
+  return columns.map((column, i) =>
+    i === colIdx ? { ...column, cards: [...column.cards, card] } : column
+  )
+}
+
 // ============================================================================
 // Drop-index calculation (needs DOMRect[] — callers pass pre-collected rects)
 // ============================================================================
