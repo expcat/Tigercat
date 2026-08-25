@@ -48,7 +48,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #34 | Calendar mode=year month emit + disabledDate | done | this commit | 2026-08-25 |
 | #36 | OrgChart direction=horizontal keep node size | done | this commit | 2026-08-25 |
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
-| #15–#16, #19–#27, #30–#33, #35, #38–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
+| #15–#16, #19–#27, #30–#33, #35, #38, #40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -474,3 +475,19 @@ Scatter `animated` + non-circle keeps data positions (Vue + React wrap-in-g):
 Pages /scatter-chart 01 diamonds stay at mapped (cx,cy), not piled at the plot origin. Public visual/behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #39 ChatWindow onUpdated (Vue drop onUpdated scroll-to-bottom; only watch messages.length).
+
+## #39 notes
+
+Vue ChatWindow auto-scroll no longer runs on every re-render:
+
+- onUpdated(scrollToBottom) and the onUpdated import are gone
+- onMounted(scrollToBottom) still pins the first paint to the latest message
+- post-mount auto-scroll watches messages.length only (not modelValue / input)
+- stickToBottom flag from the log (and VirtualList) scroll event; threshold 32px
+- new message while pinned still snaps; user left the bottom then skip
+- autoScrollToBottom === false still no-ops
+- React already keyed off messages.length; left unchanged
+
+Pages /chat-window 02: typing after scrolling history no longer jumps to the latest bubble. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #40 TaskBoard filter drop index (map filtered drop index back to source column).

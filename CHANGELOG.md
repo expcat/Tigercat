@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Vue ChatWindow 去掉 onUpdated 滚底**：auto-scroll 只跟 `messages.length`（加首次 `onMounted`），用户离开底部后跳过；受控 `v-model` 逐字输入不再把 Pages `/chat-window` 02 历史拽回最新气泡。React 本就只跟 `messages.length`。公开行为修复，无主题变量变化，无新公开 prop。
 - **ScatterChart `animated` 非 circle 入场保留 translate(cx,cy)**：Vue / React 把 square / triangle / diamond 的 `translate(cx,cy)` 放在包裹 `<g>` 上，入场 CSS `transform:scale()` 只作用在内部 `<path>`（路径以 (0,0) 为中心），不再覆盖 SVG 位移。Pages `/scatter-chart` 01 菱形停在数据映射位置，不再堆在绘图区左上；circle 仍用 `cx`/`cy` 入场。公开视觉/行为修复，无主题变量变化，无新公开 prop。
 - **OrgChart `direction=horizontal` 保持 nodeWidth × nodeHeight**：Vue / React 经 core `flipLayoutNode` 横向布局只交换 x/y，节点盒保持 `nodeWidth` × `nodeHeight`（默认 160×72），不再把卡片拧成 72×160 竖条。Pages `/org-chart`「组合展示」横卡可完整显示姓名与职称。公开视觉/行为修复，无主题变量变化，无新公开 prop。
 - **Calendar 年视图月份芯片 emit 该月 1 日并按 disabledDate 禁月**：Vue / React `mode="year"` 点击（及 Enter/Space）月份芯片会通过 `update:modelValue` / `change` / `onChange` 写出该月 1 日（本地 Date），并仍发出 `panel-change` / `onPanelChange`。`disabledDate` 在该月每一天都被禁时禁用该芯片（周末-only 不会禁任何月）。示例 02 改为全屏月视图以展示周末禁日。Pages `/calendar` 禁用日期块可见周六/周日不可选。公开行为修复，无主题变量变化，无新公开 prop。

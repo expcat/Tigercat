@@ -1,4 +1,4 @@
-import { defineComponent, h, computed, ref, watch, onMounted, onUpdated, PropType } from 'vue'
+import { defineComponent, h, computed, ref, watch, onMounted, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -24,6 +24,26 @@ export interface VueChatWindowProps extends Omit<
   modelValue?: string
   className?: string
   style?: Record<string, string | number>
+}
+
+const CHAT_STICK_TO_BOTTOM_PX = 32
+
+function resolveChatScroller(
+  virtual: boolean,
+  messageList: HTMLElement | null,
+  virtualWrapper: HTMLElement | null
+): HTMLElement | null {
+  if (virtual) {
+    const wrapper = virtualWrapper
+    return (wrapper?.firstElementChild as HTMLElement | null) ?? wrapper
+  }
+  return messageList
+}
+
+function isChatScrollerNearBottom(scroller: HTMLElement): boolean {
+  return (
+    scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight <= CHAT_STICK_TO_BOTTOM_PX
+  )
 }
 
 export const ChatWindow = defineComponent({
@@ -202,27 +222,36 @@ export const ChatWindow = defineComponent({
 
     const messageListRef = ref<HTMLElement | null>(null)
     const virtualWrapperRef = ref<HTMLElement | null>(null)
+    const stickToBottom = ref(true)
+
+    const resolveScroller = (): HTMLElement | null =>
+      resolveChatScroller(props.virtual, messageListRef.value, virtualWrapperRef.value)
+
+    const syncStickToBottom = () => {
+      const scroller = resolveScroller()
+      if (!scroller) return
+      stickToBottom.value = isChatScrollerNearBottom(scroller)
+    }
 
     const scrollToBottom = () => {
       if (!props.autoScrollToBottom) return
       requestAnimationFrame(() => {
-        if (props.virtual) {
-          const wrapper = virtualWrapperRef.value
-          const scroller = (wrapper?.firstElementChild as HTMLElement | null) ?? wrapper
-          if (scroller) {
-            scroller.scrollTop = scroller.scrollHeight
-          }
-        } else if (messageListRef.value) {
-          messageListRef.value.scrollTop = messageListRef.value.scrollHeight
+        const scroller = resolveScroller()
+        if (scroller) {
+          scroller.scrollTop = scroller.scrollHeight
+          stickToBottom.value = true
         }
       })
     }
 
     onMounted(scrollToBottom)
-    onUpdated(scrollToBottom)
     watch(
       () => props.messages.length,
-      () => scrollToBottom()
+      () => {
+        if (!resolveScroller() || stickToBottom.value) {
+          scrollToBottom()
+        }
+      }
     )
 
     const renderMessageItem = (message: ChatMessage, index: number) => {
@@ -330,7 +359,8 @@ export const ChatWindow = defineComponent({
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
-                  'aria-label': props.messageListAriaLabel ?? '消息列表'
+                  'aria-label': props.messageListAriaLabel ?? '消息列表',
+                  onScroll: syncStickToBottom
                 },
                 [
                   h(
@@ -338,7 +368,8 @@ export const ChatWindow = defineComponent({
                     {
                       itemCount: props.messages.length,
                       itemHeight: props.virtualItemHeight,
-                      height: props.virtualHeight
+                      height: props.virtualHeight,
+                      onScroll: syncStickToBottom
                     },
                     {
                       default: ({ index }: { index: number }) =>
@@ -356,7 +387,8 @@ export const ChatWindow = defineComponent({
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
-                  'aria-label': props.messageListAriaLabel ?? '消息列表'
+                  'aria-label': props.messageListAriaLabel ?? '消息列表',
+                  onScroll: syncStickToBottom
                 },
                 props.messages.length === 0
                   ? [
