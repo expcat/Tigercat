@@ -12,9 +12,10 @@ import {
   tourFooterClasses,
   tourIndicatorClasses,
   tourCloseButtonClasses,
+  tourMaskClasses,
   getTourTargetRect,
   getTourPopoverPosition,
-  getTourSpotlightStyle,
+  getTourMaskHoleStyle,
   getActiveTourSteps,
   getCurrentActiveTourStep,
   getActiveTourStepPosition,
@@ -191,12 +192,15 @@ export const Tour: React.FC<TourProps> = ({
 
   const content = (
     <>
-      {/* Spotlight / mask */}
-      {showMask && targetRect && (
-        <div style={getTourSpotlightStyle(targetRect) as React.CSSProperties} aria-hidden="true" />
-      )}
-      {showMask && !targetRect && (
-        <div className="fixed inset-0 z-[1000] bg-black/45" aria-hidden="true" onClick={close} />
+      {/* Full-screen mask; clip-path punches a hole when a target rect exists. */}
+      {showMask && (
+        <div
+          className={tourMaskClasses}
+          data-tiger-tour-mask=""
+          aria-hidden="true"
+          style={targetRect ? (getTourMaskHoleStyle(targetRect) as React.CSSProperties) : undefined}
+          onClick={close}
+        />
       )}
 
       {/* Popover */}

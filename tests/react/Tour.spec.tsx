@@ -193,8 +193,9 @@ describe('Tour', () => {
 
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
 
-    const mask = document.querySelector('div.fixed.inset-0.bg-black\\/45')
+    const mask = document.querySelector('[data-tiger-tour-mask]')
     expect(mask).toBeInTheDocument()
+    expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).toBe(mask)
     await user.click(mask as Element)
 
     expect(onClose).toHaveBeenCalled()
@@ -203,6 +204,7 @@ describe('Tour', () => {
   it('should not render mask when step.mask is false', async () => {
     render(<Tour steps={[{ title: 'No mask', description: '...', mask: false }]} open={true} />)
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    expect(document.querySelector('[data-tiger-tour-mask]')).not.toBeInTheDocument()
     expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).not.toBeInTheDocument()
   })
 
@@ -233,6 +235,50 @@ describe('Tour', () => {
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
     const overlay = document.querySelector('[aria-hidden="true"]')
     expect(overlay).toBeInTheDocument()
+    expect(overlay).toHaveAttribute('data-tiger-tour-mask')
+  })
+
+  it('should close when clicking the mask when a target exists', async () => {
+    const user = userEvent.setup()
+    const target = document.createElement('div')
+    target.id = 'tour-target'
+    target.getBoundingClientRect = () =>
+      ({
+        top: 100,
+        left: 200,
+        width: 50,
+        height: 30,
+        right: 250,
+        bottom: 130,
+        x: 200,
+        y: 100,
+        toJSON: () => ({})
+      }) as DOMRect
+    document.body.appendChild(target)
+
+    const onClose = vi.fn()
+    const onOpenChange = vi.fn()
+    render(
+      <Tour
+        steps={[{ title: 'With target', description: '...', target: '#tour-target' }]}
+        open={true}
+        onClose={onClose}
+        onOpenChange={onOpenChange}
+      />
+    )
+
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    const mask = await waitFor(() => {
+      const node = document.querySelector('[data-tiger-tour-mask]') as HTMLElement | null
+      expect(node).toBeInTheDocument()
+      expect(node?.style.clipPath).toContain('evenodd')
+      return node!
+    })
+    await user.click(mask)
+
+    expect(onClose).toHaveBeenCalled()
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+    target.remove()
   })
 
   it('should apply custom className to the popover', async () => {

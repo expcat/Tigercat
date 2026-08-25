@@ -73,7 +73,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-4 | Collapse a11y inert/aria-hidden + extra stopPropagation | done | this commit | 2026-08-25 |
 | P2-5 | parseDate YYYY-MM-DD local calendar day | done | this commit | 2026-08-25 |
 | P2-6 | Cascader / TreeSelect keyboard | done | this commit | 2026-08-25 |
-| P2-7..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-7 | Tour mask close + Vue last-step onClose | done | this commit | 2026-08-25 |
+| P2-8..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -848,3 +849,15 @@ Cascader / TreeSelect keyboard and sibling clear (Vue + React):
 - `getPickerTriggerKeyAction` contract unchanged; no new public prop
 
 Next: P2-7 Tour mask close (click mask closes when a target exists; Vue last step calls onClose like React). T1 A0-A10 did not cover Tour mask close, so do not skip.
+
+## P2-7 notes
+
+Tour mask close and Vue last-step `close` (Vue + React):
+
+- Target-case veil is one full-screen `tourMaskClasses` node (`data-tiger-tour-mask`) with `onClick: close`
+- `getTourMaskHoleStyle` punches an evenodd clip-path hole (same 4px padding as the old spotlight) so the target stays visible and is not on the mask hit region
+- No-target fallback still closes; `step.mask === false` still has no mask; popover stays `z-[1001]`
+- Vue last-step Finish emits `finish` then `close` then `update:open` false (align React `onFinish` + `onClose` + `onOpenChange(false)`)
+- `getTourSpotlightStyle` kept in core unused by Vue/React; no new public component prop
+
+Next: P2-8 Table sort keyboard + `dataKey` (header is a button; `sortData`/`filterTableData` read `dataKey` else `key`). T1 A0-A10 did not cover Table sort keyboard, so do not skip.

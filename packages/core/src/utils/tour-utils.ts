@@ -181,16 +181,56 @@ export function getTourTargetRect(selector: string): TourRect | undefined {
   }
 }
 
+/** Padding around the target hole (spotlight / mask clip-path). */
+const TOUR_MASK_HOLE_PADDING = 4
+
+function getTourMaskHoleRect(
+  rect: TourRect,
+  padding: number
+): { top: number; left: number; width: number; height: number } {
+  const scrollX = isBrowser() ? window.scrollX : 0
+  const scrollY = isBrowser() ? window.scrollY : 0
+  return {
+    top: rect.top - scrollY - padding,
+    left: rect.left - scrollX - padding,
+    width: rect.width + padding * 2,
+    height: rect.height + padding * 2
+  }
+}
+
+/**
+ * Clip-path that punches a hole over the target so a full-screen painted mask
+ * stays clickable on the dimmed backdrop without covering the target.
+ */
+export function getTourMaskHoleStyle(
+  rect: TourRect,
+  padding = TOUR_MASK_HOLE_PADDING
+): Record<string, string> {
+  const hole = getTourMaskHoleRect(rect, padding)
+  const left = hole.left
+  const top = hole.top
+  const right = hole.left + hole.width
+  const bottom = hole.top + hole.height
+  return {
+    clipPath: `polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, ${left}px ${top}px, ${right}px ${top}px, ${right}px ${bottom}px, ${left}px ${bottom}px, ${left}px ${top}px)`
+  }
+}
+
 /**
  * Style for the spotlight "hole" that sits behind the mask, revealing the target.
+ * Kept for back-compat; Vue/React Tour now paint the veil with a clip-path mask.
  */
-export function getTourSpotlightStyle(rect: TourRect, padding = 4): Record<string, string> {
+export function getTourSpotlightStyle(
+  rect: TourRect,
+  padding = TOUR_MASK_HOLE_PADDING
+): Record<string, string> {
+  const hole = getTourMaskHoleRect(rect, padding)
   return {
     position: 'fixed',
-    top: `${rect.top - window.scrollY - padding}px`,
-    left: `${rect.left - window.scrollX - padding}px`,
-    width: `${rect.width + padding * 2}px`,
-    height: `${rect.height + padding * 2}px`,
+    top: `${hole.top}px`,
+    left: `${hole.left}px`,
+    width: `${hole.width}px`,
+    height: `${hole.height}px`,
     borderRadius: '4px',
     boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)',
     zIndex: '1000',

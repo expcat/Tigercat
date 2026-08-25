@@ -17,9 +17,10 @@ import {
   tourFooterClasses,
   tourIndicatorClasses,
   tourCloseButtonClasses,
+  tourMaskClasses,
   getTourTargetRect,
   getTourPopoverPosition,
-  getTourSpotlightStyle,
+  getTourMaskHoleStyle,
   getActiveTourSteps,
   getCurrentActiveTourStep,
   getActiveTourStepPosition,
@@ -185,6 +186,7 @@ export const Tour = defineComponent({
         goTo(nextStep.index)
       } else {
         emit('finish')
+        emit('close')
         emit('update:open', false)
       }
     }
@@ -251,19 +253,14 @@ export const Tour = defineComponent({
 
       const children = []
 
-      // Spotlight mask
-      if (showMask && targetRect.value) {
+      // Full-screen mask; clip-path punches a hole when a target rect exists.
+      if (showMask) {
         children.push(
           h('div', {
-            style: getTourSpotlightStyle(targetRect.value),
-            'aria-hidden': 'true'
-          })
-        )
-      } else if (showMask) {
-        children.push(
-          h('div', {
-            class: 'fixed inset-0 z-[1000] bg-black/45',
+            class: tourMaskClasses,
+            'data-tiger-tour-mask': '',
             'aria-hidden': 'true',
+            style: targetRect.value ? getTourMaskHoleStyle(targetRect.value) : undefined,
             onClick: close
           })
         )

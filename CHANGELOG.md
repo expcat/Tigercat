@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Tour 有 target 时点遮罩可关，Vue 最后一步也发 `close`**：dimmed mask 改为全屏可点节点（`data-tiger-tour-mask`）并用 clip-path 挖洞露出 target，不再靠 `pointer-events:none` 的 box-shadow spotlight；无 target 的 fallback 与 `step.mask === false` 不变。Vue 最后一步 Finish 在 `finish` 之外兼发 `close`（对齐 React `onClose`）。Vue/React。公开行为修复。无新公开 prop。
 - **Cascader / TreeSelect 非虚拟列表键盘选值，清空钮为 trigger 兄弟**：打开后面板 Arrow/Enter（及 Space）可移动并提交当前项；清空控件改为 combobox trigger 的兄弟 `<button>`（`data-tiger-cascader-clear` / `data-tiger-treeselect-clear`，对齐 Select）。Vue/React。公开无障碍/行为修复。无新公开 prop。
 - **`parseDate` 将 `YYYY-MM-DD` 按本地日历日解析**：date-only ISO（可带首尾空白）用本地 `Date(year, monthIndex, day)` 午夜，不再走 `new Date(string)` 的 UTC 午夜；西时区下 DatePicker min/max/value 字符串与 Calendar/DatePicker 键盘 `data-date` 不再少一天。非法日历日（`2024-02-30`、非闰年 `02-29`）返回 null。Vue/React 消费共享 helper。公开行为修复。无新公开 prop。
 - **Collapse 折叠面板 `inert` + `aria-hidden`，extra 点击不再切换**：折叠态内容包装层（`data-tiger-collapse-content`）带 HTML `inert` 与 `aria-hidden="true"`，关闭面板正文离开 a11y / 焦点树；展开时两者都不写。header 内 extra（Pages `/collapse` 03「已更新」）点击 `stopPropagation`，不再切换面板。Vue/React。公开无障碍/行为修复。无新公开 prop。
