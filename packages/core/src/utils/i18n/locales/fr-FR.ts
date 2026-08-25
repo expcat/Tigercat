@@ -91,6 +91,42 @@ export const frFR: TigerLocale = defineLocale({
     dragHintText: 'Glisser pour déplacer',
     boardAriaLabel: 'Tableau des tâches'
   },
+  chatWindow: {
+    emptyText: 'Aucun message',
+    sendText: 'Envoyer',
+    placeholder: 'Saisir un message',
+    sendingText: 'Envoi...',
+    sentText: 'Distribué',
+    failedText: "Échec de l'envoi"
+  },
+  commentThread: {
+    emptyText: 'Aucun commentaire',
+    replyPlaceholder: 'Écrire une réponse...',
+    replyButtonText: 'Répondre',
+    cancelReplyText: 'Annuler',
+    likeText: "J'aime",
+    likedText: 'Aimé',
+    replyText: 'Répondre',
+    moreText: 'Plus',
+    loadMoreText: 'Charger plus',
+    collapseRepliesText: '▾ Réduire les réponses',
+    expandRepliesText: '▸ Afficher {count} réponses'
+  },
+  activityFeed: {
+    emptyText: 'Aucune activité',
+    loadingText: 'Chargement...'
+  },
+  notificationCenter: {
+    title: 'Notifications',
+    emptyText: 'Aucune notification',
+    loadingText: 'Chargement...',
+    allLabel: 'Toutes',
+    unreadLabel: 'Non lues',
+    readLabel: 'Lues',
+    markAllReadText: 'Tout marquer comme lu',
+    markReadText: 'Marquer comme lu',
+    markUnreadText: 'Marquer comme non lu'
+  },
   select: {
     doneText: 'Terminer'
   },

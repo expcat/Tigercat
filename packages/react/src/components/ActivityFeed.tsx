@@ -3,6 +3,9 @@ import {
   classNames,
   buildActivityGroups,
   formatActivityTime,
+  getActivityFeedLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   toActivityTimelineItems,
   activityItemClasses,
   activityItemLayoutClasses,
@@ -40,6 +43,7 @@ import { Card } from './Card'
 import { Text } from './Text'
 import { Link } from './Link'
 import { Loading } from './Loading'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ActivityFeedProps
   extends
@@ -74,8 +78,10 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   groupBy,
   groupOrder,
   loading = false,
-  loadingText = '加载中...',
-  emptyText = '暂无动态',
+  loadingText,
+  emptyText,
+  locale,
+  labels: labelsOverride,
   showAvatar = true,
   showTime = true,
   showGroupTitle = true,
@@ -84,6 +90,18 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   className,
   ...props
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getActivityFeedLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const resolvedLoadingText = resolveLocaleText(labels.loadingText, loadingText)
+  const resolvedEmptyText = resolveLocaleText(labels.emptyText, emptyText)
+
   const resolvedGroups = useMemo(
     () => buildActivityGroups(items, groups, groupBy, groupOrder),
     [items, groups, groupBy, groupOrder]
@@ -178,7 +196,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div
         className={wrapperClasses}
         role="feed"
-        aria-label="动态"
+        aria-label="Activity"
         aria-busy
         {...props}
         data-tiger-activity-feed>
@@ -187,7 +205,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
           size="sm"
           className={classNames('tiger-activity-feed-loading', activityFeedStateCardClasses)}>
           <div className="flex items-center justify-center py-8">
-            <Loading text={loadingText} className={activityFeedLoadingClasses} />
+            <Loading text={resolvedLoadingText} className={activityFeedLoadingClasses} />
           </div>
         </Card>
       </div>
@@ -199,7 +217,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div
         className={wrapperClasses}
         role="feed"
-        aria-label="动态"
+        aria-label="Activity"
         {...props}
         data-tiger-activity-feed>
         <Card
@@ -220,7 +238,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               />
             </svg>
             <Text tag="div" size="sm" color="muted" className="font-medium">
-              {emptyText}
+              {resolvedEmptyText}
             </Text>
           </div>
         </Card>
@@ -232,7 +250,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     <div
       className={wrapperClasses}
       role="feed"
-      aria-label="动态"
+      aria-label="Activity"
       {...props}
       data-tiger-activity-feed>
       {resolvedGroups.map((group, groupIndex) => {

@@ -7,7 +7,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import type { ChatMessage } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ChatWindow (React)', () => {
@@ -15,9 +18,9 @@ describe('ChatWindow (React)', () => {
     const onSend = vi.fn()
     render(<ChatWindow messages={[]} onSend={onSend} />)
 
-    expect(screen.getByText('暂无消息')).toBeInTheDocument()
+    expect(screen.getByText('No messages')).toBeInTheDocument()
 
-    const input = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    const input = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await userEvent.type(input, 'Hello{enter}')
 
     expect(onSend).toHaveBeenCalledTimes(1)
@@ -28,7 +31,7 @@ describe('ChatWindow (React)', () => {
     const onSend = vi.fn()
     render(<ChatWindow allowEmpty onSend={onSend} />)
 
-    const sendButton = screen.getByRole('button', { name: '发送' })
+    const sendButton = screen.getByRole('button', { name: 'Send' })
     await userEvent.click(sendButton)
 
     expect(onSend).toHaveBeenCalledWith('')
@@ -38,7 +41,7 @@ describe('ChatWindow (React)', () => {
     const onSend = vi.fn()
     render(<ChatWindow disabled onSend={onSend} />)
 
-    const sendButton = screen.getByRole('button', { name: '发送' })
+    const sendButton = screen.getByRole('button', { name: 'Send' })
     await userEvent.click(sendButton)
 
     expect(onSend).not.toHaveBeenCalled()
@@ -48,7 +51,7 @@ describe('ChatWindow (React)', () => {
     const onSend = vi.fn()
     render(<ChatWindow onSend={onSend} />)
 
-    const input = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    const input = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await userEvent.type(input, 'Hello{shift>}{enter}{/shift}')
 
     expect(onSend).not.toHaveBeenCalled()
@@ -70,7 +73,7 @@ describe('ChatWindow (React)', () => {
 
     render(<ChatWindow messages={messages} showTime />)
 
-    expect(screen.getByText('发送失败')).toBeInTheDocument()
+    expect(screen.getByText('Failed to send')).toBeInTheDocument()
     expect(screen.getByText('10:00')).toBeInTheDocument()
   })
 
@@ -98,7 +101,7 @@ describe('ChatWindow (React)', () => {
     const onSend = vi.fn()
     render(<ChatWindow inputType="input" clearOnSend={false} onSend={onSend} />)
 
-    const input = screen.getByPlaceholderText('请输入消息') as HTMLInputElement
+    const input = screen.getByPlaceholderText('Type a message') as HTMLInputElement
     await userEvent.type(input, 'Ping{enter}')
 
     expect(onSend).toHaveBeenCalledWith('Ping')
@@ -109,7 +112,7 @@ describe('ChatWindow (React)', () => {
     const onSend = vi.fn()
     render(<ChatWindow sendOnEnter={false} onSend={onSend} />)
 
-    const input = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    const input = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await userEvent.type(input, 'Hello{enter}')
 
     expect(onSend).not.toHaveBeenCalled()
@@ -129,6 +132,48 @@ describe('ChatWindow (React)', () => {
     expect(bubbles.length).toBeGreaterThan(0)
     expect(bubbles.length).toBeLessThan(40)
   })
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN for empty, send, placeholder, and failed status', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <ChatWindow messages={[{ id: '1', content: 'Hi', status: 'failed' }]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: '发送' })).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('请输入消息')).toBeInTheDocument()
+      expect(screen.getByText('发送失败')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider en-US for empty, send, and delivered status', () => {
+      render(
+        <ConfigProvider locale={enUS}>
+          <ChatWindow messages={[{ id: '1', content: 'Hi', status: 'sent' }]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument()
+      expect(screen.getByText('Delivered')).toBeInTheDocument()
+    })
+
+    it('lets explicit sendText win under en-US', () => {
+      render(
+        <ConfigProvider locale={enUS}>
+          <ChatWindow sendText="Go" />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: 'Go' })).toBeInTheDocument()
+      expect(screen.getByText('No messages')).toBeInTheDocument()
+    })
+
+    it('shows Chinese empty text under ConfigProvider zh-CN', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <ChatWindow messages={[]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('暂无消息')).toBeInTheDocument()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<ChatWindow />)

@@ -5,6 +5,9 @@ import {
   coerceClassValue,
   formatActivityTime,
   mergeStyleValues,
+  getActivityFeedLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   toActivityTimelineItems,
   activityItemClasses,
   activityItemLayoutClasses,
@@ -17,7 +20,9 @@ import {
   type ActivityGroup,
   type ActivityItem,
   type ActivityAction,
-  type ActivityTimelineItem
+  type ActivityTimelineItem,
+  type TigerLocale,
+  type TigerLocaleActivityFeed
 } from '@expcat/tigercat-core'
 import {
   activityFeedActionClasses,
@@ -42,6 +47,7 @@ import { Card } from './Card'
 import { Text } from './Text'
 import { Link } from './Link'
 import { Loading } from './Loading'
+import { useTigerConfig } from './ConfigProvider'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -100,11 +106,19 @@ export const ActivityFeed = defineComponent({
     },
     loadingText: {
       type: String,
-      default: '加载中...'
+      default: undefined
     },
     emptyText: {
       type: String,
-      default: '暂无动态'
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleActivityFeed>>,
+      default: undefined
     },
     showAvatar: {
       type: Boolean,
@@ -128,6 +142,10 @@ export const ActivityFeed = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getActivityFeedLabels(mergedLocale.value, props.labels))
+
     const resolvedGroups = computed(() =>
       buildActivityGroups(props.items, props.groups, props.groupBy, props.groupOrder)
     )
@@ -251,7 +269,7 @@ export const ActivityFeed = defineComponent({
     const feedAriaLabel = computed(
       () =>
         (attrs['aria-label'] as string | undefined) ??
-        (attrs['aria-labelledby'] ? undefined : '动态')
+        (attrs['aria-labelledby'] ? undefined : 'Activity')
     )
     const feedAriaBusy = computed(() => attrs['aria-busy'] ?? (props.loading ? 'true' : undefined))
 
@@ -260,7 +278,7 @@ export const ActivityFeed = defineComponent({
         const loadingNode = slots.loading
           ? slots.loading()
           : h(Loading, {
-              text: props.loadingText,
+              text: resolveLocaleText(labels.value.loadingText, props.loadingText),
               class: activityFeedLoadingClasses
             })
 
@@ -316,7 +334,7 @@ export const ActivityFeed = defineComponent({
               h(
                 Text,
                 { tag: 'div', size: 'sm', color: 'muted', class: 'font-medium' },
-                { default: () => props.emptyText }
+                { default: () => resolveLocaleText(labels.value.emptyText, props.emptyText) }
               )
             ])
 

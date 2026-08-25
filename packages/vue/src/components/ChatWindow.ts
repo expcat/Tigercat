@@ -3,12 +3,18 @@ import {
   classNames,
   coerceClassValue,
   getChatMessageStatusInfo,
+  buildChatMessageStatusInfo,
   getChatStatusBarClasses,
   formatChatTime,
   mergeStyleValues,
+  getChatWindowLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   type BadgeVariant,
   type ChatMessage,
-  type ChatWindowProps as CoreChatWindowProps
+  type ChatWindowProps as CoreChatWindowProps,
+  type TigerLocale,
+  type TigerLocaleChatWindow
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
@@ -16,6 +22,7 @@ import { Input } from './Input'
 import { Button } from './Button'
 import { VirtualList } from './VirtualList'
 import { Empty } from './Empty'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -63,7 +70,7 @@ export const ChatWindow = defineComponent({
     },
     placeholder: {
       type: String,
-      default: '请输入消息'
+      default: undefined
     },
     disabled: {
       type: Boolean,
@@ -74,11 +81,19 @@ export const ChatWindow = defineComponent({
     },
     emptyText: {
       type: String,
-      default: '暂无消息'
+      default: undefined
     },
     sendText: {
       type: String,
-      default: '发送'
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleChatWindow>>,
+      default: undefined
     },
     messageListAriaLabel: {
       type: String
@@ -162,6 +177,11 @@ export const ChatWindow = defineComponent({
     send: null
   },
   setup(props, { emit, attrs, slots }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChatWindowLabels(mergedLocale.value, props.labels))
+    const statusMap = computed(() => buildChatMessageStatusInfo(labels.value))
+
     const localValue = ref<string>(props.modelValue ?? props.defaultValue ?? '')
 
     watch(
@@ -256,7 +276,9 @@ export const ChatWindow = defineComponent({
 
     const renderMessageItem = (message: ChatMessage, index: number) => {
       const isSelf = message.direction === 'self'
-      const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
+      const statusInfo = message.status
+        ? getChatMessageStatusInfo(message.status, statusMap.value)
+        : undefined
       const timeText = props.showTime ? formatChatTime(message.time) : ''
       const customContent = slots.message?.({ message, index })
 
@@ -322,10 +344,11 @@ export const ChatWindow = defineComponent({
     }
 
     const renderInput = () => {
-      const resolvedInputLabel = props.inputAriaLabel ?? props.placeholder ?? '消息输入'
+      const resolvedPlaceholder = resolveLocaleText(labels.value.placeholder, props.placeholder)
+      const resolvedInputLabel = props.inputAriaLabel ?? resolvedPlaceholder
       const commonProps = {
         modelValue: inputValue.value,
-        placeholder: props.placeholder,
+        placeholder: resolvedPlaceholder,
         disabled: props.disabled,
         maxLength: props.maxLength,
         onKeydown: handleKeydown,
@@ -359,7 +382,7 @@ export const ChatWindow = defineComponent({
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
-                  'aria-label': props.messageListAriaLabel ?? '消息列表',
+                  'aria-label': props.messageListAriaLabel ?? 'Message list',
                   onScroll: syncStickToBottom
                 },
                 [
@@ -387,7 +410,7 @@ export const ChatWindow = defineComponent({
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
-                  'aria-label': props.messageListAriaLabel ?? '消息列表',
+                  'aria-label': props.messageListAriaLabel ?? 'Message list',
                   onScroll: syncStickToBottom
                 },
                 props.messages.length === 0
@@ -397,7 +420,11 @@ export const ChatWindow = defineComponent({
                         {
                           class: 'h-full flex items-center justify-center py-8'
                         },
-                        [h(Empty, { description: props.emptyText })]
+                        [
+                          h(Empty, {
+                            description: resolveLocaleText(labels.value.emptyText, props.emptyText)
+                          })
+                        ]
                       )
                     ]
                   : props.messages.map((message, index) => renderMessageItem(message, index))
@@ -424,9 +451,10 @@ export const ChatWindow = defineComponent({
                 {
                   disabled: !canSend.value,
                   onClick: handleSend,
-                  'aria-label': props.sendAriaLabel ?? props.sendText
+                  'aria-label':
+                    props.sendAriaLabel ?? resolveLocaleText(labels.value.sendText, props.sendText)
                 },
-                () => props.sendText
+                () => resolveLocaleText(labels.value.sendText, props.sendText)
               )
             ]
           )

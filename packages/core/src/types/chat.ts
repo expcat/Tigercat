@@ -3,6 +3,7 @@
  */
 
 import type { BadgeVariant } from './badge'
+import type { TigerLocale } from './locale'
 
 /**
  * Chat message direction
@@ -112,6 +113,15 @@ export interface ChatWindowProps {
    * Send button text
    */
   sendText?: string
+  /**
+   * Locale overrides for ChatWindow UI text
+   */
+  locale?: Partial<TigerLocale>
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<import('./locale').TigerLocaleChatWindow>
   /**
    * Aria label for message list container
    */

@@ -76,6 +76,42 @@ export const viVN: TigerLocale = defineLocale({
     dragHintText: 'Kéo để di chuyển',
     boardAriaLabel: 'Bảng nhiệm vụ'
   },
+  chatWindow: {
+    emptyText: 'Không có tin nhắn',
+    sendText: 'Gửi',
+    placeholder: 'Nhập tin nhắn',
+    sendingText: 'Đang gửi',
+    sentText: 'Đã gửi',
+    failedText: 'Gửi thất bại'
+  },
+  commentThread: {
+    emptyText: 'Không có bình luận',
+    replyPlaceholder: 'Viết phản hồi...',
+    replyButtonText: 'Trả lời',
+    cancelReplyText: 'Hủy',
+    likeText: 'Thích',
+    likedText: 'Đã thích',
+    replyText: 'Trả lời',
+    moreText: 'Thêm',
+    loadMoreText: 'Tải thêm',
+    collapseRepliesText: '▾ Thu gọn phản hồi',
+    expandRepliesText: '▸ Mở rộng {count} phản hồi'
+  },
+  activityFeed: {
+    emptyText: 'Không có hoạt động',
+    loadingText: 'Đang tải...'
+  },
+  notificationCenter: {
+    title: 'Thông báo',
+    emptyText: 'Không có thông báo',
+    loadingText: 'Đang tải...',
+    allLabel: 'Tất cả',
+    unreadLabel: 'Chưa đọc',
+    readLabel: 'Đã đọc',
+    markAllReadText: 'Đánh dấu tất cả là đã đọc',
+    markReadText: 'Đánh dấu đã đọc',
+    markUnreadText: 'Đánh dấu chưa đọc'
+  },
   select: {
     doneText: 'Hoàn thành'
   },

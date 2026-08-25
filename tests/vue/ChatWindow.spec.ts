@@ -6,9 +6,12 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
-import { nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { ChatWindow } from '@expcat/tigercat-vue/ChatWindow'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { ChatMessage } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function createMessages(count: number): ChatMessage[] {
@@ -59,9 +62,9 @@ describe('ChatWindow (Vue)', () => {
       props: { messages: [] }
     })
 
-    expect(screen.getByText('暂无消息')).toBeInTheDocument()
+    expect(screen.getByText('No messages')).toBeInTheDocument()
 
-    const textarea = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    const textarea = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'Hello')
     await fireEvent.keyDown(textarea, { key: 'Enter' })
 
@@ -74,7 +77,7 @@ describe('ChatWindow (Vue)', () => {
       props: { allowEmpty: true }
     })
 
-    const sendButton = screen.getByRole('button', { name: '发送' })
+    const sendButton = screen.getByRole('button', { name: 'Send' })
     await fireEvent.click(sendButton)
 
     expect(emitted().send?.[0]).toEqual([''])
@@ -85,7 +88,7 @@ describe('ChatWindow (Vue)', () => {
       props: { disabled: true }
     })
 
-    const sendButton = screen.getByRole('button', { name: '发送' })
+    const sendButton = screen.getByRole('button', { name: 'Send' })
     await fireEvent.click(sendButton)
 
     expect(emitted().send).toBeFalsy()
@@ -94,7 +97,7 @@ describe('ChatWindow (Vue)', () => {
   it('handles shift+enter in textarea without sending', async () => {
     const { emitted } = render(ChatWindow)
 
-    const textarea = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    const textarea = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'Hello')
     await fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true })
 
@@ -119,7 +122,7 @@ describe('ChatWindow (Vue)', () => {
       props: { messages, showTime: true }
     })
 
-    expect(screen.getByText('发送失败')).toBeInTheDocument()
+    expect(screen.getByText('Failed to send')).toBeInTheDocument()
     expect(screen.getByText('10:00')).toBeInTheDocument()
   })
 
@@ -148,7 +151,7 @@ describe('ChatWindow (Vue)', () => {
       props: { inputType: 'input', clearOnSend: false }
     })
 
-    const input = screen.getByPlaceholderText('请输入消息') as HTMLInputElement
+    const input = screen.getByPlaceholderText('Type a message') as HTMLInputElement
     await fireEvent.update(input, 'Ping')
     await fireEvent.keyDown(input, { key: 'Enter' })
 
@@ -161,7 +164,7 @@ describe('ChatWindow (Vue)', () => {
       props: { sendOnEnter: false }
     })
 
-    const textarea = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    const textarea = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'Hello')
     await fireEvent.keyDown(textarea, { key: 'Enter' })
 
@@ -189,6 +192,62 @@ describe('ChatWindow (Vue)', () => {
     expect(bubbles.length).toBeLessThan(40)
   })
 
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN for empty, send, placeholder, and failed status', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(ChatWindow, {
+                messages: [{ id: '1', content: 'Hi', status: 'failed' }]
+              })
+            )
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: '发送' })).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('请输入消息')).toBeInTheDocument()
+      expect(screen.getByText('发送失败')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider en-US for empty, send, and delivered status', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: enUS }, () =>
+              h(ChatWindow, {
+                messages: [{ id: '1', content: 'Hi', status: 'sent' }]
+              })
+            )
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument()
+      expect(screen.getByText('Delivered')).toBeInTheDocument()
+    })
+
+    it('lets explicit sendText win under en-US', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: enUS }, () => h(ChatWindow, { sendText: 'Go' }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: 'Go' })).toBeInTheDocument()
+      expect(screen.getByText('No messages')).toBeInTheDocument()
+    })
+
+    it('shows Chinese empty text under ConfigProvider zh-CN', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(ChatWindow, { messages: [] }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByText('暂无消息')).toBeInTheDocument()
+    })
+  })
+
   describe('auto-scroll', () => {
     it('does not call onUpdated for scroll-to-bottom', () => {
       const source = readFileSync(
@@ -208,7 +267,7 @@ describe('ChatWindow (Vue)', () => {
       await flushScrollFrames()
 
       scroller.scrollTop = 600
-      const textarea = screen.getByPlaceholderText('请输入消息')
+      const textarea = screen.getByPlaceholderText('Type a message')
       await fireEvent.update(textarea, 'reading history')
       await rerender({ messages, modelValue: 'reading history' })
       await flushScrollFrames()
@@ -232,7 +291,7 @@ describe('ChatWindow (Vue)', () => {
       await flushScrollFrames()
 
       scroller.scrollTop = 800
-      const textarea = screen.getByPlaceholderText('请输入消息')
+      const textarea = screen.getByPlaceholderText('Type a message')
       await fireEvent.update(textarea, 'reading history')
       await rerender({
         messages,

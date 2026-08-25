@@ -76,6 +76,42 @@ export const thTH: TigerLocale = defineLocale({
     dragHintText: 'ลากเพื่อย้าย',
     boardAriaLabel: 'บอร์ดงาน'
   },
+  chatWindow: {
+    emptyText: 'ไม่มีข้อความ',
+    sendText: 'ส่ง',
+    placeholder: 'พิมพ์ข้อความ',
+    sendingText: 'กำลังส่ง',
+    sentText: 'ส่งแล้ว',
+    failedText: 'ส่งไม่สำเร็จ'
+  },
+  commentThread: {
+    emptyText: 'ไม่มีความคิดเห็น',
+    replyPlaceholder: 'เขียนการตอบกลับ...',
+    replyButtonText: 'ตอบกลับ',
+    cancelReplyText: 'ยกเลิก',
+    likeText: 'ถูกใจ',
+    likedText: 'ถูกใจแล้ว',
+    replyText: 'ตอบกลับ',
+    moreText: 'เพิ่มเติม',
+    loadMoreText: 'โหลดเพิ่ม',
+    collapseRepliesText: '▾ ย่อการตอบกลับ',
+    expandRepliesText: '▸ ขยายการตอบกลับ {count} รายการ'
+  },
+  activityFeed: {
+    emptyText: 'ไม่มีกิจกรรม',
+    loadingText: 'กำลังโหลด...'
+  },
+  notificationCenter: {
+    title: 'การแจ้งเตือน',
+    emptyText: 'ไม่มีการแจ้งเตือน',
+    loadingText: 'กำลังโหลด...',
+    allLabel: 'ทั้งหมด',
+    unreadLabel: 'ยังไม่อ่าน',
+    readLabel: 'อ่านแล้ว',
+    markAllReadText: 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด',
+    markReadText: 'ทำเครื่องหมายว่าอ่านแล้ว',
+    markUnreadText: 'ทำเครื่องหมายว่ายังไม่อ่าน'
+  },
   select: {
     doneText: 'เสร็จสิ้น'
   },

@@ -4,6 +4,7 @@
 
 import type { TagVariant } from './tag'
 import type { ButtonVariant } from './button'
+import type { TigerLocale } from './locale'
 
 /**
  * Comment user info
@@ -194,6 +195,23 @@ export interface CommentThreadProps {
    * Load more text
    */
   loadMoreText?: string
+  /**
+   * Collapse replies button text
+   */
+  collapseRepliesText?: string
+  /**
+   * Expand replies button text. Template: supports {count}
+   */
+  expandRepliesText?: string
+  /**
+   * Locale overrides for CommentThread UI text
+   */
+  locale?: Partial<TigerLocale>
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<import('./locale').TigerLocaleCommentThread>
   /**
    * Show avatar
    * @default true

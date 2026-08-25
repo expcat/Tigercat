@@ -3,6 +3,7 @@
  */
 
 import type { TagVariant } from './tag'
+import type { TigerLocale } from './locale'
 
 /**
  * Activity user info
@@ -165,6 +166,15 @@ export interface ActivityFeedProps {
    * Empty state text
    */
   emptyText?: string
+  /**
+   * Locale overrides for ActivityFeed UI text
+   */
+  locale?: Partial<TigerLocale>
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<import('./locale').TigerLocaleActivityFeed>
   /**
    * Show avatar
    * @default true

@@ -27,6 +27,10 @@ import type {
   TigerLocaleImageEditor,
   TigerLocaleStatus,
   TigerLocaleTaskBoard,
+  TigerLocaleChatWindow,
+  TigerLocaleCommentThread,
+  TigerLocaleActivityFeed,
+  TigerLocaleNotificationCenter,
   TigerLocaleSelect,
   TigerLocaleTabs,
   TigerLocaleRate,
@@ -67,6 +71,10 @@ const TIGER_LOCALE_KEYS = [
   'imageEditor',
   'status',
   'taskBoard',
+  'chatWindow',
+  'commentThread',
+  'activityFeed',
+  'notificationCenter',
   'select',
   'tabs',
   'rate',
@@ -159,6 +167,10 @@ export function mergeTigerLocale(
     imageEditor: { ...base?.imageEditor, ...override?.imageEditor },
     status: { ...base?.status, ...override?.status },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
+    chatWindow: { ...base?.chatWindow, ...override?.chatWindow },
+    commentThread: { ...base?.commentThread, ...override?.commentThread },
+    activityFeed: { ...base?.activityFeed, ...override?.activityFeed },
+    notificationCenter: { ...base?.notificationCenter, ...override?.notificationCenter },
     select: { ...base?.select, ...override?.select },
     tabs: { ...base?.tabs, ...override?.tabs },
     rate: { ...base?.rate, ...override?.rate },
@@ -678,6 +690,206 @@ export function getTaskBoardLabels(
       overrides?.dragHintText ?? locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
     boardAriaLabel:
       overrides?.boardAriaLabel ?? locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
+  }
+}
+
+// ============================================================================
+// ChatWindow Labels
+// ============================================================================
+
+export const DEFAULT_CHAT_WINDOW_LABELS: Required<TigerLocaleChatWindow> = {
+  emptyText: 'No messages',
+  sendText: 'Send',
+  placeholder: 'Type a message',
+  sendingText: 'Sending',
+  sentText: 'Delivered',
+  failedText: 'Failed to send'
+}
+
+export const ZH_CN_CHAT_WINDOW_LABELS: Required<TigerLocaleChatWindow> = {
+  emptyText: '暂无消息',
+  sendText: '发送',
+  placeholder: '请输入消息',
+  sendingText: '发送中',
+  sentText: '已送达',
+  failedText: '发送失败'
+}
+
+export function getChatWindowLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleChatWindow>
+): Required<TigerLocaleChatWindow> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_CHAT_WINDOW_LABELS : DEFAULT_CHAT_WINDOW_LABELS
+  return {
+    emptyText: overrides?.emptyText ?? locale?.chatWindow?.emptyText ?? defaultLabels.emptyText,
+    sendText: overrides?.sendText ?? locale?.chatWindow?.sendText ?? defaultLabels.sendText,
+    placeholder:
+      overrides?.placeholder ?? locale?.chatWindow?.placeholder ?? defaultLabels.placeholder,
+    sendingText:
+      overrides?.sendingText ?? locale?.chatWindow?.sendingText ?? defaultLabels.sendingText,
+    sentText: overrides?.sentText ?? locale?.chatWindow?.sentText ?? defaultLabels.sentText,
+    failedText: overrides?.failedText ?? locale?.chatWindow?.failedText ?? defaultLabels.failedText
+  }
+}
+
+// ============================================================================
+// CommentThread Labels
+// ============================================================================
+
+export const DEFAULT_COMMENT_THREAD_LABELS: Required<TigerLocaleCommentThread> = {
+  emptyText: 'No comments',
+  replyPlaceholder: 'Write a reply...',
+  replyButtonText: 'Reply',
+  cancelReplyText: 'Cancel',
+  likeText: 'Like',
+  likedText: 'Liked',
+  replyText: 'Reply',
+  moreText: 'More',
+  loadMoreText: 'Load more',
+  collapseRepliesText: '▾ Collapse replies',
+  expandRepliesText: '▸ Expand {count} replies'
+}
+
+export const ZH_CN_COMMENT_THREAD_LABELS: Required<TigerLocaleCommentThread> = {
+  emptyText: '暂无评论',
+  replyPlaceholder: '写下回复...',
+  replyButtonText: '回复',
+  cancelReplyText: '取消',
+  likeText: '点赞',
+  likedText: '已赞',
+  replyText: '回复',
+  moreText: '更多',
+  loadMoreText: '加载更多',
+  collapseRepliesText: '▾ 收起回复',
+  expandRepliesText: '▸ 展开 {count} 条回复'
+}
+
+export function getCommentThreadLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCommentThread>
+): Required<TigerLocaleCommentThread> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_COMMENT_THREAD_LABELS : DEFAULT_COMMENT_THREAD_LABELS
+  return {
+    emptyText: overrides?.emptyText ?? locale?.commentThread?.emptyText ?? defaultLabels.emptyText,
+    replyPlaceholder:
+      overrides?.replyPlaceholder ??
+      locale?.commentThread?.replyPlaceholder ??
+      defaultLabels.replyPlaceholder,
+    replyButtonText:
+      overrides?.replyButtonText ??
+      locale?.commentThread?.replyButtonText ??
+      defaultLabels.replyButtonText,
+    cancelReplyText:
+      overrides?.cancelReplyText ??
+      locale?.commentThread?.cancelReplyText ??
+      defaultLabels.cancelReplyText,
+    likeText: overrides?.likeText ?? locale?.commentThread?.likeText ?? defaultLabels.likeText,
+    likedText: overrides?.likedText ?? locale?.commentThread?.likedText ?? defaultLabels.likedText,
+    replyText: overrides?.replyText ?? locale?.commentThread?.replyText ?? defaultLabels.replyText,
+    moreText: overrides?.moreText ?? locale?.commentThread?.moreText ?? defaultLabels.moreText,
+    loadMoreText:
+      overrides?.loadMoreText ?? locale?.commentThread?.loadMoreText ?? defaultLabels.loadMoreText,
+    collapseRepliesText:
+      overrides?.collapseRepliesText ??
+      locale?.commentThread?.collapseRepliesText ??
+      defaultLabels.collapseRepliesText,
+    expandRepliesText:
+      overrides?.expandRepliesText ??
+      locale?.commentThread?.expandRepliesText ??
+      defaultLabels.expandRepliesText
+  }
+}
+
+// ============================================================================
+// ActivityFeed Labels
+// ============================================================================
+
+export const DEFAULT_ACTIVITY_FEED_LABELS: Required<TigerLocaleActivityFeed> = {
+  emptyText: 'No activity',
+  loadingText: 'Loading...'
+}
+
+export const ZH_CN_ACTIVITY_FEED_LABELS: Required<TigerLocaleActivityFeed> = {
+  emptyText: '暂无动态',
+  loadingText: '加载中...'
+}
+
+export function getActivityFeedLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleActivityFeed>
+): Required<TigerLocaleActivityFeed> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_ACTIVITY_FEED_LABELS : DEFAULT_ACTIVITY_FEED_LABELS
+  return {
+    emptyText: overrides?.emptyText ?? locale?.activityFeed?.emptyText ?? defaultLabels.emptyText,
+    loadingText:
+      overrides?.loadingText ?? locale?.activityFeed?.loadingText ?? defaultLabels.loadingText
+  }
+}
+
+// ============================================================================
+// NotificationCenter Labels
+// ============================================================================
+
+export const DEFAULT_NOTIFICATION_CENTER_LABELS: Required<TigerLocaleNotificationCenter> = {
+  title: 'Notifications',
+  emptyText: 'No notifications',
+  loadingText: 'Loading...',
+  allLabel: 'All',
+  unreadLabel: 'Unread',
+  readLabel: 'Read',
+  markAllReadText: 'Mark all as read',
+  markReadText: 'Mark as read',
+  markUnreadText: 'Mark as unread'
+}
+
+export const ZH_CN_NOTIFICATION_CENTER_LABELS: Required<TigerLocaleNotificationCenter> = {
+  title: '通知中心',
+  emptyText: '暂无通知',
+  loadingText: '加载中...',
+  allLabel: '全部',
+  unreadLabel: '未读',
+  readLabel: '已读',
+  markAllReadText: '全部标记已读',
+  markReadText: '标记已读',
+  markUnreadText: '标记未读'
+}
+
+export function getNotificationCenterLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleNotificationCenter>
+): Required<TigerLocaleNotificationCenter> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_NOTIFICATION_CENTER_LABELS : DEFAULT_NOTIFICATION_CENTER_LABELS
+  return {
+    title: overrides?.title ?? locale?.notificationCenter?.title ?? defaultLabels.title,
+    emptyText:
+      overrides?.emptyText ?? locale?.notificationCenter?.emptyText ?? defaultLabels.emptyText,
+    loadingText:
+      overrides?.loadingText ??
+      locale?.notificationCenter?.loadingText ??
+      defaultLabels.loadingText,
+    allLabel: overrides?.allLabel ?? locale?.notificationCenter?.allLabel ?? defaultLabels.allLabel,
+    unreadLabel:
+      overrides?.unreadLabel ??
+      locale?.notificationCenter?.unreadLabel ??
+      defaultLabels.unreadLabel,
+    readLabel:
+      overrides?.readLabel ?? locale?.notificationCenter?.readLabel ?? defaultLabels.readLabel,
+    markAllReadText:
+      overrides?.markAllReadText ??
+      locale?.notificationCenter?.markAllReadText ??
+      defaultLabels.markAllReadText,
+    markReadText:
+      overrides?.markReadText ??
+      locale?.notificationCenter?.markReadText ??
+      defaultLabels.markReadText,
+    markUnreadText:
+      overrides?.markUnreadText ??
+      locale?.notificationCenter?.markUnreadText ??
+      defaultLabels.markUnreadText
   }
 }
 

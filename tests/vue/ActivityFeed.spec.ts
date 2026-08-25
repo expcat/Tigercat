@@ -4,8 +4,11 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
+import { defineComponent, h } from 'vue'
 import { ActivityFeed } from '@expcat/tigercat-vue/ActivityFeed'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { ActivityGroup } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ActivityFeed (Vue)', () => {
@@ -93,6 +96,28 @@ describe('ActivityFeed (Vue)', () => {
     expect(screen.queryByText('今天')).not.toBeInTheDocument()
     expect(screen.getByText('A')).toBeInTheDocument()
   })
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN empty and loading copy when props are omitted', () => {
+      const EmptyWrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(ActivityFeed, { items: [] }))
+        }
+      })
+      render(EmptyWrapper)
+      expect(screen.getByText('暂无动态')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN loading text when loading', () => {
+      const LoadingWrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(ActivityFeed, { loading: true }))
+        }
+      })
+      render(LoadingWrapper)
+      expect(screen.getByText('加载中...')).toBeInTheDocument()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(ActivityFeed)

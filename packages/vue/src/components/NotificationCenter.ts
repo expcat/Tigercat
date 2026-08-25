@@ -5,10 +5,15 @@ import {
   mergeStyleValues,
   buildNotificationGroups,
   formatActivityTime,
+  getNotificationCenterLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   type NotificationCenterProps as CoreNotificationCenterProps,
   type NotificationGroup,
   type NotificationItem,
-  type NotificationReadFilter
+  type NotificationReadFilter,
+  type TigerLocale,
+  type TigerLocaleNotificationCenter
 } from '@expcat/tigercat-core'
 import {
   notificationCenterItemClasses,
@@ -42,6 +47,7 @@ import { List } from './List'
 import { Text } from './Text'
 import { Button } from './Button'
 import { Loading } from './Loading'
+import { useTigerConfig } from './ConfigProvider'
 
 type ReadFilterOption = {
   key: NotificationReadFilter
@@ -99,39 +105,47 @@ export const NotificationCenter = defineComponent({
     },
     loadingText: {
       type: String,
-      default: '加载中...'
+      default: undefined
     },
     emptyText: {
       type: String,
-      default: '暂无通知'
+      default: undefined
     },
     title: {
       type: String,
-      default: '通知中心'
+      default: undefined
     },
     allLabel: {
       type: String,
-      default: '全部'
+      default: undefined
     },
     unreadLabel: {
       type: String,
-      default: '未读'
+      default: undefined
     },
     readLabel: {
       type: String,
-      default: '已读'
+      default: undefined
     },
     markAllReadText: {
       type: String,
-      default: '全部标记已读'
+      default: undefined
     },
     markReadText: {
       type: String,
-      default: '标记已读'
+      default: undefined
     },
     markUnreadText: {
       type: String,
-      default: '标记未读'
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleNotificationCenter>>,
+      default: undefined
     },
     manageReadState: {
       type: Boolean,
@@ -156,6 +170,10 @@ export const NotificationCenter = defineComponent({
     'item-read-change'
   ],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getNotificationCenterLabels(mergedLocale.value, props.labels))
+
     const resolvedGroups = computed(() =>
       buildNotificationGroups(props.items, props.groups, props.groupBy, props.groupOrder)
     )
@@ -322,9 +340,9 @@ export const NotificationCenter = defineComponent({
 
     const renderReadFilterButtons = () => {
       const options: ReadFilterOption[] = [
-        { key: 'all', label: props.allLabel },
-        { key: 'unread', label: props.unreadLabel },
-        { key: 'read', label: props.readLabel }
+        { key: 'all', label: resolveLocaleText(labels.value.allLabel, props.allLabel) },
+        { key: 'unread', label: resolveLocaleText(labels.value.unreadLabel, props.unreadLabel) },
+        { key: 'read', label: resolveLocaleText(labels.value.readLabel, props.readLabel) }
       ]
 
       return h(
@@ -421,7 +439,12 @@ export const NotificationCenter = defineComponent({
                 handleItemReadChange(item, !isRead)
               }
             },
-            { default: () => (isRead ? props.markUnreadText : props.markReadText) }
+            {
+              default: () =>
+                isRead
+                  ? resolveLocaleText(labels.value.markUnreadText, props.markUnreadText)
+                  : resolveLocaleText(labels.value.markReadText, props.markReadText)
+            }
           )
         ]
       )
@@ -466,7 +489,7 @@ export const NotificationCenter = defineComponent({
                 color: 'muted',
                 class: notificationCenterEmptyTextClasses
               },
-              { default: () => props.emptyText }
+              { default: () => resolveLocaleText(labels.value.emptyText, props.emptyText) }
             )
           ]
         )
@@ -479,7 +502,7 @@ export const NotificationCenter = defineComponent({
           split: true,
           bordered: 'divided',
           hoverable: true,
-          emptyText: props.emptyText,
+          emptyText: resolveLocaleText(labels.value.emptyText, props.emptyText),
           onItemClick: handleItemClick
         },
         {
@@ -533,7 +556,7 @@ export const NotificationCenter = defineComponent({
                 weight: 'bold',
                 class: notificationCenterTitleClasses
               },
-              { default: () => props.title }
+              { default: () => resolveLocaleText(labels.value.title, props.title) }
             ),
             totalUnread.value > 0
               ? h(
@@ -559,7 +582,9 @@ export const NotificationCenter = defineComponent({
               ),
               onClick: handleMarkAllRead
             },
-            { default: () => props.markAllReadText }
+            {
+              default: () => resolveLocaleText(labels.value.markAllReadText, props.markAllReadText)
+            }
           )
         ]),
         renderReadFilterButtons()
@@ -568,7 +593,7 @@ export const NotificationCenter = defineComponent({
       const content = props.loading
         ? h('div', { class: 'flex items-center justify-center py-16' }, [
             h(Loading, {
-              text: props.loadingText,
+              text: resolveLocaleText(labels.value.loadingText, props.loadingText),
               class: notificationCenterLoadingClasses
             })
           ])
@@ -580,7 +605,7 @@ export const NotificationCenter = defineComponent({
 
       const ariaLabel =
         (attrs['aria-label'] as string | undefined) ??
-        (attrs['aria-labelledby'] ? undefined : props.title)
+        (attrs['aria-labelledby'] ? undefined : resolveLocaleText(labels.value.title, props.title))
 
       return h(
         'div',

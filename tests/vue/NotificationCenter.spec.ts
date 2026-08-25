@@ -4,8 +4,11 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { defineComponent, h } from 'vue'
 import { NotificationCenter } from '@expcat/tigercat-vue/NotificationCenter'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { NotificationItem } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('NotificationCenter (Vue)', () => {
@@ -33,11 +36,11 @@ describe('NotificationCenter (Vue)', () => {
 
     render(NotificationCenter, { props: { items } })
 
-    await fireEvent.click(screen.getByRole('button', { name: '未读' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Unread' }))
     expect(screen.getByText('未读通知')).toBeInTheDocument()
     expect(screen.queryByText('已读通知')).not.toBeInTheDocument()
 
-    await fireEvent.click(screen.getByRole('button', { name: '已读' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Read' }))
     expect(screen.getByText('已读通知')).toBeInTheDocument()
     expect(screen.queryByText('未读通知')).not.toBeInTheDocument()
   })
@@ -51,7 +54,7 @@ describe('NotificationCenter (Vue)', () => {
       attrs: { onMarkAllRead }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: '全部标记已读' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }))
 
     expect(onMarkAllRead).toHaveBeenCalledTimes(1)
     expect(onMarkAllRead.mock.calls[0]?.[0]).toBe('系统')
@@ -67,7 +70,7 @@ describe('NotificationCenter (Vue)', () => {
       attrs: { onItemReadChange }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: '标记已读' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as read' }))
 
     expect(onItemReadChange).toHaveBeenCalledTimes(1)
     expect(onItemReadChange).toHaveBeenCalledWith(items[0], true)
@@ -109,7 +112,7 @@ describe('NotificationCenter (Vue)', () => {
       attrs: { onItemReadChange }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: '标记未读' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as unread' }))
     expect(onItemReadChange).toHaveBeenCalledWith(items[0], false)
   })
 
@@ -150,6 +153,35 @@ describe('NotificationCenter (Vue)', () => {
   it('renders with no items and no emptyText', () => {
     const { container } = render(NotificationCenter, { props: { items: [] } })
     expect(container.querySelector('[data-tiger-notification-center="true"]')).toBeInTheDocument()
+  })
+
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN for title, mark-all, and empty copy', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(NotificationCenter, {
+                items: [{ id: 1, title: '系统通知', type: '系统', read: false }]
+              })
+            )
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByText('通知中心')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '全部标记已读' })).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN empty text when emptyText is omitted', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () => h(NotificationCenter, { items: [] }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByText('暂无通知')).toBeInTheDocument()
+    })
   })
 
   describe('Accessibility', () => {

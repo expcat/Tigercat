@@ -160,6 +160,42 @@ export const zhCN: TigerLocale = {
     dragHintText: '拖拽以移动',
     boardAriaLabel: '任务看板'
   },
+  chatWindow: {
+    emptyText: '暂无消息',
+    sendText: '发送',
+    placeholder: '请输入消息',
+    sendingText: '发送中',
+    sentText: '已送达',
+    failedText: '发送失败'
+  },
+  commentThread: {
+    emptyText: '暂无评论',
+    replyPlaceholder: '写下回复...',
+    replyButtonText: '回复',
+    cancelReplyText: '取消',
+    likeText: '点赞',
+    likedText: '已赞',
+    replyText: '回复',
+    moreText: '更多',
+    loadMoreText: '加载更多',
+    collapseRepliesText: '▾ 收起回复',
+    expandRepliesText: '▸ 展开 {count} 条回复'
+  },
+  activityFeed: {
+    emptyText: '暂无动态',
+    loadingText: '加载中...'
+  },
+  notificationCenter: {
+    title: '通知中心',
+    emptyText: '暂无通知',
+    loadingText: '加载中...',
+    allLabel: '全部',
+    unreadLabel: '未读',
+    readLabel: '已读',
+    markAllReadText: '全部标记已读',
+    markReadText: '标记已读',
+    markUnreadText: '标记未读'
+  },
   select: {
     doneText: '完成'
   },

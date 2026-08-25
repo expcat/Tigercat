@@ -78,7 +78,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-9 | Gantt drag (wire bar drag to dates) | done | this commit | 2026-08-25 |
 | P2-10 | Chart showTooltip / hoverable | done | this commit | 2026-08-25 |
 | P2-11 | Chart responsive scale | done | this commit | 2026-08-25 |
-| P2-12..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-12 | Chat / Comment / Activity / Notification copy to locale | done | this commit | 2026-08-25 |
+| P2-13..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -919,3 +920,16 @@ Chart `responsive` recomputes plot scale / innerRect after observing the parent 
 T1 A0-A10 did not cover ChartCanvas resize vs prop scale. Optional ChartCanvas callback is public; no new required chart prop.
 
 Next: P2-12 Chat / Comment / Activity / Notification copy to locale (FormWizard/TaskBoard already do). T1 A0-A10 did not cover these default Chinese strings, so do not skip.
+
+
+## P2-12 notes
+
+Chat / Comment / Activity / Notification default copy goes through locale (Vue + React), same path as FormWizard / TaskBoard:
+
+- New TigerLocaleChatWindow / CommentThread / ActivityFeed / NotificationCenter blocks; TIGER_LOCALE_KEYS + mergeTigerLocale + get*Labels
+- Components: useTigerConfig -> mergeTigerLocale -> getXxxLabels -> resolveLocaleText; existing string props still override
+- No locale / non-zh fallback is English; zh-CN keeps 发送 / 暂无消息 / 已送达 / 点赞 / 收起回复 / 展开 n 条回复 / 暂无动态 / 通知中心 / 全部标记已读
+- Chat status texts via buildChatMessageStatusInfo(labels); Comment expand/collapse uses {count} labels
+- T1 A0-A10 did not cover these strings. No new required prop. skipCondition / like write-back / manageReadState not in this commit
+
+Next: P2-13 FormWizard skipCondition (handleStepChange should use findNextUnskippedStep like Next). T1 A0-A10 did not cover skipCondition, so do not skip.

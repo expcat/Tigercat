@@ -34,7 +34,11 @@ describe('i18n locale presets', () => {
     'table',
     'formWizard',
     'select',
-    'taskBoard'
+    'taskBoard',
+    'chatWindow',
+    'commentThread',
+    'activityFeed',
+    'notificationCenter'
   ]
 
   for (const [name, locale] of Object.entries(locales)) {
@@ -115,6 +119,35 @@ describe('i18n locale presets', () => {
       expect(locale.datePicker?.locale).toBe(locale.locale)
       expect(locale.datePicker?.labels?.today).toBeDefined()
     }
+  })
+
+  it('enUS chatWindow.sendText is "Send" and zhCN is "发送"', () => {
+    expect(enUS.chatWindow.sendText).toBe('Send')
+    expect(zhCN.chatWindow.sendText).toBe('发送')
+  })
+
+  it('mergeTigerLocale keeps chatWindow / commentThread / activityFeed / notificationCenter blocks', () => {
+    const merged = mergeTigerLocale(
+      {
+        chatWindow: { sendText: 'Base send', emptyText: 'Base empty' },
+        commentThread: { likeText: 'Base like' },
+        activityFeed: { emptyText: 'Base activity' },
+        notificationCenter: { title: 'Base title', markAllReadText: 'Base mark' }
+      },
+      {
+        chatWindow: { sendText: 'Override send' },
+        commentThread: { likeText: 'Override like' },
+        activityFeed: { emptyText: 'Override activity' },
+        notificationCenter: { markAllReadText: 'Override mark' }
+      }
+    )
+
+    expect(merged?.chatWindow?.sendText).toBe('Override send')
+    expect(merged?.chatWindow?.emptyText).toBe('Base empty')
+    expect(merged?.commentThread?.likeText).toBe('Override like')
+    expect(merged?.activityFeed?.emptyText).toBe('Override activity')
+    expect(merged?.notificationCenter?.title).toBe('Base title')
+    expect(merged?.notificationCenter?.markAllReadText).toBe('Override mark')
   })
 
   it('mergeTigerLocale preserves and overrides qrcode and timeline text', () => {

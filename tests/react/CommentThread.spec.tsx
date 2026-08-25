@@ -7,7 +7,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { CommentThread } from '@expcat/tigercat-react/CommentThread'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import type { CommentNode } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('CommentThread (React)', () => {
@@ -53,7 +56,7 @@ describe('CommentThread (React)', () => {
       />
     )
 
-    const replyAction = screen.getByRole('button', { name: '回复' })
+    const replyAction = screen.getByRole('button', { name: 'Reply' })
     await userEvent.click(replyAction)
 
     const input = screen.getByPlaceholderText('写下回复') as HTMLTextAreaElement
@@ -115,14 +118,14 @@ describe('CommentThread (React)', () => {
       />
     )
 
-    await userEvent.click(screen.getByRole('button', { name: '加载更多' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
 
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
   })
   it('renders empty state when no nodes provided', () => {
     render(<CommentThread nodes={[]} />)
-    expect(screen.getByRole('feed', { name: '评论线程' })).toBeInTheDocument()
+    expect(screen.getByRole('feed', { name: 'Comment thread' })).toBeInTheDocument()
   })
 
   it('renders emptyText when nodes is empty', () => {
@@ -192,7 +195,7 @@ describe('CommentThread (React)', () => {
 
     render(<CommentThread nodes={nodes} cancelReplyText="取消回复" replyPlaceholder="写下回复" />)
 
-    await userEvent.click(screen.getByRole('button', { name: '回复' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Reply' }))
     expect(screen.getByPlaceholderText('写下回复')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: '取消回复' }))
@@ -236,7 +239,64 @@ describe('CommentThread (React)', () => {
     ]
 
     render(<CommentThread nodes={nodes} showLike />)
-    expect(screen.getByRole('button', { name: /点赞\s+5/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Like\s+5/ })).toBeInTheDocument()
+  })
+
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN for like and expand replies', () => {
+      const nodes: CommentNode[] = [
+        {
+          id: 1,
+          content: 'Root comment',
+          user: { name: 'A' },
+          likes: 2,
+          children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+        }
+      ]
+      render(
+        <ConfigProvider locale={zhCN}>
+          <CommentThread nodes={nodes} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: /点赞/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /展开 1 条回复/ })).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider en-US for like and expand replies', () => {
+      const nodes: CommentNode[] = [
+        {
+          id: 1,
+          content: 'Root comment',
+          user: { name: 'A' },
+          likes: 2,
+          children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+        }
+      ]
+      render(
+        <ConfigProvider locale={enUS}>
+          <CommentThread nodes={nodes} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: /Like/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Expand 1 replies/ })).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN collapse copy when expanded', () => {
+      const nodes: CommentNode[] = [
+        {
+          id: 1,
+          content: 'Root comment',
+          user: { name: 'A' },
+          children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+        }
+      ]
+      render(
+        <ConfigProvider locale={zhCN}>
+          <CommentThread nodes={nodes} defaultExpandedKeys={[1]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: /收起回复/ })).toBeInTheDocument()
+    })
   })
 
   describe('Accessibility', () => {
