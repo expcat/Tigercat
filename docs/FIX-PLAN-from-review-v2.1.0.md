@@ -34,7 +34,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #5 | AutoComplete write option.label | done | this commit | 2026-08-25 |
 | #6 | React Form validate after updateValue | done | this commit | 2026-08-25 |
 | #7 | React Upload controlled fileList | done | this commit | 2026-08-25 |
-| #8 | Pagination React pageSize example | pending | | |
+| #8 | Pagination React pageSize example | done | this commit | 2026-08-25 |
 | #9 | Table default pagination uncontrolled | pending | | |
 | #10 | FileManager selectedKeys inner state | pending | | |
 | #11 | Kanban allowAddCard insert | pending | | |
@@ -267,3 +267,17 @@ React Upload controlled `fileList` progress/success/error now `onChange(file, ne
 Pages `/upload` React custom upload (fileList + onChange + customRequest) can redraw success. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase C #8 Pagination React pageSize example.
+
+## #8 notes
+
+React pagination/01 controlled `pageSize` now writes back through `onPageSizeChange`:
+
+- Example `examples/example/react/src/examples/pagination/01/App.tsx` keeps `current` + `pageSize` state and `onChange` for page navigation
+- Added `onPageSizeChange={(page, size) => { setCurrent(page); setPageSize(size) }}` so the size `<select>` no longer snaps back to 20
+- Signature is `(current, pageSize)`; do not pass `setPageSize` directly (first arg is the page)
+- Pagination component (React/Vue) unchanged: size changes still fire only `onPageSizeChange`, not `onChange`
+- Vue 01 still `v-model:pageSize`; Table left for #9
+
+Pages `/pagination` React「受控分页」can change 20 → 10. Example-only; no CHANGELOG unpublished bullet.
+
+Next: Phase C #9 Table default pagination uncontrolled.

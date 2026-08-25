@@ -18,6 +18,10 @@ export default function App() {
         setCurrent(page)
         setPageSize(size)
       }}
+      onPageSizeChange={(page, size) => {
+        setCurrent(page)
+        setPageSize(size)
+      }}
     />
   )
 }
