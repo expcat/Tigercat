@@ -84,7 +84,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-15 | Code clipboard failure state + locale | done | this commit | 2026-08-25 |
 | P2-16 | Upload drag slot (honor default slot; drop bg-white / border-gray-300) | done | this commit | 2026-08-25 |
 | P2-17 | Splitter gutter (bg-gray-200 to token; gutterSize to visual width) | done | this commit | 2026-08-25 |
-| P2-18..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-18 | Radar split disk (no --tiger-bg,#ffffff hole; splitArea follows dark) | done | this commit | 2026-08-25 |
+| P2-19..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -1001,4 +1002,17 @@ Splitter gutter chrome uses theme tokens and public gutterSize sets visible thic
 - T1 A0-A10 did not cover gutter chrome or gutterSize visual width. No new required prop.
 
 Next: P2-18 Radar split disk (do not punch --tiger-bg,#ffffff; splitArea follows dark). Check T1 A0-A10 before skipping.
+
+## P2-18 notes
+
+RadarChart splitArea no longer punches a white/mint disk; bands follow dark (Vue + React):
+
+- removed fill var(--tiger-bg,#fff) hole on circle-ring and polygon-ring (4 sites)
+- createPolygonRingPath / createCircleRingPath evenodd rings; inner is transparent
+- RADAR_SPLIT_AREA_COLORS rgba(0,0,0,0.02/0.05) -> color-mix(in oklab, var(--tiger-text) 4%/10%, transparent)
+- optional --tiger-chart-split-* override kept; not registered in THEME_CSS_VARS
+- showSplitArea still false; splitAreaOpacity still 0.06; custom splitAreaColors still wins
+- T1 A0 aliased --tiger-bg but did not change RadarChart or RADAR_SPLIT_AREA_COLORS. No new required prop.
+
+Next: P2-19 CommentThread 01 like (wire @like, or internal liked state; same root as FileManager 01). T1 did not cover it; P2-12 only moved 点赞 copy to locale. Do not skip.
 

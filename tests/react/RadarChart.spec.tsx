@@ -219,4 +219,63 @@ describe('RadarChart', () => {
     expect(container.querySelectorAll('text[data-radar-level-label]')).toHaveLength(5)
     expect(container.textContent).toContain('0-A')
   })
+
+  it('renders polygon split areas as evenodd rings without a --tiger-bg punch', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      showSplitArea: true
+    })
+    const splitAreas = container.querySelectorAll('[data-radar-split-area]')
+    expect(splitAreas.length).toBeGreaterThan(0)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/--tiger-bg,#fff/i)
+    expect(html).not.toMatch(/--tiger-bg,#ffffff/i)
+    expect(html).not.toMatch(/--tiger-bg,\s*#fff/i)
+    for (const el of splitAreas) {
+      const fill = (el.getAttribute('fill') || '').toLowerCase()
+      expect(fill).not.toBe('#fff')
+      expect(fill).not.toBe('#ffffff')
+      for (const sibling of Array.from(el.parentElement?.children ?? [])) {
+        if (sibling === el) continue
+        const siblingFill = (sibling.getAttribute('fill') || '').toLowerCase()
+        expect(siblingFill).not.toBe('#fff')
+        expect(siblingFill).not.toBe('#ffffff')
+        expect(siblingFill).not.toMatch(/--tiger-bg/)
+      }
+    }
+    expect(
+      container.querySelectorAll('path[data-radar-split-area][fill-rule="evenodd"]').length
+    ).toBeGreaterThan(0)
+  })
+
+  it('renders circle split areas as evenodd rings without a --tiger-bg punch', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      gridShape: 'circle',
+      showSplitArea: true
+    })
+    const splitAreas = container.querySelectorAll('[data-radar-split-area]')
+    expect(splitAreas.length).toBeGreaterThan(0)
+    const html = container.innerHTML
+    expect(html).not.toMatch(/--tiger-bg,#fff/i)
+    expect(html).not.toMatch(/--tiger-bg,#ffffff/i)
+    expect(html).not.toMatch(/--tiger-bg,\s*#fff/i)
+    expect(
+      container.querySelectorAll('path[data-radar-split-area][fill-rule="evenodd"]').length
+    ).toBeGreaterThan(0)
+  })
+
+  it('applies custom splitAreaColors to split fills', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      showSplitArea: true,
+      splitAreaColors: ['#f8fafc', '#eef2ff']
+    })
+    const fills = Array.from(container.querySelectorAll('[data-radar-split-area]')).map((el) =>
+      el.getAttribute('fill')
+    )
+    expect(fills.length).toBeGreaterThan(0)
+    expect(fills).toContain('#f8fafc')
+    expect(fills).toContain('#eef2ff')
+  })
 })

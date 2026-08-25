@@ -3,7 +3,9 @@ import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
   classNames,
+  createCircleRingPath,
   createPolygonPath,
+  createPolygonRingPath,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -627,52 +629,36 @@ export const RadarChart = defineComponent({
                       : [])
                   ])
                 : null,
-              // Split area (alternating fills – ECharts splitArea style)
+              // Split area (alternating fills – evenodd ring, transparent inner)
               ...splitAreaPaths.value.map((area, index) => {
-                if (area.type === 'circle-ring') {
-                  // For circle grid: use two concentric circles via clipPath or just draw filled circles
-                  // Simpler: draw filled circle then overlay inner circle with background
-                  return h('g', { key: `split-${index}` }, [
-                    h('circle', {
-                      cx: area.cx,
-                      cy: area.cy,
-                      r: area.outerRadius,
-                      fill: area.color,
-                      'fill-opacity': props.splitAreaOpacity,
-                      stroke: 'none',
-                      'data-radar-split-area': 'true'
-                    }),
-                    area.innerRadius > 0
-                      ? h('circle', {
-                          cx: area.cx,
-                          cy: area.cy,
-                          r: area.innerRadius,
-                          fill: 'var(--tiger-bg,#fff)',
-                          stroke: 'none'
-                        })
-                      : null
-                  ])
+                const shared = {
+                  key: `split-${index}`,
+                  fill: area.color,
+                  'fill-opacity': props.splitAreaOpacity,
+                  stroke: 'none',
+                  'data-radar-split-area': 'true'
                 }
-                // Polygon ring
-                const outerPath = createPolygonPath(area.outerPoints)
-                return h('g', { key: `split-${index}` }, [
-                  outerPath
-                    ? h('path', {
-                        d: outerPath,
-                        fill: area.color,
-                        'fill-opacity': props.splitAreaOpacity,
-                        stroke: 'none',
-                        'data-radar-split-area': 'true'
-                      })
-                    : null,
-                  area.innerPoints.length > 0
-                    ? h('path', {
-                        d: createPolygonPath(area.innerPoints),
-                        fill: 'var(--tiger-bg,#fff)',
-                        stroke: 'none'
-                      })
-                    : null
-                ])
+                if (area.type === 'circle-ring') {
+                  if (area.innerRadius > 0) {
+                    return h('path', {
+                      ...shared,
+                      d: createCircleRingPath(area.cx, area.cy, area.outerRadius, area.innerRadius),
+                      'fill-rule': 'evenodd'
+                    })
+                  }
+                  return h('circle', {
+                    ...shared,
+                    cx: area.cx,
+                    cy: area.cy,
+                    r: area.outerRadius
+                  })
+                }
+                if (area.innerPoints.length > 0) {
+                  const d = createPolygonRingPath(area.outerPoints, area.innerPoints)
+                  return d ? h('path', { ...shared, d, 'fill-rule': 'evenodd' }) : null
+                }
+                const d = createPolygonPath(area.outerPoints)
+                return d ? h('path', { ...shared, d }) : null
               }),
               // Grid lines
               ...gridPaths.value.map((grid, index) =>

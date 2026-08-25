@@ -3,7 +3,9 @@ import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
   classNames,
+  createCircleRingPath,
   createPolygonPath,
+  createPolygonRingPath,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -468,53 +470,60 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             })}
         </defs>
       )}
-      {/* Split areas */}
+      {/* Split areas: evenodd ring, transparent inner */}
       {splitAreaPaths.map((area, index) => {
         if (area.type === 'circle-ring') {
-          return (
-            <g key={`split-${index}`}>
-              <circle
-                cx={area.cx}
-                cy={area.cy}
-                r={area.outerRadius}
+          if (area.innerRadius > 0) {
+            return (
+              <path
+                key={`split-${index}`}
+                d={createCircleRingPath(area.cx, area.cy, area.outerRadius, area.innerRadius)}
                 fill={area.color}
                 fillOpacity={splitAreaOpacity}
+                fillRule="evenodd"
                 stroke="none"
                 data-radar-split-area="true"
               />
-              {area.innerRadius > 0 ? (
-                <circle
-                  cx={area.cx}
-                  cy={area.cy}
-                  r={area.innerRadius}
-                  fill="var(--tiger-bg,#fff)"
-                  stroke="none"
-                />
-              ) : null}
-            </g>
+            )
+          }
+          return (
+            <circle
+              key={`split-${index}`}
+              cx={area.cx}
+              cy={area.cy}
+              r={area.outerRadius}
+              fill={area.color}
+              fillOpacity={splitAreaOpacity}
+              stroke="none"
+              data-radar-split-area="true"
+            />
           )
         }
+        if (area.innerPoints.length > 0) {
+          const ringPath = createPolygonRingPath(area.outerPoints, area.innerPoints)
+          return ringPath ? (
+            <path
+              key={`split-${index}`}
+              d={ringPath}
+              fill={area.color}
+              fillOpacity={splitAreaOpacity}
+              fillRule="evenodd"
+              stroke="none"
+              data-radar-split-area="true"
+            />
+          ) : null
+        }
         const outerPath = createPolygonPath(area.outerPoints)
-        return (
-          <g key={`split-${index}`}>
-            {outerPath ? (
-              <path
-                d={outerPath}
-                fill={area.color}
-                fillOpacity={splitAreaOpacity}
-                stroke="none"
-                data-radar-split-area="true"
-              />
-            ) : null}
-            {area.innerPoints.length > 0 ? (
-              <path
-                d={createPolygonPath(area.innerPoints)}
-                fill="var(--tiger-bg,#fff)"
-                stroke="none"
-              />
-            ) : null}
-          </g>
-        )
+        return outerPath ? (
+          <path
+            key={`split-${index}`}
+            d={outerPath}
+            fill={area.color}
+            fillOpacity={splitAreaOpacity}
+            stroke="none"
+            data-radar-split-area="true"
+          />
+        ) : null
       })}
       {/* Grid lines */}
       {gridPaths.map((grid, index) =>

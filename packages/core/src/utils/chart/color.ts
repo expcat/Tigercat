@@ -41,10 +41,12 @@ export const DEFAULT_CHART_COLORS = [
 
 /**
  * Default split area colors for radar / polar grids (subtle alternating fills).
+ * Optional `--tiger-chart-split-*` overrides; fallbacks mix `--tiger-text` so
+ * bands follow light/dark instead of a black-alpha wash.
  */
 export const RADAR_SPLIT_AREA_COLORS = [
-  'var(--tiger-chart-split-1,rgba(0,0,0,0.02))',
-  'var(--tiger-chart-split-2,rgba(0,0,0,0.05))'
+  'var(--tiger-chart-split-1,color-mix(in oklab, var(--tiger-text) 4%, transparent))',
+  'var(--tiger-chart-split-2,color-mix(in oklab, var(--tiger-text) 10%, transparent))'
 ]
 
 // ----------------------------------------------------------------------------

@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **RadarChart splitArea 不再用 `var(--tiger-bg,#fff)` 挖洞**：内外环改成 evenodd 透明环路径（`createPolygonRingPath` / `createCircleRingPath`），暗色页不再露出白/薄荷盘。默认 `RADAR_SPLIT_AREA_COLORS` 不再用 `rgba(0,0,0,0.02/0.05)`，改走 `color-mix` + `--tiger-text`（可选 `--tiger-chart-split-*` 覆写），暗色跟主题。Vue/React。公开视觉修复。无新必填 prop。自定义 `splitAreaColors` 未改。
 - **Splitter gutter chrome 走 token，`gutterSize` 接到视觉宽度**：gutter 不再硬编码 `bg-gray-200`，把手不再硬编码 `bg-gray-400`，改走已注册 `--tiger-border` / `--tiger-text-muted`。公开 `gutterSize`（默认仍 4）写入 `--tiger-splitter-gutter`，水平 gutter 宽 / 垂直 gutter 高跟随该值，不再锁死未赋值的 `4px` fallback。Vue/React。公开视觉 + 行为修复。无新必填 prop。受控 `sizes` 覆盖拖拽未改。
 - **Upload drag 模式尊重默认插槽 / children**：`drag` 为 true 且提供默认插槽 / children 时，拖拽区内只渲染该内容（Pages `/upload` 02「点击或拖拽文档到此处」可见），不再叠 locale「Click to upload / or drag and drop」；无插槽时仍回落 SVG + locale 提示 + accept/maxSize。拖拽区 / 上传按钮 chrome 不再硬编码 `bg-white` / `border-gray-300`，改走已注册 `--tiger-surface` / `--tiger-border`。Vue/React。公开行为 + 视觉修复。无新必填 prop。未绘制 `file.progress` 进度条。
 - **Code copy / copied / failed 走 `getCodeLabels`，剪贴板失败可见**：无 locale 回落英文 Copy / Copied / Copy failed；zh-CN / ConfigProvider zhCN 仍为「复制 / 已复制 / 复制失败」。剪贴板失败显示 failed 态（error token + Copy failed），不再停在 idle 也不看起来像成功；成功仍只在写入成功时发 `copy` / `onCopy`。显式 `copyLabel` / `copiedLabel` / `copyFailedLabel` 仍优先。Vue/React。公开行为修复。无新必填 prop。
