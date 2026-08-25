@@ -2,6 +2,7 @@ import React, { useId, useMemo } from 'react'
 import {
   classNames,
   computeSunburstArcs,
+  getSunburstLabelPoint,
   getChartElementOpacity,
   getChartInnerRect,
   getStableChartGradientPrefix,
@@ -34,7 +35,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   padding = 24,
   data,
   innerRadiusRatio = 0,
-  showLabels: _showLabels = true,
+  showLabels = true,
   colors,
   gradient = false,
   hoverable = false,
@@ -211,6 +212,23 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
             />
           )
         })}
+        {showLabels &&
+          arcs.map((arc) => {
+            const { x, y } = getSunburstLabelPoint(arc, cx, cy)
+            return (
+              <text
+                key={`label-${arc.index}`}
+                x={x}
+                y={y}
+                className="fill-white text-xs"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                style={{ pointerEvents: 'none' }}
+                aria-hidden="true">
+                {arc.label}
+              </text>
+            )
+          })}
       </g>
     </ChartCanvas>
   )

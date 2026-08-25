@@ -12,6 +12,32 @@ const sampleData = [
   { label: 'C', value: 20 }
 ]
 
+const pagesData = [
+  {
+    label: '亚洲',
+    value: 60,
+    children: [
+      { label: '中国', value: 35 },
+      { label: '日本', value: 15 },
+      { label: '印度', value: 10 }
+    ]
+  },
+  {
+    label: '欧洲',
+    value: 25,
+    children: [
+      { label: '德国', value: 12 },
+      { label: '法国', value: 8 },
+      { label: '英国', value: 5 }
+    ]
+  },
+  { label: '美洲', value: 15 }
+]
+
+function readSvgTextPoint(el: Element): { x: number; y: number } {
+  return { x: Number(el.getAttribute('x')), y: Number(el.getAttribute('y')) }
+}
+
 describe('SunburstChart (React)', () => {
   it('renders SVG with arcs', () => {
     const { container } = renderWithProps(SunburstChart, {
@@ -85,6 +111,57 @@ describe('SunburstChart (React)', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<SunburstChart data={sampleData} width={320} height={320} />)
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('showLabels', () => {
+    it('paints arc labels at distinct mid-ring points by default', () => {
+      const { container } = renderWithProps(SunburstChart, {
+        data: pagesData,
+        ...defaultSize
+      })
+
+      const texts = Array.from(container.querySelectorAll('svg text'))
+      expect(texts.length).toBeGreaterThanOrEqual(9)
+      const labels = texts.map((el) => el.textContent)
+      expect(labels).toContain('亚洲')
+      expect(labels).toContain('中国')
+
+      for (const el of texts) {
+        const { x, y } = readSvgTextPoint(el)
+        expect(Number.isFinite(x)).toBe(true)
+        expect(Number.isFinite(y)).toBe(true)
+      }
+      expect(
+        texts.every((el) => el.getAttribute('x') === '0' && el.getAttribute('y') === '0')
+      ).toBe(false)
+
+      const asia = texts.find((el) => el.textContent === '亚洲')
+      const china = texts.find((el) => el.textContent === '中国')
+      expect(asia).toBeTruthy()
+      expect(china).toBeTruthy()
+      expect(readSvgTextPoint(asia!)).not.toEqual(readSvgTextPoint(china!))
+    })
+
+    it('renders zero arc label texts when showLabels is false', () => {
+      const { container } = renderWithProps(SunburstChart, {
+        data: pagesData,
+        showLabels: false,
+        ...defaultSize
+      })
+
+      const texts = Array.from(container.querySelectorAll('svg text'))
+      expect(texts).toHaveLength(0)
+    })
+
+    it('renders A, B, C labels for flat sample data', () => {
+      const { container } = renderWithProps(SunburstChart, {
+        data: sampleData,
+        ...defaultSize
+      })
+
+      const labels = Array.from(container.querySelectorAll('svg text')).map((el) => el.textContent)
+      expect(labels).toEqual(['A', 'B', 'C'])
     })
   })
 })

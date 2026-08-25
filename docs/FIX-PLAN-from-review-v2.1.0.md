@@ -64,7 +64,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #32 | Anchor / ScrollSpy current item | done | this commit | 2026-08-25 |
 | #33 | FloatButton default plus + Group placement/offset/portal | done | this commit | 2026-08-25 |
 | #35 | Table virtual scroll box overflow only around body | done | this commit | 2026-08-25 |
-| #19–#20, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #38 | Sunburst showLabels midAngle labels | done | this commit | 2026-08-25 |
+| #20 | ImagePreview/ImageViewer iframe (Phase E T5) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -728,4 +729,16 @@ React Table virtual / autoVirtual scroll box now matches Vue:
 
 Public behavior fix recorded in CHANGELOG unpublished.
 
-Next: Phase D #38 Sunburst showLabels (draw labels at midAngle, or drop the dead public API/example; do not touch iframe/T5). #20 iframe left for Phase E T5. #19 already landed in A10.
+## #38 notes
+
+SunburstChart Vue + React `showLabels` (default true) now paints SVG text at each arc midAngle / ring midpoint:
+
+- Core `SunburstArc` keeps `innerRadius` / `outerRadius`; `getSunburstLabelPoint` uses `polarToCartesian(cx, cy, (inner+outer)/2, midAngle)`
+- Vue reads `props.showLabels`; React uses `showLabels = true` (no `_showLabels`)
+- Labels after paths, white `text-xs`, `pointer-events: none`, `aria-hidden`
+- `showLabels={false}` still has no svg texts
+- iframe/T5, DemoBlock, #20, tooltipFormatter, keyboard Enter left alone
+
+Public behavior fix (dead API now live) recorded in CHANGELOG unpublished.
+
+Next: Phase E T5 / #20 ImagePreview/ImageViewer iframe (preview `max-h-[90vh] max-w-[90vw]`; raise demo viewport or stretch iframe when preview opens). #19 already landed in A10. C table P1 otherwise complete.

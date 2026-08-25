@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **SunburstChart `showLabels` 在弧中点绘制标签**：Vue / React 默认 `showLabels`（true）在每段弧的 `midAngle` 与环中径处绘制 SVG `<text>`，Pages `/sunburst-chart` 外环可见中国/日本/印度等子层名称，不再只有 path。React 不再把 prop 绑成 `_showLabels`。`showLabels={false}` 仍无文字。公开行为修复（死 API 现已生效）。无主题变量变化，无新公开 prop。
 - **React Table `virtual` / `autoVirtual` 滚动盒对齐 Vue**：`height` + `overflow:auto` 只包表体（colgroup/header/body/summary），导出钮与 Pagination 留在外层 wrapper、不进滚动盒。公开行为修复。无主题变量变化，无新公开 prop。
 - **FloatButton 默认 plus 图标与 Group placement/offset/portal**：无 children / 默认插槽时渲染 plus SVG。FloatButton.Group 接受 `placement` / `offset`（与独立 FloatButton / BackTop 同一套 viewport helpers，默认 `bottom-right` / 24）以及 `portal`（默认 true；`false` 时就地 `absolute` 定位，相对祖先可装下）。Pages `/float-button`「悬浮按钮组」留在 `h-56` 盒内，空圆/空方不再无图标。公开 API 增补 + 行为修复。无主题变量变化。
 - **Anchor / ScrollSpy 当前项按 offset 线取最后一项**：Vue / React 的 active href 是文档序中最后一个 section top 位于 offset 线（`rootTop + offsetTop/targetOffset + bounds`，默认 5）之上或正好压线的项，不再取顶部 40% 带里第一个相交项。点击后锁住当前项直到程序化滚动结束（`scrollend`，否则 scroll idle + 安全超时）。公开 `bounds` 接到 IntersectionObserver 路径。Pages `/anchor`「容器滚动」点「发布」与 `/scroll-spy` 末项保持高亮。公开行为修复。无主题变量变化，无新公开 prop。
