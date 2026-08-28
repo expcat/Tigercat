@@ -118,7 +118,9 @@ export const zhTW: TigerLocale = defineLocale({
     markUnreadText: '標記未讀'
   },
   select: {
-    doneText: '完成'
+    doneText: '完成',
+    placeholder: '請選擇',
+    emptyText: '暫無選項'
   },
   colorPicker: {
     trigger: '選擇顏色',

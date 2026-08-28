@@ -118,7 +118,9 @@ export const koKR: TigerLocale = defineLocale({
     markUnreadText: '읽지 않음으로 표시'
   },
   select: {
-    doneText: '완료'
+    doneText: '완료',
+    placeholder: '옵션 선택',
+    emptyText: '옵션 없음'
   },
   colorPicker: {
     trigger: '색 선택',

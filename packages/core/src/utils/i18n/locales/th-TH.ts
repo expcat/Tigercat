@@ -118,7 +118,9 @@ export const thTH: TigerLocale = defineLocale({
     markUnreadText: 'ทำเครื่องหมายว่ายังไม่อ่าน'
   },
   select: {
-    doneText: 'เสร็จสิ้น'
+    doneText: 'เสร็จสิ้น',
+    placeholder: 'เลือกตัวเลือก',
+    emptyText: 'ไม่พบตัวเลือก'
   },
   colorPicker: {
     trigger: 'เลือกสี',

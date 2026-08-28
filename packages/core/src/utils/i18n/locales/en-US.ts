@@ -202,7 +202,9 @@ export const enUS: TigerLocale = {
     markUnreadText: 'Mark as unread'
   },
   select: {
-    doneText: 'Done'
+    doneText: 'Done',
+    placeholder: 'Select an option',
+    emptyText: 'No options found'
   },
   colorPicker: {
     trigger: 'Pick color',

@@ -151,12 +151,11 @@ export const Select = defineComponent({
      */
     disabled: Boolean,
     /**
-     * Placeholder text
-     * @default 'Select an option'
+     * Placeholder text. Defaults to ConfigProvider locale `select.placeholder`.
      */
     placeholder: {
       type: String,
-      default: 'Select an option'
+      default: undefined
     },
     /**
      * Enable search functionality
@@ -326,31 +325,37 @@ export const Select = defineComponent({
         : flatFilteredOptions.value
     })
 
+    const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
+    const placeholderText = computed(() =>
+      resolveLocaleText(labels.value.placeholder, props.placeholder)
+    )
+    const doneText = computed(() => resolveLocaleText(labels.value.doneText))
+
     const displayText = computed(() => {
       if (props.multiple && Array.isArray(props.modelValue)) {
         if (props.modelValue.length === 0) {
-          return props.placeholder
+          return placeholderText.value
         }
         const currentValue = props.modelValue
         const selectedOptions = [...allOptions.value, ...createdOptions.value].filter((opt) =>
           currentValue.includes(opt.value)
         )
-        const labels = selectedOptions.map((opt) => opt.label)
-        if (props.maxTagCount !== undefined && labels.length > props.maxTagCount) {
-          const visible = labels.slice(0, props.maxTagCount)
-          return `${visible.join(', ')} +${labels.length - props.maxTagCount}`
+        const optionLabels = selectedOptions.map((opt) => opt.label)
+        if (props.maxTagCount !== undefined && optionLabels.length > props.maxTagCount) {
+          const visible = optionLabels.slice(0, props.maxTagCount)
+          return `${visible.join(', ')} +${optionLabels.length - props.maxTagCount}`
         }
-        return labels.join(', ')
+        return optionLabels.join(', ')
       }
 
       const value = Array.isArray(props.modelValue) ? undefined : props.modelValue
       if (value === undefined || value === null || value === '') {
-        return props.placeholder
+        return placeholderText.value
       }
       const option = [...allOptions.value, ...createdOptions.value].find(
         (opt) => opt.value === value
       )
-      return option ? option.label : props.placeholder
+      return option ? option.label : placeholderText.value
     })
 
     const showClearButton = computed(() => {
@@ -363,9 +368,6 @@ export const Select = defineComponent({
         (!Array.isArray(props.modelValue) || props.modelValue.length > 0)
       )
     })
-
-    const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
-    const doneText = computed(() => resolveLocaleText(labels.value.doneText))
 
     function isSelected(option: SelectOption): boolean {
       if (props.multiple && Array.isArray(props.modelValue)) {
@@ -701,7 +703,7 @@ export const Select = defineComponent({
               {
                 class: classNames(
                   'flex-1 text-left truncate',
-                  displayText.value === props.placeholder &&
+                  displayText.value === placeholderText.value &&
                     'text-[var(--tiger-select-placeholder,var(--tiger-text-muted,#9ca3af))]'
                 )
               },
@@ -926,11 +928,7 @@ export const Select = defineComponent({
                     : h(
                         'div',
                         { class: selectEmptyStateClasses },
-                        resolveLocaleText(
-                          'No options found',
-                          props.emptyText,
-                          mergedLocale.value?.common?.emptyText
-                        )
+                        resolveLocaleText(labels.value.emptyText, props.emptyText)
                       ),
                 h('div', { class: selectDoneActionClasses }, [
                   h(

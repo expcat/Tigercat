@@ -133,7 +133,9 @@ export const arSA: TigerLocale = defineLocale({
     markUnreadText: 'وضع علامة غير مقروء'
   },
   select: {
-    doneText: 'إنهاء'
+    doneText: 'إنهاء',
+    placeholder: 'اختر خياراً',
+    emptyText: 'لا توجد خيارات'
   },
   colorPicker: {
     trigger: 'اختيار لون',

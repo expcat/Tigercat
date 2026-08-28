@@ -118,7 +118,9 @@ export const viVN: TigerLocale = defineLocale({
     markUnreadText: 'Đánh dấu chưa đọc'
   },
   select: {
-    doneText: 'Hoàn thành'
+    doneText: 'Hoàn thành',
+    placeholder: 'Chọn một tùy chọn',
+    emptyText: 'Không có tùy chọn'
   },
   colorPicker: {
     trigger: 'Chọn màu',

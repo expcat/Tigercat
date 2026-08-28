@@ -133,7 +133,9 @@ export const ptBR: TigerLocale = defineLocale({
     markUnreadText: 'Marcar como não lida'
   },
   select: {
-    doneText: 'Concluir'
+    doneText: 'Concluir',
+    placeholder: 'Selecione uma opção',
+    emptyText: 'Nenhuma opção encontrada'
   },
   colorPicker: {
     trigger: 'Escolher cor',

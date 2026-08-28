@@ -3,8 +3,11 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Select } from '@expcat/tigercat-vue/Select'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,
@@ -52,6 +55,46 @@ describe('Select', () => {
       })
 
       expect(getByText('Select an option')).toBeInTheDocument()
+    })
+
+    it('uses English Select an option when placeholder is omitted', () => {
+      const { getByText } = render(Select, { props: { options: testOptions } })
+      expect(getByText('Select an option')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN placeholder 请选择', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () => h(Select, { options: testOptions }))
+        }
+      })
+      const { getByText } = render(Wrapper)
+      expect(getByText('请选择')).toBeInTheDocument()
+    })
+
+    it('lets labels.placeholder override locale text', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(Select, { options: testOptions, labels: { placeholder: '自定义占位' } })
+            )
+        }
+      })
+      const { getByText } = render(Wrapper)
+      expect(getByText('自定义占位')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN emptyText 暂无选项', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(Select, { options: [] }))
+        }
+      })
+      const { container, getByText } = render(Wrapper)
+      await fireEvent.click(container.querySelector('button')!)
+      expect(getByText('暂无选项')).toBeInTheDocument()
     })
 
     it('should render with selected value', () => {

@@ -101,10 +101,19 @@ describe('i18n locale presets', () => {
     }
   })
 
-  it('all locales have select.doneText', () => {
+  it('all locales have select.doneText, placeholder, and emptyText', () => {
     for (const [, locale] of Object.entries(locales)) {
       expect(locale.select?.doneText).toBeDefined()
+      expect(locale.select?.placeholder).toBeDefined()
+      expect(locale.select?.emptyText).toBeDefined()
     }
+  })
+
+  it('enUS select placeholder is Select an option and zhCN is 请选择', () => {
+    expect(enUS.select?.placeholder).toBe('Select an option')
+    expect(enUS.select?.emptyText).toBe('No options found')
+    expect(zhCN.select?.placeholder).toBe('请选择')
+    expect(zhCN.select?.emptyText).toBe('暂无选项')
   })
 
   it('all locales have colorPicker trigger / panelTitle / clear', () => {

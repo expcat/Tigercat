@@ -133,7 +133,9 @@ export const deDE: TigerLocale = defineLocale({
     markUnreadText: 'Als ungelesen markieren'
   },
   select: {
-    doneText: 'Fertigstellen'
+    doneText: 'Fertigstellen',
+    placeholder: 'Option auswählen',
+    emptyText: 'Keine Optionen gefunden'
   },
   colorPicker: {
     trigger: 'Farbe wählen',

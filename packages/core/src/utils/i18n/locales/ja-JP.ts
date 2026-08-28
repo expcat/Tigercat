@@ -118,7 +118,9 @@ export const jaJP: TigerLocale = defineLocale({
     markUnreadText: '未読にする'
   },
   select: {
-    doneText: '完了'
+    doneText: '完了',
+    placeholder: '選択してください',
+    emptyText: 'オプションがありません'
   },
   colorPicker: {
     trigger: '色を選択',

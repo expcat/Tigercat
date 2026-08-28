@@ -240,6 +240,8 @@ describe('custom-text overrides on label resolvers', () => {
     it('uses Chinese defaults for zh locales', () => {
       const labels = getSelectLabels({ locale: 'zh-CN' })
       expect(labels.doneText).toBe('完成')
+      expect(labels.placeholder).toBe('请选择')
+      expect(labels.emptyText).toBe('暂无选项')
     })
 
     it('ranks overrides above locale and common fallback', () => {

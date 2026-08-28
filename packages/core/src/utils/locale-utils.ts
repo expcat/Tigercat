@@ -930,11 +930,15 @@ export function getNotificationCenterLabels(
 }
 
 export const DEFAULT_SELECT_LABELS: Required<TigerLocaleSelect> = {
-  doneText: 'Done'
+  doneText: 'Done',
+  placeholder: 'Select an option',
+  emptyText: 'No options found'
 }
 
 export const ZH_CN_SELECT_LABELS: Required<TigerLocaleSelect> = {
-  doneText: '完成'
+  doneText: '完成',
+  placeholder: '请选择',
+  emptyText: '暂无选项'
 }
 
 export function getSelectLabels(
@@ -948,7 +952,13 @@ export function getSelectLabels(
       overrides?.doneText ??
       locale?.select?.doneText ??
       locale?.common?.okText ??
-      defaultLabels.doneText
+      defaultLabels.doneText,
+    placeholder: overrides?.placeholder ?? locale?.select?.placeholder ?? defaultLabels.placeholder,
+    emptyText:
+      overrides?.emptyText ??
+      locale?.select?.emptyText ??
+      locale?.common?.emptyText ??
+      defaultLabels.emptyText
   }
 }
 

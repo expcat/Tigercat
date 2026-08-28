@@ -53,7 +53,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     options = [],
     size = 'md',
     disabled = false,
-    placeholder = 'Select an option',
+    placeholder,
     searchable = false,
     searchValue,
     defaultSearchValue = '',
@@ -86,6 +86,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     () => getSelectLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
+  const resolvedPlaceholder = resolveLocaleText(labels.placeholder, placeholder)
 
   const divProps: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(props)) {
@@ -133,7 +134,7 @@ export function useSelectState(props: SelectProps): SelectContext {
   const displayText = useMemo(() => {
     if (isMultiple) {
       const values = Array.isArray(value) ? value : []
-      if (values.length === 0) return placeholder
+      if (values.length === 0) return resolvedPlaceholder
       const labels = [...allOptions, ...createdOptions]
         .filter((opt) => values.includes(opt.value))
         .map((opt) => opt.label)
@@ -144,11 +145,12 @@ export function useSelectState(props: SelectProps): SelectContext {
       return labels.join(', ')
     }
 
-    if (value === undefined || value === null || value === '') return placeholder
+    if (value === undefined || value === null || value === '') return resolvedPlaceholder
     return (
-      [...allOptions, ...createdOptions].find((opt) => opt.value === value)?.label ?? placeholder
+      [...allOptions, ...createdOptions].find((opt) => opt.value === value)?.label ??
+      resolvedPlaceholder
     )
-  }, [isMultiple, value, allOptions, createdOptions, placeholder, maxTagCount])
+  }, [isMultiple, value, allOptions, createdOptions, resolvedPlaceholder, maxTagCount])
 
   const showClearButton = useMemo(
     () =>
@@ -483,10 +485,10 @@ export function useSelectState(props: SelectProps): SelectContext {
     virtual,
     listHeight,
     disabled,
-    placeholder,
+    placeholder: resolvedPlaceholder,
     searchable,
     clearable,
-    emptyText: resolveLocaleText('No options found', emptyText, mergedLocale?.common?.emptyText),
+    emptyText: resolveLocaleText(labels.emptyText, emptyText),
     createOptionText,
     className,
     divProps,

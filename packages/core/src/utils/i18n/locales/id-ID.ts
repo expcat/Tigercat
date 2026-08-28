@@ -118,7 +118,9 @@ export const idID: TigerLocale = defineLocale({
     markUnreadText: 'Tandai belum dibaca'
   },
   select: {
-    doneText: 'Selesai'
+    doneText: 'Selesai',
+    placeholder: 'Pilih opsi',
+    emptyText: 'Tidak ada opsi'
   },
   colorPicker: {
     trigger: 'Pilih warna',

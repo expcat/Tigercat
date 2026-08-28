@@ -7,6 +7,8 @@ import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import {
   expectNoA11yViolationsIsolated,
   setThemeVariables,
@@ -48,6 +50,39 @@ describe('Select', () => {
       const { getByText } = render(<Select options={testOptions} placeholder="Select an option" />)
 
       expect(getByText('Select an option')).toBeInTheDocument()
+    })
+
+    it('uses English Select an option when placeholder is omitted', () => {
+      const { getByText } = render(<Select options={testOptions} />)
+      expect(getByText('Select an option')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN placeholder 请选择', () => {
+      const { getByText } = render(
+        <ConfigProvider locale={zhCN}>
+          <Select options={testOptions} />
+        </ConfigProvider>
+      )
+      expect(getByText('请选择')).toBeInTheDocument()
+    })
+
+    it('lets labels.placeholder override locale text', () => {
+      const { getByText } = render(
+        <ConfigProvider locale={zhCN}>
+          <Select options={testOptions} labels={{ placeholder: '自定义占位' }} />
+        </ConfigProvider>
+      )
+      expect(getByText('自定义占位')).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN emptyText 暂无选项', () => {
+      const { container, getByText } = render(
+        <ConfigProvider locale={zhCN}>
+          <Select options={[]} />
+        </ConfigProvider>
+      )
+      fireEvent.click(container.querySelector('button')!)
+      expect(getByText('暂无选项')).toBeInTheDocument()
     })
 
     it('should render with selected value', () => {

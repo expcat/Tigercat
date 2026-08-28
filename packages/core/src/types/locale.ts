@@ -280,6 +280,10 @@ export interface TigerLocaleNotificationCenter {
 export interface TigerLocaleSelect {
   /** Mobile dropdown completion action text */
   doneText?: string
+  /** Trigger placeholder when no option is selected */
+  placeholder?: string
+  /** Empty options list / no-match copy */
+  emptyText?: string
 }
 
 export interface TigerLocaleColorPicker {

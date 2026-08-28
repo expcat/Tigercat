@@ -133,7 +133,9 @@ export const esES: TigerLocale = defineLocale({
     markUnreadText: 'Marcar como no leída'
   },
   select: {
-    doneText: 'Finalizar'
+    doneText: 'Finalizar',
+    placeholder: 'Seleccione una opción',
+    emptyText: 'No hay opciones'
   },
   colorPicker: {
     trigger: 'Elegir color',
