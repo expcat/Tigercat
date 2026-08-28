@@ -3,8 +3,11 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ColorPicker', () => {
@@ -137,5 +140,52 @@ describe('ColorPicker', () => {
     })
     await fireEvent.click(container.querySelector('[role="button"]')!)
     expect(document.body.querySelector('input[aria-label="Alpha"]')).not.toBeInTheDocument()
+  })
+
+  it('uses English Pick color on the trigger by default', () => {
+    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
+    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
+    expect(trigger.getAttribute('aria-label')).toBe('Pick color')
+    expect(trigger.getAttribute('title')).toBe('Pick color')
+  })
+
+  it('uses ConfigProvider zh-CN for trigger / panel title / clear', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () => h(ColorPicker, { modelValue: '#2563eb' }))
+      }
+    })
+    const { container } = render(Wrapper)
+    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
+    expect(trigger.getAttribute('aria-label')).toBe('选择颜色')
+    await fireEvent.click(trigger)
+    expect(screen.getByRole('dialog', { name: '颜色' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '清空' })).toBeInTheDocument()
+  })
+
+  it('lets labels.trigger override locale text', () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(ColorPicker, { modelValue: '#2563eb', labels: { trigger: '自定义颜色' } })
+          )
+      }
+    })
+    const { container } = render(Wrapper)
+    expect(
+      container.querySelector('[data-tiger-colorpicker-trigger]')?.getAttribute('aria-label')
+    ).toBe('自定义颜色')
+  })
+
+  it('emits empty string when Clear is clicked', async () => {
+    const onChange = vi.fn()
+    const { container } = render(ColorPicker, {
+      props: { modelValue: '#2563eb', 'onUpdate:modelValue': onChange }
+    })
+    await fireEvent.click(container.querySelector('[data-tiger-colorpicker-trigger]')!)
+    await fireEvent.click(document.body.querySelector('[data-tiger-colorpicker-clear]')!)
+    expect(onChange).toHaveBeenCalledWith('')
   })
 })

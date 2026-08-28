@@ -204,6 +204,16 @@ export const zhCN: TigerLocale = {
   select: {
     doneText: '完成'
   },
+  colorPicker: {
+    trigger: '选择颜色',
+    panelTitle: '颜色',
+    clear: '清空',
+    hue: '色相',
+    alpha: '透明度',
+    value: '颜色值',
+    preview: '颜色预览',
+    selectPreset: '选择 {color}'
+  },
   tabs: {
     addTabAriaLabel: '新增标签页',
     closeTabAriaLabel: '关闭{label}'

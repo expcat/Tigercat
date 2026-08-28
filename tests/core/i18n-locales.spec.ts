@@ -14,10 +14,14 @@ import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
 import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
 import {
   DEFAULT_CODE_LABELS,
+  DEFAULT_COLOR_PICKER_LABELS,
   ZH_CN_CODE_LABELS,
+  ZH_CN_COLOR_PICKER_LABELS,
   defineLocale,
   defineText,
+  formatColorPickerSelectPreset,
   getCodeLabels,
+  getColorPickerLabels,
   getLocaleDirection,
   isRtlLocale,
   mergeTigerLocale
@@ -37,6 +41,7 @@ describe('i18n locale presets', () => {
     'table',
     'formWizard',
     'select',
+    'colorPicker',
     'taskBoard',
     'chatWindow',
     'code',
@@ -102,6 +107,23 @@ describe('i18n locale presets', () => {
     }
   })
 
+  it('all locales have colorPicker trigger / panelTitle / clear', () => {
+    for (const [, locale] of Object.entries(locales)) {
+      expect(locale.colorPicker?.trigger).toBeDefined()
+      expect(locale.colorPicker?.panelTitle).toBeDefined()
+      expect(locale.colorPicker?.clear).toBeDefined()
+    }
+  })
+
+  it('enUS colorPicker trigger is Pick color and zhCN is 选择颜色', () => {
+    expect(enUS.colorPicker?.trigger).toBe('Pick color')
+    expect(enUS.colorPicker?.panelTitle).toBe('Color')
+    expect(enUS.colorPicker?.clear).toBe('Clear')
+    expect(zhCN.colorPicker?.trigger).toBe('选择颜色')
+    expect(zhCN.colorPicker?.panelTitle).toBe('颜色')
+    expect(zhCN.colorPicker?.clear).toBe('清空')
+  })
+
   it('all locales have common.noMoreText', () => {
     for (const [, locale] of Object.entries(locales)) {
       expect(locale.common.noMoreText).toBeDefined()
@@ -155,6 +177,39 @@ describe('i18n locale presets', () => {
       copiedLabel: '已复制',
       copyFailedLabel: '复制失败'
     })
+  })
+
+  it('getColorPickerLabels(undefined) is English Pick color / Color / Clear', () => {
+    expect(getColorPickerLabels(undefined)).toEqual(DEFAULT_COLOR_PICKER_LABELS)
+    expect(getColorPickerLabels()).toEqual({
+      trigger: 'Pick color',
+      panelTitle: 'Color',
+      clear: 'Clear',
+      hue: 'Hue',
+      alpha: 'Alpha',
+      value: 'Color value',
+      preview: 'Color preview',
+      selectPreset: 'Select {color}'
+    })
+  })
+
+  it('getColorPickerLabels zh-CN is 选择颜色 / 颜色 / 清空', () => {
+    expect(getColorPickerLabels({ locale: 'zh-CN' })).toEqual(ZH_CN_COLOR_PICKER_LABELS)
+    expect(getColorPickerLabels(zhCN).trigger).toBe('选择颜色')
+  })
+
+  it('formatColorPickerSelectPreset substitutes {color}', () => {
+    expect(formatColorPickerSelectPreset('Select {color}', '#ff0000')).toBe('Select #ff0000')
+    expect(formatColorPickerSelectPreset('选择 {color}', '#00ff00')).toBe('选择 #00ff00')
+  })
+
+  it('mergeTigerLocale keeps colorPicker blocks', () => {
+    const merged = mergeTigerLocale(
+      { colorPicker: { trigger: 'Base trigger', clear: 'Base clear' } },
+      { colorPicker: { trigger: 'Override trigger' } }
+    )
+    expect(merged?.colorPicker?.trigger).toBe('Override trigger')
+    expect(merged?.colorPicker?.clear).toBe('Base clear')
   })
 
   it('mergeTigerLocale keeps chatWindow / commentThread / activityFeed / notificationCenter blocks', () => {

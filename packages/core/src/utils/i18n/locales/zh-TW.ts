@@ -120,6 +120,16 @@ export const zhTW: TigerLocale = defineLocale({
   select: {
     doneText: '完成'
   },
+  colorPicker: {
+    trigger: '選擇顏色',
+    panelTitle: '顏色',
+    clear: '清除',
+    hue: '色相',
+    alpha: '透明度',
+    value: '顏色值',
+    preview: '顏色預覽',
+    selectPreset: '選擇 {color}'
+  },
   inputOtp: {
     groupLabel: '一次性驗證碼',
     slotLabel: '第 {index} 位，共 {total} 位'

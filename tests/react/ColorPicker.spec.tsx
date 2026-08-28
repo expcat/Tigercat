@@ -6,6 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ColorPicker } from '@expcat/tigercat-react/ColorPicker'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ColorPicker', () => {
@@ -117,5 +119,44 @@ describe('ColorPicker', () => {
     const { container } = render(<ColorPicker value="#2563eb" showAlpha={false} />)
     fireEvent.click(container.querySelector('[role="button"]')!)
     expect(document.body.querySelector('input[aria-label="Alpha"]')).not.toBeInTheDocument()
+  })
+
+  it('uses English Pick color on the trigger by default', () => {
+    const { container } = render(<ColorPicker value="#2563eb" />)
+    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
+    expect(trigger.getAttribute('aria-label')).toBe('Pick color')
+    expect(trigger.getAttribute('title')).toBe('Pick color')
+  })
+
+  it('uses ConfigProvider zh-CN for trigger / panel title / clear', () => {
+    const { container } = render(
+      <ConfigProvider locale={zhCN}>
+        <ColorPicker value="#2563eb" />
+      </ConfigProvider>
+    )
+    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
+    expect(trigger.getAttribute('aria-label')).toBe('选择颜色')
+    fireEvent.click(trigger)
+    expect(screen.getByRole('dialog', { name: '颜色' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '清空' })).toBeInTheDocument()
+  })
+
+  it('lets labels.trigger override locale text', () => {
+    const { container } = render(
+      <ConfigProvider locale={zhCN}>
+        <ColorPicker value="#2563eb" labels={{ trigger: '自定义颜色' }} />
+      </ConfigProvider>
+    )
+    expect(
+      container.querySelector('[data-tiger-colorpicker-trigger]')?.getAttribute('aria-label')
+    ).toBe('自定义颜色')
+  })
+
+  it('emits empty string when Clear is clicked', () => {
+    const onChange = vi.fn()
+    const { container } = render(<ColorPicker value="#2563eb" onChange={onChange} />)
+    fireEvent.click(container.querySelector('[data-tiger-colorpicker-trigger]')!)
+    fireEvent.click(document.body.querySelector('[data-tiger-colorpicker-clear]')!)
+    expect(onChange).toHaveBeenCalledWith('')
   })
 })

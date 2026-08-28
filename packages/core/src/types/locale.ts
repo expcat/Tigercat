@@ -282,6 +282,25 @@ export interface TigerLocaleSelect {
   doneText?: string
 }
 
+export interface TigerLocaleColorPicker {
+  /** Trigger aria-label / title. Default "Pick color". */
+  trigger?: string
+  /** Panel heading and dialog accessible name */
+  panelTitle?: string
+  /** Clear-color action text */
+  clear?: string
+  /** Hue slider label */
+  hue?: string
+  /** Alpha slider label */
+  alpha?: string
+  /** Color value input aria-label */
+  value?: string
+  /** Preview swatch aria-label */
+  preview?: string
+  /** Preset swatch aria-label. Template: supports {color} */
+  selectPreset?: string
+}
+
 export interface TigerLocaleTabs {
   addTabAriaLabel?: string
   /** Template: supports {label} */
@@ -473,6 +492,7 @@ export interface TigerLocale {
   activityFeed?: TigerLocaleActivityFeed
   notificationCenter?: TigerLocaleNotificationCenter
   select?: TigerLocaleSelect
+  colorPicker?: TigerLocaleColorPicker
   tabs?: TigerLocaleTabs
   rate?: TigerLocaleRate
   avatarGroup?: TigerLocaleAvatarGroup

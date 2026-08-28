@@ -120,6 +120,16 @@ export const idID: TigerLocale = defineLocale({
   select: {
     doneText: 'Selesai'
   },
+  colorPicker: {
+    trigger: 'Pilih warna',
+    panelTitle: 'Warna',
+    clear: 'Hapus',
+    hue: 'Hue',
+    alpha: 'Alfa',
+    value: 'Nilai warna',
+    preview: 'Pratinjau',
+    selectPreset: 'Pilih {color}'
+  },
   inputOtp: {
     groupLabel: 'Kata sandi sekali pakai',
     slotLabel: 'Karakter {index} dari {total}'

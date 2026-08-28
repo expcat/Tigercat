@@ -204,6 +204,16 @@ export const enUS: TigerLocale = {
   select: {
     doneText: 'Done'
   },
+  colorPicker: {
+    trigger: 'Pick color',
+    panelTitle: 'Color',
+    clear: 'Clear',
+    hue: 'Hue',
+    alpha: 'Alpha',
+    value: 'Color value',
+    preview: 'Color preview',
+    selectPreset: 'Select {color}'
+  },
   tabs: {
     addTabAriaLabel: 'Add tab',
     closeTabAriaLabel: 'Close {label}'

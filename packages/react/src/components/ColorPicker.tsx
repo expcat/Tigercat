@@ -1,5 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import type { ColorPickerProps as CoreColorPickerProps } from '@expcat/tigercat-core'
+import type {
+  ColorPickerProps as CoreColorPickerProps,
+  TigerLocale,
+  TigerLocaleColorPicker
+} from '@expcat/tigercat-core'
 import {
   colorPickerBaseClasses,
   getColorPickerTriggerClasses,
@@ -12,9 +16,13 @@ import {
   formatColorString,
   parseColorInput,
   parseColorParts,
-  classNames
+  classNames,
+  mergeTigerLocale,
+  getColorPickerLabels,
+  formatColorPickerSelectPreset
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 function rgbFromValue(value: string): { r: number; g: number; b: number } {
   const parts = parseColorParts(value)
@@ -32,6 +40,8 @@ export interface ColorPickerProps extends CoreColorPickerProps {
   value?: string
   /** Called when color changes */
   onChange?: (value: string) => void
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleColorPicker>
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({
@@ -42,8 +52,19 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   format = 'hex',
   presets,
   className,
+  locale,
+  labels: labelsOverride,
   onChange
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getColorPickerLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const [isOpen, setIsOpen] = useState(false)
   const [alpha, setAlpha] = useState(() => explicitAlphaFromValue(value) ?? 1)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -134,6 +155,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     }
   }
 
+  function handleClear() {
+    onChange?.('')
+  }
+
   return (
     <div ref={containerRef} className={classNames(colorPickerBaseClasses, className)}>
       {/* Trigger swatch */}
@@ -142,7 +167,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         className={getColorPickerTriggerClasses(size, disabled)}
         style={{ backgroundColor: swatchColor }}
         role="button"
-        aria-label="Pick color"
+        data-tiger-colorpicker-trigger=""
+        aria-label={labels.trigger}
+        title={labels.trigger}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-disabled={disabled || undefined}
@@ -158,11 +185,26 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             ref={panelRef}
             className={classNames(colorPickerPanelClasses, overlay.floatingClasses)}
             style={overlay.floatingStyles}
-            data-positioned={overlay.positioned}>
+            data-positioned={overlay.positioned}
+            data-tiger-colorpicker-panel=""
+            role="dialog"
+            aria-label={labels.panelTitle}>
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-[var(--tiger-text,#111827)]">
+                {labels.panelTitle}
+              </span>
+              <button
+                type="button"
+                className="text-xs text-[var(--tiger-primary,#2563eb)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)]"
+                data-tiger-colorpicker-clear=""
+                onClick={handleClear}>
+                {labels.clear}
+              </button>
+            </div>
             {/* Hue slider */}
             <div className="mb-2">
               <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1">
-                Hue
+                {labels.hue}
               </label>
               <input
                 type="range"
@@ -170,7 +212,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                 max={360}
                 value={hsv.h}
                 className="w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]"
-                aria-label="Hue"
+                aria-label={labels.hue}
                 onChange={handleHueChange}
               />
             </div>
@@ -179,7 +221,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             {showAlpha && (
               <div className="mb-2">
                 <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1">
-                  Alpha
+                  {labels.alpha}
                 </label>
                 <input
                   type="range"
@@ -187,7 +229,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                   max={100}
                   value={Math.round(alpha * 100)}
                   className="w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]"
-                  aria-label="Alpha"
+                  aria-label={labels.alpha}
                   onChange={handleAlphaChange}
                 />
               </div>
@@ -202,7 +244,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                 type="text"
                 className={colorPickerInputClasses}
                 value={inputValue}
-                aria-label="Color value"
+                aria-label={labels.value}
                 onChange={handleInputChange}
               />
             </div>
@@ -212,7 +254,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
               <div
                 className="w-8 h-8 rounded border border-[var(--tiger-border,#d1d5db)]"
                 style={{ backgroundColor: swatchColor }}
-                aria-label="Color preview"
+                aria-label={labels.preview}
               />
               <span className="text-xs font-mono text-[var(--tiger-text,#111827)]">
                 {displayValue}
@@ -229,7 +271,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                     style={{ backgroundColor: color }}
                     role="button"
                     tabIndex={0}
-                    aria-label={`Select ${color}`}
+                    aria-label={formatColorPickerSelectPreset(labels.selectPreset, color)}
                     onClick={() => handlePresetClick(color)}
                     onKeyDown={(e) => handlePresetKeyDown(e, color)}
                   />

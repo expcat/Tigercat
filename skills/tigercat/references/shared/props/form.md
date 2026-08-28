@@ -50,13 +50,13 @@ description: Compact generated Tigercat Form props reference
 
 ## ColorPicker
 
-`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/6 props
+`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/8 props
 
-| Prop         | Type            | Default | Notes                          |
-| ------------ | --------------- | ------- | ------------------------------ |
-| `disabled?`  | `boolean`       | `-`     | Whether the picker is disabled |
-| `size?`      | `ComponentSize` | `-`     | Component size                 |
-| `showAlpha?` | `boolean`       | `-`     | Whether to show alpha channel  |
+| Prop        | Type                              | Default | Notes                                                                                      |
+| ----------- | --------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `locale?`   | `Partial<TigerLocale>`            | `-`     | Locale override merged on top of ConfigProvider locale                                     |
+| `labels?`   | `Partial<TigerLocaleColorPicker>` | `-`     | UI labels for trigger / panel title / clear and panel chrome. Takes precedence over `lo... |
+| `disabled?` | `boolean`                         | `-`     | Whether the picker is disabled                                                             |
 
 ## ColorSwatch
 

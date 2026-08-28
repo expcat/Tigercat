@@ -120,6 +120,16 @@ export const koKR: TigerLocale = defineLocale({
   select: {
     doneText: '완료'
   },
+  colorPicker: {
+    trigger: '색 선택',
+    panelTitle: '색상',
+    clear: '지우기',
+    hue: '색조',
+    alpha: '투명도',
+    value: '색상 값',
+    preview: '미리보기',
+    selectPreset: '{color} 선택'
+  },
   inputOtp: {
     groupLabel: '일회용 비밀번호',
     slotLabel: '총 {total}자 중 {index}번째'

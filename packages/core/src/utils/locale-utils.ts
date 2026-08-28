@@ -33,6 +33,7 @@ import type {
   TigerLocaleActivityFeed,
   TigerLocaleNotificationCenter,
   TigerLocaleSelect,
+  TigerLocaleColorPicker,
   TigerLocaleTabs,
   TigerLocaleRate,
   TigerLocaleAvatarGroup,
@@ -78,6 +79,7 @@ const TIGER_LOCALE_KEYS = [
   'activityFeed',
   'notificationCenter',
   'select',
+  'colorPicker',
   'tabs',
   'rate',
   'carousel',
@@ -175,6 +177,7 @@ export function mergeTigerLocale(
     activityFeed: { ...base?.activityFeed, ...override?.activityFeed },
     notificationCenter: { ...base?.notificationCenter, ...override?.notificationCenter },
     select: { ...base?.select, ...override?.select },
+    colorPicker: { ...base?.colorPicker, ...override?.colorPicker },
     tabs: { ...base?.tabs, ...override?.tabs },
     rate: { ...base?.rate, ...override?.rate },
     avatarGroup: { ...base?.avatarGroup, ...override?.avatarGroup },
@@ -947,6 +950,52 @@ export function getSelectLabels(
       locale?.common?.okText ??
       defaultLabels.doneText
   }
+}
+
+export const DEFAULT_COLOR_PICKER_LABELS: Required<TigerLocaleColorPicker> = {
+  trigger: 'Pick color',
+  panelTitle: 'Color',
+  clear: 'Clear',
+  hue: 'Hue',
+  alpha: 'Alpha',
+  value: 'Color value',
+  preview: 'Color preview',
+  selectPreset: 'Select {color}'
+}
+
+export const ZH_CN_COLOR_PICKER_LABELS: Required<TigerLocaleColorPicker> = {
+  trigger: '选择颜色',
+  panelTitle: '颜色',
+  clear: '清空',
+  hue: '色相',
+  alpha: '透明度',
+  value: '颜色值',
+  preview: '颜色预览',
+  selectPreset: '选择 {color}'
+}
+
+export function getColorPickerLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleColorPicker>
+): Required<TigerLocaleColorPicker> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_COLOR_PICKER_LABELS : DEFAULT_COLOR_PICKER_LABELS
+  return {
+    trigger: overrides?.trigger ?? locale?.colorPicker?.trigger ?? defaultLabels.trigger,
+    panelTitle:
+      overrides?.panelTitle ?? locale?.colorPicker?.panelTitle ?? defaultLabels.panelTitle,
+    clear: overrides?.clear ?? locale?.colorPicker?.clear ?? defaultLabels.clear,
+    hue: overrides?.hue ?? locale?.colorPicker?.hue ?? defaultLabels.hue,
+    alpha: overrides?.alpha ?? locale?.colorPicker?.alpha ?? defaultLabels.alpha,
+    value: overrides?.value ?? locale?.colorPicker?.value ?? defaultLabels.value,
+    preview: overrides?.preview ?? locale?.colorPicker?.preview ?? defaultLabels.preview,
+    selectPreset:
+      overrides?.selectPreset ?? locale?.colorPicker?.selectPreset ?? defaultLabels.selectPreset
+  }
+}
+
+export function formatColorPickerSelectPreset(template: string, color: string): string {
+  return template.replace('{color}', color)
 }
 
 export const DEFAULT_TABS_LABELS: Required<TigerLocaleTabs> = {

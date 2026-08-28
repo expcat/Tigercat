@@ -135,6 +135,16 @@ export const ptBR: TigerLocale = defineLocale({
   select: {
     doneText: 'Concluir'
   },
+  colorPicker: {
+    trigger: 'Escolher cor',
+    panelTitle: 'Cor',
+    clear: 'Limpar',
+    hue: 'Matiz',
+    alpha: 'Alfa',
+    value: 'Valor da cor',
+    preview: 'Prévia',
+    selectPreset: 'Selecionar {color}'
+  },
   inputOtp: {
     groupLabel: 'Senha de uso único',
     slotLabel: 'Caractere {index} de {total}'

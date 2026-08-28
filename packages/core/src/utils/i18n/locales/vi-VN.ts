@@ -120,6 +120,16 @@ export const viVN: TigerLocale = defineLocale({
   select: {
     doneText: 'Hoàn thành'
   },
+  colorPicker: {
+    trigger: 'Chọn màu',
+    panelTitle: 'Màu',
+    clear: 'Xóa',
+    hue: 'Hue',
+    alpha: 'Độ trong suốt',
+    value: 'Giá trị màu',
+    preview: 'Xem trước',
+    selectPreset: 'Chọn {color}'
+  },
   inputOtp: {
     groupLabel: 'Mật khẩu dùng một lần',
     slotLabel: 'Ký tự {index} trong {total}'

@@ -6,6 +6,7 @@ import {
   getFormWizardLabels,
   getTaskBoardLabels,
   getSelectLabels,
+  getColorPickerLabels,
   getChatWindowLabels,
   getCodeLabels,
   getCommentThreadLabels,
@@ -18,6 +19,8 @@ import {
   DEFAULT_FORM_WIZARD_LABELS,
   DEFAULT_TASK_BOARD_LABELS,
   DEFAULT_SELECT_LABELS,
+  DEFAULT_COLOR_PICKER_LABELS,
+  ZH_CN_COLOR_PICKER_LABELS,
   DEFAULT_CHAT_WINDOW_LABELS,
   DEFAULT_CODE_LABELS,
   DEFAULT_COMMENT_THREAD_LABELS,
@@ -245,6 +248,30 @@ describe('custom-text overrides on label resolvers', () => {
         { doneText: 'OverrideDone' }
       )
       expect(labels.doneText).toBe('OverrideDone')
+    })
+  })
+
+  describe('getColorPickerLabels', () => {
+    it('falls back to English Pick color / Color / Clear with no locale', () => {
+      expect(getColorPickerLabels()).toEqual(DEFAULT_COLOR_PICKER_LABELS)
+      expect(getColorPickerLabels(undefined).trigger).toBe('Pick color')
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getColorPickerLabels({ locale: 'zh-CN' }).trigger).toBe('选择颜色')
+      expect(getColorPickerLabels({ locale: 'zh-CN' }).panelTitle).toBe('颜色')
+      expect(getColorPickerLabels({ locale: 'zh-CN' }).clear).toBe('清空')
+      expect(getColorPickerLabels(zhCN)).toEqual(ZH_CN_COLOR_PICKER_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getColorPickerLabels(
+        { colorPicker: { trigger: 'locale-trigger', panelTitle: 'locale-title' } },
+        { trigger: 'override-trigger' }
+      )
+      expect(labels.trigger).toBe('override-trigger')
+      expect(labels.panelTitle).toBe('locale-title')
+      expect(labels.clear).toBe(DEFAULT_COLOR_PICKER_LABELS.clear)
     })
   })
 })

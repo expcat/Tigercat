@@ -135,6 +135,16 @@ export const esES: TigerLocale = defineLocale({
   select: {
     doneText: 'Finalizar'
   },
+  colorPicker: {
+    trigger: 'Elegir color',
+    panelTitle: 'Color',
+    clear: 'Borrar',
+    hue: 'Tono',
+    alpha: 'Alfa',
+    value: 'Valor de color',
+    preview: 'Vista previa',
+    selectPreset: 'Seleccionar {color}'
+  },
   inputOtp: {
     groupLabel: 'Contraseña de un solo uso',
     slotLabel: 'Carácter {index} de {total}'

@@ -671,6 +671,7 @@
       "DEFAULT_CHART_LABELS",
       "DEFAULT_CHAT_WINDOW_LABELS",
       "DEFAULT_CODE_LABELS",
+      "DEFAULT_COLOR_PICKER_LABELS",
       "DEFAULT_COMMENT_THREAD_LABELS",
       "DEFAULT_CRON_EDITOR_LABELS",
       "DEFAULT_DATA_EXPORT_LABELS",
@@ -987,6 +988,7 @@
       "formatBadgeContent",
       "formatBytes",
       "formatChatTime",
+      "formatColorPickerSelectPreset",
       "formatColorString",
       "formatCommentTime",
       "formatCountdown",
@@ -1199,6 +1201,7 @@
       "getCollapsePanelHeaderClasses",
       "getColMergedStyleVars",
       "getColOrderStyleVars",
+      "getColorPickerLabels",
       "getColorPickerTriggerClasses",
       "getColorSwatchButtonClasses",
       "getColorSwatchCheckClasses",
@@ -3144,6 +3147,7 @@
       "TigerLocaleChart",
       "TigerLocaleChatWindow",
       "TigerLocaleCode",
+      "TigerLocaleColorPicker",
       "TigerLocaleCommentThread",
       "TigerLocaleCommon",
       "TigerLocaleCronEditor",
@@ -3416,6 +3420,7 @@
       "ZH_CN_CHART_LABELS",
       "ZH_CN_CHAT_WINDOW_LABELS",
       "ZH_CN_CODE_LABELS",
+      "ZH_CN_COLOR_PICKER_LABELS",
       "ZH_CN_COMMENT_THREAD_LABELS",
       "ZH_CN_CRON_EDITOR_LABELS",
       "ZH_CN_DATA_EXPORT_LABELS",
@@ -3944,7 +3949,16 @@
     },
     "ColorPickerProps": {
       "extends": [],
-      "props": ["className", "disabled", "format", "presets", "showAlpha", "size"]
+      "props": [
+        "className",
+        "disabled",
+        "format",
+        "labels",
+        "locale",
+        "presets",
+        "showAlpha",
+        "size"
+      ]
     },
     "ColorSwatchProps": {
       "extends": [],

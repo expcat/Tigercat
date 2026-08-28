@@ -120,6 +120,16 @@ export const jaJP: TigerLocale = defineLocale({
   select: {
     doneText: '完了'
   },
+  colorPicker: {
+    trigger: '色を選択',
+    panelTitle: '色',
+    clear: 'クリア',
+    hue: '色相',
+    alpha: '不透明度',
+    value: 'カラー値',
+    preview: 'プレビュー',
+    selectPreset: '{color} を選択'
+  },
   inputOtp: {
     groupLabel: 'ワンタイムパスワード',
     slotLabel: '{total} 文字中 {index} 文字目'

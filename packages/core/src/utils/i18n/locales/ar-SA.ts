@@ -135,6 +135,16 @@ export const arSA: TigerLocale = defineLocale({
   select: {
     doneText: 'إنهاء'
   },
+  colorPicker: {
+    trigger: 'اختيار لون',
+    panelTitle: 'اللون',
+    clear: 'مسح',
+    hue: 'تدرج',
+    alpha: 'الشفافية',
+    value: 'قيمة اللون',
+    preview: 'معاينة',
+    selectPreset: 'اختيار {color}'
+  },
   inputOtp: {
     groupLabel: 'كلمة المرور لمرة واحدة',
     slotLabel: 'الحرف {index} من {total}'

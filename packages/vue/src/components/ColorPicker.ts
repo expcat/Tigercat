@@ -1,5 +1,10 @@
 import { defineComponent, h, ref, computed, watch, type PropType } from 'vue'
-import type { ComponentSize, ColorFormat } from '@expcat/tigercat-core'
+import type {
+  ComponentSize,
+  ColorFormat,
+  TigerLocale,
+  TigerLocaleColorPicker
+} from '@expcat/tigercat-core'
 import {
   colorPickerBaseClasses,
   getColorPickerTriggerClasses,
@@ -13,9 +18,13 @@ import {
   parseColorInput,
   parseColorParts,
   classNames,
-  coerceClassValue
+  coerceClassValue,
+  mergeTigerLocale,
+  getColorPickerLabels,
+  formatColorPickerSelectPreset
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 function rgbFromValue(value: string): { r: number; g: number; b: number } {
   const parts = parseColorParts(value)
@@ -38,10 +47,15 @@ export const ColorPicker = defineComponent({
     size: { type: String as PropType<ComponentSize>, default: 'md' },
     showAlpha: { type: Boolean, default: false },
     format: { type: String as PropType<ColorFormat>, default: 'hex' },
-    presets: { type: Array as PropType<string[]>, default: undefined }
+    presets: { type: Array as PropType<string[]>, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleColorPicker>>, default: undefined }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getColorPickerLabels(mergedLocale.value, props.labels))
     const isOpen = ref(false)
     const alpha = ref(explicitAlphaFromValue(props.modelValue) ?? 1)
     const containerRef = ref<HTMLElement | null>(null)
@@ -153,6 +167,11 @@ export const ColorPicker = defineComponent({
       }
     }
 
+    function handleClear() {
+      emit('update:modelValue', '')
+      emit('change', '')
+    }
+
     return () =>
       h(
         'div',
@@ -167,7 +186,9 @@ export const ColorPicker = defineComponent({
             class: getColorPickerTriggerClasses(props.size, props.disabled),
             style: { backgroundColor: swatchColor.value },
             role: 'button',
-            'aria-label': 'Pick color',
+            'data-tiger-colorpicker-trigger': '',
+            'aria-label': labels.value.trigger,
+            title: labels.value.trigger,
             'aria-haspopup': 'dialog',
             'aria-expanded': isOpen.value,
             'aria-disabled': props.disabled || undefined,
@@ -185,15 +206,36 @@ export const ColorPicker = defineComponent({
                     ref: panelRef,
                     class: classNames(colorPickerPanelClasses, overlay.floatingClasses.value),
                     style: overlay.floatingStyles.value,
-                    'data-positioned': overlay.positioned.value
+                    'data-positioned': overlay.positioned.value,
+                    'data-tiger-colorpicker-panel': '',
+                    role: 'dialog',
+                    'aria-label': labels.value.panelTitle
                   },
                   [
+                    h('div', { class: 'mb-2 flex items-center justify-between gap-2' }, [
+                      h(
+                        'span',
+                        { class: 'text-xs font-medium text-[var(--tiger-text,#111827)]' },
+                        labels.value.panelTitle
+                      ),
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          class:
+                            'text-xs text-[var(--tiger-primary,#2563eb)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)]',
+                          'data-tiger-colorpicker-clear': '',
+                          onClick: handleClear
+                        },
+                        labels.value.clear
+                      )
+                    ]),
                     // Hue slider
                     h('div', { class: 'mb-2' }, [
                       h(
                         'label',
                         { class: 'block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1' },
-                        'Hue'
+                        labels.value.hue
                       ),
                       h('input', {
                         type: 'range',
@@ -202,7 +244,7 @@ export const ColorPicker = defineComponent({
                         value: hsv.value.h,
                         class:
                           'w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]',
-                        'aria-label': 'Hue',
+                        'aria-label': labels.value.hue,
                         onInput: handleHueChange
                       })
                     ]),
@@ -213,7 +255,7 @@ export const ColorPicker = defineComponent({
                           h(
                             'label',
                             { class: 'block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1' },
-                            'Alpha'
+                            labels.value.alpha
                           ),
                           h('input', {
                             type: 'range',
@@ -222,7 +264,7 @@ export const ColorPicker = defineComponent({
                             value: Math.round(alpha.value * 100),
                             class:
                               'w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]',
-                            'aria-label': 'Alpha',
+                            'aria-label': labels.value.alpha,
                             onInput: handleAlphaChange
                           })
                         ])
@@ -242,7 +284,7 @@ export const ColorPicker = defineComponent({
                         type: 'text',
                         class: colorPickerInputClasses,
                         value: inputValue.value,
-                        'aria-label': 'Color value',
+                        'aria-label': labels.value.value,
                         onInput: handleInputChange
                       })
                     ]),
@@ -252,7 +294,7 @@ export const ColorPicker = defineComponent({
                       h('div', {
                         class: 'w-8 h-8 rounded border border-[var(--tiger-border,#d1d5db)]',
                         style: { backgroundColor: swatchColor.value },
-                        'aria-label': 'Color preview'
+                        'aria-label': labels.value.preview
                       }),
                       h(
                         'span',
@@ -271,7 +313,10 @@ export const ColorPicker = defineComponent({
                               style: { backgroundColor: color },
                               role: 'button',
                               tabindex: 0,
-                              'aria-label': `Select ${color}`,
+                              'aria-label': formatColorPickerSelectPreset(
+                                labels.value.selectPreset,
+                                color
+                              ),
                               onClick: () => handlePresetClick(color),
                               onKeydown: (e: KeyboardEvent) => handlePresetKeydown(e, color)
                             })

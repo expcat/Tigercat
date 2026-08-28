@@ -120,6 +120,16 @@ export const thTH: TigerLocale = defineLocale({
   select: {
     doneText: 'เสร็จสิ้น'
   },
+  colorPicker: {
+    trigger: 'เลือกสี',
+    panelTitle: 'สี',
+    clear: 'ล้าง',
+    hue: 'ฮิว',
+    alpha: 'ความโปร่งใส',
+    value: 'ค่าสี',
+    preview: 'ตัวอย่างสี',
+    selectPreset: 'เลือก {color}'
+  },
   inputOtp: {
     groupLabel: 'รหัสผ่านแบบใช้ครั้งเดียว',
     slotLabel: 'อักขระที่ {index} จาก {total}'
