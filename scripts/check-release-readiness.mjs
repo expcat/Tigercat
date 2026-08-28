@@ -28,19 +28,19 @@ const sourceVersionFiles = {
 
 const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
 const expectedSizeLimitEntries = [
-  ['Core (full)', 'packages/core/dist/index.js', '140 kB'],
-  ['Vue (full)', 'packages/vue/dist/index.mjs', '315 kB'],
-  ['React (full)', 'packages/react/dist/index.mjs', '351 kB'],
+  ['Core (full)', 'packages/core/dist/index.js', '142 kB'],
+  ['Vue (full)', 'packages/vue/dist/index.mjs', '316 kB'],
+  ['React (full)', 'packages/react/dist/index.mjs', '352 kB'],
   ['Vue Button subpath', 'packages/vue/dist/components/Button.mjs', '22 kB'],
   ['React Button subpath', 'packages/react/dist/components/Button.mjs', '20 kB'],
-  ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs', '41 kB'],
+  ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs', '42 kB'],
   ['React Menu subpath', 'packages/react/dist/components/Menu.mjs', '34 kB'],
   ['Vue DatePicker subpath', 'packages/vue/dist/components/DatePicker.mjs', '31 kB'],
   ['React DatePicker subpath', 'packages/react/dist/components/DatePicker.mjs', '25 kB'],
   ['Vue Table subpath', 'packages/vue/dist/components/Table.mjs', '48 kB'],
   ['React Table subpath', 'packages/react/dist/components/Table.mjs', '41 kB'],
-  ['Vue Tree subpath', 'packages/vue/dist/components/Tree.mjs', '32 kB'],
-  ['React Tree subpath', 'packages/react/dist/components/Tree.mjs', '25 kB'],
+  ['Vue Tree subpath', 'packages/vue/dist/components/Tree.mjs', '33 kB'],
+  ['React Tree subpath', 'packages/react/dist/components/Tree.mjs', '26 kB'],
   ['Vue TimePicker subpath', 'packages/vue/dist/components/TimePicker.mjs', '31 kB'],
   ['React TimePicker subpath', 'packages/react/dist/components/TimePicker.mjs', '25 kB'],
   ['Vue InputOTP subpath', 'packages/vue/dist/components/InputOTP.mjs', '31 kB'],
@@ -53,10 +53,10 @@ const expectedSizeLimitEntries = [
   ['React ScrollArea subpath', 'packages/react/dist/components/ScrollArea.mjs', '21 kB'],
   ['Vue Masonry subpath', 'packages/vue/dist/components/Masonry.mjs', '27 kB'],
   ['React Masonry subpath', 'packages/react/dist/components/Masonry.mjs', '20 kB'],
-  ['Vue AspectRatio subpath', 'packages/vue/dist/components/AspectRatio.mjs', '19 kB'],
+  ['Vue AspectRatio subpath', 'packages/vue/dist/components/AspectRatio.mjs', '20 kB'],
   ['React AspectRatio subpath', 'packages/react/dist/components/AspectRatio.mjs', '19 kB'],
   ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js', '3 kB'],
-  ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '4 kB'],
+  ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '5 kB'],
   ['Core icons (common) subpath', 'packages/core/dist/icons/common.js', '1 kB']
 ]
 

@@ -2,6 +2,11 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.1.2
+
+v2.1.2 是相对 v2.1.1 的 patch。**没有 breaking change，组件用户无需迁移步骤。**
+本版本为 ColorPicker / Select / RichTextEditor / MarkdownEditor 增补可选 `labels` 与 locale 键，默认英文行为不变。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v212)。
+
 ## v2.1.1
 
 v2.1.1 是相对 v2.1.0 的 patch。**没有 breaking change，组件用户无需迁移步骤。**

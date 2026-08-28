@@ -4,6 +4,11 @@
 
 ## 未发布
 
+## v2.1.2
+
+v2.1.2 patch：下游 Tigercat_Admin 上游建议 4–6 的 locale/labels 补齐（ColorPicker、Select、富文本/Markdown 工具条）。本版本无 breaking change。建议 1–3（Notification `actions`、BackTop `position`、FloatButton `floating`）已在 v2.1.0 / v2.1.1 落地。
+
+- **同步 `.size-limit.json` 预算（v2.1.2 实测）**：`Core (full)` 140→142 kB（实测 141.01）、`Vue (full)` 315→316 kB（实测 315.55）、`React (full)` 351→352 kB（实测 351.52）、`Core locale (zh-CN)` 4→5 kB（实测 4.03）；若干含子路径因 locale-utils 增补略超，一并按实测上调。
 - **ColorPicker `labels` / locale（触发器 / 面板标题 / 清空）**：Vue / React 经 `getColorPickerLabels` + ConfigProvider locale 解析触发器 `aria-label`/`title`、面板标题、清空钮以及 Hue / Alpha / 色值 / 预览 / 预设 chrome。无 locale 回落英文 `Pick color` / `Color` / `Clear`；`locale=zh-CN` 为「选择颜色 / 颜色 / 清空」。可选 `labels` 覆盖。清空发出空字符串。13 套内置 locale 增补 `colorPicker` 分区。公开 API 增补，无新必填 prop。
 - **Select locale `placeholder` / `emptyText`**：`TigerLocaleSelect` 增补占位与空选项文案键。未传 `placeholder` / `emptyText` 时走 ConfigProvider locale；无 locale 仍为 `Select an option` / `No options found`；`locale=zh-CN` 为「请选择 / 暂无选项」。显式 prop 与 `labels` 仍优先。13 套内置 locale 同步。公开 API 增补，无新必填 prop。
 - **RichTextEditor / MarkdownEditor 工具条 labels**：内置工具条 Bold / Italic / 标题 / 列表等走 `getRichTextEditorLabels` / `getMarkdownEditorLabels`。无 locale 仍为英文；`locale=zh-CN` 为「加粗 / 斜体」等。自定义 `toolbar` 仍用调用方文案；可选 `labels` 覆盖。公开 API 增补，无新必填 prop。

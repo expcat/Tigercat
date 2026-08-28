@@ -1250,19 +1250,6 @@ export const ZH_CN_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> =
   horizontalRule: '分隔线'
 }
 
-function mergeRequiredLabels<T extends Record<string, string>>(
-  defaultLabels: T,
-  localeBlock: Partial<T> | undefined,
-  overrides?: Partial<T>
-): T {
-  const next = { ...defaultLabels }
-  ;(Object.keys(defaultLabels) as Array<keyof T>).forEach((key) => {
-    const value = overrides?.[key] ?? localeBlock?.[key]
-    if (typeof value === 'string') next[key] = value as T[keyof T]
-  })
-  return next
-}
-
 export function getMarkdownEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleMarkdownEditor>
@@ -1270,7 +1257,11 @@ export function getMarkdownEditorLabels(
   const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
     ? ZH_CN_MARKDOWN_EDITOR_LABELS
     : DEFAULT_MARKDOWN_EDITOR_LABELS
-  return mergeRequiredLabels(defaultLabels, locale?.markdownEditor, overrides)
+  return {
+    ...defaultLabels,
+    ...locale?.markdownEditor,
+    ...overrides
+  }
 }
 
 export const DEFAULT_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
@@ -1324,7 +1315,11 @@ export function getRichTextEditorLabels(
   const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
     ? ZH_CN_RICH_TEXT_EDITOR_LABELS
     : DEFAULT_RICH_TEXT_EDITOR_LABELS
-  return mergeRequiredLabels(defaultLabels, locale?.richTextEditor, overrides)
+  return {
+    ...defaultLabels,
+    ...locale?.richTextEditor,
+    ...overrides
+  }
 }
 
 export const DEFAULT_CRON_EDITOR_LABELS: Required<TigerLocaleCronEditor> = {

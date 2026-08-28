@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "140 kB",
+    "limit": "142 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "315 kB",
+    "limit": "316 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "351 kB",
+    "limit": "352 kB",
     "gzip": true
   },
   {
@@ -32,7 +32,7 @@
   {
     "name": "Vue Menu subpath",
     "path": "packages/vue/dist/components/Menu.mjs",
-    "limit": "41 kB",
+    "limit": "42 kB",
     "gzip": true
   },
   {
@@ -72,13 +72,13 @@
   {
     "name": "Vue Tree subpath",
     "path": "packages/vue/dist/components/Tree.mjs",
-    "limit": "32 kB",
+    "limit": "33 kB",
     "gzip": true
   },
   {
     "name": "React Tree subpath",
     "path": "packages/react/dist/components/Tree.mjs",
-    "limit": "25 kB",
+    "limit": "26 kB",
     "gzip": true
   },
   {
@@ -158,7 +158,7 @@
   {
     "name": "Vue AspectRatio subpath",
     "path": "packages/vue/dist/components/AspectRatio.mjs",
-    "limit": "19 kB",
+    "limit": "20 kB",
     "gzip": true
   },
   {
@@ -182,13 +182,13 @@
   {
     "name": "Vue NavigationMenu subpath",
     "path": "packages/vue/dist/components/NavigationMenu.mjs",
-    "limit": "40 kB",
+    "limit": "41 kB",
     "gzip": true
   },
   {
     "name": "React NavigationMenu subpath",
     "path": "packages/react/dist/components/NavigationMenu.mjs",
-    "limit": "33 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
@@ -206,13 +206,13 @@
   {
     "name": "Vue Kbd subpath",
     "path": "packages/vue/dist/components/Kbd.mjs",
-    "limit": "19 kB",
+    "limit": "20 kB",
     "gzip": true
   },
   {
     "name": "React Kbd subpath",
     "path": "packages/react/dist/components/Kbd.mjs",
-    "limit": "19 kB",
+    "limit": "20 kB",
     "gzip": true
   },
   {
@@ -224,25 +224,25 @@
   {
     "name": "React Highlight subpath",
     "path": "packages/react/dist/components/Highlight.mjs",
-    "limit": "19 kB",
+    "limit": "20 kB",
     "gzip": true
   },
   {
     "name": "Vue Marquee subpath",
     "path": "packages/vue/dist/components/Marquee.mjs",
-    "limit": "23 kB",
+    "limit": "24 kB",
     "gzip": true
   },
   {
     "name": "React Marquee subpath",
     "path": "packages/react/dist/components/Marquee.mjs",
-    "limit": "19 kB",
+    "limit": "20 kB",
     "gzip": true
   },
   {
     "name": "Vue ImageCompare subpath",
     "path": "packages/vue/dist/components/ImageCompare.mjs",
-    "limit": "27 kB",
+    "limit": "28 kB",
     "gzip": true
   },
   {
@@ -292,7 +292,7 @@
   {
     "name": "Core locale (zh-CN) subpath",
     "path": "packages/core/dist/locales/zh-CN.js",
-    "limit": "4 kB",
+    "limit": "5 kB",
     "gzip": true
   },
   {
