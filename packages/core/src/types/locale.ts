@@ -359,11 +359,41 @@ export interface TigerLocaleMarkdownEditor {
   editModeLabel?: string
   splitModeLabel?: string
   previewModeLabel?: string
+  bold?: string
+  italic?: string
+  strikethrough?: string
+  heading?: string
+  blockquote?: string
+  unorderedList?: string
+  orderedList?: string
+  inlineCode?: string
+  codeBlock?: string
+  link?: string
+  image?: string
+  table?: string
+  horizontalRule?: string
 }
 
 export interface TigerLocaleRichTextEditor {
   formattingToolbarAriaLabel?: string
   editorAriaLabel?: string
+  bold?: string
+  italic?: string
+  underline?: string
+  strikethrough?: string
+  heading1?: string
+  heading2?: string
+  heading3?: string
+  bulletList?: string
+  orderedList?: string
+  blockquote?: string
+  codeBlock?: string
+  link?: string
+  image?: string
+  horizontalRule?: string
+  undo?: string
+  redo?: string
+  clear?: string
 }
 
 export interface TigerLocaleCronEditor {

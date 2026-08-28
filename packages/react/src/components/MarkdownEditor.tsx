@@ -3,7 +3,7 @@ import { useControlledState } from '../hooks/useControlledState'
 import {
   applyMarkdownToolbarAction,
   classNames,
-  defaultMarkdownToolbar,
+  createDefaultMarkdownToolbar,
   findMarkdownHotkeyMatch,
   getMarkdownBodyClasses,
   getMarkdownContainerClasses,
@@ -91,9 +91,17 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [currentValue, commitValue] = useControlledState(value, defaultValue, onChange)
   const [currentMode, commitMode] = useControlledState(mode, defaultMode, onModeChange)
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getMarkdownEditorLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const toolbarItems = useMemo(
-    () => (toolbar === false ? [] : (toolbar ?? defaultMarkdownToolbar)),
-    [toolbar]
+    () => (toolbar === false ? [] : (toolbar ?? createDefaultMarkdownToolbar(labels))),
+    [toolbar, labels]
   )
 
   const previewHtml = useMemo(
@@ -105,14 +113,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     const parsedHeight = parseMarkdownHeight(height)
     return { ...(parsedHeight ? { height: parsedHeight } : {}), ...style }
   }, [height, style])
-  const mergedLocale = useMemo(
-    () => mergeTigerLocale(config.locale, locale),
-    [config.locale, locale]
-  )
-  const labels = useMemo(
-    () => getMarkdownEditorLabels(mergedLocale, labelsOverride),
-    [mergedLocale, labelsOverride]
-  )
   const modeLabels: Record<MarkdownEditorMode, string> = {
     edit: labels.editModeLabel,
     split: labels.splitModeLabel,

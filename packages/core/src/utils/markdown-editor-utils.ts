@@ -8,6 +8,8 @@ import type {
   MarkdownToolbarItem,
   MarkdownToolbarSeparator
 } from '../types/markdown-editor'
+import type { TigerLocaleMarkdownEditor } from '../types/locale'
+import { DEFAULT_MARKDOWN_EDITOR_LABELS } from './locale-utils'
 
 export { parseHeight as parseMarkdownHeight }
 
@@ -46,23 +48,51 @@ export const markdownEditorEmptyPreviewClasses = 'text-[var(--tiger-text-tertiar
 
 export const markdownEditorSplitDividerClasses = 'border-l border-[var(--tiger-border,#d1d5db)]'
 
-export const defaultMarkdownToolbar: MarkdownToolbarItem[] = [
-  { name: 'bold', label: 'B', tooltip: 'Bold (Ctrl+B)', hotkey: 'Ctrl+B' },
-  { name: 'italic', label: 'I', tooltip: 'Italic (Ctrl+I)', hotkey: 'Ctrl+I' },
-  { name: 'strikethrough', label: 'S', tooltip: 'Strikethrough' },
-  { type: 'separator' },
-  { name: 'heading', label: 'H', tooltip: 'Heading' },
-  { name: 'blockquote', label: 'Quote', tooltip: 'Blockquote' },
-  { name: 'unorderedList', label: 'List', tooltip: 'Bulleted list' },
-  { name: 'orderedList', label: '1.', tooltip: 'Numbered list' },
-  { type: 'separator' },
-  { name: 'inlineCode', label: '`', tooltip: 'Inline code' },
-  { name: 'codeBlock', label: '{}', tooltip: 'Code block' },
-  { name: 'link', label: 'Link', tooltip: 'Link (Ctrl+K)', hotkey: 'Ctrl+K' },
-  { name: 'image', label: 'Img', tooltip: 'Image' },
-  { name: 'table', label: 'Table', tooltip: 'Table' },
-  { name: 'horizontalRule', label: 'HR', tooltip: 'Horizontal rule' }
-]
+function markdownToolbarTooltip(label: string, hotkey?: string): string {
+  return hotkey ? `${label} (${hotkey})` : label
+}
+
+/** Build the built-in Markdown toolbar from resolved locale labels. */
+export function createDefaultMarkdownToolbar(
+  labels: Required<TigerLocaleMarkdownEditor>
+): MarkdownToolbarItem[] {
+  return [
+    {
+      name: 'bold',
+      label: 'B',
+      tooltip: markdownToolbarTooltip(labels.bold, 'Ctrl+B'),
+      hotkey: 'Ctrl+B'
+    },
+    {
+      name: 'italic',
+      label: 'I',
+      tooltip: markdownToolbarTooltip(labels.italic, 'Ctrl+I'),
+      hotkey: 'Ctrl+I'
+    },
+    { name: 'strikethrough', label: 'S', tooltip: labels.strikethrough },
+    { type: 'separator' },
+    { name: 'heading', label: 'H', tooltip: labels.heading },
+    { name: 'blockquote', label: labels.blockquote, tooltip: labels.blockquote },
+    { name: 'unorderedList', label: labels.unorderedList, tooltip: labels.unorderedList },
+    { name: 'orderedList', label: '1.', tooltip: labels.orderedList },
+    { type: 'separator' },
+    { name: 'inlineCode', label: '`', tooltip: labels.inlineCode },
+    { name: 'codeBlock', label: '{}', tooltip: labels.codeBlock },
+    {
+      name: 'link',
+      label: labels.link,
+      tooltip: markdownToolbarTooltip(labels.link, 'Ctrl+K'),
+      hotkey: 'Ctrl+K'
+    },
+    { name: 'image', label: labels.image, tooltip: labels.image },
+    { name: 'table', label: labels.table, tooltip: labels.table },
+    { name: 'horizontalRule', label: 'HR', tooltip: labels.horizontalRule }
+  ]
+}
+
+export const defaultMarkdownToolbar: MarkdownToolbarItem[] = createDefaultMarkdownToolbar(
+  DEFAULT_MARKDOWN_EDITOR_LABELS
+)
 
 export const markdownModeLabels: Record<MarkdownEditorMode, string> = {
   edit: 'Edit',

@@ -8,7 +8,7 @@ import {
   richTextToolbarClasses,
   richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
-  defaultToolbar,
+  createDefaultRichTextToolbar,
   isInlineFormat,
   findHotkeyMatch,
   isContentEmpty,
@@ -84,7 +84,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [currentContent, setContent] = useControlledState(value, defaultValue, onChange)
   const isControlled = value !== undefined
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
-  const toolbarItems = toolbar ?? defaultToolbar
   const empty = isContentEmpty(currentContent)
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -93,6 +92,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const labels = useMemo(
     () => getRichTextEditorLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
+  )
+  const toolbarItems = useMemo(
+    () => toolbar ?? createDefaultRichTextToolbar(labels),
+    [toolbar, labels]
   )
 
   // Mount engine once (per engine identity) on the host element.

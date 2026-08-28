@@ -1211,7 +1211,20 @@ export const DEFAULT_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor>
   previewAriaLabel: 'Markdown preview',
   editModeLabel: 'Edit',
   splitModeLabel: 'Split',
-  previewModeLabel: 'Preview'
+  previewModeLabel: 'Preview',
+  bold: 'Bold',
+  italic: 'Italic',
+  strikethrough: 'Strikethrough',
+  heading: 'Heading',
+  blockquote: 'Blockquote',
+  unorderedList: 'Bulleted list',
+  orderedList: 'Numbered list',
+  inlineCode: 'Inline code',
+  codeBlock: 'Code block',
+  link: 'Link',
+  image: 'Image',
+  table: 'Table',
+  horizontalRule: 'Horizontal rule'
 }
 
 export const ZH_CN_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> = {
@@ -1221,7 +1234,33 @@ export const ZH_CN_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> =
   previewAriaLabel: 'Markdown 预览',
   editModeLabel: '编辑',
   splitModeLabel: '分栏',
-  previewModeLabel: '预览'
+  previewModeLabel: '预览',
+  bold: '加粗',
+  italic: '斜体',
+  strikethrough: '删除线',
+  heading: '标题',
+  blockquote: '引用',
+  unorderedList: '无序列表',
+  orderedList: '有序列表',
+  inlineCode: '行内代码',
+  codeBlock: '代码块',
+  link: '链接',
+  image: '图片',
+  table: '表格',
+  horizontalRule: '分隔线'
+}
+
+function mergeRequiredLabels<T extends Record<string, string>>(
+  defaultLabels: T,
+  localeBlock: Partial<T> | undefined,
+  overrides?: Partial<T>
+): T {
+  const next = { ...defaultLabels }
+  ;(Object.keys(defaultLabels) as Array<keyof T>).forEach((key) => {
+    const value = overrides?.[key] ?? localeBlock?.[key]
+    if (typeof value === 'string') next[key] = value as T[keyof T]
+  })
+  return next
 }
 
 export function getMarkdownEditorLabels(
@@ -1231,46 +1270,51 @@ export function getMarkdownEditorLabels(
   const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
     ? ZH_CN_MARKDOWN_EDITOR_LABELS
     : DEFAULT_MARKDOWN_EDITOR_LABELS
-  return {
-    formattingToolbarAriaLabel:
-      overrides?.formattingToolbarAriaLabel ??
-      locale?.markdownEditor?.formattingToolbarAriaLabel ??
-      defaultLabels.formattingToolbarAriaLabel,
-    modeToolbarAriaLabel:
-      overrides?.modeToolbarAriaLabel ??
-      locale?.markdownEditor?.modeToolbarAriaLabel ??
-      defaultLabels.modeToolbarAriaLabel,
-    editorAriaLabel:
-      overrides?.editorAriaLabel ??
-      locale?.markdownEditor?.editorAriaLabel ??
-      defaultLabels.editorAriaLabel,
-    previewAriaLabel:
-      overrides?.previewAriaLabel ??
-      locale?.markdownEditor?.previewAriaLabel ??
-      defaultLabels.previewAriaLabel,
-    editModeLabel:
-      overrides?.editModeLabel ??
-      locale?.markdownEditor?.editModeLabel ??
-      defaultLabels.editModeLabel,
-    splitModeLabel:
-      overrides?.splitModeLabel ??
-      locale?.markdownEditor?.splitModeLabel ??
-      defaultLabels.splitModeLabel,
-    previewModeLabel:
-      overrides?.previewModeLabel ??
-      locale?.markdownEditor?.previewModeLabel ??
-      defaultLabels.previewModeLabel
-  }
+  return mergeRequiredLabels(defaultLabels, locale?.markdownEditor, overrides)
 }
 
 export const DEFAULT_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
   formattingToolbarAriaLabel: 'Text formatting',
-  editorAriaLabel: 'Rich text editor'
+  editorAriaLabel: 'Rich text editor',
+  bold: 'Bold',
+  italic: 'Italic',
+  underline: 'Underline',
+  strikethrough: 'Strikethrough',
+  heading1: 'H1',
+  heading2: 'H2',
+  heading3: 'H3',
+  bulletList: 'Bullet List',
+  orderedList: 'Ordered List',
+  blockquote: 'Blockquote',
+  codeBlock: 'Code',
+  link: 'Link',
+  image: 'Image',
+  horizontalRule: 'HR',
+  undo: 'Undo',
+  redo: 'Redo',
+  clear: 'Clear'
 }
 
 export const ZH_CN_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
   formattingToolbarAriaLabel: '富文本格式工具栏',
-  editorAriaLabel: '富文本编辑器'
+  editorAriaLabel: '富文本编辑器',
+  bold: '加粗',
+  italic: '斜体',
+  underline: '下划线',
+  strikethrough: '删除线',
+  heading1: '标题1',
+  heading2: '标题2',
+  heading3: '标题3',
+  bulletList: '无序列表',
+  orderedList: '有序列表',
+  blockquote: '引用',
+  codeBlock: '代码',
+  link: '链接',
+  image: '图片',
+  horizontalRule: '分隔线',
+  undo: '撤销',
+  redo: '重做',
+  clear: '清除格式'
 }
 
 export function getRichTextEditorLabels(
@@ -1280,16 +1324,7 @@ export function getRichTextEditorLabels(
   const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
     ? ZH_CN_RICH_TEXT_EDITOR_LABELS
     : DEFAULT_RICH_TEXT_EDITOR_LABELS
-  return {
-    formattingToolbarAriaLabel:
-      overrides?.formattingToolbarAriaLabel ??
-      locale?.richTextEditor?.formattingToolbarAriaLabel ??
-      defaultLabels.formattingToolbarAriaLabel,
-    editorAriaLabel:
-      overrides?.editorAriaLabel ??
-      locale?.richTextEditor?.editorAriaLabel ??
-      defaultLabels.editorAriaLabel
-  }
+  return mergeRequiredLabels(defaultLabels, locale?.richTextEditor, overrides)
 }
 
 export const DEFAULT_CRON_EDITOR_LABELS: Required<TigerLocaleCronEditor> = {

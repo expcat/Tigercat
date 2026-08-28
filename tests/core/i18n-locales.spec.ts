@@ -109,6 +109,15 @@ describe('i18n locale presets', () => {
     }
   })
 
+  it('enUS rich text / markdown toolbar bold is Bold and zhCN is 加粗', () => {
+    expect(enUS.richTextEditor?.bold).toBe('Bold')
+    expect(enUS.richTextEditor?.italic).toBe('Italic')
+    expect(enUS.markdownEditor?.bold).toBe('Bold')
+    expect(zhCN.richTextEditor?.bold).toBe('加粗')
+    expect(zhCN.richTextEditor?.italic).toBe('斜体')
+    expect(zhCN.markdownEditor?.bold).toBe('加粗')
+  })
+
   it('enUS select placeholder is Select an option and zhCN is 请选择', () => {
     expect(enUS.select?.placeholder).toBe('Select an option')
     expect(enUS.select?.emptyText).toBe('No options found')

@@ -3,7 +3,7 @@ import {
   applyMarkdownToolbarAction,
   classNames,
   coerceClassValue,
-  defaultMarkdownToolbar,
+  createDefaultMarkdownToolbar,
   findMarkdownHotkeyMatch,
   getMarkdownBodyClasses,
   getMarkdownContainerClasses,
@@ -97,9 +97,6 @@ export const MarkdownEditor = defineComponent({
       props.value !== undefined ? props.value : internalValue.value
     )
     const currentMode = computed(() => props.mode ?? internalMode.value)
-    const toolbarItems = computed(() =>
-      props.toolbar === false ? [] : (props.toolbar ?? defaultMarkdownToolbar)
-    )
     const previewHtml = computed(() => renderMarkdownToHtml(currentValue.value, props.renderer))
     const showFormattingToolbar = computed(() => props.toolbar !== false)
     const showTopbar = computed(() => showFormattingToolbar.value || props.showModeSwitch)
@@ -109,6 +106,9 @@ export const MarkdownEditor = defineComponent({
     )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getMarkdownEditorLabels(mergedLocale.value, props.labels))
+    const toolbarItems = computed(() =>
+      props.toolbar === false ? [] : (props.toolbar ?? createDefaultMarkdownToolbar(labels.value))
+    )
     const modeLabels = computed<Record<MarkdownEditorMode, string>>(() => ({
       edit: labels.value.editModeLabel,
       split: labels.value.splitModeLabel,

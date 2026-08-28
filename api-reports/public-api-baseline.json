@@ -553,6 +553,8 @@
       "createColumnDragData",
       "createCountdownPayload",
       "createDefaultDragSnapshot",
+      "createDefaultMarkdownToolbar",
+      "createDefaultRichTextToolbar",
       "createDefaultTransform",
       "createDocumentDragSession",
       "createDragState",

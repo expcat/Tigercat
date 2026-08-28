@@ -11,6 +11,8 @@ import type {
   ToolbarItem,
   ToolbarSeparator
 } from '../types/rich-text-editor'
+import type { TigerLocaleRichTextEditor } from '../types/locale'
+import { DEFAULT_RICH_TEXT_EDITOR_LABELS } from './locale-utils'
 
 // ─── Toolbar item helpers ─────────────────────────────────────────
 
@@ -26,24 +28,62 @@ export function getToolbarButtons(items: ToolbarItem[]): ToolbarButton[] {
 
 // ─── Default toolbar ──────────────────────────────────────────────
 
-export const defaultToolbar: ToolbarButton[] = [
-  { name: 'bold', label: 'Bold', tooltip: 'Bold (Ctrl+B)', hotkey: 'Ctrl+B' },
-  { name: 'italic', label: 'Italic', tooltip: 'Italic (Ctrl+I)', hotkey: 'Ctrl+I' },
-  { name: 'underline', label: 'Underline', tooltip: 'Underline (Ctrl+U)', hotkey: 'Ctrl+U' },
-  { name: 'strikethrough', label: 'Strikethrough', tooltip: 'Strikethrough' },
-  { name: 'heading1', label: 'H1', tooltip: 'Heading 1' },
-  { name: 'heading2', label: 'H2', tooltip: 'Heading 2' },
-  { name: 'heading3', label: 'H3', tooltip: 'Heading 3' },
-  { name: 'bulletList', label: 'Bullet List', tooltip: 'Bullet List' },
-  { name: 'orderedList', label: 'Ordered List', tooltip: 'Ordered List' },
-  { name: 'blockquote', label: 'Blockquote', tooltip: 'Blockquote' },
-  { name: 'codeBlock', label: 'Code', tooltip: 'Code Block' },
-  { name: 'link', label: 'Link', tooltip: 'Insert Link' },
-  { name: 'horizontalRule', label: 'HR', tooltip: 'Horizontal Rule' },
-  { name: 'undo', label: 'Undo', tooltip: 'Undo (Ctrl+Z)', hotkey: 'Ctrl+Z' },
-  { name: 'redo', label: 'Redo', tooltip: 'Redo (Ctrl+Y)', hotkey: 'Ctrl+Y' },
-  { name: 'clear', label: 'Clear', tooltip: 'Clear Formatting' }
-]
+function toolbarTooltip(label: string, hotkey?: string): string {
+  return hotkey ? `${label} (${hotkey})` : label
+}
+
+/** Build the built-in toolbar from resolved locale labels. */
+export function createDefaultRichTextToolbar(
+  labels: Required<TigerLocaleRichTextEditor>
+): ToolbarButton[] {
+  return [
+    {
+      name: 'bold',
+      label: labels.bold,
+      tooltip: toolbarTooltip(labels.bold, 'Ctrl+B'),
+      hotkey: 'Ctrl+B'
+    },
+    {
+      name: 'italic',
+      label: labels.italic,
+      tooltip: toolbarTooltip(labels.italic, 'Ctrl+I'),
+      hotkey: 'Ctrl+I'
+    },
+    {
+      name: 'underline',
+      label: labels.underline,
+      tooltip: toolbarTooltip(labels.underline, 'Ctrl+U'),
+      hotkey: 'Ctrl+U'
+    },
+    { name: 'strikethrough', label: labels.strikethrough, tooltip: labels.strikethrough },
+    { name: 'heading1', label: labels.heading1, tooltip: labels.heading1 },
+    { name: 'heading2', label: labels.heading2, tooltip: labels.heading2 },
+    { name: 'heading3', label: labels.heading3, tooltip: labels.heading3 },
+    { name: 'bulletList', label: labels.bulletList, tooltip: labels.bulletList },
+    { name: 'orderedList', label: labels.orderedList, tooltip: labels.orderedList },
+    { name: 'blockquote', label: labels.blockquote, tooltip: labels.blockquote },
+    { name: 'codeBlock', label: labels.codeBlock, tooltip: labels.codeBlock },
+    { name: 'link', label: labels.link, tooltip: labels.link },
+    { name: 'horizontalRule', label: labels.horizontalRule, tooltip: labels.horizontalRule },
+    {
+      name: 'undo',
+      label: labels.undo,
+      tooltip: toolbarTooltip(labels.undo, 'Ctrl+Z'),
+      hotkey: 'Ctrl+Z'
+    },
+    {
+      name: 'redo',
+      label: labels.redo,
+      tooltip: toolbarTooltip(labels.redo, 'Ctrl+Y'),
+      hotkey: 'Ctrl+Y'
+    },
+    { name: 'clear', label: labels.clear, tooltip: labels.clear }
+  ]
+}
+
+export const defaultToolbar: ToolbarButton[] = createDefaultRichTextToolbar(
+  DEFAULT_RICH_TEXT_EDITOR_LABELS
+)
 
 // ─── Tailwind class constants ─────────────────────────────────────
 

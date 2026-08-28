@@ -140,6 +140,8 @@ describe('RichTextEditor', () => {
 
       expect(container.querySelector('[aria-label="富文本格式工具栏"]')).toBeTruthy()
       expect(container.querySelector('[aria-label="富文本编辑器"]')).toBeTruthy()
+      expect(container.querySelector('[aria-label="加粗"]')).toBeTruthy()
+      expect(container.querySelector('[aria-label="斜体"]')).toBeTruthy()
     })
 
     it('should have aria-pressed on inline format buttons', () => {

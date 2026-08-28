@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   defaultToolbar,
+  createDefaultRichTextToolbar,
+  ZH_CN_RICH_TEXT_EDITOR_LABELS,
   getRichTextContainerClasses,
   getToolbarButtonClasses,
   getEditorAreaClasses,
@@ -47,6 +49,14 @@ describe('defaultToolbar', () => {
       expect(btn.name).toBeTruthy()
       expect(btn.label).toBeTruthy()
     }
+  })
+
+  it('createDefaultRichTextToolbar uses locale labels for Bold / Italic', () => {
+    const toolbar = createDefaultRichTextToolbar(ZH_CN_RICH_TEXT_EDITOR_LABELS)
+    const bold = toolbar.find((btn) => btn.name === 'bold')
+    const italic = toolbar.find((btn) => btn.name === 'italic')
+    expect(bold?.label).toBe('加粗')
+    expect(italic?.label).toBe('斜体')
   })
 })
 

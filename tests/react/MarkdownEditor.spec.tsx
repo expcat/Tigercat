@@ -196,6 +196,8 @@ describe('MarkdownEditor', () => {
       expect(container.querySelector('[aria-label="Markdown 编辑器"]')).toBeTruthy()
       expect(container.querySelector('[aria-label="Markdown 预览"]')).toBeTruthy()
       expect(container.querySelector('[aria-label="Markdown 格式工具栏"] button')).toBeTruthy()
+      expect(getByRole('button', { name: '加粗 (Ctrl+B)' })).toBeTruthy()
+      expect(getByRole('button', { name: '斜体 (Ctrl+I)' })).toBeTruthy()
       fireEvent.click(getByRole('button', { name: '预览' }))
       expect(container.querySelector('[data-mode="preview"]')).toBeTruthy()
     })

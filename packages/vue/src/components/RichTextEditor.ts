@@ -8,7 +8,7 @@ import {
   richTextToolbarClasses,
   richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
-  defaultToolbar,
+  createDefaultRichTextToolbar,
   isInlineFormat,
   findHotkeyMatch,
   isContentEmpty,
@@ -88,10 +88,10 @@ export const RichTextEditor = defineComponent({
     const currentContent = computed(() =>
       props.value !== undefined ? props.value : internalValue.value
     )
-    const toolbarItems = computed(() => props.toolbar ?? defaultToolbar)
     const isEmpty = computed(() => isContentEmpty(currentContent.value))
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getRichTextEditorLabels(mergedLocale.value, props.labels))
+    const toolbarItems = computed(() => props.toolbar ?? createDefaultRichTextToolbar(labels.value))
 
     // Sync editor content when controlled value changes
     watch(
