@@ -22,6 +22,7 @@ export const TIGER_LOCALE_KEY_SET = {
   modal: true,
   drawer: true,
   qrcode: true,
+  marquee: true,
   timeline: true,
   upload: true,
   pagination: true,

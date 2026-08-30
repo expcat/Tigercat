@@ -40,6 +40,9 @@ export const zhCN: TigerLocale = {
     refreshText: '刷新',
     loadingText: '加载中...'
   },
+  marquee: {
+    ariaLabel: '滚动内容'
+  },
   timeline: {
     pendingText: '加载中...'
   },

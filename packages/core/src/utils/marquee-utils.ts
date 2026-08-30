@@ -8,7 +8,6 @@
  */
 
 import {
-  DEFAULT_MARQUEE_ARIA_LABEL,
   DEFAULT_MARQUEE_DIRECTION,
   DEFAULT_MARQUEE_DURATION_MS,
   DEFAULT_MARQUEE_GAP_PX,
@@ -234,15 +233,47 @@ export function resolveMarqueePauseOnHover(value?: boolean): boolean {
 }
 
 /**
- * Resolve the accessible name. Empty or whitespace-only values fall back
- * to {@link DEFAULT_MARQUEE_ARIA_LABEL}.
+ * Trim an explicit accessible name. Empty / whitespace / omitted → `undefined`
+ * so the root is not forced into a landmark.
  */
-export function resolveMarqueeAriaLabel(label?: string): string {
-  if (typeof label === 'string') {
-    const trimmed = label.trim()
-    if (trimmed) return trimmed
+export function resolveMarqueeAriaLabel(label?: string): string | undefined {
+  if (typeof label !== 'string') return undefined
+  const trimmed = label.trim()
+  return trimmed || undefined
+}
+
+/**
+ * Named region only when `ariaLabel` / `aria-label` / `aria-labelledby` is set.
+ * Blank labels do not fall back to a hardcoded English name.
+ */
+export function resolveMarqueeRegion(input: { ariaLabel?: string; labelledBy?: string } = {}): {
+  role?: 'region'
+  ariaLabel?: string
+} {
+  const labelledBy =
+    typeof input.labelledBy === 'string' && input.labelledBy.trim()
+      ? input.labelledBy.trim()
+      : undefined
+  const ariaLabel = resolveMarqueeAriaLabel(input.ariaLabel)
+  if (ariaLabel) return { role: 'region', ariaLabel }
+  if (labelledBy) return { role: 'region' }
+  return {}
+}
+
+/**
+ * Duplicate copies stay in the layout for a seamless loop but must not take
+ * focus or pointer. Same contract as a collapsed CollapsePanel wrapper.
+ */
+export function getMarqueeCloneAttributes(): {
+  'data-marquee-clone': ''
+  'aria-hidden': true
+  inert: true
+} {
+  return {
+    'data-marquee-clone': '',
+    'aria-hidden': true,
+    inert: true
   }
-  return DEFAULT_MARQUEE_ARIA_LABEL
 }
 
 /**

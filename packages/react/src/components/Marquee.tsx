@@ -1,5 +1,6 @@
 import React, { forwardRef, useCallback, useState } from 'react'
 import {
+  getMarqueeCloneAttributes,
   getMarqueeContentClasses,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
@@ -7,9 +8,9 @@ import {
   injectMarqueeStyles,
   isMarqueeFocusInside,
   isMarqueePaused,
-  resolveMarqueeAriaLabel,
   resolveMarqueeDirection,
   resolveMarqueePauseOnHover,
+  resolveMarqueeRegion,
   resolveMarqueeRepeat,
   type MarqueeProps as CoreMarqueeProps
 } from '@expcat/tigercat-core'
@@ -54,10 +55,11 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       hovered,
       focused
     })
-    const { 'aria-label': ariaLabelAttr, ...domProps } = rest
-    const resolvedAriaLabel = resolveMarqueeAriaLabel(
-      typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
-    )
+    const { 'aria-label': ariaLabelAttr, 'aria-labelledby': ariaLabelledByAttr, ...domProps } = rest
+    const region = resolveMarqueeRegion({
+      ariaLabel: typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel,
+      labelledBy: typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
+    })
 
     const handleMouseEnter = useCallback(
       (event: React.MouseEvent<HTMLDivElement>) => {
@@ -100,8 +102,9 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       <div
         {...domProps}
         ref={ref}
-        role="region"
-        aria-label={resolvedAriaLabel}
+        role={region.role}
+        aria-label={region.ariaLabel}
+        aria-labelledby={typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined}
         data-marquee=""
         data-marquee-direction={resolvedDirection}
         data-marquee-paused={paused ? 'true' : 'false'}
@@ -131,7 +134,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
                   clone
                 })}
                 data-marquee-content=""
-                {...(clone ? { 'data-marquee-clone': '', 'aria-hidden': true } : {})}>
+                {...(clone ? getMarqueeCloneAttributes() : {})}>
                 {children}
               </div>
             )

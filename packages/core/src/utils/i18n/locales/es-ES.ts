@@ -41,6 +41,9 @@ export const esES: TigerLocale = {
     refreshText: 'Actualizar',
     loadingText: 'Cargando...'
   },
+  marquee: {
+    ariaLabel: 'Contenido en desplazamiento'
+  },
   timeline: {
     pendingText: 'Cargando...'
   },

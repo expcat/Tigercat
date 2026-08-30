@@ -39,6 +39,7 @@ import type {
   TigerLocaleRate,
   TigerLocaleAvatarGroup,
   TigerLocaleCarousel,
+  TigerLocaleMarquee,
   TigerLocaleTransfer,
   TigerLocaleChart,
   TigerLocaleMarkdownEditor,
@@ -359,6 +360,13 @@ export function getCarouselLabels(
   overrides?: Partial<TigerLocaleCarousel>
 ): Required<TigerLocaleCarousel> {
   return resolveLocaleSection(enSection('carousel'), locale?.carousel, overrides)
+}
+
+export function getMarqueeLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleMarquee>
+): Required<TigerLocaleMarquee> {
+  return resolveLocaleSection(enSection('marquee'), locale?.marquee, overrides)
 }
 
 export function getTransferLabels(

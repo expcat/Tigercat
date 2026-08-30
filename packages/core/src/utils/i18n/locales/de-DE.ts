@@ -41,6 +41,9 @@ export const deDE: TigerLocale = {
     refreshText: 'Aktualisieren',
     loadingText: 'Wird geladen...'
   },
+  marquee: {
+    ariaLabel: 'Laufender Inhalt'
+  },
   timeline: {
     pendingText: 'Wird geladen...'
   },

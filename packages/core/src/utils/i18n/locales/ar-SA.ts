@@ -41,6 +41,9 @@ export const arSA: TigerLocale = {
     refreshText: 'تحديث',
     loadingText: 'جار التحميل...'
   },
+  marquee: {
+    ariaLabel: 'محتوى التمرير'
+  },
   timeline: {
     pendingText: 'جار التحميل...'
   },

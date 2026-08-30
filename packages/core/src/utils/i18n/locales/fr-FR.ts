@@ -41,6 +41,9 @@ export const frFR: TigerLocale = {
     refreshText: 'Actualiser',
     loadingText: 'Chargement...'
   },
+  marquee: {
+    ariaLabel: 'Contenu défilant'
+  },
   timeline: {
     pendingText: 'Chargement...'
   },

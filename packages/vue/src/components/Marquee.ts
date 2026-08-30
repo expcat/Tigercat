@@ -1,6 +1,7 @@
 import { defineComponent, h, PropType, ref } from 'vue'
 import {
   composeComponentClasses,
+  getMarqueeCloneAttributes,
   getMarqueeContentClasses,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
@@ -9,9 +10,9 @@ import {
   isMarqueeFocusInside,
   isMarqueePaused,
   mergeStyleValues,
-  resolveMarqueeAriaLabel,
   resolveMarqueeDirection,
   resolveMarqueePauseOnHover,
+  resolveMarqueeRegion,
   resolveMarqueeRepeat,
   type MarqueeDirection,
   type MarqueeGap
@@ -68,6 +69,7 @@ export const Marquee = defineComponent({
     /**
      * How many copies of the content to render for a seamless loop.
      * Values below 2 skip looping and show a single static copy.
+     * Extra copies are inert visual clones; only the first copy is in the tab order.
      * @default 2
      */
     repeat: {
@@ -75,8 +77,7 @@ export const Marquee = defineComponent({
       default: undefined
     },
     /**
-     * Accessible name for the region
-     * @default 'Scrolling content'
+     * Accessible name for the region. Omitted or blank: not a landmark.
      */
     ariaLabel: {
       type: String,
@@ -122,7 +123,14 @@ export const Marquee = defineComponent({
       })
       const attrAriaLabel =
         typeof attrsRecord['aria-label'] === 'string' ? attrsRecord['aria-label'] : undefined
-      const ariaLabel = resolveMarqueeAriaLabel(attrAriaLabel ?? props.ariaLabel)
+      const attrLabelledBy =
+        typeof attrsRecord['aria-labelledby'] === 'string'
+          ? attrsRecord['aria-labelledby']
+          : undefined
+      const region = resolveMarqueeRegion({
+        ariaLabel: attrAriaLabel ?? props.ariaLabel,
+        labelledBy: attrLabelledBy
+      })
 
       const contentCopies = Array.from({ length: copies }, (_, index) => {
         const clone = index > 0
@@ -131,7 +139,7 @@ export const Marquee = defineComponent({
           {
             class: getMarqueeContentClasses({ direction, clone }),
             'data-marquee-content': '',
-            ...(clone ? { 'data-marquee-clone': '', 'aria-hidden': 'true' } : {})
+            ...(clone ? getMarqueeCloneAttributes() : {})
           },
           slots.default?.()
         )
@@ -151,8 +159,8 @@ export const Marquee = defineComponent({
             attrsRecord.class
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
-          role: 'region',
-          'aria-label': ariaLabel,
+          role: region.role,
+          'aria-label': region.ariaLabel,
           'data-marquee': '',
           'data-marquee-direction': direction,
           'data-marquee-paused': paused ? 'true' : 'false',

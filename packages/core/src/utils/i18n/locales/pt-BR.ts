@@ -41,6 +41,9 @@ export const ptBR: TigerLocale = {
     refreshText: 'Atualizar',
     loadingText: 'Carregando...'
   },
+  marquee: {
+    ariaLabel: 'Conteúdo em rolagem'
+  },
   timeline: {
     pendingText: 'Carregando...'
   },

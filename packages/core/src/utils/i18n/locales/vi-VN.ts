@@ -41,6 +41,9 @@ export const viVN: TigerLocale = {
     refreshText: 'Làm mới',
     loadingText: 'Đang tải...'
   },
+  marquee: {
+    ariaLabel: 'Nội dung cuộn'
+  },
   timeline: {
     pendingText: 'Đang tải...'
   },

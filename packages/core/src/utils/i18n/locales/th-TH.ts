@@ -41,6 +41,9 @@ export const thTH: TigerLocale = {
     refreshText: 'รีเฟรช',
     loadingText: 'กำลังโหลด...'
   },
+  marquee: {
+    ariaLabel: 'เนื้อหาเลื่อน'
+  },
   timeline: {
     pendingText: 'กำลังโหลด...'
   },

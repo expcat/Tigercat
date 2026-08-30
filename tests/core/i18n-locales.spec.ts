@@ -267,6 +267,7 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('avatarGroup')
     expect(TIGER_LOCALE_KEYS).toContain('common')
     expect(TIGER_LOCALE_KEYS).toContain('timePicker')
+    expect(TIGER_LOCALE_KEYS).toContain('marquee')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

@@ -40,6 +40,9 @@ export const enUS: TigerLocale = {
     refreshText: 'Refresh',
     loadingText: 'Loading...'
   },
+  marquee: {
+    ariaLabel: 'Scrolling content'
+  },
   timeline: {
     pendingText: 'Loading...'
   },

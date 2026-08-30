@@ -45,11 +45,6 @@ export const MAX_MARQUEE_REPEAT = 16
 export const DEFAULT_MARQUEE_PAUSE_ON_HOVER = true
 
 /**
- * Default accessible name for the scrolling region
- */
-export const DEFAULT_MARQUEE_ARIA_LABEL = 'Scrolling content'
-
-/**
  * Base Marquee props interface (framework-agnostic)
  */
 export interface MarqueeProps {
@@ -81,13 +76,15 @@ export interface MarqueeProps {
   /**
    * How many copies of the content to render for a seamless loop.
    * Values below 2 skip looping and show a single static copy.
+   * Extra copies are inert visual clones; interactive children are still
+   * mounted `repeat` times, but only the first copy is in the tab order.
    * @default 2
    */
   repeat?: number
 
   /**
-   * Accessible name for the region
-   * @default 'Scrolling content'
+   * Accessible name for the region. Omitted or blank: not a landmark.
+   * Pass `aria-label` / `aria-labelledby` the same way.
    */
   ariaLabel?: string
 

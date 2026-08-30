@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { Marquee } from '@expcat/tigercat-vue/Marquee'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { MARQUEE_DURATION_VAR, MARQUEE_STYLE_ID } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
@@ -19,20 +21,22 @@ function getTrack(container: HTMLElement): HTMLElement {
 
 describe('Marquee', () => {
   describe('Rendering', () => {
-    it('renders a labeled region and duplicates the slot for a seamless loop', () => {
+    it('duplicates the slot for a seamless loop without becoming a landmark', () => {
       const { container } = render(Marquee, {
         slots: { default: () => h('span', 'Vue React') }
       })
       const root = getRoot(container)
       expect(root.tagName).toBe('DIV')
-      expect(root).toHaveAttribute('role', 'region')
-      expect(root).toHaveAttribute('aria-label', 'Scrolling content')
+      expect(root).not.toHaveAttribute('role')
+      expect(root).not.toHaveAttribute('aria-label')
       expect(root).toHaveAttribute('data-marquee-direction', 'left')
       expect(root).toHaveAttribute('data-marquee-paused', 'false')
       expect(root.querySelectorAll('[data-marquee-content]')).toHaveLength(2)
       expect(root.querySelectorAll('[data-marquee-clone]')).toHaveLength(1)
-      expect(root.querySelector('[data-marquee-clone]')).toHaveAttribute('aria-hidden', 'true')
-      expect(root.querySelector('[data-marquee-clone]')).toHaveTextContent('Vue React')
+      const clone = root.querySelector('[data-marquee-clone]')
+      expect(clone).toHaveAttribute('aria-hidden', 'true')
+      expect(clone).toHaveAttribute('inert')
+      expect(clone).toHaveTextContent('Vue React')
     })
 
     it('renders a single static copy when repeat is 1', () => {
@@ -118,26 +122,55 @@ describe('Marquee', () => {
       expect(root.style.color).toBe('red')
     })
 
-    it('lets a native aria-label override the default', () => {
+    it('becomes a named region only with an explicit accessible name', () => {
       const { container } = render(Marquee, {
         attrs: { 'aria-label': 'Latest headlines' },
         slots: { default: 'News' }
       })
-      expect(getRoot(container)).toHaveAttribute('aria-label', 'Latest headlines')
+      const root = getRoot(container)
+      expect(root).toHaveAttribute('role', 'region')
+      expect(root).toHaveAttribute('aria-label', 'Latest headlines')
+    })
+
+    it('does not write a default name over aria-labelledby', () => {
+      const { container } = render({
+        setup() {
+          return () =>
+            h('div', [
+              h('span', { id: 'ticker-title' }, 'Headlines'),
+              h(Marquee, { 'aria-labelledby': 'ticker-title' }, () => 'News')
+            ])
+        }
+      })
+      const root = getRoot(container)
+      expect(root).toHaveAttribute('role', 'region')
+      expect(root).toHaveAttribute('aria-labelledby', 'ticker-title')
+      expect(root).not.toHaveAttribute('aria-label')
     })
   })
 
   describe('a11y', () => {
-    it('exposes a region without interactive roles and hides cloned copies', async () => {
+    it('keeps cloned interactive nodes out of the tab order', async () => {
       const { container } = render(Marquee, {
-        slots: { default: () => h('span', 'Vue React') }
+        slots: { default: () => h('button', { type: 'button' }, 'Item') }
       })
       const root = getRoot(container)
-      expect(root).toHaveAttribute('role', 'region')
-      expect(screen.getByRole('region', { name: 'Scrolling content' })).toBe(root)
-      expect(root.querySelector('[data-marquee-clone]')).toHaveAttribute('aria-hidden', 'true')
+      expect(root.querySelectorAll('button')).toHaveLength(2)
+      expect(screen.getAllByRole('button')).toHaveLength(1)
+      expect(root.querySelector('[data-marquee-clone]')).toHaveAttribute('inert')
+      expect(screen.queryByRole('region')).not.toBeInTheDocument()
       expect(screen.queryByRole('marquee')).not.toBeInTheDocument()
       await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('does not invent an English landmark under ConfigProvider zh-CN', () => {
+      const { container } = render({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(Marquee, null, () => 'News'))
+        }
+      })
+      expect(screen.queryByRole('region')).not.toBeInTheDocument()
+      expect(getRoot(container)).not.toHaveAttribute('aria-label')
     })
 
     it('injects reduced-motion CSS that freezes the track and hides clones', () => {

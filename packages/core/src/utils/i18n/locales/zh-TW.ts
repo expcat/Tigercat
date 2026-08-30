@@ -41,6 +41,9 @@ export const zhTW: TigerLocale = {
     refreshText: '重新整理',
     loadingText: '載入中...'
   },
+  marquee: {
+    ariaLabel: '滾動內容'
+  },
   timeline: {
     pendingText: '載入中...'
   },

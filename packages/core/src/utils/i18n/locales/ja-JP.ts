@@ -41,6 +41,9 @@ export const jaJP: TigerLocale = {
     refreshText: '更新',
     loadingText: '読み込み中...'
   },
+  marquee: {
+    ariaLabel: 'スクロール中のコンテンツ'
+  },
   timeline: {
     pendingText: '読み込み中...'
   },

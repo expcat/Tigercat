@@ -4,7 +4,6 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  DEFAULT_MARQUEE_ARIA_LABEL,
   DEFAULT_MARQUEE_DIRECTION,
   DEFAULT_MARQUEE_DURATION_MS,
   DEFAULT_MARQUEE_GAP_PX,
@@ -15,7 +14,9 @@ import {
   MARQUEE_DURATION_VAR,
   MARQUEE_GAP_VAR,
   MARQUEE_STYLE_ID,
+  getMarqueeCloneAttributes,
   getMarqueeContentClasses,
+  getMarqueeLabels,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
@@ -32,9 +33,12 @@ import {
   resolveMarqueeDuration,
   resolveMarqueeGap,
   resolveMarqueePauseOnHover,
+  resolveMarqueeRegion,
   resolveMarqueeRepeat,
   shouldLoopMarquee
 } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 const loadFreshMarqueeUtils = async () => {
   vi.resetModules()
@@ -118,10 +122,35 @@ describe('marquee-utils', () => {
   })
 
   describe('aria label', () => {
-    it('trims custom labels and falls back to the default', () => {
+    it('trims custom labels and does not invent a default name', () => {
       expect(resolveMarqueeAriaLabel('  News ticker  ')).toBe('News ticker')
-      expect(resolveMarqueeAriaLabel('')).toBe(DEFAULT_MARQUEE_ARIA_LABEL)
-      expect(resolveMarqueeAriaLabel()).toBe(DEFAULT_MARQUEE_ARIA_LABEL)
+      expect(resolveMarqueeAriaLabel('')).toBeUndefined()
+      expect(resolveMarqueeAriaLabel('   ')).toBeUndefined()
+      expect(resolveMarqueeAriaLabel()).toBeUndefined()
+    })
+
+    it('is a named region only with an explicit name or labelledby', () => {
+      expect(resolveMarqueeRegion()).toEqual({})
+      expect(resolveMarqueeRegion({ ariaLabel: '' })).toEqual({})
+      expect(resolveMarqueeRegion({ ariaLabel: 'News' })).toEqual({
+        role: 'region',
+        ariaLabel: 'News'
+      })
+      expect(resolveMarqueeRegion({ labelledBy: 'ticker-title' })).toEqual({ role: 'region' })
+    })
+
+    it('reads marquee names from locale objects, not a component constant', () => {
+      expect(getMarqueeLabels().ariaLabel).toBe(enUS.marquee?.ariaLabel)
+      expect(getMarqueeLabels({ locale: 'zh-CN' }).ariaLabel).toBe(enUS.marquee?.ariaLabel)
+      expect(getMarqueeLabels(zhCN).ariaLabel).toBe('滚动内容')
+    })
+
+    it('marks clones inert so they stay out of the tab order', () => {
+      expect(getMarqueeCloneAttributes()).toEqual({
+        'data-marquee-clone': '',
+        'aria-hidden': true,
+        inert: true
+      })
     })
   })
 

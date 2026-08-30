@@ -45,6 +45,11 @@ export interface TigerLocaleQRCode {
   loadingText?: string
 }
 
+export interface TigerLocaleMarquee {
+  /** Accessible name when Marquee is a labeled region */
+  ariaLabel?: string
+}
+
 export interface TigerLocaleTimeline {
   pendingText?: string
 }
@@ -509,6 +514,7 @@ export interface TigerLocale {
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer
   qrcode?: TigerLocaleQRCode
+  marquee?: TigerLocaleMarquee
   timeline?: TigerLocaleTimeline
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination

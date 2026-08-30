@@ -41,6 +41,9 @@ export const idID: TigerLocale = {
     refreshText: 'Muat ulang',
     loadingText: 'Memuat...'
   },
+  marquee: {
+    ariaLabel: 'Konten bergulir'
+  },
   timeline: {
     pendingText: 'Memuat...'
   },

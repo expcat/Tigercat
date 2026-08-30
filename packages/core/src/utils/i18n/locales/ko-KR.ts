@@ -41,6 +41,9 @@ export const koKR: TigerLocale = {
     refreshText: '새로 고침',
     loadingText: '로딩 중...'
   },
+  marquee: {
+    ariaLabel: '스크롤 콘텐츠'
+  },
   timeline: {
     pendingText: '로딩 중...'
   },
