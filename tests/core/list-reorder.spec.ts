@@ -142,6 +142,17 @@ describe('createListReorderController', () => {
     expect(controller.getState().isDragging).toBe(false)
   })
 
+  it('returns null from moveBetween when the source index does not exist', () => {
+    const controller = createListReorderController({
+      getContainerId: () => 'left',
+      getConfig: () => ({ crossContainer: true }),
+      getCallbacks: () => ({})
+    })
+    controller.startDrag({ id: 'missing', index: 9, containerId: 'left' })
+    controller.dragOver({ id: 'x', index: 0, containerId: 'right' })
+    expect(controller.moveBetween(items(), items())).toBeNull()
+  })
+
   it('does not put listitem or deprecated ARIA on item bindings', () => {
     const controller = createListReorderController({
       getContainerId: () => 'left',

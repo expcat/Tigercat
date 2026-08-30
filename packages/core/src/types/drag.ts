@@ -44,22 +44,27 @@ export interface DragConfig {
   direction?: DragDirection
   /** CSS selector for the drag handle (if omitted, the whole item is draggable) */
   handleSelector?: string
-  /** CSS class applied to the dragged element */
+  /** Extra class appended to the dragged element */
   dragClass?: string
-  /** CSS class applied to the ghost/placeholder element */
-  ghostClass?: string
-  /** Auto-scroll speed (px/frame) when dragging near edges */
-  scrollSpeed?: number
-  /** Distance (px) from container edge to trigger auto-scroll */
-  scrollMargin?: number
   /** Whether drag is disabled */
   disabled?: boolean
   /** Whether to allow cross-container drag */
   crossContainer?: boolean
-  /** Lock axis — constrain drag to a single axis */
+  /** Lock axis — omit when `direction` is `'both'` */
   lockAxis?: DragAxis
-  /** Minimum distance (px) before a drag is initiated */
+  /** Minimum distance (px) before a pointer session emits `onMove` */
   dragThreshold?: number
+}
+
+/** `DragConfig` with defaults applied. `lockAxis` stays unset for `direction: 'both'`. */
+export interface ResolvedDragConfig {
+  direction: DragDirection
+  handleSelector: string
+  dragClass: string
+  disabled: boolean
+  crossContainer: boolean
+  lockAxis?: DragAxis
+  dragThreshold: number
 }
 
 // ---------------------------------------------------------------------------
@@ -219,7 +224,8 @@ export interface DragReorderResult<T = DragItem> {
 }
 
 /**
- * Result of a cross-container move operation
+ * Result of a cross-container move operation.
+ * `moveItemBetweenContainers` returns `null` when `fromIndex` is out of range.
  */
 export interface DragMoveResult<T = DragItem> {
   /** Items in the source container after the move */

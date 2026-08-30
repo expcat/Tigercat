@@ -18,7 +18,8 @@ import type {
   DragCallbacks,
   DocumentDragSession,
   DocumentDragSessionEvent,
-  DocumentDragSessionOptions
+  DocumentDragSessionOptions,
+  ResolvedDragConfig
 } from '../types/drag'
 import { isBrowser } from './env'
 
@@ -217,13 +218,9 @@ export function moveItemBetweenContainers<T extends DragItem>(
   targetItems: readonly T[],
   fromIndex: number,
   toIndex: number
-): DragMoveResult<T> {
+): DragMoveResult<T> | null {
   if (fromIndex < 0 || fromIndex >= sourceItems.length) {
-    return {
-      sourceItems: [...sourceItems],
-      targetItems: [...targetItems],
-      movedItem: sourceItems[0] ?? ({ id: '', index: 0 } as T)
-    }
+    return null
   }
 
   const newSource = [...sourceItems]
@@ -292,17 +289,20 @@ export function toDragItems<T extends Record<string, unknown>>(
   }))
 }
 
+function lockAxisForDirection(direction: DragConfig['direction']): DragConfig['lockAxis'] {
+  if (direction === 'horizontal') return 'x'
+  if (direction === 'vertical') return 'y'
+  return undefined
+}
+
 /**
- * Default drag config with sensible defaults
+ * Default drag config. Vertical lists lock to Y; `direction: 'both'` does not lock.
  */
-export function getDefaultDragConfig(): Required<DragConfig> {
+export function getDefaultDragConfig(): ResolvedDragConfig {
   return {
     direction: 'vertical',
     handleSelector: '',
     dragClass: 'tiger-drag-active',
-    ghostClass: 'tiger-drag-ghost',
-    scrollSpeed: 10,
-    scrollMargin: 40,
     disabled: false,
     crossContainer: false,
     lockAxis: 'y',
@@ -311,10 +311,20 @@ export function getDefaultDragConfig(): Required<DragConfig> {
 }
 
 /**
- * Merge user config with defaults
+ * Merge user config with defaults. Explicit `lockAxis` wins; otherwise it follows
+ * `direction` (`both` leaves the axis unlocked).
  */
-export function resolveDragConfig(config?: DragConfig): Required<DragConfig> {
-  return { ...getDefaultDragConfig(), ...config }
+export function resolveDragConfig(config?: DragConfig): ResolvedDragConfig {
+  const direction = config?.direction ?? 'vertical'
+  return {
+    direction,
+    handleSelector: config?.handleSelector ?? '',
+    dragClass: config?.dragClass ?? 'tiger-drag-active',
+    disabled: config?.disabled ?? false,
+    crossContainer: config?.crossContainer ?? false,
+    lockAxis: config?.lockAxis ?? lockAxisForDirection(direction),
+    dragThreshold: config?.dragThreshold ?? 5
+  }
 }
 
 // ---------------------------------------------------------------------------

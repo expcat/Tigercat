@@ -362,12 +362,13 @@ describe('moveItemBetweenContainers', () => {
     expect(result.targetItems[0].id).toBe('item-0')
   })
 
-  it('handles invalid fromIndex gracefully', () => {
+  it('returns null when fromIndex is out of range instead of moving the first item', () => {
     const source = makeItems(2)
     const target = makeItems(2)
-    const result = moveItemBetweenContainers(source, target, -1, 0)
-    expect(result.sourceItems).toHaveLength(2) // unchanged
-    expect(result.targetItems).toHaveLength(2) // unchanged
+    expect(moveItemBetweenContainers(source, target, -1, 0)).toBeNull()
+    expect(moveItemBetweenContainers(source, target, 9, 0)).toBeNull()
+    expect(source).toHaveLength(2)
+    expect(target).toHaveLength(2)
   })
 
   it('does not mutate original arrays', () => {
@@ -454,14 +455,15 @@ describe('isValidDragHandle', () => {
 })
 
 describe('getDefaultDragConfig', () => {
-  it('returns an object with all required keys', () => {
+  it('returns vertical defaults with a matching Y lock', () => {
     const config = getDefaultDragConfig()
     expect(config.direction).toBe('vertical')
     expect(config.disabled).toBe(false)
-    expect(config.scrollSpeed).toBeGreaterThan(0)
+    expect(config.lockAxis).toBe('y')
     expect(config.dragThreshold).toBeGreaterThan(0)
     expect(typeof config.dragClass).toBe('string')
-    expect(typeof config.ghostClass).toBe('string')
+    expect(config).not.toHaveProperty('ghostClass')
+    expect(config).not.toHaveProperty('scrollSpeed')
   })
 })
 
@@ -470,7 +472,17 @@ describe('resolveDragConfig', () => {
     const config = resolveDragConfig({ direction: 'horizontal', disabled: true })
     expect(config.direction).toBe('horizontal')
     expect(config.disabled).toBe(true)
-    expect(config.scrollSpeed).toBe(10) // default
+    expect(config.lockAxis).toBe('x')
+  })
+
+  it('does not lock an axis when direction is both', () => {
+    const config = resolveDragConfig({ direction: 'both' })
+    expect(config.lockAxis).toBeUndefined()
+  })
+
+  it('keeps an explicit lockAxis even when direction is both', () => {
+    const config = resolveDragConfig({ direction: 'both', lockAxis: 'x' })
+    expect(config.lockAxis).toBe('x')
   })
 
   it('returns defaults when no config provided', () => {
