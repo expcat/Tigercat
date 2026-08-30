@@ -46,10 +46,22 @@ export interface FormItemLabelClassOptions {
   isRequired?: boolean
 }
 
-export function getFormItemClasses(options: FormItemClassOptions = {}): string {
-  const { size = 'md', labelPosition = 'right', hasError = false, disabled = false } = options
+export function resolveFormLabelAlign(
+  labelPosition: FormLabelPosition = 'left',
+  labelAlign?: FormLabelAlign
+): FormLabelAlign {
+  return labelAlign ?? (labelPosition === 'top' ? 'left' : 'right')
+}
 
-  const layoutClasses = labelPosition === 'top' ? 'flex flex-col gap-2' : 'flex items-start gap-4'
+export function getFormItemClasses(options: FormItemClassOptions = {}): string {
+  const { size = 'md', labelPosition = 'left', hasError = false, disabled = false } = options
+
+  const layoutClasses =
+    labelPosition === 'top'
+      ? 'flex flex-col gap-2'
+      : labelPosition === 'right'
+        ? 'flex flex-row-reverse items-start gap-4'
+        : 'flex items-start gap-4'
 
   return classNames(
     'tiger-form-item',
@@ -64,15 +76,9 @@ export function getFormItemClasses(options: FormItemClassOptions = {}): string {
 }
 
 export function getFormItemLabelClasses(options: FormItemLabelClassOptions = {}): string {
-  const { size = 'md', labelPosition = 'right', isRequired = false } = options
-
-  // Top labels read more naturally left-aligned, so default to `left` when the
-  // caller hasn't picked an alignment and the label sits on top. Horizontal
-  // labels keep the conventional `right` alignment. Mirrors the resolution in
-  // the Vue/React `Form` components.
-  const labelAlign = options.labelAlign ?? (labelPosition === 'top' ? 'left' : 'right')
-
-  const alignClass = labelAlign === 'right' ? 'text-right' : 'text-left'
+  const { size = 'md', labelPosition = 'left', isRequired = false } = options
+  const labelAlign = resolveFormLabelAlign(labelPosition, options.labelAlign)
+  const alignClass = labelAlign === 'right' ? 'text-end' : 'text-start'
 
   const positionClasses = labelPosition === 'top' ? 'w-full' : 'shrink-0'
   const paddingClass = labelPosition === 'top' ? '' : LABEL_PADDING_TOP[size]
@@ -90,7 +96,7 @@ export function getFormItemLabelClasses(options: FormItemLabelClassOptions = {})
   )
 }
 
-export function getFormItemContentClasses(labelPosition: FormLabelPosition = 'right'): string {
+export function getFormItemContentClasses(labelPosition: FormLabelPosition = 'left'): string {
   return classNames(
     'tiger-form-item__content',
     labelPosition === 'top' ? 'w-full' : 'flex-1',
@@ -104,23 +110,51 @@ export function getFormItemFieldClasses(): string {
   return classNames('tiger-form-item__field', 'w-full')
 }
 
-export function getFormItemErrorClasses(size: ComponentSize = 'md'): string {
+export function getFormItemErrorClasses(
+  size: ComponentSize = 'md',
+  options: { visible?: boolean } = {}
+): string {
+  const { visible = false } = options
   return classNames(
     'tiger-form-item__error',
     'mt-1',
     ERROR_TEXT_SIZE[size],
     ERROR_MIN_HEIGHT[size],
     'text-[var(--tiger-error,#ef4444)]',
+    'tiger-motion-aware',
     'transition-opacity',
     'duration-150',
-    'opacity-0'
+    'motion-reduce:transition-none',
+    visible ? 'opacity-100' : 'opacity-0'
+  )
+}
+
+export function getFormItemErrorBlockClasses(size: ComponentSize = 'md'): string {
+  return classNames(
+    'tiger-form-item__error',
+    'tiger-form-item__error--block',
+    'mt-1 p-2 rounded border',
+    ERROR_TEXT_SIZE[size],
+    'bg-[var(--tiger-error-bg,#fef2f2)]',
+    'border-[var(--tiger-error,#ef4444)]',
+    'text-[var(--tiger-error,#ef4444)]'
+  )
+}
+
+export function getFormItemErrorPopupClasses(): string {
+  return classNames(
+    'tiger-form-item__error',
+    'tiger-form-item__error--popup',
+    'px-2 py-1 rounded text-xs shadow-lg',
+    'bg-[var(--tiger-error,#ef4444)]',
+    'text-[var(--tiger-error-foreground,#ffffff)]'
   )
 }
 
 export function getFormItemAsteriskClasses(): string {
   return classNames(
     'tiger-form-item__asterisk',
-    'mr-1',
+    'me-1',
     'font-semibold',
     'text-[var(--tiger-error,#ef4444)]'
   )

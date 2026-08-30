@@ -3,6 +3,7 @@
  */
 
 import type { FormValues } from '../types/form'
+import { cloneFormValues } from './form-validation'
 
 export interface FormHistoryState {
   /** History stack of past states */
@@ -24,7 +25,7 @@ export function createFormHistory(
 ): FormHistoryState {
   return {
     past: [],
-    present: { ...initialValues },
+    present: cloneFormValues(initialValues),
     future: [],
     maxSize
   }
@@ -44,8 +45,8 @@ export function pushFormHistory(
   }
 
   return {
-    past,
-    present: { ...newValues },
+    past: past.map((entry) => cloneFormValues(entry)),
+    present: cloneFormValues(newValues),
     future: [],
     maxSize: history.maxSize
   }

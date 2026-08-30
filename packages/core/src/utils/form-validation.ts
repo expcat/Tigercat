@@ -68,6 +68,91 @@ export function getValueByPath(values: FormValues | undefined, path: string): un
 }
 
 /**
+ * Immutable nested write paired with `getValueByPath`.
+ * Missing intermediate objects are created as plain records.
+ */
+export function setValueByPath(values: FormValues, path: string, value: unknown): FormValues {
+  if (!path) {
+    return values
+  }
+
+  if (!path.includes('.')) {
+    return { ...values, [path]: value }
+  }
+
+  const segments = path.split('.').filter(Boolean)
+  if (segments.length === 0) {
+    return values
+  }
+
+  const clone: FormValues = { ...values }
+  let cursor: Record<string, unknown> = clone
+
+  for (let i = 0; i < segments.length; i++) {
+    const key = segments[i]
+    const isLast = i === segments.length - 1
+
+    if (isLast) {
+      cursor[key] = value
+      break
+    }
+
+    const existing = cursor[key]
+    const next =
+      existing && typeof existing === 'object' && !Array.isArray(existing)
+        ? { ...(existing as Record<string, unknown>) }
+        : {}
+
+    cursor[key] = next
+    cursor = next
+  }
+
+  return clone
+}
+
+/**
+ * Deep clone form values for history snapshots. Nested objects are not shared
+ * with the live model, so in-place edits cannot mutate the past.
+ */
+function cloneUnknown(value: unknown): unknown {
+  if (value instanceof Date) {
+    return new Date(value.getTime())
+  }
+  if (Array.isArray(value)) {
+    return value.map(cloneUnknown)
+  }
+  if (value !== null && typeof value === 'object') {
+    const result: Record<string, unknown> = {}
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      result[key] = cloneUnknown(nested)
+    }
+    return result
+  }
+  return value
+}
+
+export function cloneFormValues(values: FormValues): FormValues {
+  try {
+    return structuredClone(values)
+  } catch {
+    return cloneUnknown(values) as FormValues
+  }
+}
+
+/**
+ * Copy `next` onto a live (often reactive) target: drop keys that disappeared,
+ * then assign. Used by Vue Form to keep a writable model in sync.
+ */
+export function assignFormValues(target: FormValues, next: FormValues): void {
+  for (const key of Object.keys(target)) {
+    if (!Object.prototype.hasOwnProperty.call(next, key)) {
+      delete target[key]
+    }
+  }
+  Object.assign(target, next)
+}
+
+/**
  * Email validation pattern (RFC 5322 compliant)
  */
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -97,6 +182,22 @@ export function createFormValidationRule(
     ...FORM_VALIDATION_PRESETS[preset],
     ...overrides
   }
+}
+
+/**
+ * Thrown when a pending debounced validation is cancelled. Callers that
+ * `await schedule()` should treat this as "did not run", not as valid.
+ */
+export class FormValidationCancelledError extends Error {
+  readonly name = 'FormValidationCancelledError'
+
+  constructor() {
+    super('Form validation cancelled')
+  }
+}
+
+export function isFormValidationCancelled(error: unknown): boolean {
+  return error instanceof FormValidationCancelledError
 }
 
 export function createFormValidationDebouncer(
@@ -132,7 +233,8 @@ export function createFormValidationDebouncer(
 
       pending.delete(name)
       clearTimer(entry.timerHandle)
-      entry.resolveCallbacks.forEach((resolve) => resolve())
+      const error = new FormValidationCancelledError()
+      entry.rejectCallbacks.forEach((reject) => reject(error))
     }
   }
 
@@ -208,6 +310,35 @@ function isEmpty(value: unknown): boolean {
 }
 
 /**
+ * Finite number, or a non-empty numeric string (`'123'`). Booleans and arrays
+ * fail even though `Number(true)` / `Number([])` are numeric.
+ */
+function isNumericFormValue(value: unknown): boolean {
+  if (typeof value === 'number') {
+    return Number.isFinite(value)
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    return Number.isFinite(Number(value))
+  }
+  return false
+}
+
+function isValidPhoneValue(value: string): boolean {
+  const digits = value.replace(/\D/g, '')
+  return PHONE_PATTERN.test(value) && digits.length >= 7
+}
+
+function isValidDateValue(value: unknown): boolean {
+  if (value instanceof Date) {
+    return !Number.isNaN(value.getTime())
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    return !Number.isNaN(Date.parse(String(value)))
+  }
+  return false
+}
+
+/**
  * Validate value type
  * @param value - Value to validate
  * @param type - Expected type
@@ -227,7 +358,7 @@ function validateType(
       }
       break
     case 'number':
-      if (typeof value !== 'number' && isNaN(Number(value))) {
+      if (!isNumericFormValue(value)) {
         return customMessage || messages.typeNumber
       }
       break
@@ -247,30 +378,27 @@ function validateType(
       }
       break
     case 'email':
-      if (typeof value === 'string' && !EMAIL_PATTERN.test(value)) {
+      if (typeof value !== 'string' || !EMAIL_PATTERN.test(value)) {
         return customMessage || messages.email
       }
       break
     case 'phone':
-      if (typeof value === 'string') {
-        const digits = value.replace(/\D/g, '')
-        if (!PHONE_PATTERN.test(value) || digits.length < 7) {
-          return customMessage || messages.phone
-        }
+      if (typeof value !== 'string' || !isValidPhoneValue(value)) {
+        return customMessage || messages.phone
       }
       break
     case 'url':
-      if (typeof value === 'string' && !URL_PATTERN.test(value)) {
+      if (typeof value !== 'string' || !URL_PATTERN.test(value)) {
         return customMessage || messages.url
       }
       break
     case 'date':
-      if (!(value instanceof Date) && isNaN(Date.parse(String(value)))) {
+      if (!isValidDateValue(value)) {
         return customMessage || messages.date
       }
       break
     case 'id-card':
-      if (typeof value === 'string' && !ID_CARD_PATTERN.test(value)) {
+      if (typeof value !== 'string' || !ID_CARD_PATTERN.test(value)) {
         return customMessage || messages.idCard
       }
       break
@@ -364,9 +492,10 @@ export async function validateRule(
     if (rangeError) return rangeError
   }
 
-  // Pattern validation
+  // Pattern validation (`/g` lastIndex must not leak across calls)
   if (rule.pattern && typeof transformedValue === 'string') {
-    if (!rule.pattern.test(transformedValue)) {
+    const tester = new RegExp(rule.pattern.source, rule.pattern.flags)
+    if (!tester.test(transformedValue)) {
       return rule.message || messages.patternMismatch
     }
   }

@@ -132,6 +132,8 @@ export * from './table-export-utils'
 // Form v0.6.0 upgrades
 export * from './form-dependency-utils'
 export * from './form-history-utils'
+export * from './form-control-utils'
+export * from './form-controller'
 export * from './upload-queue-utils'
 
 // Responsive utilities

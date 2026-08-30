@@ -31,7 +31,15 @@ export type FormRuleTrigger = 'blur' | 'change' | 'submit'
  */
 export interface FormRule {
   /**
-   * Rule type - determines the validation logic to apply
+   * Rule type - determines the validation logic to apply.
+   *
+   * - `number` accepts finite numbers and numeric strings such as `'123'`
+   *   (typical of form inputs). Booleans and arrays fail.
+   * - `email` / `phone` / `url` / `id-card` require a string.
+   * - `phone` is an international-ish pattern: optional leading `+`, at least
+   *   7 digits.
+   * - `id-card` is a mainland China 15- or 18-digit ID number.
+   * - `date` rejects `Invalid Date` and non-date values.
    */
   type?: FormRuleType
 
@@ -52,7 +60,8 @@ export interface FormRule {
   max?: number
 
   /**
-   * Regular expression pattern to match against string values
+   * Regular expression pattern to match against string values.
+   * `/g` flags are copied before test so `lastIndex` cannot skip matches.
    */
   pattern?: RegExp
 
@@ -82,8 +91,7 @@ export interface FormRule {
   trigger?: FormRuleTrigger | FormRuleTrigger[]
 
   /**
-   * Transform value before validation
-   * Useful for trimming strings, converting types, etc.
+   * Transform the value for validation only. The stored model is not rewritten.
    */
   transform?: (value: unknown) => unknown
 }
@@ -202,14 +210,23 @@ export interface FormValidationResult {
 }
 
 /**
- * Form item label alignment (horizontal positioning)
+ * Text alignment of the field label.
+ * `'top'` is not an alignment — use `labelPosition="top"` for stacked labels.
  */
-export type FormLabelAlign = 'left' | 'right' | 'top'
+export type FormLabelAlign = 'left' | 'right'
 
 /**
- * Form item label position relative to the input
+ * Side of the control the label sits on.
+ * `'left'` places the label before the control (default);
+ * `'right'` places it after; `'top'` stacks it above.
  */
 export type FormLabelPosition = 'left' | 'right' | 'top'
+
+/**
+ * Field dependency map. Plain objects are accepted (JSON / templates);
+ * they are normalized to `Map` internally.
+ */
+export type FormFieldDependencies = Map<string, string[]> | Record<string, string[]>
 
 /**
  * Base form props interface
@@ -231,8 +248,8 @@ export interface FormProps {
   labelWidth?: string | number
 
   /**
-   * Label position
-   * @default 'right'
+   * Label position relative to the control
+   * @default 'left'
    */
   labelPosition?: FormLabelPosition
 
@@ -272,19 +289,19 @@ export interface FormProps {
    */
   loading?: boolean
 
-  // --- v0.6.0 ---
+  /**
+   * Headless controller from `useFormController` / `createFormEngine`.
+   * When set, the controller owns values, errors, validation, and history;
+   * `model` / `onChange` are not used as the store.
+   */
+  controller?: FormController
 
   /**
-   * Enable dynamic field management (addField/removeField)
-   * @default false
+   * Field dependency map: key is the dependent field, value is array of fields it depends on.
+   * When a dependency changes, the dependent field is re-validated.
+   * Accepts a `Map` or a plain object.
    */
-  dynamicFields?: boolean
-
-  /**
-   * Field dependency map: key is the dependent field, value is array of fields it depends on
-   * When a dependency changes, the dependent field is re-validated
-   */
-  fieldDependencies?: Map<string, string[]>
+  fieldDependencies?: FormFieldDependencies
 
   /**
    * Conditional field behavior DSL for visibility, disabled state, and dynamic required rules.
@@ -370,7 +387,7 @@ export interface FormItemProps {
   /**
    * Error display mode
    * - 'inline': shows error below the field (default)
-   * - 'popup': shows error in a tooltip/popup on hover
+   * - 'popup': shows error in an anchored popup on hover or focus
    * - 'block': shows error in a block-level alert
    * @default 'inline'
    */
@@ -394,8 +411,14 @@ export interface FormControllerOptions {
   initialValues?: FormValues
   /** Validation rules */
   rules?: FormRules
-  /** Field dependency map for cross-field validation */
-  fieldDependencies?: Map<string, string[]>
+  /** Conditional field behavior */
+  conditions?: FormConditions
+  /** Field dependency map for cross-field validation. `Map` or plain object. */
+  fieldDependencies?: FormFieldDependencies
+  /** Debounce delay for change-triggered validation in milliseconds */
+  validateDebounce?: number
+  /** Locale override for built-in validation messages */
+  locale?: Partial<TigerLocale>
   /** Enable undo/redo history */
   undoable?: boolean
   /** Maximum undo history size @default 50 */
@@ -403,10 +426,41 @@ export interface FormControllerOptions {
 }
 
 /**
- * Headless form controller returned by `useFormController`.
+ * Imperative form handle exposed on `<Form>` refs.
+ */
+export interface FormHandle {
+  validate: () => Promise<boolean>
+  validateFields: (fieldNames: string[]) => Promise<boolean>
+  validateField: (
+    fieldName: string,
+    rulesOverride?: FormRule | FormRule[],
+    trigger?: FormRuleTrigger
+  ) => Promise<void>
+  clearValidate: (fieldNames?: string | string[]) => void
+  resetFields: () => void
+  addField: (fieldName: string, defaultValue?: unknown) => void
+  removeField: (fieldName: string) => void
+  undo: () => void
+  redo: () => void
+  snapshotHistory: () => void
+  readonly canUndo: boolean
+  readonly canRedo: boolean
+}
+
+/**
+ * Payload emitted when a form is submitted.
+ */
+export interface FormSubmitEvent {
+  valid: boolean
+  values: FormValues
+  errors: FormError[]
+}
+
+/**
+ * Headless form controller returned by `useFormController` / `createFormEngine`.
  *
- * Can be used standalone or passed to `<Form controller={ctrl}>` to bind
- * the controller to a rendered form.
+ * Pass it to `<Form controller={ctrl}>` so the rendered form and the hook
+ * share one values/errors store. `resetFields` on Form is `reset` on the hook.
  */
 export interface FormController {
   /** Current form values (reactive in Vue, state snapshot in React) */
@@ -417,7 +471,7 @@ export interface FormController {
   readonly errorsByField: Record<string, string | undefined>
   /** Whether the form has any errors */
   readonly hasErrors: boolean
-  /** Set a single field value */
+  /** Set a single field value (dotted paths write nested objects) */
   setFieldValue: (fieldName: string, value: unknown) => void
   /** Set multiple field values at once */
   setValues: (values: Partial<FormValues>) => void
@@ -428,17 +482,40 @@ export interface FormController {
   /** Validate specific fields */
   validateFields: (fieldNames: string[]) => Promise<boolean>
   /** Validate a single field */
-  validateField: (fieldName: string) => Promise<string | null>
+  validateField: (
+    fieldName: string,
+    rulesOverride?: FormRule | FormRule[],
+    trigger?: FormRuleTrigger
+  ) => Promise<string | null>
   /** Clear validation errors */
   clearValidate: (fieldNames?: string | string[]) => void
   /** Reset all values to initial and clear errors */
   reset: () => void
+  /** Alias of `reset` for Form handles */
+  resetFields: () => void
+  /** Add a top-level field */
+  addField: (fieldName: string, defaultValue?: unknown) => void
+  /** Remove a top-level field */
+  removeField: (fieldName: string) => void
   /** Undo last change (if undoable) */
   undo: () => void
   /** Redo last undone change (if undoable) */
   redo: () => void
+  /** Push the current values onto the undo stack (undoable forms also snapshot on every commit) */
+  snapshotHistory: () => void
   /** Whether undo is available */
   readonly canUndo: boolean
   /** Whether redo is available */
   readonly canRedo: boolean
+  /** Subscribe to values/errors/history updates */
+  subscribe: (listener: () => void) => () => void
+  /** Register per-item rules (FormItem). Pass `undefined` to unregister. */
+  registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
+  /** Register per-item condition (FormItem). Pass `undefined` to unregister. */
+  registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  /** Resolved visibility / disabled / required for a field */
+  getFieldConditionState: (
+    fieldName: string,
+    conditionOverride?: FormFieldCondition
+  ) => FormConditionState
 }

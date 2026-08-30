@@ -10,6 +10,7 @@ import type {
   FormConditions,
   FormConditionState,
   FormFieldCondition,
+  FormFieldDependencies,
   FormRule,
   FormRules,
   FormValues
@@ -195,9 +196,21 @@ export function resolveFormConditionState(
   return resolveFormFieldConditionState(values, conditions?.[fieldName])
 }
 
-function hasRequiredRule(rules: FormRule | FormRule[]): boolean {
+export function normalizeFieldDependencies(
+  dependencies?: FormFieldDependencies
+): Map<string, string[]> | undefined {
+  if (!dependencies) return undefined
+  if (dependencies instanceof Map) {
+    return dependencies.size > 0 ? dependencies : undefined
+  }
+  const entries = Object.entries(dependencies)
+  return entries.length > 0 ? new Map(entries) : undefined
+}
+
+export function hasRequiredRule(rules: FormRule | FormRule[] | undefined): boolean {
+  if (!rules) return false
   const ruleList = Array.isArray(rules) ? rules : [rules]
-  return ruleList.some((rule) => !!rule.required)
+  return ruleList.some((rule) => !!rule && typeof rule === 'object' && !!rule.required)
 }
 
 function addRequiredRule(rules: FormRule | FormRule[] | undefined): FormRule | FormRule[] {

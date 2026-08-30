@@ -96,6 +96,8 @@ describe('form-validation', () => {
         expect(await validateRule(123, { type: 'number' })).toBe(null)
         expect(await validateRule('123', { type: 'number' })).toBe(null) // Numeric string is valid
         expect(await validateRule('abc', { type: 'number' })).toBe('Value must be a number')
+        expect(await validateRule(true, { type: 'number' })).toBe('Value must be a number')
+        expect(await validateRule([1], { type: 'number' })).toBe('Value must be a number')
       })
 
       it('validates boolean type', async () => {
@@ -206,6 +208,12 @@ describe('form-validation', () => {
           'Value does not match the required pattern'
         )
         expect(await validateRule('abc', { pattern: /^[a-z]+$/ })).toBe(null)
+      })
+
+      it('does not skip matches when the pattern has a global flag', async () => {
+        const pattern = /abc/g
+        expect(await validateRule('abc', { pattern })).toBe(null)
+        expect(await validateRule('abc', { pattern })).toBe(null)
       })
 
       it('uses custom message for pattern failure', async () => {
