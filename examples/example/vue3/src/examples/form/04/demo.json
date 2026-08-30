@@ -1,7 +1,7 @@
 {
   "id": "form-04",
-  "title": "错误呈现",
-  "description": "通过 FormItem 的 showMessage=false 隐藏默认提示，让必填错误由输入控件内联呈现。",
+  "title": "规则必填与选择器",
+  "description": "不传 required prop，只靠 rules.required 出星号；Input 包在 Space 里；带一个原生选择器。",
   "entry": "App.vue",
   "order": 4,
   "viewport": {

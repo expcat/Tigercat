@@ -95,7 +95,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Form
 
-`packages/core/src/types/form.ts` · `FormProps` · 6/19 props
+`packages/core/src/types/form.ts` · `FormProps` · 7/18 props
 
 | Prop          | Type                   | Default | Notes                                                                                      |
 | ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -105,16 +105,20 @@ description: Compact generated Tigercat Form props reference
 | `disabled?`   | `boolean`              | `false` | Whether to disable the entire form                                                         |
 | `loading?`    | `boolean`              | `false` | Whether the form is in a loading state (prevents submit)                                   |
 | `locale?`     | `Partial<TigerLocale>` | `-`     | Locale override for built-in validation messages. Merged on top of the ConfigProvider l... |
+| `controller?` | `FormController`       | `-`     | Headless controller from `useFormController` / `createFormEngine`. When set, the contro... |
 
 ## FormItem
 
-`packages/core/src/types/form.ts` · `FormItemProps` · 3/12 props
+`packages/core/src/types/form.ts` · `FormItemProps` · 6/13 props
 
-| Prop     | Type                     | Default | Notes                                     |
-| -------- | ------------------------ | ------- | ----------------------------------------- |
-| `name?`  | `string`                 | `-`     | Field name (must match key in form model) |
-| `rules?` | `FormRule \| FormRule[]` | `-`     | Validation rules for this field           |
-| `label?` | `string`                 | `-`     | Label text                                |
+| Prop                | Type                     | Default    | Notes                                                                                      |
+| ------------------- | ------------------------ | ---------- | ------------------------------------------------------------------------------------------ |
+| `name?`             | `string`                 | `-`        | Field name (must match key in form model)                                                  |
+| `label?`            | `string`                 | `-`        | Label text                                                                                 |
+| `required?`         | `boolean`                | `-`        | Whether the field is required                                                              |
+| `rules?`            | `FormRule \| FormRule[]` | `-`        | Validation rules for this field                                                            |
+| `error?`            | `string`                 | `-`        | Error message (controlled mode)                                                            |
+| `errorDisplayMode?` | `FormErrorDisplayMode`   | `'inline'` | Error display mode - 'inline': shows error below the field (default) - 'popup': shows e... |
 
 ## Input
 

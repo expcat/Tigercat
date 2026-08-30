@@ -17,8 +17,8 @@ const rules: FormRules = {
 
 <template>
   <Form :model="model" :rules="rules" class="max-w-sm">
-    <FormItem name="email" label="邮箱" required>
-      <Input v-model="model.email" placeholder="name@example.com" />
+    <FormItem name="email" label="邮箱">
+      <Input placeholder="name@example.com" />
     </FormItem>
     <Button html-type="submit" variant="primary">校验并提交</Button>
   </Form>

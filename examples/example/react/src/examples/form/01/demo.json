@@ -1,7 +1,7 @@
 {
   "id": "form-01",
   "title": "基础预览",
-  "description": "一个最小受控 Form 只包含名称输入，并在旁侧实时预览当前 model。",
+  "description": "FormItem 接管 Input 显示值：不绑 value，旁侧预览 model。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

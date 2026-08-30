@@ -59,7 +59,8 @@ export const COMPONENT_PROP_PRIORITY = {
     'virtual?'
   ],
   Message: ['type?', 'content?', 'closable?', 'position?', 'closeAriaLabel?'],
-  Form: ['model?', 'rules?', 'conditions?', 'disabled?', 'loading?', 'locale?']
+  Form: ['model?', 'rules?', 'conditions?', 'disabled?', 'loading?', 'locale?', 'controller?'],
+  FormItem: ['name?', 'label?', 'required?', 'rules?', 'error?', 'errorDisplayMode?']
 }
 
 export function propStem(name) {
@@ -176,15 +177,14 @@ export const REQUIRED_USAGE_SNIPPETS = {
   Vue: {
     Image: '<Image src="..." />',
     Calendar: '<Calendar :value="date" />',
-    FormItem: '<FormItem name="name"><Input v-model="form.name" /></FormItem>',
+    FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
     Tour: '<Tour :steps="steps" />'
   },
   React: {
     Image: '<Image src="..." />',
     Calendar: '<Calendar value={date} />',
-    FormItem:
-      '<FormItem name="name"><Input value={form.name} onChange={onNameChange} /></FormItem>',
+    FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
     Tour: '<Tour steps={steps} />'
   }

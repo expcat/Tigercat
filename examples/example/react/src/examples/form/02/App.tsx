@@ -16,13 +16,9 @@ export default function App() {
   const [model, setModel] = useState({ email: '' })
 
   return (
-    <Form model={model} rules={rules} className="max-w-sm">
-      <FormItem name="email" label="邮箱" required>
-        <Input
-          value={model.email}
-          onChange={(event) => setModel({ email: event.target.value })}
-          placeholder="name@example.com"
-        />
+    <Form model={model} onChange={setModel} rules={rules} className="max-w-sm">
+      <FormItem name="email" label="邮箱">
+        <Input placeholder="name@example.com" />
       </FormItem>
       <Button htmlType="submit" variant="primary">
         校验并提交

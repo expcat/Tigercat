@@ -38,6 +38,18 @@ React `useControlledState` 只接受 options 对象，不再是位置参数：
 
 Vue 没有这份 hook；`modelValue` 默认必须是 `undefined`（禁止 `null`），省略才是非受控。
 
+Form 引擎收成一份 `createFormEngine` / `useFormController`。需要处理的路径：
+
+- React `<Form>` 不再默认 `model={}`（每次 render 新对象）。省略 `model` 时内部持有值；受控时请传 `onChange`（或 `controller`）。
+- Vue Form 仍写入传入的 reactive `model`，并额外 `emit('update:model')`。可用 `v-model:model`。
+- `useFormController` 的返回值可以传给 `<Form controller={ctrl}>`；`resetFields` 即 `ctrl.reset()`。嵌套名 `'user.email'` 走 `setValueByPath`，不再写成顶层怪键。
+- FormItem **接管**显示：不必再给 Input 绑 `value`/`v-model`。Clear 也走同一条变更。
+- `labelPosition` 默认改为 `'left'`（label 在字段前）。以前默认 `'right'` 实际也是 label 在左、文字右对齐；现在 `'right'` 会把 label 放到字段右侧。`FormLabelAlign` 去掉 `'top'`（堆叠用 `labelPosition="top"`）。
+- 删除从未实现的 `dynamicFields`。`fieldDependencies` 可传普通对象，不必 `new Map`。
+- 校验文案只读 locale 对象的 `formValidation` 段。`ConfigProvider locale={{ locale: 'zh-CN' }}` 不再灌简体，请传 `zhCN` / `zhTW`。
+- 防抖校验被 `cancel()` 时 pending Promise **reject**（`FormValidationCancelledError`），不再当成 valid。
+- `showMessage={false}` / `inlineMessage={false}` 不再把错误交给 Input extras；只留 `aria-invalid`。
+
 ## v2.1.2
 
 v2.1.2 是相对 v2.1.1 的 patch。**没有 breaking change，组件用户无需迁移步骤。**

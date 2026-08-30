@@ -4,25 +4,32 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Input } from '@expcat/tigercat-react/Input'
+import { Space } from '@expcat/tigercat-react/Space'
 
 const rules: FormRules = {
-  email: [{ required: true, message: '邮箱不能为空' }]
+  email: [{ required: true, message: '邮箱不能为空' }],
+  role: [{ required: true, message: '请选择角色' }]
 }
 
 export default function App() {
-  const [model, setModel] = useState({ email: '' })
+  const [model, setModel] = useState({ email: '', role: '' })
 
   return (
-    <Form model={model} rules={rules} className="max-w-sm">
-      <FormItem name="email" label="内联错误" showMessage={false}>
-        <Input
-          value={model.email}
-          onChange={(event) => setModel({ email: event.target.value })}
-          placeholder="错误由输入框呈现"
-        />
+    <Form model={model} onChange={setModel} rules={rules} className="max-w-sm">
+      <FormItem name="email" label="邮箱">
+        <Space>
+          <Input placeholder="不传 required，只靠 rules" />
+        </Space>
+      </FormItem>
+      <FormItem name="role" label="角色">
+        <select aria-label="角色" className="w-full rounded border px-2 py-1">
+          <option value="">请选择</option>
+          <option value="admin">管理员</option>
+          <option value="user">用户</option>
+        </select>
       </FormItem>
       <Button htmlType="submit" variant="primary">
-        触发校验
+        提交
       </Button>
     </Form>
   )

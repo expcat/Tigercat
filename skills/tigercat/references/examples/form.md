@@ -11,17 +11,17 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component | Vue                                                                                         | React                                                                                                            |
-| --------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Checkbox  | `<Checkbox v-model="value" />`                                                              | `<Checkbox value={value} onChange={setValue} />`                                                                 |
-| Form      | `<Form :model="form"><FormItem name="name"><Input v-model="form.name" /></FormItem></Form>` | `<Form model={form}><FormItem name="name"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>` |
-| FormItem  | `<FormItem name="name"><Input v-model="form.name" /></FormItem>`                            | `<FormItem name="name"><Input value={form.name} onChange={onNameChange} /></FormItem>`                           |
-| Input     | `<Input v-model="value" />`                                                                 | `<Input value={value} onChange={setValue} />`                                                                    |
-| MaskInput | `<MaskInput :mask="mask" />`                                                                | `<MaskInput mask={mask} />`                                                                                      |
-| Radio     | `<Radio v-model="value" />`                                                                 | `<Radio value={value} onChange={setValue} />`                                                                    |
-| Select    | `<Select v-model="value" />`                                                                | `<Select value={value} onChange={setValue} />`                                                                   |
-| Switch    | `<Switch v-model="value" />`                                                                | `<Switch value={value} onChange={setValue} />`                                                                   |
-| Textarea  | `<Textarea v-model="value" />`                                                              | `<Textarea value={value} onChange={setValue} />`                                                                 |
+| Component | Vue                                                                                  | React                                                                                                  |
+| --------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Checkbox  | `<Checkbox v-model="value" />`                                                       | `<Checkbox value={value} onChange={setValue} />`                                                       |
+| Form      | `<Form :model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>` | `<Form model={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>` |
+| FormItem  | `<FormItem name="name" label="Name"><Input /></FormItem>`                            | `<FormItem name="name" label="Name"><Input /></FormItem>`                                              |
+| Input     | `<Input v-model="value" />`                                                          | `<Input value={value} onChange={setValue} />`                                                          |
+| MaskInput | `<MaskInput :mask="mask" />`                                                         | `<MaskInput mask={mask} />`                                                                            |
+| Radio     | `<Radio v-model="value" />`                                                          | `<Radio value={value} onChange={setValue} />`                                                          |
+| Select    | `<Select v-model="value" />`                                                         | `<Select value={value} onChange={setValue} />`                                                         |
+| Switch    | `<Switch v-model="value" />`                                                         | `<Switch value={value} onChange={setValue} />`                                                         |
+| Textarea  | `<Textarea v-model="value" />`                                                       | `<Textarea value={value} onChange={setValue} />`                                                       |
 
 标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, InputGroup, InputGroupAddon, InputNumber, InputOTP, Mentions, NumberKeyboard, RadioGroup, Signature, Slider, Stepper, TagsInput, TimePicker, Transfer, TreeSelect, Upload.
 

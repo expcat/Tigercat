@@ -951,7 +951,7 @@ function getVueSnippet(component, category, requiredNames) {
     return `<${component} v-model=\"value\" />`
   }
   if (component === 'Form')
-    return '<Form :model=\"form\"><FormItem name=\"name\"><Input v-model=\"form.name\" /></FormItem></Form>'
+    return '<Form :model=\"form\"><FormItem name=\"name\" label=\"Name\"><Input /></FormItem></Form>'
   if (component === 'Table')
     return '<Table :columns=\"columns\" :data-source=\"rows\" row-key=\"id\" />'
   const requiredSnippet = buildRequiredPropSnippet(component, requiredNames, 'Vue')
@@ -975,7 +975,7 @@ function getReactSnippet(component, category, requiredNames) {
     return `<${component} value={value} onChange={setValue} />`
   }
   if (component === 'Form')
-    return '<Form model={form}><FormItem name=\"name\"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>'
+    return '<Form model={form} onChange={setForm}><FormItem name=\"name\" label=\"Name\"><Input /></FormItem></Form>'
   if (component === 'Table') return '<Table columns={columns} dataSource={rows} rowKey=\"id\" />'
   const requiredSnippet = buildRequiredPropSnippet(component, requiredNames, 'React')
   if (requiredSnippet) return requiredSnippet

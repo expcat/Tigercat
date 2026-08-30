@@ -21,13 +21,9 @@ export default function App() {
   const [model, setModel] = useState({ username: '' })
 
   return (
-    <Form model={model} rules={rules} className="max-w-sm">
-      <FormItem name="username" label="用户名" required>
-        <Input
-          value={model.username}
-          onChange={(event) => setModel({ username: event.target.value })}
-          placeholder="输入 admin 观察异步错误"
-        />
+    <Form model={model} onChange={setModel} rules={rules} className="max-w-sm">
+      <FormItem name="username" label="用户名">
+        <Input placeholder="输入 admin 观察异步错误" />
       </FormItem>
       <Button htmlType="submit" variant="primary">
         异步校验
