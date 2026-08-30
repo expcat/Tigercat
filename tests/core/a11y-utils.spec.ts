@@ -5,7 +5,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import {
   createAriaId,
+  createFloatingIdFactory,
   createFocusTrap,
+  resetAriaIdCounter,
   announceToScreenReader,
   manageLiveRegion,
   isActivationKey,
@@ -28,6 +30,22 @@ describe('a11y-utils (core)', () => {
   it('createAriaId should support custom prefix and separator', () => {
     const id = createAriaId({ prefix: 'tiger', separator: '_' })
     expect(id).toMatch(/^tiger_\d+$/)
+  })
+
+  it('createAriaId can be reset for isolated SSR requests', () => {
+    resetAriaIdCounter()
+    const first = createAriaId()
+    resetAriaIdCounter()
+    const second = createAriaId()
+    expect(first).toBe(second)
+  })
+
+  it('createFloatingIdFactory shares the resettable aria id sequence', () => {
+    resetAriaIdCounter()
+    const next = createFloatingIdFactory('tooltip')
+    expect(next()).toBe('tiger-tooltip-1')
+    resetAriaIdCounter()
+    expect(next()).toBe('tiger-tooltip-1')
   })
 
   it('key helpers should detect Enter', () => {

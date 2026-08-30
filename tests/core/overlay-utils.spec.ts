@@ -206,4 +206,13 @@ describe('overlay-utils (core)', () => {
     removeOuter()
     removeInner()
   })
+
+  it('unregistering the last Escape listener removes the document handler', () => {
+    const remove = registerEscapeDismiss(document, () => undefined)
+    expect(document.querySelector).toBeDefined()
+    remove()
+    const calls: string[] = []
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+    expect(calls).toEqual([])
+  })
 })

@@ -1,8 +1,13 @@
 import { isEscapeKey, isTabKey, type KeyLikeEvent } from './a11y-utils'
 import { isBrowser } from './env'
 
-let bodyScrollLockCount = 0
-let previousBodyOverflow = ''
+interface BodyScrollLockState {
+  count: number
+  previousOverflow: string
+  previousPaddingRight: string
+}
+
+const bodyScrollLocks = new WeakMap<Document, BodyScrollLockState>()
 
 type EscapeDismissLayer = () => HTMLElement | null
 
@@ -13,6 +18,7 @@ interface EscapeDismissEntry {
 }
 
 const escapeDismissStacks = new WeakMap<Document, EscapeDismissEntry[]>()
+const escapeDismissListeners = new WeakMap<Document, (event: KeyboardEvent) => void>()
 let escapeDismissOrder = 0
 
 type ComposedPathEvent = Event & {
@@ -193,7 +199,7 @@ export function registerEscapeDismiss(
     stack = []
     escapeDismissStacks.set(ownerDocument, stack)
     const entries = stack
-    ownerDocument.addEventListener('keydown', (event) => {
+    const listener = (event: KeyboardEvent) => {
       if (event.defaultPrevented || !isEscapeKey(event)) return
       const topmost = entries.reduce<EscapeDismissEntry | undefined>((current, entry) => {
         if (!current) return entry
@@ -203,7 +209,9 @@ export function registerEscapeDismiss(
         event.preventDefault()
         topmost.dismiss()
       }
-    })
+    }
+    ownerDocument.addEventListener('keydown', listener)
+    escapeDismissListeners.set(ownerDocument, listener)
   }
 
   const entry = { dismiss, getLayer, order: ++escapeDismissOrder }
@@ -212,37 +220,71 @@ export function registerEscapeDismiss(
   return () => {
     const index = stack.lastIndexOf(entry)
     if (index >= 0) stack.splice(index, 1)
+    if (stack.length > 0) return
+    const listener = escapeDismissListeners.get(ownerDocument)
+    if (listener) {
+      ownerDocument.removeEventListener('keydown', listener)
+      escapeDismissListeners.delete(ownerDocument)
+    }
+    escapeDismissStacks.delete(ownerDocument)
   }
 }
 
 export function lockBodyScroll(targetDocument?: Document): () => void {
-  const resolvedDocument = targetDocument ?? (isBrowser() ? document : undefined)
-  const body = resolvedDocument?.body
+  if (!isBrowser()) return () => undefined
+  const resolvedDocument = targetDocument ?? document
+  const body = resolvedDocument.body
   if (!body) return () => undefined
 
-  let active = true
-
-  if (bodyScrollLockCount === 0) {
-    previousBodyOverflow = body.style.overflow
+  let state = bodyScrollLocks.get(resolvedDocument)
+  if (!state) {
+    const view = resolvedDocument.defaultView
+    const computedPadding = view ? Number.parseFloat(view.getComputedStyle(body).paddingRight) : 0
+    const scrollbarWidth = view
+      ? Math.max(0, view.innerWidth - resolvedDocument.documentElement.clientWidth)
+      : 0
+    state = {
+      count: 0,
+      previousOverflow: body.style.overflow,
+      previousPaddingRight: body.style.paddingRight
+    }
     body.style.overflow = 'hidden'
+    if (scrollbarWidth > 0 && Number.isFinite(computedPadding)) {
+      body.style.paddingRight = `${computedPadding + scrollbarWidth}px`
+    }
+    bodyScrollLocks.set(resolvedDocument, state)
   }
 
-  bodyScrollLockCount += 1
+  state.count += 1
+  let active = true
 
   return () => {
     if (!active) return
     active = false
-    bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1)
-
-    if (bodyScrollLockCount === 0) {
-      body.style.overflow = previousBodyOverflow
-      previousBodyOverflow = ''
-    }
+    const current = bodyScrollLocks.get(resolvedDocument)
+    if (!current) return
+    current.count = Math.max(0, current.count - 1)
+    if (current.count > 0) return
+    body.style.overflow = current.previousOverflow
+    body.style.paddingRight = current.previousPaddingRight
+    bodyScrollLocks.delete(resolvedDocument)
   }
 }
 
-export function getBodyScrollLockCount(): number {
-  return bodyScrollLockCount
+export function getBodyScrollLockCount(targetDocument?: Document): number {
+  const resolvedDocument = targetDocument ?? (isBrowser() ? document : undefined)
+  if (!resolvedDocument) return 0
+  return bodyScrollLocks.get(resolvedDocument)?.count ?? 0
+}
+
+export function resetBodyScrollLock(targetDocument?: Document): void {
+  const resolvedDocument = targetDocument ?? (isBrowser() ? document : undefined)
+  if (!resolvedDocument) return
+  const state = bodyScrollLocks.get(resolvedDocument)
+  if (!state) return
+  resolvedDocument.body.style.overflow = state.previousOverflow
+  resolvedDocument.body.style.paddingRight = state.previousPaddingRight
+  bodyScrollLocks.delete(resolvedDocument)
 }
 
 function isLiveRegionElement(element: HTMLElement): boolean {

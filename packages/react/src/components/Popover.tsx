@@ -1,9 +1,8 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
 import {
   classNames,
-  createFloatingIdFactory,
   getPopoverContainerClasses,
   getPopoverTriggerClasses,
   getPopoverContentClasses,
@@ -12,8 +11,6 @@ import {
   type PopoverProps as CorePopoverProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-
-const createPopoverId = createFloatingIdFactory('popover')
 
 export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'title'> & {
@@ -49,9 +46,7 @@ export const Popover: React.FC<PopoverProps> = ({
   onOpenChange,
   ...divProps
 }) => {
-  const popoverIdRef = useRef<string | null>(null)
-  if (!popoverIdRef.current) popoverIdRef.current = createPopoverId()
-  const popoverId = popoverIdRef.current
+  const popoverId = `tiger-popover-${useId()}`
   const titleId = `${popoverId}-title`
   const contentId = `${popoverId}-content`
 

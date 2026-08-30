@@ -1,10 +1,9 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
-  createFloatingIdFactory,
   getPopoverContainerClasses,
   getPopoverTriggerClasses,
   getPopoverContentClasses,
@@ -19,8 +18,6 @@ export interface VuePopoverProps {
   className?: string
   style?: StyleValue
 }
-
-const createPopoverId = createFloatingIdFactory('popover')
 
 export const Popover = defineComponent({
   name: 'TigerPopover',
@@ -65,7 +62,7 @@ export const Popover = defineComponent({
       triggerHandlers
     } = useFloatingPopup({ props, emit })
 
-    const popoverId = createPopoverId()
+    const popoverId = `tiger-popover-${useId()}`
     const titleId = `${popoverId}-title`
     const contentId = `${popoverId}-content`
 

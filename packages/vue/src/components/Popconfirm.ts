@@ -1,10 +1,9 @@
-import { defineComponent, computed, h, cloneVNode, isVNode, PropType } from 'vue'
+import { defineComponent, computed, h, cloneVNode, isVNode, PropType, useId } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
-  createFloatingIdFactory,
   getPopconfirmIconPath,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
@@ -45,8 +44,6 @@ const renderPopconfirmIcon = (iconType: PopconfirmIconType) => {
     ]
   )
 }
-
-const createPopconfirmId = createFloatingIdFactory('popconfirm')
 
 export interface VuePopconfirmProps {
   className?: string
@@ -105,7 +102,7 @@ export const Popconfirm = defineComponent({
       actualPlacement
     } = useFloatingPopup({ props, emit, multiTrigger: false })
 
-    const popconfirmId = createPopconfirmId()
+    const popconfirmId = `tiger-popconfirm-${useId()}`
     const titleId = `${popconfirmId}-title`
     const descriptionId = `${popconfirmId}-description`
 

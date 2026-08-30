@@ -8,6 +8,7 @@
  */
 
 import type { FloatingTrigger } from '../types/floating-popup'
+import { createAriaId } from './a11y-utils'
 
 /**
  * Hide delay after the pointer leaves the trigger / floating layer.
@@ -119,8 +120,7 @@ export function createFloatingHoverDelayController(
  * ```
  */
 export function createFloatingIdFactory(prefix: string): () => string {
-  let counter = 0
-  return () => `tiger-${prefix}-${++counter}`
+  return () => createAriaId({ prefix: `tiger-${prefix}` })
 }
 
 /**

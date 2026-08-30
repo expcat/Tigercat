@@ -1,17 +1,14 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
 import {
   classNames,
-  createFloatingIdFactory,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getTooltipContentClasses,
   type TooltipProps as CoreTooltipProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-
-const createTooltipId = createFloatingIdFactory('tooltip')
 
 export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'content'> & {
@@ -38,9 +35,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   onOpenChange,
   ...divProps
 }) => {
-  const tooltipIdRef = useRef<string | null>(null)
-  if (!tooltipIdRef.current) tooltipIdRef.current = createTooltipId()
-  const tooltipId = tooltipIdRef.current
+  const tooltipId = `tiger-tooltip-${useId()}`
   const describedBy = content != null ? tooltipId : undefined
 
   // Shared popup logic

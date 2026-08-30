@@ -49,6 +49,10 @@ export function createAriaId(options: CreateAriaIdOptions = {}): string {
   return `${prefix}${separator}${ariaIdCounter}`
 }
 
+export function resetAriaIdCounter(): void {
+  ariaIdCounter = 0
+}
+
 // ----- Screen Reader Announcements -----
 
 export type AriaLiveLevel = 'polite' | 'assertive' | 'off'

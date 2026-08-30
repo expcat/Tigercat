@@ -56,6 +56,7 @@ export function useVueClickOutside({
   onOutsideClick,
   defer = false
 }: UseVueClickOutsideOptions): () => void {
+  if (!isBrowser()) return () => undefined
   let timer: number | undefined
 
   const handler = (event: MouseEvent) => {
@@ -94,6 +95,7 @@ export function useVueEscapeKey({
   onEscape,
   layerRef
 }: UseVueEscapeKeyOptions): () => void {
+  if (!isBrowser()) return () => undefined
   let removeEntry: (() => void) | undefined
   const stop = watch(
     enabled,
@@ -116,7 +118,7 @@ export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
   watch(
     enabled,
     (isEnabled, _prevEnabled, onCleanup) => {
-      if (!isEnabled) return
+      if (!isEnabled || !isBrowser()) return
 
       const unlock = lockBodyScroll()
       onCleanup(() => unlock())
@@ -132,7 +134,7 @@ export function useVueBackgroundInert(
   watch(
     [enabled, containerRef],
     ([isEnabled, container], _prev, onCleanup) => {
-      if (!isEnabled || !container) return
+      if (!isEnabled || !container || !isBrowser()) return
       const release = setBackgroundInert(container)
       onCleanup(() => release())
     },
@@ -194,7 +196,7 @@ export function useVueFocusTrap({
   watch(
     enabled,
     (isEnabled) => {
-      if (!isEnabled) teardown()
+      if (!isEnabled || !isBrowser()) teardown()
     },
     { flush: 'sync' }
   )
@@ -203,7 +205,7 @@ export function useVueFocusTrap({
     [enabled, containerRef, () => toValue(inert)],
     ([isEnabled, container, inertEnabled]) => {
       teardown()
-      if (!isEnabled || !container) return
+      if (!isEnabled || !container || !isBrowser()) return
       const ownerDocument = container.ownerDocument
       releaseInert = inertEnabled ? setBackgroundInert(container) : undefined
 
@@ -404,7 +406,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
         cleanup = null
       }
 
-      if (!isEnabled || !reference || !floating) {
+      if (!isEnabled || !reference || !floating || !isBrowser()) {
         isPositioned.value = false
         return
       }
@@ -474,7 +476,7 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
   watch(
     [options.enabled, options.floatingRef],
     ([enabled, floating], _previous, onCleanup) => {
-      if (!enabled || !floating) return
+      if (!enabled || !floating || !isBrowser()) return
 
       const handleTab = (event: KeyboardEvent) => {
         if (event.key !== 'Tab') return

@@ -22,6 +22,7 @@ import {
   getContainerScrollTop,
   getElementOffsetTop,
   handleMenuNavigation,
+  lockBodyScroll,
   manageLiveRegion,
   scrollToAnchor
 } from '@expcat/tigercat-core'
@@ -108,5 +109,10 @@ describe('browser-only utility guards', () => {
     expect(() => instance.exec('link')).not.toThrow()
     expect(() => instance.exec('image')).not.toThrow()
     expect(() => instance.destroy()).not.toThrow()
+  })
+
+  it('no-ops overlay scroll lock outside the browser', () => {
+    const unlock = lockBodyScroll()
+    expect(() => unlock()).not.toThrow()
   })
 })

@@ -1,7 +1,6 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useId, useMemo } from 'react'
 import {
   classNames,
-  createFloatingIdFactory,
   getPopconfirmIconPath,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
@@ -24,8 +23,6 @@ import {
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
-
-const createPopconfirmId = createFloatingIdFactory('popconfirm')
 
 const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   <svg
@@ -83,9 +80,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
   onCancel,
   ...divProps
 }) => {
-  const popconfirmIdRef = useRef<string | null>(null)
-  if (!popconfirmIdRef.current) popconfirmIdRef.current = createPopconfirmId()
-  const popconfirmId = popconfirmIdRef.current
+  const popconfirmId = `tiger-popconfirm-${useId()}`
   const titleId = `${popconfirmId}-title`
   const descriptionId = `${popconfirmId}-description`
   const describedBy = description || descriptionContent ? descriptionId : undefined

@@ -1,10 +1,9 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
-  createFloatingIdFactory,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getTooltipContentClasses,
@@ -17,8 +16,6 @@ export interface VueTooltipProps {
   className?: string
   style?: StyleValue
 }
-
-const createTooltipId = createFloatingIdFactory('tooltip')
 
 export const Tooltip = defineComponent({
   name: 'TigerTooltip',
@@ -59,7 +56,7 @@ export const Tooltip = defineComponent({
       triggerHandlers
     } = useFloatingPopup({ props, emit })
 
-    const tooltipId = createTooltipId()
+    const tooltipId = `tiger-tooltip-${useId()}`
 
     // Memoized classes
     const containerClasses = computed(() =>
