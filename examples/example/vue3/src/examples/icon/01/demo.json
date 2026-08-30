@@ -1,7 +1,7 @@
 {
   "id": "icon-01",
-  "title": "内置图标",
-  "description": "通过 name 使用内置图标，并组合 size、color 与 aria-label；替换 name 即可使用其他注册图标。",
+  "title": "装饰与有名图标",
+  "description": "未传 color 时继承文字色。无 aria-label 的是装饰图标；有 aria-label 的是有名图标。",
   "entry": "App.vue",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

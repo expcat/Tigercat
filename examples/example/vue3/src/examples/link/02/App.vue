@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Link } from '@expcat/tigercat-vue/Link'
 
-const clickCount = ref(0)
+function track() {
+  window.console.info('tracked navigation')
+}
 </script>
 
 <template>
-  <Link href="#" variant="secondary" :underline="false" @click.prevent="clickCount++">
-    点击计数：{{ clickCount }}
+  <Link href="https://github.com/expcat/Tigercat" target="_blank" variant="default" @click="track">
+    打开仓库（不拦截跳转）
   </Link>
 </template>

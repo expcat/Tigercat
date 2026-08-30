@@ -4,6 +4,10 @@
 
 ## 未发布
 
+Text `align` 改为逻辑值：`start` / `center` / `end` / `justify`。运行时仍接受 `left`/`right` 并映射到 `start`/`end`。
+
+Link `disabled` 不再拆掉 `href`（仍是 `role=link`）。`underline` 默认在静止态显示，不再只在 hover。`target="_blank"` 会把 `noopener noreferrer` 并入已有 `rel`。
+
 Button `loading` 不再设置原生 `disabled`。加载中仍可聚焦、读屏能听到 `aria-busy`；click / Enter / Space 继续被吞掉，不会提交。真正禁用只走 `disabled`。
 
 `htmlType` 与原生 `type` 是同一属性：`htmlType ?? type ?? 'button'`。Vue `<Button type="submit">` 现在会提交表单。

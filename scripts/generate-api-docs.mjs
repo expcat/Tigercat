@@ -95,7 +95,26 @@ const COMPONENT_USAGE_NOTES = {
   },
   Icon: {
     notes:
-      '内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。'
+      '内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。'
+  },
+  Link: {
+    notes:
+      '`href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。'
+  },
+  Text: {
+    notes:
+      '`tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。'
+  },
+  Code: {
+    notes: '`code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。'
+  },
+  Kbd: {
+    notes:
+      '由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。'
+  },
+  Highlight: {
+    notes:
+      '需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。'
   },
   Image: {
     notes:
@@ -365,6 +384,11 @@ const COMPONENT_SNIPPETS = {
     ButtonGroup:
       '<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>',
     Icon: '<Icon name="search" />',
+    Link: '<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>',
+    Text: '<Text tag="h1" align="start">Title</Text>',
+    Code: '<Code code="const n = 1" />',
+    Kbd: "<Kbd :keys=\"['Ctrl', 'K']\" />",
+    Highlight: '<Highlight keywords="Vue">Learn Vue</Highlight>',
     ChatWindow: '<ChatWindow :messages="messages" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" />',
@@ -406,6 +430,11 @@ const COMPONENT_SNIPPETS = {
     ButtonGroup:
       '<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>',
     Icon: '<Icon name="search" />',
+    Link: '<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>',
+    Text: '<Text tag="h1" align="start">Title</Text>',
+    Code: '<Code code="const n = 1" />',
+    Kbd: "<Kbd keys={['Ctrl', 'K']} />",
+    Highlight: '<Highlight keywords="Vue">Learn Vue</Highlight>',
     ChatWindow: '<ChatWindow messages={messages} />',
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} />',

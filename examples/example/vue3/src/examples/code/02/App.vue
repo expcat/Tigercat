@@ -10,7 +10,13 @@ sum(2, 3) // 5`
 
 <template>
   <div class="space-y-4">
-    <Code :code="snippet" copy-label="复制" />
+    <Code
+      :code="snippet"
+      :labels="{
+        copyLabel: 'Copy snippet',
+        copiedLabel: 'Copied',
+        copyFailedLabel: 'Copy failed'
+      }" />
     <Code code="npm i @expcat/tigercat-vue" :copyable="false" />
   </div>
 </template>

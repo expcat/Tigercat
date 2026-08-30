@@ -1,19 +1,15 @@
-import { useState } from 'react'
 import { Link } from '@expcat/tigercat-react/Link'
 
 export default function App() {
-  const [clickCount, setClickCount] = useState(0)
-
   return (
     <Link
-      href="#"
-      variant="secondary"
-      underline={false}
-      onClick={(event) => {
-        event.preventDefault()
-        setClickCount((count) => count + 1)
+      href="https://github.com/expcat/Tigercat"
+      target="_blank"
+      variant="default"
+      onClick={() => {
+        window.console.info('tracked navigation')
       }}>
-      点击计数：{clickCount}
+      打开仓库（不拦截跳转）
     </Link>
   )
 }

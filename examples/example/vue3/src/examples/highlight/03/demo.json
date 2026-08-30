@@ -1,7 +1,7 @@
 {
   "id": "highlight-03",
-  "title": "正则与区分大小写",
-  "description": "keywords 可传 RegExp；字符串关键词可用 caseSensitive 区分大小写，global=false 只高亮首次匹配。",
+  "title": "首次匹配与保树",
+  "description": "global=false 是每个 keyword 的首次匹配。子节点里的链接会保留，匹配文本包在 mark 里。",
   "entry": "App.vue",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }

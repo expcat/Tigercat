@@ -9,7 +9,14 @@ sum(2, 3) // 5`
 export default function App() {
   return (
     <div className="space-y-4">
-      <Code code={snippet} copyLabel="复制" />
+      <Code
+        code={snippet}
+        labels={{
+          copyLabel: 'Copy snippet',
+          copiedLabel: 'Copied',
+          copyFailedLabel: 'Copy failed'
+        }}
+      />
       <Code code="npm i @expcat/tigercat-react" copyable={false} />
     </div>
   )

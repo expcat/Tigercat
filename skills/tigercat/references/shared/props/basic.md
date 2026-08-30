@@ -80,13 +80,18 @@ Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `ari
 
 ## Code
 
-`packages/core/src/types/code.ts` · `CodeProps` · 3/9 props
+`packages/core/src/types/code.ts` · `CodeProps` · 6/9 props
 
-| Prop        | Type                   | Default | Notes                             |
-| ----------- | ---------------------- | ------- | --------------------------------- |
-| `code`      | `string`               | `-`     | -                                 |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for Code UI text |
-| `copyable?` | `boolean`              | `-`     | -                                 |
+Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。
+
+| Prop               | Type                       | Default | Notes                                                                                      |
+| ------------------ | -------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `code`             | `string`                   | `-`     | -                                                                                          |
+| `copyable?`        | `boolean`                  | `true`  | -                                                                                          |
+| `locale?`          | `Partial<TigerLocale>`     | `-`     | Locale overrides for Code UI text                                                          |
+| `labels?`          | `Partial<TigerLocaleCode>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| `copiedLabel?`     | `string`                   | `-`     | -                                                                                          |
+| `copyFailedLabel?` | `string`                   | `-`     | -                                                                                          |
 
 ## ConfigProvider
 
@@ -131,25 +136,28 @@ Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `ari
 
 ## Highlight
 
-`packages/core/src/types/highlight.ts` · `HighlightProps` · 3/9 props
+`packages/core/src/types/highlight.ts` · `HighlightProps` · 4/9 props
 
-| Prop             | Type                | Default | Notes                                                                                      |
-| ---------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `text?`          | `string`            | `-`     | Source text to search. When omitted, Vue default slot / React children are flattened to... |
-| `keywords?`      | `HighlightKeywords` | `-`     | Keyword string(s) and/or regular expression(s) to highlight.                               |
-| `caseSensitive?` | `boolean`           | `false` | Match case for string keywords. Regular expressions keep their own `i` flag.               |
+Note: 需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
+
+| Prop                  | Type                | Default | Notes                                                                                      |
+| --------------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `keywords?`           | `HighlightKeywords` | `-`     | Keyword string(s) and/or regular expression(s) to highlight.                               |
+| `global?`             | `boolean`           | `true`  | Highlight every occurrence. When false, only the first match of each keyword.              |
+| `highlightClassName?` | `string`            | `-`     | Additional CSS classes on highlighted `mark` elements                                      |
+| `text?`               | `string`            | `-`     | Source text to search. When set, it wins over children/slot. When omitted, children/slo... |
 
 ## Icon
 
 `packages/core/src/types/icon.ts` · `IconProps` · 3/6 props
 
-Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。
+Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。
 
-| Prop    | Type             | Default | Notes                                                                                      |
-| ------- | ---------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `name?` | `IconName`       | `-`     | Built-in icon name. When provided (and no custom SVG children are given), the component... |
-| `icon?` | `IconDefinition` | `-`     | Custom icon definition (viewBox + path data), e.g. an application logo. Define it once...  |
-| `size?` | `IconSize`       | `'md'`  | Icon size                                                                                  |
+| Prop     | Type       | Default | Notes                                                                                      |
+| -------- | ---------- | ------- | ------------------------------------------------------------------------------------------ |
+| `name?`  | `IconName` | `-`     | Built-in icon name. When provided (and no custom SVG children are given), the component... |
+| `size?`  | `IconSize` | `'md'`  | Icon size                                                                                  |
+| `color?` | `string`   | `-`     | Icon color written onto the wrapper. Omitted values inherit CSS `color` (including `sty... |
 
 ### Built-in icon set
 
@@ -267,23 +275,30 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Kbd
 
-`packages/core/src/types/kbd.ts` · `KbdProps` · 3/7 props
+`packages/core/src/types/kbd.ts` · `KbdProps` · 4/7 props
 
-| Prop         | Type      | Default | Notes                                                                                      |
-| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
-| `keys?`      | `KbdKeys` | `-`     | One key or a combo list. A string is a single key; an array is joined with `separator`.... |
-| `separator?` | `string`  | `'+'`   | Separator between combo keys                                                               |
-| `size?`      | `KbdSize` | `'md'`  | Visual size                                                                                |
+Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。
+
+| Prop         | Type         | Default     | Notes                                                                                      |
+| ------------ | ------------ | ----------- | ------------------------------------------------------------------------------------------ |
+| `keys?`      | `KbdKeys`    | `-`         | One key or a combo list. A string is a single key; an array is joined with `separator`.... |
+| `separator?` | `string`     | `'+'`       | Separator between combo keys                                                               |
+| `size?`      | `KbdSize`    | `'md'`      | Visual size                                                                                |
+| `variant?`   | `KbdVariant` | `'default'` | Visual variant. `default` is Kbd chrome (bg/text/border); `subtle` is quieter.             |
 
 ## Link
 
-`packages/core/src/types/link.ts` · `LinkProps` · 3/8 props
+`packages/core/src/types/link.ts` · `LinkProps` · 5/8 props
 
-| Prop        | Type          | Default     | Notes                        |
-| ----------- | ------------- | ----------- | ---------------------------- |
-| `disabled?` | `boolean`     | `false`     | Whether the link is disabled |
-| `variant?`  | `LinkVariant` | `'primary'` | Link variant style           |
-| `size?`     | `LinkSize`    | `'md'`      | Link size                    |
+Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
+
+| Prop         | Type                                         | Default     | Notes                                                                       |
+| ------------ | -------------------------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `href?`      | `string`                                     | `-`         | The URL to navigate to                                                      |
+| `target?`    | `'_blank' \| '_self' \| '_parent' \| '_top'` | `undefined` | Where to open the linked document                                           |
+| `variant?`   | `LinkVariant`                                | `'primary'` | Link variant style                                                          |
+| `underline?` | `boolean`                                    | `true`      | Whether to underline at rest. Hover is not a substitute for the rest state. |
+| `disabled?`  | `boolean`                                    | `false`     | Whether the link is disabled                                                |
 
 ## Marquee
 
@@ -367,13 +382,17 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Text
 
-`packages/core/src/types/text.ts` · `TextProps` · 3/9 props
+`packages/core/src/types/text.ts` · `TextProps` · 5/9 props
 
-| Prop      | Type         | Default    | Notes              |
-| --------- | ------------ | ---------- | ------------------ |
-| `tag?`    | `TextTag`    | `'p'`      | HTML tag to render |
-| `size?`   | `TextSize`   | `'base'`   | Text size          |
-| `weight?` | `TextWeight` | `'normal'` | Text weight        |
+Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。
+
+| Prop        | Type        | Default     | Notes                                  |
+| ----------- | ----------- | ----------- | -------------------------------------- |
+| `tag?`      | `TextTag`   | `'p'`       | HTML tag to render                     |
+| `align?`    | `TextAlign` | `-`         | Text alignment                         |
+| `color?`    | `TextColor` | `'default'` | Text color                             |
+| `truncate?` | `boolean`   | `false`     | Whether to truncate text with ellipsis |
+| `size?`     | `TextSize`  | `'base'`    | Text size                              |
 
 ## Watermark
 

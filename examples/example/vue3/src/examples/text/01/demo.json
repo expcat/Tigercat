@@ -1,7 +1,7 @@
 {
   "id": "text-01",
-  "title": "组合文本样式",
-  "description": "单个 Text 组合 tag、size、weight、color、align、italic 与 underline；其余取值可直接替换。",
+  "title": "标签与逻辑对齐",
+  "description": "tag 只允许白名单（此处 h1 与 label）。align 用 start/end；dir=rtl 时 start 在右边。",
   "entry": "App.vue",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

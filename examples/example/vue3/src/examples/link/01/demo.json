@@ -1,7 +1,7 @@
 {
   "id": "link-01",
-  "title": "代表外观",
-  "description": "组合 primary、lg 与外部链接属性；其他 variant、size、underline 和 disabled 取值按需替换。",
+  "title": "外观与安全 rel",
+  "description": "默认静止态有下划线。target=_blank 会把 noopener noreferrer 并入 rel。disabled 仍保留 href。",
   "entry": "App.vue",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

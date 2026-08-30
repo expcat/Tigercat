@@ -2,6 +2,9 @@ import type { TigerLocale, TigerLocaleCode } from './locale'
 
 export interface CodeProps {
   code: string
+  /**
+   * @default true
+   */
   copyable?: boolean
   copyLabel?: string
   copiedLabel?: string

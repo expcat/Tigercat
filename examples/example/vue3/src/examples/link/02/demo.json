@@ -1,7 +1,7 @@
 {
   "id": "link-02",
-  "title": "点击行为",
-  "description": "在 onClick 中阻止默认导航并更新业务状态，适合将 Link 用作可追踪操作入口。",
+  "title": "追踪导航",
+  "description": "onClick 只记录、不 preventDefault。href 必须是真实地址；计数请用 Button。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

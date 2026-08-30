@@ -8,5 +8,14 @@ const brandMark: IconDefinition = {
 }
 
 export default function App() {
-  return <Icon icon={brandMark} size="xl" color="#f59e0b" aria-label="Tigercat 标志" />
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <Icon icon={brandMark} size="xl" aria-label="Tigercat 标志" />
+      <Icon color="#2563eb" aria-label="自定义描边">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 12h14" />
+        </svg>
+      </Icon>
+    </div>
+  )
 }

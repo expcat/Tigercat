@@ -44,6 +44,12 @@ export const BEHAVIOR_PROP_STEMS = new Set([
 ])
 
 export const COMPONENT_PROP_PRIORITY = {
+  Icon: ['name?', 'size?', 'color?'],
+  Link: ['href?', 'target?', 'variant?', 'underline?', 'disabled?'],
+  Text: ['tag?', 'align?', 'color?', 'truncate?', 'size?'],
+  Code: ['copyable?', 'locale?', 'labels?', 'copiedLabel?', 'copyFailedLabel?'],
+  Kbd: ['keys?', 'separator?', 'size?', 'variant?'],
+  Highlight: ['keywords?', 'global?', 'highlightClassName?', 'text?'],
   Button: [
     'variant?',
     'size?',

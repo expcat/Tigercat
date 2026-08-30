@@ -11,12 +11,17 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Component Notes
 
-| Component   | Uses | Notes                                                                                                                                                                                                        |
-| ----------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Button      | -    | `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。 |
-| ButtonGroup | -    | 直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。                                                                       |
-| Icon        | -    | 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。                                             |
-| Image       | -    | 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。                                                                    |
+| Component   | Uses | Notes                                                                                                                                                                                                                                                                                               |
+| ----------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button      | -    | `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。                                                                                        |
+| ButtonGroup | -    | 直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。                                                                                                                                                              |
+| Code        | -    | `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。                                                                                                                                                                                                                    |
+| Highlight   | -    | 需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。                                                                                                                                                         |
+| Icon        | -    | 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。 |
+| Image       | -    | 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。                                                                                                                                                           |
+| Kbd         | -    | 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。                                                                                                                                                                      |
+| Link        | -    | `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。                                                                                                                                                           |
+| Text        | -    | `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。                                                                                                                              |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
@@ -24,13 +29,17 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | ------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Button       | `<Button html-type="submit">Save</Button>`                                                           | `<Button htmlType="submit">Save</Button>`                                                            |
 | ButtonGroup  | `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>` | `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>` |
-| Code         | `<Code :code="code" />`                                                                              | `<Code code={code} />`                                                                               |
+| Code         | `<Code code="const n = 1" />`                                                                        | `<Code code="const n = 1" />`                                                                        |
+| Highlight    | `<Highlight keywords="Vue">Learn Vue</Highlight>`                                                    | `<Highlight keywords="Vue">Learn Vue</Highlight>`                                                    |
 | Icon         | `<Icon name="search" />`                                                                             | `<Icon name="search" />`                                                                             |
 | Image        | `<Image src="..." />`                                                                                | `<Image src="..." />`                                                                                |
 | ImageCropper | `<ImageCropper :src="src" />`                                                                        | `<ImageCropper src={src} />`                                                                         |
 | ImagePreview | `<ImagePreview :images="images" />`                                                                  | `<ImagePreview images={images} />`                                                                   |
+| Kbd          | `<Kbd :keys="['Ctrl', 'K']" />`                                                                      | `<Kbd keys={['Ctrl', 'K']} />`                                                                       |
+| Link         | `<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>`                                      | `<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>`                                      |
 | QRCode       | `<QRCode value="..." />`                                                                             | `<QRCode value="..." />`                                                                             |
+| Text         | `<Text tag="h1" align="start">Title</Text>`                                                          | `<Text tag="h1" align="start">Title</Text>`                                                          |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, Avatar, AvatarGroup, Badge, ConfigProvider, CropUpload, Divider, Empty, Highlight, ImageCompare, ImageGroup, Kbd, Link, Marquee, Rate, Result, Segmented, SplitButton, Statistic, Tag, Text, Watermark.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, Avatar, AvatarGroup, Badge, ConfigProvider, CropUpload, Divider, Empty, ImageCompare, ImageGroup, Marquee, Rate, Result, Segmented, SplitButton, Statistic, Tag, Watermark.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

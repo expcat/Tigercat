@@ -5,5 +5,5 @@ const snippet = `const greeting = 'Hello Tigercat'`
 </script>
 
 <template>
-  <Code :code="snippet" copy-label="复制代码" />
+  <Code :code="snippet" />
 </template>
