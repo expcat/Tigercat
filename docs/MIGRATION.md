@@ -4,6 +4,11 @@
 
 ## 未发布
 
+拖拽原语收成两份，产品必须走它们：
+
+- `createDocumentDragSession` 只绑 `pointermove` / `pointerup` / `pointercancel` + Escape。`DocumentDragSessionEvent.event` 是原始 `Event`（pointer 或 keyboard），带 `cancelled`。Splitter / Resizable / ScrollArea / Modal 已迁走，不要再抄 `document mousemove`。
+- 列表重排走 `createListReorderController` / `useDrag`。`DragConfig` 删除未实现的 `ghostClass` / `scrollSpeed` / `scrollMargin`。`direction: 'both'` 不再默认 `lockAxis: 'y'`。`moveItemBetweenContainers` 越界返回 `null`，不再搬走 `sourceItems[0]`。`DragDropEvent` 增加 `overItem`。已删除 `applyFileDragReorder`（改用 `reorderSequence`）。项绑定不再写 `role="listitem"` / `aria-grabbed` / `aria-dropeffect`；class 只追加。子路径 `@expcat/tigercat-react/useDrag` 与 `@expcat/tigercat-vue/useDrag`。
+
 Locale / i18n 系统改为只读官方 locale 对象。需要处理的路径：
 
 - 不要再从 `@expcat/tigercat-core` 导入 `DEFAULT_*_LABELS` / `ZH_CN_*_LABELS`。缺省文案读 `enUS.<section>`，中文读 `zhCN.<section>`。

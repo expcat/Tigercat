@@ -889,6 +889,11 @@
       "types": "./dist/components/Watermark.d.mts",
       "import": "./dist/components/Watermark.mjs",
       "default": "./dist/components/Watermark.mjs"
+    },
+    "./useDrag": {
+      "types": "./dist/composables/useDrag.d.mts",
+      "import": "./dist/composables/useDrag.mjs",
+      "default": "./dist/composables/useDrag.mjs"
     }
   },
   "files": [

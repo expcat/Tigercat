@@ -889,6 +889,11 @@
       "import": "./dist/components/Watermark.mjs",
       "default": "./dist/components/Watermark.mjs"
     },
+    "./useDrag": {
+      "types": "./dist/hooks/useDrag.d.mts",
+      "import": "./dist/hooks/useDrag.mjs",
+      "default": "./dist/hooks/useDrag.mjs"
+    },
     "./useControlledState": {
       "types": "./dist/hooks/useControlledState.d.mts",
       "import": "./dist/hooks/useControlledState.mjs",

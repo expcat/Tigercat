@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **指针会话 + 列表拖拽原语**：`createDocumentDragSession` 改为 pointer（含 cancel / Escape / 阈值 / 锁轴 / capture）。Splitter、Resizable、ScrollArea、Modal 共用这一份，不再手写 `mousemove`。List / Tree / FileManager / `useDrag` 共用 `createListReorderController`（`setData`、项上 drop、跨容器共享会话）。删除未实现的 `ghostClass` / `scrollSpeed` / `scrollMargin` 和 `applyFileDragReorder`；越界 `moveItemBetweenContainers` 返回 `null`。子路径 `./useDrag`。
 - **`useControlledState`**：options 对象（`value` / `defaultValue` / `onChange` / `postState`）。同拍 updater 累加；同值不发 `onChange`；受控切省略保留最后展示值。`undefined` 非受控，`null` 合法空。Vue `modelValue` 默认改为 `undefined`。根入口导出 `SetControlledState` / `UseControlledStateOptions`，子路径 `./useControlledState`。
 - **Overlay 基础设施**：Vue `placement` / `offset` 打开后仍跟 props。Portal 目标链为最近 overlay-host → ConfigProvider 根 → `document.body`；body portal 也包 layer+host。一份 focus trap（空列表仍拦 Tab）+ 全屏 `inert`。ID 可重置或走 `useId`。scroll lock 按 Document 并补偿滚动条。`OVERLAY_Z_INDEX` 一层尺度（viewport < overlay < modal < message < loading-bar）。删除未使用的 `applyFloatingStyles`；Vue `useFloatingPopup` 与 React 对齐为 `usePopup`。
 - **ConfigProvider 文档所有权**：`TigerConfig` 与方向决议下沉 core（显式 `direction` → 本层 locale.direction → 按本层 locale id 推断 → 父级）。只有最外层仍挂着的 ConfigProvider 写 `html` 的 `dir` / `lang` / 主题；内层只改 context；卸载 restore 含停掉 `colorScheme="auto"` 的 media 监听。React 在 render / `useLayoutEffect` 对齐 Vue immediate。失败暴露 `localeLoadError`。`theme="modern"` 与 F-001 开关等价。

@@ -1,7 +1,7 @@
 {
   "id": "use-drag-01",
   "title": "基础列表排序",
-  "description": "拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。",
+  "description": "指针拖拽重排；键盘用上移/下移。项绑定须包在 drop zone 内。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

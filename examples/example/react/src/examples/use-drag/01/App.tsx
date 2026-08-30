@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { Card } from '@expcat/tigercat-react/Card'
 import { Tag } from '@expcat/tigercat-react/Tag'
 import { useDrag } from '@expcat/tigercat-react'
-import type { DragItem } from '@expcat/tigercat-core'
+import { reorderSequence, type DragItem } from '@expcat/tigercat-core'
 
 interface TodoItem extends DragItem {
   title: string
@@ -19,13 +18,23 @@ export default function App() {
   const [items, setItems] = useState<TodoItem[]>(initialItems)
 
   const drag = useDrag({
-    onDrop: () => {
-      const result = drag.reorder(items)
-      if (result) {
-        setItems(result.items.map((item, index) => ({ ...item, index })))
-      }
+    containerId: 'todos',
+    onDrop: (event) => {
+      if (event.fromIndex === event.toIndex) return
+      setItems(
+        reorderSequence(items, event.fromIndex, event.toIndex).map((item, index) => ({
+          ...item,
+          index
+        }))
+      )
     }
   })
+
+  const moveBy = (from: number, delta: number) => {
+    const to = from + delta
+    if (to < 0 || to >= items.length) return
+    setItems(reorderSequence(items, from, to).map((item, index) => ({ ...item, index })))
+  }
 
   const draggedTitle = drag.draggedItem
     ? (items.find((it) => it.id === drag.draggedItem!.id)?.title ?? '无')
@@ -33,19 +42,45 @@ export default function App() {
 
   return (
     <>
-      <div className="space-y-3" {...drag.getDropZoneProps()}>
-        {items.map((item) => (
-          <Card key={item.id} {...drag.getDragItemProps(item)} className="cursor-move select-none">
-            <div className="flex items-center justify-between">
+      <ul className="m-0 list-none space-y-3 p-0" {...drag.getDropZoneProps()}>
+        {items.map((item, index) => {
+          const { className: dragClass, ...itemProps } = drag.getDragItemProps(item)
+          return (
+            <li
+              key={item.id}
+              {...itemProps}
+              className={[
+                'flex cursor-grab items-center justify-between rounded-md border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#fff)] px-3 py-2 select-none',
+                dragClass
+              ]
+                .filter(Boolean)
+                .join(' ')}>
               <span>{item.title}</span>
-              <Tag color="blue">序号 {item.index + 1}</Tag>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="mt-4 text-sm text-gray-500">
-        当前拖拽：<strong>{draggedTitle}</strong>
-      </div>
+              <span className="flex items-center gap-2">
+                <Tag color="blue">序号 {item.index + 1}</Tag>
+                <button
+                  type="button"
+                  className="text-xs text-[var(--tiger-text-muted,#6b7280)]"
+                  disabled={index === 0}
+                  onClick={() => moveBy(index, -1)}>
+                  上移
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-[var(--tiger-text-muted,#6b7280)]"
+                  disabled={index === items.length - 1}
+                  onClick={() => moveBy(index, 1)}>
+                  下移
+                </button>
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+      <p className="mt-4 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+        指针拖拽重排（须包一层 drop zone）。键盘请用上移 / 下移。当前拖拽：
+        <strong>{draggedTitle}</strong>
+      </p>
     </>
   )
 }

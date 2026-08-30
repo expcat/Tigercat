@@ -634,15 +634,24 @@ export function getComponentPackageExport(component) {
 }
 
 function getFrameworkHookPackageExports(framework) {
-  if (framework !== 'react') return {}
+  const hookDir = framework === 'react' ? 'hooks' : 'composables'
+  const exports = {
+    './useDrag': {
+      types: `./dist/${hookDir}/useDrag.d.mts`,
+      import: `./dist/${hookDir}/useDrag.mjs`,
+      default: `./dist/${hookDir}/useDrag.mjs`
+    }
+  }
 
-  return {
-    './useControlledState': {
+  if (framework === 'react') {
+    exports['./useControlledState'] = {
       types: './dist/hooks/useControlledState.d.mts',
       import: './dist/hooks/useControlledState.mjs',
       default: './dist/hooks/useControlledState.mjs'
     }
   }
+
+  return exports
 }
 
 export function buildFrameworkPackageExports(components, framework) {

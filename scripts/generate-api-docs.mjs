@@ -642,7 +642,7 @@ function generatePublicHooksSection(publicHooks) {
 
   const items = publicHooks.map((hook) => `\`${hook.name}\` (${hook.packages.join(', ')})`)
   let markdownText = '## Public hooks\n\n'
-  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. React \`useControlledState({ value, defaultValue, onChange, postState })\`; T cannot be a function.\n\n`
+  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. React \`useControlledState({ value, defaultValue, onChange, postState })\`; T cannot be a function. \`useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })\`: wrap items with \`getDragItemProps\` / \`getDragItemAttrs\` and the parent with the drop-zone bindings; merge extra \`className\`/\`class\`. Cross-container needs \`config.crossContainer\` and distinct \`containerId\`s. Pointer reorder; keyboard via move buttons or your own keys. Types: \`packages/core/src/types/drag.ts\`.\n\n`
   return markdownText
 }
 

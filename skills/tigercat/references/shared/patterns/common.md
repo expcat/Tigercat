@@ -75,5 +75,5 @@ SSR: React body/overlay portals render the layer in place when not in the browse
 
 - Do not read `window`, `document`, `localStorage`, DOM size, or media queries at module top level.
 - Put client-only Vue work in `onMounted`; React work in `useEffect` or client components.
-- Portal, overlay, drag, copy, and upload behavior should return a stable placeholder or skip mounting outside the browser.
+- Portal, overlay, drag, copy, and upload behavior should return a stable placeholder or skip mounting outside the browser. `useDrag` wraps `createListReorderController`; see Public hooks in `shared/api-summary.md`.
 - Theme variables may be statically injected; runtime theme reads/writes must be client-only.

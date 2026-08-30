@@ -11,7 +11,7 @@ description: Compact generated route map for Tigercat core type files
 
 ## Public hooks
 
-`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. React `useControlledState({ value, defaultValue, onChange, postState })`; T cannot be a function.
+`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. React `useControlledState({ value, defaultValue, onChange, postState })`; T cannot be a function. `useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })`: wrap items with `getDragItemProps` / `getDragItemAttrs` and the parent with the drop-zone bindings; merge extra `className`/`class`. Cross-container needs `config.crossContainer` and distinct `containerId`s. Pointer reorder; keyboard via move buttons or your own keys. Types: `packages/core/src/types/drag.ts`.
 
 ## Basic
 

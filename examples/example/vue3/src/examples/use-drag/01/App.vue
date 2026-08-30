@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { Card } from '@expcat/tigercat-vue/Card'
 import { Tag } from '@expcat/tigercat-vue/Tag'
 import { ref, computed } from 'vue'
 import { useDrag } from '@expcat/tigercat-vue'
-import type { DragItem } from '@expcat/tigercat-core'
+import { reorderSequence, type DragItem } from '@expcat/tigercat-core'
 
 interface TodoItem extends DragItem {
   title: string
@@ -17,13 +16,23 @@ const items = ref<TodoItem[]>([
 ])
 
 const drag = useDrag({
-  onDrop: () => {
-    const result = drag.reorder(items.value)
-    if (result) {
-      items.value = result.items.map((item, index) => ({ ...item, index }))
-    }
+  containerId: 'todos',
+  onDrop: (event) => {
+    if (event.fromIndex === event.toIndex) return
+    items.value = reorderSequence(items.value, event.fromIndex, event.toIndex).map(
+      (item, index) => ({ ...item, index })
+    )
   }
 })
+
+function moveBy(from: number, delta: number) {
+  const to = from + delta
+  if (to < 0 || to >= items.value.length) return
+  items.value = reorderSequence(items.value, from, to).map((item, index) => ({
+    ...item,
+    index
+  }))
+}
 
 const draggedTitle = computed(() => {
   const id = drag.draggedItem.value?.id
@@ -33,20 +42,35 @@ const draggedTitle = computed(() => {
 
 <template>
   <div class="min-w-0">
-    <div class="space-y-3" v-bind="drag.getDropZoneAttrs()">
-      <Card
-        v-for="item in items"
+    <ul class="m-0 list-none space-y-3 p-0" v-bind="drag.getDropZoneAttrs()">
+      <li
+        v-for="(item, index) in items"
         :key="item.id"
         v-bind="drag.getDragItemAttrs(item)"
-        class="cursor-move select-none">
-        <div class="flex items-center justify-between">
-          <span>{{ item.title }}</span>
+        class="flex cursor-grab items-center justify-between rounded-md border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#fff)] px-3 py-2 select-none">
+        <span>{{ item.title }}</span>
+        <span class="flex items-center gap-2">
           <Tag color="blue">序号 {{ item.index + 1 }}</Tag>
-        </div>
-      </Card>
-    </div>
-    <div class="mt-4 text-sm text-gray-500">
-      当前拖拽：<strong>{{ draggedTitle }}</strong>
-    </div>
+          <button
+            type="button"
+            class="text-xs text-[var(--tiger-text-muted,#6b7280)]"
+            :disabled="index === 0"
+            @click="moveBy(index, -1)">
+            上移
+          </button>
+          <button
+            type="button"
+            class="text-xs text-[var(--tiger-text-muted,#6b7280)]"
+            :disabled="index === items.length - 1"
+            @click="moveBy(index, 1)">
+            下移
+          </button>
+        </span>
+      </li>
+    </ul>
+    <p class="mt-4 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+      指针拖拽重排（须包一层 drop zone）。键盘请用上移 / 下移。当前拖拽：
+      <strong>{{ draggedTitle }}</strong>
+    </p>
   </div>
 </template>
