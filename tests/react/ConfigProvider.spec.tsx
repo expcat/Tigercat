@@ -66,6 +66,18 @@ describe('ConfigProvider', () => {
       // Inner overrides are shallow-merged per section, but okText comes from outer
       expect(getByTestId('ok').textContent).toBe('Outer')
     })
+
+    it('resolves nested overlay locale direction from the overlay language, not the parent', () => {
+      const { getByTestId } = render(
+        <ConfigProvider locale={{ locale: 'ar-SA', direction: 'rtl' }}>
+          <ConfigProvider locale={{ locale: 'en-US', empty: { noResults: 'None' } }}>
+            <LocaleDisplay />
+          </ConfigProvider>
+        </ConfigProvider>
+      )
+
+      expect(getByTestId('direction').textContent).toBe('ltr')
+    })
   })
 
   describe('async locale', () => {

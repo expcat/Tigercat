@@ -1,33 +1,21 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  mergeTigerLocale,
   isLazyTigerLocale,
   getImmediateTigerLocale,
   resolveTigerLocale,
-  getLocaleDirection,
+  resolveTigerConfig,
   ThemeManager,
-  type TigerLocale,
-  type TigerLocaleInput,
-  type TigerLocaleDirection,
-  type ColorScheme
+  type TigerConfig,
+  type ConfigProviderProps as CoreConfigProviderProps,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
 
-export interface TigerConfig {
-  locale?: Partial<TigerLocale>
-  localeLoading?: boolean
-  direction?: TigerLocaleDirection
-  theme?: string
-  colorScheme?: ColorScheme
-}
+export type { TigerConfig }
 
 const TigerConfigContext = React.createContext<TigerConfig>({})
 
-export interface ConfigProviderProps {
-  locale?: TigerLocaleInput
-  direction?: TigerLocaleDirection
-  theme?: string
-  colorScheme?: ColorScheme
+export interface ConfigProviderProps extends CoreConfigProviderProps {
   children?: React.ReactNode
 }
 
@@ -78,30 +66,18 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     }
   }, [locale])
 
-  const value = useMemo<TigerConfig>(() => {
-    return {
-      locale: mergeTigerLocale(parent.locale, resolvedLocale),
-      localeLoading: localeLoading || parent.localeLoading,
-      direction:
-        direction ??
-        resolvedLocale?.direction ??
-        parent.direction ??
-        (resolvedLocale?.locale ? getLocaleDirection(resolvedLocale) : undefined),
-      theme: theme ?? parent.theme,
-      colorScheme: colorScheme ?? parent.colorScheme
-    }
-  }, [
-    parent.locale,
-    resolvedLocale,
-    localeLoading,
-    parent.localeLoading,
-    direction,
-    parent.direction,
-    theme,
-    parent.theme,
-    colorScheme,
-    parent.colorScheme
-  ])
+  const value = useMemo<TigerConfig>(
+    () =>
+      resolveTigerConfig({
+        locale: resolvedLocale,
+        localeLoading,
+        direction,
+        theme,
+        colorScheme,
+        parent
+      }),
+    [resolvedLocale, localeLoading, direction, theme, colorScheme, parent]
+  )
 
   useEffect(() => {
     if (value.theme) ThemeManager.setTheme(value.theme)

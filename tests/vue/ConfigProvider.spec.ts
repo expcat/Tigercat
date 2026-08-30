@@ -79,6 +79,25 @@ describe('ConfigProvider', () => {
 
       expect(getByTestId('ok').textContent).toBe('Outer')
     })
+
+    it('resolves nested overlay locale direction from the overlay language, not the parent', () => {
+      const { getByTestId } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { locale: 'ar-SA', direction: 'rtl' } }, () =>
+                h(
+                  ConfigProvider,
+                  { locale: { locale: 'en-US', empty: { noResults: 'None' } } },
+                  () => h(LocaleDisplay)
+                )
+              )
+          }
+        })
+      )
+
+      expect(getByTestId('direction').textContent).toBe('ltr')
+    })
   })
 
   describe('async locale', () => {

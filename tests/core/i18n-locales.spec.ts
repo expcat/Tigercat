@@ -275,6 +275,26 @@ describe('i18n locale presets', () => {
     expect(merged?.avatarGroup).toEqual(zhCN.avatarGroup)
   })
 
+  it('mergeTigerLocale does not copy parent direction onto a different language', () => {
+    const merged = mergeTigerLocale(
+      { locale: 'ar-SA', direction: 'rtl', empty: { noResults: 'لا نتائج' } },
+      { locale: 'en-US', empty: { noResults: 'No results' } }
+    )
+    expect(merged?.locale).toBe('en-US')
+    expect(merged?.direction).toBeUndefined()
+    expect(merged?.empty?.noResults).toBe('No results')
+  })
+
+  it('mergeTigerLocale keeps parent direction for same-language overlays', () => {
+    const merged = mergeTigerLocale(
+      { locale: 'ar-SA', direction: 'rtl', empty: { noData: 'فارغ' } },
+      { empty: { noResults: 'لا نتائج' } }
+    )
+    expect(merged?.direction).toBe('rtl')
+    expect(merged?.empty?.noData).toBe('فارغ')
+    expect(merged?.empty?.noResults).toBe('لا نتائج')
+  })
+
   it('mergeTigerLocale keeps defineText dataExport through getter', () => {
     const text = defineText({ dataExport: { triggerText: 'Download' } })
     const merged = mergeTigerLocale(zhCN, text)

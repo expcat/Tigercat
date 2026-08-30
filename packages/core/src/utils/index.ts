@@ -221,3 +221,6 @@ export * from './aspect-ratio-utils'
 
 // Masonry utilities (v2.1.0+)
 export * from './masonry-utils'
+
+export { resolveConfigDirection, resolveTigerConfig } from './config-provider-utils'
+export type { ResolveTigerConfigInput } from './config-provider-utils'

@@ -5,7 +5,7 @@
  * detection, ConfigProvider merge, and new-section typecheck all read it.
  */
 
-import type { TigerLocale } from '../../types/locale'
+import type { TigerLocale, TigerLocaleDirection } from '../../types/locale'
 
 export type TigerLocaleKey = keyof TigerLocale
 
@@ -89,6 +89,26 @@ export function deepMergeLocale(base: unknown, override: unknown): unknown {
   return out
 }
 
+/**
+ * When the override switches `locale` and does not set `direction`, do not
+ * copy the parent's direction onto a different language. Callers then infer
+ * from the override locale id.
+ */
+function mergeLocaleDirection(
+  base?: Partial<TigerLocale>,
+  override?: Partial<TigerLocale>
+): TigerLocaleDirection | undefined {
+  if (override?.direction !== undefined) return override.direction
+
+  const overrideId = override?.locale
+  const baseId = base?.locale
+  const switchedLanguage =
+    typeof overrideId === 'string' && typeof baseId === 'string' && overrideId !== baseId
+
+  if (switchedLanguage) return undefined
+  return base?.direction
+}
+
 export function mergeTigerLocale(
   base?: Partial<TigerLocale>,
   override?: Partial<TigerLocale>
@@ -97,10 +117,17 @@ export function mergeTigerLocale(
 
   const result: Partial<TigerLocale> = {}
   for (const key of TIGER_LOCALE_KEYS) {
+    if (key === 'direction') continue
     const merged = deepMergeLocale(base?.[key], override?.[key])
     if (merged !== undefined) {
       ;(result as Record<string, unknown>)[key] = merged
     }
   }
+
+  const direction = mergeLocaleDirection(base, override)
+  if (direction !== undefined) {
+    result.direction = direction
+  }
+
   return result
 }

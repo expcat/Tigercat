@@ -12,13 +12,13 @@ import {
   type PropType
 } from 'vue'
 import {
-  mergeTigerLocale,
   isLazyTigerLocale,
   getImmediateTigerLocale,
   resolveTigerLocale,
-  getLocaleDirection,
+  resolveTigerConfig,
   isBrowser,
   ThemeManager,
+  type TigerConfig,
   type TigerLocale,
   type TigerLocaleInput,
   type TigerLocaleDirection,
@@ -26,13 +26,7 @@ import {
 } from '@expcat/tigercat-core'
 import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
 
-export interface TigerConfig {
-  locale?: Partial<TigerLocale>
-  localeLoading?: boolean
-  direction?: TigerLocaleDirection
-  theme?: string
-  colorScheme?: ColorScheme
-}
+export type { TigerConfig }
 
 export const TigerConfigKey: InjectionKey<ComputedRef<TigerConfig>> = Symbol('TigerConfig')
 
@@ -106,19 +100,16 @@ export const ConfigProvider = defineComponent({
       { immediate: true }
     )
 
-    const merged = computed<TigerConfig>(() => {
-      return {
-        locale: mergeTigerLocale(parent.value.locale, resolvedLocale.value),
-        localeLoading: localeLoading.value || parent.value.localeLoading,
-        direction:
-          props.direction ??
-          resolvedLocale.value?.direction ??
-          parent.value.direction ??
-          (resolvedLocale.value?.locale ? getLocaleDirection(resolvedLocale.value) : undefined),
-        theme: props.theme ?? parent.value.theme,
-        colorScheme: props.colorScheme ?? parent.value.colorScheme
-      }
-    })
+    const merged = computed<TigerConfig>(() =>
+      resolveTigerConfig({
+        locale: resolvedLocale.value,
+        localeLoading: localeLoading.value,
+        direction: props.direction,
+        theme: props.theme,
+        colorScheme: props.colorScheme,
+        parent: parent.value
+      })
+    )
 
     // Apply theme when it changes
     watch(
