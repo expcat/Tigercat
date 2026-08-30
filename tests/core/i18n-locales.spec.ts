@@ -22,9 +22,12 @@ import {
   formatColorPickerSelectPreset,
   getCodeLabels,
   getColorPickerLabels,
+  getDataExportLabels,
   getLocaleDirection,
   isRtlLocale,
-  mergeTigerLocale
+  mergeTigerLocale,
+  resolveTigerLocale,
+  TIGER_LOCALE_KEYS
 } from '@expcat/tigercat-core'
 import { FR_FR_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/fr-FR'
 
@@ -219,6 +222,42 @@ describe('i18n locale presets', () => {
   it('formatColorPickerSelectPreset substitutes {color}', () => {
     expect(formatColorPickerSelectPreset('Select {color}', '#ff0000')).toBe('Select #ff0000')
     expect(formatColorPickerSelectPreset('选择 {color}', '#00ff00')).toBe('选择 #00ff00')
+  })
+
+  it('TIGER_LOCALE_KEYS lists every TigerLocale section including dataExport and avatarGroup', () => {
+    expect(TIGER_LOCALE_KEYS).toContain('dataExport')
+    expect(TIGER_LOCALE_KEYS).toContain('avatarGroup')
+    expect(TIGER_LOCALE_KEYS).toContain('common')
+    expect(TIGER_LOCALE_KEYS).toContain('timePicker')
+  })
+
+  it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {
+    const merged = mergeTigerLocale(zhCN, {})
+    expect(merged?.dataExport).toEqual(zhCN.dataExport)
+    expect(merged?.avatarGroup).toEqual(zhCN.avatarGroup)
+  })
+
+  it('mergeTigerLocale keeps defineText dataExport through getter', () => {
+    const text = defineText({ dataExport: { triggerText: 'Download' } })
+    const merged = mergeTigerLocale(zhCN, text)
+    expect(getDataExportLabels(merged).triggerText).toBe('Download')
+    expect(getDataExportLabels(merged).xlsxText).toBe(zhCN.dataExport?.xlsxText)
+  })
+
+  it('mergeTigerLocale skips undefined leaves so they do not wipe the base', () => {
+    const merged = mergeTigerLocale(
+      { common: { okText: 'OK', cancelText: 'Cancel' } },
+      { common: { okText: undefined, cancelText: 'Dismiss' } }
+    )
+    expect(merged?.common?.okText).toBe('OK')
+    expect(merged?.common?.cancelText).toBe('Dismiss')
+  })
+
+  it('resolves a lazy module that only exports dataExport on default', async () => {
+    const locale = await resolveTigerLocale(() =>
+      Promise.resolve({ default: { dataExport: { triggerText: 'Download' } } })
+    )
+    expect(locale?.dataExport?.triggerText).toBe('Download')
   })
 
   it('mergeTigerLocale keeps colorPicker blocks', () => {

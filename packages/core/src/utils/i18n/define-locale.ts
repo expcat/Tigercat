@@ -20,39 +20,8 @@
  */
 
 import type { TigerLocale } from '../../types/locale'
+import { deepMergeLocale } from './locale-merge'
 import { enUS } from './locales/en-US'
-
-type PlainObject = Record<string, unknown>
-
-function isPlainObject(value: unknown): value is PlainObject {
-  if (value === null || typeof value !== 'object') return false
-  const proto = Object.getPrototypeOf(value)
-  return proto === Object.prototype || proto === null
-}
-
-/**
- * Recursively merges `override` onto `base`, returning a new object.
- *
- * - Plain-object branches are merged key-by-key (deep)
- * - Arrays and non-plain objects from `override` replace the base value
- * - `undefined` values in `override` are skipped (don't blank out the base)
- * - `null` in `override` is preserved as an explicit reset
- */
-function deepMerge(base: PlainObject, override: PlainObject | undefined): PlainObject {
-  if (!override) return { ...base }
-  const out: PlainObject = { ...base }
-  for (const key of Object.keys(override)) {
-    const next = override[key]
-    if (next === undefined) continue
-    const prev = base[key]
-    if (isPlainObject(prev) && isPlainObject(next)) {
-      out[key] = deepMerge(prev, next)
-    } else {
-      out[key] = next
-    }
-  }
-  return out
-}
 
 /**
  * Build a complete `TigerLocale` from a partial overlay on the default
@@ -62,5 +31,5 @@ function deepMerge(base: PlainObject, override: PlainObject | undefined): PlainO
  * @returns A fully populated `TigerLocale`.
  */
 export function defineLocale(overrides: Partial<TigerLocale> = {}): TigerLocale {
-  return deepMerge(enUS as unknown as PlainObject, overrides as PlainObject) as TigerLocale
+  return deepMergeLocale(enUS, overrides) as TigerLocale
 }

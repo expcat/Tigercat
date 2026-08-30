@@ -50,48 +50,9 @@ import type {
 } from '../types/locale'
 import type { TimePickerLabels } from '../types/timepicker'
 import type { UploadLabels } from '../types/upload'
+import { TIGER_LOCALE_KEYS } from './i18n/locale-merge'
 
-const TIGER_LOCALE_KEYS = [
-  'locale',
-  'direction',
-  'common',
-  'empty',
-  'modal',
-  'drawer',
-  'qrcode',
-  'timeline',
-  'upload',
-  'pagination',
-  'table',
-  'datePicker',
-  'timePicker',
-  'formWizard',
-  'tour',
-  'calendar',
-  'fileManager',
-  'imageViewer',
-  'imageEditor',
-  'status',
-  'taskBoard',
-  'chatWindow',
-  'code',
-  'commentThread',
-  'activityFeed',
-  'notificationCenter',
-  'select',
-  'colorPicker',
-  'tabs',
-  'rate',
-  'carousel',
-  'transfer',
-  'chart',
-  'markdownEditor',
-  'richTextEditor',
-  'cronEditor',
-  'formValidation',
-  'inputOtp',
-  'tagsInput'
-]
+export { TIGER_LOCALE_KEYS, mergeTigerLocale } from './i18n/locale-merge'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -141,56 +102,6 @@ export async function resolveTigerLocale(
   const loaded =
     typeof locale === 'function' ? await locale() : isPromiseLike(locale) ? await locale : locale
   return resolveTigerLocaleModule(loaded)
-}
-
-export function mergeTigerLocale(
-  base?: Partial<TigerLocale>,
-  override?: Partial<TigerLocale>
-): Partial<TigerLocale> | undefined {
-  if (!base && !override) return undefined
-
-  return {
-    locale: override?.locale ?? base?.locale,
-    direction: override?.direction ?? base?.direction,
-    common: { ...base?.common, ...override?.common },
-    empty: { ...base?.empty, ...override?.empty },
-    modal: { ...base?.modal, ...override?.modal },
-    drawer: { ...base?.drawer, ...override?.drawer },
-    qrcode: { ...base?.qrcode, ...override?.qrcode },
-    timeline: { ...base?.timeline, ...override?.timeline },
-    upload: { ...base?.upload, ...override?.upload },
-    pagination: { ...base?.pagination, ...override?.pagination },
-    table: { ...base?.table, ...override?.table },
-    datePicker: { ...base?.datePicker, ...override?.datePicker },
-    timePicker: { ...base?.timePicker, ...override?.timePicker },
-    formWizard: { ...base?.formWizard, ...override?.formWizard },
-    tour: { ...base?.tour, ...override?.tour },
-    calendar: { ...base?.calendar, ...override?.calendar },
-    fileManager: { ...base?.fileManager, ...override?.fileManager },
-    imageViewer: { ...base?.imageViewer, ...override?.imageViewer },
-    imageEditor: { ...base?.imageEditor, ...override?.imageEditor },
-    status: { ...base?.status, ...override?.status },
-    taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
-    chatWindow: { ...base?.chatWindow, ...override?.chatWindow },
-    code: { ...base?.code, ...override?.code },
-    commentThread: { ...base?.commentThread, ...override?.commentThread },
-    activityFeed: { ...base?.activityFeed, ...override?.activityFeed },
-    notificationCenter: { ...base?.notificationCenter, ...override?.notificationCenter },
-    select: { ...base?.select, ...override?.select },
-    colorPicker: { ...base?.colorPicker, ...override?.colorPicker },
-    tabs: { ...base?.tabs, ...override?.tabs },
-    rate: { ...base?.rate, ...override?.rate },
-    avatarGroup: { ...base?.avatarGroup, ...override?.avatarGroup },
-    carousel: { ...base?.carousel, ...override?.carousel },
-    transfer: { ...base?.transfer, ...override?.transfer },
-    chart: { ...base?.chart, ...override?.chart },
-    markdownEditor: { ...base?.markdownEditor, ...override?.markdownEditor },
-    richTextEditor: { ...base?.richTextEditor, ...override?.richTextEditor },
-    cronEditor: { ...base?.cronEditor, ...override?.cronEditor },
-    formValidation: { ...base?.formValidation, ...override?.formValidation },
-    inputOtp: { ...base?.inputOtp, ...override?.inputOtp },
-    tagsInput: { ...base?.tagsInput, ...override?.tagsInput }
-  }
 }
 
 const RTL_LANGUAGE_CODES = new Set(['ar', 'fa', 'he', 'iw', 'ps', 'ur'])
