@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import {
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
+  getOverlayDirLang,
   resolveAnchoredOverlayTarget
 } from '@expcat/tigercat-core'
 
@@ -44,6 +45,17 @@ describe('anchored overlay contract', () => {
 
     expect(resolveAnchoredOverlayTarget(reference)).toBe(configRoot)
     expect(resolveAnchoredOverlayTarget(null)).toBe(configRoot)
+  })
+
+  it('copies dir and lang from the nearest ancestor for portaled layers', () => {
+    const root = document.createElement('div')
+    root.setAttribute('dir', 'rtl')
+    root.setAttribute('lang', 'ar')
+    const reference = document.createElement('button')
+    root.appendChild(reference)
+    document.body.appendChild(root)
+
+    expect(getOverlayDirLang(reference)).toEqual({ dir: 'rtl', lang: 'ar' })
   })
 
   it('keeps layout and first-position visibility in the shared class contract', () => {

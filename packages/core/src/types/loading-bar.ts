@@ -43,7 +43,7 @@ export interface LoadingBarProps {
 
   /**
    * Mount parent for the host container. CSS selector or element.
-   * Defaults to `document.body`.
+   * Defaults to the overlay target chain (ConfigProvider root, then `document.body`).
    */
   container?: string | HTMLElement
 

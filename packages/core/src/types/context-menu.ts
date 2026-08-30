@@ -40,7 +40,8 @@ export interface ContextMenuProps {
    */
   closeOnClick?: boolean
   /**
-   * Render the menu into document.body (portal/Teleport) so it is not
+   * Portal the menu through the overlay target chain (overlay-host, then
+   * ConfigProvider root, then document.body) so it is not
    * clipped or covered by overflow/sticky ancestors.
    * @default true
    */

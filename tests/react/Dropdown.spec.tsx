@@ -400,6 +400,24 @@ describe('Dropdown', () => {
       )
     })
 
+    it('renders the menu into the ConfigProvider root when there is no overlay-host', () => {
+      render(
+        <div data-tiger-config-root="" data-testid="config-root">
+          <Dropdown defaultOpen>
+            <button>Trigger</button>
+            <DropdownMenu>
+              <DropdownItem>Item 1</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+      )
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(
+        screen.getByTestId('config-root')
+      )
+    })
+
     it('renders the menu in place when portal is false', () => {
       const { container } = render(
         <Dropdown defaultOpen portal={false}>

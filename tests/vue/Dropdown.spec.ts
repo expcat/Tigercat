@@ -345,6 +345,27 @@ describe('Dropdown', () => {
       })
     })
 
+    it('renders the menu into the ConfigProvider root when there is no overlay-host', async () => {
+      const { getByTestId } = render({
+        setup() {
+          return () =>
+            h('div', { 'data-tiger-config-root': '', 'data-testid': 'config-root' }, [
+              h(Dropdown, { defaultOpen: true }, () => [
+                h('button', null, 'Trigger'),
+                h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+              ])
+            ])
+        }
+      })
+
+      await waitFor(() => {
+        const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+        expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(
+          getByTestId('config-root')
+        )
+      })
+    })
+
     it('renders the menu in place when portal is false', () => {
       const { container } = render(Dropdown, {
         props: { defaultOpen: true, portal: false },

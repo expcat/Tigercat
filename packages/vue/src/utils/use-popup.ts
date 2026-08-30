@@ -19,7 +19,7 @@ import {
 // ---------------------------------------------------------------------------
 // Options
 // ---------------------------------------------------------------------------
-export interface UseFloatingPopupOptions {
+export interface UsePopupOptions {
   /** Vue reactive props object — must contain at least open / disabled */
   props: {
     open?: boolean
@@ -37,17 +37,12 @@ export interface UseFloatingPopupOptions {
    * @default true
    */
   multiTrigger?: boolean
-  /**
-   * Extra emits to fire after visibility change (e.g. 'confirm', 'cancel').
-   * Called via the returned setVisible helper.
-   */
-  extraVisibleEmits?: string[]
 }
 
 // ---------------------------------------------------------------------------
 // Return type
 // ---------------------------------------------------------------------------
-export interface UseFloatingPopupReturn {
+export interface UsePopupReturn {
   /** Resolved current visibility (works for both controlled & uncontrolled) */
   currentVisible: Ref<boolean>
   /** Toggle / set visibility — honours disabled & controlled */
@@ -81,7 +76,7 @@ export interface UseFloatingPopupReturn {
 // ---------------------------------------------------------------------------
 // Composable
 // ---------------------------------------------------------------------------
-export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingPopupReturn {
+export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const { props, emit, multiTrigger = true } = options
 
   // ─── Visibility ──────────────────────────────────────────────────────

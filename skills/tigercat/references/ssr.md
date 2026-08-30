@@ -12,7 +12,7 @@ Tigercat 可在 Nuxt、Next.js 等 SSR 框架中通过正常包入口使用：`@
 - 顶层模块代码不要读取 `window`、`document`、`navigator`、`localStorage`、`matchMedia`、DOM 尺寸或 `ResizeObserver`。
 - 客户端专属逻辑放进 Vue `onMounted` 或 React `useEffect` / 客户端组件。
 - 初始渲染不要依赖客户端尺寸、滚动位置、媒体查询、当前时间或随机值。
-- Portal、overlay、拖拽、复制、上传等能力在非浏览器环境返回稳定占位或跳过挂载。
+- Portal、overlay、拖拽、复制、上传等能力在非浏览器环境返回稳定占位或跳过挂载。浮层：React 在非浏览器把 layer 渲染在原地；Vue Teleport `disabled`。默认目标链是 overlay-host → ConfigProvider 根 → `document.body`，不要写死 `to: 'body'`。
 - 主题 CSS 变量可静态注入；运行时主题读写只在客户端执行。要把 ConfigProvider 的 `theme` / `dir` / `lang` 写进首屏 HTML，在 `<html>` 上预置**同一套**值（`lang`、`dir`、`class="dark"`、`data-tiger-style="modern"`）。`colorScheme="auto"` 首屏当 light，不要等 hydrate 再闪 `.dark`；系统暗色请用 cookie / 预置 class。
 
 ## Browser Guard
@@ -25,14 +25,14 @@ if (isBrowser()) {
 }
 ```
 
-| 场景           | 做法                                                                                      |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| DOM 查询/尺寸  | Vue `onMounted` / React `useEffect` 后读取                                                |
-| 全局事件监听   | 客户端注册，卸载时移除                                                                    |
-| Portal/overlay | 非浏览器环境返回 `null` 或稳定占位                                                        |
-| 主题变量读写   | 客户端调用 `setThemeColors` / `getThemeColor`；应用层用 ConfigProvider，html 预置同一套值 |
-| 媒体查询/暗色  | `colorScheme="auto"` 首屏当 light；系统暗色用 cookie / `<html class="dark">`              |
-| 图表尺寸       | 先给定容器尺寸；需要测量时延迟到客户端                                                    |
+| 场景           | 做法                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| DOM 查询/尺寸  | Vue `onMounted` / React `useEffect` 后读取                                                        |
+| 全局事件监听   | 客户端注册，卸载时移除                                                                            |
+| Portal/overlay | 非浏览器环境返回稳定 layer 占位（React 原地渲染，Vue Teleport `disabled`）；`open` 首屏也要有节点 |
+| 主题变量读写   | 客户端调用 `setThemeColors` / `getThemeColor`；应用层用 ConfigProvider，html 预置同一套值         |
+| 媒体查询/暗色  | `colorScheme="auto"` 首屏当 light；系统暗色用 cookie / `<html class="dark">`                      |
+| 图表尺寸       | 先给定容器尺寸；需要测量时延迟到客户端                                                            |
 
 ## Framework Checks
 

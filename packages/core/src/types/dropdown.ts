@@ -41,9 +41,9 @@ export interface DropdownProps {
    */
   showArrow?: boolean
   /**
-   * Render the menu into document.body (portal/Teleport) so it is not
-   * clipped or covered by overflow/sticky ancestors (e.g. fixed table columns).
-   * Set to false to render in place with the legacy DOM structure.
+   * Portal the menu through the overlay target chain (nearest overlay-host,
+   * then ConfigProvider root, then document.body) so it is not clipped by
+   * overflow/sticky ancestors. Set to false to render in place.
    * @default true
    */
   portal?: boolean

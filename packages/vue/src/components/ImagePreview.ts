@@ -33,7 +33,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
-import { renderVueBodyTeleport } from '../utils/overlay'
+import { renderVueBodyTeleport, useVueBodyScrollLock } from '../utils/overlay'
 
 export interface VueImagePreviewProps extends Omit<CoreImagePreviewProps, 'images'> {
   images?: string[]
@@ -126,12 +126,10 @@ export const ImagePreview = defineComponent({
         if (val) {
           resetTransform()
           index.value = props.currentIndex
-          document.body.style.overflow = 'hidden'
-        } else {
-          document.body.style.overflow = ''
         }
       }
     )
+    useVueBodyScrollLock(isOpen)
 
     const navState = computed(() => getPreviewNavState(index.value, props.images.length))
 
@@ -318,7 +316,6 @@ export const ImagePreview = defineComponent({
 
     onBeforeUnmount(() => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = ''
     })
 
     const transform = computed(

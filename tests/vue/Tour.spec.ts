@@ -4,7 +4,9 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
+import { h, onMounted, ref, Teleport } from 'vue'
 import { Tour } from '@expcat/tigercat-vue/Tour'
+import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
 import type { TourStep } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -349,6 +351,33 @@ describe('Tour', () => {
       const dialog = await screen.findByRole('dialog')
       const layer = dialog.closest('[data-tiger-overlay-layer]')
       expect(layer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
+    })
+
+    it('portals a nested Dropdown into the tour overlay-host instead of document.body', async () => {
+      render({
+        setup() {
+          const dialog = ref<HTMLElement | null>(null)
+          onMounted(() => {
+            dialog.value = document.querySelector('[role="dialog"]')
+          })
+          return () => [
+            h(Tour, { steps: baseSteps, open: true }),
+            dialog.value
+              ? h(Teleport, { to: dialog.value }, [
+                  h(Dropdown, { defaultOpen: true }, () => [
+                    h('button', null, 'Tour menu'),
+                    h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Nested action')])
+                  ])
+                ])
+              : null
+          ]
+        }
+      })
+
+      const item = await screen.findByText('Nested action')
+      const nestedLayer = item.closest('[data-tiger-overlay-layer]')
+      expect(nestedLayer?.parentElement).not.toBe(document.body)
+      expect(nestedLayer?.parentElement).toHaveAttribute('data-tiger-overlay-host')
     })
 
     it('closes on Escape', async () => {

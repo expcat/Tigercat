@@ -3,7 +3,12 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { getFloatingMiddleware, getPlacementSide, getTransformOrigin } from '@expcat/tigercat-core'
+import {
+  getArrowStyles,
+  getFloatingMiddleware,
+  getPlacementSide,
+  getTransformOrigin
+} from '@expcat/tigercat-core'
 
 describe('floating utilities', () => {
   describe('getFloatingMiddleware', () => {
@@ -73,6 +78,19 @@ describe('floating utilities', () => {
     it('gets placement side from placement', () => {
       expect(getPlacementSide('bottom-end')).toBe('bottom')
       expect(getPlacementSide('left-start')).toBe('left')
+    })
+
+    it('places the arrow on the opposite side of the floating element', () => {
+      expect(getArrowStyles('top', { x: 12 })).toMatchObject({
+        position: 'absolute',
+        bottom: '-4px',
+        left: '12px'
+      })
+      expect(getArrowStyles('left', { y: 8 })).toMatchObject({
+        position: 'absolute',
+        right: '-4px',
+        top: '8px'
+      })
     })
   })
 })

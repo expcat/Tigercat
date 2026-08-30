@@ -43,7 +43,6 @@ function resolveOverlayLayer(element: HTMLElement | null): HTMLElement | null {
 export interface UseVueClickOutsideOptions {
   enabled: Ref<boolean>
   containerRef?: Ref<HTMLElement | null>
-  outsideRefs?: Array<Ref<HTMLElement | null> | undefined>
   refs?: Array<Ref<HTMLElement | null> | undefined>
   onOutsideClick: () => void
   defer?: boolean

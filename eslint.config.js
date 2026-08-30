@@ -66,12 +66,7 @@ export default [
             },
             {
               name: '@expcat/tigercat-core',
-              importNames: [
-                'applyFloatingStyles',
-                'autoUpdateFloating',
-                'computeFloatingPosition',
-                'isEventOutside'
-              ],
+              importNames: ['autoUpdateFloating', 'computeFloatingPosition', 'isEventOutside'],
               message: '锚点浮层组件不得直接编排低层定位或 dismiss API。'
             },
             {

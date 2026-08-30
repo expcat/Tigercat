@@ -59,7 +59,8 @@ export interface NavigationMenuProps {
    */
   showArrow?: boolean
   /**
-   * Render panels into document.body (portal/Teleport) so they are not
+   * Portal panels through the overlay target chain (overlay-host, then
+   * ConfigProvider root, then document.body) so they are not
    * clipped or covered by overflow/sticky ancestors.
    * @default true
    */

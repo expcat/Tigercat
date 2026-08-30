@@ -23,7 +23,7 @@ import {
   type ImageFit,
   type ImagePreviewTrigger
 } from '@expcat/tigercat-core'
-import { useFloatingPopup } from '../utils/use-floating-popup'
+import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import type { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
@@ -108,7 +108,7 @@ export const Image = defineComponent({
       positioned: hoverPositioned,
       overlayTarget: hoverOverlayTarget,
       triggerHandlers: hoverTriggerHandlers
-    } = useFloatingPopup({
+    } = usePopup({
       props: floatingPopupProps,
       // Hover visibility is internal; popup model events are not Image events.
       emit: () => {}

@@ -31,7 +31,7 @@ import {
   OVERLAY_Z_INDEX,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
-import { useEscapeKey, renderBodyPortal } from '../utils/overlay'
+import { useEscapeKey, useBodyScrollLock, renderBodyPortal } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface ImagePreviewProps extends CoreImagePreviewProps {
@@ -123,14 +123,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     if (isOpen) {
       resetTransform()
       setIndex(currentIndex)
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
     }
   }, [isOpen, currentIndex, resetTransform])
+
+  useBodyScrollLock({ enabled: Boolean(isOpen) })
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false)

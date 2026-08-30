@@ -1,5 +1,5 @@
 import { defineComponent, computed, h, PropType, useId } from 'vue'
-import { useFloatingPopup } from '../utils/use-floating-popup'
+import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import {
   classNames,
@@ -54,7 +54,7 @@ export const Tooltip = defineComponent({
       positioned,
       overlayTarget,
       triggerHandlers
-    } = useFloatingPopup({ props, emit })
+    } = usePopup({ props, emit })
 
     const tooltipId = `tiger-tooltip-${useId()}`
 

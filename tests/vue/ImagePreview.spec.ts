@@ -35,6 +35,18 @@ describe('ImagePreview', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true')
   })
 
+  it('locks body scroll while open and restores it on close', () => {
+    const { unmount } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+    expect(document.body.style.overflow).toBe('hidden')
+    unmount()
+    expect(document.body.style.overflow).not.toBe('hidden')
+  })
+
   it('uses open prop as the only controlled visibility API', async () => {
     const { rerender } = render(ImagePreview, {
       props: {

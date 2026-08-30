@@ -5,8 +5,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
+import React, { useLayoutEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Tour } from '@expcat/tigercat-react/Tour'
+import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-react/Dropdown'
 import type { TourStep } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -324,6 +326,38 @@ describe('Tour', () => {
       const dialog = await screen.findByRole('dialog')
       const layer = dialog.closest('[data-tiger-overlay-layer]')
       expect(layer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
+    })
+
+    it('portals a nested Dropdown into the tour overlay-host instead of document.body', async () => {
+      function NestedDropdownInTour() {
+        const [dialog, setDialog] = useState<HTMLElement | null>(null)
+        useLayoutEffect(() => {
+          const next = document.querySelector('[role="dialog"]')
+          setDialog((current) => (current === next ? current : next))
+        })
+        return (
+          <>
+            <Tour steps={baseSteps} open={true} />
+            {dialog
+              ? createPortal(
+                  <Dropdown defaultOpen>
+                    <button>Tour menu</button>
+                    <DropdownMenu>
+                      <DropdownItem>Nested action</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>,
+                  dialog
+                )
+              : null}
+          </>
+        )
+      }
+
+      render(<NestedDropdownInTour />)
+      const item = await screen.findByText('Nested action')
+      const nestedLayer = item.closest('[data-tiger-overlay-layer]')
+      expect(nestedLayer?.parentElement).not.toBe(document.body)
+      expect(nestedLayer?.parentElement).toHaveAttribute('data-tiger-overlay-host')
     })
 
     it('locks body scroll while open and restores it on close', async () => {

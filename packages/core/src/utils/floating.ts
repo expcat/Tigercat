@@ -56,51 +56,6 @@ export type FloatingPlacement =
   | 'right-end'
 
 /**
- * Options for computing floating element position.
- */
-export interface FloatingOptions {
-  /**
-   * Preferred placement of the floating element relative to the reference.
-   * @default 'bottom'
-   */
-  placement?: FloatingPlacement
-  /**
-   * Distance (in pixels) between reference and floating element.
-   * @default 8
-   */
-  offset?: number
-  /**
-   * Whether to flip placement when there's not enough space.
-   * @default true
-   */
-  flip?: boolean
-  /**
-   * Whether to shift the floating element to stay within viewport.
-   * @default true
-   */
-  shift?: boolean
-  /**
-   * Padding from viewport edges when shifting.
-   * @default 8
-   */
-  shiftPadding?: number
-  /**
-   * Whether to expose the collision-safe available size as CSS variables.
-   * @default true
-   */
-  size?: boolean
-  /**
-   * Arrow element for positioning the arrow indicator.
-   */
-  arrowElement?: HTMLElement | null
-  /**
-   * Arrow padding from edges.
-   * @default 8
-   */
-  arrowPadding?: number
-}
-
-/**
  * Options used to build the Floating UI middleware chain.
  */
 export interface FloatingMiddlewareOptions {
@@ -135,6 +90,19 @@ export interface FloatingMiddlewareOptions {
    * @default 8
    */
   arrowPadding?: number
+}
+
+/**
+ * Options for computing floating element position.
+ * Low-level default placement is `bottom`. Popup components default to `top`;
+ * pickers and dropdowns default to `bottom-start`.
+ */
+export interface FloatingOptions extends FloatingMiddlewareOptions {
+  /**
+   * Preferred placement of the floating element relative to the reference.
+   * @default 'bottom'
+   */
+  placement?: FloatingPlacement
 }
 
 const floatingMiddlewareCache = new Map<string, Middleware[]>()
@@ -454,22 +422,4 @@ export function getArrowStyles(
   }
 
   return styles
-}
-
-/**
- * Apply floating position to an element's style.
- * Convenience function that sets left/top CSS properties.
- *
- * @param element - The floating element to position
- * @param result - Position result from computeFloatingPosition
- *
- * @example
- * ```ts
- * const result = await computeFloatingPosition(trigger, tooltip)
- * applyFloatingStyles(tooltip, result)
- * ```
- */
-export function applyFloatingStyles(element: HTMLElement, result: FloatingResult): void {
-  element.style.left = `${result.x}px`
-  element.style.top = `${result.y}px`
 }

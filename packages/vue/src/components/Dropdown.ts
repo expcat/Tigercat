@@ -298,7 +298,7 @@ export const Dropdown = defineComponent({
       default: true
     },
     /**
-     * Render the menu into document.body (Teleport) so it is not clipped or
+     * Portal the menu through the overlay target chain so it is not clipped or
      * covered by overflow/sticky ancestors (e.g. fixed table columns).
      * @default true
      */

@@ -51,19 +51,25 @@ Tooltip, Popover, and Popconfirm share the floating-popup layer; Dropdown, Selec
 | -------------- | ------------------------------------ | --------------------------------------- |
 | Core types     | `core/types/floating-popup.ts`       | shared props and trigger types          |
 | Core utils     | `core/utils/floating-popup-utils.ts` | ids and trigger handler maps            |
-| Vue composable | `vue/utils/use-floating-popup.ts`    | open state, floating, dismiss, trigger  |
+| Vue composable | `vue/utils/use-popup.ts`             | open state, floating, dismiss, trigger  |
 | React hook     | `react/utils/use-popup.ts`           | React counterpart for the same behavior |
 
 Stable behavior:
 
 - Controlled and uncontrolled `open` modes.
-- Floating UI position state: `x`, `y`, `actualPlacement`, `floatingStyles`.
+- Floating UI position state: `x`, `y`, `actualPlacement`, `floatingStyles`. Vue `placement` / `offset` are reactive after open.
 - Click-outside and Escape dismissal.
 - Trigger modes: `click`, `hover`, `focus`, `manual`.
 - Root trigger exposes `data-state="open" | "closed"` for CSS state styling.
 - Interactive triggers also expose `aria-expanded`; generic Popover wrappers expose only `data-state`.
+- Portal target chain: nearest `[data-tiger-overlay-host]` → `[data-tiger-config-root]` → `document.body`. Body portals wrap the same layer+host so nested overlays stay inside. The layer copies `dir` / `lang`.
+- Stacking: `OVERLAY_Z_INDEX` viewport (200) < overlay (1000) < modal/tour (1100) < message (1200) < loading-bar (1300).
+- Popup default placement `top` / offset `8`; pickers and dropdowns `bottom-start` / offset `4`.
+- Small-screen `fullscreen-sm` / `bottom-sheet-sm` switch to `fixed` and drop x/y via CSS.
 
 Custom trigger state is available through Vue `#trigger="{ open }"` slots and React render props such as Dropdown `renderTrigger={({ open }) => ...}`. Prefer these APIs over internal DOM selectors.
+
+SSR: React body/overlay portals render the layer in place when not in the browser; Vue Teleport is `disabled` outside the browser. Do not expect a first-paint `null` vs Teleport mismatch.
 
 ## SSR And Runtime
 

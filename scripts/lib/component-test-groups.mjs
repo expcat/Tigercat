@@ -27,7 +27,7 @@ const FRAMEWORKS = new Set(['react', 'vue'])
 const FRAMEWORK_EXTRAS = {
   basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr'],
   form: ['custom-text', 'useFormController'],
-  feedback: ['Notification', 'overlay-positioning'],
+  feedback: ['Notification', 'overlay-positioning', 'overlay-ssr'],
   layout: ['Grid', 'LayoutSections'],
   data: ['TableState'],
   charts: ['ChartSubComponents', 'useChartInteraction'],
@@ -140,6 +140,7 @@ const CORE_EXTRAS = {
     'imperative-side-effects.spec.ts',
     'overlay-scroll-lock.spec.ts',
     'overlay-utils.spec.ts',
+    'overlay-z-index.spec.ts',
     'reduced-motion.spec.ts',
     'viewport-utils.spec.ts'
   ],

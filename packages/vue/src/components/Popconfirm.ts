@@ -1,5 +1,5 @@
 import { defineComponent, computed, h, cloneVNode, isVNode, PropType, useId } from 'vue'
-import { useFloatingPopup } from '../utils/use-floating-popup'
+import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import {
   classNames,
@@ -100,7 +100,7 @@ export const Popconfirm = defineComponent({
       positioned,
       overlayTarget,
       actualPlacement
-    } = useFloatingPopup({ props, emit, multiTrigger: false })
+    } = usePopup({ props, emit, multiTrigger: false })
 
     const popconfirmId = `tiger-popconfirm-${useId()}`
     const titleId = `${popconfirmId}-title`

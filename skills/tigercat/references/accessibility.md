@@ -25,7 +25,7 @@ tree-shakeable through normal subpath imports.
 ## Component Expectations
 
 - Forms: labels must be associated with controls; required, disabled, readonly, invalid, and error states must be announced.
-- Overlays: Modal and Drawer trap focus while open and restore focus to the trigger when closed.
+- Overlays: Modal, Drawer, Tour, and Spotlight trap focus while open, restore focus to the trigger on close, inert the rest of the document, and still `preventDefault` Tab when the trap has no focusable nodes. Nested Select/Dropdown portal into the current overlay-host so Tab cannot leave. Esc dismisses the topmost layer and restores trigger focus.
 - Navigation: current, selected, expanded, and disabled states must be exposed through ARIA or semantic markup.
 - Tables and data views: headers, sorting, filtering, expanded rows, loading, and empty states must be perceivable.
 - Charts: provide a concise accessible name and keyboard access for interactive legends, tooltips, data points, export, zoom, or brush controls; color must not be the only information channel.

@@ -11,6 +11,8 @@ Locale / i18n 系统改为只读官方 locale 对象。需要处理的路径：
 - `getTimePickerLabels('es-ES')` 不再按语言码查第三张表。传入 `esES` 或带 `timePicker` 段的对象。
 - `defineLocale` 只给应用 overlay：省略的键填成英文。内置包已是完整对象，不要再用来「补全」官方语言。
 
+Overlay 默认 portal 目标链改为最近 overlay-host → ConfigProvider 根 → `document.body`。测试或 CSS 不要再假设浮层一定是 `document.body` 的直接子节点。已删除无人调用的 `applyFloatingStyles`；定位走 overlay adapter。
+
 ## v2.1.2
 
 v2.1.2 是相对 v2.1.1 的 patch。**没有 breaking change，组件用户无需迁移步骤。**
