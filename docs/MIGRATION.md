@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Marquee 默认不再是名为 “Scrolling content” 的 `region`。需要 landmark 时传 `ariaLabel` / `aria-label` / `aria-labelledby`。`repeat={0}` 现在是静态一份，不再回落到 2。`pauseOnHover={false}` 不再关掉焦点暂停（用 `pauseOnFocus={false}`）。删除 `DEFAULT_MARQUEE_ARIA_LABEL`，文案在 `enUS.marquee.ariaLabel` / `getMarqueeLabels`。纵向不要再靠外挂 `h-*` 才能像跑马灯。
+
 Text `align` 改为逻辑值：`start` / `center` / `end` / `justify`。运行时仍接受 `left`/`right` 并映射到 `start`/`end`。
 
 Link `disabled` 不再拆掉 `href`（仍是 `role=link`）。`underline` 默认在静止态显示，不再只在 hover。`target="_blank"` 会把 `noopener noreferrer` 并入已有 `rel`。

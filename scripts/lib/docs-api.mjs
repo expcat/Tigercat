@@ -50,6 +50,16 @@ export const COMPONENT_PROP_PRIORITY = {
   Code: ['copyable?', 'locale?', 'labels?', 'copiedLabel?', 'copyFailedLabel?'],
   Kbd: ['keys?', 'separator?', 'size?', 'variant?'],
   Highlight: ['keywords?', 'global?', 'highlightClassName?', 'text?'],
+  Marquee: [
+    'direction?',
+    'duration?',
+    'pauseOnHover?',
+    'pauseOnFocus?',
+    'paused?',
+    'gap?',
+    'repeat?',
+    'ariaLabel?'
+  ],
   Button: [
     'variant?',
     'size?',

@@ -1,8 +1,8 @@
 {
   "id": "marquee-03",
   "title": "纵向滚动",
-  "description": "direction 为 up 或 down 时沿纵轴循环；可用 duration 与 gap 控制节奏和间距。",
+  "description": "up / down 沿纵轴循环。不设根高度时视口吃第一份内容，repeat 不会把根撑高。",
   "entry": "App.vue",
   "order": 3,
-  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 320 }
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
 }

@@ -116,6 +116,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。'
   },
+  Marquee: {
+    notes:
+      '`repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。'
+  },
   Image: {
     notes:
       '支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。'
@@ -389,6 +393,7 @@ const COMPONENT_SNIPPETS = {
     Code: '<Code code="const n = 1" />',
     Kbd: "<Kbd :keys=\"['Ctrl', 'K']\" />",
     Highlight: '<Highlight keywords="Vue">Learn Vue</Highlight>',
+    Marquee: '<Marquee aria-label="News"><span>Item</span></Marquee>',
     ChatWindow: '<ChatWindow :messages="messages" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" />',
@@ -435,6 +440,7 @@ const COMPONENT_SNIPPETS = {
     Code: '<Code code="const n = 1" />',
     Kbd: "<Kbd keys={['Ctrl', 'K']} />",
     Highlight: '<Highlight keywords="Vue">Learn Vue</Highlight>',
+    Marquee: '<Marquee aria-label="News"><span>Item</span></Marquee>',
     ChatWindow: '<ChatWindow messages={messages} />',
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} />',

@@ -1,7 +1,7 @@
 {
   "id": "marquee-02",
-  "title": "反向与悬停暂停",
-  "description": "direction 为 right 时反向滚动；pauseOnHover 默认在悬停和焦点进入时暂停。",
+  "title": "反向与暂停",
+  "description": "direction 为 right 时朝 inline-end 滚。paused 受控停动画；焦点进入区域内仍会暂停。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }

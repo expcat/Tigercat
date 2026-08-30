@@ -302,13 +302,20 @@ Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener n
 
 ## Marquee
 
-`packages/core/src/types/marquee.ts` · `MarqueeProps` · 3/9 props
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 8/11 props
 
-| Prop            | Type               | Default  | Notes                                                           |
-| --------------- | ------------------ | -------- | --------------------------------------------------------------- |
-| `direction?`    | `MarqueeDirection` | `'left'` | Scroll direction                                                |
-| `duration?`     | `number`           | `20000`  | Time for one full loop, in milliseconds                         |
-| `pauseOnHover?` | `boolean`          | `true`   | Pause looping while hovered or while focus is inside the region |
+Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。
+
+| Prop            | Type               | Default  | Notes                                                                                      |
+| --------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------ |
+| `direction?`    | `MarqueeDirection` | `'left'` | Scroll direction. `left`/`right` are logical (inline-start/end). Vertical height is the... |
+| `duration?`     | `number`           | `20000`  | Time for one full loop, in milliseconds                                                    |
+| `pauseOnHover?` | `boolean`          | `true`   | Pause looping while hovered. Does not control focus-within pause.                          |
+| `pauseOnFocus?` | `boolean`          | `true`   | Pause looping while focus is inside the region. Independent of `pauseOnHover`; default...  |
+| `paused?`       | `boolean`          | `-`      | Controlled pause. When set, hover/focus no longer derive the flag.                         |
+| `gap?`          | `MarqueeGap`       | `16`     | Gap between items and between duplicated copies. A number is pixels; a string is a CSS...  |
+| `repeat?`       | `number`           | `2`      | How many copies of the content to render for a seamless loop. Omitted or non-finite → 2... |
+| `ariaLabel?`    | `string`           | `-`      | Accessible name for the region. Omitted or blank: not a landmark. Pass `aria-label` / `... |
 
 ## QRCode
 
