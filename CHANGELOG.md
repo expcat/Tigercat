@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Locale / i18n 一条事实源**：内置 13 套语言包都是与 en-US 同叶子的完整对象，不再经 `defineLocale` 用英文填洞。`get*Labels` 只读 `overrides ?? locale.section ?? en-US`，禁止 `startsWith('zh')` / 中文句子启发式；zh-TW 缺键不再灌简体。`mergeTigerLocale` 与 `TIGER_LOCALE_KEYS` 从 `TigerLocale` 对齐（含 `dataExport`），`undefined` 不擦基值。`createTigerLocaleScope` 下沉 core，Node 默认不装进程全局栈。删除成对 `DEFAULT_*` / `ZH_CN_*` 文案常量；Rate `{plural}` 走 `Intl.PluralRules`。`common` 增补 `closeMessageAriaLabel` / `closeNotificationAriaLabel`。
 - **Theme / tokens 一条事实源**：`tokens.json` 生成 default 预设与组件正在读的 `--tiger-*` 别名（primary 统一为 `#2563eb`）。`ThemeManager` 按类型注释 merge default 段，切 dark 不再丢掉 radius/motion。Tailwind plugin 写入完整预设（含非颜色）。`setTheme('modern')` 与 `@plugin ".../tailwind/modern"` 是同一开关。运动只留 `--tiger-transition-*` / `--tiger-motion-duration-*`。新增 on-color 与 error hover token；删从未写入的 `--tiger-tag-*` / `--tiger-alert-*` 假名。内置主题改为 `registerBuiltInThemes()` / ThemeManager 惰性注册。生成物不再包含 `tailwind-tokens.js`。
 
 ## v2.1.2

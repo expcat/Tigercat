@@ -2,6 +2,15 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## 未发布
+
+Locale / i18n 系统改为只读官方 locale 对象。需要处理的路径：
+
+- 不要再从 `@expcat/tigercat-core` 导入 `DEFAULT_*_LABELS` / `ZH_CN_*_LABELS`。缺省文案读 `enUS.<section>`，中文读 `zhCN.<section>`。
+- `get*Labels({ locale: 'zh-CN' })`（只有语言码、没有对应段）现在回落 **en-US**，不再猜简体。传入 `zhCN` / `zhTW` 等完整对象。
+- `getTimePickerLabels('es-ES')` 不再按语言码查第三张表。传入 `esES` 或带 `timePicker` 段的对象。
+- `defineLocale` 只给应用 overlay：省略的键填成英文。内置包已是完整对象，不要再用来「补全」官方语言。
+
 ## v2.1.2
 
 v2.1.2 是相对 v2.1.1 的 patch。**没有 breaking change，组件用户无需迁移步骤。**
