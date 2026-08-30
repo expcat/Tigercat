@@ -3,6 +3,7 @@
  */
 
 import type { NotificationType, NotificationPosition } from '../types/notification'
+import { overlayZIndexClass } from './floating'
 
 import { closeIconPathD } from './icons/common'
 import {
@@ -15,8 +16,7 @@ import {
 /**
  * Base notification container classes
  */
-export const notificationContainerBaseClasses =
-  'fixed z-[9999] flex flex-col gap-3 pointer-events-none w-96 max-w-[calc(100vw-2rem)]'
+export const notificationContainerBaseClasses = `fixed ${overlayZIndexClass.message} flex flex-col gap-3 pointer-events-none w-96 max-w-[calc(100vw-2rem)]`
 
 /**
  * Get position classes for notification container

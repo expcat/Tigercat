@@ -41,7 +41,8 @@ import {
   type GesturePoint,
   type DrawerPlacement,
   type DrawerSize,
-  type StyleValue
+  type StyleValue,
+  OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import {
   renderVueBodyTeleport,
@@ -150,7 +151,7 @@ export const Drawer = defineComponent({
      */
     zIndex: {
       type: Number,
-      default: 1000
+      default: OVERLAY_Z_INDEX.modal
     },
     /**
      * Additional CSS class for the drawer container

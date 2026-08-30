@@ -4,6 +4,7 @@
 
 import { classNames } from './class-names'
 import { isBrowser } from './env'
+import { overlayZIndexClass } from './floating'
 import type { LoadingSize, LoadingColor, LoadingVariant } from '../types/loading'
 
 /**
@@ -47,7 +48,7 @@ export const loadingContainerBaseClasses = 'inline-flex flex-col items-center ju
 /**
  * Base classes for fullscreen loading
  */
-export const loadingFullscreenBaseClasses = 'fixed inset-0 z-50 flex items-center justify-center'
+export const loadingFullscreenBaseClasses = `fixed inset-0 ${overlayZIndexClass.modal} flex items-center justify-center`
 
 /**
  * Default fullscreen mask: 90% of `--tiger-surface`.

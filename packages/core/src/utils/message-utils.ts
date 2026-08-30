@@ -3,6 +3,7 @@
  */
 
 import type { MessageType, MessagePosition } from '../types/message'
+import { overlayZIndexClass } from './floating'
 
 import { closeIconPathD } from './icons/common'
 import {
@@ -15,7 +16,7 @@ import {
 /**
  * Base message container classes
  */
-export const messageContainerBaseClasses = 'fixed z-[9999] flex flex-col gap-2 pointer-events-none'
+export const messageContainerBaseClasses = `fixed ${overlayZIndexClass.message} flex flex-col gap-2 pointer-events-none`
 
 /**
  * Get position classes for message container

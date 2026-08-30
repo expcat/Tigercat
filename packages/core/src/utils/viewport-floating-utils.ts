@@ -1,6 +1,8 @@
 import type { ViewportOffset, ViewportPlacement } from '../types/viewport'
 
-export const viewportFloatingBaseClasses = 'fixed z-50'
+import { overlayZIndexClass } from './floating'
+
+export const viewportFloatingBaseClasses = `fixed ${overlayZIndexClass.viewport}`
 
 export const viewportPlacementClasses: Record<ViewportPlacement, string> = {
   'top-left': 'top-0 left-0',

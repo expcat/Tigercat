@@ -67,7 +67,7 @@ export interface DrawerProps {
 
   /**
    * z-index of the drawer
-   * @default 1000
+   * @default OVERLAY_Z_INDEX.modal
    */
   zIndex?: number
 

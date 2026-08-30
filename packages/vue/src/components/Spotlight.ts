@@ -41,7 +41,8 @@ import {
   spotlightTitleClasses,
   type SpotlightItem,
   type SpotlightItemFilter,
-  type TigerLocale
+  type TigerLocale,
+  OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import {
@@ -118,7 +119,7 @@ export const Spotlight = defineComponent({
     },
     zIndex: {
       type: Number,
-      default: 1000
+      default: OVERLAY_Z_INDEX.modal
     },
     className: {
       type: String,

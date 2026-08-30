@@ -26,6 +26,7 @@ import {
   spotlightPanelClasses,
   spotlightRootClasses,
   spotlightTitleClasses,
+  OVERLAY_Z_INDEX,
   type SpotlightItem,
   type SpotlightProps as CoreSpotlightProps
 } from '@expcat/tigercat-core'
@@ -65,7 +66,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({
   closeOnSelect = true,
   mask = true,
   maskClosable = true,
-  zIndex = 1000,
+  zIndex = OVERLAY_Z_INDEX.modal,
   className,
   defaultActiveFirstItem = true,
   filterItem,

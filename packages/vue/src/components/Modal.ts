@@ -37,7 +37,8 @@ import {
   type GesturePoint,
   type TigerLocale,
   type TigerLocaleModal,
-  type ModalSize
+  type ModalSize,
+  OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 
 import { Button } from './Button'
@@ -160,7 +161,7 @@ export const Modal = defineComponent({
      */
     zIndex: {
       type: Number,
-      default: 1000
+      default: OVERLAY_Z_INDEX.modal
     },
     /**
      * Custom class name

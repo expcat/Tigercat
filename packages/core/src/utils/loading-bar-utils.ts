@@ -14,6 +14,7 @@ import type {
 import { resolveAnchoredOverlayTarget } from './anchored-overlay'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
+import { overlayZIndexClass } from './floating'
 
 export const DEFAULT_LOADING_BAR_HEIGHT = 2
 export const DEFAULT_LOADING_BAR_COLOR: LoadingBarColor = 'primary'
@@ -25,8 +26,7 @@ export const LOADING_BAR_FINISH_HIDE_DELAY_MS = 300
 export const LOADING_BAR_CONTAINER_ID = 'tiger-loading-bar-container'
 export const LOADING_BAR_CONTAINER_ROOT_ID = `${LOADING_BAR_CONTAINER_ID}-root`
 
-export const loadingBarContainerBaseClasses =
-  'fixed top-0 left-0 right-0 z-[10000] pointer-events-none overflow-hidden'
+export const loadingBarContainerBaseClasses = `fixed top-0 left-0 right-0 ${overlayZIndexClass.loadingBar} pointer-events-none overflow-hidden`
 
 export const loadingBarFillBaseClasses =
   'block w-full origin-left transition-transform duration-200 ease-out motion-reduce:transition-none'

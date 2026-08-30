@@ -21,7 +21,7 @@ import {
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
   getOverlayDirLang,
-  FLOATING_OVERLAY_Z_INDEX,
+  OVERLAY_Z_INDEX,
   getTransformOrigin,
   restoreFocus,
   registerEscapeDismiss,
@@ -523,7 +523,7 @@ export function useAnchoredOverlay({
         '--tiger-overlay-x': `${x}px`,
         '--tiger-overlay-y': `${y}px`,
         '--tiger-overlay-reference-width': `${referenceWidth}px`,
-        zIndex: FLOATING_OVERLAY_Z_INDEX,
+        zIndex: OVERLAY_Z_INDEX.overlay,
         transformOrigin: getTransformOrigin(actualPlacement)
       }) as React.CSSProperties,
     [actualPlacement, referenceWidth, x, y]

@@ -18,11 +18,24 @@ import {
 } from '@floating-ui/dom'
 
 /**
- * Shared z-index for floating overlays rendered into document.body
- * (tooltips, popovers, dropdown menus). Keeps them above in-table sticky
- * layers (fixed columns z-15, sticky header z-10, loading overlay z-20).
+ * Shared stacking scale for overlays.
+ * viewport chrome < anchored overlay < modal/drawer/tour < message < loading-bar
  */
-export const FLOATING_OVERLAY_Z_INDEX = 1000
+export const OVERLAY_Z_INDEX = {
+  viewport: 200,
+  overlay: 1000,
+  modal: 1100,
+  message: 1200,
+  loadingBar: 1300
+} as const
+
+export const overlayZIndexClass = {
+  viewport: 'z-[200]',
+  overlay: 'z-[1000]',
+  modal: 'z-[1100]',
+  message: 'z-[1200]',
+  loadingBar: 'z-[1300]'
+} as const
 
 /**
  * Placement options supported by the floating system.

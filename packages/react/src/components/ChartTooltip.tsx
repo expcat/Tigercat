@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useMemo } from 'react'
 import {
   classNames,
   getChartTooltipTransform,
+  overlayZIndexClass,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
 import { renderBodyPortal } from '../utils/overlay'
@@ -60,7 +61,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   const tooltipClasses = useMemo(
     () =>
       classNames(
-        'fixed left-0 top-0 z-[9999] pointer-events-none will-change-transform',
+        `fixed left-0 top-0 ${overlayZIndexClass.message} pointer-events-none will-change-transform`,
         'px-3 py-2 rounded-[var(--tiger-radius-md,0.375rem)] shadow-[var(--tiger-shadow-glass,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]',
         'bg-[color:var(--tiger-bg-elevated,#1f2937)]',
         'text-[color:var(--tiger-text-inverse,#f9fafb)]',

@@ -28,6 +28,7 @@ import {
   movePinch,
   getImageViewerLabels,
   mergeTigerLocale,
+  OVERLAY_Z_INDEX,
   type ImagePreviewProps as CoreImagePreviewProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
@@ -65,7 +66,7 @@ export const ImagePreview = defineComponent({
     open: { type: Boolean, default: undefined },
     images: { type: Array as PropType<string[]>, default: () => [] },
     currentIndex: { type: Number, default: 0 },
-    zIndex: { type: Number, default: 1050 },
+    zIndex: { type: Number, default: OVERLAY_Z_INDEX.modal },
     maskClosable: { type: Boolean, default: true },
     scaleStep: { type: Number, default: 0.5 },
     minScale: { type: Number, default: 0.25 },

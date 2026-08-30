@@ -25,6 +25,7 @@ import {
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   mergeTigerLocale,
+  OVERLAY_Z_INDEX,
   type GesturePoint,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
@@ -113,7 +114,7 @@ export const Modal: React.FC<ModalProps> = ({
   centered = false,
   mobileSheet = false,
   destroyOnClose = false,
-  zIndex = 1000,
+  zIndex = OVERLAY_Z_INDEX.modal,
   className,
   children,
   footer,

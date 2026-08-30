@@ -164,7 +164,7 @@ export interface ImageViewerBaseProps {
 export interface ImagePreviewProps extends ImageViewerBaseProps {
   /**
    * Custom z-index for the preview overlay
-   * @default 1050
+   * @default OVERLAY_Z_INDEX.modal
    */
   zIndex?: number
 

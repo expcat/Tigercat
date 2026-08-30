@@ -3,6 +3,7 @@
  */
 
 import { isBrowser } from './env'
+import { overlayZIndexClass } from './floating'
 
 export type BackTopFrameCallback = (timestamp: number) => void
 
@@ -117,8 +118,7 @@ export function createBackTopVisibilityController(
 /**
  * Base CSS classes for the BackTop button (without positioning)
  */
-export const backTopBaseClasses =
-  'z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary,#2563eb)] text-white shadow-lg transition-all duration-300 hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2'
+export const backTopBaseClasses = `${overlayZIndexClass.viewport} flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary,#2563eb)] text-white shadow-lg transition-all duration-300 hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2`
 
 /**
  * Default CSS classes for the BackTop button (fixed positioning for window target)

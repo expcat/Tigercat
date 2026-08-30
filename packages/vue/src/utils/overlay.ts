@@ -11,7 +11,7 @@ import {
   getAnchoredOverlayLayoutClasses,
   getOverlayDirLang,
   isBrowser,
-  FLOATING_OVERLAY_Z_INDEX,
+  OVERLAY_Z_INDEX,
   getTransformOrigin,
   restoreFocus,
   registerEscapeDismiss,
@@ -560,7 +560,7 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     '--tiger-overlay-x': `${floating.x.value}px`,
     '--tiger-overlay-y': `${floating.y.value}px`,
     '--tiger-overlay-reference-width': `${floating.referenceWidth.value}px`,
-    zIndex: FLOATING_OVERLAY_Z_INDEX,
+    zIndex: OVERLAY_Z_INDEX.overlay,
     transformOrigin: getTransformOrigin(floating.placement.value)
   }))
   const floatingClasses = computed(() =>

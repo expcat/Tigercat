@@ -6,6 +6,7 @@
 import type { FloatButtonShape, FloatButtonSize } from '../types/float-button'
 import type { ViewportPlacement } from '../types/viewport'
 import { classNames } from './class-names'
+import { overlayZIndexClass } from './floating'
 import { viewportFloatingBaseClasses, viewportPlacementClasses } from './viewport-floating-utils'
 
 // ---------------------------------------------------------------------------
@@ -39,7 +40,7 @@ export const floatButtonDisabledClasses = 'opacity-50 cursor-not-allowed pointer
 // Group classes
 // ---------------------------------------------------------------------------
 
-export const floatButtonGroupClasses = 'z-50 flex flex-col-reverse items-center gap-3'
+export const floatButtonGroupClasses = `${overlayZIndexClass.viewport} flex flex-col-reverse items-center gap-3`
 
 export const floatButtonGroupExpandClasses = 'transition-all duration-200 ease-in-out'
 
@@ -52,7 +53,7 @@ export function getFloatButtonGroupClasses(
   const placement = options.placement ?? 'bottom-right'
   const portal = options.portal ?? true
   return classNames(
-    portal ? viewportFloatingBaseClasses : 'absolute z-50',
+    portal ? viewportFloatingBaseClasses : `absolute ${overlayZIndexClass.viewport}`,
     viewportPlacementClasses[placement],
     floatButtonGroupClasses
   )

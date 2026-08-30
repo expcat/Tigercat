@@ -24,6 +24,7 @@ import {
   restoreFocus,
   shouldCloseOnMaskClick,
   mergeTigerLocale,
+  OVERLAY_Z_INDEX,
   type GesturePoint,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
@@ -76,7 +77,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   closable = true,
   mask = true,
   maskClosable = true,
-  zIndex = 1000,
+  zIndex = OVERLAY_Z_INDEX.modal,
   className,
   bodyClassName,
   bodyPadding,

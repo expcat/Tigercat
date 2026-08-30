@@ -5,17 +5,17 @@
 
 import type { TourPlacement, TourStep } from '../types/tour'
 import { isBrowser } from './env'
+import { OVERLAY_Z_INDEX, overlayZIndexClass } from './floating'
 
 // ---------------------------------------------------------------------------
 // Classes
 // ---------------------------------------------------------------------------
 
 /** Full-screen mask overlay */
-export const tourMaskClasses = 'fixed inset-0 z-[1000] bg-black/45 transition-opacity duration-200'
+export const tourMaskClasses = `fixed inset-0 ${overlayZIndexClass.modal} bg-black/45 transition-opacity duration-200`
 
 /** Popover card */
-export const tourPopoverClasses =
-  'absolute z-[1001] w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-surface-raised,#ffffff)] shadow-xl border border-[var(--tiger-border,#e5e7eb)] p-4'
+export const tourPopoverClasses = `absolute ${overlayZIndexClass.modal} w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-surface-raised,#ffffff)] shadow-xl border border-[var(--tiger-border,#e5e7eb)] p-4`
 
 export interface ActiveTourStep {
   step: TourStep
@@ -233,7 +233,7 @@ export function getTourSpotlightStyle(
     height: `${hole.height}px`,
     borderRadius: '4px',
     boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)',
-    zIndex: '1000',
+    zIndex: String(OVERLAY_Z_INDEX.modal),
     pointerEvents: 'none',
     transition: 'all 0.2s ease'
   }

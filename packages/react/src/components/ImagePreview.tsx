@@ -28,6 +28,7 @@ import {
   movePinch,
   getImageViewerLabels,
   mergeTigerLocale,
+  OVERLAY_Z_INDEX,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey, renderBodyPortal } from '../utils/overlay'
@@ -65,7 +66,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   open,
   images,
   currentIndex = 0,
-  zIndex = 1050,
+  zIndex = OVERLAY_Z_INDEX.modal,
   maskClosable = true,
   scaleStep = 0.5,
   minScale = 0.25,

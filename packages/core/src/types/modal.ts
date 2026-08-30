@@ -73,7 +73,7 @@ export interface ModalProps {
 
   /**
    * z-index of the modal
-   * @default 1000
+   * @default OVERLAY_Z_INDEX.modal
    */
   zIndex?: number
 
