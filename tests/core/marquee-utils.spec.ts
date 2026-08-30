@@ -10,12 +10,15 @@ import {
   DEFAULT_MARQUEE_REPEAT,
   MAX_MARQUEE_REPEAT,
   MARQUEE_COPIES_VAR,
+  MARQUEE_COPY_INDEX_VAR,
   MARQUEE_CSS,
   MARQUEE_DURATION_VAR,
   MARQUEE_GAP_VAR,
+  MARQUEE_INLINE_SIGN_VAR,
   MARQUEE_STYLE_ID,
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
+  getMarqueeContentStyle,
   getMarqueeLabels,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
@@ -89,14 +92,16 @@ describe('marquee-utils', () => {
       expect(resolveMarqueeGap(-4)).toBe(`${DEFAULT_MARQUEE_GAP_PX}px`)
     })
 
-    it('floors and clamps repeat, and requires 2 copies to loop', () => {
+    it('floors and clamps repeat, and treats values below 2 as a static copy', () => {
       expect(resolveMarqueeRepeat()).toBe(DEFAULT_MARQUEE_REPEAT)
       expect(resolveMarqueeRepeat(4)).toBe(4)
       expect(resolveMarqueeRepeat(1.8)).toBe(1)
-      expect(resolveMarqueeRepeat(0)).toBe(DEFAULT_MARQUEE_REPEAT)
+      expect(resolveMarqueeRepeat(0)).toBe(1)
+      expect(resolveMarqueeRepeat(-3)).toBe(1)
       expect(resolveMarqueeRepeat(99)).toBe(MAX_MARQUEE_REPEAT)
       expect(shouldLoopMarquee(2)).toBe(true)
       expect(shouldLoopMarquee(1)).toBe(false)
+      expect(shouldLoopMarquee(0)).toBe(false)
     })
   })
 
@@ -186,6 +191,12 @@ describe('marquee-utils', () => {
       expect(style[MARQUEE_COPIES_VAR]).toBe('3')
       expect(style[MARQUEE_GAP_VAR]).toBe('12px')
     })
+
+    it('writes a copy index only on clones', () => {
+      expect(getMarqueeContentStyle({ clone: false, index: 0 })).toBeUndefined()
+      expect(getMarqueeContentStyle({ clone: true, index: 1 })?.[MARQUEE_COPY_INDEX_VAR]).toBe('1')
+      expect(getMarqueeContentStyle({ clone: true, index: 2 })?.[MARQUEE_COPY_INDEX_VAR]).toBe('2')
+    })
   })
 
   describe('MARQUEE_CSS', () => {
@@ -196,6 +207,15 @@ describe('marquee-utils', () => {
       expect(MARQUEE_CSS).toContain('@media (prefers-reduced-motion: reduce)')
       expect(MARQUEE_CSS).toContain('animation: none !important')
       expect(MARQUEE_CSS).toContain('.tiger-marquee-clone')
+    })
+
+    it('moves on the inline axis and takes vertical clones out of flow', () => {
+      expect(MARQUEE_CSS).toContain(MARQUEE_INLINE_SIGN_VAR)
+      expect(MARQUEE_CSS).toContain('[dir="rtl"]')
+      expect(MARQUEE_CSS).toContain('padding-inline-end')
+      expect(MARQUEE_CSS).toContain('flex-direction: row')
+      expect(MARQUEE_CSS).toContain('position: absolute')
+      expect(MARQUEE_CSS).toContain('translate3d(0, -100%, 0)')
     })
   })
 

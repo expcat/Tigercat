@@ -3,8 +3,10 @@
  */
 
 /**
- * Scroll direction. Horizontal `left` is the default looping ticker.
- * `right` / `down` reverse the same CSS animation.
+ * Scroll direction. Horizontal `left` / `right` follow the inline axis
+ * (`left` toward inline-start, `right` toward inline-end). `up` / `down`
+ * follow the block axis. A vertical viewport is the first copy unless the
+ * caller sets a root height.
  */
 export type MarqueeDirection = 'left' | 'right' | 'up' | 'down'
 
@@ -49,7 +51,8 @@ export const DEFAULT_MARQUEE_PAUSE_ON_HOVER = true
  */
 export interface MarqueeProps {
   /**
-   * Scroll direction
+   * Scroll direction. `left`/`right` are logical (inline-start/end).
+   * Vertical height is the first copy unless the root height is set.
    * @default 'left'
    */
   direction?: MarqueeDirection
@@ -75,9 +78,9 @@ export interface MarqueeProps {
 
   /**
    * How many copies of the content to render for a seamless loop.
-   * Values below 2 skip looping and show a single static copy.
-   * Extra copies are inert visual clones; interactive children are still
-   * mounted `repeat` times, but only the first copy is in the tab order.
+   * Omitted or non-finite → 2. Values below 2 (including 0) show one
+   * static copy. Extra copies are inert visual clones and do not grow a
+   * vertical viewport. Short content may leave a gap; raise `repeat` to fill.
    * @default 2
    */
   repeat?: number

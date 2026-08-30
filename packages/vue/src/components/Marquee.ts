@@ -3,6 +3,7 @@ import {
   composeComponentClasses,
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
+  getMarqueeContentStyle,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
@@ -34,7 +35,8 @@ export const Marquee = defineComponent({
   inheritAttrs: false,
   props: {
     /**
-     * Scroll direction
+     * Scroll direction. `left`/`right` are logical (inline-start/end).
+     * Vertical height is the first copy unless the root height is set.
      * @default 'left'
      */
     direction: {
@@ -68,8 +70,8 @@ export const Marquee = defineComponent({
     },
     /**
      * How many copies of the content to render for a seamless loop.
-     * Values below 2 skip looping and show a single static copy.
-     * Extra copies are inert visual clones; only the first copy is in the tab order.
+     * Omitted or non-finite → 2. Values below 2 (including 0) show one
+     * static copy. Extra copies do not grow a vertical viewport.
      * @default 2
      */
     repeat: {
@@ -138,6 +140,7 @@ export const Marquee = defineComponent({
           'div',
           {
             class: getMarqueeContentClasses({ direction, clone }),
+            style: getMarqueeContentStyle({ clone, index }),
             'data-marquee-content': '',
             ...(clone ? getMarqueeCloneAttributes() : {})
           },

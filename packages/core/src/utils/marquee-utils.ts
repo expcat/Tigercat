@@ -27,28 +27,61 @@ export const MARQUEE_STYLE_ID = 'tiger-ui-marquee-styles'
 export const MARQUEE_DURATION_VAR = '--tiger-marquee-duration'
 export const MARQUEE_COPIES_VAR = '--tiger-marquee-copies'
 export const MARQUEE_GAP_VAR = '--tiger-marquee-gap'
+export const MARQUEE_INLINE_SIGN_VAR = '--tiger-marquee-inline-sign'
+export const MARQUEE_COPY_INDEX_VAR = '--tiger-marquee-copy-index'
 
 /**
  * Keyframes plus pause / reduced-motion rules. Clones stay in the DOM for
  * hydration stability; the reduced-motion block hides them and stops motion.
+ * Horizontal motion uses the inline axis (flipped under `dir=rtl`).
+ * Vertical clones are taken out of flow so the viewport is the first copy.
  */
 export const MARQUEE_CSS = `
 @keyframes tiger-marquee-x {
   from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(calc(-100% / var(${MARQUEE_COPIES_VAR}, 2)), 0, 0); }
+  to {
+    transform: translate3d(
+      calc(var(${MARQUEE_INLINE_SIGN_VAR}, 1) * -100% / var(${MARQUEE_COPIES_VAR}, 2)),
+      0,
+      0
+    );
+  }
 }
 
 @keyframes tiger-marquee-y {
   from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(0, calc(-100% / var(${MARQUEE_COPIES_VAR}, 2)), 0); }
+  to { transform: translate3d(0, -100%, 0); }
+}
+
+.tiger-marquee-horizontal {
+  ${MARQUEE_INLINE_SIGN_VAR}: 1;
+}
+
+.tiger-marquee-horizontal:dir(rtl),
+[dir="rtl"] .tiger-marquee-horizontal,
+.tiger-marquee-horizontal[dir="rtl"] {
+  ${MARQUEE_INLINE_SIGN_VAR}: -1;
 }
 
 .tiger-marquee-track {
   animation: tiger-marquee-x var(${MARQUEE_DURATION_VAR}, 20000ms) linear infinite;
 }
 
+.tiger-marquee-horizontal > .tiger-marquee-track {
+  flex-direction: row;
+}
+
 .tiger-marquee-vertical > .tiger-marquee-track {
+  position: relative;
+  flex-direction: column;
   animation-name: tiger-marquee-y;
+}
+
+.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-clone {
+  position: absolute;
+  inset-inline-start: 0;
+  width: 100%;
+  top: calc(var(${MARQUEE_COPY_INDEX_VAR}, 1) * 100%);
 }
 
 .tiger-marquee-reverse > .tiger-marquee-track {
@@ -207,12 +240,15 @@ export function resolveMarqueeGap(gap?: MarqueeGap): string {
 }
 
 /**
- * Resolve how many copies to render. Floors to an integer in 1..max.
+ * Resolve how many copies to render.
+ * Omitted / non-finite → default 2. Finite values below 2 (including 0)
+ * render a single static copy. Otherwise clamp to {@link MAX_MARQUEE_REPEAT}.
  */
 export function resolveMarqueeRepeat(repeat?: number): number {
   if (typeof repeat === 'number' && Number.isFinite(repeat)) {
     const copies = Math.floor(repeat)
-    if (copies >= 1) return Math.min(copies, MAX_MARQUEE_REPEAT)
+    if (copies < 2) return 1
+    return Math.min(copies, MAX_MARQUEE_REPEAT)
   }
   return DEFAULT_MARQUEE_REPEAT
 }
@@ -309,6 +345,17 @@ export function getMarqueeTrackStyle(
     [MARQUEE_COPIES_VAR]: String(resolveMarqueeRepeat(input.repeat)),
     [MARQUEE_GAP_VAR]: resolveMarqueeGap(input.gap)
   }
+}
+
+/**
+ * Copy index for vertical clones taken out of flow (`top: index * 100%`).
+ */
+export function getMarqueeContentStyle(
+  input: { clone?: boolean; index?: number } = {}
+): Record<string, string> | undefined {
+  if (!input.clone) return undefined
+  const index = typeof input.index === 'number' && Number.isFinite(input.index) ? input.index : 1
+  return { [MARQUEE_COPY_INDEX_VAR]: String(Math.max(1, Math.floor(index))) }
 }
 
 /**

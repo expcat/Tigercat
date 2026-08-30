@@ -7,7 +7,12 @@ import { fireEvent, render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { Marquee } from '@expcat/tigercat-vue/Marquee'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
-import { MARQUEE_DURATION_VAR, MARQUEE_STYLE_ID } from '@expcat/tigercat-core'
+import {
+  MARQUEE_COPY_INDEX_VAR,
+  MARQUEE_DURATION_VAR,
+  MARQUEE_INLINE_SIGN_VAR,
+  MARQUEE_STYLE_ID
+} from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -49,6 +54,16 @@ describe('Marquee', () => {
       expect(root.querySelector('[data-marquee-clone]')).toBeNull()
       expect(root.className).toContain('tiger-marquee-static')
     })
+
+    it('treats repeat 0 as a single static copy', () => {
+      const { container } = render(Marquee, {
+        props: { repeat: 0 },
+        slots: { default: 'Once' }
+      })
+      const root = getRoot(container)
+      expect(root.querySelectorAll('[data-marquee-content]')).toHaveLength(1)
+      expect(root.querySelector('[data-marquee-clone]')).toBeNull()
+    })
   })
 
   describe('direction duration gap', () => {
@@ -58,6 +73,40 @@ describe('Marquee', () => {
         slots: { default: direction }
       })
       expect(getRoot(container)).toHaveAttribute('data-marquee-direction', direction)
+    })
+
+    it('takes vertical clones out of flow so the viewport is the first copy', () => {
+      const { container } = render(Marquee, {
+        props: { direction: 'up' },
+        slots: { default: () => h('div', { style: { height: '48px' } }, 'A') }
+      })
+      const root = getRoot(container)
+      const first = root.querySelector(
+        '[data-marquee-content]:not([data-marquee-clone])'
+      ) as HTMLElement
+      const clone = root.querySelector('[data-marquee-clone]') as HTMLElement
+      expect(getComputedStyle(clone).position).toBe('absolute')
+      expect(getComputedStyle(first).position).not.toBe('absolute')
+      expect(clone.style.getPropertyValue(MARQUEE_COPY_INDEX_VAR)).toBe('1')
+      const rootHeight = root.getBoundingClientRect().height
+      const firstHeight = first.getBoundingClientRect().height
+      if (firstHeight > 0 && rootHeight > 0) {
+        expect(rootHeight).toBeCloseTo(firstHeight, 0)
+        expect(rootHeight).toBeLessThan(firstHeight * 2)
+      }
+    })
+
+    it('flips the inline motion sign under dir=rtl', () => {
+      const { container } = render({
+        setup() {
+          return () => h('div', { dir: 'rtl' }, [h(Marquee, null, () => 'News')])
+        }
+      })
+      const root = getRoot(container)
+      const sign = getComputedStyle(root).getPropertyValue(MARQUEE_INLINE_SIGN_VAR).trim()
+      if (sign) expect(sign).toBe('-1')
+      const track = getTrack(container)
+      expect(getComputedStyle(track).flexDirection).toBe('row')
     })
 
     it('writes duration and gap onto the track as CSS variables', () => {

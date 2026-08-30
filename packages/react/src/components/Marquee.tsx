@@ -2,6 +2,7 @@ import React, { forwardRef, useCallback, useState } from 'react'
 import {
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
+  getMarqueeContentStyle,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
@@ -134,6 +135,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
                   clone
                 })}
                 data-marquee-content=""
+                style={getMarqueeContentStyle({ clone, index })}
                 {...(clone ? getMarqueeCloneAttributes() : {})}>
                 {children}
               </div>
