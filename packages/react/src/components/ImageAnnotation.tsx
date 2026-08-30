@@ -29,6 +29,7 @@ import {
   type ImageAnnotationTool
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface ImageAnnotationProps extends Omit<
   CoreImageAnnotationProps,
@@ -96,14 +97,24 @@ export function ImageAnnotation({
   const [imageLoaded, setImageLoaded] = useState(false)
   const [displayWidth, setDisplayWidth] = useState(0)
   const [displayHeight, setDisplayHeight] = useState(0)
-  const [innerAnnotations, setInnerAnnotations] = useState(defaultValue)
-  const [innerSelectedId, setInnerSelectedId] = useState(defaultSelectedId)
-  const [innerTool, setInnerTool] = useState<ImageAnnotationTool>(defaultTool)
+  const [annotations, setAnnotations] = useControlledState<
+    CoreImageAnnotation[],
+    [ImageAnnotationChangeMeta]
+  >({
+    value,
+    defaultValue,
+    onChange
+  })
+  const [activeSelectedId, setSelectedId] = useControlledState<string | undefined>({
+    value: selectedId,
+    defaultValue: defaultSelectedId
+  })
+  const [activeTool, setActiveToolState] = useControlledState({
+    value: tool,
+    defaultValue: defaultTool,
+    onChange: onToolChange
+  })
   const [draft, setDraft] = useState<CoreImageAnnotation | null>(null)
-
-  const annotations = value ?? innerAnnotations
-  const activeSelectedId = selectedId ?? innerSelectedId
-  const activeTool = tool ?? innerTool
   const canEdit = !disabled && !readonly
 
   useEffect(() => {
@@ -130,28 +141,26 @@ export function ImageAnnotation({
 
   const commitAnnotations = useCallback(
     (next: CoreImageAnnotation[], meta: ImageAnnotationChangeMeta) => {
-      if (value === undefined) setInnerAnnotations(next)
-      onChange?.(next, meta)
+      setAnnotations(next, meta)
     },
-    [onChange, value]
+    [setAnnotations]
   )
 
   const selectAnnotation = useCallback(
     (annotation: CoreImageAnnotation | null) => {
-      if (selectedId === undefined) setInnerSelectedId(annotation?.id)
+      setSelectedId(annotation?.id)
       onSelect?.(annotation)
     },
-    [onSelect, selectedId]
+    [onSelect, setSelectedId]
   )
 
   const setActiveTool = useCallback(
     (nextTool: ImageAnnotationTool) => {
       setDraft(null)
       drawingRef.current = null
-      if (tool === undefined) setInnerTool(nextTool)
-      onToolChange?.(nextTool)
+      setActiveToolState(nextTool)
     },
-    [onToolChange, tool]
+    [setActiveToolState]
   )
 
   const createId = useCallback((shape: string) => {

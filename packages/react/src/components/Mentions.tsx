@@ -9,9 +9,11 @@ import {
   getCyclicIndex
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface MentionsProps {
   value?: string
+  defaultValue?: string
   prefix?: string
   options?: MentionOption[]
   placeholder?: string
@@ -24,7 +26,8 @@ export interface MentionsProps {
 }
 
 export const Mentions: React.FC<MentionsProps> = ({
-  value = '',
+  value,
+  defaultValue = '',
   prefix: triggerPrefix = '@',
   options = [],
   placeholder,
@@ -35,6 +38,11 @@ export const Mentions: React.FC<MentionsProps> = ({
   onSelect,
   className
 }) => {
+  const [currentValue, setCurrentValue] = useControlledState({
+    value,
+    defaultValue,
+    onChange
+  })
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [query, setQuery] = useState('')
@@ -63,7 +71,7 @@ export const Mentions: React.FC<MentionsProps> = ({
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newValue = e.target.value
-      onChange?.(newValue)
+      setCurrentValue(newValue)
 
       const cursorPos = e.target.selectionStart ?? newValue.length
       const result = extractMentionQuery(newValue, cursorPos, triggerPrefix)
@@ -76,21 +84,21 @@ export const Mentions: React.FC<MentionsProps> = ({
         setIsOpen(false)
       }
     },
-    [onChange, triggerPrefix, options.length]
+    [setCurrentValue, triggerPrefix, options.length]
   )
 
   const selectOption = useCallback(
     (option: MentionOption) => {
       if (option.disabled) return
-      const before = value.slice(0, mentionStartRef.current)
-      const cursorPos = textareaRef.current?.selectionStart ?? value.length
-      const after = value.slice(cursorPos)
+      const before = currentValue.slice(0, mentionStartRef.current)
+      const cursorPos = textareaRef.current?.selectionStart ?? currentValue.length
+      const after = currentValue.slice(cursorPos)
       const newValue = `${before}${triggerPrefix}${option.value} ${after}`
-      onChange?.(newValue)
+      setCurrentValue(newValue)
       onSelect?.(option)
       setIsOpen(false)
     },
-    [value, triggerPrefix, onChange, onSelect]
+    [currentValue, triggerPrefix, setCurrentValue, onSelect]
   )
 
   const handleKeydown = useCallback(
@@ -119,7 +127,7 @@ export const Mentions: React.FC<MentionsProps> = ({
     <div ref={containerRef} className={wrapperClass}>
       <textarea
         ref={textareaRef}
-        value={value}
+        value={currentValue}
         className={getMentionsInputClasses(size, disabled)}
         placeholder={placeholder}
         disabled={disabled}

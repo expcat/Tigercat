@@ -22,6 +22,7 @@ import {
   resolveImageCompareStep,
   type ImageCompareProps as CoreImageCompareProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface ImageCompareProps
   extends
@@ -91,19 +92,16 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
 
     const resolvedOrientation = resolveImageCompareOrientation(orientation)
     const resolvedStep = resolveImageCompareStep(step)
-    const [uncontrolledPosition, setUncontrolledPosition] = useState(() =>
-      resolveImageComparePosition(controlledPosition ?? defaultPosition, step)
-    )
+    const [current, setCurrent] = useControlledState({
+      value: controlledPosition,
+      defaultValue: defaultPosition ?? 50,
+      onChange,
+      postState: (position) => resolveImageComparePosition(position, step)
+    })
     const [dragging, setDragging] = useState(false)
     const rootRef = useRef<HTMLDivElement | null>(null)
     const handleRef = useRef<HTMLDivElement | null>(null)
     const draggingRef = useRef(false)
-
-    const isControlled = controlledPosition !== undefined
-    const current = resolveImageComparePosition(
-      isControlled ? controlledPosition : uncontrolledPosition,
-      step
-    )
     const vertical = isImageCompareVertical(resolvedOrientation)
     const resolvedAriaLabel = resolveImageCompareAriaLabel(
       typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
@@ -120,11 +118,9 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
 
     const commit = useCallback(
       (next: number) => {
-        const resolved = resolveImageComparePosition(next, step)
-        if (!isControlled) setUncontrolledPosition(resolved)
-        onChange?.(resolved)
+        setCurrent(next)
       },
-      [isControlled, onChange, step]
+      [setCurrent]
     )
 
     const positionFromEvent = useCallback(

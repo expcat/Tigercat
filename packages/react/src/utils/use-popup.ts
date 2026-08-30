@@ -6,8 +6,9 @@
  * Floating UI positioning, click-outside dismiss, escape-key dismiss,
  * trigger → event-handler mapping, floating styles.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useAnchoredOverlay } from './overlay'
+import { useControlledState } from '../hooks/useControlledState'
 import {
   buildTriggerHandlerMap,
   createFloatingHoverDelayController,
@@ -71,9 +72,11 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   } = options
 
   // ─── Visibility ──────────────────────────────────────────────────────
-  const isControlled = open !== undefined
-  const [internalVisible, setInternalVisible] = useState(defaultOpen)
-  const currentVisible = isControlled ? open : internalVisible
+  const [currentVisible, setVisibleState] = useControlledState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange
+  })
 
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
@@ -83,10 +86,9 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const setVisible = useCallback(
     (next: boolean) => {
       if (disabled && next) return
-      if (!isControlled) setInternalVisible(next)
-      onOpenChange?.(next)
+      setVisibleState(next)
     },
-    [disabled, isControlled, onOpenChange]
+    [disabled, setVisibleState]
   )
 
   const setVisibleRef = useRef(setVisible)

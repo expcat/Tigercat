@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import type {
   CronEditorProps as CoreCronEditorProps,
   CronFieldControl,
@@ -29,6 +29,7 @@ import {
   validateCronExpressionWithLabels
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface CronEditorProps extends CoreCronEditorProps {
   value?: string
@@ -111,8 +112,14 @@ export const CronEditor: React.FC<CronEditorProps> = ({
     }),
     [labels]
   )
-  const [innerValue, setInnerValue] = useState(defaultValue)
-  const expression = value ?? innerValue
+  const [expression, setExpression] = useControlledState<string, [CronValidationResult]>({
+    value,
+    defaultValue,
+    onChange: (next, validation) => {
+      onChange?.(next, validation)
+      onValidate?.(validation)
+    }
+  })
   const validation = useMemo(
     () => validateCronExpressionWithLabels(expression, labels, fieldLabels),
     [expression, labels, fieldLabels]
@@ -122,16 +129,12 @@ export const CronEditor: React.FC<CronEditorProps> = ({
   function commit(nextValue: string) {
     const normalized = normalizeCronExpression(nextValue)
     const nextValidation = validateCronExpressionWithLabels(normalized, labels, fieldLabels)
-    if (value === undefined) setInnerValue(normalized)
-    onChange?.(normalized, nextValidation)
-    onValidate?.(nextValidation)
+    setExpression(normalized, nextValidation)
   }
 
   function handleRawExpressionChange(nextValue: string) {
     const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
-    if (value === undefined) setInnerValue(nextValue)
-    onChange?.(nextValue, nextValidation)
-    onValidate?.(nextValidation)
+    setExpression(nextValue, nextValidation)
   }
 
   function handleFieldRawChange(meta: CronFieldMeta, raw: string) {

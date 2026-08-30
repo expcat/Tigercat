@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   getChatMessageStatusInfo,
@@ -18,6 +18,7 @@ import { Button } from './Button'
 import { VirtualList } from './VirtualList'
 import { Empty } from './Empty'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface ChatWindowProps
   extends
@@ -78,15 +79,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const resolvedEmptyText = resolveLocaleText(labels.emptyText, emptyText)
   const resolvedSendText = resolveLocaleText(labels.sendText, sendText)
 
-  const [innerValue, setInnerValue] = useState<string>(value ?? defaultValue)
-
-  useEffect(() => {
-    if (value !== undefined) {
-      setInnerValue(value)
-    }
-  }, [value])
-
-  const inputValue = value !== undefined ? value : innerValue
+  const [inputValue, setInputValue] = useControlledState({
+    value,
+    defaultValue,
+    onChange
+  })
 
   const wrapperClasses = useMemo(
     () =>
@@ -106,12 +103,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const handleValueChange = useCallback(
     (nextValue: string) => {
-      if (value === undefined) {
-        setInnerValue(nextValue)
-      }
-      onChange?.(nextValue)
+      setInputValue(nextValue)
     },
-    [onChange, value]
+    [setInputValue]
   )
 
   const handleSend = useCallback(() => {
@@ -119,12 +113,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     const payload = String(inputValue ?? '')
     onSend?.(payload)
     if (clearOnSend) {
-      if (value === undefined) {
-        setInnerValue('')
-      }
-      onChange?.('')
+      setInputValue('')
     }
-  }, [canSend, clearOnSend, inputValue, onSend, onChange, value])
+  }, [canSend, clearOnSend, inputValue, onSend, setInputValue])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {

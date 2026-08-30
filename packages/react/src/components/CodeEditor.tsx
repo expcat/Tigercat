@@ -17,6 +17,7 @@ import {
   type Token,
   type CodeHighlighter
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface CodeEditorProps extends Omit<CoreCodeEditorProps, 'style'> {
   onChange?: (value: string) => void
@@ -50,11 +51,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   onChange,
   highlighter
 }) => {
-  const [internalValue, setInternalValue] = useState(defaultValue)
+  const [code, setCode] = useControlledState({
+    value: controlledValue,
+    defaultValue,
+    onChange
+  })
   const [activeLine, setActiveLine] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  const code = controlledValue !== undefined ? controlledValue : internalValue
 
   const lines = useMemo(() => code.split('\n'), [code])
   const lineCount = useMemo(() => countLines(code), [code])
@@ -82,11 +85,10 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const val = e.target.value
-      setInternalValue(val)
-      onChange?.(val)
+      setCode(val)
       setActiveLine(getActiveLineIndex(val, e.target.selectionStart))
     },
-    [onChange]
+    [setCode]
   )
 
   const handleKeyDown = useCallback(
@@ -96,15 +98,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         const ta = textareaRef.current
         if (!ta) return
         const result = handleTabKey(ta.value, ta.selectionStart, ta.selectionEnd, tabSize)
-        setInternalValue(result.value)
-        onChange?.(result.value)
+        setCode(result.value)
         requestAnimationFrame(() => {
           ta.selectionStart = result.selectionStart
           ta.selectionEnd = result.selectionStart
         })
       }
     },
-    [tabSize, onChange]
+    [tabSize, setCode]
   )
 
   const wrapClass = wordWrap ? 'whitespace-pre-wrap break-all' : ''

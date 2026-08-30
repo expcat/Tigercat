@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   createProgrammaticScrollLock,
@@ -18,6 +18,7 @@ import {
   type ScrollSpyKey,
   type ScrollSpyProps as CoreScrollSpyProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 const getWindowContainer = () => window
 
@@ -53,11 +54,21 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
   onClick,
   ...rest
 }) => {
-  const isControlled = activeKey !== undefined
-  const [innerActiveKey, setInnerActiveKey] = useState<ScrollSpyKey | undefined>(() =>
-    getInitialScrollSpyActiveKey(items, activeKey, defaultActiveKey)
-  )
-  const currentActiveKey = isControlled ? activeKey : innerActiveKey
+  const [currentActiveKey, setActiveKey] = useControlledState<
+    ScrollSpyKey | undefined,
+    [ScrollSpyItem, ScrollSpyChangePayload]
+  >({
+    value: activeKey,
+    defaultValue: getInitialScrollSpyActiveKey(items, undefined, defaultActiveKey),
+    onChange: (key, item, payload) => {
+      if (key !== undefined) onActiveKeyChange?.(key, item, payload)
+    },
+    postState: (key) => {
+      const item = getScrollSpyItemByKey(items, key)
+      if (item && !item.disabled) return key
+      return getInitialScrollSpyActiveKey(items, undefined, defaultActiveKey)
+    }
+  })
   const flatItems = useMemo(() => flattenScrollSpyItems(items), [items])
   const activeKeyString =
     currentActiveKey === undefined ? '' : getScrollSpyKeyString(currentActiveKey)
@@ -65,8 +76,6 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
   const scrollLockRef = useRef(createProgrammaticScrollLock(() => getContainerRef.current()))
-  const onActiveKeyChangeRef = useRef(onActiveKeyChange)
-  onActiveKeyChangeRef.current = onActiveKeyChange
 
   const emitActive = useCallback(
     (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {
@@ -74,19 +83,10 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
       if (nextKeyString === activeKeyString) return
 
       const payload = createScrollSpyPayload(item, source)
-      if (!isControlled) setInnerActiveKey(item.key)
-      onActiveKeyChangeRef.current?.(item.key, item, payload)
+      setActiveKey(item.key, item, payload)
     },
-    [activeKeyString, isControlled]
+    [activeKeyString, setActiveKey]
   )
-
-  useEffect(() => {
-    if (isControlled) return
-    const currentItem = getScrollSpyItemByKey(items, innerActiveKey)
-    if (!currentItem || currentItem.disabled) {
-      setInnerActiveKey(getInitialScrollSpyActiveKey(items, undefined, defaultActiveKey))
-    }
-  }, [defaultActiveKey, innerActiveKey, isControlled, items])
 
   useEffect(() => {
     const container = getContainerRef.current()

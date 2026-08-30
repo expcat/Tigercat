@@ -95,15 +95,16 @@ describe('Slider', () => {
       expect(onChange).not.toHaveBeenCalled()
     })
     it.each([
-      ['ArrowRight', 100, 100],
-      ['ArrowLeft', 0, 0]
-    ])('should clamp %s at the boundary', async (key, value, expected) => {
+      ['ArrowRight', 100],
+      ['ArrowLeft', 0]
+    ])('should not emit onChange when %s is already at the boundary', async (key, value) => {
       const onChange = vi.fn()
       const { container } = render(
         <Slider value={value as number} min={0} max={100} onChange={onChange} />
       )
       await fireEvent.keyDown(getThumb(container), { key: key as string })
-      expect(onChange).toHaveBeenCalledWith(expected)
+      expect(onChange).not.toHaveBeenCalled()
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', String(value))
     })
 
     it('should be focusable via keyboard', async () => {

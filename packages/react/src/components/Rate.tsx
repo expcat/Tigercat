@@ -17,10 +17,13 @@ import {
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface RateProps extends CoreRateProps {
   /** Controlled value */
   value?: number
+  /** Initial value when uncontrolled */
+  defaultValue?: number
   /** Called when value changes */
   onChange?: (value: number) => void
   /** Called when hover value changes */
@@ -32,7 +35,8 @@ export interface RateProps extends CoreRateProps {
 }
 
 export const Rate: React.FC<RateProps> = ({
-  value = 0,
+  value,
+  defaultValue = 0,
   count = 5,
   allowHalf = false,
   disabled = false,
@@ -46,6 +50,11 @@ export const Rate: React.FC<RateProps> = ({
   onHoverChange
 }) => {
   const config = useTigerConfig()
+  const [currentValue, setCurrentValue] = useControlledState({
+    value,
+    defaultValue,
+    onChange
+  })
   const [hoverValue, setHoverValue] = useState(0)
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -56,7 +65,7 @@ export const Rate: React.FC<RateProps> = ({
     [mergedLocale, labelsOverride]
   )
 
-  const displayValue = hoverValue > 0 ? hoverValue : value
+  const displayValue = hoverValue > 0 ? hoverValue : currentValue
   const isChar = !!character
 
   const getStarValue = useCallback((index: number, isHalf: boolean): number => {
@@ -70,10 +79,10 @@ export const Rate: React.FC<RateProps> = ({
       const rect = el.getBoundingClientRect()
       const half = allowHalf && e.clientX - rect.left < rect.width / 2
       const val = getStarValue(index, half)
-      const newVal = allowClear && val === value ? 0 : val
-      onChange?.(newVal)
+      const newVal = allowClear && val === currentValue ? 0 : val
+      setCurrentValue(newVal)
     },
-    [disabled, allowHalf, getStarValue, allowClear, value, onChange]
+    [disabled, allowHalf, getStarValue, allowClear, currentValue, setCurrentValue]
   )
 
   const handleMouseMove = useCallback(
@@ -102,15 +111,15 @@ export const Rate: React.FC<RateProps> = ({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (disabled) return
-      let next = value
+      let next = currentValue
       switch (e.key) {
         case 'ArrowRight':
         case 'ArrowUp':
-          next = Math.min(count, value + step)
+          next = Math.min(count, currentValue + step)
           break
         case 'ArrowLeft':
         case 'ArrowDown':
-          next = Math.max(0, value - step)
+          next = Math.max(0, currentValue - step)
           break
         case 'Home':
           next = 0
@@ -122,9 +131,9 @@ export const Rate: React.FC<RateProps> = ({
           return
       }
       e.preventDefault()
-      if (next !== value) onChange?.(next)
+      setCurrentValue(next)
     },
-    [disabled, value, count, step, onChange]
+    [disabled, currentValue, count, step, setCurrentValue]
   )
 
   const starIcon = useMemo(
@@ -198,7 +207,7 @@ export const Rate: React.FC<RateProps> = ({
     handleMouseLeave
   ])
 
-  const valueText = formatRateValueText(labels.valueText, value, mergedLocale?.locale)
+  const valueText = formatRateValueText(labels.valueText, currentValue, mergedLocale?.locale)
 
   return (
     <div
@@ -207,7 +216,7 @@ export const Rate: React.FC<RateProps> = ({
       aria-label={labels.ariaLabel}
       aria-valuemin={0}
       aria-valuemax={count}
-      aria-valuenow={value}
+      aria-valuenow={currentValue}
       aria-valuetext={valueText}
       aria-disabled={disabled || undefined}
       aria-orientation="horizontal"

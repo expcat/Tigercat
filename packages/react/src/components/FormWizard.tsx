@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import {
   classNames,
   getFormWizardLabels,
@@ -13,6 +13,7 @@ import {
 import { Steps, StepsItem } from './Steps'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 const ArrowLeftIcon = () => (
   <svg
@@ -93,14 +94,16 @@ export const FormWizard: React.FC<FormWizardProps> = ({
     [mergedLocale, labelsOverride]
   )
 
-  const [innerCurrent, setInnerCurrent] = useState(defaultCurrent)
-
-  useEffect(() => {
-    if (current !== undefined) setInnerCurrent(current)
-  }, [current])
-
   const totalCount = steps.length
-  const currentIndex = current ?? innerCurrent
+  const [currentIndex, setIndex] = useControlledState({
+    value: current,
+    defaultValue: defaultCurrent,
+    onChange: (next, prev?: number) => {
+      onChange?.(next, prev ?? next)
+      if (autoSave && steps[next]) autoSave(next, steps[next])
+    },
+    postState: (next) => clampStepIndex(next, totalCount)
+  })
   const currentStep = steps[currentIndex]
   const isFirst = currentIndex <= 0
   const isLast = currentIndex >= totalCount - 1
@@ -115,16 +118,9 @@ export const FormWizard: React.FC<FormWizardProps> = ({
 
   const setCurrent = useCallback(
     (next: number) => {
-      const clamped = clampStepIndex(next, totalCount)
-      if (current === undefined) {
-        setInnerCurrent(clamped)
-      }
-      onChange?.(clamped, currentIndex)
-      if (autoSave && steps[clamped]) {
-        autoSave(clamped, steps[clamped])
-      }
+      setIndex(next, currentIndex)
     },
-    [current, currentIndex, onChange, totalCount, autoSave, steps]
+    [currentIndex, setIndex]
   )
 
   const runBeforeNext = useCallback(

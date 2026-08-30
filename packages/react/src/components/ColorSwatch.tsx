@@ -16,6 +16,7 @@ import {
   isColorSwatchSelected,
   normalizeColorSwatchGroups
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface ColorSwatchProps extends CoreColorSwatchProps {
   value?: string
@@ -37,7 +38,16 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
   className,
   onChange
 }) => {
-  const [innerValue, setInnerValue] = useState(defaultValue)
+  const [selectedValue, setSelectedValue] = useControlledState<
+    string | undefined,
+    [ColorSwatchNormalizedOption]
+  >({
+    value,
+    defaultValue,
+    onChange: (next, option) => {
+      if (next !== undefined) onChange?.(next, option)
+    }
+  })
   const [focusIndex, setFocusIndex] = useState(-1)
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
 
@@ -46,7 +56,6 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
     [groups, colors]
   )
   const options = useMemo(() => flattenColorSwatchGroups(normalizedGroups), [normalizedGroups])
-  const selectedValue = value ?? innerValue
   const selectedIndex = options.findIndex((option) =>
     isColorSwatchSelected(option.value, selectedValue)
   )
@@ -55,8 +64,7 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
 
   function handleSelect(option: ColorSwatchNormalizedOption) {
     if (disabled || option.disabled) return
-    if (value === undefined) setInnerValue(option.value)
-    onChange?.(option.value, option)
+    setSelectedValue(option.value, option)
   }
 
   function handleKeyDown(optionIndex: number, event: React.KeyboardEvent<HTMLButtonElement>) {

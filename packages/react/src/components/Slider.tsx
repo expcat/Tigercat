@@ -12,6 +12,7 @@ import {
   sliderGetKeyboardValue,
   sliderResolveMarks
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface SliderProps
   extends
@@ -119,25 +120,15 @@ export const Slider: React.FC<SliderProps> = ({
     ...divProps
   } = props
 
-  // Initialize internal value
-  const getInitialValue = (): number | [number, number] => {
-    if (controlledValue !== undefined) return controlledValue
-    if (defaultValue !== undefined) return defaultValue
-    return range ? [min, max] : min
-  }
-
-  const [internalValue, setInternalValue] = useState<number | [number, number]>(getInitialValue())
+  const [internalValue, setInternalValue] = useControlledState<number | [number, number]>({
+    value: controlledValue,
+    defaultValue: defaultValue ?? (range ? [min, max] : min),
+    onChange
+  })
   const [isDragging, setIsDragging] = useState(false)
   const [activeThumb, setActiveThumb] = useState<'min' | 'max' | null>(null)
   const [showTooltip, setShowTooltip] = useState(false)
   const trackRef = useRef<HTMLDivElement>(null)
-
-  // Sync with controlled value
-  useEffect(() => {
-    if (controlledValue !== undefined) {
-      setInternalValue(controlledValue)
-    }
-  }, [controlledValue])
 
   const getPercentage = useCallback(
     (val: number): number => sliderGetPercentage(val, min, max),
@@ -157,9 +148,8 @@ export const Slider: React.FC<SliderProps> = ({
   const updateValue = useCallback(
     (newValue: number | [number, number]) => {
       setInternalValue(newValue)
-      onChange?.(newValue)
     },
-    [onChange]
+    [setInternalValue]
   )
 
   // Handle mouse/touch move

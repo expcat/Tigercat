@@ -8,10 +8,13 @@ import {
   getSegmentedOptionClasses,
   classNames
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface SegmentedProps extends CoreSegmentedProps {
   /** Controlled value */
   value?: string | number
+  /** Initial value when uncontrolled */
+  defaultValue?: string | number
   /** Called when value changes */
   onChange?: (value: string | number) => void
 }
@@ -22,6 +25,7 @@ export const Segmented: React.FC<
   SegmentedProps & Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'>
 > = ({
   value,
+  defaultValue,
   options = [],
   disabled = false,
   size = 'md',
@@ -30,13 +34,20 @@ export const Segmented: React.FC<
   onChange,
   ...rest
 }) => {
+  const [currentValue, setCurrentValue] = useControlledState<string | number | undefined>({
+    value,
+    defaultValue,
+    onChange: (next) => {
+      if (next !== undefined) onChange?.(next)
+    }
+  })
+
   function handleSelect(opt: SegmentedOption) {
     if (opt.disabled || disabled) return
-    if (opt.value === value) return
-    onChange?.(opt.value)
+    setCurrentValue(opt.value)
   }
 
-  const selectedIndex = options.findIndex((opt) => opt.value === value)
+  const selectedIndex = options.findIndex((opt) => opt.value === currentValue)
   const firstEnabledIndex = options.findIndex((opt) => !opt.disabled)
   // Roving tabindex: the selected option is the single tab-stop; if nothing is
   // selected yet, the first enabled option carries focus into the group.
@@ -103,7 +114,7 @@ export const Segmented: React.FC<
         style={getSegmentedIndicatorStyle(selectedIndex, options.length, size)}
       />
       {options.map((opt, index) => {
-        const selected = opt.value === value
+        const selected = opt.value === currentValue
         const isDisabled = !!opt.disabled || disabled
         return (
           <label

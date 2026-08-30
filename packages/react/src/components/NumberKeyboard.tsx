@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import {
   applyNumberKeyboardInput,
   classNames,
@@ -16,6 +16,7 @@ import {
   type NumberKeyboardProps as CoreNumberKeyboardProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface NumberKeyboardProps
   extends
@@ -56,9 +57,14 @@ export const NumberKeyboard: React.FC<NumberKeyboardProps> = ({
     [config.locale, locale]
   )
   const confirmLabel = resolveLocaleText('Done', confirmText, mergedLocale?.common?.okText)
-  const isControlled = value !== undefined
-  const [innerValue, setInnerValue] = useState(() => normalizeNumberKeyboardValue(defaultValue))
-  const currentValue = isControlled ? normalizeNumberKeyboardValue(value) : innerValue
+  const [currentValue, setCurrentValue] = useControlledState<string, [NumberKeyboardChangePayload]>(
+    {
+      value,
+      defaultValue,
+      onChange,
+      postState: normalizeNumberKeyboardValue
+    }
+  )
   const isDisabled = disabled || readonly
 
   const keys = useMemo(
@@ -74,8 +80,7 @@ export const NumberKeyboard: React.FC<NumberKeyboardProps> = ({
   )
 
   function emitChange(nextValue: string, payload: NumberKeyboardChangePayload) {
-    if (!isControlled) setInnerValue(nextValue)
-    onChange?.(nextValue, payload)
+    setCurrentValue(nextValue, payload)
   }
 
   function handleKeyClick(key: NumberKeyboardKey) {
