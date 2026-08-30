@@ -1,4 +1,4 @@
-import { defineComponent, h, PropType, ref } from 'vue'
+import { defineComponent, h, onMounted, PropType, ref } from 'vue'
 import {
   composeComponentClasses,
   getMarqueeCloneAttributes,
@@ -12,6 +12,7 @@ import {
   isMarqueePaused,
   mergeStyleValues,
   resolveMarqueeDirection,
+  resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
   resolveMarqueeRegion,
   resolveMarqueeRepeat,
@@ -23,6 +24,8 @@ export interface VueMarqueeProps {
   direction?: MarqueeDirection
   duration?: number
   pauseOnHover?: boolean
+  pauseOnFocus?: boolean
+  paused?: boolean
   gap?: MarqueeGap
   repeat?: number
   ariaLabel?: string
@@ -52,12 +55,29 @@ export const Marquee = defineComponent({
       default: undefined
     },
     /**
-     * Pause looping while hovered or while focus is inside the region
+     * Pause looping while hovered. Does not control focus-within pause.
      * @default true
      */
     pauseOnHover: {
       type: Boolean,
       default: true
+    },
+    /**
+     * Pause looping while focus is inside the region.
+     * Independent of pauseOnHover; default stays on so turning off hover
+     * does not remove the keyboard pause.
+     * @default true
+     */
+    pauseOnFocus: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * Controlled pause. When set, hover/focus no longer derive the flag.
+     */
+    paused: {
+      type: Boolean,
+      default: undefined
     },
     /**
      * Gap between items and between duplicated copies.
@@ -101,7 +121,9 @@ export const Marquee = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    injectMarqueeStyles()
+    onMounted(() => {
+      injectMarqueeStyles()
+    })
 
     const hovered = ref(false)
     const focused = ref(false)
@@ -117,9 +139,12 @@ export const Marquee = defineComponent({
       const attrsRecord = attrs as Record<string, unknown>
       const direction = resolveMarqueeDirection(props.direction)
       const pauseOnHover = resolveMarqueePauseOnHover(props.pauseOnHover)
+      const pauseOnFocus = resolveMarqueePauseOnFocus(props.pauseOnFocus)
       const copies = resolveMarqueeRepeat(props.repeat)
       const paused = isMarqueePaused({
+        paused: props.paused,
         pauseOnHover,
+        pauseOnFocus,
         hovered: hovered.value,
         focused: focused.value
       })
@@ -156,6 +181,8 @@ export const Marquee = defineComponent({
             getMarqueeRootClasses({
               direction,
               pauseOnHover,
+              pauseOnFocus,
+              paused: props.paused,
               repeat: copies,
               className: props.className
             }),
@@ -168,6 +195,7 @@ export const Marquee = defineComponent({
           'data-marquee-direction': direction,
           'data-marquee-paused': paused ? 'true' : 'false',
           'data-marquee-pause-on-hover': pauseOnHover ? 'true' : 'false',
+          'data-marquee-pause-on-focus': pauseOnFocus ? 'true' : 'false',
           onMouseenter: (event: MouseEvent) => {
             if (pauseOnHover) hovered.value = true
             callAttrHandler(attrsRecord.onMouseenter, event)
@@ -177,11 +205,11 @@ export const Marquee = defineComponent({
             callAttrHandler(attrsRecord.onMouseleave, event)
           },
           onFocusin: (event: FocusEvent) => {
-            if (pauseOnHover) focused.value = true
+            if (pauseOnFocus) focused.value = true
             callAttrHandler(attrsRecord.onFocusin, event)
           },
           onFocusout: (event: FocusEvent) => {
-            if (pauseOnHover && !isMarqueeFocusInside(event.currentTarget, event.relatedTarget)) {
+            if (pauseOnFocus && !isMarqueeFocusInside(event.currentTarget, event.relatedTarget)) {
               focused.value = false
             }
             callAttrHandler(attrsRecord.onFocusout, event)

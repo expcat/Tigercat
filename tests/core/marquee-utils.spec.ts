@@ -28,6 +28,7 @@ import {
   isMarqueeReverse,
   isMarqueeVertical,
   marqueeCloneClasses,
+  marqueePauseFocusClasses,
   marqueePauseHoverClasses,
   marqueeReverseClasses,
   marqueeStaticClasses,
@@ -35,6 +36,7 @@ import {
   resolveMarqueeDirection,
   resolveMarqueeDuration,
   resolveMarqueeGap,
+  resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
   resolveMarqueeRegion,
   resolveMarqueeRepeat,
@@ -106,13 +108,17 @@ describe('marquee-utils', () => {
   })
 
   describe('pause helpers', () => {
-    it('pauses only when pauseOnHover is on and the region is hovered or focused', () => {
+    it('pauses hover and focus independently, and honors controlled paused', () => {
       expect(isMarqueePaused({ pauseOnHover: true, hovered: true })).toBe(true)
-      expect(isMarqueePaused({ pauseOnHover: true, focused: true })).toBe(true)
-      expect(isMarqueePaused({ pauseOnHover: true, hovered: false, focused: false })).toBe(false)
-      expect(isMarqueePaused({ pauseOnHover: false, hovered: true, focused: true })).toBe(false)
+      expect(isMarqueePaused({ pauseOnHover: false, pauseOnFocus: true, focused: true })).toBe(true)
+      expect(isMarqueePaused({ pauseOnHover: false, hovered: true, focused: false })).toBe(false)
+      expect(isMarqueePaused({ pauseOnFocus: false, focused: true })).toBe(false)
+      expect(isMarqueePaused({ paused: true, pauseOnHover: false, hovered: false })).toBe(true)
+      expect(isMarqueePaused({ paused: false, pauseOnHover: true, hovered: true })).toBe(false)
       expect(resolveMarqueePauseOnHover()).toBe(true)
       expect(resolveMarqueePauseOnHover(false)).toBe(false)
+      expect(resolveMarqueePauseOnFocus()).toBe(true)
+      expect(resolveMarqueePauseOnFocus(false)).toBe(false)
     })
 
     it('detects whether focus is still inside the root', () => {
@@ -175,6 +181,9 @@ describe('marquee-utils', () => {
 
       expect(getMarqueeRootClasses({ repeat: 1 })).toContain(marqueeStaticClasses)
       expect(getMarqueeRootClasses({ pauseOnHover: false })).not.toContain(marqueePauseHoverClasses)
+      expect(getMarqueeRootClasses({ pauseOnHover: false })).toContain(marqueePauseFocusClasses)
+      expect(getMarqueeRootClasses({ paused: true })).not.toContain(marqueePauseHoverClasses)
+      expect(getMarqueeRootClasses({ paused: false })).not.toContain(marqueePauseFocusClasses)
     })
 
     it('switches track and content layout for vertical direction', () => {
@@ -227,6 +236,14 @@ describe('marquee-utils', () => {
       injectMarqueeStyles()
 
       expect(document.querySelectorAll(`#${MARQUEE_STYLE_ID}`)).toHaveLength(1)
+      expect(document.getElementById(MARQUEE_STYLE_ID)?.textContent).toContain('tiger-marquee-x')
+    })
+
+    it('re-injects after the style node is removed without resetting modules', async () => {
+      const { injectMarqueeStyles } = await loadFreshMarqueeUtils()
+      injectMarqueeStyles()
+      document.getElementById(MARQUEE_STYLE_ID)?.remove()
+      injectMarqueeStyles()
       expect(document.getElementById(MARQUEE_STYLE_ID)?.textContent).toContain('tiger-marquee-x')
     })
 

@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useState } from 'react'
+import React, { forwardRef, useCallback, useLayoutEffect, useState } from 'react'
 import {
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
@@ -10,6 +10,7 @@ import {
   isMarqueeFocusInside,
   isMarqueePaused,
   resolveMarqueeDirection,
+  resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
   resolveMarqueeRegion,
   resolveMarqueeRepeat,
@@ -30,6 +31,8 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       direction,
       duration,
       pauseOnHover,
+      pauseOnFocus,
+      paused: pausedProp,
       gap,
       repeat,
       ariaLabel,
@@ -44,15 +47,20 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
     },
     ref
   ) => {
-    injectMarqueeStyles()
+    useLayoutEffect(() => {
+      injectMarqueeStyles()
+    }, [])
 
     const [hovered, setHovered] = useState(false)
     const [focused, setFocused] = useState(false)
     const resolvedDirection = resolveMarqueeDirection(direction)
     const resolvedPauseOnHover = resolveMarqueePauseOnHover(pauseOnHover)
+    const resolvedPauseOnFocus = resolveMarqueePauseOnFocus(pauseOnFocus)
     const copies = resolveMarqueeRepeat(repeat)
     const paused = isMarqueePaused({
+      paused: pausedProp,
       pauseOnHover: resolvedPauseOnHover,
+      pauseOnFocus: resolvedPauseOnFocus,
       hovered,
       focused
     })
@@ -80,23 +88,23 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
 
     const handleFocus = useCallback(
       (event: React.FocusEvent<HTMLDivElement>) => {
-        if (resolvedPauseOnHover) setFocused(true)
+        if (resolvedPauseOnFocus) setFocused(true)
         onFocus?.(event)
       },
-      [onFocus, resolvedPauseOnHover]
+      [onFocus, resolvedPauseOnFocus]
     )
 
     const handleBlur = useCallback(
       (event: React.FocusEvent<HTMLDivElement>) => {
         if (
-          resolvedPauseOnHover &&
+          resolvedPauseOnFocus &&
           !isMarqueeFocusInside(event.currentTarget, event.relatedTarget)
         ) {
           setFocused(false)
         }
         onBlur?.(event)
       },
-      [onBlur, resolvedPauseOnHover]
+      [onBlur, resolvedPauseOnFocus]
     )
 
     return (
@@ -110,9 +118,12 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
         data-marquee-direction={resolvedDirection}
         data-marquee-paused={paused ? 'true' : 'false'}
         data-marquee-pause-on-hover={resolvedPauseOnHover ? 'true' : 'false'}
+        data-marquee-pause-on-focus={resolvedPauseOnFocus ? 'true' : 'false'}
         className={getMarqueeRootClasses({
           direction: resolvedDirection,
           pauseOnHover: resolvedPauseOnHover,
+          pauseOnFocus: resolvedPauseOnFocus,
+          paused: pausedProp,
           repeat: copies,
           className
         })}

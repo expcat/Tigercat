@@ -42,9 +42,14 @@ export const DEFAULT_MARQUEE_REPEAT = 2
 export const MAX_MARQUEE_REPEAT = 16
 
 /**
- * Whether hover (and focus-within) pauses the animation by default
+ * Whether pointer hover pauses the animation by default
  */
 export const DEFAULT_MARQUEE_PAUSE_ON_HOVER = true
+
+/**
+ * Whether focus-within pauses the animation by default
+ */
+export const DEFAULT_MARQUEE_PAUSE_ON_FOCUS = true
 
 /**
  * Base Marquee props interface (framework-agnostic)
@@ -64,10 +69,23 @@ export interface MarqueeProps {
   duration?: number
 
   /**
-   * Pause looping while hovered or while focus is inside the region
+   * Pause looping while hovered. Does not control focus-within pause.
    * @default true
    */
   pauseOnHover?: boolean
+
+  /**
+   * Pause looping while focus is inside the region.
+   * Independent of `pauseOnHover`; default stays on so turning off hover
+   * does not remove the keyboard pause.
+   * @default true
+   */
+  pauseOnFocus?: boolean
+
+  /**
+   * Controlled pause. When set, hover/focus no longer derive the flag.
+   */
+  paused?: boolean
 
   /**
    * Gap between items and between duplicated copies.

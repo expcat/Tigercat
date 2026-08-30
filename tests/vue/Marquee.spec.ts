@@ -154,6 +154,31 @@ describe('Marquee', () => {
       await fireEvent.mouseEnter(root)
       expect(root).toHaveAttribute('data-marquee-paused', 'false')
     })
+
+    it('still pauses on focus when pauseOnHover is false', async () => {
+      const { container } = render(Marquee, {
+        props: { pauseOnHover: false },
+        slots: { default: () => h('button', { type: 'button' }, 'Item') }
+      })
+      const root = getRoot(container)
+      await fireEvent.focusIn(screen.getByRole('button', { name: 'Item' }))
+      expect(root).toHaveAttribute('data-marquee-paused', 'true')
+    })
+
+    it('honors a controlled paused flag', async () => {
+      const { container, rerender } = render(Marquee, {
+        props: { paused: true },
+        slots: { default: 'Live' }
+      })
+      const root = getRoot(container)
+      expect(root).toHaveAttribute('data-marquee-paused', 'true')
+      await fireEvent.mouseLeave(root)
+      expect(root).toHaveAttribute('data-marquee-paused', 'true')
+      await rerender({ paused: false })
+      const next = getRoot(container)
+      await fireEvent.mouseEnter(next)
+      expect(next).toHaveAttribute('data-marquee-paused', 'false')
+    })
   })
 
   describe('attrs integration', () => {
@@ -228,6 +253,14 @@ describe('Marquee', () => {
       expect(style?.textContent).toContain('prefers-reduced-motion: reduce')
       expect(style?.textContent).toContain('animation: none !important')
       expect(style?.textContent).toContain('.tiger-marquee-clone')
+    })
+
+    it('re-injects keyframes after the style node is removed', () => {
+      const first = render(Marquee, { slots: { default: 'News' } })
+      document.getElementById(MARQUEE_STYLE_ID)?.remove()
+      first.unmount()
+      render(Marquee, { slots: { default: 'Again' } })
+      expect(document.getElementById(MARQUEE_STYLE_ID)?.textContent).toContain('tiger-marquee-x')
     })
   })
 

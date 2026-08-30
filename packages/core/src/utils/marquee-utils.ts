@@ -11,6 +11,7 @@ import {
   DEFAULT_MARQUEE_DIRECTION,
   DEFAULT_MARQUEE_DURATION_MS,
   DEFAULT_MARQUEE_GAP_PX,
+  DEFAULT_MARQUEE_PAUSE_ON_FOCUS,
   DEFAULT_MARQUEE_PAUSE_ON_HOVER,
   DEFAULT_MARQUEE_REPEAT,
   MAX_MARQUEE_REPEAT,
@@ -106,7 +107,7 @@ export const MARQUEE_CSS = `
 
 .tiger-marquee[data-marquee-paused='true'] > .tiger-marquee-track,
 .tiger-marquee-pause-hover:hover > .tiger-marquee-track,
-.tiger-marquee-pause-hover:focus-within > .tiger-marquee-track {
+.tiger-marquee-pause-focus:focus-within > .tiger-marquee-track {
   animation-play-state: paused;
 }
 
@@ -137,8 +138,11 @@ export const MARQUEE_CSS = `
 /** Root overflow clip */
 export const marqueeRootClasses = 'tiger-marquee overflow-hidden max-w-full'
 
-/** Pause via :hover / :focus-within as a CSS complement to JS state */
+/** Pause via :hover as a CSS complement to JS state */
 export const marqueePauseHoverClasses = 'tiger-marquee-pause-hover'
+
+/** Pause via :focus-within as a CSS complement to JS state */
+export const marqueePauseFocusClasses = 'tiger-marquee-pause-focus'
 
 /** Horizontal axis */
 export const marqueeHorizontalClasses = 'tiger-marquee-horizontal'
@@ -169,25 +173,19 @@ export const marqueeCloneClasses = 'tiger-marquee-clone'
 
 const MARQUEE_DIRECTIONS = new Set<MarqueeDirection>(['left', 'right', 'up', 'down'])
 
-let isStyleInjected = false
-
 /**
- * Inject looping keyframes and reduced-motion rules once.
- * Safe to call during render; no-ops during SSR.
+ * Inject looping keyframes and reduced-motion rules if the style node
+ * is missing. Presence in the document is the only guard — a sticky
+ * module flag would skip re-inject after the node is removed.
  */
 export function injectMarqueeStyles(): void {
-  if (!isBrowser() || isStyleInjected) return
-
-  if (document.getElementById(MARQUEE_STYLE_ID)) {
-    isStyleInjected = true
-    return
-  }
+  if (!isBrowser()) return
+  if (document.getElementById(MARQUEE_STYLE_ID)) return
 
   const style = document.createElement('style')
   style.id = MARQUEE_STYLE_ID
   style.textContent = MARQUEE_CSS
   document.head.appendChild(style)
-  isStyleInjected = true
 }
 
 /**
@@ -269,6 +267,14 @@ export function resolveMarqueePauseOnHover(value?: boolean): boolean {
 }
 
 /**
+ * Resolve pause-on-focus, falling back to {@link DEFAULT_MARQUEE_PAUSE_ON_FOCUS}.
+ */
+export function resolveMarqueePauseOnFocus(value?: boolean): boolean {
+  if (typeof value === 'boolean') return value
+  return DEFAULT_MARQUEE_PAUSE_ON_FOCUS
+}
+
+/**
  * Trim an explicit accessible name. Empty / whitespace / omitted → `undefined`
  * so the root is not forced into a landmark.
  */
@@ -313,15 +319,20 @@ export function getMarqueeCloneAttributes(): {
 }
 
 /**
- * Combine hover and focus-within into a single paused flag.
+ * Controlled `paused` wins. Otherwise hover and focus pause independently.
  */
 export function isMarqueePaused(input: {
+  paused?: boolean
   pauseOnHover?: boolean
+  pauseOnFocus?: boolean
   hovered?: boolean
   focused?: boolean
 }): boolean {
-  if (!resolveMarqueePauseOnHover(input.pauseOnHover)) return false
-  return Boolean(input.hovered || input.focused)
+  if (typeof input.paused === 'boolean') return input.paused
+  return (
+    (resolveMarqueePauseOnHover(input.pauseOnHover) && Boolean(input.hovered)) ||
+    (resolveMarqueePauseOnFocus(input.pauseOnFocus) && Boolean(input.focused))
+  )
 }
 
 /**
@@ -365,17 +376,21 @@ export function getMarqueeRootClasses(
   input: {
     direction?: MarqueeDirection
     pauseOnHover?: boolean
+    pauseOnFocus?: boolean
+    paused?: boolean
     repeat?: number
     className?: string
   } = {}
 ): string {
   const direction = resolveMarqueeDirection(input.direction)
   const looping = shouldLoopMarquee(input.repeat)
+  const pauseControlled = typeof input.paused === 'boolean'
   return classNames(
     marqueeRootClasses,
     isMarqueeVertical(direction) ? marqueeVerticalClasses : marqueeHorizontalClasses,
     isMarqueeReverse(direction) && marqueeReverseClasses,
-    resolveMarqueePauseOnHover(input.pauseOnHover) && marqueePauseHoverClasses,
+    !pauseControlled && resolveMarqueePauseOnHover(input.pauseOnHover) && marqueePauseHoverClasses,
+    !pauseControlled && resolveMarqueePauseOnFocus(input.pauseOnFocus) && marqueePauseFocusClasses,
     !looping && marqueeStaticClasses,
     input.className
   )
