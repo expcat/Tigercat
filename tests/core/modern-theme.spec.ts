@@ -115,11 +115,13 @@ describe('createTigercatPlugin modern option', () => {
     return rules
   }
 
-  it('default tigercatPlugin always emits MODERN_BASE_TOKENS in :root', () => {
+  it('default tigercatPlugin writes the default preset including non-color tokens', () => {
     const rules = captureRules(tigercatPlugin as PluginInstance)
-    expect(rules[':root']?.['--tiger-radius-md']).toBe('0.5rem')
+    expect(rules[':root']?.['--tiger-radius-md']).toBe(defaultTheme.light.radius?.md)
+    expect(rules[':root']?.['--tiger-primary']).toBe(defaultTheme.light.colors?.primary)
     expect(rules[':root']?.['--tiger-shadow-glass']).toBeDefined()
-    expect(rules['.dark']?.['--tiger-shadow-md']).toBeDefined()
+    expect(rules['.dark']?.['--tiger-shadow-md']).toBe(defaultTheme.dark.shadows?.md)
+    expect(rules['.dark']?.['--tiger-radius-md']).toBe(defaultTheme.dark.radius?.md)
   })
 
   it('createTigercatPlugin without modern flag does NOT emit override block', () => {
@@ -139,10 +141,11 @@ describe('createTigercatPlugin modern option', () => {
     expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
   })
 
-  it('createTigercatPlugin({ preset: modernTheme }) maps preset colors into :root', () => {
+  it('createTigercatPlugin({ preset: modernTheme }) maps full preset tokens into :root', () => {
     const rules = captureRules(createTigercatPlugin({ preset: modernTheme }))
-    expect(rules[':root']?.['--tiger-primary']).toBe('#2563eb')
-    expect(rules[':root']?.['--tiger-radius-md']).toBe('0.5rem')
-    expect(rules['.dark']?.['--tiger-surface']).toBe('#0f172a')
+    expect(rules[':root']?.['--tiger-primary']).toBe(modernTheme.light.colors?.primary)
+    expect(rules[':root']?.['--tiger-radius-md']).toBe(modernTheme.light.radius?.md)
+    expect(rules['.dark']?.['--tiger-surface']).toBe(modernTheme.dark.colors?.surface)
+    expect(rules['.dark']?.['--tiger-radius-md']).toBe(modernTheme.dark.radius?.md)
   })
 })

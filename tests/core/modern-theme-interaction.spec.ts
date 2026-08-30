@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
   createTigercatPlugin,
+  defaultTheme,
   MODERN_BASE_TOKENS_LIGHT,
   MODERN_OVERRIDE_TOKENS_LIGHT,
   MODERN_OVERRIDE_TOKENS_DARK
@@ -86,10 +87,10 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
     document.documentElement.classList.remove('dark')
   })
 
-  it('without data-tiger-style, :root resolves to base (v1.0.x) token values', () => {
+  it('without data-tiger-style, :root resolves to the default preset radius', () => {
     const styles = getComputedStyle(document.documentElement)
     expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
-      MODERN_BASE_TOKENS_LIGHT['--tiger-radius-md']
+      defaultTheme.light.radius?.md
     )
     expect(styles.getPropertyValue('--tiger-blur-glass').trim()).toBe(
       MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']
@@ -117,9 +118,7 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
     document.documentElement.setAttribute('data-tiger-style', 'modern')
     document.documentElement.removeAttribute('data-tiger-style')
     const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
-      MODERN_BASE_TOKENS_LIGHT['--tiger-radius-md']
-    )
+    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(defaultTheme.light.radius?.md)
   })
 
   it('combined .dark + data-tiger-style="modern" resolves dark override shadows', () => {

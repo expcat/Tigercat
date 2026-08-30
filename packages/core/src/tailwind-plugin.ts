@@ -1,7 +1,6 @@
 import plugin from 'tailwindcss/plugin'
 import type { PluginAPI } from 'tailwindcss/plugin'
 import type { ThemePreset } from './types/theme'
-import { semanticColorsToCssVars } from './theme-runtime'
 import {
   MODERN_BASE_TOKENS_LIGHT,
   MODERN_BASE_TOKENS_DARK,
@@ -9,13 +8,18 @@ import {
   MODERN_OVERRIDE_TOKENS_DARK,
   MODERN_REDUCED_MOTION_TOKENS
 } from './themes/modern/tokens'
-import { defaultThemeDarkColors, defaultThemeLightColors } from './themes/default/theme'
+import { defaultTheme } from './themes/default/theme'
+import { resolvePresetThemeConfig, themeConfigToCssVars } from './themes/manager'
 
-/** Default theme colors for Tigercat. */
-export const tigercatTheme = semanticColorsToCssVars(defaultThemeLightColors)
+function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {
+  return themeConfigToCssVars(resolvePresetThemeConfig(preset ?? defaultTheme, scheme))
+}
+
+/** Default theme CSS variables for Tigercat (colors + radius/type/motion). */
+export const tigercatTheme = cssVarsForPreset(defaultTheme, 'light')
 
 /** Dark mode theme overrides. */
-export const tigercatDarkTheme = semanticColorsToCssVars(defaultThemeDarkColors)
+export const tigercatDarkTheme = cssVarsForPreset(defaultTheme, 'dark')
 
 const tigercatDirectionBase = {
   '[dir="rtl"] .tiger-rtl-mirror, [data-tiger-dir="rtl"] .tiger-rtl-mirror': {
@@ -52,8 +56,10 @@ const tigercatReducedMotionBase = {
  */
 export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
   addBase({
-    ':root': { ...tigercatTheme, ...MODERN_BASE_TOKENS_LIGHT },
-    '.dark': { ...tigercatDarkTheme, ...MODERN_BASE_TOKENS_DARK },
+    // Extra (glass/gradient/motion-name) tokens first; the preset wins on
+    // shared names such as --tiger-radius-md so plugin output matches ThemeManager.
+    ':root': { ...MODERN_BASE_TOKENS_LIGHT, ...tigercatTheme },
+    '.dark': { ...MODERN_BASE_TOKENS_DARK, ...tigercatDarkTheme },
     // Remove browser default focus outline on interactive SVG elements
     'svg [tabindex], svg [role="button"]': {
       outline: 'none'
@@ -101,18 +107,12 @@ export interface TigercatPluginOptions {
 export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
   return plugin(function ({ addBase }: PluginAPI) {
     const preset = options.preset
-
-    const lightVars = preset?.light?.colors
-      ? semanticColorsToCssVars(preset.light.colors)
-      : tigercatTheme
-
-    const darkVars = preset?.dark?.colors
-      ? semanticColorsToCssVars(preset.dark.colors)
-      : tigercatDarkTheme
+    const lightVars = cssVarsForPreset(preset, 'light')
+    const darkVars = cssVarsForPreset(preset, 'dark')
 
     addBase({
-      ':root': { ...lightVars, ...MODERN_BASE_TOKENS_LIGHT },
-      '.dark': { ...darkVars, ...MODERN_BASE_TOKENS_DARK },
+      ':root': { ...MODERN_BASE_TOKENS_LIGHT, ...lightVars },
+      '.dark': { ...MODERN_BASE_TOKENS_DARK, ...darkVars },
       'svg [tabindex], svg [role="button"]': {
         outline: 'none'
       },
