@@ -177,21 +177,33 @@ const NON_COMPONENT_TYPE_NAMES = new Set([
 export const FRAMEWORK_COMPONENTS = {
   ConfigProvider: {
     category: 'Basic',
-    typeSource:
-      'packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts',
+    typeSource: 'packages/core/src/types/config-provider.ts',
+    propsInterfaces: ['ConfigProviderProps'],
     propsRows: [
       {
         name: 'locale?',
         type: 'TigerLocaleInput',
         defaultValue: '-',
-        description: 'Locale configuration'
+        description: 'Locale object, Promise, or loader. Nested providers merge onto the parent.'
       },
-      { name: 'theme?', type: 'string', defaultValue: '-', description: 'Theme name' },
+      {
+        name: 'theme?',
+        type: 'string',
+        defaultValue: '-',
+        description: 'Theme name applied to the document by the outermost provider'
+      },
       {
         name: 'colorScheme?',
         type: 'ColorScheme',
         defaultValue: '-',
-        description: 'Theme color scheme'
+        description: "Color scheme. 'auto' is light on first paint / SSR"
+      },
+      {
+        name: 'direction?',
+        type: 'TigerLocaleDirection',
+        defaultValue: '-',
+        description:
+          'Explicit text direction. Wins over locale.direction and language-id inference.'
       }
     ]
   },

@@ -957,9 +957,9 @@
       "testGroup": "basic",
       "packageSubpath": "./ConfigProvider",
       "packageTarget": "ConfigProvider",
-      "typeSource": "packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts",
+      "typeSource": "packages/core/src/types/config-provider.ts",
       "sourceFiles": [],
-      "propsInterfaces": [],
+      "propsInterfaces": ["ConfigProviderProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

@@ -22,9 +22,11 @@ Modern visuals — one switch:
 @plugin "@expcat/tigercat-core/tailwind/modern";
 ```
 
-or at runtime `ThemeManager.setTheme('modern')` (also sets `data-tiger-style="modern"`). Either path writes the modern radius / glass / motion tokens. The default plugin still honors `data-tiger-style="modern"` for CSS-only opt-in.
+or `<ConfigProvider theme="modern">` / `ThemeManager.setTheme('modern')` (also sets `data-tiger-style="modern"`). Either path writes the modern radius / glass / motion tokens. The default plugin still honors `data-tiger-style="modern"` for CSS-only opt-in.
 
 ## Runtime API
+
+The app-layer entry is `ConfigProvider` (`theme` / `colorScheme`). It calls `ThemeManager` on the **outermost** still-mounted provider and writes `document.documentElement`. Nested ConfigProviders only change `useTigerConfig()`; they do not restyle a subtree.
 
 ```ts
 import {
@@ -49,15 +51,15 @@ Solid fills use on-color tokens: `--tiger-primary-foreground`, `--tiger-secondar
 
 ## Switches
 
-| Need           | How                                                                                       |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| Dark mode      | Set `<html class="dark">` or call `ThemeManager.setColorScheme()`                         |
-| Modern visuals | `@plugin ".../tailwind/modern"` **or** `ThemeManager.setTheme('modern')`                  |
-| High contrast  | Call `ThemeManager.setTheme('high-contrast')`                                             |
-| Reduced motion | `prefers-reduced-motion` collapses `--tiger-transition-*` and `--tiger-motion-duration-*` |
-| RTL            | Prefer locale `direction: 'rtl'`; see [i18n.md](i18n.md)                                  |
+| Need           | How                                                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Dark mode      | `<ConfigProvider colorScheme="dark">`, `<html class="dark">`, or `ThemeManager.setColorScheme()`                  |
+| Modern visuals | `<ConfigProvider theme="modern">` **or** `@plugin ".../tailwind/modern"` **or** `ThemeManager.setTheme('modern')` |
+| High contrast  | `<ConfigProvider theme="high-contrast">` or `ThemeManager.setTheme('high-contrast')`                              |
+| Reduced motion | `prefers-reduced-motion` collapses `--tiger-transition-*` and `--tiger-motion-duration-*`                         |
+| RTL            | Prefer locale `direction: 'rtl'`; see [i18n.md](i18n.md)                                                          |
 
-Nested / per-subtree theme roots are ConfigProvider (separate task). `setTheme` always applies to `document.documentElement`.
+`theme` / `dir` / `lang` are an application-level document singleton. `setTheme` always writes `document.documentElement`. There is no subtree theme root.
 
 ## Motion API
 

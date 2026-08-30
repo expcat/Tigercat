@@ -38,7 +38,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Button                | Basic      | `basic`      | button.ts                                           | ./Button                |
 | ButtonGroup           | Basic      | `basic`      | button.ts                                           | ./ButtonGroup           |
 | Code                  | Basic      | `basic`      | code.ts                                             | ./Code                  |
-| ConfigProvider        | Basic      | `basic`      | ConfigProvider.tsx, ConfigProvider.ts               | ./ConfigProvider        |
+| ConfigProvider        | Basic      | `basic`      | config-provider.ts                                  | ./ConfigProvider        |
 | CropUpload            | Basic      | `basic`      | image.ts                                            | ./CropUpload            |
 | Divider               | Basic      | `basic`      | divider.ts                                          | ./Divider               |
 | Empty                 | Basic      | `basic`      | empty.ts                                            | ./Empty                 |

@@ -1,7 +1,7 @@
 {
   "id": "config-provider-01",
   "title": "全局配置",
-  "description": "动态切换 ConfigProvider 的 locale、theme、colorScheme 与 direction 配置。",
+  "description": "官方 zhCN/enUS 对象、modern 主题、colorScheme=auto。theme/dir/lang 写 document（iframe 的 html）；内层只改 context。",
   "order": 1,
   "entry": "App.tsx"
 }

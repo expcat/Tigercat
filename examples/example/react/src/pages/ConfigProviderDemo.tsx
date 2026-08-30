@@ -7,7 +7,7 @@ export default function ConfigProviderDemo() {
   return (
     <DemoPage
       title="ConfigProvider 全局配置"
-      description="为组件树统一提供语言、主题、配色模式和文字方向。"
+      description="应用根 ConfigProvider 写入 document 的 locale / theme / dir / lang；内层只改 context。"
       modules={modules}
     />
   )

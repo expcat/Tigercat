@@ -81,13 +81,14 @@ description: Compact generated Tigercat Basic props reference
 
 ## ConfigProvider
 
-`packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts` · `-`
+`packages/core/src/types/config-provider.ts` · `ConfigProviderProps`
 
-| Prop           | Type               | Default | Notes                |
-| -------------- | ------------------ | ------- | -------------------- |
-| `locale?`      | `TigerLocaleInput` | `-`     | Locale configuration |
-| `theme?`       | `string`           | `-`     | Theme name           |
-| `colorScheme?` | `ColorScheme`      | `-`     | Theme color scheme   |
+| Prop           | Type                   | Default | Notes                                                                          |
+| -------------- | ---------------------- | ------- | ------------------------------------------------------------------------------ |
+| `locale?`      | `TigerLocaleInput`     | `-`     | Locale object, Promise, or loader. Nested providers merge onto the parent.     |
+| `theme?`       | `string`               | `-`     | Theme name applied to the document by the outermost provider                   |
+| `colorScheme?` | `ColorScheme`          | `-`     | Color scheme. 'auto' is light on first paint / SSR                             |
+| `direction?`   | `TigerLocaleDirection` | `-`     | Explicit text direction. Wins over locale.direction and language-id inference. |
 
 ## CropUpload
 
