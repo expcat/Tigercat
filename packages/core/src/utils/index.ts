@@ -224,3 +224,6 @@ export * from './masonry-utils'
 
 export { resolveConfigDirection, resolveTigerConfig } from './config-provider-utils'
 export type { ResolveTigerConfigInput } from './config-provider-utils'
+
+export { createDocumentConfigHandle, resetDocumentConfigScope } from './document-config'
+export type { DocumentConfigHandle, DocumentConfigValues } from './document-config'

@@ -4,9 +4,14 @@
 
 import { afterEach, describe, it, expect } from 'vitest'
 import { render, waitFor } from '@testing-library/vue'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
-import type { TigerLocale } from '@expcat/tigercat-core'
+import {
+  resetDocumentConfigScope,
+  resetTigerLocaleScope,
+  ThemeManager,
+  type TigerLocale
+} from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const LocaleDisplay = defineComponent({
@@ -17,15 +22,27 @@ const LocaleDisplay = defineComponent({
       h('div', [
         h('span', { 'data-testid': 'ok' }, config.value.locale?.common?.okText ?? 'default'),
         h('span', { 'data-testid': 'loading' }, config.value.localeLoading ? 'loading' : 'ready'),
-        h('span', { 'data-testid': 'direction' }, config.value.direction ?? 'none')
+        h('span', { 'data-testid': 'direction' }, config.value.direction ?? 'none'),
+        h('span', { 'data-testid': 'theme' }, config.value.theme ?? 'none')
       ])
   }
 })
 
+function resetDocument(): void {
+  resetDocumentConfigScope()
+  resetTigerLocaleScope()
+  ThemeManager.setTheme('default')
+  ThemeManager.setColorScheme('light')
+  document.documentElement.removeAttribute('dir')
+  document.documentElement.removeAttribute('data-tiger-dir')
+  document.documentElement.removeAttribute('lang')
+  document.documentElement.removeAttribute('data-tiger-style')
+  document.documentElement.classList.remove('dark')
+}
+
 describe('ConfigProvider', () => {
   afterEach(() => {
-    document.documentElement.removeAttribute('dir')
-    document.documentElement.removeAttribute('data-tiger-dir')
+    resetDocument()
   })
 
   describe('sync locale', () => {
@@ -97,6 +114,7 @@ describe('ConfigProvider', () => {
       )
 
       expect(getByTestId('direction').textContent).toBe('ltr')
+      expect(document.documentElement.getAttribute('dir')).toBe('rtl')
     })
   })
 
@@ -208,6 +226,77 @@ describe('ConfigProvider', () => {
         expect(getByTestId('loading').textContent).toBe('ready')
         expect(getByTestId('ok').textContent).toBe('Outer Done')
       })
+    })
+  })
+
+  describe('document ownership', () => {
+    it('keeps the outer theme on the document while nested providers only change context', async () => {
+      const showInner = ref(true)
+      const { getByTestId } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { theme: 'vibrant' }, () =>
+                showInner.value
+                  ? h(ConfigProvider, { theme: 'minimal' }, () => h(LocaleDisplay))
+                  : h(LocaleDisplay)
+              )
+          }
+        })
+      )
+
+      expect(getByTestId('theme').textContent).toBe('minimal')
+      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+
+      showInner.value = false
+      await waitFor(() => {
+        expect(getByTestId('theme').textContent).toBe('vibrant')
+      })
+      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+    })
+
+    it('does not remove an existing html dir when unmounting a locale-only provider', () => {
+      document.documentElement.setAttribute('dir', 'rtl')
+
+      const { unmount } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { okText: 'OK' } } }, () => h(LocaleDisplay))
+          }
+        })
+      )
+
+      unmount()
+
+      expect(document.documentElement.getAttribute('dir')).toBe('rtl')
+    })
+
+    it('does not restore over a remaining sibling owner', () => {
+      const first = render(
+        defineComponent({
+          setup() {
+            return () => h(ConfigProvider, { direction: 'rtl' }, () => h('span', 'first'))
+          }
+        })
+      )
+      const second = render(
+        defineComponent({
+          setup() {
+            return () => h(ConfigProvider, { direction: 'ltr' }, () => h('span', 'second'))
+          }
+        })
+      )
+
+      expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+
+      first.unmount()
+
+      expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+
+      second.unmount()
+
+      expect(document.documentElement.getAttribute('dir')).toBeNull()
     })
   })
 

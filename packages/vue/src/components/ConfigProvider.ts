@@ -16,13 +16,13 @@ import {
   getImmediateTigerLocale,
   resolveTigerLocale,
   resolveTigerConfig,
-  isBrowser,
-  ThemeManager,
+  createDocumentConfigHandle,
   type TigerConfig,
   type TigerLocale,
   type TigerLocaleInput,
   type TigerLocaleDirection,
-  type ColorScheme
+  type ColorScheme,
+  type DocumentConfigHandle
 } from '@expcat/tigercat-core'
 import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
 
@@ -62,8 +62,12 @@ export const ConfigProvider = defineComponent({
   name: 'TigerConfigProvider',
   props: configProviderProps,
   setup(props, { slots }) {
-    const parent = useTigerConfig()
+    const parentInjected = inject(TigerConfigKey, null)
+    const isDocumentOwner = parentInjected === null
+    const parent = parentInjected ?? computed(() => ({}) as TigerConfig)
     let globalLocaleHandle: GlobalTigerLocaleHandle | null = null
+    let documentHandle: DocumentConfigHandle | null = null
+    let didHydrateDocument = false
 
     const resolvedLocale = ref<Partial<TigerLocale> | undefined>(
       isLazyTigerLocale(props.locale) ? undefined : getImmediateTigerLocale(props.locale)
@@ -111,23 +115,6 @@ export const ConfigProvider = defineComponent({
       })
     )
 
-    // Apply theme when it changes
-    watch(
-      () => merged.value.theme,
-      (name) => {
-        if (name) ThemeManager.setTheme(name)
-      },
-      { immediate: true }
-    )
-
-    watch(
-      () => merged.value.colorScheme,
-      (scheme) => {
-        if (scheme) ThemeManager.setColorScheme(scheme)
-      },
-      { immediate: true }
-    )
-
     watch(
       () => merged.value.locale,
       (locale) => {
@@ -140,20 +127,17 @@ export const ConfigProvider = defineComponent({
       { immediate: true }
     )
 
-    let previousDir: string | null = null
-    let previousDataDir: string | null = null
     watch(
-      () => merged.value.direction,
-      (direction) => {
-        if (!direction || !isBrowser()) return
-
-        const root = document.documentElement
-        if (previousDir === null && previousDataDir === null) {
-          previousDir = root.getAttribute('dir')
-          previousDataDir = root.getAttribute('data-tiger-dir')
-        }
-        root.setAttribute('dir', direction)
-        root.setAttribute('data-tiger-dir', direction)
+      () => ({
+        theme: merged.value.theme,
+        colorScheme: merged.value.colorScheme,
+        direction: merged.value.direction
+      }),
+      (values) => {
+        if (!isDocumentOwner) return
+        if (!documentHandle) documentHandle = createDocumentConfigHandle()
+        documentHandle.apply(values, { hydrateAuto: !didHydrateDocument })
+        didHydrateDocument = true
       },
       { immediate: true }
     )
@@ -161,13 +145,8 @@ export const ConfigProvider = defineComponent({
     onBeforeUnmount(() => {
       globalLocaleHandle?.dispose()
       globalLocaleHandle = null
-
-      if (!isBrowser()) return
-      const root = document.documentElement
-      if (previousDir === null) root.removeAttribute('dir')
-      else root.setAttribute('dir', previousDir)
-      if (previousDataDir === null) root.removeAttribute('data-tiger-dir')
-      else root.setAttribute('data-tiger-dir', previousDataDir)
+      documentHandle?.dispose()
+      documentHandle = null
     })
 
     provide(TigerConfigKey, merged)

@@ -4,16 +4,18 @@ import {
   getImmediateTigerLocale,
   resolveTigerLocale,
   resolveTigerConfig,
-  ThemeManager,
+  createDocumentConfigHandle,
   type TigerConfig,
   type ConfigProviderProps as CoreConfigProviderProps,
-  type TigerLocale
+  type TigerLocale,
+  type DocumentConfigHandle
 } from '@expcat/tigercat-core'
 import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
 
 export type { TigerConfig }
 
-const TigerConfigContext = React.createContext<TigerConfig>({})
+const EMPTY_CONFIG: TigerConfig = {}
+const TigerConfigContext = React.createContext<TigerConfig>(EMPTY_CONFIG)
 
 export interface ConfigProviderProps extends CoreConfigProviderProps {
   children?: React.ReactNode
@@ -27,7 +29,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   children
 }) => {
   const parent = useContext(TigerConfigContext)
+  const isDocumentOwner = parent === EMPTY_CONFIG
   const globalLocaleHandleRef = useRef<GlobalTigerLocaleHandle | null>(null)
+  const documentHandleRef = useRef<DocumentConfigHandle | null>(null)
+  const hydratedDocumentRef = useRef(false)
 
   const isLazy = isLazyTigerLocale(locale)
   const immediateLocale = isLazy ? undefined : getImmediateTigerLocale(locale)
@@ -80,14 +85,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   )
 
   useEffect(() => {
-    if (value.theme) ThemeManager.setTheme(value.theme)
-  }, [value.theme])
-
-  useEffect(() => {
-    if (value.colorScheme) ThemeManager.setColorScheme(value.colorScheme)
-  }, [value.colorScheme])
-
-  useEffect(() => {
     globalLocaleHandleRef.current = createGlobalTigerLocaleHandle(value.locale)
     return () => {
       globalLocaleHandleRef.current?.dispose()
@@ -100,21 +97,28 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   }, [value.locale])
 
   useEffect(() => {
-    if (!value.direction || typeof document === 'undefined') return
-
-    const root = document.documentElement
-    const previousDir = root.getAttribute('dir')
-    const previousDataDir = root.getAttribute('data-tiger-dir')
-    root.setAttribute('dir', value.direction)
-    root.setAttribute('data-tiger-dir', value.direction)
-
+    if (!isDocumentOwner) return
+    const handle = createDocumentConfigHandle()
+    documentHandleRef.current = handle
     return () => {
-      if (previousDir === null) root.removeAttribute('dir')
-      else root.setAttribute('dir', previousDir)
-      if (previousDataDir === null) root.removeAttribute('data-tiger-dir')
-      else root.setAttribute('data-tiger-dir', previousDataDir)
+      handle.dispose()
+      documentHandleRef.current = null
+      hydratedDocumentRef.current = false
     }
-  }, [value.direction])
+  }, [isDocumentOwner])
+
+  useEffect(() => {
+    if (!documentHandleRef.current) return
+    documentHandleRef.current.apply(
+      {
+        theme: value.theme,
+        colorScheme: value.colorScheme,
+        direction: value.direction
+      },
+      { hydrateAuto: !hydratedDocumentRef.current }
+    )
+    hydratedDocumentRef.current = true
+  }, [value.theme, value.colorScheme, value.direction])
 
   return <TigerConfigContext.Provider value={value}>{children}</TigerConfigContext.Provider>
 }

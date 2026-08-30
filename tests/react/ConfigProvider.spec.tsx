@@ -2,11 +2,16 @@
  * @vitest-environment happy-dom
  */
 
-import { afterEach, describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect } from 'vitest'
 import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
-import type { TigerLocale } from '@expcat/tigercat-core'
+import {
+  resetDocumentConfigScope,
+  resetTigerLocaleScope,
+  ThemeManager,
+  type TigerLocale
+} from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function LocaleDisplay() {
@@ -16,14 +21,26 @@ function LocaleDisplay() {
       <span data-testid="ok">{config.locale?.common?.okText ?? 'default'}</span>
       <span data-testid="loading">{config.localeLoading ? 'loading' : 'ready'}</span>
       <span data-testid="direction">{config.direction ?? 'none'}</span>
+      <span data-testid="theme">{config.theme ?? 'none'}</span>
     </div>
   )
 }
 
+function resetDocument(): void {
+  resetDocumentConfigScope()
+  resetTigerLocaleScope()
+  ThemeManager.setTheme('default')
+  ThemeManager.setColorScheme('light')
+  document.documentElement.removeAttribute('dir')
+  document.documentElement.removeAttribute('data-tiger-dir')
+  document.documentElement.removeAttribute('lang')
+  document.documentElement.removeAttribute('data-tiger-style')
+  document.documentElement.classList.remove('dark')
+}
+
 describe('ConfigProvider', () => {
   afterEach(() => {
-    document.documentElement.removeAttribute('dir')
-    document.documentElement.removeAttribute('data-tiger-dir')
+    resetDocument()
   })
 
   describe('sync locale', () => {
@@ -77,6 +94,7 @@ describe('ConfigProvider', () => {
       )
 
       expect(getByTestId('direction').textContent).toBe('ltr')
+      expect(document.documentElement.getAttribute('dir')).toBe('rtl')
     })
   })
 
@@ -180,6 +198,71 @@ describe('ConfigProvider', () => {
         expect(getByTestId('loading').textContent).toBe('ready')
         expect(getByTestId('ok').textContent).toBe('Outer Done')
       })
+    })
+  })
+
+  describe('document ownership', () => {
+    it('keeps the outer theme on the document while nested providers only change context', () => {
+      function NestedTheme({ showInner }: { showInner: boolean }) {
+        return (
+          <ConfigProvider theme="vibrant">
+            {showInner ? (
+              <ConfigProvider theme="minimal">
+                <LocaleDisplay />
+              </ConfigProvider>
+            ) : (
+              <LocaleDisplay />
+            )}
+          </ConfigProvider>
+        )
+      }
+
+      const { getByTestId, rerender } = render(<NestedTheme showInner />)
+
+      expect(getByTestId('theme').textContent).toBe('minimal')
+      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+
+      rerender(<NestedTheme showInner={false} />)
+
+      expect(getByTestId('theme').textContent).toBe('vibrant')
+      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+    })
+
+    it('does not remove an existing html dir when unmounting a locale-only provider', () => {
+      document.documentElement.setAttribute('dir', 'rtl')
+
+      const { unmount } = render(
+        <ConfigProvider locale={{ common: { okText: 'OK' } }}>
+          <LocaleDisplay />
+        </ConfigProvider>
+      )
+
+      unmount()
+
+      expect(document.documentElement.getAttribute('dir')).toBe('rtl')
+    })
+
+    it('does not restore over a remaining sibling owner', () => {
+      const first = render(
+        <ConfigProvider direction="rtl">
+          <span>first</span>
+        </ConfigProvider>
+      )
+      const second = render(
+        <ConfigProvider direction="ltr">
+          <span>second</span>
+        </ConfigProvider>
+      )
+
+      expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+
+      first.unmount()
+
+      expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+
+      second.unmount()
+
+      expect(document.documentElement.getAttribute('dir')).toBeNull()
     })
   })
 

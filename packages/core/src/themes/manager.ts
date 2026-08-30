@@ -280,12 +280,19 @@ class ThemeManagerImpl {
    * Set the colour scheme strategy.
    * - `'light'` / `'dark'` — force a specific mode
    * - `'auto'` — follow `prefers-color-scheme` media query
+   *
+   * Pass `{ applyResolved: false }` with `'auto'` to attach the media listener
+   * without applying the current system preference. ConfigProvider uses that
+   * on first paint so SSR (light) does not flash `.dark` during hydrate.
    */
-  setColorScheme(scheme: ColorScheme): void {
+  setColorScheme(scheme: ColorScheme, options?: { applyResolved?: boolean }): void {
     this.colorScheme = scheme
 
     if (scheme === 'auto') {
       this.startWatchingMedia()
+      if (options?.applyResolved === false) {
+        return
+      }
       this.resolvedDark = resolveSystemDark()
     } else {
       this.stopWatchingMedia()
