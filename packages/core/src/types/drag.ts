@@ -110,6 +110,7 @@ export interface DragOverEvent {
 /** Payload emitted when a drop occurs */
 export interface DragDropEvent {
   item: DragItem
+  overItem: DragItem | null
   fromIndex: number
   toIndex: number
   fromContainerId: string
@@ -130,6 +131,39 @@ export interface DragCallbacks {
   onDragOver?: (event: DragOverEvent) => void
   onDrop?: (event: DragDropEvent) => void
   onDragEnd?: (event: DragEndEvent) => void
+}
+
+/**
+ * Public options for `useDrag` (React hook / Vue composable).
+ * Framework wrappers are thin aliases over `createListReorderController`.
+ */
+export interface UseDragOptions extends DragCallbacks {
+  /** Drag configuration */
+  config?: DragConfig
+  /** Container id for this list (cross-container drags compare these ids) */
+  containerId?: string
+}
+
+/**
+ * Minimal drag event shape accepted by list bindings (native or React synthetic).
+ */
+export interface DragBindingEvent {
+  preventDefault(): void
+  target: EventTarget | null
+  dataTransfer: DataTransfer | null
+}
+
+/**
+ * Minimal pointer event shape for the touch/pen fallback on list items.
+ */
+export interface DragPointerBindingEvent {
+  pointerType: string
+  button: number
+  pointerId: number
+  clientX: number
+  clientY: number
+  currentTarget: EventTarget | null
+  preventDefault(): void
 }
 
 // ---------------------------------------------------------------------------

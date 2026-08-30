@@ -142,6 +142,7 @@ export * from './gesture-utils'
 
 // Drag & Drop utilities (v0.8.0+)
 export * from './drag'
+export * from './list-reorder'
 
 // Splitter utilities (v0.8.0+)
 export * from './splitter-utils'

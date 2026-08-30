@@ -83,6 +83,14 @@ export function handleDragOver(
 ): void {
   if (!state.isDragging || !state.draggedItem) return
 
+  const nextIndex = overItem !== null ? overItem.index : state.targetIndex
+  const sameTarget =
+    state.targetContainerId === containerId &&
+    state.targetIndex === nextIndex &&
+    ((overItem === null && state.hoveredItem === null) ||
+      (overItem !== null && state.hoveredItem?.id === overItem.id))
+  if (sameTarget) return
+
   state.hoveredItem = overItem ? { ...overItem } : null
   state.targetContainerId = containerId
   if (overItem !== null) {
@@ -104,6 +112,7 @@ export function handleDrop(state: DragState, callbacks?: DragCallbacks): DragDro
 
   const event: DragDropEvent = {
     item: { ...state.draggedItem },
+    overItem: state.hoveredItem ? { ...state.hoveredItem } : null,
     fromIndex: state.sourceIndex,
     toIndex: state.targetIndex,
     fromContainerId: state.sourceContainerId ?? '',
@@ -152,6 +161,26 @@ export function updateDragOffset(state: DragState, offsetX: number, offsetY: num
 // ---------------------------------------------------------------------------
 
 /**
+ * Move one item in a sequence. Does not require `DragItem` (FileManager, List).
+ */
+export function reorderSequence<T>(items: readonly T[], fromIndex: number, toIndex: number): T[] {
+  if (
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= items.length ||
+    toIndex >= items.length ||
+    fromIndex === toIndex
+  ) {
+    return [...items]
+  }
+
+  const result = [...items]
+  const [moved] = result.splice(fromIndex, 1)
+  result.splice(toIndex, 0, moved)
+  return result
+}
+
+/**
  * Reorder items within a single container
  *
  * @returns New array with the item moved from fromIndex to toIndex
@@ -171,13 +200,8 @@ export function reorderItems<T extends DragItem>(
     return { items: [...items], fromIndex, toIndex }
   }
 
-  const result = [...items]
-  const [moved] = result.splice(fromIndex, 1)
-  result.splice(toIndex, 0, moved)
-
-  // Update indices
   return {
-    items: result.map((item, i) => ({ ...item, index: i })),
+    items: reorderSequence(items, fromIndex, toIndex).map((item, i) => ({ ...item, index: i })),
     fromIndex,
     toIndex
   }

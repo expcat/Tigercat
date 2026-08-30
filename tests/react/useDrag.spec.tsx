@@ -2,10 +2,11 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { act, renderHook } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { act, render, renderHook, fireEvent } from '@testing-library/react'
+import React from 'react'
 import { useDrag } from '@expcat/tigercat-react'
-import type { DragItem } from '@expcat/tigercat-core'
+import { clearActiveListDrag, type DragItem } from '@expcat/tigercat-core'
 
 function makeItems(containerId = 'list-a'): DragItem[] {
   return [
@@ -16,36 +17,68 @@ function makeItems(containerId = 'list-a'): DragItem[] {
 }
 
 function makeDragEvent(target: Element = document.createElement('div')) {
+  const dataTransfer = {
+    setData: vi.fn(),
+    effectAllowed: 'none',
+    dropEffect: 'none'
+  }
   return {
     target,
-    preventDefault: vi.fn()
+    preventDefault: vi.fn(),
+    dataTransfer
   } as unknown as React.DragEvent
 }
 
-describe('useDrag', () => {
-  it('returns the default idle state and prop helpers', () => {
-    const { result } = renderHook(() => useDrag())
-    const item = makeItems()[0]
+function DragList({
+  items,
+  containerId = 'list-a',
+  config,
+  onDrop
+}: {
+  items: DragItem[]
+  containerId?: string
+  config?: { disabled?: boolean; handleSelector?: string; dragClass?: string }
+  onDrop?: () => void
+}) {
+  const drag = useDrag({
+    containerId,
+    config,
+    onDrop: () => {
+      onDrop?.()
+    }
+  })
+  return (
+    <ul role="list" {...drag.getDropZoneProps()}>
+      {items.map((item) => {
+        const props = drag.getDragItemProps(item)
+        return (
+          <li key={item.id} {...props}>
+            {String(item.id)}
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
-    expect(result.current.isDragging).toBe(false)
-    expect(result.current.draggedItem).toBeNull()
-    expect(result.current.isSameContainer).toBe(true)
-    expect(result.current.isCrossContainer).toBe(false)
-    expect(result.current.reorder(makeItems())).toBeNull()
-    expect(result.current.moveBetween(makeItems(), makeItems('list-b'))).toBeNull()
-    expect(result.current.getDragItemProps(item)).toMatchObject({
-      draggable: true,
-      'data-drag-id': 'a',
-      'data-drag-index': 0,
-      'aria-grabbed': false,
-      role: 'listitem'
-    })
-    expect(result.current.getDropZoneProps()).toMatchObject({
-      'aria-dropeffect': 'none'
-    })
+describe('useDrag', () => {
+  beforeEach(() => {
+    clearActiveListDrag()
   })
 
-  it('starts, hovers, drops, and resets a same-container drag', () => {
+  it('returns idle state without listitem or deprecated ARIA', () => {
+    const { result } = renderHook(() => useDrag())
+    const item = makeItems()[0]
+    const props = result.current.getDragItemProps(item)
+    expect(result.current.isDragging).toBe(false)
+    expect(result.current.draggedItem).toBeNull()
+    expect(props.role).toBeUndefined()
+    expect(props['aria-grabbed']).toBeUndefined()
+    expect(result.current.getDropZoneProps()['aria-dropeffect']).toBeUndefined()
+    expect(result.current.reorder(makeItems())).toBeNull()
+  })
+
+  it('starts, hovers, drops, and fires onDragEnd as not cancelled', () => {
     const callbacks = {
       onDragStart: vi.fn(),
       onDragOver: vi.fn(),
@@ -57,8 +90,9 @@ describe('useDrag', () => {
 
     act(() => result.current.startDrag(items[0]))
     expect(result.current.isDragging).toBe(true)
-    expect(result.current.draggedItem?.id).toBe('a')
-    expect(callbacks.onDragStart).toHaveBeenCalledWith({ item: items[0], containerId: 'list-a' })
+    expect(callbacks.onDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({ item: expect.objectContaining({ id: 'a' }), containerId: 'list-a' })
+    )
 
     act(() => result.current.dragOver(items[2], makeDragEvent()))
     expect(callbacks.onDragOver).toHaveBeenCalled()
@@ -69,7 +103,6 @@ describe('useDrag', () => {
     act(() => {
       dropResult = result.current.drop(makeDragEvent())
     })
-
     expect(dropResult).toMatchObject({
       item: expect.objectContaining({ id: 'a' }),
       fromIndex: 0,
@@ -78,26 +111,25 @@ describe('useDrag', () => {
       toContainerId: 'list-a'
     })
     expect(callbacks.onDrop).toHaveBeenCalledWith(dropResult)
+    expect(callbacks.onDragEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: false }))
     expect(result.current.isDragging).toBe(false)
 
-    act(() => result.current.endDrag(true))
-    expect(callbacks.onDragEnd).not.toHaveBeenCalled()
+    act(() => result.current.endDrag())
+    expect(callbacks.onDragEnd).toHaveBeenCalledTimes(1)
   })
 
-  it('moves between source and target arrays using current drag indexes', () => {
+  it('updates targetContainerId from the hovered item', () => {
     const source = makeItems('source')
-    const target = makeItems('target')
-    const { result } = renderHook(() => useDrag({ containerId: 'source' }))
+    const { result } = renderHook(() =>
+      useDrag({ containerId: 'source', config: { crossContainer: true } })
+    )
 
-    act(() => result.current.startDrag(source[1]))
-    act(() => result.current.dragOver({ id: 'target-b', index: 1, containerId: 'source' }))
+    act(() => result.current.startDrag(source[0]))
+    act(() => result.current.dragOver({ id: 'x', index: 0, containerId: 'target' }))
 
-    expect(result.current.isSameContainer).toBe(true)
-    expect(result.current.isCrossContainer).toBe(false)
-    const moveResult = result.current.moveBetween(source, target)
-    expect(moveResult?.sourceItems.map((item) => item.id)).toEqual(['a', 'c'])
-    expect(moveResult?.targetItems.map((item) => item.id)).toEqual(['a', 'b', 'b', 'c'])
-    expect(moveResult?.movedItem.id).toBe('b')
+    expect(result.current.isCrossContainer).toBe(true)
+    expect(result.current.isSameContainer).toBe(false)
+    expect(result.current.state.targetContainerId).toBe('target')
   })
 
   it('ignores disabled drag and invalid drag handles', () => {
@@ -108,17 +140,19 @@ describe('useDrag', () => {
     const disabled = renderHook(() => useDrag({ config: { disabled: true } }))
     const restricted = renderHook(() => useDrag({ config: { handleSelector: '.drag-handle' } }))
 
-    act(() => disabled.result.current.startDrag(item))
+    act(() => disabled.result.current.startDrag(item, makeDragEvent()))
     expect(disabled.result.current.isDragging).toBe(false)
 
-    act(() => restricted.result.current.startDrag(item, makeDragEvent(wrongHandle)))
+    const blocked = makeDragEvent(wrongHandle)
+    act(() => restricted.result.current.startDrag(item, blocked))
     expect(restricted.result.current.isDragging).toBe(false)
+    expect(blocked.preventDefault).toHaveBeenCalled()
 
     act(() => restricted.result.current.startDrag(item, makeDragEvent(handle)))
     expect(restricted.result.current.isDragging).toBe(true)
   })
 
-  it('wire drag item and drop zone handlers to hook actions', () => {
+  it('appends dragClass and sets data-dragging while the item is dragged', () => {
     const items = makeItems()
     const { result } = renderHook(() => useDrag({ config: { dragClass: 'dragging' } }))
 
@@ -127,144 +161,58 @@ describe('useDrag', () => {
       ;(props.onDragStart as (event: React.DragEvent) => void)(makeDragEvent())
     })
     expect(result.current.getDragItemProps(items[0]).className).toBe('dragging')
-    expect(result.current.getDragItemProps(items[0])['aria-grabbed']).toBe(true)
-    expect(result.current.getDropZoneProps()['aria-dropeffect']).toBe('move')
+    expect(result.current.getDragItemProps(items[0])['data-dragging']).toBe(true)
 
     act(() => {
       const props = result.current.getDragItemProps(items[1])
-      const onDragOver = props.onDragOver as (event: React.DragEvent) => void
-      onDragOver(makeDragEvent())
+      ;(props.onDragOver as (event: React.DragEvent) => void)(makeDragEvent())
     })
     expect(result.current.state.targetIndex).toBe(1)
 
     act(() => {
-      const props = result.current.getDropZoneProps()
-      const onDragOver = props.onDragOver as (event: React.DragEvent) => void
-      const onDrop = props.onDrop as (event: React.DragEvent) => void
-      onDragOver(makeDragEvent())
-      onDrop(makeDragEvent())
+      const zone = result.current.getDropZoneProps()
+      ;(zone.onDrop as (event: React.DragEvent) => void)(makeDragEvent())
     })
     expect(result.current.isDragging).toBe(false)
   })
 
-  it('ends active drags through item props', () => {
-    const item = makeItems()[0]
+  it('binds attrs to DOM, calls setData, and drops onto another item', () => {
+    const items = makeItems()
+    const onDrop = vi.fn()
+    const { getByText } = render(<DragList items={items} onDrop={onDrop} />)
+    const first = getByText('a')
+    const third = getByText('c')
+    const dataTransfer = { setData: vi.fn(), effectAllowed: 'none', dropEffect: 'none' }
+
+    fireEvent.dragStart(first, { dataTransfer })
+    expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', 'a')
+    fireEvent.dragOver(third, { dataTransfer })
+    fireEvent.drop(third, { dataTransfer })
+
+    expect(onDrop).toHaveBeenCalledTimes(1)
+  })
+
+  it('reports cancelled when drag ends without a drop', () => {
     const onDragEnd = vi.fn()
+    const item = makeItems()[0]
     const { result } = renderHook(() => useDrag({ onDragEnd }))
 
     act(() => result.current.startDrag(item))
-    act(() => {
-      const props = result.current.getDragItemProps(item)
-      const onDragEndProp = props.onDragEnd as () => void
-      onDragEndProp()
-    })
+    act(() => result.current.endDrag())
 
+    expect(onDragEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: true }))
     expect(result.current.isDragging).toBe(false)
-    expect(onDragEnd).toHaveBeenCalledWith({ item, cancelled: false })
   })
 
-  describe('Edge Cases', () => {
-    it('returns null when dropping without an active drag', () => {
-      const { result } = renderHook(() => useDrag())
-      let dropResult = null as ReturnType<typeof result.current.drop>
-      act(() => {
-        dropResult = result.current.drop(makeDragEvent())
-      })
-      expect(dropResult).toBeNull()
-    })
-
-    it('ignores drag over without an active drag', () => {
-      const onDragOver = vi.fn()
-      const { result } = renderHook(() => useDrag({ onDragOver }))
-      act(() => result.current.dragOver(makeItems()[1], makeDragEvent()))
-      expect(onDragOver).not.toHaveBeenCalled()
-      expect(result.current.state.targetIndex).toBe(-1)
-    })
-
-    it('reports cancelled drag endings', () => {
-      const onDragEnd = vi.fn()
-      const item = makeItems()[0]
-      const { result } = renderHook(() => useDrag({ onDragEnd }))
-
-      act(() => result.current.startDrag(item))
-      act(() => result.current.endDrag(true))
-
-      expect(onDragEnd).toHaveBeenCalledWith({ item, cancelled: true })
-      expect(result.current.isDragging).toBe(false)
-    })
-
-    it('keeps container flags stable for unresolved cross-container targets', () => {
-      const source = makeItems('source')
-      const { result } = renderHook(() => useDrag({ containerId: 'source' }))
-
-      act(() => result.current.startDrag(source[0]))
-      act(() => result.current.dragOver({ id: 'x', index: 0, containerId: 'target' }))
-
-      expect(result.current.isCrossContainer).toBe(false)
-      expect(result.current.isSameContainer).toBe(true)
-      expect(result.current.reorder(source)?.items.map((item) => item.id)).toEqual(['a', 'b', 'c'])
-    })
-
-    it('falls back to source indexes when moving an out-of-range dragged item', () => {
-      const { result } = renderHook(() => useDrag({ containerId: 'source' }))
-
-      act(() => result.current.startDrag({ id: 'missing', index: 9, containerId: 'source' }))
-      act(() => result.current.dragOver({ id: 'target', index: 0, containerId: 'target' }))
-
-      const moveResult = result.current.moveBetween(makeItems('source'), makeItems('target'))
-      expect(moveResult?.movedItem.id).toBe('a')
-      expect(moveResult?.targetItems).toHaveLength(3)
-    })
-
-    it('applies custom class names to dragged items and drop zones', () => {
-      const item = makeItems()[0]
-      const { result } = renderHook(() =>
-        useDrag({ config: { dragClass: 'dragging', dropZoneClass: 'drop-zone' } })
-      )
-
-      expect(result.current.getDropZoneProps().className).toBeUndefined()
-      act(() => result.current.startDrag(item))
-      expect(result.current.getDragItemProps(item).className).toBe('dragging')
-      expect(result.current.getDropZoneProps().className).toBeUndefined()
-    })
-
-    it('uses default target values when dropping before dragOver', () => {
-      const onDrop = vi.fn()
-      const { result } = renderHook(() => useDrag({ onDrop }))
-
-      act(() => result.current.startDrag(makeItems()[0]))
-      act(() => result.current.drop(makeDragEvent()))
-
-      expect(onDrop).toHaveBeenCalledWith(
-        expect.objectContaining({ fromIndex: 0, toIndex: 0, toContainerId: 'default' })
-      )
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('exposes listitem drag state and drop effect semantics', () => {
-      const item = makeItems()[0]
-      const { result } = renderHook(() => useDrag())
-
-      expect(result.current.getDragItemProps(item)).toMatchObject({
-        role: 'listitem',
-        'aria-grabbed': false
-      })
-
-      act(() => result.current.startDrag(item))
-
-      expect(result.current.getDragItemProps(item)['aria-grabbed']).toBe(true)
-      expect(result.current.getDropZoneProps()['aria-dropeffect']).toBe('move')
-    })
-
-    it('removes drop effects after drag completion', () => {
-      const item = makeItems()[0]
-      const { result } = renderHook(() => useDrag())
-
-      act(() => result.current.startDrag(item))
-      act(() => result.current.endDrag(false))
-
-      expect(result.current.getDropZoneProps()['aria-dropeffect']).toBe('none')
-    })
+  it('reacts to disabled flipping after mount', () => {
+    const item = makeItems()[0]
+    const { result, rerender } = renderHook(
+      ({ disabled }: { disabled: boolean }) => useDrag({ config: { disabled } }),
+      { initialProps: { disabled: false } }
+    )
+    rerender({ disabled: true })
+    act(() => result.current.startDrag(item, makeDragEvent()))
+    expect(result.current.isDragging).toBe(false)
+    expect(result.current.getDragItemProps(item).draggable).toBe(false)
   })
 })

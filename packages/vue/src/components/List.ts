@@ -39,6 +39,7 @@ import {
   getPaginationLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
+  reorderSequence,
   type ComponentSize,
   type ListBorderStyle,
   type ListItemLayout,
@@ -48,6 +49,7 @@ import {
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
 import { Pagination } from './Pagination'
+import { useDrag } from '../composables/useDrag'
 import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -253,33 +255,18 @@ export const List = defineComponent({
         : internalCurrentPageSize.value
     )
 
-    // Drag state
-    const dragIndex = ref<number | null>(null)
-
-    function handleDragStart(index: number) {
-      dragIndex.value = index
-    }
-
-    function handleDragOver(e: DragEvent) {
-      e.preventDefault()
-    }
-
-    function handleDrop(index: number) {
-      if (dragIndex.value === null || dragIndex.value === index) {
-        dragIndex.value = null
-        return
+    const drag = useDrag({
+      containerId: 'list',
+      onDrop: (event) => {
+        if (event.fromIndex === event.toIndex) return
+        emit(
+          'reorder',
+          reorderSequence(props.dataSource, event.fromIndex, event.toIndex),
+          event.fromIndex,
+          event.toIndex
+        )
       }
-      const from = dragIndex.value
-      dragIndex.value = null
-      const items = [...props.dataSource]
-      const [moved] = items.splice(from, 1)
-      items.splice(index, 0, moved)
-      emit('reorder', items, from, index)
-    }
-
-    function handleDragEnd() {
-      dragIndex.value = null
-    }
+    })
 
     // Paginated data
     const paginatedData = computed(() => {
@@ -386,21 +373,17 @@ export const List = defineComponent({
     function getItemAttrs(item: ListItem, index: number, itemClasses: string) {
       const key = getItemKey(item, index)
       const clickable = hasItemClickListener.value
-      const draggableAttrs = props.draggable
-        ? {
-            draggable: true,
-            onDragstart: () => handleDragStart(index),
-            onDragover: handleDragOver,
-            onDrop: () => handleDrop(index),
-            onDragend: handleDragEnd
-          }
+      const dragBindings = props.draggable
+        ? drag.getDragItemAttrs({ id: String(key), index, containerId: 'list' })
         : {}
+      const { class: dragClass, ...dragRest } = dragBindings
       return {
         key,
         class: classNames(
           itemClasses,
           clickable && 'cursor-pointer',
-          props.draggable && 'cursor-grab'
+          props.draggable && 'cursor-grab touch-none',
+          dragClass as string | undefined
         ),
         role: 'listitem' as const,
         tabindex: clickable ? 0 : undefined,
@@ -413,7 +396,7 @@ export const List = defineComponent({
               }
             }
           : undefined,
-        ...draggableAttrs
+        ...dragRest
       }
     }
 
@@ -589,6 +572,7 @@ export const List = defineComponent({
             'div',
             {
               ...attrs,
+              ...(props.draggable ? drag.getDropZoneAttrs() : {}),
               class: classNames(listClasses.value, coerceClassValue(attrsClass)),
               style: mergeStyleValues(attrsStyle, props.style),
               role: 'list',

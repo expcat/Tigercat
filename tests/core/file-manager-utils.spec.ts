@@ -450,6 +450,7 @@ describe('file-manager-utils', () => {
       const items = [makeFile('a'), makeFile('b'), makeFile('c')]
       const result = applyFileDragReorder(items, {
         item: { id: 'a', index: 0 },
+        overItem: null,
         fromIndex: 0,
         toIndex: 2,
         fromContainerId: 'x',
@@ -462,6 +463,7 @@ describe('file-manager-utils', () => {
       const items = [makeFile('a'), makeFile('b')]
       const result = applyFileDragReorder(items, {
         item: { id: 'a', index: 0 },
+        overItem: null,
         fromIndex: 1,
         toIndex: 1,
         fromContainerId: 'x',

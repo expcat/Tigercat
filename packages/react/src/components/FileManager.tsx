@@ -265,6 +265,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
       const items = model.processedItems
       const reordered = applyFileDragReorder(items, {
         item: toFileDragItem(items[fromIndex], fromIndex),
+        overItem: null,
         fromIndex,
         toIndex,
         fromContainerId: '',

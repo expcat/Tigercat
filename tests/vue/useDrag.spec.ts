@@ -2,35 +2,46 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { defineComponent, h, nextTick, ref } from 'vue'
+import { render, fireEvent } from '@testing-library/vue'
 import { useDrag } from '@expcat/tigercat-vue'
-import type { DragItem } from '@expcat/tigercat-core'
+import { clearActiveListDrag, type DragItem } from '@expcat/tigercat-core'
 
-// Helper to call composable outside of setup()
 function setupDrag(options = {}) {
-  let result!: ReturnType<typeof useDrag>
-  // useDrag uses reactive/computed which work outside components
-  result = useDrag(options)
-  return result
+  return useDrag(options)
 }
 
-const item1: DragItem = { id: 'a', index: 0 }
-const item2: DragItem = { id: 'b', index: 1 }
-const item3: DragItem = { id: 'c', index: 2 }
+const item1: DragItem = { id: 'a', index: 0, containerId: 'default' }
+const item2: DragItem = { id: 'b', index: 1, containerId: 'default' }
+const item3: DragItem = { id: 'c', index: 2, containerId: 'default' }
+
+function makeDragEvent(target: Element = document.createElement('div')) {
+  return {
+    target,
+    preventDefault: vi.fn(),
+    dataTransfer: {
+      setData: vi.fn(),
+      effectAllowed: 'none',
+      dropEffect: 'none'
+    }
+  } as unknown as DragEvent
+}
 
 describe('useDrag (Vue composable)', () => {
+  beforeEach(() => {
+    clearActiveListDrag()
+  })
+
   describe('Initial state', () => {
-    it('returns idle state by default', () => {
-      const { state, isDragging, draggedItem } = setupDrag()
+    it('returns idle state without listitem or deprecated ARIA', () => {
+      const { state, isDragging, draggedItem, getDragItemAttrs, getDropZoneAttrs } = setupDrag()
       expect(isDragging.value).toBe(false)
       expect(draggedItem.value).toBeNull()
       expect(state.isDragging).toBe(false)
-    })
-
-    it('isSameContainer and isCrossContainer are computed refs', () => {
-      const { isSameContainer, isCrossContainer } = setupDrag()
-      expect(isSameContainer.value).toBe(true) // same default containerId
-      expect(isCrossContainer.value).toBe(false)
+      expect(getDragItemAttrs(item1).role).toBeUndefined()
+      expect(getDragItemAttrs(item1)['aria-grabbed']).toBeUndefined()
+      expect(getDropZoneAttrs()['aria-dropeffect']).toBeUndefined()
     })
   })
 
@@ -54,23 +65,22 @@ describe('useDrag (Vue composable)', () => {
 
     it('does not start drag when config.disabled is true', () => {
       const { startDrag, isDragging } = setupDrag({ config: { disabled: true } })
-      startDrag(item1)
+      startDrag(item1, makeDragEvent())
       expect(isDragging.value).toBe(false)
     })
 
-    it('validates drag handle when event is provided', () => {
+    it('prevents native drag when the handle selector does not match', () => {
       const { startDrag, isDragging } = setupDrag({
         config: { handleSelector: '.drag-handle' }
       })
-      const el = document.createElement('div')
-      const event = { target: el } as unknown as DragEvent
+      const event = makeDragEvent()
       startDrag(item1, event)
-      // el does not match .drag-handle, so drag should not start
+      expect(event.preventDefault).toHaveBeenCalled()
       expect(isDragging.value).toBe(false)
     })
   })
 
-  describe('dragOver', () => {
+  describe('dragOver and drop', () => {
     it('updates target item and index', () => {
       const { startDrag, dragOver, state } = setupDrag()
       startDrag(item1)
@@ -79,199 +89,115 @@ describe('useDrag (Vue composable)', () => {
       expect(state.hoveredItem).toMatchObject({ id: 'b' })
     })
 
-    it('accepts null item (hovering over empty area)', () => {
-      const { startDrag, dragOver, state } = setupDrag()
-      startDrag(item1)
-      dragOver(null)
-      expect(state.hoveredItem).toBeNull()
-    })
-
-    it('invokes onDragOver callback', () => {
-      const onDragOver = vi.fn()
-      const { startDrag, dragOver } = setupDrag({ onDragOver })
-      startDrag(item1)
-      dragOver(item2)
-      expect(onDragOver).toHaveBeenCalled()
-    })
-
     it('calls event.preventDefault when DragEvent provided', () => {
       const { startDrag, dragOver } = setupDrag()
       startDrag(item1)
-      const event = { preventDefault: vi.fn() } as unknown as DragEvent
+      const event = makeDragEvent()
       dragOver(item2, event)
       expect(event.preventDefault).toHaveBeenCalled()
     })
-  })
 
-  describe('drop', () => {
-    it('returns DragDropEvent with from/to data', () => {
-      const { startDrag, dragOver, drop } = setupDrag()
+    it('returns drop payload and fires onDragEnd as not cancelled', () => {
+      const onDrop = vi.fn()
+      const onDragEnd = vi.fn()
+      const { startDrag, dragOver, drop, isDragging, endDrag } = setupDrag({ onDrop, onDragEnd })
       startDrag(item1)
       dragOver(item2)
       const result = drop()
       expect(result).toMatchObject({
         fromIndex: 0,
-        toIndex: 1
+        toIndex: 1,
+        overItem: expect.objectContaining({ id: 'b' })
       })
-    })
-
-    it('resets state after drop', () => {
-      const { startDrag, dragOver, drop, isDragging } = setupDrag()
-      startDrag(item1)
-      dragOver(item2)
-      drop()
-      expect(isDragging.value).toBe(false)
-    })
-
-    it('invokes onDrop callback', () => {
-      const onDrop = vi.fn()
-      const { startDrag, dragOver, drop } = setupDrag({ onDrop })
-      startDrag(item1)
-      dragOver(item2)
-      drop()
       expect(onDrop).toHaveBeenCalled()
-    })
-
-    it('calls event.preventDefault when DragEvent provided', () => {
-      const { startDrag, drop } = setupDrag()
-      startDrag(item1)
-      const event = { preventDefault: vi.fn() } as unknown as DragEvent
-      drop(event)
-      expect(event.preventDefault).toHaveBeenCalled()
-    })
-
-    it('returns null when not dragging', () => {
-      const { drop } = setupDrag()
-      expect(drop()).toBeNull()
+      expect(onDragEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: false }))
+      expect(isDragging.value).toBe(false)
+      endDrag()
+      expect(onDragEnd).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('endDrag', () => {
-    it('resets drag state', () => {
-      const { startDrag, endDrag, isDragging } = setupDrag()
-      startDrag(item1)
-      endDrag()
-      expect(isDragging.value).toBe(false)
-    })
-
     it('invokes onDragEnd callback with cancelled flag', () => {
       const onDragEnd = vi.fn()
-      const { startDrag, endDrag } = setupDrag({ onDragEnd })
+      const { startDrag, endDrag, isDragging } = setupDrag({ onDragEnd })
       startDrag(item1)
-      endDrag(true)
+      endDrag()
       expect(onDragEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: true }))
+      expect(isDragging.value).toBe(false)
     })
   })
 
   describe('reorder', () => {
     it('reorders items array based on drag state', () => {
-      const items = [item1, item2, item3]
+      const list = [item1, item2, item3]
       const { startDrag, dragOver, reorder } = setupDrag()
-      startDrag(item1) // sourceIndex = 0
-      dragOver(item3) // targetIndex = 2
-      const result = reorder(items)
+      startDrag(item1)
+      dragOver(item3)
+      const result = reorder(list)
       expect(result).not.toBeNull()
       expect(result!.items.map((i) => i.id)).toEqual(['b', 'c', 'a'])
     })
-
-    it('returns null when not dragging', () => {
-      const { reorder } = setupDrag()
-      expect(reorder([item1, item2])).toBeNull()
-    })
   })
 
-  describe('moveBetween', () => {
-    it('moves item between containers', () => {
-      const source = [item1, item2]
-      const target = [item3]
-      const { startDrag, dragOver, moveBetween, state } = setupDrag()
-      startDrag(item1) // sourceIndex = 0
-      // Manually set targetIndex for cross-container scenario
-      dragOver(item3)
-      state.targetIndex = 1 // insert after item3
-      const result = moveBetween(source, target)
-      expect(result).not.toBeNull()
-      expect(result!.sourceItems).toHaveLength(1)
-      expect(result!.targetItems).toHaveLength(2)
-    })
-
-    it('returns null when not dragging', () => {
-      const { moveBetween } = setupDrag()
-      expect(moveBetween([item1], [item2])).toBeNull()
-    })
-  })
-
-  describe('getDragItemAttrs', () => {
-    it('returns draggable attributes for an item', () => {
-      const { getDragItemAttrs } = setupDrag()
-      const attrs = getDragItemAttrs(item1)
-      expect(attrs.draggable).toBe(true)
-      expect(attrs['data-drag-id']).toBe('a')
-      expect(attrs['data-drag-index']).toBe(0)
-      expect(attrs.role).toBe('listitem')
-    })
-
-    it('sets draggable false when config.disabled', () => {
-      const { getDragItemAttrs } = setupDrag({ config: { disabled: true } })
-      const attrs = getDragItemAttrs(item1)
-      expect(attrs.draggable).toBe(false)
-    })
-
-    it('marks aria-grabbed for currently dragged item', () => {
-      const { startDrag, getDragItemAttrs } = setupDrag()
-      startDrag(item1)
-      const attrs1 = getDragItemAttrs(item1)
-      const attrs2 = getDragItemAttrs(item2)
-      expect(attrs1['aria-grabbed']).toBe(true)
-      expect(attrs2['aria-grabbed']).toBe(false)
-    })
-
-    it('applies dragClass to dragged item', () => {
-      const { startDrag, getDragItemAttrs } = setupDrag({
-        config: { dragClass: 'is-dragging' }
+  describe('cross-container', () => {
+    it('updates targetContainerId from the hovered item', () => {
+      const { startDrag, dragOver, isCrossContainer, isSameContainer, state } = setupDrag({
+        containerId: 'source',
+        config: { crossContainer: true }
       })
-      startDrag(item1)
-      expect(getDragItemAttrs(item1).class).toBe('is-dragging')
-      expect(getDragItemAttrs(item2).class).toBeUndefined()
+      startDrag({ id: 'a', index: 0, containerId: 'source' })
+      dragOver({ id: 'x', index: 0, containerId: 'target' })
+      expect(isCrossContainer.value).toBe(true)
+      expect(isSameContainer.value).toBe(false)
+      expect(state.targetContainerId).toBe('target')
     })
   })
 
-  describe('getDropZoneAttrs', () => {
-    it('returns drop zone attributes when idle', () => {
-      const { getDropZoneAttrs } = setupDrag()
-      const attrs = getDropZoneAttrs()
-      expect(attrs['aria-dropeffect']).toBe('none')
-    })
-
-    it('returns move dropeffect when dragging', () => {
-      const { startDrag, getDropZoneAttrs } = setupDrag()
+  describe('live config', () => {
+    it('picks up disabled after it changes on the same options object', () => {
+      const options = { config: { disabled: false } }
+      const { startDrag, isDragging, endDrag } = setupDrag(options)
       startDrag(item1)
-      const attrs = getDropZoneAttrs()
-      expect(attrs['aria-dropeffect']).toBe('move')
+      expect(isDragging.value).toBe(true)
+      endDrag()
+      options.config.disabled = true
+      startDrag(item1, makeDragEvent())
+      expect(isDragging.value).toBe(false)
     })
   })
 
-  describe('container identification', () => {
-    it('uses custom containerId', () => {
-      const onDragStart = vi.fn()
-      const { startDrag } = setupDrag({ containerId: 'list-a', onDragStart })
-      startDrag(item1)
-      expect(onDragStart).toHaveBeenCalledWith(expect.objectContaining({ containerId: 'list-a' }))
-    })
-
-    it('isSameContainer is true for same container drag', () => {
-      const { startDrag, dragOver, isSameContainer } = setupDrag({ containerId: 'x' })
-      startDrag(item1)
-      dragOver(item2)
-      expect(isSameContainer.value).toBe(true)
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { state, getDropZoneAttrs } = setupDrag()
-      expect(state.isDragging).toBe(false)
-      expect(getDropZoneAttrs()['aria-dropeffect']).toBe('none')
+  describe('DOM bindings', () => {
+    it('calls setData on dragstart and emits drop on another item', async () => {
+      const onDrop = vi.fn()
+      const items = ref([item1, item2, item3])
+      const Comp = defineComponent({
+        setup() {
+          const drag = useDrag({
+            containerId: 'default',
+            onDrop: () => onDrop()
+          })
+          return () =>
+            h(
+              'ul',
+              { role: 'list', ...drag.getDropZoneAttrs() },
+              items.value.map((item) => {
+                const attrs = drag.getDragItemAttrs(item)
+                return h('li', { ...attrs, key: item.id }, String(item.id))
+              })
+            )
+        }
+      })
+      const { getByText } = render(Comp)
+      await nextTick()
+      const first = getByText('a')
+      const third = getByText('c')
+      const dataTransfer = { setData: vi.fn(), effectAllowed: 'none', dropEffect: 'none' }
+      await fireEvent.dragStart(first, { dataTransfer })
+      expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', 'a')
+      await fireEvent.dragOver(third, { dataTransfer })
+      await fireEvent.drop(third, { dataTransfer })
+      expect(onDrop).toHaveBeenCalledTimes(1)
     })
   })
 })

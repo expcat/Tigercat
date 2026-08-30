@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import {
   classNames,
+  reorderSequence,
   resolveLocaleText,
   mergeTigerLocale,
   getListClasses,
@@ -37,6 +38,7 @@ import {
 import { VirtualList } from './VirtualList'
 import { Pagination } from './Pagination'
 import { useTigerConfig } from './ConfigProvider'
+import { useDrag } from '../hooks/useDrag'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -212,11 +214,21 @@ export const List = <T extends ListItem = ListItem>({
 
   const [internalCurrentPage, setInternalCurrentPage] = useState(paginationCfg?.current || 1)
 
-  const dragIndexRef = React.useRef<number | null>(null)
-
   const [internalCurrentPageSize, setInternalCurrentPageSize] = useState(
     paginationCfg?.pageSize || 10
   )
+
+  const drag = useDrag({
+    containerId: 'list',
+    onDrop: (event) => {
+      if (event.fromIndex === event.toIndex) return
+      onReorder?.(
+        reorderSequence(dataSource, event.fromIndex, event.toIndex),
+        event.fromIndex,
+        event.toIndex
+      )
+    }
+  })
 
   // Remote mode treats current/pageSize as controlled props.
   const currentPage = isRemotePagination
@@ -387,6 +399,10 @@ export const List = <T extends ListItem = ListItem>({
           }
         }
       : undefined
+    const dragBindings = isDraggable
+      ? drag.getDragItemProps({ id: String(key), index, containerId: 'list' })
+      : {}
+    const { className: dragClassName, ...dragRest } = dragBindings
 
     return (
       <div
@@ -394,44 +410,14 @@ export const List = <T extends ListItem = ListItem>({
         className={classNames(
           itemClasses,
           clickable && 'cursor-pointer',
-          isDraggable && 'cursor-grab'
+          isDraggable && 'cursor-grab touch-none',
+          dragClassName as string | undefined
         )}
         role="listitem"
         tabIndex={clickable ? 0 : undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        draggable={isDraggable || undefined}
-        onDragStart={
-          isDraggable
-            ? () => {
-                dragIndexRef.current = index
-              }
-            : undefined
-        }
-        onDragOver={isDraggable ? (e) => e.preventDefault() : undefined}
-        onDrop={
-          isDraggable
-            ? () => {
-                const from = dragIndexRef.current
-                if (from === null || from === index) {
-                  dragIndexRef.current = null
-                  return
-                }
-                dragIndexRef.current = null
-                const items = [...dataSource] as T[]
-                const [moved] = items.splice(from, 1)
-                items.splice(index, 0, moved)
-                onReorder?.(items, from, index)
-              }
-            : undefined
-        }
-        onDragEnd={
-          isDraggable
-            ? () => {
-                dragIndexRef.current = null
-              }
-            : undefined
-        }>
+        {...dragRest}>
         {renderItem ? renderItem(item, index) : renderDefaultListItem(item, index)}
       </div>
     )
@@ -527,7 +513,12 @@ export const List = <T extends ListItem = ListItem>({
   return (
     <div className={listWrapperClasses}>
       <div className="relative">
-        <div {...divProps} className={listClasses} role="list" aria-busy={loading || undefined}>
+        <div
+          {...divProps}
+          {...(isDraggable ? drag.getDropZoneProps() : {})}
+          className={listClasses}
+          role="list"
+          aria-busy={loading || undefined}>
           {renderListHeader()}
           {renderListItems()}
           {renderListFooter()}

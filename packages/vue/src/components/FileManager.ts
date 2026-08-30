@@ -149,6 +149,7 @@ export const FileManager = defineComponent({
       const items = model.value.processedItems
       const reordered = applyFileDragReorder(items, {
         item: toFileDragItem(items[fromIndex], fromIndex),
+        overItem: null,
         fromIndex,
         toIndex,
         fromContainerId: '',
