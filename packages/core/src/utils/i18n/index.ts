@@ -19,3 +19,10 @@ export {
 export * from '../upload-labels'
 export { defineLocale } from './define-locale'
 export { defineText } from './define-text'
+export {
+  createTigerLocaleScope,
+  createGlobalTigerLocaleHandle,
+  getGlobalTigerLocale,
+  resetTigerLocaleScope
+} from './global-locale'
+export type { GlobalTigerLocaleHandle, TigerLocaleScope } from './global-locale'
