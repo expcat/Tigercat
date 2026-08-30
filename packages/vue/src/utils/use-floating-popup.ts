@@ -143,8 +143,8 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     referenceRef: triggerRef,
     floatingRef,
     containerRef,
-    placement: (props.placement ?? 'top') as FloatingPlacement,
-    offset: props.offset ?? 8,
+    placement: () => (props.placement ?? 'top') as FloatingPlacement,
+    offset: () => props.offset ?? 8,
     dismissOnOutside: computed(() => effectiveTrigger.value === 'click'),
     dismissOnEscape: computed(() => effectiveTrigger.value !== 'manual'),
     onDismiss: (reason) => {

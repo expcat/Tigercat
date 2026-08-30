@@ -18,7 +18,18 @@ import {
   type FloatingResult,
   type FloatingCleanup
 } from '@expcat/tigercat-core'
-import { h, ref, computed, Teleport, watch, onBeforeUnmount, type Ref, type VNodeChild } from 'vue'
+import {
+  h,
+  ref,
+  computed,
+  Teleport,
+  watch,
+  onBeforeUnmount,
+  toValue,
+  type MaybeRefOrGetter,
+  type Ref,
+  type VNodeChild
+} from 'vue'
 
 const OVERLAY_LAYER_SELECTOR = '[data-tiger-overlay-layer]'
 
@@ -179,19 +190,20 @@ export interface UseVueFloatingOptions {
    */
   enabled: Ref<boolean>
   /**
-   * Preferred placement
+   * Preferred placement. Accepts a value, ref, or getter so open overlays
+   * follow later placement changes (same as React render-time props).
    * @default 'bottom'
    */
-  placement?: FloatingPlacement
+  placement?: MaybeRefOrGetter<FloatingPlacement>
   /**
-   * Offset distance in pixels
+   * Offset distance in pixels. Accepts a value, ref, or getter.
    * @default 8
    */
-  offset?: number
+  offset?: MaybeRefOrGetter<number>
   /**
    * Arrow element ref
    */
-  arrowRef?: Ref<HTMLElement | null>
+  arrowRef?: MaybeRefOrGetter<HTMLElement | null>
   /**
    * Callback when placement changes (due to collision)
    */
@@ -249,19 +261,15 @@ export interface UseVueFloatingReturn {
  * ```
  */
 export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingReturn {
-  const {
-    referenceRef,
-    floatingRef,
-    enabled,
-    placement: initialPlacement = 'bottom',
-    offset: offsetDistance = 8,
-    arrowRef,
-    onPlacementChange
-  } = options
+  const { referenceRef, floatingRef, enabled, onPlacementChange } = options
+
+  const requestedPlacement = () => toValue(options.placement) ?? 'bottom'
+  const requestedOffset = () => toValue(options.offset) ?? 8
+  const requestedArrow = () => toValue(options.arrowRef) ?? null
 
   const x = ref(0)
   const y = ref(0)
-  const placement = ref<FloatingPlacement>(initialPlacement)
+  const placement = ref<FloatingPlacement>(requestedPlacement())
   const arrowX = ref<number | undefined>(undefined)
   const arrowY = ref<number | undefined>(undefined)
   const isPositioned = ref(false)
@@ -278,11 +286,11 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
     if (!enabled.value || !reference || !floating) return
 
     const floatingOptions: FloatingOptions = {
-      placement: initialPlacement,
-      offset: offsetDistance,
+      placement: requestedPlacement(),
+      offset: requestedOffset(),
       flip: true,
       shift: true,
-      arrowElement: arrowRef?.value
+      arrowElement: requestedArrow()
     }
 
     const result: FloatingResult = await computeFloatingPosition(
@@ -317,7 +325,15 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
   }
 
   watch(
-    [enabled, referenceRef, floatingRef],
+    () =>
+      [
+        enabled.value,
+        referenceRef.value,
+        floatingRef.value,
+        requestedPlacement(),
+        requestedOffset(),
+        requestedArrow()
+      ] as const,
     ([isEnabled, reference, floating]) => {
       updateRequest += 1
       // Cleanup previous auto-update
@@ -366,10 +382,10 @@ export interface UseVueAnchoredOverlayOptions {
   floatingRef: Ref<HTMLElement | null>
   containerRef?: Ref<HTMLElement | null>
   outsideRefs?: Array<Ref<HTMLElement | null> | undefined>
-  placement?: FloatingPlacement
-  offset?: number
-  layout?: AnchoredOverlayLayout
-  matchReferenceWidth?: boolean
+  placement?: MaybeRefOrGetter<FloatingPlacement>
+  offset?: MaybeRefOrGetter<number>
+  layout?: MaybeRefOrGetter<AnchoredOverlayLayout>
+  matchReferenceWidth?: MaybeRefOrGetter<boolean>
   portal?: Ref<boolean> | boolean
   dismissOnOutside?: Ref<boolean> | boolean
   dismissOnEscape?: Ref<boolean> | boolean
@@ -434,8 +450,8 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     referenceRef: options.referenceRef,
     floatingRef: options.floatingRef,
     enabled: options.enabled,
-    placement: options.placement ?? 'bottom-start',
-    offset: options.offset ?? 4
+    placement: () => toValue(options.placement) ?? 'bottom-start',
+    offset: () => toValue(options.offset) ?? 4
   })
 
   const dismiss = (reason: AnchoredOverlayDismissReason) => {
@@ -498,8 +514,8 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
   }))
   const floatingClasses = computed(() =>
     getAnchoredOverlayLayoutClasses(
-      options.layout ?? 'anchored',
-      options.matchReferenceWidth ?? false
+      toValue(options.layout) ?? 'anchored',
+      toValue(options.matchReferenceWidth) ?? false
     )
   )
 

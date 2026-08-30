@@ -18,6 +18,7 @@ vi.mock('@expcat/tigercat-core', async (importOriginal) => ({
 }))
 
 import { useVueFloating, type UseVueFloatingReturn } from '../../packages/vue/src/utils/overlay'
+import type { FloatingPlacement } from '@expcat/tigercat-core'
 
 describe('Vue floating positioning lifecycle', () => {
   beforeEach(() => {
@@ -56,5 +57,39 @@ describe('Vue floating positioning lifecycle', () => {
     expect(floatingState?.isPositioned.value).toBe(false)
     expect(floatingState?.x.value).toBe(0)
     expect(floatingState?.y.value).toBe(0)
+  })
+
+  it('recomputes position when placement changes while the overlay is open', async () => {
+    floatingMocks.computePosition.mockResolvedValue({
+      x: 10,
+      y: 20,
+      placement: 'top',
+      middlewareData: {}
+    })
+
+    const enabled = ref(true)
+    const placement = ref<FloatingPlacement>('bottom')
+    const offset = ref(8)
+    const referenceRef = ref<HTMLElement | null>(document.createElement('button'))
+    const floatingRef = ref<HTMLElement | null>(document.createElement('div'))
+    const Harness = defineComponent({
+      setup() {
+        useVueFloating({ referenceRef, floatingRef, enabled, placement, offset })
+        return () => h('div')
+      }
+    })
+
+    render(Harness)
+    await waitFor(() => expect(floatingMocks.computePosition).toHaveBeenCalledTimes(1))
+    expect(floatingMocks.computePosition.mock.calls[0]?.[2]).toEqual(
+      expect.objectContaining({ placement: 'bottom', offset: 8 })
+    )
+
+    placement.value = 'top'
+    offset.value = 16
+    await waitFor(() => expect(floatingMocks.computePosition).toHaveBeenCalledTimes(2))
+    expect(floatingMocks.computePosition.mock.calls[1]?.[2]).toEqual(
+      expect.objectContaining({ placement: 'top', offset: 16 })
+    )
   })
 })

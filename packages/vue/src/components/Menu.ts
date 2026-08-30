@@ -869,7 +869,7 @@ export const SubMenu = defineComponent({
       referenceRef: titleEl,
       floatingRef: popupEl,
       enabled: computed(() => isPopup.value && isExpanded.value),
-      placement: popupPlacement.value,
+      placement: popupPlacement,
       offset: 4,
       portal: popupPortal,
       dismissOnEscape: true,
