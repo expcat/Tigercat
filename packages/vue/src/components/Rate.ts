@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, type PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, type PropType } from 'vue'
 import type { RateSize } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
@@ -24,7 +24,8 @@ export type VueRateProps = InstanceType<typeof Rate>['$props']
 export const Rate = defineComponent({
   name: 'TigerRate',
   props: {
-    modelValue: { type: Number, default: 0 },
+    modelValue: { type: Number, default: undefined },
+    defaultValue: { type: Number, default: 0 },
     count: { type: Number, default: 5 },
     allowHalf: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -38,11 +39,29 @@ export const Rate = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const hoverValue = ref(0)
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const innerValue = ref(props.defaultValue)
+    const currentValue = computed(() =>
+      isControlled.value ? (props.modelValue as number) : innerValue.value
+    )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getRateLabels(mergedLocale.value, props.labels))
 
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) innerValue.value = next
+      }
+    )
+
+    function commitValue(next: number) {
+      if (!isControlled.value) innerValue.value = next
+      emit('update:modelValue', next)
+      emit('change', next)
+    }
+
     const displayValue = computed(() =>
-      hoverValue.value > 0 ? hoverValue.value : props.modelValue
+      hoverValue.value > 0 ? hoverValue.value : currentValue.value
     )
 
     function getStarValue(index: number, isHalf: boolean): number {
@@ -55,9 +74,8 @@ export const Rate = defineComponent({
       const rect = el.getBoundingClientRect()
       const isHalf = props.allowHalf && e.clientX - rect.left < rect.width / 2
       const val = getStarValue(index, isHalf)
-      const newVal = props.allowClear && val === props.modelValue ? 0 : val
-      emit('update:modelValue', newVal)
-      emit('change', newVal)
+      const newVal = props.allowClear && val === currentValue.value ? 0 : val
+      commitValue(newVal)
     }
 
     function handleMouseMove(index: number, e: MouseEvent) {
@@ -81,15 +99,15 @@ export const Rate = defineComponent({
     function handleKeydown(e: KeyboardEvent) {
       if (props.disabled) return
       const step = props.allowHalf ? 0.5 : 1
-      let next = props.modelValue
+      let next = currentValue.value
       switch (e.key) {
         case 'ArrowRight':
         case 'ArrowUp':
-          next = Math.min(props.count, props.modelValue + step)
+          next = Math.min(props.count, currentValue.value + step)
           break
         case 'ArrowLeft':
         case 'ArrowDown':
-          next = Math.max(0, props.modelValue - step)
+          next = Math.max(0, currentValue.value - step)
           break
         case 'Home':
           next = 0
@@ -101,10 +119,7 @@ export const Rate = defineComponent({
           return
       }
       e.preventDefault()
-      if (next !== props.modelValue) {
-        emit('update:modelValue', next)
-        emit('change', next)
-      }
+      commitValue(next)
     }
 
     return () => {
@@ -193,7 +208,7 @@ export const Rate = defineComponent({
 
       const valueText = formatRateValueText(
         labels.value.valueText,
-        props.modelValue,
+        currentValue.value,
         mergedLocale.value?.locale
       )
 
@@ -205,7 +220,7 @@ export const Rate = defineComponent({
           'aria-label': labels.value.ariaLabel,
           'aria-valuemin': 0,
           'aria-valuemax': props.count,
-          'aria-valuenow': props.modelValue,
+          'aria-valuenow': currentValue.value,
           'aria-valuetext': valueText,
           'aria-disabled': props.disabled || undefined,
           'aria-orientation': 'horizontal',

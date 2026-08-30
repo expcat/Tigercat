@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, PropType } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type { MentionsSize, MentionOption } from '@expcat/tigercat-core'
 import {
@@ -12,6 +12,7 @@ import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overla
 
 export interface VueMentionsProps {
   modelValue?: string
+  defaultValue?: string
   prefix?: string
   options?: MentionOption[]
   placeholder?: string
@@ -23,7 +24,8 @@ export interface VueMentionsProps {
 export const Mentions = defineComponent({
   name: 'TigerMentions',
   props: {
-    modelValue: { type: String, default: '' },
+    modelValue: { type: String, default: undefined },
+    defaultValue: { type: String, default: '' },
     prefix: { type: String, default: '@' },
     options: { type: Array as PropType<MentionOption[]>, default: () => [] },
     placeholder: { type: String, default: undefined },
@@ -33,6 +35,25 @@ export const Mentions = defineComponent({
   },
   emits: ['update:modelValue', 'change', 'select'],
   setup(props, { emit, attrs }) {
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const innerValue = ref(props.defaultValue)
+    const currentValue = computed(() =>
+      isControlled.value ? (props.modelValue as string) : innerValue.value
+    )
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) innerValue.value = next
+      }
+    )
+
+    function commitValue(next: string) {
+      if (!isControlled.value) innerValue.value = next
+      emit('update:modelValue', next)
+      emit('change', next)
+    }
+
     const isOpen = ref(false)
     const activeIndex = ref(0)
     const mentionStartPos = ref(-1)
@@ -63,8 +84,7 @@ export const Mentions = defineComponent({
     function handleInput(e: Event) {
       const target = e.target as HTMLTextAreaElement
       const value = target.value
-      emit('update:modelValue', value)
-      emit('change', value)
+      commitValue(value)
 
       const cursorPos = target.selectionStart ?? value.length
       const result = extractMentionQuery(value, cursorPos, props.prefix ?? '@')
@@ -80,12 +100,11 @@ export const Mentions = defineComponent({
 
     function selectOption(option: MentionOption) {
       if (option.disabled) return
-      const val = props.modelValue || ''
+      const val = currentValue.value || ''
       const before = val.slice(0, mentionStartPos.value)
       const after = val.slice(textareaRef.value?.selectionStart ?? val.length)
       const newValue = `${before}${props.prefix}${option.value} ${after}`
-      emit('update:modelValue', newValue)
-      emit('change', newValue)
+      commitValue(newValue)
       emit('select', option)
       isOpen.value = false
     }
@@ -113,7 +132,7 @@ export const Mentions = defineComponent({
       return h('div', { ref: containerRef, class: wrapperClass }, [
         h('textarea', {
           ref: textareaRef,
-          value: props.modelValue,
+          value: currentValue.value,
           class: getMentionsInputClasses(props.size ?? 'md', props.disabled ?? false),
           placeholder: props.placeholder,
           disabled: props.disabled,

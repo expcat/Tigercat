@@ -90,7 +90,7 @@ export const TimePicker = defineComponent({
      */
     modelValue: {
       type: [String, Array, null] as PropType<string | null | [string | null, string | null]>,
-      default: null
+      default: undefined
     },
 
     /**
@@ -277,6 +277,23 @@ export const TimePicker = defineComponent({
 
     const isRangeMode = computed(() => props.range === true)
     const activePart = ref<'start' | 'end'>('start')
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const innerValue = ref<VueTimePickerModelValue | undefined>(undefined)
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) innerValue.value = next
+      }
+    )
+
+    const currentModel = computed(() => (isControlled.value ? props.modelValue : innerValue.value))
+
+    const commitValue = (value: TimePickerModelValue) => {
+      if (!isControlled.value) innerValue.value = value
+      emit('update:modelValue', value)
+      emit('change', value)
+    }
 
     const normalizeRangeValue = (value: unknown): TimePickerRangeInputValue => {
       if (Array.isArray(value)) return [value[0] ?? null, value[1] ?? null]
@@ -285,13 +302,13 @@ export const TimePicker = defineComponent({
 
     const currentRangeValue = computed<TimePickerRangeInputValue>(() => {
       if (!isRangeMode.value) return [null, null]
-      return normalizeRangeValue(props.modelValue)
+      return normalizeRangeValue(currentModel.value)
     })
 
     const currentSingleValue = computed<string | null>(() => {
       if (isRangeMode.value) return null
-      return typeof props.modelValue === 'string' || props.modelValue === null
-        ? props.modelValue
+      return typeof currentModel.value === 'string' || currentModel.value === null
+        ? currentModel.value
         : null
     })
 
@@ -505,8 +522,7 @@ export const TimePicker = defineComponent({
       )
 
       if (!isRangeMode.value) {
-        emit('update:modelValue', timeString)
-        emit('change', timeString)
+        commitValue(timeString)
         return
       }
 
@@ -550,8 +566,7 @@ export const TimePicker = defineComponent({
       if (activePart.value === 'start' && endSeconds !== null && candidateSeconds > endSeconds) {
         nextRange[1] = timeString
       }
-      emit('update:modelValue', nextRange)
-      emit('change', nextRange)
+      commitValue(nextRange)
 
       if (activePart.value === 'start' && nextRange[1] === null) {
         activePart.value = 'end'
@@ -562,15 +577,13 @@ export const TimePicker = defineComponent({
       event.stopPropagation()
 
       if (!isRangeMode.value) {
-        emit('update:modelValue', null)
-        emit('change', null)
+        commitValue(null)
         emit('clear')
         return
       }
 
       const cleared: [string | null, string | null] = [null, null]
-      emit('update:modelValue', cleared)
-      emit('change', cleared)
+      commitValue(cleared)
       emit('clear')
     }
 

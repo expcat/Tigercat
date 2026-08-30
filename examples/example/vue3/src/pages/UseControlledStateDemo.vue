@@ -1,35 +1,71 @@
 <script setup lang="ts">
+import { computed, defineComponent, h, ref } from 'vue'
 import { Alert } from '@expcat/tigercat-vue/Alert'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Card } from '@expcat/tigercat-vue/Card'
+
+const Counter = defineComponent({
+  name: 'DemoCounter',
+  props: {
+    modelValue: { type: Number, default: undefined },
+    defaultValue: { type: Number, default: 0 }
+  },
+  emits: ['update:modelValue'],
+  setup(props, { emit }) {
+    const inner = ref(props.defaultValue)
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const count = computed(() => (isControlled.value ? (props.modelValue as number) : inner.value))
+
+    function commit(next: number) {
+      if (!isControlled.value) inner.value = next
+      emit('update:modelValue', next)
+    }
+
+    return () =>
+      h('div', { class: 'flex items-center gap-3' }, [
+        h(Button, { onClick: () => commit(count.value - 1) }, () => '-'),
+        h('span', { class: 'w-8 text-center font-medium' }, String(count.value)),
+        h(Button, { onClick: () => commit(count.value + 1) }, () => '+')
+      ])
+  }
+})
+
+const controlledCount = ref(5)
 </script>
 
 <template>
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2">useControlledState 受控/非受控</h1>
+      <h1 class="text-3xl font-bold mb-2">useControlledState</h1>
       <p class="text-gray-600 dark:text-gray-400">
-        该 Hook 仅在 React 版本中提供，Vue 版本请直接使用 <code>v-model</code>。
+        React 独有 hook。Vue 没有导出 composable，但受控哨兵同一句：
+        <code>undefined</code> 非受控，<code>null</code> 是合法空值。
       </p>
     </div>
 
     <Alert
       type="info"
-      message="为什么 Vue 不需要？"
-      description="Vue 的 v-model 已经原生支持「受控 + 默认值」语义；通过 props 与 emit('update:xxx') 即可在父子组件间双向同步，无需额外封装 Hook。" />
+      message="Vue 不导出这份 hook"
+      description="v-model 只是语法糖。省略 modelValue 才是非受控；把默认写成 null 或用 ?? 会把合法空值当成缺省。下面两块 Counter 用同一套哨兵。" />
 
-    <Card title="Vue 等价写法" class="mt-6">
-      <pre class="text-sm overflow-x-auto bg-gray-50 p-4 rounded"><code>// 父组件
-&lt;Counter v-model:value="count" /&gt;
+    <Card title="受控" class="mt-6">
+      <Counter v-model="controlledCount" />
+    </Card>
 
-// 子组件 props + emits
-const props = defineProps&lt;{ value?: number }&gt;()
-const emit = defineEmits&lt;{ (e: 'update:value', v: number): void }&gt;()
+    <Card title="非受控" class="mt-6">
+      <Counter :default-value="0" />
+    </Card>
 
-const inner = ref(props.value ?? 0)
-const value = computed(() =&gt; props.value ?? inner.value)
-function update(v: number) {
-  if (props.value === undefined) inner.value = v
-  emit('update:value', v)
+    <Card title="哨兵" class="mt-6">
+      <pre
+        class="text-sm overflow-x-auto bg-gray-50 p-4 rounded"><code>const isControlled = computed(() => props.modelValue !== undefined)
+const inner = ref(props.defaultValue ?? 0)
+const value = computed(() =>
+  isControlled.value ? props.modelValue : inner.value
+)
+function commit(next: number) {
+  if (!isControlled.value) inner.value = next
+  emit('update:modelValue', next)
 }</code></pre>
     </Card>
   </div>

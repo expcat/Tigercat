@@ -189,28 +189,20 @@ export const FormWizard = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getFormWizardLabels(mergedLocale.value, props.labels))
 
-    const innerCurrent = ref(props.current ?? props.defaultCurrent)
+    const innerCurrent = ref(props.defaultCurrent)
+    const isControlled = computed(() => props.current !== undefined)
 
     watch(
       () => props.current,
       (value) => {
-        if (value !== undefined) {
-          innerCurrent.value = value
-        }
-      }
-    )
-
-    watch(
-      () => props.defaultCurrent,
-      (value) => {
-        if (props.current === undefined && value !== undefined) {
-          innerCurrent.value = value
-        }
+        if (value !== undefined) innerCurrent.value = value
       }
     )
 
     const totalCount = computed(() => props.steps.length)
-    const currentIndex = computed(() => props.current ?? innerCurrent.value ?? 0)
+    const currentIndex = computed(() =>
+      isControlled.value ? (props.current as number) : (innerCurrent.value ?? 0)
+    )
     const currentStep = computed(() => props.steps[currentIndex.value])
 
     const wrapperClasses = computed(() =>

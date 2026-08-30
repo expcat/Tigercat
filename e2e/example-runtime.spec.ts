@@ -22,7 +22,7 @@ async function inspectRoute(
     })
 
     if (framework === 'Vue' && route === 'use-controlled-state') {
-      await expect(page.getByText(/Vue 版本请直接使用/)).toBeVisible({ timeout: 30_000 })
+      await expect(page.getByText(/React 独有 hook/)).toBeVisible({ timeout: 30_000 })
       await expect(page.locator('[data-demo-id]')).toHaveCount(0)
       return
     }

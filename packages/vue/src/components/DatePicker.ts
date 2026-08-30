@@ -146,7 +146,7 @@ export const DatePicker = defineComponent({
       type: [Date, String, Array, null] as PropType<
         Date | string | null | [Date | string | null, Date | string | null]
       >,
-      default: null
+      default: undefined
     },
     /**
      * Date picker size
@@ -301,15 +301,25 @@ export const DatePicker = defineComponent({
     const restoreFocusEl = ref<HTMLElement | null>(null)
 
     const isRangeMode = computed(() => props.range)
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const innerValue = ref<VueDatePickerModelValue | undefined>(undefined)
+    const currentModel = computed(() => (isControlled.value ? props.modelValue : innerValue.value))
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) innerValue.value = next
+      }
+    )
 
     const selectedDate = computed(() => {
       if (isRangeMode.value) return null
-      return parseDate(props.modelValue as Date | string | null)
+      return parseDate(currentModel.value as Date | string | null)
     })
 
     const selectedRange = computed<[Date | null, Date | null]>(() => {
       if (!isRangeMode.value) return [null, null]
-      const raw = props.modelValue as [Date | string | null, Date | string | null] | null
+      const raw = currentModel.value as [Date | string | null, Date | string | null] | null
       if (!raw || !Array.isArray(raw)) return [null, null]
       return [parseDate(raw[0]), parseDate(raw[1])]
     })
@@ -392,6 +402,7 @@ export const DatePicker = defineComponent({
 
     /** Emit both update:modelValue and change in one call */
     const emitValue = (value: DatePickerModelValue | null) => {
+      if (!isControlled.value) innerValue.value = value
       emit('update:modelValue', value)
       emit('change', value)
     }

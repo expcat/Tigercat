@@ -1,13 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  PropType,
-  inject,
-  ref,
-  getCurrentInstance,
-  type ComputedRef
-} from 'vue'
+import { defineComponent, computed, h, PropType, inject, ref, watch, type ComputedRef } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -67,7 +58,8 @@ export const Radio = defineComponent({
      * Whether the radio is checked (controlled mode)
      */
     modelValue: {
-      type: Boolean
+      type: Boolean as PropType<boolean | undefined>,
+      default: undefined
     },
 
     /**
@@ -104,18 +96,20 @@ export const Radio = defineComponent({
     'update:modelValue': (value: boolean) => typeof value === 'boolean'
   },
   setup(props, { slots, emit, attrs }) {
-    const instance = getCurrentInstance()
-
     const groupContextRef = inject<ComputedRef<RadioGroupContext> | null>(RadioGroupKey, null)
 
     const groupContext = computed(() => groupContextRef?.value)
 
     const internalChecked = ref(props.defaultValue)
 
-    const isCheckedControlled = computed(() => {
-      const rawProps = instance?.vnode.props as Record<string, unknown> | null | undefined
-      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'modelValue')
-    })
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) internalChecked.value = next
+      }
+    )
+
+    const isCheckedControlled = computed(() => props.modelValue !== undefined)
     const isInGroup = computed(() => !!groupContext.value)
 
     const actualSize = computed<ComponentSize>(() => props.size || groupContext.value?.size || 'md')

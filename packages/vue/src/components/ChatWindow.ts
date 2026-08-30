@@ -182,14 +182,12 @@ export const ChatWindow = defineComponent({
     const labels = computed(() => getChatWindowLabels(mergedLocale.value, props.labels))
     const statusMap = computed(() => buildChatMessageStatusInfo(labels.value))
 
-    const localValue = ref<string>(props.modelValue ?? props.defaultValue ?? '')
+    const localValue = ref<string>(props.defaultValue ?? '')
 
     watch(
       () => props.modelValue,
       (nextValue) => {
-        if (nextValue !== undefined && nextValue !== localValue.value) {
-          localValue.value = nextValue
-        }
+        if (nextValue !== undefined) localValue.value = nextValue
       }
     )
 

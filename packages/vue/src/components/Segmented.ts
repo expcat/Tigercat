@@ -1,4 +1,4 @@
-import { defineComponent, h, type PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, type PropType } from 'vue'
 import type { ComponentSize, SegmentedOption } from '@expcat/tigercat-core'
 import {
   getSegmentedContainerClasses,
@@ -21,6 +21,10 @@ export const Segmented = defineComponent({
       type: [String, Number] as PropType<string | number>,
       default: undefined
     },
+    defaultValue: {
+      type: [String, Number] as PropType<string | number>,
+      default: undefined
+    },
     options: {
       type: Array as PropType<SegmentedOption[]>,
       default: () => []
@@ -32,9 +36,21 @@ export const Segmented = defineComponent({
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const innerValue = ref<string | number | undefined>(props.defaultValue)
+    const currentValue = computed(() => (isControlled.value ? props.modelValue : innerValue.value))
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) innerValue.value = next
+      }
+    )
+
     function handleSelect(option: SegmentedOption) {
       if (option.disabled || props.disabled) return
-      if (option.value === props.modelValue) return
+      if (option.value === currentValue.value) return
+      if (!isControlled.value) innerValue.value = option.value
       emit('update:modelValue', option.value)
       emit('change', option.value)
     }
@@ -86,7 +102,7 @@ export const Segmented = defineComponent({
     }
 
     return () => {
-      const selectedIndex = props.options.findIndex((opt) => opt.value === props.modelValue)
+      const selectedIndex = props.options.findIndex((opt) => opt.value === currentValue.value)
       const firstEnabledIndex = props.options.findIndex((opt) => !opt.disabled)
       const rovingIndex = selectedIndex >= 0 ? selectedIndex : firstEnabledIndex
 
@@ -112,13 +128,13 @@ export const Segmented = defineComponent({
             'aria-hidden': 'true',
             class: getSegmentedIndicatorClasses(props.size),
             style: getSegmentedIndicatorStyle(
-              props.options.findIndex((opt) => opt.value === props.modelValue),
+              props.options.findIndex((opt) => opt.value === currentValue.value),
               props.options.length,
               props.size
             )
           }),
           ...props.options.map((opt, index) => {
-            const selected = opt.value === props.modelValue
+            const selected = opt.value === currentValue.value
             const isDisabled = !!opt.disabled || props.disabled
             return h(
               'label',

@@ -1,13 +1,4 @@
-import {
-  defineComponent,
-  ref,
-  provide,
-  computed,
-  h,
-  PropType,
-  getCurrentInstance,
-  type ComputedRef
-} from 'vue'
+import { defineComponent, ref, provide, computed, h, watch, PropType, type ComputedRef } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -100,16 +91,18 @@ export const RadioGroup = defineComponent({
     change: (value: string | number) => typeof value === 'string' || typeof value === 'number'
   },
   setup(props, { slots, emit, attrs }) {
-    const instance = getCurrentInstance()
-
     // Internal state for uncontrolled mode
     const internalValue = ref<string | number | undefined>(props.defaultValue)
 
     // Determine if controlled or uncontrolled
-    const isControlled = computed(() => {
-      const rawProps = instance?.vnode.props as Record<string, unknown> | null | undefined
-      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'modelValue')
-    })
+    const isControlled = computed(() => props.modelValue !== undefined)
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) internalValue.value = next
+      }
+    )
 
     // Current value - use prop value if controlled, otherwise use internal state
     const currentValue = computed(() =>

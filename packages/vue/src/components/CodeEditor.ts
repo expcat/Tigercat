@@ -123,7 +123,7 @@ export const CodeEditor = defineComponent({
     const onInput = (e: Event) => {
       const target = e.target as HTMLTextAreaElement
       const val = target.value
-      internalValue.value = val
+      if (props.value === undefined) internalValue.value = val
       emit('update:value', val)
       emit('change', val)
       activeLine.value = getActiveLineIndex(val, target.selectionStart)
@@ -135,7 +135,7 @@ export const CodeEditor = defineComponent({
         const ta = textareaRef.value
         if (!ta) return
         const result = handleTabKey(ta.value, ta.selectionStart, ta.selectionEnd, props.tabSize)
-        internalValue.value = result.value
+        if (props.value === undefined) internalValue.value = result.value
         emit('update:value', result.value)
         emit('change', result.value)
         // Restore cursor position

@@ -61,7 +61,9 @@ export const CronEditor = defineComponent({
   setup(props, { attrs, emit }) {
     const config = useTigerConfig()
     const innerValue = ref(props.defaultValue)
-    const expression = computed(() => props.modelValue ?? innerValue.value)
+    const expression = computed(() =>
+      props.modelValue !== undefined ? props.modelValue : innerValue.value
+    )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getCronEditorLabels(mergedLocale.value, props.labels))
     const fieldLabels = computed<Record<CronFieldMeta['key'], string>>(() => ({

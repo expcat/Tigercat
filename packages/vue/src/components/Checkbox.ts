@@ -37,7 +37,7 @@ export const Checkbox = defineComponent({
      */
     modelValue: {
       type: [Boolean, null] as PropType<boolean | null>,
-      default: null
+      default: undefined
     },
     /**
      * Checkbox value (for use in checkbox groups)
@@ -108,7 +108,14 @@ export const Checkbox = defineComponent({
     const internalChecked = ref(props.defaultValue)
 
     // Determine if controlled or uncontrolled
-    const isControlled = computed(() => props.modelValue !== null)
+    const isControlled = computed(() => props.modelValue !== undefined)
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) internalChecked.value = next === true
+      }
+    )
 
     // Determine effective size and disabled state
     const effectiveSize = computed(() => props.size || groupContext.value?.size || 'md')
@@ -122,7 +129,7 @@ export const Checkbox = defineComponent({
       if (groupContext.value && props.value !== undefined) {
         return groupContext.value.value.includes(props.value)
       }
-      return isControlled.value ? props.modelValue : internalChecked.value
+      return isControlled.value ? props.modelValue === true : internalChecked.value
     })
 
     const checkboxRef = ref<HTMLInputElement | null>(null)

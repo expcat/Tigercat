@@ -97,6 +97,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
 
   const setVisible = (next: boolean) => {
     if (props.disabled && next) return
+    if (next === currentVisible.value) return
     if (!isControlled.value) internalVisible.value = next
     emit('update:open', next)
     emit('open-change', next)

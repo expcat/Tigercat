@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue'
+import { defineComponent, computed, h, ref, watch, PropType } from 'vue'
 import {
   type ComponentSize,
   getSwitchClasses,
@@ -24,7 +24,7 @@ export const Switch = defineComponent({
      */
     modelValue: {
       type: [Boolean, null] as PropType<boolean | null>,
-      default: null
+      default: undefined
     },
 
     /**
@@ -75,9 +75,16 @@ export const Switch = defineComponent({
   },
   setup(props, { emit, attrs }) {
     const internalChecked = ref(props.defaultValue)
-    const isControlled = computed(() => props.modelValue !== null)
+    const isControlled = computed(() => props.modelValue !== undefined)
     const checked = computed(() =>
       isControlled.value ? props.modelValue === true : internalChecked.value
+    )
+
+    watch(
+      () => props.modelValue,
+      (next) => {
+        if (next !== undefined) internalChecked.value = next === true
+      }
     )
 
     const switchClasses = computed(() =>

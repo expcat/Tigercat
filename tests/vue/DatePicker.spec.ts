@@ -355,6 +355,26 @@ describe('DatePicker', () => {
   })
 
   describe('Events', () => {
+    it('keeps the selected date when v-model is omitted', async () => {
+      const { container } = render(DatePicker)
+
+      const input = container.querySelector('input') as HTMLInputElement
+      expect(input.value).toBe('')
+      await fireEvent.click(input)
+
+      await waitFor(() => {
+        expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument()
+      })
+
+      const dateButtons = document.body.querySelectorAll('button[aria-selected]')
+      expect(dateButtons.length).toBeGreaterThan(0)
+      await fireEvent.click(dateButtons[0])
+
+      await waitFor(() => {
+        expect(input.value).not.toBe('')
+      })
+    })
+
     it('should emit update:modelValue when date is selected', async () => {
       const { container, emitted } = renderWithProps(DatePicker, {
         modelValue: null

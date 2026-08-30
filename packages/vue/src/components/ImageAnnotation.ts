@@ -117,9 +117,13 @@ export const ImageAnnotation = defineComponent({
     const draft = ref<CoreImageAnnotation | null>(null)
     const drawing = ref<DrawingState | null>(null)
 
-    const annotations = computed(() => props.modelValue ?? innerAnnotations.value)
-    const activeSelectedId = computed(() => props.selectedId ?? innerSelectedId.value)
-    const activeTool = computed(() => props.tool ?? innerTool.value)
+    const annotations = computed(() =>
+      props.modelValue !== undefined ? props.modelValue : innerAnnotations.value
+    )
+    const activeSelectedId = computed(() =>
+      props.selectedId !== undefined ? props.selectedId : innerSelectedId.value
+    )
+    const activeTool = computed(() => (props.tool !== undefined ? props.tool : innerTool.value))
     const canEdit = computed(() => !props.disabled && !props.readonly)
 
     const loadImage = () => {

@@ -163,7 +163,11 @@ export const Slider = defineComponent({
       return props.range ? [props.min, props.max] : props.min
     }
 
+    const isControlled = computed(() => resolveBoundValue() !== undefined)
     const internalValue = ref<number | [number, number]>(getInitialValue())
+    const currentValue = computed(() =>
+      isControlled.value ? (resolveBoundValue() as number | [number, number]) : internalValue.value
+    )
     const isDragging = ref(false)
     const activeThumb = ref<'min' | 'max' | null>(null)
     const showTooltip = ref(false)
@@ -194,7 +198,7 @@ export const Slider = defineComponent({
 
     // Update value
     const updateValue = (newValue: number | [number, number]) => {
-      internalValue.value = newValue
+      if (!isControlled.value) internalValue.value = newValue
       emit('update:value', newValue)
       emit('update:modelValue', newValue)
       emit('change', newValue)
@@ -207,8 +211,8 @@ export const Slider = defineComponent({
       const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
       const newValue = getValueFromPosition(clientX, el)
 
-      if (props.range && Array.isArray(internalValue.value)) {
-        const [minVal, maxVal] = internalValue.value
+      if (props.range && Array.isArray(currentValue.value)) {
+        const [minVal, maxVal] = currentValue.value
         if (activeThumb.value === 'min') {
           updateValue([Math.min(newValue, maxVal), maxVal])
         } else if (activeThumb.value === 'max') {
@@ -240,8 +244,8 @@ export const Slider = defineComponent({
     const trackClasses = computed(() => getSliderTrackClasses(props.size, props.disabled))
 
     const rangeStyles = computed(() => {
-      if (props.range && Array.isArray(internalValue.value)) {
-        const [minVal, maxVal] = internalValue.value
+      if (props.range && Array.isArray(currentValue.value)) {
+        const [minVal, maxVal] = currentValue.value
         const left = getPercentage(minVal)
         const width = getPercentage(maxVal) - left
         return {
@@ -250,7 +254,7 @@ export const Slider = defineComponent({
         }
       } else {
         const val =
-          typeof internalValue.value === 'number' ? internalValue.value : internalValue.value[0]
+          typeof currentValue.value === 'number' ? currentValue.value : currentValue.value[0]
         return {
           left: '0%',
           width: `${getPercentage(val)}%`
@@ -355,8 +359,8 @@ export const Slider = defineComponent({
               if (newValue === null) return
               e.preventDefault()
 
-              if (props.range && Array.isArray(internalValue.value)) {
-                const [minVal, maxVal] = internalValue.value
+              if (props.range && Array.isArray(currentValue.value)) {
+                const [minVal, maxVal] = currentValue.value
                 if (thumbType === 'min') {
                   updateValue([Math.min(newValue, maxVal), maxVal])
                 } else if (thumbType === 'max') {
@@ -419,8 +423,8 @@ export const Slider = defineComponent({
                 if (props.disabled || !trackElement.value) return
                 const newValue = getValueFromPosition(e.clientX, trackElement.value)
 
-                if (props.range && Array.isArray(internalValue.value)) {
-                  const [minVal, maxVal] = internalValue.value
+                if (props.range && Array.isArray(currentValue.value)) {
+                  const [minVal, maxVal] = currentValue.value
                   const distToMin = Math.abs(newValue - minVal)
                   const distToMax = Math.abs(newValue - maxVal)
 
@@ -441,15 +445,15 @@ export const Slider = defineComponent({
                 style: rangeStyles.value
               }),
               // Thumbs
-              props.range && Array.isArray(internalValue.value)
+              props.range && Array.isArray(currentValue.value)
                 ? [
-                    createThumb(internalValue.value[0], 'min'),
-                    createThumb(internalValue.value[1], 'max')
+                    createThumb(currentValue.value[0], 'min'),
+                    createThumb(currentValue.value[1], 'max')
                   ]
                 : createThumb(
-                    typeof internalValue.value === 'number'
-                      ? internalValue.value
-                      : internalValue.value[0]
+                    typeof currentValue.value === 'number'
+                      ? currentValue.value
+                      : currentValue.value[0]
                   )
             ]
           ),
