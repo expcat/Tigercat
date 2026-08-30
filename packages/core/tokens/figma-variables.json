@@ -12,8 +12,8 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-50",
           "value": {
-            "r": 0.9411764705882353,
-            "g": 0.9764705882352941,
+            "r": 0.9372549019607843,
+            "g": 0.9647058823529412,
             "b": 1,
             "a": 1
           }
@@ -23,8 +23,8 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-100",
           "value": {
-            "r": 0.8784313725490196,
-            "g": 0.9490196078431372,
+            "r": 0.8588235294117647,
+            "g": 0.9176470588235294,
             "b": 0.996078431372549,
             "a": 1
           }
@@ -34,9 +34,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-200",
           "value": {
-            "r": 0.7294117647058823,
-            "g": 0.9019607843137255,
-            "b": 0.9921568627450981,
+            "r": 0.7490196078431373,
+            "g": 0.8588235294117647,
+            "b": 0.996078431372549,
             "a": 1
           }
         },
@@ -45,9 +45,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-300",
           "value": {
-            "r": 0.49019607843137253,
-            "g": 0.8274509803921568,
-            "b": 0.9882352941176471,
+            "r": 0.5764705882352941,
+            "g": 0.7725490196078432,
+            "b": 0.9921568627450981,
             "a": 1
           }
         },
@@ -56,9 +56,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-400",
           "value": {
-            "r": 0.2196078431372549,
-            "g": 0.7411764705882353,
-            "b": 0.9725490196078431,
+            "r": 0.3764705882352941,
+            "g": 0.6470588235294118,
+            "b": 0.9803921568627451,
             "a": 1
           }
         },
@@ -67,9 +67,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-500",
           "value": {
-            "r": 0.054901960784313725,
-            "g": 0.6470588235294118,
-            "b": 0.9137254901960784,
+            "r": 0.23137254901960785,
+            "g": 0.5098039215686274,
+            "b": 0.9647058823529412,
             "a": 1
           }
         },
@@ -78,9 +78,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-600",
           "value": {
-            "r": 0.00784313725490196,
-            "g": 0.5176470588235295,
-            "b": 0.7803921568627451,
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
             "a": 1
           }
         },
@@ -89,9 +89,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-700",
           "value": {
-            "r": 0.011764705882352941,
-            "g": 0.4117647058823529,
-            "b": 0.6313725490196078,
+            "r": 0.11372549019607843,
+            "g": 0.3058823529411765,
+            "b": 0.8470588235294118,
             "a": 1
           }
         },
@@ -100,9 +100,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-800",
           "value": {
-            "r": 0.027450980392156862,
-            "g": 0.34901960784313724,
-            "b": 0.5215686274509804,
+            "r": 0.11764705882352941,
+            "g": 0.25098039215686274,
+            "b": 0.6862745098039216,
             "a": 1
           }
         },
@@ -111,9 +111,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-primitive-color-primary-950",
           "value": {
-            "r": 0.047058823529411764,
-            "g": 0.23921568627450981,
-            "b": 0.4,
+            "r": 0.09019607843137255,
+            "g": 0.1450980392156863,
+            "b": 0.32941176470588235,
             "a": 1
           }
         },
@@ -778,6 +778,116 @@
           }
         },
         {
+          "name": "primitive/color/gray/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-50",
+          "value": {
+            "r": 0.9764705882352941,
+            "g": 0.9803921568627451,
+            "b": 0.984313725490196,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-100",
+          "value": {
+            "r": 0.9529411764705882,
+            "g": 0.9568627450980393,
+            "b": 0.9647058823529412,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-200",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-300",
+          "value": {
+            "r": 0.8196078431372549,
+            "g": 0.8352941176470589,
+            "b": 0.8588235294117647,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-400",
+          "value": {
+            "r": 0.611764705882353,
+            "g": 0.6392156862745098,
+            "b": 0.6862745098039216,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-500",
+          "value": {
+            "r": 0.4196078431372549,
+            "g": 0.4470588235294118,
+            "b": 0.5019607843137255,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-600",
+          "value": {
+            "r": 0.29411764705882354,
+            "g": 0.3333333333333333,
+            "b": 0.38823529411764707,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-700",
+          "value": {
+            "r": 0.21568627450980393,
+            "g": 0.2549019607843137,
+            "b": 0.3176470588235294,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-800",
+          "value": {
+            "r": 0.12156862745098039,
+            "g": 0.1607843137254902,
+            "b": 0.21568627450980393,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/gray/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-gray-950",
+          "value": {
+            "r": 0.06666666666666667,
+            "g": 0.09411764705882353,
+            "b": 0.15294117647058825,
+            "a": 1
+          }
+        },
+        {
           "name": "primitive/space/xs",
           "type": "STRING",
           "cssVariable": "--tiger-primitive-space-xs",
@@ -835,25 +945,25 @@
           "name": "primitive/radius/sm",
           "type": "STRING",
           "cssVariable": "--tiger-primitive-radius-sm",
-          "value": "2px"
+          "value": "4px"
         },
         {
           "name": "primitive/radius/md",
           "type": "STRING",
           "cssVariable": "--tiger-primitive-radius-md",
-          "value": "4px"
+          "value": "6px"
         },
         {
           "name": "primitive/radius/lg",
           "type": "STRING",
           "cssVariable": "--tiger-primitive-radius-lg",
-          "value": "8px"
+          "value": "10px"
         },
         {
           "name": "primitive/radius/xl",
           "type": "STRING",
           "cssVariable": "--tiger-primitive-radius-xl",
-          "value": "12px"
+          "value": "14px"
         },
         {
           "name": "primitive/radius/full",
@@ -1064,8 +1174,8 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-bg-primary",
           "value": {
-            "r": 0.9411764705882353,
-            "g": 0.9764705882352941,
+            "r": 0.9372549019607843,
+            "g": 0.9647058823529412,
             "b": 1,
             "a": 1
           },
@@ -1170,48 +1280,48 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-text-primary",
           "value": {
-            "r": 0.0392156862745098,
-            "g": 0.0392156862745098,
-            "b": 0.0392156862745098,
+            "r": 0.06666666666666667,
+            "g": 0.09411764705882353,
+            "b": 0.15294117647058825,
             "a": 1
           },
-          "reference": "primitive/color/neutral/950"
+          "reference": "primitive/color/gray/950"
         },
         {
           "name": "semantic/color/text-secondary",
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-text-secondary",
           "value": {
-            "r": 0.3215686274509804,
-            "g": 0.3215686274509804,
-            "b": 0.3215686274509804,
+            "r": 0.4196078431372549,
+            "g": 0.4470588235294118,
+            "b": 0.5019607843137255,
             "a": 1
           },
-          "reference": "primitive/color/neutral/600"
+          "reference": "primitive/color/gray/500"
         },
         {
           "name": "semantic/color/text-tertiary",
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-text-tertiary",
           "value": {
-            "r": 0.6392156862745098,
+            "r": 0.611764705882353,
             "g": 0.6392156862745098,
-            "b": 0.6392156862745098,
+            "b": 0.6862745098039216,
             "a": 1
           },
-          "reference": "primitive/color/neutral/400"
+          "reference": "primitive/color/gray/400"
         },
         {
           "name": "semantic/color/text-disabled",
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-text-disabled",
           "value": {
-            "r": 0.8313725490196079,
-            "g": 0.8313725490196079,
-            "b": 0.8313725490196079,
+            "r": 0.8196078431372549,
+            "g": 0.8352941176470589,
+            "b": 0.8588235294117647,
             "a": 1
           },
-          "reference": "primitive/color/neutral/300"
+          "reference": "primitive/color/gray/300"
         },
         {
           "name": "semantic/color/text-inverse",
@@ -1229,9 +1339,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-text-link",
           "value": {
-            "r": 0.00784313725490196,
-            "g": 0.5176470588235295,
-            "b": 0.7803921568627451,
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "primitive/color/primary/600"
@@ -1241,9 +1351,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-text-link-hover",
           "value": {
-            "r": 0.011764705882352941,
-            "g": 0.4117647058823529,
-            "b": 0.6313725490196078,
+            "r": 0.11372549019607843,
+            "g": 0.3058823529411765,
+            "b": 0.8470588235294118,
             "a": 1
           },
           "reference": "primitive/color/primary/700"
@@ -1290,35 +1400,35 @@
           "cssVariable": "--tiger-semantic-color-border-default",
           "value": {
             "r": 0.8980392156862745,
-            "g": 0.8980392156862745,
-            "b": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
             "a": 1
           },
-          "reference": "primitive/color/neutral/200"
+          "reference": "primitive/color/gray/200"
         },
         {
           "name": "semantic/color/border-strong",
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-border-strong",
           "value": {
-            "r": 0.6392156862745098,
+            "r": 0.611764705882353,
             "g": 0.6392156862745098,
-            "b": 0.6392156862745098,
+            "b": 0.6862745098039216,
             "a": 1
           },
-          "reference": "primitive/color/neutral/400"
+          "reference": "primitive/color/gray/400"
         },
         {
           "name": "semantic/color/border-focus",
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-border-focus",
           "value": {
-            "r": 0.054901960784313725,
-            "g": 0.6470588235294118,
-            "b": 0.9137254901960784,
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
             "a": 1
           },
-          "reference": "primitive/color/primary/500"
+          "reference": "primitive/color/primary/600"
         },
         {
           "name": "semantic/color/border-error",
@@ -1385,9 +1495,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-interactive-primary",
           "value": {
-            "r": 0.00784313725490196,
-            "g": 0.5176470588235295,
-            "b": 0.7803921568627451,
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "primitive/color/primary/600"
@@ -1397,9 +1507,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-interactive-primary-hover",
           "value": {
-            "r": 0.011764705882352941,
-            "g": 0.4117647058823529,
-            "b": 0.6313725490196078,
+            "r": 0.11372549019607843,
+            "g": 0.3058823529411765,
+            "b": 0.8470588235294118,
             "a": 1
           },
           "reference": "primitive/color/primary/700"
@@ -1409,9 +1519,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-interactive-primary-active",
           "value": {
-            "r": 0.027450980392156862,
-            "g": 0.34901960784313724,
-            "b": 0.5215686274509804,
+            "r": 0.11764705882352941,
+            "g": 0.25098039215686274,
+            "b": 0.6862745098039216,
             "a": 1
           },
           "reference": "primitive/color/primary/800"
@@ -1421,24 +1531,24 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-interactive-secondary",
           "value": {
-            "r": 0.2784313725490196,
+            "r": 0.29411764705882354,
             "g": 0.3333333333333333,
-            "b": 0.4117647058823529,
+            "b": 0.38823529411764707,
             "a": 1
           },
-          "reference": "primitive/color/secondary/600"
+          "reference": "primitive/color/gray/600"
         },
         {
           "name": "semantic/color/interactive-secondary-hover",
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-interactive-secondary-hover",
           "value": {
-            "r": 0.2,
+            "r": 0.21568627450980393,
             "g": 0.2549019607843137,
-            "b": 0.3333333333333333,
+            "b": 0.3176470588235294,
             "a": 1
           },
-          "reference": "primitive/color/secondary/700"
+          "reference": "primitive/color/gray/700"
         },
         {
           "name": "semantic/color/interactive-danger",
@@ -1469,12 +1579,12 @@
           "type": "COLOR",
           "cssVariable": "--tiger-semantic-color-focus-ring",
           "value": {
-            "r": 0.054901960784313725,
-            "g": 0.6470588235294118,
-            "b": 0.9137254901960784,
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
             "a": 1
           },
-          "reference": "primitive/color/primary/500"
+          "reference": "primitive/color/primary/600"
         },
         {
           "name": "semantic/space/component-gap",
@@ -1501,14 +1611,14 @@
           "name": "semantic/radius/component",
           "type": "STRING",
           "cssVariable": "--tiger-semantic-radius-component",
-          "value": "8px",
+          "value": "10px",
           "reference": "primitive/radius/lg"
         },
         {
           "name": "semantic/radius/card",
           "type": "STRING",
           "cssVariable": "--tiger-semantic-radius-card",
-          "value": "12px",
+          "value": "14px",
           "reference": "primitive/radius/xl"
         },
         {
@@ -1567,7 +1677,7 @@
           "name": "component/button/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-button-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -1627,7 +1737,7 @@
           "name": "component/input/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-input-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -1643,8 +1753,8 @@
           "cssVariable": "--tiger-component-input-border-color",
           "value": {
             "r": 0.8980392156862745,
-            "g": 0.8980392156862745,
-            "b": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "semantic/color/border-default"
@@ -1654,9 +1764,9 @@
           "type": "COLOR",
           "cssVariable": "--tiger-component-input-border-color-focus",
           "value": {
-            "r": 0.054901960784313725,
-            "g": 0.6470588235294118,
-            "b": 0.9137254901960784,
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "semantic/color/border-focus"
@@ -1702,7 +1812,7 @@
           "name": "component/select/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-select-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -1729,7 +1839,7 @@
           "name": "component/modal/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-modal-border-radius",
-          "value": "12px",
+          "value": "14px",
           "reference": "semantic/radius/card"
         },
         {
@@ -1864,7 +1974,7 @@
           "name": "component/card/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-card-border-radius",
-          "value": "12px",
+          "value": "14px",
           "reference": "semantic/radius/card"
         },
         {
@@ -1887,8 +1997,8 @@
           "cssVariable": "--tiger-component-card-border-color",
           "value": {
             "r": 0.8980392156862745,
-            "g": 0.8980392156862745,
-            "b": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "semantic/color/border-default"
@@ -2038,8 +2148,8 @@
           "cssVariable": "--tiger-component-table-border-color",
           "value": {
             "r": 0.8980392156862745,
-            "g": 0.8980392156862745,
-            "b": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "semantic/color/border-default"
@@ -2061,8 +2171,8 @@
           "type": "COLOR",
           "cssVariable": "--tiger-component-table-hover-bg",
           "value": {
-            "r": 0.9411764705882353,
-            "g": 0.9764705882352941,
+            "r": 0.9372549019607843,
+            "g": 0.9647058823529412,
             "b": 1,
             "a": 1
           },
@@ -2116,7 +2226,7 @@
           "name": "component/tooltip/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-tooltip-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -2136,7 +2246,7 @@
           "name": "component/alert/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-alert-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -2216,7 +2326,7 @@
           "name": "component/pagination/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-pagination-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -2329,7 +2439,7 @@
           "name": "component/skeleton/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-skeleton-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -2338,8 +2448,8 @@
           "cssVariable": "--tiger-component-divider-color",
           "value": {
             "r": 0.8980392156862745,
-            "g": 0.8980392156862745,
-            "b": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "semantic/color/border-default"
@@ -2378,8 +2488,8 @@
           "cssVariable": "--tiger-component-collapse-border-color",
           "value": {
             "r": 0.8980392156862745,
-            "g": 0.8980392156862745,
-            "b": 0.8980392156862745,
+            "g": 0.9058823529411765,
+            "b": 0.9215686274509803,
             "a": 1
           },
           "reference": "semantic/color/border-default"
@@ -2447,7 +2557,7 @@
           "name": "component/dropdown/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-dropdown-border-radius",
-          "value": "12px",
+          "value": "14px",
           "reference": "semantic/radius/card"
         },
         {
@@ -2488,7 +2598,7 @@
           "name": "component/menu/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-menu-border-radius",
-          "value": "8px",
+          "value": "10px",
           "reference": "semantic/radius/component"
         },
         {
@@ -2508,7 +2618,7 @@
           "name": "component/notification/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-notification-border-radius",
-          "value": "12px",
+          "value": "14px",
           "reference": "semantic/radius/card"
         },
         {
@@ -2543,7 +2653,7 @@
           "name": "component/popover/border-radius",
           "type": "STRING",
           "cssVariable": "--tiger-component-popover-border-radius",
-          "value": "12px",
+          "value": "14px",
           "reference": "semantic/radius/card"
         },
         {

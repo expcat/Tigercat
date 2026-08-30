@@ -18,7 +18,9 @@ export {
   primitiveEasing,
   semanticTokens,
   designTokens,
-  componentTokens
+  componentTokens,
+  runtimeThemeLight,
+  runtimeThemeDark
 } from './tokens'
 
 export type {

@@ -2,12 +2,11 @@
 
 /**
  * Token generator — reads tokens.json and outputs:
- *   tokens.css  — CSS custom properties
- *   tokens.ts   — TypeScript constants with types
- *   tailwind-tokens.js — Tailwind config extend object
+ *   tokens.css  — layered tokens plus runtime --tiger-* aliases
+ *   tokens.ts   — TypeScript constants, including the default runtime theme
  *   figma-variables.json — Figma Variables import data
  *
- * Usage:  node packages/core/scripts/generate-tokens.js
+ * Usage:  node packages/core/scripts/generate-tokens.mjs
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -23,10 +22,103 @@ const rawTokens = JSON.parse(readFileSync(join(TOKENS_DIR, 'tokens.json'), 'utf-
 const primitiveTokens = rawTokens.primitive ?? rawTokens.global
 const semanticTokens = rawTokens.semantic ?? rawTokens.alias
 const componentTokens = rawTokens.component
+const runtimeTokens = rawTokens.runtime
 const tokens = {
   primitive: primitiveTokens,
   semantic: semanticTokens,
-  component: componentTokens
+  component: componentTokens,
+  runtime: runtimeTokens
+}
+
+/** Runtime ThemeConfig color keys → CSS custom properties components actually read. */
+const RUNTIME_COLOR_CSS_VARS = {
+  primary: '--tiger-primary',
+  primaryHover: '--tiger-primary-hover',
+  primaryActive: '--tiger-primary-active',
+  primaryDisabled: '--tiger-primary-disabled',
+  secondary: '--tiger-secondary',
+  secondaryHover: '--tiger-secondary-hover',
+  secondaryActive: '--tiger-secondary-active',
+  secondaryDisabled: '--tiger-secondary-disabled',
+  outlineBgHover: '--tiger-outline-bg-hover',
+  ghostBgHover: '--tiger-ghost-bg-hover',
+  focusRing: '--tiger-focus-ring',
+  surface: '--tiger-surface',
+  surfaceMuted: '--tiger-surface-muted',
+  surfaceRaised: '--tiger-surface-raised',
+  text: '--tiger-text',
+  textSecondary: '--tiger-text-secondary',
+  textDisabled: '--tiger-text-disabled',
+  border: '--tiger-border',
+  borderStrong: '--tiger-border-strong',
+  success: '--tiger-success',
+  warning: '--tiger-warning',
+  error: '--tiger-error',
+  info: '--tiger-info',
+  chart1: '--tiger-chart-1',
+  chart2: '--tiger-chart-2',
+  chart3: '--tiger-chart-3',
+  chart4: '--tiger-chart-4',
+  chart5: '--tiger-chart-5',
+  chart6: '--tiger-chart-6'
+}
+
+const RUNTIME_SECTION_CSS_VARS = {
+  typography: {
+    fontFamily: '--tiger-font-family',
+    fontFamilyMono: '--tiger-font-family-mono',
+    fontSizeBase: '--tiger-font-size-base',
+    fontSizeSm: '--tiger-font-size-sm',
+    fontSizeLg: '--tiger-font-size-lg',
+    fontWeightNormal: '--tiger-font-weight-normal',
+    fontWeightMedium: '--tiger-font-weight-medium',
+    fontWeightSemibold: '--tiger-font-weight-semibold',
+    fontWeightBold: '--tiger-font-weight-bold',
+    lineHeightNormal: '--tiger-line-height-normal',
+    lineHeightTight: '--tiger-line-height-tight'
+  },
+  radius: {
+    none: '--tiger-radius-none',
+    sm: '--tiger-radius-sm',
+    md: '--tiger-radius-md',
+    lg: '--tiger-radius-lg',
+    xl: '--tiger-radius-xl',
+    full: '--tiger-radius-full'
+  },
+  shadows: {
+    xs: '--tiger-shadow-xs',
+    sm: '--tiger-shadow-sm',
+    md: '--tiger-shadow-md',
+    lg: '--tiger-shadow-lg',
+    xl: '--tiger-shadow-xl'
+  },
+  spacing: {
+    xs: '--tiger-spacing-xs',
+    sm: '--tiger-spacing-sm',
+    md: '--tiger-spacing-md',
+    lg: '--tiger-spacing-lg',
+    xl: '--tiger-spacing-xl'
+  },
+  motion: {
+    durationFast: '--tiger-motion-duration-quick',
+    durationBase: '--tiger-motion-duration-base',
+    durationSlow: '--tiger-motion-duration-relaxed',
+    easing: '--tiger-motion-ease-standard'
+  }
+}
+
+const RUNTIME_COLOR_ALIASES = {
+  '--tiger-text-muted': '--tiger-text-secondary',
+  '--tiger-fill': '--tiger-surface-muted',
+  '--tiger-bg': '--tiger-surface'
+}
+
+const RUNTIME_BREAKPOINT_CSS_VARS = {
+  xs: '--tiger-breakpoint-xs',
+  sm: '--tiger-breakpoint-sm',
+  md: '--tiger-breakpoint-md',
+  lg: '--tiger-breakpoint-lg',
+  xl: '--tiger-breakpoint-xl'
 }
 
 // ---------------------------------------------------------------------------
@@ -82,6 +174,89 @@ function tokenPathToName(path) {
   return path.join('/')
 }
 
+function resolveRuntimeValue(value) {
+  return resolve(value)
+}
+
+function resolveRuntimeConfig(scheme) {
+  const source = tokens.runtime?.[scheme]
+  if (!source) return null
+  const resolved = {}
+  for (const [section, entries] of Object.entries(source)) {
+    resolved[section] = Object.fromEntries(
+      Object.entries(entries).map(([key, value]) => [key, resolveRuntimeValue(value)])
+    )
+  }
+  return resolved
+}
+
+function collectRuntimeCssVars(schemeConfig) {
+  const vars = {}
+  if (!schemeConfig) return vars
+
+  if (schemeConfig.colors) {
+    for (const [key, value] of Object.entries(schemeConfig.colors)) {
+      const varName = RUNTIME_COLOR_CSS_VARS[key]
+      if (varName && value) vars[varName] = value
+    }
+  }
+
+  for (const [aliasName, sourceName] of Object.entries(RUNTIME_COLOR_ALIASES)) {
+    vars[aliasName] = `var(${sourceName})`
+  }
+
+  for (const section of ['typography', 'radius', 'shadows', 'spacing', 'motion']) {
+    const values = schemeConfig[section]
+    const varNames = RUNTIME_SECTION_CSS_VARS[section]
+    if (!values || !varNames) continue
+    for (const [key, value] of Object.entries(values)) {
+      const varName = varNames[key]
+      if (varName && value) vars[varName] = value
+    }
+  }
+
+  const motion = schemeConfig.motion
+  if (motion?.durationBase && motion?.easing) {
+    vars['--tiger-transition-base'] = `all ${motion.durationBase} ${motion.easing}`
+  }
+  if (motion?.durationFast && motion?.easing) {
+    vars['--tiger-transition-quick'] = `all ${motion.durationFast} ${motion.easing}`
+  }
+  if (motion?.durationSlow && motion?.easing) {
+    vars['--tiger-transition-emphasized'] = `transform ${motion.durationSlow} ${motion.easing}`
+  }
+
+  const breakpoints = tokens.runtime?.breakpoints
+  if (breakpoints) {
+    for (const [key, value] of Object.entries(breakpoints)) {
+      const varName = RUNTIME_BREAKPOINT_CSS_VARS[key]
+      if (varName && value) vars[varName] = value
+    }
+  }
+
+  return vars
+}
+
+function emitJsObject(value, indent = 0) {
+  const pad = '  '.repeat(indent)
+  const inner = '  '.repeat(indent + 1)
+  if (value == null) return 'undefined'
+  if (typeof value === 'string') return `'${value.replaceAll("'", "\\'")}'`
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (Array.isArray(value)) {
+    if (value.length === 0) return '[]'
+    return `[\n${value.map((item) => `${inner}${emitJsObject(item, indent + 1)}`).join(',\n')}\n${pad}]`
+  }
+  const entries = Object.entries(value)
+  if (entries.length === 0) return '{}'
+  return `{\n${entries
+    .map(([key, item]) => {
+      const safeKey = /^[A-Za-z_$][\w$]*$/.test(key) ? key : `'${key}'`
+      return `${inner}${safeKey}: ${emitJsObject(item, indent + 1)}`
+    })
+    .join(',\n')}\n${pad}}`
+}
+
 // 必须复用仓库 .prettierrc.json，不能手写子集：漏掉 printWidth 会让产物停在
 // prettier 默认的 80 列，与 `pnpm format:check` 永久互相打架。
 let prettierConfigPromise
@@ -96,7 +271,7 @@ async function formatGenerated(source, parser) {
 // ---------------------------------------------------------------------------
 
 function generateCSS() {
-  const lines = ['/* Auto-generated by generate-tokens.js — Do not edit manually */', '', ':root {']
+  const lines = ['/* Auto-generated by generate-tokens.mjs — Do not edit manually */', '', ':root {']
   lines.push('  color-scheme: light;')
   lines.push('')
 
@@ -153,10 +328,29 @@ function generateCSS() {
     }
   }
 
+  const lightRuntime = collectRuntimeCssVars(resolveRuntimeConfig('light'))
+  if (Object.keys(lightRuntime).length > 0) {
+    lines.push('')
+    lines.push('  /* Runtime aliases (component-facing --tiger-* names) */')
+    for (const [name, value] of Object.entries(lightRuntime)) {
+      lines.push(`  ${name}: ${value};`)
+    }
+  }
+
   lines.push('}')
   lines.push('')
   lines.push('.dark {')
   lines.push('  color-scheme: dark;')
+
+  const darkRuntime = collectRuntimeCssVars(resolveRuntimeConfig('dark'))
+  if (Object.keys(darkRuntime).length > 0) {
+    lines.push('')
+    lines.push('  /* Runtime aliases */')
+    for (const [name, value] of Object.entries(darkRuntime)) {
+      lines.push(`  ${name}: ${value};`)
+    }
+  }
+
   lines.push('}')
   return lines.join('\n')
 }
@@ -166,7 +360,7 @@ function generateCSS() {
 // ---------------------------------------------------------------------------
 
 function generateTS() {
-  const lines = ['/* Auto-generated by generate-tokens.js — Do not edit manually */', '']
+  const lines = ['/* Auto-generated by generate-tokens.mjs — Do not edit manually */', '']
 
   // Primitive color tokens
   lines.push('/** Primitive color tokens */')
@@ -278,6 +472,19 @@ function generateTS() {
   lines.push('} as const')
   lines.push('')
 
+  const lightRuntime = resolveRuntimeConfig('light')
+  const darkRuntime = resolveRuntimeConfig('dark')
+  if (lightRuntime) {
+    lines.push('/** Default runtime theme (light). Source: tokens.json runtime.light */')
+    lines.push(`export const runtimeThemeLight = ${emitJsObject(lightRuntime)} as const`)
+    lines.push('')
+  }
+  if (darkRuntime) {
+    lines.push('/** Default runtime theme (dark). Source: tokens.json runtime.dark */')
+    lines.push(`export const runtimeThemeDark = ${emitJsObject(darkRuntime)} as const`)
+    lines.push('')
+  }
+
   lines.push('/** Complete three-layer design token registry */')
   lines.push('export const designTokens = {')
   lines.push('  primitive: {')
@@ -309,70 +516,7 @@ function generateTS() {
 }
 
 // ---------------------------------------------------------------------------
-// 3. Generate Tailwind config
-// ---------------------------------------------------------------------------
-
-function generateTailwind() {
-  const lines = [
-    '/* Auto-generated by generate-tokens.js — Do not edit manually */',
-    '',
-    '/** @type {import("tailwindcss").Config["theme"]} */',
-    'module.exports = {',
-    '  colors: {'
-  ]
-
-  // Map color tokens → Tailwind color palette
-  for (const [hue, shades] of Object.entries(tokens.primitive.color)) {
-    lines.push(`    'tiger-${hue}': {`)
-    for (const [level, value] of Object.entries(shades)) {
-      lines.push(`      '${level}': '${value}',`)
-    }
-    lines.push('    },')
-  }
-  lines.push('  },')
-
-  // Spacing
-  lines.push('  spacing: {')
-  for (const [key, value] of Object.entries(tokens.primitive.space)) {
-    lines.push(`    'tiger-${key}': '${value}',`)
-  }
-  lines.push('  },')
-
-  // Border radius
-  lines.push('  borderRadius: {')
-  for (const [key, value] of Object.entries(tokens.primitive.radius)) {
-    lines.push(`    'tiger-${key}': '${value}',`)
-  }
-  lines.push('  },')
-
-  // Box shadow
-  lines.push('  boxShadow: {')
-  for (const [key, value] of Object.entries(tokens.primitive.shadow)) {
-    lines.push(`    'tiger-${key}': '${value}',`)
-  }
-  lines.push('  },')
-
-  // Font family
-  lines.push('  fontFamily: {')
-  for (const [key, value] of Object.entries(tokens.primitive.font.family)) {
-    const families = value.split(',').map((f) => f.trim())
-    lines.push(`    'tiger-${key}': ${JSON.stringify(families)},`)
-  }
-  lines.push('  },')
-
-  // Font size
-  lines.push('  fontSize: {')
-  for (const [key, value] of Object.entries(tokens.primitive.font.size)) {
-    lines.push(`    'tiger-${key}': '${value}',`)
-  }
-  lines.push('  },')
-
-  lines.push('}')
-  return lines.join('\n')
-}
-
-// ---------------------------------------------------------------------------
-// 4. Generate Figma Variables JSON
+// 3. Generate Figma Variables JSON
 // ---------------------------------------------------------------------------
 
 function isColorValue(value) {
@@ -505,11 +649,6 @@ const generatedOutputs = [
     label: 'tokens.ts',
     path: join(SRC_TOKENS_DIR, 'tokens.ts'),
     content: await formatGenerated(generateTS(), 'typescript')
-  },
-  {
-    label: 'tailwind-tokens.js',
-    path: join(TOKENS_DIR, 'tailwind-tokens.js'),
-    content: await formatGenerated(generateTailwind(), 'babel')
   },
   {
     label: 'figma-variables.json',
