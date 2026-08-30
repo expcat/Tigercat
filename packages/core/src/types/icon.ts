@@ -35,8 +35,8 @@ export interface IconProps {
   size?: IconSize
 
   /**
-   * Icon color
-   * Uses CSS color value
+   * Icon color written onto the wrapper. Omitted values inherit CSS `color`
+   * (including `style.color`). An explicit `color` wins over `style.color`.
    * @example '#2563eb' | 'currentColor'
    */
   color?: string

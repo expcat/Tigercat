@@ -3,10 +3,11 @@
  */
 
 import React from 'react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { Icon } from '@expcat/tigercat-react/Icon'
 import type { IconDefinition } from '@expcat/tigercat-core'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { renderWithProps, renderWithChildren } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -44,7 +45,49 @@ describe('Icon (React)', () => {
     const svg = container.querySelector('svg')
     expect(svg).toHaveAttribute('viewBox', '0 0 32 32')
     expect(svg).toHaveAttribute('fill', 'currentColor')
+    expect(svg).toHaveAttribute('stroke', 'none')
+    expect(svg).not.toHaveAttribute('stroke-width')
+    expect(svg).toHaveAttribute('aria-hidden', 'true')
+    expect(svg).toHaveAttribute('focusable', 'false')
     expect(svg?.querySelector('path')).toHaveAttribute('d', 'M16 2 2 30h28Z')
+  })
+
+  it('treats a definition without mode as a stroke icon', () => {
+    const outline = { viewBox: '0 0 24 24', paths: ['M5 12h14'] } as IconDefinition
+    const { container } = render(<Icon icon={outline} />)
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('fill', 'none')
+    expect(svg).toHaveAttribute('stroke', 'currentColor')
+    expect(svg).toHaveAttribute('stroke-width', '1.5')
+  })
+
+  it('forwards ref to the wrapper span', () => {
+    const ref = React.createRef<HTMLSpanElement>()
+    const { container } = render(<Icon name="check" ref={ref} />)
+    expect(ref.current).toBe(container.querySelector('span'))
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement)
+  })
+
+  it('keeps style.color when color is omitted', () => {
+    const { container } = render(<Icon name="check" style={{ color: 'red' }} />)
+    expect(container.querySelector('span')).toHaveStyle({ color: 'red' })
+  })
+
+  it('falls back to md size classes for an unknown size', () => {
+    const { container } = render(<Icon name="check" size={'xxl' as 'md'} />)
+    expect(container.querySelector('svg')).toHaveClass('w-5', 'h-5')
+  })
+
+  it('warns for an unknown built-in name and renders an empty decorative span', () => {
+    resetDevWarnCache()
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { container } = render(<Icon name={'not-a-real-icon' as 'check'} />)
+    expect(container.querySelector('svg')).toBeFalsy()
+    expect(container.querySelector('span')).toHaveAttribute('aria-hidden', 'true')
+    expect(warnSpy).toHaveBeenCalledWith(
+      '[Tigercat] Icon name "not-a-real-icon" is not registered.'
+    )
+    warnSpy.mockRestore()
   })
 
   it('prefers custom children over the icon prop', () => {

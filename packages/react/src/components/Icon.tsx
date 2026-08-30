@@ -1,17 +1,15 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import {
   classNames,
+  getIconDefinition,
   iconSizeClasses,
   iconSvgBaseClasses,
-  iconSvgDefaultStrokeLinecap,
-  iconSvgDefaultStrokeLinejoin,
-  iconSvgDefaultStrokeWidth,
   iconWrapperClasses,
-  getIconDefinition,
-  SVG_DEFAULT_FILL,
-  SVG_DEFAULT_STROKE,
-  SVG_DEFAULT_VIEWBOX_24,
-  SVG_DEFAULT_XMLNS,
+  mergeChildSvgAttrs,
+  resolveIconSize,
+  resolveIconSvgAttrs,
+  resolveIconWrapperStyle,
+  warnUnknownIconName,
   type IconProps as CoreIconProps
 } from '@expcat/tigercat-core'
 
@@ -19,38 +17,31 @@ export interface IconProps extends CoreIconProps, React.HTMLAttributes<HTMLSpanE
   children?: React.ReactNode
 }
 
-export const Icon: React.FC<IconProps> = ({
-  name,
-  icon,
-  size = 'md',
-  color = 'currentColor',
-  className,
-  style,
-  children,
-  ...props
-}) => {
+export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
+  { name, icon, size = 'md', color, className, style, children, ...props },
+  ref
+) {
+  const resolvedSize = resolveIconSize(size)
   const iconClasses = classNames(iconWrapperClasses, className)
-  const iconStyle: React.CSSProperties = { ...style, color }
+  const iconStyle = resolveIconWrapperStyle(color, style as Record<string, unknown> | undefined) as
+    React.CSSProperties | undefined
   const isDecorative =
     props['aria-label'] == null && props['aria-labelledby'] == null && props.role == null
 
-  // Named or custom definition: render the glyph when an `icon` definition or
-  // `name` is provided and no custom children override it (children > icon > name).
   const hasChildren = React.Children.count(children) > 0
   const definition = !hasChildren
     ? (icon ?? (name ? getIconDefinition(name) : undefined))
     : undefined
 
+  if (!hasChildren && !definition && name) {
+    warnUnknownIconName(name)
+  }
+
+  const svgClassName = classNames(iconSvgBaseClasses, iconSizeClasses[resolvedSize])
   const builtInSvg = definition ? (
     <svg
-      className={classNames(iconSvgBaseClasses, iconSizeClasses[size])}
-      xmlns={SVG_DEFAULT_XMLNS}
-      viewBox={definition.viewBox}
-      fill={definition.mode === 'fill' ? 'currentColor' : SVG_DEFAULT_FILL}
-      stroke={definition.mode === 'stroke' ? 'currentColor' : SVG_DEFAULT_STROKE}
-      strokeWidth={definition.mode === 'stroke' ? 1.5 : undefined}
-      strokeLinecap={definition.mode === 'stroke' ? iconSvgDefaultStrokeLinecap : undefined}
-      strokeLinejoin={definition.mode === 'stroke' ? iconSvgDefaultStrokeLinejoin : undefined}>
+      className={svgClassName}
+      {...resolveIconSvgAttrs({ mode: definition.mode, viewBox: definition.viewBox })}>
       {definition.paths.map((d, i) => (
         <path key={i} d={d} />
       ))}
@@ -63,27 +54,24 @@ export const Icon: React.FC<IconProps> = ({
     }
 
     const svgProps = child.props
+    const merged = mergeChildSvgAttrs(svgProps as Record<string, unknown>)
 
     return React.cloneElement(child, {
       ...svgProps,
-      className: classNames(iconSvgBaseClasses, iconSizeClasses[size], svgProps.className),
-      xmlns: svgProps.xmlns ?? SVG_DEFAULT_XMLNS,
-      viewBox: svgProps.viewBox ?? SVG_DEFAULT_VIEWBOX_24,
-      fill: svgProps.fill ?? SVG_DEFAULT_FILL,
-      stroke: svgProps.stroke ?? SVG_DEFAULT_STROKE,
-      strokeWidth: svgProps.strokeWidth ?? iconSvgDefaultStrokeWidth,
-      strokeLinecap: svgProps.strokeLinecap ?? iconSvgDefaultStrokeLinecap,
-      strokeLinejoin: svgProps.strokeLinejoin ?? iconSvgDefaultStrokeLinejoin
+      ...merged,
+      className: classNames(svgClassName, svgProps.className)
     })
   })
 
   return (
     <span
       {...props}
+      ref={ref}
       className={iconClasses}
       style={iconStyle}
       {...(isDecorative ? { 'aria-hidden': true } : { role: props.role ?? 'img' })}>
       {builtInSvg ?? processedChildren}
     </span>
   )
-}
+})
+Icon.displayName = 'Icon'
