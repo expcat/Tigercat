@@ -1,12 +1,26 @@
-import { Comment, defineComponent, h, PropType, type VNode, type VNodeChild } from 'vue'
+import {
+  Comment,
+  Fragment,
+  Text,
+  cloneVNode,
+  defineComponent,
+  h,
+  isVNode,
+  PropType,
+  type VNode,
+  type VNodeChild
+} from 'vue'
 import {
   composeComponentClasses,
+  findHighlightRanges,
   getHighlightMarkClasses,
   getHighlightRootClasses,
   getHighlightSegments,
   mergeStyleValues,
   resolveHighlightText,
-  type HighlightKeywords
+  sliceTextByHighlightRanges,
+  type HighlightKeywords,
+  type HighlightRange
 } from '@expcat/tigercat-core'
 
 export interface VueHighlightProps {
@@ -52,12 +66,77 @@ function flattenVueText(input: unknown): string {
   return ''
 }
 
+function renderMark(
+  text: string,
+  markClasses: string,
+  markStyle: Record<string, unknown> | undefined
+): VNode {
+  return h(
+    'mark',
+    {
+      class: markClasses,
+      style: markStyle,
+      'data-highlight-mark': ''
+    },
+    text
+  )
+}
+
+function highlightVueNode(
+  input: unknown,
+  ranges: HighlightRange[],
+  offset: { value: number },
+  markClasses: string,
+  markStyle: Record<string, unknown> | undefined
+): VNodeChild {
+  if (input == null || typeof input === 'boolean') return null
+  if (typeof input === 'string' || typeof input === 'number') {
+    const text = String(input)
+    const pieces = sliceTextByHighlightRanges(text, offset.value, ranges)
+    offset.value += text.length
+    if (pieces.length === 1 && !pieces[0].highlighted) return text
+    return pieces.map((piece) =>
+      piece.highlighted ? renderMark(piece.text, markClasses, markStyle) : piece.text
+    )
+  }
+  if (Array.isArray(input)) {
+    return input.map((item) => highlightVueNode(item, ranges, offset, markClasses, markStyle))
+  }
+  if (!isVNode(input)) return null
+  if (input.type === Comment) return input
+  if (input.type === Text) {
+    return highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
+  }
+  if (input.type === Fragment) {
+    return highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
+  }
+  if (typeof input.children === 'string' || typeof input.children === 'number') {
+    const highlighted = highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
+    return h(input.type as string, input.props, highlighted)
+  }
+  if (Array.isArray(input.children)) {
+    const highlighted = highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
+    if (typeof input.type === 'string') {
+      return h(input.type, input.props, highlighted)
+    }
+    return cloneVNode(input, null, true)
+  }
+  if (input.children && typeof input.children === 'object') {
+    const slots = input.children as { default?: () => unknown }
+    if (typeof slots.default === 'function') {
+      const highlighted = highlightVueNode(slots.default(), ranges, offset, markClasses, markStyle)
+      return h(input.type as never, input.props, () => highlighted)
+    }
+  }
+  return input
+}
+
 export const Highlight = defineComponent({
   name: 'TigerHighlight',
   inheritAttrs: false,
   props: {
     /**
-     * Source text to search. When omitted, the default slot is flattened to a string.
+     * Source text to search. When set, it wins over the default slot.
      */
     text: {
       type: String,
@@ -118,31 +197,29 @@ export const Highlight = defineComponent({
   setup(props, { slots, attrs }) {
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
-      const source = resolveHighlightText(props.text, flattenVueText(slots.default?.()))
-      const segments = getHighlightSegments(source, props.keywords, {
+      const slotNodes = slots.default?.()
+      const source = resolveHighlightText(props.text, flattenVueText(slotNodes))
+      const options = {
         caseSensitive: props.caseSensitive,
         global: props.global
-      })
+      }
       const markClasses = getHighlightMarkClasses(props.highlightClassName)
       const markStyle = mergeStyleValues(props.highlightStyle)
-      const children: VNodeChild[] = []
+      let children: VNodeChild
 
-      for (const segment of segments) {
-        if (segment.highlighted) {
-          children.push(
-            h(
-              'mark',
-              {
-                class: markClasses,
-                style: markStyle,
-                'data-highlight-mark': ''
-              },
-              segment.text
-            )
-          )
-        } else {
-          children.push(segment.text)
-        }
+      if (props.text != null) {
+        const segments = getHighlightSegments(source, props.keywords, options)
+        children = segments.map((segment) =>
+          segment.highlighted ? renderMark(segment.text, markClasses, markStyle) : segment.text
+        )
+      } else {
+        children = highlightVueNode(
+          slotNodes,
+          findHighlightRanges(source, props.keywords, options),
+          { value: 0 },
+          markClasses,
+          markStyle
+        )
       }
 
       return h(

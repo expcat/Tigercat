@@ -12,6 +12,8 @@ import {
   getKbdParts,
   getKbdRootClasses,
   getKbdVariantClasses,
+  kbdDefaultVariantClasses,
+  resolveKbdAccessibleName,
   kbdBaseClasses,
   kbdSubtleVariantClasses,
   normalizeKbdKeys,
@@ -80,6 +82,15 @@ describe('kbd-utils', () => {
     })
   })
 
+  describe('resolveKbdAccessibleName', () => {
+    it('names a keys combo and appends the extra key', () => {
+      expect(resolveKbdAccessibleName(['Ctrl', 'K'])).toBe('Ctrl + K')
+      expect(resolveKbdAccessibleName(['Ctrl'], '+', 'S')).toBe('Ctrl + S')
+      expect(resolveKbdAccessibleName([])).toBeUndefined()
+      expect(resolveKbdAccessibleName(undefined, '+', 'Esc')).toBeUndefined()
+    })
+  })
+
   describe('getKbdParts', () => {
     it('builds alternating key and separator parts', () => {
       expect(getKbdParts(['Ctrl', 'K'])).toEqual([
@@ -104,7 +115,7 @@ describe('kbd-utils', () => {
       const classes = getKbdRootClasses()
       expect(classes).toContain(kbdBaseClasses)
       expect(classes).toContain(tagSizeClasses.md)
-      expect(classes).toContain('--tiger-tag-default-bg')
+      expect(classes).toContain(kbdDefaultVariantClasses)
       expect(classes).toContain('--tiger-surface-muted')
       expect(classes).toContain('--tiger-text')
       expect(classes).not.toContain('--tiger-fill')

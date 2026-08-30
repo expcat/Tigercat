@@ -78,6 +78,27 @@ describe('Highlight', () => {
       expect(getRoot(container).querySelectorAll('mark')).toHaveLength(1)
       expect(getRoot(container)).toHaveAttribute('data-highlight-global', 'false')
     })
+
+    it('highlights the first match of each keyword when global is false', () => {
+      const { container } = render(
+        <Highlight text="a b a b" keywords={['a', 'b']} global={false} />
+      )
+      const labels = [...getRoot(container).querySelectorAll('mark')].map(
+        (node) => node.textContent
+      )
+      expect(labels).toEqual(['a', 'b'])
+    })
+
+    it('keeps nested links when highlighting children', () => {
+      const { container } = render(
+        <Highlight keywords="Vue">
+          Learn <a href="/vue">Vue</a> today
+        </Highlight>
+      )
+      const link = getRoot(container).querySelector('a')
+      expect(link).toHaveAttribute('href', '/vue')
+      expect(link?.querySelector('mark')).toHaveTextContent('Vue')
+    })
   })
 
   describe('style integration', () => {

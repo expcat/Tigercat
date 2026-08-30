@@ -6,7 +6,7 @@
  * during server-side rendering.
  */
 
-import { getTagVariantClasses } from './theme-colors'
+import { defaultTagThemeColors } from './theme-colors'
 import {
   DEFAULT_KBD_SEPARATOR,
   DEFAULT_KBD_SIZE,
@@ -38,6 +38,13 @@ export const kbdSeparatorClasses = 'tiger-kbd-separator'
 /** Quieter chrome for the subtle variant */
 export const kbdSubtleVariantClasses =
   'border-transparent bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)]'
+
+/** Default chrome: Tag default bg/text/border only, no Tag hover/close classes */
+export const kbdDefaultVariantClasses = [
+  defaultTagThemeColors.default.bg,
+  defaultTagThemeColors.default.text,
+  defaultTagThemeColors.default.border
+].join(' ')
 
 /**
  * Normalize `keys` into trimmed, non-empty key labels.
@@ -119,11 +126,26 @@ export function formatKbdCombo(keys?: KbdKeys | null, separator?: string): strin
 }
 
 /**
- * Variant classes. `default` reuses Tag default chrome.
+ * Variant classes. `default` copies Tag default bg/text/border tokens.
  */
 export function getKbdVariantClasses(variant?: KbdVariant): string {
   if (resolveKbdVariant(variant) === 'subtle') return kbdSubtleVariantClasses
-  return getTagVariantClasses('default')
+  return kbdDefaultVariantClasses
+}
+
+/**
+ * Accessible name for a combo. Extra text is treated as the last key.
+ */
+export function resolveKbdAccessibleName(
+  keys?: KbdKeys | null,
+  separator?: string,
+  extraKey?: string | null
+): string | undefined {
+  const combo = formatKbdCombo(keys, separator)
+  if (!combo) return undefined
+  const extra = extraKey?.trim() ?? ''
+  if (extra) return `${combo}${formatKbdSeparatorText(separator)}${extra}`
+  return combo
 }
 
 /**

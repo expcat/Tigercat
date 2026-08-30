@@ -8,7 +8,7 @@
 export type KbdSize = 'sm' | 'md' | 'lg'
 
 /**
- * Kbd visual variants. `default` uses Tag default chrome; `subtle` is quieter.
+ * Kbd visual variants. `default` is Kbd chrome; `subtle` is quieter.
  */
 export type KbdVariant = 'default' | 'subtle'
 
@@ -57,7 +57,7 @@ export interface KbdProps {
   size?: KbdSize
 
   /**
-   * Visual variant. `default` reuses Tag default chrome; `subtle` is quieter.
+   * Visual variant. `default` is Kbd chrome (bg/text/border); `subtle` is quieter.
    * @default 'default'
    */
   variant?: KbdVariant

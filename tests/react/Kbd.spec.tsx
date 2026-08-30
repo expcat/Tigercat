@@ -33,9 +33,13 @@ describe('Kbd', () => {
       const { container } = render(<Kbd keys={['Ctrl', 'K']} />)
       const root = getRoot(container)
       expect(root).toHaveTextContent('Ctrl + K')
+      expect(root).toHaveAttribute('aria-label', 'Ctrl + K')
       const keyLabels = [...root.querySelectorAll('[data-kbd-key]')].map((node) => node.textContent)
       expect(keyLabels).toEqual(['Ctrl', 'K'])
       expect(root.querySelectorAll('kbd[data-kbd-key]')).toHaveLength(2)
+      const visibleKbd = container.querySelectorAll('kbd:not([aria-hidden="true"])')
+      expect(visibleKbd).toHaveLength(1)
+      expect(visibleKbd[0]).toBe(root)
     })
 
     it('appends children after keys', () => {
@@ -129,6 +133,7 @@ describe('Kbd', () => {
       const root = getRoot(container)
       expect(root.tagName).toBe('KBD')
       expect(root.textContent).toBe('')
+      expect(root).toHaveAttribute('aria-hidden', 'true')
     })
 
     it('renders special characters as text, not HTML', () => {

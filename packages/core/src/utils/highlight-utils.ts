@@ -26,7 +26,7 @@ export const highlightRootClasses = 'tiger-highlight'
  * readable in both color schemes, without Tag border or warning foreground.
  */
 export const highlightMarkClasses =
-  'tiger-highlight-mark rounded-[var(--tiger-radius-sm,0.375rem)] bg-[color-mix(in_srgb,var(--tiger-warning,#d97706)_20%,transparent)] px-0.5 text-inherit box-decoration-clone'
+  'tiger-highlight-mark rounded-[var(--tiger-radius-sm,0.375rem)] bg-[var(--tiger-warning,#d97706)]/20 px-0.5 text-inherit box-decoration-clone'
 
 const REGEXP_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g
 
@@ -277,4 +277,51 @@ export function getHighlightRootClasses(className?: string): string {
  */
 export function getHighlightMarkClasses(className?: string): string {
   return classNames(highlightMarkClasses, className)
+}
+
+/**
+ * Split one text node that occupies `[offset, offset+text.length)` by match ranges.
+ */
+export function sliceTextByHighlightRanges(
+  text: string,
+  offset: number,
+  ranges: readonly HighlightRange[]
+): Array<{ text: string; highlighted: boolean; start: number }> {
+  if (!text) return []
+
+  const end = offset + text.length
+  const overlapping = ranges.filter((range) => range.start < end && range.end > offset)
+  if (overlapping.length === 0) {
+    return [{ text, highlighted: false, start: offset }]
+  }
+
+  const pieces: Array<{ text: string; highlighted: boolean; start: number }> = []
+  let cursor = offset
+  for (const range of overlapping) {
+    const start = Math.max(range.start, offset)
+    const stop = Math.min(range.end, end)
+    if (start > cursor) {
+      pieces.push({
+        text: text.slice(cursor - offset, start - offset),
+        highlighted: false,
+        start: cursor
+      })
+    }
+    if (stop > start) {
+      pieces.push({
+        text: text.slice(start - offset, stop - offset),
+        highlighted: true,
+        start
+      })
+    }
+    cursor = Math.max(cursor, stop)
+  }
+  if (cursor < end) {
+    pieces.push({
+      text: text.slice(cursor - offset),
+      highlighted: false,
+      start: cursor
+    })
+  }
+  return pieces
 }

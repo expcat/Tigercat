@@ -29,6 +29,18 @@ describe('Highlight', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument()
     })
 
+    it('keeps nested links when highlighting the default slot', () => {
+      const { container } = render(Highlight, {
+        props: { keywords: 'Vue' },
+        slots: {
+          default: () => ['Learn ', h('a', { href: '/vue' }, 'Vue'), ' today']
+        }
+      })
+      const link = getRoot(container).querySelector('a')
+      expect(link).toHaveAttribute('href', '/vue')
+      expect(link?.querySelector('mark')).toHaveTextContent('Vue')
+    })
+
     it('flattens text from nested component default slots', () => {
       const Wrapper = defineComponent({
         name: 'NestedHighlightText',
@@ -94,6 +106,16 @@ describe('Highlight', () => {
       })
       expect(getRoot(container).querySelectorAll('mark')).toHaveLength(1)
       expect(getRoot(container)).toHaveAttribute('data-highlight-global', 'false')
+    })
+
+    it('highlights the first match of each keyword when global is false', () => {
+      const { container } = render(Highlight, {
+        props: { text: 'a b a b', keywords: ['a', 'b'], global: false }
+      })
+      const labels = [...getRoot(container).querySelectorAll('mark')].map(
+        (node) => node.textContent
+      )
+      expect(labels).toEqual(['a', 'b'])
     })
   })
 

@@ -30,14 +30,15 @@ describe('Tag / Kbd default theme pair', () => {
     expect(classes).not.toContain('#f3f4f6')
   })
 
-  it('lets Kbd default inherit the Tag default bg/text pair', () => {
-    const tagDefault = getTagVariantClasses('default')
+  it('lets Kbd default copy Tag default bg/text/border tokens', () => {
+    const { bg, text, border } = defaultTagThemeColors.default
     const kbdDefault = getKbdVariantClasses()
     const kbdRoot = getKbdRootClasses()
 
-    expect(getKbdVariantClasses('default')).toBe(tagDefault)
-    expect(kbdDefault).toBe(tagDefault)
-    expect(kbdRoot).toContain(tagDefault)
+    expect(kbdDefault).toContain(bg)
+    expect(kbdDefault).toContain(text)
+    expect(kbdDefault).toContain(border)
+    expect(kbdRoot).toContain(bg)
     expect(kbdDefault).toContain('--tiger-surface-muted')
     expect(kbdDefault).toContain('--tiger-text')
     expect(kbdDefault).not.toContain('--tiger-fill')

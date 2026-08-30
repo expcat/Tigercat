@@ -59,8 +59,8 @@ export const DEFAULT_HIGHLIGHT_GLOBAL = true
  */
 export interface HighlightProps {
   /**
-   * Source text to search. When omitted, Vue default slot / React children
-   * are flattened to a string.
+   * Source text to search. When set, it wins over children/slot. When omitted,
+   * children/slot stay in the tree and matching text nodes are wrapped in `mark`.
    */
   text?: string
 

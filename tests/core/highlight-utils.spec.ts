@@ -17,7 +17,8 @@ import {
   normalizeHighlightKeywords,
   resolveHighlightCaseSensitive,
   resolveHighlightGlobal,
-  resolveHighlightText
+  resolveHighlightText,
+  sliceTextByHighlightRanges
 } from '@expcat/tigercat-core'
 
 describe('highlight-utils', () => {
@@ -87,6 +88,10 @@ describe('highlight-utils', () => {
       expect(findHighlightRanges('foo foo foo', 'foo', { global: false })).toEqual([
         { start: 0, end: 3 }
       ])
+      expect(findHighlightRanges('a b a b', ['a', 'b'], { global: false })).toEqual([
+        { start: 0, end: 1 },
+        { start: 2, end: 3 }
+      ])
     })
 
     it('matches multiple keywords and merges overlapping ranges', () => {
@@ -147,6 +152,16 @@ describe('highlight-utils', () => {
     it('returns the original text as a single plain segment when nothing matches', () => {
       expect(getHighlightSegments('plain', 'z')).toEqual([
         { text: 'plain', highlighted: false, start: 0, end: 5 }
+      ])
+    })
+  })
+
+  describe('sliceTextByHighlightRanges', () => {
+    it('splits a text node that straddles a match', () => {
+      expect(sliceTextByHighlightRanges('Learn Vue today', 0, [{ start: 6, end: 9 }])).toEqual([
+        { text: 'Learn ', highlighted: false, start: 0 },
+        { text: 'Vue', highlighted: true, start: 6 },
+        { text: ' today', highlighted: false, start: 9 }
       ])
     })
   })
