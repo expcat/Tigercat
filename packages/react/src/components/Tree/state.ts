@@ -17,6 +17,7 @@ import {
   type TreeCheckedState
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from '../ConfigProvider'
+import { useDrag } from '../../hooks/useDrag'
 import type { TreeProps, TreeContext } from './types'
 
 export function useTreeState(props: TreeProps): TreeContext {
@@ -64,7 +65,14 @@ export function useTreeState(props: TreeProps): TreeContext {
   } = props
 
   const itemRefs = useRef(new Map<string | number, HTMLDivElement | null>())
-  const dragNodeKeyRef = useRef<string | number | null>(null)
+  const drag = useDrag({
+    containerId: 'tree',
+    onDrop: (event) => {
+      const dropKey = event.overItem?.id
+      if (dropKey == null || dropKey === event.item.id) return
+      onDrop?.({ dragKey: event.item.id, dropKey })
+    }
+  })
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -441,7 +449,18 @@ export function useTreeState(props: TreeProps): TreeContext {
     internalSearchValue,
     setInternalSearchValue,
     itemRefs,
-    dragNodeKeyRef,
+    startTreeDrag: (nodeKey, event) => {
+      drag.startDrag({ id: nodeKey, index: 0, containerId: 'tree' }, event)
+    },
+    overTreeDrag: (nodeKey, event) => {
+      drag.dragOver({ id: nodeKey, index: 0, containerId: 'tree' }, event)
+    },
+    dropTreeDrag: (event) => {
+      drag.drop(event)
+    },
+    endTreeDrag: () => {
+      drag.endDrag()
+    },
     setActiveKey,
     loadData,
     onNodeClick,

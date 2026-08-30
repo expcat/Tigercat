@@ -6,7 +6,7 @@
  */
 
 import type { FileItem, FileSortField, FileSortOrder, FileViewMode } from '../types/file-manager'
-import type { DragItem, DragDropEvent } from '../types/drag'
+import type { DragItem } from '../types/drag'
 import { formatBytes, getFileExtensionName } from './file-utils'
 
 // ─── Tailwind class constants ─────────────────────────────────────
@@ -254,17 +254,4 @@ export function toFileDragItem(item: FileItem, index: number, containerId?: stri
     containerId,
     data: { name: item.name, type: item.type }
   }
-}
-
-/**
- * Apply a drag-drop reorder to a flat list of file items.
- * Returns the new array with the moved item in its new position.
- */
-export function applyFileDragReorder(items: FileItem[], event: DragDropEvent): FileItem[] {
-  const { fromIndex, toIndex } = event
-  if (fromIndex === toIndex) return items
-  const result = [...items]
-  const [moved] = result.splice(fromIndex, 1)
-  result.splice(toIndex, 0, moved)
-  return result
 }

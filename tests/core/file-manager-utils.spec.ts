@@ -15,7 +15,6 @@ import {
   resolveFileOpen,
   sliceBreadcrumbPath,
   toFileDragItem,
-  applyFileDragReorder,
   fileManagerContainerClasses,
   fileManagerToolbarClasses,
   fileManagerLoadingClasses,
@@ -440,36 +439,6 @@ describe('file-manager-utils', () => {
       expect(drag.index).toBe(3)
       expect(drag.containerId).toBe('container-1')
       expect(drag.data).toEqual({ name: 'index.ts', type: 'file' })
-    })
-  })
-
-  // ─── applyFileDragReorder ─────────────────────────────────
-
-  describe('applyFileDragReorder', () => {
-    it('reorders items', () => {
-      const items = [makeFile('a'), makeFile('b'), makeFile('c')]
-      const result = applyFileDragReorder(items, {
-        item: { id: 'a', index: 0 },
-        overItem: null,
-        fromIndex: 0,
-        toIndex: 2,
-        fromContainerId: 'x',
-        toContainerId: 'x'
-      })
-      expect(result.map((i) => i.name)).toEqual(['b', 'c', 'a'])
-    })
-
-    it('returns same array for same index', () => {
-      const items = [makeFile('a'), makeFile('b')]
-      const result = applyFileDragReorder(items, {
-        item: { id: 'a', index: 0 },
-        overItem: null,
-        fromIndex: 1,
-        toIndex: 1,
-        fromContainerId: 'x',
-        toContainerId: 'x'
-      })
-      expect(result).toBe(items)
     })
   })
 })

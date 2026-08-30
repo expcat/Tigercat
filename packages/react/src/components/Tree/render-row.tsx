@@ -53,37 +53,27 @@ export function renderTreeRow(ctx: TreeContext, node: TreeNode, level: number): 
         ctx.isDraggable && !node.disabled
           ? (e) => {
               e.stopPropagation()
-              ctx.dragNodeKeyRef.current = node.key
+              ctx.startTreeDrag(node.key, e)
             }
           : undefined
       }
       onDragOver={
         ctx.isDraggable
           ? (e) => {
-              e.preventDefault()
               e.stopPropagation()
+              ctx.overTreeDrag(node.key, e)
             }
           : undefined
       }
       onDrop={
         ctx.isDraggable
           ? (e) => {
-              e.preventDefault()
               e.stopPropagation()
-              if (ctx.dragNodeKeyRef.current !== null && ctx.dragNodeKeyRef.current !== node.key) {
-                ctx.onDrop?.({ dragKey: ctx.dragNodeKeyRef.current, dropKey: node.key })
-              }
-              ctx.dragNodeKeyRef.current = null
+              ctx.dropTreeDrag(e)
             }
           : undefined
       }
-      onDragEnd={
-        ctx.isDraggable
-          ? () => {
-              ctx.dragNodeKeyRef.current = null
-            }
-          : undefined
-      }
+      onDragEnd={ctx.isDraggable ? () => ctx.endTreeDrag() : undefined}
       onFocus={() => {
         if (!node.disabled) ctx.setActiveKey(node.key)
       }}

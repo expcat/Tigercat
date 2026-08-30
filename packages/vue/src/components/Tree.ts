@@ -38,6 +38,7 @@ import {
   mergeTigerLocale,
   type TigerLocale
 } from '@expcat/tigercat-core'
+import { useDrag } from '../composables/useDrag'
 import { VirtualList } from './VirtualList'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -349,32 +350,14 @@ export const Tree = defineComponent({
     // Internal state for expanded keys
     const internalExpandedKeys = ref<Set<string | number>>(new Set())
 
-    // Drag state for tree node reordering
-    const dragNodeKey = ref<string | number | null>(null)
-
-    function handleTreeDragStart(key: string | number) {
-      dragNodeKey.value = key
-    }
-
-    function handleTreeDragOver(e: DragEvent) {
-      e.preventDefault()
-    }
-
-    function handleTreeDrop(targetKey: string | number) {
-      if (dragNodeKey.value === null || dragNodeKey.value === targetKey) {
-        dragNodeKey.value = null
-        return
+    const drag = useDrag({
+      containerId: 'tree',
+      onDrop: (event) => {
+        const dropKey = event.overItem?.id
+        if (dropKey == null || dropKey === event.item.id) return
+        emit('drop', { dragKey: event.item.id, dropKey })
       }
-      emit('drop', {
-        dragKey: dragNodeKey.value,
-        dropKey: targetKey
-      })
-      dragNodeKey.value = null
-    }
-
-    function handleTreeDragEnd() {
-      dragNodeKey.value = null
-    }
+    })
 
     // Internal state for selected keys
     const internalSelectedKeys = ref<Set<string | number>>(
@@ -714,18 +697,22 @@ export const Tree = defineComponent({
             props.draggable && !node.disabled
               ? (e: DragEvent) => {
                   e.stopPropagation()
-                  handleTreeDragStart(node.key)
+                  drag.startDrag({ id: node.key, index: 0, containerId: 'tree' }, e)
                 }
               : undefined,
-          onDragover: props.draggable ? handleTreeDragOver : undefined,
-          onDrop: props.draggable
+          onDragover: props.draggable
             ? (e: DragEvent) => {
-                e.preventDefault()
                 e.stopPropagation()
-                handleTreeDrop(node.key)
+                drag.dragOver({ id: node.key, index: 0, containerId: 'tree' }, e)
               }
             : undefined,
-          onDragend: props.draggable ? handleTreeDragEnd : undefined,
+          onDrop: props.draggable
+            ? (e: DragEvent) => {
+                e.stopPropagation()
+                drag.drop(e)
+              }
+            : undefined,
+          onDragend: props.draggable ? () => drag.endDrag() : undefined,
           onFocus: () => {
             if (!node.disabled) activeKey.value = node.key
           },

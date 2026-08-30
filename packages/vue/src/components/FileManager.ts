@@ -9,7 +9,7 @@ import {
   resolveFileOpen,
   sliceBreadcrumbPath,
   toFileDragItem,
-  applyFileDragReorder,
+  reorderSequence,
   formatFileSizeLabel,
   getFileManagerLabels,
   fileManagerToolbarClasses,
@@ -33,6 +33,7 @@ import {
   type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useDrag } from '../composables/useDrag'
 
 /**
  * Vue FileManager props. Reuses the shared core props except the React-style
@@ -109,7 +110,6 @@ export const FileManager = defineComponent({
     const localSearch = ref(props.searchText)
     const focusedIndex = ref(0)
     const contentRef = ref<HTMLElement | null>(null)
-    let dragFromIndex: number | null = null
     const innerSelectedKeys = ref<(string | number)[]>([...(props.defaultSelectedKeys ?? [])])
     const isControlled = computed(() => props.selectedKeys !== undefined)
     const resolvedKeys = computed(() =>
@@ -125,38 +125,28 @@ export const FileManager = defineComponent({
       }
     )
 
+    const drag = useDrag({
+      containerId: 'files',
+      onDrop: (event) => {
+        if (event.fromIndex === event.toIndex) return
+        const reordered = reorderSequence(
+          model.value.processedItems,
+          event.fromIndex,
+          event.toIndex
+        )
+        emit('reorder', reordered, event.fromIndex, event.toIndex)
+        emit('update:files', reordered)
+      }
+    })
+
     function handleDragStart(event: DragEvent, item: FileItem, index: number) {
       if (!props.draggable || item.disabled) return
-      dragFromIndex = index
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = 'move'
-        event.dataTransfer.setData('text/plain', String(toFileDragItem(item, index).id))
-      }
+      drag.startDrag(toFileDragItem(item, index, 'files'), event)
     }
 
-    function handleDragOver(event: DragEvent) {
-      if (!props.draggable || dragFromIndex === null) return
-      event.preventDefault()
-      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
-    }
-
-    function handleDrop(event: DragEvent, toIndex: number) {
+    function handleDragOver(event: DragEvent, item: FileItem, index: number) {
       if (!props.draggable) return
-      const fromIndex = dragFromIndex
-      dragFromIndex = null
-      if (fromIndex === null || fromIndex === toIndex) return
-      event.preventDefault()
-      const items = model.value.processedItems
-      const reordered = applyFileDragReorder(items, {
-        item: toFileDragItem(items[fromIndex], fromIndex),
-        overItem: null,
-        fromIndex,
-        toIndex,
-        fromContainerId: '',
-        toContainerId: ''
-      })
-      emit('reorder', reordered, fromIndex, toIndex)
-      emit('update:files', reordered)
+      drag.dragOver(toFileDragItem(item, index, 'files'), event)
     }
 
     const model = computed(() =>
@@ -371,8 +361,6 @@ export const FileManager = defineComponent({
               ]
             : []
 
-        const dragItem = props.draggable && !item.disabled ? toFileDragItem(item, index) : undefined
-
         return h(
           'div',
           {
@@ -390,10 +378,15 @@ export const FileManager = defineComponent({
             onClick: () => handleSelect(item),
             onDblclick: () => handleOpen(item),
             draggable: props.draggable && !item.disabled,
-            'data-drag-id': dragItem?.id,
+            'data-drag-id': item.key,
+            'data-drag-index': index,
+            'data-drag-container': 'files',
             onDragstart: (event: DragEvent) => handleDragStart(event, item, index),
-            onDragover: handleDragOver,
-            onDrop: (event: DragEvent) => handleDrop(event, index)
+            onDragover: props.draggable
+              ? (event: DragEvent) => handleDragOver(event, item, index)
+              : undefined,
+            onDrop: props.draggable ? (event: DragEvent) => drag.drop(event) : undefined,
+            onDragend: props.draggable ? () => drag.endDrag() : undefined
           },
           [fileIcon(item), nameEl, ...metaEls]
         )

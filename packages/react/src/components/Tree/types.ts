@@ -251,7 +251,10 @@ export interface TreeContext {
 
   // refs
   itemRefs: React.MutableRefObject<Map<string | number, HTMLDivElement | null>>
-  dragNodeKeyRef: React.MutableRefObject<string | number | null>
+  startTreeDrag: (nodeKey: string | number, event: React.DragEvent) => void
+  overTreeDrag: (nodeKey: string | number, event: React.DragEvent) => void
+  dropTreeDrag: (event: React.DragEvent) => void
+  endTreeDrag: () => void
 
   // handlers
   setActiveKey: React.Dispatch<React.SetStateAction<string | number | undefined>>

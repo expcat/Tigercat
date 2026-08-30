@@ -8,7 +8,7 @@ import {
   resolveFileOpen,
   sliceBreadcrumbPath,
   toFileDragItem,
-  applyFileDragReorder,
+  reorderSequence,
   formatFileSizeLabel,
   getFileManagerLabels,
   fileManagerToolbarClasses,
@@ -28,6 +28,7 @@ import {
   type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useDrag } from '../hooks/useDrag'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface FileManagerProps extends CoreFileManagerProps {
@@ -70,7 +71,6 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const [localSearch, setLocalSearch] = useState(searchText)
   const [focusedIndex, setFocusedIndex] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
-  const dragFromIndex = useRef<number | null>(null)
   const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
   const [keys, setKeys] = useControlledState({
     value: selectedKeys,
@@ -97,6 +97,15 @@ export const FileManager: React.FC<FileManagerProps> = ({
       }),
     [files, currentPath, keys, sortField, sortOrder, showHidden, localSearch, searchText]
   )
+
+  const drag = useDrag({
+    containerId: 'files',
+    onDrop: (event) => {
+      if (event.fromIndex === event.toIndex) return
+      const next = reorderSequence(model.processedItems, event.fromIndex, event.toIndex)
+      onReorder?.(next, event.fromIndex, event.toIndex)
+    }
+  })
 
   const containerClasses = useMemo(() => getFileManagerContainerClasses(className), [className])
 
@@ -239,41 +248,17 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const handleDragStart = useCallback(
     (event: React.DragEvent<HTMLDivElement>, item: FileItem, index: number) => {
       if (!draggable || item.disabled) return
-      dragFromIndex.current = index
-      event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.setData('text/plain', String(toFileDragItem(item, index).id))
+      drag.startDrag(toFileDragItem(item, index, 'files'), event)
     },
-    [draggable]
+    [draggable, drag]
   )
 
   const handleDragOver = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      if (!draggable || dragFromIndex.current === null) return
-      event.preventDefault()
-      event.dataTransfer.dropEffect = 'move'
-    },
-    [draggable]
-  )
-
-  const handleDrop = useCallback(
-    (event: React.DragEvent<HTMLDivElement>, toIndex: number) => {
+    (event: React.DragEvent<HTMLDivElement>, item: FileItem, index: number) => {
       if (!draggable) return
-      const fromIndex = dragFromIndex.current
-      dragFromIndex.current = null
-      if (fromIndex === null || fromIndex === toIndex) return
-      event.preventDefault()
-      const items = model.processedItems
-      const reordered = applyFileDragReorder(items, {
-        item: toFileDragItem(items[fromIndex], fromIndex),
-        overItem: null,
-        fromIndex,
-        toIndex,
-        fromContainerId: '',
-        toContainerId: ''
-      })
-      onReorder?.(reordered, fromIndex, toIndex)
+      drag.dragOver(toFileDragItem(item, index, 'files'), event)
     },
-    [draggable, model.processedItems, onReorder]
+    [draggable, drag]
   )
 
   return (
@@ -306,8 +291,6 @@ export const FileManager: React.FC<FileManagerProps> = ({
           {model.processedItems.map((item, index) => {
             const isSelected = model.selectedSet.has(item.key)
             const itemClass = getFileItemClasses(viewMode, isSelected)
-            const dragItem = draggable && !item.disabled ? toFileDragItem(item, index) : undefined
-
             return (
               <div
                 key={item.key}
@@ -317,7 +300,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 tabIndex={!item.disabled && index === focusedItem ? 0 : -1}
                 data-option-index={index}
                 data-disabled={item.disabled || undefined}
-                data-drag-id={dragItem?.id}
+                data-drag-id={item.key}
+                data-drag-index={index}
+                data-drag-container="files"
                 onFocus={() => {
                   if (!item.disabled) setFocusedIndex(index)
                 }}
@@ -326,8 +311,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 onDoubleClick={() => handleOpen(item)}
                 draggable={draggable && !item.disabled}
                 onDragStart={(event) => handleDragStart(event, item, index)}
-                onDragOver={handleDragOver}
-                onDrop={(event) => handleDrop(event, index)}>
+                onDragOver={draggable ? (event) => handleDragOver(event, item, index) : undefined}
+                onDrop={draggable ? (event) => drag.drop(event) : undefined}
+                onDragEnd={draggable ? () => drag.endDrag() : undefined}>
                 {renderIcon ? (
                   renderIcon(item)
                 ) : (
