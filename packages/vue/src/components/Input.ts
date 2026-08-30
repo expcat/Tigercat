@@ -2,6 +2,7 @@ import { defineComponent, computed, ref, watch, h, inject, getCurrentInstance, P
 import {
   classNames,
   coerceClassValue,
+  mergeAriaDescribedBy,
   getInputFieldClasses,
   getInputWrapperClasses,
   getInputAffixClasses,
@@ -186,26 +187,41 @@ export const Input = defineComponent({
     const effectiveStatus = computed(() =>
       hasOwnStatus.value ? props.status : (formItemControl?.status.value ?? props.status)
     )
-    const effectiveErrorMessage = computed(
-      () => props.errorMessage ?? formItemControl?.errorMessage.value
+    const effectiveErrorMessage = computed(() => props.errorMessage)
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const formValue = computed(() => formItemControl?.value.value)
     const effectiveShakeTrigger = computed(
       () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
     )
     const inputRef = ref<HTMLInputElement | null>(null)
     const wrapperRef = ref<HTMLDivElement | null>(null)
-    const localValue = ref<string | number>(props.modelValue ?? '')
+    const localValue = ref<string | number>(
+      props.modelValue ??
+        (typeof formValue.value === 'string' || typeof formValue.value === 'number'
+          ? formValue.value
+          : '')
+    )
     const passwordVisible = ref(false)
     const instanceId = ++inputIdCounter
     const errorMsgId = `tiger-input-error-${instanceId}`
 
     // Sync localValue with modelValue prop
     watch(
-      () => props.modelValue,
-      (newValue) => {
-        const next = newValue ?? ''
-        if (next !== localValue.value) {
-          localValue.value = next
+      () => [props.modelValue, formValue.value] as const,
+      ([modelValue, controlValue]) => {
+        const source =
+          modelValue !== undefined
+            ? modelValue
+            : typeof controlValue === 'string' || typeof controlValue === 'number'
+              ? controlValue
+              : undefined
+        if (source === undefined) return
+        if (source !== localValue.value) {
+          localValue.value = source
         }
       }
     )
@@ -250,16 +266,21 @@ export const Input = defineComponent({
       localValue.value = value
       emit('update:modelValue', value)
       emit('input', event)
+      formItemControl?.onChange(value)
     }
 
     const handleChange = (event: Event) => emit('change', event)
     const handleFocus = (event: FocusEvent) => emit('focus', event)
-    const handleBlur = (event: FocusEvent) => emit('blur', event)
+    const handleBlur = (event: FocusEvent) => {
+      formItemControl?.onBlur()
+      emit('blur', event)
+    }
 
     const handleClear = () => {
       localValue.value = ''
       emit('update:modelValue', '')
       emit('clear')
+      formItemControl?.onChange('')
       inputRef.value?.focus()
     }
 
@@ -271,8 +292,9 @@ export const Input = defineComponent({
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
       const currentValStr = String(localValue.value)
       const showClear =
-        props.clearable && !props.disabled && !props.readonly && currentValStr.length > 0
-      const showPasswordToggle = props.showPassword && props.type === 'password' && !props.disabled
+        props.clearable && !effectiveDisabled.value && !props.readonly && currentValStr.length > 0
+      const showPasswordToggle =
+        props.showPassword && props.type === 'password' && !effectiveDisabled.value
       const dualSuffix = showClear && showPasswordToggle
       const inputClasses = getInputFieldClasses({
         size: effectiveSize.value,
@@ -341,17 +363,24 @@ export const Input = defineComponent({
           type: effectiveType.value,
           value: localValue.value,
           placeholder: props.placeholder,
-          disabled: props.disabled,
+          disabled: effectiveDisabled.value,
           readonly: props.readonly,
           required: props.required,
           maxlength: props.maxLength,
           minlength: props.minLength,
-          name: props.name,
-          id: props.id,
+          name: effectiveName.value,
+          id: effectiveId.value,
           autocomplete: props.autoComplete,
           autofocus: props.autoFocus,
           ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
-          ...(activeError.value ? { 'aria-describedby': errorMsgId } : {}),
+          ...(formItemControl?.required.value ? { 'aria-required': true } : {}),
+          'aria-describedby': mergeAriaDescribedBy(
+            mergeAriaDescribedBy(
+              restAttrs['aria-describedby'] as string | undefined,
+              activeError.value ? errorMsgId : undefined
+            ),
+            formItemControl?.describedBy.value
+          ),
           onInput: handleInput,
           onChange: handleChange,
           onFocus: handleFocus,

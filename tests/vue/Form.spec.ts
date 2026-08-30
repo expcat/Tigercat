@@ -9,8 +9,11 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Input } from '@expcat/tigercat-vue/Input'
+import { Space } from '@expcat/tigercat-vue/Space'
 import type { FormRule, FormRules } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Form', () => {
   // ==================== Basic Functionality ====================
@@ -119,7 +122,7 @@ describe('Form', () => {
 
   // ==================== Layout Modes ====================
   describe('Layout Modes', () => {
-    it('renders horizontal layout (label-right) by default', () => {
+    it('renders horizontal layout (label-left) by default', () => {
       const Demo = defineComponent({
         setup() {
           const model = reactive({ name: '' })
@@ -142,7 +145,7 @@ describe('Form', () => {
       })
 
       const { container } = render(Demo)
-      expect(container.querySelector('.tiger-form--label-right')).toBeInTheDocument()
+      expect(container.querySelector('.tiger-form--label-left')).toBeInTheDocument()
     })
 
     it('renders with label position left', () => {
@@ -195,7 +198,7 @@ describe('Form', () => {
 
       const { container } = render(Demo)
       expect(container.querySelector('.tiger-form--label-top')).toBeInTheDocument()
-      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-left')
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-start')
     })
 
     it('keeps explicit top label alignment', () => {
@@ -221,7 +224,7 @@ describe('Form', () => {
       })
 
       const { container } = render(Demo)
-      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-right')
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-end')
     })
 
     it('applies custom label width', () => {
@@ -471,7 +474,7 @@ describe('Form', () => {
           // No per-rule message → falls back to the localized built-in message
           const rules: FormRules = { email: [{ required: true }] }
           return () =>
-            h(ConfigProvider, { locale: { locale: 'zh-CN' } }, () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
               h(
                 Form,
                 { model, rules },
@@ -494,6 +497,40 @@ describe('Form', () => {
       await fireEvent.focusOut(screen.getByLabelText('email'))
 
       expect(await screen.findByText('此字段为必填项')).toBeInTheDocument()
+    })
+
+    it('uses Traditional Chinese required copy under zhTW', async () => {
+      let formApi: { validateField: (name: string) => Promise<void> } | undefined
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ email: '' })
+          return () =>
+            h(ConfigProvider, { locale: zhTW }, () =>
+              h(
+                Form,
+                {
+                  model,
+                  rules: { email: [{ required: true }] },
+                  ref: (el) => {
+                    formApi = (el as typeof formApi) ?? undefined
+                  }
+                },
+                {
+                  default: () =>
+                    h(FormItem, { label: 'Email', name: 'email' }, () =>
+                      h('input', { 'aria-label': 'email' })
+                    )
+                }
+              )
+            )
+        }
+      })
+
+      render(Demo)
+      await formApi?.validateField('email')
+      const message = await screen.findByRole('alert')
+      expect(message.textContent).toBe('此欄位為必填項')
+      expect(message.textContent).not.toBe('此字段为必填项')
     })
     it('displays validation error message in alert role', async () => {
       const Demo = defineComponent({
@@ -755,10 +792,12 @@ describe('Form', () => {
       const form = screen.getByRole('button', { name: 'Submit' }).closest('form')
       await fireEvent.submit(form as HTMLFormElement)
 
-      expect(onSubmit).toHaveBeenCalledWith({
-        valid: true,
-        values: { username: 'john', password: 'secret123' },
-        errors: []
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith({
+          valid: true,
+          values: { username: 'john', password: 'secret123' },
+          errors: []
+        })
       })
     })
 
@@ -1476,7 +1515,8 @@ describe('Form', () => {
       })
 
       render(Demo)
-      expect(screen.getByText('Username taken')).toBeInTheDocument()
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('username')).toHaveAttribute('aria-invalid', 'true')
     })
 
     it('supports different form sizes', () => {
@@ -1541,12 +1581,17 @@ describe('Form', () => {
   // ==================== Accessibility ====================
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
-      const { container } = render(Form, {
-        props: { model: {} },
-        slots: { default: '<div>Accessible form</div>' }
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ name: '' })
+          return () =>
+            h(Form, { model, rules: { name: { required: true } } }, () =>
+              h(FormItem, { name: 'name', label: 'Name', required: true }, () => h(Input))
+            )
+        }
       })
-
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(Demo)
+      await expectNoA11yViolations(container)
     })
 
     it('associates label with input field', () => {
@@ -1891,10 +1936,84 @@ describe('Form', () => {
           // expected
         }
         await nextTick()
-        const errorEl = screen.getByRole('alert')
-        expect(errorEl.className).toContain('absolute')
-        expect(errorEl.className).toContain('bg-red-600')
+        const content = document.querySelector('.tiger-form-item__content') as HTMLElement
+        content.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+        await nextTick()
+        const errorEl = await screen.findByRole('alert')
+        expect(errorEl).toHaveTextContent('Required')
+        expect(errorEl.className).toContain('--tiger-error')
       })
+    })
+  })
+
+  describe('FormItem takeover', () => {
+    it('owns an unbound Input so typing validates and resetFields clears the box', async () => {
+      let formApi: { validate: () => Promise<boolean>; resetFields: () => void } | undefined
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ name: '' })
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                rules: { name: { required: true, message: 'Required' } },
+                ref: (el) => {
+                  formApi = (el as typeof formApi) ?? undefined
+                }
+              },
+              () =>
+                h(FormItem, { name: 'name', label: 'Name' }, () =>
+                  h(Input, { 'aria-label': 'name' })
+                )
+            )
+        }
+      })
+
+      render(Demo)
+      const input = screen.getByLabelText('name') as HTMLInputElement
+      await fireEvent.update(input, 'Ada')
+      expect(await formApi?.validate()).toBe(true)
+      formApi?.resetFields()
+      await nextTick()
+      expect((screen.getByLabelText('name') as HTMLInputElement).value).toBe('')
+    })
+
+    it('marks required from rules without a required prop', () => {
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ name: '' })
+          return () =>
+            h(Form, { model }, () =>
+              h(FormItem, { name: 'name', label: 'Name', rules: { required: true } }, () =>
+                h(Input, { 'aria-label': 'name' })
+              )
+            )
+        }
+      })
+
+      const { container } = render(Demo)
+      expect(container.querySelector('.tiger-form-item__asterisk')).toBeInTheDocument()
+      expect(screen.getByLabelText('name')).toHaveAttribute('aria-required', 'true')
+    })
+
+    it('associates the label with an Input wrapped in Space', () => {
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ name: '' })
+          return () =>
+            h(Form, { model }, () =>
+              h(FormItem, { name: 'name', label: 'Full Name' }, () =>
+                h(Space, () => h(Input, { 'aria-label': 'name' }))
+              )
+            )
+        }
+      })
+
+      render(Demo)
+      const label = document.querySelector('label')
+      const input = screen.getByLabelText('name')
+      expect(label).toHaveAttribute('for', input.id)
     })
   })
 })

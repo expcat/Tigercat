@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import {
   classNames,
+  mergeAriaDescribedBy,
   getInputFieldClasses,
   getInputWrapperClasses,
   getInputAffixClasses,
@@ -119,15 +120,27 @@ export const Input: React.FC<InputProps> = ({
   const formItemControl = useFormItemControlContext()
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const status = statusProp ?? formItemControl?.status ?? 'default'
-  const errorMessage = errorMessageProp ?? formItemControl?.errorMessage
+  const errorMessage = errorMessageProp
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
+  const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const formBoundValue = formItemControl?.value
+  const resolvedValue =
+    value !== undefined
+      ? value
+      : typeof formBoundValue === 'string' || typeof formBoundValue === 'number'
+        ? formBoundValue
+        : formBoundValue === undefined
+          ? undefined
+          : String(formBoundValue ?? '')
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const reactId = useId()
   const errorMsgId = `tiger-input-error-${reactId}`
   const [inputValue, setInputValue] = useControlledState<string | number>({
-    value,
+    value: resolvedValue,
     defaultValue: defaultValue ?? ''
   })
   const [passwordVisible, setPasswordVisible] = useState(false)
@@ -149,19 +162,29 @@ export const Input: React.FC<InputProps> = ({
   const currentValStr = String(inputValue)
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
-    setInputValue(parseInputValue(event.currentTarget, type))
+    const next = parseInputValue(event.currentTarget, type)
+    setInputValue(next)
+    formItemControl?.onChange?.(next)
     onInput?.(event)
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(parseInputValue(event.currentTarget, type))
+    const next = parseInputValue(event.currentTarget, type)
+    setInputValue(next)
+    formItemControl?.onChange?.(next)
     onChange?.(event)
   }
 
   const handleClear = () => {
     setInputValue('')
+    formItemControl?.onChange?.('')
     onClear?.()
     inputRef.current?.focus()
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    formItemControl?.onBlur?.()
+    onBlur?.(event)
   }
 
   const togglePasswordVisibility = () => {
@@ -171,8 +194,8 @@ export const Input: React.FC<InputProps> = ({
   const hasPrefix = !!prefix
   const hasSuffix = !!suffix || clearable || showPassword
   const activeError = status === 'error' && !!errorMessage
-  const showClear = clearable && !disabled && !readonly && currentValStr.length > 0
-  const showPasswordToggle = showPassword && type === 'password' && !disabled
+  const showClear = clearable && !effectiveDisabled && !readonly && currentValStr.length > 0
+  const showPasswordToggle = showPassword && type === 'password' && !effectiveDisabled
 
   const effectiveType =
     showPassword && type === 'password' ? (passwordVisible ? 'text' : 'password') : type
@@ -229,21 +252,28 @@ export const Input: React.FC<InputProps> = ({
         type={effectiveType}
         value={inputValue}
         placeholder={placeholder}
-        disabled={disabled}
+        disabled={effectiveDisabled}
         readOnly={readonly}
         required={required}
         maxLength={maxLength}
         minLength={minLength}
-        name={name}
-        id={id}
+        name={effectiveName}
+        id={effectiveId}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
-        {...(status === 'error' ? { 'aria-invalid': true as const } : {})}
-        {...(activeError ? { 'aria-describedby': errorMsgId } : {})}
+        aria-invalid={status === 'error' ? true : undefined}
+        aria-required={formItemControl?.required || required ? true : undefined}
+        aria-describedby={mergeAriaDescribedBy(
+          mergeAriaDescribedBy(
+            typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+            activeError ? errorMsgId : undefined
+          ),
+          formItemControl?.describedBy
+        )}
         onInput={handleInput}
         onChange={handleChange}
         onFocus={onFocus}
-        onBlur={onBlur}
+        onBlur={handleBlur}
       />
       {renderSuffix()}
     </div>

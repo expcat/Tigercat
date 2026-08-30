@@ -27,6 +27,16 @@ describe('useFormController (React)', () => {
       expect(result.current.values.name).toBe('Bob')
     })
 
+    it('setFieldValue writes nested dotted paths', () => {
+      const { result } = renderHook(() =>
+        useFormController({ initialValues: { user: { email: '' } } })
+      )
+
+      act(() => result.current.setFieldValue('user.email', 'a@b.c'))
+      expect(result.current.getFieldValue('user.email')).toBe('a@b.c')
+      expect(result.current.values['user.email']).toBeUndefined()
+    })
+
     it('setValues updates multiple fields', () => {
       const { result } = renderHook(() => useFormController({ initialValues: { a: 1, b: 2 } }))
 

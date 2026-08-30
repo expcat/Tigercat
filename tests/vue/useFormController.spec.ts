@@ -23,6 +23,13 @@ describe('useFormController (Vue)', () => {
       expect(form.values.name).toBe('Bob')
     })
 
+    it('setFieldValue writes nested dotted paths', () => {
+      const form = useFormController({ initialValues: { user: { email: '' } } })
+      form.setFieldValue('user.email', 'a@b.c')
+      expect(form.getFieldValue('user.email')).toBe('a@b.c')
+      expect(form.values['user.email']).toBeUndefined()
+    })
+
     it('setValues updates multiple fields', () => {
       const form = useFormController({ initialValues: { a: 1, b: 2 } })
       form.setValues({ a: 10, b: 20 })

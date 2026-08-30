@@ -1,95 +1,44 @@
 import React, { useMemo, useEffect, useState, useCallback, useId, useRef } from 'react'
 import {
   classNames,
-  type InputStatus,
-  type ComponentSize,
-  type FormRule,
-  type FormItemProps as CoreFormItemProps,
+  devWarn,
+  extractFormChangeValue,
+  getFormItemAsteriskClasses,
   getFormItemClasses,
-  getFormItemLabelClasses,
   getFormItemContentClasses,
-  getFormItemFieldClasses,
+  getFormItemErrorBlockClasses,
   getFormItemErrorClasses,
-  getFormItemAsteriskClasses
+  getFormItemErrorPopupClasses,
+  getFormItemFieldClasses,
+  getFormItemLabelClasses,
+  hasRequiredRule,
+  mergeAriaDescribedBy,
+  type ComponentSize,
+  type FormItemProps as CoreFormItemProps,
+  type InputStatus
 } from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
 import { FormItemControlProvider } from './FormItemContext'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface FormItemProps extends CoreFormItemProps {
-  /**
-   * Form item content
-   */
   children?: React.ReactNode
-
-  /**
-   * Additional CSS classes
-   */
   className?: string
+  style?: React.CSSProperties
 }
 
-type FieldLikeProps = {
+type NativeFieldProps = {
   id?: string
-  status?: string
-  errorMessage?: string
-  _shakeTrigger?: number
-  onBlur?: React.FocusEventHandler<unknown>
-  onChange?: (...args: unknown[]) => void
+  name?: string
+  type?: string
+  value?: unknown
+  checked?: boolean
   disabled?: boolean
+  onBlur?: React.FocusEventHandler<HTMLElement>
+  onChange?: React.ChangeEventHandler<HTMLElement>
   'aria-invalid'?: boolean | 'true' | 'false'
   'aria-describedby'?: string
   'aria-required'?: boolean | 'true' | 'false'
-}
-
-type ExtractedFormChange = { found: true; value: unknown } | { found: false }
-
-function isEventTarget(value: unknown): value is {
-  type?: unknown
-  checked?: unknown
-  value?: unknown
-} {
-  return value !== null && typeof value === 'object'
-}
-
-/** Event target → checked/value; bare 0/'' count; undefined does not wipe. */
-function extractFormChangeValue(argument: unknown): ExtractedFormChange {
-  if (argument === undefined) {
-    return { found: false }
-  }
-
-  if (argument !== null && typeof argument === 'object' && 'target' in argument) {
-    const target = (argument as { target: unknown }).target
-    if (isEventTarget(target)) {
-      const type = typeof target.type === 'string' ? target.type.toLowerCase() : ''
-      if (type === 'checkbox' || type === 'radio') {
-        return { found: true, value: target.checked }
-      }
-      return { found: true, value: target.value }
-    }
-  }
-
-  return { found: true, value: argument }
-}
-
-function hasRequiredRule(maybeRules: FormRule | FormRule[] | undefined): boolean {
-  if (!maybeRules) return false
-  const ruleArr = Array.isArray(maybeRules) ? maybeRules : [maybeRules]
-  return ruleArr.some((rule) => !!rule && typeof rule === 'object' && !!rule.required)
-}
-
-function mergeAriaDescribedBy(
-  existing: string | undefined,
-  next: string | undefined
-): string | undefined {
-  if (!existing) return next
-  if (!next) return existing
-  const parts = new Set(
-    `${existing} ${next}`
-      .split(' ')
-      .map((s) => s.trim())
-      .filter(Boolean)
-  )
-  return Array.from(parts).join(' ')
 }
 
 const FIELD_CLASSES = getFormItemFieldClasses()
@@ -107,11 +56,13 @@ export const FormItem: React.FC<FormItemProps> = ({
   size,
   children,
   className,
-  condition
+  style,
+  condition,
+  ...rest
 }) => {
   const formContext = useFormContext()
-  const [errorMessage, setErrorMessage] = useState<string>('')
   const [shakeTrigger, setShakeTrigger] = useState(0)
+  const [popupActive, setPopupActive] = useState(false)
   const prevFormErrorRef = useRef<string>('')
   const contentRef = useRef<HTMLDivElement>(null)
   const errorRef = useRef<HTMLDivElement>(null)
@@ -122,10 +73,9 @@ export const FormItem: React.FC<FormItemProps> = ({
   const fieldId = `${baseId}-field`
   const errorId = `${baseId}-error`
 
-  // Simple logical operations - no need to memoize
   const actualSize: ComponentSize = size || formContext?.size || 'md'
-  const labelPosition = formContext?.labelPosition || 'right'
-  const labelAlign = formContext?.labelAlign || 'right'
+  const labelPosition = formContext?.labelPosition || 'left'
+  const labelAlign = formContext?.labelAlign
 
   const conditionState = useMemo(() => {
     if (!name || !formContext) {
@@ -142,67 +92,32 @@ export const FormItem: React.FC<FormItemProps> = ({
     return width
   }, [labelWidth, formContext?.labelWidth])
 
-  const showRequiredAsterisk = useMemo(() => {
-    if (required !== undefined) {
-      return required
-    }
+  const fieldIsRequired = useMemo(() => {
+    if (required !== undefined) return required
+    if (hasRequiredRule(rules)) return true
+    if (name && hasRequiredRule(formContext?.rules?.[name])) return true
+    return conditionState.required
+  }, [required, rules, name, formContext?.rules, conditionState.required])
 
-    // Check if any rule has required: true
-    if (rules) {
-      return hasRequiredRule(rules)
-    }
+  const showAsterisk = fieldIsRequired && (formContext?.showRequiredAsterisk ?? true)
 
-    // Check form-level rules
-    if (name && formContext?.rules) {
-      const fieldRules = formContext.rules[name]
-      if (fieldRules) {
-        return hasRequiredRule(fieldRules)
-      }
-    }
+  const formError = name ? formContext?.errorsByField[name] : undefined
+  const errorMessage = controlledError !== undefined ? controlledError : (formError ?? '')
+  const hasError = !!errorMessage
 
-    return false
-  }, [required, rules, name, formContext?.rules])
-
-  const isRequired = useMemo(
-    () =>
-      (showRequiredAsterisk || conditionState.required) &&
-      (formContext?.showRequiredAsterisk ?? true),
-    [showRequiredAsterisk, conditionState.required, formContext?.showRequiredAsterisk]
-  )
-
-  // Watch for errors in form context
   useEffect(() => {
-    if (name && formContext?.errorsByField) {
-      const error = formContext.errorsByField[name] || ''
-      setErrorMessage(error)
-      // Only trigger shake when error is newly set (transition from no-error to error,
-      // or error message changes). Prevents re-shaking unrelated fields when another
-      // field's validation updates the shared errors array.
-      if (error && error !== prevFormErrorRef.current) {
-        setShakeTrigger((prev) => prev + 1)
-      }
-      prevFormErrorRef.current = error
+    if (errorMessage && errorMessage !== prevFormErrorRef.current) {
+      setShakeTrigger((prev) => prev + 1)
     }
-  }, [name, formContext?.errorsByField])
-
-  // Watch for controlled error prop
-  useEffect(() => {
-    if (controlledError !== undefined) {
-      setErrorMessage(controlledError)
-    }
-  }, [controlledError])
+    prevFormErrorRef.current = errorMessage
+  }, [errorMessage])
 
   useEffect(() => {
     if (!name || !formContext) {
       return
     }
-
-    if (rules) {
-      formContext.registerFieldRules(name, rules)
-    }
-
+    formContext.registerFieldRules(name, rules)
     formContext.registerFieldCondition(name, condition)
-
     return () => {
       formContext.registerFieldRules(name, undefined)
       formContext.registerFieldCondition(name, undefined)
@@ -215,23 +130,30 @@ export const FormItem: React.FC<FormItemProps> = ({
     }
   }, [name, formContext, rules])
 
-  const handleChange = useCallback(
-    (argument?: unknown) => {
-      if (!name || !formContext) {
-        return
-      }
-
-      const extracted = extractFormChangeValue(argument)
-      if (extracted.found) {
-        formContext.updateValue(name, extracted.value)
-      }
+  const handleValueChange = useCallback(
+    (next: unknown) => {
+      if (!name || !formContext) return
+      formContext.updateValue(name, next)
       formContext.validateField(name, rules, 'change')
     },
     [name, formContext, rules]
   )
 
-  const hasError = !!errorMessage
-  const popupErrorVisible = showMessage && hasError && errorDisplayMode === 'popup'
+  const handleNativeChange = useCallback(
+    (argument?: unknown) => {
+      const extracted = extractFormChangeValue(argument)
+      if (extracted.found) {
+        handleValueChange(extracted.value)
+      } else if (name && formContext) {
+        formContext.validateField(name, rules, 'change')
+      }
+    },
+    [handleValueChange, name, formContext, rules]
+  )
+
+  const effectiveShowMessage = showMessage && (formContext?.inlineMessage ?? true)
+  const popupErrorVisible =
+    effectiveShowMessage && hasError && errorDisplayMode === 'popup' && popupActive
   const overlay = useAnchoredOverlay({
     enabled: popupErrorVisible,
     referenceRef: contentRef,
@@ -240,175 +162,193 @@ export const FormItem: React.FC<FormItemProps> = ({
     offset: 4
   })
 
-  const describedById = useMemo(
-    () => (showMessage && hasError ? errorId : undefined),
-    [showMessage, hasError, errorId]
+  const describedById = effectiveShowMessage && hasError ? errorId : undefined
+  const fieldValue = name ? formContext?.getFieldValue(name) : undefined
+  const controlDisabled = Boolean(
+    formContext?.disabled || formContext?.loading || conditionState.disabled
   )
 
-  const onlyChild = useMemo(() => {
-    const count = React.Children.count(children)
-    if (count !== 1) {
-      return null
-    }
-    return React.Children.toArray(children)[0] ?? null
-  }, [children])
-
-  const isClonableChild = React.isValidElement<FieldLikeProps>(onlyChild)
-  const isNativeElement = isClonableChild && typeof onlyChild.type === 'string'
-  const childId = isClonableChild ? onlyChild.props.id : undefined
-  const effectiveFieldId = childId ?? fieldId
+  const childArray = React.Children.toArray(children)
+  const onlyChild = childArray.length === 1 ? childArray[0] : null
+  const isNativeElement =
+    React.isValidElement<NativeFieldProps>(onlyChild) && typeof onlyChild.type === 'string'
+  const nativeId = isNativeElement ? onlyChild.props.id : undefined
+  const effectiveFieldId = nativeId ?? fieldId
+  const useGroup = childArray.length !== 1
 
   const enhancedChild = useMemo(() => {
-    if (!isClonableChild) {
+    if (!isNativeElement || !React.isValidElement<NativeFieldProps>(onlyChild)) {
       return children
     }
 
-    const nextProps: Partial<FieldLikeProps> = {
+    const nativeType =
+      typeof onlyChild.props.type === 'string' ? onlyChild.props.type.toLowerCase() : ''
+    const nextProps: Partial<NativeFieldProps> = {
       id: effectiveFieldId,
+      name: onlyChild.props.name ?? name,
       'aria-invalid': hasError ? true : onlyChild.props['aria-invalid'],
-      'aria-required': isRequired ? true : onlyChild.props['aria-required'],
-      disabled: conditionState.disabled || formContext?.disabled ? true : onlyChild.props.disabled,
+      'aria-required': fieldIsRequired ? true : onlyChild.props['aria-required'],
+      disabled: controlDisabled ? true : onlyChild.props.disabled,
       'aria-describedby': mergeAriaDescribedBy(onlyChild.props['aria-describedby'], describedById),
       onBlur: (event) => {
         onlyChild.props.onBlur?.(event)
         handleBlur()
       },
-      onChange: (...args: unknown[]) => {
-        onlyChild.props.onChange?.(...args)
-        handleChange(args[0])
+      onChange: (event) => {
+        onlyChild.props.onChange?.(event)
+        handleNativeChange(event)
       }
     }
 
-    if (!isNativeElement) {
-      nextProps.status = hasError ? 'error' : onlyChild.props.status
+    if (nativeType === 'checkbox') {
+      nextProps.checked = Boolean(fieldValue)
+    } else if (nativeType === 'radio') {
+      nextProps.checked = onlyChild.props.value === fieldValue
+    } else if (fieldValue !== undefined) {
+      nextProps.value = fieldValue as string
+    } else {
+      nextProps.value = onlyChild.props.value ?? ''
     }
 
     return React.cloneElement(onlyChild, nextProps)
   }, [
-    isClonableChild,
-    children,
-    onlyChild,
-    effectiveFieldId,
-    hasError,
-    isRequired,
-    conditionState.disabled,
-    formContext?.disabled,
     isNativeElement,
+    onlyChild,
+    children,
+    effectiveFieldId,
+    name,
+    hasError,
+    fieldIsRequired,
+    controlDisabled,
     describedById,
     handleBlur,
-    handleChange
+    handleNativeChange,
+    fieldValue
   ])
+
+  useEffect(() => {
+    if (useGroup && name) {
+      devWarn(
+        'FormItem.multipleControls',
+        'FormItem supports a single field control. Extra children do not receive value or validation bindings.'
+      )
+    }
+  }, [useGroup, name])
 
   const controlValue = useMemo(
     () => ({
+      id: effectiveFieldId,
+      name,
       status: (hasError ? 'error' : undefined) as InputStatus | undefined,
-      errorMessage: hasError && !showMessage ? errorMessage : undefined,
-      shakeTrigger: hasError ? shakeTrigger : undefined
+      shakeTrigger: hasError ? shakeTrigger : undefined,
+      disabled: controlDisabled,
+      describedBy: describedById,
+      required: fieldIsRequired,
+      value: name ? (fieldValue ?? '') : fieldValue,
+      onChange: handleValueChange,
+      onBlur: handleBlur
     }),
-    [hasError, showMessage, errorMessage, shakeTrigger]
+    [
+      effectiveFieldId,
+      name,
+      hasError,
+      shakeTrigger,
+      controlDisabled,
+      describedById,
+      fieldIsRequired,
+      fieldValue,
+      handleValueChange,
+      handleBlur
+    ]
   )
 
-  const formItemClasses = useMemo(
-    () =>
-      classNames(
-        getFormItemClasses({
-          size: actualSize,
-          labelPosition,
-          hasError,
-          disabled: formContext?.disabled || conditionState.disabled
-        }),
-        className
-      ),
-    [actualSize, labelPosition, hasError, formContext?.disabled, conditionState.disabled, className]
+  const formItemClasses = classNames(
+    getFormItemClasses({
+      size: actualSize,
+      labelPosition,
+      hasError,
+      disabled: controlDisabled
+    }),
+    className
   )
 
-  const labelClasses = useMemo(
-    () =>
-      getFormItemLabelClasses({
-        size: actualSize,
-        labelAlign,
-        labelPosition,
-        isRequired
-      }),
-    [actualSize, labelAlign, labelPosition, isRequired]
-  )
+  const labelClasses = getFormItemLabelClasses({
+    size: actualSize,
+    labelAlign,
+    labelPosition,
+    isRequired: showAsterisk
+  })
 
-  const labelStyles = useMemo((): React.CSSProperties => {
-    if (labelPosition === 'top') {
-      return {}
-    }
-    return actualLabelWidth ? { width: actualLabelWidth } : {}
-  }, [labelPosition, actualLabelWidth])
+  const labelStyles: React.CSSProperties =
+    labelPosition === 'top' ? {} : actualLabelWidth ? { width: actualLabelWidth } : {}
 
-  const errorClasses = useMemo(
-    () => classNames(getFormItemErrorClasses(actualSize), hasError && 'opacity-100'),
-    [actualSize, hasError]
-  )
+  const errorNode = (() => {
+    if (!effectiveShowMessage) return null
+    if (errorDisplayMode === 'block' && !hasError) return null
+    if (errorDisplayMode === 'popup' && !hasError) return null
 
-  const contentClasses = useMemo(
-    () =>
-      classNames(
-        getFormItemContentClasses(labelPosition),
-        errorDisplayMode === 'popup' && 'relative'
-      ),
-    [labelPosition, errorDisplayMode]
-  )
+    const errorClass =
+      errorDisplayMode === 'block'
+        ? getFormItemErrorBlockClasses(actualSize)
+        : errorDisplayMode === 'popup'
+          ? classNames(getFormItemErrorPopupClasses(), overlay.floatingClasses)
+          : getFormItemErrorClasses(actualSize, { visible: hasError })
+
+    return renderOverlayPortal(
+      <div
+        ref={errorRef}
+        id={hasError ? errorId : undefined}
+        role={hasError ? 'alert' : undefined}
+        className={errorClass}
+        style={errorDisplayMode === 'popup' ? overlay.floatingStyles : undefined}
+        data-positioned={errorDisplayMode === 'popup' ? overlay.positioned : undefined}
+        aria-hidden={hasError ? undefined : true}>
+        {hasError ? errorMessage : ''}
+      </div>,
+      overlay.target,
+      errorDisplayMode !== 'popup'
+    )
+  })()
 
   if (!conditionState.shown) {
     return null
   }
 
+  const fieldWrapperProps = useGroup
+    ? {
+        role: 'group' as const,
+        'aria-labelledby': label ? labelId : undefined,
+        'aria-describedby': describedById,
+        'aria-invalid': hasError ? true : undefined
+      }
+    : {}
+
   return (
-    <div className={formItemClasses}>
+    <div className={formItemClasses} style={style} {...rest}>
       {label && (
-        <label
-          id={labelId}
-          className={labelClasses}
-          style={labelStyles}
-          htmlFor={isClonableChild ? effectiveFieldId : undefined}>
-          {isRequired && <span className={ASTERISK_CLASSES}>*</span>}
+        <label id={labelId} className={labelClasses} style={labelStyles} htmlFor={effectiveFieldId}>
+          {showAsterisk && <span className={ASTERISK_CLASSES}>*</span>}
           {label}
         </label>
       )}
-      <div ref={contentRef} className={contentClasses}>
-        <div
-          className={FIELD_CLASSES}
-          role="group"
-          aria-labelledby={label ? labelId : undefined}
-          aria-describedby={describedById}
-          aria-invalid={hasError ? true : undefined}
-          onBlur={isClonableChild ? undefined : handleBlur}
-          onChange={isClonableChild ? undefined : handleChange}>
+      <div
+        ref={contentRef}
+        className={classNames(
+          getFormItemContentClasses(labelPosition),
+          errorDisplayMode === 'popup' && 'relative'
+        )}
+        onMouseEnter={() => setPopupActive(true)}
+        onMouseLeave={() => setPopupActive(false)}
+        onFocus={() => setPopupActive(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setPopupActive(false)
+          }
+        }}>
+        <div className={FIELD_CLASSES} {...fieldWrapperProps}>
           <FormItemControlProvider value={controlValue}>{enhancedChild}</FormItemControlProvider>
         </div>
-        {showMessage &&
-          renderOverlayPortal(
-            <div
-              ref={errorRef}
-              id={hasError ? errorId : undefined}
-              role={hasError ? 'alert' : undefined}
-              className={
-                errorDisplayMode === 'block'
-                  ? classNames(
-                      'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
-                      !hasError && 'hidden'
-                    )
-                  : errorDisplayMode === 'popup'
-                    ? classNames(
-                        'px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
-                        overlay.floatingClasses,
-                        !hasError && 'hidden'
-                      )
-                    : errorClasses
-              }
-              style={errorDisplayMode === 'popup' ? overlay.floatingStyles : undefined}
-              data-positioned={errorDisplayMode === 'popup' ? overlay.positioned : undefined}
-              aria-hidden={hasError ? undefined : true}>
-              {hasError ? errorMessage : ''}
-            </div>,
-            overlay.target,
-            errorDisplayMode !== 'popup'
-          )}
+        {errorNode}
       </div>
     </div>
   )

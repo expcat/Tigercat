@@ -8,11 +8,14 @@ import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Form, type FormHandle } from '@expcat/tigercat-react/Form'
+import { useFormController } from '@expcat/tigercat-react'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Input } from '@expcat/tigercat-react/Input'
 import { Space } from '@expcat/tigercat-react/Space'
 import type { FormRule, FormRules } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Form', () => {
   // ==================== Basic Functionality ====================
@@ -92,7 +95,7 @@ describe('Form', () => {
 
   // ==================== Layout Modes ====================
   describe('Layout Modes', () => {
-    it('renders horizontal layout (label-right) by default', () => {
+    it('renders horizontal layout (label-left) by default', () => {
       const { container } = render(
         <Form model={{}}>
           <FormItem label="Name">
@@ -101,7 +104,7 @@ describe('Form', () => {
         </Form>
       )
 
-      expect(container.querySelector('.tiger-form--label-right')).toBeInTheDocument()
+      expect(container.querySelector('.tiger-form--label-left')).toBeInTheDocument()
     })
 
     it('renders with label position left', () => {
@@ -126,7 +129,7 @@ describe('Form', () => {
       )
 
       expect(container.querySelector('.tiger-form--label-top')).toBeInTheDocument()
-      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-left')
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-start')
     })
 
     it('keeps explicit top label alignment', () => {
@@ -138,7 +141,7 @@ describe('Form', () => {
         </Form>
       )
 
-      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-right')
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-end')
     })
 
     it('applies custom label width', () => {
@@ -286,7 +289,7 @@ describe('Form', () => {
         // No per-rule message → falls back to the localized built-in message
         const rules: FormRules = { username: [{ required: true }] }
         return (
-          <ConfigProvider locale={{ locale: 'zh-CN' }}>
+          <ConfigProvider locale={zhCN}>
             <Form ref={formRef} model={model} rules={rules}>
               <FormItem label="Username" name="username">
                 <input aria-label="username" value={model.username} readOnly />
@@ -302,6 +305,33 @@ describe('Form', () => {
       })
 
       expect(await screen.findByText('此字段为必填项')).toBeInTheDocument()
+    })
+
+    it('uses Traditional Chinese required copy under zhTW', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      function Demo() {
+        const [model] = useState({ username: '' })
+        return (
+          <ConfigProvider locale={zhTW}>
+            <Form ref={formRef} model={model} rules={{ username: [{ required: true }] }}>
+              <FormItem label="Username" name="username">
+                <input aria-label="username" value={model.username} readOnly />
+              </FormItem>
+            </Form>
+          </ConfigProvider>
+        )
+      }
+
+      render(<Demo />)
+      await act(async () => {
+        await formRef.current?.validateField('username')
+      })
+
+      const message = await screen.findByRole('alert')
+      expect(message).toHaveTextContent('此欄位為必填項')
+      expect(message).not.toHaveTextContent('此字段为必填项')
+      expect(message).not.toHaveTextContent('This field is required')
     })
 
     it('validates required field', async () => {
@@ -1132,7 +1162,7 @@ describe('Form', () => {
       errorSpy.mockRestore()
     })
 
-    it('passes hidden FormItem error to a direct Input child through context', () => {
+    it('hides the error surface when showMessage is false and still marks the control invalid', () => {
       render(
         <Form model={{}}>
           <FormItem label="Username" error="Username taken" showMessage={false}>
@@ -1141,10 +1171,12 @@ describe('Form', () => {
         </Form>
       )
 
-      expect(screen.getByText('Username taken')).toBeInTheDocument()
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(screen.queryByText('Username taken')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('username')).toHaveAttribute('aria-invalid', 'true')
     })
 
-    it('passes hidden FormItem error to wrapped Input through context', () => {
+    it('keeps aria-invalid when a wrapped Input has a controlled error and showMessage is false', () => {
       const WrappedInput = (props: React.ComponentProps<typeof Input>) => (
         <Input aria-label={props['aria-label']} />
       )
@@ -1157,7 +1189,8 @@ describe('Form', () => {
         </Form>
       )
 
-      expect(screen.getByText('Username taken')).toBeInTheDocument()
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('username')).toHaveAttribute('aria-invalid', 'true')
     })
 
     it('supports different form sizes', () => {
@@ -1195,12 +1228,14 @@ describe('Form', () => {
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(
-        <Form model={{}}>
-          <div>Accessible form</div>
+        <Form model={{ name: '' }} rules={{ name: { required: true } }}>
+          <FormItem name="name" label="Name" required>
+            <Input />
+          </FormItem>
         </Form>
       )
 
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
 
     it('associates label with input field', () => {
@@ -1392,8 +1427,8 @@ describe('Form', () => {
         })
 
         const errorEl = screen.getByRole('alert')
-        expect(errorEl.className).toContain('bg-red-50')
-        expect(errorEl.className).toContain('border-red-200')
+        expect(errorEl).toHaveTextContent('Required')
+        expect(errorEl.className).toContain('--tiger-error')
       })
 
       it('renders error in popup mode with absolute positioning', async () => {
@@ -1416,9 +1451,126 @@ describe('Form', () => {
           }
         })
 
-        const errorEl = screen.getByRole('alert')
-        expect(errorEl.className).toContain('absolute')
-        expect(errorEl.className).toContain('bg-red-600')
+        fireEvent.mouseEnter(screen.getByRole('textbox').closest('.tiger-form-item__content')!)
+        const errorEl = await screen.findByRole('alert')
+        expect(errorEl).toHaveTextContent('Required')
+        expect(errorEl.className).toContain('--tiger-error')
+      })
+    })
+  })
+
+  describe('FormItem takeover', () => {
+    it('owns an unbound Input so typing validates and resetFields clears the box', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      render(
+        <Form ref={formRef} rules={{ name: { required: true, message: 'Required' } }}>
+          <FormItem name="name" label="Name">
+            <Input aria-label="name" />
+          </FormItem>
+        </Form>
+      )
+
+      const input = screen.getByLabelText('name')
+      fireEvent.change(input, { target: { value: 'Ada' } })
+      await act(async () => {
+        expect(await formRef.current?.validate()).toBe(true)
+      })
+
+      await act(async () => {
+        formRef.current?.resetFields()
+      })
+      expect(input).toHaveValue('')
+    })
+
+    it('marks required from rules without a required prop, and keeps aria-required when asterisks are hidden', () => {
+      const { rerender } = render(
+        <Form model={{ name: '' }}>
+          <FormItem name="name" label="Name" rules={{ required: true }}>
+            <Input aria-label="name" />
+          </FormItem>
+        </Form>
+      )
+
+      expect(document.querySelector('.tiger-form-item__asterisk')).toBeInTheDocument()
+      expect(screen.getByLabelText('name')).toHaveAttribute('aria-required', 'true')
+
+      rerender(
+        <Form model={{ name: '' }} showRequiredAsterisk={false}>
+          <FormItem name="name" label="Name" rules={{ required: true }}>
+            <Input aria-label="name" />
+          </FormItem>
+        </Form>
+      )
+
+      expect(document.querySelector('.tiger-form-item__asterisk')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('name')).toHaveAttribute('aria-required', 'true')
+    })
+
+    it('associates the label with an Input wrapped in Space', () => {
+      render(
+        <Form model={{ name: '' }}>
+          <FormItem name="name" label="Full Name">
+            <Space>
+              <Input aria-label="name" />
+            </Space>
+          </FormItem>
+        </Form>
+      )
+
+      const label = document.querySelector('label')
+      const input = screen.getByLabelText('name')
+      expect(label).toHaveAttribute('for', input.id)
+    })
+
+    it('shares values with useFormController passed as controller', async () => {
+      const formRef = React.createRef<FormHandle>()
+      let ctrl: ReturnType<typeof useFormController> | null = null
+
+      function Demo() {
+        ctrl = useFormController({
+          initialValues: { name: '' },
+          rules: { name: { required: true, message: 'Required' } }
+        })
+        return (
+          <Form ref={formRef} controller={ctrl}>
+            <FormItem name="name" label="Name">
+              <Input aria-label="name" />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+      act(() => {
+        ctrl?.setFieldValue('name', 'Ada')
+      })
+      expect(screen.getByLabelText('name')).toHaveValue('Ada')
+      await act(async () => {
+        formRef.current?.resetFields()
+      })
+      expect(ctrl?.getFieldValue('name')).toBe('')
+      expect(screen.getByLabelText('name')).toHaveValue('')
+    })
+
+    it('writes an empty value and required error when a clearable Input is cleared', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      render(
+        <Form ref={formRef} rules={{ name: { required: true, message: 'Required' } }}>
+          <FormItem name="name" label="Name">
+            <Input aria-label="name" clearable />
+          </FormItem>
+        </Form>
+      )
+
+      const input = screen.getByLabelText('name')
+      fireEvent.change(input, { target: { value: 'Ada' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Clear input' }))
+
+      expect(input).toHaveValue('')
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('Required')
       })
     })
   })

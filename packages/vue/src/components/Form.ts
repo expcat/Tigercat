@@ -1,17 +1,23 @@
 import {
   defineComponent,
   provide,
-  reactive,
   computed,
   h,
   ref,
   watch,
   onBeforeUnmount,
+  inject,
   PropType,
   type ComputedRef
 } from 'vue'
 import {
   classNames,
+  assignFormValues,
+  createFormEngine,
+  createFormErrorMap,
+  focusFirstInvalidField,
+  mergeTigerLocale,
+  getFormValidationLabels,
   type FormRules,
   type FormValues,
   type FormError,
@@ -23,39 +29,22 @@ import {
   type ComponentSize,
   type FormRule,
   type FormRuleTrigger,
-  validateForm,
-  validateField as validateFieldUtil,
-  getValueByPath,
-  createFormErrorMap,
-  getDependentFields,
-  createFormConditionDependencies,
-  resolveConditionalFormRules,
-  resolveFormFieldConditionState,
-  createFormValidationDebouncer,
-  createFormHistory,
-  pushFormHistory,
-  undoFormHistory,
-  redoFormHistory,
-  canUndo,
-  canRedo,
-  mergeTigerLocale,
-  getFormValidationLabels,
-  type TigerLocale,
-  type FormValidationDebouncer,
-  type FormHistoryState
+  type FormController,
+  type FormEngine,
+  type FormHandle,
+  type FormFieldDependencies,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-// Form context key
 export const FormContextKey = Symbol('FormContext')
 
-// Form context type
 export interface FormContext {
   model: FormValues
   rules?: FormRules
   labelWidth?: string | number
   labelPosition: FormLabelPosition
-  labelAlign: FormLabelAlign
+  labelAlign?: FormLabelAlign
   size: ComponentSize
   inlineMessage: boolean
   showRequiredAsterisk: boolean
@@ -75,10 +64,19 @@ export interface FormContext {
     trigger?: FormRuleTrigger
   ) => Promise<void>
   clearValidate: (fieldNames?: string | string[]) => void
+  getFieldValue: (fieldName: string) => unknown
+  updateValue: (fieldName: string, value: unknown) => void
 }
+
+export function useFormContext(): ComputedRef<FormContext> | null {
+  return inject<ComputedRef<FormContext> | null>(FormContextKey, null)
+}
+
+export type { FormHandle }
 
 export interface VueFormProps {
   model?: FormValues
+  controller?: FormController
   rules?: FormRules
   labelWidth?: string | number
   labelPosition?: FormLabelPosition
@@ -88,95 +86,65 @@ export interface VueFormProps {
   showRequiredAsterisk?: boolean
   disabled?: boolean
   loading?: boolean
-  fieldDependencies?: Map<string, string[]>
+  fieldDependencies?: FormFieldDependencies
   conditions?: FormConditions
   validateDebounce?: number
   undoable?: boolean
   maxHistorySize?: number
+  locale?: Partial<TigerLocale>
+}
+
+function isFormEngine(controller: FormController): controller is FormEngine {
+  return typeof (controller as FormEngine).replaceValues === 'function'
 }
 
 export const Form = defineComponent({
   name: 'TigerForm',
   props: {
-    /**
-     * Form data model
-     * @default {}
-     */
     model: {
       type: Object as PropType<FormValues>,
       default: () => ({})
     },
-    /**
-     * Form validation rules
-     */
+    controller: {
+      type: Object as PropType<FormController>,
+      default: undefined
+    },
     rules: {
       type: Object as PropType<FormRules>
     },
-    /**
-     * Label width (string or number in pixels)
-     */
     labelWidth: {
       type: [String, Number] as PropType<string | number>
     },
-    /**
-     * Label position
-     * @default 'right'
-     */
     labelPosition: {
       type: String as PropType<FormLabelPosition>,
-      default: 'right' as FormLabelPosition
+      default: 'left' as FormLabelPosition
     },
-    /**
-     * Label alignment
-     * @default 'right'
-     */
     labelAlign: {
       type: String as PropType<FormLabelAlign>,
       default: undefined
     },
-    /**
-     * Form size (applies to all form items)
-     * @default 'md'
-     */
     size: {
       type: String as PropType<ComponentSize>,
       default: 'md' as ComponentSize
     },
-    /**
-     * Show inline validation messages
-     * @default true
-     */
     inlineMessage: {
       type: Boolean,
       default: true
     },
-    /**
-     * Show required asterisk on required fields
-     * @default true
-     */
     showRequiredAsterisk: {
       type: Boolean,
       default: true
     },
-    /**
-     * Disable all form controls
-     * @default false
-     */
     disabled: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether the form is in a loading state (prevents submit)
-     * @default false
-     */
     loading: {
       type: Boolean,
       default: false
     },
-    // v0.6.0 props
     fieldDependencies: {
-      type: Object as PropType<Map<string, string[]>>,
+      type: Object as PropType<FormFieldDependencies>,
       default: undefined
     },
     conditions: {
@@ -195,424 +163,217 @@ export const Form = defineComponent({
       type: Number,
       default: 50
     },
-    /**
-     * Locale override for built-in validation messages. Merged on top of the
-     * ConfigProvider locale; a per-rule `message` still takes precedence.
-     */
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
     }
   },
   emits: {
-    /**
-     * Emitted when form is submitted
-     */
     submit: (_data: { valid: boolean; values: FormValues; errors: FormError[] }) => true,
-    /**
-     * Emitted when field is validated
-     */
     validate: (fieldName: string, isValid: boolean, _errorMessage?: string) =>
-      typeof fieldName === 'string' && typeof isValid === 'boolean'
+      typeof fieldName === 'string' && typeof isValid === 'boolean',
+    'update:model': (_values: FormValues) => true
   },
   setup(props, { slots, emit, expose }) {
-    const initialValues = { ...(props.model ?? {}) }
-    const errors = reactive<FormError[]>([])
-    const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
-    const fieldConditions = reactive<FormConditions>({})
-    const errorsByField = computed(() => createFormErrorMap(errors))
-
-    // Localized built-in validation messages (ConfigProvider locale + prop override)
     const config = useTigerConfig()
-    const validationMessages = computed(() =>
-      getFormValidationLabels(mergeTigerLocale(config.value.locale, props.locale))
-    )
-    let validationDebouncer: FormValidationDebouncer = createFormValidationDebouncer({
-      delay: props.validateDebounce
+    const formElementRef = ref<HTMLFormElement | null>(null)
+    const ownedEngine =
+      props.controller && isFormEngine(props.controller)
+        ? null
+        : createFormEngine({
+            initialValues: props.model ?? {},
+            undoable: props.undoable,
+            maxHistorySize: props.maxHistorySize,
+            getRules: () => props.rules,
+            getConditions: () => props.conditions,
+            getFieldDependencies: () => props.fieldDependencies,
+            getMessages: () =>
+              getFormValidationLabels(mergeTigerLocale(config.value.locale, props.locale)),
+            getValidateDebounce: () => props.validateDebounce,
+            onValidate: (fieldName, valid, error) =>
+              emit('validate', fieldName, valid, error ?? undefined),
+            onValuesChange: (next) => {
+              if (props.model) {
+                assignFormValues(props.model, next)
+              }
+              emit('update:model', next)
+            }
+          })
+
+    const engine = (): FormEngine => {
+      if (props.controller && isFormEngine(props.controller)) {
+        return props.controller
+      }
+      if (!ownedEngine) {
+        throw new Error('Form is missing a form engine')
+      }
+      return ownedEngine
+    }
+
+    const version = ref(0)
+    const stop = engine().subscribe(() => {
+      version.value += 1
     })
 
-    // v0.6.0: undo/redo history
-    const history = ref<FormHistoryState>(
-      createFormHistory(props.model ?? {}, props.maxHistorySize)
+    watch(
+      () => props.model,
+      (next) => {
+        if (props.controller || !next) return
+        engine().replaceValues(next)
+      },
+      { deep: true }
     )
 
-    const registerFieldRules = (fieldName: string, rules?: FormRule | FormRule[]): void => {
-      if (!fieldName) {
-        return
-      }
-
-      if (!rules) {
-        delete fieldRules[fieldName]
-        return
-      }
-
-      fieldRules[fieldName] = rules
-    }
-
-    const registerFieldCondition = (fieldName: string, condition?: FormFieldCondition): void => {
-      if (!fieldName) {
-        return
-      }
-
-      if (!condition) {
-        delete fieldConditions[fieldName]
-        return
-      }
-
-      fieldConditions[fieldName] = condition
-    }
-
-    const getEffectiveConditions = (): FormConditions | undefined => {
-      const merged = {
-        ...(props.conditions ?? {}),
-        ...fieldConditions
-      }
-      return Object.keys(merged).length > 0 ? merged : undefined
-    }
-
-    const getMergedFieldCondition = (
-      fieldName: string,
-      conditionOverride?: FormFieldCondition
-    ): FormFieldCondition | undefined => {
-      const base = getEffectiveConditions()?.[fieldName]
-      return base || conditionOverride
-        ? { ...(base ?? {}), ...(conditionOverride ?? {}) }
-        : undefined
-    }
-
-    const getFieldConditionState = (
-      fieldName: string,
-      conditionOverride?: FormFieldCondition
-    ): FormConditionState => {
-      return resolveFormFieldConditionState(
-        props.model,
-        getMergedFieldCondition(fieldName, conditionOverride)
-      )
-    }
-
-    const getEffectiveRules = (): FormRules | undefined => {
-      const mergedRules = {
-        ...(props.rules ?? {}),
-        ...fieldRules
-      }
-      const rules = Object.keys(mergedRules).length > 0 ? mergedRules : undefined
-      return resolveConditionalFormRules(props.model, rules, getEffectiveConditions())
-    }
-
-    const resolveFieldRules = (fieldName: string, rulesOverride?: FormRule | FormRule[]) => {
-      const fieldRulesValue = rulesOverride ?? fieldRules[fieldName] ?? props.rules?.[fieldName]
-      const resolved = resolveConditionalFormRules(
-        props.model,
-        fieldRulesValue ? { [fieldName]: fieldRulesValue } : undefined,
-        getEffectiveConditions()
-      )
-      return resolved?.[fieldName]
-    }
-
-    const getDependencyMap = (): Map<string, string[]> | undefined => {
-      const conditionDependencies = createFormConditionDependencies(getEffectiveConditions())
-      if (!props.fieldDependencies && conditionDependencies.size === 0) {
-        return undefined
-      }
-
-      const merged = new Map<string, string[]>(props.fieldDependencies ?? [])
-      for (const [fieldName, dependencies] of conditionDependencies.entries()) {
-        const current = merged.get(fieldName) ?? []
-        merged.set(fieldName, Array.from(new Set([...current, ...dependencies])))
-      }
-      return merged
-    }
-
-    const runFieldValidation = async (
-      fieldName: string,
-      rulesOverride?: FormRule | FormRule[],
-      trigger?: FormRuleTrigger
-    ): Promise<string | null> => {
-      const effectiveFieldRules = resolveFieldRules(fieldName, rulesOverride)
-      if (!effectiveFieldRules) {
-        return null
-      }
-
-      const value = getValueByPath(props.model, fieldName)
-      return validateFieldUtil(
-        fieldName,
-        value,
-        effectiveFieldRules,
-        props.model,
-        trigger,
-        validationMessages.value
-      )
-    }
-
-    const validateFieldNow = async (
-      fieldName: string,
-      rulesOverride?: FormRule | FormRule[],
-      trigger?: FormRuleTrigger
-    ): Promise<void> => {
-      const conditionState = getFieldConditionState(fieldName)
-      if (!conditionState.shown || conditionState.disabled) {
-        clearValidate(fieldName)
-        emit('validate', fieldName, true, undefined)
-        return
-      }
-
-      const effectiveFieldRules = resolveFieldRules(fieldName, rulesOverride)
-      if (effectiveFieldRules) {
-        const error = await runFieldValidation(fieldName, rulesOverride, trigger)
-
-        // Skip mutation if error state for this field hasn't changed,
-        // avoiding unnecessary watcher triggers in unrelated FormItems.
-        const existingIndex = errors.findIndex((e) => e.field === fieldName)
-        const existingMessage = existingIndex !== -1 ? errors[existingIndex].message : null
-
-        if (!error && existingMessage === null) {
-          // No error before, no error now — nothing to do
-        } else if (error && error === existingMessage) {
-          // Same error as before — nothing to do
-        } else {
-          // Remove existing error for this field
-          if (existingIndex !== -1) {
-            errors.splice(existingIndex, 1)
-          }
-
-          // Add new error if validation failed
-          if (error) {
-            errors.push({
-              field: fieldName,
-              message: error
-            })
-          }
-        }
-
-        emit('validate', fieldName, !error, error || undefined)
-      }
-
-      // v0.6.0: revalidate dependent fields (even if current field has no rules)
-      const dependencyMap = getDependencyMap()
-      if (dependencyMap) {
-        const dependents = getDependentFields(fieldName, dependencyMap)
-        for (const dep of dependents) {
-          await validateFieldNow(dep)
+    watch(
+      () =>
+        [
+          props.controller,
+          props.rules,
+          props.conditions,
+          props.fieldDependencies,
+          props.validateDebounce,
+          props.locale,
+          config.value.locale
+        ] as const,
+      () => {
+        if (props.controller && isFormEngine(props.controller)) {
+          props.controller.setOptions({
+            rules: props.rules,
+            conditions: props.conditions,
+            fieldDependencies: props.fieldDependencies,
+            validateDebounce: props.validateDebounce,
+            messages: getFormValidationLabels(mergeTigerLocale(config.value.locale, props.locale))
+          })
         }
       }
-    }
+    )
+
+    onBeforeUnmount(() => {
+      stop()
+      ownedEngine?.dispose()
+    })
+
+    const errors = computed(() => {
+      version.value
+      return engine().getErrors()
+    })
+    const errorsByField = computed(() => createFormErrorMap(errors.value))
+    const values = computed(() => {
+      version.value
+      return engine().getValues()
+    })
+    const canUndoNow = computed(() => {
+      version.value
+      return engine().canUndo
+    })
+    const canRedoNow = computed(() => {
+      version.value
+      return engine().canRedo
+    })
 
     const validateField = async (
       fieldName: string,
       rulesOverride?: FormRule | FormRule[],
       trigger?: FormRuleTrigger
     ): Promise<void> => {
-      if (trigger === 'change' && props.validateDebounce > 0) {
-        return validationDebouncer.schedule(fieldName, () =>
-          validateFieldNow(fieldName, rulesOverride, trigger)
-        )
-      }
-
-      validationDebouncer.cancel(fieldName)
-      return validateFieldNow(fieldName, rulesOverride, trigger)
+      await engine().validateField(fieldName, rulesOverride, trigger)
     }
-
-    const validate = async (): Promise<boolean> => {
-      validationDebouncer.cancel()
-      errors.splice(0, errors.length)
-      const effectiveRules = getEffectiveRules()
-      if (!effectiveRules) {
-        return true
-      }
-
-      const result = await validateForm(props.model, effectiveRules, validationMessages.value)
-      errors.push(...result.errors)
-      return result.valid
-    }
-
-    const validateFields = async (fieldNames: string[]): Promise<boolean> => {
-      if (!fieldNames || fieldNames.length === 0) {
-        return true
-      }
-
-      fieldNames.forEach((fieldName) => validationDebouncer.cancel(fieldName))
-
-      const nextErrors: FormError[] = []
-      const fieldSet = new Set(fieldNames)
-
-      for (const fieldName of fieldNames) {
-        const effectiveFieldRules = resolveFieldRules(fieldName)
-        if (!effectiveFieldRules) {
-          emit('validate', fieldName, true, undefined)
-          continue
-        }
-
-        const error = await runFieldValidation(fieldName)
-
-        if (error) {
-          nextErrors.push({ field: fieldName, message: error })
-        }
-
-        emit('validate', fieldName, !error, error || undefined)
-      }
-
-      for (let i = errors.length - 1; i >= 0; i--) {
-        if (fieldSet.has(errors[i].field)) {
-          errors.splice(i, 1)
-        }
-      }
-
-      errors.push(...nextErrors)
-      return nextErrors.length === 0
-    }
-
-    const clearValidate = (fieldNames?: string | string[]): void => {
-      if (!fieldNames) {
-        validationDebouncer.cancel()
-        errors.splice(0, errors.length)
-        return
-      }
-
-      const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames]
-      fields.forEach((fieldName) => validationDebouncer.cancel(fieldName))
-
-      fields.forEach((fieldName) => {
-        const index = errors.findIndex((e) => e.field === fieldName)
-        if (index !== -1) {
-          errors.splice(index, 1)
-        }
-      })
-    }
-
-    const resetFields = (): void => {
-      validationDebouncer.cancel()
-      clearValidate()
-      if (props.model) {
-        Object.keys(props.model).forEach((key) => delete props.model![key])
-        Object.assign(props.model, { ...initialValues })
-      }
-      if (props.undoable) {
-        history.value = createFormHistory({ ...initialValues }, props.maxHistorySize)
-      }
-    }
-
-    const addField = (fieldName: string, defaultValue?: unknown): void => {
-      if (props.model && fieldName) {
-        props.model[fieldName] = defaultValue ?? null
-      }
-    }
-
-    const removeField = (fieldName: string): void => {
-      if (props.model && fieldName) {
-        delete props.model[fieldName]
-        clearValidate(fieldName)
-      }
-    }
-
-    watch(
-      () => props.validateDebounce,
-      (delay) => {
-        validationDebouncer.cancel()
-        validationDebouncer = createFormValidationDebouncer({ delay })
-      }
-    )
-
-    onBeforeUnmount(() => {
-      validationDebouncer.cancel()
-    })
-
-    // v0.6.0: undo/redo
-    const snapshotHistory = (): void => {
-      if (!props.undoable || !props.model) return
-      history.value = pushFormHistory(history.value, props.model)
-    }
-
-    const undo = (): void => {
-      if (!props.undoable) return
-      const result = undoFormHistory(history.value)
-      if (result && props.model) {
-        history.value = result
-        Object.keys(props.model).forEach((k) => delete props.model![k])
-        Object.assign(props.model, { ...result.present })
-      }
-    }
-
-    const redo = (): void => {
-      if (!props.undoable) return
-      const result = redoFormHistory(history.value)
-      if (result && props.model) {
-        history.value = result
-        Object.keys(props.model).forEach((k) => delete props.model![k])
-        Object.assign(props.model, { ...result.present })
-      }
-    }
-
-    const canUndoNow = computed(() => props.undoable && canUndo(history.value))
-    const canRedoNow = computed(() => props.undoable && canRedo(history.value))
-    const resolvedLabelAlign = computed<FormLabelAlign>(
-      () => props.labelAlign ?? (props.labelPosition === 'top' ? 'left' : 'right')
-    )
 
     const handleSubmit = async (event: Event): Promise<void> => {
       event.preventDefault()
       if (props.loading) return
-      const valid = await validate()
-      emit('submit', { valid, values: props.model, errors })
+      const current = engine()
+      const valid = await current.validate()
+      if (!valid) {
+        focusFirstInvalidField(formElementRef.value)
+      }
+      emit('submit', { valid, values: current.getValues(), errors: current.getErrors() })
     }
 
-    // Provide form context to child FormItems
+    const handleReset = (event: Event): void => {
+      event.preventDefault()
+      engine().reset()
+    }
+
     const formContextValue = computed<FormContext>(() => ({
-      model: props.model,
+      model: values.value,
       rules: props.rules,
       labelWidth: props.labelWidth,
       labelPosition: props.labelPosition,
-      labelAlign: resolvedLabelAlign.value,
+      labelAlign: props.labelAlign,
       size: props.size,
       inlineMessage: props.inlineMessage,
       showRequiredAsterisk: props.showRequiredAsterisk,
       disabled: props.disabled,
       loading: props.loading,
-      errors,
+      errors: errors.value,
       errorsByField: errorsByField.value,
-      registerFieldRules,
-      registerFieldCondition,
-      getFieldConditionState,
+      registerFieldRules: (fieldName, nextRules) =>
+        engine().registerFieldRules(fieldName, nextRules),
+      registerFieldCondition: (fieldName, condition) =>
+        engine().registerFieldCondition(fieldName, condition),
+      getFieldConditionState: (fieldName, override) =>
+        engine().getFieldConditionState(fieldName, override),
       validateField,
-      clearValidate
+      clearValidate: (fieldNames) => engine().clearValidate(fieldNames),
+      getFieldValue: (fieldName) => engine().getFieldValue(fieldName),
+      updateValue: (fieldName, value) => engine().setFieldValue(fieldName, value)
     }))
 
     provide<ComputedRef<FormContext>>(FormContextKey, formContextValue)
 
-    // Expose methods
-    expose({
-      validate,
-      validateFields,
+    const handle: FormHandle = {
+      validate: () => engine().validate(),
+      validateFields: (fieldNames) => engine().validateFields(fieldNames),
       validateField,
-      clearValidate,
-      resetFields,
-      addField,
-      removeField,
-      undo,
-      redo,
-      snapshotHistory,
-      canUndo: canUndoNow,
-      canRedo: canRedoNow
-    })
+      clearValidate: (fieldNames) => engine().clearValidate(fieldNames),
+      resetFields: () => engine().reset(),
+      addField: (fieldName, defaultValue) => engine().addField(fieldName, defaultValue),
+      removeField: (fieldName) => engine().removeField(fieldName),
+      undo: () => engine().undo(),
+      redo: () => engine().redo(),
+      snapshotHistory: () => engine().snapshotHistory(),
+      get canUndo() {
+        return canUndoNow.value
+      },
+      get canRedo() {
+        return canRedoNow.value
+      }
+    }
 
-    const formClasses = computed(() => {
-      return classNames(
+    expose(handle)
+
+    const formClasses = computed(() =>
+      classNames(
         'tiger-form',
         `tiger-form--label-${props.labelPosition}`,
         props.disabled && 'tiger-form--disabled',
         props.loading && 'tiger-form--loading'
       )
-    })
+    )
 
-    return () => {
-      return h(
+    return () =>
+      h(
         'form',
         {
+          ref: formElementRef,
           class: formClasses.value,
-          onSubmit: handleSubmit
+          noValidate: true,
+          'aria-busy': props.loading || undefined,
+          onSubmit: handleSubmit,
+          onReset: handleReset
         },
-        slots.default?.()
+        [
+          h(
+            'fieldset',
+            {
+              disabled: props.disabled || props.loading,
+              class: 'contents m-0 min-w-0 border-0 p-0'
+            },
+            slots.default?.()
+          )
+        ]
       )
-    }
   }
 })
 
