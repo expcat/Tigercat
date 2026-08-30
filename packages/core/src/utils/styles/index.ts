@@ -10,6 +10,7 @@ export * from '../interaction-styles'
 
 // Form components
 export * from '../button-utils'
+export * from '../joined-group-utils'
 export * from '../theme-colors'
 export * from '../checkbox-utils'
 export * from '../switch-utils'

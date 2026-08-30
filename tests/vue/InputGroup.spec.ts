@@ -82,8 +82,8 @@ describe('InputGroup', () => {
     const last = group.lastElementChild as HTMLElement
     const input = screen.getByLabelText('q')
 
-    expect(group.className).toContain('[&>*:first-child]:!rounded-r-none')
-    expect(group.className).toContain('[&>*:last-child]:!rounded-l-none')
+    expect(group.className).toContain(':first-child:not(:last-child)')
+    expect(group.className).toContain(':last-child:not(:first-child)')
     expect(first).toBe(input.parentElement)
     expect(first.className).toContain('border')
     expect(first.className).toContain('rounded-[var(--tiger-radius-md')

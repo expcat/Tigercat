@@ -1,5 +1,10 @@
 import { defineComponent, h, PropType, provide } from 'vue'
-import { coerceClassValue, getButtonGroupClasses, type ButtonSize } from '@expcat/tigercat-core'
+import {
+  coerceClassValue,
+  getButtonGroupClasses,
+  warnMissingAccessibleName,
+  type ButtonSize
+} from '@expcat/tigercat-core'
 
 export const BUTTON_GROUP_INJECTION_KEY = Symbol('TigerButtonGroup')
 
@@ -35,6 +40,10 @@ export const ButtonGroup = defineComponent({
     })
 
     return () => {
+      warnMissingAccessibleName('ButtonGroup', {
+        ariaLabel: attrs['aria-label'],
+        ariaLabelledby: attrs['aria-labelledby']
+      })
       const classes = getButtonGroupClasses(
         props.vertical,
         props.className,

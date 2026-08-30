@@ -5,6 +5,7 @@
  */
 
 import type { ComponentSize } from '../types/base'
+import { getJoinedGroupItemClasses } from './joined-group-utils'
 
 /**
  * Base classes for InputGroup container
@@ -14,8 +15,7 @@ export const inputGroupBaseClasses = 'inline-flex items-stretch w-full'
 /**
  * Compact mode classes — merges borders of adjacent children
  */
-export const inputGroupCompactClasses =
-  '[&>*:not(:first-child):not(:last-child)]:!rounded-none [&>*:first-child]:!rounded-r-none [&>*:last-child]:!rounded-l-none [&>*:not(:first-child)]:-ml-px [&>*:focus-within]:z-10 [&>*:focus-within]:relative'
+export const inputGroupCompactClasses = getJoinedGroupItemClasses({ focus: 'focus-within' })
 
 /**
  * Non-compact mode spacing

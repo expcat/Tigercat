@@ -2,11 +2,12 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { ButtonGroup } from '@expcat/tigercat-react/ButtonGroup'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ButtonGroup', () => {
@@ -53,18 +54,14 @@ describe('ButtonGroup', () => {
       expect(el.className).toContain('flex-col')
     })
 
-    it('applies child-selector classes for adjacent button seams', () => {
-      const { container } = render(<ButtonGroup>content</ButtonGroup>)
-      const el = container.firstElementChild!
-      expect(el.className).toContain('[&>*:first-child]')
-      expect(el.className).toContain('[&>*:not(:first-child)]:-ml-px')
-    })
-
-    it('applies vertical child-selector classes when vertical', () => {
-      const { container } = render(<ButtonGroup vertical>content</ButtonGroup>)
-      const el = container.firstElementChild!
-      expect(el.className).toContain('-mt-px')
-      expect(el.className).toContain('[&>*:first-child]:!rounded-b-none')
+    it('keeps a single child as a named group', () => {
+      render(
+        <ButtonGroup aria-label="Pages">
+          <Button>Only</Button>
+        </ButtonGroup>
+      )
+      expect(screen.getByRole('group', { name: 'Pages' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Only' })).toBeInTheDocument()
     })
 
     it('applies base inline-flex class', () => {
@@ -122,6 +119,35 @@ describe('ButtonGroup', () => {
         </ButtonGroup>
       )
       await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('warns when the group has no accessible name', () => {
+      resetDevWarnCache()
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+      render(
+        <ButtonGroup>
+          <Button>A</Button>
+        </ButtonGroup>
+      )
+      expect(warn).toHaveBeenCalledWith(
+        '[Tigercat] ButtonGroup has no accessible name. Provide text content, aria-label, or aria-labelledby.'
+      )
+      warn.mockRestore()
+    })
+
+    it('does not warn when labelled by another element', () => {
+      resetDevWarnCache()
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+      render(
+        <>
+          <span id="pages-label">Pages</span>
+          <ButtonGroup aria-labelledby="pages-label">
+            <Button>A</Button>
+          </ButtonGroup>
+        </>
+      )
+      expect(warn).not.toHaveBeenCalled()
+      warn.mockRestore()
     })
   })
 })

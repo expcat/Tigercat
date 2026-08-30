@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useMemo } from 'react'
-import { getButtonGroupClasses, type ButtonSize } from '@expcat/tigercat-core'
+import {
+  getButtonGroupClasses,
+  warnMissingAccessibleName,
+  type ButtonSize
+} from '@expcat/tigercat-core'
 
 export interface ButtonGroupContextValue {
   size?: ButtonSize
@@ -21,8 +25,11 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   vertical = false,
   className,
   children,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
   ...rest
 }) => {
+  warnMissingAccessibleName('ButtonGroup', { ariaLabel, ariaLabelledby })
   const contextValue = useMemo(() => ({ size }), [size])
 
   const groupClasses = useMemo(
@@ -32,7 +39,12 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
 
   return (
     <ButtonGroupContext.Provider value={contextValue}>
-      <div {...rest} className={groupClasses} role="group">
+      <div
+        {...rest}
+        className={groupClasses}
+        role="group"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}>
         {children}
       </div>
     </ButtonGroupContext.Provider>

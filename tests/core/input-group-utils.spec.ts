@@ -4,12 +4,12 @@ import { getInputGroupClasses } from '@expcat/tigercat-core'
 describe('getInputGroupClasses compact', () => {
   it('uses focus-within, overlap, and first/last radius on direct children', () => {
     const compact = getInputGroupClasses(true)
-    expect(compact).toContain('[&>*:focus-within]')
+    expect(compact).toContain('focus-within')
     expect(compact).not.toContain('[&>*:focus]:z-10')
-    expect(compact).toContain('-ml-px')
-    expect(compact).toContain('[&>*:first-child]:!rounded-r-none')
-    expect(compact).toContain('[&>*:last-child]:!rounded-l-none')
-    expect(compact).toContain('[&>*:not(:first-child):not(:last-child)]:!rounded-none')
+    expect(compact).toContain('-ms-px')
+    expect(compact).toContain(':first-child:not(:last-child)')
+    expect(compact).toContain(':last-child:not(:first-child)')
+    expect(compact).not.toContain('[&>*:first-child]:!rounded-e-none')
   })
 
   it('does not apply compact selectors when spaced', () => {

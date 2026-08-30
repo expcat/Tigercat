@@ -86,12 +86,15 @@ export interface ButtonProps {
 }
 
 /**
- * Button group props interface
+ * Button group props interface.
+ * Direct children must be Button (no Tooltip/span wrapper between the group
+ * and the button root). SplitButton is not joined here.
+ * An accessible name (`aria-label` / `aria-labelledby`) is required.
  * @since 0.5.0
  */
 export interface ButtonGroupProps {
   /**
-   * Size applied to all buttons in the group
+   * Size applied to all buttons in the group. A child Button `size` still wins.
    */
   size?: ButtonSize
 
