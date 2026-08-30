@@ -51,7 +51,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const inputGroup = useInputGroupContext()
     const effectiveSize = size ?? inputGroup?.size ?? 'md'
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-    const [currentValue, setValue] = useControlledState(value, defaultValue || '')
+    const [currentValue, setValue] = useControlledState({
+      value,
+      defaultValue: defaultValue || ''
+    })
 
     const setRefs = (node: HTMLTextAreaElement | null) => {
       textareaRef.current = node

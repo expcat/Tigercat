@@ -77,7 +77,11 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   // Get group context if inside CheckboxGroup
   const groupContext = useCheckboxGroup()
 
-  const [checkedState, setChecked] = useControlledState(controlledChecked, defaultChecked, onChange)
+  const [checkedState, setChecked] = useControlledState({
+    value: controlledChecked,
+    defaultValue: defaultChecked,
+    onChange
+  })
 
   // Determine effective size and disabled state - simple logical operations
   const effectiveSize = propSize || groupContext?.size || 'md'

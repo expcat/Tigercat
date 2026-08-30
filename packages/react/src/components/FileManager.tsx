@@ -72,11 +72,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const contentRef = useRef<HTMLDivElement>(null)
   const dragFromIndex = useRef<number | null>(null)
   const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
-  const [keys, setKeys] = useControlledState(
-    selectedKeys,
-    defaultSelectedKeys ?? [],
-    onSelectedKeysChange
-  )
+  const [keys, setKeys] = useControlledState({
+    value: selectedKeys,
+    defaultValue: defaultSelectedKeys ?? [],
+    onChange: onSelectedKeysChange
+  })
 
   // Which meta columns the list view shows (name is always rendered).
   const metaColumns = columns ?? ['size', 'modified']

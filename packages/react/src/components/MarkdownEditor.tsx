@@ -89,8 +89,16 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 }) => {
   const config = useTigerConfig()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [currentValue, commitValue] = useControlledState(value, defaultValue, onChange)
-  const [currentMode, commitMode] = useControlledState(mode, defaultMode, onModeChange)
+  const [currentValue, commitValue] = useControlledState({
+    value,
+    defaultValue,
+    onChange
+  })
+  const [currentMode, commitMode] = useControlledState({
+    value: mode,
+    defaultValue: defaultMode,
+    onChange: onModeChange
+  })
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]

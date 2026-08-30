@@ -49,7 +49,10 @@ export const Radio: React.FC<RadioProps> = ({
 }) => {
   const groupContext = useContext(RadioGroupContext)
 
-  const [checkedState, setChecked] = useControlledState<boolean>(checked, defaultChecked)
+  const [checkedState, setChecked] = useControlledState<boolean>({
+    value: checked,
+    defaultValue: defaultChecked
+  })
 
   const isInGroup = !!groupContext
 

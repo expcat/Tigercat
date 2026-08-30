@@ -81,7 +81,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const config = useTigerConfig()
   const editorRef = useRef<HTMLDivElement>(null)
   const engineRef = useRef<RichTextEngineInstance | null>(null)
-  const [currentContent, setContent] = useControlledState(value, defaultValue, onChange)
+  const [currentContent, setContent] = useControlledState({
+    value,
+    defaultValue,
+    onChange
+  })
   const isControlled = value !== undefined
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
   const empty = isContentEmpty(currentContent)

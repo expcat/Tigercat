@@ -99,11 +99,11 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   const repeatValueRef = useRef<number | null>(null)
   const suppressNextClickRef = useRef(false)
   const [focused, setFocused] = useState(false)
-  const [currentValue, setValue] = useControlledState<number | null>(
-    controlledValue,
-    defaultValue ?? controlledValue ?? null,
+  const [currentValue, setValue] = useControlledState<number | null>({
+    value: controlledValue,
+    defaultValue: defaultValue ?? null,
     onChange
-  )
+  })
   const [displayValue, setDisplayValue] = useState('')
 
   const toDisplayValue = useCallback(

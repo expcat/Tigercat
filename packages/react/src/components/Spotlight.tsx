@@ -87,16 +87,16 @@ export const Spotlight: React.FC<SpotlightProps> = ({
     placeholder,
     mergedLocale?.common?.searchPlaceholder
   )
-  const [resolvedOpen, setOpenValue] = useControlledState<boolean>(
-    open,
-    defaultOpen ?? false,
-    onOpenChange
-  )
-  const [resolvedQuery, setQueryValue] = useControlledState<string>(
-    query,
-    defaultQuery ?? '',
-    onQueryChange
-  )
+  const [resolvedOpen, setOpenValue] = useControlledState<boolean>({
+    value: open,
+    defaultValue: defaultOpen ?? false,
+    onChange: onOpenChange
+  })
+  const [resolvedQuery, setQueryValue] = useControlledState<string>({
+    value: query,
+    defaultValue: defaultQuery ?? '',
+    onChange: onQueryChange
+  })
   const [activeIndex, setActiveIndex] = useState(-1)
 
   const reactId = useId()

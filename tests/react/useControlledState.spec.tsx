@@ -11,7 +11,9 @@ import { Switch, useControlledState } from '@expcat/tigercat-react'
 describe('useControlledState', () => {
   it('uncontrolled: starts from defaultValue, updates internal state and fires onChange', () => {
     const onChange = vi.fn()
-    const { result } = renderHook(() => useControlledState<string>(undefined, 'a', onChange))
+    const { result } = renderHook(() =>
+      useControlledState<string>({ value: undefined, defaultValue: 'a', onChange })
+    )
 
     expect(result.current[0]).toBe('a')
 
@@ -24,7 +26,9 @@ describe('useControlledState', () => {
 
   it('controlled: display follows the prop and setter only notifies the parent', () => {
     const onChange = vi.fn()
-    const { result } = renderHook(() => useControlledState<string>('x', 'a', onChange))
+    const { result } = renderHook(() =>
+      useControlledState<string>({ value: 'x', defaultValue: 'a', onChange })
+    )
 
     expect(result.current[0]).toBe('x')
 
@@ -37,7 +41,7 @@ describe('useControlledState', () => {
 
   it('reflects controlled value changes from props', () => {
     const { result, rerender } = renderHook(
-      ({ value }: { value: number }) => useControlledState<number>(value, 0),
+      ({ value }: { value: number }) => useControlledState<number>({ value, defaultValue: 0 }),
       { initialProps: { value: 1 } }
     )
 
@@ -48,7 +52,9 @@ describe('useControlledState', () => {
 
   it('accumulates two updater calls in one act', () => {
     const onChange = vi.fn()
-    const { result } = renderHook(() => useControlledState<number>(undefined, 1, onChange))
+    const { result } = renderHook(() =>
+      useControlledState<number>({ value: undefined, defaultValue: 1, onChange })
+    )
 
     act(() => {
       result.current[1]((prev) => prev + 1)
@@ -63,7 +69,8 @@ describe('useControlledState', () => {
 
   it('keeps the last controlled value after the parent omits value', () => {
     const { result, rerender } = renderHook(
-      ({ value }: { value?: string }) => useControlledState<string>(value, 'default'),
+      ({ value }: { value?: string }) =>
+        useControlledState<string>({ value, defaultValue: 'default' }),
       { initialProps: { value: 'live' as string | undefined } }
     )
 
@@ -76,7 +83,9 @@ describe('useControlledState', () => {
 
   it('does not setState or call onChange when the resolved value is unchanged', () => {
     const onChange = vi.fn()
-    const { result } = renderHook(() => useControlledState<string>(undefined, 'a', onChange))
+    const { result } = renderHook(() =>
+      useControlledState<string>({ value: undefined, defaultValue: 'a', onChange })
+    )
 
     act(() => result.current[1]('a'))
 
@@ -92,7 +101,11 @@ describe('useControlledState', () => {
   ])('treats %s as a controlled empty value', (_label, controlled, fallback) => {
     const onChange = vi.fn()
     const { result } = renderHook(() =>
-      useControlledState<typeof controlled>(controlled, fallback, onChange)
+      useControlledState<typeof controlled>({
+        value: controlled,
+        defaultValue: fallback,
+        onChange
+      })
     )
 
     expect(result.current[0]).toBe(controlled)
@@ -106,7 +119,7 @@ describe('useControlledState', () => {
     const second = vi.fn()
     const { result, rerender } = renderHook(
       ({ onChange }: { onChange: (value: string) => void }) =>
-        useControlledState<string>(undefined, 'a', onChange),
+        useControlledState<string>({ value: undefined, defaultValue: 'a', onChange }),
       { initialProps: { onChange: first } }
     )
 
@@ -120,7 +133,11 @@ describe('useControlledState', () => {
   it('forwards extra arguments to onChange', () => {
     const onChange = vi.fn<(value: boolean, event: string) => void>()
     const { result } = renderHook(() =>
-      useControlledState<boolean, [string]>(undefined, false, onChange)
+      useControlledState<boolean, [string]>({
+        value: undefined,
+        defaultValue: false,
+        onChange
+      })
     )
 
     act(() => result.current[1](true, 'click'))
@@ -129,7 +146,9 @@ describe('useControlledState', () => {
   })
 
   it('keeps a stable setter identity across renders', () => {
-    const { result, rerender } = renderHook(() => useControlledState<string>(undefined, 'a'))
+    const { result, rerender } = renderHook(() =>
+      useControlledState<string>({ value: undefined, defaultValue: 'a' })
+    )
     const firstSetter = result.current[1]
 
     act(() => result.current[1]('b'))
@@ -139,7 +158,9 @@ describe('useControlledState', () => {
   })
 
   it('is a no-op callback safe when onChange is omitted', () => {
-    const { result } = renderHook(() => useControlledState<string>(undefined, 'a'))
+    const { result } = renderHook(() =>
+      useControlledState<string>({ value: undefined, defaultValue: 'a' })
+    )
     expect(() => act(() => result.current[1]('b'))).not.toThrow()
     expect(result.current[0]).toBe('b')
   })
@@ -168,5 +189,28 @@ describe('useControlledState', () => {
 
     await user.click(getByRole('button', { name: 'release' }))
     expect(sw).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('applies postState to the displayed value and to onChange', () => {
+    const onChange = vi.fn()
+    const { result, rerender } = renderHook(
+      ({ value }: { value?: number }) =>
+        useControlledState<number>({
+          value,
+          defaultValue: 150,
+          onChange,
+          postState: (next) => Math.min(100, Math.max(0, next))
+        }),
+      { initialProps: { value: 150 as number | undefined } }
+    )
+
+    expect(result.current[0]).toBe(100)
+
+    rerender({ value: undefined })
+    expect(result.current[0]).toBe(100)
+
+    act(() => result.current[1](-20))
+    expect(result.current[0]).toBe(0)
+    expect(onChange).toHaveBeenCalledWith(0)
   })
 })

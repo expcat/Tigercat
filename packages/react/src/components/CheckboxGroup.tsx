@@ -60,7 +60,11 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   className,
   ...props
 }) => {
-  const [value, setValue] = useControlledState(controlledValue, defaultValue, onChange)
+  const [value, setValue] = useControlledState({
+    value: controlledValue,
+    defaultValue,
+    onChange
+  })
 
   const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
     if (disabled) return

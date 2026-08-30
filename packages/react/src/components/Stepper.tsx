@@ -36,7 +36,11 @@ export const Stepper: React.FC<StepperProps> = ({
   decrementAriaLabel = 'Decrease',
   onChange
 }) => {
-  const [currentValue, setCurrentValue] = useControlledState(value, defaultValue ?? 0, onChange)
+  const [currentValue, setCurrentValue] = useControlledState({
+    value,
+    defaultValue: defaultValue ?? 0,
+    onChange
+  })
   const repeatControllerRef = useRef(createRafRepeatActionController())
   const repeatValueRef = useRef(currentValue)
   const suppressNextClickRef = useRef(false)

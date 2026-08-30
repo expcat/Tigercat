@@ -109,7 +109,11 @@ export const MaskInput: React.FC<MaskInputProps> = ({
   const errorMsgId = `tiger-mask-input-error-${reactId}`
 
   const spec = useMemo(() => parseMask(mask, tokens), [mask, tokens])
-  const [rawValue, setRawValue] = useControlledState<string>(value, defaultValue ?? '')
+  const [rawValue, setRawValue] = useControlledState<string, [MaskInputChangeDetail]>({
+    value,
+    defaultValue: defaultValue ?? '',
+    onChange
+  })
   const formatted = useMemo(() => formatMaskValue(rawValue, spec), [rawValue, spec])
   const maskedValue = formatted.maskedValue
 
@@ -132,8 +136,7 @@ export const MaskInput: React.FC<MaskInputProps> = ({
   })
 
   const commit = (raw: string, detail: MaskInputChangeDetail, previousMasked: string) => {
-    setRawValue(raw)
-    onChange?.(raw, detail)
+    setRawValue(raw, detail)
     if (detail.completed && !formatMaskValue(previousMasked, spec).completed) {
       onComplete?.(raw, detail.maskedValue)
     }
@@ -179,8 +182,7 @@ export const MaskInput: React.FC<MaskInputProps> = ({
   }
 
   const handleClear = () => {
-    setRawValue('')
-    onChange?.('', { maskedValue: '', completed: false })
+    setRawValue('', { maskedValue: '', completed: false })
     onClear?.()
     inputRef.current?.focus()
   }

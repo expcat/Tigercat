@@ -105,7 +105,11 @@ export const InputOTP: React.FC<InputOTPProps> = ({
   const slotRefs = useRef<Array<HTMLInputElement | null>>([])
 
   const charOptions = useMemo(() => ({ type, pattern }), [type, pattern])
-  const [rawValue, setRawValue] = useControlledState<string>(value, defaultValue ?? '', onChange)
+  const [rawValue, setRawValue] = useControlledState<string>({
+    value,
+    defaultValue: defaultValue ?? '',
+    onChange
+  })
   const currentValue = normalizeOtpValue(rawValue, length, charOptions)
 
   const separatorIndices = useMemo(() => getOtpSeparatorIndices(length, groups), [length, groups])

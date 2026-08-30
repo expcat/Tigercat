@@ -82,17 +82,17 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
     return null
   })()
 
-  const [singleValue, setSingleValue] = useControlledState<string | null>(
-    singleControlled,
-    singleDefault,
-    allProps.onChange as ((time: TimePickerSingleInputValue) => void) | undefined
-  )
+  const [singleValue, setSingleValue] = useControlledState<string | null>({
+    value: singleControlled,
+    defaultValue: singleDefault,
+    onChange: allProps.onChange as ((time: TimePickerSingleInputValue) => void) | undefined
+  })
 
-  const [rangeValue, setRangeValue] = useControlledState<TimePickerRangeInputValue>(
-    isRangeMode && value !== undefined ? normalizeRangeValue(value) : undefined,
-    normalizeRangeValue(defaultValue),
-    allProps.onChange as ((time: TimePickerRangeInputValue) => void) | undefined
-  )
+  const [rangeValue, setRangeValue] = useControlledState<TimePickerRangeInputValue>({
+    value: isRangeMode && value !== undefined ? normalizeRangeValue(value) : undefined,
+    defaultValue: normalizeRangeValue(defaultValue),
+    onChange: allProps.onChange as ((time: TimePickerRangeInputValue) => void) | undefined
+  })
 
   const [activePart, setActivePart] = useState<'start' | 'end'>('start')
 

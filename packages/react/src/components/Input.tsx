@@ -126,7 +126,10 @@ export const Input: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const reactId = useId()
   const errorMsgId = `tiger-input-error-${reactId}`
-  const [inputValue, setInputValue] = useControlledState<string | number>(value, defaultValue ?? '')
+  const [inputValue, setInputValue] = useControlledState<string | number>({
+    value,
+    defaultValue: defaultValue ?? ''
+  })
   const [passwordVisible, setPasswordVisible] = useState(false)
 
   // Trigger shake animation via direct DOM manipulation for reliable re-trigger

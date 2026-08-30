@@ -13,6 +13,17 @@ export type SetControlledState<T, Args extends unknown[] = []> = (
   ...args: Args
 ) => void
 
+export interface UseControlledStateOptions<T, Args extends unknown[] = []> {
+  /** Controlled value. `undefined` is uncontrolled; `null` is a legal empty value. */
+  value?: T
+  /** Initial value for uncontrolled mode. Stored as-is (not called as a lazy initializer). */
+  defaultValue: T
+  /** Invoked only when the resolved value changes. Extra setter args are forwarded. */
+  onChange?: (value: T, ...args: Args) => void
+  /** Normalize/clamp both the displayed value and values passed to `onChange`. */
+  postState?: (value: T) => T
+}
+
 /**
  * Hook for the controlled/uncontrolled component state pattern.
  *
@@ -23,26 +34,32 @@ export type SetControlledState<T, Args extends unknown[] = []> = (
  * Switching from controlled to omitted `value` keeps the last displayed value
  * (the last controlled prop), not the original `defaultValue`.
  *
- * @param controlledValue - The controlled value (from props). Pass `undefined` for uncontrolled.
- * @param defaultValue - The initial value for uncontrolled mode. Stored as-is (not called).
- * @param onChange - Optional change callback. Invoked only when the resolved value changes.
- * @returns A tuple of `[currentValue, setValue]`.
+ * Pass the component `onChange` in when its shape is `(value, ...args)`. Wrap
+ * native events or `(file, fileList)` in `onChange` instead of firing again
+ * after `setValue`.
  */
 export function useControlledState<T, Args extends unknown[] = []>(
-  controlledValue: T | undefined,
-  defaultValue: T,
-  onChange?: (value: T, ...args: Args) => void
+  options: UseControlledStateOptions<T, Args>
 ): [T, SetControlledState<T, Args>] {
-  const [internalValue, setInternalValue] = useState(() => defaultValue)
+  const { value: controlledValue, defaultValue, onChange, postState } = options
+  const postStateRef = useRef(postState)
+  postStateRef.current = postState
+
+  const applyPostState = (next: T): T => {
+    const fn = postStateRef.current
+    return fn ? fn(next) : next
+  }
+
+  const [internalValue, setInternalValue] = useState(() => applyPostState(defaultValue))
   const isControlled = controlledValue !== undefined
+  const raw = isControlled ? (controlledValue as T) : internalValue
+  const value = applyPostState(raw)
 
   // Keep internal as the last displayed value so dropping `value` does not
   // snap back to defaultValue. React allows this render-phase sync.
-  if (isControlled && !Object.is(internalValue, controlledValue)) {
-    setInternalValue(controlledValue as T)
+  if (isControlled && !Object.is(internalValue, value)) {
+    setInternalValue(value)
   }
-
-  const value = isControlled ? (controlledValue as T) : internalValue
 
   const valueRef = useRef(value)
   valueRef.current = value
@@ -53,7 +70,9 @@ export function useControlledState<T, Args extends unknown[] = []>(
 
   const setValue = useCallback<SetControlledState<T, Args>>((next, ...args) => {
     const prev = valueRef.current
-    const resolved = typeof next === 'function' ? (next as (prev: T) => T)(prev) : next
+    const resolved = applyPostState(
+      typeof next === 'function' ? (next as (prev: T) => T)(prev) : next
+    )
     if (Object.is(resolved, prev)) return
     valueRef.current = resolved
     if (!isControlledRef.current) {

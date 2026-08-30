@@ -109,19 +109,21 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
     return [parseDate(tuple[0]), parseDate(tuple[1])]
   }
 
-  const [singleValue, setSingleValue] = useControlledState<Date | null>(
-    !isRangeMode && singleProps.value !== undefined
-      ? parseDate(singleProps.value ?? null)
-      : undefined,
-    parseDate(singleProps.defaultValue ?? null),
-    singleProps.onChange
-  )
+  const [singleValue, setSingleValue] = useControlledState<Date | null>({
+    value:
+      !isRangeMode && singleProps.value !== undefined
+        ? parseDate(singleProps.value ?? null)
+        : undefined,
+    defaultValue: parseDate(singleProps.defaultValue ?? null),
+    onChange: singleProps.onChange
+  })
 
-  const [rangeValue, setRangeValue] = useControlledState<DatePickerRangeResolvedValue>(
-    isRangeMode && rangeProps.value !== undefined ? parseRangeTuple(rangeProps.value) : undefined,
-    parseRangeTuple(rangeProps.defaultValue),
-    rangeProps.onChange
-  )
+  const [rangeValue, setRangeValue] = useControlledState<DatePickerRangeResolvedValue>({
+    value:
+      isRangeMode && rangeProps.value !== undefined ? parseRangeTuple(rangeProps.value) : undefined,
+    defaultValue: parseRangeTuple(rangeProps.defaultValue),
+    onChange: rangeProps.onChange
+  })
 
   const calendarRef = useRef<HTMLDivElement>(null)
   const mobileCalendarRef = useRef<HTMLDivElement>(null)

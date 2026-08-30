@@ -96,7 +96,13 @@ export const Upload: React.FC<UploadProps> = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const objectUrlsRef = useRef(new Map<File, string>())
   const [isDragging, setIsDragging] = useState(false)
-  const [fileList, setFileList] = useControlledState<UploadFile[]>(controlledFileList, [])
+  const [fileList, setFileList] = useControlledState<UploadFile[], [UploadFile?]>({
+    value: controlledFileList,
+    defaultValue: [],
+    onChange: (nextList, file) => {
+      if (file) onChange?.(file, nextList)
+    }
+  })
 
   const revokeUnusedObjectUrls = useCallback((files: UploadFile[]) => {
     const activeFiles = new Set(
@@ -123,8 +129,8 @@ export const Upload: React.FC<UploadProps> = ({
   )
 
   const updateFileList = useCallback(
-    (newFileList: UploadFile[]) => {
-      setFileList(newFileList)
+    (newFileList: UploadFile[], file?: UploadFile) => {
+      setFileList(newFileList, file)
     },
     [setFileList]
   )
@@ -164,13 +170,11 @@ export const Upload: React.FC<UploadProps> = ({
     let nextFileList = [...fileList]
 
     // Progress/success/error mutate the same uploadFile then notify with a new
-    // array so controlled parents (fileList + onChange) redraw. Do not pass
-    // Upload onChange into useControlledState: hook onChange is (fileList) =>
-    // void, Upload onChange is (file, fileList) => void.
+    // array so controlled parents (fileList + onChange) redraw. Upload onChange
+    // is (file, fileList); the extra arg is forwarded through the hook.
     const notifyFileList = (file: UploadFile) => {
       const nextList = [...nextFileList]
-      updateFileList(nextList)
-      onChange?.(file, nextList)
+      updateFileList(nextList, file)
     }
 
     for (const file of prepared.acceptedFiles) {
@@ -178,11 +182,7 @@ export const Upload: React.FC<UploadProps> = ({
 
       // Add to file list
       nextFileList = [...nextFileList, uploadFile]
-      updateFileList(nextFileList)
-
-      if (onChange) {
-        onChange(uploadFile, nextFileList)
-      }
+      updateFileList(nextFileList, uploadFile)
 
       if (autoUpload && !queue) {
         await uploadOne(file, uploadFile, () => notifyFileList(uploadFile))
@@ -306,9 +306,7 @@ export const Upload: React.FC<UploadProps> = ({
     const removeResult = onRemove?.(file, newFileList)
     if (removeResult === false) return
 
-    updateFileList(newFileList)
-    // Keep controlled mode in sync (demo relies on onChange)
-    onChange?.(file, newFileList)
+    updateFileList(newFileList, file)
   }
 
   const handlePreview = (file: UploadFile) => {

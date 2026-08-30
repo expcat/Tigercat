@@ -112,7 +112,11 @@ export const TagsInput: React.FC<TagsInputProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [tags, setTags] = useControlledState<string[]>(value, defaultValue ?? [], onChange)
+  const [tags, setTags] = useControlledState<string[]>({
+    value,
+    defaultValue: defaultValue ?? [],
+    onChange
+  })
   const [inputText, setInputText] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
 

@@ -109,15 +109,12 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     }, [children])
 
     const slideCount = slides.length
-    const [currentIndexValue, setCurrentIndexValue] = useControlledState(
-      controlledCurrentIndex,
-      clampSlideIndex(defaultCurrentIndex, slideCount),
-      onCurrentIndexChange
-    )
-    const currentIndex = useMemo(
-      () => clampSlideIndex(currentIndexValue, slideCount),
-      [currentIndexValue, slideCount]
-    )
+    const [currentIndex, setCurrentIndexValue] = useControlledState({
+      value: controlledCurrentIndex,
+      defaultValue: defaultCurrentIndex,
+      onChange: onCurrentIndexChange,
+      postState: (index) => clampSlideIndex(index, slideCount)
+    })
     const [isPaused, setIsPaused] = useState(false)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const touchStartRef = useRef<CarouselTouchPoint | null>(null)

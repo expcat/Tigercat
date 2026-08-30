@@ -32,7 +32,11 @@ export const Switch: React.FC<SwitchProps> = ({
   tabIndex,
   ...props
 }) => {
-  const [checked, setChecked] = useControlledState(checkedProp, defaultChecked ?? false, onChange)
+  const [checked, setChecked] = useControlledState({
+    value: checkedProp,
+    defaultValue: defaultChecked ?? false,
+    onChange
+  })
 
   const switchClasses = getSwitchClasses(size, checked, disabled, className)
 
