@@ -7,7 +7,11 @@ description: Compact generated route map for Tigercat core type files
 
 # Tigercat API Summary
 
-> 自动生成。只用于定位类型文件和 Props 接口；组件路由看 component-index，字段细节看分类 props 文档或源码。
+> 自动生成。只用于定位类型文件、Props 接口和公开 hook；组件路由看 component-index，字段细节看分类 props 文档或源码。
+
+## Public hooks
+
+`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value.
 
 ## Basic
 

@@ -20,7 +20,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 | ChartGrid     | `<ChartGrid :x-scale="xScale" :y-scale="yScale" />`                     | `<ChartGrid xScale={xScale} yScale={yScale} />`                    |
 | ChartLegend   | `<ChartLegend :items="items" />`                                        | `<ChartLegend items={items} />`                                    |
 | ChartSeries   | `<ChartSeries :data="data" />`                                          | `<ChartSeries data={data} />`                                      |
-| ChartTooltip  | `<ChartTooltip content="Value: 42" open :x="120" :y="80" />`            | `<ChartTooltip content="Value: 42" open x={120} y={80} />`         |
+| ChartTooltip  | `<ChartTooltip :content="content" />`                                   | `<ChartTooltip content={content} />`                               |
 | DonutChart    | `<DonutChart :data="data" />`                                           | `<DonutChart data={data} />`                                       |
 | FunnelChart   | `<FunnelChart :data="data" />`                                          | `<FunnelChart data={data} />`                                      |
 | Gantt         | `<Gantt :data="tasks" />`                                               | `<Gantt data={tasks} />`                                           |

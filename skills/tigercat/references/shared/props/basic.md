@@ -11,72 +11,73 @@ description: Compact generated Tigercat Basic props reference
 
 ## Alert
 
-`packages/core/src/types/alert.ts` · `AlertProps` · 3/11 props
+`packages/core/src/types/alert.ts` · `AlertProps` · 3/15 props
 
-| Prop     | Type        | Default  | Notes                                      |
-| -------- | ----------- | -------- | ------------------------------------------ |
-| `type?`  | `AlertType` | `'info'` | Alert type (success, warning, error, info) |
-| `size?`  | `AlertSize` | `'md'`   | Alert size                                 |
-| `title?` | `string`    | `-`      | Alert title (main message)                 |
+| Prop        | Type        | Default  | Notes                                      |
+| ----------- | ----------- | -------- | ------------------------------------------ |
+| `closable?` | `boolean`   | `false`  | Whether the alert can be closed            |
+| `type?`     | `AlertType` | `'info'` | Alert type (success, warning, error, info) |
+| `size?`     | `AlertSize` | `'md'`   | Alert size                                 |
 
 ## Avatar
 
-`packages/core/src/types/avatar.ts` · `AvatarProps` · 3/8 props
+`packages/core/src/types/avatar.ts` · `AvatarProps` · 3/10 props
 
 | Prop     | Type          | Default    | Notes            |
 | -------- | ------------- | ---------- | ---------------- |
+| `src?`   | `string`      | `-`        | Image source URL |
 | `size?`  | `AvatarSize`  | `'md'`     | Avatar size      |
 | `shape?` | `AvatarShape` | `'circle'` | Avatar shape     |
-| `src?`   | `string`      | `-`        | Image source URL |
 
 ## AvatarGroup
 
-`packages/core/src/types/avatar.ts` · `AvatarGroupProps`
+`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 3/6 props
 
-| Prop         | Type         | Default | Notes                                                                                 |
-| ------------ | ------------ | ------- | ------------------------------------------------------------------------------------- |
-| `max?`       | `number`     | `-`     | Maximum number of avatars to display Excess avatars will be shown as a "+N" indicator |
-| `size?`      | `AvatarSize` | `'md'`  | Size applied to all avatars in the group                                              |
-| `className?` | `string`     | `-`     | Additional CSS classes                                                                |
+| Prop      | Type                   | Default | Notes                                                                                 |
+| --------- | ---------------------- | ------- | ------------------------------------------------------------------------------------- |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                               |
+| `max?`    | `number`               | `-`     | Maximum number of avatars to display Excess avatars will be shown as a "+N" indicator |
+| `size?`   | `AvatarSize`           | `'md'`  | Size applied to all avatars in the group                                              |
 
 ## Badge
 
-`packages/core/src/types/badge.ts` · `BadgeProps` · 3/10 props
+`packages/core/src/types/badge.ts` · `BadgeProps` · 3/11 props
 
-| Prop       | Type                   | Default    | Notes                                                   |
-| ---------- | ---------------------- | ---------- | ------------------------------------------------------- |
-| `locale?`  | `Partial<TigerLocale>` | `-`        | Locale override merged on top of ConfigProvider locale. |
-| `variant?` | `BadgeVariant`         | `'danger'` | Badge variant style                                     |
-| `size?`    | `BadgeSize`            | `'md'`     | Badge size                                              |
+| Prop       | Type                   | Default    | Notes                                                    |
+| ---------- | ---------------------- | ---------- | -------------------------------------------------------- |
+| `locale?`  | `Partial<TigerLocale>` | `-`        | Locale override merged on top of ConfigProvider locale.  |
+| `content?` | `number \| string`     | `-`        | Badge content (number or text). Ignored when type='dot'. |
+| `variant?` | `BadgeVariant`         | `'danger'` | Badge variant style                                      |
 
 ## Button
 
-`packages/core/src/types/button.ts` · `ButtonProps` · 3/8 props
+`packages/core/src/types/button.ts` · `ButtonProps` · 3/12 props
 
-| Prop        | Type            | Default     | Notes                          |
-| ----------- | --------------- | ----------- | ------------------------------ |
-| `variant?`  | `ButtonVariant` | `'primary'` | Button variant style           |
-| `size?`     | `ButtonSize`    | `'md'`      | Button size                    |
-| `disabled?` | `boolean`       | `false`     | Whether the button is disabled |
+| Prop        | Type            | Default     | Notes                                  |
+| ----------- | --------------- | ----------- | -------------------------------------- |
+| `disabled?` | `boolean`       | `false`     | Whether the button is disabled         |
+| `loading?`  | `boolean`       | `false`     | Whether the button is in loading state |
+| `variant?`  | `ButtonVariant` | `'primary'` | Button variant style                   |
 
 ## ButtonGroup
 
 `packages/core/src/types/button.ts` · `ButtonGroupProps`
 
-| Prop        | Type         | Default | Notes                                    |
-| ----------- | ------------ | ------- | ---------------------------------------- |
-| `size?`     | `ButtonSize` | `-`     | Size applied to all buttons in the group |
-| `vertical?` | `boolean`    | `false` | Whether to render buttons vertically     |
+| Prop         | Type         | Default | Notes                                    |
+| ------------ | ------------ | ------- | ---------------------------------------- |
+| `size?`      | `ButtonSize` | `-`     | Size applied to all buttons in the group |
+| `vertical?`  | `boolean`    | `false` | Whether to render buttons vertically     |
+| `className?` | `string`     | `-`     | -                                        |
 
 ## Code
 
-`packages/core/src/types/code.ts` · `CodeProps` · 3/7 props
+`packages/core/src/types/code.ts` · `CodeProps` · 3/9 props
 
-| Prop         | Type      | Default | Notes |
-| ------------ | --------- | ------- | ----- |
-| `code`       | `string`  | `-`     | -     |
-| `copyable?`  | `boolean` | `-`     | -     |
-| `copyLabel?` | `string`  | `-`     | -     |
+| Prop        | Type                   | Default | Notes                             |
+| ----------- | ---------------------- | ------- | --------------------------------- |
+| `code`      | `string`               | `-`     | -                                 |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for Code UI text |
+| `copyable?` | `boolean`              | `-`     | -                                 |
 
 ## ConfigProvider
 
@@ -90,17 +91,17 @@ description: Compact generated Tigercat Basic props reference
 
 ## CropUpload
 
-`packages/core/src/types/image.ts` · `CropUploadProps` · 3/8 props
+`packages/core/src/types/image.ts` · `CropUploadProps` · 3/10 props
 
 | Prop        | Type                   | Default     | Notes                                                   |
 | ----------- | ---------------------- | ----------- | ------------------------------------------------------- |
 | `locale?`   | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
-| `accept?`   | `string`               | `'image/*'` | Accepted file types                                     |
 | `disabled?` | `boolean`              | `false`     | Whether the component is disabled                       |
+| `accept?`   | `string`               | `'image/*'` | Accepted file types                                     |
 
 ## Divider
 
-`packages/core/src/types/divider.ts` · `DividerProps` · 3/5 props
+`packages/core/src/types/divider.ts` · `DividerProps` · 3/6 props
 
 | Prop           | Type                 | Default        | Notes                               |
 | -------------- | -------------------- | -------------- | ----------------------------------- |
@@ -110,7 +111,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Empty
 
-`packages/core/src/types/empty.ts` · `EmptyProps` · 3/5 props
+`packages/core/src/types/empty.ts` · `EmptyProps` · 3/9 props
 
 | Prop           | Type                   | Default     | Notes                                                   |
 | -------------- | ---------------------- | ----------- | ------------------------------------------------------- |
@@ -120,7 +121,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Highlight
 
-`packages/core/src/types/highlight.ts` · `HighlightProps` · 3/8 props
+`packages/core/src/types/highlight.ts` · `HighlightProps` · 3/9 props
 
 | Prop             | Type                | Default | Notes                                                                                      |
 | ---------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -130,7 +131,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Icon
 
-`packages/core/src/types/icon.ts` · `IconProps` · 3/5 props
+`packages/core/src/types/icon.ts` · `IconProps` · 3/6 props
 
 Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。
 
@@ -204,7 +205,7 @@ import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-cor
 
 ## Image
 
-`packages/core/src/types/image.ts` · `ImageProps` · 3/10 props
+`packages/core/src/types/image.ts` · `ImageProps` · 3/13 props
 
 Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。
 
@@ -216,45 +217,47 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## ImageCompare
 
-`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 3/15 props
+`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 3/17 props
 
-| Prop         | Type     | Default | Notes                                                                                      |
-| ------------ | -------- | ------- | ------------------------------------------------------------------------------------------ |
-| `beforeSrc?` | `string` | `-`     | Before (starting) image URL. Vue `before` slot / React `before` node take precedence wh... |
-| `afterSrc?`  | `string` | `-`     | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
-| `beforeAlt?` | `string` | `''`    | Alternative text for the before image                                                      |
+| Prop         | Type      | Default | Notes                                                                                      |
+| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `disabled?`  | `boolean` | `false` | Whether pointer and keyboard adjustment are disabled                                       |
+| `beforeSrc?` | `string`  | `-`     | Before (starting) image URL. Vue `before` slot / React `before` node take precedence wh... |
+| `afterSrc?`  | `string`  | `-`     | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
 
 ## ImageCropper
 
-`packages/core/src/types/image.ts` · `ImageCropperProps` · 3/9 props
+`packages/core/src/types/image.ts` · `ImageCropperProps` · 3/10 props
 
 | Prop           | Type                   | Default | Notes                                                                   |
 | -------------- | ---------------------- | ------- | ----------------------------------------------------------------------- |
-| `locale?`      | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                 |
 | `src`          | `string`               | `-`     | Image source URL to crop                                                |
+| `locale?`      | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                 |
 | `aspectRatio?` | `number`               | `-`     | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
 
 ## ImageGroup
 
 `packages/core/src/types/image.ts` · `ImageGroupProps`
 
-| Prop       | Type      | Default | Notes                                          |
-| ---------- | --------- | ------- | ---------------------------------------------- |
-| `preview?` | `boolean` | `true`  | Whether to enable preview for all child images |
+| Prop         | Type              | Default | Notes                                          |
+| ------------ | ----------------- | ------- | ---------------------------------------------- |
+| `preview?`   | `boolean`         | `true`  | Whether to enable preview for all child images |
+| `children?`  | `React.ReactNode` | `-`     | Children                                       |
+| `className?` | `string`          | `-`     | Additional CSS classes                         |
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/6 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/12 props
 
-| Prop         | Type     | Default | Notes                                  |
-| ------------ | -------- | ------- | -------------------------------------- |
-| `zIndex?`    | `number` | `1050`  | Custom z-index for the preview overlay |
-| `scaleStep?` | `number` | `0.5`   | Scale step for zoom in/out             |
-| `minScale?`  | `number` | `0.25`  | Minimum scale factor                   |
+| Prop      | Type                   | Default | Notes                                                   |
+| --------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `images`  | `string[]`             | `-`     | Array of image URLs to preview                          |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
+| `open?`   | `boolean`              | `-`     | Whether the preview is open                             |
 
 ## Kbd
 
-`packages/core/src/types/kbd.ts` · `KbdProps` · 3/6 props
+`packages/core/src/types/kbd.ts` · `KbdProps` · 3/7 props
 
 | Prop         | Type      | Default | Notes                                                                                      |
 | ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -264,17 +267,17 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Link
 
-`packages/core/src/types/link.ts` · `LinkProps` · 3/7 props
+`packages/core/src/types/link.ts` · `LinkProps` · 3/8 props
 
 | Prop        | Type          | Default     | Notes                        |
 | ----------- | ------------- | ----------- | ---------------------------- |
+| `disabled?` | `boolean`     | `false`     | Whether the link is disabled |
 | `variant?`  | `LinkVariant` | `'primary'` | Link variant style           |
 | `size?`     | `LinkSize`    | `'md'`      | Link size                    |
-| `disabled?` | `boolean`     | `false`     | Whether the link is disabled |
 
 ## Marquee
 
-`packages/core/src/types/marquee.ts` · `MarqueeProps` · 3/8 props
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 3/9 props
 
 | Prop            | Type               | Default  | Notes                                                           |
 | --------------- | ------------------ | -------- | --------------------------------------------------------------- |
@@ -284,27 +287,27 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## QRCode
 
-`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 3/6 props
+`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 3/7 props
 
-| Prop     | Type     | Default | Notes                |
-| -------- | -------- | ------- | -------------------- |
-| `value`  | `string` | `-`     | Text / URL to encode |
-| `size?`  | `number` | `-`     | Size in pixels       |
-| `color?` | `string` | `-`     | Foreground color     |
+| Prop      | Type                   | Default | Notes                |
+| --------- | ---------------------- | ------- | -------------------- |
+| `value`   | `string`               | `-`     | Text / URL to encode |
+| `locale?` | `Partial<TigerLocale>` | `-`     | -                    |
+| `size?`   | `number`               | `-`     | Size in pixels       |
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 3/7 props
+`packages/core/src/types/rate.ts` · `RateProps` · 3/10 props
 
-| Prop         | Type      | Default | Notes                                         |
-| ------------ | --------- | ------- | --------------------------------------------- |
-| `count?`     | `number`  | `-`     | Number of stars                               |
-| `allowHalf?` | `boolean` | `-`     | Whether to allow half stars                   |
-| `disabled?`  | `boolean` | `-`     | Whether the component is disabled / read-only |
+| Prop        | Type                   | Default | Notes                                                   |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `disabled?` | `boolean`              | `-`     | Whether the component is disabled / read-only           |
+| `value?`    | `number`               | `-`     | Controlled value                                        |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
 
 ## Result
 
-`packages/core/src/types/result.ts` · `ResultProps` · 3/4 props
+`packages/core/src/types/result.ts` · `ResultProps` · 3/8 props
 
 | Prop        | Type           | Default  | Notes                                                |
 | ----------- | -------------- | -------- | ---------------------------------------------------- |
@@ -314,43 +317,43 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Segmented
 
-`packages/core/src/types/segmented.ts` · `SegmentedProps` · 3/5 props
+`packages/core/src/types/segmented.ts` · `SegmentedProps` · 3/6 props
 
 | Prop        | Type                | Default | Notes                                 |
 | ----------- | ------------------- | ------- | ------------------------------------- |
 | `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
 | `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
-| `size?`     | `ComponentSize`     | `-`     | Component size                        |
+| `value?`    | `string \| number`  | `-`     | Controlled value                      |
 
 ## SplitButton
 
-`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 3/15 props
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 3/22 props
 
-| Prop        | Type            | Default     | Notes                                                             |
-| ----------- | --------------- | ----------- | ----------------------------------------------------------------- |
-| `variant?`  | `ButtonVariant` | `'primary'` | Visual variant applied to the primary action and the menu trigger |
-| `size?`     | `ButtonSize`    | `'md'`      | Size applied to the primary action and the menu trigger           |
-| `disabled?` | `boolean`       | `false`     | Whether both the primary action and the menu trigger are disabled |
+| Prop        | Type      | Default | Notes                                                                             |
+| ----------- | --------- | ------- | --------------------------------------------------------------------------------- |
+| `disabled?` | `boolean` | `false` | Whether both the primary action and the menu trigger are disabled                 |
+| `loading?`  | `boolean` | `false` | Whether the primary action is in a loading state. Also disables the menu trigger. |
+| `open?`     | `boolean` | `-`     | Whether the menu is open (controlled mode)                                        |
 
 ## Statistic
 
 `packages/core/src/types/statistic.ts` · `StatisticProps` · 3/10 props
 
-| Prop         | Type               | Default | Notes                                         |
-| ------------ | ------------------ | ------- | --------------------------------------------- |
-| `title?`     | `string`           | `-`     | Title / label text                            |
-| `value?`     | `string \| number` | `-`     | The numeric or text value                     |
-| `precision?` | `number`           | `-`     | Precision (decimal places) for numeric values |
+| Prop        | Type               | Default | Notes                             |
+| ----------- | ------------------ | ------- | --------------------------------- |
+| `value?`    | `string \| number` | `-`     | The numeric or text value         |
+| `animated?` | `boolean`          | `-`     | Whether to animate numeric values |
+| `title?`    | `string`           | `-`     | Title / label text                |
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 3/5 props
+`packages/core/src/types/tag.ts` · `TagProps` · 3/7 props
 
-| Prop       | Type                   | Default     | Notes                                                   |
-| ---------- | ---------------------- | ----------- | ------------------------------------------------------- |
-| `locale?`  | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
-| `variant?` | `TagVariant`           | `'default'` | Tag variant style                                       |
-| `size?`    | `TagSize`              | `'md'`      | Tag size                                                |
+| Prop        | Type                   | Default     | Notes                                                   |
+| ----------- | ---------------------- | ----------- | ------------------------------------------------------- |
+| `locale?`   | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
+| `closable?` | `boolean`              | `false`     | Whether the tag can be closed                           |
+| `variant?`  | `TagVariant`           | `'default'` | Tag variant style                                       |
 
 ## Text
 
@@ -364,7 +367,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Watermark
 
-`packages/core/src/types/watermark.ts` · `WatermarkProps` · 3/12 props
+`packages/core/src/types/watermark.ts` · `WatermarkProps` · 3/14 props
 
 | Prop       | Type                 | Default | Notes                                                       |
 | ---------- | -------------------- | ------- | ----------------------------------------------------------- |

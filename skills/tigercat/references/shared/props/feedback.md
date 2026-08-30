@@ -11,19 +11,19 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Drawer
 
-`packages/core/src/types/drawer.ts` · `DrawerProps` · 3/19 props
+`packages/core/src/types/drawer.ts` · `DrawerProps` · 3/24 props
 
 Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
 
-| Prop         | Type              | Default   | Notes                      |
-| ------------ | ----------------- | --------- | -------------------------- |
-| `open?`      | `boolean`         | `false`   | Whether the drawer is open |
-| `placement?` | `DrawerPlacement` | `'right'` | Drawer placement           |
-| `size?`      | `DrawerSize`      | `'md'`    | Drawer size                |
+| Prop        | Type                   | Default | Notes                             |
+| ----------- | ---------------------- | ------- | --------------------------------- |
+| `open?`     | `boolean`              | `false` | Whether the drawer is open        |
+| `closable?` | `boolean`              | `true`  | Whether to show close button      |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for common texts |
 
 ## Loading
 
-`packages/core/src/types/loading.ts` · `LoadingProps` · 3/11 props
+`packages/core/src/types/loading.ts` · `LoadingProps` · 3/12 props
 
 | Prop       | Type                   | Default     | Notes                                                   |
 | ---------- | ---------------------- | ----------- | ------------------------------------------------------- |
@@ -53,13 +53,15 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 ## Message
 
-`packages/core/src/types/message.ts` · `MessageProps` · 3/8 props
+`packages/core/src/types/message.ts` · `MessageProps` · 5/8 props
 
-| Prop        | Type          | Default  | Notes                                                              |
-| ----------- | ------------- | -------- | ------------------------------------------------------------------ |
-| `type?`     | `MessageType` | `'info'` | Message type                                                       |
-| `content?`  | `string`      | `-`      | Message content                                                    |
-| `duration?` | `number`      | `3000`   | Duration in milliseconds before auto-close (0 means no auto-close) |
+| Prop              | Type              | Default           | Notes                                            |
+| ----------------- | ----------------- | ----------------- | ------------------------------------------------ |
+| `type?`           | `MessageType`     | `'info'`          | Message type                                     |
+| `content?`        | `string`          | `-`               | Message content                                  |
+| `closable?`       | `boolean`         | `false`           | Whether the message can be closed manually       |
+| `position?`       | `MessagePosition` | `'top'`           | Message position on screen                       |
+| `closeAriaLabel?` | `string`          | `'Close message'` | Close button aria-label when `closable` is true. |
 
 Events/callback props: `onClose?`.
 
@@ -76,13 +78,13 @@ Events/callback props: `onClose?`.
 
 ## Modal
 
-`packages/core/src/types/modal.ts` · `ModalProps` · 3/15 props
+`packages/core/src/types/modal.ts` · `ModalProps` · 3/23 props
 
-| Prop     | Type               | Default | Notes                                                                   |
-| -------- | ------------------ | ------- | ----------------------------------------------------------------------- |
-| `open?`  | `boolean`          | `false` | Whether the modal is open                                               |
-| `size?`  | `ModalSize`        | `'md'`  | Modal size                                                              |
-| `width?` | `string \| number` | `-`     | Custom width (overrides size). Accepts CSS value like '600px' or '80%'. |
+| Prop        | Type                   | Default | Notes                             |
+| ----------- | ---------------------- | ------- | --------------------------------- |
+| `open?`     | `boolean`              | `false` | Whether the modal is open         |
+| `closable?` | `boolean`              | `true`  | Whether to show the close button  |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for common texts |
 
 ## NotificationContainer
 
@@ -104,22 +106,22 @@ Imperative notification API supports inline toast actions via `notification.info
 | Prop           | Type      | Default | Notes                                            |
 | -------------- | --------- | ------- | ------------------------------------------------ |
 | `open?`        | `boolean` | `-`     | Whether the popconfirm is open (controlled mode) |
+| `disabled?`    | `boolean` | `false` | Whether the popconfirm is disabled               |
 | `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)           |
-| `title?`       | `string`  | `-`     | Popconfirm title/question text                   |
 
 ## Popover
 
 `packages/core/src/types/popover.ts` · `PopoverProps` · 3/11 props
 
-| Prop           | Type      | Default | Notes                                         |
-| -------------- | --------- | ------- | --------------------------------------------- |
-| `open?`        | `boolean` | `-`     | Whether the popover is open (controlled mode) |
-| `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)        |
-| `title?`       | `string`  | `-`     | Popover title text                            |
+| Prop        | Type      | Default | Notes                                                         |
+| ----------- | --------- | ------- | ------------------------------------------------------------- |
+| `open?`     | `boolean` | `-`     | Whether the popover is open (controlled mode)                 |
+| `content?`  | `string`  | `-`     | Popover content text (can be overridden by content slot/prop) |
+| `disabled?` | `boolean` | `false` | Whether the popover is disabled                               |
 
 ## Progress
 
-`packages/core/src/types/progress.ts` · `ProgressProps` · 3/14 props
+`packages/core/src/types/progress.ts` · `ProgressProps` · 3/15 props
 
 | Prop       | Type              | Default     | Notes                  |
 | ---------- | ----------------- | ----------- | ---------------------- |
@@ -129,20 +131,21 @@ Imperative notification API supports inline toast actions via `notification.info
 
 ## Tooltip
 
-`packages/core/src/types/tooltip.ts` · `TooltipProps` · 3/8 props
+`packages/core/src/types/tooltip.ts` · `TooltipProps` · 3/9 props
 
-| Prop           | Type      | Default | Notes                                         |
-| -------------- | --------- | ------- | --------------------------------------------- |
-| `open?`        | `boolean` | `-`     | Whether the tooltip is open (controlled mode) |
-| `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)        |
-| `content?`     | `string`  | `-`     | Tooltip content text                          |
+| Prop        | Type      | Default | Notes                                         |
+| ----------- | --------- | ------- | --------------------------------------------- |
+| `open?`     | `boolean` | `-`     | Whether the tooltip is open (controlled mode) |
+| `content?`  | `string`  | `-`     | Tooltip content text                          |
+| `disabled?` | `boolean` | `false` | Whether the tooltip is disabled               |
 
 ## Tour
 
-`packages/core/src/types/tour.ts` · `TourProps` · 3/11 props
+`packages/core/src/types/tour.ts` · `TourProps` · 4/11 props
 
-| Prop         | Type             | Default | Notes                                               |
-| ------------ | ---------------- | ------- | --------------------------------------------------- |
-| `steps`      | `TourStep[]`     | `-`     | Array of tour steps                                 |
-| `loadSteps?` | `TourStepLoader` | `-`     | Load tour steps asynchronously when the tour opens. |
-| `open?`      | `boolean`        | `false` | Whether the tour is open                            |
+| Prop        | Type                   | Default | Notes                                                |
+| ----------- | ---------------------- | ------- | ---------------------------------------------------- |
+| `steps`     | `TourStep[]`           | `-`     | Array of tour steps                                  |
+| `open?`     | `boolean`              | `false` | Whether the tour is open                             |
+| `closable?` | `boolean`              | `true`  | Whether to show the close button                     |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override; falls back to ConfigProvider locale |

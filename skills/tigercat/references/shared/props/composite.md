@@ -11,63 +11,69 @@ description: Compact generated Tigercat Composite props reference
 
 ## ActivityFeed
 
-`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 3/14 props
+`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 3/16 props
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
 Note: 时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。
 
-| Prop       | Type                             | Default | Notes                                               |
-| ---------- | -------------------------------- | ------- | --------------------------------------------------- |
-| `items?`   | `ActivityItem[]`                 | `-`     | Activity items (flat list)                          |
-| `groups?`  | `ActivityGroup[]`                | `-`     | Activity groups                                     |
-| `groupBy?` | `(item: ActivityItem) => string` | `-`     | Group by function (used when `groups` not provided) |
+| Prop       | Type                   | Default | Notes                                     |
+| ---------- | ---------------------- | ------- | ----------------------------------------- |
+| `items?`   | `ActivityItem[]`       | `-`     | Activity items (flat list)                |
+| `loading?` | `boolean`              | `false` | Whether to show loading state             |
+| `locale?`  | `Partial<TigerLocale>` | `-`     | Locale overrides for ActivityFeed UI text |
 
 ## ChatWindow
 
-`packages/core/src/types/chat.ts` · `ChatWindowProps` · 3/28 props
+`packages/core/src/types/chat.ts` · `ChatWindowProps` · 4/32 props
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
 Note: `virtual` 开启后消息列表走 `VirtualList`；输入区根据 `inputType` 选择 `Textarea` 或 `Input`。
 
-| Prop            | Type            | Default | Notes                              |
-| --------------- | --------------- | ------- | ---------------------------------- |
-| `messages?`     | `ChatMessage[]` | `-`     | Message list                       |
-| `value?`        | `string`        | `-`     | Input value (controlled)           |
-| `defaultValue?` | `string`        | `-`     | Default input value (uncontrolled) |
+| Prop        | Type                   | Default | Notes                                                                                      |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`    | `string`               | `-`     | Input value (controlled)                                                                   |
+| `disabled?` | `boolean`              | `false` | Whether the input is disabled                                                              |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for ChatWindow UI text                                                    |
+| `virtual?`  | `boolean`              | `false` | Enable virtualized rendering for the message list. Recommended when the conversation ha... |
 
 Events/callback props: `onChange?`, `onSend?`.
 
 ## CommentThread
 
-`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 3/24 props
+`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 3/26 props
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
 Note: 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。展开状态受控量为 `expandedKeys`：Vue 使用 `update:expandedKeys` / `v-model:expanded-keys`，React 对应历史回调名 `onExpandedChange`。
 
-| Prop        | Type            | Default | Notes                     |
-| ----------- | --------------- | ------- | ------------------------- |
-| `nodes?`    | `CommentNode[]` | `-`     | Comment nodes (tree)      |
-| `items?`    | `CommentNode[]` | `-`     | Comment items (flat list) |
-| `maxDepth?` | `number`        | `3`     | Maximum nesting depth     |
+| Prop      | Type                   | Default | Notes                                      |
+| --------- | ---------------------- | ------- | ------------------------------------------ |
+| `items?`  | `CommentNode[]`        | `-`     | Comment items (flat list)                  |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale overrides for CommentThread UI text |
+| `nodes?`  | `CommentNode[]`        | `-`     | Comment nodes (tree)                       |
 
 Events/callback props: `onLike?`, `onReply?`, `onMore?`, `onAction?`, `onExpandedChange?`, `onLoadMore?`.
 
 ## DataTableWithToolbar
 
-`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps`
+`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 8/53 props
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
 Note: 透传 Table props（含 `columnLockable`、列级 `column.fixed` 钉列与 `tableLayout`）：开启 `columnLockable` 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列，可与列级 `column.fixed` 配合实现横向滚动钉列，注意这与 `toolbar.columnSettings.lockedColumnKeys`（列设置面板中不可隐藏的可见性锁定）是两个不同概念。卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName` 和 `valueClassName` 做轻量布局调整。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则（含 `pagination.remote` 服务端分页模式，原样透传给内部 Table）；分页由内部 Table 交给 Pagination 组件渲染，页数大于 3 时自动展示可点击页码与跳页输入框（`pagination.simple` / `pagination.showQuickJumper` 可覆盖）。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
 
-| Prop              | Type                        | Default | Notes                                            |
-| ----------------- | --------------------------- | ------- | ------------------------------------------------ |
-| `toolbar?`        | `TableToolbarProps`         | `-`     | Toolbar configuration                            |
-| `pagination?`     | `PaginationConfig \| false` | `-`     | Pagination configuration Set to false to disable |
-| `tableClassName?` | `string`                    | `-`     | Class applied to the inner table element.        |
+| Prop              | Type                        | Default | Notes                                                                          |
+| ----------------- | --------------------------- | ------- | ------------------------------------------------------------------------------ |
+| `columns`         | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                    |
+| `toolbar?`        | `TableToolbarProps`         | `-`     | Toolbar configuration                                                          |
+| `pagination?`     | `PaginationConfig \| false` | `-`     | Pagination configuration Set to false to disable                               |
+| `tableClassName?` | `string`                    | `-`     | Class applied to the inner table element.                                      |
+| `dataSource?`     | `T[]`                       | `[]`    | Table data source                                                              |
+| `sort?`           | `SortState`                 | `-`     | Controlled sort state. When provided, internal sort state will not be mutated. |
+| `filters?`        | `Record<string, unknown>`   | `-`     | Controlled filters. When provided, internal filter state will not be mutated.  |
+| `loading?`        | `boolean`                   | `false` | Loading state                                                                  |
 
 Events/callback props: `onPageChange?`, `onPageSizeChange?`.
 
@@ -102,48 +108,48 @@ Vue 通过 `#toolbar` 作用域插槽，React 通过 `toolbar.render`（函数�
 
 ## FormWizard
 
-`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 3/19 props
+`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 3/21 props
 
 Uses: `Steps/StepsItem`, `Button`, `ConfigProvider`.
 
 Note: 按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。
 
-| Prop              | Type           | Default | Notes                             |
-| ----------------- | -------------- | ------- | --------------------------------- |
-| `steps`           | `WizardStep[]` | `-`     | Steps configuration               |
-| `current?`        | `number`       | `-`     | Current step index (0-based)      |
-| `defaultCurrent?` | `number`       | `0`     | Default step index (uncontrolled) |
+| Prop      | Type                   | Default | Notes                                   |
+| --------- | ---------------------- | ------- | --------------------------------------- |
+| `steps`   | `WizardStep[]`         | `-`     | Steps configuration                     |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale overrides for FormWizard UI text |
+| `steps?`  | `WizardStep[]`         | `-`     | -                                       |
 
 Events/callback props: `onChange?`, `onFinish?`.
 
 ## NotificationCenter
 
-`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 3/21 props
+`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 3/23 props
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 
 Note: 传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。
 
-| Prop       | Type                                 | Default | Notes                                               |
-| ---------- | ------------------------------------ | ------- | --------------------------------------------------- |
-| `items?`   | `NotificationItem[]`                 | `-`     | Notification items (flat list)                      |
-| `groups?`  | `NotificationGroup[]`                | `-`     | Notification groups                                 |
-| `groupBy?` | `(item: NotificationItem) => string` | `-`     | Group by function (used when `groups` not provided) |
+| Prop       | Type                   | Default | Notes                                           |
+| ---------- | ---------------------- | ------- | ----------------------------------------------- |
+| `items?`   | `NotificationItem[]`   | `-`     | Notification items (flat list)                  |
+| `loading?` | `boolean`              | `false` | Loading state                                   |
+| `locale?`  | `Partial<TigerLocale>` | `-`     | Locale overrides for NotificationCenter UI text |
 
 Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`, `onItemClick?`, `onItemReadChange?`.
 
 ## TaskBoard
 
-`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 3/20 props
+`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 3/22 props
 
 Uses: `ConfigProvider`, `task-board drag utilities`, `kanban utilities`.
 
 Note: 拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。
 
-| Prop              | Type                | Default | Notes                                                                                      |
-| ----------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns?`        | `TaskBoardColumn[]` | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `defaultColumns?` | `TaskBoardColumn[]` | `-`     | Initial column data for uncontrolled usage.                                                |
-| `draggable?`      | `boolean`           | `true`  | Enable card drag-and-drop.                                                                 |
+| Prop              | Type                                      | Default | Notes                                                                                      |
+| ----------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns?`        | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `locale?`         | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
+| `defaultColumns?` | `TaskBoardColumn[]`                       | `-`     | Initial column data for uncontrolled usage.                                                |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`.

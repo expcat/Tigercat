@@ -11,112 +11,120 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 3/13 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 4/14 props
 
-| Prop           | Type                   | Default | Notes                                                  |
-| -------------- | ---------------------- | ------- | ------------------------------------------------------ |
-| `locale?`      | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
-| `options?`     | `AutoCompleteOption[]` | `-`     | Options list                                           |
-| `placeholder?` | `string`               | `-`     | Placeholder text                                       |
+| Prop        | Type                   | Default | Notes                                                  |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------ |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
+| `options?`  | `AutoCompleteOption[]` | `-`     | Options list                                           |
+| `disabled?` | `boolean`              | `-`     | Whether the component is disabled                      |
+| `value?`    | `string \| number`     | `-`     | Controlled value                                       |
 
 ## Cascader
 
-`packages/core/src/types/cascader.ts` · `CascaderProps` · 3/15 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 5/18 props
 
-| Prop           | Type               | Default           | Notes                 |
-| -------------- | ------------------ | ----------------- | --------------------- |
-| `options?`     | `CascaderOption[]` | `-`               | Cascader options data |
-| `placeholder?` | `string`           | `'Please select'` | Placeholder text      |
-| `size?`        | `ComponentSize`    | `'md'`            | Component size        |
+| Prop        | Type                   | Default | Notes                                                                                      |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `options?`  | `CascaderOption[]`     | `-`     | Cascader options data                                                                      |
+| `disabled?` | `boolean`              | `false` | Whether the cascader is disabled                                                           |
+| `virtual?`  | `boolean`              | `false` | Whether to use virtual scrolling for large column / search lists. When enabled, only vi... |
+| `value?`    | `CascaderValue`        | `-`     | Current selected value path                                                                |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                                    |
 
 ## Checkbox
 
-`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 3/4 props
+`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 3/11 props
 
 | Prop        | Type            | Default | Notes                                       |
 | ----------- | --------------- | ------- | ------------------------------------------- |
-| `size?`     | `ComponentSize` | `'md'`  | Checkbox size                               |
 | `disabled?` | `boolean`       | `false` | Whether the checkbox is disabled            |
 | `value?`    | `CheckboxValue` | `-`     | Checkbox value (for use in checkbox groups) |
+| `checked?`  | `boolean`       | `-`     | Checkbox checked state (controlled mode)    |
 
 ## CheckboxGroup
 
-`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps`
+`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 3/8 props
 
-| Prop        | Type            | Default | Notes                                         |
-| ----------- | --------------- | ------- | --------------------------------------------- |
-| `disabled?` | `boolean`       | `false` | Whether the checkbox group is disabled        |
-| `size?`     | `ComponentSize` | `'md'`  | Checkbox size for all checkboxes in the group |
+| Prop        | Type                 | Default | Notes                                         |
+| ----------- | -------------------- | ------- | --------------------------------------------- |
+| `disabled?` | `boolean`            | `false` | Whether the checkbox group is disabled        |
+| `value?`    | `CheckboxGroupValue` | `-`     | Selected values (controlled mode)             |
+| `size?`     | `ComponentSize`      | `'md'`  | Checkbox size for all checkboxes in the group |
 
 ## ColorPicker
 
-`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/8 props
+`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/9 props
 
-| Prop        | Type                              | Default | Notes                                                                                      |
-| ----------- | --------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `locale?`   | `Partial<TigerLocale>`            | `-`     | Locale override merged on top of ConfigProvider locale                                     |
-| `labels?`   | `Partial<TigerLocaleColorPicker>` | `-`     | UI labels for trigger / panel title / clear and panel chrome. Takes precedence over `lo... |
-| `disabled?` | `boolean`                         | `-`     | Whether the picker is disabled                                                             |
+| Prop        | Type                   | Default | Notes                                                  |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------ |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
+| `disabled?` | `boolean`              | `-`     | Whether the picker is disabled                         |
+| `value?`    | `string`               | `-`     | Controlled color value (hex)                           |
 
 ## ColorSwatch
 
-`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 3/7 props
+`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 3/9 props
 
-| Prop        | Type                       | Default | Notes |
-| ----------- | -------------------------- | ------- | ----- |
-| `disabled?` | `boolean`                  | `-`     | -     |
-| `size?`     | `ComponentSize`            | `-`     | -     |
-| `colors?`   | `ColorSwatchOptionInput[]` | `-`     | -     |
+| Prop        | Type      | Default | Notes |
+| ----------- | --------- | ------- | ----- |
+| `disabled?` | `boolean` | `-`     | -     |
+| `columns?`  | `number`  | `-`     | -     |
+| `value?`    | `string`  | `-`     | -     |
 
 ## CronEditor
 
-`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 3/6 props
+`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 3/10 props
 
-| Prop        | Type             | Default | Notes |
-| ----------- | ---------------- | ------- | ----- |
-| `disabled?` | `boolean`        | `-`     | -     |
-| `readonly?` | `boolean`        | `-`     | -     |
-| `size?`     | `CronEditorSize` | `-`     | -     |
+| Prop        | Type                   | Default | Notes                                                   |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `disabled?` | `boolean`              | `-`     | -                                                       |
+| `value?`    | `string`               | `-`     | -                                                       |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
 
 ## DatePicker
 
-`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 3/17 props
+`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/20 props
 
-| Prop      | Type                        | Default | Notes                                                                         |
-| --------- | --------------------------- | ------- | ----------------------------------------------------------------------------- |
-| `locale?` | `DatePickerLocaleInput`     | `-`     | Locale used for month/day names in the calendar UI. Example: 'zh-CN', 'en-US' |
-| `labels?` | `Partial<DatePickerLabels>` | `-`     | UI labels for i18n. When provided, merges with locale-based defaults.         |
-| `size?`   | `ComponentSize`             | `'md'`  | DatePicker size                                                               |
+| Prop        | Type                           | Default | Notes                                                                         |
+| ----------- | ------------------------------ | ------- | ----------------------------------------------------------------------------- |
+| `locale?`   | `DatePickerLocaleInput`        | `-`     | Locale used for month/day names in the calendar UI. Example: 'zh-CN', 'en-US' |
+| `value?`    | `DatePickerModelValue \| null` | `-`     | Selected date value (for controlled mode)                                     |
+| `disabled?` | `boolean`                      | `false` | Whether the datepicker is disabled                                            |
+| `name?`     | `string`                       | `-`     | Input name attribute                                                          |
 
 ## Form
 
-`packages/core/src/types/form.ts` · `FormProps` · 3/17 props
+`packages/core/src/types/form.ts` · `FormProps` · 6/19 props
 
-| Prop          | Type               | Default | Notes                                                         |
-| ------------- | ------------------ | ------- | ------------------------------------------------------------- |
-| `model?`      | `FormValues`       | `-`     | Form values                                                   |
-| `rules?`      | `FormRules`        | `-`     | Form validation rules                                         |
-| `labelWidth?` | `string \| number` | `-`     | Label width (applies when labelPosition is 'left' or 'right') |
+| Prop          | Type                   | Default | Notes                                                                                      |
+| ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `model?`      | `FormValues`           | `-`     | Form values                                                                                |
+| `rules?`      | `FormRules`            | `-`     | Form validation rules                                                                      |
+| `conditions?` | `FormConditions`       | `-`     | Conditional field behavior DSL for visibility, disabled state, and dynamic required rules. |
+| `disabled?`   | `boolean`              | `false` | Whether to disable the entire form                                                         |
+| `loading?`    | `boolean`              | `false` | Whether the form is in a loading state (prevents submit)                                   |
+| `locale?`     | `Partial<TigerLocale>` | `-`     | Locale override for built-in validation messages. Merged on top of the ConfigProvider l... |
 
 ## FormItem
 
-`packages/core/src/types/form.ts` · `FormItemProps` · 3/10 props
+`packages/core/src/types/form.ts` · `FormItemProps` · 3/12 props
 
-| Prop          | Type               | Default | Notes                                     |
-| ------------- | ------------------ | ------- | ----------------------------------------- |
-| `name?`       | `string`           | `-`     | Field name (must match key in form model) |
-| `label?`      | `string`           | `-`     | Label text                                |
-| `labelWidth?` | `string \| number` | `-`     | Label width (overrides form's labelWidth) |
+| Prop     | Type                     | Default | Notes                                     |
+| -------- | ------------------------ | ------- | ----------------------------------------- |
+| `name?`  | `string`                 | `-`     | Field name (must match key in form model) |
+| `rules?` | `FormRule \| FormRule[]` | `-`     | Validation rules for this field           |
+| `label?` | `string`                 | `-`     | Label text                                |
 
 ## Input
 
-`packages/core/src/types/input.ts` · `InputProps` · 3/19 props
+`packages/core/src/types/input.ts` · `InputProps` · 3/25 props
 
-| Prop            | Type            | Default     | Notes                    |
-| --------------- | --------------- | ----------- | ------------------------ |
-| `size?`         | `ComponentSize` | `'md'`      | Input size               |
-| `status?`       | `InputStatus`   | `'default'` | Validation status        |
-| `errorMessage?` | `string`        | `-`         | Error message to display |
+| Prop        | Type               | Default | Notes                             |
+| ----------- | ------------------ | ------- | --------------------------------- |
+| `value?`    | `string \| number` | `-`     | Input value (for controlled mode) |
+| `disabled?` | `boolean`          | `false` | Whether the input is disabled     |
+| `name?`     | `string`           | `-`     | Input name attribute              |
 
 ## InputGroup
 
@@ -136,120 +144,124 @@ description: Compact generated Tigercat Form props reference
 | ------------ | ------------------ | -------- | ---------------------- |
 | `type?`      | `'text' \| 'icon'` | `'text'` | Addon type             |
 | `className?` | `string`           | `-`      | Additional CSS classes |
+| `addonType?` | `'text' \| 'icon'` | `-`      | -                      |
 
 ## InputNumber
 
-`packages/core/src/types/input-number.ts` · `InputNumberProps` · 3/21 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 3/23 props
 
-| Prop      | Type             | Default     | Notes                           |
-| --------- | ---------------- | ----------- | ------------------------------- |
-| `size?`   | `ComponentSize`  | `'md'`      | Input size                      |
-| `status?` | `InputStatus`    | `'default'` | Validation status               |
-| `value?`  | `number \| null` | `-`         | Current value (controlled mode) |
+| Prop        | Type             | Default | Notes                           |
+| ----------- | ---------------- | ------- | ------------------------------- |
+| `value?`    | `number \| null` | `-`     | Current value (controlled mode) |
+| `disabled?` | `boolean`        | `false` | Whether the input is disabled   |
+| `name?`     | `string`         | `-`     | Input name attribute            |
 
 ## InputOTP
 
-`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 3/18 props
+`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 3/20 props
 
-| Prop            | Type            | Default     | Notes                    |
-| --------------- | --------------- | ----------- | ------------------------ |
-| `size?`         | `ComponentSize` | `'md'`      | Input size               |
-| `status?`       | `InputStatus`   | `'default'` | Validation status        |
-| `errorMessage?` | `string`        | `-`         | Error message to display |
+| Prop        | Type      | Default | Notes                                                                      |
+| ----------- | --------- | ------- | -------------------------------------------------------------------------- |
+| `value?`    | `string`  | `-`     | Value (for controlled mode) — the joined characters, at most `length` long |
+| `disabled?` | `boolean` | `false` | Whether the input is disabled                                              |
+| `name?`     | `string`  | `-`     | Name for the hidden input carrying the joined value (form submission)      |
 
 ## MaskInput
 
-`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 3/15 props
+`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 4/17 props
 
-| Prop            | Type            | Default     | Notes                    |
-| --------------- | --------------- | ----------- | ------------------------ |
-| `size?`         | `ComponentSize` | `'md'`      | Input size               |
-| `status?`       | `InputStatus`   | `'default'` | Validation status        |
-| `errorMessage?` | `string`        | `-`         | Error message to display |
+| Prop        | Type      | Default | Notes                                                                                      |
+| ----------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `mask`      | `string`  | `-`     | Mask template. Built-in tokens: `#` digit, `a` letter, `*` alphanumeric; `!` escapes th... |
+| `value?`    | `string`  | `-`     | Raw (unmasked) value (for controlled mode)                                                 |
+| `disabled?` | `boolean` | `false` | Whether the input is disabled                                                              |
+| `name?`     | `string`  | `-`     | Input name attribute. When set, a hidden input with this name submits the raw (unmasked... |
 
 ## Mentions
 
-`packages/core/src/types/mentions.ts` · `MentionsProps` · 3/7 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 3/9 props
 
-| Prop           | Type              | Default | Notes                     |
-| -------------- | ----------------- | ------- | ------------------------- |
-| `prefix?`      | `string`          | `-`     | Trigger character         |
-| `options?`     | `MentionOption[]` | `-`     | Available mention options |
-| `placeholder?` | `string`          | `-`     | Placeholder text          |
+| Prop        | Type              | Default | Notes                     |
+| ----------- | ----------------- | ------- | ------------------------- |
+| `options?`  | `MentionOption[]` | `-`     | Available mention options |
+| `disabled?` | `boolean`         | `-`     | Disabled state            |
+| `value?`    | `string`          | `-`     | -                         |
 
 ## NumberKeyboard
 
 `packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 3/14 props
 
-| Prop            | Type                 | Default | Notes |
-| --------------- | -------------------- | ------- | ----- |
-| `value?`        | `string`             | `-`     | -     |
-| `defaultValue?` | `string`             | `-`     | -     |
-| `mode?`         | `NumberKeyboardMode` | `-`     | -     |
+| Prop        | Type                   | Default | Notes |
+| ----------- | ---------------------- | ------- | ----- |
+| `value?`    | `string`               | `-`     | -     |
+| `disabled?` | `boolean`              | `-`     | -     |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | -     |
 
 ## Radio
 
-`packages/core/src/types/radio.ts` · `RadioProps` · 3/6 props
+`packages/core/src/types/radio.ts` · `RadioProps` · 4/11 props
 
-| Prop        | Type               | Default | Notes                         |
-| ----------- | ------------------ | ------- | ----------------------------- |
-| `value`     | `string \| number` | `-`     | The value of the radio        |
-| `size?`     | `ComponentSize`    | `'md'`  | Radio size                    |
-| `disabled?` | `boolean`          | `false` | Whether the radio is disabled |
+| Prop        | Type               | Default | Notes                                             |
+| ----------- | ------------------ | ------- | ------------------------------------------------- |
+| `value`     | `string \| number` | `-`     | The value of the radio                            |
+| `disabled?` | `boolean`          | `false` | Whether the radio is disabled                     |
+| `name?`     | `string`           | `-`     | Name attribute for the radio input (for grouping) |
+| `checked?`  | `boolean`          | `-`     | Whether the radio is checked (controlled mode)    |
 
 ## RadioGroup
 
-`packages/core/src/types/radio.ts` · `RadioGroupProps` · 3/5 props
+`packages/core/src/types/radio.ts` · `RadioGroupProps` · 3/9 props
 
-| Prop            | Type               | Default | Notes                                        |
-| --------------- | ------------------ | ------- | -------------------------------------------- |
-| `value?`        | `string \| number` | `-`     | Current selected value (controlled mode)     |
-| `defaultValue?` | `string \| number` | `-`     | Default selected value (uncontrolled mode)   |
-| `name?`         | `string`           | `-`     | Name attribute for radio inputs in the group |
+| Prop        | Type               | Default | Notes                                        |
+| ----------- | ------------------ | ------- | -------------------------------------------- |
+| `value?`    | `string \| number` | `-`     | Current selected value (controlled mode)     |
+| `name?`     | `string`           | `-`     | Name attribute for radio inputs in the group |
+| `disabled?` | `boolean`          | `false` | Whether all radios in the group are disabled |
 
 ## Select
 
-`packages/core/src/types/select.ts` · `SelectProps` · 3/19 props
+`packages/core/src/types/select.ts` · `SelectProps` · 4/20 props
 
-| Prop           | Type            | Default | Notes                                       |
-| -------------- | --------------- | ------- | ------------------------------------------- |
-| `size?`        | `ComponentSize` | `'md'`  | Select size                                 |
-| `disabled?`    | `boolean`       | `false` | Whether the select is disabled              |
-| `placeholder?` | `string`        | `-`     | Placeholder text when no option is selected |
+| Prop        | Type                   | Default | Notes                                                                                      |
+| ----------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `disabled?` | `boolean`              | `false` | Whether the select is disabled                                                             |
+| `options?`  | `SelectOptions`        | `-`     | Options list (can be flat list or grouped)                                                 |
+| `virtual?`  | `boolean`              | `false` | Whether to use virtual scrolling for large option lists. When enabled, only visible opt... |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                                    |
 
 ## Signature
 
 `packages/core/src/types/signature.ts` · `SignatureProps` · 3/14 props
 
-| Prop        | Type     | Default | Notes |
-| ----------- | -------- | ------- | ----- |
-| `width?`    | `number` | `-`     | -     |
-| `height?`   | `number` | `-`     | -     |
-| `penColor?` | `string` | `-`     | -     |
+| Prop        | Type                   | Default | Notes |
+| ----------- | ---------------------- | ------- | ----- |
+| `disabled?` | `boolean`              | `-`     | -     |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | -     |
+| `width?`    | `number`               | `-`     | -     |
 
 ## Slider
 
-`packages/core/src/types/slider.ts` · `SliderProps` · 3/10 props
+`packages/core/src/types/slider.ts` · `SliderProps` · 3/13 props
 
 | Prop            | Type                         | Default | Notes                                                                                     |
 | --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------------------- |
 | `value?`        | `number \| [number, number]` | `-`     | Current value of the slider For single slider, this is a number For range slider, this... |
+| `disabled?`     | `boolean`                    | `false` | Whether the slider is disabled                                                            |
 | `defaultValue?` | `number \| [number, number]` | `-`     | Default value                                                                             |
-| `min?`          | `number`                     | `0`     | Minimum value                                                                             |
 
 ## Stepper
 
-`packages/core/src/types/stepper.ts` · `StepperProps` · 3/9 props
+`packages/core/src/types/stepper.ts` · `StepperProps` · 3/11 props
 
-| Prop    | Type     | Default | Notes          |
-| ------- | -------- | ------- | -------------- |
-| `min?`  | `number` | `-`     | Minimum value  |
-| `max?`  | `number` | `-`     | Maximum value  |
-| `step?` | `number` | `-`     | Step increment |
+| Prop        | Type      | Default | Notes                           |
+| ----------- | --------- | ------- | ------------------------------- |
+| `disabled?` | `boolean` | `-`     | Whether the stepper is disabled |
+| `value?`    | `number`  | `-`     | Controlled value                |
+| `min?`      | `number`  | `-`     | Minimum value                   |
 
 ## Switch
 
-`packages/core/src/types/switch.ts` · `SwitchProps`
+`packages/core/src/types/switch.ts` · `SwitchProps` · 3/8 props
 
 | Prop        | Type            | Default | Notes                          |
 | ----------- | --------------- | ------- | ------------------------------ |
@@ -259,62 +271,65 @@ description: Compact generated Tigercat Form props reference
 
 ## TagsInput
 
-`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 3/17 props
+`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 3/19 props
 
-| Prop            | Type            | Default     | Notes                    |
-| --------------- | --------------- | ----------- | ------------------------ |
-| `size?`         | `ComponentSize` | `'md'`      | Input size               |
-| `status?`       | `InputStatus`   | `'default'` | Validation status        |
-| `errorMessage?` | `string`        | `-`         | Error message to display |
+| Prop        | Type       | Default | Notes                                                                 |
+| ----------- | ---------- | ------- | --------------------------------------------------------------------- |
+| `value?`    | `string[]` | `-`     | Tags (for controlled mode)                                            |
+| `disabled?` | `boolean`  | `false` | Whether the input is disabled                                         |
+| `name?`     | `string`   | `-`     | Name for the hidden input carrying the joined value (form submission) |
 
 ## Textarea
 
-`packages/core/src/types/textarea.ts` · `TextareaProps` · 3/18 props
+`packages/core/src/types/textarea.ts` · `TextareaProps` · 3/21 props
 
-| Prop            | Type            | Default | Notes                                 |
-| --------------- | --------------- | ------- | ------------------------------------- |
-| `size?`         | `ComponentSize` | `'md'`  | Textarea size                         |
-| `value?`        | `string`        | `-`     | Textarea value (for controlled mode)  |
-| `defaultValue?` | `string`        | `-`     | Default value (for uncontrolled mode) |
+| Prop        | Type      | Default | Notes                                |
+| ----------- | --------- | ------- | ------------------------------------ |
+| `value?`    | `string`  | `-`     | Textarea value (for controlled mode) |
+| `disabled?` | `boolean` | `false` | Whether the textarea is disabled     |
+| `name?`     | `string`  | `-`     | Textarea name attribute              |
 
 ## TimePicker
 
-`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 3/20 props
+`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/23 props
 
-| Prop      | Type                             | Default | Notes                                                                                      |
-| --------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `locale?` | `string \| Partial<TigerLocale>` | `-`     | Locale used for UI labels (e.g. AM/PM) and display formatting. Example: 'zh-CN', 'en-US... |
-| `labels?` | `Partial<TimePickerLabels>`      | `-`     | UI labels for i18n. When provided, merges with locale-based defaults.                      |
-| `size?`   | `ComponentSize`                  | `'md'`  | TimePicker size                                                                            |
+| Prop        | Type                             | Default | Notes                                                                                      |
+| ----------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `locale?`   | `string \| Partial<TigerLocale>` | `-`     | Locale used for UI labels (e.g. AM/PM) and display formatting. Example: 'zh-CN', 'en-US... |
+| `value?`    | `TimePickerModelValue`           | `-`     | Controlled value. Format: 'HH:mm' or 'HH:mm:ss'                                            |
+| `disabled?` | `boolean`                        | `false` | Whether the timepicker is disabled                                                         |
+| `name?`     | `string`                         | `-`     | Input name attribute                                                                       |
 
 ## Transfer
 
-`packages/core/src/types/transfer.ts` · `TransferProps` · 3/12 props
+`packages/core/src/types/transfer.ts` · `TransferProps` · 4/15 props
 
-| Prop          | Type                   | Default | Notes                                    |
-| ------------- | ---------------------- | ------- | ---------------------------------------- |
-| `dataSource?` | `TransferItem[]`       | `-`     | All available data items                 |
-| `targetKeys?` | `(string \| number)[]` | `-`     | Keys of items in the right (target) list |
-| `size?`       | `ComponentSize`        | `-`     | Component size                           |
+| Prop          | Type                   | Default | Notes                                                   |
+| ------------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `dataSource?` | `TransferItem[]`       | `-`     | All available data items                                |
+| `disabled?`   | `boolean`              | `-`     | Whether the component is disabled                       |
+| `value?`      | `(string \| number)[]` | `-`     | Controlled target keys                                  |
+| `locale?`     | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 3/15 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/17 props
 
-| Prop           | Type            | Default | Notes            |
-| -------------- | --------------- | ------- | ---------------- |
-| `treeData?`    | `TreeNode[]`    | `-`     | Tree data        |
-| `placeholder?` | `string`        | `-`     | Placeholder text |
-| `size?`        | `ComponentSize` | `-`     | Component size   |
+| Prop        | Type                   | Default | Notes                                                                                     |
+| ----------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `disabled?` | `boolean`              | `-`     | Whether the component is disabled                                                         |
+| `virtual?`  | `boolean`              | `false` | Enable virtualized rendering of the dropdown tree. Visible flattened rows are rendered... |
+| `value?`    | `TreeSelectValue`      | `-`     | Controlled value                                                                          |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                                   |
 
 ## Upload
 
-`packages/core/src/types/upload.ts` · `UploadProps` · 3/18 props
+`packages/core/src/types/upload.ts` · `UploadProps` · 3/20 props
 
-| Prop        | Type      | Default | Notes                                               |
-| ----------- | --------- | ------- | --------------------------------------------------- |
-| `accept?`   | `string`  | `-`     | Accepted file types (same as HTML accept attribute) |
-| `multiple?` | `boolean` | `false` | Whether to allow multiple file selection            |
-| `limit?`    | `number`  | `-`     | Maximum number of files                             |
+| Prop        | Type                   | Default | Notes                                               |
+| ----------- | ---------------------- | ------- | --------------------------------------------------- |
+| `disabled?` | `boolean`              | `false` | Whether the upload is disabled                      |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for Upload UI text.                |
+| `accept?`   | `string`               | `-`     | Accepted file types (same as HTML accept attribute) |
 
 Events/callback props: `onQueueChange?`, `onChunkProgress?`, `onChange?`, `onRemove?`, `onPreview?`, `onProgress?`, ....

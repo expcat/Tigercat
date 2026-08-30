@@ -18,11 +18,13 @@ description: Compact Tigercat Data Vue and React usage routes
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component  | Vue                                                                                                                                              | React                                                                                                                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| DataExport | `<DataExport :columns="columns" :data-source="rows" file-name="users" />`                                                                        | `<DataExport columns={columns} dataSource={rows} fileName="users" />`                                                                    |
-| Table      | `<Table :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :pagination="false" />` | `<Table columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} pagination={false} />` |
+| Component     | Vue                                                                                                                                              | React                                                                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Calendar      | `<Calendar :value="date" />`                                                                                                                     | `<Calendar value={date} />`                                                                                                              |
+| CollapsePanel | `<CollapsePanel :panel-key="panelKey" />`                                                                                                        | `<CollapsePanel panelKey={panelKey} />`                                                                                                  |
+| DataExport    | `<DataExport :columns="columns" :data-source="rows" file-name="users" />`                                                                        | `<DataExport columns={columns} dataSource={rows} fileName="users" />`                                                                    |
+| Table         | `<Table :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :pagination="false" />` | `<Table columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} pagination={false} />` |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Calendar, Collapse, CollapsePanel, Countdown, Timeline.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Collapse, Countdown, Timeline.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

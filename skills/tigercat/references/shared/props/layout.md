@@ -21,7 +21,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Card
 
-`packages/core/src/types/card.ts` · `CardProps` · 3/6 props
+`packages/core/src/types/card.ts` · `CardProps` · 3/13 props
 
 Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。
 
@@ -33,13 +33,13 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Carousel
 
-`packages/core/src/types/carousel.ts` · `CarouselProps` · 3/14 props
+`packages/core/src/types/carousel.ts` · `CarouselProps` · 3/17 props
 
-| Prop             | Type      | Default | Notes                                       |
-| ---------------- | --------- | ------- | ------------------------------------------- |
-| `autoplay?`      | `boolean` | `false` | Whether to enable automatic slide switching |
-| `autoplaySpeed?` | `number`  | `3000`  | Time interval for auto-play in milliseconds |
-| `dots?`          | `boolean` | `true`  | Whether to show navigation dots             |
+| Prop             | Type                   | Default | Notes                                                   |
+| ---------------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `locale?`        | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
+| `autoplay?`      | `boolean`              | `false` | Whether to enable automatic slide switching             |
+| `autoplaySpeed?` | `number`               | `3000`  | Time interval for auto-play in milliseconds             |
 
 ## Col
 
@@ -53,7 +53,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Container
 
-`packages/core/src/types/container.ts` · `ContainerProps`
+`packages/core/src/types/container.ts` · `ContainerProps` · 3/4 props
 
 | Prop        | Type                | Default | Notes                                                                                      |
 | ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -65,33 +65,35 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 `packages/core/src/types/layout.ts` · `ContentProps`
 
-| Prop         | Type                | Default | Notes                                                                                      |
-| ------------ | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `className?` | `string`            | `-`     | Additional CSS classes                                                                     |
-| `padding?`   | `boolean \| string` | `true`  | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
+| Prop         | Type                               | Default | Notes                                                                                      |
+| ------------ | ---------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `className?` | `string`                           | `-`     | Additional CSS classes                                                                     |
+| `padding?`   | `boolean \| string`                | `true`  | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
+| `style?`     | `Record<string, string \| number>` | `-`     | -                                                                                          |
 
 ## Descriptions
 
-`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 3/10 props
+`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 3/12 props
 
-| Prop        | Type      | Default | Notes                                |
-| ----------- | --------- | ------- | ------------------------------------ |
-| `title?`    | `string`  | `-`     | Descriptions title                   |
-| `extra?`    | `unknown` | `-`     | Extra content (actions, links, etc.) |
-| `bordered?` | `boolean` | `false` | Whether to show border               |
+| Prop     | Type                 | Default | Notes                                |
+| -------- | -------------------- | ------- | ------------------------------------ |
+| `items?` | `DescriptionsItem[]` | `-`     | Items data source                    |
+| `title?` | `string`             | `-`     | Descriptions title                   |
+| `extra?` | `unknown`            | `-`     | Extra content (actions, links, etc.) |
 
 ## Footer
 
 `packages/core/src/types/layout.ts` · `FooterProps`
 
-| Prop         | Type     | Default  | Notes                  |
-| ------------ | -------- | -------- | ---------------------- |
-| `className?` | `string` | `-`      | Additional CSS classes |
-| `height?`    | `string` | `'auto'` | Footer height          |
+| Prop         | Type                               | Default  | Notes                  |
+| ------------ | ---------------------------------- | -------- | ---------------------- |
+| `className?` | `string`                           | `-`      | Additional CSS classes |
+| `height?`    | `string`                           | `'auto'` | Footer height          |
+| `style?`     | `Record<string, string \| number>` | `-`      | -                      |
 
 ## Header
 
-`packages/core/src/types/layout.ts` · `HeaderProps`
+`packages/core/src/types/layout.ts` · `HeaderProps` · 3/4 props
 
 | Prop         | Type            | Default     | Notes                  |
 | ------------ | --------------- | ----------- | ---------------------- |
@@ -103,21 +105,25 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 `packages/core/src/types/layout.ts` · `LayoutProps`
 
-| Prop         | Type     | Default | Notes                  |
-| ------------ | -------- | ------- | ---------------------- |
-| `className?` | `string` | `-`     | Additional CSS classes |
+| Prop         | Type                               | Default | Notes                  |
+| ------------ | ---------------------------------- | ------- | ---------------------- |
+| `className?` | `string`                           | `-`     | Additional CSS classes |
+| `style?`     | `Record<string, string \| number>` | `-`     | -                      |
 
 ## List
 
-`packages/core/src/types/list.ts` · `ListProps` · 3/16 props
+`packages/core/src/types/list.ts` · `ListProps` · 6/22 props
 
 Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。
 
-| Prop        | Type              | Default     | Notes             |
-| ----------- | ----------------- | ----------- | ----------------- |
-| `size?`     | `ComponentSize`   | `'md'`      | List size         |
-| `bordered?` | `ListBorderStyle` | `'divided'` | List border style |
-| `loading?`  | `boolean`         | `false`     | Loading state     |
+| Prop          | Type                                                       | Default | Notes                                                                                      |
+| ------------- | ---------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `loading?`    | `boolean`                                                  | `false` | Loading state                                                                              |
+| `pagination?` | `ListPaginationConfig \| false`                            | `-`     | Pagination configuration, set to false to disable                                          |
+| `virtual?`    | `boolean`                                                  | `false` | Enable fixed-height virtual rendering via VirtualList. Recommended for large non-grid l... |
+| `dataSource?` | `T[]`                                                      | `-`     | List data source                                                                           |
+| `locale?`     | `Partial<TigerLocale>`                                     | `-`     | Locale override; falls back to ConfigProvider locale                                       |
+| `rowKey?`     | `string \| ((item: T, index: number) => string \| number)` | `-`     | Function to get item key                                                                   |
 
 ## Masonry
 
@@ -131,13 +137,13 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Resizable
 
-`packages/core/src/types/resizable.ts` · `ResizableProps` · 3/12 props
+`packages/core/src/types/resizable.ts` · `ResizableProps` · 3/13 props
 
-| Prop             | Type     | Default | Notes                    |
-| ---------------- | -------- | ------- | ------------------------ |
-| `defaultWidth?`  | `number` | `-`     | Default width in pixels  |
-| `defaultHeight?` | `number` | `-`     | Default height in pixels |
-| `minWidth?`      | `number` | `0`     | Minimum width in pixels  |
+| Prop             | Type      | Default | Notes                        |
+| ---------------- | --------- | ------- | ---------------------------- |
+| `disabled?`      | `boolean` | `false` | Whether resizing is disabled |
+| `defaultWidth?`  | `number`  | `-`     | Default width in pixels      |
+| `defaultHeight?` | `number`  | `-`     | Default height in pixels     |
 
 ## Row
 
@@ -161,7 +167,7 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Sidebar
 
-`packages/core/src/types/layout.ts` · `SidebarProps` · 3/4 props
+`packages/core/src/types/layout.ts` · `SidebarProps` · 3/5 props
 
 | Prop              | Type     | Default   | Notes                                                                                    |
 | ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
@@ -171,7 +177,7 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Skeleton
 
-`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 3/8 props
+`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 3/9 props
 
 | Prop         | Type                | Default                             | Notes                                                                   |
 | ------------ | ------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
@@ -181,20 +187,21 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Space
 
-`packages/core/src/types/space.ts` · `SpaceProps` · 3/4 props
+`packages/core/src/types/space.ts` · `SpaceProps` · 4/5 props
 
 | Prop         | Type                           | Default        | Notes                                                  |
 | ------------ | ------------------------------ | -------------- | ------------------------------------------------------ |
 | `direction?` | `BaseLayoutProps['direction']` | `'horizontal'` | Space direction                                        |
 | `size?`      | `SpaceSize`                    | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
 | `align?`     | `BaseLayoutProps['align']`     | `'start'`      | Align items in the space                               |
+| `wrap?`      | `BaseLayoutProps['wrap']`      | `false`        | Whether to wrap items                                  |
 
 ## Splitter
 
-`packages/core/src/types/splitter.ts` · `SplitterProps` · 3/8 props
+`packages/core/src/types/splitter.ts` · `SplitterProps` · 3/9 props
 
 | Prop         | Type                   | Default        | Notes                                                                                      |
 | ------------ | ---------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `disabled?`  | `boolean`              | `false`        | Whether the splitter is disabled                                                           |
 | `direction?` | `SplitDirection`       | `'horizontal'` | Direction of the split                                                                     |
 | `sizes?`     | `(number \| string)[]` | `-`            | Initial sizes of each pane in pixels or percentage / px strings (`'30%'`, `'200px'`). N... |
-| `min?`       | `number`               | `0`            | Minimum size of any pane in pixels                                                         |

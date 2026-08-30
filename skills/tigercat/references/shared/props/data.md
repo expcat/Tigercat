@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Calendar
 
-`packages/core/src/types/calendar.ts` · `CalendarProps` · 3/6 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 3/7 props
 
 | Prop      | Type                   | Default | Notes                                                  |
 | --------- | ---------------------- | ------- | ------------------------------------------------------ |
@@ -23,7 +23,7 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## Collapse
 
-`packages/core/src/types/collapse.ts` · `CollapseProps` · 3/8 props
+`packages/core/src/types/collapse.ts` · `CollapseProps` · 3/9 props
 
 | Prop                | Type                                       | Default | Notes                                                     |
 | ------------------- | ------------------------------------------ | ------- | --------------------------------------------------------- |
@@ -33,13 +33,13 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## CollapsePanel
 
-`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 3/6 props
+`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 3/8 props
 
 | Prop        | Type               | Default | Notes                               |
 | ----------- | ------------------ | ------- | ----------------------------------- |
 | `panelKey`  | `string \| number` | `-`     | Unique key for the panel (required) |
-| `header?`   | `string`           | `-`     | Panel header/title                  |
 | `disabled?` | `boolean`          | `false` | Whether the panel is disabled       |
+| `header?`   | `string`           | `-`     | Panel header/title                  |
 
 ## Countdown
 
@@ -53,38 +53,44 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## DataExport
 
-`packages/core/src/types/data-export.ts` · `DataExportProps` · 3/5 props
+`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/10 props
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
 Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import('@expcat/tigercat-core/utils/data-export')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。
 
-| Prop         | Type                 | Default                | Notes                                                                                      |
-| ------------ | -------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
-| `columns`    | `TableColumn<T>[]`   | `-`                    | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
-| `dataSource` | `T[]`                | `-`                    | Records to export                                                                          |
-| `formats?`   | `DataExportFormat[]` | `['xlsx', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
+| Prop         | Type                   | Default | Notes                                                                                      |
+| ------------ | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns`    | `TableColumn<T>[]`     | `-`     | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
+| `dataSource` | `T[]`                  | `-`     | Records to export                                                                          |
+| `disabled?`  | `boolean`              | `false` | Whether the export trigger is disabled                                                     |
+| `locale?`    | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                                    |
 
 ## Table
 
-`packages/core/src/types/table.ts` · `TableProps` · 3/49 props
+`packages/core/src/types/table.ts` · `TableProps` · 8/49 props
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 
 Note: 固定列通过 `column.fixed`（`left` / `right`）开启；开启 `columnLockable` 后表头会出现锁定按钮，点击可交互切换该列进入左侧固定区，按钮的 `aria-label` 走 i18n，可用 `lockColumnAriaLabel` / `unlockColumnAriaLabel`（模板支持 `{column}`）自定义。推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。当存在固定列或开启 `columnLockable` 时，表格会渲染 `<colgroup>` + `<col>` 钉死每列宽度（有声明 `width` 的列用声明值，无声明宽度的列冻结首次实测宽度），使列宽与 `fixed`/锁定状态解耦——切换锁定不会改变任何列宽，sticky 偏移保持准确；代价是这类表格的自适应列在首次测量后宽度被冻结、不再随容器宽度回流（普通表格不受影响）。`tableLayout`（默认 `"auto"`，可设为 `"fixed"`）切换底层 `table-layout`，固定列/钉列场景配合列 `width` 时 `"fixed"` 列宽更稳定。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName`、`valueClassName` 做轻量布局调整，且 `cardFieldGap`（默认 "gap-3"，需传完整 Tailwind gap 类以便 Tailwind JIT 静态识别）可调整字段间的间距。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。为保证锁定/固定列在横向滚动时 `position: sticky` 稳定钉住，表格根使用 `border-separate` + `border-spacing-0`，行/表头分隔线落在单元格（`<td>`/`<th>`）而非 `<tr>`/`<thead>`。内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数和 `showTotal` 范围文案全部由 `pagination.total` 计算，`current`/`pageSize` 仍为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求；注意 remote 模式下组件内置排序/筛选仅作用于当前页数据，排序/筛选应由服务端完成。
 
-| Prop              | Type               | Default | Notes                                                                                      |
-| ----------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `columns`         | `TableColumn<T>[]` | `-`     | Table columns configuration                                                                |
-| `columnLockable?` | `boolean`          | `false` | Whether to show a lock button in each column header. Clicking the lock toggles the colu... |
-| `dataSource?`     | `T[]`              | `[]`    | Table data source                                                                          |
+| Prop            | Type                                          | Default                 | Notes                                                                                     |
+| --------------- | --------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------- |
+| `columns`       | `TableColumn<T>[]`                            | `-`                     | Table columns configuration                                                               |
+| `dataSource?`   | `T[]`                                         | `[]`                    | Table data source                                                                         |
+| `pagination?`   | `PaginationConfig \| false`                   | `-`                     | Pagination configuration Set to false to disable pagination                               |
+| `sort?`         | `SortState`                                   | `-`                     | Controlled sort state. When provided, internal sort state will not be mutated.            |
+| `filters?`      | `Record<string, unknown>`                     | `-`                     | Controlled filters. When provided, internal filter state will not be mutated.             |
+| `rowSelection?` | `RowSelectionConfig<T>`                       | `-`                     | Row selection configuration                                                               |
+| `expandable?`   | `ExpandableConfig<T>`                         | `-`                     | Row expansion configuration. Adds an expand toggle column and renders expanded content... |
+| `rowKey?`       | `string \| ((record: T) => string \| number)` | `(record) => record.id` | Function to get row key                                                                   |
 
 ## Timeline
 
-`packages/core/src/types/timeline.ts` · `TimelineProps` · 3/5 props
+`packages/core/src/types/timeline.ts` · `TimelineProps` · 3/11 props
 
-| Prop          | Type           | Default  | Notes                                               |
-| ------------- | -------------- | -------- | --------------------------------------------------- |
-| `mode?`       | `TimelineMode` | `'left'` | Timeline mode/direction                             |
-| `pending?`    | `boolean`      | `false`  | Whether to show the connector line in pending state |
-| `pendingDot?` | `unknown`      | `-`      | Pending item dot content                            |
+| Prop      | Type                   | Default  | Notes                                                |
+| --------- | ---------------------- | -------- | ---------------------------------------------------- |
+| `items?`  | `TimelineItem[]`       | `-`      | Timeline data source                                 |
+| `locale?` | `Partial<TigerLocale>` | `-`      | Locale override; falls back to ConfigProvider locale |
+| `mode?`   | `TimelineMode`         | `'left'` | Timeline mode/direction                              |

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Affix
 
-`packages/core/src/types/affix.ts` · `AffixProps` · 3/5 props
+`packages/core/src/types/affix.ts` · `AffixProps` · 3/7 props
 
 | Prop            | Type     | Default | Notes                                                                                      |
 | --------------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -21,7 +21,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Anchor
 
-`packages/core/src/types/anchor.ts` · `AnchorProps` · 3/10 props
+`packages/core/src/types/anchor.ts` · `AnchorProps` · 3/11 props
 
 | Prop         | Type      | Default | Notes                                     |
 | ------------ | --------- | ------- | ----------------------------------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## AnchorLink
 
-`packages/core/src/types/anchor.ts` · `AnchorLinkProps` · 3/4 props
+`packages/core/src/types/anchor.ts` · `AnchorLinkProps` · 3/5 props
 
 | Prop      | Type     | Default | Notes                     |
 | --------- | -------- | ------- | ------------------------- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BackTop
 
-`packages/core/src/types/back-top.ts` · `BackTopProps` · 3/5 props
+`packages/core/src/types/back-top.ts` · `BackTopProps` · 3/9 props
 
 | Prop         | Type                | Default          | Notes                                                                                      |
 | ------------ | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
@@ -61,7 +61,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BreadcrumbItem
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 3/6 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 3/8 props
 
 | Prop       | Type                                         | Default | Notes                                 |
 | ---------- | -------------------------------------------- | ------- | ------------------------------------- |
@@ -71,7 +71,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenu
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 3/8 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 3/10 props
 
 | Prop           | Type      | Default | Notes                                      |
 | -------------- | --------- | ------- | ------------------------------------------ |
@@ -81,12 +81,12 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenuItem
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 3/4 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 3/5 props
 
 | Prop        | Type               | Default | Notes                                              |
 | ----------- | ------------------ | ------- | -------------------------------------------------- |
-| `key?`      | `string \| number` | `-`     | Unique key for the menu item                       |
 | `disabled?` | `boolean`          | `false` | Whether the item is disabled                       |
+| `key?`      | `string \| number` | `-`     | Unique key for the menu item                       |
 | `divided?`  | `boolean`          | `false` | Whether the item is divided from the previous item |
 
 ## ContextMenuMenu
@@ -97,20 +97,21 @@ description: Compact generated Tigercat Navigation props reference
 | ------------ | ------------------------- | ------- | ---------------------- |
 | `className?` | `string`                  | `-`     | Additional CSS classes |
 | `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
+| `children?`  | `React.ReactNode`         | `-`     | -                      |
 
 ## ContextMenuSub
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/4 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/6 props
 
 | Prop        | Type               | Default | Notes                                   |
 | ----------- | ------------------ | ------- | --------------------------------------- |
+| `disabled?` | `boolean`          | `false` | Whether the submenu trigger is disabled |
 | `itemKey?`  | `string \| number` | `-`     | Unique key for the submenu              |
 | `title?`    | `string`           | `-`     | Submenu trigger label                   |
-| `disabled?` | `boolean`          | `false` | Whether the submenu trigger is disabled |
 
 ## Dropdown
 
-`packages/core/src/types/dropdown.ts` · `DropdownProps` · 3/9 props
+`packages/core/src/types/dropdown.ts` · `DropdownProps` · 3/13 props
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
@@ -118,18 +119,18 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 | Prop        | Type              | Default   | Notes                                          |
 | ----------- | ----------------- | --------- | ---------------------------------------------- |
-| `trigger?`  | `DropdownTrigger` | `'hover'` | Trigger mode - click or hover                  |
 | `disabled?` | `boolean`         | `false`   | Whether the dropdown is disabled               |
 | `open?`     | `boolean`         | `-`       | Whether the dropdown is open (controlled mode) |
+| `trigger?`  | `DropdownTrigger` | `'hover'` | Trigger mode - click or hover                  |
 
 ## DropdownItem
 
-`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 3/6 props
+`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 3/7 props
 
 | Prop        | Type               | Default | Notes                                          |
 | ----------- | ------------------ | ------- | ---------------------------------------------- |
-| `key?`      | `string \| number` | `-`     | Unique key for the dropdown item               |
 | `disabled?` | `boolean`          | `false` | Whether the item is disabled                   |
+| `key?`      | `string \| number` | `-`     | Unique key for the dropdown item               |
 | `divided?`  | `boolean`          | `false` | Whether the item is divided from previous item |
 
 ## DropdownMenu
@@ -140,26 +141,28 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | ------------ | ------------------------- | ------- | ---------------------- |
 | `className?` | `string`                  | `-`     | Additional CSS classes |
 | `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
+| `children?`  | `React.ReactNode`         | `-`     | Menu content           |
 
 ## FloatButton
 
-`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 3/10 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/12 props
 
 | Prop         | Type                | Default          | Notes                                                          |
 | ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |
 | `floating?`  | `boolean`           | `false`          | Whether the standalone button should be fixed to the viewport. |
 | `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
 | `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when floating is true.              |
+| `disabled?`  | `boolean`           | `false`          | Whether the button is disabled                                 |
 
 ## FloatButtonGroup
 
-`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 3/7 props
+`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 3/10 props
 
 | Prop       | Type                 | Default    | Notes                                  |
 | ---------- | -------------------- | ---------- | -------------------------------------- |
+| `open?`    | `boolean`            | `-`        | Whether the group is open (controlled) |
 | `shape?`   | `FloatButtonShape`   | `'circle'` | Shape applied to all child buttons     |
 | `trigger?` | `'click' \| 'hover'` | `'click'`  | Whether the group expands on trigger   |
-| `open?`    | `boolean`            | `-`        | Whether the group is open (controlled) |
 
 ## Menu
 
@@ -183,7 +186,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## MenuItem
 
-`packages/core/src/types/menu.ts` · `MenuItemProps` · 3/4 props
+`packages/core/src/types/menu.ts` · `MenuItemProps` · 3/7 props
 
 | Prop        | Type      | Default | Notes                             |
 | ----------- | --------- | ------- | --------------------------------- |
@@ -193,26 +196,27 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## MenuItemGroup
 
-`packages/core/src/types/menu.ts` · `MenuItemGroupProps`
+`packages/core/src/types/menu.ts` · `MenuItemGroupProps` · 3/5 props
 
 | Prop         | Type     | Default | Notes                  |
 | ------------ | -------- | ------- | ---------------------- |
 | `title?`     | `string` | `-`     | Group title            |
 | `className?` | `string` | `-`     | Additional CSS classes |
+| `level?`     | `number` | `-`     | -                      |
 
 ## NavigationMenu
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 3/13 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 3/15 props
 
-| Prop            | Type                          | Default | Notes                                                                                      |
-| --------------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `value?`        | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
-| `defaultValue?` | `NavigationMenuValue \| null` | `-`     | Default open item key (uncontrolled mode)                                                  |
-| `open?`         | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
+| Prop        | Type                          | Default | Notes                                                                                      |
+| ----------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`    | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
+| `open?`     | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
+| `disabled?` | `boolean`                     | `false` | Whether the navigation menu is disabled                                                    |
 
 ## NavigationMenuContent
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuContentProps`
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuContentProps` · 3/4 props
 
 | Prop         | Type                      | Default | Notes                                                    |
 | ------------ | ------------------------- | ------- | -------------------------------------------------------- |
@@ -222,7 +226,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## NavigationMenuItem
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuItemProps` · 3/4 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuItemProps` · 3/5 props
 
 | Prop         | Type                  | Default | Notes                                                                                      |
 | ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -232,17 +236,17 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## NavigationMenuLink
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 3/7 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 3/8 props
 
-| Prop      | Type     | Default | Notes                                                                     |
-| --------- | -------- | ------- | ------------------------------------------------------------------------- |
-| `href?`   | `string` | `-`     | Link href. Renders an `<a>` when set, otherwise a `<button>`.             |
-| `target?` | `string` | `-`     | Link target                                                               |
-| `rel?`    | `string` | `-`     | Rel attribute. `noopener noreferrer` is added automatically for `_blank`. |
+| Prop        | Type      | Default | Notes                                                         |
+| ----------- | --------- | ------- | ------------------------------------------------------------- |
+| `disabled?` | `boolean` | `false` | Whether the link is disabled                                  |
+| `href?`     | `string`  | `-`     | Link href. Renders an `<a>` when set, otherwise a `<button>`. |
+| `target?`   | `string`  | `-`     | Link target                                                   |
 
 ## NavigationMenuTrigger
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuTriggerProps` · 3/4 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuTriggerProps` · 3/5 props
 
 | Prop         | Type      | Default | Notes                                                               |
 | ------------ | --------- | ------- | ------------------------------------------------------------------- |
@@ -252,7 +256,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## PageHeader
 
-`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 3/7 props
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 3/11 props
 
 | Prop             | Type      | Default  | Notes                                                                                      |
 | ---------------- | --------- | -------- | ------------------------------------------------------------------------------------------ |
@@ -264,15 +268,15 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 `packages/core/src/types/pagination.ts` · `PaginationProps` · 3/22 props
 
-| Prop              | Type     | Default | Notes                                        |
-| ----------------- | -------- | ------- | -------------------------------------------- |
-| `current?`        | `number` | `1`     | Current page number (1-indexed)              |
-| `defaultCurrent?` | `number` | `1`     | Default current page (for uncontrolled mode) |
-| `total?`          | `number` | `0`     | Total number of items                        |
+| Prop        | Type               | Default | Notes                                                                 |
+| ----------- | ------------------ | ------- | --------------------------------------------------------------------- |
+| `disabled?` | `boolean`          | `false` | Whether pagination is disabled                                        |
+| `locale?`   | `TigerLocaleInput` | `-`     | Locale configuration. Accepts a sync locale, promise, or lazy loader. |
+| `current?`  | `number`           | `1`     | Current page number (1-indexed)                                       |
 
 ## ScrollSpy
 
-`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 3/11 props
+`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 3/12 props
 
 | Prop                | Type              | Default | Notes |
 | ------------------- | ----------------- | ------- | ----- |
@@ -284,15 +288,15 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 `packages/core/src/types/spotlight.ts` · `SpotlightProps` · 3/19 props
 
-| Prop           | Type      | Default | Notes |
-| -------------- | --------- | ------- | ----- |
-| `open?`        | `boolean` | `-`     | -     |
-| `defaultOpen?` | `boolean` | `-`     | -     |
-| `query?`       | `string`  | `-`     | -     |
+| Prop      | Type                   | Default | Notes |
+| --------- | ---------------------- | ------- | ----- |
+| `open?`   | `boolean`              | `-`     | -     |
+| `items?`  | `SpotlightItem[]`      | `-`     | -     |
+| `locale?` | `Partial<TigerLocale>` | `-`     | -     |
 
 ## Steps
 
-`packages/core/src/types/steps.ts` · `StepsProps` · 3/8 props
+`packages/core/src/types/steps.ts` · `StepsProps` · 3/9 props
 
 | Prop         | Type             | Default        | Notes                          |
 | ------------ | ---------------- | -------------- | ------------------------------ |
@@ -304,48 +308,49 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 `packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 3/9 props
 
-| Prop           | Type              | Default | Notes                           |
-| -------------- | ----------------- | ------- | ------------------------------- |
-| `title`        | `string`          | `-`     | Step title                      |
-| `description?` | `string`          | `-`     | Step description                |
-| `icon?`        | `React.ReactNode` | `-`     | Step icon (custom icon element) |
+| Prop           | Type      | Default | Notes                        |
+| -------------- | --------- | ------- | ---------------------------- |
+| `title`        | `string`  | `-`     | Step title                   |
+| `disabled?`    | `boolean` | `-`     | Whether the step is disabled |
+| `description?` | `string`  | `-`     | Step description             |
 
 ## SubMenu
 
-`packages/core/src/types/menu.ts` · `SubMenuProps` · 3/5 props
+`packages/core/src/types/menu.ts` · `SubMenuProps` · 3/8 props
 
-| Prop      | Type      | Default | Notes                      |
-| --------- | --------- | ------- | -------------------------- |
-| `itemKey` | `MenuKey` | `-`     | Unique key for the submenu |
-| `title?`  | `string`  | `-`     | Submenu title              |
-| `icon?`   | `unknown` | `-`     | Icon for the submenu       |
+| Prop        | Type      | Default | Notes                           |
+| ----------- | --------- | ------- | ------------------------------- |
+| `itemKey`   | `MenuKey` | `-`     | Unique key for the submenu      |
+| `disabled?` | `boolean` | `-`     | Whether the submenu is disabled |
+| `title?`    | `string`  | `-`     | Submenu title                   |
 
 ## TabPane
 
-`packages/core/src/types/tabs.ts` · `TabPaneProps` · 3/7 props
+`packages/core/src/types/tabs.ts` · `TabPaneProps` · 4/11 props
 
-| Prop        | Type               | Default | Notes                                  |
-| ----------- | ------------------ | ------- | -------------------------------------- |
-| `tabKey`    | `string \| number` | `-`     | Unique key for the tab pane (required) |
-| `label`     | `string`           | `-`     | Tab label/title                        |
-| `disabled?` | `boolean`          | `false` | Whether the tab is disabled            |
+| Prop        | Type               | Default | Notes                                                     |
+| ----------- | ------------------ | ------- | --------------------------------------------------------- |
+| `tabKey`    | `string \| number` | `-`     | Unique key for the tab pane (required)                    |
+| `label`     | `string`           | `-`     | Tab label/title                                           |
+| `disabled?` | `boolean`          | `false` | Whether the tab is disabled                               |
+| `closable?` | `boolean`          | `-`     | Whether the tab can be closed (overrides parent closable) |
 
 ## Tabs
 
-`packages/core/src/types/tabs.ts` · `TabsProps` · 3/12 props
+`packages/core/src/types/tabs.ts` · `TabsProps` · 3/15 props
 
-| Prop                | Type               | Default  | Notes                                          |
-| ------------------- | ------------------ | -------- | ---------------------------------------------- |
-| `activeKey?`        | `string \| number` | `-`      | Currently active tab key                       |
-| `defaultActiveKey?` | `string \| number` | `-`      | Default active tab key (for uncontrolled mode) |
-| `type?`             | `TabType`          | `'line'` | Tab type - line, card, or editable-card        |
+| Prop         | Type                   | Default | Notes                                                           |
+| ------------ | ---------------------- | ------- | --------------------------------------------------------------- |
+| `closable?`  | `boolean`              | `false` | Whether tabs can be closed (only works with editable-card type) |
+| `locale?`    | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale         |
+| `activeKey?` | `string \| number`     | `-`     | Currently active tab key                                        |
 
 ## Tree
 
-`packages/core/src/types/tree.ts` · `TreeProps` · 3/28 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 3/30 props
 
-| Prop             | Type                | Default  | Notes                      |
-| ---------------- | ------------------- | -------- | -------------------------- |
-| `treeData?`      | `TreeNode[]`        | `-`      | Tree data source           |
-| `selectionMode?` | `TreeSelectionMode` | `'none'` | Selection mode             |
-| `checkable?`     | `boolean`           | `false`  | Whether to show checkboxes |
+| Prop        | Type                   | Default | Notes                                                                                     |
+| ----------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `virtual?`  | `boolean`              | `false` | Enable virtualized rendering. The tree is flattened to its currently visible items and... |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | -                                                                                         |
+| `treeData?` | `TreeNode[]`           | `-`     | Tree data source                                                                          |

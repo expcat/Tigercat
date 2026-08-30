@@ -18,10 +18,15 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component | Vue                      | React                    |
-| --------- | ------------------------ | ------------------------ |
-| Icon      | `<Icon name="search" />` | `<Icon name="search" />` |
+| Component    | Vue                                 | React                              |
+| ------------ | ----------------------------------- | ---------------------------------- |
+| Code         | `<Code :code="code" />`             | `<Code code={code} />`             |
+| Icon         | `<Icon name="search" />`            | `<Icon name="search" />`           |
+| Image        | `<Image src="..." />`               | `<Image src="..." />`              |
+| ImageCropper | `<ImageCropper :src="src" />`       | `<ImageCropper src={src} />`       |
+| ImagePreview | `<ImagePreview :images="images" />` | `<ImagePreview images={images} />` |
+| QRCode       | `<QRCode value="..." />`            | `<QRCode value="..." />`           |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, ConfigProvider, CropUpload, Divider, Empty, Highlight, Image, ImageCompare, ImageCropper, ImageGroup, ImagePreview, Kbd, Link, Marquee, QRCode, Rate, Result, Segmented, SplitButton, Statistic, Tag, Text, Watermark.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, ConfigProvider, CropUpload, Divider, Empty, Highlight, ImageCompare, ImageGroup, Kbd, Link, Marquee, Rate, Result, Segmented, SplitButton, Statistic, Tag, Text, Watermark.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

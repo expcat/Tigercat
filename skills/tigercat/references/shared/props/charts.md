@@ -11,23 +11,23 @@ description: Compact generated Tigercat Charts props reference
 
 ## AreaChart
 
-`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 3/35 props
+`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 3/53 props
 
-| Prop      | Type                | Default | Notes                      |
-| --------- | ------------------- | ------- | -------------------------- |
-| `data?`   | `LineChartDatum[]`  | `-`     | Chart data (single series) |
-| `series?` | `AreaChartSeries[]` | `-`     | Multiple series            |
-| `xScale?` | `ChartScale`        | `-`     | Custom x scale             |
+| Prop        | Type                | Default | Notes                               |
+| ----------- | ------------------- | ------- | ----------------------------------- |
+| `data?`     | `LineChartDatum[]`  | `-`     | Chart data (single series)          |
+| `animated?` | `boolean`           | `false` | Enable line draw entrance animation |
+| `series?`   | `AreaChartSeries[]` | `-`     | Multiple series                     |
 
 ## BarChart
 
-`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 3/31 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 3/49 props
 
-| Prop      | Type              | Default | Notes          |
-| --------- | ----------------- | ------- | -------------- |
-| `data`    | `BarChartDatum[]` | `-`     | Chart data     |
-| `xScale?` | `ChartScale`      | `-`     | Custom x scale |
-| `yScale?` | `ChartScale`      | `-`     | Custom y scale |
+| Prop        | Type              | Default | Notes                                         |
+| ----------- | ----------------- | ------- | --------------------------------------------- |
+| `data`      | `BarChartDatum[]` | `-`     | Chart data                                    |
+| `animated?` | `boolean`         | `false` | Enable CSS transitions for smooth bar updates |
+| `xScale?`   | `ChartScale`      | `-`     | Custom x scale                                |
 
 ## ChartAxis
 
@@ -35,8 +35,8 @@ description: Compact generated Tigercat Charts props reference
 
 | Prop           | Type                   | Default    | Notes                                   |
 | -------------- | ---------------------- | ---------- | --------------------------------------- |
-| `orientation?` | `ChartAxisOrientation` | `'bottom'` | Axis orientation                        |
 | `scale`        | `ChartScale`           | `-`        | Axis scale                              |
+| `orientation?` | `ChartAxisOrientation` | `'bottom'` | Axis orientation                        |
 | `ticks?`       | `number`               | `5`        | Number of ticks (only for linear scale) |
 
 ## ChartCanvas
@@ -63,17 +63,19 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## ChartLegend
 
-`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 3/4 props
+`packages/react/src/components/ChartLegend.tsx and packages/vue/src/components/ChartLegend.ts` · `ChartLegendProps / VueChartLegendProps` · 3/7 props
 
-| Prop                | Type                  | Default    | Notes                    |
-| ------------------- | --------------------- | ---------- | ------------------------ |
-| `showLegend?`       | `boolean`             | `false`    | Whether to show legend   |
-| `legendPosition?`   | `ChartLegendPosition` | `'bottom'` | Legend position          |
-| `legendMarkerSize?` | `number`              | `10`       | Legend marker size in px |
+| Prop          | Type                  | Default | Notes |
+| ------------- | --------------------- | ------- | ----- |
+| `items`       | `ChartLegendItem[]`   | `-`     | -     |
+| `position?`   | `ChartLegendPosition` | `-`     | -     |
+| `markerSize?` | `number`              | `-`     | -     |
+
+Events/callback props: `onItemClick?`, `onItemHover?`, `onItemLeave?`.
 
 ## ChartSeries
 
-`packages/core/src/types/chart-core.ts` · `ChartSeriesProps` · 3/6 props
+`packages/core/src/types/chart-core.ts` · `ChartSeriesProps` · 3/7 props
 
 | Prop     | Type     | Default | Notes        |
 | -------- | -------- | ------- | ------------ |
@@ -93,17 +95,19 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## DonutChart
 
-`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 3/4 props
+`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 5/39 props
 
 | Prop                | Type               | Default | Notes                                                         |
 | ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
+| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                    |
 | `innerRadiusRatio?` | `number`           | `0.6`   | Inner radius ratio based on outer radius                      |
 | `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the donut center              |
 | `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue in the donut center |
+| `animated?`         | `boolean`          | `false` | Enable entrance animation (fade + scale)                      |
 
 ## FunnelChart
 
-`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 3/6 props
+`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 3/25 props
 
 | Prop         | Type                         | Default      | Notes                                         |
 | ------------ | ---------------------------- | ------------ | --------------------------------------------- |
@@ -113,7 +117,7 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 3/16 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 3/29 props
 
 | Prop         | Type          | Default | Notes |
 | ------------ | ------------- | ------- | ----- |
@@ -123,7 +127,7 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## GaugeChart
 
-`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 3/16 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 3/24 props
 
 | Prop    | Type     | Default | Notes                      |
 | ------- | -------- | ------- | -------------------------- |
@@ -133,7 +137,7 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## HeatmapChart
 
-`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 3/13 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 3/27 props
 
 | Prop      | Type                  | Default | Notes         |
 | --------- | --------------------- | ------- | ------------- |
@@ -143,17 +147,17 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## LineChart
 
-`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 3/34 props
+`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 3/52 props
 
-| Prop      | Type                | Default | Notes                      |
-| --------- | ------------------- | ------- | -------------------------- |
-| `data?`   | `LineChartDatum[]`  | `-`     | Chart data (single series) |
-| `series?` | `LineChartSeries[]` | `-`     | Multiple series            |
-| `xScale?` | `ChartScale`        | `-`     | Custom x scale             |
+| Prop        | Type                | Default | Notes                               |
+| ----------- | ------------------- | ------- | ----------------------------------- |
+| `data?`     | `LineChartDatum[]`  | `-`     | Chart data (single series)          |
+| `animated?` | `boolean`           | `false` | Enable line draw entrance animation |
+| `series?`   | `LineChartSeries[]` | `-`     | Multiple series                     |
 
 ## OrgChart
 
-`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 3/11 props
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 3/24 props
 
 | Prop          | Type                             | Default | Notes |
 | ------------- | -------------------------------- | ------- | ----- |
@@ -163,7 +167,7 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## PieChart
 
-`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 3/17 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 3/35 props
 
 | Prop           | Type              | Default | Notes                  |
 | -------------- | ----------------- | ------- | ---------------------- |
@@ -173,7 +177,7 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 3/41 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 3/54 props
 
 | Prop        | Type                 | Default | Notes                        |
 | ----------- | -------------------- | ------- | ---------------------------- |
@@ -183,17 +187,17 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## ScatterChart
 
-`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 3/13 props
+`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 3/49 props
 
-| Prop          | Type                  | Default | Notes               |
-| ------------- | --------------------- | ------- | ------------------- |
-| `data`        | `ScatterChartDatum[]` | `-`     | Chart data          |
-| `pointSize?`  | `number`              | `6`     | Point size (radius) |
-| `pointColor?` | `string`              | `-`     | Point color         |
+| Prop        | Type                   | Default | Notes                                  |
+| ----------- | ---------------------- | ------- | -------------------------------------- |
+| `data`      | `ScatterChartDatum[]`  | `-`     | Chart data                             |
+| `animated?` | `boolean`              | `false` | Enable entrance animation with stagger |
+| `locale?`   | `Partial<TigerLocale>` | `-`     | -                                      |
 
 ## SunburstChart
 
-`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 3/5 props
+`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 3/24 props
 
 | Prop                | Type                   | Default | Notes                                              |
 | ------------------- | ---------------------- | ------- | -------------------------------------------------- |
@@ -203,7 +207,7 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## TreeMapChart
 
-`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 3/6 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 3/25 props
 
 | Prop          | Type                  | Default | Notes                               |
 | ------------- | --------------------- | ------- | ----------------------------------- |
