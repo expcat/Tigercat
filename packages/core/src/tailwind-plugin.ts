@@ -61,10 +61,6 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
     // shared names such as --tiger-radius-md so plugin output matches ThemeManager.
     ':root': { ...MODERN_BASE_TOKENS_LIGHT, ...tigercatTheme },
     '.dark': { ...MODERN_BASE_TOKENS_DARK, ...tigercatDarkTheme },
-    // Remove browser default focus outline on interactive SVG elements
-    'svg [tabindex], svg [role="button"]': {
-      outline: 'none'
-    },
     ...tigercatDirectionBase,
     ...tigercatReducedMotionBase,
     '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
@@ -119,9 +115,6 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
         ...MODERN_BASE_TOKENS_DARK,
         ...darkVars,
         ...(modern ? MODERN_OVERRIDE_TOKENS_DARK : {})
-      },
-      'svg [tabindex], svg [role="button"]': {
-        outline: 'none'
       },
       ...tigercatDirectionBase,
       ...tigercatReducedMotionBase

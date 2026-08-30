@@ -5,7 +5,7 @@
  * - Class: class name composition and coercion
  * - DOM: environment detection, clipboard, style values
  * - Motion: animation constants (re-exported from motion/)
- * - Component: imperative API, slider, back-top helpers
+ * - Component: imperative API, slider math, back-top helpers
  */
 
 // --- Class ---

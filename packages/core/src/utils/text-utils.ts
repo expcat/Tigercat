@@ -5,7 +5,7 @@ import {
   textAlignClasses,
   textColorClasses,
   textDecorationClasses
-} from '../theme-runtime/colors'
+} from './theme-colors'
 import type { TextProps } from '../types/text'
 
 /**

@@ -6,7 +6,7 @@
  * during server-side rendering.
  */
 
-import { getTagVariantClasses } from '../theme-runtime/colors'
+import { getTagVariantClasses } from './theme-colors'
 import {
   DEFAULT_KBD_SEPARATOR,
   DEFAULT_KBD_SIZE,

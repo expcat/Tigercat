@@ -1,14 +1,11 @@
 /**
- * Theme configuration and context
+ * Theme runtime — CSS variable names, write/read helpers, and alias mapping.
+ * Component skin class maps live in `utils/*`.
  */
-
-export * from './colors'
-export * from './checkbox'
-export * from './switch'
-export * from './slider'
 
 import type { ThemeSemanticColors } from '../types/theme'
 import { isBrowser } from '../utils/env'
+import { devWarn } from '../utils/dev-warn'
 
 /**
  * CSS variables for theme colors
@@ -200,7 +197,8 @@ export function setThemeColors(
   const target = element || (isBrowser() ? document.documentElement : null)
 
   if (!target) {
-    console.warn(
+    devWarn(
+      'setThemeColors.ssr',
       'Cannot set theme colors: document is not available (SSR environment or non-browser context)'
     )
     return

@@ -19,13 +19,30 @@ import {
   setCssVarsCached
 } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
+import { devWarn } from '../utils/dev-warn'
 import { defaultTheme } from './default/theme'
+import { vibrantTheme } from './vibrant/theme'
+import { professionalTheme } from './professional/theme'
+import { minimalTheme } from './minimal/theme'
+import { naturalTheme } from './natural/theme'
+import { modernTheme } from './modern/theme'
+import { highContrastTheme } from './high-contrast/theme'
 import {
   MODERN_BASE_TOKENS_DARK,
   MODERN_BASE_TOKENS_LIGHT,
   MODERN_OVERRIDE_TOKENS_DARK,
   MODERN_OVERRIDE_TOKENS_LIGHT
 } from './modern/tokens'
+
+const builtInPresets = [
+  defaultTheme,
+  vibrantTheme,
+  professionalTheme,
+  minimalTheme,
+  naturalTheme,
+  modernTheme,
+  highContrastTheme
+]
 
 /**
  * Merge a preset segment onto the default theme for the same scheme.
@@ -190,6 +207,18 @@ class ThemeManagerImpl {
   private listeners: ThemeChangeListener[] = []
   private mediaQuery: MediaQueryList | null = null
   private mediaHandler: ((e: MediaQueryListEvent) => void) | null = null
+  private builtInsRegistered = false
+
+  /** Register shipped presets. Safe to call more than once. */
+  registerBuiltIns(): void {
+    if (this.builtInsRegistered) return
+    for (const preset of builtInPresets) {
+      if (!this.presets.has(preset.name)) {
+        this.presets.set(preset.name, preset)
+      }
+    }
+    this.builtInsRegistered = true
+  }
 
   // -----------------------------------------------------------------------
   // Theme registration
@@ -197,16 +226,19 @@ class ThemeManagerImpl {
 
   /** Register a preset theme. Replaces any existing preset with the same name. */
   registerTheme(preset: ThemePreset): void {
+    this.registerBuiltIns()
     this.presets.set(preset.name, preset)
   }
 
   /** Get a registered preset by name. */
   getTheme(name: string): ThemePreset | undefined {
+    this.registerBuiltIns()
     return this.presets.get(name)
   }
 
   /** List all registered preset names. */
   getAvailableThemes(): string[] {
+    this.registerBuiltIns()
     return Array.from(this.presets.keys())
   }
 
@@ -229,8 +261,12 @@ class ThemeManagerImpl {
    * If the name is not registered the call is a no-op.
    */
   setTheme(name: string): void {
+    this.registerBuiltIns()
     if (!this.presets.has(name)) {
-      console.warn(`[Tigercat] Theme "${name}" is not registered.`)
+      devWarn(
+        `ThemeManager.setTheme.${name}`,
+        `[Tigercat] Theme "${name}" is not registered.`
+      )
       return
     }
     this.currentThemeName = name
@@ -287,6 +323,7 @@ class ThemeManagerImpl {
   // -----------------------------------------------------------------------
 
   private apply(): void {
+    this.registerBuiltIns()
     if (!isBrowser()) return
 
     const root = document.documentElement
@@ -370,3 +407,8 @@ class ThemeManagerImpl {
  * ```
  */
 export const ThemeManager = new ThemeManagerImpl()
+
+/** Explicitly register built-in presets. ThemeManager methods also call this. */
+export function registerBuiltInThemes(): void {
+  ThemeManager.registerBuiltIns()
+}

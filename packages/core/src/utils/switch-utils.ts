@@ -2,8 +2,8 @@
  * Theme configuration for Switch component
  */
 
-import { classNames } from '../utils/class-names'
-import { composeComponentClasses, type ComposableClassInput } from '../utils/compose-classes'
+import { classNames } from './class-names'
+import { composeComponentClasses, type ComposableClassInput } from './compose-classes'
 import type { ComponentSize } from '../types/base'
 
 /**

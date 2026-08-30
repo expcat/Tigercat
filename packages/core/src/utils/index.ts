@@ -5,18 +5,9 @@
  * 1. Grouped exports via sub-modules (helpers/, icons/, a11y/, i18n/, styles/, motion/)
  * 2. Flat exports for backward compatibility
  *
- * **Recommended import patterns (for better tree-shaking):**
- *
- * ```ts
- * // ✅ Prefer: sub-path group imports
- * import { classNames, coerceClassValue } from '@expcat/tigercat-core' // helpers
- * import { getButtonClasses } from '@expcat/tigercat-core'             // styles
- * import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'        // motion
- * import { trapFocus } from '@expcat/tigercat-core'                    // a11y
- *
- * // ❌ Avoid: importing everything when you only need a few symbols
- * import * as core from '@expcat/tigercat-core'
- * ```
+ * Named imports from `@expcat/tigercat-core` are the supported public path.
+ * Group folders (`helpers/`, `styles/`, …) organize source; they are not
+ * package subpath exports.
  */
 
 // Re-export all from organized sub-modules

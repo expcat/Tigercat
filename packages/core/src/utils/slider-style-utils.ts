@@ -23,7 +23,7 @@ export const sliderRangeClasses = 'bg-[var(--tiger-primary,#2563eb)] rounded-ful
  * Slider thumb classes
  */
 export const sliderThumbClasses =
-  'bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]'
+  'bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
 /**
  * Slider disabled classes

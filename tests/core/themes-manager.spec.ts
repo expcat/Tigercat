@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
   defaultTheme,
+  registerBuiltInThemes,
   themeConfigToCssVars,
   ThemeManager,
   setCssVarsCached,
@@ -53,6 +54,7 @@ describe('themes/manager — ThemeManager', () => {
 
   describe('built-in presets', () => {
     it('auto-registers all built-in presets', () => {
+      registerBuiltInThemes()
       const names = ThemeManager.getAvailableThemes()
       expect(names).toEqual(
         expect.arrayContaining([

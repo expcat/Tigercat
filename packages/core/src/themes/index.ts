@@ -33,7 +33,8 @@ export {
   THEME_CONFIG_CSS_VARS,
   themeConfigToCssVars,
   mergeThemeConfig,
-  resolvePresetThemeConfig
+  resolvePresetThemeConfig,
+  registerBuiltInThemes
 } from './manager'
 export type { ThemeChangeEvent, ThemeChangeListener } from './manager'
 
@@ -65,28 +66,4 @@ export type {
   ColorScheme
 } from '../types/theme'
 
-// ---------------------------------------------------------------------------
-// Auto-register built-in presets
-// ---------------------------------------------------------------------------
-import { ThemeManager } from './manager'
-import { defaultTheme } from './default/theme'
-import { vibrantTheme } from './vibrant/theme'
-import { professionalTheme } from './professional/theme'
-import { minimalTheme } from './minimal/theme'
-import { naturalTheme } from './natural/theme'
-import { modernTheme } from './modern/theme'
-import { highContrastTheme } from './high-contrast/theme'
 
-const builtInPresets = [
-  defaultTheme,
-  vibrantTheme,
-  professionalTheme,
-  minimalTheme,
-  naturalTheme,
-  modernTheme,
-  highContrastTheme
-]
-
-for (const preset of builtInPresets) {
-  ThemeManager.registerTheme(preset)
-}
