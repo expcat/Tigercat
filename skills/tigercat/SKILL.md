@@ -23,7 +23,7 @@ Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，
 - Component lookup: [component-index.md](references/component-index.md) -> `shared/props/{cat}.md` + `examples/{cat}.md`.
 - Vue/React notes: [vue/index.md](references/vue/index.md) / [react/index.md](references/react/index.md).
 - Binding differences: [shared/patterns/common.md](references/shared/patterns/common.md); terms: [shared/glossary.md](references/shared/glossary.md).
-- Type lookup only: [shared/api-summary.md](references/shared/api-summary.md).
+- Type lookup only: [shared/api-summary.md](references/shared/api-summary.md) (includes public hooks).
 - Table/virtual/toolbar: start from data, advanced, and composite props/examples.
 
 ## Use Rules

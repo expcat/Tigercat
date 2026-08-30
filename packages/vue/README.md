@@ -55,6 +55,12 @@ import subpaths lives in
 `Message` and `notification` are also available as imperative command APIs from
 the package root; `notification` is a command API, not a component.
 
+## Composables
+
+`useFormController`, `useDrag`, and `useChartInteraction`. Signatures are listed
+in
+[api-summary.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/shared/api-summary.md).
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)
