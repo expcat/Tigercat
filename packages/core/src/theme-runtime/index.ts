@@ -48,11 +48,13 @@ export const THEME_CSS_VARS = {
   primaryHover: '--tiger-primary-hover',
   primaryActive: '--tiger-primary-active',
   primaryDisabled: '--tiger-primary-disabled',
+  primaryForeground: '--tiger-primary-foreground',
   // Secondary colors
   secondary: '--tiger-secondary',
   secondaryHover: '--tiger-secondary-hover',
   secondaryActive: '--tiger-secondary-active',
   secondaryDisabled: '--tiger-secondary-disabled',
+  secondaryForeground: '--tiger-secondary-foreground',
   // Background hover states
   outlineBgHover: '--tiger-outline-bg-hover',
   ghostBgHover: '--tiger-ghost-bg-hover',
@@ -73,6 +75,10 @@ export const THEME_CSS_VARS = {
   success: '--tiger-success',
   warning: '--tiger-warning',
   error: '--tiger-error',
+  errorForeground: '--tiger-error-foreground',
+  errorHover: '--tiger-error-hover',
+  errorDisabled: '--tiger-error-disabled',
+  errorBgHover: '--tiger-error-bg-hover',
   info: '--tiger-info',
   // Chart palette
   chart1: '--tiger-chart-1',
@@ -91,6 +97,14 @@ export const THEME_CSS_VARS = {
   breakpointMd: '--tiger-breakpoint-md',
   breakpointLg: '--tiger-breakpoint-lg',
   breakpointXl: '--tiger-breakpoint-xl'
+} as const
+
+export const TIGER_BREAKPOINT_CSS_VALUES = {
+  breakpointXs: '0px',
+  breakpointSm: '640px',
+  breakpointMd: '768px',
+  breakpointLg: '1024px',
+  breakpointXl: '1280px'
 } as const
 
 /** Canonical semantic keys that alias CSS names resolve through. */
@@ -119,6 +133,10 @@ export function semanticColorsToCssVars(
   >) {
     const sourceKey = THEME_CSS_VAR_ALIAS_SOURCES[aliasKey]
     vars[THEME_CSS_VARS[aliasKey]] = `var(${THEME_CSS_VARS[sourceKey]})`
+  }
+
+  for (const [key, value] of Object.entries(TIGER_BREAKPOINT_CSS_VALUES)) {
+    vars[THEME_CSS_VARS[key as keyof typeof TIGER_BREAKPOINT_CSS_VALUES]] = value
   }
 
   return vars
@@ -151,14 +169,6 @@ export function removeCssVarsCached(element: HTMLElement, names: string[]): void
     cache?.delete(name)
   }
 }
-
-export const TIGER_BREAKPOINT_CSS_VALUES = {
-  breakpointXs: '0px',
-  breakpointSm: '640px',
-  breakpointMd: '768px',
-  breakpointLg: '1024px',
-  breakpointXl: '1280px'
-} as const
 
 /**
  * Helper function to set theme colors programmatically
@@ -198,9 +208,17 @@ export function setThemeColors(
 
   const vars: Record<string, string> = {}
   Object.entries(colors).forEach(([key, value]) => {
-    const varName = THEME_CSS_VARS[key as keyof typeof THEME_CSS_VARS]
+    const canonicalKey =
+      (THEME_CSS_VAR_ALIAS_SOURCES as Record<string, keyof typeof THEME_CSS_VARS>)[key] ?? key
+    const varName = THEME_CSS_VARS[canonicalKey as keyof typeof THEME_CSS_VARS]
     if (varName && value) vars[varName] = value
   })
+  for (const aliasKey of Object.keys(THEME_CSS_VAR_ALIAS_SOURCES) as Array<
+    keyof typeof THEME_CSS_VAR_ALIAS_SOURCES
+  >) {
+    const sourceKey = THEME_CSS_VAR_ALIAS_SOURCES[aliasKey]
+    vars[THEME_CSS_VARS[aliasKey]] = `var(${THEME_CSS_VARS[sourceKey]})`
+  }
   setCssVarsCached(target, vars)
 }
 
@@ -216,7 +234,11 @@ export function setThemeColors(
  * import { getThemeColor } from '@expcat/tigercat-core'
  *
  * const primaryColor = getThemeColor('primary')
- * console.log(primaryColor) // '#2563eb'
+ * console.log(primaryColor) // specified value of --tiger-primary, e.g. '#2563eb'
+ *
+ * Alias keys (`textMuted`, `fill`, `bg`) resolve through their canonical
+ * token so the return is the same hex (or specified value) as `textSecondary` /
+ * `surfaceMuted` / `surface`, not the `var(--tiger-…)` wrapper.
  * ```
  */
 export function getThemeColor(
@@ -229,7 +251,10 @@ export function getThemeColor(
     return undefined
   }
 
-  const varName = THEME_CSS_VARS[colorKey]
+  const canonicalKey =
+    (THEME_CSS_VAR_ALIAS_SOURCES as Record<string, keyof typeof THEME_CSS_VARS>)[colorKey] ??
+    colorKey
+  const varName = THEME_CSS_VARS[canonicalKey]
   const value = getComputedStyle(target).getPropertyValue(varName).trim()
 
   return value || undefined

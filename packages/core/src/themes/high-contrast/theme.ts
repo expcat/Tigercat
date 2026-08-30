@@ -2,7 +2,8 @@ import type { ThemePreset } from '../../types/theme'
 
 /**
  * High Contrast theme — maximum legibility for low-vision and forced-contrast use cases.
- * Uses near-binary surfaces plus saturated accents that pass WCAG AA contrast checks.
+ * Uses near-binary surfaces plus saturated accents. Surface/text pairs and
+ * accent fill ↔ on-color pairs are covered by theme-contrast tests.
  */
 export const highContrastTheme: ThemePreset = {
   name: 'high-contrast',
@@ -13,10 +14,12 @@ export const highContrastTheme: ThemePreset = {
       primaryHover: '#002699',
       primaryActive: '#001f80',
       primaryDisabled: '#7f8fcf',
+      primaryForeground: '#ffffff',
       secondary: '#000000',
       secondaryHover: '#1f1f1f',
       secondaryActive: '#333333',
       secondaryDisabled: '#767676',
+      secondaryForeground: '#ffffff',
       outlineBgHover: '#e6eeff',
       ghostBgHover: '#f2f2f2',
       focusRing: '#000000',
@@ -31,6 +34,10 @@ export const highContrastTheme: ThemePreset = {
       success: '#006400',
       warning: '#7a4b00',
       error: '#b00020',
+      errorForeground: '#ffffff',
+      errorHover: '#7a0016',
+      errorDisabled: '#fca5a5',
+      errorBgHover: '#fef2f2',
       info: '#0033cc',
       chart1: '#0033cc',
       chart2: '#006400',
@@ -54,10 +61,12 @@ export const highContrastTheme: ThemePreset = {
       primaryHover: '#99ccff',
       primaryActive: '#cce5ff',
       primaryDisabled: '#335c85',
+      primaryForeground: '#000000',
       secondary: '#ffffff',
       secondaryHover: '#e6e6e6',
       secondaryActive: '#cccccc',
       secondaryDisabled: '#8c8c8c',
+      secondaryForeground: '#000000',
       outlineBgHover: '#001f3f',
       ghostBgHover: '#1a1a1a',
       focusRing: '#ffff00',
@@ -72,6 +81,10 @@ export const highContrastTheme: ThemePreset = {
       success: '#00e676',
       warning: '#ffd54f',
       error: '#ff8a80',
+      errorForeground: '#000000',
+      errorHover: '#ffcdd2',
+      errorDisabled: '#b71c1c',
+      errorBgHover: '#1a1a1a',
       info: '#80d8ff',
       chart1: '#66b2ff',
       chart2: '#00e676',

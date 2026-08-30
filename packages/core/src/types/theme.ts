@@ -43,11 +43,15 @@ export interface ThemeSemanticColors {
   primaryHover: string
   primaryActive: string
   primaryDisabled: string
+  /** Text / icon color that sits on `primary` fills */
+  primaryForeground: string
 
   secondary: string
   secondaryHover: string
   secondaryActive: string
   secondaryDisabled: string
+  /** Text / icon color that sits on `secondary` fills */
+  secondaryForeground: string
 
   /** Button-specific hover backgrounds */
   outlineBgHover: string
@@ -74,6 +78,11 @@ export interface ThemeSemanticColors {
   success: string
   warning: string
   error: string
+  /** Text / icon color that sits on `error` fills */
+  errorForeground: string
+  errorHover: string
+  errorDisabled: string
+  errorBgHover: string
   info: string
 
   /** Chart palette (6 colors) */

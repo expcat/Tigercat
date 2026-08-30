@@ -30,9 +30,9 @@ export const buttonDisabledClasses = 'cursor-not-allowed opacity-60'
  */
 export const buttonDangerClasses: Record<string, string> = {
   primary:
-    'bg-[var(--tiger-error,#dc2626)] hover:bg-[var(--tiger-error-hover,#b91c1c)] text-white focus:ring-[var(--tiger-error,#dc2626)] disabled:bg-[var(--tiger-error-disabled,#fca5a5)]',
+    'bg-[var(--tiger-error,#dc2626)] hover:bg-[var(--tiger-error-hover,#b91c1c)] text-[var(--tiger-error-foreground,#ffffff)] focus:ring-[var(--tiger-error,#dc2626)] disabled:bg-[var(--tiger-error-disabled,#fca5a5)]',
   secondary:
-    'bg-[var(--tiger-error,#dc2626)] hover:bg-[var(--tiger-error-hover,#b91c1c)] text-white focus:ring-[var(--tiger-error,#dc2626)] disabled:bg-[var(--tiger-error-disabled,#fca5a5)]',
+    'bg-[var(--tiger-error,#dc2626)] hover:bg-[var(--tiger-error-hover,#b91c1c)] text-[var(--tiger-error-foreground,#ffffff)] focus:ring-[var(--tiger-error,#dc2626)] disabled:bg-[var(--tiger-error-disabled,#fca5a5)]',
   outline:
     'bg-transparent hover:bg-[var(--tiger-error-bg-hover,#fef2f2)] text-[var(--tiger-error,#dc2626)] border-2 border-[var(--tiger-error,#dc2626)] focus:ring-[var(--tiger-error,#dc2626)] disabled:border-[var(--tiger-error-disabled,#fca5a5)] disabled:text-[var(--tiger-error-disabled,#fca5a5)]',
   ghost:

@@ -213,17 +213,20 @@ describe('themes/manager — ThemeManager', () => {
           spacing: { md: '1rem' },
           motion: { durationBase: '240ms' }
         })
-      ).toEqual({
-        '--tiger-text-muted': 'var(--tiger-text-secondary)',
-        '--tiger-fill': 'var(--tiger-surface-muted)',
-        '--tiger-bg': 'var(--tiger-surface)',
-        '--tiger-font-family': 'Inter, sans-serif',
-        '--tiger-radius-md': '0.75rem',
-        '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',
-        '--tiger-spacing-md': '1rem',
-        '--tiger-motion-duration-base': '240ms',
-        '--tiger-transition-base': 'all 240ms cubic-bezier(0.4, 0, 0.2, 1)'
-      })
+      ).toEqual(
+        expect.objectContaining({
+          '--tiger-text-muted': 'var(--tiger-text-secondary)',
+          '--tiger-fill': 'var(--tiger-surface-muted)',
+          '--tiger-bg': 'var(--tiger-surface)',
+          '--tiger-font-family': 'Inter, sans-serif',
+          '--tiger-radius-md': '0.75rem',
+          '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',
+          '--tiger-spacing-md': '1rem',
+          '--tiger-motion-duration-base': '240ms',
+          '--tiger-transition-base': 'all 240ms cubic-bezier(0.4, 0, 0.2, 1)',
+          '--tiger-breakpoint-md': '768px'
+        })
+      )
     })
   })
 

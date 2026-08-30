@@ -82,14 +82,14 @@ export const defaultThemeColors: ThemeColors = {
   primary: {
     bg: 'bg-[var(--tiger-primary,#2563eb)]',
     bgHover: 'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
-    text: 'text-white',
+    text: 'text-[var(--tiger-primary-foreground,#ffffff)]',
     focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
     disabled: 'disabled:bg-[var(--tiger-primary-disabled,#93c5fd)]'
   },
   secondary: {
     bg: 'bg-[var(--tiger-secondary,#4b5563)]',
     bgHover: 'hover:bg-[var(--tiger-secondary-hover,#374151)]',
-    text: 'text-white',
+    text: 'text-[var(--tiger-secondary-foreground,#ffffff)]',
     focus: 'focus:ring-[var(--tiger-secondary,#4b5563)]',
     disabled: 'disabled:bg-[var(--tiger-secondary-disabled,#9ca3af)]'
   },
@@ -199,7 +199,7 @@ export const defaultRadioColors: RadioColorScheme = {
   innerDot: 'bg-[var(--tiger-surface,#ffffff)]',
   focus: 'ring-[var(--tiger-primary,#2563eb)]',
   disabled: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#d1d5db)]',
-  textDisabled: 'text-[var(--tiger-text-muted,#6b7280)]'
+  textDisabled: 'text-[var(--tiger-text-disabled,#d1d5db)]'
 }
 
 /**
@@ -265,10 +265,10 @@ export const defaultLinkThemeColors: LinkThemeColors = {
     disabled: 'text-[var(--tiger-secondary-disabled,#9ca3af)]'
   },
   default: {
-    text: 'text-gray-700',
-    textHover: 'hover:text-gray-900',
-    focus: 'focus:ring-gray-500',
-    disabled: 'text-gray-400'
+    text: 'text-[var(--tiger-text,#111827)]',
+    textHover: 'hover:text-[var(--tiger-text-secondary,#6b7280)]',
+    focus: 'focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    disabled: 'text-[var(--tiger-text-disabled,#d1d5db)]'
   }
 }
 
@@ -420,40 +420,40 @@ export interface TagThemeColors {
  */
 export const defaultTagThemeColors: TagThemeColors = {
   default: {
-    bg: 'bg-[var(--tiger-tag-default-bg,var(--tiger-surface-muted,#f9fafb))]',
+    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
     text: 'text-[var(--tiger-text,#111827)]',
     border: 'border-[var(--tiger-border,#e5e7eb)]',
-    closeBgHover: 'hover:bg-[var(--tiger-tag-default-close-hover,#e5e7eb)]'
+    closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
   },
   primary: {
-    bg: 'bg-[var(--tiger-tag-primary-bg,#dbeafe)]',
+    bg: 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
     text: 'text-[var(--tiger-primary,#2563eb)]',
-    border: 'border-[var(--tiger-tag-primary-border,#bfdbfe)]',
-    closeBgHover: 'hover:bg-[var(--tiger-tag-primary-close-hover,#bfdbfe)]'
+    border: 'border-[var(--tiger-primary-disabled,#93c5fd)]',
+    closeBgHover: 'hover:bg-[var(--tiger-primary-disabled,#93c5fd)]'
   },
   success: {
-    bg: 'bg-[var(--tiger-tag-success-bg,#dcfce7)]',
+    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
     text: 'text-[var(--tiger-success,#16a34a)]',
-    border: 'border-[var(--tiger-tag-success-border,#bbf7d0)]',
-    closeBgHover: 'hover:bg-[var(--tiger-tag-success-close-hover,#bbf7d0)]'
+    border: 'border-[var(--tiger-border,#e5e7eb)]',
+    closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-tag-warning-bg,#fef9c3)]',
-    text: 'text-[var(--tiger-warning,#ca8a04)]',
-    border: 'border-[var(--tiger-tag-warning-border,#fef08a)]',
-    closeBgHover: 'hover:bg-[var(--tiger-tag-warning-close-hover,#fef08a)]'
+    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
+    text: 'text-[var(--tiger-warning,#d97706)]',
+    border: 'border-[var(--tiger-border,#e5e7eb)]',
+    closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
   },
   danger: {
-    bg: 'bg-[var(--tiger-tag-danger-bg,#fee2e2)]',
+    bg: 'bg-[var(--tiger-error-bg-hover,#fef2f2)]',
     text: 'text-[var(--tiger-error,#dc2626)]',
-    border: 'border-[var(--tiger-tag-danger-border,#fecaca)]',
-    closeBgHover: 'hover:bg-[var(--tiger-tag-danger-close-hover,#fecaca)]'
+    border: 'border-[var(--tiger-error-disabled,#fca5a5)]',
+    closeBgHover: 'hover:bg-[var(--tiger-error-disabled,#fca5a5)]'
   },
   info: {
-    bg: 'bg-[var(--tiger-tag-info-bg,#e0f2fe)]',
+    bg: 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
     text: 'text-[var(--tiger-info,#3b82f6)]',
-    border: 'border-[var(--tiger-tag-info-border,#bae6fd)]',
-    closeBgHover: 'hover:bg-[var(--tiger-tag-info-close-hover,#bae6fd)]'
+    border: 'border-[var(--tiger-primary-disabled,#93c5fd)]',
+    closeBgHover: 'hover:bg-[var(--tiger-primary-disabled,#93c5fd)]'
   }
 }
 
@@ -501,27 +501,27 @@ export interface BadgeThemeColors {
 export const defaultBadgeThemeColors: BadgeThemeColors = {
   default: {
     bg: 'bg-[var(--tiger-text-muted,#6b7280)]',
-    text: 'text-white'
+    text: 'text-[var(--tiger-secondary-foreground,#ffffff)]'
   },
   primary: {
     bg: 'bg-[var(--tiger-primary,#2563eb)]',
-    text: 'text-white'
+    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   success: {
     bg: 'bg-[var(--tiger-success,#16a34a)]',
-    text: 'text-white'
+    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-warning,#ca8a04)]',
-    text: 'text-white'
+    bg: 'bg-[var(--tiger-warning,#d97706)]',
+    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   danger: {
     bg: 'bg-[var(--tiger-error,#dc2626)]',
-    text: 'text-white'
+    text: 'text-[var(--tiger-error-foreground,#ffffff)]'
   },
   info: {
     bg: 'bg-[var(--tiger-info,#3b82f6)]',
-    text: 'text-white'
+    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   }
 }
 
@@ -604,16 +604,16 @@ export const defaultProgressThemeColors: ProgressThemeColors = {
     text: 'text-[color:var(--tiger-success,#16a34a)]'
   },
   warning: {
-    bg: 'bg-[color:var(--tiger-warning,#f59e0b)]',
-    text: 'text-[color:var(--tiger-warning,#f59e0b)]'
+    bg: 'bg-[color:var(--tiger-warning,#d97706)]',
+    text: 'text-[color:var(--tiger-warning,#d97706)]'
   },
   danger: {
     bg: 'bg-[color:var(--tiger-error,#dc2626)]',
     text: 'text-[color:var(--tiger-error,#dc2626)]'
   },
   info: {
-    bg: 'bg-[color:var(--tiger-info,#0ea5e9)]',
-    text: 'text-[color:var(--tiger-info,#0ea5e9)]'
+    bg: 'bg-[color:var(--tiger-info,#3b82f6)]',
+    text: 'text-[color:var(--tiger-info,#3b82f6)]'
   }
 }
 
@@ -721,50 +721,44 @@ export interface AlertThemeColors {
  */
 export const defaultAlertThemeColors: AlertThemeColors = {
   success: {
-    bg: 'bg-[var(--tiger-alert-success-bg,var(--tiger-surface,#ffffff))]',
-    border: 'border-[var(--tiger-alert-success-border,var(--tiger-border,#e5e7eb))]',
-    icon: 'text-[var(--tiger-alert-success-icon,var(--tiger-success,#16a34a))]',
-    title: 'text-[var(--tiger-alert-success-title,var(--tiger-success,#16a34a))]',
-    description:
-      'text-[var(--tiger-alert-success-description,var(--tiger-text-secondary,#6b7280))]',
-    closeButton: 'text-[var(--tiger-alert-success-close,var(--tiger-success,#16a34a))]',
-    closeButtonHover:
-      'hover:bg-[var(--tiger-alert-success-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
-    focus: 'focus:ring-[color:var(--tiger-alert-success-ring,var(--tiger-success,#16a34a))]'
+    bg: 'bg-[var(--tiger-surface,#ffffff)]',
+    border: 'border-[var(--tiger-border,#e5e7eb)]',
+    icon: 'text-[var(--tiger-success,#16a34a)]',
+    title: 'text-[var(--tiger-success,#16a34a)]',
+    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
+    closeButton: 'text-[var(--tiger-success,#16a34a)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+    focus: 'focus:ring-[color:var(--tiger-success,#16a34a)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-alert-warning-bg,var(--tiger-surface,#ffffff))]',
-    border: 'border-[var(--tiger-alert-warning-border,var(--tiger-border,#e5e7eb))]',
-    icon: 'text-[var(--tiger-alert-warning-icon,var(--tiger-warning,#d97706))]',
-    title: 'text-[var(--tiger-alert-warning-title,var(--tiger-warning,#d97706))]',
-    description:
-      'text-[var(--tiger-alert-warning-description,var(--tiger-text-secondary,#6b7280))]',
-    closeButton: 'text-[var(--tiger-alert-warning-close,var(--tiger-warning,#d97706))]',
-    closeButtonHover:
-      'hover:bg-[var(--tiger-alert-warning-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
-    focus: 'focus:ring-[color:var(--tiger-alert-warning-ring,var(--tiger-warning,#d97706))]'
+    bg: 'bg-[var(--tiger-surface,#ffffff)]',
+    border: 'border-[var(--tiger-border,#e5e7eb)]',
+    icon: 'text-[var(--tiger-warning,#d97706)]',
+    title: 'text-[var(--tiger-warning,#d97706)]',
+    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
+    closeButton: 'text-[var(--tiger-warning,#d97706)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+    focus: 'focus:ring-[color:var(--tiger-warning,#d97706)]'
   },
   error: {
-    bg: 'bg-[var(--tiger-alert-error-bg,var(--tiger-surface,#ffffff))]',
-    border: 'border-[var(--tiger-alert-error-border,var(--tiger-border,#e5e7eb))]',
-    icon: 'text-[var(--tiger-alert-error-icon,var(--tiger-error,#dc2626))]',
-    title: 'text-[var(--tiger-alert-error-title,var(--tiger-error,#dc2626))]',
-    description: 'text-[var(--tiger-alert-error-description,var(--tiger-text-secondary,#6b7280))]',
-    closeButton: 'text-[var(--tiger-alert-error-close,var(--tiger-error,#dc2626))]',
-    closeButtonHover:
-      'hover:bg-[var(--tiger-alert-error-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
-    focus: 'focus:ring-[color:var(--tiger-alert-error-ring,var(--tiger-error,#dc2626))]'
+    bg: 'bg-[var(--tiger-surface,#ffffff)]',
+    border: 'border-[var(--tiger-border,#e5e7eb)]',
+    icon: 'text-[var(--tiger-error,#dc2626)]',
+    title: 'text-[var(--tiger-error,#dc2626)]',
+    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
+    closeButton: 'text-[var(--tiger-error,#dc2626)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+    focus: 'focus:ring-[color:var(--tiger-error,#dc2626)]'
   },
   info: {
-    bg: 'bg-[var(--tiger-alert-info-bg,var(--tiger-surface,#ffffff))]',
-    border: 'border-[var(--tiger-alert-info-border,var(--tiger-border,#e5e7eb))]',
-    icon: 'text-[var(--tiger-alert-info-icon,var(--tiger-info,#3b82f6))]',
-    title: 'text-[var(--tiger-alert-info-title,var(--tiger-info,#3b82f6))]',
-    description: 'text-[var(--tiger-alert-info-description,var(--tiger-text-secondary,#6b7280))]',
-    closeButton: 'text-[var(--tiger-alert-info-close,var(--tiger-info,#3b82f6))]',
-    closeButtonHover:
-      'hover:bg-[var(--tiger-alert-info-close-hover-bg,var(--tiger-surface-muted,#f9fafb))]',
-    focus: 'focus:ring-[color:var(--tiger-alert-info-ring,var(--tiger-info,#3b82f6))]'
+    bg: 'bg-[var(--tiger-surface,#ffffff)]',
+    border: 'border-[var(--tiger-border,#e5e7eb)]',
+    icon: 'text-[var(--tiger-info,#3b82f6)]',
+    title: 'text-[var(--tiger-info,#3b82f6)]',
+    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
+    closeButton: 'text-[var(--tiger-info,#3b82f6)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+    focus: 'focus:ring-[color:var(--tiger-info,#3b82f6)]'
   }
 }
 

@@ -82,6 +82,27 @@ const ACCENT_CHECKS: ContrastCheck[] = [
   { fgKey: 'error', bgKey: 'surface', min: 3, label: 'error ↔ surface' }
 ]
 
+const ON_COLOR_CHECKS: ContrastCheck[] = [
+  {
+    fgKey: 'primaryForeground',
+    bgKey: 'primary',
+    min: 4.5,
+    label: 'primaryForeground ↔ primary'
+  },
+  {
+    fgKey: 'secondaryForeground',
+    bgKey: 'secondary',
+    min: 4.5,
+    label: 'secondaryForeground ↔ secondary'
+  },
+  {
+    fgKey: 'errorForeground',
+    bgKey: 'error',
+    min: 4.5,
+    label: 'errorForeground ↔ error'
+  }
+]
+
 const STATUS_HUE_CHECKS: ContrastCheck[] = [
   { fgKey: 'success', bgKey: 'surface', min: 2.0, label: 'success ↔ surface' },
   { fgKey: 'warning', bgKey: 'surface', min: 2.0, label: 'warning ↔ surface' },
@@ -144,6 +165,14 @@ describe('Theme contrast — WCAG AA', () => {
 
       it('dark scheme: status hues on surface stay ≥ 2.0 (regression guard)', () => {
         runChecks('dark', preset.dark?.colors, STATUS_HUE_CHECKS)
+      })
+
+      it('light scheme: accent fill ↔ on-color meets 4.5:1', () => {
+        runChecks('light', preset.light?.colors, ON_COLOR_CHECKS)
+      })
+
+      it('dark scheme: accent fill ↔ on-color meets 4.5:1', () => {
+        runChecks('dark', preset.dark?.colors, ON_COLOR_CHECKS)
       })
     })
   }
