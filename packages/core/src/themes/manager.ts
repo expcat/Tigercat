@@ -19,6 +19,34 @@ import {
   setCssVarsCached
 } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
+import { defaultTheme } from './default/theme'
+
+/**
+ * Merge a preset segment onto the default theme for the same scheme.
+ * Missing colors / radius / motion / etc. fall back to `base`.
+ */
+export function mergeThemeConfig(
+  base: ThemeConfig = {},
+  override: ThemeConfig = {}
+): ThemeConfig {
+  return {
+    colors: { ...base.colors, ...override.colors },
+    typography: { ...base.typography, ...override.typography },
+    radius: { ...base.radius, ...override.radius },
+    shadows: { ...base.shadows, ...override.shadows },
+    spacing: { ...base.spacing, ...override.spacing },
+    motion: { ...base.motion, ...override.motion }
+  }
+}
+
+/** Resolve a preset's light or dark config with default-theme fallbacks. */
+export function resolvePresetThemeConfig(
+  preset: ThemePreset | undefined,
+  scheme: 'light' | 'dark',
+  fallback: ThemePreset = defaultTheme
+): ThemeConfig {
+  return mergeThemeConfig(fallback[scheme], preset?.[scheme] ?? {})
+}
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -226,14 +254,13 @@ class ThemeManagerImpl {
 
     const root = document.documentElement
     const preset = this.presets.get(this.currentThemeName)
+    const scheme = this.resolvedDark ? 'dark' : 'light'
+    const config = resolvePresetThemeConfig(preset, scheme)
 
-    // Clear previous inline variables so preset defaults flow through
+    // Replace the previous inline theme with the merged config so missing
+    // segments fall back to the default theme instead of disappearing.
     clearThemeConfig(root)
-
-    if (preset) {
-      const config = this.resolvedDark ? preset.dark : preset.light
-      setCssVarsCached(root, themeConfigToCssVars(config))
-    }
+    setCssVarsCached(root, themeConfigToCssVars(config))
 
     // Toggle `.dark` class on <html>
     if (this.resolvedDark) {

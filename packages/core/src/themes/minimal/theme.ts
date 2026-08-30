@@ -80,6 +80,7 @@ export const minimalTheme: ThemePreset = {
       chart5: '#d4d4d8',
       chart6: '#e4e4e7'
     },
+    radius: { sm: '2px', md: '4px', lg: '6px', xl: '8px', none: '0', full: '9999px' },
     shadows: {
       xs: '0 1px 2px 0 rgba(0,0,0,0.3)',
       sm: '0 1px 2px 0 rgba(0,0,0,0.4)',

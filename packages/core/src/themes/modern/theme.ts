@@ -92,12 +92,19 @@ export const modernTheme: ThemePreset = {
       chart5: '#38bdf8',
       chart6: '#f87171'
     },
+    radius: { none: '0', sm: '8px', md: '12px', lg: '16px', xl: '20px', full: '9999px' },
     shadows: {
       xs: '0 1px 2px 0 rgb(2 6 23 / 0.4)',
       sm: '0 1px 2px 0 rgb(2 6 23 / 0.5)',
       md: '0 4px 8px -2px rgb(2 6 23 / 0.55), 0 2px 4px -1px rgb(2 6 23 / 0.4)',
       lg: '0 12px 24px -4px rgb(2 6 23 / 0.55), 0 4px 8px -2px rgb(2 6 23 / 0.4)',
       xl: '0 24px 48px -8px rgb(2 6 23 / 0.6), 0 8px 16px -4px rgb(2 6 23 / 0.45)'
+    },
+    motion: {
+      durationFast: '150ms',
+      durationBase: '200ms',
+      durationSlow: '300ms',
+      easing: 'cubic-bezier(0.2, 0, 0, 1)'
     }
   }
 }

@@ -80,6 +80,7 @@ export const highContrastTheme: ThemePreset = {
       chart5: '#80d8ff',
       chart6: '#ff8a80'
     },
+    radius: { sm: '2px', md: '4px', lg: '6px', xl: '8px', none: '0', full: '9999px' },
     shadows: {
       xs: '0 0 0 1px #ffffff',
       sm: '0 0 0 1px #ffffff',

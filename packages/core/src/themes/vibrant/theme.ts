@@ -72,6 +72,7 @@ export const vibrantTheme: ThemePreset = {
       chart4: '#22d3ee',
       chart5: '#34d399',
       chart6: '#fb7185'
-    }
+    },
+    radius: { sm: '6px', md: '10px', lg: '14px', xl: '18px', none: '0', full: '9999px' }
   }
 }

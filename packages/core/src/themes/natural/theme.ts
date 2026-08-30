@@ -85,6 +85,20 @@ export const naturalTheme: ThemePreset = {
       chart4: '#fcd34d',
       chart5: '#2dd4bf',
       chart6: '#fb7185'
+    },
+    radius: { sm: '6px', md: '8px', lg: '12px', xl: '16px', none: '0', full: '9999px' },
+    typography: {
+      fontFamily: "'Source Sans 3', 'Georgia', -apple-system, sans-serif",
+      fontFamilyMono: "'Source Code Pro', 'Menlo', monospace",
+      fontSizeBase: '16px',
+      fontSizeSm: '14px',
+      fontSizeLg: '18px',
+      fontWeightNormal: '400',
+      fontWeightMedium: '500',
+      fontWeightSemibold: '600',
+      fontWeightBold: '700',
+      lineHeightNormal: '1.6',
+      lineHeightTight: '1.3'
     }
   }
 }

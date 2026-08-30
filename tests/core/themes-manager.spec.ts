@@ -4,6 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
+  defaultTheme,
   themeConfigToCssVars,
   ThemeManager,
   setCssVarsCached,
@@ -150,13 +151,16 @@ describe('themes/manager — ThemeManager', () => {
       warnSpy.mockRestore()
     })
 
-    it('clears previous inline variables when switching themes', () => {
+    it('merges missing segments from the default theme when switching presets', () => {
       ThemeManager.defineTheme({
         name: 'with-extra',
         label: 'With extra',
         light: {
           colors: { primary: '#abcdef' },
           radius: { md: '12px' }
+        },
+        dark: {
+          colors: { primary: '#fedcba' }
         }
       })
       expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('#abcdef')
@@ -164,12 +168,27 @@ describe('themes/manager — ThemeManager', () => {
       ThemeManager.defineTheme({
         name: 'without-primary',
         label: 'Without',
-        light: { colors: { surface: '#111111' } }
+        light: { colors: { surface: '#111111' } },
+        dark: { colors: { surface: '#000000' } }
       })
-      // Previous primary value must have been cleared.
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('')
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('')
       expect(document.documentElement.style.getPropertyValue('--tiger-surface')).toBe('#111111')
+      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe(
+        defaultTheme.light.colors?.primary
+      )
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
+        defaultTheme.light.radius?.md
+      )
+    })
+
+    it('keeps default radius when switching the default theme to dark', () => {
+      ThemeManager.setTheme('default')
+      ThemeManager.setColorScheme('dark')
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
+        defaultTheme.dark.radius?.md
+      )
+      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe(
+        defaultTheme.dark.colors?.primary
+      )
     })
 
     it('maps non-color ThemeConfig sections to runtime CSS variables', () => {

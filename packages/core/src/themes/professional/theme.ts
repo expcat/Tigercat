@@ -85,6 +85,20 @@ export const professionalTheme: ThemePreset = {
       chart4: '#c084fc',
       chart5: '#22d3ee',
       chart6: '#f87171'
+    },
+    radius: { sm: '2px', md: '4px', lg: '8px', xl: '10px', none: '0', full: '9999px' },
+    typography: {
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      fontFamilyMono: "'JetBrains Mono', 'SF Mono', monospace",
+      fontSizeBase: '15px',
+      fontSizeSm: '13px',
+      fontSizeLg: '17px',
+      fontWeightNormal: '400',
+      fontWeightMedium: '500',
+      fontWeightSemibold: '600',
+      fontWeightBold: '700',
+      lineHeightNormal: '1.5',
+      lineHeightTight: '1.25'
     }
   }
 }
