@@ -9,6 +9,7 @@ import { Code } from '@expcat/tigercat-vue/Code'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Code (Vue)', () => {
@@ -231,6 +232,17 @@ describe('Code (Vue)', () => {
       expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
     })
 
+    it('uses ConfigProvider zh-TW Traditional copy labels', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhTW }, () => h(Code, { code: 'x = 1' }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: '複製' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: '复制' })).not.toBeInTheDocument()
+    })
+
     it('lets explicit copyLabel win under zh-CN', () => {
       const Wrapper = defineComponent({
         setup() {
@@ -262,21 +274,27 @@ describe('Code (Vue)', () => {
   })
 
   describe('Accessibility', () => {
-    it('copy button has aria-label matching copyLabel', () => {
+    it('uses the visible copy label as the accessible name', () => {
       render(Code, { props: { code: 'test', copyLabel: 'Copy code' } })
-      expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Copy code')
+      expect(screen.getByRole('button', { name: 'Copy code' })).toBeInTheDocument()
     })
 
-    it('aria-label changes to copiedLabel after copy', async () => {
+    it('announces copy status in a polite live region', async () => {
       const writeText = vi.fn().mockResolvedValue(undefined)
       Object.defineProperty(navigator, 'clipboard', {
         value: { writeText },
         configurable: true
       })
 
-      render(Code, { props: { code: 'test', copyLabel: 'Copy', copiedLabel: 'Copied!' } })
+      const { container } = render(Code, {
+        props: { code: 'test', copyLabel: 'Copy', copiedLabel: 'Copied!' }
+      })
+      const live = container.querySelector('[aria-live="polite"]')
+      expect(live).toBeInTheDocument()
+      expect(live).toHaveTextContent('')
       await fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
       expect(await screen.findByRole('button', { name: 'Copied!' })).toBeInTheDocument()
+      expect(live).toHaveTextContent('Copied!')
     })
 
     it('copy button has type="button"', () => {

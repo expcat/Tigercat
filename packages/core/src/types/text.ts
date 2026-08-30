@@ -32,9 +32,25 @@ export type TextWeight =
   'thin' | 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold' | 'black'
 
 /**
- * Text alignment types
+ * Text alignment types. Physical `left`/`right` map to `start`/`end` at runtime.
  */
-export type TextAlign = 'left' | 'center' | 'right' | 'justify'
+export type TextAlign = 'start' | 'center' | 'end' | 'justify'
+
+export const TEXT_TAGS: readonly TextTag[] = [
+  'p',
+  'span',
+  'div',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'label',
+  'strong',
+  'em',
+  'small'
+]
 
 /**
  * Text color types

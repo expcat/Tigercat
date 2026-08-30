@@ -2,12 +2,14 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
+  CODE_COPY_STATUS_RESET_MS,
   codeBlockContainerClasses,
   codeBlockCopyButtonBaseClasses,
   codeBlockCopyButtonCopiedClasses,
   codeBlockCopyButtonFailedClasses,
+  createCopyStatusReset,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses
 } from '@expcat/tigercat-core'
@@ -39,5 +41,25 @@ describe('code-utils', () => {
     expect(failedClasses).toContain(codeBlockCopyButtonBaseClasses)
     expect(failedClasses).toContain(codeBlockCopyButtonFailedClasses)
     expect(failedClasses).not.toContain(codeBlockCopyButtonCopiedClasses)
+  })
+
+  it('places the copy control on the logical end edge with a 24px minimum box', () => {
+    const tokens = codeBlockCopyButtonBaseClasses.split(/\s+/)
+    expect(tokens).toContain('end-3')
+    expect(tokens).not.toContain('right-3')
+    expect(tokens).toContain('min-h-6')
+    expect(tokens).toContain('min-w-6')
+  })
+
+  it('resets copy status after the shared timeout', () => {
+    vi.useFakeTimers()
+    const setStatus = vi.fn()
+    const machine = createCopyStatusReset(setStatus)
+    machine.schedule('copied')
+    expect(setStatus).toHaveBeenCalledWith('copied')
+    vi.advanceTimersByTime(CODE_COPY_STATUS_RESET_MS)
+    expect(setStatus).toHaveBeenCalledWith('idle')
+    machine.dispose()
+    vi.useRealTimers()
   })
 })

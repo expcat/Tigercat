@@ -1,6 +1,7 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
   getTextClasses,
+  resolveTextTag,
   type TextProps,
   type TextTag,
   type TextSize,
@@ -16,7 +17,7 @@ export const Text = defineComponent({
   inheritAttrs: false,
   props: {
     /**
-     * HTML tag to render
+     * HTML tag to render. Only the TextTag whitelist is allowed.
      * @default 'p'
      */
     tag: {
@@ -40,7 +41,7 @@ export const Text = defineComponent({
       default: 'normal' as TextWeight
     },
     /**
-     * Text alignment
+     * Logical text alignment (`start` / `center` / `end` / `justify`)
      */
     align: {
       type: String as PropType<TextAlign>
@@ -88,9 +89,10 @@ export const Text = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const textClasses = computed(() => getTextClasses(props))
+    const resolvedTag = computed(() => resolveTextTag(props.tag))
 
     return () =>
-      h(props.tag, { ...attrs, class: [textClasses.value, attrs.class] }, slots.default?.())
+      h(resolvedTag.value, { ...attrs, class: [textClasses.value, attrs.class] }, slots.default?.())
   }
 })
 

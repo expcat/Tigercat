@@ -94,4 +94,28 @@ describe('Text (Vue)', () => {
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
     await expectNoA11yViolationsIsolated(container)
   })
+
+  it('renders a whitelist fallback for an illegal tag', () => {
+    const { container } = renderWithProps(
+      Text,
+      { tag: 'script' as 'p' },
+      { slots: { default: 'Safe' } }
+    )
+    expect(container.querySelector('script')).toBeNull()
+    expect(container.querySelector('p')).toHaveTextContent('Safe')
+  })
+
+  it('applies logical start alignment', () => {
+    const style = document.createElement('style')
+    style.textContent = '.text-start { text-align: start; }'
+    document.head.appendChild(style)
+    const { container } = render(Text, {
+      props: { align: 'start' },
+      slots: { default: 'RTL start' },
+      attrs: { dir: 'rtl' }
+    })
+    const el = container.querySelector('p') as HTMLElement
+    expect(getComputedStyle(el).textAlign).toBe('start')
+    style.remove()
+  })
 })

@@ -43,21 +43,24 @@ describe('Link (Vue)', () => {
       props: { variant: 'default' },
       slots: { default: 'Def' }
     })
-    expect(c2.querySelector('a')?.className).toContain('text-gray-700')
+    expect(c2.querySelector('a')?.className).toContain('--tiger-text')
+    expect(c2.querySelector('a')?.className).not.toContain('text-gray-')
   })
-  it('adds hover:underline when underline=true (default)', () => {
+  it('underlines at rest when underline is true', () => {
     const { container } = render(Link, {
       slots: { default: 'U' }
     })
-    expect(container.querySelector('a')).toHaveClass('hover:underline')
+    expect(container.querySelector('a')).toHaveClass('underline')
+    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
   })
 
-  it('omits hover:underline when underline=false', () => {
+  it('omits underline when underline=false', () => {
     const { container } = render(Link, {
       props: { underline: false },
       slots: { default: 'U' }
     })
-    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
+    expect(container.querySelector('a')).toHaveClass('no-underline')
+    expect(container.querySelector('a')).not.toHaveClass('underline')
   })
 
   it('emits click event when not disabled', async () => {
@@ -82,8 +85,9 @@ describe('Link (Vue)', () => {
 
     const link = container.querySelector('a')
     expect(link).toHaveAttribute('aria-disabled', 'true')
-    expect(link).not.toHaveAttribute('href')
+    expect(link).toHaveAttribute('href', '/test')
     expect(link).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('link', { name: 'Disabled' })).toBe(link)
 
     await fireEvent.click(screen.getByText('Disabled'))
     expect(onClick).not.toHaveBeenCalled()
@@ -98,13 +102,28 @@ describe('Link (Vue)', () => {
     expect(container.querySelector('a')).toHaveAttribute('rel', 'noopener noreferrer')
   })
 
-  it('preserves custom rel when provided', () => {
+  it('merges secure tokens into a custom _blank rel', () => {
     const { container } = render(Link, {
       props: { href: 'https://example.com', target: '_blank', rel: 'nofollow' },
       slots: { default: 'Custom' }
     })
 
-    expect(container.querySelector('a')).toHaveAttribute('rel', 'nofollow')
+    const tokens = new Set((container.querySelector('a')?.getAttribute('rel') ?? '').split(/\s+/))
+    expect(tokens.has('nofollow')).toBe(true)
+    expect(tokens.has('noopener')).toBe(true)
+    expect(tokens.has('noreferrer')).toBe(true)
+  })
+
+  it('forwards keydown on an enabled link', async () => {
+    const onKeydown = vi.fn()
+    const { container } = render(Link, {
+      props: { href: '/test' },
+      slots: { default: 'Go' },
+      attrs: { onKeydown }
+    })
+
+    await fireEvent.keyDown(container.querySelector('a') as HTMLAnchorElement, { key: 'Enter' })
+    expect(onKeydown).toHaveBeenCalledOnce()
   })
 
   it('has no accessibility violations', async () => {

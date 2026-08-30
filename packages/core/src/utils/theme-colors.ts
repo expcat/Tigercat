@@ -242,7 +242,7 @@ export interface LinkThemeColors {
   secondary: LinkColorScheme
 
   /**
-   * Default link theme (uses gray color)
+   * Default link theme (uses semantic text tokens)
    */
   default: LinkColorScheme
 }
@@ -281,11 +281,13 @@ export const defaultLinkThemeColors: LinkThemeColors = {
  *   disabled styling is applied directly when `options.disabled` is true.
  */
 export function getLinkVariantClasses(
-  variant: keyof LinkThemeColors,
+  variant?: string,
   colors?: LinkThemeColors,
   options?: { disabled?: boolean }
 ): string {
-  const scheme = (colors ?? defaultLinkThemeColors)[variant]
+  const palette = colors ?? defaultLinkThemeColors
+  const resolved = variant && variant in palette ? (variant as keyof LinkThemeColors) : 'primary'
+  const scheme = palette[resolved]
   if (options?.disabled) return scheme.disabled
   return `${scheme.text} ${scheme.textHover}`
 }
@@ -324,9 +326,9 @@ export const textWeightClasses = {
  * Text alignment classes mapping
  */
 export const textAlignClasses = {
-  left: 'text-left',
+  start: 'text-start',
   center: 'text-center',
-  right: 'text-right',
+  end: 'text-end',
   justify: 'text-justify'
 } as const
 

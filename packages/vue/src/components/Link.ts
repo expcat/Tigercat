@@ -1,11 +1,7 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  classNames,
-  getLinkVariantClasses,
   getSecureRel,
-  linkBaseClasses,
-  linkDisabledClasses,
-  linkSizeClasses,
+  resolveLinkClasses,
   type LinkVariant,
   type LinkSize
 } from '@expcat/tigercat-core'
@@ -18,6 +14,16 @@ export interface VueLinkProps {
   target?: '_blank' | '_self' | '_parent' | '_top'
   rel?: string
   underline?: boolean
+}
+
+function callListener(listener: unknown, event: Event): void {
+  if (typeof listener === 'function') {
+    listener(event)
+    return
+  }
+  if (Array.isArray(listener)) {
+    for (const item of listener) callListener(item, event)
+  }
 }
 
 export const Link = defineComponent({
@@ -43,9 +49,9 @@ export const Link = defineComponent({
     target: {
       type: String as PropType<'_blank' | '_self' | '_parent' | '_top'>
     },
-    /** Auto-set to 'noopener noreferrer' when target="_blank" */
+    /** `_blank` always merges noopener noreferrer into rel */
     rel: { type: String },
-    /** @default true */
+    /** Underline at rest. @default true */
     underline: {
       type: Boolean,
       default: true
@@ -56,13 +62,12 @@ export const Link = defineComponent({
   },
   setup(props, { slots, emit, attrs }) {
     const linkClasses = computed(() =>
-      classNames(
-        linkBaseClasses,
-        getLinkVariantClasses(props.variant, undefined, { disabled: props.disabled }),
-        linkSizeClasses[props.size],
-        props.underline && 'hover:underline',
-        props.disabled && linkDisabledClasses
-      )
+      resolveLinkClasses({
+        variant: props.variant,
+        size: props.size,
+        underline: props.underline,
+        disabled: props.disabled
+      })
     )
 
     const computedRel = computed(() => getSecureRel(props.target, props.rel))
@@ -80,7 +85,9 @@ export const Link = defineComponent({
       if (props.disabled && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault()
         event.stopPropagation()
+        return
       }
+      callListener(attrs.onKeydown, event)
     }
 
     return () =>
@@ -89,7 +96,7 @@ export const Link = defineComponent({
         {
           ...attrs,
           class: [linkClasses.value, attrs.class],
-          href: props.disabled ? undefined : props.href,
+          href: props.href,
           target: props.target,
           rel: computedRel.value,
           'aria-disabled': props.disabled ? 'true' : undefined,

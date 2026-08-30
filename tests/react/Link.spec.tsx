@@ -31,16 +31,19 @@ describe('Link (React)', () => {
     expect(c1.querySelector('a')?.className).toContain('--tiger-secondary')
 
     const { container: c2 } = render(<Link variant="default">Def</Link>)
-    expect(c2.querySelector('a')?.className).toContain('text-gray-700')
+    expect(c2.querySelector('a')?.className).toContain('--tiger-text')
+    expect(c2.querySelector('a')?.className).not.toContain('text-gray-')
   })
-  it('adds hover:underline when underline=true (default)', () => {
+  it('underlines at rest when underline is true', () => {
     const { container } = render(<Link>U</Link>)
-    expect(container.querySelector('a')).toHaveClass('hover:underline')
+    expect(container.querySelector('a')).toHaveClass('underline')
+    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
   })
 
-  it('omits hover:underline when underline=false', () => {
+  it('omits underline when underline=false', () => {
     const { container } = render(<Link underline={false}>U</Link>)
-    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
+    expect(container.querySelector('a')).toHaveClass('no-underline')
+    expect(container.querySelector('a')).not.toHaveClass('underline')
   })
 
   it('fires onClick when not disabled', async () => {
@@ -67,9 +70,9 @@ describe('Link (React)', () => {
       </Link>
     )
 
-    const link = screen.getByText('Disabled')
+    const link = screen.getByRole('link', { name: 'Disabled' })
     expect(link).toHaveAttribute('aria-disabled', 'true')
-    expect(link).not.toHaveAttribute('href')
+    expect(link).toHaveAttribute('href', '/test')
     expect(link).toHaveAttribute('tabindex', '-1')
 
     await user.click(link)
@@ -87,7 +90,7 @@ describe('Link (React)', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
 
-  it('preserves custom rel when provided', () => {
+  it('merges secure tokens into a custom _blank rel', () => {
     render(
       <Link href="https://example.com" target="_blank" rel="nofollow">
         Custom
@@ -95,7 +98,21 @@ describe('Link (React)', () => {
     )
 
     const link = screen.getByRole('link', { name: 'Custom' })
-    expect(link).toHaveAttribute('rel', 'nofollow')
+    const tokens = new Set((link.getAttribute('rel') ?? '').split(/\s+/))
+    expect(tokens.has('nofollow')).toBe(true)
+    expect(tokens.has('noopener')).toBe(true)
+    expect(tokens.has('noreferrer')).toBe(true)
+  })
+
+  it('forwards ref to the anchor', () => {
+    const ref = React.createRef<HTMLAnchorElement>()
+    render(
+      <Link ref={ref} href="/test">
+        Go
+      </Link>
+    )
+    expect(ref.current).toBeInstanceOf(HTMLAnchorElement)
+    expect(ref.current).toHaveAttribute('href', '/test')
   })
 
   it('has no accessibility violations', async () => {

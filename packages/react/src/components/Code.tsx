@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  codeBlockCopyStatusLiveClasses,
   codeBlockPreClasses,
   copyTextToClipboard,
+  createCopyStatusReset,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses,
   getCodeLabels,
@@ -17,18 +19,21 @@ export type CodeProps = CoreCodeProps &
     onCopy?: (code: string) => void
   }
 
-export const Code: React.FC<CodeProps> = ({
-  code,
-  copyable = true,
-  copyLabel,
-  copiedLabel,
-  copyFailedLabel,
-  locale,
-  labels: labelsOverride,
-  onCopy,
-  className,
-  ...props
-}) => {
+export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
+  {
+    code,
+    copyable = true,
+    copyLabel,
+    copiedLabel,
+    copyFailedLabel,
+    locale,
+    labels: labelsOverride,
+    onCopy,
+    className,
+    ...props
+  },
+  ref
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -43,24 +48,24 @@ export const Code: React.FC<CodeProps> = ({
   const resolvedCopyFailedLabel = resolveLocaleText(labels.copyFailedLabel, copyFailedLabel)
 
   const [copyStatus, setCopyStatus] = useState<CodeCopyButtonStatus>('idle')
+  const resetRef = useRef<ReturnType<typeof createCopyStatusReset> | null>(null)
+  if (resetRef.current == null) {
+    resetRef.current = createCopyStatusReset(setCopyStatus)
+  }
 
   useEffect(() => {
-    if (copyStatus === 'idle') return
-    const timer = window.setTimeout(() => {
-      setCopyStatus('idle')
-    }, 1500)
-
-    return () => window.clearTimeout(timer)
-  }, [copyStatus])
+    const machine = resetRef.current
+    return () => machine?.dispose()
+  }, [])
 
   const handleCopy = async () => {
     if (!copyable) return
     const ok = await copyTextToClipboard(code)
     if (ok) {
-      setCopyStatus('copied')
+      resetRef.current?.schedule('copied')
       onCopy?.(code)
     } else {
-      setCopyStatus('failed')
+      resetRef.current?.schedule('failed')
     }
   }
 
@@ -72,23 +77,26 @@ export const Code: React.FC<CodeProps> = ({
       : copyStatus === 'copied'
         ? resolvedCopiedLabel
         : resolvedCopyLabel
+  const liveText = copyStatus === 'idle' ? '' : buttonLabel
 
   return (
-    <div className={containerClasses} {...props}>
+    <div ref={ref} className={containerClasses} {...props}>
       <pre className={codeBlockPreClasses}>
         <code className="block">{code}</code>
       </pre>
       {copyable && (
-        <button
-          type="button"
-          className={copyButtonClasses}
-          onClick={handleCopy}
-          aria-label={buttonLabel}>
-          {buttonLabel}
-        </button>
+        <>
+          <button type="button" className={copyButtonClasses} onClick={handleCopy}>
+            {buttonLabel}
+          </button>
+          <span className={codeBlockCopyStatusLiveClasses} aria-live="polite">
+            {liveText}
+          </span>
+        </>
       )}
     </div>
   )
-}
+})
+Code.displayName = 'Code'
 
 export default Code

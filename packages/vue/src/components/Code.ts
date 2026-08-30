@@ -1,8 +1,10 @@
 import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
 import {
   coerceClassValue,
+  codeBlockCopyStatusLiveClasses,
   codeBlockPreClasses,
   copyTextToClipboard,
+  createCopyStatusReset,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses,
   getCodeLabels,
@@ -66,7 +68,9 @@ export const Code = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const copyStatus = ref<CodeCopyButtonStatus>('idle')
-    const timerRef = ref<number | null>(null)
+    const reset = createCopyStatusReset((status) => {
+      copyStatus.value = status
+    })
 
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getCodeLabels(mergedLocale.value, props.labels))
@@ -84,6 +88,7 @@ export const Code = defineComponent({
       if (copyStatus.value === 'copied') return resolvedCopiedLabel.value
       return resolvedCopyLabel.value
     })
+    const liveText = computed(() => (copyStatus.value === 'idle' ? '' : buttonLabel.value))
 
     const containerClasses = computed(() => {
       const attrsRecord = attrs as Record<string, unknown>
@@ -94,31 +99,19 @@ export const Code = defineComponent({
       return getCodeBlockCopyButtonClasses(copyStatus.value)
     })
 
-    const clearTimer = () => {
-      if (timerRef.value != null) {
-        window.clearTimeout(timerRef.value)
-        timerRef.value = null
-      }
-    }
-
     const handleCopy = async () => {
       if (!props.copyable) return
       const ok = await copyTextToClipboard(props.code)
-      clearTimer()
       if (ok) {
-        copyStatus.value = 'copied'
+        reset.schedule('copied')
         emit('copy', props.code)
       } else {
-        copyStatus.value = 'failed'
+        reset.schedule('failed')
       }
-      timerRef.value = window.setTimeout(() => {
-        copyStatus.value = 'idle'
-        timerRef.value = null
-      }, 1500)
     }
 
     onBeforeUnmount(() => {
-      clearTimer()
+      reset.dispose()
     })
 
     return () =>
@@ -137,10 +130,19 @@ export const Code = defineComponent({
                 {
                   type: 'button',
                   class: copyButtonClasses.value,
-                  onClick: handleCopy,
-                  'aria-label': buttonLabel.value
+                  onClick: handleCopy
                 },
                 buttonLabel.value
+              )
+            : null,
+          props.copyable
+            ? h(
+                'span',
+                {
+                  class: codeBlockCopyStatusLiveClasses,
+                  'aria-live': 'polite'
+                },
+                liveText.value
               )
             : null
         ]

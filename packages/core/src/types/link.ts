@@ -46,13 +46,13 @@ export interface LinkProps {
   target?: '_blank' | '_self' | '_parent' | '_top'
 
   /**
-   * Relationship between current document and linked document
-   * Automatically set to 'noopener noreferrer' when target="_blank"
+   * Relationship between current document and linked document.
+   * `target="_blank"` always merges `noopener noreferrer` into the token set.
    */
   rel?: string
 
   /**
-   * Whether to show underline
+   * Whether to underline at rest. Hover is not a substitute for the rest state.
    * @default true
    */
   underline?: boolean

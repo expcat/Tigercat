@@ -1,11 +1,7 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { forwardRef, useCallback, useMemo } from 'react'
 import {
-  classNames,
-  getLinkVariantClasses,
   getSecureRel,
-  linkBaseClasses,
-  linkDisabledClasses,
-  linkSizeClasses,
+  resolveLinkClasses,
   type LinkProps as CoreLinkProps
 } from '@expcat/tigercat-core'
 
@@ -20,31 +16,26 @@ export interface LinkProps
   children?: React.ReactNode
 }
 
-export const Link: React.FC<LinkProps> = ({
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  href,
-  target,
-  rel,
-  underline = true,
-  onClick,
-  onKeyDown,
-  tabIndex,
-  children,
-  className,
-  ...props
-}) => {
+export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
+  {
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    href,
+    target,
+    rel,
+    underline = true,
+    onClick,
+    onKeyDown,
+    tabIndex,
+    children,
+    className,
+    ...props
+  },
+  ref
+) {
   const linkClasses = useMemo(
-    () =>
-      classNames(
-        linkBaseClasses,
-        getLinkVariantClasses(variant, undefined, { disabled }),
-        linkSizeClasses[size],
-        underline && 'hover:underline',
-        disabled && linkDisabledClasses,
-        className
-      ),
+    () => resolveLinkClasses({ variant, size, underline, disabled, className }),
     [variant, size, underline, disabled, className]
   )
 
@@ -77,8 +68,9 @@ export const Link: React.FC<LinkProps> = ({
   return (
     <a
       {...props}
+      ref={ref}
       className={linkClasses}
-      href={disabled ? undefined : href}
+      href={href}
       target={target}
       rel={computedRel}
       aria-disabled={disabled || undefined}
@@ -88,4 +80,5 @@ export const Link: React.FC<LinkProps> = ({
       {children}
     </a>
   )
-}
+})
+Link.displayName = 'Link'
