@@ -115,7 +115,7 @@ function checkPackageExports(packages) {
       `@expcat/tigercat-${packageName} must use explicit component subpath exports`
     )
 
-    const expectedExports = buildFrameworkPackageExports(publicComponents[packageName])
+    const expectedExports = buildFrameworkPackageExports(publicComponents[packageName], packageName)
     const actualKeys = new Set(Object.keys(packageExports))
     const expectedKeys = new Set(Object.keys(expectedExports))
 

@@ -11,7 +11,7 @@ description: Compact generated route map for Tigercat core type files
 
 ## Public hooks
 
-`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value.
+`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. React `useControlledState({ value, defaultValue, onChange, postState })`; T cannot be a function.
 
 ## Basic
 

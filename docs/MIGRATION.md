@@ -13,6 +13,26 @@ Locale / i18n 系统改为只读官方 locale 对象。需要处理的路径：
 
 Overlay 默认 portal 目标链改为最近 overlay-host → ConfigProvider 根 → `document.body`。测试或 CSS 不要再假设浮层一定是 `document.body` 的直接子节点。已删除无人调用的 `applyFloatingStyles`；定位走 overlay adapter。
 
+React `useControlledState` 只接受 options 对象，不再是位置参数：
+
+```diff
+- const [value, setValue] = useControlledState(controlledValue, defaultValue, onChange)
++ const [value, setValue] = useControlledState({
++   value: controlledValue,
++   defaultValue,
++   onChange,
++   postState // optional clamp/normalize
++ })
+```
+
+- `undefined` 非受控，`null` / `0` / `false` / `''` 是合法受控空值。
+- 同值 setter 不 `setState`、不调 `onChange`。
+- 父级把 `value` 从有改成省略时，显示最后一次受控值，不是 `defaultValue`。
+- 组件 `onChange` 形状是 `(value, ...args)` 时交给 hook，不要 `setX` 后再发一次。
+- `T` 不能是函数（函数参数一律当 updater）。
+
+Vue 没有这份 hook；`modelValue` 默认必须是 `undefined`（禁止 `null`），省略才是非受控。
+
 ## v2.1.2
 
 v2.1.2 是相对 v2.1.1 的 patch。**没有 breaking change，组件用户无需迁移步骤。**

@@ -179,7 +179,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Mentions
 
-`packages/core/src/types/mentions.ts` · `MentionsProps` · 3/9 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 3/10 props
 
 | Prop        | Type              | Default | Notes                     |
 | ----------- | ----------------- | ------- | ------------------------- |

@@ -298,7 +298,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 3/10 props
+`packages/core/src/types/rate.ts` · `RateProps` · 3/11 props
 
 | Prop        | Type                   | Default | Notes                                                   |
 | ----------- | ---------------------- | ------- | ------------------------------------------------------- |
@@ -318,7 +318,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Segmented
 
-`packages/core/src/types/segmented.ts` · `SegmentedProps` · 3/6 props
+`packages/core/src/types/segmented.ts` · `SegmentedProps` · 3/7 props
 
 | Prop        | Type                | Default | Notes                                 |
 | ----------- | ------------------- | ------- | ------------------------------------- |

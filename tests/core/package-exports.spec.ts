@@ -23,12 +23,12 @@ describe('package exports', () => {
 
     for (const framework of ['react', 'vue'] as const) {
       const packageJson = readPackageJson(`packages/${framework}/package.json`)
-      const expectedExports = buildFrameworkPackageExports(publicComponents[framework])
+      const expectedExports = buildFrameworkPackageExports(publicComponents[framework], framework)
 
       expect(packageJson.exports).toEqual(expectedExports)
       expect(packageJson.exports).not.toHaveProperty('./*')
       expect(Object.keys(packageJson.exports ?? {})).toHaveLength(
-        publicComponents[framework].length + 1
+        Object.keys(expectedExports).length
       )
     }
   })

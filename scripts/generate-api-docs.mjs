@@ -642,7 +642,7 @@ function generatePublicHooksSection(publicHooks) {
 
   const items = publicHooks.map((hook) => `\`${hook.name}\` (${hook.packages.join(', ')})`)
   let markdownText = '## Public hooks\n\n'
-  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value.\n\n`
+  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. React \`useControlledState({ value, defaultValue, onChange, postState })\`; T cannot be a function.\n\n`
   return markdownText
 }
 

@@ -1,7 +1,7 @@
 {
   "id": "use-controlled-state-01",
-  "title": "受控计数器",
-  "description": "一个 Counter 使用 value/onChange 展示 useControlledState 的受控模式；只传 defaultValue 即可切换为非受控模式。",
+  "title": "受控 / 非受控计数器",
+  "description": "受控 Counter 用 updater 加减；点「省略 value」后仍显示最后一次受控值。旁边一块只传 defaultValue 的非受控 Counter。",
   "entry": "App.tsx",
   "order": 1
 }

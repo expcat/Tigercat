@@ -888,6 +888,11 @@
       "types": "./dist/components/Watermark.d.mts",
       "import": "./dist/components/Watermark.mjs",
       "default": "./dist/components/Watermark.mjs"
+    },
+    "./useControlledState": {
+      "types": "./dist/hooks/useControlledState.d.mts",
+      "import": "./dist/hooks/useControlledState.mjs",
+      "default": "./dist/hooks/useControlledState.mjs"
     }
   },
   "files": [

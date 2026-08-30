@@ -633,7 +633,19 @@ export function getComponentPackageExport(component) {
   }
 }
 
-export function buildFrameworkPackageExports(components) {
+function getFrameworkHookPackageExports(framework) {
+  if (framework !== 'react') return {}
+
+  return {
+    './useControlledState': {
+      types: './dist/hooks/useControlledState.d.mts',
+      import: './dist/hooks/useControlledState.mjs',
+      default: './dist/hooks/useControlledState.mjs'
+    }
+  }
+}
+
+export function buildFrameworkPackageExports(components, framework) {
   const exports = {
     '.': FRAMEWORK_ROOT_PACKAGE_EXPORT
   }
@@ -641,6 +653,8 @@ export function buildFrameworkPackageExports(components) {
   for (const component of [...components].sort((a, b) => a.localeCompare(b))) {
     exports[getComponentPackageSubpath(component)] = getComponentPackageExport(component)
   }
+
+  Object.assign(exports, getFrameworkHookPackageExports(framework))
 
   return exports
 }

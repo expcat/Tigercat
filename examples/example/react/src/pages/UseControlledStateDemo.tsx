@@ -7,7 +7,7 @@ export default function UseControlledStateDemo() {
   return (
     <DemoPage
       title="useControlledState 受控/非受控"
-      description="统一处理表单组件「受控 / 非受控」两种用法的样板代码，避免重复 if/else。"
+      description="受控与非受控两块样板。省略 value 时保留最后一次展示值；undefined 非受控，null 是合法空值。"
       modules={modules}
     />
   )

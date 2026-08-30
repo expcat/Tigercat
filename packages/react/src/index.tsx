@@ -381,6 +381,7 @@ export type {
 export { useDrag } from './hooks/useDrag'
 export type { UseDragOptions, UseDragReturn } from './hooks/useDrag'
 export { useControlledState } from './hooks/useControlledState'
+export type { SetControlledState, UseControlledStateOptions } from './hooks/useControlledState'
 
 // Splitter (v0.8.0+)
 export { Splitter } from './components/Splitter'

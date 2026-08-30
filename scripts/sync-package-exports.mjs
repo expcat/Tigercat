@@ -71,7 +71,7 @@ function assertComponentTargetsExist(framework, components, info) {
 function syncFrameworkPackage(framework, components, info) {
   const packagePath = join(root, info.packagePath)
   const packageJson = readJson(packagePath)
-  const expectedExports = buildFrameworkPackageExports(components)
+  const expectedExports = buildFrameworkPackageExports(components, framework)
 
   assertComponentTargetsExist(framework, components, info)
 
