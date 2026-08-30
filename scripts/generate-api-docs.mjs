@@ -12,10 +12,21 @@
  * Usage: node scripts/generate-api-docs.mjs
  */
 
+import { existsSync } from 'node:fs'
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { basename, join, relative, sep } from 'node:path'
 import prettier from 'prettier'
 import ts from 'typescript'
+import {
+  buildRequiredPropSnippet,
+  collectPublicHookExports,
+  getVisiblePropRows,
+  isEmptyComponentSnippet,
+  mergeHeritageMembers,
+  resolveUsageSnippet,
+  shouldUseFrameworkRuntimeProps,
+  uniqueMembers
+} from './lib/docs-api.mjs'
 import {
   CATEGORIES,
   CATEGORY_SLUGS,
@@ -366,7 +377,6 @@ const COMPONENT_SNIPPETS = {
     ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" />',
     ChartLegend: '<ChartLegend :items="items" />',
     ChartSeries: '<ChartSeries :data="data" />',
-    ChartTooltip: '<ChartTooltip content="Value: 42" open :x="120" :y="80" />',
     DonutChart: '<DonutChart :data="data" />',
     FunnelChart: '<FunnelChart :data="data" />',
     Gantt: '<Gantt :data="tasks" />',
@@ -404,7 +414,6 @@ const COMPONENT_SNIPPETS = {
     ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} />',
     ChartLegend: '<ChartLegend items={items} />',
     ChartSeries: '<ChartSeries data={data} />',
-    ChartTooltip: '<ChartTooltip content="Value: 42" open x={120} y={80} />',
     DonutChart: '<DonutChart data={data} />',
     FunnelChart: '<FunnelChart data={data} />',
     Gantt: '<Gantt data={tasks} />',
@@ -420,13 +429,7 @@ const COMPONENT_SNIPPETS = {
   }
 }
 
-const MAX_PROPS_PER_COMPONENT = 3
 const MAX_EVENTS_PER_COMPONENT = 6
-const COMPONENT_PROP_PRIORITY = {
-  BackTop: ['position?', 'placement?', 'offset?'],
-  FloatButton: ['floating?', 'placement?', 'offset?'],
-  Notification: ['actions?', 'type?', 'position?']
-}
 
 let prettierConfigPromise
 async function formatWithPrettier(content, parser) {
@@ -496,6 +499,46 @@ function codeText(text) {
   return tableText(String(text).replace(/`/g, '\\`'))
 }
 
+function collectHeritageIdentifiers(node, names) {
+  if (ts.isIdentifier(node)) {
+    names.push(node.text)
+    return
+  }
+
+  if (ts.isExpressionWithTypeArguments(node)) {
+    collectHeritageIdentifiers(node.expression, names)
+    node.typeArguments?.forEach((argument) => collectHeritageIdentifiers(argument, names))
+    return
+  }
+
+  if (ts.isTypeReferenceNode(node)) {
+    collectHeritageIdentifiers(node.typeName, names)
+    node.typeArguments?.forEach((argument) => collectHeritageIdentifiers(argument, names))
+    return
+  }
+
+  if (ts.isIntersectionTypeNode(node) || ts.isUnionTypeNode(node)) {
+    node.types.forEach((part) => collectHeritageIdentifiers(part, names))
+    return
+  }
+
+  if (ts.isQualifiedName(node)) {
+    collectHeritageIdentifiers(node.right, names)
+    return
+  }
+
+  ts.forEachChild(node, (child) => collectHeritageIdentifiers(child, names))
+}
+
+function getHeritageTypeNames(node) {
+  const names = []
+  for (const clause of node.heritageClauses || []) {
+    if (clause.token !== ts.SyntaxKind.ExtendsKeyword) continue
+    for (const typeNode of clause.types) collectHeritageIdentifiers(typeNode, names)
+  }
+  return names
+}
+
 function extractMembers(node, sourceFile) {
   if (!node.members) return []
 
@@ -517,7 +560,7 @@ function extractMembers(node, sourceFile) {
     })
 }
 
-function extractFileInfo(fileName, content) {
+function extractFileInfo(fileName, content, sourcePath = fileName) {
   const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.Latest, true)
   const exports = []
   const propsInterfaces = []
@@ -550,7 +593,9 @@ function extractFileInfo(fileName, content) {
       interfaceDetails.push({
         name: node.name.text,
         description: compactDescription(getJsDocText(node) || `${node.name.text} definition`),
-        members: extractMembers(node, sourceFile)
+        members: extractMembers(node, sourceFile),
+        heritage: getHeritageTypeNames(node),
+        sourcePath
       })
     }
 
@@ -560,6 +605,7 @@ function extractFileInfo(fileName, content) {
   visit(sourceFile)
   return {
     fileName,
+    sourcePath,
     typeName: basename(fileName).replace(/\.(tsx?|mts|cts)$/, ''),
     exports,
     propsInterfaces,
@@ -591,7 +637,16 @@ function countExportedTypes(categorizedFiles) {
   )
 }
 
-function generateLlmApiSummary(categorizedFiles) {
+function generatePublicHooksSection(publicHooks) {
+  if (publicHooks.length === 0) return ''
+
+  const items = publicHooks.map((hook) => `\`${hook.name}\` (${hook.packages.join(', ')})`)
+  let markdownText = '## Public hooks\n\n'
+  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value.\n\n`
+  return markdownText
+}
+
+function generateLlmApiSummary(categorizedFiles, publicHooks = []) {
   let markdownText = '---\n'
   markdownText += 'name: tigercat-api-summary\n'
   markdownText += 'description: Compact generated route map for Tigercat core type files\n'
@@ -599,7 +654,8 @@ function generateLlmApiSummary(categorizedFiles) {
   markdownText += '<!-- generated by pnpm docs:api -->\n\n'
   markdownText += '# Tigercat API Summary\n\n'
   markdownText +=
-    '> 自动生成。只用于定位类型文件和 Props 接口；组件路由看 component-index，字段细节看分类 props 文档或源码。\n\n'
+    '> 自动生成。只用于定位类型文件、Props 接口和公开 hook；组件路由看 component-index，字段细节看分类 props 文档或源码。\n\n'
+  markdownText += generatePublicHooksSection(publicHooks)
 
   for (const { category, files } of categorizedFiles) {
     markdownText += `## ${category}\n\n`
@@ -680,14 +736,51 @@ function collectInterfaceDetails(fileInfos) {
   const details = new Map()
   for (const fileInfo of fileInfos) {
     for (const detail of fileInfo.interfaceDetails) {
-      if (!details.has(detail.name)) details.set(detail.name, detail)
+      const list = details.get(detail.name) || []
+      list.push(detail)
+      details.set(detail.name, list)
     }
   }
   return details
 }
 
+function isCoreTypePath(sourcePath) {
+  return String(sourcePath).includes('packages/core/src/types/')
+}
+
+function isFrameworkComponentPath(sourcePath, component) {
+  const path = String(sourcePath).replaceAll('\\', '/')
+  return (
+    path.endsWith(`/components/${component}.tsx`) || path.endsWith(`/components/${component}.ts`)
+  )
+}
+
+function pickCoreDetail(interfaceDetails, name) {
+  const list = interfaceDetails.get(name) || []
+  return list.find((detail) => isCoreTypePath(detail.sourcePath)) || list[0]
+}
+
+function pickFrameworkDetail(interfaceDetails, name, component) {
+  const list = interfaceDetails.get(name) || []
+  return (
+    list.find((detail) => isFrameworkComponentPath(detail.sourcePath, component)) ||
+    list.find((detail) => !isCoreTypePath(detail.sourcePath))
+  )
+}
+
+function coreDetailsByName(interfaceDetails) {
+  const coreByName = new Map()
+  for (const name of interfaceDetails.keys()) {
+    const detail = pickCoreDetail(interfaceDetails, name)
+    if (detail) coreByName.set(name, detail)
+  }
+  return coreByName
+}
+
 function getComponentDetails(entry, interfaceDetails) {
-  return (entry.propsInterfaces || []).map((name) => interfaceDetails.get(name)).filter(Boolean)
+  return (entry.propsInterfaces || [])
+    .map((name) => pickCoreDetail(interfaceDetails, name))
+    .filter(Boolean)
 }
 
 function mergeMembers(details, kind) {
@@ -695,7 +788,7 @@ function mergeMembers(details, kind) {
   const seen = new Set()
 
   for (const detail of details) {
-    for (const member of detail.members.filter((item) => item.kind === kind)) {
+    for (const member of (detail.members || []).filter((item) => item.kind === kind)) {
       if (seen.has(member.name)) continue
       seen.add(member.name)
       members.push(member)
@@ -705,27 +798,68 @@ function mergeMembers(details, kind) {
   return members
 }
 
+function getResolvedComponentRows(entry, interfaceDetails, coreByName) {
+  const component = entry.component
+  const coreName = entry.propsInterfaces?.[0]
+  const vueName = `Vue${component}Props`
+  const reactName = `${component}Props`
+  const frameworkReact = pickFrameworkDetail(interfaceDetails, reactName, component)
+  const frameworkVue = pickFrameworkDetail(interfaceDetails, vueName, component)
+  const frameworkRuntime = frameworkReact || frameworkVue
+  const useFrameworkRuntime = shouldUseFrameworkRuntimeProps(
+    coreName,
+    coreByName,
+    frameworkRuntime?.heritage
+  )
+
+  if (useFrameworkRuntime && frameworkRuntime) {
+    const runtimeDetails = [frameworkReact, frameworkVue].filter(Boolean)
+    const sourcePaths = [
+      ...new Set(runtimeDetails.map((detail) => detail.sourcePath).filter(Boolean))
+    ]
+    return {
+      details: runtimeDetails,
+      typeSource: sourcePaths.join(' and '),
+      propRows: uniqueMembers(runtimeDetails.map((detail) => detail.members || [])).filter(
+        (member) => member.kind === 'prop'
+      ),
+      eventRows: uniqueMembers(runtimeDetails.map((detail) => detail.members || [])).filter(
+        (member) => member.kind === 'event'
+      ),
+      methodRows: uniqueMembers(runtimeDetails.map((detail) => detail.members || [])).filter(
+        (member) => member.kind === 'method'
+      )
+    }
+  }
+
+  const coreDetails = getComponentDetails(entry, interfaceDetails)
+  const mergedCore = uniqueMembers(
+    coreDetails.map((detail) => mergeHeritageMembers(detail.name, coreByName))
+  )
+  const frameworkOwn = uniqueMembers(
+    [frameworkReact, frameworkVue]
+      .filter(Boolean)
+      .map((detail) => (detail.members || []).filter((member) => member.kind === 'prop'))
+  )
+  const members = uniqueMembers([mergedCore, frameworkOwn])
+
+  return {
+    details: coreDetails,
+    propRows: members.filter((member) => member.kind === 'prop'),
+    eventRows: members.filter((member) => member.kind === 'event'),
+    methodRows: members.filter((member) => member.kind === 'method')
+  }
+}
+
 function getPropsExtra(component) {
   const extras = [COMPONENT_PROPS_EXTRA[component]]
   if (component === 'DataTableWithToolbar') extras.push(COMPONENT_PROPS_EXTRA.TableToolbar)
   return extras.filter(Boolean).join('\n\n')
 }
 
-function getVisiblePropRows(component, propRows) {
-  const priority = COMPONENT_PROP_PRIORITY[component]
-  if (!priority) return propRows.slice(0, MAX_PROPS_PER_COMPONENT)
-
-  const prioritySet = new Set(priority)
-  const visibleRows = [
-    ...priority.map((name) => propRows.find((member) => member.name === name)).filter(Boolean),
-    ...propRows.filter((member) => !prioritySet.has(member.name))
-  ]
-
-  return visibleRows.slice(0, MAX_PROPS_PER_COMPONENT)
-}
-
 function generatePublicPropsReference(category, componentEntries, interfaceDetails) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
+  const coreByName = coreDetailsByName(interfaceDetails)
   let markdownText = '---\n'
   markdownText += `name: tigercat-props-${slug}\n`
   markdownText += `description: Compact generated Tigercat ${category} props reference\n`
@@ -736,22 +870,29 @@ function generatePublicPropsReference(category, componentEntries, interfaceDetai
 
   for (const entry of componentEntries) {
     const component = entry.component
-    const details = getComponentDetails(entry, interfaceDetails)
-    const propRows = entry.propsRows || mergeMembers(details, 'prop')
-    const eventRows = mergeMembers(details, 'event')
-    const methodRows = mergeMembers(details, 'method')
-    const shownCount = Math.min(propRows.length, MAX_PROPS_PER_COMPONENT)
+    const resolved = entry.propsRows
+      ? {
+          details: getComponentDetails(entry, interfaceDetails),
+          typeSource: entry.typeSource,
+          propRows: entry.propsRows,
+          eventRows: mergeMembers(getComponentDetails(entry, interfaceDetails), 'event'),
+          methodRows: mergeMembers(getComponentDetails(entry, interfaceDetails), 'method')
+        }
+      : getResolvedComponentRows(entry, interfaceDetails, coreByName)
+    const { details, propRows, eventRows, methodRows } = resolved
+    const typeSource = resolved.typeSource || entry.typeSource
+    const visiblePropRows = getVisiblePropRows(component, propRows)
+    const shownCount = visiblePropRows.length
     const propsMeta =
       propRows.length > shownCount ? ` · ${shownCount}/${propRows.length} props` : ''
     const interfaceNames =
       details.map((detail) => detail.name).join(' / ') || entry.propsInterfaces?.join(' / ') || '-'
 
     markdownText += `## ${component}\n\n`
-    markdownText += `\`${entry.typeSource}\` · \`${interfaceNames}\`${propsMeta}\n\n`
+    markdownText += `\`${typeSource}\` · \`${interfaceNames}\`${propsMeta}\n\n`
     markdownText += getComponentUsageText(component)
 
     if (propRows.length > 0) {
-      const visiblePropRows = getVisiblePropRows(component, propRows)
       markdownText += '| Prop | Type | Default | Notes |\n'
       markdownText += '| ---- | ---- | ------- | ----- |\n'
       for (const member of visiblePropRows) {
@@ -785,8 +926,24 @@ function generatePublicPropsReference(category, componentEntries, interfaceDetai
   return markdownText
 }
 
-function getVueSnippet(component, category) {
-  if (COMPONENT_SNIPPETS.Vue[component]) return COMPONENT_SNIPPETS.Vue[component]
+function getRequiredPropNames(entry, interfaceDetails, coreByName) {
+  if (!entry) return []
+  const propRows = entry.propsRows
+    ? entry.propsRows
+    : getResolvedComponentRows(entry, interfaceDetails, coreByName).propRows
+  return propRows
+    .filter((member) => !String(member.name).endsWith('?'))
+    .map((member) => member.name)
+}
+
+function getVueSnippet(component, category, requiredNames) {
+  const resolved = resolveUsageSnippet(
+    component,
+    'Vue',
+    requiredNames,
+    COMPONENT_SNIPPETS.Vue[component]
+  )
+  if (resolved) return resolved
   if (
     category === 'Form' &&
     ['Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Textarea'].includes(component)
@@ -797,12 +954,20 @@ function getVueSnippet(component, category) {
     return '<Form :model=\"form\"><FormItem name=\"name\"><Input v-model=\"form.name\" /></FormItem></Form>'
   if (component === 'Table')
     return '<Table :columns=\"columns\" :data-source=\"rows\" row-key=\"id\" />'
-  if (category === 'Charts') return `<${component} :data-source=\"data\" />`
+  const requiredSnippet = buildRequiredPropSnippet(component, requiredNames, 'Vue')
+  if (requiredSnippet) return requiredSnippet
+  if (category === 'Charts') return `<${component} :data=\"data\" />`
   return `<${component} />`
 }
 
-function getReactSnippet(component, category) {
-  if (COMPONENT_SNIPPETS.React[component]) return COMPONENT_SNIPPETS.React[component]
+function getReactSnippet(component, category, requiredNames) {
+  const resolved = resolveUsageSnippet(
+    component,
+    'React',
+    requiredNames,
+    COMPONENT_SNIPPETS.React[component]
+  )
+  if (resolved) return resolved
   if (
     category === 'Form' &&
     ['Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Textarea'].includes(component)
@@ -812,13 +977,17 @@ function getReactSnippet(component, category) {
   if (component === 'Form')
     return '<Form model={form}><FormItem name=\"name\"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>'
   if (component === 'Table') return '<Table columns={columns} dataSource={rows} rowKey=\"id\" />'
+  const requiredSnippet = buildRequiredPropSnippet(component, requiredNames, 'React')
+  if (requiredSnippet) return requiredSnippet
   if (category === 'Charts') return `<${component} data={data} />`
   return `<${component} />`
 }
 
-function generateExamples(category, componentEntries) {
+function generateExamples(category, componentEntries, interfaceDetails) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
+  const coreByName = coreDetailsByName(interfaceDetails)
   const components = componentEntries.map((entry) => entry.component)
+  const entriesByComponent = new Map(componentEntries.map((entry) => [entry.component, entry]))
   let markdownText = '---\n'
   markdownText += `name: tigercat-examples-${slug}\n`
   markdownText += `description: Compact Tigercat ${category} Vue and React usage routes\n`
@@ -829,12 +998,23 @@ function generateExamples(category, componentEntries) {
   markdownText += generateComponentNotesTable(components)
 
   const snippetRows = components
-    .map((component) => ({
-      component,
-      vue: getVueSnippet(component, category),
-      react: getReactSnippet(component, category)
-    }))
-    .filter((row) => row.vue !== `<${row.component} />` || row.react !== `<${row.component} />`)
+    .map((component) => {
+      const requiredNames = getRequiredPropNames(
+        entriesByComponent.get(component),
+        interfaceDetails,
+        coreByName
+      )
+      return {
+        component,
+        vue: getVueSnippet(component, category, requiredNames),
+        react: getReactSnippet(component, category, requiredNames)
+      }
+    })
+    .filter(
+      (row) =>
+        !isEmptyComponentSnippet(row.component, row.vue) ||
+        !isEmptyComponentSnippet(row.component, row.react)
+    )
   const trivialComponents = components.filter(
     (component) => !snippetRows.some((row) => row.component === component)
   )
@@ -886,8 +1066,9 @@ async function main() {
 
   const fileInfoByName = new Map()
   for (const fileName of typeFiles) {
+    const sourcePath = `packages/core/src/types/${fileName}`
     const content = await readFile(join(TYPES_DIR, fileName), 'utf8')
-    const fileInfo = extractFileInfo(fileName, content)
+    const fileInfo = extractFileInfo(fileName, content, sourcePath)
     fileInfoByName.set(fileInfo.typeName, fileInfo)
   }
 
@@ -896,13 +1077,21 @@ async function main() {
   const publicExports = loadPublicComponentExports(ROOT_DIR)
   const publicComponentNames = new Set(publicExports.all)
   const componentRows = buildPublicComponentEntries(ROOT_DIR, fileInfoByName, publicExports)
-  const frameworkSourceFiles = [
-    ...new Set(componentRows.flatMap((entry) => entry.sourceFiles || []))
-  ].filter((fileName) => !fileName.startsWith('packages/core/src/types/'))
+  const frameworkSourceFiles = new Set(
+    componentRows
+      .flatMap((entry) => entry.sourceFiles || [])
+      .filter((fileName) => !fileName.startsWith('packages/core/src/types/'))
+  )
+  for (const row of componentRows) {
+    const react = `packages/react/src/components/${row.component}.tsx`
+    const vue = `packages/vue/src/components/${row.component}.ts`
+    if (existsSync(join(ROOT_DIR, react))) frameworkSourceFiles.add(react)
+    if (existsSync(join(ROOT_DIR, vue))) frameworkSourceFiles.add(vue)
+  }
   const frameworkFileInfos = []
   for (const fileName of frameworkSourceFiles) {
     const content = await readFile(join(ROOT_DIR, fileName), 'utf8')
-    frameworkFileInfos.push(extractFileInfo(fileName, content))
+    frameworkFileInfos.push(extractFileInfo(fileName, content, fileName))
   }
   const interfaceDetails = collectInterfaceDetails([
     ...[...fileInfoByName.values()],
@@ -924,9 +1113,25 @@ async function main() {
   await mkdir(PROPS_DIR, { recursive: true })
   await mkdir(EXAMPLES_DIR, { recursive: true })
 
+  const reactHooks = collectPublicHookExports(
+    await readFile(join(ROOT_DIR, 'packages', 'react', 'src', 'index.tsx'), 'utf8')
+  )
+  const vueHooks = collectPublicHookExports(
+    await readFile(join(ROOT_DIR, 'packages', 'vue', 'src', 'index.ts'), 'utf8')
+  )
+  const publicHooks = [...new Set([...reactHooks, ...vueHooks])]
+    .sort((a, b) => a.localeCompare(b))
+    .map((name) => ({
+      name,
+      packages: [
+        ...(reactHooks.includes(name) ? ['react'] : []),
+        ...(vueHooks.includes(name) ? ['vue'] : [])
+      ]
+    }))
+
   await writeFile(
     LLM_API_SUMMARY,
-    await formatMarkdown(generateLlmApiSummary(categorizedFiles)),
+    await formatMarkdown(generateLlmApiSummary(categorizedFiles, publicHooks)),
     'utf8'
   )
   await writeFile(
@@ -947,7 +1152,7 @@ async function main() {
     )
     await writeFile(
       join(EXAMPLES_DIR, `${slug}.md`),
-      await formatMarkdown(generateExamples(category, entries)),
+      await formatMarkdown(generateExamples(category, entries, interfaceDetails)),
       'utf8'
     )
   }
