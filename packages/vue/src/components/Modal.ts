@@ -339,7 +339,7 @@ export const Modal = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(overlayOpen)
-    useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef })
+    useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef, inert: true })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({

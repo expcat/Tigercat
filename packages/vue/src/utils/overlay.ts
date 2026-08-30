@@ -3,6 +3,7 @@ import {
   getFocusableElements,
   isEventOutside,
   lockBodyScroll,
+  setBackgroundInert,
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
@@ -124,6 +125,21 @@ export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
   )
 }
 
+export function useVueBackgroundInert(
+  enabled: Ref<boolean>,
+  containerRef: Ref<HTMLElement | null>
+): void {
+  watch(
+    [enabled, containerRef],
+    ([isEnabled, container], _prev, onCleanup) => {
+      if (!isEnabled || !container) return
+      const release = setBackgroundInert(container)
+      onCleanup(() => release())
+    },
+    { immediate: true, flush: 'post' }
+  )
+}
+
 function wrapVueOverlayLayer(children: VNodeChild, target: HTMLElement | null): VNodeChild {
   const dirLang = getOverlayDirLang(target)
   return h('div', { class: 'contents', 'data-tiger-overlay-layer': '', ...dirLang }, [
@@ -156,32 +172,66 @@ export function renderVueOverlayTeleport(
 export interface UseVueFocusTrapOptions {
   enabled: Ref<boolean>
   containerRef: Ref<HTMLElement | null>
+  /** Inert the rest of the document while the trap is active. */
+  inert?: Ref<boolean> | boolean
 }
 
-export function useVueFocusTrap({ enabled, containerRef }: UseVueFocusTrapOptions): void {
+export function useVueFocusTrap({
+  enabled,
+  containerRef,
+  inert = false
+}: UseVueFocusTrapOptions): void {
+  let releaseInert: (() => void) | undefined
+  let detachTrap: (() => void) | undefined
+
+  const teardown = () => {
+    detachTrap?.()
+    detachTrap = undefined
+    releaseInert?.()
+    releaseInert = undefined
+  }
+
   watch(
-    [enabled, containerRef],
-    ([isEnabled, container], _previous, onCleanup) => {
+    enabled,
+    (isEnabled) => {
+      if (!isEnabled) teardown()
+    },
+    { flush: 'sync' }
+  )
+
+  watch(
+    [enabled, containerRef, () => toValue(inert)],
+    ([isEnabled, container, inertEnabled]) => {
+      teardown()
       if (!isEnabled || !container) return
       const ownerDocument = container.ownerDocument
+      releaseInert = inertEnabled ? setBackgroundInert(container) : undefined
 
       const handler = (event: KeyboardEvent) => {
-        if (!(event.target instanceof Node) || !container.contains(event.target)) return
         const focusables = getFocusableElements(container)
         const activeElement = ownerDocument.activeElement
+        const inside = activeElement instanceof Node && container.contains(activeElement)
+        if (!inside) {
+          if (event.key !== 'Tab') return
+          event.preventDefault()
+          const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
+          next?.focus()
+          return
+        }
         const navigation = getFocusTrapNavigation(event, focusables, activeElement)
-
-        if (!navigation.shouldHandle || !navigation.next) return
+        if (!navigation.shouldHandle) return
 
         event.preventDefault()
-        navigation.next.focus()
+        navigation.next?.focus()
       }
 
       ownerDocument.addEventListener('keydown', handler, true)
-      onCleanup(() => ownerDocument.removeEventListener('keydown', handler, true))
+      detachTrap = () => ownerDocument.removeEventListener('keydown', handler, true)
     },
     { immediate: true, flush: 'post' }
   )
+
+  onBeforeUnmount(teardown)
 }
 
 // ============================================================================

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useRef } from 'react'
 import {
   classNames,
   resolveLocaleText,
@@ -17,7 +17,7 @@ import {
   injectLoadingAnimationStyles,
   type LoadingProps as CoreLoadingProps
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useBodyScrollLock } from '../utils/overlay'
+import { renderBodyPortal, useBackgroundInert, useBodyScrollLock } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface LoadingProps
@@ -44,12 +44,14 @@ export const Loading: React.FC<LoadingProps> = ({
     [config.locale, locale]
   )
   const [visible, setVisible] = useState(delay <= 0)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     injectLoadingAnimationStyles()
   }, [])
 
   useBodyScrollLock({ enabled: fullscreen && visible && lockScroll })
+  useBackgroundInert({ enabled: fullscreen && visible, containerRef })
 
   useEffect(() => {
     if (delay <= 0) {
@@ -147,6 +149,7 @@ export const Loading: React.FC<LoadingProps> = ({
 
   const loadingNode = (
     <div
+      ref={containerRef}
       className={containerClasses}
       style={mergedStyle}
       role="status"

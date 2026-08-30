@@ -236,7 +236,7 @@ export const Spotlight = defineComponent({
     }
 
     useVueBodyScrollLock(resolvedOpen)
-    useVueFocusTrap({ enabled: resolvedOpen, containerRef: rootRef })
+    useVueFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
     let cleanupEscape: (() => void) | undefined
 
     onMounted(() => {

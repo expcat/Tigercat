@@ -330,7 +330,7 @@ export const Drawer = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(escapeEnabled)
-    useVueFocusTrap({ enabled: escapeEnabled, containerRef: rootRef })
+    useVueFocusTrap({ enabled: escapeEnabled, containerRef: rootRef, inert: true })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({

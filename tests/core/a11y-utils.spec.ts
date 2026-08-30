@@ -169,6 +169,17 @@ describe('createFocusTrap', () => {
 
     trap.deactivate()
   })
+
+  it('should prevent Tab when the trap has no focusable elements', () => {
+    const trap = createFocusTrap(container)
+    trap.activate()
+
+    const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
+    document.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+
+    trap.deactivate()
+  })
 })
 
 describe('announceToScreenReader', () => {

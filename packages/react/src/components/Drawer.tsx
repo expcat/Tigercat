@@ -203,7 +203,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     restoreFocus(previousActiveElementRef.current)
   }, [open])
 
-  useFocusTrap({ enabled: open, containerRef: rootRef })
+  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null

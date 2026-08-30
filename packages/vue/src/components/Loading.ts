@@ -24,7 +24,11 @@ import {
   type LoadingColor,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { renderVueBodyTeleport, useVueBodyScrollLock } from '../utils/overlay'
+import {
+  renderVueBodyTeleport,
+  useVueBackgroundInert,
+  useVueBodyScrollLock
+} from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueLoadingProps extends LoadingProps {
@@ -95,12 +99,15 @@ export const Loading = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
     const visible = ref(false)
+    const containerRef = ref<HTMLElement | null>(null)
     let timer: ReturnType<typeof setTimeout> | null = null
     const shouldLockBodyScroll = computed(
       () => props.fullscreen && visible.value && props.lockScroll
     )
+    const shouldInertBackground = computed(() => props.fullscreen && visible.value)
 
     useVueBodyScrollLock(shouldLockBodyScroll)
+    useVueBackgroundInert(shouldInertBackground, containerRef)
 
     const clearTimer = () => {
       if (timer) {
@@ -238,6 +245,7 @@ export const Loading = defineComponent({
       const loadingNode = h(
         'div',
         {
+          ref: containerRef,
           role: 'status',
           'aria-label':
             props.text || resolveLocaleText('Loading', mergedLocale.value?.common?.loadingText),

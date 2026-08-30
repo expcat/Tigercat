@@ -119,7 +119,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({
 
   useEscapeKey({ enabled: resolvedOpen, onEscape: closeSpotlight })
   useBodyScrollLock({ enabled: resolvedOpen })
-  useFocusTrap({ enabled: resolvedOpen, containerRef: rootRef })
+  useFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
 
   useEffect(() => {
     if (!resolvedOpen) {

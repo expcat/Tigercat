@@ -13,6 +13,7 @@ import {
   getFocusableElements,
   isEventOutside,
   lockBodyScroll,
+  setBackgroundInert,
   isBrowser,
   computeFloatingPosition,
   autoUpdateFloating,
@@ -100,6 +101,20 @@ export function useBodyScrollLock({ enabled }: UseBodyScrollLockOptions): void {
   }, [enabled])
 }
 
+export function useBackgroundInert({
+  enabled,
+  containerRef
+}: {
+  enabled: boolean
+  containerRef: React.RefObject<HTMLElement | null>
+}): void {
+  useEffect(() => {
+    const container = containerRef.current
+    if (!enabled || !container) return
+    return setBackgroundInert(container)
+  }, [enabled, containerRef])
+}
+
 function wrapOverlayLayer(node: React.ReactNode, target: HTMLElement | null): React.ReactElement {
   const dirLang = getOverlayDirLang(target)
   return createElement(
@@ -136,28 +151,41 @@ export function renderOverlayPortal(
 export interface UseFocusTrapOptions {
   enabled: boolean
   containerRef: React.RefObject<HTMLElement | null>
+  /** Inert the rest of the document while the trap is active. */
+  inert?: boolean
 }
 
-export function useFocusTrap({ enabled, containerRef }: UseFocusTrapOptions): void {
+export function useFocusTrap({ enabled, containerRef, inert = false }: UseFocusTrapOptions): void {
   useEffect(() => {
     const container = containerRef.current
     if (!enabled || !container) return
     const ownerDocument = container.ownerDocument
+    const releaseInert = inert ? setBackgroundInert(container) : undefined
 
     const handler = (event: KeyboardEvent) => {
-      if (!(event.target instanceof Node) || !container.contains(event.target)) return
       const focusables = getFocusableElements(container)
       const activeElement = ownerDocument.activeElement
+      const inside = activeElement instanceof Node && container.contains(activeElement)
+      if (!inside) {
+        if (event.key !== 'Tab') return
+        event.preventDefault()
+        const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
+        next?.focus()
+        return
+      }
       const nav = getFocusTrapNavigation(event, focusables, activeElement)
-      if (!nav.shouldHandle || !nav.next) return
+      if (!nav.shouldHandle) return
 
       event.preventDefault()
-      nav.next.focus()
+      nav.next?.focus()
     }
 
     ownerDocument.addEventListener('keydown', handler, true)
-    return () => ownerDocument.removeEventListener('keydown', handler, true)
-  }, [enabled, containerRef])
+    return () => {
+      ownerDocument.removeEventListener('keydown', handler, true)
+      releaseInert?.()
+    }
+  }, [enabled, containerRef, inert])
 }
 
 // ============================================================================

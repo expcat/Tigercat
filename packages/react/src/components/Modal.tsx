@@ -276,7 +276,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   useEscapeKey({ enabled: open, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: rootRef })
+  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null

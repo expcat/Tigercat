@@ -8,6 +8,7 @@ import {
   getFocusTrapNavigation,
   isEventOutside,
   registerEscapeDismiss,
+  setBackgroundInert,
   shouldCloseOnMaskClick
 } from '@expcat/tigercat-core'
 
@@ -117,6 +118,24 @@ describe('overlay-utils (core)', () => {
     expect(focusables).not.toContain(hiddenButton)
   })
 
+  it('getFocusableElements skips inert subtrees and disabled fieldsets', () => {
+    const root = document.createElement('div')
+    const inertWrap = document.createElement('div')
+    inertWrap.setAttribute('inert', '')
+    const inertButton = document.createElement('button')
+    inertWrap.appendChild(inertButton)
+
+    const fieldset = document.createElement('fieldset')
+    fieldset.disabled = true
+    const fieldsetInput = document.createElement('input')
+    fieldset.appendChild(fieldsetInput)
+
+    const visible = document.createElement('button')
+    root.append(inertWrap, fieldset, visible)
+
+    expect(getFocusableElements(root)).toEqual([visible])
+  })
+
   it('getFocusTrapNavigation should wrap focus on Tab at edges', () => {
     const a = document.createElement('button')
     const b = document.createElement('button')
@@ -131,6 +150,22 @@ describe('overlay-utils (core)', () => {
       shouldHandle: true,
       next: b
     })
+  })
+
+  it('getFocusTrapNavigation still handles Tab when there are no focusables', () => {
+    expect(getFocusTrapNavigation({ key: 'Tab' }, [], null)).toEqual({ shouldHandle: true })
+  })
+
+  it('setBackgroundInert marks siblings of the overlay as inert', () => {
+    const app = document.createElement('div')
+    const overlay = document.createElement('div')
+    document.body.append(app, overlay)
+
+    const release = setBackgroundInert(overlay)
+    expect(app.hasAttribute('inert')).toBe(true)
+
+    release()
+    expect(app.hasAttribute('inert')).toBe(false)
   })
 
   it('registerEscapeDismiss should dismiss only the topmost overlay', () => {

@@ -167,7 +167,7 @@ export const Tour: React.FC<TourProps> = ({
 
   useEscapeKey({ enabled: open, onEscape: close })
   useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: rootRef })
+  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true })
 
   if (!open || !step) return null
 

@@ -75,6 +75,14 @@ export function isEventOutside(
   return !isInsideAny
 }
 
+function isDisabledFieldset(element: HTMLElement): boolean {
+  return element instanceof HTMLFieldSetElement && element.disabled
+}
+
+function isInertElement(element: HTMLElement): boolean {
+  return Boolean(element.inert) || element.hasAttribute('inert')
+}
+
 export function getFocusableElements(root: ParentNode): HTMLElement[] {
   const selectors = [
     'a[href]',
@@ -82,6 +90,7 @@ export function getFocusableElements(root: ParentNode): HTMLElement[] {
     'input:not([disabled])',
     'select:not([disabled])',
     'textarea:not([disabled])',
+    'summary',
     '[tabindex]:not([tabindex="-1"])',
     '[contenteditable="true"]'
   ]
@@ -92,6 +101,7 @@ export function getFocusableElements(root: ParentNode): HTMLElement[] {
     let current: HTMLElement | null = el
     while (current) {
       if (current.hidden || current.getAttribute('aria-hidden') === 'true') return false
+      if (isInertElement(current) || isDisabledFieldset(current)) return false
       if (current.style.display === 'none' || current.style.visibility === 'hidden') return false
 
       const view: Window | null = current.ownerDocument.defaultView
@@ -118,7 +128,7 @@ export function getFocusTrapNavigation(
   activeElement: Element | null
 ): FocusTrapNavigation {
   if (!isTabKey(event)) return { shouldHandle: false }
-  if (focusables.length === 0) return { shouldHandle: false }
+  if (focusables.length === 0) return { shouldHandle: true }
 
   const currentIndex = activeElement ? focusables.findIndex((el) => el === activeElement) : -1
 
@@ -233,4 +243,127 @@ export function lockBodyScroll(targetDocument?: Document): () => void {
 
 export function getBodyScrollLockCount(): number {
   return bodyScrollLockCount
+}
+
+function isLiveRegionElement(element: HTMLElement): boolean {
+  return (
+    element.hasAttribute('aria-live') ||
+    element.id.startsWith('tigercat-live-region') ||
+    element.id.startsWith('tiger-live-region')
+  )
+}
+
+/** Inert every sibling between the overlay and document.body so pointer input cannot leave. */
+export function setBackgroundInert(overlayRoot: HTMLElement): () => void {
+  const restored: Array<{ element: HTMLElement; wasInert: boolean }> = []
+  let current: HTMLElement | null = overlayRoot
+
+  while (current && current !== current.ownerDocument.body) {
+    const parent = current.parentElement
+    if (!parent) break
+
+    for (const child of Array.from(parent.children)) {
+      if (
+        !(child instanceof HTMLElement) ||
+        child === current ||
+        current.contains(child) ||
+        isLiveRegionElement(child)
+      ) {
+        continue
+      }
+      restored.push({ element: child, wasInert: isInertElement(child) })
+      child.setAttribute('inert', '')
+      child.inert = true
+    }
+
+    if (parent === current.ownerDocument.body) break
+    current = parent
+  }
+
+  return () => {
+    for (const { element, wasInert } of restored) {
+      if (wasInert) continue
+      element.inert = false
+      element.removeAttribute('inert')
+    }
+  }
+}
+
+export interface FocusTrapOptions {
+  initialFocus?: HTMLElement | null
+  returnFocusOnDeactivate?: boolean
+  escapeDeactivates?: boolean
+  onEscape?: () => void
+}
+
+export interface FocusTrap {
+  activate: () => void
+  deactivate: () => void
+}
+
+/** Thin wrapper around the overlay Tab cycle used by Modal / Drawer / Tour. */
+export function createFocusTrap(container: HTMLElement, options: FocusTrapOptions = {}): FocusTrap {
+  if (!isBrowser()) {
+    return {
+      activate() {},
+      deactivate() {}
+    }
+  }
+
+  const {
+    initialFocus = null,
+    returnFocusOnDeactivate = true,
+    escapeDeactivates = true,
+    onEscape
+  } = options
+
+  let previouslyFocused: HTMLElement | null = null
+  let active = false
+
+  function handleKeyDown(event: KeyboardEvent): void {
+    if (!active) return
+
+    if (escapeDeactivates && isEscapeKey(event)) {
+      event.preventDefault()
+      onEscape?.()
+      return
+    }
+
+    const focusables = getFocusableElements(container)
+    const navigation = getFocusTrapNavigation(
+      event,
+      focusables,
+      container.ownerDocument.activeElement
+    )
+    if (!navigation.shouldHandle) return
+
+    event.preventDefault()
+    navigation.next?.focus()
+  }
+
+  return {
+    activate() {
+      if (active) return
+      active = true
+      previouslyFocused = container.ownerDocument.activeElement as HTMLElement | null
+      container.ownerDocument.addEventListener('keydown', handleKeyDown, true)
+
+      if (initialFocus) {
+        initialFocus.focus()
+        return
+      }
+      const focusables = getFocusableElements(container)
+      focusables[0]?.focus()
+    },
+    deactivate() {
+      if (!active) return
+      active = false
+      container.ownerDocument.removeEventListener('keydown', handleKeyDown, true)
+
+      if (returnFocusOnDeactivate && previouslyFocused) {
+        previouslyFocused.focus()
+        previouslyFocused = null
+      }
+    }
+  }
 }

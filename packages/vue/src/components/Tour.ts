@@ -209,7 +209,7 @@ export const Tour = defineComponent({
     const detachEscape = useVueEscapeKey({ enabled: openRef, onEscape: close })
     onBeforeUnmount(detachEscape)
     useVueBodyScrollLock(openRef)
-    useVueFocusTrap({ enabled: openRef, containerRef: rootRef })
+    useVueFocusTrap({ enabled: openRef, containerRef: rootRef, inert: true })
 
     watch(
       openRef,
