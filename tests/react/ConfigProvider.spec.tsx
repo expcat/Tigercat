@@ -7,6 +7,7 @@ import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
 import {
+  getGlobalTigerLocale,
   resetDocumentConfigScope,
   resetTigerLocaleScope,
   ThemeManager,
@@ -240,6 +241,52 @@ describe('ConfigProvider', () => {
       unmount()
 
       expect(document.documentElement.getAttribute('dir')).toBe('rtl')
+    })
+
+    it('writes lang from the locale id and restores it on unmount', () => {
+      document.documentElement.setAttribute('lang', 'en')
+
+      const { unmount } = render(
+        <ConfigProvider locale={{ locale: 'zh-CN' }}>
+          <span>中文</span>
+        </ConfigProvider>
+      )
+
+      expect(document.documentElement.getAttribute('lang')).toBe('zh-CN')
+
+      unmount()
+
+      expect(document.documentElement.getAttribute('lang')).toBe('en')
+    })
+
+    it('does not clear an existing html lang when the provider has no locale id', () => {
+      document.documentElement.setAttribute('lang', 'en')
+
+      const { unmount } = render(
+        <ConfigProvider locale={{ common: { okText: 'OK' } }}>
+          <LocaleDisplay />
+        </ConfigProvider>
+      )
+
+      expect(document.documentElement.getAttribute('lang')).toBe('en')
+
+      unmount()
+
+      expect(document.documentElement.getAttribute('lang')).toBe('en')
+    })
+
+    it('exposes the ConfigProvider locale to imperative APIs during the first render', () => {
+      function ImperativeLocale() {
+        return <span data-testid="global">{getGlobalTigerLocale()?.common?.okText ?? 'empty'}</span>
+      }
+
+      const { getByTestId } = render(
+        <ConfigProvider locale={{ common: { okText: '确定' } }}>
+          <ImperativeLocale />
+        </ConfigProvider>
+      )
+
+      expect(getByTestId('global').textContent).toBe('确定')
     })
 
     it('does not restore over a remaining sibling owner', () => {

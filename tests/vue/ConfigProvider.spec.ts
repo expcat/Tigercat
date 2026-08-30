@@ -7,6 +7,7 @@ import { render, waitFor } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
 import {
+  getGlobalTigerLocale,
   resetDocumentConfigScope,
   resetTigerLocaleScope,
   ThemeManager,
@@ -270,6 +271,69 @@ describe('ConfigProvider', () => {
       unmount()
 
       expect(document.documentElement.getAttribute('dir')).toBe('rtl')
+    })
+
+    it('writes lang from the locale id and restores it on unmount', () => {
+      document.documentElement.setAttribute('lang', 'en')
+
+      const { unmount } = render(
+        defineComponent({
+          setup() {
+            return () => h(ConfigProvider, { locale: { locale: 'zh-CN' } }, () => h('span', '中文'))
+          }
+        })
+      )
+
+      expect(document.documentElement.getAttribute('lang')).toBe('zh-CN')
+
+      unmount()
+
+      expect(document.documentElement.getAttribute('lang')).toBe('en')
+    })
+
+    it('does not clear an existing html lang when the provider has no locale id', () => {
+      document.documentElement.setAttribute('lang', 'en')
+
+      const { unmount } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { okText: 'OK' } } }, () => h(LocaleDisplay))
+          }
+        })
+      )
+
+      expect(document.documentElement.getAttribute('lang')).toBe('en')
+
+      unmount()
+
+      expect(document.documentElement.getAttribute('lang')).toBe('en')
+    })
+
+    it('exposes the ConfigProvider locale to imperative APIs during setup', () => {
+      const ImperativeLocale = defineComponent({
+        setup() {
+          return () =>
+            h(
+              'span',
+              { 'data-testid': 'global' },
+              getGlobalTigerLocale()?.common?.okText ?? 'empty'
+            )
+        }
+      })
+
+      const { getByTestId } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { okText: '确定' } } }, () =>
+                h(ImperativeLocale)
+              )
+          }
+        })
+      )
+
+      expect(getByTestId('global').textContent).toBe('确定')
     })
 
     it('does not restore over a remaining sibling owner', () => {

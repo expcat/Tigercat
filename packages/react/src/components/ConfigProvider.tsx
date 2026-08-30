@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   isLazyTigerLocale,
   getImmediateTigerLocale,
@@ -35,16 +35,13 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   const hydratedDocumentRef = useRef(false)
 
   const isLazy = isLazyTigerLocale(locale)
-  const immediateLocale = isLazy ? undefined : getImmediateTigerLocale(locale)
-
-  const [resolvedLocale, setResolvedLocale] = useState<Partial<TigerLocale> | undefined>(
-    immediateLocale
-  )
+  const [lazyLocale, setLazyLocale] = useState<Partial<TigerLocale> | undefined>(undefined)
   const [localeLoading, setLocaleLoading] = useState(isLazy)
+  const resolvedLocale = isLazy ? lazyLocale : getImmediateTigerLocale(locale)
 
   useEffect(() => {
     if (!isLazyTigerLocale(locale)) {
-      setResolvedLocale(getImmediateTigerLocale(locale))
+      setLazyLocale(undefined)
       setLocaleLoading(false)
       return
     }
@@ -55,7 +52,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     resolveTigerLocale(locale).then(
       (result) => {
         if (!cancelled) {
-          setResolvedLocale(result)
+          setLazyLocale(result)
           setLocaleLoading(false)
         }
       },
@@ -84,19 +81,23 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     [resolvedLocale, localeLoading, direction, theme, colorScheme, parent]
   )
 
-  useEffect(() => {
+  if (!globalLocaleHandleRef.current) {
     globalLocaleHandleRef.current = createGlobalTigerLocaleHandle(value.locale)
+  } else {
+    globalLocaleHandleRef.current.update(value.locale)
+  }
+
+  useLayoutEffect(() => {
+    if (!globalLocaleHandleRef.current) {
+      globalLocaleHandleRef.current = createGlobalTigerLocaleHandle(value.locale)
+    }
     return () => {
       globalLocaleHandleRef.current?.dispose()
       globalLocaleHandleRef.current = null
     }
   }, [])
 
-  useEffect(() => {
-    globalLocaleHandleRef.current?.update(value.locale)
-  }, [value.locale])
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isDocumentOwner) return
     const handle = createDocumentConfigHandle()
     documentHandleRef.current = handle
@@ -107,21 +108,24 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     }
   }, [isDocumentOwner])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!documentHandleRef.current) return
     documentHandleRef.current.apply(
       {
         theme: value.theme,
         colorScheme: value.colorScheme,
-        direction: value.direction
+        direction: value.direction,
+        lang: value.locale?.locale
       },
       { hydrateAuto: !hydratedDocumentRef.current }
     )
     hydratedDocumentRef.current = true
-  }, [value.theme, value.colorScheme, value.direction])
+  }, [value.theme, value.colorScheme, value.direction, value.locale?.locale])
 
   return <TigerConfigContext.Provider value={value}>{children}</TigerConfigContext.Provider>
 }
+
+ConfigProvider.displayName = 'TigerConfigProvider'
 
 export function useTigerConfig(): TigerConfig {
   return useContext(TigerConfigContext)

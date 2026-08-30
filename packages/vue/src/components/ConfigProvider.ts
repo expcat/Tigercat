@@ -131,7 +131,8 @@ export const ConfigProvider = defineComponent({
       () => ({
         theme: merged.value.theme,
         colorScheme: merged.value.colorScheme,
-        direction: merged.value.direction
+        direction: merged.value.direction,
+        lang: merged.value.locale?.locale
       }),
       (values) => {
         if (!isDocumentOwner) return
