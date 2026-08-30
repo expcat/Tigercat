@@ -28,11 +28,7 @@ const { getSpinnerSVGMock } = vi.hoisted(() => ({
 // heavy core package and causes worker timeouts.
 vi.mock('@expcat/tigercat-core', () => ({
   classNames: (...args: unknown[]) => args.filter(Boolean).join(' '),
-  buttonBaseClasses: 'btn-base',
-  buttonSizeClasses: { xs: 'btn-xs', sm: 'btn-sm', md: 'btn-md', lg: 'btn-lg', xl: 'btn-xl' },
-  buttonDisabledClasses: 'btn-disabled',
-  buttonDangerClasses: { primary: 'btn-danger-primary' },
-  getButtonVariantClasses: () => 'btn-variant',
+  resolveButtonClasses: () => 'btn-resolved',
   getSpinnerSVG: getSpinnerSVGMock,
   warnUnsupportedColorProp: () => {}
 }))

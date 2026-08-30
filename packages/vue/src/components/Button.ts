@@ -2,11 +2,7 @@ import { defineComponent, computed, h, inject, PropType } from 'vue'
 import {
   composeComponentClasses,
   mergeStyleValues,
-  buttonBaseClasses,
-  buttonSizeClasses,
-  buttonDisabledClasses,
-  buttonDangerClasses,
-  getButtonVariantClasses,
+  resolveButtonClasses,
   getSpinnerSVG,
   normalizeSvgAttrs,
   warnUnsupportedColorProp,
@@ -118,21 +114,20 @@ export const Button = defineComponent({
     const group = inject<ButtonGroupContext | null>(BUTTON_GROUP_INJECTION_KEY, null)
     const resolvedSize = computed<ButtonSize>(() => props.size ?? group?.size ?? 'md')
 
-    const buttonClasses = computed(() => {
-      const variantClasses = props.danger
-        ? (buttonDangerClasses[props.variant] ?? buttonDangerClasses.primary)
-        : getButtonVariantClasses(props.variant)
-
-      return composeComponentClasses(
-        buttonBaseClasses,
-        variantClasses,
-        buttonSizeClasses[resolvedSize.value],
-        (props.disabled || props.loading) && buttonDisabledClasses,
-        props.block && 'w-full',
-        props.className,
+    const buttonClasses = computed(() =>
+      composeComponentClasses(
+        resolveButtonClasses({
+          variant: props.variant,
+          danger: props.danger,
+          size: resolvedSize.value,
+          disabled: props.disabled,
+          loading: props.loading,
+          block: props.block,
+          className: props.className
+        }),
         attrs.class
       )
-    })
+    )
 
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 

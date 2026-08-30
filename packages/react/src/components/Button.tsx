@@ -1,11 +1,6 @@
 import React, { useMemo } from 'react'
 import {
-  classNames,
-  buttonBaseClasses,
-  buttonSizeClasses,
-  buttonDisabledClasses,
-  buttonDangerClasses,
-  getButtonVariantClasses,
+  resolveButtonClasses,
   getSpinnerSVG,
   warnUnsupportedColorProp,
   type ButtonProps as CoreButtonProps
@@ -63,20 +58,19 @@ export const Button: React.FC<ButtonProps> = ({
   const ariaBusy = ariaBusyProp ?? (loading ? true : undefined)
   const ariaDisabled = ariaDisabledProp ?? (isDisabled ? true : undefined)
 
-  const buttonClasses = useMemo(() => {
-    const variantClasses = danger
-      ? (buttonDangerClasses[variant] ?? buttonDangerClasses.primary)
-      : getButtonVariantClasses(variant)
-
-    return classNames(
-      buttonBaseClasses,
-      variantClasses,
-      buttonSizeClasses[resolvedSize],
-      isDisabled && buttonDisabledClasses,
-      block && 'w-full',
-      className
-    )
-  }, [variant, resolvedSize, isDisabled, block, danger, className])
+  const buttonClasses = useMemo(
+    () =>
+      resolveButtonClasses({
+        variant,
+        danger,
+        size: resolvedSize,
+        disabled,
+        loading,
+        block,
+        className
+      }),
+    [variant, danger, resolvedSize, disabled, loading, block, className]
+  )
 
   const iconIsRight = iconPosition === 'right'
 

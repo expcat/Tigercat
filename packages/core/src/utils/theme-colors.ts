@@ -83,14 +83,14 @@ export const defaultThemeColors: ThemeColors = {
     bg: 'bg-[var(--tiger-primary,#2563eb)]',
     bgHover: 'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
     text: 'text-[var(--tiger-primary-foreground,#ffffff)]',
-    focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
     disabled: 'disabled:bg-[var(--tiger-primary-disabled,#93c5fd)]'
   },
   secondary: {
     bg: 'bg-[var(--tiger-secondary,#4b5563)]',
     bgHover: 'hover:bg-[var(--tiger-secondary-hover,#374151)]',
     text: 'text-[var(--tiger-secondary-foreground,#ffffff)]',
-    focus: 'focus:ring-[var(--tiger-secondary,#4b5563)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-secondary,#4b5563))]',
     disabled: 'disabled:bg-[var(--tiger-secondary-disabled,#9ca3af)]'
   },
   outline: {
@@ -98,7 +98,7 @@ export const defaultThemeColors: ThemeColors = {
     bgHover: 'hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
     text: 'text-[var(--tiger-primary,#2563eb)]',
     border: 'border-2 border-[var(--tiger-primary,#2563eb)]',
-    focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
     disabled:
       'disabled:border-[var(--tiger-primary-disabled,#93c5fd)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)]'
   },
@@ -106,36 +106,35 @@ export const defaultThemeColors: ThemeColors = {
     bg: 'bg-transparent',
     bgHover: 'hover:bg-[var(--tiger-ghost-bg-hover,#eff6ff)]',
     text: 'text-[var(--tiger-primary,#2563eb)]',
-    focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
     disabled: 'disabled:text-[var(--tiger-primary-disabled,#93c5fd)]'
   },
   link: {
     bg: 'bg-transparent',
     bgHover: 'hover:underline',
     text: 'text-[var(--tiger-primary,#2563eb)]',
-    focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
     disabled: 'disabled:text-[var(--tiger-primary-disabled,#93c5fd)]'
   }
 }
 
 /**
- * Get button variant classes based on theme colors
- * @param variant - Button variant type
- * @param colors - Theme colors configuration (uses default if not provided)
- * @returns Combined class string for the button variant
+ * Get button variant classes based on theme colors.
+ * Unknown variants fall back to primary (does not throw). Keyboard ring lives
+ * on `buttonBaseClasses` (`focus-visible`); `scheme.focus` is not joined.
  */
 export function getButtonVariantClasses(
-  variant: keyof ThemeColors,
+  variant?: string,
   colors: ThemeColors = defaultThemeColors
 ): string {
-  const scheme = colors[variant]
+  const scheme =
+    variant && variant in colors ? colors[variant as keyof ThemeColors] : colors.primary
   const classes = [
     scheme.bg,
     scheme.bgHover,
     scheme.text,
     scheme.border,
     scheme.borderHover,
-    scheme.focus,
     scheme.disabled
   ].filter(Boolean)
 
