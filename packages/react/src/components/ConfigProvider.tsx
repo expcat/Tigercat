@@ -5,6 +5,7 @@ import {
   resolveTigerLocale,
   resolveTigerConfig,
   createDocumentConfigHandle,
+  devWarn,
   type TigerConfig,
   type ConfigProviderProps as CoreConfigProviderProps,
   type TigerLocale,
@@ -37,28 +38,38 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   const isLazy = isLazyTigerLocale(locale)
   const [lazyLocale, setLazyLocale] = useState<Partial<TigerLocale> | undefined>(undefined)
   const [localeLoading, setLocaleLoading] = useState(isLazy)
+  const [localeLoadError, setLocaleLoadError] = useState<Error | undefined>(undefined)
   const resolvedLocale = isLazy ? lazyLocale : getImmediateTigerLocale(locale)
 
   useEffect(() => {
     if (!isLazyTigerLocale(locale)) {
-      setLazyLocale(undefined)
+      setLazyLocale(getImmediateTigerLocale(locale))
       setLocaleLoading(false)
+      setLocaleLoadError(undefined)
       return
     }
 
     let cancelled = false
     setLocaleLoading(true)
+    setLocaleLoadError(undefined)
 
     resolveTigerLocale(locale).then(
       (result) => {
         if (!cancelled) {
           setLazyLocale(result)
           setLocaleLoading(false)
+          setLocaleLoadError(undefined)
         }
       },
-      () => {
+      (reason) => {
         if (!cancelled) {
+          const error = reason instanceof Error ? reason : new Error(String(reason))
           setLocaleLoading(false)
+          setLocaleLoadError(error)
+          devWarn(
+            'ConfigProvider.localeLoad',
+            '[Tigercat] ConfigProvider failed to load locale; keeping the previous locale.'
+          )
         }
       }
     )
@@ -73,12 +84,13 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
       resolveTigerConfig({
         locale: resolvedLocale,
         localeLoading,
+        localeLoadError,
         direction,
         theme,
         colorScheme,
         parent
       }),
-    [resolvedLocale, localeLoading, direction, theme, colorScheme, parent]
+    [resolvedLocale, localeLoading, localeLoadError, direction, theme, colorScheme, parent]
   )
 
   if (!globalLocaleHandleRef.current) {

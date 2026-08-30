@@ -24,7 +24,9 @@ const LocaleDisplay = defineComponent({
         h('span', { 'data-testid': 'ok' }, config.value.locale?.common?.okText ?? 'default'),
         h('span', { 'data-testid': 'loading' }, config.value.localeLoading ? 'loading' : 'ready'),
         h('span', { 'data-testid': 'direction' }, config.value.direction ?? 'none'),
-        h('span', { 'data-testid': 'theme' }, config.value.theme ?? 'none')
+        h('span', { 'data-testid': 'theme' }, config.value.theme ?? 'none'),
+        h('span', { 'data-testid': 'load-error' }, config.value.localeLoadError ? 'error' : 'ok'),
+        h('span', { 'data-testid': 'data-export' }, config.value.locale?.dataExport ? 'yes' : 'no')
       ])
   }
 })
@@ -198,6 +200,29 @@ describe('ConfigProvider', () => {
       })
 
       expect(getByTestId('ok').textContent).toBe('default')
+      expect(getByTestId('load-error').textContent).toBe('error')
+    })
+
+    it('keeps the previous locale when a later loader fails', async () => {
+      const locale = ref<TigerLocale | (() => Promise<never>)>({ common: { okText: 'Keep' } })
+      const { getByTestId } = render(
+        defineComponent({
+          setup() {
+            return () => h(ConfigProvider, { locale: locale.value }, () => h(LocaleDisplay))
+          }
+        })
+      )
+
+      expect(getByTestId('ok').textContent).toBe('Keep')
+
+      locale.value = () => Promise.reject(new Error('network error'))
+
+      await waitFor(() => {
+        expect(getByTestId('loading').textContent).toBe('ready')
+        expect(getByTestId('load-error').textContent).toBe('error')
+      })
+
+      expect(getByTestId('ok').textContent).toBe('Keep')
     })
 
     it('propagates localeLoading through nested providers', async () => {
@@ -372,10 +397,49 @@ describe('ConfigProvider', () => {
       expect(getByTestId('loading').textContent).toBe('ready')
     })
   })
+  describe('official locale and theme', () => {
+    it('keeps dataExport when wrapping with the zhCN locale object', async () => {
+      const { zhCN } = await import('@expcat/tigercat-core/locales/zh-CN')
+      const { getByTestId } = render(
+        defineComponent({
+          setup() {
+            return () => h(ConfigProvider, { locale: zhCN }, () => h(LocaleDisplay))
+          }
+        })
+      )
+
+      expect(getByTestId('data-export').textContent).toBe('yes')
+    })
+
+    it('applies theme=modern as the F-001 modern switch', () => {
+      render(
+        defineComponent({
+          setup() {
+            return () => h(ConfigProvider, { theme: 'modern' }, () => h('span', 'modern'))
+          }
+        })
+      )
+
+      expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
+    })
+  })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(ConfigProvider)
+    it('has no accessibility violations on a labelled tree and writes dir plus lang', async () => {
+      const { container } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { locale: 'zh-CN' }, direction: 'ltr' }, () =>
+                h('p', '配置树')
+              )
+          }
+        })
+      )
+
       await expectNoA11yViolationsIsolated(container)
+      expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+      expect(document.documentElement.getAttribute('lang')).toBe('zh-CN')
     })
   })
 })

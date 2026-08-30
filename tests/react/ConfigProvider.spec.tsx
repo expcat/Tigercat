@@ -23,6 +23,8 @@ function LocaleDisplay() {
       <span data-testid="loading">{config.localeLoading ? 'loading' : 'ready'}</span>
       <span data-testid="direction">{config.direction ?? 'none'}</span>
       <span data-testid="theme">{config.theme ?? 'none'}</span>
+      <span data-testid="load-error">{config.localeLoadError ? 'error' : 'ok'}</span>
+      <span data-testid="data-export">{config.locale?.dataExport ? 'yes' : 'no'}</span>
     </div>
   )
 }
@@ -170,8 +172,31 @@ describe('ConfigProvider', () => {
         expect(getByTestId('loading').textContent).toBe('ready')
       })
 
-      // Falls back to default (no locale loaded)
       expect(getByTestId('ok').textContent).toBe('default')
+      expect(getByTestId('load-error').textContent).toBe('error')
+    })
+
+    it('keeps the previous locale when a later loader fails', async () => {
+      const { getByTestId, rerender } = render(
+        <ConfigProvider locale={{ common: { okText: 'Keep' } }}>
+          <LocaleDisplay />
+        </ConfigProvider>
+      )
+
+      expect(getByTestId('ok').textContent).toBe('Keep')
+
+      rerender(
+        <ConfigProvider locale={() => Promise.reject(new Error('network error'))}>
+          <LocaleDisplay />
+        </ConfigProvider>
+      )
+
+      await waitFor(() => {
+        expect(getByTestId('loading').textContent).toBe('ready')
+        expect(getByTestId('load-error').textContent).toBe('error')
+      })
+
+      expect(getByTestId('ok').textContent).toBe('Keep')
     })
 
     it('propagates localeLoading through nested providers', async () => {
@@ -321,10 +346,40 @@ describe('ConfigProvider', () => {
       expect(getByTestId('loading').textContent).toBe('ready')
     })
   })
+  describe('official locale and theme', () => {
+    it('keeps dataExport when wrapping with the zhCN locale object', async () => {
+      const { zhCN } = await import('@expcat/tigercat-core/locales/zh-CN')
+      const { getByTestId } = render(
+        <ConfigProvider locale={zhCN}>
+          <LocaleDisplay />
+        </ConfigProvider>
+      )
+
+      expect(getByTestId('data-export').textContent).toBe('yes')
+    })
+
+    it('applies theme=modern as the F-001 modern switch', () => {
+      render(
+        <ConfigProvider theme="modern">
+          <span>modern</span>
+        </ConfigProvider>
+      )
+
+      expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
+    })
+  })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<ConfigProvider />)
+    it('has no accessibility violations on a labelled tree and writes dir plus lang', async () => {
+      const { container } = render(
+        <ConfigProvider locale={{ locale: 'zh-CN' }} direction="ltr">
+          <p>配置树</p>
+        </ConfigProvider>
+      )
+
       await expectNoA11yViolationsIsolated(container)
+      expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+      expect(document.documentElement.getAttribute('lang')).toBe('zh-CN')
     })
   })
 })

@@ -17,6 +17,7 @@ import {
   resolveTigerLocale,
   resolveTigerConfig,
   createDocumentConfigHandle,
+  devWarn,
   type TigerConfig,
   type TigerLocale,
   type TigerLocaleInput,
@@ -73,6 +74,7 @@ export const ConfigProvider = defineComponent({
       isLazyTigerLocale(props.locale) ? undefined : getImmediateTigerLocale(props.locale)
     )
     const localeLoading = ref(isLazyTigerLocale(props.locale))
+    const localeLoadError = ref<Error | undefined>(undefined)
     let loadId = 0
 
     watch(
@@ -81,22 +83,30 @@ export const ConfigProvider = defineComponent({
         if (!isLazyTigerLocale(locale)) {
           resolvedLocale.value = getImmediateTigerLocale(locale)
           localeLoading.value = false
+          localeLoadError.value = undefined
           return
         }
 
         const thisId = ++loadId
         localeLoading.value = true
+        localeLoadError.value = undefined
 
         resolveTigerLocale(locale).then(
           (result) => {
             if (thisId === loadId) {
               resolvedLocale.value = result
               localeLoading.value = false
+              localeLoadError.value = undefined
             }
           },
-          () => {
+          (reason) => {
             if (thisId === loadId) {
               localeLoading.value = false
+              localeLoadError.value = reason instanceof Error ? reason : new Error(String(reason))
+              devWarn(
+                'ConfigProvider.localeLoad',
+                '[Tigercat] ConfigProvider failed to load locale; keeping the previous locale.'
+              )
             }
           }
         )
@@ -108,6 +118,7 @@ export const ConfigProvider = defineComponent({
       resolveTigerConfig({
         locale: resolvedLocale.value,
         localeLoading: localeLoading.value,
+        localeLoadError: localeLoadError.value,
         direction: props.direction,
         theme: props.theme,
         colorScheme: props.colorScheme,
