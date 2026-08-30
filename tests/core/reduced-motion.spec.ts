@@ -158,6 +158,12 @@ describe('createTigercatPlugin() — reduced-motion CSS block', () => {
     expect(rules['[data-tiger-style="modern"]']).toBeDefined()
     expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
   })
+
+  it('reduced-motion covers the --tiger-transition-* names components read', () => {
+    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-transition-base']).toBe('all 0ms linear')
+    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-transition-quick']).toBe('all 0ms linear')
+    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-motion-duration-base']).toBe('0ms')
+  })
 })
 
 describe('Reduced-motion CSS — actually applies in jsdom when media matches', () => {

@@ -20,6 +20,12 @@ import {
 } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 import { defaultTheme } from './default/theme'
+import {
+  MODERN_BASE_TOKENS_DARK,
+  MODERN_BASE_TOKENS_LIGHT,
+  MODERN_OVERRIDE_TOKENS_DARK,
+  MODERN_OVERRIDE_TOKENS_LIGHT
+} from './modern/tokens'
 
 /**
  * Merge a preset segment onto the default theme for the same scheme.
@@ -89,11 +95,17 @@ export const THEME_CONFIG_CSS_VARS = {
     xl: '--tiger-spacing-xl'
   },
   motion: {
-    durationFast: '--tiger-duration-fast',
-    durationBase: '--tiger-duration-base',
-    durationSlow: '--tiger-duration-slow',
-    easing: '--tiger-easing'
+    durationFast: '--tiger-motion-duration-quick',
+    durationBase: '--tiger-motion-duration-base',
+    durationSlow: '--tiger-motion-duration-relaxed',
+    easing: '--tiger-motion-ease-standard'
   }
+} as const
+
+const THEME_TRANSITION_CSS_VARS = {
+  durationFast: '--tiger-transition-quick',
+  durationBase: '--tiger-transition-base',
+  durationSlow: '--tiger-transition-emphasized'
 } as const
 
 export function themeConfigToCssVars(config: ThemeConfig): Record<string, string> {
@@ -111,7 +123,31 @@ export function themeConfigToCssVars(config: ThemeConfig): Record<string, string
     }
   }
 
+  const motion = config.motion
+  if (motion) {
+    const easing = motion.easing ?? 'cubic-bezier(0.4, 0, 0.2, 1)'
+    if (motion.durationBase) {
+      vars[THEME_TRANSITION_CSS_VARS.durationBase] = `all ${motion.durationBase} ${easing}`
+    }
+    if (motion.durationFast) {
+      vars[THEME_TRANSITION_CSS_VARS.durationFast] = `all ${motion.durationFast} ${easing}`
+    }
+    if (motion.durationSlow) {
+      vars[THEME_TRANSITION_CSS_VARS.durationSlow] = `transform ${motion.durationSlow} ${easing}`
+    }
+  }
+
   return vars
+}
+
+function extraThemeVarNames(): string[] {
+  return [
+    ...Object.values(THEME_TRANSITION_CSS_VARS),
+    ...Object.keys(MODERN_BASE_TOKENS_LIGHT),
+    ...Object.keys(MODERN_BASE_TOKENS_DARK),
+    ...Object.keys(MODERN_OVERRIDE_TOKENS_LIGHT),
+    ...Object.keys(MODERN_OVERRIDE_TOKENS_DARK)
+  ]
 }
 
 function clearThemeConfig(target: HTMLElement): void {
@@ -121,7 +157,8 @@ function clearThemeConfig(target: HTMLElement): void {
     ...Object.values(THEME_CONFIG_CSS_VARS.radius),
     ...Object.values(THEME_CONFIG_CSS_VARS.shadows),
     ...Object.values(THEME_CONFIG_CSS_VARS.spacing),
-    ...Object.values(THEME_CONFIG_CSS_VARS.motion)
+    ...Object.values(THEME_CONFIG_CSS_VARS.motion),
+    ...extraThemeVarNames()
   ])
 }
 
@@ -260,7 +297,20 @@ class ThemeManagerImpl {
     // Replace the previous inline theme with the merged config so missing
     // segments fall back to the default theme instead of disappearing.
     clearThemeConfig(root)
-    setCssVarsCached(root, themeConfigToCssVars(config))
+
+    const isModern = this.currentThemeName === 'modern'
+    const extra = isModern
+      ? this.resolvedDark
+        ? MODERN_OVERRIDE_TOKENS_DARK
+        : MODERN_OVERRIDE_TOKENS_LIGHT
+      : {}
+    setCssVarsCached(root, { ...themeConfigToCssVars(config), ...extra })
+
+    if (isModern) {
+      root.setAttribute('data-tiger-style', 'modern')
+    } else {
+      root.removeAttribute('data-tiger-style')
+    }
 
     // Toggle `.dark` class on <html>
     if (this.resolvedDark) {

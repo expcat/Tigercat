@@ -75,11 +75,6 @@ function injectStyle(id: string, css: string): HTMLStyleElement {
 describe('Modern theme — interaction (data-tiger-style="modern")', () => {
   let styleEl: HTMLStyleElement | null = null
 
-  beforeEach(() => {
-    const capture = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-  })
-
   afterEach(() => {
     styleEl?.remove()
     styleEl = null
@@ -87,7 +82,21 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
     document.documentElement.classList.remove('dark')
   })
 
-  it('without data-tiger-style, :root resolves to the default preset radius', () => {
+  it('createTigercatPlugin({ modern: true }) writes modern radius at :root without the attribute', () => {
+    const capture = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
+    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
+    const styles = getComputedStyle(document.documentElement)
+    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
+      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-md']
+    )
+    expect(styles.getPropertyValue('--tiger-blur-glass').trim()).toBe(
+      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-blur-glass']
+    )
+  })
+
+  it('default plugin :root stays on the default preset until data-tiger-style is set', () => {
+    const capture = captureRules(createTigercatPlugin() as PluginInstance)
+    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
     const styles = getComputedStyle(document.documentElement)
     expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
       defaultTheme.light.radius?.md
@@ -98,6 +107,8 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
   })
 
   it('setting data-tiger-style="modern" on <html> flips radius / blur / shadow tokens', () => {
+    const capture = captureRules(createTigercatPlugin() as PluginInstance)
+    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
     document.documentElement.setAttribute('data-tiger-style', 'modern')
     const styles = getComputedStyle(document.documentElement)
     expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
@@ -114,7 +125,9 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
     )
   })
 
-  it('removing data-tiger-style restores base tokens (round-trip)', () => {
+  it('removing data-tiger-style restores default preset tokens (round-trip)', () => {
+    const capture = captureRules(createTigercatPlugin() as PluginInstance)
+    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
     document.documentElement.setAttribute('data-tiger-style', 'modern')
     document.documentElement.removeAttribute('data-tiger-style')
     const styles = getComputedStyle(document.documentElement)
@@ -122,6 +135,8 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
   })
 
   it('combined .dark + data-tiger-style="modern" resolves dark override shadows', () => {
+    const capture = captureRules(createTigercatPlugin() as PluginInstance)
+    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
     document.documentElement.classList.add('dark')
     document.documentElement.setAttribute('data-tiger-style', 'modern')
     const styles = getComputedStyle(document.documentElement)
@@ -131,6 +146,8 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
   })
 
   it('attribute selector can also activate the override on a sub-tree', () => {
+    const capture = captureRules(createTigercatPlugin() as PluginInstance)
+    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
     const subtree = document.createElement('div')
     subtree.setAttribute('data-tiger-style', 'modern')
     document.body.appendChild(subtree)

@@ -180,6 +180,19 @@ describe('themes/manager — ThemeManager', () => {
       )
     })
 
+    it('setTheme("modern") writes modern tokens and data-tiger-style', () => {
+      ThemeManager.setTheme('modern')
+      expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
+        '12px'
+      )
+      ThemeManager.setTheme('default')
+      expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
+        defaultTheme.light.radius?.md
+      )
+    })
+
     it('keeps default radius when switching the default theme to dark', () => {
       ThemeManager.setTheme('default')
       ThemeManager.setColorScheme('dark')
@@ -208,7 +221,8 @@ describe('themes/manager — ThemeManager', () => {
         '--tiger-radius-md': '0.75rem',
         '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',
         '--tiger-spacing-md': '1rem',
-        '--tiger-duration-base': '240ms'
+        '--tiger-motion-duration-base': '240ms',
+        '--tiger-transition-base': 'all 240ms cubic-bezier(0.4, 0, 0.2, 1)'
       })
     })
   })

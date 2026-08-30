@@ -124,14 +124,16 @@ describe('createTigercatPlugin modern option', () => {
     expect(rules['.dark']?.['--tiger-radius-md']).toBe(defaultTheme.dark.radius?.md)
   })
 
-  it('createTigercatPlugin without modern flag does NOT emit override block', () => {
+  it('createTigercatPlugin without modern flag still emits the data-tiger-style layer', () => {
     const rules = captureRules(createTigercatPlugin())
-    expect(rules['[data-tiger-style="modern"]']).toBeUndefined()
+    expect(rules['[data-tiger-style="modern"]']?.['--tiger-radius-md']).toBe('12px')
+    expect(rules[':root']?.['--tiger-radius-md']).toBe(defaultTheme.light.radius?.md)
     expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
   })
 
-  it('createTigercatPlugin({ modern: true }) emits override + reduced-motion block', () => {
+  it('createTigercatPlugin({ modern: true }) writes modern tokens at :root', () => {
     const rules = captureRules(createTigercatPlugin({ modern: true }))
+    expect(rules[':root']?.['--tiger-radius-md']).toBe(modernTheme.light.radius?.md)
     expect(rules['[data-tiger-style="modern"]']?.['--tiger-radius-md']).toBe('12px')
     expect(
       rules['.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark']?.[

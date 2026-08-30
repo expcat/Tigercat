@@ -9,6 +9,7 @@ import {
   MODERN_REDUCED_MOTION_TOKENS
 } from './themes/modern/tokens'
 import { defaultTheme } from './themes/default/theme'
+import { modernTheme } from './themes/modern/theme'
 import { resolvePresetThemeConfig, themeConfigToCssVars } from './themes/manager'
 
 function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {
@@ -65,7 +66,10 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
       outline: 'none'
     },
     ...tigercatDirectionBase,
-    ...tigercatReducedMotionBase
+    ...tigercatReducedMotionBase,
+    '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
+    '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
+      MODERN_OVERRIDE_TOKENS_DARK
   })
 })
 
@@ -73,15 +77,9 @@ export interface TigercatPluginOptions {
   /** A ThemePreset object to use instead of the built-in default */
   preset?: ThemePreset
   /**
-   * Enable the opt-in "modern" token layer.
-   *
-   * When `true`, the plugin emits `[data-tiger-style="modern"]` (and the
-   * dark counterpart) blocks that override radius / shadow / glass /
-   * gradient / motion tokens with the modern values, plus a
-   * `prefers-reduced-motion` rule that collapses motion durations.
-   *
-   * Activate it on a page by setting `data-tiger-style="modern"` on `<html>`
-   * or any ancestor element of your Tigercat tree.
+   * Use the modern preset at `:root` (same as `{ preset: modernTheme }`).
+   * `ThemeManager.setTheme('modern')` is the runtime equivalent and also
+   * sets `data-tiger-style="modern"`.
    *
    * @default false
    */
@@ -106,13 +104,22 @@ export interface TigercatPluginOptions {
  */
 export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
   return plugin(function ({ addBase }: PluginAPI) {
-    const preset = options.preset
+    const preset = options.preset ?? (options.modern ? modernTheme : defaultTheme)
+    const modern = options.modern === true || preset.name === 'modern'
     const lightVars = cssVarsForPreset(preset, 'light')
     const darkVars = cssVarsForPreset(preset, 'dark')
 
     addBase({
-      ':root': { ...MODERN_BASE_TOKENS_LIGHT, ...lightVars },
-      '.dark': { ...MODERN_BASE_TOKENS_DARK, ...darkVars },
+      ':root': {
+        ...MODERN_BASE_TOKENS_LIGHT,
+        ...lightVars,
+        ...(modern ? MODERN_OVERRIDE_TOKENS_LIGHT : {})
+      },
+      '.dark': {
+        ...MODERN_BASE_TOKENS_DARK,
+        ...darkVars,
+        ...(modern ? MODERN_OVERRIDE_TOKENS_DARK : {})
+      },
       'svg [tabindex], svg [role="button"]': {
         outline: 'none'
       },
@@ -120,13 +127,13 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
       ...tigercatReducedMotionBase
     })
 
-    if (options.modern) {
-      addBase({
-        '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
-        '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
-          MODERN_OVERRIDE_TOKENS_DARK
-      })
-    }
+    // Always emit the attribute layer so existing `data-tiger-style="modern"`
+    // markup and ThemeManager.setTheme('modern') stay equivalent.
+    addBase({
+      '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
+      '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
+        MODERN_OVERRIDE_TOKENS_DARK
+    })
   })
 }
 

@@ -8,10 +8,10 @@
  * @plugin "@expcat/tigercat-core/tailwind/modern";
  * ```
  *
- * Activates the opt-in "modern" visual style. Then any subtree marked
- * with `data-tiger-style="modern"` (e.g. on `<html>`) picks up the
- * modern radius / shadow / glass / gradient / motion overrides; an
- * additional `prefers-reduced-motion` rule collapses motion durations.
+ * Writes the modern preset to `:root` (same visual as
+ * `ThemeManager.setTheme('modern')`). `prefers-reduced-motion` collapses
+ * the `--tiger-transition-*` / `--tiger-motion-duration-*` tokens
+ * components actually read.
  */
 import { createTigercatPlugin } from './tailwind-plugin'
 
