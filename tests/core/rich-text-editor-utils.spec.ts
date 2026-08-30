@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   defaultToolbar,
   createDefaultRichTextToolbar,
-  ZH_CN_RICH_TEXT_EDITOR_LABELS,
   getRichTextContainerClasses,
   getToolbarButtonClasses,
   getEditorAreaClasses,
@@ -27,6 +26,7 @@ import {
   getToolbarButtons
 } from '@expcat/tigercat-core'
 import type { ToolbarButton, ToolbarSeparator, ToolbarItem } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 // ─── defaultToolbar ───────────────────────────────────────────────
 
@@ -52,7 +52,9 @@ describe('defaultToolbar', () => {
   })
 
   it('createDefaultRichTextToolbar uses locale labels for Bold / Italic', () => {
-    const toolbar = createDefaultRichTextToolbar(ZH_CN_RICH_TEXT_EDITOR_LABELS)
+    const toolbar = createDefaultRichTextToolbar(
+      zhCN.richTextEditor as Parameters<typeof createDefaultRichTextToolbar>[0]
+    )
     const bold = toolbar.find((btn) => btn.name === 'bold')
     const italic = toolbar.find((btn) => btn.name === 'italic')
     expect(bold?.label).toBe('加粗')

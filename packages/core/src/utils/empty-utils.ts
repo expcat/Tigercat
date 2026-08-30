@@ -5,6 +5,7 @@
 
 import type { EmptyPreset } from '../types/empty'
 import type { TigerLocale } from '../types/locale'
+import { getEmptyLabels } from './locale-utils'
 
 // ---------------------------------------------------------------------------
 // Layout classes
@@ -26,26 +27,19 @@ export const emptyActionsClasses = 'flex flex-wrap items-center justify-center g
 // Default descriptions per preset
 // ---------------------------------------------------------------------------
 
-const presetDescriptions: Record<EmptyPreset, string> = {
-  default: 'No data',
-  simple: 'No data',
-  'no-data': 'No data available',
-  'no-results': 'No results found',
-  error: 'Something went wrong'
-}
-
 export function getEmptyDescription(preset: EmptyPreset, locale?: Partial<TigerLocale>): string {
+  const empty = getEmptyLabels(locale)
   switch (preset) {
     case 'no-data':
-      return locale?.empty?.noDataAvailable ?? presetDescriptions[preset]
+      return empty.noDataAvailable
     case 'no-results':
-      return locale?.empty?.noResults ?? presetDescriptions[preset]
+      return empty.noResults
     case 'error':
-      return locale?.empty?.error ?? presetDescriptions[preset]
+      return empty.error
     case 'default':
     case 'simple':
     default:
-      return locale?.empty?.noData ?? locale?.common?.emptyText ?? presetDescriptions[preset]
+      return locale?.empty?.noData ?? locale?.common?.emptyText ?? empty.noData
   }
 }
 

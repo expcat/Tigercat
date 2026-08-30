@@ -8,97 +8,13 @@
 
 import type { TimePickerLabels } from '../types/timepicker'
 import type { TigerLocale } from '../types/locale'
-import {
-  formatIntlNumber,
-  getIntlPluralCategory,
-  DEFAULT_TIME_PICKER_LABELS,
-  ZH_CN_TIME_PICKER_LABELS
-} from './locale-utils'
+import { formatIntlNumber, getIntlPluralCategory, resolveLocaleSection } from './locale-utils'
+import { enUS } from './i18n/locales/en-US'
 import { findFirstEnabledIndex, findLastEnabledIndex, findNextEnabledIndex } from './picker-utils'
 
 // ============================================================================
 // Labels / i18n
 // ============================================================================
-
-// EN/ZH baselines live in locale-utils (single source of truth shared with
-// the rest of the locale system); this file only adds the extra languages.
-const EN_LABELS = DEFAULT_TIME_PICKER_LABELS
-const ZH_LABELS = ZH_CN_TIME_PICKER_LABELS
-
-const TIME_PICKER_LABELS_BY_LANGUAGE: Record<string, TimePickerLabels> = {
-  en: EN_LABELS,
-  zh: ZH_LABELS,
-  es: {
-    hour: 'Hora',
-    minute: 'Min',
-    second: 'Seg',
-    now: 'Ahora',
-    ok: 'Aceptar',
-    start: 'Inicio',
-    end: 'Fin',
-    clear: 'Borrar hora',
-    toggle: 'Abrir selector de hora',
-    dialog: 'Selector de hora',
-    selectTime: 'Seleccionar hora',
-    selectTimeRange: 'Seleccionar rango de horas'
-  },
-  fr: {
-    hour: 'Heure',
-    minute: 'Min',
-    second: 'Sec',
-    now: 'Maintenant',
-    ok: 'OK',
-    start: 'Début',
-    end: 'Fin',
-    clear: 'Effacer l’heure',
-    toggle: 'Ouvrir le sélecteur d’heure',
-    dialog: 'Sélecteur d’heure',
-    selectTime: 'Sélectionner une heure',
-    selectTimeRange: 'Sélectionner une plage horaire'
-  },
-  de: {
-    hour: 'Stunde',
-    minute: 'Min',
-    second: 'Sek',
-    now: 'Jetzt',
-    ok: 'OK',
-    start: 'Start',
-    end: 'Ende',
-    clear: 'Zeit löschen',
-    toggle: 'Zeitauswahl öffnen',
-    dialog: 'Zeitauswahl',
-    selectTime: 'Zeit auswählen',
-    selectTimeRange: 'Zeitbereich auswählen'
-  },
-  pt: {
-    hour: 'Hora',
-    minute: 'Min',
-    second: 'Seg',
-    now: 'Agora',
-    ok: 'OK',
-    start: 'Início',
-    end: 'Fim',
-    clear: 'Limpar hora',
-    toggle: 'Abrir seletor de hora',
-    dialog: 'Seletor de hora',
-    selectTime: 'Selecionar hora',
-    selectTimeRange: 'Selecionar intervalo de horas'
-  },
-  ar: {
-    hour: 'ساعة',
-    minute: 'دقيقة',
-    second: 'ثانية',
-    now: 'الآن',
-    ok: 'موافق',
-    start: 'البداية',
-    end: 'النهاية',
-    clear: 'مسح الوقت',
-    toggle: 'فتح منتقي الوقت',
-    dialog: 'منتقي الوقت',
-    selectTime: 'اختر الوقت',
-    selectTimeRange: 'اختر نطاق الوقت'
-  }
-}
 
 type TimePickerLocaleInput = string | Partial<TigerLocale>
 
@@ -114,11 +30,12 @@ export function getTimePickerLabels(
   locale?: TimePickerLocaleInput,
   overrides?: Partial<TimePickerLabels>
 ): TimePickerLabels {
-  const localeCode = getTimePickerLocaleCode(locale)
-  const language = (localeCode ?? '').split('-')[0]?.toLowerCase()
-  const base = language ? (TIME_PICKER_LABELS_BY_LANGUAGE[language] ?? EN_LABELS) : EN_LABELS
-  const localeLabels = typeof locale === 'string' ? undefined : locale?.timePicker
-  return { ...base, ...(localeLabels ?? {}), ...(overrides ?? {}) }
+  const localeObject = typeof locale === 'string' ? undefined : locale
+  return resolveLocaleSection(
+    enUS.timePicker as TimePickerLabels,
+    localeObject?.timePicker,
+    overrides
+  )
 }
 
 export type TimePickerOptionUnit = 'hour' | 'minute' | 'second'

@@ -4,7 +4,8 @@ import type {
   PaginationQuickJumperValidationOptions
 } from '../types/pagination'
 import { classNames } from './class-names'
-import { DEFAULT_PAGINATION_LABELS, formatPaginationTotal } from './locale-utils'
+import { formatPaginationTotal } from './locale-utils'
+import { enUS } from './i18n/locales/en-US'
 
 type IdleCallbackHandle = number
 type IdleCallbackScheduler = (
@@ -196,10 +197,10 @@ export function getPageNumbers(
 }
 
 /**
- * Default total text: English `DEFAULT_PAGINATION_LABELS.totalText` via formatPaginationTotal.
+ * Default total text: English `enUS.pagination.totalText` via formatPaginationTotal.
  */
 export function defaultTotalText(total: number, range: [number, number]): string {
-  return formatPaginationTotal(DEFAULT_PAGINATION_LABELS.totalText, total, range)
+  return formatPaginationTotal(enUS.pagination!.totalText!, total, range)
 }
 
 /**

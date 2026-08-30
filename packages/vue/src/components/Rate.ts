@@ -13,6 +13,7 @@ import {
   coerceClassValue,
   mergeTigerLocale,
   getRateLabels,
+  formatRateValueText,
   type TigerLocale,
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
@@ -190,9 +191,11 @@ export const Rate = defineComponent({
         )
       }
 
-      const valueText = labels.value.valueText
-        .replace('{value}', String(props.modelValue))
-        .replace('{plural}', props.modelValue === 1 ? '' : 's')
+      const valueText = formatRateValueText(
+        labels.value.valueText,
+        props.modelValue,
+        mergedLocale.value?.locale
+      )
 
       return h(
         'div',

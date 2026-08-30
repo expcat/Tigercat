@@ -3,7 +3,6 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
-import { ZH_CN_TIME_PICKER_LABELS, ZH_CN_UPLOAD_LABELS } from '../../locale-utils'
 import { ZH_CN_DATEPICKER_LOCALE } from '../datepicker-locales/zh-CN'
 
 export const zhCN: TigerLocale = {
@@ -42,7 +41,21 @@ export const zhCN: TigerLocale = {
   timeline: {
     pendingText: '加载中...'
   },
-  upload: ZH_CN_UPLOAD_LABELS,
+  upload: {
+    dragAreaAriaLabel: '点击或拖拽上传文件',
+    buttonAriaLabel: '上传文件',
+    clickToUploadText: '点击上传',
+    dragAndDropText: '或拖拽到此处',
+    acceptInfoText: '支持：{accept}',
+    maxSizeInfoText: '最大大小：{maxSize}',
+    selectFileText: '选择文件',
+    uploadedFilesAriaLabel: '已上传文件',
+    successAriaLabel: '成功',
+    errorAriaLabel: '错误',
+    uploadingAriaLabel: '上传中',
+    removeFileAriaLabel: '移除 {fileName}',
+    previewFileAriaLabel: '预览 {fileName}'
+  },
   pagination: {
     totalText: '共 {total} 条',
     itemsPerPageText: '条/页',
@@ -88,7 +101,20 @@ export const zhCN: TigerLocale = {
     exportingText: '导出中...'
   },
   datePicker: ZH_CN_DATEPICKER_LOCALE,
-  timePicker: ZH_CN_TIME_PICKER_LABELS,
+  timePicker: {
+    hour: '时',
+    minute: '分',
+    second: '秒',
+    now: '现在',
+    ok: '确定',
+    start: '开始',
+    end: '结束',
+    clear: '清除时间',
+    toggle: '打开时间选择器',
+    dialog: '时间选择器',
+    selectTime: '请选择时间',
+    selectTimeRange: '请选择时间范围'
+  },
   formWizard: {
     prevText: '上一步',
     nextText: '下一步',

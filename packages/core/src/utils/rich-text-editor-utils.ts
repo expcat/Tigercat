@@ -12,7 +12,7 @@ import type {
   ToolbarSeparator
 } from '../types/rich-text-editor'
 import type { TigerLocaleRichTextEditor } from '../types/locale'
-import { DEFAULT_RICH_TEXT_EDITOR_LABELS } from './locale-utils'
+import { enUS } from './i18n/locales/en-US'
 
 // ─── Toolbar item helpers ─────────────────────────────────────────
 
@@ -82,7 +82,7 @@ export function createDefaultRichTextToolbar(
 }
 
 export const defaultToolbar: ToolbarButton[] = createDefaultRichTextToolbar(
-  DEFAULT_RICH_TEXT_EDITOR_LABELS
+  enUS.richTextEditor as Required<TigerLocaleRichTextEditor>
 )
 
 // ─── Tailwind class constants ─────────────────────────────────────

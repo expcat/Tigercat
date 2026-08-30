@@ -9,7 +9,7 @@ import type {
   MarkdownToolbarSeparator
 } from '../types/markdown-editor'
 import type { TigerLocaleMarkdownEditor } from '../types/locale'
-import { DEFAULT_MARKDOWN_EDITOR_LABELS } from './locale-utils'
+import { enUS } from './i18n/locales/en-US'
 
 export { parseHeight as parseMarkdownHeight }
 
@@ -91,7 +91,7 @@ export function createDefaultMarkdownToolbar(
 }
 
 export const defaultMarkdownToolbar: MarkdownToolbarItem[] = createDefaultMarkdownToolbar(
-  DEFAULT_MARKDOWN_EDITOR_LABELS
+  enUS.markdownEditor as Required<TigerLocaleMarkdownEditor>
 )
 
 export const markdownModeLabels: Record<MarkdownEditorMode, string> = {

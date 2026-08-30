@@ -12,7 +12,7 @@ import type {
   FormRuleType
 } from '../types/form'
 import type { TigerLocaleFormValidation } from '../types/locale'
-import { DEFAULT_FORM_VALIDATION_LABELS } from './locale-utils'
+import { enUS } from './i18n/locales/en-US'
 
 export type FormValidationPreset = Extract<FormRuleType, 'email' | 'phone' | 'url' | 'id-card'>
 
@@ -218,7 +218,7 @@ function validateType(
   value: unknown,
   type: FormRule['type'],
   customMessage?: string,
-  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
+  messages: FormValidationMessages = enUS.formValidation as FormValidationMessages
 ): string | null {
   switch (type) {
     case 'string':
@@ -291,7 +291,7 @@ function validateRange(
   min: number | undefined,
   max: number | undefined,
   customMessage?: string,
-  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
+  messages: FormValidationMessages = enUS.formValidation as FormValidationMessages
 ): string | null {
   // String length validation
   if (typeof value === 'string') {
@@ -337,7 +337,7 @@ export async function validateRule(
   value: unknown,
   rule: FormRule,
   allValues?: FormValues,
-  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
+  messages: FormValidationMessages = enUS.formValidation as FormValidationMessages
 ): Promise<string | null> {
   // Skip validation if value is empty and not required
   if (!rule.required && isEmpty(value)) {
@@ -398,7 +398,7 @@ export async function validateField(
   rules: FormRule | FormRule[] | undefined,
   allValues?: FormValues,
   trigger?: FormRuleTrigger,
-  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
+  messages: FormValidationMessages = enUS.formValidation as FormValidationMessages
 ): Promise<string | null> {
   if (!rules) {
     return null
@@ -435,7 +435,7 @@ export async function validateField(
 export async function validateForm(
   values: FormValues,
   rules: FormRules,
-  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
+  messages: FormValidationMessages = enUS.formValidation as FormValidationMessages
 ): Promise<FormValidationResult> {
   const errors: FormError[] = []
 
@@ -463,7 +463,7 @@ export async function validateFormFields(
   rules: FormRules,
   fieldNames: string[],
   trigger?: FormRuleTrigger,
-  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
+  messages: FormValidationMessages = enUS.formValidation as FormValidationMessages
 ): Promise<FormValidationResult> {
   const errors: FormError[] = []
   const uniqueFieldNames = Array.from(new Set(fieldNames))

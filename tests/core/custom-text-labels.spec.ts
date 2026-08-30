@@ -14,37 +14,21 @@ import {
   getNotificationCenterLabels,
   getChatMessageStatusInfo,
   buildChatMessageStatusInfo,
-  DEFAULT_PAGINATION_LABELS,
-  DEFAULT_TABLE_LABELS,
-  DEFAULT_FORM_WIZARD_LABELS,
-  DEFAULT_TASK_BOARD_LABELS,
-  DEFAULT_SELECT_LABELS,
-  DEFAULT_COLOR_PICKER_LABELS,
-  ZH_CN_COLOR_PICKER_LABELS,
-  DEFAULT_CHAT_WINDOW_LABELS,
-  DEFAULT_CODE_LABELS,
-  DEFAULT_COMMENT_THREAD_LABELS,
-  DEFAULT_ACTIVITY_FEED_LABELS,
-  DEFAULT_NOTIFICATION_CENTER_LABELS,
-  ZH_CN_CHAT_WINDOW_LABELS,
-  ZH_CN_CODE_LABELS,
-  ZH_CN_COMMENT_THREAD_LABELS,
-  ZH_CN_ACTIVITY_FEED_LABELS,
-  ZH_CN_NOTIFICATION_CENTER_LABELS
+  getTourLabels
 } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 describe('custom-text overrides on label resolvers', () => {
   describe('getPaginationLabels', () => {
     it('falls back to English defaults with no locale or overrides', () => {
-      expect(getPaginationLabels()).toEqual(DEFAULT_PAGINATION_LABELS)
+      expect(getPaginationLabels()).toEqual(enUS.pagination)
     })
 
     it('uses flat overrides without needing a locale (single-language use)', () => {
       const labels = getPaginationLabels(undefined, { totalText: '{total} results' })
       expect(labels.totalText).toBe('{total} results')
-      // Unspecified fields still fall back to defaults
-      expect(labels.itemsPerPageText).toBe(DEFAULT_PAGINATION_LABELS.itemsPerPageText)
+      expect(labels.itemsPerPageText).toBe(enUS.pagination?.itemsPerPageText)
     })
 
     it('ranks overrides above the locale object', () => {
@@ -53,8 +37,12 @@ describe('custom-text overrides on label resolvers', () => {
         { totalText: 'from-overrides' }
       )
       expect(labels.totalText).toBe('from-overrides')
-      // Locale still wins for fields the overrides omit
       expect(labels.jumpToText).toBe('locale-jump')
+    })
+
+    it('does not guess Simplified Chinese from a locale id', () => {
+      expect(getPaginationLabels({ locale: 'zh-CN' }).totalText).toBe(enUS.pagination?.totalText)
+      expect(getPaginationLabels(zhCN).totalText).toBe(zhCN.pagination?.totalText)
     })
   })
 
@@ -66,19 +54,21 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.prevText).toBe('override-prev')
       expect(labels.nextText).toBe('locale-next')
-      expect(labels.finishText).toBe(DEFAULT_FORM_WIZARD_LABELS.finishText)
+      expect(labels.finishText).toBe(enUS.formWizard?.finishText)
     })
   })
 
   describe('getTableLabels', () => {
     it('falls back to English table defaults with no locale or overrides', () => {
-      expect(getTableLabels()).toEqual(DEFAULT_TABLE_LABELS)
+      expect(getTableLabels()).toEqual(enUS.table)
     })
 
-    it('uses Chinese table defaults for zh locales', () => {
-      const labels = getTableLabels({ locale: 'zh-CN' })
-      expect(labels.searchButtonText).toBe('搜索')
-      expect(labels.expandText).toBe('展开')
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getTableLabels({ locale: 'zh-CN' }).searchButtonText).toBe(
+        enUS.table?.searchButtonText
+      )
+      expect(getTableLabels(zhCN).searchButtonText).toBe('搜索')
+      expect(getTableLabels(zhCN).expandText).toBe('展开')
     })
 
     it('ranks overrides above locale and default', () => {
@@ -88,7 +78,16 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.searchButtonText).toBe('override-search')
       expect(labels.selectedText).toBe('locale-selected')
-      expect(labels.emptyText).toBe(DEFAULT_TABLE_LABELS.emptyText)
+      expect(labels.emptyText).toBe(enUS.table?.emptyText)
+    })
+
+    it('skips undefined override leaves so they do not wipe locale values', () => {
+      const labels = getTableLabels(
+        { table: { searchButtonText: 'locale-search' } },
+        { searchButtonText: undefined, emptyText: 'override-empty' }
+      )
+      expect(labels.searchButtonText).toBe('locale-search')
+      expect(labels.emptyText).toBe('override-empty')
     })
   })
 
@@ -100,19 +99,19 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.emptyColumnText).toBe('Nothing here')
       expect(labels.addCardText).toBe('locale-add')
-      expect(labels.boardAriaLabel).toBe(DEFAULT_TASK_BOARD_LABELS.boardAriaLabel)
+      expect(labels.boardAriaLabel).toBe(enUS.taskBoard?.boardAriaLabel)
     })
   })
 
   describe('getChatWindowLabels', () => {
     it('falls back to English defaults with no locale', () => {
-      expect(getChatWindowLabels()).toEqual(DEFAULT_CHAT_WINDOW_LABELS)
+      expect(getChatWindowLabels()).toEqual(enUS.chatWindow)
     })
 
-    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
-      expect(getChatWindowLabels({ locale: 'zh-CN' }).sendText).toBe('发送')
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getChatWindowLabels({ locale: 'zh-CN' }).sendText).toBe(enUS.chatWindow?.sendText)
       expect(getChatWindowLabels(zhCN).emptyText).toBe('暂无消息')
-      expect(getChatWindowLabels(zhCN)).toEqual(ZH_CN_CHAT_WINDOW_LABELS)
+      expect(getChatWindowLabels(zhCN)).toEqual(zhCN.chatWindow)
     })
 
     it('ranks overrides above locale and default', () => {
@@ -122,23 +121,21 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.sendText).toBe('override-send')
       expect(labels.emptyText).toBe('locale-empty')
-      expect(labels.placeholder).toBe(DEFAULT_CHAT_WINDOW_LABELS.placeholder)
+      expect(labels.placeholder).toBe(enUS.chatWindow?.placeholder)
     })
   })
 
   describe('getCodeLabels', () => {
     it('falls back to English Copy / Copied / Copy failed with no locale', () => {
-      expect(getCodeLabels()).toEqual(DEFAULT_CODE_LABELS)
+      expect(getCodeLabels()).toEqual(enUS.code)
       expect(getCodeLabels(undefined).copyLabel).toBe('Copy')
       expect(getCodeLabels(undefined).copiedLabel).toBe('Copied')
       expect(getCodeLabels(undefined).copyFailedLabel).toBe('Copy failed')
     })
 
-    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
-      expect(getCodeLabels({ locale: 'zh-CN' }).copyLabel).toBe('复制')
-      expect(getCodeLabels({ locale: 'zh-CN' }).copiedLabel).toBe('已复制')
-      expect(getCodeLabels({ locale: 'zh-CN' }).copyFailedLabel).toBe('复制失败')
-      expect(getCodeLabels(zhCN)).toEqual(ZH_CN_CODE_LABELS)
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getCodeLabels({ locale: 'zh-CN' }).copyLabel).toBe('Copy')
+      expect(getCodeLabels(zhCN)).toEqual(zhCN.code)
     })
 
     it('ranks overrides above locale and default', () => {
@@ -148,19 +145,21 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.copyLabel).toBe('Clone')
       expect(labels.copiedLabel).toBe('locale-copied')
-      expect(labels.copyFailedLabel).toBe(DEFAULT_CODE_LABELS.copyFailedLabel)
+      expect(labels.copyFailedLabel).toBe(enUS.code?.copyFailedLabel)
     })
   })
 
   describe('getCommentThreadLabels', () => {
     it('falls back to English defaults with no locale', () => {
-      expect(getCommentThreadLabels()).toEqual(DEFAULT_COMMENT_THREAD_LABELS)
+      expect(getCommentThreadLabels()).toEqual(enUS.commentThread)
     })
 
-    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
-      expect(getCommentThreadLabels({ locale: 'zh-CN' }).likeText).toBe('点赞')
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getCommentThreadLabels({ locale: 'zh-CN' }).likeText).toBe(
+        enUS.commentThread?.likeText
+      )
       expect(getCommentThreadLabels(zhCN).expandRepliesText).toBe('▸ 展开 {count} 条回复')
-      expect(getCommentThreadLabels(zhCN)).toEqual(ZH_CN_COMMENT_THREAD_LABELS)
+      expect(getCommentThreadLabels(zhCN)).toEqual(zhCN.commentThread)
     })
 
     it('ranks overrides above locale and default', () => {
@@ -170,18 +169,20 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.likeText).toBe('override-like')
       expect(labels.replyText).toBe('locale-reply')
-      expect(labels.emptyText).toBe(DEFAULT_COMMENT_THREAD_LABELS.emptyText)
+      expect(labels.emptyText).toBe(enUS.commentThread?.emptyText)
     })
   })
 
   describe('getActivityFeedLabels', () => {
     it('falls back to English defaults with no locale', () => {
-      expect(getActivityFeedLabels()).toEqual(DEFAULT_ACTIVITY_FEED_LABELS)
+      expect(getActivityFeedLabels()).toEqual(enUS.activityFeed)
     })
 
-    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
-      expect(getActivityFeedLabels({ locale: 'zh-CN' }).emptyText).toBe('暂无动态')
-      expect(getActivityFeedLabels(zhCN)).toEqual(ZH_CN_ACTIVITY_FEED_LABELS)
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getActivityFeedLabels({ locale: 'zh-CN' }).emptyText).toBe(
+        enUS.activityFeed?.emptyText
+      )
+      expect(getActivityFeedLabels(zhCN)).toEqual(zhCN.activityFeed)
     })
 
     it('ranks overrides above locale and default', () => {
@@ -196,13 +197,15 @@ describe('custom-text overrides on label resolvers', () => {
 
   describe('getNotificationCenterLabels', () => {
     it('falls back to English defaults with no locale', () => {
-      expect(getNotificationCenterLabels()).toEqual(DEFAULT_NOTIFICATION_CENTER_LABELS)
+      expect(getNotificationCenterLabels()).toEqual(enUS.notificationCenter)
     })
 
-    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
-      expect(getNotificationCenterLabels({ locale: 'zh-CN' }).title).toBe('通知中心')
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getNotificationCenterLabels({ locale: 'zh-CN' }).title).toBe(
+        enUS.notificationCenter?.title
+      )
       expect(getNotificationCenterLabels(zhCN).markAllReadText).toBe('全部标记已读')
-      expect(getNotificationCenterLabels(zhCN)).toEqual(ZH_CN_NOTIFICATION_CENTER_LABELS)
+      expect(getNotificationCenterLabels(zhCN)).toEqual(zhCN.notificationCenter)
     })
 
     it('ranks overrides above locale and default', () => {
@@ -212,7 +215,7 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.title).toBe('override-title')
       expect(labels.markAllReadText).toBe('locale-mark')
-      expect(labels.emptyText).toBe(DEFAULT_NOTIFICATION_CENTER_LABELS.emptyText)
+      expect(labels.emptyText).toBe(enUS.notificationCenter?.emptyText)
     })
   })
 
@@ -224,7 +227,7 @@ describe('custom-text overrides on label resolvers', () => {
     })
 
     it('uses Chinese status text when given a zh labels map', () => {
-      const zhMap = buildChatMessageStatusInfo(getChatWindowLabels({ locale: 'zh-CN' }))
+      const zhMap = buildChatMessageStatusInfo(getChatWindowLabels(zhCN))
       expect(getChatMessageStatusInfo('sent', zhMap).text).toBe('已送达')
       expect(getChatMessageStatusInfo('sending', zhMap).text).toBe('发送中')
       expect(getChatMessageStatusInfo('failed', zhMap).text).toBe('发送失败')
@@ -234,17 +237,18 @@ describe('custom-text overrides on label resolvers', () => {
 
   describe('getSelectLabels', () => {
     it('falls back to English defaults with no locale or overrides', () => {
-      expect(getSelectLabels()).toEqual(DEFAULT_SELECT_LABELS)
+      expect(getSelectLabels()).toEqual(enUS.select)
     })
 
-    it('uses Chinese defaults for zh locales', () => {
-      const labels = getSelectLabels({ locale: 'zh-CN' })
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getSelectLabels({ locale: 'zh-CN' }).doneText).toBe(enUS.select?.doneText)
+      const labels = getSelectLabels(zhCN)
       expect(labels.doneText).toBe('完成')
       expect(labels.placeholder).toBe('请选择')
       expect(labels.emptyText).toBe('暂无选项')
     })
 
-    it('ranks overrides above locale and common fallback', () => {
+    it('ranks overrides above locale', () => {
       const labels = getSelectLabels(
         { select: { doneText: 'LocaleDone' }, common: { okText: 'CommonOK' } },
         { doneText: 'OverrideDone' }
@@ -255,15 +259,14 @@ describe('custom-text overrides on label resolvers', () => {
 
   describe('getColorPickerLabels', () => {
     it('falls back to English Pick color / Color / Clear with no locale', () => {
-      expect(getColorPickerLabels()).toEqual(DEFAULT_COLOR_PICKER_LABELS)
+      expect(getColorPickerLabels()).toEqual(enUS.colorPicker)
       expect(getColorPickerLabels(undefined).trigger).toBe('Pick color')
     })
 
-    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
-      expect(getColorPickerLabels({ locale: 'zh-CN' }).trigger).toBe('选择颜色')
-      expect(getColorPickerLabels({ locale: 'zh-CN' }).panelTitle).toBe('颜色')
-      expect(getColorPickerLabels({ locale: 'zh-CN' }).clear).toBe('清空')
-      expect(getColorPickerLabels(zhCN)).toEqual(ZH_CN_COLOR_PICKER_LABELS)
+    it('reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+      expect(getColorPickerLabels({ locale: 'zh-CN' }).trigger).toBe('Pick color')
+      expect(getColorPickerLabels(zhCN).trigger).toBe('选择颜色')
+      expect(getColorPickerLabels(zhCN)).toEqual(zhCN.colorPicker)
     })
 
     it('ranks overrides above locale and default', () => {
@@ -273,7 +276,23 @@ describe('custom-text overrides on label resolvers', () => {
       )
       expect(labels.trigger).toBe('override-trigger')
       expect(labels.panelTitle).toBe('locale-title')
-      expect(labels.clear).toBe(DEFAULT_COLOR_PICKER_LABELS.clear)
+      expect(labels.clear).toBe(enUS.colorPicker?.clear)
+    })
+  })
+
+  describe('getTourLabels', () => {
+    it('does not read FormWizard when tour keys are missing', () => {
+      const labels = getTourLabels({
+        formWizard: { prevText: 'WizardPrev', nextText: 'WizardNext', finishText: 'WizardDone' }
+      })
+      expect(labels.prevText).toBe(enUS.tour?.prevText)
+      expect(labels.nextText).toBe(enUS.tour?.nextText)
+      expect(labels.finishText).toBe(enUS.tour?.finishText)
+    })
+
+    it('can fall back to common.closeText for closeAriaLabel', () => {
+      const labels = getTourLabels({ common: { closeText: 'Dismiss' } })
+      expect(labels.closeAriaLabel).toBe('Dismiss')
     })
   })
 })

@@ -3,7 +3,6 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
-import { DEFAULT_TIME_PICKER_LABELS, DEFAULT_UPLOAD_LABELS } from '../../locale-utils'
 import { EN_US_DATEPICKER_LOCALE } from '../datepicker-locales/en-US'
 
 export const enUS: TigerLocale = {
@@ -42,7 +41,21 @@ export const enUS: TigerLocale = {
   timeline: {
     pendingText: 'Loading...'
   },
-  upload: DEFAULT_UPLOAD_LABELS,
+  upload: {
+    dragAreaAriaLabel: 'Upload file by clicking or dragging',
+    buttonAriaLabel: 'Upload file',
+    clickToUploadText: 'Click to upload',
+    dragAndDropText: 'or drag and drop',
+    acceptInfoText: 'Accepted: {accept}',
+    maxSizeInfoText: 'Max size: {maxSize}',
+    selectFileText: 'Select File',
+    uploadedFilesAriaLabel: 'Uploaded files',
+    successAriaLabel: 'Success',
+    errorAriaLabel: 'Error',
+    uploadingAriaLabel: 'Uploading',
+    removeFileAriaLabel: 'Remove {fileName}',
+    previewFileAriaLabel: 'Preview {fileName}'
+  },
   pagination: {
     totalText: 'Total {total} items',
     itemsPerPageText: '/ page',
@@ -88,7 +101,20 @@ export const enUS: TigerLocale = {
     exportingText: 'Exporting...'
   },
   datePicker: EN_US_DATEPICKER_LOCALE,
-  timePicker: DEFAULT_TIME_PICKER_LABELS,
+  timePicker: {
+    hour: 'Hour',
+    minute: 'Min',
+    second: 'Sec',
+    now: 'Now',
+    ok: 'OK',
+    start: 'Start',
+    end: 'End',
+    clear: 'Clear time',
+    toggle: 'Toggle time picker',
+    dialog: 'Time picker',
+    selectTime: 'Select time',
+    selectTimeRange: 'Select time range'
+  },
   formWizard: {
     prevText: 'Previous',
     nextText: 'Next',

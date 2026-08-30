@@ -5,7 +5,7 @@
 import type { ChatMessageStatus } from '../types/composite'
 import type { BadgeVariant } from '../types/badge'
 import type { TigerLocaleChatWindow } from '../types/locale'
-import { DEFAULT_CHAT_WINDOW_LABELS } from './locale-utils'
+import { enUS } from './i18n/locales/en-US'
 
 export interface ChatMessageStatusInfo {
   text: string
@@ -14,15 +14,15 @@ export interface ChatMessageStatusInfo {
 
 export const defaultChatMessageStatusInfo: Record<ChatMessageStatus, ChatMessageStatusInfo> = {
   sending: {
-    text: DEFAULT_CHAT_WINDOW_LABELS.sendingText,
+    text: enUS.chatWindow!.sendingText!,
     className: 'text-[var(--tiger-text-muted,#6b7280)]'
   },
   sent: {
-    text: DEFAULT_CHAT_WINDOW_LABELS.sentText,
+    text: enUS.chatWindow!.sentText!,
     className: 'text-[var(--tiger-text-muted,#6b7280)]'
   },
   failed: {
-    text: DEFAULT_CHAT_WINDOW_LABELS.failedText,
+    text: enUS.chatWindow!.failedText!,
     className: 'text-[var(--tiger-danger,#ef4444)]'
   }
 }

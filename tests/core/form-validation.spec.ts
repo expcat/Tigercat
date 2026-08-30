@@ -15,6 +15,7 @@ import {
   createFormValidationDebouncer,
   getFormValidationLabels
 } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 describe('form-validation', () => {
   describe('getValueByPath', () => {
@@ -483,7 +484,7 @@ describe('form-validation', () => {
   })
 
   describe('localized messages', () => {
-    const zh = getFormValidationLabels({ locale: 'zh-CN' })
+    const zh = getFormValidationLabels(zhCN)
 
     it('defaults to English when no messages passed', async () => {
       expect(await validateRule('', { required: true })).toBe('This field is required')

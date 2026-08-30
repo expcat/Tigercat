@@ -13,10 +13,6 @@ import { deDE } from '@expcat/tigercat-core/locales/de-DE'
 import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
 import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
 import {
-  DEFAULT_CODE_LABELS,
-  DEFAULT_COLOR_PICKER_LABELS,
-  ZH_CN_CODE_LABELS,
-  ZH_CN_COLOR_PICKER_LABELS,
   defineLocale,
   defineText,
   formatColorPickerSelectPreset,
@@ -183,7 +179,7 @@ describe('i18n locale presets', () => {
   })
 
   it('getCodeLabels(undefined) is English Copy / Copied / Copy failed', () => {
-    expect(getCodeLabels(undefined)).toEqual(DEFAULT_CODE_LABELS)
+    expect(getCodeLabels(undefined)).toEqual(enUS.code)
     expect(getCodeLabels()).toEqual({
       copyLabel: 'Copy',
       copiedLabel: 'Copied',
@@ -191,8 +187,8 @@ describe('i18n locale presets', () => {
     })
   })
 
-  it('getCodeLabels zh-CN is 复制 / 已复制 / 复制失败', () => {
-    expect(getCodeLabels({ locale: 'zh-CN' })).toEqual(ZH_CN_CODE_LABELS)
+  it('getCodeLabels reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+    expect(getCodeLabels({ locale: 'zh-CN' }).copyLabel).toBe('Copy')
     expect(getCodeLabels(zhCN)).toEqual({
       copyLabel: '复制',
       copiedLabel: '已复制',
@@ -201,7 +197,7 @@ describe('i18n locale presets', () => {
   })
 
   it('getColorPickerLabels(undefined) is English Pick color / Color / Clear', () => {
-    expect(getColorPickerLabels(undefined)).toEqual(DEFAULT_COLOR_PICKER_LABELS)
+    expect(getColorPickerLabels(undefined)).toEqual(enUS.colorPicker)
     expect(getColorPickerLabels()).toEqual({
       trigger: 'Pick color',
       panelTitle: 'Color',
@@ -214,8 +210,8 @@ describe('i18n locale presets', () => {
     })
   })
 
-  it('getColorPickerLabels zh-CN is 选择颜色 / 颜色 / 清空', () => {
-    expect(getColorPickerLabels({ locale: 'zh-CN' })).toEqual(ZH_CN_COLOR_PICKER_LABELS)
+  it('getColorPickerLabels reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
+    expect(getColorPickerLabels({ locale: 'zh-CN' }).trigger).toBe('Pick color')
     expect(getColorPickerLabels(zhCN).trigger).toBe('选择颜色')
   })
 

@@ -71,12 +71,11 @@ describe('pagination-utils', () => {
     expect(defaultTotalText(240, [1, 20])).not.toBe('共 240 条')
   })
 
-  it('resolves TimePicker labels for new locale codes', () => {
-    expect(getTimePickerLabels('es-ES').selectTime).toBe('Seleccionar hora')
-    expect(getTimePickerLabels('ar-SA').ok).toBe('موافق')
+  it('resolves TimePicker labels from locale objects, not language codes', () => {
+    expect(getTimePickerLabels('es-ES').selectTime).toBe('Select time')
+    expect(
+      getTimePickerLabels({ timePicker: { selectTime: 'Seleccionar hora', ok: 'موافق' } }).ok
+    ).toBe('موافق')
     expect(getTimePickerOptionAriaLabel(2, 'hour', 'en-US')).toBe('2 hours')
-    expect(getTimePickerOptionAriaLabel(5, 'minute', 'ar-SA')).toBe(
-      `${new Intl.NumberFormat('ar-SA').format(5)} دقيقة`
-    )
   })
 })

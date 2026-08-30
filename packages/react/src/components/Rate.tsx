@@ -12,6 +12,7 @@ import {
   classNames,
   mergeTigerLocale,
   getRateLabels,
+  formatRateValueText,
   type TigerLocale,
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
@@ -197,9 +198,7 @@ export const Rate: React.FC<RateProps> = ({
     handleMouseLeave
   ])
 
-  const valueText = labels.valueText
-    .replace('{value}', String(value))
-    .replace('{plural}', value === 1 ? '' : 's')
+  const valueText = formatRateValueText(labels.valueText, value, mergedLocale?.locale)
 
   return (
     <div

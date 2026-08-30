@@ -16,6 +16,7 @@ import type {
   TigerLocaleInput,
   TigerLocaleLoader,
   TigerLocaleLazyModule,
+  TigerLocaleEmpty,
   TigerLocalePagination,
   TigerLocaleTable,
   TigerLocaleDataExport,
@@ -48,9 +49,8 @@ import type {
   TigerLocaleTagsInput,
   TigerLocaleDirection
 } from '../types/locale'
-import type { TimePickerLabels } from '../types/timepicker'
-import type { UploadLabels } from '../types/upload'
-import { TIGER_LOCALE_KEYS } from './i18n/locale-merge'
+import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
+import { enUS } from './i18n/locales/en-US'
 
 export { TIGER_LOCALE_KEYS, mergeTigerLocale } from './i18n/locale-merge'
 
@@ -138,194 +138,69 @@ export function getIntlPluralCategory(value: number, locale?: string): Intl.LDML
   }
 }
 
-// ============================================================================
-// Pagination Labels
-// ============================================================================
-
 /**
- * Default English pagination labels
+ * Merge `overrides` onto `section` onto `defaults`, skipping `undefined`.
+ * Missing keys always fall back to the en-US locale object — never a
+ * language-id heuristic.
  */
-export const DEFAULT_PAGINATION_LABELS: Required<TigerLocalePagination> = {
-  totalText: 'Total {total} items',
-  itemsPerPageText: '/ page',
-  jumpToText: 'Go to',
-  pageText: 'page',
-  prevPageAriaLabel: 'Previous page',
-  nextPageAriaLabel: 'Next page',
-  pageAriaLabel: 'Page {page}',
-  pageIndicatorText: 'Page {current} of {total}'
+export function resolveLocaleSection<T extends Record<string, unknown>>(
+  defaults: T,
+  section?: Partial<T> | null,
+  overrides?: Partial<T> | null
+): T {
+  return deepMergeLocale(
+    deepMergeLocale(defaults, section ?? undefined),
+    overrides ?? undefined
+  ) as T
 }
 
-/**
- * Chinese (Simplified) pagination labels
- */
-export const ZH_CN_PAGINATION_LABELS: Required<TigerLocalePagination> = {
-  totalText: '共 {total} 条',
-  itemsPerPageText: '条/页',
-  jumpToText: '跳至',
-  pageText: '页',
-  prevPageAriaLabel: '上一页',
-  nextPageAriaLabel: '下一页',
-  pageAriaLabel: '第 {page} 页',
-  pageIndicatorText: '第 {current} 页，共 {total} 页'
+function enSection<K extends keyof TigerLocale>(key: K): Required<NonNullable<TigerLocale[K]>> {
+  return enUS[key] as Required<NonNullable<TigerLocale[K]>>
 }
 
-// ============================================================================
-// FormWizard Labels
-// ============================================================================
-
-export const DEFAULT_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
-  prevText: 'Previous',
-  nextText: 'Next',
-  finishText: 'Finish'
-}
-
-export const ZH_CN_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
-  prevText: '上一步',
-  nextText: '下一步',
-  finishText: '完成'
-}
-
-export const DEFAULT_TOUR_LABELS: Required<TigerLocaleTour> = {
-  prevText: 'Previous',
-  nextText: 'Next',
-  finishText: 'Finish',
-  closeAriaLabel: 'Close tour'
-}
-
-export const ZH_CN_TOUR_LABELS: Required<TigerLocaleTour> = {
-  prevText: '上一步',
-  nextText: '下一步',
-  finishText: '完成',
-  closeAriaLabel: '关闭导览'
+export function getEmptyLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleEmpty>
+): Required<TigerLocaleEmpty> {
+  return resolveLocaleSection(enSection('empty'), locale?.empty, overrides)
 }
 
 export function getTourLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTour>
 ): Required<TigerLocaleTour> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_TOUR_LABELS : DEFAULT_TOUR_LABELS
+  const labels = resolveLocaleSection(enSection('tour'), locale?.tour, overrides)
   return {
-    prevText:
-      overrides?.prevText ??
-      locale?.tour?.prevText ??
-      locale?.formWizard?.prevText ??
-      defaultLabels.prevText,
-    nextText:
-      overrides?.nextText ??
-      locale?.tour?.nextText ??
-      locale?.formWizard?.nextText ??
-      defaultLabels.nextText,
-    finishText:
-      overrides?.finishText ??
-      locale?.tour?.finishText ??
-      locale?.formWizard?.finishText ??
-      defaultLabels.finishText,
+    ...labels,
     closeAriaLabel:
       overrides?.closeAriaLabel ??
       locale?.tour?.closeAriaLabel ??
       locale?.common?.closeText ??
-      defaultLabels.closeAriaLabel
+      labels.closeAriaLabel
   }
 }
 
-export const DEFAULT_CALENDAR_LABELS: Required<TigerLocaleCalendar> = {
-  previousMonth: 'Previous month',
-  nextMonth: 'Next month',
-  previousYear: 'Previous year',
-  nextYear: 'Next year',
-  yearSelectAriaLabel: 'Year',
-  monthSelectAriaLabel: 'Month',
-  daySelectAriaLabel: 'Day'
-}
-
-export const ZH_CN_CALENDAR_LABELS: Required<TigerLocaleCalendar> = {
-  previousMonth: '上个月',
-  nextMonth: '下个月',
-  previousYear: '上一年',
-  nextYear: '下一年',
-  yearSelectAriaLabel: '年份',
-  monthSelectAriaLabel: '月份',
-  daySelectAriaLabel: '日期'
-}
-
-export function getCalendarLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleCalendar> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_CALENDAR_LABELS : DEFAULT_CALENDAR_LABELS
-  return {
-    previousMonth: locale?.calendar?.previousMonth ?? defaultLabels.previousMonth,
-    nextMonth: locale?.calendar?.nextMonth ?? defaultLabels.nextMonth,
-    previousYear: locale?.calendar?.previousYear ?? defaultLabels.previousYear,
-    nextYear: locale?.calendar?.nextYear ?? defaultLabels.nextYear,
-    yearSelectAriaLabel: locale?.calendar?.yearSelectAriaLabel ?? defaultLabels.yearSelectAriaLabel,
-    monthSelectAriaLabel:
-      locale?.calendar?.monthSelectAriaLabel ?? defaultLabels.monthSelectAriaLabel,
-    daySelectAriaLabel: locale?.calendar?.daySelectAriaLabel ?? defaultLabels.daySelectAriaLabel
-  }
+export function getCalendarLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCalendar>
+): Required<TigerLocaleCalendar> {
+  return resolveLocaleSection(enSection('calendar'), locale?.calendar, overrides)
 }
 
 export function getFormWizardLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFormWizard>
 ): Required<TigerLocaleFormWizard> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_FORM_WIZARD_LABELS : DEFAULT_FORM_WIZARD_LABELS
-  return {
-    prevText: overrides?.prevText ?? locale?.formWizard?.prevText ?? defaultLabels.prevText,
-    nextText: overrides?.nextText ?? locale?.formWizard?.nextText ?? defaultLabels.nextText,
-    finishText: overrides?.finishText ?? locale?.formWizard?.finishText ?? defaultLabels.finishText
-  }
+  return resolveLocaleSection(enSection('formWizard'), locale?.formWizard, overrides)
 }
 
-/**
- * Get resolved pagination labels with fallback to defaults
- *
- * @param locale - Optional locale configuration
- * @returns Resolved pagination labels
- */
 export function getPaginationLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocalePagination>
 ): Required<TigerLocalePagination> {
-  const isZh =
-    !!locale?.locale?.startsWith('zh') ||
-    locale?.formWizard?.prevText === '上一步' ||
-    locale?.upload?.clickToUploadText === '点击上传'
-  const defaultLabels = isZh ? ZH_CN_PAGINATION_LABELS : DEFAULT_PAGINATION_LABELS
-  return {
-    totalText: overrides?.totalText ?? locale?.pagination?.totalText ?? defaultLabels.totalText,
-    itemsPerPageText:
-      overrides?.itemsPerPageText ??
-      locale?.pagination?.itemsPerPageText ??
-      defaultLabels.itemsPerPageText,
-    jumpToText: overrides?.jumpToText ?? locale?.pagination?.jumpToText ?? defaultLabels.jumpToText,
-    pageText: overrides?.pageText ?? locale?.pagination?.pageText ?? defaultLabels.pageText,
-    prevPageAriaLabel:
-      overrides?.prevPageAriaLabel ??
-      locale?.pagination?.prevPageAriaLabel ??
-      defaultLabels.prevPageAriaLabel,
-    nextPageAriaLabel:
-      overrides?.nextPageAriaLabel ??
-      locale?.pagination?.nextPageAriaLabel ??
-      defaultLabels.nextPageAriaLabel,
-    pageAriaLabel:
-      overrides?.pageAriaLabel ?? locale?.pagination?.pageAriaLabel ?? defaultLabels.pageAriaLabel,
-    pageIndicatorText:
-      overrides?.pageIndicatorText ??
-      locale?.pagination?.pageIndicatorText ??
-      defaultLabels.pageIndicatorText
-  }
+  return resolveLocaleSection(enSection('pagination'), locale?.pagination, overrides)
 }
 
-/**
- * Format pagination total text with variables
- *
- * @param template - Template string with {total}, {start}, {end} placeholders
- * @param total - Total item count
- * @param range - Current page range [start, end]
- * @returns Formatted string
- */
 export function formatPaginationTotal(
   template: string,
   total: number,
@@ -341,13 +216,6 @@ export function formatPaginationTotal(
     .replace('{plural}', category)
 }
 
-/**
- * Format pagination page aria-label
- *
- * @param template - Template string with {page} placeholder
- * @param page - Page number
- * @returns Formatted string
- */
 export function formatPageAriaLabel(template: string, page: number, locale?: string): string {
   return template.replace('{page}', formatIntlNumber(page, locale))
 }
@@ -363,151 +231,11 @@ export function formatPaginationPageIndicator(
     .replace('{total}', formatIntlNumber(total, locale))
 }
 
-// ============================================================================
-// Table Labels
-// ============================================================================
-
-export const DEFAULT_TABLE_LABELS: Required<TigerLocaleTable> = {
-  emptyText: 'No data',
-  loadingText: 'Loading',
-  expandText: 'Expand',
-  collapseText: 'Collapse',
-  selectAllText: 'Select all',
-  selectRowAriaLabel: 'Select row {row}',
-  sortByText: 'Sort by {column}',
-  clearSortText: 'Clear sort',
-  toolbarAriaLabel: 'Data table toolbar',
-  searchPlaceholder: 'Search',
-  searchButtonText: 'Search',
-  selectedText: 'Selected',
-  selectedItemsText: 'items',
-  columnSettingsText: 'Column settings',
-  columnSettingsAriaLabel: 'Column settings',
-  lockColumnAriaLabel: 'Lock column {column}',
-  unlockColumnAriaLabel: 'Unlock column {column}',
-  allText: 'All',
-  filterPlaceholder: 'Filter...',
-  exportCsvText: 'Export CSV',
-  exportExcelText: 'Export Excel',
-  exportCsvAriaLabel: 'Export to CSV',
-  exportExcelAriaLabel: 'Export to Excel',
-  expandRowAriaLabel: 'Expand row',
-  collapseRowAriaLabel: 'Collapse row'
-}
-
-export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
-  emptyText: '暂无数据',
-  loadingText: '加载中',
-  expandText: '展开',
-  collapseText: '收起',
-  selectAllText: '全选',
-  selectRowAriaLabel: '选择第 {row} 行',
-  sortByText: '按 {column} 排序',
-  clearSortText: '不排序',
-  toolbarAriaLabel: '数据表格工具栏',
-  searchPlaceholder: '搜索',
-  searchButtonText: '搜索',
-  selectedText: '已选择',
-  selectedItemsText: '项',
-  columnSettingsText: '列设置',
-  columnSettingsAriaLabel: '列设置',
-  lockColumnAriaLabel: '锁定{column}列',
-  unlockColumnAriaLabel: '取消锁定{column}列',
-  allText: '全部',
-  filterPlaceholder: '筛选...',
-  exportCsvText: '导出 CSV',
-  exportExcelText: '导出 Excel',
-  exportCsvAriaLabel: '导出为 CSV',
-  exportExcelAriaLabel: '导出为 Excel',
-  expandRowAriaLabel: '展开行',
-  collapseRowAriaLabel: '收起行'
-}
-
 export function getTableLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTable>
 ): Required<TigerLocaleTable> {
-  const isZh =
-    !!locale?.locale?.startsWith('zh') ||
-    locale?.common?.emptyText === '暂无数据' ||
-    locale?.table?.searchButtonText === '搜索'
-  const defaultLabels = isZh ? ZH_CN_TABLE_LABELS : DEFAULT_TABLE_LABELS
-
-  return {
-    emptyText: overrides?.emptyText ?? locale?.table?.emptyText ?? defaultLabels.emptyText,
-    loadingText: overrides?.loadingText ?? locale?.table?.loadingText ?? defaultLabels.loadingText,
-    expandText: overrides?.expandText ?? locale?.table?.expandText ?? defaultLabels.expandText,
-    collapseText:
-      overrides?.collapseText ?? locale?.table?.collapseText ?? defaultLabels.collapseText,
-    selectAllText:
-      overrides?.selectAllText ?? locale?.table?.selectAllText ?? defaultLabels.selectAllText,
-    selectRowAriaLabel:
-      overrides?.selectRowAriaLabel ??
-      locale?.table?.selectRowAriaLabel ??
-      defaultLabels.selectRowAriaLabel,
-    sortByText: overrides?.sortByText ?? locale?.table?.sortByText ?? defaultLabels.sortByText,
-    clearSortText:
-      overrides?.clearSortText ?? locale?.table?.clearSortText ?? defaultLabels.clearSortText,
-    toolbarAriaLabel:
-      overrides?.toolbarAriaLabel ??
-      locale?.table?.toolbarAriaLabel ??
-      defaultLabels.toolbarAriaLabel,
-    searchPlaceholder:
-      overrides?.searchPlaceholder ??
-      locale?.table?.searchPlaceholder ??
-      defaultLabels.searchPlaceholder,
-    searchButtonText:
-      overrides?.searchButtonText ??
-      locale?.table?.searchButtonText ??
-      defaultLabels.searchButtonText,
-    selectedText:
-      overrides?.selectedText ?? locale?.table?.selectedText ?? defaultLabels.selectedText,
-    selectedItemsText:
-      overrides?.selectedItemsText ??
-      locale?.table?.selectedItemsText ??
-      defaultLabels.selectedItemsText,
-    columnSettingsText:
-      overrides?.columnSettingsText ??
-      locale?.table?.columnSettingsText ??
-      defaultLabels.columnSettingsText,
-    columnSettingsAriaLabel:
-      overrides?.columnSettingsAriaLabel ??
-      locale?.table?.columnSettingsAriaLabel ??
-      defaultLabels.columnSettingsAriaLabel,
-    lockColumnAriaLabel:
-      overrides?.lockColumnAriaLabel ??
-      locale?.table?.lockColumnAriaLabel ??
-      defaultLabels.lockColumnAriaLabel,
-    unlockColumnAriaLabel:
-      overrides?.unlockColumnAriaLabel ??
-      locale?.table?.unlockColumnAriaLabel ??
-      defaultLabels.unlockColumnAriaLabel,
-    allText: overrides?.allText ?? locale?.table?.allText ?? defaultLabels.allText,
-    filterPlaceholder:
-      overrides?.filterPlaceholder ??
-      locale?.table?.filterPlaceholder ??
-      defaultLabels.filterPlaceholder,
-    exportCsvText:
-      overrides?.exportCsvText ?? locale?.table?.exportCsvText ?? defaultLabels.exportCsvText,
-    exportExcelText:
-      overrides?.exportExcelText ?? locale?.table?.exportExcelText ?? defaultLabels.exportExcelText,
-    exportCsvAriaLabel:
-      overrides?.exportCsvAriaLabel ??
-      locale?.table?.exportCsvAriaLabel ??
-      defaultLabels.exportCsvAriaLabel,
-    exportExcelAriaLabel:
-      overrides?.exportExcelAriaLabel ??
-      locale?.table?.exportExcelAriaLabel ??
-      defaultLabels.exportExcelAriaLabel,
-    expandRowAriaLabel:
-      overrides?.expandRowAriaLabel ??
-      locale?.table?.expandRowAriaLabel ??
-      defaultLabels.expandRowAriaLabel,
-    collapseRowAriaLabel:
-      overrides?.collapseRowAriaLabel ??
-      locale?.table?.collapseRowAriaLabel ??
-      defaultLabels.collapseRowAriaLabel
-  }
+  return resolveLocaleSection(enSection('table'), locale?.table, overrides)
 }
 
 export function formatTableSelectRowAriaLabel(
@@ -522,1293 +250,197 @@ export function formatTableSortByText(template: string, column: string): string 
   return template.replace('{column}', column)
 }
 
-// ============================================================================
-// DataExport Labels
-// ============================================================================
-
-export const DEFAULT_DATA_EXPORT_LABELS: Required<TigerLocaleDataExport> = {
-  triggerText: 'Export',
-  triggerAriaLabel: 'Export data',
-  xlsxText: 'Export Excel',
-  markdownText: 'Export Markdown',
-  exportingText: 'Exporting...'
-}
-
-export const ZH_CN_DATA_EXPORT_LABELS: Required<TigerLocaleDataExport> = {
-  triggerText: '导出',
-  triggerAriaLabel: '导出数据',
-  xlsxText: '导出 Excel',
-  markdownText: '导出 Markdown',
-  exportingText: '导出中...'
-}
-
 export function getDataExportLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleDataExport>
 ): Required<TigerLocaleDataExport> {
-  const isZh = !!locale?.locale?.startsWith('zh') || locale?.common?.emptyText === '暂无数据'
-  const defaultLabels = isZh ? ZH_CN_DATA_EXPORT_LABELS : DEFAULT_DATA_EXPORT_LABELS
-
-  return {
-    triggerText:
-      overrides?.triggerText ?? locale?.dataExport?.triggerText ?? defaultLabels.triggerText,
-    triggerAriaLabel:
-      overrides?.triggerAriaLabel ??
-      locale?.dataExport?.triggerAriaLabel ??
-      defaultLabels.triggerAriaLabel,
-    xlsxText: overrides?.xlsxText ?? locale?.dataExport?.xlsxText ?? defaultLabels.xlsxText,
-    markdownText:
-      overrides?.markdownText ?? locale?.dataExport?.markdownText ?? defaultLabels.markdownText,
-    exportingText:
-      overrides?.exportingText ?? locale?.dataExport?.exportingText ?? defaultLabels.exportingText
-  }
-}
-
-// ============================================================================
-// TaskBoard Labels
-// ============================================================================
-
-export const DEFAULT_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
-  emptyColumnText: 'No tasks',
-  addCardText: 'Add task',
-  addColumnText: 'Add column',
-  wipLimitText: 'WIP limit: {limit}',
-  dragHintText: 'Drag to move',
-  boardAriaLabel: 'Task Board'
-}
-
-export const ZH_CN_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
-  emptyColumnText: '暂无任务',
-  addCardText: '添加任务',
-  addColumnText: '添加列',
-  wipLimitText: 'WIP 限制: {limit}',
-  dragHintText: '拖拽以移动',
-  boardAriaLabel: '任务看板'
+  return resolveLocaleSection(enSection('dataExport'), locale?.dataExport, overrides)
 }
 
 export function getTaskBoardLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTaskBoard>
 ): Required<TigerLocaleTaskBoard> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_TASK_BOARD_LABELS : DEFAULT_TASK_BOARD_LABELS
-  return {
-    emptyColumnText:
-      overrides?.emptyColumnText ??
-      locale?.taskBoard?.emptyColumnText ??
-      defaultLabels.emptyColumnText,
-    addCardText:
-      overrides?.addCardText ?? locale?.taskBoard?.addCardText ?? defaultLabels.addCardText,
-    addColumnText:
-      overrides?.addColumnText ?? locale?.taskBoard?.addColumnText ?? defaultLabels.addColumnText,
-    wipLimitText:
-      overrides?.wipLimitText ?? locale?.taskBoard?.wipLimitText ?? defaultLabels.wipLimitText,
-    dragHintText:
-      overrides?.dragHintText ?? locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
-    boardAriaLabel:
-      overrides?.boardAriaLabel ?? locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
-  }
-}
-
-// ============================================================================
-// ChatWindow Labels
-// ============================================================================
-
-export const DEFAULT_CHAT_WINDOW_LABELS: Required<TigerLocaleChatWindow> = {
-  emptyText: 'No messages',
-  sendText: 'Send',
-  placeholder: 'Type a message',
-  sendingText: 'Sending',
-  sentText: 'Delivered',
-  failedText: 'Failed to send'
-}
-
-export const ZH_CN_CHAT_WINDOW_LABELS: Required<TigerLocaleChatWindow> = {
-  emptyText: '暂无消息',
-  sendText: '发送',
-  placeholder: '请输入消息',
-  sendingText: '发送中',
-  sentText: '已送达',
-  failedText: '发送失败'
+  return resolveLocaleSection(enSection('taskBoard'), locale?.taskBoard, overrides)
 }
 
 export function getChatWindowLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleChatWindow>
 ): Required<TigerLocaleChatWindow> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_CHAT_WINDOW_LABELS : DEFAULT_CHAT_WINDOW_LABELS
-  return {
-    emptyText: overrides?.emptyText ?? locale?.chatWindow?.emptyText ?? defaultLabels.emptyText,
-    sendText: overrides?.sendText ?? locale?.chatWindow?.sendText ?? defaultLabels.sendText,
-    placeholder:
-      overrides?.placeholder ?? locale?.chatWindow?.placeholder ?? defaultLabels.placeholder,
-    sendingText:
-      overrides?.sendingText ?? locale?.chatWindow?.sendingText ?? defaultLabels.sendingText,
-    sentText: overrides?.sentText ?? locale?.chatWindow?.sentText ?? defaultLabels.sentText,
-    failedText: overrides?.failedText ?? locale?.chatWindow?.failedText ?? defaultLabels.failedText
-  }
-}
-
-// ============================================================================
-// Code Labels
-// ============================================================================
-
-export const DEFAULT_CODE_LABELS: Required<TigerLocaleCode> = {
-  copyLabel: 'Copy',
-  copiedLabel: 'Copied',
-  copyFailedLabel: 'Copy failed'
-}
-
-export const ZH_CN_CODE_LABELS: Required<TigerLocaleCode> = {
-  copyLabel: '复制',
-  copiedLabel: '已复制',
-  copyFailedLabel: '复制失败'
+  return resolveLocaleSection(enSection('chatWindow'), locale?.chatWindow, overrides)
 }
 
 export function getCodeLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCode>
 ): Required<TigerLocaleCode> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_CODE_LABELS : DEFAULT_CODE_LABELS
-  return {
-    copyLabel: overrides?.copyLabel ?? locale?.code?.copyLabel ?? defaultLabels.copyLabel,
-    copiedLabel: overrides?.copiedLabel ?? locale?.code?.copiedLabel ?? defaultLabels.copiedLabel,
-    copyFailedLabel:
-      overrides?.copyFailedLabel ?? locale?.code?.copyFailedLabel ?? defaultLabels.copyFailedLabel
-  }
-}
-
-// ============================================================================
-// CommentThread Labels
-// ============================================================================
-
-export const DEFAULT_COMMENT_THREAD_LABELS: Required<TigerLocaleCommentThread> = {
-  emptyText: 'No comments',
-  replyPlaceholder: 'Write a reply...',
-  replyButtonText: 'Reply',
-  cancelReplyText: 'Cancel',
-  likeText: 'Like',
-  likedText: 'Liked',
-  replyText: 'Reply',
-  moreText: 'More',
-  loadMoreText: 'Load more',
-  collapseRepliesText: '▾ Collapse replies',
-  expandRepliesText: '▸ Expand {count} replies'
-}
-
-export const ZH_CN_COMMENT_THREAD_LABELS: Required<TigerLocaleCommentThread> = {
-  emptyText: '暂无评论',
-  replyPlaceholder: '写下回复...',
-  replyButtonText: '回复',
-  cancelReplyText: '取消',
-  likeText: '点赞',
-  likedText: '已赞',
-  replyText: '回复',
-  moreText: '更多',
-  loadMoreText: '加载更多',
-  collapseRepliesText: '▾ 收起回复',
-  expandRepliesText: '▸ 展开 {count} 条回复'
+  return resolveLocaleSection(enSection('code'), locale?.code, overrides)
 }
 
 export function getCommentThreadLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCommentThread>
 ): Required<TigerLocaleCommentThread> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_COMMENT_THREAD_LABELS : DEFAULT_COMMENT_THREAD_LABELS
-  return {
-    emptyText: overrides?.emptyText ?? locale?.commentThread?.emptyText ?? defaultLabels.emptyText,
-    replyPlaceholder:
-      overrides?.replyPlaceholder ??
-      locale?.commentThread?.replyPlaceholder ??
-      defaultLabels.replyPlaceholder,
-    replyButtonText:
-      overrides?.replyButtonText ??
-      locale?.commentThread?.replyButtonText ??
-      defaultLabels.replyButtonText,
-    cancelReplyText:
-      overrides?.cancelReplyText ??
-      locale?.commentThread?.cancelReplyText ??
-      defaultLabels.cancelReplyText,
-    likeText: overrides?.likeText ?? locale?.commentThread?.likeText ?? defaultLabels.likeText,
-    likedText: overrides?.likedText ?? locale?.commentThread?.likedText ?? defaultLabels.likedText,
-    replyText: overrides?.replyText ?? locale?.commentThread?.replyText ?? defaultLabels.replyText,
-    moreText: overrides?.moreText ?? locale?.commentThread?.moreText ?? defaultLabels.moreText,
-    loadMoreText:
-      overrides?.loadMoreText ?? locale?.commentThread?.loadMoreText ?? defaultLabels.loadMoreText,
-    collapseRepliesText:
-      overrides?.collapseRepliesText ??
-      locale?.commentThread?.collapseRepliesText ??
-      defaultLabels.collapseRepliesText,
-    expandRepliesText:
-      overrides?.expandRepliesText ??
-      locale?.commentThread?.expandRepliesText ??
-      defaultLabels.expandRepliesText
-  }
-}
-
-// ============================================================================
-// ActivityFeed Labels
-// ============================================================================
-
-export const DEFAULT_ACTIVITY_FEED_LABELS: Required<TigerLocaleActivityFeed> = {
-  emptyText: 'No activity',
-  loadingText: 'Loading...'
-}
-
-export const ZH_CN_ACTIVITY_FEED_LABELS: Required<TigerLocaleActivityFeed> = {
-  emptyText: '暂无动态',
-  loadingText: '加载中...'
+  return resolveLocaleSection(enSection('commentThread'), locale?.commentThread, overrides)
 }
 
 export function getActivityFeedLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleActivityFeed>
 ): Required<TigerLocaleActivityFeed> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_ACTIVITY_FEED_LABELS : DEFAULT_ACTIVITY_FEED_LABELS
-  return {
-    emptyText: overrides?.emptyText ?? locale?.activityFeed?.emptyText ?? defaultLabels.emptyText,
-    loadingText:
-      overrides?.loadingText ?? locale?.activityFeed?.loadingText ?? defaultLabels.loadingText
-  }
-}
-
-// ============================================================================
-// NotificationCenter Labels
-// ============================================================================
-
-export const DEFAULT_NOTIFICATION_CENTER_LABELS: Required<TigerLocaleNotificationCenter> = {
-  title: 'Notifications',
-  emptyText: 'No notifications',
-  loadingText: 'Loading...',
-  allLabel: 'All',
-  unreadLabel: 'Unread',
-  readLabel: 'Read',
-  markAllReadText: 'Mark all as read',
-  markReadText: 'Mark as read',
-  markUnreadText: 'Mark as unread'
-}
-
-export const ZH_CN_NOTIFICATION_CENTER_LABELS: Required<TigerLocaleNotificationCenter> = {
-  title: '通知中心',
-  emptyText: '暂无通知',
-  loadingText: '加载中...',
-  allLabel: '全部',
-  unreadLabel: '未读',
-  readLabel: '已读',
-  markAllReadText: '全部标记已读',
-  markReadText: '标记已读',
-  markUnreadText: '标记未读'
+  return resolveLocaleSection(enSection('activityFeed'), locale?.activityFeed, overrides)
 }
 
 export function getNotificationCenterLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleNotificationCenter>
 ): Required<TigerLocaleNotificationCenter> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_NOTIFICATION_CENTER_LABELS : DEFAULT_NOTIFICATION_CENTER_LABELS
-  return {
-    title: overrides?.title ?? locale?.notificationCenter?.title ?? defaultLabels.title,
-    emptyText:
-      overrides?.emptyText ?? locale?.notificationCenter?.emptyText ?? defaultLabels.emptyText,
-    loadingText:
-      overrides?.loadingText ??
-      locale?.notificationCenter?.loadingText ??
-      defaultLabels.loadingText,
-    allLabel: overrides?.allLabel ?? locale?.notificationCenter?.allLabel ?? defaultLabels.allLabel,
-    unreadLabel:
-      overrides?.unreadLabel ??
-      locale?.notificationCenter?.unreadLabel ??
-      defaultLabels.unreadLabel,
-    readLabel:
-      overrides?.readLabel ?? locale?.notificationCenter?.readLabel ?? defaultLabels.readLabel,
-    markAllReadText:
-      overrides?.markAllReadText ??
-      locale?.notificationCenter?.markAllReadText ??
-      defaultLabels.markAllReadText,
-    markReadText:
-      overrides?.markReadText ??
-      locale?.notificationCenter?.markReadText ??
-      defaultLabels.markReadText,
-    markUnreadText:
-      overrides?.markUnreadText ??
-      locale?.notificationCenter?.markUnreadText ??
-      defaultLabels.markUnreadText
-  }
-}
-
-export const DEFAULT_SELECT_LABELS: Required<TigerLocaleSelect> = {
-  doneText: 'Done',
-  placeholder: 'Select an option',
-  emptyText: 'No options found'
-}
-
-export const ZH_CN_SELECT_LABELS: Required<TigerLocaleSelect> = {
-  doneText: '完成',
-  placeholder: '请选择',
-  emptyText: '暂无选项'
+  return resolveLocaleSection(
+    enSection('notificationCenter'),
+    locale?.notificationCenter,
+    overrides
+  )
 }
 
 export function getSelectLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSelect>
 ): Required<TigerLocaleSelect> {
-  const isZh = !!locale?.locale?.startsWith('zh') || locale?.formWizard?.finishText === '完成'
-  const defaultLabels = isZh ? ZH_CN_SELECT_LABELS : DEFAULT_SELECT_LABELS
-  return {
-    doneText:
-      overrides?.doneText ??
-      locale?.select?.doneText ??
-      locale?.common?.okText ??
-      defaultLabels.doneText,
-    placeholder: overrides?.placeholder ?? locale?.select?.placeholder ?? defaultLabels.placeholder,
-    emptyText:
-      overrides?.emptyText ??
-      locale?.select?.emptyText ??
-      locale?.common?.emptyText ??
-      defaultLabels.emptyText
-  }
-}
-
-export const DEFAULT_COLOR_PICKER_LABELS: Required<TigerLocaleColorPicker> = {
-  trigger: 'Pick color',
-  panelTitle: 'Color',
-  clear: 'Clear',
-  hue: 'Hue',
-  alpha: 'Alpha',
-  value: 'Color value',
-  preview: 'Color preview',
-  selectPreset: 'Select {color}'
-}
-
-export const ZH_CN_COLOR_PICKER_LABELS: Required<TigerLocaleColorPicker> = {
-  trigger: '选择颜色',
-  panelTitle: '颜色',
-  clear: '清空',
-  hue: '色相',
-  alpha: '透明度',
-  value: '颜色值',
-  preview: '颜色预览',
-  selectPreset: '选择 {color}'
+  return resolveLocaleSection(enSection('select'), locale?.select, overrides)
 }
 
 export function getColorPickerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleColorPicker>
 ): Required<TigerLocaleColorPicker> {
-  const isZh = locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_COLOR_PICKER_LABELS : DEFAULT_COLOR_PICKER_LABELS
-  return {
-    trigger: overrides?.trigger ?? locale?.colorPicker?.trigger ?? defaultLabels.trigger,
-    panelTitle:
-      overrides?.panelTitle ?? locale?.colorPicker?.panelTitle ?? defaultLabels.panelTitle,
-    clear: overrides?.clear ?? locale?.colorPicker?.clear ?? defaultLabels.clear,
-    hue: overrides?.hue ?? locale?.colorPicker?.hue ?? defaultLabels.hue,
-    alpha: overrides?.alpha ?? locale?.colorPicker?.alpha ?? defaultLabels.alpha,
-    value: overrides?.value ?? locale?.colorPicker?.value ?? defaultLabels.value,
-    preview: overrides?.preview ?? locale?.colorPicker?.preview ?? defaultLabels.preview,
-    selectPreset:
-      overrides?.selectPreset ?? locale?.colorPicker?.selectPreset ?? defaultLabels.selectPreset
-  }
+  return resolveLocaleSection(enSection('colorPicker'), locale?.colorPicker, overrides)
 }
 
 export function formatColorPickerSelectPreset(template: string, color: string): string {
   return template.replace('{color}', color)
 }
 
-export const DEFAULT_TABS_LABELS: Required<TigerLocaleTabs> = {
-  addTabAriaLabel: 'Add tab',
-  closeTabAriaLabel: 'Close {label}'
-}
-
-export const ZH_CN_TABS_LABELS: Required<TigerLocaleTabs> = {
-  addTabAriaLabel: '新增标签页',
-  closeTabAriaLabel: '关闭{label}'
-}
-
 export function getTabsLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTabs>
 ): Required<TigerLocaleTabs> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_TABS_LABELS
-    : DEFAULT_TABS_LABELS
-  return {
-    addTabAriaLabel:
-      overrides?.addTabAriaLabel ?? locale?.tabs?.addTabAriaLabel ?? defaultLabels.addTabAriaLabel,
-    closeTabAriaLabel:
-      overrides?.closeTabAriaLabel ??
-      locale?.tabs?.closeTabAriaLabel ??
-      defaultLabels.closeTabAriaLabel
-  }
-}
-
-export const DEFAULT_RATE_LABELS: Required<TigerLocaleRate> = {
-  ariaLabel: 'Rating',
-  valueText: '{value} star{plural}'
-}
-
-export const ZH_CN_RATE_LABELS: Required<TigerLocaleRate> = {
-  ariaLabel: '评分',
-  valueText: '{value} 星'
+  return resolveLocaleSection(enSection('tabs'), locale?.tabs, overrides)
 }
 
 export function getRateLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleRate>
 ): Required<TigerLocaleRate> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_RATE_LABELS
-    : DEFAULT_RATE_LABELS
-  return {
-    ariaLabel: overrides?.ariaLabel ?? locale?.rate?.ariaLabel ?? defaultLabels.ariaLabel,
-    valueText: overrides?.valueText ?? locale?.rate?.valueText ?? defaultLabels.valueText
-  }
+  return resolveLocaleSection(enSection('rate'), locale?.rate, overrides)
 }
 
-export const DEFAULT_AVATAR_GROUP_LABELS: Required<TigerLocaleAvatarGroup> = {
-  ariaLabel: 'Avatar group',
-  overflowAriaLabel: '{count} more'
-}
-
-export const ZH_CN_AVATAR_GROUP_LABELS: Required<TigerLocaleAvatarGroup> = {
-  ariaLabel: '头像组',
-  overflowAriaLabel: '还有 {count} 位'
+/**
+ * Fill `{value}` with an Intl number and `{plural}` with an English suffix
+ * (`''` for `one`, `'s'` otherwise). Locales that write a complete sentence
+ * omit `{plural}` so they are not given an English `s`.
+ */
+export function formatRateValueText(template: string, value: number, locale?: string): string {
+  const category = getIntlPluralCategory(value, locale)
+  return template
+    .replace('{value}', formatIntlNumber(value, locale))
+    .replace('{plural}', category === 'one' ? '' : 's')
 }
 
 export function getAvatarGroupLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleAvatarGroup>
 ): Required<TigerLocaleAvatarGroup> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_AVATAR_GROUP_LABELS
-    : DEFAULT_AVATAR_GROUP_LABELS
-  return {
-    ariaLabel: overrides?.ariaLabel ?? locale?.avatarGroup?.ariaLabel ?? defaultLabels.ariaLabel,
-    overflowAriaLabel:
-      overrides?.overflowAriaLabel ??
-      locale?.avatarGroup?.overflowAriaLabel ??
-      defaultLabels.overflowAriaLabel
-  }
-}
-
-export const DEFAULT_CAROUSEL_LABELS: Required<TigerLocaleCarousel> = {
-  ariaLabel: 'Image carousel',
-  navigationAriaLabel: 'Carousel navigation',
-  previousSlideAriaLabel: 'Previous slide',
-  nextSlideAriaLabel: 'Next slide',
-  goToSlideAriaLabel: 'Go to slide {index}',
-  slideAriaLabel: 'Slide {index} of {total}'
-}
-
-export const ZH_CN_CAROUSEL_LABELS: Required<TigerLocaleCarousel> = {
-  ariaLabel: '图片轮播',
-  navigationAriaLabel: '轮播导航',
-  previousSlideAriaLabel: '上一张',
-  nextSlideAriaLabel: '下一张',
-  goToSlideAriaLabel: '跳转到第 {index} 张',
-  slideAriaLabel: '第 {index} 张，共 {total} 张'
+  return resolveLocaleSection(enSection('avatarGroup'), locale?.avatarGroup, overrides)
 }
 
 export function getCarouselLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCarousel>
 ): Required<TigerLocaleCarousel> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_CAROUSEL_LABELS
-    : DEFAULT_CAROUSEL_LABELS
-  return {
-    ariaLabel: overrides?.ariaLabel ?? locale?.carousel?.ariaLabel ?? defaultLabels.ariaLabel,
-    navigationAriaLabel:
-      overrides?.navigationAriaLabel ??
-      locale?.carousel?.navigationAriaLabel ??
-      defaultLabels.navigationAriaLabel,
-    previousSlideAriaLabel:
-      overrides?.previousSlideAriaLabel ??
-      locale?.carousel?.previousSlideAriaLabel ??
-      defaultLabels.previousSlideAriaLabel,
-    nextSlideAriaLabel:
-      overrides?.nextSlideAriaLabel ??
-      locale?.carousel?.nextSlideAriaLabel ??
-      defaultLabels.nextSlideAriaLabel,
-    goToSlideAriaLabel:
-      overrides?.goToSlideAriaLabel ??
-      locale?.carousel?.goToSlideAriaLabel ??
-      defaultLabels.goToSlideAriaLabel,
-    slideAriaLabel:
-      overrides?.slideAriaLabel ?? locale?.carousel?.slideAriaLabel ?? defaultLabels.slideAriaLabel
-  }
-}
-
-export const DEFAULT_TRANSFER_LABELS: Required<TigerLocaleTransfer> = {
-  sourceTitle: 'Source',
-  targetTitle: 'Target',
-  searchAriaLabel: 'Search {title}',
-  itemsAriaLabel: '{title} items',
-  moveToTargetAriaLabel: 'Move selected to target',
-  moveToSourceAriaLabel: 'Move selected to source'
-}
-
-export const ZH_CN_TRANSFER_LABELS: Required<TigerLocaleTransfer> = {
-  sourceTitle: '源列表',
-  targetTitle: '目标列表',
-  searchAriaLabel: '搜索{title}',
-  itemsAriaLabel: '{title}项目',
-  moveToTargetAriaLabel: '移动选中项到目标列表',
-  moveToSourceAriaLabel: '移动选中项到源列表'
+  return resolveLocaleSection(enSection('carousel'), locale?.carousel, overrides)
 }
 
 export function getTransferLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTransfer>
 ): Required<TigerLocaleTransfer> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_TRANSFER_LABELS
-    : DEFAULT_TRANSFER_LABELS
-  return {
-    sourceTitle:
-      overrides?.sourceTitle ?? locale?.transfer?.sourceTitle ?? defaultLabels.sourceTitle,
-    targetTitle:
-      overrides?.targetTitle ?? locale?.transfer?.targetTitle ?? defaultLabels.targetTitle,
-    searchAriaLabel:
-      overrides?.searchAriaLabel ??
-      locale?.transfer?.searchAriaLabel ??
-      defaultLabels.searchAriaLabel,
-    itemsAriaLabel:
-      overrides?.itemsAriaLabel ?? locale?.transfer?.itemsAriaLabel ?? defaultLabels.itemsAriaLabel,
-    moveToTargetAriaLabel:
-      overrides?.moveToTargetAriaLabel ??
-      locale?.transfer?.moveToTargetAriaLabel ??
-      defaultLabels.moveToTargetAriaLabel,
-    moveToSourceAriaLabel:
-      overrides?.moveToSourceAriaLabel ??
-      locale?.transfer?.moveToSourceAriaLabel ??
-      defaultLabels.moveToSourceAriaLabel
-  }
-}
-
-export const DEFAULT_CHART_LABELS: Required<TigerLocaleChart> = {
-  legendAriaLabel: 'Chart legend',
-  pointAriaLabel: 'Point {index}: ({x}, {y})'
-}
-
-export const ZH_CN_CHART_LABELS: Required<TigerLocaleChart> = {
-  legendAriaLabel: '图表图例',
-  pointAriaLabel: '第 {index} 个点：({x}, {y})'
+  return resolveLocaleSection(enSection('transfer'), locale?.transfer, overrides)
 }
 
 export function getChartLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleChart>
 ): Required<TigerLocaleChart> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_CHART_LABELS
-    : DEFAULT_CHART_LABELS
-  return {
-    legendAriaLabel:
-      overrides?.legendAriaLabel ?? locale?.chart?.legendAriaLabel ?? defaultLabels.legendAriaLabel,
-    pointAriaLabel:
-      overrides?.pointAriaLabel ?? locale?.chart?.pointAriaLabel ?? defaultLabels.pointAriaLabel
-  }
-}
-
-export const DEFAULT_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> = {
-  formattingToolbarAriaLabel: 'Markdown formatting',
-  modeToolbarAriaLabel: 'Markdown view mode',
-  editorAriaLabel: 'Markdown editor',
-  previewAriaLabel: 'Markdown preview',
-  editModeLabel: 'Edit',
-  splitModeLabel: 'Split',
-  previewModeLabel: 'Preview',
-  bold: 'Bold',
-  italic: 'Italic',
-  strikethrough: 'Strikethrough',
-  heading: 'Heading',
-  blockquote: 'Blockquote',
-  unorderedList: 'Bulleted list',
-  orderedList: 'Numbered list',
-  inlineCode: 'Inline code',
-  codeBlock: 'Code block',
-  link: 'Link',
-  image: 'Image',
-  table: 'Table',
-  horizontalRule: 'Horizontal rule'
-}
-
-export const ZH_CN_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> = {
-  formattingToolbarAriaLabel: 'Markdown 格式工具栏',
-  modeToolbarAriaLabel: 'Markdown 视图模式',
-  editorAriaLabel: 'Markdown 编辑器',
-  previewAriaLabel: 'Markdown 预览',
-  editModeLabel: '编辑',
-  splitModeLabel: '分栏',
-  previewModeLabel: '预览',
-  bold: '加粗',
-  italic: '斜体',
-  strikethrough: '删除线',
-  heading: '标题',
-  blockquote: '引用',
-  unorderedList: '无序列表',
-  orderedList: '有序列表',
-  inlineCode: '行内代码',
-  codeBlock: '代码块',
-  link: '链接',
-  image: '图片',
-  table: '表格',
-  horizontalRule: '分隔线'
+  return resolveLocaleSection(enSection('chart'), locale?.chart, overrides)
 }
 
 export function getMarkdownEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleMarkdownEditor>
 ): Required<TigerLocaleMarkdownEditor> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_MARKDOWN_EDITOR_LABELS
-    : DEFAULT_MARKDOWN_EDITOR_LABELS
-  return {
-    ...defaultLabels,
-    ...locale?.markdownEditor,
-    ...overrides
-  }
-}
-
-export const DEFAULT_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
-  formattingToolbarAriaLabel: 'Text formatting',
-  editorAriaLabel: 'Rich text editor',
-  bold: 'Bold',
-  italic: 'Italic',
-  underline: 'Underline',
-  strikethrough: 'Strikethrough',
-  heading1: 'H1',
-  heading2: 'H2',
-  heading3: 'H3',
-  bulletList: 'Bullet List',
-  orderedList: 'Ordered List',
-  blockquote: 'Blockquote',
-  codeBlock: 'Code',
-  link: 'Link',
-  image: 'Image',
-  horizontalRule: 'HR',
-  undo: 'Undo',
-  redo: 'Redo',
-  clear: 'Clear'
-}
-
-export const ZH_CN_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
-  formattingToolbarAriaLabel: '富文本格式工具栏',
-  editorAriaLabel: '富文本编辑器',
-  bold: '加粗',
-  italic: '斜体',
-  underline: '下划线',
-  strikethrough: '删除线',
-  heading1: '标题1',
-  heading2: '标题2',
-  heading3: '标题3',
-  bulletList: '无序列表',
-  orderedList: '有序列表',
-  blockquote: '引用',
-  codeBlock: '代码',
-  link: '链接',
-  image: '图片',
-  horizontalRule: '分隔线',
-  undo: '撤销',
-  redo: '重做',
-  clear: '清除格式'
+  return resolveLocaleSection(enSection('markdownEditor'), locale?.markdownEditor, overrides)
 }
 
 export function getRichTextEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleRichTextEditor>
 ): Required<TigerLocaleRichTextEditor> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_RICH_TEXT_EDITOR_LABELS
-    : DEFAULT_RICH_TEXT_EDITOR_LABELS
-  return {
-    ...defaultLabels,
-    ...locale?.richTextEditor,
-    ...overrides
-  }
-}
-
-export const DEFAULT_CRON_EDITOR_LABELS: Required<TigerLocaleCronEditor> = {
-  ariaLabel: 'Cron editor',
-  expressionAriaLabel: 'Cron expression',
-  presetAriaLabel: 'Cron preset',
-  presetPlaceholder: 'Preset',
-  everyMinutePreset: 'Every minute',
-  hourlyPreset: 'Hourly',
-  dailyPreset: 'Daily',
-  weeklyPreset: 'Weekly',
-  monthlyPreset: 'Monthly',
-  minuteLabel: 'Minute',
-  hourLabel: 'Hour',
-  dayOfMonthLabel: 'Day',
-  monthLabel: 'Month',
-  dayOfWeekLabel: 'Weekday',
-  modeAnyLabel: 'Any',
-  modeEveryLabel: 'Every',
-  modeSpecificLabel: 'Specific',
-  modeRangeLabel: 'Range',
-  modeCustomLabel: 'Custom',
-  modeAriaLabel: '{field} mode',
-  stepAriaLabel: '{field} step',
-  valueAriaLabel: '{field} value',
-  rangeStartAriaLabel: '{field} range start',
-  rangeEndAriaLabel: '{field} range end',
-  customValueAriaLabel: '{field} custom value',
-  expressionFieldsError: 'Cron expression must contain 5 fields',
-  fieldRequiredError: '{field} is required',
-  invalidStepError: '{field} has an invalid step expression',
-  stepRangeError: '{field} step must be between 1 and {max}',
-  fieldRangeError: '{field} must be between {min} and {max}',
-  rangeOrderError: '{field} range start must be less than or equal to end',
-  invalidFieldError: '{field} must be *, a number, a range, a step, or a comma list'
-}
-
-export const ZH_CN_CRON_EDITOR_LABELS: Required<TigerLocaleCronEditor> = {
-  ariaLabel: 'Cron 表达式编辑器',
-  expressionAriaLabel: 'Cron 表达式',
-  presetAriaLabel: 'Cron 预设',
-  presetPlaceholder: '选择预设',
-  everyMinutePreset: '每分钟',
-  hourlyPreset: '每小时',
-  dailyPreset: '每天',
-  weeklyPreset: '每周',
-  monthlyPreset: '每月',
-  minuteLabel: '分钟',
-  hourLabel: '小时',
-  dayOfMonthLabel: '日期',
-  monthLabel: '月份',
-  dayOfWeekLabel: '星期',
-  modeAnyLabel: '任意',
-  modeEveryLabel: '每隔',
-  modeSpecificLabel: '指定',
-  modeRangeLabel: '范围',
-  modeCustomLabel: '自定义',
-  modeAriaLabel: '{field}模式',
-  stepAriaLabel: '{field}步长',
-  valueAriaLabel: '{field}值',
-  rangeStartAriaLabel: '{field}范围开始',
-  rangeEndAriaLabel: '{field}范围结束',
-  customValueAriaLabel: '{field}自定义值',
-  expressionFieldsError: 'Cron 表达式必须包含 5 个字段',
-  fieldRequiredError: '{field}为必填项',
-  invalidStepError: '{field}步长表达式无效',
-  stepRangeError: '{field}步长必须在 1 到 {max} 之间',
-  fieldRangeError: '{field}必须在 {min} 到 {max} 之间',
-  rangeOrderError: '{field}范围开始值必须小于或等于结束值',
-  invalidFieldError: '{field}必须是 *、数字、范围、步长或逗号列表'
+  return resolveLocaleSection(enSection('richTextEditor'), locale?.richTextEditor, overrides)
 }
 
 export function getCronEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCronEditor>
 ): Required<TigerLocaleCronEditor> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_CRON_EDITOR_LABELS
-    : DEFAULT_CRON_EDITOR_LABELS
-  return {
-    ariaLabel: overrides?.ariaLabel ?? locale?.cronEditor?.ariaLabel ?? defaultLabels.ariaLabel,
-    expressionAriaLabel:
-      overrides?.expressionAriaLabel ??
-      locale?.cronEditor?.expressionAriaLabel ??
-      defaultLabels.expressionAriaLabel,
-    presetAriaLabel:
-      overrides?.presetAriaLabel ??
-      locale?.cronEditor?.presetAriaLabel ??
-      defaultLabels.presetAriaLabel,
-    presetPlaceholder:
-      overrides?.presetPlaceholder ??
-      locale?.cronEditor?.presetPlaceholder ??
-      defaultLabels.presetPlaceholder,
-    everyMinutePreset:
-      overrides?.everyMinutePreset ??
-      locale?.cronEditor?.everyMinutePreset ??
-      defaultLabels.everyMinutePreset,
-    hourlyPreset:
-      overrides?.hourlyPreset ?? locale?.cronEditor?.hourlyPreset ?? defaultLabels.hourlyPreset,
-    dailyPreset:
-      overrides?.dailyPreset ?? locale?.cronEditor?.dailyPreset ?? defaultLabels.dailyPreset,
-    weeklyPreset:
-      overrides?.weeklyPreset ?? locale?.cronEditor?.weeklyPreset ?? defaultLabels.weeklyPreset,
-    monthlyPreset:
-      overrides?.monthlyPreset ?? locale?.cronEditor?.monthlyPreset ?? defaultLabels.monthlyPreset,
-    minuteLabel:
-      overrides?.minuteLabel ?? locale?.cronEditor?.minuteLabel ?? defaultLabels.minuteLabel,
-    hourLabel: overrides?.hourLabel ?? locale?.cronEditor?.hourLabel ?? defaultLabels.hourLabel,
-    dayOfMonthLabel:
-      overrides?.dayOfMonthLabel ??
-      locale?.cronEditor?.dayOfMonthLabel ??
-      defaultLabels.dayOfMonthLabel,
-    monthLabel: overrides?.monthLabel ?? locale?.cronEditor?.monthLabel ?? defaultLabels.monthLabel,
-    dayOfWeekLabel:
-      overrides?.dayOfWeekLabel ??
-      locale?.cronEditor?.dayOfWeekLabel ??
-      defaultLabels.dayOfWeekLabel,
-    modeAnyLabel:
-      overrides?.modeAnyLabel ?? locale?.cronEditor?.modeAnyLabel ?? defaultLabels.modeAnyLabel,
-    modeEveryLabel:
-      overrides?.modeEveryLabel ??
-      locale?.cronEditor?.modeEveryLabel ??
-      defaultLabels.modeEveryLabel,
-    modeSpecificLabel:
-      overrides?.modeSpecificLabel ??
-      locale?.cronEditor?.modeSpecificLabel ??
-      defaultLabels.modeSpecificLabel,
-    modeRangeLabel:
-      overrides?.modeRangeLabel ??
-      locale?.cronEditor?.modeRangeLabel ??
-      defaultLabels.modeRangeLabel,
-    modeCustomLabel:
-      overrides?.modeCustomLabel ??
-      locale?.cronEditor?.modeCustomLabel ??
-      defaultLabels.modeCustomLabel,
-    modeAriaLabel:
-      overrides?.modeAriaLabel ?? locale?.cronEditor?.modeAriaLabel ?? defaultLabels.modeAriaLabel,
-    stepAriaLabel:
-      overrides?.stepAriaLabel ?? locale?.cronEditor?.stepAriaLabel ?? defaultLabels.stepAriaLabel,
-    valueAriaLabel:
-      overrides?.valueAriaLabel ??
-      locale?.cronEditor?.valueAriaLabel ??
-      defaultLabels.valueAriaLabel,
-    rangeStartAriaLabel:
-      overrides?.rangeStartAriaLabel ??
-      locale?.cronEditor?.rangeStartAriaLabel ??
-      defaultLabels.rangeStartAriaLabel,
-    rangeEndAriaLabel:
-      overrides?.rangeEndAriaLabel ??
-      locale?.cronEditor?.rangeEndAriaLabel ??
-      defaultLabels.rangeEndAriaLabel,
-    customValueAriaLabel:
-      overrides?.customValueAriaLabel ??
-      locale?.cronEditor?.customValueAriaLabel ??
-      defaultLabels.customValueAriaLabel,
-    expressionFieldsError:
-      overrides?.expressionFieldsError ??
-      locale?.cronEditor?.expressionFieldsError ??
-      defaultLabels.expressionFieldsError,
-    fieldRequiredError:
-      overrides?.fieldRequiredError ??
-      locale?.cronEditor?.fieldRequiredError ??
-      defaultLabels.fieldRequiredError,
-    invalidStepError:
-      overrides?.invalidStepError ??
-      locale?.cronEditor?.invalidStepError ??
-      defaultLabels.invalidStepError,
-    stepRangeError:
-      overrides?.stepRangeError ??
-      locale?.cronEditor?.stepRangeError ??
-      defaultLabels.stepRangeError,
-    fieldRangeError:
-      overrides?.fieldRangeError ??
-      locale?.cronEditor?.fieldRangeError ??
-      defaultLabels.fieldRangeError,
-    rangeOrderError:
-      overrides?.rangeOrderError ??
-      locale?.cronEditor?.rangeOrderError ??
-      defaultLabels.rangeOrderError,
-    invalidFieldError:
-      overrides?.invalidFieldError ??
-      locale?.cronEditor?.invalidFieldError ??
-      defaultLabels.invalidFieldError
-  }
-}
-
-export const DEFAULT_FILE_MANAGER_LABELS: Required<TigerLocaleFileManager> = {
-  rootText: 'Root'
-}
-
-export const ZH_CN_FILE_MANAGER_LABELS: Required<TigerLocaleFileManager> = {
-  rootText: '根目录'
+  return resolveLocaleSection(enSection('cronEditor'), locale?.cronEditor, overrides)
 }
 
 export function getFileManagerLabels(
-  locale?: Partial<TigerLocale>
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleFileManager>
 ): Required<TigerLocaleFileManager> {
-  const defaultLabels = locale?.locale?.startsWith('zh')
-    ? ZH_CN_FILE_MANAGER_LABELS
-    : DEFAULT_FILE_MANAGER_LABELS
-  return {
-    rootText: locale?.fileManager?.rootText ?? defaultLabels.rootText
-  }
-}
-
-export const DEFAULT_IMAGE_VIEWER_LABELS: Required<TigerLocaleImageViewer> = {
-  dialogAriaLabel: 'Image viewer',
-  previewDialogAriaLabel: 'Image preview',
-  closeAriaLabel: 'Close',
-  closePreviewAriaLabel: 'Close preview',
-  previousImageAriaLabel: 'Previous image',
-  nextImageAriaLabel: 'Next image',
-  zoomOutAriaLabel: 'Zoom out',
-  resetAriaLabel: 'Reset',
-  zoomInAriaLabel: 'Zoom in',
-  rotateLeftAriaLabel: 'Rotate left',
-  rotateRightAriaLabel: 'Rotate right'
-}
-
-export const ZH_CN_IMAGE_VIEWER_LABELS: Required<TigerLocaleImageViewer> = {
-  dialogAriaLabel: '图片查看器',
-  previewDialogAriaLabel: '图片预览',
-  closeAriaLabel: '关闭',
-  closePreviewAriaLabel: '关闭预览',
-  previousImageAriaLabel: '上一张图片',
-  nextImageAriaLabel: '下一张图片',
-  zoomOutAriaLabel: '缩小',
-  resetAriaLabel: '重置',
-  zoomInAriaLabel: '放大',
-  rotateLeftAriaLabel: '向左旋转',
-  rotateRightAriaLabel: '向右旋转'
+  return resolveLocaleSection(enSection('fileManager'), locale?.fileManager, overrides)
 }
 
 export function getImageViewerLabels(
-  locale?: Partial<TigerLocale>
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleImageViewer>
 ): Required<TigerLocaleImageViewer> {
-  const defaultLabels = locale?.locale?.startsWith('zh')
-    ? ZH_CN_IMAGE_VIEWER_LABELS
-    : DEFAULT_IMAGE_VIEWER_LABELS
-  return {
-    dialogAriaLabel: locale?.imageViewer?.dialogAriaLabel ?? defaultLabels.dialogAriaLabel,
-    previewDialogAriaLabel:
-      locale?.imageViewer?.previewDialogAriaLabel ?? defaultLabels.previewDialogAriaLabel,
-    closeAriaLabel:
-      locale?.imageViewer?.closeAriaLabel ??
-      locale?.common?.closeText ??
-      defaultLabels.closeAriaLabel,
-    closePreviewAriaLabel:
-      locale?.imageViewer?.closePreviewAriaLabel ?? defaultLabels.closePreviewAriaLabel,
-    previousImageAriaLabel:
-      locale?.imageViewer?.previousImageAriaLabel ?? defaultLabels.previousImageAriaLabel,
-    nextImageAriaLabel: locale?.imageViewer?.nextImageAriaLabel ?? defaultLabels.nextImageAriaLabel,
-    zoomOutAriaLabel: locale?.imageViewer?.zoomOutAriaLabel ?? defaultLabels.zoomOutAriaLabel,
-    resetAriaLabel: locale?.imageViewer?.resetAriaLabel ?? defaultLabels.resetAriaLabel,
-    zoomInAriaLabel: locale?.imageViewer?.zoomInAriaLabel ?? defaultLabels.zoomInAriaLabel,
-    rotateLeftAriaLabel:
-      locale?.imageViewer?.rotateLeftAriaLabel ?? defaultLabels.rotateLeftAriaLabel,
-    rotateRightAriaLabel:
-      locale?.imageViewer?.rotateRightAriaLabel ?? defaultLabels.rotateRightAriaLabel
-  }
-}
-
-export const DEFAULT_IMAGE_EDITOR_LABELS: Required<TigerLocaleImageEditor> = {
-  selectImageText: 'Select image',
-  selectImageAriaLabel: 'Select image to crop and upload',
-  cropModalTitle: 'Crop image',
-  cropCancelText: 'Cancel',
-  cropConfirmText: 'Confirm crop',
-  cropperDialogAriaLabel: 'Image cropper',
-  imageToCropAriaLabel: 'Image to crop',
-  moveCropAreaAriaLabel: 'Move crop area',
-  resizeCropAreaAriaLabel: 'Resize crop area {handle}',
-  loadingCropImageAriaLabel: 'Loading image for cropping',
-  annotationToolbarAriaLabel: 'Annotation tools',
-  annotationEditorAriaLabel: 'Image annotation editor',
-  annotationCanvasAriaLabel: 'Image annotation canvas',
-  loadingAnnotationImageAriaLabel: 'Loading image for annotation',
-  selectToolText: 'Select',
-  rectangleToolText: 'Rectangle',
-  ellipseToolText: 'Ellipse',
-  polygonToolText: 'Polygon',
-  freehandToolText: 'Freehand',
-  deleteText: 'Delete'
-}
-
-export const ZH_CN_IMAGE_EDITOR_LABELS: Required<TigerLocaleImageEditor> = {
-  selectImageText: '选择图片',
-  selectImageAriaLabel: '选择图片进行裁剪并上传',
-  cropModalTitle: '裁剪图片',
-  cropCancelText: '取消',
-  cropConfirmText: '确认裁剪',
-  cropperDialogAriaLabel: '图片裁剪器',
-  imageToCropAriaLabel: '待裁剪图片',
-  moveCropAreaAriaLabel: '移动裁剪区域',
-  resizeCropAreaAriaLabel: '调整裁剪区域 {handle}',
-  loadingCropImageAriaLabel: '正在加载待裁剪图片',
-  annotationToolbarAriaLabel: '标注工具',
-  annotationEditorAriaLabel: '图片标注编辑器',
-  annotationCanvasAriaLabel: '图片标注画布',
-  loadingAnnotationImageAriaLabel: '正在加载待标注图片',
-  selectToolText: '选择',
-  rectangleToolText: '矩形',
-  ellipseToolText: '椭圆',
-  polygonToolText: '多边形',
-  freehandToolText: '自由绘制',
-  deleteText: '删除'
+  return resolveLocaleSection(enSection('imageViewer'), locale?.imageViewer, overrides)
 }
 
 export function getImageEditorLabels(
-  locale?: Partial<TigerLocale>
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleImageEditor>
 ): Required<TigerLocaleImageEditor> {
-  const defaultLabels = locale?.locale?.startsWith('zh')
-    ? ZH_CN_IMAGE_EDITOR_LABELS
-    : DEFAULT_IMAGE_EDITOR_LABELS
-  return {
-    selectImageText: locale?.imageEditor?.selectImageText ?? defaultLabels.selectImageText,
-    selectImageAriaLabel:
-      locale?.imageEditor?.selectImageAriaLabel ?? defaultLabels.selectImageAriaLabel,
-    cropModalTitle: locale?.imageEditor?.cropModalTitle ?? defaultLabels.cropModalTitle,
-    cropCancelText:
-      locale?.imageEditor?.cropCancelText ??
-      locale?.common?.cancelText ??
-      defaultLabels.cropCancelText,
-    cropConfirmText:
-      locale?.imageEditor?.cropConfirmText ??
-      locale?.common?.okText ??
-      defaultLabels.cropConfirmText,
-    cropperDialogAriaLabel:
-      locale?.imageEditor?.cropperDialogAriaLabel ?? defaultLabels.cropperDialogAriaLabel,
-    imageToCropAriaLabel:
-      locale?.imageEditor?.imageToCropAriaLabel ?? defaultLabels.imageToCropAriaLabel,
-    moveCropAreaAriaLabel:
-      locale?.imageEditor?.moveCropAreaAriaLabel ?? defaultLabels.moveCropAreaAriaLabel,
-    resizeCropAreaAriaLabel:
-      locale?.imageEditor?.resizeCropAreaAriaLabel ?? defaultLabels.resizeCropAreaAriaLabel,
-    loadingCropImageAriaLabel:
-      locale?.imageEditor?.loadingCropImageAriaLabel ?? defaultLabels.loadingCropImageAriaLabel,
-    annotationToolbarAriaLabel:
-      locale?.imageEditor?.annotationToolbarAriaLabel ?? defaultLabels.annotationToolbarAriaLabel,
-    annotationEditorAriaLabel:
-      locale?.imageEditor?.annotationEditorAriaLabel ?? defaultLabels.annotationEditorAriaLabel,
-    annotationCanvasAriaLabel:
-      locale?.imageEditor?.annotationCanvasAriaLabel ?? defaultLabels.annotationCanvasAriaLabel,
-    loadingAnnotationImageAriaLabel:
-      locale?.imageEditor?.loadingAnnotationImageAriaLabel ??
-      defaultLabels.loadingAnnotationImageAriaLabel,
-    selectToolText: locale?.imageEditor?.selectToolText ?? defaultLabels.selectToolText,
-    rectangleToolText: locale?.imageEditor?.rectangleToolText ?? defaultLabels.rectangleToolText,
-    ellipseToolText: locale?.imageEditor?.ellipseToolText ?? defaultLabels.ellipseToolText,
-    polygonToolText: locale?.imageEditor?.polygonToolText ?? defaultLabels.polygonToolText,
-    freehandToolText: locale?.imageEditor?.freehandToolText ?? defaultLabels.freehandToolText,
-    deleteText: locale?.imageEditor?.deleteText ?? defaultLabels.deleteText
-  }
+  return resolveLocaleSection(enSection('imageEditor'), locale?.imageEditor, overrides)
 }
 
-export const DEFAULT_STATUS_LABELS: Required<TigerLocaleStatus> = {
-  tagCloseAriaLabel: 'Close tag',
-  badgeLabel: 'notification',
-  badgeCountLabel: '{count} notifications'
+export function getStatusLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleStatus>
+): Required<TigerLocaleStatus> {
+  return resolveLocaleSection(enSection('status'), locale?.status, overrides)
 }
 
-export const ZH_CN_STATUS_LABELS: Required<TigerLocaleStatus> = {
-  tagCloseAriaLabel: '关闭标签',
-  badgeLabel: '通知',
-  badgeCountLabel: '{count} 条通知'
-}
-
-export function getStatusLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleStatus> {
-  const defaultLabels = locale?.locale?.startsWith('zh')
-    ? ZH_CN_STATUS_LABELS
-    : DEFAULT_STATUS_LABELS
-  return {
-    tagCloseAriaLabel: locale?.status?.tagCloseAriaLabel ?? defaultLabels.tagCloseAriaLabel,
-    badgeLabel: locale?.status?.badgeLabel ?? defaultLabels.badgeLabel,
-    badgeCountLabel: locale?.status?.badgeCountLabel ?? defaultLabels.badgeCountLabel
-  }
-}
-
-// ============================================================================
-// Form Validation Labels
-// ============================================================================
-
-/**
- * Default English form-validation messages. Range messages use {min}/{max}.
- */
-export const DEFAULT_FORM_VALIDATION_LABELS: Required<TigerLocaleFormValidation> = {
-  required: 'This field is required',
-  typeString: 'Value must be a string',
-  typeNumber: 'Value must be a number',
-  typeBoolean: 'Value must be a boolean',
-  typeArray: 'Value must be an array',
-  typeObject: 'Value must be an object',
-  email: 'Please enter a valid email address',
-  phone: 'Please enter a valid phone number',
-  url: 'Please enter a valid URL',
-  date: 'Please enter a valid date',
-  idCard: 'Please enter a valid ID card number',
-  minLength: 'Minimum length is {min} characters',
-  maxLength: 'Maximum length is {max} characters',
-  minValue: 'Minimum value is {min}',
-  maxValue: 'Maximum value is {max}',
-  minItems: 'Minimum {min} items required',
-  maxItems: 'Maximum {max} items allowed',
-  patternMismatch: 'Value does not match the required pattern',
-  validatorFailed: 'Validation failed',
-  validatorError: 'Validation error occurred'
-}
-
-/**
- * Chinese (Simplified) form-validation messages.
- */
-export const ZH_CN_FORM_VALIDATION_LABELS: Required<TigerLocaleFormValidation> = {
-  required: '此字段为必填项',
-  typeString: '值必须是字符串',
-  typeNumber: '值必须是数字',
-  typeBoolean: '值必须是布尔值',
-  typeArray: '值必须是数组',
-  typeObject: '值必须是对象',
-  email: '请输入有效的邮箱地址',
-  phone: '请输入有效的电话号码',
-  url: '请输入有效的网址',
-  date: '请输入有效的日期',
-  idCard: '请输入有效的身份证号码',
-  minLength: '长度不能少于 {min} 个字符',
-  maxLength: '长度不能超过 {max} 个字符',
-  minValue: '数值不能小于 {min}',
-  maxValue: '数值不能大于 {max}',
-  minItems: '至少需要 {min} 项',
-  maxItems: '最多允许 {max} 项',
-  patternMismatch: '格式不正确',
-  validatorFailed: '校验未通过',
-  validatorError: '校验时发生错误'
-}
-
-/**
- * Resolve form-validation messages with fallback to defaults.
- *
- * Priority per field: overrides > locale.formValidation > locale default.
- */
 export function getFormValidationLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFormValidation>
 ): Required<TigerLocaleFormValidation> {
-  const isZh = !!locale?.locale?.startsWith('zh')
-  const defaultLabels = isZh ? ZH_CN_FORM_VALIDATION_LABELS : DEFAULT_FORM_VALIDATION_LABELS
-  const fv = locale?.formValidation
-  const resolved = {} as Required<TigerLocaleFormValidation>
-  for (const key of Object.keys(defaultLabels) as Array<keyof TigerLocaleFormValidation>) {
-    resolved[key] = overrides?.[key] ?? fv?.[key] ?? defaultLabels[key]
-  }
-  return resolved
-}
-
-// ============================================================================
-// TimePicker Labels (centralized defaults; see timepicker-utils for the
-// per-language map that consumes these for the en/zh baselines)
-// ============================================================================
-
-export const DEFAULT_TIME_PICKER_LABELS: TimePickerLabels = {
-  hour: 'Hour',
-  minute: 'Min',
-  second: 'Sec',
-  now: 'Now',
-  ok: 'OK',
-  start: 'Start',
-  end: 'End',
-  clear: 'Clear time',
-  toggle: 'Toggle time picker',
-  dialog: 'Time picker',
-  selectTime: 'Select time',
-  selectTimeRange: 'Select time range'
-}
-
-export const ZH_CN_TIME_PICKER_LABELS: TimePickerLabels = {
-  hour: '时',
-  minute: '分',
-  second: '秒',
-  now: '现在',
-  ok: '确定',
-  start: '开始',
-  end: '结束',
-  clear: '清除时间',
-  toggle: '打开时间选择器',
-  dialog: '时间选择器',
-  selectTime: '请选择时间',
-  selectTimeRange: '请选择时间范围'
-}
-
-// ============================================================================
-// Upload Labels (centralized English defaults consumed by getUploadLabels)
-// ============================================================================
-
-export const DEFAULT_UPLOAD_LABELS: UploadLabels = {
-  dragAreaAriaLabel: 'Upload file by clicking or dragging',
-  buttonAriaLabel: 'Upload file',
-  clickToUploadText: 'Click to upload',
-  dragAndDropText: 'or drag and drop',
-  acceptInfoText: 'Accepted: {accept}',
-  maxSizeInfoText: 'Max size: {maxSize}',
-  selectFileText: 'Select File',
-  uploadedFilesAriaLabel: 'Uploaded files',
-  successAriaLabel: 'Success',
-  errorAriaLabel: 'Error',
-  uploadingAriaLabel: 'Uploading',
-  removeFileAriaLabel: 'Remove {fileName}',
-  previewFileAriaLabel: 'Preview {fileName}'
-}
-
-export const ZH_CN_UPLOAD_LABELS: UploadLabels = {
-  dragAreaAriaLabel: '点击或拖拽上传文件',
-  buttonAriaLabel: '上传文件',
-  clickToUploadText: '点击上传',
-  dragAndDropText: '或拖拽到此处',
-  acceptInfoText: '支持：{accept}',
-  maxSizeInfoText: '最大大小：{maxSize}',
-  selectFileText: '选择文件',
-  uploadedFilesAriaLabel: '已上传文件',
-  successAriaLabel: '成功',
-  errorAriaLabel: '错误',
-  uploadingAriaLabel: '上传中',
-  removeFileAriaLabel: '移除 {fileName}',
-  previewFileAriaLabel: '预览 {fileName}'
-}
-
-// ============================================================================
-// InputOTP Labels
-// ============================================================================
-
-export const DEFAULT_INPUT_OTP_LABELS: Required<TigerLocaleInputOTP> = {
-  groupLabel: 'One-time password',
-  slotLabel: 'Character {index} of {total}'
-}
-
-export const ZH_CN_INPUT_OTP_LABELS: Required<TigerLocaleInputOTP> = {
-  groupLabel: '一次性验证码',
-  slotLabel: '第 {index} 位，共 {total} 位'
+  return resolveLocaleSection(enSection('formValidation'), locale?.formValidation, overrides)
 }
 
 export function getInputOTPLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleInputOTP>
 ): Required<TigerLocaleInputOTP> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_INPUT_OTP_LABELS
-    : DEFAULT_INPUT_OTP_LABELS
-  return {
-    groupLabel: overrides?.groupLabel ?? locale?.inputOtp?.groupLabel ?? defaultLabels.groupLabel,
-    slotLabel: overrides?.slotLabel ?? locale?.inputOtp?.slotLabel ?? defaultLabels.slotLabel
-  }
-}
-
-// ============================================================================
-// TagsInput Labels
-// ============================================================================
-
-export const DEFAULT_TAGS_INPUT_LABELS: Required<TigerLocaleTagsInput> = {
-  removeTagLabel: 'Remove {tag}',
-  clearAllLabel: 'Clear all tags'
-}
-
-export const ZH_CN_TAGS_INPUT_LABELS: Required<TigerLocaleTagsInput> = {
-  removeTagLabel: '移除 {tag}',
-  clearAllLabel: '清空全部标签'
+  return resolveLocaleSection(enSection('inputOtp'), locale?.inputOtp, overrides)
 }
 
 export function getTagsInputLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTagsInput>
 ): Required<TigerLocaleTagsInput> {
-  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
-    ? ZH_CN_TAGS_INPUT_LABELS
-    : DEFAULT_TAGS_INPUT_LABELS
-  return {
-    removeTagLabel:
-      overrides?.removeTagLabel ??
-      locale?.tagsInput?.removeTagLabel ??
-      defaultLabels.removeTagLabel,
-    clearAllLabel:
-      overrides?.clearAllLabel ?? locale?.tagsInput?.clearAllLabel ?? defaultLabels.clearAllLabel
-  }
+  return resolveLocaleSection(enSection('tagsInput'), locale?.tagsInput, overrides)
 }
