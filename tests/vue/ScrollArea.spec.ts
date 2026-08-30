@@ -141,26 +141,26 @@ describe('ScrollArea', () => {
       const { container, viewport } = await renderOverflowing()
       const track = container.querySelector('[data-scroll-area-scrollbar="y"]') as HTMLElement
       // thumb is 100px tall, so a click at 150 centers it at the end of the track
-      await fireEvent.mouseDown(track, { clientY: 150 })
+      await fireEvent.pointerDown(track, { clientY: 150, button: 0 })
       expect(viewport.scrollTop).toBe(200)
     })
 
     it('scrolls while dragging the thumb', async () => {
       const { container, viewport } = await renderOverflowing()
       const thumb = container.querySelector('[data-scroll-area-thumb="y"]') as HTMLElement
-      await fireEvent.mouseDown(thumb, { clientY: 0 })
-      await fireEvent.mouseMove(document, { clientY: 50 })
+      await fireEvent.pointerDown(thumb, { clientY: 0, button: 0 })
+      await fireEvent.pointerMove(document, { clientY: 50 })
       // 50px of thumb travel over a 100px track maps onto half of the 200px scroll range
       expect(viewport.scrollTop).toBe(100)
-      await fireEvent.mouseUp(document, { clientY: 50 })
+      await fireEvent.pointerUp(document, { clientY: 50 })
     })
 
     it('stops scrolling after the drag ends', async () => {
       const { container, viewport } = await renderOverflowing()
       const thumb = container.querySelector('[data-scroll-area-thumb="y"]') as HTMLElement
-      await fireEvent.mouseDown(thumb, { clientY: 0 })
-      await fireEvent.mouseUp(document, { clientY: 50 })
-      await fireEvent.mouseMove(document, { clientY: 100 })
+      await fireEvent.pointerDown(thumb, { clientY: 0, button: 0 })
+      await fireEvent.pointerUp(document, { clientY: 50 })
+      await fireEvent.pointerMove(document, { clientY: 100 })
       expect(viewport.scrollTop).toBe(0)
     })
   })
@@ -243,9 +243,9 @@ describe('ScrollArea', () => {
     it('survives unmount in the middle of a thumb drag', async () => {
       const { container, unmount } = await renderOverflowing()
       const thumb = container.querySelector('[data-scroll-area-thumb="y"]') as HTMLElement
-      await fireEvent.mouseDown(thumb, { clientY: 0 })
+      await fireEvent.pointerDown(thumb, { clientY: 0, button: 0 })
       expect(() => unmount()).not.toThrow()
-      await fireEvent.mouseMove(document, { clientY: 50 })
+      await fireEvent.pointerMove(document, { clientY: 50 })
     })
 
     it('tolerates a zero-sized viewport', async () => {

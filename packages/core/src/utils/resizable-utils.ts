@@ -10,7 +10,7 @@ import type { ResizeHandlePosition, ResizeAxis } from '../types/resizable'
 export const resizableBaseClasses = 'relative'
 
 export const resizableHandleBaseClasses =
-  'absolute z-10 transition-opacity duration-150 opacity-0 hover:opacity-100 group-hover/resizable:opacity-100'
+  'absolute z-10 transition-opacity duration-150 opacity-0 hover:opacity-100 group-hover/resizable:opacity-100 touch-none'
 
 export const resizableHandleDraggingClasses = 'opacity-100'
 

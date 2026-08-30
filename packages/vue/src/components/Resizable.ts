@@ -88,8 +88,8 @@ export const Resizable = defineComponent({
       dragSession = null
     }
 
-    const onMouseDown = (handle: ResizeHandlePosition, e: MouseEvent) => {
-      if (props.disabled) return
+    const onPointerDown = (handle: ResizeHandlePosition, e: PointerEvent) => {
+      if (props.disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
       draggingHandle.value = handle
@@ -109,6 +109,8 @@ export const Resizable = defineComponent({
         startX: e.clientX,
         startY: e.clientY,
         ownerDocument: (e.currentTarget as HTMLElement | null)?.ownerDocument,
+        pointerId: e.pointerId,
+        pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
         onMove: ({ currentX, currentY }) => {
           applyResize(currentX, currentY, (event) => emit('resize', event))
         },
@@ -228,7 +230,7 @@ export const Resizable = defineComponent({
           'aria-valuemin': usesHeight ? props.minHeight : props.minWidth,
           'aria-valuemax': usesHeight ? props.maxHeight : props.maxWidth,
           tabindex: props.disabled ? -1 : 0,
-          onMousedown: (e: MouseEvent) => onMouseDown(pos, e),
+          onPointerdown: (e: PointerEvent) => onPointerDown(pos, e),
           onKeydown: (e: KeyboardEvent) => onKeyDown(pos, e)
         })
       })

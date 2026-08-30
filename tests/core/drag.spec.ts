@@ -483,6 +483,13 @@ describe('resolveDragConfig', () => {
 // Document Pointer Session
 // ---------------------------------------------------------------------------
 
+function dispatchPointer(
+  type: string,
+  init: PointerEventInit & { clientX: number; clientY: number }
+): void {
+  document.dispatchEvent(new PointerEvent(type, { bubbles: true, pointerId: 1, ...init }))
+}
+
 describe('createDocumentDragSession', () => {
   it('emits movement payloads with deltas from the start point', () => {
     const onMove = vi.fn()
@@ -493,7 +500,7 @@ describe('createDocumentDragSession', () => {
       onMove
     })
 
-    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 35, clientY: 50 }))
+    dispatchPointer('pointermove', { clientX: 35, clientY: 50 })
 
     expect(onMove).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -502,14 +509,15 @@ describe('createDocumentDragSession', () => {
         currentX: 35,
         currentY: 50,
         deltaX: 25,
-        deltaY: 30
+        deltaY: 30,
+        cancelled: false
       })
     )
 
     session.dispose()
   })
 
-  it('emits end payloads and disposes itself on mouseup', () => {
+  it('emits end payloads and disposes itself on pointerup', () => {
     const onMove = vi.fn()
     const onEnd = vi.fn()
     createDocumentDragSession({
@@ -520,18 +528,102 @@ describe('createDocumentDragSession', () => {
       onEnd
     })
 
-    document.dispatchEvent(new MouseEvent('mouseup', { clientX: 15, clientY: 25 }))
-    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 50, clientY: 50 }))
+    dispatchPointer('pointerup', { clientX: 15, clientY: 25 })
+    dispatchPointer('pointermove', { clientX: 50, clientY: 50 })
 
     expect(onEnd).toHaveBeenCalledWith(
       expect.objectContaining({
         currentX: 15,
         currentY: 25,
         deltaX: 5,
-        deltaY: 5
+        deltaY: 5,
+        cancelled: false
       })
     )
     expect(onMove).not.toHaveBeenCalled()
+  })
+
+  it('does not emit onMove until the drag threshold is crossed', () => {
+    const onMove = vi.fn()
+    const session = createDocumentDragSession({
+      startX: 0,
+      startY: 0,
+      ownerDocument: document,
+      dragThreshold: 10,
+      onMove
+    })
+
+    dispatchPointer('pointermove', { clientX: 3, clientY: 4 })
+    expect(onMove).not.toHaveBeenCalled()
+
+    dispatchPointer('pointermove', { clientX: 8, clientY: 8 })
+    expect(onMove).toHaveBeenCalledTimes(1)
+    expect(onMove).toHaveBeenCalledWith(
+      expect.objectContaining({ currentX: 8, currentY: 8, deltaX: 8, deltaY: 8 })
+    )
+
+    session.dispose()
+  })
+
+  it('locks movement to a single axis', () => {
+    const onMove = vi.fn()
+    const session = createDocumentDragSession({
+      startX: 10,
+      startY: 20,
+      ownerDocument: document,
+      lockAxis: 'x',
+      onMove
+    })
+
+    dispatchPointer('pointermove', { clientX: 40, clientY: 80 })
+
+    expect(onMove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        currentX: 40,
+        currentY: 20,
+        deltaX: 30,
+        deltaY: 0
+      })
+    )
+
+    session.dispose()
+  })
+
+  it('disposes on pointercancel and stops further onMove', () => {
+    const onMove = vi.fn()
+    const onEnd = vi.fn()
+    createDocumentDragSession({
+      startX: 0,
+      startY: 0,
+      ownerDocument: document,
+      onMove,
+      onEnd
+    })
+
+    dispatchPointer('pointermove', { clientX: 12, clientY: 4 })
+    dispatchPointer('pointercancel', { clientX: 12, clientY: 4 })
+    dispatchPointer('pointermove', { clientX: 40, clientY: 40 })
+
+    expect(onMove).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: true }))
+  })
+
+  it('cancels on Escape and restores user-select', () => {
+    const onEnd = vi.fn()
+    document.documentElement.style.userSelect = 'auto'
+    createDocumentDragSession({
+      startX: 0,
+      startY: 0,
+      ownerDocument: document,
+      onMove: vi.fn(),
+      onEnd
+    })
+    expect(document.documentElement.style.userSelect).toBe('none')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+
+    expect(onEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: true }))
+    expect(document.documentElement.style.userSelect).toBe('auto')
   })
 
   it('removes listeners when disposed manually', () => {
@@ -546,8 +638,8 @@ describe('createDocumentDragSession', () => {
     })
 
     session.dispose()
-    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }))
-    document.dispatchEvent(new MouseEvent('mouseup', { clientX: 10, clientY: 10 }))
+    dispatchPointer('pointermove', { clientX: 10, clientY: 10 })
+    dispatchPointer('pointerup', { clientX: 10, clientY: 10 })
 
     expect(onMove).not.toHaveBeenCalled()
     expect(onEnd).not.toHaveBeenCalled()

@@ -26,6 +26,8 @@ import {
   resolveSwipeGesture,
   mergeTigerLocale,
   OVERLAY_Z_INDEX,
+  createDocumentDragSession,
+  type DocumentDragSession,
   type GesturePoint,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
@@ -141,35 +143,46 @@ export const Modal: React.FC<ModalProps> = ({
   const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
   const prevOpenRef = useRef(open)
+  const dragSessionRef = useRef<DocumentDragSession | null>(null)
+
+  const cleanupDragSession = useCallback(() => {
+    dragSessionRef.current?.dispose()
+    dragSessionRef.current = null
+  }, [])
 
   useEffect(() => {
     if (open) {
       setHasBeenOpened(true)
     } else {
+      cleanupDragSession()
       setDragOffset({ x: 0, y: 0 })
     }
-  }, [open])
+  }, [open, cleanupDragSession])
 
-  const handleDragMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (!isDraggable) return
-      const startX = e.clientX
-      const startY = e.clientY
-      let offsetX = dragOffset.x
-      let offsetY = dragOffset.y
-      const onMouseMove = (ev: MouseEvent) => {
-        offsetX = dragOffset.x + (ev.clientX - startX)
-        offsetY = dragOffset.y + (ev.clientY - startY)
-        setDragOffset({ x: offsetX, y: offsetY })
-      }
-      const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
-      }
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+  useEffect(() => cleanupDragSession, [cleanupDragSession])
+
+  const handleDragPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDraggable || e.button !== 0) return
+      e.preventDefault()
+      const originX = dragOffset.x
+      const originY = dragOffset.y
+      cleanupDragSession()
+      dragSessionRef.current = createDocumentDragSession({
+        startX: e.clientX,
+        startY: e.clientY,
+        ownerDocument: e.currentTarget.ownerDocument,
+        pointerId: e.pointerId,
+        pointerTarget: e.currentTarget,
+        onMove: ({ deltaX, deltaY }) => {
+          setDragOffset({ x: originX + deltaX, y: originY + deltaY })
+        },
+        onEnd: () => {
+          dragSessionRef.current = null
+        }
+      })
     },
-    [isDraggable, dragOffset]
+    [isDraggable, dragOffset, cleanupDragSession]
   )
 
   useEffect(() => {
@@ -403,8 +416,12 @@ export const Modal: React.FC<ModalProps> = ({
           {(title || titleContent || closable) && (
             <div
               className={modalHeaderClasses}
-              onMouseDown={isDraggable ? handleDragMouseDown : undefined}
-              style={isDraggable ? { cursor: 'grab', userSelect: 'none' } : undefined}>
+              onPointerDown={isDraggable ? handleDragPointerDown : undefined}
+              style={
+                isDraggable
+                  ? { cursor: 'grab', userSelect: 'none', touchAction: 'none' }
+                  : undefined
+              }>
               {/* Title */}
               {(title || titleContent) && (
                 <h3 id={titleId} className={modalTitleClasses}>

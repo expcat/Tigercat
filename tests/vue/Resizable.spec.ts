@@ -71,8 +71,8 @@ describe('Resizable', () => {
     })
   })
 
-  describe('Mouse interaction', () => {
-    it('should have mousedown handler on handles', () => {
+  describe('Pointer interaction', () => {
+    it('should have pointerdown handler on handles', () => {
       const { container } = renderResizable()
       const handle = container.querySelector('[data-handle="right"]')!
       // Handle is rendered and interactive

@@ -130,9 +130,9 @@ export const ScrollArea = defineComponent({
       return axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth
     }
 
-    function startThumbDrag(axis: ScrollAreaAxis, event: MouseEvent): void {
+    function startThumbDrag(axis: ScrollAreaAxis, event: PointerEvent): void {
       const viewport = viewportRef.value
-      if (!viewport) return
+      if (!viewport || event.button !== 0) return
       event.preventDefault()
       event.stopPropagation()
 
@@ -146,6 +146,9 @@ export const ScrollArea = defineComponent({
         startX: event.clientX,
         startY: event.clientY,
         ownerDocument: viewport.ownerDocument,
+        pointerId: event.pointerId,
+        pointerTarget: event.currentTarget instanceof Element ? event.currentTarget : null,
+        lockAxis: axis,
         onMove: ({ currentX, currentY }) => {
           const current = axis === 'y' ? currentY : currentX
           const trackSize = trackSizeOf(axis)
@@ -167,7 +170,7 @@ export const ScrollArea = defineComponent({
       })
     }
 
-    function handleTrackMouseDown(axis: ScrollAreaAxis, event: MouseEvent): void {
+    function handleTrackPointerDown(axis: ScrollAreaAxis, event: PointerEvent): void {
       const target = event.target as HTMLElement | null
       if (target?.dataset.scrollAreaThumb) {
         startThumbDrag(axis, event)
@@ -254,7 +257,7 @@ export const ScrollArea = defineComponent({
           class: getScrollAreaScrollbarClasses(axis, props.scrollbarSize, props.scrollbar),
           'data-scroll-area-scrollbar': axis,
           'aria-hidden': 'true',
-          onMousedown: (event: MouseEvent) => handleTrackMouseDown(axis, event)
+          onPointerdown: (event: PointerEvent) => handleTrackPointerDown(axis, event)
         },
         [
           h('div', {

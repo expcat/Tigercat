@@ -34,6 +34,8 @@ import {
   mergeTigerLocale,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
+  createDocumentDragSession,
+  type DocumentDragSession,
   type GesturePoint,
   type TigerLocale,
   type TigerLocaleModal,
@@ -256,23 +258,32 @@ export const Modal = defineComponent({
 
     // Drag state
     const dragOffset = ref({ x: 0, y: 0 })
-    const isDragging = ref(false)
-    const dragStart = ref({ x: 0, y: 0 })
+    let dragSession: DocumentDragSession | null = null
 
-    const handleDragMouseDown = (e: MouseEvent) => {
-      if (!props.draggable) return
-      isDragging.value = true
-      dragStart.value = { x: e.clientX - dragOffset.value.x, y: e.clientY - dragOffset.value.y }
-      const onMouseMove = (ev: MouseEvent) => {
-        dragOffset.value = { x: ev.clientX - dragStart.value.x, y: ev.clientY - dragStart.value.y }
-      }
-      const onMouseUp = () => {
-        isDragging.value = false
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
-      }
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+    const cleanupDragSession = () => {
+      dragSession?.dispose()
+      dragSession = null
+    }
+
+    const handleDragPointerDown = (e: PointerEvent) => {
+      if (!props.draggable || e.button !== 0) return
+      e.preventDefault()
+      const originX = dragOffset.value.x
+      const originY = dragOffset.value.y
+      cleanupDragSession()
+      dragSession = createDocumentDragSession({
+        startX: e.clientX,
+        startY: e.clientY,
+        ownerDocument: (e.currentTarget as HTMLElement | null)?.ownerDocument,
+        pointerId: e.pointerId,
+        pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
+        onMove: ({ deltaX, deltaY }) => {
+          dragOffset.value = { x: originX + deltaX, y: originY + deltaY }
+        },
+        onEnd: () => {
+          dragSession = null
+        }
+      })
     }
 
     const titleId = computed(() => `${instanceId.value}-title`)
@@ -352,6 +363,7 @@ export const Modal = defineComponent({
 
     onBeforeUnmount(() => {
       cleanupEscape?.()
+      cleanupDragSession()
     })
 
     watch(
@@ -368,6 +380,7 @@ export const Modal = defineComponent({
           el?.focus?.()
         } else {
           previousActiveElement.value?.focus?.()
+          cleanupDragSession()
           dragOffset.value = { x: 0, y: 0 }
           if (previousVisible) {
             const timer = window.setTimeout(() => emit('after-close'), ANIMATION_DURATION_MS)
@@ -443,8 +456,10 @@ export const Modal = defineComponent({
               'div',
               {
                 class: modalHeaderClasses,
-                onMousedown: props.draggable ? handleDragMouseDown : undefined,
-                style: props.draggable ? 'cursor: grab; user-select: none' : undefined
+                onPointerdown: props.draggable ? handleDragPointerDown : undefined,
+                style: props.draggable
+                  ? 'cursor: grab; user-select: none; touch-action: none'
+                  : undefined
               },
               [
                 props.title || slots.title

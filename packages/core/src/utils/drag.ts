@@ -297,8 +297,37 @@ export function resolveDragConfig(config?: DragConfig): Required<DragConfig> {
 // Document Pointer Session
 // ---------------------------------------------------------------------------
 
+function isMatchingPointer(event: PointerEvent, pointerId: number | undefined): boolean {
+  return pointerId == null || event.pointerId === pointerId
+}
+
+function applyLockAxis(
+  startX: number,
+  startY: number,
+  currentX: number,
+  currentY: number,
+  lockAxis: DocumentDragSessionOptions['lockAxis']
+): { currentX: number; currentY: number; deltaX: number; deltaY: number } {
+  if (lockAxis === 'x') {
+    return { currentX, currentY: startY, deltaX: currentX - startX, deltaY: 0 }
+  }
+  if (lockAxis === 'y') {
+    return { currentX: startX, currentY, deltaX: 0, deltaY: currentY - startY }
+  }
+  return {
+    currentX,
+    currentY,
+    deltaX: currentX - startX,
+    deltaY: currentY - startY
+  }
+}
+
 /**
- * Create a document-level mouse drag session with shared cleanup semantics.
+ * Create a document-level pointer drag session with shared cleanup semantics.
+ *
+ * Callers start the session from `pointerdown`. The session binds
+ * `pointermove` / `pointerup` / `pointercancel` plus Escape, optionally
+ * captures the pointer, and restores `user-select` on dispose.
  */
 export function createDocumentDragSession(
   options: DocumentDragSessionOptions
@@ -310,37 +339,98 @@ export function createDocumentDragSession(
   }
 
   let disposed = false
+  const threshold = options.dragThreshold ?? 0
+  let passedThreshold = threshold <= 0
+  const pointerId = options.pointerId
+  const captureTarget = options.pointerTarget ?? null
+  const root = ownerDocument.documentElement
+  const previousUserSelect = root.style.userSelect
+  root.style.userSelect = 'none'
 
-  const createPayload = (event: MouseEvent): DocumentDragSessionEvent => ({
-    startX: options.startX,
-    startY: options.startY,
-    currentX: event.clientX,
-    currentY: event.clientY,
-    deltaX: event.clientX - options.startX,
-    deltaY: event.clientY - options.startY,
-    event
-  })
+  if (captureTarget && pointerId != null && typeof captureTarget.setPointerCapture === 'function') {
+    try {
+      captureTarget.setPointerCapture(pointerId)
+    } catch {
+      // Element may not be connected (tests / SSR hydrate).
+    }
+  }
+
+  const createPayload = (
+    event: Event,
+    clientX: number,
+    clientY: number,
+    cancelled: boolean
+  ): DocumentDragSessionEvent => {
+    const locked = applyLockAxis(options.startX, options.startY, clientX, clientY, options.lockAxis)
+    return {
+      startX: options.startX,
+      startY: options.startY,
+      currentX: locked.currentX,
+      currentY: locked.currentY,
+      deltaX: locked.deltaX,
+      deltaY: locked.deltaY,
+      event,
+      cancelled
+    }
+  }
 
   const dispose = () => {
     if (disposed) return
     disposed = true
-    ownerDocument.removeEventListener('mousemove', handleMouseMove)
-    ownerDocument.removeEventListener('mouseup', handleMouseUp)
+    ownerDocument.removeEventListener('pointermove', handlePointerMove)
+    ownerDocument.removeEventListener('pointerup', handlePointerUp)
+    ownerDocument.removeEventListener('pointercancel', handlePointerCancel)
+    ownerDocument.removeEventListener('keydown', handleKeyDown)
+    root.style.userSelect = previousUserSelect
+    if (
+      captureTarget &&
+      pointerId != null &&
+      typeof captureTarget.releasePointerCapture === 'function'
+    ) {
+      try {
+        captureTarget.releasePointerCapture(pointerId)
+      } catch {
+        // Capture may already have been released.
+      }
+    }
   }
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const finish = (event: Event, clientX: number, clientY: number, cancelled: boolean) => {
     if (disposed) return
-    options.onMove(createPayload(event))
-  }
-
-  const handleMouseUp = (event: MouseEvent) => {
-    if (disposed) return
-    options.onEnd?.(createPayload(event))
+    options.onEnd?.(createPayload(event, clientX, clientY, cancelled))
     dispose()
   }
 
-  ownerDocument.addEventListener('mousemove', handleMouseMove)
-  ownerDocument.addEventListener('mouseup', handleMouseUp)
+  const handlePointerMove = (event: PointerEvent) => {
+    if (disposed || !isMatchingPointer(event, pointerId)) return
+    const distance = Math.hypot(event.clientX - options.startX, event.clientY - options.startY)
+    if (!passedThreshold) {
+      if (distance < threshold) return
+      passedThreshold = true
+    }
+    options.onMove(createPayload(event, event.clientX, event.clientY, false))
+  }
+
+  const handlePointerUp = (event: PointerEvent) => {
+    if (disposed || !isMatchingPointer(event, pointerId)) return
+    finish(event, event.clientX, event.clientY, false)
+  }
+
+  const handlePointerCancel = (event: PointerEvent) => {
+    if (disposed || !isMatchingPointer(event, pointerId)) return
+    finish(event, event.clientX, event.clientY, true)
+  }
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (disposed || event.key !== 'Escape') return
+    event.preventDefault()
+    finish(event, options.startX, options.startY, true)
+  }
+
+  ownerDocument.addEventListener('pointermove', handlePointerMove)
+  ownerDocument.addEventListener('pointerup', handlePointerUp)
+  ownerDocument.addEventListener('pointercancel', handlePointerCancel)
+  ownerDocument.addEventListener('keydown', handleKeyDown)
 
   return { dispose }
 }

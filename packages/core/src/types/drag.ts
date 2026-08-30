@@ -144,14 +144,21 @@ export interface DocumentDragSessionEvent {
   currentY: number
   deltaX: number
   deltaY: number
-  event: MouseEvent
+  /** Pointer, cancel, or Escape originating event */
+  event: Event
+  cancelled: boolean
 }
 
-/** Configuration for a document-level mouse drag session */
+/** Configuration for a document-level pointer drag session */
 export interface DocumentDragSessionOptions {
   startX: number
   startY: number
   ownerDocument?: Document
+  pointerId?: number
+  pointerTarget?: Element | null
+  /** Distance in px before `onMove` fires. `0` (default) moves on the first pointermove. */
+  dragThreshold?: number
+  lockAxis?: DragAxis
   onMove: (event: DocumentDragSessionEvent) => void
   onEnd?: (event: DocumentDragSessionEvent) => void
 }

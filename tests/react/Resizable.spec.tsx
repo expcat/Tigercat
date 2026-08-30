@@ -43,17 +43,17 @@ describe('Resizable', () => {
       const onResizeStart = vi.fn()
       const { container } = renderResizable({ disabled: true, onResizeStart })
       const handle = container.querySelector('[data-handle="right"]')!
-      fireEvent.mouseDown(handle, { clientX: 300, clientY: 100 })
+      fireEvent.pointerDown(handle, { clientX: 300, clientY: 100, button: 0 })
       expect(onResizeStart).not.toHaveBeenCalled()
     })
   })
 
-  describe('Mouse interaction', () => {
-    it('should call onResizeStart on mousedown', () => {
+  describe('Pointer interaction', () => {
+    it('should call onResizeStart on pointerdown', () => {
       const onResizeStart = vi.fn()
       const { container } = renderResizable({ onResizeStart })
       const handle = container.querySelector('[data-handle="right"]')!
-      fireEvent.mouseDown(handle, { clientX: 300, clientY: 100 })
+      fireEvent.pointerDown(handle, { clientX: 300, clientY: 100, button: 0 })
       expect(onResizeStart).toHaveBeenCalledWith(
         expect.objectContaining({
           width: 300,
@@ -116,12 +116,12 @@ describe('Resizable', () => {
       const { container } = renderResizable({ onResizeStart, onResize, onResizeEnd })
       const handle = container.querySelector('[data-handle="right"]')!
 
-      fireEvent.mouseDown(handle, { clientX: 300, clientY: 100 })
+      fireEvent.pointerDown(handle, { clientX: 300, clientY: 100, button: 0 })
       expect(onResizeStart).toHaveBeenCalledWith(
         expect.objectContaining({ width: 300, height: 200, handle: 'right' })
       )
 
-      fireEvent.mouseMove(document, { clientX: 350, clientY: 100 })
+      fireEvent.pointerMove(document, { clientX: 350, clientY: 100 })
       // onResize should have been called via createDocumentDragSession
     })
   })

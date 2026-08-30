@@ -106,9 +106,9 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(
     )
 
     const startThumbDrag = useCallback(
-      (axis: ScrollAreaAxis, event: React.MouseEvent) => {
+      (axis: ScrollAreaAxis, event: React.PointerEvent) => {
         const viewport = viewportRef.current
-        if (!viewport) return
+        if (!viewport || event.button !== 0) return
         event.preventDefault()
         event.stopPropagation()
 
@@ -122,6 +122,9 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(
           startX: event.clientX,
           startY: event.clientY,
           ownerDocument: viewport.ownerDocument,
+          pointerId: event.pointerId,
+          pointerTarget: event.currentTarget,
+          lockAxis: axis,
           onMove: ({ currentX, currentY }) => {
             const current = axis === 'y' ? currentY : currentX
             const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
@@ -145,8 +148,8 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(
       [applyScroll]
     )
 
-    const handleTrackMouseDown = useCallback(
-      (axis: ScrollAreaAxis, event: React.MouseEvent) => {
+    const handleTrackPointerDown = useCallback(
+      (axis: ScrollAreaAxis, event: React.PointerEvent) => {
         const target = event.target as HTMLElement | null
         if (target?.dataset.scrollAreaThumb) {
           startThumbDrag(axis, event)
@@ -223,7 +226,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(
           className={getScrollAreaScrollbarClasses(axis, scrollbarSize, scrollbar)}
           data-scroll-area-scrollbar={axis}
           aria-hidden="true"
-          onMouseDown={(event) => handleTrackMouseDown(axis, event)}>
+          onPointerDown={(event) => handleTrackPointerDown(axis, event)}>
           <div
             className={getScrollAreaThumbClasses(axis, draggingAxis === axis)}
             style={getScrollAreaThumbStyle(axis, axisState)}

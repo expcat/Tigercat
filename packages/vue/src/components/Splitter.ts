@@ -129,8 +129,8 @@ export const Splitter = defineComponent({
       dragSession = null
     }
 
-    const onMouseDown = (index: number, e: MouseEvent) => {
-      if (props.disabled) return
+    const onPointerDown = (index: number, e: PointerEvent) => {
+      if (props.disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
       draggingIndex.value = index
@@ -142,6 +142,9 @@ export const Splitter = defineComponent({
         startX: e.clientX,
         startY: e.clientY,
         ownerDocument: (e.currentTarget as HTMLElement | null)?.ownerDocument,
+        pointerId: e.pointerId,
+        pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
+        lockAxis: props.direction === 'horizontal' ? 'x' : 'y',
         onMove: ({ currentX, currentY }) => {
           applyDragResize(currentX, currentY)
         },
@@ -213,7 +216,7 @@ export const Splitter = defineComponent({
                 'aria-orientation': props.direction === 'horizontal' ? 'vertical' : 'horizontal',
                 tabindex: props.disabled ? -1 : 0,
                 'data-gutter-index': i,
-                onMousedown: (e: MouseEvent) => onMouseDown(i, e),
+                onPointerdown: (e: PointerEvent) => onPointerDown(i, e),
                 onKeydown: (e: KeyboardEvent) => {
                   if (props.disabled) return
                   const step = 10

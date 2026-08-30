@@ -107,15 +107,15 @@ describe('Splitter', () => {
     })
   })
 
-  describe('Mouse interaction', () => {
-    it('should emit resize-start on mousedown', async () => {
+  describe('Pointer interaction', () => {
+    it('should emit resize-start on pointerdown', async () => {
       const onResizeStart = vi.fn()
       const { container } = renderSplitter({
         sizes: [400, 400],
         'onResize-start': onResizeStart
       })
       const gutter = container.querySelector('[role="separator"]')!
-      await fireEvent.mouseDown(gutter, { clientX: 400 })
+      await fireEvent.pointerDown(gutter, { clientX: 400, button: 0 })
       expect(onResizeStart).toHaveBeenCalledWith(
         expect.objectContaining({ index: 0, sizes: [400, 400] })
       )
@@ -136,12 +136,12 @@ describe('Splitter', () => {
     })
   })
   describe('Dragging state', () => {
-    it('should apply dragging highlight class to the active gutter on mousedown', async () => {
+    it('should apply dragging highlight class to the active gutter on pointerdown', async () => {
       const { container } = renderSplitter({ sizes: [400, 400] })
       const gutter = container.querySelector('[role="separator"]') as HTMLElement
       const draggingClass = 'bg-[var(--tiger-primary,#2563eb)]'
       expect(gutter.classList.contains(draggingClass)).toBe(false)
-      await fireEvent.mouseDown(gutter, { clientX: 400 })
+      await fireEvent.pointerDown(gutter, { clientX: 400, button: 0 })
       expect(gutter.classList.contains(draggingClass)).toBe(true)
     })
   })

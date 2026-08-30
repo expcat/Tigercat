@@ -136,9 +136,9 @@ describe('Modal - Drag Enhancements', () => {
     const header = document.querySelector('[data-tiger-modal] > div:first-child') as HTMLElement
     const dialog = document.querySelector('[data-tiger-modal]') as HTMLElement
 
-    fireEvent.mouseDown(header, { clientX: 100, clientY: 100 })
-    fireEvent.mouseMove(document, { clientX: 150, clientY: 120 })
-    fireEvent.mouseUp(document)
+    fireEvent.pointerDown(header, { clientX: 100, clientY: 100, button: 0 })
+    fireEvent.pointerMove(document, { clientX: 150, clientY: 120 })
+    fireEvent.pointerUp(document)
 
     expect(dialog.style.transform).toBe('translate(50px, 20px)')
   })
@@ -147,9 +147,9 @@ describe('Modal - Drag Enhancements', () => {
     const { rerender } = render(<Modal open title="Draggable Modal" draggable />)
     const header = document.querySelector('[data-tiger-modal] > div:first-child') as HTMLElement
 
-    fireEvent.mouseDown(header, { clientX: 100, clientY: 100 })
-    fireEvent.mouseMove(document, { clientX: 200, clientY: 200 })
-    fireEvent.mouseUp(document)
+    fireEvent.pointerDown(header, { clientX: 100, clientY: 100, button: 0 })
+    fireEvent.pointerMove(document, { clientX: 200, clientY: 200 })
+    fireEvent.pointerUp(document)
 
     // Close and reopen
     rerender(<Modal open={false} title="Draggable Modal" draggable />)

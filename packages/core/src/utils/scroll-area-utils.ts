@@ -37,7 +37,7 @@ export const scrollAreaScrollbarBaseClasses =
   'tiger-scroll-area-scrollbar absolute z-10 touch-none select-none rounded-full bg-[var(--tiger-surface-muted,#f3f4f6)] transition-opacity duration-200'
 
 export const scrollAreaThumbBaseClasses =
-  'tiger-scroll-area-thumb absolute rounded-full bg-[var(--tiger-border,#d1d5db)] transition-colors hover:bg-[var(--tiger-text-muted,#9ca3af)]'
+  'tiger-scroll-area-thumb absolute rounded-full bg-[var(--tiger-border,#d1d5db)] transition-colors hover:bg-[var(--tiger-text-muted,#9ca3af)] touch-none'
 
 export const scrollAreaThumbDraggingClasses = 'bg-[var(--tiger-text-muted,#9ca3af)]'
 

@@ -82,9 +82,9 @@ export const Splitter: React.FC<SplitterProps> = ({
   const mins = useMemo(() => Array.from({ length: paneCount }, () => min), [paneCount, min])
   const maxes = useMemo(() => Array.from({ length: paneCount }, () => max), [paneCount, max])
 
-  const handleMouseDown = useCallback(
-    (index: number, e: React.MouseEvent) => {
-      if (disabled) return
+  const handlePointerDown = useCallback(
+    (index: number, e: React.PointerEvent) => {
+      if (disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
       draggingRef.current = {
@@ -99,6 +99,9 @@ export const Splitter: React.FC<SplitterProps> = ({
         startX: e.clientX,
         startY: e.clientY,
         ownerDocument: e.currentTarget.ownerDocument,
+        pointerId: e.pointerId,
+        pointerTarget: e.currentTarget,
+        lockAxis: direction === 'horizontal' ? 'x' : 'y',
         onMove: ({ currentX, currentY }) => {
           const drag = draggingRef.current
           if (!drag) return
@@ -201,7 +204,7 @@ export const Splitter: React.FC<SplitterProps> = ({
                 aria-orientation={direction === 'horizontal' ? 'vertical' : 'horizontal'}
                 tabIndex={disabled ? -1 : 0}
                 data-gutter-index={i}
-                onMouseDown={(e) => handleMouseDown(i, e)}
+                onPointerDown={(e) => handlePointerDown(i, e)}
                 onKeyDown={(e) => handleKeyDown(i, e)}>
                 <div className={getSplitterGutterHandleClasses(direction)} />
               </div>

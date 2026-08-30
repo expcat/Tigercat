@@ -16,7 +16,7 @@ export const splitterVerticalClasses = 'flex-col'
 export const splitterPaneBaseClasses = 'relative overflow-auto'
 
 export const splitterGutterBaseClasses =
-  'relative flex-shrink-0 bg-[var(--tiger-border,#e5e7eb)] transition-colors duration-150 hover:bg-[var(--tiger-primary,#2563eb)] z-10'
+  'relative flex-shrink-0 bg-[var(--tiger-border,#e5e7eb)] transition-colors duration-150 hover:bg-[var(--tiger-primary,#2563eb)] z-10 touch-none'
 
 export const splitterGutterHorizontalClasses =
   'cursor-col-resize w-[var(--tiger-splitter-gutter,4px)] h-full'

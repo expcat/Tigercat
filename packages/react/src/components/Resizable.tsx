@@ -61,9 +61,9 @@ export const Resizable: React.FC<ResizableProps> = ({
 
   useEffect(() => cleanupDragSession, [cleanupDragSession])
 
-  const handleMouseDown = useCallback(
-    (handle: ResizeHandlePosition, e: React.MouseEvent) => {
-      if (disabled) return
+  const handlePointerDown = useCallback(
+    (handle: ResizeHandlePosition, e: React.PointerEvent) => {
+      if (disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
       const sw = width ?? 0
@@ -112,6 +112,8 @@ export const Resizable: React.FC<ResizableProps> = ({
         startX: e.clientX,
         startY: e.clientY,
         ownerDocument: e.currentTarget.ownerDocument,
+        pointerId: e.pointerId,
+        pointerTarget: e.currentTarget,
         onMove: ({ currentX, currentY }) => {
           const next = calculateResize(currentX, currentY)
           if (!next) return
@@ -226,7 +228,7 @@ export const Resizable: React.FC<ResizableProps> = ({
             aria-valuemin={valueMin}
             aria-valuemax={valueMax}
             tabIndex={disabled ? -1 : 0}
-            onMouseDown={(e) => handleMouseDown(pos, e)}
+            onPointerDown={(e) => handlePointerDown(pos, e)}
             onKeyDown={(e) => handleKeyDown(pos, e)}
           />
         )
