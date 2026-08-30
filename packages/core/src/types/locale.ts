@@ -15,6 +15,10 @@ export interface TigerLocaleCommon {
   searchPlaceholder?: string
   /** Default label for clear actions */
   clearText?: string
+  /** Imperative Message close-button accessible name */
+  closeMessageAriaLabel?: string
+  /** Imperative Notification close-button accessible name */
+  closeNotificationAriaLabel?: string
 }
 
 export interface TigerLocaleEmpty {

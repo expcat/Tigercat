@@ -3,10 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
-import { defineLocale } from '../define-locale'
 import { AR_SA_DATEPICKER_LOCALE } from '../datepicker-locales/ar-SA'
 
-export const arSA: TigerLocale = defineLocale({
+export const arSA: TigerLocale = {
   locale: 'ar-SA',
   direction: 'rtl',
   datePicker: AR_SA_DATEPICKER_LOCALE,
@@ -16,7 +15,17 @@ export const arSA: TigerLocale = defineLocale({
     closeText: 'إغلاق',
     loadingText: 'جار التحميل...',
     emptyText: 'لا توجد بيانات',
-    noMoreText: 'لا مزيد من البيانات'
+    noMoreText: 'لا مزيد من البيانات',
+    searchPlaceholder: 'بحث',
+    clearText: 'مسح',
+    closeMessageAriaLabel: 'إغلاق الرسالة',
+    closeNotificationAriaLabel: 'إغلاق الإشعار'
+  },
+  empty: {
+    noData: 'لا توجد بيانات',
+    noDataAvailable: 'لا توجد بيانات متاحة',
+    noResults: 'لا توجد نتائج',
+    error: 'حدث خطأ ما'
   },
   modal: {
     closeAriaLabel: 'إغلاق',
@@ -77,16 +86,104 @@ export const arSA: TigerLocale = defineLocale({
     columnSettingsText: 'إعدادات الأعمدة',
     columnSettingsAriaLabel: 'إعدادات الأعمدة',
     lockColumnAriaLabel: 'تثبيت العمود {column}',
-    unlockColumnAriaLabel: 'إلغاء تثبيت العمود {column}'
+    unlockColumnAriaLabel: 'إلغاء تثبيت العمود {column}',
+    allText: 'الكل',
+    filterPlaceholder: 'تصفية...',
+    exportCsvText: 'تصدير CSV',
+    exportExcelText: 'تصدير Excel',
+    exportCsvAriaLabel: 'تصدير إلى CSV',
+    exportExcelAriaLabel: 'تصدير إلى Excel',
+    expandRowAriaLabel: 'توسيع الصف',
+    collapseRowAriaLabel: 'طي الصف'
+  },
+  dataExport: {
+    triggerText: 'تصدير',
+    triggerAriaLabel: 'تصدير البيانات',
+    xlsxText: 'تصدير Excel',
+    markdownText: 'تصدير Markdown',
+    exportingText: 'جارٍ التصدير...'
+  },
+  timePicker: {
+    hour: 'ساعة',
+    minute: 'دقيقة',
+    second: 'ثانية',
+    now: 'الآن',
+    ok: 'موافق',
+    start: 'البداية',
+    end: 'النهاية',
+    clear: 'مسح الوقت',
+    toggle: 'فتح منتقي الوقت',
+    dialog: 'منتقي الوقت',
+    selectTime: 'اختر الوقت',
+    selectTimeRange: 'اختر نطاق الوقت'
   },
   formWizard: {
     prevText: 'السابق',
     nextText: 'التالي',
     finishText: 'إنهاء'
   },
+  tour: {
+    prevText: 'السابق',
+    nextText: 'التالي',
+    finishText: 'إنهاء',
+    closeAriaLabel: 'إغلاق الجولة'
+  },
+  calendar: {
+    previousMonth: 'الشهر السابق',
+    nextMonth: 'الشهر التالي',
+    previousYear: 'السنة السابقة',
+    nextYear: 'السنة التالية',
+    yearSelectAriaLabel: 'السنة',
+    monthSelectAriaLabel: 'الشهر',
+    daySelectAriaLabel: 'اليوم'
+  },
+  fileManager: {
+    rootText: 'الجذر'
+  },
+  imageViewer: {
+    dialogAriaLabel: 'عارض الصور',
+    previewDialogAriaLabel: 'معاينة الصورة',
+    closeAriaLabel: 'إغلاق',
+    closePreviewAriaLabel: 'إغلاق المعاينة',
+    previousImageAriaLabel: 'الصورة السابقة',
+    nextImageAriaLabel: 'الصورة التالية',
+    zoomOutAriaLabel: 'تصغير',
+    resetAriaLabel: 'إعادة تعيين',
+    zoomInAriaLabel: 'تكبير',
+    rotateLeftAriaLabel: 'تدوير لليسار',
+    rotateRightAriaLabel: 'تدوير لليمين'
+  },
+  imageEditor: {
+    selectImageText: 'اختر صورة',
+    selectImageAriaLabel: 'اختر صورة للقص والرفع',
+    cropModalTitle: 'قص الصورة',
+    cropCancelText: 'إلغاء',
+    cropConfirmText: 'تأكيد القص',
+    cropperDialogAriaLabel: 'أداة قص الصورة',
+    imageToCropAriaLabel: 'الصورة المراد قصها',
+    moveCropAreaAriaLabel: 'تحريك منطقة القص',
+    resizeCropAreaAriaLabel: 'تغيير حجم منطقة القص {handle}',
+    loadingCropImageAriaLabel: 'جارٍ تحميل الصورة للقص',
+    annotationToolbarAriaLabel: 'أدوات التعليق',
+    annotationEditorAriaLabel: 'محرر تعليق الصورة',
+    annotationCanvasAriaLabel: 'لوحة التعليق',
+    loadingAnnotationImageAriaLabel: 'جارٍ تحميل الصورة للتعليق',
+    selectToolText: 'تحديد',
+    rectangleToolText: 'مستطيل',
+    ellipseToolText: 'قطع ناقص',
+    polygonToolText: 'مضلع',
+    freehandToolText: 'رسم حر',
+    deleteText: 'حذف'
+  },
+  status: {
+    tagCloseAriaLabel: 'إغلاق الوسم',
+    badgeLabel: 'إشعار',
+    badgeCountLabel: '{count} إشعارات'
+  },
   taskBoard: {
     emptyColumnText: 'لا توجد مهام',
     addCardText: 'إضافة مهمة',
+    addColumnText: 'إضافة عمود',
     wipLimitText: 'حد العمل الجاري: {limit}',
     dragHintText: 'اسحب للنقل',
     boardAriaLabel: 'لوحة المهام'
@@ -147,6 +244,137 @@ export const arSA: TigerLocale = defineLocale({
     preview: 'معاينة',
     selectPreset: 'اختيار {color}'
   },
+  tabs: {
+    addTabAriaLabel: 'إضافة علامة تبويب',
+    closeTabAriaLabel: 'إغلاق {label}'
+  },
+  rate: {
+    ariaLabel: 'التقييم',
+    valueText: '{value} نجوم'
+  },
+  avatarGroup: {
+    ariaLabel: 'مجموعة الصور الرمزية',
+    overflowAriaLabel: '{count} أكثر'
+  },
+  carousel: {
+    ariaLabel: 'عرض شرائح الصور',
+    navigationAriaLabel: 'تنقل العرض',
+    previousSlideAriaLabel: 'الشريحة السابقة',
+    nextSlideAriaLabel: 'الشريحة التالية',
+    goToSlideAriaLabel: 'الانتقال إلى الشريحة {index}',
+    slideAriaLabel: 'الشريحة {index} من {total}'
+  },
+  transfer: {
+    sourceTitle: 'المصدر',
+    targetTitle: 'الهدف',
+    searchAriaLabel: 'بحث {title}',
+    itemsAriaLabel: 'عناصر {title}',
+    moveToTargetAriaLabel: 'نقل المحدد إلى الهدف',
+    moveToSourceAriaLabel: 'نقل المحدد إلى المصدر'
+  },
+  chart: {
+    legendAriaLabel: 'مفتاح الرسم البياني',
+    pointAriaLabel: 'النقطة {index}: ({x}, {y})'
+  },
+  markdownEditor: {
+    formattingToolbarAriaLabel: 'تنسيق Markdown',
+    modeToolbarAriaLabel: 'وضع عرض Markdown',
+    editorAriaLabel: 'محرر Markdown',
+    previewAriaLabel: 'معاينة Markdown',
+    editModeLabel: 'تحرير',
+    splitModeLabel: 'تقسيم',
+    previewModeLabel: 'معاينة',
+    bold: 'عريض',
+    italic: 'مائل',
+    strikethrough: 'يتوسطه خط',
+    heading: 'عنوان',
+    blockquote: 'اقتباس',
+    unorderedList: 'قائمة نقطية',
+    orderedList: 'قائمة مرقمة',
+    inlineCode: 'رمز مضمّن',
+    codeBlock: 'كتلة رمز',
+    link: 'رابط',
+    image: 'صورة',
+    table: 'جدول',
+    horizontalRule: 'خط أفقي'
+  },
+  richTextEditor: {
+    formattingToolbarAriaLabel: 'تنسيق النص',
+    editorAriaLabel: 'محرر نص منسق',
+    bold: 'عريض',
+    italic: 'مائل',
+    underline: 'تسطير',
+    strikethrough: 'يتوسطه خط',
+    heading1: 'عنوان 1',
+    heading2: 'عنوان 2',
+    heading3: 'عنوان 3',
+    bulletList: 'قائمة نقطية',
+    orderedList: 'قائمة مرقمة',
+    blockquote: 'اقتباس',
+    codeBlock: 'رمز',
+    link: 'رابط',
+    image: 'صورة',
+    horizontalRule: 'خط',
+    undo: 'تراجع',
+    redo: 'إعادة',
+    clear: 'مسح التنسيق'
+  },
+  cronEditor: {
+    ariaLabel: 'محرر Cron',
+    expressionAriaLabel: 'تعبير Cron',
+    presetAriaLabel: 'إعداد مسبق لـ Cron',
+    presetPlaceholder: 'إعداد مسبق',
+    everyMinutePreset: 'كل دقيقة',
+    hourlyPreset: 'كل ساعة',
+    dailyPreset: 'يوميًا',
+    weeklyPreset: 'أسبوعيًا',
+    monthlyPreset: 'شهريًا',
+    minuteLabel: 'دقيقة',
+    hourLabel: 'ساعة',
+    dayOfMonthLabel: 'يوم',
+    monthLabel: 'شهر',
+    dayOfWeekLabel: 'يوم الأسبوع',
+    modeAnyLabel: 'أي',
+    modeEveryLabel: 'كل',
+    modeSpecificLabel: 'محدد',
+    modeRangeLabel: 'نطاق',
+    modeCustomLabel: 'مخصص',
+    modeAriaLabel: 'وضع {field}',
+    stepAriaLabel: 'خطوة {field}',
+    valueAriaLabel: 'قيمة {field}',
+    rangeStartAriaLabel: 'بداية نطاق {field}',
+    rangeEndAriaLabel: 'نهاية نطاق {field}',
+    customValueAriaLabel: 'قيمة {field} المخصصة',
+    expressionFieldsError: 'يجب أن يحتوي تعبير Cron على 5 حقول',
+    fieldRequiredError: '{field} مطلوب',
+    invalidStepError: '{field} يحتوي على تعبير خطوة غير صالح',
+    stepRangeError: 'يجب أن تكون خطوة {field} بين 1 و {max}',
+    fieldRangeError: 'يجب أن يكون {field} بين {min} و {max}',
+    rangeOrderError: 'يجب أن تكون بداية نطاق {field} أقل من النهاية أو تساويها',
+    invalidFieldError: 'يجب أن يكون {field} * أو رقمًا أو نطاقًا أو خطوة أو قائمة مفصولة بفواصل'
+  },
+  formValidation: {
+    required: 'هذا الحقل مطلوب',
+    typeString: 'يجب أن تكون القيمة نصًا',
+    typeNumber: 'يجب أن تكون القيمة رقمًا',
+    typeBoolean: 'يجب أن تكون القيمة منطقية',
+    typeArray: 'يجب أن تكون القيمة مصفوفة',
+    typeObject: 'يجب أن تكون القيمة كائنًا',
+    email: 'يرجى إدخال بريد إلكتروني صالح',
+    phone: 'يرجى إدخال رقم هاتف صالح',
+    url: 'يرجى إدخال عنوان URL صالح',
+    date: 'يرجى إدخال تاريخ صالح',
+    idCard: 'يرجى إدخال رقم هوية صالح',
+    minLength: 'الحد الأدنى للطول هو {min} أحرف',
+    maxLength: 'الحد الأقصى للطول هو {max} أحرف',
+    minValue: 'الحد الأدنى للقيمة هو {min}',
+    maxValue: 'الحد الأقصى للقيمة هو {max}',
+    minItems: 'يلزم {min} عناصر على الأقل',
+    maxItems: 'يُسمح بـ {max} عناصر كحد أقصى',
+    patternMismatch: 'القيمة لا تطابق النمط المطلوب',
+    validatorFailed: 'فشل التحقق',
+    validatorError: 'حدث خطأ أثناء التحقق'
+  },
   inputOtp: {
     groupLabel: 'كلمة المرور لمرة واحدة',
     slotLabel: 'الحرف {index} من {total}'
@@ -155,6 +383,6 @@ export const arSA: TigerLocale = defineLocale({
     removeTagLabel: 'إزالة {tag}',
     clearAllLabel: 'مسح كل الوسوم'
   }
-})
+}
 
 export default arSA

@@ -3,10 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
-import { defineLocale } from '../define-locale'
 import { ES_ES_DATEPICKER_LOCALE } from '../datepicker-locales/es-ES'
 
-export const esES: TigerLocale = defineLocale({
+export const esES: TigerLocale = {
   locale: 'es-ES',
   direction: 'ltr',
   datePicker: ES_ES_DATEPICKER_LOCALE,
@@ -16,7 +15,17 @@ export const esES: TigerLocale = defineLocale({
     closeText: 'Cerrar',
     loadingText: 'Cargando...',
     emptyText: 'Sin datos',
-    noMoreText: 'No hay más datos'
+    noMoreText: 'No hay más datos',
+    searchPlaceholder: 'Buscar',
+    clearText: 'Borrar',
+    closeMessageAriaLabel: 'Cerrar mensaje',
+    closeNotificationAriaLabel: 'Cerrar notificación'
+  },
+  empty: {
+    noData: 'Sin datos',
+    noDataAvailable: 'No hay datos disponibles',
+    noResults: 'No se encontraron resultados',
+    error: 'Algo salió mal'
   },
   modal: {
     closeAriaLabel: 'Cerrar',
@@ -45,7 +54,7 @@ export const esES: TigerLocale = defineLocale({
     selectFileText: 'Seleccionar archivo',
     uploadedFilesAriaLabel: 'Archivos subidos',
     successAriaLabel: 'Correcto',
-    errorAriaLabel: 'Error',
+    errorAriaLabel: 'Fallido',
     uploadingAriaLabel: 'Subiendo',
     removeFileAriaLabel: 'Eliminar {fileName}',
     previewFileAriaLabel: 'Vista previa de {fileName}'
@@ -77,16 +86,104 @@ export const esES: TigerLocale = defineLocale({
     columnSettingsText: 'Configuración de columnas',
     columnSettingsAriaLabel: 'Configuración de columnas',
     lockColumnAriaLabel: 'Bloquear columna {column}',
-    unlockColumnAriaLabel: 'Desbloquear columna {column}'
+    unlockColumnAriaLabel: 'Desbloquear columna {column}',
+    allText: 'Todo',
+    filterPlaceholder: 'Filtrar...',
+    exportCsvText: 'Exportar CSV',
+    exportExcelText: 'Exportar Excel',
+    exportCsvAriaLabel: 'Exportar a CSV',
+    exportExcelAriaLabel: 'Exportar a Excel',
+    expandRowAriaLabel: 'Expandir fila',
+    collapseRowAriaLabel: 'Contraer fila'
+  },
+  dataExport: {
+    triggerText: 'Exportar',
+    triggerAriaLabel: 'Exportar datos',
+    xlsxText: 'Exportar Excel',
+    markdownText: 'Exportar Markdown',
+    exportingText: 'Exportando...'
+  },
+  timePicker: {
+    hour: 'Hora',
+    minute: 'Minuto',
+    second: 'Seg',
+    now: 'Ahora',
+    ok: 'Aceptar',
+    start: 'Inicio',
+    end: 'Fin',
+    clear: 'Borrar hora',
+    toggle: 'Abrir selector de hora',
+    dialog: 'Selector de hora',
+    selectTime: 'Seleccionar hora',
+    selectTimeRange: 'Seleccionar rango de horas'
   },
   formWizard: {
     prevText: 'Anterior',
     nextText: 'Siguiente',
     finishText: 'Finalizar'
   },
+  tour: {
+    prevText: 'Anterior',
+    nextText: 'Siguiente',
+    finishText: 'Finalizar',
+    closeAriaLabel: 'Cerrar recorrido'
+  },
+  calendar: {
+    previousMonth: 'Mes anterior',
+    nextMonth: 'Mes siguiente',
+    previousYear: 'Año anterior',
+    nextYear: 'Año siguiente',
+    yearSelectAriaLabel: 'Año',
+    monthSelectAriaLabel: 'Mes',
+    daySelectAriaLabel: 'Día'
+  },
+  fileManager: {
+    rootText: 'Raíz'
+  },
+  imageViewer: {
+    dialogAriaLabel: 'Visor de imágenes',
+    previewDialogAriaLabel: 'Vista previa de imagen',
+    closeAriaLabel: 'Cerrar',
+    closePreviewAriaLabel: 'Cerrar vista previa',
+    previousImageAriaLabel: 'Imagen anterior',
+    nextImageAriaLabel: 'Imagen siguiente',
+    zoomOutAriaLabel: 'Alejar',
+    resetAriaLabel: 'Restablecer',
+    zoomInAriaLabel: 'Acercar',
+    rotateLeftAriaLabel: 'Girar a la izquierda',
+    rotateRightAriaLabel: 'Girar a la derecha'
+  },
+  imageEditor: {
+    selectImageText: 'Seleccionar imagen',
+    selectImageAriaLabel: 'Seleccionar imagen para recortar y subir',
+    cropModalTitle: 'Recortar imagen',
+    cropCancelText: 'Cancelar',
+    cropConfirmText: 'Confirmar recorte',
+    cropperDialogAriaLabel: 'Recortador de imagen',
+    imageToCropAriaLabel: 'Imagen a recortar',
+    moveCropAreaAriaLabel: 'Mover área de recorte',
+    resizeCropAreaAriaLabel: 'Redimensionar área de recorte {handle}',
+    loadingCropImageAriaLabel: 'Cargando imagen para recortar',
+    annotationToolbarAriaLabel: 'Herramientas de anotación',
+    annotationEditorAriaLabel: 'Editor de anotación de imagen',
+    annotationCanvasAriaLabel: 'Lienzo de anotación',
+    loadingAnnotationImageAriaLabel: 'Cargando imagen para anotar',
+    selectToolText: 'Seleccionar',
+    rectangleToolText: 'Rectángulo',
+    ellipseToolText: 'Elipse',
+    polygonToolText: 'Polígono',
+    freehandToolText: 'Trazo libre',
+    deleteText: 'Eliminar'
+  },
+  status: {
+    tagCloseAriaLabel: 'Cerrar etiqueta',
+    badgeLabel: 'notificación',
+    badgeCountLabel: '{count} notificaciones'
+  },
   taskBoard: {
     emptyColumnText: 'Sin tareas',
     addCardText: 'Agregar tarea',
+    addColumnText: 'Agregar columna',
     wipLimitText: 'Límite WIP: {limit}',
     dragHintText: 'Arrastra para mover',
     boardAriaLabel: 'Tablero de tareas'
@@ -139,13 +236,145 @@ export const esES: TigerLocale = defineLocale({
   },
   colorPicker: {
     trigger: 'Elegir color',
-    panelTitle: 'Color',
+    panelTitle: 'Tono de color',
     clear: 'Borrar',
     hue: 'Tono',
     alpha: 'Alfa',
     value: 'Valor de color',
     preview: 'Vista previa',
     selectPreset: 'Seleccionar {color}'
+  },
+  tabs: {
+    addTabAriaLabel: 'Añadir pestaña',
+    closeTabAriaLabel: 'Cerrar {label}'
+  },
+  rate: {
+    ariaLabel: 'Valoración',
+    valueText: '{value} estrellas'
+  },
+  avatarGroup: {
+    ariaLabel: 'Grupo de avatares',
+    overflowAriaLabel: '{count} más'
+  },
+  carousel: {
+    ariaLabel: 'Carrusel de imágenes',
+    navigationAriaLabel: 'Navegación del carrusel',
+    previousSlideAriaLabel: 'Diapositiva anterior',
+    nextSlideAriaLabel: 'Diapositiva siguiente',
+    goToSlideAriaLabel: 'Ir a la diapositiva {index}',
+    slideAriaLabel: 'Diapositiva {index} de {total}'
+  },
+  transfer: {
+    sourceTitle: 'Origen',
+    targetTitle: 'Destino',
+    searchAriaLabel: 'Buscar {title}',
+    itemsAriaLabel: 'Elementos de {title}',
+    moveToTargetAriaLabel: 'Mover selección al destino',
+    moveToSourceAriaLabel: 'Mover selección al origen'
+  },
+  chart: {
+    legendAriaLabel: 'Leyenda del gráfico',
+    pointAriaLabel: 'Punto {index}: ({x}, {y})'
+  },
+  markdownEditor: {
+    formattingToolbarAriaLabel: 'Formato Markdown',
+    modeToolbarAriaLabel: 'Modo de vista Markdown',
+    editorAriaLabel: 'Editor Markdown',
+    previewAriaLabel: 'Vista previa Markdown',
+    editModeLabel: 'Editar',
+    splitModeLabel: 'Dividir',
+    previewModeLabel: 'Vista previa',
+    bold: 'Negrita',
+    italic: 'Cursiva',
+    strikethrough: 'Tachado',
+    heading: 'Título',
+    blockquote: 'Cita',
+    unorderedList: 'Lista con viñetas',
+    orderedList: 'Lista numerada',
+    inlineCode: 'Código en línea',
+    codeBlock: 'Bloque de código',
+    link: 'Enlace',
+    image: 'Imagen',
+    table: 'Tabla',
+    horizontalRule: 'Línea horizontal'
+  },
+  richTextEditor: {
+    formattingToolbarAriaLabel: 'Formato de texto',
+    editorAriaLabel: 'Editor de texto enriquecido',
+    bold: 'Negrita',
+    italic: 'Cursiva',
+    underline: 'Subrayado',
+    strikethrough: 'Tachado',
+    heading1: 'Título 1',
+    heading2: 'Título 2',
+    heading3: 'Título 3',
+    bulletList: 'Lista con viñetas',
+    orderedList: 'Lista numerada',
+    blockquote: 'Cita',
+    codeBlock: 'Código',
+    link: 'Enlace',
+    image: 'Imagen',
+    horizontalRule: 'Línea',
+    undo: 'Deshacer',
+    redo: 'Rehacer',
+    clear: 'Borrar formato'
+  },
+  cronEditor: {
+    ariaLabel: 'Editor Cron',
+    expressionAriaLabel: 'Expresión Cron',
+    presetAriaLabel: 'Preajuste Cron',
+    presetPlaceholder: 'Preajuste',
+    everyMinutePreset: 'Cada minuto',
+    hourlyPreset: 'Cada hora',
+    dailyPreset: 'Cada día',
+    weeklyPreset: 'Cada semana',
+    monthlyPreset: 'Cada mes',
+    minuteLabel: 'Minuto',
+    hourLabel: 'Hora',
+    dayOfMonthLabel: 'Día',
+    monthLabel: 'Mes',
+    dayOfWeekLabel: 'Día de la semana',
+    modeAnyLabel: 'Cualquiera',
+    modeEveryLabel: 'Cada',
+    modeSpecificLabel: 'Específico',
+    modeRangeLabel: 'Rango',
+    modeCustomLabel: 'Personalizado',
+    modeAriaLabel: 'Modo de {field}',
+    stepAriaLabel: 'Paso de {field}',
+    valueAriaLabel: 'Valor de {field}',
+    rangeStartAriaLabel: 'Inicio del rango de {field}',
+    rangeEndAriaLabel: 'Fin del rango de {field}',
+    customValueAriaLabel: 'Valor personalizado de {field}',
+    expressionFieldsError: 'La expresión Cron debe tener 5 campos',
+    fieldRequiredError: '{field} es obligatorio',
+    invalidStepError: '{field} tiene una expresión de paso no válida',
+    stepRangeError: 'El paso de {field} debe estar entre 1 y {max}',
+    fieldRangeError: '{field} debe estar entre {min} y {max}',
+    rangeOrderError: 'El inicio del rango de {field} debe ser menor o igual que el fin',
+    invalidFieldError:
+      '{field} debe ser *, un número, un rango, un paso o una lista separada por comas'
+  },
+  formValidation: {
+    required: 'Este campo es obligatorio',
+    typeString: 'El valor debe ser una cadena',
+    typeNumber: 'El valor debe ser un número',
+    typeBoolean: 'El valor debe ser un booleano',
+    typeArray: 'El valor debe ser una matriz',
+    typeObject: 'El valor debe ser un objeto',
+    email: 'Introduce un correo electrónico válido',
+    phone: 'Introduce un teléfono válido',
+    url: 'Introduce una URL válida',
+    date: 'Introduce una fecha válida',
+    idCard: 'Introduce un número de documento válido',
+    minLength: 'La longitud mínima es {min} caracteres',
+    maxLength: 'La longitud máxima es {max} caracteres',
+    minValue: 'El valor mínimo es {min}',
+    maxValue: 'El valor máximo es {max}',
+    minItems: 'Se requieren al menos {min} elementos',
+    maxItems: 'Se permiten como máximo {max} elementos',
+    patternMismatch: 'El valor no coincide con el patrón requerido',
+    validatorFailed: 'La validación ha fallado',
+    validatorError: 'Se ha producido un error de validación'
   },
   inputOtp: {
     groupLabel: 'Contraseña de un solo uso',
@@ -155,6 +384,6 @@ export const esES: TigerLocale = defineLocale({
     removeTagLabel: 'Eliminar {tag}',
     clearAllLabel: 'Borrar todas las etiquetas'
   }
-})
+}
 
 export default esES

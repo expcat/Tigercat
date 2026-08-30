@@ -3,10 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
-import { defineLocale } from '../define-locale'
 import { VI_VN_DATEPICKER_LOCALE } from '../datepicker-locales/vi-VN'
 
-export const viVN: TigerLocale = defineLocale({
+export const viVN: TigerLocale = {
   locale: 'vi-VN',
   direction: 'ltr',
   datePicker: VI_VN_DATEPICKER_LOCALE,
@@ -16,7 +15,17 @@ export const viVN: TigerLocale = defineLocale({
     closeText: 'Đóng',
     loadingText: 'Đang tải...',
     emptyText: 'Không có dữ liệu',
-    noMoreText: 'Không còn dữ liệu'
+    noMoreText: 'Không còn dữ liệu',
+    searchPlaceholder: 'Tìm kiếm',
+    clearText: 'Xóa',
+    closeMessageAriaLabel: 'Đóng tin nhắn',
+    closeNotificationAriaLabel: 'Đóng thông báo'
+  },
+  empty: {
+    noData: 'Không có dữ liệu',
+    noDataAvailable: 'Không có dữ liệu khả dụng',
+    noResults: 'Không có kết quả',
+    error: 'Đã xảy ra lỗi'
   },
   modal: {
     closeAriaLabel: 'Đóng',
@@ -34,6 +43,21 @@ export const viVN: TigerLocale = defineLocale({
   },
   timeline: {
     pendingText: 'Đang tải...'
+  },
+  upload: {
+    dragAreaAriaLabel: 'Nhấp hoặc kéo để tải tệp lên',
+    buttonAriaLabel: 'Tải tệp lên',
+    clickToUploadText: 'Nhấp để tải lên',
+    dragAndDropText: 'hoặc kéo và thả',
+    acceptInfoText: 'Chấp nhận: {accept}',
+    maxSizeInfoText: 'Kích thước tối đa: {maxSize}',
+    selectFileText: 'Chọn tệp',
+    uploadedFilesAriaLabel: 'Tệp đã tải lên',
+    successAriaLabel: 'Thành công',
+    errorAriaLabel: 'Lỗi',
+    uploadingAriaLabel: 'Đang tải lên',
+    removeFileAriaLabel: 'Xóa {fileName}',
+    previewFileAriaLabel: 'Xem trước {fileName}'
   },
   pagination: {
     totalText: 'Tổng {total} mục',
@@ -53,7 +77,7 @@ export const viVN: TigerLocale = defineLocale({
     selectAllText: 'Chọn tất cả',
     selectRowAriaLabel: 'Chọn hàng {row}',
     sortByText: 'Sắp xếp theo {column}',
-    clearSortText: 'Xóa sắp xếp',
+    clearSortText: 'Bỏ sắp xếp',
     toolbarAriaLabel: 'Thanh công cụ bảng dữ liệu',
     searchPlaceholder: 'Tìm kiếm',
     searchButtonText: 'Tìm kiếm',
@@ -62,16 +86,104 @@ export const viVN: TigerLocale = defineLocale({
     columnSettingsText: 'Cài đặt cột',
     columnSettingsAriaLabel: 'Cài đặt cột',
     lockColumnAriaLabel: 'Khóa cột {column}',
-    unlockColumnAriaLabel: 'Bỏ khóa cột {column}'
+    unlockColumnAriaLabel: 'Bỏ khóa cột {column}',
+    allText: 'Tất cả',
+    filterPlaceholder: 'Lọc...',
+    exportCsvText: 'Xuất CSV',
+    exportExcelText: 'Xuất Excel',
+    exportCsvAriaLabel: 'Xuất sang CSV',
+    exportExcelAriaLabel: 'Xuất sang Excel',
+    expandRowAriaLabel: 'Mở rộng hàng',
+    collapseRowAriaLabel: 'Thu gọn hàng'
+  },
+  dataExport: {
+    triggerText: 'Xuất',
+    triggerAriaLabel: 'Xuất dữ liệu',
+    xlsxText: 'Xuất Excel',
+    markdownText: 'Xuất Markdown',
+    exportingText: 'Đang xuất...'
+  },
+  timePicker: {
+    hour: 'Giờ',
+    minute: 'Phút',
+    second: 'Giây',
+    now: 'Bây giờ',
+    ok: 'Đồng ý',
+    start: 'Bắt đầu',
+    end: 'Kết thúc',
+    clear: 'Xóa giờ',
+    toggle: 'Mở bộ chọn giờ',
+    dialog: 'Bộ chọn giờ',
+    selectTime: 'Chọn giờ',
+    selectTimeRange: 'Chọn khoảng giờ'
   },
   formWizard: {
     prevText: 'Trước',
     nextText: 'Tiếp',
     finishText: 'Hoàn thành'
   },
+  tour: {
+    prevText: 'Trước',
+    nextText: 'Tiếp',
+    finishText: 'Hoàn thành',
+    closeAriaLabel: 'Đóng hướng dẫn'
+  },
+  calendar: {
+    previousMonth: 'Tháng trước',
+    nextMonth: 'Tháng sau',
+    previousYear: 'Năm trước',
+    nextYear: 'Năm sau',
+    yearSelectAriaLabel: 'Năm',
+    monthSelectAriaLabel: 'Tháng',
+    daySelectAriaLabel: 'Ngày'
+  },
+  fileManager: {
+    rootText: 'Gốc'
+  },
+  imageViewer: {
+    dialogAriaLabel: 'Trình xem ảnh',
+    previewDialogAriaLabel: 'Xem trước ảnh',
+    closeAriaLabel: 'Đóng',
+    closePreviewAriaLabel: 'Đóng xem trước',
+    previousImageAriaLabel: 'Ảnh trước',
+    nextImageAriaLabel: 'Ảnh sau',
+    zoomOutAriaLabel: 'Thu nhỏ',
+    resetAriaLabel: 'Đặt lại',
+    zoomInAriaLabel: 'Phóng to',
+    rotateLeftAriaLabel: 'Xoay trái',
+    rotateRightAriaLabel: 'Xoay phải'
+  },
+  imageEditor: {
+    selectImageText: 'Chọn ảnh',
+    selectImageAriaLabel: 'Chọn ảnh để cắt và tải lên',
+    cropModalTitle: 'Cắt ảnh',
+    cropCancelText: 'Hủy',
+    cropConfirmText: 'Xác nhận cắt',
+    cropperDialogAriaLabel: 'Công cụ cắt ảnh',
+    imageToCropAriaLabel: 'Ảnh cần cắt',
+    moveCropAreaAriaLabel: 'Di chuyển vùng cắt',
+    resizeCropAreaAriaLabel: 'Thay đổi kích thước vùng cắt {handle}',
+    loadingCropImageAriaLabel: 'Đang tải ảnh để cắt',
+    annotationToolbarAriaLabel: 'Công cụ chú thích',
+    annotationEditorAriaLabel: 'Trình chú thích ảnh',
+    annotationCanvasAriaLabel: 'Canvas chú thích',
+    loadingAnnotationImageAriaLabel: 'Đang tải ảnh để chú thích',
+    selectToolText: 'Chọn',
+    rectangleToolText: 'Hình chữ nhật',
+    ellipseToolText: 'Hình elip',
+    polygonToolText: 'Đa giác',
+    freehandToolText: 'Vẽ tự do',
+    deleteText: 'Xóa'
+  },
+  status: {
+    tagCloseAriaLabel: 'Đóng thẻ',
+    badgeLabel: 'thông báo',
+    badgeCountLabel: '{count} thông báo'
+  },
   taskBoard: {
     emptyColumnText: 'Không có nhiệm vụ',
     addCardText: 'Thêm nhiệm vụ',
+    addColumnText: 'Thêm cột',
     wipLimitText: 'Giới hạn WIP: {limit}',
     dragHintText: 'Kéo để di chuyển',
     boardAriaLabel: 'Bảng nhiệm vụ'
@@ -126,11 +238,142 @@ export const viVN: TigerLocale = defineLocale({
     trigger: 'Chọn màu',
     panelTitle: 'Màu',
     clear: 'Xóa',
-    hue: 'Hue',
+    hue: 'Tông màu',
     alpha: 'Độ trong suốt',
     value: 'Giá trị màu',
     preview: 'Xem trước',
     selectPreset: 'Chọn {color}'
+  },
+  tabs: {
+    addTabAriaLabel: 'Thêm tab',
+    closeTabAriaLabel: 'Đóng {label}'
+  },
+  rate: {
+    ariaLabel: 'Đánh giá',
+    valueText: '{value} sao'
+  },
+  avatarGroup: {
+    ariaLabel: 'Nhóm ảnh đại diện',
+    overflowAriaLabel: 'còn {count} người'
+  },
+  carousel: {
+    ariaLabel: 'Băng chuyền ảnh',
+    navigationAriaLabel: 'Điều hướng băng chuyền',
+    previousSlideAriaLabel: 'Trang trước',
+    nextSlideAriaLabel: 'Trang sau',
+    goToSlideAriaLabel: 'Đến trang {index}',
+    slideAriaLabel: 'Trang {index} / {total}'
+  },
+  transfer: {
+    sourceTitle: 'Nguồn',
+    targetTitle: 'Đích',
+    searchAriaLabel: 'Tìm {title}',
+    itemsAriaLabel: 'Mục {title}',
+    moveToTargetAriaLabel: 'Chuyển mục đã chọn sang đích',
+    moveToSourceAriaLabel: 'Chuyển mục đã chọn sang nguồn'
+  },
+  chart: {
+    legendAriaLabel: 'Chú giải biểu đồ',
+    pointAriaLabel: 'Điểm {index}: ({x}, {y})'
+  },
+  markdownEditor: {
+    formattingToolbarAriaLabel: 'Định dạng Markdown',
+    modeToolbarAriaLabel: 'Chế độ xem Markdown',
+    editorAriaLabel: 'Trình soạn Markdown',
+    previewAriaLabel: 'Xem trước Markdown',
+    editModeLabel: 'Sửa',
+    splitModeLabel: 'Chia',
+    previewModeLabel: 'Xem trước',
+    bold: 'Đậm',
+    italic: 'Nghiêng',
+    strikethrough: 'Gạch ngang',
+    heading: 'Tiêu đề',
+    blockquote: 'Trích dẫn',
+    unorderedList: 'Danh sách dấu đầu dòng',
+    orderedList: 'Danh sách đánh số',
+    inlineCode: 'Mã nội dòng',
+    codeBlock: 'Khối mã',
+    link: 'Liên kết',
+    image: 'Ảnh',
+    table: 'Bảng',
+    horizontalRule: 'Đường ngang'
+  },
+  richTextEditor: {
+    formattingToolbarAriaLabel: 'Định dạng văn bản',
+    editorAriaLabel: 'Trình soạn văn bản phong phú',
+    bold: 'Đậm',
+    italic: 'Nghiêng',
+    underline: 'Gạch chân',
+    strikethrough: 'Gạch ngang',
+    heading1: 'Tiêu đề 1',
+    heading2: 'Tiêu đề 2',
+    heading3: 'Tiêu đề 3',
+    bulletList: 'Danh sách dấu đầu dòng',
+    orderedList: 'Danh sách đánh số',
+    blockquote: 'Trích dẫn',
+    codeBlock: 'Mã',
+    link: 'Liên kết',
+    image: 'Ảnh',
+    horizontalRule: 'Đường',
+    undo: 'Hoàn tác',
+    redo: 'Làm lại',
+    clear: 'Xóa định dạng'
+  },
+  cronEditor: {
+    ariaLabel: 'Trình soạn Cron',
+    expressionAriaLabel: 'Biểu thức Cron',
+    presetAriaLabel: 'Cài đặt sẵn Cron',
+    presetPlaceholder: 'Cài đặt sẵn',
+    everyMinutePreset: 'Mỗi phút',
+    hourlyPreset: 'Mỗi giờ',
+    dailyPreset: 'Mỗi ngày',
+    weeklyPreset: 'Mỗi tuần',
+    monthlyPreset: 'Mỗi tháng',
+    minuteLabel: 'Phút',
+    hourLabel: 'Giờ',
+    dayOfMonthLabel: 'Ngày',
+    monthLabel: 'Tháng',
+    dayOfWeekLabel: 'Thứ',
+    modeAnyLabel: 'Bất kỳ',
+    modeEveryLabel: 'Mỗi',
+    modeSpecificLabel: 'Cụ thể',
+    modeRangeLabel: 'Khoảng',
+    modeCustomLabel: 'Tùy chỉnh',
+    modeAriaLabel: 'Chế độ {field}',
+    stepAriaLabel: 'Bước {field}',
+    valueAriaLabel: 'Giá trị {field}',
+    rangeStartAriaLabel: 'Đầu khoảng {field}',
+    rangeEndAriaLabel: 'Cuối khoảng {field}',
+    customValueAriaLabel: 'Giá trị tùy chỉnh {field}',
+    expressionFieldsError: 'Biểu thức Cron phải có 5 trường',
+    fieldRequiredError: '{field} là bắt buộc',
+    invalidStepError: '{field} có biểu thức bước không hợp lệ',
+    stepRangeError: 'Bước {field} phải từ 1 đến {max}',
+    fieldRangeError: '{field} phải từ {min} đến {max}',
+    rangeOrderError: 'Đầu khoảng {field} phải nhỏ hơn hoặc bằng cuối',
+    invalidFieldError: '{field} phải là *, số, khoảng, bước hoặc danh sách cách nhau bởi dấu phẩy'
+  },
+  formValidation: {
+    required: 'Trường này là bắt buộc',
+    typeString: 'Giá trị phải là chuỗi',
+    typeNumber: 'Giá trị phải là số',
+    typeBoolean: 'Giá trị phải là boolean',
+    typeArray: 'Giá trị phải là mảng',
+    typeObject: 'Giá trị phải là đối tượng',
+    email: 'Vui lòng nhập email hợp lệ',
+    phone: 'Vui lòng nhập số điện thoại hợp lệ',
+    url: 'Vui lòng nhập URL hợp lệ',
+    date: 'Vui lòng nhập ngày hợp lệ',
+    idCard: 'Vui lòng nhập số CMND/CCCD hợp lệ',
+    minLength: 'Độ dài tối thiểu là {min} ký tự',
+    maxLength: 'Độ dài tối đa là {max} ký tự',
+    minValue: 'Giá trị tối thiểu là {min}',
+    maxValue: 'Giá trị tối đa là {max}',
+    minItems: 'Cần ít nhất {min} mục',
+    maxItems: 'Cho phép tối đa {max} mục',
+    patternMismatch: 'Giá trị không khớp mẫu yêu cầu',
+    validatorFailed: 'Xác thực không thành công',
+    validatorError: 'Đã xảy ra lỗi khi xác thực'
   },
   inputOtp: {
     groupLabel: 'Mật khẩu dùng một lần',
@@ -140,4 +383,6 @@ export const viVN: TigerLocale = defineLocale({
     removeTagLabel: 'Xóa {tag}',
     clearAllLabel: 'Xóa tất cả thẻ'
   }
-})
+}
+
+export default viVN

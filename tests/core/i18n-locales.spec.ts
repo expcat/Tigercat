@@ -19,6 +19,8 @@ import {
   getCodeLabels,
   getColorPickerLabels,
   getDataExportLabels,
+  getEmptyDescription,
+  getTimePickerLabels,
   getLocaleDirection,
   isRtlLocale,
   mergeTigerLocale,
@@ -29,33 +31,73 @@ import { FR_FR_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locale
 
 const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID, esES, frFR, deDE, ptBR, arSA }
 
-describe('i18n locale presets', () => {
-  const requiredKeys = [
-    'common',
-    'modal',
-    'drawer',
-    'qrcode',
-    'timeline',
-    'pagination',
-    'table',
-    'formWizard',
-    'select',
-    'colorPicker',
-    'taskBoard',
-    'chatWindow',
-    'code',
-    'commentThread',
-    'activityFeed',
-    'notificationCenter'
-  ]
+const SAME_AS_ENGLISH_ALLOWLIST = new Set([
+  'ja-JP:common.okText',
+  'ja-JP:modal.okText',
+  'ja-JP:timePicker.ok',
+  'fr-FR:common.okText',
+  'fr-FR:modal.okText',
+  'fr-FR:timePicker.ok',
+  'de-DE:common.okText',
+  'de-DE:modal.okText',
+  'de-DE:timePicker.ok',
+  'pt-BR:common.okText',
+  'pt-BR:modal.okText',
+  'pt-BR:timePicker.ok',
+  'id-ID:common.okText',
+  'id-ID:modal.okText',
+  'id-ID:timePicker.ok'
+])
 
-  for (const [name, locale] of Object.entries(locales)) {
-    it(`${name} contains all required sub-interfaces`, () => {
-      for (const key of requiredKeys) {
-        expect(locale).toHaveProperty(key)
-      }
-    })
+function leafEntries(value: unknown, prefix = ''): Array<{ path: string; value: string }> {
+  if (typeof value === 'string') {
+    return [{ path: prefix, value }]
   }
+  if (!value || typeof value !== 'object') return []
+  return Object.entries(value as Record<string, unknown>).flatMap(([key, next]) =>
+    leafEntries(next, prefix ? `${prefix}.${key}` : key)
+  )
+}
+
+describe('i18n locale presets', () => {
+  it('every built-in pack has the same sections and leaves as en-US', () => {
+    const skip = (path: string) =>
+      path === 'locale' || path === 'direction' || path.startsWith('datePicker.')
+    const enLeaves = leafEntries(enUS).filter((leaf) => !skip(leaf.path))
+    const enByPath = new Map(enLeaves.map((leaf) => [leaf.path, leaf.value]))
+
+    const problems: string[] = []
+    for (const [name, locale] of Object.entries(locales)) {
+      if (name === 'enUS') continue
+      const leaves = leafEntries(locale).filter((leaf) => !skip(leaf.path))
+      const byPath = new Map(leaves.map((leaf) => [leaf.path, leaf.value]))
+
+      for (const path of enByPath.keys()) {
+        if (!byPath.has(path)) problems.push(`${name} missing ${path}`)
+        const actual = byPath.get(path)
+        const english = enByPath.get(path)
+        const allowKey = `${locale.locale}:${path}`
+        if (actual === english && !SAME_AS_ENGLISH_ALLOWLIST.has(allowKey)) {
+          problems.push(`${name} ${path} = ${english}`)
+        }
+      }
+    }
+    expect(problems).toEqual([])
+  })
+
+  it('zhTW missing keys stay Traditional, not English or Simplified', () => {
+    expect(zhTW.empty?.noData).toBe('暫無資料')
+    expect(zhTW.empty?.noData).not.toBe(enUS.empty?.noData)
+    expect(zhTW.empty?.noData).not.toBe(zhCN.empty?.noData)
+    expect(zhTW.dataExport?.triggerText).toBe('匯出')
+    expect(getEmptyDescription('default', zhTW)).toBe('暫無資料')
+  })
+
+  it('getTimePickerLabels reads the locale object timePicker section', () => {
+    expect(getTimePickerLabels(esES).selectTime).toBe('Seleccionar hora')
+    expect(getTimePickerLabels(zhTW).selectTime).toBe('請選擇時間')
+    expect(getTimePickerLabels('es-ES').selectTime).toBe('Select time')
+  })
 
   it('enUS common.okText is "OK"', () => {
     expect(enUS.common.okText).toBe('OK')
