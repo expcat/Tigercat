@@ -1,7 +1,7 @@
 {
   "id": "button-02",
-  "title": "行为与原生类型",
-  "description": "单个受控按钮同时展示 onClick 与 htmlType；提交和重置场景可将 htmlType 改为 submit 或 reset。",
+  "title": "表单提交与重置",
+  "description": "真实 <form> 里不传 htmlType 的 type=submit 提交、html-type=reset 重置非受控输入。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

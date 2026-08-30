@@ -51,23 +51,32 @@ description: Compact generated Tigercat Basic props reference
 
 ## Button
 
-`packages/core/src/types/button.ts` · `ButtonProps` · 3/12 props
+`packages/core/src/types/button.ts` · `ButtonProps` · 8/13 props
 
-| Prop        | Type            | Default     | Notes                                  |
-| ----------- | --------------- | ----------- | -------------------------------------- |
-| `disabled?` | `boolean`       | `false`     | Whether the button is disabled         |
-| `loading?`  | `boolean`       | `false`     | Whether the button is in loading state |
-| `variant?`  | `ButtonVariant` | `'primary'` | Button variant style                   |
+Note: `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。
+
+| Prop            | Type                 | Default     | Notes                                                                                      |
+| --------------- | -------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `variant?`      | `ButtonVariant`      | `'primary'` | Button variant style                                                                       |
+| `size?`         | `ButtonSize`         | `-`         | Button size. When omitted, uses the enclosing ButtonGroup size, then `md`. Passing `und... |
+| `disabled?`     | `boolean`            | `false`     | Whether the button is disabled                                                             |
+| `loading?`      | `boolean`            | `false`     | Whether the button is in loading state                                                     |
+| `htmlType?`     | `ButtonHtmlType`     | `'button'`  | HTML `type`. Same attribute as native `type`: `htmlType ?? type ?? 'button'`. If both a... |
+| `danger?`       | `boolean`            | `false`     | Whether to apply danger/destructive styling Overrides variant colors with error/danger...  |
+| `iconPosition?` | `ButtonIconPosition` | `'start'`   | Position of the icon relative to button text. DOM order follows this value (`start`/`le... |
+| `block?`        | `boolean`            | `false`     | Whether the button should take full width of its parent                                    |
 
 ## ButtonGroup
 
 `packages/core/src/types/button.ts` · `ButtonGroupProps`
 
-| Prop         | Type         | Default | Notes                                    |
-| ------------ | ------------ | ------- | ---------------------------------------- |
-| `size?`      | `ButtonSize` | `-`     | Size applied to all buttons in the group |
-| `vertical?`  | `boolean`    | `false` | Whether to render buttons vertically     |
-| `className?` | `string`     | `-`     | -                                        |
+Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。
+
+| Prop         | Type         | Default | Notes                                                                       |
+| ------------ | ------------ | ------- | --------------------------------------------------------------------------- |
+| `size?`      | `ButtonSize` | `-`     | Size applied to all buttons in the group. A child Button `size` still wins. |
+| `vertical?`  | `boolean`    | `false` | Whether to render buttons vertically                                        |
+| `className?` | `string`     | `-`     | -                                                                           |
 
 ## Code
 

@@ -147,7 +147,7 @@ describe('SplitButton', () => {
     it('puts the primary action into a loading state and disables the trigger', () => {
       const { container } = renderSplitButton({ loading: true })
       expect(getPrimary(container)).toHaveAttribute('aria-busy', 'true')
-      expect(getPrimary(container)).toBeDisabled()
+      expect(getPrimary(container)).not.toBeDisabled()
       expect(getTrigger(container)).toBeDisabled()
     })
   })

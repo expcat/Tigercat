@@ -1,7 +1,7 @@
 {
   "id": "button-01",
   "title": "外观、尺寸与状态",
-  "description": "用一个 primary/lg/loading 按钮组合代表外观、尺寸与加载状态；其他 variant、size 和 disabled 取值按需替换。",
+  "description": "默认 variant 的可点按钮，以及 size、disabled、danger、装饰图标、icon-only（aria-label）和 loading。",
   "entry": "App.vue",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

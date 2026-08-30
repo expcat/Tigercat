@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Button `loading` 不再设置原生 `disabled`。加载中仍可聚焦、读屏能听到 `aria-busy`；click / Enter / Space 继续被吞掉，不会提交。真正禁用只走 `disabled`。
+
+`htmlType` 与原生 `type` 是同一属性：`htmlType ?? type ?? 'button'`。Vue `<Button type="submit">` 现在会提交表单。
+
+ButtonGroup 直子必须是 Button；组和 Button 之间不能插 Tooltip/`span`。需要 `aria-label` 或 `aria-labelledby`。
+
 拖拽原语收成两份，产品必须走它们：
 
 - `createDocumentDragSession` 只绑 `pointermove` / `pointerup` / `pointercancel` + Escape。`DocumentDragSessionEvent.event` 是原始 `Event`（pointer 或 keyboard），带 `cancelled`。Splitter / Resizable / ScrollArea / Modal 已迁走，不要再抄 `document mousemove`。

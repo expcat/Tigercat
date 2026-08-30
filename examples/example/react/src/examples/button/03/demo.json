@@ -1,7 +1,7 @@
 {
   "id": "button-03",
   "title": "按钮组与尺寸继承",
-  "description": "展示 ButtonGroup 的水平、垂直布局，以及子按钮继承按钮组尺寸的能力。",
+  "description": "每组都有可访问名。示范水平/垂直、单独一颗仍保留四角、RTL 外沿圆角、子 size 覆盖组 size。直子必须是 Button。",
   "order": 3,
   "entry": "App.tsx"
 }

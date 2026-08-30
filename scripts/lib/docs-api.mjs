@@ -44,6 +44,16 @@ export const BEHAVIOR_PROP_STEMS = new Set([
 ])
 
 export const COMPONENT_PROP_PRIORITY = {
+  Button: [
+    'variant?',
+    'size?',
+    'disabled?',
+    'loading?',
+    'htmlType?',
+    'danger?',
+    'iconPosition?',
+    'block?'
+  ],
   ConfigProvider: ['locale?', 'theme?', 'colorScheme?', 'direction?'],
   BackTop: ['position?', 'placement?', 'offset?'],
   FloatButton: ['floating?', 'placement?', 'offset?'],

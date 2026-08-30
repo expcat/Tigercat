@@ -85,6 +85,14 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`，zIndex 用 `OVERLAY_Z_INDEX.overlay`），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。触发器（trigger）上会暴露稳定的 `data-state="open" | "closed"` 属性（与 `aria-expanded` 同步），可用于自定义样式联动或无障碍钩子（此约定对所有浮层触发器统一适用，详见 patterns/common 的“浮层触发器状态属性”）。需要在渲染自定义触发器时拿到开启状态，可用 Vue `#trigger="{ open }"` 作用域插槽 / React `renderTrigger={({ open }) => …}` prop。'
   },
+  Button: {
+    notes:
+      '`htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。'
+  },
+  ButtonGroup: {
+    notes:
+      '直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。'
+  },
   Icon: {
     notes:
       '内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。'
@@ -353,6 +361,9 @@ React \`filtersExtra\` age range:
 
 const COMPONENT_SNIPPETS = {
   Vue: {
+    Button: '<Button html-type="submit">Save</Button>',
+    ButtonGroup:
+      '<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>',
     Icon: '<Icon name="search" />',
     ChatWindow: '<ChatWindow :messages="messages" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
@@ -391,6 +402,9 @@ const COMPONENT_SNIPPETS = {
     TreeMapChart: '<TreeMapChart :data="data" />'
   },
   React: {
+    Button: '<Button htmlType="submit">Save</Button>',
+    ButtonGroup:
+      '<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>',
     Icon: '<Icon name="search" />',
     ChatWindow: '<ChatWindow messages={messages} />',
     ActivityFeed: '<ActivityFeed items={items} />',
