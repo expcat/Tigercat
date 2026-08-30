@@ -5,6 +5,7 @@ import {
   createNotificationStackUpdateScheduler,
   isBrowser,
   normalizeStringOption,
+  resolveAnchoredOverlayTarget,
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
@@ -122,7 +123,9 @@ function ensureContainer(position: NotificationPosition) {
   if (!rootEl) {
     rootEl = document.createElement('div')
     rootEl.id = rootId
-    document.body.appendChild(rootEl)
+    const mountTarget = resolveAnchoredOverlayTarget(null)
+    if (!mountTarget) return
+    mountTarget.appendChild(rootEl)
   }
 
   containerRoots[position] = createRoot(rootEl)

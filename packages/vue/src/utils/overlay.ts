@@ -8,6 +8,8 @@ import {
   resolveAnchoredOverlayTarget,
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
+  getOverlayDirLang,
+  isBrowser,
   FLOATING_OVERLAY_Z_INDEX,
   getTransformOrigin,
   restoreFocus,
@@ -122,9 +124,22 @@ export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
   )
 }
 
+function wrapVueOverlayLayer(children: VNodeChild, target: HTMLElement | null): VNodeChild {
+  const dirLang = getOverlayDirLang(target)
+  return h('div', { class: 'contents', 'data-tiger-overlay-layer': '', ...dirLang }, [
+    children,
+    h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
+  ])
+}
+
 export function renderVueBodyTeleport(children: VNodeChild, disabled = false): VNodeChild {
-  const normalizedChildren = children == null ? [] : Array.isArray(children) ? children : [children]
-  return h(Teleport as never, { to: 'body', disabled }, normalizedChildren)
+  if (children == null || typeof children === 'boolean') return children
+  const target = isBrowser() ? resolveAnchoredOverlayTarget(null) : null
+  const layeredChildren = wrapVueOverlayLayer(children, target)
+  if (disabled || !isBrowser()) {
+    return layeredChildren
+  }
+  return h(Teleport as never, { to: target ?? 'body', disabled: !target }, [layeredChildren])
 }
 
 export function renderVueOverlayTeleport(
@@ -133,11 +148,8 @@ export function renderVueOverlayTeleport(
   disabled = false
 ): VNodeChild {
   if (children == null || typeof children === 'boolean') return children
-  const layeredChildren = h('div', { class: 'contents', 'data-tiger-overlay-layer': '' }, [
-    children,
-    h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
-  ])
-  if (disabled || !target) return layeredChildren
+  const layeredChildren = wrapVueOverlayLayer(children, target)
+  if (disabled || !target || !isBrowser()) return layeredChildren
   return h(Teleport as never, { to: target }, [layeredChildren])
 }
 
@@ -396,7 +408,6 @@ export interface UseVueAnchoredOverlayOptions {
 export type AnchoredOverlayDismissReason = 'outside' | 'escape'
 
 export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
-  const target = ref<HTMLElement | null>(null)
   const floatingLayerRef = computed(
     () => resolveOverlayLayer(options.floatingRef.value) ?? options.floatingRef.value
   )
@@ -405,22 +416,10 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
   const optionEnabled = (value: Ref<boolean> | boolean | undefined) =>
     typeof value === 'object' ? value.value : Boolean(value)
 
-  const targetSources = [
-    options.enabled,
-    options.referenceRef,
-    ...(typeof options.portal === 'object' ? [options.portal] : [])
-  ]
-  watch(
-    targetSources,
-    () => {
-      if (!portalEnabled()) {
-        target.value = null
-        return
-      }
-      target.value = resolveAnchoredOverlayTarget(options.referenceRef.value)
-    },
-    { immediate: true, flush: 'post' }
-  )
+  const target = computed(() => {
+    if (!portalEnabled() || !isBrowser()) return null
+    return resolveAnchoredOverlayTarget(options.referenceRef.value)
+  })
 
   watch(
     [options.enabled, options.floatingRef],

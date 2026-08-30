@@ -319,6 +319,13 @@ describe('Tour', () => {
       expect(onClose).toHaveBeenCalled()
     })
 
+    it('owns an overlay-host so nested layers stay inside the tour', async () => {
+      render(<Tour steps={baseSteps} open={true} />)
+      const dialog = await screen.findByRole('dialog')
+      const layer = dialog.closest('[data-tiger-overlay-layer]')
+      expect(layer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
+    })
+
     it('locks body scroll while open and restores it on close', async () => {
       const { rerender } = render(<Tour steps={baseSteps} open={true} />)
       await screen.findByRole('dialog')

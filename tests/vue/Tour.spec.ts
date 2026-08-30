@@ -344,6 +344,13 @@ describe('Tour', () => {
       await waitFor(() => expect(closeButton).toHaveFocus())
     })
 
+    it('owns an overlay-host so nested layers stay inside the tour', async () => {
+      render(Tour, { props: { steps: baseSteps, open: true } })
+      const dialog = await screen.findByRole('dialog')
+      const layer = dialog.closest('[data-tiger-overlay-layer]')
+      expect(layer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
+    })
+
     it('closes on Escape', async () => {
       const onClose = vi.fn()
       const onUpdateOpen = vi.fn()

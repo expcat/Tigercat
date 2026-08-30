@@ -314,6 +314,18 @@ describe('ConfigProvider', () => {
       expect(getByTestId('global').textContent).toBe('确定')
     })
 
+    it('renders a config root with dir and lang for overlay portals', () => {
+      const { getByText } = render(
+        <ConfigProvider direction="rtl" locale={{ locale: 'ar-SA' }}>
+          <span>child</span>
+        </ConfigProvider>
+      )
+
+      const root = getByText('child').closest('[data-tiger-config-root]')
+      expect(root).toHaveAttribute('dir', 'rtl')
+      expect(root).toHaveAttribute('lang', 'ar-SA')
+    })
+
     it('does not restore over a remaining sibling owner', () => {
       const first = render(
         <ConfigProvider direction="rtl">

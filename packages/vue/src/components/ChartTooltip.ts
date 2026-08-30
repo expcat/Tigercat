@@ -1,9 +1,10 @@
-import { defineComponent, h, computed, ref, watch, Teleport } from 'vue'
+import { defineComponent, h, computed, ref, watch } from 'vue'
 import {
   classNames,
   getChartTooltipTransform,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
+import { renderVueBodyTeleport } from '../utils/overlay'
 
 export interface VueChartTooltipProps {
   content: string
@@ -89,21 +90,20 @@ export const ChartTooltip = defineComponent({
       // Don't render if content is empty
       if (!props.content) return null
 
-      return h(Teleport, { to: 'body' }, [
-        h(
-          'div',
-          {
-            ref: tooltipRef,
-            class: tooltipClasses.value,
-            style: {
-              transform: getChartTooltipTransform(adjustedPosition.value)
-            },
-            role: 'tooltip',
-            'data-chart-tooltip': 'true'
+      const tooltip = h(
+        'div',
+        {
+          ref: tooltipRef,
+          class: tooltipClasses.value,
+          style: {
+            transform: getChartTooltipTransform(adjustedPosition.value)
           },
-          props.content
-        )
-      ])
+          role: 'tooltip',
+          'data-chart-tooltip': 'true'
+        },
+        props.content
+      )
+      return props.open ? renderVueBodyTeleport(tooltip) : tooltip
     }
   }
 })

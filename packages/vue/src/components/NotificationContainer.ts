@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, Teleport, TransitionGroup, type PropType } from 'vue'
+import { computed, defineComponent, h, TransitionGroup, type PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -21,6 +21,7 @@ import {
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
+import { renderVueBodyTeleport } from '../utils/overlay'
 
 type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
 
@@ -187,9 +188,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
     }
 
     return () =>
-      h(
-        Teleport,
-        { to: 'body' },
+      renderVueBodyTeleport(
         h(
           'div',
           {

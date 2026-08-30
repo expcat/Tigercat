@@ -134,7 +134,17 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     hydratedDocumentRef.current = true
   }, [value.theme, value.colorScheme, value.direction, value.locale?.locale])
 
-  return <TigerConfigContext.Provider value={value}>{children}</TigerConfigContext.Provider>
+  return (
+    <TigerConfigContext.Provider value={value}>
+      <div
+        className="contents"
+        data-tiger-config-root=""
+        dir={value.direction}
+        lang={value.locale?.locale}>
+        {children}
+      </div>
+    </TigerConfigContext.Provider>
+  )
 }
 
 ConfigProvider.displayName = 'TigerConfigProvider'

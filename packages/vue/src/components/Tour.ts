@@ -110,6 +110,7 @@ export const Tour = defineComponent({
     )
     const step = computed(() => activeStepInfo.value?.step)
     const targetRect = ref<TourRect | undefined>()
+    const rootRef = ref<HTMLElement | null>(null)
     const popoverRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const openRef = computed(() => props.open)
@@ -208,7 +209,7 @@ export const Tour = defineComponent({
     const detachEscape = useVueEscapeKey({ enabled: openRef, onEscape: close })
     onBeforeUnmount(detachEscape)
     useVueBodyScrollLock(openRef)
-    useVueFocusTrap({ enabled: openRef, containerRef: popoverRef })
+    useVueFocusTrap({ enabled: openRef, containerRef: rootRef })
 
     watch(
       openRef,
@@ -350,7 +351,12 @@ export const Tour = defineComponent({
         )
       )
 
-      return renderVueBodyTeleport(children)
+      return renderVueBodyTeleport(
+        h('div', { ref: rootRef, class: 'contents', 'data-tiger-overlay-layer': '' }, [
+          ...children,
+          h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
+        ])
+      )
     }
   }
 })

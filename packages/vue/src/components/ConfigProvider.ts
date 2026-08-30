@@ -1,6 +1,7 @@
 import {
   defineComponent,
   computed,
+  h,
   inject,
   onBeforeUnmount,
   provide,
@@ -163,7 +164,17 @@ export const ConfigProvider = defineComponent({
 
     provide(TigerConfigKey, merged)
 
-    return () => slots.default?.()
+    return () =>
+      h(
+        'div',
+        {
+          class: 'contents',
+          'data-tiger-config-root': '',
+          dir: merged.value.direction,
+          lang: merged.value.locale?.locale
+        },
+        slots.default?.()
+      )
   }
 })
 

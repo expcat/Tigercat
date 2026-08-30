@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {
   classNames,
-  isBrowser,
   mergeTigerLocale,
   captureActiveElement,
   focusFirst,
@@ -77,6 +76,7 @@ export const Tour: React.FC<TourProps> = ({
   const activeStepPosition = getActiveTourStepPosition(activeSteps, activeStepInfo?.index)
   const step = activeStepInfo?.step
   const [targetRect, setTargetRect] = useState<TourRect | undefined>()
+  const rootRef = useRef<HTMLDivElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
@@ -167,10 +167,9 @@ export const Tour: React.FC<TourProps> = ({
 
   useEscapeKey({ enabled: open, onEscape: close })
   useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: popoverRef })
+  useFocusTrap({ enabled: open, containerRef: rootRef })
 
   if (!open || !step) return null
-  if (!isBrowser()) return null
 
   const placement: TourPlacement = step.placement ?? 'bottom'
   const showMask = step.mask !== false
@@ -191,7 +190,7 @@ export const Tour: React.FC<TourProps> = ({
   }
 
   const content = (
-    <>
+    <div ref={rootRef} className="contents" data-tiger-overlay-layer="">
       {/* Full-screen mask; clip-path punches a hole when a target rect exists. */}
       {showMask && (
         <div
@@ -248,7 +247,8 @@ export const Tour: React.FC<TourProps> = ({
           </div>
         </div>
       </div>
-    </>
+      <div className="contents" data-tiger-overlay-host="" />
+    </div>
   )
 
   return renderBodyPortal(content)

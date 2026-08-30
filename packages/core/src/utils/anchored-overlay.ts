@@ -1,17 +1,48 @@
 import { classNames } from './class-names'
 import { getFocusableElements } from './overlay-utils'
 
-const OVERLAY_LAYER_ATTRIBUTE = 'data-tiger-overlay-layer'
-const OVERLAY_HOST_ATTRIBUTE = 'data-tiger-overlay-host'
+export const OVERLAY_LAYER_ATTRIBUTE = 'data-tiger-overlay-layer'
+export const OVERLAY_HOST_ATTRIBUTE = 'data-tiger-overlay-host'
+export const CONFIG_ROOT_ATTRIBUTE = 'data-tiger-config-root'
 
 export type AnchoredOverlayLayout = 'anchored' | 'fullscreen-sm' | 'bottom-sheet-sm'
 
+function resolveOwnerDocument(reference: HTMLElement | null): Document | null {
+  return reference?.ownerDocument ?? (typeof document === 'undefined' ? null : document)
+}
+
+/**
+ * Portal target chain: nearest overlay-host → ConfigProvider root → document.body.
+ */
 export function resolveAnchoredOverlayTarget(reference: HTMLElement | null): HTMLElement | null {
-  return typeof document === 'undefined'
-    ? null
-    : (reference
-        ?.closest(`[${OVERLAY_LAYER_ATTRIBUTE}]`)
-        ?.querySelector<HTMLElement>(`:scope > [${OVERLAY_HOST_ATTRIBUTE}]`) ?? document.body)
+  const ownerDocument = resolveOwnerDocument(reference)
+  if (!ownerDocument) return null
+
+  const overlayHost = reference
+    ?.closest(`[${OVERLAY_LAYER_ATTRIBUTE}]`)
+    ?.querySelector<HTMLElement>(`:scope > [${OVERLAY_HOST_ATTRIBUTE}]`)
+  if (overlayHost) return overlayHost
+
+  const configRoot =
+    reference?.closest<HTMLElement>(`[${CONFIG_ROOT_ATTRIBUTE}]`) ??
+    ownerDocument.querySelector<HTMLElement>(`[${CONFIG_ROOT_ATTRIBUTE}]`)
+  if (configRoot) return configRoot
+
+  return ownerDocument.body
+}
+
+/** Copy dir/lang onto a portaled layer so start/end placement matches the trigger. */
+export function getOverlayDirLang(target: HTMLElement | null): { dir?: string; lang?: string } {
+  if (!target) return {}
+  const root = target.ownerDocument.documentElement
+  const dirSource = target.closest('[dir]') ?? (root.getAttribute('dir') ? root : null)
+  const langSource = target.closest('[lang]') ?? (root.getAttribute('lang') ? root : null)
+  const dir = dirSource?.getAttribute('dir') ?? undefined
+  const lang = langSource?.getAttribute('lang') ?? undefined
+  return {
+    ...(dir ? { dir } : {}),
+    ...(lang ? { lang } : {})
+  }
 }
 
 /** Resolve Tab focus relative to the anchor while keeping it inside the active layer. */

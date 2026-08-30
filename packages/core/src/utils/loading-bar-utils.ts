@@ -11,6 +11,7 @@ import type {
   LoadingBarOptions,
   LoadingBarStatus
 } from '../types/loading-bar'
+import { resolveAnchoredOverlayTarget } from './anchored-overlay'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
 
@@ -140,12 +141,12 @@ export function nextLoadingBarTricklePercentage(
 
 export function resolveLoadingBarMountTarget(container?: string | HTMLElement): HTMLElement | null {
   if (!isBrowser()) return null
-  if (!container) return document.body
   if (typeof container === 'string') {
     const found = document.querySelector(container)
-    return found instanceof HTMLElement ? found : document.body
+    return found instanceof HTMLElement ? found : resolveAnchoredOverlayTarget(null)
   }
-  return container
+  if (container) return container
+  return resolveAnchoredOverlayTarget(null)
 }
 
 export type LoadingBarTimeoutId = ReturnType<typeof setTimeout>

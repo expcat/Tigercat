@@ -34,6 +34,18 @@ describe('anchored overlay contract', () => {
     expect(resolveAnchoredOverlayTarget(document.createElement('button'))).toBe(document.body)
   })
 
+  it('prefers the ConfigProvider root over document.body when no overlay-host exists', () => {
+    const configRoot = document.createElement('div')
+    configRoot.setAttribute('data-tiger-config-root', '')
+    configRoot.setAttribute('dir', 'rtl')
+    const reference = document.createElement('button')
+    configRoot.appendChild(reference)
+    document.body.appendChild(configRoot)
+
+    expect(resolveAnchoredOverlayTarget(reference)).toBe(configRoot)
+    expect(resolveAnchoredOverlayTarget(null)).toBe(configRoot)
+  })
+
   it('keeps layout and first-position visibility in the shared class contract', () => {
     const anchored = getAnchoredOverlayLayoutClasses('anchored', true)
     const fullscreen = getAnchoredOverlayLayoutClasses('fullscreen-sm', true)

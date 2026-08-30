@@ -158,6 +158,7 @@ export const Spotlight = defineComponent({
     const instanceId = createSpotlightId()
     const titleId = `${instanceId}-title`
     const listboxId = `${instanceId}-listbox`
+    const rootRef = ref<HTMLElement | null>(null)
     const dialogRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
@@ -235,7 +236,7 @@ export const Spotlight = defineComponent({
     }
 
     useVueBodyScrollLock(resolvedOpen)
-    useVueFocusTrap({ enabled: resolvedOpen, containerRef: dialogRef })
+    useVueFocusTrap({ enabled: resolvedOpen, containerRef: rootRef })
     let cleanupEscape: (() => void) | undefined
 
     onMounted(() => {
@@ -276,9 +277,11 @@ export const Spotlight = defineComponent({
       const content = h(
         'div',
         {
+          ref: rootRef,
           class: spotlightRootClasses,
           style: { zIndex: props.zIndex },
-          'data-tiger-spotlight-root': ''
+          'data-tiger-spotlight-root': '',
+          'data-tiger-overlay-layer': ''
         },
         [
           props.mask
@@ -423,7 +426,8 @@ export const Spotlight = defineComponent({
                     )
                   )
             ]
-          )
+          ),
+          h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
         ]
       )
 

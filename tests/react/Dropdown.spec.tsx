@@ -381,6 +381,25 @@ describe('Dropdown', () => {
       expect(container.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
     })
 
+    it('renders the menu into the nearest overlay-host', () => {
+      render(
+        <div data-tiger-overlay-layer="">
+          <Dropdown defaultOpen>
+            <button>Trigger</button>
+            <DropdownMenu>
+              <DropdownItem>Item 1</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <div data-tiger-overlay-host="" data-testid="overlay-host" />
+        </div>
+      )
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(
+        screen.getByTestId('overlay-host')
+      )
+    })
+
     it('renders the menu in place when portal is false', () => {
       const { container } = render(
         <Dropdown defaultOpen portal={false}>

@@ -1,14 +1,4 @@
-import {
-  defineComponent,
-  h,
-  Teleport,
-  ref,
-  computed,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  PropType
-} from 'vue'
+import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   imagePreviewMaskClasses,
@@ -42,6 +32,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueBodyTeleport } from '../utils/overlay'
 
 export interface VueImagePreviewProps extends Omit<CoreImagePreviewProps, 'images'> {
   images?: string[]
@@ -471,7 +462,7 @@ export const ImagePreview = defineComponent({
         [mask, img, closeBtn, prevBtn, nextBtn, toolbar]
       )
 
-      return h(Teleport, { to: 'body' }, [wrapper])
+      return renderVueBodyTeleport(wrapper)
     }
   }
 })

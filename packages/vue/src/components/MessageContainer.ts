@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, Teleport, TransitionGroup, type PropType } from 'vue'
+import { computed, defineComponent, h, TransitionGroup, type PropType } from 'vue'
 import {
   classNames,
   defaultMessageThemeColors,
@@ -16,6 +16,7 @@ import {
   type MessagePosition
 } from '@expcat/tigercat-core'
 import { createStatusIcon, createStatusIconWithLoading } from '../utils/icon-helpers'
+import { renderVueBodyTeleport } from '../utils/overlay'
 
 const MESSAGE_CONTAINER_ID = 'tiger-message-container'
 const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
@@ -109,9 +110,7 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
     }
 
     return () =>
-      h(
-        Teleport,
-        { to: 'body' },
+      renderVueBodyTeleport(
         h(
           'div',
           {

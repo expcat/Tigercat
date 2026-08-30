@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -321,6 +321,28 @@ describe('Dropdown', () => {
       const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
       expect(container.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
+    })
+
+    it('renders the menu into the nearest overlay-host', async () => {
+      const { getByTestId } = render({
+        setup() {
+          return () =>
+            h('div', { 'data-tiger-overlay-layer': '' }, [
+              h(Dropdown, { defaultOpen: true }, () => [
+                h('button', null, 'Trigger'),
+                h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+              ]),
+              h('div', { 'data-tiger-overlay-host': '', 'data-testid': 'overlay-host' })
+            ])
+        }
+      })
+
+      await waitFor(() => {
+        const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+        expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(
+          getByTestId('overlay-host')
+        )
+      })
     })
 
     it('renders the menu in place when portal is false', () => {

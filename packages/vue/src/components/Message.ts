@@ -3,6 +3,7 @@ import {
   createInstanceCounter,
   isBrowser,
   normalizeStringOption,
+  resolveAnchoredOverlayTarget,
   type MessageConfig,
   type MessageInstance,
   type MessageOptions,
@@ -86,7 +87,9 @@ function ensureContainer() {
   if (!rootEl) {
     rootEl = document.createElement('div')
     rootEl.id = MESSAGE_CONTAINER_ROOT_ID
-    document.body.appendChild(rootEl)
+    const mountTarget = resolveAnchoredOverlayTarget(null)
+    if (!mountTarget) return
+    mountTarget.appendChild(rootEl)
   }
 
   containerApp = createApp(MessageHost)

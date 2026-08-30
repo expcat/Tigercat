@@ -19,6 +19,7 @@ import {
   resolveAnchoredOverlayTarget,
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
+  getOverlayDirLang,
   FLOATING_OVERLAY_Z_INDEX,
   getTransformOrigin,
   restoreFocus,
@@ -99,9 +100,26 @@ export function useBodyScrollLock({ enabled }: UseBodyScrollLockOptions): void {
   }, [enabled])
 }
 
-export function renderBodyPortal(node: React.ReactNode): React.ReactPortal | null {
-  if (!isBrowser()) return null
-  return createPortal(node, document.body)
+function wrapOverlayLayer(node: React.ReactNode, target: HTMLElement | null): React.ReactElement {
+  const dirLang = getOverlayDirLang(target)
+  return createElement(
+    'div',
+    { className: 'contents', 'data-tiger-overlay-layer': '', ...dirLang },
+    node,
+    createElement('div', {
+      key: 'overlay-host',
+      className: 'contents',
+      'data-tiger-overlay-host': ''
+    })
+  )
+}
+
+export function renderBodyPortal(node: React.ReactNode, disabled = false): React.ReactNode {
+  if (node == null || typeof node === 'boolean') return node
+  const target = isBrowser() ? resolveAnchoredOverlayTarget(null) : null
+  const layeredNode = wrapOverlayLayer(node, target)
+  if (disabled || !target) return layeredNode
+  return createPortal(layeredNode, target)
 }
 
 export function renderOverlayPortal(
@@ -110,16 +128,7 @@ export function renderOverlayPortal(
   disabled = false
 ): React.ReactNode {
   if (node == null || typeof node === 'boolean') return node
-  const layeredNode = createElement(
-    'div',
-    { className: 'contents', 'data-tiger-overlay-layer': '' },
-    node,
-    createElement('div', {
-      key: 'overlay-host',
-      className: 'contents',
-      'data-tiger-overlay-host': ''
-    })
-  )
+  const layeredNode = wrapOverlayLayer(node, target)
   if (disabled || !target) return layeredNode
   return createPortal(layeredNode, target)
 }

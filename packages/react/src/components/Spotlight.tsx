@@ -103,6 +103,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({
   const titleId = `${dialogId}-title`
   const listboxId = `${dialogId}-listbox`
 
+  const rootRef = useRef<HTMLDivElement | null>(null)
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
@@ -118,7 +119,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({
 
   useEscapeKey({ enabled: resolvedOpen, onEscape: closeSpotlight })
   useBodyScrollLock({ enabled: resolvedOpen })
-  useFocusTrap({ enabled: resolvedOpen, containerRef: dialogRef })
+  useFocusTrap({ enabled: resolvedOpen, containerRef: rootRef })
 
   useEffect(() => {
     if (!resolvedOpen) {
@@ -203,7 +204,12 @@ export const Spotlight: React.FC<SpotlightProps> = ({
     : undefined
 
   const content = (
-    <div className={spotlightRootClasses} style={{ zIndex }} data-tiger-spotlight-root="">
+    <div
+      ref={rootRef}
+      className={spotlightRootClasses}
+      style={{ zIndex }}
+      data-tiger-spotlight-root=""
+      data-tiger-overlay-layer="">
       {mask && (
         <div className={spotlightMaskClasses} aria-hidden="true" onClick={handleMaskClick} />
       )}
@@ -294,6 +300,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({
           </div>
         )}
       </div>
+      <div className="contents" data-tiger-overlay-host="" />
     </div>
   )
 

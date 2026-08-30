@@ -1,11 +1,10 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { createPortal } from 'react-dom'
 import {
   classNames,
   getChartTooltipTransform,
-  isBrowser,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
+import { renderBodyPortal } from '../utils/overlay'
 
 export interface ChartTooltipProps {
   content: string
@@ -89,12 +88,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
     </div>
   )
 
-  // Use portal to render at body level
-  if (isBrowser()) {
-    return createPortal(tooltip, document.body)
-  }
-
-  return null
+  return open ? renderBodyPortal(tooltip) : tooltip
 }
 
 export default ChartTooltip
