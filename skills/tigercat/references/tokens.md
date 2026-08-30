@@ -5,13 +5,20 @@ description: Tigercat design token source files, generated outputs, and validati
 
 # Design Tokens
 
-`packages/core/tokens/tokens.json` is the single source of truth for Tigercat design tokens.
+`packages/core/tokens/tokens.json` is the single source of truth. It generates:
 
-| Layer     | Source key  | CSS prefix                   | TS export         |
-| --------- | ----------- | ---------------------------- | ----------------- |
-| Primitive | `primitive` | `--tiger-primitive-*`        | `primitive*`      |
-| Semantic  | `semantic`  | `--tiger-semantic-*`         | `semanticTokens`  |
-| Component | `component` | `--tiger-component-{name}-*` | `componentTokens` |
+1. Layered Figma/design tokens (`--tiger-primitive-*` / `--tiger-semantic-*` / `--tiger-component-*`)
+2. The **default runtime theme** (`runtimeThemeLight` / `runtimeThemeDark`)
+3. Runtime aliases with the names components read (`--tiger-primary`, `--tiger-radius-md`, `--tiger-transition-base`, …) on `:root` and `.dark`
+
+Default `primary` is `#2563eb` in both the layered tokens and the runtime aliases. Do not keep a second palette.
+
+| Layer     | Source key  | CSS prefix                   | TS export                                |
+| --------- | ----------- | ---------------------------- | ---------------------------------------- |
+| Primitive | `primitive` | `--tiger-primitive-*`        | `primitive*`                             |
+| Semantic  | `semantic`  | `--tiger-semantic-*`         | `semanticTokens`                         |
+| Component | `component` | `--tiger-component-{name}-*` | `componentTokens`                        |
+| Runtime   | `runtime`   | `--tiger-*` (no extra layer) | `runtimeThemeLight` / `runtimeThemeDark` |
 
 Run this after editing token source data:
 
@@ -19,15 +26,24 @@ Run this after editing token source data:
 pnpm tokens:build
 ```
 
-Generated outputs:
+Generated outputs (do not hand-edit):
 
-| File                                        | Purpose                          |
-| ------------------------------------------- | -------------------------------- |
-| `packages/core/tokens/tokens.css`           | CSS variables and `color-scheme` |
-| `packages/core/src/tokens/tokens.ts`        | TS constants and token types     |
-| `packages/core/tokens/tailwind-tokens.js`   | Tailwind v4 plugin token data    |
-| `packages/core/tokens/figma-variables.json` | Figma Variables import data      |
+| File                                        | Purpose                                                          |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| `packages/core/tokens/tokens.css`           | Layered tokens + runtime `--tiger-*` aliases + dark aliases      |
+| `packages/core/src/tokens/tokens.ts`        | TS constants, including `runtimeThemeLight` / `runtimeThemeDark` |
+| `packages/core/tokens/figma-variables.json` | Figma Variables import data                                      |
 
-For app setup, use Tailwind v4 CSS plugin syntax from [theme.md](theme.md).
+`tokens.css` is optional for apps that already use the Tailwind plugin: the plugin writes the same runtime names. Use `tokens.css` only when you need the layered Figma names in CSS.
 
-Validate token-sensitive changes with `pnpm build`, `pnpm test`, `pnpm size`, and visual tests when component rendering changes.
+Canonical runtime color names (written by the plugin and `ThemeManager`):
+
+`--tiger-primary` (+ hover/active/disabled/foreground), `--tiger-secondary` (same suffixes), `--tiger-error` (+ foreground/hover/disabled/bg-hover), `--tiger-success` / `--tiger-warning` / `--tiger-info`, `--tiger-surface` (+ muted/raised), `--tiger-text` (+ secondary/disabled), `--tiger-border` (+ strong), `--tiger-focus-ring`, `--tiger-chart-1`…`6`, `--tiger-outline-bg-hover`, `--tiger-ghost-bg-hover`.
+
+Aliases (always `var()` of a canonical token): `--tiger-text-muted` → text-secondary, `--tiger-fill` → surface-muted, `--tiger-bg` → surface.
+
+Also written: `--tiger-radius-*`, `--tiger-shadow-*`, `--tiger-font-*`, `--tiger-spacing-*`, `--tiger-motion-duration-*`, `--tiger-transition-*`, `--tiger-breakpoint-*`.
+
+App setup uses the Tailwind v4 plugin from [theme.md](theme.md).
+
+Validate token-sensitive changes with `pnpm tokens:check` and the core theme specs (`design-tokens`, `themes-manager`, `theme-contrast`, `theme-css-var-aliases`).

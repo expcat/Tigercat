@@ -123,14 +123,10 @@ describe('theme CSS var aliases (T1 A0)', () => {
   it('writes on-color, error interaction, and breakpoint tokens', () => {
     const rules = capturePluginBase()
     const root = rules[':root']
-    expect(root?.[THEME_CSS_VARS.primaryForeground]).toBe(
-      lightColors?.primaryForeground
-    )
+    expect(root?.[THEME_CSS_VARS.primaryForeground]).toBe(lightColors?.primaryForeground)
     expect(root?.[THEME_CSS_VARS.errorHover]).toBe(lightColors?.errorHover)
     expect(root?.[THEME_CSS_VARS.breakpointMd]).toBe('768px')
-    expect(rules['.dark']?.[THEME_CSS_VARS.primaryForeground]).toBe(
-      darkColors?.primaryForeground
-    )
+    expect(rules['.dark']?.[THEME_CSS_VARS.primaryForeground]).toBe(darkColors?.primaryForeground)
   })
 })
 

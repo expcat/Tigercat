@@ -10,7 +10,12 @@ describe('composeComponentClasses', () => {
 
   it('merges a Vue class object and array with className', () => {
     expect(
-      composeComponentClasses('root', { active: true, disabled: false }, ['array-a', 'array-b'], 'extra')
+      composeComponentClasses(
+        'root',
+        { active: true, disabled: false },
+        ['array-a', 'array-b'],
+        'extra'
+      )
     ).toBe('root active array-a array-b extra')
   })
 

@@ -98,9 +98,7 @@ describe('Modern theme — interaction (data-tiger-style="modern")', () => {
     const capture = captureRules(createTigercatPlugin() as PluginInstance)
     styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
     const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
-      defaultTheme.light.radius?.md
-    )
+    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(defaultTheme.light.radius?.md)
     expect(styles.getPropertyValue('--tiger-blur-glass').trim()).toBe(
       MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']
     )

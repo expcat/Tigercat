@@ -513,24 +513,16 @@ import { MessageContainer } from '@expcat/tigercat-react/MessageContainer'
 import { NotificationContainer } from '@expcat/tigercat-react/NotificationContainer'
 ```
 
-### Legacy token CSS 变量改为 canonical 三层 token
+### Token CSS：三层 layered 名 + 运行时 `--tiger-*` 别名
 
-`@expcat/tigercat-core/tokens.css` 现在只生成三层 canonical token：
+`tokens.json` 是唯一事实源。`tokens.css` 同时输出：
 
-- `--tiger-primitive-*`
-- `--tiger-semantic-*`
-- `--tiger-component-*`
+- 三层 layered token：`--tiger-primitive-*` / `--tiger-semantic-*` / `--tiger-component-*`（Figma / 设计）
+- 与组件相同的运行时别名：`--tiger-primary`、`--tiger-surface`、`--tiger-radius-md`、`--tiger-transition-base` …（`:root` 与 `.dark`）
 
-如果应用 CSS 直接覆盖旧兼容变量，请迁移到对应 canonical token：
+覆盖旧 `--tiger-color-primary-*` 请改 layered 名。覆盖组件皮肤请改运行时 `--tiger-primary`（或 `ThemeManager` / plugin），不要再维护第二套 palette。
 
-```diff
-- --tiger-color-primary-600: #2563eb;
-- --tiger-primary: #2563eb;
-+ --tiger-primitive-color-primary-600: #2563eb;
-+ --tiger-semantic-color-interactive-primary: #2563eb;
-```
-
-组件运行时主题仍可能使用 `--tiger-primary`、`--tiger-surface` 等主题变量；本次删除的是 token 生成物中的旧兼容变量输出，不要求业务组件样式整体重写。
+首屏用 Tailwind plugin 写出这些运行时名；`tokens.css` 不是另一套主题。
 
 ### Token JS API 移除 global / alias 兼容命名
 

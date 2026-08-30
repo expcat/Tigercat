@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **Theme / tokens 一条事实源**：`tokens.json` 生成 default 预设与组件正在读的 `--tiger-*` 别名（primary 统一为 `#2563eb`）。`ThemeManager` 按类型注释 merge default 段，切 dark 不再丢掉 radius/motion。Tailwind plugin 写入完整预设（含非颜色）。`setTheme('modern')` 与 `@plugin ".../tailwind/modern"` 是同一开关。运动只留 `--tiger-transition-*` / `--tiger-motion-duration-*`。新增 on-color 与 error hover token；删从未写入的 `--tiger-tag-*` / `--tiger-alert-*` 假名。内置主题改为 `registerBuiltInThemes()` / ThemeManager 惰性注册。生成物不再包含 `tailwind-tokens.js`。
+
 ## v2.1.2
 
 v2.1.2 patch：下游 Tigercat_Admin 上游建议 4–6 的 locale/labels 补齐（ColorPicker、Select、富文本/Markdown 工具条）。本版本无 breaking change。建议 1–3（Notification `actions`、BackTop `position`、FloatButton `floating`）已在 v2.1.0 / v2.1.1 落地。

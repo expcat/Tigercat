@@ -65,5 +65,3 @@ export type {
   ThemeColorScale,
   ColorScheme
 } from '../types/theme'
-
-

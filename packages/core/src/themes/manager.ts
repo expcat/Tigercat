@@ -48,10 +48,7 @@ const builtInPresets = [
  * Merge a preset segment onto the default theme for the same scheme.
  * Missing colors / radius / motion / etc. fall back to `base`.
  */
-export function mergeThemeConfig(
-  base: ThemeConfig = {},
-  override: ThemeConfig = {}
-): ThemeConfig {
+export function mergeThemeConfig(base: ThemeConfig = {}, override: ThemeConfig = {}): ThemeConfig {
   return {
     colors: { ...base.colors, ...override.colors },
     typography: { ...base.typography, ...override.typography },
@@ -263,10 +260,7 @@ class ThemeManagerImpl {
   setTheme(name: string): void {
     this.registerBuiltIns()
     if (!this.presets.has(name)) {
-      devWarn(
-        `ThemeManager.setTheme.${name}`,
-        `[Tigercat] Theme "${name}" is not registered.`
-      )
+      devWarn(`ThemeManager.setTheme.${name}`, `[Tigercat] Theme "${name}" is not registered.`)
       return
     }
     this.currentThemeName = name

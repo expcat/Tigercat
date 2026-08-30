@@ -185,9 +185,7 @@ describe('themes/manager — ThemeManager', () => {
     it('setTheme("modern") writes modern tokens and data-tiger-style', () => {
       ThemeManager.setTheme('modern')
       expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
-        '12px'
-      )
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('12px')
       ThemeManager.setTheme('default')
       expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
       expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
