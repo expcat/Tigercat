@@ -11,7 +11,7 @@ import {
   tagSizeClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
-  warnUnsupportedColorProp,
+  omitUnsupportedColorProp,
   getStatusLabels,
   mergeTigerLocale,
   type TagProps as CoreTagProps
@@ -65,7 +65,7 @@ export const Tag: React.FC<TagProps> = ({
     () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
     [config.locale, locale]
   )
-  warnUnsupportedColorProp('Tag', props as Record<string, unknown>)
+  const rest = omitUnsupportedColorProp('Tag', props as Record<string, unknown>)
   const [isVisible, setIsVisible] = useState(true)
 
   const tagClasses = useMemo(
@@ -93,7 +93,7 @@ export const Tag: React.FC<TagProps> = ({
   }
 
   return (
-    <span className={tagClasses} role="status" {...props}>
+    <span className={tagClasses} role="status" {...rest}>
       {children != null && <span>{children}</span>}
       {closable && (
         <button

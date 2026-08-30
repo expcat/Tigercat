@@ -47,7 +47,9 @@ describe('Button', () => {
 
     render(<Button color="primary">Color prop</Button>)
 
-    expect(screen.getByRole('button', { name: 'Color prop' })).toBeInTheDocument()
+    const button = screen.getByRole('button', { name: 'Color prop' })
+    expect(button).toBeInTheDocument()
+    expect(button).not.toHaveAttribute('color')
     expect(warn).toHaveBeenCalledWith(
       '[Tigercat] Button does not support color. Use variant instead.'
     )
@@ -95,6 +97,47 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveAttribute('type', 'button')
   })
 
+  it('treats native type as the same attribute as htmlType', () => {
+    const { rerender } = render(<Button type="submit">Submit</Button>)
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
+
+    rerender(
+      <Button type="reset" htmlType="submit">
+        Submit
+      </Button>
+    )
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
+  })
+
+  it('forwards ref to the native button', () => {
+    const ref = React.createRef<HTMLButtonElement>()
+    render(<Button ref={ref}>Focus me</Button>)
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement)
+    ref.current?.focus()
+    expect(ref.current).toHaveFocus()
+  })
+
+  it('renders an unknown variant as primary without throwing', () => {
+    expect(() =>
+      render(<Button variant={'not-a-variant' as 'primary'}>Fallback</Button>)
+    ).not.toThrow()
+    expect(screen.getByRole('button', { name: 'Fallback' })).toBeInTheDocument()
+  })
+
+  it('submits a form when htmlType is submit', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault())
+
+    render(
+      <form onSubmit={onSubmit}>
+        <Button htmlType="submit">Save</Button>
+      </form>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
   it('calls onClick when enabled', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()
@@ -131,12 +174,14 @@ describe('Button', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Loading' })
-    expect(button).toBeDisabled()
+    expect(button).not.toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
-    expect(button).toHaveAttribute('aria-disabled', 'true')
+    expect(button).not.toHaveAttribute('aria-disabled', 'true')
     expect(container.querySelector('svg.animate-spin')).toBeInTheDocument()
     expect(container.querySelector('svg.animate-spin')).toHaveAttribute('aria-hidden', 'true')
 
+    button.focus()
+    expect(button).toHaveFocus()
     await user.click(button)
     expect(onClick).not.toHaveBeenCalled()
   })
@@ -158,7 +203,7 @@ describe('Button', () => {
     // but let's check if we can find it by generic role first.
     // Ideally we want to ensure the custom icon is there.
     const button = screen.getByRole('button')
-    expect(button).toBeDisabled()
+    expect(button).not.toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
     expect(screen.getByTestId('custom-spinner')).toBeInTheDocument()
     // Default spinner should not be present
@@ -190,11 +235,9 @@ describe('Button', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Loading' })
-    expect(button).toBeDisabled()
+    expect(button).not.toBeDisabled()
 
-    await user.tab()
-    expect(button).not.toHaveFocus()
-
+    button.focus()
     await user.keyboard('{Enter}')
     expect(onClick).not.toHaveBeenCalled()
   })
@@ -251,32 +294,48 @@ describe('Button', () => {
   })
 
   describe('iconPosition prop', () => {
-    it('renders icon on the left by default', () => {
-      const { container } = render(<Button icon={<span data-testid="icon">★</span>}>Star</Button>)
+    it('renders icon before the label by default', () => {
+      render(<Button icon={<span data-testid="icon">★</span>}>Star</Button>)
+      const button = screen.getByRole('button', { name: 'Star' })
       const iconSpan = screen.getByTestId('icon').parentElement!
-      expect(iconSpan).toHaveClass('mr-2')
+      expect(button.firstElementChild).toBe(iconSpan)
+      expect(iconSpan).toHaveAttribute('aria-hidden', 'true')
+      expect(iconSpan.className).toContain('me-2')
     })
 
-    it('renders icon on the right when iconPosition is right', () => {
-      const { container } = render(
-        <Button icon={<span data-testid="icon">★</span>} iconPosition="right">
+    it('renders icon after the label when iconPosition is end', () => {
+      render(
+        <Button icon={<span data-testid="icon">★</span>} iconPosition="end">
           Star
         </Button>
       )
+      const button = screen.getByRole('button', { name: 'Star' })
       const iconSpan = screen.getByTestId('icon').parentElement!
-      expect(iconSpan).toHaveClass('ml-2')
-      expect(iconSpan).toHaveClass('order-1')
+      expect(button.lastElementChild).toBe(iconSpan)
+      expect(iconSpan.className).toContain('ms-2')
+      expect(iconSpan.className).not.toContain('order-1')
     })
 
-    it('renders loading spinner on the right when iconPosition is right', () => {
+    it('renders loading spinner after the label when iconPosition is right', () => {
       const { container } = render(
         <Button loading iconPosition="right">
           Loading
         </Button>
       )
+      const button = screen.getByRole('button', { name: 'Loading' })
       const spinnerSpan = container.querySelector('svg.animate-spin')!.parentElement!
-      expect(spinnerSpan).toHaveClass('ml-2')
-      expect(spinnerSpan).toHaveClass('order-1')
+      expect(button.lastElementChild).toBe(spinnerSpan)
+      expect(spinnerSpan.className).toContain('ms-2')
+    })
+
+    it('warns when an icon-only button has no accessible name', () => {
+      resetDevWarnCache()
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+      render(<Button icon={<span>★</span>} />)
+      expect(warn).toHaveBeenCalledWith(
+        '[Tigercat] Button has no accessible name. Provide text content, aria-label, or aria-labelledby.'
+      )
+      warn.mockRestore()
     })
   })
 })

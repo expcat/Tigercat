@@ -29,8 +29,13 @@ const { getSpinnerSVGMock } = vi.hoisted(() => ({
 vi.mock('@expcat/tigercat-core', () => ({
   classNames: (...args: unknown[]) => args.filter(Boolean).join(' '),
   resolveButtonClasses: () => 'btn-resolved',
+  resolveButtonHtmlType: () => 'button',
+  resolveButtonIconPlacement: () => 'start',
+  getButtonIconSlotClasses: () => '',
+  getButtonSpinnerClasses: () => 'animate-spin h-4 w-4',
   getSpinnerSVG: getSpinnerSVGMock,
-  warnUnsupportedColorProp: () => {}
+  omitUnsupportedColorProp: (_component: string, props: Record<string, unknown>) => props,
+  warnMissingAccessibleName: () => {}
 }))
 
 describe('React Button default spinner lazy creation', () => {
@@ -54,7 +59,8 @@ describe('React Button default spinner lazy creation', () => {
 
     render(<Button loading>Loading</Button>)
 
-    expect(screen.getByRole('button', { name: 'Loading' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Loading' })).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByRole('button', { name: 'Loading' })).not.toBeDisabled()
     expect(getSpinnerSVGMock).toHaveBeenCalledTimes(1)
     expect(getSpinnerSVGMock).toHaveBeenCalledWith('spinner')
   })

@@ -3,9 +3,14 @@ import {
   composeComponentClasses,
   mergeStyleValues,
   resolveButtonClasses,
+  resolveButtonHtmlType,
+  resolveButtonIconPlacement,
+  getButtonIconSlotClasses,
+  getButtonSpinnerClasses,
   getSpinnerSVG,
   normalizeSvgAttrs,
-  warnUnsupportedColorProp,
+  omitUnsupportedColorProp,
+  warnMissingAccessibleName,
   type ButtonVariant,
   type ButtonSize,
   type ButtonIconPosition,
@@ -21,19 +26,24 @@ export interface VueButtonProps {
   block?: boolean
   iconPosition?: ButtonIconPosition
   htmlType?: ButtonHtmlType
+  type?: ButtonHtmlType
   danger?: boolean
   className?: string
   style?: Record<string, unknown>
 }
 
-// Factory — must NOT be hoisted to module scope. Returning a fresh vnode per call
-// avoids cross-instance vnode reuse during SSR / concurrent renders.
-const createLoadingSpinner = () => {
+function hasSlotContent(nodes: unknown): boolean {
+  if (nodes == null || nodes === false) return false
+  if (Array.isArray(nodes)) return nodes.some(hasSlotContent)
+  return true
+}
+
+const createLoadingSpinner = (size: ButtonSize) => {
   const spinnerSvg = getSpinnerSVG('spinner')
   return h(
     'svg',
     {
-      class: 'animate-spin h-4 w-4',
+      class: getButtonSpinnerClasses(size),
       xmlns: 'http://www.w3.org/2000/svg',
       fill: 'none',
       viewBox: spinnerSvg.viewBox,
@@ -48,58 +58,30 @@ export const Button = defineComponent({
   name: 'TigerButton',
   inheritAttrs: false,
   props: {
-    /**
-     * Button variant style
-     * @default 'primary'
-     */
     variant: {
       type: String as PropType<ButtonVariant>,
       default: 'primary'
     },
-    /**
-     * Button size. Falls back to the enclosing ButtonGroup size, then 'md'.
-     */
     size: {
       type: String as PropType<ButtonSize>,
       default: undefined
     },
-    /**
-     * Whether the button is disabled
-     */
     disabled: Boolean,
-    /**
-     * Whether the button is in loading state
-     */
     loading: Boolean,
-
-    /**
-     * Whether the button should take full width of its parent
-     */
     block: Boolean,
-
-    /**
-     * Icon position relative to button text
-     * @default 'left'
-     */
     iconPosition: {
       type: String as PropType<ButtonIconPosition>,
-      default: 'left'
+      default: 'start'
     },
-
-    /**
-     * HTML button type
-     * @default 'button'
-     */
     htmlType: {
       type: String as PropType<ButtonHtmlType>,
-      default: 'button'
+      default: undefined
     },
-
-    /**
-     * Whether to apply danger/destructive styling
-     */
+    type: {
+      type: String as PropType<ButtonHtmlType>,
+      default: undefined
+    },
     danger: Boolean,
-
     className: {
       type: String,
       default: undefined
@@ -132,36 +114,62 @@ export const Button = defineComponent({
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
-      warnUnsupportedColorProp('Button', attrs as Record<string, unknown>)
-      const isDisabled = props.disabled || props.loading
-      const iconIsRight = props.iconPosition === 'right'
+      const restAttrs = omitUnsupportedColorProp('Button', {
+        ...(attrs as Record<string, unknown>)
+      })
+      const {
+        class: _class,
+        style: _style,
+        type: attrType,
+        onClick: _onClick,
+        ...domAttrs
+      } = restAttrs
+      const htmlType = resolveButtonHtmlType(props.htmlType, props.type ?? attrType)
+      const label = slots.default?.()
+      const hasLabel = hasSlotContent(label)
+      warnMissingAccessibleName('Button', {
+        text: hasLabel ? 'named' : '',
+        ariaLabel: domAttrs['aria-label'],
+        ariaLabelledby: domAttrs['aria-labelledby']
+      })
 
+      const placement = resolveButtonIconPlacement(props.iconPosition)
+      const slotClass = getButtonIconSlotClasses(placement, hasLabel)
       const loadingNode = props.loading
         ? h(
             'span',
-            { class: iconIsRight ? 'ml-2 order-1' : 'mr-2' },
-            slots['loading-icon'] ? slots['loading-icon']() : createLoadingSpinner()
+            { class: slotClass || undefined, 'aria-hidden': 'true' },
+            slots['loading-icon']
+              ? slots['loading-icon']()
+              : createLoadingSpinner(resolvedSize.value)
           )
         : null
-
       const iconNode =
         !props.loading && slots.icon
-          ? h('span', { class: iconIsRight ? 'ml-2 order-1' : 'mr-2' }, slots.icon())
+          ? h('span', { class: slotClass || undefined, 'aria-hidden': 'true' }, slots.icon())
           : null
+      const chrome = loadingNode ?? iconNode
+      const children = placement === 'end' ? [label, chrome] : [chrome, label]
 
       return h(
         'button',
         {
-          ...attrs,
+          ...domAttrs,
           class: buttonClasses.value,
           style: mergedStyle.value,
           'aria-busy': attrs['aria-busy'] ?? (props.loading ? 'true' : undefined),
-          'aria-disabled': attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined),
-          disabled: isDisabled,
-          type: props.htmlType,
-          onClick: isDisabled ? undefined : (event: MouseEvent) => emit('click', event)
+          'aria-disabled': attrs['aria-disabled'] ?? (props.disabled ? 'true' : undefined),
+          disabled: props.disabled ? true : undefined,
+          type: htmlType,
+          onClick: (event: MouseEvent) => {
+            if (props.disabled || props.loading) {
+              event.preventDefault()
+              return
+            }
+            emit('click', event)
+          }
         },
-        [loadingNode, iconNode, slots.default?.()]
+        children
       )
     }
   }

@@ -46,6 +46,42 @@ export function warnUnsupportedColorProp(component: string, props: Record<string
 }
 
 /**
+ * Warn about an unsupported `color` prop and drop it so it does not land on DOM.
+ */
+export function omitUnsupportedColorProp<T extends Record<string, unknown>>(
+  component: string,
+  props: T
+): Omit<T, 'color'> {
+  warnUnsupportedColorProp(component, props)
+  if (!('color' in props)) return props
+  const { color: _color, ...rest } = props
+  return rest
+}
+
+export function hasAccessibleName(options: {
+  text?: unknown
+  ariaLabel?: unknown
+  ariaLabelledby?: unknown
+}): boolean {
+  if (typeof options.ariaLabel === 'string' && options.ariaLabel.trim()) return true
+  if (typeof options.ariaLabelledby === 'string' && options.ariaLabelledby.trim()) return true
+  if (typeof options.text === 'string' && options.text.trim()) return true
+  if (typeof options.text === 'number') return true
+  return false
+}
+
+export function warnMissingAccessibleName(
+  component: string,
+  options: { text?: unknown; ariaLabel?: unknown; ariaLabelledby?: unknown }
+): void {
+  if (hasAccessibleName(options)) return
+  devWarn(
+    `${component}.accessibleName`,
+    `[Tigercat] ${component} has no accessible name. Provide text content, aria-label, or aria-labelledby.`
+  )
+}
+
+/**
  * Reset the de-duplication cache. Intended for tests only.
  */
 export function resetDevWarnCache(): void {

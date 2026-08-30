@@ -1,5 +1,11 @@
-import { type ButtonSize, type ButtonVariant } from '../types/button'
+import {
+  type ButtonHtmlType,
+  type ButtonIconPosition,
+  type ButtonSize,
+  type ButtonVariant
+} from '../types/button'
 import { classNames, type ClassValue } from './class-names'
+import { devWarn } from './dev-warn'
 import { getButtonVariantClasses } from './theme-colors'
 
 /**
@@ -65,6 +71,54 @@ export function resolveButtonClasses(input: ResolveButtonClassesInput = {}): str
     (input.disabled || input.loading) && buttonDisabledClasses,
     input.block && 'w-full',
     input.className
+  )
+}
+
+export const buttonSpinnerSizeClasses: Record<ButtonSize, string> = {
+  xs: 'h-3 w-3',
+  sm: 'h-3 w-3',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5',
+  xl: 'h-5 w-5'
+}
+
+const BUTTON_HTML_TYPES: ReadonlySet<string> = new Set(['button', 'submit', 'reset'])
+
+export function isButtonHtmlType(value: unknown): value is ButtonHtmlType {
+  return typeof value === 'string' && BUTTON_HTML_TYPES.has(value)
+}
+
+/**
+ * `htmlType` and native `type` are the same attribute. Conflicting values keep
+ * `htmlType` and warn once.
+ */
+export function resolveButtonHtmlType(htmlType: unknown, nativeType?: unknown): ButtonHtmlType {
+  const fromHtml = isButtonHtmlType(htmlType) ? htmlType : undefined
+  const fromNative = isButtonHtmlType(nativeType) ? nativeType : undefined
+  if (fromHtml && fromNative && fromHtml !== fromNative) {
+    devWarn('Button.htmlType', '[Tigercat] Button htmlType and type differ; htmlType wins.')
+  }
+  return fromHtml ?? fromNative ?? 'button'
+}
+
+export type ButtonIconPlacement = 'start' | 'end'
+
+export function resolveButtonIconPlacement(position?: ButtonIconPosition): ButtonIconPlacement {
+  return position === 'right' || position === 'end' ? 'end' : 'start'
+}
+
+export function getButtonIconSlotClasses(
+  placement: ButtonIconPlacement,
+  hasLabel: boolean
+): string {
+  if (!hasLabel) return ''
+  return placement === 'end' ? 'ms-2' : 'me-2'
+}
+
+export function getButtonSpinnerClasses(size: ButtonSize = 'md'): string {
+  return classNames(
+    'tiger-motion-aware animate-spin',
+    buttonSpinnerSizeClasses[size] ?? buttonSpinnerSizeClasses.md
   )
 }
 

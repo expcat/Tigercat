@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { devWarn, warnUnsupportedColorProp, resetDevWarnCache } from '@expcat/tigercat-core'
+import {
+  devWarn,
+  omitUnsupportedColorProp,
+  warnUnsupportedColorProp,
+  resetDevWarnCache
+} from '@expcat/tigercat-core'
 
 describe('devWarn', () => {
   let warnSpy: ReturnType<typeof vi.spyOn>
@@ -52,6 +57,12 @@ describe('devWarn', () => {
       warnUnsupportedColorProp('Button', { color: 'blue' })
       warnUnsupportedColorProp('Tag', { color: 'red' })
       expect(warnSpy).toHaveBeenCalledTimes(2)
+    })
+
+    it('omits color from the object that should reach the DOM', () => {
+      const rest = omitUnsupportedColorProp('Button', { color: 'primary', id: 'save' })
+      expect(rest).toEqual({ id: 'save' })
+      expect(warnSpy).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -1,9 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import {
   buttonBaseClasses,
   buttonDangerClasses,
   getButtonVariantClasses,
-  resolveButtonClasses
+  resolveButtonClasses,
+  resolveButtonHtmlType,
+  resolveButtonIconPlacement,
+  resetDevWarnCache
 } from '@expcat/tigercat-core'
 
 describe('resolveButtonClasses', () => {
@@ -35,5 +38,41 @@ describe('resolveButtonClasses', () => {
     expect(classes).toContain('--tiger-error')
     expect(classes).toContain('border-2')
     expect(classes).not.toContain('--tiger-primary-foreground')
+  })
+})
+
+describe('resolveButtonHtmlType', () => {
+  let warnSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    resetDevWarnCache()
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    warnSpy.mockRestore()
+  })
+
+  it('uses htmlType, then native type, then button', () => {
+    expect(resolveButtonHtmlType('submit')).toBe('submit')
+    expect(resolveButtonHtmlType(undefined, 'reset')).toBe('reset')
+    expect(resolveButtonHtmlType(undefined, undefined)).toBe('button')
+  })
+
+  it('lets htmlType win and warns when the two differ', () => {
+    expect(resolveButtonHtmlType('submit', 'reset')).toBe('submit')
+    expect(warnSpy).toHaveBeenCalledWith(
+      '[Tigercat] Button htmlType and type differ; htmlType wins.'
+    )
+  })
+})
+
+describe('resolveButtonIconPlacement', () => {
+  it('maps left/right aliases onto start/end', () => {
+    expect(resolveButtonIconPlacement()).toBe('start')
+    expect(resolveButtonIconPlacement('left')).toBe('start')
+    expect(resolveButtonIconPlacement('start')).toBe('start')
+    expect(resolveButtonIconPlacement('right')).toBe('end')
+    expect(resolveButtonIconPlacement('end')).toBe('end')
   })
 })

@@ -14,10 +14,11 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'lin
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 /**
- * Icon position relative to button text
+ * Icon position relative to button text.
+ * `start` / `end` follow writing direction; `left` / `right` are aliases.
  * @since 0.5.0
  */
-export type ButtonIconPosition = 'left' | 'right'
+export type ButtonIconPosition = 'start' | 'end' | 'left' | 'right'
 
 /**
  * HTML button type attribute
@@ -36,8 +37,8 @@ export interface ButtonProps {
   variant?: ButtonVariant
 
   /**
-   * Button size
-   * @default 'md'
+   * Button size. When omitted, uses the enclosing ButtonGroup size, then `md`.
+   * Passing `undefined` is the same as omitting the prop.
    */
   size?: ButtonSize
 
@@ -60,14 +61,16 @@ export interface ButtonProps {
   block?: boolean
 
   /**
-   * Position of the icon relative to button text
-   * @default 'left'
+   * Position of the icon relative to button text.
+   * DOM order follows this value (`start`/`left` = icon then label).
+   * @default 'start'
    * @since 0.5.0
    */
   iconPosition?: ButtonIconPosition
 
   /**
-   * HTML button type attribute
+   * HTML `type`. Same attribute as native `type`: `htmlType ?? type ?? 'button'`.
+   * If both are set and differ, `htmlType` wins.
    * @default 'button'
    * @since 0.5.0
    */

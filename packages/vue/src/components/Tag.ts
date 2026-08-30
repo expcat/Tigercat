@@ -13,7 +13,7 @@ import {
   tagSizeClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
-  warnUnsupportedColorProp,
+  omitUnsupportedColorProp,
   getStatusLabels,
   mergeTigerLocale,
   type TagVariant,
@@ -144,19 +144,20 @@ export const Tag = defineComponent({
     }
 
     return () => {
-      warnUnsupportedColorProp('Tag', attrs as Record<string, unknown>)
+      const attrsRecord = omitUnsupportedColorProp('Tag', {
+        ...(attrs as Record<string, unknown>)
+      })
       if (!isVisible.value) {
         return null
       }
 
-      const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
 
       return h(
         'span',
         {
-          ...attrs,
+          ...attrsRecord,
           class: classNames(tagClasses.value, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
           role: 'status'
