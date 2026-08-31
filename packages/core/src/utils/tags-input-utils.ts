@@ -100,6 +100,91 @@ export function removeTagAt(tags: string[], index: number): string[] {
   return [...tags.slice(0, index), ...tags.slice(index + 1)]
 }
 
+export function prepareTagCandidates(
+  candidates: string[],
+  beforeAdd?: (tag: string) => boolean | string
+): string[] {
+  const prepared: string[] = []
+  for (const raw of candidates) {
+    const trimmed = raw.trim()
+    if (!trimmed) continue
+    if (!beforeAdd) {
+      prepared.push(trimmed)
+      continue
+    }
+    const result = beforeAdd(trimmed)
+    if (result === false) continue
+    prepared.push(typeof result === 'string' ? result.trim() : trimmed)
+  }
+  return prepared.filter(Boolean)
+}
+
+export interface CommitTagCandidatesResult extends AddTagsResult {
+  /** Pending text to keep in the input. Rejected-only commits keep the last candidate. */
+  pending: string
+}
+
+export function commitTagCandidates(
+  current: string[],
+  candidates: string[],
+  options: AddTagsOptions & {
+    beforeAdd?: (tag: string) => boolean | string
+    pendingFallback?: string
+  } = {}
+): CommitTagCandidatesResult {
+  const prepared = prepareTagCandidates(candidates, options.beforeAdd)
+  if (prepared.length === 0) {
+    return {
+      tags: current,
+      added: [],
+      rejected: [],
+      pending: options.pendingFallback ?? candidates.map((item) => item.trim()).find(Boolean) ?? ''
+    }
+  }
+  const result = addTags(current, prepared, options)
+  return {
+    ...result,
+    pending: result.added.length > 0 ? '' : (options.pendingFallback ?? prepared.at(-1) ?? '')
+  }
+}
+
+export function resolveTagsPasteCandidates(
+  pending: string,
+  clipboard: string,
+  delimiters: string[] = [',']
+): string[] {
+  const fromClipboard = splitTagInput(clipboard, delimiters)
+  const head = pending.trim()
+  if (!head) return fromClipboard
+  return [head, ...fromClipboard]
+}
+
+export function getTagsArrowDelta(key: string, dir: 'ltr' | 'rtl' = 'ltr'): number | null {
+  if (key !== 'ArrowLeft' && key !== 'ArrowRight') return null
+  const inline = dir === 'rtl' ? -1 : 1
+  return key === 'ArrowLeft' ? -inline : inline
+}
+
+export function moveTagsHighlight(
+  current: number | null,
+  tagCount: number,
+  delta: number
+): number | null {
+  if (tagCount <= 0) return null
+  if (current === null) {
+    return delta < 0 ? tagCount - 1 : null
+  }
+  const next = current + delta
+  if (next < 0) return 0
+  if (next >= tagCount) return null
+  return next
+}
+
+/** One hidden field per tag so values can contain the delimiter. */
+export function getTagsHiddenValues(tags: string[]): string[] {
+  return tags
+}
+
 /**
  * Format a remove-tag aria-label template. Supports `{tag}`.
  */
@@ -115,14 +200,15 @@ const TAGS_INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
 
 const TAGS_INPUT_STATUS_CLASSES: Record<InputStatus, string> = {
   default:
-    'border-[var(--tiger-border,#e5e7eb)] focus-within:ring-[var(--tiger-primary,#2563eb)]/40 focus-within:border-transparent',
-  error: 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500',
-  success: 'border-green-500 focus-within:ring-green-500 focus-within:border-green-500',
-  warning: 'border-yellow-500 focus-within:ring-yellow-500 focus-within:border-yellow-500'
+    'border-[var(--tiger-border,#e5e7eb)] focus-within:has-[:focus-visible]:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-within:has-[:focus-visible]:border-transparent',
+  error: 'border-[var(--tiger-error,#dc2626)]',
+  success: 'border-[var(--tiger-success,#16a34a)]',
+  warning: 'border-[var(--tiger-warning,#d97706)]'
 }
 
 export interface GetTagsInputContainerClassesOptions {
   disabled?: boolean
+  inGroup?: boolean
 }
 
 export function getTagsInputContainerClasses(
@@ -131,10 +217,13 @@ export function getTagsInputContainerClasses(
   options: GetTagsInputContainerClassesOptions = {}
 ): string {
   return classNames(
-    'flex w-full flex-wrap items-center border rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-surface,#ffffff)] transition-colors focus-within:ring-2',
+    'flex flex-wrap items-center border rounded-[var(--tiger-radius-md,0.5rem)]',
+    'bg-[var(--tiger-surface,#ffffff)] tiger-motion-aware',
+    '[transition:var(--tiger-transition-base,color_150ms_ease,border-color_150ms_ease)]',
+    'focus-within:has-[:focus-visible]:ring-2',
     TAGS_INPUT_SIZE_CLASSES[size],
     TAGS_INPUT_STATUS_CLASSES[status],
+    options.inGroup ? 'flex-1 min-w-0' : 'w-full',
     options.disabled &&
       'cursor-not-allowed bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text-muted,#6b7280)]'
   )
@@ -150,7 +239,7 @@ export function getTagsInputInnerInputClasses(): string {
 
 /** Extra classes marking the tag highlighted for two-step backspace removal */
 export function getTagsInputHighlightClasses(): string {
-  return 'ring-2 ring-[var(--tiger-primary,#2563eb)]/60'
+  return 'ring-2 ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/60'
 }
 
 export function getTagsInputClearButtonClasses(): string {

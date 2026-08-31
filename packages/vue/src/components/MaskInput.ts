@@ -1,17 +1,33 @@
-import { computed, defineComponent, h, inject, nextTick, ref, watch, type PropType } from 'vue'
 import {
+  computed,
+  defineComponent,
+  h,
+  inject,
+  nextTick,
+  ref,
+  useId,
+  watch,
+  type PropType
+} from 'vue'
+import {
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
   applyMaskInput,
+  callUnknownEventHandler,
   classNames,
   coerceClassValue,
   formatMaskValue,
-  getInputClasses,
   getInputClearButtonClasses,
   getInputErrorClasses,
+  getInputFieldClasses,
+  getInputLabels,
   getInputWrapperClasses,
-  injectShakeStyle,
+  getMaskInputMode,
+  mergeAriaDescribedBy,
   mergeStyleValues,
   parseMask,
-  SHAKE_CLASS,
+  runShakeAnimation,
+  shouldEmitMaskComplete,
   type ComponentSize,
   type InputStatus,
   type MaskInputChangeDetail,
@@ -19,71 +35,33 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
-
-let maskInputIdCounter = 0
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { Icon } from './Icon'
 
 export type VueMaskInputProps = InstanceType<typeof MaskInput>['$props']
+export type MaskInputProps = VueMaskInputProps
 
 export const MaskInput = defineComponent({
   name: 'TigerMaskInput',
   inheritAttrs: false,
   props: {
-    /**
-     * Raw (unmasked) value for v-model
-     */
     modelValue: { type: String, default: undefined },
-    /**
-     * Default raw value (for uncontrolled mode)
-     */
     defaultValue: { type: String, default: '' },
-    /**
-     * Mask template. Built-in tokens: `#` digit, `a` letter, `*` alphanumeric,
-     * `!` escapes the next character to a literal
-     */
     mask: { type: String, required: true },
-    /**
-     * Custom tokens merged over the built-ins
-     */
     tokens: { type: Object as PropType<Record<string, MaskToken>>, default: undefined },
-    /**
-     * Input size
-     * @default 'md'
-     */
-    size: { type: String as PropType<ComponentSize>, default: 'md' },
-    /**
-     * Validation status
-     * @default 'default'
-     */
-    status: { type: String as PropType<InputStatus>, default: 'default' },
-    /** Error message to display */
+    size: { type: String as PropType<ComponentSize>, default: undefined },
+    status: { type: String as PropType<InputStatus>, default: undefined },
     errorMessage: String,
-    /** Placeholder text */
     placeholder: { type: String, default: '' },
-    /** Whether the input is disabled */
     disabled: Boolean,
-    /** Whether the input is readonly */
     readonly: Boolean,
-    /** Whether to show a clear button when the input has value */
     clearable: Boolean,
-    /**
-     * Input name attribute. When set, a hidden input with this name submits the
-     * raw (unmasked) value; the visible field displays the mask and has no name.
-     */
     name: String,
-    /** Input id attribute */
     id: String,
-    /** Autocomplete attribute */
     autoComplete: String,
-    /** Whether to autofocus on mount */
     autoFocus: Boolean,
-    /**
-     * Internal shake trigger counter (used by FormItem)
-     * @internal
-     */
     _shakeTrigger: { type: Number, default: undefined },
-    /** Additional CSS classes */
     className: String,
-    /** Inline styles */
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   emits: {
@@ -94,84 +72,102 @@ export const MaskInput = defineComponent({
     blur: null,
     clear: null
   },
-  setup(props, { emit, attrs }) {
-    injectShakeStyle()
+  setup(props, { emit, attrs, expose }) {
+    const config = useTigerConfig()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
     )
-    // config kept for locale-aware future use; parity with sibling inputs
-    useTigerConfig()
-    const effectiveStatus = computed(() =>
-      props.status !== 'default' ? props.status : (formItemControl?.status.value ?? props.status)
+    const labels = computed(() => getInputLabels(config.value.locale))
+    const inGroup = computed(() => inputGroup != null)
+    const effectiveSize = computed(() => props.size ?? inputGroup?.size ?? 'md')
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
     )
-    const effectiveErrorMessage = computed(
-      () => props.errorMessage ?? formItemControl?.errorMessage.value
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
-    const effectiveShakeTrigger = computed(
-      () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
-    )
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const formValue = computed(() => formItemControl?.value.value)
+    const errorMsgId = `tiger-mask-input-error-${useId()}`
 
-    const instanceId = ++maskInputIdCounter
-    const errorMsgId = `tiger-mask-input-error-${instanceId}`
-
-    const wrapperRef = ref<HTMLDivElement | null>(null)
+    const chromeRef = ref<HTMLDivElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
     const isComposing = ref(false)
 
     const spec = computed(() => parseMask(props.mask, props.tokens))
-    const isControlled = computed(() => props.modelValue !== undefined)
-    const innerRaw = ref(props.defaultValue ?? '')
+    const localRaw = ref(
+      props.modelValue ??
+        (typeof formValue.value === 'string' ? formValue.value : undefined) ??
+        props.defaultValue ??
+        ''
+    )
     const rawValue = computed(() =>
-      isControlled.value ? (props.modelValue ?? '') : innerRaw.value
+      props.modelValue !== undefined
+        ? props.modelValue
+        : typeof formValue.value === 'string'
+          ? formValue.value
+          : localRaw.value
     )
     const formatted = computed(() => formatMaskValue(rawValue.value, spec.value))
     const maskedValue = computed(() => formatted.value.maskedValue)
+    const resolvedInputMode = computed(() => getMaskInputMode(props.mask, spec.value))
 
-    watch([effectiveStatus, effectiveShakeTrigger] as const, ([newStatus]) => {
-      if (newStatus === 'error' && wrapperRef.value) {
-        const el = wrapperRef.value
-        el.classList.remove(SHAKE_CLASS)
-        void el.offsetWidth // force reflow to restart animation
-        el.classList.add(SHAKE_CLASS)
+    watch(
+      () => [props.modelValue, formValue.value] as const,
+      ([model, controlValue]) => {
+        const source =
+          model !== undefined ? model : typeof controlValue === 'string' ? controlValue : undefined
+        if (source === undefined) return
+        if (source !== localRaw.value) localRaw.value = source
       }
-    })
+    )
 
-    const commit = (raw: string, detail: MaskInputChangeDetail, previousMasked: string) => {
-      if (!isControlled.value) innerRaw.value = raw
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value, props._shakeTrigger] as const,
+      (current, previous) => {
+        if (!previous) return
+        if (current[0] === 'error') runShakeAnimation(chromeRef.value ?? inputRef.value)
+      },
+      { flush: 'post' }
+    )
+
+    function commit(raw: string, detail: MaskInputChangeDetail, wasCompleted: boolean) {
+      if (props.modelValue === undefined && typeof formValue.value !== 'string') {
+        localRaw.value = raw
+      }
       emit('update:modelValue', raw)
       emit('change', raw, detail)
-      if (detail.completed && !formatMaskValue(previousMasked, spec.value).completed) {
+      formItemControl?.onChange(raw)
+      if (shouldEmitMaskComplete(wasCompleted, detail.completed)) {
         emit('complete', raw, detail.maskedValue)
       }
     }
 
-    const applyValue = (inputValue: string, caret: number) => {
-      const previousMasked = maskedValue.value
-      const result = applyMaskInput(inputValue, caret, spec.value, previousMasked)
+    function applyValue(inputValue: string, caret: number) {
+      const wasCompleted = formatted.value.completed
+      const result = applyMaskInput(inputValue, caret, spec.value, maskedValue.value)
       if (inputRef.value) inputRef.value.value = result.maskedValue
       commit(
         result.rawValue,
         { maskedValue: result.maskedValue, completed: result.completed },
-        previousMasked
+        wasCompleted
       )
-      // Restore caret after Vue patches the value back
       nextTick(() => {
         if (inputRef.value) inputRef.value.setSelectionRange(result.caret, result.caret)
       })
     }
 
-    const processInput = (target: HTMLInputElement) => {
+    function handleInput(event: Event) {
+      if (isComposing.value) return
+      const target = event.target as HTMLInputElement
       applyValue(target.value, target.selectionStart ?? target.value.length)
     }
 
-    const handleInput = (event: Event) => {
-      if (isComposing.value) return
-      processInput(event.target as HTMLInputElement)
-    }
-
-    const handlePaste = (event: ClipboardEvent) => {
-      if (props.disabled || props.readonly) return
+    function handlePaste(event: ClipboardEvent) {
+      if (effectiveDisabled.value || props.readonly) return
       event.preventDefault()
       const input = event.target as HTMLInputElement
       const text = event.clipboardData?.getData('text') ?? ''
@@ -180,107 +176,147 @@ export const MaskInput = defineComponent({
       applyValue(input.value.slice(0, start) + text + input.value.slice(end), start + text.length)
     }
 
-    const handleCompositionStart = () => {
-      isComposing.value = true
-    }
-
-    const handleCompositionEnd = (event: Event) => {
-      isComposing.value = false
-      processInput(event.target as HTMLInputElement)
-    }
-
-    const handleClear = () => {
-      if (!isControlled.value) innerRaw.value = ''
-      emit('update:modelValue', '')
-      emit('change', '', { maskedValue: '', completed: false })
+    function handleClear() {
+      commit('', { maskedValue: '', completed: false }, formatted.value.completed)
       emit('clear')
       inputRef.value?.focus()
     }
 
-    const handleFocus = (event: FocusEvent) => emit('focus', event)
-    const handleBlur = (event: FocusEvent) => emit('blur', event)
+    expose({
+      focus: () => inputRef.value?.focus(),
+      input: inputRef
+    })
 
     return () => {
-      const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
-      const activeError = effectiveStatus.value === 'error' && !!effectiveErrorMessage.value
-      const hasSuffix = props.clearable
+      const { class: attrClass, style: attrStyle, type: attrType, ...restAttrs } = attrs
+      const activeError = status.value === 'error' && !!props.errorMessage
       const showClear =
-        props.clearable && !props.disabled && !props.readonly && rawValue.value.length > 0
+        props.clearable && !effectiveDisabled.value && !props.readonly && rawValue.value.length > 0
+      const hasExtras = activeError
+      const describedBy = mergeAriaDescribedBy(
+        mergeAriaDescribedBy(
+          typeof restAttrs['aria-describedby'] === 'string'
+            ? restAttrs['aria-describedby']
+            : undefined,
+          activeError ? errorMsgId : undefined
+        ),
+        formItemControl?.describedBy.value
+      )
+      const attrInputMode =
+        typeof restAttrs.inputmode === 'string' ? restAttrs.inputmode : undefined
 
-      const inputClasses = getInputClasses({
-        size: props.size,
-        status: effectiveStatus.value,
-        hasPrefix: false,
-        hasSuffix
+      const field = h('input', {
+        ...restAttrs,
+        ref: inputRef,
+        class: getInputFieldClasses({
+          size: effectiveSize.value,
+          status: status.value,
+          hasSuffix: showClear
+        }),
+        type: typeof attrType === 'string' ? attrType : 'text',
+        inputmode: attrInputMode ?? resolvedInputMode.value,
+        value: maskedValue.value,
+        placeholder: props.placeholder,
+        disabled: effectiveDisabled.value,
+        readonly: props.readonly,
+        id: effectiveId.value,
+        autocomplete: props.autoComplete,
+        autofocus: props.autoFocus,
+        'aria-invalid': status.value === 'error' ? true : restAttrs['aria-invalid'],
+        'aria-required': formItemControl?.required.value ? true : restAttrs['aria-required'],
+        'aria-describedby': describedBy,
+        onInput: (event: Event) => {
+          handleInput(event)
+          callUnknownEventHandler(restAttrs.onInput, event)
+        },
+        onPaste: handlePaste,
+        onCompositionstart: () => {
+          isComposing.value = true
+        },
+        onCompositionend: (event: Event) => {
+          isComposing.value = false
+          const target = event.target as HTMLInputElement
+          applyValue(target.value, target.selectionStart ?? target.value.length)
+        },
+        onFocus: (event: FocusEvent) => emit('focus', event),
+        onBlur: (event: FocusEvent) => {
+          formItemControl?.onBlur()
+          emit('blur', event)
+        }
       })
 
-      const children: ReturnType<typeof h>[] = [
-        h('input', {
-          ...restAttrs,
-          ref: inputRef,
-          class: inputClasses,
-          type: 'text',
-          value: maskedValue.value,
-          placeholder: props.placeholder,
-          disabled: props.disabled,
-          readonly: props.readonly,
-          id: props.id,
-          autocomplete: props.autoComplete,
-          autofocus: props.autoFocus,
-          ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
-          ...(activeError ? { 'aria-describedby': errorMsgId } : {}),
-          onInput: handleInput,
-          onPaste: handlePaste,
-          onCompositionstart: handleCompositionStart,
-          onCompositionend: handleCompositionEnd,
-          onFocus: handleFocus,
-          onBlur: handleBlur
-        })
-      ]
+      const chrome = h(
+        'div',
+        {
+          ref: chromeRef,
+          class: classNames(
+            getInputWrapperClasses(status.value, { inGroup: inGroup.value && !hasExtras }),
+            !hasExtras ? props.className : undefined,
+            !hasExtras ? coerceClassValue(attrClass) : undefined
+          ),
+          style: !hasExtras ? mergeStyleValues(props.style, attrStyle) : undefined,
+          [TIGER_CHROME_ATTR]: '',
+          onAnimationend: () => chromeRef.value?.classList.remove(SHAKE_CLASS)
+        },
+        [
+          field,
+          effectiveName.value
+            ? h('input', {
+                type: 'hidden',
+                name: effectiveName.value,
+                value: rawValue.value,
+                disabled: effectiveDisabled.value
+              })
+            : null,
+          showClear
+            ? h(
+                'button',
+                {
+                  type: 'button',
+                  class: getInputClearButtonClasses(effectiveSize.value),
+                  onMousedown: (event: Event) => event.preventDefault(),
+                  onClick: handleClear,
+                  'aria-label': labels.value.clearAriaLabel,
+                  tabindex: -1
+                },
+                [
+                  h(Icon, {
+                    name: 'close',
+                    size: 'sm',
+                    'aria-hidden': true
+                  })
+                ]
+              )
+            : null
+        ]
+      )
 
-      if (props.name) {
-        children.push(
-          h('input', {
-            key: 'hidden',
-            type: 'hidden',
-            name: props.name,
-            value: rawValue.value
-          })
-        )
-      }
-
-      if (activeError) {
-        children.push(
-          h(
-            'div',
-            { id: errorMsgId, class: getInputErrorClasses(props.size), 'aria-live': 'polite' },
-            effectiveErrorMessage.value
-          )
-        )
-      } else if (showClear) {
-        children.push(
-          h(
-            'button',
-            {
-              type: 'button',
-              class: getInputClearButtonClasses(props.size),
-              onClick: handleClear,
-              'aria-label': 'Clear input',
-              tabindex: -1
-            },
-            '✕'
-          )
-        )
-      }
+      if (!hasExtras) return chrome
 
       return h(
         'div',
         {
-          ref: wrapperRef,
-          class: classNames(getInputWrapperClasses(), props.className, coerceClassValue(attrClass)),
-          style: mergeStyleValues(props.style, attrStyle as Record<string, unknown> | undefined)
+          class: classNames(
+            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+            props.className,
+            coerceClassValue(attrClass)
+          ),
+          style: mergeStyleValues(props.style, attrStyle)
         },
-        children
+        [
+          chrome,
+          activeError
+            ? h(
+                'div',
+                {
+                  id: errorMsgId,
+                  class: getInputErrorClasses(effectiveSize.value),
+                  'aria-live': 'polite'
+                },
+                props.errorMessage
+              )
+            : null
+        ]
       )
     }
   }

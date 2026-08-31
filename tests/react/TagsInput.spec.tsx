@@ -136,5 +136,30 @@ describe('TagsInput', () => {
       )
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('keeps tag close buttons out of the tab order', () => {
+      const { getByRole, container } = render(
+        <TagsInput defaultValue={['vue', 'react']} aria-label="Tags" />
+      )
+      expect(getByRole('textbox').tabIndex).not.toBe(-1)
+      const closes = Array.from(container.querySelectorAll('button'))
+      expect(closes.length).toBeGreaterThan(0)
+      expect(closes.every((button) => button.tabIndex === -1)).toBe(true)
+    })
+  })
+
+  describe('Rejected pending', () => {
+    it('keeps the pending text when a duplicate is committed with a delimiter', async () => {
+      const user = userEvent.setup()
+      const onAdd = vi.fn()
+      const { getByRole } = render(
+        <TagsInput defaultValue={['dup']} onAdd={onAdd} aria-label="Tags" />
+      )
+      const input = getByRole('textbox') as HTMLInputElement
+      await user.click(input)
+      await user.keyboard('dup,')
+      expect(input.value).toBe('dup')
+      expect(onAdd).not.toHaveBeenCalled()
+    })
   })
 })

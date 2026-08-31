@@ -6,7 +6,9 @@ import {
   extractRawValue,
   formatMaskValue,
   getMaskCaretPosition,
-  parseMask
+  getMaskInputMode,
+  parseMask,
+  shouldEmitMaskComplete
 } from '@expcat/tigercat-core'
 
 const DATE_SPEC = parseMask('##/##/####')
@@ -76,6 +78,20 @@ describe('mask-input-utils', () => {
       })
     })
 
+    it('accepts consecutive digits when the token pattern has a global flag', () => {
+      const spec = parseMask('XX', { X: { pattern: /[0-9]/g } })
+      expect(formatMaskValue('12', spec)).toEqual({
+        rawValue: '12',
+        maskedValue: '12',
+        completed: true
+      })
+    })
+
+    it('truncates multi-character transforms to one character', () => {
+      const spec = parseMask('X', { X: { pattern: /[A-Z]/, transform: () => 'AX' } })
+      expect(formatMaskValue('b', spec).rawValue).toBe('A')
+    })
+
     it('reports completion only when every token slot is filled', () => {
       expect(formatMaskValue('1234567', DATE_SPEC).completed).toBe(false)
       expect(formatMaskValue('12345678', DATE_SPEC).completed).toBe(true)
@@ -142,6 +158,13 @@ describe('mask-input-utils', () => {
       expect(result.maskedValue).toBe('(555) 123-4567')
       expect(result.completed).toBe(true)
       expect(result.caret).toBe(14)
+    })
+
+    it('emits complete only on the rising edge', () => {
+      expect(shouldEmitMaskComplete(false, true)).toBe(true)
+      expect(shouldEmitMaskComplete(true, true)).toBe(false)
+      expect(getMaskInputMode('##/##/####', DATE_SPEC)).toBe('numeric')
+      expect(getMaskInputMode('(###) ###-####', PHONE_SPEC)).toBe('tel')
     })
 
     it('deletes through a trailing fixed character instead of bouncing back', () => {

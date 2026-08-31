@@ -48,6 +48,12 @@ export interface TagProps {
   closeAriaLabel?: string
 
   /**
+   * Tab index for the close button. TagsInput uses `-1` so the field is one
+   * Tab stop and keyboard removal goes through Backspace.
+   */
+  closeTabIndex?: number
+
+  /**
    * When `false`, the tag is not rendered. Omitted / `true` keeps it visible.
    * Closing never hides internally — the parent unmounts or sets `visible={false}`.
    */

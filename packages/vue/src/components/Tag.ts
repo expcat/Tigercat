@@ -29,6 +29,7 @@ export interface VueTagProps {
   size?: TagSize
   closable?: boolean
   closeAriaLabel?: string
+  closeTabIndex?: number
   visible?: boolean
   pill?: boolean
   className?: string
@@ -96,6 +97,10 @@ export const Tag = defineComponent({
      */
     closeAriaLabel: {
       type: String,
+      default: undefined
+    },
+    closeTabIndex: {
+      type: Number,
       default: undefined
     },
 
@@ -186,6 +191,7 @@ export const Tag = defineComponent({
                   class: closeButtonClasses.value,
                   onClick: handleClose,
                   'aria-label': props.closeAriaLabel ?? labels.value.tagCloseAriaLabel,
+                  tabindex: props.closeTabIndex,
                   type: 'button'
                 },
                 CloseIcon()

@@ -1,24 +1,31 @@
-import React, { useEffect, useId, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useId, useRef, useState } from 'react'
 import {
-  addTags,
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
   classNames,
+  commitTagCandidates,
   extractTagCandidates,
   formatRemoveTagLabel,
+  getTagsArrowDelta,
   getTagsInputClearButtonClasses,
   getTagsInputContainerClasses,
   getTagsInputErrorClasses,
   getTagsInputHighlightClasses,
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
-  injectShakeStyle,
+  mergeAriaDescribedBy,
+  moveTagsHighlight,
   removeTagAt,
-  SHAKE_CLASS,
-  splitTagInput,
+  resolveReadOnlyFlag,
+  resolveTagsPasteCandidates,
+  runShakeAnimation,
   type TagsInputProps as CoreTagsInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './ConfigProvider'
 import { useFormItemControlContext } from './FormItemContext'
+import { useInputGroupContext } from './InputGroup'
+import { Icon } from './Icon'
 import { Tag } from './Tag'
 
 export interface TagsInputProps
@@ -28,134 +35,125 @@ export interface TagsInputProps
       React.HTMLAttributes<HTMLDivElement>,
       'onChange' | 'defaultValue' | 'id' | 'onFocus' | 'onBlur'
     > {
-  /**
-   * Additional CSS classes
-   */
   className?: string
-
-  /**
-   * Internal shake trigger counter (used by FormItem)
-   * @internal
-   */
+  /** @internal */
   _shakeTrigger?: number
-
-  /**
-   * Change event handler, called with the full tag list
-   */
   onChange?: (value: string[]) => void
-
-  /**
-   * Called when a tag is added
-   */
   onAdd?: (tag: string) => void
-
-  /**
-   * Called when a tag is removed
-   */
   onRemove?: (tag: string, index: number) => void
-
-  /**
-   * Called when all tags are cleared
-   */
   onClear?: () => void
-
-  /**
-   * Focus event handler for the inner input
-   */
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
-
-  /**
-   * Blur event handler for the inner input
-   */
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
+  readOnly?: boolean
 }
 
-export const TagsInput: React.FC<TagsInputProps> = ({
-  size = 'md',
-  status: statusProp,
-  errorMessage: errorMessageProp,
-  _shakeTrigger: shakeTriggerProp,
-  value,
-  defaultValue,
-  placeholder = '',
-  allowDuplicates = false,
-  max,
-  delimiters = [','],
-  addOnBlur = false,
-  beforeAdd,
-  clearable = false,
-  disabled = false,
-  readonly = false,
-  name,
-  id,
-  removeTagAriaLabel,
-  onChange,
-  onAdd,
-  onRemove,
-  onClear,
-  onFocus,
-  onBlur,
-  className,
-  style,
-  ...rest
-}) => {
-  injectShakeStyle()
+export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function TagsInput(
+  {
+    size,
+    status: statusProp,
+    errorMessage: errorMessageProp,
+    _shakeTrigger: shakeTriggerProp,
+    value,
+    defaultValue,
+    placeholder = '',
+    allowDuplicates = false,
+    max,
+    delimiters = [','],
+    addOnBlur = false,
+    beforeAdd,
+    clearable = false,
+    disabled = false,
+    readonly: readonlyProp,
+    readOnly: readOnlyProp,
+    name,
+    id,
+    removeTagAriaLabel,
+    onChange,
+    onAdd,
+    onRemove,
+    onClear,
+    onFocus,
+    onBlur,
+    onClick,
+    className,
+    style,
+    ...rest
+  },
+  ref
+) {
   const config = useTigerConfig()
+  const inputGroup = useInputGroupContext()
   const formItemControl = useFormItemControlContext()
+  const inGroup = inputGroup != null
+  const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const status = statusProp ?? formItemControl?.status ?? 'default'
-  const errorMessage = errorMessageProp ?? formItemControl?.errorMessage
+  const errorMessage = errorMessageProp
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
-
+  const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+  const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const formBoundValue = formItemControl?.value
+  const resolvedValue =
+    value !== undefined ? value : Array.isArray(formBoundValue) ? formBoundValue : undefined
+  const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
   const labels = getTagsInputLabels(config.locale)
   const reactId = useId()
   const errorMsgId = `tiger-tags-input-error-${reactId}`
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const mountedRef = useRef(false)
+  const setInputRefs = (node: HTMLInputElement | null) => {
+    inputRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node
+  }
+
   const [tags, setTags] = useControlledState<string[]>({
-    value,
+    value: resolvedValue,
     defaultValue: defaultValue ?? [],
-    onChange
+    onChange: (next) => {
+      onChange?.(next)
+      formItemControl?.onChange?.(next)
+    }
   })
   const [inputText, setInputText] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
 
   useEffect(() => {
-    if (status === 'error' && containerRef.current) {
-      const el = containerRef.current
-      el.classList.remove(SHAKE_CLASS)
-      void el.offsetWidth // force reflow to restart animation
-      el.classList.add(SHAKE_CLASS)
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
     }
+    if (status === 'error') runShakeAnimation(containerRef.current)
   }, [status, shakeTrigger])
 
-  const isInteractive = !disabled && !readonly
+  const isInteractive = !effectiveDisabled && !isReadOnly
 
-  const commitCandidates = (candidates: string[]) => {
-    const prepared: string[] = []
-    for (const raw of candidates) {
-      if (!beforeAdd) {
-        prepared.push(raw)
-        continue
-      }
-      const result = beforeAdd(raw.trim())
-      if (result === false) continue
-      prepared.push(typeof result === 'string' ? result : raw)
+  const commitCandidates = (candidates: string[], pendingFallback?: string) => {
+    const result = commitTagCandidates(tags, candidates, {
+      allowDuplicates,
+      max,
+      beforeAdd,
+      pendingFallback
+    })
+    if (result.added.length > 0) {
+      setTags(result.tags)
+      result.added.forEach((tag) => onAdd?.(tag))
     }
-    if (prepared.length === 0) return { added: [] as string[] }
-    const { tags: nextTags, added } = addTags(tags, prepared, { allowDuplicates, max })
-    if (added.length > 0) {
-      setTags(nextTags)
-      added.forEach((tag) => onAdd?.(tag))
-    }
-    return { added }
+    return result
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isInteractive) return
     setHighlightedIndex(null)
     const { candidates, pending } = extractTagCandidates(event.currentTarget.value, delimiters)
-    if (candidates.length > 0) commitCandidates(candidates)
+    if (candidates.length > 0) {
+      const result = commitCandidates(candidates, pending || candidates.at(-1))
+      setInputText(result.added.length > 0 ? pending : result.pending || pending)
+      return
+    }
     setInputText(pending)
   }
 
@@ -169,11 +167,11 @@ export const TagsInput: React.FC<TagsInputProps> = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isInteractive) return
     if (event.key === 'Enter') {
+      if (!inputText.trim()) return
       event.preventDefault()
-      if (inputText.trim()) {
-        const { added } = commitCandidates([inputText])
-        if (added.length > 0) setInputText('')
-      }
+      const result = commitCandidates([inputText], inputText)
+      if (result.added.length > 0) setInputText('')
+      else setInputText(result.pending)
       return
     }
     if (event.key === 'Backspace' && inputText === '') {
@@ -185,44 +183,44 @@ export const TagsInput: React.FC<TagsInputProps> = ({
       }
       return
     }
-    if (event.key === 'ArrowLeft' && inputText === '' && tags.length > 0) {
-      setHighlightedIndex((prev) => {
-        if (prev === null) return tags.length - 1
-        return Math.max(0, prev - 1)
-      })
+    if (event.key === 'Delete' && highlightedIndex !== null) {
+      removeAt(highlightedIndex)
+      setHighlightedIndex(null)
       return
     }
-    if (event.key === 'ArrowRight' && highlightedIndex !== null) {
-      setHighlightedIndex((prev) => {
-        if (prev === null || prev >= tags.length - 1) return null
-        return prev + 1
-      })
+    const delta = getTagsArrowDelta(event.key, dir)
+    if (delta !== null && inputText === '' && (tags.length > 0 || highlightedIndex !== null)) {
+      setHighlightedIndex((prev) => moveTagsHighlight(prev, tags.length, delta))
       return
     }
     if (event.key === 'Escape' && highlightedIndex !== null) {
       setHighlightedIndex(null)
       return
     }
-    // Any other key returns focus to text editing
     if (highlightedIndex !== null) setHighlightedIndex(null)
   }
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     if (!isInteractive) return
     const text = event.clipboardData.getData('text')
-    const candidates = splitTagInput(text, delimiters)
-    if (candidates.length <= 1) return // let the browser insert a single value normally
+    const candidates = resolveTagsPasteCandidates(inputText, text, delimiters)
+    if (candidates.length <= 1) return
     event.preventDefault()
-    commitCandidates(candidates)
-    setInputText('')
+    const result = commitCandidates(candidates, inputText)
+    setInputText(result.added.length > 0 ? '' : result.pending)
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const next = event.relatedTarget as Node | null
+    if (containerRef.current && next && containerRef.current.contains(next)) {
+      return
+    }
     setHighlightedIndex(null)
     if (addOnBlur && inputText.trim() && isInteractive) {
-      const { added } = commitCandidates([inputText])
-      if (added.length > 0) setInputText('')
+      const result = commitCandidates([inputText], inputText)
+      if (result.added.length > 0) setInputText('')
     }
+    formItemControl?.onBlur?.()
     onBlur?.(event)
   }
 
@@ -235,48 +233,80 @@ export const TagsInput: React.FC<TagsInputProps> = ({
     inputRef.current?.focus()
   }
 
-  const focusInput = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.target === containerRef.current) inputRef.current?.focus()
+  const focusInput = () => inputRef.current?.focus()
+
+  const handleContainerClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    onClick?.(event)
+    if (event.defaultPrevented) return
+    if (!(event.target instanceof HTMLButtonElement)) focusInput()
+  }
+
+  const handleClose = (index: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    removeAt(index)
+    focusInput()
   }
 
   const activeError = status === 'error' && !!errorMessage
+  const hasExtras = activeError
   const isFull = max !== undefined && tags.length >= max
   const removeLabelTemplate = removeTagAriaLabel ?? labels.removeTagLabel
+  const labelledby =
+    typeof rest['aria-labelledby'] === 'string' && rest['aria-labelledby'].trim()
+      ? rest['aria-labelledby']
+      : formItemControl?.labelId
+  const describedBy = mergeAriaDescribedBy(
+    mergeAriaDescribedBy(
+      typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
+      activeError ? errorMsgId : undefined
+    ),
+    formItemControl?.describedBy
+  )
 
   const containerNode = (
     <div
       {...rest}
       ref={containerRef}
-      id={id}
-      className={classNames(getTagsInputContainerClasses(size, status, { disabled }), className)}
-      style={style}
+      className={classNames(
+        getTagsInputContainerClasses(effectiveSize, status, {
+          disabled: effectiveDisabled,
+          inGroup: inGroup && !hasExtras
+        }),
+        !hasExtras ? className : undefined
+      )}
+      style={!hasExtras ? style : undefined}
       data-state={isFull ? 'full' : undefined}
-      onClick={focusInput}>
+      onClick={handleContainerClick}
+      onAnimationEnd={() => containerRef.current?.classList.remove(SHAKE_CLASS)}
+      {...{ [TIGER_CHROME_ATTR]: '' }}>
       {tags.map((tag, index) => (
         <Tag
           key={`${tag}-${index}`}
-          size={size === 'lg' ? 'md' : 'sm'}
+          size={effectiveSize === 'lg' ? 'md' : 'sm'}
           closable={isInteractive}
+          closeTabIndex={-1}
           closeAriaLabel={formatRemoveTagLabel(removeLabelTemplate, tag)}
           className={index === highlightedIndex ? getTagsInputHighlightClasses() : undefined}
-          onClose={(event) => {
-            event.preventDefault()
-            removeAt(index)
-          }}>
+          aria-current={index === highlightedIndex ? 'true' : undefined}
+          onClose={(event) => handleClose(index, event)}>
           {tag}
         </Tag>
       ))}
       <input
-        ref={inputRef}
+        ref={setInputRefs}
         className={getTagsInputInnerInputClasses()}
         type="text"
         value={inputText}
         placeholder={tags.length === 0 ? placeholder : ''}
-        disabled={disabled}
-        readOnly={readonly}
-        id={id ? `${id}-input` : undefined}
-        {...(status === 'error' ? { 'aria-invalid': true as const } : {})}
-        {...(activeError ? { 'aria-describedby': errorMsgId } : {})}
+        disabled={effectiveDisabled}
+        readOnly={isReadOnly}
+        id={effectiveId}
+        aria-label={typeof rest['aria-label'] === 'string' ? rest['aria-label'] : undefined}
+        aria-labelledby={labelledby}
+        aria-invalid={status === 'error' ? true : undefined}
+        aria-required={formItemControl?.required ? true : undefined}
+        aria-describedby={describedBy}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
@@ -287,25 +317,37 @@ export const TagsInput: React.FC<TagsInputProps> = ({
         <button
           type="button"
           className={getTagsInputClearButtonClasses()}
+          onMouseDown={(event) => event.preventDefault()}
           onClick={handleClear}
           aria-label={labels.clearAllLabel}
           tabIndex={-1}>
-          ✕
+          <Icon name="close" size="sm" aria-hidden />
         </button>
       )}
-      {name && <input type="hidden" name={name} value={tags.join(',')} />}
+      {effectiveName && !effectiveDisabled
+        ? tags.map((tag, index) => (
+            <input key={`hidden-${index}`} type="hidden" name={effectiveName} value={tag} />
+          ))
+        : null}
     </div>
   )
 
-  if (!activeError) return containerNode
+  if (!hasExtras) return containerNode
   return (
-    <div>
+    <div
+      className={classNames(
+        inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+        className
+      )}
+      style={style}>
       {containerNode}
-      <div id={errorMsgId} className={getTagsInputErrorClasses()}>
+      <div id={errorMsgId} className={getTagsInputErrorClasses()} aria-live="polite">
         {errorMessage}
       </div>
     </div>
   )
-}
+})
+
+TagsInput.displayName = 'TagsInput'
 
 export default TagsInput

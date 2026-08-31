@@ -73,27 +73,103 @@ export function distributeOtpPaste(
  * from slot 0 like a paste. Values stay contiguous: typing past the filled
  * range appends at the first empty slot instead of leaving gaps.
  */
+export interface ApplyOtpCharInputOptions extends InputOTPCharOptions {
+  /**
+   * Distribute a multi-character string from slot 0 (SMS autofill / paste).
+   * When false, only the last accepted character is written at `index`.
+   */
+  distributeFromStart?: boolean
+}
+
 export function applyOtpCharInput(
   current: string,
   index: number,
   chars: string,
   length: number,
-  options: InputOTPCharOptions = {}
+  options: ApplyOtpCharInputOptions = {}
 ): InputOTPApplyResult {
   const sanitized = sanitizeOtpInput(chars, options)
   if (!sanitized) return { value: current, nextIndex: index }
 
-  if (sanitized.length > 1) {
+  if (sanitized.length > 1 && (options.distributeFromStart || index === 0)) {
     return distributeOtpPaste(sanitized, length, options) ?? { value: current, nextIndex: index }
   }
 
-  const effectiveIndex = Math.min(index, current.length, length - 1)
-  const value = (
-    current.slice(0, effectiveIndex) +
-    sanitized +
-    current.slice(effectiveIndex + 1)
-  ).slice(0, length)
+  const one = sanitized.slice(-1)
+  const effectiveIndex = Math.min(Math.max(index, 0), current.length, length - 1)
+  const value = (current.slice(0, effectiveIndex) + one + current.slice(effectiveIndex + 1)).slice(
+    0,
+    length
+  )
   return { value, nextIndex: Math.min(effectiveIndex + 1, length - 1) }
+}
+
+export type OtpKeyIntent =
+  | { type: 'none' }
+  | { type: 'backspace' }
+  | { type: 'delete' }
+  | { type: 'move'; delta: number }
+  | { type: 'home' }
+  | { type: 'end' }
+
+export function getOtpKeyIntent(key: string, dir: 'ltr' | 'rtl' = 'ltr'): OtpKeyIntent {
+  const inline = dir === 'rtl' ? -1 : 1
+  switch (key) {
+    case 'Backspace':
+      return { type: 'backspace' }
+    case 'Delete':
+      return { type: 'delete' }
+    case 'ArrowLeft':
+      return { type: 'move', delta: -inline }
+    case 'ArrowRight':
+      return { type: 'move', delta: inline }
+    case 'Home':
+      return { type: 'home' }
+    case 'End':
+      return { type: 'end' }
+    default:
+      return { type: 'none' }
+  }
+}
+
+/** First empty slot, or the last slot when the value is full. */
+export function getOtpFocusIndex(value: string, length: number): number {
+  if (length <= 0) return 0
+  return Math.min(value.length, length - 1)
+}
+
+export function clampOtpClickIndex(index: number, value: string, length: number): number {
+  return Math.min(Math.max(index, 0), getOtpFocusIndex(value, length))
+}
+
+export function getOtpSlotTabIndex(index: number, focusIndex: number, disabled?: boolean): number {
+  if (disabled) return -1
+  return index === focusIndex ? 0 : -1
+}
+
+export function getOtpInputMode(
+  type?: InputOTPType,
+  pattern?: RegExp
+): 'numeric' | 'text' | undefined {
+  if (pattern) {
+    const letters = sanitizeOtpInput('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', {
+      pattern
+    })
+    return letters.length > 0 ? 'text' : 'numeric'
+  }
+  return type === 'numeric' ? 'numeric' : 'text'
+}
+
+export function shouldDistributeOtpInput(
+  index: number,
+  inputType: string | undefined,
+  sanitizedLength: number
+): boolean {
+  if (sanitizedLength <= 1) return false
+  if (index === 0) return true
+  return Boolean(
+    inputType && (inputType.startsWith('insertFrom') || inputType === 'insertReplacementText')
+  )
 }
 
 /**
@@ -171,10 +247,13 @@ const OTP_SLOT_SIZE_CLASSES: Record<ComponentSize, string> = {
 
 const OTP_SLOT_STATUS_CLASSES: Record<InputStatus, string> = {
   default:
-    'border-[var(--tiger-border,#e5e7eb)] focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:border-transparent',
-  error: 'border-red-500 focus:ring-red-500 focus:border-red-500 text-red-900',
-  success: 'border-green-500 focus:ring-green-500 focus:border-green-500 text-green-900',
-  warning: 'border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-yellow-900'
+    'border-[var(--tiger-border,#e5e7eb)] focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:border-transparent',
+  error:
+    'border-[var(--tiger-error,#dc2626)] focus-visible:ring-[var(--tiger-error,#dc2626)]/40 text-[var(--tiger-error,#dc2626)]',
+  success:
+    'border-[var(--tiger-success,#16a34a)] focus-visible:ring-[var(--tiger-success,#16a34a)]/40 text-[var(--tiger-success,#16a34a)]',
+  warning:
+    'border-[var(--tiger-warning,#d97706)] focus-visible:ring-[var(--tiger-warning,#d97706)]/40 text-[var(--tiger-warning,#d97706)]'
 }
 
 export interface GetOtpSlotClassesOptions {
@@ -190,7 +269,8 @@ export function getOtpSlotClasses(
   return classNames(
     'text-center border rounded-[var(--tiger-radius-md,0.5rem)]',
     'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]',
-    'focus:outline-none focus:ring-2 transition-colors',
+    'focus:outline-none focus-visible:ring-2 tiger-motion-aware',
+    '[transition:var(--tiger-transition-base,color_150ms_ease,border-color_150ms_ease)]',
     'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)] disabled:text-[var(--tiger-text-muted,#6b7280)] disabled:cursor-not-allowed',
     OTP_SLOT_SIZE_CLASSES[size],
     OTP_SLOT_STATUS_CLASSES[status],

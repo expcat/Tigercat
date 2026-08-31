@@ -139,5 +139,11 @@ describe('InputOTP', () => {
       const { container } = render(<InputOTP length={4} ariaLabel="Verification code" />)
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('has a single Tab stop', () => {
+      const { container } = render(<InputOTP length={6} ariaLabel="Code" />)
+      const stops = getSlots(container).filter((slot) => slot.tabIndex === 0)
+      expect(stops).toHaveLength(1)
+    })
   })
 })

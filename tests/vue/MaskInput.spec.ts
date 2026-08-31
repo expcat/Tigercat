@@ -153,7 +153,7 @@ describe('MaskInput', () => {
       expect((getByRole('textbox') as HTMLInputElement).value).toBe('')
     })
 
-    it('still renders the hidden raw input when disabled', () => {
+    it('does not submit the hidden raw input when disabled', () => {
       const { getByRole, container } = render(MaskInput, {
         props: { mask: '##/##/####', modelValue: '12345678', name: 'date', disabled: true }
       })
@@ -161,7 +161,7 @@ describe('MaskInput', () => {
       const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement
       expect(hidden).toHaveAttribute('name', 'date')
       expect(hidden.value).toBe('12345678')
-      expect(hidden).not.toBeDisabled()
+      expect(hidden).toBeDisabled()
     })
 
     it('submits the raw value via FormData', () => {

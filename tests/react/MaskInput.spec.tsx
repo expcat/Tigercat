@@ -166,7 +166,7 @@ describe('MaskInput', () => {
       expect((getByRole('textbox') as HTMLInputElement).value).toBe('')
     })
 
-    it('still renders the hidden raw input when disabled', () => {
+    it('does not submit the hidden raw input when disabled', () => {
       const { getByRole, container } = render(
         <MaskInput mask="##/##/####" value="12345678" name="date" disabled />
       )
@@ -174,7 +174,21 @@ describe('MaskInput', () => {
       const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement
       expect(hidden).toHaveAttribute('name', 'date')
       expect(hidden.value).toBe('12345678')
-      expect(hidden).not.toBeDisabled()
+      expect(hidden).toBeDisabled()
+    })
+
+    it('keeps Clear when the field is in an error state', () => {
+      const { getByLabelText, getByRole } = render(
+        <MaskInput
+          mask="##/##"
+          defaultValue="12"
+          clearable
+          status="error"
+          errorMessage="Bad date"
+        />
+      )
+      expect(getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
+      expect(getByLabelText('Clear input')).toBeInTheDocument()
     })
 
     it('submits the raw value via FormData', () => {

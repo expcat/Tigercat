@@ -1,20 +1,29 @@
-import React, { useEffect, useId, useLayoutEffect, useMemo, useRef } from 'react'
+import React, { forwardRef, useEffect, useId, useLayoutEffect, useMemo, useRef } from 'react'
 import {
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
   applyMaskInput,
   classNames,
   formatMaskValue,
-  getInputClasses,
   getInputClearButtonClasses,
   getInputErrorClasses,
+  getInputFieldClasses,
+  getInputLabels,
   getInputWrapperClasses,
-  injectShakeStyle,
+  getMaskInputMode,
+  mergeAriaDescribedBy,
   parseMask,
-  SHAKE_CLASS,
+  resolveReadOnlyFlag,
+  runShakeAnimation,
+  shouldEmitMaskComplete,
   type MaskInputChangeDetail,
   type MaskInputProps as CoreMaskInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
 import { useFormItemControlContext } from './FormItemContext'
+import { useInputGroupContext } from './InputGroup'
+import { Icon } from './Icon'
 
 export interface MaskInputProps
   extends
@@ -31,102 +40,101 @@ export interface MaskInputProps
       | 'onBlur'
       | 'readOnly'
     > {
-  /**
-   * Additional CSS classes
-   */
   className?: string
-
-  /**
-   * Internal shake trigger counter (used by FormItem)
-   * @internal
-   */
+  /** @internal */
   _shakeTrigger?: number
-
-  /**
-   * Change event handler, called with the raw (unmasked) value and detail
-   */
   onChange?: (value: string, detail: MaskInputChangeDetail) => void
-
-  /**
-   * Called when every token slot is filled
-   */
   onComplete?: (value: string, maskedValue: string) => void
-
-  /**
-   * Focus event handler
-   */
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
-
-  /**
-   * Blur event handler
-   */
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
-
-  /**
-   * Clear event handler
-   */
   onClear?: () => void
+  readOnly?: boolean
 }
 
-export const MaskInput: React.FC<MaskInputProps> = ({
-  size,
-  status: statusProp,
-  errorMessage: errorMessageProp,
-  _shakeTrigger: shakeTriggerProp,
-  mask,
-  tokens,
-  value,
-  defaultValue,
-  placeholder = '',
-  disabled = false,
-  readonly = false,
-  clearable = false,
-  name,
-  id,
-  autoComplete,
-  autoFocus = false,
-  onChange,
-  onComplete,
-  onFocus,
-  onBlur,
-  onClear,
-  className,
-  style,
-  ...rest
-}) => {
-  injectShakeStyle()
+export const MaskInput = forwardRef<HTMLInputElement, MaskInputProps>(function MaskInput(
+  {
+    size,
+    status: statusProp,
+    errorMessage: errorMessageProp,
+    _shakeTrigger: shakeTriggerProp,
+    mask,
+    tokens,
+    value,
+    defaultValue,
+    placeholder = '',
+    disabled = false,
+    readonly: readonlyProp,
+    readOnly: readOnlyProp,
+    clearable = false,
+    name,
+    id,
+    autoComplete,
+    autoFocus = false,
+    onChange,
+    onComplete,
+    onFocus,
+    onBlur,
+    onClear,
+    className,
+    style,
+    type,
+    inputMode,
+    ...rest
+  },
+  ref
+) {
+  const inputGroup = useInputGroupContext()
   const formItemControl = useFormItemControlContext()
-  const effectiveSize = size ?? 'md'
+  const config = useTigerConfig()
+  const labels = useMemo(() => getInputLabels(config.locale), [config.locale])
+  const inGroup = inputGroup != null
+  const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const status = statusProp ?? formItemControl?.status ?? 'default'
-  const errorMessage = errorMessageProp ?? formItemControl?.errorMessage
+  const errorMessage = errorMessageProp
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
+  const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+  const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const formBoundValue = formItemControl?.value
+  const resolvedValue =
+    value !== undefined ? value : typeof formBoundValue === 'string' ? formBoundValue : undefined
 
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const chromeRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const isComposing = useRef(false)
   const pendingCaret = useRef<number | null>(null)
+  const mountedRef = useRef(false)
   const reactId = useId()
   const errorMsgId = `tiger-mask-input-error-${reactId}`
 
   const spec = useMemo(() => parseMask(mask, tokens), [mask, tokens])
   const [rawValue, setRawValue] = useControlledState<string, [MaskInputChangeDetail]>({
-    value,
+    value: resolvedValue,
     defaultValue: defaultValue ?? '',
-    onChange
+    onChange: (next, detail) => {
+      onChange?.(next, detail)
+      formItemControl?.onChange?.(next)
+    }
   })
   const formatted = useMemo(() => formatMaskValue(rawValue, spec), [rawValue, spec])
   const maskedValue = formatted.maskedValue
+  const resolvedInputMode = inputMode ?? getMaskInputMode(mask, spec)
+
+  const setRefs = (node: HTMLInputElement | null) => {
+    inputRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node
+  }
 
   useEffect(() => {
-    if (status === 'error' && wrapperRef.current) {
-      const el = wrapperRef.current
-      el.classList.remove(SHAKE_CLASS)
-      void el.offsetWidth // force reflow to restart animation
-      el.classList.add(SHAKE_CLASS)
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
     }
+    if (status === 'error') runShakeAnimation(chromeRef.current ?? inputRef.current)
   }, [status, shakeTrigger])
 
-  // Restore the caret after the derived value re-renders
   useLayoutEffect(() => {
     if (pendingCaret.current !== null && inputRef.current) {
       const caret = pendingCaret.current
@@ -135,34 +143,33 @@ export const MaskInput: React.FC<MaskInputProps> = ({
     }
   })
 
-  const commit = (raw: string, detail: MaskInputChangeDetail, previousMasked: string) => {
+  const commit = (raw: string, detail: MaskInputChangeDetail, wasCompleted: boolean) => {
     setRawValue(raw, detail)
-    if (detail.completed && !formatMaskValue(previousMasked, spec).completed) {
+    if (shouldEmitMaskComplete(wasCompleted, detail.completed)) {
       onComplete?.(raw, detail.maskedValue)
     }
   }
 
   const applyValue = (inputValue: string, caret: number) => {
-    const previousMasked = maskedValue
-    const result = applyMaskInput(inputValue, caret, spec, previousMasked)
-    // Keep the DOM in sync even when React skips the patch (value unchanged)
+    const wasCompleted = formatted.completed
+    const result = applyMaskInput(inputValue, caret, spec, maskedValue)
     if (inputRef.current) inputRef.current.value = result.maskedValue
     pendingCaret.current = result.caret
     commit(
       result.rawValue,
       { maskedValue: result.maskedValue, completed: result.completed },
-      previousMasked
+      wasCompleted
     )
   }
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
-    if (isComposing.current) return // defer until compositionend
+    if (isComposing.current) return
     const target = event.currentTarget
     applyValue(target.value, target.selectionStart ?? target.value.length)
   }
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
-    if (disabled || readonly) return
+    if (effectiveDisabled || isReadOnly) return
     event.preventDefault()
     const input = event.currentTarget
     const text = event.clipboardData.getData('text')
@@ -171,76 +178,113 @@ export const MaskInput: React.FC<MaskInputProps> = ({
     applyValue(input.value.slice(0, start) + text + input.value.slice(end), start + text.length)
   }
 
-  const handleCompositionStart = () => {
-    isComposing.current = true
-  }
-
-  const handleCompositionEnd = (event: React.CompositionEvent<HTMLInputElement>) => {
-    isComposing.current = false
-    const target = event.currentTarget
-    applyValue(target.value, target.selectionStart ?? target.value.length)
-  }
-
   const handleClear = () => {
     setRawValue('', { maskedValue: '', completed: false })
     onClear?.()
     inputRef.current?.focus()
   }
 
-  const hasSuffix = clearable
-  const activeError = status === 'error' && !!errorMessage
-  const showClear = clearable && !disabled && !readonly && rawValue.length > 0
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    formItemControl?.onBlur?.()
+    onBlur?.(event)
+  }
 
-  const inputClasses = getInputClasses({
-    size: effectiveSize,
-    status,
-    hasPrefix: false,
-    hasSuffix
-  })
+  const activeError = status === 'error' && !!errorMessage
+  const showClear = clearable && !effectiveDisabled && !isReadOnly && rawValue.length > 0
+  const hasExtras = activeError
+  const describedBy = mergeAriaDescribedBy(
+    mergeAriaDescribedBy(
+      typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
+      activeError ? errorMsgId : undefined
+    ),
+    formItemControl?.describedBy
+  )
+
+  const field = (
+    <input
+      {...rest}
+      ref={setRefs}
+      className={getInputFieldClasses({
+        size: effectiveSize,
+        status,
+        hasSuffix: showClear,
+        inGroup: false
+      })}
+      type={type ?? 'text'}
+      inputMode={resolvedInputMode}
+      value={maskedValue}
+      placeholder={placeholder}
+      disabled={effectiveDisabled}
+      readOnly={isReadOnly}
+      id={effectiveId}
+      autoComplete={autoComplete}
+      autoFocus={autoFocus}
+      aria-invalid={status === 'error' ? true : rest['aria-invalid']}
+      aria-required={formItemControl?.required ? true : rest['aria-required']}
+      aria-describedby={describedBy}
+      onInput={handleInput}
+      onChange={() => {}}
+      onPaste={handlePaste}
+      onCompositionStart={() => {
+        isComposing.current = true
+      }}
+      onCompositionEnd={(event) => {
+        isComposing.current = false
+        const target = event.currentTarget
+        applyValue(target.value, target.selectionStart ?? target.value.length)
+      }}
+      onFocus={onFocus}
+      onBlur={handleBlur}
+    />
+  )
+
+  const chrome = (
+    <div
+      ref={chromeRef}
+      {...{ [TIGER_CHROME_ATTR]: '' }}
+      className={classNames(
+        getInputWrapperClasses(status, { inGroup: inGroup && !hasExtras }),
+        !hasExtras ? className : undefined
+      )}
+      style={!hasExtras ? style : undefined}
+      onAnimationEnd={() => chromeRef.current?.classList.remove(SHAKE_CLASS)}>
+      {field}
+      {effectiveName ? (
+        <input type="hidden" name={effectiveName} value={rawValue} disabled={effectiveDisabled} />
+      ) : null}
+      {showClear ? (
+        <button
+          type="button"
+          className={getInputClearButtonClasses(effectiveSize)}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={handleClear}
+          aria-label={labels.clearAriaLabel}
+          tabIndex={-1}>
+          <Icon name="close" size="sm" aria-hidden />
+        </button>
+      ) : null}
+    </div>
+  )
+
+  if (!hasExtras) return chrome
 
   return (
-    <div ref={wrapperRef} className={classNames(getInputWrapperClasses(), className)} style={style}>
-      <input
-        {...rest}
-        ref={inputRef}
-        className={inputClasses}
-        type="text"
-        value={maskedValue}
-        placeholder={placeholder}
-        disabled={disabled}
-        readOnly={readonly}
-        id={id}
-        autoComplete={autoComplete}
-        autoFocus={autoFocus}
-        {...(status === 'error' ? { 'aria-invalid': true as const } : {})}
-        {...(activeError ? { 'aria-describedby': errorMsgId } : {})}
-        onInput={handleInput}
-        onChange={() => {}}
-        onPaste={handlePaste}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      />
-      {name ? <input type="hidden" name={name} value={rawValue} /> : null}
+    <div
+      className={classNames(
+        inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+        className
+      )}
+      style={style}>
+      {chrome}
       {activeError ? (
         <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
           {errorMessage}
         </div>
-      ) : (
-        showClear && (
-          <button
-            type="button"
-            className={getInputClearButtonClasses(effectiveSize)}
-            onClick={handleClear}
-            aria-label="Clear input"
-            tabIndex={-1}>
-            ✕
-          </button>
-        )
-      )}
+      ) : null}
     </div>
   )
-}
+})
+
+MaskInput.displayName = 'MaskInput'
 
 export default MaskInput

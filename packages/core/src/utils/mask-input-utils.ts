@@ -32,6 +32,14 @@ export function parseMask(mask: string, tokens?: Record<string, MaskToken>): Mas
   return spec
 }
 
+function acceptMaskChar(token: MaskToken, char: string): string | undefined {
+  const transformed = token.transform ? token.transform(char) : char
+  const candidate = transformed.length <= 1 ? transformed : transformed.slice(0, 1)
+  if (!candidate) return undefined
+  token.pattern.lastIndex = 0
+  return token.pattern.test(candidate) ? candidate : undefined
+}
+
 export function countMaskTokens(spec: MaskSpecEntry[]): number {
   let count = 0
   for (const entry of spec) {
@@ -72,9 +80,9 @@ export function formatMaskValue(raw: string, spec: MaskSpecEntry[]): MaskFormatR
     while (rawPos < chars.length) {
       const candidate = chars[rawPos]
       rawPos += 1
-      const transformed = entry.token.transform ? entry.token.transform(candidate) : candidate
-      if (entry.token.pattern.test(transformed)) {
-        accepted = transformed
+      const next = acceptMaskChar(entry.token, candidate)
+      if (next !== undefined) {
+        accepted = next
         break
       }
     }
@@ -119,9 +127,9 @@ export function extractRawValue(masked: string, spec: MaskSpecEntry[], upTo?: nu
     while (tokenIdx < spec.length && spec[tokenIdx].kind === 'fixed') tokenIdx += 1
     if (tokenIdx >= spec.length) break
     const entry = spec[tokenIdx] as Extract<MaskSpecEntry, { kind: 'token' }>
-    const transformed = entry.token.transform ? entry.token.transform(char) : char
-    if (entry.token.pattern.test(transformed)) {
-      raw += transformed
+    const next = acceptMaskChar(entry.token, char)
+    if (next !== undefined) {
+      raw += next
       specIdx = tokenIdx + 1
     }
     // Non-matching characters are dropped without advancing the spec
@@ -196,4 +204,31 @@ export function applyMaskInput(
     caret: caretPos,
     completed: result.completed
   }
+}
+
+export function shouldEmitMaskComplete(wasCompleted: boolean, nextCompleted: boolean): boolean {
+  return nextCompleted && !wasCompleted
+}
+
+/**
+ * Default `inputMode` for a mask whose tokens are all digits. Phone-like
+ * templates (`(` / `)`) use `tel`; other all-digit masks use `numeric`.
+ */
+export function getMaskInputMode(
+  mask: string,
+  spec: MaskSpecEntry[]
+): 'numeric' | 'tel' | undefined {
+  const tokens = spec.filter((entry): entry is Extract<MaskSpecEntry, { kind: 'token' }> => {
+    return entry.kind === 'token'
+  })
+  if (tokens.length === 0) return undefined
+  const allDigits = tokens.every((entry) => {
+    entry.token.pattern.lastIndex = 0
+    const digit = entry.token.pattern.test('0')
+    entry.token.pattern.lastIndex = 0
+    const letter = entry.token.pattern.test('a')
+    return digit && !letter
+  })
+  if (!allDigits) return undefined
+  return /[()]/.test(mask) ? 'tel' : 'numeric'
 }

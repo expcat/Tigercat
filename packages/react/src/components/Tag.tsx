@@ -58,6 +58,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
     size = 'md',
     closable = false,
     closeAriaLabel,
+    closeTabIndex,
     visible,
     pill = false,
     onClose,
@@ -108,6 +109,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
           className={closeButtonClasses}
           onClick={handleClose}
           aria-label={closeAriaLabel ?? labels.tagCloseAriaLabel}
+          tabIndex={closeTabIndex}
           type="button">
           <CloseIcon />
         </button>

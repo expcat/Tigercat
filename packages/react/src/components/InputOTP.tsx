@@ -1,22 +1,30 @@
-import React, { useEffect, useId, useMemo, useRef } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
+  SHAKE_CLASS,
   applyOtpBackspace,
   applyOtpCharInput,
   applyOtpDelete,
   classNames,
+  clampOtpClickIndex,
   devWarn,
   distributeOtpPaste,
   formatOtpSlotLabel,
   getInputOTPLabels,
   getOtpContainerClasses,
   getOtpErrorClasses,
+  getOtpFocusIndex,
+  getOtpInputMode,
+  getOtpKeyIntent,
   getOtpSeparatorClasses,
   getOtpSeparatorIndices,
   getOtpSlotClasses,
-  injectShakeStyle,
+  getOtpSlotTabIndex,
   isOtpComplete,
+  mergeAriaDescribedBy,
   normalizeOtpValue,
-  SHAKE_CLASS,
+  runShakeAnimation,
+  sanitizeOtpInput,
+  shouldDistributeOtpInput,
   type InputOTPProps as CoreInputOTPProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
@@ -30,87 +38,84 @@ export interface InputOTPProps
       React.HTMLAttributes<HTMLDivElement>,
       'onChange' | 'onFocus' | 'onBlur' | 'defaultValue' | 'id'
     > {
-  /**
-   * Additional CSS classes
-   */
   className?: string
-
-  /**
-   * Internal shake trigger counter (used by FormItem)
-   * @internal
-   */
+  /** @internal */
   _shakeTrigger?: number
-
-  /**
-   * Change event handler, called with the joined value
-   */
   onChange?: (value: string) => void
-
-  /**
-   * Called when every slot is filled, with the complete value
-   */
   onComplete?: (value: string) => void
-
-  /**
-   * Focus event handler (fires when focus enters the group)
-   */
-  onFocus?: (event: React.FocusEvent<HTMLDivElement>) => void
-
-  /**
-   * Blur event handler (fires when focus leaves the group)
-   */
-  onBlur?: (event: React.FocusEvent<HTMLDivElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void
 }
 
-export const InputOTP: React.FC<InputOTPProps> = ({
-  size = 'md',
-  status: statusProp,
-  errorMessage: errorMessageProp,
-  _shakeTrigger: shakeTriggerProp,
-  length = 6,
-  value,
-  defaultValue,
-  type = 'numeric',
-  pattern,
-  masked = false,
-  maskChar = '•',
-  groups,
-  separator = '-',
-  disabled = false,
-  readonly = false,
-  autoFocus = false,
-  name,
-  id,
-  ariaLabel,
-  onChange,
-  onComplete,
-  onFocus,
-  onBlur,
-  className,
-  style,
-  ...rest
-}) => {
-  injectShakeStyle()
+export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function InputOTP(
+  {
+    size = 'md',
+    status: statusProp,
+    errorMessage: errorMessageProp,
+    _shakeTrigger: shakeTriggerProp,
+    length = 6,
+    value,
+    defaultValue,
+    type = 'numeric',
+    pattern,
+    masked = false,
+    maskChar = '•',
+    groups,
+    separator = '-',
+    disabled = false,
+    readonly = false,
+    autoFocus = false,
+    name,
+    id,
+    ariaLabel,
+    onChange,
+    onComplete,
+    onFocus,
+    onBlur,
+    className,
+    style,
+    ...rest
+  },
+  ref
+) {
   const config = useTigerConfig()
   const formItemControl = useFormItemControlContext()
   const status = statusProp ?? formItemControl?.status ?? 'default'
-  const errorMessage = errorMessageProp ?? formItemControl?.errorMessage
+  const errorMessage = errorMessageProp
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
-
+  const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+  const effectiveName = name ?? formItemControl?.name
+  const formBoundValue = formItemControl?.value
+  const resolvedValue =
+    value !== undefined ? value : typeof formBoundValue === 'string' ? formBoundValue : undefined
+  const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
   const labels = getInputOTPLabels(config.locale)
   const reactId = useId()
   const errorMsgId = `tiger-input-otp-error-${reactId}`
 
   const containerRef = useRef<HTMLDivElement>(null)
   const slotRefs = useRef<Array<HTMLInputElement | null>>([])
+  const mountedRef = useRef(false)
+  const setSlotRef = (index: number) => (node: HTMLInputElement | null) => {
+    slotRefs.current[index] = node
+    if (index === 0) {
+      if (typeof ref === 'function') ref(node)
+      else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node
+    }
+  }
 
   const charOptions = useMemo(() => ({ type, pattern }), [type, pattern])
+  const inputMode = getOtpInputMode(type, pattern)
   const [rawValue, setRawValue] = useControlledState<string>({
-    value,
+    value: resolvedValue,
     defaultValue: defaultValue ?? '',
-    onChange
+    onChange: (next) => {
+      onChange?.(next)
+      formItemControl?.onChange?.(next)
+    }
   })
   const currentValue = normalizeOtpValue(rawValue, length, charOptions)
+  const [focusIndex, setFocusIndex] = useState(() => getOtpFocusIndex(currentValue, length))
 
   const separatorIndices = useMemo(() => getOtpSeparatorIndices(length, groups), [length, groups])
   if (groups && groups.length > 0 && separatorIndices.length === 0) {
@@ -118,23 +123,24 @@ export const InputOTP: React.FC<InputOTPProps> = ({
   }
 
   useEffect(() => {
-    if (status === 'error' && containerRef.current) {
-      const el = containerRef.current
-      el.classList.remove(SHAKE_CLASS)
-      void el.offsetWidth // force reflow to restart animation
-      el.classList.add(SHAKE_CLASS)
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
     }
+    if (status === 'error') runShakeAnimation(containerRef.current)
   }, [status, shakeTrigger])
 
   useEffect(() => {
     if (autoFocus) {
-      slotRefs.current[Math.min(currentValue.length, length - 1)]?.focus()
+      slotRefs.current[getOtpFocusIndex(currentValue, length)]?.focus()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- focus only on mount
   }, [])
 
   const focusSlot = (index: number) => {
-    slotRefs.current[Math.max(0, Math.min(index, length - 1))]?.focus()
+    const next = Math.max(0, Math.min(index, length - 1))
+    setFocusIndex(next)
+    slotRefs.current[next]?.focus()
   }
 
   const displayChar = (val: string, index: number): string => {
@@ -148,19 +154,16 @@ export const InputOTP: React.FC<InputOTPProps> = ({
     if (isOtpComplete(next, length)) onComplete?.(next)
   }
 
-  const isInteractive = !disabled && !readonly
+  const isInteractive = !effectiveDisabled && !readonly
 
   const handleSlotChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isInteractive) return
-    const result = applyOtpCharInput(
-      currentValue,
-      index,
-      event.currentTarget.value,
-      length,
-      charOptions
-    )
-    // Keep the DOM in sync even when the value is rejected or the parent
-    // ignores the change (React only patches on state changes)
+    const inputType = (event.nativeEvent as InputEvent).inputType
+    const sanitized = sanitizeOtpInput(event.currentTarget.value, charOptions)
+    const result = applyOtpCharInput(currentValue, index, event.currentTarget.value, length, {
+      ...charOptions,
+      distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)
+    })
     event.currentTarget.value = displayChar(result.value, index)
     emitValue(result.value)
     focusSlot(result.nextIndex)
@@ -168,35 +171,34 @@ export const InputOTP: React.FC<InputOTPProps> = ({
 
   const handleSlotKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isInteractive) return
-    switch (event.key) {
-      case 'Backspace': {
+    const intent = getOtpKeyIntent(event.key, dir)
+    switch (intent.type) {
+      case 'backspace': {
         event.preventDefault()
         const result = applyOtpBackspace(currentValue, index)
         emitValue(result.value)
         focusSlot(result.nextIndex)
         break
       }
-      case 'Delete': {
+      case 'delete': {
         event.preventDefault()
         const result = applyOtpDelete(currentValue, index)
         emitValue(result.value)
         break
       }
-      case 'ArrowLeft':
+      case 'move':
         event.preventDefault()
-        focusSlot(index - 1)
+        focusSlot(index + intent.delta)
         break
-      case 'ArrowRight':
-        event.preventDefault()
-        focusSlot(index + 1)
-        break
-      case 'Home':
+      case 'home':
         event.preventDefault()
         focusSlot(0)
         break
-      case 'End':
+      case 'end':
         event.preventDefault()
-        focusSlot(Math.min(currentValue.length, length - 1))
+        focusSlot(getOtpFocusIndex(currentValue, length))
+        break
+      default:
         break
     }
   }
@@ -210,9 +212,12 @@ export const InputOTP: React.FC<InputOTPProps> = ({
     focusSlot(result.nextIndex)
   }
 
-  const handleSlotFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    // Select the slot content so the next keystroke overwrites it
-    event.currentTarget.select()
+  const handleSlotMouseDown = (index: number, event: React.MouseEvent<HTMLInputElement>) => {
+    const next = clampOtpClickIndex(index, currentValue, length)
+    if (next !== index) {
+      event.preventDefault()
+      focusSlot(next)
+    }
   }
 
   const handleGroupFocus = (event: React.FocusEvent<HTMLDivElement>) => {
@@ -223,33 +228,51 @@ export const InputOTP: React.FC<InputOTPProps> = ({
 
   const handleGroupBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (!containerRef.current?.contains(event.relatedTarget as Node | null)) {
+      formItemControl?.onBlur?.()
       onBlur?.(event)
     }
   }
 
   const activeError = status === 'error' && !!errorMessage
-  const slotClasses = getOtpSlotClasses(size, status, { disabled, readonly })
+  const slotClasses = getOtpSlotClasses(size, status, { disabled: effectiveDisabled, readonly })
+  const labelledby =
+    typeof rest['aria-labelledby'] === 'string' && rest['aria-labelledby'].trim()
+      ? rest['aria-labelledby']
+      : formItemControl?.labelId
+  const describedBy = mergeAriaDescribedBy(
+    mergeAriaDescribedBy(
+      typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
+      activeError ? errorMsgId : undefined
+    ),
+    formItemControl?.describedBy
+  )
+  const currentTab = Math.min(Math.max(focusIndex, 0), length - 1)
 
   const slots: React.ReactNode[] = []
   for (let i = 0; i < length; i++) {
+    const isTabStop = i === currentTab
     slots.push(
       <input
         key={`slot-${i}`}
-        ref={(el) => {
-          slotRefs.current[i] = el
-        }}
+        ref={setSlotRef(i)}
         className={slotClasses}
         type="text"
-        inputMode={type === 'numeric' ? 'numeric' : undefined}
+        inputMode={inputMode}
         autoComplete={i === 0 ? 'one-time-code' : 'off'}
+        maxLength={1}
         value={displayChar(currentValue, i)}
-        disabled={disabled}
+        disabled={effectiveDisabled}
         readOnly={readonly}
+        tabIndex={getOtpSlotTabIndex(i, currentTab, effectiveDisabled)}
+        id={isTabStop ? (id ?? formItemControl?.id) : undefined}
         aria-label={formatOtpSlotLabel(labels.slotLabel, i + 1, length)}
-        {...(status === 'error' ? { 'aria-invalid': true as const } : {})}
+        aria-invalid={status === 'error' ? true : undefined}
+        aria-required={isTabStop && formItemControl?.required ? true : undefined}
+        aria-describedby={isTabStop ? describedBy : undefined}
         onChange={(event) => handleSlotChange(i, event)}
         onKeyDown={(event) => handleSlotKeyDown(i, event)}
-        onFocus={handleSlotFocus}
+        onMouseDown={(event) => handleSlotMouseDown(i, event)}
+        onFocus={(event) => event.currentTarget.select()}
       />
     )
     if (separatorIndices.includes(i) && separator) {
@@ -261,29 +284,40 @@ export const InputOTP: React.FC<InputOTPProps> = ({
     }
   }
 
+  const { onClick: restOnClick, ...groupRest } = rest
+
   return (
     <div className={classNames('inline-block', className)} style={style}>
       <div
-        {...rest}
+        {...groupRest}
         ref={containerRef}
-        id={id}
         role="group"
-        aria-label={ariaLabel ?? labels.groupLabel}
-        {...(activeError ? { 'aria-describedby': errorMsgId } : {})}
+        aria-label={labelledby ? undefined : (ariaLabel ?? labels.groupLabel)}
+        aria-labelledby={labelledby}
         className={getOtpContainerClasses(size)}
         onPaste={handlePaste}
         onFocus={handleGroupFocus}
-        onBlur={handleGroupBlur}>
+        onBlur={handleGroupBlur}
+        onClick={restOnClick}>
         {slots}
-        {name && <input type="hidden" name={name} value={currentValue} />}
+        {effectiveName && (
+          <input
+            type="hidden"
+            name={effectiveName}
+            value={currentValue}
+            disabled={effectiveDisabled}
+          />
+        )}
       </div>
       {activeError && (
-        <div id={errorMsgId} className={getOtpErrorClasses()}>
+        <div id={errorMsgId} className={getOtpErrorClasses()} aria-live="polite">
           {errorMessage}
         </div>
       )}
     </div>
   )
-}
+})
+
+InputOTP.displayName = 'InputOTP'
 
 export default InputOTP

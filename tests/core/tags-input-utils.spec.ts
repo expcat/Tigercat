@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   addTags,
+  commitTagCandidates,
   extractTagCandidates,
   formatRemoveTagLabel,
+  getTagsArrowDelta,
   removeTagAt,
+  resolveTagsPasteCandidates,
   splitTagInput
 } from '@expcat/tigercat-core'
 
@@ -100,5 +103,33 @@ describe('tags-input-utils', () => {
 
   it('formats remove-tag labels', () => {
     expect(formatRemoveTagLabel('Remove {tag}', 'vue')).toBe('Remove vue')
+  })
+
+  describe('commitTagCandidates', () => {
+    it('keeps pending text when a duplicate is rejected', () => {
+      expect(commitTagCandidates(['dup'], ['dup'], { pendingFallback: 'dup' })).toEqual({
+        tags: ['dup'],
+        added: [],
+        rejected: ['dup'],
+        pending: 'dup'
+      })
+    })
+
+    it('trims beforeAdd true-path candidates', () => {
+      const result = commitTagCandidates([], ['  hello  '], { beforeAdd: () => true })
+      expect(result.tags).toEqual(['hello'])
+      expect(result.added).toEqual(['hello'])
+    })
+  })
+
+  describe('paste and arrows', () => {
+    it('prepends current pending text to a multi-value paste', () => {
+      expect(resolveTagsPasteCandidates('hello', 'a,b', [','])).toEqual(['hello', 'a', 'b'])
+    })
+
+    it('mirrors arrow keys in RTL', () => {
+      expect(getTagsArrowDelta('ArrowLeft', 'ltr')).toBe(-1)
+      expect(getTagsArrowDelta('ArrowLeft', 'rtl')).toBe(1)
+    })
   })
 })

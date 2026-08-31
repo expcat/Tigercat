@@ -1,94 +1,63 @@
-import { computed, defineComponent, h, inject, ref, watch, type PropType } from 'vue'
+import { computed, defineComponent, h, inject, ref, useId, watch, type PropType } from 'vue'
 import {
-  addTags,
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
   classNames,
   coerceClassValue,
+  commitTagCandidates,
   extractTagCandidates,
   formatRemoveTagLabel,
+  getTagsArrowDelta,
   getTagsInputClearButtonClasses,
   getTagsInputContainerClasses,
   getTagsInputErrorClasses,
   getTagsInputHighlightClasses,
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
-  injectShakeStyle,
+  mergeAriaDescribedBy,
   mergeStyleValues,
+  moveTagsHighlight,
   removeTagAt,
-  SHAKE_CLASS,
-  splitTagInput,
+  resolveTagsPasteCandidates,
+  runShakeAnimation,
   type ComponentSize,
   type InputStatus
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { Icon } from './Icon'
 import { Tag } from './Tag'
 
-let tagsInputIdCounter = 0
-
 export type VueTagsInputProps = InstanceType<typeof TagsInput>['$props']
+export type TagsInputProps = VueTagsInputProps
 
 export const TagsInput = defineComponent({
   name: 'TigerTagsInput',
   inheritAttrs: false,
   props: {
-    /**
-     * Tags (for v-model)
-     */
     modelValue: { type: Array as PropType<string[]>, default: undefined },
-    /**
-     * Default tags (for uncontrolled mode)
-     */
     defaultValue: { type: Array as PropType<string[]>, default: () => [] },
-    /**
-     * Input size
-     * @default 'md'
-     */
-    size: { type: String as PropType<ComponentSize>, default: 'md' },
-    /**
-     * Validation status
-     * @default 'default'
-     */
-    status: { type: String as PropType<InputStatus>, default: 'default' },
-    /** Error message to display */
+    size: { type: String as PropType<ComponentSize>, default: undefined },
+    status: { type: String as PropType<InputStatus>, default: undefined },
     errorMessage: String,
-    /** Placeholder for the inner text input */
     placeholder: { type: String, default: '' },
-    /** Whether the same tag may be added more than once */
     allowDuplicates: Boolean,
-    /** Maximum number of tags */
     max: { type: Number, default: undefined },
-    /**
-     * Characters that commit input while typing and split pasted text
-     * @default [',']
-     */
     delimiters: { type: Array as PropType<string[]>, default: () => [','] },
-    /** Commit the pending input as a tag on blur */
     addOnBlur: Boolean,
-    /** Validate/transform a candidate tag before it is added */
     beforeAdd: {
       type: Function as PropType<(tag: string) => boolean | string>,
       default: undefined
     },
-    /** Whether to show a clear-all button */
     clearable: Boolean,
-    /** Whether the input is disabled */
     disabled: Boolean,
-    /** Whether the input is readonly */
     readonly: Boolean,
-    /** Name for the hidden input carrying the joined value */
     name: String,
-    /** Id attribute applied to the inner text input */
     id: String,
-    /** Aria-label template for tag remove buttons; supports {tag} */
     removeTagAriaLabel: String,
-    /**
-     * Internal shake trigger counter (used by FormItem)
-     * @internal
-     */
     _shakeTrigger: { type: Number, default: undefined },
-    /** Additional CSS classes */
     className: String,
-    /** Inline styles */
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   emits: {
@@ -99,99 +68,111 @@ export const TagsInput = defineComponent({
     focus: null,
     blur: null
   },
-  setup(props, { emit, attrs }) {
-    injectShakeStyle()
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
     )
-    const effectiveStatus = computed(() =>
-      props.status !== 'default' ? props.status : (formItemControl?.status.value ?? props.status)
+    const inGroup = computed(() => inputGroup != null)
+    const effectiveSize = computed(() => props.size ?? inputGroup?.size ?? 'md')
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
     )
-    const effectiveErrorMessage = computed(
-      () => props.errorMessage ?? formItemControl?.errorMessage.value
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
-    const effectiveShakeTrigger = computed(
-      () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
-    )
-
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const formValue = computed(() => formItemControl?.value.value)
+    const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const labels = computed(() => getTagsInputLabels(config.value.locale))
-    const instanceId = ++tagsInputIdCounter
-    const errorMsgId = `tiger-tags-input-error-${instanceId}`
+    const errorMsgId = `tiger-tags-input-error-${useId()}`
 
     const containerRef = ref<HTMLDivElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
-    const isControlled = computed(() => props.modelValue !== undefined)
-    const innerTags = ref<string[]>([...props.defaultValue])
-    const tags = computed(() => (isControlled.value ? (props.modelValue ?? []) : innerTags.value))
+    const localTags = ref<string[]>([...(props.defaultValue ?? [])])
+    const tags = computed(() =>
+      props.modelValue !== undefined
+        ? props.modelValue
+        : Array.isArray(formValue.value)
+          ? formValue.value
+          : localTags.value
+    )
     const inputText = ref('')
     const highlightedIndex = ref<number | null>(null)
+    const isInteractive = computed(() => !effectiveDisabled.value && !props.readonly)
 
-    watch([effectiveStatus, effectiveShakeTrigger] as const, ([newStatus]) => {
-      if (newStatus === 'error' && containerRef.value) {
-        const el = containerRef.value
-        el.classList.remove(SHAKE_CLASS)
-        void el.offsetWidth // force reflow to restart animation
-        el.classList.add(SHAKE_CLASS)
+    watch(
+      () => [props.modelValue, formValue.value] as const,
+      ([model, controlValue]) => {
+        const source =
+          model !== undefined ? model : Array.isArray(controlValue) ? controlValue : undefined
+        if (source === undefined) return
+        localTags.value = source
       }
-    })
+    )
 
-    const isInteractive = computed(() => !props.disabled && !props.readonly)
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value, props._shakeTrigger] as const,
+      (current, previous) => {
+        if (!previous) return
+        if (current[0] === 'error') runShakeAnimation(containerRef.value)
+      },
+      { flush: 'post' }
+    )
 
-    const setTags = (next: string[]) => {
-      if (!isControlled.value) innerTags.value = next
+    function setTags(next: string[]) {
+      if (props.modelValue === undefined && !Array.isArray(formValue.value)) {
+        localTags.value = next
+      }
       emit('update:modelValue', next)
+      formItemControl?.onChange(next)
     }
 
-    const commitCandidates = (candidates: string[]): string[] => {
-      const prepared: string[] = []
-      for (const raw of candidates) {
-        if (!props.beforeAdd) {
-          prepared.push(raw)
-          continue
-        }
-        const result = props.beforeAdd(raw.trim())
-        if (result === false) continue
-        prepared.push(typeof result === 'string' ? result : raw)
-      }
-      if (prepared.length === 0) return []
-      const { tags: nextTags, added } = addTags(tags.value, prepared, {
+    function commitCandidates(candidates: string[], pendingFallback?: string) {
+      const result = commitTagCandidates(tags.value, candidates, {
         allowDuplicates: props.allowDuplicates,
-        max: props.max
+        max: props.max,
+        beforeAdd: props.beforeAdd,
+        pendingFallback
       })
-      if (added.length > 0) {
-        setTags(nextTags)
-        added.forEach((tag) => emit('add', tag))
+      if (result.added.length > 0) {
+        setTags(result.tags)
+        result.added.forEach((tag) => emit('add', tag))
       }
-      return added
+      return result
     }
 
-    const removeAt = (index: number) => {
+    function removeAt(index: number) {
       const tag = tags.value[index]
       if (tag === undefined) return
       setTags(removeTagAt(tags.value, index))
       emit('remove', tag, index)
     }
 
-    const handleInput = (event: Event) => {
+    function handleInput(event: Event) {
       if (!isInteractive.value) return
       highlightedIndex.value = null
       const target = event.target as HTMLInputElement
       const { candidates, pending } = extractTagCandidates(target.value, props.delimiters)
-      if (candidates.length > 0) commitCandidates(candidates)
+      if (candidates.length > 0) {
+        const result = commitCandidates(candidates, pending || candidates.at(-1))
+        inputText.value = result.added.length > 0 ? pending : result.pending || pending
+        target.value = inputText.value
+        return
+      }
       inputText.value = pending
-      target.value = pending
     }
 
-    const handleKeydown = (event: KeyboardEvent) => {
+    function handleKeydown(event: KeyboardEvent) {
       if (!isInteractive.value) return
       if (event.key === 'Enter') {
+        if (!inputText.value.trim()) return
         event.preventDefault()
-        if (inputText.value.trim()) {
-          const added = commitCandidates([inputText.value])
-          if (added.length > 0) inputText.value = ''
-        }
+        const result = commitCandidates([inputText.value], inputText.value)
+        inputText.value = result.added.length > 0 ? '' : result.pending
         return
       }
       if (event.key === 'Backspace' && inputText.value === '') {
@@ -203,16 +184,14 @@ export const TagsInput = defineComponent({
         }
         return
       }
-      if (event.key === 'ArrowLeft' && inputText.value === '' && tags.value.length > 0) {
-        highlightedIndex.value =
-          highlightedIndex.value === null
-            ? tags.value.length - 1
-            : Math.max(0, highlightedIndex.value - 1)
+      if (event.key === 'Delete' && highlightedIndex.value !== null) {
+        removeAt(highlightedIndex.value)
+        highlightedIndex.value = null
         return
       }
-      if (event.key === 'ArrowRight' && highlightedIndex.value !== null) {
-        highlightedIndex.value =
-          highlightedIndex.value >= tags.value.length - 1 ? null : highlightedIndex.value + 1
+      const delta = getTagsArrowDelta(event.key, dir.value)
+      if (delta !== null && inputText.value === '' && tags.value.length > 0) {
+        highlightedIndex.value = moveTagsHighlight(highlightedIndex.value, tags.value.length, delta)
         return
       }
       if (event.key === 'Escape' && highlightedIndex.value !== null) {
@@ -222,29 +201,30 @@ export const TagsInput = defineComponent({
       if (highlightedIndex.value !== null) highlightedIndex.value = null
     }
 
-    const handlePaste = (event: ClipboardEvent) => {
+    function handlePaste(event: ClipboardEvent) {
       if (!isInteractive.value) return
       const text = event.clipboardData?.getData('text') ?? ''
-      const candidates = splitTagInput(text, props.delimiters)
+      const candidates = resolveTagsPasteCandidates(inputText.value, text, props.delimiters)
       if (candidates.length <= 1) return
       event.preventDefault()
-      commitCandidates(candidates)
-      inputText.value = ''
-      if (inputRef.value) inputRef.value.value = ''
+      const result = commitCandidates(candidates, inputText.value)
+      inputText.value = result.added.length > 0 ? '' : result.pending
+      if (inputRef.value) inputRef.value.value = inputText.value
     }
 
-    const handleFocus = (event: FocusEvent) => emit('focus', event)
-
-    const handleBlur = (event: FocusEvent) => {
+    function handleBlur(event: FocusEvent) {
+      const next = event.relatedTarget as Node | null
+      if (containerRef.value && next && containerRef.value.contains(next)) return
       highlightedIndex.value = null
       if (props.addOnBlur && inputText.value.trim() && isInteractive.value) {
-        const added = commitCandidates([inputText.value])
-        if (added.length > 0) inputText.value = ''
+        const result = commitCandidates([inputText.value], inputText.value)
+        if (result.added.length > 0) inputText.value = ''
       }
+      formItemControl?.onBlur()
       emit('blur', event)
     }
 
-    const handleClear = () => {
+    function handleClear() {
       if (!isInteractive.value || tags.value.length === 0) return
       setTags([])
       inputText.value = ''
@@ -253,19 +233,38 @@ export const TagsInput = defineComponent({
       inputRef.value?.focus()
     }
 
-    const handleContainerClick = (event: MouseEvent) => {
-      if (event.target === containerRef.value) inputRef.value?.focus()
+    function handleContainerClick(event: MouseEvent) {
+      if (event.target instanceof HTMLButtonElement) return
+      inputRef.value?.focus()
     }
+
+    expose({
+      focus: () => inputRef.value?.focus(),
+      input: inputRef
+    })
 
     return () => {
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
-      const activeError = effectiveStatus.value === 'error' && !!effectiveErrorMessage.value
+      const activeError = status.value === 'error' && !!props.errorMessage
+      const hasExtras = activeError
       const isFull = props.max !== undefined && tags.value.length >= props.max
       const removeLabelTemplate = props.removeTagAriaLabel ?? labels.value.removeTagLabel
-      const tagSize = props.size === 'lg' ? 'md' : 'sm'
+      const tagSize = effectiveSize.value === 'lg' ? 'md' : 'sm'
+      const labelledby =
+        typeof restAttrs['aria-labelledby'] === 'string' && restAttrs['aria-labelledby'].trim()
+          ? restAttrs['aria-labelledby']
+          : formItemControl?.labelId.value
+      const describedBy = mergeAriaDescribedBy(
+        mergeAriaDescribedBy(
+          typeof restAttrs['aria-describedby'] === 'string'
+            ? restAttrs['aria-describedby']
+            : undefined,
+          activeError ? errorMsgId : undefined
+        ),
+        formItemControl?.describedBy.value
+      )
 
       const children: ReturnType<typeof h>[] = []
-
       tags.value.forEach((tag, index) => {
         children.push(
           h(
@@ -274,11 +273,14 @@ export const TagsInput = defineComponent({
               key: `${tag}-${index}`,
               size: tagSize,
               closable: isInteractive.value,
+              closeTabIndex: -1,
               closeAriaLabel: formatRemoveTagLabel(removeLabelTemplate, tag),
               class: index === highlightedIndex.value ? getTagsInputHighlightClasses() : undefined,
+              'aria-current': index === highlightedIndex.value ? 'true' : undefined,
               onClose: (event: MouseEvent) => {
                 event.preventDefault()
                 removeAt(index)
+                inputRef.value?.focus()
               }
             },
             () => tag
@@ -294,16 +296,20 @@ export const TagsInput = defineComponent({
           type: 'text',
           value: inputText.value,
           placeholder: tags.value.length === 0 ? props.placeholder : '',
-          disabled: props.disabled,
+          disabled: effectiveDisabled.value,
           readonly: props.readonly,
-          id: props.id ? `${props.id}-input` : props.id,
-          ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
-          ...(activeError ? { 'aria-describedby': errorMsgId } : {}),
+          id: effectiveId.value,
+          'aria-label':
+            typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined,
+          'aria-labelledby': labelledby,
+          'aria-invalid': status.value === 'error' ? true : undefined,
+          'aria-required': formItemControl?.required.value ? true : undefined,
+          'aria-describedby': describedBy,
           onInput: handleInput,
           onKeydown: handleKeydown,
           onPaste: handlePaste,
-          onFocus: handleFocus,
-          onBlur: handleBlur
+          onFocus: (event: FocusEvent) => emit('focus', event),
+          onFocusout: handleBlur
         })
       )
 
@@ -315,24 +321,27 @@ export const TagsInput = defineComponent({
               key: 'clear',
               type: 'button',
               class: getTagsInputClearButtonClasses(),
+              onMousedown: (event: Event) => event.preventDefault(),
               onClick: handleClear,
               'aria-label': labels.value.clearAllLabel,
               tabindex: -1
             },
-            '✕'
+            [h(Icon, { name: 'close', size: 'sm', 'aria-hidden': true })]
           )
         )
       }
 
-      if (props.name) {
-        children.push(
-          h('input', {
-            key: 'hidden',
-            type: 'hidden',
-            name: props.name,
-            value: tags.value.join(',')
-          })
-        )
+      if (effectiveName.value && !effectiveDisabled.value) {
+        tags.value.forEach((tag, index) => {
+          children.push(
+            h('input', {
+              key: `hidden-${index}`,
+              type: 'hidden',
+              name: effectiveName.value,
+              value: tag
+            })
+          )
+        })
       }
 
       const containerNode = h(
@@ -340,26 +349,45 @@ export const TagsInput = defineComponent({
         {
           ...restAttrs,
           ref: containerRef,
-          id: props.id,
           class: classNames(
-            getTagsInputContainerClasses(props.size, effectiveStatus.value, {
-              disabled: props.disabled
+            getTagsInputContainerClasses(effectiveSize.value, status.value, {
+              disabled: effectiveDisabled.value,
+              inGroup: inGroup.value && !hasExtras
             }),
-            props.className,
-            coerceClassValue(attrClass)
+            !hasExtras ? props.className : undefined,
+            !hasExtras ? coerceClassValue(attrClass) : undefined
           ),
-          style: mergeStyleValues(props.style, attrStyle as Record<string, unknown> | undefined),
+          style: !hasExtras
+            ? mergeStyleValues(props.style, attrStyle as Record<string, unknown> | undefined)
+            : undefined,
           'data-state': isFull ? 'full' : undefined,
-          onClick: handleContainerClick
+          [TIGER_CHROME_ATTR]: '',
+          onClick: handleContainerClick,
+          onAnimationend: () => containerRef.value?.classList.remove(SHAKE_CLASS)
         },
         children
       )
 
-      if (!activeError) return containerNode
-      return h('div', {}, [
-        containerNode,
-        h('div', { id: errorMsgId, class: getTagsInputErrorClasses() }, effectiveErrorMessage.value)
-      ])
+      if (!hasExtras) return containerNode
+      return h(
+        'div',
+        {
+          class: classNames(
+            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+            props.className,
+            coerceClassValue(attrClass)
+          ),
+          style: mergeStyleValues(props.style, attrStyle as Record<string, unknown> | undefined)
+        },
+        [
+          containerNode,
+          h(
+            'div',
+            { id: errorMsgId, class: getTagsInputErrorClasses(), 'aria-live': 'polite' },
+            props.errorMessage
+          )
+        ]
+      )
     }
   }
 })

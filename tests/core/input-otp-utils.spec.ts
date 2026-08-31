@@ -70,7 +70,14 @@ describe('input-otp-utils', () => {
 
     it('distributes multi-character input (mobile autofill) from slot 0', () => {
       expect(applyOtpCharInput('', 0, '123456', 6)).toEqual({ value: '123456', nextIndex: 5 })
-      expect(applyOtpCharInput('99', 1, '123456', 6)).toEqual({ value: '123456', nextIndex: 5 })
+      expect(applyOtpCharInput('99', 1, '123456', 6, { distributeFromStart: true })).toEqual({
+        value: '123456',
+        nextIndex: 5
+      })
+    })
+
+    it('replaces the current slot when a second character is typed without select', () => {
+      expect(applyOtpCharInput('123456', 2, '39', 6)).toEqual({ value: '129456', nextIndex: 3 })
     })
   })
 

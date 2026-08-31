@@ -1,9 +1,21 @@
-import { computed, defineComponent, h, inject, onMounted, ref, watch, type PropType } from 'vue'
 import {
+  computed,
+  defineComponent,
+  h,
+  inject,
+  onMounted,
+  ref,
+  useId,
+  watch,
+  type PropType
+} from 'vue'
+import {
+  SHAKE_CLASS,
   applyOtpBackspace,
   applyOtpCharInput,
   applyOtpDelete,
   classNames,
+  clampOtpClickIndex,
   coerceClassValue,
   devWarn,
   distributeOtpPaste,
@@ -11,14 +23,20 @@ import {
   getInputOTPLabels,
   getOtpContainerClasses,
   getOtpErrorClasses,
+  getOtpFocusIndex,
+  getOtpInputMode,
+  getOtpKeyIntent,
   getOtpSeparatorClasses,
   getOtpSeparatorIndices,
   getOtpSlotClasses,
-  injectShakeStyle,
+  getOtpSlotTabIndex,
   isOtpComplete,
+  mergeAriaDescribedBy,
   mergeStyleValues,
   normalizeOtpValue,
-  SHAKE_CLASS,
+  runShakeAnimation,
+  sanitizeOtpInput,
+  shouldDistributeOtpInput,
   type ComponentSize,
   type InputOTPType,
   type InputStatus
@@ -26,88 +44,33 @@ import {
 import { useTigerConfig } from './ConfigProvider'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
-let inputOtpIdCounter = 0
-
 export type VueInputOTPProps = InstanceType<typeof InputOTP>['$props']
+export type InputOTPProps = VueInputOTPProps
 
 export const InputOTP = defineComponent({
   name: 'TigerInputOTP',
   inheritAttrs: false,
   props: {
-    /**
-     * Value (for v-model) — the joined characters
-     */
     modelValue: { type: String, default: undefined },
-    /**
-     * Default value (for uncontrolled mode)
-     */
     defaultValue: { type: String, default: '' },
-    /**
-     * Input size
-     * @default 'md'
-     */
     size: { type: String as PropType<ComponentSize>, default: 'md' },
-    /**
-     * Validation status
-     * @default 'default'
-     */
-    status: { type: String as PropType<InputStatus>, default: 'default' },
-    /**
-     * Error message to display
-     */
+    status: { type: String as PropType<InputStatus>, default: undefined },
     errorMessage: String,
-    /**
-     * Number of character slots
-     * @default 6
-     */
     length: { type: Number, default: 6 },
-    /**
-     * Allowed character set
-     * @default 'numeric'
-     */
     type: { type: String as PropType<InputOTPType>, default: 'numeric' },
-    /**
-     * Per-character validation regex; overrides `type` filtering
-     */
     pattern: { type: RegExp as PropType<RegExp>, default: undefined },
-    /**
-     * Hide entered characters (renders maskChar instead)
-     */
     masked: Boolean,
-    /**
-     * Character shown per filled slot when masked
-     * @default '•'
-     */
     maskChar: { type: String, default: '•' },
-    /**
-     * Visual slot grouping, e.g. [3, 3]
-     */
     groups: { type: Array as PropType<number[]>, default: undefined },
-    /**
-     * Separator rendered between groups
-     * @default '-'
-     */
     separator: { type: String, default: '-' },
-    /** Whether the input is disabled */
     disabled: Boolean,
-    /** Whether the input is readonly */
     readonly: Boolean,
-    /** Whether to autofocus the first empty slot on mount */
     autoFocus: Boolean,
-    /** Name for the hidden input carrying the joined value */
     name: String,
-    /** Id attribute applied to the group element */
     id: String,
-    /** Accessible label for the slot group */
     ariaLabel: String,
-    /**
-     * Internal shake trigger counter (used by FormItem)
-     * @internal
-     */
     _shakeTrigger: { type: Number, default: undefined },
-    /** Additional CSS classes */
     className: String,
-    /** Inline styles */
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   emits: {
@@ -116,40 +79,47 @@ export const InputOTP = defineComponent({
     focus: null,
     blur: null
   },
-  setup(props, { emit, attrs }) {
-    injectShakeStyle()
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
     )
-    const effectiveStatus = computed(() =>
-      props.status !== 'default' ? props.status : (formItemControl?.status.value ?? props.status)
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
     )
-    const effectiveErrorMessage = computed(
-      () => props.errorMessage ?? formItemControl?.errorMessage.value
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
-    const effectiveShakeTrigger = computed(
-      () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
-    )
-
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const formValue = computed(() => formItemControl?.value.value)
+    const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const labels = computed(() => getInputOTPLabels(config.value.locale))
-    const instanceId = ++inputOtpIdCounter
-    const errorMsgId = `tiger-input-otp-error-${instanceId}`
+    const errorMsgId = `tiger-input-otp-error-${useId()}`
 
     const containerRef = ref<HTMLDivElement | null>(null)
     const slotRefs = ref<Array<HTMLInputElement | null>>([])
-
     const charOptions = computed(() => ({ type: props.type, pattern: props.pattern }))
-    const isControlled = computed(() => props.modelValue !== undefined)
-    const innerValue = ref(props.defaultValue ?? '')
+    const inputMode = computed(() => getOtpInputMode(props.type, props.pattern))
+
+    const localValue = ref(
+      props.modelValue ??
+        (typeof formValue.value === 'string' ? formValue.value : undefined) ??
+        props.defaultValue ??
+        ''
+    )
     const currentValue = computed(() =>
       normalizeOtpValue(
-        isControlled.value ? (props.modelValue ?? '') : innerValue.value,
+        props.modelValue !== undefined
+          ? props.modelValue
+          : typeof formValue.value === 'string'
+            ? formValue.value
+            : localValue.value,
         props.length,
         charOptions.value
       )
     )
+    const focusIndex = ref(getOtpFocusIndex(currentValue.value, props.length))
 
     const separatorIndices = computed(() => {
       const indices = getOtpSeparatorIndices(props.length, props.groups)
@@ -159,126 +129,148 @@ export const InputOTP = defineComponent({
       return indices
     })
 
-    watch([effectiveStatus, effectiveShakeTrigger] as const, ([newStatus]) => {
-      if (newStatus === 'error' && containerRef.value) {
-        const el = containerRef.value
-        el.classList.remove(SHAKE_CLASS)
-        void el.offsetWidth // force reflow to restart animation
-        el.classList.add(SHAKE_CLASS)
+    watch(
+      () => [props.modelValue, formValue.value] as const,
+      ([model, controlValue]) => {
+        const source =
+          model !== undefined ? model : typeof controlValue === 'string' ? controlValue : undefined
+        if (source === undefined) return
+        if (source !== localValue.value) localValue.value = source
       }
-    })
+    )
 
-    const focusSlot = (index: number) => {
-      slotRefs.value[Math.max(0, Math.min(index, props.length - 1))]?.focus()
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value, props._shakeTrigger] as const,
+      (current, previous) => {
+        if (!previous) return
+        if (current[0] === 'error') runShakeAnimation(containerRef.value)
+      },
+      { flush: 'post' }
+    )
+
+    function focusSlot(index: number) {
+      const next = Math.max(0, Math.min(index, props.length - 1))
+      focusIndex.value = next
+      slotRefs.value[next]?.focus()
     }
 
     onMounted(() => {
-      if (props.autoFocus) {
-        focusSlot(Math.min(currentValue.value.length, props.length - 1))
-      }
+      if (props.autoFocus) focusSlot(getOtpFocusIndex(currentValue.value, props.length))
     })
 
-    const displayChar = (val: string, index: number): string => {
+    function displayChar(val: string, index: number): string {
       const char = val[index] ?? ''
       return char && props.masked ? props.maskChar : char
     }
 
-    const emitValue = (next: string) => {
+    function emitValue(next: string) {
       if (next === currentValue.value) return
-      if (!isControlled.value) innerValue.value = next
+      if (props.modelValue === undefined && typeof formValue.value !== 'string') {
+        localValue.value = next
+      }
       emit('update:modelValue', next)
+      formItemControl?.onChange(next)
       if (isOtpComplete(next, props.length)) emit('complete', next)
     }
 
-    const isInteractive = computed(() => !props.disabled && !props.readonly)
+    const isInteractive = computed(() => !effectiveDisabled.value && !props.readonly)
 
-    const handleSlotInput = (index: number, event: Event) => {
+    function handleSlotInput(index: number, event: Event) {
       if (!isInteractive.value) return
       const target = event.target as HTMLInputElement
-      const result = applyOtpCharInput(
-        currentValue.value,
-        index,
-        target.value,
-        props.length,
-        charOptions.value
-      )
-      // Vue only patches the DOM on state changes — sync rejected input manually
+      const inputType = (event as InputEvent).inputType
+      const sanitized = sanitizeOtpInput(target.value, charOptions.value)
+      const result = applyOtpCharInput(currentValue.value, index, target.value, props.length, {
+        ...charOptions.value,
+        distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)
+      })
       target.value = displayChar(result.value, index)
       emitValue(result.value)
       focusSlot(result.nextIndex)
     }
 
-    const handleSlotKeydown = (index: number, event: KeyboardEvent) => {
+    function handleSlotKeydown(index: number, event: KeyboardEvent) {
       if (!isInteractive.value) return
-      switch (event.key) {
-        case 'Backspace': {
+      const intent = getOtpKeyIntent(event.key, dir.value)
+      switch (intent.type) {
+        case 'backspace': {
           event.preventDefault()
           const result = applyOtpBackspace(currentValue.value, index)
           emitValue(result.value)
           focusSlot(result.nextIndex)
           break
         }
-        case 'Delete': {
+        case 'delete': {
           event.preventDefault()
           const result = applyOtpDelete(currentValue.value, index)
           emitValue(result.value)
           break
         }
-        case 'ArrowLeft':
+        case 'move':
           event.preventDefault()
-          focusSlot(index - 1)
+          focusSlot(index + intent.delta)
           break
-        case 'ArrowRight':
-          event.preventDefault()
-          focusSlot(index + 1)
-          break
-        case 'Home':
+        case 'home':
           event.preventDefault()
           focusSlot(0)
           break
-        case 'End':
+        case 'end':
           event.preventDefault()
-          focusSlot(Math.min(currentValue.value.length, props.length - 1))
+          focusSlot(getOtpFocusIndex(currentValue.value, props.length))
+          break
+        default:
           break
       }
     }
 
-    const handlePaste = (event: ClipboardEvent) => {
+    function handlePaste(event: ClipboardEvent) {
       if (!isInteractive.value) return
       event.preventDefault()
-      const text = event.clipboardData?.getData('text') ?? ''
-      const result = distributeOtpPaste(text, props.length, charOptions.value)
+      const result = distributeOtpPaste(
+        event.clipboardData?.getData('text') ?? '',
+        props.length,
+        charOptions.value
+      )
       if (!result) return
       emitValue(result.value)
       focusSlot(result.nextIndex)
     }
 
-    const handleSlotFocus = (event: FocusEvent) => {
-      // Select the slot content so the next keystroke overwrites it
-      ;(event.target as HTMLInputElement).select()
+    function containsNode(node: EventTarget | null) {
+      return node instanceof Node && !!containerRef.value?.contains(node)
     }
 
-    const containsNode = (node: EventTarget | null) =>
-      node instanceof Node && !!containerRef.value?.contains(node)
-
-    const handleGroupFocusin = (event: FocusEvent) => {
-      if (!containsNode(event.relatedTarget)) emit('focus', event)
-    }
-
-    const handleGroupFocusout = (event: FocusEvent) => {
-      if (!containsNode(event.relatedTarget)) emit('blur', event)
-    }
+    expose({
+      focus: () => focusSlot(getOtpFocusIndex(currentValue.value, props.length)),
+      input: computed(() => slotRefs.value[0] ?? null)
+    })
 
     return () => {
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
-      const activeError = effectiveStatus.value === 'error' && !!effectiveErrorMessage.value
-      const slotClasses = getOtpSlotClasses(props.size, effectiveStatus.value, {
-        disabled: props.disabled,
+      const activeError = status.value === 'error' && !!props.errorMessage
+      const slotClasses = getOtpSlotClasses(props.size, status.value, {
+        disabled: effectiveDisabled.value,
         readonly: props.readonly
       })
+      const labelledby =
+        typeof restAttrs['aria-labelledby'] === 'string' && restAttrs['aria-labelledby'].trim()
+          ? restAttrs['aria-labelledby']
+          : formItemControl?.labelId.value
+      const describedBy = mergeAriaDescribedBy(
+        mergeAriaDescribedBy(
+          typeof restAttrs['aria-describedby'] === 'string'
+            ? restAttrs['aria-describedby']
+            : undefined,
+          activeError ? errorMsgId : undefined
+        ),
+        formItemControl?.describedBy.value
+      )
+      const currentTab = Math.min(Math.max(focusIndex.value, 0), props.length - 1)
+      const fieldId = props.id ?? formItemControl?.id.value
 
       const children: ReturnType<typeof h>[] = []
       for (let i = 0; i < props.length; i++) {
+        const isTabStop = i === currentTab
         children.push(
           h('input', {
             key: `slot-${i}`,
@@ -287,16 +279,28 @@ export const InputOTP = defineComponent({
             },
             class: slotClasses,
             type: 'text',
-            inputmode: props.type === 'numeric' ? 'numeric' : undefined,
+            inputmode: inputMode.value,
             autocomplete: i === 0 ? 'one-time-code' : 'off',
+            maxlength: 1,
             value: displayChar(currentValue.value, i),
-            disabled: props.disabled,
+            disabled: effectiveDisabled.value,
             readonly: props.readonly,
+            tabindex: getOtpSlotTabIndex(i, currentTab, effectiveDisabled.value),
+            id: isTabStop ? fieldId : undefined,
             'aria-label': formatOtpSlotLabel(labels.value.slotLabel, i + 1, props.length),
-            ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
+            'aria-invalid': status.value === 'error' ? true : undefined,
+            'aria-required': isTabStop && formItemControl?.required.value ? true : undefined,
+            'aria-describedby': isTabStop ? describedBy : undefined,
             onInput: (event: Event) => handleSlotInput(i, event),
             onKeydown: (event: KeyboardEvent) => handleSlotKeydown(i, event),
-            onFocus: handleSlotFocus
+            onMousedown: (event: MouseEvent) => {
+              const next = clampOtpClickIndex(i, currentValue.value, props.length)
+              if (next !== i) {
+                event.preventDefault()
+                focusSlot(next)
+              }
+            },
+            onFocus: (event: FocusEvent) => (event.target as HTMLInputElement).select()
           })
         )
         if (separatorIndices.value.includes(i) && props.separator) {
@@ -314,9 +318,15 @@ export const InputOTP = defineComponent({
         }
       }
 
-      if (props.name) {
+      if (effectiveName.value) {
         children.push(
-          h('input', { key: 'hidden', type: 'hidden', name: props.name, value: currentValue.value })
+          h('input', {
+            key: 'hidden',
+            type: 'hidden',
+            name: effectiveName.value,
+            value: currentValue.value,
+            disabled: effectiveDisabled.value
+          })
         )
       }
 
@@ -325,14 +335,20 @@ export const InputOTP = defineComponent({
         {
           ...restAttrs,
           ref: containerRef,
-          id: props.id,
           role: 'group',
-          'aria-label': props.ariaLabel ?? labels.value.groupLabel,
-          ...(activeError ? { 'aria-describedby': errorMsgId } : {}),
+          'aria-label': labelledby ? undefined : (props.ariaLabel ?? labels.value.groupLabel),
+          'aria-labelledby': labelledby,
           class: getOtpContainerClasses(props.size),
           onPaste: handlePaste,
-          onFocusin: handleGroupFocusin,
-          onFocusout: handleGroupFocusout
+          onFocusin: (event: FocusEvent) => {
+            if (!containsNode(event.relatedTarget)) emit('focus', event)
+          },
+          onFocusout: (event: FocusEvent) => {
+            if (!containsNode(event.relatedTarget)) {
+              formItemControl?.onBlur()
+              emit('blur', event)
+            }
+          }
         },
         children
       )
@@ -340,7 +356,11 @@ export const InputOTP = defineComponent({
       const nodes: ReturnType<typeof h>[] = [groupNode]
       if (activeError) {
         nodes.push(
-          h('div', { id: errorMsgId, class: getOtpErrorClasses() }, effectiveErrorMessage.value)
+          h(
+            'div',
+            { id: errorMsgId, class: getOtpErrorClasses(), 'aria-live': 'polite' },
+            props.errorMessage
+          )
         )
       }
 
