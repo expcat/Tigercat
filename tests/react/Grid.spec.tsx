@@ -3,60 +3,95 @@
  */
 
 import React from 'react'
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { Col } from '@expcat/tigercat-react/Col'
 import { Row } from '@expcat/tigercat-react/Row'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
+function box(el: Element) {
+  return (el as HTMLElement).getBoundingClientRect()
+}
+
 describe('Grid (React)', () => {
   it('renders Row defaults and forwards div props', () => {
     render(<Row data-testid="row" />)
-
     const row = screen.getByTestId('row')
-    expect(row).toHaveClass('flex', 'w-full', 'flex-wrap', 'items-start', 'justify-start')
+    expect(row).toHaveClass('tiger-row')
+    expect(getComputedStyle(row).flexWrap).toBe('wrap')
   })
-  it('applies gutter styles to Row and Col', () => {
+
+  it('keeps a numeric gutter on the row and does not overflow the parent', () => {
+    const { container } = render(
+      <div data-testid="parent" style={{ width: 480 }}>
+        <Row data-testid="row" gutter={16}>
+          <Col data-testid="a" span={12}>
+            A
+          </Col>
+          <Col data-testid="b" span={12}>
+            B
+          </Col>
+        </Row>
+      </div>
+    )
+    const parent = screen.getByTestId('parent')
+    const row = screen.getByTestId('row')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('')
+    expect(getComputedStyle(row).columnGap).toBe('16px')
+    expect(getComputedStyle(row).rowGap).toBe('0px')
+    const parentBox = box(parent)
+    const rowBox = box(row)
+    if (parentBox.width > 0) {
+      expect(rowBox.left).toBeGreaterThanOrEqual(parentBox.left - 0.5)
+      expect(rowBox.right).toBeLessThanOrEqual(parentBox.right + 0.5)
+    }
+    expect(container.querySelector('.tiger-col')).toBeTruthy()
+  })
+
+  it('uses flex when flex is passed without span=0', () => {
+    render(<Col data-testid="col" flex="120px" />)
+    const col = screen.getByTestId('col')
+    expect(col.className).toContain('tiger-col-flex')
+    expect(col.style.getPropertyValue('--tiger-col-flex')).toBe('120px')
+    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('')
+  })
+
+  it('hides span={0} and keeps offset 0 at a larger breakpoint', () => {
+    const hidden = render(<Col data-testid="hidden" span={0} />)
+    expect(hidden.getByTestId('hidden').style.getPropertyValue('--tiger-col-display-base')).toBe(
+      'none'
+    )
+    expect(getComputedStyle(hidden.getByTestId('hidden')).display).toBe('none')
+
+    render(<Col data-testid="offset" offset={{ xs: 4, md: 0 }} />)
+    const col = screen.getByTestId('offset')
+    expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('4')
+    expect(col.style.getPropertyValue('--tiger-col-offset-md')).toBe('0')
+  })
+
+  it('order only changes visual flex order', () => {
     render(
-      <Row data-testid="row" gutter={16}>
-        <Col data-testid="col">Content</Col>
+      <Row data-testid="row">
+        <Col data-testid="first" order={2}>
+          <button>first</button>
+        </Col>
+        <Col data-testid="second" order={1}>
+          <button>second</button>
+        </Col>
       </Row>
     )
-
-    const row = screen.getByTestId('row')
-    const col = screen.getByTestId('col')
-
-    expect(row.className).toContain('mx-[calc(var(--tiger-row-gutter-x-half)*-1)]')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('8px')
-    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
-    expect(col.style.paddingLeft).toBe('')
-    expect(col.style.paddingRight).toBe('')
-  })
-  it('supports flex layout with span=0', () => {
-    render(<Col data-testid="col" span={0} flex="0_0_160px" />)
-
-    const col = screen.getByTestId('col')
-    expect(col.className).toContain('flex-[var(--tiger-col-flex)]')
-    expect(col.className).not.toContain('w-[var(--tiger-col-span)]')
-    expect(col.style.getPropertyValue('--tiger-col-flex')).toBe('0 0 160px')
-  })
-
-  it('supports order (including responsive)', () => {
-    render(<Col data-testid="col" order={{ xs: 3, md: 1 }} />)
-
-    const col = screen.getByTestId('col')
-    expect(col.className).toContain('order-[var(--tiger-col-order)]')
-    expect(col.style.getPropertyValue('--tiger-col-order')).toBe('3')
-    expect(col.style.getPropertyValue('--tiger-col-order-md')).toBe('1')
+    expect(screen.getByTestId('first').style.getPropertyValue('--tiger-col-order')).toBe('2')
+    expect(screen.getByTestId('second').style.getPropertyValue('--tiger-col-order')).toBe('1')
+    const buttons = screen.getAllByRole('button')
+    expect(buttons[0]).toHaveTextContent('first')
+    expect(buttons[1]).toHaveTextContent('second')
   })
 
   it('disables wrapping with wrap={false}', () => {
     render(<Row data-testid="row" wrap={false} />)
-
-    const row = screen.getByTestId('row')
-    expect(row).toHaveClass('flex', 'w-full')
-    expect(row).not.toHaveClass('flex-wrap')
+    expect(screen.getByTestId('row')).toHaveClass('tiger-row-nowrap')
+    expect(getComputedStyle(screen.getByTestId('row')).flexWrap).toBe('nowrap')
   })
 
   it('applies both axes with tuple gutter [horizontal, vertical]', () => {
@@ -65,34 +100,42 @@ describe('Grid (React)', () => {
         <Col data-testid="col">Content</Col>
       </Row>
     )
+    const row = screen.getByTestId('row')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('24px')
+    expect(getComputedStyle(row).columnGap).toBe('16px')
+    expect(getComputedStyle(row).rowGap).toBe('24px')
+  })
 
+  it('forwards ref, className, and a single click on Row and Col', () => {
+    const rowRef = React.createRef<HTMLDivElement>()
+    const colRef = React.createRef<HTMLDivElement>()
+    const onRowClick = vi.fn()
+    const onColClick = vi.fn()
+    render(
+      <Row ref={rowRef} data-testid="row" className="custom-row" onClick={onRowClick}>
+        <Col
+          ref={colRef}
+          data-testid="col"
+          span={12}
+          className="custom-class"
+          style={{ color: 'red' }}
+          onClick={onColClick}>
+          Content
+        </Col>
+      </Row>
+    )
     const row = screen.getByTestId('row')
     const col = screen.getByTestId('col')
-
-    expect(row.className).toContain('my-[calc(var(--tiger-row-gutter-y-half)*-1)]')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('12px')
-    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
-    expect(col.className).toContain('py-[var(--tiger-row-gutter-y-half)]')
-    expect(col.style.paddingTop).toBe('')
-    expect(col.style.paddingBottom).toBe('')
-  })
-
-  it('applies responsive span CSS variables', () => {
-    render(<Col data-testid="col" span={{ xs: 24, md: 12, lg: 8 }} />)
-
-    const col = screen.getByTestId('col')
-    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('100%')
-    expect(col.style.getPropertyValue('--tiger-col-span-md')).toBe('50%')
-    expect(col.style.getPropertyValue('--tiger-col-span-lg')).toBe('33.333333%')
-  })
-
-  it('forwards custom className and style on Col', () => {
-    render(<Col data-testid="col" span={12} className="custom-class" style={{ color: 'red' }} />)
-
-    const col = screen.getByTestId('col')
+    expect(rowRef.current).toBe(row)
+    expect(colRef.current).toBe(col)
+    expect(row.className).toContain('tiger-row')
+    expect(row.className).toContain('custom-row')
     expect(col).toHaveClass('custom-class')
+    expect(col).toHaveClass('tiger-col')
     expect(col.style.color).toBe('red')
+    fireEvent.click(col)
+    expect(onColClick).toHaveBeenCalledTimes(1)
   })
 
   it('has no a11y violations for a basic grid', async () => {
@@ -101,7 +144,6 @@ describe('Grid (React)', () => {
         <Col>Content</Col>
       </Row>
     )
-
     await expectNoA11yViolationsIsolated(container)
   })
 })

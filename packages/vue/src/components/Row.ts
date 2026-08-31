@@ -1,10 +1,9 @@
-import { defineComponent, computed, h, PropType, provide, InjectionKey } from 'vue'
-import type { ComputedRef } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
-  getAlignClasses,
-  getJustifyClasses,
-  getRowGutterClasses,
+  coerceClassValue,
+  getRowAlignJustifyVars,
+  getRowClasses,
   getRowGutterStyleVars,
   type Align,
   type Justify,
@@ -16,79 +15,59 @@ export interface VueRowProps {
   align?: Align
   justify?: Justify
   wrap?: boolean
+  className?: string
 }
-
-interface RowContext {
-  gutter: ComputedRef<GutterSize>
-}
-
-const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext')
 
 export const Row = defineComponent({
   name: 'TigerRow',
+  inheritAttrs: false,
   props: {
-    /**
-     * Gutter size between columns (number or [horizontal, vertical])
-     * @default 0
-     */
     gutter: {
       type: [Number, Array] as PropType<GutterSize>,
       default: 0
     },
-    /**
-     * Vertical alignment of columns
-     * @default 'top'
-     */
     align: {
       type: String as PropType<Align>,
       default: 'top' as Align
     },
-    /**
-     * Horizontal alignment of columns
-     * @default 'start'
-     */
     justify: {
       type: String as PropType<Justify>,
       default: 'start' as Justify
     },
-    /**
-     * Whether to wrap columns
-     * @default true
-     */
     wrap: {
       type: Boolean,
       default: true
+    },
+    className: {
+      type: String as PropType<string>,
+      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
-    const gutter = computed(() => props.gutter)
-    const rowStyle = computed(() => getRowGutterStyleVars(gutter.value))
+    const rowStyle = computed(() => ({
+      ...getRowGutterStyleVars(props.gutter),
+      ...getRowAlignJustifyVars(props.align, props.justify)
+    }))
 
-    const rowClasses = computed(() => {
-      return classNames(
-        'flex',
-        'w-full',
-        props.wrap && 'flex-wrap',
-        getRowGutterClasses(gutter.value),
-        getAlignClasses(props.align),
-        getJustifyClasses(props.justify)
+    const rowClasses = computed(() =>
+      classNames(
+        getRowClasses({ wrap: props.wrap }),
+        props.className,
+        coerceClassValue(attrs.class)
       )
-    })
+    )
 
-    provide(RowContextKey, { gutter })
-
-    return () =>
-      h(
+    return () => {
+      const { class: _class, style: attrsStyle, ...rest } = attrs
+      return h(
         'div',
         {
-          ...attrs,
-          class: [rowClasses.value, attrs.class],
-          style: [rowStyle.value, attrs.style]
+          ...rest,
+          class: rowClasses.value,
+          style: [rowStyle.value, attrsStyle]
         },
         slots.default?.()
       )
+    }
   }
 })
-
-// Export context key for Col component
-export { RowContextKey }

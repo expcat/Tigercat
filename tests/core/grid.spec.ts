@@ -1,21 +1,15 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
-  colGutterClasses,
   getAlignClasses,
-  getColGutterClasses,
   getColMergedStyleVars,
   getColOrderStyleVars,
   getColStyleVars,
-  getFlexClasses,
-  getGutterStyles,
   getJustifyClasses,
-  getOffsetClasses,
-  getOrderClasses,
-  getRowGutterClasses,
   getRowGutterStyleVars,
-  getSpanClasses,
   hasGutter,
-  rowGutterClasses
+  resetDevWarnCache,
+  resolveActiveGridBreakpoint,
+  resolveGutter
 } from '@expcat/tigercat-core'
 
 describe('grid gutter css variable helpers', () => {
@@ -26,100 +20,81 @@ describe('grid gutter css variable helpers', () => {
     expect(hasGutter([0, 24])).toBe(true)
   })
 
-  it('creates row gutter CSS variables once on Row', () => {
+  it('keeps a numeric gutter on the horizontal axis only', () => {
+    expect(resolveGutter(16)).toEqual({ x: 16, y: 0 })
     expect(getRowGutterStyleVars(16)).toEqual({
-      '--tiger-row-gutter-x-half': '8px',
-      '--tiger-row-gutter-y-half': '8px'
+      '--tiger-row-gutter-x': '16px'
     })
-
     expect(getRowGutterStyleVars([16, 24])).toEqual({
-      '--tiger-row-gutter-x-half': '8px',
-      '--tiger-row-gutter-y-half': '12px'
+      '--tiger-row-gutter-x': '16px',
+      '--tiger-row-gutter-y': '24px'
     })
-  })
-
-  it('returns static Row and Col gutter classes only when needed', () => {
-    expect(getRowGutterClasses(0)).toBe('')
-    expect(getColGutterClasses(0)).toBe('')
-    expect(getRowGutterClasses(16)).toBe(rowGutterClasses)
-    expect(getColGutterClasses(16)).toBe(colGutterClasses)
-  })
-
-  it('builds legacy gutter styles for numeric and tuple values', () => {
-    expect(getGutterStyles(undefined)).toEqual({})
-    expect(getGutterStyles(16)).toEqual({
-      rowStyle: {
-        marginLeft: '-8px',
-        marginRight: '-8px',
-        marginTop: '-8px',
-        marginBottom: '-8px'
-      },
-      colStyle: {
-        paddingLeft: '8px',
-        paddingRight: '8px',
-        paddingTop: '8px',
-        paddingBottom: '8px'
-      }
+    expect(getRowGutterStyleVars([16, 0])).toEqual({
+      '--tiger-row-gutter-x': '16px'
     })
-    expect(getGutterStyles([20, 0])).toEqual({
-      rowStyle: { marginLeft: '-10px', marginRight: '-10px' },
-      colStyle: { paddingLeft: '10px', paddingRight: '10px' }
-    })
-    expect(getGutterStyles([0, 12])).toEqual({
-      rowStyle: { marginTop: '-6px', marginBottom: '-6px' },
-      colStyle: { paddingTop: '6px', paddingBottom: '6px' }
+    expect(getRowGutterStyleVars([0, 16])).toEqual({
+      '--tiger-row-gutter-y': '16px'
     })
   })
 
   it('clamps negative gutter CSS variables to zero', () => {
     expect(getRowGutterStyleVars([-8, 12])).toEqual({
-      '--tiger-row-gutter-x-half': '0px',
-      '--tiger-row-gutter-y-half': '6px'
+      '--tiger-row-gutter-y': '12px'
     })
   })
 })
 
 describe('grid col css variable helpers', () => {
-  it('creates span and offset variables for numeric values', () => {
+  beforeEach(() => resetDevWarnCache())
+
+  it('stores span as grid units and hides span 0', () => {
     expect(getColStyleVars(12, 6)).toEqual({
-      '--tiger-col-span': '50%',
-      '--tiger-col-offset': '25%'
+      '--tiger-col-span': '12',
+      '--tiger-col-display-base': 'block',
+      '--tiger-col-offset': '6'
     })
-    expect(getColStyleVars(0, 0)).toEqual({ '--tiger-col-span': '0%' })
+    expect(getColStyleVars(0, 0)).toEqual({
+      '--tiger-col-span': '0',
+      '--tiger-col-display-base': 'none',
+      '--tiger-col-offset': '0'
+    })
     expect(getColStyleVars()).toEqual({})
   })
 
-  it('creates responsive span and offset variables', () => {
-    expect(getColStyleVars({ xs: 24, sm: 12, lg: 6 }, { xs: 0, md: 3, xl: 6 })).toEqual({
-      '--tiger-col-span': '100%',
-      '--tiger-col-span-sm': '50%',
-      '--tiger-col-span-lg': '25%',
-      '--tiger-col-offset': '0%',
-      '--tiger-col-offset-md': '12.5%',
-      '--tiger-col-offset-xl': '25%'
+  it('writes an explicit 0 offset at larger breakpoints', () => {
+    expect(getColStyleVars({ xs: 24, sm: 12, lg: 6 }, { xs: 4, md: 0 })).toEqual({
+      '--tiger-col-span': '24',
+      '--tiger-col-display-base': 'block',
+      '--tiger-col-span-sm': '12',
+      '--tiger-col-display-sm': 'block',
+      '--tiger-col-span-lg': '6',
+      '--tiger-col-display-lg': 'block',
+      '--tiger-col-offset': '4',
+      '--tiger-col-offset-md': '0'
     })
   })
 
-  it('skips invalid span and offset values with warnings', () => {
+  it('clamps invalid span and offset values with a single warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
-    expect(getColStyleVars(25, -1)).toEqual({})
-    expect(getColStyleVars({ xs: 24, md: 30 }, { xs: 2, lg: -4 })).toEqual({
-      '--tiger-col-span': '100%',
-      '--tiger-col-offset': '8.333333%'
+    expect(getColStyleVars(25, -1)).toEqual({
+      '--tiger-col-span': '24',
+      '--tiger-col-display-base': 'block',
+      '--tiger-col-offset': '0'
     })
-    expect(warn).toHaveBeenCalledWith('Invalid span value: 25. span should be between 0 and 24.')
-    expect(warn).toHaveBeenCalledWith(
-      'Invalid offset value: -1. offset should be between 0 and 24.'
-    )
-    expect(warn).toHaveBeenCalledWith(
-      'Invalid span.md value: 30. span.md should be between 0 and 24.'
-    )
-    expect(warn).toHaveBeenCalledWith(
-      'Invalid offset.lg value: -4. offset.lg should be between 0 and 24.'
-    )
 
+    expect(warn).toHaveBeenCalled()
     warn.mockRestore()
+  })
+
+  it('skips span width vars when flex is set', () => {
+    expect(getColMergedStyleVars(24, 0, undefined, '120px')).toEqual({
+      '--tiger-col-offset': '0',
+      '--tiger-col-flex': '120px'
+    })
+    expect(getColMergedStyleVars(undefined, undefined, undefined, '1_1_auto')).toEqual({
+      '--tiger-col-flex': '1 1 auto'
+    })
   })
 
   it('creates order variables for numeric and responsive values', () => {
@@ -130,55 +105,6 @@ describe('grid col css variable helpers', () => {
       '--tiger-col-order-md': '-1',
       '--tiger-col-order-xl': '5'
     })
-  })
-
-  it('merges span, offset, order, and flex variables in one pass', () => {
-    expect(getColMergedStyleVars(8, 4, 2, '1_1_auto')).toEqual({
-      '--tiger-col-span': '33.333333%',
-      '--tiger-col-offset': '16.666667%',
-      '--tiger-col-order': '2',
-      '--tiger-col-flex': '1 1 auto'
-    })
-    expect(getColMergedStyleVars(undefined, undefined, undefined, 1)).toEqual({
-      '--tiger-col-flex': '1'
-    })
-  })
-
-  it('returns static classes for span, offset, order, and flex controls', () => {
-    expect(getSpanClasses(undefined)).toBe('w-full')
-    expect(getSpanClasses(12)).toContain('w-[var(--tiger-col-span)]')
-    expect(getOffsetClasses(undefined)).toBe('')
-    expect(getOffsetClasses(0)).toBe('')
-    expect(getOffsetClasses({ xs: 0, md: 0 })).toBe('')
-    expect(getOffsetClasses({ md: 2 })).toContain('ml-[var(--tiger-col-offset)]')
-    expect(getOrderClasses(undefined)).toBe('')
-    expect(getOrderClasses(0)).toContain('order-[var(--tiger-col-order)]')
-    expect(getFlexClasses(undefined)).toBe('')
-    expect(getFlexClasses('auto')).toContain('flex-[var(--tiger-col-flex)]')
-  })
-
-  it('cascades responsive span/offset/order fallbacks up through lower breakpoints', () => {
-    // A value set at a lower breakpoint must still apply at larger breakpoints when
-    // those are not explicitly provided. The always-present xl/2xl classes therefore
-    // fall back through lg -> md -> sm -> base instead of jumping straight to base
-    // (which previously reverted large viewports to the base value).
-    const span = getSpanClasses({ md: 12 })
-    expect(span).toContain(
-      'xl:w-[var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span)))))]'
-    )
-    expect(span).toContain(
-      '2xl:w-[var(--tiger-col-span-2xl,var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span))))))]'
-    )
-
-    const offset = getOffsetClasses({ md: 4 })
-    expect(offset).toContain(
-      'xl:ml-[var(--tiger-col-offset-xl,var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset)))))]'
-    )
-
-    const order = getOrderClasses({ md: 1 })
-    expect(order).toContain(
-      'xl:order-[var(--tiger-col-order-xl,var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order)))))]'
-    )
   })
 })
 
@@ -194,5 +120,16 @@ describe('grid row alignment helpers', () => {
     expect(getJustifyClasses('space-around')).toBe('justify-around')
     expect(getJustifyClasses('space-between')).toBe('justify-between')
     expect(getJustifyClasses('space-evenly')).toBe('justify-evenly')
+  })
+})
+
+describe('grid breakpoint map', () => {
+  it('picks the active breakpoint from the theme map, not a hardcoded 768', () => {
+    expect(
+      resolveActiveGridBreakpoint(800, { xs: 0, sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 })
+    ).toBe('md')
+    expect(
+      resolveActiveGridBreakpoint(800, { xs: 0, sm: 640, md: 900, lg: 1024, xl: 1280, '2xl': 1536 })
+    ).toBe('sm')
   })
 })

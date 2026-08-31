@@ -2,8 +2,8 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/vue'
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Col } from '@expcat/tigercat-vue/Col'
 import { Row } from '@expcat/tigercat-vue/Row'
@@ -12,11 +12,12 @@ import { expectNoA11yViolationsIsolated } from '../utils'
 describe('Grid (Vue)', () => {
   it('renders Row defaults and forwards attrs', () => {
     render(Row, { attrs: { 'data-testid': 'row' } })
-
     const row = screen.getByTestId('row')
-    expect(row).toHaveClass('flex', 'w-full', 'flex-wrap', 'items-start', 'justify-start')
+    expect(row).toHaveClass('tiger-row')
+    expect(getComputedStyle(row).flexWrap).toBe('wrap')
   })
-  it('applies gutter styles to Row and Col', () => {
+
+  it('keeps a numeric gutter on the row without negative margin', () => {
     render(Row, {
       props: { gutter: 16 },
       attrs: { 'data-testid': 'row' },
@@ -24,27 +25,40 @@ describe('Grid (Vue)', () => {
         default: () => h(Col, { 'data-testid': 'col' }, () => 'Content')
       }
     })
-
     const row = screen.getByTestId('row') as HTMLElement
-    const col = screen.getByTestId('col') as HTMLElement
-
-    expect(row.className).toContain('mx-[calc(var(--tiger-row-gutter-x-half)*-1)]')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('8px')
-    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
-    expect(col.style.paddingLeft).toBe('')
-    expect(col.style.paddingRight).toBe('')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('')
+    expect(getComputedStyle(row).columnGap).toBe('16px')
+    expect(getComputedStyle(row).rowGap).toBe('0px')
   })
-  it('supports flex layout with span=0', () => {
+
+  it('uses flex when flex is passed without span=0', () => {
     render(Col, {
-      props: { span: 0, flex: '0_0_160px' },
+      props: { flex: '0_0_160px' },
       attrs: { 'data-testid': 'col' }
     })
-
     const col = screen.getByTestId('col') as HTMLElement
-    expect(col.className).toContain('flex-[var(--tiger-col-flex)]')
-    expect(col.className).not.toContain('w-[var(--tiger-col-span)]')
+    expect(col.className).toContain('tiger-col-flex')
     expect(col.style.getPropertyValue('--tiger-col-flex')).toBe('0 0 160px')
+    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('')
+  })
+
+  it('hides span=0 and writes an explicit 0 offset', () => {
+    render(Col, {
+      props: { span: 0 },
+      attrs: { 'data-testid': 'hidden' }
+    })
+    expect(screen.getByTestId('hidden').style.getPropertyValue('--tiger-col-display-base')).toBe(
+      'none'
+    )
+
+    render(Col, {
+      props: { offset: { xs: 4, md: 0 } },
+      attrs: { 'data-testid': 'offset' }
+    })
+    const col = screen.getByTestId('offset') as HTMLElement
+    expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('4')
+    expect(col.style.getPropertyValue('--tiger-col-offset-md')).toBe('0')
   })
 
   it('supports order (including responsive)', () => {
@@ -52,9 +66,7 @@ describe('Grid (Vue)', () => {
       props: { order: { xs: 3, md: 1 } },
       attrs: { 'data-testid': 'col' }
     })
-
     const col = screen.getByTestId('col') as HTMLElement
-    expect(col.className).toContain('order-[var(--tiger-col-order)]')
     expect(col.style.getPropertyValue('--tiger-col-order')).toBe('3')
     expect(col.style.getPropertyValue('--tiger-col-order-md')).toBe('1')
   })
@@ -64,10 +76,7 @@ describe('Grid (Vue)', () => {
       props: { wrap: false },
       attrs: { 'data-testid': 'row' }
     })
-
-    const row = screen.getByTestId('row')
-    expect(row).toHaveClass('flex', 'w-full')
-    expect(row).not.toHaveClass('flex-wrap')
+    expect(screen.getByTestId('row')).toHaveClass('tiger-row-nowrap')
   })
 
   it('applies both axes with tuple gutter [horizontal, vertical]', () => {
@@ -78,44 +87,31 @@ describe('Grid (Vue)', () => {
         default: () => h(Col, { 'data-testid': 'col' }, () => 'Content')
       }
     })
-
     const row = screen.getByTestId('row') as HTMLElement
-    const col = screen.getByTestId('col') as HTMLElement
-
-    expect(row.className).toContain('my-[calc(var(--tiger-row-gutter-y-half)*-1)]')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('12px')
-    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
-    expect(col.className).toContain('py-[var(--tiger-row-gutter-y-half)]')
-    expect(col.style.paddingTop).toBe('')
-    expect(col.style.paddingBottom).toBe('')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('24px')
+    expect(getComputedStyle(row).columnGap).toBe('16px')
+    expect(getComputedStyle(row).rowGap).toBe('24px')
   })
 
-  it('applies responsive span CSS variables', () => {
-    render(Col, {
-      props: { span: { xs: 24, md: 12, lg: 8 } },
-      attrs: { 'data-testid': 'col' }
-    })
-
-    const col = screen.getByTestId('col') as HTMLElement
-    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('100%')
-    expect(col.style.getPropertyValue('--tiger-col-span-md')).toBe('50%')
-    expect(col.style.getPropertyValue('--tiger-col-span-lg')).toBe('33.333333%')
-  })
-
-  it('forwards custom class and style on Col', () => {
-    render(Col, {
-      props: { span: 12 },
-      attrs: {
-        'data-testid': 'col',
-        class: 'custom-class',
-        style: { color: 'red' }
+  it('merges className without replacing the row/col base class and clicks once', async () => {
+    const onClick = vi.fn()
+    render(Row, {
+      props: { className: 'custom' },
+      attrs: { 'data-testid': 'row', onClick },
+      slots: {
+        default: () =>
+          h(Col, { className: 'custom-col', 'data-testid': 'col', span: 12 }, () => 'Content')
       }
     })
-
-    const col = screen.getByTestId('col') as HTMLElement
-    expect(col).toHaveClass('custom-class')
-    expect(col.style.color).toBe('red')
+    const row = screen.getByTestId('row')
+    const col = screen.getByTestId('col')
+    expect(row.className).toContain('tiger-row')
+    expect(row.className).toContain('custom')
+    expect(col.className).toContain('tiger-col')
+    expect(col.className).toContain('custom-col')
+    await fireEvent.click(row)
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 
   it('has no a11y violations for a basic grid', async () => {
@@ -124,7 +120,6 @@ describe('Grid (Vue)', () => {
         default: () => h(Col, () => 'Content')
       }
     })
-
     await expectNoA11yViolationsIsolated(container)
   })
 })

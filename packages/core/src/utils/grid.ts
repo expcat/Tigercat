@@ -1,17 +1,34 @@
 /**
- * Grid utility functions
+ * Grid utility functions — 24-column flex grid with CSS gap.
  */
 
 import type { Align, Justify, GutterSize, ColSpan, Breakpoint } from '../types/grid'
+import { classNames } from './class-names'
+import { devWarn } from './dev-warn'
+import {
+  GRID_BREAKPOINT_ORDER,
+  ensureGridBreakpointSync,
+  injectLayoutGridStyles
+} from './layout-grid-styles'
 
-/**
- * Breakpoint order for responsive classes
- */
-const BREAKPOINT_ORDER: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
+export { GRID_BREAKPOINT_ORDER }
 
-/**
- * Align class map for Row component
- */
+const ALIGN_CSS: Record<Align, string> = {
+  top: 'flex-start',
+  middle: 'center',
+  bottom: 'flex-end',
+  stretch: 'stretch'
+}
+
+const JUSTIFY_CSS: Record<Justify, string> = {
+  start: 'flex-start',
+  end: 'flex-end',
+  center: 'center',
+  'space-around': 'space-around',
+  'space-between': 'space-between',
+  'space-evenly': 'space-evenly'
+}
+
 const ALIGN_MAP: Record<Align, string> = {
   top: 'items-start',
   middle: 'items-center',
@@ -19,9 +36,6 @@ const ALIGN_MAP: Record<Align, string> = {
   stretch: 'items-stretch'
 }
 
-/**
- * Justify class map for Row component
- */
 const JUSTIFY_MAP: Record<Justify, string> = {
   start: 'justify-start',
   end: 'justify-end',
@@ -31,119 +45,130 @@ const JUSTIFY_MAP: Record<Justify, string> = {
   'space-evenly': 'justify-evenly'
 }
 
-/**
- * Validate span or offset value (should be between 0 and 24)
- * @param value - Value to validate
- * @param fieldName - Name of the field for warning message
- * @returns True if valid
- */
-function validateGridValue(value: number, fieldName: string): boolean {
-  if (value < 0 || value > 24) {
-    console.warn(`Invalid ${fieldName} value: ${value}. ${fieldName} should be between 0 and 24.`)
-    return false
-  }
-  return true
-}
-
-/**
- * Convert grid value (0-24) to percentage
- * @param value - Grid value
- * @returns Percentage string
- */
-function toPercentage(value: number): string {
-  return ((value / 24) * 100).toFixed(6).replace(/\.?0+$/, '')
-}
-
 type ColOffset = number | Partial<Record<Breakpoint, number>>
 type ColOrder = number | Partial<Record<Breakpoint, number>>
 
-// Tailwind needs classes to be statically present in source to generate CSS.
-// We keep a small fixed set of classes and provide concrete values via CSS vars.
-//
-// Each responsive variant falls back through the chain of lower breakpoints down
-// to the base var, so a value set at (say) `lg` still applies at `xl`/`2xl` when
-// those larger breakpoints are not explicitly provided. Without this cascade the
-// always-present `xl`/`2xl` classes would resolve to the base value at large
-// viewports and wipe out the intended `md`/`lg` layout.
-const colSpanClasses =
-  'w-[var(--tiger-col-span)] sm:w-[var(--tiger-col-span-sm,var(--tiger-col-span))] md:w-[var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span)))] lg:w-[var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span))))] xl:w-[var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span)))))] 2xl:w-[var(--tiger-col-span-2xl,var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span))))))]'
+function clampGridValue(value: number, fieldName: string): number | undefined {
+  if (!Number.isFinite(value)) {
+    devWarn(`grid.${fieldName}`, `Invalid ${fieldName} value: ${value}.`)
+    return undefined
+  }
+  if (value < 0 || value > 24) {
+    devWarn(
+      `grid.${fieldName}`,
+      `Invalid ${fieldName} value: ${value}. ${fieldName} should be between 0 and 24.`
+    )
+    return Math.min(24, Math.max(0, Math.round(value)))
+  }
+  return value
+}
 
-const colOffsetClasses =
-  'ml-[var(--tiger-col-offset)] sm:ml-[var(--tiger-col-offset-sm,var(--tiger-col-offset))] md:ml-[var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset)))] lg:ml-[var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset))))] xl:ml-[var(--tiger-col-offset-xl,var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset)))))] 2xl:ml-[var(--tiger-col-offset-2xl,var(--tiger-col-offset-xl,var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset))))))]'
+export function resolveGutter(gutter: GutterSize | undefined | null): { x: number; y: number } {
+  if (gutter === undefined || gutter === null || gutter === 0) return { x: 0, y: 0 }
+  if (Array.isArray(gutter)) {
+    return {
+      x: Math.max(0, gutter[0] ?? 0),
+      y: Math.max(0, gutter[1] ?? 0)
+    }
+  }
+  return { x: Math.max(0, gutter), y: 0 }
+}
 
-const colFlexClasses = 'flex-[var(--tiger-col-flex)]'
+export function hasGutter(gutter: GutterSize | undefined | null): boolean {
+  const { x, y } = resolveGutter(gutter)
+  return x > 0 || y > 0
+}
 
-const colOrderClasses =
-  'order-[var(--tiger-col-order)] sm:order-[var(--tiger-col-order-sm,var(--tiger-col-order))] md:order-[var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order)))] lg:order-[var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order))))] xl:order-[var(--tiger-col-order-xl,var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order)))))] 2xl:order-[var(--tiger-col-order-2xl,var(--tiger-col-order-xl,var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order))))))]'
+export function getRowGutterStyleVars(
+  gutter: GutterSize | undefined | null
+): Record<string, string> {
+  const { x, y } = resolveGutter(gutter)
+  const vars: Record<string, string> = {}
+  if (x > 0) vars['--tiger-row-gutter-x'] = `${x}px`
+  if (y > 0) vars['--tiger-row-gutter-y'] = `${y}px`
+  return vars
+}
 
-export const rowGutterClasses =
-  'mx-[calc(var(--tiger-row-gutter-x-half)*-1)] my-[calc(var(--tiger-row-gutter-y-half)*-1)]'
+export function getRowAlignJustifyVars(
+  align: Align = 'top',
+  justify: Justify = 'start'
+): Record<string, string> {
+  return {
+    '--tiger-row-align': ALIGN_CSS[align] ?? ALIGN_CSS.top,
+    '--tiger-row-justify': JUSTIFY_CSS[justify] ?? JUSTIFY_CSS.start
+  }
+}
 
-export const colGutterClasses =
-  'px-[var(--tiger-row-gutter-x-half)] py-[var(--tiger-row-gutter-y-half)]'
+export function getRowClasses(
+  options: {
+    wrap?: boolean
+    align?: Align
+    justify?: Justify
+    className?: string
+  } = {}
+): string {
+  injectLayoutGridStyles()
+  ensureGridBreakpointSync()
+  return classNames('tiger-row', options.wrap === false && 'tiger-row-nowrap', options.className)
+}
 
-function hasNonZeroOffset(offset: ColOffset): boolean {
-  if (typeof offset === 'number') return offset !== 0
-  return BREAKPOINT_ORDER.some((bp) => (offset[bp] ?? 0) !== 0)
+export function getAlignClasses(align: Align): string {
+  return ALIGN_MAP[align] || 'items-start'
+}
+
+export function getJustifyClasses(justify: Justify): string {
+  return JUSTIFY_MAP[justify] || 'justify-start'
 }
 
 function setSpanVars(vars: Record<string, string>, span: ColSpan): void {
   if (typeof span === 'number') {
-    if (validateGridValue(span, 'span')) vars['--tiger-col-span'] = `${toPercentage(span)}%`
+    const value = clampGridValue(span, 'span')
+    if (value === undefined) return
+    vars['--tiger-col-span'] = String(value)
+    vars['--tiger-col-display-base'] = value === 0 ? 'none' : 'block'
     return
   }
 
-  // Default to full width on xs unless explicitly provided.
-  vars['--tiger-col-span'] = '100%'
+  vars['--tiger-col-span'] = '24'
+  vars['--tiger-col-display-base'] = 'block'
 
-  BREAKPOINT_ORDER.forEach((bp) => {
-    const value = span[bp]
+  GRID_BREAKPOINT_ORDER.forEach((bp) => {
+    const raw = span[bp]
+    if (raw === undefined) return
+    const value = clampGridValue(raw, `span.${bp}`)
     if (value === undefined) return
-    if (!validateGridValue(value, `span.${bp}`)) return
-
-    const percentage = `${toPercentage(value)}%`
+    const display = value === 0 ? 'none' : 'block'
     if (bp === 'xs') {
-      vars['--tiger-col-span'] = percentage
+      vars['--tiger-col-span'] = String(value)
+      vars['--tiger-col-display-base'] = display
       return
     }
-
-    vars[`--tiger-col-span-${bp}`] = percentage
+    vars[`--tiger-col-span-${bp}`] = String(value)
+    vars[`--tiger-col-display-${bp}`] = display
   })
 }
 
 function setOffsetVars(vars: Record<string, string>, offset: ColOffset): void {
   if (typeof offset === 'number') {
-    if (offset === 0) return
-    if (validateGridValue(offset, 'offset')) vars['--tiger-col-offset'] = `${toPercentage(offset)}%`
+    const value = clampGridValue(offset, 'offset')
+    if (value === undefined) return
+    vars['--tiger-col-offset'] = String(value)
     return
   }
 
-  // Default to no offset on xs unless explicitly provided.
-  vars['--tiger-col-offset'] = '0%'
+  vars['--tiger-col-offset'] = '0'
 
-  BREAKPOINT_ORDER.forEach((bp) => {
-    const value = offset[bp]
+  GRID_BREAKPOINT_ORDER.forEach((bp) => {
+    const raw = offset[bp]
+    if (raw === undefined) return
+    const value = clampGridValue(raw, `offset.${bp}`)
     if (value === undefined) return
-    if (value === 0) return
-    if (!validateGridValue(value, `offset.${bp}`)) return
-
-    const percentage = `${toPercentage(value)}%`
     if (bp === 'xs') {
-      vars['--tiger-col-offset'] = percentage
+      vars['--tiger-col-offset'] = String(value)
       return
     }
-
-    vars[`--tiger-col-offset-${bp}`] = percentage
+    vars[`--tiger-col-offset-${bp}`] = String(value)
   })
-}
-
-export function getColStyleVars(span?: ColSpan, offset?: ColOffset): Record<string, string> {
-  const vars: Record<string, string> = {}
-
-  if (span !== undefined && span !== null) setSpanVars(vars, span)
-  if (offset !== undefined && offset !== null) setOffsetVars(vars, offset)
-
-  return vars
 }
 
 function setOrderVars(vars: Record<string, string>, order: ColOrder): void {
@@ -152,34 +177,19 @@ function setOrderVars(vars: Record<string, string>, order: ColOrder): void {
     return
   }
 
-  // Default to 0 on xs unless explicitly provided.
   vars['--tiger-col-order'] = '0'
 
-  BREAKPOINT_ORDER.forEach((bp) => {
+  GRID_BREAKPOINT_ORDER.forEach((bp) => {
     const value = order[bp]
     if (value === undefined) return
-
     if (bp === 'xs') {
       vars['--tiger-col-order'] = String(value)
       return
     }
-
     vars[`--tiger-col-order-${bp}`] = String(value)
   })
 }
 
-export function getColOrderStyleVars(order?: ColOrder): Record<string, string> {
-  if (order === undefined || order === null) return {}
-
-  const vars: Record<string, string> = {}
-  setOrderVars(vars, order)
-  return vars
-}
-
-/**
- * Get all Col CSS variable styles in a single pass
- * Combines span, offset, order and flex vars into one object
- */
 export function getColMergedStyleVars(
   span?: ColSpan,
   offset?: ColOffset,
@@ -187,122 +197,52 @@ export function getColMergedStyleVars(
   flex?: string | number
 ): Record<string, string> {
   const vars: Record<string, string> = {}
-  if (span !== undefined && span !== null) setSpanVars(vars, span)
+  if (flex === undefined && span !== undefined && span !== null) setSpanVars(vars, span)
   if (offset !== undefined && offset !== null) setOffsetVars(vars, offset)
   if (order !== undefined && order !== null) setOrderVars(vars, order)
   if (flex !== undefined) vars['--tiger-col-flex'] = String(flex).replace(/_/g, ' ')
   return vars
 }
 
-/**
- * Get align classes for Row component
- */
-export function getAlignClasses(align: Align): string {
-  return ALIGN_MAP[align] || 'items-start'
+export function getColStyleVars(span?: ColSpan, offset?: ColOffset): Record<string, string> {
+  return getColMergedStyleVars(span, offset)
 }
 
-/**
- * Get justify classes for Row component
- */
-export function getJustifyClasses(justify: Justify): string {
-  return JUSTIFY_MAP[justify] || 'justify-start'
+export function getColOrderStyleVars(order?: ColOrder): Record<string, string> {
+  if (order === undefined || order === null) return {}
+  return getColMergedStyleVars(undefined, undefined, order)
 }
 
-/**
- * Get gutter styles for Row component
- */
-export function getGutterStyles(gutter: GutterSize): {
-  rowStyle?: Record<string, string>
-  colStyle?: Record<string, string>
-} {
-  if (gutter === undefined || gutter === null || gutter === 0) return {}
-
-  const [horizontal, vertical] = Array.isArray(gutter) ? gutter : [gutter, gutter]
-
-  const rowStyle: Record<string, string> = {}
-  const colStyle: Record<string, string> = {}
-
-  if (horizontal > 0) {
-    rowStyle.marginLeft = `-${horizontal / 2}px`
-    rowStyle.marginRight = `-${horizontal / 2}px`
-    colStyle.paddingLeft = `${horizontal / 2}px`
-    colStyle.paddingRight = `${horizontal / 2}px`
-  }
-
-  if (vertical > 0) {
-    rowStyle.marginTop = `-${vertical / 2}px`
-    rowStyle.marginBottom = `-${vertical / 2}px`
-    colStyle.paddingTop = `${vertical / 2}px`
-    colStyle.paddingBottom = `${vertical / 2}px`
-  }
-
-  return { rowStyle, colStyle }
+export function getColClasses(
+  options: { flex?: string | number; className?: string } = {}
+): string {
+  injectLayoutGridStyles()
+  ensureGridBreakpointSync()
+  return classNames('tiger-col', options.flex !== undefined && 'tiger-col-flex', options.className)
 }
 
-export function hasGutter(gutter: GutterSize): boolean {
-  if (gutter === undefined || gutter === null || gutter === 0) return false
-  if (!Array.isArray(gutter)) return gutter > 0
-
-  const [horizontal, vertical] = gutter
-  return horizontal > 0 || vertical > 0
-}
-
-export function getRowGutterStyleVars(gutter: GutterSize): Record<string, string> {
-  if (!hasGutter(gutter)) return {}
-
-  const [horizontal, vertical] = Array.isArray(gutter) ? gutter : [gutter, gutter]
-
-  return {
-    '--tiger-row-gutter-x-half': `${Math.max(0, horizontal) / 2}px`,
-    '--tiger-row-gutter-y-half': `${Math.max(0, vertical) / 2}px`
-  }
-}
-
-export function getRowGutterClasses(gutter: GutterSize): string {
-  return hasGutter(gutter) ? rowGutterClasses : ''
-}
-
-export function getColGutterClasses(gutter: GutterSize): string {
-  return hasGutter(gutter) ? colGutterClasses : ''
-}
-
-/**
- * Get span classes for Col component
- */
 export function getSpanClasses(span: ColSpan | undefined): string {
-  if (span === undefined || span === null) return 'w-full'
-
-  return colSpanClasses
+  if (span === undefined || span === null) return ''
+  return 'tiger-col'
 }
 
-/**
- * Get offset classes for Col component
- */
 export function getOffsetClasses(
-  offset: number | Partial<Record<Breakpoint, number>> | undefined
+  _offset: number | Partial<Record<Breakpoint, number>> | undefined
 ): string {
-  if (offset === undefined || offset === null) return ''
-
-  if (!hasNonZeroOffset(offset)) return ''
-  return colOffsetClasses
+  return ''
 }
 
-/**
- * Get order classes for Col component
- */
 export function getOrderClasses(
-  order: number | Partial<Record<Breakpoint, number>> | undefined
+  _order: number | Partial<Record<Breakpoint, number>> | undefined
 ): string {
-  if (order === undefined) return ''
-
-  return colOrderClasses
+  return ''
 }
 
-/**
- * Get flex classes for Col component
- */
 export function getFlexClasses(flex: string | number | undefined): string {
   if (flex === undefined) return ''
+  return 'tiger-col-flex'
+}
 
-  return colFlexClasses
+export function getRowGutterClasses(_gutter: GutterSize): string {
+  return ''
 }

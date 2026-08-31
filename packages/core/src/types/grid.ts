@@ -32,7 +32,8 @@ export type Justify = 'start' | 'end' | 'center' | 'space-around' | 'space-betwe
  */
 export interface RowProps {
   /**
-   * Grid gutter, could be horizontal or [horizontal, vertical]
+   * Grid gutter in px. A number is **horizontal only**; pass `[horizontal, vertical]`
+   * for both axes. Implemented as CSS `column-gap` / `row-gap` (no negative margin).
    * @default 0
    */
   gutter?: GutterSize
@@ -61,7 +62,8 @@ export interface RowProps {
  */
 export interface ColProps {
   /**
-   * Number of cells to span, or responsive object
+   * Number of cells to span (1–24), or a responsive object.
+   * `0` (including `{ md: 0 }`) hides the column at that breakpoint.
    * @default 24
    */
   span?: ColSpan
@@ -73,12 +75,13 @@ export interface ColProps {
   offset?: number | Partial<Record<Breakpoint, number>>
 
   /**
-   * Number of cells to order
+   * Visual flex `order` only. DOM / Tab / screen-reader order stay as written.
    */
   order?: number | Partial<Record<Breakpoint, number>>
 
   /**
-   * Flex layout fill
+   * Flex item (`flex-basis` / shorthand). When set, span width is not applied.
+   * `span={0}` means hide at that breakpoint, not “enter flex mode”.
    */
   flex?: string | number
 }

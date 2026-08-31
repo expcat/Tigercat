@@ -1,55 +1,31 @@
-import React, { useContext, useMemo } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
-  classNames,
+  getColClasses,
   getColMergedStyleVars,
-  getSpanClasses,
-  getOffsetClasses,
-  getOrderClasses,
-  getFlexClasses,
-  getColGutterClasses,
   type ColProps as CoreColProps
 } from '@expcat/tigercat-core'
-import { RowContext } from './Row'
 
 export type ColProps = React.HTMLAttributes<HTMLDivElement> & CoreColProps
 
-export const Col: React.FC<ColProps> = ({
-  span = 24,
-  offset = 0,
-  order,
-  flex,
-  children,
-  className,
-  style,
-  ...divProps
-}) => {
-  const { gutter } = useContext(RowContext)
-  const isFlexSpanMode = flex !== undefined && span === 0
-
-  const colClasses = useMemo(
-    () =>
-      classNames(
-        isFlexSpanMode ? '' : getSpanClasses(span),
-        getOffsetClasses(offset),
-        getOrderClasses(order),
-        getFlexClasses(flex),
-        getColGutterClasses(gutter || 0),
-        className
-      ),
-    [gutter, isFlexSpanMode, span, offset, order, flex, className]
-  )
+export const Col = forwardRef<HTMLDivElement, ColProps>(function Col(
+  { span = 24, offset = 0, order, flex, children, className, style, ...divProps },
+  ref
+) {
+  const colClasses = useMemo(() => getColClasses({ flex, className }), [flex, className])
 
   const mergedStyle = useMemo<React.CSSProperties>(
     () => ({
-      ...getColMergedStyleVars(isFlexSpanMode ? undefined : span, offset, order, flex),
+      ...getColMergedStyleVars(span, offset, order, flex),
       ...style
     }),
-    [isFlexSpanMode, span, offset, order, flex, style]
+    [span, offset, order, flex, style]
   )
 
   return (
-    <div className={colClasses} style={mergedStyle} {...divProps}>
+    <div ref={ref} className={colClasses} style={mergedStyle} {...divProps}>
       {children}
     </div>
   )
-}
+})
+
+Col.displayName = 'TigerCol'
