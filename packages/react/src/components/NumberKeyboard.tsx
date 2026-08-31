@@ -1,146 +1,322 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type {
+  InputStatus,
+  NumberKeyboardChangePayload,
+  NumberKeyboardKey,
+  NumberKeyboardProps as CoreNumberKeyboardProps
+} from '@expcat/tigercat-core'
 import {
-  applyNumberKeyboardInput,
+  applyNumberKeyboardKey,
   classNames,
-  deleteNumberKeyboardValue,
-  getNumberKeyboardAction,
+  getNumberKeyboardInteractiveIndexes,
   getNumberKeyboardKeyClasses,
   getNumberKeyboardKeys,
+  getNumberKeyboardLabels,
+  mergeAriaDescribedBy,
   mergeTigerLocale,
-  normalizeNumberKeyboardValue,
+  moveNumberKeyboardIndex,
+  numberKeyboardEmptyKeyClasses,
   numberKeyboardGridClasses,
   numberKeyboardRootClasses,
-  resolveLocaleText,
-  type NumberKeyboardChangePayload,
-  type NumberKeyboardKey,
-  type NumberKeyboardProps as CoreNumberKeyboardProps
+  numberKeyboardScrimClasses,
+  numberKeyboardSheetClasses,
+  postNumberKeyboardValue,
+  resolveAnchoredOverlayTarget,
+  resolveNumberKeyboardPhysicalKey
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import {
+  renderOverlayPortal,
+  useBodyScrollLock,
+  useEscapeKey,
+  useFocusTrap
+} from '../utils/overlay'
 import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface NumberKeyboardProps
   extends
-    Omit<CoreNumberKeyboardProps, 'modelValue' | 'className'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'onKeyPress'> {
+    Omit<CoreNumberKeyboardProps, 'className'>,
+    Omit<
+      React.HTMLAttributes<HTMLDivElement>,
+      'defaultValue' | 'onChange' | 'onKeyPress' | 'onBlur'
+    > {
   className?: string
-  onChange?: (value: string, payload: NumberKeyboardChangePayload) => void
   onKeyPress?: (key: NumberKeyboardKey, payload: NumberKeyboardChangePayload) => void
   onDelete?: (value: string, payload: NumberKeyboardChangePayload) => void
   onConfirm?: (value: string, payload: NumberKeyboardChangePayload) => void
+  onBlur?: React.FocusEventHandler<HTMLElement>
 }
 
-export const NumberKeyboard: React.FC<NumberKeyboardProps> = ({
-  value,
-  defaultValue = '',
-  mode = 'number',
-  maxLength,
-  precision,
-  decimalSeparator = '.',
-  disabled = false,
-  readonly = false,
-  confirmText,
-  deleteText = 'Delete',
-  ariaLabel = 'Number keyboard',
-  showConfirm = true,
-  locale,
-  className,
-  style,
-  onChange,
-  onKeyPress,
-  onDelete,
-  onConfirm,
-  ...rest
-}) => {
-  const config = useTigerConfig()
-  const mergedLocale = useMemo(
-    () => mergeTigerLocale(config.locale, locale),
-    [config.locale, locale]
-  )
-  const confirmLabel = resolveLocaleText('Done', confirmText, mergedLocale?.common?.okText)
-  const [currentValue, setCurrentValue] = useControlledState<string, [NumberKeyboardChangePayload]>(
+export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
+  function NumberKeyboard(
     {
       value,
       defaultValue,
+      mode = 'number',
+      maxLength,
+      precision,
+      decimalSeparator = '.',
+      disabled = false,
+      readonly = false,
+      confirmText,
+      deleteText,
+      ariaLabel,
+      showConfirm = true,
+      open,
+      defaultOpen,
+      name,
+      id,
+      status: statusProp,
+      locale,
+      labels: labelsOverride,
+      className,
+      style,
       onChange,
-      postState: normalizeNumberKeyboardValue
+      onOpenChange,
+      onKeyPress,
+      onDelete,
+      onConfirm,
+      onBlur,
+      ...rest
+    },
+    ref
+  ) {
+    const config = useTigerConfig()
+    const formItemControl = useFormItemControlContext()
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
+    const labels = useMemo(
+      () =>
+        getNumberKeyboardLabels(mergedLocale, {
+          ...labelsOverride,
+          ariaLabel: ariaLabel?.trim() || labelsOverride?.ariaLabel,
+          deleteText: deleteText?.trim() || labelsOverride?.deleteText,
+          confirmText: confirmText?.trim()
+        }),
+      [ariaLabel, confirmText, deleteText, labelsOverride, mergedLocale]
+    )
+
+    const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+    const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+    const effectiveId = id ?? formItemControl?.id
+    const effectiveName = name ?? formItemControl?.name
+    const describedBy = mergeAriaDescribedBy(
+      typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
+      formItemControl?.describedBy
+    )
+    const labelledby =
+      typeof rest['aria-labelledby'] === 'string' && rest['aria-labelledby'].trim()
+        ? rest['aria-labelledby']
+        : formItemControl?.labelId
+    const parsedValue = value !== undefined ? value : (formItemControl?.value as string | undefined)
+    const overlayMode = open !== undefined || defaultOpen !== undefined
+
+    const [currentValue, setCurrentValue] = useControlledState<
+      string,
+      [NumberKeyboardChangePayload]
+    >({
+      value: value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
+      defaultValue: defaultValue ?? '',
+      onChange: (next, payload) => {
+        onChange?.(next, payload)
+        formItemControl?.onChange?.(next)
+      },
+      postState: (next) => postNumberKeyboardValue(next, mode)
+    })
+    const [isOpen, setOpen] = useControlledState({
+      value: open,
+      defaultValue: defaultOpen ?? false,
+      onChange: onOpenChange
+    })
+
+    const rootRef = useRef<HTMLDivElement | null>(null)
+    const sheetRef = useRef<HTMLDivElement | null>(null)
+    const setRootRef = (node: HTMLDivElement | null) => {
+      rootRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) ref.current = node
     }
-  )
-  const isDisabled = disabled || readonly
 
-  const keys = useMemo(
-    () =>
-      getNumberKeyboardKeys({
-        mode,
-        decimalSeparator,
-        deleteText,
-        confirmText: confirmLabel,
-        showConfirm
-      }),
-    [confirmLabel, decimalSeparator, deleteText, mode, showConfirm]
-  )
+    const keys = useMemo(
+      () =>
+        getNumberKeyboardKeys({
+          mode,
+          decimalSeparator,
+          showConfirm,
+          labels
+        }),
+      [decimalSeparator, labels, mode, showConfirm]
+    )
+    const interactive = useMemo(() => getNumberKeyboardInteractiveIndexes(keys), [keys])
+    const [activeIndex, setActiveIndex] = useState(() => interactive[0] ?? 0)
 
-  function emitChange(nextValue: string, payload: NumberKeyboardChangePayload) {
-    setCurrentValue(nextValue, payload)
-  }
+    useEffect(() => {
+      if (!interactive.includes(activeIndex)) setActiveIndex(interactive[0] ?? 0)
+    }, [activeIndex, interactive])
 
-  function handleKeyClick(key: NumberKeyboardKey) {
-    if (isDisabled || key.type === 'empty') return
+    const overlayEnabled = overlayMode && isOpen && !effectiveDisabled
+    useFocusTrap({ enabled: overlayEnabled, containerRef: sheetRef, inert: true })
+    useBodyScrollLock({ enabled: overlayEnabled })
+    useEscapeKey({
+      enabled: overlayEnabled,
+      onEscape: () => setOpen(false),
+      layerRef: sheetRef
+    })
 
-    const action = getNumberKeyboardAction(key)
-    const nextValue =
-      action === 'delete'
-        ? deleteNumberKeyboardValue(currentValue)
-        : action === 'input'
-          ? applyNumberKeyboardInput(currentValue, key.value, {
-              mode,
-              maxLength,
-              precision,
-              decimalSeparator
-            })
-          : currentValue
-
-    const payload: NumberKeyboardChangePayload = {
-      value: nextValue,
-      key: key.value,
-      action,
-      mode
+    const inputOptions = {
+      mode,
+      maxLength,
+      precision,
+      decimalSeparator
     }
 
-    onKeyPress?.(key, payload)
+    const closeSheet = useCallback(() => {
+      if (overlayMode) setOpen(false)
+    }, [overlayMode, setOpen])
 
-    if (action === 'confirm') {
-      onConfirm?.(currentValue, { ...payload, value: currentValue })
-      return
+    function applyKey(key: NumberKeyboardKey) {
+      if (effectiveDisabled || readonly || key.type === 'empty') return
+
+      const result = applyNumberKeyboardKey(currentValue, key, inputOptions)
+      const payload: NumberKeyboardChangePayload = {
+        value: result.nextValue,
+        key: key.value,
+        action: result.action,
+        mode
+      }
+      onKeyPress?.(key, payload)
+
+      if (result.action === 'confirm') {
+        onConfirm?.(currentValue, { ...payload, value: currentValue })
+        closeSheet()
+        return
+      }
+
+      if (result.action === 'delete') onDelete?.(result.nextValue, payload)
+      if (result.changed) setCurrentValue(result.nextValue, payload)
     }
 
-    if (action === 'delete') onDelete?.(nextValue, payload)
-    if (nextValue !== currentValue) emitChange(nextValue, payload)
-  }
+    function handleGroupKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+      if (effectiveDisabled) return
+      if (
+        event.key === 'ArrowLeft' ||
+        event.key === 'ArrowRight' ||
+        event.key === 'ArrowUp' ||
+        event.key === 'ArrowDown' ||
+        event.key === 'Home' ||
+        event.key === 'End'
+      ) {
+        event.preventDefault()
+        setActiveIndex((index) => moveNumberKeyboardIndex(keys, index, event.key))
+        return
+      }
+      if (event.key === ' ') {
+        event.preventDefault()
+        const key = keys[activeIndex]
+        if (key) applyKey(key)
+        return
+      }
+      const physical = resolveNumberKeyboardPhysicalKey(event.key, inputOptions)
+      if (!physical) return
+      event.preventDefault()
+      const match =
+        keys.find((key) => key.type === physical.type && key.value === physical.value) ??
+        ({
+          type: physical.type,
+          value: physical.value,
+          label: physical.value,
+          ariaLabel: physical.value
+        } as NumberKeyboardKey)
+      applyKey(match)
+    }
 
-  return (
-    <div
-      className={classNames(numberKeyboardRootClasses, className)}
-      style={style}
-      role="group"
-      aria-label={ariaLabel}
-      aria-disabled={isDisabled || undefined}
-      {...rest}>
-      <div className={numberKeyboardGridClasses}>
-        {keys.map((key, index) => (
-          <button
-            key={`${key.type}-${key.value}-${index}`}
-            type="button"
-            className={getNumberKeyboardKeyClasses(key, isDisabled)}
-            disabled={isDisabled || key.disabled}
-            aria-label={key.ariaLabel}
-            data-key={key.value}
-            onClick={() => handleKeyClick(key)}>
-            {key.label}
-          </button>
-        ))}
+    function handleFocusOut(event: React.FocusEvent<HTMLDivElement>) {
+      const next = event.relatedTarget as Node | null
+      const root = overlayMode ? sheetRef.current : rootRef.current
+      if (root && next && root.contains(next)) return
+      formItemControl?.onBlur?.()
+      onBlur?.(event)
+    }
+
+    const { 'aria-describedby': _describedBy, 'aria-labelledby': _labelledby, ...rootRest } = rest
+
+    const group = (sheet: boolean) => (
+      <div
+        ref={sheet ? sheetRef : setRootRef}
+        className={classNames(
+          sheet ? numberKeyboardSheetClasses : numberKeyboardRootClasses,
+          className
+        )}
+        style={sheet ? undefined : style}
+        role={sheet ? 'dialog' : 'group'}
+        aria-modal={sheet || undefined}
+        id={effectiveId}
+        tabIndex={effectiveDisabled ? -1 : 0}
+        aria-label={labelledby ? undefined : labels.ariaLabel}
+        aria-labelledby={labelledby}
+        aria-describedby={describedBy}
+        aria-disabled={effectiveDisabled || undefined}
+        aria-readonly={readonly || undefined}
+        aria-invalid={status === 'error' ? true : undefined}
+        aria-required={formItemControl?.required || undefined}
+        data-tiger-number-keyboard=""
+        onKeyDown={handleGroupKeyDown}
+        onBlur={handleFocusOut}
+        {...rootRest}>
+        {effectiveName ? <input type="hidden" name={effectiveName} value={currentValue} /> : null}
+        <div className={numberKeyboardGridClasses}>
+          {keys.map((key, index) =>
+            key.type === 'empty' ? (
+              <div
+                key={`${key.type}-${index}`}
+                className={numberKeyboardEmptyKeyClasses}
+                aria-hidden="true"
+              />
+            ) : (
+              <button
+                key={`${key.type}-${key.value}-${index}`}
+                type="button"
+                tabIndex={-1}
+                className={getNumberKeyboardKeyClasses(key, effectiveDisabled)}
+                disabled={effectiveDisabled}
+                aria-label={key.ariaLabel}
+                data-key={key.value}
+                data-active={index === activeIndex ? '' : undefined}
+                onClick={() => {
+                  setActiveIndex(index)
+                  applyKey(key)
+                }}>
+                {key.label}
+              </button>
+            )
+          )}
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+
+    if (!overlayMode) return group(false)
+
+    const portalTarget = resolveAnchoredOverlayTarget(rootRef.current)
+    return (
+      <div ref={setRootRef} className={classNames('contents', className)} style={style}>
+        {effectiveName ? <input type="hidden" name={effectiveName} value={currentValue} /> : null}
+        {overlayEnabled
+          ? renderOverlayPortal(
+              <>
+                <div className={numberKeyboardScrimClasses} onClick={closeSheet} />
+                {group(true)}
+              </>,
+              portalTarget
+            )
+          : null}
+      </div>
+    )
+  }
+)
+
+NumberKeyboard.displayName = 'NumberKeyboard'
 
 export default NumberKeyboard

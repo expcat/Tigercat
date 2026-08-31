@@ -1,9 +1,10 @@
 import type {
+  NumberKeyboardAction,
   NumberKeyboardKey,
-  NumberKeyboardMode,
-  NumberKeyboardAction
+  NumberKeyboardMode
 } from '../types/number-keyboard'
 import { classNames } from './class-names'
+import { overlayZIndexClass } from './floating'
 
 export interface NumberKeyboardInputOptions {
   mode?: NumberKeyboardMode
@@ -12,29 +13,77 @@ export interface NumberKeyboardInputOptions {
   decimalSeparator?: string
 }
 
+export interface NumberKeyboardLayoutLabels {
+  deleteText: string
+  confirmText: string
+  decimalAriaLabel: string
+  idCardXAriaLabel: string
+}
+
 export interface NumberKeyboardLayoutOptions {
   mode?: NumberKeyboardMode
   decimalSeparator?: string
-  deleteText?: string
-  confirmText?: string
   showConfirm?: boolean
+  labels: NumberKeyboardLayoutLabels
 }
 
-export const numberKeyboardRootClasses =
-  'w-full max-w-sm rounded-[var(--tiger-radius-lg,0.75rem)] border border-[var(--tiger-number-keyboard-border,var(--tiger-border,#d1d5db))] bg-[var(--tiger-number-keyboard-bg,var(--tiger-surface,#ffffff))] p-2 shadow-sm'
+export interface ApplyNumberKeyboardKeyResult {
+  nextValue: string
+  action: NumberKeyboardAction
+  changed: boolean
+}
+
+const KEY_LAYOUT =
+  'flex min-h-12 select-none items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border px-3 text-lg font-medium tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease,background-color_150ms_ease)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/30 disabled:cursor-not-allowed disabled:opacity-50'
+
+const KEY_TONE =
+  'border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-fill,#f3f4f6)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]'
+
+const CONFIRM_TONE =
+  'col-span-3 border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)]'
+
+export const numberKeyboardRootClasses = classNames(
+  'w-full rounded-[var(--tiger-radius-lg,0.75rem)]',
+  'border border-[var(--tiger-border,#d1d5db)]',
+  'bg-[var(--tiger-surface,#ffffff)] p-2',
+  'shadow-[var(--tiger-shadow-sm,0_1px_2px_rgb(0_0_0_/_0.05))]'
+)
 
 export const numberKeyboardGridClasses = 'grid grid-cols-3 gap-2'
 
-export const numberKeyboardKeyClasses =
-  'flex min-h-12 select-none items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-number-keyboard-key-border,var(--tiger-border,#d1d5db))] bg-[var(--tiger-number-keyboard-key-bg,var(--tiger-fill,#f3f4f6))] px-3 text-lg font-medium text-[var(--tiger-number-keyboard-key-text,var(--tiger-text,#111827))] transition-colors hover:bg-[var(--tiger-number-keyboard-key-bg-hover,var(--tiger-outline-bg-hover,#eff6ff))] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-number-keyboard-ring,var(--tiger-primary,#2563eb))]/30 disabled:cursor-not-allowed disabled:opacity-50'
+export const numberKeyboardEmptyKeyClasses = 'min-h-12'
 
-export const numberKeyboardConfirmKeyClasses =
-  'col-span-3 bg-[var(--tiger-number-keyboard-confirm-bg,var(--tiger-primary,#2563eb))] text-[var(--tiger-number-keyboard-confirm-text,#ffffff)] hover:bg-[var(--tiger-number-keyboard-confirm-bg-hover,var(--tiger-primary-hover,#1d4ed8))]'
+export const numberKeyboardSheetClasses = classNames(
+  'fixed inset-x-0 bottom-0',
+  overlayZIndexClass.overlay,
+  'w-full',
+  'rounded-t-[var(--tiger-radius-lg,0.75rem)]',
+  'border-t border-[var(--tiger-border,#d1d5db)]',
+  'bg-[var(--tiger-surface,#ffffff)] p-2',
+  'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+  'shadow-[var(--tiger-shadow-lg,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]'
+)
 
-export const numberKeyboardEmptyKeyClasses = 'pointer-events-none opacity-0'
+export const numberKeyboardScrimClasses = classNames(
+  'fixed inset-0',
+  overlayZIndexClass.overlay,
+  'bg-[color-mix(in_srgb,var(--tiger-text,#111827)_40%,transparent)]'
+)
+
+export const numberKeyboardKeyClasses = classNames(KEY_LAYOUT, KEY_TONE)
+
+export const numberKeyboardConfirmKeyClasses = classNames(KEY_LAYOUT, CONFIRM_TONE)
 
 export function normalizeNumberKeyboardValue(value: unknown): string {
   return value === null || value === undefined ? '' : String(value)
+}
+
+export function postNumberKeyboardValue(
+  value: unknown,
+  mode: NumberKeyboardMode = 'number'
+): string {
+  const normalized = normalizeNumberKeyboardValue(value)
+  return mode === 'id-card' ? normalized.toUpperCase() : normalized
 }
 
 export function getNumberKeyboardMaxLength(
@@ -74,7 +123,8 @@ function appendAmountInput(
   const precision = getNumberKeyboardPrecision('amount', options.precision)
   const maxLength = getNumberKeyboardMaxLength('amount', options.maxLength)
 
-  if (key === separator || key === '.') {
+  if (key === separator) {
+    if (precision === 0) return current
     if (current.includes(separator) || current.length >= maxLength) return current
     return current === '' ? `0${separator}` : `${current}${separator}`
   }
@@ -92,13 +142,16 @@ function appendAmountInput(
 }
 
 function appendIdCardInput(current: string, key: string, maxLength: number): string {
+  const normalizedCurrent = current.toUpperCase()
   const normalizedKey = key.toUpperCase()
-  if (current.length >= maxLength) return current
-  if (current.includes('X')) return current
+  if (normalizedCurrent.length >= maxLength) return normalizedCurrent
+  if (normalizedCurrent.includes('X')) return normalizedCurrent
 
-  if (isDigit(normalizedKey)) return current + normalizedKey
-  if (normalizedKey === 'X' && current.length === maxLength - 1) return current + normalizedKey
-  return current
+  if (isDigit(normalizedKey)) return normalizedCurrent + normalizedKey
+  if (normalizedKey === 'X' && normalizedCurrent.length === maxLength - 1) {
+    return normalizedCurrent + normalizedKey
+  }
+  return normalizedCurrent
 }
 
 export function applyNumberKeyboardInput(
@@ -107,7 +160,7 @@ export function applyNumberKeyboardInput(
   options: NumberKeyboardInputOptions = {}
 ): string {
   const mode = options.mode ?? 'number'
-  const current = normalizeNumberKeyboardValue(currentValue)
+  const current = postNumberKeyboardValue(currentValue, mode)
   const maxLength = getNumberKeyboardMaxLength(mode, options.maxLength)
   const decimalSeparator = options.decimalSeparator || '.'
 
@@ -123,8 +176,11 @@ export function applyNumberKeyboardInput(
   return appendDigit(current, key, maxLength)
 }
 
-export function deleteNumberKeyboardValue(value: unknown): string {
-  return normalizeNumberKeyboardValue(value).slice(0, -1)
+export function deleteNumberKeyboardValue(
+  value: unknown,
+  mode: NumberKeyboardMode = 'number'
+): string {
+  return postNumberKeyboardValue(value, mode).slice(0, -1)
 }
 
 export function getNumberKeyboardAction(key: NumberKeyboardKey): NumberKeyboardAction {
@@ -133,55 +189,162 @@ export function getNumberKeyboardAction(key: NumberKeyboardKey): NumberKeyboardA
   return 'input'
 }
 
+export function applyNumberKeyboardKey(
+  current: unknown,
+  key: Pick<NumberKeyboardKey, 'type' | 'value'> | string,
+  options: NumberKeyboardInputOptions = {}
+): ApplyNumberKeyboardKeyResult {
+  const mode = options.mode ?? 'number'
+  const currentValue = postNumberKeyboardValue(current, mode)
+  const resolved =
+    typeof key === 'string'
+      ? resolveNumberKeyboardPhysicalKey(key, options)
+      : { type: key.type, value: key.value }
+
+  if (!resolved || resolved.type === 'empty') {
+    return { nextValue: currentValue, action: 'input', changed: false }
+  }
+
+  if (resolved.type === 'confirm') {
+    return { nextValue: currentValue, action: 'confirm', changed: false }
+  }
+
+  const nextValue =
+    resolved.type === 'delete'
+      ? deleteNumberKeyboardValue(currentValue, mode)
+      : applyNumberKeyboardInput(currentValue, resolved.value, options)
+
+  return {
+    nextValue,
+    action: resolved.type === 'delete' ? 'delete' : 'input',
+    changed: nextValue !== currentValue
+  }
+}
+
+export function resolveNumberKeyboardPhysicalKey(
+  eventKey: string,
+  options: NumberKeyboardInputOptions = {}
+): { type: NumberKeyboardKeyType; value: string } | null {
+  const mode = options.mode ?? 'number'
+  const decimalSeparator = options.decimalSeparator || '.'
+
+  if (eventKey === 'Backspace' || eventKey === 'Delete') {
+    return { type: 'delete', value: 'delete' }
+  }
+  if (eventKey === 'Enter') {
+    return { type: 'confirm', value: 'confirm' }
+  }
+  if (isDigit(eventKey)) {
+    return { type: 'digit', value: eventKey }
+  }
+  if (mode === 'amount' && eventKey === decimalSeparator) {
+    return { type: 'decimal', value: decimalSeparator }
+  }
+  if (mode === 'id-card' && eventKey.toUpperCase() === 'X') {
+    return { type: 'id-card-x', value: 'X' }
+  }
+  return null
+}
+
 function createDigitKey(value: string): NumberKeyboardKey {
   return { type: 'digit', value, label: value, ariaLabel: value }
 }
 
-function createExtraKey(mode: NumberKeyboardMode, decimalSeparator: string): NumberKeyboardKey {
+function createExtraKey(
+  mode: NumberKeyboardMode,
+  decimalSeparator: string,
+  labels: NumberKeyboardLayoutLabels
+): NumberKeyboardKey {
   if (mode === 'amount') {
     return {
       type: 'decimal',
       value: decimalSeparator,
       label: decimalSeparator,
-      ariaLabel: 'Decimal'
+      ariaLabel: labels.decimalAriaLabel
     }
   }
   if (mode === 'id-card') {
-    return { type: 'id-card-x', value: 'X', label: 'X', ariaLabel: 'ID card X' }
+    return { type: 'id-card-x', value: 'X', label: 'X', ariaLabel: labels.idCardXAriaLabel }
   }
-  return { type: 'empty', value: '', label: '', ariaLabel: 'Empty', disabled: true }
+  return { type: 'empty', value: '', label: '', ariaLabel: '' }
 }
 
-export function getNumberKeyboardKeys(
-  options: NumberKeyboardLayoutOptions = {}
-): NumberKeyboardKey[] {
+export function getNumberKeyboardKeys(options: NumberKeyboardLayoutOptions): NumberKeyboardKey[] {
   const mode = options.mode ?? 'number'
   const decimalSeparator = options.decimalSeparator || '.'
-  const deleteText = options.deleteText || 'Delete'
-  const confirmText = options.confirmText || 'Done'
   const keys: NumberKeyboardKey[] = ['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(
     createDigitKey
   )
 
-  keys.push(createExtraKey(mode, decimalSeparator), createDigitKey('0'), {
+  keys.push(createExtraKey(mode, decimalSeparator, options.labels), createDigitKey('0'), {
     type: 'delete',
     value: 'delete',
-    label: deleteText,
-    ariaLabel: deleteText
+    label: options.labels.deleteText,
+    ariaLabel: options.labels.deleteText
   })
 
   if (options.showConfirm !== false) {
-    keys.push({ type: 'confirm', value: 'confirm', label: confirmText, ariaLabel: confirmText })
+    keys.push({
+      type: 'confirm',
+      value: 'confirm',
+      label: options.labels.confirmText,
+      ariaLabel: options.labels.confirmText
+    })
   }
 
   return keys
 }
 
 export function getNumberKeyboardKeyClasses(key: NumberKeyboardKey, disabled = false): string {
+  if (key.type === 'empty') return numberKeyboardEmptyKeyClasses
   return classNames(
-    numberKeyboardKeyClasses,
-    key.type === 'confirm' && numberKeyboardConfirmKeyClasses,
-    key.type === 'empty' && numberKeyboardEmptyKeyClasses,
+    KEY_LAYOUT,
+    key.type === 'confirm' ? CONFIRM_TONE : KEY_TONE,
     disabled && 'pointer-events-none'
   )
+}
+
+export function getNumberKeyboardInteractiveIndexes(keys: readonly NumberKeyboardKey[]): number[] {
+  return keys.map((key, index) => (key.type === 'empty' ? -1 : index)).filter((index) => index >= 0)
+}
+
+export function moveNumberKeyboardIndex(
+  keys: readonly NumberKeyboardKey[],
+  activeIndex: number,
+  key: string,
+  columns = 3
+): number {
+  const interactive = getNumberKeyboardInteractiveIndexes(keys)
+  if (interactive.length === 0) return activeIndex
+  const currentPos = interactive.indexOf(activeIndex)
+  const fallback = interactive[0]
+  const pos = currentPos < 0 ? 0 : currentPos
+
+  if (key === 'Home') return interactive[0] ?? fallback
+  if (key === 'End') return interactive[interactive.length - 1] ?? fallback
+
+  const index = interactive[pos] ?? fallback
+  const row = Math.floor(index / columns)
+  const col = index % columns
+  let nextRow = row
+  let nextCol = col
+
+  if (key === 'ArrowLeft') nextCol -= 1
+  else if (key === 'ArrowRight') nextCol += 1
+  else if (key === 'ArrowUp') nextRow -= 1
+  else if (key === 'ArrowDown') nextRow += 1
+  else return index
+
+  const nextIndex = nextRow * columns + nextCol
+  if (interactive.includes(nextIndex)) return nextIndex
+
+  const nearest = interactive.reduce((best, candidate) => {
+    const bestDist =
+      Math.abs(Math.floor(best / columns) - nextRow) + Math.abs((best % columns) - nextCol)
+    const nextDist =
+      Math.abs(Math.floor(candidate / columns) - nextRow) +
+      Math.abs((candidate % columns) - nextCol)
+    return nextDist < bestDist ? candidate : best
+  }, interactive[pos] ?? fallback)
+  return nearest
 }

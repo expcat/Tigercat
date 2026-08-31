@@ -49,7 +49,7 @@ export type {
 export { Signature } from './components/Signature'
 export type { VueSignatureProps, SignatureProps } from './components/Signature'
 export { NumberKeyboard } from './components/NumberKeyboard'
-export type { VueNumberKeyboardProps } from './components/NumberKeyboard'
+export type { VueNumberKeyboardProps, NumberKeyboardProps } from './components/NumberKeyboard'
 export { InputOTP } from './components/InputOTP'
 export type { VueInputOTPProps } from './components/InputOTP'
 export { TagsInput } from './components/TagsInput'
