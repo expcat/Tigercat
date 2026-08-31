@@ -75,6 +75,7 @@ export * from '../collapse-utils'
 
 // Navigation components
 export * from '../menu-utils'
+export * from '../menu-controller'
 export * from '../tabs-utils'
 export * from '../breadcrumb-utils'
 export * from '../steps-utils'

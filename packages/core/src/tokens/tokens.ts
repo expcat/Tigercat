@@ -399,13 +399,6 @@ export const componentTokens = {
     'border-radius': '14px',
     shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)'
   },
-  menu: {
-    'item-height': '40px',
-    'item-padding-x': '16px',
-    'group-title-padding': '8px',
-    'indent-width': '24px',
-    'border-radius': '10px'
-  },
   notification: {
     width: '384px',
     padding: '16px',

@@ -1,36 +1,54 @@
 import React, { useCallback } from 'react'
 import {
   classNames,
+  focusMenuEdge,
   getMenuItemClasses,
   getMenuItemIndent,
+  getMenuNavigationKeys,
   isKeySelected,
-  menuItemIconClasses,
-  menuCollapsedIconClasses,
+  isMenuRoving,
   moveFocusInMenu,
-  focusMenuEdge,
-  getMenuNavigationKeys
+  sameMenuKey,
+  shouldIndentMenuItem
 } from '@expcat/tigercat-core'
-import { useMenuContext } from './context'
+import { useMenuContext, useSubMenuScope, warnMissingMenuContext } from './context'
+import { getReactMenuPlainText, renderCollapsedLabel, renderMenuIcon } from './render'
 import type { MenuItemProps } from './types'
 
 export const MenuItem: React.FC<MenuItemProps> = ({
   itemKey,
   disabled = false,
   icon,
+  href,
   className,
   children,
   level = 0,
-  collapsed: collapsedOverride
+  collapsed: collapsedOverride,
+  ...rest
 }) => {
   const menuContext = useMenuContext()
+  const submenuScope = useSubMenuScope()
 
   if (!menuContext) {
-    console.warn('MenuItem must be used within Menu component')
+    warnMissingMenuContext('MenuItem')
   }
 
   const isSelected = !!menuContext && isKeySelected(itemKey, menuContext.selectedKeys)
-
   const effectiveCollapsed = collapsedOverride ?? (menuContext ? menuContext.collapsed : false)
+  const inPopup = Boolean(submenuScope?.popup)
+  const usesMenuRole = inPopup || menuContext?.mode === 'horizontal'
+  const roving = Boolean(
+    menuContext &&
+    isMenuRoving(menuContext.mode, {
+      popup: inPopup,
+      isRoot: !submenuScope
+    })
+  )
+  const isTabStop =
+    !disabled &&
+    (!roving ||
+      (menuContext?.tabStopKey != null && sameMenuKey(itemKey, menuContext.tabStopKey)) ||
+      (inPopup && false))
 
   const itemClasses = classNames(
     menuContext
@@ -40,7 +58,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   )
 
   const indentStyle: React.CSSProperties =
-    menuContext && menuContext.mode === 'inline' && level > 0
+    menuContext && shouldIndentMenuItem(menuContext.mode, level)
       ? getMenuItemIndent(level, menuContext.inlineIndent)
       : {}
 
@@ -51,12 +69,16 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   }, [disabled, menuContext, itemKey])
 
   const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    (event: React.KeyboardEvent<HTMLElement>) => {
       if (!menuContext) return
       const current = event.currentTarget
-      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode, isRoot)
+      const rootMenu = current.closest('[data-tiger-menu-root="true"]') as HTMLElement | null
+      const isRoot = Boolean(rootMenu && current.closest('[data-tiger-menu-list]') === rootMenu)
+      const { nextKey, prevKey, closeKey } = getMenuNavigationKeys(
+        menuContext.mode,
+        isRoot,
+        menuContext.dir
+      )
 
       if (event.key === nextKey) {
         event.preventDefault()
@@ -82,62 +104,64 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         return
       }
 
-      if (event.key === 'Enter' || event.key === ' ') {
+      if ((event.key === 'Escape' || event.key === closeKey) && submenuScope) {
         event.preventDefault()
-        handleClick()
+        submenuScope.close()
+        submenuScope.titleRef.current?.focus()
       }
     },
-    [menuContext, handleClick]
+    [menuContext, submenuScope]
   )
 
-  const renderIcon = () => {
-    if (!icon) return null
+  const label = getReactMenuPlainText(children)
+  const content = (
+    <>
+      {renderMenuIcon(icon, effectiveCollapsed)}
+      {effectiveCollapsed ? (
+        renderCollapsedLabel(label, icon)
+      ) : (
+        <span className="flex-1">{children}</span>
+      )}
+    </>
+  )
 
-    const iconClasses = effectiveCollapsed ? menuCollapsedIconClasses : menuItemIconClasses
-    if (typeof icon === 'string') {
-      return <span className={iconClasses} dangerouslySetInnerHTML={{ __html: icon }} />
-    }
-
-    return <span className={iconClasses}>{icon as React.ReactNode}</span>
+  const shared = {
+    className: itemClasses,
+    style: indentStyle,
+    'data-tiger-menuitem': 'true' as const,
+    'data-tiger-selected': isSelected ? 'true' : 'false',
+    'aria-disabled': disabled ? true : undefined,
+    tabIndex: disabled ? -1 : roving ? (isTabStop ? 0 : -1) : 0,
+    onClick: handleClick,
+    onKeyDown: handleKeyDown,
+    ...rest
   }
 
-  const renderLabel = () => {
-    if (!effectiveCollapsed) return <span className="flex-1">{children}</span>
-    if (!icon) {
-      const text = String(children || '')
-      // First-letter fallback is aria-hidden; the sr-only full label below
-      // keeps the accessible name complete.
-      return (
-        <>
-          <span className="flex-1 text-center" aria-hidden="true">
-            {text.charAt(0).toUpperCase()}
-          </span>
-          <span className="sr-only">{children}</span>
-        </>
-      )
-    }
-    // Keep the full label in the DOM for screen readers
-    return <span className="sr-only">{children}</span>
+  const role = usesMenuRole ? ('menuitem' as const) : undefined
+  const wrapperRole = usesMenuRole ? ('none' as const) : undefined
+
+  if (href) {
+    return (
+      <li role={wrapperRole}>
+        <a
+          {...shared}
+          href={disabled ? undefined : href}
+          role={role}
+          aria-current={isSelected ? 'page' : undefined}
+          aria-disabled={disabled ? true : undefined}>
+          {content}
+        </a>
+      </li>
+    )
   }
 
   return (
-    <li role="none">
-      <button
-        type="button"
-        className={itemClasses}
-        style={indentStyle}
-        role="menuitem"
-        data-tiger-menuitem="true"
-        data-tiger-selected={isSelected ? 'true' : 'false'}
-        aria-current={isSelected ? 'page' : undefined}
-        aria-disabled={disabled ? 'true' : undefined}
-        disabled={disabled}
-        tabIndex={-1}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}>
-        {renderIcon()}
-        {renderLabel()}
+    <li role={wrapperRole}>
+      <button {...shared} type="button" role={role} disabled={disabled}>
+        {content}
       </button>
     </li>
   )
 }
+
+MenuItem.displayName = 'MenuItem'

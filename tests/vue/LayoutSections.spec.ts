@@ -131,7 +131,7 @@ describe('Layout Sections', () => {
           h(Sidebar, { collapsed: false }, () => h(Menu, { items: [{ key: 'a', label: 'A' }] }))
       }
     })
-    expect(view.container.querySelector('[data-tiger-menu-root]')?.className).not.toContain(
+    expect(view.container.querySelector('[data-tiger-menu]')?.className).not.toContain(
       menuCollapsedClasses
     )
     view.unmount()
@@ -142,7 +142,7 @@ describe('Layout Sections', () => {
           h(Sidebar, { collapsed: true }, () => h(Menu, { items: [{ key: 'a', label: 'A' }] }))
       }
     })
-    expect(collapsed.container.querySelector('[data-tiger-menu-root]')?.className).toContain(
+    expect(collapsed.container.querySelector('[data-tiger-menu]')?.className).toContain(
       menuCollapsedClasses
     )
   })

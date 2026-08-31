@@ -310,11 +310,6 @@
   --tiger-component-dropdown-border-radius: 14px;
   --tiger-component-dropdown-shadow:
     0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --tiger-component-menu-item-height: 40px;
-  --tiger-component-menu-item-padding-x: 16px;
-  --tiger-component-menu-group-title-padding: 8px;
-  --tiger-component-menu-indent-width: 24px;
-  --tiger-component-menu-border-radius: 10px;
   --tiger-component-notification-width: 384px;
   --tiger-component-notification-padding: 16px;
   --tiger-component-notification-border-radius: 14px;

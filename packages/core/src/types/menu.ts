@@ -15,19 +15,39 @@ export type MenuTheme = 'light' | 'dark'
 export type MenuKey = string | number
 
 /**
- * Menu item data structure
+ * Filter behavior when a parent label matches the query.
+ * `subtree` keeps the item a submenu and retains its children.
+ * `match-only` keeps only matching descendants.
+ */
+export type MenuFilterMode = 'subtree' | 'match-only'
+
+export type MenuItemType = 'item' | 'group' | 'divider'
+
+/**
+ * Menu item data structure. Slot/children usage is still supported.
+ * Unknown fields are not forwarded — use `type`, `href`, and `title` instead
+ * of an index signature.
  */
 export interface MenuItem {
   /**
-   * Unique key for the menu item
+   * Unique key for an item or submenu. Optional on group/divider nodes.
    */
-  key: MenuKey
+  key?: MenuKey
   /**
-   * Menu item label/title
+   * Discriminator. Omit (or `item`) for a leaf or submenu; `group` and
+   * `divider` match the slot components.
    */
-  label: string
+  type?: MenuItemType
   /**
-   * Icon for the menu item
+   * Menu item label / submenu title.
+   */
+  label?: string
+  /**
+   * Group title when `type="group"`.
+   */
+  title?: string
+  /**
+   * Icon node or a registered icon name. HTML strings are ignored.
    */
   icon?: unknown
   /**
@@ -35,13 +55,13 @@ export interface MenuItem {
    */
   disabled?: boolean
   /**
-   * Child menu items (for submenu)
+   * Navigate with an `<a>` instead of a button.
+   */
+  href?: string
+  /**
+   * Child menu items (submenu or group).
    */
   children?: MenuItem[]
-  /**
-   * Custom data
-   */
-  [key: string]: unknown
 }
 
 /**
@@ -64,7 +84,8 @@ export interface MenuProps {
    */
   theme?: MenuTheme
   /**
-   * Currently selected menu item keys
+   * Currently selected menu item keys.
+   * Selection is always single-key: the array is empty or length 1.
    */
   selectedKeys?: MenuKey[]
   /**
@@ -72,7 +93,7 @@ export interface MenuProps {
    */
   defaultSelectedKeys?: MenuKey[]
   /**
-   * Currently opened submenu keys (for vertical/inline mode)
+   * Currently opened submenu keys (inline, vertical, and popup).
    */
   openKeys?: MenuKey[]
   /**
@@ -80,13 +101,15 @@ export interface MenuProps {
    */
   defaultOpenKeys?: MenuKey[]
   /**
-   * Whether the menu is collapsed (for vertical mode)
-   * When used with `mode="inline"`, collapsed menus automatically use popup-style submenu behavior.
+   * Collapse vertical/inline menus to icons (or first letter) and popup submenus.
+   * Horizontal menus ignore this and `devWarn`.
+   * With `mode="inline"`, collapsed menus switch to vertical popup submenus.
    * @default false
    */
   collapsed?: boolean
   /**
-   * Whether multiple submenus can be opened at once
+   * Whether multiple **submenus** can be opened at once.
+   * Does not change item selection (always single-select).
    * @default true
    */
   multiple?: boolean
@@ -96,9 +119,8 @@ export interface MenuProps {
    */
   inlineIndent?: number
   /**
-   * Whether popup submenus are rendered through a body portal/teleport.
-   * Useful when parent containers clip overflow.
-   * @default false
+   * Whether popup submenus are rendered through a portal.
+   * @default true
    */
   popupPortal?: boolean
   /**
@@ -127,16 +149,21 @@ export interface MenuProps {
   defaultSearchValue?: string
 
   /**
-   * Search input placeholder.
-   * @default 'Search menu'
+   * Search input placeholder. Falls back to `locale.common.searchPlaceholder`.
    */
   searchPlaceholder?: string
 
   /**
    * Empty text shown when `items` are filtered to no results.
-   * @default 'No menu items found'
+   * Falls back to `locale.common.emptyText`.
    */
   emptyText?: string
+
+  /**
+   * How a matching parent node treats unmatched children.
+   * @default 'subtree'
+   */
+  filterMode?: MenuFilterMode
 }
 
 /**
@@ -152,9 +179,13 @@ export interface MenuItemProps {
    */
   disabled?: boolean
   /**
-   * Icon for the menu item
+   * Icon for the menu item (node or registered icon name)
    */
   icon?: unknown
+  /**
+   * Render an `<a>` with this href. `aria-current="page"` only applies to links.
+   */
+  href?: string
   /**
    * Additional CSS classes
    */
@@ -174,7 +205,7 @@ export interface SubMenuProps {
    */
   title?: string
   /**
-   * Icon for the submenu
+   * Icon for the submenu (node or registered icon name)
    */
   icon?: unknown
   /**

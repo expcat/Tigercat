@@ -9,60 +9,76 @@ import {
   type ComputedRef,
   watch,
   nextTick,
-  onMounted,
   onBeforeUnmount,
   cloneVNode,
   isVNode,
-  type VNode
+  type VNode,
+  useId
 } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  createSubmenuHeightTransitionController,
+  devWarn,
+  focusFirstChildItem,
+  focusMenuEdge,
   getMenuClasses,
+  getMenuCollapsedInitial,
   getMenuItemClasses,
   getMenuItemIndent,
-  getSubMenuTitleClasses,
+  getMenuItemKind,
+  getMenuListRole,
+  getMenuNavigationKeys,
+  getMenuPlainText,
+  getMenuPopupPlacement,
   getSubMenuExpandIconClasses,
-  filterMenuItems,
-  isKeySelected,
+  getSubMenuTitleClasses,
+  hasSelectedMenuDescendant,
   isKeyOpen,
-  menuItemIconClasses,
+  isKeySelected,
+  isMenuRoving,
+  isSubmenuPopup,
+  MENU_POPUP_HOVER_CLOSE_MS,
   menuCollapsedIconClasses,
   menuItemGroupTitleClasses,
-  menuSearchFieldClasses,
+  menuItemIconClasses,
   menuSearchEmptyClasses,
+  menuSearchFieldClasses,
   menuSearchInputClasses,
   mergeStyleValues,
+  mergeTigerLocale,
   moveFocusInMenu,
-  focusMenuEdge,
-  focusFirstChildItem,
-  getMenuNavigationKeys,
-  submenuContentHorizontalClasses,
-  submenuContentHorizontalNestedClasses,
+  nextOpenKeys,
+  nextSelectedKeys,
+  reconcileSearchOpenKeys,
+  resolveMenuCollapsed,
+  resolveMenuIconKind,
+  resolveMenuMode,
+  resolveSearchFilter,
+  sameMenuKey,
+  shouldIndentMenuItem,
+  submenuContentInlineClasses,
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
-  submenuContentInlineClasses,
   submenuHeightTransitionClasses,
-  getInitialSubmenuHeightTransitionStyle,
-  createSubmenuHeightTransitionController,
-  type SubmenuHeightTransitionController,
+  warnControlledSearchOpenKeys,
   type FloatingPlacement,
-  type MenuMode,
-  type MenuTheme,
-  type MenuKey,
+  type MenuFilterMode,
   type MenuItem as CoreMenuItem,
+  type MenuKey,
+  type MenuMode,
   type MenuProps as CoreMenuProps,
-  replaceKeys,
-  toggleKey,
-  initRovingTabIndex
+  type MenuTheme,
+  type SubmenuHeightTransitionController
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { SidebarContextKey } from '../utils/layout-context'
+import { useTigerConfig } from './ConfigProvider'
+import { Icon } from './Icon'
 
-// Menu context key
 export const MenuContextKey = Symbol('MenuContext')
+export const SubMenuScopeKey = Symbol('SubMenuScope')
 
-// Menu context interface
 export interface MenuContext {
   mode: ComputedRef<MenuMode>
   theme: ComputedRef<MenuTheme>
@@ -71,8 +87,99 @@ export interface MenuContext {
   popupPortal: ComputedRef<boolean>
   selectedKeys: ComputedRef<MenuKey[]>
   openKeys: ComputedRef<MenuKey[]>
-  handleSelect: (key: string | number) => void
-  handleOpenChange: (key: string | number) => void
+  dir: ComputedRef<'ltr' | 'rtl'>
+  handleSelect: (key: MenuKey) => void
+  handleOpenChange: (key: MenuKey, open?: boolean) => void
+  tabStopKey: ComputedRef<MenuKey | undefined>
+}
+
+export interface SubMenuScope {
+  itemKey: MenuKey
+  popup: boolean
+  titleEl: { value: HTMLElement | null }
+  close: () => void
+}
+
+export function useMenuContext(): MenuContext | null {
+  return inject(MenuContextKey, null)
+}
+
+function warnMissingMenuContext(component: 'MenuItem' | 'SubMenu'): void {
+  devWarn(`Menu.${component}.context`, `${component} must be used within Menu component`)
+}
+
+function getVueSlotPlainText(nodes: VNode[] | undefined): string | null {
+  if (!nodes || nodes.length === 0) return null
+  return getMenuPlainText(
+    nodes.map((node) => (typeof node.children === 'string' ? node.children : node))
+  )
+}
+
+function asVNodeList(value: unknown): VNode[] {
+  if (Array.isArray(value)) return value.filter(isVNode)
+  if (isVNode(value)) return [value]
+  return []
+}
+
+function collectVueMenuKeys(nodes: VNode[] | undefined): MenuKey[] {
+  if (!nodes) return []
+  const keys: MenuKey[] = []
+  const walk = (list: VNode[]) => {
+    for (const node of list) {
+      if (!isVNode(node)) continue
+      const props = (node.props ?? {}) as { itemKey?: MenuKey }
+      if (props.itemKey != null) keys.push(props.itemKey)
+      const children = node.children
+      if (Array.isArray(children)) walk(asVNodeList(children))
+      else if (children && typeof children === 'object' && 'default' in children) {
+        const inner = (children as { default?: () => unknown }).default?.()
+        walk(asVNodeList(inner))
+      }
+    }
+  }
+  walk(asVNodeList(nodes))
+  return keys
+}
+
+function renderMenuIcon(icon: unknown, collapsed: boolean) {
+  const kind = resolveMenuIconKind(icon)
+  if (kind === 'none') return null
+  const iconClasses = collapsed ? menuCollapsedIconClasses : menuItemIconClasses
+  if (kind === 'name') {
+    return h('span', { class: iconClasses }, [h(Icon, { name: icon as string })])
+  }
+  return h('span', { class: iconClasses }, [icon as VNode])
+}
+
+function renderCollapsedLabel(text: string | null, icon: unknown) {
+  if (resolveMenuIconKind(icon) !== 'none') {
+    return text ? [h('span', { class: 'sr-only' }, text)] : []
+  }
+  const initial = getMenuCollapsedInitial(text)
+  const nodes = []
+  if (initial) {
+    nodes.push(h('span', { class: 'flex-1 text-center', 'aria-hidden': 'true' }, initial))
+  }
+  if (text) nodes.push(h('span', { class: 'sr-only' }, text))
+  return nodes
+}
+
+function withChildProps(
+  nodes: VNode[] | undefined,
+  next: Record<string, unknown>,
+  names: string[]
+): VNode[] | undefined {
+  if (!nodes || nodes.length === 0) return nodes
+  return nodes.map((node) => {
+    if (!isVNode(node)) return node
+    const type = node.type as unknown
+    const name =
+      typeof type === 'object' && type != null && 'name' in type
+        ? (type as { name?: unknown }).name
+        : undefined
+    if (typeof name !== 'string' || !names.includes(name)) return node
+    return cloneVNode(node, next)
+  })
 }
 
 export interface VueMenuProps {
@@ -94,118 +201,36 @@ export interface VueMenuProps {
   defaultSearchValue?: string
   searchPlaceholder?: string
   emptyText?: string
+  filterMode?: MenuFilterMode
 }
+
+export type MenuProps = VueMenuProps
 
 export const Menu = defineComponent({
   name: 'TigerMenu',
   inheritAttrs: false,
   props: {
-    /**
-     * Data-driven menu items
-     */
-    items: {
-      type: Array as PropType<CoreMenuItem[]>,
-      default: undefined
-    },
-    /**
-     * Menu mode - horizontal, vertical, or inline
-     * @default 'vertical'
-     */
-    mode: {
-      type: String as PropType<MenuMode>,
-      default: 'vertical' as MenuMode
-    },
-    /**
-     * Menu theme - light or dark
-     * @default 'light'
-     */
-    theme: {
-      type: String as PropType<MenuTheme>,
-      default: 'light' as MenuTheme
-    },
-    /**
-     * Currently selected menu item keys
-     */
-    selectedKeys: {
-      type: Array as PropType<(string | number)[]>,
-      default: undefined
-    },
-    /**
-     * Default selected menu item keys
-     */
-    defaultSelectedKeys: {
-      type: Array as PropType<(string | number)[]>,
-      default: () => []
-    },
-    /**
-     * Currently opened submenu keys (for vertical/inline mode)
-     */
-    openKeys: {
-      type: Array as PropType<(string | number)[]>,
-      default: undefined
-    },
-    /**
-     * Default opened submenu keys
-     */
-    defaultOpenKeys: {
-      type: Array as PropType<(string | number)[]>,
-      default: () => []
-    },
-    /**
-     * Whether the menu is collapsed (for vertical mode).
-     * Omitted: follow Sidebar context when nested, otherwise false.
-     */
-    collapsed: {
-      type: Boolean,
-      default: undefined
-    },
-    /**
-     * Whether multiple submenus can be opened at once
-     * @default true
-     */
-    multiple: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Inline indentation for submenu items
-     * @default 24
-     */
-    inlineIndent: {
-      type: Number,
-      default: 24
-    },
-    popupPortal: {
-      type: Boolean,
-      default: false
-    },
-    className: {
-      type: String,
-      default: undefined
-    },
-    style: {
-      type: Object as PropType<CoreMenuProps['style']>,
-      default: undefined
-    },
-    searchable: {
-      type: Boolean,
-      default: false
-    },
-    searchValue: {
-      type: String,
-      default: undefined
-    },
-    defaultSearchValue: {
-      type: String,
-      default: ''
-    },
-    searchPlaceholder: {
-      type: String,
-      default: 'Search menu'
-    },
-    emptyText: {
-      type: String,
-      default: 'No menu items found'
+    items: { type: Array as PropType<CoreMenuItem[]>, default: undefined },
+    mode: { type: String as PropType<MenuMode>, default: 'vertical' as MenuMode },
+    theme: { type: String as PropType<MenuTheme>, default: 'light' as MenuTheme },
+    selectedKeys: { type: Array as PropType<MenuKey[]>, default: undefined },
+    defaultSelectedKeys: { type: Array as PropType<MenuKey[]>, default: () => [] },
+    openKeys: { type: Array as PropType<MenuKey[]>, default: undefined },
+    defaultOpenKeys: { type: Array as PropType<MenuKey[]>, default: () => [] },
+    collapsed: { type: Boolean, default: undefined },
+    multiple: { type: Boolean, default: true },
+    inlineIndent: { type: Number, default: 24 },
+    popupPortal: { type: Boolean, default: true },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<CoreMenuProps['style']>, default: undefined },
+    searchable: { type: Boolean, default: false },
+    searchValue: { type: String, default: undefined },
+    defaultSearchValue: { type: String, default: '' },
+    searchPlaceholder: { type: String, default: undefined },
+    emptyText: { type: String, default: undefined },
+    filterMode: {
+      type: String as PropType<MenuFilterMode>,
+      default: 'subtree' as MenuFilterMode
     }
   },
   emits: [
@@ -219,150 +244,171 @@ export const Menu = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const menuEl = ref<HTMLElement | null>(null)
     const sidebarCtx = inject(SidebarContextKey, null)
-    const collapsed = computed(() => props.collapsed ?? sidebarCtx?.collapsed.value ?? false)
-    const resolvedMode = computed<MenuMode>(() =>
-      collapsed.value && props.mode === 'inline' ? 'vertical' : props.mode
+    const config = useTigerConfig()
+    const locale = computed(() => mergeTigerLocale(config.value.locale))
+    const dir = computed<'ltr' | 'rtl'>(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
+    const collapsed = computed(() =>
+      resolveMenuCollapsed(props.mode, props.collapsed ?? sidebarCtx?.collapsed.value ?? false)
     )
+    const resolvedMode = computed<MenuMode>(() => resolveMenuMode(props.mode, collapsed.value))
 
-    // Internal state for uncontrolled mode
     const internalSelectedKeys = ref<MenuKey[]>(props.defaultSelectedKeys)
     const internalOpenKeys = ref<MenuKey[]>(props.defaultOpenKeys)
     const internalSearchValue = ref(props.defaultSearchValue)
+    const searchExpandKeys = ref<MenuKey[]>([])
 
-    // Computed selected keys (controlled or uncontrolled)
-    const currentSelectedKeys = computed(() => {
-      return props.selectedKeys !== undefined ? props.selectedKeys : internalSelectedKeys.value
-    })
+    const currentSelectedKeys = computed(() =>
+      props.selectedKeys !== undefined ? props.selectedKeys : internalSelectedKeys.value
+    )
+    const currentOpenKeys = computed(() =>
+      props.openKeys !== undefined ? props.openKeys : internalOpenKeys.value
+    )
+    const currentSearchValue = computed(() =>
+      props.searchValue !== undefined ? props.searchValue : internalSearchValue.value
+    )
 
-    // Computed open keys (controlled or uncontrolled)
-    const currentOpenKeys = computed(() => {
-      return props.openKeys !== undefined ? props.openKeys : internalOpenKeys.value
-    })
-
-    // Handle menu item selection
-    const handleSelect = (key: string | number) => {
-      const newSelectedKeys = replaceKeys(key, currentSelectedKeys.value)
-
-      // Update internal state if uncontrolled
-      if (props.selectedKeys === undefined) {
-        internalSelectedKeys.value = newSelectedKeys
-      }
-
-      // Emit events
-      emit('update:selectedKeys', newSelectedKeys)
-      emit('select', key, { selectedKeys: newSelectedKeys })
+    const handleSelect = (key: MenuKey) => {
+      const next = nextSelectedKeys(currentSelectedKeys.value, key)
+      if (props.selectedKeys === undefined) internalSelectedKeys.value = next
+      emit('update:selectedKeys', next)
+      emit('select', key, { selectedKeys: next })
     }
 
-    // Handle submenu open/close
-    const handleOpenChange = (key: string | number) => {
-      const toggled = toggleKey(key, currentOpenKeys.value)
-      const newOpenKeys = props.multiple ? toggled : toggled.includes(key) ? [key] : []
-
-      // Update internal state if uncontrolled
-      if (props.openKeys === undefined) {
-        internalOpenKeys.value = newOpenKeys
-      }
-
-      // Emit events
-      emit('update:openKeys', newOpenKeys)
-      emit('open-change', key, { openKeys: newOpenKeys })
+    const handleOpenChange = (key: MenuKey, open?: boolean) => {
+      const next = nextOpenKeys({
+        current: currentOpenKeys.value,
+        key,
+        multiple: props.multiple,
+        open
+      })
+      if (props.openKeys === undefined) internalOpenKeys.value = next
+      emit('update:openKeys', next)
+      emit('open-change', key, { openKeys: next })
     }
 
     const handleSearchInput = (event: Event) => {
       const value = (event.target as HTMLInputElement).value
-
-      if (props.searchValue === undefined) {
-        internalSearchValue.value = value
-      }
-
+      if (props.searchValue === undefined) internalSearchValue.value = value
       emit('update:searchValue', value)
       emit('search', value)
     }
 
-    // Menu classes
-    const menuClasses = computed(() => {
-      return classNames(
+    const searchResult = computed(() =>
+      resolveSearchFilter({
+        items: props.items,
+        query: currentSearchValue.value,
+        filterMode: props.filterMode
+      })
+    )
+    const filteredItems = computed(() => searchResult.value.filtered)
+
+    watch(
+      () => [currentSearchValue.value, searchResult.value.expandKeys] as const,
+      () => {
+        const reconciled = reconcileSearchOpenKeys({
+          openKeys: currentOpenKeys.value,
+          previousSearchExpandKeys: searchExpandKeys.value,
+          nextSearchExpandKeys: searchResult.value.expandKeys
+        })
+        searchExpandKeys.value = reconciled.searchExpandKeys
+        const current = currentOpenKeys.value
+        const unchanged =
+          reconciled.openKeys.length === current.length &&
+          reconciled.openKeys.every((key, index) => key === current[index])
+        if (!unchanged) {
+          if (props.openKeys === undefined) internalOpenKeys.value = reconciled.openKeys
+          emit('update:openKeys', reconciled.openKeys)
+        }
+        warnControlledSearchOpenKeys({
+          controlled: props.openKeys !== undefined,
+          openKeys: props.openKeys ?? reconciled.openKeys,
+          searchExpandKeys: reconciled.searchExpandKeys
+        })
+      },
+      { immediate: true }
+    )
+
+    const menuClasses = computed(() =>
+      classNames(
         getMenuClasses(resolvedMode.value, props.theme, collapsed.value),
         props.className,
         coerceClassValue(attrs.class)
       )
-    })
-
-    const menuStyle = computed(() => mergeStyleValues(attrs.style, props.style))
-
-    const currentSearchValue = computed(() => {
-      return props.searchValue !== undefined ? props.searchValue : internalSearchValue.value
-    })
-
-    const filteredItems = computed(() =>
-      filterMenuItems(props.items ?? [], currentSearchValue.value)
     )
-
+    const menuStyle = computed(() => mergeStyleValues(attrs.style, props.style))
     const passthroughAttrs = computed(() => {
       const { class: _class, style: _style, ...rest } = attrs
       return rest
     })
 
-    // Provide menu context to child components
-    const modeRef = computed(() => resolvedMode.value)
-    const themeRef = computed(() => props.theme)
-    const collapsedRef = collapsed
-    const inlineIndentRef = computed(() => props.inlineIndent)
-    const popupPortalRef = computed(() => props.popupPortal)
+    const tabStopKey = computed(() => {
+      if (resolvedMode.value !== 'horizontal') return undefined
+      const rootKeys =
+        props.items && props.items.length > 0
+          ? props.items.map((item) => item.key).filter((key): key is MenuKey => key != null)
+          : collectVueMenuKeys(slots.default?.())
+      const selected = rootKeys.find((key) => isKeySelected(key, currentSelectedKeys.value))
+      return selected ?? rootKeys[0]
+    })
 
     provide<MenuContext>(MenuContextKey, {
-      mode: modeRef,
-      theme: themeRef,
-      collapsed: collapsedRef,
-      inlineIndent: inlineIndentRef,
-      popupPortal: popupPortalRef,
+      mode: resolvedMode,
+      theme: computed(() => props.theme),
+      collapsed,
+      inlineIndent: computed(() => props.inlineIndent),
+      popupPortal: computed(() => props.popupPortal),
       selectedKeys: currentSelectedKeys,
       openKeys: currentOpenKeys,
+      dir,
       handleSelect,
-      handleOpenChange
+      handleOpenChange,
+      tabStopKey
     })
 
-    const runRovingTabIndex = async () => {
-      await nextTick()
-      if (menuEl.value) initRovingTabIndex(menuEl.value)
+    const handleSearchKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'ArrowDown') return
+      event.preventDefault()
+      menuEl.value?.querySelector<HTMLElement>('[data-tiger-menuitem="true"]')?.focus()
     }
-
-    onMounted(() => {
-      void runRovingTabIndex()
-    })
-
-    watch(
-      [modeRef, collapsedRef, currentSelectedKeys, currentOpenKeys, filteredItems],
-      () => {
-        void runRovingTabIndex()
-      },
-      { deep: true }
-    )
 
     return () => {
       const renderDataItem = (item: CoreMenuItem): VNode => {
-        if (item.children && item.children.length > 0) {
-          const children = item.children
+        const kind = getMenuItemKind(item)
+        if (kind === 'divider') {
+          return h('li', {
+            key: item.key ?? item.label,
+            role: 'separator',
+            class: 'my-1 border-t border-[var(--tiger-border,#e5e7eb)]'
+          })
+        }
+        if (kind === 'group') {
+          return h(
+            MenuItemGroup,
+            { key: item.key ?? item.title, title: item.title ?? item.label },
+            () => (item.children ?? []).map(renderDataItem)
+          )
+        }
+        if (kind === 'submenu') {
           return h(
             SubMenu,
             {
               key: item.key,
-              itemKey: item.key,
-              title: item.label,
+              itemKey: item.key ?? item.label ?? '',
+              title: item.label ?? item.title,
               icon: item.icon,
               disabled: item.disabled
             },
-            () => children.map(renderDataItem)
+            () => (item.children ?? []).map(renderDataItem)
           )
         }
-
         return h(
           MenuItem,
           {
             key: item.key,
-            itemKey: item.key,
+            itemKey: item.key ?? item.label ?? '',
             icon: item.icon,
-            disabled: item.disabled
+            disabled: item.disabled,
+            href: item.href
           },
           () => item.label
         )
@@ -370,268 +416,55 @@ export const Menu = defineComponent({
 
       const dataChildren = filteredItems.value.map(renderDataItem)
       const slotChildren = slots.default?.() ?? []
-      const searchChild = props.searchable
-        ? [
-            h('li', { role: 'none', class: menuSearchFieldClasses }, [
-              h('input', {
-                type: 'search',
-                value: currentSearchValue.value,
-                placeholder: props.searchPlaceholder,
-                class: menuSearchInputClasses,
-                'aria-label': props.searchPlaceholder,
-                onInput: handleSearchInput
-              })
-            ])
-          ]
-        : []
-      const emptyChild =
+      const empty =
         props.items &&
         props.items.length > 0 &&
         dataChildren.length === 0 &&
         slotChildren.length === 0
-          ? [
-              h('li', { role: 'none' }, [
-                h('div', { class: menuSearchEmptyClasses }, props.emptyText)
-              ])
-            ]
-          : []
 
       return h(
-        'ul',
+        'nav',
         {
-          ref: menuEl,
           class: menuClasses.value,
           style: menuStyle.value,
-          role: 'menu',
-          'data-tiger-menu-root': 'true',
+          'data-tiger-menu': '',
           'data-tiger-menu-mode': resolvedMode.value,
           'data-tiger-menu-requested-mode': props.mode,
           ...passthroughAttrs.value
         },
-        [...searchChild, ...dataChildren, ...slotChildren, ...emptyChild]
-      )
-    }
-  }
-})
-
-export default Menu
-
-// --- MenuItem (child component) ---
-
-export interface VueMenuItemProps {
-  itemKey: string | number
-  disabled?: boolean
-  icon?: unknown
-  level?: number
-  collapsed?: boolean
-  className?: string
-  style?: Record<string, string | number>
-}
-
-export const MenuItem = defineComponent({
-  name: 'TigerMenuItem',
-  props: {
-    /**
-     * Unique key for the menu item
-     */
-    itemKey: {
-      type: [String, Number] as PropType<string | number>,
-      required: true
-    },
-    /**
-     * Whether the menu item is disabled
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Icon for the menu item
-     */
-    icon: {
-      type: [String, Object] as PropType<unknown>
-    },
-    level: {
-      type: Number,
-      default: 0
-    },
-    collapsed: {
-      type: Boolean,
-      default: undefined
-    },
-    className: {
-      type: String,
-      default: undefined
-    },
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
-  },
-  inheritAttrs: false,
-  setup(props, { slots, attrs }) {
-    // Inject menu context
-    const menuContext = inject<MenuContext>(MenuContextKey)
-
-    if (!menuContext) {
-      console.warn('MenuItem must be used within Menu component')
-    }
-
-    // Check if this item is selected
-    const isSelected = computed(() => {
-      if (!menuContext) return false
-      return isKeySelected(props.itemKey, menuContext.selectedKeys.value)
-    })
-
-    // Menu item classes
-    const itemClasses = computed(() => {
-      if (!menuContext) {
-        return classNames(
-          'flex items-center px-4 py-2 cursor-pointer transition-colors duration-200'
-        )
-      }
-
-      const effectiveCollapsed = props.collapsed ?? menuContext.collapsed.value
-
-      return classNames(
-        getMenuItemClasses(
-          isSelected.value,
-          props.disabled,
-          menuContext.theme.value,
-          effectiveCollapsed
-        ),
-        props.className,
-        coerceClassValue(attrs.class)
-      )
-    })
-
-    const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode.value !== 'inline' || props.level === 0) {
-        return {}
-      }
-      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
-    })
-
-    const itemStyle = computed(() => mergeStyleValues(attrs.style, props.style, indentStyle.value))
-
-    const passthroughAttrs = computed(() => {
-      const { class: _class, style: _style, ...rest } = attrs
-      return rest
-    })
-
-    // Handle click
-    const handleClick = () => {
-      if (!props.disabled && menuContext) {
-        menuContext.handleSelect(props.itemKey)
-      }
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (!menuContext) return
-      const current = event.currentTarget as HTMLButtonElement
-      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode.value, isRoot)
-
-      if (event.key === nextKey) {
-        event.preventDefault()
-        moveFocusInMenu(current, 1)
-        return
-      }
-
-      if (event.key === prevKey) {
-        event.preventDefault()
-        moveFocusInMenu(current, -1)
-        return
-      }
-
-      if (event.key === 'Home') {
-        event.preventDefault()
-        focusMenuEdge(current, 'start')
-        return
-      }
-
-      if (event.key === 'End') {
-        event.preventDefault()
-        focusMenuEdge(current, 'end')
-        return
-      }
-
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault()
-        handleClick()
-      }
-    }
-
-    return () => {
-      const children = []
-      type HChildren = Parameters<typeof h>[2]
-
-      const effectiveCollapsed =
-        props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
-
-      // Render icon if provided
-      const iconClasses = effectiveCollapsed ? menuCollapsedIconClasses : menuItemIconClasses
-      if (props.icon) {
-        if (typeof props.icon === 'string') {
-          children.push(
-            h('span', {
-              class: iconClasses,
-              innerHTML: props.icon
-            })
-          )
-        } else {
-          children.push(h('span', { class: iconClasses }, props.icon as HChildren))
-        }
-      }
-
-      // Render label (slot content)
-      if (!effectiveCollapsed && slots.default) {
-        children.push(h('span', { class: 'flex-1' }, slots.default()))
-      } else if (effectiveCollapsed && slots.default) {
-        if (!props.icon) {
-          // Show first letter when collapsed without icon; the full label is
-          // kept below as sr-only so the accessible name stays complete.
-          const defaultSlot = slots.default()
-          if (defaultSlot && defaultSlot.length > 0) {
-            const text = String(defaultSlot[0].children || '')
-            children.push(
-              h(
-                'span',
-                { class: 'flex-1 text-center', 'aria-hidden': 'true' },
-                text.charAt(0).toUpperCase()
-              )
-            )
-          }
-        }
-        // Keep the full label in the DOM for screen readers
-        children.push(h('span', { class: 'sr-only' }, slots.default()))
-      }
-
-      return h(
-        'li',
-        {
-          role: 'none'
-        },
         [
+          props.searchable
+            ? h('div', { class: menuSearchFieldClasses }, [
+                h('input', {
+                  type: 'search',
+                  value: currentSearchValue.value,
+                  placeholder:
+                    props.searchPlaceholder ?? locale.value?.common?.searchPlaceholder ?? 'Search',
+                  class: menuSearchInputClasses,
+                  'aria-label':
+                    props.searchPlaceholder ?? locale.value?.common?.searchPlaceholder ?? 'Search',
+                  onInput: handleSearchInput,
+                  onKeydown: handleSearchKeyDown
+                })
+              ])
+            : null,
+          empty
+            ? h(
+                'div',
+                { class: menuSearchEmptyClasses },
+                props.emptyText ?? locale.value?.common?.emptyText ?? 'No data'
+              )
+            : null,
           h(
-            'button',
+            'ul',
             {
-              type: 'button',
-              class: itemClasses.value,
-              style: itemStyle.value,
-              role: 'menuitem',
-              'data-tiger-menuitem': 'true',
-              'data-tiger-selected': isSelected.value ? 'true' : 'false',
-              'aria-current': isSelected.value ? 'page' : undefined,
-              'aria-disabled': props.disabled ? 'true' : undefined,
-              disabled: props.disabled,
-              tabindex: -1,
-              onClick: handleClick,
-              onKeydown: handleKeyDown,
-              ...passthroughAttrs.value
+              ref: menuEl,
+              role: getMenuListRole(resolvedMode.value, { isRoot: true }),
+              'data-tiger-menu-root': 'true',
+              'data-tiger-menu-list': '',
+              'data-tiger-menu-mode': resolvedMode.value
             },
-            children
+            [...dataChildren, ...slotChildren]
           )
         ]
       )
@@ -639,7 +472,177 @@ export const MenuItem = defineComponent({
   }
 })
 
-// --- MenuItemGroup (child component) ---
+export default Menu
+
+export interface VueMenuItemProps {
+  itemKey: MenuKey
+  disabled?: boolean
+  icon?: unknown
+  href?: string
+  level?: number
+  collapsed?: boolean
+  className?: string
+  style?: Record<string, string | number>
+}
+
+export type MenuItemProps = VueMenuItemProps
+
+export const MenuItem = defineComponent({
+  name: 'TigerMenuItem',
+  inheritAttrs: false,
+  props: {
+    itemKey: { type: [String, Number] as PropType<MenuKey>, required: true },
+    disabled: { type: Boolean, default: false },
+    icon: { type: [String, Object] as PropType<unknown> },
+    href: { type: String, default: undefined },
+    level: { type: Number, default: 0 },
+    collapsed: { type: Boolean, default: undefined },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
+  },
+  setup(props, { slots, attrs }) {
+    const menuContext = inject<MenuContext>(MenuContextKey)
+    const submenuScope = inject<SubMenuScope | null>(SubMenuScopeKey, null)
+    if (!menuContext) warnMissingMenuContext('MenuItem')
+
+    const isSelected = computed(() =>
+      menuContext ? isKeySelected(props.itemKey, menuContext.selectedKeys.value) : false
+    )
+    const effectiveCollapsed = computed(
+      () => props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
+    )
+    const inPopup = computed(() => Boolean(submenuScope?.popup))
+    const roving = computed(() =>
+      Boolean(
+        menuContext &&
+        isMenuRoving(menuContext.mode.value, { popup: inPopup.value, isRoot: !submenuScope })
+      )
+    )
+    const itemClasses = computed(() => {
+      if (!menuContext) {
+        return classNames(
+          'flex items-center px-4 py-2 cursor-pointer transition-colors duration-200'
+        )
+      }
+      return classNames(
+        getMenuItemClasses(
+          isSelected.value,
+          props.disabled,
+          menuContext.theme.value,
+          effectiveCollapsed.value
+        ),
+        props.className,
+        coerceClassValue(attrs.class)
+      )
+    })
+    const indentStyle = computed(() => {
+      if (!menuContext || !shouldIndentMenuItem(menuContext.mode.value, props.level)) return {}
+      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
+    })
+    const itemStyle = computed(() => mergeStyleValues(attrs.style, props.style, indentStyle.value))
+    const passthroughAttrs = computed(() => {
+      const { class: _class, style: _style, ...rest } = attrs
+      return rest
+    })
+
+    const handleClick = () => {
+      if (!props.disabled && menuContext) menuContext.handleSelect(props.itemKey)
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!menuContext) return
+      const current = event.currentTarget as HTMLElement
+      const rootMenu = current.closest('[data-tiger-menu-root="true"]') as HTMLElement | null
+      const isRoot = Boolean(rootMenu && current.closest('[data-tiger-menu-list]') === rootMenu)
+      const { nextKey, prevKey, closeKey } = getMenuNavigationKeys(
+        menuContext.mode.value,
+        isRoot,
+        menuContext.dir.value
+      )
+      if (event.key === nextKey) {
+        event.preventDefault()
+        moveFocusInMenu(current, 1)
+        return
+      }
+      if (event.key === prevKey) {
+        event.preventDefault()
+        moveFocusInMenu(current, -1)
+        return
+      }
+      if (event.key === 'Home') {
+        event.preventDefault()
+        focusMenuEdge(current, 'start')
+        return
+      }
+      if (event.key === 'End') {
+        event.preventDefault()
+        focusMenuEdge(current, 'end')
+        return
+      }
+      if ((event.key === 'Escape' || event.key === closeKey) && submenuScope) {
+        event.preventDefault()
+        submenuScope.close()
+        submenuScope.titleEl.value?.focus()
+      }
+    }
+
+    return () => {
+      const slotNodes = slots.default?.() ?? []
+      const label = getVueSlotPlainText(slotNodes)
+      const collapsed = effectiveCollapsed.value
+      const children = collapsed
+        ? [renderMenuIcon(props.icon, true), ...renderCollapsedLabel(label, props.icon)]
+        : [renderMenuIcon(props.icon, false), h('span', { class: 'flex-1' }, slotNodes)]
+
+      const inPopupMenu = inPopup.value
+      const usesMenuRole = inPopupMenu || menuContext?.mode.value === 'horizontal'
+      const role = usesMenuRole ? 'menuitem' : undefined
+      const tabIndex = props.disabled
+        ? -1
+        : roving.value
+          ? menuContext?.tabStopKey.value != null &&
+            sameMenuKey(props.itemKey, menuContext.tabStopKey.value)
+            ? 0
+            : -1
+          : 0
+
+      const shared = {
+        class: itemClasses.value,
+        style: itemStyle.value,
+        'data-tiger-menuitem': 'true',
+        'data-tiger-selected': isSelected.value ? 'true' : 'false',
+        'aria-disabled': props.disabled ? 'true' : undefined,
+        tabindex: tabIndex,
+        onClick: handleClick,
+        onKeydown: handleKeyDown,
+        role,
+        ...passthroughAttrs.value
+      }
+
+      const node = props.href
+        ? h(
+            'a',
+            {
+              ...shared,
+              href: props.disabled ? undefined : props.href,
+              'aria-current': isSelected.value ? 'page' : undefined
+            },
+            children
+          )
+        : h(
+            'button',
+            {
+              ...shared,
+              type: 'button',
+              disabled: props.disabled
+            },
+            children
+          )
+
+      return h('li', { role: usesMenuRole ? 'none' : undefined }, [node])
+    }
+  }
+})
 
 export interface VueMenuItemGroupProps {
   title?: string
@@ -649,96 +652,74 @@ export interface VueMenuItemGroupProps {
   style?: Record<string, string | number>
 }
 
+export type MenuItemGroupProps = VueMenuItemGroupProps
+
 export const MenuItemGroup = defineComponent({
   name: 'TigerMenuItemGroup',
   inheritAttrs: false,
   props: {
-    /**
-     * Group title
-     */
-    title: {
-      type: String,
-      default: ''
-    },
-    level: {
-      type: Number,
-      default: 0
-    },
-    collapsed: {
-      type: Boolean,
-      default: undefined
-    },
-    className: {
-      type: String,
-      default: undefined
-    },
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
+    title: { type: String, default: '' },
+    level: { type: Number, default: 0 },
+    collapsed: { type: Boolean, default: undefined },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   setup(props, { slots, attrs }) {
+    const menuContext = inject<MenuContext | null>(MenuContextKey, null)
+    const titleId = useId()
     const groupClasses = computed(() => classNames(props.className, coerceClassValue(attrs.class)))
-
     const groupStyle = computed(() => mergeStyleValues(attrs.style, props.style))
-
     const passthroughAttrs = computed(() => {
       const { class: _class, style: _style, ...rest } = attrs
       return rest
     })
+    const submenuScope = inject<SubMenuScope | null>(SubMenuScopeKey, null)
+    const hidden = computed(() => props.collapsed ?? menuContext?.collapsed.value ?? false)
+    const usesMenuRole = computed(
+      () => Boolean(submenuScope?.popup) || menuContext?.mode.value === 'horizontal'
+    )
+    const indentStyle = computed(() => {
+      if (!menuContext || !shouldIndentMenuItem(menuContext.mode.value, props.level))
+        return undefined
+      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
+    })
 
-    const withLevel = (nodes: VNode[] | undefined): VNode[] | undefined => {
-      if (!nodes || nodes.length === 0) return nodes
-      const level = props.level
-
-      return nodes.map((node) => {
-        if (!isVNode(node)) return node
-        const type = node.type as unknown
-        const name =
-          typeof type === 'object' && type != null && 'name' in type
-            ? (type as { name?: unknown }).name
-            : undefined
-
-        const isTarget = name === 'TigerMenuItem' || name === 'TigerSubMenu'
-        if (!isTarget) return node
-
-        const existingProps = (node.props ?? {}) as Record<string, unknown>
-        if (existingProps.level != null && existingProps.collapsed != null) return node
-
-        const nextProps: Record<string, unknown> = {}
-        if (existingProps.level == null) nextProps.level = level
-        if (props.collapsed !== undefined && existingProps.collapsed == null) {
-          nextProps.collapsed = props.collapsed
-        }
-
-        return cloneVNode(node, nextProps)
-      })
-    }
-
-    return () => {
-      return h('li', { class: 'list-none' }, [
-        props.title ? h('div', { class: menuItemGroupTitleClasses }, props.title) : null,
+    return () =>
+      h('li', { role: usesMenuRole.value ? 'none' : undefined }, [
+        props.title
+          ? h(
+              'div',
+              {
+                id: titleId,
+                class: classNames(menuItemGroupTitleClasses, hidden.value && 'sr-only'),
+                style: indentStyle.value
+              },
+              props.title
+            )
+          : null,
         slots.default
           ? h(
               'ul',
               {
-                role: 'group',
+                role: usesMenuRole.value ? 'group' : undefined,
                 class: groupClasses.value,
                 style: groupStyle.value,
+                'aria-labelledby': props.title ? titleId : undefined,
                 ...passthroughAttrs.value
               },
-              withLevel(slots.default?.() as VNode[] | undefined)
+              withChildProps(
+                slots.default() as VNode[],
+                { level: props.level, collapsed: props.collapsed },
+                ['TigerMenuItem', 'TigerSubMenu']
+              )
             )
           : null
       ])
-    }
   }
 })
 
-// --- SubMenu (child component) ---
-
 export interface VueSubMenuProps {
-  itemKey: string | number
+  itemKey: MenuKey
   title?: string
   icon?: unknown
   disabled?: boolean
@@ -748,137 +729,78 @@ export interface VueSubMenuProps {
   style?: Record<string, string | number>
 }
 
-// Expand/collapse icon
-const ExpandIcon = (expanded: boolean) => {
-  return h(
+export type SubMenuProps = VueSubMenuProps
+
+const ExpandIcon = (expanded: boolean, popup?: boolean) =>
+  h(
     'svg',
     {
-      class: getSubMenuExpandIconClasses(expanded),
+      class: getSubMenuExpandIconClasses(expanded, { popup }),
       width: '12',
       height: '12',
       viewBox: '0 0 12 12',
-      fill: 'currentColor'
+      fill: 'currentColor',
+      'aria-hidden': 'true',
+      focusable: 'false'
     },
-    [
-      h('path', {
-        d: 'M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z'
-      })
-    ]
+    [h('path', { d: 'M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z' })]
   )
-}
 
 export const SubMenu = defineComponent({
   name: 'TigerSubMenu',
   inheritAttrs: false,
   props: {
-    /**
-     * Unique key for the submenu
-     */
-    itemKey: {
-      type: [String, Number] as PropType<string | number>,
-      required: true
-    },
-    /**
-     * Submenu title
-     */
-    title: {
-      type: String,
-      default: ''
-    },
-    /**
-     * Icon for the submenu
-     */
-    icon: {
-      type: [String, Object] as PropType<unknown>
-    },
-    /**
-     * Whether the submenu is disabled
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Nesting level (internal use for indentation)
-     */
-    level: {
-      type: Number,
-      default: 0
-    },
-    collapsed: {
-      type: Boolean,
-      default: undefined
-    },
-    className: {
-      type: String,
-      default: undefined
-    },
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
+    itemKey: { type: [String, Number] as PropType<MenuKey>, required: true },
+    title: { type: String, default: '' },
+    icon: { type: [String, Object] as PropType<unknown> },
+    disabled: { type: Boolean, default: false },
+    level: { type: Number, default: 0 },
+    collapsed: { type: Boolean, default: undefined },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   setup(props, { slots, attrs }) {
-    // Inject menu context
     const menuContext = inject<MenuContext>(MenuContextKey)
+    const parentScope = inject<SubMenuScope | null>(SubMenuScopeKey, null)
+    if (!menuContext) warnMissingMenuContext('SubMenu')
 
-    if (!menuContext) {
-      console.warn('SubMenu must be used within Menu component')
-    }
-
-    // Check if this submenu is open
-    const isOpen = computed(() => {
-      if (!menuContext) return false
-      return isKeyOpen(props.itemKey, menuContext.openKeys.value)
-    })
-
-    // For horizontal mode, track hover state
-    const isHovered = ref(false)
-
-    const isOpenByKeyboard = ref(false)
     const titleEl = ref<HTMLElement | null>(null)
     const popupEl = ref<HTMLElement | null>(null)
     const submenuContentEl = ref<HTMLElement | null>(null)
+    const titleId = useId()
+    const listId = useId()
     let heightTransitionController: SubmenuHeightTransitionController | null = null
     let popupCloseTimer: ReturnType<typeof setTimeout> | null = null
 
-    const effectiveCollapsed = computed(() => {
-      return props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
-    })
-
-    const isPopup = computed(() => {
-      if (!menuContext) return false
-      if (menuContext.mode.value === 'horizontal') return true
-      return menuContext.mode.value === 'vertical' && effectiveCollapsed.value
-    })
-
-    const popupPortal = computed(() => Boolean(isPopup.value && menuContext?.popupPortal.value))
-
-    // Determine if submenu should be shown
-    const isExpanded = computed(() => {
-      if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
-        return isHovered.value || isOpenByKeyboard.value
-      }
-      return isOpen.value
-    })
-
-    const hasRenderedInline = ref(!isPopup.value && isExpanded.value)
-
-    const popupPlacement = computed<FloatingPlacement>(() =>
-      menuContext?.mode.value === 'horizontal' && props.level === 0 ? 'bottom-start' : 'right-start'
+    const effectiveCollapsed = computed(
+      () => props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
     )
+    const isPopup = computed(() =>
+      menuContext ? isSubmenuPopup(menuContext.mode.value, effectiveCollapsed.value) : false
+    )
+    const isOpen = computed(() =>
+      menuContext ? isKeyOpen(props.itemKey, menuContext.openKeys.value) : false
+    )
+    const isExpanded = computed(() => isOpen.value)
+    const popupPortal = computed(() => Boolean(isPopup.value && menuContext?.popupPortal.value))
+    const hasRenderedInline = ref(!isPopup.value && isExpanded.value)
+    const popupPlacement = computed<FloatingPlacement>(() =>
+      getMenuPopupPlacement(menuContext?.mode.value ?? 'vertical', props.level)
+    )
+    const overlayEnabled = computed(() => isPopup.value && isExpanded.value)
+    const overlayOffset = computed(() => (popupPortal.value ? 4 : 0))
 
     const overlay = useVueAnchoredOverlay({
       referenceRef: titleEl,
       floatingRef: popupEl,
-      enabled: computed(() => isPopup.value && isExpanded.value),
+      enabled: overlayEnabled,
       placement: popupPlacement,
-      offset: 4,
+      offset: overlayOffset,
       portal: popupPortal,
       dismissOnEscape: true,
+      dismissOnOutside: true,
       onDismiss: () => {
-        isOpenByKeyboard.value = false
-        isHovered.value = false
+        menuContext?.handleOpenChange(props.itemKey, false)
       }
     })
 
@@ -887,337 +809,254 @@ export const SubMenu = defineComponent({
       heightTransitionController = null
     }
 
-    const syncHeightTransition = async () => {
-      await nextTick()
-
-      if (isPopup.value || !hasRenderedInline.value || !submenuContentEl.value) {
-        disposeHeightTransition()
-        return
-      }
-
-      if (!heightTransitionController) {
-        heightTransitionController = createSubmenuHeightTransitionController(
-          submenuContentEl.value,
-          { expanded: isExpanded.value }
-        )
-        return
-      }
-
-      heightTransitionController.update(isExpanded.value)
-    }
-
     watch(
       [isPopup, isExpanded],
       () => {
-        if (!isPopup.value && isExpanded.value) {
-          hasRenderedInline.value = true
-        }
-        void syncHeightTransition()
+        if (!isPopup.value && isExpanded.value) hasRenderedInline.value = true
+        void nextTick(() => {
+          if (isPopup.value || !hasRenderedInline.value || !submenuContentEl.value) {
+            disposeHeightTransition()
+            return
+          }
+          if (!heightTransitionController) {
+            heightTransitionController = createSubmenuHeightTransitionController(
+              submenuContentEl.value,
+              { expanded: isExpanded.value }
+            )
+            return
+          }
+          heightTransitionController.update(isExpanded.value)
+        })
       },
       { immediate: true }
     )
-
-    watch(hasRenderedInline, () => {
-      void syncHeightTransition()
-    })
 
     onBeforeUnmount(() => {
       disposeHeightTransition()
       if (popupCloseTimer) clearTimeout(popupCloseTimer)
     })
 
-    // Submenu title classes
+    const descendantKeys = computed(() => collectVueMenuKeys(slots.default?.()))
+    const childSelected = computed(() =>
+      menuContext
+        ? hasSelectedMenuDescendant(menuContext.selectedKeys.value, descendantKeys.value)
+        : false
+    )
+
     const titleClasses = computed(() => {
       if (!menuContext) return ''
       return classNames(
-        getSubMenuTitleClasses(menuContext.theme.value, props.disabled),
+        getSubMenuTitleClasses(menuContext.theme.value, props.disabled, {
+          collapsed: effectiveCollapsed.value,
+          childSelected: childSelected.value
+        }),
         props.className,
         coerceClassValue(attrs.class)
       )
     })
-
+    const indentStyle = computed(() => {
+      if (!menuContext || !shouldIndentMenuItem(menuContext.mode.value, props.level)) return {}
+      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
+    })
     const titleStyle = computed(() => mergeStyleValues(attrs.style, props.style, indentStyle.value))
-
     const passthroughAttrs = computed(() => {
       const { class: _class, style: _style, ...rest } = attrs
       return rest
     })
-
-    // Submenu content classes
     const contentClasses = computed(() => {
       if (!menuContext) return ''
-
-      if (menuContext.mode.value === 'horizontal') {
-        // Top-level drops below; nested cascades right
-        return props.level === 0
-          ? submenuContentHorizontalClasses
-          : submenuContentHorizontalNestedClasses
-      }
-
       if (isPopup.value) return submenuContentPopupClasses
-
       if (menuContext.mode.value === 'inline') return submenuContentInlineClasses
-
       return submenuContentVerticalClasses
     })
 
-    // Handle title click
-    const handleTitleClick = () => {
+    const clearCloseTimer = () => {
+      if (popupCloseTimer) {
+        clearTimeout(popupCloseTimer)
+        popupCloseTimer = null
+      }
+    }
+
+    const handleTitleClick = (event: MouseEvent) => {
       if (!menuContext || props.disabled) return
-      if (menuContext.mode.value === 'horizontal') return
-
-      if (isPopup.value) {
-        isOpenByKeyboard.value = !isOpenByKeyboard.value
-        isHovered.value = true
-        return
-      }
-
-      if (!isOpen.value) {
-        hasRenderedInline.value = true
-      }
+      if (!isPopup.value) hasRenderedInline.value = true
+      const pointerType = 'pointerType' in event ? (event as PointerEvent).pointerType : ''
+      if (isPopup.value && isExpanded.value && pointerType === 'mouse') return
       menuContext.handleOpenChange(props.itemKey)
     }
 
-    const focusFirstChild = async () => {
-      await nextTick()
-      const titleEl = document.activeElement as HTMLElement | null
-      if (titleEl) focusFirstChildItem(titleEl)
+    const handleMouseEnter = () => {
+      if (!menuContext || props.disabled || !isPopup.value) return
+      clearCloseTimer()
+      menuContext.handleOpenChange(props.itemKey, true)
     }
 
-    const handleTitleKeyDown = async (event: KeyboardEvent) => {
+    const handleMouseLeave = () => {
+      if (!menuContext || !isPopup.value) return
+      clearCloseTimer()
+      popupCloseTimer = setTimeout(() => {
+        menuContext.handleOpenChange(props.itemKey, false)
+      }, MENU_POPUP_HOVER_CLOSE_MS)
+    }
+
+    const focusFirstChild = (title: HTMLElement) => {
+      void nextTick(() => focusFirstChildItem(title, isPopup.value ? popupEl.value : null))
+    }
+
+    const handleTitleKeyDown = (event: KeyboardEvent) => {
       if (!menuContext || props.disabled) return
       const current = event.currentTarget as HTMLButtonElement
-
-      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode.value, isRoot)
+      const rootMenu = current.closest('[data-tiger-menu-root="true"]') as HTMLElement | null
+      const isRoot = Boolean(rootMenu && current.closest('[data-tiger-menu-list]') === rootMenu)
+      const { nextKey, prevKey, openKey, closeKey } = getMenuNavigationKeys(
+        menuContext.mode.value,
+        isRoot,
+        menuContext.dir.value
+      )
 
       if (event.key === nextKey) {
         event.preventDefault()
         moveFocusInMenu(current, 1)
         return
       }
-
       if (event.key === prevKey) {
         event.preventDefault()
         moveFocusInMenu(current, -1)
         return
       }
-
       if (event.key === 'Home') {
         event.preventDefault()
         focusMenuEdge(current, 'start')
         return
       }
-
       if (event.key === 'End') {
         event.preventDefault()
         focusMenuEdge(current, 'end')
         return
       }
-
-      if (event.key === 'Escape' || event.key === 'ArrowLeft') {
-        if (menuContext.mode.value === 'horizontal' || isPopup.value) {
+      if (event.key === 'Escape' || event.key === closeKey) {
+        if (isExpanded.value) {
           event.preventDefault()
-          isOpenByKeyboard.value = false
-          isHovered.value = false
+          menuContext.handleOpenChange(props.itemKey, false)
           return
         }
-
-        if (isOpen.value) {
+        if (parentScope) {
           event.preventDefault()
-          menuContext.handleOpenChange(props.itemKey)
+          parentScope.close()
+          parentScope.titleEl.value?.focus()
         }
         return
       }
-
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-        if (menuContext.mode.value === 'horizontal' || isPopup.value) {
-          isOpenByKeyboard.value = true
-          return
+        if (!isExpanded.value) {
+          hasRenderedInline.value = true
+          menuContext.handleOpenChange(props.itemKey, true)
         }
-        hasRenderedInline.value = true
-        menuContext.handleOpenChange(props.itemKey)
-        await focusFirstChild()
+        focusFirstChild(current)
         return
       }
-
-      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-        if (menuContext.mode.value === 'horizontal' || isPopup.value) {
-          event.preventDefault()
-          isOpenByKeyboard.value = true
-          return
-        }
-
-        if (!isOpen.value) {
-          event.preventDefault()
+      if (event.key === openKey || (isPopup.value && event.key === 'ArrowDown')) {
+        event.preventDefault()
+        if (!isExpanded.value) {
           hasRenderedInline.value = true
-          menuContext.handleOpenChange(props.itemKey)
-          await focusFirstChild()
+          menuContext.handleOpenChange(props.itemKey, true)
         }
+        focusFirstChild(current)
       }
     }
 
-    // Handle mouse enter for horizontal mode
-    const handleMouseEnter = () => {
-      if (popupCloseTimer) {
-        clearTimeout(popupCloseTimer)
-        popupCloseTimer = null
-      }
-      if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
-        isHovered.value = true
-      }
-    }
+    const closeSelf = () => menuContext?.handleOpenChange(props.itemKey, false)
 
-    // Handle mouse leave for horizontal mode
-    const handleMouseLeave = () => {
-      if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
-        const close = () => {
-          isHovered.value = false
-          isOpenByKeyboard.value = false
-        }
-
-        if (popupPortal.value) {
-          popupCloseTimer = setTimeout(close, 120)
-          return
-        }
-
-        close()
-      }
-    }
-
-    // Get indent style for nested menus in inline/vertical mode
-    const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode.value === 'horizontal' || props.level === 0) {
-        return {}
-      }
-      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
+    provide<SubMenuScope>(SubMenuScopeKey, {
+      itemKey: props.itemKey,
+      get popup() {
+        return isPopup.value
+      },
+      titleEl,
+      close: closeSelf
     })
-
-    const withChildLevel = (nodes: VNode[] | undefined): VNode[] | undefined => {
-      if (!nodes || nodes.length === 0) return nodes
-      const nextLevel = props.level + 1
-
-      return nodes.map((node) => {
-        if (!isVNode(node)) return node
-        const type = node.type as unknown
-
-        const name =
-          typeof type === 'object' && type != null && 'name' in type
-            ? (type as { name?: unknown }).name
-            : undefined
-
-        const isTarget =
-          name === 'TigerMenuItem' || name === 'TigerSubMenu' || name === 'TigerMenuItemGroup'
-
-        if (!isTarget) return node
-
-        const existingProps = (node.props ?? {}) as Record<string, unknown>
-
-        const nextProps: Record<string, unknown> = {
-          level: existingProps.level ?? nextLevel
-        }
-
-        if (existingProps.collapsed == null && isPopup.value) {
-          nextProps.collapsed = false
-        }
-
-        return cloneVNode(node, nextProps)
-      })
-    }
 
     return () => {
       if (!menuContext) return null
+      const inPopup = Boolean(parentScope?.popup)
+      const roving = isMenuRoving(menuContext.mode.value, {
+        popup: inPopup,
+        isRoot: !parentScope
+      })
+      const isTabStop =
+        !props.disabled &&
+        roving &&
+        menuContext.tabStopKey.value != null &&
+        sameMenuKey(props.itemKey, menuContext.tabStopKey.value)
+      const titleRole = inPopup || menuContext.mode.value === 'horizontal' ? 'menuitem' : undefined
+      const listRole = getMenuListRole(menuContext.mode.value, { popup: isPopup.value })
+      const collapsed = effectiveCollapsed.value
 
-      const titleChildren = []
-      type HChildren = Parameters<typeof h>[2]
+      const titleChildren = collapsed
+        ? [renderMenuIcon(props.icon, true), ...renderCollapsedLabel(props.title, props.icon)]
+        : [
+            renderMenuIcon(props.icon, false),
+            h('span', { class: 'flex-1' }, props.title),
+            ExpandIcon(isExpanded.value, isPopup.value)
+          ]
 
-      // Render icon if provided
-      const submenuIconClasses = effectiveCollapsed.value
-        ? menuCollapsedIconClasses
-        : menuItemIconClasses
-      if (props.icon) {
-        if (typeof props.icon === 'string') {
-          titleChildren.push(
-            h('span', {
-              class: submenuIconClasses,
-              innerHTML: props.icon
-            })
-          )
-        } else {
-          titleChildren.push(h('span', { class: submenuIconClasses }, props.icon as HChildren))
-        }
-      }
+      const childNodes = withChildProps(
+        slots.default?.() as VNode[] | undefined,
+        {
+          level: props.level + 1,
+          collapsed: isPopup.value ? false : undefined
+        },
+        ['TigerMenuItem', 'TigerSubMenu', 'TigerMenuItemGroup']
+      )
 
-      // Render title text
-      if (!effectiveCollapsed.value) {
-        titleChildren.push(h('span', { class: 'flex-1' }, props.title))
-
-        // Add expand icon
-        if (menuContext.mode.value !== 'horizontal' && !isPopup.value) {
-          titleChildren.push(ExpandIcon(isExpanded.value))
-        }
-      } else {
-        if (!props.icon) {
-          // Show first letter when collapsed without icon; the full title is
-          // kept below as sr-only so the accessible name stays complete.
-          titleChildren.push(
-            h(
-              'span',
-              { class: 'flex-1 text-center', 'aria-hidden': 'true' },
-              props.title.charAt(0).toUpperCase()
-            )
-          )
-        }
-        // Keep the full title in the DOM for screen readers
-        titleChildren.push(h('span', { class: 'sr-only' }, props.title))
-      }
-
-      // Render submenu title
       const titleNode = h(
         'button',
         {
           type: 'button',
+          id: titleId,
           ref: titleEl,
           class: titleClasses.value,
           style: titleStyle.value,
           onClick: handleTitleClick,
           onKeydown: handleTitleKeyDown,
-          role: 'menuitem',
+          role: titleRole,
           'data-tiger-menuitem': 'true',
+          'data-tiger-submenu-title': '',
           'aria-expanded': isExpanded.value ? 'true' : 'false',
-          'aria-haspopup': 'true',
+          'aria-haspopup': isPopup.value ? 'menu' : undefined,
+          'aria-controls': listId,
           'aria-disabled': props.disabled ? 'true' : undefined,
           'data-state': isExpanded.value ? 'open' : 'closed',
           disabled: props.disabled,
-          tabindex: -1,
+          tabindex: props.disabled ? -1 : roving ? (isTabStop ? 0 : -1) : 0,
           ...passthroughAttrs.value
         },
         titleChildren
       )
 
-      // Render submenu content
       const popupContentNode = () => {
         const node = h(
           'ul',
           {
             ref: popupEl,
+            id: listId,
             class: classNames(contentClasses.value, overlay.floatingClasses.value),
             style: {
               ...overlay.floatingStyles.value,
               display: isExpanded.value ? 'block' : 'none'
             },
             'data-positioned': overlay.positioned.value,
-            role: 'menu',
+            role: listRole,
+            'aria-labelledby': titleId,
             'aria-hidden': isExpanded.value ? undefined : 'true',
-            onMouseenter: popupPortal.value ? handleMouseEnter : undefined,
-            onMouseleave: popupPortal.value ? handleMouseLeave : undefined,
+            onMouseenter: handleMouseEnter,
+            onMouseleave: handleMouseLeave,
+            'data-tiger-menu-list': '',
             'data-tiger-submenu-popup': ''
           },
-          withChildLevel(slots.default?.() as VNode[] | undefined)
+          childNodes
         )
-
         return renderVueOverlayTeleport(node, overlay.target.value, !popupPortal.value)
       }
 
@@ -1229,9 +1068,6 @@ export const SubMenu = defineComponent({
               {
                 ref: submenuContentEl,
                 class: submenuHeightTransitionClasses,
-                style: heightTransitionController
-                  ? undefined
-                  : getInitialSubmenuHeightTransitionStyle(isExpanded.value),
                 'aria-hidden': isExpanded.value ? undefined : 'true',
                 'data-tiger-menu-hidden': isExpanded.value ? undefined : 'true',
                 'data-tiger-submenu-motion': 'height'
@@ -1240,10 +1076,13 @@ export const SubMenu = defineComponent({
                 h(
                   'ul',
                   {
+                    id: listId,
                     class: contentClasses.value,
-                    role: 'menu'
+                    role: listRole,
+                    'aria-labelledby': titleId,
+                    'data-tiger-menu-list': ''
                   },
-                  withChildLevel(slots.default?.() as VNode[] | undefined)
+                  childNodes
                 )
               ]
             )
@@ -1255,7 +1094,9 @@ export const SubMenu = defineComponent({
           class: isPopup.value && !popupPortal.value ? 'relative' : '',
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
-          role: 'none'
+          role: inPopup || menuContext.mode.value === 'horizontal' ? 'none' : undefined,
+          'data-tiger-submenu': '',
+          'data-child-selected': childSelected.value ? 'true' : undefined
         },
         [titleNode, contentNode]
       )

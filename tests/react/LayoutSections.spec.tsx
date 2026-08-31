@@ -141,7 +141,7 @@ describe('Layout Sections', () => {
         <Menu items={[{ key: 'a', label: 'A' }]} />
       </Sidebar>
     )
-    expect(container.querySelector('[data-tiger-menu-root]')?.className).not.toContain(
+    expect(container.querySelector('[data-tiger-menu]')?.className).not.toContain(
       menuCollapsedClasses
     )
 
@@ -150,9 +150,7 @@ describe('Layout Sections', () => {
         <Menu items={[{ key: 'a', label: 'A' }]} />
       </Sidebar>
     )
-    expect(container.querySelector('[data-tiger-menu-root]')?.className).toContain(
-      menuCollapsedClasses
-    )
+    expect(container.querySelector('[data-tiger-menu]')?.className).toContain(menuCollapsedClasses)
   })
 
   it('uses the official locale object for the Sidebar landmark name', () => {

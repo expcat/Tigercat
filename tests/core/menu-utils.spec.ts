@@ -6,7 +6,9 @@ import {
   focusMenuEdge,
   getMenuButtons,
   getMenuClasses,
+  getMenuItemIndent,
   getMenuNavigationKeys,
+  getMenuSearchExpandKeys,
   getInitialSubmenuHeightTransitionStyle,
   initRovingTabIndex,
   matchesMenuSearch,
@@ -133,6 +135,23 @@ describe('menu-utils submenu height transition', () => {
     expect(element.style.opacity).toBe('0')
   })
 
+  it('jumps to the end state when prefers-reduced-motion is set', () => {
+    const scheduler = createFrameScheduler()
+    const { element } = createTransitionElement(96)
+    const controller = createSubmenuHeightTransitionController(element, {
+      expanded: true,
+      requestAnimationFrame: scheduler.requestAnimationFrame,
+      cancelAnimationFrame: scheduler.cancelAnimationFrame,
+      prefersReducedMotion: () => true
+    })
+
+    controller.update(false)
+
+    expect(scheduler.requestAnimationFrame).not.toHaveBeenCalled()
+    expect(element.style.height).toBe('0px')
+    expect(element.style.opacity).toBe('0')
+  })
+
   it('cancels pending frames and removes listeners when disposed', () => {
     const scheduler = createFrameScheduler()
     const { element } = createTransitionElement()
@@ -183,8 +202,29 @@ describe('menu-utils search filtering', () => {
     ])
   })
 
+  it('keeps a matching parent as a submenu with its children', () => {
+    const filtered = filterMenuItems(items, 'Administration')
+    expect(filtered).toHaveLength(1)
+    expect(filtered[0].key).toBe('admin')
+    expect(filtered[0].children).toEqual([
+      { key: 'users', label: 'Users' },
+      { key: 'roles', label: 'Roles' }
+    ])
+  })
+
+  it('match-only strips unmatched children of a matching parent', () => {
+    const filtered = filterMenuItems(items, 'Administration', 'match-only')
+    expect(filtered[0].children).toEqual([])
+  })
+
   it('returns the original items for an empty query', () => {
     expect(filterMenuItems(items, '   ')).toBe(items)
+  })
+
+  it('collects ancestor keys that must open for a nested match', () => {
+    expect(getMenuSearchExpandKeys(items, 'roles')).toEqual(['admin'])
+    expect(getMenuSearchExpandKeys(items, 'Administration')).toEqual(['admin'])
+    expect(getMenuSearchExpandKeys(items, '')).toEqual([])
   })
 })
 
@@ -237,34 +277,52 @@ describe('menu-utils classes', () => {
     expect(classes).toContain('[--tiger-surface:#111827]')
   })
 
-  it('drops the icon right margin when collapsed', () => {
-    expect(menuCollapsedIconClasses).toContain('flex-shrink-0')
-    expect(menuCollapsedIconClasses).not.toContain('mr-2')
-    expect(menuItemIconClasses).toContain('mr-2')
+  it('uses logical icon spacing instead of physical right margin', () => {
+    expect(menuItemIconClasses.split(/\s+/)).toContain('me-2')
+    expect(menuItemIconClasses.split(/\s+/)).not.toContain('mr-2')
+    expect(menuCollapsedIconClasses.split(/\s+/)).not.toContain('me-2')
+  })
+
+  it('indents nested items from the inline start', () => {
+    expect(getMenuItemIndent(1, 24)).toEqual({ paddingInlineStart: '24px' })
+    expect(getMenuItemIndent(2, 24).paddingInlineStart).toBe('48px')
   })
 })
 
 describe('getMenuNavigationKeys', () => {
   it('uses horizontal arrows for a horizontal root menu', () => {
-    expect(getMenuNavigationKeys('horizontal', true)).toEqual({
+    expect(getMenuNavigationKeys('horizontal', true)).toMatchObject({
       nextKey: 'ArrowRight',
-      prevKey: 'ArrowLeft'
+      prevKey: 'ArrowLeft',
+      openKey: 'ArrowDown'
+    })
+  })
+
+  it('flips horizontal next/prev under rtl', () => {
+    expect(getMenuNavigationKeys('horizontal', true, 'rtl')).toMatchObject({
+      nextKey: 'ArrowLeft',
+      prevKey: 'ArrowRight',
+      openKey: 'ArrowDown'
     })
   })
 
   it('uses vertical arrows for vertical and inline roots', () => {
-    expect(getMenuNavigationKeys('vertical', true)).toEqual({
+    expect(getMenuNavigationKeys('vertical', true)).toMatchObject({
       nextKey: 'ArrowDown',
-      prevKey: 'ArrowUp'
+      prevKey: 'ArrowUp',
+      openKey: 'ArrowRight',
+      closeKey: 'ArrowLeft'
     })
-    expect(getMenuNavigationKeys('inline', true)).toEqual({
+    expect(getMenuNavigationKeys('inline', true, 'rtl')).toMatchObject({
       nextKey: 'ArrowDown',
-      prevKey: 'ArrowUp'
+      prevKey: 'ArrowUp',
+      openKey: 'ArrowLeft',
+      closeKey: 'ArrowRight'
     })
   })
 
   it('uses vertical arrows for non-root menus regardless of mode', () => {
-    expect(getMenuNavigationKeys('horizontal', false)).toEqual({
+    expect(getMenuNavigationKeys('horizontal', false)).toMatchObject({
       nextKey: 'ArrowDown',
       prevKey: 'ArrowUp'
     })
@@ -387,5 +445,33 @@ describe('menu-utils roving tabindex helpers', () => {
     const first = document.getElementById('b3a') as HTMLButtonElement
     expect(document.activeElement).toBe(first)
     expect(first.tabIndex).toBe(0)
+  })
+
+  it('initRovingTabIndex re-pins when the current tab stop left the container', () => {
+    const root = buildMenu()
+    const items = getMenuButtons(root)
+    items[0].tabIndex = 0
+    const stray = document.createElement('button')
+    stray.tabIndex = 0
+    document.body.appendChild(stray)
+    items[0].tabIndex = -1
+    initRovingTabIndex(root)
+    expect(items.find((b) => b.id === 'b3')?.tabIndex).toBe(0)
+    expect(items.filter((b) => b.id !== 'b3').every((b) => b.tabIndex === -1)).toBe(true)
+  })
+
+  it('focusFirstChildItem uses the popup node when the list is not under the title', () => {
+    document.body.innerHTML = `
+      <button data-tiger-menuitem="true" id="title" tabindex="-1">Title</button>
+      <ul role="menu" id="popup">
+        <li><button data-tiger-menuitem="true" id="child" tabindex="-1">Child</button></li>
+      </ul>
+    `
+    const title = document.getElementById('title') as HTMLElement
+    const popup = document.getElementById('popup') as HTMLElement
+    focusFirstChildItem(title, popup)
+    const child = document.getElementById('child') as HTMLButtonElement
+    expect(document.activeElement).toBe(child)
+    expect(child.tabIndex).toBe(0)
   })
 })

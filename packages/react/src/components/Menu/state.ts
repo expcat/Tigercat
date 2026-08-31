@@ -1,15 +1,24 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   getMenuClasses,
-  filterMenuItems,
-  replaceKeys,
-  toggleKey,
-  initRovingTabIndex,
+  getMenuListRole,
+  mergeTigerLocale,
+  nextOpenKeys,
+  nextSelectedKeys,
+  reconcileSearchOpenKeys,
+  resolveMenuCollapsed,
+  resolveMenuMode,
+  resolveSearchFilter,
+  warnControlledSearchOpenKeys,
+  type MenuKey,
   type MenuMode
 } from '@expcat/tigercat-core'
-import type { MenuProps, MenuRootState, MenuContextValue } from './types'
+import { useControlledState } from '../../hooks/useControlledState'
+import { useTigerConfig } from '../ConfigProvider'
 import { useSidebarContext } from '../../utils/layout-context'
+import type { MenuContextValue, MenuProps, MenuRootState } from './types'
+import { collectReactMenuKeys } from './render'
 
 export function useMenuRootState(props: MenuProps): MenuRootState {
   const {
@@ -23,7 +32,7 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     collapsed: collapsedProp,
     multiple = true,
     inlineIndent = 24,
-    popupPortal = false,
+    popupPortal = true,
     className,
     style,
     onSelectedKeysChange,
@@ -34,81 +43,115 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     searchable = false,
     searchValue: controlledSearchValue,
     defaultSearchValue = '',
-    searchPlaceholder = 'Search menu',
-    emptyText = 'No menu items found'
+    searchPlaceholder,
+    emptyText,
+    filterMode = 'subtree',
+    children,
+    ...rest
   } = props
-  const children = props.children
+  const config = useTigerConfig()
+  const locale = useMemo(() => mergeTigerLocale(config.locale), [config.locale])
+  const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
   const sidebar = useSidebarContext()
-  const collapsed = collapsedProp ?? sidebar?.collapsed ?? false
+  const collapsed = resolveMenuCollapsed(mode, collapsedProp ?? sidebar?.collapsed ?? false)
+  const resolvedMode: MenuMode = resolveMenuMode(mode, collapsed)
 
   const menuRef = useRef<HTMLUListElement | null>(null)
-  const resolvedMode: MenuMode = collapsed && mode === 'inline' ? 'vertical' : mode
+  const searchExpandKeysRef = useRef<MenuKey[]>([])
+  const openKeysRef = useRef<MenuKey[]>([])
 
-  // Internal state for uncontrolled mode
-  const [internalSelectedKeys, setInternalSelectedKeys] =
-    useState<(string | number)[]>(defaultSelectedKeys)
-  const [internalOpenKeys, setInternalOpenKeys] = useState<(string | number)[]>(defaultOpenKeys)
-  const [internalSearchValue, setInternalSearchValue] = useState(defaultSearchValue)
+  const [selectedKeys, setSelectedKeys] = useControlledState<MenuKey[]>({
+    value: controlledSelectedKeys,
+    defaultValue: defaultSelectedKeys,
+    onChange: onSelectedKeysChange
+  })
+  const [openKeys, setOpenKeys] = useControlledState<MenuKey[]>({
+    value: controlledOpenKeys,
+    defaultValue: defaultOpenKeys,
+    onChange: onOpenKeysChange
+  })
+  openKeysRef.current = openKeys
+  const [searchValue, setSearchValue] = useControlledState<string>({
+    value: controlledSearchValue,
+    defaultValue: defaultSearchValue,
+    onChange: onSearchChange
+  })
 
-  // Use controlled or uncontrolled state
-  const selectedKeys =
-    controlledSelectedKeys !== undefined ? controlledSelectedKeys : internalSelectedKeys
-  const openKeys = controlledOpenKeys !== undefined ? controlledOpenKeys : internalOpenKeys
-  const searchValue =
-    controlledSearchValue !== undefined ? controlledSearchValue : internalSearchValue
-
-  // Handle menu item selection
   const handleSelect = useCallback(
-    (key: string | number) => {
-      const newSelectedKeys = replaceKeys(key, selectedKeys)
-
-      // Update internal state if uncontrolled
-      if (controlledSelectedKeys === undefined) {
-        setInternalSelectedKeys(newSelectedKeys)
-      }
-
-      onSelectedKeysChange?.(newSelectedKeys)
-      onSelect?.(key, { selectedKeys: newSelectedKeys })
+    (key: MenuKey) => {
+      const next = nextSelectedKeys(selectedKeys, key)
+      setSelectedKeys(next)
+      onSelect?.(key, { selectedKeys: next })
     },
-    [controlledSelectedKeys, selectedKeys, onSelectedKeysChange, onSelect]
+    [selectedKeys, setSelectedKeys, onSelect]
   )
 
-  // Handle submenu open/close
   const handleOpenChange = useCallback(
-    (key: string | number) => {
-      const toggled = toggleKey(key, openKeys)
-      const newOpenKeys = multiple ? toggled : toggled.includes(key) ? [key] : []
-
-      // Update internal state if uncontrolled
-      if (controlledOpenKeys === undefined) {
-        setInternalOpenKeys(newOpenKeys)
-      }
-
-      onOpenKeysChange?.(newOpenKeys)
-      onOpenChange?.(key, { openKeys: newOpenKeys })
+    (key: MenuKey, open?: boolean) => {
+      const next = nextOpenKeys({ current: openKeys, key, multiple, open })
+      setOpenKeys(next)
+      onOpenChange?.(key, { openKeys: next })
     },
-    [openKeys, multiple, controlledOpenKeys, onOpenKeysChange, onOpenChange]
+    [openKeys, multiple, setOpenKeys, onOpenChange]
   )
 
   const handleSearchInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value
-
-      if (controlledSearchValue === undefined) {
-        setInternalSearchValue(value)
-      }
-
-      onSearchChange?.(value)
+      setSearchValue(event.target.value)
     },
-    [controlledSearchValue, onSearchChange]
+    [setSearchValue]
   )
 
-  // Menu classes
+  const { filtered: filteredItems, expandKeys } = useMemo(
+    () => resolveSearchFilter({ items, query: searchValue, filterMode }),
+    [items, searchValue, filterMode]
+  )
+
+  useEffect(() => {
+    const current = openKeysRef.current
+    const reconciled = reconcileSearchOpenKeys({
+      openKeys: current,
+      previousSearchExpandKeys: searchExpandKeysRef.current,
+      nextSearchExpandKeys: expandKeys
+    })
+    searchExpandKeysRef.current = reconciled.searchExpandKeys
+    const unchanged =
+      reconciled.openKeys.length === current.length &&
+      reconciled.openKeys.every((key, index) => key === current[index])
+    if (!unchanged) {
+      setOpenKeys(reconciled.openKeys)
+    }
+    warnControlledSearchOpenKeys({
+      controlled: controlledOpenKeys !== undefined,
+      openKeys: controlledOpenKeys ?? reconciled.openKeys,
+      searchExpandKeys: reconciled.searchExpandKeys
+    })
+  }, [expandKeys, searchValue, setOpenKeys, controlledOpenKeys])
+
+  const handleSearchKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'ArrowDown') return
+    event.preventDefault()
+    const first = menuRef.current?.querySelector<HTMLElement>('[data-tiger-menuitem="true"]')
+    first?.focus()
+  }, [])
+
   const menuClasses = useMemo(() => {
     return classNames(getMenuClasses(resolvedMode, theme, collapsed), className)
   }, [resolvedMode, theme, collapsed, className])
 
-  // Context value
+  const slotKeys = useMemo(() => collectReactMenuKeys(children), [children])
+  const tabStopKey = useMemo(() => {
+    if (resolvedMode !== 'horizontal') return undefined
+    const rootKeys =
+      items && items.length > 0
+        ? items.map((item) => item.key).filter((key): key is MenuKey => key != null)
+        : slotKeys
+    const selected = rootKeys.find((key) =>
+      selectedKeys.some((item) => String(item) === String(key))
+    )
+    return selected ?? rootKeys[0]
+  }, [items, slotKeys, resolvedMode, selectedKeys])
+
   const contextValue = useMemo<MenuContextValue>(
     () => ({
       mode: resolvedMode,
@@ -118,8 +161,10 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
       popupPortal,
       selectedKeys,
       openKeys,
+      dir,
       handleSelect,
-      handleOpenChange
+      handleOpenChange,
+      tabStopKey
     }),
     [
       resolvedMode,
@@ -129,34 +174,40 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
       popupPortal,
       selectedKeys,
       openKeys,
+      dir,
       handleSelect,
-      handleOpenChange
+      handleOpenChange,
+      tabStopKey
     ]
   )
 
-  const filteredItems = useMemo(
-    () => filterMenuItems(items ?? [], searchValue),
-    [items, searchValue]
-  )
+  const hasSlotChildren = React.Children.count(children) > 0
+  const empty = Boolean(items && items.length > 0 && filteredItems.length === 0 && !hasSlotChildren)
 
-  useEffect(() => {
-    if (menuRef.current) initRovingTabIndex(menuRef.current)
-  }, [resolvedMode, collapsed, selectedKeys, openKeys, filteredItems])
+  const {
+    id,
+    role: _role,
+    ...navRest
+  } = rest as React.HTMLAttributes<HTMLElement> & { role?: string }
 
   return {
+    navProps: { id, ...navRest },
     menuRef,
     menuClasses,
     style,
+    listRole: getMenuListRole(resolvedMode, { isRoot: true }),
     resolvedMode,
     mode,
     contextValue,
     searchable,
     searchValue,
-    searchPlaceholder,
-    emptyText,
+    searchPlaceholder: searchPlaceholder ?? locale?.common?.searchPlaceholder ?? 'Search',
+    emptyText: emptyText ?? locale?.common?.emptyText ?? 'No data',
     handleSearchInput,
+    handleSearchKeyDown,
     filteredItems,
     items,
-    children
+    children,
+    empty
   }
 }

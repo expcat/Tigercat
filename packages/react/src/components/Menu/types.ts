@@ -1,5 +1,6 @@
 import type React from 'react'
 import type {
+  MenuKey,
   MenuMode,
   MenuTheme,
   MenuItem as CoreMenuItem,
@@ -9,111 +10,63 @@ import type {
   SubMenuProps as CoreSubMenuProps
 } from '@expcat/tigercat-core'
 
-// Menu context interface
 export interface MenuContextValue {
   mode: MenuMode
   theme: MenuTheme
   collapsed: boolean
   inlineIndent: number
   popupPortal: boolean
-  selectedKeys: (string | number)[]
-  openKeys: (string | number)[]
-  handleSelect: (key: string | number) => void
-  handleOpenChange: (key: string | number) => void
+  selectedKeys: MenuKey[]
+  openKeys: MenuKey[]
+  dir: 'ltr' | 'rtl'
+  handleSelect: (key: MenuKey) => void
+  handleOpenChange: (key: MenuKey, open?: boolean) => void
+  tabStopKey?: MenuKey
 }
 
-export interface MenuProps extends CoreMenuProps {
-  /**
-   * Controlled selected keys change handler
-   */
-  onSelectedKeysChange?: (selectedKeys: (string | number)[]) => void
+export interface SubMenuScopeValue {
+  itemKey: MenuKey
+  popup: boolean
+  titleRef: React.RefObject<HTMLElement | null>
+  close: () => void
+}
 
-  /**
-   * Controlled open keys change handler
-   */
-  onOpenKeysChange?: (openKeys: (string | number)[]) => void
-
-  /**
-   * Menu item click event handler
-   */
-  onSelect?: (key: string | number, info: { selectedKeys: (string | number)[] }) => void
-
-  /**
-   * Submenu open/close event handler
-   */
-  onOpenChange?: (key: string | number, info: { openKeys: (string | number)[] }) => void
-
-  /**
-   * Search value change handler
-   */
+export interface MenuProps
+  extends CoreMenuProps, Omit<React.HTMLAttributes<HTMLElement>, 'onSelect'> {
+  onSelectedKeysChange?: (selectedKeys: MenuKey[]) => void
+  onOpenKeysChange?: (openKeys: MenuKey[]) => void
+  onSelect?: (key: MenuKey, info: { selectedKeys: MenuKey[] }) => void
+  onOpenChange?: (key: MenuKey, info: { openKeys: MenuKey[] }) => void
   onSearchChange?: (value: string) => void
-
-  /**
-   * Menu content
-   */
   children?: React.ReactNode
 }
 
-export interface MenuItemProps extends CoreMenuItemProps {
-  /**
-   * Menu item content
-   */
+export interface MenuItemProps
+  extends CoreMenuItemProps, Omit<React.HTMLAttributes<HTMLElement>, 'onSelect'> {
   children?: React.ReactNode
-
-  /**
-   * Nesting level (internal use for indentation)
-   */
   level?: number
-
-  /**
-   * Internal override for collapsed rendering (used by SubMenu popup)
-   */
   collapsed?: boolean
 }
 
 export interface MenuItemGroupProps extends CoreMenuItemGroupProps {
-  /**
-   * Group items
-   */
   children?: React.ReactNode
-
-  /**
-   * Nesting level (internal use for indentation)
-   */
   level?: number
-
-  /**
-   * Internal override for collapsed rendering (used by SubMenu popup)
-   */
   collapsed?: boolean
 }
 
-export interface SubMenuProps extends CoreSubMenuProps {
-  /**
-   * Submenu content
-   */
+export interface SubMenuProps
+  extends CoreSubMenuProps, Omit<React.HTMLAttributes<HTMLElement>, 'onSelect'> {
   children?: React.ReactNode
-
-  /**
-   * Nesting level (internal use for indentation)
-   */
   level?: number
-
-  /**
-   * Internal override for collapsed rendering (used by SubMenu popup)
-   */
   collapsed?: boolean
 }
 
-/**
- * Internal state produced by {@link useMenuRootState} and consumed by the
- * `Menu.tsx` wrapper. Mirrors the `Table/` paradigm (state hook returns an
- * immutable context object; the wrapper owns the top-level JSX).
- */
 export interface MenuRootState {
+  navProps: React.HTMLAttributes<HTMLElement>
   menuRef: React.RefObject<HTMLUListElement | null>
   menuClasses: string
   style?: React.CSSProperties
+  listRole: 'menu' | 'menubar' | undefined
   resolvedMode: MenuMode
   mode: MenuMode
   contextValue: MenuContextValue
@@ -122,7 +75,9 @@ export interface MenuRootState {
   searchPlaceholder: string
   emptyText: string
   handleSearchInput: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleSearchKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void
   filteredItems: CoreMenuItem[]
   items?: CoreMenuItem[]
   children?: React.ReactNode
+  empty: boolean
 }

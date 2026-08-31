@@ -2568,40 +2568,6 @@
           "reference": "primitive/shadow/lg"
         },
         {
-          "name": "component/menu/item-height",
-          "type": "STRING",
-          "cssVariable": "--tiger-component-menu-item-height",
-          "value": "40px"
-        },
-        {
-          "name": "component/menu/item-padding-x",
-          "type": "STRING",
-          "cssVariable": "--tiger-component-menu-item-padding-x",
-          "value": "16px",
-          "reference": "primitive/space/lg"
-        },
-        {
-          "name": "component/menu/group-title-padding",
-          "type": "STRING",
-          "cssVariable": "--tiger-component-menu-group-title-padding",
-          "value": "8px",
-          "reference": "primitive/space/md"
-        },
-        {
-          "name": "component/menu/indent-width",
-          "type": "STRING",
-          "cssVariable": "--tiger-component-menu-indent-width",
-          "value": "24px",
-          "reference": "primitive/space/xl"
-        },
-        {
-          "name": "component/menu/border-radius",
-          "type": "STRING",
-          "cssVariable": "--tiger-component-menu-border-radius",
-          "value": "10px",
-          "reference": "semantic/radius/component"
-        },
-        {
           "name": "component/notification/width",
           "type": "STRING",
           "cssVariable": "--tiger-component-notification-width",
