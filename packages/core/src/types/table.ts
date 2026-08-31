@@ -694,8 +694,8 @@ export interface TableProps<T = Record<string, unknown>> {
 
   /**
    * Mobile layout below the `cardBreakpoint` width (640px by default).
-   * `scroll` keeps the table horizontally scrollable; `card` renders each row
-   * as a stacked card list.
+   * `scroll` keeps the table horizontally scrollable; `card` mounts a stacked
+   * card list **instead of** the `<table>` on that viewport (one accessible tree).
    * @default 'scroll'
    */
   responsiveMode?: TableResponsiveMode
@@ -746,7 +746,9 @@ export interface TableProps<T = Record<string, unknown>> {
   // --- v0.6.0 additions ---
 
   /**
-   * Enable virtual scrolling for large datasets
+   * Enable virtual scrolling for large datasets.
+   * Ignored when `expandable` or `groupBy` is set (row height is not fixed).
+   * The active card tree uses the same row window.
    * @default false
    */
   virtual?: boolean

@@ -28,6 +28,19 @@ const tableStripeBgClass =
 const tableFixedStripeBgClass =
   'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
 
+function stubCardViewport(isCard: boolean) {
+  window.matchMedia = ((query: string) => ({
+    matches: isCard && query.includes('max-width'),
+    media: query,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    dispatchEvent: () => false,
+    onchange: null
+  })) as typeof window.matchMedia
+}
+
 describe('Table', () => {
   describe('Rendering', () => {
     it('should render column headers', () => {
@@ -72,6 +85,23 @@ describe('Table', () => {
     })
 
     it('renders mobile card markup when responsiveMode is card', () => {
+      stubCardViewport(true)
+      const { container, getAllByText } = renderWithProps(Table, {
+        columns,
+        dataSource: [dataSource[0]],
+        responsiveMode: 'card',
+        pagination: false
+      })
+
+      const cardList = container.querySelector('[data-tiger-table-mobile="card"]')
+      expect(cardList).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-table-layout="card"]')).toBeInTheDocument()
+      expect(container.querySelector('table')).not.toBeInTheDocument()
+      expect(getAllByText('Name')).toHaveLength(1)
+    })
+
+    it('keeps a single accessible table tree on the desktop card breakpoint', () => {
+      stubCardViewport(false)
       const { container, getAllByText } = renderWithProps(Table, {
         columns,
         dataSource,
@@ -79,14 +109,13 @@ describe('Table', () => {
         pagination: false
       })
 
-      const cardList = container.querySelector('[data-tiger-table-mobile="card"]')
-      expect(cardList).toBeInTheDocument()
-      expect(cardList).toHaveClass('max-sm:grid')
-      expect(container.querySelector('table')).toHaveClass('max-sm:hidden')
-      expect(getAllByText('Name').length).toBeGreaterThan(1)
+      expect(container.querySelector('table')).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-table-mobile="card"]')).not.toBeInTheDocument()
+      expect(getAllByText('Name')).toHaveLength(1)
     })
 
     it('hides hideInCard columns in card mode while keeping them in the table', () => {
+      stubCardViewport(true)
       const { container } = renderWithProps(Table, {
         columns: [
           { key: 'name', title: 'Name' },
@@ -98,11 +127,12 @@ describe('Table', () => {
       })
 
       const cardList = container.querySelector('[data-tiger-table-mobile="card"]')!
-      expect(container.querySelector('table')?.textContent).toContain('Age')
       expect(cardList.textContent).not.toContain('Age')
+      expect(cardList.textContent).toContain('Name')
     })
 
     it('orders card body columns by cardPriority', () => {
+      stubCardViewport(true)
       const { container } = renderWithProps(Table, {
         columns: [
           { key: 'name', title: 'Name', cardPriority: 2 },
@@ -120,6 +150,7 @@ describe('Table', () => {
     })
 
     it('renders a cardTitle column as the card heading instead of a row', () => {
+      stubCardViewport(true)
       const { container } = renderWithProps(Table, {
         columns: [
           { key: 'name', title: 'Name', cardTitle: true },
@@ -137,6 +168,7 @@ describe('Table', () => {
     })
 
     it('respects a configurable cardBreakpoint', () => {
+      stubCardViewport(true)
       const { container } = renderWithProps(Table, {
         columns,
         dataSource,
@@ -145,11 +177,13 @@ describe('Table', () => {
         pagination: false
       })
 
-      expect(container.querySelector('[data-tiger-table-mobile="card"]')).toHaveClass('max-md:grid')
-      expect(container.querySelector('table')).toHaveClass('max-md:hidden')
+      expect(container.querySelector('[data-tiger-table-layout="card"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-table-mobile="card"]')).toBeInTheDocument()
+      expect(container.querySelector('table')).not.toBeInTheDocument()
     })
 
     it('uses the default card field gap, overridable via cardFieldGap', () => {
+      stubCardViewport(true)
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
         { key: 'email', title: 'Email', cardGrid: { colSpan: 6 } }
@@ -178,6 +212,7 @@ describe('Table', () => {
     })
 
     it('renders configured card fields in a responsive grid layout', () => {
+      stubCardViewport(true)
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
         { key: 'email', title: 'Email', cardGrid: { colSpan: 6, labelPosition: 'top' } },
@@ -202,6 +237,7 @@ describe('Table', () => {
     })
 
     it('uses cardLayout ahead of column-level cardGrid options', () => {
+      stubCardViewport(true)
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
         {
@@ -250,6 +286,7 @@ describe('Table', () => {
     })
 
     it('supports inline selection controls and configurable card padding', () => {
+      stubCardViewport(true)
       const { container, getByLabelText } = renderWithProps(Table, {
         columns: [
           { key: 'name', title: 'Name', cardTitle: true },
@@ -272,6 +309,7 @@ describe('Table', () => {
     })
 
     it('uses custom card padding classes', () => {
+      stubCardViewport(true)
       const { container } = renderWithProps(Table, {
         columns,
         dataSource: [dataSource[0]],
@@ -286,6 +324,7 @@ describe('Table', () => {
     })
 
     it('uses table labels and themed selection controls in card mode', async () => {
+      stubCardViewport(true)
       const onSelectionChange = vi.fn()
       const { getByText, getByLabelText, container } = renderWithProps(Table, {
         columns,
@@ -318,6 +357,7 @@ describe('Table', () => {
     })
 
     it('renders Empty and custom card slot in card mode', () => {
+      stubCardViewport(true)
       const empty = renderWithProps(Table, {
         columns,
         dataSource: [],
@@ -325,7 +365,7 @@ describe('Table', () => {
         pagination: false,
         labels: { emptyText: 'Nothing here' }
       })
-      expect(empty.getAllByText('Nothing here').length).toBeGreaterThan(1)
+      expect(empty.getAllByText('Nothing here')).toHaveLength(1)
       empty.unmount()
 
       const { getByTestId } = render(Table, {
@@ -347,6 +387,7 @@ describe('Table', () => {
     })
 
     it('exposes a card-mode sort selector', async () => {
+      stubCardViewport(true)
       const onSortChange = vi.fn()
       const sortableColumns = [
         { key: 'name', title: 'Name', sortable: true },
@@ -363,6 +404,8 @@ describe('Table', () => {
       const sortTrigger = container.querySelector(
         '[data-tiger-table-mobile="card"] [role="combobox"]'
       )!
+      expect(sortTrigger).toHaveAttribute('aria-label', 'Sort')
+      expect(sortTrigger).toHaveTextContent('Clear sort')
       await fireEvent.click(sortTrigger)
       await fireEvent.click(getByText('Sort by Age ↓'))
 

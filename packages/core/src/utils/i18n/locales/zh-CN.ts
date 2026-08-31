@@ -127,7 +127,10 @@ export const zhCN: TigerLocale = {
     exportCsvAriaLabel: '导出为 CSV',
     exportExcelAriaLabel: '导出为 Excel',
     expandRowAriaLabel: '展开行',
-    collapseRowAriaLabel: '收起行'
+    collapseRowAriaLabel: '收起行',
+    sortMenuAriaLabel: '排序',
+    filterColumnAriaLabel: '筛选 {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: '导出',

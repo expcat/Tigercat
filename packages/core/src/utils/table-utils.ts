@@ -4,10 +4,13 @@
 
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
+import { isBrowser } from './env'
+import { RESPONSIVE_BREAKPOINT_FALLBACK_PX } from './responsive'
 import type {
   TableSize,
   ColumnAlign,
   SortDirection,
+  SortState,
   TableColumn,
   TableResponsiveMode,
   TableCardBreakpoint,
@@ -125,6 +128,111 @@ export function getTableResponsiveTableClasses(
 export function getTableResponsiveCardListClasses(breakpoint: TableCardBreakpoint = 'sm'): string {
   return CARD_LIST_CLASSES[breakpoint]
 }
+
+/**
+ * Card-list classes when JS owns which tree is mounted (no CSS hide).
+ */
+export const tableCardListVisibleClasses = 'grid gap-3 p-3'
+
+/**
+ * Sentinel option for the card-layout sort Select. `''` is Select's unselected
+ * value, so "clear sort" cannot share it.
+ */
+export const TABLE_CARD_SORT_NONE = '__tiger-table-sort-none__'
+
+export function getTableCardSortValue(sort: SortState): string {
+  if (sort.key && sort.direction) return `${sort.key}:${sort.direction}`
+  return TABLE_CARD_SORT_NONE
+}
+
+export function parseTableCardSortValue(value: string | number | undefined | null): SortState {
+  const raw = value == null ? '' : String(value)
+  if (!raw || raw === TABLE_CARD_SORT_NONE) {
+    return { key: null, direction: null }
+  }
+  const separatorIndex = raw.lastIndexOf(':')
+  if (separatorIndex <= 0) {
+    return { key: null, direction: null }
+  }
+  const key = raw.slice(0, separatorIndex)
+  const direction = raw.slice(separatorIndex + 1)
+  if (direction !== 'asc' && direction !== 'desc') {
+    return { key: null, direction: null }
+  }
+  return { key, direction }
+}
+
+/**
+ * Tailwind `max-sm` is `(max-width: ${sm - 1}px)` for a 640px `sm` token.
+ */
+export function getTableCardViewportQuery(breakpoint: TableCardBreakpoint = 'sm'): string {
+  const minWidth = RESPONSIVE_BREAKPOINT_FALLBACK_PX[breakpoint]
+  return `(max-width: ${minWidth - 1}px)`
+}
+
+/**
+ * Subscribe to the card-mode max-width query. Defaults to table layout when
+ * matchMedia is unavailable (SSR / node).
+ */
+export function subscribeTableCardViewport(
+  breakpoint: TableCardBreakpoint,
+  onChange: (isCardViewport: boolean) => void
+): () => void {
+  if (!isBrowser() || typeof window.matchMedia !== 'function') {
+    onChange(false)
+    return () => undefined
+  }
+
+  const media = window.matchMedia(getTableCardViewportQuery(breakpoint))
+  const emit = (): void => {
+    onChange(media.matches)
+  }
+  emit()
+
+  if (typeof media.addEventListener === 'function') {
+    media.addEventListener('change', emit)
+    return () => media.removeEventListener('change', emit)
+  }
+
+  media.addListener(emit)
+  return () => media.removeListener(emit)
+}
+
+export type TableChromeSlot = 'expand' | 'selection'
+
+export function getTableChromeSlots(options: {
+  hasSelectionColumn: boolean
+  expand: 'start' | 'end' | false
+}): { leading: TableChromeSlot[]; trailing: TableChromeSlot[] } {
+  const leading: TableChromeSlot[] = []
+  const trailing: TableChromeSlot[] = []
+  if (options.expand === 'start') leading.push('expand')
+  if (options.hasSelectionColumn) leading.push('selection')
+  if (options.expand === 'end') trailing.push('expand')
+  return { leading, trailing }
+}
+
+export function resolveTableExpandSlot(
+  expandable?: { expandIconPosition?: 'start' | 'end' } | null
+): 'start' | 'end' | false {
+  if (!expandable) return false
+  return expandable.expandIconPosition === 'end' ? 'end' : 'start'
+}
+
+/**
+ * Variable-height extra rows (expand / group headers) are not in the fixed
+ * itemHeight window. Virtual scrolling is ignored when either is set.
+ */
+export function canUseTableVirtualWindow(options: {
+  expandable?: unknown
+  groupBy?: string
+}): boolean {
+  return !options.expandable && !options.groupBy
+}
+
+export const tableExportBarClasses = 'mb-2 flex justify-end'
+
+export const tableVirtualSpacerCellClasses = 'border-0 p-0 leading-none'
 
 /**
  * Split visible columns into the card heading column and the body columns.
@@ -639,13 +747,17 @@ export function getTableVirtualRecommendation(
 /**
  * Get table wrapper classes
  */
-export function getTableWrapperClasses(bordered: boolean, maxHeight?: string | number): string {
+export function getTableWrapperClasses(
+  bordered: boolean,
+  maxHeight?: string | number,
+  scrollable = true
+): string {
   return classNames(
-    'relative',
-    tableContainerClasses,
+    'relative w-full',
+    scrollable && 'overflow-auto',
     bordered &&
       'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden',
-    maxHeight && 'overflow-y-auto'
+    scrollable && maxHeight && 'overflow-y-auto'
   )
 }
 
@@ -677,9 +789,9 @@ export function getTableHeaderCellClasses(
   }
 
   const alignClasses = {
-    left: 'text-left',
+    left: 'text-start',
     center: 'text-center',
-    right: 'text-right'
+    right: 'text-end'
   }
 
   return classNames(
@@ -726,9 +838,9 @@ export function getTableCellClasses(
   }
 
   const alignClasses = {
-    left: 'text-left',
+    left: 'text-start',
     center: 'text-center',
-    right: 'text-right'
+    right: 'text-end'
   }
 
   return classNames(
@@ -744,8 +856,8 @@ export function getTableCellClasses(
  */
 export function getSortIconClasses(active: boolean): string {
   return classNames(
-    'inline-block ml-1 transition-colors',
-    active ? 'text-[var(--tiger-primary,#2563eb)]' : 'text-gray-400'
+    'inline-block ms-1 transition-colors',
+    active ? 'text-[var(--tiger-primary,#2563eb)]' : 'text-[var(--tiger-text-muted,#6b7280)]'
   )
 }
 
@@ -753,7 +865,7 @@ export function getSortIconClasses(active: boolean): string {
  * Reset native button chrome so a sortable header still looks like a `<th>` label.
  */
 export const tableSortButtonClasses =
-  'inline-flex items-center appearance-none border-0 bg-transparent p-0 font-[inherit] text-inherit cursor-pointer'
+  'inline-flex items-center appearance-none border-0 bg-transparent p-0 font-[inherit] text-inherit cursor-pointer rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
 
 /**
  * Get empty state classes

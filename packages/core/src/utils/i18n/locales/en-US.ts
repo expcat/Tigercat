@@ -127,7 +127,10 @@ export const enUS: TigerLocale = {
     exportCsvAriaLabel: 'Export to CSV',
     exportExcelAriaLabel: 'Export to Excel',
     expandRowAriaLabel: 'Expand row',
-    collapseRowAriaLabel: 'Collapse row'
+    collapseRowAriaLabel: 'Collapse row',
+    sortMenuAriaLabel: 'Sort',
+    filterColumnAriaLabel: 'Filter {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: 'Export',

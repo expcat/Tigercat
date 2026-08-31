@@ -190,6 +190,12 @@ export interface TigerLocaleTable {
   exportExcelAriaLabel?: string
   expandRowAriaLabel?: string
   collapseRowAriaLabel?: string
+  /** Accessible name for the card-layout sort Select */
+  sortMenuAriaLabel?: string
+  /** Template: supports {column} */
+  filterColumnAriaLabel?: string
+  /** Template: supports {key} and {count} */
+  groupHeaderText?: string
 }
 
 export interface TigerLocaleDataExport {

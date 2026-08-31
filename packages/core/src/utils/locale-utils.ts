@@ -278,6 +278,19 @@ export function formatTableSortByText(template: string, column: string): string 
   return template.replace('{column}', column)
 }
 
+export function formatTableFilterColumnAriaLabel(template: string, column: string): string {
+  return template.replace('{column}', column)
+}
+
+export function formatTableGroupHeaderText(
+  template: string,
+  key: string,
+  count: number,
+  locale?: string
+): string {
+  return template.replace('{key}', key).replace('{count}', formatIntlNumber(count, locale))
+}
+
 export function getDataExportLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleDataExport>

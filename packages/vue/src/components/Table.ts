@@ -11,6 +11,7 @@ import {
 } from 'vue'
 import {
   classNames,
+  canUseTableVirtualWindow,
   createTableResizeObserverController,
   formatTableSelectRowAriaLabel,
   formatTableSortByText,
@@ -21,10 +22,15 @@ import {
   getTableLabels,
   getTableWrapperClasses,
   getTableResponsiveCardClasses,
-  getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   getTableVirtualWindow,
+  getTableCardSortValue,
+  parseTableCardSortValue,
+  subscribeTableCardViewport,
+  TABLE_CARD_SORT_NONE,
+  tableCardListVisibleClasses,
+  isActivationKey,
   isLazyTigerLocale,
   mergeTigerLocale,
   resolveTigerLocale,
@@ -69,6 +75,8 @@ export const Table = defineComponent({
     const measuredColumnWidths = ref<Record<string, number>>({})
     const measuredRowHeights = ref<Record<number, number>>({})
     const measuredContainerSize = ref({ width: 0, height: 0 })
+    const isCardViewport = ref(false)
+    let stopCardViewport: (() => void) | undefined
     const ctx = useTableState(
       props as TableInternalProps,
       emit,
@@ -235,7 +243,30 @@ export const Table = defineComponent({
 
     onMounted(() => attachResizeObserver())
 
-    onBeforeUnmount(() => resizeController.disconnect())
+    watch(
+      () =>
+        [props.responsiveMode, props.cardBreakpoint] as [
+          TableInternalProps['responsiveMode'],
+          TableInternalProps['cardBreakpoint']
+        ],
+      ([mode, breakpoint]) => {
+        stopCardViewport?.()
+        if (mode !== 'card') {
+          isCardViewport.value = false
+          stopCardViewport = undefined
+          return
+        }
+        stopCardViewport = subscribeTableCardViewport(breakpoint, (next) => {
+          isCardViewport.value = next
+        })
+      },
+      { immediate: true }
+    )
+
+    onBeforeUnmount(() => {
+      stopCardViewport?.()
+      resizeController.disconnect()
+    })
 
     return () => {
       const resolvedProps = props as TableInternalProps
@@ -245,7 +276,13 @@ export const Table = defineComponent({
         dataLength: ctx.processedData.value.length,
         threshold: resolvedProps.virtualThreshold
       })
-      const effectiveVirtual = virtualRecommendation.enabled
+      const virtualAllowed = canUseTableVirtualWindow({
+        expandable: resolvedProps.expandable,
+        groupBy: resolvedProps.groupBy
+      })
+      const effectiveVirtual = virtualRecommendation.enabled && virtualAllowed
+      const showCardTree = resolvedProps.responsiveMode === 'card' && isCardViewport.value
+      const showTableTree = !showCardTree
       const wrapperStyle = resolvedProps.maxHeight
         ? {
             maxHeight:
@@ -317,10 +354,12 @@ export const Table = defineComponent({
           ref: tableRef,
           class: classNames(
             tableBaseClasses,
-            getTableResponsiveTableClasses(
-              resolvedProps.responsiveMode,
-              resolvedProps.cardBreakpoint
-            ),
+            resolvedProps.responsiveMode === 'scroll'
+              ? getTableResponsiveTableClasses(
+                  resolvedProps.responsiveMode,
+                  resolvedProps.cardBreakpoint
+                )
+              : undefined,
             resolvedProps.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
           ),
           style:
@@ -331,21 +370,32 @@ export const Table = defineComponent({
         tableChildren
       )
 
-      const tableContent = effectiveVirtual
-        ? h(
-            'div',
-            {
-              style: { height: `${resolvedProps.virtualHeight}px`, overflow: 'auto' },
-              onScroll: (e: Event) => {
-                ctx.virtualScrollTop.value = (e.target as HTMLElement).scrollTop
-              }
-            },
-            [tableInner]
-          )
-        : tableInner
+      const virtualScrollerStyle = {
+        height:
+          typeof resolvedProps.virtualHeight === 'number'
+            ? `${resolvedProps.virtualHeight}px`
+            : resolvedProps.virtualHeight,
+        overflow: 'auto'
+      }
+      const onVirtualScroll = (e: Event) => {
+        ctx.virtualScrollTop.value = (e.target as HTMLElement).scrollTop
+      }
+
+      const tableContent =
+        showTableTree &&
+        (effectiveVirtual
+          ? h(
+              'div',
+              {
+                style: virtualScrollerStyle,
+                onScroll: onVirtualScroll
+              },
+              [tableInner]
+            )
+          : tableInner)
 
       const cardContent = (() => {
-        if (resolvedProps.responsiveMode !== 'card') return null
+        if (!showCardTree) return null
 
         const cardChildren: VNodeChild[] = []
         const sortableColumns = ctx.displayColumns.value.filter((column) => column.sortable)
@@ -354,6 +404,7 @@ export const Table = defineComponent({
           resolvedProps.rowSelection &&
           resolvedProps.rowSelection.type !== 'radio' &&
           resolvedProps.rowSelection.showCheckbox !== false &&
+          !resolvedProps.loading &&
           ctx.paginatedData.value.length > 0
         ) {
           cardChildren.push(
@@ -390,12 +441,10 @@ export const Table = defineComponent({
               [
                 h(Select, {
                   size: 'sm',
-                  modelValue:
-                    ctx.sortState.value.key && ctx.sortState.value.direction
-                      ? `${ctx.sortState.value.key}:${ctx.sortState.value.direction}`
-                      : '',
+                  'aria-label': tableLabels.value.sortMenuAriaLabel,
+                  modelValue: getTableCardSortValue(ctx.sortState.value),
                   options: [
-                    { label: tableLabels.value.clearSortText, value: '' },
+                    { label: tableLabels.value.clearSortText, value: TABLE_CARD_SORT_NONE },
                     ...sortableColumns.flatMap((column) => [
                       {
                         label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↑`,
@@ -409,15 +458,7 @@ export const Table = defineComponent({
                   ],
                   clearable: false,
                   'onUpdate:modelValue': (value: string | number | undefined) => {
-                    const nextValue = String(value ?? '')
-                    if (!nextValue) {
-                      ctx.handleSetSort({ key: null, direction: null })
-                      return
-                    }
-                    const separatorIndex = nextValue.lastIndexOf(':')
-                    const key = nextValue.slice(0, separatorIndex)
-                    const direction = nextValue.slice(separatorIndex + 1) as 'asc' | 'desc'
-                    ctx.handleSetSort({ key, direction })
+                    ctx.handleSetSort(parseTableCardSortValue(value))
                   }
                 })
               ]
@@ -425,15 +466,32 @@ export const Table = defineComponent({
           )
         }
 
-        if (ctx.paginatedData.value.length === 0) {
+        if (resolvedProps.loading) {
+          // Data is hidden under the overlay, matching table tbody.
+        } else if (ctx.paginatedData.value.length === 0) {
           cardChildren.push(
             h('div', { class: getTableResponsiveCardClasses(resolvedProps.cardPadding) }, [
               h(Empty, { showImage: false, description: tableLabels.value.emptyText })
             ])
           )
         } else {
+          const cardStart = effectiveVirtual && virtualWindow ? virtualWindow.startIndex : 0
+          const cardEnd =
+            effectiveVirtual && virtualWindow
+              ? virtualWindow.endIndex + 1
+              : ctx.paginatedData.value.length
+          if (effectiveVirtual && virtualWindow && virtualWindow.topPad > 0) {
+            cardChildren.push(
+              h('div', {
+                'aria-hidden': 'true',
+                style: { height: `${virtualWindow.topPad}px` }
+              })
+            )
+          }
           cardChildren.push(
-            ...ctx.paginatedData.value.map((record, index) => {
+            ...ctx.paginatedData.value.slice(cardStart, cardEnd).map((record, offset) => {
+              const index = cardStart + offset
+              const sourceIndex = ctx.pageSourceIndices.value[index] ?? index
               const key = ctx.paginatedRowKeys.value[index]
               const isExpanded = ctx.expandedRowKeySet.value.has(key)
               const isSelected = ctx.selectedRowKeySet.value.has(key)
@@ -447,9 +505,9 @@ export const Table = defineComponent({
               const renderCardCellContent = (column: TableColumn) => {
                 const dataKey = column.dataKey || column.key
                 return (
-                  slots[`cell-${column.key}`]?.({ record, index }) ??
+                  slots[`cell-${column.key}`]?.({ record, index: sourceIndex }) ??
                   (column.render
-                    ? (column.render(record, index) as string)
+                    ? (column.render(record, sourceIndex) as string)
                     : (record[dataKey] as string))
                 )
               }
@@ -583,7 +641,7 @@ export const Table = defineComponent({
                           disabled: checkboxProps.disabled,
                           'aria-label': formatTableSelectRowAriaLabel(
                             tableLabels.value.selectRowAriaLabel,
-                            index + 1,
+                            sourceIndex + 1,
                             tableLocale.value?.locale
                           ),
                           onChange: () => ctx.handleSelectRow(key, true)
@@ -594,7 +652,7 @@ export const Table = defineComponent({
                           disabled: checkboxProps.disabled,
                           'aria-label': formatTableSelectRowAriaLabel(
                             tableLabels.value.selectRowAriaLabel,
-                            index + 1,
+                            sourceIndex + 1,
                             tableLocale.value?.locale
                           ),
                           onChange: (checked: boolean) => ctx.handleSelectRow(key, checked)
@@ -643,13 +701,13 @@ export const Table = defineComponent({
 
               const expandedContent =
                 resolvedProps.expandable && isExpanded && isRowExpandable
-                  ? (slots['expanded-row']?.({ record, index }) ??
-                    resolvedProps.expandable.expandedRowRender?.(record, index))
+                  ? (slots['expanded-row']?.({ record, index: sourceIndex }) ??
+                    resolvedProps.expandable.expandedRowRender?.(record, sourceIndex))
                   : null
 
               const cardContext = {
                 record,
-                index,
+                index: sourceIndex,
                 columns: ctx.displayColumns.value,
                 selected: isSelected,
                 expanded: isExpanded,
@@ -660,8 +718,13 @@ export const Table = defineComponent({
                 slots.card?.(cardContext) ?? resolvedProps.renderCard?.(cardContext)
               const resolvedCardClassName =
                 typeof resolvedProps.cardClassName === 'function'
-                  ? resolvedProps.cardClassName(record, index)
+                  ? resolvedProps.cardClassName(record, sourceIndex)
                   : resolvedProps.cardClassName
+
+              const hasCardControls = controls.length > 0
+              const cardInteractive =
+                !!resolvedProps.rowSelection ||
+                typeof instance?.vnode.props?.onRowClick === 'function'
 
               return h(
                 'div',
@@ -671,7 +734,18 @@ export const Table = defineComponent({
                     getTableResponsiveCardClasses(resolvedProps.cardPadding),
                     resolvedCardClassName
                   ),
-                  onClick: () => ctx.handleRowClick(record, index, key)
+                  tabindex: cardInteractive && !hasCardControls ? 0 : undefined,
+                  onClick: () => ctx.handleRowClick(record, sourceIndex, key),
+                  onKeydown:
+                    cardInteractive && !hasCardControls
+                      ? (event: KeyboardEvent) => {
+                          if (event.target !== event.currentTarget) return
+                          if (isActivationKey(event)) {
+                            event.preventDefault()
+                            ctx.handleRowClick(record, sourceIndex, key)
+                          }
+                        }
+                      : undefined
                 },
                 customCard !== undefined && customCard !== null
                   ? [customCard as VNodeChild]
@@ -695,13 +769,23 @@ export const Table = defineComponent({
               )
             })
           )
+          if (effectiveVirtual && virtualWindow && virtualWindow.bottomPad > 0) {
+            cardChildren.push(
+              h('div', {
+                'aria-hidden': 'true',
+                style: { height: `${virtualWindow.bottomPad}px` }
+              })
+            )
+          }
         }
 
         return h(
           'div',
           {
-            class: getTableResponsiveCardListClasses(resolvedProps.cardBreakpoint),
-            'data-tiger-table-mobile': 'card'
+            class: tableCardListVisibleClasses,
+            'data-tiger-table-mobile': 'card',
+            style: effectiveVirtual ? virtualScrollerStyle : undefined,
+            onScroll: effectiveVirtual ? onVirtualScroll : undefined
           },
           cardChildren
         )
@@ -719,6 +803,7 @@ export const Table = defineComponent({
             ? virtualRecommendation.threshold
             : undefined,
           'data-tiger-measured-row-height': Object.values(measuredRowHeights.value)[0] || undefined,
+          'data-tiger-table-layout': showCardTree ? 'card' : 'table',
           'aria-busy': resolvedProps.loading
         },
         [

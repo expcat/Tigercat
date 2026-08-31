@@ -1,19 +1,25 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  canUseTableVirtualWindow,
   createTableResizeObserverController,
   getTableWrapperClasses,
   getCardColumns,
   getCardGridInfo,
   getTableColgroup,
   getTableResponsiveCardClasses,
-  getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   getTableVirtualWindow,
+  getTableCardSortValue,
+  parseTableCardSortValue,
+  subscribeTableCardViewport,
+  TABLE_CARD_SORT_NONE,
+  tableCardListVisibleClasses,
   formatTableSelectRowAriaLabel,
   formatTableSortByText,
   getTableLabels,
+  isActivationKey,
   tableBaseClasses,
   tableResponsiveCardLabelClasses,
   tableResponsiveCardRowClasses,
@@ -122,6 +128,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [measuredColumnWidths, setMeasuredColumnWidths] = useState<Record<string, number>>({})
   const [measuredRowHeights, setMeasuredRowHeights] = useState<Record<number, number>>({})
   const [measuredContainerSize, setMeasuredContainerSize] = useState({ width: 0, height: 0 })
+  const [isCardViewport, setIsCardViewport] = useState(false)
   const internalRowSelection = rowSelection as
     RowSelectionConfig<Record<string, unknown>> | undefined
   const internalExpandable = expandable as ExpandableConfig<Record<string, unknown>> | undefined
@@ -283,7 +290,18 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     [autoVirtual, ctx.processedData.length, virtual, virtualThreshold]
   )
 
-  const effectiveVirtual = virtualRecommendation.enabled
+  const virtualAllowed = canUseTableVirtualWindow({ expandable: internalExpandable, groupBy })
+  const effectiveVirtual = virtualRecommendation.enabled && virtualAllowed
+  const showCardTree = responsiveMode === 'card' && isCardViewport
+  const showTableTree = !showCardTree
+
+  useEffect(() => {
+    if (responsiveMode !== 'card') {
+      setIsCardViewport(false)
+      return undefined
+    }
+    return subscribeTableCardViewport(cardBreakpoint, setIsCardViewport)
+  }, [responsiveMode, cardBreakpoint])
   const shouldObserveGeometry =
     effectiveVirtual ||
     columnLockable ||
@@ -360,7 +378,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       ref={tableRef}
       className={classNames(
         tableBaseClasses,
-        getTableResponsiveTableClasses(responsiveMode, cardBreakpoint),
+        responsiveMode === 'scroll'
+          ? getTableResponsiveTableClasses(responsiveMode, cardBreakpoint)
+          : undefined,
         tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
         className
       )}
@@ -428,18 +448,22 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     </table>
   )
 
-  const tableContent = effectiveVirtual ? (
-    <div
-      style={{
-        height: typeof virtualHeight === 'number' ? `${virtualHeight}px` : virtualHeight,
-        overflow: 'auto'
-      }}
-      onScroll={(e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)}>
-      {tableInner}
-    </div>
-  ) : (
-    tableInner
-  )
+  const virtualScrollerStyle = {
+    height: typeof virtualHeight === 'number' ? `${virtualHeight}px` : virtualHeight,
+    overflow: 'auto' as const
+  }
+
+  const tableContent =
+    showTableTree &&
+    (effectiveVirtual ? (
+      <div
+        style={virtualScrollerStyle}
+        onScroll={(e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)}>
+        {tableInner}
+      </div>
+    ) : (
+      tableInner
+    ))
 
   return (
     <div
@@ -452,6 +476,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         virtualRecommendation.recommended ? virtualRecommendation.threshold : undefined
       }
       data-tiger-measured-row-height={measuredItemHeight || undefined}
+      data-tiger-table-layout={showCardTree ? 'card' : 'table'}
       aria-busy={loading}>
       {exportable && (
         <div className="mb-2 flex justify-end">
@@ -467,13 +492,20 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
       {tableContent}
 
-      {responsiveMode === 'card' && (
+      {showCardTree && (
         <div
-          className={getTableResponsiveCardListClasses(cardBreakpoint)}
-          data-tiger-table-mobile="card">
+          className={tableCardListVisibleClasses}
+          data-tiger-table-mobile="card"
+          style={effectiveVirtual ? virtualScrollerStyle : undefined}
+          onScroll={
+            effectiveVirtual
+              ? (e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)
+              : undefined
+          }>
           {internalRowSelection?.type !== 'radio' &&
           internalRowSelection?.showCheckbox !== false &&
           internalRowSelection &&
+          !loading &&
           ctx.paginatedData.length > 0 ? (
             <div className="flex items-center justify-between rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2">
               <Checkbox
@@ -489,13 +521,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             <div className="rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2">
               <Select
                 size="sm"
-                value={
-                  ctx.sortState.key && ctx.sortState.direction
-                    ? `${ctx.sortState.key}:${ctx.sortState.direction}`
-                    : ''
-                }
+                aria-label={tableLabels.sortMenuAriaLabel}
+                value={getTableCardSortValue(ctx.sortState)}
                 options={[
-                  { label: tableLabels.clearSortText, value: '' },
+                  { label: tableLabels.clearSortText, value: TABLE_CARD_SORT_NONE },
                   ...ctx.displayColumns
                     .filter((column) => column.sortable)
                     .flatMap((column) => [
@@ -511,263 +540,293 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                 ]}
                 clearable={false}
                 onChange={(value) => {
-                  const nextValue = String(value ?? '')
-                  if (!nextValue) {
-                    ctx.handleSetSort({ key: null, direction: null })
-                    return
-                  }
-                  const separatorIndex = nextValue.lastIndexOf(':')
-                  const key = nextValue.slice(0, separatorIndex)
-                  const direction = nextValue.slice(separatorIndex + 1) as 'asc' | 'desc'
-                  ctx.handleSetSort({ key, direction })
+                  ctx.handleSetSort(parseTableCardSortValue(value))
                 }}
               />
             </div>
           ) : null}
-          {ctx.paginatedData.length === 0 ? (
+          {loading ? null : ctx.paginatedData.length === 0 ? (
             <div className={getTableResponsiveCardClasses(cardPadding)}>
               <Empty showImage={false} description={tableLabels.emptyText} />
             </div>
           ) : (
-            ctx.paginatedData.map((record, index) => {
-              const key = ctx.pageRowKeys[index]
-              const isExpanded = ctx.expandedRowKeySet.has(key)
-              const isSelected = ctx.selectedRowKeySet.has(key)
-              const isRowExpandable = internalExpandable
-                ? internalExpandable.rowExpandable
-                  ? internalExpandable.rowExpandable(record)
-                  : true
-                : false
-              const expandedContent =
-                internalExpandable && isExpanded && isRowExpandable
-                  ? internalExpandable.expandedRowRender?.(record, index)
-                  : null
-              const expandedNode = expandedContent as React.ReactNode
-              const renderContext = {
-                record: record as T,
-                index,
-                columns: ctx.displayColumns as TableColumn<T>[],
-                selected: isSelected,
-                expanded: isExpanded,
-                toggleExpand: () => ctx.handleToggleExpand(key, record),
-                selectRow: (checked: boolean) => ctx.handleSelectRow(key, checked)
-              }
-              const customCard = renderCard?.(renderContext)
-              const resolvedCardClassName =
-                typeof cardClassName === 'function'
-                  ? cardClassName(record as T, index)
-                  : cardClassName
-              const controlsNode =
-                (internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
-                (internalExpandable && isRowExpandable) ? (
-                  <>
-                    {internalRowSelection && internalRowSelection.showCheckbox !== false && (
-                      <span onClick={(event) => event.stopPropagation()}>
-                        {internalRowSelection.type === 'radio' ? (
-                          <Radio
-                            value={key}
-                            checked={isSelected}
-                            disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
-                            aria-label={formatTableSelectRowAriaLabel(
-                              tableLabels.selectRowAriaLabel,
-                              index + 1,
-                              tableLocale?.locale
-                            )}
-                            onChange={() => ctx.handleSelectRow(key, true)}
-                          />
-                        ) : (
-                          <Checkbox
-                            size="sm"
-                            checked={isSelected}
-                            disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
-                            aria-label={formatTableSelectRowAriaLabel(
-                              tableLabels.selectRowAriaLabel,
-                              index + 1,
-                              tableLocale?.locale
-                            )}
-                            onChange={(checked) => ctx.handleSelectRow(key, checked)}
-                          />
-                        )}
-                      </span>
-                    )}
-                    {internalExpandable && isRowExpandable && (
-                      <button
-                        type="button"
-                        className="text-sm text-[var(--tiger-primary,#2563eb)]"
-                        aria-expanded={isExpanded}
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          ctx.handleToggleExpand(key, record)
-                        }}>
-                        {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
-                      </button>
-                    )}
-                  </>
-                ) : null
-
-              return (
-                <div
-                  key={key}
-                  className={classNames(
-                    getTableResponsiveCardClasses(cardPadding),
-                    resolvedCardClassName
-                  )}
-                  onClick={() => ctx.handleRowClick(record, index, key)}>
-                  {customCard !== undefined && customCard !== null ? (
-                    (customCard as React.ReactNode)
-                  ) : (
-                    <>
-                      {(() => {
-                        const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns)
-                        const renderCellContent = (column: TableColumn) => {
-                          const dataKey = column.dataKey || column.key
-                          return column.render
-                            ? (column.render(record, index) as React.ReactNode)
-                            : (record[dataKey] as React.ReactNode)
-                        }
-
-                        if (hasCustomCardLayout) {
-                          return (
-                            <>
-                              {titleColumn && (
-                                <div
-                                  className={classNames(
-                                    tableResponsiveCardTitleClasses,
-                                    cardSelectionPosition === 'title-inline' &&
-                                      controlsNode &&
-                                      'flex items-center gap-3'
-                                  )}>
-                                  {cardSelectionPosition === 'title-inline' && controlsNode}
-                                  <span className="min-w-0 flex-1">
-                                    {renderCellContent(titleColumn)}
-                                  </span>
-                                </div>
-                              )}
-                              {(!titleColumn || cardSelectionPosition !== 'title-inline') &&
-                                controlsNode && (
-                                  <div className="mb-2 flex items-center gap-3">{controlsNode}</div>
+            <>
+              {effectiveVirtual && virtualWindow && virtualWindow.topPad > 0 ? (
+                <div aria-hidden="true" style={{ height: `${virtualWindow.topPad}px` }} />
+              ) : null}
+              {ctx.paginatedData
+                .slice(
+                  effectiveVirtual && virtualWindow ? virtualWindow.startIndex : 0,
+                  effectiveVirtual && virtualWindow
+                    ? virtualWindow.endIndex + 1
+                    : ctx.paginatedData.length
+                )
+                .map((record, offset) => {
+                  const index =
+                    (effectiveVirtual && virtualWindow ? virtualWindow.startIndex : 0) + offset
+                  const sourceIndex = ctx.pageSourceIndices[index] ?? index
+                  const key = ctx.pageRowKeys[index]
+                  const isExpanded = ctx.expandedRowKeySet.has(key)
+                  const isSelected = ctx.selectedRowKeySet.has(key)
+                  const isRowExpandable = internalExpandable
+                    ? internalExpandable.rowExpandable
+                      ? internalExpandable.rowExpandable(record)
+                      : true
+                    : false
+                  const expandedContent =
+                    internalExpandable && isExpanded && isRowExpandable
+                      ? internalExpandable.expandedRowRender?.(record, sourceIndex)
+                      : null
+                  const expandedNode = expandedContent as React.ReactNode
+                  const renderContext = {
+                    record: record as T,
+                    index: sourceIndex,
+                    columns: ctx.displayColumns as TableColumn<T>[],
+                    selected: isSelected,
+                    expanded: isExpanded,
+                    toggleExpand: () => ctx.handleToggleExpand(key, record),
+                    selectRow: (checked: boolean) => ctx.handleSelectRow(key, checked)
+                  }
+                  const customCard = renderCard?.(renderContext)
+                  const resolvedCardClassName =
+                    typeof cardClassName === 'function'
+                      ? cardClassName(record as T, sourceIndex)
+                      : cardClassName
+                  const controlsNode =
+                    (internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
+                    (internalExpandable && isRowExpandable) ? (
+                      <>
+                        {internalRowSelection && internalRowSelection.showCheckbox !== false && (
+                          <span onClick={(event) => event.stopPropagation()}>
+                            {internalRowSelection.type === 'radio' ? (
+                              <Radio
+                                value={key}
+                                checked={isSelected}
+                                disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                                aria-label={formatTableSelectRowAriaLabel(
+                                  tableLabels.selectRowAriaLabel,
+                                  sourceIndex + 1,
+                                  tableLocale?.locale
                                 )}
-                              <div className={classNames('grid grid-cols-12 mt-2', cardFieldGap)}>
-                                {bodyColumns.map((column) => {
-                                  const layoutItem = cardLayoutMap.get(column.key)
-                                  const gridInfo = getCardGridInfo(column, layoutItem)
-
-                                  if (gridInfo.hideLabel) {
-                                    return (
-                                      <div
-                                        key={column.key}
-                                        className={classNames(
-                                          gridInfo.className,
-                                          gridInfo.divider &&
-                                            'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
-                                        )}>
-                                        {renderCellContent(column)}
-                                      </div>
-                                    )
-                                  }
-
-                                  if (gridInfo.labelPosition === 'top') {
-                                    return (
-                                      <div
-                                        key={column.key}
-                                        className={classNames(
-                                          gridInfo.className,
-                                          gridInfo.divider &&
-                                            'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
-                                        )}>
-                                        <div
-                                          className={classNames(
-                                            'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1',
-                                            gridInfo.labelClassName
-                                          )}>
-                                          {column.title}
-                                        </div>
-                                        <div
-                                          className={classNames(
-                                            'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
-                                            gridInfo.valueClassName
-                                          )}>
-                                          {renderCellContent(column)}
-                                        </div>
-                                      </div>
-                                    )
-                                  }
-
-                                  return (
-                                    <div
-                                      key={column.key}
-                                      className={classNames(
-                                        gridInfo.className,
-                                        'grid grid-cols-[auto_1fr] gap-2 items-baseline',
-                                        gridInfo.divider &&
-                                          'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
-                                      )}>
-                                      <div
-                                        className={classNames(
-                                          'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0',
-                                          gridInfo.labelClassName
-                                        )}>
-                                        {column.title}
-                                      </div>
-                                      <div
-                                        className={classNames(
-                                          'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
-                                          gridInfo.valueClassName
-                                        )}>
-                                        {renderCellContent(column)}
-                                      </div>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            </>
-                          )
-                        }
-
-                        return (
-                          <>
-                            {titleColumn && (
-                              <div
-                                className={classNames(
-                                  tableResponsiveCardTitleClasses,
-                                  cardSelectionPosition === 'title-inline' &&
-                                    controlsNode &&
-                                    'flex items-center gap-3'
-                                )}>
-                                {cardSelectionPosition === 'title-inline' && controlsNode}
-                                <span className="min-w-0 flex-1">
-                                  {renderCellContent(titleColumn)}
-                                </span>
-                              </div>
+                                onChange={() => ctx.handleSelectRow(key, true)}
+                              />
+                            ) : (
+                              <Checkbox
+                                size="sm"
+                                checked={isSelected}
+                                disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                                aria-label={formatTableSelectRowAriaLabel(
+                                  tableLabels.selectRowAriaLabel,
+                                  sourceIndex + 1,
+                                  tableLocale?.locale
+                                )}
+                                onChange={(checked) => ctx.handleSelectRow(key, checked)}
+                              />
                             )}
-                            {(!titleColumn || cardSelectionPosition !== 'title-inline') &&
-                              controlsNode && (
-                                <div className="mb-2 flex items-center gap-3">{controlsNode}</div>
-                              )}
-                            {bodyColumns.map((column) => (
-                              <div key={column.key} className={tableResponsiveCardRowClasses}>
-                                <div className={tableResponsiveCardLabelClasses}>
-                                  {column.title}
-                                </div>
-                                <div className={tableResponsiveCardValueClasses}>
-                                  {renderCellContent(column)}
-                                </div>
-                              </div>
-                            ))}
-                          </>
-                        )
-                      })()}
+                          </span>
+                        )}
+                        {internalExpandable && isRowExpandable && (
+                          <button
+                            type="button"
+                            className="text-sm text-[var(--tiger-primary,#2563eb)]"
+                            aria-expanded={isExpanded}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              ctx.handleToggleExpand(key, record)
+                            }}>
+                            {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
+                          </button>
+                        )}
+                      </>
+                    ) : null
 
-                      {expandedNode && (
-                        <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
-                          {expandedNode}
-                        </div>
+                  const hasCardControls = Boolean(controlsNode)
+                  const cardInteractive = Boolean(onRowClick || internalRowSelection)
+
+                  return (
+                    <div
+                      key={key}
+                      className={classNames(
+                        getTableResponsiveCardClasses(cardPadding),
+                        resolvedCardClassName
                       )}
-                    </>
-                  )}
-                </div>
-              )
-            })
+                      tabIndex={cardInteractive && !hasCardControls ? 0 : undefined}
+                      onClick={() => ctx.handleRowClick(record, sourceIndex, key)}
+                      onKeyDown={
+                        cardInteractive && !hasCardControls
+                          ? (event) => {
+                              if (event.target !== event.currentTarget) return
+                              if (isActivationKey(event)) {
+                                event.preventDefault()
+                                ctx.handleRowClick(record, sourceIndex, key)
+                              }
+                            }
+                          : undefined
+                      }>
+                      {customCard !== undefined && customCard !== null ? (
+                        (customCard as React.ReactNode)
+                      ) : (
+                        <>
+                          {(() => {
+                            const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns)
+                            const renderCellContent = (column: TableColumn) => {
+                              const dataKey = column.dataKey || column.key
+                              return column.render
+                                ? (column.render(record, sourceIndex) as React.ReactNode)
+                                : (record[dataKey] as React.ReactNode)
+                            }
+
+                            if (hasCustomCardLayout) {
+                              return (
+                                <>
+                                  {titleColumn && (
+                                    <div
+                                      className={classNames(
+                                        tableResponsiveCardTitleClasses,
+                                        cardSelectionPosition === 'title-inline' &&
+                                          controlsNode &&
+                                          'flex items-center gap-3'
+                                      )}>
+                                      {cardSelectionPosition === 'title-inline' && controlsNode}
+                                      <span className="min-w-0 flex-1">
+                                        {renderCellContent(titleColumn)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {(!titleColumn || cardSelectionPosition !== 'title-inline') &&
+                                    controlsNode && (
+                                      <div className="mb-2 flex items-center gap-3">
+                                        {controlsNode}
+                                      </div>
+                                    )}
+                                  <div
+                                    className={classNames('grid grid-cols-12 mt-2', cardFieldGap)}>
+                                    {bodyColumns.map((column) => {
+                                      const layoutItem = cardLayoutMap.get(column.key)
+                                      const gridInfo = getCardGridInfo(column, layoutItem)
+
+                                      if (gridInfo.hideLabel) {
+                                        return (
+                                          <div
+                                            key={column.key}
+                                            className={classNames(
+                                              gridInfo.className,
+                                              gridInfo.divider &&
+                                                'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                            )}>
+                                            {renderCellContent(column)}
+                                          </div>
+                                        )
+                                      }
+
+                                      if (gridInfo.labelPosition === 'top') {
+                                        return (
+                                          <div
+                                            key={column.key}
+                                            className={classNames(
+                                              gridInfo.className,
+                                              gridInfo.divider &&
+                                                'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                            )}>
+                                            <div
+                                              className={classNames(
+                                                'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1',
+                                                gridInfo.labelClassName
+                                              )}>
+                                              {column.title}
+                                            </div>
+                                            <div
+                                              className={classNames(
+                                                'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                                gridInfo.valueClassName
+                                              )}>
+                                              {renderCellContent(column)}
+                                            </div>
+                                          </div>
+                                        )
+                                      }
+
+                                      return (
+                                        <div
+                                          key={column.key}
+                                          className={classNames(
+                                            gridInfo.className,
+                                            'grid grid-cols-[auto_1fr] gap-2 items-baseline',
+                                            gridInfo.divider &&
+                                              'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                          )}>
+                                          <div
+                                            className={classNames(
+                                              'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0',
+                                              gridInfo.labelClassName
+                                            )}>
+                                            {column.title}
+                                          </div>
+                                          <div
+                                            className={classNames(
+                                              'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                              gridInfo.valueClassName
+                                            )}>
+                                            {renderCellContent(column)}
+                                          </div>
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
+                                </>
+                              )
+                            }
+
+                            return (
+                              <>
+                                {titleColumn && (
+                                  <div
+                                    className={classNames(
+                                      tableResponsiveCardTitleClasses,
+                                      cardSelectionPosition === 'title-inline' &&
+                                        controlsNode &&
+                                        'flex items-center gap-3'
+                                    )}>
+                                    {cardSelectionPosition === 'title-inline' && controlsNode}
+                                    <span className="min-w-0 flex-1">
+                                      {renderCellContent(titleColumn)}
+                                    </span>
+                                  </div>
+                                )}
+                                {(!titleColumn || cardSelectionPosition !== 'title-inline') &&
+                                  controlsNode && (
+                                    <div className="mb-2 flex items-center gap-3">
+                                      {controlsNode}
+                                    </div>
+                                  )}
+                                {bodyColumns.map((column) => (
+                                  <div key={column.key} className={tableResponsiveCardRowClasses}>
+                                    <div className={tableResponsiveCardLabelClasses}>
+                                      {column.title}
+                                    </div>
+                                    <div className={tableResponsiveCardValueClasses}>
+                                      {renderCellContent(column)}
+                                    </div>
+                                  </div>
+                                ))}
+                              </>
+                            )
+                          })()}
+
+                          {expandedNode && (
+                            <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
+                              {expandedNode}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )
+                })}
+              {effectiveVirtual && virtualWindow && virtualWindow.bottomPad > 0 ? (
+                <div aria-hidden="true" style={{ height: `${virtualWindow.bottomPad}px` }} />
+              ) : null}
+            </>
           )}
         </div>
       )}

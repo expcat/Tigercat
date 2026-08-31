@@ -19,6 +19,12 @@ import {
   getTableFixedHeaderCellClasses,
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
+  getTableCardSortValue,
+  getTableCardViewportQuery,
+  getTableChromeSlots,
+  parseTableCardSortValue,
+  TABLE_CARD_SORT_NONE,
+  canUseTableVirtualWindow,
   getTableVirtualRecommendation,
   getTableVirtualWindow,
   getTableRowClasses,
@@ -664,6 +670,45 @@ describe('table-utils', () => {
     it('resolves the card list container classes per breakpoint', () => {
       expect(getTableResponsiveCardListClasses()).toContain('max-sm:grid')
       expect(getTableResponsiveCardListClasses('lg')).toContain('max-lg:grid')
+    })
+
+    it('maps card breakpoints to a max-width media query one pixel below the token', () => {
+      expect(getTableCardViewportQuery('sm')).toBe('(max-width: 639px)')
+      expect(getTableCardViewportQuery('md')).toBe('(max-width: 767px)')
+      expect(getTableCardViewportQuery('lg')).toBe('(max-width: 1023px)')
+    })
+
+    it('uses a non-empty sentinel for unsorted card-layout sort', () => {
+      expect(getTableCardSortValue({ key: null, direction: null })).toBe(TABLE_CARD_SORT_NONE)
+      expect(parseTableCardSortValue(TABLE_CARD_SORT_NONE)).toEqual({
+        key: null,
+        direction: null
+      })
+      expect(parseTableCardSortValue('age:desc')).toEqual({ key: 'age', direction: 'desc' })
+      expect(parseTableCardSortValue('')).toEqual({ key: null, direction: null })
+    })
+
+    it('orders expand and selection chrome the same way for every table section', () => {
+      expect(getTableChromeSlots({ hasSelectionColumn: true, expand: 'start' })).toEqual({
+        leading: ['expand', 'selection'],
+        trailing: []
+      })
+      expect(getTableChromeSlots({ hasSelectionColumn: true, expand: 'end' })).toEqual({
+        leading: ['selection'],
+        trailing: ['expand']
+      })
+      expect(getTableChromeSlots({ hasSelectionColumn: false, expand: 'start' })).toEqual({
+        leading: ['expand'],
+        trailing: []
+      })
+    })
+
+    it('disables virtual windows when expand or group rows would vary height', () => {
+      expect(canUseTableVirtualWindow({})).toBe(true)
+      expect(canUseTableVirtualWindow({ expandable: { expandedRowRender: () => null } })).toBe(
+        false
+      )
+      expect(canUseTableVirtualWindow({ groupBy: 'dept' })).toBe(false)
     })
   })
 
