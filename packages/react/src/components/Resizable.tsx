@@ -1,50 +1,91 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  applyResizeJump,
+  applyResizeSize,
   classNames,
-  resizableBaseClasses,
-  getResizableHandleClasses,
-  calculateResizeDelta,
-  clampDimensions,
-  applyAspectRatio,
-  defaultResizeHandles,
   createDocumentDragSession,
-  getResizeKeyboardDelta,
+  defaultResizeHandles,
+  formatResizableHandleLabel,
+  getResizableHandleClasses,
   getResizeHandleOrientation,
+  getResizeKeyboardDelta,
+  getResizableLabels,
+  isCornerResizeHandle,
+  isSplitterRtl,
+  mergeResizableBoxStyle,
+  resizableBaseClasses,
+  resolveVisibleResizeHandles,
   type DocumentDragSession,
   type ResizableProps as CoreResizableProps,
-  type ResizeHandlePosition,
-  type ResizeEvent
+  type ResizeEvent,
+  type ResizeHandlePosition
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
 
-export interface ResizableProps extends Omit<CoreResizableProps, 'style'> {
+export interface ResizableProps
+  extends
+    Omit<CoreResizableProps, 'style'>,
+    Omit<
+      React.ComponentPropsWithoutRef<'div'>,
+      keyof CoreResizableProps | 'onResize' | 'children' | 'width' | 'height'
+    > {
   onResizeStart?: (event: ResizeEvent) => void
   onResize?: (event: ResizeEvent) => void
   onResizeEnd?: (event: ResizeEvent) => void
+  onWidthChange?: (width: number) => void
+  onHeightChange?: (height: number) => void
   children?: React.ReactNode
   style?: React.CSSProperties
+  width?: number
+  height?: number
 }
 
-export const Resizable: React.FC<ResizableProps> = ({
-  defaultWidth,
-  defaultHeight,
-  minWidth = 0,
-  minHeight = 0,
-  maxWidth,
-  maxHeight,
-  handles = defaultResizeHandles,
-  axis = 'both',
-  disabled = false,
-  lockAspectRatio = false,
-  className,
-  style,
-  onResizeStart,
-  onResize,
-  onResizeEnd,
-  children
-}) => {
-  const [width, setWidth] = useState(defaultWidth)
-  const [height, setHeight] = useState(defaultHeight)
+export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Resizable(
+  {
+    width: widthProp,
+    height: heightProp,
+    defaultWidth,
+    defaultHeight,
+    minWidth = 0,
+    minHeight = 0,
+    maxWidth,
+    maxHeight,
+    handles = defaultResizeHandles,
+    axis = 'both',
+    disabled = false,
+    lockAspectRatio = false,
+    className,
+    style,
+    onResizeStart,
+    onResize,
+    onResizeEnd,
+    onWidthChange,
+    onHeightChange,
+    children,
+    dir,
+    ...rest
+  },
+  ref
+) {
+  const config = useTigerConfig()
+  const labels = getResizableLabels(config.locale)
+  const rtl = isSplitterRtl(typeof dir === 'string' ? dir : config.direction)
+  const { 'aria-labelledby': ariaLabelledby, 'aria-label': ariaLabel, ...domProps } = rest
+
+  const [width, setWidth] = useControlledState<number | undefined>({
+    value: widthProp,
+    defaultValue: defaultWidth,
+    onChange: onWidthChange
+  })
+  const [height, setHeight] = useControlledState<number | undefined>({
+    value: heightProp,
+    defaultValue: defaultHeight,
+    onChange: onHeightChange
+  })
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [draggingHandle, setDraggingHandle] = useState<ResizeHandlePosition | null>(null)
+  const rootRef = useRef<HTMLDivElement | null>(null)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const dragRef = useRef<{
     handle: ResizeHandlePosition
@@ -52,7 +93,20 @@ export const Resizable: React.FC<ResizableProps> = ({
     startY: number
     startW: number
     startH: number
+    startOffsetX: number
+    startOffsetY: number
   } | null>(null)
+
+  const visibleHandles = useMemo(() => resolveVisibleResizeHandles(handles, axis), [handles, axis])
+
+  const setRootRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) ref.current = node
+    },
+    [ref]
+  )
 
   const cleanupDragSession = useCallback(() => {
     dragSessionRef.current?.dispose()
@@ -61,52 +115,63 @@ export const Resizable: React.FC<ResizableProps> = ({
 
   useEffect(() => cleanupDragSession, [cleanupDragSession])
 
+  const commitSize = useCallback(
+    (
+      next: { width: number; height: number; offsetX: number; offsetY: number },
+      handle: ResizeHandlePosition,
+      startW: number,
+      startH: number,
+      startOffsetX: number,
+      startOffsetY: number,
+      phase: 'move' | 'end' | 'keyboard'
+    ) => {
+      setWidth(next.width)
+      setHeight(next.height)
+      setOffset({ x: startOffsetX + next.offsetX, y: startOffsetY + next.offsetY })
+      const event: ResizeEvent = {
+        width: next.width,
+        height: next.height,
+        handle,
+        deltaX: next.width - startW,
+        deltaY: next.height - startH
+      }
+      onResize?.(event)
+      if (phase !== 'move') onResizeEnd?.(event)
+    },
+    [onResize, onResizeEnd, setHeight, setWidth]
+  )
+
+  const measureBox = (): { width: number; height: number } => {
+    const rect = rootRef.current?.getBoundingClientRect()
+    return {
+      width: width ?? rect?.width ?? 0,
+      height: height ?? rect?.height ?? 0
+    }
+  }
+
   const handlePointerDown = useCallback(
     (handle: ResizeHandlePosition, e: React.PointerEvent) => {
       if (disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
-      const sw = width ?? 0
-      const sh = height ?? 0
+      const box = measureBox()
       dragRef.current = {
         handle,
         startX: e.clientX,
         startY: e.clientY,
-        startW: sw,
-        startH: sh
+        startW: box.width,
+        startH: box.height,
+        startOffsetX: offset.x,
+        startOffsetY: offset.y
       }
       setDraggingHandle(handle)
-      onResizeStart?.({ width: sw, height: sh, handle, deltaX: 0, deltaY: 0 })
-
-      const calculateResize = (currentX: number, currentY: number) => {
-        const drag = dragRef.current
-        if (!drag) return null
-        const mouseDeltaX = currentX - drag.startX
-        const mouseDeltaY = currentY - drag.startY
-        const { deltaWidth, deltaHeight } = calculateResizeDelta(
-          drag.handle,
-          mouseDeltaX,
-          mouseDeltaY,
-          axis
-        )
-        let newW = drag.startW + deltaWidth
-        let newH = drag.startH + deltaHeight
-
-        if (lockAspectRatio) {
-          const ar = applyAspectRatio(newW, newH, drag.startW, drag.startH)
-          newW = ar.width
-          newH = ar.height
-        }
-
-        const clamped = clampDimensions(newW, newH, minWidth, minHeight, maxWidth, maxHeight)
-        return {
-          width: clamped.width,
-          height: clamped.height,
-          handle: drag.handle,
-          deltaX: clamped.width - drag.startW,
-          deltaY: clamped.height - drag.startH
-        }
-      }
+      onResizeStart?.({
+        width: box.width,
+        height: box.height,
+        handle,
+        deltaX: 0,
+        deltaY: 0
+      })
 
       dragSessionRef.current = createDocumentDragSession({
         startX: e.clientX,
@@ -115,15 +180,63 @@ export const Resizable: React.FC<ResizableProps> = ({
         pointerId: e.pointerId,
         pointerTarget: e.currentTarget,
         onMove: ({ currentX, currentY }) => {
-          const next = calculateResize(currentX, currentY)
-          if (!next) return
-          setWidth(next.width)
-          setHeight(next.height)
-          onResize?.(next)
+          const drag = dragRef.current
+          if (!drag) return
+          const next = applyResizeSize(
+            drag.handle,
+            drag.startW,
+            drag.startH,
+            currentX - drag.startX,
+            currentY - drag.startY,
+            axis,
+            {
+              rtl,
+              lockAspectRatio,
+              minWidth,
+              minHeight,
+              maxWidth,
+              maxHeight
+            }
+          )
+          commitSize(
+            next,
+            drag.handle,
+            drag.startW,
+            drag.startH,
+            drag.startOffsetX,
+            drag.startOffsetY,
+            'move'
+          )
         },
         onEnd: ({ currentX, currentY }) => {
-          const next = calculateResize(currentX, currentY)
-          if (next) onResizeEnd?.(next)
+          const drag = dragRef.current
+          if (drag) {
+            const next = applyResizeSize(
+              drag.handle,
+              drag.startW,
+              drag.startH,
+              currentX - drag.startX,
+              currentY - drag.startY,
+              axis,
+              {
+                rtl,
+                lockAspectRatio,
+                minWidth,
+                minHeight,
+                maxWidth,
+                maxHeight
+              }
+            )
+            commitSize(
+              next,
+              drag.handle,
+              drag.startW,
+              drag.startH,
+              drag.startOffsetX,
+              drag.startOffsetY,
+              'end'
+            )
+          }
           dragRef.current = null
           dragSessionRef.current = null
           setDraggingHandle(null)
@@ -131,103 +244,112 @@ export const Resizable: React.FC<ResizableProps> = ({
       })
     },
     [
-      disabled,
-      width,
-      height,
       axis,
-      lockAspectRatio,
-      minWidth,
-      minHeight,
-      maxWidth,
-      maxHeight,
       cleanupDragSession,
+      commitSize,
+      disabled,
+      height,
+      lockAspectRatio,
+      maxHeight,
+      maxWidth,
+      minHeight,
+      minWidth,
+      offset.x,
+      offset.y,
       onResizeStart,
-      onResize,
-      onResizeEnd
+      rtl,
+      width
     ]
   )
 
   const handleKeyDown = useCallback(
     (handle: ResizeHandlePosition, e: React.KeyboardEvent) => {
       if (disabled) return
+      const box = measureBox()
+      const jumped = applyResizeJump(e.key, handle, box.width, box.height, axis, {
+        rtl,
+        lockAspectRatio,
+        minWidth,
+        minHeight,
+        maxWidth,
+        maxHeight
+      })
+      if (jumped) {
+        e.preventDefault()
+        commitSize(jumped, handle, box.width, box.height, offset.x, offset.y, 'keyboard')
+        return
+      }
       const delta = getResizeKeyboardDelta(e.key)
       if (!delta) return
       e.preventDefault()
-      const startW = width ?? 0
-      const startH = height ?? 0
-      const { deltaWidth, deltaHeight } = calculateResizeDelta(
+      const next = applyResizeSize(
         handle,
+        box.width,
+        box.height,
         delta.deltaX,
         delta.deltaY,
-        axis
+        axis,
+        { rtl, lockAspectRatio, minWidth, minHeight, maxWidth, maxHeight }
       )
-      let newW = startW + deltaWidth
-      let newH = startH + deltaHeight
-      if (lockAspectRatio) {
-        const ar = applyAspectRatio(newW, newH, startW, startH)
-        newW = ar.width
-        newH = ar.height
-      }
-      const clamped = clampDimensions(newW, newH, minWidth, minHeight, maxWidth, maxHeight)
-      setWidth(clamped.width)
-      setHeight(clamped.height)
-      const evt: ResizeEvent = {
-        width: clamped.width,
-        height: clamped.height,
-        handle,
-        deltaX: clamped.width - startW,
-        deltaY: clamped.height - startH
-      }
-      onResize?.(evt)
-      onResizeEnd?.(evt)
+      commitSize(next, handle, box.width, box.height, offset.x, offset.y, 'keyboard')
     },
     [
-      disabled,
-      width,
-      height,
       axis,
+      commitSize,
+      disabled,
+      height,
       lockAspectRatio,
-      minWidth,
-      minHeight,
-      maxWidth,
       maxHeight,
-      onResize,
-      onResizeEnd
+      maxWidth,
+      minHeight,
+      minWidth,
+      offset.x,
+      offset.y,
+      rtl,
+      width
     ]
   )
 
-  const containerClasses = useMemo(
-    () => classNames(resizableBaseClasses, 'group/resizable', className),
-    [className]
-  )
-
-  const containerStyle = useMemo<React.CSSProperties>(() => {
-    const s: React.CSSProperties = { ...style }
-    if (width != null) s.width = `${width}px`
-    if (height != null) s.height = `${height}px`
-    return s
-  }, [width, height, style])
+  const containerClasses = classNames(resizableBaseClasses, 'group/resizable', className)
+  const containerStyle = mergeResizableBoxStyle(
+    style as Record<string, string | number> | undefined,
+    width,
+    height,
+    offset.x,
+    offset.y
+  ) as React.CSSProperties
 
   return (
-    <div className={containerClasses} style={containerStyle} data-resizable="">
+    <div
+      {...domProps}
+      ref={setRootRef}
+      className={containerClasses}
+      style={containerStyle}
+      dir={dir}
+      data-resizable=""
+      aria-label={typeof ariaLabel === 'string' ? ariaLabel : undefined}
+      aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
       {children}
-      {handles.map((pos) => {
+      {visibleHandles.map((pos) => {
+        const corner = isCornerResizeHandle(pos)
         const usesHeight = pos === 'top' || pos === 'bottom'
         const valueNow = Math.round((usesHeight ? height : width) ?? 0)
         const valueMin = usesHeight ? minHeight : minWidth
         const valueMax = usesHeight ? maxHeight : maxWidth
+        const handleName = formatResizableHandleLabel(labels.handleAriaLabel, pos)
         return (
           <div
             key={pos}
             className={getResizableHandleClasses(pos, draggingHandle === pos, disabled)}
             data-handle={pos}
-            role="separator"
-            aria-label={`Resize ${pos}`}
-            aria-orientation={getResizeHandleOrientation(pos)}
-            aria-valuenow={valueNow}
-            aria-valuemin={valueMin}
-            aria-valuemax={valueMax}
-            tabIndex={disabled ? -1 : 0}
+            role={corner ? undefined : 'separator'}
+            aria-hidden={corner ? true : undefined}
+            aria-label={corner || ariaLabelledby ? undefined : handleName}
+            aria-orientation={corner ? undefined : getResizeHandleOrientation(pos)}
+            aria-valuenow={corner ? undefined : valueNow}
+            aria-valuemin={corner ? undefined : valueMin}
+            aria-valuemax={corner ? undefined : valueMax}
+            tabIndex={disabled || corner ? -1 : 0}
             onPointerDown={(e) => handlePointerDown(pos, e)}
             onKeyDown={(e) => handleKeyDown(pos, e)}
           />
@@ -235,6 +357,8 @@ export const Resizable: React.FC<ResizableProps> = ({
       })}
     </div>
   )
-}
+})
+
+Resizable.displayName = 'Resizable'
 
 export default Resizable

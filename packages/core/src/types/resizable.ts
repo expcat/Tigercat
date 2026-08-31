@@ -14,9 +14,23 @@ export type ResizeHandlePosition =
 export type ResizeAxis = 'horizontal' | 'vertical' | 'both'
 
 /**
+ * Which axis drives an aspect-ratio lock
+ */
+export type AspectRatioPrimary = 'width' | 'height' | 'auto'
+
+/**
  * Base Resizable props interface
  */
 export interface ResizableProps {
+  /**
+   * Controlled width in pixels. Omit to stay uncontrolled.
+   * Dropping `width` keeps the last size instead of snapping back to defaultWidth.
+   */
+  width?: number
+  /**
+   * Controlled height in pixels. Omit to stay uncontrolled.
+   */
+  height?: number
   /**
    * Default width in pixels
    */
@@ -49,7 +63,7 @@ export interface ResizableProps {
    */
   handles?: ResizeHandlePosition[]
   /**
-   * Constraint axis
+   * Constraint axis. Handles that cannot move this axis are not rendered.
    * @default 'both'
    */
   axis?: ResizeAxis
@@ -59,7 +73,8 @@ export interface ResizableProps {
    */
   disabled?: boolean
   /**
-   * Whether to maintain aspect ratio
+   * Whether to maintain aspect ratio.
+   * Edge handles follow that axis; corners follow the larger pointer delta.
    * @default false
    */
   lockAspectRatio?: boolean
@@ -68,7 +83,7 @@ export interface ResizableProps {
    */
   className?: string
   /**
-   * Custom styles
+   * Custom styles. Width/height written by the component win over `style.width` / `style.height`.
    */
   style?: Record<string, string | number>
 }

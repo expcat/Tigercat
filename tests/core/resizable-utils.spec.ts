@@ -4,8 +4,11 @@ import {
   calculateResizeDelta,
   clampDimensions,
   applyAspectRatio,
+  clampDimensionsWithRatio,
+  getResizeOriginShift,
+  applyResizeSize,
+  resolveVisibleResizeHandles,
   defaultResizeHandles,
-  resizableBaseClasses,
   resizableHandlePositionStyles,
   getResizeKeyboardDelta,
   getResizeHandleOrientation,
@@ -34,9 +37,9 @@ describe('resizable-utils', () => {
     })
 
     it('should have correct cursor for each position', () => {
-      expect(resizableHandlePositionStyles.right.cursor).toBe('cursor-e-resize')
+      expect(resizableHandlePositionStyles.right.cursor).toContain('cursor-e-resize')
       expect(resizableHandlePositionStyles.bottom.cursor).toBe('cursor-s-resize')
-      expect(resizableHandlePositionStyles['bottom-right'].cursor).toBe('cursor-se-resize')
+      expect(resizableHandlePositionStyles['bottom-right'].cursor).toContain('cursor-se-resize')
     })
   })
 
@@ -138,7 +141,30 @@ describe('resizable-utils', () => {
     it('should maintain aspect ratio 2:1', () => {
       const { width, height } = applyAspectRatio(400, 300, 200, 100)
       expect(width).toBe(400)
-      expect(height).toBe(200) // 400 / 2
+      expect(height).toBe(200)
+    })
+
+    it('follows height when the handle is vertical', () => {
+      const { width, height } = applyAspectRatio(200, 150, 200, 100, 'height')
+      expect(height).toBe(150)
+      expect(width).toBe(300)
+    })
+
+    it('keeps the ratio after clamping to maxHeight', () => {
+      const locked = applyAspectRatio(400, 300, 200, 100, 'width')
+      const { width, height } = clampDimensionsWithRatio(
+        locked.width,
+        locked.height,
+        200,
+        100,
+        0,
+        0,
+        undefined,
+        150
+      )
+      expect(height).toBeCloseTo(150)
+      expect(width / height).toBeCloseTo(2)
+      expect(Math.abs(width / height - 2)).toBeLessThan(1 / 150)
     })
 
     it('should maintain aspect ratio 1:1', () => {
@@ -206,6 +232,47 @@ describe('resizable-utils', () => {
     it('returns undefined for corner handles', () => {
       expect(getResizeHandleOrientation('top-left')).toBeUndefined()
       expect(getResizeHandleOrientation('bottom-right')).toBeUndefined()
+    })
+  })
+
+  describe('origin and RTL', () => {
+    it('shifts origin when resizing from the start edge', () => {
+      expect(getResizeOriginShift('left', 40, 0, false)).toEqual({ offsetX: -40, offsetY: 0 })
+      expect(getResizeOriginShift('left', 40, 0, true)).toEqual({ offsetX: 40, offsetY: 0 })
+      expect(getResizeOriginShift('top', 0, 20, false)).toEqual({ offsetX: 0, offsetY: -20 })
+      expect(getResizeOriginShift('right', 40, 0, false)).toEqual({ offsetX: 0, offsetY: 0 })
+    })
+
+    it('grows width when dragging the end handle toward inline-end in rtl', () => {
+      const next = applyResizeSize('right', 200, 100, -30, 0, 'both', {
+        rtl: true,
+        minWidth: 0,
+        minHeight: 0
+      })
+      expect(next.width).toBe(230)
+    })
+
+    it('locks ratio from the bottom handle', () => {
+      const next = applyResizeSize('bottom', 200, 100, 0, 50, 'both', {
+        lockAspectRatio: true,
+        minWidth: 0,
+        minHeight: 0
+      })
+      expect(next.height).toBe(150)
+      expect(next.width).toBe(300)
+    })
+  })
+
+  describe('resolveVisibleResizeHandles', () => {
+    it('drops empty-axis edge handles', () => {
+      expect(resolveVisibleResizeHandles(undefined, 'horizontal')).toEqual([
+        'right',
+        'bottom-right'
+      ])
+      expect(resolveVisibleResizeHandles(['left', 'top', 'bottom'], 'vertical')).toEqual([
+        'top',
+        'bottom'
+      ])
     })
   })
 })

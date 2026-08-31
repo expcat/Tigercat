@@ -1,22 +1,31 @@
 import { defineComponent, h, ref, computed, onBeforeUnmount, PropType } from 'vue'
 import {
+  applyResizeJump,
+  applyResizeSize,
   classNames,
   coerceClassValue,
-  resizableBaseClasses,
-  getResizableHandleClasses,
-  calculateResizeDelta,
-  clampDimensions,
-  applyAspectRatio,
-  defaultResizeHandles,
   createDocumentDragSession,
-  getResizeKeyboardDelta,
+  defaultResizeHandles,
+  formatResizableHandleLabel,
+  getResizableHandleClasses,
+  getResizableLabels,
   getResizeHandleOrientation,
+  getResizeKeyboardDelta,
+  isCornerResizeHandle,
+  isSplitterRtl,
+  mergeResizableBoxStyle,
+  mergeStyleValues,
+  resizableBaseClasses,
+  resolveVisibleResizeHandles,
   type DocumentDragSession,
-  type ResizeHandlePosition,
-  type ResizeAxis
+  type ResizeAxis,
+  type ResizeHandlePosition
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueResizableProps {
+  width?: number
+  height?: number
   defaultWidth?: number
   defaultHeight?: number
   minWidth?: number
@@ -33,7 +42,10 @@ export interface VueResizableProps {
 
 export const Resizable = defineComponent({
   name: 'TigerResizable',
+  inheritAttrs: false,
   props: {
+    width: { type: Number, default: undefined },
+    height: { type: Number, default: undefined },
     defaultWidth: { type: Number, default: undefined },
     defaultHeight: { type: Number, default: undefined },
     minWidth: { type: Number, default: 0 },
@@ -56,16 +68,34 @@ export const Resizable = defineComponent({
       default: undefined
     }
   },
-  emits: ['resize-start', 'resize', 'resize-end'],
+  emits: ['resize-start', 'resize', 'resize-end', 'update:width', 'update:height'],
   setup(props, { slots, emit, attrs }) {
-    const width = ref(props.defaultWidth)
-    const height = ref(props.defaultHeight)
+    const config = useTigerConfig()
+    const labels = computed(() => getResizableLabels(config.value.locale))
+    const rtl = computed(() => {
+      const attrDir = attrs.dir
+      return isSplitterRtl(typeof attrDir === 'string' ? attrDir : config.value.direction)
+    })
+    const internalWidth = ref(props.defaultWidth)
+    const internalHeight = ref(props.defaultHeight)
+    const offsetX = ref(0)
+    const offsetY = ref(0)
     const draggingHandle = ref<ResizeHandlePosition | null>(null)
+    const rootRef = ref<HTMLElement | null>(null)
+    let dragSession: DocumentDragSession | null = null
     const startMouseX = ref(0)
     const startMouseY = ref(0)
     const startWidth = ref(0)
     const startHeight = ref(0)
-    let dragSession: DocumentDragSession | null = null
+    const startOffsetX = ref(0)
+    const startOffsetY = ref(0)
+
+    const width = computed(() => (props.width !== undefined ? props.width : internalWidth.value))
+    const height = computed(() =>
+      props.height !== undefined ? props.height : internalHeight.value
+    )
+
+    const visibleHandles = computed(() => resolveVisibleResizeHandles(props.handles, props.axis))
 
     const containerClasses = computed(() =>
       classNames(
@@ -76,30 +106,67 @@ export const Resizable = defineComponent({
       )
     )
 
-    const containerStyle = computed(() => {
-      const s: Record<string, string> = {}
-      if (width.value != null) s.width = `${width.value}px`
-      if (height.value != null) s.height = `${height.value}px`
-      return s
-    })
-
     const cleanupDragSession = () => {
       dragSession?.dispose()
       dragSession = null
     }
 
+    const measureBox = (): { width: number; height: number } => {
+      const rect = rootRef.value?.getBoundingClientRect()
+      return {
+        width: width.value ?? rect?.width ?? 0,
+        height: height.value ?? rect?.height ?? 0
+      }
+    }
+
+    const commitSize = (
+      next: { width: number; height: number; offsetX: number; offsetY: number },
+      handle: ResizeHandlePosition,
+      startW: number,
+      startH: number,
+      phase: 'move' | 'end' | 'keyboard'
+    ) => {
+      if (props.width === undefined) internalWidth.value = next.width
+      if (props.height === undefined) internalHeight.value = next.height
+      offsetX.value = startOffsetX.value + next.offsetX
+      offsetY.value = startOffsetY.value + next.offsetY
+      emit('update:width', next.width)
+      emit('update:height', next.height)
+      const event = {
+        width: next.width,
+        height: next.height,
+        handle,
+        deltaX: next.width - startW,
+        deltaY: next.height - startH
+      }
+      emit('resize', event)
+      if (phase !== 'move') emit('resize-end', event)
+    }
+
+    const resizeOptions = () => ({
+      rtl: rtl.value,
+      lockAspectRatio: props.lockAspectRatio,
+      minWidth: props.minWidth,
+      minHeight: props.minHeight,
+      maxWidth: props.maxWidth,
+      maxHeight: props.maxHeight
+    })
+
     const onPointerDown = (handle: ResizeHandlePosition, e: PointerEvent) => {
       if (props.disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
+      const box = measureBox()
       draggingHandle.value = handle
       startMouseX.value = e.clientX
       startMouseY.value = e.clientY
-      startWidth.value = width.value ?? 0
-      startHeight.value = height.value ?? 0
+      startWidth.value = box.width
+      startHeight.value = box.height
+      startOffsetX.value = offsetX.value
+      startOffsetY.value = offsetY.value
       emit('resize-start', {
-        width: startWidth.value,
-        height: startHeight.value,
+        width: box.width,
+        height: box.height,
         handle,
         deltaX: 0,
         deltaY: 0
@@ -112,104 +179,65 @@ export const Resizable = defineComponent({
         pointerId: e.pointerId,
         pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
         onMove: ({ currentX, currentY }) => {
-          applyResize(currentX, currentY, (event) => emit('resize', event))
+          const next = applyResizeSize(
+            handle,
+            startWidth.value,
+            startHeight.value,
+            currentX - startMouseX.value,
+            currentY - startMouseY.value,
+            props.axis,
+            resizeOptions()
+          )
+          commitSize(next, handle, startWidth.value, startHeight.value, 'move')
         },
         onEnd: ({ currentX, currentY }) => {
-          applyResize(currentX, currentY, (event) => emit('resize-end', event))
+          const next = applyResizeSize(
+            handle,
+            startWidth.value,
+            startHeight.value,
+            currentX - startMouseX.value,
+            currentY - startMouseY.value,
+            props.axis,
+            resizeOptions()
+          )
+          commitSize(next, handle, startWidth.value, startHeight.value, 'end')
           draggingHandle.value = null
           dragSession = null
         }
       })
     }
 
-    const applyResize = (
-      currentX: number,
-      currentY: number,
-      notify: (event: {
-        width: number
-        height: number
-        handle: ResizeHandlePosition
-        deltaX: number
-        deltaY: number
-      }) => void
-    ) => {
-      const handle = draggingHandle.value
-      if (!handle) return
-      const mouseDeltaX = currentX - startMouseX.value
-      const mouseDeltaY = currentY - startMouseY.value
-      const { deltaWidth, deltaHeight } = calculateResizeDelta(
-        handle,
-        mouseDeltaX,
-        mouseDeltaY,
-        props.axis
-      )
-      let newW = startWidth.value + deltaWidth
-      let newH = startHeight.value + deltaHeight
-
-      if (props.lockAspectRatio) {
-        const ar = applyAspectRatio(newW, newH, startWidth.value, startHeight.value)
-        newW = ar.width
-        newH = ar.height
-      }
-
-      const clamped = clampDimensions(
-        newW,
-        newH,
-        props.minWidth,
-        props.minHeight,
-        props.maxWidth,
-        props.maxHeight
-      )
-      width.value = clamped.width
-      height.value = clamped.height
-      notify({
-        width: clamped.width,
-        height: clamped.height,
-        handle,
-        deltaX: clamped.width - startWidth.value,
-        deltaY: clamped.height - startHeight.value
-      })
-    }
-
     const onKeyDown = (handle: ResizeHandlePosition, e: KeyboardEvent) => {
       if (props.disabled) return
+      const box = measureBox()
+      startOffsetX.value = offsetX.value
+      startOffsetY.value = offsetY.value
+      const jumped = applyResizeJump(
+        e.key,
+        handle,
+        box.width,
+        box.height,
+        props.axis,
+        resizeOptions()
+      )
+      if (jumped) {
+        e.preventDefault()
+        commitSize(jumped, handle, box.width, box.height, 'keyboard')
+        return
+      }
       const delta = getResizeKeyboardDelta(e.key)
       if (!delta) return
       e.preventDefault()
-      const startW = width.value ?? 0
-      const startH = height.value ?? 0
-      const { deltaWidth, deltaHeight } = calculateResizeDelta(
+      const next = applyResizeSize(
         handle,
+        box.width,
+        box.height,
         delta.deltaX,
         delta.deltaY,
-        props.axis
+        props.axis,
+        resizeOptions()
       )
-      let newW = startW + deltaWidth
-      let newH = startH + deltaHeight
-      if (props.lockAspectRatio) {
-        const ar = applyAspectRatio(newW, newH, startW, startH)
-        newW = ar.width
-        newH = ar.height
-      }
-      const clamped = clampDimensions(
-        newW,
-        newH,
-        props.minWidth,
-        props.minHeight,
-        props.maxWidth,
-        props.maxHeight
-      )
-      width.value = clamped.width
-      height.value = clamped.height
-      const evt = {
-        width: clamped.width,
-        height: clamped.height,
-        handle,
-        deltaX: clamped.width - startW,
-        deltaY: clamped.height - startH
-      }
-      emit('resize', evt)
-      emit('resize-end', evt)
+      commitSize(next, handle, box.width, box.height, 'keyboard')
     }
 
     onBeforeUnmount(() => {
@@ -217,29 +245,45 @@ export const Resizable = defineComponent({
     })
 
     return () => {
-      const handleNodes = props.handles.map((pos) => {
+      const labelledby = attrs['aria-labelledby']
+      const handleNodes = visibleHandles.value.map((pos) => {
+        const corner = isCornerResizeHandle(pos)
         const usesHeight = pos === 'top' || pos === 'bottom'
         const valueNow = Math.round((usesHeight ? height.value : width.value) ?? 0)
+        const handleName = formatResizableHandleLabel(labels.value.handleAriaLabel, pos)
         return h('div', {
           class: getResizableHandleClasses(pos, draggingHandle.value === pos, props.disabled),
           'data-handle': pos,
-          role: 'separator',
-          'aria-label': `Resize ${pos}`,
-          'aria-orientation': getResizeHandleOrientation(pos),
-          'aria-valuenow': valueNow,
-          'aria-valuemin': usesHeight ? props.minHeight : props.minWidth,
-          'aria-valuemax': usesHeight ? props.maxHeight : props.maxWidth,
-          tabindex: props.disabled ? -1 : 0,
+          role: corner ? undefined : 'separator',
+          'aria-hidden': corner ? 'true' : undefined,
+          'aria-label': corner || typeof labelledby === 'string' ? undefined : handleName,
+          'aria-orientation': corner ? undefined : getResizeHandleOrientation(pos),
+          'aria-valuenow': corner ? undefined : valueNow,
+          'aria-valuemin': corner ? undefined : usesHeight ? props.minHeight : props.minWidth,
+          'aria-valuemax': corner ? undefined : usesHeight ? props.maxHeight : props.maxWidth,
+          tabindex: props.disabled || corner ? -1 : 0,
           onPointerdown: (e: PointerEvent) => onPointerDown(pos, e),
           onKeydown: (e: KeyboardEvent) => onKeyDown(pos, e)
         })
       })
 
+      const boxStyle = mergeResizableBoxStyle(
+        undefined,
+        width.value,
+        height.value,
+        offsetX.value,
+        offsetY.value
+      )
+
       return h(
         'div',
         {
+          ...attrs,
+          ref: (el: HTMLElement | null) => {
+            rootRef.value = el
+          },
           class: containerClasses.value,
-          style: { ...containerStyle.value, ...(props.style as Record<string, string>) },
+          style: mergeStyleValues(attrs.style, props.style, boxStyle),
           'data-resizable': ''
         },
         [...(slots.default?.() || []), ...handleNodes]
