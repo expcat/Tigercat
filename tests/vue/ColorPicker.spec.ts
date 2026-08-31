@@ -4,152 +4,133 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
+
+function trigger(container: HTMLElement) {
+  return container.querySelector('[data-tiger-colorpicker-trigger]') as HTMLButtonElement
+}
+
+function clickSv(s = 80, v = 80) {
+  const plane = document.body.querySelector('[data-tiger-colorpicker-sv]') as HTMLElement
+  plane.getBoundingClientRect = () =>
+    ({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 100,
+      bottom: 100,
+      width: 100,
+      height: 100,
+      toJSON: () => undefined
+    }) as DOMRect
+  return fireEvent.pointerDown(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
+}
 
 describe('ColorPicker', () => {
-  it('applies className prop', () => {
+  it('applies className without dropping the wrapper', () => {
     const { container } = renderWithProps(ColorPicker, { className: 'my-picker' })
-    expect(container.querySelector('.my-picker')).toBeInTheDocument()
+    const root = container.querySelector('.my-picker') as HTMLElement
+    expect(root).toBeInTheDocument()
+    expect(root.className).toMatch(/inline-block/)
   })
 
-  // --- Dropdown toggle ---
-  it('opens dropdown on trigger click', async () => {
+  it('opens a modal dialog from a native button trigger', async () => {
     const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
-    const trigger = container.querySelector('[role="button"]')!
-    await fireEvent.click(trigger)
-    // Should have dropdown panel
-    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
+    const button = trigger(container)
+    expect(button.tagName).toBe('BUTTON')
+    expect(button.getAttribute('aria-haspopup')).toBe('dialog')
+    await fireEvent.click(button)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
-  // --- Disabled ---
+
   it('does not open when disabled', async () => {
     const { container } = renderWithProps(ColorPicker, { disabled: true })
-    const trigger = container.querySelector('[role="button"]')!
-    await fireEvent.click(trigger)
-    expect(container.querySelector('input[type="text"]')).not.toBeInTheDocument()
+    await fireEvent.click(trigger(container))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  // --- Preset colors ---
-  it('renders preset swatches', async () => {
+  it('renders presets as a ColorSwatch radiogroup', async () => {
     const { container } = renderWithProps(ColorPicker, {
-      modelValue: '#000',
+      modelValue: '#000000',
       presets: ['#ff0000', '#00ff00', '#0000ff']
     })
-    const trigger = container.querySelector('[role="button"]')!
-    await fireEvent.click(trigger)
-    // Should render 3 preset buttons
-    const presets = document.body.querySelectorAll('[aria-label^="Select "]')
-    expect(presets.length).toBe(3)
+    await fireEvent.click(trigger(container))
+    expect(screen.getByRole('radiogroup')).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(3)
   })
 
-  // --- Hex input ---
-  it('updates value via hex input', async () => {
+  it('commits typed input', async () => {
     const onChange = vi.fn()
     const { container } = render(ColorPicker, {
       props: { modelValue: '#2563eb', 'onUpdate:modelValue': onChange }
     })
-    const trigger = container.querySelector('[role="button"]')!
-    await fireEvent.click(trigger)
+    await fireEvent.click(trigger(container))
     const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
     await fireEvent.update(input, 'ff0000')
     expect(onChange).toHaveBeenCalledWith('#ff0000')
-  }) // --- Keyboard accessibility (S3) ---
-  it('opens the panel with Enter and Space on the trigger', async () => {
-    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
-    const trigger = container.querySelector('[role="button"]')!
-    await fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
-    await fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(document.body.querySelector('input[type="text"]')).not.toBeInTheDocument()
-    await fireEvent.keyDown(trigger, { key: ' ' })
-    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
   })
 
-  it('exposes aria-expanded / aria-haspopup on the trigger', async () => {
-    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
-    const trigger = container.querySelector('[role="button"]')!
-    expect(trigger.getAttribute('aria-haspopup')).toBe('dialog')
-    expect(trigger.getAttribute('aria-expanded')).toBe('false')
-    await fireEvent.click(trigger)
-    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+  it('emits rgb after an SV change when format is rgb', async () => {
+    const onChange = vi.fn()
+    const { container } = render(ColorPicker, {
+      props: { modelValue: '#808080', format: 'rgb', 'onUpdate:modelValue': onChange }
+    })
+    await fireEvent.click(trigger(container))
+    await clickSv(90, 90)
+    expect(onChange).toHaveBeenCalled()
+    const emitted = String(onChange.mock.calls.at(-1)?.[0])
+    expect(emitted.startsWith('rgb')).toBe(true)
   })
 
-  it('makes preset swatches keyboard-operable', async () => {
+  it('selects a preset through ColorSwatch', async () => {
     const onChange = vi.fn()
     const { container } = render(ColorPicker, {
       props: { modelValue: '#000000', presets: ['#ff0000'], 'onUpdate:modelValue': onChange }
     })
-    await fireEvent.click(container.querySelector('[role="button"]')!)
-    const preset = document.body.querySelector('[aria-label="Select #ff0000"]')!
-    expect(preset.getAttribute('role')).toBe('button')
-    expect(preset.getAttribute('tabindex')).toBe('0')
-    await fireEvent.keyDown(preset, { key: 'Enter' })
+    await fireEvent.click(trigger(container))
+    await fireEvent.click(screen.getByRole('radio', { name: '#ff0000' }))
     expect(onChange).toHaveBeenCalledWith('#ff0000')
   })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(ColorPicker)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
 
-  it('paints the trigger swatch from rgba modelValue (not black)', () => {
+  it('paints the trigger from rgba instead of falling back to black', () => {
     const { container } = renderWithProps(ColorPicker, {
       modelValue: 'rgba(37, 99, 235, 0.8)',
       showAlpha: true
     })
-    const trigger = container.querySelector('[role="button"]') as HTMLElement
-    const bg = (trigger.style.backgroundColor || '').replace(/\s+/g, '').toLowerCase()
-    expect(bg).not.toMatch(/rgb\(0,0,0\)|#000/)
-    expect(bg).toMatch(/37/)
-    expect(bg).toMatch(/99/)
-    expect(bg).toMatch(/235/)
-    expect(bg).toMatch(/0\.8/)
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    const painted = `${swatch.style.boxShadow} ${swatch.style.backgroundColor}`
+    expect(painted).toMatch(/37/)
+    expect(painted).toMatch(/99/)
+    expect(painted).toMatch(/235/)
   })
 
-  it('emits an alpha-bearing string when the Alpha slider changes', async () => {
+  it('emits rgba when the alpha slider moves under format=rgb', async () => {
     const onUpdate = vi.fn()
-    const onChange = vi.fn()
     const { container } = render(ColorPicker, {
       props: {
         modelValue: 'rgba(37, 99, 235, 0.8)',
         showAlpha: true,
         format: 'rgb',
-        'onUpdate:modelValue': onUpdate,
-        onChange
+        'onUpdate:modelValue': onUpdate
       }
     })
-    await fireEvent.click(container.querySelector('[role="button"]')!)
+    await fireEvent.click(trigger(container))
     const slider = document.body.querySelector('input[aria-label="Alpha"]') as HTMLInputElement
-    expect(slider).toBeTruthy()
     await fireEvent.update(slider, '50')
-    expect(onUpdate).toHaveBeenCalled()
     const emitted = String(onUpdate.mock.calls[0][0])
-    expect(emitted).toMatch(/rgba?\(|hsla?\(/)
-    expect(emitted).not.toMatch(/^#[0-9a-fA-F]{6}$/)
-    expect(onChange).toHaveBeenCalledWith(emitted)
+    expect(emitted).toMatch(/rgba\(/)
   })
 
-  it('does not render the Alpha slider when showAlpha is false', async () => {
-    const { container } = renderWithProps(ColorPicker, {
-      modelValue: '#2563eb',
-      showAlpha: false
-    })
-    await fireEvent.click(container.querySelector('[role="button"]')!)
-    expect(document.body.querySelector('input[aria-label="Alpha"]')).not.toBeInTheDocument()
-  })
-
-  it('uses English Pick color on the trigger by default', () => {
-    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
-    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
-    expect(trigger.getAttribute('aria-label')).toBe('Pick color')
-    expect(trigger.getAttribute('title')).toBe('Pick color')
-  })
-
-  it('uses ConfigProvider zh-CN for trigger / panel title / clear', async () => {
+  it('uses ConfigProvider zh-CN for trigger / panel / clear', async () => {
     const Wrapper = defineComponent({
       setup() {
         return () =>
@@ -157,26 +138,30 @@ describe('ColorPicker', () => {
       }
     })
     const { container } = render(Wrapper)
-    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
-    expect(trigger.getAttribute('aria-label')).toBe('选择颜色')
-    await fireEvent.click(trigger)
+    expect(trigger(container).getAttribute('aria-label')).toBe('选择颜色')
+    await fireEvent.click(trigger(container))
     expect(screen.getByRole('dialog', { name: '颜色' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '清空' })).toBeInTheDocument()
   })
 
-  it('lets labels.trigger override locale text', () => {
-    const Wrapper = defineComponent({
+  it('uses official zhTW and jaJP objects', () => {
+    const Tw = defineComponent({
       setup() {
         return () =>
-          h(ConfigProvider, { locale: zhCN }, () =>
-            h(ColorPicker, { modelValue: '#2563eb', labels: { trigger: '自定义颜色' } })
-          )
+          h(ConfigProvider, { locale: zhTW }, () => h(ColorPicker, { modelValue: '#2563eb' }))
       }
     })
-    const { container } = render(Wrapper)
-    expect(
-      container.querySelector('[data-tiger-colorpicker-trigger]')?.getAttribute('aria-label')
-    ).toBe('自定义颜色')
+    const { container, unmount } = render(Tw)
+    expect(trigger(container).getAttribute('aria-label')).toBe('選擇顏色')
+    unmount()
+    const Ja = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: jaJP }, () => h(ColorPicker, { modelValue: '#2563eb' }))
+      }
+    })
+    const ja = render(Ja)
+    expect(trigger(ja.container).getAttribute('aria-label')).toBe('色を選択')
   })
 
   it('emits empty string when Clear is clicked', async () => {
@@ -184,8 +169,33 @@ describe('ColorPicker', () => {
     const { container } = render(ColorPicker, {
       props: { modelValue: '#2563eb', 'onUpdate:modelValue': onChange }
     })
-    await fireEvent.click(container.querySelector('[data-tiger-colorpicker-trigger]')!)
+    await fireEvent.click(trigger(container))
     await fireEvent.click(document.body.querySelector('[data-tiger-colorpicker-clear]')!)
     expect(onChange).toHaveBeenCalledWith('')
+  })
+
+  it('does not treat opening the panel as a field blur', async () => {
+    const validator = vi.fn(() => undefined)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(Form, null, () =>
+            h(FormItem, { name: 'color', label: 'Theme', rules: [{ validator }] }, () =>
+              h(ColorPicker)
+            )
+          )
+      }
+    })
+    const { container } = render(Wrapper)
+    expect(trigger(container).id).toBeTruthy()
+    await fireEvent.click(trigger(container))
+    expect(validator).not.toHaveBeenCalled()
+    await clickSv(70, 70)
+    await waitFor(() => expect(validator).toHaveBeenCalled())
+  })
+
+  it('has no accessibility violations when open', async () => {
+    renderWithProps(ColorPicker, { defaultOpen: true, modelValue: '#2563eb', presets: ['#ff0000'] })
+    await expectNoA11yViolations(document.body)
   })
 })

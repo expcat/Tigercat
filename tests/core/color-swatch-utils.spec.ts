@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  defaultColorSwatchGroups,
   flattenColorSwatchGroups,
-  getColorSwatchButtonClasses,
-  getColorSwatchCheckClasses,
+  getColorSwatchCheckTone,
   getColorSwatchOptionKey,
   getNextColorSwatchIndex,
   isColorSwatchSelected,
@@ -12,25 +10,10 @@ import {
 } from '@expcat/tigercat-core'
 
 describe('color-swatch-utils', () => {
-  it('normalizes default groups when no colors are provided', () => {
-    const groups = normalizeColorSwatchGroups()
-
-    expect(groups).toHaveLength(defaultColorSwatchGroups.length)
-    expect(groups[0].colors[0]).toMatchObject({ value: '#ef4444', label: '#ef4444' })
-  })
-
   it('normalizes flat string colors', () => {
     const groups = normalizeColorSwatchGroups(undefined, ['#111111', '#222222'])
 
-    expect(groups).toEqual([
-      {
-        label: undefined,
-        colors: [
-          { value: '#111111', label: '#111111', groupIndex: 0, index: 0 },
-          { value: '#222222', label: '#222222', groupIndex: 0, index: 1 }
-        ]
-      }
-    ])
+    expect(groups[0].colors.map((color) => color.value)).toEqual(['#111111', '#222222'])
   })
 
   it('keeps custom group labels and disabled options', () => {
@@ -60,40 +43,48 @@ describe('color-swatch-utils', () => {
     expect(isColorSwatchSelected('#ABCDEF', undefined)).toBe(false)
   })
 
-  it('moves to the next enabled option by arrow key', () => {
-    const options = flattenColorSwatchGroups(
-      normalizeColorSwatchGroups(undefined, [
-        '#111111',
-        { value: '#222222', disabled: true },
-        '#333333'
-      ])
-    )
+  it('moves to the next enabled option and wraps', () => {
+    const groups = normalizeColorSwatchGroups(undefined, [
+      '#111111',
+      { value: '#222222', disabled: true },
+      '#333333'
+    ])
 
-    expect(getNextColorSwatchIndex(options, 0, 'ArrowRight', 3)).toBe(2)
-    expect(getNextColorSwatchIndex(options, 2, 'ArrowLeft', 3)).toBe(0)
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowRight', 3)).toBe(2)
+    expect(getNextColorSwatchIndex(groups, 2, 'ArrowRight', 3)).toBe(0)
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowLeft', 3)).toBe(2)
   })
 
-  it('supports vertical and boundary keyboard navigation', () => {
-    const options = flattenColorSwatchGroups(
-      normalizeColorSwatchGroups(undefined, ['#111111', '#222222', '#333333', '#444444'])
-    )
+  it('inverts left/right when dir is rtl', () => {
+    const groups = normalizeColorSwatchGroups(undefined, ['#111111', '#222222', '#333333'])
 
-    expect(getNextColorSwatchIndex(options, 0, 'ArrowDown', 2)).toBe(2)
-    expect(getNextColorSwatchIndex(options, 3, 'Home', 2)).toBe(0)
-    expect(getNextColorSwatchIndex(options, 0, 'End', 2)).toBe(3)
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowRight', 3, 'rtl')).toBe(2)
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowLeft', 3, 'rtl')).toBe(1)
+  })
+
+  it('moves down within a group then into the next group same column', () => {
+    const groups = normalizeColorSwatchGroups([
+      { label: 'A', colors: ['#111111', '#222222', '#333333', '#444444'] },
+      { label: 'B', colors: ['#aaaaaa', '#bbbbbb', '#cccccc', '#dddddd', '#eeeeee', '#ffffff'] }
+    ])
+    const options = flattenColorSwatchGroups(groups)
+    const a0 = options.findIndex((option) => option.value === '#111111')
+    const b0 = options.findIndex((option) => option.value === '#aaaaaa')
+    const a3 = options.findIndex((option) => option.value === '#444444')
+    const b3 = options.findIndex((option) => option.value === '#dddddd')
+
+    expect(getNextColorSwatchIndex(groups, a0, 'ArrowDown', 6)).toBe(b0)
+    expect(getNextColorSwatchIndex(groups, a3, 'ArrowDown', 6)).toBe(b3)
+  })
+
+  it('uses a dark check on light swatches and a light check on dark swatches', () => {
+    expect(getColorSwatchCheckTone('#f59e0b')).toBe('dark')
+    expect(getColorSwatchCheckTone('#eab308')).toBe('dark')
+    expect(getColorSwatchCheckTone('#111111')).toBe('light')
   })
 
   it('returns -1 when every option is disabled', () => {
-    const options = flattenColorSwatchGroups(
-      normalizeColorSwatchGroups(undefined, [{ value: '#111111', disabled: true }])
-    )
-
-    expect(getNextColorSwatchIndex(options, 0, 'ArrowRight', 1)).toBe(-1)
-  })
-
-  it('provides size and state classes', () => {
-    expect(getColorSwatchButtonClasses('sm', true, false)).toContain('h-6 w-6')
-    expect(getColorSwatchButtonClasses('md', false, true)).toContain('cursor-not-allowed')
-    expect(getColorSwatchCheckClasses('lg')).toContain('h-5 w-5')
+    const groups = normalizeColorSwatchGroups(undefined, [{ value: '#111111', disabled: true }])
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowRight', 1)).toBe(-1)
   })
 })

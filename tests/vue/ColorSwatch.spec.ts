@@ -5,7 +5,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { ColorSwatch } from '@expcat/tigercat-vue/ColorSwatch'
-import { expectNoA11yViolationsIsolated, renderWithProps } from '../utils'
+import { expectNoA11yViolations, renderWithProps } from '../utils'
 
 describe('ColorSwatch', () => {
   it('renders default color groups', () => {
@@ -102,13 +102,16 @@ describe('ColorSwatch', () => {
     })
 
     expect(container.querySelector('.brand-swatches')).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: '#111111' }).className).toContain('h-10 w-10')
+    expect(screen.getByRole('radio', { name: '#111111' })).toBeInTheDocument()
   })
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithProps(ColorSwatch, { colors: ['#111111', '#222222'] })
+    const { container } = renderWithProps(ColorSwatch, {
+      groups: [{ label: 'Brand', colors: ['#111111', { value: '#222222', disabled: true }] }],
+      modelValue: '#111111'
+    })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
   describe('Edge Cases and Boundary', () => {
@@ -125,7 +128,7 @@ describe('ColorSwatch', () => {
     it('renders an empty custom color list without fallback swatches', () => {
       renderWithProps(ColorSwatch, { ariaLabel: 'Theme swatches', colors: [] })
 
-      expect(screen.getByRole('radiogroup', { name: 'Theme swatches' })).toBeInTheDocument()
+      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
       expect(screen.queryAllByRole('radio')).toHaveLength(0)
     })
 

@@ -290,10 +290,19 @@ export const arSA: TigerLocale = {
     panelTitle: 'اللون',
     clear: 'مسح',
     hue: 'تدرج',
+    saturation: 'التشبع',
+    brightness: 'السطوع',
     alpha: 'الشفافية',
     value: 'قيمة اللون',
     preview: 'معاينة',
-    selectPreset: 'اختيار {color}'
+    selectPreset: 'اختيار {color}',
+    done: 'تم',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'عينات الألوان',
+    primaryGroup: 'أساسي',
+    accentGroup: 'تمييز'
   },
   tabs: {
     addTabAriaLabel: 'إضافة علامة تبويب',

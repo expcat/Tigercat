@@ -290,10 +290,19 @@ export const jaJP: TigerLocale = {
     panelTitle: '色',
     clear: 'クリア',
     hue: '色相',
+    saturation: '彩度',
+    brightness: '明度',
     alpha: '不透明度',
     value: 'カラー値',
     preview: 'プレビュー',
-    selectPreset: '{color} を選択'
+    selectPreset: '{color} を選択',
+    done: '完了',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'スウォッチ',
+    primaryGroup: 'プライマリ',
+    accentGroup: 'アクセント'
   },
   tabs: {
     addTabAriaLabel: 'タブを追加',

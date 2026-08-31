@@ -290,10 +290,19 @@ export const zhTW: TigerLocale = {
     panelTitle: '顏色',
     clear: '清除',
     hue: '色相',
+    saturation: '飽和度',
+    brightness: '明度',
     alpha: '透明度',
     value: '顏色值',
     preview: '顏色預覽',
-    selectPreset: '選擇 {color}'
+    selectPreset: '選擇 {color}',
+    done: '完成',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: '色票',
+    primaryGroup: '主色',
+    accentGroup: '強調色'
   },
   tabs: {
     addTabAriaLabel: '新增分頁',

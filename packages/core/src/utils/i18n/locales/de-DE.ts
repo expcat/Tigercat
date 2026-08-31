@@ -290,10 +290,19 @@ export const deDE: TigerLocale = {
     panelTitle: 'Farbe',
     clear: 'Löschen',
     hue: 'Farbton',
+    saturation: 'Sättigung',
+    brightness: 'Helligkeit',
     alpha: 'Deckkraft',
     value: 'Farbwert',
     preview: 'Vorschau',
-    selectPreset: '{color} auswählen'
+    selectPreset: '{color} auswählen',
+    done: 'Fertig',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Farbfelder',
+    primaryGroup: 'Primär',
+    accentGroup: 'Akzent'
   },
   tabs: {
     addTabAriaLabel: 'Tab hinzufügen',

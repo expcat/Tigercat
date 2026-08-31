@@ -290,10 +290,19 @@ export const enUS: TigerLocale = {
     panelTitle: 'Color',
     clear: 'Clear',
     hue: 'Hue',
+    saturation: 'Saturation',
+    brightness: 'Brightness',
     alpha: 'Alpha',
     value: 'Color value',
     preview: 'Color preview',
-    selectPreset: 'Select {color}'
+    selectPreset: 'Select {color}',
+    done: 'Done',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Color swatches',
+    primaryGroup: 'Primary',
+    accentGroup: 'Accent'
   },
   tabs: {
     addTabAriaLabel: 'Add tab',

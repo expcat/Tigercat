@@ -290,10 +290,19 @@ export const thTH: TigerLocale = {
     panelTitle: 'สี',
     clear: 'ล้าง',
     hue: 'ฮิว',
+    saturation: 'ความอิ่มตัว',
+    brightness: 'ความสว่าง',
     alpha: 'ความโปร่งใส',
     value: 'ค่าสี',
     preview: 'ตัวอย่างสี',
-    selectPreset: 'เลือก {color}'
+    selectPreset: 'เลือก {color}',
+    done: 'เสร็จ',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'แถบสี',
+    primaryGroup: 'หลัก',
+    accentGroup: 'เน้น'
   },
   tabs: {
     addTabAriaLabel: 'เพิ่มแท็บ',

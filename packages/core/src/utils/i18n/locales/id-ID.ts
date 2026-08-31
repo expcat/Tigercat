@@ -290,10 +290,19 @@ export const idID: TigerLocale = {
     panelTitle: 'Warna',
     clear: 'Hapus',
     hue: 'Rona',
+    saturation: 'Saturasi',
+    brightness: 'Kecerahan',
     alpha: 'Opasitas',
     value: 'Nilai warna',
     preview: 'Pratinjau',
-    selectPreset: 'Pilih {color}'
+    selectPreset: 'Pilih {color}',
+    done: 'Selesai',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Sampel warna',
+    primaryGroup: 'Utama',
+    accentGroup: 'Aksen'
   },
   tabs: {
     addTabAriaLabel: 'Tambah tab',

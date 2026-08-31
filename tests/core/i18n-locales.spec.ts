@@ -18,6 +18,7 @@ import {
   formatColorPickerSelectPreset,
   getCodeLabels,
   getColorPickerLabels,
+  getCronEditorLabels,
   getDataExportLabels,
   getEmptyDescription,
   getTimePickerLabels,
@@ -56,7 +57,27 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
   'fr-FR:descriptions.colon',
   'de-DE:descriptions.colon',
   'pt-BR:descriptions.colon',
-  'ar-SA:descriptions.colon'
+  'ar-SA:descriptions.colon',
+  'fr-FR:colorPicker.saturation',
+  'fr-FR:colorPicker.accentGroup',
+  ...[
+    'zh-CN',
+    'zh-TW',
+    'ja-JP',
+    'ko-KR',
+    'th-TH',
+    'vi-VN',
+    'id-ID',
+    'es-ES',
+    'fr-FR',
+    'de-DE',
+    'pt-BR',
+    'ar-SA'
+  ].flatMap((locale) => [
+    `${locale}:colorPicker.formatHex`,
+    `${locale}:colorPicker.formatRgb`,
+    `${locale}:colorPicker.formatHsl`
+  ])
 ])
 
 function leafEntries(value: unknown, prefix = ''): Array<{ path: string; value: string }> {
@@ -259,21 +280,21 @@ describe('i18n locale presets', () => {
 
   it('getColorPickerLabels(undefined) is English Pick color / Color / Clear', () => {
     expect(getColorPickerLabels(undefined)).toEqual(enUS.colorPicker)
-    expect(getColorPickerLabels()).toEqual({
-      trigger: 'Pick color',
-      panelTitle: 'Color',
-      clear: 'Clear',
-      hue: 'Hue',
-      alpha: 'Alpha',
-      value: 'Color value',
-      preview: 'Color preview',
-      selectPreset: 'Select {color}'
-    })
+    expect(getColorPickerLabels().trigger).toBe('Pick color')
+    expect(getColorPickerLabels().swatches).toBe('Color swatches')
   })
 
   it('getColorPickerLabels reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
     expect(getColorPickerLabels({ locale: 'zh-CN' }).trigger).toBe('Pick color')
     expect(getColorPickerLabels(zhCN).trigger).toBe('选择颜色')
+    expect(getColorPickerLabels(zhTW).trigger).toBe('選擇顏色')
+    expect(getColorPickerLabels(jaJP).trigger).toBe('色を選択')
+  })
+
+  it('getCronEditorLabels uses official locale objects', () => {
+    expect(getCronEditorLabels(zhTW).ariaLabel).toBe('Cron 運算式編輯器')
+    expect(getCronEditorLabels(jaJP).ariaLabel).toBe('Cron エディタ')
+    expect(getCronEditorLabels({ locale: 'zh-TW' }).ariaLabel).toBe('Cron editor')
   })
 
   it('formatColorPickerSelectPreset substitutes {color}', () => {

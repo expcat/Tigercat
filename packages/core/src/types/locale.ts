@@ -383,14 +383,27 @@ export interface TigerLocaleColorPicker {
   clear?: string
   /** Hue slider label */
   hue?: string
+  /** Saturation / brightness plane */
+  saturation?: string
+  brightness?: string
   /** Alpha slider label */
   alpha?: string
   /** Color value input aria-label */
   value?: string
-  /** Preview swatch aria-label */
+  /** Preview swatch (decorative; not exposed as a name) */
   preview?: string
   /** Preset swatch aria-label. Template: supports {color} */
   selectPreset?: string
+  /** Small-screen Done button */
+  done?: string
+  formatHex?: string
+  formatRgb?: string
+  formatHsl?: string
+  /** ColorSwatch radiogroup name */
+  swatches?: string
+  /** Default ColorSwatch group names */
+  primaryGroup?: string
+  accentGroup?: string
 }
 
 export interface TigerLocaleTabs {

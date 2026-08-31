@@ -290,10 +290,19 @@ export const viVN: TigerLocale = {
     panelTitle: 'Màu',
     clear: 'Xóa',
     hue: 'Tông màu',
+    saturation: 'Độ bão hòa',
+    brightness: 'Độ sáng',
     alpha: 'Độ trong suốt',
     value: 'Giá trị màu',
     preview: 'Xem trước',
-    selectPreset: 'Chọn {color}'
+    selectPreset: 'Chọn {color}',
+    done: 'Xong',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Bảng màu',
+    primaryGroup: 'Chính',
+    accentGroup: 'Nhấn'
   },
   tabs: {
     addTabAriaLabel: 'Thêm tab',

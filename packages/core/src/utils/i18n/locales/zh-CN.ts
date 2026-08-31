@@ -290,10 +290,19 @@ export const zhCN: TigerLocale = {
     panelTitle: '颜色',
     clear: '清空',
     hue: '色相',
+    saturation: '饱和度',
+    brightness: '明度',
     alpha: '透明度',
     value: '颜色值',
     preview: '颜色预览',
-    selectPreset: '选择 {color}'
+    selectPreset: '选择 {color}',
+    done: '完成',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: '色板',
+    primaryGroup: '主色',
+    accentGroup: '强调色'
   },
   tabs: {
     addTabAriaLabel: '新增标签页',

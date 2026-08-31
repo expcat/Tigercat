@@ -290,10 +290,19 @@ export const esES: TigerLocale = {
     panelTitle: 'Tono de color',
     clear: 'Borrar',
     hue: 'Tono',
+    saturation: 'Saturación',
+    brightness: 'Brillo',
     alpha: 'Alfa',
     value: 'Valor de color',
     preview: 'Vista previa',
-    selectPreset: 'Seleccionar {color}'
+    selectPreset: 'Seleccionar {color}',
+    done: 'Listo',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Muestras',
+    primaryGroup: 'Primario',
+    accentGroup: 'Acento'
   },
   tabs: {
     addTabAriaLabel: 'Añadir pestaña',

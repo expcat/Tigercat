@@ -290,10 +290,19 @@ export const koKR: TigerLocale = {
     panelTitle: '색상',
     clear: '지우기',
     hue: '색조',
+    saturation: '채도',
+    brightness: '명도',
     alpha: '투명도',
     value: '색상 값',
     preview: '미리보기',
-    selectPreset: '{color} 선택'
+    selectPreset: '{color} 선택',
+    done: '완료',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: '색상 견본',
+    primaryGroup: '기본',
+    accentGroup: '강조'
   },
   tabs: {
     addTabAriaLabel: '탭 추가',

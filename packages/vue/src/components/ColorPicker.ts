@@ -1,335 +1,577 @@
-import { defineComponent, h, ref, computed, watch, type PropType } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  provide,
+  ref,
+  watch,
+  type PropType,
+  type CSSProperties
+} from 'vue'
 import type {
-  ComponentSize,
   ColorFormat,
+  ComponentSize,
+  FloatingPlacement,
+  HsvaColor,
+  InputStatus,
   TigerLocale,
   TigerLocaleColorPicker
 } from '@expcat/tigercat-core'
 import {
-  colorPickerBaseClasses,
-  getColorPickerTriggerClasses,
-  colorPickerPanelClasses,
-  colorPickerInputClasses,
-  colorPickerPresetClasses,
-  rgbToHex,
-  rgbToHsv,
-  hsvToRgb,
-  formatColorString,
-  parseColorInput,
-  parseColorParts,
+  applyColorPickerAlpha,
+  applyColorPickerHue,
   classNames,
   coerceClassValue,
-  mergeTigerLocale,
+  colorPickerBaseClasses,
+  colorPickerCheckerboardStyle,
+  colorPickerChromeLabelClasses,
+  colorPickerClearButtonClasses,
+  colorPickerHueTrackStyle,
+  colorPickerInputClasses,
+  colorPickerPanelClasses,
+  colorPickerPreviewClasses,
+  colorPickerSliderTrackClasses,
+  colorPickerSvPlaneClasses,
+  colorPickerSvThumbClasses,
+  colorPickerTriggerSwatchClasses,
+  commitPresetColor,
+  createDocumentDragSession,
+  cssColorFromHsva,
+  formatHsva,
+  getColorPickerAlphaTrackStyle,
+  getColorPickerFormatLabel,
   getColorPickerLabels,
-  formatColorPickerSelectPreset
+  getColorPickerSvPlaneStyle,
+  getColorPickerTriggerClasses,
+  hsvaFromSvPointer,
+  isColorPickerEmpty,
+  mergeAriaDescribedBy,
+  mergeHsvaHue,
+  mergeTigerLocale,
+  nudgeColorPickerSv,
+  parseColorInput,
+  parseColorToHsva,
+  seedColorPickerHsva,
+  selectDoneActionClasses,
+  selectDoneButtonClasses,
+  SHAKE_CLASS,
+  runShakeAnimation
 } from '@expcat/tigercat-core'
-import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+import {
+  renderVueOverlayTeleport,
+  useVueAnchoredOverlay,
+  useVueBodyScrollLock,
+  useVueFocusTrap
+} from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
-
-function rgbFromValue(value: string): { r: number; g: number; b: number } {
-  const parts = parseColorParts(value)
-  return parts ? { r: parts.r, g: parts.g, b: parts.b } : { r: 0, g: 0, b: 0 }
-}
-
-function explicitAlphaFromValue(value: string): number | null {
-  if (!/^(rgba|hsla)\(/i.test(value.trim())) return null
-  const parts = parseColorParts(value)
-  return parts ? parts.a : null
-}
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
+import { ColorSwatch } from './ColorSwatch'
 
 export type VueColorPickerProps = InstanceType<typeof ColorPicker>['$props']
+export type ColorPickerProps = VueColorPickerProps
+export type { ColorFormat }
 
 export const ColorPicker = defineComponent({
   name: 'TigerColorPicker',
+  inheritAttrs: false,
   props: {
-    modelValue: { type: String, default: '#2563eb' },
-    disabled: { type: Boolean, default: false },
+    modelValue: { type: String, default: undefined },
+    defaultValue: { type: String, default: undefined },
+    disabled: Boolean,
     size: { type: String as PropType<ComponentSize>, default: 'md' },
-    showAlpha: { type: Boolean, default: false },
+    showAlpha: Boolean,
     format: { type: String as PropType<ColorFormat>, default: 'hex' },
     presets: { type: Array as PropType<string[]>, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
-    labels: { type: Object as PropType<Partial<TigerLocaleColorPicker>>, default: undefined }
+    labels: { type: Object as PropType<Partial<TigerLocaleColorPicker>>, default: undefined },
+    open: { type: Boolean, default: undefined },
+    defaultOpen: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: true },
+    closeOnSelect: { type: Boolean, default: true },
+    name: String,
+    id: String,
+    status: { type: String as PropType<InputStatus>, default: undefined },
+    placement: { type: String as PropType<FloatingPlacement>, default: 'bottom-start' },
+    offset: { type: Number, default: 4 },
+    dropdownClassName: String,
+    getPopupContainer: { type: Function as PropType<() => HTMLElement | null> },
+    className: String
   },
-  emits: ['update:modelValue', 'change'],
-  setup(props, { emit, attrs }) {
+  emits: ['update:modelValue', 'update:open', 'change', 'input', 'open-change', 'blur'],
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
+    provide(FORM_ITEM_CONTROL_INJECTION_KEY, null)
+
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getColorPickerLabels(mergedLocale.value, props.labels))
-    const isOpen = ref(false)
-    const alpha = ref(explicitAlphaFromValue(props.modelValue) ?? 1)
-    const containerRef = ref<HTMLElement | null>(null)
-    const triggerRef = ref<HTMLElement | null>(null)
-    const panelRef = ref<HTMLElement | null>(null)
-    const overlay = useVueAnchoredOverlay({
-      enabled: isOpen,
-      referenceRef: triggerRef,
-      floatingRef: panelRef,
-      containerRef,
-      placement: 'bottom-start',
-      offset: 4,
-      dismissOnOutside: true,
-      dismissOnEscape: true,
-      restoreFocusOnDismiss: true,
-      onDismiss: closePanel
-    })
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
 
-    const rgb = computed(() => rgbFromValue(props.modelValue))
-    // Derive HSV from modelValue
-    const hsv = computed(() => rgbToHsv(rgb.value.r, rgb.value.g, rgb.value.b))
+    const innerValue = ref(props.defaultValue)
+    const innerOpen = ref(props.defaultOpen)
+    const dragging = ref(false)
 
     watch(
       () => props.modelValue,
       (value) => {
-        const next = explicitAlphaFromValue(value)
-        if (next !== null) alpha.value = next
+        if (value !== undefined) innerValue.value = value
       }
     )
 
-    // Value rendered in the panel input / preview, honoring `format` (and `showAlpha`).
-    const displayValue = computed(() =>
-      formatColorString(
-        rgb.value.r,
-        rgb.value.g,
-        rgb.value.b,
-        props.format,
-        props.showAlpha ? alpha.value : undefined
-      )
-    )
-    // CSS color usable as a swatch background (includes alpha when enabled).
-    const swatchColor = computed(() =>
-      props.showAlpha
-        ? `rgba(${rgb.value.r}, ${rgb.value.g}, ${rgb.value.b}, ${alpha.value})`
-        : props.modelValue
+    const committed = computed(() => {
+      if (props.modelValue !== undefined) return props.modelValue
+      if (formItemControl?.value.value !== undefined) {
+        return formItemControl.value.value as string | undefined
+      }
+      return innerValue.value
+    })
+    const isOpen = computed(() => (props.open !== undefined ? props.open : innerOpen.value))
+
+    const hsva = ref<HsvaColor>(seedColorPickerHsva(committed.value))
+    const inputValue = ref(
+      isColorPickerEmpty(committed.value)
+        ? ''
+        : formatHsva(seedColorPickerHsva(committed.value), props.format, props.showAlpha)
     )
 
-    const inputValue = ref(displayValue.value)
+    watch(
+      () => [committed.value, props.format, props.showAlpha] as const,
+      () => {
+        if (dragging.value) return
+        const parsed = parseColorToHsva(committed.value)
+        if (parsed) {
+          hsva.value = mergeHsvaHue(hsva.value, parsed)
+          inputValue.value = formatHsva(parsed, props.format, props.showAlpha)
+          return
+        }
+        if (isColorPickerEmpty(committed.value)) inputValue.value = ''
+      }
+    )
 
-    watch(displayValue, (v) => {
-      inputValue.value = v
+    const rootRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLButtonElement | null>(null)
+    const panelRef = ref<HTMLElement | null>(null)
+    const svRef = ref<HTMLElement | null>(null)
+    const panelId = `tiger-colorpicker-panel-${Math.random().toString(36).slice(2, 9)}`
+    let dragDispose: (() => void) | undefined
+
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: triggerRef,
+      floatingRef: panelRef,
+      containerRef: rootRef,
+      placement: () => props.placement ?? 'bottom-start',
+      offset: () => props.offset ?? 4,
+      layout: 'fullscreen-sm',
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      getContainer: () => props.getPopupContainer?.() ?? null,
+      onDismiss: () => {
+        setOpenSafe(false)
+        window.setTimeout(() => triggerRef.value?.focus(), 0)
+      }
+    })
+    useVueFocusTrap({ enabled: isOpen, containerRef: panelRef, inert: true })
+    useVueBodyScrollLock(isOpen)
+
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      () => {
+        if (status.value === 'error') runShakeAnimation(rootRef.value)
+      }
+    )
+
+    watch(isOpen, (open) => {
+      if (!open) return
+      nextTick(() => svRef.value?.focus())
     })
 
-    function togglePanel() {
-      if (props.disabled) return
-      isOpen.value = !isOpen.value
-    }
+    onBeforeUnmount(() => dragDispose?.())
 
-    function closePanel() {
-      isOpen.value = false
-    }
-
-    function handleTriggerKeydown(e: KeyboardEvent) {
-      if (props.disabled) return
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-        e.preventDefault()
-        isOpen.value = !isOpen.value
-      } else if (e.key === 'Escape' && isOpen.value) {
-        isOpen.value = false
-      }
-    }
-
-    function handleAlphaChange(e: Event) {
-      const nextAlpha = Number((e.target as HTMLInputElement).value) / 100
-      alpha.value = nextAlpha
-      const format = props.format === 'hex' ? 'rgb' : props.format
-      const next = formatColorString(rgb.value.r, rgb.value.g, rgb.value.b, format, nextAlpha)
+    function writeCommitted(next: string) {
+      if (props.modelValue === undefined) innerValue.value = next
       emit('update:modelValue', next)
+      emit('input', next)
       emit('change', next)
+      formItemControl?.onChange(next)
     }
 
-    function handleHueChange(e: Event) {
-      const hue = Number((e.target as HTMLInputElement).value)
-      const { r, g, b } = hsvToRgb(hue, hsv.value.s, hsv.value.v)
-      const hex = rgbToHex(r, g, b)
-      emit('update:modelValue', hex)
-      emit('change', hex)
+    function setOpenSafe(next: boolean) {
+      if (effectiveDisabled.value) return
+      if (props.open === undefined) innerOpen.value = next
+      emit('update:open', next)
+      emit('open-change', next)
     }
 
-    function handleInputChange(e: Event) {
-      const val = (e.target as HTMLInputElement).value
-      inputValue.value = val
-      const parsed = parseColorInput(val)
-      if (parsed) {
-        emit('update:modelValue', parsed)
-        emit('change', parsed)
+    function commitHsva(next: HsvaColor) {
+      hsva.value = next
+      const formatted = formatHsva(next, props.format, props.showAlpha)
+      inputValue.value = formatted
+      writeCommitted(formatted)
+    }
+
+    const hasValue = computed(() => !isColorPickerEmpty(committed.value))
+    const showClear = computed(() => props.clearable && hasValue.value && !effectiveDisabled.value)
+    const displayColor = computed(() => cssColorFromHsva(hsva.value, props.showAlpha))
+
+    function handleTriggerKeydown(event: KeyboardEvent) {
+      if (effectiveDisabled.value) return
+      if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+        event.preventDefault()
+        setOpenSafe(!isOpen.value)
+      } else if (event.key === 'Escape' && isOpen.value) {
+        event.preventDefault()
+        setOpenSafe(false)
+      } else if ((event.key === 'Delete' || event.key === 'Backspace') && showClear.value) {
+        event.preventDefault()
+        writeCommitted('')
+        inputValue.value = ''
       }
     }
 
-    function handlePresetClick(color: string) {
-      emit('update:modelValue', color)
-      emit('change', color)
-    }
-
-    function handlePresetKeydown(e: KeyboardEvent, color: string) {
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-        e.preventDefault()
-        handlePresetClick(color)
+    function handleFocusout(event: FocusEvent) {
+      const next = event.relatedTarget as Node | null
+      if (
+        (rootRef.value && next && rootRef.value.contains(next)) ||
+        (panelRef.value && next && panelRef.value.contains(next))
+      ) {
+        return
       }
+      formItemControl?.onBlur()
+      emit('blur', event)
     }
 
-    function handleClear() {
-      emit('update:modelValue', '')
-      emit('change', '')
+    function startSvDrag(event: PointerEvent) {
+      if (effectiveDisabled.value) return
+      event.preventDefault()
+      const plane = svRef.value
+      if (!plane) return
+      dragging.value = true
+      const apply = (clientX: number, clientY: number) => {
+        commitHsva(
+          hsvaFromSvPointer(
+            clientX,
+            clientY,
+            plane.getBoundingClientRect(),
+            hsva.value.h,
+            hsva.value.a
+          )
+        )
+      }
+      apply(event.clientX, event.clientY)
+      dragDispose?.()
+      const session = createDocumentDragSession({
+        startX: event.clientX,
+        startY: event.clientY,
+        pointerId: event.pointerId,
+        pointerTarget: plane,
+        dragThreshold: 0,
+        onMove: (payload) => apply(payload.currentX, payload.currentY),
+        onEnd: () => {
+          dragging.value = false
+          dragDispose = undefined
+        }
+      })
+      dragDispose = session.dispose
     }
 
-    return () =>
-      h(
-        'div',
-        {
-          ref: containerRef,
-          class: classNames(colorPickerBaseClasses, coerceClassValue(attrs.class))
-        },
-        [
-          // Color trigger swatch
-          h('div', {
-            ref: triggerRef,
-            class: getColorPickerTriggerClasses(props.size, props.disabled),
-            style: { backgroundColor: swatchColor.value },
-            role: 'button',
-            'data-tiger-colorpicker-trigger': '',
-            'aria-label': labels.value.trigger,
-            title: labels.value.trigger,
-            'aria-haspopup': 'dialog',
-            'aria-expanded': isOpen.value,
-            'aria-disabled': props.disabled || undefined,
-            tabindex: props.disabled ? -1 : 0,
-            onClick: togglePanel,
-            onKeydown: handleTriggerKeydown
-          }),
+    function handleSvKeydown(event: KeyboardEvent) {
+      const step = event.shiftKey ? 10 : 2
+      let next: HsvaColor | null = null
+      if (event.key === 'ArrowRight') next = nudgeColorPickerSv(hsva.value, step, 0)
+      else if (event.key === 'ArrowLeft') next = nudgeColorPickerSv(hsva.value, -step, 0)
+      else if (event.key === 'ArrowUp') next = nudgeColorPickerSv(hsva.value, 0, step)
+      else if (event.key === 'ArrowDown') next = nudgeColorPickerSv(hsva.value, 0, -step)
+      if (!next) return
+      event.preventDefault()
+      commitHsva(next)
+    }
 
-          // Panel
-          isOpen.value
-            ? renderVueOverlayTeleport(
-                h(
-                  'div',
-                  {
-                    ref: panelRef,
-                    class: classNames(colorPickerPanelClasses, overlay.floatingClasses.value),
-                    style: overlay.floatingStyles.value,
-                    'data-positioned': overlay.positioned.value,
-                    'data-tiger-colorpicker-panel': '',
-                    role: 'dialog',
-                    'aria-label': labels.value.panelTitle
-                  },
-                  [
-                    h('div', { class: 'mb-2 flex items-center justify-between gap-2' }, [
-                      h(
-                        'span',
-                        { class: 'text-xs font-medium text-[var(--tiger-text,#111827)]' },
-                        labels.value.panelTitle
-                      ),
-                      h(
+    function handlePreset(color: string) {
+      const formatted = commitPresetColor(color, hsva.value, props.format, props.showAlpha)
+      if (!formatted) return
+      const next = parseColorToHsva(formatted)
+      if (next) hsva.value = next
+      inputValue.value = formatted
+      writeCommitted(formatted)
+      if (props.closeOnSelect) setOpenSafe(false)
+    }
+
+    expose({
+      focus: () => triggerRef.value?.focus(),
+      open: () => setOpenSafe(true),
+      close: () => setOpenSafe(false)
+    })
+
+    return () => {
+      const attrRecord = attrs as Record<string, unknown>
+      const describedBy = mergeAriaDescribedBy(
+        typeof attrRecord['aria-describedby'] === 'string'
+          ? (attrRecord['aria-describedby'] as string)
+          : undefined,
+        formItemControl?.describedBy.value
+      )
+      const labelledby =
+        typeof attrRecord['aria-labelledby'] === 'string' &&
+        (attrRecord['aria-labelledby'] as string).trim()
+          ? (attrRecord['aria-labelledby'] as string)
+          : formItemControl?.labelId.value
+
+      const triggerSwatchStyle: CSSProperties = {
+        ...colorPickerCheckerboardStyle
+      }
+      if (hasValue.value) {
+        triggerSwatchStyle.boxShadow = `inset 0 0 0 999px ${displayColor.value}`
+      }
+
+      const panel = isOpen.value
+        ? renderVueOverlayTeleport(
+            h(
+              'div',
+              {
+                ref: panelRef,
+                id: panelId,
+                role: 'dialog',
+                'aria-modal': 'true',
+                'aria-label': labels.value.panelTitle,
+                class: classNames(
+                  colorPickerPanelClasses,
+                  overlay.floatingClasses.value,
+                  props.dropdownClassName
+                ),
+                style: overlay.floatingStyles.value,
+                'data-positioned': overlay.positioned.value,
+                'data-tiger-colorpicker-panel': '',
+                onFocusout: handleFocusout
+              },
+              [
+                h('div', { class: 'flex items-center justify-between gap-2' }, [
+                  h(
+                    'span',
+                    { class: 'text-xs font-medium text-[var(--tiger-text,#111827)]' },
+                    labels.value.panelTitle
+                  ),
+                  showClear.value
+                    ? h(
                         'button',
                         {
                           type: 'button',
-                          class:
-                            'text-xs text-[var(--tiger-primary,#2563eb)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)]',
+                          class: colorPickerClearButtonClasses,
                           'data-tiger-colorpicker-clear': '',
-                          onClick: handleClear
+                          onClick: () => {
+                            writeCommitted('')
+                            inputValue.value = ''
+                          }
                         },
                         labels.value.clear
                       )
-                    ]),
-                    // Hue slider
-                    h('div', { class: 'mb-2' }, [
-                      h(
-                        'label',
-                        { class: 'block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1' },
-                        labels.value.hue
-                      ),
+                    : null
+                ]),
+                h(
+                  'div',
+                  {
+                    ref: svRef,
+                    class: colorPickerSvPlaneClasses,
+                    style: getColorPickerSvPlaneStyle(hsva.value.h),
+                    role: 'slider',
+                    tabindex: effectiveDisabled.value ? -1 : 0,
+                    'aria-label': `${labels.value.saturation}, ${labels.value.brightness}`,
+                    'aria-valuemin': 0,
+                    'aria-valuemax': 100,
+                    'aria-valuenow': Math.round(hsva.value.s),
+                    'aria-valuetext': `${labels.value.saturation} ${Math.round(hsva.value.s)}, ${labels.value.brightness} ${Math.round(hsva.value.v)}`,
+                    'data-tiger-colorpicker-sv': '',
+                    onPointerdown: startSvDrag,
+                    onKeydown: handleSvKeydown
+                  },
+                  [
+                    h('span', {
+                      class: colorPickerSvThumbClasses,
+                      style: { left: `${hsva.value.s}%`, top: `${100 - hsva.value.v}%` },
+                      'aria-hidden': 'true'
+                    })
+                  ]
+                ),
+                h('div', [
+                  h('label', { class: colorPickerChromeLabelClasses }, labels.value.hue),
+                  h('input', {
+                    type: 'range',
+                    min: 0,
+                    max: 360,
+                    value: Math.round(hsva.value.h),
+                    class: colorPickerSliderTrackClasses,
+                    style: colorPickerHueTrackStyle,
+                    'aria-label': labels.value.hue,
+                    disabled: effectiveDisabled.value,
+                    onInput: (event: Event) => {
+                      dragging.value = true
+                      commitHsva(
+                        applyColorPickerHue(
+                          hsva.value,
+                          Number((event.target as HTMLInputElement).value)
+                        )
+                      )
+                      dragging.value = false
+                    }
+                  })
+                ]),
+                props.showAlpha
+                  ? h('div', [
+                      h('label', { class: colorPickerChromeLabelClasses }, labels.value.alpha),
                       h('input', {
                         type: 'range',
                         min: 0,
-                        max: 360,
-                        value: hsv.value.h,
-                        class:
-                          'w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]',
-                        'aria-label': labels.value.hue,
-                        onInput: handleHueChange
-                      })
-                    ]),
-
-                    // Alpha slider
-                    props.showAlpha
-                      ? h('div', { class: 'mb-2' }, [
-                          h(
-                            'label',
-                            { class: 'block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1' },
-                            labels.value.alpha
-                          ),
-                          h('input', {
-                            type: 'range',
-                            min: 0,
-                            max: 100,
-                            value: Math.round(alpha.value * 100),
-                            class:
-                              'w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]',
-                            'aria-label': labels.value.alpha,
-                            onInput: handleAlphaChange
-                          })
-                        ])
-                      : null,
-
-                    // Color value input (rendered in the selected format)
-                    h('div', { class: 'mb-2' }, [
-                      h(
-                        'label',
-                        {
-                          class:
-                            'block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1 uppercase'
-                        },
-                        props.format
-                      ),
-                      h('input', {
-                        type: 'text',
-                        class: colorPickerInputClasses,
-                        value: inputValue.value,
-                        'aria-label': labels.value.value,
-                        onInput: handleInputChange
-                      })
-                    ]),
-
-                    // Preview
-                    h('div', { class: 'flex items-center gap-2 mb-2' }, [
-                      h('div', {
-                        class: 'w-8 h-8 rounded border border-[var(--tiger-border,#d1d5db)]',
-                        style: { backgroundColor: swatchColor.value },
-                        'aria-label': labels.value.preview
-                      }),
-                      h(
-                        'span',
-                        { class: 'text-xs font-mono text-[var(--tiger-text,#111827)]' },
-                        displayValue.value
-                      )
-                    ]),
-
-                    // Presets
-                    props.presets && props.presets.length > 0
-                      ? h('div', { class: 'flex flex-wrap gap-1' }, [
-                          ...props.presets.map((color) =>
-                            h('div', {
-                              key: color,
-                              class: colorPickerPresetClasses,
-                              style: { backgroundColor: color },
-                              role: 'button',
-                              tabindex: 0,
-                              'aria-label': formatColorPickerSelectPreset(
-                                labels.value.selectPreset,
-                                color
-                              ),
-                              onClick: () => handlePresetClick(color),
-                              onKeydown: (e: KeyboardEvent) => handlePresetKeydown(e, color)
-                            })
+                        max: 100,
+                        value: Math.round(hsva.value.a * 100),
+                        class: colorPickerSliderTrackClasses,
+                        style: getColorPickerAlphaTrackStyle(hsva.value),
+                        'aria-label': labels.value.alpha,
+                        disabled: effectiveDisabled.value,
+                        onInput: (event: Event) => {
+                          dragging.value = true
+                          commitHsva(
+                            applyColorPickerAlpha(
+                              hsva.value,
+                              Number((event.target as HTMLInputElement).value) / 100
+                            )
                           )
-                        ])
-                      : null
-                  ]
-                ),
-                overlay.target.value
-              )
-            : null
+                          dragging.value = false
+                        }
+                      })
+                    ])
+                  : null,
+                h('div', [
+                  h(
+                    'label',
+                    { class: classNames(colorPickerChromeLabelClasses, 'uppercase') },
+                    getColorPickerFormatLabel(props.format, labels.value)
+                  ),
+                  h('input', {
+                    type: 'text',
+                    class: colorPickerInputClasses,
+                    value: inputValue.value,
+                    'aria-label': labels.value.value,
+                    disabled: effectiveDisabled.value,
+                    onInput: (event: Event) => {
+                      const raw = (event.target as HTMLInputElement).value
+                      inputValue.value = raw
+                      const parsed = parseColorInput(raw, props.format, props.showAlpha)
+                      if (!parsed) return
+                      const next = parseColorToHsva(parsed)
+                      if (!next) return
+                      hsva.value = next
+                      writeCommitted(parsed)
+                    }
+                  })
+                ]),
+                h('div', { class: 'flex items-center gap-2' }, [
+                  h('div', {
+                    class: colorPickerPreviewClasses,
+                    style: {
+                      ...colorPickerCheckerboardStyle,
+                      boxShadow: `inset 0 0 0 999px ${displayColor.value}`
+                    },
+                    role: 'img',
+                    'aria-hidden': 'true'
+                  }),
+                  h(
+                    'span',
+                    { class: 'text-xs font-mono text-[var(--tiger-text,#111827)]' },
+                    hasValue.value ? formatHsva(hsva.value, props.format, props.showAlpha) : ''
+                  )
+                ]),
+                props.presets && props.presets.length > 0
+                  ? h(ColorSwatch, {
+                      colors: props.presets,
+                      modelValue: hasValue.value ? formatHsva(hsva.value, 'hex', false) : undefined,
+                      columns: Math.min(8, props.presets.length),
+                      size: 'sm',
+                      ariaLabel: labels.value.swatches,
+                      onChange: (color: string) => handlePreset(color)
+                    })
+                  : null,
+                h('div', { class: selectDoneActionClasses }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: selectDoneButtonClasses,
+                      onClick: () => setOpenSafe(false)
+                    },
+                    labels.value.done
+                  )
+                ])
+              ]
+            ),
+            overlay.target.value
+          )
+        : null
+
+      return h(
+        'div',
+        {
+          ref: rootRef,
+          class: classNames(
+            colorPickerBaseClasses,
+            props.className,
+            coerceClassValue(attrs.class),
+            status.value === 'error' ? SHAKE_CLASS : undefined
+          ),
+          onFocusout: handleFocusout
+        },
+        [
+          effectiveName.value
+            ? h('input', {
+                type: 'hidden',
+                name: effectiveName.value,
+                value: hasValue.value ? (committed.value ?? '') : ''
+              })
+            : null,
+          h(
+            'button',
+            {
+              ref: triggerRef,
+              type: 'button',
+              id: effectiveId.value,
+              class: getColorPickerTriggerClasses(
+                props.size,
+                effectiveDisabled.value,
+                status.value
+              ),
+              'data-tiger-colorpicker-trigger': '',
+              'aria-label': labelledby ? undefined : labels.value.trigger,
+              'aria-labelledby': labelledby,
+              'aria-describedby': describedBy,
+              title: labels.value.trigger,
+              'aria-haspopup': 'dialog',
+              'aria-expanded': isOpen.value,
+              'aria-controls': isOpen.value ? panelId : undefined,
+              'aria-invalid': status.value === 'error' ? true : undefined,
+              'aria-required': formItemControl?.required.value || undefined,
+              disabled: effectiveDisabled.value,
+              onClick: () => setOpenSafe(!isOpen.value),
+              onKeydown: handleTriggerKeydown
+            },
+            [h('span', { class: colorPickerTriggerSwatchClasses, style: triggerSwatchStyle })]
+          ),
+          panel
         ]
       )
+    }
   }
 })
 

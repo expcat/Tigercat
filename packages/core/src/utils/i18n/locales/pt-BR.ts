@@ -290,10 +290,19 @@ export const ptBR: TigerLocale = {
     panelTitle: 'Cor',
     clear: 'Limpar',
     hue: 'Matiz',
+    saturation: 'Saturação',
+    brightness: 'Brilho',
     alpha: 'Opacidade',
     value: 'Valor da cor',
     preview: 'Prévia',
-    selectPreset: 'Selecionar {color}'
+    selectPreset: 'Selecionar {color}',
+    done: 'Concluído',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Amostras',
+    primaryGroup: 'Primária',
+    accentGroup: 'Destaque'
   },
   tabs: {
     addTabAriaLabel: 'Adicionar aba',

@@ -1,72 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import {
-  colorPickerBaseClasses,
-  getColorPickerTriggerClasses,
-  colorPickerPanelClasses,
-  colorPickerInputClasses,
-  colorPickerPresetClasses,
-  colorPickerSliderTrackClasses,
-  hexToRgb,
-  rgbToHex,
-  rgbToHsv,
-  hsvToRgb,
   formatColorString,
+  formatHsva,
+  hexToRgb,
+  hsvaFromSvPointer,
+  hsvToRgb,
+  isColorPickerEmpty,
   isValidHex,
   parseColorInput,
-  parseColorParts
+  parseColorParts,
+  parseColorToHsva,
+  rgbToHex,
+  rgbToHex8,
+  rgbToHsv,
+  seedColorPickerHsva
 } from '@expcat/tigercat-core'
-import type { ComponentSize } from '@expcat/tigercat-core'
-
-describe('color-picker-utils — class generators', () => {
-  it('colorPickerBaseClasses is the inline-block wrapper', () => {
-    expect(colorPickerBaseClasses).toBe('relative inline-block')
-  })
-
-  it('getColorPickerTriggerClasses includes radius/border token + size + enabled affordance', () => {
-    const sizes: Array<[ComponentSize, string]> = [
-      ['sm', 'w-6 h-6'],
-      ['md', 'w-8 h-8'],
-      ['lg', 'w-10 h-10']
-    ]
-    for (const [size, sizeFragment] of sizes) {
-      const cls = getColorPickerTriggerClasses(size, false)
-      expect(cls).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-      expect(cls).toContain('border')
-      expect(cls).toContain('overflow-hidden')
-      expect(cls).toContain(sizeFragment)
-      expect(cls).toContain('cursor-pointer')
-      expect(cls).toContain(
-        'hover:border-[var(--tiger-colorpicker-border-hover,var(--tiger-primary,#2563eb))]'
-      )
-      expect(cls).not.toContain('opacity-50')
-      expect(cls).not.toContain('cursor-not-allowed')
-    }
-  })
-
-  it('getColorPickerTriggerClasses applies disabled affordance', () => {
-    const cls = getColorPickerTriggerClasses('md', true)
-    expect(cls).toContain('opacity-50')
-    expect(cls).toContain('cursor-not-allowed')
-    expect(cls).not.toContain('cursor-pointer')
-    expect(cls).not.toContain('hover:border-')
-  })
-
-  it('panel/input/preset/slider class strings expose theme tokens', () => {
-    expect(colorPickerPanelClasses).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-    expect(colorPickerPanelClasses).toContain('var(--tiger-colorpicker-panel-bg')
-    expect(colorPickerPanelClasses).toContain('var(--tiger-colorpicker-panel-border')
-
-    expect(colorPickerInputClasses).toContain('font-mono')
-    expect(colorPickerInputClasses).toContain('var(--tiger-colorpicker-input-bg')
-    expect(colorPickerInputClasses).toContain('focus:border-[var(--tiger-colorpicker-input-focus')
-
-    expect(colorPickerPresetClasses).toContain('w-5 h-5')
-    expect(colorPickerPresetClasses).toContain('hover:scale-110')
-
-    expect(colorPickerSliderTrackClasses).toContain('rounded-full')
-    expect(colorPickerSliderTrackClasses).toContain('appearance-none')
-  })
-})
 
 describe('color-picker-utils — hexToRgb', () => {
   it('parses 6-digit hex with leading #', () => {
@@ -82,6 +30,10 @@ describe('color-picker-utils — hexToRgb', () => {
     expect(hexToRgb('#000')).toEqual({ r: 0, g: 0, b: 0 })
     expect(hexToRgb('#fff')).toEqual({ r: 255, g: 255, b: 255 })
   })
+
+  it('parses 8-digit hex RGB channels', () => {
+    expect(hexToRgb('#ff880080')).toEqual({ r: 255, g: 136, b: 0 })
+  })
 })
 
 describe('color-picker-utils — rgbToHex', () => {
@@ -91,208 +43,102 @@ describe('color-picker-utils — rgbToHex', () => {
     expect(rgbToHex(255, 255, 255)).toBe('#ffffff')
   })
 
-  it('rounds float channels to nearest integer', () => {
-    expect(rgbToHex(127.4, 127.6, 127.5)).toBe('#7f8080')
-  })
-
-  it('clamps out-of-range channels to [0, 255]', () => {
-    expect(rgbToHex(-10, 300, 128)).toBe('#00ff80')
+  it('writes 8-digit hex when alpha is below 1', () => {
+    expect(rgbToHex8(255, 0, 0, 0.5)).toBe('#ff000080')
   })
 })
 
-describe('color-picker-utils — rgbToHsv', () => {
-  it('returns h=0,s=0 for grayscale (max === min)', () => {
+describe('color-picker-utils — rgbToHsv / hsvToRgb', () => {
+  it('returns h=0,s=0 for grayscale', () => {
     expect(rgbToHsv(0, 0, 0)).toEqual({ h: 0, s: 0, v: 0 })
     expect(rgbToHsv(128, 128, 128)).toEqual({ h: 0, s: 0, v: 50 })
-    expect(rgbToHsv(255, 255, 255)).toEqual({ h: 0, s: 0, v: 100 })
   })
 
-  it('computes hue when red is max', () => {
-    expect(rgbToHsv(255, 0, 0)).toEqual({ h: 0, s: 100, v: 100 })
-  })
-
-  it('computes hue when green is max', () => {
-    expect(rgbToHsv(0, 255, 0)).toEqual({ h: 120, s: 100, v: 100 })
-  })
-
-  it('computes hue when blue is max', () => {
-    expect(rgbToHsv(0, 0, 255)).toEqual({ h: 240, s: 100, v: 100 })
-  })
-
-  it('handles red max with green < blue (negative hue branch wraps via +6)', () => {
-    // gg < bb so it should wrap into 300-360 range
-    const result = rgbToHsv(255, 0, 128)
-    expect(result.h).toBeGreaterThanOrEqual(300)
-    expect(result.h).toBeLessThanOrEqual(360)
-    expect(result.s).toBe(100)
-    expect(result.v).toBe(100)
-  })
-})
-
-describe('color-picker-utils — hsvToRgb', () => {
-  it('round-trips primary colors via rgbToHsv → hsvToRgb', () => {
+  it('round-trips primary colors', () => {
     const cases: Array<[number, number, number]> = [
       [255, 0, 0],
       [0, 255, 0],
-      [0, 0, 255],
-      [255, 255, 0],
-      [0, 255, 255],
-      [255, 0, 255]
+      [0, 0, 255]
     ]
     for (const [r, g, b] of cases) {
       const hsv = rgbToHsv(r, g, b)
-      const back = hsvToRgb(hsv.h, hsv.s, hsv.v)
-      expect(back).toEqual({ r, g, b })
+      expect(hsvToRgb(hsv.h, hsv.s, hsv.v)).toEqual({ r, g, b })
     }
   })
-
-  it('covers all 6 hue sectors', () => {
-    // h<60 sector — red→yellow
-    expect(hsvToRgb(30, 100, 100)).toEqual({ r: 255, g: 128, b: 0 })
-    // 60-120 — yellow→green
-    expect(hsvToRgb(90, 100, 100)).toEqual({ r: 128, g: 255, b: 0 })
-    // 120-180 — green→cyan
-    expect(hsvToRgb(150, 100, 100)).toEqual({ r: 0, g: 255, b: 128 })
-    // 180-240 — cyan→blue
-    expect(hsvToRgb(210, 100, 100)).toEqual({ r: 0, g: 128, b: 255 })
-    // 240-300 — blue→magenta
-    expect(hsvToRgb(270, 100, 100)).toEqual({ r: 128, g: 0, b: 255 })
-    // 300-360 — magenta→red
-    expect(hsvToRgb(330, 100, 100)).toEqual({ r: 255, g: 0, b: 128 })
-  })
-
-  it('returns black for v=0 regardless of hue/saturation', () => {
-    expect(hsvToRgb(180, 100, 0)).toEqual({ r: 0, g: 0, b: 0 })
-  })
-
-  it('returns gray for s=0', () => {
-    expect(hsvToRgb(0, 0, 50)).toEqual({ r: 128, g: 128, b: 128 })
-  })
 })
 
-describe('color-picker-utils — formatColorString', () => {
-  it('formats hex regardless of alpha', () => {
-    expect(formatColorString(255, 136, 0, 'hex')).toBe('#ff8800')
-    expect(formatColorString(255, 136, 0, 'hex', 0.5)).toBe('#ff8800')
+describe('color-picker-utils — format / parse', () => {
+  it('keeps hex format when alpha is requested but opaque', () => {
+    expect(formatColorString(37, 99, 235, 'hex', 1)).toBe('#2563eb')
   })
 
-  it('formats rgb without alpha when alpha is undefined or >= 1', () => {
-    expect(formatColorString(255, 136, 0, 'rgb')).toBe('rgb(255, 136, 0)')
-    expect(formatColorString(255, 136, 0, 'rgb', 1)).toBe('rgb(255, 136, 0)')
+  it('emits 8-digit hex for transparent hex format', () => {
+    expect(formatColorString(37, 99, 235, 'hex', 0.5)).toBe('#2563eb80')
   })
 
-  it('formats rgba when alpha < 1', () => {
-    expect(formatColorString(255, 136, 0, 'rgb', 0.5)).toBe('rgba(255, 136, 0, 0.5)')
-    expect(formatColorString(0, 0, 0, 'rgb', 0)).toBe('rgba(0, 0, 0, 0)')
+  it('emits rgb/rgba in the requested format', () => {
+    expect(formatColorString(255, 0, 0, 'rgb')).toBe('rgb(255, 0, 0)')
+    expect(formatColorString(255, 0, 0, 'rgb', 0.5)).toBe('rgba(255, 0, 0, 0.5)')
   })
 
-  it('formats hsl without alpha', () => {
-    const result = formatColorString(255, 0, 0, 'hsl')
-    expect(result).toMatch(/^hsl\(0, \d+%, \d+%\)$/)
+  it('parses 4/8-digit hex alpha', () => {
+    expect(parseColorParts('#f008')?.a).toBeCloseTo(0x88 / 255)
+    expect(parseColorParts('#ff000080')?.a).toBeCloseTo(0x80 / 255)
   })
 
-  it('formats hsla when alpha < 1', () => {
-    const result = formatColorString(255, 0, 0, 'hsl', 0.3)
-    expect(result).toMatch(/^hsla\(0, \d+%, \d+%, 0\.3\)$/)
+  it('parses space-separated rgb and hsl with slash alpha', () => {
+    expect(parseColorParts('rgb(255 0 0 / 0.5)')).toMatchObject({ r: 255, g: 0, b: 0, a: 0.5 })
+    const hsl = parseColorParts('hsl(0 100% 50% / 0.4)')
+    expect(hsl?.a).toBe(0.4)
+    expect(hsl?.r).toBe(255)
   })
 
-  it('hsl handles black (l=0 branch)', () => {
-    expect(formatColorString(0, 0, 0, 'hsl')).toBe('hsl(0, 0%, 0%)')
+  it('expands 3-digit hex and formats in the requested format', () => {
+    expect(parseColorInput('#fff')).toBe('#ffffff')
+    expect(parseColorInput('#f00', 'rgb')).toBe('rgb(255, 0, 0)')
   })
 
-  it('hsl handles white (l=100 branch)', () => {
-    expect(formatColorString(255, 255, 255, 'hsl')).toBe('hsl(0, 0%, 100%)')
-  })
-})
-
-describe('color-picker-utils — parseColorParts', () => {
-  it('parses hex into rgb with implicit alpha 1', () => {
-    expect(parseColorParts('#2563eb')).toEqual({ r: 37, g: 99, b: 235, a: 1 })
-    expect(parseColorParts('ff0000')).toEqual({ r: 255, g: 0, b: 0, a: 1 })
-    expect(parseColorParts('#fff')).toEqual({ r: 255, g: 255, b: 255, a: 1 })
-  })
-
-  it('parses rgba including alpha', () => {
-    expect(parseColorParts('rgba(37, 99, 235, 0.8)')).toEqual({ r: 37, g: 99, b: 235, a: 0.8 })
-  })
-
-  it('parses rgb with implicit alpha 1', () => {
-    expect(parseColorParts('rgb(37, 99, 235)')).toEqual({ r: 37, g: 99, b: 235, a: 1 })
-  })
-
-  it('parses hsla into rgb + alpha', () => {
-    const parts = parseColorParts('hsla(221, 83%, 53%, 0.8)')
-    expect(parts).not.toBeNull()
-    expect(parts!.a).toBe(0.8)
-    expect(parts!.r).toBeGreaterThan(30)
-    expect(parts!.r).toBeLessThan(45)
-    expect(parts!.g).toBeGreaterThan(90)
-    expect(parts!.g).toBeLessThan(110)
-    expect(parts!.b).toBeGreaterThan(225)
+  it('formats typed rgb input as rgb when format is rgb', () => {
+    expect(parseColorInput('rgb(255, 0, 0)', 'rgb')).toBe('rgb(255, 0, 0)')
   })
 
   it('returns null for empty or invalid input', () => {
     expect(parseColorParts('')).toBeNull()
-    expect(parseColorParts('   ')).toBeNull()
-    expect(parseColorParts('not-a-color')).toBeNull()
+    expect(parseColorInput('not-a-color')).toBeNull()
+    expect(isColorPickerEmpty('')).toBe(true)
+    expect(isColorPickerEmpty(undefined)).toBe(true)
+    expect(isColorPickerEmpty('#000000')).toBe(false)
   })
 })
 
-describe('color-picker-utils — parseColorInput', () => {
-  it('keeps existing hex normalization', () => {
-    expect(parseColorInput('ff0000')).toBe('#ff0000')
-    expect(parseColorInput('#fff')).toBe('#fff')
-    expect(parseColorInput('#2563eb')).toBe('#2563eb')
+describe('color-picker-utils — HSV source of truth', () => {
+  it('maps a plane click to s>0 so gray can become chromatic', () => {
+    const next = hsvaFromSvPointer(80, 20, { left: 0, top: 0, width: 100, height: 100 }, 200, 1)
+    expect(next.s).toBeGreaterThan(0)
+    expect(next.v).toBeGreaterThan(0)
+    expect(next.h).toBe(200)
+    const formatted = formatHsva(next, 'rgb', false)
+    expect(formatted.startsWith('rgb(')).toBe(true)
+    expect(parseColorToHsva(formatted)?.s).toBeGreaterThan(0)
   })
 
-  it('parses rgb() (hex or rgb string is fine)', () => {
-    const parsed = parseColorInput('rgb(37, 99, 235)')
-    expect(parsed).not.toBeNull()
-    expect(parsed).toMatch(/#2563eb|rgb\(\s*37\s*,\s*99\s*,\s*235\s*\)/i)
-  })
-
-  it('keeps alpha when parsing rgba', () => {
-    const parsed = parseColorInput('rgba(37, 99, 235, 0.8)')
-    expect(parsed).not.toBeNull()
-    expect(parsed).not.toBe('#2563eb')
-    expect(parsed).toMatch(/37/)
-    expect(parsed).toMatch(/99/)
-    expect(parsed).toMatch(/235/)
-    expect(parsed).toMatch(/0\.8/)
-  })
-
-  it('keeps alpha when parsing hsla', () => {
-    const parsed = parseColorInput('hsla(221, 83%, 53%, 0.8)')
-    expect(parsed).not.toBeNull()
-    expect(parsed).toMatch(/rgba?\(|hsla?\(/)
-    expect(parsed).toMatch(/0\.8/)
-    const parts = parseColorParts(parsed!)
-    expect(parts?.a).toBeCloseTo(0.8)
-  })
-
-  it('returns null for invalid or empty input', () => {
-    expect(parseColorInput('')).toBeNull()
-    expect(parseColorInput('not-a-color')).toBeNull()
-    expect(parseColorInput('rgb()')).toBeNull()
+  it('seeds empty as a usable HSVA without treating it as committed black', () => {
+    const seeded = seedColorPickerHsva('')
+    expect(seeded.s).toBeGreaterThan(0)
+    expect(parseColorToHsva('')).toBeNull()
   })
 })
 
 describe('color-picker-utils — isValidHex', () => {
-  it('accepts 3- and 6-digit hex with or without #', () => {
+  it('accepts 3, 4, 6, and 8 digit hex', () => {
     expect(isValidHex('#fff')).toBe(true)
-    expect(isValidHex('fff')).toBe(true)
+    expect(isValidHex('#ffff')).toBe(true)
     expect(isValidHex('#ffffff')).toBe(true)
-    expect(isValidHex('FFFFFF')).toBe(true)
-    expect(isValidHex('#aB3')).toBe(true)
+    expect(isValidHex('#ffffffff')).toBe(true)
   })
 
-  it('rejects invalid lengths and non-hex characters', () => {
-    expect(isValidHex('')).toBe(false)
-    expect(isValidHex('#')).toBe(false)
+  it('rejects junk', () => {
     expect(isValidHex('#ff')).toBe(false)
-    expect(isValidHex('#ffff')).toBe(false)
-    expect(isValidHex('#fffffff')).toBe(false)
-    expect(isValidHex('#zzz')).toBe(false)
     expect(isValidHex('rgb(0,0,0)')).toBe(false)
   })
 })

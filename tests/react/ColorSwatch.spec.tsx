@@ -4,9 +4,13 @@
 
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { ColorSwatch } from '@expcat/tigercat-react/ColorSwatch'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('ColorSwatch', () => {
   it('renders default color groups', () => {
@@ -91,30 +95,56 @@ describe('ColorSwatch', () => {
     )
 
     expect(container.querySelector('.brand-swatches')).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: '#111111' }).className).toContain('h-10 w-10')
+    expect(screen.getByRole('radio', { name: '#111111' })).toBeInTheDocument()
   })
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<ColorSwatch colors={['#111111', '#222222']} />)
+    const { container } = render(
+      <ColorSwatch
+        colors={['#111111', { value: '#222222', disabled: true }]}
+        value="#111111"
+        groups={[{ label: 'Brand', colors: ['#111111', { value: '#222222', disabled: true }] }]}
+      />
+    )
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
+  })
+
+  it('uses official zhTW for the default radiogroup name', () => {
+    render(
+      <ConfigProvider locale={zhTW}>
+        <ColorSwatch />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('radiogroup', { name: '色票' })).toBeInTheDocument()
+  })
+
+  it('wraps ArrowRight from the last enabled option', () => {
+    render(<ColorSwatch colors={['#111111', '#222222']} />)
+    const last = screen.getByRole('radio', { name: '#222222' })
+    last.focus()
+    fireEvent.keyDown(last, { key: 'ArrowRight' })
+    expect(document.activeElement).toBe(screen.getByRole('radio', { name: '#111111' }))
+  })
+
+  it('reads FormItem and validates on select', async () => {
+    const validator = vi.fn(() => undefined)
+    render(
+      <Form>
+        <FormItem name="theme" label="Theme" rules={[{ validator }]}>
+          <ColorSwatch colors={['#111111', '#222222']} />
+        </FormItem>
+      </Form>
+    )
+    fireEvent.click(screen.getByRole('radio', { name: '#222222' }))
+    await waitFor(() => expect(validator).toHaveBeenCalled())
   })
 
   describe('Edge Cases and Boundary', () => {
-    it.each([
-      ['sm', 'h-6 w-6'],
-      ['md', 'h-8 w-8'],
-      ['lg', 'h-10 w-10']
-    ] as const)('renders %s size boundary', (size, expectedClass) => {
-      render(<ColorSwatch size={size} colors={['#111111']} />)
-
-      expect(screen.getByRole('radio', { name: '#111111' }).className).toContain(expectedClass)
-    })
-
     it('renders an empty custom color list without fallback swatches', () => {
       render(<ColorSwatch ariaLabel="Theme swatches" colors={[]} />)
 
-      expect(screen.getByRole('radiogroup', { name: 'Theme swatches' })).toBeInTheDocument()
+      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
       expect(screen.queryAllByRole('radio')).toHaveLength(0)
     })
 

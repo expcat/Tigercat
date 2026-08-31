@@ -290,10 +290,19 @@ export const frFR: TigerLocale = {
     panelTitle: 'Couleur',
     clear: 'Effacer',
     hue: 'Teinte',
+    saturation: 'Saturation',
+    brightness: 'Luminosité',
     alpha: 'Opacité',
     value: 'Valeur',
     preview: 'Aperçu',
-    selectPreset: 'Sélectionner {color}'
+    selectPreset: 'Sélectionner {color}',
+    done: 'Terminé',
+    formatHex: 'HEX',
+    formatRgb: 'RGB',
+    formatHsl: 'HSL',
+    swatches: 'Nuancier',
+    primaryGroup: 'Primaire',
+    accentGroup: 'Accent'
   },
   tabs: {
     addTabAriaLabel: 'Ajouter un onglet',

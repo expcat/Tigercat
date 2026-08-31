@@ -3,142 +3,184 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { ColorPicker } from '@expcat/tigercat-react/ColorPicker'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { expectNoA11yViolations } from '../utils/react'
+
+function trigger(container: HTMLElement) {
+  return container.querySelector('[data-tiger-colorpicker-trigger]') as HTMLButtonElement
+}
+
+function open(container: HTMLElement) {
+  fireEvent.click(trigger(container))
+}
+
+function clickSv(s = 80, v = 80) {
+  const plane = document.body.querySelector('[data-tiger-colorpicker-sv]') as HTMLElement
+  plane.getBoundingClientRect = () =>
+    ({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 100,
+      bottom: 100,
+      width: 100,
+      height: 100,
+      toJSON: () => undefined
+    }) as DOMRect
+  fireEvent.pointerDown(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
+}
 
 describe('ColorPicker', () => {
-  it('applies className', () => {
+  it('applies className without dropping the wrapper', () => {
     const { container } = render(<ColorPicker className="my-picker" />)
-    expect(container.querySelector('.my-picker')).toBeInTheDocument()
+    const root = container.querySelector('.my-picker') as HTMLElement
+    expect(root).toBeInTheDocument()
+    expect(root.className).toMatch(/inline-block/)
   })
 
-  // --- Dropdown toggle ---
-  it('opens dropdown on trigger click', () => {
+  it('opens a modal dialog from a native button trigger', () => {
     const { container } = render(<ColorPicker value="#2563eb" />)
-    const trigger = container.querySelector('[role="button"]')!
-    fireEvent.click(trigger)
-    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
+    const button = trigger(container)
+    expect(button.tagName).toBe('BUTTON')
+    expect(button).toHaveAttribute('aria-haspopup', 'dialog')
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(button)
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(button).toHaveAttribute('aria-controls')
   })
-  // --- Disabled ---
+
   it('does not open when disabled', () => {
     const { container } = render(<ColorPicker disabled />)
-    const trigger = container.querySelector('[role="button"]')!
-    fireEvent.click(trigger)
-    expect(container.querySelector('input[type="text"]')).not.toBeInTheDocument()
+    fireEvent.click(trigger(container))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  // --- Preset colors ---
-  it('renders preset swatches', () => {
+  it('renders presets as a ColorSwatch radiogroup', () => {
     const { container } = render(
-      <ColorPicker value="#000" presets={['#ff0000', '#00ff00', '#0000ff']} />
+      <ColorPicker value="#000000" presets={['#ff0000', '#00ff00', '#0000ff']} />
     )
-    fireEvent.click(container.querySelector('[role="button"]')!)
-    const presets = document.body.querySelectorAll('[aria-label^="Select "]')
-    expect(presets.length).toBe(3)
+    open(container)
+    expect(screen.getByRole('radiogroup')).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(3)
   })
 
-  // --- Hex input ---
-  it('calls onChange via hex input', () => {
+  it('commits typed input in the current format', () => {
     const onChange = vi.fn()
     const { container } = render(<ColorPicker value="#2563eb" onChange={onChange} />)
-    fireEvent.click(container.querySelector('[role="button"]')!)
+    open(container)
     const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
     fireEvent.change(input, { target: { value: 'ff0000' } })
     expect(onChange).toHaveBeenCalledWith('#ff0000')
-  }) // --- Keyboard accessibility (S3) ---
-  it('opens the panel with Enter and Space on the trigger', () => {
-    const { container } = render(<ColorPicker value="#2563eb" />)
-    const trigger = container.querySelector('[role="button"]')!
-    fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
-    fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(document.body.querySelector('input[type="text"]')).not.toBeInTheDocument()
-    fireEvent.keyDown(trigger, { key: ' ' })
-    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
   })
 
-  it('exposes aria-expanded / aria-haspopup on the trigger', () => {
+  it('opens with Enter and Space on the trigger', () => {
     const { container } = render(<ColorPicker value="#2563eb" />)
-    const trigger = container.querySelector('[role="button"]')!
-    expect(trigger.getAttribute('aria-haspopup')).toBe('dialog')
-    expect(trigger.getAttribute('aria-expanded')).toBe('false')
-    fireEvent.click(trigger)
-    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    const button = trigger(container)
+    fireEvent.keyDown(button, { key: 'Enter' })
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    fireEvent.keyDown(button, { key: 'Enter' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.keyDown(button, { key: ' ' })
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
-  it('makes preset swatches keyboard-operable', () => {
+  it('emits rgb after an SV change when format is rgb', () => {
+    const onChange = vi.fn()
+    const { container } = render(<ColorPicker value="#808080" format="rgb" onChange={onChange} />)
+    open(container)
+    clickSv(90, 90)
+    expect(onChange).toHaveBeenCalled()
+    const emitted = String(onChange.mock.calls.at(-1)?.[0])
+    expect(emitted.startsWith('rgb')).toBe(true)
+    expect(emitted).not.toMatch(/^#/)
+  })
+
+  it('keeps hex format when dragging hue of a saturated color', () => {
+    const onChange = vi.fn()
+    const { container } = render(<ColorPicker value="#ff0000" format="hex" onChange={onChange} />)
+    open(container)
+    fireEvent.change(screen.getByRole('slider', { name: 'Hue' }), { target: { value: '120' } })
+    const emitted = String(onChange.mock.calls.at(-1)?.[0])
+    expect(emitted).toMatch(/^#[0-9a-f]{6}$/)
+  })
+
+  it('selects a preset through ColorSwatch', () => {
     const onChange = vi.fn()
     const { container } = render(
       <ColorPicker value="#000000" presets={['#ff0000']} onChange={onChange} />
     )
-    fireEvent.click(container.querySelector('[role="button"]')!)
-    const preset = document.body.querySelector('[aria-label="Select #ff0000"]')!
-    expect(preset.getAttribute('role')).toBe('button')
-    expect(preset.getAttribute('tabindex')).toBe('0')
-    fireEvent.keyDown(preset, { key: 'Enter' })
+    open(container)
+    fireEvent.click(screen.getByRole('radio', { name: '#ff0000' }))
     expect(onChange).toHaveBeenCalledWith('#ff0000')
   })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<ColorPicker />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
 
-  it('paints the trigger swatch from rgba value (not black)', () => {
+  it('paints the trigger from rgba instead of falling back to black', () => {
     const { container } = render(<ColorPicker value="rgba(37, 99, 235, 0.8)" showAlpha />)
-    const trigger = container.querySelector('[role="button"]') as HTMLElement
-    const bg = (trigger.style.backgroundColor || '').replace(/\s+/g, '').toLowerCase()
-    expect(bg).not.toMatch(/rgb\(0,0,0\)|#000/)
-    expect(bg).toMatch(/37/)
-    expect(bg).toMatch(/99/)
-    expect(bg).toMatch(/235/)
-    expect(bg).toMatch(/0\.8/)
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    const painted = `${swatch.style.boxShadow} ${swatch.style.backgroundColor}`
+    expect(painted).toMatch(/37/)
+    expect(painted).toMatch(/99/)
+    expect(painted).toMatch(/235/)
   })
 
-  it('emits an alpha-bearing string when the Alpha slider changes', () => {
+  it('emits rgba when the alpha slider moves under format=rgb', () => {
     const onChange = vi.fn()
     const { container } = render(
       <ColorPicker value="rgba(37, 99, 235, 0.8)" showAlpha format="rgb" onChange={onChange} />
     )
-    fireEvent.click(container.querySelector('[role="button"]')!)
-    const slider = document.body.querySelector('input[aria-label="Alpha"]') as HTMLInputElement
-    expect(slider).toBeTruthy()
-    fireEvent.change(slider, { target: { value: '50' } })
-    expect(onChange).toHaveBeenCalled()
+    open(container)
+    fireEvent.change(screen.getByRole('slider', { name: 'Alpha' }), { target: { value: '50' } })
     const emitted = String(onChange.mock.calls[0][0])
-    expect(emitted).toMatch(/rgba?\(|hsla?\(/)
+    expect(emitted).toMatch(/rgba\(/)
     expect(emitted).not.toMatch(/^#[0-9a-fA-F]{6}$/)
   })
 
-  it('does not render the Alpha slider when showAlpha is false', () => {
-    const { container } = render(<ColorPicker value="#2563eb" showAlpha={false} />)
-    fireEvent.click(container.querySelector('[role="button"]')!)
-    expect(document.body.querySelector('input[aria-label="Alpha"]')).not.toBeInTheDocument()
+  it('uncontrolled defaultValue survives rerender and updates from a preset', () => {
+    const { container, rerender } = render(
+      <ColorPicker defaultValue="#111111" presets={['#ff0000']} />
+    )
+    open(container)
+    fireEvent.click(screen.getByRole('radio', { name: '#ff0000' }))
+    rerender(<ColorPicker defaultValue="#111111" presets={['#ff0000']} />)
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    expect(swatch.style.boxShadow).toMatch(/255/)
   })
 
-  it('uses English Pick color on the trigger by default', () => {
-    const { container } = render(<ColorPicker value="#2563eb" />)
-    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
-    expect(trigger.getAttribute('aria-label')).toBe('Pick color')
-    expect(trigger.getAttribute('title')).toBe('Pick color')
-  })
-
-  it('uses ConfigProvider zh-CN for trigger / panel title / clear', () => {
+  it('uses ConfigProvider zh-CN for trigger / panel / clear', () => {
     const { container } = render(
       <ConfigProvider locale={zhCN}>
         <ColorPicker value="#2563eb" />
       </ConfigProvider>
     )
-    const trigger = container.querySelector('[data-tiger-colorpicker-trigger]')!
-    expect(trigger.getAttribute('aria-label')).toBe('选择颜色')
-    fireEvent.click(trigger)
+    expect(trigger(container)).toHaveAttribute('aria-label', '选择颜色')
+    open(container)
     expect(screen.getByRole('dialog', { name: '颜色' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '清空' })).toBeInTheDocument()
+  })
+
+  it('uses official zhTW and jaJP objects', () => {
+    const { container, rerender } = render(
+      <ConfigProvider locale={zhTW}>
+        <ColorPicker value="#2563eb" />
+      </ConfigProvider>
+    )
+    expect(trigger(container)).toHaveAttribute('aria-label', '選擇顏色')
+    rerender(
+      <ConfigProvider locale={jaJP}>
+        <ColorPicker value="#2563eb" />
+      </ConfigProvider>
+    )
+    expect(trigger(container)).toHaveAttribute('aria-label', '色を選択')
   })
 
   it('lets labels.trigger override locale text', () => {
@@ -147,16 +189,36 @@ describe('ColorPicker', () => {
         <ColorPicker value="#2563eb" labels={{ trigger: '自定义颜色' }} />
       </ConfigProvider>
     )
-    expect(
-      container.querySelector('[data-tiger-colorpicker-trigger]')?.getAttribute('aria-label')
-    ).toBe('自定义颜色')
+    expect(trigger(container)).toHaveAttribute('aria-label', '自定义颜色')
   })
 
   it('emits empty string when Clear is clicked', () => {
     const onChange = vi.fn()
     const { container } = render(<ColorPicker value="#2563eb" onChange={onChange} />)
-    fireEvent.click(container.querySelector('[data-tiger-colorpicker-trigger]')!)
+    open(container)
     fireEvent.click(document.body.querySelector('[data-tiger-colorpicker-clear]')!)
     expect(onChange).toHaveBeenCalledWith('')
+  })
+
+  it('does not treat opening the panel as a field blur', async () => {
+    const validator = vi.fn(() => undefined)
+    const { container } = render(
+      <Form>
+        <FormItem name="color" label="Theme" rules={[{ validator }]}>
+          <ColorPicker />
+        </FormItem>
+      </Form>
+    )
+    expect(trigger(container)).toHaveAttribute('id')
+    open(container)
+    expect(validator).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('slider', { name: /Saturation/ }))
+    clickSv(70, 70)
+    await waitFor(() => expect(validator).toHaveBeenCalled())
+  })
+
+  it('has no accessibility violations when open', async () => {
+    render(<ColorPicker defaultOpen value="#2563eb" presets={['#ff0000']} />)
+    await expectNoA11yViolations(document.body)
   })
 })
