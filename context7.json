@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 173,
+  "component_count": 174,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -568,7 +568,7 @@
       "props": "skills/tigercat/references/shared/props/other.md",
       "vue": "skills/tigercat/references/vue/index.md",
       "react": "skills/tigercat/references/react/index.md",
-      "components": ["FORM_ITEM_CONTROL_INJECTION_KEY"],
+      "components": ["FORM_ITEM_CONTROL_INJECTION_KEY", "IMAGE_GROUP_INJECTION_KEY"],
       "examples": "skills/tigercat/references/examples/other.md"
     }
   },
@@ -4033,6 +4033,26 @@
       "testGroup": "other",
       "packageSubpath": "./FORM_ITEM_CONTROL_INJECTION_KEY",
       "packageTarget": "FORM_ITEM_CONTROL_INJECTION_KEY",
+      "typeSource": "unknown",
+      "sourceFiles": [],
+      "propsInterfaces": [],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/other.md",
+        "examples": "skills/tigercat/references/examples/other.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "IMAGE_GROUP_INJECTION_KEY": {
+      "name": "IMAGE_GROUP_INJECTION_KEY",
+      "aliases": [],
+      "category": "Other",
+      "slug": "other",
+      "testGroup": "other",
+      "packageSubpath": "./IMAGE_GROUP_INJECTION_KEY",
+      "packageTarget": "IMAGE_GROUP_INJECTION_KEY",
       "typeSource": "unknown",
       "sourceFiles": [],
       "propsInterfaces": [],

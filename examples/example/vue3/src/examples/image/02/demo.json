@@ -1,7 +1,7 @@
 {
   "id": "image-02",
   "title": "失败回退",
-  "description": "主图片加载失败时使用 fallbackSrc；需要完全自定义占位内容时可改用 errorRender。",
+  "description": "fallbackSrc 成功时显示回退图；回退也失败时走 error 插槽。lazy 在进入视口前显示 placeholder。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }

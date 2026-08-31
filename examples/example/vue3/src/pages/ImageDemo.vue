@@ -9,6 +9,6 @@ const modules = getDemoModules('image')
 <template>
   <DemoPage
     title="Image 图片"
-    description="图片展示组件，支持适配模式、懒加载、错误回退、点击预览、多图组预览。"
+    description="默认可键盘预览、懒加载、失败回退、悬停放大、组图连续切换。"
     :modules="modules" />
 </template>

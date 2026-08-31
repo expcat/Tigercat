@@ -223,15 +223,20 @@ import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-cor
 
 ## Image
 
-`packages/core/src/types/image.ts` · `ImageProps` · 3/13 props
+`packages/core/src/types/image.ts` · `ImageProps` · 8/19 props
 
-Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。
+Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。
 
-| Prop     | Type               | Default | Notes                      |
-| -------- | ------------------ | ------- | -------------------------- |
-| `src?`   | `string`           | `-`     | Image source URL           |
-| `alt?`   | `string`           | `-`     | Alternative text for image |
-| `width?` | `number \| string` | `-`     | Image width (CSS value)    |
+| Prop              | Type                  | Default   | Notes                                                                                      |
+| ----------------- | --------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `src?`            | `string`              | `-`       | Image source URL                                                                           |
+| `alt?`            | `string`              | `-`       | Alternative text for image                                                                 |
+| `preview?`        | `boolean`             | `true`    | Whether the image triggers preview                                                         |
+| `previewTrigger?` | `ImagePreviewTrigger` | `'click'` | How the preview is triggered when `preview` is enabled. - `click`: full-screen viewer o... |
+| `lazy?`           | `boolean`             | `false`   | Whether to lazy load the image using IntersectionObserver                                  |
+| `fallbackSrc?`    | `string`              | `-`       | Fallback image source when loading fails                                                   |
+| `fit?`            | `ImageFit`            | `'cover'` | Object-fit behavior for the image                                                          |
+| `height?`         | `number \| string`    | `-`       | Image height (CSS value)                                                                   |
 
 ## ImageCompare
 
@@ -257,11 +262,12 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 `packages/core/src/types/image.ts` · `ImageGroupProps`
 
-| Prop         | Type              | Default | Notes                                          |
-| ------------ | ----------------- | ------- | ---------------------------------------------- |
-| `preview?`   | `boolean`         | `true`  | Whether to enable preview for all child images |
-| `children?`  | `React.ReactNode` | `-`     | Children                                       |
-| `className?` | `string`          | `-`     | Additional CSS classes                         |
+Note: 只收集子 Image 的 URL，不是图库布局；间距用 class。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。
+
+| Prop         | Type      | Default | Notes                                                     |
+| ------------ | --------- | ------- | --------------------------------------------------------- |
+| `preview?`   | `boolean` | `true`  | Whether to enable preview for all child images            |
+| `className?` | `string`  | `-`     | Additional CSS classes. Merged with the group base class. |
 
 ## ImagePreview
 

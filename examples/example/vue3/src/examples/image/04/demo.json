@@ -1,8 +1,8 @@
 {
   "id": "image-04",
   "title": "ImageGroup",
-  "description": "一个 ImageGroup 统一管理必要的组图子项，并在预览中提供连续切换。",
+  "description": "ImageGroup 只收集 URL，布局靠 class；重复 src 仍是两张。preview={false} 时子图不是按钮。",
   "entry": "App.vue",
   "order": 4,
-  "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
 }

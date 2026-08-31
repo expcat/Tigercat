@@ -1,7 +1,7 @@
 {
   "id": "image-03",
   "title": "图片预览",
-  "description": "单张图片通过 previewTrigger=hover 打开悬停预览；默认 click 可打开全屏预览。",
+  "description": "previewTrigger=hover 时悬停或键盘聚焦都会出现放大层；点击或 Enter 仍打开全屏预览。默认 click 见第一块。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }

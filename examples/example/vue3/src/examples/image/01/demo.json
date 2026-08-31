@@ -1,7 +1,7 @@
 {
   "id": "image-01",
   "title": "基础与适配",
-  "description": "一个图片实例组合固定尺寸和 cover 适配；fit 还支持 contain、fill、none 与 scale-down。",
+  "description": "默认 preview 是可聚焦的预览按钮，点击或键盘打开全屏；cover 适配固定尺寸。",
   "entry": "App.vue",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }

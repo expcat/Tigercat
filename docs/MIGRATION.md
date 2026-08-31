@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Image 默认 `preview=true` 时宿主是 `<button>`，不再是 `div role=button`。预览名走 `locale.image.previewAriaLabel`；开启 preview 时内层 img `alt=""`。React `ref` 指向 `<img>`；`onLoad` / `onError` / `srcSet` 不再落在包装节点。`previewTrigger="hover"` 仍可键盘聚焦出浮层、点击进全屏。`registerImageGroupItem` 改为 `{ id, src }`，按实例注销，不再按 URL `indexOf`。`getImageGroupClasses` 合并自定义 class，不再替换基类。
+
 Marquee 默认不再是名为 “Scrolling content” 的 `region`。需要 landmark 时传 `ariaLabel` / `aria-label` / `aria-labelledby`。`repeat={0}` 现在是静态一份，不再回落到 2。`pauseOnHover={false}` 不再关掉焦点暂停（用 `pauseOnFocus={false}`）。删除 `DEFAULT_MARQUEE_ARIA_LABEL`，文案在 `enUS.marquee.ariaLabel` / `getMarqueeLabels`。纵向不要再靠外挂 `h-*` 才能像跑马灯。
 
 Text `align` 改为逻辑值：`start` / `center` / `end` / `justify`。运行时仍接受 `left`/`right` 并映射到 `start`/`end`。
