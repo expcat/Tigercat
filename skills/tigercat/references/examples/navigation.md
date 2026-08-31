@@ -24,7 +24,8 @@ description: Compact Tigercat Navigation Vue and React usage routes
 | StepsItem  | `<StepsItem :title="title" />`                 | `<StepsItem title={title} />`               |
 | SubMenu    | `<SubMenu :item-key="itemKey" />`              | `<SubMenu itemKey={itemKey} />`             |
 | TabPane    | `<TabPane :tab-key="tabKey" :label="label" />` | `<TabPane tabKey={tabKey} label={label} />` |
+| Tree       | `<Tree :tree-data="treeData" />`               | `<Tree treeData={treeData} />`              |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Affix, Anchor, BackTop, Breadcrumb, BreadcrumbItem, ContextMenu, ContextMenuItem, ContextMenuMenu, ContextMenuSub, Dropdown, DropdownItem, DropdownMenu, FloatButton, FloatButtonGroup, Menu, MenuItemGroup, NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, PageHeader, Pagination, ScrollSpy, Spotlight, Steps, Tabs, Tree.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Affix, Anchor, BackTop, Breadcrumb, BreadcrumbItem, ContextMenu, ContextMenuItem, ContextMenuMenu, ContextMenuSub, Dropdown, DropdownItem, DropdownMenu, FloatButton, FloatButtonGroup, Menu, MenuItemGroup, NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, PageHeader, Pagination, ScrollSpy, Spotlight, Steps, Tabs.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

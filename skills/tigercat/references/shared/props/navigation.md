@@ -347,10 +347,17 @@ Note: 菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider
 
 ## Tree
 
-`packages/core/src/types/tree.ts` · `TreeProps` · 3/30 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 8/35 props
 
-| Prop        | Type                   | Default | Notes                                                                                     |
-| ----------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `virtual?`  | `boolean`              | `false` | Enable virtualized rendering. The tree is flattened to its currently visible items and... |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | -                                                                                         |
-| `treeData?` | `TreeNode[]`           | `-`     | Tree data source                                                                          |
+| Prop            | Type                                | Default | Notes                                                                                      |
+| --------------- | ----------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `treeData?`     | `TreeNode[]`                        | `-`     | Tree data source                                                                           |
+| `expandedKeys?` | `TreeNodeKey[]`                     | `-`     | Expanded node keys. `undefined` is uncontrolled; an array (including `[]`) is controlle... |
+| `selectedKeys?` | `TreeNodeKey[]`                     | `-`     | Selected node keys. `undefined` is uncontrolled; `[]` is controlled empty.                 |
+| `checkedKeys?`  | `TreeNodeKey[] \| TreeCheckedState` | `-`     | Checked node keys. Arrays in, arrays out. Objects are accepted as an input snapshot (`c... |
+| `loadData?`     | `TreeLoadDataFn`                    | `-`     | Whether to load data asynchronously. Must not mutate the incoming node.                    |
+| `virtual?`      | `boolean`                           | `false` | Enable virtualized rendering through `VirtualList`.                                        |
+| `filterValue?`  | `string`                            | `-`     | Filter query that **hides** unmatched nodes. Same channel as `searchValue`.                |
+| `searchable?`   | `boolean`                           | `false` | Whether to show the built-in search input. Does not open a second query source; bind `s... |
+
+Events/callback props: `onExpand?`, `onExpandedKeysChange?`, `onSelect?`, `onSelectedKeysChange?`, `onCheck?`, `onCheckedKeysChange?`, ....

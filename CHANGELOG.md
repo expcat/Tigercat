@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Tree**：展开 / 选中 / 勾选 / 过滤 / 懒加载 / 拖拽下沉 core。`1` 与 `'1'` 是同一节点。flatten 一行渲染，虚拟和非虚拟缩进、连线同一套。`filterValue` / `searchValue` 是同一条查询（摘节点，匹配子串走 `<mark>`）；`searchable` 只决定是否画输入框。`loadData` 不得改传入对象，失败清转圈。`checkStrategy` 会走过半选祖先；级联跳过 disabled。`onDrop` 带 `before` / `after` / `inside` 和下一棵不可变树。默认名走 `locale.tree`。搜索框在 `role="tree"` 外面。Vue 主入口导出 `TreeProps`。
 - **DataExport**：真 xlsx / CSV / Markdown 一条栈。CSV 带 BOM、CRLF、公式前缀；Date 写 ISO，对象写 JSON；只有 `render` 的操作列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不再拼接。闸、序列化、下载下沉 `runDataExport`；连点只跑一次；失败有 `aria-live`。多格式触发器 `asChild` 把 ARIA 打在同一颗 button 上。空 `formats` 不再卸组件。Vue 导出 `DataExportProps`。
 - **VirtualTable**：行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。可见行钉死 `virtualItemHeight`；spacer 是带 `td` 的垫片。原生 `<table>` 语义，roving tabindex。选择是点行、默认 `rowKey="id"`，没有 checkbox 列。列虚拟化要数字 `width` 且无固定列。React `forwardRef` / Vue `expose({ scrollToIndex })`。删除 React 独有 `renderCell`。
 - **Table 状态 / 工具**：排序、筛选、分页、选中、展开、隐列、列锁、编辑、行列拖拽下沉 `resolveTableView`。行键走 `rowKey` / `rowSelection.getRowKey`，缺 id 用 dataSource 下标而不是页内下标；`onCellChange` / `onRowClick` / `render` 同一份。`undefined` 非受控、数组（含 `[]`）受控。筛完会连 `onPageChange` 一起回到第 1 页。remote 默认不本地筛排分组，`total: 0` 是真 0。先分组再分页。单元格一律 `dataKey || key`。内置导出只留 CSV（BOM / CRLF / 公式前缀）；假 `.xls` 删掉，xlsx 走 DataExport。`autoVirtual` 默认关。`editableCells` 改为 `{ [columnKey]: number[] }`。Vue 导出 `TableProps`。

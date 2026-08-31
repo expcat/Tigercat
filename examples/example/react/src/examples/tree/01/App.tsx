@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Tree } from '@expcat/tigercat-react/Tree'
 import type { TreeNode } from '@expcat/tigercat-react'
 
@@ -15,16 +14,5 @@ const treeData: TreeNode[] = [
 ]
 
 export default function App() {
-  const [checkedKeys, setCheckedKeys] = useState<(string | number)[]>(['ui'])
-
-  return (
-    <Tree
-      treeData={treeData}
-      checkable
-      selectable
-      defaultExpandAll
-      checkedKeys={checkedKeys}
-      onCheckedKeysChange={setCheckedKeys}
-    />
-  )
+  return <Tree treeData={treeData} defaultExpandAll aria-label="项目结构" />
 }

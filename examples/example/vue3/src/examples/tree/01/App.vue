@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Tree } from '@expcat/tigercat-vue/Tree'
 import type { TreeNode } from '@expcat/tigercat-vue'
 
@@ -14,15 +13,8 @@ const treeData: TreeNode[] = [
   },
   { key: 'development', label: '开发' }
 ]
-
-const checkedKeys = ref<(string | number)[]>(['ui'])
 </script>
 
 <template>
-  <Tree
-    v-model:checkedKeys="checkedKeys"
-    :tree-data="treeData"
-    checkable
-    selectable
-    default-expand-all />
+  <Tree :tree-data="treeData" default-expand-all aria-label="项目结构" />
 </template>

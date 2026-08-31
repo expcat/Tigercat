@@ -1,7 +1,7 @@
 {
   "id": "tree-03",
-  "title": "节点过滤",
-  "description": "通过输入关键字过滤树节点。",
+  "title": "搜索与虚拟滚动",
+  "description": "内置搜索过滤可见节点；虚拟列表与连线共用同一套缩进。",
   "entry": "App.vue",
   "order": 3
 }

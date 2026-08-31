@@ -1,7 +1,7 @@
 {
   "id": "tree-02",
   "title": "懒加载",
-  "description": "展开节点时异步加载子节点。",
+  "description": "受控 treeData。loadData 不得改传入对象；失败时转圈消失。",
   "entry": "App.vue",
   "order": 2
 }
