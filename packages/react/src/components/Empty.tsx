@@ -1,14 +1,15 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
   classNames,
   emptyBaseClasses,
   emptyImageClasses,
   emptyDescriptionClasses,
   emptyActionsClasses,
-  emptyIllustrationViewBox,
-  emptyIllustrationPaths,
   getEmptyDescription,
+  getEmptyIllustration,
+  resolveEmptyImageMode,
   mergeTigerLocale,
+  devWarn,
   type EmptyProps as CoreEmptyProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -22,17 +23,20 @@ export interface EmptyProps extends React.HTMLAttributes<HTMLDivElement>, CoreEm
   children?: React.ReactNode
 }
 
-export const Empty: React.FC<EmptyProps> = ({
-  preset = 'default',
-  description,
-  showImage = true,
-  image,
-  extra,
-  className,
-  children,
-  locale,
-  ...props
-}) => {
+export const Empty = forwardRef<HTMLDivElement, EmptyProps>(function Empty(
+  {
+    preset = 'default',
+    description,
+    showImage = true,
+    image,
+    extra,
+    className,
+    children,
+    locale,
+    ...props
+  },
+  ref
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -42,44 +46,50 @@ export const Empty: React.FC<EmptyProps> = ({
     () => description ?? getEmptyDescription(preset, mergedLocale),
     [description, preset, mergedLocale]
   )
+  const hasCustomImage = image !== undefined && image !== null
+  const imageMode = resolveEmptyImageMode({ showImage, hasCustomImage, preset })
+  const illustration = imageMode === 'builtin' ? getEmptyIllustration(preset) : null
 
-  const wrapperClasses = useMemo(() => classNames(emptyBaseClasses, className), [className])
+  if (showImage === false && hasCustomImage) {
+    devWarn(
+      'Empty.showImage.custom',
+      'Empty: `image` still renders when `showImage` is false. Pass no `image` to hide the illustration.'
+    )
+  }
+
+  const wrapperClasses = classNames(emptyBaseClasses, className)
 
   return (
-    <div className={wrapperClasses} {...props}>
-      {/* Illustration */}
-      {showImage && (
-        <div className={emptyImageClasses}>
-          {image !== undefined ? (
-            image
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox={emptyIllustrationViewBox}
-              className="mx-auto h-24 w-24">
-              {emptyIllustrationPaths.map((p, i) => (
-                <path
-                  key={i}
-                  d={p.d}
-                  fill={p.fill ?? 'none'}
-                  stroke={p.stroke}
-                  strokeWidth={p.strokeWidth}
-                  opacity={p.opacity}
-                />
-              ))}
-            </svg>
-          )}
+    <div ref={ref} className={wrapperClasses} {...props}>
+      {imageMode === 'custom' ? (
+        <div className={emptyImageClasses || undefined}>{image}</div>
+      ) : illustration ? (
+        <div className={emptyImageClasses || undefined}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox={illustration.viewBox}
+            className="mx-auto h-24 w-24"
+            aria-hidden="true"
+            focusable="false">
+            {illustration.paths.map((p, i) => (
+              <path
+                key={i}
+                d={p.d}
+                fill={p.fill ?? 'none'}
+                stroke={p.stroke}
+                strokeWidth={p.strokeWidth}
+                opacity={p.opacity}
+              />
+            ))}
+          </svg>
         </div>
-      )}
+      ) : null}
 
-      {/* Description */}
-      {descText && <div className={emptyDescriptionClasses}>{descText}</div>}
+      {descText ? <div className={emptyDescriptionClasses}>{descText}</div> : null}
 
-      {/* Actions */}
-      {extra && <div className={emptyActionsClasses}>{extra}</div>}
+      {extra ? <div className={emptyActionsClasses}>{extra}</div> : null}
 
-      {/* Children */}
-      {children && <div>{children}</div>}
+      {children ? <div>{children}</div> : null}
     </div>
   )
-}
+})

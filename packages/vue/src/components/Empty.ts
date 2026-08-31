@@ -7,10 +7,11 @@ import {
   emptyImageClasses,
   emptyDescriptionClasses,
   emptyActionsClasses,
-  emptyIllustrationViewBox,
-  emptyIllustrationPaths,
   getEmptyDescription,
+  getEmptyIllustration,
+  resolveEmptyImageMode,
   mergeTigerLocale,
+  devWarn,
   type TigerLocale,
   type EmptyPreset
 } from '@expcat/tigercat-core'
@@ -63,40 +64,53 @@ export const Empty = defineComponent({
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
-      const children = []
+      const hasCustomImage = Boolean(slots.image)
+      const imageMode = resolveEmptyImageMode({
+        showImage: props.showImage,
+        hasCustomImage,
+        preset: props.preset
+      })
+      const illustration = imageMode === 'builtin' ? getEmptyIllustration(props.preset) : null
 
-      // Image / illustration
-      if (props.showImage) {
-        if (slots.image) {
-          children.push(h('div', { class: emptyImageClasses }, slots.image()))
-        } else {
-          const paths = emptyIllustrationPaths.map((p, i) =>
-            h('path', {
-              key: i,
-              d: p.d,
-              fill: p.fill ?? 'none',
-              stroke: p.stroke,
-              'stroke-width': p.strokeWidth,
-              opacity: p.opacity
-            })
-          )
-          children.push(
-            h('div', { class: emptyImageClasses }, [
-              h(
-                'svg',
-                {
-                  xmlns: 'http://www.w3.org/2000/svg',
-                  viewBox: emptyIllustrationViewBox,
-                  class: 'mx-auto h-24 w-24'
-                },
-                paths
-              )
-            ])
-          )
-        }
+      if (props.showImage === false && hasCustomImage) {
+        devWarn(
+          'Empty.showImage.custom',
+          'Empty: the image slot still renders when `showImage` is false. Omit the slot to hide the illustration.'
+        )
       }
 
-      // Description
+      const children = []
+
+      if (imageMode === 'custom' && slots.image) {
+        children.push(h('div', { class: emptyImageClasses || undefined }, slots.image()))
+      } else if (illustration) {
+        const paths = illustration.paths.map((p, i) =>
+          h('path', {
+            key: i,
+            d: p.d,
+            fill: p.fill ?? 'none',
+            stroke: p.stroke,
+            'stroke-width': p.strokeWidth,
+            opacity: p.opacity
+          })
+        )
+        children.push(
+          h('div', { class: emptyImageClasses || undefined }, [
+            h(
+              'svg',
+              {
+                xmlns: 'http://www.w3.org/2000/svg',
+                viewBox: illustration.viewBox,
+                class: 'mx-auto h-24 w-24',
+                'aria-hidden': 'true',
+                focusable: 'false'
+              },
+              paths
+            )
+          ])
+        )
+      }
+
       if (slots.description || descText.value) {
         children.push(
           h(
@@ -107,12 +121,10 @@ export const Empty = defineComponent({
         )
       }
 
-      // Actions slot
       if (slots.extra) {
         children.push(h('div', { class: emptyActionsClasses }, slots.extra()))
       }
 
-      // Default slot (arbitrary content)
       if (slots.default) {
         children.push(h('div', null, slots.default()))
       }

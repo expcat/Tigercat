@@ -142,13 +142,16 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 
 ## Empty
 
-`packages/core/src/types/empty.ts` · `EmptyProps` · 3/9 props
+`packages/core/src/types/empty.ts` · `EmptyProps` · 4/9 props
 
-| Prop           | Type                   | Default     | Notes                                                   |
-| -------------- | ---------------------- | ----------- | ------------------------------------------------------- |
-| `locale?`      | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
-| `preset?`      | `EmptyPreset`          | `'default'` | Preset empty state style                                |
-| `description?` | `string`               | `-`         | Description text below the illustration                 |
+Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
+
+| Prop           | Type                   | Default     | Notes                                                                                      |
+| -------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `preset?`      | `EmptyPreset`          | `'default'` | Preset default copy. Built-in illustration follows the preset (`simple` has none, `erro... |
+| `description?` | `string`               | `-`         | Description text below the illustration                                                    |
+| `showImage?`   | `boolean`              | `true`      | Whether to show the built-in illustration. A custom `image` / image slot still renders...  |
+| `locale?`      | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
 
 ## Highlight
 
@@ -378,13 +381,16 @@ Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃�
 
 ## Result
 
-`packages/core/src/types/result.ts` · `ResultProps` · 3/8 props
+`packages/core/src/types/result.ts` · `ResultProps` · 4/9 props
 
-| Prop        | Type           | Default  | Notes                                                |
-| ----------- | -------------- | -------- | ---------------------------------------------------- |
-| `status?`   | `ResultStatus` | `'info'` | Result status — determines the icon and color scheme |
-| `title?`    | `string`       | `-`      | Title text                                           |
-| `subTitle?` | `string`       | `-`      | Subtitle / description text                          |
+Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTTP 状态画数字，不自动补 “Not Found”。无 title 时只有装饰图标或 HTTP 数字。需要播报时自己写 `role` / `aria-live`。
+
+| Prop            | Type                 | Default  | Notes                                                                                     |
+| --------------- | -------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status?`       | `ResultStatus`       | `'info'` | Result status — determines the icon and color scheme                                      |
+| `title?`        | `string`             | `-`      | Title. Rendered as a heading (`headingLevel`, default `h2`). Not the native HTML tooltip. |
+| `subTitle?`     | `string`             | `-`      | Subtitle / description text                                                               |
+| `headingLevel?` | `ResultHeadingLevel` | `2`      | Heading level used when `title` is set.                                                   |
 
 ## Segmented
 

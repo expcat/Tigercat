@@ -7,6 +7,8 @@
  */
 export type ResultStatus = 'success' | 'error' | 'warning' | 'info' | '404' | '403' | '500'
 
+export type ResultHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
+
 /**
  * Base result props interface (framework-agnostic)
  */
@@ -18,7 +20,8 @@ export interface ResultProps {
   status?: ResultStatus
 
   /**
-   * Title text
+   * Title. Rendered as a heading (`headingLevel`, default `h2`).
+   * Not the native HTML tooltip.
    */
   title?: string
 
@@ -26,6 +29,12 @@ export interface ResultProps {
    * Subtitle / description text
    */
   subTitle?: string
+
+  /**
+   * Heading level used when `title` is set.
+   * @default 2
+   */
+  headingLevel?: ResultHeadingLevel
 
   /**
    * Additional CSS class name

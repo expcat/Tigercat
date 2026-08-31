@@ -87,6 +87,8 @@ export const COMPONENT_PROP_PRIORITY = {
   AvatarGroup: ['max?', 'size?', 'shape?', 'locale?', 'labels?'],
   Badge: ['content?', 'type?', 'standalone?', 'max?', 'showZero?', 'position?', 'variant?'],
   Tag: ['closable?', 'visible?', 'pill?', 'variant?', 'size?', 'closeAriaLabel?'],
+  Empty: ['preset?', 'description?', 'showImage?'],
+  Result: ['status?', 'title?', 'subTitle?', 'headingLevel?'],
   Button: [
     'variant?',
     'size?',
@@ -232,6 +234,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Calendar: '<Calendar :value="date" />',
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
+    Result: '<Result status="success" title="提交成功" />',
     Tour: '<Tour :steps="steps" />'
   },
   React: {
@@ -239,6 +242,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Calendar: '<Calendar value={date} />',
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
+    Result: '<Result status="success" title="提交成功" />',
     Tour: '<Tour steps={steps} />'
   }
 }

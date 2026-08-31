@@ -19,7 +19,9 @@ export interface EmptyProps {
   locale?: Partial<TigerLocale>
 
   /**
-   * Preset empty state style
+   * Preset default copy. Built-in illustration follows the preset
+   * (`simple` has none, `error` / `no-results` have their own marks, others
+   * share the open box). Override with `image` / `showImage`.
    * @default 'default'
    */
   preset?: EmptyPreset
@@ -30,7 +32,8 @@ export interface EmptyProps {
   description?: string
 
   /**
-   * Whether to show the built-in SVG illustration
+   * Whether to show the built-in illustration. A custom `image` / image slot
+   * still renders when this is false.
    * @default true
    */
   showImage?: boolean

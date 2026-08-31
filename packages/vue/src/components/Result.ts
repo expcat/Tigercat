@@ -6,12 +6,16 @@ import {
   resultBaseClasses,
   resultIconContainerBaseClasses,
   resultIconClasses,
+  resultHttpLabelClasses,
   resultTitleClasses,
   resultSubTitleClasses,
   resultExtraClasses,
+  RESULT_ICON_SIZE_PX,
   getResultColorScheme,
   getResultIconPath,
   isHttpResultStatus,
+  resultHeadingTag,
+  type ResultHeadingLevel,
   type ResultStatus
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
@@ -20,6 +24,7 @@ export interface VueResultProps {
   status?: ResultStatus
   title?: string
   subTitle?: string
+  headingLevel?: ResultHeadingLevel
   className?: string
   style?: Record<string, string | number>
 }
@@ -40,6 +45,10 @@ export const Result = defineComponent({
       type: String,
       default: undefined
     },
+    headingLevel: {
+      type: Number as PropType<ResultHeadingLevel>,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -53,22 +62,30 @@ export const Result = defineComponent({
     const colors = computed(() => getResultColorScheme(props.status))
     const iconPath = computed(() => getResultIconPath(props.status))
     const httpLabel = computed(() => (isHttpResultStatus(props.status) ? props.status : undefined))
-
-    const iconContainerClasses = computed(() =>
-      classNames(resultIconContainerBaseClasses, colors.value.iconBg)
-    )
+    const headingTag = computed(() => resultHeadingTag(props.headingLevel))
 
     const iconSvgClasses = computed(() => classNames(resultIconClasses, colors.value.iconColor))
-
-    const titleCls = computed(() => classNames(resultTitleClasses, colors.value.titleColor))
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const children = []
+      const hasTitle = Boolean(props.title || slots.title)
 
-      // Icon area
       if (slots.icon) {
-        children.push(h('div', { class: iconContainerClasses.value }, slots.icon()))
+        children.push(
+          h(
+            'div',
+            {
+              class: resultIconContainerBaseClasses,
+              style: {
+                width: `${RESULT_ICON_SIZE_PX}px`,
+                height: `${RESULT_ICON_SIZE_PX}px`,
+                background: colors.value.iconBg
+              }
+            },
+            slots.icon()
+          )
+        )
       } else {
         const iconContent = []
 
@@ -77,26 +94,47 @@ export const Result = defineComponent({
             h(
               'span',
               {
-                class: classNames('text-5xl font-bold', colors.value.iconColor)
+                class: classNames(resultHttpLabelClasses, colors.value.iconColor),
+                'aria-hidden': hasTitle ? 'true' : undefined
               },
               httpLabel.value
             )
           )
         } else {
-          iconContent.push(createStatusIcon(iconPath.value, iconSvgClasses.value))
+          iconContent.push(
+            createStatusIcon(iconPath.value, iconSvgClasses.value, {
+              'aria-hidden': 'true',
+              focusable: 'false'
+            })
+          )
         }
 
-        children.push(h('div', { class: iconContainerClasses.value }, iconContent))
-      }
-
-      // Title
-      if (props.title || slots.title) {
         children.push(
-          h('div', { class: titleCls.value }, slots.title ? slots.title() : props.title)
+          h(
+            'div',
+            {
+              class: resultIconContainerBaseClasses,
+              style: {
+                width: `${RESULT_ICON_SIZE_PX}px`,
+                height: `${RESULT_ICON_SIZE_PX}px`,
+                background: colors.value.iconBg
+              }
+            },
+            iconContent
+          )
         )
       }
 
-      // SubTitle
+      if (hasTitle) {
+        children.push(
+          h(
+            headingTag.value,
+            { class: resultTitleClasses },
+            slots.title ? slots.title() : props.title
+          )
+        )
+      }
+
       if (props.subTitle || slots.subTitle) {
         children.push(
           h(
@@ -107,12 +145,10 @@ export const Result = defineComponent({
         )
       }
 
-      // Extra content (actions)
       if (slots.extra) {
         children.push(h('div', { class: resultExtraClasses }, slots.extra()))
       }
 
-      // Default slot (body content below extra)
       if (slots.default) {
         children.push(h('div', { class: 'mt-6 w-full' }, slots.default()))
       }
@@ -126,8 +162,7 @@ export const Result = defineComponent({
             props.className,
             coerceClassValue(attrsRecord.class)
           ),
-          style: mergeStyleValues(attrsRecord.style, props.style),
-          role: 'status'
+          style: mergeStyleValues(attrsRecord.style, props.style)
         },
         children
       )

@@ -4,20 +4,34 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import React from 'react'
+import React, { createRef } from 'react'
+import { RESULT_ICON_SIZE_PX } from '@expcat/tigercat-core'
 import { Result } from '@expcat/tigercat-react/Result'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Result (React)', () => {
   describe('Rendering', () => {
-    it('renders with role=status', () => {
-      render(<Result status="success" title="Done" />)
+    it('does not use a live region by default', () => {
+      const { container } = render(<Result status="success" title="Done" />)
+      expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
+      expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    })
+
+    it('lets the caller opt into a role', () => {
+      render(<Result status="success" title="Done" role="status" />)
       expect(screen.getByRole('status')).toBeInTheDocument()
     })
 
-    it('renders title', () => {
+    it('renders title as a heading', () => {
       render(<Result title="Operation Complete" />)
-      expect(screen.getByText('Operation Complete')).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: 'Operation Complete', level: 2 })
+      ).toBeInTheDocument()
+    })
+
+    it('honors headingLevel', () => {
+      render(<Result title="Done" headingLevel={3} />)
+      expect(screen.getByRole('heading', { name: 'Done', level: 3 })).toBeInTheDocument()
     })
 
     it('renders subTitle', () => {
@@ -28,6 +42,12 @@ describe('Result (React)', () => {
     it('renders icon area', () => {
       const { container } = render(<Result status="success" />)
       expect(container.querySelector('svg')).toBeInTheDocument()
+    })
+
+    it('forwards ref to the root', () => {
+      const ref = createRef<HTMLDivElement>()
+      render(<Result ref={ref} title="Done" />)
+      expect(ref.current).toBeInstanceOf(HTMLDivElement)
     })
   })
 
@@ -47,42 +67,51 @@ describe('Result (React)', () => {
       expect(screen.getByText('Info')).toBeInTheDocument()
     })
 
-    it('renders 404 status with HTTP label', () => {
+    it('renders 404 digits and hides them when a title is present', () => {
       render(<Result status="404" title="Not Found" />)
-      expect(screen.getByText('404')).toBeInTheDocument()
-      expect(screen.getByText('Not Found')).toBeInTheDocument()
+      const digits = screen.getByText('404')
+      expect(digits).toHaveAttribute('aria-hidden', 'true')
+      expect(screen.getByRole('heading', { name: 'Not Found' })).toBeInTheDocument()
     })
 
-    it('renders 403 status', () => {
-      render(<Result status="403" title="Forbidden" />)
-      expect(screen.getByText('403')).toBeInTheDocument()
+    it('keeps HTTP digits as the visible name when there is no title', () => {
+      render(<Result status="404" />)
+      const digits = screen.getByText('404')
+      expect(digits).not.toHaveAttribute('aria-hidden')
     })
 
-    it('renders 500 status', () => {
-      render(<Result status="500" title="Server Error" />)
-      expect(screen.getByText('500')).toBeInTheDocument()
+    it('does not throw on an unknown status', () => {
+      expect(() => render(<Result status={'foo' as 'info'} title="Fallback" />)).not.toThrow()
+      expect(screen.getByRole('heading', { name: 'Fallback' })).toBeInTheDocument()
     })
 
-    it('renders the six-status gallery including 403 and 500', () => {
-      const statuses = ['info', 'warning', 'error', '404', '403', '500'] as const
+    it('renders the status gallery including success', () => {
+      const statuses = ['success', 'info', 'warning', 'error', '404', '403', '500'] as const
       render(
         <>
           {statuses.map((status) => (
             <Result
               key={status}
               status={status}
-              title={`状态：${status}`}
+              title={status.startsWith('4') || status === '500' ? undefined : status}
               subTitle="状态决定图标与配色"
             />
           ))}
         </>
       )
-      for (const status of statuses) {
-        expect(screen.getByText(`状态：${status}`)).toBeInTheDocument()
-      }
+      expect(screen.getByRole('heading', { name: 'success' })).toBeInTheDocument()
       expect(screen.getByText('403')).toBeInTheDocument()
       expect(screen.getByText('500')).toBeInTheDocument()
       expect(screen.getByText('404')).toBeInTheDocument()
+    })
+  })
+
+  describe('Icon geometry', () => {
+    it('keeps the icon container square', () => {
+      const { container } = render(<Result status="404" />)
+      const circle = container.querySelector('span')?.parentElement as HTMLElement
+      expect(circle.style.width).toBe(`${RESULT_ICON_SIZE_PX}px`)
+      expect(circle.style.height).toBe(circle.style.width)
     })
   })
 
@@ -113,9 +142,27 @@ describe('Result (React)', () => {
       expect(container.firstElementChild).toHaveClass('my-result')
     })
   })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Result />)
+    it('hides the default status SVG', () => {
+      const { container } = render(<Result status="success" title="Done" />)
+      expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('should have no accessibility violations for titled, empty, and a gallery', async () => {
+      const { container, rerender } = render(<Result status="success" title="提交成功" />)
+      await expectNoA11yViolationsIsolated(container)
+
+      rerender(<Result />)
+      await expectNoA11yViolationsIsolated(container)
+
+      rerender(
+        <div>
+          <Result status="success" title="A" />
+          <Result status="error" title="B" />
+          <Result status="404" />
+        </div>
+      )
       await expectNoA11yViolationsIsolated(container)
     })
   })

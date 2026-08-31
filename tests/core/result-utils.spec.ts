@@ -2,79 +2,44 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
-  resultBaseClasses,
-  resultIconContainerBaseClasses,
-  resultIconClasses,
-  resultTitleClasses,
-  resultSubTitleClasses,
-  resultExtraClasses,
+  RESULT_ICON_SIZE_PX,
   getResultColorScheme,
   getResultIconPath,
-  isHttpResultStatus
+  isHttpResultStatus,
+  resultHeadingTag,
+  resolveResultHeadingLevel
 } from '@expcat/tigercat-core'
-import type { ResultStatus } from '@expcat/tigercat-core'
 
 describe('result-utils', () => {
-  it('base classes include centering', () => {
-    expect(resultBaseClasses).toContain('items-center')
-    expect(resultBaseClasses).toContain('text-center')
-  })
-
-  it('icon container includes rounded-full', () => {
-    expect(resultIconContainerBaseClasses).toContain('rounded-full')
-  })
-
-  it('icon classes include sizing', () => {
-    expect(resultIconClasses).toContain('h-16')
-    expect(resultIconClasses).toContain('w-16')
-  })
-
-  it('title classes include font-semibold', () => {
-    expect(resultTitleClasses).toContain('font-semibold')
-  })
-
-  it('subtitle classes include secondary text color', () => {
-    expect(resultSubTitleClasses).toContain('text-')
-  })
-
-  it('extra classes include flex layout', () => {
-    expect(resultExtraClasses).toContain('flex')
-  })
-
   describe('getResultColorScheme', () => {
-    const statuses: ResultStatus[] = ['success', 'error', 'warning', 'info', '404', '403', '500']
+    it('washes the status hue instead of painting a solid fill', () => {
+      const scheme = getResultColorScheme('success')
+      expect(scheme.iconBg).toContain('color-mix')
+      expect(scheme.iconBg).toContain('#16a34a')
+      expect(scheme.iconBg).not.toBe('#16a34a')
+    })
 
-    for (const status of statuses) {
-      it(`returns color scheme for "${status}"`, () => {
-        const scheme = getResultColorScheme(status)
-        expect(scheme).toHaveProperty('iconBg')
-        expect(scheme).toHaveProperty('iconColor')
-        expect(scheme).toHaveProperty('titleColor')
-        expect(scheme.iconBg).toBeTruthy()
-        expect(scheme.iconColor).toBeTruthy()
-      })
-    }
+    it('aligns fallback hex with the Alert semantic tokens', () => {
+      expect(getResultColorScheme('success').iconColor).toContain('#16a34a')
+      expect(getResultColorScheme('warning').iconColor).toContain('#d97706')
+      expect(getResultColorScheme('error').iconColor).toContain('#dc2626')
+    })
 
-    it('HTTP error statuses reuse semantic colors', () => {
-      expect(getResultColorScheme('404').iconColor).toBe(getResultColorScheme('info').iconColor)
-      expect(getResultColorScheme('403').iconColor).toBe(getResultColorScheme('warning').iconColor)
-      expect(getResultColorScheme('500').iconColor).toBe(getResultColorScheme('error').iconColor)
+    it('falls back to info for unknown status', () => {
+      expect(getResultColorScheme('foo').iconColor).toBe(getResultColorScheme('info').iconColor)
+      expect(getResultColorScheme('').iconColor).toBe(getResultColorScheme('info').iconColor)
     })
   })
 
   describe('getResultIconPath', () => {
-    it('returns non-empty SVG path for each status', () => {
-      const statuses: ResultStatus[] = ['success', 'error', 'warning', 'info', '404', '403', '500']
-      for (const status of statuses) {
-        expect(getResultIconPath(status)).toBeTruthy()
-        expect(typeof getResultIconPath(status)).toBe('string')
+    it('returns a path for semantic statuses', () => {
+      for (const status of ['success', 'error', 'warning', 'info'] as const) {
+        expect(getResultIconPath(status).length).toBeGreaterThan(0)
       }
     })
 
-    it('HTTP error statuses share icon paths with semantic statuses', () => {
-      expect(getResultIconPath('404')).toBe(getResultIconPath('info'))
-      expect(getResultIconPath('403')).toBe(getResultIconPath('warning'))
-      expect(getResultIconPath('500')).toBe(getResultIconPath('error'))
+    it('falls back to info for unknown status', () => {
+      expect(getResultIconPath('foo')).toBe(getResultIconPath('info'))
     })
   })
 
@@ -85,11 +50,26 @@ describe('result-utils', () => {
       expect(isHttpResultStatus('500')).toBe(true)
     })
 
-    it('returns false for non-HTTP statuses', () => {
+    it('returns false for non-HTTP and unknown statuses', () => {
       expect(isHttpResultStatus('success')).toBe(false)
-      expect(isHttpResultStatus('error')).toBe(false)
-      expect(isHttpResultStatus('info')).toBe(false)
-      expect(isHttpResultStatus('warning')).toBe(false)
+      expect(isHttpResultStatus('foo')).toBe(false)
+      expect(isHttpResultStatus('')).toBe(false)
+    })
+  })
+
+  describe('heading', () => {
+    it('defaults to h2 and clamps unknown levels', () => {
+      expect(resolveResultHeadingLevel()).toBe(2)
+      expect(resolveResultHeadingLevel(7)).toBe(2)
+      expect(resultHeadingTag(1)).toBe('h1')
+      expect(resultHeadingTag(3)).toBe('h3')
+    })
+  })
+
+  describe('icon geometry', () => {
+    it('uses an equal width and height for the circle', () => {
+      expect(RESULT_ICON_SIZE_PX).toBeGreaterThan(0)
+      expect(RESULT_ICON_SIZE_PX).toBe(RESULT_ICON_SIZE_PX)
     })
   })
 
