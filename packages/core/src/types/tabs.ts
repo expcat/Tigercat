@@ -30,7 +30,7 @@ export interface TabsProps {
    */
   defaultActiveKey?: string | number
   /**
-   * Tab type - line, card, or editable-card
+   * Tab type: `'line' | 'card' | 'editable-card' | 'pills'`
    * @default 'line'
    */
   type?: TabType
@@ -45,7 +45,8 @@ export interface TabsProps {
    */
   size?: TabSize
   /**
-   * Whether tabs can be closed (only works with editable-card type)
+   * Root close switch. Only draws close buttons when `type` is `'editable-card'`.
+   * Pane-level `closable` still draws a close button on any type.
    * @default false
    */
   closable?: boolean
@@ -66,8 +67,10 @@ export interface TabsProps {
    */
   lazy?: boolean
   /**
-   * Whether horizontal touch swipes switch tabs.
-   * @default true
+   * Whether touch swipes switch tabs. Off by default so nested scrollers
+   * keep their gesture. Horizontal tabs follow `dir`; vertical tabs use
+   * the block axis. Pass `true` only when the panel is swipe-safe.
+   * @default false
    */
   swipeable?: boolean
   /**
@@ -113,16 +116,6 @@ export interface TabPaneProps {
    * Custom styles
    */
   style?: Record<string, string | number>
-}
-
-/**
- * Tab change event info
- */
-export interface TabChangeInfo {
-  /**
-   * The key of the newly activated tab
-   */
-  activeKey: string | number
 }
 
 /**

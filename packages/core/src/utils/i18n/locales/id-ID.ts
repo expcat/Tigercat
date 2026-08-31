@@ -103,7 +103,9 @@ export const idID: TigerLocale = {
     prevPageAriaLabel: 'Halaman sebelumnya',
     nextPageAriaLabel: 'Halaman berikutnya',
     pageAriaLabel: 'Halaman {page}',
-    pageIndicatorText: 'Halaman {current} dari {total}'
+    pageIndicatorText: 'Halaman {current} dari {total}',
+    paginationAriaLabel: 'Paginasi',
+    pageSizeAriaLabel: 'Item per halaman'
   },
   table: {
     emptyText: 'Tidak ada data',
@@ -312,7 +314,8 @@ export const idID: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'Tambah tab',
-    closeTabAriaLabel: 'Tutup {label}'
+    closeTabAriaLabel: 'Tutup {label}',
+    tablistAriaLabel: 'Tab'
   },
   rate: {
     ariaLabel: 'Peringkat',
@@ -484,6 +487,20 @@ export const idID: TigerLocale = {
     deleteText: 'Hapus',
     decimalAriaLabel: 'Pemisah desimal',
     idCardXAriaLabel: 'KTP X'
+  },
+  breadcrumb: {
+    ariaLabel: 'Jejak navigasi',
+    expandAriaLabel: 'Tampilkan item yang dilipat'
+  },
+  pageHeader: {
+    backAriaLabel: 'Kembali'
+  },
+  steps: {
+    ariaLabel: 'Langkah',
+    waitStatus: 'Menunggu',
+    processStatus: 'Berjalan',
+    finishStatus: 'Selesai',
+    errorStatus: 'Kesalahan'
   },
   tree: {
     ariaLabel: 'Pohon',

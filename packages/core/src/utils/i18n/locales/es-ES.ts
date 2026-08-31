@@ -103,7 +103,9 @@ export const esES: TigerLocale = {
     prevPageAriaLabel: 'Página anterior',
     nextPageAriaLabel: 'Página siguiente',
     pageAriaLabel: 'Página {page}',
-    pageIndicatorText: 'Página {current} de {total}'
+    pageIndicatorText: 'Página {current} de {total}',
+    paginationAriaLabel: 'Paginación',
+    pageSizeAriaLabel: 'Elementos por página'
   },
   table: {
     emptyText: 'Sin datos',
@@ -312,7 +314,8 @@ export const esES: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'Añadir pestaña',
-    closeTabAriaLabel: 'Cerrar {label}'
+    closeTabAriaLabel: 'Cerrar {label}',
+    tablistAriaLabel: 'Pestañas'
   },
   rate: {
     ariaLabel: 'Valoración',
@@ -485,6 +488,20 @@ export const esES: TigerLocale = {
     deleteText: 'Borrar',
     decimalAriaLabel: 'Separador decimal',
     idCardXAriaLabel: 'X del DNI'
+  },
+  breadcrumb: {
+    ariaLabel: 'Migas de pan',
+    expandAriaLabel: 'Mostrar elementos plegados'
+  },
+  pageHeader: {
+    backAriaLabel: 'Atrás'
+  },
+  steps: {
+    ariaLabel: 'Pasos',
+    waitStatus: 'Pendiente',
+    processStatus: 'Actual',
+    finishStatus: 'Completado',
+    errorStatus: 'Error de paso'
   },
   tree: {
     ariaLabel: 'Árbol',

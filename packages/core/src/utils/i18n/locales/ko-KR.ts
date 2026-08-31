@@ -103,7 +103,9 @@ export const koKR: TigerLocale = {
     prevPageAriaLabel: '이전 페이지',
     nextPageAriaLabel: '다음 페이지',
     pageAriaLabel: '{page} 페이지',
-    pageIndicatorText: '전체 {total}페이지 중 {current}페이지'
+    pageIndicatorText: '전체 {total}페이지 중 {current}페이지',
+    paginationAriaLabel: '페이지네이션',
+    pageSizeAriaLabel: '페이지당 항목 수'
   },
   table: {
     emptyText: '데이터 없음',
@@ -312,7 +314,8 @@ export const koKR: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: '탭 추가',
-    closeTabAriaLabel: '{label} 닫기'
+    closeTabAriaLabel: '{label} 닫기',
+    tablistAriaLabel: '탭'
   },
   rate: {
     ariaLabel: '평점',
@@ -484,6 +487,20 @@ export const koKR: TigerLocale = {
     deleteText: '삭제',
     decimalAriaLabel: '소수점',
     idCardXAriaLabel: '신분증 X'
+  },
+  breadcrumb: {
+    ariaLabel: '탐색 경로',
+    expandAriaLabel: '접힌 탐색 경로 표시'
+  },
+  pageHeader: {
+    backAriaLabel: '뒤로'
+  },
+  steps: {
+    ariaLabel: '단계',
+    waitStatus: '대기',
+    processStatus: '진행 중',
+    finishStatus: '완료',
+    errorStatus: '오류'
   },
   tree: {
     ariaLabel: '트리',

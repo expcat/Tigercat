@@ -103,7 +103,9 @@ export const jaJP: TigerLocale = {
     prevPageAriaLabel: '前のページ',
     nextPageAriaLabel: '次のページ',
     pageAriaLabel: '{page} ページ',
-    pageIndicatorText: '全 {total} ページ中 {current} ページ'
+    pageIndicatorText: '全 {total} ページ中 {current} ページ',
+    paginationAriaLabel: 'ページネーション',
+    pageSizeAriaLabel: 'ページあたりの件数'
   },
   table: {
     emptyText: 'データなし',
@@ -312,7 +314,8 @@ export const jaJP: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'タブを追加',
-    closeTabAriaLabel: '{label} を閉じる'
+    closeTabAriaLabel: '{label} を閉じる',
+    tablistAriaLabel: 'タブ'
   },
   rate: {
     ariaLabel: '評価',
@@ -484,6 +487,20 @@ export const jaJP: TigerLocale = {
     deleteText: '削除',
     decimalAriaLabel: '小数点',
     idCardXAriaLabel: 'IDカードのX'
+  },
+  breadcrumb: {
+    ariaLabel: 'パンくず',
+    expandAriaLabel: '折りたたまれたパンくずを表示'
+  },
+  pageHeader: {
+    backAriaLabel: '戻る'
+  },
+  steps: {
+    ariaLabel: 'ステップ',
+    waitStatus: '待機',
+    processStatus: '進行中',
+    finishStatus: '完了',
+    errorStatus: 'エラー'
   },
   tree: {
     ariaLabel: 'ツリー',

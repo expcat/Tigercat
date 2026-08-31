@@ -102,7 +102,9 @@ export const enUS: TigerLocale = {
     prevPageAriaLabel: 'Previous page',
     nextPageAriaLabel: 'Next page',
     pageAriaLabel: 'Page {page}',
-    pageIndicatorText: 'Page {current} of {total}'
+    pageIndicatorText: 'Page {current} of {total}',
+    paginationAriaLabel: 'Pagination',
+    pageSizeAriaLabel: 'Items per page'
   },
   table: {
     emptyText: 'No data',
@@ -315,7 +317,8 @@ export const enUS: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'Add tab',
-    closeTabAriaLabel: 'Close {label}'
+    closeTabAriaLabel: 'Close {label}',
+    tablistAriaLabel: 'Tabs'
   },
   rate: {
     ariaLabel: 'Rating',
@@ -487,6 +490,20 @@ export const enUS: TigerLocale = {
     deleteText: 'Delete',
     decimalAriaLabel: 'Decimal',
     idCardXAriaLabel: 'ID card X'
+  },
+  breadcrumb: {
+    ariaLabel: 'Breadcrumb',
+    expandAriaLabel: 'Show collapsed breadcrumb items'
+  },
+  pageHeader: {
+    backAriaLabel: 'Back'
+  },
+  steps: {
+    ariaLabel: 'Steps',
+    waitStatus: 'Pending',
+    processStatus: 'Current',
+    finishStatus: 'Completed',
+    errorStatus: 'Error'
   },
   tree: {
     ariaLabel: 'Tree',

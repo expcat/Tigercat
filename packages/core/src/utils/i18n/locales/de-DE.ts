@@ -103,7 +103,9 @@ export const deDE: TigerLocale = {
     prevPageAriaLabel: 'Vorherige Seite',
     nextPageAriaLabel: 'Nächste Seite',
     pageAriaLabel: 'Seite {page}',
-    pageIndicatorText: 'Seite {current} von {total}'
+    pageIndicatorText: 'Seite {current} von {total}',
+    paginationAriaLabel: 'Paginierung',
+    pageSizeAriaLabel: 'Elemente pro Seite'
   },
   table: {
     emptyText: 'Keine Daten',
@@ -312,7 +314,8 @@ export const deDE: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'Tab hinzufügen',
-    closeTabAriaLabel: '{label} schließen'
+    closeTabAriaLabel: '{label} schließen',
+    tablistAriaLabel: 'Registerkarten'
   },
   rate: {
     ariaLabel: 'Bewertung',
@@ -485,6 +488,20 @@ export const deDE: TigerLocale = {
     deleteText: 'Löschen',
     decimalAriaLabel: 'Dezimalzeichen',
     idCardXAriaLabel: 'Ausweis-X'
+  },
+  breadcrumb: {
+    ariaLabel: 'Brotkrumen',
+    expandAriaLabel: 'Eingeklappte Brotkrumen anzeigen'
+  },
+  pageHeader: {
+    backAriaLabel: 'Zurück'
+  },
+  steps: {
+    ariaLabel: 'Schritte',
+    waitStatus: 'Ausstehend',
+    processStatus: 'Aktuell',
+    finishStatus: 'Abgeschlossen',
+    errorStatus: 'Fehler'
   },
   tree: {
     ariaLabel: 'Baum',

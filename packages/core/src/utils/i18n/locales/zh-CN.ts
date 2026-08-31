@@ -102,7 +102,9 @@ export const zhCN: TigerLocale = {
     prevPageAriaLabel: '上一页',
     nextPageAriaLabel: '下一页',
     pageAriaLabel: '第 {page} 页',
-    pageIndicatorText: '第 {current} 页，共 {total} 页'
+    pageIndicatorText: '第 {current} 页，共 {total} 页',
+    paginationAriaLabel: '分页',
+    pageSizeAriaLabel: '每页条数'
   },
   table: {
     emptyText: '暂无数据',
@@ -315,7 +317,8 @@ export const zhCN: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: '新增标签页',
-    closeTabAriaLabel: '关闭{label}'
+    closeTabAriaLabel: '关闭{label}',
+    tablistAriaLabel: '标签页'
   },
   rate: {
     ariaLabel: '评分',
@@ -487,6 +490,20 @@ export const zhCN: TigerLocale = {
     deleteText: '删除',
     decimalAriaLabel: '小数点',
     idCardXAriaLabel: '身份证 X'
+  },
+  breadcrumb: {
+    ariaLabel: '面包屑',
+    expandAriaLabel: '显示折叠的面包屑项'
+  },
+  pageHeader: {
+    backAriaLabel: '返回'
+  },
+  steps: {
+    ariaLabel: '步骤',
+    waitStatus: '等待',
+    processStatus: '进行中',
+    finishStatus: '已完成',
+    errorStatus: '错误'
   },
   tree: {
     ariaLabel: '树',

@@ -6,7 +6,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { TabPane, Tabs } from '@expcat/tigercat-vue/Tabs'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
+import { zhTW } from '../../packages/core/src/utils/i18n/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Tabs', () => {
   describe('Rendering', () => {
@@ -132,9 +135,9 @@ describe('Tabs', () => {
       expect(screen.getByText('Content 2')).toBeVisible()
     })
 
-    it('should move the line indicator with transform when activeKey changes', async () => {
-      const { container, rerender } = render(Tabs, {
-        props: { activeKey: '1' },
+    it('keeps a line indicator in the tablist without making it a control', () => {
+      const { container } = render(Tabs, {
+        props: { activeKey: '3' },
         slots: {
           default: () => [
             h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
@@ -143,29 +146,46 @@ describe('Tabs', () => {
           ]
         }
       })
+      const tablist = screen.getByRole('tablist')
       const indicator = container.querySelector('[data-tiger-tabs-indicator]')
-
-      expect(indicator).toHaveStyle({ transform: 'translateX(0%)' })
-      expect(indicator).toHaveStyle({ width: 'calc(100% / 3)' })
-
-      await rerender({ activeKey: '3' })
-      expect(indicator).toHaveStyle({ transform: 'translateX(200%)' })
+      expect(indicator).toHaveAttribute('aria-hidden', 'true')
+      expect(tablist.contains(indicator)).toBe(true)
+      expect(screen.getByRole('tab', { name: 'Tab 3', exact: true })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
     })
 
-    it('should use translateY for vertical line indicators', () => {
-      const { container } = render(Tabs, {
-        props: { activeKey: '2', tabPosition: 'left' },
+    it('matches number and string tab keys', () => {
+      render(Tabs, {
+        props: { activeKey: '1' },
         slots: {
           default: () => [
-            h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
-            h(TabPane, { tabKey: '2', label: 'Tab 2' }, () => 'Content 2')
+            h(TabPane, { tabKey: 1, label: 'Numeric' }, () => 'One'),
+            h(TabPane, { tabKey: '2', label: 'Text' }, () => 'Two')
           ]
         }
       })
+      expect(screen.getByRole('tab', { name: 'Numeric', exact: true })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
+    })
 
-      const indicator = container.querySelector('[data-tiger-tabs-indicator]')
-      expect(indicator).toHaveStyle({ transform: 'translateY(100%)' })
-      expect(indicator).toHaveStyle({ height: 'calc(100% / 2)' })
+    it('defaults to the first enabled tab when the first pane is disabled', () => {
+      render(Tabs, {
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Off', disabled: true }, () => 'Hidden'),
+            h(TabPane, { tabKey: '2', label: 'On' }, () => 'Visible')
+          ]
+        }
+      })
+      expect(screen.getByRole('tab', { name: 'On', exact: true })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
+      expect(screen.getByRole('tab', { name: 'On', exact: true })).toHaveAttribute('tabindex', '0')
     })
 
     it('should respect defaultActiveKey prop in uncontrolled mode', () => {
@@ -192,8 +212,7 @@ describe('Tabs', () => {
         }
       })
 
-      const navList = container.querySelector('[role="tablist"] > div')
-      expect(navList).toHaveClass('justify-center')
+      expect(screen.getByRole('tablist')).toHaveClass('justify-center')
     })
 
     it('should render tabs in different sizes', () => {
@@ -218,7 +237,7 @@ describe('Tabs', () => {
       const onChange = vi.fn()
 
       render(Tabs, {
-        props: { defaultActiveKey: '1', onChange },
+        props: { defaultActiveKey: '1', swipeable: true, onChange },
         slots: {
           default: () => [
             h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
@@ -328,7 +347,7 @@ describe('Tabs', () => {
       expect(onEdit).toHaveBeenCalledWith({ targetKey: '1', action: 'remove' })
     })
 
-    it('renders the close control as a real button nested in a non-button tab (C06-3)', () => {
+    it('renders the close control as a real button outside the tab', () => {
       render(Tabs, {
         props: { type: 'editable-card', closable: true },
         slots: {
@@ -337,10 +356,11 @@ describe('Tabs', () => {
       })
 
       const closeButton = screen.getByRole('button', { name: 'Close Tab 1' })
+      const tab = screen.getByRole('tab', { name: 'Tab 1', exact: true })
       expect(closeButton.tagName).toBe('BUTTON')
-      const tab = screen.getByRole('tab', { name: 'Tab 1' })
-      expect(tab.tagName).not.toBe('BUTTON')
-      expect(tab.contains(closeButton)).toBe(true)
+      expect(tab.tagName).toBe('BUTTON')
+      expect(tab.contains(closeButton)).toBe(false)
+      expect(closeButton.closest('[role="tablist"]')).toBeNull()
     })
 
     it('does not select the tab when its close control is clicked (C06-3)', async () => {
@@ -704,13 +724,41 @@ describe('Tabs', () => {
       const tab1 = screen.getByRole('tab', { name: 'Tab 1' })
       const tab2 = screen.getByRole('tab', { name: 'Tab 2' })
 
-      expect(tab1).toHaveAttribute('aria-disabled', 'false')
+      expect(tab1).not.toHaveAttribute('aria-disabled')
       expect(tab2).toHaveAttribute('aria-disabled', 'true')
     })
 
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Tabs)
-      await expectNoA11yViolationsIsolated(container)
+    it('keeps the add button outside the tablist and names tabs without the close suffix', async () => {
+      const { container } = render({
+        render: () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(Tabs, { type: 'editable-card', closable: true }, () => [
+              h(TabPane, { tabKey: '1', label: '概览' }, () => 'Content 1'),
+              h(TabPane, { tabKey: '2', label: '详情', disabled: true }, () => 'Content 2')
+            ])
+          )
+      })
+
+      const tablist = screen.getByRole('tablist')
+      expect(screen.getByRole('tab', { name: '概览', exact: true })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '关闭概览' })).toBeInTheDocument()
+      const add = screen.getByRole('button', { name: '新增标签页' })
+      expect(add.closest('[role="tablist"]')).toBeNull()
+      expect(tablist.contains(add)).toBe(false)
+      await expectNoA11yViolations(container)
+    })
+
+    it('localizes the tablist from an official zhTW locale object', () => {
+      render({
+        render: () =>
+          h(ConfigProvider, { locale: zhTW }, () =>
+            h(Tabs, { type: 'editable-card', closable: true }, () => [
+              h(TabPane, { tabKey: '1', label: '概覽' }, () => 'Content')
+            ])
+          )
+      })
+      expect(screen.getByRole('tablist', { name: '標籤頁' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '新增分頁' })).toBeInTheDocument()
     })
   })
 

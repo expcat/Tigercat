@@ -103,7 +103,9 @@ export const viVN: TigerLocale = {
     prevPageAriaLabel: 'Trang trước',
     nextPageAriaLabel: 'Trang sau',
     pageAriaLabel: 'Trang {page}',
-    pageIndicatorText: 'Trang {current} / {total}'
+    pageIndicatorText: 'Trang {current} / {total}',
+    paginationAriaLabel: 'Phân trang',
+    pageSizeAriaLabel: 'Số mục mỗi trang'
   },
   table: {
     emptyText: 'Không có dữ liệu',
@@ -312,7 +314,8 @@ export const viVN: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'Thêm tab',
-    closeTabAriaLabel: 'Đóng {label}'
+    closeTabAriaLabel: 'Đóng {label}',
+    tablistAriaLabel: 'Thẻ'
   },
   rate: {
     ariaLabel: 'Đánh giá',
@@ -484,6 +487,20 @@ export const viVN: TigerLocale = {
     deleteText: 'Xóa',
     decimalAriaLabel: 'Dấu thập phân',
     idCardXAriaLabel: 'CCCD X'
+  },
+  breadcrumb: {
+    ariaLabel: 'Đường dẫn',
+    expandAriaLabel: 'Hiện các mục đã thu gọn'
+  },
+  pageHeader: {
+    backAriaLabel: 'Quay lại'
+  },
+  steps: {
+    ariaLabel: 'Các bước',
+    waitStatus: 'Đang chờ',
+    processStatus: 'Hiện tại',
+    finishStatus: 'Hoàn tất',
+    errorStatus: 'Lỗi'
   },
   tree: {
     ariaLabel: 'Cây',

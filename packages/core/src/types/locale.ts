@@ -146,8 +146,10 @@ export interface TigerLocaleUpload {
 export interface TigerLocalePagination {
   /** Total text template: supports {total}, {start}, {end} */
   totalText?: string
-  /** Items per page text */
+  /** Items per page option suffix */
   itemsPerPageText?: string
+  /** Accessible name for the page-size control */
+  pageSizeAriaLabel?: string
   /** Quick jumper label */
   jumpToText?: string
   /** Page text (after number) */
@@ -160,6 +162,8 @@ export interface TigerLocalePagination {
   pageAriaLabel?: string
   /** Simple pagination page indicator template: supports {current}, {total} */
   pageIndicatorText?: string
+  /** Default pagination landmark name */
+  paginationAriaLabel?: string
 }
 
 export interface TigerLocaleTable {
@@ -427,6 +431,29 @@ export interface TigerLocaleTabs {
   addTabAriaLabel?: string
   /** Template: supports {label} */
   closeTabAriaLabel?: string
+  /** Default tablist accessible name when none is passed */
+  tablistAriaLabel?: string
+}
+
+export interface TigerLocaleBreadcrumb {
+  /** Default breadcrumb landmark name */
+  ariaLabel?: string
+  /** Ellipsis button that expands collapsed items */
+  expandAriaLabel?: string
+}
+
+export interface TigerLocalePageHeader {
+  /** Default back-control accessible name */
+  backAriaLabel?: string
+}
+
+export interface TigerLocaleSteps {
+  /** Default steps list accessible name */
+  ariaLabel?: string
+  waitStatus?: string
+  processStatus?: string
+  finishStatus?: string
+  errorStatus?: string
 }
 
 export interface TigerLocaleRate {
@@ -724,6 +751,9 @@ export interface TigerLocale {
   select?: TigerLocaleSelect
   colorPicker?: TigerLocaleColorPicker
   tabs?: TigerLocaleTabs
+  breadcrumb?: TigerLocaleBreadcrumb
+  pageHeader?: TigerLocalePageHeader
+  steps?: TigerLocaleSteps
   rate?: TigerLocaleRate
   avatarGroup?: TigerLocaleAvatarGroup
   carousel?: TigerLocaleCarousel

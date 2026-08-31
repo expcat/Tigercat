@@ -103,7 +103,9 @@ export const thTH: TigerLocale = {
     prevPageAriaLabel: 'หน้าก่อนหน้า',
     nextPageAriaLabel: 'หน้าถัดไป',
     pageAriaLabel: 'หน้า {page}',
-    pageIndicatorText: 'หน้า {current} จาก {total}'
+    pageIndicatorText: 'หน้า {current} จาก {total}',
+    paginationAriaLabel: 'การแบ่งหน้า',
+    pageSizeAriaLabel: 'รายการต่อหน้า'
   },
   table: {
     emptyText: 'ไม่มีข้อมูล',
@@ -312,7 +314,8 @@ export const thTH: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'เพิ่มแท็บ',
-    closeTabAriaLabel: 'ปิด {label}'
+    closeTabAriaLabel: 'ปิด {label}',
+    tablistAriaLabel: 'แท็บ'
   },
   rate: {
     ariaLabel: 'คะแนน',
@@ -484,6 +487,20 @@ export const thTH: TigerLocale = {
     deleteText: 'ลบ',
     decimalAriaLabel: 'จุดทศนิยม',
     idCardXAriaLabel: 'บัตรประชาชน X'
+  },
+  breadcrumb: {
+    ariaLabel: 'เส้นทางนำทาง',
+    expandAriaLabel: 'แสดงรายการที่ยุบ'
+  },
+  pageHeader: {
+    backAriaLabel: 'ย้อนกลับ'
+  },
+  steps: {
+    ariaLabel: 'ขั้นตอน',
+    waitStatus: 'รอดำเนินการ',
+    processStatus: 'กำลังดำเนินการ',
+    finishStatus: 'เสร็จสิ้น',
+    errorStatus: 'ข้อผิดพลาด'
   },
   tree: {
     ariaLabel: 'ต้นไม้',

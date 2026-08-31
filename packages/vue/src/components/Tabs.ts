@@ -2,49 +2,65 @@ import {
   defineComponent,
   computed,
   ref,
-  watch,
   provide,
   inject,
   PropType,
   h,
-  Fragment,
-  getCurrentInstance,
+  useId,
+  watch,
+  onMounted,
+  onBeforeUnmount,
   type VNode,
   type Component
 } from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   closeIconPathD,
   closeIconViewBox,
   getTabsContainerClasses,
   getTabItemClasses,
   getTabNavClasses,
   getTabNavListClasses,
-  getTabNavListStyle,
   getTabPaneClasses,
   getTabIndicatorClasses,
-  getTabIndicatorStyle,
+  getTabIndicatorStyleFromBox,
+  getTabContentClasses,
+  getTabAddButtonClasses,
+  tabCloseButtonClasses,
   getGestureTouchPoint,
   resolveSwipeGesture,
   isKeyActive,
   getNextActiveKey,
+  getAdjacentEnabledKey,
+  getTabKeyboardDelta,
+  getTabSwipeDelta,
+  isSwipeBlockedByNestedScroll,
+  measureTabIndicatorBox,
+  formatTabKey,
+  parseTabKey,
+  resolveDisplayedActiveKey,
+  isTabPaneType,
+  isTabPaneChildProps,
+  readTabPaneKey,
+  pickTablistNamingAttrs,
   mergeTigerLocale,
   getTabsLabels,
-  tabAddButtonClasses,
-  tabCloseButtonClasses,
-  tabContentBaseClasses,
+  getLocaleDirection,
+  type TabRecord,
+  type TabIndicatorStyle,
   type TigerLocale,
   type TigerLocaleTabs,
   type TabType,
   type TabPosition,
   type TabSize
 } from '@expcat/tigercat-core'
+import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
 
-// Tabs context key
 export const TabsContextKey = Symbol('TabsContext')
 
-// Tabs context interface
 export interface TabsContext {
   activeKey: string | number | undefined
   type: TabType
@@ -60,6 +76,10 @@ export interface TabsContext {
   handleTabClose: (key: string | number, event: Event) => void
 }
 
+export function useTabsContext(): TabsContext | undefined {
+  return inject<TabsContext>(TabsContextKey)
+}
+
 export interface VueTabsProps {
   activeKey?: string | number
   defaultActiveKey?: string | number
@@ -69,12 +89,13 @@ export interface VueTabsProps {
   closable?: boolean
   centered?: boolean
   destroyInactiveTabPane?: boolean
-  /** Whether inactive tab panes are mounted lazily (on first activation) */
   lazy?: boolean
   swipeable?: boolean
   className?: string
   style?: Record<string, string | number>
 }
+
+export type TabsProps = VueTabsProps
 
 export interface VueTabPaneProps {
   tabKey: string | number
@@ -86,69 +107,51 @@ export interface VueTabPaneProps {
   style?: Record<string, string | number>
 }
 
+export type TabPaneProps = VueTabPaneProps
+
+function isTabPaneVNode(child: VNode, tabPane: unknown): boolean {
+  return (
+    isTabPaneType(child.type, tabPane) ||
+    isTabPaneChildProps((child.props ?? {}) as Record<string, unknown>)
+  )
+}
+
 export const TabPane = defineComponent({
   name: 'TigerTabPane',
+  inheritAttrs: false,
   props: {
-    /**
-     * Unique key for the tab pane (required)
-     */
     tabKey: {
       type: [String, Number] as PropType<string | number>,
       required: true
     },
-    /**
-     * Tab label/title
-     */
     label: {
       type: String,
       required: true
     },
-    /**
-     * Whether the tab is disabled
-     * @default false
-     */
     disabled: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether the tab can be closed (overrides parent closable)
-     */
     closable: {
       type: Boolean,
       default: undefined
     },
-    /**
-     * Icon for the tab
-     */
     icon: {
       type: [String, Object] as PropType<string | VNode>,
       default: undefined
     },
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String,
       default: undefined
     },
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     },
-    /**
-     * Render mode - 'tab' for tab item, 'pane' for content pane
-     * @internal
-     */
     renderMode: {
       type: String as PropType<'tab' | 'pane'>,
       default: 'pane'
     },
-
-    // Internal props for a11y + roving tabindex
     tabId: {
       type: String,
       default: undefined
@@ -162,55 +165,42 @@ export const TabPane = defineComponent({
       default: undefined
     }
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const tabsContext = inject<TabsContext>(TabsContextKey)
 
     if (!tabsContext) {
       throw new Error('TabPane must be used within a Tabs component')
     }
 
-    const isActive = computed(() => {
-      return isKeyActive(props.tabKey, tabsContext.activeKey)
-    })
-
+    const isActive = computed(() => isKeyActive(props.tabKey, tabsContext.activeKey))
     const hasBeenActivated = ref(isActive.value)
     watch(isActive, (val) => {
       if (val) hasBeenActivated.value = true
     })
 
-    const isClosable = computed(() => {
-      return props.closable !== undefined
+    const isClosable = computed(() =>
+      props.closable !== undefined
         ? props.closable
         : tabsContext.closable && tabsContext.type === 'editable-card'
-    })
+    )
 
-    const tabItemClasses = computed(() => {
-      return getTabItemClasses(isActive.value, props.disabled, tabsContext.type, tabsContext.size)
-    })
-
-    const tabPaneClasses = computed(() => {
-      return classNames(getTabPaneClasses(isActive.value), props.className)
-    })
+    const panelMounted = computed(() =>
+      tabsContext.lazy
+        ? hasBeenActivated.value && (isActive.value || !tabsContext.destroyInactiveTabPane)
+        : isActive.value || !tabsContext.destroyInactiveTabPane
+    )
 
     const handleClick = () => {
-      if (!props.disabled) {
-        tabsContext.handleTabClick(props.tabKey)
-      }
+      if (!props.disabled) tabsContext.handleTabClick(props.tabKey)
     }
 
     const handleClose = (event: Event) => {
-      // The close control is nested inside the tab; prevent the click from
-      // bubbling up and activating the tab it is closing.
       event.stopPropagation()
-      if (!props.disabled) {
-        tabsContext.handleTabClose(props.tabKey, event)
-      }
+      if (!props.disabled) tabsContext.handleTabClose(props.tabKey, event)
     }
 
     const handleKeydown = (event: KeyboardEvent) => {
-      if (props.disabled) {
-        return
-      }
+      if (props.disabled) return
 
       if (isClosable.value && (event.key === 'Backspace' || event.key === 'Delete')) {
         event.preventDefault()
@@ -218,88 +208,64 @@ export const TabPane = defineComponent({
         return
       }
 
-      const isVertical = tabsContext.tabPosition === 'left' || tabsContext.tabPosition === 'right'
+      const tabList = (event.currentTarget as HTMLElement | null)?.closest('[role="tablist"]')
+      const dir =
+        tabList instanceof HTMLElement && getComputedStyle(tabList).direction === 'rtl'
+          ? 'rtl'
+          : 'ltr'
+      const delta = getTabKeyboardDelta(event.key, tabsContext.tabPosition, dir)
 
-      const nextKeys = isVertical ? ['ArrowDown'] : ['ArrowRight']
-      const prevKeys = isVertical ? ['ArrowUp'] : ['ArrowLeft']
-
-      const key = event.key
-      if (
-        nextKeys.includes(key) ||
-        prevKeys.includes(key) ||
-        key === 'Home' ||
-        key === 'End' ||
-        key === 'Enter' ||
-        key === ' '
-      ) {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-      }
-
-      if (key === 'Enter' || key === ' ') {
         tabsContext.handleTabClick(props.tabKey)
         return
       }
 
-      const tabList = (event.currentTarget as HTMLElement | null)?.closest('[role="tablist"]')
+      if (delta == null) return
+      event.preventDefault()
 
       const tabButtons = Array.from(tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])
+      const records: TabRecord[] = tabButtons.map((button) => ({
+        key: parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id,
+        disabled: button.getAttribute('aria-disabled') === 'true'
+      }))
+      const enabled = records.filter((tab) => !tab.disabled)
+      if (enabled.length === 0) return
 
-      const enabled = tabButtons.filter((button) => button.getAttribute('aria-disabled') !== 'true')
-      const currentIndex = enabled.findIndex((button) => button.id === props.tabId)
-      if (currentIndex === -1) {
-        return
-      }
+      const nextKey =
+        delta === 'home'
+          ? enabled[0].key
+          : delta === 'end'
+            ? enabled[enabled.length - 1].key
+            : getAdjacentEnabledKey(records, props.tabKey, delta)
+      if (nextKey === undefined) return
 
-      const focusByIndex = (index: number) => {
-        const next = enabled[index]
-        if (!next) return
-        next.focus()
-
-        const nextKey = next.getAttribute('data-tiger-tab-key')
-        if (nextKey != null) {
-          const parsed: string | number = nextKey.startsWith('n:')
-            ? Number(nextKey.slice(2))
-            : nextKey.startsWith('s:')
-              ? nextKey.slice(2)
-              : nextKey
-          tabsContext.handleTabClick(parsed)
-        }
-      }
-
-      if (nextKeys.includes(key)) {
-        focusByIndex((currentIndex + 1) % enabled.length)
-        return
-      }
-
-      if (prevKeys.includes(key)) {
-        focusByIndex((currentIndex - 1 + enabled.length) % enabled.length)
-        return
-      }
-
-      if (key === 'Home') {
-        focusByIndex(0)
-        return
-      }
-
-      if (key === 'End') {
-        focusByIndex(enabled.length - 1)
-      }
+      const nextButton = tabButtons.find((button) =>
+        isKeyActive(parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id, nextKey)
+      )
+      nextButton?.focus()
+      tabsContext.handleTabClick(nextKey)
     }
 
     return () => {
       if (props.renderMode === 'tab') {
-        // The tab is a `div[role="tab"]` (not a native button) so the closable
-        // variant can nest a real `<button>` close control without nesting an
-        // interactive button inside another button (C06-3).
         return h(
-          'div',
+          'button',
           {
-            class: tabItemClasses.value,
+            type: 'button',
+            class: getTabItemClasses(
+              isActive.value,
+              props.disabled,
+              tabsContext.type,
+              tabsContext.size,
+              tabsContext.tabPosition
+            ),
             role: 'tab',
             id: props.tabId,
-            'aria-controls': props.panelId,
+            'aria-controls': panelMounted.value ? props.panelId : undefined,
             'aria-selected': isActive.value,
-            'aria-disabled': props.disabled,
+            'aria-disabled': props.disabled || undefined,
+            'aria-label': props.label,
             tabindex: props.disabled
               ? -1
               : typeof props.tabIndex === 'number'
@@ -308,25 +274,19 @@ export const TabPane = defineComponent({
                   ? 0
                   : -1,
             'data-tiger-tabs-id': tabsContext.idBase,
-            'data-tiger-tab-key':
-              typeof props.tabKey === 'number' ? `n:${props.tabKey}` : `s:${props.tabKey}`,
+            'data-tiger-tab-key': formatTabKey(props.tabKey),
             onClick: handleClick,
             onKeydown: handleKeydown
           },
           [
             props.icon && h('span', { class: 'flex items-center' }, props.icon),
-            h('span', props.label),
+            h('span', { 'aria-hidden': 'true' }, props.label),
             isClosable.value &&
               h(
-                'button',
+                'span',
                 {
-                  type: 'button',
                   class: tabCloseButtonClasses,
-                  'aria-label': tabsContext.labels.closeTabAriaLabel.replace(
-                    '{label}',
-                    String(props.label)
-                  ),
-                  tabindex: -1,
+                  'aria-hidden': 'true',
                   onClick: handleClose
                 },
                 h(
@@ -335,7 +295,8 @@ export const TabPane = defineComponent({
                     class: 'w-4 h-4',
                     fill: 'none',
                     stroke: 'currentColor',
-                    viewBox: closeIconViewBox
+                    viewBox: closeIconViewBox,
+                    'aria-hidden': 'true'
                   },
                   h('path', {
                     'stroke-linecap': 'round',
@@ -349,22 +310,22 @@ export const TabPane = defineComponent({
         )
       }
 
-      const shouldRender = tabsContext.lazy
-        ? hasBeenActivated.value && (isActive.value || !tabsContext.destroyInactiveTabPane)
-        : isActive.value || !tabsContext.destroyInactiveTabPane
-      if (!shouldRender) {
-        return null
-      }
+      if (!panelMounted.value) return null
 
       return h(
         'div',
         {
-          class: tabPaneClasses.value,
-          style: props.style,
+          class: classNames(
+            getTabPaneClasses(isActive.value),
+            props.className,
+            coerceClassValue(attrs.class)
+          ),
+          style: mergeStyleValues(attrs.style, props.style),
           role: 'tabpanel',
           id: props.panelId,
           'aria-labelledby': props.tabId,
-          'aria-hidden': !isActive.value
+          'aria-hidden': !isActive.value,
+          inert: isActive.value ? undefined : true
         },
         slots.default?.()
       )
@@ -374,96 +335,52 @@ export const TabPane = defineComponent({
 
 export const Tabs = defineComponent({
   name: 'TigerTabs',
+  inheritAttrs: false,
   props: {
-    /**
-     * Currently active tab key
-     */
     activeKey: {
       type: [String, Number] as PropType<string | number>,
       default: undefined
     },
-    /**
-     * Default active tab key (for uncontrolled mode)
-     */
     defaultActiveKey: {
       type: [String, Number] as PropType<string | number>,
       default: undefined
     },
-    /**
-     * Tab type - line, card, or editable-card
-     * @default 'line'
-     */
     type: {
       type: String as PropType<TabType>,
       default: 'line' as TabType
     },
-    /**
-     * Tab position - top, bottom, left, or right
-     * @default 'top'
-     */
     tabPosition: {
       type: String as PropType<TabPosition>,
       default: 'top' as TabPosition
     },
-    /**
-     * Tab size - small, medium, or large
-     * @default 'medium'
-     */
     size: {
       type: String as PropType<TabSize>,
       default: 'medium' as TabSize
     },
-    /**
-     * Whether tabs can be closed (only works with editable-card type)
-     * @default false
-     */
     closable: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether tabs are centered
-     * @default false
-     */
     centered: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether to destroy inactive tab panes
-     * @default false
-     */
     destroyInactiveTabPane: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether to lazily render tab panes (only render when first activated)
-     * @default false
-     * @since 0.6.0
-     */
     lazy: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether horizontal touch swipes switch tabs.
-     * @default true
-     */
     swipeable: {
       type: Boolean,
-      default: true
+      default: false
     },
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String,
       default: undefined
     },
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
@@ -478,66 +395,86 @@ export const Tabs = defineComponent({
     }
   },
   emits: ['update:activeKey', 'change', 'edit', 'tab-click'],
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
-    const instance = getCurrentInstance()
-    const idBase = `tiger-tabs-${instance?.uid ?? '0'}`
+    const idBase = `tiger-tabs-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getTabsLabels(mergedLocale.value, props.labels))
+    const dir = computed(() => getLocaleDirection(mergedLocale.value))
 
-    // Internal state for uncontrolled mode
     const internalActiveKey = ref<string | number | undefined>(props.defaultActiveKey)
     const swipeStart = ref<ReturnType<typeof getGestureTouchPoint> | null>(null)
-    // Snapshot of the rendered tab keys (updated each render); used by close
-    // handling to compute the next active key without re-walking slots.
-    let lastTabKeys: Array<string | number> = []
+    const tabListEl = ref<HTMLElement | null>(null)
+    const indicatorBox = ref<TabIndicatorStyle>({ opacity: '0' })
+    let lastTabRecords: TabRecord[] = []
+    let resizeObserver: ResizeObserver | null = null
 
-    // Computed active key (controlled or uncontrolled)
-    const currentActiveKey = computed(() => {
-      return props.activeKey !== undefined ? props.activeKey : internalActiveKey.value
-    })
+    const currentActiveKey = computed(() =>
+      props.activeKey !== undefined ? props.activeKey : internalActiveKey.value
+    )
 
-    // Handle tab click
     const handleTabClick = (key: string | number) => {
       emit('tab-click', key)
-
-      if (currentActiveKey.value === key) return
-
-      // Update internal state if uncontrolled
-      if (props.activeKey === undefined) {
-        internalActiveKey.value = key
-      }
-
+      if (isKeyActive(key, currentActiveKey.value)) return
+      if (props.activeKey === undefined) internalActiveKey.value = key
       emit('update:activeKey', key)
       emit('change', key)
     }
 
-    // Handle tab close
     const handleTabClose = (key: string | number, event: Event) => {
       event.stopPropagation()
-      // In uncontrolled mode, move the active key off a closed active tab.
-      if (props.activeKey === undefined && key === currentActiveKey.value) {
-        internalActiveKey.value = getNextActiveKey(key, currentActiveKey.value, lastTabKeys)
+      if (props.activeKey === undefined && isKeyActive(key, currentActiveKey.value)) {
+        internalActiveKey.value = getNextActiveKey(key, currentActiveKey.value, lastTabRecords)
       }
       emit('edit', { targetKey: key, action: 'remove' })
     }
 
-    const activateAdjacentTab = (direction: 1 | -1, enabledTabKeys: Array<string | number>) => {
-      if (enabledTabKeys.length <= 1) return
-      const currentIndex = enabledTabKeys.indexOf(currentActiveKey.value ?? enabledTabKeys[0])
-      const baseIndex = currentIndex >= 0 ? currentIndex : 0
-      const nextKey =
-        enabledTabKeys[(baseIndex + direction + enabledTabKeys.length) % enabledTabKeys.length]
-      handleTabClick(nextKey)
+    const updateIndicator = () => {
+      const list = tabListEl.value
+      if (!list || props.type !== 'line') {
+        indicatorBox.value = { opacity: '0' }
+        return
+      }
+      const tab = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+      const computedDir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : dir.value
+      indicatorBox.value = getTabIndicatorStyleFromBox(
+        measureTabIndicatorBox(list, tab, props.tabPosition, computedDir),
+        props.tabPosition
+      )
     }
+
+    const bindIndicatorObserver = () => {
+      resizeObserver?.disconnect()
+      const list = tabListEl.value
+      if (!list || typeof ResizeObserver === 'undefined') return
+      resizeObserver = new ResizeObserver(updateIndicator)
+      resizeObserver.observe(list)
+      Array.from(list.querySelectorAll('[role="tab"]')).forEach((node) =>
+        resizeObserver?.observe(node)
+      )
+      updateIndicator()
+    }
+
+    onMounted(bindIndicatorObserver)
+    onBeforeUnmount(() => resizeObserver?.disconnect())
+    watch(
+      () => [currentActiveKey.value, props.tabPosition, props.type, dir.value],
+      () => {
+        bindIndicatorObserver()
+      }
+    )
 
     const handleContentTouchStart = (event: TouchEvent) => {
       if (!props.swipeable || event.touches.length !== 1) return
       swipeStart.value = getGestureTouchPoint(event.touches, event.timeStamp)
     }
 
-    const handleContentTouchEnd = (event: TouchEvent, enabledTabKeys: Array<string | number>) => {
+    const handleContentTouchEnd = (event: TouchEvent) => {
       if (!props.swipeable || !swipeStart.value || event.changedTouches.length !== 1) return
+      if (isSwipeBlockedByNestedScroll(event.target, event.currentTarget)) {
+        swipeStart.value = null
+        return
+      }
       const endPoint = getGestureTouchPoint(event.changedTouches, event.timeStamp)
       const swipe = resolveSwipeGesture(swipeStart.value, endPoint, {
         minDistance: 48,
@@ -545,30 +482,17 @@ export const Tabs = defineComponent({
       })
       swipeStart.value = null
       if (!swipe) return
-      if (swipe.direction === 'left') activateAdjacentTab(1, enabledTabKeys)
-      if (swipe.direction === 'right') activateAdjacentTab(-1, enabledTabKeys)
+      const computedDir =
+        tabListEl.value && getComputedStyle(tabListEl.value).direction === 'rtl' ? 'rtl' : dir.value
+      const delta = getTabSwipeDelta(swipe.direction, props.tabPosition, computedDir)
+      if (delta == null) return
+      const nextKey = getAdjacentEnabledKey(lastTabRecords, currentActiveKey.value, delta)
+      if (nextKey !== undefined) handleTabClick(nextKey)
     }
 
-    // Container classes
-    const containerClasses = computed(() => {
-      return classNames(getTabsContainerClasses(props.tabPosition), props.className)
-    })
-
-    // Tab nav classes
-    const tabNavClasses = computed(() => {
-      return getTabNavClasses(props.tabPosition, props.type)
-    })
-
-    // Tab nav list classes
-    const tabNavListClasses = computed(() => {
-      return getTabNavListClasses(props.tabPosition, props.centered)
-    })
-
-    // Provide tabs context via plain object with getters — reactive props
-    // are tracked automatically when the consumer reads them in a computed/render.
     provide<TabsContext>(TabsContextKey, {
       get activeKey() {
-        return currentActiveKey.value
+        return resolveDisplayedActiveKey(currentActiveKey.value, lastTabRecords)
       },
       get type() {
         return props.type
@@ -600,156 +524,148 @@ export const Tabs = defineComponent({
     })
 
     return () => {
-      const rawChildren = (slots.default?.() || []) as VNode[]
-
-      // Flatten Fragment VNodes (produced by v-for) into a flat list
-      const children: VNode[] = []
-      const flatten = (vnodes: VNode[]) => {
-        for (const vnode of vnodes) {
-          if (vnode.type === Fragment && Array.isArray(vnode.children)) {
-            flatten(vnode.children as VNode[])
-          } else {
-            children.push(vnode)
-          }
-        }
-      }
-      flatten(rawChildren)
-
-      // Extract tab items (for nav) and tab panes (for content)
-      const tabItems: VNode[] = []
-      const tabPanes: VNode[] = []
-      const tabKeys: Array<string | number> = []
-      const enabledTabKeys: Array<string | number> = []
-      let firstTabKey: string | number | undefined
-
-      // First pass: collect valid TabPane children and determine firstTabKey
-      type ChildInfo = {
+      const children = flattenElementVNodes(slots.default?.() as VNode[] | undefined)
+      const validChildren: Array<{
         type: string | Component
         props: Record<string, unknown>
         children: unknown
-      }
-      const validChildren: ChildInfo[] = []
+        key: string | number
+      }> = []
+      const tabRecords: TabRecord[] = []
 
       for (const child of children) {
-        const childType = child?.type
-        const childName =
-          typeof childType === 'object' && childType && 'name' in childType
-            ? (childType as { name?: string }).name
-            : undefined
-
-        if (childName !== 'TigerTabPane') continue
-
+        if (!isTabPaneVNode(child, TabPane)) continue
         const childProps = (child.props ?? {}) as Record<string, unknown>
-        const k = childProps.tabKey
-        if (firstTabKey === undefined && (typeof k === 'string' || typeof k === 'number')) {
-          firstTabKey = k
-        }
-        if (typeof k === 'string' || typeof k === 'number') {
-          tabKeys.push(k)
-          if (childProps.disabled !== true) {
-            enabledTabKeys.push(k)
-          }
-        }
-
-        const tabPaneType =
+        const key = readTabPaneKey(childProps)
+        if (key === undefined) continue
+        const paneClosable =
+          childProps.closable === true || childProps.closable === ''
+            ? true
+            : childProps.closable === false
+              ? false
+              : props.closable && props.type === 'editable-card'
+        tabRecords.push({
+          key,
+          disabled: childProps.disabled === true || childProps.disabled === '',
+          closable: paneClosable,
+          label: typeof childProps.label === 'string' ? childProps.label : undefined
+        })
+        const paneType =
           typeof child.type === 'string' || typeof child.type === 'object'
             ? (child.type as string | Component)
             : 'div'
-
-        validChildren.push({ type: tabPaneType, props: childProps, children: child.children })
+        validChildren.push({
+          type: paneType,
+          props: childProps,
+          children: child.children,
+          key
+        })
       }
 
-      // Auto-activate first tab when no key is specified
-      if (
-        props.activeKey === undefined &&
-        internalActiveKey.value === undefined &&
-        firstTabKey !== undefined
-      ) {
-        internalActiveKey.value = firstTabKey
-      }
+      lastTabRecords = tabRecords
+      const displayedKey = resolveDisplayedActiveKey(currentActiveKey.value, tabRecords)
+      const tabItems: VNode[] = []
+      const tabPanes: VNode[] = []
 
-      // Snapshot keys for the close handler (next-active-key computation)
-      lastTabKeys = tabKeys
-
-      // Compute resolvedActiveKey once for roving tabindex
-      const resolvedActiveKey = currentActiveKey.value ?? firstTabKey
-      const activeTabIndex = tabKeys.indexOf(resolvedActiveKey ?? '')
-
-      // Second pass: build tab items and panes
-      for (const { type, props: childProps, children: childChildren } of validChildren) {
-        const tabId = `${idBase}-tab-${String(childProps.tabKey ?? '')}`
-        const panelId = `${idBase}-panel-${String(childProps.tabKey ?? '')}`
-
+      for (const child of validChildren) {
+        const tabId = `${idBase}-tab-${String(child.key)}`
+        const panelId = `${idBase}-panel-${String(child.key)}`
         tabItems.push(
-          h(type, {
-            ...childProps,
+          h(child.type, {
+            ...child.props,
+            key: `tab-${String(child.key)}`,
             renderMode: 'tab',
             tabId,
             panelId,
-            tabIndex: childProps.tabKey === resolvedActiveKey ? 0 : -1
+            tabIndex: isKeyActive(child.key, displayedKey) ? 0 : -1
           })
         )
         tabPanes.push(
           h(
-            type,
-            { ...childProps, renderMode: 'pane', tabId, panelId },
-            childChildren as VNode[] | undefined
+            child.type,
+            {
+              ...child.props,
+              key: `pane-${String(child.key)}`,
+              renderMode: 'pane',
+              tabId,
+              panelId
+            },
+            child.children as VNode[] | undefined
           )
         )
       }
 
-      // Render tab nav
-      const tabNavContent = h(
-        'div',
-        {
-          class: tabNavClasses.value,
-          role: 'tablist',
-          'aria-orientation':
-            props.tabPosition === 'left' || props.tabPosition === 'right'
-              ? 'vertical'
-              : 'horizontal'
-        },
-        [
-          h(
-            'div',
-            {
-              class: tabNavListClasses.value,
-              style: getTabNavListStyle(props.type, props.tabPosition, tabKeys.length)
+      const naming = pickTablistNamingAttrs(attrs as Record<string, unknown>)
+      const tabNavContent = h('div', { class: getTabNavClasses(props.tabPosition, props.type) }, [
+        h(
+          'div',
+          {
+            ref: (el) => {
+              tabListEl.value = el as HTMLElement | null
             },
-            [
-              props.type === 'line'
-                ? h('div', {
-                    'data-tiger-tabs-indicator': 'true',
-                    'aria-hidden': 'true',
-                    class: getTabIndicatorClasses(props.type, props.tabPosition),
-                    style: getTabIndicatorStyle(activeTabIndex, tabKeys.length, props.tabPosition)
-                  })
-                : null,
-              ...tabItems,
-              props.type === 'editable-card'
-                ? h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: tabAddButtonClasses,
-                      onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
-                      'aria-label': labels.value.addTabAriaLabel
-                    },
-                    '+'
-                  )
-                : null
-            ]
-          )
-        ]
-      )
+            class: getTabNavListClasses(props.tabPosition, props.centered),
+            role: 'tablist',
+            dir: dir.value,
+            'aria-label':
+              naming['aria-label'] ??
+              (naming['aria-labelledby'] ? undefined : labels.value.tablistAriaLabel),
+            'aria-labelledby': naming['aria-labelledby'],
+            id: naming.id,
+            'aria-orientation':
+              props.tabPosition === 'left' || props.tabPosition === 'right'
+                ? 'vertical'
+                : 'horizontal'
+          },
+          [
+            props.type === 'line'
+              ? h('div', {
+                  'data-tiger-tabs-indicator': 'true',
+                  'aria-hidden': 'true',
+                  class: getTabIndicatorClasses(props.type, props.tabPosition),
+                  style: indicatorBox.value
+                })
+              : null,
+            ...tabItems
+          ]
+        ),
+        ...tabRecords
+          .filter((tab) => tab.closable && !tab.disabled)
+          .map((tab) =>
+            h(
+              'button',
+              {
+                key: `close-${String(tab.key)}`,
+                type: 'button',
+                class: 'sr-only',
+                'aria-label': labels.value.closeTabAriaLabel.replace(
+                  '{label}',
+                  String(tab.label ?? tab.key)
+                ),
+                onClick: (event: Event) => handleTabClose(tab.key, event)
+              },
+              labels.value.closeTabAriaLabel.replace('{label}', String(tab.label ?? tab.key))
+            )
+          ),
+        props.type === 'editable-card'
+          ? h(
+              'button',
+              {
+                type: 'button',
+                class: getTabAddButtonClasses(props.tabPosition),
+                onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
+                'aria-label': labels.value.addTabAriaLabel
+              },
+              '+'
+            )
+          : null
+      ])
 
-      // Render tab content
       const tabContent = h(
         'div',
         {
-          class: tabContentBaseClasses,
+          class: getTabContentClasses(props.tabPosition),
           onTouchstart: handleContentTouchStart,
-          onTouchend: (event: TouchEvent) => handleContentTouchEnd(event, enabledTabKeys),
+          onTouchend: handleContentTouchEnd,
           onTouchcancel: () => {
             swipeStart.value = null
           }
@@ -759,7 +675,14 @@ export const Tabs = defineComponent({
 
       return h(
         'div',
-        { class: containerClasses.value, style: props.style },
+        {
+          class: classNames(
+            getTabsContainerClasses(props.tabPosition),
+            props.className,
+            coerceClassValue((attrs as { class?: unknown }).class)
+          ),
+          style: mergeStyleValues((attrs as { style?: unknown }).style, props.style)
+        },
         props.tabPosition === 'bottom' ? [tabContent, tabNavContent] : [tabNavContent, tabContent]
       )
     }

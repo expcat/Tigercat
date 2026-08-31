@@ -38,6 +38,9 @@ import type {
   TigerLocaleSelect,
   TigerLocaleColorPicker,
   TigerLocaleTabs,
+  TigerLocaleBreadcrumb,
+  TigerLocalePageHeader,
+  TigerLocaleSteps,
   TigerLocaleRate,
   TigerLocaleAvatarGroup,
   TigerLocaleCarousel,
@@ -382,6 +385,27 @@ export function getTabsLabels(
   overrides?: Partial<TigerLocaleTabs>
 ): Required<TigerLocaleTabs> {
   return resolveLocaleSection(enSection('tabs'), locale?.tabs, overrides)
+}
+
+export function getBreadcrumbLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleBreadcrumb>
+): Required<TigerLocaleBreadcrumb> {
+  return resolveLocaleSection(enSection('breadcrumb'), locale?.breadcrumb, overrides)
+}
+
+export function getPageHeaderLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocalePageHeader>
+): Required<TigerLocalePageHeader> {
+  return resolveLocaleSection(enSection('pageHeader'), locale?.pageHeader, overrides)
+}
+
+export function getStepsLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSteps>
+): Required<TigerLocaleSteps> {
+  return resolveLocaleSection(enSection('steps'), locale?.steps, overrides)
 }
 
 export function getRateLabels(

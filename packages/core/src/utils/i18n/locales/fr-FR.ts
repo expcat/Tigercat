@@ -103,7 +103,9 @@ export const frFR: TigerLocale = {
     prevPageAriaLabel: 'Page précédente',
     nextPageAriaLabel: 'Page suivante',
     pageAriaLabel: 'Page n° {page}',
-    pageIndicatorText: 'Page {current} sur {total}'
+    pageIndicatorText: 'Page {current} sur {total}',
+    paginationAriaLabel: 'Pagination des pages',
+    pageSizeAriaLabel: 'Éléments par page'
   },
   table: {
     emptyText: 'Aucune donnée',
@@ -312,7 +314,8 @@ export const frFR: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'Ajouter un onglet',
-    closeTabAriaLabel: 'Fermer {label}'
+    closeTabAriaLabel: 'Fermer {label}',
+    tablistAriaLabel: 'Onglets'
   },
   rate: {
     ariaLabel: 'Note',
@@ -485,6 +488,20 @@ export const frFR: TigerLocale = {
     deleteText: 'Supprimer',
     decimalAriaLabel: 'Séparateur décimal',
     idCardXAriaLabel: 'X de la carte'
+  },
+  breadcrumb: {
+    ariaLabel: "Fil d'Ariane",
+    expandAriaLabel: 'Afficher les éléments masqués'
+  },
+  pageHeader: {
+    backAriaLabel: 'Retour'
+  },
+  steps: {
+    ariaLabel: 'Étapes',
+    waitStatus: 'En attente',
+    processStatus: 'En cours',
+    finishStatus: 'Terminé',
+    errorStatus: 'Erreur'
   },
   tree: {
     ariaLabel: 'Arborescence',

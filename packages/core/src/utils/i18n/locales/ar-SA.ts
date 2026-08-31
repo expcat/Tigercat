@@ -103,7 +103,9 @@ export const arSA: TigerLocale = {
     prevPageAriaLabel: 'الصفحة السابقة',
     nextPageAriaLabel: 'الصفحة التالية',
     pageAriaLabel: 'الصفحة {page}',
-    pageIndicatorText: 'الصفحة {current} من {total}'
+    pageIndicatorText: 'الصفحة {current} من {total}',
+    paginationAriaLabel: 'ترقيم الصفحات',
+    pageSizeAriaLabel: 'عناصر لكل صفحة'
   },
   table: {
     emptyText: 'لا توجد بيانات',
@@ -312,7 +314,8 @@ export const arSA: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: 'إضافة علامة تبويب',
-    closeTabAriaLabel: 'إغلاق {label}'
+    closeTabAriaLabel: 'إغلاق {label}',
+    tablistAriaLabel: 'علامات التبويب'
   },
   rate: {
     ariaLabel: 'التقييم',
@@ -484,6 +487,20 @@ export const arSA: TigerLocale = {
     deleteText: 'حذف',
     decimalAriaLabel: 'فاصلة عشرية',
     idCardXAriaLabel: 'رمز X في الهوية'
+  },
+  breadcrumb: {
+    ariaLabel: 'مسار التنقل',
+    expandAriaLabel: 'إظهار عناصر مسار التنقل المطوية'
+  },
+  pageHeader: {
+    backAriaLabel: 'رجوع'
+  },
+  steps: {
+    ariaLabel: 'الخطوات',
+    waitStatus: 'قيد الانتظار',
+    processStatus: 'الحالي',
+    finishStatus: 'مكتمل',
+    errorStatus: 'خطأ'
   },
   tree: {
     ariaLabel: 'الشجرة',

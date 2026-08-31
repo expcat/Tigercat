@@ -103,7 +103,9 @@ export const zhTW: TigerLocale = {
     prevPageAriaLabel: '上一頁',
     nextPageAriaLabel: '下一頁',
     pageAriaLabel: '第 {page} 頁',
-    pageIndicatorText: '第 {current} 頁，共 {total} 頁'
+    pageIndicatorText: '第 {current} 頁，共 {total} 頁',
+    paginationAriaLabel: '分頁',
+    pageSizeAriaLabel: '每頁筆數'
   },
   table: {
     emptyText: '暫無資料',
@@ -315,7 +317,8 @@ export const zhTW: TigerLocale = {
   },
   tabs: {
     addTabAriaLabel: '新增分頁',
-    closeTabAriaLabel: '關閉{label}'
+    closeTabAriaLabel: '關閉{label}',
+    tablistAriaLabel: '標籤頁'
   },
   rate: {
     ariaLabel: '評分',
@@ -487,6 +490,20 @@ export const zhTW: TigerLocale = {
     deleteText: '刪除',
     decimalAriaLabel: '小數點',
     idCardXAriaLabel: '身份證 X'
+  },
+  breadcrumb: {
+    ariaLabel: '麵包屑',
+    expandAriaLabel: '顯示摺疊的麵包屑項目'
+  },
+  pageHeader: {
+    backAriaLabel: '返回'
+  },
+  steps: {
+    ariaLabel: '步驟',
+    waitStatus: '等待',
+    processStatus: '進行中',
+    finishStatus: '已完成',
+    errorStatus: '錯誤'
   },
   tree: {
     ariaLabel: '樹',
