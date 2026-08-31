@@ -159,15 +159,15 @@ describe('Textarea', () => {
   describe('Character count (showCount)', () => {
     it('shows the count with maxLength', () => {
       renderWithProps(Textarea, { modelValue: 'abc', showCount: true, maxLength: 10 })
-      expect(screen.getByText('3/10')).toBeInTheDocument()
+      expect(screen.getByText('3 / 10')).toBeInTheDocument()
     })
     it('updates the count when modelValue changes', async () => {
       const { rerender } = render(Textarea, {
         props: { modelValue: 'ab', showCount: true, maxLength: 10 }
       })
-      expect(screen.getByText('2/10')).toBeInTheDocument()
+      expect(screen.getByText('2 / 10')).toBeInTheDocument()
       await rerender({ modelValue: 'abcd', showCount: true, maxLength: 10 })
-      expect(screen.getByText('4/10')).toBeInTheDocument()
+      expect(screen.getByText('4 / 10')).toBeInTheDocument()
     })
   })
 
@@ -189,6 +189,16 @@ describe('Textarea', () => {
       textarea.focus()
       expect(textarea).toHaveFocus()
       expect(onFocus).toHaveBeenCalled()
+    })
+  })
+
+  describe('status', () => {
+    it('marks error status on the native field', () => {
+      render(Textarea, { props: { status: 'error', errorMessage: 'Too short' } })
+      const field = screen.getByRole('textbox')
+      expect(field).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByText('Too short')).toBeInTheDocument()
+      expect(field.className).toContain('--tiger-error')
     })
   })
 })

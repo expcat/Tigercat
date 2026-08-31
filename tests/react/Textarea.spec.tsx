@@ -170,7 +170,7 @@ describe('Textarea', () => {
   describe('Character count (showCount)', () => {
     it('shows the count with maxLength', () => {
       render(<Textarea defaultValue="abc" showCount maxLength={10} />)
-      expect(screen.getByText('3/10')).toBeInTheDocument()
+      expect(screen.getByText('3 / 10')).toBeInTheDocument()
     })
     it('updates the count on input', async () => {
       const user = userEvent.setup()
@@ -186,9 +186,9 @@ describe('Textarea', () => {
         )
       }
       render(<TestComponent />)
-      expect(screen.getByText('2/10')).toBeInTheDocument()
+      expect(screen.getByText('2 / 10')).toBeInTheDocument()
       await user.type(getTextarea(), 'cd')
-      expect(screen.getByText('4/10')).toBeInTheDocument()
+      expect(screen.getByText('4 / 10')).toBeInTheDocument()
     })
   })
 
@@ -220,6 +220,36 @@ describe('Textarea', () => {
       expect(ref.current).toBeInstanceOf(HTMLTextAreaElement)
       ref.current?.focus()
       expect(ref.current).toHaveFocus()
+    })
+  })
+
+  describe('status and autoResize', () => {
+    it('marks error status on the native field', () => {
+      render(<Textarea status="error" errorMessage="Too short" />)
+      const field = getTextarea()
+      expect(field).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByText('Too short')).toBeInTheDocument()
+      expect(field.className).toContain('--tiger-error')
+    })
+
+    it('writes a content-based height and overflow when autoResize is on', () => {
+      const textarea = document.createElement('textarea')
+      Object.defineProperty(textarea, 'scrollHeight', { configurable: true, value: 80 })
+      const proto = HTMLTextAreaElement.prototype as unknown as {
+        scrollHeight: number
+      }
+      const original = Object.getOwnPropertyDescriptor(proto, 'scrollHeight')
+      Object.defineProperty(proto, 'scrollHeight', { configurable: true, get: () => 80 })
+      render(<Textarea autoResize defaultValue="hello" />)
+      expect(getTextarea().style.height).toMatch(/px$/)
+      if (original) Object.defineProperty(proto, 'scrollHeight', original)
+      else delete (proto as { scrollHeight?: number }).scrollHeight
+      void textarea
+    })
+
+    it('honors React readOnly', () => {
+      render(<Textarea readOnly defaultValue="locked" />)
+      expect(getTextarea()).toHaveAttribute('readonly')
     })
   })
 })

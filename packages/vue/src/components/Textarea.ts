@@ -8,21 +8,35 @@ import {
   h,
   inject,
   getCurrentInstance,
+  useId,
   PropType
 } from 'vue'
 import {
   autoResizeTextarea,
+  clearTextareaAutoResize,
   classNames,
   coerceClassValue,
+  callUnknownEventHandler,
+  formatInputCountText,
   getInputClasses,
+  getInputCountClasses,
+  getInputErrorClasses,
+  mergeAriaDescribedBy,
   mergeStyleValues,
-  type ComponentSize
+  runShakeAnimation,
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  type ComponentSize,
+  type InputStatus
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export interface VueTextareaProps {
   modelValue?: string
   size?: ComponentSize
+  status?: InputStatus
+  errorMessage?: string
   placeholder?: string
   disabled?: boolean
   readonly?: boolean
@@ -46,138 +60,75 @@ export const Textarea = defineComponent({
   name: 'TigerTextarea',
   inheritAttrs: false,
   props: {
-    /**
-     * Textarea value (for v-model)
-     */
     modelValue: {
       type: String
     },
-    /**
-     * Textarea size
-     * @default 'md'
-     */
     size: {
       type: String as PropType<ComponentSize>,
       default: 'md' as ComponentSize
     },
-    /**
-     * Whether the textarea is disabled
-     * @default false
-     */
+    status: {
+      type: String as PropType<InputStatus>,
+      default: 'default'
+    },
+    errorMessage: String,
     disabled: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether the textarea is readonly
-     * @default false
-     */
     readonly: {
       type: Boolean,
       default: false
     },
-
-    /**
-     * Whether the textarea is required
-     * @default false
-     */
     required: {
       type: Boolean,
       default: false
     },
-    /**
-     * Placeholder text
-     */
     placeholder: {
       type: String,
       default: ''
     },
-    /**
-     * Number of visible text rows
-     * @default 3
-     */
     rows: {
       type: Number,
       default: 3
     },
-    /**
-     * Auto-resize height based on content
-     * @default false
-     */
     autoResize: {
       type: Boolean,
       default: false
     },
-    /**
-     * Maximum number of rows (only with autoResize)
-     */
     maxRows: {
       type: Number
     },
-    /**
-     * Minimum number of rows (only with autoResize)
-     */
     minRows: {
       type: Number
     },
-    /**
-     * Maximum character length
-     */
     maxLength: {
       type: Number
     },
-
-    /**
-     * Minimum character length
-     */
     minLength: {
       type: Number
     },
-
-    /**
-     * Textarea name attribute
-     */
     name: {
       type: String
     },
-
-    /**
-     * Textarea id attribute
-     */
     id: {
       type: String
     },
-
-    /**
-     * Autocomplete attribute
-     */
     autoComplete: {
       type: String
     },
-
-    /**
-     * Whether to autofocus on mount
-     */
     autoFocus: Boolean,
-    /**
-     * Show character count
-     * @default false
-     */
     showCount: {
       type: Boolean,
       default: false
     },
-
-    /**
-     * Additional CSS classes
-     */
+    _shakeTrigger: {
+      type: Number,
+      default: undefined
+    },
     className: {
       type: String
     },
-
-    /**
-     * Inline styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>
     }
@@ -189,43 +140,86 @@ export const Textarea = defineComponent({
     focus: null,
     blur: null
   },
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, expose }) {
     const instance = getCurrentInstance()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
+    const inGroup = computed(() => inputGroup != null)
     const effectiveSize = computed(() => {
       const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
       return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
     })
+    const hasOwnStatus = computed(() =>
+      Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'status')
+    )
+    const effectiveStatus = computed(() =>
+      hasOwnStatus.value ? props.status : (formItemControl?.status.value ?? props.status)
+    )
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const formValue = computed(() => formItemControl?.value.value)
+    const effectiveShakeTrigger = computed(
+      () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
+    )
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
+    const errorMsgId = `tiger-textarea-error-${useId()}`
+    const localValue = ref<string>(
+      props.modelValue ?? (typeof formValue.value === 'string' ? formValue.value : '')
+    )
 
-    const localValue = ref<string>(props.modelValue ?? '')
+    expose({
+      focus: () => textareaRef.value?.focus(),
+      textarea: textareaRef
+    })
 
     watch(
-      () => props.modelValue,
-      (newValue) => {
-        const next = newValue ?? ''
-        if (next !== localValue.value) {
-          localValue.value = next
-        }
+      () => [props.modelValue, formValue.value] as const,
+      ([modelValue, controlValue]) => {
+        const source =
+          modelValue !== undefined
+            ? modelValue
+            : typeof controlValue === 'string'
+              ? controlValue
+              : undefined
+        if (source === undefined) return
+        if (source !== localValue.value) localValue.value = source
       }
     )
+
+    const activeError = computed(() => effectiveStatus.value === 'error' && !!props.errorMessage)
+    const hasExtras = computed(() => activeError.value || props.showCount)
+    const resolvedMinRows = computed(() => props.minRows ?? props.rows)
 
     const textareaClasses = computed(() =>
       classNames(
         'block',
-        getInputClasses({ size: effectiveSize.value }),
+        getInputClasses({
+          size: effectiveSize.value,
+          status: effectiveStatus.value,
+          inGroup: inGroup.value && !hasExtras.value
+        }),
         props.autoResize ? 'resize-none' : 'resize-y',
-        props.className,
-        coerceClassValue(attrs.class)
+        !hasExtras.value ? props.className : undefined,
+        !hasExtras.value ? coerceClassValue(attrs.class) : undefined
       )
     )
 
     const currentLength = computed(() => localValue.value.length)
 
     const adjustHeight = () => {
-      if (!props.autoResize || !textareaRef.value) return
+      if (!textareaRef.value) return
+      if (!props.autoResize) {
+        clearTextareaAutoResize(textareaRef.value)
+        return
+      }
       autoResizeTextarea(textareaRef.value, {
-        minRows: props.minRows,
+        minRows: resolvedMinRows.value,
         maxRows: props.maxRows
       })
     }
@@ -236,76 +230,124 @@ export const Textarea = defineComponent({
       localValue.value = value
       emit('update:modelValue', value)
       emit('input', event)
+      formItemControl?.onChange(value)
     }
 
-    const handleChange = (event: Event) => {
-      emit('change', event)
-    }
-
-    const handleFocus = (event: FocusEvent) => {
-      emit('focus', event)
-    }
-
+    const handleChange = (event: Event) => emit('change', event)
+    const handleFocus = (event: FocusEvent) => emit('focus', event)
     const handleBlur = (event: FocusEvent) => {
+      formItemControl?.onBlur()
       emit('blur', event)
     }
 
-    // Single watcher for all autoResize triggers (value change, prop change)
-    watch([localValue, () => props.autoResize, () => props.minRows, () => props.maxRows], () => {
-      if (!props.autoResize) return
+    watch(
+      [localValue, () => props.autoResize, resolvedMinRows, () => props.maxRows, () => props.rows],
+      () => {
+        nextTick(adjustHeight)
+      }
+    )
+
+    watch(
+      [effectiveStatus, effectiveShakeTrigger] as const,
+      ([newStatus], oldValue) => {
+        if (oldValue === undefined) return
+        if (newStatus === 'error') runShakeAnimation(textareaRef.value)
+      },
+      { flush: 'post' }
+    )
+
+    onMounted(() => {
       nextTick(adjustHeight)
     })
 
-    // Initial resize on mount
-    onMounted(() => {
-      if (props.autoResize) nextTick(adjustHeight)
-    })
-
     return () => {
-      const children = [
-        h('textarea', {
-          ...attrs,
-          ref: textareaRef,
-          class: textareaClasses.value,
-          style: mergeStyleValues(attrs.style, props.style),
-          value: localValue.value,
-          disabled: props.disabled,
-          readonly: props.readonly,
-          required: props.required,
-          placeholder: props.placeholder,
-          rows: props.rows,
-          maxlength: props.maxLength,
-          minlength: props.minLength,
-          name: props.name,
-          id: props.id,
-          autocomplete: props.autoComplete,
-          autofocus: props.autoFocus,
-          onInput: handleInput,
-          onChange: handleChange,
-          onFocus: handleFocus,
-          onBlur: handleBlur
-        })
-      ]
+      const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+      const field = h('textarea', {
+        ...restAttrs,
+        ref: textareaRef,
+        class: textareaClasses.value,
+        style: mergeStyleValues(attrs.style, props.style),
+        value: localValue.value,
+        disabled: effectiveDisabled.value,
+        readonly: props.readonly,
+        required: props.required || Boolean(formItemControl?.required.value),
+        placeholder: props.placeholder,
+        rows: props.rows,
+        maxlength: props.maxLength,
+        minlength: props.minLength,
+        name: effectiveName.value,
+        id: effectiveId.value,
+        autocomplete: props.autoComplete,
+        autofocus: props.autoFocus,
+        [TIGER_CHROME_ATTR]: '',
+        ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
+        'aria-describedby': mergeAriaDescribedBy(
+          mergeAriaDescribedBy(
+            restAttrs['aria-describedby'] as string | undefined,
+            activeError.value ? errorMsgId : undefined
+          ),
+          formItemControl?.describedBy.value
+        ),
+        onInput: (event: Event) => {
+          handleInput(event)
+          callUnknownEventHandler(restAttrs.onInput, event)
+        },
+        onChange: (event: Event) => {
+          handleChange(event)
+          callUnknownEventHandler(restAttrs.onChange, event)
+        },
+        onFocus: (event: FocusEvent) => {
+          handleFocus(event)
+          callUnknownEventHandler(restAttrs.onFocus, event)
+        },
+        onBlur: (event: FocusEvent) => {
+          handleBlur(event)
+          callUnknownEventHandler(restAttrs.onBlur, event)
+        },
+        onAnimationend: () => textareaRef.value?.classList.remove(SHAKE_CLASS)
+      })
 
-      if (!props.showCount) {
-        return children[0]
+      if (!hasExtras.value) return field
+
+      const extras: ReturnType<typeof h>[] = [field]
+      if (activeError.value) {
+        extras.push(
+          h(
+            'div',
+            {
+              id: errorMsgId,
+              class: getInputErrorClasses(effectiveSize.value),
+              'aria-live': 'polite'
+            },
+            props.errorMessage
+          )
+        )
+      }
+      if (props.showCount) {
+        extras.push(
+          h(
+            'div',
+            {
+              class: getInputCountClasses(
+                props.maxLength !== undefined && currentLength.value > props.maxLength
+              )
+            },
+            formatInputCountText(currentLength.value, props.maxLength)
+          )
+        )
       }
 
-      const countText = props.maxLength
-        ? `${currentLength.value}/${props.maxLength}`
-        : `${currentLength.value}`
-
-      children.push(
-        h(
-          'div',
-          {
-            class: 'mt-1 text-sm text-gray-500 text-right'
-          },
-          countText
-        )
+      return h(
+        'div',
+        {
+          class: classNames(
+            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+            props.className,
+            coerceClassValue(attrClass)
+          )
+        },
+        extras
       )
-
-      return h('div', { class: 'w-full' }, children)
     }
   }
 })

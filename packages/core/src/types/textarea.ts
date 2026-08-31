@@ -3,6 +3,7 @@
  */
 
 import type { ComponentSize } from './base'
+import type { InputStatus } from './input'
 
 /**
  * Base textarea props interface
@@ -13,6 +14,17 @@ export interface TextareaProps {
    * @default 'md'
    */
   size?: ComponentSize
+
+  /**
+   * Validation status
+   * @default 'default'
+   */
+  status?: InputStatus
+
+  /**
+   * Error message to display below the field
+   */
+  errorMessage?: string
 
   /**
    * Textarea value (for controlled mode)

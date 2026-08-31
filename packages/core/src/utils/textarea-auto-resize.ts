@@ -7,6 +7,11 @@ export interface AutoResizeTextareaOptions {
   maxRows?: number
 }
 
+function finitePositiveInt(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return undefined
+  return Math.floor(value)
+}
+
 export function autoResizeTextarea(
   textarea: HTMLTextAreaElement,
   { minRows, maxRows }: AutoResizeTextareaOptions = {}
@@ -25,18 +30,34 @@ export function autoResizeTextarea(
 
   const paddingTop = parseFloat(styles.paddingTop) || 0
   const paddingBottom = parseFloat(styles.paddingBottom) || 0
+  const borderTop = parseFloat(styles.borderTopWidth) || 0
+  const borderBottom = parseFloat(styles.borderBottomWidth) || 0
+  const boxSizing = styles.boxSizing
+  const borderExtra = boxSizing === 'border-box' ? borderTop + borderBottom : 0
 
-  let nextHeight = textarea.scrollHeight
+  let nextHeight = textarea.scrollHeight + borderExtra
+  const min = finitePositiveInt(minRows)
+  const max = finitePositiveInt(maxRows)
 
-  if (typeof minRows === 'number') {
-    const minHeight = lineHeight * minRows + paddingTop + paddingBottom
+  if (min !== undefined) {
+    const minHeight = lineHeight * min + paddingTop + paddingBottom + borderExtra
     nextHeight = Math.max(nextHeight, minHeight)
   }
 
-  if (typeof maxRows === 'number') {
-    const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom
-    nextHeight = Math.min(nextHeight, maxHeight)
+  let overflowY = 'hidden'
+  if (max !== undefined) {
+    const maxHeight = lineHeight * max + paddingTop + paddingBottom + borderExtra
+    if (nextHeight > maxHeight) {
+      nextHeight = maxHeight
+      overflowY = 'auto'
+    }
   }
 
   textarea.style.height = `${Math.max(0, nextHeight)}px`
+  textarea.style.overflowY = overflowY
+}
+
+export function clearTextareaAutoResize(textarea: HTMLTextAreaElement): void {
+  textarea.style.height = ''
+  textarea.style.overflowY = ''
 }
