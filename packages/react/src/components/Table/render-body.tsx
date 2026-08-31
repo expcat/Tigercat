@@ -85,14 +85,16 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     )
     if (!row) return null
 
-    const index = Number(row.dataset.tigerTableRowIndex)
-    if (!Number.isInteger(index)) return null
+    const sourceIndex = Number(row.dataset.tigerTableRowIndex)
+    if (!Number.isInteger(sourceIndex)) return null
 
-    const record = ctx.paginatedData[index]
-    const key = ctx.pageRowKeys[index]
+    const pageIndex = ctx.pageSourceIndices.indexOf(sourceIndex)
+    if (pageIndex < 0) return null
+    const record = ctx.paginatedData[pageIndex]
+    const key = ctx.pageRowKeys[pageIndex]
     if (!record || key === undefined) return null
 
-    return { key, record, index }
+    return { key, record, index: sourceIndex }
   }
 
   function handleBodyClick(event: React.MouseEvent<HTMLTableSectionElement>) {
@@ -121,6 +123,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
   }
 
   function renderDataRow(record: Record<string, unknown>, index: number): React.ReactNode {
+    const sourceIndex = ctx.pageSourceIndices[index] ?? index
     const key = ctx.pageRowKeys[index]
     const isSelected = ctx.selectedRowKeySet.has(key)
     const isExpanded = ctx.expandedRowKeySet.has(key)
@@ -129,7 +132,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
         ? expandable.rowExpandable(record)
         : true
       : false
-    const rowClass = typeof rowClassName === 'function' ? rowClassName(record, index) : rowClassName
+    const rowClass =
+      typeof rowClassName === 'function' ? rowClassName(record, sourceIndex) : rowClassName
 
     const expandToggleCell = expandable ? (
       <td className={getExpandIconCellClasses(size)}>
@@ -154,7 +158,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     const rowNode = (
       <tr
         key={key}
-        data-tiger-table-row-index={index}
+        data-tiger-table-row-index={sourceIndex}
         className={classNames(
           getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'
@@ -168,7 +172,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                 if (e.target !== e.currentTarget) return
                 if (isActivationKey(e)) {
                   e.preventDefault()
-                  ctx.handleRowClick(record, index, key)
+                  ctx.handleRowClick(record, sourceIndex, key)
                 }
               }
             : undefined
@@ -211,7 +215,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             view: 'table',
             column,
             record,
-            rowIndex: index,
+            rowIndex: sourceIndex,
             striped,
             stripedActive: striped && index % 2 === 0,
             selected: isSelected,
@@ -220,8 +224,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           })
 
           const isEditing =
-            ctx.editingCell?.rowIndex === index && ctx.editingCell?.columnKey === column.key
-          const cellEditable = ctx.isCellEditable(column.key, index)
+            ctx.editingCell?.rowIndex === sourceIndex && ctx.editingCell?.columnKey === column.key
+          const cellEditable = ctx.isCellEditable(column.key, sourceIndex)
 
           return (
             <td
@@ -233,7 +237,9 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
               )}
               style={style}
               onDoubleClick={
-                cellEditable ? () => ctx.startEditing(index, column.key, cellValue) : undefined
+                cellEditable
+                  ? () => ctx.startEditing(sourceIndex, column.key, cellValue)
+                  : undefined
               }>
               {isEditing ? (
                 <input
@@ -248,7 +254,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                   autoFocus
                 />
               ) : column.render ? (
-                (column.render(record, index) as React.ReactNode)
+                (column.render(record, sourceIndex) as React.ReactNode)
               ) : (
                 (cellValue as React.ReactNode)
               )}
@@ -262,7 +268,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
 
     if (expandable && isExpanded && isRowExpandable) {
       const expandedContent = expandable.expandedRowRender
-        ? expandable.expandedRowRender(record, index)
+        ? expandable.expandedRowRender(record, sourceIndex)
         : null
 
       return (

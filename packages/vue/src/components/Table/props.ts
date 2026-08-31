@@ -59,7 +59,7 @@ export interface VueTableProps {
   autoVirtual?: boolean
   virtualThreshold?: number
   editable?: boolean
-  editableCells?: Map<string, Set<number>>
+  editableCells?: Record<string, number[]>
   filterMode?: 'basic' | 'advanced'
   advancedFilterRules?: FilterRule[]
   columnDraggable?: boolean
@@ -67,7 +67,7 @@ export interface VueTableProps {
   summaryRow?: { show: boolean; data: Record<string, unknown> }
   groupBy?: string
   exportable?: boolean
-  exportFormat?: 'csv' | 'excel'
+  exportFormat?: 'csv'
   exportFilename?: string
   cardLayout?: TableCardLayoutItem[]
 }
@@ -89,7 +89,7 @@ export const tableProps = {
   },
   dataSource: {
     type: Array as PropType<Record<string, unknown>[]>,
-    default: () => []
+    default: undefined
   },
   hiddenColumnKeys: {
     type: Array as PropType<string[]>,
@@ -148,14 +148,7 @@ export const tableProps = {
   },
   pagination: {
     type: [Object, Boolean] as PropType<PaginationConfig | false>,
-    default: () => ({
-      defaultCurrent: 1,
-      defaultPageSize: 10,
-      total: 0,
-      pageSizeOptions: [10, 20, 50, 100],
-      showSizeChanger: true,
-      showTotal: true
-    })
+    default: undefined
   },
   rowSelection: {
     type: Object as PropType<RowSelectionConfig>
@@ -217,20 +210,20 @@ export const tableProps = {
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },
-  autoVirtual: { type: Boolean, default: true },
+  autoVirtual: { type: Boolean, default: false },
   virtualHeight: { type: Number, default: 400 },
   virtualItemHeight: { type: Number, default: 40 },
   virtualThreshold: { type: Number, default: 1000 },
   editable: { type: Boolean, default: false },
-  editableCells: { type: Object as PropType<Map<string, Set<number>>> },
+  editableCells: { type: Object as PropType<Record<string, number[]>> },
   filterMode: { type: String as PropType<'basic' | 'advanced'>, default: 'basic' },
-  advancedFilterRules: { type: Array as PropType<FilterRule[]>, default: () => [] },
+  advancedFilterRules: { type: Array as PropType<FilterRule[]>, default: undefined },
   columnDraggable: { type: Boolean, default: false },
   rowDraggable: { type: Boolean, default: false },
   summaryRow: { type: Object as PropType<{ show: boolean; data: Record<string, unknown> }> },
   groupBy: { type: String },
   exportable: { type: Boolean, default: false },
-  exportFormat: { type: String as PropType<'csv' | 'excel'>, default: 'csv' },
+  exportFormat: { type: String as PropType<'csv'>, default: 'csv' },
   exportFilename: { type: String, default: 'export' },
   cardLayout: {
     type: Array as PropType<TableCardLayoutItem[]>,
@@ -250,6 +243,7 @@ export const tableEmits = [
   'expand-change',
   'cell-change',
   'column-order-change',
+  'column-fixed-change',
   'row-order-change',
   'export'
 ] as const

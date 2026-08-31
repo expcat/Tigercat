@@ -65,14 +65,16 @@ export function renderTableBody(
     )
     if (!row) return null
 
-    const index = Number(row.dataset.tigerTableRowIndex)
-    if (!Number.isInteger(index)) return null
+    const sourceIndex = Number(row.dataset.tigerTableRowIndex)
+    if (!Number.isInteger(sourceIndex)) return null
 
-    const record = ctx.paginatedData.value[index]
-    const key = ctx.paginatedRowKeys.value[index]
+    const pageIndex = ctx.pageSourceIndices.value.indexOf(sourceIndex)
+    if (pageIndex < 0) return null
+    const record = ctx.paginatedData.value[pageIndex]
+    const key = ctx.paginatedRowKeys.value[pageIndex]
     if (!record || key === undefined) return null
 
-    return { key, record, index }
+    return { key, record, index: sourceIndex }
   }
 
   function handleBodyClick(event: MouseEvent) {
@@ -108,6 +110,7 @@ export function renderTableBody(
   }
 
   function renderDataRow(record: Record<string, unknown>, index: number): VNodeChild {
+    const sourceIndex = ctx.pageSourceIndices.value[index] ?? index
     const key = ctx.paginatedRowKeys.value[index]
     const isSelected = ctx.selectedRowKeySet.value.has(key)
     const isExpanded = ctx.expandedRowKeySet.value.has(key)
@@ -118,7 +121,7 @@ export function renderTableBody(
       : false
     const rowClass =
       typeof props.rowClassName === 'function'
-        ? props.rowClassName(record, index)
+        ? props.rowClassName(record, sourceIndex)
         : props.rowClassName
 
     const cells: VNodeChild[] = []
@@ -202,7 +205,7 @@ export function renderTableBody(
         view: 'table',
         column,
         record,
-        rowIndex: index,
+        rowIndex: sourceIndex,
         striped: props.striped,
         stripedActive: props.striped && index % 2 === 0,
         selected: isSelected,
@@ -211,8 +214,9 @@ export function renderTableBody(
       })
 
       const isEditing =
-        ctx.editingCell.value?.rowIndex === index && ctx.editingCell.value?.columnKey === column.key
-      const isEditableCell = ctx.isCellEditable(column.key, index)
+        ctx.editingCell.value?.rowIndex === sourceIndex &&
+        ctx.editingCell.value?.columnKey === column.key
+      const isEditableCell = ctx.isCellEditable(column.key, sourceIndex)
 
       const cellContent = isEditing
         ? h('input', {
@@ -229,8 +233,8 @@ export function renderTableBody(
               if (e.key === 'Escape') ctx.cancelEdit()
             }
           })
-        : (slots[`cell-${column.key}`]?.({ record, index }) ??
-          (column.render ? (column.render(record, index) as string) : (cellValue as string)))
+        : (slots[`cell-${column.key}`]?.({ record, index: sourceIndex }) ??
+          (column.render ? (column.render(record, sourceIndex) as string) : (cellValue as string)))
 
       cells.push(
         h(
@@ -245,7 +249,7 @@ export function renderTableBody(
             style,
             onDblclick:
               isEditableCell && !isEditing
-                ? () => ctx.startEditing(index, column.key, cellValue)
+                ? () => ctx.startEditing(sourceIndex, column.key, cellValue)
                 : undefined
           },
           [cellContent]
@@ -261,7 +265,7 @@ export function renderTableBody(
       'tr',
       {
         key,
-        'data-tiger-table-row-index': index,
+        'data-tiger-table-row-index': sourceIndex,
         class: classNames(
           getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'
@@ -274,7 +278,7 @@ export function renderTableBody(
               if (e.target !== e.currentTarget) return
               if (isActivationKey(e)) {
                 e.preventDefault()
-                ctx.handleRowClick(record, index, key)
+                ctx.handleRowClick(record, sourceIndex, key)
               }
             }
           : undefined,
@@ -285,9 +289,9 @@ export function renderTableBody(
 
     if (props.expandable && isExpanded && isRowExpandable) {
       const expandedContent =
-        slots['expanded-row']?.({ record, index }) ||
+        slots['expanded-row']?.({ record, index: sourceIndex }) ||
         (props.expandable.expandedRowRender
-          ? props.expandable.expandedRowRender(record, index)
+          ? props.expandable.expandedRowRender(record, sourceIndex)
           : null)
 
       const expandedRow = h(

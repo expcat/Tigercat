@@ -117,7 +117,7 @@ export interface VueDataTableWithToolbarProps {
   virtualItemHeight?: number
   virtualThreshold?: number
   editable?: boolean
-  editableCells?: Map<string, Set<number>>
+  editableCells?: Record<string, number[]>
   filterMode?: 'basic' | 'advanced'
   advancedFilterRules?: FilterRule[]
   columnDraggable?: boolean
@@ -295,7 +295,7 @@ export const DataTableWithToolbar = defineComponent({
       default: undefined
     },
     editableCells: {
-      type: Object as PropType<Map<string, Set<number>>>,
+      type: Object as PropType<Record<string, number[]>>,
       default: undefined
     },
     filterMode: {

@@ -25,6 +25,7 @@ export interface TableContext {
   processedData: ComputedRef<Record<string, unknown>[]>
   paginatedData: ComputedRef<Record<string, unknown>[]>
   paginatedRowKeys: ComputedRef<(string | number)[]>
+  pageSourceIndices: ComputedRef<number[]>
   selectedRowKeySet: ComputedRef<Set<string | number>>
   expandedRowKeySet: ComputedRef<Set<string | number>>
   totalColumnCount: ComputedRef<number>

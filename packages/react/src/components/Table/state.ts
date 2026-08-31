@@ -1,57 +1,67 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  sortData,
-  filterTableData,
-  paginateData,
-  calculatePagination,
-  createTableRowKeyCache,
-  filterDataAdvanced,
-  groupDataByColumn,
-  getFixedColumnOffsets,
+  DEFAULT_TABLE_SORT,
+  EMPTY_TABLE_FILTER_RULES,
+  EMPTY_TABLE_FILTERS,
+  EMPTY_TABLE_HIDDEN_KEYS,
+  EMPTY_TABLE_RECORDS,
+  applyTableColumnOrder,
+  commitTableCellEdit,
+  downloadTableExport,
+  exportTableData,
   freezeTableColumnWidths,
-  filterHiddenColumns,
-  orderTableFixedColumns,
+  getNextTableColumnFixed,
+  getNextTableExpandKeys,
   getNextTableSelectAllKeys,
-  getTableSelectionState,
-  hasTableSelectionColumn,
-  type SortState,
-  type PaginationConfig,
-  type TableColumn,
+  getNextTableSelectRowKeys,
+  getNextTableSortState,
+  mergeTableFilterValue,
+  mergeTablePagination,
+  reorderTableColumnsByKey,
+  reorderTableRowsByKey,
+  resolveTableKeyList,
+  resolveTableRecordKey,
+  resolveTableView,
+  shouldWarnControlledPageReset,
   type FilterRule,
-  type RowSelectionConfig,
-  type ExpandableConfig
+  type PaginationConfig,
+  type SortState,
+  type TableColumn,
+  type TableExportFormat,
+  type TableFixedPosition,
+  type ExpandableConfig,
+  type RowSelectionConfig
 } from '@expcat/tigercat-core'
-import { exportTableData, downloadTableExport, type TableExportFormat } from '@expcat/tigercat-core'
+import { devWarn } from '@expcat/tigercat-core'
 import type { TableContext, TableProps } from './types'
 
 /**
  * Inputs consumed by the Table state hook. Mirrors the props that influence
- * derived data + handlers but excludes pure render-only props (className, size,
- * etc.) that the render-* modules read directly from props.
+ * derived data + handlers but excludes pure render-only props.
  */
 export interface UseTableStateInput {
   columns: TableProps['columns']
-  dataSource: Record<string, unknown>[]
+  dataSource?: Record<string, unknown>[]
   hiddenColumnKeys?: string[]
   defaultHiddenColumnKeys?: string[]
   sort?: SortState
   defaultSort?: SortState
   filters?: Record<string, unknown>
   defaultFilters?: Record<string, unknown>
-  pagination: PaginationConfig | false
+  pagination: PaginationConfig | false | undefined
   rowSelection?: RowSelectionConfig
   expandable?: ExpandableConfig
   rowKey: string | ((record: Record<string, unknown>) => string | number)
   editable: boolean
-  editableCells?: Map<string, Set<number>>
+  editableCells?: Record<string, number[]>
   filterMode: 'basic' | 'advanced'
-  advancedFilterRules: FilterRule[]
+  advancedFilterRules?: FilterRule[]
   groupBy?: string
-  exportFormat: TableExportFormat
+  exportFormat?: TableExportFormat
   exportFilename: string
   measuredColumnWidths?: Record<string, number>
+  containerWidth?: number
 
-  // event callbacks
   onChange?: TableProps['onChange']
   onRowClick?: (record: Record<string, unknown>, index: number) => void
   onSelectionChange?: TableProps['onSelectionChange']
@@ -59,13 +69,10 @@ export interface UseTableStateInput {
   onFilterChange?: TableProps['onFilterChange']
   onHiddenColumnKeysChange?: TableProps['onHiddenColumnKeysChange']
   onPageChange?: TableProps['onPageChange']
-  onExpandChange?: (
-    expandedKeys: (string | number)[],
-    record: Record<string, unknown>,
-    expanded: boolean
-  ) => void
+  onExpandChange?: TableProps['onExpandChange']
   onCellChange?: TableProps['onCellChange']
   onColumnOrderChange?: (columns: TableColumn[]) => void
+  onColumnFixedChange?: TableProps['onColumnFixedChange']
   onRowOrderChange?: (rows: Record<string, unknown>[]) => void
   onExport?: TableProps['onExport']
 }
@@ -89,9 +96,9 @@ export function useTableState(input: UseTableStateInput): TableContext {
     filterMode,
     advancedFilterRules,
     groupBy,
-    exportFormat,
     exportFilename,
     measuredColumnWidths,
+    containerWidth,
     onChange,
     onRowClick,
     onSelectionChange,
@@ -102,52 +109,66 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onExpandChange,
     onCellChange,
     onColumnOrderChange,
+    onColumnFixedChange,
     onRowOrderChange,
     onExport
   } = input
+
+  const sourceData = dataSource ?? EMPTY_TABLE_RECORDS
+  const [internalData, setInternalData] = useState<Record<string, unknown>[] | null>(null)
+  const prevSourceData = useRef(sourceData)
+  if (prevSourceData.current !== sourceData) {
+    prevSourceData.current = sourceData
+    if (internalData !== null) {
+      setInternalData(null)
+    }
+  }
+  const effectiveData = internalData ?? sourceData
 
   const isSortControlled = sort !== undefined
   const isFiltersControlled = filters !== undefined
   const isHiddenColumnsControlled = hiddenColumnKeys !== undefined
 
+  const paginationMerged = mergeTablePagination(pagination)
   const paginationConfig: PaginationConfig | null =
-    pagination !== false && typeof pagination === 'object' ? pagination : null
+    paginationMerged === false ? null : paginationMerged
   const isCurrentPageControlled = paginationConfig?.current !== undefined
   const isPageSizeControlled = paginationConfig?.pageSize !== undefined
 
-  const isSelectionControlled =
-    rowSelection?.selectedRowKeys !== undefined && Array.isArray(rowSelection.selectedRowKeys)
-
-  const isExpandControlled =
-    expandable?.expandedRowKeys !== undefined && Array.isArray(expandable.expandedRowKeys)
+  const selectionControl = resolveTableKeyList(
+    rowSelection?.selectedRowKeys,
+    'rowSelection.selectedRowKeys'
+  )
+  const expandControl = resolveTableKeyList(
+    expandable?.expandedRowKeys,
+    'expandable.expandedRowKeys'
+  )
 
   const [uncontrolledSortState, setUncontrolledSortState] = useState<SortState>(
-    defaultSort ?? { key: null, direction: null }
+    defaultSort ?? DEFAULT_TABLE_SORT
   )
-
   const [uncontrolledHiddenColumnKeys, setUncontrolledHiddenColumnKeys] = useState<string[]>(
-    defaultHiddenColumnKeys ?? hiddenColumnKeys ?? []
+    defaultHiddenColumnKeys ?? hiddenColumnKeys ?? EMPTY_TABLE_HIDDEN_KEYS
   )
-
   const [uncontrolledFilterState, setUncontrolledFilterState] = useState<Record<string, unknown>>(
-    defaultFilters ?? {}
+    defaultFilters ?? EMPTY_TABLE_FILTERS
   )
-
   const [uncontrolledCurrentPage, setUncontrolledCurrentPage] = useState(
     () => paginationConfig?.defaultCurrent ?? paginationConfig?.current ?? 1
   )
-
   const [uncontrolledCurrentPageSize, setUncontrolledCurrentPageSize] = useState(
     () => paginationConfig?.defaultPageSize ?? paginationConfig?.pageSize ?? 10
   )
-
   const [uncontrolledSelectedRowKeys, setUncontrolledSelectedRowKeys] = useState<
     (string | number)[]
-  >(rowSelection?.defaultSelectedRowKeys ?? rowSelection?.selectedRowKeys ?? [])
-
+  >(rowSelection?.defaultSelectedRowKeys ?? [])
   const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = useState<
     (string | number)[]
-  >(expandable?.defaultExpandedRowKeys ?? expandable?.expandedRowKeys ?? [])
+  >(expandable?.defaultExpandedRowKeys ?? [])
+  const [columnOrder, setColumnOrder] = useState<string[] | null>(null)
+  const [fixedOverrides, setFixedOverrides] = useState<Record<string, TableFixedPosition | false>>(
+    {}
+  )
 
   const sortState = isSortControlled ? (sort as SortState) : uncontrolledSortState
   const effectiveHiddenColumnKeys = isHiddenColumnsControlled
@@ -162,100 +183,102 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const currentPageSize = isPageSizeControlled
     ? (paginationConfig!.pageSize as number)
     : uncontrolledCurrentPageSize
-  const selectedRowKeys = isSelectionControlled
-    ? (rowSelection!.selectedRowKeys as (string | number)[])
+  const selectedRowKeys = selectionControl.controlled
+    ? selectionControl.keys
     : uncontrolledSelectedRowKeys
-  const expandedRowKeys = isExpandControlled
-    ? (expandable!.expandedRowKeys as (string | number)[])
+  const expandedRowKeys = expandControl.controlled
+    ? expandControl.keys
     : uncontrolledExpandedRowKeys
 
-  useEffect(() => {
-    if (isSortControlled && sort) {
-      setUncontrolledSortState(sort)
+  const prevColumnKeys = useRef(columns.map((column) => column.key).join('\0'))
+  const columnKeysSignature = columns.map((column) => column.key).join('\0')
+  if (prevColumnKeys.current !== columnKeysSignature) {
+    prevColumnKeys.current = columnKeysSignature
+    if (columnOrder !== null) {
+      setColumnOrder(null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSortControlled, sort?.key, sort?.direction])
+  }
 
-  useEffect(() => {
-    if (isFiltersControlled && filters) {
-      setUncontrolledFilterState(filters)
-    }
-  }, [isFiltersControlled, filters])
-
-  useEffect(() => {
-    if (isCurrentPageControlled) {
-      setUncontrolledCurrentPage(paginationConfig!.current as number)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCurrentPageControlled, paginationConfig?.current])
-
-  useEffect(() => {
-    if (isPageSizeControlled) {
-      setUncontrolledCurrentPageSize(paginationConfig!.pageSize as number)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPageSizeControlled, paginationConfig?.pageSize])
-
-  useEffect(() => {
-    if (isSelectionControlled) {
-      setUncontrolledSelectedRowKeys((rowSelection?.selectedRowKeys as (string | number)[]) ?? [])
-    }
-  }, [isSelectionControlled, rowSelection?.selectedRowKeys])
-
-  useEffect(() => {
-    if (isHiddenColumnsControlled && hiddenColumnKeys) {
-      setUncontrolledHiddenColumnKeys(hiddenColumnKeys)
-    }
-  }, [isHiddenColumnsControlled, hiddenColumnKeys])
-
-  useEffect(() => {
-    if (isExpandControlled) {
-      setUncontrolledExpandedRowKeys((expandable?.expandedRowKeys as (string | number)[]) ?? [])
-    }
-  }, [isExpandControlled, expandable?.expandedRowKeys])
-
-  const [fixedOverrides, setFixedOverrides] = useState<Record<string, 'left' | 'right' | false>>({})
-
-  const displayColumns = useMemo<TableColumn[]>(() => {
-    const mapped = columns.map((column) => {
-      const hasOverride = Object.prototype.hasOwnProperty.call(fixedOverrides, column.key)
-      return {
-        ...column,
-        fixed: hasOverride ? fixedOverrides[column.key] : column.fixed
-      }
-    })
-    return orderTableFixedColumns(filterHiddenColumns(mapped, effectiveHiddenColumnKeys))
-  }, [columns, fixedOverrides, effectiveHiddenColumnKeys])
-
-  const totalColumnCount = useMemo(() => {
-    let count = displayColumns.length
-    if (hasTableSelectionColumn(rowSelection)) count++
-    if (expandable) count++
-    return count
-  }, [displayColumns.length, rowSelection, expandable])
-
-  const columnByKey = useMemo(() => {
-    const map: Record<string, TableColumn> = {}
-    for (const column of displayColumns) {
-      map[column.key] = column
-    }
-    return map
-  }, [displayColumns])
-
-  const fixedColumnsInfo = useMemo(
-    () => getFixedColumnOffsets(displayColumns, measuredColumnWidths),
-    [displayColumns, measuredColumnWidths]
+  const view = useMemo(
+    () =>
+      resolveTableView({
+        columns,
+        dataSource: effectiveData,
+        hiddenColumnKeys: effectiveHiddenColumnKeys,
+        columnOrder: columnOrder ?? undefined,
+        fixedOverrides,
+        filters: filterState,
+        sort: sortState,
+        filterMode,
+        advancedFilterRules: advancedFilterRules ?? EMPTY_TABLE_FILTER_RULES,
+        groupBy,
+        pagination: paginationMerged,
+        currentPage,
+        currentPageSize,
+        rowKey,
+        getRowKey: rowSelection?.getRowKey,
+        rowSelection,
+        expandable,
+        selectedRowKeys,
+        measuredColumnWidths,
+        containerWidth
+      }),
+    [
+      columns,
+      effectiveData,
+      effectiveHiddenColumnKeys,
+      columnOrder,
+      fixedOverrides,
+      filterState,
+      sortState,
+      filterMode,
+      advancedFilterRules,
+      groupBy,
+      paginationMerged,
+      currentPage,
+      currentPageSize,
+      rowKey,
+      rowSelection,
+      expandable,
+      selectedRowKeys,
+      measuredColumnWidths,
+      containerWidth
+    ]
   )
 
-  // Freeze each auto-sized column's first measured width so the `<colgroup>` can
-  // pin it — keeps lock toggling from reflowing column widths.
+  const selectedRowKeySet = useMemo(
+    () => new Set<string | number>(selectedRowKeys),
+    [selectedRowKeys]
+  )
+  const expandedRowKeySet = useMemo(
+    () => new Set<string | number>(expandedRowKeys),
+    [expandedRowKeys]
+  )
+
   const [frozenColumnWidths, setFrozenColumnWidths] = useState<Record<string, number>>({})
 
   useEffect(() => {
     setFrozenColumnWidths((prev) =>
-      freezeTableColumnWidths(displayColumns, measuredColumnWidths ?? {}, prev)
+      freezeTableColumnWidths(view.displayColumns, measuredColumnWidths ?? {}, prev)
     )
-  }, [displayColumns, measuredColumnWidths])
+  }, [view.displayColumns, measuredColumnWidths])
+
+  function emitChange(next: {
+    sort?: SortState
+    filters?: Record<string, unknown>
+    pagination?: { current: number; pageSize: number } | null
+  }) {
+    onChange?.({
+      sort: next.sort ?? sortState,
+      filters: next.filters ?? filterState,
+      pagination:
+        next.pagination !== undefined
+          ? next.pagination
+          : paginationMerged !== false
+            ? { current: currentPage, pageSize: currentPageSize }
+            : null
+    })
+  }
 
   function handleSetHiddenColumns(hiddenKeys: string[]) {
     if (!isHiddenColumnsControlled) {
@@ -265,145 +288,81 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function toggleColumnLock(columnKey: string) {
-    setFixedOverrides((prev) => {
-      const original = columns.find((c) => c.key === columnKey)?.fixed
-      const current = Object.prototype.hasOwnProperty.call(prev, columnKey)
-        ? prev[columnKey]
-        : original
-      const isLocked = current === 'left' || current === 'right'
-      return {
-        ...prev,
-        [columnKey]: isLocked ? false : 'left'
-      }
-    })
+    const original = columns.find((column) => column.key === columnKey)?.fixed
+    const current = Object.prototype.hasOwnProperty.call(fixedOverrides, columnKey)
+      ? fixedOverrides[columnKey]
+      : original
+    const nextFixed = getNextTableColumnFixed(current, original)
+    const nextOverrides = { ...fixedOverrides, [columnKey]: nextFixed }
+    setFixedOverrides(nextOverrides)
+    const fullColumns = applyTableColumnOrder(columns, columnOrder ?? undefined).map((column) =>
+      column.key === columnKey ? { ...column, fixed: nextFixed } : column
+    )
+    onColumnFixedChange?.(columnKey, nextFixed, fullColumns)
   }
-
-  const processedData = useMemo(() => {
-    let data = dataSource
-    if (filterMode === 'advanced' && advancedFilterRules.length > 0) {
-      data = filterDataAdvanced(data, advancedFilterRules)
-    } else {
-      data = filterTableData(data, columns, filterState)
-    }
-    if (sortState.key && sortState.direction) {
-      const column = columnByKey[sortState.key]
-      data = sortData(data, sortState.key, sortState.direction, column?.sortFn, columns)
-    }
-    return data
-  }, [dataSource, columns, filterState, sortState, columnByKey, filterMode, advancedFilterRules])
-
-  const paginatedData = useMemo(() => {
-    if (pagination === false) {
-      return processedData
-    }
-    // Remote mode: dataSource already holds only the current page — no slicing.
-    if (paginationConfig?.remote) {
-      return processedData
-    }
-    return paginateData(processedData, currentPage, currentPageSize)
-  }, [processedData, currentPage, currentPageSize, pagination, paginationConfig?.remote])
-
-  const pageRowKeys = useMemo(
-    () => createTableRowKeyCache<Record<string, unknown>>(rowKey).getMany(paginatedData),
-    [paginatedData, rowKey]
-  )
-
-  const selectedRowKeySet = useMemo(
-    () => new Set<string | number>(selectedRowKeys),
-    [selectedRowKeys]
-  )
-
-  const expandedRowKeySet = useMemo(
-    () => new Set<string | number>(expandedRowKeys),
-    [expandedRowKeys]
-  )
-
-  const paginationInfo = useMemo(() => {
-    if (pagination === false) {
-      return null
-    }
-    const total =
-      paginationConfig?.total !== undefined && paginationConfig.total > 0
-        ? paginationConfig.total
-        : processedData.length
-    return calculatePagination(total, currentPage, currentPageSize)
-  }, [processedData.length, currentPage, currentPageSize, pagination, paginationConfig?.total])
 
   function handleSetSort(newSortState: SortState) {
     if (!isSortControlled) {
       setUncontrolledSortState(newSortState)
     }
     onSortChange?.(newSortState)
-    onChange?.({
-      sort: newSortState,
-      filters: filterState,
-      pagination: pagination !== false ? { current: currentPage, pageSize: currentPageSize } : null
-    })
+    emitChange({ sort: newSortState })
   }
 
   function handleSort(columnKey: string) {
-    const column = columnByKey[columnKey]
+    const column = view.displayColumns.find((item) => item.key === columnKey)
     if (!column || !column.sortable) return
-
-    let newDirection: 'asc' | 'desc' | null = 'asc'
-    if (sortState.key === columnKey) {
-      if (sortState.direction === 'asc') {
-        newDirection = 'desc'
-      } else if (sortState.direction === 'desc') {
-        newDirection = null
-      }
-    }
-
-    handleSetSort({
-      key: newDirection ? columnKey : null,
-      direction: newDirection
-    })
+    handleSetSort(getNextTableSortState(sortState, columnKey))
   }
 
   function handleFilter(columnKey: string, value: unknown) {
-    const newFilterState = { ...filterState, [columnKey]: value }
+    const newFilterState = mergeTableFilterValue(filterState, columnKey, value)
     if (!isFiltersControlled) {
       setUncontrolledFilterState(newFilterState)
     }
-    setUncontrolledCurrentPage(1)
+    if (!isCurrentPageControlled) {
+      setUncontrolledCurrentPage(1)
+    } else if (shouldWarnControlledPageReset(true, currentPage)) {
+      devWarn(
+        'Table.filter.page',
+        'Table filter reset pagination.current to 1; the controlled current page was not written back'
+      )
+    }
     onFilterChange?.(newFilterState)
-    onChange?.({
-      sort: sortState,
+    if (paginationMerged !== false) {
+      onPageChange?.({ current: 1, pageSize: currentPageSize })
+    }
+    emitChange({
       filters: newFilterState,
-      pagination: pagination !== false ? { current: 1, pageSize: currentPageSize } : null
+      pagination: paginationMerged !== false ? { current: 1, pageSize: currentPageSize } : null
     })
   }
 
   function handlePageChange(page: number) {
-    setUncontrolledCurrentPage(page)
+    if (!isCurrentPageControlled) {
+      setUncontrolledCurrentPage(page)
+    }
     onPageChange?.({ current: page, pageSize: currentPageSize })
-    onChange?.({
-      sort: sortState,
-      filters: filterState,
-      pagination: { current: page, pageSize: currentPageSize }
-    })
+    emitChange({ pagination: { current: page, pageSize: currentPageSize } })
   }
 
   function handlePageSizeChange(pageSize: number) {
-    setUncontrolledCurrentPageSize(pageSize)
-    setUncontrolledCurrentPage(1)
+    if (!isPageSizeControlled) {
+      setUncontrolledCurrentPageSize(pageSize)
+    }
+    if (!isCurrentPageControlled) {
+      setUncontrolledCurrentPage(1)
+    }
     onPageChange?.({ current: 1, pageSize })
-    onChange?.({
-      sort: sortState,
-      filters: filterState,
-      pagination: { current: 1, pageSize }
-    })
+    emitChange({ pagination: { current: 1, pageSize } })
   }
 
   function handleToggleExpand(key: string | number, record: Record<string, unknown>) {
-    const isExpanded = expandedRowKeySet.has(key)
-    const newKeys = isExpanded
-      ? expandedRowKeys.filter((k) => k !== key)
-      : [...expandedRowKeys, key]
-    if (!isExpandControlled) {
-      setUncontrolledExpandedRowKeys(newKeys)
+    const next = getNextTableExpandKeys(expandedRowKeys, key)
+    if (!expandControl.controlled) {
+      setUncontrolledExpandedRowKeys(next.keys)
     }
-    onExpandChange?.(newKeys, record, !isExpanded)
+    onExpandChange?.(next.keys, record, next.expanded)
   }
 
   function handleRowClick(record: Record<string, unknown>, index: number, key: string | number) {
@@ -417,49 +376,26 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function handleSelectRow(key: string | number, checked: boolean) {
-    let newKeys: (string | number)[]
-    if (rowSelection?.type === 'radio') {
-      newKeys = checked ? [key] : []
-    } else {
-      if (checked) {
-        newKeys = [...selectedRowKeys, key]
-      } else {
-        newKeys = selectedRowKeys.filter((k) => k !== key)
-      }
-    }
-    if (!isSelectionControlled) {
+    const newKeys = getNextTableSelectRowKeys({
+      selectedRowKeys,
+      key,
+      checked,
+      type: rowSelection?.type
+    })
+    if (!selectionControl.controlled) {
       setUncontrolledSelectedRowKeys(newKeys)
     }
     onSelectionChange?.(newKeys)
   }
-
-  const selectionState = useMemo(
-    () =>
-      getTableSelectionState({
-        records: paginatedData,
-        rowKeys: pageRowKeys,
-        selectedRowKeys,
-        getCheckboxProps: rowSelection?.getCheckboxProps
-      }),
-    [paginatedData, pageRowKeys, selectedRowKeys, rowSelection]
-  )
 
   function handleSelectAll(checked: boolean) {
-    const newKeys = getNextTableSelectAllKeys(
-      selectedRowKeys,
-      selectionState.selectableRowKeys,
-      checked
-    )
-    if (!isSelectionControlled) {
+    const newKeys = getNextTableSelectAllKeys(selectedRowKeys, view.selectableRowKeys, checked)
+    if (!selectionControl.controlled) {
       setUncontrolledSelectedRowKeys(newKeys)
     }
     onSelectionChange?.(newKeys)
   }
 
-  const allSelected = selectionState.allSelected
-  const someSelected = selectionState.someSelected
-
-  // editable cell state
   const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnKey: string } | null>(
     null
   )
@@ -468,7 +404,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
   function isCellEditable(columnKey: string, rowIndex: number): boolean {
     if (!editable) return false
     if (!editableCells) return true
-    return !!editableCells.get(columnKey)?.has(rowIndex)
+    return editableCells[columnKey]?.includes(rowIndex) === true
   }
 
   function startEditing(rowIndex: number, columnKey: string, currentValue: unknown) {
@@ -477,10 +413,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function commitEdit() {
-    if (editingCell) {
-      onCellChange?.(editingCell.rowIndex, editingCell.columnKey, editingValue)
-      setEditingCell(null)
-    }
+    if (!editingCell) return
+    const column = columns.find((item) => item.key === editingCell.columnKey)
+    const nextData = commitTableCellEdit(effectiveData, editingCell.rowIndex, column, editingValue)
+    setInternalData(nextData)
+    onCellChange?.(editingCell.rowIndex, editingCell.columnKey, editingValue)
+    setEditingCell(null)
   }
 
   function cancelEdit() {
@@ -488,12 +426,11 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function handleExport() {
-    const content = exportTableData(displayColumns, processedData, exportFormat)
-    downloadTableExport(content, exportFilename, exportFormat)
+    const content = exportTableData(view.displayColumns, view.processedData)
+    downloadTableExport(content, exportFilename)
     onExport?.(content)
   }
 
-  // column drag
   const [dragColumnKey, setDragColumnKey] = useState<string | null>(null)
 
   function handleDragStart(columnKey: string) {
@@ -502,14 +439,10 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function handleDrop(targetKey: string) {
     if (!dragColumnKey || dragColumnKey === targetKey) return
-    const cols = [...displayColumns]
-    const fromIdx = cols.findIndex((c) => c.key === dragColumnKey)
-    const toIdx = cols.findIndex((c) => c.key === targetKey)
-    if (fromIdx >= 0 && toIdx >= 0) {
-      const [moved] = cols.splice(fromIdx, 1)
-      cols.splice(toIdx, 0, moved)
-      onColumnOrderChange?.(cols)
-    }
+    const fullColumns = applyTableColumnOrder(columns, columnOrder ?? undefined)
+    const nextColumns = reorderTableColumnsByKey(fullColumns, dragColumnKey, targetKey)
+    setColumnOrder(nextColumns.map((column) => column.key))
+    onColumnOrderChange?.(nextColumns)
     setDragColumnKey(null)
   }
 
@@ -521,39 +454,36 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function handleRowDrop(targetKey: string | number) {
     if (dragRowKey === null || dragRowKey === targetKey) return
-    const rows = [...paginatedData]
-    const fromIdx = pageRowKeys.findIndex((key) => key === dragRowKey)
-    const toIdx = pageRowKeys.findIndex((key) => key === targetKey)
-    if (fromIdx >= 0 && toIdx >= 0) {
-      const [moved] = rows.splice(fromIdx, 1)
-      rows.splice(toIdx, 0, moved)
-      onRowOrderChange?.(rows)
-    }
+    const nextRows = reorderTableRowsByKey(
+      effectiveData,
+      dragRowKey,
+      targetKey,
+      (record, sourceIndex) =>
+        resolveTableRecordKey(record, sourceIndex, rowKey, rowSelection?.getRowKey)
+    )
+    setInternalData(nextRows)
+    onRowOrderChange?.(nextRows)
     setDragRowKey(null)
   }
 
-  // grouping
-  const groupedData = useMemo(() => {
-    if (!groupBy) return null
-    return groupDataByColumn(paginatedData, groupBy)
-  }, [groupBy, paginatedData])
-
   return {
-    paginationConfig,
-    displayColumns,
-    fixedColumnsInfo,
+    paginationConfig: view.paginationConfig ?? paginationConfig,
+    displayColumns: view.displayColumns,
+    fixedColumnsInfo: view.fixedColumnsInfo,
     frozenColumnWidths,
-    processedData,
-    paginatedData,
-    pageRowKeys,
+    processedData: view.processedData,
+    paginatedData: view.paginatedData,
+    pageRowKeys: view.pageRowKeys,
+    pageSourceIndices: view.pageSourceIndices,
     selectedRowKeySet,
     expandedRowKeySet,
-    totalColumnCount,
-    paginationInfo,
-    allSelected,
-    someSelected,
-    groupedData,
+    totalColumnCount: view.totalColumnCount,
+    paginationInfo: view.paginationInfo,
+    allSelected: view.allSelected,
+    someSelected: view.someSelected,
+    groupedData: view.groupedData,
     sortState,
+    filterState,
     currentPage,
     currentPageSize,
     hiddenColumnKeys: effectiveHiddenColumnKeys,

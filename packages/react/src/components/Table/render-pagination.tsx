@@ -24,16 +24,12 @@ export function renderPagination(
   view: RenderPaginationViewProps
 ): React.ReactNode {
   const { pagination } = view
-  if (pagination === false || !ctx.paginationInfo) {
+  const paginationConfig = ctx.paginationConfig
+  if (pagination === false || !ctx.paginationInfo || !paginationConfig) {
     return null
   }
 
-  const { totalPages } = ctx.paginationInfo
-  const paginationConfig = pagination as PaginationConfig
-  const total =
-    paginationConfig.total !== undefined && paginationConfig.total > 0
-      ? paginationConfig.total
-      : ctx.processedData.length
+  const { totalPages, total } = ctx.paginationInfo
   const locale = view.disableI18n ? undefined : view.locale
   const labels = getPaginationLabels(locale)
   const localeCode = locale?.locale

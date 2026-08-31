@@ -55,7 +55,7 @@ import { renderSummaryRow } from './Table/render-summary'
 import { renderPagination } from './Table/render-pagination'
 import type { TableInternalProps } from './Table/types'
 
-export type { VueTableProps }
+export type { VueTableProps, VueTableProps as TableProps }
 
 export const Table = defineComponent({
   name: 'TigerTable',
@@ -67,8 +67,14 @@ export const Table = defineComponent({
     const wrapperRef = ref<HTMLElement | null>(null)
     const tableRef = ref<HTMLTableElement | null>(null)
     const measuredColumnWidths = ref<Record<string, number>>({})
-    const measuredRowHeights = ref<number[]>([])
-    const ctx = useTableState(props as TableInternalProps, emit, measuredColumnWidths)
+    const measuredRowHeights = ref<Record<number, number>>({})
+    const measuredContainerSize = ref({ width: 0, height: 0 })
+    const ctx = useTableState(
+      props as TableInternalProps,
+      emit,
+      measuredColumnWidths,
+      measuredContainerSize
+    )
     const resolvedPaginationLocale = ref<Partial<TigerLocale> | undefined>()
     const resolvedTableLocale = ref<Partial<TigerLocale> | undefined>()
     let paginationLocaleResolveId = 0
@@ -182,17 +188,52 @@ export const Table = defineComponent({
         if (!areNumberRecordsEqual(measuredColumnWidths.value, snapshot.columnWidths)) {
           measuredColumnWidths.value = snapshot.columnWidths
         }
-        if (!areNumberArraysEqual(measuredRowHeights.value, snapshot.rowHeights)) {
+        if (!areNumberRecordsEqual(measuredRowHeights.value, snapshot.rowHeights)) {
           measuredRowHeights.value = snapshot.rowHeights
+        }
+        const nextSize = { width: snapshot.containerWidth, height: snapshot.containerHeight }
+        if (
+          measuredContainerSize.value.width !== nextSize.width ||
+          measuredContainerSize.value.height !== nextSize.height
+        ) {
+          measuredContainerSize.value = nextSize
         }
       }
     })
 
-    onMounted(() => {
-      if (wrapperRef.value) {
-        resizeController.observe(wrapperRef.value, tableRef.value)
-      }
+    const shouldObserveGeometry = computed(() => {
+      const resolvedProps = props as TableInternalProps
+      const virtualRecommendation = getTableVirtualRecommendation({
+        virtual: resolvedProps.virtual,
+        autoVirtual: resolvedProps.autoVirtual,
+        dataLength: ctx.processedData.value.length,
+        threshold: resolvedProps.virtualThreshold
+      })
+      return (
+        virtualRecommendation.enabled ||
+        resolvedProps.columnLockable ||
+        ctx.displayColumns.value.some(
+          (column) => column.fixed === 'left' || column.fixed === 'right'
+        )
+      )
     })
+
+    function attachResizeObserver() {
+      resizeController.disconnect()
+      if (!shouldObserveGeometry.value || !wrapperRef.value) return
+      resizeController.observe(wrapperRef.value, tableRef.value)
+    }
+
+    watch(
+      [
+        shouldObserveGeometry,
+        () => ctx.displayColumns.value.length,
+        () => ctx.paginatedData.value.length
+      ],
+      () => attachResizeObserver()
+    )
+
+    onMounted(() => attachResizeObserver())
 
     onBeforeUnmount(() => resizeController.disconnect())
 
@@ -201,7 +242,7 @@ export const Table = defineComponent({
       const virtualRecommendation = getTableVirtualRecommendation({
         virtual: resolvedProps.virtual,
         autoVirtual: resolvedProps.autoVirtual,
-        dataLength: resolvedProps.dataSource.length,
+        dataLength: ctx.processedData.value.length,
         threshold: resolvedProps.virtualThreshold
       })
       const effectiveVirtual = virtualRecommendation.enabled
@@ -214,11 +255,16 @@ export const Table = defineComponent({
           }
         : undefined
 
+      const measuredItemHeight = Object.values(measuredRowHeights.value)[0]
       const virtualWindow = effectiveVirtual
         ? getTableVirtualWindow(
             ctx.virtualScrollTop.value,
-            typeof resolvedProps.virtualHeight === 'number' ? resolvedProps.virtualHeight : 400,
-            resolvedProps.virtualItemHeight,
+            measuredContainerSize.value.height > 0
+              ? measuredContainerSize.value.height
+              : typeof resolvedProps.virtualHeight === 'number'
+                ? resolvedProps.virtualHeight
+                : 400,
+            measuredItemHeight > 0 ? measuredItemHeight : resolvedProps.virtualItemHeight,
             ctx.paginatedData.value.length
           )
         : undefined
@@ -672,7 +718,7 @@ export const Table = defineComponent({
           'data-tiger-virtual-threshold': virtualRecommendation.recommended
             ? virtualRecommendation.threshold
             : undefined,
-          'data-tiger-measured-row-height': measuredRowHeights.value[0] || undefined,
+          'data-tiger-measured-row-height': Object.values(measuredRowHeights.value)[0] || undefined,
           'aria-busy': resolvedProps.loading
         },
         [
@@ -684,14 +730,9 @@ export const Table = defineComponent({
                   type: 'button',
                   class: tableExportButtonClasses,
                   onClick: ctx.handleExport,
-                  'aria-label':
-                    resolvedProps.exportFormat === 'excel'
-                      ? tableLabels.value.exportExcelAriaLabel
-                      : tableLabels.value.exportCsvAriaLabel
+                  'aria-label': tableLabels.value.exportCsvAriaLabel
                 },
-                resolvedProps.exportFormat === 'excel'
-                  ? tableLabels.value.exportExcelText
-                  : tableLabels.value.exportCsvText
+                tableLabels.value.exportCsvText
               )
             ]),
 
@@ -723,16 +764,12 @@ export const Table = defineComponent({
 export default Table
 
 function areNumberRecordsEqual(
-  current: Record<string, number>,
-  next: Record<string, number>
+  current: Record<string | number, number>,
+  next: Record<string | number, number>
 ): boolean {
   const currentKeys = Object.keys(current)
   const nextKeys = Object.keys(next)
   return (
     currentKeys.length === nextKeys.length && nextKeys.every((key) => current[key] === next[key])
   )
-}
-
-function areNumberArraysEqual(current: number[], next: number[]): boolean {
-  return current.length === next.length && next.every((value, index) => current[index] === value)
 }

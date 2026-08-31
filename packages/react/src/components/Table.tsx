@@ -49,19 +49,10 @@ import type { TableProps } from './Table/types'
 
 export type { TableProps } from './Table/types'
 
-const DEFAULT_TABLE_PAGINATION: PaginationConfig = {
-  defaultCurrent: 1,
-  defaultPageSize: 10,
-  total: 0,
-  pageSizeOptions: [10, 20, 50, 100],
-  showSizeChanger: true,
-  showTotal: true
-}
-
 export function Table<T extends Record<string, unknown> = Record<string, unknown>>({
   columns,
   columnLockable = false,
-  dataSource = [],
+  dataSource,
   hiddenColumnKeys,
   defaultHiddenColumnKeys,
   sort,
@@ -76,7 +67,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   locale,
   labels,
   emptyText,
-  pagination = DEFAULT_TABLE_PAGINATION,
+  pagination,
   rowSelection,
   expandable,
   rowKey = 'id',
@@ -94,14 +85,14 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   cardFieldGap = 'gap-3',
   // v0.6.0 props
   virtual = false,
-  autoVirtual = true,
+  autoVirtual = false,
   virtualHeight = 400,
   virtualItemHeight = 40,
   virtualThreshold = 1000,
   editable = false,
   editableCells,
   filterMode = 'basic',
-  advancedFilterRules = [],
+  advancedFilterRules,
   columnDraggable = false,
   rowDraggable = false,
   summaryRow,
@@ -119,6 +110,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   onExpandChange,
   onCellChange,
   onColumnOrderChange,
+  onColumnFixedChange,
   onRowOrderChange,
   onExport,
   className,
@@ -128,7 +120,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const tableRef = useRef<HTMLTableElement | null>(null)
   const [measuredColumnWidths, setMeasuredColumnWidths] = useState<Record<string, number>>({})
-  const [measuredRowHeights, setMeasuredRowHeights] = useState<number[]>([])
+  const [measuredRowHeights, setMeasuredRowHeights] = useState<Record<number, number>>({})
+  const [measuredContainerSize, setMeasuredContainerSize] = useState({ width: 0, height: 0 })
   const internalRowSelection = rowSelection as
     RowSelectionConfig<Record<string, unknown>> | undefined
   const internalExpandable = expandable as ExpandableConfig<Record<string, unknown>> | undefined
@@ -242,6 +235,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     exportFormat,
     exportFilename,
     measuredColumnWidths,
+    containerWidth: measuredContainerSize.width,
     onChange,
     onRowClick: onRowClick as
       ((record: Record<string, unknown>, index: number) => void) | undefined,
@@ -259,6 +253,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       | undefined,
     onCellChange,
     onColumnOrderChange: onColumnOrderChange as ((columns: TableColumn[]) => void) | undefined,
+    onColumnFixedChange: onColumnFixedChange as TableProps['onColumnFixedChange'],
     onRowOrderChange: onRowOrderChange as ((rows: Record<string, unknown>[]) => void) | undefined,
     onExport
   })
@@ -282,10 +277,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       getTableVirtualRecommendation({
         virtual,
         autoVirtual,
-        dataLength: dataSource.length,
+        dataLength: ctx.processedData.length,
         threshold: virtualThreshold
       }),
-    [autoVirtual, dataSource.length, virtual, virtualThreshold]
+    [autoVirtual, ctx.processedData.length, virtual, virtualThreshold]
   )
 
   const effectiveVirtual = virtualRecommendation.enabled
@@ -296,17 +291,30 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
   // Row windowing: track the scroll position and compute the visible slice.
   const [virtualScrollTop, setVirtualScrollTop] = useState(0)
+  const measuredItemHeight = Object.values(measuredRowHeights)[0]
   const virtualWindow = useMemo(
     () =>
       effectiveVirtual
         ? getTableVirtualWindow(
             virtualScrollTop,
-            typeof virtualHeight === 'number' ? virtualHeight : 400,
-            virtualItemHeight,
+            measuredContainerSize.height > 0
+              ? measuredContainerSize.height
+              : typeof virtualHeight === 'number'
+                ? virtualHeight
+                : 400,
+            measuredItemHeight > 0 ? measuredItemHeight : virtualItemHeight,
             ctx.paginatedData.length
           )
         : undefined,
-    [effectiveVirtual, virtualScrollTop, virtualHeight, virtualItemHeight, ctx.paginatedData.length]
+    [
+      effectiveVirtual,
+      virtualScrollTop,
+      virtualHeight,
+      virtualItemHeight,
+      ctx.paginatedData.length,
+      measuredContainerSize.height,
+      measuredItemHeight
+    ]
   )
 
   const wrapperStyle = useMemo(() => {
@@ -333,7 +341,12 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           areNumberRecordsEqual(prev, snapshot.columnWidths) ? prev : snapshot.columnWidths
         )
         setMeasuredRowHeights((prev) =>
-          areNumberArraysEqual(prev, snapshot.rowHeights) ? prev : snapshot.rowHeights
+          areNumberRecordsEqual(prev, snapshot.rowHeights) ? prev : snapshot.rowHeights
+        )
+        setMeasuredContainerSize((prev) =>
+          prev.width === snapshot.containerWidth && prev.height === snapshot.containerHeight
+            ? prev
+            : { width: snapshot.containerWidth, height: snapshot.containerHeight }
         )
       }
     })
@@ -438,20 +451,16 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-tiger-virtual-threshold={
         virtualRecommendation.recommended ? virtualRecommendation.threshold : undefined
       }
-      data-tiger-measured-row-height={measuredRowHeights[0] || undefined}
+      data-tiger-measured-row-height={measuredItemHeight || undefined}
       aria-busy={loading}>
       {exportable && (
         <div className="mb-2 flex justify-end">
           <button
             type="button"
             className={tableExportButtonClasses}
-            aria-label={
-              exportFormat === 'excel'
-                ? tableLabels.exportExcelAriaLabel
-                : tableLabels.exportCsvAriaLabel
-            }
+            aria-label={tableLabels.exportCsvAriaLabel}
             onClick={ctx.handleExport}>
-            {exportFormat === 'excel' ? tableLabels.exportExcelText : tableLabels.exportCsvText}
+            {tableLabels.exportCsvText}
           </button>
         </div>
       )}
@@ -784,16 +793,12 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 }
 
 function areNumberRecordsEqual(
-  current: Record<string, number>,
-  next: Record<string, number>
+  current: Record<string | number, number>,
+  next: Record<string | number, number>
 ): boolean {
   const currentKeys = Object.keys(current)
   const nextKeys = Object.keys(next)
   return (
     currentKeys.length === nextKeys.length && nextKeys.every((key) => current[key] === next[key])
   )
-}
-
-function areNumberArraysEqual(current: number[], next: number[]): boolean {
-  return current.length === next.length && next.every((value, index) => current[index] === value)
 }

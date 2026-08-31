@@ -130,7 +130,7 @@ export type {
 export { Upload } from './components/Upload'
 export type { VueUploadProps, UploadProps } from './components/Upload'
 export { Table } from './components/Table'
-export type { VueTableProps } from './components/Table'
+export type { VueTableProps, TableProps } from './components/Table'
 export { DataExport } from './components/DataExport'
 export type { VueDataExportProps } from './components/DataExport'
 export { Tag } from './components/Tag'

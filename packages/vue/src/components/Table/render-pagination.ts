@@ -23,16 +23,12 @@ export function renderPagination(
   props: TableInternalProps,
   view?: RenderPaginationOptions
 ): VNodeChild {
-  if (props.pagination === false || !ctx.paginationInfo.value) {
+  const paginationConfig = ctx.paginationConfig.value
+  if (props.pagination === false || !ctx.paginationInfo.value || !paginationConfig) {
     return null
   }
 
-  const { totalPages } = ctx.paginationInfo.value
-  const paginationConfig = props.pagination as PaginationConfig
-  const total =
-    paginationConfig.total !== undefined && paginationConfig.total > 0
-      ? paginationConfig.total
-      : ctx.processedData.value.length
+  const { totalPages, total } = ctx.paginationInfo.value
 
   const locale = view?.disableI18n ? undefined : view?.locale
   const labels = getPaginationLabels(locale)

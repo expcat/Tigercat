@@ -8,26 +8,9 @@ import type {
 } from '@expcat/tigercat-core'
 
 /**
- * Public React Table prop interface — extends shared core contract with
- * React-style event callbacks and className support.
+ * Public React Table prop interface — core contract plus className.
  */
 export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<T> {
-  onChange?: (params: {
-    sort: SortState
-    filters: Record<string, unknown>
-    pagination: { current: number; pageSize: number } | null
-  }) => void
-  onRowClick?: (record: T, index: number) => void
-  onSelectionChange?: (selectedKeys: (string | number)[]) => void
-  onSortChange?: (sort: SortState) => void
-  onFilterChange?: (filters: Record<string, unknown>) => void
-  onHiddenColumnKeysChange?: (hiddenKeys: string[]) => void
-  onPageChange?: (page: { current: number; pageSize: number }) => void
-  onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
-  onCellChange?: (rowIndex: number, columnKey: string, newValue: string) => void
-  onColumnOrderChange?: (columns: CoreTableProps<T>['columns']) => void
-  onRowOrderChange?: (rows: T[]) => void
-  onExport?: (csv: string) => void
   className?: string
 }
 
@@ -47,6 +30,7 @@ export interface TableContext {
   processedData: Record<string, unknown>[]
   paginatedData: Record<string, unknown>[]
   pageRowKeys: (string | number)[]
+  pageSourceIndices: number[]
   selectedRowKeySet: Set<string | number>
   expandedRowKeySet: Set<string | number>
   totalColumnCount: number
@@ -55,6 +39,7 @@ export interface TableContext {
   someSelected: boolean
   groupedData: Map<string, Record<string, unknown>[]> | null
   sortState: SortState
+  filterState: Record<string, unknown>
   currentPage: number
   currentPageSize: number
   hiddenColumnKeys: string[]
