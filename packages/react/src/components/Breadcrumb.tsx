@@ -1,208 +1,272 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  forwardRef
+} from 'react'
 import {
   classNames,
   breadcrumbContainerClasses,
   breadcrumbEllipsisClasses,
+  breadcrumbExtraClasses,
+  breadcrumbListClasses,
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
+  getBreadcrumbSlots,
+  getSeparatorKind,
   getSeparatorContent,
-  getBreadcrumbCollapsedItems,
+  resolveBreadcrumbItemCurrent,
+  mergeTigerLocale,
+  getBreadcrumbLabels,
+  chevronLeftSolidIcon20PathD,
+  icon20ViewBox,
   type BreadcrumbItemProps as CoreBreadcrumbItemProps,
   type BreadcrumbProps as CoreBreadcrumbProps,
-  type BreadcrumbSeparator
+  type BreadcrumbSeparator,
+  type TigerLocale,
+  type TigerLocaleBreadcrumb
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
-// Breadcrumb context interface
 export interface BreadcrumbContextValue {
   separator: BreadcrumbSeparator
 }
 
-// Create breadcrumb context
 const BreadcrumbContext = createContext<BreadcrumbContextValue | null>(null)
 
-// Hook to use breadcrumb context
 export function useBreadcrumbContext(): BreadcrumbContextValue | null {
   return useContext(BreadcrumbContext)
 }
 
-export interface BreadcrumbItemProps
-  extends
-    Omit<CoreBreadcrumbItemProps, 'style'>,
-    Omit<React.LiHTMLAttributes<HTMLLIElement>, 'onClick' | 'children'> {
-  /**
-   * Click event handler
-   */
-  onClick?: (event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => void
-
-  style?: React.CSSProperties
-
-  /**
-   * Item content
-   */
-  children?: React.ReactNode
-
-  /**
-   * Icon to display before the item content
-   */
-  icon?: React.ReactNode
-}
-
-export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
-  href,
-  target,
-  current = false,
-  separator: customSeparator,
-  className,
-  style,
-  onClick,
-  children,
-  icon,
-  ...props
-}) => {
-  const breadcrumbContext = useBreadcrumbContext()
-
-  const itemClasses = useMemo(() => getBreadcrumbItemClasses(className), [className])
-
-  const linkClasses = useMemo(() => getBreadcrumbLinkClasses(current), [current])
-
-  const separatorClasses = useMemo(() => getBreadcrumbSeparatorClasses(), [])
-
-  const separatorContent = useMemo(() => {
-    const separator =
-      customSeparator !== undefined ? customSeparator : breadcrumbContext?.separator || '/'
-    return getSeparatorContent(separator)
-  }, [customSeparator, breadcrumbContext])
-
-  const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => {
-      if (!current) {
-        onClick?.(event)
-      }
-    },
-    [current, onClick]
-  )
-
-  const computedRel = useMemo(() => {
-    if (target === '_blank') {
-      return 'noopener noreferrer'
-    }
-    return undefined
-  }, [target])
-
-  const contentElements = icon ? (
-    <>
-      <span className="inline-flex">{icon}</span>
-      {children}
-    </>
-  ) : (
-    children
-  )
-
-  const linkElement =
-    href && !current ? (
-      <a
-        className={linkClasses}
-        href={href}
-        target={target}
-        rel={computedRel}
-        onClick={handleClick}>
-        {contentElements}
-      </a>
-    ) : (
-      <span className={linkClasses} aria-current={current ? 'page' : undefined}>
-        {contentElements}
+function SeparatorMark({ separator }: { separator: BreadcrumbSeparator }) {
+  const kind = getSeparatorKind(separator)
+  const classes = getBreadcrumbSeparatorClasses()
+  if (kind === 'arrow' || kind === 'chevron') {
+    return (
+      <span className={classes} aria-hidden="true">
+        <svg
+          className={`h-3.5 w-3.5 ${kind === 'arrow' ? '-scale-x-100 rtl:scale-x-100' : 'rtl:-scale-x-100'}`}
+          viewBox={icon20ViewBox}
+          fill="currentColor">
+          <path fillRule="evenodd" d={chevronLeftSolidIcon20PathD} clipRule="evenodd" />
+        </svg>
       </span>
     )
-
-  const separatorElement = !current ? (
-    <span className={separatorClasses} aria-hidden="true">
-      {separatorContent}
-    </span>
-  ) : null
-
+  }
   return (
-    <li className={itemClasses} style={style} {...props}>
-      {linkElement}
-      {separatorElement}
-    </li>
+    <span className={classes} aria-hidden="true">
+      {getSeparatorContent(separator)}
+    </span>
   )
 }
 
-export interface BreadcrumbProps
-  extends Omit<CoreBreadcrumbProps, 'style'>, React.HTMLAttributes<HTMLElement> {
-  /**
-   * Extra content aligned to the end of the breadcrumb
-   */
-  extra?: React.ReactNode
+export interface BreadcrumbItemProps
+  extends
+    Omit<CoreBreadcrumbItemProps, 'style' | 'icon'>,
+    Omit<React.LiHTMLAttributes<HTMLLIElement>, 'onClick' | 'children'> {
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void
+  style?: React.CSSProperties
+  children?: React.ReactNode
+  icon?: React.ReactNode
+  /** @internal */
+  isLast?: boolean
 }
 
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({
-  separator = '/',
-  maxItems,
-  className,
-  style,
-  extra,
-  children,
-  ...props
-}) => {
-  const hasExtra = Boolean(extra)
-  const [expanded, setExpanded] = useState(false)
+export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
+  (
+    {
+      href,
+      target,
+      current,
+      separator: _separator,
+      className,
+      style,
+      onClick,
+      children,
+      icon,
+      isLast = false,
+      ...props
+    },
+    ref
+  ) => {
+    const isCurrent = resolveBreadcrumbItemCurrent(current, isLast)
+    const itemClasses = getBreadcrumbItemClasses(className)
+    const linkClasses = getBreadcrumbLinkClasses(isCurrent)
 
-  // Container classes
-  const containerClasses = React.useMemo(
-    () => classNames(breadcrumbContainerClasses, hasExtra && 'w-full', className),
-    [className, hasExtra]
-  )
+    const handleClick = useCallback(
+      (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+        if (isCurrent) return
+        onClick?.(event)
+      },
+      [isCurrent, onClick]
+    )
 
-  // Context value
-  const contextValue = React.useMemo<BreadcrumbContextValue>(() => ({ separator }), [separator])
+    const computedRel = target === '_blank' ? 'noopener noreferrer' : undefined
+    const contentElements = icon ? (
+      <>
+        <span className="inline-flex">{icon}</span>
+        {children}
+      </>
+    ) : (
+      children
+    )
 
-  const renderedItems = useMemo(() => {
-    const items = React.Children.toArray(children)
-
-    if (expanded || maxItems === undefined || maxItems <= 0 || maxItems >= items.length) {
-      return items
+    let control: React.ReactNode
+    if (isCurrent) {
+      control = (
+        <span className={linkClasses} aria-current="page">
+          {contentElements}
+        </span>
+      )
+    } else if (href) {
+      control = (
+        <a
+          className={linkClasses}
+          href={href}
+          target={target}
+          rel={computedRel}
+          onClick={handleClick}>
+          {contentElements}
+        </a>
+      )
+    } else if (onClick) {
+      control = (
+        <button type="button" className={linkClasses} onClick={handleClick}>
+          {contentElements}
+        </button>
+      )
+    } else {
+      control = <span className={getBreadcrumbLinkClasses(true)}>{contentElements}</span>
     }
 
-    const { collapsed } = getBreadcrumbCollapsedItems(items.length, maxItems)
-    if (collapsed.length === 0) return items
+    return (
+      <li ref={ref} className={itemClasses} style={style} {...props}>
+        {control}
+      </li>
+    )
+  }
+)
+BreadcrumbItem.displayName = 'BreadcrumbItem'
 
-    const collapsedSet = new Set(collapsed)
-    const result: React.ReactNode[] = []
-    let ellipsisInserted = false
-    items.forEach((item, index) => {
-      if (collapsedSet.has(index)) {
-        if (!ellipsisInserted) {
-          ellipsisInserted = true
-          result.push(
-            <li key="__tiger-breadcrumb-ellipsis" className={getBreadcrumbItemClasses()}>
-              <button
-                type="button"
-                className={breadcrumbEllipsisClasses}
-                aria-label="Show collapsed breadcrumb items"
-                onClick={() => setExpanded(true)}>
-                ...
-              </button>
-              <span className={getBreadcrumbSeparatorClasses()} aria-hidden="true">
-                {getSeparatorContent(separator)}
-              </span>
-            </li>
-          )
-        }
-        return
-      }
-      result.push(item)
-    })
-    return result
-  }, [children, expanded, maxItems, separator])
-
-  return (
-    <BreadcrumbContext.Provider value={contextValue}>
-      <nav className={containerClasses} aria-label="Breadcrumb" style={style} {...props}>
-        <ol className="flex items-center flex-wrap gap-2">{renderedItems}</ol>
-        {hasExtra && <div className="ml-auto flex items-center">{extra}</div>}
-      </nav>
-    </BreadcrumbContext.Provider>
-  )
+export interface BreadcrumbProps
+  extends
+    Omit<CoreBreadcrumbProps, 'style' | 'extra'>,
+    Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+  extra?: React.ReactNode
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleBreadcrumb>
 }
+
+export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
+  (
+    {
+      separator = '/',
+      maxItems,
+      className,
+      style,
+      extra,
+      children,
+      locale,
+      labels: labelsOverride,
+      ...props
+    },
+    ref
+  ) => {
+    const { 'aria-label': ariaLabelProp, ...rest } = props
+    const config = useTigerConfig()
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
+    const labels = useMemo(
+      () => getBreadcrumbLabels(mergedLocale, labelsOverride),
+      [mergedLocale, labelsOverride]
+    )
+    const items = useMemo(() => React.Children.toArray(children), [children])
+    const itemSignature = items
+      .map((item) => (React.isValidElement(item) ? String(item.key ?? '') : ''))
+      .join('|')
+    const [expanded, setExpanded] = useState(false)
+
+    useEffect(() => {
+      setExpanded(false)
+    }, [itemSignature, maxItems])
+
+    const hasExtra = Boolean(extra)
+    const containerClasses = classNames(breadcrumbContainerClasses, hasExtra && 'w-full', className)
+    const contextValue = useMemo<BreadcrumbContextValue>(() => ({ separator }), [separator])
+    const slots = getBreadcrumbSlots(items.length, maxItems, expanded)
+
+    const rendered = slots.map((slot, index) => {
+      const nodes: React.ReactNode[] = []
+      if (slot.type === 'ellipsis') {
+        nodes.push(
+          <li key="__tiger-breadcrumb-ellipsis" className={getBreadcrumbItemClasses()}>
+            <button
+              type="button"
+              className={breadcrumbEllipsisClasses}
+              aria-label={labels.expandAriaLabel}
+              aria-expanded="false"
+              onClick={() => setExpanded(true)}>
+              ...
+            </button>
+          </li>
+        )
+      } else {
+        const child = items[slot.index]
+        const isLast = slot.index === items.length - 1
+        nodes.push(
+          React.isValidElement(child)
+            ? React.cloneElement(child as React.ReactElement<BreadcrumbItemProps>, {
+                key: child.key ?? slot.index,
+                isLast
+              })
+            : child
+        )
+      }
+      const isLastSlot = index === slots.length - 1
+      if (!isLastSlot) {
+        nodes.push(
+          <li key={`sep-${index}`} className={getBreadcrumbItemClasses()} aria-hidden="true">
+            <SeparatorMark separator={separator} />
+          </li>
+        )
+      }
+      return nodes
+    })
+
+    const nav = (
+      <nav
+        ref={ref}
+        className={hasExtra ? undefined : containerClasses}
+        aria-label={ariaLabelProp ?? labels.ariaLabel}
+        style={hasExtra ? undefined : style}
+        {...rest}>
+        <ol
+          className={
+            hasExtra ? breadcrumbListClasses : classNames(breadcrumbListClasses, 'w-full')
+          }>
+          {rendered}
+        </ol>
+      </nav>
+    )
+
+    if (!hasExtra) {
+      return <BreadcrumbContext.Provider value={contextValue}>{nav}</BreadcrumbContext.Provider>
+    }
+
+    return (
+      <BreadcrumbContext.Provider value={contextValue}>
+        <div className={containerClasses} style={style}>
+          {nav}
+          <div className={breadcrumbExtraClasses}>{extra}</div>
+        </div>
+      </BreadcrumbContext.Provider>
+    )
+  }
+)
+Breadcrumb.displayName = 'Breadcrumb'

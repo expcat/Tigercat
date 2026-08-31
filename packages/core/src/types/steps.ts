@@ -87,6 +87,10 @@ export interface StepsProps {
    */
   clickable?: boolean
   /**
+   * Data-driven items. When set, `StepsItem` children are optional.
+   */
+  items?: StepItem[]
+  /**
    * Additional CSS classes
    */
   className?: string

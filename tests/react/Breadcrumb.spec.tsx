@@ -7,7 +7,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react/Breadcrumb'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Breadcrumb', () => {
   describe('Rendering', () => {
@@ -20,7 +20,7 @@ describe('Breadcrumb', () => {
         </Breadcrumb>
       )
       expect(container.querySelector('nav')).toHaveAttribute('aria-label', 'Breadcrumb')
-      expect(container.querySelectorAll('ol > li')).toHaveLength(3)
+      expect(container.querySelectorAll('ol > li:not([aria-hidden])')).toHaveLength(3)
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('Details')).toBeInTheDocument()
     })
@@ -33,15 +33,13 @@ describe('Breadcrumb', () => {
         </Breadcrumb>
       )
       expect(screen.getByText('Action')).toBeInTheDocument()
-      expect(container.querySelector('.ml-auto')).toBeInTheDocument()
+      expect(container.querySelector('nav')?.contains(screen.getByText('Action'))).toBe(false)
     })
   })
 
   describe('Separator', () => {
     it.each([
       [undefined, '/'],
-      ['arrow', '→'],
-      ['chevron', '›'],
       ['>', '>']
     ])('renders the %s separator as "%s"', (separator, expected) => {
       const { container } = render(
@@ -51,6 +49,16 @@ describe('Breadcrumb', () => {
         </Breadcrumb>
       )
       expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent(expected)
+    })
+
+    it('renders directional separators as graphics that flip with dir', () => {
+      const { container } = render(
+        <Breadcrumb separator="chevron">
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      expect(container.querySelector('svg')).toBeInTheDocument()
     })
 
     it('does not render a separator after the last item', () => {
@@ -64,16 +72,14 @@ describe('Breadcrumb', () => {
       expect(items[items.length - 1]?.querySelector('[aria-hidden="true"]')).toBeNull()
     })
 
-    it('allows an item-level separator override', () => {
-      const { container } = render(
-        <Breadcrumb separator="/">
-          <BreadcrumbItem href="/" separator="arrow">
-            Home
-          </BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
+    it('treats the last item as current when current is omitted', () => {
+      render(
+        <Breadcrumb>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem>Here</BreadcrumbItem>
         </Breadcrumb>
       )
-      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('→')
+      expect(screen.getByText('Here')).toHaveAttribute('aria-current', 'page')
     })
   })
 
@@ -81,7 +87,7 @@ describe('Breadcrumb', () => {
     it('renders a link with target/rel when href is set and not current', () => {
       const { container } = render(
         <Breadcrumb>
-          <BreadcrumbItem href="https://example.com" target="_blank">
+          <BreadcrumbItem href="https://example.com" target="_blank" current={false}>
             External
           </BreadcrumbItem>
         </Breadcrumb>
@@ -118,14 +124,28 @@ describe('Breadcrumb', () => {
   })
 
   describe('Events', () => {
+    it('activates onClick without href via a button', async () => {
+      const handleClick = vi.fn()
+      const user = userEvent.setup()
+      render(
+        <Breadcrumb>
+          <BreadcrumbItem onClick={handleClick}>Home</BreadcrumbItem>
+          <BreadcrumbItem>Here</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      await user.click(screen.getByRole('button', { name: 'Home' }))
+      expect(handleClick).toHaveBeenCalledTimes(1)
+    })
+
     it('calls onClick when a link item is clicked', async () => {
       const handleClick = vi.fn()
       const user = userEvent.setup()
       render(
         <Breadcrumb>
-          <BreadcrumbItem href="/home" onClick={handleClick}>
+          <BreadcrumbItem href="/home" onClick={handleClick} current={false}>
             Home
           </BreadcrumbItem>
+          <BreadcrumbItem>Here</BreadcrumbItem>
         </Breadcrumb>
       )
       await user.click(screen.getByText('Home'))
@@ -186,7 +206,7 @@ describe('Breadcrumb', () => {
     it('collapses middle items into an ellipsis when maxItems is set', () => {
       const { container } = renderItems(3)
       expect(ellipsis(container)).toBeInTheDocument()
-      expect(container.querySelectorAll('li')).toHaveLength(4)
+      expect(container.querySelectorAll('li:not([aria-hidden])')).toHaveLength(4)
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('C')).toBeInTheDocument()
       expect(screen.queryByText('A')).not.toBeInTheDocument()
@@ -204,7 +224,7 @@ describe('Breadcrumb', () => {
     it('does not collapse when maxItems is >= the item count', () => {
       const { container } = renderItems(10)
       expect(ellipsis(container)).toBeNull()
-      expect(container.querySelectorAll('li')).toHaveLength(5)
+      expect(container.querySelectorAll('li:not([aria-hidden])')).toHaveLength(5)
     })
 
     it('does not leak maxItems to the DOM', () => {
@@ -225,8 +245,15 @@ describe('Breadcrumb', () => {
     })
 
     it('has no accessibility violations', async () => {
-      const { container } = render(<Breadcrumb />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(
+        <Breadcrumb extra={<button type="button">Action</button>} maxItems={3}>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem href="/a">A</BreadcrumbItem>
+          <BreadcrumbItem href="/b">B</BreadcrumbItem>
+          <BreadcrumbItem>Here</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      await expectNoA11yViolations(container)
     })
   })
 })

@@ -39,8 +39,8 @@ describe('breadcrumb-utils', () => {
   it('resolves built-in and custom separators', () => {
     expect(getSeparatorContent()).toBe('/')
     expect(getSeparatorContent('slash')).toBe('/')
-    expect(getSeparatorContent('arrow')).toBe('→')
-    expect(getSeparatorContent('chevron')).toBe('›')
+    expect(getSeparatorContent('arrow')).toBe('')
+    expect(getSeparatorContent('chevron')).toBe('')
     expect(getSeparatorContent('·')).toBe('·')
   })
 
@@ -59,5 +59,14 @@ describe('breadcrumb-utils', () => {
       visible: [0, 4],
       collapsed: [1, 2, 3]
     })
+    expect(getBreadcrumbCollapsedItems(5, 1)).toEqual({
+      visible: [0, 4],
+      collapsed: [1, 2, 3]
+    })
+    expect(getBreadcrumbCollapsedItems(5, Number.NaN)).toEqual({
+      visible: [0, 1, 2, 3, 4],
+      collapsed: []
+    })
+    expect(getBreadcrumbCollapsedItems(0, 3)).toEqual({ visible: [], collapsed: [] })
   })
 })

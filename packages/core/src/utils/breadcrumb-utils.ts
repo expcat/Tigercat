@@ -8,7 +8,9 @@ import type { BreadcrumbSeparator } from '../types/breadcrumb'
 /**
  * Base breadcrumb container classes
  */
-export const breadcrumbContainerClasses = 'flex items-center flex-wrap gap-2 text-sm'
+export const breadcrumbContainerClasses = 'flex w-full items-center gap-2 text-sm'
+export const breadcrumbListClasses = 'flex min-w-0 flex-1 items-center flex-wrap gap-2'
+export const breadcrumbExtraClasses = 'ms-auto flex items-center'
 
 /**
  * Breadcrumb item base classes
@@ -55,19 +57,20 @@ export function getBreadcrumbLinkClasses(current?: boolean): string {
 /**
  * Get separator content based on separator type
  */
-export function getSeparatorContent(separator?: BreadcrumbSeparator): string {
-  if (!separator) return '/'
+export type BreadcrumbSeparatorKind = 'slash' | 'arrow' | 'chevron' | 'custom'
 
-  switch (separator) {
-    case 'slash':
-      return '/'
-    case 'arrow':
-      return '→'
-    case 'chevron':
-      return '›'
-    default:
-      return separator
-  }
+export function getSeparatorKind(separator?: BreadcrumbSeparator): BreadcrumbSeparatorKind {
+  if (!separator || separator === 'slash') return 'slash'
+  if (separator === 'arrow') return 'arrow'
+  if (separator === 'chevron') return 'chevron'
+  return 'custom'
+}
+
+export function getSeparatorContent(separator?: BreadcrumbSeparator): string {
+  const kind = getSeparatorKind(separator)
+  if (kind === 'slash') return '/'
+  if (kind === 'arrow' || kind === 'chevron') return ''
+  return separator as string
 }
 
 /**
@@ -98,26 +101,64 @@ export function getBreadcrumbCollapsedItems(
   totalItems: number,
   maxItems: number
 ): { visible: number[]; collapsed: number[] } {
-  if (maxItems <= 0 || maxItems >= totalItems) {
-    return {
-      visible: Array.from({ length: totalItems }, (_, i) => i),
-      collapsed: []
-    }
+  const all = Array.from({ length: Math.max(0, totalItems) }, (_, i) => i)
+  if (!Number.isFinite(maxItems) || maxItems <= 0 || maxItems >= totalItems || totalItems <= 2) {
+    return { visible: all, collapsed: [] }
   }
 
+  const tailCount = Math.max(1, Math.trunc(maxItems) - 1)
+  const tailStart = totalItems - tailCount
   const visible: number[] = [0]
   const collapsed: number[] = []
 
-  const tailCount = maxItems - 1
-  const tailStart = totalItems - tailCount
-
   for (let i = 1; i < totalItems; i++) {
-    if (i >= tailStart) {
-      visible.push(i)
-    } else {
-      collapsed.push(i)
-    }
+    if (i >= tailStart) visible.push(i)
+    else collapsed.push(i)
   }
 
+  if (!visible.includes(totalItems - 1)) visible.push(totalItems - 1)
+
   return { visible, collapsed }
+}
+
+export type BreadcrumbSlot = { type: 'item'; index: number } | { type: 'ellipsis' }
+
+export function getBreadcrumbSlots(
+  totalItems: number,
+  maxItems: number | undefined,
+  expanded: boolean
+): BreadcrumbSlot[] {
+  if (expanded || maxItems === undefined) {
+    return allItemSlots(totalItems)
+  }
+  const { visible, collapsed } = getBreadcrumbCollapsedItems(totalItems, maxItems)
+  if (collapsed.length === 0) return visible.map((index) => ({ type: 'item', index }))
+
+  const slots: BreadcrumbSlot[] = []
+  let ellipsisInserted = false
+  const collapsedSet = new Set(collapsed)
+  for (let i = 0; i < totalItems; i++) {
+    if (collapsedSet.has(i)) {
+      if (!ellipsisInserted) {
+        slots.push({ type: 'ellipsis' })
+        ellipsisInserted = true
+      }
+      continue
+    }
+    slots.push({ type: 'item', index: i })
+  }
+  return slots
+}
+
+function allItemSlots(totalItems: number): BreadcrumbSlot[] {
+  return Array.from({ length: Math.max(0, totalItems) }, (_, index) => ({ type: 'item', index }))
+}
+
+export function resolveBreadcrumbItemCurrent(
+  current: boolean | undefined,
+  isLast: boolean
+): boolean {
+  if (current === false) return false
+  if (current === true) return true
+  return isLast
 }

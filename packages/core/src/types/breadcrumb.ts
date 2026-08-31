@@ -55,10 +55,15 @@ export interface BreadcrumbItemProps {
   target?: '_blank' | '_self' | '_parent' | '_top'
 
   /**
-   * Whether this is the current/last item
-   * @default false
+   * Marks the current page (`aria-current="page"`).
+   * When omitted, the last item is treated as current. Pass `false` to opt out.
    */
   current?: boolean
+
+  /**
+   * Icon shown before the item content
+   */
+  icon?: unknown
 
   /**
    * Custom separator for this item (overrides global separator)

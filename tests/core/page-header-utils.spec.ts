@@ -76,7 +76,7 @@ describe('page-header-utils', () => {
       expect(pageHeaderRootClasses).toContain('flex')
       expect(pageHeaderHeadingRowClasses).toContain('justify-between')
       expect(pageHeaderStartClasses).toContain('flex')
-      expect(pageHeaderActionsClasses).toContain('ml-auto')
+      expect(pageHeaderActionsClasses).not.toContain('ml-auto')
     })
 
     it('appends extra class names after the base classes', () => {

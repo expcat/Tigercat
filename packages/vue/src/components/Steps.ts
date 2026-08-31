@@ -6,6 +6,7 @@ import {
   PropType,
   h,
   reactive,
+  ref,
   type VNode,
   type VNodeArrayChildren,
   type Component
@@ -22,13 +23,23 @@ import {
   getStepDescriptionClasses,
   getStepsContainerClasses,
   calculateStepStatus,
+  clampStepCurrent,
+  getStepStatusText,
+  isStepsItemType,
+  mergeTigerLocale,
+  getStepsLabels,
   stepFinishIconViewBox,
   stepFinishIconStrokeWidth,
   stepFinishIconPathD,
   type StepsDirection,
   type StepStatus,
-  type StepSize
+  type StepSize,
+  type StepItem,
+  type TigerLocale,
+  type TigerLocaleSteps
 } from '@expcat/tigercat-core'
+import { flattenElementVNodes } from '../utils/flatten-vnodes'
+import { useTigerConfig } from './ConfigProvider'
 
 // Steps context key
 export const StepsContextKey = Symbol('StepsContext')
@@ -41,7 +52,12 @@ export interface StepsContext {
   size: StepSize
   simple: boolean
   clickable: boolean
+  labels: Required<TigerLocaleSteps>
   handleStepClick?: (index: number) => void
+}
+
+export function useStepsContext(): StepsContext | undefined {
+  return inject<StepsContext>(StepsContextKey)
 }
 
 type RawChildren = string | number | boolean | VNode | VNodeArrayChildren | (() => unknown)
@@ -54,9 +70,13 @@ export interface VueStepsProps {
   size?: StepSize
   simple?: boolean
   clickable?: boolean
+  items?: StepItem[]
   className?: string
   style?: Record<string, unknown>
 }
+
+export type StepsProps = VueStepsProps
+export type StepsItemProps = VueStepsItemProps
 
 export interface VueStepsItemProps {
   title: string
@@ -131,14 +151,10 @@ export const StepsItem = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const stepsContext = inject<StepsContext>(StepsContextKey, {
-      current: 0,
-      status: 'process',
-      direction: 'horizontal',
-      size: 'default',
-      simple: false,
-      clickable: false
-    })
+    const stepsContext = inject<StepsContext>(StepsContextKey)
+    if (!stepsContext) {
+      throw new Error('StepsItem must be used within a Steps component')
+    }
 
     const stepStatus = computed(() => {
       return calculateStepStatus(
@@ -201,60 +217,36 @@ export const StepsItem = defineComponent({
     }
 
     const renderIcon = () => {
-      if (slots.icon) {
-        return h('div', { class: iconClasses.value }, slots.icon())
-      }
+      let inner: unknown
+      if (slots.icon) inner = slots.icon()
+      else if (props.icon) inner = props.icon
+      else if (stepStatus.value === 'finish') {
+        inner = h(
+          'svg',
+          {
+            class: 'w-4 h-4 shrink-0 tiger-animate-fade-in',
+            fill: 'none',
+            stroke: 'currentColor',
+            'stroke-width': stepFinishIconStrokeWidth,
+            viewBox: stepFinishIconViewBox,
+            'aria-hidden': 'true'
+          },
+          [
+            h('path', {
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              d: stepFinishIconPathD
+            })
+          ]
+        )
+      } else if (stepStatus.value === 'error') inner = h('span', { 'aria-hidden': 'true' }, '!')
+      else inner = h('span', { 'aria-hidden': 'true' }, String(props.stepIndex + 1))
 
-      if (props.icon) {
-        return h('div', { class: iconClasses.value }, props.icon as unknown as RawChildren)
-      }
-
-      if (stepStatus.value === 'finish') {
-        return h('div', { class: iconClasses.value, 'aria-hidden': 'true' }, [
-          h(
-            'svg',
-            {
-              class: 'w-4 h-4 shrink-0 transition-transform duration-300 animate-fade-in',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': stepFinishIconStrokeWidth,
-              viewBox: stepFinishIconViewBox
-            },
-            [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                d: stepFinishIconPathD
-              })
-            ]
-          )
-        ])
-      }
-
-      return h('div', { class: iconClasses.value }, String(props.stepIndex + 1))
+      return h('div', { class: iconClasses.value, 'aria-hidden': 'true' }, inner as RawChildren)
     }
 
     const renderContent = () => {
-      const children = []
-
-      if (stepsContext.clickable) {
-        children.push(
-          h(
-            'button',
-            {
-              type: 'button',
-              class: titleClasses.value,
-              onClick: handleClick,
-              disabled: props.disabled,
-              'aria-disabled': props.disabled || undefined
-            },
-            props.title
-          )
-        )
-      } else {
-        children.push(h('div', { class: titleClasses.value }, props.title))
-      }
-
+      const children = [h('div', { class: titleClasses.value }, props.title)]
       if (!stepsContext.simple && (props.description || slots.description)) {
         children.push(
           h(
@@ -264,7 +256,6 @@ export const StepsItem = defineComponent({
           )
         )
       }
-
       return h('div', { class: contentClasses.value }, children)
     }
 
@@ -273,23 +264,32 @@ export const StepsItem = defineComponent({
     return () => {
       const { class: _class, style: _style, ...restAttrs } = attrs as Record<string, unknown>
 
-      if (stepsContext.direction === 'vertical') {
-        return h(
-          'li',
-          {
-            class: itemClasses.value,
-            style: mergedStyle.value,
-            'aria-current': props.stepIndex === stepsContext.current ? 'step' : undefined,
-            'aria-disabled': props.disabled || undefined,
-            ...restAttrs
-          },
-          [
-            h('div', { class: 'relative' }, [renderIcon(), h('div', { class: tailClasses.value })]),
-            renderContent()
-          ]
-        )
-      }
+      const body =
+        stepsContext.direction === 'vertical'
+          ? [
+              h('div', { class: 'relative' }, [
+                renderIcon(),
+                h('div', { class: tailClasses.value })
+              ]),
+              renderContent(),
+              h(
+                'span',
+                { class: 'sr-only' },
+                getStepStatusText(stepStatus.value, stepsContext.labels)
+              )
+            ]
+          : [
+              renderIcon(),
+              h('div', { class: tailClasses.value }),
+              renderContent(),
+              h(
+                'span',
+                { class: 'sr-only' },
+                getStepStatusText(stepStatus.value, stepsContext.labels)
+              )
+            ]
 
+      const isClickable = !!stepsContext.handleStepClick && !props.disabled
       return h(
         'li',
         {
@@ -299,7 +299,22 @@ export const StepsItem = defineComponent({
           'aria-disabled': props.disabled || undefined,
           ...restAttrs
         },
-        [renderIcon(), h('div', { class: tailClasses.value }), renderContent()]
+        isClickable
+          ? [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class:
+                    stepsContext.direction === 'vertical'
+                      ? 'flex w-full flex-row items-start bg-transparent p-0 text-start'
+                      : 'flex w-full flex-col items-center bg-transparent p-0',
+                  onClick: handleClick
+                },
+                body
+              )
+            ]
+          : body
       )
     }
   }
@@ -357,6 +372,18 @@ export const Steps = defineComponent({
       type: Boolean,
       default: false
     },
+    items: {
+      type: Array as PropType<StepItem[]>,
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleSteps>>,
+      default: undefined
+    },
     /**
      * Additional CSS classes
      */
@@ -382,6 +409,11 @@ export const Steps = defineComponent({
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     // Handle step click
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const stepLabels = computed(() => getStepsLabels(mergedLocale.value, props.labels))
+    const itemCount = ref(0)
+
     const handleStepClick = (index: number) => {
       if (!props.clickable) {
         return
@@ -391,53 +423,64 @@ export const Steps = defineComponent({
       emit('change', index)
     }
 
-    // Provide steps context to child components via reactive computed refs
     provide<StepsContext>(
       StepsContextKey,
       reactive({
-        current: computed(() => props.current),
+        current: computed(() => clampStepCurrent(props.current, itemCount.value)),
         status: computed(() => props.status),
         direction: computed(() => props.direction),
         size: computed(() => props.size),
         simple: computed(() => props.simple),
         clickable: computed(() => props.clickable),
+        labels: computed(() => stepLabels.value),
         handleStepClick: computed(() => (props.clickable ? handleStepClick : undefined))
-      }) as StepsContext
+      }) as unknown as StepsContext
     )
 
     return () => {
-      const children = (slots.default?.() || []) as VNode[]
+      const {
+        class: _class,
+        style: _style,
+        'aria-label': ariaLabelAttr,
+        ...restAttrs
+      } = attrs as Record<string, unknown>
 
-      const { class: _class, style: _style, ...restAttrs } = attrs as Record<string, unknown>
+      let itemVNodes: VNode[]
+      if (props.items && props.items.length > 0) {
+        itemVNodes = props.items.map((item) =>
+          h(StepsItem, {
+            key: item.key ?? item.title,
+            title: item.title,
+            description: item.description,
+            icon: item.icon,
+            status: item.status,
+            disabled: item.disabled
+          })
+        )
+      } else {
+        itemVNodes = flattenElementVNodes(slots.default?.() as VNode[] | undefined).filter(
+          (child) => isStepsItemType(child.type, StepsItem)
+        )
+      }
 
-      // Add step index and isLast props to each step item
-      const stepsWithProps = children.map((child, index: number) => {
-        const childType = child?.type
-        const childName =
-          typeof childType === 'object' && childType && 'name' in childType
-            ? (childType as { name?: string }).name
-            : undefined
+      itemCount.value = itemVNodes.length
 
-        if (childName === 'TigerStepsItem') {
-          const childProps = (child.props ?? {}) as Record<string, unknown>
-          // `h()` expects `string | Component`, but `VNode.type` is `VNodeTypes`.
-          // Narrow here to keep DTS generation happy.
-          const stepItemType =
-            typeof child.type === 'string' || typeof child.type === 'object'
-              ? (child.type as string | Component)
-              : 'div'
-
-          return h(
-            stepItemType,
-            {
-              ...childProps,
-              stepIndex: index,
-              isLast: index === children.length - 1
-            },
-            (child.children ?? undefined) as unknown as RawChildren | RawSlotsLike
-          )
-        }
-        return child
+      const stepsWithProps = itemVNodes.map((child, index: number) => {
+        const childProps = (child.props ?? {}) as Record<string, unknown>
+        const stepItemType =
+          typeof child.type === 'string' || typeof child.type === 'object'
+            ? (child.type as string | Component)
+            : 'div'
+        return h(
+          stepItemType,
+          {
+            ...childProps,
+            key: child.key ?? index,
+            stepIndex: index,
+            isLast: index === itemVNodes.length - 1
+          },
+          (child.children ?? undefined) as unknown as RawChildren | RawSlotsLike
+        )
       })
 
       return h(
@@ -445,6 +488,9 @@ export const Steps = defineComponent({
         {
           class: containerClasses.value,
           style: mergedStyle.value,
+          role: 'list',
+          'aria-label':
+            typeof ariaLabelAttr === 'string' ? ariaLabelAttr : stepLabels.value.ariaLabel,
           ...restAttrs
         },
         stepsWithProps

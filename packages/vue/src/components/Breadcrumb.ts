@@ -6,7 +6,6 @@ import {
   reactive,
   ref,
   watch,
-  Fragment,
   PropType,
   h,
   type VNode,
@@ -14,15 +13,39 @@ import {
 } from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   breadcrumbContainerClasses,
   breadcrumbEllipsisClasses,
+  breadcrumbExtraClasses,
+  breadcrumbListClasses,
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
+  getBreadcrumbSlots,
+  getSeparatorKind,
   getSeparatorContent,
-  getBreadcrumbCollapsedItems,
-  type BreadcrumbSeparator
+  resolveBreadcrumbItemCurrent,
+  mergeTigerLocale,
+  getBreadcrumbLabels,
+  chevronLeftSolidIcon20PathD,
+  icon20ViewBox,
+  type BreadcrumbSeparator,
+  type TigerLocale,
+  type TigerLocaleBreadcrumb
 } from '@expcat/tigercat-core'
+import { flattenElementVNodes } from '../utils/flatten-vnodes'
+import { useTigerConfig } from './ConfigProvider'
+
+export const BreadcrumbContextKey = Symbol('BreadcrumbContext')
+
+export interface BreadcrumbContext {
+  separator: BreadcrumbSeparator
+}
+
+export function useBreadcrumbContext(): BreadcrumbContext | undefined {
+  return inject<BreadcrumbContext>(BreadcrumbContextKey)
+}
 
 export interface VueBreadcrumbProps {
   separator?: BreadcrumbSeparator
@@ -32,13 +55,7 @@ export interface VueBreadcrumbProps {
   extra?: VNodeChild | VNodeChild[]
 }
 
-// Breadcrumb context key
-export const BreadcrumbContextKey = Symbol('BreadcrumbContext')
-
-// Breadcrumb context interface
-export interface BreadcrumbContext {
-  separator: BreadcrumbSeparator
-}
+export type BreadcrumbProps = VueBreadcrumbProps
 
 export interface VueBreadcrumbItemProps {
   href?: string
@@ -50,148 +67,104 @@ export interface VueBreadcrumbItemProps {
   icon?: string | VNode
 }
 
+export type BreadcrumbItemProps = VueBreadcrumbItemProps
+
+function renderSeparator(separator: BreadcrumbSeparator) {
+  const kind = getSeparatorKind(separator)
+  const classes = getBreadcrumbSeparatorClasses()
+  if (kind === 'arrow' || kind === 'chevron') {
+    return h('span', { class: classes, 'aria-hidden': 'true' }, [
+      h(
+        'svg',
+        {
+          class: `h-3.5 w-3.5 ${kind === 'arrow' ? '-scale-x-100 rtl:scale-x-100' : 'rtl:-scale-x-100'}`,
+          viewBox: icon20ViewBox,
+          fill: 'currentColor'
+        },
+        h('path', {
+          'fill-rule': 'evenodd',
+          d: chevronLeftSolidIcon20PathD,
+          'clip-rule': 'evenodd'
+        })
+      )
+    ])
+  }
+  return h('span', { class: classes, 'aria-hidden': 'true' }, getSeparatorContent(separator))
+}
+
 export const BreadcrumbItem = defineComponent({
   name: 'TigerBreadcrumbItem',
+  inheritAttrs: false,
   props: {
-    /**
-     * Navigation link URL
-     */
-    href: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Link target attribute
-     */
+    href: { type: String, default: undefined },
     target: {
       type: String as PropType<'_blank' | '_self' | '_parent' | '_top'>,
       default: undefined
     },
-    /**
-     * Whether this is the current/last item
-     * @default false
-     */
-    current: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Custom separator for this item (overrides global separator)
-     */
-    separator: {
-      type: String as PropType<BreadcrumbSeparator>,
-      default: undefined
-    },
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Inline styles
-     */
-    style: {
-      type: Object as PropType<Record<string, unknown>>,
-      default: undefined
-    },
-    /**
-     * Icon to display before the item content
-     */
-    icon: {
-      type: [String, Object] as PropType<string | VNode>,
-      default: undefined
-    }
+    current: { type: Boolean, default: undefined },
+    separator: { type: String as PropType<BreadcrumbSeparator>, default: undefined },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<Record<string, unknown>>, default: undefined },
+    icon: { type: [String, Object] as PropType<string | VNode>, default: undefined },
+    isLast: { type: Boolean, default: false }
   },
   emits: {
-    /**
-     * Emitted when breadcrumb item is clicked
-     */
     click: (event: MouseEvent) => event instanceof MouseEvent
   },
   setup(props, { slots, emit, attrs }) {
-    const breadcrumbContext = inject<BreadcrumbContext>(BreadcrumbContextKey, {
-      separator: '/'
-    })
-
-    const itemClasses = computed(() => {
-      return getBreadcrumbItemClasses(props.className)
-    })
-
-    const linkClasses = computed(() => {
-      return getBreadcrumbLinkClasses(props.current)
-    })
-
-    const separatorClasses = computed(() => {
-      return getBreadcrumbSeparatorClasses()
-    })
-
-    const separatorContent = computed(() => {
-      const separator =
-        props.separator !== undefined ? props.separator : breadcrumbContext.separator
-      return getSeparatorContent(separator)
-    })
+    const isCurrent = computed(() => resolveBreadcrumbItemCurrent(props.current, props.isLast))
+    const hasHandler = typeof (attrs as { onClick?: unknown }).onClick === 'function'
 
     const handleClick = (event: MouseEvent) => {
-      if (!props.current) {
-        emit('click', event)
-      }
+      if (!isCurrent.value) emit('click', event)
     }
-
-    const computedRel = computed(() => {
-      if (props.target === '_blank') {
-        return 'noopener noreferrer'
-      }
-      return undefined
-    })
 
     return () => {
       const children = slots.default ? slots.default() : []
       const iconElement = props.icon ? h('span', { class: 'inline-flex' }, props.icon) : null
       const contentElements = iconElement ? [iconElement, ...children] : children
+      const linkClasses = getBreadcrumbLinkClasses(isCurrent.value)
+      const computedRel = props.target === '_blank' ? 'noopener noreferrer' : undefined
+      let control: VNode
+      if (isCurrent.value) {
+        control = h('span', { class: linkClasses, 'aria-current': 'page' }, contentElements)
+      } else if (props.href) {
+        control = h(
+          'a',
+          {
+            class: linkClasses,
+            href: props.href,
+            target: props.target,
+            rel: computedRel,
+            onClick: handleClick
+          },
+          contentElements
+        )
+      } else if (hasHandler) {
+        control = h(
+          'button',
+          { type: 'button', class: linkClasses, onClick: handleClick },
+          contentElements
+        )
+      } else {
+        control = h('span', { class: getBreadcrumbLinkClasses(true) }, contentElements)
+      }
 
-      const linkElement =
-        props.href && !props.current
-          ? h(
-              'a',
-              {
-                class: linkClasses.value,
-                href: props.href,
-                target: props.target,
-                rel: computedRel.value,
-                onClick: handleClick
-              },
-              contentElements
-            )
-          : h(
-              'span',
-              {
-                class: linkClasses.value,
-                'aria-current': props.current ? 'page' : undefined
-              },
-              contentElements
-            )
-
-      const separatorElement = !props.current
-        ? h(
-            'span',
-            {
-              class: separatorClasses.value,
-              'aria-hidden': 'true'
-            },
-            separatorContent.value
-          )
-        : null
+      const {
+        class: attrClass,
+        style: attrStyle,
+        onClick: _onClick,
+        ...rest
+      } = attrs as Record<string, unknown>
 
       return h(
         'li',
         {
-          ...attrs,
-          class: [itemClasses.value, attrs.class],
-          style: [props.style, attrs.style]
+          ...rest,
+          class: classNames(getBreadcrumbItemClasses(props.className), coerceClassValue(attrClass)),
+          style: mergeStyleValues(attrStyle, props.style)
         },
-        [linkElement, separatorElement]
+        [control]
       )
     }
   }
@@ -199,48 +172,28 @@ export const BreadcrumbItem = defineComponent({
 
 export const Breadcrumb = defineComponent({
   name: 'TigerBreadcrumb',
+  inheritAttrs: false,
   props: {
-    /**
-     * Custom separator between breadcrumb items
-     * @default '/'
-     */
     separator: {
       type: String as PropType<BreadcrumbSeparator>,
       default: '/' as BreadcrumbSeparator
     },
-    /**
-     * Maximum number of visible items before collapsing the middle into '...'.
-     * Shows the first item, the last `maxItems - 1` items, and a clickable
-     * ellipsis for the rest. Ignored when `maxItems <= 0` or `>=` item count.
-     */
-    maxItems: {
-      type: Number,
-      default: undefined
-    },
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Inline styles
-     */
-    style: {
-      type: Object as PropType<Record<string, unknown>>,
-      default: undefined
-    },
-    /**
-     * Extra content aligned to the end of the breadcrumb
-     */
+    maxItems: { type: Number, default: undefined },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<Record<string, unknown>>, default: undefined },
     extra: {
       type: null as unknown as PropType<VNodeChild | VNodeChild[]>,
       default: undefined
-    }
+    },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleBreadcrumb>>, default: undefined }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getBreadcrumbLabels(mergedLocale.value, props.labels))
     const expanded = ref(false)
+    const itemSignature = ref('')
 
     const extraContent = computed(() => {
       const slotValue = slots.extra?.()
@@ -249,12 +202,6 @@ export const Breadcrumb = defineComponent({
       return null
     })
 
-    // Container classes
-    const containerClasses = computed(() => {
-      return classNames(breadcrumbContainerClasses, extraContent.value && 'w-full', props.className)
-    })
-
-    // Provide a reactive context so child items follow dynamic `separator` changes
     const breadcrumbContext = reactive<BreadcrumbContext>({
       separator: props.separator
     })
@@ -266,96 +213,100 @@ export const Breadcrumb = defineComponent({
     )
     provide(BreadcrumbContextKey, breadcrumbContext)
 
-    const renderItems = (): VNodeChild[] => {
-      const rawChildren = (slots.default?.() || []) as VNode[]
-
-      // Flatten Fragment VNodes (produced by v-for) into a flat list
-      const items: VNode[] = []
-      const flatten = (vnodes: VNode[]) => {
-        for (const vnode of vnodes) {
-          if (vnode.type === Fragment && Array.isArray(vnode.children)) {
-            flatten(vnode.children as VNode[])
-          } else {
-            items.push(vnode)
-          }
-        }
+    watch(
+      () => [itemSignature.value, props.maxItems] as const,
+      () => {
+        expanded.value = false
       }
-      flatten(rawChildren)
-
-      const maxItems = props.maxItems
-      if (expanded.value || maxItems === undefined || maxItems <= 0 || maxItems >= items.length) {
-        return items
-      }
-
-      const { collapsed } = getBreadcrumbCollapsedItems(items.length, maxItems)
-      if (collapsed.length === 0) return items
-
-      const collapsedSet = new Set(collapsed)
-      const result: VNodeChild[] = []
-      let ellipsisInserted = false
-      items.forEach((item, index) => {
-        if (collapsedSet.has(index)) {
-          if (!ellipsisInserted) {
-            ellipsisInserted = true
-            result.push(
-              h('li', { key: '__tiger-breadcrumb-ellipsis', class: getBreadcrumbItemClasses() }, [
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: breadcrumbEllipsisClasses,
-                    'aria-label': 'Show collapsed breadcrumb items',
-                    onClick: () => {
-                      expanded.value = true
-                    }
-                  },
-                  '...'
-                ),
-                h(
-                  'span',
-                  { class: getBreadcrumbSeparatorClasses(), 'aria-hidden': 'true' },
-                  getSeparatorContent(props.separator)
-                )
-              ])
-            )
-          }
-          return
-        }
-        result.push(item)
-      })
-      return result
-    }
+    )
 
     return () => {
-      return h(
+      const items = flattenElementVNodes(slots.default?.() as VNode[] | undefined)
+      itemSignature.value = items.map((item) => String(item.key ?? '')).join('|')
+      const slotsList = getBreadcrumbSlots(items.length, props.maxItems, expanded.value)
+      const nodes: VNodeChild[] = []
+
+      slotsList.forEach((slot, index) => {
+        if (slot.type === 'ellipsis') {
+          nodes.push(
+            h('li', { key: '__tiger-breadcrumb-ellipsis', class: getBreadcrumbItemClasses() }, [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: breadcrumbEllipsisClasses,
+                  'aria-label': labels.value.expandAriaLabel,
+                  'aria-expanded': 'false',
+                  onClick: () => {
+                    expanded.value = true
+                  }
+                },
+                '...'
+              )
+            ])
+          )
+        } else {
+          const child = items[slot.index]
+          const isLast = slot.index === items.length - 1
+          const childProps = (child.props ?? {}) as Record<string, unknown>
+          const childType =
+            typeof child.type === 'string' || typeof child.type === 'object' ? child.type : 'li'
+          nodes.push(
+            h(
+              childType as string,
+              {
+                ...childProps,
+                key: child.key ?? slot.index,
+                isLast
+              },
+              child.children as VNode[] | undefined
+            )
+          )
+        }
+        if (index !== slotsList.length - 1) {
+          nodes.push(
+            h(
+              'li',
+              { key: `sep-${index}`, class: getBreadcrumbItemClasses(), 'aria-hidden': 'true' },
+              [renderSeparator(props.separator)]
+            )
+          )
+        }
+      })
+
+      const attrsRecord = attrs as Record<string, unknown>
+      const ariaLabel = (attrsRecord['aria-label'] as string | undefined) ?? labels.value.ariaLabel
+      const hasExtra = Boolean(extraContent.value)
+      const rootClass = classNames(
+        breadcrumbContainerClasses,
+        hasExtra && 'w-full',
+        props.className,
+        coerceClassValue(attrsRecord.class)
+      )
+      const nav = h(
         'nav',
         {
-          'aria-label': 'Breadcrumb',
-          ...attrs,
-          class: [containerClasses.value, attrs.class],
-          style: [props.style, attrs.style]
+          'aria-label': ariaLabel,
+          class: hasExtra ? undefined : rootClass,
+          style: hasExtra ? undefined : mergeStyleValues(attrsRecord.style, props.style)
         },
         [
           h(
             'ol',
             {
-              class: 'flex items-center flex-wrap gap-2'
+              class: hasExtra ? breadcrumbListClasses : classNames(breadcrumbListClasses, 'w-full')
             },
-            renderItems()
-          ),
-          extraContent.value
-            ? h(
-                'div',
-                {
-                  class: 'ml-auto flex items-center'
-                },
-                extraContent.value
-              )
-            : null
+            nodes
+          )
         ]
+      )
+
+      if (!hasExtra) return nav
+      return h(
+        'div',
+        { class: rootClass, style: mergeStyleValues(attrsRecord.style, props.style) },
+        [nav, h('div', { class: breadcrumbExtraClasses }, extraContent.value)]
       )
     }
   }
 })
-
-export default Breadcrumb

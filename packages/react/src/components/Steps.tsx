@@ -9,14 +9,23 @@ import {
   getStepTitleClasses,
   getStepsContainerClasses,
   calculateStepStatus,
+  clampStepCurrent,
+  getStepStatusText,
+  isStepsItemType,
+  mergeTigerLocale,
+  getStepsLabels,
   stepFinishIconViewBox,
   stepFinishIconStrokeWidth,
   stepFinishIconPathD,
   type StepsDirection,
   type StepStatus,
   type StepSize,
-  type StepsProps as CoreStepsProps
+  type StepsProps as CoreStepsProps,
+  type StepItem,
+  type TigerLocale,
+  type TigerLocaleSteps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 // Steps context interface
 export interface StepsContextValue {
@@ -26,6 +35,7 @@ export interface StepsContextValue {
   size: StepSize
   simple: boolean
   clickable: boolean
+  labels: Required<TigerLocaleSteps>
   handleStepClick?: (index: number) => void
 }
 
@@ -89,13 +99,9 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   style,
   ...props
 }) => {
-  const stepsContext = useStepsContext() || {
-    current: 0,
-    status: 'process' as StepStatus,
-    direction: 'horizontal' as const,
-    size: 'default' as const,
-    simple: false,
-    clickable: false
+  const stepsContext = useStepsContext()
+  if (!stepsContext) {
+    throw new Error('StepsItem must be used within a Steps component')
   }
 
   const stepStatus = calculateStepStatus(
@@ -127,67 +133,59 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     stepsContext.handleStepClick?.(stepIndex)
   }
 
+  const statusText = getStepStatusText(stepStatus, stepsContext.labels)
+
   const renderIcon = () => {
-    if (icon) {
-      return <div className={iconClasses}>{icon}</div>
-    }
-
-    if (stepStatus === 'finish') {
-      return (
-        <div className={iconClasses} aria-hidden="true">
-          <svg
-            className="w-4 h-4 shrink-0 transition-transform duration-300 animate-fade-in"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={stepFinishIconStrokeWidth}
-            viewBox={stepFinishIconViewBox}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={stepFinishIconPathD} />
-          </svg>
-        </div>
-      )
-    }
-
-    return <div className={iconClasses}>{stepIndex + 1}</div>
-  }
-
-  const renderContent = () => {
+    const inner = icon ? (
+      icon
+    ) : stepStatus === 'finish' ? (
+      <svg
+        className="w-4 h-4 shrink-0 tiger-animate-fade-in"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={stepFinishIconStrokeWidth}
+        viewBox={stepFinishIconViewBox}
+        aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d={stepFinishIconPathD} />
+      </svg>
+    ) : stepStatus === 'error' ? (
+      <span aria-hidden="true">!</span>
+    ) : (
+      <span aria-hidden="true">{stepIndex + 1}</span>
+    )
     return (
-      <div className={contentClasses}>
-        {stepsContext.clickable ? (
-          <button
-            type="button"
-            className={titleClasses}
-            onClick={handleClick}
-            disabled={!isClickable}
-            aria-disabled={disabled || undefined}>
-            {title}
-          </button>
-        ) : (
-          <div className={titleClasses}>{title}</div>
-        )}
-        {!stepsContext.simple && description && (
-          <div className={descriptionClasses}>{description}</div>
-        )}
+      <div className={iconClasses} aria-hidden="true">
+        {inner}
       </div>
     )
   }
 
-  if (stepsContext.direction === 'vertical') {
-    return (
-      <li
-        {...props}
-        className={itemClasses}
-        style={style as React.CSSProperties}
-        aria-current={stepIndex === stepsContext.current ? 'step' : undefined}
-        aria-disabled={disabled || undefined}>
+  const renderContent = () => (
+    <div className={contentClasses}>
+      <div className={titleClasses}>{title}</div>
+      {!stepsContext.simple && description && (
+        <div className={descriptionClasses}>{description}</div>
+      )}
+    </div>
+  )
+
+  const body = (
+    <>
+      {stepsContext.direction === 'vertical' ? (
         <div className="relative">
           {renderIcon()}
           <div className={tailClasses} />
         </div>
-        {renderContent()}
-      </li>
-    )
-  }
+      ) : (
+        <>
+          {renderIcon()}
+          <div className={tailClasses} />
+        </>
+      )}
+      {renderContent()}
+      <span className="sr-only">{statusText}</span>
+    </>
+  )
 
   return (
     <li
@@ -196,9 +194,20 @@ export const StepsItem: React.FC<StepsItemProps> = ({
       style={style as React.CSSProperties}
       aria-current={stepIndex === stepsContext.current ? 'step' : undefined}
       aria-disabled={disabled || undefined}>
-      {renderIcon()}
-      <div className={tailClasses} />
-      {renderContent()}
+      {isClickable ? (
+        <button
+          type="button"
+          className={
+            stepsContext.direction === 'vertical'
+              ? 'flex w-full flex-row items-start bg-transparent p-0 text-start'
+              : 'flex w-full flex-col items-center bg-transparent p-0'
+          }
+          onClick={handleClick}>
+          {body}
+        </button>
+      ) : (
+        body
+      )}
     </li>
   )
 }
@@ -222,6 +231,8 @@ export interface StepsProps
    * Step items
    */
   children?: React.ReactNode
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleSteps>
 }
 
 export const Steps: React.FC<StepsProps> = ({
@@ -231,12 +242,46 @@ export const Steps: React.FC<StepsProps> = ({
   size = 'default',
   simple = false,
   clickable = false,
+  items,
   className,
   style,
   onChange,
   children,
+  locale,
+  labels: labelsOverride,
   ...props
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const stepLabels = useMemo(
+    () => getStepsLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const { 'aria-label': ariaLabelProp, ...rest } = props
+
+  const itemNodes = useMemo(() => {
+    if (items && items.length > 0) {
+      return items.map((item) => (
+        <StepsItem
+          key={item.key ?? item.title}
+          title={item.title}
+          description={item.description}
+          icon={item.icon as React.ReactNode}
+          status={item.status}
+          disabled={item.disabled}
+        />
+      ))
+    }
+    return React.Children.toArray(children).filter(
+      (child) => React.isValidElement(child) && isStepsItemType(child.type, StepsItem)
+    )
+  }, [items, children])
+
+  const clampedCurrent = clampStepCurrent(current, itemNodes.length)
+
   const containerClasses = useMemo(
     () => classNames(getStepsContainerClasses(direction), className),
     [direction, className]
@@ -252,31 +297,34 @@ export const Steps: React.FC<StepsProps> = ({
 
   const contextValue = useMemo<StepsContextValue>(
     () => ({
-      current,
+      current: clampedCurrent,
       status,
       direction,
       size,
       simple,
       clickable,
+      labels: stepLabels,
       handleStepClick: clickable ? handleStepClick : undefined
     }),
-    [current, status, direction, size, simple, clickable, handleStepClick]
+    [clampedCurrent, status, direction, size, simple, clickable, stepLabels, handleStepClick]
   )
 
-  const totalCount = React.Children.count(children)
-  const stepsWithProps = React.Children.map(children, (child, index) => {
-    if (React.isValidElement<StepsItemProps>(child) && child.type === StepsItem) {
-      return React.cloneElement(child, {
-        stepIndex: index,
-        isLast: index === totalCount - 1
-      })
-    }
-    return child as ReactElement
+  const stepsWithProps = itemNodes.map((child, index) => {
+    if (!React.isValidElement<StepsItemProps>(child)) return child
+    return React.cloneElement(child, {
+      stepIndex: index,
+      isLast: index === itemNodes.length - 1
+    })
   })
 
   return (
     <StepsContext.Provider value={contextValue}>
-      <ol {...props} className={containerClasses} style={style}>
+      <ol
+        {...rest}
+        className={containerClasses}
+        style={style}
+        role="list"
+        aria-label={ariaLabelProp ?? stepLabels.ariaLabel}>
         {stepsWithProps}
       </ol>
     </StepsContext.Provider>

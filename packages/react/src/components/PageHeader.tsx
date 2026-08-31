@@ -1,10 +1,14 @@
-import React, { forwardRef, useCallback, useMemo } from 'react'
+import React, { forwardRef, useCallback, useId, useMemo } from 'react'
 import {
   chevronLeftSolidIcon20PathD,
   composeComponentClasses,
   getPageHeaderBackButtonClasses,
   getPageHeaderRootClasses,
   hasPageHeaderHeadingContent,
+  hasPageHeaderNode,
+  resolvePageHeaderHeadingTag,
+  mergeTigerLocale,
+  getPageHeaderLabels,
   icon20ViewBox,
   pageHeaderActionsClasses,
   pageHeaderBackIconClasses,
@@ -18,10 +22,13 @@ import {
   pageHeaderTitleRowClasses,
   resolvePageHeaderBackAriaLabel,
   resolvePageHeaderBackVisibility,
-  type PageHeaderProps as CorePageHeaderProps
+  type PageHeaderProps as CorePageHeaderProps,
+  type TigerLocale,
+  type TigerLocalePageHeader
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
 import { Link } from './Link'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface PageHeaderProps
   extends
@@ -53,6 +60,8 @@ export interface PageHeaderProps
   onBack?: (event: React.MouseEvent<HTMLElement>) => void
   children?: React.ReactNode
   style?: React.CSSProperties
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocalePageHeader>
 }
 
 function BackIcon() {
@@ -81,23 +90,36 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
       actions,
       back,
       onBack,
+      headingLevel,
       className,
       style,
       children,
+      locale,
+      labels: labelsOverride,
       ...rest
     },
     ref
   ) => {
-    const hasBackOverride = back != null && back !== false
-    const hasBreadcrumb = breadcrumb != null && breadcrumb !== false
-    const hasTitle = title != null && title !== false && title !== ''
-    const hasSubtitle = subTitle != null && subTitle !== false && subTitle !== ''
-    const hasActions = actions != null && actions !== false
-    const hasBody = children != null && children !== false
+    const config = useTigerConfig()
+    const titleId = `tiger-page-header-title-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
+    const headerLabels = useMemo(
+      () => getPageHeaderLabels(mergedLocale, labelsOverride),
+      [mergedLocale, labelsOverride]
+    )
+    const hasBackOverride = hasPageHeaderNode(back)
+    const hasBreadcrumb = hasPageHeaderNode(breadcrumb)
+    const hasTitle = hasPageHeaderNode(title) && title !== ''
+    const hasSubtitle = hasPageHeaderNode(subTitle) && subTitle !== ''
+    const hasActions = hasPageHeaderNode(actions)
+    const hasBody = hasPageHeaderNode(children)
 
     const showBackControl = resolvePageHeaderBackVisibility({
       showBack,
-      hasHandler: Boolean(onBack),
+      hasHandler: typeof onBack === 'function',
       hasBackHref: Boolean(backHref),
       hasBackOverride
     })
@@ -110,7 +132,11 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
       hasActions
     })
 
-    const resolvedBackAriaLabel = resolvePageHeaderBackAriaLabel(backAriaLabel)
+    const resolvedBackAriaLabel = resolvePageHeaderBackAriaLabel(
+      backAriaLabel,
+      headerLabels.backAriaLabel
+    )
+    const TitleTag = resolvePageHeaderHeadingTag(headingLevel)
     const rootClasses = useMemo(
       () => composeComponentClasses(getPageHeaderRootClasses(className)),
       [className]
@@ -146,7 +172,13 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
     )
 
     return (
-      <header {...rest} ref={ref} data-page-header="" className={rootClasses} style={style}>
+      <header
+        {...rest}
+        ref={ref}
+        data-page-header=""
+        className={rootClasses}
+        style={style}
+        aria-labelledby={hasTitle ? titleId : undefined}>
         {showHeading ? (
           <div className={pageHeaderHeadingRowClasses} data-page-header-heading="">
             <div className={pageHeaderStartClasses}>
@@ -161,9 +193,12 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
                   {hasTitle || hasSubtitle ? (
                     <div className={pageHeaderTitleRowClasses}>
                       {hasTitle ? (
-                        <div className={pageHeaderTitleClasses} data-page-header-title="">
+                        <TitleTag
+                          id={titleId}
+                          className={pageHeaderTitleClasses}
+                          data-page-header-title="">
                           {title}
-                        </div>
+                        </TitleTag>
                       ) : null}
                       {hasSubtitle ? (
                         <div className={pageHeaderSubtitleClasses} data-page-header-subtitle="">

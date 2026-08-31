@@ -41,7 +41,7 @@ export const pageHeaderSubtitleClasses =
 
 /** Right-aligned actions */
 export const pageHeaderActionsClasses =
-  'tiger-page-header-actions ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2'
+  'tiger-page-header-actions flex shrink-0 flex-wrap items-center justify-end gap-2'
 
 /** Back control wrapper */
 export const pageHeaderBackWrapClasses = 'tiger-page-header-back flex shrink-0 items-center pt-0.5'
@@ -70,12 +70,28 @@ export function resolvePageHeaderBackVisibility(input: PageHeaderBackVisibilityI
 /**
  * Resolve the accessible name for the default back control.
  */
-export function resolvePageHeaderBackAriaLabel(label?: string): string {
+export function resolvePageHeaderBackAriaLabel(label?: string, fallback?: string): string {
   if (typeof label === 'string') {
     const trimmed = label.trim()
     if (trimmed) return trimmed
   }
+  if (typeof fallback === 'string' && fallback.trim()) return fallback.trim()
   return PAGE_HEADER_DEFAULT_BACK_ARIA_LABEL
+}
+
+export function hasPageHeaderNode(value: unknown): boolean {
+  if (value == null || value === false) return false
+  if (Array.isArray(value)) return value.length > 0
+  return true
+}
+
+export type PageHeaderHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
+
+export function resolvePageHeaderHeadingTag(level?: number): `h${PageHeaderHeadingLevel}` {
+  if (level === 2 || level === 3 || level === 4 || level === 5 || level === 6) {
+    return `h${level}`
+  }
+  return 'h1'
 }
 
 /**

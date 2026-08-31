@@ -183,10 +183,25 @@ export { MenuItemGroup } from './components/Menu'
 export type { VueMenuItemGroupProps, MenuItemGroupProps } from './components/Menu'
 export { Tabs, TabPane, useTabsContext, TabsContextKey } from './components/Tabs'
 export type { VueTabsProps, TabsProps, VueTabPaneProps, TabPaneProps } from './components/Tabs'
-export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb'
-export type { VueBreadcrumbProps, VueBreadcrumbItemProps } from './components/Breadcrumb'
-export { Steps, StepsItem } from './components/Steps'
-export type { VueStepsProps, VueStepsItemProps } from './components/Steps'
+export {
+  Breadcrumb,
+  BreadcrumbItem,
+  useBreadcrumbContext,
+  BreadcrumbContextKey
+} from './components/Breadcrumb'
+export type {
+  VueBreadcrumbProps,
+  BreadcrumbProps,
+  VueBreadcrumbItemProps,
+  BreadcrumbItemProps
+} from './components/Breadcrumb'
+export { Steps, StepsItem, useStepsContext, StepsContextKey } from './components/Steps'
+export type {
+  VueStepsProps,
+  StepsProps,
+  VueStepsItemProps,
+  StepsItemProps
+} from './components/Steps'
 export { Pagination } from './components/Pagination'
 export type { VuePaginationProps, PaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
@@ -226,7 +241,7 @@ export type {
   NavigationMenuListProps
 } from './components/NavigationMenu'
 export { PageHeader } from './components/PageHeader'
-export type { VuePageHeaderProps } from './components/PageHeader'
+export type { VuePageHeaderProps, PageHeaderProps } from './components/PageHeader'
 export { Spotlight } from './components/Spotlight'
 export type { VueSpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'

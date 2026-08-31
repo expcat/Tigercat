@@ -71,9 +71,15 @@ export interface PageHeaderProps {
   backAriaLabel?: string
 
   /**
-   * Page title
+   * Page title. Rendered as a heading (`h1` by default).
    */
   title?: string
+
+  /**
+   * Heading level for `title`.
+   * @default 1
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
 
   /**
    * Secondary text shown beside the title

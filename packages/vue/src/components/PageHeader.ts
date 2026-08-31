@@ -1,4 +1,4 @@
-import { defineComponent, getCurrentInstance, h, PropType } from 'vue'
+import { computed, defineComponent, getCurrentInstance, h, PropType, useId } from 'vue'
 import {
   chevronLeftSolidIcon20PathD,
   coerceClassValue,
@@ -6,6 +6,10 @@ import {
   getPageHeaderBackButtonClasses,
   getPageHeaderRootClasses,
   hasPageHeaderHeadingContent,
+  hasPageHeaderNode,
+  resolvePageHeaderHeadingTag,
+  mergeTigerLocale,
+  getPageHeaderLabels,
   icon20ViewBox,
   mergeStyleValues,
   pageHeaderActionsClasses,
@@ -19,10 +23,13 @@ import {
   pageHeaderTitleClasses,
   pageHeaderTitleRowClasses,
   resolvePageHeaderBackAriaLabel,
-  resolvePageHeaderBackVisibility
+  resolvePageHeaderBackVisibility,
+  type TigerLocale,
+  type TigerLocalePageHeader
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
 import { Link } from './Link'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VuePageHeaderProps {
   showBack?: boolean
@@ -30,9 +37,12 @@ export interface VuePageHeaderProps {
   backAriaLabel?: string
   title?: string
   subTitle?: string
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
   className?: string
   style?: Record<string, unknown>
 }
+
+export type PageHeaderProps = VuePageHeaderProps
 
 function hasSlotContent(nodes: unknown): boolean {
   return Array.isArray(nodes) && nodes.length > 0
@@ -102,6 +112,18 @@ export const PageHeader = defineComponent({
       type: String,
       default: undefined
     },
+    headingLevel: {
+      type: Number as PropType<1 | 2 | 3 | 4 | 5 | 6>,
+      default: 1
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocalePageHeader>>,
+      default: undefined
+    },
     /**
      * Additional CSS classes
      */
@@ -125,6 +147,10 @@ export const PageHeader = defineComponent({
   },
   setup(props, { slots, emit, attrs }) {
     const instance = getCurrentInstance()
+    const config = useTigerConfig()
+    const titleId = `tiger-page-header-title-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const headerLabels = computed(() => getPageHeaderLabels(mergedLocale.value, props.labels))
 
     const handleBack = (event: MouseEvent) => {
       emit('back', event)
@@ -144,7 +170,7 @@ export const PageHeader = defineComponent({
       const hasTitleSlot = hasSlotContent(titleSlot)
       const hasSubTitleSlot = hasSlotContent(subTitleSlot)
       const hasActions = hasSlotContent(actions)
-      const hasBackOverride = hasSlotContent(backOverride)
+      const hasBackOverride = hasPageHeaderNode(backOverride) && hasSlotContent(backOverride)
       const hasBody = hasSlotContent(body)
       const titleContent = hasTitleSlot ? titleSlot : props.title
       const subTitleContent = hasSubTitleSlot ? subTitleSlot : props.subTitle
@@ -153,7 +179,7 @@ export const PageHeader = defineComponent({
 
       const showBack = resolvePageHeaderBackVisibility({
         showBack: props.showBack,
-        hasHandler: Boolean(vnodeProps && 'onBack' in vnodeProps),
+        hasHandler: typeof vnodeProps?.onBack === 'function',
         hasBackHref: Boolean(props.backHref),
         hasBackOverride
       })
@@ -166,7 +192,11 @@ export const PageHeader = defineComponent({
         hasActions
       })
 
-      const backAriaLabel = resolvePageHeaderBackAriaLabel(props.backAriaLabel)
+      const backAriaLabel = resolvePageHeaderBackAriaLabel(
+        props.backAriaLabel,
+        headerLabels.value.backAriaLabel
+      )
+      const TitleTag = resolvePageHeaderHeadingTag(props.headingLevel)
       const backControl = showBack
         ? h('div', { class: pageHeaderBackWrapClasses, 'data-page-header-back': '' }, [
             hasBackOverride
@@ -206,8 +236,12 @@ export const PageHeader = defineComponent({
                 ? h('div', { class: pageHeaderTitleRowClasses }, [
                     hasTitle
                       ? h(
-                          'div',
-                          { class: pageHeaderTitleClasses, 'data-page-header-title': '' },
+                          TitleTag,
+                          {
+                            id: titleId,
+                            class: pageHeaderTitleClasses,
+                            'data-page-header-title': ''
+                          },
                           titleContent
                         )
                       : null,
@@ -245,7 +279,8 @@ export const PageHeader = defineComponent({
             coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
-          'data-page-header': ''
+          'data-page-header': '',
+          'aria-labelledby': hasTitle ? titleId : undefined
         },
         [heading, hasBody ? h('div', { class: pageHeaderContentClasses }, body) : null]
       )

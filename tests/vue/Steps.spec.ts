@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { Steps, StepsItem } from '@expcat/tigercat-vue/Steps'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Steps', () => {
   describe('Rendering', () => {
@@ -202,7 +202,7 @@ describe('Steps', () => {
         }
       })
 
-      const step2Button = screen.getByRole('button', { name: 'Step 2' })
+      const step2Button = screen.getByRole('button', { name: /Step 2/ })
       await user.click(step2Button)
 
       expect(onChange).toHaveBeenCalledWith(1)
@@ -223,7 +223,7 @@ describe('Steps', () => {
         }
       })
 
-      const step2Button = screen.getByRole('button', { name: 'Step 2' })
+      const step2Button = screen.getByRole('button', { name: /Step 2/ })
       step2Button.focus()
       await user.keyboard('{Enter}')
 
@@ -269,10 +269,8 @@ describe('Steps', () => {
         }
       })
 
-      const step2Button = screen.getByRole('button', { name: 'Step 2' })
-      expect(step2Button).toBeDisabled()
-      await user.click(step2Button)
-
+      await user.click(screen.getByText('Step 2'))
+      expect(screen.queryByRole('button', { name: /Step 2/ })).toBeNull()
       expect(onChange).not.toHaveBeenCalled()
     })
   })
@@ -327,8 +325,17 @@ describe('Steps', () => {
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(Steps)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(Steps, {
+        props: { current: 1, clickable: true },
+        slots: {
+          default: () => [
+            h(StepsItem, { title: 'Login', description: 'Account' }),
+            h(StepsItem, { title: 'Verify', status: 'error' }),
+            h(StepsItem, { title: 'Done', disabled: true })
+          ]
+        }
+      })
+      await expectNoA11yViolations(container)
     })
   })
 })

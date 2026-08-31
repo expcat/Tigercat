@@ -72,12 +72,12 @@ export function getStepIconClasses(
 
   // Status-based colors using CSS variables with fallbacks
   const activeClasses =
-    'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white ring-4 ring-[var(--tiger-primary,#2563eb)]/15 scale-105 shadow-sm transition-all duration-300'
+    'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white ring-4 ring-[var(--tiger-primary,#2563eb)]/15 scale-105 shadow-sm transition-all duration-300 motion-reduce:transition-none'
   const statusClasses = {
-    wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)] transition-all duration-300 group-hover:border-[var(--tiger-primary,#2563eb)]/60 group-hover:text-[var(--tiger-primary,#2563eb)]/80',
+    wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)] transition-all duration-300 motion-reduce:transition-none',
     process: activeClasses,
     finish:
-      'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-[var(--tiger-primary-hover,#0369a1)]',
+      'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white shadow-sm transition-all duration-300 motion-reduce:transition-none',
     error:
       'bg-[var(--tiger-error-bg,#fef2f2)] border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)] transition-all duration-300'
   }
@@ -106,18 +106,18 @@ export function getStepTailClasses(
   // Use full class strings so Tailwind JIT can detect them
   if (direction === 'vertical') {
     const verticalClasses = simple
-      ? 'absolute left-3 top-6 w-0.5 h-full'
+      ? 'absolute inset-inline-start-3 top-6 w-0.5 h-full'
       : size === 'small'
-        ? 'absolute left-4 top-8 w-0.5 h-full'
-        : 'absolute left-5 top-10 w-0.5 h-full'
+        ? 'absolute inset-inline-start-4 top-8 w-0.5 h-full'
+        : 'absolute inset-inline-start-5 top-10 w-0.5 h-full'
     return `tiger-step-tail ${verticalClasses} ${colorClasses}`
   }
 
   const horizontalClasses = simple
-    ? 'absolute top-3 left-1/2 w-full h-0.5'
+    ? 'absolute top-3 inset-inline-start-1/2 w-full h-0.5'
     : size === 'small'
-      ? 'absolute top-4 left-1/2 w-full h-0.5'
-      : 'absolute top-5 left-1/2 w-full h-0.5'
+      ? 'absolute top-4 inset-inline-start-1/2 w-full h-0.5'
+      : 'absolute top-5 inset-inline-start-1/2 w-full h-0.5'
 
   return `tiger-step-tail ${horizontalClasses} ${colorClasses}`
 }
@@ -129,7 +129,7 @@ export function getStepContentClasses(direction: StepsDirection): string {
   const baseClasses = 'tiger-step-content'
 
   if (direction === 'vertical') {
-    return `${baseClasses} ml-4 flex-1`
+    return `${baseClasses} ms-4 flex-1`
   }
 
   return `${baseClasses} mt-2 text-center`
@@ -148,10 +148,11 @@ export function getStepTitleClasses(
   const sizeClasses = size === 'small' ? 'text-sm' : 'text-base'
 
   const statusClasses = {
-    wait: 'text-[var(--tiger-text-muted,#6b7280)] transition-colors duration-300 group-hover:text-[var(--tiger-text,#111827)]',
-    process: 'text-[var(--tiger-text,#111827)] font-semibold transition-colors duration-300',
+    wait: 'text-[var(--tiger-text-muted,#6b7280)] transition-colors duration-300 motion-reduce:transition-none',
+    process:
+      'text-[var(--tiger-text,#111827)] font-semibold transition-colors duration-300 motion-reduce:transition-none',
     finish:
-      'text-[var(--tiger-text,#111827)] transition-colors duration-300 group-hover:text-[var(--tiger-primary,#2563eb)]',
+      'text-[var(--tiger-text,#111827)] transition-colors duration-300 motion-reduce:transition-none',
     error: 'text-[var(--tiger-error,#ef4444)]'
   }
 
@@ -178,6 +179,19 @@ export function getStepDescriptionClasses(status: StepStatus, size: StepSize): s
   return `${baseClasses} ${sizeClasses} ${statusClass}`
 }
 
+const STEP_STATUSES: StepStatus[] = ['wait', 'process', 'finish', 'error']
+
+export const STEPS_ITEM_COMPONENT_NAME = 'TigerStepsItem'
+
+export function isStepStatus(value: unknown): value is StepStatus {
+  return typeof value === 'string' && STEP_STATUSES.includes(value as StepStatus)
+}
+
+export function clampStepCurrent(current: number, count: number): number {
+  if (!Number.isFinite(current) || count <= 0) return 0
+  return Math.min(Math.max(0, Math.trunc(current)), count - 1)
+}
+
 /**
  * Calculate step status based on current index
  */
@@ -187,21 +201,29 @@ export function calculateStepStatus(
   currentStatus: StepStatus,
   customStatus?: StepStatus
 ): StepStatus {
-  // Use custom status if provided
-  if (customStatus) {
-    return customStatus
-  }
+  if (isStepStatus(customStatus)) return customStatus
 
-  // Before current step
-  if (index < currentIndex) {
-    return 'finish'
-  }
+  const current = Number.isFinite(currentIndex) ? Math.trunc(currentIndex) : 0
+  const status = isStepStatus(currentStatus) ? currentStatus : 'process'
 
-  // Current step
-  if (index === currentIndex) {
-    return currentStatus
-  }
-
-  // After current step
+  if (index < current) return 'finish'
+  if (index === current) return status
   return 'wait'
+}
+
+export function getStepStatusText(
+  status: StepStatus,
+  labels: { waitStatus: string; processStatus: string; finishStatus: string; errorStatus: string }
+): string {
+  if (status === 'finish') return labels.finishStatus
+  if (status === 'process') return labels.processStatus
+  if (status === 'error') return labels.errorStatus
+  return labels.waitStatus
+}
+
+export function isStepsItemType(type: unknown, stepsItem: unknown): boolean {
+  if (type === stepsItem) return true
+  if (!type || typeof type !== 'object') return false
+  const named = type as { name?: string; displayName?: string }
+  return named.name === STEPS_ITEM_COMPONENT_NAME || named.displayName === 'StepsItem'
 }

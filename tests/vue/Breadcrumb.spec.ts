@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import userEvent from '@testing-library/user-event'
 import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue/Breadcrumb'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 const twoItems = () => [
   h(BreadcrumbItem, { href: '/' }, () => 'Home'),
@@ -30,7 +30,7 @@ describe('Breadcrumb', () => {
         }
       })
       expect(container.querySelector('nav')).toHaveAttribute('aria-label', 'Breadcrumb')
-      expect(container.querySelectorAll('ol > li')).toHaveLength(3)
+      expect(container.querySelectorAll('ol > li:not([aria-hidden])')).toHaveLength(3)
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('Details')).toBeInTheDocument()
     })
@@ -40,15 +40,13 @@ describe('Breadcrumb', () => {
         slots: { default: twoItems, extra: () => h('button', {}, 'Action') }
       })
       expect(screen.getByText('Action')).toBeInTheDocument()
-      expect(container.querySelector('.ml-auto')).toBeInTheDocument()
+      expect(container.querySelector('nav')?.contains(screen.getByText('Action'))).toBe(false)
     })
   })
 
   describe('Separator', () => {
     it.each([
       [undefined, '/'],
-      ['arrow', '→'],
-      ['chevron', '›'],
       ['>', '>']
     ])('renders the %s separator as "%s"', (separator, expected) => {
       const { container } = renderBc({ separator })
@@ -61,29 +59,11 @@ describe('Breadcrumb', () => {
       expect(items[items.length - 1]?.querySelector('[aria-hidden="true"]')).toBeNull()
     })
 
-    it('allows an item-level separator override', () => {
-      const { container } = renderBc({ separator: '/' }, () => [
-        h(BreadcrumbItem, { href: '/', separator: 'arrow' }, () => 'Home'),
-        h(BreadcrumbItem, { current: true }, () => 'Current')
-      ])
-      expect(sep(container)).toHaveTextContent('→')
-    })
-
     it('reacts to parent separator prop changes', async () => {
       const { container, rerender } = renderBc({ separator: '/' })
       expect(sep(container)).toHaveTextContent('/')
-      await rerender({ separator: 'arrow' })
-      expect(sep(container)).toHaveTextContent('→')
-    })
-
-    it('keeps the item-level override when the parent separator changes', async () => {
-      const { container, rerender } = renderBc({ separator: '/' }, () => [
-        h(BreadcrumbItem, { href: '/', separator: 'chevron' }, () => 'Home'),
-        h(BreadcrumbItem, { current: true }, () => 'Current')
-      ])
-      expect(sep(container)).toHaveTextContent('›')
-      await rerender({ separator: 'arrow' })
-      expect(sep(container)).toHaveTextContent('›')
+      await rerender({ separator: '>' })
+      expect(sep(container)).toHaveTextContent('>')
     })
   })
 
@@ -92,7 +72,11 @@ describe('Breadcrumb', () => {
       const { container } = render(Breadcrumb, {
         slots: {
           default: () => [
-            h(BreadcrumbItem, { href: 'https://example.com', target: '_blank' }, () => 'External')
+            h(
+              BreadcrumbItem,
+              { href: 'https://example.com', target: '_blank', current: false },
+              () => 'External'
+            )
           ]
         }
       })
@@ -129,7 +113,14 @@ describe('Breadcrumb', () => {
       const user = userEvent.setup()
       render(Breadcrumb, {
         slots: {
-          default: () => [h(BreadcrumbItem, { href: '/home', onClick: handleClick }, () => 'Home')]
+          default: () => [
+            h(
+              BreadcrumbItem,
+              { href: '/home', current: false, onClick: handleClick },
+              () => 'Home'
+            ),
+            h(BreadcrumbItem, {}, () => 'Here')
+          ]
         }
       })
       await user.click(screen.getByText('Home'))
@@ -201,7 +192,7 @@ describe('Breadcrumb', () => {
         slots: { default: items }
       })
       expect(ellipsis(container)).toBeInTheDocument()
-      expect(container.querySelectorAll('li')).toHaveLength(4)
+      expect(container.querySelectorAll('li:not([aria-hidden])')).toHaveLength(4)
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('C')).toBeInTheDocument()
       expect(screen.queryByText('A')).not.toBeInTheDocument()
@@ -225,7 +216,7 @@ describe('Breadcrumb', () => {
         slots: { default: items }
       })
       expect(ellipsis(container)).toBeNull()
-      expect(container.querySelectorAll('li')).toHaveLength(5)
+      expect(container.querySelectorAll('li:not([aria-hidden])')).toHaveLength(5)
     })
   })
 
@@ -236,8 +227,18 @@ describe('Breadcrumb', () => {
     })
 
     it('has no accessibility violations', async () => {
-      const { container } = render(Breadcrumb)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(Breadcrumb, {
+        props: { extra: h('button', { type: 'button' }, 'Action'), maxItems: 3 },
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { href: '/' }, () => 'Home'),
+            h(BreadcrumbItem, { href: '/a' }, () => 'A'),
+            h(BreadcrumbItem, { href: '/b' }, () => 'B'),
+            h(BreadcrumbItem, {}, () => 'Here')
+          ]
+        }
+      })
+      await expectNoA11yViolations(container)
     })
   })
 })
