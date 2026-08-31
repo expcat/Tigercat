@@ -69,6 +69,9 @@ export const ptBR: TigerLocale = {
   timeline: {
     pendingText: 'Carregando...'
   },
+  progress: {
+    ariaLabel: 'Progresso'
+  },
   upload: {
     dragAreaAriaLabel: 'Enviar arquivo clicando ou arrastando',
     buttonAriaLabel: 'Enviar arquivo',

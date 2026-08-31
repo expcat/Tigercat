@@ -68,6 +68,9 @@ export const zhCN: TigerLocale = {
   timeline: {
     pendingText: '加载中...'
   },
+  progress: {
+    ariaLabel: '进度'
+  },
   upload: {
     dragAreaAriaLabel: '点击或拖拽上传文件',
     buttonAriaLabel: '上传文件',

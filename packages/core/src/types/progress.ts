@@ -58,7 +58,7 @@ export interface ProgressProps {
   status?: ProgressStatus
 
   /**
-   * Whether to show progress text inside the progress bar
+   * Whether to show progress text. Line: outside the bar. Circle: in the center.
    * @default true for line, false for circle
    */
   showText?: boolean
@@ -81,8 +81,8 @@ export interface ProgressProps {
   striped?: boolean
 
   /**
-   * Whether the striped animation should be animated
-   * Only applicable when striped is true
+   * Whether the striped animation should be animated.
+   * `status="paused"` stops the stripes as well as swapping the color.
    * @default false
    */
   stripedAnimation?: boolean

@@ -69,6 +69,9 @@ export const koKR: TigerLocale = {
   timeline: {
     pendingText: '로딩 중...'
   },
+  progress: {
+    ariaLabel: '진행률'
+  },
   upload: {
     dragAreaAriaLabel: '클릭하거나 끌어다 놓아 파일 업로드',
     buttonAriaLabel: '파일 업로드',

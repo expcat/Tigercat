@@ -1,34 +1,49 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { computed, defineComponent, h, onMounted, PropType } from 'vue'
 import {
+  calculateCirclePath,
   classNames,
   coerceClassValue,
-  getProgressVariantClasses,
-  getProgressTextColorClasses,
-  getStatusVariant,
-  formatProgressText,
-  clampPercentage,
-  calculateCirclePath,
   getCircleSize,
-  progressLineBaseClasses,
-  progressLineInnerClasses,
-  progressTextBaseClasses,
+  getProgressFillClasses,
+  getProgressLabels,
+  getProgressStrokeClasses,
+  getProgressTextColorClasses,
+  injectProgressStyles,
   progressCircleBaseClasses,
-  progressLineSizeClasses,
-  progressTextSizeClasses,
-  progressStripedClasses,
-  progressStripedAnimationClasses,
-  progressTrackBgClasses,
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
+  progressLineBaseClasses,
+  progressLineSizeClasses,
+  progressTextBaseClasses,
+  progressTextSizeClasses,
+  progressTrackBgClasses,
+  resolveProgressView,
   type ProgressProps,
-  type ProgressVariant,
   type ProgressSize,
+  type ProgressStatus,
   type ProgressType,
-  type ProgressStatus
+  type ProgressVariant
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueProgressProps extends ProgressProps {
   style?: Record<string, string | number>
+}
+
+export type { ProgressProps }
+
+function pickAria(attrs: Record<string, unknown>) {
+  const rest: Record<string, unknown> = { ...attrs }
+  const ariaLabel = rest['aria-label'] as string | undefined
+  const ariaLabelledby = rest['aria-labelledby']
+  const ariaDescribedby = rest['aria-describedby']
+  delete rest['aria-label']
+  delete rest['aria-labelledby']
+  delete rest['aria-describedby']
+  delete rest.role
+  delete rest.class
+  delete rest.style
+  return { rest, ariaLabel, ariaLabelledby, ariaDescribedby }
 }
 
 export const Progress = defineComponent({
@@ -52,30 +67,46 @@ export const Progress = defineComponent({
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   setup(props, { attrs }) {
-    const clamped = computed(() => clampPercentage(props.percentage))
-    const effectiveVariant = computed(
-      () => (getStatusVariant(props.status) || props.variant) as ProgressVariant
-    )
-    const shouldShowText = computed(() => props.showText ?? props.type === 'line')
-    const displayText = computed(() =>
-      shouldShowText.value ? formatProgressText(clamped.value, props.text, props.format) : ''
-    )
-    const resolvedAriaLabel = computed(() => {
-      const label = attrs['aria-label'] as string | undefined
-      return label ?? (attrs['aria-labelledby'] != null ? undefined : `Progress: ${clamped.value}%`)
+    const config = useTigerConfig()
+
+    onMounted(() => {
+      injectProgressStyles()
     })
 
-    const ariaProps = computed(() => ({
-      role: 'progressbar',
-      'aria-label': resolvedAriaLabel.value,
-      'aria-labelledby': attrs['aria-labelledby'],
-      'aria-describedby': attrs['aria-describedby'],
-      'aria-valuenow': clamped.value,
-      'aria-valuemin': 0,
-      'aria-valuemax': 100
-    }))
+    const view = computed(() => {
+      const { ariaLabel, ariaLabelledby } = pickAria(attrs as Record<string, unknown>)
+      return resolveProgressView({
+        percentage: props.percentage,
+        variant: props.variant,
+        status: props.status,
+        type: props.type,
+        showText: props.showText,
+        text: props.text,
+        format: props.format,
+        striped: props.striped,
+        stripedAnimation: props.stripedAnimation,
+        ariaLabel,
+        ariaLabelledby: ariaLabelledby as string | undefined,
+        widgetName: getProgressLabels(config.value.locale).ariaLabel
+      })
+    })
+
+    const ariaProps = computed(() => {
+      const { ariaLabelledby, ariaDescribedby } = pickAria(attrs as Record<string, unknown>)
+      return {
+        role: 'progressbar',
+        'aria-label': view.value.ariaLabel,
+        'aria-labelledby': ariaLabelledby,
+        'aria-describedby': ariaDescribedby,
+        'aria-valuenow': view.value.valueNow,
+        'aria-valuemin': 0,
+        'aria-valuemax': 100,
+        'aria-valuetext': view.value.valueText
+      }
+    })
 
     const renderLineProgress = () => {
+      const { rest } = pickAria(attrs as Record<string, unknown>)
       const containerStyle =
         props.width !== 'auto'
           ? { width: typeof props.width === 'number' ? `${props.width}px` : props.width }
@@ -84,9 +115,10 @@ export const Progress = defineComponent({
       return h(
         'div',
         {
-          ...attrs,
+          ...rest,
           class: classNames(
             'flex items-center w-full',
+            view.value.paused && 'tiger-progress-paused',
             coerceClassValue(attrs.class),
             props.className
           ),
@@ -94,7 +126,8 @@ export const Progress = defineComponent({
             ...(attrs.style as Record<string, unknown> | undefined),
             ...(props.style ?? {}),
             ...containerStyle
-          }
+          },
+          ...ariaProps.value
         },
         [
           h(
@@ -109,28 +142,22 @@ export const Progress = defineComponent({
             },
             [
               h('div', {
-                class: classNames(
-                  progressLineInnerClasses,
-                  getProgressVariantClasses(effectiveVariant.value),
-                  props.striped && progressStripedClasses,
-                  props.striped && props.stripedAnimation && progressStripedAnimationClasses
-                ),
-                style: { width: `${clamped.value}%` },
-                ...ariaProps.value
+                class: getProgressFillClasses(view.value),
+                style: { width: `${view.value.percentage}%` }
               })
             ]
           ),
-          shouldShowText.value
+          view.value.shouldShowText
             ? h(
                 'span',
                 {
                   class: classNames(
                     progressTextBaseClasses,
                     progressTextSizeClasses[props.size],
-                    getProgressTextColorClasses(effectiveVariant.value)
+                    getProgressTextColorClasses(view.value.effectiveVariant)
                   )
                 },
-                displayText.value
+                view.value.displayText
               )
             : undefined
         ].filter(Boolean)
@@ -138,15 +165,23 @@ export const Progress = defineComponent({
     }
 
     const renderCircleProgress = () => {
-      const { width, height, radius, cx, cy } = getCircleSize(props.size, props.strokeWidth)
-      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(radius, clamped.value)
+      const { rest } = pickAria(attrs as Record<string, unknown>)
+      const { width, height, radius, cx, cy, strokeWidth } = getCircleSize(
+        props.size,
+        props.strokeWidth
+      )
+      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(
+        radius,
+        view.value.percentage
+      )
 
       return h(
         'div',
         {
-          ...attrs,
+          ...rest,
           class: classNames(
             progressCircleBaseClasses,
+            view.value.paused && 'tiger-progress-paused',
             coerceClassValue(attrs.class),
             props.className
           ),
@@ -155,10 +190,11 @@ export const Progress = defineComponent({
             ...(props.style ?? {}),
             width: `${width}px`,
             height: `${height}px`
-          }
+          },
+          ...ariaProps.value
         },
         [
-          h('svg', { width, height, viewBox: `0 0 ${width} ${height}` }, [
+          h('svg', { width, height, viewBox: `0 0 ${width} ${height}`, 'aria-hidden': 'true' }, [
             h('circle', {
               cx,
               cy,
@@ -166,7 +202,7 @@ export const Progress = defineComponent({
               fill: 'none',
               stroke: 'currentColor',
               class: progressCircleTrackStrokeClasses,
-              'stroke-width': props.strokeWidth
+              'stroke-width': strokeWidth
             }),
             h('circle', {
               cx,
@@ -174,20 +210,21 @@ export const Progress = defineComponent({
               r: radius,
               fill: 'none',
               stroke: 'currentColor',
-              class: getProgressVariantClasses(effectiveVariant.value).replace('bg-', 'text-'),
-              'stroke-width': props.strokeWidth,
-              'stroke-linecap': 'round',
+              class: classNames(
+                'tiger-progress-fill',
+                getProgressStrokeClasses(view.value.effectiveVariant)
+              ),
+              'stroke-width': strokeWidth,
+              'stroke-linecap': view.value.percentage === 0 ? 'butt' : 'round',
               'stroke-dasharray': strokeDasharray,
               'stroke-dashoffset': strokeDashoffset,
               style: {
-                transition: 'stroke-dashoffset 0.3s ease',
                 transform: 'rotate(-90deg)',
                 transformOrigin: 'center'
-              },
-              ...ariaProps.value
+              }
             })
           ]),
-          shouldShowText.value
+          view.value.shouldShowText
             ? h(
                 'div',
                 {
@@ -195,10 +232,10 @@ export const Progress = defineComponent({
                     progressCircleTextClasses,
                     progressTextSizeClasses[props.size],
                     'font-medium',
-                    getProgressTextColorClasses(effectiveVariant.value)
+                    getProgressTextColorClasses(view.value.effectiveVariant)
                   )
                 },
-                displayText.value
+                view.value.displayText
               )
             : undefined
         ].filter(Boolean)

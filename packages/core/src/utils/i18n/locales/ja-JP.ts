@@ -69,6 +69,9 @@ export const jaJP: TigerLocale = {
   timeline: {
     pendingText: '読み込み中...'
   },
+  progress: {
+    ariaLabel: '進捗'
+  },
   upload: {
     dragAreaAriaLabel: 'クリックまたはドラッグしてファイルをアップロード',
     buttonAriaLabel: 'ファイルをアップロード',

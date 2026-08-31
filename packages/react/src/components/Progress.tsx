@@ -1,27 +1,25 @@
-import React from 'react'
+import React, { useLayoutEffect, useMemo } from 'react'
 import {
-  classNames,
-  getProgressVariantClasses,
-  getProgressTextColorClasses,
-  getStatusVariant,
-  formatProgressText,
-  clampPercentage,
   calculateCirclePath,
+  classNames,
   getCircleSize,
-  progressLineBaseClasses,
-  progressLineInnerClasses,
-  progressTextBaseClasses,
+  getProgressFillClasses,
+  getProgressLabels,
+  getProgressStrokeClasses,
+  getProgressTextColorClasses,
+  injectProgressStyles,
   progressCircleBaseClasses,
-  progressLineSizeClasses,
-  progressTextSizeClasses,
-  progressStripedClasses,
-  progressStripedAnimationClasses,
-  progressTrackBgClasses,
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
-  type ProgressProps as CoreProgressProps,
-  type ProgressVariant
+  progressLineBaseClasses,
+  progressLineSizeClasses,
+  progressTextBaseClasses,
+  progressTextSizeClasses,
+  progressTrackBgClasses,
+  resolveProgressView,
+  type ProgressProps as CoreProgressProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ProgressProps
   extends CoreProgressProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreProgressProps> {}
@@ -48,84 +46,86 @@ export const Progress: React.FC<ProgressProps> = React.memo(
     'aria-describedby': ariaDescribedby,
     ...props
   }) => {
-    const clampedPercentage = clampPercentage(percentage)
-    const effectiveVariant = (getStatusVariant(status) || variant) as ProgressVariant
-    const shouldShowText = showText ?? type === 'line'
-    const displayText = shouldShowText ? formatProgressText(clampedPercentage, text, format) : ''
-    const resolvedAriaLabel =
-      ariaLabel ?? (ariaLabelledby ? undefined : `Progress: ${clampedPercentage}%`)
+    const config = useTigerConfig()
+    const widgetName = getProgressLabels(config.locale).ariaLabel
+
+    useLayoutEffect(() => {
+      injectProgressStyles()
+    }, [])
+
+    const view = useMemo(
+      () =>
+        resolveProgressView({
+          percentage,
+          variant,
+          status,
+          type,
+          showText,
+          text,
+          format,
+          striped,
+          stripedAnimation,
+          ariaLabel,
+          ariaLabelledby,
+          widgetName
+        }),
+      [
+        percentage,
+        variant,
+        status,
+        type,
+        showText,
+        text,
+        format,
+        striped,
+        stripedAnimation,
+        ariaLabel,
+        ariaLabelledby,
+        widgetName
+      ]
+    )
 
     const ariaAttrs = {
       role: 'progressbar' as const,
-      'aria-label': resolvedAriaLabel,
+      'aria-label': view.ariaLabel,
       'aria-labelledby': ariaLabelledby,
       'aria-describedby': ariaDescribedby,
-      'aria-valuenow': clampedPercentage,
+      'aria-valuenow': view.valueNow,
       'aria-valuemin': 0,
-      'aria-valuemax': 100
+      'aria-valuemax': 100,
+      'aria-valuetext': view.valueText
     }
 
-    const renderLineProgress = () => {
-      const containerStyle =
-        width !== 'auto' ? { width: typeof width === 'number' ? `${width}px` : width } : {}
-
-      return (
-        <div
-          {...props}
-          className={classNames('flex items-center w-full', className)}
-          style={{ ...(style ?? {}), ...containerStyle }}>
-          <div
-            className={classNames(
-              progressLineBaseClasses,
-              progressTrackBgClasses,
-              !height && progressLineSizeClasses[size]
-            )}
-            style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
-            <div
-              className={classNames(
-                progressLineInnerClasses,
-                getProgressVariantClasses(effectiveVariant),
-                striped && progressStripedClasses,
-                striped && stripedAnimation && progressStripedAnimationClasses
-              )}
-              style={{ width: `${clampedPercentage}%` }}
-              {...ariaAttrs}
-            />
-          </div>
-          {shouldShowText && (
-            <span
-              className={classNames(
-                progressTextBaseClasses,
-                progressTextSizeClasses[size],
-                getProgressTextColorClasses(effectiveVariant)
-              )}>
-              {displayText}
-            </span>
-          )}
-        </div>
-      )
-    }
-
-    const renderCircleProgress = () => {
+    if (type === 'circle') {
       const {
         width: svgWidth,
         height: svgHeight,
         radius,
         cx,
-        cy
+        cy,
+        strokeWidth: safeStroke
       } = getCircleSize(size, strokeWidth)
-      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(radius, clampedPercentage)
+      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(radius, view.percentage)
 
       return (
         <div
           {...props}
-          className={classNames(progressCircleBaseClasses, className)}
+          className={classNames(
+            progressCircleBaseClasses,
+            view.paused && 'tiger-progress-paused',
+            className
+          )}
           style={{
             ...(style ?? {}),
             width: `${svgWidth}px`,
             height: `${svgHeight}px`
-          }}>
-          <svg width={svgWidth} height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
+          }}
+          {...ariaAttrs}>
+          <svg
+            width={svgWidth}
+            height={svgHeight}
+            viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+            aria-hidden="true">
             <circle
               cx={cx}
               cy={cy}
@@ -133,7 +133,7 @@ export const Progress: React.FC<ProgressProps> = React.memo(
               fill="none"
               stroke="currentColor"
               className={progressCircleTrackStrokeClasses}
-              strokeWidth={strokeWidth}
+              strokeWidth={safeStroke}
             />
             <circle
               cx={cx}
@@ -141,36 +141,69 @@ export const Progress: React.FC<ProgressProps> = React.memo(
               r={radius}
               fill="none"
               stroke="currentColor"
-              className={getProgressVariantClasses(effectiveVariant).replace('bg-', 'text-')}
-              strokeWidth={strokeWidth}
-              strokeLinecap="round"
+              className={classNames('tiger-progress-fill', getProgressStrokeClasses(view.effectiveVariant))}
+              strokeWidth={safeStroke}
+              strokeLinecap={view.percentage === 0 ? 'butt' : 'round'}
               strokeDasharray={strokeDasharray}
               strokeDashoffset={strokeDashoffset}
               style={{
-                transition: 'stroke-dashoffset 0.3s ease',
                 transform: 'rotate(-90deg)',
                 transformOrigin: 'center'
               }}
-              {...ariaAttrs}
             />
           </svg>
-          {shouldShowText && (
+          {view.shouldShowText && (
             <div
               className={classNames(
                 progressCircleTextClasses,
                 progressTextSizeClasses[size],
                 'font-medium',
-                getProgressTextColorClasses(effectiveVariant)
+                getProgressTextColorClasses(view.effectiveVariant)
               )}>
-              {displayText}
+              {view.displayText}
             </div>
           )}
         </div>
       )
     }
 
-    if (type === 'circle') return renderCircleProgress()
-    return renderLineProgress()
+    const containerStyle =
+      width !== 'auto' ? { width: typeof width === 'number' ? `${width}px` : width } : {}
+
+    return (
+      <div
+        {...props}
+        className={classNames(
+          'flex items-center w-full',
+          view.paused && 'tiger-progress-paused',
+          className
+        )}
+        style={{ ...(style ?? {}), ...containerStyle }}
+        {...ariaAttrs}>
+        <div
+          className={classNames(
+            progressLineBaseClasses,
+            progressTrackBgClasses,
+            !height && progressLineSizeClasses[size]
+          )}
+          style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
+          <div
+            className={getProgressFillClasses(view)}
+            style={{ width: `${view.percentage}%` }}
+          />
+        </div>
+        {view.shouldShowText && (
+          <span
+            className={classNames(
+              progressTextBaseClasses,
+              progressTextSizeClasses[size],
+              getProgressTextColorClasses(view.effectiveVariant)
+            )}>
+            {view.displayText}
+          </span>
+        )}
+      </div>
+    )
   }
 )
 Progress.displayName = 'Progress'

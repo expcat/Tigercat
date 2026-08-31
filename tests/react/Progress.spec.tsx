@@ -3,154 +3,160 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import React from 'react'
 import { Progress } from '@expcat/tigercat-react/Progress'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
+
+function fillOf(container: HTMLElement): HTMLElement | null {
+  return container.querySelector('.tiger-progress-fill')
+}
 
 describe('Progress', () => {
   it('renders a line progressbar with default ARIA', () => {
-    const { container } = renderWithProps(Progress, {})
+    const { container } = render(<Progress />)
 
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar).toBeInTheDocument()
+    const progressbar = screen.getByRole('progressbar')
     expect(progressbar).toHaveAttribute('aria-valuenow', '0')
     expect(progressbar).toHaveAttribute('aria-valuemin', '0')
     expect(progressbar).toHaveAttribute('aria-valuemax', '100')
-    expect(progressbar).toHaveAttribute('aria-label', 'Progress: 0%')
-
-    const wrapper = progressbar?.parentElement?.parentElement as HTMLElement | null
-    expect(wrapper?.className).toContain('w-full')
+    expect(progressbar).toHaveAttribute('aria-label', 'Progress')
+    expect(progressbar.className).toContain('w-full')
+    expect(fillOf(container)).toHaveStyle({ width: '0%' })
   })
 
   it('clamps percentage to 0-100 range', () => {
-    const { container: over } = renderWithProps(Progress, { percentage: 150 })
-    const bar1 = over.querySelector('[role="progressbar"]')
-    expect(bar1).toHaveAttribute('aria-valuenow', '100')
-    expect(bar1).toHaveStyle({ width: '100%' })
+    const { container: over, unmount } = render(<Progress percentage={150} />)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100')
+    expect(fillOf(over)).toHaveStyle({ width: '100%' })
+    unmount()
 
-    const { container: under } = renderWithProps(Progress, { percentage: -20 })
-    const bar2 = under.querySelector('[role="progressbar"]')
-    expect(bar2).toHaveAttribute('aria-valuenow', '0')
-    expect(bar2).toHaveStyle({ width: '0%' })
+    const { container: under } = render(<Progress percentage={-20} />)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+    expect(fillOf(under)).toHaveStyle({ width: '0%' })
   })
 
-  it('applies variant color classes', () => {
-    const { container } = renderWithProps(Progress, { percentage: 50, variant: 'success' })
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar?.className).toContain('success')
+  it('clamps NaN to 0', () => {
+    render(<Progress percentage={Number.NaN} />)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  })
+
+  it('applies variant color classes on the fill', () => {
+    const { container } = render(<Progress percentage={50} variant="success" />)
+    expect(fillOf(container)?.className).toContain('success')
   })
 
   it('status overrides variant color', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 50,
-      variant: 'primary',
-      status: 'exception'
-    })
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar?.className).toContain('error')
-    expect(progressbar?.className).not.toContain('primary')
+    const { container } = render(
+      <Progress percentage={50} variant="primary" status="exception" />
+    )
+    expect(fillOf(container)?.className).toContain('error')
+    expect(fillOf(container)?.className).not.toContain('primary')
   })
 
   it('hides text when showText is false', () => {
-    const { container } = renderWithProps(Progress, { percentage: 50, showText: false })
+    const { container } = render(<Progress percentage={50} showText={false} />)
     expect(container.querySelector('span')).not.toBeInTheDocument()
   })
 
   it('forwards className prop', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 50,
-      className: 'my-custom-class'
-    })
-    const wrapper = container.querySelector('[role="progressbar"]')?.parentElement?.parentElement
-    expect(wrapper?.className).toContain('my-custom-class')
+    render(<Progress percentage={50} className="my-custom-class" />)
+    expect(screen.getByRole('progressbar').className).toContain('my-custom-class')
   })
 
   it('forwards aria-label to the progressbar element', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 10,
-      'aria-label': '上传进度'
-    })
+    render(<Progress percentage={10} aria-label="上传进度" />)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-label', '上传进度')
+  })
 
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar).toHaveAttribute('aria-label', '上传进度')
+  it('puts custom text in valuetext and keeps the name free of the percentage', () => {
+    render(<Progress percentage={50} text="进行中" />)
+    const bar = screen.getByRole('progressbar')
+    expect(bar).toHaveAttribute('aria-valuetext', '进行中')
+    expect(bar.getAttribute('aria-label')).not.toContain('50%')
+    expect(screen.getByText('进行中')).toBeInTheDocument()
+  })
+
+  it('uses official locale names', () => {
+    const { unmount } = render(
+      <ConfigProvider locale={zhCN}>
+        <Progress percentage={40} />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-label', zhCN.progress!.ariaLabel)
+    unmount()
+
+    render(
+      <ConfigProvider locale={zhTW}>
+        <Progress percentage={40} />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-label', zhTW.progress!.ariaLabel)
   })
 
   it('renders line text and supports custom text/format', () => {
-    renderWithProps(Progress, { percentage: 50 })
+    const { unmount } = render(<Progress percentage={50} />)
     expect(screen.getByText('50%')).toBeInTheDocument()
+    unmount()
 
-    renderWithProps(Progress, { percentage: 50, text: '进行中' })
-    expect(screen.getByText('进行中')).toBeInTheDocument()
-
-    renderWithProps(Progress, {
-      percentage: 50,
-      format: (p: number) => `${p}个/100个`
-    })
+    render(<Progress percentage={50} format={(p) => `${p}个/100个`} />)
     expect(screen.getByText('50个/100个')).toBeInTheDocument()
   })
+
   it('supports custom width/height and circle strokeWidth', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 50,
-      width: '300px',
-      height: 20
-    })
+    const { container, unmount } = render(<Progress percentage={50} width="300px" height={20} />)
+    expect(screen.getByRole('progressbar')).toHaveStyle({ width: '300px' })
+    expect(container.querySelector('[class*="overflow-hidden"]')).toHaveStyle({ height: '20px' })
+    unmount()
 
-    const progressbar = container.querySelector('[role="progressbar"]') as HTMLElement
-    const track = progressbar.parentElement as HTMLElement
-    const wrapper = track.parentElement as HTMLElement
-    expect(wrapper).toHaveStyle({ width: '300px' })
-    expect(track).toHaveStyle({ height: '20px' })
-
-    const { container: circle } = renderWithProps(Progress, {
-      type: 'circle',
-      percentage: 50,
-      strokeWidth: 10
-    })
+    const { container: circle } = render(
+      <Progress type="circle" percentage={50} strokeWidth={10} />
+    )
     circle.querySelectorAll('circle').forEach((c) => {
       expect(c).toHaveAttribute('stroke-width', '10')
     })
   })
 
   it('renders circle progress', () => {
-    const { container } = renderWithProps(Progress, {
-      type: 'circle',
-      percentage: 75,
-      showText: true
-    })
-
+    const { container } = render(<Progress type="circle" percentage={75} showText />)
     expect(container.querySelector('svg')).toBeInTheDocument()
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar).toHaveAttribute('aria-valuenow', '75')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75')
   })
 
-  it('passes basic a11y checks', async () => {
-    const { container: line } = renderWithProps(Progress, { percentage: 50 })
-    await expectNoA11yViolationsIsolated(line)
-
-    const { container: circle } = renderWithProps(Progress, {
-      type: 'circle',
-      percentage: 75,
-      showText: true
-    })
-    await expectNoA11yViolationsIsolated(circle)
-  })
   it('applies success status color', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 100,
-      status: 'success'
-    })
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar?.className).toContain('success')
+    const { container } = render(<Progress percentage={100} status="success" />)
+    expect(fillOf(container)?.className).toContain('success')
   })
 
   it('renders striped without animation', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 50,
-      striped: true,
-      stripedAnimation: false
-    })
-    const progressbar = container.querySelector('[role="progressbar"]') as HTMLElement
-    expect(progressbar.className).toContain('bg-gradient')
-    expect(progressbar.className).not.toContain('progress-stripes')
+    const { container } = render(
+      <Progress percentage={50} striped stripedAnimation={false} />
+    )
+    expect(fillOf(container)?.className).toContain('tiger-progress-striped')
+    expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
+  })
+
+  it('animates stripes and pauses them', () => {
+    const { container, rerender } = render(
+      <Progress percentage={50} striped stripedAnimation />
+    )
+    expect(fillOf(container)?.className).toContain('tiger-progress-striped-animated')
+    rerender(<Progress percentage={50} striped stripedAnimation status="paused" />)
+    expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
+    expect(screen.getByRole('progressbar').className).toContain('tiger-progress-paused')
+  })
+
+  it('passes basic a11y checks', async () => {
+    const { container: line, unmount } = render(<Progress percentage={50} />)
+    await expectNoA11yViolations(line)
+    unmount()
+
+    const { container: circle } = render(
+      <Progress type="circle" percentage={75} showText />
+    )
+    await expectNoA11yViolations(circle)
   })
 })

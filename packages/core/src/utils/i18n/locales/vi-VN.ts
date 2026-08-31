@@ -69,6 +69,9 @@ export const viVN: TigerLocale = {
   timeline: {
     pendingText: 'Đang tải...'
   },
+  progress: {
+    ariaLabel: 'Tiến độ'
+  },
   upload: {
     dragAreaAriaLabel: 'Nhấp hoặc kéo để tải tệp lên',
     buttonAriaLabel: 'Tải tệp lên',

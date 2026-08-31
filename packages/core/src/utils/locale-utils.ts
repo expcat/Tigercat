@@ -47,6 +47,7 @@ import type {
   TigerLocaleList,
   TigerLocaleScrollArea,
   TigerLocalePrintLayout,
+  TigerLocaleProgress,
   TigerLocaleTransfer,
   TigerLocaleChart,
   TigerLocaleMarkdownEditor,
@@ -373,6 +374,13 @@ export function getCarouselLabels(
   overrides?: Partial<TigerLocaleCarousel>
 ): Required<TigerLocaleCarousel> {
   return resolveLocaleSection(enSection('carousel'), locale?.carousel, overrides)
+}
+
+export function getProgressLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleProgress>
+): Required<TigerLocaleProgress> {
+  return resolveLocaleSection(enSection('progress'), locale?.progress, overrides)
 }
 
 export function getMarqueeLabels(

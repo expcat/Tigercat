@@ -69,6 +69,9 @@ export const arSA: TigerLocale = {
   timeline: {
     pendingText: 'جار التحميل...'
   },
+  progress: {
+    ariaLabel: 'التقدم'
+  },
   upload: {
     dragAreaAriaLabel: 'رفع ملف بالنقر أو السحب',
     buttonAriaLabel: 'رفع ملف',

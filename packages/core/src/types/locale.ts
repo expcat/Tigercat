@@ -92,6 +92,11 @@ export interface TigerLocaleTimeline {
   pendingText?: string
 }
 
+export interface TigerLocaleProgress {
+  /** Accessible name for the progress widget (does not include the current value) */
+  ariaLabel?: string
+}
+
 export interface TigerLocaleUpload {
   /** Drag area aria-label */
   dragAreaAriaLabel?: string
@@ -576,6 +581,7 @@ export interface TigerLocale {
   scrollArea?: TigerLocaleScrollArea
   printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
+  progress?: TigerLocaleProgress
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
   table?: TigerLocaleTable

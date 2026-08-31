@@ -69,6 +69,9 @@ export const deDE: TigerLocale = {
   timeline: {
     pendingText: 'Wird geladen...'
   },
+  progress: {
+    ariaLabel: 'Fortschritt'
+  },
   upload: {
     dragAreaAriaLabel: 'Datei per Klick oder Ziehen hochladen',
     buttonAriaLabel: 'Datei hochladen',

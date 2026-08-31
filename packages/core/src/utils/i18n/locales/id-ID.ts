@@ -69,6 +69,9 @@ export const idID: TigerLocale = {
   timeline: {
     pendingText: 'Memuat...'
   },
+  progress: {
+    ariaLabel: 'Progres'
+  },
   upload: {
     dragAreaAriaLabel: 'Unggah berkas dengan mengeklik atau menyeret',
     buttonAriaLabel: 'Unggah berkas',
