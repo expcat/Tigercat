@@ -4,7 +4,6 @@ import {
   ref,
   watch,
   h,
-  onMounted,
   onBeforeUnmount,
   inject,
   getCurrentInstance,
@@ -13,9 +12,8 @@ import {
 import {
   classNames,
   coerceClassValue,
+  callUnknownEventHandler,
   getInputNumberWrapperClasses,
-  getInputNumberStatusClasses,
-  getInputNumberFocusRingColor,
   getInputNumberSizeClasses,
   getInputNumberInputClasses,
   getInputNumberStepButtonClasses,
@@ -25,42 +23,32 @@ import {
   inputNumberDownIconPathD,
   inputNumberMinusIconPathD,
   inputNumberPlusIconPathD,
-  clampValue,
   stepValue,
-  formatPrecision,
   isAtMin,
   isAtMax,
   formatInputNumberDisplay,
+  formatInputNumberEditingDisplay,
   parseInputNumberValue,
+  commitInputNumberValue,
+  getInputNumberKeyboardNextValue,
+  resolveInputNumberControlsLayout,
   createRafRepeatActionController,
+  mergeAriaDescribedBy,
+  runShakeAnimation,
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  getInputNumberLabels,
   type ComponentSize,
-  type InputStatus
+  type InputStatus,
+  type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
+import { useTigerConfig } from './ConfigProvider'
 
-export interface VueInputNumberProps {
+export interface VueInputNumberProps extends Omit<CoreInputNumberProps, 'value' | 'defaultValue'> {
   modelValue?: number | null
-  /** Initial value for uncontrolled usage (when `modelValue` is not bound) */
   defaultValue?: number | null
-  size?: ComponentSize
-  status?: InputStatus
-  min?: number
-  max?: number
-  step?: number
-  precision?: number
-  disabled?: boolean
-  readonly?: boolean
-  placeholder?: string
-  name?: string
-  id?: string
-  keyboard?: boolean
-  controls?: boolean
-  controlsPosition?: 'right' | 'both'
-  formatter?: (value: number | undefined) => string
-  parser?: (displayValue: string) => number
-  autoFocus?: boolean
-  incrementAriaLabel?: string
-  decrementAriaLabel?: string
   className?: string
 }
 
@@ -126,101 +114,134 @@ export const InputNumber = defineComponent({
       type: Function as PropType<(value: number | undefined) => string>
     },
     parser: {
-      type: Function as PropType<(displayValue: string) => number>
+      type: Function as PropType<(displayValue: string) => number | null>
     },
     autoFocus: {
       type: Boolean,
       default: false
     },
-    incrementAriaLabel: {
-      type: String,
-      default: 'Increase'
-    },
-    decrementAriaLabel: {
-      type: String,
-      default: 'Decrease'
+    incrementAriaLabel: String,
+    decrementAriaLabel: String,
+    _shakeTrigger: {
+      type: Number,
+      default: undefined
     },
     className: {
       type: String,
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change', 'focus', 'blur'],
+  emits: ['update:modelValue', 'change', 'focus', 'blur', 'keydown'],
 
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, expose }) {
     const instance = getCurrentInstance()
+    const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
+    const inGroup = computed(() => inputGroup != null)
+    const labels = computed(() =>
+      getInputNumberLabels(config.value.locale, {
+        incrementAriaLabel: props.incrementAriaLabel,
+        decrementAriaLabel: props.decrementAriaLabel
+      })
+    )
     const effectiveSize = computed(() => {
       const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
       return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
     })
+    const hasOwnStatus = computed(() =>
+      Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'status')
+    )
+    const effectiveStatus = computed(() =>
+      hasOwnStatus.value ? props.status : (formItemControl?.status.value ?? props.status)
+    )
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const formValue = computed(() => formItemControl?.value.value)
+    const effectiveShakeTrigger = computed(
+      () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
+    )
+
     const inputRef = ref<HTMLInputElement | null>(null)
+    const wrapperRef = ref<HTMLDivElement | null>(null)
     const focused = ref(false)
+    const displayValue = ref('')
     const repeatController = createRafRepeatActionController()
     let repeatValue: number | null = null
     let suppressNextClick = false
 
-    // Internal display value
-    const displayValue = ref('')
+    expose({
+      focus: () => inputRef.value?.focus(),
+      input: inputRef
+    })
 
-    function toDisplayValue(val: number | null | undefined): string {
-      return formatInputNumberDisplay(val, {
-        formatter: props.formatter,
-        precision: props.precision
-      })
+    function toDisplayValue(val: number | null | undefined, editing: boolean): string {
+      return editing
+        ? formatInputNumberEditingDisplay(val, props.precision)
+        : formatInputNumberDisplay(val, {
+            formatter: props.formatter,
+            precision: props.precision
+          })
     }
 
     function parseValue(str: string): number | null {
       return parseInputNumberValue(str, { parser: props.parser })
     }
 
-    // Sync display value from modelValue
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const internalValue = ref<number | null>(props.modelValue ?? props.defaultValue ?? null)
+    const currentValue = computed(() => {
+      if (isControlled.value) return props.modelValue ?? null
+      if (formItemControl?.name.value) {
+        return typeof formValue.value === 'number' ? formValue.value : null
+      }
+      return internalValue.value
+    })
+
     watch(
-      () => props.modelValue,
-      (val) => {
-        if (!focused.value) {
-          displayValue.value = toDisplayValue(val)
-        }
+      () => [currentValue.value, focused.value, props.formatter, props.precision] as const,
+      () => {
+        if (!focused.value) displayValue.value = toDisplayValue(currentValue.value, false)
       },
       { immediate: true }
     )
 
-    const isControlled = computed(() => props.modelValue !== undefined)
-
-    const internalValue = ref<number | null>(props.modelValue ?? props.defaultValue ?? null)
-
-    const currentValue = computed(() =>
-      isControlled.value ? (props.modelValue ?? null) : internalValue.value
+    watch(
+      [effectiveStatus, effectiveShakeTrigger] as const,
+      ([newStatus], oldValue) => {
+        if (oldValue === undefined) return
+        if (newStatus === 'error') runShakeAnimation(wrapperRef.value)
+      },
+      { flush: 'post' }
     )
 
-    // Reflect the uncontrolled initial (defaultValue) in the display value;
-    // the immediate modelValue watch above only handles the controlled case.
-    if (!isControlled.value && internalValue.value !== null) {
-      displayValue.value = toDisplayValue(internalValue.value)
-    }
-
-    function commitValue(val: number | null) {
-      let finalVal = val
-      if (finalVal !== null) {
-        finalVal = clampValue(finalVal, props.min, props.max)
-        if (props.precision !== undefined) {
-          finalVal = formatPrecision(finalVal, props.precision)
-        }
+    function commit(val: number | null, nextFocused = focused.value): number | null {
+      const { value: next, changed } = commitInputNumberValue(val, currentValue.value, {
+        min: props.min,
+        max: props.max,
+        precision: props.precision
+      })
+      if (changed) {
+        if (!isControlled.value) internalValue.value = next
+        emit('update:modelValue', next)
+        emit('change', next)
+        formItemControl?.onChange(next)
       }
-
-      if (!isControlled.value) {
-        internalValue.value = finalVal
-      }
-      emit('update:modelValue', finalVal)
-      emit('change', finalVal)
-      displayValue.value = toDisplayValue(finalVal)
+      displayValue.value = toDisplayValue(next, nextFocused)
+      return next
     }
 
     function handleStep(
       direction: 'up' | 'down',
       baseValue: number | null | undefined = currentValue.value
     ): number | null {
-      if (props.disabled || props.readonly) return baseValue ?? null
+      if (effectiveDisabled.value || props.readonly) return baseValue ?? null
       const next = stepValue(
         baseValue,
         props.step,
@@ -229,8 +250,7 @@ export const InputNumber = defineComponent({
         props.max,
         props.precision
       )
-      commitValue(next)
-      return next
+      return commit(next)
     }
 
     function handleStepClick(direction: 'up' | 'down') {
@@ -238,14 +258,13 @@ export const InputNumber = defineComponent({
         suppressNextClick = false
         return
       }
-
       handleStep(direction)
     }
 
     function startStepRepeat(direction: 'up' | 'down') {
       return (event: PointerEvent) => {
         event.preventDefault()
-        if (props.disabled || props.readonly) return
+        if (effectiveDisabled.value || props.readonly) return
         if (direction === 'down' && isAtMin(currentValue.value, props.min)) return
         if (direction === 'up' && isAtMax(currentValue.value, props.max)) return
 
@@ -255,11 +274,9 @@ export const InputNumber = defineComponent({
           const baseValue = repeatValue
           const nextValue = handleStep(direction, baseValue)
           repeatValue = nextValue
-
-          if (nextValue === baseValue) {
-            repeatController.stop()
-          }
+          if (nextValue === baseValue) repeatController.stop()
         })
+        inputRef.value?.focus()
       }
     }
 
@@ -268,110 +285,115 @@ export const InputNumber = defineComponent({
     }
 
     function handleInput(e: Event) {
-      const target = e.target as HTMLInputElement
-      displayValue.value = target.value
+      displayValue.value = (e.target as HTMLInputElement).value
     }
 
     function handleBlur(e: FocusEvent) {
+      commit(parseValue(displayValue.value), false)
       focused.value = false
-      const parsed = parseValue(displayValue.value)
-      commitValue(parsed)
+      formItemControl?.onBlur()
       emit('blur', e)
     }
 
     function handleFocus(e: FocusEvent) {
       focused.value = true
-      // Show raw value when focused (remove formatting)
-      if (props.formatter && currentValue.value !== null) {
-        displayValue.value = String(currentValue.value)
-      }
+      displayValue.value = toDisplayValue(currentValue.value, true)
       emit('focus', e)
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (!props.keyboard || props.disabled || props.readonly) return
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        handleStep('up')
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        handleStep('down')
-      } else if (e.key === 'Enter') {
-        const parsed = parseValue(displayValue.value)
-        commitValue(parsed)
+      if (e.key === 'Enter') {
+        commit(parseValue(displayValue.value))
+      } else {
+        const next = getInputNumberKeyboardNextValue(e.key, currentValue.value, {
+          min: props.min,
+          max: props.max,
+          step: props.step,
+          precision: props.precision,
+          keyboard: props.keyboard && !effectiveDisabled.value && !props.readonly
+        })
+        if (next !== undefined) {
+          e.preventDefault()
+          commit(next)
+        }
       }
+      emit('keydown', e)
     }
 
     const atMin = computed(() => isAtMin(currentValue.value, props.min))
     const atMax = computed(() => isAtMax(currentValue.value, props.max))
+    const layout = computed(() =>
+      resolveInputNumberControlsLayout(props.controls, props.controlsPosition)
+    )
+    const stepDisabled = computed(() => effectiveDisabled.value || props.readonly)
 
     const wrapperClasses = computed(() =>
       classNames(
-        getInputNumberWrapperClasses(props.disabled),
-        getInputNumberStatusClasses(props.status),
+        getInputNumberWrapperClasses({
+          disabled: effectiveDisabled.value,
+          inGroup: inGroup.value,
+          status: effectiveStatus.value
+        }),
         getInputNumberSizeClasses(effectiveSize.value),
-        focused.value && `ring-2 ${getInputNumberFocusRingColor(props.status)}`,
         props.className,
         coerceClassValue(attrs.class)
       )
     )
 
     const inputClasses = computed(() =>
-      getInputNumberInputClasses(
-        effectiveSize.value,
-        props.controls && props.controlsPosition === 'right',
-        props.controls && props.controlsPosition === 'both'
-      )
+      getInputNumberInputClasses(effectiveSize.value, layout.value)
     )
 
-    onMounted(() => {
-      if (props.autoFocus && inputRef.value) {
-        inputRef.value.focus()
-      }
-    })
-
     onBeforeUnmount(() => repeatController.stop())
+
+    function renderStepIcon(d: string, stroke: boolean) {
+      return h(
+        'svg',
+        {
+          xmlns: 'http://www.w3.org/2000/svg',
+          viewBox: '0 0 24 24',
+          fill: stroke ? 'none' : 'currentColor',
+          stroke: stroke ? 'currentColor' : undefined,
+          'stroke-width': stroke ? '2' : undefined,
+          class: stroke ? 'w-4 h-4' : 'w-3 h-3',
+          'aria-hidden': 'true'
+        },
+        [h('path', { d })]
+      )
+    }
 
     return () => {
       const { class: _attrClass, style: attrStyle, ...restAttrs } = attrs
       const children: ReturnType<typeof h>[] = []
+      const valueText =
+        currentValue.value == null
+          ? labels.value.emptyAriaValueText
+          : props.formatter
+            ? props.formatter(currentValue.value)
+            : String(currentValue.value)
 
-      // Left-side minus button (both mode)
-      if (props.controls && props.controlsPosition === 'both') {
+      if (layout.value === 'both') {
         children.push(
           h(
             'button',
             {
               type: 'button',
               tabindex: -1,
-              'aria-label': props.decrementAriaLabel,
-              class: getInputNumberSideButtonClasses('left', props.disabled || atMin.value),
-              disabled: props.disabled || atMin.value,
+              'aria-hidden': 'true',
+              'aria-label': labels.value.decrementAriaLabel,
+              class: getInputNumberSideButtonClasses('start', stepDisabled.value || atMin.value),
+              disabled: stepDisabled.value || atMin.value,
               onPointerdown: startStepRepeat('down'),
               onPointerup: stopStepRepeat,
               onPointerleave: stopStepRepeat,
               onPointercancel: stopStepRepeat,
               onClick: () => handleStepClick('down')
             },
-            [
-              h(
-                'svg',
-                {
-                  xmlns: 'http://www.w3.org/2000/svg',
-                  viewBox: '0 0 24 24',
-                  fill: 'none',
-                  stroke: 'currentColor',
-                  'stroke-width': '2',
-                  class: 'w-4 h-4'
-                },
-                [h('path', { d: inputNumberMinusIconPathD })]
-              )
-            ]
+            [renderStepIcon(inputNumberMinusIconPathD, true)]
           )
         )
       }
 
-      // Input element
       children.push(
         h('input', {
           ...restAttrs,
@@ -379,60 +401,65 @@ export const InputNumber = defineComponent({
           type: 'text',
           inputmode: 'decimal',
           role: 'spinbutton',
+          autofocus: props.autoFocus ? true : undefined,
           'aria-valuemin': props.min === -Infinity ? undefined : props.min,
           'aria-valuemax': props.max === Infinity ? undefined : props.max,
           'aria-valuenow': currentValue.value ?? undefined,
+          'aria-valuetext': valueText,
+          ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
+          'aria-describedby': mergeAriaDescribedBy(
+            restAttrs['aria-describedby'] as string | undefined,
+            formItemControl?.describedBy.value
+          ),
           class: inputClasses.value,
           value: displayValue.value,
           placeholder: props.placeholder,
-          disabled: props.disabled,
+          disabled: effectiveDisabled.value,
           readonly: props.readonly,
-          name: props.name,
-          id: props.id,
-          onInput: handleInput,
-          onBlur: handleBlur,
-          onFocus: handleFocus,
-          onKeydown: handleKeyDown
+          name: effectiveName.value,
+          id: effectiveId.value,
+          onInput: (event: Event) => {
+            handleInput(event)
+            callUnknownEventHandler(restAttrs.onInput, event)
+          },
+          onBlur: (event: FocusEvent) => {
+            handleBlur(event)
+            callUnknownEventHandler(restAttrs.onBlur, event)
+          },
+          onFocus: (event: FocusEvent) => {
+            handleFocus(event)
+            callUnknownEventHandler(restAttrs.onFocus, event)
+          },
+          onKeydown: (event: KeyboardEvent) => {
+            handleKeyDown(event)
+            callUnknownEventHandler(restAttrs.onKeydown, event)
+          }
         })
       )
 
-      // Right-side plus button (both mode)
-      if (props.controls && props.controlsPosition === 'both') {
+      if (layout.value === 'both') {
         children.push(
           h(
             'button',
             {
               type: 'button',
               tabindex: -1,
-              'aria-label': props.incrementAriaLabel,
-              class: getInputNumberSideButtonClasses('right', props.disabled || atMax.value),
-              disabled: props.disabled || atMax.value,
+              'aria-hidden': 'true',
+              'aria-label': labels.value.incrementAriaLabel,
+              class: getInputNumberSideButtonClasses('end', stepDisabled.value || atMax.value),
+              disabled: stepDisabled.value || atMax.value,
               onPointerdown: startStepRepeat('up'),
               onPointerup: stopStepRepeat,
               onPointerleave: stopStepRepeat,
               onPointercancel: stopStepRepeat,
               onClick: () => handleStepClick('up')
             },
-            [
-              h(
-                'svg',
-                {
-                  xmlns: 'http://www.w3.org/2000/svg',
-                  viewBox: '0 0 24 24',
-                  fill: 'none',
-                  stroke: 'currentColor',
-                  'stroke-width': '2',
-                  class: 'w-4 h-4'
-                },
-                [h('path', { d: inputNumberPlusIconPathD })]
-              )
-            ]
+            [renderStepIcon(inputNumberPlusIconPathD, true)]
           )
         )
       }
 
-      // Right-stacked controls (default right mode)
-      if (props.controls && props.controlsPosition === 'right') {
+      if (layout.value === 'end') {
         children.push(
           h('div', { class: inputNumberControlsRightClasses }, [
             h(
@@ -440,54 +467,34 @@ export const InputNumber = defineComponent({
               {
                 type: 'button',
                 tabindex: -1,
-                'aria-label': props.incrementAriaLabel,
-                class: getInputNumberStepButtonClasses('up', props.disabled || atMax.value),
-                disabled: props.disabled || atMax.value,
+                'aria-hidden': 'true',
+                'aria-label': labels.value.incrementAriaLabel,
+                class: getInputNumberStepButtonClasses('up', stepDisabled.value || atMax.value),
+                disabled: stepDisabled.value || atMax.value,
                 onPointerdown: startStepRepeat('up'),
                 onPointerup: stopStepRepeat,
                 onPointerleave: stopStepRepeat,
                 onPointercancel: stopStepRepeat,
                 onClick: () => handleStepClick('up')
               },
-              [
-                h(
-                  'svg',
-                  {
-                    xmlns: 'http://www.w3.org/2000/svg',
-                    viewBox: '0 0 24 24',
-                    fill: 'currentColor',
-                    class: 'w-3 h-3'
-                  },
-                  [h('path', { d: inputNumberUpIconPathD })]
-                )
-              ]
+              [renderStepIcon(inputNumberUpIconPathD, false)]
             ),
             h(
               'button',
               {
                 type: 'button',
                 tabindex: -1,
-                'aria-label': props.decrementAriaLabel,
-                class: getInputNumberStepButtonClasses('down', props.disabled || atMin.value),
-                disabled: props.disabled || atMin.value,
+                'aria-hidden': 'true',
+                'aria-label': labels.value.decrementAriaLabel,
+                class: getInputNumberStepButtonClasses('down', stepDisabled.value || atMin.value),
+                disabled: stepDisabled.value || atMin.value,
                 onPointerdown: startStepRepeat('down'),
                 onPointerup: stopStepRepeat,
                 onPointerleave: stopStepRepeat,
                 onPointercancel: stopStepRepeat,
                 onClick: () => handleStepClick('down')
               },
-              [
-                h(
-                  'svg',
-                  {
-                    xmlns: 'http://www.w3.org/2000/svg',
-                    viewBox: '0 0 24 24',
-                    fill: 'currentColor',
-                    class: 'w-3 h-3'
-                  },
-                  [h('path', { d: inputNumberDownIconPathD })]
-                )
-              ]
+              [renderStepIcon(inputNumberDownIconPathD, false)]
             )
           ])
         )
@@ -496,8 +503,11 @@ export const InputNumber = defineComponent({
       return h(
         'div',
         {
+          ref: wrapperRef,
           class: wrapperClasses.value,
-          style: attrStyle
+          style: attrStyle,
+          [TIGER_CHROME_ATTR]: '',
+          onAnimationend: () => wrapperRef.value?.classList.remove(SHAKE_CLASS)
         },
         children
       )

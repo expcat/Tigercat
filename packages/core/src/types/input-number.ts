@@ -94,20 +94,20 @@ export interface InputNumberProps {
   controls?: boolean
 
   /**
-   * Position of step controls
+   * Position of step controls. `'right'` is the inline-end stack (trailing side).
    * @default 'right'
    */
   controlsPosition?: 'right' | 'both'
 
   /**
-   * Format the display value
+   * Format the display value (applied when the field is not focused)
    */
   formatter?: (value: number | undefined) => string
 
   /**
-   * Parse the displayed string back to number
+   * Parse the displayed string back to number. Return `null` for empty/invalid.
    */
-  parser?: (displayValue: string) => number
+  parser?: (displayValue: string) => number | null
 
   /**
    * Whether to auto-focus on mount

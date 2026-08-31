@@ -9,6 +9,8 @@ import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InputNumber (Vue)', () => {
   const getInput = (container: HTMLElement) => container.querySelector('input') as HTMLInputElement
+  const stepButton = (name: string) =>
+    document.querySelector(`button[aria-label="${name}"]`) as HTMLButtonElement
 
   describe('Rendering', () => {
     it('renders a decimal spinbutton by default', () => {
@@ -41,8 +43,8 @@ describe('InputNumber (Vue)', () => {
 
     it('shows the step controls by default and hides them when controls=false', async () => {
       const { rerender } = render(InputNumber, { props: { modelValue: 5 } })
-      expect(screen.getByLabelText('Increase')).toBeInTheDocument()
-      expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
+      expect(stepButton('Increase')).toBeInTheDocument()
+      expect(stepButton('Decrease')).toBeInTheDocument()
       await rerender({ modelValue: 5, controls: false })
       expect(screen.queryByLabelText('Increase')).toBeNull()
     })
@@ -55,8 +57,8 @@ describe('InputNumber (Vue)', () => {
           decrementAriaLabel: '减少数值'
         }
       })
-      expect(screen.getByLabelText('增加数值')).toBeInTheDocument()
-      expect(screen.getByLabelText('减少数值')).toBeInTheDocument()
+      expect(stepButton('增加数值')).toBeInTheDocument()
+      expect(stepButton('减少数值')).toBeInTheDocument()
     })
 
     it('formats the display value with precision and via formatter', () => {
@@ -79,7 +81,7 @@ describe('InputNumber (Vue)', () => {
       ['Decrease', 4]
     ])('%s emits the value changed by one', async (label, expected) => {
       const { emitted } = render(InputNumber, { props: { modelValue: 5 } })
-      await fireEvent.click(screen.getByLabelText(label))
+      await fireEvent.click(stepButton(label))
       expect(emitted()['update:modelValue'][0]).toEqual([expected])
     })
     it.each([
@@ -87,14 +89,14 @@ describe('InputNumber (Vue)', () => {
       ['Increase', { modelValue: 10, max: 10 }]
     ])('disables the %s button at the boundary', (label, props) => {
       render(InputNumber, { props })
-      expect((screen.getByLabelText(label) as HTMLButtonElement).disabled).toBe(true)
+      expect((stepButton(label) as HTMLButtonElement).disabled).toBe(true)
     })
 
     it('repeats increment while the Increase button is held', async () => {
       vi.useFakeTimers()
       try {
         const { emitted } = render(InputNumber, { props: { modelValue: 0 } })
-        const increase = screen.getByLabelText('Increase')
+        const increase = stepButton('Increase')
         await fireEvent.pointerDown(increase)
         expect(emitted()['update:modelValue'][0]).toEqual([1])
         vi.advanceTimersByTime(450)
@@ -187,10 +189,38 @@ describe('InputNumber (Vue)', () => {
       expect(wrapper).not.toHaveAttribute('data-foo')
       expect(wrapper).toHaveClass('extra-wrap')
 
-      expect(screen.getByLabelText('Increase')).toBeInTheDocument()
-      expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
+      expect(stepButton('Increase')).toBeInTheDocument()
+      expect(stepButton('Decrease')).toBeInTheDocument()
 
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('precision and keyboard', () => {
+    it('steps 0.1 without writing a binary residue', async () => {
+      const { emitted } = render(InputNumber, { props: { modelValue: 0.1, step: 0.1 } })
+      await fireEvent.click(stepButton('Increase'))
+      expect(emitted()['update:modelValue'][0]).toEqual([0.2])
+    })
+
+    it('keeps the editing buffer unformatted while focused after a step', async () => {
+      const formatter = (val: number | undefined) => (val !== undefined ? `$ ${val}` : '')
+      const parser = (s: string) => {
+        const n = Number(s.replace(/[^0-9.-]/g, ''))
+        return Number.isNaN(n) ? null : n
+      }
+      const { container, emitted } = render(InputNumber, {
+        props: { defaultValue: 1000, step: 1, formatter, parser }
+      })
+      const input = getInput(container)
+      expect(input.value).toBe('$ 1000')
+      await fireEvent.focus(input)
+      expect(input.value).toBe('1000')
+      await fireEvent.keyDown(input, { key: 'ArrowUp' })
+      expect(emitted()['update:modelValue'][0]).toEqual([1001])
+      expect(input.value).toBe('1001')
+      await fireEvent.blur(input)
+      expect(input.value).toBe('$ 1001')
     })
   })
 })

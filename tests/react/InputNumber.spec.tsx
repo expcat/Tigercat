@@ -7,6 +7,8 @@ import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InputNumber (React)', () => {
   const getInput = (container: HTMLElement) => container.querySelector('input') as HTMLInputElement
+  const stepButton = (name: string) =>
+    document.querySelector(`button[aria-label="${name}"]`) as HTMLButtonElement
 
   describe('Rendering', () => {
     it('renders a decimal spinbutton by default', () => {
@@ -37,16 +39,16 @@ describe('InputNumber (React)', () => {
 
     it('shows the step controls by default and hides them when controls=false', () => {
       const { rerender } = render(<InputNumber value={5} />)
-      expect(screen.getByLabelText('Increase')).toBeInTheDocument()
-      expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
+      expect(stepButton('Increase')).toBeInTheDocument()
+      expect(stepButton('Decrease')).toBeInTheDocument()
       rerender(<InputNumber value={5} controls={false} />)
       expect(screen.queryByLabelText('Increase')).toBeNull()
     })
 
     it('allows overriding step control aria labels', () => {
       render(<InputNumber value={5} incrementAriaLabel="增加数值" decrementAriaLabel="减少数值" />)
-      expect(screen.getByLabelText('增加数值')).toBeInTheDocument()
-      expect(screen.getByLabelText('减少数值')).toBeInTheDocument()
+      expect(stepButton('增加数值')).toBeInTheDocument()
+      expect(stepButton('减少数值')).toBeInTheDocument()
     })
 
     it('formats the display value with precision and via formatter', () => {
@@ -68,7 +70,7 @@ describe('InputNumber (React)', () => {
     ])('%s changes the value by one', async (label, expected) => {
       const onChange = vi.fn()
       render(<InputNumber defaultValue={5} onChange={onChange} />)
-      await userEvent.click(screen.getByLabelText(label))
+      await userEvent.click(stepButton(label))
       expect(onChange).toHaveBeenCalledWith(expected)
     })
     it('repeats increment while the Increase button is held', () => {
@@ -76,7 +78,7 @@ describe('InputNumber (React)', () => {
       try {
         const onChange = vi.fn()
         render(<InputNumber defaultValue={0} onChange={onChange} />)
-        const increase = screen.getByLabelText('Increase')
+        const increase = stepButton('Increase')
         fireEvent.pointerDown(increase)
         expect(onChange).toHaveBeenCalledWith(1)
         act(() => vi.advanceTimersByTime(450))
@@ -172,10 +174,65 @@ describe('InputNumber (React)', () => {
       expect(wrapper).not.toHaveAttribute('data-foo')
       expect(wrapper).toHaveClass('extra-wrap')
 
-      expect(screen.getByLabelText('Increase')).toBeInTheDocument()
-      expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
+      expect(stepButton('Increase')).toBeInTheDocument()
+      expect(stepButton('Decrease')).toBeInTheDocument()
 
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('precision, keyboard, ref', () => {
+    it('steps 0.1 without writing a binary residue', async () => {
+      const onChange = vi.fn()
+      render(<InputNumber defaultValue={0.1} step={0.1} onChange={onChange} />)
+      await userEvent.click(stepButton('Increase'))
+      expect(onChange).toHaveBeenCalledWith(0.2)
+    })
+
+    it('keeps the editing buffer unformatted while focused after a step', async () => {
+      const onChange = vi.fn()
+      const formatter = (val: number | undefined) => (val !== undefined ? `$ ${val}` : '')
+      const { container } = render(
+        <InputNumber
+          defaultValue={1000}
+          step={1}
+          formatter={formatter}
+          parser={(s) => {
+            const n = Number(s.replace(/[^0-9.-]/g, ''))
+            return Number.isNaN(n) ? null : n
+          }}
+          onChange={onChange}
+        />
+      )
+      const input = getInput(container)
+      expect(input.value).toBe('$ 1000')
+      fireEvent.focus(input)
+      expect(input.value).toBe('1000')
+      fireEvent.keyDown(input, { key: 'ArrowUp' })
+      expect(onChange).toHaveBeenCalledWith(1001)
+      expect(input.value).toBe('1001')
+      fireEvent.blur(input)
+      expect(input.value).toBe('$ 1001')
+    })
+
+    it('moves Home/End to min/max', () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <InputNumber defaultValue={4} min={0} max={10} onChange={onChange} />
+      )
+      const input = getInput(container)
+      fireEvent.keyDown(input, { key: 'End' })
+      expect(onChange).toHaveBeenCalledWith(10)
+      fireEvent.keyDown(input, { key: 'Home' })
+      expect(onChange).toHaveBeenCalledWith(0)
+    })
+
+    it('forwards a ref to the native input', () => {
+      const ref = React.createRef<HTMLInputElement>()
+      render(<InputNumber ref={ref} aria-label="qty" />)
+      expect(ref.current).toBeInstanceOf(HTMLInputElement)
+      ref.current?.focus()
+      expect(ref.current).toHaveFocus()
     })
   })
 })
