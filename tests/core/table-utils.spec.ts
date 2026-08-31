@@ -101,6 +101,19 @@ describe('table-utils', () => {
       })
     })
 
+    it('resolves percent widths against the container so left offsets do not collapse', () => {
+      const columns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: '20%', fixed: 'left' },
+        { key: 'age', title: 'Age', width: '20%', fixed: 'left' }
+      ]
+      expect(getFixedColumnOffsets(columns, {}, 500)).toEqual({
+        leftOffsets: { name: 0, age: 100 },
+        rightOffsets: {},
+        minTableWidth: 200,
+        hasFixedColumns: true
+      })
+    })
+
     it('reports no fixed columns without key-array checks', () => {
       const columns: TableColumn[] = [
         { key: 'name', title: 'Name', width: 120 },
@@ -494,8 +507,18 @@ describe('table-utils', () => {
       })
     })
 
-    it('auto-enables virtual mode at the virtual threshold', () => {
+    it('does not auto-enable virtual mode unless opted in', () => {
       expect(getTableVirtualRecommendation({ dataLength: 1000 })).toEqual({
+        enabled: false,
+        autoEnabled: false,
+        recommended: true,
+        threshold: 1000,
+        dataLength: 1000
+      })
+    })
+
+    it('auto-enables virtual mode only when autoVirtual is true', () => {
+      expect(getTableVirtualRecommendation({ autoVirtual: true, dataLength: 1000 })).toEqual({
         enabled: true,
         autoEnabled: true,
         recommended: false,
@@ -712,6 +735,13 @@ describe('table-utils', () => {
     it('falls back to the filters key when no column matches', () => {
       const filtered = filterTableData(rows, columns, { name: 'Bob' })
       expect(filtered.map((row) => row.name)).toEqual(['Bob'])
+    })
+
+    it('matches a numeric select value against a string cell', () => {
+      const filtered = filterTableData([{ id: '1' }, { id: '2' }], [{ key: 'id', title: 'Id' }], {
+        id: 1
+      })
+      expect(filtered).toEqual([{ id: '1' }])
     })
   })
 

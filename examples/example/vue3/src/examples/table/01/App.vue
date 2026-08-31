@@ -18,6 +18,7 @@ const rows = [
   <Table
     :columns="columns"
     :data-source="rows"
+    row-key="id"
     bordered
     striped
     size="sm"

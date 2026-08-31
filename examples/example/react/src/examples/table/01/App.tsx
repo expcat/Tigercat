@@ -23,6 +23,7 @@ export default function App() {
     <Table<Row>
       columns={columns}
       dataSource={rows}
+      rowKey="id"
       bordered
       striped
       size="sm"

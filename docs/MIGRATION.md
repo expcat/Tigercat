@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Table 行身份是 `rowKey`（及 `rowSelection.getRowKey`），缺键时用 **dataSource 下标**，不要再当页内 `0,1,…`。`onCellChange` / `onRowClick` / `column.render` / `editableCells` 都是这份下标。`editableCells` 从 `Map<string, Set<number>>` 改成 `{ [columnKey]: number[] }`。
+
+`pagination.total: 0` 不再被当成「没传」。remote 默认不跑本地 filter/sort/group（要当前页再筛设 `pagination.localProcessing`）。省略 `pagination` 仍默认开（`pageSize` 10），关掉请 `false`；传入的分页对象与默认浅合并。`autoVirtual` 默认 `false`。
+
+Table `exportable` 只出 CSV。删除 `exportFormat: 'excel'` 和 HTML 假 `.xls`；真 xlsx 用 DataExport。CSV 带 BOM、CRLF。Vue 主入口导出 `TableProps`。
+
 VirtualList / Table / VirtualTable 行窗口现在是同一份 exclusive 算术：默认 overscan 下可见条数比旧的 VirtualList/Table 少（不再 `2 * overscan` 后再 inclusive 多渲一行）。`height` 只收 px。命令式滚动用 `scrollToIndex` / `scrollToOffset`，不要再找 `firstElementChild` 写 `scrollTop` 再 `dispatchEvent('scroll')`。嵌在 Tree/List 里的 VirtualList 请传 `role="none"`。删除类型 `VirtualListItemSize`。Vue 主入口导出 `VirtualListProps`。
 
 InfiniteScroll 必须把滚动盒定高（`height` 或 class），否则会一次拉完或拉不动。`onLoadMore` / `@load-more` 必须同步把 `loading` 置 true。`threshold` 是像素 rootMargin，不是 IO 相交比例。横向 sentinel 不再是 0×0。`inverse` 的结束文案在内容前。Vue 主入口导出 `InfiniteScrollProps`。

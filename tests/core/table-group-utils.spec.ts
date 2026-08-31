@@ -26,6 +26,13 @@ describe('groupDataByColumn', () => {
     expect(groups.get('Marketing')).toHaveLength(1)
   })
 
+  it('reads the grouped field through dataKey', () => {
+    const groups = groupDataByColumn(data, 'deptCol', [
+      { key: 'deptCol', title: 'Dept', dataKey: 'dept' }
+    ])
+    expect(groups.get('Engineering')).toHaveLength(2)
+  })
+
   it('should preserve order within groups', () => {
     const groups = groupDataByColumn(data, 'dept')
     const engineering = groups.get('Engineering')!

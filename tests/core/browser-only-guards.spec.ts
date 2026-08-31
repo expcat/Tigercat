@@ -12,8 +12,8 @@ import {
   cropCanvas,
   downloadChartPng,
   downloadChartSvg,
+  createTableResizeObserverController,
   downloadCsv,
-  downloadExcel,
   downloadTableExport,
   exportChartPng,
   findActiveAnchor,
@@ -56,8 +56,12 @@ describe('browser-only utility guards', () => {
     expect(() => focusTrap.deactivate()).not.toThrow()
 
     expect(() => downloadCsv('name\nAda')).not.toThrow()
-    expect(() => downloadExcel('<table></table>')).not.toThrow()
     expect(() => downloadTableExport('name\nAda')).not.toThrow()
+    expect(() => {
+      const controller = createTableResizeObserverController({ onResize: () => {} })
+      controller.observe({} as HTMLElement)
+      controller.disconnect()
+    }).not.toThrow()
     expect(() => downloadChartSvg({} as SVGSVGElement)).not.toThrow()
     await expect(downloadChartPng({} as SVGSVGElement)).resolves.toBeUndefined()
   })

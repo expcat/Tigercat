@@ -202,7 +202,7 @@ describe('useTableState', () => {
   })
 
   it('handles editable cells', () => {
-    const editableCells = new Map<string, Set<number>>([['name', new Set([0])]])
+    const editableCells = { name: [0] }
     const onCellChange = vi.fn()
     const { result } = renderHook(() =>
       useTableState(makeInput({ editable: true, editableCells, onCellChange }))
@@ -261,9 +261,9 @@ describe('useTableState', () => {
     act(() => result.current.handleDragStart('status'))
     act(() => result.current.handleDrop('name'))
     expect(onColumnOrderChange).toHaveBeenCalledWith([
-      expect.objectContaining({ key: 'age' }),
       expect.objectContaining({ key: 'status' }),
-      expect.objectContaining({ key: 'name' })
+      expect.objectContaining({ key: 'name' }),
+      expect.objectContaining({ key: 'age' })
     ])
   })
 

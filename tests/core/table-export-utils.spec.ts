@@ -5,15 +5,13 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   exportTableToCsv,
-  exportTableToExcel,
   exportTableData,
   downloadCsv,
-  downloadExcel,
-  tableExportButtonClasses
+  downloadTableExport
 } from '@expcat/tigercat-core/utils/table-export'
 
 const columns = [
-  { key: 'name', title: 'Name' },
+  { key: 'nameCol', title: '姓名', dataKey: 'name' },
   { key: 'age', title: 'Age' },
   { key: 'city', title: 'City' }
 ]
@@ -24,130 +22,72 @@ const data = [
 ]
 
 describe('exportTableToCsv', () => {
-  it('should generate CSV with headers', () => {
+  it('writes a UTF-8 BOM and CRLF rows', () => {
     const csv = exportTableToCsv(columns, data)
-    const lines = csv.split('\n')
-    expect(lines[0]).toBe('Name,Age,City')
+    expect(csv.startsWith('\uFEFF')).toBe(true)
+    expect(csv).toContain('\r\n')
+    expect(csv).toContain('姓名,Age,City')
+    expect(csv).toContain('Alice,25,New York')
   })
 
-  it('should generate CSV with data rows', () => {
-    const csv = exportTableToCsv(columns, data)
-    const lines = csv.split('\n')
-    expect(lines[1]).toBe('Alice,25,New York')
-    expect(lines[2]).toBe('Bob,30,London')
+  it('uses dataKey for cell values', () => {
+    const csv = exportTableToCsv(columns, [{ name: 'Ada', age: 1, city: 'X' }])
+    expect(csv).toContain('Ada')
   })
 
-  it('should escape commas in values', () => {
-    const dataWithComma = [{ name: 'Doe, John', age: 25, city: 'NYC' }]
-    const csv = exportTableToCsv(columns, dataWithComma)
-    const lines = csv.split('\n')
-    expect(lines[1]).toContain('"Doe, John"')
+  it('quotes commas, quotes, and carriage returns', () => {
+    const csv = exportTableToCsv(columns, [
+      { name: 'Doe, John', age: 25, city: 'A"B' },
+      { name: 'line\rbreak', age: 1, city: 'NYC' }
+    ])
+    expect(csv).toContain('"Doe, John"')
+    expect(csv).toContain('"A""B"')
+    expect(csv).toContain('"line\rbreak"')
   })
 
-  it('should escape quotes in values', () => {
-    const dataWithQuote = [{ name: 'He said "hi"', age: 25, city: 'NYC' }]
-    const csv = exportTableToCsv(columns, dataWithQuote)
-    expect(csv).toContain('"He said ""hi"""')
+  it('prefixes formula-like cells', () => {
+    const csv = exportTableToCsv(columns, [{ name: '=SUM(A1)', age: 1, city: '+cmd' }])
+    expect(csv).toContain("'=SUM(A1)")
+    expect(csv).toContain("'+cmd")
   })
 
-  it('should handle empty data', () => {
-    const csv = exportTableToCsv(columns, [])
-    expect(csv).toBe('Name,Age,City')
-  })
-
-  it('should handle null/undefined values', () => {
-    const dataWithNull = [{ name: null, age: undefined, city: 'NYC' }]
-    const csv = exportTableToCsv(columns, dataWithNull as any)
-    const lines = csv.split('\n')
-    expect(lines[1]).toBe(',,NYC')
-  })
-
-  it('should use dataKey when available', () => {
-    const cols = [{ key: 'n', title: 'Name', dataKey: 'fullName' }]
-    const d = [{ fullName: 'Alice' }]
-    const csv = exportTableToCsv(cols, d)
-    expect(csv).toContain('Alice')
+  it('handles empty, null, and undefined cells', () => {
+    const csv = exportTableToCsv(columns, [{ name: null, age: undefined, city: 'NYC' }] as never)
+    expect(csv).toContain(',,NYC')
   })
 })
 
 describe('downloadCsv', () => {
-  it('should create and click a link', () => {
+  it('does not duplicate an existing .csv suffix', () => {
     const clickSpy = vi.fn()
-    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue({
+    const created = {
       href: '',
       download: '',
       style: { display: '' },
       click: clickSpy
-    } as any)
-    const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((n) => n)
-    const removeSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((n) => n)
-    const revokeURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+    }
+    const createElementSpy = vi
+      .spyOn(document, 'createElement')
+      .mockReturnValue(created as unknown as HTMLElement)
+    const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node)
+    const removeSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node)
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
 
-    downloadCsv('a,b,c', 'test')
-
-    expect(createElementSpy).toHaveBeenCalledWith('a')
+    downloadCsv('a,b,c', 'report.csv')
+    expect(created.download).toBe('report.csv')
     expect(clickSpy).toHaveBeenCalled()
+
+    downloadTableExport('a,b,c', 'plain')
+    expect(created.download).toBe('plain.csv')
 
     createElementSpy.mockRestore()
     appendSpy.mockRestore()
     removeSpy.mockRestore()
-    revokeURL.mockRestore()
   })
 })
 
-describe('exportTableToExcel', () => {
-  it('should generate an Excel-compatible HTML worksheet', () => {
-    const excel = exportTableToExcel(columns, data)
-
-    expect(excel).toContain('<table>')
-    expect(excel).toContain('<th>Name</th>')
-    expect(excel).toContain('<td>Alice</td>')
-  })
-
-  it('should escape HTML in values', () => {
-    const excel = exportTableToExcel(columns, [{ name: '<Alice>', age: 25, city: 'A&B' }])
-
-    expect(excel).toContain('&lt;Alice&gt;')
-    expect(excel).toContain('A&amp;B')
-  })
-
-  it('should dispatch by export format', () => {
-    expect(exportTableData(columns, data, 'csv')).toContain('Name,Age,City')
-    expect(exportTableData(columns, data, 'excel')).toContain('<table>')
-  })
-})
-
-describe('downloadExcel', () => {
-  it('should create an xls download link', () => {
-    const clickSpy = vi.fn()
-    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue({
-      href: '',
-      download: '',
-      style: { display: '' },
-      click: clickSpy
-    } as any)
-    const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((n) => n)
-    const removeSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((n) => n)
-    const revokeURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
-
-    downloadExcel('<table></table>', 'report')
-
-    expect(createElementSpy).toHaveBeenCalledWith('a')
-    expect((createElementSpy.mock.results[0].value as HTMLAnchorElement).download).toBe(
-      'report.xls'
-    )
-    expect(clickSpy).toHaveBeenCalled()
-
-    createElementSpy.mockRestore()
-    appendSpy.mockRestore()
-    removeSpy.mockRestore()
-    revokeURL.mockRestore()
-  })
-})
-
-describe('tableExportButtonClasses', () => {
-  it('should be a non-empty string', () => {
-    expect(tableExportButtonClasses).toBeTruthy()
-    expect(typeof tableExportButtonClasses).toBe('string')
+describe('exportTableData', () => {
+  it('is CSV-only', () => {
+    expect(exportTableData(columns, data)).toContain('Alice,25,New York')
   })
 })

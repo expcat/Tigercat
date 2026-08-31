@@ -85,4 +85,27 @@ describe('filterDataAdvanced', () => {
     const result = filterDataAdvanced(data, rules)
     expect(result).toEqual(data)
   })
+
+  it('reads cells through column dataKey', () => {
+    const columns = [{ key: 'nameCol', title: 'Name', dataKey: 'name' }]
+    const rules: FilterRule[] = [{ column: 'nameCol', operator: 'equals', value: 'Alice' }]
+    expect(filterDataAdvanced(data, rules, columns)).toEqual([data[0]])
+  })
+
+  it('matches isEmpty, gte, and lte', () => {
+    const withBlank = [...data, { id: 6, name: '', age: 20, city: '' }]
+    expect(filterDataAdvanced(withBlank, [{ column: 'name', operator: 'isEmpty' }])).toHaveLength(1)
+    expect(filterDataAdvanced(data, [{ column: 'age', operator: 'gte', value: 35 }])).toEqual([
+      data[2],
+      data[3]
+    ])
+    expect(filterDataAdvanced(data, [{ column: 'age', operator: 'lte', value: 25 }])).toEqual([
+      data[0]
+    ])
+  })
+
+  it('does not treat NaN numeric compares as a match', () => {
+    const result = filterDataAdvanced(data, [{ column: 'city', operator: 'gt', value: 10 }])
+    expect(result).toEqual([])
+  })
 })

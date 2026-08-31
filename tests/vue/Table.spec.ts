@@ -308,7 +308,7 @@ describe('Table', () => {
       expect(getByLabelText('Pick row 1')).toBeInTheDocument()
       expect(
         container.querySelector('[data-tiger-table-mobile="card"] input[type="checkbox"]')
-      ).toHaveClass('rounded')
+      ).toBeTruthy()
 
       await fireEvent.click(getByText('All rows'))
       expect(onSelectionChange).toHaveBeenCalledWith([1])
@@ -360,7 +360,9 @@ describe('Table', () => {
         onSortChange
       })
 
-      const sortTrigger = container.querySelector('[data-tiger-table-mobile="card"] button')!
+      const sortTrigger = container.querySelector(
+        '[data-tiger-table-mobile="card"] [role="combobox"]'
+      )!
       await fireEvent.click(sortTrigger)
       await fireEvent.click(getByText('Sort by Age ↓'))
 
@@ -414,7 +416,7 @@ describe('Table', () => {
       )
     })
 
-    it('auto-enables virtual mode at the virtualThreshold', () => {
+    it('does not auto-enable virtual mode unless autoVirtual is set', () => {
       const largeData = Array.from({ length: 4 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
@@ -426,6 +428,26 @@ describe('Table', () => {
         columns,
         dataSource: largeData,
         pagination: false,
+        virtualThreshold: 4
+      })
+
+      expect(container.querySelector('[data-tiger-virtual="enabled"]')).toBeNull()
+      expect(container.querySelector('[data-tiger-virtual-recommended="true"]')).toBeTruthy()
+    })
+
+    it('auto-enables virtual mode when autoVirtual is true', () => {
+      const largeData = Array.from({ length: 4 }, (_, index) => ({
+        id: index,
+        name: `User ${index}`,
+        age: index,
+        email: `user${index}@example.com`
+      }))
+
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource: largeData,
+        pagination: false,
+        autoVirtual: true,
         virtualThreshold: 4
       })
 

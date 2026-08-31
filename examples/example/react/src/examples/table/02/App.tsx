@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Table } from '@expcat/tigercat-react/Table'
-import type { TableColumn } from '@expcat/tigercat-react'
+import type { SortState, TableColumn } from '@expcat/tigercat-react'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -9,12 +10,7 @@ interface Row extends Record<string, unknown> {
 }
 
 const columns: TableColumn<Row>[] = [
-  {
-    key: 'name',
-    title: '姓名',
-    sortable: true,
-    filter: { type: 'text', placeholder: '搜索姓名...' }
-  },
+  { key: 'name', title: '姓名', sortable: true, filter: { type: 'text' } },
   { key: 'age', title: '年龄', sortable: true, width: 100 },
   {
     key: 'status',
@@ -36,5 +32,19 @@ const rows: Row[] = [
 ]
 
 export default function App() {
-  return <Table<Row> columns={columns} dataSource={rows} pagination={false} />
+  const [sort, setSort] = useState<SortState>({ key: 'name', direction: 'asc' })
+  const [filters, setFilters] = useState<Record<string, unknown>>({ status: 'active' })
+
+  return (
+    <Table<Row>
+      columns={columns}
+      dataSource={rows}
+      rowKey="id"
+      sort={sort}
+      filters={filters}
+      pagination={false}
+      onSortChange={setSort}
+      onFilterChange={setFilters}
+    />
+  )
 }

@@ -1,14 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Table } from '@expcat/tigercat-vue/Table'
-import type { TableColumn } from '@expcat/tigercat-vue'
+import type { SortState, TableColumn } from '@expcat/tigercat-vue'
 
 const columns: TableColumn[] = [
-  {
-    key: 'name',
-    title: '姓名',
-    sortable: true,
-    filter: { type: 'text', placeholder: '搜索姓名...' }
-  },
+  { key: 'name', title: '姓名', sortable: true, filter: { type: 'text' } },
   { key: 'age', title: '年龄', sortable: true, width: 100 },
   {
     key: 'status',
@@ -28,8 +24,19 @@ const rows = [
   { id: 2, name: '李娜', age: 28, status: 'inactive' },
   { id: 3, name: '王强', age: 41, status: 'active' }
 ]
+
+const sort = ref<SortState>({ key: 'name', direction: 'asc' })
+const filters = ref<Record<string, unknown>>({ status: 'active' })
 </script>
 
 <template>
-  <Table :columns="columns" :data-source="rows" :pagination="false" />
+  <Table
+    :columns="columns"
+    :data-source="rows"
+    row-key="id"
+    :sort="sort"
+    :filters="filters"
+    :pagination="false"
+    @sort-change="sort = $event"
+    @filter-change="filters = $event" />
 </template>

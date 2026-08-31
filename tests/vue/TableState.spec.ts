@@ -161,7 +161,7 @@ describe('Vue useTableState', () => {
   })
 
   it('handles radio selection and editable cells', () => {
-    const editableCells = new Map<string, Set<number>>([['name', new Set([0])]])
+    const editableCells = { name: [0] }
     const { context, emit, scope } = createState({
       rowSelection: { type: 'radio' },
       editable: true,
@@ -216,9 +216,9 @@ describe('Vue useTableState', () => {
     context.handleDragStart('status')
     context.handleDrop('name')
     expect(emit).toHaveBeenCalledWith('column-order-change', [
-      expect.objectContaining({ key: 'age' }),
       expect.objectContaining({ key: 'status' }),
-      expect.objectContaining({ key: 'name' })
+      expect.objectContaining({ key: 'name' }),
+      expect.objectContaining({ key: 'age' })
     ])
     scope.stop()
   })

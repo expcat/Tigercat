@@ -341,7 +341,7 @@ const COMPONENT_USAGE_NOTES = {
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '固定列通过 `column.fixed`（`left` / `right`）开启；开启 `columnLockable` 后表头会出现锁定按钮，点击可交互切换该列进入左侧固定区，按钮的 `aria-label` 走 i18n，可用 `lockColumnAriaLabel` / `unlockColumnAriaLabel`（模板支持 `{column}`）自定义。推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。当存在固定列或开启 `columnLockable` 时，表格会渲染 `<colgroup>` + `<col>` 钉死每列宽度（有声明 `width` 的列用声明值，无声明宽度的列冻结首次实测宽度），使列宽与 `fixed`/锁定状态解耦——切换锁定不会改变任何列宽，sticky 偏移保持准确；代价是这类表格的自适应列在首次测量后宽度被冻结、不再随容器宽度回流（普通表格不受影响）。`tableLayout`（默认 `"auto"`，可设为 `"fixed"`）切换底层 `table-layout`，固定列/钉列场景配合列 `width` 时 `"fixed"` 列宽更稳定。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName`、`valueClassName` 做轻量布局调整，且 `cardFieldGap`（默认 "gap-3"，需传完整 Tailwind gap 类以便 Tailwind JIT 静态识别）可调整字段间的间距。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。为保证锁定/固定列在横向滚动时 `position: sticky` 稳定钉住，表格根使用 `border-separate` + `border-spacing-0`，行/表头分隔线落在单元格（`<td>`/`<th>`）而非 `<tr>`/`<thead>`。内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数和 `showTotal` 范围文案全部由 `pagination.total` 计算，`current`/`pageSize` 仍为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求；注意 remote 模式下组件内置排序/筛选仅作用于当前页数据，排序/筛选应由服务端完成。'
+      '固定列通过 `column.fixed`（`left` / `right`）开启；开启 `columnLockable` 后表头会出现锁定按钮，点击可交互切换该列进入左侧固定区，按钮的 `aria-label` 走 i18n，可用 `lockColumnAriaLabel` / `unlockColumnAriaLabel`（模板支持 `{column}`）自定义。推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。当存在固定列或开启 `columnLockable` 时，表格会渲染 `<colgroup>` + `<col>` 钉死每列宽度（有声明 `width` 的列用声明值，无声明宽度的列冻结首次实测宽度），使列宽与 `fixed`/锁定状态解耦——切换锁定不会改变任何列宽，sticky 偏移保持准确；代价是这类表格的自适应列在首次测量后宽度被冻结、不再随容器宽度回流（普通表格不受影响）。`tableLayout`（默认 `"auto"`，可设为 `"fixed"`）切换底层 `table-layout`，固定列/钉列场景配合列 `width` 时 `"fixed"` 列宽更稳定。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制（默认 `sm`），卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName`、`valueClassName` 做轻量布局调整，且 `cardFieldGap`（默认 "gap-3"，需传完整 Tailwind gap 类以便 Tailwind JIT 静态识别）可调整字段间的间距。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。为保证锁定/固定列在横向滚动时 `position: sticky` 稳定钉住，表格根使用 `border-separate` + `border-spacing-0`，行/表头分隔线落在单元格（`<td>`/`<th>`）而非 `<tr>`/`<thead>`。省略 `pagination` 时默认开启（`pageSize` 10）；关掉请传 `false`。传入的分页对象与该默认浅合并。`pagination.total` 未传才回落到本地长度，`0` 是合法总数。服务端模式 `pagination.remote: true` 跳过内部切片以及内置 filter/sort/group（当前页再筛请设 `localProcessing`）。`onCellChange` / `onRowClick` / `render` 的 index 是 dataSource 下标。内置 `exportable` 只出 CSV；xlsx 走 DataExport。`autoVirtual` 默认关。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -586,8 +586,7 @@ const COMPONENT_SNIPPETS = {
       '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />',
     DataTableWithToolbar:
       '<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />',
-    Table:
-      '<Table :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :pagination="false" />',
+    Table: '<Table :columns="columns" :data-source="rows" row-key="id" :pagination="false" />',
     FormWizard: '<FormWizard :steps="steps" />',
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
@@ -649,8 +648,7 @@ const COMPONENT_SNIPPETS = {
     TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',
     DataTableWithToolbar:
       '<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />',
-    Table:
-      '<Table columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} pagination={false} />',
+    Table: '<Table columns={columns} dataSource={rows} rowKey="id" pagination={false} />',
     FormWizard: '<FormWizard steps={steps} />',
     TaskBoard: '<TaskBoard columns={columns} />',
     Kanban: '<Kanban columns={columns} />',

@@ -55,7 +55,7 @@ describe('table-resize-utils', () => {
       tableWidth: 460,
       tableHeight: 240,
       columnWidths: { name: 180, age: 90 },
-      rowHeights: [48]
+      rowHeights: { 0: 48 }
     })
   })
 

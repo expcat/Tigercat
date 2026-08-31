@@ -50,7 +50,7 @@ describe('DataTableWithToolbar (React)', () => {
       />
     )
 
-    await userEvent.click(screen.getByRole('button', { name: '状态' }))
+    await userEvent.click(screen.getByText('状态'))
     await userEvent.click(screen.getByText('启用'))
 
     expect(onFiltersChange).toHaveBeenCalledWith({ status: 'active' })
@@ -58,7 +58,7 @@ describe('DataTableWithToolbar (React)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(onPageChange).toHaveBeenCalledWith(2, 10)
 
-    await userEvent.selectOptions(screen.getByRole('combobox'), '20')
+    await userEvent.selectOptions(screen.getByLabelText('/ page'), '20')
     expect(onPageSizeChange).toHaveBeenCalledWith(1, 20)
   })
 

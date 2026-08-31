@@ -1,7 +1,7 @@
 {
   "id": "table-02",
   "title": "排序与筛选",
-  "description": "在同一组列上演示排序与文本、选项筛选。",
+  "description": "受控 sort / filters：触发器与输入框跟父级状态走。",
   "entry": "App.vue",
   "order": 2
 }

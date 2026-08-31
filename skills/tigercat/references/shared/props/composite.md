@@ -75,7 +75,7 @@ Note: 透传 Table props（含 `columnLockable`、列级 `column.fixed` 钉列�
 | `filters?`        | `Record<string, unknown>`   | `-`     | Controlled filters. When provided, internal filter state will not be mutated.  |
 | `loading?`        | `boolean`                   | `false` | Loading state                                                                  |
 
-Events/callback props: `onPageChange?`, `onPageSizeChange?`.
+Events/callback props: `onPageChange?`, `onPageSizeChange?`, `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, ....
 
 卡片自定义（公开 API）：`renderCard(context)` / `cardClassName`（`string` 或 `(record, index) => string`）已在 `DataTableWithToolbar` 显式声明并转发给内部 Table；Vue 侧另有 `#card="{ record, index, columns, selected, expanded, toggleExpand, selectRow }"` 作用域插槽，**插槽优先于 `renderCard` prop**。
 
