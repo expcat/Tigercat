@@ -32,7 +32,10 @@ export interface CountdownProps
   onFinish?: (payload: CountdownChangePayload) => void
 }
 
-function initialRemaining(value: CountdownValue | undefined, now: CountdownValue | undefined): number {
+function initialRemaining(
+  value: CountdownValue | undefined,
+  now: CountdownValue | undefined
+): number {
   if (now === undefined) return 0
   return getCountdownRemaining(value, now)
 }
@@ -62,7 +65,8 @@ export const Countdown: React.FC<CountdownProps> = ({
   const formatted = useMemo(() => formatCountdown(remaining, format), [format, remaining])
 
   useEffect(() => {
-    const nextRemaining = now === undefined ? getCountdownRemaining(value) : getCountdownRemaining(value, now)
+    const nextRemaining =
+      now === undefined ? getCountdownRemaining(value) : getCountdownRemaining(value, now)
     setRemaining(nextRemaining)
     finishedRef.current = nextRemaining <= 0
   }, [value, now])

@@ -50,9 +50,7 @@ describe('Progress', () => {
   })
 
   it('status overrides variant color', () => {
-    const { container } = render(
-      <Progress percentage={50} variant="primary" status="exception" />
-    )
+    const { container } = render(<Progress percentage={50} variant="primary" status="exception" />)
     expect(fillOf(container)?.className).toContain('error')
     expect(fillOf(container)?.className).not.toContain('primary')
   })
@@ -132,17 +130,13 @@ describe('Progress', () => {
   })
 
   it('renders striped without animation', () => {
-    const { container } = render(
-      <Progress percentage={50} striped stripedAnimation={false} />
-    )
+    const { container } = render(<Progress percentage={50} striped stripedAnimation={false} />)
     expect(fillOf(container)?.className).toContain('tiger-progress-striped')
     expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
   })
 
   it('animates stripes and pauses them', () => {
-    const { container, rerender } = render(
-      <Progress percentage={50} striped stripedAnimation />
-    )
+    const { container, rerender } = render(<Progress percentage={50} striped stripedAnimation />)
     expect(fillOf(container)?.className).toContain('tiger-progress-striped-animated')
     rerender(<Progress percentage={50} striped stripedAnimation status="paused" />)
     expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
@@ -154,9 +148,7 @@ describe('Progress', () => {
     await expectNoA11yViolations(line)
     unmount()
 
-    const { container: circle } = render(
-      <Progress type="circle" percentage={75} showText />
-    )
+    const { container: circle } = render(<Progress type="circle" percentage={75} showText />)
     await expectNoA11yViolations(circle)
   })
 })

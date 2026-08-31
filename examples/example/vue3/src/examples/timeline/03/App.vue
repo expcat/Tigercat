@@ -8,9 +8,5 @@ const items = [
 </script>
 
 <template>
-  <Timeline :items="items" reverse :pending="true">
-    <template #pending>
-      <span class="text-blue-600">处理中…</span>
-    </template>
-  </Timeline>
+  <Timeline :items="items" reverse pending />
 </template>

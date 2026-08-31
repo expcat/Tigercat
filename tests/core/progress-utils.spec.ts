@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  clampPercentage,
-  getCircleSize,
-  resolveProgressView
-} from '@expcat/tigercat-core'
+import { clampPercentage, getCircleSize, resolveProgressView } from '@expcat/tigercat-core'
 
 describe('progress-utils', () => {
   it('clamps non-finite percentages to 0', () => {

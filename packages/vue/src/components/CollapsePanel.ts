@@ -267,9 +267,7 @@ export const CollapsePanel = defineComponent({
         headerContent
       )
 
-      const extraNode = extraSlot
-        ? h('span', { class: collapseExtraClasses }, extraSlot)
-        : null
+      const extraNode = extraSlot ? h('span', { class: collapseExtraClasses }, extraSlot) : null
 
       const initialClass = controllerReady.value
         ? undefined
@@ -310,10 +308,7 @@ export const CollapsePanel = defineComponent({
           class: panelClasses.value,
           style: props.style
         },
-        [
-          h('div', { class: collapseHeaderRowClasses }, [headerButton, extraNode]),
-          content
-        ]
+        [h('div', { class: collapseHeaderRowClasses }, [headerButton, extraNode]), content]
       )
     }
   }

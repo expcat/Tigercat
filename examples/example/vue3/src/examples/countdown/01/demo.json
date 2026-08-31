@@ -1,7 +1,7 @@
 {
   "id": "countdown-01",
   "title": "展示格式",
-  "description": "一个倒计时组合展示格式、前缀与尺寸。",
+  "description": "不传 now（SSR 需要传）。天数 token 是 D，不是文案。",
   "entry": "App.vue",
   "order": 1
 }

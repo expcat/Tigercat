@@ -1,7 +1,7 @@
 {
   "id": "timeline-03",
   "title": "等待与反转",
-  "description": "一个时间线组合展示 pending 与 reverse。",
+  "description": "reverse 后 pending 仍在列表末尾，文案走语言包。",
   "entry": "App.vue",
   "order": 3
 }

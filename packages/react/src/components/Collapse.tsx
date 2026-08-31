@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getCollapseContainerClasses,
@@ -37,9 +30,7 @@ export function useCollapseContext(): CollapseContextValue | null {
 }
 
 export interface CollapseProps
-  extends
-    Omit<CoreCollapseProps, 'style'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<CoreCollapseProps, 'style'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /**
    * Always an array. Empty `[]` is a controlled all-closed state.
    */

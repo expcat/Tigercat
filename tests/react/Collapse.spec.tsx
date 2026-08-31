@@ -606,7 +606,10 @@ describe('Collapse', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(
         <Collapse>
-          <CollapsePanel panelKey="1" header="Panel 1" extra={<button type="button">已更新</button>}>
+          <CollapsePanel
+            panelKey="1"
+            header="Panel 1"
+            extra={<button type="button">已更新</button>}>
             Content 1
           </CollapsePanel>
           <CollapsePanel panelKey="2" header="Panel 2">

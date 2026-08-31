@@ -11,18 +11,20 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## Component Notes
 
-| Component | Uses | Notes                                                                        |
-| --------- | ---- | ---------------------------------------------------------------------------- |
-| Drawer    | -    | `bodyPadding`（`boolean \| string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。 |
+| Component | Uses | Notes                                                                                                             |
+| --------- | ---- | ----------------------------------------------------------------------------------------------------------------- |
+| Drawer    | -    | `bodyPadding`（`boolean \| string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。                                      |
+| Progress  | -    | 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。 |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component  | Vue                       | React                    |
-| ---------- | ------------------------- | ------------------------ |
-| LoadingBar | `LoadingBar.start()`      | `LoadingBar.start()`     |
-| Message    | `Message.info('Saved')`   | `Message.info('Saved')`  |
-| Tour       | `<Tour :steps="steps" />` | `<Tour steps={steps} />` |
+| Component  | Vue                             | React                          |
+| ---------- | ------------------------------- | ------------------------------ |
+| LoadingBar | `LoadingBar.start()`            | `LoadingBar.start()`           |
+| Message    | `Message.info('Saved')`         | `Message.info('Saved')`        |
+| Progress   | `<Progress :percentage="64" />` | `<Progress percentage={64} />` |
+| Tour       | `<Tour :steps="steps" />`       | `<Tour steps={steps} />`       |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, Loading, LoadingBarContainer, MessageContainer, Modal, NotificationContainer, Popconfirm, Popover, Progress, Tooltip.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, Loading, LoadingBarContainer, MessageContainer, Modal, NotificationContainer, Popconfirm, Popover, Tooltip.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

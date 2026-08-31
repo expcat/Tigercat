@@ -191,5 +191,6 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | TabPane                         | Navigation | `navigation` | tabs.ts                                             | ./TabPane                         |
 | Tabs                            | Navigation | `navigation` | tabs.ts                                             | ./Tabs                            |
 | Tree                            | Navigation | `navigation` | tree.ts                                             | ./Tree                            |
+| CollapseContextKey              | Other      | `other`      | unknown                                             | ./CollapseContextKey              |
 | FORM_ITEM_CONTROL_INJECTION_KEY | Other      | `other`      | unknown                                             | ./FORM_ITEM_CONTROL_INJECTION_KEY |
 | IMAGE_GROUP_INJECTION_KEY       | Other      | `other`      | unknown                                             | ./IMAGE_GROUP_INJECTION_KEY       |

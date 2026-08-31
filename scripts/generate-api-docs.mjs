@@ -124,6 +124,25 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '子节点才是 slides。`infinite` 在 scroll 下走首尾 clone，不会整段倒带。无名不是 landmark。非当前页 `inert`。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。'
   },
+  Collapse: {
+    notes:
+      '`onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion 多键只留最后一项。`1` 与 `"1"` 同一面板。header 是真 button；extra 是兄弟，不进可访问名。'
+  },
+  CollapsePanel: {
+    notes: '必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 序并 `aria-disabled`。'
+  },
+  Timeline: {
+    notes:
+      '需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。'
+  },
+  Countdown: {
+    notes:
+      '`now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。'
+  },
+  Progress: {
+    notes:
+      '默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。'
+  },
   Image: {
     notes:
       '默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。'

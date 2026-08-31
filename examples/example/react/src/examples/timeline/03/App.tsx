@@ -6,12 +6,5 @@ const items = [
 ]
 
 export default function App() {
-  return (
-    <Timeline
-      items={items}
-      reverse
-      pending
-      pendingContent={<span className="text-blue-600">处理中…</span>}
-    />
-  )
+  return <Timeline items={items} reverse pending />
 }

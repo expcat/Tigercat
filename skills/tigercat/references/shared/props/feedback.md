@@ -121,13 +121,17 @@ Imperative notification API supports inline toast actions via `notification.info
 
 ## Progress
 
-`packages/core/src/types/progress.ts` · `ProgressProps` · 3/15 props
+`packages/core/src/types/progress.ts` · `ProgressProps` · 5/15 props
 
-| Prop       | Type              | Default     | Notes                  |
-| ---------- | ----------------- | ----------- | ---------------------- |
-| `variant?` | `ProgressVariant` | `'primary'` | Progress variant style |
-| `size?`    | `ProgressSize`    | `'md'`      | Progress size          |
-| `type?`    | `ProgressType`    | `'line'`    | Progress type (shape)  |
+Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。
+
+| Prop          | Type             | Default                           | Notes                                                                        |
+| ------------- | ---------------- | --------------------------------- | ---------------------------------------------------------------------------- |
+| `percentage?` | `number`         | `0`                               | Current progress percentage (0-100)                                          |
+| `status?`     | `ProgressStatus` | `'normal'`                        | Progress status When set, overrides variant color                            |
+| `showText?`   | `boolean`        | `true for line, false for circle` | Whether to show progress text. Line: outside the bar. Circle: in the center. |
+| `type?`       | `ProgressType`   | `'line'`                          | Progress type (shape)                                                        |
+| `striped?`    | `boolean`        | `false`                           | Whether to show striped animation Only applicable for line type              |
 
 ## Tooltip
 

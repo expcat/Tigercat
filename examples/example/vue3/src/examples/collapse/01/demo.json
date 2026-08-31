@@ -1,7 +1,7 @@
 {
   "id": "collapse-01",
   "title": "基础手风琴",
-  "description": "单个手风琴每次只展开一个面板。",
+  "description": "手风琴每次一块；下面一块可以同时展开两项。",
   "entry": "App.vue",
   "order": 1
 }

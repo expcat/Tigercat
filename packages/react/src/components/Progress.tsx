@@ -141,7 +141,10 @@ export const Progress: React.FC<ProgressProps> = React.memo(
               r={radius}
               fill="none"
               stroke="currentColor"
-              className={classNames('tiger-progress-fill', getProgressStrokeClasses(view.effectiveVariant))}
+              className={classNames(
+                'tiger-progress-fill',
+                getProgressStrokeClasses(view.effectiveVariant)
+              )}
               strokeWidth={safeStroke}
               strokeLinecap={view.percentage === 0 ? 'butt' : 'round'}
               strokeDasharray={strokeDasharray}
@@ -187,10 +190,7 @@ export const Progress: React.FC<ProgressProps> = React.memo(
             !height && progressLineSizeClasses[size]
           )}
           style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
-          <div
-            className={getProgressFillClasses(view)}
-            style={{ width: `${view.percentage}%` }}
-          />
+          <div className={getProgressFillClasses(view)} style={{ width: `${view.percentage}%` }} />
         </div>
         {view.shouldShowText && (
           <span

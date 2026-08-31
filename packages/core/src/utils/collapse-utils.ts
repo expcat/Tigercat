@@ -350,10 +350,7 @@ export function getInitialCollapseContentStyle(
   }
 }
 
-function applyInitialStyle(
-  element: CollapseTransitionElement,
-  expanded: boolean
-): void {
+function applyInitialStyle(element: CollapseTransitionElement, expanded: boolean): void {
   if (expanded) {
     setExpandedStyle(element)
   } else {

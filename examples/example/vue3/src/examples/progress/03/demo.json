@@ -1,7 +1,7 @@
 {
   "id": "progress-03",
   "title": "异步上传",
-  "description": "用单个进度条呈现模拟上传流程。",
+  "description": "上传会清旧 interval；另有一条 paused 停纹。",
   "entry": "App.vue",
   "order": 3
 }

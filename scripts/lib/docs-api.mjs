@@ -157,6 +157,11 @@ export const COMPONENT_PROP_PRIORITY = {
     'dotPosition?',
     'speed?'
   ],
+  Collapse: ['activeKey?', 'accordion?', 'expandIconPosition?', 'bordered?', 'ghost?'],
+  CollapsePanel: ['panelKey', 'header?', 'extra?', 'showArrow?', 'disabled?'],
+  Timeline: ['items?', 'mode?', 'pending?', 'reverse?'],
+  Countdown: ['value?', 'now?', 'format?', 'interval?', 'title?'],
+  Progress: ['percentage?', 'status?', 'showText?', 'type?', 'striped?'],
   Button: [
     'variant?',
     'size?',
@@ -314,7 +319,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Masonry: '<Masonry :columns="3"><slot /></Masonry>',
     PrintLayout:
       '<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>',
-    Carousel: '<Carousel><div>One</div><div>Two</div></Carousel>'
+    Carousel: '<Carousel><div>One</div><div>Two</div></Carousel>',
+    Collapse:
+      '<Collapse :active-key="keys"><CollapsePanel panel-key="1" header="FAQ">Answer</CollapsePanel></Collapse>',
+    CollapsePanel: '<CollapsePanel panel-key="1" header="FAQ">Answer</CollapsePanel>',
+    Timeline: '<Timeline :items="items" />',
+    Countdown: '<Countdown :value="deadline" />',
+    Progress: '<Progress :percentage="64" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -333,7 +344,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Masonry: '<Masonry columns={3}>{children}</Masonry>',
     PrintLayout:
       '<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>',
-    Carousel: '<Carousel><div>One</div><div>Two</div></Carousel>'
+    Carousel: '<Carousel><div>One</div><div>Two</div></Carousel>',
+    Collapse:
+      '<Collapse activeKey={keys}><CollapsePanel panelKey="1" header="FAQ">Answer</CollapsePanel></Collapse>',
+    CollapsePanel: '<CollapsePanel panelKey="1" header="FAQ">Answer</CollapsePanel>',
+    Timeline: '<Timeline items={items} />',
+    Countdown: '<Countdown value={deadline} />',
+    Progress: '<Progress percentage={64} />'
   }
 }
 

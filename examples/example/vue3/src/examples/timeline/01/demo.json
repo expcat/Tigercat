@@ -1,7 +1,7 @@
 {
   "id": "timeline-01",
   "title": "基础时间线",
-  "description": "使用颜色和交替布局展示基础时间线。",
+  "description": "默认左轴。长文案停在轴的一侧。",
   "entry": "App.vue",
   "order": 1
 }

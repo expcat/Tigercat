@@ -1,7 +1,7 @@
 {
   "id": "progress-01",
   "title": "线性进度",
-  "description": "一个线性进度条组合展示尺寸、颜色与条纹动画。",
+  "description": "尺寸、颜色对照，条纹会动。默认名走语言包。",
   "entry": "App.vue",
   "order": 1
 }

@@ -17,7 +17,10 @@ import {
 } from '@expcat/tigercat-core'
 import { useCollapseContext } from './Collapse'
 
-export interface CollapsePanelProps extends Omit<CoreCollapsePanelProps, 'style' | 'header' | 'extra'> {
+export interface CollapsePanelProps extends Omit<
+  CoreCollapsePanelProps,
+  'style' | 'header' | 'extra'
+> {
   header?: React.ReactNode
   extra?: React.ReactNode
   children?: React.ReactNode

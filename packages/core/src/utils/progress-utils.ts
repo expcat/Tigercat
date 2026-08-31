@@ -207,9 +207,7 @@ export function resolveProgressView(input: ProgressViewInput): ProgressView {
   const statusVariant = getStatusVariant(input.status ?? 'normal')
   const effectiveVariant = (statusVariant || input.variant || 'primary') as ProgressVariant
   const shouldShowText = input.showText ?? type === 'line'
-  const displayText = shouldShowText
-    ? formatProgressText(percentage, input.text, input.format)
-    : ''
+  const displayText = shouldShowText ? formatProgressText(percentage, input.text, input.format) : ''
   const hasCustomText = input.text !== undefined || input.format !== undefined
   const valueText = hasCustomText && shouldShowText ? displayText : undefined
   const ariaLabel = input.ariaLabel ?? (input.ariaLabelledby ? undefined : input.widgetName)
@@ -231,10 +229,7 @@ export function resolveProgressView(input: ProgressViewInput): ProgressView {
   }
 }
 
-export function getProgressFillClasses(
-  view: ProgressView,
-  extra?: string
-): string {
+export function getProgressFillClasses(view: ProgressView, extra?: string): string {
   return [
     progressLineInnerClasses,
     getProgressVariantClasses(view.effectiveVariant),

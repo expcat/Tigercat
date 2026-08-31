@@ -23,33 +23,45 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## Collapse
 
-`packages/core/src/types/collapse.ts` · `CollapseProps` · 3/9 props
+`packages/core/src/types/collapse.ts` · `CollapseProps` · 5/9 props
 
-| Prop                | Type                                       | Default | Notes                                                     |
-| ------------------- | ------------------------------------------ | ------- | --------------------------------------------------------- |
-| `activeKey?`        | `string \| number \| (string \| number)[]` | `-`     | Currently active panel keys (controlled mode)             |
-| `defaultActiveKey?` | `string \| number \| (string \| number)[]` | `-`     | Default active panel keys (uncontrolled mode)             |
-| `accordion?`        | `boolean`                                  | `false` | Accordion mode - only one panel can be expanded at a time |
+Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion 多键只留最后一项。`1` 与 `"1"` 同一面板。header 是真 button；extra 是兄弟，不进可访问名。
+
+| Prop                  | Type                                       | Default   | Notes                                                                                     |
+| --------------------- | ------------------------------------------ | --------- | ----------------------------------------------------------------------------------------- |
+| `activeKey?`          | `string \| number \| (string \| number)[]` | `-`       | Currently active panel keys (controlled mode)                                             |
+| `accordion?`          | `boolean`                                  | `false`   | Accordion mode — only one panel can be expanded at a time. Extra keys in `activeKey` /... |
+| `expandIconPosition?` | `ExpandIconPosition`                       | `'start'` | Position of the expand icon                                                               |
+| `bordered?`           | `boolean`                                  | `true`    | Whether to show border                                                                    |
+| `ghost?`              | `boolean`                                  | `false`   | Ghost mode - transparent without border                                                   |
 
 ## CollapsePanel
 
-`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 3/8 props
+`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 5/8 props
 
-| Prop        | Type               | Default | Notes                               |
-| ----------- | ------------------ | ------- | ----------------------------------- |
-| `panelKey`  | `string \| number` | `-`     | Unique key for the panel (required) |
-| `disabled?` | `boolean`          | `false` | Whether the panel is disabled       |
-| `header?`   | `string`           | `-`     | Panel header/title                  |
+Note: 必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 序并 `aria-disabled`。
+
+| Prop         | Type               | Default | Notes                                                            |
+| ------------ | ------------------ | ------- | ---------------------------------------------------------------- |
+| `panelKey`   | `string \| number` | `-`     | Unique key for the panel (required)                              |
+| `header?`    | `string`           | `-`     | Panel header/title                                               |
+| `extra?`     | `unknown`          | `-`     | Extra content rendered beside the header button (not inside it). |
+| `showArrow?` | `boolean`          | `true`  | Whether to show arrow icon                                       |
+| `disabled?`  | `boolean`          | `false` | Whether the panel is disabled                                    |
 
 ## Countdown
 
-`packages/core/src/types/countdown.ts` · `CountdownProps` · 3/10 props
+`packages/core/src/types/countdown.ts` · `CountdownProps` · 5/10 props
 
-| Prop      | Type             | Default | Notes |
-| --------- | ---------------- | ------- | ----- |
-| `value?`  | `CountdownValue` | `-`     | -     |
-| `now?`    | `CountdownValue` | `-`     | -     |
-| `format?` | `string`         | `-`     | -     |
+Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。
+
+| Prop        | Type             | Default      | Notes                                                                                      |
+| ----------- | ---------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `value?`    | `CountdownValue` | `-`          | Target timestamp. Invalid or omitted values render `00:00:00` and do not tick.             |
+| `now?`      | `CountdownValue` | `-`          | First-paint / SSR clock snapshot only. After mount, ticks use `Date.now()`. Changing `n... |
+| `format?`   | `string`         | `'HH:mm:ss'` | Display pattern. `HH` is total hours unless `D`/`DD` is present (then 24h remainder). `... |
+| `interval?` | `number`         | `1000`       | Tick period in ms. `<= 0` disables the timer.                                              |
+| `title?`    | `unknown`        | `-`          | Visible title above the value. Not an HTML tooltip.                                        |
 
 ## DataExport
 
@@ -87,10 +99,14 @@ Note: 固定列通过 `column.fixed`（`left` / `right`）开启；开启 `colum
 
 ## Timeline
 
-`packages/core/src/types/timeline.ts` · `TimelineProps` · 3/11 props
+`packages/core/src/types/timeline.ts` · `TimelineProps` · 5/11 props
 
-| Prop      | Type                   | Default  | Notes                                                |
-| --------- | ---------------------- | -------- | ---------------------------------------------------- |
-| `items?`  | `TimelineItem[]`       | `-`      | Timeline data source                                 |
-| `locale?` | `Partial<TigerLocale>` | `-`      | Locale override; falls back to ConfigProvider locale |
-| `mode?`   | `TimelineMode`         | `'left'` | Timeline mode/direction                              |
+Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。
+
+| Prop       | Type                   | Default  | Notes                                                                                      |
+| ---------- | ---------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `items?`   | `TimelineItem[]`       | `-`      | Timeline items                                                                             |
+| `mode?`    | `TimelineMode`         | `'left'` | Timeline mode/direction                                                                    |
+| `pending?` | `boolean`              | `false`  | Append a pending item after the (optionally reversed) list. Pending stays at the DOM en... |
+| `reverse?` | `boolean`              | `false`  | Whether to reverse the timeline order                                                      |
+| `locale?`  | `Partial<TigerLocale>` | `-`      | -                                                                                          |
