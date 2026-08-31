@@ -799,9 +799,13 @@ export const Table = defineComponent({
         'div',
         {
           ref: wrapperRef,
-          class: getTableWrapperClasses(resolvedProps.bordered, resolvedProps.maxHeight),
+          class: getTableWrapperClasses(
+            resolvedProps.bordered,
+            resolvedProps.maxHeight,
+            !effectiveVirtual
+          ),
           style: wrapperStyle,
-          'data-tiger-virtual': virtualRecommendation.enabled ? 'enabled' : undefined,
+          'data-tiger-virtual': effectiveVirtual ? 'enabled' : undefined,
           'data-tiger-virtual-recommended': virtualRecommendation.recommended ? 'true' : undefined,
           'data-tiger-virtual-threshold': virtualRecommendation.recommended
             ? virtualRecommendation.threshold

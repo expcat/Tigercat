@@ -518,6 +518,7 @@ describe('Table', () => {
       expect(wrapper.style.overflow).not.toMatch(/^(auto|scroll)$/)
       expect(wrapper.style.height).not.toBe('320px')
       expect(wrapper.className.split(/\s+/)).not.toContain('overflow-y-auto')
+      expect(wrapper.className.split(/\s+/)).not.toContain('overflow-auto')
 
       const table = wrapper.querySelector('table')
       expect(table).toBeTruthy()
@@ -535,6 +536,27 @@ describe('Table', () => {
       expect(pagination).toBeTruthy()
       expect(wrapper.contains(pagination)).toBe(true)
       expect(scroller.contains(pagination)).toBe(false)
+    })
+
+    it('pads the virtual window with borderless spacer rows', () => {
+      const rows = Array.from({ length: 40 }, (_, index) => ({
+        id: index,
+        name: `User ${index}`,
+        age: index,
+        email: `user${index}@example.com`
+      }))
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource: rows,
+        pagination: false,
+        virtual: true,
+        virtualHeight: 120,
+        virtualItemHeight: 40
+      })
+
+      const spacer = container.querySelector('[data-tiger-table-virtual-spacer] td') as HTMLElement
+      expect(spacer).toBeTruthy()
+      expect(Number.parseFloat(spacer.style.height)).toBeGreaterThan(0)
     })
   })
 
