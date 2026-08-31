@@ -122,7 +122,7 @@ export { Table } from './components/Table'
 export type { TableProps } from './components/Table'
 
 export { DataExport } from './components/DataExport'
-export type { DataExportProps } from './components/DataExport'
+export type { DataExportProps, DataExportHandle } from './components/DataExport'
 
 export { Tag } from './components/Tag'
 export type { TagProps } from './components/Tag'
@@ -422,7 +422,7 @@ export type { KanbanProps } from './components/Kanban'
 
 // VirtualTable (v0.8.0+)
 export { VirtualTable } from './components/VirtualTable'
-export type { VirtualTableProps } from './components/VirtualTable'
+export type { VirtualTableProps, VirtualTableHandle } from './components/VirtualTable'
 
 // InfiniteScroll (v0.8.0+)
 export { InfiniteScroll } from './components/InfiniteScroll'

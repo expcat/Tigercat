@@ -132,7 +132,7 @@ export type { VueUploadProps, UploadProps } from './components/Upload'
 export { Table } from './components/Table'
 export type { VueTableProps, TableProps } from './components/Table'
 export { DataExport } from './components/DataExport'
-export type { VueDataExportProps } from './components/DataExport'
+export type { VueDataExportProps, DataExportProps } from './components/DataExport'
 export { Tag } from './components/Tag'
 export type { VueTagProps } from './components/Tag'
 export { Badge } from './components/Badge'
@@ -408,7 +408,11 @@ export type { VueKanbanProps } from './components/Kanban'
 
 // VirtualTable (v0.8.0+)
 export { VirtualTable } from './components/VirtualTable'
-export type { VueVirtualTableProps } from './components/VirtualTable'
+export type {
+  VueVirtualTableProps,
+  VirtualTableProps,
+  VirtualTableHandle
+} from './components/VirtualTable'
 
 // InfiniteScroll (v0.8.0+)
 export { InfiniteScroll } from './components/InfiniteScroll'

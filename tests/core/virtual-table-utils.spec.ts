@@ -120,6 +120,18 @@ describe('virtual-table-utils', () => {
       expect(range.leftPad).toBe(360)
     })
 
+    it('covers mid-range, empty, and trailing columns', () => {
+      expect(calculateVirtualColumnRange(0, 400, [], 2)).toEqual({
+        start: 0,
+        end: 0,
+        leftPad: 0,
+        rightPad: 0
+      })
+      const tail = calculateVirtualColumnRange(960, 400, widths, 0)
+      expect(tail.end).toBe(widths.length)
+      expect(tail.rightPad).toBe(0)
+    })
+
     it('returns an empty window for NaN, zero, or negative viewport', () => {
       expect(calculateVirtualColumnRange(0, Number.NaN, widths, 2)).toEqual({
         start: 0,
@@ -141,8 +153,8 @@ describe('virtual-table-utils', () => {
   // ─── getRowKey ────────────────────────────────────────────
 
   describe('getVirtualRowKey', () => {
-    it('returns index when no rowKey', () => {
-      expect(getVirtualRowKey({ id: 1 }, 5)).toBe(5)
+    it('defaults to id when no rowKey is passed', () => {
+      expect(getVirtualRowKey({ id: 1 }, 5)).toBe(1)
     })
 
     it('returns property value for string key', () => {

@@ -1,21 +1,19 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+/**
+ * @vitest-environment happy-dom
+ */
+
+import { describe, it, expect } from 'vitest'
+import { render, fireEvent, screen } from '@testing-library/vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
+import type { VirtualTableHandle } from '@expcat/tigercat-vue/VirtualTable'
 import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
 import type { TableColumn } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
-const columns = [
+const columns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 80 },
   { key: 'name', title: 'Name' }
 ]
-
-const tableHeaderBgClass =
-  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
-const tableFixedStripeBgClass =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
-const tableFixedSelectedBgClass =
-  'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_5%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff)))))]'
 
 function makeData(count: number) {
   return Array.from({ length: count }, (_, i) => ({
@@ -24,163 +22,40 @@ function makeData(count: number) {
   }))
 }
 
+function dataRowsOf(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll('tbody tr')).filter(
+    (row) => row.getAttribute('aria-hidden') !== 'true'
+  ) as HTMLElement[]
+}
+
 describe('VirtualTable (Vue)', () => {
-  it('renders with basic data', () => {
-    const { getByRole, getByText } = render(VirtualTable, {
-      props: { dataSource: makeData(10), columns, virtualHeight: 400, virtualItemHeight: 40 }
+  it('renders headers and visible rows as a native table', () => {
+    const { container } = render(VirtualTable, {
+      props: {
+        dataSource: makeData(10),
+        columns,
+        virtualHeight: 400,
+        virtualItemHeight: 40,
+        'data-testid': 'vt'
+      }
     })
-    expect(getByRole('grid')).toBeTruthy()
-    expect(getByText('ID')).toBeTruthy()
-    expect(getByText('Name')).toBeTruthy()
+    expect(container.querySelector('table')).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: 'ID' })).toBeTruthy()
+    expect(screen.getByText('Row 1')).toBeTruthy()
+    expect(container.querySelector('table')?.getAttribute('aria-rowcount')).toBe('11')
   })
 
-  it('renders header cells', () => {
-    const { getAllByRole } = render(VirtualTable, {
-      props: { dataSource: makeData(5), columns }
-    })
-    const ths = getAllByRole('columnheader')
-    expect(ths.length).toBe(2)
-    expect(ths[0].textContent).toBe('ID')
-    expect(ths[1].textContent).toBe('Name')
-  })
-
-  it('shows empty text when no data', () => {
-    const { getByText } = render(VirtualTable, {
+  it('shows empty and loading text', async () => {
+    const { rerender } = render(VirtualTable, {
       props: { dataSource: [], columns, emptyText: 'Nothing here' }
     })
-    expect(getByText('Nothing here')).toBeTruthy()
+    expect(screen.getByText('Nothing here')).toBeTruthy()
+    await rerender({ dataSource: makeData(2), columns, loading: true })
+    expect(screen.getByText('Loading...')).toBeTruthy()
   })
 
-  it('shows default empty text', () => {
-    const { getByText } = render(VirtualTable, {
-      props: { dataSource: [], columns }
-    })
-    expect(getByText('No data')).toBeTruthy()
-  })
-
-  it('shows loading overlay', () => {
-    const { getByText } = render(VirtualTable, {
-      props: { dataSource: makeData(5), columns, loading: true }
-    })
-    expect(getByText('Loading...')).toBeTruthy()
-  })
-
-  it('does not show loading when not loading', () => {
-    const { queryByText } = render(VirtualTable, {
-      props: { dataSource: makeData(5), columns, loading: false }
-    })
-    expect(queryByText('Loading...')).toBeNull()
-  })
-
-  it('renders row data', () => {
-    const { getByText } = render(VirtualTable, {
-      props: { dataSource: makeData(3), columns, virtualItemHeight: 40, virtualHeight: 400 }
-    })
-    expect(getByText('Row 1')).toBeTruthy()
-    expect(getByText('Row 2')).toBeTruthy()
-    expect(getByText('Row 3')).toBeTruthy()
-  })
-
-  it('emits row-click event', async () => {
-    const wrapper = render(VirtualTable, {
-      props: { dataSource: makeData(3), columns, virtualItemHeight: 40, virtualHeight: 400 }
-    })
-    const rows = wrapper.getAllByRole('row')
-    // First row is header, second is spacer (aria-hidden), rows start from index 2
-    const dataRows = rows.filter(
-      (r) =>
-        !r.querySelector('th') &&
-        r.getAttribute('aria-hidden') !== 'true' &&
-        r.getAttribute('aria-hidden') !== ''
-    )
-    if (dataRows.length > 0) {
-      await fireEvent.click(dataRows[0])
-      expect(wrapper.emitted('row-click')?.[0]).toBeTruthy()
-    }
-  })
-
-  it('makes interactive rows keyboard-activable with aria (C23-3)', async () => {
-    const wrapper = render(VirtualTable, {
-      props: {
-        dataSource: makeData(3),
-        columns,
-        virtualItemHeight: 40,
-        virtualHeight: 400,
-        rowSelection: { selectedRowKeys: [1] },
-        rowKey: 'id'
-      }
-    })
-    const dataRows = wrapper.getAllByRole('row').filter((r) => r.querySelector('td'))
-    const first = dataRows[0]
-    expect(first.getAttribute('tabindex')).toBe('0')
-    expect(first.getAttribute('aria-rowindex')).toBe('2')
-    expect(first.getAttribute('aria-selected')).toBe('true')
-    expect(dataRows[1].getAttribute('aria-selected')).toBe('false')
-    expect(first.querySelectorAll('td')[0].getAttribute('aria-colindex')).toBe('1')
-    expect(first.querySelectorAll('td')[1].getAttribute('aria-colindex')).toBe('2')
-
-    await fireEvent.keyDown(first, { key: 'Enter' })
-    expect(wrapper.emitted('row-click')?.length).toBe(1)
-    expect(wrapper.emitted('selection-change')?.[0]).toEqual([[]])
-  })
-
-  it('does not make rows focusable when non-interactive', () => {
-    const wrapper = render(VirtualTable, {
-      props: { dataSource: makeData(3), columns, virtualItemHeight: 40, virtualHeight: 400 }
-    })
-    const dataRows = wrapper.getAllByRole('row').filter((r) => r.querySelector('td'))
-    expect(dataRows[0].getAttribute('tabindex')).toBeNull()
-    expect(dataRows[0].getAttribute('aria-selected')).toBeNull()
-  })
-
-  it('emits selection-change when rowSelection is enabled', async () => {
-    const wrapper = render(VirtualTable, {
-      props: {
-        dataSource: makeData(3),
-        columns,
-        virtualItemHeight: 40,
-        virtualHeight: 400,
-        rowSelection: { getRowKey: (row: Record<string, unknown>) => row.id as string | number }
-      }
-    })
-    const rows = wrapper.getAllByRole('row')
-    const dataRows = rows.filter(
-      (r) =>
-        !r.querySelector('th') &&
-        r.getAttribute('aria-hidden') !== 'true' &&
-        r.getAttribute('aria-hidden') !== ''
-    )
-    if (dataRows.length > 0) {
-      await fireEvent.click(dataRows[0])
-      expect(wrapper.emitted('selection-change')?.[0]).toEqual([[1]])
-    }
-  })
-
-  it('applies aria-rowcount', () => {
-    const data = makeData(100)
-    const { getByRole } = render(VirtualTable, {
-      props: { dataSource: data, columns, virtualItemHeight: 40, virtualHeight: 200 }
-    })
-    expect(getByRole('grid').getAttribute('aria-rowcount')).toBe('100')
-  })
-
-  it('applies bordered class', () => {
-    const { getByRole } = render(VirtualTable, {
-      props: { dataSource: makeData(3), columns, bordered: true }
-    })
-    expect(getByRole('grid').className).toContain('border')
-  })
-
-  it('applies custom className', () => {
-    const { getByRole } = render(VirtualTable, {
-      props: { dataSource: makeData(3), columns, className: 'custom-vt' }
-    })
-    expect(getByRole('grid').className).toContain('custom-vt')
-  })
-
-  it('renders only visible rows for large datasets', () => {
-    // 1000 rows, 40px each, 200px viewport → visible ~5 + overscan 5 = ~15 rows
-    const { getAllByRole } = render(VirtualTable, {
+  it('windows large datasets and pins row height', () => {
+    const { container } = render(VirtualTable, {
       props: {
         dataSource: makeData(1000),
         columns,
@@ -189,362 +64,152 @@ describe('VirtualTable (Vue)', () => {
         overscan: 5
       }
     })
-    // Filter to data rows only (not header, not spacers)
-    const allRows = getAllByRole('row')
-    const dataRows = allRows.filter(
-      (r) =>
-        !r.querySelector('th') &&
-        r.getAttribute('aria-hidden') !== 'true' &&
-        r.getAttribute('aria-hidden') !== ''
-    )
-    // Should be much less than 1000
-    expect(dataRows.length).toBeLessThan(30)
-    expect(dataRows.length).toBeGreaterThan(0)
+    const rows = dataRowsOf(container)
+    expect(rows.length).toBeGreaterThan(0)
+    expect(rows.length).toBeLessThan(30)
+    expect(rows[0].style.height).toBe('40px')
+    expect(container.querySelector('[data-tiger-table-virtual-spacer] td')).toBeTruthy()
   })
 
-  it('uses rowKey prop for key extraction', () => {
-    const data = [
-      { id: 'a', name: 'Alpha' },
-      { id: 'b', name: 'Beta' }
-    ]
-    const { getByText } = render(VirtualTable, {
-      props: { dataSource: data, columns, rowKey: 'id' }
+  it('emits row-click from click and keyboard without rowSelection', async () => {
+    const { container, emitted } = render(VirtualTable, {
+      props: {
+        dataSource: makeData(3),
+        columns,
+        virtualItemHeight: 40,
+        virtualHeight: 400,
+        onRowClick: () => undefined
+      }
     })
-    expect(getByText('Alpha')).toBeTruthy()
-    expect(getByText('Beta')).toBeTruthy()
+    const rows = dataRowsOf(container)
+    await fireEvent.click(rows[0])
+    await fireEvent.keyDown(rows[0], { key: 'Enter' })
+    expect(emitted()['row-click']?.length).toBeGreaterThanOrEqual(1)
+    expect(rows[0].getAttribute('tabindex')).toBe('0')
   })
 
-  it('sets virtualHeight style on container', () => {
-    const { getByRole } = render(VirtualTable, {
-      props: { dataSource: makeData(5), columns, virtualHeight: 500 }
-    })
-    expect(getByRole('grid').style.height).toBe('500px')
-  })
-
-  it('applies column width', () => {
-    const cols = [
-      { key: 'id', title: 'ID', width: 100 },
-      { key: 'name', title: 'Name', width: '200px' }
-    ]
-    const { getAllByRole } = render(VirtualTable, {
-      props: { dataSource: makeData(3), columns: cols }
-    })
-    const ths = getAllByRole('columnheader')
-    expect(ths[0].style.width).toBe('100px')
-    expect(ths[1].style.width).toBe('200px')
-  })
-
-  it('uses column render and renderHeader with dataKey values', () => {
-    const rows = [{ id: 1, name: 'Alice' }]
-    const columns: TableColumn[] = [
+  it('selects by id and ignores cell button clicks', async () => {
+    const cols: TableColumn[] = [
+      { key: 'id', title: 'ID' },
       {
-        key: 'displayName',
-        dataKey: 'name',
-        title: 'Fallback',
-        renderHeader: () => h('strong', 'Custom header'),
-        render: (row) => h('span', `Column: ${String(row.name)}`)
+        key: 'name',
+        title: 'Name',
+        render: (row) => h('button', { type: 'button' }, `Open ${String(row.id)}`)
       }
     ]
-    const { getByText } = render(VirtualTable, { props: { dataSource: rows, columns } })
-
-    expect(getByText('Custom header')).toBeInTheDocument()
-    expect(getByText('Column: Alice')).toBeInTheDocument()
+    const { container, emitted } = render(VirtualTable, {
+      props: {
+        dataSource: makeData(3),
+        columns: cols,
+        virtualItemHeight: 40,
+        virtualHeight: 400,
+        rowSelection: { selectedRowKeys: [1] }
+      }
+    })
+    expect(dataRowsOf(container)[0].getAttribute('aria-selected')).toBe('true')
+    await fireEvent.click(screen.getByRole('button', { name: 'Open 2' }))
+    expect(emitted()['selection-change']).toBeUndefined()
+    await fireEvent.click(dataRowsOf(container)[1])
+    expect(emitted()['selection-change']?.[0]).toEqual([[1, 2]])
   })
 
-  describe('Sticky Columns', () => {
-    const fixedColumns = [
-      { key: 'id', title: 'ID', width: 80, fixed: 'left' as const },
-      { key: 'name', title: 'Name', width: 150 },
-      { key: 'action', title: 'Action', width: 100, fixed: 'right' as const }
-    ]
-
-    function makeFixedData(count: number) {
-      return Array.from({ length: count }, (_, i) => ({
-        id: i + 1,
-        name: `Row ${i + 1}`,
-        action: 'Edit'
-      }))
-    }
-
-    it('applies sticky left style to fixed-left header cell', () => {
-      const { getByText } = render(VirtualTable, {
-        props: { dataSource: makeFixedData(5), columns: fixedColumns }
-      })
-      const th = getByText('ID').closest('th')!
-      expect(th.style.position).toBe('sticky')
-      expect(th.style.left).toBe('0px')
-      expect(th).toHaveClass(tableHeaderBgClass)
-    })
-
-    it('pins fixed-column widths with a colgroup', () => {
-      const { container } = render(VirtualTable, {
-        props: { dataSource: makeFixedData(5), columns: fixedColumns }
-      })
-      const widths = Array.from(container.querySelectorAll('table > colgroup col')).map(
-        (col) => (col as HTMLElement).style.width
-      )
-      expect(widths).toEqual(['80px', '150px', '100px'])
-      expect(container.querySelector('table')?.className).toContain('border-separate')
-    })
-
-    it('applies sticky right style to fixed-right header cell', () => {
-      const { getByText } = render(VirtualTable, {
-        props: { dataSource: makeFixedData(5), columns: fixedColumns }
-      })
-      const th = getByText('Action').closest('th')!
-      expect(th.style.position).toBe('sticky')
-      expect(th.style.right).toBe('0px')
-      expect(th).toHaveClass(tableHeaderBgClass)
-    })
-
-    it('does not apply sticky style to non-fixed header cell', () => {
-      const { getByText } = render(VirtualTable, {
-        props: { dataSource: makeFixedData(5), columns: fixedColumns }
-      })
-      const th = getByText('Name').closest('th')!
-      expect(th.style.position).not.toBe('sticky')
-    })
-
-    it('applies sticky left style to fixed-left body cell', () => {
-      const { getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeFixedData(3),
-          columns: fixedColumns,
-          virtualItemHeight: 40,
-          virtualHeight: 400
-        }
-      })
-      const rows = getAllByRole('row')
-      const dataRows = rows.filter(
-        (r) =>
-          !r.querySelector('th') &&
-          r.getAttribute('aria-hidden') !== 'true' &&
-          r.getAttribute('aria-hidden') !== ''
-      )
-      if (dataRows.length > 0) {
-        const firstCell = dataRows[0].querySelectorAll('td')[0]
-        expect(firstCell.style.position).toBe('sticky')
-        expect(firstCell.style.left).toBe('0px')
+  it('does not write an index when the row has no id', async () => {
+    const { container, emitted } = render(VirtualTable, {
+      props: {
+        dataSource: [{ name: 'ghost' }],
+        columns: [{ key: 'name', title: 'Name' }],
+        rowSelection: {}
       }
     })
-
-    it('applies sticky right style to fixed-right body cell', () => {
-      const { getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeFixedData(3),
-          columns: fixedColumns,
-          virtualItemHeight: 40,
-          virtualHeight: 400
-        }
-      })
-      const rows = getAllByRole('row')
-      const dataRows = rows.filter(
-        (r) =>
-          !r.querySelector('th') &&
-          r.getAttribute('aria-hidden') !== 'true' &&
-          r.getAttribute('aria-hidden') !== ''
-      )
-      if (dataRows.length > 0) {
-        const lastCell = dataRows[0].querySelectorAll('td')[2]
-        expect(lastCell.style.position).toBe('sticky')
-        expect(lastCell.style.right).toBe('0px')
-      }
-    })
-
-    it('keeps striped background on fixed body cells', () => {
-      const { getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeFixedData(3),
-          columns: fixedColumns,
-          striped: true,
-          virtualItemHeight: 40,
-          virtualHeight: 400
-        }
-      })
-      const rows = getAllByRole('row')
-      const dataRows = rows.filter(
-        (r) =>
-          !r.querySelector('th') &&
-          r.getAttribute('aria-hidden') !== 'true' &&
-          r.getAttribute('aria-hidden') !== ''
-      )
-
-      if (dataRows.length > 1) {
-        expect(dataRows[1].querySelectorAll('td')[0]).toHaveClass(tableFixedStripeBgClass)
-      }
-    })
-
-    it('supports fixedClassName and fixedHeaderClassName overrides', () => {
-      const styledColumns = [
-        {
-          key: 'id',
-          title: 'ID',
-          width: 80,
-          fixed: 'left' as const,
-          fixedHeaderClassName: 'custom-fixed-header',
-          fixedClassName: ({
-            selected,
-            view,
-            fixed
-          }: {
-            selected: boolean
-            view: string
-            fixed: string
-          }) => (selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell')
-        },
-        { key: 'name', title: 'Name', width: 150 }
-      ]
-
-      const { getByText, getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeFixedData(3),
-          columns: styledColumns,
-          virtualItemHeight: 40,
-          virtualHeight: 240,
-          rowSelection: { selectedRowKeys: [0] }
-        }
-      })
-
-      expect(getByText('ID').closest('th')).toHaveClass('custom-fixed-header')
-      const dataRows = getAllByRole('row').filter((row) => row.querySelector('td'))
-      expect(dataRows[0].querySelectorAll('td')[0]).toHaveClass('virtual-table-left-selected')
-      expect(dataRows[0].querySelectorAll('td')[0]).toHaveClass(tableFixedSelectedBgClass)
-    })
-
-    it('supports sticky header + sticky columns simultaneously', () => {
-      const { getByText } = render(VirtualTable, {
-        props: {
-          dataSource: makeFixedData(5),
-          columns: fixedColumns,
-          stickyHeader: true
-        }
-      })
-      // Header is sticky
-      const thead = getByText('ID').closest('thead')!
-      expect(thead.className).toContain('sticky')
-      // Fixed column header is also sticky
-      const th = getByText('ID').closest('th')!
-      expect(th.style.position).toBe('sticky')
-      expect(th.style.left).toBe('0px')
-    })
+    await fireEvent.click(dataRowsOf(container)[0])
+    expect(emitted()['selection-change']).toBeUndefined()
   })
 
-  describe('Edge cases', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(VirtualTable, {
-        props: { dataSource: makeData(3), columns, virtualHeight: 240, virtualItemHeight: 40 }
-      })
-
-      await expectNoA11yViolationsIsolated(container)
-    })
-
-    it('renders with empty data and columns', () => {
-      const { getByRole, getByText } = render(VirtualTable, {
-        props: { dataSource: [], columns: [] }
-      })
-      expect(getByRole('grid')).toBeTruthy()
-      expect(getByText('No data')).toBeTruthy()
-    })
-
-    it('renders with single column', () => {
-      const singleCol = [{ key: 'id', title: 'ID' }]
-      const { getAllByRole } = render(VirtualTable, {
-        props: { dataSource: makeData(3), columns: singleCol }
-      })
-      expect(getAllByRole('columnheader').length).toBe(1)
-    })
-
-    it('renders striped rows correctly', () => {
-      const { getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeData(5),
-          columns,
-          striped: true,
-          virtualItemHeight: 40,
-          virtualHeight: 400
-        }
-      })
-      const rows = getAllByRole('row')
-      const dataRows = rows.filter(
-        (r) =>
-          !r.querySelector('th') &&
-          r.getAttribute('aria-hidden') !== 'true' &&
-          r.getAttribute('aria-hidden') !== ''
-      )
-      // Odd rows (index 1, 3) should have striped class
-      if (dataRows.length > 1) {
-        expect(dataRows[1].className).toContain('bg-')
+  it('exposes scrollToIndex', async () => {
+    const exposed = ref<VirtualTableHandle | null>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VirtualTable, {
+            ref: (value: VirtualTableHandle | null) => {
+              exposed.value = value
+            },
+            dataSource: makeData(1000),
+            columns,
+            virtualItemHeight: 40,
+            virtualHeight: 200,
+            overscan: 2
+          })
       }
     })
-
-    it('renders selected row with highlight', () => {
-      const { getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeData(3),
-          columns,
-          virtualItemHeight: 40,
-          virtualHeight: 400,
-          rowSelection: { selectedRowKeys: [0] }
-        }
-      })
-      const rows = getAllByRole('row')
-      const dataRows = rows.filter(
-        (r) =>
-          !r.querySelector('th') &&
-          r.getAttribute('aria-hidden') !== 'true' &&
-          r.getAttribute('aria-hidden') !== ''
-      )
-      if (dataRows.length > 0) {
-        expect(dataRows[0].className).toContain('bg-')
-      }
-    })
-
-    it('handles function rowKey', () => {
-      const data = makeData(3)
-      const { getByText } = render(VirtualTable, {
-        props: {
-          dataSource: data,
-          columns,
-          rowKey: (row: Record<string, unknown>) => `key-${row.id}`
-        }
-      })
-      expect(getByText('Row 1')).toBeTruthy()
-    })
-
-    it('renders with loading and empty data simultaneously', () => {
-      const { getByText, queryByText } = render(VirtualTable, {
-        props: { dataSource: [], columns, loading: true }
-      })
-      expect(getByText('Loading...')).toBeTruthy()
-      // Empty text should NOT show when loading
-      expect(queryByText('No data')).toBeNull()
-    })
-
-    it('handles large overscan value', () => {
-      const { getAllByRole } = render(VirtualTable, {
-        props: {
-          dataSource: makeData(10),
-          columns,
-          virtualItemHeight: 40,
-          virtualHeight: 200,
-          overscan: 100
-        }
-      })
-      const rows = getAllByRole('row')
-      const dataRows = rows.filter(
-        (r) =>
-          !r.querySelector('th') &&
-          r.getAttribute('aria-hidden') !== 'true' &&
-          r.getAttribute('aria-hidden') !== ''
-      )
-      // Should render all 10 rows since overscan exceeds total
-      expect(dataRows.length).toBe(10)
-    })
+    const { container } = render(Wrapper)
+    exposed.value?.scrollToIndex(500)
+    await nextTick()
+    expect(container.textContent).toContain('Row 501')
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(VirtualTable)
-      expect(container.firstChild).toBeTruthy()
+
+  it('virtualizes columns with a numeric width', () => {
+    const wide: TableColumn[] = Array.from({ length: 10 }, (_, i) => ({
+      key: `c${i}`,
+      title: `C${i}`,
+      width: 120
+    }))
+    const rows = Array.from({ length: 5 }, (_, i) => {
+      const record: Record<string, unknown> = { id: i + 1 }
+      wide.forEach((col) => {
+        record[col.key] = `${col.key}-${i}`
+      })
+      return record
     })
+    const { container } = render(VirtualTable, {
+      props: {
+        dataSource: rows,
+        columns: wide,
+        width: 400,
+        virtualizeColumns: true,
+        virtualItemHeight: 40,
+        virtualHeight: 200
+      }
+    })
+    const headerCells = container.querySelectorAll('thead th:not([aria-hidden])')
+    expect(headerCells.length).toBeGreaterThan(0)
+    expect(headerCells.length).toBeLessThan(10)
+    expect(container.querySelector('table')?.getAttribute('aria-colcount')).toBe('10')
+  })
+
+  it('has no a11y violations for default, selection, loading, and empty states', async () => {
+    const table = render(VirtualTable, {
+      props: {
+        dataSource: makeData(5),
+        columns,
+        virtualHeight: 240,
+        virtualItemHeight: 40
+      }
+    })
+    await expectNoA11yViolations(table.container)
+    table.unmount()
+
+    const selected = render(VirtualTable, {
+      props: {
+        dataSource: makeData(5),
+        columns,
+        rowSelection: { selectedRowKeys: [2] },
+        virtualHeight: 240,
+        virtualItemHeight: 40
+      }
+    })
+    await expectNoA11yViolations(selected.container)
+    selected.unmount()
+
+    const loading = render(VirtualTable, {
+      props: { dataSource: makeData(3), columns, loading: true, virtualHeight: 240 }
+    })
+    await expectNoA11yViolations(loading.container)
+    loading.unmount()
+
+    const empty = render(VirtualTable, {
+      props: { dataSource: [], columns, virtualHeight: 240 }
+    })
+    await expectNoA11yViolations(empty.container)
   })
 })

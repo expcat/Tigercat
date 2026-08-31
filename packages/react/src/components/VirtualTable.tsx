@@ -1,30 +1,48 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
   classNames,
   isActivationKey,
   resolveLocaleText,
   mergeTigerLocale,
-  calculateVirtualRange,
   calculateVirtualColumnRange,
+  EMPTY_VIRTUAL_TABLE_COLUMNS,
+  EMPTY_VIRTUAL_TABLE_ROWS,
   getVirtualTableContainerClasses,
   getVirtualTableRowClasses,
-  getVirtualRowKey,
+  getVirtualTableRowWindow,
+  getVirtualTableSpacerHeights,
+  getVirtualTableColumnWidths,
+  getNextVirtualTableSelection,
   getVirtualTableFixedInfo,
   getVirtualTableFixedCellStyle,
-  getTableFixedCellClasses,
-  getTableFixedHeaderCellClasses,
+  getVirtualTableFixedCellClasses,
+  getVirtualTableFixedHeaderCellClasses,
   getTableColgroup,
-  getNextTableSelectAllKeys,
+  isVirtualTableCellControlTarget,
+  resolveVirtualTableColumnVirtualization,
+  resolveVirtualTableRowIdentity,
+  resolveVirtualTableSelectedKeys,
+  resolveVirtualTableWidth,
   tableBaseClasses,
+  tableVirtualSpacerCellClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
-  virtualTableFixedCellSelectedClasses,
+  virtualTableRowFocusClasses,
+  VIRTUAL_TABLE_HEADER_ROW_HEIGHT,
   type RowSelectionConfig,
   type TableColumn,
-  type TigerLocale
+  type TigerLocale,
+  type VirtualTableHandle
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -33,14 +51,11 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   columns?: TableColumn<T>[]
   virtualItemHeight?: number
   virtualHeight?: number
-  /** Viewport width in px or 'auto' */
   width?: number | 'auto'
   overscan?: number
   stickyHeader?: boolean
-  /** Enable horizontal column virtualization (when no fixed columns) */
   virtualizeColumns?: boolean
   rowKey?: keyof T | ((row: T, index: number) => string | number)
-  /** Row class name (static or per-row resolver) */
   rowClassName?: string | ((row: T, index: number) => string)
   loading?: boolean
   emptyText?: string
@@ -49,37 +64,50 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   striped?: boolean
   bordered?: boolean
   className?: string
+  id?: string
+  style?: React.CSSProperties
   onRowClick?: (row: T, index: number) => void
   onSelectionChange?: (selectedKeys: (string | number)[]) => void
-  renderCell?: (value: unknown, row: T, column: TableColumn<T>) => React.ReactNode
 }
 
-/** Fallback column width (px) when a column has no numeric `width`. */
-const DEFAULT_VIRTUAL_COLUMN_WIDTH = 150
+export type { VirtualTableHandle }
 
-export const VirtualTable = <T extends Record<string, unknown> = Record<string, unknown>>({
-  dataSource = [] as unknown as T[],
-  columns = [] as unknown as TableColumn<T>[],
-  virtualItemHeight = 48,
-  virtualHeight = 400,
-  width = 'auto',
-  overscan = 5,
-  stickyHeader = true,
-  virtualizeColumns = false,
-  rowKey,
-  rowClassName,
-  loading = false,
-  emptyText,
-  locale,
-  rowSelection,
-  striped = false,
-  bordered = false,
-  className,
-  onRowClick,
-  onSelectionChange,
-  renderCell,
-  ...rest
-}: VirtualTableProps<T>) => {
+function alignClass(align?: TableColumn['align']): string | undefined {
+  if (align === 'center') return 'text-center'
+  if (align === 'right') return 'text-end'
+  return 'text-start'
+}
+
+function VirtualTableInner<T extends Record<string, unknown> = Record<string, unknown>>(
+  {
+    dataSource: dataSourceProp,
+    columns: columnsProp,
+    virtualItemHeight = 48,
+    virtualHeight = 400,
+    width: widthProp = 'auto',
+    overscan = 5,
+    stickyHeader = true,
+    virtualizeColumns = false,
+    rowKey,
+    rowClassName,
+    loading = false,
+    emptyText,
+    locale,
+    rowSelection,
+    striped = false,
+    bordered = false,
+    className,
+    id,
+    style,
+    onRowClick,
+    onSelectionChange,
+    ...rest
+  }: VirtualTableProps<T>,
+  ref: React.ForwardedRef<VirtualTableHandle>
+) {
+  const dataSource = dataSourceProp ?? (EMPTY_VIRTUAL_TABLE_ROWS as T[])
+  const columns = columnsProp ?? (EMPTY_VIRTUAL_TABLE_COLUMNS as TableColumn<T>[])
+  const width = resolveVirtualTableWidth(widthProp)
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -88,33 +116,48 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0)
   const [uncontrolledSelectedKeys, setUncontrolledSelectedKeys] = useState<(string | number)[]>(
-    rowSelection?.defaultSelectedRowKeys ?? rowSelection?.selectedRowKeys ?? []
+    () => resolveVirtualTableSelectedKeys(rowSelection?.defaultSelectedRowKeys)
   )
   const isSelectionControlled = rowSelection?.selectedRowKeys !== undefined
   const selectedKeys = isSelectionControlled
-    ? (rowSelection.selectedRowKeys ?? [])
+    ? resolveVirtualTableSelectedKeys(rowSelection.selectedRowKeys)
     : uncontrolledSelectedKeys
   const hasSelection = !!rowSelection
+  const isInteractive = !!onRowClick || hasSelection
 
+  const headerHeight = stickyHeader ? VIRTUAL_TABLE_HEADER_ROW_HEIGHT : 0
   const range = useMemo(
     () =>
-      calculateVirtualRange(
+      getVirtualTableRowWindow(
         scrollTop,
         virtualHeight,
         dataSource.length,
         virtualItemHeight,
-        overscan
+        overscan,
+        headerHeight
       ),
-    [scrollTop, virtualHeight, dataSource.length, virtualItemHeight, overscan]
+    [scrollTop, virtualHeight, dataSource.length, virtualItemHeight, overscan, headerHeight]
   )
-
+  const spacers = getVirtualTableSpacerHeights(range, virtualItemHeight)
   const visibleData = useMemo(
     () => dataSource.slice(range.start, range.end),
     [dataSource, range.start, range.end]
   )
-
   const selectedSet = useMemo(() => new Set(selectedKeys), [selectedKeys])
+
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      const next = Math.max(0, index) * virtualItemHeight
+      const el = containerRef.current
+      if (el) el.scrollTop = next
+      setScrollTop(next)
+    },
+    [virtualItemHeight]
+  )
+
+  useImperativeHandle(ref, () => ({ scrollToIndex }), [scrollToIndex])
 
   const commitSelection = useCallback(
     (nextKeys: (string | number)[]) => {
@@ -129,13 +172,15 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   const toggleRowSelection = useCallback(
     (key: string | number, row: T) => {
       if (!rowSelection || rowSelection.getCheckboxProps?.(row)?.disabled) return
-      if (rowSelection.type === 'radio') {
-        commitSelection([key])
-        return
-      }
-      commitSelection(getNextTableSelectAllKeys(selectedKeys, [key], !selectedSet.has(key)))
+      commitSelection(
+        getNextVirtualTableSelection({
+          type: rowSelection.type,
+          selectedKeys,
+          key
+        })
+      )
     },
-    [commitSelection, rowSelection, selectedKeys, selectedSet]
+    [commitSelection, rowSelection, selectedKeys]
   )
 
   const onScroll = useCallback(() => {
@@ -149,61 +194,71 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
     () => getVirtualTableContainerClasses(bordered, className),
     [bordered, className]
   )
-
   const fixedInfo = useMemo(() => getVirtualTableFixedInfo(columns), [columns])
-
-  // Column virtualization only when explicitly enabled and there are no fixed
-  // columns (sticky offsets are incompatible with spacer cells).
-  const columnWidths = useMemo(
-    () =>
-      columns.map((c) => (typeof c.width === 'number' ? c.width : DEFAULT_VIRTUAL_COLUMN_WIDTH)),
-    [columns]
-  )
-  const colVirtualActive = virtualizeColumns && !fixedInfo.hasFixedColumns && width !== 'auto'
+  const columnWidths = useMemo(() => getVirtualTableColumnWidths(columns), [columns])
+  const colVirtual = resolveVirtualTableColumnVirtualization({
+    virtualizeColumns,
+    hasFixedColumns: fixedInfo.hasFixedColumns,
+    width
+  })
   const colRange = useMemo(
     () =>
-      colVirtualActive
-        ? calculateVirtualColumnRange(scrollLeft, width as number, columnWidths)
+      colVirtual.active
+        ? calculateVirtualColumnRange(scrollLeft, colVirtual.viewportWidth, columnWidths)
         : undefined,
-    [colVirtualActive, scrollLeft, width, columnWidths]
+    [colVirtual, scrollLeft, columnWidths]
   )
   const visibleColumns = colRange ? columns.slice(colRange.start, colRange.end) : columns
   const colIndexOffset = colRange ? colRange.start : 0
-  const colgroupEntries = useMemo(
-    () =>
-      fixedInfo.hasFixedColumns
-        ? getTableColgroup({
-            columns: visibleColumns,
-            size: 'md',
-            hasSelectionColumn: false,
-            expand: false
-          })
-        : [],
-    [fixedInfo.hasFixedColumns, visibleColumns]
-  )
+  const colgroupEntries = getTableColgroup({
+    columns: visibleColumns,
+    size: 'md',
+    hasSelectionColumn: false,
+    expand: false
+  })
+  const colSpan =
+    visibleColumns.length +
+    (colRange && colRange.leftPad > 0 ? 1 : 0) +
+    (colRange && colRange.rightPad > 0 ? 1 : 0)
 
   const resolveRowClassName = (row: T, index: number): string | undefined =>
     typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
 
-  const bottomHeight = Math.max(0, range.totalHeight - range.end * virtualItemHeight)
+  const focusIndex = visibleData.some((_, localIdx) => range.start + localIdx === activeIndex)
+    ? activeIndex
+    : range.start
+
+  const moveActive = (nextIndex: number) => {
+    const clamped = Math.max(0, Math.min(dataSource.length - 1, nextIndex))
+    setActiveIndex(clamped)
+    if (clamped < range.start || clamped >= range.end) {
+      scrollToIndex(clamped)
+    }
+  }
 
   return (
     <div
       ref={containerRef}
-      className={classNames(
-        containerClasses,
-        (rest as Record<string, unknown>).className as string
-      )}
+      id={id}
+      className={containerClasses}
       style={{
         height: `${virtualHeight}px`,
-        ...(width !== 'auto' ? { width: `${width}px` } : {})
+        ...(width !== 'auto' ? { width: `${width}px` } : {}),
+        ...style
       }}
       onScroll={onScroll}
-      role="grid"
-      aria-rowcount={dataSource.length}>
-      <table className={classNames(tableBaseClasses, 'table-fixed')}>
+      aria-busy={loading || undefined}
+      {...rest}>
+      <table
+        className={classNames(tableBaseClasses, 'table-fixed')}
+        style={
+          fixedInfo.minTableWidth > 0 ? { minWidth: `${fixedInfo.minTableWidth}px` } : undefined
+        }
+        aria-rowcount={dataSource.length + 1}
+        aria-colcount={columns.length}>
         {colgroupEntries.length > 0 && (
           <colgroup>
+            {colRange && colRange.leftPad > 0 && <col style={{ width: `${colRange.leftPad}px` }} />}
             {colgroupEntries.map((entry) => (
               <col
                 key={entry.key}
@@ -211,10 +266,13 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                 style={entry.width ? { width: entry.width } : undefined}
               />
             ))}
+            {colRange && colRange.rightPad > 0 && (
+              <col style={{ width: `${colRange.rightPad}px` }} />
+            )}
           </colgroup>
         )}
         <thead className={stickyHeader ? virtualTableHeaderClasses : undefined}>
-          <tr>
+          <tr aria-rowindex={1}>
             {colRange && colRange.leftPad > 0 && (
               <th aria-hidden style={{ width: `${colRange.leftPad}px`, padding: 0 }} />
             )}
@@ -228,12 +286,8 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                   key={col.key as string}
                   className={classNames(
                     virtualTableHeaderCellClasses,
-                    getTableFixedHeaderCellClasses({
-                      view: 'virtual-table',
-                      column: col,
-                      stickyHeader,
-                      fixedInfo
-                    })
+                    alignClass(col.align),
+                    getVirtualTableFixedHeaderCellClasses(col, fixedInfo, stickyHeader)
                   )}
                   style={{ ...widthStyle, ...stickyStyle }}>
                   {col.renderHeader ? (col.renderHeader() as React.ReactNode) : (col.title ?? '')}
@@ -246,37 +300,65 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
           </tr>
         </thead>
         <tbody>
-          <tr style={{ height: `${range.offsetTop}px` }} aria-hidden />
+          {spacers.top > 0 && (
+            <tr data-tiger-table-virtual-spacer="" aria-hidden="true">
+              <td
+                colSpan={Math.max(1, colSpan)}
+                className={tableVirtualSpacerCellClasses}
+                style={{ height: `${spacers.top}px` }}
+              />
+            </tr>
+          )}
           {visibleData.map((row, localIdx) => {
             const globalIdx = range.start + localIdx
-            const key = rowSelection?.getRowKey
-              ? rowSelection.getRowKey(row)
-              : getVirtualRowKey(row, globalIdx, rowKey)
-            const isSelected = selectedSet.has(key)
-            const isInteractive = !!onRowClick || hasSelection
-            const activate = () => {
+            const identity = rowSelection?.getRowKey
+              ? { key: rowSelection.getRowKey(row), domKey: rowSelection.getRowKey(row) }
+              : resolveVirtualTableRowIdentity(row, globalIdx, rowKey)
+            const isSelected = identity.key !== undefined && selectedSet.has(identity.key)
+            const isDisabled = !!rowSelection?.getCheckboxProps?.(row)?.disabled
+            const tabIndex =
+              loading || !isInteractive || isDisabled
+                ? undefined
+                : globalIdx === focusIndex
+                  ? 0
+                  : -1
+            const activate = (event?: React.SyntheticEvent) => {
+              if (event && isVirtualTableCellControlTarget(event.target)) return
               onRowClick?.(row, globalIdx)
-              if (hasSelection) toggleRowSelection(key, row)
+              if (hasSelection && identity.key !== undefined && !isDisabled) {
+                toggleRowSelection(identity.key, row)
+              }
             }
 
             return (
               <tr
-                key={key}
+                key={identity.domKey}
                 className={classNames(
                   getVirtualTableRowClasses(globalIdx, striped, isSelected),
+                  isInteractive && virtualTableRowFocusClasses,
                   resolveRowClassName(row, globalIdx)
                 )}
-                // header occupies aria-rowindex 1
+                style={{ height: `${virtualItemHeight}px`, overflow: 'hidden' }}
                 aria-rowindex={globalIdx + 2}
                 aria-selected={hasSelection ? isSelected : undefined}
-                tabIndex={isInteractive ? 0 : undefined}
+                aria-disabled={isDisabled || undefined}
+                tabIndex={tabIndex}
                 onClick={isInteractive ? activate : undefined}
                 onKeyDown={
                   isInteractive
                     ? (e) => {
                         if (isActivationKey(e)) {
                           e.preventDefault()
-                          activate()
+                          activate(e)
+                          return
+                        }
+                        if (e.key === 'ArrowDown') {
+                          e.preventDefault()
+                          moveActive(globalIdx + 1)
+                        }
+                        if (e.key === 'ArrowUp') {
+                          e.preventDefault()
+                          moveActive(globalIdx - 1)
                         }
                       }
                     : undefined
@@ -293,25 +375,25 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                       aria-colindex={colIndexOffset + colIdx + 1}
                       className={classNames(
                         virtualTableCellClasses,
-                        getTableFixedCellClasses({
-                          view: 'virtual-table',
+                        alignClass(col.align),
+                        getVirtualTableFixedCellClasses({
                           column: col,
                           record: row,
                           rowIndex: globalIdx,
                           striped,
-                          stripedActive: striped && globalIdx % 2 === 1,
                           selected: isSelected,
                           hoverable: true,
-                          fixedInfo,
-                          selectedClassName: virtualTableFixedCellSelectedClasses
+                          fixedInfo
                         })
                       )}
-                      style={getVirtualTableFixedCellStyle(col.key, fixedInfo)}>
-                      {renderCell
-                        ? renderCell(value, row, col)
-                        : col.render
-                          ? (col.render(row, globalIdx) as React.ReactNode)
-                          : (value as React.ReactNode)}
+                      style={{
+                        height: `${virtualItemHeight}px`,
+                        overflow: 'hidden',
+                        ...getVirtualTableFixedCellStyle(col.key, fixedInfo)
+                      }}>
+                      {col.render
+                        ? (col.render(row, globalIdx) as React.ReactNode)
+                        : (value as React.ReactNode)}
                     </td>
                   )
                 })}
@@ -321,7 +403,15 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
               </tr>
             )
           })}
-          {bottomHeight > 0 && <tr style={{ height: `${bottomHeight}px` }} aria-hidden />}
+          {spacers.bottom > 0 && (
+            <tr data-tiger-table-virtual-spacer="" aria-hidden="true">
+              <td
+                colSpan={Math.max(1, colSpan)}
+                className={tableVirtualSpacerCellClasses}
+                style={{ height: `${spacers.bottom}px` }}
+              />
+            </tr>
+          )}
         </tbody>
       </table>
       {dataSource.length === 0 && !loading && (
@@ -330,12 +420,18 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
         </div>
       )}
       {loading && (
-        <div className={virtualTableLoadingClasses}>
+        <div className={virtualTableLoadingClasses} aria-live="polite">
           {resolveLocaleText('Loading...', mergedLocale?.common?.loadingText)}
         </div>
       )}
     </div>
   )
 }
+
+export const VirtualTable = forwardRef(VirtualTableInner) as <
+  T extends Record<string, unknown> = Record<string, unknown>
+>(
+  props: VirtualTableProps<T> & { ref?: React.Ref<VirtualTableHandle> }
+) => React.ReactElement
 
 export default VirtualTable
