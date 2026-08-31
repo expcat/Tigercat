@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
+  createCropUploadSession,
   validateUploadFile,
   readFileAsDataUrl,
   getCropperResult,
@@ -35,6 +36,57 @@ describe('crop-upload-utils', () => {
 
     it('treats non-positive maxSize as no limit', () => {
       expect(validateUploadFile(fakeFile(1024), 0)).toBeNull()
+    })
+  })
+
+  describe('createCropUploadSession', () => {
+    beforeEach(() => {
+      vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:one')
+      vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+    })
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('opens with an object URL and revokes on replace', () => {
+      const onState = vi.fn()
+      const onError = vi.fn()
+      const session = createCropUploadSession({
+        getAccept: () => 'image/*',
+        getMaxSize: () => undefined,
+        getSizeError: () => 'too big',
+        getTypeError: () => 'bad type',
+        onState,
+        onError
+      })
+
+      expect(session.selectFile(fakeFile(10, 'a.png'))).toBe(true)
+      expect(session.getState().modalOpen).toBe(true)
+      expect(session.getState().imageSrc).toBe('blob:one')
+      expect(session.getState().cropperReady).toBe(false)
+      expect(session.beginCrop()).toBe(false)
+
+      session.markReady()
+      expect(session.beginCrop()).toBe(true)
+
+      session.selectFile(fakeFile(10, 'b.png'))
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:one')
+      session.dispose()
+    })
+
+    it('rejects non-image files', () => {
+      const onError = vi.fn()
+      const session = createCropUploadSession({
+        getAccept: () => 'image/*',
+        getMaxSize: () => undefined,
+        getSizeError: () => 'too big',
+        getTypeError: () => 'bad type',
+        onState: () => undefined,
+        onError
+      })
+      expect(session.selectFile(new File(['x'], 'note.txt', { type: 'text/plain' }))).toBe(false)
+      expect(onError).toHaveBeenCalled()
+      session.dispose()
     })
   })
 
@@ -91,7 +143,7 @@ describe('crop-upload-utils', () => {
     })
 
     it('awaits and returns the cropper result', async () => {
-      const result = { dataUrl: 'data:x', file: undefined } as unknown as CropResult
+      const result = { dataUrl: 'data:x', file: fakeFile(1) } as unknown as CropResult
       const cropper = { getCropResult: vi.fn().mockResolvedValue(result) }
       expect(await getCropperResult(cropper)).toBe(result)
       expect(cropper.getCropResult).toHaveBeenCalledTimes(1)

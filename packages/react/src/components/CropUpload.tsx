@@ -1,227 +1,253 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
   classNames,
-  cropUploadTriggerClasses,
-  cropUploadTriggerDisabledClasses,
-  uploadPlusIconPath,
-  validateUploadFile,
-  readFileAsDataUrl,
-  getCropperResult,
-  isActivationKey,
+  createCropUploadSession,
+  formatBytes,
+  getCropUploadTriggerClasses,
   getImageEditorLabels,
+  handleUploadDragLeave,
+  handleUploadDragOver,
+  handleUploadDrop,
+  interpolateUploadLabel,
+  mergeAriaDescribedBy,
   mergeTigerLocale,
-  type ImageCropperProps as CoreImageCropperProps,
+  withCropFile,
   type CropResult,
+  type ImageCropperProps as CoreImageCropperProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { Modal } from './Modal'
 import { ImageCropper, type ImageCropperRef } from './ImageCropper'
 import { Button } from './Button'
+import { Icon } from './Icon'
 import { useTigerConfig } from './ConfigProvider'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface CropUploadProps {
-  /**
-   * Locale override merged on top of ConfigProvider locale.
-   */
   locale?: Partial<TigerLocale>
-
-  /**
-   * Accepted file types
-   * @default 'image/*'
-   */
   accept?: string
-  /**
-   * Whether the component is disabled
-   * @default false
-   */
   disabled?: boolean
-  /**
-   * Maximum file size in bytes
-   */
   maxSize?: number
-  /**
-   * Props to pass to the internal ImageCropper
-   */
   cropperProps?: Partial<Omit<CoreImageCropperProps, 'src'>>
-  /**
-   * Title for the crop modal
-   * @default locale.imageEditor.cropModalTitle
-   */
   modalTitle?: string
-  /**
-   * Width of the crop modal
-   * @default 520
-   */
   modalWidth?: number
-  /**
-   * Additional CSS classes
-   */
   className?: string
-  /**
-   * Custom trigger content
-   */
+  style?: React.CSSProperties
   children?: React.ReactNode
-  /**
-   * Callback after cropping completes
-   */
   onCropComplete?: (result: CropResult) => void
-  /**
-   * Callback on error
-   */
   onError?: (error: Error) => void
 }
 
-export const CropUpload: React.FC<CropUploadProps> = ({
-  locale,
-  accept = 'image/*',
-  disabled = false,
-  maxSize,
-  cropperProps,
-  modalTitle,
-  modalWidth = 520,
-  className,
-  children,
-  onCropComplete,
-  onError
-}) => {
+export interface CropUploadRef {
+  focus: () => void
+}
+
+export const CropUpload = forwardRef<HTMLLabelElement, CropUploadProps>(function CropUpload(
+  {
+    locale,
+    accept = 'image/*',
+    disabled = false,
+    maxSize,
+    cropperProps,
+    modalTitle,
+    modalWidth = 520,
+    className,
+    style,
+    children,
+    onCropComplete,
+    onError,
+    ...rest
+  },
+  ref
+) {
   const config = useTigerConfig()
+  const formItemControl = useFormItemControlContext()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
   const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const reactId = useId()
+  const triggerId =
+    (rest as { id?: string }).id ?? formItemControl?.id ?? `tiger-crop-upload-${reactId}`
+  const inputId = `${triggerId}-input`
+  const describedBy = mergeAriaDescribedBy(
+    typeof (rest as { 'aria-describedby'?: string })['aria-describedby'] === 'string'
+      ? (rest as { 'aria-describedby'?: string })['aria-describedby']
+      : undefined,
+    formItemControl?.describedBy
+  )
+
+  const inputRef = useRef<HTMLInputElement>(null)
+  const triggerRef = useRef<HTMLLabelElement>(null)
   const cropperRef = useRef<ImageCropperRef>(null)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [imageSrc, setImageSrc] = useState('')
-  const [cropping, setCropping] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [sessionState, setSessionState] = useState(() => ({
+    generation: 0,
+    modalOpen: false,
+    imageSrc: '',
+    originalFile: null as File | null,
+    cropperReady: false,
+    cropping: false
+  }))
 
-  const handleTriggerClick = useCallback(() => {
-    if (disabled) return
-    fileInputRef.current?.click()
-  }, [disabled])
+  const labelsRef = useRef(labels)
+  labelsRef.current = labels
+  const acceptRef = useRef(accept)
+  acceptRef.current = accept
+  const maxSizeRef = useRef(maxSize)
+  maxSizeRef.current = maxSize
+  const onErrorRef = useRef(onError)
+  onErrorRef.current = onError
 
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
+  const sessionHolder = useRef<ReturnType<typeof createCropUploadSession> | null>(null)
+  if (!sessionHolder.current) {
+    sessionHolder.current = createCropUploadSession({
+      getAccept: () => acceptRef.current,
+      getMaxSize: () => maxSizeRef.current,
+      getSizeError: (limit) =>
+        interpolateUploadLabel(labelsRef.current.fileTooLargeText, { maxSize: formatBytes(limit) }),
+      getTypeError: () => labelsRef.current.fileTypeRejectedText,
+      onState: setSessionState,
+      onError: (error) => onErrorRef.current?.(error)
+    })
+  }
+  const session = sessionHolder.current
 
-      const sizeError = validateUploadFile(file, maxSize)
-      if (sizeError) {
-        onError?.(sizeError)
-        e.target.value = ''
-        return
-      }
+  useEffect(() => () => session.dispose(), [session])
+  useImperativeHandle(ref, () => triggerRef.current as HTMLLabelElement, [])
 
-      readFileAsDataUrl(file)
-        .then((url) => {
-          setImageSrc(url)
-          setModalVisible(true)
-        })
-        .catch((err: Error) => onError?.(err))
-      e.target.value = ''
+  const handleFiles = useCallback(
+    (file?: File | null) => {
+      if (effectiveDisabled) return
+      session.selectFile(file)
+      if (inputRef.current) inputRef.current.value = ''
     },
-    [maxSize, onError]
+    [effectiveDisabled, session]
   )
 
-  const handleConfirm = useCallback(async () => {
-    if (!cropperRef.current) return
-    setCropping(true)
+  const handleConfirm = async () => {
+    if (!session.beginCrop()) return
     try {
-      const result = await getCropperResult(
-        cropperRef.current as { getCropResult: () => Promise<CropResult> }
-      )
-      if (result) {
-        onCropComplete?.(result)
-        setModalVisible(false)
-      }
-    } catch (err) {
-      onError?.(err as Error)
-    } finally {
-      setCropping(false)
+      const raw = await cropperRef.current?.getCropResult()
+      if (!raw) return
+      const originalName = session.getState().originalFile?.name ?? raw.file.name
+      const result = withCropFile(raw, originalName)
+      onCropComplete?.(result)
+      formItemControl?.onChange?.(result.file)
+      session.close()
+    } catch (error) {
+      onError?.(error as Error)
+      session.endCrop()
     }
-  }, [onCropComplete, onError])
+  }
 
-  const handleCancel = useCallback(() => {
-    setModalVisible(false)
-    setImageSrc('')
-  }, [])
+  const handleCancel = () => session.close()
 
-  const triggerClasses = useMemo(
-    () =>
-      classNames(disabled ? cropUploadTriggerDisabledClasses : cropUploadTriggerClasses, className),
-    [disabled, className]
-  )
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (isActivationKey(e)) {
-        e.preventDefault()
-        handleTriggerClick()
-      }
-    },
-    [handleTriggerClick]
-  )
+  const cropperLocale = locale ?? cropperProps?.locale
+  const userReady = cropperProps?.onReady
+  const {
+    onReady: _ignoredReady,
+    locale: _ignoredLocale,
+    className: cropperClassName,
+    ...restCropper
+  } = cropperProps ?? {}
 
   return (
     <div className="tiger-crop-upload inline-block">
       <input
-        ref={fileInputRef}
+        ref={inputRef}
+        id={inputId}
         type="file"
         accept={accept}
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
+        disabled={effectiveDisabled}
+        className="sr-only"
+        onChange={(event) => handleFiles(event.target.files?.[0])}
+        tabIndex={-1}
       />
-      <div
-        className={triggerClasses}
-        onClick={handleTriggerClick}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        aria-label={labels.selectImageAriaLabel}
-        aria-disabled={disabled ? 'true' : undefined}
-        onKeyDown={handleKeyDown}>
+      <label
+        {...(rest as React.LabelHTMLAttributes<HTMLLabelElement>)}
+        ref={triggerRef}
+        id={triggerId}
+        htmlFor={effectiveDisabled ? undefined : inputId}
+        className={getCropUploadTriggerClasses(effectiveDisabled, className)}
+        style={style}
+        aria-disabled={effectiveDisabled || undefined}
+        aria-describedby={describedBy}
+        aria-label={children ? undefined : labels.selectImageAriaLabel}
+        onDragOver={(event) => {
+          const result = handleUploadDragOver(event, effectiveDisabled)
+          if (result.handled) setIsDragging(result.isDragging)
+        }}
+        onDragLeave={(event) => {
+          const result = handleUploadDragLeave(event, effectiveDisabled, event.currentTarget)
+          if (result.handled) setIsDragging(result.isDragging)
+        }}
+        onDrop={(event) => {
+          const result = handleUploadDrop(event, effectiveDisabled)
+          if (!result.handled) return
+          setIsDragging(false)
+          handleFiles(result.files[0])
+        }}
+        data-dragging={isDragging ? 'true' : undefined}>
         {children || (
           <>
-            <svg
-              className="w-5 h-5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d={uploadPlusIconPath}
-              />
-            </svg>
+            <Icon name="plus" className="w-5 h-5" aria-hidden />
             <span>{labels.selectImageText}</span>
           </>
         )}
-      </div>
+      </label>
       <Modal
-        open={modalVisible}
-        size="lg"
+        open={sessionState.modalOpen}
         width={modalWidth}
         title={modalTitle ?? labels.cropModalTitle}
-        className="tiger-crop-upload-modal"
         closable
         maskClosable={false}
+        destroyOnClose
         onClose={handleCancel}
         footer={
           <div className="flex items-center justify-end gap-3">
             <Button variant="secondary" onClick={handleCancel}>
               {labels.cropCancelText}
             </Button>
-            <Button onClick={handleConfirm} loading={cropping}>
+            <Button
+              onClick={handleConfirm}
+              loading={sessionState.cropping}
+              disabled={!sessionState.cropperReady}>
               {labels.cropConfirmText}
             </Button>
           </div>
         }>
-        {imageSrc && (
-          <ImageCropper ref={cropperRef} src={imageSrc} locale={locale} {...cropperProps} />
-        )}
+        {sessionState.imageSrc ? (
+          <ImageCropper
+            ref={cropperRef}
+            src={sessionState.imageSrc}
+            className={cropperClassName}
+            locale={cropperLocale}
+            {...restCropper}
+            onReady={() => {
+              session.markReady()
+              userReady?.()
+            }}
+            onError={(error) => {
+              session.markLoadError(error)
+              cropperProps?.onError?.(error)
+            }}
+          />
+        ) : null}
       </Modal>
     </div>
   )
-}
+})
+
+CropUpload.displayName = 'CropUpload'

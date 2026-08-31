@@ -57,6 +57,7 @@ export interface ImageCropperProps
   style?: React.CSSProperties
   onCropChange?: (rect: CropRect) => void
   onReady?: () => void
+  onError?: (error: Error) => void
 }
 
 export interface ImageCropperRef {
@@ -117,6 +118,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       style,
       onCropChange,
       onReady,
+      onError,
       ...rest
     },
     ref
@@ -138,9 +140,11 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     const aspectRef = useRef(aspectRatio)
     const defaultCropRectRef = useRef(defaultCropRect)
     const onReadyRef = useRef(onReady)
+    const onErrorRef = useRef(onError)
     aspectRef.current = aspectRatio
     defaultCropRectRef.current = defaultCropRect
     onReadyRef.current = onReady
+    onErrorRef.current = onError
 
     const [status, setStatus] = useState<CropperStatus>('loading')
     const [displayWidth, setDisplayWidth] = useState(0)
@@ -183,6 +187,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           )
           if (!size) {
             setStatus('error')
+            onErrorRef.current?.(new Error('Image not loaded'))
             return
           }
           imageRef.current = img
@@ -200,6 +205,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         onError: () => {
           imageRef.current = null
           setStatus('error')
+          onErrorRef.current?.(new Error('Image not loaded'))
         }
       })
       return () => loader.dispose()

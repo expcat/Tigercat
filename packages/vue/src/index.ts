@@ -271,7 +271,7 @@ export type {
 export { FormWizard } from './components/FormWizard'
 export type { VueFormWizardProps } from './components/FormWizard'
 export { CropUpload } from './components/CropUpload'
-export type { VueCropUploadProps } from './components/CropUpload'
+export type { VueCropUploadProps, CropUploadProps } from './components/CropUpload'
 export { ChartCanvas } from './components/ChartCanvas'
 export type { VueChartCanvasProps } from './components/ChartCanvas'
 export { ChartAxis } from './components/ChartAxis'

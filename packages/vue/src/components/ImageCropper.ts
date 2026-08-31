@@ -106,7 +106,8 @@ export const ImageCropper = defineComponent({
   emits: {
     'crop-change': (rect: CropRect) => Boolean(rect),
     'update:crop-rect': (rect: CropRect) => Boolean(rect),
-    ready: () => true
+    ready: () => true,
+    error: (error: Error) => error instanceof Error
   },
   setup(props, { emit, attrs, expose }) {
     const instance = getCurrentInstance()
@@ -180,6 +181,7 @@ export const ImageCropper = defineComponent({
           )
           if (!size) {
             status.value = 'error'
+            emit('error', new Error('Image not loaded'))
             return
           }
           imageRef.value = img
@@ -193,6 +195,7 @@ export const ImageCropper = defineComponent({
         onError: () => {
           imageRef.value = null
           status.value = 'error'
+          emit('error', new Error('Image not loaded'))
         }
       })
     }
