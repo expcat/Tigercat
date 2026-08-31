@@ -1,7 +1,7 @@
 {
   "id": "avatar-01",
-  "title": "代表外观",
-  "description": "单个文字头像组合 lg、square 和自定义颜色；src 可切换为图片头像，shape 也支持 circle。",
+  "title": "图片、文字、图标",
+  "description": "默认 circle 的 src+alt 图片头像。未传 bgColor 时按姓名生成稳定底色；square 和 Icon 子节点另开一颗。",
   "entry": "App.vue",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

@@ -143,6 +143,22 @@ const COMPONENT_USAGE_NOTES = {
   ImageCropper: {
     notes: '`src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。'
   },
+  Avatar: {
+    notes:
+      '`text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。'
+  },
+  AvatarGroup: {
+    notes:
+      '`max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。'
+  },
+  Badge: {
+    notes:
+      '无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。'
+  },
+  Tag: {
+    notes:
+      '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。'
+  },
   Card: {
     notes:
       '`padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。'
@@ -416,6 +432,11 @@ const COMPONENT_SNIPPETS = {
     ImageCompare:
       '<ImageCompare :before-src="beforeSrc" :after-src="afterSrc" :width="480" :height="280" />',
     ImageCropper: '<ImageCropper :src="src" />',
+    Avatar: '<Avatar text="Jane" />',
+    AvatarGroup:
+      '<AvatarGroup :max="3"><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>',
+    Badge: '<Badge :content="5" />',
+    Tag: '<Tag closable>标签</Tag>',
     ChatWindow: '<ChatWindow :messages="messages" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" />',
@@ -466,6 +487,11 @@ const COMPONENT_SNIPPETS = {
     ImageCompare:
       '<ImageCompare beforeSrc={beforeSrc} afterSrc={afterSrc} width={480} height={280} />',
     ImageCropper: '<ImageCropper src={src} />',
+    Avatar: '<Avatar text="Jane" />',
+    AvatarGroup:
+      '<AvatarGroup max={3}><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>',
+    Badge: '<Badge content={5} />',
+    Tag: '<Tag closable>标签</Tag>',
     ChatWindow: '<ChatWindow messages={messages} />',
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} />',

@@ -1,8 +1,8 @@
 {
   "id": "avatar-03",
   "title": "AvatarGroup",
-  "description": "一个 AvatarGroup 管理必要成员并用 max 折叠溢出项，组级 size 会传递给子头像。",
+  "description": "未传 aria-label 时组名来自 locale。max 是可见 Avatar 数，overflow 额外一槽；max=0 只出 +N。RTL 叠缝、v-if=false 不计 max、组 shape 跟 overflow。",
   "entry": "App.vue",
   "order": 3,
-  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
 }

@@ -1,7 +1,7 @@
 {
   "id": "badge-01",
-  "title": "计数徽章",
-  "description": "单个计数徽章组合 max、lg 与 danger；超过 max 时显示上限提示。",
+  "title": "计数、零、点状",
+  "description": "数字徽章超过 max 显示 max+。content=0 默认隐藏，showZero 才显示。type=dot 忽略 content。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

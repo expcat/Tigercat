@@ -1,7 +1,7 @@
 {
   "id": "badge-03",
-  "title": "包裹与定位",
-  "description": "standalone=false 时徽章包裹一个目标元素，position 可替换为四个角的位置。",
+  "title": "叠放",
+  "description": "standalone=false 时计数写进宿主 aria-label，不要靠旁边 live region。清零后包装仍在。top-right 跟阅读方向。",
   "entry": "App.vue",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

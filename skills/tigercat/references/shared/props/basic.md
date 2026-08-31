@@ -21,33 +21,49 @@ description: Compact generated Tigercat Basic props reference
 
 ## Avatar
 
-`packages/core/src/types/avatar.ts` · `AvatarProps` · 3/10 props
+`packages/core/src/types/avatar.ts` · `AvatarProps` · 6/16 props
 
-| Prop     | Type          | Default    | Notes            |
-| -------- | ------------- | ---------- | ---------------- |
-| `src?`   | `string`      | `-`        | Image source URL |
-| `size?`  | `AvatarSize`  | `'md'`     | Avatar size      |
-| `shape?` | `AvatarShape` | `'circle'` | Avatar shape     |
+Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。
+
+| Prop       | Type          | Default    | Notes                                                                                      |
+| ---------- | ------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `src?`     | `string`      | `-`        | Image source URL                                                                           |
+| `alt?`     | `string`      | `-`        | Alternative text for the image. When omitted, `text` or `aria-label` is used as the acc... |
+| `text?`    | `string`      | `-`        | Text content to display (e.g., initials) when src is missing or fails. Also used as the... |
+| `bgColor?` | `string`      | `-`        | Background for text/icon avatars. Tailwind class, or a CSS color (`#rgb` / `rgb()` / `v... |
+| `size?`    | `AvatarSize`  | `'md'`     | Avatar size                                                                                |
+| `shape?`   | `AvatarShape` | `'circle'` | Avatar shape                                                                               |
 
 ## AvatarGroup
 
-`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 3/6 props
+`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 5/7 props
 
-| Prop      | Type                   | Default | Notes                                                                                 |
-| --------- | ---------------------- | ------- | ------------------------------------------------------------------------------------- |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                               |
-| `max?`    | `number`               | `-`     | Maximum number of avatars to display Excess avatars will be shown as a "+N" indicator |
-| `size?`   | `AvatarSize`           | `'md'`  | Size applied to all avatars in the group                                              |
+Note: `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。
+
+| Prop      | Type                              | Default    | Notes                                                                                      |
+| --------- | --------------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `max?`    | `number`                          | `-`        | Maximum number of **avatars** to show. Overflow is an extra slot, so `max={3}` with 5 c... |
+| `size?`   | `AvatarSize`                      | `'md'`     | Size applied to avatars that did not set their own size                                    |
+| `shape?`  | `AvatarShape`                     | `'circle'` | Shape applied to avatars that did not set their own shape, and to overflow                 |
+| `locale?` | `Partial<TigerLocale>`            | `-`        | -                                                                                          |
+| `labels?` | `Partial<TigerLocaleAvatarGroup>` | `-`        | -                                                                                          |
 
 ## Badge
 
-`packages/core/src/types/badge.ts` · `BadgeProps` · 3/11 props
+`packages/core/src/types/badge.ts` · `BadgeProps` · 8/11 props
 
-| Prop       | Type                   | Default    | Notes                                                    |
-| ---------- | ---------------------- | ---------- | -------------------------------------------------------- |
-| `locale?`  | `Partial<TigerLocale>` | `-`        | Locale override merged on top of ConfigProvider locale.  |
-| `content?` | `number \| string`     | `-`        | Badge content (number or text). Ignored when type='dot'. |
-| `variant?` | `BadgeVariant`         | `'danger'` | Badge variant style                                      |
+Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。
+
+| Prop          | Type                   | Default       | Notes                                                                                      |
+| ------------- | ---------------------- | ------------- | ------------------------------------------------------------------------------------------ |
+| `content?`    | `number \| string`     | `-`           | Badge content (number or text). Ignored when type='dot'. Empty number/text badges do no... |
+| `type?`       | `BadgeType`            | `'number'`    | Badge display type                                                                         |
+| `standalone?` | `boolean`              | `true`        | Standalone (inline) or wrapping children. Overlay requires `standalone={false}`.           |
+| `max?`        | `number`               | `99`          | Maximum count (`type='number'` only). Exceeds shows 'max+'. Text badges are never capped.  |
+| `showZero?`   | `boolean`              | `false`       | Whether to show a number badge whose value is `0` or `'0'`.                                |
+| `position?`   | `BadgePosition`        | `'top-right'` | Overlay position. `right`/`left` follow the reading direction.                             |
+| `variant?`    | `BadgeVariant`         | `'danger'`    | Badge variant style                                                                        |
+| `locale?`     | `Partial<TigerLocale>` | `-`           | Locale override merged on top of ConfigProvider locale.                                    |
 
 ## Button
 
@@ -402,13 +418,19 @@ Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃�
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 3/7 props
+`packages/core/src/types/tag.ts` · `TagProps` · 7/9 props
 
-| Prop        | Type                   | Default     | Notes                                                   |
-| ----------- | ---------------------- | ----------- | ------------------------------------------------------- |
-| `locale?`   | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
-| `closable?` | `boolean`              | `false`     | Whether the tag can be closed                           |
-| `variant?`  | `TagVariant`           | `'default'` | Tag variant style                                       |
+Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
+
+| Prop              | Type                   | Default     | Notes                                                                                      |
+| ----------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `closable?`       | `boolean`              | `false`     | Whether the tag can be closed                                                              |
+| `visible?`        | `boolean`              | `-`         | When `false`, the tag is not rendered. Omitted / `true` keeps it visible. Closing never... |
+| `pill?`           | `boolean`              | `false`     | Fully rounded pill shape                                                                   |
+| `variant?`        | `TagVariant`           | `'default'` | Tag variant style                                                                          |
+| `size?`           | `TagSize`              | `'md'`      | Tag size                                                                                   |
+| `closeAriaLabel?` | `string`               | `-`         | Accessible label for the close button (when `closable` is true). Defaults to ConfigProv... |
+| `locale?`         | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
 
 ## Text
 

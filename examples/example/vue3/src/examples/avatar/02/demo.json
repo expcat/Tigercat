@@ -1,7 +1,7 @@
 {
   "id": "avatar-02",
-  "title": "加载失败回退",
-  "description": "图片地址失效时使用 text 生成文字头像，alt 仍保留完整语义。",
+  "title": "失败后换 src",
+  "description": "同一实例把损坏地址换成有效 src 会重新出 img，不必换 key。src+text 且不传 alt 时，成功照片也叫这个名字。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

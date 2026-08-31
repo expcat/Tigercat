@@ -83,6 +83,10 @@ export const COMPONENT_PROP_PRIORITY = {
     'width?'
   ],
   ImageCropper: ['src', 'aspectRatio?', 'minWidth?', 'outputType?', 'guides?', 'locale?'],
+  Avatar: ['src?', 'alt?', 'text?', 'bgColor?', 'size?', 'shape?'],
+  AvatarGroup: ['max?', 'size?', 'shape?', 'locale?', 'labels?'],
+  Badge: ['content?', 'type?', 'standalone?', 'max?', 'showZero?', 'position?', 'variant?'],
+  Tag: ['closable?', 'visible?', 'pill?', 'variant?', 'size?', 'closeAriaLabel?'],
   Button: [
     'variant?',
     'size?',

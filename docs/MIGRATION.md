@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Tag 不再是 live region（无默认 `role="status"`）。点关闭只发 `onClose` / `close`，组件不会自己 `return null`；从列表删或设 `visible={false}`。关闭钮名走 locale `status.tagCloseAriaLabel`，不是写死 `Close tag`。新增 `pill`。
+
+Badge 默认不是 `role="status"`。`type="number"` 只接受有限数字或十进制串（`content="NEW"` 请设 `type="text"`）。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，并把计数写进宿主可访问名。`position` 的 left/right 跟阅读方向。删除 `formatBadgeContent` / `shouldHideBadge`，改用 `resolveBadgeContent`。
+
+Avatar 图片名落在 `img alt`（可用 `text`）。`src` 变化会重试。组 `max` 只计 Avatar 子节点，overflow 额外一槽。假 token `--tiger-avatar-*` 改为 `--tiger-surface-muted` 等 canonical 名。
+
 Image 默认 `preview=true` 时宿主是 `<button>`，不再是 `div role=button`。预览名走 `locale.image.previewAriaLabel`；开启 preview 时内层 img `alt=""`。React `ref` 指向 `<img>`；`onLoad` / `onError` / `srcSet` 不再落在包装节点。`previewTrigger="hover"` 仍可键盘聚焦出浮层、点击进全屏。`registerImageGroupItem` 改为 `{ id, src, alt? }`，按实例注销，不再按 URL `indexOf`。`getImageGroupClasses` 合并自定义 class，不再替换基类。
 
 ImagePreview 与 ImageViewer 收成**一套**全屏 dialog（overlay-host、滚锁、焦点陷阱、Escape 栈）。公开名仍两个：`ImageViewer` 是同一实现的配置别名，`minZoom`/`maxZoom` 映射到 `minScale`/`maxScale`。导航改为到头 disable，不再 `% length` 循环。`images` 为 `string | { src, alt? }`；空列表会 emit 关闭。默认缩放范围统一为 0.25–5。删除 `ImagePreviewToolbarAction` 与 `clampZoom`。文案走 `locale.imageViewer`（含 `previewImageAriaLabel`），不再写死 `Preview image n` / `Image n`。
