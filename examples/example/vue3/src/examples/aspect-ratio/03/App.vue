@@ -4,22 +4,18 @@ import { AspectRatio } from '@expcat/tigercat-vue/AspectRatio'
 
 const ratio = ref('16/9')
 const options = ['16/9', '4/3', '1/1'] as const
+const cover = 'https://picsum.photos/seed/tiger-overlay/640/360'
 </script>
 
 <template>
   <div class="w-full max-w-md space-y-3">
     <AspectRatio
       :ratio="ratio"
-      class="overflow-hidden rounded-xl border border-gray-200 shadow-sm dark:border-gray-700"
-      content-class-name="bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500">
-      <div class="relative h-full">
-        <div class="absolute inset-x-0 bottom-0 bg-black/40 px-4 py-3 backdrop-blur-sm">
-          <p class="text-sm font-medium text-white">课程封面：响应式布局实战</p>
-          <p class="text-xs text-white/80">子内容铺满比例框，随比例切换重排</p>
-        </div>
-        <div class="flex h-full items-center justify-center">
-          <span class="sr-only">封面区域</span>
-        </div>
+      class="rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
+      <img :src="cover" alt="" />
+      <div class="absolute inset-x-0 bottom-0 bg-black/40 px-4 py-3 backdrop-blur-sm">
+        <p class="text-sm font-medium text-white">课程封面：响应式布局实战</p>
+        <p class="text-xs text-white/80">覆盖层铺在媒体上，圆角由比例盒裁切</p>
       </div>
     </AspectRatio>
     <div class="flex items-center gap-2">

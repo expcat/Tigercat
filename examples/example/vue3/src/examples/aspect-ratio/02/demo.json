@@ -1,7 +1,7 @@
 {
   "id": "aspect-ratio-02",
-  "title": "常用比例网格",
-  "description": "1/1、4/3、16/9、21/9 常用比例并排对比，子内容自动铺满比例框。",
+  "title": "数字、分数与非法值",
+  "description": "数字 1.5 与分数字符串都可作为 ratio；非法值回退到 16/9。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

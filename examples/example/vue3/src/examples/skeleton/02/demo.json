@@ -1,7 +1,7 @@
 {
   "id": "skeleton-02",
   "title": "加载切换",
-  "description": "用最小状态在 Skeleton 与真实内容之间切换。",
+  "description": "父级 aria-busy 标记加载区域；切走后读屏能听到内容已到。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

@@ -7,8 +7,12 @@ const styles = ['solid', 'dashed', 'dotted', 'gradient'] as const
 <template>
   <div>
     <div v-for="lineStyle in styles" :key="lineStyle">
-      <p class="text-sm text-gray-500">lineStyle="{{ lineStyle }}"</p>
-      <Divider :line-style="lineStyle" spacing="sm" />
+      <p class="text-sm text-gray-500 dark:text-gray-400">lineStyle="{{ lineStyle }}"</p>
+      <Divider
+        :line-style="lineStyle"
+        spacing="sm"
+        :color="lineStyle === 'gradient' ? '#7c3aed' : undefined"
+        :thickness="lineStyle === 'gradient' ? '3px' : undefined" />
     </div>
   </div>
 </template>

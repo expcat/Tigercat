@@ -10,7 +10,7 @@ export default function App() {
           key={variant}
           variant={variant}
           header={<span className="font-medium">{variant}</span>}>
-          <p className="text-sm text-gray-600">variant=&quot;{variant}&quot;</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">variant=&quot;{variant}&quot;</p>
         </Card>
       ))}
     </div>

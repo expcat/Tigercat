@@ -1,7 +1,7 @@
 {
   "id": "card-01",
   "title": "代表卡片",
-  "description": "一个 Card 组合展示阴影、尺寸、悬停、头部与底部；封面和 actions 按需添加。",
+  "description": "阴影、尺寸、头部、底部，以及可进 Tab 的悬停抬起。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -10,7 +10,9 @@ export default function App() {
       <Button size="sm" onClick={() => setLoading((value) => !value)}>
         切换加载状态
       </Button>
-      {loading ? <Skeleton variant="text" rows={2} paragraph /> : <p>内容加载完成。</p>}
+      <div aria-busy={loading} aria-live="polite">
+        {loading ? <Skeleton variant="text" rows={2} paragraph /> : <p>内容加载完成。</p>}
+      </div>
     </div>
   )
 }

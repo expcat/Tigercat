@@ -7,8 +7,15 @@ export default function App() {
     <div>
       {styles.map((lineStyle) => (
         <div key={lineStyle}>
-          <p className="text-sm text-gray-500">lineStyle=&quot;{lineStyle}&quot;</p>
-          <Divider lineStyle={lineStyle} spacing="sm" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            lineStyle=&quot;{lineStyle}&quot;
+          </p>
+          <Divider
+            lineStyle={lineStyle}
+            spacing="sm"
+            color={lineStyle === 'gradient' ? '#7c3aed' : undefined}
+            thickness={lineStyle === 'gradient' ? '3px' : undefined}
+          />
         </div>
       ))}
     </div>

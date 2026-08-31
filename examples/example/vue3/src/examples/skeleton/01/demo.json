@@ -1,7 +1,7 @@
 {
   "id": "skeleton-01",
-  "title": "静态骨架",
-  "description": "单个文本骨架组合展示多行段落与动画；avatar、image、button 为其他 variant。",
+  "title": "骨架形状与扫光",
+  "description": "text 多行段落用 wave 扫过高光；avatar、image、button 是不同占位形状。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

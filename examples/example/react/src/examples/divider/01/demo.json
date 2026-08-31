@@ -1,7 +1,7 @@
 {
   "id": "divider-01",
   "title": "水平分割",
-  "description": "一个水平 Divider 组合展示虚线、间距与自定义颜色；solid、dotted 为其他 lineStyle。",
+  "description": "虚线、间距、自定义颜色，以及中间带文字的分割线。其他线型见下一例。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

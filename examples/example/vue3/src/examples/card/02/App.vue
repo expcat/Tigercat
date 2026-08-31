@@ -10,7 +10,7 @@ const variants = ['default', 'bordered', 'shadow', 'elevated', 'transparent'] as
       <template #header>
         <span class="font-medium">{{ variant }}</span>
       </template>
-      <p class="text-sm text-gray-600">variant="{{ variant }}"</p>
+      <p class="text-sm text-gray-600 dark:text-gray-300">variant="{{ variant }}"</p>
     </Card>
   </div>
 </template>

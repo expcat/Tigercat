@@ -1,11 +1,12 @@
 import { Divider } from '@expcat/tigercat-react/Divider'
+import { Space } from '@expcat/tigercat-react/Space'
 
 export default function App() {
   return (
-    <div className="flex h-12 items-center gap-3">
+    <Space>
       <span>左侧</span>
-      <Divider orientation="vertical" className="h-6" />
+      <Divider orientation="vertical" spacing="none" />
       <span>右侧</span>
-    </div>
+    </Space>
   )
 }
