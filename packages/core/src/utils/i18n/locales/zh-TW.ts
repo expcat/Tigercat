@@ -19,7 +19,8 @@ export const zhTW: TigerLocale = {
     searchPlaceholder: '搜尋',
     clearText: '清除',
     closeMessageAriaLabel: '關閉訊息',
-    closeNotificationAriaLabel: '關閉通知'
+    closeNotificationAriaLabel: '關閉通知',
+    sidebarAriaLabel: '側欄'
   },
   empty: {
     noData: '暫無資料',

@@ -19,6 +19,8 @@ export interface TigerLocaleCommon {
   closeMessageAriaLabel?: string
   /** Imperative Notification close-button accessible name */
   closeNotificationAriaLabel?: string
+  /** Default accessible name for Sidebar (`<aside>`) when none is passed */
+  sidebarAriaLabel?: string
 }
 
 export interface TigerLocaleEmpty {

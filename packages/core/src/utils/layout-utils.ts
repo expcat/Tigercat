@@ -1,55 +1,147 @@
+import { overlayZIndexClass } from './floating'
 import { classNames } from './class-names'
-import type { HeaderVariant } from '../types/layout'
+import { injectLayoutGridStyles } from './layout-grid-styles'
+import type { HeaderVariant, LayoutDirection, LayoutSiderSide } from '../types/layout'
 
-/**
- * Layout component shared classes
- *
- * Keep these classes framework-agnostic so Vue/React can stay thin.
- */
+export const LAYOUT_SIDER_NAME = 'TigerSidebar'
 
-export const layoutRootClasses = 'tiger-layout flex flex-col min-h-screen'
-
-export const layoutHeaderClasses =
-  'tiger-header bg-[var(--tiger-surface,#ffffff)] border-b border-[var(--tiger-border,#e5e7eb)]'
-
-const layoutHeaderVariantClasses: Record<HeaderVariant, string> = {
-  default: '',
-  translucent:
-    'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass,16px)] backdrop-saturate-[var(--tiger-header-saturate,1.8)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70 border-[color:var(--tiger-header-border,var(--tiger-border,#e5e7eb))]',
-  blur: 'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass-strong,24px)] backdrop-saturate-[var(--tiger-header-saturate,1.8)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70 shadow-[var(--tiger-header-shadow,0_1px_2px_0_rgb(0_0_0/0.05))] border-[color:var(--tiger-header-border,var(--tiger-border,#e5e7eb))]'
+export function isLayoutSiderTypeName(name: unknown): boolean {
+  return name === LAYOUT_SIDER_NAME || name === 'Sidebar'
 }
+
+export function resolveLayoutHasSider(options: {
+  hasSider?: boolean
+  direction?: LayoutDirection
+  childIsSider: boolean
+}): boolean {
+  if (options.hasSider !== undefined) return options.hasSider
+  if (options.direction === 'horizontal') return true
+  if (options.direction === 'vertical') return false
+  return options.childIsSider
+}
+
+export function getLayoutRootClasses(
+  options: {
+    hasSider?: boolean
+    nested?: boolean
+    fullHeight?: boolean
+  } = {}
+): string {
+  injectLayoutGridStyles()
+  return classNames(
+    'tiger-layout',
+    options.hasSider ? 'tiger-flex-row' : undefined,
+    options.nested && 'tiger-layout-nested',
+    options.fullHeight && !options.nested && 'tiger-layout-full'
+  )
+}
+
+/** Default column shell (no sider, not nested, not fullHeight). */
+export const layoutRootClasses = getLayoutRootClasses()
 
 export function getLayoutHeaderClasses(variant: HeaderVariant = 'default'): string {
-  return classNames(layoutHeaderClasses, layoutHeaderVariantClasses[variant])
+  injectLayoutGridStyles()
+  const variantClass =
+    variant === 'translucent'
+      ? classNames('tiger-header-translucent', overlayZIndexClass.viewport)
+      : variant === 'blur'
+        ? classNames('tiger-header-blur', overlayZIndexClass.viewport)
+        : 'tiger-header-default'
+  return classNames('tiger-header', variantClass)
 }
 
-export const layoutSidebarClasses =
-  'tiger-sidebar bg-[var(--tiger-surface,#ffffff)] border-r border-[var(--tiger-border,#e5e7eb)] overflow-hidden transition-all duration-300'
+export const layoutHeaderClasses = getLayoutHeaderClasses('default')
+
+export function getLayoutSidebarClasses(
+  options: {
+    collapsed?: boolean
+    side?: LayoutSiderSide
+    widthProvided?: boolean
+  } = {}
+): string {
+  injectLayoutGridStyles()
+  const side = options.side ?? 'start'
+  return classNames(
+    'tiger-sidebar tiger-motion-aware',
+    side === 'end' && 'tiger-sidebar-end',
+    options.collapsed && 'tiger-sidebar-collapsed',
+    !options.widthProvided && !options.collapsed && 'tiger-sidebar-default-width'
+  )
+}
+
+export const layoutSidebarClasses = getLayoutSidebarClasses()
 
 export const layoutSidebarCollapsedClasses = 'tiger-sidebar-collapsed'
 
+export function isCssLengthZero(value: string | undefined): boolean {
+  if (value == null) return false
+  const n = Number.parseFloat(value.trim())
+  return Number.isFinite(n) && n === 0
+}
+
 /**
- * Compute the width/minWidth style for a sidebar.
+ * Width/minWidth for a sidebar.
+ * Uncollapsed default width lives on the `tiger-sidebar-default-width` class so
+ * caller `style.width` can win. Collapsed always writes the collapsed width.
  */
 export function getSidebarStyle(
   collapsed: boolean,
-  width: string = '256px',
+  width?: string,
   collapsedWidth: string = '64px'
-): { width: string; minWidth: string } {
-  const w = collapsed ? collapsedWidth : width
-  return { width: w, minWidth: w }
+): { width?: string; minWidth?: string } {
+  if (collapsed) {
+    const w = collapsedWidth
+    return { width: w, minWidth: w }
+  }
+  if (width) return { width, minWidth: width }
+  return {}
+}
+
+export function isSidebarFullyHidden(collapsed: boolean, collapsedWidth?: string): boolean {
+  return collapsed && isCssLengthZero(collapsedWidth ?? '64px')
+}
+
+export function resolveSidebarAriaProps(options: {
+  ariaLabel?: unknown
+  ariaLabelledby?: unknown
+  fallback: string
+}): { 'aria-label'?: string; 'aria-labelledby'?: string } {
+  const labelledby = typeof options.ariaLabelledby === 'string' ? options.ariaLabelledby.trim() : ''
+  if (labelledby) return { 'aria-labelledby': labelledby }
+  if (options.ariaLabel !== undefined) {
+    const label = typeof options.ariaLabel === 'string' ? options.ariaLabel.trim() : ''
+    if (!label) return {}
+    return { 'aria-label': label }
+  }
+  return { 'aria-label': options.fallback }
 }
 
 /** Content fill: optional `--tiger-layout-content-bg`, then registered `--tiger-surface-muted`. */
 export const layoutContentClasses =
-  'tiger-content flex-1 bg-[var(--tiger-layout-content-bg,var(--tiger-surface-muted,#f9fafb))]'
+  'tiger-content bg-[var(--tiger-layout-content-bg,var(--tiger-surface-muted,#f9fafb))]'
 
 export function getLayoutContentClasses(padding: boolean | string = true): string {
+  injectLayoutGridStyles()
   return classNames(
     layoutContentClasses,
     padding === false ? undefined : typeof padding === 'string' ? padding : 'p-6'
   )
 }
 
-export const layoutFooterClasses =
-  'tiger-footer bg-[var(--tiger-surface,#ffffff)] border-t border-[var(--tiger-border,#e5e7eb)] p-4'
+export const layoutFooterClasses = 'tiger-footer'
+
+export const LAYOUT_CONTENT_TAGS = ['main', 'div', 'section', 'article'] as const
+export const LAYOUT_FOOTER_TAGS = ['footer', 'div'] as const
+export const CONTAINER_TAGS = [
+  'div',
+  'section',
+  'article',
+  'main',
+  'nav',
+  'header',
+  'footer'
+] as const
+
+export type LayoutContentTag = (typeof LAYOUT_CONTENT_TAGS)[number]
+export type LayoutFooterTag = (typeof LAYOUT_FOOTER_TAGS)[number]
+export type ContainerTag = (typeof CONTAINER_TAGS)[number]

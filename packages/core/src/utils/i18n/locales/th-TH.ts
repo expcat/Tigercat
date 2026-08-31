@@ -19,7 +19,8 @@ export const thTH: TigerLocale = {
     searchPlaceholder: 'ค้นหา',
     clearText: 'ล้าง',
     closeMessageAriaLabel: 'ปิดข้อความ',
-    closeNotificationAriaLabel: 'ปิดการแจ้งเตือน'
+    closeNotificationAriaLabel: 'ปิดการแจ้งเตือน',
+    sidebarAriaLabel: 'แถบด้านข้าง'
   },
   empty: {
     noData: 'ไม่มีข้อมูล',

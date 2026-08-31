@@ -18,7 +18,8 @@ export const enUS: TigerLocale = {
     searchPlaceholder: 'Search',
     clearText: 'Clear',
     closeMessageAriaLabel: 'Close message',
-    closeNotificationAriaLabel: 'Close notification'
+    closeNotificationAriaLabel: 'Close notification',
+    sidebarAriaLabel: 'Sidebar'
   },
   empty: {
     noData: 'No data',

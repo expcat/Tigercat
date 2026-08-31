@@ -19,7 +19,8 @@ export const arSA: TigerLocale = {
     searchPlaceholder: 'بحث',
     clearText: 'مسح',
     closeMessageAriaLabel: 'إغلاق الرسالة',
-    closeNotificationAriaLabel: 'إغلاق الإشعار'
+    closeNotificationAriaLabel: 'إغلاق الإشعار',
+    sidebarAriaLabel: 'الشريط الجانبي'
   },
   empty: {
     noData: 'لا توجد بيانات',

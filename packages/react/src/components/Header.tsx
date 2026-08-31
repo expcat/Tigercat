@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import {
   classNames,
   getLayoutHeaderClasses,
+  injectLayoutGridStyles,
   type HeaderProps as CoreHeaderProps
 } from '@expcat/tigercat-core'
 
@@ -10,20 +11,19 @@ export interface ReactHeaderProps
   children?: React.ReactNode
 }
 
-export const Header: React.FC<ReactHeaderProps> = ({
-  className,
-  variant = 'default',
-  height = '64px',
-  style,
-  children,
-  ...props
-}) => {
+export const Header = forwardRef<HTMLElement, ReactHeaderProps>(function Header(
+  { className, variant = 'default', height, style, children, ...props },
+  ref
+) {
+  injectLayoutGridStyles()
   const headerClasses = classNames(getLayoutHeaderClasses(variant), className)
-  const headerStyle: React.CSSProperties = { ...style, height }
+  const headerStyle: React.CSSProperties | undefined = height ? { ...style, height } : style
 
   return (
-    <header className={headerClasses} style={headerStyle} {...props}>
+    <header ref={ref} className={headerClasses} style={headerStyle} {...props}>
       {children}
     </header>
   )
-}
+})
+
+Header.displayName = 'TigerHeader'

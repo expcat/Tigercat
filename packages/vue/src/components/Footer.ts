@@ -2,12 +2,14 @@ import { defineComponent, h, PropType, computed } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  injectLayoutGridStyles,
   layoutFooterClasses,
   mergeStyleValues
 } from '@expcat/tigercat-core'
 
 export interface VueFooterProps {
   className?: string
+  as?: string
   height?: string
   style?: Record<string, string | number>
 }
@@ -16,31 +18,25 @@ export const Footer = defineComponent({
   name: 'TigerFooter',
   inheritAttrs: false,
   props: {
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String as PropType<string>,
       default: undefined
     },
-    /**
-     * Footer height (CSS value)
-     * @default 'auto'
-     */
+    as: {
+      type: String as PropType<string>,
+      default: 'footer'
+    },
     height: {
       type: String as PropType<string>,
-      default: 'auto'
+      default: undefined
     },
-
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
   setup(props, { slots, attrs }) {
+    injectLayoutGridStyles()
     const footerClasses = computed(() =>
       classNames(
         layoutFooterClasses,
@@ -51,11 +47,11 @@ export const Footer = defineComponent({
 
     return () =>
       h(
-        'footer',
+        props.as || 'footer',
         {
           ...attrs,
           class: footerClasses.value,
-          style: mergeStyleValues(props.style, { height: props.height })
+          style: mergeStyleValues(props.style, props.height ? { height: props.height } : undefined)
         },
         slots.default?.()
       )

@@ -19,7 +19,8 @@ export const viVN: TigerLocale = {
     searchPlaceholder: 'Tìm kiếm',
     clearText: 'Xóa',
     closeMessageAriaLabel: 'Đóng tin nhắn',
-    closeNotificationAriaLabel: 'Đóng thông báo'
+    closeNotificationAriaLabel: 'Đóng thông báo',
+    sidebarAriaLabel: 'Thanh bên'
   },
   empty: {
     noData: 'Không có dữ liệu',

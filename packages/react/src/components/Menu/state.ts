@@ -9,6 +9,7 @@ import {
   type MenuMode
 } from '@expcat/tigercat-core'
 import type { MenuProps, MenuRootState, MenuContextValue } from './types'
+import { useSidebarContext } from '../../utils/layout-context'
 
 export function useMenuRootState(props: MenuProps): MenuRootState {
   const {
@@ -19,7 +20,7 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     defaultSelectedKeys = [],
     openKeys: controlledOpenKeys,
     defaultOpenKeys = [],
-    collapsed = false,
+    collapsed: collapsedProp,
     multiple = true,
     inlineIndent = 24,
     popupPortal = false,
@@ -37,6 +38,8 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     emptyText = 'No menu items found'
   } = props
   const children = props.children
+  const sidebar = useSidebarContext()
+  const collapsed = collapsedProp ?? sidebar?.collapsed ?? false
 
   const menuRef = useRef<HTMLUListElement | null>(null)
   const resolvedMode: MenuMode = collapsed && mode === 'inline' ? 'vertical' : mode

@@ -1,18 +1,34 @@
-import { defineComponent, h, PropType, computed } from 'vue'
+import {
+  defineComponent,
+  h,
+  PropType,
+  computed,
+  inject,
+  watch,
+  onBeforeUnmount,
+  provide
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
-  layoutSidebarClasses,
-  layoutSidebarCollapsedClasses,
+  getLayoutSidebarClasses,
+  getSidebarAriaLabel,
   getSidebarStyle,
-  mergeStyleValues
+  injectLayoutGridStyles,
+  isSidebarFullyHidden,
+  mergeStyleValues,
+  resolveSidebarAriaProps,
+  type LayoutSiderSide
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
+import { LayoutContextKey, SidebarContextKey } from '../utils/layout-context'
 
 export interface VueSidebarProps {
   className?: string
   width?: string
   collapsedWidth?: string
   collapsed?: boolean
+  side?: LayoutSiderSide
   style?: Record<string, string | number>
 }
 
@@ -20,52 +36,52 @@ export const Sidebar = defineComponent({
   name: 'TigerSidebar',
   inheritAttrs: false,
   props: {
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String as PropType<string>,
       default: undefined
     },
-    /**
-     * Sidebar width (CSS value)
-     * @default '256px'
-     */
     width: {
       type: String as PropType<string>,
-      default: '256px'
+      default: undefined
     },
-    /**
-     * Width when collapsed (mini mode).
-     * Set to '0px' to fully hide the sidebar when collapsed.
-     * @default '64px'
-     */
     collapsedWidth: {
       type: String as PropType<string>,
       default: '64px'
     },
-    /**
-     * Whether the sidebar is collapsed
-     * @default false
-     */
     collapsed: {
       type: Boolean as PropType<boolean>,
       default: false
     },
-
-    /**
-     * Custom styles
-     */
+    side: {
+      type: String as PropType<LayoutSiderSide>,
+      default: 'start'
+    },
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
   setup(props, { slots, attrs }) {
+    injectLayoutGridStyles()
+    const layout = inject(LayoutContextKey, null)
+    const config = useTigerConfig()
+    const fallbackName = computed(() => getSidebarAriaLabel(config.value.locale))
+    const collapsedRef = computed(() => props.collapsed)
+
+    provide(SidebarContextKey, { collapsed: collapsedRef })
+
+    watch(collapsedRef, (value) => layout?.setSiderCollapsed(value), { immediate: true })
+    onBeforeUnmount(() => layout?.setSiderCollapsed(false))
+
+    const fullyHidden = computed(() => isSidebarFullyHidden(props.collapsed, props.collapsedWidth))
+
     const sidebarClasses = computed(() =>
       classNames(
-        layoutSidebarClasses,
-        props.collapsed && layoutSidebarCollapsedClasses,
+        getLayoutSidebarClasses({
+          collapsed: props.collapsed,
+          side: props.side,
+          widthProvided: props.width !== undefined
+        }),
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -75,16 +91,31 @@ export const Sidebar = defineComponent({
       getSidebarStyle(props.collapsed, props.width, props.collapsedWidth)
     )
 
-    return () =>
-      h(
+    return () => {
+      const restAttrs = { ...attrs } as Record<string, unknown>
+      const ariaLabel = restAttrs['aria-label']
+      const ariaLabelledby = restAttrs['aria-labelledby']
+      delete restAttrs['aria-label']
+      delete restAttrs['aria-labelledby']
+      const aria = resolveSidebarAriaProps({
+        ariaLabel,
+        ariaLabelledby,
+        fallback: fallbackName.value
+      })
+
+      return h(
         'aside',
         {
-          ...attrs,
+          ...restAttrs,
           class: sidebarClasses.value,
-          style: mergeStyleValues(props.style, sidebarStyle.value)
+          style: mergeStyleValues(props.style, sidebarStyle.value),
+          inert: fullyHidden.value ? true : undefined,
+          'aria-hidden': fullyHidden.value ? true : undefined,
+          ...aria
         },
         slots.default?.()
       )
+    }
   }
 })
 

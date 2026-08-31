@@ -19,7 +19,8 @@ export const esES: TigerLocale = {
     searchPlaceholder: 'Buscar',
     clearText: 'Borrar',
     closeMessageAriaLabel: 'Cerrar mensaje',
-    closeNotificationAriaLabel: 'Cerrar notificación'
+    closeNotificationAriaLabel: 'Cerrar notificación',
+    sidebarAriaLabel: 'Barra lateral'
   },
   empty: {
     noData: 'Sin datos',

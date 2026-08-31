@@ -12,14 +12,10 @@ export type ContainerMaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | fal
  */
 export interface ContainerProps {
   /**
-   * Maximum width constraint for the container
-   * - 'sm': max-w-screen-sm (640px)
-   * - 'md': max-w-screen-md (768px)
-   * - 'lg': max-w-screen-lg (1024px)
-   * - 'xl': max-w-screen-xl (1280px)
-   * - '2xl': max-w-screen-2xl (1536px)
-   * - 'full': w-full (100%)
-   * - false: no max-width constraint
+   * Maximum width constraint, read from `--tiger-breakpoint-*`.
+   * - 'sm' | 'md' | 'lg' | 'xl' | '2xl': `max-width: var(--tiger-breakpoint-*)`
+   * - 'full': `max-width: 100%` (caps at the parent)
+   * - false: no max-width (still `width: 100%`)
    * @default false
    */
   maxWidth?: ContainerMaxWidth

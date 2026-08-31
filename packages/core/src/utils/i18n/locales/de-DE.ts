@@ -19,7 +19,8 @@ export const deDE: TigerLocale = {
     searchPlaceholder: 'Suchen',
     clearText: 'Löschen',
     closeMessageAriaLabel: 'Nachricht schließen',
-    closeNotificationAriaLabel: 'Benachrichtigung schließen'
+    closeNotificationAriaLabel: 'Benachrichtigung schließen',
+    sidebarAriaLabel: 'Seitenleiste'
   },
   empty: {
     noData: 'Keine Daten',

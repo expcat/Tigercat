@@ -61,6 +61,7 @@ export * from '../upload-utils'
 export * from '../grid'
 export * from '../divider'
 export * from '../layout-utils'
+export * from '../layout-grid-styles'
 export * from '../container-utils'
 export * from '../space'
 

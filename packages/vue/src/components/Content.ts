@@ -1,8 +1,15 @@
-import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames, coerceClassValue, getLayoutContentClasses } from '@expcat/tigercat-core'
+import { defineComponent, h, PropType, computed, inject, onBeforeUnmount, ref } from 'vue'
+import {
+  classNames,
+  coerceClassValue,
+  getLayoutContentClasses,
+  injectLayoutGridStyles
+} from '@expcat/tigercat-core'
+import { LayoutContextKey } from '../utils/layout-context'
 
 export interface VueContentProps {
   className?: string
+  as?: string
   padding?: boolean | string
   style?: Record<string, string | number>
 }
@@ -11,32 +18,30 @@ export const Content = defineComponent({
   name: 'TigerContent',
   inheritAttrs: false,
   props: {
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String as PropType<string>,
       default: undefined
     },
-
-    /**
-     * Built-in content padding.
-     * @default true
-     */
+    as: {
+      type: String as PropType<string>,
+      default: 'main'
+    },
     padding: {
       type: [Boolean, String] as PropType<boolean | string>,
       default: true
     },
-
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
   setup(props, { slots, attrs }) {
+    injectLayoutGridStyles()
+    const layout = inject(LayoutContextKey, null)
+    const rootRef = ref<HTMLElement | null>(null)
+
+    onBeforeUnmount(() => layout?.setContentEl(null))
+
     const contentClasses = computed(() =>
       classNames(
         getLayoutContentClasses(props.padding),
@@ -46,7 +51,20 @@ export const Content = defineComponent({
     )
 
     return () =>
-      h('main', { ...attrs, class: contentClasses.value, style: props.style }, slots.default?.())
+      h(
+        props.as || 'main',
+        {
+          ...attrs,
+          ref: (el: unknown) => {
+            const node = el as HTMLElement | null
+            rootRef.value = node
+            layout?.setContentEl(node)
+          },
+          class: contentClasses.value,
+          style: props.style
+        },
+        slots.default?.()
+      )
   }
 })
 

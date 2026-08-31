@@ -378,6 +378,13 @@ export function getMarqueeLabels(
   return resolveLocaleSection(enSection('marquee'), locale?.marquee, overrides)
 }
 
+export function getSidebarAriaLabel(locale?: Partial<TigerLocale>): string {
+  return resolveLocaleText(
+    enUS.common?.sidebarAriaLabel ?? 'Sidebar',
+    locale?.common?.sidebarAriaLabel
+  )
+}
+
 export function getImageLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleImage>

@@ -19,7 +19,8 @@ export const jaJP: TigerLocale = {
     searchPlaceholder: '検索',
     clearText: 'クリア',
     closeMessageAriaLabel: 'メッセージを閉じる',
-    closeNotificationAriaLabel: '通知を閉じる'
+    closeNotificationAriaLabel: '通知を閉じる',
+    sidebarAriaLabel: 'サイドバー'
   },
   empty: {
     noData: 'データなし',

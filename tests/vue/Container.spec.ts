@@ -6,162 +6,74 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { Container } from '@expcat/tigercat-vue/Container'
 import { h } from 'vue'
-import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Container (Vue)', () => {
   const ContentSlot = () => h('div', 'Container content')
 
-  describe('Rendering', () => {
-    it('should render children content', () => {
-      render(Container, {
-        slots: {
-          default: ContentSlot
-        }
-      })
-
-      expect(screen.getByText('Container content')).toBeInTheDocument()
-    })
+  it('should render children content', () => {
+    render(Container, { slots: { default: ContentSlot } })
+    expect(screen.getByText('Container content')).toBeInTheDocument()
   })
 
-  describe('Max Width', () => {
-    it('should not apply max width when set to false', () => {
-      const { container } = renderWithProps(
-        Container,
-        { maxWidth: false },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).not.toHaveClass('max-w-screen-')
+  it('distinguishes false, full, and named maxWidth', () => {
+    const none = render(Container, {
+      props: { maxWidth: false },
+      slots: { default: ContentSlot }
     })
+    const noneEl = none.container.querySelector('.tiger-container') as HTMLElement
+    expect(noneEl.style.maxWidth).toBe('')
 
-    it('should apply sm max width class', () => {
-      const { container } = renderWithProps(
-        Container,
-        { maxWidth: 'sm' },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('max-w-screen-sm')
+    const full = render(Container, {
+      props: { maxWidth: 'full' },
+      slots: { default: ContentSlot }
     })
+    const fullEl = full.container.querySelector('.tiger-container') as HTMLElement
+    expect(fullEl.style.maxWidth).toBe('100%')
+
+    const sm = render(Container, {
+      props: { maxWidth: 'sm' },
+      slots: { default: ContentSlot }
+    })
+    const smEl = sm.container.querySelector('.tiger-container') as HTMLElement
+    expect(smEl.style.maxWidth).toContain('--tiger-breakpoint-sm')
   })
 
-  describe('Center', () => {
-    it('should center by default', () => {
-      const { container } = renderWithSlots(Container, {
-        default: ContentSlot
-      })
+  it('centers and pads by default, and both can be turned off', () => {
+    const on = render(Container, { slots: { default: ContentSlot } })
+    const onEl = on.container.querySelector('.tiger-container') as HTMLElement
+    expect(onEl.className).toContain('tiger-container-center')
+    expect(onEl.className).toContain('tiger-container-pad')
 
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('mx-auto')
+    const off = render(Container, {
+      props: { center: false, padding: false },
+      slots: { default: ContentSlot }
     })
-
-    it('should not center when set to false', () => {
-      const { container } = renderWithProps(
-        Container,
-        { center: false },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).not.toHaveClass('mx-auto')
-    })
+    const offEl = off.container.querySelector('.tiger-container') as HTMLElement
+    expect(offEl.className).not.toContain('tiger-container-center')
+    expect(offEl.className).not.toContain('tiger-container-pad')
   })
 
-  describe('Padding', () => {
-    it('should apply padding by default', () => {
-      const { container } = renderWithSlots(Container, {
-        default: ContentSlot
-      })
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('px-4')
+  it('keeps the base class when className is copied from React docs', () => {
+    const { container } = render(Container, {
+      props: { className: 'custom' },
+      slots: { default: ContentSlot }
     })
-
-    it('should not apply padding when set to false', () => {
-      const { container } = renderWithProps(
-        Container,
-        { padding: false },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).not.toHaveClass('px-4')
-    })
+    const el = container.querySelector('.tiger-container') as HTMLElement
+    expect(el.className).toContain('tiger-container')
+    expect(el.className).toContain('custom')
   })
 
-  describe('Combined Props', () => {
-    it('should apply multiple props together', () => {
-      const { container } = renderWithProps(
-        Container,
-        {
-          maxWidth: 'lg',
-          center: true,
-          padding: true
-        },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('w-full')
-      expect(containerEl).toHaveClass('max-w-screen-lg')
-      expect(containerEl).toHaveClass('mx-auto')
-      expect(containerEl).toHaveClass('px-4')
+  it('renders as a section', () => {
+    const { container } = render(Container, {
+      props: { as: 'section' },
+      slots: { default: ContentSlot }
     })
-
-    it('should work with all features disabled', () => {
-      const { container } = renderWithProps(
-        Container,
-        {
-          maxWidth: false,
-          center: false,
-          padding: false
-        },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('w-full')
-      expect(containerEl).not.toHaveClass('mx-auto')
-      expect(containerEl).not.toHaveClass('px-4')
-    })
+    expect(container.querySelector('section.tiger-container')).toBeTruthy()
   })
 
-  describe('Custom Class', () => {
-    it('should merge attrs.class', () => {
-      const { container } = renderWithSlots(
-        Container,
-        { default: ContentSlot },
-        { attrs: { class: ['custom-class', { 'custom-obj-class': true }] } }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('w-full')
-      expect(containerEl).toHaveClass('custom-class')
-      expect(containerEl).toHaveClass('custom-obj-class')
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = renderWithSlots(Container, {
-        default: ContentSlot
-      })
-
-      await expectNoA11yViolationsIsolated(container)
-    })
+  it('should have no accessibility violations', async () => {
+    const { container } = render(Container, { slots: { default: ContentSlot } })
+    await expectNoA11yViolationsIsolated(container)
   })
 })

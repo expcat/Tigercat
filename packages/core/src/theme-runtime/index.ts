@@ -93,7 +93,8 @@ export const THEME_CSS_VARS = {
   breakpointSm: '--tiger-breakpoint-sm',
   breakpointMd: '--tiger-breakpoint-md',
   breakpointLg: '--tiger-breakpoint-lg',
-  breakpointXl: '--tiger-breakpoint-xl'
+  breakpointXl: '--tiger-breakpoint-xl',
+  breakpoint2xl: '--tiger-breakpoint-2xl'
 } as const
 
 export const TIGER_BREAKPOINT_CSS_VALUES = {
@@ -101,7 +102,8 @@ export const TIGER_BREAKPOINT_CSS_VALUES = {
   breakpointSm: '640px',
   breakpointMd: '768px',
   breakpointLg: '1024px',
-  breakpointXl: '1280px'
+  breakpointXl: '1280px',
+  breakpoint2xl: '1536px'
 } as const
 
 /** Canonical semantic keys that alias CSS names resolve through. */

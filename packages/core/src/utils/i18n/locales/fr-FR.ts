@@ -19,7 +19,8 @@ export const frFR: TigerLocale = {
     searchPlaceholder: 'Rechercher',
     clearText: 'Effacer',
     closeMessageAriaLabel: 'Fermer le message',
-    closeNotificationAriaLabel: 'Fermer la notification'
+    closeNotificationAriaLabel: 'Fermer la notification',
+    sidebarAriaLabel: 'Barre latérale'
   },
   empty: {
     noData: 'Aucune donnée',

@@ -3,6 +3,7 @@ import {
   classNames,
   coerceClassValue,
   getLayoutHeaderClasses,
+  injectLayoutGridStyles,
   mergeStyleValues
 } from '@expcat/tigercat-core'
 import type { HeaderVariant } from '@expcat/tigercat-core'
@@ -18,39 +19,25 @@ export const Header = defineComponent({
   name: 'TigerHeader',
   inheritAttrs: false,
   props: {
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String as PropType<string>,
       default: undefined
     },
-    /**
-     * Header visual style.
-     * @default 'default'
-     */
     variant: {
       type: String as PropType<HeaderVariant>,
       default: 'default' as HeaderVariant
     },
-    /**
-     * Header height (CSS value)
-     * @default '64px'
-     */
     height: {
       type: String as PropType<string>,
-      default: '64px'
+      default: undefined
     },
-
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
   setup(props, { slots, attrs }) {
+    injectLayoutGridStyles()
     const headerClasses = computed(() =>
       classNames(
         getLayoutHeaderClasses(props.variant),
@@ -65,7 +52,7 @@ export const Header = defineComponent({
         {
           ...attrs,
           class: headerClasses.value,
-          style: mergeStyleValues(props.style, { height: props.height })
+          style: mergeStyleValues(props.style, props.height ? { height: props.height } : undefined)
         },
         slots.default?.()
       )

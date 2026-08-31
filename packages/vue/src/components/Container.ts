@@ -1,48 +1,42 @@
 import { defineComponent, computed, h, PropType, Component, resolveDynamicComponent } from 'vue'
-import { getContainerClasses, type ContainerMaxWidth } from '@expcat/tigercat-core'
+import {
+  coerceClassValue,
+  getContainerClasses,
+  getContainerMaxWidthStyle,
+  type ContainerMaxWidth
+} from '@expcat/tigercat-core'
 
 export interface VueContainerProps {
   as?: string | Component
   maxWidth?: ContainerMaxWidth
   center?: boolean
   padding?: boolean
+  className?: string
 }
 
 export const Container = defineComponent({
   name: 'TigerContainer',
   inheritAttrs: false,
   props: {
-    /**
-     * HTML element or component to render as
-     * @default 'div'
-     */
     as: {
       type: [String, Object] as PropType<string | Component>,
       default: 'div'
     },
-    /**
-     * Maximum width constraint (false for no constraint)
-     * @default false
-     */
     maxWidth: {
       type: [String, Boolean] as PropType<ContainerMaxWidth>,
       default: false
     },
-    /**
-     * Center container horizontally
-     * @default true
-     */
     center: {
       type: Boolean,
       default: true
     },
-    /**
-     * Add responsive horizontal padding
-     * @default true
-     */
     padding: {
       type: Boolean,
       default: true
+    },
+    className: {
+      type: String as PropType<string>,
+      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
@@ -50,9 +44,11 @@ export const Container = defineComponent({
       getContainerClasses({
         maxWidth: props.maxWidth,
         center: props.center,
-        padding: props.padding
+        padding: props.padding,
+        className: props.className
       })
     )
+    const maxWidthStyle = computed(() => getContainerMaxWidthStyle(props.maxWidth))
 
     return () => {
       const { class: attrsClass, style: attrsStyle, ...restAttrs } = attrs
@@ -61,8 +57,8 @@ export const Container = defineComponent({
         tag,
         {
           ...restAttrs,
-          class: [containerClasses.value, attrsClass],
-          style: attrsStyle
+          class: [containerClasses.value, coerceClassValue(attrsClass)],
+          style: [maxWidthStyle.value, attrsStyle]
         },
         slots.default?.()
       )

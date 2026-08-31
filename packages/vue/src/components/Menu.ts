@@ -57,6 +57,7 @@ import {
   initRovingTabIndex
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+import { SidebarContextKey } from '../utils/layout-context'
 
 // Menu context key
 export const MenuContextKey = Symbol('MenuContext')
@@ -151,12 +152,12 @@ export const Menu = defineComponent({
       default: () => []
     },
     /**
-     * Whether the menu is collapsed (for vertical mode)
-     * @default false
+     * Whether the menu is collapsed (for vertical mode).
+     * Omitted: follow Sidebar context when nested, otherwise false.
      */
     collapsed: {
       type: Boolean,
-      default: false
+      default: undefined
     },
     /**
      * Whether multiple submenus can be opened at once
@@ -217,8 +218,10 @@ export const Menu = defineComponent({
   ],
   setup(props, { slots, emit, attrs }) {
     const menuEl = ref<HTMLElement | null>(null)
+    const sidebarCtx = inject(SidebarContextKey, null)
+    const collapsed = computed(() => props.collapsed ?? sidebarCtx?.collapsed.value ?? false)
     const resolvedMode = computed<MenuMode>(() =>
-      props.collapsed && props.mode === 'inline' ? 'vertical' : props.mode
+      collapsed.value && props.mode === 'inline' ? 'vertical' : props.mode
     )
 
     // Internal state for uncontrolled mode
@@ -279,7 +282,7 @@ export const Menu = defineComponent({
     // Menu classes
     const menuClasses = computed(() => {
       return classNames(
-        getMenuClasses(resolvedMode.value, props.theme, props.collapsed),
+        getMenuClasses(resolvedMode.value, props.theme, collapsed.value),
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -303,7 +306,7 @@ export const Menu = defineComponent({
     // Provide menu context to child components
     const modeRef = computed(() => resolvedMode.value)
     const themeRef = computed(() => props.theme)
-    const collapsedRef = computed(() => props.collapsed)
+    const collapsedRef = collapsed
     const inlineIndentRef = computed(() => props.inlineIndent)
     const popupPortalRef = computed(() => props.popupPortal)
 

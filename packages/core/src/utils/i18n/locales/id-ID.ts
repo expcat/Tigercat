@@ -19,7 +19,8 @@ export const idID: TigerLocale = {
     searchPlaceholder: 'Cari',
     clearText: 'Hapus',
     closeMessageAriaLabel: 'Tutup pesan',
-    closeNotificationAriaLabel: 'Tutup notifikasi'
+    closeNotificationAriaLabel: 'Tutup notifikasi',
+    sidebarAriaLabel: 'Bilah sisi'
   },
   empty: {
     noData: 'Tidak ada data',

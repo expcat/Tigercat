@@ -19,7 +19,8 @@ export const ptBR: TigerLocale = {
     searchPlaceholder: 'Pesquisar',
     clearText: 'Limpar',
     closeMessageAriaLabel: 'Fechar mensagem',
-    closeNotificationAriaLabel: 'Fechar notificação'
+    closeNotificationAriaLabel: 'Fechar notificação',
+    sidebarAriaLabel: 'Barra lateral'
   },
   empty: {
     noData: 'Sem dados',
