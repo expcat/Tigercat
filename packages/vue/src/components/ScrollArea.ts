@@ -1,18 +1,20 @@
 import {
+  computed,
   defineComponent,
   h,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
   ref,
   shallowRef,
-  onMounted,
-  onBeforeUnmount,
-  nextTick,
   watch,
   PropType
 } from 'vue'
 import {
+  applyScrollAreaWheel,
   classNames,
   coerceClassValue,
-  mergeStyleValues,
+  computeScrollAreaKeyboardDelta,
   computeScrollAreaState,
   computeScrollFromThumbOffset,
   computeScrollFromTrackPoint,
@@ -20,40 +22,44 @@ import {
   createEmptyScrollAreaState,
   getScrollAreaBoxStyle,
   getScrollAreaContentClasses,
+  getScrollAreaGutterStyle,
+  getScrollAreaLabels,
   getScrollAreaScrollbarClasses,
+  getScrollAreaScrollbarPlacementStyle,
   getScrollAreaShadowClasses,
   getScrollAreaShadowSides,
   getScrollAreaThumbClasses,
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
+  mergeStyleValues,
+  mergeTigerLocale,
   observeScrollAreaSize,
+  physicalInlineScrollFromLogical,
+  readInlineDirection,
   readScrollAreaMetrics,
+  resolveScrollAreaViewportTabIndex,
+  scrollAreaHasFocusable,
   scrollAreaRootClasses,
   shouldRenderScrollAreaScrollbar,
   SCROLL_AREA_MIN_THUMB_SIZE,
   type DocumentDragSession,
   type ScrollAreaAxis,
   type ScrollAreaDirection,
+  type ScrollAreaInstance,
+  type ScrollAreaProps as CoreScrollAreaProps,
   type ScrollAreaScrollbarSize,
   type ScrollAreaScrollbarVisibility,
   type ScrollAreaScrollToOptions,
-  type ScrollAreaState
+  type ScrollAreaState,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
-export interface VueScrollAreaProps {
-  direction?: ScrollAreaDirection
-  scrollbar?: ScrollAreaScrollbarVisibility
-  scrollbarSize?: ScrollAreaScrollbarSize
-  shadow?: boolean
-  minThumbSize?: number
-  height?: number | string
-  maxHeight?: number | string
-  width?: number | string
-  maxWidth?: number | string
-  ariaLabel?: string
-  className?: string
-  viewportClassName?: string
-}
+export interface VueScrollAreaProps extends CoreScrollAreaProps {}
+
+export type ScrollAreaProps = VueScrollAreaProps
+
+export type { ScrollAreaInstance }
 
 export const ScrollArea = defineComponent({
   name: 'TigerScrollArea',
@@ -79,7 +85,8 @@ export const ScrollArea = defineComponent({
     maxWidth: { type: [Number, String] as PropType<number | string>, default: undefined },
     ariaLabel: { type: String, default: undefined },
     className: { type: String, default: undefined },
-    viewportClassName: { type: String, default: undefined }
+    viewportClassName: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: ['scroll'],
   setup(props, { slots, emit, attrs, expose }) {
@@ -87,15 +94,22 @@ export const ScrollArea = defineComponent({
     const contentRef = ref<HTMLElement | null>(null)
     const scrollState = shallowRef<ScrollAreaState>(createEmptyScrollAreaState())
     const draggingAxis = ref<ScrollAreaAxis | null>(null)
+    const scrolling = ref(false)
     let dragSession: DocumentDragSession | null = null
     let stopObserving: (() => void) | null = null
+    let scrollTimer = 0
+    const config = useTigerConfig()
+    const labels = computed(() =>
+      getScrollAreaLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
 
     function syncState(): void {
       const viewport = viewportRef.value
       if (!viewport) return
       scrollState.value = computeScrollAreaState(
         readScrollAreaMetrics(viewport),
-        props.minThumbSize
+        props.minThumbSize,
+        readInlineDirection(viewport)
       )
     }
 
@@ -103,6 +117,11 @@ export const ScrollArea = defineComponent({
       const viewport = viewportRef.value
       if (!viewport) return
       syncState()
+      scrolling.value = true
+      window.clearTimeout(scrollTimer)
+      scrollTimer = window.setTimeout(() => {
+        scrolling.value = false
+      }, 600)
       emit('scroll', {
         scrollTop: viewport.scrollTop,
         scrollLeft: viewport.scrollLeft,
@@ -110,24 +129,20 @@ export const ScrollArea = defineComponent({
       })
     }
 
-    function applyScroll(axis: ScrollAreaAxis, position: number): void {
+    function applyScroll(axis: ScrollAreaAxis, logical: number): void {
       const viewport = viewportRef.value
       if (!viewport) return
-      if (axis === 'y') viewport.scrollTop = position
-      else viewport.scrollLeft = position
+      if (axis === 'y') viewport.scrollTop = logical
+      else {
+        viewport.scrollLeft = physicalInlineScrollFromLogical(
+          logical,
+          viewport.scrollWidth,
+          viewport.clientWidth,
+          readInlineDirection(viewport),
+          viewport.scrollLeft
+        )
+      }
       handleScroll()
-    }
-
-    function trackSizeOf(axis: ScrollAreaAxis): number {
-      const viewport = viewportRef.value
-      if (!viewport) return 0
-      return axis === 'y' ? viewport.clientHeight : viewport.clientWidth
-    }
-
-    function scrollSizeOf(axis: ScrollAreaAxis): number {
-      const viewport = viewportRef.value
-      if (!viewport) return 0
-      return axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth
     }
 
     function startThumbDrag(axis: ScrollAreaAxis, event: PointerEvent): void {
@@ -135,11 +150,10 @@ export const ScrollArea = defineComponent({
       if (!viewport || event.button !== 0) return
       event.preventDefault()
       event.stopPropagation()
-
       const axisState = axis === 'y' ? scrollState.value.y : scrollState.value.x
       const startOffset = axisState.thumbOffset
+      const rtl = axis === 'x' && readInlineDirection(viewport) === 'rtl'
       const startPoint = axis === 'y' ? event.clientY : event.clientX
-
       dragSession?.dispose()
       draggingAxis.value = axis
       dragSession = createDocumentDragSession({
@@ -151,14 +165,15 @@ export const ScrollArea = defineComponent({
         lockAxis: axis,
         onMove: ({ currentX, currentY }) => {
           const current = axis === 'y' ? currentY : currentX
-          const trackSize = trackSizeOf(axis)
+          const delta = rtl ? startPoint - current : current - startPoint
+          const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
           applyScroll(
             axis,
             computeScrollFromThumbOffset(
-              startOffset + (current - startPoint),
+              startOffset + delta,
               trackSize,
               axisState.thumbSize,
-              scrollSizeOf(axis),
+              axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth,
               trackSize
             )
           )
@@ -176,19 +191,26 @@ export const ScrollArea = defineComponent({
         startThumbDrag(axis, event)
         return
       }
-
+      const viewport = viewportRef.value
+      if (!viewport) return
       const track = event.currentTarget as HTMLElement
       const rect = track.getBoundingClientRect()
-      const point = axis === 'y' ? event.clientY - rect.top : event.clientX - rect.left
+      const rtl = axis === 'x' && readInlineDirection(viewport) === 'rtl'
+      const point =
+        axis === 'y'
+          ? event.clientY - rect.top
+          : rtl
+            ? rect.right - event.clientX
+            : event.clientX - rect.left
       const axisState = axis === 'y' ? scrollState.value.y : scrollState.value.x
-      const trackSize = trackSizeOf(axis)
+      const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
       applyScroll(
         axis,
         computeScrollFromTrackPoint(
           point,
           trackSize,
           axisState.thumbSize,
-          scrollSizeOf(axis),
+          axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth,
           trackSize
         )
       )
@@ -207,28 +229,15 @@ export const ScrollArea = defineComponent({
       handleScroll()
     }
 
-    function scrollToTop(behavior?: ScrollAreaScrollToOptions['behavior']): void {
-      scrollTo({ top: 0, behavior })
-    }
-
-    function scrollToBottom(behavior?: ScrollAreaScrollToOptions['behavior']): void {
-      const viewport = viewportRef.value
-      if (!viewport) return
-      scrollTo({ top: viewport.scrollHeight, behavior })
-    }
-
     onMounted(() => {
       syncState()
       stopObserving = observeScrollAreaSize([viewportRef.value, contentRef.value], syncState)
     })
-
     onBeforeUnmount(() => {
       dragSession?.dispose()
-      dragSession = null
       stopObserving?.()
-      stopObserving = null
+      window.clearTimeout(scrollTimer)
     })
-
     watch(
       () => [props.direction, props.minThumbSize],
       () => {
@@ -238,26 +247,49 @@ export const ScrollArea = defineComponent({
 
     expose({
       scrollTo,
-      scrollToTop,
-      scrollToBottom,
+      scrollToTop: (behavior?: ScrollAreaScrollToOptions['behavior']) =>
+        scrollTo({ top: 0, behavior }),
+      scrollToBottom: (behavior?: ScrollAreaScrollToOptions['behavior']) =>
+        scrollTo({ top: viewportRef.value?.scrollHeight ?? 0, behavior }),
       getViewport: () => viewportRef.value,
       getState: () => scrollState.value
-    })
+    } satisfies ScrollAreaInstance)
 
     function renderScrollbar(axis: ScrollAreaAxis) {
       const axisState = axis === 'y' ? scrollState.value.y : scrollState.value.x
       if (!shouldRenderScrollAreaScrollbar(props.scrollbar, props.direction, axis, axisState)) {
         return null
       }
-
+      const otherVisible =
+        axis === 'y'
+          ? shouldRenderScrollAreaScrollbar(
+              props.scrollbar,
+              props.direction,
+              'x',
+              scrollState.value.x
+            )
+          : shouldRenderScrollAreaScrollbar(
+              props.scrollbar,
+              props.direction,
+              'y',
+              scrollState.value.y
+            )
       return h(
         'div',
         {
           key: `scrollbar-${axis}`,
           class: getScrollAreaScrollbarClasses(axis, props.scrollbarSize, props.scrollbar),
+          style: getScrollAreaScrollbarPlacementStyle(axis, props.scrollbarSize, otherVisible),
           'data-scroll-area-scrollbar': axis,
+          'data-dragging': draggingAxis.value === axis ? '' : undefined,
           'aria-hidden': 'true',
-          onPointerdown: (event: PointerEvent) => handleTrackPointerDown(axis, event)
+          onPointerdown: (event: PointerEvent) => handleTrackPointerDown(axis, event),
+          onWheel: (event: WheelEvent) => {
+            const viewport = viewportRef.value
+            if (!viewport) return
+            applyScrollAreaWheel(event, viewport)
+            handleScroll()
+          }
         },
         [
           h('div', {
@@ -270,30 +302,114 @@ export const ScrollArea = defineComponent({
     }
 
     return () => {
+      const visibleY = shouldRenderScrollAreaScrollbar(
+        props.scrollbar,
+        props.direction,
+        'y',
+        scrollState.value.y
+      )
+      const visibleX = shouldRenderScrollAreaScrollbar(
+        props.scrollbar,
+        props.direction,
+        'x',
+        scrollState.value.x
+      )
+      const overflow =
+        (visibleY && scrollState.value.y.scrollable) || (visibleX && scrollState.value.x.scrollable)
+      const userTabIndex =
+        typeof attrs.tabindex === 'number'
+          ? attrs.tabindex
+          : typeof attrs.tabIndex === 'number'
+            ? (attrs.tabIndex as number)
+            : undefined
+      const tabIndex = resolveScrollAreaViewportTabIndex({
+        overflow,
+        hasFocusable: scrollAreaHasFocusable(contentRef.value),
+        userTabIndex
+      })
+      const labelledBy = (attrs['aria-labelledby'] as string | undefined) || undefined
+      const attrLabel = (attrs['aria-label'] as string | undefined) || props.ariaLabel
+      const viewportName =
+        attrLabel || labelledBy || (tabIndex === 0 ? labels.value.ariaLabel : undefined)
+      const {
+        class: attrClass,
+        style: attrStyle,
+        tabindex: _t,
+        tabIndex: _t2,
+        ...rootAttrs
+      } = attrs as Record<string, unknown>
       const shadows = props.shadow
         ? getScrollAreaShadowSides(scrollState.value, props.direction)
         : []
 
+      const restRoot: Record<string, unknown> = {}
+      const restA11y: Record<string, unknown> = {}
+      for (const [key, value] of Object.entries(rootAttrs)) {
+        if (key.startsWith('aria-')) restA11y[key] = value
+        else restRoot[key] = value
+      }
+
       return h(
         'div',
         {
-          ...attrs,
-          class: classNames(scrollAreaRootClasses, props.className, coerceClassValue(attrs.class)),
-          style: mergeStyleValues(attrs.style),
-          'data-scroll-area': ''
+          ...restRoot,
+          class: scrollAreaRootClasses,
+          'data-scroll-area': '',
+          'data-scrolling': scrolling.value ? '' : undefined
         },
         [
           h(
             'div',
             {
               ref: viewportRef,
-              class: getScrollAreaViewportClasses(props.direction, props.viewportClassName),
-              style: getScrollAreaBoxStyle(props),
-              tabindex: 0,
-              role: props.ariaLabel ? 'region' : undefined,
-              'aria-label': props.ariaLabel,
+              class: getScrollAreaViewportClasses(
+                props.direction,
+                classNames(props.className, props.viewportClassName, coerceClassValue(attrClass))
+              ),
+              style: mergeStyleValues(
+                {
+                  ...getScrollAreaBoxStyle(props),
+                  ...getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY)
+                },
+                attrStyle
+              ),
+              tabindex: tabIndex,
+              role: viewportName ? 'region' : undefined,
+              'aria-label': attrLabel || (tabIndex === 0 ? labels.value.ariaLabel : undefined),
+              'aria-labelledby': labelledBy,
               'data-scroll-area-viewport': '',
-              onScroll: handleScroll
+              onScroll: handleScroll,
+              onKeydown: (event: KeyboardEvent) => {
+                const viewport = viewportRef.value
+                if (!viewport) return
+                const delta = computeScrollAreaKeyboardDelta(
+                  event.key,
+                  props.direction,
+                  { width: viewport.clientWidth, height: viewport.clientHeight },
+                  readInlineDirection(viewport)
+                )
+                if (!delta) return
+                event.preventDefault()
+                if ('to' in delta) {
+                  applyScroll(
+                    delta.axis,
+                    delta.to === 'start'
+                      ? 0
+                      : delta.axis === 'y'
+                        ? viewport.scrollHeight
+                        : viewport.scrollWidth
+                  )
+                  return
+                }
+                if (delta.axis === 'y') applyScroll('y', viewport.scrollTop + delta.delta)
+                else {
+                  const logical =
+                    scrollState.value.x.progress *
+                      Math.max(viewport.scrollWidth - viewport.clientWidth, 0) +
+                    delta.delta
+                  applyScroll('x', logical)
+                }
+              }
             },
             [
               h(

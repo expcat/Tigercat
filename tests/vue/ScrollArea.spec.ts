@@ -58,12 +58,12 @@ describe('ScrollArea', () => {
       expect(viewport.style.width).toBe('100%')
     })
 
-    it('merges attrs class onto the root element', () => {
+    it('merges attrs class onto the viewport', () => {
       const { container } = render(ScrollArea, {
         attrs: { class: 'custom-root' },
         slots: { default: () => h('p', 'body') }
       })
-      expect(container.querySelector('[data-scroll-area]')?.className).toContain('custom-root')
+      expect(getViewport(container).className).toContain('custom-root')
     })
   })
 
@@ -203,9 +203,9 @@ describe('ScrollArea', () => {
   })
 
   describe('Accessibility', () => {
-    it('keeps the scrollable viewport keyboard reachable', () => {
+    it('does not put a non-overflowing viewport on the tab order', () => {
       const { container } = render(ScrollArea, { slots: { default: () => h('p', 'body') } })
-      expect(getViewport(container).getAttribute('tabindex')).toBe('0')
+      expect(getViewport(container).getAttribute('tabindex')).toBeNull()
     })
 
     it('names the region when ariaLabel is provided', () => {

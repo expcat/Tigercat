@@ -69,7 +69,7 @@ describe('ScrollArea', () => {
         </ScrollArea>
       )
       const root = container.querySelector('[data-scroll-area]') as HTMLElement
-      expect(root.className).toContain('custom-root')
+      expect(getViewport(container).className).toContain('custom-root')
       expect(root.id).toBe('log-panel')
     })
   })
@@ -217,13 +217,13 @@ describe('ScrollArea', () => {
   })
 
   describe('Accessibility', () => {
-    it('keeps the scrollable viewport keyboard reachable', () => {
+    it('does not put a non-overflowing viewport on the tab order', () => {
       const { container } = render(
         <ScrollArea>
           <p>body</p>
         </ScrollArea>
       )
-      expect(getViewport(container).getAttribute('tabindex')).toBe('0')
+      expect(getViewport(container).getAttribute('tabindex')).toBeNull()
     })
 
     it('names the region when ariaLabel is provided', () => {
