@@ -243,14 +243,20 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 
 ## Select
 
-`packages/core/src/types/select.ts` · `SelectProps` · 4/20 props
+`packages/vue/src/components/Select.ts` · `VueSelectProps` · 8/33 props
 
-| Prop        | Type                   | Default | Notes                                                                                      |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `disabled?` | `boolean`              | `false` | Whether the select is disabled                                                             |
-| `options?`  | `SelectOptions`        | `-`     | Options list (can be flat list or grouped)                                                 |
-| `virtual?`  | `boolean`              | `false` | Whether to use virtual scrolling for large option lists. When enabled, only visible opt... |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                                    |
+Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。
+
+| Prop            | Type               | Default | Notes |
+| --------------- | ------------------ | ------- | ----- |
+| `options?`      | `SelectOptions`    | `-`     | -     |
+| `defaultValue?` | `SelectModelValue` | `-`     | -     |
+| `multiple?`     | `boolean`          | `-`     | -     |
+| `searchable?`   | `boolean`          | `-`     | -     |
+| `clearable?`    | `boolean`          | `-`     | -     |
+| `virtual?`      | `boolean`          | `-`     | -     |
+| `creatable?`    | `boolean`          | `-`     | -     |
+| `remote?`       | `boolean`          | `-`     | -     |
 
 ## Signature
 

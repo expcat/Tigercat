@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Select } from '@expcat/tigercat-react/Select'
 
 const options = [
@@ -8,16 +9,11 @@ const options = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number>('standard')
+  const [value, setValue] = useState<string | number | undefined>('standard')
 
   return (
-    <Select
-      value={value}
-      onChange={(next) => setValue(next ?? '')}
-      options={options}
-      clearable
-      size="lg"
-      className="w-full max-w-sm"
-    />
+    <FormItem label="套餐" className="w-full max-w-sm">
+      <Select value={value} onChange={setValue} options={options} clearable size="lg" />
+    </FormItem>
   )
 }

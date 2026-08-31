@@ -101,6 +101,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       'React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。'
   },
+  Select: {
+    notes:
+      "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。"
+  },
   Icon: {
     notes:
       '内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。'

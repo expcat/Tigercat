@@ -9,15 +9,14 @@ const cities = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number>('')
+  const [value, setValue] = useState<string | number | undefined>(undefined)
 
   return (
     <Select
       value={value}
-      onChange={(next) => setValue(next ?? '')}
+      onChange={setValue}
       options={cities}
       searchable
-      placeholder="搜索城市"
       className="w-full max-w-sm"
     />
   )

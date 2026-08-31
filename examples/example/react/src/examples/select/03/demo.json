@@ -1,12 +1,12 @@
 {
   "id": "select-03",
   "title": "多选搜索",
-  "description": "一个受控 Select 同时开启 multiple 和 searchable，在最小技能列表中搜索并多选。",
+  "description": "选中后默认清掉搜索词，面板保持打开，列表回到全量。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 320,
     "maxHeight": 720
   }
 }

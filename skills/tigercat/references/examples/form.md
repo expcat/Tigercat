@@ -11,10 +11,11 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Component Notes
 
-| Component   | Uses | Notes                                                                                                                                                                                |
-| ----------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| InputGroup  | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。 |
-| InputNumber | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                          |
+| Component   | Uses | Notes                                                                                                                                                                                                          |
+| ----------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| InputGroup  | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                           |
+| InputNumber | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                    |
+| Select      | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。 |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
@@ -31,7 +32,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | MaskInput       | `<MaskInput :mask="mask" />`                                                                                | `<MaskInput mask={mask} />`                                                                                 |
 | Radio           | `<Radio v-model="checked" value="a">A</Radio>`                                                              | `<Radio checked={checked} onChange={setChecked} value="a">A</Radio>`                                        |
 | RadioGroup      | `<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>`                                       | `<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>`                     |
-| Select          | `<Select v-model="value" />`                                                                                | `<Select value={value} onChange={setValue} />`                                                              |
+| Select          | `<Select v-model="value" :options="options" />`                                                             | `<Select value={value} options={options} onChange={(next) => setValue(next)} />`                            |
 | Slider          | `<Slider v-model="value" />`                                                                                | `<Slider value={value} onChange={setValue} />`                                                              |
 | Stepper         | `<Stepper v-model="value" />`                                                                               | `<Stepper value={value} onChange={setValue} />`                                                             |
 | Switch          | `<Switch v-model="checked">Label</Switch>`                                                                  | `<Switch checked={checked} onChange={setChecked}>Label</Switch>`                                            |

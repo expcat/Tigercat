@@ -19,13 +19,22 @@ const groupedOptions = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number>('apple')
+  const [value, setValue] = useState<string | number | undefined>(undefined)
+  const [loading, setLoading] = useState(false)
 
   return (
     <Select
       value={value}
-      onChange={(next) => setValue(next ?? '')}
+      onChange={setValue}
       options={groupedOptions}
+      searchable
+      creatable
+      remote
+      loading={loading}
+      onSearchValueChange={() => {
+        setLoading(true)
+        window.setTimeout(() => setLoading(false), 240)
+      }}
       className="w-full max-w-sm"
     />
   )

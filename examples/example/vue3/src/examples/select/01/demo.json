@@ -1,12 +1,12 @@
 {
   "id": "select-01",
   "title": "单选",
-  "description": "一个受控 Select 用三个最小选项组合清空、lg 尺寸和禁用选项。",
+  "description": "FormItem 给 combobox 可见名。Clear 发 undefined，不要收成空串。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 320,
     "maxHeight": 720
   }
 }

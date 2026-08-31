@@ -1,12 +1,12 @@
 {
   "id": "select-02",
   "title": "搜索",
-  "description": "一个受控 Select 开启 searchable，在四个城市选项中进行搜索和单选。",
+  "description": "未选初值是 undefined。不传 placeholder 时走 locale 默认文案。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 320,
     "maxHeight": 720
   }
 }

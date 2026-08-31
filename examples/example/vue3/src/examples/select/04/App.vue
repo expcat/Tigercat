@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
 
-const value = ref<string | number>('apple')
+const value = ref<string | number | undefined>(undefined)
+const loading = ref(false)
 const groupedOptions = [
   {
     label: '水果',
@@ -19,8 +20,23 @@ const groupedOptions = [
     ]
   }
 ]
+
+function onSearch() {
+  loading.value = true
+  window.setTimeout(() => {
+    loading.value = false
+  }, 240)
+}
 </script>
 
 <template>
-  <Select v-model="value" :options="groupedOptions" class="w-full max-w-sm" />
+  <Select
+    v-model="value"
+    :options="groupedOptions"
+    searchable
+    creatable
+    remote
+    :loading="loading"
+    class="w-full max-w-sm"
+    @update:search-value="onSearch" />
 </template>

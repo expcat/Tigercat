@@ -221,7 +221,19 @@ export const COMPONENT_PROP_PRIORITY = {
   RadioGroup: ['value?', 'defaultValue?', 'name?', 'disabled?', 'size?', 'direction?'],
   Switch: ['checked?', 'defaultChecked?', 'disabled?', 'size?'],
   Slider: ['value?', 'defaultValue?', 'min?', 'max?', 'step?', 'range?', 'marks?', 'disabled?'],
-  Stepper: ['value?', 'defaultValue?', 'min?', 'max?', 'step?', 'disabled?', 'size?', 'precision?']
+  Stepper: ['value?', 'defaultValue?', 'min?', 'max?', 'step?', 'disabled?', 'size?', 'precision?'],
+  Select: [
+    'options?',
+    'value?',
+    'defaultValue?',
+    'multiple?',
+    'searchable?',
+    'clearable?',
+    'virtual?',
+    'creatable?',
+    'remote?',
+    'open?'
+  ]
 }
 
 export function propStem(name) {
@@ -374,7 +386,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
     RadioGroup: '<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>',
     Switch: '<Switch v-model="checked">Label</Switch>',
     Slider: '<Slider v-model="value" />',
-    Stepper: '<Stepper v-model="value" />'
+    Stepper: '<Stepper v-model="value" />',
+    Select: '<Select v-model="value" :options="options" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -416,7 +429,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
       '<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>',
     Switch: '<Switch checked={checked} onChange={setChecked}>Label</Switch>',
     Slider: '<Slider value={value} onChange={setValue} />',
-    Stepper: '<Stepper value={value} onChange={setValue} />'
+    Stepper: '<Stepper value={value} onChange={setValue} />',
+    Select: '<Select value={value} options={options} onChange={(next) => setValue(next)} />'
   }
 }
 

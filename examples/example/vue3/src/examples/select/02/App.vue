@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
 
-const value = ref<string | number>('')
+const value = ref<string | number | undefined>(undefined)
 const cities = [
   { label: '北京', value: 'beijing' },
   { label: '上海', value: 'shanghai' },
@@ -12,10 +12,5 @@ const cities = [
 </script>
 
 <template>
-  <Select
-    v-model="value"
-    :options="cities"
-    searchable
-    placeholder="搜索城市"
-    class="w-full max-w-sm" />
+  <Select v-model="value" :options="cities" searchable class="w-full max-w-sm" />
 </template>

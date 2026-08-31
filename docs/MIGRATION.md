@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Select 未选是 `undefined`（多选 `[]`），`''` 是合法选项值。React `onChange` 单选 Clear 第一参是 `undefined`，不要 `next ?? ''`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。搜索输入即时更新，`onSearchChange` 才 debounce；React 即时通道是 `onSearchValueChange`。trigger 不再是 native `button`，而是 `role="combobox"`；搜索时 combobox 是输入框。选项不再抢焦点（`aria-activedescendant`）。删除假 token `--tiger-select-*`。`listHeight` 是面板内容区高度。Vue 主入口导出 `SelectProps`。
+
 Input React 支持 `readOnly`（与 `readonly` 同一属性）。Input 的 clear / 密码按钮进 Tab，文案走 `locale.input`。InputGroup 没有可访问名时不再写 `role="group"`。删除 InputGroupAddon 的 `type` / `addonType`（从未改视觉）。InputNumber `parser` 可返回 `null`，`NaN` 当空；`controlsPosition="right"` 是阅读方向的尾侧。React InputNumber `onChange` 仍是 `(value: number | null)`。Textarea 新增 `status` / `errorMessage`。
 
 Splitter 删除公开类型 `SplitterPaneConfig`（组件从未读取，也没有 `Splitter.Pane` / 折叠）。`sizes` 按值受控：父级回写才改比例，仅数组身份变化不会重置拖拽。拿掉 `sizes` 后停在最后比例，不会均分。百分比随容器重算。gutter 需要可读名（locale 默认「Resize panes {index}」）。水平拖拽在 `dir=rtl` 下跟着指针。

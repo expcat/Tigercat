@@ -18,7 +18,6 @@ export default function App() {
       options={skills}
       multiple
       searchable
-      placeholder="搜索并多选技能"
       className="w-full max-w-sm"
     />
   )
