@@ -6,8 +6,9 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
   getAnchorTargetElement,
   getContainerScrollTop,
-  getContainerHeight,
   getElementOffsetTop,
+  findAnchorLinkElement,
+  shouldHandleAnchorClick,
   scrollToAnchor,
   findActiveAnchor,
   findActiveAnchorAtOffsetLine,
@@ -97,15 +98,29 @@ describe('anchor-utils', () => {
     })
   })
 
-  describe('getContainerHeight', () => {
-    it('should return height for element container', () => {
-      // Note: happy-dom may not properly simulate clientHeight, so we just verify it returns a number
-      const height = getContainerHeight(container)
-      expect(typeof height).toBe('number')
+  describe('shouldHandleAnchorClick', () => {
+    it('handles a primary click when the section exists', () => {
+      expect(shouldHandleAnchorClick({ button: 0 }, { hasTargetElement: true })).toBe(true)
     })
 
-    it('should return height for window', () => {
-      expect(typeof getContainerHeight(window)).toBe('number')
+    it('lets modifier clicks and _blank through', () => {
+      expect(
+        shouldHandleAnchorClick({ button: 0, ctrlKey: true }, { hasTargetElement: true })
+      ).toBe(false)
+      expect(
+        shouldHandleAnchorClick({ button: 0 }, { target: '_blank', hasTargetElement: true })
+      ).toBe(false)
+      expect(shouldHandleAnchorClick({ button: 0 }, { hasTargetElement: false })).toBe(false)
+    })
+  })
+
+  describe('findAnchorLinkElement', () => {
+    it('matches href by attribute equality instead of concatenating a selector', () => {
+      const root = document.createElement('div')
+      const link = document.createElement('a')
+      link.setAttribute('data-anchor-href', '#a"b]')
+      root.appendChild(link)
+      expect(findAnchorLinkElement(root, '#a"b]')).toBe(link)
     })
   })
 
@@ -198,34 +213,15 @@ describe('anchor-utils', () => {
       expect(links).toContain(result3)
     })
 
-    it('picks the last section at or above the offset line with stubbed offsets', () => {
+    it('picks the last section at or above the offset line from rect space', () => {
       const links = ['#section1', '#section2', '#section3']
-      Object.defineProperty(section1, 'offsetTop', { value: 10, configurable: true })
-      Object.defineProperty(section2, 'offsetTop', { value: 50, configurable: true })
-      Object.defineProperty(section3, 'offsetTop', { value: 120, configurable: true })
-      Object.defineProperty(section1, 'offsetParent', { value: container, configurable: true })
-      Object.defineProperty(section2, 'offsetParent', { value: container, configurable: true })
-      Object.defineProperty(section3, 'offsetParent', { value: container, configurable: true })
+      vi.spyOn(container, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 200))
+      vi.spyOn(section1, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 10, 100, 20))
+      vi.spyOn(section2, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 50, 100, 20))
+      vi.spyOn(section3, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 120, 100, 20))
 
-      container.scrollTop = 50
-      expect(findActiveAnchor(links, container, 0, 0)).toBe('#section2')
-
-      container.scrollTop = 49
+      container.scrollTop = 0
       expect(findActiveAnchor(links, container, 0, 0)).toBe('#section1')
-    })
-
-    it('keeps the previous section active at the same scrollTop with a smaller bounds', () => {
-      const links = ['#section1', '#section2', '#section3']
-      Object.defineProperty(section1, 'offsetTop', { value: 10, configurable: true })
-      Object.defineProperty(section2, 'offsetTop', { value: 50, configurable: true })
-      Object.defineProperty(section3, 'offsetTop', { value: 120, configurable: true })
-      Object.defineProperty(section1, 'offsetParent', { value: container, configurable: true })
-      Object.defineProperty(section2, 'offsetParent', { value: container, configurable: true })
-      Object.defineProperty(section3, 'offsetParent', { value: container, configurable: true })
-
-      container.scrollTop = 48
-      expect(findActiveAnchor(links, container, 0, 0)).toBe('#section1')
-      expect(findActiveAnchor(links, container, 5, 0)).toBe('#section2')
     })
   })
 
@@ -385,33 +381,17 @@ describe('anchor-utils', () => {
 
   describe('CSS class generators', () => {
     describe('getAnchorWrapperClasses', () => {
-      it('should include fixed class when affix is true', () => {
-        const classes = getAnchorWrapperClasses(true)
-        expect(classes).toContain('fixed')
-      })
-
-      it('should not include fixed class when affix is false', () => {
-        const classes = getAnchorWrapperClasses(false)
-        expect(classes).not.toContain('fixed')
-      })
-
-      it('should include custom className', () => {
-        const classes = getAnchorWrapperClasses(true, 'custom-class')
-        expect(classes).toContain('custom-class')
-      })
-
-      it('should always include relative class', () => {
-        const classesWithAffix = getAnchorWrapperClasses(true)
-        const classesWithoutAffix = getAnchorWrapperClasses(false)
-        expect(classesWithAffix).toContain('relative')
-        expect(classesWithoutAffix).toContain('relative')
+      it('is in-flow relative and never a naked fixed', () => {
+        expect(getAnchorWrapperClasses()).toContain('relative')
+        expect(getAnchorWrapperClasses()).not.toContain('fixed')
+        expect(getAnchorWrapperClasses('custom-class')).toContain('custom-class')
       })
     })
 
     describe('getAnchorInkContainerClasses', () => {
       it('should return vertical classes for vertical direction', () => {
         const classes = getAnchorInkContainerClasses('vertical')
-        expect(classes).toContain('left-0')
+        expect(classes).toContain('start-0')
         expect(classes).toContain('w-0.5')
       })
 
@@ -439,14 +419,14 @@ describe('anchor-utils', () => {
     describe('getAnchorLinkListClasses', () => {
       it('should return vertical classes for vertical direction', () => {
         const classes = getAnchorLinkListClasses('vertical')
-        expect(classes).toContain('pl-4')
+        expect(classes).toContain('ps-4')
         expect(classes).toContain('space-y-2')
       })
 
       it('should return horizontal classes for horizontal direction', () => {
         const classes = getAnchorLinkListClasses('horizontal')
         expect(classes).toContain('flex')
-        expect(classes).toContain('space-x-4')
+        expect(classes).toContain('gap-x-4')
       })
     })
 

@@ -496,6 +496,12 @@ export const frFR: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Retour'
   },
+  backTop: {
+    ariaLabel: 'Haut de page'
+  },
+  anchor: {
+    ariaLabel: 'Sur cette page'
+  },
   steps: {
     ariaLabel: 'Étapes',
     waitStatus: 'En attente',

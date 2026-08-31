@@ -498,6 +498,12 @@ export const zhCN: TigerLocale = {
   pageHeader: {
     backAriaLabel: '返回'
   },
+  backTop: {
+    ariaLabel: '回到顶部'
+  },
+  anchor: {
+    ariaLabel: '本页导航'
+  },
   steps: {
     ariaLabel: '步骤',
     waitStatus: '等待',

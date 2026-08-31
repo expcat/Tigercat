@@ -495,6 +495,12 @@ export const viVN: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Quay lại'
   },
+  backTop: {
+    ariaLabel: 'Về đầu trang'
+  },
+  anchor: {
+    ariaLabel: 'Trên trang này'
+  },
   steps: {
     ariaLabel: 'Các bước',
     waitStatus: 'Đang chờ',

@@ -31,6 +31,8 @@ describe('BackTop', () => {
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('aria-label', 'Back to top')
     expect(button).toHaveAttribute('type', 'button')
+    expect(button).toHaveAttribute('tabindex', '-1')
+    expect(button).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('renders custom children', () => {
@@ -83,8 +85,7 @@ describe('BackTop', () => {
 
     const button = container.querySelector('button')
     expect(button).toHaveClass('custom-class')
-    // When target is a custom container (not window), uses sticky positioning
-    expect(button).toHaveClass('sticky')
+    expect(button).toHaveClass('fixed')
   })
 
   it('uses fixed positioning when target is window', () => {
@@ -115,9 +116,9 @@ describe('BackTop', () => {
     const button = container.querySelector('button')
     expect(button).toHaveClass('fixed')
     expect(button).toHaveClass('bottom-0')
-    expect(button).toHaveClass('left-0')
+    expect(button).toHaveClass('start-0')
     expect(button).not.toHaveClass('sticky')
-    expect(button?.style.left).toBe('24px')
+    expect(button?.style.insetInlineStart).toBe('24px')
     expect(button?.style.bottom).toBe('2rem')
 
     await user.click(button!)
@@ -135,10 +136,30 @@ describe('BackTop', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom label')
   })
 
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<BackTop target={() => scrollContainer} />)
+  it('keeps type=button even if rest props pass submit', () => {
+    const { container } = render(<BackTop target={() => scrollContainer} type="submit" as never />)
+    expect(container.querySelector('button')).toHaveAttribute('type', 'button')
+  })
 
+  it('scrolls the resolved target on click', async () => {
+    const user = userEvent.setup()
+    scrollContainer.scrollTop = 200
+    scrollContainer.scrollTo = vi.fn((options?: ScrollToOptions) => {
+      scrollContainer.scrollTop = Number(options?.top ?? 0)
+    })
+
+    render(<BackTop visibilityHeight={0} duration={0} target={() => scrollContainer} />)
+    await user.click(screen.getByRole('button'))
+    expect(scrollContainer.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' })
+  })
+
+  describe('Accessibility', () => {
+    it('should have no accessibility violations when visible', async () => {
+      const { container } = render(<BackTop visibilityHeight={0} target={() => scrollContainer} />)
+
+      await waitFor(() =>
+        expect(container.querySelector('button')).toHaveAttribute('tabindex', '0')
+      )
       await expectNoA11yViolationsIsolated(container)
     })
 
@@ -149,6 +170,16 @@ describe('BackTop', () => {
 
       const button = container.querySelector('button')
       expect(button).toHaveAttribute('aria-label', 'Scroll to top')
+    })
+
+    it('does not override visible children with the default aria-label', () => {
+      render(
+        <BackTop visibilityHeight={0} target={() => scrollContainer}>
+          顶部
+        </BackTop>
+      )
+      const button = screen.getByRole('button', { name: '顶部' })
+      expect(button).not.toHaveAttribute('aria-label', 'Back to top')
     })
   })
 })

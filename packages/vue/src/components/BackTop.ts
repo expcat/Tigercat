@@ -1,41 +1,37 @@
-import {
-  defineComponent,
-  h,
-  ref,
-  shallowRef,
-  computed,
-  onMounted,
-  onBeforeUnmount,
-  PropType
-} from 'vue'
+import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   createBackTopVisibilityController,
+  getBackTopLabels,
+  getBackTopOffsetStyle,
+  getBackTopPositionClasses,
+  getBackTopVisibilityClasses,
+  getScrollRootEventTarget,
   mergeStyleValues,
+  mergeTigerLocale,
+  resolveScrollRoot,
   scrollToTop,
-  backTopBaseClasses,
-  backTopButtonClasses,
-  backTopContainerClasses,
-  backTopHiddenClasses,
-  backTopVisibleClasses,
   backTopIconPath,
-  getViewportOffsetStyle,
-  isBrowser,
-  viewportFloatingBaseClasses,
-  viewportPlacementClasses,
   type BackTopPosition,
   type BackTopProps,
   type BackTopVisibilityController,
+  type ScrollRootInput,
+  type TigerLocale,
+  type TigerLocaleBackTop,
   type ViewportOffset,
   type ViewportPlacement
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueBackTopProps extends BackTopProps {
-  target?: () => HTMLElement | Window | null
   className?: string
   style?: Record<string, unknown>
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleBackTop>
 }
+
+export type { BackTopProps }
 
 const DefaultIcon = h(
   'svg',
@@ -55,29 +51,17 @@ export const BackTop = defineComponent({
   name: 'TigerBackTop',
   inheritAttrs: false,
   props: {
-    /**
-     * Scroll height to show the BackTop button
-     * @default 400
-     */
     visibilityHeight: {
       type: Number,
       default: 400
     },
-    /**
-     * Target element to listen for scroll events
-     * @default () => window
-     */
     target: {
-      type: Function as PropType<() => HTMLElement | Window | null>,
-      default: () => (isBrowser() ? window : null)
+      type: [String, Object, Function] as PropType<ScrollRootInput>,
+      default: undefined
     },
-    /**
-     * Use immediate scroll when set to 0; positive values use native smooth scrolling
-     * @default 450
-     */
     duration: {
       type: Number,
-      default: 450
+      default: undefined
     },
     position: {
       type: String as PropType<BackTopPosition>,
@@ -98,78 +82,116 @@ export const BackTop = defineComponent({
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleBackTop>>,
+      default: undefined
     }
   },
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
     const visible = ref(false)
-    const targetElement = shallowRef<HTMLElement | Window | null>(null)
-    let visibilityController: BackTopVisibilityController | undefined
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labelSet = computed(() => getBackTopLabels(mergedLocale.value, props.labels))
 
-    const handleClick = (event: MouseEvent) => {
-      if (!targetElement.value) return
-      scrollToTop(targetElement.value, props.duration)
-      emit('click', event)
+    const resolvedKey = computed(() => {
+      const root = resolveScrollRoot(props.target)
+      return root.isWindow ? 'window' : root.target
+    })
+    let visibilityController: BackTopVisibilityController | undefined
+    let boundTarget: EventTarget | null = null
+
+    const unbind = () => {
+      if (boundTarget && visibilityController) {
+        boundTarget.removeEventListener('scroll', visibilityController.schedule)
+      }
+      visibilityController?.cancel()
+      visibilityController = undefined
+      boundTarget = null
     }
 
-    onMounted(() => {
-      targetElement.value = props.target() ?? (isBrowser() ? window : null)
-      if (!targetElement.value) return
+    const bind = () => {
+      unbind()
+      const root = resolveScrollRoot(props.target)
+      const eventTarget = getScrollRootEventTarget(root)
+      const scrollNode = root.target
+      if (!eventTarget || !scrollNode) return
       visibilityController = createBackTopVisibilityController({
-        target: targetElement.value,
+        target: scrollNode as HTMLElement | Window,
         getVisibilityHeight: () => props.visibilityHeight,
         onChange: (nextVisible) => {
           visible.value = nextVisible
         }
       })
-      targetElement.value.addEventListener('scroll', visibilityController.schedule, {
-        passive: true
-      })
+      eventTarget.addEventListener('scroll', visibilityController.schedule, { passive: true })
+      boundTarget = eventTarget
       visibilityController.update()
+    }
+
+    const handleClick = (event: MouseEvent) => {
+      const root = resolveScrollRoot(props.target)
+      if (!root.target) {
+        emit('click', event)
+        return
+      }
+      scrollToTop(root.target as HTMLElement | Window, props.duration)
+      emit('click', event)
+    }
+
+    onMounted(() => {
+      bind()
     })
+
+    watch(resolvedKey, () => {
+      bind()
+    })
+
+    watch(
+      () => props.visibilityHeight,
+      () => {
+        visibilityController?.update()
+      }
+    )
 
     onBeforeUnmount(() => {
-      if (targetElement.value && visibilityController) {
-        targetElement.value.removeEventListener('scroll', visibilityController.schedule)
-      }
-      visibilityController?.cancel()
+      unbind()
     })
 
-    const buttonClasses = computed(() => {
-      const target = targetElement.value ?? (isBrowser() ? props.target() : null)
-      const isWindowTarget = !target || target === window
-      const positionClasses =
-        props.position === 'fixed'
-          ? classNames(
-              viewportFloatingBaseClasses,
-              viewportPlacementClasses[props.placement],
-              backTopBaseClasses
-            )
-          : props.position === 'sticky'
-            ? backTopContainerClasses
-            : isWindowTarget
-              ? backTopButtonClasses
-              : backTopContainerClasses
-      return classNames(
-        positionClasses,
-        visible.value ? backTopVisibleClasses : backTopHiddenClasses,
+    const buttonClasses = computed(() =>
+      classNames(
+        getBackTopPositionClasses({
+          position: props.position,
+          placement: props.placement
+        }),
+        getBackTopVisibilityClasses(visible.value),
         props.className,
         coerceClassValue(attrs.class)
       )
-    })
+    )
 
     const mergedStyle = computed(() =>
       mergeStyleValues(
-        props.position === 'fixed'
-          ? getViewportOffsetStyle(props.placement, props.offset)
-          : undefined,
+        getBackTopOffsetStyle(props.position, props.placement, props.offset),
         attrs.style,
         props.style
       )
     )
 
     return () => {
-      const content = slots.default ? slots.default() : DefaultIcon
+      const hasSlot = Boolean(slots.default)
+      const content = hasSlot ? slots.default!() : DefaultIcon
+      const userLabel = attrs['aria-label']
+      const ariaLabel =
+        typeof userLabel === 'string' && userLabel.trim()
+          ? userLabel
+          : hasSlot
+            ? undefined
+            : labelSet.value.ariaLabel
 
       return h(
         'button',
@@ -178,7 +200,9 @@ export const BackTop = defineComponent({
           type: 'button',
           class: buttonClasses.value,
           style: mergedStyle.value,
-          'aria-label': attrs['aria-label'] ?? 'Back to top',
+          'aria-label': ariaLabel,
+          'aria-hidden': visible.value ? undefined : 'true',
+          tabindex: visible.value ? 0 : -1,
           onClick: handleClick
         },
         content

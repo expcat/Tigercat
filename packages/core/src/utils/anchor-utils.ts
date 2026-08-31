@@ -5,6 +5,7 @@
 
 import type { AnchorDirection } from '../types/anchor'
 import { isBrowser } from './env'
+import { resolveScrollRoot, type ScrollRootInput } from './scroll-root'
 
 /**
  * Base anchor wrapper classes
@@ -12,21 +13,16 @@ import { isBrowser } from './env'
 export const anchorBaseClasses = 'relative'
 
 /**
- * Anchor wrapper classes for fixed positioning
- */
-export const anchorAffixClasses = 'fixed'
-
-/**
  * Anchor ink container classes (vertical)
  */
 export const anchorInkContainerVerticalClasses =
-  'absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
+  'absolute start-0 top-0 bottom-0 w-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
 
 /**
  * Anchor ink container classes (horizontal)
  */
 export const anchorInkContainerHorizontalClasses =
-  'absolute left-0 right-0 bottom-0 h-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
+  'absolute start-0 end-0 bottom-0 h-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
 
 /**
  * Active ink indicator classes (vertical)
@@ -38,17 +34,19 @@ export const anchorInkActiveVerticalClasses =
  * Active ink indicator classes (horizontal)
  */
 export const anchorInkActiveHorizontalClasses =
-  'absolute h-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[left,width] duration-200 ease-in-out motion-reduce:transition-none'
+  'absolute h-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[inset-inline-start,width] duration-200 ease-in-out motion-reduce:transition-none'
 
 /**
  * Anchor link list classes (vertical)
  */
-export const anchorLinkListVerticalClasses = 'pl-4 space-y-2'
+export const anchorLinkListVerticalClasses = 'ps-4 space-y-2'
 
 /**
  * Anchor link list classes (horizontal)
  */
-export const anchorLinkListHorizontalClasses = 'flex items-center space-x-4 pb-2'
+export const anchorLinkListHorizontalClasses = 'flex items-center gap-x-4 pb-2'
+
+export const anchorNestedListClasses = 'ps-3 mt-1 space-y-1'
 
 /**
  * Anchor link base classes
@@ -62,10 +60,10 @@ export const anchorLinkBaseClasses =
 export const anchorLinkActiveClasses = 'text-[var(--tiger-primary,#2563eb)] font-medium'
 
 /**
- * Get anchor wrapper classes
+ * Get anchor nav classes. Affix is a real Affix wrapper, not a naked `fixed`.
  */
-export function getAnchorWrapperClasses(affix: boolean, className?: string): string {
-  return [anchorBaseClasses, affix && anchorAffixClasses, className].filter(Boolean).join(' ')
+export function getAnchorWrapperClasses(className?: string): string {
+  return [anchorBaseClasses, className].filter(Boolean).join(' ')
 }
 
 /**
@@ -137,21 +135,7 @@ export function getContainerScrollTop(container: HTMLElement | Window): number {
 }
 
 /**
- * Get container height
- */
-export function getContainerHeight(container: HTMLElement | Window): number {
-  if (!isBrowser()) {
-    return (container as HTMLElement | undefined)?.clientHeight ?? 0
-  }
-
-  if (container === window) {
-    return window.innerHeight
-  }
-  return (container as HTMLElement).clientHeight
-}
-
-/**
- * Get element offset relative to container
+ * Get element offset relative to container using the same rect space as observers.
  */
 export function getElementOffsetTop(element: HTMLElement, container: HTMLElement | Window): number {
   if (!isBrowser()) {
@@ -159,28 +143,101 @@ export function getElementOffsetTop(element: HTMLElement, container: HTMLElement
   }
 
   if (container === window) {
-    const rect = element.getBoundingClientRect()
-    return rect.top + window.scrollY
+    return element.getBoundingClientRect().top + window.scrollY
   }
 
-  // Calculate offset relative to scrolling container
-  // Walk up the offsetParent chain to find the position relative to container
   const containerEl = container as HTMLElement
-  let offset = 0
-  let el: HTMLElement | null = element
+  return (
+    element.getBoundingClientRect().top -
+    containerEl.getBoundingClientRect().top +
+    containerEl.scrollTop
+  )
+}
 
-  while (el && el !== containerEl) {
-    offset += el.offsetTop
-    el = el.offsetParent as HTMLElement | null
-    // If we've gone outside the container, just use bounding rect calculation
-    if (el === null || el === document.body) {
-      const containerRect = containerEl.getBoundingClientRect()
-      const elementRect = element.getBoundingClientRect()
-      return elementRect.top - containerRect.top + containerEl.scrollTop
+export function resolveAnchorScrollContainer(input?: ScrollRootInput): HTMLElement | Window {
+  const root = resolveScrollRoot(input)
+  if (!root.target || root.isWindow) return isBrowser() ? window : (null as unknown as Window)
+  return root.target as HTMLElement
+}
+
+export interface AnchorClickLike {
+  defaultPrevented?: boolean
+  button?: number
+  metaKey?: boolean
+  ctrlKey?: boolean
+  shiftKey?: boolean
+  altKey?: boolean
+}
+
+export function shouldHandleAnchorClick(
+  event: AnchorClickLike,
+  options: { target?: string; hasTargetElement: boolean }
+): boolean {
+  if (event.defaultPrevented) return false
+  if ((event.button ?? 0) !== 0) return false
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false
+  if (options.target === '_blank') return false
+  if (!options.hasTargetElement) return false
+  return true
+}
+
+export function resolveActiveAnchorHref(
+  href: string,
+  getCurrentAnchor?: (activeLink: string) => string
+): string {
+  return getCurrentAnchor ? getCurrentAnchor(href) : href
+}
+
+export function replaceAnchorHash(href: string): void {
+  if (!isBrowser() || !href.startsWith('#')) return
+  const { pathname, search } = window.location
+  window.history.replaceState(window.history.state, '', `${pathname}${search}${href}`)
+}
+
+export function findAnchorLinkElement(root: Element, href: string): HTMLElement | null {
+  const nodes = root.querySelectorAll<HTMLElement>('[data-anchor-href]')
+  for (const node of nodes) {
+    if (node.getAttribute('data-anchor-href') === href) return node
+  }
+  return null
+}
+
+export function getAnchorInkStyle(
+  direction: AnchorDirection,
+  linkRect: { top: number; left: number; width: number; height: number },
+  rootRect: { top: number; left: number }
+): Record<string, string> {
+  if (direction === 'vertical') {
+    return {
+      top: `${linkRect.top - rootRect.top}px`,
+      height: `${linkRect.height}px`,
+      insetInlineStart: '',
+      width: ''
     }
   }
+  return {
+    insetInlineStart: `${linkRect.left - rootRect.left}px`,
+    width: `${linkRect.width}px`,
+    top: '',
+    height: ''
+  }
+}
 
-  return offset
+export function sortAnchorHrefsByDocumentOrder(
+  entries: Array<{ href: string; node: Element }>
+): string[] {
+  const sorted = [...entries].sort((a, b) => {
+    if (a.node === b.node) return 0
+    const position = a.node.compareDocumentPosition(b.node)
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1
+    if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1
+    return 0
+  })
+  const hrefs: string[] = []
+  for (const entry of sorted) {
+    if (!hrefs.includes(entry.href)) hrefs.push(entry.href)
+  }
+  return hrefs
 }
 
 /**
@@ -410,16 +467,8 @@ export interface AnchorObserverOptions {
  */
 export function createAnchorObserver(links: string[], options: AnchorObserverOptions): () => void {
   if (!isBrowser()) return () => {}
-  if (typeof IntersectionObserver === 'undefined') return () => {}
 
   const { offsetTop = 0, bounds = 5, root = null, onChange } = options
-
-  const targets = new Map<Element, string>()
-  for (const href of links) {
-    const el = getAnchorTargetElement(href)
-    if (el) targets.set(el, href)
-  }
-  if (targets.size === 0) return () => {}
 
   const computeActive = (): string => {
     const rootTop = root ? root.getBoundingClientRect().top : 0
@@ -438,26 +487,44 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   }
 
   let last = ''
-  const observer = new IntersectionObserver(
-    () => {
-      const next = computeActive()
-      if (next !== last) {
-        last = next
-        onChange(next)
-      }
-    },
-    {
-      root,
-      // Top inset at the offset line; 0 bottom so last sections still notify.
-      rootMargin: `-${offsetTop}px 0px 0px 0px`,
-      threshold: [0, 1]
+  const emit = (): void => {
+    const next = computeActive()
+    if (next !== last) {
+      last = next
+      onChange(next)
     }
-  )
+  }
+
+  const targets = new Map<Element, string>()
+  for (const href of links) {
+    const el = getAnchorTargetElement(href)
+    if (el) targets.set(el, href)
+  }
+
+  if (typeof IntersectionObserver === 'undefined') {
+    const scrollTarget: EventTarget = root ?? window
+    scrollTarget.addEventListener('scroll', emit, { passive: true })
+    window.addEventListener('resize', emit, { passive: true })
+    emit()
+    return () => {
+      scrollTarget.removeEventListener('scroll', emit)
+      window.removeEventListener('resize', emit)
+    }
+  }
+
+  if (targets.size === 0) {
+    emit()
+    return () => {}
+  }
+
+  const observer = new IntersectionObserver(emit, {
+    root,
+    rootMargin: `-${offsetTop}px 0px 0px 0px`,
+    threshold: [0, 1]
+  })
 
   for (const target of targets.keys()) observer.observe(target)
 
-  // Initial synchronous emit using the same last-at-offset-line rule. IO
-  // callbacks may not fire on mount in all environments (e.g. test shims).
   const initial = computeActive()
   if (initial) {
     last = initial

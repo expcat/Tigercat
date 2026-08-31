@@ -33,6 +33,8 @@ describe('BackTop', () => {
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('aria-label', 'Back to top')
     expect(button).toHaveAttribute('type', 'button')
+    expect(button).toHaveAttribute('tabindex', '-1')
+    expect(button).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('renders custom content via slot', () => {
@@ -108,8 +110,7 @@ describe('BackTop', () => {
 
     const button = container.querySelector('button')
     expect(button).toHaveClass('custom-class')
-    // When target is a custom container (not window), uses sticky positioning
-    expect(button).toHaveClass('sticky')
+    expect(button).toHaveClass('fixed')
   })
 
   it('uses fixed positioning when target is window', () => {
@@ -143,9 +144,9 @@ describe('BackTop', () => {
     const button = container.querySelector('button')
     expect(button).toHaveClass('fixed')
     expect(button).toHaveClass('bottom-0')
-    expect(button).toHaveClass('left-0')
+    expect(button).toHaveClass('start-0')
     expect(button).not.toHaveClass('sticky')
-    expect(button?.style.left).toBe('24px')
+    expect(button?.style.insetInlineStart).toBe('24px')
     expect(button?.style.bottom).toBe('2rem')
 
     await fireEvent.click(button!)
@@ -170,13 +171,17 @@ describe('BackTop', () => {
   })
 
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('should have no accessibility violations when visible', async () => {
       const { container } = render(BackTop, {
         props: {
+          visibilityHeight: 0,
           target: () => scrollContainer
         }
       })
 
+      await waitFor(() =>
+        expect(container.querySelector('button')).toHaveAttribute('tabindex', '0')
+      )
       await expectNoA11yViolationsIsolated(container)
     })
 

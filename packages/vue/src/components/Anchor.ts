@@ -7,6 +7,7 @@ import {
   inject,
   onMounted,
   onBeforeUnmount,
+  onUpdated,
   watch,
   nextTick,
   PropType,
@@ -16,27 +17,42 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  mergeTigerLocale,
+  getAnchorLabels,
   getAnchorWrapperClasses,
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
   getAnchorLinkClasses,
   getAnchorLinkListClasses,
+  anchorNestedListClasses,
   createAnchorObserver,
   createProgrammaticScrollLock,
+  findAnchorLinkElement,
+  getAnchorInkStyle,
+  getAnchorTargetElement,
+  replaceAnchorHash,
+  resolveActiveAnchorHref,
+  resolveAnchorScrollContainer,
+  resolveScrollRoot,
   scrollToAnchor,
-  type AnchorDirection
+  shouldHandleAnchorClick,
+  sortAnchorHrefsByDocumentOrder,
+  type AnchorDirection,
+  type ScrollRootInput,
+  type TigerLocale,
+  type TigerLocaleAnchor
 } from '@expcat/tigercat-core'
+import { Affix } from './Affix'
+import { useTigerConfig } from './ConfigProvider'
 
-// Anchor context key
 export const AnchorContextKey = Symbol('AnchorContext')
 
-// Anchor context interface
 export interface AnchorContext {
   activeLink: string
   direction: AnchorDirection
-  registerLink: (href: string) => void
-  unregisterLink: (href: string) => void
-  handleLinkClick: (href: string, event: Event) => void
+  registerLink: (href: string, node: Element) => void
+  unregisterLink: (href: string, node: Element) => void
+  handleLinkClick: (href: string, event: Event, targetAttr?: string) => void
   scrollTo: (href: string) => void
 }
 
@@ -47,11 +63,15 @@ export interface VueAnchorProps {
   showInkInFixed?: boolean
   targetOffset?: number
   getCurrentAnchor?: (activeLink: string) => string
-  getContainer?: () => HTMLElement | Window
+  getContainer?: ScrollRootInput
   direction?: AnchorDirection
   className?: string
   style?: Record<string, unknown>
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleAnchor>
 }
+
+export type AnchorProps = VueAnchorProps
 
 export interface VueAnchorLinkProps {
   href: string
@@ -60,27 +80,20 @@ export interface VueAnchorLinkProps {
   className?: string
 }
 
+export type AnchorLinkProps = VueAnchorLinkProps
+
 export const AnchorLink = defineComponent({
   name: 'TigerAnchorLink',
   inheritAttrs: false,
   props: {
-    /**
-     * Target anchor ID (with #)
-     */
     href: {
       type: String,
       required: true
     },
-    /**
-     * Link title/text
-     */
     title: {
       type: String,
       default: undefined
     },
-    /**
-     * Link target attribute
-     */
     target: {
       type: String,
       default: undefined
@@ -92,78 +105,68 @@ export const AnchorLink = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const anchorContext = inject<AnchorContext | null>(AnchorContextKey, null)
+    const linkRef = ref<HTMLElement | null>(null)
+
+    const register = () => {
+      if (linkRef.value) anchorContext?.registerLink(props.href, linkRef.value)
+    }
 
     onMounted(() => {
-      anchorContext?.registerLink(props.href)
+      register()
     })
 
-    // Keep the parent registry in sync when href changes dynamically
     watch(
       () => props.href,
-      (next, prev) => {
-        anchorContext?.unregisterLink(prev)
-        anchorContext?.registerLink(next)
+      (_next, prev) => {
+        if (linkRef.value && prev) anchorContext?.unregisterLink(prev, linkRef.value)
+        register()
       }
     )
 
     onBeforeUnmount(() => {
-      anchorContext?.unregisterLink(props.href)
+      if (linkRef.value) anchorContext?.unregisterLink(props.href, linkRef.value)
     })
 
     const handleClick = (event: Event) => {
-      event.preventDefault()
-      anchorContext?.handleLinkClick(props.href, event)
+      const userClick = (attrs as { onClick?: (event: Event) => void }).onClick
+      userClick?.(event)
+      if (!anchorContext) return
+      anchorContext.handleLinkClick(props.href, event, props.target)
     }
 
     const linkClasses = computed(() => {
       const isActive = anchorContext?.activeLink === props.href
       return classNames(
-        getAnchorLinkClasses(isActive, props.className),
+        getAnchorLinkClasses(Boolean(isActive), props.className),
         coerceClassValue(attrs.class)
       )
     })
 
     return () => {
       const slotContent = slots.default?.()
-      const hasNestedLinks =
-        slotContent &&
-        Array.isArray(slotContent) &&
-        slotContent.some(
-          (vnode) => vnode.type && (vnode.type as { name?: string }).name === 'TigerAnchorLink'
-        )
-
-      if (hasNestedLinks) {
-        return h('div', { class: 'anchor-link-wrapper' }, [
-          h(
-            'a',
-            {
-              ...attrs,
-              href: props.href,
-              target: props.target,
-              class: linkClasses.value,
-              'data-anchor-href': props.href,
-              onClick: handleClick
-            },
-            props.title
-          ),
-          h('div', { class: 'pl-3 mt-1 space-y-1' }, slotContent)
-        ])
-      }
-
-      const content = slotContent ?? props.title
-
-      return h(
+      const nested = props.title != null && Boolean(slotContent?.length)
+      const isActive = anchorContext?.activeLink === props.href
+      const link = h(
         'a',
         {
           ...attrs,
+          ref: linkRef,
           href: props.href,
           target: props.target,
           class: linkClasses.value,
           'data-anchor-href': props.href,
+          'aria-current': isActive ? 'location' : undefined,
           onClick: handleClick
         },
-        content
+        nested ? props.title : (slotContent ?? props.title)
       )
+
+      if (!anchorContext) return link
+
+      return h('li', [
+        link,
+        nested ? h('ul', { class: anchorNestedListClasses }, slotContent) : null
+      ])
     }
   }
 })
@@ -172,64 +175,34 @@ export const Anchor = defineComponent({
   name: 'TigerAnchor',
   inheritAttrs: false,
   props: {
-    /**
-     * Whether to fix the anchor to the viewport
-     * @default true
-     */
     affix: {
       type: Boolean,
       default: true
     },
-    /**
-     * Anchor detection boundary in pixels
-     * @default 5
-     */
     bounds: {
       type: Number,
       default: 5
     },
-    /**
-     * Offset from top of viewport when fixed
-     * @default 0
-     */
     offsetTop: {
       type: Number,
       default: 0
     },
-    /**
-     * Whether to show ink indicator when in fixed mode
-     * @default false
-     */
     showInkInFixed: {
       type: Boolean,
-      default: false
+      default: true
     },
-    /**
-     * Offset when scrolling to target anchor
-     */
     targetOffset: {
       type: Number,
       default: undefined
     },
-    /**
-     * Custom function to determine current active anchor
-     */
     getCurrentAnchor: {
       type: Function as PropType<(activeLink: string) => string>,
       default: undefined
     },
-    /**
-     * Get the scroll container
-     * @default () => window
-     */
     getContainer: {
-      type: Function as PropType<() => HTMLElement | Window>,
-      default: () => window
+      type: [String, Object, Function] as PropType<ScrollRootInput>,
+      default: undefined
     },
-    /**
-     * Direction of the anchor navigation
-     * @default 'vertical'
-     */
     direction: {
       type: String as PropType<AnchorDirection>,
       default: 'vertical'
@@ -241,40 +214,62 @@ export const Anchor = defineComponent({
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleAnchor>>,
+      default: undefined
     }
   },
   emits: ['click', 'change'],
-  setup(props, { slots, emit, attrs }) {
+  setup(props, { slots, emit, attrs, expose }) {
     const activeLink = ref('')
-    const links = ref<string[]>([])
+    const linkEntries = ref<Array<{ href: string; node: Element }>>([])
     const anchorRef = ref<HTMLElement | null>(null)
     const inkRef = ref<HTMLElement | null>(null)
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labelSet = computed(() => getAnchorLabels(mergedLocale.value, props.labels))
 
-    // Get current container (call fresh each time to handle lazy refs)
-    const getContainer = () => props.getContainer()
-    const scrollLock = createProgrammaticScrollLock(getContainer)
-
-    // Scroll offset: targetOffset takes priority, falling back to offsetTop
+    const scrollLock = createProgrammaticScrollLock(() =>
+      resolveAnchorScrollContainer(props.getContainer)
+    )
     const scrollOffset = computed(() => props.targetOffset ?? props.offsetTop)
+    const links = computed(() => sortAnchorHrefsByDocumentOrder(linkEntries.value))
 
-    // Register a link
-    const registerLink = (href: string) => {
-      if (href && !links.value.includes(href)) {
-        links.value = [...links.value, href]
+    const registerLink = (href: string, node: Element) => {
+      const existing = linkEntries.value.find((entry) => entry.node === node)
+      if (existing) {
+        existing.href = href
+        linkEntries.value = [...linkEntries.value]
+        return
       }
+      linkEntries.value = [...linkEntries.value, { href, node }]
     }
 
-    // Unregister a link
-    const unregisterLink = (href: string) => {
-      links.value = links.value.filter((l) => l !== href)
+    const unregisterLink = (href: string, node: Element) => {
+      linkEntries.value = linkEntries.value.filter(
+        (entry) => entry.node !== node || entry.href !== href
+      )
     }
 
-    // Active link tracking via IntersectionObserver
+    const applyActive = (href: string): string => {
+      const finalHref = resolveActiveAnchorHref(href, props.getCurrentAnchor)
+      if (finalHref !== activeLink.value) {
+        activeLink.value = finalHref
+        emit('change', finalHref)
+      }
+      return finalHref
+    }
+
     let stopObserver: (() => void) | null = null
 
     const setupObserver = () => {
       stopObserver?.()
-      const container = getContainer()
+      const container = resolveAnchorScrollContainer(props.getContainer)
       const root = container === window ? null : (container as Element)
       stopObserver = createAnchorObserver(links.value, {
         offsetTop: scrollOffset.value,
@@ -282,79 +277,71 @@ export const Anchor = defineComponent({
         root,
         onChange: (newActiveLink) => {
           if (scrollLock.isLocked()) return
-          const finalActiveLink = props.getCurrentAnchor
-            ? props.getCurrentAnchor(newActiveLink)
-            : newActiveLink
-          if (finalActiveLink !== activeLink.value) {
-            activeLink.value = finalActiveLink
-            emit('change', finalActiveLink)
-          }
+          applyActive(newActiveLink)
         }
       })
     }
 
-    // Scroll to anchor
     const scrollTo = (href: string) => {
-      scrollToAnchor(href, getContainer(), scrollOffset.value)
+      scrollToAnchor(href, resolveAnchorScrollContainer(props.getContainer), scrollOffset.value)
     }
 
-    // Handle link click
-    const handleLinkClick = (href: string, event: Event) => {
+    const handleLinkClick = (href: string, event: Event, targetAttr?: string) => {
+      const hasTargetElement = Boolean(getAnchorTargetElement(href))
+      if (
+        !shouldHandleAnchorClick(event as MouseEvent, {
+          target: targetAttr,
+          hasTargetElement
+        })
+      ) {
+        emit('click', event, href)
+        return
+      }
+      event.preventDefault()
       emit('click', event, href)
-
+      const finalHref = applyActive(href)
       scrollLock.lock()
-      activeLink.value = href
-
-      scrollTo(href)
+      scrollTo(finalHref)
+      replaceAnchorHash(finalHref)
     }
 
-    // Update ink position
     const updateInkPosition = () => {
-      if (!inkRef.value || !anchorRef.value || !activeLink.value) {
-        return
-      }
-
-      const activeLinkElement = anchorRef.value.querySelector(
-        `[data-anchor-href="${activeLink.value}"]`
-      ) as HTMLElement | null
-
-      if (!activeLinkElement) {
-        return
-      }
-
-      const anchorRect = anchorRef.value.getBoundingClientRect()
-      const linkRect = activeLinkElement.getBoundingClientRect()
-
-      if (props.direction === 'vertical') {
-        inkRef.value.style.top = `${linkRect.top - anchorRect.top}px`
-        inkRef.value.style.height = `${linkRect.height}px`
-      } else {
-        inkRef.value.style.left = `${linkRect.left - anchorRect.left}px`
-        inkRef.value.style.width = `${linkRect.width}px`
-      }
+      if (!inkRef.value || !anchorRef.value || !activeLink.value) return
+      const activeLinkElement = findAnchorLinkElement(anchorRef.value, activeLink.value)
+      if (!activeLinkElement) return
+      const next = getAnchorInkStyle(
+        props.direction,
+        activeLinkElement.getBoundingClientRect(),
+        anchorRef.value.getBoundingClientRect()
+      )
+      inkRef.value.style.top = next.top
+      inkRef.value.style.height = next.height
+      inkRef.value.style.insetInlineStart = next.insetInlineStart
+      inkRef.value.style.width = next.width
     }
 
-    // Watch activeLink for ink position updates
-    watch(activeLink, () => {
-      updateInkPosition()
+    const resolvedKey = computed(() => {
+      const resolved = resolveScrollRoot(props.getContainer)
+      return resolved.isWindow ? 'window' : resolved.target
     })
 
-    // Watch direction for ink position updates
+    watch(activeLink, () => {
+      nextTick(updateInkPosition)
+    })
     watch(() => props.direction, updateInkPosition)
+    watch([links, scrollOffset, resolvedKey, () => props.bounds], () => {
+      nextTick(() => setupObserver())
+    })
 
-    // Store current container for cleanup
     onMounted(() => {
-      // Use nextTick to ensure sibling refs are ready
       nextTick(() => {
         setupObserver()
-        // Initial ink position update
-        setTimeout(updateInkPosition, 0)
+        updateInkPosition()
       })
     })
 
-    // Re-setup observer when links list, offset, or bounds change
-    watch([links, scrollOffset, () => props.getContainer, () => props.bounds], () => {
-      nextTick(() => setupObserver())
+    onUpdated(() => {
+      updateInkPosition()
     })
 
     onBeforeUnmount(() => {
@@ -362,37 +349,11 @@ export const Anchor = defineComponent({
       scrollLock.dispose()
     })
 
-    // Computed classes
-    const wrapperClasses = computed(() => {
-      return classNames(
-        getAnchorWrapperClasses(props.affix, props.className),
-        coerceClassValue(attrs.class)
-      )
-    })
-
-    const inkContainerClasses = computed(() => {
-      return getAnchorInkContainerClasses(props.direction)
-    })
-
-    const inkActiveClasses = computed(() => {
-      return getAnchorInkActiveClasses(props.direction)
-    })
-
-    const linkListClasses = computed(() => {
-      return getAnchorLinkListClasses(props.direction)
-    })
-
+    const wrapperClasses = computed(() =>
+      classNames(getAnchorWrapperClasses(props.className), coerceClassValue(attrs.class))
+    )
     const showInk = computed(() => !props.affix || props.showInkInFixed)
 
-    const wrapperStyle = computed(() => {
-      const baseStyle: Record<string, unknown> = {}
-      if (props.affix && props.offsetTop > 0) {
-        baseStyle.top = `${props.offsetTop}px`
-      }
-      return mergeStyleValues(attrs.style, props.style, baseStyle)
-    })
-
-    // Provide context to child AnchorLinks
     const contextValue = reactive<AnchorContext>({
       activeLink: '',
       direction: props.direction,
@@ -402,7 +363,6 @@ export const Anchor = defineComponent({
       scrollTo
     })
 
-    // Keep context in sync
     watch([activeLink, () => props.direction], ([newActive, newDir]) => {
       contextValue.activeLink = newActive
       contextValue.direction = newDir
@@ -410,37 +370,46 @@ export const Anchor = defineComponent({
 
     provide(AnchorContextKey, contextValue)
 
+    expose({
+      scrollTo
+    })
+
     return () => {
+      const attrsRecord = attrs as Record<string, unknown>
+      const navLabel =
+        (typeof attrsRecord['aria-label'] === 'string' && attrsRecord['aria-label']) ||
+        labelSet.value.ariaLabel
+
       const inkIndicator = showInk.value
         ? [
-            h('div', { class: inkContainerClasses.value }, [
+            h('div', { class: getAnchorInkContainerClasses(props.direction) }, [
               h('div', {
                 ref: inkRef,
-                class: inkActiveClasses.value
+                class: getAnchorInkActiveClasses(props.direction)
               })
             ])
           ]
         : []
 
-      return h(
-        'div',
+      const nav = h(
+        'nav',
         {
           ...attrs,
           ref: anchorRef,
           class: wrapperClasses.value,
-          style: wrapperStyle.value
+          style: mergeStyleValues(attrs.style, props.style),
+          'aria-label': navLabel
         },
         [
           ...inkIndicator,
-          h(
-            'div',
-            {
-              class: linkListClasses.value
-            },
-            slots.default?.()
-          )
+          h('ul', { class: getAnchorLinkListClasses(props.direction) }, slots.default?.())
         ]
       )
+
+      if (props.affix) {
+        return h(Affix, { offsetTop: props.offsetTop }, { default: () => nav })
+      }
+      return nav
     }
   }
 })

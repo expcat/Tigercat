@@ -496,6 +496,12 @@ export const deDE: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Zurück'
   },
+  backTop: {
+    ariaLabel: 'Nach oben'
+  },
+  anchor: {
+    ariaLabel: 'Auf dieser Seite'
+  },
   steps: {
     ariaLabel: 'Schritte',
     waitStatus: 'Ausstehend',

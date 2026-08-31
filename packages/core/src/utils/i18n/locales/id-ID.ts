@@ -495,6 +495,12 @@ export const idID: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Kembali'
   },
+  backTop: {
+    ariaLabel: 'Kembali ke atas'
+  },
+  anchor: {
+    ariaLabel: 'Di halaman ini'
+  },
   steps: {
     ariaLabel: 'Langkah',
     waitStatus: 'Menunggu',

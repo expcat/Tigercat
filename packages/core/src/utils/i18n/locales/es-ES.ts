@@ -496,6 +496,12 @@ export const esES: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Atrás'
   },
+  backTop: {
+    ariaLabel: 'Volver arriba'
+  },
+  anchor: {
+    ariaLabel: 'En esta página'
+  },
   steps: {
     ariaLabel: 'Pasos',
     waitStatus: 'Pendiente',

@@ -1,40 +1,54 @@
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
+  forwardRef,
   useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
   useMemo,
-  useRef
+  useRef,
+  useState
 } from 'react'
 import {
   classNames,
-  getAnchorWrapperClasses,
-  getAnchorInkContainerClasses,
-  getAnchorInkActiveClasses,
-  getAnchorLinkClasses,
-  getAnchorLinkListClasses,
+  anchorNestedListClasses,
   createAnchorObserver,
   createProgrammaticScrollLock,
+  findAnchorLinkElement,
+  getAnchorInkActiveClasses,
+  getAnchorInkContainerClasses,
+  getAnchorInkStyle,
+  getAnchorLabels,
+  getAnchorLinkClasses,
+  getAnchorLinkListClasses,
+  getAnchorTargetElement,
+  getAnchorWrapperClasses,
+  mergeTigerLocale,
+  replaceAnchorHash,
+  resolveActiveAnchorHref,
+  resolveAnchorScrollContainer,
+  resolveScrollRoot,
   scrollToAnchor,
+  shouldHandleAnchorClick,
+  sortAnchorHrefsByDocumentOrder,
   type AnchorDirection,
-  type AnchorProps as CoreAnchorProps
+  type AnchorProps as CoreAnchorProps,
+  type TigerLocale,
+  type TigerLocaleAnchor
 } from '@expcat/tigercat-core'
+import { Affix } from './Affix'
+import { useTigerConfig } from './ConfigProvider'
 
-// Anchor context interface
 export interface AnchorContextValue {
   activeLink: string
   direction: AnchorDirection
-  registerLink: (href: string) => void
-  unregisterLink: (href: string) => void
-  handleLinkClick: (href: string, event: React.MouseEvent) => void
-  scrollTo: (href: string) => void
+  registerLink: (href: string, node: Element) => void
+  unregisterLink: (href: string, node: Element) => void
+  handleLinkClick: (href: string, event: React.MouseEvent, targetAttr?: string) => void
 }
 
-// Create anchor context
 const AnchorContext = createContext<AnchorContextValue | null>(null)
 
-// Hook to use anchor context
 export function useAnchorContext(): AnchorContextValue | null {
   return useContext(AnchorContext)
 }
@@ -43,21 +57,9 @@ export interface AnchorLinkProps extends Omit<
   React.AnchorHTMLAttributes<HTMLAnchorElement>,
   'href'
 > {
-  /**
-   * Target anchor ID (with #)
-   */
   href: string
-  /**
-   * Link title/text
-   */
-  title?: string
-  /**
-   * Link target attribute
-   */
+  title?: React.ReactNode
   target?: string
-  /**
-   * Children content
-   */
   children?: React.ReactNode
 }
 
@@ -67,197 +69,187 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
   target,
   className,
   children,
+  onClick,
   ...props
 }) => {
   const anchorContext = useAnchorContext()
-
-  // Extract stable function references from context to avoid re-running
-  // registration on every activeLink change (which recreates contextValue).
+  const nodeRef = useRef<HTMLAnchorElement>(null)
   const register = anchorContext?.registerLink
   const unregister = anchorContext?.unregisterLink
 
-  useEffect(() => {
-    if (href) {
-      register?.(href)
-    }
-
+  useLayoutEffect(() => {
+    const node = nodeRef.current
+    if (!href || !node || !register) return undefined
+    register(href, node)
     return () => {
-      unregister?.(href)
+      unregister?.(href, node)
     }
   }, [href, register, unregister])
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault()
-    anchorContext?.handleLinkClick(href, event)
+    onClick?.(event)
+    if (!anchorContext) return
+    anchorContext.handleLinkClick(href, event, target)
   }
 
-  const linkClasses = useMemo(() => {
-    const isActive = anchorContext?.activeLink === href
-    return classNames(getAnchorLinkClasses(isActive, className))
-  }, [anchorContext?.activeLink, href, className])
+  const isActive = anchorContext?.activeLink === href
+  const linkClasses = classNames(getAnchorLinkClasses(Boolean(isActive), className))
+  const nested = title != null && children != null
 
-  const hasNestedLinks = React.Children.toArray(children).some(
-    (child) => React.isValidElement(child) && child.type === AnchorLink
-  )
-
-  if (hasNestedLinks) {
-    return (
-      <div className="anchor-link-wrapper">
-        <a
-          href={href}
-          target={target}
-          className={linkClasses}
-          data-anchor-href={href}
-          onClick={handleClick}
-          {...props}>
-          {title}
-        </a>
-        <div className="pl-3 mt-1 space-y-1">{children}</div>
-      </div>
-    )
-  }
-
-  const content = children ?? title
-
-  return (
+  const link = (
     <a
+      {...props}
+      ref={nodeRef}
       href={href}
       target={target}
       className={linkClasses}
       data-anchor-href={href}
-      onClick={handleClick}
-      {...props}>
-      {content}
+      aria-current={isActive ? 'location' : undefined}
+      onClick={handleClick}>
+      {nested ? title : (title ?? children)}
     </a>
+  )
+
+  if (!anchorContext) return link
+
+  return (
+    <li>
+      {link}
+      {nested ? <ul className={anchorNestedListClasses}>{children}</ul> : null}
+    </li>
   )
 }
 
-export interface AnchorProps extends Omit<CoreAnchorProps, 'style'> {
-  /**
-   * Target element to listen for scroll events
-   * @default () => window
-   */
-  getContainer?: () => HTMLElement | Window
-  /**
-   * Click event handler
-   */
+export interface AnchorProps extends Omit<CoreAnchorProps, 'style' | 'onClick'> {
   onClick?: (event: React.MouseEvent, href: string) => void
-  /**
-   * Change event handler when active anchor changes
-   */
   onChange?: (activeLink: string) => void
-  /**
-   * Children (AnchorLink components)
-   */
   children?: React.ReactNode
-  /**
-   * Custom styles
-   */
   style?: React.CSSProperties
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleAnchor>
+  'aria-label'?: string
 }
 
-export const Anchor: React.FC<AnchorProps> = ({
-  affix = true,
-  bounds = 5,
-  offsetTop = 0,
-  showInkInFixed = false,
-  targetOffset,
-  getCurrentAnchor,
-  getContainer = () => window,
-  direction = 'vertical',
-  className,
-  style,
-  onClick,
-  onChange,
-  children
-}) => {
+export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
+  {
+    affix = true,
+    bounds = 5,
+    offsetTop = 0,
+    showInkInFixed = true,
+    targetOffset,
+    getCurrentAnchor,
+    getContainer,
+    direction = 'vertical',
+    className,
+    style,
+    onClick,
+    onChange,
+    children,
+    locale,
+    labels,
+    'aria-label': ariaLabel
+  },
+  ref
+) {
   const [activeLink, setActiveLink] = useState('')
-  const [links, setLinks] = useState<string[]>([])
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const [linkEntries, setLinkEntries] = useState<Array<{ href: string; node: Element }>>([])
+  const anchorRef = useRef<HTMLElement | null>(null)
   const inkRef = useRef<HTMLDivElement>(null)
-  // Cache getContainer to avoid recreating on every render
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
-  const scrollLockRef = useRef(createProgrammaticScrollLock(() => getContainerRef.current()))
   const getCurrentAnchorRef = useRef(getCurrentAnchor)
   getCurrentAnchorRef.current = getCurrentAnchor
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
+  const scrollLockRef = useRef(
+    createProgrammaticScrollLock(() => resolveAnchorScrollContainer(getContainerRef.current))
+  )
 
-  // Get scroll offset
-  const scrollOffset = useMemo(() => targetOffset ?? offsetTop, [targetOffset, offsetTop])
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labelSet = getAnchorLabels(mergedLocale, labels)
+  const navLabel = ariaLabel ?? labelSet.ariaLabel
 
-  // Register a link
-  const registerLink = useCallback((href: string) => {
-    setLinks((prevLinks) => {
-      if (href && !prevLinks.includes(href)) {
-        return [...prevLinks, href]
+  const scrollOffset = targetOffset ?? offsetTop
+  const links = useMemo(() => sortAnchorHrefsByDocumentOrder(linkEntries), [linkEntries])
+
+  const registerLink = useCallback((href: string, node: Element) => {
+    setLinkEntries((prev) => {
+      if (prev.some((entry) => entry.node === node)) {
+        return prev.map((entry) => (entry.node === node ? { href, node } : entry))
       }
-      return prevLinks
+      return [...prev, { href, node }]
     })
   }, [])
 
-  // Unregister a link
-  const unregisterLink = useCallback((href: string) => {
-    setLinks((prevLinks) => prevLinks.filter((l) => l !== href))
+  const unregisterLink = useCallback((href: string, node: Element) => {
+    setLinkEntries((prev) => prev.filter((entry) => entry.node !== node || entry.href !== href))
   }, [])
 
-  // Scroll to anchor
+  const applyActive = useCallback((href: string) => {
+    const finalHref = resolveActiveAnchorHref(href, getCurrentAnchorRef.current)
+    setActiveLink((prev) => {
+      if (finalHref !== prev) {
+        onChangeRef.current?.(finalHref)
+        return finalHref
+      }
+      return prev
+    })
+    return finalHref
+  }, [])
+
   const scrollTo = useCallback(
     (href: string) => {
-      const container = getContainerRef.current()
+      const container = resolveAnchorScrollContainer(getContainerRef.current)
       scrollToAnchor(href, container, scrollOffset)
     },
     [scrollOffset]
   )
 
-  // Handle link click
   const handleLinkClick = useCallback(
-    (href: string, event: React.MouseEvent) => {
-      // Note: preventDefault is called by AnchorLink before invoking this handler
+    (href: string, event: React.MouseEvent, targetAttr?: string) => {
+      const hasTargetElement = Boolean(getAnchorTargetElement(href))
+      if (
+        !shouldHandleAnchorClick(event.nativeEvent, {
+          target: targetAttr,
+          hasTargetElement
+        })
+      ) {
+        onClick?.(event, href)
+        return
+      }
+      event.preventDefault()
       onClick?.(event, href)
-
+      const finalHref = applyActive(href)
       scrollLockRef.current.lock()
-      setActiveLink(href)
-
-      scrollTo(href)
+      scrollTo(finalHref)
+      replaceAnchorHash(finalHref)
     },
-    [onClick, scrollTo]
+    [applyActive, onClick, scrollTo]
   )
 
-  // Active link tracking via IntersectionObserver
+  const resolved = resolveScrollRoot(getContainer)
+  const resolvedKey = resolved.isWindow ? 'window' : resolved.target
+
   useEffect(() => {
-    let stop: (() => void) | null = null
-
-    // Small delay to ensure target sections are mounted
-    const timeoutId = setTimeout(() => {
-      const container = getContainerRef.current()
-      const root = container === window ? null : (container as Element)
-      stop = createAnchorObserver(links, {
-        offsetTop: scrollOffset,
-        bounds,
-        root,
-        onChange: (newActiveLink) => {
-          if (scrollLockRef.current.isLocked()) return
-          const finalActiveLink = getCurrentAnchorRef.current
-            ? getCurrentAnchorRef.current(newActiveLink)
-            : newActiveLink
-          setActiveLink((prev) => {
-            if (finalActiveLink !== prev) {
-              onChangeRef.current?.(finalActiveLink)
-              return finalActiveLink
-            }
-            return prev
-          })
-        }
-      })
-    }, 0)
-
+    const container = resolveAnchorScrollContainer(getContainerRef.current)
+    const root = container === window ? null : (container as Element)
+    const stop = createAnchorObserver(links, {
+      offsetTop: scrollOffset,
+      bounds,
+      root,
+      onChange: (newActiveLink) => {
+        if (scrollLockRef.current.isLocked()) return
+        applyActive(newActiveLink)
+      }
+    })
     return () => {
-      clearTimeout(timeoutId)
-      stop?.()
+      stop()
     }
-  }, [bounds, links, scrollOffset])
+  }, [bounds, links, scrollOffset, resolvedKey, applyActive])
 
   useEffect(() => {
     return () => {
@@ -265,79 +257,61 @@ export const Anchor: React.FC<AnchorProps> = ({
     }
   }, [])
 
-  // Update ink position
-  useEffect(() => {
-    if (!inkRef.current || !anchorRef.current || !activeLink) {
-      return
-    }
+  useLayoutEffect(() => {
+    const ink = inkRef.current
+    const root = anchorRef.current
+    if (!ink || !root || !activeLink) return
+    const activeLinkElement = findAnchorLinkElement(root, activeLink)
+    if (!activeLinkElement) return
+    const next = getAnchorInkStyle(
+      direction,
+      activeLinkElement.getBoundingClientRect(),
+      root.getBoundingClientRect()
+    )
+    ink.style.top = next.top
+    ink.style.height = next.height
+    ink.style.insetInlineStart = next.insetInlineStart
+    ink.style.width = next.width
+  }, [activeLink, direction, links])
 
-    const activeLinkElement = anchorRef.current.querySelector(
-      `[data-anchor-href="${activeLink}"]`
-    ) as HTMLElement | null
+  const wrapperClasses = classNames(getAnchorWrapperClasses(className))
+  const showInk = !affix || showInkInFixed
 
-    if (!activeLinkElement) {
-      return
-    }
+  const setNavRef = (node: HTMLElement | null) => {
+    anchorRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }
 
-    const anchorRect = anchorRef.current.getBoundingClientRect()
-    const linkRect = activeLinkElement.getBoundingClientRect()
-
-    if (direction === 'vertical') {
-      inkRef.current.style.top = `${linkRect.top - anchorRect.top}px`
-      inkRef.current.style.height = `${linkRect.height}px`
-    } else {
-      inkRef.current.style.left = `${linkRect.left - anchorRect.left}px`
-      inkRef.current.style.width = `${linkRect.width}px`
-    }
-  }, [activeLink, direction])
-
-  // Computed classes
-  const wrapperClasses = useMemo(
-    () => classNames(getAnchorWrapperClasses(affix, className)),
-    [affix, className]
-  )
-
-  const inkContainerClasses = useMemo(() => getAnchorInkContainerClasses(direction), [direction])
-
-  const inkActiveClasses = useMemo(() => getAnchorInkActiveClasses(direction), [direction])
-
-  const linkListClasses = useMemo(() => getAnchorLinkListClasses(direction), [direction])
-
-  const showInk = useMemo(() => !affix || showInkInFixed, [affix, showInkInFixed])
-
-  const wrapperStyle = useMemo<React.CSSProperties>(() => {
-    const baseStyle: React.CSSProperties = {}
-    if (affix && offsetTop > 0) {
-      baseStyle.top = `${offsetTop}px`
-    }
-    return { ...baseStyle, ...style }
-  }, [affix, offsetTop, style])
-
-  // Context value
   const contextValue = useMemo<AnchorContextValue>(
     () => ({
       activeLink,
       direction,
       registerLink,
       unregisterLink,
-      handleLinkClick,
-      scrollTo
+      handleLinkClick
     }),
-    [activeLink, direction, registerLink, unregisterLink, handleLinkClick, scrollTo]
+    [activeLink, direction, registerLink, unregisterLink, handleLinkClick]
+  )
+
+  const nav = (
+    <nav ref={setNavRef} className={wrapperClasses} style={style} aria-label={navLabel}>
+      {showInk && (
+        <div className={getAnchorInkContainerClasses(direction)}>
+          <div ref={inkRef} className={getAnchorInkActiveClasses(direction)} />
+        </div>
+      )}
+      <ul className={getAnchorLinkListClasses(direction)}>{children}</ul>
+    </nav>
   )
 
   return (
     <AnchorContext.Provider value={contextValue}>
-      <div ref={anchorRef} className={wrapperClasses} style={wrapperStyle}>
-        {showInk && (
-          <div className={inkContainerClasses}>
-            <div ref={inkRef} className={inkActiveClasses} />
-          </div>
-        )}
-        <div className={linkListClasses}>{children}</div>
-      </div>
+      {affix ? <Affix offsetTop={offsetTop}>{nav}</Affix> : nav}
     </AnchorContext.Provider>
   )
-}
+})
+
+Anchor.displayName = 'Anchor'
 
 export default Anchor

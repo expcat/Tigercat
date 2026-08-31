@@ -1,36 +1,28 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   createBackTopVisibilityController,
+  getBackTopLabels,
+  getBackTopOffsetStyle,
+  getBackTopPositionClasses,
+  getBackTopVisibilityClasses,
+  getScrollRootEventTarget,
+  mergeTigerLocale,
+  resolveScrollRoot,
   scrollToTop,
-  backTopBaseClasses,
-  backTopButtonClasses,
-  backTopContainerClasses,
-  backTopHiddenClasses,
-  backTopVisibleClasses,
   backTopIconPath,
-  getViewportOffsetStyle,
-  isBrowser,
-  viewportFloatingBaseClasses,
-  viewportPlacementClasses,
-  type BackTopProps as CoreBackTopProps
+  type BackTopProps as CoreBackTopProps,
+  type TigerLocale,
+  type TigerLocaleBackTop
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface BackTopProps
   extends CoreBackTopProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
-  /**
-   * Target element to listen for scroll events
-   * @default () => window
-   */
-  target?: () => HTMLElement | Window | null
-  /**
-   * Click event handler
-   */
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-  /**
-   * Custom content for the button
-   */
   children?: React.ReactNode
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleBackTop>
 }
 
 const DefaultIcon: React.FC = () => (
@@ -46,92 +38,114 @@ const DefaultIcon: React.FC = () => (
   </svg>
 )
 
-const getDefaultTarget = () => (isBrowser() ? window : null)
-
-export const BackTop: React.FC<BackTopProps> = ({
-  visibilityHeight = 400,
-  target = getDefaultTarget,
-  duration = 450,
-  position = 'auto',
-  placement = 'bottom-right',
-  offset,
-  onClick,
-  children,
-  className,
-  style,
-  'aria-label': ariaLabel = 'Back to top',
-  ...props
-}) => {
+export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function BackTop(
+  {
+    visibilityHeight = 400,
+    target,
+    duration,
+    position = 'auto',
+    placement = 'bottom-right',
+    offset,
+    onClick,
+    children,
+    className,
+    style,
+    locale,
+    labels,
+    'aria-label': ariaLabel,
+    ...props
+  },
+  ref
+) {
   const [visible, setVisible] = useState(false)
-  const [targetElement, setTargetElement] = useState<HTMLElement | Window | null>(null)
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labelSet = getBackTopLabels(mergedLocale, labels)
+
+  const resolved = resolveScrollRoot(target)
+  const resolvedKey = resolved.isWindow ? 'window' : resolved.target
+  const visibilityHeightRef = useRef(visibilityHeight)
+  visibilityHeightRef.current = visibilityHeight
+  const controllerRef = useRef<ReturnType<typeof createBackTopVisibilityController> | undefined>(
+    undefined
+  )
 
   useEffect(() => {
-    const el = target()
-    setTargetElement(el)
-    if (!el) return
+    const root = resolveScrollRoot(target)
+    const eventTarget = getScrollRootEventTarget(root)
+    const scrollNode = root.target
+    if (!eventTarget || !scrollNode) return undefined
 
     const visibilityController = createBackTopVisibilityController({
-      target: el,
-      getVisibilityHeight: () => visibilityHeight,
+      target: scrollNode as HTMLElement | Window,
+      getVisibilityHeight: () => visibilityHeightRef.current,
       onChange: setVisible
     })
-
-    el.addEventListener('scroll', visibilityController.schedule, { passive: true })
+    controllerRef.current = visibilityController
+    eventTarget.addEventListener('scroll', visibilityController.schedule, { passive: true })
     visibilityController.update()
 
     return () => {
-      el.removeEventListener('scroll', visibilityController.schedule)
+      eventTarget.removeEventListener('scroll', visibilityController.schedule)
       visibilityController.cancel()
-      setTargetElement(null)
+      controllerRef.current = undefined
     }
-  }, [target, visibilityHeight])
+  }, [resolvedKey, target])
+
+  useEffect(() => {
+    controllerRef.current?.update()
+  }, [visibilityHeight])
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
-      const el = target()
-      if (el) scrollToTop(el, duration)
+      const root = resolveScrollRoot(target)
+      if (root.target) scrollToTop(root.target as HTMLElement | Window, duration)
       onClick?.(event)
     },
     [target, duration, onClick]
   )
 
-  const buttonClasses = useMemo(() => {
-    const positionClasses =
-      position === 'fixed'
-        ? classNames(
-            viewportFloatingBaseClasses,
-            viewportPlacementClasses[placement],
-            backTopBaseClasses
-          )
-        : position === 'sticky'
-          ? backTopContainerClasses
-          : !targetElement || targetElement === window
-            ? backTopButtonClasses
-            : backTopContainerClasses
-    return classNames(
-      positionClasses,
-      visible ? backTopVisibleClasses : backTopHiddenClasses,
-      className
-    )
-  }, [position, placement, targetElement, visible, className])
-
-  const buttonStyle = useMemo(
+  const buttonClasses = useMemo(
     () =>
-      position === 'fixed' ? { ...getViewportOffsetStyle(placement, offset), ...style } : style,
-    [position, placement, offset, style]
+      classNames(
+        getBackTopPositionClasses({ position, placement }),
+        getBackTopVisibilityClasses(visible),
+        className
+      ),
+    [position, placement, visible, className]
   )
+
+  const buttonStyle = useMemo(() => {
+    const offsetStyle = getBackTopOffsetStyle(position, placement, offset)
+    return offsetStyle ? { ...offsetStyle, ...style } : style
+  }, [position, placement, offset, style])
+
+  const resolvedAriaLabel =
+    typeof ariaLabel === 'string' && ariaLabel.trim()
+      ? ariaLabel
+      : children
+        ? undefined
+        : labelSet.ariaLabel
 
   return (
     <button
+      {...props}
+      ref={ref}
       type="button"
       className={buttonClasses}
       style={buttonStyle}
-      aria-label={ariaLabel}
-      onClick={handleClick}
-      {...props}>
+      aria-label={resolvedAriaLabel}
+      aria-hidden={visible ? undefined : true}
+      tabIndex={visible ? 0 : -1}
+      onClick={handleClick}>
       {children || <DefaultIcon />}
     </button>
   )
-}
+})
+
+BackTop.displayName = 'BackTop'
 
 export default BackTop

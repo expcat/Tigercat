@@ -498,6 +498,12 @@ export const enUS: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Back'
   },
+  backTop: {
+    ariaLabel: 'Back to top'
+  },
+  anchor: {
+    ariaLabel: 'On this page'
+  },
   steps: {
     ariaLabel: 'Steps',
     waitStatus: 'Pending',

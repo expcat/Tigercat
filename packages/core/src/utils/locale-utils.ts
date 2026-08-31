@@ -40,6 +40,8 @@ import type {
   TigerLocaleTabs,
   TigerLocaleBreadcrumb,
   TigerLocalePageHeader,
+  TigerLocaleBackTop,
+  TigerLocaleAnchor,
   TigerLocaleSteps,
   TigerLocaleRate,
   TigerLocaleAvatarGroup,
@@ -399,6 +401,20 @@ export function getPageHeaderLabels(
   overrides?: Partial<TigerLocalePageHeader>
 ): Required<TigerLocalePageHeader> {
   return resolveLocaleSection(enSection('pageHeader'), locale?.pageHeader, overrides)
+}
+
+export function getBackTopLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleBackTop>
+): Required<TigerLocaleBackTop> {
+  return resolveLocaleSection(enSection('backTop'), locale?.backTop, overrides)
+}
+
+export function getAnchorLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleAnchor>
+): Required<TigerLocaleAnchor> {
+  return resolveLocaleSection(enSection('anchor'), locale?.anchor, overrides)
 }
 
 export function getStepsLabels(

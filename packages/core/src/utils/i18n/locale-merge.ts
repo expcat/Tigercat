@@ -57,6 +57,8 @@ export const TIGER_LOCALE_KEY_SET = {
   tabs: true,
   breadcrumb: true,
   pageHeader: true,
+  backTop: true,
+  anchor: true,
   steps: true,
   rate: true,
   avatarGroup: true,

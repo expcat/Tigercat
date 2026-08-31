@@ -334,9 +334,16 @@ export type { VueSunburstChartProps } from './components/SunburstChart'
 export { Carousel } from './components/Carousel'
 export type { CarouselProps, VueCarouselProps, CarouselMethods } from './components/Carousel'
 export { BackTop } from './components/BackTop'
-export type { VueBackTopProps } from './components/BackTop'
+export type { VueBackTopProps, BackTopProps } from './components/BackTop'
 export { Anchor, AnchorLink } from './components/Anchor'
-export type { VueAnchorProps, VueAnchorLinkProps, AnchorContext } from './components/Anchor'
+export type {
+  VueAnchorProps,
+  VueAnchorLinkProps,
+  AnchorProps,
+  AnchorLinkProps,
+  AnchorContext
+} from './components/Anchor'
+export { AnchorContextKey } from './components/Anchor'
 export { TaskBoard } from './components/TaskBoard'
 export type { VueTaskBoardProps } from './components/TaskBoard'
 

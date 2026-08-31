@@ -18,7 +18,6 @@ import {
   exportChartPng,
   findActiveAnchor,
   getAnchorTargetElement,
-  getContainerHeight,
   getContainerScrollTop,
   getElementOffsetTop,
   handleMenuNavigation,
@@ -73,7 +72,6 @@ describe('browser-only utility guards', () => {
     expect(captureActiveElement()).toBeNull()
     expect(getAnchorTargetElement('#section')).toBeNull()
     expect(getContainerScrollTop(container)).toBe(12)
-    expect(getContainerHeight(container)).toBe(240)
     expect(getElementOffsetTop(element, container)).toBe(0)
     expect(findActiveAnchor(['#first', '#second'], container)).toBe('#first')
     expect(() => scrollToAnchor('#first', container)).not.toThrow()
@@ -82,7 +80,11 @@ describe('browser-only utility guards', () => {
     expect(disconnect).toEqual(expect.any(Function))
     expect(() => disconnect()).not.toThrow()
 
-    const menu = { querySelectorAll: () => [] } as unknown as HTMLElement
+    const menu = {
+      querySelectorAll: () => [],
+      querySelector: () => null,
+      matches: () => true
+    } as unknown as HTMLElement
     expect(handleMenuNavigation(menu, { key: 'ArrowDown' } as KeyboardEvent)).toBe(false)
   })
 

@@ -16,6 +16,9 @@ describe('back-top-utils', () => {
     expect(getScrollTop(container)).toBe(240)
     expect(shouldShowBackTop(container, 200)).toBe(true)
     expect(shouldShowBackTop(container, 300)).toBe(false)
+    expect(shouldShowBackTop(container, Number.NaN)).toBe(false)
+    container.scrollTop = 400
+    expect(shouldShowBackTop(container, Number.NaN)).toBe(true)
   })
 
   it('throttles visibility updates to one animation frame', () => {
@@ -67,13 +70,11 @@ describe('back-top-utils', () => {
   it('uses native smooth scroll for positive duration', () => {
     const container = document.createElement('div')
     const scrollTo = vi.fn()
-    const callback = vi.fn()
     Object.defineProperty(container, 'scrollTo', { value: scrollTo, configurable: true })
 
-    scrollToTop(container, 450, callback)
+    scrollToTop(container, 450)
 
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
-    expect(callback).toHaveBeenCalledTimes(1)
   })
 
   it('uses immediate scroll for zero duration', () => {

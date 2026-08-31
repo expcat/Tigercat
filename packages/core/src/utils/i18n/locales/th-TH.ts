@@ -495,6 +495,12 @@ export const thTH: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'ย้อนกลับ'
   },
+  backTop: {
+    ariaLabel: 'กลับขึ้นด้านบน'
+  },
+  anchor: {
+    ariaLabel: 'ในหน้านี้'
+  },
   steps: {
     ariaLabel: 'ขั้นตอน',
     waitStatus: 'รอดำเนินการ',

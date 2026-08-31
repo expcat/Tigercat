@@ -2,6 +2,8 @@
  * Anchor component types and interfaces
  */
 
+import type { ScrollRootInput } from './scroll-root'
+
 /**
  * Anchor direction - determines the orientation of the anchor navigation
  */
@@ -12,7 +14,7 @@ export type AnchorDirection = 'vertical' | 'horizontal'
  */
 export interface AnchorProps {
   /**
-   * Whether to fix the anchor to the viewport
+   * Whether to pin the anchor with Affix (placeholder + live geometry).
    * @default true
    */
   affix?: boolean
@@ -22,28 +24,29 @@ export interface AnchorProps {
    */
   bounds?: number
   /**
-   * Offset from top of viewport when fixed
+   * Offset from top of the scroll root when Affix is on, and fallback
+   * scroll offset when `targetOffset` is omitted.
    * @default 0
    */
   offsetTop?: number
   /**
-   * Whether to show ink indicator when in fixed mode
-   * @default false
+   * Whether to show the ink indicator when Affix is on.
+   * @default true
    */
   showInkInFixed?: boolean
   /**
-   * Offset when scrolling to target anchor
+   * Offset when scrolling to a target section
    */
   targetOffset?: number
   /**
-   * Custom function to determine current active anchor
+   * Transform the detected active href. This is not a controlled value.
    */
   getCurrentAnchor?: (activeLink: string) => string
   /**
-   * Get the scroll container
-   * @default () => window
+   * Scroll container for spy / scrollTo. Selector, Element, Window, or getter.
+   * @default window
    */
-  getContainer?: () => HTMLElement | Window
+  getContainer?: ScrollRootInput
   /**
    * Direction of the anchor navigation
    * @default 'vertical'
@@ -57,6 +60,14 @@ export interface AnchorProps {
    * Custom styles
    */
   style?: Record<string, string | number>
+  /**
+   * Clicked href after the internal handler runs
+   */
+  onClick?: (event: Event, href: string) => void
+  /**
+   * Active href from click or scroll. Click and scroll share this path.
+   */
+  onChange?: (activeLink: string) => void
 }
 
 /**
@@ -68,7 +79,7 @@ export interface AnchorLinkProps {
    */
   href: string
   /**
-   * Link title/text
+   * Link title/text. Nested `AnchorLink` children go below the title.
    */
   title?: string
   /**
@@ -79,28 +90,4 @@ export interface AnchorLinkProps {
    * Additional CSS classes
    */
   className?: string
-}
-
-/**
- * Anchor click event info
- */
-export interface AnchorClickInfo {
-  /**
-   * The click event
-   */
-  event: Event
-  /**
-   * The href of the clicked link
-   */
-  href: string
-}
-
-/**
- * Anchor change event info
- */
-export interface AnchorChangeInfo {
-  /**
-   * The active anchor href
-   */
-  activeLink: string
 }

@@ -495,6 +495,12 @@ export const arSA: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'رجوع'
   },
+  backTop: {
+    ariaLabel: 'العودة إلى الأعلى'
+  },
+  anchor: {
+    ariaLabel: 'في هذه الصفحة'
+  },
   steps: {
     ariaLabel: 'الخطوات',
     waitStatus: 'قيد الانتظار',

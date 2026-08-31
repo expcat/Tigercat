@@ -40,75 +40,61 @@ describe('Anchor', () => {
 
       expect(screen.getByText('Link 1')).toBeInTheDocument()
       expect(screen.getByText('Link 2')).toBeInTheDocument()
-      expect(container.firstChild).toHaveClass('relative')
+      expect(screen.getByRole('navigation')).toHaveClass('relative')
     })
 
-    it('should render with affix class when affix is true', () => {
-      const { container } = render(
+    it('does not use a naked fixed class for default affix', () => {
+      render(
         <Anchor affix getContainer={() => scrollContainer}>
           <AnchorLink href="#section1" title="Link 1" />
         </Anchor>
       )
 
-      expect(container.firstChild).toHaveClass('fixed')
+      expect(screen.getByRole('navigation')).not.toHaveClass('fixed')
     })
 
     it('should not render with affix class when affix is false', () => {
-      const { container } = render(
+      render(
         <Anchor affix={false} getContainer={() => scrollContainer}>
           <AnchorLink href="#section1" title="Link 1" />
         </Anchor>
       )
 
-      expect(container.firstChild).not.toHaveClass('fixed')
+      expect(screen.getByRole('navigation')).not.toHaveClass('fixed')
     })
 
     it('should render with vertical direction by default', () => {
-      const { container } = render(
+      render(
         <Anchor getContainer={() => scrollContainer} affix={false}>
           <AnchorLink href="#section1" title="Link 1" />
         </Anchor>
       )
 
-      const anchorEl = container.firstChild as HTMLElement
-      const children = anchorEl.querySelectorAll(':scope > div')
-      const linkList = children[children.length - 1]
-      expect(linkList).toHaveClass('pl-4')
+      const linkList = screen.getByRole('navigation').querySelector('ul')
+      expect(linkList).toHaveClass('ps-4')
       expect(linkList).toHaveClass('space-y-2')
     })
 
     it('should render with horizontal direction', () => {
-      const { container } = render(
+      render(
         <Anchor direction="horizontal" getContainer={() => scrollContainer} affix={false}>
           <AnchorLink href="#section1" title="Link 1" />
         </Anchor>
       )
 
-      const anchorEl = container.firstChild as HTMLElement
-      const children = anchorEl.querySelectorAll(':scope > div')
-      const linkList = children[children.length - 1]
+      const linkList = screen.getByRole('navigation').querySelector('ul')
       expect(linkList).toHaveClass('flex')
-      expect(linkList).toHaveClass('space-x-4')
+      expect(linkList).toHaveClass('gap-x-4')
     })
 
     it('should apply custom className', () => {
-      const { container } = render(
-        <Anchor className="custom-class" getContainer={() => scrollContainer}>
+      render(
+        <Anchor className="custom-class" getContainer={() => scrollContainer} affix={false}>
           <AnchorLink href="#section1" title="Link 1" />
         </Anchor>
       )
 
-      expect(container.firstChild).toHaveClass('custom-class')
-    })
-
-    it('should apply offsetTop style when affix and offsetTop are set', () => {
-      const { container } = render(
-        <Anchor affix offsetTop={100} getContainer={() => scrollContainer}>
-          <AnchorLink href="#section1" title="Link 1" />
-        </Anchor>
-      )
-
-      expect(container.firstChild).toHaveStyle({ top: '100px' })
+      expect(screen.getByRole('navigation')).toHaveClass('custom-class')
     })
   })
 
@@ -197,6 +183,37 @@ describe('Anchor', () => {
 
       expect(onClick).toHaveBeenCalledTimes(1)
       expect(onClick).toHaveBeenCalledWith(expect.any(Object), '#section1')
+    })
+
+    it('emits onChange when a link is clicked', async () => {
+      const onChange = vi.fn()
+
+      render(
+        <Anchor affix={false} onChange={onChange} getContainer={() => scrollContainer}>
+          <AnchorLink href="#section1" title="Link 1" />
+          <AnchorLink href="#section2" title="Link 2" />
+        </Anchor>
+      )
+
+      await fireEvent.click(screen.getByText('Link 2'))
+      expect(onChange).toHaveBeenCalledWith('#section2')
+      expect(screen.getByText('Link 2')).toHaveAttribute('aria-current', 'location')
+    })
+
+    it('does not preventDefault on ctrl+click', async () => {
+      render(
+        <Anchor affix={false} getContainer={() => scrollContainer}>
+          <AnchorLink href="#section1" title="Link" />
+        </Anchor>
+      )
+
+      const link = screen.getByText('Link')
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true, ctrlKey: true })
+      const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
+      await act(async () => {
+        link.dispatchEvent(event)
+      })
+      expect(preventDefaultSpy).not.toHaveBeenCalled()
     })
 
     it('should prevent default behavior on link click', async () => {
@@ -314,7 +331,13 @@ describe('Anchor', () => {
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Anchor />)
+      const { container } = render(
+        <Anchor affix={false} getContainer={() => scrollContainer}>
+          <AnchorLink href="#section1" title="Link 1" />
+          <AnchorLink href="#section2" title="Link 2" />
+        </Anchor>
+      )
+      expect(screen.getByRole('navigation')).toBeInTheDocument()
       await expectNoA11yViolationsIsolated(container)
     })
   })

@@ -495,6 +495,12 @@ export const jaJP: TigerLocale = {
   pageHeader: {
     backAriaLabel: '戻る'
   },
+  backTop: {
+    ariaLabel: 'トップへ戻る'
+  },
+  anchor: {
+    ariaLabel: 'このページ'
+  },
   steps: {
     ariaLabel: 'ステップ',
     waitStatus: '待機',

@@ -495,6 +495,12 @@ export const koKR: TigerLocale = {
   pageHeader: {
     backAriaLabel: '뒤로'
   },
+  backTop: {
+    ariaLabel: '맨 위로'
+  },
+  anchor: {
+    ariaLabel: '이 페이지'
+  },
   steps: {
     ariaLabel: '단계',
     waitStatus: '대기',

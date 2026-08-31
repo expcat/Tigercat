@@ -447,6 +447,16 @@ export interface TigerLocalePageHeader {
   backAriaLabel?: string
 }
 
+export interface TigerLocaleBackTop {
+  /** Default BackTop button accessible name when there is no visible text */
+  ariaLabel?: string
+}
+
+export interface TigerLocaleAnchor {
+  /** Default Anchor landmark name */
+  ariaLabel?: string
+}
+
 export interface TigerLocaleSteps {
   /** Default steps list accessible name */
   ariaLabel?: string
@@ -753,6 +763,8 @@ export interface TigerLocale {
   tabs?: TigerLocaleTabs
   breadcrumb?: TigerLocaleBreadcrumb
   pageHeader?: TigerLocalePageHeader
+  backTop?: TigerLocaleBackTop
+  anchor?: TigerLocaleAnchor
   steps?: TigerLocaleSteps
   rate?: TigerLocaleRate
   avatarGroup?: TigerLocaleAvatarGroup

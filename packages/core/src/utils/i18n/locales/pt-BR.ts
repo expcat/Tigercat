@@ -496,6 +496,12 @@ export const ptBR: TigerLocale = {
   pageHeader: {
     backAriaLabel: 'Voltar'
   },
+  backTop: {
+    ariaLabel: 'Voltar ao topo'
+  },
+  anchor: {
+    ariaLabel: 'Nesta página'
+  },
   steps: {
     ariaLabel: 'Etapas',
     waitStatus: 'Pendente',

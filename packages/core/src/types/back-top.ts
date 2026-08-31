@@ -2,6 +2,7 @@
  * BackTop component types and interfaces
  */
 
+import type { ScrollRootInput } from './scroll-root'
 import type { ViewportOffset, ViewportPlacement } from './viewport'
 
 /**
@@ -14,31 +15,42 @@ export type BackTopPosition = 'auto' | 'fixed' | 'sticky'
  */
 export interface BackTopProps {
   /**
-   * Scroll height to show the BackTop button
+   * Scroll height to show the BackTop button.
+   * Non-finite values fall back to 400.
    * @default 400
    */
   visibilityHeight?: number
 
   /**
-   * Use immediate scroll when set to 0; positive values use native smooth scrolling
-   * @default 450
+   * Scroll container. Selector, Element, Window, or getter.
+   * Defaults to `window`.
+   */
+  target?: ScrollRootInput
+
+  /**
+   * 0 (or any non-positive finite number) uses instant scroll.
+   * Any positive number uses the browser's native smooth scroll.
+   * Duration is not milliseconds.
+   * @default 'smooth'
    */
   duration?: number
 
   /**
-   * Positioning strategy. Auto preserves the historical window=fixed/container=sticky behavior.
+   * Positioning strategy. `auto` and `fixed` both pin to the viewport
+   * using `placement` / `offset`. `sticky` is for placing the button
+   * inside the scroll container.
    * @default 'auto'
    */
   position?: BackTopPosition
 
   /**
-   * Fixed viewport corner used when position is fixed.
+   * Viewport corner used when position is auto or fixed.
    * @default 'bottom-right'
    */
   placement?: ViewportPlacement
 
   /**
-   * Fixed viewport offset used when position is fixed.
+   * Viewport offset used when position is auto or fixed.
    * @default 24
    */
   offset?: ViewportOffset
