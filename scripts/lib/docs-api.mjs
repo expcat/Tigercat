@@ -344,6 +344,28 @@ export const COMPONENT_PROP_PRIORITY = {
   ],
   Transfer: ['dataSource?', 'value?', 'targetKeys?', 'searchable?', 'disabled?'],
   CropUpload: ['accept?', 'maxSize?', 'cropperProps?', 'onCropComplete?', 'disabled?'],
+  VirtualList: [
+    'itemCount?',
+    'itemHeight?',
+    'height?',
+    'overscan?',
+    'getItemHeight?',
+    'estimatedItemHeight?',
+    'sizeStrategy?'
+  ],
+  InfiniteScroll: [
+    'hasMore?',
+    'loading?',
+    'onLoadMore?',
+    'direction?',
+    'inverse?',
+    'disabled?',
+    'threshold?',
+    'height?',
+    'loadingText?',
+    'endText?',
+    'locale?'
+  ],
   ColorSwatch: [
     'value?',
     'defaultValue?',
@@ -535,7 +557,11 @@ export const REQUIRED_USAGE_SNIPPETS = {
     TagsInput: '<TagsInput v-model="tags" />',
     Upload: '<Upload v-model:file-list="fileList" />',
     Transfer: '<Transfer v-model="targetKeys" :data-source="dataSource" />',
-    CropUpload: '<CropUpload @crop-complete="onCropComplete" />'
+    CropUpload: '<CropUpload @crop-complete="onCropComplete" />',
+    VirtualList:
+      '<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>',
+    InfiniteScroll:
+      '<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -597,7 +623,11 @@ export const REQUIRED_USAGE_SNIPPETS = {
     TagsInput: '<TagsInput value={tags} onChange={setTags} />',
     Upload: '<Upload fileList={fileList} onChange={(file, next) => setFileList(next)} />',
     Transfer: '<Transfer value={targetKeys} dataSource={dataSource} onChange={setTargetKeys} />',
-    CropUpload: '<CropUpload onCropComplete={onCropComplete} />'
+    CropUpload: '<CropUpload onCropComplete={onCropComplete} />',
+    VirtualList:
+      '<VirtualList itemCount={count} itemHeight={40} renderItem={({ index }) => <div>{index}</div>} />',
+    InfiniteScroll:
+      '<InfiniteScroll hasMore={hasMore} height={288} onLoadMore={loadMore}>{items}</InfiniteScroll>'
   }
 }
 

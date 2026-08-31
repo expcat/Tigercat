@@ -4,6 +4,10 @@
 
 ## 未发布
 
+VirtualList / Table / VirtualTable 行窗口现在是同一份 exclusive 算术：默认 overscan 下可见条数比旧的 VirtualList/Table 少（不再 `2 * overscan` 后再 inclusive 多渲一行）。`height` 只收 px。命令式滚动用 `scrollToIndex` / `scrollToOffset`，不要再找 `firstElementChild` 写 `scrollTop` 再 `dispatchEvent('scroll')`。嵌在 Tree/List 里的 VirtualList 请传 `role="none"`。删除类型 `VirtualListItemSize`。Vue 主入口导出 `VirtualListProps`。
+
+InfiniteScroll 必须把滚动盒定高（`height` 或 class），否则会一次拉完或拉不动。`onLoadMore` / `@load-more` 必须同步把 `loading` 置 true。`threshold` 是像素 rootMargin，不是 IO 相交比例。横向 sentinel 不再是 0×0。`inverse` 的结束文案在内容前。Vue 主入口导出 `InfiniteScrollProps`。
+
 Upload 不传 `action` 也不传 `customRequest` 时文件停在 `ready`，不再标 `success`。`autoUpload={false}` 用 ref / expose 的 `submit()`。React `onChange` 仍是 `(file, fileList)`，FormItem 写入的是第二参列表。`listType="picture"` 现在是带缩略图的文本行。隐藏 file input 改 `sr-only`，不要再给它 `name`。
 
 Transfer 省略 `value` / `targetKeys` 时移动会改两栏。`1` 与 `'1'` 是同一 key。面板不再是 `listbox`/`option`。React `onChange` 第一参仍是目标键数组。Vue 主入口导出 `TransferProps`。

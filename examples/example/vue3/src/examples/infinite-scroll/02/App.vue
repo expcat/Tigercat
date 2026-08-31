@@ -26,9 +26,8 @@ const loadMore = () => {
       direction="horizontal"
       :has-more="hasMore"
       :loading="loading"
-      loading-text="正在加载卡片..."
-      end-text="已加载全部卡片"
-      class-name="h-44 gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700"
+      :height="176"
+      class-name="gap-3 rounded-lg border border-[var(--tiger-border,#e5e7eb)] p-3"
       @load-more="loadMore">
       <article
         v-for="item in items"

@@ -1,7 +1,7 @@
 {
   "id": "infinite-scroll-02",
   "title": "横向增量加载",
-  "description": "direction=horizontal 将容器切换为横向滚动，并在右侧边界触发分批加载与结束状态。",
+  "description": "横向滚动。sentinel 至少 1×1，滚到逻辑终点分批加载。容器必须定高。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

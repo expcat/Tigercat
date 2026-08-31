@@ -1,7 +1,7 @@
 {
   "id": "infinite-scroll-01",
   "title": "增量加载",
-  "description": "单个滚动容器展示加载状态、结束状态与自定义文案。",
+  "description": "容器必须定高（height 或 class）。第一页只有 3 条，不够高时会连拉到填满。文案走 locale.common。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

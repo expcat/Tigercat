@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **VirtualList / InfiniteScroll / 窗口算术**：行窗口只留 `calculateVirtualRange`（exclusive end、两侧对称 overscan、NaN 闸）。Table `getTableVirtualWindow` 与 VirtualList `getFixedVirtualRange` 都转这份。variable/dynamic 的 `endIndex` 是最后一条与视口相交的项；dynamic 在 `itemCount` 增长时保留已测高度。VirtualList 暴露 `scrollToIndex` / `scrollToOffset` / `getScrollElement`，固定项 `overflow: hidden`，滚动根可聚焦并默认 `role="list"`（嵌在 Tree/List 里传 `role="none"`）。InfiniteScroll 的 `loading` 会重建观察者、sentinel 至少 1×1、`end` 跟 sentinel 同一侧；`onLoadMore` 必须同步把 `loading` 置 true。容器必须定高（`height` 或 class）。Vue 导出 `VirtualListProps` / `InfiniteScrollProps`。删除未使用的 `VirtualListItemSize`。
 - **Upload**：选文件 / 校验 / 请求 / 中止下沉 core。不传 `action` 且不传 `customRequest` 时列表停在 `ready`，不再假成功。`autoUpload={false}` 必须 `submit()`。进行中 Remove 不会把项写回。FormItem 写入 `UploadFile[]`。`picture` 是带缩略图的文本行。Vue 导出 `UploadProps`，React `UploadRef` 含 `submit` / `abort`。
 - **Transfer**：勾选 / 全选 / 移动下沉 core。补非受控 `defaultValue`；右侧按 `targetKeys` 顺序。面板是 checkbox 组（带头上全选），不再是 listbox 套 checkbox。默认渲染并过滤 `description`。读 FormItem。假 `--tiger-transfer-*` 删掉。Vue 导出 `TransferProps`。
 - **CropUpload**：object URL + generation，确认钮等 cropper `onReady`。`CropResult.file` 带原名。触发器是 `<label>`；有可见 children 时不再盖英文 `aria-label`。footer 只留 Modal 一层 chrome。

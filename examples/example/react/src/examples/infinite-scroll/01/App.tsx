@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
 
 export default function App() {
-  const [items, setItems] = useState(() => Array.from({ length: 10 }, (_, index) => index + 1))
+  const [items, setItems] = useState(() => Array.from({ length: 3 }, (_, index) => index + 1))
   const [loading, setLoading] = useState(false)
   const hasMore = items.length < 30
 
@@ -22,12 +22,11 @@ export default function App() {
     <InfiniteScroll
       hasMore={hasMore}
       loading={loading}
-      loadingText="正在加载更多..."
-      endText="没有更多数据了"
+      height={288}
       onLoadMore={loadMore}
-      className="h-72 rounded border border-gray-200">
+      className="rounded border border-[var(--tiger-border,#e5e7eb)]">
       {items.map((item) => (
-        <div key={item} className="border-b px-4 py-3">
+        <div key={item} className="border-b border-[var(--tiger-border,#e5e7eb)] px-4 py-3">
           项目 {item}
         </div>
       ))}

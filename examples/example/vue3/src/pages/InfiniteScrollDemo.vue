@@ -9,6 +9,6 @@ const modules = getDemoModules('infinite-scroll')
 <template>
   <DemoPage
     title="InfiniteScroll 无限滚动"
-    description="滚动到底部自动加载更多内容。"
+    description="滚到阈值自动加载更多。容器必须定高。02 是横向。"
     :modules="modules" />
 </template>

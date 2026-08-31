@@ -7,7 +7,7 @@ export default function VirtualListDemo() {
   return (
     <DemoPage
       title="VirtualList 虚拟列表"
-      description="虚拟滚动渲染大量列表项，只渲染可视区域内的元素。"
+      description="只渲染可视窗口里的项。height 是 px 数字；命令式滚动用 scrollToIndex。"
       modules={modules}
     />
   )

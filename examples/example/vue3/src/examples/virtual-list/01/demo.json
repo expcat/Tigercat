@@ -1,7 +1,7 @@
 {
   "id": "virtual-list-01",
   "title": "大数据列表",
-  "description": "一个实例组合展示固定行高、视口高度与 overscan；其他数值按业务数据调整。",
+  "description": "固定行高、默认 height=400 与 overscan=5。height 只收 px，不会跟着父级变高。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

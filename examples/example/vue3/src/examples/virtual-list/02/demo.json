@@ -1,0 +1,13 @@
+{
+  "id": "virtual-list-02",
+  "title": "可变行高",
+  "description": "getItemHeight 按索引返回已知高度。滚动窗口只渲染相交的项。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

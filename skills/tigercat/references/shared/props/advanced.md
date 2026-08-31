@@ -60,13 +60,18 @@ Note: ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`
 
 ## InfiniteScroll
 
-`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 3/13 props
+`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 8/15 props
 
-| Prop        | Type                   | Default | Notes                                   |
-| ----------- | ---------------------- | ------- | --------------------------------------- |
-| `loading?`  | `boolean`              | `-`     | Whether a load is currently in progress |
-| `disabled?` | `boolean`              | `-`     | Disable the infinite scroll trigger     |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | -                                       |
+| Prop           | Type                         | Default | Notes                                                                                      |
+| -------------- | ---------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `hasMore?`     | `boolean`                    | `-`     | Whether more data is available                                                             |
+| `loading?`     | `boolean`                    | `-`     | Whether a load is currently in progress                                                    |
+| `direction?`   | `'vertical' \| 'horizontal'` | `-`     | Scroll direction                                                                           |
+| `inverse?`     | `boolean`                    | `-`     | Inverse scroll (load at the start edge, e.g. chat history)                                 |
+| `disabled?`    | `boolean`                    | `-`     | Disable the infinite scroll trigger                                                        |
+| `threshold?`   | `number`                     | `-`     | Pixel `rootMargin` before the sentinel intersects (not the IO ratio). The padded edge f... |
+| `height?`      | `number`                     | `-`     | Optional px height. The box must be a scroll container (this prop, class, or style); wi... |
+| `loadingText?` | `string`                     | `-`     | Custom loading text                                                                        |
 
 ## Kanban
 
@@ -133,13 +138,18 @@ Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps ex
 
 ## VirtualList
 
-`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 3/9 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 8/11 props
 
-| Prop          | Type                                           | Default | Notes                                                  |
-| ------------- | ---------------------------------------------- | ------- | ------------------------------------------------------ |
-| `renderItem`  | `(info: { index: number }) => React.ReactNode` | `-`     | Render function for each item — receives { index }     |
-| `itemCount?`  | `number`                                       | `-`     | Total number of items                                  |
-| `itemHeight?` | `number`                                       | `-`     | Fixed item height (px) — used when itemSize is 'fixed' |
+| Prop                   | Type                                           | Default | Notes                                                                                      |
+| ---------------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `renderItem`           | `(info: { index: number }) => React.ReactNode` | `-`     | Render function for each item — receives { index }                                         |
+| `itemCount?`           | `number`                                       | `-`     | Total number of items                                                                      |
+| `itemHeight?`          | `number`                                       | `-`     | Fixed item height in px. Used when `getItemHeight` and `estimatedItemHeight` are omitte... |
+| `height?`              | `number`                                       | `400`   | Visible container height in px (not `%`, not observed from the parent).                    |
+| `overscan?`            | `number`                                       | `-`     | Extra items to render above and below the viewport (each side, not doubled).               |
+| `getItemHeight?`       | `(index: number) => number`                    | `-`     | Known height per index (variable mode). Takes precedence over estimated/fixed.             |
+| `estimatedItemHeight?` | `number`                                       | `-`     | Estimated item height for dynamic measurement. When set (and `getItemHeight` is not), t... |
+| `sizeStrategy?`        | `VirtualListSizeStrategy`                      | `-`     | Custom size strategy. Overrides `itemHeight` / `getItemHeight` / `estimatedItemHeight`.... |
 
 ## VirtualTable
 

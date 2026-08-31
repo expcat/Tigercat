@@ -29,10 +29,9 @@ export default function App() {
         direction="horizontal"
         hasMore={hasMore}
         loading={loading}
-        loadingText="正在加载卡片..."
-        endText="已加载全部卡片"
+        height={176}
         onLoadMore={loadMore}
-        className="h-44 gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+        className="gap-3 rounded-lg border border-[var(--tiger-border,#e5e7eb)] p-3">
         {items.map((item) => (
           <article
             key={item}
