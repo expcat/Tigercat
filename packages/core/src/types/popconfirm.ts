@@ -2,7 +2,7 @@
  * Popconfirm component types and interfaces
  */
 
-import type { FloatingPlacement } from '../utils/floating'
+import type { BaseFloatingPopupProps } from './floating-popup'
 
 /**
  * Popconfirm icon type
@@ -12,20 +12,9 @@ export type PopconfirmIconType = 'warning' | 'info' | 'error' | 'success' | 'que
 /**
  * Base popconfirm props interface
  */
-export interface PopconfirmProps {
+export interface PopconfirmProps extends Omit<BaseFloatingPopupProps, 'trigger'> {
   /**
-   * Whether the popconfirm is open (controlled mode)
-   */
-  open?: boolean
-
-  /**
-   * Default open state (uncontrolled mode)
-   * @default false
-   */
-  defaultOpen?: boolean
-
-  /**
-   * Popconfirm title/question text
+   * Popconfirm title/question text. Defaults to `locale.common.confirmTitle`.
    */
   title?: string
 
@@ -47,14 +36,12 @@ export interface PopconfirmProps {
   showIcon?: boolean
 
   /**
-   * Confirm button text
-   * @default '确定' (Chinese) / 'Confirm' (English)
+   * Confirm button text. Defaults to `locale.common.okText`.
    */
   okText?: string
 
   /**
-   * Cancel button text
-   * @default '取消' (Chinese) / 'Cancel' (English)
+   * Cancel button text. Defaults to `locale.common.cancelText`.
    */
   cancelText?: string
 
@@ -65,21 +52,15 @@ export interface PopconfirmProps {
   okType?: 'primary' | 'danger'
 
   /**
-   * Popconfirm placement relative to trigger
-   * @default 'top'
+   * Called when the user confirms. Return a Promise to keep the layer open
+   * and show loading on OK until it settles; reject leaves the layer open.
    */
-  placement?: FloatingPlacement
+  onConfirm?: () => void | Promise<void>
 
   /**
-   * Whether the popconfirm is disabled
-   * @default false
+   * Called when the user cancels.
    */
-  disabled?: boolean
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
+  onCancel?: () => void
 
   /**
    * Custom styles

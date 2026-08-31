@@ -9,26 +9,44 @@ export function getDropdownContainerClasses(): string {
 }
 
 /**
- * Get dropdown trigger classes
+ * Get dropdown trigger classes (self-rendered `<button type="button">`).
  */
 export function getDropdownTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-dropdown-trigger',
     'inline-flex items-center gap-1.5',
-    'select-none',
-    disabled ? 'cursor-not-allowed opacity-50 pointer-events-none' : 'cursor-pointer'
+    'select-none bg-transparent p-0 border-0 font-inherit text-inherit',
+    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
   )
 }
 
+export type DropdownChevronTone = 'muted' | 'current'
+export type DropdownChevronSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
+const DROPDOWN_CHEVRON_SIZE_CLASSES: Record<DropdownChevronSize, string> = {
+  xs: 'h-3 w-3',
+  sm: 'h-3 w-3',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5',
+  xl: 'h-5 w-5'
+}
+
 /**
- * Get dropdown chevron indicator classes
+ * Get dropdown chevron indicator classes.
+ * `tone: 'current'` follows the host button foreground (SplitButton).
  */
-export function getDropdownChevronClasses(visible: boolean): string {
+export function getDropdownChevronClasses(
+  visible: boolean,
+  options: { tone?: DropdownChevronTone; size?: DropdownChevronSize } = {}
+): string {
+  const size = options.size ?? 'md'
+  const tone = options.tone ?? 'muted'
   return classNames(
     'tiger-dropdown-chevron',
-    'w-4 h-4 shrink-0',
-    'text-[var(--tiger-text-muted,#9ca3af)]',
-    'transition-transform duration-200 ease-out',
+    'shrink-0',
+    DROPDOWN_CHEVRON_SIZE_CLASSES[size],
+    tone === 'current' ? 'text-current' : 'text-[var(--tiger-text-muted,#9ca3af)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base,transform_200ms_ease)]',
     visible && 'rotate-180'
   )
 }
@@ -44,12 +62,12 @@ export const DROPDOWN_CHEVRON_PATH = 'M6 9l6 6 6-6'
 export function getDropdownMenuClasses(): string {
   return classNames(
     'tiger-dropdown-menu',
-    'min-w-[160px]',
+    'min-w-[var(--tiger-component-dropdown-min-width,160px)]',
     'py-1.5 px-1',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
+    'rounded-[var(--tiger-component-dropdown-border-radius,var(--tiger-radius-md,0.5rem))]',
     'bg-[var(--tiger-surface,#ffffff)]',
     'border border-[var(--tiger-border,#e5e7eb)]',
-    'shadow-[0_6px_16px_-2px_rgba(0,0,0,0.12),0_2px_6px_-1px_rgba(0,0,0,0.08)]',
+    'shadow-[var(--tiger-component-dropdown-shadow,0_6px_16px_-2px_rgba(0,0,0,0.12),0_2px_6px_-1px_rgba(0,0,0,0.08))]',
     'ring-1 ring-black/[0.04]'
   )
 }
@@ -65,7 +83,7 @@ export function getDropdownItemClasses(disabled: boolean, divided: boolean): str
     'px-3 py-1.5',
     'text-sm text-[var(--tiger-text,#374151)]',
     'transition-colors duration-150',
-    'text-left',
+    'text-start',
     'focus:outline-none',
     'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)]/40 focus-visible:ring-inset',
     divided && 'mt-1 border-t border-[var(--tiger-border,#e5e7eb)] pt-1',

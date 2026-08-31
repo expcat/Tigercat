@@ -20,7 +20,9 @@ export const jaJP: TigerLocale = {
     clearText: 'クリア',
     closeMessageAriaLabel: 'メッセージを閉じる',
     closeNotificationAriaLabel: '通知を閉じる',
-    sidebarAriaLabel: 'サイドバー'
+    sidebarAriaLabel: 'サイドバー',
+    moreOptionsText: 'その他の操作',
+    confirmTitle: 'この操作を実行しますか？'
   },
   empty: {
     noData: 'データなし',

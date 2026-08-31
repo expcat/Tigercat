@@ -19,7 +19,10 @@ import {
   getContextMenuSubChevronClasses,
   getContextMenuPointStyle,
   getContextMenuOpenPoint,
+  getContextMenuSubPlacement,
+  getOverlayTriggerAria,
   injectContextMenuStyles,
+  CONTEXT_MENU_SUB_HIDE_DELAY_MS,
   CONTEXT_MENU_ENTER_CLASS,
   CONTEXT_MENU_SUB_CHEVRON_PATH,
   isContextMenuKeyboardEvent,
@@ -35,6 +38,7 @@ import {
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface ContextMenuContextValue {
   closeOnClick: boolean
@@ -71,24 +75,28 @@ export const ContextMenuMenu: React.FC<ContextMenuMenuProps> = ({
 
 export interface ContextMenuItemProps
   extends
-    Omit<CoreContextMenuItemProps, 'className' | 'key'>,
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> {
+    Omit<CoreContextMenuItemProps, 'className'>,
+    Omit<
+      React.AnchorHTMLAttributes<HTMLAnchorElement> & React.ButtonHTMLAttributes<HTMLButtonElement>,
+      'onClick' | 'disabled' | 'href'
+    > {
   className?: string
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void
   children?: React.ReactNode
 }
 
 export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
   disabled = false,
   divided = false,
+  href,
   className,
   onClick,
   children,
-  ...buttonProps
+  ...rest
 }) => {
   const context = useContext(ContextMenuContext)
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (disabled) {
       event.preventDefault()
       return
@@ -102,19 +110,20 @@ export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
   }
 
   const itemClasses = classNames(getContextMenuItemClasses(disabled, divided), className)
+  const Comp = href && !disabled ? 'a' : 'button'
 
   return (
-    <button
-      type="button"
+    <Comp
+      {...(rest as React.HTMLAttributes<HTMLElement>)}
+      {...(Comp === 'a' ? { href } : { type: 'button' as const })}
       className={itemClasses}
       role="menuitem"
       tabIndex={-1}
-      aria-disabled={disabled}
-      disabled={disabled}
-      onClick={handleClick}
-      {...buttonProps}>
+      aria-disabled={disabled || undefined}
+      disabled={Comp === 'button' ? disabled : undefined}
+      onClick={handleClick}>
       {children}
-    </button>
+    </Comp>
   )
 }
 
@@ -137,6 +146,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
   const popupCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const titleRef = useRef<HTMLButtonElement | null>(null)
   const popupRef = useRef<HTMLDivElement | null>(null)
+  const subMenuId = `tiger-context-menu-sub-${useId()}`
 
   const isExpanded = isHovered || isOpenByKeyboard
   const portalEnabled = Boolean(context?.portal)
@@ -145,7 +155,10 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
     referenceRef: titleRef,
     floatingRef: popupRef,
     enabled: Boolean(context) && isExpanded && !disabled,
-    placement: 'right-start',
+    placement: getContextMenuSubPlacement(
+      titleRef.current?.closest('[dir]')?.getAttribute('dir') ??
+        (typeof document === 'undefined' ? undefined : document.documentElement.getAttribute('dir'))
+    ),
     offset: 4,
     portal: portalEnabled,
     dismissOnEscape: true,
@@ -190,7 +203,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
     }
 
     if (portalEnabled) {
-      popupCloseTimerRef.current = setTimeout(close, 120)
+      popupCloseTimerRef.current = setTimeout(close, CONTEXT_MENU_SUB_HIDE_DELAY_MS)
       return
     }
 
@@ -207,7 +220,13 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if (disabled) return
 
-      if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') {
+      const dir =
+        titleRef.current?.closest('[dir]')?.getAttribute('dir') ??
+        document.documentElement.getAttribute('dir')
+      const openKey = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+      const closeKey = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'
+
+      if (event.key === openKey || event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         event.stopPropagation()
         setIsOpenByKeyboard(true)
@@ -216,7 +235,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
         return
       }
 
-      if (event.key === 'ArrowLeft' || event.key === 'Escape') {
+      if (event.key === closeKey || event.key === 'Escape') {
         if (isExpanded) {
           event.preventDefault()
           event.stopPropagation()
@@ -264,7 +283,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
       onMouseLeave={handleMouseLeave}
       onKeyDown={handlePopupKeyDown}
       onContextMenu={handlePopupContextMenu}>
-      <div className={getContextMenuMenuClasses()} role="menu">
+      <div id={subMenuId} className={getContextMenuMenuClasses()} role="menu">
         {children}
       </div>
     </div>
@@ -285,6 +304,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
         tabIndex={-1}
         aria-haspopup="menu"
         aria-expanded={isExpanded}
+        aria-controls={isExpanded ? subMenuId : undefined}
         aria-disabled={disabled || undefined}
         data-state={isExpanded ? 'open' : 'closed'}
         data-tiger-context-menu-sub-trigger=""
@@ -292,9 +312,17 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
+          if (disabled) return
+          if (isExpanded) {
+            setIsOpenByKeyboard(false)
+            setIsHovered(false)
+            return
+          }
+          setIsOpenByKeyboard(true)
+          setIsHovered(true)
         }}
         onKeyDown={handleTitleKeyDown}>
-        <span className="flex-1 text-left">{title}</span>
+        <span className="flex-1 text-start">{title}</span>
         <svg
           className={getContextMenuSubChevronClasses()}
           viewBox="0 0 24 24"
@@ -318,6 +346,7 @@ export interface ContextMenuProps
     Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'onContextMenu'> {
   style?: React.CSSProperties
   placement?: FloatingPlacement
+  asChild?: boolean
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
 }
@@ -330,6 +359,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   portal = true,
   offset = 0,
   placement = 'bottom-start',
+  asChild = false,
   className,
   style,
   onOpenChange,
@@ -340,7 +370,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   const visible = controlledOpen !== undefined ? controlledOpen : internalVisible
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
   const pointNodeRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
@@ -389,6 +419,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           }
         })
       } else {
+        explicitPointRef.current = false
         restoreFocus(previousActiveElementRef.current)
         previousActiveElementRef.current = null
       }
@@ -436,11 +467,18 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     [disabled, openAt]
   )
 
-  const handleMenuKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (floatingRef.current) {
-      handleMenuNavigation(floatingRef.current, event.nativeEvent)
-    }
-  }, [])
+  const handleMenuKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        setVisible(false)
+        return
+      }
+      if (floatingRef.current) {
+        handleMenuNavigation(floatingRef.current, event.nativeEvent)
+      }
+    },
+    [setVisible]
+  )
 
   const handleMenuContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault()
@@ -465,6 +503,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   const triggerClasses = useMemo(() => getContextMenuTriggerClasses(disabled), [disabled])
   const menuWrapperClasses = classNames(overlay.floatingClasses, CONTEXT_MENU_ENTER_CLASS)
   const pointStyle = useMemo(() => getContextMenuPointStyle(point) as React.CSSProperties, [point])
+  const triggerAria = getOverlayTriggerAria({
+    kind: 'menu',
+    open: visible,
+    controlsId: menuId,
+    disabled
+  })
 
   const contextValue = useMemo<ContextMenuContextValue>(
     () => ({ closeOnClick, handleItemClick, portal, open: visible }),
@@ -505,18 +549,18 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   return (
     <ContextMenuContext.Provider value={contextValue}>
       <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
-        <div
-          ref={triggerRef}
-          className={triggerClasses}
-          onContextMenu={handleContextMenu}
-          onKeyDown={handleTriggerKeyDown}
-          aria-haspopup="menu"
-          aria-expanded={visible}
-          aria-controls={visible ? menuId : undefined}
-          data-state={visible ? 'open' : 'closed'}
-          data-tiger-context-menu-trigger="">
-          {triggerChildren}
-        </div>
+        {renderOverlayTrigger({
+          asChild,
+          child: triggerChildren.length === 1 ? triggerChildren[0] : triggerChildren,
+          triggerRef,
+          className: triggerClasses,
+          disabled,
+          aria: { ...triggerAria, 'data-tiger-context-menu-trigger': '' },
+          handlers: {
+            onContextMenu: handleContextMenu,
+            onKeyDown: handleTriggerKeyDown
+          }
+        })}
         <div
           ref={pointNodeRef}
           style={pointStyle}

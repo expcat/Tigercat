@@ -1,6 +1,9 @@
-import React, { useId, useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  getArrowStyles,
+  getFocusableElements,
+  getOverlayTriggerAria,
   getPopconfirmIconPath,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
@@ -10,19 +13,21 @@ import {
   getPopconfirmIconClasses,
   getPopconfirmArrowClasses,
   getPopconfirmButtonsClasses,
-  getPopconfirmCancelButtonClasses,
-  getPopconfirmOkButtonClasses,
   mergeStyleValues,
   popconfirmIconPathStrokeLinecap,
   popconfirmIconPathStrokeLinejoin,
   popconfirmIconStrokeWidth,
   popconfirmIconViewBox,
+  resolveLocaleText,
   type PopconfirmProps as CorePopconfirmProps,
   type PopconfirmIconType,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
-import { renderOverlayPortal } from '../utils/overlay'
+import { renderOverlayPortal, useFocusTrap } from '../utils/overlay'
+import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
+import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   <svg
@@ -39,53 +44,68 @@ const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   </svg>
 )
 
-export type PopconfirmProps = Omit<CorePopconfirmProps, 'style' | 'placement'> &
-  Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {
-    /**
-     * Trigger content. May be a render function receiving `{ open }` so the
-     * trigger can be styled/rendered by open state without attribute selectors.
-     */
+export type PopconfirmProps = Omit<
+  CorePopconfirmProps,
+  'style' | 'placement' | 'onConfirm' | 'onCancel'
+> &
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'title'> & {
     children?: React.ReactNode | ((state: { open: boolean }) => React.ReactNode)
     titleContent?: React.ReactNode
     descriptionContent?: React.ReactNode
     onOpenChange?: (open: boolean) => void
-    onConfirm?: () => void
+    onConfirm?: () => void | Promise<void>
     onCancel?: () => void
     placement?: FloatingPlacement
     offset?: number
+    asChild?: boolean
     className?: string
     style?: React.CSSProperties
   }
 
-export const Popconfirm: React.FC<PopconfirmProps> = ({
-  open,
-  defaultOpen = false,
-  title = '确定要执行此操作吗？',
-  description,
-  icon = 'warning',
-  showIcon = true,
-  okText = '确定',
-  cancelText = '取消',
-  okType = 'primary',
-  placement: initialPlacement = 'top',
-  offset = 8,
-  disabled = false,
-  className,
-  style,
-  children,
-  titleContent,
-  descriptionContent,
-  onOpenChange,
-  onConfirm,
-  onCancel,
-  ...divProps
-}) => {
+export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popconfirm(
+  {
+    open,
+    defaultOpen = false,
+    title,
+    description,
+    icon = 'warning',
+    showIcon = true,
+    okText,
+    cancelText,
+    okType = 'primary',
+    placement: initialPlacement = 'top',
+    offset = 8,
+    disabled = false,
+    asChild = false,
+    className,
+    style,
+    children,
+    titleContent,
+    descriptionContent,
+    onOpenChange,
+    onConfirm,
+    onCancel,
+    ...divProps
+  },
+  forwardedRef
+) {
+  const { locale } = useTigerConfig()
+  const resolvedTitle = resolveLocaleText(
+    'Are you sure you want to continue?',
+    title,
+    locale?.common?.confirmTitle
+  )
+  const resolvedOkText = resolveLocaleText('OK', okText, locale?.common?.okText)
+  const resolvedCancelText = resolveLocaleText('Cancel', cancelText, locale?.common?.cancelText)
+
   const popconfirmId = `tiger-popconfirm-${useId()}`
   const titleId = `${popconfirmId}-title`
   const descriptionId = `${popconfirmId}-description`
   const describedBy = description || descriptionContent ? descriptionId : undefined
+  const arrowRef = useRef<HTMLDivElement>(null)
+  const cancelRef = useRef<HTMLButtonElement>(null)
+  const [confirming, setConfirming] = useState(false)
 
-  // Shared popup logic (click-only, multiTrigger=false)
   const {
     currentVisible,
     setVisible,
@@ -97,7 +117,9 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     overlayTarget,
     closeAndRestoreFocus,
     actualPlacement,
-    floatingStyles: baseFloatingStyles
+    floatingStyles: baseFloatingStyles,
+    arrowX,
+    arrowY
   } = usePopup({
     open,
     defaultOpen,
@@ -105,94 +127,98 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     placement: initialPlacement,
     offset,
     multiTrigger: false,
+    arrowRef,
     onOpenChange
   })
 
-  const handleConfirm = () => {
-    onConfirm?.()
+  useFocusTrap({ enabled: Boolean(currentVisible), containerRef: floatingRef })
+
+  useEffect(() => {
+    if (!currentVisible) {
+      setConfirming(false)
+      return
+    }
+    const frame = requestAnimationFrame(() => {
+      if (cancelRef.current) {
+        cancelRef.current.focus()
+        return
+      }
+      const root = floatingRef.current
+      if (!root) return
+      const first = getFocusableElements(root)[0]
+      first?.focus()
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [currentVisible, floatingRef])
+
+  const handleConfirm = async () => {
+    const result = onConfirm?.()
+    if (result && typeof (result as Promise<void>).then === 'function') {
+      setConfirming(true)
+      try {
+        await result
+        closeAndRestoreFocus()
+      } catch {
+        setConfirming(false)
+      }
+      return
+    }
     closeAndRestoreFocus()
   }
+
   const handleCancel = () => {
+    if (confirming) return
     onCancel?.()
     closeAndRestoreFocus()
   }
-  const handleTriggerClick = () => {
-    if (disabled) return
-    setVisible(!currentVisible)
-  }
 
-  // Classes
   const containerClasses = useMemo(
     () => classNames(getPopconfirmContainerClasses(), className),
     [className]
   )
   const triggerClasses = useMemo(() => getPopconfirmTriggerClasses(disabled), [disabled])
-  const arrowClasses = useMemo(() => getPopconfirmArrowClasses(actualPlacement), [actualPlacement])
   const contentClasses = getPopconfirmContentClasses()
   const titleClasses = getPopconfirmTitleClasses()
   const descriptionClasses = getPopconfirmDescriptionClasses()
   const iconClasses = useMemo(() => getPopconfirmIconClasses(icon), [icon])
   const buttonsClasses = getPopconfirmButtonsClasses()
-  const cancelButtonClasses = getPopconfirmCancelButtonClasses()
-  const okButtonClasses = useMemo(() => getPopconfirmOkButtonClasses(okType), [okType])
+  const arrowClasses = getPopconfirmArrowClasses()
+  const arrowStyle = useMemo(
+    () => getArrowStyles(actualPlacement, { x: arrowX, y: arrowY }) as React.CSSProperties,
+    [actualPlacement, arrowX, arrowY]
+  )
 
   if (!children) return null
 
-  // The trigger may be a render function receiving `{ open }`.
   const resolvedChildren =
     typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children
 
+  const triggerAria = getOverlayTriggerAria({
+    kind: 'dialog',
+    open: Boolean(currentVisible),
+    controlsId: popconfirmId,
+    disabled
+  })
+
   const mergedStyle = mergeStyleValues(style) as React.CSSProperties | undefined
-
-  const triggerProps = {
-    className: triggerClasses,
-    onClick: (event: React.MouseEvent) => {
-      const target = resolvedChildren
-      if (React.isValidElement<{ onClick?: unknown }>(target)) {
-        const onChildClick = target.props.onClick
-        if (typeof onChildClick === 'function') {
-          ;(onChildClick as (e: React.MouseEvent) => void)(event)
-        }
-      }
-      if (event.defaultPrevented) return
-      handleTriggerClick()
-    },
-    'aria-haspopup': 'dialog' as const,
-    'aria-expanded': Boolean(currentVisible),
-    'aria-controls': currentVisible ? popconfirmId : undefined,
-    'data-state': (currentVisible ? 'open' : 'closed') as 'open' | 'closed'
-  }
-
-  type TriggerChildProps = { className?: string; onClick?: unknown }
-
-  const triggerNode = (() => {
-    if (React.isValidElement<TriggerChildProps>(resolvedChildren)) {
-      return React.cloneElement(resolvedChildren, {
-        ...triggerProps,
-        className: classNames(resolvedChildren.props.className, triggerProps.className)
-      })
-    }
-    return (
-      <div
-        {...triggerProps}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        aria-disabled={disabled}
-        onKeyDown={(event) => {
-          if (disabled) return
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            handleTriggerClick()
-          }
-        }}>
-        {resolvedChildren}
-      </div>
-    )
-  })()
 
   return (
     <div ref={containerRef} className={containerClasses} style={mergedStyle} {...divProps}>
-      <div ref={triggerRef}>{triggerNode}</div>
+      {renderOverlayTrigger({
+        asChild,
+        child: resolvedChildren,
+        triggerRef: composeRefs(forwardedRef, triggerRef),
+        className: asChild ? undefined : triggerClasses,
+        disabled,
+        preventDefaultOnClick: true,
+        aria: triggerAria,
+        handlers: {
+          onClick: () => {
+            if (disabled) return
+            setVisible(!currentVisible)
+          }
+        }
+      })}
 
       {renderOverlayPortal(
         <div
@@ -203,11 +229,12 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
           hidden={!currentVisible}
           aria-hidden={!currentVisible}>
           <div className="relative">
-            <div className={arrowClasses} aria-hidden="true" />
+            <div ref={arrowRef} className={arrowClasses} style={arrowStyle} aria-hidden="true" />
             <div
               id={popconfirmId}
               role="dialog"
               aria-modal="false"
+              tabIndex={-1}
               aria-labelledby={titleId}
               aria-describedby={describedBy}
               className={contentClasses}>
@@ -219,7 +246,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
                 )}
                 <div className="flex-1">
                   <div id={titleId} className={titleClasses}>
-                    {titleContent || title}
+                    {titleContent || resolvedTitle}
                   </div>
                   {(description || descriptionContent) && (
                     <div id={descriptionId} className={descriptionClasses}>
@@ -229,12 +256,17 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
                 </div>
               </div>
               <div className={buttonsClasses}>
-                <button type="button" className={cancelButtonClasses} onClick={handleCancel}>
-                  {cancelText}
-                </button>
-                <button type="button" className={okButtonClasses} onClick={handleConfirm}>
-                  {okText}
-                </button>
+                <Button ref={cancelRef} size="sm" variant="outline" onClick={handleCancel}>
+                  {resolvedCancelText}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={okType === 'danger' ? 'primary' : 'primary'}
+                  danger={okType === 'danger'}
+                  loading={confirming}
+                  onClick={() => void handleConfirm()}>
+                  {resolvedOkText}
+                </Button>
               </div>
             </div>
           </div>
@@ -243,4 +275,6 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
       )}
     </div>
   )
-}
+})
+
+Popconfirm.displayName = 'Popconfirm'

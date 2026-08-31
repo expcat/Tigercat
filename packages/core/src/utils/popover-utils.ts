@@ -8,30 +8,37 @@ export function getPopoverContainerClasses(): string {
   return classNames('tiger-popover', 'relative', 'inline-block')
 }
 
-/** Popover trigger classes */
+/** Popover trigger classes (self-rendered `<button type="button">`) */
 export function getPopoverTriggerClasses(disabled: boolean): string {
-  return classNames('tiger-popover-trigger', disabled && 'cursor-not-allowed opacity-50')
+  return classNames(
+    'tiger-popover-trigger',
+    'inline-flex items-center bg-transparent p-0 border-0 font-inherit text-inherit',
+    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+  )
 }
 
-/** Popover content wrapper classes */
-export function getPopoverContentClasses(width?: string | number): string {
-  let widthClass = 'min-w-[200px]'
-  if (width != null && width !== '') {
-    const w = String(width)
-    widthClass = /^\d+$/.test(w) ? `w-[${w}px]` : w
-  }
-
+/** Popover content wrapper classes. Pixel `width` is applied as inline style. */
+export function getPopoverContentClasses(hasCustomWidth = false): string {
   return classNames(
     'tiger-popover-content',
-    widthClass,
-    'max-w-[400px]',
-    'p-3',
+    hasCustomWidth ? undefined : 'min-w-[200px]',
+    hasCustomWidth ? undefined : 'max-w-[var(--tiger-component-popover-max-width,400px)]',
+    'p-[var(--tiger-component-popover-padding,0.75rem)]',
     'bg-[var(--tiger-surface,#ffffff)]',
-    'rounded-[var(--tiger-radius-lg,0.75rem)]',
-    'shadow-lg',
+    'rounded-[var(--tiger-component-popover-border-radius,var(--tiger-radius-lg,0.75rem))]',
+    'shadow-[var(--tiger-component-popover-shadow,var(--tw-shadow,0_10px_15px_-3px_rgb(0_0_0_/_0.1)))]',
     'border',
     'border-[var(--tiger-border,#e5e7eb)]'
   )
+}
+
+export function getPopoverContentStyle(
+  width?: number | string
+): Record<string, string> | undefined {
+  if (width == null || width === '') return undefined
+  const pixels = typeof width === 'number' ? width : Number(width)
+  if (!Number.isFinite(pixels) || pixels <= 0) return undefined
+  return { width: `${pixels}px`, maxWidth: `${pixels}px` }
 }
 
 /** Popover title classes (static) */

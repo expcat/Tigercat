@@ -1,11 +1,15 @@
-import React, { useId, useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
-import { renderOverlayPortal } from '../utils/overlay'
+import { renderOverlayPortal, useFocusTrap } from '../utils/overlay'
+import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
+  getFocusableElements,
+  getOverlayTriggerAria,
   getPopoverContainerClasses,
-  getPopoverTriggerClasses,
   getPopoverContentClasses,
+  getPopoverContentStyle,
+  getPopoverTriggerClasses,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverProps as CorePopoverProps,
@@ -14,10 +18,6 @@ import {
 
 export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'title'> & {
-    /**
-     * Trigger content. May be a render function receiving `{ open }` so the
-     * trigger can be styled/rendered by open state without attribute selectors.
-     */
     children?: React.ReactNode | ((state: { open: boolean }) => React.ReactNode)
     titleContent?: React.ReactNode
     contentContent?: React.ReactNode
@@ -25,32 +25,36 @@ export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
     style?: React.CSSProperties
     placement?: FloatingPlacement
     offset?: number
+    asChild?: boolean
     onOpenChange?: (open: boolean) => void
   }
 
-export const Popover: React.FC<PopoverProps> = ({
-  open,
-  defaultOpen = false,
-  title,
-  content,
-  trigger = 'click',
-  placement = 'top',
-  disabled = false,
-  width,
-  offset = 8,
-  className,
-  style,
-  children,
-  titleContent,
-  contentContent,
-  onOpenChange,
-  ...divProps
-}) => {
+export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
+  {
+    open,
+    defaultOpen = false,
+    title,
+    content,
+    trigger = 'click',
+    placement = 'top',
+    disabled = false,
+    width,
+    offset = 8,
+    asChild = false,
+    className,
+    style,
+    children,
+    titleContent,
+    contentContent,
+    onOpenChange,
+    ...divProps
+  },
+  forwardedRef
+) {
   const popoverId = `tiger-popover-${useId()}`
   const titleId = `${popoverId}-title`
   const contentId = `${popoverId}-content`
 
-  // Shared popup logic
   const {
     currentVisible,
     containerRef,
@@ -63,33 +67,61 @@ export const Popover: React.FC<PopoverProps> = ({
     triggerHandlers
   } = usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
 
-  // Memoized classes
+  const trapEnabled = Boolean(currentVisible && trigger === 'click')
+  useFocusTrap({ enabled: trapEnabled, containerRef: floatingRef })
+
+  useEffect(() => {
+    if (!currentVisible || trigger !== 'click') return
+    const frame = requestAnimationFrame(() => {
+      const root = floatingRef.current
+      if (!root) return
+      const dialog = root.querySelector<HTMLElement>('[role="dialog"]') ?? root
+      const first = getFocusableElements(dialog)[0] ?? dialog
+      first.focus()
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [currentVisible, trigger, floatingRef])
+
   const containerClasses = useMemo(
     () => classNames(getPopoverContainerClasses(), className),
     [className]
   )
   const triggerClasses = useMemo(() => getPopoverTriggerClasses(disabled), [disabled])
-  const contentClasses = useMemo(() => getPopoverContentClasses(width), [width])
+  const hasCustomWidth = Boolean(getPopoverContentStyle(width))
+  const contentClasses = useMemo(() => getPopoverContentClasses(hasCustomWidth), [hasCustomWidth])
+  const contentStyle = useMemo(() => getPopoverContentStyle(width), [width])
 
   if (!children) return null
 
+  const resolvedChildren =
+    typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children
+
   const hasTitle = Boolean(title || titleContent)
   const hasContent = Boolean(content || contentContent)
+  const triggerAria = getOverlayTriggerAria({
+    kind: 'dialog',
+    open: Boolean(currentVisible),
+    controlsId: popoverId,
+    disabled
+  })
 
   return (
     <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
-      <div
-        ref={triggerRef}
-        className={triggerClasses}
-        aria-haspopup="dialog"
-        aria-disabled={disabled ? 'true' : undefined}
-        // `data-state` is the stable styling hook. `aria-expanded` is
-        // intentionally omitted: the trigger is a generic wrapper without an
-        // interactive role, where `aria-expanded` is invalid.
-        data-state={currentVisible ? 'open' : 'closed'}
-        {...triggerHandlers}>
-        {typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children}
-      </div>
+      {renderOverlayTrigger({
+        asChild,
+        child: resolvedChildren,
+        triggerRef: composeRefs(forwardedRef, triggerRef),
+        className: asChild ? undefined : triggerClasses,
+        disabled,
+        aria: triggerAria,
+        handlers: {
+          onClick: triggerHandlers.onClick as ((event: React.MouseEvent) => void) | undefined,
+          onMouseEnter: triggerHandlers.onMouseEnter,
+          onMouseLeave: triggerHandlers.onMouseLeave,
+          onFocus: triggerHandlers.onFocus,
+          onBlur: triggerHandlers.onBlur
+        }
+      })}
 
       {currentVisible &&
         renderOverlayPortal(
@@ -103,9 +135,12 @@ export const Popover: React.FC<PopoverProps> = ({
               id={popoverId}
               role="dialog"
               aria-modal="false"
+              tabIndex={-1}
+              aria-label={hasTitle ? undefined : title || content || undefined}
               aria-labelledby={hasTitle ? titleId : undefined}
               aria-describedby={hasContent ? contentId : undefined}
-              className={contentClasses}>
+              className={contentClasses}
+              style={contentStyle}>
               {hasTitle && (
                 <div id={titleId} className={POPOVER_TITLE_CLASSES}>
                   {titleContent || title}
@@ -122,4 +157,6 @@ export const Popover: React.FC<PopoverProps> = ({
         )}
     </div>
   )
-}
+})
+
+Popover.displayName = 'Popover'

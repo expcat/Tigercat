@@ -7,3 +7,4 @@
 export * from '../a11y-utils'
 export * from '../focus-utils'
 export * from '../overlay-utils'
+export * from '../overlay-trigger'

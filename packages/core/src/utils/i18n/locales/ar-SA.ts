@@ -20,7 +20,9 @@ export const arSA: TigerLocale = {
     clearText: 'مسح',
     closeMessageAriaLabel: 'إغلاق الرسالة',
     closeNotificationAriaLabel: 'إغلاق الإشعار',
-    sidebarAriaLabel: 'الشريط الجانبي'
+    sidebarAriaLabel: 'الشريط الجانبي',
+    moreOptionsText: 'المزيد من الخيارات',
+    confirmTitle: 'هل أنت متأكد أنك تريد المتابعة؟'
   },
   empty: {
     noData: 'لا توجد بيانات',

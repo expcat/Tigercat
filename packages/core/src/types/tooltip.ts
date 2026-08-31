@@ -2,59 +2,26 @@
  * Tooltip component types and interfaces
  */
 
-import type { FloatingPlacement } from '../utils/floating'
+import type { BaseFloatingPopupProps, FloatingTrigger } from './floating-popup'
 
 /**
  * Tooltip trigger type
  */
-export type TooltipTrigger = 'hover' | 'focus' | 'click' | 'manual'
+export type TooltipTrigger = FloatingTrigger
 
 /**
  * Base tooltip props interface
  */
-export interface TooltipProps {
+export interface TooltipProps extends BaseFloatingPopupProps {
   /**
-   * Whether the tooltip is open (controlled mode)
-   */
-  open?: boolean
-
-  /**
-   * Default open state (uncontrolled mode)
-   * @default false
-   */
-  defaultOpen?: boolean
-
-  /**
-   * Tooltip content text
+   * Tooltip content. Interactive descendants are not allowed (`role="tooltip"`).
    */
   content?: string
 
   /**
-   * Trigger type for showing/hiding tooltip
+   * Trigger type. Default hover is co-joined with focus and click so keyboard
+   * and touch can open the tooltip.
    * @default 'hover'
    */
   trigger?: TooltipTrigger
-
-  /**
-   * Tooltip placement relative to trigger
-   * @default 'top'
-   */
-  placement?: FloatingPlacement
-
-  /**
-   * Whether the tooltip is disabled
-   * @default false
-   */
-  disabled?: boolean
-
-  /**
-   * Offset distance from trigger (in pixels)
-   * @default 8
-   */
-  offset?: number
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
 }

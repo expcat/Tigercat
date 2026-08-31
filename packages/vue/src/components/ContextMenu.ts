@@ -12,6 +12,7 @@ import {
   VNode,
   cloneVNode,
   watch,
+  useId,
   type ComputedRef
 } from 'vue'
 import {
@@ -26,8 +27,11 @@ import {
   getContextMenuSubChevronClasses,
   getContextMenuPointStyle,
   getContextMenuOpenPoint,
+  getContextMenuSubPlacement,
+  getOverlayTriggerAria,
   injectContextMenuStyles,
   CONTEXT_MENU_ENTER_CLASS,
+  CONTEXT_MENU_SUB_HIDE_DELAY_MS,
   CONTEXT_MENU_SUB_CHEVRON_PATH,
   isContextMenuKeyboardEvent,
   handleMenuNavigation,
@@ -45,6 +49,7 @@ import type {
   ContextMenuSubProps as CoreContextMenuSubProps
 } from '@expcat/tigercat-core'
 import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
+import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface VueContextMenuMenuProps extends CoreContextMenuMenuProps {}
 
@@ -96,9 +101,6 @@ export const ContextMenuMenu = defineComponent({
   }
 })
 
-let contextMenuIdCounter = 0
-const createContextMenuId = () => `tiger-context-menu-${++contextMenuIdCounter}`
-
 export const ContextMenuContextKey = Symbol('ContextMenuContext')
 
 export interface ContextMenuContext {
@@ -121,6 +123,10 @@ export const ContextMenuItem = defineComponent({
     divided: {
       type: Boolean,
       default: false
+    },
+    href: {
+      type: String,
+      default: undefined
     },
     className: {
       type: String,
@@ -172,16 +178,17 @@ export const ContextMenuItem = defineComponent({
         style?: unknown
       } & Record<string, unknown>
 
+      const isLink = Boolean(props.href) && !props.disabled
       return h(
-        'button',
+        isLink ? 'a' : 'button',
         {
           ...restAttrs,
-          type: 'button',
+          ...(isLink ? { href: props.href } : { type: 'button' }),
           class: itemClasses.value,
           role: 'menuitem',
           tabindex: -1,
-          'aria-disabled': props.disabled,
-          disabled: props.disabled,
+          'aria-disabled': props.disabled || undefined,
+          disabled: isLink ? undefined : props.disabled,
           onClick: handleClick,
           style: mergedStyle.value
         },
@@ -234,11 +241,19 @@ export const ContextMenuSub = defineComponent({
     const isExpanded = computed(() => isHovered.value || isOpenByKeyboard.value)
     const portalEnabled = computed(() => Boolean(context?.portal.value))
 
+    const subMenuId = `tiger-context-menu-sub-${useId()}`
+
     const overlay = useVueAnchoredOverlay({
       referenceRef: titleRef,
       floatingRef: popupRef,
       enabled: computed(() => Boolean(context) && isExpanded.value && !props.disabled),
-      placement: 'right-start',
+      placement: () =>
+        getContextMenuSubPlacement(
+          titleRef.value?.closest('[dir]')?.getAttribute('dir') ??
+            (typeof document === 'undefined'
+              ? undefined
+              : document.documentElement.getAttribute('dir'))
+        ),
       offset: 4,
       portal: portalEnabled,
       dismissOnEscape: true,
@@ -282,7 +297,7 @@ export const ContextMenuSub = defineComponent({
       }
 
       if (portalEnabled.value) {
-        popupCloseTimer = setTimeout(close, 120)
+        popupCloseTimer = setTimeout(close, CONTEXT_MENU_SUB_HIDE_DELAY_MS)
         return
       }
 
@@ -298,7 +313,13 @@ export const ContextMenuSub = defineComponent({
     const handleTitleKeyDown = (event: KeyboardEvent) => {
       if (props.disabled) return
 
-      if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') {
+      const dir =
+        titleRef.value?.closest('[dir]')?.getAttribute('dir') ??
+        document.documentElement.getAttribute('dir')
+      const openKey = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+      const closeKey = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'
+
+      if (event.key === openKey || event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         event.stopPropagation()
         isOpenByKeyboard.value = true
@@ -307,7 +328,7 @@ export const ContextMenuSub = defineComponent({
         return
       }
 
-      if (event.key === 'ArrowLeft' || event.key === 'Escape') {
+      if (event.key === closeKey || event.key === 'Escape') {
         if (isExpanded.value) {
           event.preventDefault()
           event.stopPropagation()
@@ -374,6 +395,7 @@ export const ContextMenuSub = defineComponent({
           tabindex: -1,
           'aria-haspopup': 'menu',
           'aria-expanded': isExpanded.value,
+          'aria-controls': isExpanded.value ? subMenuId : undefined,
           'aria-disabled': props.disabled || undefined,
           'data-state': isExpanded.value ? 'open' : 'closed',
           'data-tiger-context-menu-sub-trigger': '',
@@ -381,12 +403,20 @@ export const ContextMenuSub = defineComponent({
           onClick: (event: MouseEvent) => {
             event.preventDefault()
             event.stopPropagation()
+            if (props.disabled) return
+            if (isExpanded.value) {
+              isOpenByKeyboard.value = false
+              isHovered.value = false
+              return
+            }
+            isOpenByKeyboard.value = true
+            isHovered.value = true
           },
           onMouseenter: handleMouseEnter,
           onKeydown: handleTitleKeyDown
         },
         [
-          h('span', { class: 'flex-1 text-left' }, props.title),
+          h('span', { class: 'flex-1 text-start' }, props.title),
           h(
             'svg',
             {
@@ -422,6 +452,7 @@ export const ContextMenuSub = defineComponent({
           h(
             'div',
             {
+              id: subMenuId,
               class: getContextMenuMenuClasses(),
               role: 'menu'
             },
@@ -451,6 +482,8 @@ export interface VueContextMenuProps extends CoreContextMenuProps {
    */
   placement?: FloatingPlacement
 }
+
+export type ContextMenuProps = VueContextMenuProps
 
 export const ContextMenu = defineComponent({
   name: 'TigerContextMenu',
@@ -491,6 +524,10 @@ export const ContextMenu = defineComponent({
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
+    },
+    asChild: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:open', 'open-change'],
@@ -504,7 +541,7 @@ export const ContextMenu = defineComponent({
       if (currentVisible.value) ensurePoint()
     })
 
-    const menuId = createContextMenuId()
+    const menuId = `tiger-context-menu-${useId()}`
     const previousActiveElement = ref<HTMLElement | null>(null)
     const internalVisible = ref(props.defaultOpen)
     const currentVisible = computed(() =>
@@ -540,6 +577,7 @@ export const ContextMenu = defineComponent({
           })
         })
       } else {
+        hasExplicitPoint.value = false
         restoreFocus(previousActiveElement.value)
         previousActiveElement.value = null
       }
@@ -582,6 +620,10 @@ export const ContextMenu = defineComponent({
     }
 
     const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        setVisible(false)
+        return
+      }
       if (floatingRef.value) {
         handleMenuNavigation(floatingRef.value, event)
       }
@@ -638,21 +680,25 @@ export const ContextMenu = defineComponent({
         triggerNodes.push(node)
       })
 
-      const trigger = h(
-        'div',
-        {
-          ref: triggerRef,
-          class: triggerClasses.value,
+      const triggerAria = getOverlayTriggerAria({
+        kind: 'menu',
+        open: currentVisible.value,
+        controlsId: menuId,
+        disabled: props.disabled
+      })
+
+      const trigger = renderOverlayTrigger({
+        asChild: props.asChild,
+        child: triggerNodes.length === 1 ? triggerNodes[0] : triggerNodes,
+        setTriggerRef: (el) => assignOverlayTriggerRef(triggerRef, el),
+        className: triggerClasses.value,
+        disabled: props.disabled,
+        aria: { ...triggerAria, 'data-tiger-context-menu-trigger': '' },
+        handlers: {
           onContextmenu: handleContextMenu,
-          onKeydown: handleTriggerKeyDown,
-          'aria-haspopup': 'menu',
-          'aria-expanded': currentVisible.value,
-          'aria-controls': currentVisible.value ? menuId : undefined,
-          'data-state': currentVisible.value ? 'open' : 'closed',
-          'data-tiger-context-menu-trigger': ''
-        },
-        triggerNodes
-      )
+          onKeydown: handleTriggerKeyDown
+        }
+      })
 
       const pointNode = h('div', {
         ref: pointRef,

@@ -20,7 +20,9 @@ export const thTH: TigerLocale = {
     clearText: 'ล้าง',
     closeMessageAriaLabel: 'ปิดข้อความ',
     closeNotificationAriaLabel: 'ปิดการแจ้งเตือน',
-    sidebarAriaLabel: 'แถบด้านข้าง'
+    sidebarAriaLabel: 'แถบด้านข้าง',
+    moreOptionsText: 'ตัวเลือกเพิ่มเติม',
+    confirmTitle: 'คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?'
   },
   empty: {
     noData: 'ไม่มีข้อมูล',

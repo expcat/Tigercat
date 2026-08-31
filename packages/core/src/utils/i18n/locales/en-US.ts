@@ -19,7 +19,9 @@ export const enUS: TigerLocale = {
     clearText: 'Clear',
     closeMessageAriaLabel: 'Close message',
     closeNotificationAriaLabel: 'Close notification',
-    sidebarAriaLabel: 'Sidebar'
+    sidebarAriaLabel: 'Sidebar',
+    moreOptionsText: 'More options',
+    confirmTitle: 'Are you sure you want to continue?'
   },
   empty: {
     noData: 'No data',

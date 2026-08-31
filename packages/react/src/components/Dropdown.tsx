@@ -1,54 +1,53 @@
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
-  useRef,
+  forwardRef,
   useCallback,
+  useContext,
+  useEffect,
+  useId,
   useMemo,
-  useId
+  useRef
 } from 'react'
 import {
   classNames,
-  getDropdownContainerClasses,
-  getDropdownTriggerClasses,
-  getDropdownChevronClasses,
-  getDropdownMenuClasses,
-  getDropdownItemClasses,
-  injectDropdownStyles,
+  createFloatingHoverDelayController,
+  DEFAULT_DROPDOWN_TRIGGER,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
-  handleMenuNavigation,
+  devWarn,
   focusFirstMenuItem,
-  captureActiveElement,
+  getDropdownChevronClasses,
+  getDropdownContainerClasses,
+  getDropdownItemClasses,
+  getDropdownMenuClasses,
+  getDropdownTriggerClasses,
+  getOverlayTriggerAria,
+  getOverlayTriggerKeyboardAction,
+  handleMenuNavigation,
+  injectDropdownStyles,
   restoreFocus,
-  type DropdownProps as CoreDropdownProps,
-  type DropdownMenuProps as CoreDropdownMenuProps,
   type DropdownItemProps as CoreDropdownItemProps,
+  type DropdownMenuProps as CoreDropdownMenuProps,
+  type DropdownProps as CoreDropdownProps,
+  type DropdownTrigger,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 
-// Dropdown context interface
 export interface DropdownContextValue {
   closeOnClick: boolean
   handleItemClick: () => void
 }
 
-// Create dropdown context
 export const DropdownContext = createContext<DropdownContextValue | null>(null)
-
-// --- DropdownMenu (child component) ---
 
 export interface DropdownMenuProps
   extends
     Omit<CoreDropdownMenuProps, 'style'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style?: React.CSSProperties
-
-  /**
-   * Menu content
-   */
   children?: React.ReactNode
 }
 
@@ -62,28 +61,26 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const menuClasses = classNames(getDropdownMenuClasses(), className)
 
   return (
-    <div className={menuClasses} style={style} role={role ?? 'menu'} {...divProps}>
+    <div
+      className={menuClasses}
+      style={style}
+      data-tiger-dropdown-menu=""
+      {...divProps}
+      role={role ?? 'menu'}>
       {children}
     </div>
   )
 }
 
-// --- DropdownItem (child component) ---
-
 export interface DropdownItemProps
   extends
     Omit<CoreDropdownItemProps, 'className'>,
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> {
+    Omit<
+      React.AnchorHTMLAttributes<HTMLAnchorElement> & React.ButtonHTMLAttributes<HTMLButtonElement>,
+      'onClick' | 'disabled' | 'href'
+    > {
   className?: string
-
-  /**
-   * Click event handler
-   */
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-
-  /**
-   * Item content
-   */
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void
   children?: React.ReactNode
 }
 
@@ -91,14 +88,18 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   disabled = false,
   divided = false,
   closeOnClick,
+  href,
   className,
   onClick,
   children,
-  ...buttonProps
+  ...rest
 }) => {
   const context = useContext(DropdownContext)
+  if (context == null) {
+    devWarn('DropdownItem.orphan', 'DropdownItem must be used inside Dropdown.')
+  }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (disabled) {
       event.preventDefault()
       return
@@ -113,23 +114,22 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   }
 
   const itemClasses = classNames(getDropdownItemClasses(disabled, divided), className)
+  const Comp = href && !disabled ? 'a' : 'button'
 
   return (
-    <button
-      type="button"
+    <Comp
+      {...(rest as React.HTMLAttributes<HTMLElement>)}
+      {...(Comp === 'a' ? { href } : { type: 'button' as const })}
       className={itemClasses}
       role="menuitem"
       tabIndex={-1}
-      aria-disabled={disabled}
-      disabled={disabled}
-      onClick={handleClick}
-      {...buttonProps}>
+      aria-disabled={disabled || undefined}
+      disabled={Comp === 'button' ? disabled : undefined}
+      onClick={handleClick}>
       {children}
-    </button>
+    </Comp>
   )
 }
-
-// --- Dropdown (parent component) ---
 
 export interface DropdownProps
   extends Omit<CoreDropdownProps, 'style'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
@@ -138,139 +138,157 @@ export interface DropdownProps
   offset?: number
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
-  /**
-   * Render the trigger from open state. Receives `{ open }` so the trigger can
-   * be styled/rendered by open state without attribute selectors. When given,
-   * `children` only needs to provide the `DropdownMenu`. (Named `renderTrigger`
-   * because `trigger` already configures the open event.)
-   */
   renderTrigger?: (state: { open: boolean }) => React.ReactNode
-  /**
-   * Merge menu ARIA onto the trigger child instead of a wrapping div.
-   * The child must be a single element that can receive a ref (e.g. a button).
-   */
   asChild?: boolean
 }
 
-export const Dropdown: React.FC<DropdownProps> = ({
-  trigger = 'hover',
-  placement: initialPlacement = 'bottom-start',
-  offset = 4,
-  disabled = false,
-  open: controlledOpen,
-  defaultOpen = false,
-  closeOnClick = true,
-  showArrow = true,
-  portal = true,
-  className,
-  style,
-  onOpenChange,
-  children,
-  renderTrigger,
-  asChild = false,
-  ...divProps
-}) => {
-  // Internal state for uncontrolled mode
-  const [internalVisible, setInternalVisible] = useState(defaultOpen)
+export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown(
+  {
+    trigger = DEFAULT_DROPDOWN_TRIGGER,
+    placement: initialPlacement = 'bottom-start',
+    offset = 4,
+    disabled = false,
+    open: controlledOpen,
+    defaultOpen = false,
+    closeOnClick = true,
+    showArrow = true,
+    portal = true,
+    asChild = false,
+    className,
+    style,
+    onOpenChange,
+    children,
+    renderTrigger,
+    ...divProps
+  },
+  forwardedRef
+) {
+  const [visible, setVisibleState] = useControlledState({
+    value: controlledOpen,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange
+  })
 
-  // Use controlled or uncontrolled state
-  const visible = controlledOpen !== undefined ? controlledOpen : internalVisible
-
-  // Refs for Floating UI positioning
   const containerRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
-  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
+  const openIntentRef = useRef<'menu' | 'hover'>('menu')
+  const skipRestoreRef = useRef(false)
 
-  // Unique menu ID for aria-controls
   const reactId = useId()
   const menuId = useMemo(() => `tiger-dropdown-menu-${reactId}`, [reactId])
 
-  // Inject animation styles once
   useEffect(() => {
     injectDropdownStyles()
   }, [])
 
-  // Handle visibility change
+  const setVisibleRef = useRef<(next: boolean) => void>(() => undefined)
+
+  const hoverControllerRef = useRef<ReturnType<typeof createFloatingHoverDelayController> | null>(
+    null
+  )
+  if (hoverControllerRef.current === null) {
+    hoverControllerRef.current = createFloatingHoverDelayController({
+      show: () => {
+        openIntentRef.current = 'hover'
+        setVisibleRef.current(true)
+      },
+      hide: () => {
+        skipRestoreRef.current = true
+        setVisibleRef.current(false)
+      }
+    })
+  }
+  const hoverController = hoverControllerRef.current
+
   const setVisible = useCallback(
-    (newVisible: boolean) => {
-      if (disabled && newVisible) return
-
-      // Capture focus before opening
-      if (newVisible && !visible) {
-        previousActiveElementRef.current = captureActiveElement()
+    (next: boolean) => {
+      if (disabled && next) return
+      if (next && !visible) {
+        previousActiveElementRef.current = triggerRef.current
       }
-
-      // Update internal state if uncontrolled
-      if (controlledOpen === undefined) {
-        setInternalVisible(newVisible)
-      }
-
-      // Call event handler
-      onOpenChange?.(newVisible)
-
-      // Focus management
-      if (newVisible) {
-        // Use rAF to wait for menu to render
-        requestAnimationFrame(() => {
-          if (floatingRef.current) {
-            focusFirstMenuItem(floatingRef.current)
-          }
-        })
-      } else {
-        restoreFocus(previousActiveElementRef.current)
+      setVisibleState(next)
+      if (!next) {
+        hoverController.cancel()
+        if (!skipRestoreRef.current) {
+          restoreFocus(previousActiveElementRef.current)
+        }
         previousActiveElementRef.current = null
+        skipRestoreRef.current = false
       }
     },
-    [disabled, visible, controlledOpen, onOpenChange]
+    [disabled, visible, setVisibleState, hoverController]
   )
+  setVisibleRef.current = setVisible
 
-  // Handle item click (close dropdown). The item already decided whether to
-  // close; do not re-check parent closeOnClick here so an item can override
-  // parent-false with closeOnClick={true}.
+  useEffect(() => {
+    if (!visible) return
+    if (openIntentRef.current === 'hover') return
+    const frame = requestAnimationFrame(() => {
+      if (floatingRef.current) focusFirstMenuItem(floatingRef.current)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [visible])
+
   const handleItemClick = useCallback(() => {
+    skipRestoreRef.current = false
     setVisible(false)
   }, [setVisible])
 
-  // Handle mouse enter (for hover trigger)
   const handleMouseEnter = useCallback(() => {
-    if (trigger !== 'hover') return
+    if (trigger !== 'hover' || disabled) return
+    hoverController.enter()
+  }, [trigger, disabled, hoverController])
 
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-    }
-
-    hoverTimerRef.current = setTimeout(() => {
-      setVisible(true)
-    }, 100)
-  }, [trigger, setVisible])
-
-  // Handle mouse leave (for hover trigger)
   const handleMouseLeave = useCallback(() => {
     if (trigger !== 'hover') return
+    hoverController.leave()
+  }, [trigger, hoverController])
 
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-    }
-
-    hoverTimerRef.current = setTimeout(() => {
-      setVisible(false)
-    }, 150)
-  }, [trigger, setVisible])
-
-  // Handle click (for click trigger)
   const handleClick = useCallback(() => {
-    if (trigger !== 'click') return
-    setVisible(!visible)
-  }, [trigger, visible, setVisible])
-
-  // Handle keyboard navigation within menu
-  const handleMenuKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (floatingRef.current) {
-      handleMenuNavigation(floatingRef.current, event.nativeEvent)
+    if (disabled) return
+    if (triggerRef.current?.getAttribute('aria-disabled') === 'true') return
+    if (trigger === 'hover') {
+      hoverController.cancel()
     }
-  }, [])
+    openIntentRef.current = 'menu'
+    setVisible(!visible)
+  }, [disabled, trigger, visible, setVisible, hoverController])
+
+  const handleTriggerKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      const action = getOverlayTriggerKeyboardAction(event.nativeEvent, {
+        kind: 'menu',
+        open: visible,
+        disabled
+      })
+      if (!action) return
+      event.preventDefault()
+      hoverController.cancel()
+      if (action === 'close') {
+        setVisible(false)
+        return
+      }
+      openIntentRef.current = 'menu'
+      if (!visible) setVisible(true)
+    },
+    [visible, disabled, hoverController, setVisible]
+  )
+
+  const handleMenuKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        skipRestoreRef.current = true
+        setVisible(false)
+        return
+      }
+      if (floatingRef.current) {
+        handleMenuNavigation(floatingRef.current, event.nativeEvent)
+      }
+    },
+    [setVisible]
+  )
 
   const overlay = useAnchoredOverlay({
     referenceRef: triggerRef,
@@ -280,19 +298,16 @@ export const Dropdown: React.FC<DropdownProps> = ({
     offset,
     portal,
     containerRef,
-    dismissOnOutside: trigger === 'click',
+    dismissOnOutside: true,
     dismissOnEscape: true,
-    onDismiss: () => setVisible(false)
+    onDismiss: (reason) => {
+      skipRestoreRef.current = reason !== 'escape'
+      if (reason === 'escape') openIntentRef.current = 'menu'
+      setVisible(false)
+    }
   })
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current)
-      }
-    }
-  }, [])
+  useEffect(() => () => hoverController.dispose(), [hoverController])
 
   const containerClasses = useMemo(
     () => classNames(getDropdownContainerClasses(), 'tiger-dropdown-container', className),
@@ -301,77 +316,38 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const triggerClasses = useMemo(() => getDropdownTriggerClasses(disabled), [disabled])
 
-  const menuWrapperClasses = classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)
-  const menuWrapperStyles = overlay.floatingStyles
-
   const contextValue = useMemo<DropdownContextValue>(
     () => ({ closeOnClick, handleItemClick }),
     [closeOnClick, handleItemClick]
   )
 
-  // Parse children to find trigger and menu. When `renderTrigger` is given it
-  // supplies the trigger (receiving open state) and children only carry the menu.
   const childrenArray = React.Children.toArray(children)
   let triggerElement: React.ReactNode = renderTrigger ? renderTrigger({ open: visible }) : null
   let menuElement: React.ReactNode = null
+  let sawTrigger = Boolean(renderTrigger)
 
   childrenArray.forEach((child) => {
-    if (!React.isValidElement(child)) {
-      if (!renderTrigger && triggerElement == null) triggerElement = child
-      return
-    }
-
-    if (child.type === DropdownMenu) {
+    if (React.isValidElement(child) && child.type === DropdownMenu) {
       menuElement = child
       return
     }
-
-    if (!renderTrigger && triggerElement == null) {
+    if (renderTrigger) return
+    if (!sawTrigger) {
       triggerElement = child
+      sawTrigger = true
+      return
     }
+    devWarn('Dropdown.extraTrigger', 'Dropdown only uses the first non-menu child as the trigger.')
   })
 
-  const triggerAria = {
-    'aria-haspopup': 'menu' as const,
-    'aria-expanded': visible,
-    'aria-controls': visible ? menuId : undefined,
-    'data-state': visible ? 'open' : 'closed'
-  }
+  const triggerAria = getOverlayTriggerAria({
+    kind: 'menu',
+    open: visible,
+    controlsId: menuId,
+    disabled
+  })
 
-  const asChildTrigger =
-    asChild && React.isValidElement(triggerElement)
-      ? React.cloneElement(triggerElement as React.ReactElement<Record<string, unknown>>, {
-          ref: triggerRef,
-          onClick: (event: React.MouseEvent) => {
-            const childOnClick = (
-              triggerElement as React.ReactElement<{
-                onClick?: (event: React.MouseEvent) => void
-              }>
-            ).props.onClick
-            childOnClick?.(event)
-            handleClick()
-          },
-          onMouseEnter: (event: React.MouseEvent) => {
-            const childOnMouseEnter = (
-              triggerElement as React.ReactElement<{
-                onMouseEnter?: (event: React.MouseEvent) => void
-              }>
-            ).props.onMouseEnter
-            childOnMouseEnter?.(event)
-            handleMouseEnter()
-          },
-          onMouseLeave: (event: React.MouseEvent) => {
-            const childOnMouseLeave = (
-              triggerElement as React.ReactElement<{
-                onMouseLeave?: (event: React.MouseEvent) => void
-              }>
-            ).props.onMouseLeave
-            childOnMouseLeave?.(event)
-            handleMouseLeave()
-          },
-          ...triggerAria
-        })
-      : null
+  const composedTriggerRef = composeRefs(forwardedRef, triggerRef)
 
   const chevronNode =
     showArrow && !asChild ? (
@@ -388,11 +364,27 @@ export const Dropdown: React.FC<DropdownProps> = ({
       </svg>
     ) : null
 
+  const triggerNode = renderOverlayTrigger({
+    asChild,
+    child: triggerElement,
+    triggerRef: composedTriggerRef,
+    className: asChild ? undefined : triggerClasses,
+    disabled,
+    extraChildren: chevronNode,
+    aria: triggerAria,
+    handlers: {
+      onClick: handleClick,
+      onKeyDown: handleTriggerKeyDown,
+      onMouseEnter: handleMouseEnter,
+      onMouseLeave: handleMouseLeave
+    }
+  })
+
   const menuWrapperNode = (
     <div
       ref={floatingRef}
-      className={menuWrapperClasses}
-      style={menuWrapperStyles}
+      className={classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)}
+      style={overlay.floatingStyles}
       data-positioned={overlay.positioned}
       hidden={!visible}
       data-tiger-dropdown-menu=""
@@ -410,20 +402,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <DropdownContext.Provider value={contextValue}>
       <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
-        {asChildTrigger ?? (
-          <div
-            ref={triggerRef}
-            className={triggerClasses}
-            onClick={handleClick}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            {...triggerAria}>
-            {triggerElement}
-            {chevronNode}
-          </div>
-        )}
+        {triggerNode}
         {renderOverlayPortal(menuWrapperNode, overlay.target, !portal)}
       </div>
     </DropdownContext.Provider>
   )
-}
+})
+
+Dropdown.displayName = 'Dropdown'
+DropdownMenu.displayName = 'DropdownMenu'
+DropdownItem.displayName = 'DropdownItem'

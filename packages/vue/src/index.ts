@@ -25,7 +25,7 @@ export type { VueButtonProps } from './components/Button'
 export { ButtonGroup } from './components/ButtonGroup'
 export type { VueButtonGroupProps } from './components/ButtonGroup'
 export { SplitButton } from './components/SplitButton'
-export type { VueSplitButtonProps } from './components/SplitButton'
+export type { VueSplitButtonProps, SplitButtonProps } from './components/SplitButton'
 export { Slider } from './components/Slider'
 export type { VueSliderProps } from './components/Slider'
 export { Switch } from './components/Switch'
@@ -190,7 +190,7 @@ export type { VueStepsProps, VueStepsItemProps } from './components/Steps'
 export { Pagination } from './components/Pagination'
 export type { VuePaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
-export type { VueDropdownProps } from './components/Dropdown'
+export type { VueDropdownProps, DropdownProps } from './components/Dropdown'
 export { DropdownMenu, DropdownItem } from './components/Dropdown'
 export type { VueDropdownMenuProps, VueDropdownItemProps } from './components/Dropdown'
 export {
@@ -201,6 +201,7 @@ export {
 } from './components/ContextMenu'
 export type {
   VueContextMenuProps,
+  ContextMenuProps,
   VueContextMenuMenuProps,
   VueContextMenuItemProps,
   VueContextMenuSubProps
@@ -246,11 +247,11 @@ export type { VueLoadingBarProps } from './components/LoadingBarRoot'
 export { LoadingBarContainer } from './components/LoadingBarContainer'
 export type { VueLoadingBarContainerProps } from './components/LoadingBarContainer'
 export { Popconfirm } from './components/Popconfirm'
-export type { VuePopconfirmProps } from './components/Popconfirm'
+export type { VuePopconfirmProps, PopconfirmProps } from './components/Popconfirm'
 export { Popover } from './components/Popover'
-export type { VuePopoverProps } from './components/Popover'
+export type { VuePopoverProps, PopoverProps } from './components/Popover'
 export { Tooltip } from './components/Tooltip'
-export type { VueTooltipProps } from './components/Tooltip'
+export type { VueTooltipProps, TooltipProps } from './components/Tooltip'
 export { ActivityFeed } from './components/ActivityFeed'
 export type { VueActivityFeedProps } from './components/ActivityFeed'
 export { ChatWindow } from './components/ChatWindow'

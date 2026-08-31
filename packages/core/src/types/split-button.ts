@@ -3,6 +3,7 @@
  */
 
 import type { ButtonHtmlType, ButtonIconPosition, ButtonSize, ButtonVariant } from './button'
+import type { FloatingPlacement } from '../utils/floating'
 
 /**
  * Default accessible name for the chevron menu trigger
@@ -95,10 +96,28 @@ export interface SplitButtonProps {
   portal?: boolean
 
   /**
-   * Accessible name for the chevron menu trigger
-   * @default 'More options'
+   * Accessible name for the chevron menu trigger. Defaults to
+   * `locale.common.moreOptionsText`.
    */
   triggerAriaLabel?: string
+
+  /**
+   * Accessible name for an icon-only primary action. Do not reuse the group
+   * `aria-label` for this.
+   */
+  primaryAriaLabel?: string
+
+  /**
+   * Dropdown placement relative to the chevron trigger
+   * @default 'bottom-end'
+   */
+  placement?: FloatingPlacement
+
+  /**
+   * Offset distance from the chevron trigger
+   * @default 4
+   */
+  offset?: number
 
   /**
    * Additional CSS classes on the root group

@@ -401,6 +401,7 @@ export interface UseAnchoredOverlayOptions {
   dismissOnOutside?: boolean
   dismissOnEscape?: boolean
   restoreFocusOnDismiss?: boolean
+  arrowRef?: React.RefObject<HTMLElement | null>
   onDismiss?: (reason: AnchoredOverlayDismissReason) => void
 }
 
@@ -414,6 +415,8 @@ export interface UseAnchoredOverlayReturn {
   placement: FloatingPlacement
   x: number
   y: number
+  arrowX: number | undefined
+  arrowY: number | undefined
 }
 
 function resolveOverlayPortalTarget(
@@ -438,6 +441,7 @@ export function useAnchoredOverlay({
   dismissOnOutside = false,
   dismissOnEscape = false,
   restoreFocusOnDismiss = false,
+  arrowRef,
   onDismiss
 }: UseAnchoredOverlayOptions): UseAnchoredOverlayReturn {
   const [target, setTarget] = useState<HTMLElement | null>(null)
@@ -472,13 +476,16 @@ export function useAnchoredOverlay({
     y,
     placement: actualPlacement,
     isPositioned,
-    referenceWidth
+    referenceWidth,
+    arrowX,
+    arrowY
   } = useFloating({
     referenceRef,
     floatingRef,
     enabled,
     placement,
     offset,
+    arrowRef,
     context: effectiveTarget
   })
 
@@ -547,6 +554,8 @@ export function useAnchoredOverlay({
     positioned: isPositioned,
     placement: actualPlacement,
     x,
-    y
+    y,
+    arrowX,
+    arrowY
   }
 }

@@ -14,24 +14,27 @@ export function getTooltipContainerClasses(): string {
  * Get tooltip trigger classes
  */
 export function getTooltipTriggerClasses(disabled: boolean): string {
-  return classNames('tiger-tooltip-trigger', disabled && 'cursor-not-allowed opacity-50')
+  return classNames(
+    'tiger-tooltip-trigger',
+    'inline-flex items-center bg-transparent p-0 border-0 font-inherit text-inherit',
+    disabled ? 'cursor-not-allowed opacity-50' : undefined
+  )
 }
 
 /**
  * Get tooltip content classes
- * Tooltips are simpler and smaller than popovers
  */
 export function getTooltipContentClasses(): string {
   return classNames(
     'tiger-tooltip-content',
-    'max-w-[300px]',
-    'px-2',
-    'py-1',
-    'text-xs',
-    'text-[var(--tiger-tooltip-text,#ffffff)]',
-    'bg-[var(--tiger-tooltip-bg,#111827)]',
-    'rounded-[var(--tiger-radius-sm,0.375rem)]',
-    'shadow-lg',
-    'whitespace-nowrap'
+    'max-w-[var(--tiger-component-tooltip-max-width,280px)]',
+    'px-[var(--tiger-component-tooltip-padding-x,8px)]',
+    'py-[var(--tiger-component-tooltip-padding-y,4px)]',
+    'text-[length:var(--tiger-component-tooltip-font-size,14px)]',
+    'text-[var(--tiger-component-tooltip-text-color,#ffffff)]',
+    'bg-[var(--tiger-component-tooltip-bg,#262626)]',
+    'rounded-[var(--tiger-component-tooltip-border-radius,var(--tiger-radius-sm,0.375rem))]',
+    'shadow-[var(--tiger-component-tooltip-shadow,var(--tw-shadow,0_10px_15px_-3px_rgb(0_0_0_/_0.1)))]',
+    'whitespace-normal break-words'
   )
 }

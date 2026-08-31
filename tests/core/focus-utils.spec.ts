@@ -260,6 +260,28 @@ describe('focus-utils', () => {
       expect(items).toHaveLength(2)
       expect(items).toEqual([item1, item3])
     })
+
+    it('skips menuitems inside a hidden nested menu', () => {
+      const container = document.createElement('div')
+      const menu = document.createElement('div')
+      menu.setAttribute('role', 'menu')
+      const item1 = document.createElement('button')
+      item1.setAttribute('role', 'menuitem')
+      const subWrap = document.createElement('div')
+      subWrap.hidden = true
+      const subMenu = document.createElement('div')
+      subMenu.setAttribute('role', 'menu')
+      const hiddenItem = document.createElement('button')
+      hiddenItem.setAttribute('role', 'menuitem')
+      subMenu.appendChild(hiddenItem)
+      subWrap.appendChild(subMenu)
+      menu.append(item1, subWrap)
+      container.appendChild(menu)
+      document.body.appendChild(container)
+      cleanup.push(container)
+
+      expect(getMenuItems(container)).toEqual([item1])
+    })
   })
 
   describe('handleMenuNavigation', () => {

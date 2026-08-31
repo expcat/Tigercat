@@ -20,7 +20,9 @@ export const koKR: TigerLocale = {
     clearText: '지우기',
     closeMessageAriaLabel: '메시지 닫기',
     closeNotificationAriaLabel: '알림 닫기',
-    sidebarAriaLabel: '사이드바'
+    sidebarAriaLabel: '사이드바',
+    moreOptionsText: '추가 작업',
+    confirmTitle: '이 작업을 계속하시겠습니까?'
   },
   empty: {
     noData: '데이터 없음',

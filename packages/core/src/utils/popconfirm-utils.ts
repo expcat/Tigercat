@@ -3,7 +3,6 @@
  */
 import { classNames } from './class-names'
 import type { PopconfirmIconType } from '../types/popconfirm'
-import type { FloatingPlacement } from './floating'
 
 /**
  * Get base popconfirm container classes
@@ -18,8 +17,8 @@ export function getPopconfirmContainerClasses(): string {
 export function getPopconfirmTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-popconfirm-trigger',
-    'inline-block',
-    disabled && 'cursor-not-allowed opacity-50'
+    'inline-flex items-center bg-transparent p-0 border-0 font-inherit text-inherit',
+    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
   )
 }
 
@@ -43,45 +42,18 @@ export function getPopconfirmContentClasses(): string {
 }
 
 /**
- * Get popconfirm arrow classes (small pointer to the trigger)
+ * Arrow chrome. Position is applied via `getArrowStyles`.
  */
-export function getPopconfirmArrowClasses(placement: FloatingPlacement): string {
-  const base = classNames(
+export function getPopconfirmArrowClasses(): string {
+  return classNames(
     'tiger-popconfirm-arrow',
-    'absolute',
-    'w-3',
-    'h-3',
+    'w-2',
+    'h-2',
     'rotate-45',
-    'bg-[var(--tiger-border,#e5e7eb)]',
-    'rounded-[2px]',
-    "after:content-['']",
-    'after:absolute',
-    'after:inset-px',
-    'after:bg-[var(--tiger-surface,#ffffff)]',
-    'after:rounded-[2px]',
-    'pointer-events-none',
-    'z-0'
+    'bg-[var(--tiger-surface,#ffffff)]',
+    'border border-[var(--tiger-border,#e5e7eb)]',
+    'pointer-events-none'
   )
-
-  const placementMap: Record<FloatingPlacement, string> = {
-    'top-start': 'bottom-0 left-6 translate-y-1/2',
-    top: 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2',
-    'top-end': 'bottom-0 right-6 translate-y-1/2',
-
-    'bottom-start': 'top-0 left-6 -translate-y-1/2',
-    bottom: 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2',
-    'bottom-end': 'top-0 right-6 -translate-y-1/2',
-
-    'left-start': 'right-0 top-6 translate-x-1/2',
-    left: 'right-0 top-1/2 -translate-y-1/2 translate-x-1/2',
-    'left-end': 'right-0 bottom-6 translate-x-1/2',
-
-    'right-start': 'left-0 top-6 -translate-x-1/2',
-    right: 'left-0 top-1/2 -translate-y-1/2 -translate-x-1/2',
-    'right-end': 'left-0 bottom-6 -translate-x-1/2'
-  }
-
-  return classNames(base, placementMap[placement] || placementMap.bottom)
 }
 
 /**
@@ -126,7 +98,7 @@ export function getPopconfirmIconClasses(iconType: PopconfirmIconType): string {
     'flex-shrink-0',
     'w-5',
     'h-5',
-    'mr-2',
+    'me-2',
     iconColorMap[iconType] || iconColorMap.warning
   )
 }

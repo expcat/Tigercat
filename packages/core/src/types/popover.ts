@@ -2,26 +2,17 @@
  * Popover component types and interfaces
  */
 
-import type { FloatingPlacement } from '../utils/floating'
+import type { BaseFloatingPopupProps, FloatingTrigger } from './floating-popup'
 
 /**
  * Popover trigger type
  */
-export type PopoverTrigger = 'click' | 'hover' | 'focus' | 'manual'
+export type PopoverTrigger = FloatingTrigger
 
 /**
  * Base popover props interface
  */
-export interface PopoverProps {
-  /** Whether the popover is open (controlled mode) */
-  open?: boolean
-
-  /**
-   * Default open state (uncontrolled mode)
-   * @default false
-   */
-  defaultOpen?: boolean
-
+export interface PopoverProps extends BaseFloatingPopupProps {
   /** Popover title text */
   title?: string
 
@@ -35,30 +26,9 @@ export interface PopoverProps {
   trigger?: PopoverTrigger
 
   /**
-   * Popover placement relative to trigger
-   * @default 'top'
+   * Popover width in pixels. Custom width drops the default max-width cap.
    */
-  placement?: FloatingPlacement
-
-  /**
-   * Whether the popover is disabled
-   * @default false
-   */
-  disabled?: boolean
-
-  /**
-   * Popover width (pixel number or Tailwind class)
-   */
-  width?: string | number
-
-  /**
-   * Offset distance from trigger (in pixels)
-   * @default 8
-   */
-  offset?: number
-
-  /** Additional CSS classes */
-  className?: string
+  width?: number | string
 
   /** Custom styles */
   style?: Record<string, string | number>

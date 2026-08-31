@@ -20,7 +20,9 @@ export const viVN: TigerLocale = {
     clearText: 'Xóa',
     closeMessageAriaLabel: 'Đóng tin nhắn',
     closeNotificationAriaLabel: 'Đóng thông báo',
-    sidebarAriaLabel: 'Thanh bên'
+    sidebarAriaLabel: 'Thanh bên',
+    moreOptionsText: 'Thêm tùy chọn',
+    confirmTitle: 'Bạn có chắc muốn tiếp tục?'
   },
   empty: {
     noData: 'Không có dữ liệu',

@@ -18,12 +18,20 @@ export interface BaseFloatingPopupProps {
   open?: boolean
   /** Default open state (uncontrolled mode) @default false */
   defaultOpen?: boolean
+  /** Trigger type @default 'click' (Tooltip defaults to hover+focus+click) */
+  trigger?: FloatingTrigger
   /** Placement relative to trigger @default 'top' */
   placement?: FloatingPlacement
   /** Whether the popup is disabled @default false */
   disabled?: boolean
   /** Offset distance from trigger in pixels @default 8 */
   offset?: number
+  /**
+   * Merge trigger ARIA / handlers onto the single child instead of rendering
+   * a wrapping button.
+   * @default false
+   */
+  asChild?: boolean
   /** Additional CSS classes */
   className?: string
 }

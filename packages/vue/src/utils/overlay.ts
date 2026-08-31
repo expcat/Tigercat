@@ -454,6 +454,7 @@ export interface UseVueAnchoredOverlayOptions {
   dismissOnOutside?: Ref<boolean> | boolean
   dismissOnEscape?: Ref<boolean> | boolean
   restoreFocusOnDismiss?: boolean
+  arrowRef?: MaybeRefOrGetter<HTMLElement | null>
   onDismiss?: (reason: AnchoredOverlayDismissReason) => void
 }
 
@@ -502,7 +503,8 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     floatingRef: options.floatingRef,
     enabled: options.enabled,
     placement: () => toValue(options.placement) ?? 'bottom-start',
-    offset: () => toValue(options.offset) ?? 4
+    offset: () => toValue(options.offset) ?? 4,
+    arrowRef: options.arrowRef
   })
 
   const dismiss = (reason: AnchoredOverlayDismissReason) => {
@@ -577,6 +579,8 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     positioned: floating.isPositioned,
     placement: floating.placement,
     x: floating.x,
-    y: floating.y
+    y: floating.y,
+    arrowX: floating.arrowX,
+    arrowY: floating.arrowY
   }
 }

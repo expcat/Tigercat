@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
   DROPDOWN_CHEVRON_PATH,
   getDropdownChevronClasses,
   getSplitButtonPrimaryClasses,
   getSplitButtonRootClasses,
   getSplitButtonTriggerClasses,
+  resolveLocaleText,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
   resolveSplitButtonVariant,
@@ -12,7 +13,7 @@ import {
   type SplitButtonProps as CoreSplitButtonProps
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
-import { ButtonGroup } from './ButtonGroup'
+import { useTigerConfig } from './ConfigProvider'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 
 export interface SplitButtonProps
@@ -22,31 +23,11 @@ export interface SplitButtonProps
   style?: React.CSSProperties
   icon?: React.ReactNode
   loadingIcon?: React.ReactNode
-  /**
-   * Custom chevron trigger content. Defaults to a rotating chevron.
-   */
   trigger?: React.ReactNode
-  /**
-   * Menu content. Takes precedence over a `DropdownMenu` found in `children`.
-   */
   menu?: React.ReactNode
-  /**
-   * Dropdown placement relative to the chevron trigger
-   * @default 'bottom-end'
-   */
   placement?: FloatingPlacement
-  /**
-   * Offset distance from the chevron trigger
-   * @default 4
-   */
   offset?: number
-  /**
-   * Primary action click handler. Does not open the menu.
-   */
   onClick?: React.MouseEventHandler<HTMLButtonElement>
-  /**
-   * Called when the dropdown open state changes
-   */
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
 }
@@ -95,10 +76,10 @@ function partitionChildren(children: React.ReactNode): {
   return { primary, menu }
 }
 
-function Chevron({ open }: { open: boolean }) {
+function Chevron({ open, size }: { open: boolean; size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' }) {
   return (
     <svg
-      className={getDropdownChevronClasses(open)}
+      className={getDropdownChevronClasses(open, { tone: 'current', size })}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -112,52 +93,56 @@ function Chevron({ open }: { open: boolean }) {
   )
 }
 
-export const SplitButton: React.FC<SplitButtonProps> = ({
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  loading = false,
-  danger = false,
-  block = false,
-  htmlType = 'button',
-  iconPosition = 'left',
-  icon,
-  loadingIcon,
-  trigger,
-  triggerAriaLabel,
-  open,
-  defaultOpen = false,
-  closeOnClick = true,
-  portal = true,
-  placement = 'bottom-end',
-  offset = 4,
-  menu,
-  onClick,
-  onOpenChange,
-  className,
-  style,
-  children,
-  ...rest
-}) => {
+export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(function SplitButton(
+  {
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    loading = false,
+    danger = false,
+    block = false,
+    htmlType = 'button',
+    iconPosition = 'left',
+    icon,
+    loadingIcon,
+    trigger,
+    triggerAriaLabel,
+    primaryAriaLabel,
+    open,
+    defaultOpen = false,
+    closeOnClick = true,
+    portal = true,
+    placement = 'bottom-end',
+    offset = 4,
+    menu,
+    onClick,
+    onOpenChange,
+    className,
+    style,
+    children,
+    ...rest
+  },
+  forwardedRef
+) {
+  const { locale } = useTigerConfig()
   const resolvedVariant = resolveSplitButtonVariant(variant)
   const resolvedSize = resolveSplitButtonSize(size)
-  const isDisabled = disabled || loading
-  const triggerLabel = resolveSplitButtonTriggerAriaLabel(triggerAriaLabel)
+  const triggerLabel = resolveSplitButtonTriggerAriaLabel(
+    triggerAriaLabel,
+    resolveLocaleText('More options', locale?.common?.moreOptionsText)
+  )
   const partitioned = useMemo(() => partitionChildren(children), [children])
   const menuNode = menu != null ? wrapMenu(menu) : partitioned.menu
+  const hasMenu = menuNode != null
 
   const rootClasses = getSplitButtonRootClasses({ block, className })
   const primaryClasses = getSplitButtonPrimaryClasses({ block })
   const triggerClasses = getSplitButtonTriggerClasses({ size: resolvedSize })
 
   return (
-    <ButtonGroup
-      size={resolvedSize}
-      className={rootClasses}
-      style={style}
-      data-split-button=""
-      {...rest}>
+    <div className={rootClasses} style={style} role="group" data-split-button="" {...rest}>
       <Button
+        ref={forwardedRef}
         variant={resolvedVariant}
         size={resolvedSize}
         disabled={disabled}
@@ -168,40 +153,51 @@ export const SplitButton: React.FC<SplitButtonProps> = ({
         icon={icon}
         loadingIcon={loadingIcon}
         className={primaryClasses}
+        aria-label={primaryAriaLabel}
         data-split-button-primary=""
         onClick={onClick}>
         {partitioned.primary}
       </Button>
-      <Dropdown
-        trigger="click"
-        showArrow={false}
-        disabled={isDisabled}
-        open={open}
-        defaultOpen={defaultOpen}
-        closeOnClick={closeOnClick}
-        portal={portal}
-        placement={placement}
-        offset={offset}
-        onOpenChange={onOpenChange}
-        renderTrigger={({ open: menuOpen }) => (
-          <Button
-            variant={resolvedVariant}
-            size={resolvedSize}
-            disabled={isDisabled}
-            danger={danger}
-            htmlType="button"
-            className={triggerClasses}
-            aria-label={triggerLabel}
-            aria-haspopup="menu"
-            aria-expanded={menuOpen}
-            data-split-button-trigger="">
-            {trigger ?? <Chevron open={menuOpen} />}
-          </Button>
-        )}>
-        {menuNode}
-      </Dropdown>
-    </ButtonGroup>
+      {hasMenu ? (
+        <Dropdown
+          trigger="click"
+          showArrow={false}
+          asChild
+          disabled={disabled}
+          open={open}
+          defaultOpen={defaultOpen}
+          closeOnClick={closeOnClick}
+          portal={portal}
+          placement={placement}
+          offset={offset}
+          onOpenChange={(next) => {
+            if (loading) return
+            onOpenChange?.(next)
+          }}
+          renderTrigger={({ open: menuOpen }) => (
+            <Button
+              variant={resolvedVariant}
+              size={resolvedSize}
+              disabled={disabled}
+              danger={danger}
+              htmlType="button"
+              className={triggerClasses}
+              aria-label={triggerLabel}
+              aria-disabled={loading || undefined}
+              data-split-button-trigger=""
+              onClick={(event) => {
+                if (loading) event.preventDefault()
+              }}>
+              {trigger ?? <Chevron open={menuOpen} size={resolvedSize} />}
+            </Button>
+          )}>
+          {menuNode}
+        </Dropdown>
+      ) : null}
+    </div>
   )
-}
+})
+
+SplitButton.displayName = 'SplitButton'
 
 export default SplitButton

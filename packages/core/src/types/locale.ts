@@ -21,6 +21,10 @@ export interface TigerLocaleCommon {
   closeNotificationAriaLabel?: string
   /** Default accessible name for Sidebar (`<aside>`) when none is passed */
   sidebarAriaLabel?: string
+  /** Default accessible name for SplitButton chevron / "more" triggers */
+  moreOptionsText?: string
+  /** Default Popconfirm title when none is passed */
+  confirmTitle?: string
 }
 
 export interface TigerLocaleEmpty {

@@ -1,8 +1,10 @@
-import React, { useId, useMemo } from 'react'
+import React, { forwardRef, useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
+import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
+  getOverlayTriggerAria,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getTooltipContentClasses,
@@ -11,34 +13,40 @@ import {
 } from '@expcat/tigercat-core'
 
 export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'placement'> &
-  Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'content'> & {
+  Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    'children' | 'className' | 'style' | 'content' | 'title'
+  > & {
     children?: React.ReactNode
     content?: React.ReactNode
     className?: string
     style?: React.CSSProperties
     placement?: FloatingPlacement
     offset?: number
+    asChild?: boolean
     onOpenChange?: (open: boolean) => void
   }
 
-export const Tooltip: React.FC<TooltipProps> = ({
-  open,
-  defaultOpen = false,
-  content,
-  trigger = 'hover',
-  placement = 'top',
-  disabled = false,
-  offset = 8,
-  className,
-  style,
-  children,
-  onOpenChange,
-  ...divProps
-}) => {
+export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
+  {
+    open,
+    defaultOpen = false,
+    content,
+    trigger = 'hover',
+    placement = 'top',
+    disabled = false,
+    offset = 8,
+    asChild = false,
+    className,
+    style,
+    children,
+    onOpenChange,
+    ...divProps
+  },
+  forwardedRef
+) {
   const tooltipId = `tiger-tooltip-${useId()}`
-  const describedBy = content != null ? tooltipId : undefined
 
-  // Shared popup logic
   const {
     currentVisible,
     containerRef,
@@ -51,7 +59,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
     triggerHandlers
   } = usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
 
-  // Memoized classes
   const containerClasses = useMemo(
     () => classNames(getTooltipContainerClasses(), className),
     [className]
@@ -61,15 +68,30 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   if (!children) return null
 
+  const triggerAria = getOverlayTriggerAria({
+    kind: 'tooltip',
+    open: Boolean(currentVisible),
+    describedBy: tooltipId,
+    disabled
+  })
+
   return (
     <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
-      <div
-        ref={triggerRef}
-        className={triggerClasses}
-        aria-describedby={describedBy}
-        {...triggerHandlers}>
-        {children}
-      </div>
+      {renderOverlayTrigger({
+        asChild,
+        child: children,
+        triggerRef: composeRefs(forwardedRef, triggerRef),
+        className: asChild ? undefined : triggerClasses,
+        disabled,
+        aria: triggerAria,
+        handlers: {
+          onClick: triggerHandlers.onClick as ((event: React.MouseEvent) => void) | undefined,
+          onMouseEnter: triggerHandlers.onMouseEnter,
+          onMouseLeave: triggerHandlers.onMouseLeave,
+          onFocus: triggerHandlers.onFocus,
+          onBlur: triggerHandlers.onBlur
+        }
+      })}
 
       {currentVisible &&
         renderOverlayPortal(
@@ -87,4 +109,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
         )}
     </div>
   )
-}
+})
+
+Tooltip.displayName = 'Tooltip'

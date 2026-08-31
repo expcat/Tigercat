@@ -15,7 +15,7 @@ import type { ButtonSize, ButtonVariant } from '../types/button'
 import { classNames } from './class-names'
 
 /** Root group wrapping the primary action and the menu trigger */
-export const splitButtonRootClasses = 'tiger-split-button inline-flex'
+export const splitButtonRootClasses = 'tiger-split-button inline-flex items-stretch'
 
 /** Stretch the group to the parent width */
 export const splitButtonRootBlockClasses = 'w-full'
@@ -24,7 +24,7 @@ export const splitButtonRootBlockClasses = 'w-full'
  * Join the primary button to the trigger. `!` wins over Button's token radius
  * so the seam stays square regardless of generated CSS order.
  */
-export const splitButtonPrimaryClasses = '!rounded-r-none'
+export const splitButtonPrimaryClasses = '!rounded-e-none'
 
 /** Let the primary action fill remaining width in block layout */
 export const splitButtonPrimaryBlockClasses = 'min-w-0 flex-1'
@@ -34,7 +34,7 @@ export const splitButtonPrimaryBlockClasses = 'min-w-0 flex-1'
  * when the group is stretched.
  */
 export const splitButtonTriggerClasses =
-  'tiger-split-button-trigger shrink-0 !rounded-l-none -ml-px'
+  'tiger-split-button-trigger shrink-0 !rounded-s-none -ms-px'
 
 /** Compact horizontal padding so the chevron trigger stays square-ish */
 export const splitButtonTriggerSizeClasses: Record<ButtonSize, string> = {
@@ -66,14 +66,18 @@ export function resolveSplitButtonVariant(variant?: ButtonVariant): ButtonVarian
 
 /**
  * Resolve the accessible name for the chevron trigger.
- * Empty or whitespace-only values fall back to the default.
+ * Empty or whitespace-only values fall back to `fallback` (locale) or the
+ * English default.
  */
-export function resolveSplitButtonTriggerAriaLabel(label?: string): string {
+export function resolveSplitButtonTriggerAriaLabel(
+  label?: string,
+  fallback: string = DEFAULT_SPLIT_BUTTON_TRIGGER_ARIA_LABEL
+): string {
   if (typeof label === 'string') {
     const trimmed = label.trim()
     if (trimmed) return trimmed
   }
-  return DEFAULT_SPLIT_BUTTON_TRIGGER_ARIA_LABEL
+  return fallback
 }
 
 /**

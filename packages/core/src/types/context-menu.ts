@@ -2,6 +2,8 @@
  * ContextMenu component types and interfaces
  */
 
+import type { FloatingPlacement } from '../utils/floating'
+
 /**
  * Viewport point used as the floating-ui virtual reference.
  */
@@ -20,6 +22,16 @@ export interface ContextMenuPoint {
  * Base ContextMenu props interface
  */
 export interface ContextMenuProps {
+  /**
+   * Merge trigger ARIA / handlers onto the unique focusable child.
+   * @default false
+   */
+  asChild?: boolean
+  /**
+   * Menu placement relative to the cursor point
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
   /**
    * Whether the context menu is disabled
    * @default false
@@ -80,9 +92,13 @@ export interface ContextMenuMenuProps {
  */
 export interface ContextMenuItemProps {
   /**
-   * Unique key for the menu item
+   * Stable item identity when rendering lists. Not a React/Vue vnode key.
    */
-  key?: string | number
+  itemKey?: string | number
+  /**
+   * When set, the item renders as a link (`<a role="menuitem">`).
+   */
+  href?: string
   /**
    * Whether the item is disabled
    * @default false
@@ -103,10 +119,6 @@ export interface ContextMenuItemProps {
  * Nested submenu props interface
  */
 export interface ContextMenuSubProps {
-  /**
-   * Unique key for the submenu
-   */
-  itemKey?: string | number
   /**
    * Submenu trigger label
    */

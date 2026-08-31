@@ -2,20 +2,46 @@
  * Dropdown component types and interfaces
  */
 
+import type { FloatingPlacement } from '../utils/floating'
+
 /**
  * Dropdown trigger mode - determines how the dropdown is opened
  */
 export type DropdownTrigger = 'click' | 'hover'
 
 /**
+ * Default trigger. Hover still works when set explicitly, and is co-joined
+ * with click / keyboard so touch and Tab can open the menu.
+ */
+export const DEFAULT_DROPDOWN_TRIGGER: DropdownTrigger = 'click'
+
+/**
  * Base dropdown props interface
  */
 export interface DropdownProps {
   /**
-   * Trigger mode - click or hover
-   * @default 'hover'
+   * Trigger mode - click or hover. Hover also opens on click, focus, and
+   * ArrowDown / ArrowUp.
+   * @default 'click'
    */
   trigger?: DropdownTrigger
+  /**
+   * Merge trigger ARIA / handlers onto the single child instead of rendering
+   * a wrapping button. The child must accept a ref (native button/a, or a
+   * Tigercat Button).
+   * @default false
+   */
+  asChild?: boolean
+  /**
+   * Dropdown placement relative to trigger
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
+  /**
+   * Offset distance from trigger element
+   * @default 4
+   */
+  offset?: number
   /**
    * Whether the dropdown is disabled
    * @default false
@@ -76,9 +102,9 @@ export interface DropdownMenuProps {
  */
 export interface DropdownItemProps {
   /**
-   * Unique key for the dropdown item
+   * Stable item identity when rendering lists. Not a React/Vue vnode key.
    */
-  key?: string | number
+  itemKey?: string | number
   /**
    * Whether the item is disabled
    * @default false
@@ -95,9 +121,9 @@ export interface DropdownItemProps {
    */
   closeOnClick?: boolean
   /**
-   * Icon for the dropdown item
+   * When set, the item renders as a link (`<a role="menuitem">`).
    */
-  icon?: unknown
+  href?: string
   /**
    * Additional CSS classes
    */

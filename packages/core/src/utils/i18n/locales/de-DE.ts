@@ -20,7 +20,9 @@ export const deDE: TigerLocale = {
     clearText: 'Löschen',
     closeMessageAriaLabel: 'Nachricht schließen',
     closeNotificationAriaLabel: 'Benachrichtigung schließen',
-    sidebarAriaLabel: 'Seitenleiste'
+    sidebarAriaLabel: 'Seitenleiste',
+    moreOptionsText: 'Weitere Optionen',
+    confirmTitle: 'Möchten Sie fortfahren?'
   },
   empty: {
     noData: 'Keine Daten',

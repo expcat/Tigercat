@@ -9,7 +9,7 @@
 import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 import { useVueAnchoredOverlay } from './overlay'
 import {
-  buildTriggerHandlerMap,
+  buildOverlayTriggerHandlerMap,
   createFloatingHoverDelayController,
   restoreFocus,
   type FloatingPlacement,
@@ -37,6 +37,7 @@ export interface UsePopupOptions {
    * @default true
    */
   multiTrigger?: boolean
+  arrowRef?: Ref<HTMLElement | null>
 }
 
 // ---------------------------------------------------------------------------
@@ -71,13 +72,15 @@ export interface UsePopupReturn {
   triggerHandlers: Ref<Record<string, unknown>>
   /** Close the popup and restore focus to the trigger. */
   closeAndRestoreFocus: () => void
+  arrowX: Ref<number | undefined>
+  arrowY: Ref<number | undefined>
 }
 
 // ---------------------------------------------------------------------------
 // Composable
 // ---------------------------------------------------------------------------
 export function usePopup(options: UsePopupOptions): UsePopupReturn {
-  const { props, emit, multiTrigger = true } = options
+  const { props, emit, multiTrigger = true, arrowRef } = options
 
   // ─── Visibility ──────────────────────────────────────────────────────
   const internalVisible = ref(props.open ?? props.defaultOpen ?? false)
@@ -114,20 +117,14 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const floatingRef = ref<HTMLElement | null>(null)
 
   const restoreTriggerFocus = () => {
-    const trigger = triggerRef.value
-    const target =
-      trigger?.querySelector<HTMLElement>(
-        'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'
-      ) ?? trigger
-
     window.setTimeout(() => {
-      restoreFocus(target, { preventScroll: true })
+      restoreFocus(triggerRef.value, { preventScroll: true })
     }, 0)
   }
 
   const closeAndRestoreFocus = () => {
     hoverController.closeNow()
-    restoreTriggerFocus()
+    if (effectiveTrigger.value !== 'hover') restoreTriggerFocus()
   }
 
   const effectiveTrigger = computed<FloatingTrigger>(() =>
@@ -141,8 +138,11 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     containerRef,
     placement: () => (props.placement ?? 'top') as FloatingPlacement,
     offset: () => props.offset ?? 8,
-    dismissOnOutside: computed(() => effectiveTrigger.value === 'click'),
+    dismissOnOutside: computed(
+      () => effectiveTrigger.value === 'click' || effectiveTrigger.value === 'hover'
+    ),
     dismissOnEscape: computed(() => effectiveTrigger.value !== 'manual'),
+    arrowRef,
     onDismiss: (reason) => {
       if (reason === 'escape') {
         closeAndRestoreFocus()
@@ -170,8 +170,15 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     hoverController.cancel()
     setVisible(true)
   }
-  const handleHide = () => {
+  const handleHide = (event?: Event) => {
     if (props.disabled) return
+    const related = (event as FocusEvent | undefined)?.relatedTarget
+    if (
+      related instanceof Node &&
+      (floatingRef.value?.contains(related) || triggerRef.value?.contains(related))
+    ) {
+      return
+    }
     if (effectiveTrigger.value === 'hover') {
       hoverController.leave()
       return
@@ -206,7 +213,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
       // Click-only (Popconfirm)
       return { onClick: handleToggle }
     }
-    return buildTriggerHandlerMap(
+    return buildOverlayTriggerHandlerMap(
       effectiveTrigger.value,
       { toggle: handleToggle, show: handleShow, hide: handleHide },
       'vue'
@@ -227,6 +234,8 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     positioned: overlay.positioned,
     overlayTarget: overlay.target,
     triggerHandlers,
-    closeAndRestoreFocus
+    closeAndRestoreFocus,
+    arrowX: overlay.arrowX,
+    arrowY: overlay.arrowY
   }
 }

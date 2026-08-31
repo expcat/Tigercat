@@ -1,9 +1,11 @@
 import { defineComponent, computed, h, PropType, useId } from 'vue'
 import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
+import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
   coerceClassValue,
+  getOverlayTriggerAria,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getTooltipContentClasses,
@@ -13,29 +15,32 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface VueTooltipProps {
+  open?: boolean
+  defaultOpen?: boolean
+  content?: string
+  trigger?: TooltipTrigger
+  placement?: FloatingPlacement
+  disabled?: boolean
+  offset?: number
+  asChild?: boolean
   className?: string
   style?: StyleValue
 }
+
+export type TooltipProps = VueTooltipProps
 
 export const Tooltip = defineComponent({
   name: 'TigerTooltip',
   inheritAttrs: false,
   props: {
-    /** Whether the tooltip is open (controlled mode) */
     open: { type: Boolean, default: undefined },
-    /** Default open state (uncontrolled mode) @default false */
     defaultOpen: { type: Boolean, default: false },
-    /** Tooltip content text */
     content: { type: String, default: undefined },
-    /** Trigger type @default 'hover' */
     trigger: { type: String as PropType<TooltipTrigger>, default: 'hover' as TooltipTrigger },
-    /** Placement @default 'top' */
     placement: { type: String as PropType<FloatingPlacement>, default: 'top' as FloatingPlacement },
-    /** Disabled state @default false */
     disabled: { type: Boolean, default: false },
-    /** Offset in pixels @default 8 */
     offset: { type: Number, default: 8 },
-    /** Additional CSS classes */
+    asChild: { type: Boolean, default: false },
     className: { type: String, default: undefined },
     style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
   },
@@ -43,7 +48,6 @@ export const Tooltip = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
 
-    // Shared floating-popup logic
     const {
       currentVisible,
       containerRef,
@@ -58,7 +62,6 @@ export const Tooltip = defineComponent({
 
     const tooltipId = `tiger-tooltip-${useId()}`
 
-    // Memoized classes
     const containerClasses = computed(() =>
       classNames(getTooltipContainerClasses(), props.className, coerceClassValue(attrsRecord.class))
     )
@@ -72,10 +75,19 @@ export const Tooltip = defineComponent({
       const {
         class: _class,
         style: _style,
+        title: _title,
         ...restAttrs
-      } = attrsRecord as { class?: unknown; style?: unknown } & Record<string, unknown>
+      } = attrsRecord as { class?: unknown; style?: unknown; title?: unknown } & Record<
+        string,
+        unknown
+      >
 
-      const hasTooltipContent = Boolean(props.content || slots.content)
+      const triggerAria = getOverlayTriggerAria({
+        kind: 'tooltip',
+        open: currentVisible.value,
+        describedBy: tooltipId,
+        disabled: props.disabled
+      })
 
       return h(
         'div',
@@ -86,18 +98,15 @@ export const Tooltip = defineComponent({
           style: props.style
         },
         [
-          // Trigger element
-          h(
-            'div',
-            {
-              ref: triggerRef,
-              class: triggerClasses.value,
-              'aria-describedby': hasTooltipContent ? tooltipId : undefined,
-              ...triggerHandlers.value
-            },
-            defaultSlot
-          ),
-          // Tooltip content (positioned with Floating UI)
+          renderOverlayTrigger({
+            asChild: props.asChild,
+            child: defaultSlot.length === 1 ? defaultSlot[0] : defaultSlot,
+            setTriggerRef: (el) => assignOverlayTriggerRef(triggerRef, el),
+            className: props.asChild ? undefined : triggerClasses.value,
+            disabled: props.disabled,
+            aria: triggerAria,
+            handlers: triggerHandlers.value
+          }),
           currentVisible.value
             ? renderVueOverlayTeleport(
                 h(
@@ -112,11 +121,7 @@ export const Tooltip = defineComponent({
                   [
                     h(
                       'div',
-                      {
-                        id: tooltipId,
-                        role: 'tooltip',
-                        class: contentClasses.value
-                      },
+                      { id: tooltipId, role: 'tooltip', class: contentClasses.value },
                       slots.content ? slots.content() : props.content
                     )
                   ]

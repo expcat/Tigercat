@@ -20,7 +20,9 @@ export const idID: TigerLocale = {
     clearText: 'Hapus',
     closeMessageAriaLabel: 'Tutup pesan',
     closeNotificationAriaLabel: 'Tutup notifikasi',
-    sidebarAriaLabel: 'Bilah sisi'
+    sidebarAriaLabel: 'Bilah sisi',
+    moreOptionsText: 'Opsi lainnya',
+    confirmTitle: 'Yakin ingin melanjutkan?'
   },
   empty: {
     noData: 'Tidak ada data',

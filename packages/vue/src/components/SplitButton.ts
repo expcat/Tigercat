@@ -7,6 +7,7 @@ import {
   getSplitButtonRootClasses,
   getSplitButtonTriggerClasses,
   mergeStyleValues,
+  resolveLocaleText,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
   resolveSplitButtonVariant,
@@ -18,7 +19,7 @@ import {
 } from '@expcat/tigercat-core'
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { Button } from './Button'
-import { ButtonGroup } from './ButtonGroup'
+import { useTigerConfig } from './ConfigProvider'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 
 export interface VueSplitButtonProps {
@@ -35,11 +36,14 @@ export interface VueSplitButtonProps {
   closeOnClick?: boolean
   portal?: boolean
   triggerAriaLabel?: string
+  primaryAriaLabel?: string
   placement?: FloatingPlacement
   offset?: number
   className?: string
   style?: Record<string, unknown>
 }
+
+export type SplitButtonProps = VueSplitButtonProps
 
 function wrapMenu(nodes: VNode[] | undefined): VNode | null {
   const flattened = flattenSlotVNodes(nodes)
@@ -76,11 +80,11 @@ function partitionDefaultSlot(nodes: VNode[] | undefined): {
   return { primary, menu }
 }
 
-function createChevron(open: boolean) {
+function createChevron(open: boolean, size: ButtonSize) {
   return h(
     'svg',
     {
-      class: getDropdownChevronClasses(open),
+      class: getDropdownChevronClasses(open, { tone: 'current', size }),
       viewBox: '0 0 24 24',
       fill: 'none',
       stroke: 'currentColor',
@@ -98,119 +102,62 @@ export const SplitButton = defineComponent({
   name: 'TigerSplitButton',
   inheritAttrs: false,
   props: {
-    /**
-     * Visual variant applied to the primary action and the menu trigger
-     * @default 'primary'
-     */
     variant: {
       type: String as PropType<ButtonVariant>,
       default: 'primary'
     },
-    /**
-     * Size applied to the primary action and the menu trigger
-     * @default 'md'
-     */
     size: {
       type: String as PropType<ButtonSize>,
       default: 'md'
     },
-    /**
-     * Whether both the primary action and the menu trigger are disabled
-     */
     disabled: Boolean,
-    /**
-     * Whether the primary action is in a loading state. Also disables the menu trigger.
-     */
     loading: Boolean,
-    /**
-     * Whether to apply danger/destructive styling to both buttons
-     */
     danger: Boolean,
-    /**
-     * Whether the split control should take the full width of its parent
-     */
     block: Boolean,
-    /**
-     * HTML button type for the primary action
-     * @default 'button'
-     */
     htmlType: {
       type: String as PropType<ButtonHtmlType>,
-      default: 'button'
+      default: undefined
     },
-    /**
-     * Position of the icon relative to the primary action text
-     * @default 'left'
-     */
     iconPosition: {
       type: String as PropType<ButtonIconPosition>,
       default: 'left'
     },
-    /**
-     * Whether the menu is open (controlled mode)
-     */
     open: {
       type: Boolean as PropType<boolean | undefined>,
       default: undefined
     },
-    /**
-     * Default open state (uncontrolled mode)
-     * @default false
-     */
     defaultOpen: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether to close the menu when a menu item is clicked
-     * @default true
-     */
     closeOnClick: {
       type: Boolean,
       default: true
     },
-    /**
-     * Render the menu into document.body (Teleport)
-     * @default true
-     */
     portal: {
       type: Boolean,
       default: true
     },
-    /**
-     * Accessible name for the chevron menu trigger
-     * @default 'More options'
-     */
     triggerAriaLabel: {
       type: String,
       default: undefined
     },
-    /**
-     * Dropdown placement relative to the chevron trigger
-     * @default 'bottom-end'
-     */
+    primaryAriaLabel: {
+      type: String,
+      default: undefined
+    },
     placement: {
       type: String as PropType<FloatingPlacement>,
       default: 'bottom-end' as FloatingPlacement
     },
-    /**
-     * Offset distance from the chevron trigger
-     * @default 4
-     */
     offset: {
       type: Number,
       default: 4
     },
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String,
       default: undefined
     },
-    /**
-     * Inline styles
-     */
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
@@ -218,21 +165,28 @@ export const SplitButton = defineComponent({
   },
   emits: ['click', 'update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
+
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const {
         class: _class,
         style: _style,
+        type: attrType,
         ...restAttrs
       } = attrsRecord as {
         class?: unknown
         style?: unknown
+        type?: unknown
       } & Record<string, unknown>
 
       const variant = resolveSplitButtonVariant(props.variant)
       const size = resolveSplitButtonSize(props.size)
-      const isDisabled = props.disabled || props.loading
-      const triggerLabel = resolveSplitButtonTriggerAriaLabel(props.triggerAriaLabel)
+      const triggerLabel = resolveSplitButtonTriggerAriaLabel(
+        props.triggerAriaLabel,
+        resolveLocaleText('More options', config.value.locale?.common?.moreOptionsText)
+      )
+      const htmlType = props.htmlType ?? (attrType as ButtonHtmlType | undefined) ?? 'button'
 
       const partitioned = partitionDefaultSlot(slots.default?.())
       const menuNode = wrapMenu(slots.menu?.()) ?? partitioned.menu
@@ -245,9 +199,10 @@ export const SplitButton = defineComponent({
           disabled: props.disabled,
           loading: props.loading,
           danger: props.danger,
-          htmlType: props.htmlType,
+          htmlType,
           iconPosition: props.iconPosition,
           className: getSplitButtonPrimaryClasses({ block: props.block }),
+          'aria-label': props.primaryAriaLabel,
           'data-split-button-primary': '',
           onClick: (event: MouseEvent) => emit('click', event)
         },
@@ -258,51 +213,61 @@ export const SplitButton = defineComponent({
         }
       )
 
-      const dropdown = h(
-        Dropdown,
-        {
-          trigger: 'click' as const,
-          showArrow: false,
-          disabled: isDisabled,
-          open: props.open,
-          defaultOpen: props.defaultOpen,
-          closeOnClick: props.closeOnClick,
-          portal: props.portal,
-          placement: props.placement,
-          offset: props.offset,
-          'onUpdate:open': (visible: boolean) => emit('update:open', visible),
-          onOpenChange: (visible: boolean) => emit('open-change', visible)
-        },
-        {
-          trigger: ({ open }: { open: boolean }) =>
-            h(
-              Button,
-              {
-                variant,
-                size,
-                disabled: isDisabled,
-                danger: props.danger,
-                htmlType: 'button',
-                className: getSplitButtonTriggerClasses({ size }),
-                'aria-label': triggerLabel,
-                'aria-haspopup': 'menu',
-                'aria-expanded': open,
-                'data-split-button-trigger': ''
+      const dropdown = menuNode
+        ? h(
+            Dropdown,
+            {
+              trigger: 'click' as const,
+              showArrow: false,
+              asChild: true,
+              disabled: props.disabled,
+              open: props.open,
+              defaultOpen: props.defaultOpen,
+              closeOnClick: props.closeOnClick,
+              portal: props.portal,
+              placement: props.placement,
+              offset: props.offset,
+              'onUpdate:open': (visible: boolean) => {
+                if (props.loading) return
+                emit('update:open', visible)
               },
-              {
-                default: () => slots.trigger?.({ open }) ?? createChevron(open)
+              onOpenChange: (visible: boolean) => {
+                if (props.loading) return
+                emit('open-change', visible)
               }
-            ),
-          default: () => menuNode
-        }
-      )
+            },
+            {
+              trigger: ({ open }: { open: boolean }) =>
+                h(
+                  Button,
+                  {
+                    variant,
+                    size,
+                    disabled: props.disabled,
+                    danger: props.danger,
+                    htmlType: 'button',
+                    className: getSplitButtonTriggerClasses({ size }),
+                    'aria-label': triggerLabel,
+                    'aria-disabled': props.loading || undefined,
+                    'data-split-button-trigger': '',
+                    onClick: (event: MouseEvent) => {
+                      if (props.loading) event.preventDefault()
+                    }
+                  },
+                  {
+                    default: () => slots.trigger?.({ open }) ?? createChevron(open, size)
+                  }
+                ),
+              default: () => menuNode
+            }
+          )
+        : null
 
       return h(
-        ButtonGroup,
+        'div',
         {
           ...restAttrs,
-          size,
-          className: composeComponentClasses(
+          class: composeComponentClasses(
             getSplitButtonRootClasses({
               block: props.block,
               className: props.className
@@ -310,9 +275,10 @@ export const SplitButton = defineComponent({
             attrsRecord.class
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
+          role: 'group',
           'data-split-button': ''
         },
-        { default: () => [primaryButton, dropdown] }
+        [primaryButton, dropdown]
       )
     }
   }

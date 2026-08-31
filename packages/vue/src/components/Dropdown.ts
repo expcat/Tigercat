@@ -12,7 +12,8 @@ import {
   nextTick,
   VNode,
   cloneVNode,
-  watch
+  watch,
+  useId
 } from 'vue'
 import {
   classNames,
@@ -28,8 +29,12 @@ import {
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
   focusFirstMenuItem,
-  captureActiveElement,
   restoreFocus,
+  createFloatingHoverDelayController,
+  DEFAULT_DROPDOWN_TRIGGER,
+  getOverlayTriggerAria,
+  getOverlayTriggerKeyboardAction,
+  devWarn,
   type DropdownTrigger,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
@@ -40,8 +45,7 @@ import type {
   DropdownItemProps as CoreDropdownItemProps
 } from '@expcat/tigercat-core'
 import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
-
-// --- DropdownMenu (child component) ---
+import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface VueDropdownMenuProps extends CoreDropdownMenuProps {}
 
@@ -49,9 +53,6 @@ export const DropdownMenu = defineComponent({
   name: 'TigerDropdownMenu',
   inheritAttrs: false,
   props: {
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String,
       default: undefined
@@ -88,6 +89,7 @@ export const DropdownMenu = defineComponent({
           ...restAttrs,
           class: menuClasses.value,
           role: 'menu',
+          'data-tiger-dropdown-menu': '',
           style: mergedStyle.value
         },
         slots.default?.()
@@ -96,20 +98,12 @@ export const DropdownMenu = defineComponent({
   }
 })
 
-// Counter for unique menu IDs
-let dropdownIdCounter = 0
-const createDropdownMenuId = () => `tiger-dropdown-menu-${++dropdownIdCounter}`
-
-// Dropdown context key
 export const DropdownContextKey = Symbol('DropdownContext')
 
-// Dropdown context interface
 export interface DropdownContext {
   closeOnClick: boolean
   handleItemClick: () => void
 }
-
-// --- DropdownItem (child component) ---
 
 export type VueDropdownItemProps = CoreDropdownItemProps
 
@@ -117,34 +111,26 @@ export const DropdownItem = defineComponent({
   name: 'TigerDropdownItem',
   inheritAttrs: false,
   props: {
-    /**
-     * Whether the item is disabled
-     * @default false
-     */
     disabled: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether the item is divided from previous item
-     * @default false
-     */
     divided: {
       type: Boolean,
       default: false
     },
-    /**
-     * When set, overrides the parent Dropdown `closeOnClick`.
-     * Omitted inherits the parent. Must default to undefined (not false): a
-     * bare Boolean would coerce omitted to false and break parent inheritance.
-     */
     closeOnClick: {
       type: Boolean,
       default: undefined
     },
-    /**
-     * Additional CSS classes
-     */
+    href: {
+      type: String,
+      default: undefined
+    },
+    itemKey: {
+      type: [String, Number],
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -161,6 +147,9 @@ export const DropdownItem = defineComponent({
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     const context = inject<DropdownContext | null>(DropdownContextKey, null)
+    if (context == null) {
+      devWarn('DropdownItem.orphan', 'DropdownItem must be used inside Dropdown.')
+    }
 
     const handleClick = (event: MouseEvent) => {
       if (props.disabled) {
@@ -196,16 +185,17 @@ export const DropdownItem = defineComponent({
         style?: unknown
       } & Record<string, unknown>
 
+      const isLink = Boolean(props.href) && !props.disabled
       return h(
-        'button',
+        isLink ? 'a' : 'button',
         {
           ...restAttrs,
-          type: 'button',
+          ...(isLink ? { href: props.href } : { type: 'button' }),
           class: itemClasses.value,
           role: 'menuitem',
           tabindex: -1,
-          'aria-disabled': props.disabled,
-          disabled: props.disabled,
+          'aria-disabled': props.disabled || undefined,
+          disabled: isLink ? undefined : props.disabled,
           onClick: handleClick,
           style: mergedStyle.value
         },
@@ -215,100 +205,53 @@ export const DropdownItem = defineComponent({
   }
 })
 
-// --- Dropdown (parent component) ---
-
 export interface VueDropdownProps extends CoreDropdownProps {
-  /**
-   * Dropdown placement relative to trigger
-   * @default 'bottom-start'
-   */
   placement?: FloatingPlacement
-  /**
-   * Offset distance from trigger element
-   * @default 4
-   */
   offset?: number
 }
+
+export type DropdownProps = VueDropdownProps
 
 export const Dropdown = defineComponent({
   name: 'TigerDropdown',
   inheritAttrs: false,
   props: {
-    /**
-     * Trigger mode - click or hover
-     * @default 'hover'
-     */
     trigger: {
       type: String as PropType<DropdownTrigger>,
-      default: 'hover' as DropdownTrigger
+      default: DEFAULT_DROPDOWN_TRIGGER
     },
-    /**
-     * Dropdown placement relative to trigger
-     * @default 'bottom-start'
-     */
     placement: {
       type: String as PropType<FloatingPlacement>,
       default: 'bottom-start' as FloatingPlacement
     },
-    /**
-     * Offset distance from trigger element
-     * @default 4
-     */
     offset: {
       type: Number,
       default: 4
     },
-    /**
-     * Whether the dropdown is disabled
-     * @default false
-     */
     disabled: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether the dropdown is open (controlled mode)
-     */
     open: {
       type: Boolean,
       default: undefined
     },
-    /**
-     * Default open state (uncontrolled mode)
-     * @default false
-     */
     defaultOpen: {
       type: Boolean,
       default: false
     },
-    /**
-     * Whether to close dropdown on menu item click
-     * @default true
-     */
     closeOnClick: {
       type: Boolean,
       default: true
     },
-    /**
-     * Whether to show the dropdown arrow/chevron indicator
-     * @default true
-     */
     showArrow: {
       type: Boolean,
       default: true
     },
-    /**
-     * Portal the menu through the overlay target chain so it is not clipped or
-     * covered by overflow/sticky ancestors (e.g. fixed table columns).
-     * @default true
-     */
     portal: {
       type: Boolean,
       default: true
     },
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String,
       default: undefined
@@ -317,9 +260,6 @@ export const Dropdown = defineComponent({
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
     },
-    /**
-     * Merge menu ARIA onto the trigger child instead of a wrapping div.
-     */
     asChild: {
       type: Boolean,
       default: false
@@ -331,34 +271,37 @@ export const Dropdown = defineComponent({
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
-    // Inject animation styles
     onMounted(() => injectDropdownStyles())
 
-    // Unique ID for menu a11y
-    const menuId = createDropdownMenuId()
-
-    // Previous active element for focus restore
+    const menuId = `tiger-dropdown-menu-${useId()}`
     const previousActiveElement = ref<HTMLElement | null>(null)
-
-    // Internal state for uncontrolled mode
     const internalVisible = ref(props.defaultOpen)
-
-    // Computed visible state (controlled or uncontrolled)
     const currentVisible = computed(() =>
       props.open !== undefined ? props.open : internalVisible.value
     )
 
-    // Refs for Floating UI positioning
     const containerRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const floatingRef = ref<HTMLElement | null>(null)
+    const openIntent = ref<'menu' | 'hover'>('menu')
+    const skipRestore = ref(false)
+
+    const hoverController = createFloatingHoverDelayController({
+      show: () => {
+        openIntent.value = 'hover'
+        setVisible(true)
+      },
+      hide: () => {
+        skipRestore.value = true
+        setVisible(false)
+      }
+    })
 
     const setVisible = (visible: boolean) => {
       if (props.disabled && visible) return
 
-      // Capture focus before opening
       if (visible && !currentVisible.value) {
-        previousActiveElement.value = captureActiveElement()
+        previousActiveElement.value = triggerRef.value
       }
 
       if (props.open === undefined) {
@@ -367,49 +310,81 @@ export const Dropdown = defineComponent({
       emit('update:open', visible)
       emit('open-change', visible)
 
-      // Focus management
       if (visible) {
+        if (openIntent.value === 'hover') return
         nextTick(() => {
-          if (floatingRef.value) {
-            focusFirstMenuItem(floatingRef.value)
-          }
+          if (floatingRef.value) focusFirstMenuItem(floatingRef.value)
         })
-      } else {
-        restoreFocus(previousActiveElement.value)
-        previousActiveElement.value = null
+        return
       }
+
+      hoverController.cancel()
+      if (!skipRestore.value) {
+        restoreFocus(previousActiveElement.value)
+      }
+      previousActiveElement.value = null
+      skipRestore.value = false
     }
 
+    watch(currentVisible, (visible) => {
+      if (!visible || openIntent.value === 'hover') return
+      nextTick(() => {
+        if (floatingRef.value) focusFirstMenuItem(floatingRef.value)
+      })
+    })
+
     const handleItemClick = () => {
+      skipRestore.value = false
       setVisible(false)
     }
 
-    let hoverTimer: ReturnType<typeof setTimeout> | null = null
-
     const handleMouseEnter = () => {
-      if (props.trigger !== 'hover') return
-      if (hoverTimer) clearTimeout(hoverTimer)
-      hoverTimer = setTimeout(() => setVisible(true), 100)
+      if (props.trigger !== 'hover' || props.disabled) return
+      hoverController.enter()
     }
 
     const handleMouseLeave = () => {
       if (props.trigger !== 'hover') return
-      if (hoverTimer) clearTimeout(hoverTimer)
-      hoverTimer = setTimeout(() => setVisible(false), 150)
+      hoverController.leave()
     }
 
     const handleClick = () => {
-      if (props.trigger !== 'click') return
+      if (props.disabled) return
+      if (triggerRef.value?.getAttribute('aria-disabled') === 'true') return
+      if (props.trigger === 'hover') hoverController.cancel()
+      openIntent.value = 'menu'
       setVisible(!currentVisible.value)
     }
 
+    const handleTriggerKeyDown = (event: Event) => {
+      const keyboardEvent = event as KeyboardEvent
+      const action = getOverlayTriggerKeyboardAction(keyboardEvent, {
+        kind: 'menu',
+        open: currentVisible.value,
+        disabled: props.disabled
+      })
+      if (!action) return
+      keyboardEvent.preventDefault()
+      hoverController.cancel()
+      if (action === 'close') {
+        setVisible(false)
+        return
+      }
+      openIntent.value = 'menu'
+      if (!currentVisible.value) setVisible(true)
+    }
+
     const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        skipRestore.value = true
+        setVisible(false)
+        return
+      }
       if (floatingRef.value) {
         handleMenuNavigation(floatingRef.value, event)
       }
     }
 
-    const clickOutsideEnabled = computed(() => props.trigger === 'click')
     const portalEnabled = computed(() => props.portal)
     const overlay = useVueAnchoredOverlay({
       referenceRef: triggerRef,
@@ -419,14 +394,15 @@ export const Dropdown = defineComponent({
       offset: () => props.offset,
       portal: portalEnabled,
       containerRef,
-      dismissOnOutside: clickOutsideEnabled,
+      dismissOnOutside: true,
       dismissOnEscape: true,
-      onDismiss: () => setVisible(false)
+      onDismiss: (reason) => {
+        skipRestore.value = reason !== 'escape'
+        setVisible(false)
+      }
     })
 
-    onBeforeUnmount(() => {
-      if (hoverTimer) clearTimeout(hoverTimer)
-    })
+    onBeforeUnmount(() => hoverController.dispose())
 
     const containerClasses = computed(() =>
       classNames(
@@ -438,14 +414,11 @@ export const Dropdown = defineComponent({
     )
 
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
-
     const triggerClasses = computed(() => getDropdownTriggerClasses(props.disabled))
-
     const menuWrapperClasses = computed(() =>
       classNames(overlay.floatingClasses.value, DROPDOWN_ENTER_CLASS)
     )
 
-    // Provide a reactive context so items see dynamic `closeOnClick` changes
     const dropdownContext = reactive<DropdownContext>({
       closeOnClick: props.closeOnClick,
       handleItemClick
@@ -459,83 +432,77 @@ export const Dropdown = defineComponent({
     provide(DropdownContextKey, dropdownContext)
 
     return () => {
-      const defaultSlot = slots.default?.()
+      const defaultSlot = slots.default?.() ?? []
       const triggerSlot = slots.trigger?.({ open: currentVisible.value })
-      if (
-        (!defaultSlot || defaultSlot.length === 0) &&
-        (!triggerSlot || triggerSlot.length === 0)
-      ) {
-        return null
-      }
 
-      let triggerNode: VNode | null = null
+      let triggerNode: VNode | string | number | VNode[] | null = null
       let menuNode: VNode | null = null
+      let sawTrigger = false
 
-      // The `trigger` scoped slot (receives `{ open }`) supplies the trigger so
-      // consumers can style/render it by open state without attribute-selector
-      // hacks; the menu is still taken from the default slot.
       if (triggerSlot && triggerSlot.length > 0) {
-        triggerNode = triggerSlot.length === 1 ? triggerSlot[0] : (h('span', triggerSlot) as VNode)
+        triggerNode = triggerSlot.length === 1 ? triggerSlot[0] : triggerSlot
+        sawTrigger = true
       }
 
-      defaultSlot?.forEach((node: VNode) => {
+      defaultSlot.forEach((node: VNode) => {
         if (node.type === DropdownMenu) {
           menuNode = node
           return
         }
-        if (!triggerSlot) {
-          triggerNode = node
+        if (sawTrigger) {
+          if (!slots.trigger) {
+            devWarn(
+              'Dropdown.extraTrigger',
+              'Dropdown only uses the first non-menu child as the trigger.'
+            )
+          }
+          return
+        }
+        triggerNode = node
+        sawTrigger = true
+      })
+
+      const chevronNode =
+        props.showArrow && !props.asChild
+          ? h(
+              'svg',
+              {
+                class: getDropdownChevronClasses(currentVisible.value),
+                viewBox: '0 0 24 24',
+                fill: 'none',
+                stroke: 'currentColor',
+                'stroke-width': '2',
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'aria-hidden': 'true'
+              },
+              [h('path', { d: DROPDOWN_CHEVRON_PATH })]
+            )
+          : null
+
+      const triggerAria = getOverlayTriggerAria({
+        kind: 'menu',
+        open: currentVisible.value,
+        controlsId: menuId,
+        disabled: props.disabled
+      })
+
+      const trigger = renderOverlayTrigger({
+        asChild: props.asChild,
+        child: triggerNode,
+        setTriggerRef: (el) => assignOverlayTriggerRef(triggerRef, el),
+        className: props.asChild ? undefined : triggerClasses.value,
+        disabled: props.disabled,
+        extraChildren: chevronNode,
+        aria: triggerAria,
+        handlers: {
+          onClick: handleClick,
+          onKeydown: handleTriggerKeyDown,
+          onMouseenter: handleMouseEnter,
+          onMouseleave: handleMouseLeave
         }
       })
 
-      const chevronNode = props.showArrow
-        ? h(
-            'svg',
-            {
-              class: getDropdownChevronClasses(currentVisible.value),
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              'aria-hidden': 'true'
-            },
-            [h('path', { d: DROPDOWN_CHEVRON_PATH })]
-          )
-        : null
-
-      const triggerAria = {
-        'aria-haspopup': 'menu',
-        'aria-expanded': currentVisible.value,
-        'aria-controls': currentVisible.value ? menuId : undefined,
-        'data-state': currentVisible.value ? 'open' : 'closed'
-      }
-
-      const trigger = !triggerNode
-        ? null
-        : props.asChild
-          ? cloneVNode(triggerNode as VNode, {
-              ref: triggerRef,
-              onClick: handleClick,
-              onMouseenter: handleMouseEnter,
-              onMouseleave: handleMouseLeave,
-              ...triggerAria
-            })
-          : h(
-              'div',
-              {
-                ref: triggerRef,
-                class: triggerClasses.value,
-                onClick: handleClick,
-                onMouseenter: handleMouseEnter,
-                onMouseleave: handleMouseLeave,
-                ...triggerAria
-              },
-              [triggerNode, chevronNode]
-            )
-
-      // Clone menuNode with id for aria-controls
       const menuWrapper = menuNode
         ? h(
             'div',

@@ -54,11 +54,33 @@ export function restoreFocus(
   return focusElement(previous, options)
 }
 
+function isHiddenOrInert(element: HTMLElement, stopAt: HTMLElement): boolean {
+  let current: HTMLElement | null = element
+  while (current && current !== stopAt) {
+    if (current.hidden || current.hasAttribute('hidden')) return true
+    if (current.inert || current.hasAttribute('inert')) return true
+    if (current.getAttribute('aria-hidden') === 'true') return true
+    current = current.parentElement
+  }
+  return false
+}
+
 /**
- * Get all focusable menu items within a container
+ * Get enabled, visible menu items in the nearest `role="menu"` (or `container`
+ * when it has no menu). Nested / hidden submenu items are excluded.
  */
 export function getMenuItems(container: HTMLElement): HTMLElement[] {
-  return Array.from(container.querySelectorAll<HTMLElement>('[role="menuitem"]:not([disabled])'))
+  const menu = container.matches('[role="menu"]')
+    ? container
+    : (container.querySelector<HTMLElement>(':scope [role="menu"]') ?? container)
+
+  return Array.from(menu.querySelectorAll<HTMLElement>('[role="menuitem"]')).filter((el) => {
+    const owner = el.closest<HTMLElement>('[role="menu"]')
+    if (owner && owner !== menu) return false
+    if (el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true') return false
+    if (isHiddenOrInert(el, menu)) return false
+    return true
+  })
 }
 
 /**

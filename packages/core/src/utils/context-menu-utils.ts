@@ -6,6 +6,8 @@ import {
   injectDropdownStyles
 } from './dropdown-utils'
 import type { ContextMenuPoint } from '../types/context-menu'
+import type { FloatingPlacement } from './floating'
+import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from './floating-popup-utils'
 
 /**
  * Origin-size of the cursor virtual reference used with anchored-overlay.
@@ -22,6 +24,13 @@ export const CONTEXT_MENU_ENTER_CLASS = DROPDOWN_ENTER_CLASS
  * SVG path for the nested submenu chevron-right icon (viewBox 0 0 24 24)
  */
 export const CONTEXT_MENU_SUB_CHEVRON_PATH = 'M9 5l7 7-7 7'
+
+/** Submenu hover close delay — same as other overlay hover groups. */
+export const CONTEXT_MENU_SUB_HIDE_DELAY_MS = DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS
+
+export function getContextMenuSubPlacement(dir?: string | null): FloatingPlacement {
+  return dir === 'rtl' ? 'left-start' : 'right-start'
+}
 
 /**
  * Inject context menu animation styles. Delegates to dropdown styles so both
@@ -44,7 +53,8 @@ export function getContextMenuContainerClasses(): string {
 export function getContextMenuTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-context-menu-trigger',
-    disabled ? 'cursor-not-allowed opacity-50 pointer-events-none' : undefined
+    'inline-block w-full text-start bg-transparent p-0 border-0 font-inherit text-inherit',
+    disabled ? 'cursor-not-allowed opacity-50' : undefined
   )
 }
 
@@ -75,7 +85,7 @@ export function getContextMenuSubTriggerClasses(disabled: boolean): string {
 export function getContextMenuSubChevronClasses(): string {
   return classNames(
     'tiger-context-menu-sub-chevron',
-    'w-3.5 h-3.5 shrink-0',
+    'w-3.5 h-3.5 shrink-0 rtl:-scale-x-100',
     'text-[var(--tiger-text-muted,#9ca3af)]'
   )
 }

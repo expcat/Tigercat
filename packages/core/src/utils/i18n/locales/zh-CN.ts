@@ -19,7 +19,9 @@ export const zhCN: TigerLocale = {
     clearText: '清除',
     closeMessageAriaLabel: '关闭消息',
     closeNotificationAriaLabel: '关闭通知',
-    sidebarAriaLabel: '侧栏'
+    sidebarAriaLabel: '侧栏',
+    moreOptionsText: '更多操作',
+    confirmTitle: '确定要执行此操作吗？'
   },
   empty: {
     noData: '暂无数据',
