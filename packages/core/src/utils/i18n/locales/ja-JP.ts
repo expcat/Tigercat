@@ -482,6 +482,12 @@ export const jaJP: TigerLocale = {
     deleteText: '削除',
     decimalAriaLabel: '小数点',
     idCardXAriaLabel: 'IDカードのX'
+  },
+  tree: {
+    ariaLabel: 'ツリー',
+    selectNode: '{label}を選択',
+    expand: '展開',
+    collapse: '折りたたむ'
   }
 }
 

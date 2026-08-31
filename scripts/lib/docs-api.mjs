@@ -405,6 +405,16 @@ export const COMPONENT_PROP_PRIORITY = {
     'virtual?',
     'defaultExpandAll?',
     'open?'
+  ],
+  Tree: [
+    'treeData?',
+    'expandedKeys?',
+    'selectedKeys?',
+    'checkedKeys?',
+    'loadData?',
+    'virtual?',
+    'filterValue?',
+    'searchable?'
   ]
 }
 
@@ -563,6 +573,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     AutoComplete: '<AutoComplete v-model="value" :options="options" />',
     Cascader: '<Cascader v-model="value" :options="options" />',
     TreeSelect: '<TreeSelect v-model="value" :tree-data="treeData" />',
+    Tree: '<Tree :tree-data="treeData" />',
     DatePicker: '<DatePicker v-model="value" />',
     TimePicker: '<TimePicker v-model="value" />',
     ColorPicker: '<ColorPicker v-model="value" />',
@@ -629,6 +640,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Cascader: '<Cascader value={value} options={options} onChange={(next) => setValue(next)} />',
     TreeSelect:
       '<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />',
+    Tree: '<Tree treeData={treeData} />',
     DatePicker: '<DatePicker value={date} onChange={setDate} />',
     TimePicker: '<TimePicker value={value} onChange={setValue} />',
     ColorPicker: '<ColorPicker value={value} onChange={setValue} />',

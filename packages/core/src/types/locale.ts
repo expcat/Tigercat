@@ -666,6 +666,17 @@ export interface TigerLocaleNumberKeyboard {
   idCardXAriaLabel?: string
 }
 
+export interface TigerLocaleTree {
+  /** Default accessible name for the tree widget */
+  ariaLabel?: string
+  /** Checkbox name. Template: supports {label} */
+  selectNode?: string
+  /** Expand-control name (hidden; expansion is on the treeitem) */
+  expand?: string
+  /** Collapse-control name */
+  collapse?: string
+}
+
 export interface TigerLocale {
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
@@ -726,6 +737,7 @@ export interface TigerLocale {
   stepper?: TigerLocaleStepper
   signature?: TigerLocaleSignature
   numberKeyboard?: TigerLocaleNumberKeyboard
+  tree?: TigerLocaleTree
 }
 
 /**

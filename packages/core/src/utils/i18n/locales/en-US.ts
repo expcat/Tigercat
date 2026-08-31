@@ -485,5 +485,11 @@ export const enUS: TigerLocale = {
     deleteText: 'Delete',
     decimalAriaLabel: 'Decimal',
     idCardXAriaLabel: 'ID card X'
+  },
+  tree: {
+    ariaLabel: 'Tree',
+    selectNode: 'Select {label}',
+    expand: 'Expand',
+    collapse: 'Collapse'
   }
 }

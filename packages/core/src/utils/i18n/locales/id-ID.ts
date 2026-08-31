@@ -482,6 +482,12 @@ export const idID: TigerLocale = {
     deleteText: 'Hapus',
     decimalAriaLabel: 'Pemisah desimal',
     idCardXAriaLabel: 'KTP X'
+  },
+  tree: {
+    ariaLabel: 'Pohon',
+    selectNode: 'Pilih {label}',
+    expand: 'Bentangkan',
+    collapse: 'Ciutkan'
   }
 }
 

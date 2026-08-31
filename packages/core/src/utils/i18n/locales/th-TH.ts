@@ -482,6 +482,12 @@ export const thTH: TigerLocale = {
     deleteText: 'ลบ',
     decimalAriaLabel: 'จุดทศนิยม',
     idCardXAriaLabel: 'บัตรประชาชน X'
+  },
+  tree: {
+    ariaLabel: 'ต้นไม้',
+    selectNode: 'เลือก {label}',
+    expand: 'ขยาย',
+    collapse: 'ยุบ'
   }
 }
 

@@ -1,89 +1,182 @@
 /**
- * Tree component utilities
- * Shared styles and helpers for Tree components
+ * Tree traversal, keyboard, classes, and flatten helpers.
+ * Expand / select / check / filter / drop commits live in `tree-controller`.
  */
 
-import type { TreeNode, TreeCheckedState, TreeCheckStrategy, TreeFilterFn } from '../types/tree'
+import type {
+  TreeCheckStrategy,
+  TreeCheckedState,
+  TreeExpandedState,
+  TreeFilterFn,
+  TreeFilterMode,
+  TreeNode,
+  TreeNodeKey
+} from '../types/tree'
 import { classNames } from './class-names'
 
+export type { TreeNodeKey }
+
+export function treeKeyId(key: TreeNodeKey): string {
+  return String(key)
+}
+
+export function sameTreeKey(
+  a: TreeNodeKey | null | undefined,
+  b: TreeNodeKey | null | undefined
+): boolean {
+  if (a == null || b == null) return a === b
+  return treeKeyId(a) === treeKeyId(b)
+}
+
+export function createTreeKeyIdSet(keys?: Iterable<TreeNodeKey> | null): Set<string> {
+  const set = new Set<string>()
+  if (!keys) return set
+  for (const key of keys) set.add(treeKeyId(key))
+  return set
+}
+
+export function uniqueTreeKeys(keys: Iterable<TreeNodeKey>): TreeNodeKey[] {
+  const seen = new Set<string>()
+  const result: TreeNodeKey[] = []
+  for (const key of keys) {
+    const id = treeKeyId(key)
+    if (seen.has(id)) continue
+    seen.add(id)
+    result.push(key)
+  }
+  return result
+}
+
+export function treeExpandedStateFromKeys(keys: Iterable<TreeNodeKey>): TreeExpandedState {
+  const state: TreeExpandedState = {}
+  for (const key of keys) state[treeKeyId(key)] = true
+  return state
+}
+
+export function treeExpandedKeysFromState(state: TreeExpandedState): TreeNodeKey[] {
+  return Object.keys(state).filter((key) => state[key])
+}
+
 export interface VisibleTreeItem {
-  key: string | number
+  key: TreeNodeKey
+  /** 1-based depth. Indent columns = `level - 1`. */
   level: number
-  parentKey?: string | number
+  parentKey?: TreeNodeKey
   node: TreeNode
+  isLastChild: boolean
+  ancestorLast: boolean[]
+}
+
+export interface TreeIndexEntry {
+  node: TreeNode
+  parentKey?: TreeNodeKey
+  childrenKeys: TreeNodeKey[]
+  level: number
+}
+
+export interface TreeIndex {
+  byId: Map<string, TreeIndexEntry>
+  roots: TreeNodeKey[]
+}
+
+export function buildTreeIndex(treeData: TreeNode[]): TreeIndex {
+  const byId = new Map<string, TreeIndexEntry>()
+  const roots: TreeNodeKey[] = []
+
+  function walk(nodes: TreeNode[], parentKey: TreeNodeKey | undefined, level: number): void {
+    for (const node of nodes) {
+      const children = node.children ?? []
+      byId.set(treeKeyId(node.key), {
+        node,
+        parentKey,
+        childrenKeys: children.map((child) => child.key),
+        level
+      })
+      if (parentKey === undefined) roots.push(node.key)
+      if (children.length > 0) walk(children, node.key, level + 1)
+    }
+  }
+
+  walk(treeData, undefined, 1)
+  return { byId, roots }
+}
+
+export function lookupTreeNode(index: TreeIndex, key: TreeNodeKey): TreeNode | null {
+  return index.byId.get(treeKeyId(key))?.node ?? null
 }
 
 /**
  * Whether a node can expand. `isLeaf: true` never expands, even with children.
- * Empty children with `isLeaf: false` are loadable when `hasLoadData` is set.
+ * Empty children with `isLeaf !== true` are loadable when `hasLoadData` is set.
  */
 export function isTreeNodeExpandable(node: TreeNode, hasLoadData = false): boolean {
   if (node.isLeaf === true) return false
   if (node.children && node.children.length > 0) return true
-  return hasLoadData && node.isLeaf === false
+  return hasLoadData && node.isLeaf !== true
+}
+
+export function nodeHasChildren(node: TreeNode): boolean {
+  return Boolean(node.children && node.children.length > 0)
 }
 
 export function getVisibleTreeItems(
   treeData: TreeNode[],
-  expandedKeys: Set<string | number> = new Set(),
-  matchedKeys?: Set<string | number>
+  expandedKeys: Iterable<TreeNodeKey> = [],
+  matchedKeys?: Iterable<TreeNodeKey>
 ): VisibleTreeItem[] {
-  const isFiltered = !!matchedKeys && matchedKeys.size > 0
+  const expandedIds = createTreeKeyIdSet(expandedKeys)
+  const matchedIds = matchedKeys ? createTreeKeyIdSet(matchedKeys) : null
+  const isFiltered = Boolean(matchedIds && matchedIds.size > 0)
   const result: VisibleTreeItem[] = []
 
-  function traverse(nodes: TreeNode[], level: number, parentKey?: string | number) {
-    for (const node of nodes) {
-      const isVisible = !isFiltered || matchedKeys!.has(node.key)
-      if (!isVisible) continue
+  function traverse(
+    nodes: TreeNode[],
+    level: number,
+    parentKey: TreeNodeKey | undefined,
+    ancestorLast: boolean[]
+  ): void {
+    const lastIndex = nodes.length - 1
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
+      if (isFiltered && matchedIds && !matchedIds.has(treeKeyId(node.key))) continue
 
-      result.push({ key: node.key, level, parentKey, node })
+      const isLastChild = i === lastIndex
+      result.push({
+        key: node.key,
+        level,
+        parentKey,
+        node,
+        isLastChild,
+        ancestorLast
+      })
 
-      if (
-        isTreeNodeExpandable(node) &&
-        node.children &&
-        node.children.length > 0 &&
-        expandedKeys.has(node.key)
-      ) {
-        traverse(node.children, level + 1, node.key)
+      if (nodeHasChildren(node) && expandedIds.has(treeKeyId(node.key))) {
+        traverse(node.children!, level + 1, node.key, [...ancestorLast, isLastChild])
       }
     }
   }
 
-  traverse(treeData, 1)
+  traverse(treeData, 1, undefined, [])
   return result
 }
 
-export type TreeNodeKey = string | number
-
-/**
- * Find the first visible, non-disabled child of `parentKey` within a flattened
- * `getVisibleTreeItems()` list. Mirrors the inline walk previously duplicated in
- * the Vue and React Tree components (used by ArrowRight on an expanded node).
- *
- * @returns the child key, or `undefined` when the parent is absent or has no
- *   visible enabled child.
- */
 export function getFirstVisibleChildKey(
   visibleItems: VisibleTreeItem[],
   parentKey: TreeNodeKey
 ): TreeNodeKey | undefined {
-  const index = visibleItems.findIndex((item) => item.key === parentKey)
+  const index = visibleItems.findIndex((item) => sameTreeKey(item.key, parentKey))
   if (index < 0) return undefined
 
   const base = visibleItems[index]
   for (let i = index + 1; i < visibleItems.length; i++) {
     const item = visibleItems[i]
     if (item.level <= base.level) break
-    if (item.parentKey === parentKey && !item.node.disabled) return item.key
+    if (sameTreeKey(item.parentKey, parentKey) && !item.node.disabled) return item.key
   }
 
   return undefined
 }
 
-/**
- * Framework-agnostic description of what a Tree keyboard event should do. The
- * caller maps each variant onto its own state setters / handlers.
- */
 export type TreeKeyboardAction =
   | { type: 'none' }
   | { type: 'focus'; key: TreeNodeKey }
@@ -92,52 +185,22 @@ export type TreeKeyboardAction =
   | { type: 'check'; key: TreeNodeKey; checked: boolean }
   | { type: 'collapseAndFocus'; collapseKey: TreeNodeKey | undefined; focusKey: TreeNodeKey }
 
-/**
- * Inputs needed to resolve a Tree keyboard event into a {@link TreeKeyboardAction}.
- * The component computes these from its own reactive/derived state.
- */
 export interface TreeKeyboardContext {
-  /** The pressed key, i.e. `KeyboardEvent.key`. */
   key: string
-  /** Key of the node receiving the event. */
   nodeKey: TreeNodeKey
-  /** Currently active/focused key (`activeKey ?? defaultActiveKey ?? nodeKey`). */
   currentKey: TreeNodeKey
-  /** Visible, non-disabled keys in DOM order (the roving-focus ring). */
   focusableKeys: readonly TreeNodeKey[]
-  /** Direct parent key, or `undefined` for a root node. */
   parentKey?: TreeNodeKey
-  /** First visible, non-disabled child of `nodeKey`, or `undefined`. */
   firstChildKey?: TreeNodeKey
-  /** Whether the node can expand (has children or is lazily loadable). */
   isExpandable: boolean
-  /** Whether the node is currently expanded. */
   isExpanded: boolean
-  /** Whether `parentKey` is currently expanded. */
   isParentExpanded: boolean
-  /** Whether the node is currently checked. */
   isChecked: boolean
-  /** Whether node selection is enabled. */
   selectable: boolean
-  /** Whether checkboxes are enabled. */
   checkable: boolean
-  /** Text direction. RTL swaps ArrowLeft / ArrowRight. */
   dir?: 'ltr' | 'rtl'
 }
 
-/**
- * Resolve a Tree keyboard event into a framework-agnostic action, so the Vue
- * and React Tree components share one keyboard-interaction model (the tree
- * counterpart of {@link getPickerNavigationIndex} for comboboxes).
- *
- * Returns `null` for keys the tree does not handle — the caller should neither
- * `preventDefault` nor act. For every recognised key it returns an action
- * (possibly `{ type: 'none' }` for recognised no-ops, e.g. ArrowRight on a
- * leaf), and the caller should `preventDefault` before applying it.
- *
- * Linear navigation (Arrow/Home/End) clamps to the ends of `focusableKeys` and
- * stays on `currentKey` at the boundaries, matching the prior inline behaviour.
- */
 export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAction | null {
   const {
     key,
@@ -155,7 +218,7 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
     dir = 'ltr'
   } = ctx
 
-  const currentIndex = focusableKeys.findIndex((k) => k === currentKey)
+  const currentIndex = focusableKeys.findIndex((item) => sameTreeKey(item, currentKey))
   const focusAt = (index: number): TreeKeyboardAction => ({
     type: 'focus',
     key: focusableKeys[index] ?? currentKey
@@ -202,228 +265,193 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
   }
 }
 
-/**
- * Base classes for tree container
- */
+export const TREE_INDENT_SLOT_PX = 24
+
 export const treeBaseClasses =
   'w-full bg-[var(--tiger-tree-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-text,#111827)] rounded-[var(--tiger-radius-md,0.5rem)]'
 
-/**
- * Tree node wrapper classes
- */
 export const treeNodeWrapperClasses = 'select-none'
 
-/**
- * Tree node content classes
- */
 export const treeNodeContentClasses =
-  'flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200'
+  'flex items-center px-2 py-1.5 rounded tiger-motion-aware transition-colors duration-200 motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
-/**
- * Tree node hover classes
- */
 export const treeNodeHoverClasses =
   'hover:bg-[var(--tiger-tree-node-hover,var(--tiger-surface-muted,#f9fafb))]'
 
-/**
- * Tree node selected classes
- */
 export const treeNodeSelectedClasses =
   'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_10%,transparent)] text-[var(--tiger-primary,#2563eb)]'
 
-/**
- * Tree node disabled classes
- */
+export const treeNodeActiveClasses = 'bg-[var(--tiger-surface-muted,#f3f4f6)]'
+
 export const treeNodeDisabledClasses = 'opacity-50 cursor-not-allowed'
 
-/**
- * Tree node indent classes
- */
-export const treeNodeIndentClasses = 'inline-block w-6'
+export const treeNodeIndentClasses = 'inline-flex shrink-0 w-6 h-full box-border'
 
-/**
- * Tree node expand icon classes
- */
 export const treeNodeExpandIconClasses =
-  'inline-flex items-center justify-center w-6 h-6 transition-transform duration-200'
+  'inline-flex items-center justify-center w-6 h-6 min-w-6 min-h-6 p-0 border-0 bg-transparent text-current tiger-motion-aware transition-transform duration-200 motion-reduce:transition-none'
 
-/**
- * Tree node expand icon expanded classes
- */
-export const treeNodeExpandIconExpandedClasses = 'transform rotate-90'
+export const treeNodeExpandIconExpandedClasses = 'rotate-90'
 
-/**
- * Tree node checkbox classes
- */
-export const treeNodeCheckboxClasses =
-  'mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+export const treeNodeExpandIconRtlClasses = 'rtl:rotate-180'
 
-/**
- * Tree node icon classes
- */
-export const treeNodeIconClasses = 'mr-2 flex-shrink-0'
+export const treeNodeCheckboxClasses = 'me-2 shrink-0'
 
-/**
- * Tree node label classes
- */
+export const treeNodeIconClasses = 'me-2 flex-shrink-0'
+
 export const treeNodeLabelClasses = 'flex-1 truncate'
 
-/**
- * Tree node children container classes
- */
-export const treeNodeChildrenClasses = 'ml-6'
+export const treeNodeLabelMatchedClasses = 'font-semibold text-[var(--tiger-primary,#2563eb)]'
 
-/**
- * Tree loading classes
- */
-export const treeLoadingClasses = 'inline-block ml-2 animate-spin h-4 w-4'
+export const treeNodeChildrenClasses = 'ms-6'
 
-/**
- * Tree empty state classes
- */
+export const treeLoadingClasses = 'inline-block ms-2 animate-spin h-4 w-4'
+
 export const treeEmptyStateClasses = 'py-8 text-center text-[var(--tiger-text-secondary,#6b7280)]'
 
-/**
- * Tree line classes
- */
-export const treeLineClasses = 'border-l border-[var(--tiger-border,#e5e7eb)]'
+export const treeLineClasses = 'border-s border-[var(--tiger-border,#e5e7eb)]'
 
-/**
- * Get tree node classes
- * @param selected - Whether the node is selected
- * @param disabled - Whether the node is disabled
- * @param blockNode - Whether to use block node style
- * @returns Combined class string for tree node
- */
+export const treeSearchInputClasses =
+  'w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--tiger-primary,#2563eb)]'
+
+export const treeDropBeforeClasses =
+  'before:absolute before:inset-x-2 before:top-0 before:h-0.5 before:bg-[var(--tiger-primary,#2563eb)]'
+export const treeDropAfterClasses =
+  'after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-[var(--tiger-primary,#2563eb)]'
+export const treeDropInsideClasses =
+  'outline outline-2 outline-[var(--tiger-primary,#2563eb)] outline-offset-[-2px]'
+
 export function getTreeNodeClasses(
   selected: boolean,
   disabled: boolean,
-  blockNode = false
+  blockNode = false,
+  options?: { active?: boolean; interactive?: boolean }
 ): string {
+  const interactive = options?.interactive !== false && !disabled
+  const active = Boolean(options?.active) && !selected && !disabled
   return classNames(
     treeNodeContentClasses,
-    !disabled && treeNodeHoverClasses,
+    'relative',
+    interactive ? 'cursor-pointer' : disabled ? treeNodeDisabledClasses : 'cursor-default',
+    interactive && treeNodeHoverClasses,
     selected && treeNodeSelectedClasses,
+    active && treeNodeActiveClasses,
     disabled && treeNodeDisabledClasses,
     blockNode && 'w-full'
   )
 }
 
-/**
- * Get tree node expand icon classes
- * @param expanded - Whether the node is expanded
- * @returns Combined class string for expand icon
- */
 export function getTreeNodeExpandIconClasses(expanded: boolean): string {
-  return classNames(treeNodeExpandIconClasses, expanded && treeNodeExpandIconExpandedClasses)
+  return classNames(
+    treeNodeExpandIconClasses,
+    expanded ? treeNodeExpandIconExpandedClasses : treeNodeExpandIconRtlClasses
+  )
 }
 
-/**
- * Get all keys from tree data
- * @param treeData - Tree data
- * @returns Array of all node keys
- */
-export function getAllKeys(treeData: TreeNode[]): (string | number)[] {
-  const keys: (string | number)[] = []
+export interface TreeIndentSlot {
+  key: string
+  showLine: boolean
+  truncate: boolean
+}
 
-  function traverse(nodes: TreeNode[]) {
-    nodes.forEach((node) => {
-      keys.push(node.key)
-      if (node.children && node.children.length > 0) {
-        traverse(node.children)
-      }
+export function getTreeIndentSlots(item: VisibleTreeItem, showLine: boolean): TreeIndentSlot[] {
+  const count = Math.max(0, item.level - 1)
+  const slots: TreeIndentSlot[] = []
+  for (let i = 0; i < count; i++) {
+    const isParentCol = i === count - 1
+    const ancestorIsLast = item.ancestorLast[i] === true
+    const draw = showLine && (isParentCol || !ancestorIsLast)
+    slots.push({
+      key: `indent-${i}`,
+      showLine: draw,
+      truncate: Boolean(showLine && isParentCol && item.isLastChild)
     })
+  }
+  return slots
+}
+
+export function getTreeIndentSlotClasses(slot: TreeIndentSlot): string {
+  return classNames(
+    treeNodeIndentClasses,
+    slot.showLine && treeLineClasses,
+    slot.truncate && 'self-start h-1/2'
+  )
+}
+
+export function getAllKeys(treeData: TreeNode[]): TreeNodeKey[] {
+  const keys: TreeNodeKey[] = []
+
+  function traverse(nodes: TreeNode[]): void {
+    for (const node of nodes) {
+      keys.push(node.key)
+      if (node.children && node.children.length > 0) traverse(node.children)
+    }
   }
 
   traverse(treeData)
   return keys
 }
 
-/**
- * Get all leaf node keys from tree data
- * @param treeData - Tree data
- * @returns Array of leaf node keys
- */
-export function getLeafKeys(treeData: TreeNode[]): (string | number)[] {
-  const keys: (string | number)[] = []
+export function getLeafKeys(treeData: TreeNode[]): TreeNodeKey[] {
+  const keys: TreeNodeKey[] = []
 
-  function traverse(nodes: TreeNode[]) {
-    nodes.forEach((node) => {
-      if (!node.children || node.children.length === 0 || node.isLeaf) {
+  function traverse(nodes: TreeNode[]): void {
+    for (const node of nodes) {
+      if (node.isLeaf === true || !node.children || node.children.length === 0) {
         keys.push(node.key)
       } else {
         traverse(node.children)
       }
-    })
+    }
   }
 
   traverse(treeData)
   return keys
 }
 
-/**
- * Find node by key
- * @param treeData - Tree data
- * @param key - Node key
- * @returns Found node or null
- */
-export function findNode(treeData: TreeNode[], key: string | number): TreeNode | null {
+export function findNode(treeData: TreeNode[], key: TreeNodeKey): TreeNode | null {
   for (const node of treeData) {
-    if (node.key === key) {
-      return node
-    }
+    if (sameTreeKey(node.key, key)) return node
     if (node.children && node.children.length > 0) {
       const found = findNode(node.children, key)
-      if (found) {
-        return found
-      }
+      if (found) return found
     }
   }
   return null
 }
 
-/**
- * Get parent keys of a node
- * @param treeData - Tree data
- * @param key - Node key
- * @returns Array of parent keys from root to direct parent
- */
-export function getParentKeys(treeData: TreeNode[], key: string | number): (string | number)[] {
-  const parents: (string | number)[] = []
+export function getParentKeys(treeData: TreeNode[], key: TreeNodeKey): TreeNodeKey[] {
+  const parents: TreeNodeKey[] = []
 
-  function traverse(nodes: TreeNode[], path: (string | number)[] = []): boolean {
+  function traverse(nodes: TreeNode[], path: TreeNodeKey[]): boolean {
     for (const node of nodes) {
-      if (node.key === key) {
+      if (sameTreeKey(node.key, key)) {
         parents.push(...path)
         return true
       }
       if (node.children && node.children.length > 0) {
-        if (traverse(node.children, [...path, node.key])) {
-          return true
-        }
+        if (traverse(node.children, [...path, node.key])) return true
       }
     }
     return false
   }
 
-  traverse(treeData)
+  traverse(treeData, [])
   return parents
 }
 
-/**
- * Get all descendant keys of a node
- * @param node - Tree node
- * @returns Array of all descendant keys
- */
-export function getDescendantKeys(node: TreeNode): (string | number)[] {
-  const keys: (string | number)[] = []
+export function getDescendantKeys(
+  node: TreeNode,
+  options?: { skipDisabled?: boolean }
+): TreeNodeKey[] {
+  const keys: TreeNodeKey[] = []
+  const skipDisabled = options?.skipDisabled === true
 
-  function traverse(n: TreeNode) {
-    if (n.children && n.children.length > 0) {
-      n.children.forEach((child) => {
-        keys.push(child.key)
-        traverse(child)
-      })
+  function traverse(current: TreeNode): void {
+    if (!current.children || current.children.length === 0) return
+    for (const child of current.children) {
+      if (skipDisabled && child.disabled) continue
+      keys.push(child.key)
+      traverse(child)
     }
   }
 
@@ -431,96 +459,103 @@ export function getDescendantKeys(node: TreeNode): (string | number)[] {
   return keys
 }
 
-/**
- * Calculate checked state based on selected keys
- * @param treeData - Tree data
- * @param checkedKeys - Checked node keys
- * @param checkStrictly - Whether parent and children are independent
- * @returns Checked state with checked and half-checked keys
- */
+export function isTreeAncestor(
+  treeData: TreeNode[],
+  ancestorKey: TreeNodeKey,
+  nodeKey: TreeNodeKey
+): boolean {
+  return getParentKeys(treeData, nodeKey).some((key) => sameTreeKey(key, ancestorKey))
+}
+
+function countableChildren(node: TreeNode): TreeNode[] {
+  return (node.children ?? []).filter((child) => !child.disabled)
+}
+
 export function calculateCheckedState(
   treeData: TreeNode[],
-  checkedKeys: (string | number)[],
+  checkedKeys: TreeNodeKey[],
   checkStrictly = false
 ): TreeCheckedState {
   if (checkStrictly) {
-    return { checked: checkedKeys, halfChecked: [] }
+    return { checked: uniqueTreeKeys(checkedKeys), halfChecked: [] }
   }
 
-  const checkedSet = new Set(checkedKeys)
-  const halfCheckedSet = new Set<string | number>()
+  const checkedSet = createTreeKeyIdSet(checkedKeys)
+  const halfCheckedSet = new Set<string>()
+  const canonical = new Map<string, TreeNodeKey>()
 
-  function markSubtreeChecked(node: TreeNode) {
-    checkedSet.add(node.key)
-    halfCheckedSet.delete(node.key)
-    node.children?.forEach(markSubtreeChecked)
+  function remember(node: TreeNode): void {
+    const id = treeKeyId(node.key)
+    if (!canonical.has(id)) canonical.set(id, node.key)
   }
 
-  function checkNode(node: TreeNode): {
-    checked: boolean
-    halfChecked: boolean
-  } {
-    // Treat explicitly-checked parent keys as selecting the whole subtree.
-    if (checkedSet.has(node.key)) {
+  function markSubtreeChecked(node: TreeNode): void {
+    remember(node)
+    checkedSet.add(treeKeyId(node.key))
+    halfCheckedSet.delete(treeKeyId(node.key))
+    for (const child of node.children ?? []) {
+      if (child.disabled) continue
+      markSubtreeChecked(child)
+    }
+  }
+
+  function checkNode(node: TreeNode): { checked: boolean; halfChecked: boolean } {
+    remember(node)
+    if (checkedSet.has(treeKeyId(node.key))) {
       markSubtreeChecked(node)
       return { checked: true, halfChecked: false }
     }
 
-    if (!node.children || node.children.length === 0) {
-      return { checked: checkedSet.has(node.key), halfChecked: false }
+    const children = countableChildren(node)
+    if (children.length === 0) {
+      const checked = checkedSet.has(treeKeyId(node.key))
+      return { checked, halfChecked: false }
     }
 
     let checkedCount = 0
-    let totalCount = 0
-
-    node.children.forEach((child) => {
+    for (const child of children) {
       const childState = checkNode(child)
-      totalCount++
+      if (childState.checked) checkedCount++
+      else if (childState.halfChecked) halfCheckedSet.add(treeKeyId(node.key))
+    }
 
-      if (childState.checked) {
-        checkedCount++
-      } else if (childState.halfChecked) {
-        halfCheckedSet.add(node.key)
-      }
-    })
-
-    if (checkedCount === totalCount) {
-      checkedSet.add(node.key)
-      halfCheckedSet.delete(node.key)
+    if (checkedCount === children.length) {
+      checkedSet.add(treeKeyId(node.key))
+      halfCheckedSet.delete(treeKeyId(node.key))
       return { checked: true, halfChecked: false }
-    } else if (checkedCount > 0 || halfCheckedSet.has(node.key)) {
-      halfCheckedSet.add(node.key)
-      checkedSet.delete(node.key)
+    }
+    if (checkedCount > 0 || halfCheckedSet.has(treeKeyId(node.key))) {
+      halfCheckedSet.add(treeKeyId(node.key))
+      checkedSet.delete(treeKeyId(node.key))
       return { checked: false, halfChecked: true }
     }
 
-    checkedSet.delete(node.key)
-    halfCheckedSet.delete(node.key)
+    checkedSet.delete(treeKeyId(node.key))
+    halfCheckedSet.delete(treeKeyId(node.key))
     return { checked: false, halfChecked: false }
   }
 
   treeData.forEach((node) => checkNode(node))
 
-  return {
-    checked: Array.from(checkedSet),
-    halfChecked: Array.from(halfCheckedSet)
+  const checked: TreeNodeKey[] = []
+  const halfChecked: TreeNodeKey[] = []
+  for (const id of checkedSet) {
+    const key = canonical.get(id)
+    if (key !== undefined) checked.push(key)
   }
+  for (const id of halfCheckedSet) {
+    const key = canonical.get(id)
+    if (key !== undefined) halfChecked.push(key)
+  }
+
+  return { checked, halfChecked }
 }
 
-/**
- * Handle node check/uncheck with cascade
- * @param treeData - Tree data
- * @param nodeKey - Node key to check/uncheck
- * @param checked - Whether to check or uncheck
- * @param currentChecked - Current checked keys
- * @param checkStrictly - Whether parent and children are independent
- * @returns New checked state
- */
 export function handleNodeCheck(
   treeData: TreeNode[],
-  nodeKey: string | number,
+  nodeKey: TreeNodeKey,
   checked: boolean,
-  currentChecked: (string | number)[],
+  currentChecked: TreeNodeKey[],
   checkStrictly = false
 ): TreeCheckedState {
   const node = findNode(treeData, nodeKey)
@@ -528,170 +563,168 @@ export function handleNodeCheck(
     return calculateCheckedState(treeData, currentChecked, checkStrictly)
   }
 
-  let newCheckedKeys = [...currentChecked]
+  const currentIds = createTreeKeyIdSet(currentChecked)
+  let next = currentChecked.filter((key) => currentIds.has(treeKeyId(key)))
 
   if (checkStrictly) {
     if (checked) {
-      if (!newCheckedKeys.includes(nodeKey)) {
-        newCheckedKeys.push(nodeKey)
-      }
+      if (!currentIds.has(treeKeyId(nodeKey))) next = [...next, node.key]
     } else {
-      newCheckedKeys = newCheckedKeys.filter((k) => k !== nodeKey)
+      next = next.filter((key) => !sameTreeKey(key, nodeKey))
     }
   } else {
-    // Get all descendant keys
-    const descendantKeys = getDescendantKeys(node)
-
+    const descendantKeys = getDescendantKeys(node, { skipDisabled: true })
     if (checked) {
-      // Add node and all descendants
-      if (!newCheckedKeys.includes(nodeKey)) {
-        newCheckedKeys.push(nodeKey)
-      }
-      descendantKeys.forEach((key) => {
-        if (!newCheckedKeys.includes(key)) {
-          newCheckedKeys.push(key)
+      if (!currentIds.has(treeKeyId(nodeKey))) next = [...next, node.key]
+      const nextIds = createTreeKeyIdSet(next)
+      for (const key of descendantKeys) {
+        if (!nextIds.has(treeKeyId(key))) {
+          next.push(key)
+          nextIds.add(treeKeyId(key))
         }
-      })
+      }
     } else {
-      // Remove node and all descendants
-      newCheckedKeys = newCheckedKeys.filter((k) => k !== nodeKey && !descendantKeys.includes(k))
+      const removeIds = createTreeKeyIdSet([nodeKey, ...descendantKeys])
+      next = next.filter((key) => !removeIds.has(treeKeyId(key)))
     }
   }
 
-  return calculateCheckedState(treeData, newCheckedKeys, checkStrictly)
+  return calculateCheckedState(treeData, next, checkStrictly)
 }
 
-/**
- * Filter checked keys based on check strategy
- * @param checkedState - Current checked state
- * @param treeData - Tree data
- * @param strategy - Check strategy
- * @returns Filtered checked keys
- */
 export function getCheckedKeysByStrategy(
   checkedState: TreeCheckedState,
   treeData: TreeNode[],
   strategy: TreeCheckStrategy = 'all'
-): (string | number)[] {
-  if (strategy === 'all') {
-    return checkedState.checked
+): TreeNodeKey[] {
+  if (strategy === 'all') return checkedState.checked
+
+  const checkedIds = createTreeKeyIdSet(checkedState.checked)
+  const result: TreeNodeKey[] = []
+
+  function isFullyChecked(node: TreeNode): boolean {
+    return checkedIds.has(treeKeyId(node.key))
   }
 
-  const allKeys = new Set(checkedState.checked)
-  const result: (string | number)[] = []
-
-  function traverse(nodes: TreeNode[]) {
-    nodes.forEach((node) => {
-      if (allKeys.has(node.key)) {
-        const hasChildren = node.children && node.children.length > 0
-        const allChildrenChecked =
-          hasChildren && node.children!.every((child) => allKeys.has(child.key))
-
-        if (strategy === 'parent') {
-          // Return parent if all children are checked
-          if (hasChildren && allChildrenChecked) {
-            result.push(node.key)
-            // Don't traverse children
-            return
-          } else if (!hasChildren) {
-            result.push(node.key)
-          }
-        } else if (strategy === 'child') {
-          // Return leaf nodes only
-          if (!hasChildren || !allChildrenChecked) {
-            result.push(node.key)
-          }
+  function walk(nodes: TreeNode[]): void {
+    for (const node of nodes) {
+      const hasChildren = nodeHasChildren(node)
+      if (strategy === 'parent') {
+        if (isFullyChecked(node)) {
+          result.push(node.key)
+          continue
         }
-
-        if (hasChildren) {
-          traverse(node.children!)
-        }
+        if (hasChildren) walk(node.children!)
+        continue
       }
-    })
+
+      if (!hasChildren) {
+        if (isFullyChecked(node)) result.push(node.key)
+        continue
+      }
+      walk(node.children!)
+    }
   }
 
-  traverse(treeData)
+  walk(treeData)
   return result
 }
 
-/**
- * Filter tree nodes based on filter function
- * @param treeData - Tree data
- * @param filterValue - Filter value
- * @param filterFn - Filter function
- * @returns Set of matched node keys
- */
 export function filterTreeNodes(
   treeData: TreeNode[],
   filterValue: string,
-  filterFn?: TreeFilterFn
-): Set<string | number> {
-  const matchedKeys = new Set<string | number>()
+  filterFn?: TreeFilterFn,
+  filterMode: TreeFilterMode = 'subtree'
+): Set<TreeNodeKey> {
+  const matchedKeys = new Set<TreeNodeKey>()
+  if (!filterValue) return matchedKeys
 
-  if (!filterValue) {
-    return matchedKeys
-  }
-
-  const defaultFilterFn: TreeFilterFn = (value, node) => {
-    return node.label.toLowerCase().includes(value.toLowerCase())
-  }
-
+  const defaultFilterFn: TreeFilterFn = (value, node) =>
+    node.label.toLowerCase().includes(value.toLowerCase())
   const fn = filterFn || defaultFilterFn
 
+  function addSubtree(node: TreeNode): void {
+    matchedKeys.add(node.key)
+    node.children?.forEach(addSubtree)
+  }
+
   function traverse(nodes: TreeNode[]): boolean {
-    let hasMatchedChild = false
-
-    nodes.forEach((node) => {
+    let any = false
+    for (const node of nodes) {
       const isMatched = fn(filterValue, node)
-      let childMatched = false
-
-      if (node.children && node.children.length > 0) {
-        childMatched = traverse(node.children)
-      }
-
-      if (isMatched || childMatched) {
+      const childMatched =
+        node.children && node.children.length > 0 ? traverse(node.children) : false
+      if (isMatched) {
+        if (filterMode === 'subtree') addSubtree(node)
+        else matchedKeys.add(node.key)
+        any = true
+      } else if (childMatched) {
         matchedKeys.add(node.key)
-        hasMatchedChild = true
+        any = true
       }
-    })
-
-    return hasMatchedChild
+    }
+    return any
   }
 
   traverse(treeData)
   return matchedKeys
 }
 
-/**
- * Get expanded keys for auto-expand when filtering
- * @param treeData - Tree data
- * @param matchedKeys - Matched node keys
- * @returns Set of keys to expand
- */
 export function getAutoExpandKeys(
   treeData: TreeNode[],
-  matchedKeys: Set<string | number>
-): Set<string | number> {
-  const expandKeys = new Set<string | number>()
-
-  matchedKeys.forEach((key) => {
-    const parentKeys = getParentKeys(treeData, key)
-    parentKeys.forEach((pk) => expandKeys.add(pk))
-  })
-
+  matchedKeys: Iterable<TreeNodeKey>
+): Set<TreeNodeKey> {
+  const expandKeys = new Set<TreeNodeKey>()
+  const seen = new Set<string>()
+  for (const key of matchedKeys) {
+    for (const parent of getParentKeys(treeData, key)) {
+      const id = treeKeyId(parent)
+      if (seen.has(id)) continue
+      seen.add(id)
+      expandKeys.add(parent)
+    }
+  }
   return expandKeys
 }
 
-/**
- * Create Set-based lookup from TreeCheckedState for O(1) per-node checks.
- * Use this in render loops instead of Array.includes() for better performance.
- */
 export function checkedSetsFromState(state: TreeCheckedState): {
-  checkedSet: Set<string | number>
-  halfCheckedSet: Set<string | number>
+  checkedSet: Set<TreeNodeKey>
+  halfCheckedSet: Set<TreeNodeKey>
 } {
   return {
     checkedSet: new Set(state.checked),
     halfCheckedSet: new Set(state.halfChecked)
   }
+}
+
+export function getTreeVirtualAlignScrollTop(
+  scrollTop: number,
+  index: number,
+  itemHeight: number,
+  viewportHeight: number
+): number {
+  if (index < 0 || itemHeight <= 0 || viewportHeight <= 0) return scrollTop
+  const top = index * itemHeight
+  if (top < scrollTop) return top
+  if (top + itemHeight > scrollTop + viewportHeight) return top + itemHeight - viewportHeight
+  return scrollTop
+}
+
+export function alignTreeVirtualScroll(
+  el: HTMLElement | null | undefined,
+  index: number,
+  itemHeight: number,
+  viewportHeight: number
+): number {
+  if (!el || index < 0) return el?.scrollTop ?? 0
+  const next = getTreeVirtualAlignScrollTop(el.scrollTop, index, itemHeight, viewportHeight)
+  if (el.scrollTop !== next) {
+    el.scrollTop = next
+    el.dispatchEvent(new Event('scroll'))
+  }
+  return next
+}
+
+export function treeItemKeyAttr(key: TreeNodeKey): string {
+  return String(key)
 }

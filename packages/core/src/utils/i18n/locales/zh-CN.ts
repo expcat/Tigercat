@@ -485,5 +485,11 @@ export const zhCN: TigerLocale = {
     deleteText: '删除',
     decimalAriaLabel: '小数点',
     idCardXAriaLabel: '身份证 X'
+  },
+  tree: {
+    ariaLabel: '树',
+    selectNode: '选择{label}',
+    expand: '展开',
+    collapse: '收起'
   }
 }

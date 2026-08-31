@@ -482,6 +482,12 @@ export const viVN: TigerLocale = {
     deleteText: 'Xóa',
     decimalAriaLabel: 'Dấu thập phân',
     idCardXAriaLabel: 'CCCD X'
+  },
+  tree: {
+    ariaLabel: 'Cây',
+    selectNode: 'Chọn {label}',
+    expand: 'Mở rộng',
+    collapse: 'Thu gọn'
   }
 }
 

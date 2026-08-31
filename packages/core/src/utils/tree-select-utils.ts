@@ -338,32 +338,12 @@ export function getTreeSelectTreeItemAria(options: {
   }
 }
 
-export function getTreeSelectVirtualAlignScrollTop(
-  scrollTop: number,
-  index: number,
-  itemHeight: number,
-  viewportHeight: number
-): number {
-  if (index < 0 || itemHeight <= 0 || viewportHeight <= 0) return scrollTop
-  const top = index * itemHeight
-  if (top < scrollTop) return top
-  if (top + itemHeight > scrollTop + viewportHeight) return top + itemHeight - viewportHeight
-  return scrollTop
-}
-
-export function alignTreeSelectVirtualScroll(
-  el: HTMLElement | null | undefined,
-  index: number,
-  itemHeight: number,
-  viewportHeight: number
-): number {
-  if (!el || index < 0) return el?.scrollTop ?? 0
-  const next = getTreeSelectVirtualAlignScrollTop(el.scrollTop, index, itemHeight, viewportHeight)
-  if (el.scrollTop !== next) {
-    el.scrollTop = next
-    el.dispatchEvent(new Event('scroll'))
-  }
-  return next
-}
-
-export { isTreeNodeExpandable, getVisibleTreeItems, findNode, getAllKeys, getParentKeys }
+export {
+  getTreeVirtualAlignScrollTop as getTreeSelectVirtualAlignScrollTop,
+  alignTreeVirtualScroll as alignTreeSelectVirtualScroll,
+  isTreeNodeExpandable,
+  getVisibleTreeItems,
+  findNode,
+  getAllKeys,
+  getParentKeys
+} from './tree-utils'

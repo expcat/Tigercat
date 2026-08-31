@@ -65,6 +65,7 @@ import type {
   TigerLocaleStepper,
   TigerLocaleSignature,
   TigerLocaleNumberKeyboard,
+  TigerLocaleTree,
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
@@ -416,6 +417,17 @@ export function getProgressLabels(
   overrides?: Partial<TigerLocaleProgress>
 ): Required<TigerLocaleProgress> {
   return resolveLocaleSection(enSection('progress'), locale?.progress, overrides)
+}
+
+export function getTreeLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTree>
+): Required<TigerLocaleTree> {
+  return resolveLocaleSection(enSection('tree'), locale?.tree, overrides)
+}
+
+export function formatTreeSelectNodeLabel(template: string, label: string): string {
+  return template.replace('{label}', label)
 }
 
 export function getSplitterLabels(

@@ -482,6 +482,12 @@ export const arSA: TigerLocale = {
     deleteText: 'حذف',
     decimalAriaLabel: 'فاصلة عشرية',
     idCardXAriaLabel: 'رمز X في الهوية'
+  },
+  tree: {
+    ariaLabel: 'الشجرة',
+    selectNode: 'تحديد {label}',
+    expand: 'توسيع',
+    collapse: 'طي'
   }
 }
 

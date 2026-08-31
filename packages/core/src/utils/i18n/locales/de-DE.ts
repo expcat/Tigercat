@@ -483,6 +483,12 @@ export const deDE: TigerLocale = {
     deleteText: 'Löschen',
     decimalAriaLabel: 'Dezimalzeichen',
     idCardXAriaLabel: 'Ausweis-X'
+  },
+  tree: {
+    ariaLabel: 'Baum',
+    selectNode: '{label} auswählen',
+    expand: 'Erweitern',
+    collapse: 'Einklappen'
   }
 }
 

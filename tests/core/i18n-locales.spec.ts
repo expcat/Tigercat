@@ -312,6 +312,7 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('imageCompare')
     expect(TIGER_LOCALE_KEYS).toContain('input')
     expect(TIGER_LOCALE_KEYS).toContain('inputNumber')
+    expect(TIGER_LOCALE_KEYS).toContain('tree')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

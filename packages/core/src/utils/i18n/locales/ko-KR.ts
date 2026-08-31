@@ -482,6 +482,12 @@ export const koKR: TigerLocale = {
     deleteText: '삭제',
     decimalAriaLabel: '소수점',
     idCardXAriaLabel: '신분증 X'
+  },
+  tree: {
+    ariaLabel: '트리',
+    selectNode: '{label} 선택',
+    expand: '펼치기',
+    collapse: '접기'
   }
 }
 

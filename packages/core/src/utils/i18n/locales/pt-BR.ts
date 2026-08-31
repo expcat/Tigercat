@@ -483,6 +483,12 @@ export const ptBR: TigerLocale = {
     deleteText: 'Apagar',
     decimalAriaLabel: 'Separador decimal',
     idCardXAriaLabel: 'X do documento'
+  },
+  tree: {
+    ariaLabel: 'Árvore',
+    selectNode: 'Selecionar {label}',
+    expand: 'Expandir',
+    collapse: 'Recolher'
   }
 }
 

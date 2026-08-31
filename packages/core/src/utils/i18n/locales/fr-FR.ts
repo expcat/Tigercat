@@ -483,6 +483,12 @@ export const frFR: TigerLocale = {
     deleteText: 'Supprimer',
     decimalAriaLabel: 'Séparateur décimal',
     idCardXAriaLabel: 'X de la carte'
+  },
+  tree: {
+    ariaLabel: 'Arborescence',
+    selectNode: 'Sélectionner {label}',
+    expand: 'Développer',
+    collapse: 'Réduire'
   }
 }
 

@@ -11,11 +11,14 @@ import {
   getFirstVisibleChildKey,
   getLeafKeys,
   getParentKeys,
+  getTreeIndentSlots,
   getTreeKeyboardAction,
   getTreeNodeClasses,
   getTreeNodeExpandIconClasses,
   getVisibleTreeItems,
   handleNodeCheck,
+  isTreeNodeExpandable,
+  sameTreeKey,
   type TreeKeyboardContext,
   treeBaseClasses,
   treeEmptyStateClasses,
@@ -59,20 +62,24 @@ describe('tree-utils classes', () => {
   it('exports stable class constants', () => {
     expect(treeBaseClasses).toContain('w-full')
     expect(treeNodeWrapperClasses).toBe('select-none')
-    expect(treeNodeContentClasses).toContain('cursor-pointer')
+    expect(treeNodeContentClasses).toContain('tiger-motion-aware')
+    expect(treeNodeContentClasses).toContain('motion-reduce:transition-none')
     expect(treeNodeHoverClasses).toContain('--tiger-surface-muted')
     expect(treeNodeSelectedClasses).toContain('tiger-primary')
     expect(treeNodeDisabledClasses).toContain('cursor-not-allowed')
     expect(treeNodeIndentClasses).toContain('w-6')
     expect(treeNodeExpandIconClasses).toContain('transition-transform')
     expect(treeNodeExpandIconExpandedClasses).toContain('rotate-90')
-    expect(treeNodeCheckboxClasses).toContain('focus:ring')
-    expect(treeNodeIconClasses).toContain('flex-shrink-0')
+    expect(treeNodeCheckboxClasses).toContain('me-2')
+    expect(treeNodeIconClasses).toContain('me-2')
     expect(treeNodeLabelClasses).toContain('truncate')
-    expect(treeNodeChildrenClasses).toBe('ml-6')
+    expect(treeNodeChildrenClasses).toBe('ms-6')
+    expect(treeLoadingClasses).toContain('ms-2')
     expect(treeLoadingClasses).toContain('animate-spin')
     expect(treeEmptyStateClasses).toContain('text-center')
-    expect(treeLineClasses).toContain('border-l')
+    expect(treeLineClasses).toContain('border-s')
+    expect(treeLineClasses).not.toContain('border-l')
+    expect(treeNodeChildrenClasses).not.toContain('ml-6')
   })
 
   it('lands tree root chrome on registered surface/text, not locked white or bg/fill aliases', () => {
@@ -108,15 +115,20 @@ describe('tree-utils classes', () => {
 
   it('combines node state classes', () => {
     expect(getTreeNodeClasses(false, false)).toContain(treeNodeHoverClasses)
+    expect(getTreeNodeClasses(false, false)).toContain('cursor-pointer')
     expect(getTreeNodeClasses(true, false, true)).toContain(treeNodeSelectedClasses)
     expect(getTreeNodeClasses(true, false, true)).toContain('w-full')
     expect(getTreeNodeClasses(false, true)).toContain(treeNodeDisabledClasses)
     expect(getTreeNodeClasses(false, true)).not.toContain(treeNodeHoverClasses)
+    expect(getTreeNodeClasses(false, false, false, { interactive: false })).toContain(
+      'cursor-default'
+    )
   })
 
-  it('rotates the expand icon only when expanded', () => {
-    expect(getTreeNodeExpandIconClasses(false)).toBe(treeNodeExpandIconClasses)
+  it('rotates the expand icon only when expanded, and flips in RTL when collapsed', () => {
     expect(getTreeNodeExpandIconClasses(true)).toContain(treeNodeExpandIconExpandedClasses)
+    expect(getTreeNodeExpandIconClasses(false)).toContain('rtl:rotate-180')
+    expect(getTreeNodeExpandIconClasses(true)).not.toContain('rtl:rotate-180')
   })
 })
 
@@ -146,6 +158,48 @@ describe('tree-utils traversal', () => {
       'child-b',
       'leaf-b2'
     ])
+  })
+
+  it('treats numeric and string keys as the same node', () => {
+    const data: TreeNode[] = [
+      {
+        key: 1,
+        label: 'One',
+        children: [{ key: '1-1', label: 'Nested' }]
+      }
+    ]
+    expect(sameTreeKey(1, '1')).toBe(true)
+    expect(findNode(data, '1')?.label).toBe('One')
+    expect(getParentKeys(data, '1-1')).toEqual([1])
+    const items = getVisibleTreeItems(data, new Set(['1']))
+    expect(items.map((item) => item.key)).toEqual([1, '1-1'])
+  })
+
+  it('keeps 1-based levels and last-child flags for indent lines', () => {
+    const expanded = new Set<string | number>(['root', 'child-b'])
+    const items = getVisibleTreeItems(treeData, expanded)
+    const leaf = items.find((item) => item.key === 'leaf-b2')
+    expect(leaf?.level).toBe(3)
+    expect(leaf?.isLastChild).toBe(true)
+    expect(leaf?.ancestorLast).toEqual([false, true])
+    const slots = getTreeIndentSlots(leaf!, true)
+    expect(slots).toHaveLength(2)
+    expect(slots[1]?.truncate).toBe(true)
+  })
+
+  it('treats empty children as loadable when isLeaf is not true', () => {
+    expect(isTreeNodeExpandable({ key: 'n', label: 'N', children: [] }, true)).toBe(true)
+    expect(isTreeNodeExpandable({ key: 'n', label: 'N', isLeaf: false, children: [] }, true)).toBe(
+      true
+    )
+    expect(
+      isTreeNodeExpandable({
+        key: 'n',
+        label: 'N',
+        isLeaf: true,
+        children: [{ key: 'c', label: 'C' }]
+      })
+    ).toBe(false)
   })
 
   it('collects all keys, leaf keys, parents, descendants, and found nodes', () => {
@@ -231,6 +285,33 @@ describe('tree-utils checked state', () => {
     ])
   })
 
+  it('returns partial leaves for parent/child strategy under a half-checked ancestor', () => {
+    const oneLeaf = calculateCheckedState(treeData, ['leaf-b1'])
+    expect(getCheckedKeysByStrategy(oneLeaf, treeData, 'child')).toEqual(['leaf-b1'])
+    expect(getCheckedKeysByStrategy(oneLeaf, treeData, 'parent')).toEqual(['leaf-b1'])
+
+    const mid = calculateCheckedState(treeData, ['child-b'])
+    expect(getCheckedKeysByStrategy(mid, treeData, 'parent')).toEqual(['child-b'])
+    expect(getCheckedKeysByStrategy(mid, treeData, 'child')).toEqual(['leaf-b1', 'leaf-b2'])
+  })
+
+  it('skips disabled descendants when cascading a check', () => {
+    const data: TreeNode[] = [
+      {
+        key: 'p',
+        label: 'P',
+        children: [
+          { key: 'ok', label: 'OK' },
+          { key: 'off', label: 'Off', disabled: true }
+        ]
+      }
+    ]
+    const next = handleNodeCheck(data, 'p', true, [])
+    expect(next.checked).toContain('p')
+    expect(next.checked).toContain('ok')
+    expect(next.checked).not.toContain('off')
+  })
+
   it('creates set lookups from checked state', () => {
     const sets = checkedSetsFromState({ checked: ['a'], halfChecked: ['b'] })
 
@@ -246,6 +327,18 @@ describe('tree-utils filtering', () => {
 
   it('matches nodes and their ancestors with the default filter', () => {
     expect(Array.from(filterTreeNodes(treeData, 'leaf b2'))).toEqual(['leaf-b2', 'child-b', 'root'])
+  })
+
+  it('keeps children of a matched parent in subtree mode', () => {
+    const matched = filterTreeNodes(treeData, 'Child B')
+    expect(matched.has('child-b')).toBe(true)
+    expect(matched.has('leaf-b1')).toBe(true)
+    expect(matched.has('leaf-b2')).toBe(true)
+    expect(matched.has('child-a')).toBe(false)
+
+    const matchOnly = filterTreeNodes(treeData, 'Child B', undefined, 'match-only')
+    expect(matchOnly.has('child-b')).toBe(true)
+    expect(matchOnly.has('leaf-b1')).toBe(false)
   })
 
   it('supports custom filter functions and auto-expand key derivation', () => {
