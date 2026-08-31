@@ -127,6 +127,7 @@ export * from './qrcode-utils'
 
 // Table v0.6.0 upgrades
 export * from './table-utils'
+export * from './table-controller'
 export * from './table-filter-utils'
 export * from './table-group-utils'
 export * from './table-resize-utils'

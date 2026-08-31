@@ -3,6 +3,7 @@
  */
 
 import { classNames } from './class-names'
+import { devWarn } from './dev-warn'
 import type {
   TableSize,
   ColumnAlign,
@@ -202,16 +203,29 @@ export function orderTableFixedColumns<T = Record<string, unknown>>(
  * - Returns 0 when width is undefined or not a pixel value.
  * - For sticky/fixed columns, a numeric (or px string) width is recommended.
  */
-export function parseWidthToPx(width?: string | number): number {
+export function parseWidthToPx(width?: string | number, containerWidth?: number): number {
   if (typeof width === 'number' && Number.isFinite(width)) {
     return width
   }
 
   if (typeof width === 'string') {
     const trimmed = width.trim()
+    const percent = trimmed.match(/^(\d+(?:\.\d+)?)%$/)
+    if (percent) {
+      if (typeof containerWidth === 'number' && containerWidth > 0) {
+        return (Number(percent[1]) / 100) * containerWidth
+      }
+      return 0
+    }
     const match = trimmed.match(/^(\d+(?:\.\d+)?)(px)?$/)
     if (match) {
       return Number(match[1])
+    }
+    if (trimmed) {
+      devWarn(
+        `Table.width.${trimmed}`,
+        `Table column width "${trimmed}" is not px or %; fixed columns need a resolvable width`
+      )
     }
   }
 
@@ -391,9 +405,10 @@ export function freezeTableColumnWidths<T = Record<string, unknown>>(
 
 function getColumnWidthForOffset<T = Record<string, unknown>>(
   column: Pick<TableColumn<T>, 'key' | 'width'>,
-  measuredColumnWidths: Record<string, number>
+  measuredColumnWidths: Record<string, number>,
+  containerWidth?: number
 ): number {
-  return measuredColumnWidths[column.key] || parseWidthToPx(column.width)
+  return measuredColumnWidths[column.key] || parseWidthToPx(column.width, containerWidth)
 }
 
 /**
@@ -401,7 +416,8 @@ function getColumnWidthForOffset<T = Record<string, unknown>>(
  */
 export function getFixedColumnOffsets<T = Record<string, unknown>>(
   columns: TableColumn<T>[],
-  measuredColumnWidths: Record<string, number> = {}
+  measuredColumnWidths: Record<string, number> = {},
+  containerWidth?: number
 ): {
   leftOffsets: Record<string, number>
   rightOffsets: Record<string, number>
@@ -418,7 +434,7 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
     if (column.fixed === 'left') {
       leftOffsets[column.key] = left
       hasLeftFixedColumns = true
-      left += getColumnWidthForOffset(column, measuredColumnWidths)
+      left += getColumnWidthForOffset(column, measuredColumnWidths, containerWidth)
     }
   }
 
@@ -428,12 +444,12 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
     if (column.fixed === 'right') {
       rightOffsets[column.key] = right
       hasRightFixedColumns = true
-      right += getColumnWidthForOffset(column, measuredColumnWidths)
+      right += getColumnWidthForOffset(column, measuredColumnWidths, containerWidth)
     }
   }
 
   const minTableWidth = columns.reduce(
-    (sum, col) => sum + getColumnWidthForOffset(col, measuredColumnWidths),
+    (sum, col) => sum + getColumnWidthForOffset(col, measuredColumnWidths, containerWidth),
     0
   )
   const hasFixedColumns = hasLeftFixedColumns || hasRightFixedColumns
@@ -600,15 +616,15 @@ export interface TableVirtualRecommendation {
  * Resolve the public Table virtual strategy.
  *
  * Table stays opt-in for virtualization to avoid surprising layout changes.
- * Large data sets surface a recommendation that consumers can inspect and use
- * to switch to `virtual` or the dedicated `VirtualTable` component.
+ * `autoVirtual` defaults to false; large processed-row counts only set
+ * `recommended` unless the caller opts in.
  */
 export function getTableVirtualRecommendation(
   options: TableVirtualRecommendationOptions
 ): TableVirtualRecommendation {
   const threshold = options.threshold ?? TABLE_VIRTUAL_RECOMMENDATION_THRESHOLD
   const autoEnabled =
-    options.virtual !== true && options.autoVirtual !== false && options.dataLength >= threshold
+    options.virtual !== true && options.autoVirtual === true && options.dataLength >= threshold
   const enabled = options.virtual === true || autoEnabled
 
   return {
@@ -823,31 +839,21 @@ export function sortData<T>(
   return sortedData
 }
 
+function cellMatchesFilterValue(cellValue: unknown, filterValue: unknown): boolean {
+  if (cellValue === filterValue) return true
+  if (String(cellValue) === String(filterValue)) return true
+  if (typeof filterValue === 'string') {
+    return String(cellValue).toLowerCase().includes(filterValue.toLowerCase())
+  }
+  return false
+}
+
 /**
- * Filter data array by filter values.
- *
- * Looks up `record[filtersKey]`. Prefer {@link filterTableData} when columns may define `dataKey`.
+ * @deprecated Use {@link filterTableData} so `dataKey` and `filterFn` apply.
+ * Kept as a thin wrapper for benches; not used by Table.
  */
 export function filterData<T>(data: T[], filters: Record<string, unknown>): T[] {
-  if (!filters || Object.keys(filters).length === 0) {
-    return data
-  }
-
-  return data.filter((record) => {
-    return Object.entries(filters).every(([key, filterValue]) => {
-      if (filterValue === '' || filterValue === null || filterValue === undefined) {
-        return true
-      }
-
-      const cellValue = (record as Record<string, unknown>)[key]
-
-      if (typeof filterValue === 'string') {
-        return String(cellValue).toLowerCase().includes(filterValue.toLowerCase())
-      }
-
-      return cellValue === filterValue
-    })
-  })
+  return filterTableData(data, [], filters)
 }
 
 /**
@@ -892,11 +898,7 @@ export function filterTableData<T>(
         return customFn(cellValue, filterValue)
       }
 
-      if (typeof filterValue === 'string') {
-        return String(cellValue).toLowerCase().includes(filterValue.toLowerCase())
-      }
-
-      return cellValue === filterValue
+      return cellMatchesFilterValue(cellValue, filterValue)
     })
   })
 }
@@ -938,38 +940,46 @@ export function getTableVirtualWindow(
 }
 
 /**
- * Paginate data array
+ * Paginate data array. `current` is 1-indexed and clamped to >= 1;
+ * `pageSize` is clamped to >= 1.
  */
 export function paginateData<T>(data: T[], current: number, pageSize: number): T[] {
-  const startIndex = (current - 1) * pageSize
-  const endIndex = startIndex + pageSize
-  return data.slice(startIndex, endIndex)
+  const safePage = Math.max(1, current)
+  const safeSize = Math.max(1, pageSize)
+  const startIndex = (safePage - 1) * safeSize
+  return data.slice(startIndex, startIndex + safeSize)
 }
 
 /**
- * Calculate pagination info
+ * Calculate pagination info. `pageSize <= 0` does not become Infinity.
+ * `total: 0` yields `totalPages: 0`.
  */
 export function calculatePagination(
   total: number,
   current: number,
   pageSize: number
 ): {
+  total: number
   totalPages: number
   startIndex: number
   endIndex: number
   hasNext: boolean
   hasPrev: boolean
 } {
-  const totalPages = Math.ceil(total / pageSize)
-  const startIndex = (current - 1) * pageSize + 1
-  const endIndex = Math.min(current * pageSize, total)
+  const safeTotal = Math.max(0, total)
+  const safePage = Math.max(1, current)
+  const safeSize = Math.max(1, pageSize)
+  const totalPages = safeTotal === 0 ? 0 : Math.ceil(safeTotal / safeSize)
+  const startIndex = safeTotal === 0 ? 0 : (safePage - 1) * safeSize + 1
+  const endIndex = Math.min(safePage * safeSize, safeTotal)
 
   return {
+    total: safeTotal,
     totalPages,
     startIndex,
     endIndex,
-    hasNext: current < totalPages,
-    hasPrev: current > 1
+    hasNext: totalPages > 0 && safePage < totalPages,
+    hasPrev: safePage > 1 && totalPages > 0
   }
 }
 
@@ -1016,7 +1026,9 @@ export function getExpandedRowContentClasses(size: TableSize): string {
 }
 
 /**
- * Get row key from record
+ * Get row key from record.
+ *
+ * `index` must be the **dataSource** index, not a page offset.
  */
 export function getRowKey<T>(
   record: T,

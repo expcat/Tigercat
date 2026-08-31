@@ -5,6 +5,8 @@
  * repeated synchronous column/row reads.
  */
 
+import { isBrowser } from './env'
+
 export type TableResizeFrameCallback = (timestamp: number) => void
 export type TableResizeFrameRequest = (callback: TableResizeFrameCallback) => number
 export type TableResizeFrameCancel = (handle: number) => void
@@ -24,7 +26,8 @@ export interface TableResizeSnapshot {
   tableWidth: number
   tableHeight: number
   columnWidths: Record<string, number>
-  rowHeights: number[]
+  /** Row heights keyed by `data-tiger-table-row-index` (dataSource index). */
+  rowHeights: Record<number, number>
 }
 
 export interface TableResizeObserverControllerOptions {
@@ -57,6 +60,12 @@ function cancelDefaultFrame(handle: number): void {
 }
 
 function createDefaultResizeObserver(callback: ResizeObserverCallback): TableResizeObserverLike {
+  if (!isBrowser() || typeof ResizeObserver === 'undefined') {
+    return {
+      observe() {},
+      disconnect() {}
+    }
+  }
   return new ResizeObserver(callback)
 }
 
@@ -79,7 +88,7 @@ export function measureTableResizeSnapshot(
   const containerSize = readElementSize(container)
   const tableSize = readElementSize(table)
   const columnWidths: Record<string, number> = {}
-  const rowHeights: number[] = []
+  const rowHeights: Record<number, number> = {}
 
   table?.querySelectorAll<HTMLElement>('thead th[data-tiger-table-column-key]').forEach((cell) => {
     const columnKey = cell.dataset.tigerTableColumnKey
@@ -89,7 +98,10 @@ export function measureTableResizeSnapshot(
   })
 
   table?.querySelectorAll<HTMLElement>('tbody tr[data-tiger-table-row-index]').forEach((row) => {
-    rowHeights.push(readElementSize(row).height)
+    const index = Number(row.dataset.tigerTableRowIndex)
+    if (Number.isInteger(index)) {
+      rowHeights[index] = readElementSize(row).height
+    }
   })
 
   return {
@@ -143,6 +155,10 @@ export function createTableResizeObserverController(
 
   function observe(nextContainer: HTMLElement, nextTable?: HTMLTableElement | null) {
     disconnect()
+
+    if (typeof nextContainer?.querySelector !== 'function') {
+      return
+    }
 
     container = nextContainer
     table = nextTable ?? nextContainer.querySelector('table')

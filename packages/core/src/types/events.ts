@@ -76,10 +76,14 @@ export type TableFilterChangeHandler = (filters: Record<string, unknown>) => voi
 export type TableSelectionChangeHandler = (selectedKeys: (string | number)[]) => void
 
 /** Callback when expanded rows change */
-export type TableExpandChangeHandler = (expandedKeys: (string | number)[]) => void
+export type TableExpandChangeHandler<T = Record<string, unknown>> = (
+  expandedKeys: (string | number)[],
+  record: T,
+  expanded: boolean
+) => void
 
 /** Callback when page or page size changes */
-export type PaginationChangeHandler = (page: number, pageSize: number) => void
+export type PaginationChangeHandler = (page: { current: number; pageSize: number }) => void
 
 /** Callback when a table row is clicked */
 export type TableRowClickHandler<T = Record<string, unknown>> = (record: T, index: number) => void

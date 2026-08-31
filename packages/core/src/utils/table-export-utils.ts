@@ -1,122 +1,87 @@
 /**
- * Table export utilities (CSV / Excel-compatible HTML worksheet)
+ * Table CSV export.
+ *
+ * Excel / xlsx is DataExport (`@expcat/tigercat-core/utils/data-export`), not
+ * an HTML worksheet pretending to be `.xls`.
  */
 
-import type { TableColumn, TableExportFormat } from '../types/table'
+import type { TableColumn } from '../types/table'
 import { isBrowser } from './env'
+import { getTableColumnDataKey } from './table-utils'
+
+const CSV_BOM = '\uFEFF'
+const FORMULA_PREFIX = /^[=+\-@]/
+
+function needsCsvQuotes(value: string): boolean {
+  return /[",\n\r]/.test(value)
+}
 
 /**
- * Escape a value for CSV output
+ * Escape a value for RFC 4180 CSV output.
  */
-function escapeCsvValue(value: unknown): string {
-  const str = value === null || value === undefined ? '' : String(value)
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+export function escapeCsvValue(value: unknown): string {
+  let str = value === null || value === undefined ? '' : String(value)
+  if (FORMULA_PREFIX.test(str)) {
+    str = `'${str}`
+  }
+  if (needsCsvQuotes(str)) {
     return `"${str.replace(/"/g, '""')}"`
   }
   return str
 }
 
+function withCsvExtension(filename: string): string {
+  return filename.toLowerCase().endsWith('.csv') ? filename : `${filename}.csv`
+}
+
 /**
- * Export table data to CSV string
+ * Export table data to a CSV string (UTF-8 BOM + CRLF).
+ *
+ * Cell values use `dataKey || key`. `filename` is ignored — pass it to
+ * {@link downloadCsv}.
  */
-export function exportTableToCsv<T>(
-  columns: TableColumn<T>[],
-  data: T[],
-  _filename?: string
-): string {
+export function exportTableToCsv<T>(columns: TableColumn<T>[], data: T[]): string {
   const headers = columns.map((col) => escapeCsvValue(col.title))
   const rows = data.map((record) =>
     columns
       .map((col) => {
-        const key = col.dataKey || col.key
-        const value = (record as Record<string, unknown>)[key]
+        const value = (record as Record<string, unknown>)[getTableColumnDataKey(col)]
         return escapeCsvValue(value)
       })
       .join(',')
   )
 
-  return [headers.join(','), ...rows].join('\n')
+  return `${CSV_BOM}${[headers.join(','), ...rows].join('\r\n')}`
 }
 
-function escapeHtmlValue(value: unknown): string {
-  const str = value === null || value === undefined ? '' : String(value)
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+export function exportTableData<T>(columns: TableColumn<T>[], data: T[]): string {
+  return exportTableToCsv(columns, data)
 }
 
-export function exportTableToExcel<T>(columns: TableColumn<T>[], data: T[]): string {
-  const headerCells = columns.map((column) => `<th>${escapeHtmlValue(column.title)}</th>`).join('')
-  const bodyRows = data
-    .map((record) => {
-      const cells = columns
-        .map((column) => {
-          const key = column.dataKey || column.key
-          const value = (record as Record<string, unknown>)[key]
-          return `<td>${escapeHtmlValue(value)}</td>`
-        })
-        .join('')
+function downloadBlob(content: string, filename: string, mime: string): void {
+  if (!isBrowser()) return
 
-      return `<tr>${cells}</tr>`
-    })
-    .join('')
-
-  return `<!doctype html><html><head><meta charset="utf-8"></head><body><table><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></body></html>`
+  const blob = new Blob([content], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.style.display = 'none'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 /**
- * Trigger a CSV file download in the browser
+ * Trigger a CSV file download in the browser.
+ * Existing `.csv` suffixes are not duplicated.
  */
 export function downloadCsv(csvContent: string, filename: string = 'export'): void {
-  if (!isBrowser()) return
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${filename}.csv`
-  link.style.display = 'none'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  downloadBlob(csvContent, withCsvExtension(filename), 'text/csv;charset=utf-8;')
 }
 
-export function downloadExcel(excelContent: string, filename: string = 'export'): void {
-  if (!isBrowser()) return
-
-  const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${filename}.xls`
-  link.style.display = 'none'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-}
-
-export function exportTableData<T>(
-  columns: TableColumn<T>[],
-  data: T[],
-  format: TableExportFormat = 'csv'
-): string {
-  return format === 'excel' ? exportTableToExcel(columns, data) : exportTableToCsv(columns, data)
-}
-
-export function downloadTableExport(
-  content: string,
-  filename: string = 'export',
-  format: TableExportFormat = 'csv'
-): void {
-  if (format === 'excel') {
-    downloadExcel(content, filename)
-    return
-  }
-
+export function downloadTableExport(content: string, filename: string = 'export'): void {
   downloadCsv(content, filename)
 }
 

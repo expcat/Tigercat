@@ -10,7 +10,8 @@ import type { PaginationPageSizeOptionItem } from './pagination'
  */
 export type TableSize = 'sm' | 'md' | 'lg'
 
-export type TableExportFormat = 'csv' | 'excel'
+/** Built-in Table export is CSV only. Use DataExport for `.xlsx`. */
+export type TableExportFormat = 'csv'
 
 export type TableResponsiveMode = 'card' | 'scroll'
 
@@ -319,18 +320,26 @@ export interface PaginationConfig {
   defaultPageSize?: number
 
   /**
-   * Total number of items
+   * Total number of items. `undefined` means “not passed” (local mode uses
+   * processed length). `0` is a real total — especially for `remote`.
    */
   total?: number
 
   /**
-   * Remote (server-side) pagination mode. When true, `dataSource` is treated
-   * as the current page and the table skips internal slicing; page count and
-   * range text are derived from `total`. Built-in sorting/filtering only
-   * affects the current page — perform them server-side instead.
+   * Remote (server-side) mode. `dataSource` is the current page: the table
+   * skips internal slicing **and** built-in filter / sort / group. Page count
+   * uses `total` (including `0`). Set `localProcessing` to still run those
+   * on the current page.
    * @default false
    */
   remote?: boolean
+
+  /**
+   * When `remote` is true, still run built-in filter / sort / group on the
+   * current page. Default is off.
+   * @default false
+   */
+  localProcessing?: boolean
 
   /**
    * Available page size options
@@ -410,7 +419,9 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
   defaultSelectedRowKeys?: (string | number)[]
 
   /**
-   * Function to get row key
+   * Function to get row key. Shares Table `rowKey` when both are set
+   * (`getRowKey` wins). Missing keys fall back to the dataSource index, never
+   * a page offset.
    * @default (record) => record.id
    */
   getRowKey?: (record: T) => string | number
@@ -635,8 +646,8 @@ export interface TableProps<T = Record<string, unknown>> {
   emptyText?: string
 
   /**
-   * Pagination configuration
-   * Set to false to disable pagination
+   * Pagination configuration. Omit to use the default pager (`pageSize` 10).
+   * Set to `false` to disable pagination.
    */
   pagination?: PaginationConfig | false
 
@@ -652,8 +663,10 @@ export interface TableProps<T = Record<string, unknown>> {
   expandable?: ExpandableConfig<T>
 
   /**
-   * Function to get row key
-   * @default (record) => record.id
+   * Row identity. String form reads `record[rowKey]`. Missing keys fall back
+   * to the dataSource index (not the current page index).
+   * `rowSelection.getRowKey`, when set, uses the same resolver (and wins).
+   * @default 'id'
    */
   rowKey?: string | ((record: T) => string | number)
 
@@ -739,8 +752,10 @@ export interface TableProps<T = Record<string, unknown>> {
   virtual?: boolean
 
   /**
-   * Automatically enable Table's virtual scroll container for very large data sets.
-   * @default true
+   * Automatically enable Table's virtual scroll container for very large
+   * **processed** row counts. Default is off so a 1000-row source filtered to
+   * a handful of rows does not jump to a 400px virtual box.
+   * @default false
    */
   autoVirtual?: boolean
 
@@ -770,10 +785,10 @@ export interface TableProps<T = Record<string, unknown>> {
   editable?: boolean
 
   /**
-   * Set of editable cells: Map<columnKey, Set<rowIndex>>
-   * If not provided and editable=true, all cells are editable
+   * Editable cells as `{ [columnKey]: dataSourceIndex[] }`.
+   * If omitted and `editable` is true, every cell is editable.
    */
-  editableCells?: Map<string, Set<number>>
+  editableCells?: Record<string, number[]>
 
   /**
    * Filter mode
@@ -815,25 +830,58 @@ export interface TableProps<T = Record<string, unknown>> {
   exportable?: boolean
 
   /**
-   * Export format.
+   * Built-in export format. Table only serializes CSV; use DataExport for xlsx.
    * @default 'csv'
    */
   exportFormat?: TableExportFormat
 
   /**
-   * Export filename (without extension)
+   * Export filename. A trailing `.csv` is not duplicated.
    * @default 'export'
    */
   exportFilename?: string
+
+  onChange?: (params: {
+    sort: SortState
+    filters: Record<string, unknown>
+    pagination: { current: number; pageSize: number } | null
+  }) => void
+  onRowClick?: (record: T, index: number) => void
+  onSelectionChange?: (selectedKeys: (string | number)[]) => void
+  onSortChange?: (sort: SortState) => void
+  onFilterChange?: (filters: Record<string, unknown>) => void
+  onHiddenColumnKeysChange?: (hiddenKeys: string[]) => void
+  onPageChange?: (page: { current: number; pageSize: number }) => void
+  onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
+  /**
+   * Cell commit. `rowIndex` is the **dataSource** index.
+   */
+  onCellChange?: (rowIndex: number, columnKey: string, newValue: string) => void
+  onColumnOrderChange?: (columns: TableColumn<T>[]) => void
+  onColumnFixedChange?: (
+    columnKey: string,
+    fixed: TableFixedPosition | false,
+    columns: TableColumn<T>[]
+  ) => void
+  onRowOrderChange?: (rows: T[]) => void
+  onExport?: (csv: string) => void
 }
 
 /**
  * Filter rule for advanced filtering
  */
 export interface FilterRule {
+  /** Column key (not the record field). Values resolve through `dataKey`. */
   column: string
-  operator: 'equals' | 'contains' | 'gt' | 'lt' | 'between' | 'notEquals'
-  value: unknown
-  valueTo?: unknown // for 'between' operator
+  operator:
+    'equals' | 'contains' | 'gt' | 'lt' | 'gte' | 'lte' | 'between' | 'notEquals' | 'isEmpty'
+  /**
+   * Compared value. Empty `''` / `null` / `undefined` skips the rule
+   * (does not match every row). Use `isEmpty` to target blank cells.
+   */
+  value?: unknown
+  /** Inclusive upper bound for `between`. */
+  valueTo?: unknown
+  /** How this rule combines with the previous one. Ignored on the first rule. */
   logic?: 'and' | 'or'
 }
