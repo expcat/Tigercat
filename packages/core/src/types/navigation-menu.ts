@@ -2,8 +2,11 @@
  * NavigationMenu component types and interfaces
  */
 
+import type { FloatingPlacement } from '../utils/floating'
+
 /**
  * Open item key for a NavigationMenu. `null` / `undefined` / `''` means closed.
+ * `1` and `'1'` identify the same item.
  */
 export type NavigationMenuValue = string | number
 
@@ -23,14 +26,27 @@ export interface NavigationMenuProps {
   /**
    * Whether any panel is open (controlled mode).
    * When `false`, every panel is closed even if `value` is set.
+   * When `true` without a `value` / `defaultValue`, nothing opens
+   * (there is no panel to show).
    */
   open?: boolean
   /**
    * Default open state (uncontrolled mode). Requires `defaultValue` to know
-   * which panel to show.
+   * which panel to show. Alone it does not open a panel.
    * @default false
    */
   defaultOpen?: boolean
+  /**
+   * Open the hovered trigger's panel after `delayDuration`.
+   * Focus never opens a panel; Enter / Space / ArrowDown / click do.
+   * @default false
+   */
+  openOnHover?: boolean
+  /**
+   * Panel placement relative to the trigger
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
   /**
    * Whether the navigation menu is disabled
    * @default false
@@ -70,6 +86,21 @@ export interface NavigationMenuProps {
    * @default 4
    */
   offset?: number
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+  /**
+   * Custom styles
+   */
+  style?: Record<string, unknown>
+}
+
+/**
+ * Menubar list (`ul` with `role="menubar"`). Optional; the root wraps
+ * children in a list when this is omitted.
+ */
+export interface NavigationMenuListProps {
   /**
    * Additional CSS classes
    */

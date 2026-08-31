@@ -9,6 +9,8 @@ import {
 } from './dropdown-utils'
 import type { NavigationMenuValue } from '../types/navigation-menu'
 
+export const NAVIGATION_MENU_ITEM_VALUE_ATTR = 'data-tiger-navigation-menu-value'
+
 /**
  * Hover delay (ms) before a panel opens
  */
@@ -48,15 +50,36 @@ export function injectNavigationMenuStyles(): void {
 }
 
 /**
+ * Normalize an item key so `1` and `'1'` match.
+ */
+export function navigationMenuValueId(
+  value: NavigationMenuValue | null | undefined
+): string | null {
+  if (value == null || value === '') return null
+  return String(value)
+}
+
+/**
+ * Whether two item keys identify the same panel / trigger.
+ */
+export function sameNavigationMenuValue(
+  a: NavigationMenuValue | null | undefined,
+  b: NavigationMenuValue | null | undefined
+): boolean {
+  const left = navigationMenuValueId(a)
+  const right = navigationMenuValueId(b)
+  if (left == null || right == null) return false
+  return left === right
+}
+
+/**
  * Whether `openValue` currently identifies `itemValue` as the open panel
  */
 export function isNavigationMenuValueOpen(
   itemValue: NavigationMenuValue,
   openValue: NavigationMenuValue | null | undefined
 ): boolean {
-  return (
-    openValue !== null && openValue !== undefined && openValue !== '' && openValue === itemValue
-  )
+  return sameNavigationMenuValue(itemValue, openValue)
 }
 
 /**
@@ -114,55 +137,18 @@ export function getNavigationMenuBarItems(container: HTMLElement): HTMLElement[]
 }
 
 /**
- * Handle ArrowLeft/ArrowRight/Home/End within a menubar.
- * Returns true if the event was handled.
+ * Initialise roving tabindex on a menubar. Prefer the existing tab stop.
+ * Frameworks should set `tabIndex` from `tabStopValue` and only call this
+ * when that value is still empty.
  */
-export function handleMenubarNavigation(container: HTMLElement, event: KeyboardEvent): boolean {
-  const items = getNavigationMenuBarItems(container)
-  if (items.length === 0) return false
-
-  const activeElement = container.ownerDocument?.activeElement ?? null
-  const currentIndex = items.indexOf(activeElement as HTMLElement)
-  let nextIndex = -1
-
-  switch (event.key) {
-    case 'ArrowRight':
-      nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0
-      break
-    case 'ArrowLeft':
-      nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1
-      break
-    case 'Home':
-      nextIndex = 0
-      break
-    case 'End':
-      nextIndex = items.length - 1
-      break
-    default:
-      return false
-  }
-
-  event.preventDefault()
-  const next = items[nextIndex]
-  items.forEach((el) => {
-    el.tabIndex = el === next ? 0 : -1
-  })
-  next.focus()
-  return true
-}
-
-/**
- * Initialise roving tabindex on a menubar. Sets tabindex=0 on the first
- * item (or the one that already has it), -1 on the rest.
- */
-export function initNavigationMenuRovingTabIndex(root: HTMLElement): void {
+export function initNavigationMenuRovingTabIndex(root: HTMLElement): HTMLElement | null {
   const items = getNavigationMenuBarItems(root)
-  if (items.length === 0) return
-  const hasActive = items.some((el) => el.tabIndex === 0)
-  if (hasActive) return
-  items.forEach((el, index) => {
-    el.tabIndex = index === 0 ? 0 : -1
+  if (items.length === 0) return null
+  const active = items.find((el) => el.tabIndex === 0) ?? items[0]
+  items.forEach((el) => {
+    el.tabIndex = el === active ? 0 : -1
   })
+  return active
 }
 
 /**
@@ -178,7 +164,7 @@ export function getNavigationMenuClasses(): string {
 export function getNavigationMenuListClasses(): string {
   return classNames(
     'tiger-navigation-menu-list',
-    'flex flex-row flex-wrap items-center gap-1',
+    'flex flex-row items-center gap-1',
     'm-0 p-1',
     'list-none'
   )
@@ -227,7 +213,7 @@ export function getNavigationMenuContentClasses(mega: boolean): string {
   return classNames(
     'tiger-navigation-menu-content',
     getDropdownMenuClasses(),
-    mega && 'min-w-[28rem]! p-4'
+    mega && 'min-w-[28rem] p-4'
   )
 }
 
@@ -243,6 +229,7 @@ export function getNavigationMenuLinkClasses(
     return classNames(
       'tiger-navigation-menu-link',
       getDropdownItemClasses(disabled, false),
+      disabled && 'pointer-events-none',
       active && 'bg-[var(--tiger-surface-muted,#f3f4f6)] font-medium'
     )
   }

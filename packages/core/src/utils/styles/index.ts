@@ -83,6 +83,7 @@ export * from '../pagination-utils'
 export * from '../dropdown-utils'
 export * from '../context-menu-utils'
 export * from '../navigation-menu-utils'
+export * from '../navigation-menu-controller'
 export * from '../page-header-utils'
 
 // Feedback components

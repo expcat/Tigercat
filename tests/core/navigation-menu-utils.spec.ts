@@ -35,6 +35,13 @@ describe('navigation-menu-utils', () => {
       expect(isNavigationMenuValueOpen('products', 'docs')).toBe(false)
     })
 
+    it('treats 1 and "1" as the same open item', () => {
+      expect(isNavigationMenuValueOpen('1', 1)).toBe(true)
+      expect(isNavigationMenuValueOpen(1, '1')).toBe(true)
+      expect(isNavigationMenuValueOpen(1, 1)).toBe(true)
+      expect(isNavigationMenuValueOpen(1, 2)).toBe(false)
+    })
+
     it('honours a controlled open=false overlay', () => {
       expect(
         resolveNavigationMenuOpenValue({
