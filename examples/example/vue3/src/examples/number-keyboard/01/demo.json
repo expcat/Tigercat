@@ -1,7 +1,7 @@
 {
   "id": "number-keyboard-01",
   "title": "金额输入",
-  "description": "amount 模式支持小数点和默认两位小数",
+  "description": "FormItem 包显示用 Input。聚焦打开底栏键盘；完成关闭。amount 默认两位小数。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -1,0 +1,12 @@
+{
+  "id": "number-keyboard-03",
+  "title": "手机号",
+  "description": "phone 默认 11 位大陆手机号，不能打 +。确认关闭底栏。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

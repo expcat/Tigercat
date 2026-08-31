@@ -11,15 +11,17 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Component Notes
 
-| Component    | Uses | Notes                                                                                                                                                                                                          |
-| ------------ | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AutoComplete | -    | 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。      |
-| Cascader     | -    | value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。                                                                              |
-| InputGroup   | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                           |
-| InputNumber  | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                    |
-| Select       | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。 |
-| TimePicker   | -    | 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。                                                                  |
-| TreeSelect   | -    | 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。                                                                     |
+| Component      | Uses | Notes                                                                                                                                                                                                                |
+| -------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AutoComplete   | -    | 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。            |
+| Cascader       | -    | value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。                                                                                    |
+| InputGroup     | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                                 |
+| InputNumber    | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                          |
+| NumberKeyboard | -    | 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。 |
+| Select         | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。       |
+| Signature      | -    | 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。                                  |
+| TimePicker     | -    | 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。                                                                        |
+| TreeSelect     | -    | 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。                                                                           |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
@@ -40,9 +42,11 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | InputGroupAddon | `<InputGroupAddon>https://</InputGroupAddon>`                                                               | `<InputGroupAddon>https://</InputGroupAddon>`                                                               |
 | InputNumber     | `<InputNumber v-model="value" />`                                                                           | `<InputNumber value={value} onChange={setValue} />`                                                         |
 | MaskInput       | `<MaskInput :mask="mask" />`                                                                                | `<MaskInput mask={mask} />`                                                                                 |
+| NumberKeyboard  | `<NumberKeyboard v-model="value" />`                                                                        | `<NumberKeyboard value={value} onChange={setValue} />`                                                      |
 | Radio           | `<Radio v-model="checked" value="a">A</Radio>`                                                              | `<Radio checked={checked} onChange={setChecked} value="a">A</Radio>`                                        |
 | RadioGroup      | `<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>`                                       | `<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>`                     |
 | Select          | `<Select v-model="value" :options="options" />`                                                             | `<Select value={value} options={options} onChange={(next) => setValue(next)} />`                            |
+| Signature       | `<Signature v-model="value" />`                                                                             | `<Signature value={value} onChange={setValue} />`                                                           |
 | Slider          | `<Slider v-model="value" />`                                                                                | `<Slider value={value} onChange={setValue} />`                                                              |
 | Stepper         | `<Stepper v-model="value" />`                                                                               | `<Stepper value={value} onChange={setValue} />`                                                             |
 | Switch          | `<Switch v-model="checked">Label</Switch>`                                                                  | `<Switch checked={checked} onChange={setChecked}>Label</Switch>`                                            |
@@ -50,6 +54,6 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | TimePicker      | `<TimePicker v-model="value" />`                                                                            | `<TimePicker value={value} onChange={setValue} />`                                                          |
 | TreeSelect      | `<TreeSelect v-model="value" :tree-data="treeData" />`                                                      | `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`                      |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, Transfer, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：InputOTP, Mentions, TagsInput, Transfer, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

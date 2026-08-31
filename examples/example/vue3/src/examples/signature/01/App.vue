@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { SignatureChangePayload } from '@expcat/tigercat-core'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Signature } from '@expcat/tigercat-vue/Signature'
 
-const signed = ref(false)
-const handleChange = (payload: SignatureChangePayload) => {
-  signed.value = !payload.empty
-}
+const value = ref('')
 </script>
 
 <template>
-  <div class="space-y-2">
-    <Signature
-      :width="420"
-      :height="180"
-      pen-color="#0f766e"
-      :line-width="3"
-      export-type="image/svg+xml"
-      aria-label="合同签名"
-      clear-text="清空"
-      @change="handleChange" />
-    <p class="text-sm text-gray-600 dark:text-gray-300">
-      {{ signed ? '签名已记录' : '等待签名' }}
+  <div class="w-full max-w-[320px] space-y-2">
+    <FormItem name="sign" label="合同签名">
+      <Signature v-model="value" export-type="image/jpeg" />
+    </FormItem>
+    <p class="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+      {{ value ? '已签名（受控值为 SVG data URL）' : '等待签名' }}
     </p>
+    <img
+      v-if="value"
+      :src="value"
+      alt=""
+      class="w-full rounded border border-[var(--tiger-border,#d1d5db)]" />
   </div>
 </template>

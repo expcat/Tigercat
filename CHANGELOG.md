@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **Signature**：笔迹会话下沉 core（pointerId、一次 finish）。受控值是 SVG data URL 或 `''`，能回灌；光栅从离屏逻辑尺寸导出，不再吃显示 canvas 的 DPR。空签不发空白图。读 FormItem；画板是可聚焦 widget；Undo + locale；假 `--tiger-signature-*` 删掉。React `forwardRef` / Vue `expose({ focus, clear, undo, toDataURL, toSVG, isEmpty })`。
+- **NumberKeyboard**：`applyNumberKeyboardKey` 一份。Confirm 的颜色单独解析，不再和普通键对打。假 `--tiger-number-keyboard-*` 删掉。组是一个 Tab 停，方向键和物理数字走同一份 apply。`open` 经 overlay-host 挂底栏。empty 是 spacer。读 FormItem。`phone`/`id-card` 写进 JSDoc。Confirm 走 `common.okText`。
 - **ColorPicker / ColorSwatch**：HSV 在拖动期间当事实源，面板有 SV 平面和光谱色相轨；所有操作按 `format` emit（hex+alpha 用 8 位）。未选是 `undefined`，Clear 是 `''`。补 `defaultValue` / `open` / `placement`。预设复用 ColorSwatch。读 FormItem；trigger 是 native button；弹层 dialog + trap + `fullscreen-sm` + Done。假 `--tiger-colorpicker-*` / `--tiger-colorswatch-*` 删掉。方向键读 `dir` 并环绕。勾按亮度选 on-color。
 - **CronEditor**：方言是 5 段数字 unix（0/7 周日，不认名字和 Quartz）。空值是 `''` 不是每分钟。段数不对时不把原文改写成 `* * * * *`。Custom 模式是状态。数字不每键 clamp。读 FormItem；出错写 `aria-invalid`。假 `--tiger-croneditor-*` / `--tiger-danger` 删掉。
 - **TimePicker**：open / 草稿 / range 两步 / Now 下沉 core。列点不立刻 `onChange`，OK 才提交；空值是 `null`。`minTime="09:30"` 能选 09 再选 30。12 小时制小时列含 12；`parseTime` 认 `02:30 PM` / locale dayPeriod。locale 只收官方对象，13 套包带 `timePicker.period`。读 FormItem；打开不当 blur。弹层 dialog + trap + DatePicker 同一套 sheet 遮罩。按断点只挂桌面 listbox 或小屏原生 select。chrome 复用 Input。React `forwardRef` / Vue `expose({ focus, open, close })`。

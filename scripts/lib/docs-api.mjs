@@ -306,6 +306,28 @@ export const COMPONENT_PROP_PRIORITY = {
     'clearable?',
     'disabled?'
   ],
+  Signature: [
+    'value?',
+    'defaultValue?',
+    'exportType?',
+    'readonly?',
+    'clearable?',
+    'disabled?',
+    'penColor?',
+    'width?',
+    'height?'
+  ],
+  NumberKeyboard: [
+    'value?',
+    'defaultValue?',
+    'mode?',
+    'open?',
+    'maxLength?',
+    'precision?',
+    'showConfirm?',
+    'disabled?',
+    'readonly?'
+  ],
   ColorSwatch: [
     'value?',
     'defaultValue?',
@@ -488,7 +510,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     TimePicker: '<TimePicker v-model="value" />',
     ColorPicker: '<ColorPicker v-model="value" />',
     ColorSwatch: '<ColorSwatch v-model="value" :colors="colors" />',
-    CronEditor: '<CronEditor v-model="value" />'
+    CronEditor: '<CronEditor v-model="value" />',
+    Signature: '<Signature v-model="value" />',
+    NumberKeyboard: '<NumberKeyboard v-model="value" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -541,7 +565,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     TimePicker: '<TimePicker value={value} onChange={setValue} />',
     ColorPicker: '<ColorPicker value={value} onChange={setValue} />',
     ColorSwatch: '<ColorSwatch value={value} colors={colors} onChange={setValue} />',
-    CronEditor: '<CronEditor value={value} onChange={setValue} />'
+    CronEditor: '<CronEditor value={value} onChange={setValue} />',
+    Signature: '<Signature value={value} onChange={setValue} />',
+    NumberKeyboard: '<NumberKeyboard value={value} onChange={setValue} />'
   }
 }
 

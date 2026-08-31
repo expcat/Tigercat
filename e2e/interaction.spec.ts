@@ -67,6 +67,18 @@ for (const { framework, baseUrl } of exampleApps) {
       await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
     })
 
+    test('number keyboard types from clicks and physical keys', async ({ page }) => {
+      const { preview } = await openDemo(page, baseUrl, 'number-keyboard', 'number-keyboard-02')
+      await preview.getByRole('button', { name: '1' }).click()
+      await expect(preview.getByPlaceholder('身份证号')).toHaveValue('1')
+      const keypad = preview.locator('[data-tiger-number-keyboard]')
+      await keypad.focus()
+      await keypad.press('2')
+      await expect(preview.getByPlaceholder('身份证号')).toHaveValue('12')
+      await keypad.press('Backspace')
+      await expect(preview.getByPlaceholder('身份证号')).toHaveValue('1')
+    })
+
     test('table sorting and filtering update visible rows', async ({ page }) => {
       const { preview } = await openDemo(page, baseUrl, 'table', 'table-02')
       const table = preview.locator('table').first()

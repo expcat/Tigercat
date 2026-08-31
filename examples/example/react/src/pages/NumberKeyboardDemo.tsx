@@ -7,7 +7,7 @@ export default function NumberKeyboardDemo() {
   return (
     <DemoPage
       title="NumberKeyboard 数字键盘"
-      description="移动端数字键盘，支持金额、手机号和身份证输入模式。"
+      description="与 Input 一起用。amount / phone / id-card 三种模式；open 时走 overlay 底栏。"
       modules={modules}
     />
   )

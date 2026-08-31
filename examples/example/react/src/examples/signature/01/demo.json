@@ -1,7 +1,7 @@
 {
   "id": "signature-01",
   "title": "基本用法",
-  "description": "通过 onChange 获取当前签名导出值",
+  "description": "FormItem 绑定 v-model / value。空签是空字符串；画完是可回灌的 SVG data URL。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

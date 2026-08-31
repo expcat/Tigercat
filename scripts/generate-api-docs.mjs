@@ -101,6 +101,14 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       'React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。'
   },
+  Signature: {
+    notes:
+      "受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。"
+  },
+  NumberKeyboard: {
+    notes:
+      '配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。'
+  },
   Select: {
     notes:
       "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。"

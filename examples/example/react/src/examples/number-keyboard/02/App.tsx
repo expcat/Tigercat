@@ -7,14 +7,13 @@ export default function App() {
 
   return (
     <div className="max-w-sm space-y-3">
-      <Input value={value} readonly placeholder="身份证号" />
-      <NumberKeyboard
-        mode="id-card"
+      <Input
         value={value}
-        onChange={setValue}
-        confirmText="完成"
-        deleteText="退格"
+        placeholder="身份证号"
+        inputMode="none"
+        onChange={(event) => setValue(event.target.value)}
       />
+      <NumberKeyboard mode="id-card" value={value} onChange={setValue} showConfirm={false} />
     </div>
   )
 }

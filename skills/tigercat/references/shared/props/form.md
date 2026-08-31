@@ -247,13 +247,22 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 
 ## NumberKeyboard
 
-`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 3/14 props
+`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 8/20 props
 
-| Prop        | Type                   | Default | Notes |
-| ----------- | ---------------------- | ------- | ----- |
-| `value?`    | `string`               | `-`     | -     |
-| `disabled?` | `boolean`              | `-`     | -     |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | -     |
+Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。
+
+| Prop            | Type                 | Default    | Notes                                                                              |
+| --------------- | -------------------- | ---------- | ---------------------------------------------------------------------------------- |
+| `value?`        | `string`             | `-`        | -                                                                                  |
+| `defaultValue?` | `string`             | `-`        | -                                                                                  |
+| `mode?`         | `NumberKeyboardMode` | `'number'` | -                                                                                  |
+| `open?`         | `boolean`            | `-`        | Controlled sheet visibility. Passing `open` or `defaultOpen` selects overlay mode. |
+| `maxLength?`    | `number`             | `-`        | -                                                                                  |
+| `precision?`    | `number`             | `2`        | Fractional digits in `amount` mode.                                                |
+| `showConfirm?`  | `boolean`            | `true`     | -                                                                                  |
+| `disabled?`     | `boolean`            | `false`    | -                                                                                  |
+
+Events/callback props: `onChange?`, `onOpenChange?`.
 
 ## Radio
 
@@ -298,13 +307,22 @@ Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React �
 
 ## Signature
 
-`packages/core/src/types/signature.ts` · `SignatureProps` · 3/14 props
+`packages/core/src/types/signature.ts` · `SignatureProps` · 8/21 props
 
-| Prop        | Type                   | Default | Notes |
-| ----------- | ---------------------- | ------- | ----- |
-| `disabled?` | `boolean`              | `-`     | -     |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | -     |
-| `width?`    | `number`               | `-`     | -     |
+Note: 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。
+
+| Prop            | Type                  | Default       | Notes                                                                     |
+| --------------- | --------------------- | ------------- | ------------------------------------------------------------------------- |
+| `value?`        | `string`              | `-`           | Controlled value. SVG data URL or `''`. `undefined` is uncontrolled.      |
+| `defaultValue?` | `string`              | `-`           | Initial SVG data URL for uncontrolled mode.                               |
+| `exportType?`   | `SignatureExportType` | `'image/png'` | Format for `toDataURL()`. The controlled `value` is always SVG.           |
+| `readonly?`     | `boolean`             | `false`       | Focusable, not drawable. Distinct from `disabled`.                        |
+| `clearable?`    | `boolean`             | `true`        | -                                                                         |
+| `disabled?`     | `boolean`             | `false`       | -                                                                         |
+| `penColor?`     | `string`              | `-`           | Stroke color. Defaults to `--tiger-text` (resolved from computed styles). |
+| `width?`        | `number`              | `-`           | Logical canvas width in CSS pixels. Omit to follow the container (100%).  |
+
+Events/callback props: `onChange?`.
 
 ## Slider
 
