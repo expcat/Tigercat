@@ -96,12 +96,37 @@ describe('AspectRatio', () => {
       expect(getRoot(container).style.aspectRatio).toBe('1 / 1')
     })
 
+    it('keeps data-aspect-ratio when attrs also pass that attribute', () => {
+      const { container } = render(AspectRatio, {
+        attrs: { 'data-aspect-ratio': 'caller' }
+      })
+      expect(getRoot(container).getAttribute('data-aspect-ratio')).toBe('')
+    })
+
     it('forwards non-class attrs to the root element', () => {
       const { container } = render(AspectRatio, {
         attrs: { id: 'hero-frame', 'aria-label': '主视觉' }
       })
       expect(getRoot(container).id).toBe('hero-frame')
       expect(getRoot(container).getAttribute('aria-label')).toBe('主视觉')
+    })
+  })
+
+  describe('clipping', () => {
+    it('clips the ratio box and fills a replaced image', () => {
+      const { container } = render(AspectRatio, {
+        props: { className: 'rounded-lg' },
+        slots: {
+          default: () =>
+            h('img', { src: 'https://example.com/cover.jpg', alt: '', width: 800, height: 600 })
+        }
+      })
+      const root = getRoot(container)
+      const img = getContent(container).querySelector('img') as HTMLImageElement
+      expect(getComputedStyle(root).overflow).toBe('hidden')
+      expect(getComputedStyle(img).objectFit).toBe('cover')
+      expect(getComputedStyle(img).width).toBe('100%')
+      expect(getComputedStyle(img).height).toBe('100%')
     })
   })
 

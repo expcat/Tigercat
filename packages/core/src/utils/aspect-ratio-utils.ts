@@ -4,9 +4,15 @@
  * Pure ratio parsing/validation and Tailwind class builders shared by the
  * Vue and React AspectRatio implementations. All helpers are string/number
  * only, so they stay safe to evaluate during server-side rendering.
+ *
+ * Overflow clipping and replaced-element fill live in the injected
+ * stylesheet so rounded corners and media do not depend on the caller
+ * adding `overflow-hidden`.
  */
 
 import type { AspectRatioStyle, AspectRatioValue } from '../types/aspect-ratio'
+import { classNames } from './class-names'
+import { isBrowser } from './env'
 
 /** Ratio applied when ratio is omitted or invalid */
 export const ASPECT_RATIO_DEFAULT = '16/9'
@@ -20,9 +26,41 @@ const ASPECT_RATIO_DEFAULT_STYLE: AspectRatioStyle = { aspectRatio: '16 / 9' }
 /** Fraction string such as 16/9 or 1.5 / 2 */
 const ASPECT_RATIO_FRACTION_PATTERN = /^\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*$/
 
+export const ASPECT_RATIO_STYLE_ID = 'tiger-ui-aspect-ratio-styles'
+
+export const ASPECT_RATIO_CSS = `
+.tiger-aspect-ratio {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.tiger-aspect-ratio-content {
+  position: absolute;
+  inset: 0;
+}
+.tiger-aspect-ratio-content > img,
+.tiger-aspect-ratio-content > video,
+.tiger-aspect-ratio-content > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+`
+
+export function injectAspectRatioStyles(): void {
+  if (!isBrowser()) return
+  if (document.getElementById(ASPECT_RATIO_STYLE_ID)) return
+  const style = document.createElement('style')
+  style.id = ASPECT_RATIO_STYLE_ID
+  style.textContent = ASPECT_RATIO_CSS
+  document.head.appendChild(style)
+}
+
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const aspectRatioRootClasses = 'tiger-aspect-ratio relative w-full'
+export const aspectRatioRootClasses = 'tiger-aspect-ratio relative w-full overflow-hidden'
 
 export const aspectRatioContentClasses = 'tiger-aspect-ratio-content absolute inset-0'
 
@@ -112,12 +150,14 @@ export function getAspectRatioStyle(ratio?: AspectRatioValue): AspectRatioStyle 
  * Classes for the root ratio box.
  */
 export function getAspectRatioRootClasses(className?: string): string {
-  return className ? aspectRatioRootClasses + ' ' + className : aspectRatioRootClasses
+  injectAspectRatioStyles()
+  return classNames(aspectRatioRootClasses, className)
 }
 
 /**
  * Classes for the content wrapper that fills the ratio box.
  */
 export function getAspectRatioContentClasses(className?: string): string {
-  return className ? aspectRatioContentClasses + ' ' + className : aspectRatioContentClasses
+  injectAspectRatioStyles()
+  return classNames(aspectRatioContentClasses, className)
 }

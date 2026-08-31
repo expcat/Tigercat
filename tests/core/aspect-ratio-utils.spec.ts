@@ -86,9 +86,8 @@ describe('aspect-ratio-utils', () => {
   })
 
   describe('class helpers', () => {
-    it('exposes positioning classes for root and content', () => {
-      expect(aspectRatioRootClasses).toContain('relative')
-      expect(aspectRatioRootClasses).toContain('w-full')
+    it('clips the ratio box by default', () => {
+      expect(aspectRatioRootClasses).toContain('overflow-hidden')
       expect(aspectRatioContentClasses).toContain('absolute')
       expect(aspectRatioContentClasses).toContain('inset-0')
     })

@@ -1,5 +1,6 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
+  classNames,
   getAspectRatioContentClasses,
   getAspectRatioRootClasses,
   getAspectRatioStyle,
@@ -27,7 +28,7 @@ export const AspectRatio = forwardRef<HTMLDivElement, AspectRatioProps>(
   ) => {
     const rootClasses = useMemo(() => getAspectRatioRootClasses(className), [className])
     const contentClasses = useMemo(
-      () => getAspectRatioContentClasses(contentClassName),
+      () => classNames(getAspectRatioContentClasses(), contentClassName),
       [contentClassName]
     )
     const style = useMemo(
@@ -39,7 +40,7 @@ export const AspectRatio = forwardRef<HTMLDivElement, AspectRatioProps>(
     )
 
     return (
-      <div ref={ref} data-aspect-ratio="" className={rootClasses} style={style} {...rest}>
+      <div {...rest} ref={ref} data-aspect-ratio="" className={rootClasses} style={style}>
         <div data-aspect-ratio-content="" className={contentClasses}>
           {children}
         </div>

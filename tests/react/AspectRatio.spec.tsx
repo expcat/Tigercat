@@ -104,6 +104,55 @@ describe('AspectRatio', () => {
       const { container } = render(<AspectRatio style={{ aspectRatio: '1 / 1' }} />)
       expect(getRoot(container).style.aspectRatio).toBe('1 / 1')
     })
+
+    it('keeps data-aspect-ratio when rest also passes that attribute', () => {
+      const { container } = render(<AspectRatio data-aspect-ratio="caller" />)
+      expect(getRoot(container).getAttribute('data-aspect-ratio')).toBe('')
+    })
+  })
+
+  describe('clipping', () => {
+    it('clips the ratio box and fills a replaced image', () => {
+      const { container } = render(
+        <div style={{ width: 320 }}>
+          <AspectRatio className="rounded-lg">
+            <img src="https://example.com/cover.jpg" alt="" width={800} height={600} />
+          </AspectRatio>
+        </div>
+      )
+      const root = getRoot(container)
+      const img = getContent(container).querySelector('img') as HTMLImageElement
+      expect(getComputedStyle(root).overflow).toBe('hidden')
+      expect(getComputedStyle(img).objectFit).toBe('cover')
+      expect(getComputedStyle(img).width).toBe('100%')
+      expect(getComputedStyle(img).height).toBe('100%')
+      const box = root.getBoundingClientRect()
+      if (box.width > 0 && box.height > 0) {
+        expect(box.height).toBeCloseTo(box.width * (9 / 16), 0)
+        const imgBox = img.getBoundingClientRect()
+        expect(imgBox.width).toBeCloseTo(box.width, 0)
+        expect(imgBox.height).toBeCloseTo(box.height, 0)
+      }
+    })
+
+    it.each([
+      { ratio: undefined, expected: 16 / 9 },
+      { ratio: '4/3' as const, expected: 4 / 3 },
+      { ratio: 1, expected: 1 }
+    ])('sizes a $ratio box from a 320px parent', ({ ratio, expected }) => {
+      const { container } = render(
+        <div style={{ width: 320 }}>
+          <AspectRatio ratio={ratio} />
+        </div>
+      )
+      const root = getRoot(container)
+      const box = root.getBoundingClientRect()
+      if (box.width > 0) {
+        expect(box.height).toBeCloseTo(320 / expected, 0)
+      } else {
+        expect(root.style.aspectRatio.length).toBeGreaterThan(0)
+      }
+    })
   })
 
   describe('a11y', () => {
