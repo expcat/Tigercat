@@ -72,6 +72,12 @@ export const ptBR: TigerLocale = {
   progress: {
     ariaLabel: 'Progresso'
   },
+  splitter: {
+    gutterAriaLabel: 'Redimensionar painéis {index}'
+  },
+  resizable: {
+    handleAriaLabel: 'Redimensionar {handle}'
+  },
   upload: {
     dragAreaAriaLabel: 'Enviar arquivo clicando ou arrastando',
     buttonAriaLabel: 'Enviar arquivo',

@@ -72,6 +72,12 @@ export const koKR: TigerLocale = {
   progress: {
     ariaLabel: '진행률'
   },
+  splitter: {
+    gutterAriaLabel: '패널 {index} 크기 조절'
+  },
+  resizable: {
+    handleAriaLabel: '{handle} 크기 조절'
+  },
   upload: {
     dragAreaAriaLabel: '클릭하거나 끌어다 놓아 파일 업로드',
     buttonAriaLabel: '파일 업로드',

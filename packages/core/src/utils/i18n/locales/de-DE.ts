@@ -72,6 +72,12 @@ export const deDE: TigerLocale = {
   progress: {
     ariaLabel: 'Fortschritt'
   },
+  splitter: {
+    gutterAriaLabel: 'Bereiche {index} skalieren'
+  },
+  resizable: {
+    handleAriaLabel: '{handle} skalieren'
+  },
   upload: {
     dragAreaAriaLabel: 'Datei per Klick oder Ziehen hochladen',
     buttonAriaLabel: 'Datei hochladen',

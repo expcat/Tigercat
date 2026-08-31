@@ -71,6 +71,12 @@ export const zhCN: TigerLocale = {
   progress: {
     ariaLabel: '进度'
   },
+  splitter: {
+    gutterAriaLabel: '调整分栏 {index}'
+  },
+  resizable: {
+    handleAriaLabel: '调整大小：{handle}'
+  },
   upload: {
     dragAreaAriaLabel: '点击或拖拽上传文件',
     buttonAriaLabel: '上传文件',

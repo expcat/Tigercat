@@ -2,11 +2,39 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { h } from 'vue'
+import { h, ref } from 'vue'
 import { Splitter } from '@expcat/tigercat-vue/Splitter'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
+import { MockResizeObserver } from '../utils/mock-observers'
+import { RESIZE_KEYBOARD_STEP } from '@expcat/tigercat-core'
+
+function stubElementSize(width: number, height = 400) {
+  Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+    configurable: true,
+    get() {
+      return width
+    }
+  })
+  Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+    configurable: true,
+    get() {
+      return height
+    }
+  })
+}
+
+function paneBox(container: HTMLElement, index: number): HTMLElement {
+  return container.querySelector(`[data-pane-index="${index}"]`) as HTMLElement
+}
+
+function gutter(container: HTMLElement, index = 0): HTMLElement {
+  return container.querySelector(`[data-gutter-index="${index}"]`) as HTMLElement
+}
 
 function renderSplitter(props: Record<string, unknown> = {}) {
   return render(Splitter, {
@@ -24,98 +52,137 @@ function renderSplitter(props: Record<string, unknown> = {}) {
 }
 
 describe('Splitter', () => {
+  beforeEach(() => {
+    MockResizeObserver.reset()
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    stubElementSize(804, 400)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   describe('Rendering', () => {
-    it('should render with two panes', () => {
+    it('renders a pane per child and a gutter between them', () => {
       const { container } = renderSplitter()
-      const panes = container.querySelectorAll('.tiger-splitter-pane')
-      expect(panes).toHaveLength(2)
+      expect(container.querySelectorAll('[data-pane-index]')).toHaveLength(2)
+      expect(container.querySelectorAll('[role="separator"]')).toHaveLength(1)
+      expect(container.firstElementChild).toHaveAttribute('data-direction', 'horizontal')
     })
 
-    it('should render gutter between panes', () => {
-      const { container } = renderSplitter()
-      const gutters = container.querySelectorAll('[role="separator"]')
-      expect(gutters).toHaveLength(1)
-    })
-
-    it('should render horizontal direction by default', () => {
-      const { container } = renderSplitter()
-      const root = container.firstElementChild as HTMLElement
-      expect(root.getAttribute('data-direction')).toBe('horizontal')
-      expect(root.className).toContain('flex-row')
-    })
-
-    it('should render vertical direction', () => {
+    it('renders vertical direction', () => {
       const { container } = renderSplitter({ direction: 'vertical' })
-      const root = container.firstElementChild as HTMLElement
-      expect(root.getAttribute('data-direction')).toBe('vertical')
-      expect(root.className).toContain('flex-col')
+      expect(container.firstElementChild).toHaveAttribute('data-direction', 'vertical')
     })
   })
 
   describe('Gutter', () => {
-    function gutterVar(container: HTMLElement): string {
-      const root = container.firstElementChild as HTMLElement
-      const fromRoot = root.style.getPropertyValue('--tiger-splitter-gutter')
-      if (fromRoot) return fromRoot
-      const gutter = container.querySelector('[role="separator"]') as HTMLElement | null
-      return gutter?.style.getPropertyValue('--tiger-splitter-gutter') ?? ''
-    }
-
-    it('should have separator role', () => {
+    it('is a vertical separator and a tab stop', () => {
       const { container } = renderSplitter()
-      const gutter = container.querySelector('[role="separator"]')
-      expect(gutter).toBeTruthy()
+      const bar = gutter(container)
+      expect(bar).toHaveAttribute('role', 'separator')
+      expect(bar).toHaveAttribute('aria-orientation', 'vertical')
+      expect(bar).toHaveAttribute('tabindex', '0')
     })
 
-    it('should have correct aria-orientation for horizontal', () => {
-      const { container } = renderSplitter()
-      const gutter = container.querySelector('[role="separator"]')
-      expect(gutter?.getAttribute('aria-orientation')).toBe('vertical')
-    })
-    it('should be focusable when not disabled', () => {
-      const { container } = renderSplitter()
-      const gutter = container.querySelector('[role="separator"]')
-      expect(gutter?.getAttribute('tabindex')).toBe('0')
-    })
-
-    it('defaults visible gutter thickness to 4px', () => {
-      const { container } = renderSplitter()
-      expect(gutterVar(container)).toBe('4px')
-    })
-
-    it('sets visible gutter thickness from gutterSize', () => {
+    it('writes gutterSize to the visible thickness variable', () => {
       const { container } = renderSplitter({ gutterSize: 8 })
-      expect(gutterVar(container)).toBe('8px')
-    })
-
-    it('sets vertical gutter thickness from gutterSize', () => {
-      const { container } = renderSplitter({ gutterSize: 8, direction: 'vertical' })
-      expect(gutterVar(container)).toBe('8px')
+      const root = container.firstElementChild as HTMLElement
+      expect(root.style.getPropertyValue('--tiger-splitter-gutter')).toBe('8px')
     })
   })
 
-  describe('Keyboard interaction', () => {
-    it('should resize on ArrowRight key in horizontal mode', async () => {
+  describe('Controlled sizes', () => {
+    it('does not reset a drag when rerendered with the same sizes values', async () => {
       const onResize = vi.fn()
+      const { container, rerender } = renderSplitter({
+        sizes: ['50%', '50%'],
+        onResize
+      })
+      await fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      const afterDrag = onResize.mock.calls.at(-1)?.[0].sizes as number[]
+      expect(afterDrag[0]).toBeGreaterThan(400)
+
+      await rerender({ sizes: ['50%', '50%'], onResize })
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(afterDrag[0], 0)
+    })
+
+    it('applies new size values on rerender', async () => {
+      const { container, rerender } = renderSplitter({ sizes: [200, 600] })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(200, 0)
+      })
+      await rerender({ sizes: [100, 700] })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(100, 0)
+      })
+    })
+  })
+
+  describe('Percentages follow the container', () => {
+    it('resolves percentage sizes against the measured container', async () => {
+      const { container } = renderSplitter({ sizes: ['30%', '70%'] })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(240, 0)
+      })
+    })
+
+    it('keeps the same ratios when the container is resized', async () => {
+      const { container } = renderSplitter({ sizes: ['30%', '70%'] })
+      await waitFor(() => expect(MockResizeObserver.instances.length).toBeGreaterThan(0))
+      stubElementSize(1604, 400)
+      MockResizeObserver.instances[0].trigger(1604, 400)
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(480, 0)
+      })
+    })
+  })
+
+  describe('Keyboard and pointer', () => {
+    it('grows the start pane on ArrowRight and emits resize-end', async () => {
+      const onResize = vi.fn()
+      const onResizeEnd = vi.fn()
       const { container } = renderSplitter({
         sizes: [400, 400],
-        onResize: onResize
+        onResize,
+        'onResize-end': onResizeEnd
       })
-      const gutter = container.querySelector('[role="separator"]')!
-      await fireEvent.keyDown(gutter, { key: 'ArrowRight' })
-      expect(onResize).toHaveBeenCalledWith(expect.objectContaining({ sizes: expect.any(Array) }))
+      await fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(onResize).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sizes: [400 + RESIZE_KEYBOARD_STEP, 400 - RESIZE_KEYBOARD_STEP]
+        })
+      )
+      expect(onResizeEnd).toHaveBeenCalled()
     })
-  })
 
-  describe('Pointer interaction', () => {
-    it('should emit resize-start on pointerdown', async () => {
+    it('moves the gutter with the pointer in rtl', async () => {
+      const onResize = vi.fn()
+      const { container } = render(Splitter, {
+        props: {
+          sizes: [400, 400],
+          onResize
+        },
+        attrs: { dir: 'rtl' },
+        slots: {
+          default: () => [h('div', 'A'), h('div', 'B')]
+        }
+      })
+      const bar = gutter(container)
+      await fireEvent.pointerDown(bar, { clientX: 400, button: 0, pointerId: 1 })
+      await fireEvent.pointerMove(document, { clientX: 450, pointerId: 1 })
+      expect(onResize).toHaveBeenCalled()
+      const sizes = onResize.mock.calls.at(-1)?.[0].sizes as number[]
+      expect(sizes[0]).toBeLessThan(400)
+    })
+
+    it('emits resize-start on pointerdown', async () => {
       const onResizeStart = vi.fn()
       const { container } = renderSplitter({
         sizes: [400, 400],
         'onResize-start': onResizeStart
       })
-      const gutter = container.querySelector('[role="separator"]')!
-      await fireEvent.pointerDown(gutter, { clientX: 400, button: 0 })
+      await fireEvent.pointerDown(gutter(container), { clientX: 400, button: 0 })
       expect(onResizeStart).toHaveBeenCalledWith(
         expect.objectContaining({ index: 0, sizes: [400, 400] })
       )
@@ -125,83 +192,63 @@ describe('Splitter', () => {
   describe('Custom className', () => {
     it('should apply custom className', () => {
       const { container } = renderSplitter({ className: 'my-splitter' })
-      const root = container.firstElementChild as HTMLElement
-      expect(root.className).toContain('my-splitter')
+      expect(container.firstElementChild?.className).toContain('my-splitter')
     })
   })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Splitter)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Dragging state', () => {
-    it('should apply dragging highlight class to the active gutter on pointerdown', async () => {
-      const { container } = renderSplitter({ sizes: [400, 400] })
-      const gutter = container.querySelector('[role="separator"]') as HTMLElement
-      const draggingClass = 'bg-[var(--tiger-primary,#2563eb)]'
-      expect(gutter.classList.contains(draggingClass)).toBe(false)
-      await fireEvent.pointerDown(gutter, { clientX: 400, button: 0 })
-      expect(gutter.classList.contains(draggingClass)).toBe(true)
-    })
-  })
-
-  describe('Initial sizes', () => {
-    function paneWidth(el: Element): number {
-      return parseFloat((el as HTMLElement).style.width)
-    }
-
-    it('clamps numeric sizes to min on mount (Pages [30, 70] + min 100)', () => {
-      const { container } = renderSplitter({ sizes: [30, 70], min: 100 })
-      const panes = container.querySelectorAll('.tiger-splitter-pane')
-      expect(panes).toHaveLength(2)
-      expect((panes[0] as HTMLElement).style.width).not.toBe('30px')
-      expect((panes[1] as HTMLElement).style.width).not.toBe('70px')
-      expect(paneWidth(panes[0])).toBeGreaterThanOrEqual(100)
-      expect(paneWidth(panes[1])).toBeGreaterThanOrEqual(100)
+    it('names the gutter and exposes splitter values', async () => {
+      const { container } = renderSplitter()
+      const bar = gutter(container)
+      expect(bar).toHaveAttribute('aria-label', 'Resize panes 1')
+      expect(bar).toHaveAttribute('aria-valuenow')
+      expect(bar).toHaveAttribute('aria-controls', paneBox(container, 0).id)
+      await expectNoA11yViolations(container)
     })
 
-    it('keeps pixel sizes when min is 0', () => {
-      const { container } = renderSplitter({ sizes: [400, 400] })
-      const panes = container.querySelectorAll('.tiger-splitter-pane')
-      expect((panes[0] as HTMLElement).style.width).toBe('400px')
-      expect((panes[1] as HTMLElement).style.width).toBe('400px')
-    })
-
-    it('does not collapse to [0, 100] on first ArrowRight from [30, 70] + min 100', async () => {
-      const onResize = vi.fn()
-      const { container } = renderSplitter({
-        sizes: [30, 70],
-        min: 100,
-        onResize
-      })
-      const gutter = container.querySelector('[role="separator"]')!
-      await fireEvent.keyDown(gutter, { key: 'ArrowRight' })
-      expect(onResize).toHaveBeenCalled()
-      const sizes = onResize.mock.calls[0][0].sizes as number[]
-      expect(sizes[0]).toBeGreaterThanOrEqual(100)
-      expect(sizes[1]).toBeGreaterThanOrEqual(100)
-    })
-
-    it('resolves percentage sizes against the measured container', async () => {
-      const desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
-      Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
-        configurable: true,
-        get: () => 1004
-      })
-      try {
-        const { container } = renderSplitter({ sizes: ['30%', '70%'] })
-        await waitFor(() => {
-          const panes = container.querySelectorAll('.tiger-splitter-pane')
-          expect(panes).toHaveLength(2)
-          expect(paneWidth(panes[0])).toBeCloseTo(300, 0)
-          expect(paneWidth(panes[1])).toBeCloseTo(700, 0)
-        })
-      } finally {
-        if (desc) {
-          Object.defineProperty(HTMLElement.prototype, 'clientWidth', desc)
+    it('uses official locale objects for the gutter name', () => {
+      const view = render({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () => [
+              h(Splitter, { sizes: [400, 400] }, () => [h('div', 'A'), h('div', 'B')])
+            ])
         }
-      }
+      })
+      expect(gutter(view.container)).toHaveAttribute('aria-label', '调整分栏 1')
+      view.unmount()
+      const tw = render({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhTW }, () => [
+              h(Splitter, { sizes: [400, 400] }, () => [h('div', 'A'), h('div', 'B')])
+            ])
+        }
+      })
+      expect(gutter(tw.container)).toHaveAttribute('aria-label', '調整分欄 1')
+    })
+  })
+
+  describe('v-model:sizes', () => {
+    it('keeps dragging when the parent writes the emitted pixels back', async () => {
+      const sizes = ref<(number | string)[]>([400, 400])
+      const { container } = render({
+        setup() {
+          return () =>
+            h(
+              Splitter,
+              {
+                sizes: sizes.value,
+                'onUpdate:sizes': (next: number[]) => {
+                  sizes.value = next
+                }
+              },
+              () => [h('div', 'A'), h('div', 'B')]
+            )
+        }
+      })
+      await fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(parseFloat(paneBox(container, 0).style.width)).toBe(410)
     })
   })
 })

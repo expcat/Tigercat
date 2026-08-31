@@ -72,6 +72,12 @@ export const viVN: TigerLocale = {
   progress: {
     ariaLabel: 'Tiến độ'
   },
+  splitter: {
+    gutterAriaLabel: 'Chỉnh kích thước ngăn {index}'
+  },
+  resizable: {
+    handleAriaLabel: 'Chỉnh kích thước {handle}'
+  },
   upload: {
     dragAreaAriaLabel: 'Nhấp hoặc kéo để tải tệp lên',
     buttonAriaLabel: 'Tải tệp lên',

@@ -72,6 +72,12 @@ export const frFR: TigerLocale = {
   progress: {
     ariaLabel: 'Progression'
   },
+  splitter: {
+    gutterAriaLabel: 'Redimensionner les panneaux {index}'
+  },
+  resizable: {
+    handleAriaLabel: 'Redimensionner {handle}'
+  },
   upload: {
     dragAreaAriaLabel: 'Téléverser un fichier en cliquant ou en le déposant',
     buttonAriaLabel: 'Téléverser un fichier',

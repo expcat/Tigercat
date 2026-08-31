@@ -97,6 +97,16 @@ export interface TigerLocaleProgress {
   ariaLabel?: string
 }
 
+export interface TigerLocaleSplitter {
+  /** Accessible name for a gutter. Template: supports {index} (1-based) */
+  gutterAriaLabel?: string
+}
+
+export interface TigerLocaleResizable {
+  /** Accessible name for an edge handle. Template: supports {handle} */
+  handleAriaLabel?: string
+}
+
 export interface TigerLocaleUpload {
   /** Drag area aria-label */
   dragAreaAriaLabel?: string
@@ -582,6 +592,8 @@ export interface TigerLocale {
   printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
   progress?: TigerLocaleProgress
+  splitter?: TigerLocaleSplitter
+  resizable?: TigerLocaleResizable
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
   table?: TigerLocaleTable

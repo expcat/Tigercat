@@ -2,114 +2,227 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
-import React from 'react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, fireEvent, waitFor, act } from '@testing-library/react'
+import React, { useState } from 'react'
 import { Splitter } from '@expcat/tigercat-react/Splitter'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/a11y-helpers'
+import { MockResizeObserver } from '../utils/mock-observers'
+import { RESIZE_KEYBOARD_STEP } from '@expcat/tigercat-core'
 
-function renderSplitter(props: Record<string, unknown> = {}) {
+function stubElementSize(width: number, height = 400) {
+  Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+    configurable: true,
+    get() {
+      return width
+    }
+  })
+  Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+    configurable: true,
+    get() {
+      return height
+    }
+  })
+}
+
+function paneBox(container: HTMLElement, index: number): HTMLElement {
+  return container.querySelector(`[data-pane-index="${index}"]`) as HTMLElement
+}
+
+function gutter(container: HTMLElement, index = 0): HTMLElement {
+  return container.querySelector(`[data-gutter-index="${index}"]`) as HTMLElement
+}
+
+function renderSplitter(props: Record<string, unknown> = {}, children?: React.ReactNode) {
   return render(
     <Splitter sizes={[400, 400]} {...props}>
-      <div data-testid="pane-1">Pane 1</div>
-      <div data-testid="pane-2">Pane 2</div>
+      {children ?? (
+        <>
+          <div data-testid="pane-1">Pane 1</div>
+          <div data-testid="pane-2">Pane 2</div>
+        </>
+      )}
     </Splitter>
   )
 }
 
 describe('Splitter', () => {
+  beforeEach(() => {
+    MockResizeObserver.reset()
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    stubElementSize(804, 400)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   describe('Rendering', () => {
-    it('should render with two panes', () => {
+    it('renders a pane per child and a gutter between them', () => {
       const { container } = renderSplitter()
-      const panes = container.querySelectorAll('.tiger-splitter-pane')
-      expect(panes).toHaveLength(2)
+      expect(container.querySelectorAll('[data-pane-index]')).toHaveLength(2)
+      expect(container.querySelectorAll('[role="separator"]')).toHaveLength(1)
+      expect(container.firstElementChild).toHaveAttribute('data-direction', 'horizontal')
     })
 
-    it('should render gutter between panes', () => {
-      const { container } = renderSplitter()
-      const gutters = container.querySelectorAll('[role="separator"]')
-      expect(gutters).toHaveLength(1)
+    it('flattens fragments and ignores blank text when counting panes', () => {
+      const { container } = render(
+        <Splitter sizes={['50%', '50%']}>
+          <>
+            <div>One</div>
+            <div>Two</div>
+          </>
+        </Splitter>
+      )
+      expect(container.querySelectorAll('[data-pane-index]')).toHaveLength(2)
+      expect(container.querySelectorAll('[role="separator"]')).toHaveLength(1)
     })
 
-    it('should render horizontal direction by default', () => {
-      const { container } = renderSplitter()
-      const root = container.firstElementChild as HTMLElement
-      expect(root.getAttribute('data-direction')).toBe('horizontal')
-      expect(root.className).toContain('flex-row')
-    })
-
-    it('should render vertical direction', () => {
+    it('renders vertical direction', () => {
       const { container } = renderSplitter({ direction: 'vertical' })
-      const root = container.firstElementChild as HTMLElement
-      expect(root.getAttribute('data-direction')).toBe('vertical')
-      expect(root.className).toContain('flex-col')
+      expect(container.firstElementChild).toHaveAttribute('data-direction', 'vertical')
     })
   })
 
   describe('Gutter', () => {
-    function gutterVar(container: HTMLElement): string {
-      const root = container.firstElementChild as HTMLElement
-      const fromRoot = root.style.getPropertyValue('--tiger-splitter-gutter')
-      if (fromRoot) return fromRoot
-      const gutter = container.querySelector('[role="separator"]') as HTMLElement | null
-      return gutter?.style.getPropertyValue('--tiger-splitter-gutter') ?? ''
-    }
-
-    it('should have separator role', () => {
+    it('is a vertical separator and a tab stop', () => {
       const { container } = renderSplitter()
-      const gutter = container.querySelector('[role="separator"]')
-      expect(gutter).toBeTruthy()
+      const bar = gutter(container)
+      expect(bar).toHaveAttribute('role', 'separator')
+      expect(bar).toHaveAttribute('aria-orientation', 'vertical')
+      expect(bar).toHaveAttribute('tabindex', '0')
     })
 
-    it('should have correct aria-orientation for horizontal', () => {
-      const { container } = renderSplitter()
-      const gutter = container.querySelector('[role="separator"]')
-      expect(gutter?.getAttribute('aria-orientation')).toBe('vertical')
-    })
-    it('should be focusable when not disabled', () => {
-      const { container } = renderSplitter()
-      const gutter = container.querySelector('[role="separator"]')
-      expect(gutter?.getAttribute('tabindex')).toBe('0')
-    })
-
-    it('defaults visible gutter thickness to 4px', () => {
-      const { container } = renderSplitter()
-      expect(gutterVar(container)).toBe('4px')
-    })
-
-    it('sets visible gutter thickness from gutterSize', () => {
+    it('writes gutterSize to the visible thickness variable', () => {
       const { container } = renderSplitter({ gutterSize: 8 })
-      expect(gutterVar(container)).toBe('8px')
-    })
-
-    it('sets vertical gutter thickness from gutterSize', () => {
-      const { container } = renderSplitter({ gutterSize: 8, direction: 'vertical' })
-      expect(gutterVar(container)).toBe('8px')
+      const root = container.firstElementChild as HTMLElement
+      expect(root.style.getPropertyValue('--tiger-splitter-gutter')).toBe('8px')
     })
   })
 
-  describe('Keyboard interaction', () => {
-    it('should resize on ArrowRight key in horizontal mode', () => {
+  describe('Controlled sizes', () => {
+    it('does not reset a drag when rerendered with the same sizes literal', () => {
+      const onResize = vi.fn()
+      const { container, rerender } = render(
+        <Splitter sizes={['50%', '50%']} onResize={onResize}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      const afterDrag = onResize.mock.calls.at(-1)?.[0].sizes as number[]
+      expect(afterDrag[0]).toBeGreaterThan(400)
+
+      rerender(
+        <Splitter sizes={['50%', '50%']} onResize={onResize}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(afterDrag[0], 0)
+    })
+
+    it('applies new size values on rerender', () => {
+      const { container, rerender } = render(
+        <Splitter sizes={[200, 600]}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(200, 0)
+      rerender(
+        <Splitter sizes={[100, 700]}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(100, 0)
+    })
+
+    it('keeps the last ratios after sizes is omitted', () => {
+      const onResize = vi.fn()
+      const { container, rerender } = render(
+        <Splitter sizes={[200, 600]} onResize={onResize}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      const dragged = onResize.mock.calls.at(-1)?.[0].sizes as number[]
+      rerender(
+        <Splitter onResize={onResize}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(dragged[0], 0)
+    })
+  })
+
+  describe('Percentages follow the container', () => {
+    it('resolves percentage sizes against the measured container', () => {
+      const { container } = renderSplitter({ sizes: ['30%', '70%'] })
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(240, 0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(560, 0)
+    })
+
+    it('keeps the same ratios when the container is resized', async () => {
+      const { container } = renderSplitter({ sizes: ['30%', '70%'] })
+      await waitFor(() => expect(MockResizeObserver.instances.length).toBeGreaterThan(0))
+      stubElementSize(1604, 400)
+      act(() => {
+        MockResizeObserver.instances[0].trigger(1604, 400)
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(480, 0)
+      })
+    })
+
+    it('does not let independent min clamps overflow the container', () => {
+      const { container } = renderSplitter({ sizes: ['50%', '50%'], min: 500 })
+      const first = parseFloat(paneBox(container, 0).style.width)
+      const second = parseFloat(paneBox(container, 1).style.width)
+      expect(first + second).toBeCloseTo(800, 0)
+      expect(first).toBeLessThan(500)
+    })
+  })
+
+  describe('Keyboard and pointer', () => {
+    it('grows the start pane on ArrowRight and emits resize-end', () => {
+      const onResize = vi.fn()
+      const onResizeEnd = vi.fn()
+      const { container } = renderSplitter({ sizes: [400, 400], onResize, onResizeEnd })
+      fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(onResize).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sizes: [400 + RESIZE_KEYBOARD_STEP, 400 - RESIZE_KEYBOARD_STEP]
+        })
+      )
+      expect(onResizeEnd).toHaveBeenCalled()
+    })
+
+    it('moves the gutter with the pointer in rtl', () => {
       const onResize = vi.fn()
       const { container } = renderSplitter({
         sizes: [400, 400],
+        dir: 'rtl',
         onResize
       })
-      const gutter = container.querySelector('[role="separator"]')!
-      fireEvent.keyDown(gutter, { key: 'ArrowRight' })
-      expect(onResize).toHaveBeenCalledWith(expect.objectContaining({ sizes: expect.any(Array) }))
+      const bar = gutter(container)
+      fireEvent.pointerDown(bar, { clientX: 400, button: 0, pointerId: 1 })
+      fireEvent.pointerMove(document, { clientX: 450, pointerId: 1 })
+      expect(onResize).toHaveBeenCalled()
+      const sizes = onResize.mock.calls.at(-1)?.[0].sizes as number[]
+      expect(sizes[0]).toBeLessThan(400)
     })
-  })
 
-  describe('Pointer interaction', () => {
-    it('should call onResizeStart on pointerdown', () => {
+    it('calls onResizeStart on pointerdown', () => {
       const onResizeStart = vi.fn()
-      const { container } = renderSplitter({
-        sizes: [400, 400],
-        onResizeStart
-      })
-      const gutter = container.querySelector('[role="separator"]')!
-      fireEvent.pointerDown(gutter, { clientX: 400, button: 0 })
+      const { container } = renderSplitter({ sizes: [400, 400], onResizeStart })
+      fireEvent.pointerDown(gutter(container), { clientX: 400, button: 0 })
       expect(onResizeStart).toHaveBeenCalledWith(
         expect.objectContaining({ index: 0, sizes: [400, 400] })
       )
@@ -119,81 +232,56 @@ describe('Splitter', () => {
   describe('Custom className', () => {
     it('should apply custom className', () => {
       const { container } = renderSplitter({ className: 'my-splitter' })
-      const root = container.firstElementChild as HTMLElement
-      expect(root.className).toContain('my-splitter')
+      expect(container.firstElementChild).toHaveClass('my-splitter')
     })
   })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Splitter />)
-      await expectNoA11yViolationsIsolated(container)
+    it('names the gutter and exposes splitter values', async () => {
+      const { container } = renderSplitter()
+      const bar = gutter(container)
+      expect(bar).toHaveAttribute('aria-label', 'Resize panes 1')
+      expect(bar).toHaveAttribute('aria-valuenow', '50')
+      expect(bar).toHaveAttribute('aria-controls', paneBox(container, 0).id)
+      await expectNoA11yViolations(container)
+    })
+
+    it('uses official locale objects for the gutter name', () => {
+      const { container, rerender } = render(
+        <ConfigProvider locale={zhCN}>
+          <Splitter sizes={[400, 400]}>
+            <div>A</div>
+            <div>B</div>
+          </Splitter>
+        </ConfigProvider>
+      )
+      expect(gutter(container)).toHaveAttribute('aria-label', '调整分栏 1')
+      rerender(
+        <ConfigProvider locale={zhTW}>
+          <Splitter sizes={[400, 400]}>
+            <div>A</div>
+            <div>B</div>
+          </Splitter>
+        </ConfigProvider>
+      )
+      expect(gutter(container)).toHaveAttribute('aria-label', '調整分欄 1')
     })
   })
-  describe('Dragging state', () => {
-    it('should apply dragging highlight class to the active gutter on pointerdown', () => {
-      const { container } = renderSplitter({ sizes: [400, 400] })
-      const gutter = container.querySelector('[role="separator"]') as HTMLElement
-      const draggingClass = 'bg-[var(--tiger-primary,#2563eb)]'
-      expect(gutter.classList.contains(draggingClass)).toBe(false)
-      fireEvent.pointerDown(gutter, { clientX: 400, button: 0 })
-      expect(gutter.classList.contains(draggingClass)).toBe(true)
-    })
-  })
 
-  describe('Initial sizes', () => {
-    function paneWidth(el: Element): number {
-      return parseFloat((el as HTMLElement).style.width)
-    }
-
-    it('clamps numeric sizes to min on mount (Pages [30, 70] + min 100)', () => {
-      const { container } = renderSplitter({ sizes: [30, 70], min: 100 })
-      const panes = container.querySelectorAll('.tiger-splitter-pane')
-      expect(panes).toHaveLength(2)
-      expect((panes[0] as HTMLElement).style.width).not.toBe('30px')
-      expect((panes[1] as HTMLElement).style.width).not.toBe('70px')
-      expect(paneWidth(panes[0])).toBeGreaterThanOrEqual(100)
-      expect(paneWidth(panes[1])).toBeGreaterThanOrEqual(100)
-    })
-
-    it('keeps pixel sizes when min is 0', () => {
-      const { container } = renderSplitter({ sizes: [400, 400] })
-      const panes = container.querySelectorAll('.tiger-splitter-pane')
-      expect((panes[0] as HTMLElement).style.width).toBe('400px')
-      expect((panes[1] as HTMLElement).style.width).toBe('400px')
-    })
-
-    it('does not collapse to [0, 100] on first ArrowRight from [30, 70] + min 100', () => {
-      const onResize = vi.fn()
-      const { container } = renderSplitter({
-        sizes: [30, 70],
-        min: 100,
-        onResize
-      })
-      const gutter = container.querySelector('[role="separator"]')!
-      fireEvent.keyDown(gutter, { key: 'ArrowRight' })
-      expect(onResize).toHaveBeenCalled()
-      const sizes = onResize.mock.calls[0][0].sizes as number[]
-      expect(sizes[0]).toBeGreaterThanOrEqual(100)
-      expect(sizes[1]).toBeGreaterThanOrEqual(100)
-    })
-
-    it('resolves percentage sizes against the measured container', () => {
-      const desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
-      Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
-        configurable: true,
-        get: () => 1004
-      })
-      try {
-        const { container } = renderSplitter({ sizes: ['30%', '70%'] })
-        const panes = container.querySelectorAll('.tiger-splitter-pane')
-        expect(panes).toHaveLength(2)
-        expect(paneWidth(panes[0])).toBeCloseTo(300, 0)
-        expect(paneWidth(panes[1])).toBeCloseTo(700, 0)
-      } finally {
-        if (desc) {
-          Object.defineProperty(HTMLElement.prototype, 'clientWidth', desc)
-        }
+  describe('Parent writeback', () => {
+    it('stays in sync when the parent writes sizes from onSizesChange', () => {
+      function Host() {
+        const [sizes, setSizes] = useState<(number | string)[]>([400, 400])
+        return (
+          <Splitter sizes={sizes} onSizesChange={setSizes}>
+            <div>A</div>
+            <div>B</div>
+          </Splitter>
+        )
       }
+      const { container } = render(<Host />)
+      fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(parseFloat(paneBox(container, 0).style.width)).toBe(410)
     })
   })
 })

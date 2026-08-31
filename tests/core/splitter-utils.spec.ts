@@ -11,9 +11,17 @@ import {
   resizePanes,
   getPaneStyle,
   sizesToPercentages,
+  paneInputsToRatios,
+  layoutPanePixels,
+  reconcileSplitterRatios,
+  getSplitterPointerDelta,
+  getSplitterKeyboardDelta,
+  panePixelsToRatios,
+  serializePaneSizes,
   splitterBaseClasses,
   splitterHorizontalClasses,
-  splitterVerticalClasses
+  splitterVerticalClasses,
+  RESIZE_KEYBOARD_STEP
 } from '@expcat/tigercat-core'
 
 describe('splitter-utils', () => {
@@ -204,12 +212,17 @@ describe('splitter-utils', () => {
       expect(sizes![1]).toBeCloseTo(0.7 * available)
     })
 
-    it('clamps numeric sizes to min when container is unavailable', () => {
+    it('keeps numeric sizes when the container is unavailable instead of independent min clamp', () => {
       const sizes = resolveInitialPaneSizes(2, 0, 4, [30, 70], 100)
+      expect(sizes).toEqual([30, 70])
+    })
+
+    it('scales panes proportionally when min cannot fit the container', () => {
+      const sizes = resolveInitialPaneSizes(2, 150, 4, ['50%', '50%'], 100)
       expect(sizes).not.toBeNull()
-      expect(sizes![0]).toBeGreaterThanOrEqual(100)
-      expect(sizes![1]).toBeGreaterThanOrEqual(100)
-      expect(sizes).toEqual([100, 100])
+      expect((sizes![0] ?? 0) + (sizes![1] ?? 0)).toBeCloseTo(146)
+      expect(sizes![0]).toBeCloseTo(73)
+      expect(sizes![1]).toBeCloseTo(73)
     })
 
     it('keeps [400, 400] unchanged when min is 0', () => {
@@ -288,6 +301,14 @@ describe('splitter-utils', () => {
       expect(style.width).toBe('300px')
       expect(style.flexShrink).toBe('0')
       expect(style.flexGrow).toBe('0')
+      expect(style.minWidth).toBe('0')
+    })
+
+    it('uses flex-grow from the ratio before the container is measured', () => {
+      const style = getPaneStyle(null, 'horizontal', { ratio: 0.3, measured: false })
+      expect(style.flexGrow).toBe('0.3')
+      expect(style.flexBasis).toBe('0px')
+      expect(style.width).toBeUndefined()
     })
 
     it('should return height style for vertical', () => {
@@ -318,6 +339,68 @@ describe('splitter-utils', () => {
     it('should handle single pane', () => {
       const pcts = sizesToPercentages([500])
       expect(pcts[0]).toBeCloseTo(100)
+    })
+  })
+
+  describe('paneInputsToRatios / layoutPanePixels', () => {
+    it('parses percentage sizes into ratios that reflow with the container', () => {
+      const ratios = paneInputsToRatios(2, ['30%', '70%'])
+      expect(ratios[0]).toBeCloseTo(0.3)
+      expect(ratios[1]).toBeCloseTo(0.7)
+      expect(layoutPanePixels(ratios, 2004, 4)[0]).toBeCloseTo(600)
+      expect(layoutPanePixels(ratios, 1004, 4)[0]).toBeCloseTo(300)
+    })
+
+    it('does not treat current pixels as a new percentage denominator', () => {
+      const ratios = paneInputsToRatios(2, ['30%', '70%'])
+      const first = layoutPanePixels(ratios, 1004, 4)
+      const again = layoutPanePixels(panePixelsToRatios(first), 2004, 4)
+      expect(again[0]).toBeCloseTo(600)
+    })
+
+    it('pads extra panes when sizes is shorter than the child count', () => {
+      const ratios = paneInputsToRatios(3, ['30%', '70%'])
+      expect(ratios).toHaveLength(3)
+      expect(ratios.reduce((sum, ratio) => sum + ratio, 0)).toBeCloseTo(1)
+      expect(ratios[2]).toBeGreaterThan(0)
+    })
+  })
+
+  describe('reconcileSplitterRatios', () => {
+    it('does not reset ratios when the sizes array identity changes', () => {
+      const first = reconcileSplitterRatios({ ratios: [], sizesKey: undefined }, 2, ['30%', '70%'])
+      const dragged = { ratios: [0.4, 0.6], sizesKey: first.sizesKey }
+      const again = reconcileSplitterRatios(dragged, 2, ['30%', '70%'])
+      expect(again).toBe(dragged)
+      expect(serializePaneSizes(['30%', '70%'])).toBe(serializePaneSizes(['30%', '70%']))
+    })
+
+    it('reparses when the size values change', () => {
+      const first = reconcileSplitterRatios({ ratios: [], sizesKey: undefined }, 2, ['30%', '70%'])
+      const next = reconcileSplitterRatios(first, 2, ['40%', '60%'])
+      expect(next.ratios[0]).toBeCloseTo(0.4)
+    })
+
+    it('keeps the last ratios after sizes is dropped', () => {
+      const first = reconcileSplitterRatios({ ratios: [], sizesKey: undefined }, 2, ['30%', '70%'])
+      const dropped = reconcileSplitterRatios(first, 2, undefined)
+      expect(dropped.ratios[0]).toBeCloseTo(0.3)
+      expect(dropped.sizesKey).toBeUndefined()
+    })
+  })
+
+  describe('RTL pointer and keyboard', () => {
+    it('negates horizontal pointer delta in rtl so the gutter follows the pointer', () => {
+      expect(getSplitterPointerDelta('horizontal', 100, 0, 130, 0, false)).toBe(30)
+      expect(getSplitterPointerDelta('horizontal', 100, 0, 130, 0, true)).toBe(-30)
+      expect(getSplitterPointerDelta('vertical', 0, 100, 0, 130, true)).toBe(30)
+    })
+
+    it('reuses the shared keyboard step and flips ArrowRight in rtl', () => {
+      expect(getSplitterKeyboardDelta('ArrowRight', 'horizontal', false)).toBe(RESIZE_KEYBOARD_STEP)
+      expect(getSplitterKeyboardDelta('ArrowRight', 'horizontal', true)).toBe(-RESIZE_KEYBOARD_STEP)
+      expect(getSplitterKeyboardDelta('ArrowDown', 'vertical', true)).toBe(RESIZE_KEYBOARD_STEP)
+      expect(getSplitterKeyboardDelta('Enter', 'horizontal', false)).toBeNull()
     })
   })
 })

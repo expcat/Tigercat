@@ -8,38 +8,6 @@
 export type SplitDirection = 'horizontal' | 'vertical'
 
 /**
- * Splitter pane configuration
- */
-export interface SplitterPaneConfig {
-  /**
-   * Unique key for the pane
-   */
-  key?: string
-  /**
-   * Default size in pixels or percentage string (e.g. '50%', '200px')
-   */
-  defaultSize?: number | string
-  /**
-   * Minimum size in pixels
-   * @default 0
-   */
-  min?: number
-  /**
-   * Maximum size in pixels (undefined = no limit)
-   */
-  max?: number
-  /**
-   * Whether the pane is collapsible
-   * @default false
-   */
-  collapsible?: boolean
-  /**
-   * Whether the pane is currently collapsed
-   */
-  collapsed?: boolean
-}
-
-/**
  * Base Splitter props interface
  */
 export interface SplitterProps {
@@ -49,14 +17,18 @@ export interface SplitterProps {
    */
   direction?: SplitDirection
   /**
-   * Initial sizes of each pane in pixels or percentage / px strings (`'30%'`, `'200px'`).
+   * Pane sizes in pixels or percentage / px strings (`'30%'`, `'200px'`).
    * Numbers are pixels. `'30%'` is a percent of available space (container minus gutters).
    * `'200px'` and bare numeric strings (`'250'`) are pixels.
-   * If not provided, panes split equally.
+   * Passed `sizes` is controlled by value (not array identity): the same numbers
+   * or percents must not reset a drag. Omit to stay uncontrolled; dropping
+   * `sizes` keeps the last ratios instead of equal-splitting.
    */
   sizes?: (number | string)[]
   /**
-   * Minimum size of any pane in pixels
+   * Minimum size of any pane in pixels.
+   * When `min * paneCount + gutters` exceeds the container, panes scale
+   * proportionally to fit instead of each clamping independently.
    * @default 0
    */
   min?: number

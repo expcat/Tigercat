@@ -72,6 +72,12 @@ export const arSA: TigerLocale = {
   progress: {
     ariaLabel: 'التقدم'
   },
+  splitter: {
+    gutterAriaLabel: 'تغيير حجم الأجزاء {index}'
+  },
+  resizable: {
+    handleAriaLabel: 'تغيير الحجم {handle}'
+  },
   upload: {
     dragAreaAriaLabel: 'رفع ملف بالنقر أو السحب',
     buttonAriaLabel: 'رفع ملف',

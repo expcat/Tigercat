@@ -48,6 +48,8 @@ import type {
   TigerLocaleScrollArea,
   TigerLocalePrintLayout,
   TigerLocaleProgress,
+  TigerLocaleSplitter,
+  TigerLocaleResizable,
   TigerLocaleTransfer,
   TigerLocaleChart,
   TigerLocaleMarkdownEditor,
@@ -381,6 +383,24 @@ export function getProgressLabels(
   overrides?: Partial<TigerLocaleProgress>
 ): Required<TigerLocaleProgress> {
   return resolveLocaleSection(enSection('progress'), locale?.progress, overrides)
+}
+
+export function getSplitterLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSplitter>
+): Required<TigerLocaleSplitter> {
+  return resolveLocaleSection(enSection('splitter'), locale?.splitter, overrides)
+}
+
+export function getResizableLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleResizable>
+): Required<TigerLocaleResizable> {
+  return resolveLocaleSection(enSection('resizable'), locale?.resizable, overrides)
+}
+
+export function formatResizableHandleLabel(template: string, handle: string): string {
+  return template.replace(/\{handle\}/g, handle)
 }
 
 export function getMarqueeLabels(

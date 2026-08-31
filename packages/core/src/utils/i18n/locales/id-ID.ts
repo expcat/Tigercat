@@ -72,6 +72,12 @@ export const idID: TigerLocale = {
   progress: {
     ariaLabel: 'Progres'
   },
+  splitter: {
+    gutterAriaLabel: 'Ubah ukuran panel {index}'
+  },
+  resizable: {
+    handleAriaLabel: 'Ubah ukuran {handle}'
+  },
   upload: {
     dragAreaAriaLabel: 'Unggah berkas dengan mengeklik atau menyeret',
     buttonAriaLabel: 'Unggah berkas',

@@ -1,18 +1,34 @@
-import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, PropType, watch } from 'vue'
+import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, useId, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  createDocumentDragSession,
+  devWarn,
+  formatSplitterGutterLabel,
+  getPaneStyle,
   getSplitterContainerClasses,
   getSplitterGutterClasses,
   getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
-  getPaneStyle,
-  resizePanes,
+  getSplitterGutterValueNow,
+  getSplitterKeyboardDelta,
+  getSplitterLabels,
+  getSplitterPointerDelta,
+  isSplitterRtl,
+  layoutPanePixels,
+  measureSplitterContainer,
+  mergeStyleValues,
+  panePixelsToRatios,
+  reconcileSplitterRatios,
   resolveInitialPaneSizes,
-  createDocumentDragSession,
+  resizePanes,
+  splitterPaneBaseClasses,
   type DocumentDragSession,
-  type SplitDirection
+  type SplitDirection,
+  type SplitterRatioState
 } from '@expcat/tigercat-core'
+import { flattenElementVNodes } from '../utils/flatten-vnodes'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueSplitterProps {
   direction?: SplitDirection
@@ -27,6 +43,7 @@ export interface VueSplitterProps {
 
 export const Splitter = defineComponent({
   name: 'TigerSplitter',
+  inheritAttrs: false,
   props: {
     direction: {
       type: String as PropType<SplitDirection>,
@@ -63,55 +80,52 @@ export const Splitter = defineComponent({
   },
   emits: ['update:sizes', 'resize-start', 'resize', 'resize-end'],
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getSplitterLabels(config.value.locale))
+    const instanceId = useId()
     const containerRef = ref<HTMLElement | null>(null)
-    const paneSizes = ref<number[]>([])
-    const draggingIndex = ref<number>(-1)
-    const startPos = ref(0)
+    const containerSize = ref(0)
+    const ratioState = ref<SplitterRatioState>({ ratios: [], sizesKey: undefined })
+    const draggingIndex = ref(-1)
+    const startPos = ref({ x: 0, y: 0 })
     const startSizes = ref<number[]>([])
     let dragSession: DocumentDragSession | null = null
+    let resizeObserver: ResizeObserver | null = null
 
-    const getPaneCount = (): number => {
-      if (props.sizes && props.sizes.length > 0) return props.sizes.length
-      const el = containerRef.value
-      if (!el) return 0
-      let n = 0
-      for (let i = 0; i < el.children.length; i++) {
-        if (el.children[i].classList.contains('tiger-splitter-pane')) n++
-      }
-      return n
+    const rtl = computed(() => {
+      const attrDir = attrs.dir
+      const dir = typeof attrDir === 'string' ? attrDir : config.value.direction
+      return isSplitterRtl(dir)
+    })
+
+    const collectPanes = () => flattenElementVNodes(slots.default?.())
+
+    const syncRatios = (count: number) => {
+      const available =
+        containerSize.value > 0
+          ? containerSize.value - Math.max(0, count - 1) * props.gutterSize
+          : 0
+      ratioState.value = reconcileSplitterRatios(ratioState.value, count, props.sizes, available)
     }
 
-    const resolveAndApplySizes = () => {
-      const paneCount = getPaneCount()
-      if (paneCount === 0) return
-      const el = containerRef.value
-      const containerSize = el
-        ? props.direction === 'horizontal'
-          ? el.clientWidth
-          : el.clientHeight
-        : 0
-      const resolved = resolveInitialPaneSizes(
-        paneCount,
-        containerSize,
-        props.gutterSize,
-        props.sizes,
-        props.min,
-        props.max
-      )
-      if (resolved) {
-        paneSizes.value = resolved
-      }
+    const applyMeasure = () => {
+      const size = measureSplitterContainer(containerRef.value, props.direction)
+      if (size > 0) containerSize.value = size
     }
 
-    watch(
-      () => [props.sizes, props.min, props.max, props.gutterSize, props.direction] as const,
-      () => {
-        resolveAndApplySizes()
-      },
-      { immediate: true, deep: true }
-    )
+    const bindContainer = (el: HTMLElement | null) => {
+      containerRef.value = el
+      applyMeasure()
+    }
 
-    onMounted(resolveAndApplySizes)
+    onMounted(() => {
+      applyMeasure()
+      const el = containerRef.value
+      if (el && typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver(() => applyMeasure())
+        resizeObserver.observe(el)
+      }
+    })
 
     const containerClasses = computed(() =>
       classNames(
@@ -120,9 +134,42 @@ export const Splitter = defineComponent({
       )
     )
 
-    // Build mins/maxes arrays
-    const getMins = () => paneSizes.value.map(() => props.min)
-    const getMaxes = () => paneSizes.value.map(() => props.max)
+    const paneCount = () => ratioState.value.ratios.length
+    const getMins = (count = paneCount()) => Array.from({ length: count }, () => props.min)
+    const getMaxes = (count = paneCount()) => Array.from({ length: count }, () => props.max)
+
+    const currentPixels = (liveSize = containerSize.value): number[] => {
+      const ratios = ratioState.value.ratios
+      if (liveSize > 0) {
+        return layoutPanePixels(ratios, liveSize, props.gutterSize, props.min, props.max)
+      }
+      return (
+        resolveInitialPaneSizes(
+          ratios.length,
+          0,
+          props.gutterSize,
+          props.sizes,
+          props.min,
+          props.max
+        ) ?? []
+      )
+    }
+
+    const commitSizes = (
+      nextPixels: number[],
+      index: number,
+      phase: 'move' | 'end' | 'keyboard'
+    ) => {
+      ratioState.value = {
+        ratios: panePixelsToRatios(nextPixels),
+        sizesKey: ratioState.value.sizesKey
+      }
+      emit('update:sizes', nextPixels)
+      emit('resize', { index, sizes: nextPixels })
+      if (phase === 'end' || phase === 'keyboard') {
+        emit('resize-end', { index, sizes: nextPixels })
+      }
+    }
 
     const cleanupDragSession = () => {
       dragSession?.dispose()
@@ -133,10 +180,12 @@ export const Splitter = defineComponent({
       if (props.disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
+      const liveSize = measureSplitterContainer(containerRef.value, props.direction)
+      if (liveSize > 0) containerSize.value = liveSize
       draggingIndex.value = index
-      startPos.value = props.direction === 'horizontal' ? e.clientX : e.clientY
-      startSizes.value = [...paneSizes.value]
-      emit('resize-start', { index, sizes: [...paneSizes.value] })
+      startPos.value = { x: e.clientX, y: e.clientY }
+      startSizes.value = currentPixels(liveSize > 0 ? liveSize : containerSize.value)
+      emit('resize-start', { index, sizes: [...startSizes.value] })
 
       dragSession = createDocumentDragSession({
         startX: e.clientX,
@@ -146,26 +195,26 @@ export const Splitter = defineComponent({
         pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
         lockAxis: props.direction === 'horizontal' ? 'x' : 'y',
         onMove: ({ currentX, currentY }) => {
-          applyDragResize(currentX, currentY)
+          applyDragResize(currentX, currentY, 'move')
         },
         onEnd: ({ currentX, currentY }) => {
-          applyDragResize(currentX, currentY)
-          if (draggingIndex.value >= 0) {
-            emit('resize-end', {
-              index: draggingIndex.value,
-              sizes: [...paneSizes.value]
-            })
-          }
+          applyDragResize(currentX, currentY, 'end')
           draggingIndex.value = -1
           dragSession = null
         }
       })
     }
 
-    const applyDragResize = (currentX: number, currentY: number) => {
+    const applyDragResize = (currentX: number, currentY: number, phase: 'move' | 'end') => {
       if (draggingIndex.value < 0) return
-      const currentPos = props.direction === 'horizontal' ? currentX : currentY
-      const delta = currentPos - startPos.value
+      const delta = getSplitterPointerDelta(
+        props.direction,
+        startPos.value.x,
+        startPos.value.y,
+        currentX,
+        currentY,
+        rtl.value
+      )
       const newSizes = resizePanes(
         startSizes.value,
         draggingIndex.value,
@@ -173,30 +222,43 @@ export const Splitter = defineComponent({
         getMins(),
         getMaxes()
       )
-      if (newSizes) {
-        paneSizes.value = newSizes
-        emit('update:sizes', newSizes)
-        emit('resize', { index: draggingIndex.value, sizes: newSizes })
-      }
+      if (newSizes) commitSizes(newSizes, draggingIndex.value, phase)
     }
 
     onBeforeUnmount(() => {
       cleanupDragSession()
+      resizeObserver?.disconnect()
+      resizeObserver = null
     })
 
     return () => {
-      const children = slots.default?.() || []
       const nodes: ReturnType<typeof h>[] = []
+      const panes = collectPanes()
+      syncRatios(panes.length)
+      if (props.sizes && props.sizes.length !== panes.length && panes.length > 0) {
+        devWarn(
+          'Splitter.sizes.length',
+          `Splitter sizes length (${props.sizes.length}) does not match pane count (${panes.length}). Extra panes share remaining space.`
+        )
+      }
+      const ratios = ratioState.value.ratios
+      const measured = containerSize.value > 0
+      const pixels = measured
+        ? layoutPanePixels(ratios, containerSize.value, props.gutterSize, props.min, props.max)
+        : []
 
-      children.forEach((child, i) => {
-        // Pane wrapper
-        const size = paneSizes.value[i]
-        const paneStyle = size != null ? getPaneStyle(size, props.direction) : undefined
+      panes.forEach((child, i) => {
+        const size = measured ? pixels[i] : null
+        const paneStyle = getPaneStyle(size, props.direction, {
+          ratio: ratios[i] ?? 0,
+          measured
+        })
         nodes.push(
           h(
             'div',
             {
-              class: 'tiger-splitter-pane relative overflow-auto',
+              id: `${instanceId}-pane-${i}`,
+              class: splitterPaneBaseClasses,
               style: paneStyle,
               'data-pane-index': i
             },
@@ -204,9 +266,9 @@ export const Splitter = defineComponent({
           )
         )
 
-        // Gutter between panes
-        if (i < children.length - 1) {
+        if (i < panes.length - 1) {
           const isDragging = draggingIndex.value === i
+          const labelledby = attrs['aria-labelledby']
           nodes.push(
             h(
               'div',
@@ -214,36 +276,33 @@ export const Splitter = defineComponent({
                 class: getSplitterGutterClasses(props.direction, isDragging, props.disabled),
                 role: 'separator',
                 'aria-orientation': props.direction === 'horizontal' ? 'vertical' : 'horizontal',
+                'aria-controls': `${instanceId}-pane-${i}`,
+                'aria-valuemin': 0,
+                'aria-valuemax': 100,
+                'aria-valuenow': getSplitterGutterValueNow(measured ? pixels : [], i),
+                'aria-label':
+                  typeof labelledby === 'string'
+                    ? undefined
+                    : formatSplitterGutterLabel(labels.value.gutterAriaLabel, i),
+                'aria-labelledby': typeof labelledby === 'string' ? labelledby : undefined,
                 tabindex: props.disabled ? -1 : 0,
                 'data-gutter-index': i,
                 onPointerdown: (e: PointerEvent) => onPointerDown(i, e),
                 onKeydown: (e: KeyboardEvent) => {
                   if (props.disabled) return
-                  const step = 10
-                  let delta = 0
-                  if (
-                    (props.direction === 'horizontal' && e.key === 'ArrowLeft') ||
-                    (props.direction === 'vertical' && e.key === 'ArrowUp')
-                  ) {
-                    delta = -step
-                  } else if (
-                    (props.direction === 'horizontal' && e.key === 'ArrowRight') ||
-                    (props.direction === 'vertical' && e.key === 'ArrowDown')
-                  ) {
-                    delta = step
-                  }
-                  if (delta !== 0) {
-                    e.preventDefault()
-                    const newSizes = resizePanes(paneSizes.value, i, delta, getMins(), getMaxes())
-                    if (newSizes) {
-                      paneSizes.value = newSizes
-                      emit('update:sizes', newSizes)
-                      emit('resize', { index: i, sizes: newSizes })
-                    }
-                  }
+                  const delta = getSplitterKeyboardDelta(e.key, props.direction, rtl.value)
+                  if (delta == null) return
+                  e.preventDefault()
+                  const newSizes = resizePanes(currentPixels(), i, delta, getMins(), getMaxes())
+                  if (newSizes) commitSizes(newSizes, i, 'keyboard')
                 }
               },
-              [h('div', { class: getSplitterGutterHandleClasses(props.direction) })]
+              [
+                h('div', {
+                  class: getSplitterGutterHandleClasses(props.direction),
+                  'aria-hidden': 'true'
+                })
+              ]
             )
           )
         }
@@ -252,12 +311,13 @@ export const Splitter = defineComponent({
       return h(
         'div',
         {
-          ref: containerRef,
+          ...attrs,
+          ref: bindContainer,
           class: containerClasses.value,
-          style: {
+          style: mergeStyleValues(attrs.style, {
             ...props.style,
             ...getSplitterGutterCssVars(props.gutterSize)
-          },
+          }),
           'data-direction': props.direction
         },
         nodes

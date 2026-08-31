@@ -72,6 +72,12 @@ export const jaJP: TigerLocale = {
   progress: {
     ariaLabel: '進捗'
   },
+  splitter: {
+    gutterAriaLabel: 'ペイン {index} をリサイズ'
+  },
+  resizable: {
+    handleAriaLabel: '{handle} をリサイズ'
+  },
   upload: {
     dragAreaAriaLabel: 'クリックまたはドラッグしてファイルをアップロード',
     buttonAriaLabel: 'ファイルをアップロード',
