@@ -467,6 +467,16 @@ export const zhTW: TigerLocale = {
     valueAriaLabel: '數值',
     incrementAriaLabel: '遞增',
     decrementAriaLabel: '遞減'
+  },
+  signature: {
+    ariaLabel: '簽名板',
+    undoText: '復原'
+  },
+  numberKeyboard: {
+    ariaLabel: '數字鍵盤',
+    deleteText: '刪除',
+    decimalAriaLabel: '小數點',
+    idCardXAriaLabel: '身份證 X'
   }
 }
 

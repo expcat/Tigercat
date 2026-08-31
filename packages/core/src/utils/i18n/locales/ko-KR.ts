@@ -467,6 +467,16 @@ export const koKR: TigerLocale = {
     valueAriaLabel: '값',
     incrementAriaLabel: '증가',
     decrementAriaLabel: '감소'
+  },
+  signature: {
+    ariaLabel: '서명 패드',
+    undoText: '실행 취소'
+  },
+  numberKeyboard: {
+    ariaLabel: '숫자 키보드',
+    deleteText: '삭제',
+    decimalAriaLabel: '소수점',
+    idCardXAriaLabel: '신분증 X'
   }
 }
 

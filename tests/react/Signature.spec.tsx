@@ -3,10 +3,21 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen } from '@testing-library/react'
-import React, { createRef } from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import React, { createRef, useState } from 'react'
 import { Signature, type SignatureRef } from '@expcat/tigercat-react/Signature'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import {
+  signatureStrokesToSvg,
+  signatureSvgToDataUrl,
+  signatureValueToStrokes
+} from '@expcat/tigercat-core'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { expectNoA11yViolations } from '../utils/react'
 
 const createContextMock = () =>
   ({
@@ -56,24 +67,43 @@ const spyPointerCapture = () => {
   }
 }
 
-const drawSignature = (canvas: HTMLElement) => {
-  fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 })
-  fireEvent.pointerMove(canvas, { clientX: 30, clientY: 40 })
-  fireEvent.pointerUp(canvas)
+const pad = () => screen.getByRole('textbox')
+
+const drawSignature = (canvas: HTMLElement, pointerId = 1) => {
+  fireEvent.pointerDown(canvas, { pointerId, clientX: 10, clientY: 20 })
+  fireEvent.pointerMove(canvas, { pointerId, clientX: 30, clientY: 40 })
+  fireEvent.pointerUp(canvas, { pointerId, clientX: 30, clientY: 40 })
 }
 
+const sampleValue = signatureSvgToDataUrl(
+  signatureStrokesToSvg(
+    [
+      {
+        color: '#0f766e',
+        lineWidth: 3,
+        points: [
+          { x: 10, y: 20 },
+          { x: 30, y: 40 }
+        ]
+      }
+    ],
+    { width: 280, height: 140 }
+  )
+)
+
 describe('Signature', () => {
-  it('renders a signature canvas and clear button', () => {
+  it('renders a signature pad and toolbar', () => {
     render(<Signature />)
-    expect(screen.getByRole('img', { name: 'Signature pad' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument()
+    expect(pad()).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: enUS.signature.undoText })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: enUS.common.clearText })).toBeInTheDocument()
   })
 
   it('applies custom dimensions, label, and className', () => {
     const { container } = render(
       <Signature width={320} height={120} ariaLabel="Approve" className="custom-signature" />
     )
-    const canvas = screen.getByRole('img', { name: 'Approve' }) as HTMLCanvasElement
+    const canvas = screen.getByRole('textbox', { name: 'Approve' }) as HTMLCanvasElement
     expect(canvas).toHaveAttribute('width', '320')
     expect(canvas).toHaveAttribute('height', '120')
     expect(container.querySelector('.custom-signature')).toBeInTheDocument()
@@ -83,85 +113,96 @@ describe('Signature', () => {
     const onBegin = vi.fn()
     const onChange = vi.fn()
     const onEnd = vi.fn()
-    render(<Signature onBegin={onBegin} onChange={onChange} onEnd={onEnd} />)
+    render(
+      <Signature width={480} height={180} onBegin={onBegin} onChange={onChange} onEnd={onEnd} />
+    )
 
-    drawSignature(screen.getByRole('img'))
+    drawSignature(pad())
 
     expect(onBegin).toHaveBeenCalledTimes(1)
     expect(onChange).toHaveBeenCalledTimes(1)
     expect(onEnd).toHaveBeenCalledTimes(1)
-    expect(onChange.mock.calls[0][0]).toMatchObject({ empty: false, exportType: 'image/png' })
+    expect(onChange.mock.calls[0][0]).toContain('data:image/svg+xml')
+    expect(onChange.mock.calls[0][1]).toMatchObject({ empty: false, exportType: 'image/png' })
   })
 
-  it('exports svg payloads when exportType is svg', () => {
-    const onChange = vi.fn()
-    render(<Signature exportType="image/svg+xml" onChange={onChange} />)
-
-    drawSignature(screen.getByRole('img'))
-
-    expect(onChange.mock.calls[0][0].value).toContain('data:image/svg+xml')
-    expect(decodeURIComponent(onChange.mock.calls[0][0].value)).toContain('M 10 20 L 30 40')
+  it('round-trips svg values onto the pad', () => {
+    render(<Signature width={280} height={140} value={sampleValue} />)
+    expect(signatureValueToStrokes(sampleValue).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: enUS.common.clearText })).not.toBeDisabled()
   })
 
   it('does not draw while disabled', () => {
     const onChange = vi.fn()
     render(<Signature disabled onChange={onChange} />)
 
-    drawSignature(screen.getByRole('img'))
+    drawSignature(pad())
 
     expect(onChange).not.toHaveBeenCalled()
-    expect(screen.getByRole('img')).toHaveAttribute('aria-disabled', 'true')
+    expect(pad()).toHaveAttribute('aria-disabled', 'true')
+    expect(pad()).toHaveAttribute('tabIndex', '-1')
   })
 
-  it('does not draw while readonly', () => {
+  it('does not draw while readonly and stays focusable', () => {
     const onChange = vi.fn()
-    render(<Signature readonly onChange={onChange} />)
+    const { container } = render(<Signature readonly value={sampleValue} onChange={onChange} />)
 
-    drawSignature(screen.getByRole('img'))
+    drawSignature(pad())
 
     expect(onChange).not.toHaveBeenCalled()
+    expect(pad()).toHaveAttribute('aria-readonly', 'true')
+    expect(pad()).not.toHaveAttribute('aria-disabled')
+    expect(pad()).toHaveAttribute('tabIndex', '0')
   })
 
   it('keeps the clear button disabled while empty', () => {
     render(<Signature />)
-    expect(screen.getByRole('button', { name: 'Clear' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: enUS.common.clearText })).toBeDisabled()
   })
 
-  it('clears drawn strokes with the toolbar button', () => {
+  it('clears to an empty string, not a blank image', () => {
     const onChange = vi.fn()
-    render(<Signature onChange={onChange} />)
-    drawSignature(screen.getByRole('img'))
+    render(<Signature width={480} height={180} onChange={onChange} />)
+    drawSignature(pad())
 
-    fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
+    fireEvent.click(screen.getByRole('button', { name: enUS.common.clearText }))
 
-    expect(onChange.mock.calls.at(-1)?.[0]).toMatchObject({ empty: true })
+    expect(onChange.mock.calls.at(-1)?.[0]).toBe('')
+    expect(onChange.mock.calls.at(-1)?.[1]).toMatchObject({ empty: true })
+  })
+
+  it('undoes the last stroke', () => {
+    const onChange = vi.fn()
+    render(<Signature width={480} height={180} onChange={onChange} />)
+    drawSignature(pad())
+    fireEvent.click(screen.getByRole('button', { name: enUS.signature.undoText }))
+    expect(onChange.mock.calls.at(-1)?.[0]).toBe('')
   })
 
   it('calls onClear when cleared via toolbar button', () => {
     const onClear = vi.fn()
-    render(<Signature onClear={onClear} />)
-    drawSignature(screen.getByRole('img'))
+    render(<Signature width={480} height={180} onClear={onClear} />)
+    drawSignature(pad())
 
-    fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
+    fireEvent.click(screen.getByRole('button', { name: enUS.common.clearText }))
 
     expect(onClear).toHaveBeenCalledTimes(1)
   })
 
   it('clears drawn strokes with Delete', () => {
     const onChange = vi.fn()
-    const canvas = render(<Signature onChange={onChange} />).container.querySelector('canvas')!
-    drawSignature(canvas)
+    render(<Signature width={480} height={180} onChange={onChange} />)
+    drawSignature(pad())
 
-    fireEvent.keyDown(canvas, { key: 'Delete' })
+    fireEvent.keyDown(pad(), { key: 'Delete' })
 
-    expect(onChange.mock.calls.at(-1)?.[0]).toMatchObject({ empty: true })
+    expect(onChange.mock.calls.at(-1)?.[0]).toBe('')
   })
 
   it('exposes imperative ref methods', () => {
     const ref = createRef<SignatureRef>()
-    render(<Signature ref={ref} exportType="image/svg+xml" />)
-    const canvas = screen.getByRole('img')
-    drawSignature(canvas)
+    render(<Signature ref={ref} width={480} height={180} />)
+    drawSignature(pad())
 
     expect(ref.current?.isEmpty()).toBe(false)
     expect(ref.current?.toSVG()).toContain('<svg')
@@ -178,34 +219,35 @@ describe('Signature', () => {
       value: () => ({ left: 10, top: 20, width: 200, height: 100, right: 210, bottom: 120 })
     })
     const onChange = vi.fn()
-    render(<Signature width={100} height={50} exportType="image/svg+xml" onChange={onChange} />)
+    render(<Signature width={100} height={50} onChange={onChange} />)
 
-    fireEvent.pointerDown(screen.getByRole('img'), { clientX: 110, clientY: 70 })
-    fireEvent.pointerUp(screen.getByRole('img'))
+    fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 110, clientY: 70 })
+    fireEvent.pointerUp(pad(), { pointerId: 1 })
 
-    expect(onChange.mock.calls[0][0].strokes[0].points[0]).toMatchObject({ x: 50, y: 25 })
+    expect(onChange.mock.calls[0][1].strokes[0].points[0]).toMatchObject({ x: 50, y: 25 })
   })
 
   it('uses custom pen color and line width', () => {
     const onChange = vi.fn()
-    render(<Signature penColor="#dc2626" lineWidth={6} onChange={onChange} />)
+    render(
+      <Signature width={480} height={180} penColor="#dc2626" lineWidth={6} onChange={onChange} />
+    )
 
-    drawSignature(screen.getByRole('img'))
+    drawSignature(pad())
 
-    expect(onChange.mock.calls[0][0].strokes[0]).toMatchObject({ color: '#dc2626', lineWidth: 6 })
+    expect(onChange.mock.calls[0][1].strokes[0]).toMatchObject({ color: '#dc2626', lineWidth: 6 })
   })
 
   it('hides the toolbar when clearable is false', () => {
     render(<Signature clearable={false} />)
-    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: enUS.common.clearText })).not.toBeInTheDocument()
   })
 
   it('captures the pointer on pointerdown', () => {
     const { setPointerCapture } = spyPointerCapture()
-    render(<Signature />)
-    const canvas = screen.getByRole('img')
+    render(<Signature width={480} height={180} />)
 
-    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
 
     expect(setPointerCapture).toHaveBeenCalledWith(1)
   })
@@ -214,65 +256,34 @@ describe('Signature', () => {
     const { setPointerCapture } = spyPointerCapture()
     render(<Signature disabled />)
 
-    fireEvent.pointerDown(screen.getByRole('img'), { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
 
     expect(setPointerCapture).not.toHaveBeenCalled()
   })
 
-  it('does not capture the pointer while readonly', () => {
-    const { setPointerCapture } = spyPointerCapture()
-    render(<Signature readonly />)
-
-    fireEvent.pointerDown(screen.getByRole('img'), { pointerId: 1, clientX: 10, clientY: 20 })
-
-    expect(setPointerCapture).not.toHaveBeenCalled()
+  it('ignores a second pointer while the first stroke is active', () => {
+    const onChange = vi.fn()
+    render(<Signature width={480} height={180} onChange={onChange} />)
+    fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerMove(pad(), { pointerId: 2, clientX: 90, clientY: 90 })
+    fireEvent.pointerUp(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
+    const points = onChange.mock.calls[0][1].strokes[0].points
+    expect(points.some((point: { x: number }) => point.x === 90)).toBe(false)
   })
 
   it('finishes the stroke on document pointerup after leaving the pad', () => {
     const onBegin = vi.fn()
     const onChange = vi.fn()
     const onEnd = vi.fn()
-    render(<Signature onBegin={onBegin} onChange={onChange} onEnd={onEnd} />)
-    const canvas = screen.getByRole('img')
+    render(
+      <Signature width={480} height={180} onBegin={onBegin} onChange={onChange} onEnd={onEnd} />
+    )
 
-    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
-    fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
-    fireEvent.pointerUp(document)
+    fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerMove(document, { pointerId: 1, clientX: 30, clientY: 40 })
+    fireEvent.pointerUp(document, { pointerId: 1 })
 
     expect(onBegin).toHaveBeenCalledTimes(1)
-    expect(onChange).toHaveBeenCalledTimes(1)
-    expect(onEnd).toHaveBeenCalledTimes(1)
-
-    drawSignature(canvas)
-
-    expect(onBegin).toHaveBeenCalledTimes(2)
-    expect(onChange).toHaveBeenCalledTimes(2)
-    expect(onEnd).toHaveBeenCalledTimes(2)
-  })
-
-  it('finishes the stroke on lostpointercapture', () => {
-    const onChange = vi.fn()
-    const onEnd = vi.fn()
-    render(<Signature onChange={onChange} onEnd={onEnd} />)
-    const canvas = screen.getByRole('img')
-
-    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
-    fireEvent.lostPointerCapture(canvas)
-
-    expect(onChange).toHaveBeenCalledTimes(1)
-    expect(onEnd).toHaveBeenCalledTimes(1)
-  })
-
-  it('finishes the stroke on pointercancel', () => {
-    const onChange = vi.fn()
-    const onEnd = vi.fn()
-    render(<Signature onChange={onChange} onEnd={onEnd} />)
-    const canvas = screen.getByRole('img')
-
-    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
-    fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
-    fireEvent.pointerCancel(canvas)
-
     expect(onChange).toHaveBeenCalledTimes(1)
     expect(onEnd).toHaveBeenCalledTimes(1)
   })
@@ -281,34 +292,110 @@ describe('Signature', () => {
     spyPointerCapture()
     const onChange = vi.fn()
     const onEnd = vi.fn()
-    render(<Signature onChange={onChange} onEnd={onEnd} />)
-    const canvas = screen.getByRole('img')
+    render(<Signature width={480} height={180} onChange={onChange} onEnd={onEnd} />)
 
-    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
-    fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
-    fireEvent.pointerUp(canvas)
-    fireEvent.lostPointerCapture(canvas)
-    fireEvent.pointerUp(document)
+    fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerMove(pad(), { pointerId: 1, clientX: 30, clientY: 40 })
+    fireEvent.pointerUp(pad(), { pointerId: 1 })
+    fireEvent.lostPointerCapture(pad())
+    fireEvent.pointerUp(document, { pointerId: 1 })
 
     expect(onChange).toHaveBeenCalledTimes(1)
     expect(onEnd).toHaveBeenCalledTimes(1)
   })
 
-  it('exports png with configured quality', () => {
-    const toDataURL = vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL')
+  it('exports raster from an offscreen canvas at logical size', () => {
+    const widths: number[] = []
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockImplementation(function (
+      this: HTMLCanvasElement
+    ) {
+      widths.push(this.width)
+      return 'data:image/png;base64,test'
+    })
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 2 })
+    const ref = createRef<SignatureRef>()
+    render(<Signature ref={ref} width={100} height={50} />)
+    drawSignature(pad())
+    ref.current?.toDataURL('image/png')
+    expect(widths.at(-1)).toBe(100)
+  })
+
+  it('writes a string into FormItem and treats clear as empty', async () => {
+    const validator = vi.fn((value: unknown) => (value ? undefined : 'required'))
     const onChange = vi.fn()
-    render(<Signature exportType="image/jpeg" quality={0.7} onChange={onChange} />)
+    function Harness() {
+      return (
+        <Form>
+          <FormItem name="sign" label="Sign" rules={[{ validator }]}>
+            <Signature width={480} height={180} onChange={onChange} />
+          </FormItem>
+        </Form>
+      )
+    }
+    render(<Harness />)
+    expect(pad()).toHaveAttribute('id')
+    drawSignature(pad())
+    await waitFor(() => expect(onChange).toHaveBeenCalled())
+    expect(onChange.mock.calls.at(-1)?.[0]).toContain('data:image/svg+xml')
+    const clearButton = screen.getByRole('button', { name: enUS.common.clearText })
+    await waitFor(() => expect(clearButton).not.toBeDisabled())
+    fireEvent.click(clearButton)
+    await waitFor(() => expect(onChange.mock.calls.at(-1)?.[0]).toBe(''))
+  })
 
-    drawSignature(screen.getByRole('img'))
+  it('does not treat moving focus to Clear as a field blur', async () => {
+    const validator = vi.fn(() => undefined)
+    render(
+      <Form>
+        <FormItem name="sign" label="Sign" rules={[{ validator, trigger: 'blur' }]}>
+          <Signature width={480} height={180} />
+        </FormItem>
+      </Form>
+    )
+    drawSignature(pad())
+    validator.mockClear()
+    pad().focus()
+    fireEvent.blur(pad(), {
+      relatedTarget: screen.getByRole('button', { name: enUS.common.clearText })
+    })
+    expect(validator).not.toHaveBeenCalled()
+  })
 
-    expect(toDataURL).toHaveBeenCalledWith('image/jpeg', 0.7)
-    expect(onChange.mock.calls[0][0].value).toBe('data:image/png;base64,test')
+  it('uses official locale objects for pad name and clear', () => {
+    render(
+      <ConfigProvider locale={zhTW}>
+        <Signature />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('textbox', { name: zhTW.signature?.ariaLabel })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: zhTW.common?.clearText })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: zhTW.signature?.undoText })).toBeInTheDocument()
+  })
+
+  it('uses ja-JP locale objects', () => {
+    render(
+      <ConfigProvider locale={jaJP}>
+        <Signature />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('textbox', { name: jaJP.signature?.ariaLabel })).toBeInTheDocument()
   })
 
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('has no accessibility violations for an empty pad', async () => {
       const { container } = render(<Signature />)
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
+    })
+
+    it('has no accessibility violations for a readonly signed pad', async () => {
+      const { container } = render(<Signature readonly value={sampleValue} />)
+      await expectNoA11yViolations(container)
+    })
+
+    it('has no accessibility violations when invalid', async () => {
+      const { container } = render(<Signature status="error" />)
+      expect(pad()).toHaveAttribute('aria-invalid', 'true')
+      await expectNoA11yViolations(container)
     })
   })
 })

@@ -467,6 +467,16 @@ export const arSA: TigerLocale = {
     valueAriaLabel: 'القيمة',
     incrementAriaLabel: 'زيادة',
     decrementAriaLabel: 'إنقاص'
+  },
+  signature: {
+    ariaLabel: 'لوحة التوقيع',
+    undoText: 'تراجع'
+  },
+  numberKeyboard: {
+    ariaLabel: 'لوحة الأرقام',
+    deleteText: 'حذف',
+    decimalAriaLabel: 'فاصلة عشرية',
+    idCardXAriaLabel: 'رمز X في الهوية'
   }
 }
 

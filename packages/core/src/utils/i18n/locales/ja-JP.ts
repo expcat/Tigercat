@@ -467,6 +467,16 @@ export const jaJP: TigerLocale = {
     valueAriaLabel: '値',
     incrementAriaLabel: '増やす',
     decrementAriaLabel: '減らす'
+  },
+  signature: {
+    ariaLabel: '署名パッド',
+    undoText: '元に戻す'
+  },
+  numberKeyboard: {
+    ariaLabel: '数字キーボード',
+    deleteText: '削除',
+    decimalAriaLabel: '小数点',
+    idCardXAriaLabel: 'IDカードのX'
   }
 }
 

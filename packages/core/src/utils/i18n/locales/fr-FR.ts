@@ -468,6 +468,16 @@ export const frFR: TigerLocale = {
     valueAriaLabel: 'Valeur',
     incrementAriaLabel: 'Augmenter',
     decrementAriaLabel: 'Diminuer'
+  },
+  signature: {
+    ariaLabel: 'Pavé de signature',
+    undoText: 'Annuler'
+  },
+  numberKeyboard: {
+    ariaLabel: 'Clavier numérique',
+    deleteText: 'Supprimer',
+    decimalAriaLabel: 'Séparateur décimal',
+    idCardXAriaLabel: 'X de la carte'
   }
 }
 

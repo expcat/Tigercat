@@ -47,7 +47,7 @@ export type {
   AutoCompleteOption
 } from './components/AutoComplete'
 export { Signature } from './components/Signature'
-export type { VueSignatureProps } from './components/Signature'
+export type { VueSignatureProps, SignatureProps } from './components/Signature'
 export { NumberKeyboard } from './components/NumberKeyboard'
 export type { VueNumberKeyboardProps } from './components/NumberKeyboard'
 export { InputOTP } from './components/InputOTP'

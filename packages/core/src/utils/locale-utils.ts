@@ -62,6 +62,8 @@ import type {
   TigerLocaleInputNumber,
   TigerLocaleSlider,
   TigerLocaleStepper,
+  TigerLocaleSignature,
+  TigerLocaleNumberKeyboard,
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
@@ -589,4 +591,51 @@ export function getStepperLabels(
   overrides?: Partial<TigerLocaleStepper>
 ): Required<TigerLocaleStepper> {
   return resolveLocaleSection(enSection('stepper'), locale?.stepper, overrides)
+}
+
+export interface SignatureResolvedLabels extends Required<TigerLocaleSignature> {
+  clearText: string
+}
+
+export function getSignatureLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSignature> & { clearText?: string }
+): SignatureResolvedLabels {
+  const section = resolveLocaleSection(enSection('signature'), locale?.signature, overrides)
+  const clearText =
+    typeof overrides?.clearText === 'string' && overrides.clearText.trim()
+      ? overrides.clearText
+      : (locale?.common?.clearText ?? enUS.common?.clearText ?? 'Clear')
+  return {
+    ...section,
+    clearText
+  }
+}
+
+export interface NumberKeyboardResolvedLabels extends Required<TigerLocaleNumberKeyboard> {
+  confirmText: string
+}
+
+export function getNumberKeyboardLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleNumberKeyboard> & { confirmText?: string; deleteText?: string }
+): NumberKeyboardResolvedLabels {
+  const section = resolveLocaleSection(
+    enSection('numberKeyboard'),
+    locale?.numberKeyboard,
+    overrides
+  )
+  const confirmText =
+    typeof overrides?.confirmText === 'string' && overrides.confirmText.trim()
+      ? overrides.confirmText
+      : (locale?.common?.okText ?? enUS.common?.okText ?? 'OK')
+  const deleteText =
+    typeof overrides?.deleteText === 'string' && overrides.deleteText.trim()
+      ? overrides.deleteText
+      : section.deleteText
+  return {
+    ...section,
+    deleteText,
+    confirmText
+  }
 }

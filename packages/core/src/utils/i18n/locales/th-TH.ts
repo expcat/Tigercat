@@ -467,6 +467,16 @@ export const thTH: TigerLocale = {
     valueAriaLabel: 'ค่า',
     incrementAriaLabel: 'เพิ่ม',
     decrementAriaLabel: 'ลด'
+  },
+  signature: {
+    ariaLabel: 'แผ่นลายเซ็น',
+    undoText: 'เลิกทำ'
+  },
+  numberKeyboard: {
+    ariaLabel: 'แป้นตัวเลข',
+    deleteText: 'ลบ',
+    decimalAriaLabel: 'จุดทศนิยม',
+    idCardXAriaLabel: 'บัตรประชาชน X'
   }
 }
 

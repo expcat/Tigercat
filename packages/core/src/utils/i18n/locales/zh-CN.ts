@@ -467,5 +467,15 @@ export const zhCN: TigerLocale = {
     valueAriaLabel: '数值',
     incrementAriaLabel: '增加',
     decrementAriaLabel: '减少'
+  },
+  signature: {
+    ariaLabel: '签名板',
+    undoText: '撤销'
+  },
+  numberKeyboard: {
+    ariaLabel: '数字键盘',
+    deleteText: '删除',
+    decimalAriaLabel: '小数点',
+    idCardXAriaLabel: '身份证 X'
   }
 }

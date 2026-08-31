@@ -1,15 +1,27 @@
+/**
+ * @vitest-environment happy-dom
+ */
+
 import { describe, expect, it, vi } from 'vitest'
 import {
+  appendSignaturePoint,
+  beginSignatureStroke,
   clampSignatureLineWidth,
   cloneSignatureStrokes,
+  createSignatureChangePayload,
+  createSignatureExportCanvas,
+  createSignatureSession,
   drawSignatureStrokes,
-  getSignatureCanvasDataUrl,
+  finishSignatureStroke,
   getSignatureCanvasWrapClasses,
   getSignaturePoint,
   isSignatureEmpty,
+  parseSignatureSvg,
   signatureStrokeToPath,
   signatureStrokesToSvg,
   signatureSvgToDataUrl,
+  signatureValueToStrokes,
+  undoSignatureStroke,
   type SignatureStroke
 } from '@expcat/tigercat-core'
 
@@ -40,6 +52,7 @@ describe('signature-utils', () => {
     )
     expect(point.x).toBe(50)
     expect(point.y).toBe(25)
+    expect(point).not.toHaveProperty('time')
   })
 
   it('clamps points within canvas bounds', () => {
@@ -91,6 +104,22 @@ describe('signature-utils', () => {
     )
   })
 
+  it('round-trips strokes through an svg data url', () => {
+    const value = signatureSvgToDataUrl(signatureStrokesToSvg([stroke], { width: 120, height: 80 }))
+    const restored = signatureValueToStrokes(value)
+    expect(restored).toHaveLength(1)
+    expect(restored[0].color).toBe('#111827')
+    expect(restored[0].points[0]).toEqual({ x: 10, y: 20 })
+    expect(parseSignatureSvg(decodeURIComponent(value.slice(value.indexOf(',') + 1)))).toEqual(
+      restored
+    )
+  })
+
+  it('treats raster data urls as unrestorable', () => {
+    expect(signatureValueToStrokes('data:image/png;base64,abc')).toEqual([])
+    expect(signatureValueToStrokes('')).toEqual([])
+  })
+
   it('returns state classes for disabled and readonly modes', () => {
     expect(getSignatureCanvasWrapClasses(true)).toContain('opacity-60')
     expect(getSignatureCanvasWrapClasses(false, true)).toContain('cursor-not-allowed')
@@ -138,13 +167,53 @@ describe('signature-utils', () => {
     expect(context.lineTo).toHaveBeenCalledWith(1.01, 2.01)
   })
 
-  it('returns canvas data urls and ignores svg type', () => {
-    const canvas = {
-      toDataURL: vi.fn(() => 'data:image/png;base64,test')
-    } as unknown as HTMLCanvasElement
+  it('ignores a second pointer on the active stroke', () => {
+    let session = createSignatureSession()
+    session = beginSignatureStroke(session, { x: 1, y: 1 }, 1, '#111', 2)
+    const ignored = appendSignaturePoint(session, { x: 9, y: 9 }, 2)
+    expect(ignored.strokes[0].points).toHaveLength(1)
+    const moved = appendSignaturePoint(session, { x: 4, y: 5 }, 1)
+    expect(moved.strokes[0].points).toHaveLength(2)
+    const finished = finishSignatureStroke(moved, 2)
+    expect(finished.activeStroke).not.toBeNull()
+    expect(finishSignatureStroke(moved, 1).activeStroke).toBeNull()
+  })
 
-    expect(getSignatureCanvasDataUrl(canvas, 'image/png', 0.8)).toBe('data:image/png;base64,test')
-    expect(canvas.toDataURL).toHaveBeenCalledWith('image/png', 0.8)
-    expect(getSignatureCanvasDataUrl(canvas, 'image/svg+xml')).toBe('')
+  it('undoes the last stroke', () => {
+    let session = createSignatureSession([stroke])
+    session = undoSignatureStroke(session)
+    expect(session.strokes).toEqual([])
+  })
+
+  it('exports raster at logical size even when devicePixelRatio is 2', () => {
+    vi.stubGlobal('devicePixelRatio', 2)
+    const canvas = createSignatureExportCanvas([stroke], {
+      width: 100,
+      height: 50,
+      exportType: 'image/png'
+    })
+    expect(canvas?.width).toBe(100)
+    expect(canvas?.height).toBe(50)
+    vi.unstubAllGlobals()
+  })
+
+  it('empty payload value is an empty string, not a blank image', () => {
+    const payload = createSignatureChangePayload([], {
+      width: 100,
+      height: 50,
+      exportType: 'image/png'
+    })
+    expect(payload).toMatchObject({ value: '', empty: true })
+  })
+
+  it('committed value is an svg data url so strokes can round-trip', () => {
+    const payload = createSignatureChangePayload([stroke], {
+      width: 120,
+      height: 80,
+      exportType: 'image/png'
+    })
+    expect(payload?.empty).toBe(false)
+    expect(payload?.value).toContain('data:image/svg+xml')
+    expect(signatureValueToStrokes(payload?.value)).toHaveLength(1)
   })
 })

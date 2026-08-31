@@ -467,5 +467,15 @@ export const enUS: TigerLocale = {
     valueAriaLabel: 'Value',
     incrementAriaLabel: 'Increase',
     decrementAriaLabel: 'Decrease'
+  },
+  signature: {
+    ariaLabel: 'Signature pad',
+    undoText: 'Undo'
+  },
+  numberKeyboard: {
+    ariaLabel: 'Number keyboard',
+    deleteText: 'Delete',
+    decimalAriaLabel: 'Decimal',
+    idCardXAriaLabel: 'ID card X'
   }
 }

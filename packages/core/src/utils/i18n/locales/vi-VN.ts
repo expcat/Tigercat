@@ -467,6 +467,16 @@ export const viVN: TigerLocale = {
     valueAriaLabel: 'Giá trị',
     incrementAriaLabel: 'Tăng',
     decrementAriaLabel: 'Giảm'
+  },
+  signature: {
+    ariaLabel: 'Bảng chữ ký',
+    undoText: 'Hoàn tác'
+  },
+  numberKeyboard: {
+    ariaLabel: 'Bàn phím số',
+    deleteText: 'Xóa',
+    decimalAriaLabel: 'Dấu thập phân',
+    idCardXAriaLabel: 'CCCD X'
   }
 }
 

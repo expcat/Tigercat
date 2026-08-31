@@ -467,6 +467,16 @@ export const idID: TigerLocale = {
     valueAriaLabel: 'Nilai',
     incrementAriaLabel: 'Tambah',
     decrementAriaLabel: 'Kurangi'
+  },
+  signature: {
+    ariaLabel: 'Pad tanda tangan',
+    undoText: 'Urungkan'
+  },
+  numberKeyboard: {
+    ariaLabel: 'Papan tombol angka',
+    deleteText: 'Hapus',
+    decimalAriaLabel: 'Pemisah desimal',
+    idCardXAriaLabel: 'KTP X'
   }
 }
 

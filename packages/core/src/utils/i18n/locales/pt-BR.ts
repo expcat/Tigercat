@@ -468,6 +468,16 @@ export const ptBR: TigerLocale = {
     valueAriaLabel: 'Valor',
     incrementAriaLabel: 'Aumentar',
     decrementAriaLabel: 'Diminuir'
+  },
+  signature: {
+    ariaLabel: 'Área de assinatura',
+    undoText: 'Desfazer'
+  },
+  numberKeyboard: {
+    ariaLabel: 'Teclado numérico',
+    deleteText: 'Apagar',
+    decimalAriaLabel: 'Separador decimal',
+    idCardXAriaLabel: 'X do documento'
   }
 }
 

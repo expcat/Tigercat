@@ -468,6 +468,16 @@ export const deDE: TigerLocale = {
     valueAriaLabel: 'Wert',
     incrementAriaLabel: 'Erhöhen',
     decrementAriaLabel: 'Verringern'
+  },
+  signature: {
+    ariaLabel: 'Unterschriftenfeld',
+    undoText: 'Rückgängig'
+  },
+  numberKeyboard: {
+    ariaLabel: 'Ziffernblock',
+    deleteText: 'Löschen',
+    decimalAriaLabel: 'Dezimalzeichen',
+    idCardXAriaLabel: 'Ausweis-X'
   }
 }
 

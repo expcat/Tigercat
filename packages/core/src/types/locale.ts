@@ -636,6 +636,21 @@ export interface TigerLocaleStepper {
   decrementAriaLabel?: string
 }
 
+export interface TigerLocaleSignature {
+  /** Accessible name for the signature pad widget */
+  ariaLabel?: string
+  /** Undo-last-stroke control */
+  undoText?: string
+}
+
+export interface TigerLocaleNumberKeyboard {
+  /** Accessible name for the keypad group / dialog */
+  ariaLabel?: string
+  deleteText?: string
+  decimalAriaLabel?: string
+  idCardXAriaLabel?: string
+}
+
 export interface TigerLocale {
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
@@ -694,6 +709,8 @@ export interface TigerLocale {
   inputNumber?: TigerLocaleInputNumber
   slider?: TigerLocaleSlider
   stepper?: TigerLocaleStepper
+  signature?: TigerLocaleSignature
+  numberKeyboard?: TigerLocaleNumberKeyboard
 }
 
 /**
