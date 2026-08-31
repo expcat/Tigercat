@@ -138,6 +138,7 @@ export * from './form-history-utils'
 export * from './form-control-utils'
 export * from './form-controller'
 export * from './upload-queue-utils'
+export * from './upload-controller'
 
 // Responsive utilities
 export * from './responsive'

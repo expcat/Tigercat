@@ -206,6 +206,8 @@ export const zhCN: TigerLocale = {
     resizeHandleW: '左',
     loadingCropImageAriaLabel: '正在加载待裁剪图片',
     loadErrorAriaLabel: '无法加载待裁剪图片',
+    fileTooLargeText: '文件大小超过 {maxSize}',
+    fileTypeRejectedText: '不支持该文件类型',
     annotationToolbarAriaLabel: '标注工具',
     annotationEditorAriaLabel: '图片标注编辑器',
     annotationCanvasAriaLabel: '图片标注画布',
@@ -334,7 +336,8 @@ export const zhCN: TigerLocale = {
     searchAriaLabel: '搜索{title}',
     itemsAriaLabel: '{title}项目',
     moveToTargetAriaLabel: '移动选中项到目标列表',
-    moveToSourceAriaLabel: '移动选中项到源列表'
+    moveToSourceAriaLabel: '移动选中项到源列表',
+    selectAllAriaLabel: '全选{title}'
   },
   chart: {
     legendAriaLabel: '图表图例',

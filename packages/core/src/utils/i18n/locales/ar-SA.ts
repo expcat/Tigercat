@@ -206,6 +206,8 @@ export const arSA: TigerLocale = {
     resizeHandleW: 'يسار',
     loadingCropImageAriaLabel: 'جارٍ تحميل الصورة للقص',
     loadErrorAriaLabel: 'تعذر تحميل الصورة للقص',
+    fileTooLargeText: 'حجم الملف يتجاوز {maxSize}',
+    fileTypeRejectedText: 'نوع الملف هذا غير مقبول',
     annotationToolbarAriaLabel: 'أدوات التعليق',
     annotationEditorAriaLabel: 'محرر تعليق الصورة',
     annotationCanvasAriaLabel: 'لوحة التعليق',
@@ -334,7 +336,8 @@ export const arSA: TigerLocale = {
     searchAriaLabel: 'بحث {title}',
     itemsAriaLabel: 'عناصر {title}',
     moveToTargetAriaLabel: 'نقل المحدد إلى الهدف',
-    moveToSourceAriaLabel: 'نقل المحدد إلى المصدر'
+    moveToSourceAriaLabel: 'نقل المحدد إلى المصدر',
+    selectAllAriaLabel: 'تحديد الكل في {title}'
   },
   chart: {
     legendAriaLabel: 'مفتاح الرسم البياني',

@@ -8,7 +8,7 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Upload } from '@expcat/tigercat-vue/Upload'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { defineComponent, h } from 'vue'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 describe('Upload', () => {
   describe('Rendering', () => {
@@ -475,12 +475,7 @@ describe('Upload', () => {
       const img = container.querySelector('img')
       expect(img).toBeInTheDocument()
       expect(img).toHaveAttribute('src', 'https://example.com/test.jpg')
-      const renderedClasses = Array.from(container.querySelectorAll('[class]'))
-        .map((node) => node.getAttribute('class') ?? '')
-        .join(' ')
-      expect(renderedClasses).toContain('bg-black/0')
-      expect(renderedClasses).toContain('hover:bg-black/50')
-      expect(renderedClasses).not.toContain('bg-opacity-')
+      expect(container.querySelector('[aria-label="Preview test.jpg"]')).toBeInTheDocument()
     })
 
     it('reuses and revokes local picture-card object URLs', async () => {
@@ -612,24 +607,23 @@ describe('Upload', () => {
       expect(uploadingIcon).toBeInTheDocument()
     })
 
-    it('should render uploading picture card overlay with Tailwind v4 opacity classes', () => {
+    it('shows uploading progress on picture-card', () => {
       const { container } = renderWithProps(Upload, {
         fileList: [
           {
             uid: 'file-1',
             name: 'test.jpg',
             status: 'uploading',
+            progress: 40,
             url: 'https://example.com/test.jpg'
           }
         ],
         listType: 'picture-card'
       })
 
-      const renderedClasses = Array.from(container.querySelectorAll('[class]'))
-        .map((node) => node.getAttribute('class') ?? '')
-        .join(' ')
-      expect(renderedClasses).toContain('bg-white/75')
-      expect(renderedClasses).not.toContain('bg-opacity-')
+      const bar = container.querySelector('[role="progressbar"]')
+      expect(bar).toHaveAttribute('aria-valuenow', '40')
+      expect(container.querySelector('[aria-label="Uploading"]')).toBeInTheDocument()
     })
   })
 
@@ -858,7 +852,7 @@ describe('Upload', () => {
         ]
       })
 
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
   })
 })

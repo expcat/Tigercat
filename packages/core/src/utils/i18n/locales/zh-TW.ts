@@ -206,6 +206,8 @@ export const zhTW: TigerLocale = {
     resizeHandleW: '左',
     loadingCropImageAriaLabel: '正在載入待裁剪圖片',
     loadErrorAriaLabel: '無法載入待裁剪圖片',
+    fileTooLargeText: '檔案大小超過 {maxSize}',
+    fileTypeRejectedText: '不支援此檔案類型',
     annotationToolbarAriaLabel: '標註工具',
     annotationEditorAriaLabel: '圖片標註編輯器',
     annotationCanvasAriaLabel: '圖片標註畫布',
@@ -334,7 +336,8 @@ export const zhTW: TigerLocale = {
     searchAriaLabel: '搜尋{title}',
     itemsAriaLabel: '{title}項目',
     moveToTargetAriaLabel: '移動選取項到目標清單',
-    moveToSourceAriaLabel: '移動選取項到來源清單'
+    moveToSourceAriaLabel: '移動選取項到來源清單',
+    selectAllAriaLabel: '全選{title}'
   },
   chart: {
     legendAriaLabel: '圖表圖例',

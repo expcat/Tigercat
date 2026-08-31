@@ -48,7 +48,7 @@ export interface RunUploadQueueOptions<T extends UploadQueueItem> {
 
 export async function runUploadQueue<T extends UploadQueueItem>(
   items: T[],
-  upload: (item: T) => Promise<void>,
+  upload: (item: T) => Promise<void | boolean>,
   options: RunUploadQueueOptions<T> = {}
 ): Promise<T[]> {
   const concurrency = Math.max(1, Math.floor(options.concurrency ?? 2))
@@ -64,9 +64,13 @@ export async function runUploadQueue<T extends UploadQueueItem>(
       notify()
 
       try {
-        await upload(item)
-        item.status = 'success'
-        item.progress = 100
+        const result = await upload(item)
+        if (result === false) {
+          if (item.status === 'uploading') item.status = 'queued'
+        } else {
+          item.status = 'success'
+          item.progress = 100
+        }
       } catch (error) {
         item.status = 'error'
         item.error = error instanceof Error ? error.message : String(error)

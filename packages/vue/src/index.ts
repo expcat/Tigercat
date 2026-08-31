@@ -128,7 +128,7 @@ export type {
   TimePickerProps
 } from './components/TimePicker'
 export { Upload } from './components/Upload'
-export type { VueUploadProps } from './components/Upload'
+export type { VueUploadProps, UploadProps } from './components/Upload'
 export { Table } from './components/Table'
 export type { VueTableProps } from './components/Table'
 export { DataExport } from './components/DataExport'

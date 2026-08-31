@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   getUploadDataTransferFiles,
   createUploadChunks,
+  createUploadController,
   createUploadQueueItem,
   formatFileSize,
   getDragAreaClasses,
@@ -11,8 +12,11 @@ import {
   handleUploadDragLeave,
   handleUploadDragOver,
   handleUploadDrop,
+  prepareUploadFiles,
   runUploadQueue,
-  type UploadDragEventLike
+  validateFileType,
+  type UploadDragEventLike,
+  type UploadFile
 } from '@expcat/tigercat-core'
 
 function createDragEvent(files: File[] = []): UploadDragEventLike & { preventDefault: () => void } {
@@ -43,6 +47,19 @@ describe('upload-utils drag helpers', () => {
 
     expect(handleUploadDragLeave(event)).toEqual({ handled: true, isDragging: false, files: [] })
     expect(event.preventDefault).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps dragging when leave stays inside the drop target', () => {
+    const root = document.createElement('div')
+    const inner = document.createElement('p')
+    root.append(inner)
+    const event = {
+      ...createDragEvent(),
+      relatedTarget: inner,
+      currentTarget: root
+    }
+
+    expect(handleUploadDragLeave(event)).toEqual({ handled: true, isDragging: true, files: [] })
   })
 
   it('extracts dropped files and clears dragging state', () => {
@@ -114,6 +131,126 @@ describe('upload-utils chunk and queue helpers', () => {
   })
 })
 
+describe('upload-utils validation', () => {
+  it('matches extensions and MIME types case-insensitively', () => {
+    const png = new File(['x'], 'photo.png', { type: 'image/png' })
+    expect(validateFileType(png, '.PNG')).toBe(true)
+    expect(validateFileType(png, 'IMAGE/PNG')).toBe(true)
+  })
+
+  it('falls back to extension when MIME type is empty', () => {
+    const jpg = new File(['x'], 'photo.jpg', { type: '' })
+    expect(validateFileType(jpg, 'image/*')).toBe(true)
+    expect(validateFileType(jpg, '.jpg')).toBe(true)
+    expect(validateFileType(jpg, '.png')).toBe(false)
+  })
+
+  it('does not let rejected files occupy limit slots', async () => {
+    const prepared = await prepareUploadFiles({
+      currentCount: 0,
+      incomingFiles: [
+        new File(['bad'], 'bad.txt', { type: 'text/plain' }),
+        new File(['ok'], 'good.jpg', { type: 'image/jpeg' })
+      ],
+      limit: 1,
+      accept: 'image/*'
+    })
+
+    expect(prepared.acceptedFiles.map((file) => file.name)).toEqual(['good.jpg'])
+    expect(prepared.rejectedExceedFiles).toEqual([])
+    expect(prepared.rejectedFiles.map((item) => item.reason)).toEqual(['type'])
+  })
+})
+
+describe('createUploadController', () => {
+  function createHost(initial: UploadFile[] = []) {
+    let list = initial
+    return {
+      getFileList: () => list,
+      setFileList: (next: UploadFile[]) => {
+        list = next
+      },
+      snapshot: () => list
+    }
+  }
+
+  it('keeps files ready when action and customRequest are omitted', async () => {
+    const host = createHost()
+    const controller = createUploadController({
+      host,
+      getConfig: () => ({
+        autoUpload: true,
+        queue: false,
+        maxConcurrent: 2,
+        resumable: false
+      }),
+      callbacks: {}
+    })
+
+    await controller.processFiles([new File(['a'], 'a.txt', { type: 'text/plain' })])
+    expect(host.snapshot()).toHaveLength(1)
+    expect(host.snapshot()[0]?.status).toBe('ready')
+    controller.dispose()
+  })
+
+  it('does not upload when autoUpload is false until submit', async () => {
+    const host = createHost()
+    const requests: string[] = []
+    const controller = createUploadController({
+      host,
+      getConfig: () => ({
+        autoUpload: false,
+        queue: false,
+        maxConcurrent: 2,
+        resumable: false,
+        customRequest: ({ file, onSuccess }) => {
+          requests.push(file.name)
+          onSuccess?.({})
+        }
+      }),
+      callbacks: {}
+    })
+
+    await controller.processFiles([new File(['a'], 'hold.txt', { type: 'text/plain' })])
+    expect(requests).toEqual([])
+    expect(host.snapshot()[0]?.status).toBe('ready')
+    await controller.submit()
+    expect(requests).toEqual(['hold.txt'])
+    expect(host.snapshot()[0]?.status).toBe('success')
+    controller.dispose()
+  })
+
+  it('does not resurrect a file removed during upload', async () => {
+    const host = createHost()
+    let finish: (() => void) | undefined
+    const controller = createUploadController({
+      host,
+      getConfig: () => ({
+        autoUpload: true,
+        queue: false,
+        maxConcurrent: 2,
+        resumable: false,
+        customRequest: ({ onSuccess, onProgress }) => {
+          onProgress?.(40)
+          finish = () => onSuccess?.({})
+        }
+      }),
+      callbacks: {}
+    })
+
+    const process = controller.processFiles([new File(['a'], 'gone.txt', { type: 'text/plain' })])
+    await vi.waitFor(() => {
+      expect(host.snapshot()[0]).toBeDefined()
+    })
+    const current = host.snapshot()[0]
+    await controller.remove(current!)
+    finish?.()
+    await process
+    expect(host.snapshot()).toEqual([])
+    controller.dispose()
+  })
+})
+
 describe('upload-utils chrome tokens', () => {
   it('uses theme tokens on idle drag area instead of hardcoded gray/white', () => {
     const classes = getDragAreaClasses(false, false)
@@ -126,8 +263,8 @@ describe('upload-utils chrome tokens', () => {
     const classes = getUploadButtonClasses(false)
     expect(classes).not.toContain('bg-white')
     expect(classes).not.toContain('border-gray-300')
-    expect(classes).toContain('--tiger-surface')
-    expect(classes).toContain('--tiger-border')
+    expect(classes).toContain('--tiger-primary')
+    expect(classes).toContain('--tiger-focus-ring')
   })
 
   it('uses theme border token on picture-card ready and success chrome', () => {

@@ -42,6 +42,8 @@ export interface CropResult {
   dataUrl: string
   /** The crop rectangle used */
   cropRect: CropRect
+  /** File built from `blob`. CropUpload sets `name` to the original filename. */
+  file: File
 }
 
 /**
@@ -370,18 +372,20 @@ export interface CropUploadProps {
   maxSize?: number
 
   /**
-   * Props to pass to the internal ImageCropper
+   * Props passed to the internal ImageCropper (`src` is owned by CropUpload).
+   * Outer `locale` wins over `cropperProps.locale`. Internal `onReady` is
+   * composed with `cropperProps.onReady` so the confirm button stays disabled
+   * until the cropper is ready.
    */
   cropperProps?: Partial<Omit<ImageCropperProps, 'src'>>
 
   /**
-   * Title for the crop modal
-   * @default '裁剪图片'
+   * Title for the crop modal. Defaults to `locale.imageEditor.cropModalTitle`.
    */
   modalTitle?: string
 
   /**
-   * Width of the crop modal
+   * Width of the crop modal. Overrides Modal `size` when set.
    * @default 520
    */
   modalWidth?: number
@@ -390,4 +394,15 @@ export interface CropUploadProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Called after a successful crop. The result always includes `file` named
+   * after the original selection. FormItem writes this `File`.
+   */
+  onCropComplete?: (result: CropResult) => void
+
+  /**
+   * Called when validation, reading, or cropping fails.
+   */
+  onError?: (error: Error) => void
 }

@@ -206,6 +206,8 @@ export const esES: TigerLocale = {
     resizeHandleW: 'izquierda',
     loadingCropImageAriaLabel: 'Cargando imagen para recortar',
     loadErrorAriaLabel: 'No se pudo cargar la imagen para recortar',
+    fileTooLargeText: 'El archivo supera {maxSize}',
+    fileTypeRejectedText: 'Este tipo de archivo no se acepta',
     annotationToolbarAriaLabel: 'Herramientas de anotación',
     annotationEditorAriaLabel: 'Editor de anotación de imagen',
     annotationCanvasAriaLabel: 'Lienzo de anotación',
@@ -334,7 +336,8 @@ export const esES: TigerLocale = {
     searchAriaLabel: 'Buscar {title}',
     itemsAriaLabel: 'Elementos de {title}',
     moveToTargetAriaLabel: 'Mover selección al destino',
-    moveToSourceAriaLabel: 'Mover selección al origen'
+    moveToSourceAriaLabel: 'Mover selección al origen',
+    selectAllAriaLabel: 'Seleccionar todo en {title}'
   },
   chart: {
     legendAriaLabel: 'Leyenda del gráfico',

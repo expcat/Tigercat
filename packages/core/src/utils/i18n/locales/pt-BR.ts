@@ -206,6 +206,8 @@ export const ptBR: TigerLocale = {
     resizeHandleW: 'esquerdo',
     loadingCropImageAriaLabel: 'Carregando imagem para recorte',
     loadErrorAriaLabel: 'Falha ao carregar a imagem para recortar',
+    fileTooLargeText: 'O arquivo excede {maxSize}',
+    fileTypeRejectedText: 'Este tipo de arquivo não é aceito',
     annotationToolbarAriaLabel: 'Ferramentas de anotação',
     annotationEditorAriaLabel: 'Editor de anotação de imagem',
     annotationCanvasAriaLabel: 'Tela de anotação',
@@ -334,7 +336,8 @@ export const ptBR: TigerLocale = {
     searchAriaLabel: 'Pesquisar {title}',
     itemsAriaLabel: 'Itens de {title}',
     moveToTargetAriaLabel: 'Mover seleção para o destino',
-    moveToSourceAriaLabel: 'Mover seleção para a origem'
+    moveToSourceAriaLabel: 'Mover seleção para a origem',
+    selectAllAriaLabel: 'Selecionar tudo em {title}'
   },
   chart: {
     legendAriaLabel: 'Legenda do gráfico',

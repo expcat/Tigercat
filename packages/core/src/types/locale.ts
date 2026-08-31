@@ -265,6 +265,9 @@ export interface TigerLocaleImageEditor {
   resizeHandleW?: string
   loadingCropImageAriaLabel?: string
   loadErrorAriaLabel?: string
+  /** Template: supports {maxSize} */
+  fileTooLargeText?: string
+  fileTypeRejectedText?: string
   annotationToolbarAriaLabel?: string
   annotationEditorAriaLabel?: string
   annotationCanvasAriaLabel?: string
@@ -449,6 +452,8 @@ export interface TigerLocaleTransfer {
   itemsAriaLabel?: string
   moveToTargetAriaLabel?: string
   moveToSourceAriaLabel?: string
+  /** Template: supports {title} */
+  selectAllAriaLabel?: string
 }
 
 export interface TigerLocaleChart {

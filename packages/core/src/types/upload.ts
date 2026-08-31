@@ -33,6 +33,15 @@ export interface UploadQueueItem {
  */
 export type UploadListType = 'text' | 'picture' | 'picture-card'
 
+export type UploadRejectReason =
+  'exceed' | 'type' | 'size' | 'before-upload' | 'before-upload-error' | 'directory'
+
+export interface UploadRejectedFile {
+  file: File
+  reason: UploadRejectReason
+  error?: Error
+}
+
 /**
  * Upload file interface
  */
@@ -105,7 +114,7 @@ export interface UploadProps {
   limit?: number
 
   /**
-   * Maximum file size in bytes
+   * Maximum file size in bytes. `undefined` or `0` means no limit.
    */
   maxSize?: number
 
@@ -128,9 +137,54 @@ export interface UploadProps {
   listType?: UploadListType
 
   /**
-   * List of uploaded files
+   * Controlled file list. `undefined` is uncontrolled; `[]` is a real empty list.
    */
   fileList?: UploadFile[]
+
+  /**
+   * Uncontrolled initial file list.
+   */
+  defaultFileList?: UploadFile[]
+
+  /**
+   * Native form field name. Each listed file is submitted as a hidden input
+   * (`uid` or `url`). The hidden `<input type="file">` is not named, so a reset
+   * file picker cannot submit an empty FileList.
+   */
+  name?: string
+
+  /**
+   * Visual validation status. Do not spread as a DOM attribute.
+   */
+  status?: import('./input').InputStatus
+
+  /**
+   * Upload URL. Used when `customRequest` is omitted. Posts `FormData` with
+   * the file under `name` (default `'file'`).
+   */
+  action?: string
+
+  /**
+   * HTTP method for `action`.
+   * @default 'POST'
+   */
+  method?: string
+
+  /**
+   * Extra headers for the default `action` request.
+   */
+  headers?: Record<string, string>
+
+  /**
+   * Extra `FormData` fields for the default `action` request.
+   */
+  data?: Record<string, string | Blob>
+
+  /**
+   * Whether the default `action` request should send cookies.
+   * @default false
+   */
+  withCredentials?: boolean
 
   /**
    * Whether to show the file list
@@ -139,7 +193,8 @@ export interface UploadProps {
   showFileList?: boolean
 
   /**
-   * Whether to auto upload when file is selected
+   * Whether to start uploading as soon as files are accepted.
+   * When `false`, files stay `ready` until `submit()`.
    * @default true
    */
   autoUpload?: boolean
@@ -162,15 +217,18 @@ export interface UploadProps {
   chunkSize?: number
 
   /**
-   * Whether chunked uploads should expose a stable resume key.
+   * When true, pass `resumeKey` (`name:size:lastModified`) into `customRequest`.
+   * Does not skip completed chunks or persist progress.
    * @default false
    */
   resumable?: boolean
 
   /**
-   * Custom upload request
+   * Custom upload request. Return `{ abort }` or call `options.onAbort` in the
+   * same tick so `abort()` can cancel in-flight work. Omit together with
+   * `action` to keep files at `ready` (never fake `success`).
    */
-  customRequest?: (options: UploadRequestOptions) => void
+  customRequest?: (options: UploadRequestOptions) => void | { abort?: () => void }
 
   /**
    * Queue change callback.
@@ -183,14 +241,20 @@ export interface UploadProps {
   onChunkProgress?: (chunk: UploadChunk, progress: number, file: UploadFile) => void
 
   /**
-   * File change callback
+   * File change callback. First argument is the changed file; second is the
+   * full list. FormItem writes the **list** (`UploadFile[]`), not the file.
    */
   onChange?: (file: UploadFile, fileList: UploadFile[]) => void
 
   /**
-   * File remove callback
+   * File remove callback. Return `false` or `Promise<false>` to keep the file.
    */
-  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean
+  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean | Promise<void | boolean>
+
+  /**
+   * Rejected files (type, size, beforeUpload, limit, directory drop).
+   */
+  onReject?: (files: UploadRejectedFile[]) => void
 
   /**
    * File preview callback
@@ -288,4 +352,9 @@ export interface UploadRequestOptions {
    * Error callback
    */
   onError?: (error: Error) => void
+
+  /**
+   * Register an abort callback in the same tick as `customRequest`.
+   */
+  onAbort?: (abort: () => void) => void
 }

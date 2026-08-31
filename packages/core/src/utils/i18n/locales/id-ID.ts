@@ -206,6 +206,8 @@ export const idID: TigerLocale = {
     resizeHandleW: 'kiri',
     loadingCropImageAriaLabel: 'Memuat gambar untuk dipotong',
     loadErrorAriaLabel: 'Gagal memuat gambar untuk dipotong',
+    fileTooLargeText: 'Ukuran file melebihi {maxSize}',
+    fileTypeRejectedText: 'Jenis file ini tidak diterima',
     annotationToolbarAriaLabel: 'Alat anotasi',
     annotationEditorAriaLabel: 'Editor anotasi gambar',
     annotationCanvasAriaLabel: 'Kanvas anotasi',
@@ -334,7 +336,8 @@ export const idID: TigerLocale = {
     searchAriaLabel: 'Cari {title}',
     itemsAriaLabel: 'Item {title}',
     moveToTargetAriaLabel: 'Pindahkan pilihan ke tujuan',
-    moveToSourceAriaLabel: 'Pindahkan pilihan ke sumber'
+    moveToSourceAriaLabel: 'Pindahkan pilihan ke sumber',
+    selectAllAriaLabel: 'Pilih semua di {title}'
   },
   chart: {
     legendAriaLabel: 'Legenda bagan',

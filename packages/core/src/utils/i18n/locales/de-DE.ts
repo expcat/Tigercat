@@ -206,6 +206,8 @@ export const deDE: TigerLocale = {
     resizeHandleW: 'links',
     loadingCropImageAriaLabel: 'Bild zum Zuschneiden wird geladen',
     loadErrorAriaLabel: 'Bild zum Zuschneiden konnte nicht geladen werden',
+    fileTooLargeText: 'Die Datei überschreitet {maxSize}',
+    fileTypeRejectedText: 'Dieser Dateityp wird nicht akzeptiert',
     annotationToolbarAriaLabel: 'Annotationstools',
     annotationEditorAriaLabel: 'Bildannotations-Editor',
     annotationCanvasAriaLabel: 'Annotationsleinwand',
@@ -334,7 +336,8 @@ export const deDE: TigerLocale = {
     searchAriaLabel: '{title} durchsuchen',
     itemsAriaLabel: '{title}-Elemente',
     moveToTargetAriaLabel: 'Auswahl ins Ziel verschieben',
-    moveToSourceAriaLabel: 'Auswahl in die Quelle verschieben'
+    moveToSourceAriaLabel: 'Auswahl in die Quelle verschieben',
+    selectAllAriaLabel: 'Alles in {title} auswählen'
   },
   chart: {
     legendAriaLabel: 'Diagrammlegende',

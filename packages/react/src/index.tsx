@@ -116,7 +116,7 @@ export { TimePicker } from './components/TimePicker'
 export type { TimePickerProps, TimePickerRef } from './components/TimePicker'
 
 export { Upload } from './components/Upload'
-export type { UploadProps } from './components/Upload'
+export type { UploadProps, UploadRef } from './components/Upload'
 
 export { Table } from './components/Table'
 export type { TableProps } from './components/Table'

@@ -206,6 +206,8 @@ export const viVN: TigerLocale = {
     resizeHandleW: 'trái',
     loadingCropImageAriaLabel: 'Đang tải ảnh để cắt',
     loadErrorAriaLabel: 'Không tải được ảnh để cắt',
+    fileTooLargeText: 'Kích thước tệp vượt quá {maxSize}',
+    fileTypeRejectedText: 'Không chấp nhận loại tệp này',
     annotationToolbarAriaLabel: 'Công cụ chú thích',
     annotationEditorAriaLabel: 'Trình chú thích ảnh',
     annotationCanvasAriaLabel: 'Canvas chú thích',
@@ -334,7 +336,8 @@ export const viVN: TigerLocale = {
     searchAriaLabel: 'Tìm {title}',
     itemsAriaLabel: 'Mục {title}',
     moveToTargetAriaLabel: 'Chuyển mục đã chọn sang đích',
-    moveToSourceAriaLabel: 'Chuyển mục đã chọn sang nguồn'
+    moveToSourceAriaLabel: 'Chuyển mục đã chọn sang nguồn',
+    selectAllAriaLabel: 'Chọn tất cả trong {title}'
   },
   chart: {
     legendAriaLabel: 'Chú giải biểu đồ',

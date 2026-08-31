@@ -206,6 +206,8 @@ export const enUS: TigerLocale = {
     resizeHandleW: 'left',
     loadingCropImageAriaLabel: 'Loading image for cropping',
     loadErrorAriaLabel: 'Failed to load image for cropping',
+    fileTooLargeText: 'File size exceeds {maxSize}',
+    fileTypeRejectedText: 'This file type is not accepted',
     annotationToolbarAriaLabel: 'Annotation tools',
     annotationEditorAriaLabel: 'Image annotation editor',
     annotationCanvasAriaLabel: 'Image annotation canvas',
@@ -334,7 +336,8 @@ export const enUS: TigerLocale = {
     searchAriaLabel: 'Search {title}',
     itemsAriaLabel: '{title} items',
     moveToTargetAriaLabel: 'Move selected to target',
-    moveToSourceAriaLabel: 'Move selected to source'
+    moveToSourceAriaLabel: 'Move selected to source',
+    selectAllAriaLabel: 'Select all in {title}'
   },
   chart: {
     legendAriaLabel: 'Chart legend',

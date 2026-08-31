@@ -206,6 +206,8 @@ export const frFR: TigerLocale = {
     resizeHandleW: 'gauche',
     loadingCropImageAriaLabel: 'Chargement de l’image à recadrer',
     loadErrorAriaLabel: 'Impossible de charger l’image à recadrer',
+    fileTooLargeText: 'Le fichier dépasse {maxSize}',
+    fileTypeRejectedText: 'Ce type de fichier n’est pas accepté',
     annotationToolbarAriaLabel: 'Outils d’annotation',
     annotationEditorAriaLabel: 'Éditeur d’annotation d’image',
     annotationCanvasAriaLabel: 'Canevas d’annotation',
@@ -334,7 +336,8 @@ export const frFR: TigerLocale = {
     searchAriaLabel: 'Rechercher {title}',
     itemsAriaLabel: 'Éléments de {title}',
     moveToTargetAriaLabel: 'Déplacer la sélection vers la cible',
-    moveToSourceAriaLabel: 'Déplacer la sélection vers la source'
+    moveToSourceAriaLabel: 'Déplacer la sélection vers la source',
+    selectAllAriaLabel: 'Tout sélectionner dans {title}'
   },
   chart: {
     legendAriaLabel: 'Légende du graphique',

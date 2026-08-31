@@ -280,7 +280,9 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               canvas.toBlob(
                 (blob) => {
                   if (blob) {
-                    resolve({ canvas, blob, dataUrl, cropRect: { ...cropRect } })
+                    const extension = (outputType.split('/')[1] || 'png').replace('jpeg', 'jpg')
+                    const file = new File([blob], `crop.${extension}`, { type: blob.type })
+                    resolve({ canvas, blob, dataUrl, cropRect: { ...cropRect }, file })
                   } else {
                     reject(new Error('Failed to create blob'))
                   }

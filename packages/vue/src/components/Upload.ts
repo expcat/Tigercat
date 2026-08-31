@@ -1,41 +1,59 @@
-import { defineComponent, ref, computed, watch, h, onBeforeUnmount, PropType } from 'vue'
+import {
+  defineComponent,
+  ref,
+  computed,
+  watch,
+  h,
+  onBeforeUnmount,
+  inject,
+  useId,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
-  icon20ViewBox,
-  closeSolidIcon20PathD,
-  successCircleSolidIcon20PathD,
-  errorCircleSolidIcon20PathD,
-  getSpinnerSVG,
-  normalizeSvgAttrs,
+  mergeAriaDescribedBy,
+  mergeTigerLocale,
   getUploadLabels,
   interpolateUploadLabel,
-  mergeTigerLocale,
+  formatFileSize,
+  getDragAreaClasses,
+  getFileListItemClasses,
+  getPictureCardClasses,
+  getUploadStatusIconClasses,
+  handleUploadDragOver,
+  handleUploadDragLeave,
+  handleUploadDrop,
+  readUploadDropFiles,
+  createUploadController,
+  createUploadPreviewUrlCache,
+  runShakeAnimation,
+  uploadFileInputClasses,
+  uploadIconActionClasses,
+  uploadItemActionsClasses,
+  uploadListClasses,
+  uploadPictureImageWrapClasses,
+  uploadPictureListClasses,
+  uploadPictureOverlayClasses,
+  uploadProgressTrackClasses,
+  uploadProgressValueClasses,
   type TigerLocale,
   type UploadFile,
   type UploadListType,
   type UploadRequestOptions,
   type UploadLabels,
   type UploadChunk,
-  prepareUploadFiles,
-  fileToUploadFile,
-  createUploadChunks,
-  createUploadQueueItem,
-  getUploadResumeKey,
-  runUploadQueue,
-  handleUploadDragOver,
-  handleUploadDragLeave,
-  handleUploadDrop,
-  formatFileSize,
-  getUploadButtonClasses,
-  getDragAreaClasses,
-  getFileListItemClasses,
-  getPictureCardClasses,
-  getUploadStatusIconClasses
+  type UploadQueueItem,
+  type UploadRejectedFile,
+  type InputStatus
 } from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './ConfigProvider'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
+import { Button } from './Button'
+import { Icon } from './Icon'
+import { ImagePreview } from './ImagePreview'
 
 export interface VueUploadProps {
   accept?: string
@@ -46,824 +64,605 @@ export interface VueUploadProps {
   drag?: boolean
   listType?: UploadListType
   fileList?: UploadFile[]
+  defaultFileList?: UploadFile[]
+  name?: string
+  status?: InputStatus
+  action?: string
+  method?: string
+  headers?: Record<string, string>
+  data?: Record<string, string | Blob>
+  withCredentials?: boolean
   showFileList?: boolean
   autoUpload?: boolean
   queue?: boolean
   maxConcurrent?: number
   chunkSize?: number
   resumable?: boolean
-  customRequest?: (options: UploadRequestOptions) => void
+  customRequest?: (options: UploadRequestOptions) => void | { abort?: () => void }
   beforeUpload?: (file: File) => boolean | Promise<boolean>
+  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean | Promise<void | boolean>
   className?: string
   style?: Record<string, string | number>
   locale?: Partial<TigerLocale>
   labels?: Partial<UploadLabels>
 }
 
+export type UploadProps = VueUploadProps
+
 export const Upload = defineComponent({
   name: 'TigerUpload',
   inheritAttrs: false,
   props: {
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String as PropType<string>,
-      default: undefined
-    },
-
-    /**
-     * Custom styles
-     */
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    },
-
-    /**
-     * Accepted file types (e.g., 'image/*', '.pdf')
-     */
-    accept: {
-      type: String
-    },
-    /**
-     * Whether to allow multiple file selection
-     * @default false
-     */
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Maximum number of files
-     */
-    limit: {
-      type: Number
-    },
-    /**
-     * Maximum file size in bytes
-     */
-    maxSize: {
-      type: Number
-    },
-    /**
-     * Whether the upload is disabled
-     * @default false
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Whether to enable drag and drop
-     * @default false
-     */
-    drag: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * List type for displaying files
-     * @default 'text'
-     */
-    listType: {
-      type: String as PropType<UploadListType>,
-      default: 'text' as UploadListType
-    },
-    /**
-     * List of uploaded files (v-model:file-list)
-     */
-    fileList: {
-      type: Array as PropType<UploadFile[]>,
-      default: undefined
-    },
-    /**
-     * Whether to show the file list
-     * @default true
-     */
-    showFileList: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Whether to auto upload when file is selected
-     * @default true
-     */
-    autoUpload: {
-      type: Boolean,
-      default: true
-    },
+    className: { type: String as PropType<string>, default: undefined },
+    style: { type: Object as PropType<Record<string, string | number>>, default: undefined },
+    accept: { type: String },
+    multiple: { type: Boolean, default: false },
+    limit: { type: Number },
+    maxSize: { type: Number },
+    disabled: { type: Boolean, default: false },
+    drag: { type: Boolean, default: false },
+    listType: { type: String as PropType<UploadListType>, default: 'text' as UploadListType },
+    fileList: { type: Array as PropType<UploadFile[]>, default: undefined },
+    defaultFileList: { type: Array as PropType<UploadFile[]>, default: undefined },
+    name: { type: String, default: undefined },
+    status: { type: String as PropType<InputStatus>, default: undefined },
+    action: { type: String, default: undefined },
+    method: { type: String, default: undefined },
+    headers: { type: Object as PropType<Record<string, string>>, default: undefined },
+    data: { type: Object as PropType<Record<string, string | Blob>>, default: undefined },
+    withCredentials: { type: Boolean, default: false },
+    showFileList: { type: Boolean, default: true },
+    autoUpload: { type: Boolean, default: true },
     queue: { type: Boolean, default: false },
     maxConcurrent: { type: Number, default: 2 },
     chunkSize: { type: Number, default: undefined },
     resumable: { type: Boolean, default: false },
-    /**
-     * Custom upload request function
-     */
     customRequest: {
-      type: Function as PropType<(options: UploadRequestOptions) => void>
+      type: Function as PropType<(options: UploadRequestOptions) => void | { abort?: () => void }>
     },
-    /**
-     * Before upload callback - return false to prevent upload
-     */
     beforeUpload: {
       type: Function as PropType<(file: File) => boolean | Promise<boolean>>
     },
-
-    /**
-     * Locale overrides for Upload UI text
-     */
-    locale: {
-      type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined
+    onRemove: {
+      type: Function as PropType<
+        (file: UploadFile, fileList: UploadFile[]) => void | boolean | Promise<void | boolean>
+      >
     },
-
-    /**
-     * Upload UI labels for i18n.
-     * When provided, merges with locale-based defaults.
-     */
-    labels: {
-      type: Object as PropType<Partial<UploadLabels>>,
-      default: undefined
-    }
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<UploadLabels>>, default: undefined }
   },
   emits: {
-    /**
-     * Emitted when file list changes (for v-model:file-list)
-     */
     'update:file-list': (files: UploadFile[]) => Array.isArray(files),
-    /**
-     * Emitted when file list changes
-     */
     change: (_file: UploadFile, _fileList: UploadFile[]) => true,
-    /**
-     * Emitted when file is removed
-     */
     remove: (_file: UploadFile, _fileList: UploadFile[]) => true,
-    /**
-     * Emitted when file is previewed
-     */
     preview: (_file: UploadFile) => true,
-    /**
-     * Emitted on upload progress
-     */
     progress: (progress: number, _file: UploadFile) => typeof progress === 'number',
-    /**
-     * Emitted on upload success
-     */
     success: (_response: unknown, _file: UploadFile) => true,
-    /**
-     * Emitted on upload error
-     */
     error: (error: Error, _file: UploadFile) => error instanceof Error,
     'chunk-progress': (_chunk: UploadChunk, progress: number, _file: UploadFile) =>
       typeof progress === 'number',
-    'queue-change': (queue: unknown[]) => Array.isArray(queue),
-    /**
-     * Emitted when file limit is exceeded
-     */
+    'queue-change': (queue: UploadQueueItem[]) => Array.isArray(queue),
     exceed: (files: File[], fileList: UploadFile[]) =>
-      Array.isArray(files) && Array.isArray(fileList)
+      Array.isArray(files) && Array.isArray(fileList),
+    reject: (files: UploadRejectedFile[]) => Array.isArray(files)
   },
-  setup(props, { emit, slots, attrs }) {
+  setup(props, { emit, slots, attrs, expose }) {
     const inputRef = ref<HTMLInputElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null)
+    const rootRef = ref<HTMLElement | null>(null)
     const isDragging = ref(false)
-
-    const spinnerSvg = getSpinnerSVG('spinner')
+    const previewSrc = ref<string | null>(null)
+    const previewUrls = createUploadPreviewUrlCache()
 
     const config = useTigerConfig()
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-
     const labels = computed(() => getUploadLabels(mergedLocale.value, props.labels))
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
+    const autoId = useId()
+    const triggerId = computed(() => formItemControl?.id.value ?? `tiger-upload-${autoId}`)
+    const inputId = computed(() => `${triggerId.value}-input`)
+    const fieldName = computed(() => props.name ?? formItemControl?.name.value)
+    const describedBy = computed(() =>
+      mergeAriaDescribedBy(
+        typeof (attrs as Record<string, unknown>)['aria-describedby'] === 'string'
+          ? ((attrs as Record<string, unknown>)['aria-describedby'] as string)
+          : undefined,
+        formItemControl?.describedBy.value
+      )
+    )
 
     const isControlled = computed(() => props.fileList !== undefined)
-    const internalFileList = ref<UploadFile[]>(props.fileList ? [...props.fileList] : [])
+    const workingList = ref<UploadFile[]>([...(props.fileList ?? props.defaultFileList ?? [])])
+    const fileListValue = computed<UploadFile[]>(() =>
+      isControlled.value ? (props.fileList ?? workingList.value) : workingList.value
+    )
 
     watch(
       () => props.fileList,
       (value) => {
-        if (value !== undefined) {
-          internalFileList.value = [...value]
-        }
-      },
-      { deep: true }
+        if (value !== undefined) workingList.value = [...value]
+      }
     )
 
-    const fileListValue = computed<UploadFile[]>(() => {
-      if (isControlled.value) {
-        return props.fileList ?? []
-      }
-      return internalFileList.value
-    })
-
-    const objectUrls = new Map<File, string>()
-
-    const revokeUnusedObjectUrls = (files: UploadFile[]) => {
-      const activeFiles = new Set(
-        files.flatMap((file) => (file.file && !file.url ? [file.file] : []))
-      )
-      objectUrls.forEach((url, file) => {
-        if (!activeFiles.has(file)) {
-          URL.revokeObjectURL(url)
-          objectUrls.delete(file)
-        }
-      })
-    }
-
-    watch(fileListValue, revokeUnusedObjectUrls, { deep: true })
+    watch(fileListValue, (files) => previewUrls.sync(files), { deep: true, immediate: true })
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      (current, previous) => {
+        if (!previous) return
+        if (current[0] === 'error') runShakeAnimation(rootRef.value)
+      },
+      { flush: 'post' }
+    )
 
     onBeforeUnmount(() => {
-      objectUrls.forEach((url) => URL.revokeObjectURL(url))
-      objectUrls.clear()
+      previewUrls.dispose()
+      controller.dispose()
     })
 
-    const setFileList = (value: UploadFile[]) => {
-      if (!isControlled.value) {
-        internalFileList.value = value
-      }
+    const setFileList = (value: UploadFile[], changed?: UploadFile) => {
+      workingList.value = value
       emit('update:file-list', value)
+      if (changed) emit('change', changed, value)
+      formItemControl?.onChange(value)
     }
 
-    const handleClick = () => {
-      if (props.disabled) return
+    const controller = createUploadController({
+      host: {
+        getFileList: () => workingList.value,
+        setFileList
+      },
+      getConfig: () => ({
+        accept: props.accept,
+        limit: props.limit,
+        maxSize: props.maxSize,
+        autoUpload: props.autoUpload,
+        queue: props.queue,
+        maxConcurrent: props.maxConcurrent,
+        chunkSize: props.chunkSize,
+        resumable: props.resumable,
+        action: props.action,
+        name: fieldName.value,
+        method: props.method,
+        headers: props.headers,
+        data: props.data,
+        withCredentials: props.withCredentials,
+        customRequest: props.customRequest,
+        beforeUpload: props.beforeUpload
+      }),
+      callbacks: {
+        onRemove: (file, list) => props.onRemove?.(file, list),
+        onProgress: (progress, file) => emit('progress', progress, file),
+        onSuccess: (response, file) => emit('success', response, file),
+        onError: (error, file) => emit('error', error, file),
+        onExceed: (files, list) => emit('exceed', files, list),
+        onReject: (files) => emit('reject', files),
+        onQueueChange: (queue) => emit('queue-change', queue),
+        onChunkProgress: (chunk, progress, file) => emit('chunk-progress', chunk, progress, file)
+      }
+    })
+
+    const openPicker = () => {
+      if (effectiveDisabled.value) return
       inputRef.value?.click()
     }
 
     const handleFileChange = async (event: Event) => {
+      event.stopPropagation()
       const target = event.target as HTMLInputElement
-      const files = Array.from(target.files || [])
-      await processFiles(files)
-      // Reset input value to allow selecting the same file again
-      if (target) {
-        target.value = ''
-      }
+      await controller.processFiles(Array.from(target.files || []))
+      target.value = ''
     }
 
-    const processFiles = async (incomingFiles: File[]) => {
-      if (incomingFiles.length === 0) return
-
-      const prepared = await prepareUploadFiles({
-        currentCount: fileListValue.value.length,
-        incomingFiles,
-        limit: props.limit,
-        accept: props.accept,
-        maxSize: props.maxSize,
-        beforeUpload: props.beforeUpload
-      })
-
-      if (prepared.rejectedExceedFiles.length > 0) {
-        emit('exceed', prepared.rejectedExceedFiles, fileListValue.value)
-      }
-
-      // Important: fileListValue is a snapshot (props/state). Use a local accumulator
-      // to avoid overwriting previous files when selecting multiple at once.
-      let nextFileList = [...fileListValue.value]
-
-      for (const file of prepared.acceptedFiles) {
-        const uploadFile = fileToUploadFile(file)
-
-        // Add to file list
-        nextFileList = [...nextFileList, uploadFile]
-        setFileList(nextFileList)
-        emit('change', uploadFile, nextFileList)
-
-        if (props.autoUpload && !props.queue) {
-          await uploadOne(file, uploadFile, () => setFileList([...nextFileList]))
-        }
-      }
-
-      if (props.autoUpload && props.queue) {
-        const queueItems = prepared.acceptedFiles.map((file) =>
-          createUploadQueueItem(
-            file,
-            nextFileList.find((item) => item.file === file)?.uid,
-            props.chunkSize
-          )
-        )
-        emit('queue-change', queueItems)
-        await runUploadQueue(
-          queueItems,
-          async (item) => {
-            const uploadFile = nextFileList.find((candidate) => candidate.uid === item.id)
-            if (!uploadFile) return
-            await uploadOne(item.file, uploadFile, () => setFileList([...nextFileList]))
-          },
-          { concurrency: props.maxConcurrent, onChange: (items) => emit('queue-change', items) }
-        )
-      }
-    }
-
-    const uploadOne = async (
-      file: File,
-      uploadFile: UploadFile,
-      notify: () => void
-    ): Promise<void> => {
-      uploadFile.status = 'uploading'
-      notify()
-
-      if (!props.customRequest) {
-        uploadFile.progress = 100
-        uploadFile.status = 'success'
-        notify()
-        return
-      }
-
-      const chunks = props.chunkSize ? createUploadChunks(file, props.chunkSize) : []
-      const resumeKey = props.resumable ? getUploadResumeKey(file) : undefined
-
-      if (chunks.length <= 1) {
-        await requestUpload(file, uploadFile, notify, { resumeKey })
-        return
-      }
-
-      for (const chunk of chunks) {
-        const chunkFile = new File([chunk.blob], file.name, {
-          type: file.type,
-          lastModified: file.lastModified
-        })
-        await requestUpload(chunkFile, uploadFile, notify, {
-          originalFile: file,
-          chunk,
-          totalChunks: chunks.length,
-          resumeKey
-        })
-      }
-
-      uploadFile.progress = 100
-      uploadFile.status = 'success'
-      emit('success', { chunks: chunks.length, resumeKey }, uploadFile)
-      notify()
-    }
-
-    const requestUpload = (
-      file: File,
-      uploadFile: UploadFile,
-      notify: () => void,
-      options: {
-        originalFile?: File
-        chunk?: UploadChunk
-        totalChunks?: number
-        resumeKey?: string
-      }
-    ): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        props.customRequest?.({
-          file,
-          originalFile: options.originalFile,
-          chunk: options.chunk,
-          chunkIndex: options.chunk?.index,
-          totalChunks: options.totalChunks,
-          resumeKey: options.resumeKey,
-          onProgress: (progress: number) => {
-            const nextProgress = options.chunk
-              ? Math.round(
-                  ((options.chunk.index + progress / 100) / (options.totalChunks ?? 1)) * 100
-                )
-              : progress
-            uploadFile.progress = nextProgress
-            if (options.chunk) {
-              emit('chunk-progress', options.chunk, progress, uploadFile)
-            }
-            emit('progress', nextProgress, uploadFile)
-            notify()
-          },
-          onSuccess: (response: unknown) => {
-            if (!options.chunk) {
-              uploadFile.status = 'success'
-              uploadFile.progress = 100
-              emit('success', response, uploadFile)
-              notify()
-            }
-            resolve()
-          },
-          onError: (error: Error) => {
-            uploadFile.status = 'error'
-            uploadFile.error = error.message
-            emit('error', error, uploadFile)
-            notify()
-            reject(error)
-          }
-        })
-      })
-    }
-
-    const handleRemove = (file: UploadFile) => {
-      const newFileList = fileListValue.value.filter((f) => f.uid !== file.uid)
-      setFileList(newFileList)
-      emit('remove', file, newFileList)
-      emit('change', file, newFileList)
+    const handleRemove = async (file: UploadFile) => {
+      if (effectiveDisabled.value) return
+      const removed = await controller.remove(file)
+      if (removed) emit('remove', file, fileListValue.value)
     }
 
     const handlePreview = (file: UploadFile) => {
+      if (effectiveDisabled.value) return
       emit('preview', file)
+      if (attrs.onPreview) return
+      const url = previewUrls.get(file)
+      if (url) previewSrc.value = url
     }
 
-    const handleDragOver = (event: DragEvent) => {
-      const result = handleUploadDragOver(event, props.disabled)
-      if (!result.handled) return
-      isDragging.value = result.isDragging
+    const handleFocusOut = (event: FocusEvent) => {
+      const next = event.relatedTarget as Node | null
+      if (next && (event.currentTarget as Node).contains(next)) return
+      formItemControl?.onBlur()
     }
 
-    const handleDragLeave = (event: DragEvent) => {
-      const result = handleUploadDragLeave(event, props.disabled)
-      if (!result.handled) return
-      isDragging.value = result.isDragging
-    }
+    expose({
+      focus: () => {
+        const node = triggerRef.value as (HTMLElement & { $el?: HTMLElement }) | null
+        if (!node) return
+        if (typeof node.focus === 'function') node.focus()
+        else node.$el?.focus?.()
+      },
+      submit: () => controller.submit(),
+      abort: (uid?: string) => controller.abort(uid),
+      retry: (file: UploadFile) => controller.retry(file)
+    })
 
-    const handleDrop = async (event: DragEvent) => {
-      const result = handleUploadDrop(event, props.disabled)
-      if (!result.handled) return
-      isDragging.value = result.isDragging
-
-      await processFiles(result.files)
-    }
-
-    const handleDragKeydown = (event: KeyboardEvent) => {
-      if (props.disabled) return
-
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault()
-        handleClick()
+    const statusIcon = (fileStatus: UploadFile['status'], size: 'sm' | 'lg') => {
+      if (fileStatus === 'success') {
+        return h(Icon, {
+          name: 'success',
+          class: getUploadStatusIconClasses('success', size),
+          role: 'img',
+          'aria-label': labels.value.successAriaLabel
+        })
       }
+      if (fileStatus === 'error') {
+        return h(Icon, {
+          name: 'error',
+          class: getUploadStatusIconClasses('error', size),
+          role: 'img',
+          'aria-label': labels.value.errorAriaLabel
+        })
+      }
+      if (fileStatus === 'uploading') {
+        return h(Icon, {
+          name: 'refresh',
+          class: getUploadStatusIconClasses('uploading', size, { spinning: true }),
+          role: 'img',
+          'aria-label': labels.value.uploadingAriaLabel
+        })
+      }
+      return null
     }
 
-    const renderInput = () => {
-      return h('input', {
-        ref: inputRef,
-        type: 'file',
-        accept: props.accept,
-        multiple: props.multiple,
-        disabled: props.disabled,
-        style: { display: 'none' },
-        onChange: handleFileChange,
-        'aria-hidden': 'true'
-      })
-    }
-
-    const renderUploadButton = () => {
-      if (props.drag) {
-        const dragInner = slots.default
-          ? slots.default()
-          : [
-              h(
-                'svg',
-                {
-                  class: 'w-12 h-12 mb-3 text-gray-400',
-                  fill: 'none',
-                  stroke: 'currentColor',
-                  viewBox: '0 0 24 24',
-                  'aria-hidden': 'true'
-                },
-                [
-                  h('path', {
-                    'stroke-linecap': 'round',
-                    'stroke-linejoin': 'round',
-                    'stroke-width': '2',
-                    d: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12'
-                  })
-                ]
-              ),
-              h('p', { class: 'mb-2 text-sm' }, [
-                h('span', { class: 'font-semibold' }, labels.value.clickToUploadText),
-                ` ${labels.value.dragAndDropText}`
-              ]),
-              props.accept &&
-                h(
-                  'p',
-                  { class: 'text-xs text-gray-500' },
-                  interpolateUploadLabel(labels.value.acceptInfoText, {
-                    accept: props.accept
-                  })
-                ),
-              props.maxSize &&
-                h(
-                  'p',
-                  { class: 'text-xs text-gray-500' },
-                  interpolateUploadLabel(labels.value.maxSizeInfoText, {
-                    maxSize: formatFileSize(props.maxSize)
-                  })
-                )
+    const progressBlock = (file: UploadFile, errorId?: string) => [
+      file.status === 'uploading'
+        ? h(
+            'div',
+            {
+              class: uploadProgressTrackClasses,
+              role: 'progressbar',
+              'aria-valuemin': 0,
+              'aria-valuemax': 100,
+              'aria-valuenow': file.progress ?? 0
+            },
+            [
+              h('div', {
+                class: uploadProgressValueClasses,
+                style: { width: `${file.progress ?? 0}%` }
+              })
             ]
+          )
+        : null,
+      file.status === 'error' && file.error
+        ? h('p', { id: errorId, class: 'text-xs text-[var(--tiger-error,#dc2626)]' }, file.error)
+        : null
+    ]
 
-        return h(
-          'div',
-          {
-            class: getDragAreaClasses(isDragging.value, props.disabled),
-            onClick: handleClick,
-            onKeydown: handleDragKeydown,
-            onDragover: handleDragOver,
-            onDragleave: handleDragLeave,
-            onDrop: handleDrop,
-            role: 'button',
-            tabindex: props.disabled ? -1 : 0,
-            'aria-disabled': props.disabled,
-            'aria-label': labels.value.dragAreaAriaLabel
-          },
-          dragInner
-        )
-      }
-
-      return h(
-        'button',
-        {
-          type: 'button',
-          class: getUploadButtonClasses(props.disabled),
-          onClick: handleClick,
-          disabled: props.disabled,
-          'aria-label': labels.value.buttonAriaLabel
-        },
-        slots.default ? slots.default() : labels.value.selectFileText
-      )
-    }
-
-    const renderFileList = () => {
-      if (!props.showFileList || fileListValue.value.length === 0) {
-        return null
-      }
-
-      if (props.listType === 'picture-card') {
-        return h(
-          'div',
-          { class: 'flex flex-wrap gap-2 mt-4' },
-          fileListValue.value.map((file) => renderPictureCard(file))
-        )
-      }
-
-      return h(
-        'ul',
-        {
-          class: 'mt-4 space-y-2',
-          role: 'list',
-          'aria-label': labels.value.uploadedFilesAriaLabel
-        },
-        fileListValue.value.map((file) => renderFileItem(file))
-      )
-    }
-
-    const renderFileItem = (file: UploadFile) => {
-      return h(
-        'li',
-        {
-          class: getFileListItemClasses(file.status),
-          key: file.uid
-        },
-        [
-          h('div', { class: 'flex items-center flex-1 min-w-0' }, [
-            // File icon
-            h(
-              'svg',
-              {
-                class: 'w-5 h-5 mr-2 flex-shrink-0',
-                fill: 'none',
-                stroke: 'currentColor',
-                viewBox: '0 0 24 24',
-                'aria-hidden': 'true'
-              },
-              [
-                h('path', {
-                  'stroke-linecap': 'round',
-                  'stroke-linejoin': 'round',
-                  'stroke-width': '2',
-                  d: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                })
-              ]
-            ),
-            // File name and size
-            h('div', { class: 'flex-1 min-w-0' }, [
-              h('p', { class: 'text-sm font-medium truncate' }, file.name),
-              file.size && h('p', { class: 'text-xs text-gray-500' }, formatFileSize(file.size))
-            ])
-          ]),
-          // Actions
-          h('div', { class: 'flex items-center space-x-2 ml-4' }, [
-            // Status icon
-            file.status === 'success' &&
-              h(
-                'svg',
-                {
-                  class: getUploadStatusIconClasses('success', 'sm'),
-                  fill: 'currentColor',
-                  viewBox: icon20ViewBox,
-                  'aria-label': labels.value.successAriaLabel
-                },
-                [
-                  h('path', {
-                    'fill-rule': 'evenodd',
-                    d: successCircleSolidIcon20PathD,
-                    'clip-rule': 'evenodd'
-                  })
-                ]
-              ),
-            file.status === 'error' &&
-              h(
-                'svg',
-                {
-                  class: getUploadStatusIconClasses('error', 'sm'),
-                  fill: 'currentColor',
-                  viewBox: icon20ViewBox,
-                  'aria-label': labels.value.errorAriaLabel
-                },
-                [
-                  h('path', {
-                    'fill-rule': 'evenodd',
-                    d: errorCircleSolidIcon20PathD,
-                    'clip-rule': 'evenodd'
-                  })
-                ]
-              ),
-            file.status === 'uploading' &&
-              h(
-                'svg',
-                {
-                  class: getUploadStatusIconClasses('uploading', 'sm', {
-                    spinning: true
-                  }),
-                  fill: 'none',
-                  viewBox: spinnerSvg.viewBox,
-                  'aria-label': labels.value.uploadingAriaLabel
-                },
-                spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-              ),
-            // Remove button
-            h(
+    const actionButtons = (file: UploadFile, picture: boolean) => {
+      const canPreview = Boolean(previewUrls.get(file))
+      const actionClass = picture
+        ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
+        : uploadIconActionClasses
+      return [
+        canPreview
+          ? h(
               'button',
               {
                 type: 'button',
-                class: 'text-gray-400 hover:text-red-500 transition-colors',
-                onClick: () => handleRemove(file),
-                'aria-label': interpolateUploadLabel(labels.value.removeFileAriaLabel, {
+                class: actionClass,
+                disabled: effectiveDisabled.value,
+                tabindex: effectiveDisabled.value ? -1 : 0,
+                onClick: () => handlePreview(file),
+                'aria-label': interpolateUploadLabel(labels.value.previewFileAriaLabel, {
                   fileName: file.name
                 })
               },
               [
-                h(
-                  'svg',
-                  {
-                    class: 'w-5 h-5',
-                    fill: 'currentColor',
-                    viewBox: icon20ViewBox,
-                    'aria-hidden': 'true'
-                  },
-                  [
-                    h('path', {
-                      'fill-rule': 'evenodd',
-                      d: closeSolidIcon20PathD,
-                      'clip-rule': 'evenodd'
-                    })
-                  ]
-                )
+                h(Icon, {
+                  name: 'eye',
+                  class: picture ? 'w-6 h-6' : 'w-5 h-5',
+                  'aria-hidden': true
+                })
               ]
             )
-          ])
-        ]
-      )
-    }
-
-    const renderPictureCard = (file: UploadFile) => {
-      let imageUrl = file.url ?? ''
-      if (
-        !imageUrl &&
-        file.file &&
-        typeof URL !== 'undefined' &&
-        typeof URL.createObjectURL === 'function'
-      ) {
-        imageUrl = objectUrls.get(file.file) ?? ''
-        if (!imageUrl) {
-          imageUrl = URL.createObjectURL(file.file)
-          objectUrls.set(file.file, imageUrl)
-        }
-      }
-
-      return h(
-        'div',
-        {
-          class: getPictureCardClasses(file.status),
-          key: file.uid
-        },
-        [
-          // Image preview
-          imageUrl &&
-            h('img', {
-              src: imageUrl,
-              alt: file.name,
-              class: 'w-full h-full object-cover'
-            }),
-          // Overlay
-          h(
-            'div',
-            {
-              class:
-                'absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100'
-            },
-            [
-              // Preview button
-              h(
-                'button',
-                {
-                  type: 'button',
-                  class: 'text-white hover:text-blue-200 transition-colors',
-                  onClick: () => handlePreview(file),
-                  'aria-label': interpolateUploadLabel(labels.value.previewFileAriaLabel, {
-                    fileName: file.name
-                  })
-                },
-                [
-                  h(
-                    'svg',
-                    {
-                      class: 'w-6 h-6',
-                      fill: 'none',
-                      stroke: 'currentColor',
-                      viewBox: '0 0 24 24',
-                      'aria-hidden': 'true'
-                    },
-                    [
-                      h('path', {
-                        'stroke-linecap': 'round',
-                        'stroke-linejoin': 'round',
-                        'stroke-width': '2',
-                        d: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'
-                      }),
-                      h('path', {
-                        'stroke-linecap': 'round',
-                        'stroke-linejoin': 'round',
-                        'stroke-width': '2',
-                        d: 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'
-                      })
-                    ]
-                  )
-                ]
-              ),
-              // Remove button
-              h(
-                'button',
-                {
-                  type: 'button',
-                  class: 'text-white hover:text-red-200 transition-colors',
-                  onClick: () => handleRemove(file),
-                  'aria-label': interpolateUploadLabel(labels.value.removeFileAriaLabel, {
-                    fileName: file.name
-                  })
-                },
-                [
-                  h(
-                    'svg',
-                    {
-                      class: 'w-6 h-6',
-                      fill: 'currentColor',
-                      viewBox: '0 0 20 20',
-                      'aria-hidden': 'true'
-                    },
-                    [
-                      h('path', {
-                        'fill-rule': 'evenodd',
-                        d: 'M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z',
-                        'clip-rule': 'evenodd'
-                      })
-                    ]
-                  )
-                ]
-              )
-            ]
-          ),
-          // Status indicator
-          file.status === 'uploading' &&
-            h(
-              'div',
-              {
-                class: 'absolute inset-0 bg-white/75 flex items-center justify-center'
-              },
-              [
-                h(
-                  'svg',
-                  {
-                    class: getUploadStatusIconClasses('uploading', 'lg', {
-                      spinning: true
-                    }),
-                    fill: 'none',
-                    viewBox: spinnerSvg.viewBox
-                  },
-                  spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-                )
-              ]
-            )
-        ]
-      )
+          : null,
+        h(
+          'button',
+          {
+            type: 'button',
+            class: actionClass,
+            disabled: effectiveDisabled.value,
+            tabindex: effectiveDisabled.value ? -1 : 0,
+            onClick: () => handleRemove(file),
+            'aria-label': interpolateUploadLabel(labels.value.removeFileAriaLabel, {
+              fileName: file.name
+            })
+          },
+          [
+            h(Icon, {
+              name: picture ? 'trash' : 'close',
+              class: picture ? 'w-6 h-6' : 'w-5 h-5',
+              'aria-hidden': true
+            })
+          ]
+        )
+      ]
     }
 
     return () => {
+      const forwarded = Object.fromEntries(
+        Object.entries(attrs).filter(
+          ([key]) => key !== 'class' && key !== 'style' && key !== 'onPreview'
+        )
+      )
+      const triggerAria = {
+        id: triggerId.value,
+        'aria-invalid': status.value === 'error' ? true : undefined,
+        'aria-required': formItemControl?.required.value ? true : undefined,
+        'aria-describedby': describedBy.value,
+        'aria-labelledby': formItemControl?.labelId.value,
+        'aria-controls': inputId.value
+      }
+
+      const trigger = props.drag
+        ? h(
+            'div',
+            {
+              ...forwarded,
+              ...triggerAria,
+              ref: triggerRef,
+              class: getDragAreaClasses(isDragging.value, effectiveDisabled.value),
+              onClick: openPicker,
+              onKeydown: (event: KeyboardEvent) => {
+                if (effectiveDisabled.value) return
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  openPicker()
+                }
+              },
+              onDragover: (event: DragEvent) => {
+                const result = handleUploadDragOver(event, effectiveDisabled.value)
+                if (!result.handled) return
+                isDragging.value = result.isDragging
+              },
+              onDragleave: (event: DragEvent) => {
+                const result = handleUploadDragLeave(
+                  event,
+                  effectiveDisabled.value,
+                  event.currentTarget
+                )
+                if (!result.handled) return
+                isDragging.value = result.isDragging
+              },
+              onDrop: async (event: DragEvent) => {
+                const result = handleUploadDrop(event, effectiveDisabled.value)
+                if (!result.handled) return
+                isDragging.value = false
+                const read = readUploadDropFiles(event.dataTransfer)
+                if (read.rejectedDirectories.length > 0) {
+                  emit(
+                    'reject',
+                    read.rejectedDirectories.map((file) => ({
+                      file,
+                      reason: 'directory' as const
+                    }))
+                  )
+                }
+                await controller.processFiles(read.files)
+              },
+              role: 'button',
+              tabindex: effectiveDisabled.value ? -1 : 0,
+              'aria-disabled': effectiveDisabled.value,
+              'aria-label': slots.default ? undefined : labels.value.dragAreaAriaLabel
+            },
+            slots.default
+              ? slots.default()
+              : [
+                  h(Icon, {
+                    name: 'upload',
+                    class: 'w-12 h-12 mb-3 text-[var(--tiger-text-muted,#9ca3af)]',
+                    'aria-hidden': true
+                  }),
+                  h('p', { class: 'mb-2 text-sm' }, [
+                    h('span', { class: 'font-semibold' }, labels.value.clickToUploadText),
+                    ` ${labels.value.dragAndDropText}`
+                  ]),
+                  props.accept
+                    ? h(
+                        'p',
+                        { class: 'text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                        interpolateUploadLabel(labels.value.acceptInfoText, {
+                          accept: props.accept
+                        })
+                      )
+                    : null,
+                  props.maxSize
+                    ? h(
+                        'p',
+                        { class: 'text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                        interpolateUploadLabel(labels.value.maxSizeInfoText, {
+                          maxSize: formatFileSize(props.maxSize)
+                        })
+                      )
+                    : null
+                ]
+          )
+        : h(
+            Button,
+            {
+              ...forwarded,
+              ...triggerAria,
+              ref: triggerRef,
+              type: 'button',
+              variant: 'outline',
+              size: 'sm',
+              disabled: effectiveDisabled.value,
+              onClick: openPicker,
+              'aria-label': slots.default ? undefined : labels.value.buttonAriaLabel
+            },
+            { default: () => (slots.default ? slots.default() : labels.value.selectFileText) }
+          )
+
+      const list =
+        !props.showFileList || fileListValue.value.length === 0
+          ? null
+          : props.listType === 'picture-card'
+            ? h(
+                'div',
+                { class: uploadPictureListClasses },
+                fileListValue.value.map((file) => {
+                  const imageUrl = previewUrls.get(file)
+                  const errorId =
+                    file.status === 'error' && file.error ? `${file.uid}-error` : undefined
+                  return h('div', { class: getPictureCardClasses(file.status), key: file.uid }, [
+                    h('div', { class: uploadPictureImageWrapClasses }, [
+                      imageUrl
+                        ? h('img', {
+                            src: imageUrl,
+                            alt: file.name,
+                            class: 'w-full h-full object-cover'
+                          })
+                        : h(
+                            'span',
+                            {
+                              class:
+                                'flex h-full w-full items-center justify-center px-2 text-xs text-center text-[var(--tiger-text-muted,#6b7280)]'
+                            },
+                            file.name
+                          )
+                    ]),
+                    h('div', { class: uploadPictureOverlayClasses }, actionButtons(file, true)),
+                    file.status === 'uploading'
+                      ? h(
+                          'div',
+                          {
+                            class:
+                              'absolute inset-0 flex flex-col items-center justify-center bg-[var(--tiger-surface,#ffffff)]/80'
+                          },
+                          [statusIcon('uploading', 'lg'), ...progressBlock(file)]
+                        )
+                      : null,
+                    file.status === 'error' && file.error
+                      ? h(
+                          'p',
+                          {
+                            id: errorId,
+                            class:
+                              'absolute bottom-1 inset-x-1 text-[10px] text-[var(--tiger-error,#dc2626)] truncate'
+                          },
+                          file.error
+                        )
+                      : null
+                  ])
+                })
+              )
+            : h(
+                'ul',
+                {
+                  class: uploadListClasses,
+                  role: 'list',
+                  'aria-label': labels.value.uploadedFilesAriaLabel
+                },
+                fileListValue.value.map((file) => {
+                  const errorId =
+                    file.status === 'error' && file.error ? `${file.uid}-error` : undefined
+                  const thumb = props.listType === 'picture' ? previewUrls.get(file) : undefined
+                  return h(
+                    'li',
+                    {
+                      class: getFileListItemClasses(file.status),
+                      key: file.uid,
+                      'aria-describedby': errorId
+                    },
+                    [
+                      h('div', { class: 'flex items-center flex-1 min-w-0 gap-2' }, [
+                        props.listType === 'picture' && thumb
+                          ? h('img', {
+                              src: thumb,
+                              alt: '',
+                              class: 'w-10 h-10 rounded object-cover flex-shrink-0'
+                            })
+                          : h(Icon, {
+                              name: 'document',
+                              class: 'w-5 h-5 flex-shrink-0',
+                              'aria-hidden': true
+                            }),
+                        h('div', { class: 'flex-1 min-w-0' }, [
+                          h('p', { class: 'text-sm font-medium truncate' }, file.name),
+                          file.size != null
+                            ? h(
+                                'p',
+                                { class: 'text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                                formatFileSize(file.size)
+                              )
+                            : null,
+                          ...progressBlock(file, errorId)
+                        ])
+                      ]),
+                      h('div', { class: uploadItemActionsClasses }, [
+                        statusIcon(file.status, 'sm'),
+                        ...actionButtons(file, false)
+                      ])
+                    ]
+                  )
+                })
+              )
+
       return h(
         'div',
         {
-          ...attrs,
+          ref: rootRef,
           class: classNames(
             'tiger-upload',
             props.className,
             coerceClassValue((attrs as Record<string, unknown>).class)
           ),
-          style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
+          style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style),
+          onFocusout: handleFocusOut
         },
-        [renderInput(), renderUploadButton(), renderFileList()]
+        [
+          h('input', {
+            ref: inputRef,
+            id: inputId.value,
+            type: 'file',
+            accept: props.accept,
+            multiple: props.multiple,
+            disabled: effectiveDisabled.value,
+            class: uploadFileInputClasses,
+            onChange: handleFileChange,
+            'aria-hidden': 'true',
+            tabindex: -1
+          }),
+          fieldName.value
+            ? fileListValue.value.map((file) =>
+                h('input', {
+                  key: file.uid,
+                  type: 'hidden',
+                  name: fieldName.value,
+                  value: file.url ?? file.uid
+                })
+              )
+            : null,
+          trigger,
+          list,
+          previewSrc.value
+            ? h(ImagePreview, {
+                images: [previewSrc.value],
+                open: true,
+                'onUpdate:open': (open: boolean) => {
+                  if (!open) previewSrc.value = null
+                }
+              })
+            : null
+        ]
       )
     }
   }

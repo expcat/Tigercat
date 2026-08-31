@@ -206,6 +206,8 @@ export const thTH: TigerLocale = {
     resizeHandleW: 'ซ้าย',
     loadingCropImageAriaLabel: 'กำลังโหลดรูปภาพสำหรับครอบตัด',
     loadErrorAriaLabel: 'โหลดรูปภาพสำหรับครอบตัดไม่สำเร็จ',
+    fileTooLargeText: 'ไฟล์มีขนาดเกิน {maxSize}',
+    fileTypeRejectedText: 'ไม่รองรับไฟล์ประเภทนี้',
     annotationToolbarAriaLabel: 'เครื่องมือคำอธิบาย',
     annotationEditorAriaLabel: 'ตัวแก้ไขคำอธิบายรูปภาพ',
     annotationCanvasAriaLabel: 'ผืนผ้าใบคำอธิบาย',
@@ -334,7 +336,8 @@ export const thTH: TigerLocale = {
     searchAriaLabel: 'ค้นหา {title}',
     itemsAriaLabel: 'รายการ {title}',
     moveToTargetAriaLabel: 'ย้ายรายการที่เลือกไปปลายทาง',
-    moveToSourceAriaLabel: 'ย้ายรายการที่เลือกไปต้นทาง'
+    moveToSourceAriaLabel: 'ย้ายรายการที่เลือกไปต้นทาง',
+    selectAllAriaLabel: 'เลือกทั้งหมดใน {title}'
   },
   chart: {
     legendAriaLabel: 'คำอธิบายแผนภูมิ',

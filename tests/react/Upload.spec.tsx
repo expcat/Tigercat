@@ -10,7 +10,7 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Upload } from '@expcat/tigercat-react/Upload'
 import type { UploadFile } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void> {
   await act(async () => {
@@ -443,12 +443,7 @@ describe('Upload', () => {
       const img = container.querySelector('img')
       expect(img).toBeInTheDocument()
       expect(img).toHaveAttribute('src', 'https://example.com/test.jpg')
-      const renderedClasses = Array.from(container.querySelectorAll('[class]'))
-        .map((node) => node.getAttribute('class') ?? '')
-        .join(' ')
-      expect(renderedClasses).toContain('bg-black/0')
-      expect(renderedClasses).toContain('hover:bg-black/50')
-      expect(renderedClasses).not.toContain('bg-opacity-')
+      expect(container.querySelector('[aria-label="Preview test.jpg"]')).toBeInTheDocument()
     })
 
     it('reuses and revokes local picture-card object URLs', () => {
@@ -571,22 +566,21 @@ describe('Upload', () => {
       expect(uploadingIcon).toBeInTheDocument()
     })
 
-    it('should render uploading picture card overlay with Tailwind v4 opacity classes', () => {
+    it('shows uploading progress on picture-card', () => {
       const fileList: UploadFile[] = [
         {
           uid: 'file-1',
           name: 'test.jpg',
           status: 'uploading',
+          progress: 40,
           url: 'https://example.com/test.jpg'
         }
       ]
       const { container } = render(<Upload fileList={fileList} listType="picture-card" />)
 
-      const renderedClasses = Array.from(container.querySelectorAll('[class]'))
-        .map((node) => node.getAttribute('class') ?? '')
-        .join(' ')
-      expect(renderedClasses).toContain('bg-white/75')
-      expect(renderedClasses).not.toContain('bg-opacity-')
+      const bar = container.querySelector('[role="progressbar"]')
+      expect(bar).toHaveAttribute('aria-valuenow', '40')
+      expect(container.querySelector('[aria-label="Uploading"]')).toBeInTheDocument()
     })
   })
 
@@ -820,7 +814,7 @@ describe('Upload', () => {
       expect(laterList.some((item) => item.status === 'success')).toBe(true)
     })
 
-    it('writes controlled fileList back to success without customRequest', async () => {
+    it('keeps files ready without action or customRequest', async () => {
       const TestComponent = () => {
         const [fileList, setFileList] = React.useState<UploadFile[]>([])
 
@@ -841,8 +835,9 @@ describe('Upload', () => {
       await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
-        expect(container.querySelector('[aria-label="Success"]')).toBeInTheDocument()
+        expect(container.querySelector('[role="list"]')).toBeInTheDocument()
       })
+      expect(container.querySelector('[aria-label="Success"]')).not.toBeInTheDocument()
     })
 
     it('reaches success in uncontrolled mode with customRequest without onChange', async () => {
@@ -940,7 +935,7 @@ describe('Upload', () => {
       ]
       const { container } = render(<Upload fileList={fileList} />)
 
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
   })
 })

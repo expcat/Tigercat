@@ -1,392 +1,425 @@
-import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
-  type UploadProps as CoreUploadProps,
-  type UploadFile,
-  type UploadLabels,
   classNames,
-  icon20ViewBox,
-  closeSolidIcon20PathD,
-  successCircleSolidIcon20PathD,
-  errorCircleSolidIcon20PathD,
-  getSpinnerSVG,
-  getUploadLabels,
-  interpolateUploadLabel,
-  mergeTigerLocale,
-  prepareUploadFiles,
-  fileToUploadFile,
-  createUploadChunks,
-  createUploadQueueItem,
-  getUploadResumeKey,
-  runUploadQueue,
-  handleUploadDragOver,
-  handleUploadDragLeave,
-  handleUploadDrop,
+  createUploadController,
+  createUploadPreviewUrlCache,
   formatFileSize,
-  getUploadButtonClasses,
   getDragAreaClasses,
   getFileListItemClasses,
   getPictureCardClasses,
-  getUploadStatusIconClasses
+  getUploadLabels,
+  getUploadStatusIconClasses,
+  handleUploadDragLeave,
+  handleUploadDragOver,
+  handleUploadDrop,
+  interpolateUploadLabel,
+  isImageUploadFile,
+  mergeAriaDescribedBy,
+  mergeTigerLocale,
+  readUploadDropFiles,
+  runShakeAnimation,
+  uploadFileInputClasses,
+  uploadIconActionClasses,
+  uploadItemActionsClasses,
+  uploadListClasses,
+  uploadPictureImageWrapClasses,
+  uploadPictureListClasses,
+  uploadPictureOverlayClasses,
+  uploadProgressTrackClasses,
+  uploadProgressValueClasses,
+  type InputStatus,
+  type UploadFile,
+  type UploadLabels,
+  type UploadProps as CoreUploadProps,
+  type UploadRejectedFile
 } from '@expcat/tigercat-core'
 
-import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
-
-const spinnerSvg = getSpinnerSVG('spinner')
+import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
+import { useFormItemControlContext } from './FormItemContext'
+import { Icon } from './Icon'
+import { ImagePreview } from './ImagePreview'
 
 export interface UploadProps
   extends
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'onError' | 'onProgress'>,
     Omit<CoreUploadProps, 'onChange' | 'onRemove'> {
-  /**
-   * File list change callback
-   */
   onChange?: (file: UploadFile, fileList: UploadFile[]) => void
-
-  /**
-   * File remove callback
-   */
-  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean
-
-  // children/className/style 等由 React.HTMLAttributes<HTMLDivElement> 提供
+  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean | Promise<void | boolean>
 }
 
-export const Upload: React.FC<UploadProps> = ({
-  accept,
-  multiple = false,
-  limit,
-  maxSize,
-  disabled = false,
-  drag = false,
-  listType = 'text',
-  fileList: controlledFileList,
-  showFileList = true,
-  autoUpload = true,
-  queue = false,
-  maxConcurrent = 2,
-  chunkSize,
-  resumable = false,
-  customRequest,
-  onQueueChange,
-  onChunkProgress,
-  onChange,
-  onRemove,
-  onPreview,
-  beforeUpload,
-  onProgress,
-  onSuccess,
-  onError,
-  onExceed,
-  locale,
-  labels: labelsOverrides,
-  children,
-  className,
-  style,
-  ...divProps
-}) => {
+export interface UploadRef {
+  focus: () => void
+  submit: () => Promise<void>
+  abort: (uid?: string) => void
+  retry: (file: UploadFile) => Promise<void>
+}
+
+function UploadStatusIcon({
+  status,
+  labels,
+  size
+}: {
+  status?: UploadFile['status']
+  labels: UploadLabels
+  size: 'sm' | 'lg'
+}): React.ReactElement | null {
+  if (status === 'success') {
+    return (
+      <Icon
+        name="success"
+        className={getUploadStatusIconClasses('success', size)}
+        role="img"
+        aria-label={labels.successAriaLabel}
+      />
+    )
+  }
+  if (status === 'error') {
+    return (
+      <Icon
+        name="error"
+        className={getUploadStatusIconClasses('error', size)}
+        role="img"
+        aria-label={labels.errorAriaLabel}
+      />
+    )
+  }
+  if (status === 'uploading') {
+    return (
+      <Icon
+        name="refresh"
+        className={getUploadStatusIconClasses('uploading', size, { spinning: true })}
+        role="img"
+        aria-label={labels.uploadingAriaLabel}
+      />
+    )
+  }
+  return null
+}
+
+export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
+  {
+    accept,
+    multiple = false,
+    limit,
+    maxSize,
+    disabled = false,
+    drag = false,
+    listType = 'text',
+    fileList: fileListProp,
+    defaultFileList,
+    name,
+    status: statusProp,
+    action,
+    method,
+    headers,
+    data,
+    withCredentials,
+    showFileList = true,
+    autoUpload = true,
+    queue = false,
+    maxConcurrent = 2,
+    chunkSize,
+    resumable = false,
+    customRequest,
+    onQueueChange,
+    onChunkProgress,
+    onChange,
+    onRemove,
+    onPreview,
+    onReject,
+    beforeUpload,
+    onProgress,
+    onSuccess,
+    onError,
+    onExceed,
+    locale,
+    labels: labelsOverrides,
+    children,
+    className,
+    style,
+    id,
+    onBlur,
+    ...divProps
+  },
+  ref
+) {
   const config = useTigerConfig()
+  const formItemControl = useFormItemControlContext()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const labels: UploadLabels = useMemo(
+  const labels = useMemo(
     () => getUploadLabels(mergedLocale, labelsOverrides),
     [mergedLocale, labelsOverrides]
   )
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const reactId = useId()
+  const triggerId = id ?? formItemControl?.id ?? `tiger-upload-${reactId}`
+  const inputId = `${triggerId}-input`
+  const describedBy = mergeAriaDescribedBy(
+    typeof divProps['aria-describedby'] === 'string' ? divProps['aria-describedby'] : undefined,
+    formItemControl?.describedBy
+  )
+  const labelledby =
+    typeof divProps['aria-labelledby'] === 'string'
+      ? divProps['aria-labelledby']
+      : formItemControl?.labelId
+  const fieldName = name ?? formItemControl?.name
+
+  const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const objectUrlsRef = useRef(new Map<File, string>())
+  const triggerRef = useRef<HTMLElement>(null)
+  const previewUrls = useRef(createUploadPreviewUrlCache())
   const [isDragging, setIsDragging] = useState(false)
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null)
+
   const [fileList, setFileList] = useControlledState<UploadFile[], [UploadFile?]>({
-    value: controlledFileList,
-    defaultValue: [],
+    value: fileListProp,
+    defaultValue: defaultFileList ?? [],
     onChange: (nextList, file) => {
       if (file) onChange?.(file, nextList)
+      formItemControl?.onChange?.(nextList)
     }
   })
 
-  const revokeUnusedObjectUrls = useCallback((files: UploadFile[]) => {
-    const activeFiles = new Set(
-      files.flatMap((file) => (file.file && !file.url ? [file.file] : []))
-    )
-    objectUrlsRef.current.forEach((url, file) => {
-      if (!activeFiles.has(file)) {
-        URL.revokeObjectURL(url)
-        objectUrlsRef.current.delete(file)
+  const fileListRef = useRef(fileList)
+  fileListRef.current = fileList
+
+  const callbacksRef = useRef({
+    onRemove,
+    onProgress,
+    onSuccess,
+    onError,
+    onExceed,
+    onReject,
+    onQueueChange,
+    onChunkProgress
+  })
+  callbacksRef.current = {
+    onRemove,
+    onProgress,
+    onSuccess,
+    onError,
+    onExceed,
+    onReject,
+    onQueueChange,
+    onChunkProgress
+  }
+
+  const configRef = useRef({
+    accept,
+    limit,
+    maxSize,
+    autoUpload,
+    queue,
+    maxConcurrent,
+    chunkSize,
+    resumable,
+    action,
+    name: fieldName,
+    method,
+    headers,
+    data,
+    withCredentials,
+    customRequest,
+    beforeUpload
+  })
+  configRef.current = {
+    accept,
+    limit,
+    maxSize,
+    autoUpload,
+    queue,
+    maxConcurrent,
+    chunkSize,
+    resumable,
+    action,
+    name: fieldName,
+    method,
+    headers,
+    data,
+    withCredentials,
+    customRequest,
+    beforeUpload
+  }
+
+  const controllerRef = useRef(
+    createUploadController({
+      host: {
+        getFileList: () => fileListRef.current,
+        setFileList: (list, changed) => {
+          fileListRef.current = list
+          setFileList(list, changed)
+        }
+      },
+      getConfig: () => ({
+        ...configRef.current,
+        autoUpload: configRef.current.autoUpload,
+        queue: configRef.current.queue,
+        maxConcurrent: configRef.current.maxConcurrent ?? 2,
+        resumable: Boolean(configRef.current.resumable)
+      }),
+      callbacks: {
+        onRemove: (file, list) => callbacksRef.current.onRemove?.(file, list),
+        onProgress: (progress, file) => callbacksRef.current.onProgress?.(progress, file),
+        onSuccess: (response, file) => callbacksRef.current.onSuccess?.(response, file),
+        onError: (error, file) => callbacksRef.current.onError?.(error, file),
+        onExceed: (files, list) => callbacksRef.current.onExceed?.(files, list),
+        onReject: (files) => callbacksRef.current.onReject?.(files),
+        onQueueChange: (queueItems) => callbacksRef.current.onQueueChange?.(queueItems),
+        onChunkProgress: (chunk, progress, file) =>
+          callbacksRef.current.onChunkProgress?.(chunk, progress, file)
       }
     })
-  }, [])
+  )
 
   useEffect(() => {
-    revokeUnusedObjectUrls(fileList)
-  }, [fileList, revokeUnusedObjectUrls])
+    previewUrls.current.sync(fileList)
+  }, [fileList])
 
   useEffect(
     () => () => {
-      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
-      objectUrlsRef.current.clear()
+      previewUrls.current.dispose()
+      controllerRef.current.dispose()
     },
     []
   )
 
-  const updateFileList = useCallback(
-    (newFileList: UploadFile[], file?: UploadFile) => {
-      setFileList(newFileList, file)
-    },
-    [setFileList]
+  useEffect(() => {
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, formItemControl?.shakeTrigger])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => triggerRef.current?.focus(),
+      submit: () => controllerRef.current.submit(),
+      abort: (uid) => controllerRef.current.abort(uid),
+      retry: (file) => controllerRef.current.retry(file)
+    }),
+    []
   )
 
-  const handleClick = () => {
-    if (disabled) return
+  const openPicker = useCallback(() => {
+    if (effectiveDisabled) return
     inputRef.current?.click()
-  }
+  }, [effectiveDisabled])
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.stopPropagation()
     const files = Array.from(event.target.files || [])
-    await processFiles(files)
-    // Reset input value to allow selecting the same file again
-    if (event.target) {
-      event.target.value = ''
-    }
+    await controllerRef.current.processFiles(files)
+    event.target.value = ''
   }
 
-  const processFiles = async (incomingFiles: File[]) => {
-    if (incomingFiles.length === 0) return
-
-    const prepared = await prepareUploadFiles({
-      currentCount: fileList.length,
-      incomingFiles,
-      limit,
-      accept,
-      maxSize,
-      beforeUpload
-    })
-
-    if (prepared.rejectedExceedFiles.length > 0) {
-      onExceed?.(prepared.rejectedExceedFiles, fileList)
-    }
-
-    // Important: fileList is a snapshot (state/props). Use a local accumulator
-    // to avoid overwriting previous files when selecting multiple at once.
-    let nextFileList = [...fileList]
-
-    // Progress/success/error mutate the same uploadFile then notify with a new
-    // array so controlled parents (fileList + onChange) redraw. Upload onChange
-    // is (file, fileList); the extra arg is forwarded through the hook.
-    const notifyFileList = (file: UploadFile) => {
-      const nextList = [...nextFileList]
-      updateFileList(nextList, file)
-    }
-
-    for (const file of prepared.acceptedFiles) {
-      const uploadFile = fileToUploadFile(file)
-
-      // Add to file list
-      nextFileList = [...nextFileList, uploadFile]
-      updateFileList(nextFileList, uploadFile)
-
-      if (autoUpload && !queue) {
-        await uploadOne(file, uploadFile, () => notifyFileList(uploadFile))
-      }
-    }
-
-    if (autoUpload && queue) {
-      const queueItems = prepared.acceptedFiles.map((file) =>
-        createUploadQueueItem(file, nextFileList.find((item) => item.file === file)?.uid, chunkSize)
-      )
-      onQueueChange?.(queueItems)
-      await runUploadQueue(
-        queueItems,
-        async (item) => {
-          const uploadFile = nextFileList.find((candidate) => candidate.uid === item.id)
-          if (!uploadFile) return
-          await uploadOne(item.file, uploadFile, () => notifyFileList(uploadFile))
-        },
-        { concurrency: maxConcurrent, onChange: onQueueChange }
-      )
-    }
-  }
-
-  const uploadOne = async (
-    file: File,
-    uploadFile: UploadFile,
-    notify: () => void
-  ): Promise<void> => {
-    uploadFile.status = 'uploading'
-    notify()
-
-    if (!customRequest) {
-      uploadFile.progress = 100
-      uploadFile.status = 'success'
-      notify()
-      return
-    }
-
-    const chunks = chunkSize ? createUploadChunks(file, chunkSize) : []
-    const resumeKey = resumable ? getUploadResumeKey(file) : undefined
-
-    if (chunks.length <= 1) {
-      await requestUpload(file, uploadFile, notify, { resumeKey })
-      return
-    }
-
-    for (const chunk of chunks) {
-      const chunkFile = new File([chunk.blob], file.name, {
-        type: file.type,
-        lastModified: file.lastModified
-      })
-      await requestUpload(chunkFile, uploadFile, notify, {
-        originalFile: file,
-        chunk,
-        totalChunks: chunks.length,
-        resumeKey
-      })
-    }
-
-    uploadFile.progress = 100
-    uploadFile.status = 'success'
-    onSuccess?.({ chunks: chunks.length, resumeKey }, uploadFile)
-    notify()
-  }
-
-  const requestUpload = (
-    file: File,
-    uploadFile: UploadFile,
-    notify: () => void,
-    options: {
-      originalFile?: File
-      chunk?: ReturnType<typeof createUploadChunks>[number]
-      totalChunks?: number
-      resumeKey?: string
-    }
-  ): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      customRequest?.({
-        file,
-        originalFile: options.originalFile,
-        chunk: options.chunk,
-        chunkIndex: options.chunk?.index,
-        totalChunks: options.totalChunks,
-        resumeKey: options.resumeKey,
-        onProgress: (progress: number) => {
-          const nextProgress = options.chunk
-            ? Math.round(
-                ((options.chunk.index + progress / 100) / (options.totalChunks ?? 1)) * 100
-              )
-            : progress
-          uploadFile.progress = nextProgress
-          if (options.chunk) {
-            onChunkProgress?.(options.chunk, progress, uploadFile)
-          }
-          onProgress?.(nextProgress, uploadFile)
-          notify()
-        },
-        onSuccess: (response: unknown) => {
-          if (!options.chunk) {
-            uploadFile.status = 'success'
-            uploadFile.progress = 100
-            onSuccess?.(response, uploadFile)
-            notify()
-          }
-          resolve()
-        },
-        onError: (error: Error) => {
-          uploadFile.status = 'error'
-          uploadFile.error = error.message
-          onError?.(error, uploadFile)
-          notify()
-          reject(error)
-        }
-      })
-    })
-  }
-
-  const handleRemove = (file: UploadFile) => {
-    const newFileList = fileList.filter((f) => f.uid !== file.uid)
-
-    const removeResult = onRemove?.(file, newFileList)
-    if (removeResult === false) return
-
-    updateFileList(newFileList, file)
+  const handleRemove = async (file: UploadFile) => {
+    if (effectiveDisabled) return
+    await controllerRef.current.remove(file)
   }
 
   const handlePreview = (file: UploadFile) => {
-    onPreview?.(file)
-  }
-
-  const handleDragOver = (event: React.DragEvent) => {
-    const result = handleUploadDragOver(event, disabled)
-    if (!result.handled) return
-    setIsDragging(result.isDragging)
-  }
-
-  const handleDragKeyDown = (event: React.KeyboardEvent) => {
-    if (disabled) return
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      handleClick()
+    if (effectiveDisabled) return
+    if (onPreview) {
+      onPreview(file)
+      return
     }
+    const url = previewUrls.current.get(file)
+    if (url) setPreviewSrc(url)
   }
 
-  const handleDragLeave = (event: React.DragEvent) => {
-    const result = handleUploadDragLeave(event, disabled)
-    if (!result.handled) return
-    setIsDragging(result.isDragging)
+  const handleFocusOut = (event: React.FocusEvent<HTMLDivElement>) => {
+    onBlur?.(event)
+    const next = event.relatedTarget as Node | null
+    if (next && event.currentTarget.contains(next)) return
+    formItemControl?.onBlur?.()
   }
 
-  const handleDrop = async (event: React.DragEvent) => {
-    const result = handleUploadDrop(event, disabled)
-    if (!result.handled) return
-    setIsDragging(result.isDragging)
-
-    await processFiles(result.files)
+  const triggerAria = {
+    id: triggerId,
+    'aria-invalid': status === 'error' ? true : divProps['aria-invalid'],
+    'aria-required': formItemControl?.required || divProps['aria-required'] ? true : undefined,
+    'aria-describedby': describedBy,
+    'aria-labelledby': labelledby,
+    'aria-controls': inputId
   }
 
-  const renderUploadButton = () => {
+  const renderTrigger = () => {
     if (drag) {
       return (
         <div
-          className={getDragAreaClasses(isDragging, disabled)}
-          onClick={handleClick}
-          onKeyDown={handleDragKeyDown}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
+          ref={triggerRef as React.RefObject<HTMLDivElement>}
+          className={getDragAreaClasses(isDragging, effectiveDisabled)}
+          onClick={openPicker}
+          onKeyDown={(event) => {
+            if (effectiveDisabled) return
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              openPicker()
+            }
+          }}
+          onDragOver={(event) => {
+            const result = handleUploadDragOver(event, effectiveDisabled)
+            if (!result.handled) return
+            setIsDragging(result.isDragging)
+          }}
+          onDragLeave={(event) => {
+            const result = handleUploadDragLeave(event, effectiveDisabled, event.currentTarget)
+            if (!result.handled) return
+            setIsDragging(result.isDragging)
+          }}
+          onDrop={async (event) => {
+            const result = handleUploadDrop(event, effectiveDisabled)
+            if (!result.handled) return
+            setIsDragging(false)
+            const read = readUploadDropFiles(event.dataTransfer)
+            if (read.rejectedDirectories.length > 0) {
+              onReject?.(
+                read.rejectedDirectories.map((file) => ({ file, reason: 'directory' as const }))
+              )
+            }
+            await controllerRef.current.processFiles(read.files)
+          }}
           role="button"
-          tabIndex={disabled ? -1 : 0}
-          aria-disabled={disabled}
-          aria-label={labels.dragAreaAriaLabel}>
+          tabIndex={effectiveDisabled ? -1 : 0}
+          aria-disabled={effectiveDisabled}
+          aria-label={children ? undefined : labels.dragAreaAriaLabel}
+          {...triggerAria}>
           {children || (
             <>
-              <svg
-                className="w-12 h-12 mb-3 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                />
-              </svg>
+              <Icon
+                name="upload"
+                className="w-12 h-12 mb-3 text-[var(--tiger-text-muted,#9ca3af)]"
+                aria-hidden
+              />
               <p className="mb-2 text-sm">
                 <span className="font-semibold">{labels.clickToUploadText}</span>{' '}
                 {labels.dragAndDropText}
               </p>
               {accept && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
                   {interpolateUploadLabel(labels.acceptInfoText, { accept })}
                 </p>
               )}
-              {maxSize && (
-                <p className="text-xs text-gray-500">
+              {maxSize ? (
+                <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
                   {interpolateUploadLabel(labels.maxSizeInfoText, {
                     maxSize: formatFileSize(maxSize)
                   })}
                 </p>
-              )}
+              ) : null}
             </>
           )}
         </div>
@@ -394,215 +427,194 @@ export const Upload: React.FC<UploadProps> = ({
     }
 
     return (
-      <button
+      <Button
+        ref={triggerRef as React.RefObject<HTMLButtonElement>}
         type="button"
-        className={getUploadButtonClasses(disabled)}
-        onClick={handleClick}
-        disabled={disabled}
-        aria-label={labels.buttonAriaLabel}>
+        variant="outline"
+        size="sm"
+        disabled={effectiveDisabled}
+        onClick={openPicker}
+        aria-label={children ? undefined : labels.buttonAriaLabel}
+        {...triggerAria}>
         {children || labels.selectFileText}
-      </button>
+      </Button>
     )
   }
 
-  const renderFileList = () => {
-    if (!showFileList || fileList.length === 0) {
-      return null
-    }
-
-    if (listType === 'picture-card') {
-      return (
-        <div className="flex flex-wrap gap-2 mt-4">
-          {fileList.map((file) => renderPictureCard(file))}
+  const renderProgress = (file: UploadFile, errorId?: string) => (
+    <>
+      {file.status === 'uploading' ? (
+        <div
+          className={uploadProgressTrackClasses}
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={file.progress ?? 0}>
+          <div className={uploadProgressValueClasses} style={{ width: `${file.progress ?? 0}%` }} />
         </div>
-      )
-    }
+      ) : null}
+      {file.status === 'error' && file.error ? (
+        <p id={errorId} className="text-xs text-[var(--tiger-error,#dc2626)]">
+          {file.error}
+        </p>
+      ) : null}
+    </>
+  )
 
+  const renderActions = (file: UploadFile, picture: boolean) => {
+    const canPreview = Boolean(onPreview) || Boolean(previewUrls.current.get(file))
     return (
-      <ul className="mt-4 space-y-2" role="list" aria-label={labels.uploadedFilesAriaLabel}>
-        {fileList.map((file) => renderFileItem(file))}
-      </ul>
-    )
-  }
-
-  const renderFileItem = (file: UploadFile) => {
-    return (
-      <li key={file.uid} className={getFileListItemClasses(file.status)}>
-        <div className="flex items-center flex-1 min-w-0">
-          {/* File icon */}
-          <svg
-            className="w-5 h-5 mr-2 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          {/* File name and size */}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{file.name}</p>
-            {file.size && <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>}
-          </div>
-        </div>
-        {/* Actions */}
-        <div className="flex items-center space-x-2 ml-4">
-          {/* Status icon */}
-          {file.status === 'success' && (
-            <svg
-              className={getUploadStatusIconClasses('success', 'sm')}
-              fill="currentColor"
-              viewBox={icon20ViewBox}
-              aria-label={labels.successAriaLabel}>
-              <path fillRule="evenodd" d={successCircleSolidIcon20PathD} clipRule="evenodd" />
-            </svg>
-          )}
-          {file.status === 'error' && (
-            <svg
-              className={getUploadStatusIconClasses('error', 'sm')}
-              fill="currentColor"
-              viewBox={icon20ViewBox}
-              aria-label={labels.errorAriaLabel}>
-              <path fillRule="evenodd" d={errorCircleSolidIcon20PathD} clipRule="evenodd" />
-            </svg>
-          )}
-          {file.status === 'uploading' && (
-            <svg
-              className={getUploadStatusIconClasses('uploading', 'sm', {
-                spinning: true
-              })}
-              fill="none"
-              viewBox={spinnerSvg.viewBox}
-              aria-label={labels.uploadingAriaLabel}>
-              {spinnerSvg.elements.map((el, index) => {
-                if (el.type === 'circle') return <circle key={index} {...el.attrs} />
-                if (el.type === 'path') return <path key={index} {...el.attrs} />
-                return null
-              })}
-            </svg>
-          )}
-          {/* Remove button */}
+      <>
+        {canPreview ? (
           <button
             type="button"
-            className="text-gray-400 hover:text-red-500 transition-colors"
-            onClick={() => handleRemove(file)}
-            aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, {
+            className={
+              picture
+                ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
+                : uploadIconActionClasses
+            }
+            disabled={effectiveDisabled}
+            tabIndex={effectiveDisabled ? -1 : 0}
+            onClick={() => handlePreview(file)}
+            aria-label={interpolateUploadLabel(labels.previewFileAriaLabel, {
               fileName: file.name
             })}>
-            <svg className="w-5 h-5" fill="currentColor" viewBox={icon20ViewBox} aria-hidden="true">
-              <path fillRule="evenodd" d={closeSolidIcon20PathD} clipRule="evenodd" />
-            </svg>
+            <Icon name="eye" className={picture ? 'w-6 h-6' : 'w-5 h-5'} aria-hidden />
           </button>
+        ) : null}
+        <button
+          type="button"
+          className={
+            picture
+              ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
+              : uploadIconActionClasses
+          }
+          disabled={effectiveDisabled}
+          tabIndex={effectiveDisabled ? -1 : 0}
+          onClick={() => handleRemove(file)}
+          aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, { fileName: file.name })}>
+          <Icon
+            name={picture ? 'trash' : 'close'}
+            className={picture ? 'w-6 h-6' : 'w-5 h-5'}
+            aria-hidden
+          />
+        </button>
+      </>
+    )
+  }
+
+  const renderTextItem = (file: UploadFile) => {
+    const errorId = file.status === 'error' && file.error ? `${file.uid}-error` : undefined
+    const thumb = listType === 'picture' ? previewUrls.current.get(file) : undefined
+    return (
+      <li key={file.uid} className={getFileListItemClasses(file.status)} aria-describedby={errorId}>
+        <div className="flex items-center flex-1 min-w-0 gap-2">
+          {listType === 'picture' ? (
+            thumb ? (
+              <img src={thumb} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+            ) : (
+              <Icon name="document" className="w-5 h-5 flex-shrink-0" aria-hidden />
+            )
+          ) : (
+            <Icon name="document" className="w-5 h-5 flex-shrink-0" aria-hidden />
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{file.name}</p>
+            {file.size != null ? (
+              <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
+                {formatFileSize(file.size)}
+              </p>
+            ) : null}
+            {renderProgress(file, errorId)}
+          </div>
+        </div>
+        <div className={uploadItemActionsClasses}>
+          <UploadStatusIcon status={file.status} labels={labels} size="sm" />
+          {renderActions(file, false)}
         </div>
       </li>
     )
   }
 
   const renderPictureCard = (file: UploadFile) => {
-    let imageUrl = file.url ?? ''
-    if (
-      !imageUrl &&
-      file.file &&
-      typeof URL !== 'undefined' &&
-      typeof URL.createObjectURL === 'function'
-    ) {
-      imageUrl = objectUrlsRef.current.get(file.file) ?? ''
-      if (!imageUrl) {
-        imageUrl = URL.createObjectURL(file.file)
-        objectUrlsRef.current.set(file.file, imageUrl)
-      }
-    }
-
+    const imageUrl = previewUrls.current.get(file)
+    const errorId = file.status === 'error' && file.error ? `${file.uid}-error` : undefined
     return (
-      <div key={file.uid} className={getPictureCardClasses(file.status)}>
-        {/* Image preview */}
-        {imageUrl && <img src={imageUrl} alt={file.name} className="w-full h-full object-cover" />}
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100">
-          {/* Preview button */}
-          <button
-            type="button"
-            className="text-white hover:text-blue-200 transition-colors"
-            onClick={() => handlePreview(file)}
-            aria-label={interpolateUploadLabel(labels.previewFileAriaLabel, {
-              fileName: file.name
-            })}>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-            </svg>
-          </button>
-          {/* Remove button */}
-          <button
-            type="button"
-            className="text-white hover:text-red-200 transition-colors"
-            onClick={() => handleRemove(file)}
-            aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, {
-              fileName: file.name
-            })}>
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path
-                fillRule="evenodd"
-                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+      <div key={file.uid} className={getPictureCardClasses(file.status)} aria-describedby={errorId}>
+        <div className={uploadPictureImageWrapClasses}>
+          {imageUrl ? (
+            <img src={imageUrl} alt={file.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center px-2 text-xs text-center text-[var(--tiger-text-muted,#6b7280)]">
+              {file.name}
+            </span>
+          )}
         </div>
-        {/* Status indicator */}
-        {file.status === 'uploading' && (
-          <div className="absolute inset-0 bg-white/75 flex items-center justify-center">
-            <svg
-              className={getUploadStatusIconClasses('uploading', 'lg', {
-                spinning: true
-              })}
-              fill="none"
-              viewBox={spinnerSvg.viewBox}>
-              {spinnerSvg.elements.map((el, index) => {
-                if (el.type === 'circle') return <circle key={index} {...el.attrs} />
-                if (el.type === 'path') return <path key={index} {...el.attrs} />
-                return null
-              })}
-            </svg>
+        <div className={uploadPictureOverlayClasses}>{renderActions(file, true)}</div>
+        {file.status === 'uploading' ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--tiger-surface,#ffffff)]/80">
+            <UploadStatusIcon status="uploading" labels={labels} size="lg" />
+            {renderProgress(file)}
           </div>
-        )}
+        ) : null}
+        {file.status === 'error' && file.error ? (
+          <p
+            id={errorId}
+            className="absolute bottom-1 inset-x-1 text-[10px] text-[var(--tiger-error,#dc2626)] truncate">
+            {file.error}
+          </p>
+        ) : null}
       </div>
     )
   }
 
+  const renderFileList = () => {
+    if (!showFileList || fileList.length === 0) return null
+    if (listType === 'picture-card') {
+      return <div className={uploadPictureListClasses}>{fileList.map(renderPictureCard)}</div>
+    }
+    return (
+      <ul className={uploadListClasses} role="list" aria-label={labels.uploadedFilesAriaLabel}>
+        {fileList.map(renderTextItem)}
+      </ul>
+    )
+  }
+
   return (
-    <div {...divProps} className={classNames('tiger-upload', className)} style={style}>
+    <div
+      {...divProps}
+      ref={rootRef}
+      className={classNames('tiger-upload', className)}
+      style={style}
+      onBlur={handleFocusOut}>
       <input
         ref={inputRef}
+        id={inputId}
         type="file"
         accept={accept}
         multiple={multiple}
-        disabled={disabled}
-        style={{ display: 'none' }}
+        disabled={effectiveDisabled}
+        className={uploadFileInputClasses}
         onChange={handleFileChange}
         aria-hidden="true"
+        tabIndex={-1}
       />
-      {renderUploadButton()}
+      {fieldName
+        ? fileList.map((file) => (
+            <input key={file.uid} type="hidden" name={fieldName} value={file.url ?? file.uid} />
+          ))
+        : null}
+      {renderTrigger()}
       {renderFileList()}
+      {previewSrc ? (
+        <ImagePreview
+          images={[previewSrc]}
+          open
+          onOpenChange={(open) => !open && setPreviewSrc(null)}
+        />
+      ) : null}
     </div>
   )
-}
+})
+
+Upload.displayName = 'Upload'

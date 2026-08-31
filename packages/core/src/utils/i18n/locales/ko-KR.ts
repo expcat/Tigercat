@@ -206,6 +206,8 @@ export const koKR: TigerLocale = {
     resizeHandleW: '왼쪽',
     loadingCropImageAriaLabel: '자를 이미지 불러오는 중',
     loadErrorAriaLabel: '자를 이미지를 불러오지 못했습니다',
+    fileTooLargeText: '파일 크기가 {maxSize}을(를) 초과합니다',
+    fileTypeRejectedText: '이 파일 형식은 허용되지 않습니다',
     annotationToolbarAriaLabel: '주석 도구',
     annotationEditorAriaLabel: '이미지 주석 편집기',
     annotationCanvasAriaLabel: '이미지 주석 캔버스',
@@ -334,7 +336,8 @@ export const koKR: TigerLocale = {
     searchAriaLabel: '{title} 검색',
     itemsAriaLabel: '{title} 항목',
     moveToTargetAriaLabel: '선택 항목을 대상으로 이동',
-    moveToSourceAriaLabel: '선택 항목을 소스로 이동'
+    moveToSourceAriaLabel: '선택 항목을 소스로 이동',
+    selectAllAriaLabel: '{title} 모두 선택'
   },
   chart: {
     legendAriaLabel: '차트 범례',

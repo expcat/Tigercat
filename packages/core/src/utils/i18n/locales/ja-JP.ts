@@ -206,6 +206,8 @@ export const jaJP: TigerLocale = {
     resizeHandleW: '左',
     loadingCropImageAriaLabel: '切り抜き用の画像を読み込み中',
     loadErrorAriaLabel: '切り抜き用の画像を読み込めませんでした',
+    fileTooLargeText: 'ファイルサイズが {maxSize} を超えています',
+    fileTypeRejectedText: 'このファイル形式は受け付けられません',
     annotationToolbarAriaLabel: '注釈ツール',
     annotationEditorAriaLabel: '画像注釈エディタ',
     annotationCanvasAriaLabel: '画像注釈キャンバス',
@@ -334,7 +336,8 @@ export const jaJP: TigerLocale = {
     searchAriaLabel: '{title} を検索',
     itemsAriaLabel: '{title} の項目',
     moveToTargetAriaLabel: '選択項目をターゲットへ移動',
-    moveToSourceAriaLabel: '選択項目をソースへ移動'
+    moveToSourceAriaLabel: '選択項目をソースへ移動',
+    selectAllAriaLabel: '{title}をすべて選択'
   },
   chart: {
     legendAriaLabel: 'グラフの凡例',
