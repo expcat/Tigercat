@@ -332,6 +332,18 @@ export const COMPONENT_PROP_PRIORITY = {
   MaskInput: ['mask', 'value?', 'tokens?', 'clearable?', 'disabled?', 'name?'],
   InputOTP: ['length?', 'value?', 'type?', 'masked?', 'groups?', 'disabled?'],
   TagsInput: ['value?', 'max?', 'delimiters?', 'allowDuplicates?', 'addOnBlur?', 'clearable?'],
+  Upload: [
+    'fileList?',
+    'drag?',
+    'listType?',
+    'customRequest?',
+    'action?',
+    'autoUpload?',
+    'disabled?',
+    'maxSize?'
+  ],
+  Transfer: ['dataSource?', 'value?', 'targetKeys?', 'searchable?', 'disabled?'],
+  CropUpload: ['accept?', 'maxSize?', 'cropperProps?', 'onCropComplete?', 'disabled?'],
   ColorSwatch: [
     'value?',
     'defaultValue?',
@@ -520,7 +532,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Mentions: '<Mentions v-model="value" :options="options" />',
     MaskInput: '<MaskInput v-model="value" mask="##/##/####" />',
     InputOTP: '<InputOTP v-model="value" />',
-    TagsInput: '<TagsInput v-model="tags" />'
+    TagsInput: '<TagsInput v-model="tags" />',
+    Upload: '<Upload v-model:file-list="fileList" />',
+    Transfer: '<Transfer v-model="targetKeys" :data-source="dataSource" />',
+    CropUpload: '<CropUpload @crop-complete="onCropComplete" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -579,7 +594,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Mentions: '<Mentions value={value} options={options} onChange={setValue} />',
     MaskInput: '<MaskInput value={value} mask="##/##/####" onChange={(raw) => setValue(raw)} />',
     InputOTP: '<InputOTP value={value} onChange={setValue} />',
-    TagsInput: '<TagsInput value={tags} onChange={setTags} />'
+    TagsInput: '<TagsInput value={tags} onChange={setTags} />',
+    Upload: '<Upload fileList={fileList} onChange={(file, next) => setFileList(next)} />',
+    Transfer: '<Transfer value={targetKeys} dataSource={dataSource} onChange={setTargetKeys} />',
+    CropUpload: '<CropUpload onCropComplete={onCropComplete} />'
   }
 }
 

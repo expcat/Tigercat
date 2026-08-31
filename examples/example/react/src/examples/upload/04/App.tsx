@@ -7,10 +7,15 @@ export default function App() {
   const [files, setFiles] = useState<UploadFile[]>([])
 
   const upload = (options: UploadRequestOptions) => {
-    window.setTimeout(() => {
-      options.onProgress?.(100)
-      options.onSuccess?.({ name: options.file.name })
-    }, 600)
+    let progress = 0
+    const timer = window.setInterval(() => {
+      progress += 25
+      options.onProgress?.(Math.min(progress, 100))
+      if (progress >= 100) {
+        window.clearInterval(timer)
+        options.onSuccess?.({ name: options.file.name })
+      }
+    }, 200)
   }
 
   return (

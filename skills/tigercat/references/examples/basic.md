@@ -50,6 +50,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | Button       | `<Button html-type="submit">Save</Button>`                                                           | `<Button htmlType="submit">Save</Button>`                                                            |
 | ButtonGroup  | `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>` | `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>` |
 | Code         | `<Code code="const n = 1" />`                                                                        | `<Code code="const n = 1" />`                                                                        |
+| CropUpload   | `<CropUpload @crop-complete="onCropComplete" />`                                                     | `<CropUpload onCropComplete={onCropComplete} />`                                                     |
 | Highlight    | `<Highlight keywords="Vue">Learn Vue</Highlight>`                                                    | `<Highlight keywords="Vue">Learn Vue</Highlight>`                                                    |
 | Icon         | `<Icon name="search" />`                                                                             | `<Icon name="search" />`                                                                             |
 | Image        | `<Image src="..." alt="..." />`                                                                      | `<Image src="..." alt="..." />`                                                                      |
@@ -68,6 +69,6 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | Text         | `<Text tag="h1" align="start">Title</Text>`                                                          | `<Text tag="h1" align="start">Title</Text>`                                                          |
 | Watermark    | `<Watermark content="机密" />`                                                                       | `<Watermark content="机密" />`                                                                       |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, ConfigProvider, CropUpload, Divider, Empty, ImageGroup, SplitButton.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, ConfigProvider, Divider, Empty, ImageGroup, SplitButton.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

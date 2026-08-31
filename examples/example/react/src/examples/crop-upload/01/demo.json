@@ -1,7 +1,7 @@
 {
   "id": "crop-upload-01",
   "title": "基础约束",
-  "description": "单个实例组合展示方形裁剪、2 MB 文件限制、结果预览与错误处理。",
+  "description": "选择图片后弹层裁剪。确认要等图 ready，产出带原名的 File。虚线框可以 drop，但不走 Upload action。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

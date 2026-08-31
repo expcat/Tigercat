@@ -4,6 +4,9 @@
 
 ## 未发布
 
+- **Upload**：选文件 / 校验 / 请求 / 中止下沉 core。不传 `action` 且不传 `customRequest` 时列表停在 `ready`，不再假成功。`autoUpload={false}` 必须 `submit()`。进行中 Remove 不会把项写回。FormItem 写入 `UploadFile[]`。`picture` 是带缩略图的文本行。Vue 导出 `UploadProps`，React `UploadRef` 含 `submit` / `abort`。
+- **Transfer**：勾选 / 全选 / 移动下沉 core。补非受控 `defaultValue`；右侧按 `targetKeys` 顺序。面板是 checkbox 组（带头上全选），不再是 listbox 套 checkbox。默认渲染并过滤 `description`。读 FormItem。假 `--tiger-transfer-*` 删掉。Vue 导出 `TransferProps`。
+- **CropUpload**：object URL + generation，确认钮等 cropper `onReady`。`CropResult.file` 带原名。触发器是 `<label>`；有可见 children 时不再盖英文 `aria-label`。footer 只留 Modal 一层 chrome。
 - **Mentions**：省略 `value` 能打字（`undefined` 非受控，`''` 是空正文）。过滤/插入/开合下沉 core；插入用 textarea 当前值。读 FormItem；textarea 是 combobox；弹层 overlay-host + `fullscreen-sm`。默认过滤匹配 label 和 value。删除假 `--tiger-mentions-*`。
 - **MaskInput**：chrome 与 Input 同层（clear 在内、error 在下，可同时有）。`/g` token 不跳字。`disabled` 时 hidden 不提交。读 FormItem；React `forwardRef`。Clear 走 `locale.input`。
 - **InputOTP**：一个 Tab 停；方向键读 `dir`。多字只在第一格/autofill 时整段覆盖。读 FormItem；id/aria 在当前格。`pattern` 改 `inputMode`。

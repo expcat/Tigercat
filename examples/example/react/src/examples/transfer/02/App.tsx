@@ -10,11 +10,6 @@ const dataSource: TransferItem[] = [
   { key: 'observability', label: '监控服务', description: '核心运维' }
 ]
 
-const filterOption = (inputValue: string, item: TransferItem) => {
-  const keywords = `${item.label} ${item.description ?? ''}`.toLowerCase()
-  return keywords.includes(inputValue.trim().toLowerCase())
-}
-
 export default function ControlledTransferExample() {
   const [targetKeys, setTargetKeys] = useState<Array<string | number>>(['observability'])
   const [searchValue, setSearchValue] = useState<TransferSearchValue>({})
@@ -31,14 +26,13 @@ export default function ControlledTransferExample() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500">搜索“核心”可同时匹配名称和 description。</p>
+      <p className="text-sm text-gray-500">默认过滤会匹配名称和 description，例如搜「核心」。</p>
       <Transfer
         value={targetKeys}
         dataSource={dataSource}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
         onChange={handleChange}
-        filterOption={filterOption}
         searchable
         size="sm"
         sourceTitle="待分配服务"

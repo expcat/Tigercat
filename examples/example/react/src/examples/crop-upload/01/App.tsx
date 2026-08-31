@@ -16,6 +16,9 @@ export default function App() {
           onError={(value) => setError(value.message)}
         />
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {result ? (
+          <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">{result.file.name}</p>
+        ) : null}
         {result ? <img src={result.dataUrl} className="max-w-48 rounded" alt="裁剪结果" /> : null}
       </div>
     </>

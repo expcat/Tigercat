@@ -55,8 +55,8 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | TagsInput       | `<TagsInput v-model="tags" />`                                                                              | `<TagsInput value={tags} onChange={setTags} />`                                                             |
 | Textarea        | `<Textarea v-model="value" :rows="4" />`                                                                    | `<Textarea value={value} onChange={(event) => setValue(event.target.value)} />`                             |
 | TimePicker      | `<TimePicker v-model="value" />`                                                                            | `<TimePicker value={value} onChange={setValue} />`                                                          |
+| Transfer        | `<Transfer v-model="targetKeys" :data-source="dataSource" />`                                               | `<Transfer value={targetKeys} dataSource={dataSource} onChange={setTargetKeys} />`                          |
 | TreeSelect      | `<TreeSelect v-model="value" :tree-data="treeData" />`                                                      | `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`                      |
-
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Transfer, Upload.
+| Upload          | `<Upload v-model:file-list="fileList" />`                                                                   | `<Upload fileList={fileList} onChange={(file, next) => setFileList(next)} />`                               |
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

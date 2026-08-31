@@ -16,6 +16,9 @@ const error = ref('')
         @crop-complete="result = $event"
         @error="error = $event.message" />
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+      <p v-if="result" class="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+        {{ result.file.name }}
+      </p>
       <img v-if="result" :src="result.dataUrl" class="max-w-48 rounded" alt="裁剪结果" />
     </div>
   </div>

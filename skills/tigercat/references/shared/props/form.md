@@ -428,14 +428,17 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## Transfer
 
-`packages/core/src/types/transfer.ts` · `TransferProps` · 4/15 props
+`packages/core/src/types/transfer.ts` · `TransferProps` · 7/21 props
 
-| Prop          | Type                   | Default | Notes                                                   |
-| ------------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `dataSource?` | `TransferItem[]`       | `-`     | All available data items                                |
-| `disabled?`   | `boolean`              | `-`     | Whether the component is disabled                       |
-| `value?`      | `(string \| number)[]` | `-`     | Controlled target keys                                  |
-| `locale?`     | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
+| Prop          | Type                   | Default | Notes                                                                                      |
+| ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `dataSource?` | `TransferItem[]`       | `-`     | All available data items                                                                   |
+| `value?`      | `(string \| number)[]` | `-`     | Controlled target keys. `undefined` is uncontrolled; `[]` is a real empty target list.     |
+| `targetKeys?` | `(string \| number)[]` | `-`     | Keys of items in the right (target) list. Alias of `value` with lower priority. Both se... |
+| `searchable?` | `boolean`              | `-`     | Whether to show search input in each panel                                                 |
+| `disabled?`   | `boolean`              | `-`     | Whether the component is disabled                                                          |
+| `name?`       | `string`               | `-`     | Native form field name. Each target key is one hidden input.                               |
+| `locale?`     | `Partial<TigerLocale>` | `-`     | Locale overlay merged on ConfigProvider locale                                             |
 
 ## TreeSelect
 
@@ -456,12 +459,17 @@ Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined
 
 ## Upload
 
-`packages/core/src/types/upload.ts` · `UploadProps` · 3/20 props
+`packages/core/src/types/upload.ts` · `UploadProps` · 8/28 props
 
-| Prop        | Type                   | Default | Notes                                               |
-| ----------- | ---------------------- | ------- | --------------------------------------------------- |
-| `disabled?` | `boolean`              | `false` | Whether the upload is disabled                      |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for Upload UI text.                |
-| `accept?`   | `string`               | `-`     | Accepted file types (same as HTML accept attribute) |
+| Prop             | Type                                                                | Default  | Notes                                                                                      |
+| ---------------- | ------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `fileList?`      | `UploadFile[]`                                                      | `-`      | Controlled file list. `undefined` is uncontrolled; `[]` is a real empty list.              |
+| `drag?`          | `boolean`                                                           | `false`  | Whether to enable drag and drop                                                            |
+| `listType?`      | `UploadListType`                                                    | `'text'` | List type for displaying files                                                             |
+| `customRequest?` | `(options: UploadRequestOptions) => void \| { abort?: () => void }` | `-`      | Custom upload request. Return `{ abort }` or call `options.onAbort` in the same tick so... |
+| `action?`        | `string`                                                            | `-`      | Upload URL. Used when `customRequest` is omitted. Posts `FormData` with the file under...  |
+| `autoUpload?`    | `boolean`                                                           | `true`   | Whether to start uploading as soon as files are accepted. When `false`, files stay `rea... |
+| `disabled?`      | `boolean`                                                           | `false`  | Whether the upload is disabled                                                             |
+| `maxSize?`       | `number`                                                            | `-`      | Maximum file size in bytes. `undefined` or `0` means no limit.                             |
 
-Events/callback props: `onQueueChange?`, `onChunkProgress?`, `onChange?`, `onRemove?`, `onPreview?`, `onProgress?`, ....
+Events/callback props: `onQueueChange?`, `onChunkProgress?`, `onChange?`, `onRemove?`, `onReject?`, `onPreview?`, ....

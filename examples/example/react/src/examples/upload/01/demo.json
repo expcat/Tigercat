@@ -1,7 +1,7 @@
 {
   "id": "upload-01",
   "title": "基础约束",
-  "description": "一个受控 Upload 组合图片类型、2 MB 大小、最多三项和多选约束。",
+  "description": "FormItem 里的受控列表。不传 action / customRequest 时文件停在 ready，不会假装上传成功。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

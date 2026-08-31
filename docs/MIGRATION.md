@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Upload 不传 `action` 也不传 `customRequest` 时文件停在 `ready`，不再标 `success`。`autoUpload={false}` 用 ref / expose 的 `submit()`。React `onChange` 仍是 `(file, fileList)`，FormItem 写入的是第二参列表。`listType="picture"` 现在是带缩略图的文本行。隐藏 file input 改 `sr-only`，不要再给它 `name`。
+
+Transfer 省略 `value` / `targetKeys` 时移动会改两栏。`1` 与 `'1'` 是同一 key。面板不再是 `listbox`/`option`。React `onChange` 第一参仍是目标键数组。Vue 主入口导出 `TransferProps`。
+
+CropUpload 确认结果带 `file`（原文件名）。触发器是 `<label>` 不是 `div role=button`。自定义 trigger 不要再包一层 button。删除 example 站 `.tiger-crop-upload-modal` 覆写。
+
 Mentions 省略 `value` / `modelValue` 是非受控（不要再默认 `''`）；空正文才是 `''`。插入格式是 `prefix + option.value + 空格`，过滤同时匹配 `label` 和 `value`。新增 `defaultValue` / `open` / `onSearch` / `loading` / `filterOption` / `status`。弹层走 overlay-host。删除 `--tiger-mentions-*` 和 `getMentionsInputClasses`。Vue 导出 `MentionsProps` 与 `MentionOption`。
 
 MaskInput `v-model` 仍是 raw；`disabled` 时 hidden 不再提交。Clear 与 error 同时存在。自定义 token 的 `/g` 不再跳字。

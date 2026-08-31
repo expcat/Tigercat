@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
 
 const dataSource = [
@@ -9,17 +11,19 @@ const dataSource = [
 ]
 
 export default function App() {
-  const [targetKeys, setTargetKeys] = useState<(string | number)[]>(['frontend'])
+  const [model, setModel] = useState<{ team: (string | number)[] }>({ team: ['frontend'] })
 
   return (
-    <Transfer
-      dataSource={dataSource}
-      targetKeys={targetKeys}
-      onChange={setTargetKeys}
-      searchable
-      sourceTitle="可选团队"
-      targetTitle="已选团队"
-      className="max-w-2xl"
-    />
+    <Form model={model} onChange={setModel} labelPosition="top">
+      <FormItem name="team" label="团队">
+        <Transfer
+          dataSource={dataSource}
+          value={model.team}
+          onChange={(next) => setModel({ team: next })}
+          searchable
+          className="max-w-2xl"
+        />
+      </FormItem>
+    </Form>
   )
 }

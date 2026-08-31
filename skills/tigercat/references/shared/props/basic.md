@@ -122,13 +122,17 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 
 ## CropUpload
 
-`packages/core/src/types/image.ts` · `CropUploadProps` · 3/10 props
+`packages/core/src/types/image.ts` · `CropUploadProps` · 5/10 props
 
-| Prop        | Type                   | Default     | Notes                                                   |
-| ----------- | ---------------------- | ----------- | ------------------------------------------------------- |
-| `locale?`   | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
-| `disabled?` | `boolean`              | `false`     | Whether the component is disabled                       |
-| `accept?`   | `string`               | `'image/*'` | Accepted file types                                     |
+| Prop            | Type                                      | Default     | Notes                                                                                      |
+| --------------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `accept?`       | `string`                                  | `'image/*'` | Accepted file types                                                                        |
+| `maxSize?`      | `number`                                  | `-`         | Maximum file size in bytes                                                                 |
+| `cropperProps?` | `Partial<Omit<ImageCropperProps, 'src'>>` | `-`         | Props passed to the internal ImageCropper (`src` is owned by CropUpload). Outer `locale... |
+| `disabled?`     | `boolean`                                 | `false`     | Whether the component is disabled                                                          |
+| `locale?`       | `Partial<TigerLocale>`                    | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
+
+Events/callback props: `onCropComplete?`, `onError?`.
 
 ## Divider
 

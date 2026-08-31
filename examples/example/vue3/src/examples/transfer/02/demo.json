@@ -1,7 +1,7 @@
 {
   "id": "transfer-02",
   "title": "受控搜索与禁用项",
-  "description": "展示受控 searchValue、自定义 filterOption、禁用数据和带方向及 movedKeys 的移动回调。",
+  "description": "默认过滤匹配名称和 description。受控搜索、禁用项，以及带方向和 movedKeys 的移动回调。",
   "order": 2,
   "entry": "App.vue"
 }

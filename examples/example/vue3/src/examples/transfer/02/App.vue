@@ -15,11 +15,6 @@ const targetKeys = ref<Array<string | number>>(['observability'])
 const searchValue = ref<TransferSearchValue>({})
 const lastMove = ref('尚未移动项目')
 
-const filterOption = (inputValue: string, item: TransferItem) => {
-  const keywords = `${item.label} ${item.description ?? ''}`.toLowerCase()
-  return keywords.includes(inputValue.trim().toLowerCase())
-}
-
 const handleChange = (
   nextTargetKeys: Array<string | number>,
   direction: TransferDirection,
@@ -32,12 +27,11 @@ const handleChange = (
 
 <template>
   <div class="space-y-3">
-    <p class="text-sm text-gray-500">搜索“核心”可同时匹配名称和 description。</p>
+    <p class="text-sm text-gray-500">默认过滤会匹配名称和 description，例如搜「核心」。</p>
     <Transfer
       v-model="targetKeys"
       v-model:search-value="searchValue"
       :data-source="dataSource"
-      :filter-option="filterOption"
       searchable
       size="sm"
       source-title="待分配服务"

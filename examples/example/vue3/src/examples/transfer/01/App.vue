@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive } from 'vue'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
 
-const targetKeys = ref<(string | number)[]>(['frontend'])
+const model = reactive<{ team: (string | number)[] }>({ team: ['frontend'] })
 const dataSource = [
   { key: 'design', label: '设计' },
   { key: 'frontend', label: '前端' },
@@ -12,11 +14,9 @@ const dataSource = [
 </script>
 
 <template>
-  <Transfer
-    v-model:target-keys="targetKeys"
-    :data-source="dataSource"
-    searchable
-    source-title="可选团队"
-    target-title="已选团队"
-    class="max-w-2xl" />
+  <Form :model="model" label-position="top">
+    <FormItem name="team" label="团队">
+      <Transfer v-model="model.team" :data-source="dataSource" searchable class="max-w-2xl" />
+    </FormItem>
+  </Form>
 </template>
