@@ -4,10 +4,12 @@ import {
   coerceClassValue,
   mergeStyleValues,
   getCardClasses,
+  getCardCoverWrapperClasses,
   resolveCardPadding,
+  resolveCardRoot,
+  handleCardActivation,
   cardHeaderClasses,
   cardFooterClasses,
-  cardCoverWrapperClasses,
   cardCoverClasses,
   cardActionsClasses,
   cardDirectionClasses,
@@ -24,6 +26,7 @@ export interface VueCardProps {
   hoverable?: boolean
   cover?: string
   coverAlt?: string
+  href?: string
   padding?: boolean | string
   className?: string
   style?: Record<string, string | number>
@@ -33,73 +36,42 @@ export const Card = defineComponent({
   name: 'TigerCard',
   inheritAttrs: false,
   props: {
-    /**
-     * Card variant style
-     * @default 'default'
-     */
     variant: {
       type: String as PropType<CardVariant>,
       default: 'default' as CardVariant
     },
-    /**
-     * Card size (affects padding)
-     * @default 'md'
-     */
     size: {
       type: String as PropType<CardSize>,
       default: 'md' as CardSize
     },
-    /**
-     * Padding override for the card content sections. `false` removes the
-     * built-in padding; a string supplies a custom padding utility class.
-     * Takes precedence over `size`.
-     */
     padding: {
       type: [Boolean, String] as PropType<boolean | string>,
       default: undefined
     },
-    /**
-     * Whether the card is hoverable (shows hover effect)
-     * @default false
-     */
     hoverable: {
       type: Boolean,
       default: false
     },
-    /**
-     * Card layout direction
-     * @default 'vertical'
-     */
     direction: {
       type: String as PropType<CoreCardProps['direction']>,
       default: 'vertical'
     },
-    /**
-     * Cover image URL
-     */
     cover: {
       type: String,
       default: undefined
     },
-    /**
-     * Cover image alt text
-     */
     coverAlt: {
       type: String,
-      default: 'Card cover image'
+      default: ''
     },
-
-    /**
-     * Additional CSS classes
-     */
+    href: {
+      type: String,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
     },
-
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
@@ -107,70 +79,106 @@ export const Card = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const paddingClass = computed(() => resolveCardPadding(props.size, props.padding))
-
-    const cardClasses = computed(() =>
-      classNames(
-        getCardClasses(props.variant, props.hoverable),
-        cardDirectionClasses[props.direction],
-        !props.cover && paddingClass.value
-      )
-    )
-
     const isHorizontal = computed(() => props.direction === 'horizontal')
-
-    const sectionSizeClass = computed(() => (props.cover ? paddingClass.value : undefined))
-    const getSectionClasses = (baseClasses: string) =>
-      classNames(baseClasses, sectionSizeClass.value)
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
-      const attrsClass = attrsRecord.class
-      const attrsStyle = attrsRecord.style
+      const hasCover = Boolean(slots.cover) || Boolean(props.cover)
+      const nestedInteractive = Boolean(slots.actions)
+      const clickable = typeof attrsRecord.onClick === 'function' || Boolean(props.href?.trim())
+      const root = resolveCardRoot({
+        href: props.href,
+        clickable,
+        nestedInteractive
+      })
+      const cardClasses = classNames(
+        getCardClasses(props.variant, props.hoverable, clickable),
+        cardDirectionClasses[props.direction],
+        !hasCover && paddingClass.value,
+        props.className,
+        coerceClassValue(attrsRecord.class)
+      )
+
+      const coverNode = hasCover
+        ? h(
+            'div',
+            {
+              class: getCardCoverWrapperClasses(isHorizontal.value),
+              'data-tiger-card-cover': ''
+            },
+            slots.cover
+              ? slots.cover()
+              : [
+                  h('img', {
+                    src: props.cover,
+                    alt: props.coverAlt,
+                    class: cardCoverClasses
+                  })
+                ]
+          )
+        : null
+
+      const bodyChildren = [
+        slots.header ? h('div', { class: cardHeaderClasses }, slots.header()) : null,
+        slots.default ? h('div', {}, slots.default()) : null,
+        slots.footer ? h('div', { class: cardFooterClasses }, slots.footer()) : null,
+        slots.actions
+          ? h(
+              'div',
+              {
+                class: classNames(cardActionsClasses, cardFooterClasses),
+                onClick: (event: Event) => event.stopPropagation(),
+                onKeydown: (event: Event) => event.stopPropagation()
+              },
+              slots.actions()
+            )
+          : null
+      ]
+
+      const content = hasCover
+        ? h(
+            'div',
+            {
+              class: classNames(cardHorizontalBodyClasses, paddingClass.value),
+              'data-tiger-card-body': ''
+            },
+            bodyChildren
+          )
+        : isHorizontal.value
+          ? h('div', { class: cardHorizontalBodyClasses, 'data-tiger-card-body': '' }, bodyChildren)
+          : bodyChildren
+
+      const onKeydown = (event: KeyboardEvent) => {
+        const user = attrsRecord.onKeydown
+        if (typeof user === 'function') {
+          ;(user as (event: KeyboardEvent) => void)(event)
+        }
+        if (event.defaultPrevented || root.tag === 'a') return
+        if (root.role) {
+          handleCardActivation(event, () => {
+            const click = attrsRecord.onClick
+            if (typeof click === 'function') {
+              ;(click as (event: Event) => void)(event)
+              return
+            }
+            if (props.href) window.location.assign(props.href)
+          })
+        }
+      }
 
       return h(
-        'div',
+        root.tag,
         {
           ...attrs,
-          class: classNames(cardClasses.value, props.className, coerceClassValue(attrsClass)),
-          style: mergeStyleValues(attrsStyle, props.style)
+          class: cardClasses,
+          style: mergeStyleValues(attrsRecord.style, props.style),
+          href: root.tag === 'a' ? props.href : undefined,
+          role: root.role,
+          tabindex: root.tabIndex,
+          'data-tiger-card': '',
+          onKeydown
         },
-        [
-          props.cover
-            ? h('div', { class: cardCoverWrapperClasses }, [
-                h('img', {
-                  src: props.cover,
-                  alt: props.coverAlt,
-                  class: classNames(
-                    cardCoverClasses,
-                    isHorizontal.value && 'h-full w-48 object-cover'
-                  )
-                })
-              ])
-            : null,
-          (() => {
-            const bodyChildren = [
-              slots.header
-                ? h('div', { class: getSectionClasses(cardHeaderClasses) }, slots.header())
-                : null,
-              slots.default ? h('div', { class: sectionSizeClass.value }, slots.default()) : null,
-              slots.footer
-                ? h('div', { class: getSectionClasses(cardFooterClasses) }, slots.footer())
-                : null,
-              slots.actions
-                ? h(
-                    'div',
-                    {
-                      class: getSectionClasses(classNames(cardActionsClasses, cardFooterClasses))
-                    },
-                    slots.actions()
-                  )
-                : null
-            ]
-            return isHorizontal.value
-              ? h('div', { class: cardHorizontalBodyClasses }, bodyChildren)
-              : bodyChildren
-          })()
-        ]
+        [coverNode, content]
       )
     }
   }

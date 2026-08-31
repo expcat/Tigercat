@@ -39,7 +39,7 @@ export interface CardProps {
   padding?: boolean | string
 
   /**
-   * Whether the card is hoverable (shows hover effect)
+   * Visual lift on hover. Does not make the card a control; pass `onClick` or `href` for that.
    * @default false
    */
   hoverable?: boolean
@@ -49,6 +49,22 @@ export interface CardProps {
    * @default 'vertical'
    */
   direction?: BaseLayoutProps['direction']
+
+  /**
+   * Cover image URL. Framework layers also accept a custom node / `#cover` slot.
+   */
+  cover?: string
+
+  /**
+   * Accessible name for a URL cover. Empty by default (decorative).
+   * @default ''
+   */
+  coverAlt?: string
+
+  /**
+   * When set, the root is a link (`<a>` unless nested actions force a role).
+   */
+  href?: string
 
   /**
    * Additional CSS classes

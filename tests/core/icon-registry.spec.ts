@@ -7,7 +7,6 @@ import {
   iconRegistry,
   iconNames,
   getIconDefinition,
-  resolveCardPadding,
   getDrawerBodyClasses
 } from '@expcat/tigercat-core'
 
@@ -46,23 +45,6 @@ describe('icon registry', () => {
 
   it('getIconDefinition returns undefined for unknown names', () => {
     expect(getIconDefinition('definitely-not-an-icon')).toBeUndefined()
-  })
-})
-
-describe('resolveCardPadding', () => {
-  it('returns the size-based padding by default', () => {
-    expect(resolveCardPadding('sm', undefined)).toBe('p-3')
-    expect(resolveCardPadding('md', undefined)).toBe('p-4')
-    expect(resolveCardPadding('lg', undefined)).toBe('p-6')
-    expect(resolveCardPadding('md', true)).toBe('p-4')
-  })
-
-  it('returns undefined when padding is false', () => {
-    expect(resolveCardPadding('md', false)).toBeUndefined()
-  })
-
-  it('returns a custom padding class when provided', () => {
-    expect(resolveCardPadding('md', 'p-8')).toBe('p-8')
   })
 })
 

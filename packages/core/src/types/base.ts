@@ -24,7 +24,7 @@ export type ComponentSize = 'sm' | 'md' | 'lg'
 /**
  * Base props shared by interactive (clickable / focusable) components.
  *
- * Covers: Button, Link, Tag, Card, Badge, etc.
+ * Covers: Button, Link, Tag, Badge, etc.
  */
 export interface BaseInteractiveProps {
   /** Whether the component is disabled */
