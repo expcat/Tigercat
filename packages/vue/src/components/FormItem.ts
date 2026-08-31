@@ -27,6 +27,7 @@ import {
   getFormItemFieldClasses,
   getFormItemLabelClasses,
   hasRequiredRule,
+  isFormItemGroupControl,
   mergeAriaDescribedBy,
   type FormRule,
   type FormFieldCondition,
@@ -239,6 +240,7 @@ export const FormItem = defineComponent({
 
     provide(FORM_ITEM_CONTROL_INJECTION_KEY, {
       id: effectiveFieldId,
+      labelId: computed(() => (props.label ? labelId : undefined)),
       name: computed(() => props.name),
       status: computed(() => (hasError.value ? ('error' as InputStatus) : undefined)),
       errorMessage: computed(() => undefined),
@@ -284,6 +286,7 @@ export const FormItem = defineComponent({
       const only = defaultSlot.length === 1 ? defaultSlot[0] : undefined
       const isNativeElement = only != null && isVNode(only) && typeof only.type === 'string'
       const useGroup = defaultSlot.length !== 1
+      const isGroupControl = only != null && isVNode(only) && isFormItemGroupControl(only.type)
 
       if (useGroup && props.name) {
         devWarn(
@@ -341,7 +344,7 @@ export const FormItem = defineComponent({
               class: labelClasses.value,
               style: labelStyles.value,
               id: labelId,
-              for: controlId
+              for: isGroupControl ? undefined : controlId
             },
             [showAsterisk.value && h('span', { class: asteriskClasses }, '*'), props.label]
           )

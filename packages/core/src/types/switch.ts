@@ -3,6 +3,7 @@
  */
 
 import type { ComponentSize } from './base'
+import type { InputStatus } from './input'
 
 /**
  * Base switch props interface
@@ -15,6 +16,12 @@ export interface SwitchProps {
   checked?: boolean
 
   /**
+   * Default checked state (uncontrolled mode)
+   * @default false
+   */
+  defaultChecked?: boolean
+
+  /**
    * Whether the switch is disabled
    * @default false
    */
@@ -25,4 +32,21 @@ export interface SwitchProps {
    * @default 'md'
    */
   size?: ComponentSize
+
+  /**
+   * Native form name (hidden checkbox)
+   */
+  name?: string
+
+  /**
+   * Native form value when checked
+   * @default 'on'
+   */
+  value?: string
+
+  /**
+   * Validation status
+   * @default 'default'
+   */
+  status?: InputStatus
 }

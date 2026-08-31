@@ -8,7 +8,7 @@ describe('switch theme helpers', () => {
     expect(classes).toContain('h-7')
     expect(classes).toContain('w-14')
     expect(classes).toContain('bg-[var(--tiger-primary,#2563eb)]')
-    expect(classes).toContain('cursor-not-allowed')
+    expect(classes).toContain('opacity-50')
     expect(classes).toContain('custom-switch')
   })
 
@@ -23,8 +23,8 @@ describe('switch theme helpers', () => {
     expect(classes).not.toContain('inactive')
   })
 
-  it('composes thumb size and translate classes', () => {
-    expect(getSwitchThumbClasses('sm', false)).toContain('translate-x-0.5')
-    expect(getSwitchThumbClasses('sm', true)).toContain('translate-x-4')
+  it('positions the thumb with logical inset so RTL can flip', () => {
+    expect(getSwitchThumbClasses('sm', false)).toContain('inset-inline-start-0.5')
+    expect(getSwitchThumbClasses('sm', true)).toContain('inset-inline-start-[calc(100%-1.125rem)]')
   })
 })

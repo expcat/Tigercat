@@ -12,6 +12,7 @@ import {
   getFormItemFieldClasses,
   getFormItemLabelClasses,
   hasRequiredRule,
+  isFormItemGroupControl,
   mergeAriaDescribedBy,
   type ComponentSize,
   type FormItemProps as CoreFormItemProps,
@@ -175,6 +176,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const nativeId = isNativeElement ? onlyChild.props.id : undefined
   const effectiveFieldId = nativeId ?? fieldId
   const useGroup = childArray.length !== 1
+  const isGroupControl = React.isValidElement(onlyChild) && isFormItemGroupControl(onlyChild.type)
 
   const enhancedChild = useMemo(() => {
     if (!isNativeElement || !React.isValidElement<NativeFieldProps>(onlyChild)) {
@@ -238,6 +240,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const controlValue = useMemo(
     () => ({
       id: effectiveFieldId,
+      labelId: label ? labelId : undefined,
       name,
       status: (hasError ? 'error' : undefined) as InputStatus | undefined,
       shakeTrigger: hasError ? shakeTrigger : undefined,
@@ -250,6 +253,8 @@ export const FormItem: React.FC<FormItemProps> = ({
     }),
     [
       effectiveFieldId,
+      label,
+      labelId,
       name,
       hasError,
       shakeTrigger,
@@ -326,7 +331,11 @@ export const FormItem: React.FC<FormItemProps> = ({
   return (
     <div className={formItemClasses} style={style} {...rest}>
       {label && (
-        <label id={labelId} className={labelClasses} style={labelStyles} htmlFor={effectiveFieldId}>
+        <label
+          id={labelId}
+          className={labelClasses}
+          style={labelStyles}
+          htmlFor={isGroupControl ? undefined : effectiveFieldId}>
           {showAsterisk && <span className={ASTERISK_CLASSES}>*</span>}
           {label}
         </label>

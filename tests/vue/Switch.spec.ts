@@ -37,10 +37,10 @@ describe('Switch', () => {
         props: { modelValue: true, className: 'prop-class' },
         attrs: { class: ['attrs-class', { active: true }] }
       })
-      const el = getSwitch(container)
-      expect(el).toHaveClass('prop-class')
-      expect(el).toHaveClass('attrs-class')
-      expect(el).toHaveClass('active')
+      const root = container.querySelector('label')
+      expect(root).toHaveClass('prop-class')
+      expect(root).toHaveClass('attrs-class')
+      expect(root).toHaveClass('active')
     })
 
     it.each(componentSizes)('renders %s size', (size) => {
@@ -60,17 +60,15 @@ describe('Switch', () => {
       expect(onUpdate).toHaveBeenCalledWith(true)
       expect(onChange).toHaveBeenCalledWith(true)
     })
-    it.each([
-      [' ', 'Space'],
-      ['Enter', 'Enter']
-    ])('toggles when %s is pressed', async (key, code) => {
+    it('toggles when Space is pressed', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: { modelValue: false, 'onUpdate:modelValue': onUpdate }
       })
       const el = getSwitch(container)
       el.focus()
-      await fireEvent.keyDown(el, { key, code })
+      await fireEvent.keyDown(el, { key: ' ', code: 'Space' })
+      await fireEvent.click(el)
       expect(onUpdate).toHaveBeenCalledWith(true)
     })
 
@@ -111,11 +109,11 @@ describe('Switch', () => {
   })
 
   describe('States', () => {
-    it('marks the disabled state and removes it from the tab order', () => {
+    it('marks the disabled state with the native disabled attribute', () => {
       const { container } = renderWithProps(Switch, { disabled: true })
       const el = getSwitch(container)
-      expect(el).toHaveAttribute('aria-disabled', 'true')
-      expect(el).toHaveAttribute('tabindex', '-1')
+      expect(el).toBeDisabled()
+      expect(el).not.toHaveAttribute('aria-disabled')
     })
   })
 

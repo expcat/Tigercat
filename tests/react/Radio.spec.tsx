@@ -9,6 +9,7 @@ import React from 'react'
 import { Radio } from '@expcat/tigercat-react/Radio'
 import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
 import {
+  expectNoA11yViolations,
   expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
@@ -86,7 +87,7 @@ describe('Radio', () => {
         </Radio>
       )
       await user.click(getRadio(container))
-      expect(handleChange).toHaveBeenCalledWith('option1')
+      expect(handleChange).toHaveBeenCalledWith(true, expect.any(Object))
     })
 
     it('should not call onChange when disabled', async () => {
@@ -101,17 +102,21 @@ describe('Radio', () => {
       expect(handleChange).not.toHaveBeenCalled()
     })
 
-    it('should activate on the Enter key', async () => {
+    it('does not hijack Enter, so a form can still submit', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
+      const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault())
       const { container } = render(
-        <Radio value="option1" onChange={handleChange}>
-          Option
-        </Radio>
+        <form onSubmit={onSubmit}>
+          <Radio value="option1" onChange={handleChange}>
+            Option
+          </Radio>
+          <button type="submit">Save</button>
+        </form>
       )
       getRadio(container).focus()
       await user.keyboard('{Enter}')
-      expect(handleChange).toHaveBeenCalledWith('option1')
+      expect(handleChange).not.toHaveBeenCalled()
     })
   })
 
@@ -214,8 +219,40 @@ describe('Radio', () => {
       )
       const inputs = getRadios(container)
       const name = inputs[0].getAttribute('name')
-      expect(name).toContain('tiger-radio-group')
-      inputs.forEach((input) => expect(input).toHaveAttribute('name', name))
+      expect(name).toBeTruthy()
+      inputs.forEach((input) => expect(input).toHaveAttribute('name', name as string))
+    })
+
+    it('does not fire onChange twice for one click', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const { container } = render(
+        <RadioGroup onChange={handleChange} aria-label="Plan">
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      )
+      await user.click(getRadios(container)[1])
+      expect(handleChange).toHaveBeenCalledTimes(1)
+      expect(handleChange).toHaveBeenCalledWith('b')
+    })
+
+    it('leaves two standalone radios independent when they have no name', async () => {
+      const user = userEvent.setup()
+      const { container } = render(
+        <>
+          <Radio value="a" defaultChecked>
+            A
+          </Radio>
+          <Radio value="b">B</Radio>
+        </>
+      )
+      const inputs = getRadios(container)
+      expect(inputs[0]).not.toHaveAttribute('name')
+      expect(inputs[1]).not.toHaveAttribute('name')
+      await user.click(inputs[1])
+      expect(inputs[0].checked).toBe(true)
+      expect(inputs[1].checked).toBe(true)
     })
     it('should disable all radios, and support individually disabled radios', async () => {
       const user = userEvent.setup()
@@ -278,12 +315,12 @@ describe('Radio', () => {
 
     it('should have no violations for a radio group', async () => {
       const { container } = render(
-        <RadioGroup defaultValue="a">
+        <RadioGroup defaultValue="a" aria-label="Options">
           <Radio value="a">Option A</Radio>
           <Radio value="b">Option B</Radio>
         </RadioGroup>
       )
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
   })
 })

@@ -3,6 +3,7 @@ import type { InputStatus } from '@expcat/tigercat-core'
 
 export interface FormItemControlContextValue {
   id?: string
+  labelId?: string
   name?: string
   status?: InputStatus
   /** @deprecated FormItem is the only error surface; always undefined. */

@@ -1,10 +1,30 @@
-import { defineComponent, ref, provide, computed, h, watch, PropType, type ComputedRef } from 'vue'
 import {
+  defineComponent,
+  ref,
+  provide,
+  computed,
+  h,
+  inject,
+  useId,
+  type ComputedRef,
+  type PropType
+} from 'vue'
+import {
+  callUnknownEventHandler,
   classNames,
   coerceClassValue,
-  getRadioGroupClasses,
-  type ComponentSize
+  collectRadioGroupInputs,
+  getChoiceGroupClasses,
+  getElementTextDirection,
+  getRadioGroupKeyboardNextIndex,
+  markFormItemGroupControl,
+  mergeAriaDescribedBy,
+  mergeStyleValues,
+  type ChoiceGroupDirection,
+  type ComponentSize,
+  type InputStatus
 } from '@expcat/tigercat-core'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export const RadioGroupKey = Symbol('RadioGroup')
 
@@ -22,180 +42,155 @@ export interface VueRadioGroupProps {
   name?: string
   disabled?: boolean
   size?: ComponentSize
+  direction?: ChoiceGroupDirection
+  status?: InputStatus
   className?: string
   style?: Record<string, string | number>
 }
 
-export const RadioGroup = defineComponent({
-  name: 'TigerRadioGroup',
-  inheritAttrs: false,
-  props: {
-    /**
-     * Selected value (for v-model)
-     */
-    modelValue: {
-      type: [String, Number] as PropType<string | number | undefined>
-    },
-    /**
-     * Default selected value (uncontrolled mode)
-     */
-    defaultValue: {
-      type: [String, Number] as PropType<string | number | undefined>
-    },
-    /**
-     * Input name attribute for all radios
-     */
-    name: {
-      type: String
-    },
-    /**
-     * Whether all radios are disabled
-     * @default false
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Radio size for all radios
-     * @default 'md'
-     */
-    size: {
-      type: String as PropType<ComponentSize>,
-      default: 'md' as ComponentSize
-    },
-
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String
-    },
-
-    /**
-     * Inline styles
-     */
-    style: {
-      type: Object as PropType<Record<string, string | number>>
-    }
-  },
-  emits: {
-    /**
-     * Emitted when value changes (for v-model)
-     */
-    'update:modelValue': (value: string | number) =>
-      typeof value === 'string' || typeof value === 'number',
-    /**
-     * Emitted when value changes
-     */
-    change: (value: string | number) => typeof value === 'string' || typeof value === 'number'
-  },
-  setup(props, { slots, emit, attrs }) {
-    // Internal state for uncontrolled mode
-    const internalValue = ref<string | number | undefined>(props.defaultValue)
-
-    // Determine if controlled or uncontrolled
-    const isControlled = computed(() => props.modelValue !== undefined)
-
-    watch(
-      () => props.modelValue,
-      (next) => {
-        if (next !== undefined) internalValue.value = next
+export const RadioGroup = markFormItemGroupControl(
+  defineComponent({
+    name: 'TigerRadioGroup',
+    inheritAttrs: false,
+    props: {
+      modelValue: {
+        type: [String, Number] as PropType<string | number | undefined>
+      },
+      defaultValue: {
+        type: [String, Number] as PropType<string | number | undefined>
+      },
+      name: {
+        type: String
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      size: {
+        type: String as PropType<ComponentSize>,
+        default: 'md' as ComponentSize
+      },
+      direction: {
+        type: String as PropType<ChoiceGroupDirection>,
+        default: 'vertical' as ChoiceGroupDirection
+      },
+      status: {
+        type: String as PropType<InputStatus>
+      },
+      className: {
+        type: String
+      },
+      style: {
+        type: Object as PropType<Record<string, string | number>>
       }
-    )
-
-    // Current value - use prop value if controlled, otherwise use internal state
-    const currentValue = computed(() =>
-      isControlled.value ? props.modelValue : internalValue.value
-    )
-
-    const handleChange = (value: string | number) => {
-      if (props.disabled) return
-
-      // Update internal state if uncontrolled
-      if (!isControlled.value) {
-        internalValue.value = value
-      }
-
-      // Emit events
-      emit('update:modelValue', value)
-      emit('change', value)
-    }
-
-    // Generate unique name if not provided
-    const generatedName = `tiger-radio-group-${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 11)}`
-    const groupName = computed(() => props.name || generatedName)
-
-    // Provide context to child Radio components (reactive)
-    provide<ComputedRef<RadioGroupContext>>(
-      RadioGroupKey,
-      computed(() => ({
-        value: currentValue.value,
-        name: groupName.value,
-        disabled: props.disabled,
-        size: props.size,
-        onChange: handleChange
-      }))
-    )
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (props.disabled) return
-      if (
-        event.key !== 'ArrowDown' &&
-        event.key !== 'ArrowRight' &&
-        event.key !== 'ArrowUp' &&
-        event.key !== 'ArrowLeft'
-      ) {
-        return
-      }
-
-      const target = event.target as HTMLElement
-      const currentInput = target.closest('input[type="radio"]') as HTMLInputElement | null
-      if (!currentInput) return
-
-      const container = event.currentTarget as HTMLElement
-      const inputs = Array.from(
-        container.querySelectorAll('input[type="radio"]')
-      ) as HTMLInputElement[]
-
-      const enabledInputs = inputs.filter((input) => !input.disabled)
-      if (enabledInputs.length === 0) return
-
-      const currentIndex = enabledInputs.indexOf(currentInput)
-      if (currentIndex === -1) return
-
-      event.preventDefault()
-
-      const direction = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1
-      const nextIndex = (currentIndex + direction + enabledInputs.length) % enabledInputs.length
-      const nextInput = enabledInputs[nextIndex]
-
-      nextInput.focus()
-      nextInput.click()
-    }
-
-    return () => {
-      const rootStyle = [attrs.style, props.style]
-      const mergedClass = classNames(props.className, coerceClassValue(attrs.class))
-      const rootClass = getRadioGroupClasses({ className: mergedClass })
-
-      const { class: _class, style: _style, ...restAttrs } = attrs
-
-      return h(
-        'div',
-        {
-          ...restAttrs,
-          class: rootClass,
-          style: rootStyle,
-          role: 'radiogroup',
-          onKeydown: handleKeyDown
-        },
-        slots.default?.()
+    },
+    emits: {
+      'update:modelValue': (value: string | number) =>
+        typeof value === 'string' || typeof value === 'number',
+      change: (value: string | number) => typeof value === 'string' || typeof value === 'number'
+    },
+    setup(props, { slots, emit, attrs }) {
+      const formItemControl = inject<VueFormItemControlContext | null>(
+        FORM_ITEM_CONTROL_INJECTION_KEY,
+        null
       )
+      const internalValue = ref<string | number | undefined>(props.defaultValue)
+      const isControlled = computed(() => props.modelValue !== undefined)
+      const currentValue = computed(() =>
+        isControlled.value ? props.modelValue : internalValue.value
+      )
+      const generatedName = `tiger-radio-${useId()}`
+      const groupName = computed(() => props.name || generatedName)
+      const effectiveDisabled = computed(
+        () => props.disabled || (formItemControl?.disabled.value ?? false)
+      )
+
+      const handleChange = (value: string | number) => {
+        if (effectiveDisabled.value) return
+        if (currentValue.value === value) return
+        if (!isControlled.value) internalValue.value = value
+        emit('update:modelValue', value)
+        emit('change', value)
+        formItemControl?.onChange(value)
+      }
+
+      provide<ComputedRef<RadioGroupContext>>(
+        RadioGroupKey,
+        computed(() => ({
+          value: currentValue.value,
+          name: groupName.value,
+          disabled: effectiveDisabled.value,
+          size: props.size,
+          onChange: handleChange
+        }))
+      )
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        callUnknownEventHandler(attrs.onKeydown, event)
+        if (event.defaultPrevented || effectiveDisabled.value) return
+
+        const target = event.target as HTMLElement
+        const currentInput = target.closest('input[type="radio"]') as HTMLInputElement | null
+        if (!currentInput) return
+
+        const container = event.currentTarget as HTMLElement
+        const enabledInputs = collectRadioGroupInputs(container).filter((input) => !input.disabled)
+        if (enabledInputs.length === 0) return
+
+        const currentIndex = enabledInputs.indexOf(currentInput)
+        if (currentIndex === -1) return
+
+        const rtl = getElementTextDirection(container) === 'rtl'
+        const nextIndex = getRadioGroupKeyboardNextIndex(
+          event.key,
+          currentIndex,
+          enabledInputs.length,
+          rtl
+        )
+        if (nextIndex === null) return
+
+        event.preventDefault()
+        const nextInput = enabledInputs[nextIndex]
+        nextInput.focus()
+        nextInput.click()
+      }
+
+      return () => {
+        const { class: _class, style: _style, onKeydown: _onKeydown, ...restAttrs } = attrs
+        const labelledby =
+          typeof restAttrs['aria-labelledby'] === 'string' &&
+          (restAttrs['aria-labelledby'] as string).trim()
+            ? (restAttrs['aria-labelledby'] as string).trim()
+            : formItemControl?.labelId.value
+        const describedBy = mergeAriaDescribedBy(
+          typeof restAttrs['aria-describedby'] === 'string'
+            ? (restAttrs['aria-describedby'] as string)
+            : undefined,
+          formItemControl?.describedBy.value
+        )
+        const status = props.status ?? formItemControl?.status.value ?? 'default'
+
+        return h(
+          'div',
+          {
+            ...restAttrs,
+            class: getChoiceGroupClasses({
+              direction: props.direction,
+              className: classNames(props.className, coerceClassValue(attrs.class))
+            }),
+            style: mergeStyleValues(attrs.style, props.style),
+            role: 'radiogroup',
+            'aria-labelledby': labelledby,
+            'aria-describedby': describedBy,
+            'aria-invalid': status === 'error' ? true : restAttrs['aria-invalid'],
+            'aria-disabled': effectiveDisabled.value || undefined,
+            onKeydown: handleKeyDown
+          },
+          slots.default?.()
+        )
+      }
     }
-  }
-})
+  })
+)
 
 export default RadioGroup

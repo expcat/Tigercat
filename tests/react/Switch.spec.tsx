@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Switch } from '@expcat/tigercat-react/Switch'
 import {
+  expectNoA11yViolations,
   expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
@@ -56,12 +57,12 @@ describe('Switch', () => {
       expect(handleChange).toHaveBeenCalledWith(expected)
     })
 
-    it.each(['[Space]', '[Enter]'])('toggles onChange when %s is pressed', async (key) => {
+    it('toggles onChange when Space is pressed', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
       const { container } = render(<Switch checked={false} onChange={handleChange} />)
       getSwitch(container).focus()
-      await user.keyboard(key)
+      await user.keyboard('[Space]')
       expect(handleChange).toHaveBeenCalledWith(true)
     })
 
@@ -140,18 +141,18 @@ describe('Switch', () => {
   })
 
   describe('States', () => {
-    it('marks the disabled state and removes it from the tab order', () => {
+    it('marks the disabled state with the native disabled attribute', () => {
       const { container } = render(<Switch disabled />)
       const el = getSwitch(container)
-      expect(el).toHaveAttribute('aria-disabled', 'true')
-      expect(el).toHaveAttribute('tabindex', '-1')
+      expect(el).toBeDisabled()
+      expect(el).not.toHaveAttribute('aria-disabled')
     })
   })
 
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
-      const { container } = render(<Switch aria-label="Toggle switch" />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(<Switch>Toggle switch</Switch>)
+      await expectNoA11yViolations(container)
     })
 
     it('forwards aria-label and aria-labelledby', () => {

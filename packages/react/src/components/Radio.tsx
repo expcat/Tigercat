@@ -1,15 +1,19 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useMemo, forwardRef } from 'react'
 import {
   classNames,
+  defaultRadioColors,
+  devWarn,
   getRadioDotClasses,
   getRadioLabelClasses,
   getRadioVisualClasses,
-  defaultRadioColors,
+  mergeAriaDescribedBy,
   radioRootBaseClasses,
+  resolveRadioInputName,
   type RadioProps as CoreRadioProps
 } from '@expcat/tigercat-core'
 import { RadioGroupContext } from './RadioGroup'
 import { useControlledState } from '../hooks/useControlledState'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface RadioProps
   extends
@@ -18,52 +22,53 @@ export interface RadioProps
       'type' | 'size' | 'onChange' | 'checked' | 'defaultChecked' | 'value'
     >,
     CoreRadioProps {
-  /**
-   * Change event handler
-   */
-  onChange?: (value: string | number) => void
-
-  /**
-   * Radio label content
-   */
+  onChange?: (checked: boolean, event: React.ChangeEvent<HTMLInputElement>) => void
   children?: React.ReactNode
-
-  /**
-   * Additional CSS classes (applied to root element)
-   */
   className?: string
 }
 
-export const Radio: React.FC<RadioProps> = ({
-  value,
-  size,
-  disabled,
-  name,
-  checked,
-  defaultChecked = false,
-  onChange,
-  children,
-  className,
-  style,
-  ...props
-}) => {
+export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
+  {
+    value,
+    size,
+    disabled,
+    name,
+    checked,
+    defaultChecked = false,
+    status: statusProp,
+    onChange,
+    children,
+    className,
+    style,
+    id,
+    onBlur,
+    ...props
+  },
+  ref
+) {
   const groupContext = useContext(RadioGroupContext)
-
-  const [checkedState, setChecked] = useControlledState<boolean>({
-    value: checked,
-    defaultValue: defaultChecked
-  })
-
+  const formItemControl = useFormItemControlContext()
   const isInGroup = !!groupContext
 
-  const actualSize = size || groupContext?.size || 'md'
-  const actualDisabled = disabled !== undefined ? disabled : groupContext?.disabled || false
-  const actualName = name || groupContext?.name || ''
+  if (isInGroup && checked !== undefined) {
+    devWarn(
+      'Radio.groupChecked',
+      'Radio inside RadioGroup follows the group value. Per-item `checked` is ignored.'
+    )
+  }
 
-  const isChecked =
-    checked === undefined && groupContext?.value !== undefined
-      ? groupContext.value === value
-      : checkedState
+  const [checkedState, setChecked] = useControlledState<boolean>({
+    value: isInGroup ? undefined : checked,
+    defaultValue: defaultChecked,
+    onChange
+  })
+
+  const actualSize = size || groupContext?.size || 'md'
+  const actualDisabled = Boolean(disabled || groupContext?.disabled || formItemControl?.disabled)
+  const actualName = resolveRadioInputName(name, groupContext?.name)
+  const status = statusProp ?? formItemControl?.status ?? 'default'
+
+  const isChecked = isInGroup ? groupContext!.value === value : checkedState
 
   const radioClasses = useMemo(
     () =>
@@ -101,52 +106,69 @@ export const Radio: React.FC<RadioProps> = ({
       event.preventDefault()
       return
     }
+    const next = event.target.checked
+    if (!next) return
 
-    const newChecked = event.target.checked
-    if (!newChecked) return
-
-    if (!isInGroup) {
-      setChecked(true)
+    if (isInGroup) {
+      groupContext!.onChange(value)
+      return
     }
 
-    onChange?.(value)
-    groupContext?.onChange?.(value)
+    setChecked(true, event)
+    formItemControl?.onChange?.(value)
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    props.onKeyDown?.(event)
-    if (event.defaultPrevented) return
-    if (actualDisabled) return
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    onBlur?.(event)
+    if (!isInGroup) formItemControl?.onBlur?.()
+  }
 
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      const input = event.currentTarget
-      if (!input.checked) input.click()
-    }
+  const describedBy = mergeAriaDescribedBy(
+    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    isInGroup ? undefined : formItemControl?.describedBy
+  )
+  const effectiveId = isInGroup ? id : (id ?? formItemControl?.id)
+
+  const input = (
+    <input
+      {...props}
+      ref={ref}
+      id={effectiveId}
+      type="radio"
+      className="sr-only peer"
+      name={actualName}
+      value={value}
+      checked={isChecked}
+      disabled={actualDisabled}
+      aria-invalid={status === 'error' ? true : props['aria-invalid']}
+      aria-describedby={describedBy}
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  )
+
+  const visual = (
+    <span className={radioClasses} aria-hidden="true">
+      <span className={dotClasses} />
+    </span>
+  )
+
+  if (!children) {
+    return (
+      <span className={classNames(radioRootBaseClasses, className)} style={style}>
+        {input}
+        {visual}
+      </span>
+    )
   }
 
   return (
     <label className={classNames(radioRootBaseClasses, className)} style={style}>
-      {/* Hidden native radio input */}
-      <input
-        type="radio"
-        className="sr-only peer"
-        {...props}
-        name={actualName}
-        value={value}
-        checked={isChecked}
-        disabled={actualDisabled}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
-
-      {/* Custom radio visual */}
-      <span className={radioClasses} aria-hidden="true">
-        <span className={dotClasses} />
-      </span>
-
-      {/* Label content */}
-      {children && <span className={labelClasses}>{children}</span>}
+      {input}
+      {visual}
+      <span className={labelClasses}>{children}</span>
     </label>
   )
-}
+})
+
+Radio.displayName = 'Radio'

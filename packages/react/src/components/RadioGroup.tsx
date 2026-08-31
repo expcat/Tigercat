@@ -1,29 +1,27 @@
-import React, { useCallback, useMemo, useRef } from 'react'
-import { useControlledState } from '../hooks/useControlledState'
-import { getRadioGroupClasses } from '@expcat/tigercat-core'
+import React, { useCallback, useId, useMemo } from 'react'
 import {
+  collectRadioGroupInputs,
+  getChoiceGroupClasses,
+  getElementTextDirection,
+  getRadioGroupKeyboardNextIndex,
+  markFormItemGroupControl,
+  mergeAriaDescribedBy,
+  type ChoiceGroupDirection,
   type ComponentSize,
+  type InputStatus,
   type RadioGroupProps as CoreRadioGroupProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface RadioGroupProps
   extends
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'defaultValue'>,
     CoreRadioGroupProps {
-  /**
-   * Change event handler
-   */
   onChange?: (value: string | number) => void
-
-  /**
-   * Radio group children (Radio components)
-   */
   children?: React.ReactNode
-
-  /**
-   * Additional CSS classes
-   */
   className?: string
+  direction?: ChoiceGroupDirection
 }
 
 interface RadioGroupContextValue {
@@ -31,73 +29,81 @@ interface RadioGroupContextValue {
   name: string
   disabled: boolean
   size: ComponentSize
-  onChange?: (value: string | number) => void
+  onChange: (value: string | number) => void
 }
 
 const RadioGroupContext = React.createContext<RadioGroupContextValue | null>(null)
 
-export const RadioGroup: React.FC<RadioGroupProps> = ({
+const RadioGroupInner: React.FC<RadioGroupProps> = ({
   value,
   defaultValue,
   name,
   disabled = false,
   size = 'md',
+  direction = 'vertical',
+  status: statusProp,
   onChange,
   children,
   className,
+  onKeyDown,
   ...props
 }) => {
+  const formItemControl = useFormItemControlContext()
   const [currentValue, setValue] = useControlledState({
     value,
     defaultValue,
-    onChange
+    onChange: (next) => {
+      onChange?.(next)
+      formItemControl?.onChange?.(next)
+    }
   })
-
-  const generatedNameRef = useRef(
-    `tiger-radio-group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+  const reactId = useId()
+  const groupName = name || `tiger-radio-${reactId}`
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const labelledby =
+    typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
+      ? props['aria-labelledby'].trim()
+      : formItemControl?.labelId
+  const describedBy = mergeAriaDescribedBy(
+    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    formItemControl?.describedBy
   )
-
-  const groupName = name || generatedNameRef.current
+  const role = 'radiogroup'
 
   const handleChange = useCallback(
     (newValue: string | number) => {
-      if (disabled) return
+      if (effectiveDisabled) return
       setValue(newValue)
     },
-    [disabled, setValue]
+    [effectiveDisabled, setValue]
   )
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) return
-
-    if (
-      event.key !== 'ArrowDown' &&
-      event.key !== 'ArrowRight' &&
-      event.key !== 'ArrowUp' &&
-      event.key !== 'ArrowLeft'
-    ) {
-      return
-    }
+    onKeyDown?.(event)
+    if (event.defaultPrevented || effectiveDisabled) return
 
     const target = event.target as HTMLElement
     const currentInput = target.closest('input[type="radio"]') as HTMLInputElement | null
     if (!currentInput) return
 
     const container = event.currentTarget
-    const inputs = Array.from(
-      container.querySelectorAll('input[type="radio"]')
-    ) as HTMLInputElement[]
-    const enabledInputs = inputs.filter((input) => !input.disabled)
+    const enabledInputs = collectRadioGroupInputs(container).filter((input) => !input.disabled)
     if (enabledInputs.length === 0) return
 
     const currentIndex = enabledInputs.indexOf(currentInput)
     if (currentIndex === -1) return
 
+    const rtl = getElementTextDirection(container) === 'rtl'
+    const nextIndex = getRadioGroupKeyboardNextIndex(
+      event.key,
+      currentIndex,
+      enabledInputs.length,
+      rtl
+    )
+    if (nextIndex === null) return
+
     event.preventDefault()
-
-    const direction = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1
-    const nextIndex = (currentIndex + direction + enabledInputs.length) % enabledInputs.length
-
     const nextInput = enabledInputs[nextIndex]
     nextInput.focus()
     nextInput.click()
@@ -107,25 +113,31 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
     () => ({
       value: currentValue,
       name: groupName,
-      disabled,
+      disabled: effectiveDisabled,
       size,
       onChange: handleChange
     }),
-    [currentValue, groupName, disabled, size, handleChange]
+    [currentValue, groupName, effectiveDisabled, size, handleChange]
   )
 
   return (
     <RadioGroupContext.Provider value={contextValue}>
       <div
-        className={getRadioGroupClasses({ className })}
-        role="radiogroup"
-        onKeyDown={handleKeyDown}
-        {...props}>
+        {...props}
+        className={getChoiceGroupClasses({ direction, className })}
+        role={role}
+        aria-labelledby={labelledby}
+        aria-describedby={describedBy}
+        aria-invalid={status === 'error' ? true : props['aria-invalid']}
+        aria-disabled={effectiveDisabled || undefined}
+        onKeyDown={handleKeyDown}>
         {children}
       </div>
     </RadioGroupContext.Provider>
   )
 }
 
-// Export context for use in Radio component
+export const RadioGroup = markFormItemGroupControl(RadioGroupInner)
+RadioGroup.displayName = 'RadioGroup'
+
 export { RadioGroupContext }

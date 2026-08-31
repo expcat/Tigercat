@@ -91,7 +91,7 @@ describe('Radio', () => {
   })
 
   describe('Events', () => {
-    it('should emit change (with value) and update:modelValue (true) on click', async () => {
+    it('should emit change and update:modelValue with the boolean checked state', async () => {
       const onChange = vi.fn()
       const onUpdate = vi.fn()
       const { container } = render(Radio, {
@@ -99,7 +99,7 @@ describe('Radio', () => {
         slots: { default: 'Option 1' }
       })
       await fireEvent.click(getRadio(container))
-      expect(onChange).toHaveBeenCalledWith('option1')
+      expect(onChange).toHaveBeenCalledWith(true, expect.any(Event))
       expect(onUpdate).toHaveBeenCalledWith(true)
     })
 
@@ -113,7 +113,7 @@ describe('Radio', () => {
       expect(onChange).not.toHaveBeenCalled()
     })
 
-    it('should activate on the Enter key', async () => {
+    it('does not select on Enter', async () => {
       const onChange = vi.fn()
       const { container } = render(Radio, {
         props: { value: 'option1', onChange },
@@ -122,7 +122,7 @@ describe('Radio', () => {
       const radio = getRadio(container)
       radio.focus()
       await fireEvent.keyDown(radio, { key: 'Enter' })
-      expect(onChange).toHaveBeenCalledWith('option1')
+      expect(onChange).not.toHaveBeenCalled()
     })
   })
 
@@ -248,7 +248,7 @@ describe('Radio', () => {
       `)
       const inputs = getRadios(container)
       const name = inputs[0].getAttribute('name')
-      expect(name).toContain('tiger-radio-group')
+      expect(name).toBeTruthy()
       inputs.forEach((input) => expect(input).toHaveAttribute('name', name))
     })
     it('should not allow selection when the group is disabled', async () => {

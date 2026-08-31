@@ -1,16 +1,31 @@
-import { defineComponent, computed, h, PropType, inject, ref, watch, type ComputedRef } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  inject,
+  ref,
+  watch,
+  type ComputedRef,
+  type PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
+  callUnknownEventHandler,
+  defaultRadioColors,
+  devWarn,
   getRadioDotClasses,
   getRadioLabelClasses,
   getRadioVisualClasses,
-  defaultRadioColors,
+  mergeAriaDescribedBy,
+  mergeStyleValues,
   radioRootBaseClasses,
-  type ComponentSize
+  resolveRadioInputName,
+  type ComponentSize,
+  type InputStatus
 } from '@expcat/tigercat-core'
-
 import { RadioGroupKey, type RadioGroupContext } from './RadioGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export interface VueRadioProps {
   value: string | number
@@ -19,6 +34,7 @@ export interface VueRadioProps {
   name?: string
   modelValue?: boolean
   defaultValue?: boolean
+  status?: InputStatus
   className?: string
   style?: Record<string, string | number>
 }
@@ -27,99 +43,87 @@ export const Radio = defineComponent({
   name: 'TigerRadio',
   inheritAttrs: false,
   props: {
-    /**
-     * Radio value (required for radio groups)
-     */
     value: {
       type: [String, Number] as PropType<string | number>,
       required: true
     },
-    /**
-     * Radio size
-     * @default 'md'
-     */
     size: {
       type: String as PropType<ComponentSize>
     },
-    /**
-     * Whether the radio is disabled
-     * @default false
-     */
     disabled: {
       type: Boolean
     },
-    /**
-     * Input name attribute
-     */
     name: {
       type: String
     },
-    /**
-     * Whether the radio is checked (controlled mode)
-     */
     modelValue: {
       type: Boolean as PropType<boolean | undefined>,
       default: undefined
     },
-
-    /**
-     * Default checked state (uncontrolled mode)
-     * @default false
-     */
     defaultValue: {
       type: Boolean,
       default: false
     },
-
-    /**
-     * Additional CSS classes (applied to root element)
-     */
+    status: {
+      type: String as PropType<InputStatus>
+    },
     className: {
       type: String
     },
-
-    /**
-     * Inline styles (applied to root element)
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>
     }
   },
   emits: {
-    /**
-     * Emitted when radio value changes
-     */
-    change: (value: string | number) => typeof value === 'string' || typeof value === 'number',
-    /**
-     * Emitted when checked state changes (for v-model)
-     */
+    change: (value: boolean, event: Event) => typeof value === 'boolean' && event instanceof Event,
     'update:modelValue': (value: boolean) => typeof value === 'boolean'
   },
-  setup(props, { slots, emit, attrs }) {
+  setup(props, { slots, emit, attrs, expose }) {
     const groupContextRef = inject<ComputedRef<RadioGroupContext> | null>(RadioGroupKey, null)
-
-    const groupContext = computed(() => groupContextRef?.value)
-
-    const internalChecked = ref(props.defaultValue)
-
-    watch(
-      () => props.modelValue,
-      (next) => {
-        if (next !== undefined) internalChecked.value = next
-      }
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
     )
-
-    const isCheckedControlled = computed(() => props.modelValue !== undefined)
+    const groupContext = computed(() => groupContextRef?.value)
     const isInGroup = computed(() => !!groupContext.value)
 
+    watch(
+      () => [isInGroup.value, props.modelValue] as const,
+      ([grouped, model]) => {
+        if (grouped && model !== undefined) {
+          devWarn(
+            'Radio.groupChecked',
+            'Radio inside RadioGroup follows the group value. Per-item `v-model` is ignored.'
+          )
+        }
+      },
+      { immediate: true }
+    )
+
+    const internalChecked = ref(props.defaultValue)
+    const isCheckedControlled = computed(() => props.modelValue !== undefined)
+
     const actualSize = computed<ComponentSize>(() => props.size || groupContext.value?.size || 'md')
-    const actualDisabled = computed(() => props.disabled || groupContext.value?.disabled || false)
-    const actualName = computed(() => props.name || groupContext.value?.name)
+    const actualDisabled = computed(
+      () =>
+        Boolean(props.disabled) ||
+        Boolean(groupContext.value?.disabled) ||
+        Boolean(formItemControl?.disabled.value)
+    )
+    const actualName = computed(() => resolveRadioInputName(props.name, groupContext.value?.name))
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
 
     const isChecked = computed(() => {
-      if (isCheckedControlled.value) return props.modelValue
       if (isInGroup.value) return groupContext.value?.value === props.value
-      return internalChecked.value
+      return isCheckedControlled.value ? props.modelValue === true : internalChecked.value
+    })
+
+    const inputRef = ref<HTMLInputElement | null>(null)
+    expose({
+      focus: () => inputRef.value?.focus(),
+      input: inputRef
     })
 
     const radioClasses = computed(() =>
@@ -130,7 +134,6 @@ export const Radio = defineComponent({
         colors: defaultRadioColors
       })
     )
-
     const dotClasses = computed(() =>
       getRadioDotClasses({
         size: actualSize.value,
@@ -138,7 +141,6 @@ export const Radio = defineComponent({
         colors: defaultRadioColors
       })
     )
-
     const labelClasses = computed(() =>
       getRadioLabelClasses({
         size: actualSize.value,
@@ -152,76 +154,72 @@ export const Radio = defineComponent({
         event.preventDefault()
         return
       }
-
       const target = event.target as HTMLInputElement
       const newChecked = target.checked
+      if (!newChecked) return
 
-      if (!isCheckedControlled.value && !isInGroup.value && newChecked) {
-        internalChecked.value = true
+      if (isInGroup.value) {
+        groupContext.value?.onChange(props.value)
+        return
       }
 
-      emit('update:modelValue', newChecked)
-      emit('change', props.value)
-
-      // Notify group if part of a group
-      if (newChecked && groupContext.value) groupContext.value.onChange(props.value)
+      if (!isCheckedControlled.value) internalChecked.value = true
+      emit('update:modelValue', true)
+      emit('change', true, event)
+      formItemControl?.onChange(props.value)
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (actualDisabled.value) return
-      if (event.key !== 'Enter') return
-      event.preventDefault()
-
-      const input = event.currentTarget as HTMLInputElement
-      if (!input.checked) input.click()
+    const handleBlur = (event: FocusEvent) => {
+      callUnknownEventHandler(attrs.onBlur, event)
+      if (!isInGroup.value) formItemControl?.onBlur()
     }
 
     return () => {
-      const rootStyle = [attrs.style, props.style]
+      const { class: _class, style: _style, onBlur: _onBlur, ...restAttrs } = attrs
+      const describedBy = mergeAriaDescribedBy(
+        typeof restAttrs['aria-describedby'] === 'string'
+          ? (restAttrs['aria-describedby'] as string)
+          : undefined,
+        isInGroup.value ? undefined : formItemControl?.describedBy.value
+      )
+      const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
+      const effectiveId = isInGroup.value ? attrId : (attrId ?? formItemControl?.id.value)
+
+      const input = h('input', {
+        ...restAttrs,
+        ref: inputRef,
+        id: effectiveId,
+        type: 'radio',
+        class: 'sr-only peer',
+        name: actualName.value,
+        value: props.value,
+        checked: isChecked.value,
+        disabled: actualDisabled.value,
+        'aria-invalid': status.value === 'error' ? true : restAttrs['aria-invalid'],
+        'aria-describedby': describedBy,
+        onChange: handleChange,
+        onBlur: handleBlur
+      })
+      const visual = h('span', { class: radioClasses.value, 'aria-hidden': 'true' }, [
+        h('span', { class: dotClasses.value })
+      ])
       const rootClass = classNames(
         radioRootBaseClasses,
         props.className,
         coerceClassValue(attrs.class)
       )
+      const rootStyle = mergeStyleValues(attrs.style, props.style)
+      const children = slots.default?.()
 
-      const { class: _class, style: _style, ...restAttrs } = attrs
+      if (!children) {
+        return h('span', { class: rootClass, style: rootStyle }, [input, visual])
+      }
 
-      return h(
-        'label',
-        {
-          class: rootClass,
-          style: rootStyle
-        },
-        [
-          // Hidden native radio input
-          h('input', {
-            ...restAttrs,
-            type: 'radio',
-            class: 'sr-only peer',
-            name: actualName.value,
-            value: props.value,
-            checked: isChecked.value,
-            disabled: actualDisabled.value,
-            onChange: handleChange,
-            onKeydown: handleKeyDown
-          }),
-          // Custom radio visual
-          h(
-            'span',
-            {
-              class: radioClasses.value,
-              'aria-hidden': 'true'
-            },
-            [
-              h('span', {
-                class: dotClasses.value
-              })
-            ]
-          ),
-          // Label content
-          slots.default && h('span', { class: labelClasses.value }, slots.default())
-        ]
-      )
+      return h('label', { class: rootClass, style: rootStyle }, [
+        input,
+        visual,
+        h('span', { class: labelClasses.value }, children)
+      ])
     }
   }
 })

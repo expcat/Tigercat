@@ -3,6 +3,7 @@ import type { InputStatus } from '@expcat/tigercat-core'
 
 export interface VueFormItemControlContext {
   id: ComputedRef<string | undefined>
+  labelId: ComputedRef<string | undefined>
   name: ComputedRef<string | undefined>
   status: ComputedRef<InputStatus | undefined>
   /** @deprecated FormItem is the only error surface; always undefined. */

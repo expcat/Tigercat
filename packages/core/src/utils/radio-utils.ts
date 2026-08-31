@@ -5,14 +5,15 @@ import { type RadioColorScheme } from './theme-colors'
 export const radioRootBaseClasses = 'inline-flex items-center'
 
 export const radioVisualBaseClasses =
-  'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all'
+  'relative inline-flex items-center justify-center rounded-full border-2 tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease,background-color_150ms_ease,transform_150ms_ease)] cursor-pointer'
 
 export const radioFocusVisibleClasses =
-  'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
 
-export const radioDotBaseClasses = 'rounded-full transition-all'
+export const radioDotBaseClasses =
+  'rounded-full tiger-motion-aware [transition:var(--tiger-transition-base,transform_150ms_ease)]'
 
-export const radioLabelBaseClasses = 'ml-2 cursor-pointer select-none'
+export const radioLabelBaseClasses = 'ms-2 cursor-pointer select-none'
 
 export const radioDisabledCursorClasses = 'cursor-not-allowed'
 
@@ -63,8 +64,7 @@ export const getRadioVisualClasses = ({
     checked ? colors.borderChecked : colors.border,
     checked ? colors.bgChecked : colors.bg,
     disabled && colors.disabled,
-    disabled && radioDisabledCursorClasses,
-    !disabled && radioHoverBorderClasses
+    disabled ? radioDisabledCursorClasses : radioHoverBorderClasses
   )
 
 export interface GetRadioDotClassesOptions {
@@ -94,3 +94,8 @@ export const getRadioLabelClasses = ({ size, disabled, colors }: GetRadioLabelCl
     disabled ? colors.textDisabled : 'text-[var(--tiger-text,#111827)]',
     disabled && radioDisabledCursorClasses
   )
+
+export function resolveRadioInputName(name?: string, groupName?: string): string | undefined {
+  const resolved = name || groupName
+  return resolved ? resolved : undefined
+}

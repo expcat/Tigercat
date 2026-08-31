@@ -65,6 +65,20 @@ export function callUnknownEventHandler(handler: unknown, event: Event): void {
   }
 }
 
+/** Static flag on RadioGroup / CheckboxGroup so FormItem can skip htmlFor. */
+export const TIGER_FORM_ITEM_LABEL_MODE = 'tigerFormItemLabelMode'
+
+export function markFormItemGroupControl<T>(component: T): T {
+  ;(component as T & { [TIGER_FORM_ITEM_LABEL_MODE]: 'group' })[TIGER_FORM_ITEM_LABEL_MODE] =
+    'group'
+  return component
+}
+
+export function isFormItemGroupControl(type: unknown): boolean {
+  if (type == null || (typeof type !== 'object' && typeof type !== 'function')) return false
+  return (type as Record<string, unknown>)[TIGER_FORM_ITEM_LABEL_MODE] === 'group'
+}
+
 export function mergeAriaDescribedBy(
   existing: string | undefined,
   next: string | undefined

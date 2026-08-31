@@ -1,145 +1,178 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import {
   classNames,
-  getCheckboxClasses,
+  checkboxCheckPathD,
+  checkboxIconSizeClasses,
+  checkboxIconViewBox,
+  checkboxIndeterminatePathD,
+  checkboxGroupIncludes,
+  devWarn,
   getCheckboxLabelClasses,
-  type ComponentSize
+  getCheckboxLabelTextClasses,
+  getCheckboxVisualClasses,
+  mergeAriaDescribedBy,
+  runShakeAnimation,
+  type CheckboxProps as CoreCheckboxProps,
+  type ComponentSize,
+  type InputStatus
 } from '@expcat/tigercat-core'
 import { useCheckboxGroup } from './CheckboxGroup'
 import { useControlledState } from '../hooks/useControlledState'
+import { useFormItemControlContext } from './FormItemContext'
 
-export interface CheckboxProps extends Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'size' | 'onChange' | 'checked' | 'defaultChecked' | 'value'
-> {
-  /**
-   * Checkbox checked state (controlled mode)
-   */
-  checked?: boolean
-
-  /**
-   * Default checked state (uncontrolled mode)
-   * @default false
-   */
-  defaultChecked?: boolean
-
-  /**
-   * Checkbox value (for use in checkbox groups)
-   */
-  value?: string | number | boolean
-
-  /**
-   * Checkbox size
-   * @default 'md'
-   */
-  size?: ComponentSize
-
-  /**
-   * Whether the checkbox is disabled
-   * @default false
-   */
-  disabled?: boolean
-
-  /**
-   * Whether the checkbox is in indeterminate state
-   * @default false
-   */
-  indeterminate?: boolean
-
-  /**
-   * Change event handler
-   */
+export interface CheckboxProps
+  extends
+    Omit<
+      React.InputHTMLAttributes<HTMLInputElement>,
+      'type' | 'size' | 'onChange' | 'checked' | 'defaultChecked' | 'value'
+    >,
+    CoreCheckboxProps {
   onChange?: (checked: boolean, event: React.ChangeEvent<HTMLInputElement>) => void
-
-  /**
-   * Checkbox label content
-   */
   children?: React.ReactNode
-
-  /**
-   * Additional CSS classes
-   */
   className?: string
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({
-  checked: controlledChecked,
-  defaultChecked = false,
-  value,
-  size: propSize,
-  disabled: propDisabled,
-  indeterminate = false,
-  onChange,
-  children,
-  className,
-  ...props
-}) => {
-  // Get group context if inside CheckboxGroup
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
+  {
+    checked: controlledChecked,
+    defaultChecked = false,
+    value,
+    size: propSize,
+    disabled: propDisabled,
+    indeterminate = false,
+    status: statusProp,
+    onChange,
+    children,
+    className,
+    id,
+    name,
+    onBlur,
+    ...props
+  },
+  ref
+) {
   const groupContext = useCheckboxGroup()
+  const formItemControl = useFormItemControlContext()
+  const inGroup = Boolean(groupContext)
+
+  if (inGroup && value === undefined) {
+    devWarn(
+      'Checkbox.groupValue',
+      'Checkbox inside CheckboxGroup must set `value`. Independent `checked` is ignored while grouped.'
+    )
+  }
 
   const [checkedState, setChecked] = useControlledState({
-    value: controlledChecked,
+    value: inGroup ? undefined : controlledChecked,
     defaultValue: defaultChecked,
     onChange
   })
 
-  // Determine effective size and disabled state - simple logical operations
-  const effectiveSize = propSize || groupContext?.size || 'md'
-  const effectiveDisabled = propDisabled || groupContext?.disabled || false
+  const effectiveSize: ComponentSize = propSize || groupContext?.size || 'md'
+  const effectiveDisabled = Boolean(
+    propDisabled || groupContext?.disabled || formItemControl?.disabled
+  )
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const shakeTrigger = formItemControl?.shakeTrigger
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
 
-  const checked =
-    groupContext && value !== undefined ? groupContext.value.includes(value) : checkedState
+  const checked = inGroup
+    ? value !== undefined && checkboxGroupIncludes(groupContext!.value, value)
+    : checkedState
 
-  // Ref for checkbox input element
-  const checkboxRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const rootRef = useRef<HTMLLabelElement>(null)
 
-  // Handle indeterminate state
+  useImperativeHandle(ref, () => inputRef.current as HTMLInputElement, [])
+
   useEffect(() => {
-    if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = indeterminate
-    }
+    if (inputRef.current) inputRef.current.indeterminate = indeterminate
   }, [indeterminate])
+
+  useEffect(() => {
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, shakeTrigger])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (effectiveDisabled) return
-
-    const newValue = event.target.checked
-
-    // If in a group, update group value
-    if (groupContext && value !== undefined) {
-      groupContext.updateValue(value, newValue)
-    } else {
-      setChecked(newValue, event)
+    const next = event.target.checked
+    if (inGroup && value !== undefined) {
+      groupContext!.updateValue(value, next)
+      return
     }
+    setChecked(next, event)
+    formItemControl?.onChange?.(next)
   }
 
-  const checkboxClasses = getCheckboxClasses(effectiveSize, effectiveDisabled)
-
-  const inputProps = {
-    ref: checkboxRef,
-    type: 'checkbox' as const,
-    checked,
-    disabled: effectiveDisabled,
-    value: typeof value === 'boolean' ? String(value) : (value as string | number | undefined),
-    onChange: handleChange,
-    ...props
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    onBlur?.(event)
+    formItemControl?.onBlur?.()
   }
 
-  // If there's no label content, return just the checkbox
-  if (!children) {
-    return <input {...inputProps} className={classNames(checkboxClasses, className)} />
-  }
+  const describedBy = mergeAriaDescribedBy(
+    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    formItemControl?.describedBy
+  )
 
-  // Return label with checkbox and content
-  const labelClasses = classNames(
-    getCheckboxLabelClasses(effectiveSize, effectiveDisabled),
-    className
+  const visual = (
+    <span
+      className={getCheckboxVisualClasses({
+        size: effectiveSize,
+        checked,
+        indeterminate,
+        disabled: effectiveDisabled,
+        status
+      })}
+      aria-hidden="true">
+      {(checked || indeterminate) && (
+        <svg
+          className={checkboxIconSizeClasses[effectiveSize]}
+          viewBox={checkboxIconViewBox}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round">
+          <path d={indeterminate ? checkboxIndeterminatePathD : checkboxCheckPathD} />
+        </svg>
+      )}
+    </span>
+  )
+
+  const input = (
+    <input
+      {...props}
+      ref={inputRef}
+      id={effectiveId}
+      name={effectiveName}
+      type="checkbox"
+      className="sr-only peer"
+      checked={checked}
+      disabled={effectiveDisabled}
+      value={typeof value === 'boolean' ? String(value) : (value as string | number | undefined)}
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-invalid={status === 'error' ? true : props['aria-invalid']}
+      aria-required={formItemControl?.required || props['aria-required'] ? true : undefined}
+      aria-describedby={describedBy}
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
   )
 
   return (
-    <label className={labelClasses}>
-      <input {...inputProps} className={checkboxClasses} />
-      <span className="ml-2">{children}</span>
+    <label
+      ref={rootRef}
+      className={classNames(getCheckboxLabelClasses(effectiveSize, effectiveDisabled), className)}>
+      {input}
+      {visual}
+      {children != null && children !== false && (
+        <span className={getCheckboxLabelTextClasses(effectiveSize, effectiveDisabled)}>
+          {children}
+        </span>
+      )}
     </label>
   )
-}
+})
+
+Checkbox.displayName = 'Checkbox'

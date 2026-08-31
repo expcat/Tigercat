@@ -3,6 +3,8 @@
  */
 
 import type { ComponentSize } from './base'
+import type { ChoiceGroupDirection } from './checkbox'
+import type { InputStatus } from './input'
 
 /**
  * Base radio props interface
@@ -40,6 +42,12 @@ export interface RadioProps {
    * @default false
    */
   defaultChecked?: boolean
+
+  /**
+   * Validation status
+   * @default 'default'
+   */
+  status?: InputStatus
 }
 
 /**
@@ -72,4 +80,16 @@ export interface RadioGroupProps {
    * @default 'md'
    */
   size?: ComponentSize
+
+  /**
+   * Layout direction
+   * @default 'vertical'
+   */
+  direction?: ChoiceGroupDirection
+
+  /**
+   * Validation status
+   * @default 'default'
+   */
+  status?: InputStatus
 }

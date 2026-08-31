@@ -174,11 +174,6 @@ export interface RadioColorScheme {
   innerDot: string
 
   /**
-   * Focus ring color
-   */
-  focus: string
-
-  /**
    * Disabled state styles
    */
   disabled: string
@@ -198,7 +193,6 @@ export const defaultRadioColors: RadioColorScheme = {
   bg: 'bg-[var(--tiger-surface,#ffffff)]',
   bgChecked: 'bg-[var(--tiger-primary,#2563eb)]',
   innerDot: 'bg-[var(--tiger-surface,#ffffff)]',
-  focus: 'ring-[var(--tiger-primary,#2563eb)]',
   disabled: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#d1d5db)]',
   textDisabled: 'text-[var(--tiger-text-disabled,#d1d5db)]'
 }
