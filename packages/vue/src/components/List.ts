@@ -380,6 +380,7 @@ export const List = defineComponent({
         return h(
           VirtualList,
           {
+            role: 'none',
             itemCount: paginatedData.value.length,
             itemHeight: itemHeight.value,
             height: props.virtualHeight,

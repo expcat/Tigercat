@@ -213,6 +213,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           aria-relevant="additions text"
           aria-label={messageListAriaLabel ?? 'Message list'}>
           <VirtualList
+            role="none"
             itemCount={messages.length}
             itemHeight={virtualItemHeight}
             height={virtualHeight}

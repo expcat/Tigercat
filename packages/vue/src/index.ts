@@ -331,7 +331,11 @@ export type { VueColorPickerProps, ColorPickerProps, ColorFormat } from './compo
 export { ColorSwatch } from './components/ColorSwatch'
 export type { VueColorSwatchProps, ColorSwatchProps } from './components/ColorSwatch'
 export { VirtualList } from './components/VirtualList'
-export type { VueVirtualListProps } from './components/VirtualList'
+export type {
+  VueVirtualListProps,
+  VirtualListProps,
+  VirtualListHandle
+} from './components/VirtualList'
 export { Stepper } from './components/Stepper'
 export type { VueStepperProps } from './components/Stepper'
 export { CronEditor } from './components/CronEditor'

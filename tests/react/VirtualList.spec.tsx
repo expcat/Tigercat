@@ -3,10 +3,10 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
-import React from 'react'
-import { VirtualList } from '@expcat/tigercat-react/VirtualList'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { render, fireEvent, act } from '@testing-library/react'
+import React, { createRef } from 'react'
+import { VirtualList, type VirtualListHandle } from '@expcat/tigercat-react/VirtualList'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('VirtualList', () => {
   const defaultProps = {
@@ -62,12 +62,13 @@ describe('VirtualList', () => {
   })
 
   // --- Scroll event ---
-  it('calls onScroll on scroll', () => {
+  it('calls onScroll with the current scrollTop', () => {
     const onScroll = vi.fn()
     const { container } = render(<VirtualList {...defaultProps} onScroll={onScroll} />)
     const outer = container.firstElementChild as HTMLElement
+    outer.scrollTop = 500
     fireEvent.scroll(outer)
-    expect(onScroll).toHaveBeenCalled()
+    expect(onScroll).toHaveBeenCalledWith(500)
   })
 
   // --- Variable size via getItemHeight ---
@@ -199,10 +200,73 @@ describe('VirtualList', () => {
     const outer = container.firstElementChild as HTMLElement
     expect(outer.style.height).toBe('0px')
   })
+  it('forwards data attributes onto the scroller', () => {
+    const { getByTestId } = render(<VirtualList {...defaultProps} data-testid="vl-root" />)
+    expect(getByTestId('vl-root')).toHaveAttribute('role', 'list')
+  })
+
+  it('pins fixed-height items and clips overflow', () => {
+    const { container } = render(<VirtualList {...defaultProps} overscan={0} />)
+    const item = container.querySelector('[role="listitem"]') as HTMLElement
+    expect(item.style.height).toBe('40px')
+    expect(item.style.overflow).toBe('hidden')
+  })
+
+  it('updates the visible window after scrolling', () => {
+    const { container } = render(<VirtualList {...defaultProps} overscan={0} />)
+    const outer = container.firstElementChild as HTMLElement
+    outer.scrollTop = 500
+    fireEvent.scroll(outer)
+    const labels = [...container.querySelectorAll('[role="listitem"]')].map(
+      (node) => node.textContent
+    )
+    expect(labels).toContain('Item 12')
+  })
+
+  it('scrolls to an index through the imperative handle', () => {
+    const ref = createRef<VirtualListHandle>()
+    const { container } = render(
+      <VirtualList {...defaultProps} overscan={0} ref={ref} aria-label="Rows" />
+    )
+    act(() => {
+      ref.current?.scrollToIndex(500)
+    })
+    expect(ref.current?.getScrollElement()?.scrollTop).toBe(20000)
+    expect(container.textContent).toContain('Item 500')
+  })
+
+  it('measures newly visible dynamic items after scroll', () => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      get() {
+        return 80
+      }
+    })
+    const { container } = render(
+      <VirtualList
+        itemCount={100}
+        estimatedItemHeight={30}
+        height={300}
+        overscan={0}
+        renderItem={({ index }) => <div>Item {index}</div>}
+      />
+    )
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    expect(Number.parseInt(inner.style.height, 10)).toBeGreaterThan(3000)
+    outer.scrollTop = 400
+    fireEvent.scroll(outer)
+    expect(Number.parseInt(inner.style.height, 10)).toBeGreaterThan(3000)
+  })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<VirtualList />)
-      await expectNoA11yViolationsIsolated(container)
+    it('names the list and has no axe violations with visible items', async () => {
+      const { container, getByRole } = render(
+        <VirtualList {...defaultProps} aria-label="Rows" overscan={0} />
+      )
+      expect(getByRole('list')).toHaveAccessibleName('Rows')
+      expect(container.querySelectorAll('[role="listitem"]').length).toBeGreaterThan(0)
+      await expectNoA11yViolations(container)
     })
   })
 })

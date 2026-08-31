@@ -1,5 +1,17 @@
-import React, { useState, useMemo, useRef, useCallback, useLayoutEffect } from 'react'
-import type { VirtualListProps as CoreVirtualListProps } from '@expcat/tigercat-core'
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+import type {
+  VirtualListHandle,
+  VirtualListProps as CoreVirtualListProps,
+  VirtualListSizeStrategy
+} from '@expcat/tigercat-core'
 import {
   virtualListContainerClasses,
   virtualListInnerClasses,
@@ -9,51 +21,76 @@ import {
   classNames
 } from '@expcat/tigercat-core'
 
-export interface VirtualListProps extends CoreVirtualListProps {
+export type { VirtualListHandle }
+
+export interface VirtualListProps
+  extends
+    CoreVirtualListProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onScroll' | 'children'> {
   /** Render function for each item — receives { index } */
   renderItem: (info: { index: number }) => React.ReactNode
-  /** Called on scroll */
+  /**
+   * Called with the current `scrollTop` in px (not a DOM Event).
+   */
   onScroll?: (scrollTop: number) => void
 }
 
-export const VirtualList: React.FC<VirtualListProps> = ({
-  itemCount = 0,
-  itemHeight = 40,
-  estimatedItemHeight,
-  getItemHeight,
-  sizeStrategy: customStrategy,
-  height = 400,
-  overscan = 5,
-  className,
-  renderItem,
-  onScroll
-}) => {
+export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(function VirtualList(
+  {
+    itemCount = 0,
+    itemHeight = 40,
+    estimatedItemHeight,
+    getItemHeight,
+    sizeStrategy: customStrategy,
+    height = 400,
+    overscan = 5,
+    getItemKey,
+    ariaLabel,
+    className,
+    renderItem,
+    onScroll,
+    style,
+    role,
+    ...rest
+  },
+  ref
+) {
   const [scrollTop, setScrollTop] = useState(0)
-  // Bumped after DOM measurement so the range/offsets recompute (dynamic mode).
   const [measureVersion, setMeasureVersion] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef(new Map<number, HTMLDivElement>())
-
-  // Dynamic mode measures real DOM heights and writes them back to the strategy.
-  const isDynamic = !customStrategy && !getItemHeight && estimatedItemHeight !== undefined
+  const dynamicStrategyRef = useRef<VirtualListSizeStrategy | null>(null)
+  const lastEstimatedRef = useRef<number | undefined>(undefined)
 
   const strategy = useMemo(() => {
-    if (customStrategy) return customStrategy
-    if (getItemHeight) return variableSizeStrategy(getItemHeight, itemCount)
-    if (estimatedItemHeight !== undefined)
-      return dynamicSizeStrategy(estimatedItemHeight, itemCount)
+    if (customStrategy) {
+      dynamicStrategyRef.current = null
+      return customStrategy
+    }
+    if (getItemHeight) {
+      dynamicStrategyRef.current = null
+      return variableSizeStrategy(getItemHeight, itemCount)
+    }
+    if (estimatedItemHeight !== undefined) {
+      if (!dynamicStrategyRef.current || lastEstimatedRef.current !== estimatedItemHeight) {
+        dynamicStrategyRef.current = dynamicSizeStrategy(estimatedItemHeight, itemCount)
+        lastEstimatedRef.current = estimatedItemHeight
+      }
+      return dynamicStrategyRef.current
+    }
+    dynamicStrategyRef.current = null
     return fixedSizeStrategy(itemHeight)
   }, [customStrategy, getItemHeight, estimatedItemHeight, itemHeight, itemCount])
 
+  const canMeasure = typeof strategy.updateItemHeight === 'function'
+
   const range = useMemo(
     () => strategy.getRange(scrollTop, height, itemCount, overscan),
-    // measureVersion participates so re-measured heights recompute the window.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [scrollTop, height, itemCount, overscan, strategy, measureVersion]
   )
 
   useLayoutEffect(() => {
-    if (!isDynamic || !strategy.updateItemHeight) return
+    if (!canMeasure || !strategy.updateItemHeight) return
     let changed = false
     itemRefs.current.forEach((el, i) => {
       if (!el) return
@@ -64,51 +101,93 @@ export const VirtualList: React.FC<VirtualListProps> = ({
       }
     })
     if (changed) setMeasureVersion((v) => v + 1)
-  }, [isDynamic, strategy])
+  }, [canMeasure, strategy, range.startIndex, range.endIndex, itemCount])
+
+  const applyScrollTop = useCallback(
+    (next: number) => {
+      const el = containerRef.current
+      const offset = Math.max(0, next)
+      if (el && el.scrollTop !== offset) el.scrollTop = offset
+      setScrollTop(offset)
+      onScroll?.(offset)
+    },
+    [onScroll]
+  )
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToIndex(index: number) {
+        const safe = Number.isFinite(index) ? Math.floor(index) : 0
+        const clamped = Math.max(0, Math.min(Math.max(itemCount - 1, 0), safe))
+        applyScrollTop(strategy.getItemOffset(clamped))
+      },
+      scrollToOffset(offset: number) {
+        applyScrollTop(Number.isFinite(offset) ? offset : 0)
+      },
+      getScrollElement() {
+        return containerRef.current
+      }
+    }),
+    [applyScrollTop, itemCount, strategy]
+  )
 
   const handleScroll = useCallback(() => {
-    if (containerRef.current) {
-      const st = containerRef.current.scrollTop
-      setScrollTop(st)
-      onScroll?.(st)
-    }
+    if (!containerRef.current) return
+    const st = containerRef.current.scrollTop
+    setScrollTop(st)
+    onScroll?.(st)
   }, [onScroll])
 
-  const { startIndex, endIndex, totalHeight } = range
+  const { startIndex, endIndex, totalHeight, offsetTop } = range
+  const resolvedRole = role ?? 'list'
+  const asList = resolvedRole === 'list'
 
   const items: React.ReactNode[] = []
   for (let i = startIndex; i <= endIndex; i++) {
     const itemH = strategy.getItemHeight(i)
-    if (isDynamic) {
-      // Auto height so the content's real height can be measured back.
+    const key = getItemKey ? getItemKey(i) : i
+    const itemA11y = asList
+      ? { role: 'listitem' as const, 'aria-setsize': itemCount, 'aria-posinset': i + 1 }
+      : {}
+    if (canMeasure) {
       const index = i
       items.push(
         <div
-          key={index}
+          key={key}
           ref={(el) => {
             if (el) itemRefs.current.set(index, el)
             else itemRefs.current.delete(index)
           }}
+          {...itemA11y}
           style={{ width: '100%' }}>
           {renderItem({ index })}
         </div>
       )
     } else {
       items.push(
-        <div key={i} style={{ height: `${itemH}px`, width: '100%' }}>
+        <div
+          key={key}
+          {...itemA11y}
+          style={{ height: `${itemH}px`, width: '100%', overflow: 'hidden' }}>
           {renderItem({ index: i })}
         </div>
       )
     }
   }
 
-  const offsetTop = startIndex >= 0 ? strategy.getItemOffset(startIndex) : 0
+  const namedAriaLabel =
+    ariaLabel ?? (typeof rest['aria-label'] === 'string' ? rest['aria-label'] : undefined)
 
   return (
     <div
+      {...rest}
       ref={containerRef}
+      role={resolvedRole}
+      tabIndex={0}
+      aria-label={namedAriaLabel}
       className={classNames(virtualListContainerClasses, className)}
-      style={{ height: `${height}px` }}
+      style={{ ...style, height: `${height}px` }}
       onScroll={handleScroll}>
       <div className={virtualListInnerClasses} style={{ height: `${totalHeight}px` }}>
         <div
@@ -124,4 +203,6 @@ export const VirtualList: React.FC<VirtualListProps> = ({
       </div>
     </div>
   )
-}
+})
+
+VirtualList.displayName = 'VirtualList'

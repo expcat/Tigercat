@@ -864,6 +864,7 @@ export const Tree = defineComponent({
             ? h(
                 VirtualList,
                 {
+                  role: 'none',
                   itemCount: visibleItems.value.length,
                   itemHeight: props.itemHeight,
                   height: props.height

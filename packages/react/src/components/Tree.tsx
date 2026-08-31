@@ -46,6 +46,7 @@ export const Tree: React.FC<TreeProps> = (props) => {
       )}
       {ctx.virtual ? (
         <VirtualList
+          role="none"
           itemCount={ctx.visibleItems.length}
           itemHeight={ctx.itemHeight}
           height={ctx.height}

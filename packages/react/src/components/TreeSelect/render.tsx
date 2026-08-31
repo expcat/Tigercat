@@ -81,6 +81,7 @@ export function renderTreeSelectPanel(ctx: Ctx) {
     ) : ctx.virtual ? (
       <div className={treeSelectTreeClasses} style={{ height: ctx.height }} {...ctx.treeAria}>
         <VirtualList
+          role="none"
           itemCount={ctx.visibleItems.length}
           itemHeight={ctx.itemHeight}
           height={ctx.height}

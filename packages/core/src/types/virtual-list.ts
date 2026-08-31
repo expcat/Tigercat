@@ -62,18 +62,48 @@ export interface VirtualListSizeStrategy {
 export interface VirtualListProps {
   /** Total number of items */
   itemCount?: number
-  /** Fixed item height (px) — used when itemSize is 'fixed' */
+  /**
+   * Fixed item height in px. Used when `getItemHeight` and
+   * `estimatedItemHeight` are omitted. Ignored when `estimatedItemHeight` is set.
+   */
   itemHeight?: number
-  /** Estimated item height for variable-height mode */
+  /**
+   * Estimated item height for dynamic measurement. When set (and
+   * `getItemHeight` is not), the list measures rendered items and writes
+   * heights back through the size strategy.
+   */
   estimatedItemHeight?: number
-  /** Function returning the height for a given index (variable mode) */
+  /** Known height per index (variable mode). Takes precedence over estimated/fixed. */
   getItemHeight?: (index: number) => number
-  /** Custom size strategy — overrides itemSize / itemHeight / getItemHeight */
+  /**
+   * Custom size strategy. Overrides `itemHeight` / `getItemHeight` /
+   * `estimatedItemHeight`. If the strategy implements `updateItemHeight`,
+   * visible items are measured after each window commit.
+   */
   sizeStrategy?: VirtualListSizeStrategy
-  /** Visible container height (px) */
+  /**
+   * Visible container height in px (not `%`, not observed from the parent).
+   * @default 400
+   */
   height?: number
-  /** Overscan count: extra items to render above/below viewport */
+  /** Extra items to render above and below the viewport (each side, not doubled). */
   overscan?: number
+  /** Stable key for an index. Defaults to the index. */
+  getItemKey?: (index: number) => string | number
+  /** Accessible name for the scrollable list. */
+  ariaLabel?: string
   /** Custom class name */
   className?: string
+}
+
+/**
+ * Imperative handle exposed by Vue/React VirtualList.
+ *
+ * `scrollToIndex(i)` sets `scrollTop` to the item's offset (item aligned to
+ * the top of the viewport).
+ */
+export interface VirtualListHandle {
+  scrollToIndex: (index: number) => void
+  scrollToOffset: (offset: number) => void
+  getScrollElement: () => HTMLElement | null
 }

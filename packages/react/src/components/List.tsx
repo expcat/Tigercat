@@ -328,6 +328,7 @@ function ListInner<T extends ListItem>(
     if (useVirtual) {
       return (
         <VirtualList
+          role="none"
           itemCount={paginatedData.length}
           itemHeight={itemHeight}
           height={virtualHeight}

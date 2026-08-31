@@ -3,9 +3,11 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { render, fireEvent } from '@testing-library/vue'
 import { VirtualList } from '@expcat/tigercat-vue/VirtualList'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import type { VirtualListHandle } from '@expcat/tigercat-vue/VirtualList'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 describe('VirtualList', () => {
   const defaultProps = {
@@ -74,14 +76,15 @@ describe('VirtualList', () => {
   })
 
   // --- Scroll event ---
-  it('emits scroll event on scroll', async () => {
+  it('emits scroll with the current scrollTop', async () => {
     const onScroll = vi.fn()
     const { container } = render(VirtualList, {
       props: { ...defaultProps, onScroll }
     })
     const outer = container.firstElementChild as HTMLElement
+    outer.scrollTop = 500
     await fireEvent.scroll(outer)
-    expect(onScroll).toHaveBeenCalled()
+    expect(onScroll).toHaveBeenCalledWith(500)
   })
 
   // --- Variable size via getItemHeight ---
@@ -193,10 +196,73 @@ describe('VirtualList', () => {
     const outer = container.firstElementChild as HTMLElement
     expect(outer.style.height).toBe('0px')
   })
+  it('forwards data attributes onto the scroller', () => {
+    const { container } = render(VirtualList, {
+      props: defaultProps,
+      attrs: { 'data-testid': 'vl-root' }
+    })
+    const root = container.querySelector('[data-testid="vl-root"]') as HTMLElement
+    expect(root).toHaveAttribute('role', 'list')
+  })
+
+  it('pins fixed-height items and clips overflow', () => {
+    const { container } = render(VirtualList, {
+      props: { ...defaultProps, overscan: 0 },
+      slots: { default: ({ index }: { index: number }) => `Item ${index}` }
+    })
+    const item = container.querySelector('[role="listitem"]') as HTMLElement
+    expect(item.style.height).toBe('40px')
+    expect(item.style.overflow).toBe('hidden')
+  })
+
+  it('updates the visible window after scrolling', async () => {
+    const { container } = render(VirtualList, {
+      props: { ...defaultProps, overscan: 0 },
+      slots: { default: ({ index }: { index: number }) => `Item ${index}` }
+    })
+    const outer = container.firstElementChild as HTMLElement
+    outer.scrollTop = 500
+    await fireEvent.scroll(outer)
+    expect(container.textContent).toContain('Item 12')
+  })
+
+  it('scrolls to an index through the exposed handle', async () => {
+    const exposed = ref<VirtualListHandle | null>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            VirtualList,
+            {
+              ref: (value: VirtualListHandle | null) => {
+                exposed.value = value
+              },
+              itemCount: 1000,
+              itemHeight: 40,
+              height: 400,
+              overscan: 0,
+              ariaLabel: 'Rows'
+            },
+            { default: ({ index }: { index: number }) => `Item ${index}` }
+          )
+      }
+    })
+    const { container } = render(Wrapper)
+    exposed.value?.scrollToIndex(500)
+    await nextTick()
+    expect(exposed.value?.getScrollElement()?.scrollTop).toBe(20000)
+    expect(container.textContent).toContain('Item 500')
+  })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(VirtualList)
-      await expectNoA11yViolationsIsolated(container)
+    it('names the list and has no axe violations with visible items', async () => {
+      const { container, getByRole } = render(VirtualList, {
+        props: { ...defaultProps, ariaLabel: 'Rows', overscan: 0 },
+        slots: { default: ({ index }: { index: number }) => `Item ${index}` }
+      })
+      expect(getByRole('list')).toHaveAccessibleName('Rows')
+      expect(container.querySelectorAll('[role="listitem"]').length).toBeGreaterThan(0)
+      await expectNoA11yViolations(container)
     })
   })
 })

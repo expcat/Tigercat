@@ -387,6 +387,7 @@ export const ChatWindow = defineComponent({
                   h(
                     VirtualList,
                     {
+                      role: 'none',
                       itemCount: props.messages.length,
                       itemHeight: props.virtualItemHeight,
                       height: props.virtualHeight,
