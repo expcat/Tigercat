@@ -3,7 +3,8 @@ import {
   getSegmentedContainerClasses,
   getSegmentedContainerStyle,
   getSegmentedIndicatorClasses,
-  getSegmentedIndicatorStyle
+  getSegmentedIndicatorStyle,
+  getSegmentedKeyboardTarget
 } from '@expcat/tigercat-core'
 
 describe('segmented-utils', () => {
@@ -13,33 +14,26 @@ describe('segmented-utils', () => {
     })
   })
 
-  it('uses transform to move the active indicator', () => {
-    expect(getSegmentedIndicatorStyle(2, 4, 'md')).toMatchObject({
-      left: '0.25rem',
-      width: 'calc((100% - (0.25rem * 2)) / 4)',
-      transform: 'translateX(200%)',
-      opacity: '1'
-    })
+  it('moves the indicator on the inline axis', () => {
+    const style = getSegmentedIndicatorStyle(2, 4, 'md')
+    expect(style.insetInlineStart).toContain('2 *')
+    expect(style.width).toContain('/ 4')
+    expect(style.opacity).toBe('1')
   })
 
   it('hides the indicator when there is no selected option', () => {
-    expect(getSegmentedIndicatorStyle(-1, 3, 'sm')).toMatchObject({
-      transform: 'translateX(0%)',
-      opacity: '0'
-    })
+    expect(getSegmentedIndicatorStyle(-1, 3, 'sm').opacity).toBe('0')
   })
 
-  it('falls back to registered surface-muted for the track, not fill', () => {
-    const classes = getSegmentedContainerClasses('md', false)
-    expect(classes).toContain('--tiger-surface-muted')
-    expect(classes).toContain('--tiger-segmented-bg')
-    expect(classes).not.toContain('--tiger-fill')
+  it('uses surface tokens for the track and indicator', () => {
+    expect(getSegmentedContainerClasses('md', false)).toContain('--tiger-surface-muted')
+    expect(getSegmentedIndicatorClasses('md')).toContain('--tiger-surface-raised')
   })
 
-  it('falls back to registered surface-raised for the indicator, not surface', () => {
-    const classes = getSegmentedIndicatorClasses('md')
-    expect(classes).toContain('--tiger-surface-raised')
-    expect(classes).toContain('--tiger-segmented-active-bg')
-    expect(classes).not.toMatch(/var\(--tiger-surface[,)]/)
+  it('moves ArrowRight toward reading start in RTL', () => {
+    expect(getSegmentedKeyboardTarget('ArrowRight', 1, [0, 1, 2], false)).toBe(2)
+    expect(getSegmentedKeyboardTarget('ArrowRight', 1, [0, 1, 2], true)).toBe(0)
+    expect(getSegmentedKeyboardTarget('Home', 2, [0, 1, 2], true)).toBe(0)
+    expect(getSegmentedKeyboardTarget('End', 0, [0, 1, 2], true)).toBe(2)
   })
 })

@@ -32,8 +32,9 @@ function createFrameScheduler() {
 
 describe('statistic-utils', () => {
   describe('formatStatisticValue', () => {
-    it('formats precision and group separators together', () => {
-      expect(formatStatisticValue(1234.5, 2, true)).toBe('1,234.50')
+    it('formats precision and group separators with Intl', () => {
+      expect(formatStatisticValue(1234.5, 2, true, 'en-US')).toBe('1,234.50')
+      expect(formatStatisticValue(1234567, 0, true, 'de-DE')).toBe('1.234.567')
     })
 
     it('keeps string values unchanged', () => {

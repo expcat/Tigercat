@@ -6,10 +6,16 @@ import {
   getSegmentedIndicatorClasses,
   getSegmentedIndicatorStyle,
   getSegmentedOptionClasses,
+  getSegmentedTrackClasses,
+  getSegmentedKeyboardTarget,
   classNames,
   coerceClassValue,
-  mergeStyleValues
+  mergeStyleValues,
+  getLocaleDirection,
+  devWarn,
+  icon24ViewBox
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type VueSegmentedProps = InstanceType<typeof Segmented>['$props']
 
@@ -32,10 +38,13 @@ export const Segmented = defineComponent({
     disabled: { type: Boolean, default: false },
     size: { type: String as PropType<ComponentSize>, default: 'md' },
     block: { type: Boolean, default: false },
+    name: { type: String, default: undefined },
     className: { type: String, default: undefined }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const rtl = computed(() => getLocaleDirection(config.value.locale) === 'rtl')
     const isControlled = computed(() => props.modelValue !== undefined)
     const innerValue = ref<string | number | undefined>(props.defaultValue)
     const currentValue = computed(() => (isControlled.value ? props.modelValue : innerValue.value))
@@ -62,38 +71,16 @@ export const Segmented = defineComponent({
 
     function handleKeydown(e: KeyboardEvent, index: number) {
       if (props.disabled) return
-      const enabledIdxs = props.options.reduce<number[]>((acc, opt, i) => {
-        if (!opt.disabled) acc.push(i)
-        return acc
-      }, [])
-      if (enabledIdxs.length === 0) return
-
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
         handleSelect(props.options[index])
         return
       }
-
-      const pos = enabledIdxs.indexOf(index)
-      let target: number | null = null
-      switch (e.key) {
-        case 'ArrowRight':
-        case 'ArrowDown':
-          target = enabledIdxs[(pos + 1 + enabledIdxs.length) % enabledIdxs.length]
-          break
-        case 'ArrowLeft':
-        case 'ArrowUp':
-          target = enabledIdxs[(pos - 1 + enabledIdxs.length) % enabledIdxs.length]
-          break
-        case 'Home':
-          target = enabledIdxs[0]
-          break
-        case 'End':
-          target = enabledIdxs[enabledIdxs.length - 1]
-          break
-        default:
-          return
-      }
+      const enabledIdxs = props.options.reduce<number[]>((acc, opt, i) => {
+        if (!opt.disabled) acc.push(i)
+        return acc
+      }, [])
+      const target = getSegmentedKeyboardTarget(e.key, index, enabledIdxs, rtl.value)
       if (target == null) return
       e.preventDefault()
       const container = (e.currentTarget as HTMLElement).closest<HTMLElement>('[role="radiogroup"]')
@@ -102,9 +89,14 @@ export const Segmented = defineComponent({
     }
 
     return () => {
+      if (new Set(props.options.map((opt) => opt.value)).size !== props.options.length) {
+        devWarn('Segmented.duplicateValue', 'Segmented: option values should be unique.')
+      }
+
       const selectedIndex = props.options.findIndex((opt) => opt.value === currentValue.value)
       const firstEnabledIndex = props.options.findIndex((opt) => !opt.disabled)
       const rovingIndex = selectedIndex >= 0 ? selectedIndex : firstEnabledIndex
+      const attrsRecord = attrs as Record<string, unknown>
 
       return h(
         'div',
@@ -113,45 +105,59 @@ export const Segmented = defineComponent({
           class: classNames(
             getSegmentedContainerClasses(props.size, props.block),
             props.className,
-            coerceClassValue((attrs as Record<string, unknown>).class)
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(
-            (attrs as Record<string, unknown>).style,
+            attrsRecord.style,
             getSegmentedContainerStyle(props.options.length)
           ),
           role: 'radiogroup',
           'aria-disabled': props.disabled || undefined
         },
         [
-          h('div', {
-            'data-tiger-segmented-indicator': 'true',
-            'aria-hidden': 'true',
-            class: getSegmentedIndicatorClasses(props.size),
-            style: getSegmentedIndicatorStyle(
-              props.options.findIndex((opt) => opt.value === currentValue.value),
-              props.options.length,
-              props.size
-            )
-          }),
+          props.name != null
+            ? h('input', { type: 'hidden', name: props.name, value: currentValue.value ?? '' })
+            : null,
+          h('div', { class: getSegmentedTrackClasses(), 'aria-hidden': 'true' }, [
+            h('div', {
+              'data-tiger-segmented-indicator': 'true',
+              class: getSegmentedIndicatorClasses(props.size),
+              style: getSegmentedIndicatorStyle(selectedIndex, props.options.length, props.size)
+            })
+          ]),
           ...props.options.map((opt, index) => {
             const selected = opt.value === currentValue.value
-            const isDisabled = !!opt.disabled || props.disabled
+            const isDisabled = Boolean(opt.disabled) || props.disabled
             return h(
-              'label',
+              'button',
               {
-                key: opt.value,
-                class: classNames(
-                  getSegmentedOptionClasses(props.size, selected, isDisabled),
-                  props.block ? 'flex-1 text-center' : ''
-                ),
+                key: `${String(opt.value)}-${index}`,
+                type: 'button',
+                class: getSegmentedOptionClasses(props.size, selected, isDisabled),
                 role: 'radio',
                 'aria-checked': selected,
-                'aria-disabled': isDisabled,
+                'aria-disabled': isDisabled || undefined,
                 tabindex: isDisabled ? -1 : index === rovingIndex ? 0 : -1,
                 onClick: () => handleSelect(opt),
                 onKeydown: (e: KeyboardEvent) => handleKeydown(e, index)
               },
-              [h('span', null, opt.label)]
+              [
+                opt.icon
+                  ? h(
+                      'svg',
+                      {
+                        viewBox: icon24ViewBox,
+                        class: 'h-4 w-4',
+                        fill: 'none',
+                        stroke: 'currentColor',
+                        'aria-hidden': 'true',
+                        focusable: 'false'
+                      },
+                      [h('path', { d: opt.icon })]
+                    )
+                  : null,
+                h('span', null, opt.label)
+              ]
             )
           })
         ]

@@ -1,10 +1,13 @@
 import type { ComponentSize } from './base'
+import type { TigerLocale } from './locale'
 
 /**
  * Shared Statistic props (framework-agnostic)
  */
 export interface StatisticProps {
-  /** Title / label text */
+  /**
+   * Title / label of the metric. Not the native HTML tooltip.
+   */
   title?: string
   /** The numeric or text value */
   value?: string | number
@@ -22,6 +25,8 @@ export interface StatisticProps {
   animationDuration?: number
   /** Component size */
   size?: ComponentSize
+  /** Locale override merged on top of ConfigProvider locale. */
+  locale?: Partial<TigerLocale>
   /** Custom class name */
   className?: string
 }

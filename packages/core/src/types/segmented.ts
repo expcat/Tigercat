@@ -24,8 +24,13 @@ export interface SegmentedProps {
   disabled?: boolean
   /** Component size */
   size?: ComponentSize
-  /** Whether the control fills full width */
+  /**
+   * Whether the control fills full width
+   * @default false
+   */
   block?: boolean
+  /** Native form name. Writes a hidden input with the selected value. */
+  name?: string
   /** Custom class name */
   className?: string
 }

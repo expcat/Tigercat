@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { forwardRef, useMemo, useState } from 'react'
 import type { RateProps as CoreRateProps } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
@@ -7,48 +7,55 @@ import {
   rateActiveColor,
   rateInactiveColor,
   rateHoverColor,
+  rateIsInlineStartHalf,
   starPathD,
   starViewBox,
   classNames,
   mergeTigerLocale,
   getRateLabels,
   formatRateValueText,
+  sliderGetKeyboardValue,
+  sliderNormalizeValue,
+  getLocaleDirection,
   type TigerLocale,
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
 
-export interface RateProps extends CoreRateProps {
-  /** Controlled value */
+export interface RateProps
+  extends CoreRateProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   value?: number
-  /** Initial value when uncontrolled */
   defaultValue?: number
-  /** Called when value changes */
   onChange?: (value: number) => void
-  /** Called when hover value changes */
   onHoverChange?: (value: number) => void
-  /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
-  /** Text/aria label overrides */
   labels?: Partial<TigerLocaleRate>
+  character?: React.ReactNode
 }
 
-export const Rate: React.FC<RateProps> = ({
-  value,
-  defaultValue = 0,
-  count = 5,
-  allowHalf = false,
-  disabled = false,
-  size = 'md',
-  allowClear = true,
-  character,
-  className,
-  locale,
-  labels: labelsOverride,
-  onChange,
-  onHoverChange
-}) => {
+export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
+  {
+    value,
+    defaultValue = 0,
+    count = 5,
+    allowHalf = false,
+    disabled = false,
+    readOnly = false,
+    size = 'md',
+    allowClear = true,
+    character,
+    className,
+    locale,
+    labels: labelsOverride,
+    onChange,
+    onHoverChange,
+    onKeyDown,
+    'aria-label': ariaLabel,
+    ...rest
+  },
+  ref
+) {
   const config = useTigerConfig()
   const [currentValue, setCurrentValue] = useControlledState({
     value,
@@ -64,165 +71,110 @@ export const Rate: React.FC<RateProps> = ({
     () => getRateLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-
-  const displayValue = hoverValue > 0 ? hoverValue : currentValue
-  const isChar = !!character
-
-  const getStarValue = useCallback((index: number, isHalf: boolean): number => {
-    return isHalf ? index + 0.5 : index + 1
-  }, [])
-
-  const handleClick = useCallback(
-    (index: number, e: React.MouseEvent) => {
-      if (disabled) return
-      const el = e.currentTarget as HTMLElement
-      const rect = el.getBoundingClientRect()
-      const half = allowHalf && e.clientX - rect.left < rect.width / 2
-      const val = getStarValue(index, half)
-      const newVal = allowClear && val === currentValue ? 0 : val
-      setCurrentValue(newVal)
-    },
-    [disabled, allowHalf, getStarValue, allowClear, currentValue, setCurrentValue]
-  )
-
-  const handleMouseMove = useCallback(
-    (index: number, e: React.MouseEvent) => {
-      if (disabled) return
-      const el = e.currentTarget as HTMLElement
-      const rect = el.getBoundingClientRect()
-      const half = allowHalf && e.clientX - rect.left < rect.width / 2
-      const val = getStarValue(index, half)
-      if (val !== hoverValue) {
-        setHoverValue(val)
-        onHoverChange?.(val)
-      }
-    },
-    [disabled, allowHalf, getStarValue, hoverValue, onHoverChange]
-  )
-
-  const handleMouseLeave = useCallback(() => {
-    if (disabled) return
-    setHoverValue(0)
-    onHoverChange?.(0)
-  }, [disabled, onHoverChange])
-
+  const rtl = getLocaleDirection(mergedLocale) === 'rtl'
+  const locked = disabled || readOnly
   const step = allowHalf ? 0.5 : 1
+  const normalized = sliderNormalizeValue(currentValue, 0, count, step)
+  const displayValue = hoverValue > 0 ? hoverValue : normalized
+  const isChar = character != null && character !== false
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (disabled) return
-      let next = currentValue
-      switch (e.key) {
-        case 'ArrowRight':
-        case 'ArrowUp':
-          next = Math.min(count, currentValue + step)
-          break
-        case 'ArrowLeft':
-        case 'ArrowDown':
-          next = Math.max(0, currentValue - step)
-          break
-        case 'Home':
-          next = 0
-          break
-        case 'End':
-          next = count
-          break
-        default:
-          return
-      }
-      e.preventDefault()
-      setCurrentValue(next)
-    },
-    [disabled, currentValue, count, step, setCurrentValue]
-  )
-
-  const starIcon = useMemo(
-    () => (
-      <svg viewBox={starViewBox} fill="currentColor" className="w-full h-full">
+  const glyph = (extraClass?: string) =>
+    isChar ? (
+      <span className={extraClass}>{character}</span>
+    ) : (
+      <svg viewBox={starViewBox} fill="currentColor" className={extraClass ?? 'h-full w-full'}>
         <path d={starPathD} />
       </svg>
-    ),
-    []
-  )
+    )
 
-  const stars = useMemo(() => {
-    const items: React.ReactNode[] = []
-    for (let i = 0; i < count; i++) {
-      const full = displayValue >= i + 1
-      const half = allowHalf && !full && displayValue >= i + 0.5
-      const isHovering = hoverValue > 0
+  const hitValue = (index: number, clientX: number, el: HTMLElement) => {
+    const half = allowHalf && rateIsInlineStartHalf(clientX, el.getBoundingClientRect(), rtl)
+    return half ? index + 0.5 : index + 1
+  }
 
-      const colorClass =
-        full || half ? (isHovering ? rateHoverColor : rateActiveColor) : rateInactiveColor
+  const commit = (next: number) => {
+    if (locked) return
+    setCurrentValue(next)
+  }
 
-      const content = half ? (
-        <>
-          <span className={classNames('absolute inset-0', rateInactiveColor)}>
-            {isChar ? <span>{character}</span> : starIcon}
-          </span>
-          <span
-            className={classNames(
-              'absolute inset-0 overflow-hidden',
-              isHovering ? rateHoverColor : rateActiveColor
-            )}
-            style={{ width: '50%' }}>
-            {isChar ? (
-              <span className={rateHalfStarInnerClasses}>{character}</span>
-            ) : (
-              <svg viewBox={starViewBox} fill="currentColor" className={rateHalfStarInnerClasses}>
-                <path d={starPathD} />
-              </svg>
-            )}
-          </span>
-        </>
-      ) : (
-        <span className={colorClass}>{isChar ? <span>{character}</span> : starIcon}</span>
-      )
+  const stars = []
+  for (let i = 0; i < count; i++) {
+    const full = displayValue >= i + 1
+    const half = allowHalf && !full && displayValue >= i + 0.5
+    const isHovering = hoverValue > 0
+    const colorClass =
+      full || half ? (isHovering ? rateHoverColor : rateActiveColor) : rateInactiveColor
 
-      items.push(
+    const content = half ? (
+      <>
+        <span className={classNames('absolute inset-0', rateInactiveColor)}>{glyph()}</span>
         <span
-          key={i}
-          className={getRateStarClasses(size, isChar, disabled)}
-          aria-hidden="true"
-          onClick={(e) => handleClick(i, e)}
-          onMouseMove={(e) => handleMouseMove(i, e)}
-          onMouseLeave={handleMouseLeave}>
-          {content}
+          className={classNames(
+            'absolute top-0 bottom-0 overflow-hidden',
+            isHovering ? rateHoverColor : rateActiveColor
+          )}
+          style={{ width: '50%', insetInlineStart: 0 }}>
+          {glyph(rateHalfStarInnerClasses)}
         </span>
-      )
-    }
-    return items
-  }, [
-    count,
-    displayValue,
-    hoverValue,
-    allowHalf,
-    disabled,
-    size,
-    character,
-    isChar,
-    starIcon,
-    handleClick,
-    handleMouseMove,
-    handleMouseLeave
-  ])
+      </>
+    ) : (
+      <span className={colorClass}>{glyph()}</span>
+    )
 
-  const valueText = formatRateValueText(labels.valueText, currentValue, mergedLocale?.locale)
+    stars.push(
+      <span
+        key={i}
+        className={getRateStarClasses(size, Boolean(isChar), locked)}
+        aria-hidden="true"
+        onClick={(e) => {
+          if (locked) return
+          const val = hitValue(i, e.clientX, e.currentTarget)
+          commit(allowClear && val === normalized ? 0 : val)
+        }}
+        onMouseMove={(e) => {
+          if (locked) return
+          const val = hitValue(i, e.clientX, e.currentTarget)
+          if (val !== hoverValue) {
+            setHoverValue(val)
+            onHoverChange?.(val)
+          }
+        }}>
+        {content}
+      </span>
+    )
+  }
+
+  const valueText = formatRateValueText(labels.valueText, normalized, mergedLocale?.locale)
 
   return (
     <div
+      ref={ref}
       className={classNames(rateBaseClasses, className)}
       role="slider"
-      aria-label={labels.ariaLabel}
+      aria-label={ariaLabel ?? labels.ariaLabel}
       aria-valuemin={0}
       aria-valuemax={count}
-      aria-valuenow={currentValue}
+      aria-valuenow={normalized}
       aria-valuetext={valueText}
       aria-disabled={disabled || undefined}
+      aria-readonly={readOnly || undefined}
       aria-orientation="horizontal"
       tabIndex={disabled ? -1 : 0}
-      onKeyDown={handleKeyDown}>
+      {...rest}
+      onMouseLeave={() => {
+        if (locked) return
+        setHoverValue(0)
+        onHoverChange?.(0)
+      }}
+      onKeyDown={(e) => {
+        onKeyDown?.(e)
+        if (e.defaultPrevented || locked) return
+        const next = sliderGetKeyboardValue(e.key, normalized, 0, count, step, undefined, rtl)
+        if (next == null) return
+        e.preventDefault()
+        commit(next)
+      }}>
       {stars}
     </div>
   )
-}
+})

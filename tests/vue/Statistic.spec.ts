@@ -125,7 +125,7 @@ describe('Statistic', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(Statistic)
+      const { container } = render(Statistic, { props: { title: 'Users', value: 1234 } })
       await expectNoA11yViolationsIsolated(container)
     })
   })

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import type { StatisticProps as CoreStatisticProps } from '@expcat/tigercat-core'
 import {
   statisticBaseClasses,
@@ -9,36 +9,60 @@ import {
   formatStatisticValue,
   canAnimateStatisticValue,
   createStatisticNumberAnimation,
-  classNames
+  resolveStatisticPrecision,
+  statisticPrefersReducedMotion,
+  classNames,
+  mergeTigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
-export interface StatisticProps extends CoreStatisticProps {}
+export interface StatisticProps
+  extends
+    Omit<CoreStatisticProps, 'title' | 'prefix' | 'suffix'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+  title?: React.ReactNode
+  prefix?: React.ReactNode
+  suffix?: React.ReactNode
+}
 
-export const Statistic: React.FC<StatisticProps> = ({
-  title,
-  value,
-  precision,
-  prefix,
-  suffix,
-  groupSeparator = false,
-  animated = false,
-  animationDuration,
-  size = 'md',
-  className
-}) => {
-  const initialValue = animated && canAnimateStatisticValue(value) ? 0 : value
-  const [displayValue, setDisplayValue] = useState<string | number | undefined>(initialValue)
-  const currentNumberRef = useRef(canAnimateStatisticValue(initialValue) ? initialValue : 0)
+export const Statistic = forwardRef<HTMLDivElement, StatisticProps>(function Statistic(
+  {
+    title,
+    value,
+    precision,
+    prefix,
+    suffix,
+    groupSeparator = false,
+    animated = false,
+    animationDuration,
+    size = 'md',
+    className,
+    locale,
+    ...rest
+  },
+  ref
+) {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const localeId = mergedLocale?.locale
+  const [displayValue, setDisplayValue] = useState<string | number | undefined>(value)
+  const currentNumberRef = useRef(canAnimateStatisticValue(value) ? value : 0)
+  const hasPlayedRef = useRef(false)
 
   useEffect(() => {
-    if (!animated || !canAnimateStatisticValue(value)) {
+    if (!animated || !canAnimateStatisticValue(value) || statisticPrefersReducedMotion()) {
       setDisplayValue(value)
       if (canAnimateStatisticValue(value)) currentNumberRef.current = value
       return undefined
     }
 
+    const from = hasPlayedRef.current ? currentNumberRef.current : 0
+    hasPlayedRef.current = true
     const controller = createStatisticNumberAnimation({
-      from: currentNumberRef.current,
+      from,
       to: value,
       duration: animationDuration,
       onUpdate: (next) => {
@@ -54,19 +78,23 @@ export const Statistic: React.FC<StatisticProps> = ({
     return controller.stop
   }, [value, animated, animationDuration])
 
+  const formatPrecision = canAnimateStatisticValue(value)
+    ? resolveStatisticPrecision(value, precision)
+    : precision
+
   const formatted = useMemo(
-    () => formatStatisticValue(displayValue, precision, groupSeparator),
-    [displayValue, precision, groupSeparator]
+    () => formatStatisticValue(displayValue, formatPrecision, groupSeparator, localeId),
+    [displayValue, formatPrecision, groupSeparator, localeId]
   )
 
   return (
-    <div className={classNames(statisticBaseClasses, className)}>
-      {title && <div className={getStatisticTitleClasses(size)}>{title}</div>}
+    <div ref={ref} className={classNames(statisticBaseClasses, className)} {...rest}>
+      {title ? <div className={getStatisticTitleClasses(size)}>{title}</div> : null}
       <div className={getStatisticValueClasses(size)}>
-        {prefix && <span className={statisticPrefixClasses}>{prefix}</span>}
+        {prefix ? <span className={statisticPrefixClasses}>{prefix}</span> : null}
         <span>{formatted}</span>
-        {suffix && <span className={statisticSuffixClasses}>{suffix}</span>}
+        {suffix ? <span className={statisticSuffixClasses}>{suffix}</span> : null}
       </div>
     </div>
   )
-}
+})

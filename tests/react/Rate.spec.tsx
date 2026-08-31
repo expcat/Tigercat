@@ -60,7 +60,7 @@ describe('Rate', () => {
 
   it('uses singular valuetext for a value of 1', () => {
     const { container } = render(<Rate value={1} />)
-    expect(container.querySelector('[role="slider"]')).toHaveAttribute('aria-valuetext', '1 star')
+    expect(container.querySelector('[role="slider"]')).toHaveAttribute('aria-valuetext', '1 stars')
   })
 
   it('localizes slider aria text from ConfigProvider', () => {
@@ -125,6 +125,7 @@ describe('Rate', () => {
     const clip = fifth.querySelector('.overflow-hidden') as HTMLElement | null
     expect(clip).not.toBeNull()
     expect(clip!.style.width).toBe('50%')
+    expect(clip!.style.insetInlineStart).toBe('0')
 
     const glyph = clip!.querySelector('svg') ?? clip!.firstElementChild
     expect(glyph).not.toBeNull()
@@ -144,7 +145,11 @@ describe('Rate', () => {
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Rate />)
+      const { container, rerender } = render(<Rate defaultValue={3} />)
+      await expectNoA11yViolationsIsolated(container)
+      rerender(<Rate value={4.5} allowHalf readOnly />)
+      await expectNoA11yViolationsIsolated(container)
+      rerender(<Rate value={2} disabled />)
       await expectNoA11yViolationsIsolated(container)
     })
   })

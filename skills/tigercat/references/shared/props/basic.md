@@ -376,13 +376,20 @@ Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Ref
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 3/11 props
+`packages/core/src/types/rate.ts` · `RateProps` · 8/12 props
 
-| Prop        | Type                   | Default | Notes                                                   |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `disabled?` | `boolean`              | `-`     | Whether the component is disabled / read-only           |
-| `value?`    | `number`               | `-`     | Controlled value                                        |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
+Note: `readOnly` 可聚焦不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。
+
+| Prop          | Type       | Default | Notes                                                                        |
+| ------------- | ---------- | ------- | ---------------------------------------------------------------------------- |
+| `allowHalf?`  | `boolean`  | `-`     | Whether to allow half stars                                                  |
+| `allowClear?` | `boolean`  | `true`  | Whether to allow clearing by clicking the same value                         |
+| `character?`  | `string`   | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
+| `readOnly?`   | `boolean`  | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
+| `disabled?`   | `boolean`  | `-`     | Whether the component is disabled                                            |
+| `size?`       | `RateSize` | `'md'`  | Component size                                                               |
+| `count?`      | `number`   | `-`     | Number of stars                                                              |
+| `value?`      | `number`   | `-`     | -                                                                            |
 
 ## Result
 
@@ -399,13 +406,18 @@ Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTT
 
 ## Segmented
 
-`packages/core/src/types/segmented.ts` · `SegmentedProps` · 3/7 props
+`packages/core/src/types/segmented.ts` · `SegmentedProps` · 6/8 props
 
-| Prop        | Type                | Default | Notes                                 |
-| ----------- | ------------------- | ------- | ------------------------------------- |
-| `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
-| `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
-| `value?`    | `string \| number`  | `-`     | Controlled value                      |
+Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。
+
+| Prop        | Type                | Default | Notes                                                            |
+| ----------- | ------------------- | ------- | ---------------------------------------------------------------- |
+| `options?`  | `SegmentedOption[]` | `-`     | Available options                                                |
+| `block?`    | `boolean`           | `false` | Whether the control fills full width                             |
+| `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled                            |
+| `size?`     | `ComponentSize`     | `-`     | Component size                                                   |
+| `name?`     | `string`            | `-`     | Native form name. Writes a hidden input with the selected value. |
+| `value?`    | `string \| number`  | `-`     | -                                                                |
 
 ## SplitButton
 
@@ -419,13 +431,19 @@ Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTT
 
 ## Statistic
 
-`packages/core/src/types/statistic.ts` · `StatisticProps` · 3/10 props
+`packages/core/src/types/statistic.ts` · `StatisticProps` · 7/11 props
 
-| Prop        | Type               | Default | Notes                             |
-| ----------- | ------------------ | ------- | --------------------------------- |
-| `value?`    | `string \| number` | `-`     | The numeric or text value         |
-| `animated?` | `boolean`          | `-`     | Whether to animate numeric values |
-| `title?`    | `string`           | `-`     | Title / label text                |
+Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。
+
+| Prop              | Type                   | Default | Notes                                                     |
+| ----------------- | ---------------------- | ------- | --------------------------------------------------------- |
+| `title?`          | `string`               | `-`     | Title / label of the metric. Not the native HTML tooltip. |
+| `value?`          | `string \| number`     | `-`     | The numeric or text value                                 |
+| `groupSeparator?` | `boolean`              | `-`     | Whether to show grouping separator (e.g. 1,000)           |
+| `animated?`       | `boolean`              | `-`     | Whether to animate numeric values                         |
+| `prefix?`         | `string`               | `-`     | Prefix text or symbol before the value                    |
+| `suffix?`         | `string`               | `-`     | Suffix text or symbol after the value                     |
+| `locale?`         | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.   |
 
 ## Tag
 

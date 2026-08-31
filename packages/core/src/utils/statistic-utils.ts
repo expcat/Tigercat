@@ -1,4 +1,6 @@
 import { classNames } from './class-names'
+import { isBrowser } from './env'
+import { formatIntlNumber } from './locale-utils'
 import type { ComponentSize } from '../types/base'
 
 export interface StatisticNumberAnimationOptions {
@@ -34,23 +36,20 @@ const valueSize: Record<ComponentSize, string> = {
 }
 
 export function getStatisticTitleClasses(size: ComponentSize): string {
-  return classNames(
-    titleSize[size],
-    'text-[var(--tiger-statistic-title,var(--tiger-text-muted,#6b7280))] mb-1'
-  )
+  return classNames(titleSize[size], 'text-[var(--tiger-text-muted,#6b7280)] mb-1')
 }
 
 export function getStatisticValueClasses(size: ComponentSize): string {
-  return classNames(
-    valueSize[size],
-    'text-[var(--tiger-statistic-value,var(--tiger-text,#111827))]'
-  )
+  return classNames(valueSize[size], 'text-[var(--tiger-text,#111827)]')
 }
 
-export const statisticPrefixClasses =
-  'mr-1 text-[var(--tiger-statistic-prefix,var(--tiger-text,#111827))]'
-export const statisticSuffixClasses =
-  'ml-1 text-[var(--tiger-statistic-suffix,var(--tiger-text-muted,#6b7280))]'
+export const statisticPrefixClasses = 'me-1 text-[var(--tiger-text,#111827)]'
+export const statisticSuffixClasses = 'ms-1 text-[var(--tiger-text-muted,#6b7280)]'
+
+export function statisticPrefersReducedMotion(): boolean {
+  if (!isBrowser() || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
 /* ------------------------------------------------------------------ */
 /*  Number animation                                                   */
@@ -128,22 +127,30 @@ export function createStatisticNumberAnimation(
 /*  Formatting                                                         */
 /* ------------------------------------------------------------------ */
 
+export function resolveStatisticPrecision(value: number, precision: number | undefined): number {
+  if (precision !== undefined && Number.isFinite(precision)) {
+    return Math.max(0, Math.min(20, Math.floor(precision)))
+  }
+  const text = String(value)
+  const dot = text.indexOf('.')
+  if (dot === -1) return 0
+  return text.length - dot - 1
+}
+
 export function formatStatisticValue(
   value: string | number | undefined,
   precision: number | undefined,
-  groupSeparator: boolean
+  groupSeparator: boolean,
+  locale?: string
 ): string {
   if (value === undefined || value === '') return ''
 
   if (typeof value === 'string') return value
 
-  let formatted = precision !== undefined ? value.toFixed(precision) : String(value)
-
-  if (groupSeparator) {
-    const [intPart, decPart] = formatted.split('.')
-    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    formatted = decPart !== undefined ? `${grouped}.${decPart}` : grouped
-  }
-
-  return formatted
+  const digits = resolveStatisticPrecision(value, precision)
+  return formatIntlNumber(value, locale, {
+    useGrouping: groupSeparator,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  })
 }

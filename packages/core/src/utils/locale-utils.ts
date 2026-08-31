@@ -125,10 +125,14 @@ export function getLocaleDirection(locale?: string | Partial<TigerLocale>): Tige
   return isRtlLocale(locale) ? 'rtl' : 'ltr'
 }
 
-export function formatIntlNumber(value: number, locale?: string): string {
-  if (!locale) return String(value)
+export function formatIntlNumber(
+  value: number,
+  locale?: string,
+  options?: Intl.NumberFormatOptions
+): string {
+  if (!locale && !options) return String(value)
   try {
-    return new Intl.NumberFormat(locale).format(value)
+    return new Intl.NumberFormat(locale || undefined, options).format(value)
   } catch {
     return String(value)
   }
@@ -347,15 +351,10 @@ export function getRateLabels(
 }
 
 /**
- * Fill `{value}` with an Intl number and `{plural}` with an English suffix
- * (`''` for `one`, `'s'` otherwise). Locales that write a complete sentence
- * omit `{plural}` so they are not given an English `s`.
+ * Fill `{value}` with an Intl number. The rest of the sentence comes from the locale.
  */
 export function formatRateValueText(template: string, value: number, locale?: string): string {
-  const category = getIntlPluralCategory(value, locale)
-  return template
-    .replace('{value}', formatIntlNumber(value, locale))
-    .replace('{plural}', category === 'one' ? '' : 's')
+  return template.replace('{value}', formatIntlNumber(value, locale))
 }
 
 export function getAvatarGroupLabels(

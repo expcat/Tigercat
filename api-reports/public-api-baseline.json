@@ -1617,7 +1617,9 @@
       "getSegmentedContainerStyle",
       "getSegmentedIndicatorClasses",
       "getSegmentedIndicatorStyle",
+      "getSegmentedKeyboardTarget",
       "getSegmentedOptionClasses",
+      "getSegmentedTrackClasses",
       "getSelectLabels",
       "getSelectOptionClasses",
       "getSelectSizeClasses",
@@ -2645,6 +2647,7 @@
       "rateHalfStarInnerClasses",
       "rateHoverColor",
       "rateInactiveColor",
+      "rateIsInlineStartHalf",
       "RateProps",
       "RateSize",
       "readFileAsDataUrl",
@@ -2799,6 +2802,7 @@
       "resolveSplitButtonSize",
       "resolveSplitButtonTriggerAriaLabel",
       "resolveSplitButtonVariant",
+      "resolveStatisticPrecision",
       "resolveSwipeGesture",
       "resolveTableColumnWidth",
       "resolveTextAlign",
@@ -3055,6 +3059,7 @@
       "statisticBaseClasses",
       "StatisticNumberAnimationController",
       "StatisticNumberAnimationOptions",
+      "statisticPrefersReducedMotion",
       "statisticPrefixClasses",
       "StatisticProps",
       "statisticSuffixClasses",
@@ -5330,7 +5335,16 @@
     },
     "RateProps": {
       "extends": [],
-      "props": ["allowClear", "allowHalf", "character", "className", "count", "disabled", "size"]
+      "props": [
+        "allowClear",
+        "allowHalf",
+        "character",
+        "className",
+        "count",
+        "disabled",
+        "readOnly",
+        "size"
+      ]
     },
     "ResizableProps": {
       "extends": [],
@@ -5431,7 +5445,7 @@
     },
     "SegmentedProps": {
       "extends": [],
-      "props": ["block", "className", "disabled", "options", "size"]
+      "props": ["block", "className", "disabled", "name", "options", "size"]
     },
     "SelectProps": {
       "extends": [],
@@ -5567,6 +5581,7 @@
         "animationDuration",
         "className",
         "groupSeparator",
+        "locale",
         "precision",
         "prefix",
         "size",

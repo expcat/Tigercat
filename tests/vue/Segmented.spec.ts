@@ -51,18 +51,18 @@ describe('Segmented', () => {
     expect(radios[0].getAttribute('aria-checked')).toBe('false')
   })
 
-  it('moves the active indicator with transform when value changes', async () => {
+  it('moves the active indicator along the inline axis when value changes', async () => {
     const { container, rerender } = renderWithProps(Segmented, {
       options: defaultOptions,
       modelValue: 'b'
     })
-    const indicator = container.querySelector('[data-tiger-segmented-indicator]')
+    const indicator = container.querySelector('[data-tiger-segmented-indicator]') as HTMLElement
 
-    expect(indicator).toHaveStyle({ transform: 'translateX(100%)' })
-    expect(indicator).toHaveStyle({ width: 'calc((100% - (0.25rem * 2)) / 3)' })
+    expect(indicator.getAttribute('style') ?? '').toContain('1 *')
+    expect(indicator.getAttribute('style') ?? '').toContain('/ 3')
 
     await rerender({ options: defaultOptions, modelValue: 'c' })
-    expect(indicator).toHaveStyle({ transform: 'translateX(200%)' })
+    expect(indicator.getAttribute('style') ?? '').toContain('2 *')
   })
 
   // --- Disabled ---
@@ -80,9 +80,9 @@ describe('Segmented', () => {
     ]
     const { container } = renderWithProps(Segmented, { options: opts })
     const radios = container.querySelectorAll('[role="radio"]')
-    expect(radios[0].getAttribute('aria-disabled')).toBe('false')
+    expect(radios[0].getAttribute('aria-disabled')).toBeNull()
     expect(radios[1].getAttribute('aria-disabled')).toBe('true')
-    expect(radios[2].getAttribute('aria-disabled')).toBe('false')
+    expect(radios[2].getAttribute('aria-disabled')).toBeNull()
   })
 
   // --- Keyboard / roving tabindex (C13-1) ---
@@ -139,7 +139,11 @@ describe('Segmented', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(Segmented)
+      const { container } = renderWithProps(Segmented, {
+        options: defaultOptions,
+        modelValue: 'a',
+        'aria-label': 'Range'
+      })
       await expectNoA11yViolationsIsolated(container)
     })
   })

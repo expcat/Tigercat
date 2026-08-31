@@ -271,7 +271,7 @@ export const enUS: TigerLocale = {
   },
   rate: {
     ariaLabel: 'Rating',
-    valueText: '{value} star{plural}'
+    valueText: '{value} stars'
   },
   avatarGroup: {
     ariaLabel: 'Avatar group',

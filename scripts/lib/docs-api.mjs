@@ -90,6 +90,9 @@ export const COMPONENT_PROP_PRIORITY = {
   Empty: ['preset?', 'description?', 'showImage?'],
   Result: ['status?', 'title?', 'subTitle?', 'headingLevel?'],
   QRCode: ['value', 'status?', 'size?', 'color?', 'bgColor?'],
+  Statistic: ['title?', 'value?', 'groupSeparator?', 'animated?', 'prefix?', 'suffix?'],
+  Rate: ['allowHalf?', 'allowClear?', 'character?', 'readOnly?', 'disabled?', 'size?', 'count?'],
+  Segmented: ['options?', 'block?', 'disabled?', 'size?', 'name?'],
   Button: [
     'variant?',
     'size?',
@@ -236,6 +239,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
     Result: '<Result status="success" title="提交成功" />',
+    Statistic: '<Statistic title="Users" :value="1234" />',
+    Rate: '<Rate :default-value="3" />',
+    Segmented: '<Segmented :options="options" aria-label="View" />',
     Tour: '<Tour :steps="steps" />'
   },
   React: {
@@ -244,6 +250,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
     Result: '<Result status="success" title="提交成功" />',
+    Statistic: '<Statistic title="Users" value={1234} />',
+    Rate: '<Rate defaultValue={3} />',
+    Segmented: '<Segmented options={options} aria-label="View" />',
     Tour: '<Tour steps={steps} />'
   }
 }

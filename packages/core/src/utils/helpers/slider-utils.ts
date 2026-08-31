@@ -141,17 +141,20 @@ export function sliderGetKeyboardValue(
   min: number,
   max: number,
   step: number = 1,
-  largeStep?: number
+  largeStep?: number,
+  rtl = false
 ): number | null {
   const safeStep = Number.isFinite(step) && step > 0 ? step : 1
   const bigStep = Number.isFinite(largeStep) && largeStep! > 0 ? largeStep! : safeStep * 10
   const safeCurrent = sliderNormalizeValue(currentValue, min, max, safeStep)
+  const inlineIncrease = rtl ? 'ArrowLeft' : 'ArrowRight'
+  const inlineDecrease = rtl ? 'ArrowRight' : 'ArrowLeft'
 
   switch (key) {
-    case 'ArrowRight':
+    case inlineIncrease:
     case 'ArrowUp':
       return sliderNormalizeValue(safeCurrent + safeStep, min, max, safeStep)
-    case 'ArrowLeft':
+    case inlineDecrease:
     case 'ArrowDown':
       return sliderNormalizeValue(safeCurrent - safeStep, min, max, safeStep)
     case 'PageUp':

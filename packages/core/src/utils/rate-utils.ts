@@ -5,7 +5,11 @@ import type { RateSize } from '../types/rate'
 /*  Style constants                                                    */
 /* ------------------------------------------------------------------ */
 
-export const rateBaseClasses = 'inline-flex items-center gap-0.5'
+export const rateBaseClasses = classNames(
+  'inline-flex items-center gap-0.5 rounded-[var(--tiger-radius-sm,0.25rem)]',
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+)
 
 const sizePx: Record<RateSize, string> = {
   sm: 'w-4 h-4',
@@ -34,9 +38,21 @@ export function getRateStarClasses(
 /** Inner glyph of a 50% overflow clip: 200% of the clip equals the parent star box. */
 export const rateHalfStarInnerClasses = 'w-[200%] h-full'
 
-export const rateActiveColor = 'text-[var(--tiger-rate-active,var(--tiger-warning,#f59e0b))]'
-export const rateInactiveColor = 'text-[var(--tiger-rate-inactive,var(--tiger-border,#d1d5db))]'
-export const rateHoverColor = 'text-[var(--tiger-rate-hover,var(--tiger-warning,#fbbf24))]'
+export const rateActiveColor =
+  'text-[color-mix(in_srgb,var(--tiger-warning,#d97706)_75%,var(--tiger-text,#111827))]'
+export const rateInactiveColor = 'text-[var(--tiger-text-disabled,#9ca3af)]'
+export const rateHoverColor =
+  'text-[color-mix(in_srgb,var(--tiger-warning,#d97706)_55%,var(--tiger-text,#111827))]'
+
+/** True when the pointer is on the inline-start half of the star. */
+export function rateIsInlineStartHalf(
+  clientX: number,
+  rect: Pick<DOMRect, 'left' | 'width'>,
+  rtl: boolean
+): boolean {
+  const mid = rect.left + rect.width / 2
+  return rtl ? clientX >= mid : clientX < mid
+}
 
 /* ------------------------------------------------------------------ */
 /*  SVG star path                                                      */

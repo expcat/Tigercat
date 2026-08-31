@@ -109,6 +109,7 @@ describe('Rate', () => {
     const clip = fifth.querySelector('.overflow-hidden') as HTMLElement | null
     expect(clip).not.toBeNull()
     expect(clip!.style.width).toBe('50%')
+    expect(clip!.style.insetInlineStart).toBe('0')
 
     const glyph = clip!.querySelector('svg') ?? clip!.firstElementChild
     expect(glyph).not.toBeNull()
