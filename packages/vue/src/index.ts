@@ -211,14 +211,19 @@ export {
   NavigationMenuItem,
   NavigationMenuTrigger,
   NavigationMenuContent,
-  NavigationMenuLink
+  NavigationMenuLink,
+  NavigationMenuList,
+  useNavigationMenuContext
 } from './components/NavigationMenu'
 export type {
   VueNavigationMenuProps,
+  NavigationMenuProps,
   VueNavigationMenuItemProps,
   VueNavigationMenuTriggerProps,
   VueNavigationMenuContentProps,
-  VueNavigationMenuLinkProps
+  VueNavigationMenuLinkProps,
+  VueNavigationMenuListProps,
+  NavigationMenuListProps
 } from './components/NavigationMenu'
 export { PageHeader } from './components/PageHeader'
 export type { VuePageHeaderProps } from './components/PageHeader'

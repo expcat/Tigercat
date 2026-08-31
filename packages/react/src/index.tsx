@@ -226,7 +226,8 @@ export {
   NavigationMenuItem,
   NavigationMenuTrigger,
   NavigationMenuContent,
-  NavigationMenuLink
+  NavigationMenuLink,
+  NavigationMenuList
 } from './components/NavigationMenu'
 export type {
   NavigationMenuProps,
@@ -234,6 +235,7 @@ export type {
   NavigationMenuTriggerProps,
   NavigationMenuContentProps,
   NavigationMenuLinkProps,
+  NavigationMenuListProps,
   NavigationMenuContextValue,
   NavigationMenuItemContextValue
 } from './components/NavigationMenu'

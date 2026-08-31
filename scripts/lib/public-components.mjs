@@ -277,6 +277,7 @@ const DOC_SECTION_ALIASES = new Map([
   ['NavigationMenuTrigger', 'NavigationMenu'],
   ['NavigationMenuContent', 'NavigationMenu'],
   ['NavigationMenuLink', 'NavigationMenu'],
+  ['NavigationMenuList', 'NavigationMenu'],
   ['FloatButtonGroup', 'FloatButton'],
   ['InputGroupAddon', 'InputGroup'],
   ['PrintPageBreak', 'PrintLayout']
@@ -530,6 +531,7 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['NavigationMenuContent', 'NavigationMenu'],
   ['NavigationMenuItem', 'NavigationMenu'],
   ['NavigationMenuLink', 'NavigationMenu'],
+  ['NavigationMenuList', 'NavigationMenu'],
   ['NavigationMenuTrigger', 'NavigationMenu'],
   ['FloatButtonGroup', 'FloatButton'],
   ['InputGroupAddon', 'InputGroup'],

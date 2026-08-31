@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger
 } from '@expcat/tigercat-react/NavigationMenu'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 function Demo(props: React.ComponentProps<typeof NavigationMenu>) {
   return (
@@ -22,15 +22,17 @@ function Demo(props: React.ComponentProps<typeof NavigationMenu>) {
         <NavigationMenuItem value="products">
           <NavigationMenuTrigger>Products</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <NavigationMenuLink>Overview</NavigationMenuLink>
-            <NavigationMenuLink disabled>Disabled</NavigationMenuLink>
-            <NavigationMenuLink>Pricing</NavigationMenuLink>
+            <NavigationMenuLink href="/overview">Overview</NavigationMenuLink>
+            <NavigationMenuLink href="/disabled" disabled>
+              Disabled
+            </NavigationMenuLink>
+            <NavigationMenuLink href="/pricing">Pricing</NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem value="docs">
           <NavigationMenuTrigger>Docs</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <NavigationMenuLink>Guide</NavigationMenuLink>
+          <NavigationMenuContent mega>
+            <NavigationMenuLink href="/guide">Guide</NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
@@ -70,25 +72,36 @@ describe('NavigationMenu', () => {
     expect(wrapper).toHaveAttribute('hidden')
   })
 
-  it('opens on hover and records data-state', () => {
-    render(<Demo />)
-    const trigger = screen.getByRole('menuitem', { name: 'Products' })
-    expect(trigger).toHaveAttribute('data-state', 'closed')
-
-    fireEvent.mouseEnter(trigger)
-    expect(trigger).toHaveAttribute('data-state', 'open')
-    expect(getPanel()).not.toHaveAttribute('hidden')
-  })
-
-  it('opens on focus and ArrowDown, then restores focus on Escape', async () => {
+  it('does not open on focus and toggles on click', () => {
     render(<Demo />)
     const trigger = screen.getByRole('menuitem', { name: 'Products' })
 
     fireEvent.focus(trigger)
-    expect(trigger).toHaveAttribute('aria-expanded', 'true')
-
-    fireEvent.keyDown(trigger, { key: 'Escape' })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+    fireEvent.click(trigger)
+    expect(trigger).toHaveAttribute('data-state', 'open')
+    expect(getPanel()).not.toHaveAttribute('hidden')
+
+    fireEvent.click(trigger)
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(getPanel()).toHaveAttribute('hidden')
+  })
+
+  it('opens on hover only when openOnHover is set', () => {
+    const { rerender } = render(<Demo />)
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    fireEvent.mouseEnter(trigger)
+    expect(trigger).toHaveAttribute('data-state', 'closed')
+
+    rerender(<Demo openOnHover />)
+    fireEvent.mouseEnter(screen.getByRole('menuitem', { name: 'Products' }))
+    expect(screen.getByRole('menuitem', { name: 'Products' })).toHaveAttribute('data-state', 'open')
+  })
+
+  it('opens with ArrowDown immediately and restores focus on Escape', async () => {
+    render(<Demo />)
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
 
     trigger.focus()
     fireEvent.keyDown(trigger, { key: 'ArrowDown' })
@@ -96,9 +109,48 @@ describe('NavigationMenu', () => {
     await waitFor(() => {
       expect(document.activeElement).toHaveTextContent('Overview')
     })
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Escape' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveFocus()
   })
 
-  it('moves across top-level items with arrow keys', () => {
+  it('keeps the moved tab stop after opening a panel', async () => {
+    render(<Demo />)
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    products.focus()
+    fireEvent.keyDown(products, { key: 'ArrowRight' })
+    const docs = screen.getByRole('menuitem', { name: 'Docs' })
+    expect(docs).toHaveFocus()
+
+    fireEvent.keyDown(docs, { key: 'ArrowDown' })
+    await waitFor(() => {
+      expect(document.activeElement).toHaveTextContent('Guide')
+    })
+    expect(docs.tabIndex).toBe(0)
+    expect(products.tabIndex).toBe(-1)
+  })
+
+  it('moves Tab out of the panel to the control after the nav', async () => {
+    render(
+      <>
+        <Demo />
+        <button type="button">After</button>
+      </>
+    )
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    fireEvent.click(products)
+    fireEvent.keyDown(products, { key: 'ArrowDown' })
+    await waitFor(() => {
+      expect(document.activeElement).toHaveTextContent('Overview')
+    })
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Tab' })
+    expect(screen.getByRole('button', { name: 'After' })).toHaveFocus()
+    expect(products).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('moves across top-level items with arrow keys and Home/End', () => {
     render(<Demo />)
     const products = screen.getByRole('menuitem', { name: 'Products' })
     products.focus()
@@ -107,6 +159,50 @@ describe('NavigationMenu', () => {
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowRight' })
     expect(document.activeElement).toHaveTextContent('About')
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Home' })
+    expect(document.activeElement).toHaveTextContent('Products')
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'End' })
+    expect(document.activeElement).toHaveTextContent('About')
+  })
+
+  it('moves to the visual next item with ArrowLeft when dir is rtl', () => {
+    render(
+      <div dir="rtl">
+        <Demo />
+      </div>
+    )
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    products.focus()
+    fireEvent.keyDown(products, { key: 'ArrowLeft' })
+    expect(document.activeElement).toHaveTextContent('Docs')
+  })
+
+  it('skips a disabled panel link when moving with ArrowDown', async () => {
+    render(<Demo />)
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    fireEvent.click(products)
+    fireEvent.keyDown(products, { key: 'ArrowDown' })
+    await waitFor(() => {
+      expect(document.activeElement).toHaveTextContent('Overview')
+    })
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Pricing' })).toHaveFocus()
+  })
+
+  it('opens the matching item when value is 1 and the item key is "1"', () => {
+    render(
+      <NavigationMenu delayDuration={0} skipDelayDuration={0} defaultValue={1}>
+        <NavigationMenuItem value="1">
+          <NavigationMenuTrigger>One</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <NavigationMenuLink>Inside</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenu>
+    )
+    expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('closes on item click, outside click, and Escape', () => {
@@ -116,23 +212,51 @@ describe('NavigationMenu', () => {
     fireEvent.click(screen.getByText('Overview'))
     expect(getPanel()).toHaveAttribute('hidden')
 
-    fireEvent.mouseEnter(screen.getByRole('menuitem', { name: 'Products' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Products' }))
     fireEvent.click(screen.getByText('Disabled'))
     expect(getPanel()).not.toHaveAttribute('hidden')
 
     fireEvent.click(document.body)
     expect(getPanel()).toHaveAttribute('hidden')
 
-    fireEvent.mouseEnter(screen.getByRole('menuitem', { name: 'Products' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Products' }))
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(getPanel()).toHaveAttribute('hidden')
   })
 
-  it('does not open when disabled', () => {
+  it('does not open when disabled, including the top-level link', () => {
     render(<Demo disabled />)
     const trigger = screen.getByRole('menuitem', { name: 'Products' })
-    fireEvent.mouseEnter(trigger)
+    const about = screen.getByRole('menuitem', { name: 'About' })
+    fireEvent.click(trigger)
     expect(getPanel()).toHaveAttribute('hidden')
+    expect(about).toHaveAttribute('aria-disabled', 'true')
+    expect(about).not.toHaveAttribute('href')
+    expect(about.tabIndex).toBe(-1)
+  })
+
+  it('keeps aria-controls while closed', () => {
+    render(<Demo defaultValue="products" />)
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    expect(products).toHaveAttribute('aria-controls')
+    fireEvent.click(screen.getByRole('menuitem', { name: 'About' }))
+    expect(products).toHaveAttribute('aria-expanded', 'false')
+    expect(products).toHaveAttribute('aria-controls')
+    expect(getPanel()).toHaveAttribute('hidden')
+  })
+
+  it('does not name the landmark Main by default', () => {
+    render(
+      <>
+        <Demo />
+        <Demo />
+      </>
+    )
+    const navs = document.querySelectorAll('[data-tiger-navigation-menu]')
+    expect(navs).toHaveLength(2)
+    navs.forEach((nav) => {
+      expect(nav).not.toHaveAttribute('aria-label', 'Main')
+    })
   })
 
   it('renders open when defaultValue is set', () => {
@@ -148,7 +272,7 @@ describe('NavigationMenu', () => {
     const onValueChange = vi.fn()
     const onOpenChange = vi.fn()
     render(<Demo onValueChange={onValueChange} onOpenChange={onOpenChange} />)
-    fireEvent.mouseEnter(screen.getByRole('menuitem', { name: 'Products' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Products' }))
     expect(onValueChange).toHaveBeenCalledWith('products')
     expect(onOpenChange).toHaveBeenCalledWith(true)
   })
@@ -161,7 +285,7 @@ describe('NavigationMenu', () => {
 
   it('does not dismiss a later keyboard-opened panel after a pending hover close', () => {
     vi.useFakeTimers()
-    render(<Demo delayDuration={0} skipDelayDuration={200} />)
+    render(<Demo openOnHover delayDuration={0} skipDelayDuration={200} />)
     const products = screen.getByRole('menuitem', { name: 'Products' })
     const docs = screen.getByRole('menuitem', { name: 'Docs' })
 
@@ -169,7 +293,6 @@ describe('NavigationMenu', () => {
     expect(products).toHaveAttribute('aria-expanded', 'true')
 
     fireEvent.mouseLeave(products)
-    fireEvent.focus(docs)
     fireEvent.keyDown(docs, { key: 'Enter' })
 
     act(() => {
@@ -179,21 +302,6 @@ describe('NavigationMenu', () => {
     expect(docs).toHaveAttribute('aria-expanded', 'true')
     expect(products).toHaveAttribute('aria-expanded', 'false')
     expect(getPanel('Docs')).not.toHaveAttribute('hidden')
-  })
-
-  it('closes the open panel when focus moves to a top-level link without content', () => {
-    render(<Demo defaultValue="products" />)
-    const products = screen.getByRole('menuitem', { name: 'Products' })
-    const about = screen.getByRole('menuitem', { name: 'About' })
-    expect(products).toHaveAttribute('aria-expanded', 'true')
-
-    about.focus()
-    fireEvent.focus(about)
-
-    expect(about).toHaveFocus()
-    expect(products).toHaveAttribute('aria-expanded', 'false')
-    expect(products).not.toHaveAttribute('aria-controls')
-    expect(getPanel()).toHaveAttribute('hidden')
   })
 
   it('closes the open panel when focus leaves the menubar', () => {
@@ -226,7 +334,6 @@ describe('NavigationMenu', () => {
     const docsTriggers = screen.getAllByRole('menuitem', { name: 'Docs' })
     const secondDocs = docsTriggers[1]
     secondDocs.focus()
-    fireEvent.focus(secondDocs)
     fireEvent.keyDown(secondDocs, { key: 'ArrowDown' })
 
     await waitFor(() => {
@@ -258,26 +365,29 @@ describe('NavigationMenu', () => {
   })
 
   describe('a11y', () => {
-    it('exposes menubar semantics and aria-expanded on triggers', () => {
-      render(<Demo />)
+    it('exposes menubar semantics and a menu panel for mega content', () => {
+      render(<Demo defaultValue="docs" />)
       expect(screen.getByRole('menubar')).toBeInTheDocument()
 
-      const trigger = screen.getByRole('menuitem', { name: 'Products' })
+      const trigger = screen.getByRole('menuitem', { name: 'Docs' })
       expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
-      expect(trigger).toHaveAttribute('aria-expanded', 'false')
-
-      fireEvent.mouseEnter(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
       const controlsId = trigger.getAttribute('aria-controls')
       expect(controlsId).toBeTruthy()
       const menu = document.querySelector(`[id="${controlsId}"]`)
       expect(menu).toHaveAttribute('role', 'menu')
     })
 
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Demo defaultValue="products" />)
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
-      })
+    it('should have no accessibility violations with an open panel', async () => {
+      render(<Demo defaultValue="products" aria-label="Site" />)
+      const nav = document.querySelector('[data-tiger-navigation-menu]')
+      const menu = document.querySelector(
+        '[data-tiger-navigation-menu-content]:not([hidden]) [role="menu"]'
+      )
+      expect(nav).toBeTruthy()
+      expect(menu).toBeTruthy()
+      await expectNoA11yViolations(nav as HTMLElement)
+      await expectNoA11yViolations(menu as HTMLElement)
     })
   })
 

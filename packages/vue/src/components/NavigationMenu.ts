@@ -8,15 +8,22 @@ import {
   h,
   onBeforeUnmount,
   onMounted,
-  onUpdated,
   nextTick,
+  watch,
+  useId,
+  Fragment,
+  isVNode,
   type ComputedRef,
-  type Ref
+  type Ref,
+  type VNode
 } from 'vue'
 import {
+  applyNavigationMenuPanelKey,
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  createNavigationMenuHoverSession,
+  getNavigationMenuBarItems,
   getNavigationMenuClasses,
   getNavigationMenuListClasses,
   getNavigationMenuItemClasses,
@@ -24,25 +31,30 @@ import {
   getNavigationMenuChevronClasses,
   getNavigationMenuContentClasses,
   getNavigationMenuLinkClasses,
+  getNavigationMenuItemValue,
+  getNavigationMenuRovingTabIndex,
+  getNavigationMenuTabExitTarget,
   injectNavigationMenuStyles,
   NAVIGATION_MENU_ENTER_CLASS,
   NAVIGATION_MENU_CHEVRON_PATH,
   NAVIGATION_MENU_BAR_ITEM_ATTR,
+  NAVIGATION_MENU_ITEM_VALUE_ATTR,
   NAVIGATION_MENU_DEFAULT_DELAY_DURATION,
   NAVIGATION_MENU_DEFAULT_SKIP_DELAY_DURATION,
   NAVIGATION_MENU_DEFAULT_OFFSET,
   isNavigationMenuValueOpen,
   isNavigationMenuOpen,
   resolveNavigationMenuOpenValue,
-  shouldSkipNavigationMenuOpenDelay,
+  resolveNavigationMenuTabStopValue,
+  resolveElementDir,
   isNavigationMenuTriggerOpenKey,
   handleMenubarNavigation,
-  handleMenuNavigation,
-  initNavigationMenuRovingTabIndex,
   focusFirstMenuItem,
   captureActiveElement,
   restoreFocus,
   getSecureRel,
+  isFocusInsideNavigationMenu,
+  warnNavigationMenuOpenWithoutValue,
   type NavigationMenuValue,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
@@ -56,36 +68,20 @@ import type {
 } from '@expcat/tigercat-core'
 import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
 
-let navigationMenuItemIdCounter = 0
-const createNavigationMenuItemId = () =>
-  `tiger-navigation-menu-item-${++navigationMenuItemIdCounter}`
-
 export const NavigationMenuContextKey = Symbol('NavigationMenuContext')
 export const NavigationMenuItemContextKey = Symbol('NavigationMenuItemContext')
 export const NavigationMenuContentContextKey = Symbol('NavigationMenuContentContext')
 
-function containsFocusTarget(
-  container: HTMLElement | null | undefined,
-  target: EventTarget | null
-): boolean {
-  return Boolean(container && target instanceof Node && container.contains(target))
-}
-
-function getOpenPanelFromMenubar(menubar: HTMLElement | null): HTMLElement | null {
-  if (!menubar) return null
-  const trigger = menubar.querySelector<HTMLElement>('[aria-expanded="true"][aria-controls]')
-  const contentId = trigger?.getAttribute('aria-controls')
-  if (!contentId) return null
-  return menubar.ownerDocument.getElementById(contentId)
-}
-
 export interface NavigationMenuContext {
   value: ComputedRef<NavigationMenuValue | null>
+  tabStopValue: Ref<NavigationMenuValue | null>
+  setTabStopValue: (next: NavigationMenuValue | null) => void
   setValue: (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => void
   scheduleOpen: (itemValue: NavigationMenuValue) => void
   scheduleClose: (itemValue: NavigationMenuValue) => void
   cancelClose: () => void
   closeOnClick: boolean
+  openOnHover: boolean
   handleItemClick: () => void
   handleFocusLeave: (event: FocusEvent) => void
   portal: ComputedRef<boolean>
@@ -93,8 +89,8 @@ export interface NavigationMenuContext {
   offset: number
   placement: FloatingPlacement
   showArrow: boolean
+  rootRef: Ref<HTMLElement | null>
   menubarRef: Ref<HTMLElement | null>
-  suppressFocusOpen: Ref<boolean>
 }
 
 export interface NavigationMenuItemContext {
@@ -106,7 +102,7 @@ export interface NavigationMenuItemContext {
   contentRef: Ref<HTMLElement | null>
   contentId: string
   open: (focusPanel?: boolean) => void
-  close: () => void
+  close: (options?: { restoreFocus?: boolean }) => void
   scheduleOpen: () => void
   scheduleClose: () => void
   cancelClose: () => void
@@ -115,6 +111,10 @@ export interface NavigationMenuItemContext {
 
 export interface NavigationMenuContentContext {
   inPanel: true
+}
+
+export function useNavigationMenuContext(): NavigationMenuContext | null {
+  return inject(NavigationMenuContextKey, null)
 }
 
 function splitClassStyleAttrs(attrs: Record<string, unknown>): {
@@ -131,6 +131,26 @@ function splitClassStyleAttrs(attrs: Record<string, unknown>): {
     style?: unknown
   } & Record<string, unknown>
   return { restAttrs, attrsClass, attrsStyle }
+}
+
+function nodesHaveList(nodes: unknown[]): boolean {
+  for (const node of nodes) {
+    if (!isVNode(node)) continue
+    if (node.type === NavigationMenuList) return true
+    if (node.type === Fragment && Array.isArray(node.children)) {
+      if (nodesHaveList(node.children as unknown[])) return true
+    }
+  }
+  return false
+}
+
+function commitMenubarKey(root: NavigationMenuContext | null, event: KeyboardEvent): boolean {
+  if (!root?.menubarRef.value) return false
+  const next = handleMenubarNavigation(root.menubarRef.value, event)
+  if (!next) return false
+  const value = getNavigationMenuItemValue(next)
+  if (value != null) root.setTabStopValue(value)
+  return true
 }
 
 export type VueNavigationMenuLinkProps = CoreNavigationMenuLinkProps
@@ -179,7 +199,9 @@ export const NavigationMenuLink = defineComponent({
     )
 
     const inPanel = Boolean(content)
-    const disabled = computed(() => props.disabled || Boolean(item?.disabled))
+    const disabled = computed(
+      () => props.disabled || Boolean(item?.disabled) || Boolean(!inPanel && root?.disabled)
+    )
 
     const handleClick = (event: MouseEvent) => {
       if (disabled.value) {
@@ -197,13 +219,12 @@ export const NavigationMenuLink = defineComponent({
       if (!item || !item.hasPanel.value) {
         root?.setValue(null, { restoreFocus: false })
       }
+      if (item) root?.setTabStopValue(item.value)
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (inPanel) return
-      if (root?.menubarRef.value) {
-        handleMenubarNavigation(root.menubarRef.value, event)
-      }
+      commitMenubarKey(root, event)
     }
 
     const linkClasses = computed(() =>
@@ -220,30 +241,37 @@ export const NavigationMenuLink = defineComponent({
 
     return () => {
       const { restAttrs } = splitClassStyleAttrs(attrsRecord)
-      const isAnchor = Boolean(props.href)
+      const isDisabled = disabled.value
+      const isAnchor = Boolean(props.href) && !isDisabled
       const rel = isAnchor
         ? getSecureRel(
             props.target as '_blank' | '_self' | '_parent' | '_top' | undefined,
             props.rel
           )
         : undefined
+      const tabIndex = inPanel
+        ? -1
+        : getNavigationMenuRovingTabIndex(item?.value ?? '', root?.tabStopValue.value)
+
+      const tag = isAnchor ? 'a' : props.href ? 'span' : 'button'
 
       return h(
-        isAnchor ? 'a' : 'button',
+        tag,
         {
           ...restAttrs,
           href: isAnchor ? props.href : undefined,
           target: isAnchor ? props.target : undefined,
           rel,
-          type: isAnchor ? undefined : 'button',
+          type: tag === 'button' ? 'button' : undefined,
           class: linkClasses.value,
           style: mergedStyle.value,
           role: 'menuitem',
-          tabindex: inPanel ? -1 : -1,
-          [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel ? undefined : '',
-          'aria-disabled': disabled.value || undefined,
+          tabindex: tabIndex,
+          [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel || isDisabled ? undefined : '',
+          [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : String(item?.value ?? ''),
+          'aria-disabled': isDisabled || undefined,
           'aria-current': props.active ? 'page' : undefined,
-          disabled: isAnchor ? undefined : disabled.value,
+          disabled: tag === 'button' ? isDisabled : undefined,
           'data-tiger-navigation-menu-link': '',
           'data-active': props.active ? 'true' : undefined,
           onClick: handleClick,
@@ -292,17 +320,13 @@ export const NavigationMenuTrigger = defineComponent({
     )
 
     const handleMouseEnter = () => {
-      if (disabled.value) return
+      if (disabled.value || !root?.openOnHover) return
       item?.scheduleOpen()
     }
 
     const handleMouseLeave = () => {
+      if (!root?.openOnHover) return
       item?.scheduleClose()
-    }
-
-    const handleFocus = () => {
-      if (disabled.value || root?.suppressFocusOpen.value) return
-      item?.open()
     }
 
     const handleClick = (event: MouseEvent) => {
@@ -310,15 +334,14 @@ export const NavigationMenuTrigger = defineComponent({
         event.preventDefault()
         return
       }
-      item?.open()
+      if (item?.isOpen.value) item.close({ restoreFocus: false })
+      else item?.open()
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (disabled.value || !item) return
 
-      if (root?.menubarRef.value && handleMenubarNavigation(root.menubarRef.value, event)) {
-        return
-      }
+      if (commitMenubarKey(root, event)) return
 
       if (isNavigationMenuTriggerOpenKey(event.key) && item.hasPanel.value) {
         event.preventDefault()
@@ -375,18 +398,19 @@ export const NavigationMenuTrigger = defineComponent({
           class: triggerClasses.value,
           style: mergedStyle.value,
           role: 'menuitem',
-          tabindex: -1,
-          [NAVIGATION_MENU_BAR_ITEM_ATTR]: '',
+          tabindex: getNavigationMenuRovingTabIndex(item.value, root?.tabStopValue.value),
+          [NAVIGATION_MENU_BAR_ITEM_ATTR]: disabled.value ? undefined : '',
+          [NAVIGATION_MENU_ITEM_VALUE_ATTR]: String(item.value),
           'aria-haspopup': 'menu',
           'aria-expanded': item.isOpen.value,
-          'aria-controls': item.isOpen.value ? item.contentId : undefined,
+          'aria-controls': item.contentId,
           'aria-disabled': disabled.value || undefined,
           disabled: disabled.value,
           'data-state': item.isOpen.value ? 'open' : 'closed',
           'data-tiger-navigation-menu-trigger': '',
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
-          onFocus: handleFocus,
+          onFocus: () => root?.setTabStopValue(item.value),
           onClick: handleClick,
           onKeydown: handleKeyDown
         },
@@ -437,13 +461,7 @@ export const NavigationMenuContent = defineComponent({
       portal: portalEnabled,
       dismissOnOutside: true,
       dismissOnEscape: true,
-      onDismiss: () => item?.close()
-    })
-
-    if (item) item.hasPanel.value = true
-
-    onBeforeUnmount(() => {
-      if (item) item.hasPanel.value = false
+      onDismiss: () => item?.close({ restoreFocus: false })
     })
 
     const handleMouseEnter = () => {
@@ -451,6 +469,7 @@ export const NavigationMenuContent = defineComponent({
     }
 
     const handleMouseLeave = () => {
+      if (!root?.openOnHover) return
       item?.scheduleClose()
     }
 
@@ -459,27 +478,49 @@ export const NavigationMenuContent = defineComponent({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (item?.contentRef.value) {
-        handleMenuNavigation(item.contentRef.value, event)
-      }
+      const panel = item?.contentRef.value
+      if (!panel || !item || !root) return
+      if (!panel.contains(event.target as Node | null)) return
+      const dir = resolveElementDir(root.rootRef.value ?? root.menubarRef.value)
+      const action = applyNavigationMenuPanelKey({ event, panel, dir })
+      if (!action || action === 'menu-nav') return
 
-      if (event.key === 'Escape' || event.key === 'ArrowLeft') {
-        event.preventDefault()
-        event.stopPropagation()
-        item?.close()
-        item?.triggerRef.value?.focus()
+      event.stopPropagation()
+
+      if (action === 'close-to-trigger') {
+        item.close()
+        item.triggerRef.value?.focus()
         return
       }
 
-      if (
-        (event.key === 'ArrowRight' || event.key === 'ArrowLeft') &&
-        root?.menubarRef.value &&
-        item?.triggerRef.value
-      ) {
-        item.triggerRef.value.focus()
-        handleMenubarNavigation(root.menubarRef.value, event)
+      if (action === 'move-menubar-next' && root.menubarRef.value) {
+        item.close({ restoreFocus: false })
+        item.triggerRef.value?.focus()
+        const next = handleMenubarNavigation(root.menubarRef.value, event)
+        const value = getNavigationMenuItemValue(next)
+        if (value != null) root.setTabStopValue(value)
+        return
+      }
+
+      if (action === 'tab-exit' || action === 'shift-tab-exit') {
+        const nav = root.rootRef.value
+        const target = nav
+          ? getNavigationMenuTabExitTarget(nav, panel, action === 'shift-tab-exit')
+          : null
+        item.close({ restoreFocus: false })
+        target?.focus()
       }
     }
+
+    watch(
+      () => item?.contentRef.value,
+      (panel, _previous, onCleanup) => {
+        if (!panel) return
+        panel.addEventListener('keydown', handleKeyDown)
+        onCleanup(() => panel.removeEventListener('keydown', handleKeyDown))
+      },
+      { flush: 'post' }
+    )
 
     const panelClasses = computed(() =>
       classNames(overlay.floatingClasses.value, NAVIGATION_MENU_ENTER_CLASS)
@@ -494,7 +535,10 @@ export const NavigationMenuContent = defineComponent({
     )
 
     const mergedStyle = computed(() =>
-      mergeStyleValues((attrsRecord as { style?: unknown }).style, props.style)
+      mergeStyleValues(
+        (attrsRecord as { style?: unknown }).style,
+        props.mega ? { minWidth: '28rem', ...props.style } : props.style
+      )
     )
 
     return () => {
@@ -525,7 +569,7 @@ export const NavigationMenuContent = defineComponent({
               id: item.contentId,
               class: innerClasses.value,
               style: mergedStyle.value,
-              role: props.mega ? 'group' : 'menu'
+              role: 'menu'
             },
             slots.default?.()
           )
@@ -564,7 +608,7 @@ export const NavigationMenuItem = defineComponent({
     const attrsRecord = attrs as Record<string, unknown>
     const root = inject<NavigationMenuContext | null>(NavigationMenuContextKey, null)
 
-    const autoValue = createNavigationMenuItemId()
+    const autoValue = `tiger-navigation-menu-item-${useId()}`
     const itemValue = computed(() => props.value ?? autoValue)
     const triggerRef = ref<HTMLElement | null>(null)
     const contentRef = ref<HTMLElement | null>(null)
@@ -583,6 +627,7 @@ export const NavigationMenuItem = defineComponent({
       if (props.disabled || !root) return
       root.cancelClose()
       root.setValue(itemValue.value)
+      root.setTabStopValue(itemValue.value)
       if (!focusPanel) return
       nextTick(() => {
         requestAnimationFrame(() => {
@@ -592,9 +637,9 @@ export const NavigationMenuItem = defineComponent({
       })
     }
 
-    const close = () => {
+    const close = (options?: { restoreFocus?: boolean }) => {
       if (!root) return
-      if (isOpen.value) root.setValue(null)
+      if (isOpen.value) root.setValue(null, options)
     }
 
     const scheduleOpen = () => {
@@ -647,6 +692,8 @@ export const NavigationMenuItem = defineComponent({
     )
 
     return () => {
+      const children = slots.default?.() ?? []
+      hasPanel.value = children.some((node: VNode) => node.type === NavigationMenuContent)
       const { restAttrs } = splitClassStyleAttrs(attrsRecord)
       return h(
         'li',
@@ -658,7 +705,7 @@ export const NavigationMenuItem = defineComponent({
           'data-tiger-navigation-menu-item': '',
           'data-state': isOpen.value ? 'open' : 'closed'
         },
-        slots.default?.()
+        children
       )
     }
   }
@@ -668,6 +715,8 @@ export interface VueNavigationMenuListProps {
   className?: string
   style?: Record<string, unknown>
 }
+
+export type NavigationMenuListProps = VueNavigationMenuListProps
 
 export const NavigationMenuList = defineComponent({
   name: 'TigerNavigationMenuList',
@@ -687,13 +736,19 @@ export const NavigationMenuList = defineComponent({
     const root = inject<NavigationMenuContext | null>(NavigationMenuContextKey, null)
     const listRef = ref<HTMLElement | null>(null)
 
-    const syncRoving = () => {
+    const syncTabStop = () => {
       if (root) root.menubarRef.value = listRef.value
-      if (listRef.value) initNavigationMenuRovingTabIndex(listRef.value)
+      if (!listRef.value || !root) return
+      const next = resolveNavigationMenuTabStopValue({
+        items: getNavigationMenuBarItems(listRef.value),
+        tabStopValue: root.tabStopValue.value
+      })
+      if (next != null && next !== String(root.tabStopValue.value ?? '')) {
+        root.setTabStopValue(next)
+      }
     }
 
-    onMounted(syncRoving)
-    onUpdated(syncRoving)
+    onMounted(syncTabStop)
 
     const listClasses = computed(() =>
       classNames(
@@ -708,6 +763,7 @@ export const NavigationMenuList = defineComponent({
     )
 
     return () => {
+      nextTick(syncTabStop)
       const { restAttrs } = splitClassStyleAttrs(attrsRecord)
       return h(
         'ul',
@@ -725,13 +781,9 @@ export const NavigationMenuList = defineComponent({
   }
 })
 
-export interface VueNavigationMenuProps extends CoreNavigationMenuProps {
-  /**
-   * Panel placement relative to the trigger
-   * @default 'bottom-start'
-   */
-  placement?: FloatingPlacement
-}
+export interface VueNavigationMenuProps extends CoreNavigationMenuProps {}
+
+export type NavigationMenuProps = VueNavigationMenuProps
 
 export const NavigationMenu = defineComponent({
   name: 'TigerNavigationMenu',
@@ -750,6 +802,10 @@ export const NavigationMenu = defineComponent({
       default: undefined
     },
     defaultOpen: {
+      type: Boolean,
+      default: false
+    },
+    openOnHover: {
       type: Boolean,
       default: false
     },
@@ -803,7 +859,7 @@ export const NavigationMenu = defineComponent({
     const previousActiveElement = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const menubarRef = ref<HTMLElement | null>(null)
-    const suppressFocusOpen = ref(false)
+    const tabStopValue = ref<NavigationMenuValue | null>(null)
     const initialValue = props.defaultValue ?? (props.defaultOpen ? (props.value ?? null) : null)
     const internalValue = ref<NavigationMenuValue | null>(
       isNavigationMenuOpen(initialValue) ? (initialValue as NavigationMenuValue) : null
@@ -819,25 +875,10 @@ export const NavigationMenu = defineComponent({
 
     const currentOpen = computed(() => isNavigationMenuOpen(currentValue.value))
 
-    let openTimer: ReturnType<typeof setTimeout> | null = null
-    let closeTimer: ReturnType<typeof setTimeout> | null = null
-    let lastOpenAt = 0
-
-    const clearTimers = () => {
-      if (openTimer) {
-        clearTimeout(openTimer)
-        openTimer = null
-      }
-      if (closeTimer) {
-        clearTimeout(closeTimer)
-        closeTimer = null
-      }
-    }
-
     const setValue = (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => {
       if (props.disabled && next != null) return
 
-      clearTimers()
+      hover.clear()
 
       const resolvedNext = isNavigationMenuOpen(next) ? next : null
       const wasOpen = isNavigationMenuOpen(currentValue.value)
@@ -856,103 +897,61 @@ export const NavigationMenu = defineComponent({
 
       emit('update:value', resolvedNext)
       emit('value-change', resolvedNext)
+      emit('update:open', willOpen)
+      emit('open-change', willOpen)
 
-      const open = willOpen
-      emit('update:open', open)
-      emit('open-change', open)
-
-      if (!willOpen) {
-        suppressFocusOpen.value = true
-        if (options?.restoreFocus !== false) {
-          restoreFocus(previousActiveElement.value)
-        }
+      if (!willOpen && options?.restoreFocus !== false) {
+        restoreFocus(previousActiveElement.value)
         previousActiveElement.value = null
-        nextTick(() => {
-          suppressFocusOpen.value = false
-        })
       }
     }
 
-    const scheduleOpen = (itemValue: NavigationMenuValue) => {
-      if (props.disabled) return
-      if (closeTimer) {
-        clearTimeout(closeTimer)
-        closeTimer = null
-      }
-
-      const skip = shouldSkipNavigationMenuOpenDelay(
-        lastOpenAt,
-        Date.now(),
-        props.skipDelayDuration
-      )
-      const delay = skip ? 0 : props.delayDuration
-
-      const apply = () => {
-        lastOpenAt = Date.now()
-        setValue(itemValue)
-        openTimer = null
-      }
-
-      if (delay <= 0) {
-        apply()
-        return
-      }
-
-      if (openTimer) clearTimeout(openTimer)
-      openTimer = setTimeout(apply, delay)
-    }
-
-    const scheduleClose = (itemValue: NavigationMenuValue) => {
-      if (openTimer) {
-        clearTimeout(openTimer)
-        openTimer = null
-      }
-
-      const close = () => {
-        if (currentValue.value === itemValue) setValue(null)
-        closeTimer = null
-      }
-
-      if (props.skipDelayDuration <= 0) {
-        close()
-        return
-      }
-
-      if (closeTimer) clearTimeout(closeTimer)
-      closeTimer = setTimeout(close, props.skipDelayDuration)
-    }
-
-    const cancelClose = () => {
-      if (closeTimer) {
-        clearTimeout(closeTimer)
-        closeTimer = null
-      }
-    }
+    const hover = createNavigationMenuHoverSession({
+      getDelayDuration: () => props.delayDuration,
+      getSkipDelayDuration: () => props.skipDelayDuration,
+      getValue: () => currentValue.value,
+      setValue,
+      isDisabled: () => props.disabled
+    })
 
     const handleItemClick = () => {
-      if (props.closeOnClick) setValue(null)
+      if (props.closeOnClick) setValue(null, { restoreFocus: false })
     }
 
     const handleFocusLeave = (event: FocusEvent) => {
-      const next = event.relatedTarget
-      if (containsFocusTarget(rootRef.value, next)) return
-      if (containsFocusTarget(getOpenPanelFromMenubar(menubarRef.value), next)) return
+      if (isFocusInsideNavigationMenu(rootRef.value, menubarRef.value, event.relatedTarget)) {
+        return
+      }
       if (!isNavigationMenuOpen(currentValue.value)) return
       setValue(null, { restoreFocus: false })
     }
 
-    onBeforeUnmount(clearTimers)
+    onBeforeUnmount(hover.clear)
+
+    onMounted(() => {
+      warnNavigationMenuOpenWithoutValue(
+        props.open,
+        isNavigationMenuOpen(props.value ?? props.defaultValue ?? internalValue.value)
+      )
+    })
 
     const portalEnabled = computed(() => props.portal)
 
     const navigationMenuContext: NavigationMenuContext = {
       value: currentValue,
+      tabStopValue,
+      setTabStopValue: (next) => {
+        tabStopValue.value = next
+      },
       setValue,
-      scheduleOpen,
-      scheduleClose,
-      cancelClose,
+      scheduleOpen: hover.scheduleOpen,
+      scheduleClose: hover.scheduleClose,
+      cancelClose: hover.cancelClose,
       get closeOnClick() {
         return props.closeOnClick
+      },
+      get openOnHover() {
+        return props.openOnHover
       },
       handleItemClick,
       handleFocusLeave,
@@ -969,8 +968,8 @@ export const NavigationMenu = defineComponent({
       get showArrow() {
         return props.showArrow
       },
-      menubarRef,
-      suppressFocusOpen
+      rootRef,
+      menubarRef
     }
     provide(NavigationMenuContextKey, navigationMenuContext)
 
@@ -988,7 +987,7 @@ export const NavigationMenu = defineComponent({
 
     return () => {
       const defaultSlot = slots.default?.() ?? []
-      const hasList = defaultSlot.some((node) => node.type === NavigationMenuList)
+      const hasList = nodesHaveList(defaultSlot)
       const children = hasList
         ? defaultSlot
         : [h(NavigationMenuList, null, { default: () => defaultSlot })]
@@ -1002,7 +1001,6 @@ export const NavigationMenu = defineComponent({
           ref: rootRef,
           class: containerClasses.value,
           style: mergedStyle.value,
-          'aria-label': (restAttrs['aria-label'] as string | undefined) ?? 'Main',
           'data-tiger-navigation-menu': '',
           'data-state': currentOpen.value ? 'open' : 'closed',
           onFocusout: handleFocusLeave

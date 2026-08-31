@@ -3,13 +3,20 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useLayoutEffect,
   useRef,
   useCallback,
   useMemo,
   useId
 } from 'react'
 import {
+  applyNavigationMenuPanelKey,
   classNames,
+  createNavigationMenuHoverSession,
+  focusFirstMenuItem,
+  captureActiveElement,
+  restoreFocus,
+  getNavigationMenuBarItems,
   getNavigationMenuClasses,
   getNavigationMenuListClasses,
   getNavigationMenuItemClasses,
@@ -17,25 +24,27 @@ import {
   getNavigationMenuChevronClasses,
   getNavigationMenuContentClasses,
   getNavigationMenuLinkClasses,
-  injectNavigationMenuStyles,
-  NAVIGATION_MENU_ENTER_CLASS,
-  NAVIGATION_MENU_CHEVRON_PATH,
-  NAVIGATION_MENU_BAR_ITEM_ATTR,
-  NAVIGATION_MENU_DEFAULT_DELAY_DURATION,
-  NAVIGATION_MENU_DEFAULT_SKIP_DELAY_DURATION,
-  NAVIGATION_MENU_DEFAULT_OFFSET,
-  isNavigationMenuValueOpen,
-  isNavigationMenuOpen,
-  resolveNavigationMenuOpenValue,
-  shouldSkipNavigationMenuOpenDelay,
-  isNavigationMenuTriggerOpenKey,
-  handleMenubarNavigation,
-  handleMenuNavigation,
-  initNavigationMenuRovingTabIndex,
-  focusFirstMenuItem,
-  captureActiveElement,
-  restoreFocus,
+  getNavigationMenuItemValue,
+  getNavigationMenuRovingTabIndex,
+  getNavigationMenuTabExitTarget,
   getSecureRel,
+  handleMenubarNavigation,
+  injectNavigationMenuStyles,
+  isFocusInsideNavigationMenu,
+  isNavigationMenuOpen,
+  isNavigationMenuTriggerOpenKey,
+  isNavigationMenuValueOpen,
+  NAVIGATION_MENU_BAR_ITEM_ATTR,
+  NAVIGATION_MENU_CHEVRON_PATH,
+  NAVIGATION_MENU_DEFAULT_DELAY_DURATION,
+  NAVIGATION_MENU_DEFAULT_OFFSET,
+  NAVIGATION_MENU_DEFAULT_SKIP_DELAY_DURATION,
+  NAVIGATION_MENU_ENTER_CLASS,
+  NAVIGATION_MENU_ITEM_VALUE_ATTR,
+  resolveElementDir,
+  resolveNavigationMenuOpenValue,
+  resolveNavigationMenuTabStopValue,
+  warnNavigationMenuOpenWithoutValue,
   type NavigationMenuValue,
   type NavigationMenuProps as CoreNavigationMenuProps,
   type NavigationMenuItemProps as CoreNavigationMenuItemProps,
@@ -45,29 +54,18 @@ import {
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
-
-function containsFocusTarget(
-  container: HTMLElement | null | undefined,
-  target: EventTarget | null
-): boolean {
-  return Boolean(container && target instanceof Node && container.contains(target))
-}
-
-function getOpenPanelFromMenubar(menubar: HTMLElement | null): HTMLElement | null {
-  if (!menubar) return null
-  const trigger = menubar.querySelector<HTMLElement>('[aria-expanded="true"][aria-controls]')
-  const contentId = trigger?.getAttribute('aria-controls')
-  if (!contentId) return null
-  return menubar.ownerDocument.getElementById(contentId)
-}
+import { composeRefs } from '../utils/overlay-trigger'
 
 export interface NavigationMenuContextValue {
   value: NavigationMenuValue | null
+  tabStopValue: NavigationMenuValue | null
+  setTabStopValue: (next: NavigationMenuValue | null) => void
   setValue: (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => void
   scheduleOpen: (itemValue: NavigationMenuValue) => void
   scheduleClose: (itemValue: NavigationMenuValue) => void
   cancelClose: () => void
   closeOnClick: boolean
+  openOnHover: boolean
   handleItemClick: () => void
   handleFocusLeave: (event: React.FocusEvent<HTMLElement>) => void
   portal: boolean
@@ -75,8 +73,8 @@ export interface NavigationMenuContextValue {
   offset: number
   placement: FloatingPlacement
   showArrow: boolean
+  rootRef: React.RefObject<HTMLElement | null>
   menubarRef: React.RefObject<HTMLElement | null>
-  isFocusOpenSuppressed: () => boolean
 }
 
 export interface NavigationMenuItemContextValue {
@@ -84,12 +82,11 @@ export interface NavigationMenuItemContextValue {
   isOpen: boolean
   disabled: boolean
   hasPanel: boolean
-  setHasPanel: (next: boolean) => void
   triggerRef: React.RefObject<HTMLElement | null>
   contentRef: React.RefObject<HTMLElement | null>
   contentId: string
   open: (focusPanel?: boolean) => void
-  close: () => void
+  close: (options?: { restoreFocus?: boolean }) => void
   scheduleOpen: () => void
   scheduleClose: () => void
   cancelClose: () => void
@@ -106,126 +103,170 @@ export const NavigationMenuContentContext = createContext<NavigationMenuContentC
   null
 )
 
-export interface NavigationMenuLinkProps extends Omit<
-  CoreNavigationMenuLinkProps,
-  'className' | 'style'
-> {
+function hasNavigationMenuList(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false
+    if (child.type === NavigationMenuList) return true
+    if (child.type === React.Fragment) {
+      return hasNavigationMenuList((child.props as { children?: React.ReactNode }).children)
+    }
+    return false
+  })
+}
+
+function childIsContent(child: React.ReactNode): boolean {
+  return React.isValidElement(child) && child.type === NavigationMenuContent
+}
+
+export interface NavigationMenuLinkProps
+  extends
+    Omit<CoreNavigationMenuLinkProps, 'className' | 'style'>,
+    Omit<
+      React.AnchorHTMLAttributes<HTMLElement>,
+      'href' | 'target' | 'rel' | 'className' | 'style' | 'onClick'
+    > {
   className?: string
   style?: React.CSSProperties
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
   children?: React.ReactNode
 }
 
-export const NavigationMenuLink: React.FC<NavigationMenuLinkProps> = ({
-  href,
-  target,
-  rel,
-  disabled = false,
-  active = false,
-  className,
-  style,
-  onClick,
-  children
-}) => {
-  const root = useContext(NavigationMenuContext)
-  const item = useContext(NavigationMenuItemContext)
-  const content = useContext(NavigationMenuContentContext)
-  const inPanel = Boolean(content)
-  const isDisabled = disabled || Boolean(item?.disabled)
+export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLinkProps>(
+  (
+    {
+      href,
+      target,
+      rel,
+      disabled = false,
+      active = false,
+      className,
+      style,
+      onClick,
+      children,
+      ...rest
+    },
+    forwardedRef
+  ) => {
+    const root = useContext(NavigationMenuContext)
+    const item = useContext(NavigationMenuItemContext)
+    const content = useContext(NavigationMenuContentContext)
+    const inPanel = Boolean(content)
+    const isDisabled = disabled || Boolean(item?.disabled) || Boolean(!inPanel && root?.disabled)
+    const tabIndex = inPanel
+      ? -1
+      : getNavigationMenuRovingTabIndex(item?.value ?? '', root?.tabStopValue)
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (isDisabled) {
-      event.preventDefault()
-      event.stopPropagation()
-      return
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+      if (isDisabled) {
+        event.preventDefault()
+        event.stopPropagation()
+        return
+      }
+
+      onClick?.(event)
+      root?.handleItemClick()
     }
 
-    onClick?.(event)
-    root?.handleItemClick()
-  }
-
-  const handleFocus = () => {
-    if (inPanel) return
-    if (!item?.hasPanel) {
-      root?.setValue(null, { restoreFocus: false })
+    const handleFocus = () => {
+      if (inPanel) return
+      if (!item?.hasPanel) {
+        root?.setValue(null, { restoreFocus: false })
+      }
+      if (item) root?.setTabStopValue(item.value)
     }
-  }
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (inPanel) return
-    if (root?.menubarRef.current) {
-      handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+      if (inPanel || !root?.menubarRef.current) return
+      const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
+      if (!next) return
+      const value = getNavigationMenuItemValue(next)
+      if (value != null) root.setTabStopValue(value)
     }
-  }
 
-  const linkClasses = classNames(
-    getNavigationMenuLinkClasses(isDisabled, inPanel, active),
-    className
-  )
-  const computedRel = href ? getSecureRel(target as '_blank' | undefined, rel) : undefined
-  const shared = {
-    className: linkClasses,
-    style,
-    role: 'menuitem' as const,
-    tabIndex: -1,
-    [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel ? undefined : '',
-    'aria-disabled': isDisabled || undefined,
-    'aria-current': active ? ('page' as const) : undefined,
-    'data-tiger-navigation-menu-link': '',
-    'data-active': active ? 'true' : undefined,
-    onClick: handleClick,
-    onFocus: handleFocus,
-    onKeyDown: handleKeyDown
-  }
+    const linkClasses = classNames(
+      getNavigationMenuLinkClasses(isDisabled, inPanel, active),
+      className
+    )
+    const computedRel =
+      href && !isDisabled ? getSecureRel(target as '_blank' | undefined, rel) : undefined
+    const shared = {
+      ...rest,
+      className: linkClasses,
+      style,
+      role: 'menuitem' as const,
+      tabIndex,
+      [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel || isDisabled ? undefined : '',
+      [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : String(item?.value ?? ''),
+      'aria-disabled': isDisabled || undefined,
+      'aria-current': active ? ('page' as const) : undefined,
+      'data-tiger-navigation-menu-link': '',
+      'data-active': active ? 'true' : undefined,
+      onClick: handleClick,
+      onFocus: handleFocus,
+      onKeyDown: handleKeyDown
+    }
 
-  if (href) {
+    if (href && !isDisabled) {
+      return (
+        <a
+          ref={forwardedRef as React.Ref<HTMLAnchorElement>}
+          href={href}
+          target={target}
+          rel={computedRel}
+          {...shared}>
+          {children}
+        </a>
+      )
+    }
+
+    if (href && isDisabled) {
+      return (
+        <span ref={forwardedRef as React.Ref<HTMLSpanElement>} {...shared}>
+          {children}
+        </span>
+      )
+    }
+
     return (
-      <a href={href} target={target} rel={computedRel} {...shared}>
+      <button
+        ref={forwardedRef as React.Ref<HTMLButtonElement>}
+        type="button"
+        disabled={isDisabled}
+        {...shared}>
         {children}
-      </a>
+      </button>
     )
   }
+)
+NavigationMenuLink.displayName = 'NavigationMenuLink'
 
-  return (
-    <button type="button" disabled={isDisabled} {...shared}>
-      {children}
-    </button>
-  )
-}
-
-export interface NavigationMenuTriggerProps extends Omit<
-  CoreNavigationMenuTriggerProps,
-  'className' | 'style'
-> {
+export interface NavigationMenuTriggerProps
+  extends
+    Omit<CoreNavigationMenuTriggerProps, 'className' | 'style'>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'className' | 'style'> {
   className?: string
   style?: React.CSSProperties
   children?: React.ReactNode
 }
 
-export const NavigationMenuTrigger: React.FC<NavigationMenuTriggerProps> = ({
-  disabled = false,
-  showArrow,
-  className,
-  style,
-  children
-}) => {
+export const NavigationMenuTrigger = React.forwardRef<
+  HTMLButtonElement,
+  NavigationMenuTriggerProps
+>(({ disabled = false, showArrow, className, style, children, ...buttonProps }, forwardedRef) => {
   const root = useContext(NavigationMenuContext)
   const item = useContext(NavigationMenuItemContext)
   const isDisabled = disabled || Boolean(item?.disabled) || Boolean(root?.disabled)
   const arrow = showArrow !== undefined ? showArrow : (item?.showArrow ?? true)
+  const tabIndex = getNavigationMenuRovingTabIndex(item?.value ?? '', root?.tabStopValue)
 
   const handleMouseEnter = () => {
-    if (isDisabled) return
+    if (isDisabled || !root?.openOnHover) return
     item?.scheduleOpen()
   }
 
   const handleMouseLeave = () => {
+    if (!root?.openOnHover) return
     item?.scheduleClose()
-  }
-
-  const handleFocus = () => {
-    if (isDisabled || root?.isFocusOpenSuppressed()) return
-    item?.open()
   }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -233,17 +274,20 @@ export const NavigationMenuTrigger: React.FC<NavigationMenuTriggerProps> = ({
       event.preventDefault()
       return
     }
-    item?.open()
+    if (item?.isOpen) item.close({ restoreFocus: false })
+    else item?.open()
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isDisabled || !item) return
 
-    if (
-      root?.menubarRef.current &&
-      handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
-    ) {
-      return
+    if (root?.menubarRef.current) {
+      const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
+      if (next) {
+        const value = getNavigationMenuItemValue(next)
+        if (value != null) root.setTabStopValue(value)
+        return
+      }
     }
 
     if (isNavigationMenuTriggerOpenKey(event.key) && item.hasPanel) {
@@ -268,23 +312,25 @@ export const NavigationMenuTrigger: React.FC<NavigationMenuTriggerProps> = ({
 
   return (
     <button
-      ref={item.triggerRef as React.RefObject<HTMLButtonElement>}
+      {...buttonProps}
+      ref={composeRefs(forwardedRef, item.triggerRef as React.Ref<HTMLButtonElement>)}
       type="button"
       className={triggerClasses}
       style={style}
       role="menuitem"
-      tabIndex={-1}
-      {...{ [NAVIGATION_MENU_BAR_ITEM_ATTR]: '' }}
+      tabIndex={tabIndex}
+      {...{ [NAVIGATION_MENU_BAR_ITEM_ATTR]: isDisabled ? undefined : '' }}
+      {...{ [NAVIGATION_MENU_ITEM_VALUE_ATTR]: String(item.value) }}
       aria-haspopup="menu"
       aria-expanded={item.isOpen}
-      aria-controls={item.isOpen ? item.contentId : undefined}
+      aria-controls={item.contentId}
       aria-disabled={isDisabled || undefined}
       disabled={isDisabled}
       data-state={item.isOpen ? 'open' : 'closed'}
       data-tiger-navigation-menu-trigger=""
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onFocus={handleFocus}
+      onFocus={() => root?.setTabStopValue(item.value)}
       onClick={handleClick}
       onKeyDown={handleKeyDown}>
       {children}
@@ -303,7 +349,8 @@ export const NavigationMenuTrigger: React.FC<NavigationMenuTriggerProps> = ({
       ) : null}
     </button>
   )
-}
+})
+NavigationMenuTrigger.displayName = 'NavigationMenuTrigger'
 
 export interface NavigationMenuContentProps
   extends
@@ -330,12 +377,6 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
   const isOpen = Boolean(item?.isOpen)
   const portalEnabled = Boolean(root?.portal)
 
-  useEffect(() => {
-    if (!item) return
-    item.setHasPanel(true)
-    return () => item.setHasPanel(false)
-  }, [item])
-
   const overlay = useAnchoredOverlay({
     referenceRef,
     floatingRef: contentRef,
@@ -345,7 +386,7 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     portal: portalEnabled,
     dismissOnOutside: true,
     dismissOnEscape: true,
-    onDismiss: () => item?.close()
+    onDismiss: () => item?.close({ restoreFocus: false })
   })
 
   const handleMouseEnter = () => {
@@ -353,6 +394,7 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
   }
 
   const handleMouseLeave = () => {
+    if (!root?.openOnHover) return
     item?.scheduleClose()
   }
 
@@ -361,21 +403,36 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (contentRef.current) {
-      handleMenuNavigation(contentRef.current, event.nativeEvent)
-    }
+    const panel = contentRef.current
+    if (!panel || !item || !root) return
+    const dir = resolveElementDir(root.rootRef.current ?? root.menubarRef.current)
+    const action = applyNavigationMenuPanelKey({ event: event.nativeEvent, panel, dir })
+    if (!action || action === 'menu-nav') return
 
-    if (event.key === 'Escape' || event.key === 'ArrowLeft') {
-      event.preventDefault()
-      event.stopPropagation()
-      item?.close()
-      item?.triggerRef.current?.focus()
+    event.stopPropagation()
+
+    if (action === 'close-to-trigger') {
+      item.close()
+      item.triggerRef.current?.focus()
       return
     }
 
-    if (event.key === 'ArrowRight' && root?.menubarRef.current && item?.triggerRef.current) {
-      item.triggerRef.current.focus()
-      handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
+    if (action === 'move-menubar-next' && root.menubarRef.current) {
+      item.close({ restoreFocus: false })
+      item.triggerRef.current?.focus()
+      const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
+      const value = getNavigationMenuItemValue(next)
+      if (value != null) root.setTabStopValue(value)
+      return
+    }
+
+    if (action === 'tab-exit' || action === 'shift-tab-exit') {
+      const nav = root.rootRef.current
+      const target = nav
+        ? getNavigationMenuTabExitTarget(nav, panel, action === 'shift-tab-exit')
+        : null
+      item.close({ restoreFocus: false })
+      target?.focus()
     }
   }
 
@@ -397,8 +454,8 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
         {...divProps}
         id={item.contentId}
         className={classNames(getNavigationMenuContentClasses(mega), className)}
-        style={style}
-        role={mega ? 'group' : 'menu'}>
+        style={mega ? { minWidth: '28rem', ...style } : style}
+        role="menu">
         {children}
       </div>
     </div>
@@ -433,7 +490,7 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
   const itemValue = valueProp ?? autoValue
   const triggerRef = useRef<HTMLElement | null>(null)
   const contentRef = useRef<HTMLElement | null>(null)
-  const [hasPanel, setHasPanel] = useState(false)
+  const hasPanel = React.Children.toArray(children).some(childIsContent)
 
   const isOpen = Boolean(root && !disabled && isNavigationMenuValueOpen(itemValue, root.value))
 
@@ -444,6 +501,7 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       if (disabled || !root) return
       root.cancelClose()
       root.setValue(itemValue)
+      root.setTabStopValue(itemValue)
       if (!focusPanel) return
       requestAnimationFrame(() => {
         const panel = contentRef.current ?? document.getElementById(contentId)
@@ -453,10 +511,13 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
     [contentId, disabled, itemValue, root]
   )
 
-  const close = useCallback(() => {
-    if (!root) return
-    if (isOpen) root.setValue(null)
-  }, [isOpen, root])
+  const close = useCallback(
+    (options?: { restoreFocus?: boolean }) => {
+      if (!root) return
+      if (isOpen) root.setValue(null, options)
+    },
+    [isOpen, root]
+  )
 
   const scheduleOpen = useCallback(() => {
     if (disabled || !root) return
@@ -477,7 +538,6 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       isOpen,
       disabled,
       hasPanel,
-      setHasPanel,
       triggerRef,
       contentRef,
       contentId,
@@ -489,7 +549,6 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       showArrow: root?.showArrow ?? true
     }),
     [
-      autoValue,
       cancelClose,
       close,
       disabled,
@@ -545,8 +604,16 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
     [root]
   )
 
-  useEffect(() => {
-    if (listRef.current) initNavigationMenuRovingTabIndex(listRef.current)
+  useLayoutEffect(() => {
+    const list = listRef.current
+    if (!list || !root) return
+    const next = resolveNavigationMenuTabStopValue({
+      items: getNavigationMenuBarItems(list),
+      tabStopValue: root.tabStopValue
+    })
+    if (next != null && next !== String(root.tabStopValue ?? '')) {
+      root.setTabStopValue(next)
+    }
   })
 
   return (
@@ -578,6 +645,7 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   defaultValue,
   open: controlledOpen,
   defaultOpen = false,
+  openOnHover = false,
   disabled = false,
   closeOnClick = true,
   delayDuration = NAVIGATION_MENU_DEFAULT_DELAY_DURATION,
@@ -597,13 +665,10 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   const [internalValue, setInternalValue] = useState<NavigationMenuValue | null>(
     isNavigationMenuOpen(initialValue) ? (initialValue as NavigationMenuValue) : null
   )
+  const [tabStopValue, setTabStopValue] = useState<NavigationMenuValue | null>(null)
   const rootRef = useRef<HTMLElement | null>(null)
   const menubarRef = useRef<HTMLElement | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
-  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastOpenAtRef = useRef(0)
-  const suppressFocusOpenRef = useRef(false)
 
   const currentValue = resolveNavigationMenuOpenValue({
     value: controlledValue,
@@ -613,29 +678,42 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   const currentValueRef = useRef(currentValue)
   currentValueRef.current = currentValue
   const currentOpen = isNavigationMenuOpen(currentValue)
+  const delayDurationRef = useRef(delayDuration)
+  delayDurationRef.current = delayDuration
+  const skipDelayDurationRef = useRef(skipDelayDuration)
+  skipDelayDurationRef.current = skipDelayDuration
+  const disabledRef = useRef(disabled)
+  disabledRef.current = disabled
+  const setValueRef = useRef<
+    (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => void
+  >(() => undefined)
+  const hoverRef = useRef<ReturnType<typeof createNavigationMenuHoverSession> | null>(null)
+  if (!hoverRef.current) {
+    hoverRef.current = createNavigationMenuHoverSession({
+      getDelayDuration: () => delayDurationRef.current,
+      getSkipDelayDuration: () => skipDelayDurationRef.current,
+      getValue: () => currentValueRef.current,
+      setValue: (next) => setValueRef.current(next),
+      isDisabled: () => disabledRef.current
+    })
+  }
 
   useEffect(() => {
     injectNavigationMenuStyles()
   }, [])
 
-  const clearTimers = useCallback(() => {
-    if (openTimerRef.current) {
-      clearTimeout(openTimerRef.current)
-      openTimerRef.current = null
-    }
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current)
-      closeTimerRef.current = null
-    }
-  }, [])
-
-  useEffect(() => () => clearTimers(), [clearTimers])
+  useEffect(() => {
+    warnNavigationMenuOpenWithoutValue(
+      controlledOpen,
+      isNavigationMenuOpen(controlledValue ?? defaultValue ?? internalValue)
+    )
+  }, [controlledOpen, controlledValue, defaultValue, internalValue])
 
   const setValue = useCallback(
     (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => {
       if (disabled && next != null) return
 
-      clearTimers()
+      hoverRef.current?.clear()
 
       const resolvedNext = isNavigationMenuOpen(next) ? next : null
       const wasOpen = isNavigationMenuOpen(currentValueRef.current)
@@ -657,107 +735,43 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
       onValueChange?.(resolvedNext)
       onOpenChange?.(willOpen)
 
-      if (!willOpen) {
-        suppressFocusOpenRef.current = true
-        if (options?.restoreFocus !== false) {
-          restoreFocus(previousActiveElementRef.current)
-        }
+      if (!willOpen && options?.restoreFocus !== false) {
+        restoreFocus(previousActiveElementRef.current)
         previousActiveElementRef.current = null
-        queueMicrotask(() => {
-          suppressFocusOpenRef.current = false
-        })
       }
     },
-    [clearTimers, controlledValue, disabled, onOpenChange, onValueChange]
+    [controlledValue, disabled, onOpenChange, onValueChange]
   )
+  setValueRef.current = setValue
 
-  const scheduleOpen = useCallback(
-    (itemValue: NavigationMenuValue) => {
-      if (disabled) return
-      if (closeTimerRef.current) {
-        clearTimeout(closeTimerRef.current)
-        closeTimerRef.current = null
-      }
-
-      const skip = shouldSkipNavigationMenuOpenDelay(
-        lastOpenAtRef.current,
-        Date.now(),
-        skipDelayDuration
-      )
-      const delay = skip ? 0 : delayDuration
-
-      const apply = () => {
-        lastOpenAtRef.current = Date.now()
-        setValue(itemValue)
-        openTimerRef.current = null
-      }
-
-      if (delay <= 0) {
-        apply()
-        return
-      }
-
-      if (openTimerRef.current) clearTimeout(openTimerRef.current)
-      openTimerRef.current = setTimeout(apply, delay)
-    },
-    [delayDuration, disabled, setValue, skipDelayDuration]
-  )
-
-  const scheduleClose = useCallback(
-    (itemValue: NavigationMenuValue) => {
-      if (openTimerRef.current) {
-        clearTimeout(openTimerRef.current)
-        openTimerRef.current = null
-      }
-
-      const close = () => {
-        if (currentValueRef.current === itemValue) setValue(null)
-        closeTimerRef.current = null
-      }
-
-      if (skipDelayDuration <= 0) {
-        close()
-        return
-      }
-
-      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
-      closeTimerRef.current = setTimeout(close, skipDelayDuration)
-    },
-    [setValue, skipDelayDuration]
-  )
-
-  const cancelClose = useCallback(() => {
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current)
-      closeTimerRef.current = null
-    }
-  }, [])
+  useEffect(() => () => hoverRef.current?.clear(), [])
 
   const handleItemClick = useCallback(() => {
-    if (closeOnClick) setValue(null)
+    if (closeOnClick) setValue(null, { restoreFocus: false })
   }, [closeOnClick, setValue])
 
   const handleFocusLeave = useCallback(
     (event: React.FocusEvent<HTMLElement>) => {
-      const next = event.relatedTarget
-      if (containsFocusTarget(rootRef.current, next)) return
-      if (containsFocusTarget(getOpenPanelFromMenubar(menubarRef.current), next)) return
+      if (isFocusInsideNavigationMenu(rootRef.current, menubarRef.current, event.relatedTarget)) {
+        return
+      }
       if (!isNavigationMenuOpen(currentValueRef.current)) return
       setValue(null, { restoreFocus: false })
     },
     [setValue]
   )
 
-  const isFocusOpenSuppressed = useCallback(() => suppressFocusOpenRef.current, [])
-
   const contextValue = useMemo<NavigationMenuContextValue>(
     () => ({
       value: currentValue,
+      tabStopValue,
+      setTabStopValue,
       setValue,
-      scheduleOpen,
-      scheduleClose,
-      cancelClose,
+      scheduleOpen: (itemValue) => hoverRef.current?.scheduleOpen(itemValue),
+      scheduleClose: (itemValue) => hoverRef.current?.scheduleClose(itemValue),
+      cancelClose: () => hoverRef.current?.cancelClose(),
       closeOnClick,
+      openOnHover,
       handleItemClick,
       handleFocusLeave,
       portal,
@@ -765,31 +779,26 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
       offset,
       placement,
       showArrow,
-      menubarRef,
-      isFocusOpenSuppressed
+      rootRef,
+      menubarRef
     }),
     [
-      cancelClose,
       closeOnClick,
       currentValue,
       disabled,
       handleFocusLeave,
       handleItemClick,
-      isFocusOpenSuppressed,
       offset,
+      openOnHover,
       placement,
       portal,
-      scheduleClose,
-      scheduleOpen,
       setValue,
-      showArrow
+      showArrow,
+      tabStopValue
     ]
   )
 
-  const childrenArray = React.Children.toArray(children)
-  const hasList = childrenArray.some(
-    (child) => React.isValidElement(child) && child.type === NavigationMenuList
-  )
+  const hasList = hasNavigationMenuList(children)
 
   return (
     <NavigationMenuContext.Provider value={contextValue}>
@@ -798,7 +807,6 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
         ref={rootRef}
         className={classNames(getNavigationMenuClasses(), className)}
         style={style}
-        aria-label={navProps['aria-label'] ?? 'Main'}
         data-tiger-navigation-menu=""
         data-state={currentOpen ? 'open' : 'closed'}
         onBlur={(event) => {
