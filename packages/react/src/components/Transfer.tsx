@@ -1,78 +1,143 @@
-import React, { useState, useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from 'react'
 import type {
   TransferItem,
   TransferProps as CoreTransferProps,
   TransferSearchValue,
+  TransferSelectedKeys,
   TigerLocale,
   TigerLocaleTransfer
 } from '@expcat/tigercat-core'
 import {
-  resolveLocaleText,
-  mergeTigerLocale,
+  applyTransferSelectAll,
+  canMoveTransferItems,
+  classNames,
+  emptyTransferSelectedKeys,
+  filterTransferItems,
+  getCheckboxLabelClasses,
+  getCheckboxVisualClasses,
+  getInputClasses,
+  getTransferItemClasses,
   getTransferLabels,
+  getTransferSelectAllState,
+  hasTransferKey,
+  markFormItemGroupControl,
+  mergeAriaDescribedBy,
+  mergeTigerLocale,
+  moveTransferItems,
+  resolveLocaleText,
+  resolveTransferTargetKeys,
+  runShakeAnimation,
+  splitTransferData,
+  toggleTransferKey,
   transferBaseClasses,
+  transferEmptyClasses,
+  transferItemDescriptionClasses,
+  transferKeyId,
+  transferMoveToSourceIconClasses,
+  transferMoveToTargetIconClasses,
+  transferOperationClasses,
+  transferPanelBodyClasses,
   transferPanelClasses,
   transferPanelHeaderClasses,
-  transferPanelBodyClasses,
-  transferSearchClasses,
-  transferEmptyClasses,
-  transferOperationClasses,
-  getTransferItemClasses,
-  getTransferCheckboxClasses,
-  getTransferButtonClasses,
-  splitTransferData,
-  filterTransferItems,
-  moveTransferItems,
-  getPickerListboxAria,
-  getPickerOptionAria,
-  classNames,
-  icon20ViewBox,
-  chevronLeftSolidIcon20PathD,
-  chevronRightSolidIcon20PathD
+  checkboxCheckPathD,
+  checkboxIconSizeClasses,
+  checkboxIconViewBox,
+  checkboxIndeterminatePathD,
+  devWarn,
+  type InputStatus
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
+import { useFormItemControlContext } from './FormItemContext'
+import { Button } from './Button'
+import { Icon } from './Icon'
 
 export interface TransferProps
-  extends CoreTransferProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  /** Controlled target keys */
-  value?: (string | number)[]
-  /** Called when target keys change */
+  extends
+    CoreTransferProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   onChange?: (
     targetKeys: (string | number)[],
     direction: 'left' | 'right',
     movedKeys: (string | number)[]
   ) => void
-  /** Called when either panel search input changes */
+  onSelectChange?: (selected: TransferSelectedKeys) => void
   onSearchChange?: (value: TransferSearchValue) => void
-  /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
-  /** Text/aria label overrides */
   labels?: Partial<TigerLocaleTransfer>
 }
 
-const TRANSFER_KEYS = new Set<string>([
-  'value',
-  'targetKeys',
-  'dataSource',
-  'size',
-  'disabled',
-  'searchable',
-  'searchValue',
-  'defaultSearchValue',
-  'sourceTitle',
-  'targetTitle',
-  'emptyText',
-  'filterOption',
-  'onChange',
-  'onSearchChange'
-])
+export interface TransferRef {
+  focus: () => void
+}
 
-const EMPTY_TRANSFER_VALUE: (string | number)[] = []
+function TransferCheckbox({
+  checked,
+  indeterminate,
+  disabled,
+  size,
+  onChange,
+  children
+}: {
+  checked: boolean
+  indeterminate?: boolean
+  disabled?: boolean
+  size: 'sm' | 'md' | 'lg'
+  onChange: () => void
+  children?: React.ReactNode
+}): React.ReactElement {
+  const inputRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.indeterminate = Boolean(indeterminate)
+  }, [indeterminate])
 
-export const Transfer: React.FC<TransferProps> = (props) => {
+  return (
+    <label className={getCheckboxLabelClasses(size, Boolean(disabled))}>
+      <input
+        ref={inputRef}
+        type="checkbox"
+        className="sr-only peer"
+        checked={checked}
+        disabled={disabled}
+        aria-checked={indeterminate ? 'mixed' : checked}
+        onChange={() => {
+          if (!disabled) onChange()
+        }}
+      />
+      <span
+        className={getCheckboxVisualClasses({
+          size,
+          checked,
+          indeterminate,
+          disabled: Boolean(disabled)
+        })}
+        aria-hidden="true">
+        {(checked || indeterminate) && (
+          <svg
+            className={checkboxIconSizeClasses[size]}
+            viewBox={checkboxIconViewBox}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round">
+            <path d={indeterminate ? checkboxIndeterminatePathD : checkboxCheckPathD} />
+          </svg>
+        )}
+      </span>
+      {children}
+    </label>
+  )
+}
+
+const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfer(props, ref) {
   const {
     value,
     targetKeys,
+    defaultValue,
+    defaultTargetKeys,
+    selectedKeys: selectedKeysProp,
+    defaultSelectedKeys,
     dataSource = [],
     size = 'md',
     disabled = false,
@@ -84,17 +149,18 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     emptyText,
     filterOption,
     className,
+    name,
+    status: statusProp,
     onChange,
+    onSelectChange,
     onSearchChange,
     locale,
     labels: labelsOverride,
+    onBlur,
     ...rest
   } = props
 
-  // `value` is the primary controlled prop; `targetKeys` (core/shared name) is
-  // accepted as an alias with lower priority.
-  const resolvedValue = value ?? targetKeys ?? EMPTY_TRANSFER_VALUE
-
+  const formItemControl = useFormItemControlContext()
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -109,152 +175,176 @@ export const Transfer: React.FC<TransferProps> = (props) => {
       }),
     [mergedLocale, labelsOverride, sourceTitle, targetTitle]
   )
-
-  const divProps: Record<string, unknown> = {}
-  for (const key of Object.keys(rest)) {
-    if (!TRANSFER_KEYS.has(key)) {
-      divProps[key] = (rest as Record<string, unknown>)[key]
+  const resolved = resolveTransferTargetKeys(value, targetKeys)
+  useEffect(() => {
+    if (resolved.conflict) {
+      devWarn(
+        'Transfer.valueTargetKeys',
+        'Transfer received both `value` and `targetKeys`. `value` wins.'
+      )
     }
-  }
+  }, [resolved.conflict])
 
-  const [sourceSelectedKeys, setSourceSelectedKeys] = useState<Set<string | number>>(new Set())
-  const [targetSelectedKeys, setTargetSelectedKeys] = useState<Set<string | number>>(new Set())
-  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState<TransferSearchValue>(
-    defaultSearchValue ?? {}
+  const [targetValue, setTargetValue] = useControlledState<(string | number)[]>({
+    value: resolved.keys,
+    defaultValue: defaultValue ?? defaultTargetKeys ?? [],
+    onChange: (next) => {
+      formItemControl?.onChange?.(next)
+    }
+  })
+  const [selected, setSelected] = useControlledState<TransferSelectedKeys>({
+    value: selectedKeysProp,
+    defaultValue: defaultSelectedKeys ?? emptyTransferSelectedKeys(),
+    onChange: onSelectChange
+  })
+  const [search, setSearch] = useControlledState<TransferSearchValue>({
+    value: searchValue,
+    defaultValue: defaultSearchValue ?? {},
+    onChange: onSearchChange
+  })
+
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const fieldName = name ?? formItemControl?.name
+  const describedBy = mergeAriaDescribedBy(
+    typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
+    formItemControl?.describedBy
   )
-  const resolvedSearchValue = searchValue ?? uncontrolledSearchValue
-  const sourceSearch = resolvedSearchValue.source ?? ''
-  const targetSearch = resolvedSearchValue.target ?? ''
+  const labelledby =
+    typeof rest['aria-labelledby'] === 'string' ? rest['aria-labelledby'] : formItemControl?.labelId
+  const reactId = useId()
+  const groupId = rest.id ?? formItemControl?.id ?? `tiger-transfer-${reactId}`
 
-  function updateSearchValue(panel: keyof TransferSearchValue, value: string) {
-    const next = { ...resolvedSearchValue, [panel]: value }
-    if (searchValue === undefined) {
-      setUncontrolledSearchValue(next)
-    }
-    onSearchChange?.(next)
-  }
+  const rootRef = useRef<HTMLDivElement>(null)
+  useImperativeHandle(ref, () => rootRef.current as HTMLDivElement, [])
+  useEffect(() => {
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, formItemControl?.shakeTrigger])
 
   const { sourceItems, targetItems } = useMemo(
-    () => splitTransferData(dataSource, resolvedValue),
-    [dataSource, resolvedValue]
+    () => splitTransferData(dataSource, targetValue),
+    [dataSource, targetValue]
   )
-
-  const filteredSourceItems = useMemo(
+  const sourceSearch = search.source ?? ''
+  const targetSearch = search.target ?? ''
+  const filteredSource = useMemo(
     () => filterTransferItems(sourceItems, sourceSearch, filterOption),
     [sourceItems, sourceSearch, filterOption]
   )
-
-  const filteredTargetItems = useMemo(
+  const filteredTarget = useMemo(
     () => filterTransferItems(targetItems, targetSearch, filterOption),
     [targetItems, targetSearch, filterOption]
   )
 
-  const canMoveRight =
-    !disabled &&
-    [...sourceSelectedKeys].some((key) => {
-      const item = dataSource.find((d) => d.key === key)
-      return item && !item.disabled
-    })
+  const canMoveRight = canMoveTransferItems(selected.source, dataSource, effectiveDisabled)
+  const canMoveLeft = canMoveTransferItems(selected.target, dataSource, effectiveDisabled)
 
-  const canMoveLeft =
-    !disabled &&
-    [...targetSelectedKeys].some((key) => {
-      const item = dataSource.find((d) => d.key === key)
-      return item && !item.disabled
-    })
+  function updateSearch(panel: keyof TransferSearchValue, nextValue: string) {
+    setSearch({ ...search, [panel]: nextValue })
+  }
 
-  function toggleSourceItem(key: string | number) {
-    setSourceSelectedKeys((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
+  function updateSelected(next: TransferSelectedKeys) {
+    setSelected(next)
+  }
+
+  function toggle(panel: 'source' | 'target', key: string | number) {
+    updateSelected({ ...selected, [panel]: toggleTransferKey(selected[panel], key) })
+  }
+
+  function selectAll(panel: 'source' | 'target', visible: TransferItem[], checked: boolean) {
+    const state = getTransferSelectAllState(visible, selected[panel])
+    updateSelected({
+      ...selected,
+      [panel]: applyTransferSelectAll(selected[panel], state.enabledKeys, checked)
     })
   }
 
-  function toggleTargetItem(key: string | number) {
-    setTargetSelectedKeys((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
+  function move(direction: 'left' | 'right') {
+    const selectedKeys = direction === 'right' ? selected.source : selected.target
+    if (direction === 'right' && !canMoveRight) return
+    if (direction === 'left' && !canMoveLeft) return
+    const result = moveTransferItems(direction, targetValue, selectedKeys, dataSource)
+    const movedIds = new Set(result.movedKeys.map(transferKeyId))
+    setTargetValue(result.targetKeys)
+    onChange?.(result.targetKeys, direction, result.movedKeys)
+    updateSelected({
+      source:
+        direction === 'right'
+          ? selected.source.filter((key) => !movedIds.has(transferKeyId(key)))
+          : selected.source,
+      target:
+        direction === 'left'
+          ? selected.target.filter((key) => !movedIds.has(transferKeyId(key)))
+          : selected.target
     })
   }
 
-  function moveRight() {
-    if (!canMoveRight) return
-    const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
-      'right',
-      resolvedValue,
-      sourceSelectedKeys,
-      dataSource
-    )
-    setSourceSelectedKeys(new Set())
-    onChange?.(newTargetKeys, 'right', movedKeys)
-  }
-
-  function moveLeft() {
-    if (!canMoveLeft) return
-    const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
-      'left',
-      resolvedValue,
-      targetSelectedKeys,
-      dataSource
-    )
-    setTargetSelectedKeys(new Set())
-    onChange?.(newTargetKeys, 'left', movedKeys)
+  function handleFocusOut(event: React.FocusEvent<HTMLDivElement>) {
+    onBlur?.(event)
+    const next = event.relatedTarget as Node | null
+    if (next && event.currentTarget.contains(next)) return
+    formItemControl?.onBlur?.()
   }
 
   function renderPanel(
+    panel: 'source' | 'target',
     title: string,
-    items: TransferItem[],
-    selectedKeys: Set<string | number>,
-    toggleFn: (key: string | number) => void,
-    searchValue: string,
-    onSearchInput: (val: string) => void
+    allItems: TransferItem[],
+    visibleItems: TransferItem[],
+    query: string
   ) {
+    const selectedKeys = selected[panel]
+    const selectedCount = selectedKeys.filter((key) =>
+      allItems.some((item) => transferKeyId(item.key) === transferKeyId(key))
+    ).length
+    const selectState = getTransferSelectAllState(visibleItems, selectedKeys)
     return (
       <div className={transferPanelClasses} role="group" aria-label={title}>
         <div className={transferPanelHeaderClasses}>
-          <span className="font-medium text-[var(--tiger-transfer-title,var(--tiger-text,#111827))]">
-            {title} ({items.length})
-          </span>
+          <TransferCheckbox
+            checked={selectState.checked}
+            indeterminate={selectState.indeterminate}
+            disabled={effectiveDisabled || selectState.enabledKeys.length === 0}
+            size={size}
+            onChange={() => selectAll(panel, visibleItems, !selectState.checked)}>
+            <span className="font-medium text-[var(--tiger-text,#111827)]">
+              {title} ({selectedCount}/{allItems.length})
+            </span>
+          </TransferCheckbox>
         </div>
-
-        {searchable && (
+        {searchable ? (
           <input
-            type="text"
-            className={transferSearchClasses}
-            placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
-            value={searchValue}
+            type="search"
+            className={getInputClasses({ status, size: 'sm' })}
+            placeholder={resolveLocaleText('Search', mergedLocale?.common?.searchPlaceholder)}
+            value={query}
+            disabled={effectiveDisabled}
             aria-label={labels.searchAriaLabel.replace('{title}', title)}
-            onChange={(e) => onSearchInput(e.target.value)}
+            onChange={(event) => updateSearch(panel, event.target.value)}
           />
-        )}
-
-        <div
-          className={transferPanelBodyClasses}
-          {...getPickerListboxAria({ label: labels.itemsAriaLabel.replace('{title}', title) })}>
-          {items.length > 0 ? (
-            items.map((item) => {
-              const isSelected = selectedKeys.has(item.key)
-              const isDisabled = disabled || !!item.disabled
+        ) : null}
+        <div className={transferPanelBodyClasses}>
+          {visibleItems.length > 0 ? (
+            visibleItems.map((item) => {
+              const isSelected = hasTransferKey(selectedKeys, item.key)
+              const itemDisabled = effectiveDisabled || Boolean(item.disabled)
               return (
-                <label
-                  key={String(item.key)}
-                  className={getTransferItemClasses(isSelected, isDisabled, size)}
-                  {...getPickerOptionAria({ selected: isSelected, disabled: isDisabled })}>
-                  <input
-                    type="checkbox"
-                    className={getTransferCheckboxClasses(size)}
+                <div
+                  key={transferKeyId(item.key)}
+                  className={getTransferItemClasses(isSelected, itemDisabled, size)}>
+                  <TransferCheckbox
                     checked={isSelected}
-                    disabled={isDisabled}
-                    onChange={() => {
-                      if (!isDisabled) toggleFn(item.key)
-                    }}
-                  />
-                  <span className="flex-1 truncate">{item.label}</span>
-                </label>
+                    disabled={itemDisabled}
+                    size={size}
+                    onChange={() => toggle(panel, item.key)}>
+                    <span className="min-w-0">
+                      <span className="block truncate">{item.label}</span>
+                      {item.description ? (
+                        <span className={transferItemDescriptionClasses}>{item.description}</span>
+                      ) : null}
+                    </span>
+                  </TransferCheckbox>
+                </div>
               )
             })
           ) : (
@@ -268,55 +358,52 @@ export const Transfer: React.FC<TransferProps> = (props) => {
   }
 
   return (
-    <div className={classNames(transferBaseClasses, className)} {...divProps}>
-      {renderPanel(
-        labels.sourceTitle,
-        filteredSourceItems,
-        sourceSelectedKeys,
-        toggleSourceItem,
-        sourceSearch,
-        (value) => updateSearchValue('source', value)
+    <div
+      {...rest}
+      ref={rootRef}
+      id={groupId}
+      role="group"
+      aria-labelledby={labelledby}
+      aria-describedby={describedBy}
+      aria-invalid={status === 'error' ? true : rest['aria-invalid']}
+      aria-required={formItemControl?.required || rest['aria-required'] ? true : undefined}
+      aria-disabled={effectiveDisabled || undefined}
+      className={classNames(
+        transferBaseClasses,
+        status === 'error' && 'ring-1 ring-[var(--tiger-error,#dc2626)]',
+        className
       )}
-
+      onBlur={handleFocusOut}>
+      {fieldName
+        ? targetValue.map((key) => (
+            <input key={transferKeyId(key)} type="hidden" name={fieldName} value={String(key)} />
+          ))
+        : null}
+      {renderPanel('source', labels.sourceTitle, sourceItems, filteredSource, sourceSearch)}
       <div className={transferOperationClasses}>
-        <button
+        <Button
           type="button"
-          className={getTransferButtonClasses(!canMoveRight)}
+          variant="outline"
+          size="sm"
           disabled={!canMoveRight}
           aria-label={labels.moveToTargetAriaLabel}
-          onClick={moveRight}>
-          <svg
-            className="w-4 h-4"
-            viewBox={icon20ViewBox}
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d={chevronRightSolidIcon20PathD} fillRule="evenodd" clipRule="evenodd" />
-          </svg>
-        </button>
-        <button
+          onClick={() => move('right')}>
+          <Icon name="chevron-right" className={transferMoveToTargetIconClasses} aria-hidden />
+        </Button>
+        <Button
           type="button"
-          className={getTransferButtonClasses(!canMoveLeft)}
+          variant="outline"
+          size="sm"
           disabled={!canMoveLeft}
           aria-label={labels.moveToSourceAriaLabel}
-          onClick={moveLeft}>
-          <svg
-            className="w-4 h-4"
-            viewBox={icon20ViewBox}
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d={chevronLeftSolidIcon20PathD} fillRule="evenodd" clipRule="evenodd" />
-          </svg>
-        </button>
+          onClick={() => move('left')}>
+          <Icon name="chevron-left" className={transferMoveToSourceIconClasses} aria-hidden />
+        </Button>
       </div>
-
-      {renderPanel(
-        labels.targetTitle,
-        filteredTargetItems,
-        targetSelectedKeys,
-        toggleTargetItem,
-        targetSearch,
-        (value) => updateSearchValue('target', value)
-      )}
+      {renderPanel('target', labels.targetTitle, targetItems, filteredTarget, targetSearch)}
     </div>
   )
-}
+})
+
+export const Transfer = markFormItemGroupControl(TransferInner)
+Transfer.displayName = 'Transfer'

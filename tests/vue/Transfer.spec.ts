@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 const dataSource = [
   { key: '1', label: 'Item 1' },
@@ -22,8 +22,8 @@ describe('Transfer', () => {
         props: { dataSource }
       })
 
-      const panels = container.querySelectorAll('[role="group"]')
-      expect(panels.length).toBe(2)
+      expect(container.querySelector('[aria-label="Source"]')).toBeInTheDocument()
+      expect(container.querySelector('[aria-label="Target"]')).toBeInTheDocument()
     })
     it('should render items in source panel', () => {
       const { getByText } = render(Transfer, {
@@ -104,10 +104,11 @@ describe('Transfer', () => {
         }
       })
 
-      const panels = container.querySelectorAll('[role="group"]')
-      expect(panels[1].textContent).toContain('已选团队 (1)')
-      expect(panels[1].textContent).toContain('前端')
-      expect(panels[0].textContent).not.toContain('前端')
+      const target = container.querySelector('[aria-label="已选团队"]')
+      const source = container.querySelector('[aria-label="可选团队"]')
+      expect(target?.textContent).toContain('已选团队 (0/1)')
+      expect(target?.textContent).toContain('前端')
+      expect(source?.textContent).not.toContain('前端')
     })
 
     it('should disable move buttons when no items selected', () => {
@@ -129,7 +130,7 @@ describe('Transfer', () => {
         props: { dataSource, searchable: true }
       })
 
-      const searchInputs = container.querySelectorAll('input[type="text"]')
+      const searchInputs = container.querySelectorAll('input[type="search"]')
       expect(searchInputs.length).toBe(2)
     })
 
@@ -138,13 +139,10 @@ describe('Transfer', () => {
         props: { dataSource, searchable: true }
       })
 
-      const searchInput = container.querySelector('input[type="text"]')!
+      const searchInput = container.querySelector('input[type="search"]')!
       await fireEvent.update(searchInput, 'Item 1')
-
-      // Only Item 1 should be visible in source
-      const listbox = container.querySelectorAll('[role="listbox"]')[0]
-      const options = listbox.querySelectorAll('[role="option"]')
-      expect(options.length).toBe(1)
+      expect(queryByText('Item 1')).toBeInTheDocument()
+      expect(queryByText('Item 2')).not.toBeInTheDocument()
     })
   })
 
@@ -178,15 +176,15 @@ describe('Transfer', () => {
         props: { dataSource }
       })
 
-      expect(container.querySelectorAll('[role="group"]').length).toBe(2)
-      expect(container.querySelectorAll('[role="listbox"]').length).toBe(2)
+      expect(container.querySelector('[aria-label="Source"]')).toBeInTheDocument()
+      expect(container.querySelectorAll('[role="listbox"]').length).toBe(0)
       expect(getByLabelText('Move selected to target')).toBeInTheDocument()
       expect(getByLabelText('Move selected to source')).toBeInTheDocument()
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(Transfer)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(Transfer, { props: { dataSource } })
+      await expectNoA11yViolations(container)
     })
   })
 })

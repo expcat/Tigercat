@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { moveTransferItems, splitTransferData } from '@expcat/tigercat-core'
+import {
+  defaultTransferFilter,
+  filterTransferItems,
+  moveTransferItems,
+  splitTransferData,
+  toggleTransferKey
+} from '@expcat/tigercat-core'
 import type { TransferItem } from '@expcat/tigercat-core'
 
 const data: TransferItem[] = [
@@ -22,6 +28,16 @@ describe('moveTransferItems', () => {
     expect(result.targetKeys).toEqual(['a'])
   })
 
+  it('treats 1 and "1" as the same key and does not push twice', () => {
+    const numbered: TransferItem[] = [
+      { key: 1, label: 'One' },
+      { key: '2', label: 'Two' }
+    ]
+    const result = moveTransferItems('right', [1], ['1', 1], numbered)
+    expect(result.movedKeys).toEqual([1])
+    expect(result.targetKeys).toEqual([1])
+  })
+
   it('removes selected keys when moving left', () => {
     const result = moveTransferItems('left', ['a', 'b', 'd'], ['b'], data)
     expect(result.movedKeys).toEqual(['b'])
@@ -39,9 +55,18 @@ describe('moveTransferItems', () => {
     expect(result.movedKeys).toEqual(['a'])
   })
 
-  it('result re-splits consistently', () => {
-    const moved = moveTransferItems('right', [], ['a', 'd'], data)
+  it('renders target items in targetKeys order', () => {
+    const moved = moveTransferItems('right', [], ['d', 'a'], data)
     const { targetItems } = splitTransferData(data, moved.targetKeys)
-    expect(targetItems.map((i) => i.key)).toEqual(['a', 'd'])
+    expect(targetItems.map((item) => item.key)).toEqual(['d', 'a'])
+  })
+})
+
+describe('defaultTransferFilter', () => {
+  it('matches description as well as label', () => {
+    const item: TransferItem = { key: 'auth', label: '鉴权', description: '核心权限' }
+    expect(defaultTransferFilter('核心', item)).toBe(true)
+    expect(filterTransferItems([item], '监控')).toEqual([])
+    expect(toggleTransferKey([1], '1')).toEqual([])
   })
 })

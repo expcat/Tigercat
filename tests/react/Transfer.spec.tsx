@@ -5,11 +5,11 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
+import React, { useState } from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
-import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 const dataSource = [
   { key: '1', label: 'Item 1' },
@@ -22,100 +22,114 @@ const dataSource = [
 describe('Transfer', () => {
   describe('Rendering', () => {
     it('should render two panels', () => {
-      const { container } = render(<Transfer dataSource={dataSource} />)
-
-      const panels = container.querySelectorAll('[role="group"]')
-      expect(panels.length).toBe(2)
+      render(<Transfer dataSource={dataSource} />)
+      expect(screen.getByRole('group', { name: 'Source' })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Target' })).toBeInTheDocument()
     })
+
     it('should apply custom className', () => {
       const { container } = render(<Transfer dataSource={dataSource} className="custom-transfer" />)
-
       expect(container.querySelector('.custom-transfer')).toBeInTheDocument()
     })
   })
 
   describe('Transfer operations', () => {
-    it('should move items to target', async () => {
+    it('moves a checked item into the target panel when uncontrolled', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
-      const { container, getByLabelText } = render(
-        <Transfer dataSource={dataSource} onChange={onChange} />
-      )
+      render(<Transfer dataSource={dataSource} onChange={onChange} />)
 
-      // Select first item
-      const firstCheckbox = container.querySelector('input[type="checkbox"]')!
-      await user.click(firstCheckbox)
-
-      // Click move right
-      const moveRightBtn = getByLabelText('Move selected to target')
-      await user.click(moveRightBtn)
+      await user.click(screen.getByText('Item 1'))
+      await user.click(screen.getByLabelText('Move selected to target'))
 
       expect(onChange).toHaveBeenCalled()
-      const call = onChange.mock.calls[0]
-      expect(call[1]).toBe('right')
+      expect(onChange.mock.calls[0][1]).toBe('right')
+      const target = screen.getByRole('group', { name: 'Target' })
+      expect(target).toHaveTextContent('Item 1')
+    })
+
+    it('keeps target order from targetKeys', () => {
+      render(
+        <Transfer
+          dataSource={[
+            { key: 'design', label: 'design' },
+            { key: 'qa', label: 'qa' }
+          ]}
+          targetKeys={['qa', 'design']}
+        />
+      )
+      const target = screen.getByRole('group', { name: 'Target' })
+      const labels = Array.from(target.querySelectorAll('span.block.truncate')).map(
+        (node) => node.textContent
+      )
+      expect(labels).toEqual(['qa', 'design'])
     })
 
     it('should disable move buttons when nothing selected', () => {
-      const { getByLabelText } = render(<Transfer dataSource={dataSource} />)
-
-      expect(getByLabelText('Move selected to target')).toBeDisabled()
-      expect(getByLabelText('Move selected to source')).toBeDisabled()
+      render(<Transfer dataSource={dataSource} />)
+      expect(screen.getByLabelText('Move selected to target')).toBeDisabled()
+      expect(screen.getByLabelText('Move selected to source')).toBeDisabled()
     })
   })
 
   describe('Search', () => {
     it('should show search inputs when searchable', () => {
       const { container } = render(<Transfer dataSource={dataSource} searchable />)
-
-      const searchInputs = container.querySelectorAll('input[type="text"]')
-      expect(searchInputs.length).toBe(2)
+      expect(container.querySelectorAll('input[type="search"]').length).toBe(2)
     })
 
-    it('should filter items', async () => {
+    it('filters by description by default', async () => {
       const user = userEvent.setup()
-      const { container } = render(<Transfer dataSource={dataSource} searchable />)
-
-      const searchInput = container.querySelector('input[type="text"]')!
-      await user.type(searchInput, 'Item 1')
-
-      const listbox = container.querySelectorAll('[role="listbox"]')[0]
-      const options = listbox.querySelectorAll('[role="option"]')
-      expect(options.length).toBe(1)
+      render(
+        <Transfer
+          dataSource={[{ key: 'auth', label: '鉴权', description: '核心权限' }]}
+          searchable
+        />
+      )
+      const search = document.querySelector('input[type="search"]') as HTMLInputElement
+      await user.type(search, '核心')
+      expect(screen.getByText('鉴权')).toBeInTheDocument()
+      expect(screen.getByText('核心权限')).toBeInTheDocument()
     })
   })
 
   describe('Disabled', () => {
     it('should disable all checkboxes when disabled', () => {
       const { container } = render(<Transfer dataSource={dataSource} disabled />)
-
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
-      checkboxes.forEach((cb) => {
+      container.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
         expect(cb).toBeDisabled()
       })
     })
 
     it('should not allow selecting disabled items', () => {
       const { getByText } = render(<Transfer dataSource={dataSource} />)
-
-      const item5Label = getByText('Item 5').closest('label')!
-      const checkbox = item5Label.querySelector('input[type="checkbox"]')!
+      const checkbox = getByText('Item 5')
+        .closest('label')!
+        .querySelector('input[type="checkbox"]')!
       expect(checkbox).toBeDisabled()
     })
   })
 
   describe('Accessibility', () => {
     it('should have correct ARIA structure', () => {
-      const { container, getByLabelText } = render(<Transfer dataSource={dataSource} />)
-
-      expect(container.querySelectorAll('[role="group"]').length).toBe(2)
-      expect(container.querySelectorAll('[role="listbox"]').length).toBe(2)
-      expect(getByLabelText('Move selected to target')).toBeInTheDocument()
-      expect(getByLabelText('Move selected to source')).toBeInTheDocument()
+      render(<Transfer dataSource={dataSource} />)
+      expect(screen.getByRole('group', { name: 'Source' })).toBeInTheDocument()
+      expect(screen.queryAllByRole('listbox')).toHaveLength(0)
+      expect(screen.getByLabelText('Move selected to target')).toBeInTheDocument()
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Transfer />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(<Transfer dataSource={dataSource} searchable />)
+      await expectNoA11yViolations(container)
+    })
+
+    it('uses official zhTW labels', () => {
+      render(
+        <ConfigProvider locale={zhTW}>
+          <Transfer dataSource={dataSource} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('group', { name: '來源清單' })).toBeInTheDocument()
     })
   })
 })
