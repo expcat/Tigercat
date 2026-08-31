@@ -4,6 +4,8 @@
 
 ## 未发布
 
+NavigationMenu 默认不再悬停或聚焦就开层。用点击或 Enter / Space / ArrowDown；需要悬停请显式 `openOnHover`。再点同一 Trigger 会关上。不要依赖默认 `aria-label="Main"`，多个导航请各自命名。`1` 与 `'1'` 是同一项。Mega 面板是 `menu` 不是孤立 `group`。Vue 从主入口引 `NavigationMenuProps` 和 `NavigationMenuList`。
+
 Menu 点选永远是单选：`selectedKeys` 长度 0/1，再点已选项变成 `[]`。`multiple` 只表示可否同时打开多个 submenu，不再让初值多选、一点就塌成一项。`1` 与 `'1'` 是同一 key。
 
 `popupPortal` 默认 `true`。popup（horizontal / collapsed vertical）也读写 `openKeys`，点 horizontal 标题会 toggle。搜索会把匹配子孙的祖先写进 `openKeys`；受控时请回写。未传 `searchPlaceholder` / `emptyText` 走 locale `common`。

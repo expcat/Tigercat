@@ -1,7 +1,7 @@
 {
   "id": "navigation-menu-02",
   "title": "MegaMenu 面板",
-  "description": "更宽的 MegaMenu 内容区，用插槽排多列链接，仍保持 menubar 键盘与悬停展开。",
+  "description": "更宽的 MegaMenu 内容区，用插槽排多列链接。点击或键盘展开，再点同一触发器关闭。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

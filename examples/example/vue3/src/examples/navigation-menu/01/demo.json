@@ -1,7 +1,7 @@
 {
   "id": "navigation-menu-01",
   "title": "基础导航",
-  "description": "水平 menubar 导航，悬停或键盘展开下拉面板，方向键在顶栏与面板内移动。",
+  "description": "水平 menubar 导航。点击或 Enter / ArrowDown 展开面板，再点同一触发器关闭；方向键在顶栏与面板内移动。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

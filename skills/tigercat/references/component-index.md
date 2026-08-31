@@ -180,6 +180,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | NavigationMenuContent           | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuContent           |
 | NavigationMenuItem              | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuItem              |
 | NavigationMenuLink              | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuLink              |
+| NavigationMenuList              | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuList              |
 | NavigationMenuTrigger           | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuTrigger           |
 | PageHeader                      | Navigation | `navigation` | page-header.ts                                      | ./PageHeader                      |
 | Pagination                      | Navigation | `navigation` | pagination.ts                                       | ./Pagination                      |

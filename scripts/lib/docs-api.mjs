@@ -226,6 +226,20 @@ export const COMPONENT_PROP_PRIORITY = {
   MenuItem: ['itemKey', 'href?', 'disabled?'],
   MenuItemGroup: ['title?'],
   SubMenu: ['itemKey', 'title?', 'disabled?'],
+  NavigationMenu: [
+    'value?',
+    'open?',
+    'portal?',
+    'closeOnClick?',
+    'disabled?',
+    'placement?',
+    'openOnHover?'
+  ],
+  NavigationMenuLink: ['href?', 'disabled?', 'active?', 'target?'],
+  NavigationMenuTrigger: ['disabled?', 'showArrow?'],
+  NavigationMenuContent: ['mega?'],
+  NavigationMenuList: ['className?'],
+  NavigationMenuItem: ['value?', 'disabled?'],
   Popover: ['trigger?', 'content?', 'placement?', 'open?', 'width?', 'asChild?'],
   Tooltip: ['content?', 'trigger?', 'placement?', 'open?', 'asChild?'],
   Popconfirm: [
@@ -652,7 +666,19 @@ export const REQUIRED_USAGE_SNIPPETS = {
     MenuItemGroup:
       '<Menu><MenuItemGroup title="Team"><MenuItem :item-key="a">A</MenuItem></MenuItemGroup></Menu>',
     SubMenu:
-      '<Menu><SubMenu :item-key="itemKey" title="More"><MenuItem :item-key="a">A</MenuItem></SubMenu></Menu>'
+      '<Menu><SubMenu :item-key="itemKey" title="More"><MenuItem :item-key="a">A</MenuItem></SubMenu></Menu>',
+    NavigationMenu:
+      '<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>',
+    NavigationMenuList:
+      '<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>',
+    NavigationMenuItem:
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>',
+    NavigationMenuTrigger:
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
+    NavigationMenuContent:
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
+    NavigationMenuLink:
+      '<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -740,7 +766,19 @@ export const REQUIRED_USAGE_SNIPPETS = {
     MenuItemGroup:
       '<Menu><MenuItemGroup title="Team"><MenuItem itemKey="a">A</MenuItem></MenuItemGroup></Menu>',
     SubMenu:
-      '<Menu><SubMenu itemKey={itemKey} title="More"><MenuItem itemKey="a">A</MenuItem></SubMenu></Menu>'
+      '<Menu><SubMenu itemKey={itemKey} title="More"><MenuItem itemKey="a">A</MenuItem></SubMenu></Menu>',
+    NavigationMenu:
+      '<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>',
+    NavigationMenuList:
+      '<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>',
+    NavigationMenuItem:
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>',
+    NavigationMenuTrigger:
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
+    NavigationMenuContent:
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
+    NavigationMenuLink:
+      '<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>'
   }
 }
 

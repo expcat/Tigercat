@@ -8,6 +8,7 @@ for (const { framework, baseUrl } of exampleApps) {
       const products = preview.getByRole('menuitem', { name: '产品' })
       await expect(products).toBeVisible()
       await products.focus()
+      await expect(products).toHaveAttribute('aria-expanded', 'false')
       await page.keyboard.press('ArrowRight')
       const docs = preview.getByRole('menuitem', { name: '文档' })
       await expect(docs).toBeFocused()
@@ -25,6 +26,16 @@ for (const { framework, baseUrl } of exampleApps) {
       const panel = preview.locator('[data-tiger-navigation-menu-content]').first()
       await expect(panel).toBeVisible()
       await page.keyboard.press('Escape')
+      await expect(panel).toBeHidden()
+    })
+
+    test('toggles the same trigger closed on a second click', async ({ page }) => {
+      const { preview } = await openDemo(page, baseUrl, 'navigation-menu', 'navigation-menu-01')
+      const products = preview.getByRole('menuitem', { name: '产品' })
+      await products.click()
+      const panel = preview.locator('[data-tiger-navigation-menu-content]').first()
+      await expect(panel).toBeVisible()
+      await products.click()
       await expect(panel).toBeHidden()
     })
 

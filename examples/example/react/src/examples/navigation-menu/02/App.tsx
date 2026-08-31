@@ -10,7 +10,7 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <NavigationMenu>
+      <NavigationMenu aria-label="产品导航">
         <NavigationMenuItem value="products">
           <NavigationMenuTrigger>产品</NavigationMenuTrigger>
           <NavigationMenuContent mega>
@@ -19,8 +19,20 @@ export default function App() {
                 <p className="px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
                   平台
                 </p>
-                <NavigationMenuLink onClick={() => setLastAction('分析')}>分析</NavigationMenuLink>
-                <NavigationMenuLink onClick={() => setLastAction('自动化')}>
+                <NavigationMenuLink
+                  href="#analytics"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setLastAction('分析')
+                  }}>
+                  分析
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  href="#automation"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setLastAction('自动化')
+                  }}>
                   自动化
                 </NavigationMenuLink>
               </div>
@@ -28,8 +40,22 @@ export default function App() {
                 <p className="px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
                   资源
                 </p>
-                <NavigationMenuLink onClick={() => setLastAction('案例')}>案例</NavigationMenuLink>
-                <NavigationMenuLink onClick={() => setLastAction('博客')}>博客</NavigationMenuLink>
+                <NavigationMenuLink
+                  href="#cases"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setLastAction('案例')
+                  }}>
+                  案例
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  href="#blog"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setLastAction('博客')
+                  }}>
+                  博客
+                </NavigationMenuLink>
               </div>
             </div>
           </NavigationMenuContent>

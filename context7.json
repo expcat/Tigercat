@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 175,
+  "component_count": 176,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -550,6 +550,7 @@
         "NavigationMenuContent",
         "NavigationMenuItem",
         "NavigationMenuLink",
+        "NavigationMenuList",
         "NavigationMenuTrigger",
         "PageHeader",
         "Pagination",
@@ -3797,6 +3798,26 @@
       "typeSource": "packages/core/src/types/navigation-menu.ts",
       "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
       "propsInterfaces": ["NavigationMenuLinkProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NavigationMenuList": {
+      "name": "NavigationMenuList",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./NavigationMenuList",
+      "packageTarget": "NavigationMenu",
+      "typeSource": "packages/core/src/types/navigation-menu.ts",
+      "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
+      "propsInterfaces": ["NavigationMenuListProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

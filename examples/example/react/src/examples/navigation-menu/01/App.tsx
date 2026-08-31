@@ -10,19 +10,47 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <NavigationMenu>
+      <NavigationMenu aria-label="主导航">
         <NavigationMenuItem value="products">
           <NavigationMenuTrigger>产品</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <NavigationMenuLink onClick={() => setLastAction('概述')}>概述</NavigationMenuLink>
-            <NavigationMenuLink onClick={() => setLastAction('定价')}>定价</NavigationMenuLink>
+            <NavigationMenuLink
+              href="#overview"
+              onClick={(event) => {
+                event.preventDefault()
+                setLastAction('概述')
+              }}>
+              概述
+            </NavigationMenuLink>
+            <NavigationMenuLink
+              href="#pricing"
+              onClick={(event) => {
+                event.preventDefault()
+                setLastAction('定价')
+              }}>
+              定价
+            </NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem value="docs">
           <NavigationMenuTrigger>文档</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <NavigationMenuLink onClick={() => setLastAction('指南')}>指南</NavigationMenuLink>
-            <NavigationMenuLink onClick={() => setLastAction('API')}>API</NavigationMenuLink>
+            <NavigationMenuLink
+              href="#guide"
+              onClick={(event) => {
+                event.preventDefault()
+                setLastAction('指南')
+              }}>
+              指南
+            </NavigationMenuLink>
+            <NavigationMenuLink
+              href="#api"
+              onClick={(event) => {
+                event.preventDefault()
+                setLastAction('API')
+              }}>
+              API
+            </NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>

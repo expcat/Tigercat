@@ -11,19 +11,27 @@ const lastAction = ref('尚未选择')
 
 <template>
   <div class="space-y-3">
-    <NavigationMenu>
+    <NavigationMenu aria-label="主导航">
       <NavigationMenuItem value="products">
         <NavigationMenuTrigger>产品</NavigationMenuTrigger>
         <NavigationMenuContent>
-          <NavigationMenuLink @click="lastAction = '概述'">概述</NavigationMenuLink>
-          <NavigationMenuLink @click="lastAction = '定价'">定价</NavigationMenuLink>
+          <NavigationMenuLink href="#overview" @click.prevent="lastAction = '概述'">
+            概述
+          </NavigationMenuLink>
+          <NavigationMenuLink href="#pricing" @click.prevent="lastAction = '定价'">
+            定价
+          </NavigationMenuLink>
         </NavigationMenuContent>
       </NavigationMenuItem>
       <NavigationMenuItem value="docs">
         <NavigationMenuTrigger>文档</NavigationMenuTrigger>
         <NavigationMenuContent>
-          <NavigationMenuLink @click="lastAction = '指南'">指南</NavigationMenuLink>
-          <NavigationMenuLink @click="lastAction = 'API'">API</NavigationMenuLink>
+          <NavigationMenuLink href="#guide" @click.prevent="lastAction = '指南'">
+            指南
+          </NavigationMenuLink>
+          <NavigationMenuLink href="#api" @click.prevent="lastAction = 'API'">
+            API
+          </NavigationMenuLink>
         </NavigationMenuContent>
       </NavigationMenuItem>
       <NavigationMenuItem>

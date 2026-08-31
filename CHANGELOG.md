@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **NavigationMenu**：开合 / hover 定时器 / menubar 与面板键盘下沉 core。`1` 与 `'1'` 是同一项。默认点击或 Enter / Space / ArrowDown 才开层面板，焦点不再开层；`openOnHover` 才悬停打开。再点同一 Trigger 会关上。Roving tabindex 跟 `tabStopValue` 走，打开面板不会把停点打回第一项。Tab 出面板落到 nav 后面的控件。Mega 也是 `role="menu"`。`aria-controls` 关上仍在。根 `disabled` 管顶层 Link。不再默认 `aria-label="Main"`。`NavigationMenuList` 进根入口。Vue 导出 `NavigationMenuProps` / `useNavigationMenuContext`。
 - **Menu**：选中 / 展开 / 搜索下沉 core。`1` 与 `'1'` 是同一 key。点选永远单选（再点已选项变成 `[]`），`multiple` 只管 submenu。搜索会展开祖先，父标题匹配仍是 SubMenu。搜索框在 `role="menu"` / 列表外面，文案走 `common.searchPlaceholder` / `common.emptyText`。垂直导航是 `<nav>` + 列表（有 `href` 才是链接，`aria-current="page"` 只打在链接上）；horizontal 是 `menubar`。popup 与 inline 共用 `openKeys`，`popupPortal` 默认 `true`。icon 只收节点或已登记 icon 名。Vue 导出 `MenuProps` / `useMenuContext`。
 - **Overlay 触发器**：`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点节点上（`asChild` 或自渲 `<button type="button">`），不再写在包装 div。Dropdown 默认 `trigger="click"`；hover 合取 click/focus。Tooltip `aria-describedby` 只在打开时写在焦点节点。Popconfirm 打开进焦 Cancel，文案走 locale，OK/Cancel 用 Button。SplitButton 不再套 ButtonGroup，chevron 名走 locale。ContextMenu 触发面进 Tab，点 Sub 能开。Vue 导出对应 `*Props`。
 - **Tree**：展开 / 选中 / 勾选 / 过滤 / 懒加载 / 拖拽下沉 core。`1` 与 `'1'` 是同一节点。flatten 一行渲染，虚拟和非虚拟缩进、连线同一套。`filterValue` / `searchValue` 是同一条查询（摘节点，匹配子串走 `<mark>`）；`searchable` 只决定是否画输入框。`loadData` 不得改传入对象，失败清转圈。`checkStrategy` 会走过半选祖先；级联跳过 disabled。`onDrop` 带 `before` / `after` / `inside` 和下一棵不可变树。默认名走 `locale.tree`。搜索框在 `role="tree"` 外面。Vue 主入口导出 `TreeProps`。

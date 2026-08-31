@@ -7,7 +7,7 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 33 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 34 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
@@ -220,13 +220,17 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## NavigationMenu
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 3/15 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 7/16 props
 
-| Prop        | Type                          | Default | Notes                                                                                      |
-| ----------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `value?`    | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
-| `open?`     | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
-| `disabled?` | `boolean`                     | `false` | Whether the navigation menu is disabled                                                    |
+| Prop            | Type                          | Default          | Notes                                                                                      |
+| --------------- | ----------------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `NavigationMenuValue \| null` | `-`              | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
+| `open?`         | `boolean`                     | `-`              | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
+| `portal?`       | `boolean`                     | `true`           | Portal panels through the overlay target chain (overlay-host, then ConfigProvider root,... |
+| `closeOnClick?` | `boolean`                     | `true`           | Whether to close the open panel when a link or item is clicked                             |
+| `disabled?`     | `boolean`                     | `false`          | Whether the navigation menu is disabled                                                    |
+| `placement?`    | `FloatingPlacement`           | `'bottom-start'` | Panel placement relative to the trigger                                                    |
+| `openOnHover?`  | `boolean`                     | `false`          | Open the hovered trigger's panel after `delayDuration`. Focus never opens a panel; Ente... |
 
 ## NavigationMenuContent
 
@@ -250,13 +254,24 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## NavigationMenuLink
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 3/8 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 4/8 props
 
 | Prop        | Type      | Default | Notes                                                         |
 | ----------- | --------- | ------- | ------------------------------------------------------------- |
-| `disabled?` | `boolean` | `false` | Whether the link is disabled                                  |
 | `href?`     | `string`  | `-`     | Link href. Renders an `<a>` when set, otherwise a `<button>`. |
+| `disabled?` | `boolean` | `false` | Whether the link is disabled                                  |
+| `active?`   | `boolean` | `false` | Whether the link represents the current page                  |
 | `target?`   | `string`  | `-`     | Link target                                                   |
+
+## NavigationMenuList
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuListProps`
+
+| Prop         | Type                      | Default | Notes                  |
+| ------------ | ------------------------- | ------- | ---------------------- |
+| `className?` | `string`                  | `-`     | Additional CSS classes |
+| `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
+| `children?`  | `React.ReactNode`         | `-`     | -                      |
 
 ## NavigationMenuTrigger
 
