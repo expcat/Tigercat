@@ -291,6 +291,17 @@ export interface ImageCropperProps {
   src: string
 
   /**
+   * Crop rectangle in display pixels (controlled mode).
+   */
+  cropRect?: CropRect
+
+  /**
+   * Initial crop rectangle (uncontrolled mode). When omitted, a centered
+   * rect is computed after the image loads.
+   */
+  defaultCropRect?: CropRect
+
+  /**
    * Fixed aspect ratio (width / height). Leave undefined for free cropping.
    * @example 1 for square, 16/9 for widescreen
    */

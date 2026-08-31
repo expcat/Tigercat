@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { CropUpload } from '@expcat/tigercat-vue/CropUpload'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function createFile(name: string, size: number, type = 'image/png'): File {
@@ -54,7 +55,7 @@ describe('CropUpload', () => {
     })
 
     it('uses component locale for default trigger text', () => {
-      const { container } = render(CropUpload, { props: { locale: { locale: 'zh-CN' } } })
+      const { container } = render(CropUpload, { props: { locale: zhCN } })
       expect(container.textContent).toContain('选择图片')
       expect(container.querySelector('[role="button"]')).toHaveAttribute(
         'aria-label',

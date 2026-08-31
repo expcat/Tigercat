@@ -240,11 +240,42 @@ export const imagePreviewCounterClasses = 'text-sm text-white/80 mx-2 tabular-nu
 // ImageCropper styles
 // ============================================================================
 
+const CROPPER_STYLE_ID = 'tiger-image-cropper-styles'
+
+const CROPPER_CSS = `.tiger-image-cropper-checkerboard {
+  background-color: var(--tiger-surface, #ffffff);
+  background-image:
+    linear-gradient(45deg, var(--tiger-surface-muted, #e5e7eb) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--tiger-surface-muted, #e5e7eb) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--tiger-surface-muted, #e5e7eb) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--tiger-surface-muted, #e5e7eb) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}`
+
 /**
- * Cropper container classes
+ * Inject checkerboard rules if the style node is missing. Presence in the
+ * document is the only guard — a sticky module flag would skip re-inject
+ * after the node is removed.
+ */
+export function injectImageCropperStyles(): void {
+  if (!isBrowser()) return
+  if (document.getElementById(CROPPER_STYLE_ID)) return
+  const style = document.createElement('style')
+  style.id = CROPPER_STYLE_ID
+  style.textContent = CROPPER_CSS
+  document.head.appendChild(style)
+}
+
+/**
+ * Cropper container classes. Overflow clip lives on the bitmap frame so
+ * handles and their focus rings stay visible at 0/100%.
  */
 export const imageCropperContainerClasses =
-  'relative overflow-hidden bg-[var(--tiger-image-cropper-bg,#0f172a)] rounded-[var(--tiger-radius-lg,0.75rem)] select-none touch-none shadow-inner border border-white/10 tiger-image-cropper-checkerboard'
+  'relative select-none touch-none rounded-[var(--tiger-radius-lg,0.75rem)] shadow-inner border border-[var(--tiger-border,#e5e7eb)] tiger-image-cropper-checkerboard'
+
+/** Bitmap + mask clip layer */
+export const imageCropperFrameClasses = 'relative overflow-hidden'
 
 /**
  * Cropper image classes (the source image)
@@ -256,48 +287,73 @@ export const imageCropperImgClasses = 'absolute top-0 left-0 max-w-none pointer-
  */
 export const imageCropperMaskClasses = 'absolute inset-0 pointer-events-none'
 
+/** SVG mask fill — a fixed overlay, not a theme token that is never written */
+export const IMAGE_CROPPER_MASK_FILL = 'rgba(0,0,0,0.55)'
+
 /**
  * Cropper selection border classes (the crop box border)
  */
 export const imageCropperSelectionClasses =
-  'absolute border-2 border-[var(--tiger-image-cropper-border,#ffffff)] pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.65),0_0_15px_rgba(255,255,255,0.4)] transition-shadow duration-300'
+  'absolute border-2 border-white pointer-events-none shadow-[0_0_15px_rgba(255,255,255,0.4)]'
 
 /**
  * Cropper guide line classes
  */
-export const imageCropperGuideClasses =
-  'absolute border-[var(--tiger-image-cropper-border,rgba(255,255,255,0.25))] pointer-events-none opacity-40 transition-opacity duration-300'
+export const imageCropperGuideClasses = 'absolute border-white/25 pointer-events-none opacity-40'
 
 /**
  * Cropper drag area classes (inside the crop box, handles moving)
  */
-export const imageCropperDragAreaClasses = 'absolute cursor-move'
+export const imageCropperDragAreaClasses =
+  'absolute cursor-move outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+
+const CROPPER_HANDLE_CURSORS: Record<CropHandle, string> = {
+  nw: 'cursor-nw-resize',
+  n: 'cursor-n-resize',
+  ne: 'cursor-ne-resize',
+  e: 'cursor-e-resize',
+  se: 'cursor-se-resize',
+  s: 'cursor-s-resize',
+  sw: 'cursor-sw-resize',
+  w: 'cursor-w-resize'
+}
 
 /**
- * Get classes for a resize handle
+ * Get classes for a resize handle. Position is applied via
+ * {@link getCropperHandleStyle} so the knob center sits on the edge.
  */
 export function getCropperHandleClasses(handle: CropHandle): string {
-  const base =
-    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary,#2563eb)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary,#2563eb)] hover:border-white transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]'
+  return classNames(
+    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary,#2563eb)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary,#2563eb)] hover:border-white transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    CROPPER_HANDLE_CURSORS[handle]
+  )
+}
 
-  const positionMap: Record<CropHandle, string> = {
-    nw: '-top-1.75 -left-1.75 cursor-nw-resize',
-    n: '-top-1.75 left-1/2 -translate-x-1/2 cursor-n-resize',
-    ne: '-top-1.75 -right-1.75 cursor-ne-resize',
-    e: 'top-1/2 -right-1.75 -translate-y-1/2 cursor-e-resize',
-    se: '-bottom-1.75 -right-1.75 cursor-se-resize',
-    s: '-bottom-1.75 left-1/2 -translate-x-1/2 cursor-s-resize',
-    sw: '-bottom-1.75 -left-1.75 cursor-sw-resize',
-    w: 'top-1/2 -left-1.75 -translate-y-1/2 cursor-w-resize'
+/**
+ * Place a handle so its center sits on the matching crop-rect edge.
+ */
+export function getCropperHandleStyle(handle: CropHandle, rect: CropRect): Record<string, string> {
+  let x = rect.x + rect.width / 2
+  let y = rect.y + rect.height / 2
+  if (handle.includes('w')) x = rect.x
+  if (handle.includes('e')) x = rect.x + rect.width
+  if (handle.includes('n')) y = rect.y
+  if (handle.includes('s')) y = rect.y + rect.height
+  return {
+    top: `${y}px`,
+    left: `${x}px`,
+    transform: 'translate(-50%, -50%)'
   }
-
-  return classNames(base, positionMap[handle])
 }
 
 /**
  * All 8 crop handles
  */
 export const CROP_HANDLES: CropHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']
+
+export function isPositiveFinite(value: number): boolean {
+  return Number.isFinite(value) && value > 0
+}
 
 // ============================================================================
 // CropUpload styles
@@ -356,39 +412,52 @@ export function getPreviewNavState(currentIndex: number, total: number): Preview
 }
 
 /**
- * Constrain a crop rect to stay within image bounds, optionally enforcing aspect ratio
+ * Constrain a crop rect to stay within image bounds, optionally enforcing
+ * aspect ratio and minimum size. When the image is smaller than minW/minH,
+ * the rect is clamped to the image — min cannot exceed the bitmap.
  */
 export function constrainCropRect(
   rect: CropRect,
   imageWidth: number,
   imageHeight: number,
-  aspectRatio?: number
+  aspectRatio?: number,
+  minW = 0,
+  minH = 0
 ): CropRect {
-  let { x, y, width, height } = rect
+  const maxW = isPositiveFinite(imageWidth) ? imageWidth : 0
+  const maxH = isPositiveFinite(imageHeight) ? imageHeight : 0
+  const minWidth = Math.min(Math.max(minW, 0), maxW)
+  const minHeight = Math.min(Math.max(minH, 0), maxH)
 
-  // Enforce aspect ratio
-  if (aspectRatio && aspectRatio > 0) {
+  let { x, y, width, height } = rect
+  width = Math.min(Math.max(width, minWidth), maxW)
+  height = Math.min(Math.max(height, minHeight), maxH)
+
+  if (aspectRatio && aspectRatio > 0 && height > 0) {
     const currentRatio = width / height
     if (currentRatio > aspectRatio) {
       width = height * aspectRatio
     } else {
       height = width / aspectRatio
     }
+    width = Math.min(width, maxW)
+    height = Math.min(height, maxH)
+    if (width / height > aspectRatio) {
+      width = height * aspectRatio
+    } else {
+      height = width / aspectRatio
+    }
   }
 
-  // Clamp dimensions
-  width = Math.min(width, imageWidth)
-  height = Math.min(height, imageHeight)
-
-  // Clamp position
-  x = Math.max(0, Math.min(x, imageWidth - width))
-  y = Math.max(0, Math.min(y, imageHeight - height))
+  x = Math.max(0, Math.min(x, maxW - width))
+  y = Math.max(0, Math.min(y, maxH - height))
 
   return { x, y, width, height }
 }
 
 /**
- * Resize a crop rect by dragging a handle
+ * Resize a crop rect by dragging a handle. Aspect-locked resizes keep the
+ * opposite edge/corner fixed (nw locks se, e locks the west edge).
  */
 export function resizeCropRect(
   rect: CropRect,
@@ -401,84 +470,67 @@ export function resizeCropRect(
   minW = 20,
   minH = 20
 ): CropRect {
-  let { x, y, width, height } = rect
+  const startLeft = rect.x
+  const startTop = rect.y
+  const startRight = rect.x + rect.width
+  const startBottom = rect.y + rect.height
 
-  switch (handle) {
-    case 'nw':
-      x += dx
-      y += dy
-      width -= dx
-      height -= dy
-      break
-    case 'n':
-      y += dy
-      height -= dy
-      break
-    case 'ne':
-      width += dx
-      y += dy
-      height -= dy
-      break
-    case 'e':
-      width += dx
-      break
-    case 'se':
-      width += dx
-      height += dy
-      break
-    case 's':
-      height += dy
-      break
-    case 'sw':
-      x += dx
-      width -= dx
-      height += dy
-      break
-    case 'w':
-      x += dx
-      width -= dx
-      break
+  let left = startLeft
+  let top = startTop
+  let right = startRight
+  let bottom = startBottom
+
+  if (handle.includes('w')) left += dx
+  if (handle.includes('e')) right += dx
+  if (handle.includes('n')) top += dy
+  if (handle.includes('s')) bottom += dy
+
+  const lockLeft = !handle.includes('w')
+  const lockTop = !handle.includes('n')
+  const maxW = Math.min(Math.max(minW, 0), imageWidth)
+  const maxH = Math.min(Math.max(minH, 0), imageHeight)
+
+  if (right - left < maxW) {
+    if (lockLeft) right = left + maxW
+    else left = right - maxW
+  }
+  if (bottom - top < maxH) {
+    if (lockTop) bottom = top + maxH
+    else top = bottom - maxH
   }
 
-  // Enforce minimum dimensions
-  if (width < minW) {
-    if (handle.includes('w')) {
-      x = rect.x + rect.width - minW
-    }
-    width = minW
-  }
-  if (height < minH) {
-    if (handle.includes('n')) {
-      y = rect.y + rect.height - minH
-    }
-    height = minH
-  }
-
-  // Enforce aspect ratio
   if (aspectRatio && aspectRatio > 0) {
-    const newRatio = width / height
-    if (
-      handle === 'n' ||
-      handle === 's' ||
-      handle === 'nw' ||
-      handle === 'sw' ||
-      handle === 'ne' ||
-      handle === 'se'
-    ) {
+    let width = right - left
+    let height = bottom - top
+    const horizontalOnly =
+      (handle === 'e' || handle === 'w') && !handle.includes('n') && !handle.includes('s')
+    const verticalOnly = handle === 'n' || handle === 's'
+
+    if (verticalOnly) {
       width = height * aspectRatio
-    }
-    if (handle === 'e' || handle === 'w') {
+      const cx = (startLeft + startRight) / 2
+      left = cx - width / 2
+      right = left + width
+    } else if (horizontalOnly) {
       height = width / aspectRatio
-    }
-    if (
-      newRatio !== aspectRatio &&
-      (handle === 'nw' || handle === 'ne' || handle === 'sw' || handle === 'se')
-    ) {
+      const cy = (startTop + startBottom) / 2
+      top = cy - height / 2
+      bottom = top + height
+    } else {
       width = height * aspectRatio
+      if (lockLeft) right = left + width
+      else left = right - width
     }
   }
 
-  return constrainCropRect({ x, y, width, height }, imageWidth, imageHeight, aspectRatio)
+  return constrainCropRect(
+    { x: left, y: top, width: right - left, height: bottom - top },
+    imageWidth,
+    imageHeight,
+    aspectRatio,
+    minW,
+    minH
+  )
 }
 
 /**
@@ -502,7 +554,9 @@ export function moveCropRect(
 export function getInitialCropRect(
   imageWidth: number,
   imageHeight: number,
-  aspectRatio?: number
+  aspectRatio?: number,
+  minW = 20,
+  minH = 20
 ): CropRect {
   const padding = 0.1
   let cropW = imageWidth * (1 - padding * 2)
@@ -516,12 +570,148 @@ export function getInitialCropRect(
     }
   }
 
-  return {
-    x: (imageWidth - cropW) / 2,
-    y: (imageHeight - cropH) / 2,
-    width: cropW,
-    height: cropH
+  return constrainCropRect(
+    {
+      x: (imageWidth - cropW) / 2,
+      y: (imageHeight - cropH) / 2,
+      width: cropW,
+      height: cropH
+    },
+    imageWidth,
+    imageHeight,
+    aspectRatio,
+    minW,
+    minH
+  )
+}
+
+/**
+ * Fit a natural-size bitmap into a container without upscaling.
+ */
+export function getCropperDisplaySize(
+  naturalWidth: number,
+  naturalHeight: number,
+  containerWidth: number,
+  containerHeight: number
+): { width: number; height: number } | null {
+  if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) return null
+  const containerW = isPositiveFinite(containerWidth) ? containerWidth : naturalWidth
+  const containerH = isPositiveFinite(containerHeight) ? containerHeight : 400
+  const ratio = Math.min(containerW / naturalWidth, containerH / naturalHeight, 1)
+  const width = naturalWidth * ratio
+  const height = naturalHeight * ratio
+  if (!isPositiveFinite(ratio) || !isPositiveFinite(width) || !isPositiveFinite(height)) return null
+  return { width, height }
+}
+
+/**
+ * Map a crop rect from one display size to another.
+ */
+export function remapCropRect(
+  rect: CropRect,
+  fromWidth: number,
+  fromHeight: number,
+  toWidth: number,
+  toHeight: number,
+  aspectRatio?: number,
+  minW?: number,
+  minH?: number
+): CropRect {
+  if (!isPositiveFinite(fromWidth) || !isPositiveFinite(fromHeight)) {
+    return getInitialCropRect(toWidth, toHeight, aspectRatio, minW, minH)
   }
+  const scaleX = toWidth / fromWidth
+  const scaleY = toHeight / fromHeight
+  return constrainCropRect(
+    {
+      x: rect.x * scaleX,
+      y: rect.y * scaleY,
+      width: rect.width * scaleX,
+      height: rect.height * scaleY
+    },
+    toWidth,
+    toHeight,
+    aspectRatio,
+    minW,
+    minH
+  )
+}
+
+export interface CropperImageLoader {
+  load: (
+    src: string,
+    callbacks: {
+      onLoad: (image: HTMLImageElement, naturalWidth: number, naturalHeight: number) => void
+      onError: () => void
+    }
+  ) => void
+  dispose: () => void
+}
+
+/**
+ * Load an image for crop geometry. Does not set CORS — display is a separate
+ * `<img>`. Changing `src` aborts the previous load.
+ */
+export function createCropperImageLoader(): CropperImageLoader {
+  let generation = 0
+  let current: HTMLImageElement | null = null
+
+  const dispose = (): void => {
+    generation += 1
+    if (current) {
+      current.onload = null
+      current.onerror = null
+      current = null
+    }
+  }
+
+  return {
+    load(src, callbacks) {
+      dispose()
+      const gen = generation
+      if (!src || !isBrowser()) {
+        callbacks.onError()
+        return
+      }
+      const img = new window.Image()
+      current = img
+      img.onload = () => {
+        if (gen !== generation) return
+        const naturalWidth = img.naturalWidth
+        const naturalHeight = img.naturalHeight
+        if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) {
+          callbacks.onError()
+          return
+        }
+        callbacks.onLoad(img, naturalWidth, naturalHeight)
+      }
+      img.onerror = () => {
+        if (gen !== generation) return
+        callbacks.onError()
+      }
+      img.src = src
+    },
+    dispose
+  }
+}
+
+export function formatCropperResizeAriaLabel(template: string, handleName: string): string {
+  return template.replace('{handle}', handleName)
+}
+
+const CROPPER_HANDLE_LABEL_KEYS: Record<CropHandle, string> = {
+  nw: 'resizeHandleNw',
+  n: 'resizeHandleN',
+  ne: 'resizeHandleNe',
+  e: 'resizeHandleE',
+  se: 'resizeHandleSe',
+  s: 'resizeHandleS',
+  sw: 'resizeHandleSw',
+  w: 'resizeHandleW'
+}
+
+export function getCropperHandleName(handle: CropHandle, labels: Record<string, string>): string {
+  return labels[CROPPER_HANDLE_LABEL_KEYS[handle]] ?? handle
 }
 
 /**
@@ -539,10 +729,20 @@ export function cropCanvas(
   if (!isBrowser()) {
     throw new Error('Image canvas cropping is only available in the browser')
   }
+  if (
+    !isPositiveFinite(displayWidth) ||
+    !isPositiveFinite(displayHeight) ||
+    !isPositiveFinite(cropRect.width) ||
+    !isPositiveFinite(cropRect.height)
+  ) {
+    throw new Error('Image canvas cropping requires a finite display size and crop rect')
+  }
 
-  // Calculate the ratio between natural and displayed size
   const scaleX = image.naturalWidth / displayWidth
   const scaleY = image.naturalHeight / displayHeight
+  if (!Number.isFinite(scaleX) || !Number.isFinite(scaleY) || scaleX <= 0 || scaleY <= 0) {
+    throw new Error('Image canvas cropping requires a finite scale')
+  }
 
   const sx = cropRect.x * scaleX
   const sy = cropRect.y * scaleY
@@ -552,11 +752,15 @@ export function cropCanvas(
   const canvas = document.createElement('canvas')
   canvas.width = Math.round(sw)
   canvas.height = Math.round(sh)
+  if (canvas.width <= 0 || canvas.height <= 0) {
+    throw new Error('Image canvas cropping produced an empty canvas')
+  }
 
   const ctx = canvas.getContext('2d')
-  if (ctx) {
-    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
+  if (!ctx) {
+    throw new Error('Image canvas cropping is unavailable without a 2D context')
   }
+  ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
 
   const dataUrl = canvas.toDataURL(outputType, quality)
   return { canvas, dataUrl }

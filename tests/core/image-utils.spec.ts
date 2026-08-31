@@ -4,7 +4,7 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   applyImageLoadError,
   applyImageLoadSuccess,
@@ -13,6 +13,8 @@ import {
   formatImagePreviewAriaLabel,
   getImageImgClasses,
   getCropperHandleClasses,
+  getCropperHandleStyle,
+  getCropperDisplaySize,
   CROP_HANDLES,
   clampScale,
   calculateTransform,
@@ -122,25 +124,45 @@ describe('image-utils — class generators', () => {
     expect(new Set(CROP_HANDLES)).toEqual(new Set(['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']))
   })
 
-  it('getCropperHandleClasses includes correct cursor and position for each handle', () => {
-    const expectations: Array<[CropHandle, string, string]> = [
-      ['nw', 'cursor-nw-resize', '-top-1.75'],
-      ['n', 'cursor-n-resize', '-top-1.75'],
-      ['ne', 'cursor-ne-resize', '-right-1.75'],
-      ['e', 'cursor-e-resize', '-right-1.75'],
-      ['se', 'cursor-se-resize', '-bottom-1.75'],
-      ['s', 'cursor-s-resize', '-bottom-1.75'],
-      ['sw', 'cursor-sw-resize', '-left-1.75'],
-      ['w', 'cursor-w-resize', '-left-1.75']
+  it('getCropperHandleClasses includes a resize cursor for each handle', () => {
+    const expectations: Array<[CropHandle, string]> = [
+      ['nw', 'cursor-nw-resize'],
+      ['n', 'cursor-n-resize'],
+      ['ne', 'cursor-ne-resize'],
+      ['e', 'cursor-e-resize'],
+      ['se', 'cursor-se-resize'],
+      ['s', 'cursor-s-resize'],
+      ['sw', 'cursor-sw-resize'],
+      ['w', 'cursor-w-resize']
     ]
-    for (const [handle, cursor, position] of expectations) {
-      const cls = getCropperHandleClasses(handle)
-      expect(cls).toContain('absolute')
-      expect(cls).toContain('w-3')
-      expect(cls).toContain('h-3')
-      expect(cls).toContain(cursor)
-      expect(cls).toContain(position)
+    for (const [handle, cursor] of expectations) {
+      expect(getCropperHandleClasses(handle)).toContain(cursor)
     }
+  })
+
+  it('centers handle knobs on the crop edge', () => {
+    const rect: CropRect = { x: 10, y: 20, width: 100, height: 80 }
+    expect(getCropperHandleStyle('nw', rect)).toEqual({
+      top: '20px',
+      left: '10px',
+      transform: 'translate(-50%, -50%)'
+    })
+    expect(getCropperHandleStyle('e', rect)).toEqual({
+      top: '60px',
+      left: '110px',
+      transform: 'translate(-50%, -50%)'
+    })
+    expect(getCropperHandleStyle('s', rect)).toEqual({
+      top: '100px',
+      left: '60px',
+      transform: 'translate(-50%, -50%)'
+    })
+  })
+
+  it('fits the bitmap into the container without upscaling', () => {
+    expect(getCropperDisplaySize(800, 600, 400, 400)).toEqual({ width: 400, height: 300 })
+    expect(getCropperDisplaySize(100, 50, 400, 400)).toEqual({ width: 100, height: 50 })
+    expect(getCropperDisplaySize(0, 50, 400, 400)).toBeNull()
   })
 })
 
@@ -322,22 +344,28 @@ describe('image-utils — resizeCropRect', () => {
     expect(out.x).toBe(50)
   })
 
-  it('enforces aspect ratio for n handle (width follows height)', () => {
+  it('enforces aspect ratio for n handle (width follows height, bottom stays)', () => {
     const out = resizeCropRect(base, 'n', 0, 50, W, H, 1)
-    // height becomes 50, width should match → 50
-    expect(out.height).toBe(50)
-    expect(out.width).toBe(50)
+    expect(out).toEqual({ x: 75, y: 100, width: 50, height: 50 })
   })
 
-  it('enforces aspect ratio for e handle (height follows width)', () => {
+  it('enforces aspect ratio for e handle (height follows width, west stays)', () => {
     const out = resizeCropRect(base, 'e', 50, 0, W, H, 1)
     expect(out.width).toBe(150)
     expect(out.height).toBe(150)
+    expect(out.x).toBe(50)
   })
 
-  it('enforces aspect ratio for corner handle (se)', () => {
+  it('keeps the opposite corner fixed when aspect-locking nw', () => {
+    const out = resizeCropRect(base, 'nw', 0, 20, W, H, 1)
+    expect(out).toEqual({ x: 70, y: 70, width: 80, height: 80 })
+  })
+
+  it('enforces aspect ratio for corner handle (se) and keeps the northwest corner', () => {
     const out = resizeCropRect(base, 'se', 30, 80, W, H, 1)
     expect(out.width).toBe(out.height)
+    expect(out.x).toBe(50)
+    expect(out.y).toBe(50)
   })
 })
 
@@ -406,6 +434,13 @@ describe('image-utils — cropCanvas', () => {
     return img
   }
 
+  beforeEach(() => {
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+      drawImage: vi.fn()
+    })) as unknown as typeof HTMLCanvasElement.prototype.getContext
+    HTMLCanvasElement.prototype.toDataURL = vi.fn(() => 'data:image/png;base64,xx')
+  })
+
   it('produces a canvas sized to scaled crop rect', () => {
     const img = makeImage(800, 600)
     const rect: CropRect = { x: 10, y: 20, width: 100, height: 50 }
@@ -422,6 +457,15 @@ describe('image-utils — cropCanvas', () => {
     const { canvas } = cropCanvas(img, rect, 100, 100, 'image/jpeg', 0.5)
     expect(canvas.width).toBe(50)
     expect(canvas.height).toBe(50)
+  })
+
+  it('throws when display size or crop rect is not a finite area', () => {
+    const img = makeImage(100, 100)
+    const rect: CropRect = { x: 0, y: 0, width: 50, height: 50 }
+    expect(() => cropCanvas(img, rect, 0, 100)).toThrow(/finite display size/)
+    expect(() => cropCanvas(img, { x: 0, y: 0, width: 0, height: 10 }, 100, 100)).toThrow(
+      /finite display size/
+    )
   })
 })
 

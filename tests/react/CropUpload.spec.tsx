@@ -7,6 +7,7 @@ import { act, render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { CropUpload } from '@expcat/tigercat-react/CropUpload'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function createFile(name: string, size: number, type = 'image/png'): File {
@@ -64,7 +65,7 @@ describe('CropUpload', () => {
     })
 
     it('uses component locale for default trigger text', () => {
-      render(<CropUpload locale={{ locale: 'zh-CN' }} />)
+      render(<CropUpload locale={zhCN} />)
       expect(screen.getByText('选择图片')).toBeInTheDocument()
       expect(screen.getByRole('button')).toHaveAttribute('aria-label', '选择图片进行裁剪并上传')
     })

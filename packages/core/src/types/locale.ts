@@ -219,7 +219,16 @@ export interface TigerLocaleImageEditor {
   imageToCropAriaLabel?: string
   moveCropAreaAriaLabel?: string
   resizeCropAreaAriaLabel?: string
+  resizeHandleNw?: string
+  resizeHandleN?: string
+  resizeHandleNe?: string
+  resizeHandleE?: string
+  resizeHandleSe?: string
+  resizeHandleS?: string
+  resizeHandleSw?: string
+  resizeHandleW?: string
   loadingCropImageAriaLabel?: string
+  loadErrorAriaLabel?: string
   annotationToolbarAriaLabel?: string
   annotationEditorAriaLabel?: string
   annotationCanvasAriaLabel?: string

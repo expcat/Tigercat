@@ -2,6 +2,7 @@ import React, {
   useState,
   useRef,
   useEffect,
+  useLayoutEffect,
   useCallback,
   useMemo,
   useId,
@@ -10,37 +11,51 @@ import React, {
 } from 'react'
 import {
   classNames,
+  CROP_HANDLES,
+  IMAGE_CROPPER_MASK_FILL,
+  constrainCropRect,
+  createCropperImageLoader,
+  createDocumentDragSession,
+  cropCanvas,
+  formatCropperResizeAriaLabel,
+  getCropperDisplaySize,
+  getCropperHandleClasses,
+  getCropperHandleName,
+  getCropperHandleStyle,
+  getImageEditorLabels,
+  getInitialCropRect,
   imageCropperContainerClasses,
+  imageCropperDragAreaClasses,
+  imageCropperFrameClasses,
+  imageCropperGuideClasses,
   imageCropperImgClasses,
   imageCropperMaskClasses,
   imageCropperSelectionClasses,
-  imageCropperGuideClasses,
-  imageCropperDragAreaClasses,
-  getCropperHandleClasses,
-  CROP_HANDLES,
-  getInitialCropRect,
-  resizeCropRect,
-  moveCropRect,
-  cropCanvas,
-  getImageEditorLabels,
+  imageErrorClasses,
+  imageErrorIconPath,
+  imageLoadingSpinnerClasses,
+  imageLoadingSpinnerPath,
+  injectImageCropperStyles,
   mergeTigerLocale,
+  moveCropRect,
+  remapCropRect,
+  resizeCropRect,
+  type CropHandle,
   type CropRect,
   type CropResult,
-  type CropHandle,
+  type DocumentDragSession,
   type ImageCropperProps as CoreImageCropperProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface ImageCropperProps extends Omit<CoreImageCropperProps, 'className'> {
+export interface ImageCropperProps
+  extends
+    Omit<CoreImageCropperProps, 'className' | 'style'>,
+    Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreImageCropperProps> {
   className?: string
   style?: React.CSSProperties
-  /**
-   * Callback when crop area changes
-   */
   onCropChange?: (rect: CropRect) => void
-  /**
-   * Callback when image is loaded and ready
-   */
   onReady?: () => void
 }
 
@@ -48,12 +63,49 @@ export interface ImageCropperRef {
   getCropResult: () => Promise<CropResult>
 }
 
-const isPositiveFinite = (value: number) => Number.isFinite(value) && value > 0
+type CropperStatus = 'loading' | 'ready' | 'error'
+
+function renderErrorIcon(): React.ReactNode {
+  return (
+    <svg
+      className="w-8 h-8"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={imageErrorIconPath} />
+    </svg>
+  )
+}
+
+function renderLoadingSpinner(): React.ReactNode {
+  return (
+    <svg
+      className={imageLoadingSpinnerClasses}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden="true">
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
+      <path className="opacity-75" fill="currentColor" d={imageLoadingSpinnerPath} />
+    </svg>
+  )
+}
 
 export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
   (
     {
       src,
+      cropRect: controlledCropRect,
+      defaultCropRect,
       aspectRatio,
       minWidth = 20,
       minHeight = 20,
@@ -64,7 +116,8 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       className,
       style,
       onCropChange,
-      onReady
+      onReady,
+      ...rest
     },
     ref
   ) => {
@@ -78,212 +131,226 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
     const containerRef = useRef<HTMLDivElement>(null)
     const imageRef = useRef<HTMLImageElement | null>(null)
-    const [imageLoaded, setImageLoaded] = useState(false)
+    const loaderRef = useRef(createCropperImageLoader())
+    const dragSessionRef = useRef<DocumentDragSession | null>(null)
+    const displayDimsRef = useRef({ w: 0, h: 0 })
+    const naturalSizeRef = useRef({ w: 0, h: 0 })
+    const aspectRef = useRef(aspectRatio)
+    const defaultCropRectRef = useRef(defaultCropRect)
+    const onReadyRef = useRef(onReady)
+    aspectRef.current = aspectRatio
+    defaultCropRectRef.current = defaultCropRect
+    onReadyRef.current = onReady
+
+    const [status, setStatus] = useState<CropperStatus>('loading')
     const [displayWidth, setDisplayWidth] = useState(0)
     const [displayHeight, setDisplayHeight] = useState(0)
-    const [cropRect, setCropRect] = useState<CropRect>({ x: 0, y: 0, width: 0, height: 0 })
+    const [cropRect, setCropRect] = useControlledState({
+      value: controlledCropRect,
+      defaultValue: defaultCropRect ?? { x: 0, y: 0, width: 0, height: 0 },
+      onChange: onCropChange,
+      postState: (rect) =>
+        constrainCropRect(
+          rect,
+          displayDimsRef.current.w || displayWidth,
+          displayDimsRef.current.h || displayHeight,
+          aspectRatio,
+          minWidth,
+          minHeight
+        )
+    })
 
-    const dragModeRef = useRef<'none' | 'move' | 'resize'>('none')
-    const activeHandleRef = useRef<CropHandle | null>(null)
-    const dragStartPosRef = useRef({ x: 0, y: 0 })
-    const dragStartRectRef = useRef<CropRect>({ x: 0, y: 0, width: 0, height: 0 })
-    // Use refs for latest values in event handlers
-    const displayDimsRef = useRef({ w: 0, h: 0 })
+    useLayoutEffect(() => {
+      injectImageCropperStyles()
+    }, [])
 
     useEffect(() => {
       displayDimsRef.current = { w: displayWidth, h: displayHeight }
     }, [displayWidth, displayHeight])
 
-    // Load image
     useEffect(() => {
-      setImageLoaded(false)
+      const loader = loaderRef.current
+      setStatus('loading')
       imageRef.current = null
-      const img = new window.Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth
-        const naturalHeight = img.naturalHeight
-        if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) return
+      loader.load(src, {
+        onLoad: (img, naturalWidth, naturalHeight) => {
+          const container = containerRef.current
+          const size = getCropperDisplaySize(
+            naturalWidth,
+            naturalHeight,
+            container?.clientWidth ?? 0,
+            container?.clientHeight ?? 0
+          )
+          if (!size) {
+            setStatus('error')
+            return
+          }
+          imageRef.current = img
+          naturalSizeRef.current = { w: naturalWidth, h: naturalHeight }
+          displayDimsRef.current = { w: size.width, h: size.height }
+          setDisplayWidth(size.width)
+          setDisplayHeight(size.height)
+          const initial =
+            defaultCropRectRef.current ??
+            getInitialCropRect(size.width, size.height, aspectRef.current, minWidth, minHeight)
+          setCropRect(initial)
+          setStatus('ready')
+          onReadyRef.current?.()
+        },
+        onError: () => {
+          imageRef.current = null
+          setStatus('error')
+        }
+      })
+      return () => loader.dispose()
+    }, [src, minWidth, minHeight, setCropRect])
 
-        const container = containerRef.current
-        const measuredWidth = container?.clientWidth ?? 0
-        const measuredHeight = container?.clientHeight ?? 0
-        const containerW = isPositiveFinite(measuredWidth) ? measuredWidth : naturalWidth
-        const containerH = isPositiveFinite(measuredHeight) ? measuredHeight : 400
-        const ratio = Math.min(containerW / naturalWidth, containerH / naturalHeight, 1)
-        const dw = naturalWidth * ratio
-        const dh = naturalHeight * ratio
-        if (!isPositiveFinite(ratio) || !isPositiveFinite(dw) || !isPositiveFinite(dh)) return
-
-        imageRef.current = img
-        setDisplayWidth(dw)
-        setDisplayHeight(dh)
-        displayDimsRef.current = { w: dw, h: dh }
-
-        const initial = getInitialCropRect(dw, dh, aspectRatio)
-        setCropRect(initial)
-
-        setImageLoaded(true)
-        onReady?.()
+    const loadedAspectRef = useRef(aspectRatio)
+    useEffect(() => {
+      if (status !== 'ready') {
+        loadedAspectRef.current = aspectRatio
+        return
       }
-      img.src = src
-    }, [src, aspectRatio, onReady])
+      if (Object.is(loadedAspectRef.current, aspectRatio)) return
+      loadedAspectRef.current = aspectRatio
+      const dims = displayDimsRef.current
+      setCropRect(getInitialCropRect(dims.w, dims.h, aspectRatio, minWidth, minHeight))
+    }, [aspectRatio, minHeight, minWidth, setCropRect, status])
 
-    // Expose getCropResult
+    useEffect(() => {
+      const container = containerRef.current
+      if (!container || status !== 'ready' || typeof ResizeObserver === 'undefined') return
+      const observer = new ResizeObserver(() => {
+        const natural = naturalSizeRef.current
+        const next = getCropperDisplaySize(
+          natural.w,
+          natural.h,
+          container.clientWidth,
+          container.clientHeight
+        )
+        if (!next) return
+        const current = displayDimsRef.current
+        if (next.width === current.w && next.height === current.h) return
+        setCropRect((prev) =>
+          remapCropRect(
+            prev,
+            current.w,
+            current.h,
+            next.width,
+            next.height,
+            aspectRatio,
+            minWidth,
+            minHeight
+          )
+        )
+        displayDimsRef.current = { w: next.width, h: next.height }
+        setDisplayWidth(next.width)
+        setDisplayHeight(next.height)
+      })
+      observer.observe(container)
+      return () => observer.disconnect()
+    }, [aspectRatio, minHeight, minWidth, setCropRect, status])
+
+    useEffect(
+      () => () => {
+        dragSessionRef.current?.dispose()
+        dragSessionRef.current = null
+      },
+      []
+    )
+
     useImperativeHandle(
       ref,
       () => ({
         getCropResult: (): Promise<CropResult> => {
           return new Promise((resolve, reject) => {
-            if (!imageRef.current) {
+            if (status !== 'ready' || !imageRef.current) {
               reject(new Error('Image not loaded'))
               return
             }
-            const { canvas, dataUrl } = cropCanvas(
-              imageRef.current,
-              cropRect,
-              displayWidth,
-              displayHeight,
-              outputType,
-              quality
-            )
-            canvas.toBlob(
-              (blob) => {
-                if (blob) {
-                  resolve({ canvas, blob, dataUrl, cropRect: { ...cropRect } })
-                } else {
-                  reject(new Error('Failed to create blob'))
-                }
-              },
-              outputType,
-              quality
-            )
+            try {
+              const { canvas, dataUrl } = cropCanvas(
+                imageRef.current,
+                cropRect,
+                displayWidth,
+                displayHeight,
+                outputType,
+                quality
+              )
+              canvas.toBlob(
+                (blob) => {
+                  if (blob) {
+                    resolve({ canvas, blob, dataUrl, cropRect: { ...cropRect } })
+                  } else {
+                    reject(new Error('Failed to create blob'))
+                  }
+                },
+                outputType,
+                quality
+              )
+            } catch (error) {
+              reject(error)
+            }
           })
         }
       }),
-      [cropRect, displayWidth, displayHeight, outputType, quality]
+      [cropRect, displayHeight, displayWidth, outputType, quality, status]
     )
 
-    const handleMouseDown = useCallback(
-      (e: React.MouseEvent, mode: 'move' | 'resize', handle?: CropHandle) => {
-        e.preventDefault()
-        e.stopPropagation()
-        dragModeRef.current = mode
-        activeHandleRef.current = handle || null
-        dragStartPosRef.current = { x: e.clientX, y: e.clientY }
-        dragStartRectRef.current = { ...cropRect }
-
-        const onMouseMove = (ev: MouseEvent) => {
-          const dx = ev.clientX - dragStartPosRef.current.x
-          const dy = ev.clientY - dragStartPosRef.current.y
-          const dims = displayDimsRef.current
-
-          let newRect: CropRect
-          if (dragModeRef.current === 'move') {
-            newRect = moveCropRect(dragStartRectRef.current, dx, dy, dims.w, dims.h)
-          } else {
-            newRect = resizeCropRect(
-              dragStartRectRef.current,
-              activeHandleRef.current!,
-              dx,
-              dy,
-              dims.w,
-              dims.h,
-              aspectRatio,
-              minWidth,
-              minHeight
-            )
+    const startDrag = useCallback(
+      (event: React.PointerEvent, mode: 'move' | 'resize', handle?: CropHandle) => {
+        if (event.defaultPrevented) return
+        if (event.button !== 0) return
+        event.preventDefault()
+        event.stopPropagation()
+        const startRect = { ...cropRect }
+        dragSessionRef.current?.dispose()
+        dragSessionRef.current = createDocumentDragSession({
+          startX: event.clientX,
+          startY: event.clientY,
+          ownerDocument: event.currentTarget.ownerDocument,
+          pointerId: event.pointerId,
+          pointerTarget: event.currentTarget,
+          onMove: ({ event: moveEvent, deltaX, deltaY }) => {
+            if (moveEvent.cancelable) moveEvent.preventDefault()
+            const dims = displayDimsRef.current
+            const next =
+              mode === 'move'
+                ? moveCropRect(startRect, deltaX, deltaY, dims.w, dims.h)
+                : resizeCropRect(
+                    startRect,
+                    handle!,
+                    deltaX,
+                    deltaY,
+                    dims.w,
+                    dims.h,
+                    aspectRatio,
+                    minWidth,
+                    minHeight
+                  )
+            setCropRect(next)
+          },
+          onEnd: () => {
+            dragSessionRef.current = null
           }
-          setCropRect(newRect)
-          onCropChange?.(newRect)
-        }
-
-        const onMouseUp = () => {
-          dragModeRef.current = 'none'
-          activeHandleRef.current = null
-          document.removeEventListener('mousemove', onMouseMove)
-          document.removeEventListener('mouseup', onMouseUp)
-        }
-
-        document.addEventListener('mousemove', onMouseMove)
-        document.addEventListener('mouseup', onMouseUp)
+        })
       },
-      [cropRect, aspectRatio, minWidth, minHeight, onCropChange]
-    )
-
-    const handleTouchStart = useCallback(
-      (e: React.TouchEvent, mode: 'move' | 'resize', handle?: CropHandle) => {
-        if (e.touches.length !== 1) return
-        e.preventDefault()
-        e.stopPropagation()
-        const touch = e.touches[0]
-        dragModeRef.current = mode
-        activeHandleRef.current = handle || null
-        dragStartPosRef.current = { x: touch.clientX, y: touch.clientY }
-        dragStartRectRef.current = { ...cropRect }
-
-        const onTouchMove = (ev: TouchEvent) => {
-          if (ev.touches.length !== 1) return
-          const t = ev.touches[0]
-          const dx = t.clientX - dragStartPosRef.current.x
-          const dy = t.clientY - dragStartPosRef.current.y
-          const dims = displayDimsRef.current
-
-          let newRect: CropRect
-          if (dragModeRef.current === 'move') {
-            newRect = moveCropRect(dragStartRectRef.current, dx, dy, dims.w, dims.h)
-          } else {
-            newRect = resizeCropRect(
-              dragStartRectRef.current,
-              activeHandleRef.current!,
-              dx,
-              dy,
-              dims.w,
-              dims.h,
-              aspectRatio,
-              minWidth,
-              minHeight
-            )
-          }
-          setCropRect(newRect)
-          onCropChange?.(newRect)
-        }
-
-        const onTouchEnd = () => {
-          dragModeRef.current = 'none'
-          activeHandleRef.current = null
-          document.removeEventListener('touchmove', onTouchMove)
-          document.removeEventListener('touchend', onTouchEnd)
-        }
-
-        document.addEventListener('touchmove', onTouchMove, { passive: false })
-        document.addEventListener('touchend', onTouchEnd)
-      },
-      [cropRect, aspectRatio, minWidth, minHeight, onCropChange]
-    )
-
-    const updateCropRect = useCallback(
-      (nextRect: CropRect) => {
-        setCropRect(nextRect)
-        onCropChange?.(nextRect)
-      },
-      [onCropChange]
+      [aspectRatio, cropRect, minHeight, minWidth, setCropRect]
     )
 
     const handleMoveKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLDivElement>) => {
-        const step = e.shiftKey ? 10 : 1
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        const step = event.shiftKey ? 10 : 1
         const deltas: Record<string, { dx: number; dy: number } | undefined> = {
           ArrowLeft: { dx: -step, dy: 0 },
           ArrowRight: { dx: step, dy: 0 },
           ArrowUp: { dx: 0, dy: -step },
           ArrowDown: { dx: 0, dy: step }
         }
-        const delta = deltas[e.key]
+        const delta = deltas[event.key]
         if (!delta) return
-
-        e.preventDefault()
-        updateCropRect(
+        event.preventDefault()
+        setCropRect(
           moveCropRect(
             cropRect,
             delta.dx,
@@ -293,140 +360,119 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           )
         )
       },
-      [cropRect, updateCropRect]
+      [cropRect, setCropRect]
     )
 
-    const handleResizeKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLDivElement>, handle: CropHandle) => {
-        const step = e.shiftKey ? 10 : 1
-        const deltas: Record<string, { dx: number; dy: number } | undefined> = {
-          ArrowLeft: { dx: -step, dy: 0 },
-          ArrowRight: { dx: step, dy: 0 },
-          ArrowUp: { dx: 0, dy: -step },
-          ArrowDown: { dx: 0, dy: step }
-        }
-        const delta = deltas[e.key]
-        if (!delta) return
+    const containerClasses = classNames(imageCropperContainerClasses, className)
+    const rootStyle: React.CSSProperties = { ...style }
+    if (status === 'loading' || status === 'error') {
+      if (rootStyle.minHeight == null) rootStyle.minHeight = 200
+    } else {
+      if (rootStyle.width == null) rootStyle.width = displayWidth
+      if (rootStyle.height == null) rootStyle.height = displayHeight
+    }
 
-        e.preventDefault()
-        updateCropRect(
-          resizeCropRect(
-            cropRect,
-            handle,
-            delta.dx,
-            delta.dy,
-            displayDimsRef.current.w,
-            displayDimsRef.current.h,
-            aspectRatio,
-            minWidth,
-            minHeight
-          )
-        )
-      },
-      [cropRect, aspectRatio, minWidth, minHeight, updateCropRect]
-    )
-
-    const containerClasses = useMemo(
-      () => classNames(imageCropperContainerClasses, className),
-      [className]
-    )
-
-    const cr = cropRect
-
-    if (!imageLoaded) {
+    if (status !== 'ready') {
       return (
         <div
+          {...rest}
           ref={containerRef}
           className={classNames(containerClasses, 'flex items-center justify-center')}
-          style={{ ...style, minHeight: '200px' }}
+          style={rootStyle}
+          data-image-cropper=""
+          data-image-cropper-status={status}
           role="img"
-          aria-label={labels.loadingCropImageAriaLabel}>
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          aria-label={
+            status === 'error' ? labels.loadErrorAriaLabel : labels.loadingCropImageAriaLabel
+          }>
+          {status === 'error' ? (
+            <div className={imageErrorClasses}>{renderErrorIcon()}</div>
+          ) : (
+            renderLoadingSpinner()
+          )}
         </div>
       )
     }
 
+    const cr = cropRect
+
     return (
       <div
+        {...rest}
         ref={containerRef}
         className={containerClasses}
-        style={{
-          ...style,
-          width: `${displayWidth}px`,
-          height: `${displayHeight}px`
-        }}
-        role="application"
-        aria-label={labels.cropperDialogAriaLabel}
-        aria-roledescription="image cropper">
-        {/* Source image */}
-        <img
-          src={src}
-          className={imageCropperImgClasses}
-          style={{ width: `${displayWidth}px`, height: `${displayHeight}px` }}
-          draggable={false}
-          alt={labels.imageToCropAriaLabel}
-        />
-
-        {/* SVG mask with cutout */}
-        <svg
-          className={imageCropperMaskClasses}
-          width={displayWidth}
-          height={displayHeight}
-          xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <mask id={maskId}>
-              <rect width={displayWidth} height={displayHeight} fill="white" />
-              <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
-            </mask>
-          </defs>
-          <rect
+        style={rootStyle}
+        data-image-cropper=""
+        data-image-cropper-status="ready"
+        role="group"
+        aria-label={labels.cropperDialogAriaLabel}>
+        <div
+          className={imageCropperFrameClasses}
+          style={{ width: displayWidth, height: displayHeight }}>
+          <img
+            src={src}
+            className={imageCropperImgClasses}
+            style={{ width: displayWidth, height: displayHeight }}
+            draggable={false}
+            alt={labels.imageToCropAriaLabel}
+          />
+          <svg
+            className={imageCropperMaskClasses}
             width={displayWidth}
             height={displayHeight}
-            fill="var(--tiger-image-cropper-mask, rgba(0,0,0,0.55))"
-            mask={`url(#${maskId})`}
-          />
-        </svg>
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <mask id={maskId}>
+                <rect width={displayWidth} height={displayHeight} fill="white" />
+                <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
+              </mask>
+            </defs>
+            <rect
+              width={displayWidth}
+              height={displayHeight}
+              fill={IMAGE_CROPPER_MASK_FILL}
+              mask={`url(#${maskId})`}
+            />
+          </svg>
+        </div>
 
-        {/* Selection border */}
         <div
           className={imageCropperSelectionClasses}
           style={{
-            left: `${cr.x}px`,
-            top: `${cr.y}px`,
-            width: `${cr.width}px`,
-            height: `${cr.height}px`
+            left: cr.x,
+            top: cr.y,
+            width: cr.width,
+            height: cr.height
           }}
         />
 
-        {/* Drag area */}
         <div
           className={imageCropperDragAreaClasses}
           style={{
-            left: `${cr.x}px`,
-            top: `${cr.y}px`,
-            width: `${cr.width}px`,
-            height: `${cr.height}px`
+            left: cr.x,
+            top: cr.y,
+            width: cr.width,
+            height: cr.height
           }}
+          data-crop-move=""
           role="button"
           tabIndex={0}
           aria-label={labels.moveCropAreaAriaLabel}
-          onMouseDown={(e) => handleMouseDown(e, 'move')}
-          onTouchStart={(e) => handleTouchStart(e, 'move')}
+          onPointerDown={(event) => startDrag(event, 'move')}
           onKeyDown={handleMoveKeyDown}
         />
 
-        {/* Guide lines */}
         {guides && (
           <>
             <div
               className={imageCropperGuideClasses}
               data-guide="true"
               style={{
-                left: `${cr.x}px`,
-                top: `${cr.y + cr.height / 3}px`,
-                width: `${cr.width}px`,
+                left: cr.x,
+                top: cr.y + cr.height / 3,
+                width: cr.width,
                 height: 0,
-                borderTopWidth: '1px',
+                borderTopWidth: 1,
                 borderTopStyle: 'dashed'
               }}
             />
@@ -434,11 +480,11 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               className={imageCropperGuideClasses}
               data-guide="true"
               style={{
-                left: `${cr.x}px`,
-                top: `${cr.y + (cr.height * 2) / 3}px`,
-                width: `${cr.width}px`,
+                left: cr.x,
+                top: cr.y + (cr.height * 2) / 3,
+                width: cr.width,
                 height: 0,
-                borderTopWidth: '1px',
+                borderTopWidth: 1,
                 borderTopStyle: 'dashed'
               }}
             />
@@ -446,11 +492,11 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               className={imageCropperGuideClasses}
               data-guide="true"
               style={{
-                left: `${cr.x + cr.width / 3}px`,
-                top: `${cr.y}px`,
+                left: cr.x + cr.width / 3,
+                top: cr.y,
                 width: 0,
-                height: `${cr.height}px`,
-                borderLeftWidth: '1px',
+                height: cr.height,
+                borderLeftWidth: 1,
                 borderLeftStyle: 'dashed'
               }}
             />
@@ -458,41 +504,32 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               className={imageCropperGuideClasses}
               data-guide="true"
               style={{
-                left: `${cr.x + (cr.width * 2) / 3}px`,
-                top: `${cr.y}px`,
+                left: cr.x + (cr.width * 2) / 3,
+                top: cr.y,
                 width: 0,
-                height: `${cr.height}px`,
-                borderLeftWidth: '1px',
+                height: cr.height,
+                borderLeftWidth: 1,
                 borderLeftStyle: 'dashed'
               }}
             />
           </>
         )}
 
-        {/* Resize handles */}
-        {CROP_HANDLES.map((handle) => {
-          const pos: React.CSSProperties = {}
-          if (handle.includes('n')) pos.top = `${cr.y}px`
-          if (handle.includes('s')) pos.top = `${cr.y + cr.height}px`
-          if (handle === 'e' || handle === 'w') pos.top = `${cr.y + cr.height / 2}px`
-          if (handle.includes('w')) pos.left = `${cr.x}px`
-          if (handle.includes('e')) pos.left = `${cr.x + cr.width}px`
-          if (handle === 'n' || handle === 's') pos.left = `${cr.x + cr.width / 2}px`
-
-          return (
-            <div
-              key={handle}
-              className={getCropperHandleClasses(handle)}
-              style={pos}
-              role="button"
-              tabIndex={0}
-              aria-label={labels.resizeCropAreaAriaLabel.replace('{handle}', handle)}
-              onMouseDown={(e) => handleMouseDown(e, 'resize', handle)}
-              onTouchStart={(e) => handleTouchStart(e, 'resize', handle)}
-              onKeyDown={(e) => handleResizeKeyDown(e, handle)}
-            />
-          )
-        })}
+        {CROP_HANDLES.map((handle) => (
+          <div
+            key={handle}
+            className={getCropperHandleClasses(handle)}
+            style={getCropperHandleStyle(handle, cr)}
+            data-crop-handle={handle}
+            role="button"
+            tabIndex={-1}
+            aria-label={formatCropperResizeAriaLabel(
+              labels.resizeCropAreaAriaLabel,
+              getCropperHandleName(handle, labels)
+            )}
+            onPointerDown={(event) => startDrag(event, 'resize', handle)}
+          />
+        ))}
       </div>
     )
   }

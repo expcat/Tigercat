@@ -5,6 +5,7 @@ import {
   computed,
   watch,
   onMounted,
+  onBeforeUnmount,
   getCurrentInstance,
   PropType
 } from 'vue'
@@ -12,23 +13,39 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  CROP_HANDLES,
+  IMAGE_CROPPER_MASK_FILL,
+  constrainCropRect,
+  createCropperImageLoader,
+  createDocumentDragSession,
+  cropCanvas,
+  formatCropperResizeAriaLabel,
+  getCropperDisplaySize,
+  getCropperHandleClasses,
+  getCropperHandleName,
+  getCropperHandleStyle,
+  getImageEditorLabels,
+  getInitialCropRect,
   imageCropperContainerClasses,
+  imageCropperDragAreaClasses,
+  imageCropperFrameClasses,
+  imageCropperGuideClasses,
   imageCropperImgClasses,
   imageCropperMaskClasses,
   imageCropperSelectionClasses,
-  imageCropperGuideClasses,
-  imageCropperDragAreaClasses,
-  getCropperHandleClasses,
-  CROP_HANDLES,
-  getInitialCropRect,
-  resizeCropRect,
-  moveCropRect,
-  cropCanvas,
-  getImageEditorLabels,
+  imageErrorClasses,
+  imageErrorIconPath,
+  imageLoadingSpinnerClasses,
+  imageLoadingSpinnerPath,
+  injectImageCropperStyles,
   mergeTigerLocale,
+  moveCropRect,
+  remapCropRect,
+  resizeCropRect,
+  type CropHandle,
   type CropRect,
   type CropResult,
-  type CropHandle,
+  type DocumentDragSession,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -36,6 +53,8 @@ import { useTigerConfig } from './ConfigProvider'
 export interface VueImageCropperProps {
   locale?: Partial<TigerLocale>
   src: string
+  cropRect?: CropRect
+  defaultCropRect?: CropRect
   aspectRatio?: number
   minWidth?: number
   minHeight?: number
@@ -46,7 +65,11 @@ export interface VueImageCropperProps {
   style?: Record<string, string | number>
 }
 
-const isPositiveFinite = (value: number) => Number.isFinite(value) && value > 0
+export interface ImageCropperRef {
+  getCropResult: () => Promise<CropResult>
+}
+
+type CropperStatus = 'loading' | 'ready' | 'error'
 
 export const ImageCropper = defineComponent({
   name: 'TigerImageCropper',
@@ -57,6 +80,14 @@ export const ImageCropper = defineComponent({
       default: undefined
     },
     src: { type: String, required: true },
+    cropRect: {
+      type: Object as PropType<CropRect>,
+      default: undefined
+    },
+    defaultCropRect: {
+      type: Object as PropType<CropRect>,
+      default: undefined
+    },
     aspectRatio: { type: Number, default: undefined },
     minWidth: { type: Number, default: 20 },
     minHeight: { type: Number, default: 20 },
@@ -72,7 +103,11 @@ export const ImageCropper = defineComponent({
       default: undefined
     }
   },
-  emits: ['crop-change', 'ready'],
+  emits: {
+    'crop-change': (rect: CropRect) => Boolean(rect),
+    'update:crop-rect': (rect: CropRect) => Boolean(rect),
+    ready: () => true
+  },
   setup(props, { emit, attrs, expose }) {
     const instance = getCurrentInstance()
     const maskId = `tiger-crop-mask-${instance?.uid ?? '0'}`
@@ -81,175 +116,203 @@ export const ImageCropper = defineComponent({
     const labels = computed(() => getImageEditorLabels(mergedLocale.value))
     const containerRef = ref<HTMLElement | null>(null)
     const imageRef = ref<HTMLImageElement | null>(null)
-    const imageLoaded = ref(false)
+    const status = ref<CropperStatus>('loading')
     const displayWidth = ref(0)
     const displayHeight = ref(0)
-    const cropRect = ref<CropRect>({ x: 0, y: 0, width: 0, height: 0 })
+    const internalCropRect = ref<CropRect>(
+      props.defaultCropRect ?? { x: 0, y: 0, width: 0, height: 0 }
+    )
+    const loader = createCropperImageLoader()
+    let dragSession: DocumentDragSession | null = null
+    let resizeObserver: ResizeObserver | null = null
+    let naturalWidth = 0
+    let naturalHeight = 0
+    let loadedAspect = props.aspectRatio
 
-    // Drag state
-    const dragMode = ref<'none' | 'move' | 'resize'>('none')
-    const activeHandle = ref<CropHandle | null>(null)
-    const dragStartPos = ref({ x: 0, y: 0 })
-    const dragStartRect = ref<CropRect>({ x: 0, y: 0, width: 0, height: 0 })
+    const currentCropRect = (): CropRect =>
+      props.cropRect !== undefined ? props.cropRect : internalCropRect.value
 
-    const loadImage = () => {
+    const commitCropRect = (next: CropRect): void => {
+      const resolved = constrainCropRect(
+        next,
+        displayWidth.value,
+        displayHeight.value,
+        props.aspectRatio,
+        props.minWidth,
+        props.minHeight
+      )
+      if (props.cropRect === undefined) {
+        internalCropRect.value = resolved
+      }
+      emit('update:crop-rect', resolved)
+      emit('crop-change', resolved)
+    }
+
+    watch(
+      () => props.cropRect,
+      (value) => {
+        if (value !== undefined) internalCropRect.value = value
+      }
+    )
+
+    const applyDisplaySize = (width: number, height: number, resetCrop: boolean): void => {
+      displayWidth.value = width
+      displayHeight.value = height
+      if (resetCrop) {
+        commitCropRect(
+          props.defaultCropRect ??
+            getInitialCropRect(width, height, props.aspectRatio, props.minWidth, props.minHeight)
+        )
+      }
+    }
+
+    const loadImage = (): void => {
+      status.value = 'loading'
       imageRef.value = null
-      const img = new window.Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth
-        const naturalHeight = img.naturalHeight
-        if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) return
-
-        // Calculate display dimensions to fit container
-        if (containerRef.value) {
-          const measuredWidth = containerRef.value.clientWidth
-          const measuredHeight = containerRef.value.clientHeight
-          const containerW = isPositiveFinite(measuredWidth) ? measuredWidth : naturalWidth
-          const containerH = isPositiveFinite(measuredHeight) ? measuredHeight : 400
-          const ratio = Math.min(containerW / naturalWidth, containerH / naturalHeight, 1)
-          displayWidth.value = naturalWidth * ratio
-          displayHeight.value = naturalHeight * ratio
-        } else {
-          displayWidth.value = naturalWidth
-          displayHeight.value = naturalHeight
+      loader.load(props.src, {
+        onLoad: (img, nw, nh) => {
+          const container = containerRef.value
+          const size = getCropperDisplaySize(
+            nw,
+            nh,
+            container?.clientWidth ?? 0,
+            container?.clientHeight ?? 0
+          )
+          if (!size) {
+            status.value = 'error'
+            return
+          }
+          imageRef.value = img
+          naturalWidth = nw
+          naturalHeight = nh
+          loadedAspect = props.aspectRatio
+          applyDisplaySize(size.width, size.height, true)
+          status.value = 'ready'
+          emit('ready')
+        },
+        onError: () => {
+          imageRef.value = null
+          status.value = 'error'
         }
+      })
+    }
 
-        if (!isPositiveFinite(displayWidth.value) || !isPositiveFinite(displayHeight.value)) return
-
-        imageRef.value = img
-        cropRect.value = getInitialCropRect(
+    const observeContainer = (): void => {
+      resizeObserver?.disconnect()
+      const container = containerRef.value
+      if (!container || typeof ResizeObserver === 'undefined') return
+      resizeObserver = new ResizeObserver(() => {
+        if (status.value !== 'ready') return
+        const next = getCropperDisplaySize(
+          naturalWidth,
+          naturalHeight,
+          container.clientWidth,
+          container.clientHeight
+        )
+        if (!next) return
+        if (next.width === displayWidth.value && next.height === displayHeight.value) return
+        const mapped = remapCropRect(
+          currentCropRect(),
           displayWidth.value,
           displayHeight.value,
-          props.aspectRatio
+          next.width,
+          next.height,
+          props.aspectRatio,
+          props.minWidth,
+          props.minHeight
         )
-
-        imageLoaded.value = true
-        emit('ready')
-      }
-      img.src = props.src
+        displayWidth.value = next.width
+        displayHeight.value = next.height
+        commitCropRect(mapped)
+      })
+      resizeObserver.observe(container)
     }
 
     watch(
       () => props.src,
       () => {
-        imageLoaded.value = false
         loadImage()
       }
     )
 
+    watch(
+      () => props.aspectRatio,
+      (value) => {
+        if (status.value !== 'ready') {
+          loadedAspect = value
+          return
+        }
+        if (Object.is(loadedAspect, value)) return
+        loadedAspect = value
+        commitCropRect(
+          getInitialCropRect(
+            displayWidth.value,
+            displayHeight.value,
+            value,
+            props.minWidth,
+            props.minHeight
+          )
+        )
+      }
+    )
+
     onMounted(() => {
+      injectImageCropperStyles()
       loadImage()
+      observeContainer()
     })
 
-    // Dragging handlers
-    const handleMouseDown = (e: MouseEvent, mode: 'move' | 'resize', handle?: CropHandle) => {
-      e.preventDefault()
-      e.stopPropagation()
-      dragMode.value = mode
-      activeHandle.value = handle || null
-      dragStartPos.value = { x: e.clientX, y: e.clientY }
-      dragStartRect.value = { ...cropRect.value }
+    onBeforeUnmount(() => {
+      loader.dispose()
+      dragSession?.dispose()
+      dragSession = null
+      resizeObserver?.disconnect()
+    })
 
-      const onMouseMove = (ev: MouseEvent) => {
-        const dx = ev.clientX - dragStartPos.value.x
-        const dy = ev.clientY - dragStartPos.value.y
-
-        if (dragMode.value === 'move') {
-          cropRect.value = moveCropRect(
-            dragStartRect.value,
-            dx,
-            dy,
-            displayWidth.value,
-            displayHeight.value
-          )
-        } else if (dragMode.value === 'resize' && activeHandle.value) {
-          cropRect.value = resizeCropRect(
-            dragStartRect.value,
-            activeHandle.value,
-            dx,
-            dy,
-            displayWidth.value,
-            displayHeight.value,
-            props.aspectRatio,
-            props.minWidth,
-            props.minHeight
-          )
+    const startDrag = (event: PointerEvent, mode: 'move' | 'resize', handle?: CropHandle): void => {
+      if (event.defaultPrevented) return
+      if (event.button !== 0) return
+      event.preventDefault()
+      const startRect = { ...currentCropRect() }
+      dragSession?.dispose()
+      dragSession = createDocumentDragSession({
+        startX: event.clientX,
+        startY: event.clientY,
+        ownerDocument:
+          event.currentTarget instanceof Node ? event.currentTarget.ownerDocument : undefined,
+        pointerId: event.pointerId,
+        pointerTarget: event.currentTarget instanceof Element ? event.currentTarget : null,
+        onMove: ({ event: moveEvent, deltaX, deltaY }) => {
+          if (moveEvent.cancelable) moveEvent.preventDefault()
+          if (mode === 'move') {
+            commitCropRect(
+              moveCropRect(startRect, deltaX, deltaY, displayWidth.value, displayHeight.value)
+            )
+          } else if (handle) {
+            commitCropRect(
+              resizeCropRect(
+                startRect,
+                handle,
+                deltaX,
+                deltaY,
+                displayWidth.value,
+                displayHeight.value,
+                props.aspectRatio,
+                props.minWidth,
+                props.minHeight
+              )
+            )
+          }
+        },
+        onEnd: () => {
+          dragSession = null
         }
-        emit('crop-change', cropRect.value)
-      }
-
-      const onMouseUp = () => {
-        dragMode.value = 'none'
-        activeHandle.value = null
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
-      }
-
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+      })
     }
 
-    // Touch support
-    const handleTouchStart = (e: TouchEvent, mode: 'move' | 'resize', handle?: CropHandle) => {
-      if (e.touches.length !== 1) return
-      e.preventDefault()
-      e.stopPropagation()
-      const touch = e.touches[0]
-      dragMode.value = mode
-      activeHandle.value = handle || null
-      dragStartPos.value = { x: touch.clientX, y: touch.clientY }
-      dragStartRect.value = { ...cropRect.value }
-
-      const onTouchMove = (ev: TouchEvent) => {
-        if (ev.touches.length !== 1) return
-        const t = ev.touches[0]
-        const dx = t.clientX - dragStartPos.value.x
-        const dy = t.clientY - dragStartPos.value.y
-
-        if (dragMode.value === 'move') {
-          cropRect.value = moveCropRect(
-            dragStartRect.value,
-            dx,
-            dy,
-            displayWidth.value,
-            displayHeight.value
-          )
-        } else if (dragMode.value === 'resize' && activeHandle.value) {
-          cropRect.value = resizeCropRect(
-            dragStartRect.value,
-            activeHandle.value,
-            dx,
-            dy,
-            displayWidth.value,
-            displayHeight.value,
-            props.aspectRatio,
-            props.minWidth,
-            props.minHeight
-          )
-        }
-        emit('crop-change', cropRect.value)
-      }
-
-      const onTouchEnd = () => {
-        dragMode.value = 'none'
-        activeHandle.value = null
-        document.removeEventListener('touchmove', onTouchMove)
-        document.removeEventListener('touchend', onTouchEnd)
-      }
-
-      document.addEventListener('touchmove', onTouchMove, { passive: false })
-      document.addEventListener('touchend', onTouchEnd)
-    }
-
-    const updateCropRect = (nextRect: CropRect) => {
-      cropRect.value = nextRect
-      emit('crop-change', cropRect.value)
-    }
-
-    const getKeyboardDelta = (e: KeyboardEvent): { dx: number; dy: number } | null => {
-      const step = e.shiftKey ? 10 : 1
-      switch (e.key) {
+    const getKeyboardDelta = (event: KeyboardEvent): { dx: number; dy: number } | null => {
+      const step = event.shiftKey ? 10 : 1
+      switch (event.key) {
         case 'ArrowLeft':
           return { dx: -step, dy: 0 }
         case 'ArrowRight':
@@ -263,68 +326,49 @@ export const ImageCropper = defineComponent({
       }
     }
 
-    const handleMoveKeyDown = (e: KeyboardEvent) => {
-      const delta = getKeyboardDelta(e)
+    const handleMoveKeyDown = (event: KeyboardEvent): void => {
+      const delta = getKeyboardDelta(event)
       if (!delta) return
-
-      e.preventDefault()
-      updateCropRect(
-        moveCropRect(cropRect.value, delta.dx, delta.dy, displayWidth.value, displayHeight.value)
+      event.preventDefault()
+      commitCropRect(
+        moveCropRect(currentCropRect(), delta.dx, delta.dy, displayWidth.value, displayHeight.value)
       )
     }
 
-    const handleResizeKeyDown = (e: KeyboardEvent, handle: CropHandle) => {
-      const delta = getKeyboardDelta(e)
-      if (!delta) return
-
-      e.preventDefault()
-      updateCropRect(
-        resizeCropRect(
-          cropRect.value,
-          handle,
-          delta.dx,
-          delta.dy,
-          displayWidth.value,
-          displayHeight.value,
-          props.aspectRatio,
-          props.minWidth,
-          props.minHeight
-        )
-      )
-    }
-
-    // Expose getCropResult method
     const getCropResult = (): Promise<CropResult> => {
       return new Promise((resolve, reject) => {
-        if (!imageRef.value) {
+        if (status.value !== 'ready' || !imageRef.value) {
           reject(new Error('Image not loaded'))
           return
         }
-
-        const { canvas, dataUrl } = cropCanvas(
-          imageRef.value,
-          cropRect.value,
-          displayWidth.value,
-          displayHeight.value,
-          props.outputType,
-          props.quality
-        )
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve({ canvas, blob, dataUrl, cropRect: { ...cropRect.value } })
-            } else {
-              reject(new Error('Failed to create blob'))
-            }
-          },
-          props.outputType,
-          props.quality
-        )
+        try {
+          const rect = currentCropRect()
+          const { canvas, dataUrl } = cropCanvas(
+            imageRef.value,
+            rect,
+            displayWidth.value,
+            displayHeight.value,
+            props.outputType,
+            props.quality
+          )
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve({ canvas, blob, dataUrl, cropRect: { ...rect } })
+              } else {
+                reject(new Error('Failed to create blob'))
+              }
+            },
+            props.outputType,
+            props.quality
+          )
+        } catch (error) {
+          reject(error)
+        }
       })
     }
 
-    expose({ getCropResult })
+    expose({ getCropResult } satisfies ImageCropperRef)
 
     const containerClasses = computed(() =>
       classNames(
@@ -334,86 +378,135 @@ export const ImageCropper = defineComponent({
       )
     )
 
-    const containerStyle = computed(() =>
-      mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
-    )
+    const renderErrorIcon = () =>
+      h(
+        'svg',
+        {
+          class: 'w-8 h-8',
+          xmlns: 'http://www.w3.org/2000/svg',
+          fill: 'none',
+          viewBox: '0 0 24 24',
+          stroke: 'currentColor'
+        },
+        [
+          h('path', {
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            'stroke-width': '1.5',
+            d: imageErrorIconPath
+          })
+        ]
+      )
+
+    const renderLoadingSpinner = () =>
+      h(
+        'svg',
+        {
+          class: imageLoadingSpinnerClasses,
+          xmlns: 'http://www.w3.org/2000/svg',
+          fill: 'none',
+          viewBox: '0 0 24 24',
+          'aria-hidden': 'true'
+        },
+        [
+          h('circle', {
+            class: 'opacity-25',
+            cx: '12',
+            cy: '12',
+            r: '10',
+            stroke: 'currentColor',
+            'stroke-width': '4',
+            fill: 'none'
+          }),
+          h('path', {
+            class: 'opacity-75',
+            fill: 'currentColor',
+            d: imageLoadingSpinnerPath
+          })
+        ]
+      )
 
     return () => {
       const forwardedAttrs = Object.fromEntries(
         Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
       )
+      const mergedStyle = (mergeStyleValues(
+        (attrs as Record<string, unknown>).style,
+        props.style
+      ) ?? {}) as Record<string, unknown>
 
-      if (!imageLoaded.value) {
+      if (status.value !== 'ready') {
         return h(
           'div',
           {
             ...forwardedAttrs,
             ref: containerRef,
             class: classNames(containerClasses.value, 'flex items-center justify-center'),
-            style: Object.assign({}, containerStyle.value as Record<string, unknown>, {
-              minHeight: '200px'
-            }),
+            style: {
+              ...mergedStyle,
+              minHeight: mergedStyle.minHeight ?? '200px'
+            },
+            'data-image-cropper': '',
+            'data-image-cropper-status': status.value,
             role: 'img',
-            'aria-label': labels.value.loadingCropImageAriaLabel
+            'aria-label':
+              status.value === 'error'
+                ? labels.value.loadErrorAriaLabel
+                : labels.value.loadingCropImageAriaLabel
           },
           [
-            h('div', {
-              class: 'w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin'
-            })
+            status.value === 'error'
+              ? h('div', { class: imageErrorClasses }, [renderErrorIcon()])
+              : renderLoadingSpinner()
           ]
         )
       }
 
-      const cr = cropRect.value
+      const cr = currentCropRect()
+      const dw = displayWidth.value
+      const dh = displayHeight.value
 
-      // Source image
       const img = h('img', {
         src: props.src,
         class: imageCropperImgClasses,
-        style: {
-          width: `${displayWidth.value}px`,
-          height: `${displayHeight.value}px`
-        },
+        style: { width: `${dw}px`, height: `${dh}px` },
         draggable: false,
         alt: labels.value.imageToCropAriaLabel
       })
 
-      // Semi-transparent mask with SVG cutout
       const mask = h(
         'svg',
         {
           class: imageCropperMaskClasses,
-          width: displayWidth.value,
-          height: displayHeight.value,
+          width: dw,
+          height: dh,
           xmlns: 'http://www.w3.org/2000/svg'
         },
         [
           h('defs', null, [
             h('mask', { id: maskId }, [
-              h('rect', {
-                width: displayWidth.value,
-                height: displayHeight.value,
-                fill: 'white'
-              }),
-              h('rect', {
-                x: cr.x,
-                y: cr.y,
-                width: cr.width,
-                height: cr.height,
-                fill: 'black'
-              })
+              h('rect', { width: dw, height: dh, fill: 'white' }),
+              h('rect', { x: cr.x, y: cr.y, width: cr.width, height: cr.height, fill: 'black' })
             ])
           ]),
           h('rect', {
-            width: displayWidth.value,
-            height: displayHeight.value,
-            fill: 'var(--tiger-image-cropper-mask, rgba(0,0,0,0.55))',
+            width: dw,
+            height: dh,
+            fill: IMAGE_CROPPER_MASK_FILL,
             mask: `url(#${maskId})`
           })
         ]
       )
 
-      // Selection box
+      const frame = h(
+        'div',
+        {
+          class: imageCropperFrameClasses,
+          style: { width: `${dw}px`, height: `${dh}px` }
+        },
+        [img, mask]
+      )
+
       const selection = h('div', {
         class: imageCropperSelectionClasses,
         style: {
@@ -424,7 +517,6 @@ export const ImageCropper = defineComponent({
         }
       })
 
-      // Drag area (move crop box)
       const dragArea = h('div', {
         class: imageCropperDragAreaClasses,
         style: {
@@ -433,18 +525,16 @@ export const ImageCropper = defineComponent({
           width: `${cr.width}px`,
           height: `${cr.height}px`
         },
+        'data-crop-move': '',
         role: 'button',
         tabindex: 0,
         'aria-label': labels.value.moveCropAreaAriaLabel,
-        onMousedown: (e: MouseEvent) => handleMouseDown(e, 'move'),
-        onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'move'),
+        onPointerdown: (event: PointerEvent) => startDrag(event, 'move'),
         onKeydown: handleMoveKeyDown
       })
 
-      // Guide lines (rule of thirds)
       const guideLines = props.guides
         ? [
-            // Horizontal lines
             h('div', {
               class: imageCropperGuideClasses,
               'data-guide': 'true',
@@ -469,7 +559,6 @@ export const ImageCropper = defineComponent({
                 borderTopStyle: 'dashed'
               }
             }),
-            // Vertical lines
             h('div', {
               class: imageCropperGuideClasses,
               'data-guide': 'true',
@@ -497,29 +586,20 @@ export const ImageCropper = defineComponent({
           ]
         : []
 
-      // Resize handles
-      const handles = CROP_HANDLES.map((handle) => {
-        const pos: Record<string, string> = {}
-
-        // Position relative to crop box
-        if (handle.includes('n')) pos.top = `${cr.y}px`
-        if (handle.includes('s')) pos.top = `${cr.y + cr.height}px`
-        if (handle === 'e' || handle === 'w') pos.top = `${cr.y + cr.height / 2}px`
-        if (handle.includes('w')) pos.left = `${cr.x}px`
-        if (handle.includes('e')) pos.left = `${cr.x + cr.width}px`
-        if (handle === 'n' || handle === 's') pos.left = `${cr.x + cr.width / 2}px`
-
-        return h('div', {
+      const handles = CROP_HANDLES.map((handle) =>
+        h('div', {
           class: getCropperHandleClasses(handle),
-          style: pos,
+          style: getCropperHandleStyle(handle, cr),
+          'data-crop-handle': handle,
           role: 'button',
-          tabindex: 0,
-          'aria-label': labels.value.resizeCropAreaAriaLabel.replace('{handle}', handle),
-          onMousedown: (e: MouseEvent) => handleMouseDown(e, 'resize', handle),
-          onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'resize', handle),
-          onKeydown: (e: KeyboardEvent) => handleResizeKeyDown(e, handle)
+          tabindex: -1,
+          'aria-label': formatCropperResizeAriaLabel(
+            labels.value.resizeCropAreaAriaLabel,
+            getCropperHandleName(handle, labels.value)
+          ),
+          onPointerdown: (event: PointerEvent) => startDrag(event, 'resize', handle)
         })
-      })
+      )
 
       return h(
         'div',
@@ -527,15 +607,17 @@ export const ImageCropper = defineComponent({
           ...forwardedAttrs,
           ref: containerRef,
           class: containerClasses.value,
-          style: Object.assign({}, containerStyle.value as Record<string, unknown>, {
-            width: `${displayWidth.value}px`,
-            height: `${displayHeight.value}px`
-          }),
-          role: 'application',
-          'aria-label': labels.value.cropperDialogAriaLabel,
-          'aria-roledescription': 'image cropper'
+          style: {
+            ...mergedStyle,
+            width: mergedStyle.width ?? `${dw}px`,
+            height: mergedStyle.height ?? `${dh}px`
+          },
+          'data-image-cropper': '',
+          'data-image-cropper-status': 'ready',
+          role: 'group',
+          'aria-label': labels.value.cropperDialogAriaLabel
         },
-        [img, mask, selection, dragArea, ...guideLines, ...handles]
+        [frame, selection, dragArea, ...guideLines, ...handles]
       )
     }
   }
