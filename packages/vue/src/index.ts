@@ -293,7 +293,7 @@ export type { VueSunburstChartProps } from './components/SunburstChart'
 
 // Other components
 export { Carousel } from './components/Carousel'
-export type { VueCarouselProps } from './components/Carousel'
+export type { CarouselProps, VueCarouselProps, CarouselMethods } from './components/Carousel'
 export { BackTop } from './components/BackTop'
 export type { VueBackTopProps } from './components/BackTop'
 export { Anchor, AnchorLink } from './components/Anchor'

@@ -2,75 +2,76 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useMemo,
   useImperativeHandle,
+  useId,
   forwardRef
 } from 'react'
 import {
-  classNames,
-  getCarouselContainerClasses,
-  carouselTrackScrollClasses,
+  carouselPauseButtonClasses,
   carouselTrackFadeClasses,
-  carouselSlideBaseClasses,
-  getCarouselDotsClasses,
-  getCarouselDotClasses,
+  carouselTrackScrollClasses,
+  carouselViewportClasses,
+  carouselNextArrowPath,
+  carouselPrevArrowPath,
+  clampSlideIndex,
+  composeComponentClasses,
+  createCarouselAutoplayController,
   getCarouselArrowClasses,
+  getCarouselCloneAttributes,
+  getCarouselContainerClasses,
+  getCarouselDisplayIndex,
+  getCarouselDotClasses,
+  getCarouselDotMarkClasses,
+  getCarouselDotsClasses,
+  getCarouselDotsOrientation,
+  getCarouselLabels,
+  getCarouselLoopTarget,
+  getCarouselPointerPoint,
+  getCarouselSlideClasses,
   getNextSlideIndex,
   getPrevSlideIndex,
+  getScrollTransform,
+  isCarouselAutoplayEnabled,
+  isCarouselChromeTarget,
+  isCarouselFocusInside,
+  isCarouselHorizontalLock,
+  isCarouselKeyboardIgnoredTarget,
+  isCarouselPaused,
   isNextDisabled,
   isPrevDisabled,
-  clampSlideIndex,
-  getScrollTransform,
-  getCarouselTouchPoint,
-  resolveCarouselSwipeDirection,
-  createCarouselAutoplayController,
-  carouselPrevArrowPath,
-  carouselNextArrowPath,
   mergeTigerLocale,
-  getCarouselLabels,
-  type CarouselTouchPoint,
-  type CarouselSwipeDirection,
-  type CarouselProps as CoreCarouselProps,
+  prefersReducedMotion,
+  resolveCarouselKeyboardNavigation,
+  resolveCarouselLoopSnap,
+  resolveCarouselRegion,
+  resolveCarouselSwipeDirection,
+  resolveCarouselTabKeyboardNavigation,
+  shouldLoopCarousel,
   type CarouselMethods,
+  type CarouselProps as CoreCarouselProps,
+  type CarouselSwipeDirection,
+  type CarouselTouchPoint,
   type TigerLocale,
   type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface CarouselProps extends Omit<CoreCarouselProps, 'style'> {
-  /**
-   * Controlled current slide index
-   */
+export interface CarouselProps
+  extends
+    Omit<CoreCarouselProps, 'style'>,
+    Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreCarouselProps | 'onChange'> {
   currentIndex?: number
-  /**
-   * Initial current slide index for uncontrolled usage
-   */
   defaultCurrentIndex?: number
-  /**
-   * Callback when the controlled current slide index should change
-   */
   onCurrentIndexChange?: (currentIndex: number) => void
-  /**
-   * Callback when slide changes
-   */
   onChange?: (current: number, prev: number) => void
-  /**
-   * Callback before slide changes
-   */
   onBeforeChange?: (current: number, next: number) => void
-  /**
-   * Carousel slides
-   */
   children?: React.ReactNode
-  /**
-   * Custom styles
-   */
   style?: React.CSSProperties
-  /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
-  /** Text/aria label overrides */
   labels?: Partial<TigerLocaleCarousel>
 }
 
@@ -98,27 +99,64 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       onCurrentIndexChange,
       onChange,
       onBeforeChange,
-      children
+      children,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      onKeyDown,
+      ...rest
     },
     ref
   ) => {
+    const { 'aria-label': ariaLabelAttr, 'aria-labelledby': ariaLabelledByAttr, ...domProps } = rest
     const config = useTigerConfig()
-    // Get slides from children
-    const slides = useMemo(() => {
-      return React.Children.toArray(children).filter((child) => React.isValidElement(child))
-    }, [children])
-
+    const instanceId = useId()
+    const slides = useMemo(
+      () => React.Children.toArray(children).filter((child) => React.isValidElement(child)),
+      [children]
+    )
     const slideCount = slides.length
+    const looping = shouldLoopCarousel(infinite, slideCount, effect)
+    const dir = config.direction
+    const reducedMotion = prefersReducedMotion()
+    const autoplayEnabled = isCarouselAutoplayEnabled(autoplay, autoplaySpeed, reducedMotion)
+
     const [currentIndex, setCurrentIndexValue] = useControlledState({
       value: controlledCurrentIndex,
       defaultValue: defaultCurrentIndex,
       onChange: onCurrentIndexChange,
       postState: (index) => clampSlideIndex(index, slideCount)
     })
-    const [isPaused, setIsPaused] = useState(false)
+    const [hovered, setHovered] = useState(false)
+    const [focused, setFocused] = useState(false)
+    const [userPaused, setUserPaused] = useState(false)
+    const [displayIndex, setDisplayIndex] = useState(() =>
+      getCarouselDisplayIndex(currentIndex, slideCount, looping)
+    )
+    const [snapPending, setSnapPending] = useState(false)
+
+    const paused = isCarouselPaused({
+      userPaused,
+      pauseOnHover,
+      pauseOnFocus,
+      hovered,
+      focused
+    })
+
     const containerRef = useRef<HTMLDivElement | null>(null)
-    const touchStartRef = useRef<CarouselTouchPoint | null>(null)
-    const touchCurrentRef = useRef<CarouselTouchPoint | null>(null)
+    const viewportRef = useRef<HTMLDivElement | null>(null)
+    const wrappingRef = useRef(false)
+    const requestedIndexRef = useRef(
+      controlledCurrentIndex !== undefined ? controlledCurrentIndex : defaultCurrentIndex
+    )
+    const pointerRef = useRef<{
+      id: number
+      start: CarouselTouchPoint
+      current: CarouselTouchPoint
+      locked: boolean
+    } | null>(null)
+
     const mergedLocale = useMemo(
       () => mergeTigerLocale(config.locale, locale),
       [config.locale, locale]
@@ -127,231 +165,267 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       () => getCarouselLabels(mergedLocale, labelsOverride),
       [mergedLocale, labelsOverride]
     )
+    const namedAriaLabel =
+      typeof ariaLabelAttr === 'string' ? ariaLabelAttr : labelsOverride?.ariaLabel
+    const region = resolveCarouselRegion({
+      ariaLabel: namedAriaLabel,
+      labelledBy: typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
+    })
 
-    // Stable refs for callbacks (avoid restarting autoplay timer on callback changes)
     const onChangeRef = useRef(onChange)
     const onBeforeChangeRef = useRef(onBeforeChange)
     onChangeRef.current = onChange
     onBeforeChangeRef.current = onBeforeChange
-
     const currentIndexRef = useRef(currentIndex)
     currentIndexRef.current = currentIndex
+    const infiniteRef = useRef(infinite)
+    infiniteRef.current = infinite
+    const effectRef = useRef(effect)
+    effectRef.current = effect
+    const slideCountRef = useRef(slideCount)
+    slideCountRef.current = slideCount
+    const dirRef = useRef(dir)
+    dirRef.current = dir
 
     const navigateToIndex = useCallback(
-      (index: number) => {
+      (index: number, source: 'step' | 'goto' = 'goto') => {
+        const count = slideCountRef.current
         const current = currentIndexRef.current
-        const clampedIndex = clampSlideIndex(index, slideCount)
+        const clampedIndex = clampSlideIndex(index, count)
         if (clampedIndex === current) return
 
         onBeforeChangeRef.current?.(current, clampedIndex)
+        const loopingNow = shouldLoopCarousel(infiniteRef.current, count, effectRef.current)
+        const target =
+          source === 'step'
+            ? getCarouselLoopTarget(current, clampedIndex, count, loopingNow)
+            : {
+                displayIndex: getCarouselDisplayIndex(clampedIndex, count, loopingNow),
+                logicalIndex: clampedIndex,
+                needsSnap: false
+              }
+        wrappingRef.current = target.needsSnap
+        setSnapPending(false)
+        setDisplayIndex(target.displayIndex)
+        requestedIndexRef.current = clampedIndex
         setCurrentIndexValue(clampedIndex)
         onChangeRef.current?.(clampedIndex, current)
       },
-      [slideCount, setCurrentIndexValue]
+      [setCurrentIndexValue]
     )
 
     const navigateByDirection = useCallback(
       (direction: CarouselSwipeDirection) => {
         const current = currentIndexRef.current
+        const count = slideCountRef.current
         const targetIndex =
           direction === 'next'
-            ? getNextSlideIndex(current, slideCount, infinite)
-            : getPrevSlideIndex(current, slideCount, infinite)
-
-        navigateToIndex(targetIndex)
+            ? getNextSlideIndex(current, count, infiniteRef.current)
+            : getPrevSlideIndex(current, count, infiniteRef.current)
+        navigateToIndex(targetIndex, 'step')
       },
-      [slideCount, infinite, navigateToIndex]
+      [navigateToIndex]
     )
 
-    // Container classes
-    const containerClasses = useMemo(
-      () => classNames(getCarouselContainerClasses(className)),
-      [className]
-    )
-
-    // Track classes
-    const trackClasses = useMemo(() => {
-      return effect === 'fade' ? carouselTrackFadeClasses : carouselTrackScrollClasses
-    }, [effect])
-
-    // Track style for scroll effect
-    const trackStyle = useMemo(() => {
-      if (effect === 'scroll') {
-        return {
-          transform: getScrollTransform(currentIndex),
-          transitionDuration: `${speed}ms`
-        }
-      }
-      return {}
-    }, [effect, currentIndex, speed])
-
-    // Slide style for fade effect
-    const slideStyle = useMemo(() => ({ transitionDuration: `${speed}ms` }), [speed])
-
-    // Get slide classes
-    const getSlideClasses = (index: number) => {
-      const isActive = index === currentIndex
-      if (effect === 'fade') {
-        const positionClass = index === 0 ? 'relative' : 'absolute inset-0'
-        return classNames(
-          positionClass,
-          'w-full transition-opacity ease-in-out',
-          isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-        )
-      }
-      return carouselSlideBaseClasses
-    }
-
-    // Dots classes
-    const dotsClasses = useMemo(() => {
-      return getCarouselDotsClasses(dotPosition)
-    }, [dotPosition])
-
-    // Navigation methods
     const goTo = useCallback(
       (index: number) => {
-        navigateToIndex(index)
+        navigateToIndex(index, 'goto')
       },
       [navigateToIndex]
     )
 
     const next = useCallback(() => {
-      const nextIdx = getNextSlideIndex(currentIndex, slideCount, infinite)
-      if (nextIdx !== currentIndex) {
-        goTo(nextIdx)
-      }
-    }, [currentIndex, slideCount, infinite, goTo])
+      navigateByDirection('next')
+    }, [navigateByDirection])
 
     const prev = useCallback(() => {
-      const prevIdx = getPrevSlideIndex(currentIndex, slideCount, infinite)
-      if (prevIdx !== currentIndex) {
-        goTo(prevIdx)
-      }
-    }, [currentIndex, slideCount, infinite, goTo])
+      navigateByDirection('prev')
+    }, [navigateByDirection])
 
-    // Expose methods via ref
-    useImperativeHandle(
-      ref,
-      () => ({
-        next,
-        prev,
-        goTo
-      }),
-      [next, prev, goTo]
-    )
+    useImperativeHandle(ref, () => ({ next, prev, goTo }), [next, prev, goTo])
 
-    // Autoplay effect
+    useLayoutEffect(() => {
+      if (wrappingRef.current) return
+      const nextDisplay = getCarouselDisplayIndex(currentIndex, slideCount, looping)
+      setDisplayIndex((prevDisplay) => (prevDisplay === nextDisplay ? prevDisplay : nextDisplay))
+    }, [currentIndex, slideCount, looping])
+
     useEffect(() => {
-      if (!autoplay || isPaused) return
+      const requested =
+        controlledCurrentIndex !== undefined ? controlledCurrentIndex : requestedIndexRef.current
+      const clamped = clampSlideIndex(requested, slideCount)
+      if (clamped === requested) return
+      requestedIndexRef.current = clamped
+      if (clamped !== currentIndexRef.current) {
+        navigateToIndex(clamped, 'goto')
+      }
+    }, [slideCount, controlledCurrentIndex, navigateToIndex])
 
+    useEffect(() => {
+      if (!autoplayEnabled || paused) return
       const controller = createCarouselAutoplayController({
         interval: autoplaySpeed,
         onAdvance: () => {
-          const curr = currentIndexRef.current
-          const nextIdx = getNextSlideIndex(curr, slideCount, infinite)
-          if (nextIdx !== curr) {
-            navigateToIndex(nextIdx)
-          }
+          navigateByDirection('next')
         }
       })
-
       controller.start()
-
       return () => controller.stop()
-    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite, navigateToIndex])
+    }, [autoplayEnabled, autoplaySpeed, paused, navigateByDirection])
 
     useEffect(() => {
-      const container = containerRef.current
-      if (!container || slideCount <= 1) return
+      const viewport = viewportRef.current
+      if (!viewport || slideCount <= 1) return
 
-      const resetTouchGesture = () => {
-        touchStartRef.current = null
-        touchCurrentRef.current = null
+      const resetPointer = () => {
+        pointerRef.current = null
       }
 
-      const handleTouchStart = (event: TouchEvent) => {
-        const point = getCarouselTouchPoint(event.touches)
-        touchStartRef.current = point
-        touchCurrentRef.current = point
-      }
-
-      const handleTouchMove = (event: TouchEvent) => {
-        if (!touchStartRef.current) return
-
-        const point = getCarouselTouchPoint(event.touches)
-        if (point) {
-          touchCurrentRef.current = point
+      const handlePointerDown = (event: PointerEvent) => {
+        if (event.button !== 0) return
+        if (isCarouselChromeTarget(event.target)) return
+        const point = getCarouselPointerPoint(event)
+        if (!point) return
+        pointerRef.current = {
+          id: event.pointerId,
+          start: point,
+          current: point,
+          locked: false
+        }
+        try {
+          viewport.setPointerCapture(event.pointerId)
+        } catch {
+          /* happy-dom and some SVG targets omit capture */
         }
       }
 
-      const handleTouchEnd = (event: TouchEvent) => {
-        const direction = resolveCarouselSwipeDirection(
-          touchStartRef.current,
-          getCarouselTouchPoint(event.changedTouches) ?? touchCurrentRef.current
-        )
-
-        resetTouchGesture()
-
-        if (direction) {
-          navigateByDirection(direction)
+      const handlePointerMove = (event: PointerEvent) => {
+        const session = pointerRef.current
+        if (!session || session.id !== event.pointerId) return
+        const point = getCarouselPointerPoint(event)
+        if (!point) return
+        session.current = point
+        if (!session.locked && isCarouselHorizontalLock(session.start, point)) {
+          session.locked = true
+        }
+        if (session.locked && event.cancelable) {
+          event.preventDefault()
         }
       }
 
-      const handleTouchCancel = () => {
-        resetTouchGesture()
+      const handlePointerEnd = (event: PointerEvent) => {
+        const session = pointerRef.current
+        if (!session || session.id !== event.pointerId) return
+        const end = getCarouselPointerPoint(event) ?? session.current
+        const direction = resolveCarouselSwipeDirection(session.start, end, {
+          dir: dirRef.current
+        })
+        resetPointer()
+        if (direction) navigateByDirection(direction)
       }
 
-      container.addEventListener('touchstart', handleTouchStart, { passive: true })
-      container.addEventListener('touchmove', handleTouchMove, { passive: true })
-      container.addEventListener('touchend', handleTouchEnd, { passive: true })
-      container.addEventListener('touchcancel', handleTouchCancel, { passive: true })
+      const handlePointerCancel = (event: PointerEvent) => {
+        if (pointerRef.current?.id === event.pointerId) resetPointer()
+      }
+
+      viewport.addEventListener('pointerdown', handlePointerDown)
+      viewport.addEventListener('pointermove', handlePointerMove, { passive: false })
+      viewport.addEventListener('pointerup', handlePointerEnd)
+      viewport.addEventListener('pointercancel', handlePointerCancel)
 
       return () => {
-        resetTouchGesture()
-        container.removeEventListener('touchstart', handleTouchStart)
-        container.removeEventListener('touchmove', handleTouchMove)
-        container.removeEventListener('touchend', handleTouchEnd)
-        container.removeEventListener('touchcancel', handleTouchCancel)
+        resetPointer()
+        viewport.removeEventListener('pointerdown', handlePointerDown)
+        viewport.removeEventListener('pointermove', handlePointerMove)
+        viewport.removeEventListener('pointerup', handlePointerEnd)
+        viewport.removeEventListener('pointercancel', handlePointerCancel)
       }
     }, [navigateByDirection, slideCount])
 
-    // Pause/Resume handlers
-    const handleMouseEnter = useCallback(() => {
-      if (pauseOnHover && autoplay) {
-        setIsPaused(true)
+    const handleTrackTransitionEnd = (event: React.TransitionEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) return
+      if (!wrappingRef.current) return
+      const snap = resolveCarouselLoopSnap(displayIndex, slideCount)
+      if (snap === null) {
+        wrappingRef.current = false
+        return
       }
-    }, [pauseOnHover, autoplay])
+      wrappingRef.current = false
+      setSnapPending(true)
+      setDisplayIndex(snap)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setSnapPending(false))
+      })
+    }
 
-    const handleMouseLeave = useCallback(() => {
-      if (pauseOnHover && autoplay) {
-        setIsPaused(false)
+    const handleMouseEnter = (event: React.MouseEvent<HTMLDivElement>) => {
+      if (pauseOnHover && autoplayEnabled) setHovered(true)
+      onMouseEnter?.(event)
+    }
+
+    const handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
+      if (pauseOnHover && autoplayEnabled) setHovered(false)
+      onMouseLeave?.(event)
+    }
+
+    const handleFocus = (event: React.FocusEvent<HTMLDivElement>) => {
+      if (pauseOnFocus && autoplayEnabled) setFocused(true)
+      onFocus?.(event)
+    }
+
+    const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+      if (
+        pauseOnFocus &&
+        autoplayEnabled &&
+        !isCarouselFocusInside(event.currentTarget, event.relatedTarget)
+      ) {
+        setFocused(false)
       }
-    }, [pauseOnHover, autoplay])
+      onBlur?.(event)
+    }
 
-    const handleFocus = useCallback(() => {
-      if (pauseOnFocus && autoplay) {
-        setIsPaused(true)
-      }
-    }, [pauseOnFocus, autoplay])
+    const handleRootKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(event)
+      if (event.defaultPrevented || slideCount <= 1) return
+      if (isCarouselKeyboardIgnoredTarget(event.target)) return
+      if ((event.target as Element | null)?.closest?.('[role="tablist"]')) return
+      const action = resolveCarouselKeyboardNavigation(event.key, dir)
+      if (!action) return
+      event.preventDefault()
+      if (action === 'next') next()
+      else if (action === 'prev') prev()
+      else if (action === 'first') goTo(0)
+      else goTo(slideCount - 1)
+    }
 
-    const handleBlur = useCallback(() => {
-      if (pauseOnFocus && autoplay) {
-        setIsPaused(false)
-      }
-    }, [pauseOnFocus, autoplay])
+    const handleTablistKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const action = resolveCarouselTabKeyboardNavigation(
+        event.key,
+        getCarouselDotsOrientation(dotPosition),
+        dir
+      )
+      if (!action) return
+      event.preventDefault()
+      event.stopPropagation()
+      const nextIndex =
+        action === 'next'
+          ? getNextSlideIndex(currentIndex, slideCount, true)
+          : action === 'prev'
+            ? getPrevSlideIndex(currentIndex, slideCount, true)
+            : action === 'first'
+              ? 0
+              : slideCount - 1
+      goTo(nextIndex)
+      const tab = event.currentTarget.querySelector<HTMLElement>(
+        `[data-tiger-carousel-tab="${nextIndex}"]`
+      )
+      tab?.focus()
+    }
 
-    // Arrow disabled state
-    const isPrevArrowDisabled = useMemo(
-      () => isPrevDisabled(currentIndex, slideCount, infinite),
-      [currentIndex, slideCount, infinite]
-    )
+    const isPrevArrowDisabled = isPrevDisabled(currentIndex, slideCount, infinite)
+    const isNextArrowDisabled = isNextDisabled(currentIndex, slideCount, infinite)
+    const transitionDuration = snapPending || reducedMotion || speed <= 0 ? '0ms' : `${speed}ms`
 
-    const isNextArrowDisabled = useMemo(
-      () => isNextDisabled(currentIndex, slideCount, infinite),
-      [currentIndex, slideCount, infinite]
-    )
-
-    // Arrow button helper
     const renderArrowButton = (
       type: 'prev' | 'next',
       disabled: boolean,
@@ -360,6 +434,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     ) => (
       <button
         type="button"
+        data-tiger-carousel-chrome=""
         className={getCarouselArrowClasses(type, disabled)}
         onClick={onClick}
         disabled={disabled}
@@ -372,88 +447,135 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-6 h-6">
+          className="w-6 h-6"
+          aria-hidden="true"
+          focusable="false">
           <path d={path} />
         </svg>
       </button>
     )
 
-    // Render arrows
-    const renderArrows = () => {
-      if (!arrows) return null
+    const renderSlide = (slide: React.ReactNode, logicalIndex: number, clone: boolean) => {
+      const active = !clone && logicalIndex === currentIndex
+      const slideId = `${instanceId}-slide-${logicalIndex}`
+      const hidden = !active
       return (
-        <>
-          {renderArrowButton('prev', isPrevArrowDisabled, prev, carouselPrevArrowPath)}
-          {renderArrowButton('next', isNextArrowDisabled, next, carouselNextArrowPath)}
-        </>
-      )
-    }
-
-    // Render dots
-    const renderDots = () => {
-      if (!dots || slideCount <= 1) return null
-
-      return (
-        <div className={dotsClasses} role="tablist" aria-label={labels.navigationAriaLabel}>
-          {slides.map((_, index) => (
-            <button
-              type="button"
-              key={index}
-              className={getCarouselDotClasses(index === currentIndex)}
-              onClick={() => goTo(index)}
-              aria-label={labels.goToSlideAriaLabel.replace('{index}', String(index + 1))}
-              aria-current={index === currentIndex ? 'true' : 'false'}
-            />
-          ))}
-        </div>
-      )
-    }
-
-    // Render slides
-    const renderSlides = () => {
-      const slideElements = slides.map((slide, index) => (
         <div
-          key={index}
-          className={getSlideClasses(index)}
-          style={effect === 'fade' ? slideStyle : undefined}
+          key={
+            clone ? `clone-${logicalIndex}-${logicalIndex === 0 ? 'trailing' : 'leading'}` : slideId
+          }
+          id={clone ? undefined : slideId}
+          className={getCarouselSlideClasses({ effect, active })}
+          style={effect === 'fade' ? { transitionDuration } : undefined}
           role="group"
-          aria-roledescription="slide"
+          aria-roledescription={labels.slideRoleDescription}
           aria-label={labels.slideAriaLabel
-            .replace('{index}', String(index + 1))
+            .replace('{index}', String(logicalIndex + 1))
             .replace('{total}', String(slideCount))}
-          aria-hidden={index !== currentIndex}>
+          aria-hidden={hidden || undefined}
+          inert={hidden || undefined}
+          data-tiger-carousel-slide={clone ? 'clone' : active ? 'active' : 'inactive'}
+          {...(clone ? getCarouselCloneAttributes() : {})}>
           {slide}
         </div>
-      ))
-
-      // For fade effect, wrap slides in a relative container
-      if (effect === 'fade') {
-        return <div className={classNames(trackClasses, 'h-full')}>{slideElements}</div>
-      }
-
-      // For scroll effect
-      return (
-        <div className={trackClasses} style={trackStyle}>
-          {slideElements}
-        </div>
       )
     }
+
+    const slideNodes = looping
+      ? [
+          renderSlide(slides[slideCount - 1], slideCount - 1, true),
+          ...slides.map((slide, index) => renderSlide(slide, index, false)),
+          renderSlide(slides[0], 0, true)
+        ]
+      : slides.map((slide, index) => renderSlide(slide, index, false))
+
+    const track =
+      effect === 'fade' ? (
+        <div className={carouselTrackFadeClasses} data-tiger-carousel-track="">
+          {slideNodes}
+        </div>
+      ) : (
+        <div
+          className={carouselTrackScrollClasses}
+          data-tiger-carousel-track=""
+          style={{
+            transform: getScrollTransform(displayIndex, dir),
+            transitionDuration
+          }}
+          onTransitionEnd={handleTrackTransitionEnd}>
+          {slideNodes}
+        </div>
+      )
 
     return (
       <div
+        {...domProps}
         ref={containerRef}
-        className={containerClasses}
+        className={composeComponentClasses(getCarouselContainerClasses(className))}
         style={style}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={labels.ariaLabel}
+        data-tiger-carousel=""
+        role={region.role}
+        aria-roledescription={labels.roleDescription}
+        aria-label={region.ariaLabel}
+        aria-labelledby={typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onFocus={handleFocus}
-        onBlur={handleBlur}>
-        {renderSlides()}
-        {renderArrows()}
-        {renderDots()}
+        onBlur={handleBlur}
+        onKeyDown={handleRootKeyDown}>
+        <div
+          ref={viewportRef}
+          className={carouselViewportClasses}
+          data-tiger-carousel-viewport=""
+          tabIndex={slideCount > 1 ? 0 : undefined}>
+          {track}
+        </div>
+        {autoplayEnabled ? (
+          <button
+            type="button"
+            data-tiger-carousel-chrome=""
+            className={carouselPauseButtonClasses}
+            aria-label={userPaused ? labels.playAriaLabel : labels.pauseAriaLabel}
+            aria-pressed={userPaused}
+            onClick={() => setUserPaused((value) => !value)}>
+            {userPaused ? labels.playAriaLabel : labels.pauseAriaLabel}
+          </button>
+        ) : null}
+        {arrows
+          ? renderArrowButton('prev', isPrevArrowDisabled, prev, carouselPrevArrowPath)
+          : null}
+        {arrows
+          ? renderArrowButton('next', isNextArrowDisabled, next, carouselNextArrowPath)
+          : null}
+        {dots && slideCount > 1 ? (
+          <div
+            className={getCarouselDotsClasses(dotPosition)}
+            data-tiger-carousel-chrome=""
+            role="tablist"
+            aria-label={labels.navigationAriaLabel}
+            aria-orientation={getCarouselDotsOrientation(dotPosition)}
+            onKeyDown={handleTablistKeyDown}>
+            {slides.map((_, index) => {
+              const selected = index === currentIndex
+              return (
+                <button
+                  type="button"
+                  key={index}
+                  id={`${instanceId}-tab-${index}`}
+                  role="tab"
+                  data-tiger-carousel-tab={index}
+                  className={getCarouselDotClasses(selected)}
+                  aria-label={labels.goToSlideAriaLabel.replace('{index}', String(index + 1))}
+                  aria-selected={selected}
+                  aria-controls={`${instanceId}-slide-${index}`}
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => goTo(index)}>
+                  <span className={getCarouselDotMarkClasses(selected)} />
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
       </div>
     )
   }
