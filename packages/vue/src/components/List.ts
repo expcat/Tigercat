@@ -43,7 +43,6 @@ import {
   getPaginationLabels,
   getListLabels,
   formatPaginationTotal,
-  formatPaginationPageIndicator,
   observeElementSize,
   reorderSequence,
   devWarn,
@@ -408,13 +407,6 @@ export const List = defineComponent({
         paginationConfig.totalText ??
         ((value: number, range: [number, number]) =>
           formatPaginationTotal(paginationLabels.totalText, value, range, localeCode))
-      const pageIndicatorText = (current: number, pages: number) =>
-        formatPaginationPageIndicator(
-          paginationLabels.pageIndicatorText,
-          current,
-          pages,
-          localeCode
-        )
       return h('div', { class: getBuiltInPaginationContainerClasses() }, [
         h(Pagination, {
           size: props.size === 'lg' ? 'large' : props.size === 'sm' ? 'small' : 'medium',
@@ -427,7 +419,7 @@ export const List = defineComponent({
           showSizeChanger: paginationConfig.showSizeChanger !== false,
           showTotal: paginationConfig.showTotal !== false,
           totalText,
-          pageIndicatorText,
+          pageIndicatorText: paginationConfig.pageIndicatorText,
           pageSizeOptions: paginationConfig.pageSizeOptions || [10, 20, 50, 100],
           locale: mergedLocale.value,
           onChange: (page: number) => handlePageChange(page),

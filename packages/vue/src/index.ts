@@ -188,7 +188,7 @@ export type { VueBreadcrumbProps, VueBreadcrumbItemProps } from './components/Br
 export { Steps, StepsItem } from './components/Steps'
 export type { VueStepsProps, VueStepsItemProps } from './components/Steps'
 export { Pagination } from './components/Pagination'
-export type { VuePaginationProps } from './components/Pagination'
+export type { VuePaginationProps, PaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
 export type { VueDropdownProps, DropdownProps } from './components/Dropdown'
 export { DropdownMenu, DropdownItem } from './components/Dropdown'

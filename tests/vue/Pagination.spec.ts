@@ -10,7 +10,8 @@ import { Pagination } from '@expcat/tigercat-vue/Pagination'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Pagination', () => {
   afterEach(() => {
@@ -21,7 +22,7 @@ describe('Pagination', () => {
     const { container } = render(Pagination, { props: { total: 100 } })
     const nav = container.querySelector('nav')
     expect(nav).toBeInTheDocument()
-    expect(nav).toHaveAttribute('role', 'navigation')
+    expect(nav).not.toHaveAttribute('role')
     expect(nav).toHaveAttribute('aria-label', 'Pagination')
   })
 
@@ -48,13 +49,44 @@ describe('Pagination', () => {
       props: { total: 100, pageSize: 10 },
       attrs: { onChange }
     })
-    await fireEvent.click(screen.getByLabelText('Page 2'))
+    await fireEvent.click(screen.getByRole('button', { name: '2' }))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
   it('sets aria-current on the active page', () => {
     render(Pagination, { props: { total: 100, pageSize: 10, current: 3 } })
-    expect(screen.getByLabelText('Page 3')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('emits update:current and change together, and never emits NaN', async () => {
+    const onChange = vi.fn()
+    const onUpdateCurrent = vi.fn()
+    render(Pagination, {
+      props: { total: 100, pageSize: 10, current: Number.NaN },
+      attrs: { onChange, 'onUpdate:current': onUpdateCurrent }
+    })
+    await fireEvent.click(screen.getByLabelText('Previous page'))
+    expect(onChange).not.toHaveBeenCalled()
+    await fireEvent.click(screen.getByRole('button', { name: '2' }))
+    expect(onChange).toHaveBeenCalledWith(2, 10)
+    expect(onUpdateCurrent).toHaveBeenCalledWith(2)
+  })
+
+  it('uses locale page indicator text in simple mode', () => {
+    render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () =>
+          h(Pagination, { simple: true, total: 100, pageSize: 10, current: 1 })
+        )
+    })
+    expect(screen.getByText('第 1 页，共 10 页')).toBeInTheDocument()
+  })
+
+  it('names the landmark from an official zhTW locale object', () => {
+    render({
+      render: () => h(ConfigProvider, { locale: zhTW }, () => h(Pagination, { total: 100 }))
+    })
+    expect(screen.getByRole('navigation', { name: '分頁' })).toBeInTheDocument()
   })
 
   it('disables prev/next on boundaries', () => {
@@ -153,7 +185,7 @@ describe('Pagination', () => {
     })
 
     // Use default English label from i18n system
-    await fireEvent.update(screen.getByLabelText('/ page'), '50')
+    await fireEvent.update(screen.getByLabelText('Items per page'), '50')
 
     // current page 10 is clamped to 2 (100/50), carried by page-size-change
     expect(onPageSizeChange).toHaveBeenCalledWith(2, 50)
@@ -220,8 +252,10 @@ describe('Pagination', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(Pagination)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(Pagination, {
+        props: { total: 80, pageSize: 10, current: 2, showQuickJumper: true, showSizeChanger: true }
+      })
+      await expectNoA11yViolations(container)
     })
   })
   describe('Edge Cases', () => {

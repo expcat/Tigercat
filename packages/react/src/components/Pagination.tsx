@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useMemo, useRef, useId } from 'react'
 import {
   classNames,
   getTotalPages,
@@ -6,6 +6,13 @@ import {
   validateCurrentPage,
   getPageNumbers,
   formatPaginationTotal,
+  formatPaginationPageIndicator,
+  normalizePaginationTotal,
+  normalizePaginationPageSize,
+  resolvePageSizeOptions,
+  getQuickJumperPrefixClasses,
+  chevronLeftSolidIcon20PathD,
+  icon20ViewBox,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
   getPaginationEllipsisClasses,
@@ -15,7 +22,6 @@ import {
   getSizeTextClasses,
   getPaginationLabels,
   getLocaleDirection,
-  formatPageAriaLabel,
   createPaginationIdleValidationScheduler,
   getImmediateTigerLocale,
   getPaginationJumperPage,
@@ -77,7 +83,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   labels: labelsOverride,
   ...props
 }) => {
-  const { 'aria-label': ariaLabelProp, ...navProps } = props
+  const { 'aria-label': ariaLabelProp, 'aria-labelledby': ariaLabelledbyProp, ...navProps } = props
+  const jumperId = useId()
   const config = useTigerConfig()
 
   const immediateLocale = useMemo(() => getImmediateTigerLocale(locale), [locale])
@@ -140,33 +147,26 @@ export const Pagination: React.FC<PaginationProps> = ({
     }
   }, [quickJumperValidation])
 
-  // Use controlled or uncontrolled values
   const currentPage = controlledCurrent !== undefined ? controlledCurrent : internalCurrent
-  const currentPageSize = controlledPageSize !== undefined ? controlledPageSize : internalPageSize
+  const rawPageSize = controlledPageSize !== undefined ? controlledPageSize : internalPageSize
+  const currentPageSize = normalizePaginationPageSize(rawPageSize)
+  const itemTotal = normalizePaginationTotal(total)
 
-  // Calculate total pages
-  const totalPages = getTotalPages(total, currentPageSize)
-
-  // Validate and adjust current page
+  const totalPages = getTotalPages(itemTotal, currentPageSize)
   const validatedCurrentPage = validateCurrentPage(currentPage, totalPages)
+  const pageRange = getPageRange(validatedCurrentPage, currentPageSize, itemTotal)
 
-  // Calculate current page range
-  const pageRange = getPageRange(validatedCurrentPage, currentPageSize, total)
-
-  // Handle page change
   const handlePageChange = useCallback(
     (page: number) => {
       if (disabled) return
-      if (page === validatedCurrentPage) return
-      if (page < 1 || page > totalPages) return
+      const next = validateCurrentPage(page, totalPages)
+      if (next === validatedCurrentPage) return
 
-      // Update internal state if uncontrolled
       if (controlledCurrent === undefined) {
-        setInternalCurrent(page)
+        setInternalCurrent(next)
       }
 
-      // Call onChange callback
-      onChange?.(page, currentPageSize)
+      onChange?.(next, currentPageSize)
     },
     [disabled, validatedCurrentPage, totalPages, controlledCurrent, onChange, currentPageSize]
   )
@@ -176,7 +176,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     (newPageSize: number) => {
       if (disabled) return
 
-      const newTotalPages = getTotalPages(total, newPageSize)
+      const newTotalPages = getTotalPages(itemTotal, normalizePaginationPageSize(newPageSize))
       let newPage = validatedCurrentPage
 
       // Adjust current page if it exceeds new total pages
@@ -198,7 +198,14 @@ export const Pagination: React.FC<PaginationProps> = ({
       // navigation, so a single size change never triggers two callbacks.
       onPageSizeChange?.(newPage, newPageSize)
     },
-    [disabled, total, validatedCurrentPage, controlledPageSize, controlledCurrent, onPageSizeChange]
+    [
+      disabled,
+      itemTotal,
+      validatedCurrentPage,
+      controlledPageSize,
+      controlledCurrent,
+      onPageSizeChange
+    ]
   )
 
   // Handle quick jumper submit
@@ -232,18 +239,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   )
 
   const normalizedPageSizeOptions = useMemo(() => {
-    return (pageSizeOptions as PaginationPageSizeOptionItem[]).map((option) => {
-      if (typeof option === 'number') {
-        return {
-          value: option,
-          label: `${option} ${labels.itemsPerPageText}`
-        }
-      }
-
-      const label = option.label ?? `${option.value} ${labels.itemsPerPageText}`
-      return { value: option.value, label }
-    })
-  }, [pageSizeOptions, labels.itemsPerPageText])
+    return resolvePageSizeOptions(pageSizeOptions, currentPageSize, labels.itemsPerPageText)
+  }, [pageSizeOptions, currentPageSize, labels.itemsPerPageText])
 
   // Container classes
   const containerClasses = getPaginationContainerClasses(align, className)
@@ -261,7 +258,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         formatPaginationTotal(labels.totalText, value, range, localeCode))
     elements.push(
       <span key="total" className={getTotalTextClasses(size)}>
-        {totalTextFn(total, pageRange)}
+        {totalTextFn(itemTotal, pageRange)}
       </span>
     )
   }
@@ -275,25 +272,31 @@ export const Pagination: React.FC<PaginationProps> = ({
       disabled={prevDisabled}
       onClick={() => handlePageChange(validatedCurrentPage - 1)}
       aria-label={labels.prevPageAriaLabel}>
-      {isRtl ? '›' : '‹'}
+      <svg
+        className="h-4 w-4 rtl:-scale-x-100"
+        viewBox={icon20ViewBox}
+        fill="currentColor"
+        aria-hidden="true">
+        <path fillRule="evenodd" d={chevronLeftSolidIcon20PathD} clipRule="evenodd" />
+      </svg>
     </button>
   )
 
   if (simple) {
-    // Simple mode: current / total
     const indicatorText = pageIndicatorText
       ? pageIndicatorText(validatedCurrentPage, totalPages)
-      : `${validatedCurrentPage} / ${totalPages}`
+      : formatPaginationPageIndicator(
+          labels.pageIndicatorText,
+          validatedCurrentPage,
+          totalPages,
+          localeCode
+        )
     elements.push(
-      <span
-        key="current"
-        className={classNames('mx-2', getSizeTextClasses(size))}
-        aria-label={indicatorText}>
+      <span key="current" className={classNames('mx-2', getSizeTextClasses(size))}>
         {indicatorText}
       </span>
     )
   } else {
-    // Full mode: page number buttons
     getPageNumbers(validatedCurrentPage, totalPages, showLessItems).forEach((pageNum, index) => {
       if (pageNum === '...') {
         elements.push(
@@ -312,8 +315,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             type="button"
             className={getPaginationButtonBaseClasses(size, isActive)}
             disabled={disabled}
-            onClick={() => handlePageChange(pageNum as number)}
-            aria-label={formatPageAriaLabel(labels.pageAriaLabel, pageNum as number, localeCode)}
+            onClick={() => handlePageChange(pageNum)}
             aria-current={isActive ? 'page' : undefined}>
             {String(pageNum)}
           </button>
@@ -331,7 +333,13 @@ export const Pagination: React.FC<PaginationProps> = ({
       disabled={nextDisabled}
       onClick={() => handlePageChange(validatedCurrentPage + 1)}
       aria-label={labels.nextPageAriaLabel}>
-      {isRtl ? '‹' : '›'}
+      <svg
+        className="h-4 w-4 -scale-x-100 rtl:scale-x-100"
+        viewBox={icon20ViewBox}
+        fill="currentColor"
+        aria-hidden="true">
+        <path fillRule="evenodd" d={chevronLeftSolidIcon20PathD} clipRule="evenodd" />
+      </svg>
     </button>
   )
 
@@ -344,7 +352,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         disabled={disabled}
         value={currentPageSize}
         onChange={(e) => handlePageSizeChange(parseInt(e.target.value, 10))}
-        aria-label={labels.itemsPerPageText}>
+        aria-label={labels.pageSizeAriaLabel}>
         {normalizedPageSizeOptions.map((sizeOption) => (
           <option key={sizeOption.value} value={sizeOption.value}>
             {sizeOption.label}
@@ -358,22 +366,22 @@ export const Pagination: React.FC<PaginationProps> = ({
   if (showQuickJumper) {
     const sizeText = getSizeTextClasses(size)
     elements.push(
-      <span key="jumper-label-start" className={classNames('ml-2', sizeText)}>
+      <label key="jumper-label" htmlFor={jumperId} className={getQuickJumperPrefixClasses(size)}>
         {labels.jumpToText}
-      </span>
+      </label>
     )
     elements.push(
       <input
         key="jumper-input"
-        type="number"
+        id={jumperId}
+        type="text"
+        inputMode="numeric"
         className={classNames(getQuickJumperInputClasses(size), 'mx-2')}
         disabled={disabled}
         value={quickJumperValue}
         onChange={(e) => handleQuickJumperChange(e.target.value)}
         onKeyDown={handleQuickJumperKeyPress}
-        min={1}
-        max={totalPages}
-        aria-label={labels.jumpToText}
+        onBlur={handleQuickJumperSubmit}
       />
     )
     elements.push(
@@ -392,8 +400,9 @@ export const Pagination: React.FC<PaginationProps> = ({
     <nav
       className={containerClasses}
       {...navProps}
-      role="navigation"
-      aria-label={ariaLabelProp ?? 'Pagination'}
+      dir={isRtl ? 'rtl' : 'ltr'}
+      aria-label={ariaLabelProp ?? (ariaLabelledbyProp ? undefined : labels.paginationAriaLabel)}
+      aria-labelledby={ariaLabelledbyProp}
       style={style}>
       {elements}
     </nav>

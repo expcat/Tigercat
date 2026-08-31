@@ -32,6 +32,24 @@ export interface PaginationIdleValidationScheduler {
 
 const DEFAULT_JUMPER_VALIDATION_DELAY = 120
 const DEFAULT_JUMPER_VALIDATION_TIMEOUT = 250
+const DEFAULT_PAGE_SIZE = 10
+
+export type PaginationPageToken = number | '...'
+
+export function toFiniteInteger(value: number, fallback: number): number {
+  if (!Number.isFinite(value)) return fallback
+  return Math.trunc(value)
+}
+
+export function normalizePaginationTotal(total: number): number {
+  const value = toFiniteInteger(total, 0)
+  return value < 0 ? 0 : value
+}
+
+export function normalizePaginationPageSize(pageSize: number): number {
+  const value = toFiniteInteger(pageSize, DEFAULT_PAGE_SIZE)
+  return value > 0 ? value : DEFAULT_PAGE_SIZE
+}
 
 function getGlobalRequestIdleCallback(): IdleCallbackScheduler | undefined {
   return typeof globalThis === 'undefined'
@@ -126,26 +144,38 @@ export function createPaginationIdleValidationScheduler(
  * Calculate total number of pages
  */
 export function getTotalPages(total: number, pageSize: number): number {
-  if (pageSize <= 0) return 0
-  return Math.ceil(total / pageSize)
+  const normalizedTotal = normalizePaginationTotal(total)
+  const normalizedSize = normalizePaginationPageSize(pageSize)
+  if (normalizedTotal === 0) return 0
+  return Math.ceil(normalizedTotal / normalizedSize)
 }
 
 /**
  * Calculate the range of items shown on current page
  */
 export function getPageRange(current: number, pageSize: number, total: number): [number, number] {
-  const start = (current - 1) * pageSize + 1
-  const end = Math.min(current * pageSize, total)
+  const normalizedTotal = normalizePaginationTotal(total)
+  const normalizedSize = normalizePaginationPageSize(pageSize)
+  const pages = getTotalPages(normalizedTotal, normalizedSize)
+  const page = validateCurrentPage(current, pages)
+  if (normalizedTotal === 0 || pages === 0) return [0, 0]
+  const start = (page - 1) * normalizedSize + 1
+  const end = Math.min(page * normalizedSize, normalizedTotal)
   return [start, end]
 }
 
 /**
- * Validate and adjust current page number
+ * Clamp `current` to a finite page in `[1, totalPages]`.
+ * Non-finite values become 1. Display always uses this value; events never emit NaN.
  */
 export function validateCurrentPage(current: number, totalPages: number): number {
-  if (current < 1) return 1
-  if (current > totalPages && totalPages > 0) return totalPages
-  return current
+  const pages = Number.isFinite(totalPages) ? Math.max(0, Math.trunc(totalPages)) : 0
+  if (pages <= 0) return 1
+  if (current === Infinity) return pages
+  const page = toFiniteInteger(current, 1)
+  if (page < 1) return 1
+  if (page > pages) return pages
+  return page
 }
 
 /**
@@ -159,41 +189,29 @@ export function getPageNumbers(
   current: number,
   totalPages: number,
   showLessItems: boolean = false
-): (number | string)[] {
-  if (totalPages <= 0) return []
+): PaginationPageToken[] {
+  const pagesCount = Number.isFinite(totalPages) ? Math.max(0, Math.trunc(totalPages)) : 0
+  if (pagesCount <= 0) return []
 
-  // Show fewer page numbers in less items mode
+  const page = validateCurrentPage(current, pagesCount)
   const pageRange = showLessItems ? 1 : 2
-  const pages: (number | string)[] = []
+  const tokens: PaginationPageToken[] = [1]
 
-  // Always show first page
-  pages.push(1)
+  let rangeStart = Math.max(2, page - pageRange)
+  let rangeEnd = Math.min(pagesCount - 1, page + pageRange)
+  if (rangeStart === 3) rangeStart = 2
+  if (rangeEnd === pagesCount - 2) rangeEnd = pagesCount - 1
 
-  // Calculate range around current page
-  const rangeStart = Math.max(2, current - pageRange)
-  const rangeEnd = Math.min(totalPages - 1, current + pageRange)
+  if (rangeStart > 2) tokens.push('...')
 
-  // Add ellipsis before range if needed
-  if (rangeStart > 2) {
-    pages.push('...')
-  }
-
-  // Add pages in range
   for (let i = rangeStart; i <= rangeEnd; i++) {
-    pages.push(i)
+    tokens.push(i)
   }
 
-  // Add ellipsis after range if needed
-  if (rangeEnd < totalPages - 1) {
-    pages.push('...')
-  }
+  if (rangeEnd < pagesCount - 1) tokens.push('...')
+  if (pagesCount > 1) tokens.push(pagesCount)
 
-  // Always show last page if there's more than one page
-  if (totalPages > 1) {
-    pages.push(totalPages)
-  }
-
-  return pages
+  return tokens
 }
 
 /**
@@ -240,17 +258,29 @@ export function resolvePaginationDisplayMode(
 /**
  * Get container classes for pagination
  */
+export function resolvePaginationAlign(
+  align: PaginationAlign = 'center'
+): 'start' | 'center' | 'end' {
+  if (align === 'left' || align === 'start') return 'start'
+  if (align === 'right' || align === 'end') return 'end'
+  return 'center'
+}
+
 export function getPaginationContainerClasses(
   align: PaginationAlign = 'center',
   className?: string
 ): string {
   const alignClasses = {
-    left: 'justify-start',
+    start: 'justify-start',
     center: 'justify-center',
-    right: 'justify-end'
+    end: 'justify-end'
   }
 
-  return classNames('flex items-center gap-1', alignClasses[align], className)
+  return classNames(
+    'flex items-center gap-1 motion-reduce:transition-none',
+    alignClasses[resolvePaginationAlign(align)],
+    className
+  )
 }
 
 /**
@@ -282,7 +312,7 @@ export function getPaginationButtonBaseClasses(
   return classNames(
     'inline-flex items-center justify-center',
     'rounded-[var(--tiger-radius-md,0.5rem)] border',
-    'transition-colors duration-200',
+    'transition-colors duration-200 motion-reduce:transition-none',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40',
     'disabled:cursor-not-allowed disabled:opacity-50',
     colorClasses,
@@ -334,7 +364,7 @@ export function getQuickJumperInputClasses(size: PaginationSize = 'medium'): str
     'px-2 py-1',
     'rounded border border-[var(--tiger-border,#d1d5db)]',
     'text-center',
-    'transition-colors duration-200',
+    'transition-colors duration-200 motion-reduce:transition-none',
     'hover:border-[var(--tiger-primary,#2563eb)]',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
@@ -357,7 +387,7 @@ export function getPageSizeSelectorClasses(size: PaginationSize = 'medium'): str
     'px-2 py-1',
     'rounded border border-[var(--tiger-border,#d1d5db)]',
     'bg-[var(--tiger-surface,#ffffff)]',
-    'transition-colors duration-200',
+    'transition-colors duration-200 motion-reduce:transition-none',
     'hover:border-[var(--tiger-primary,#2563eb)]',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
@@ -381,7 +411,34 @@ export function getSizeTextClasses(size: PaginationSize = 'medium'): string {
  * Get total text classes
  */
 export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
-  return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'mr-2', getSizeTextClasses(size))
+  return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'me-2', getSizeTextClasses(size))
+}
+
+export function getQuickJumperPrefixClasses(size: PaginationSize = 'medium'): string {
+  return classNames('ms-2', getSizeTextClasses(size))
+}
+
+export function resolvePageSizeOptions(
+  options: Array<number | { value: number; label?: string }>,
+  currentPageSize: number,
+  itemsPerPageText: string
+): Array<{ value: number; label: string }> {
+  const normalized = options.map((option) => {
+    if (typeof option === 'number') {
+      return { value: option, label: `${option} ${itemsPerPageText}` }
+    }
+    return {
+      value: option.value,
+      label: option.label ?? `${option.value} ${itemsPerPageText}`
+    }
+  })
+  if (!normalized.some((option) => option.value === currentPageSize)) {
+    normalized.unshift({
+      value: currentPageSize,
+      label: `${currentPageSize} ${itemsPerPageText}`
+    })
+  }
+  return normalized
 }
 
 /**

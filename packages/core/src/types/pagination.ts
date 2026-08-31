@@ -10,9 +10,9 @@ import type { TigerLocaleInput, TigerLocalePagination } from './locale'
 export type PaginationSize = 'small' | 'medium' | 'large'
 
 /**
- * Pagination alignment type
+ * Pagination alignment. `left`/`right` are aliases of logical `start`/`end`.
  */
-export type PaginationAlign = 'left' | 'center' | 'right'
+export type PaginationAlign = 'start' | 'center' | 'end' | 'left' | 'right'
 
 /**
  * Page size option type
@@ -120,7 +120,7 @@ export interface PaginationProps {
 
   /**
    * Custom text renderer for the simple-mode page indicator.
-   * Defaults to `{current} / {totalPages}` when not provided.
+   * Defaults to the locale `pageIndicatorText` template.
    * @param current - Current page number
    * @param totalPages - Total number of pages
    */
@@ -176,34 +176,4 @@ export interface PaginationProps {
    * Takes precedence over `locale` and global ConfigProvider text.
    */
   labels?: Partial<TigerLocalePagination>
-}
-
-/**
- * Page change event info
- */
-export interface PageChangeInfo {
-  /**
-   * New current page
-   */
-  current: number
-
-  /**
-   * Current page size
-   */
-  pageSize: number
-}
-
-/**
- * Page size change event info
- */
-export interface PageSizeChangeInfo {
-  /**
-   * Current page (might be adjusted)
-   */
-  current: number
-
-  /**
-   * New page size
-   */
-  pageSize: number
 }

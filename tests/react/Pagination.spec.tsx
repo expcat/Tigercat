@@ -10,7 +10,8 @@ import { Pagination } from '@expcat/tigercat-react/Pagination'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Pagination', () => {
   afterEach(() => {
@@ -21,7 +22,7 @@ describe('Pagination', () => {
     const { container } = render(<Pagination total={100} />)
     const nav = container.querySelector('nav')
     expect(nav).toBeInTheDocument()
-    expect(nav).toHaveAttribute('role', 'navigation')
+    expect(nav).not.toHaveAttribute('role')
     expect(nav).toHaveAttribute('aria-label', 'Pagination')
   })
 
@@ -33,13 +34,40 @@ describe('Pagination', () => {
   it('calls onChange when a page button is clicked', async () => {
     const onChange = vi.fn()
     render(<Pagination total={100} pageSize={10} onChange={onChange} />)
-    await fireEvent.click(screen.getByLabelText('Page 2'))
+    await fireEvent.click(screen.getByRole('button', { name: '2' }))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
   it('sets aria-current on the active page', () => {
     render(<Pagination total={100} pageSize={10} current={3} />)
-    expect(screen.getByLabelText('Page 3')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('does not emit NaN when current is not a finite page', async () => {
+    const onChange = vi.fn()
+    render(<Pagination total={100} pageSize={10} current={Number.NaN} onChange={onChange} />)
+    await fireEvent.click(screen.getByLabelText('Previous page'))
+    expect(onChange).not.toHaveBeenCalled()
+    await fireEvent.click(screen.getByRole('button', { name: '2' }))
+    expect(onChange).toHaveBeenCalledWith(2, 10)
+  })
+
+  it('uses locale page indicator text in simple mode', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <Pagination simple total={100} pageSize={10} current={1} />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('第 1 页，共 10 页')).toBeInTheDocument()
+  })
+
+  it('names the landmark from an official zhTW locale object', () => {
+    render(
+      <ConfigProvider locale={zhTW}>
+        <Pagination total={100} />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('navigation', { name: '分頁' })).toBeInTheDocument()
   })
 
   it('disables prev/next on boundaries', () => {
@@ -131,7 +159,7 @@ describe('Pagination', () => {
       />
     )
 
-    await fireEvent.change(screen.getByLabelText('/ page'), {
+    await fireEvent.change(screen.getByLabelText('Items per page'), {
       target: { value: '50' }
     })
 
@@ -186,8 +214,10 @@ describe('Pagination', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Pagination />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(
+        <Pagination total={80} pageSize={10} current={2} showQuickJumper showSizeChanger />
+      )
+      await expectNoA11yViolations(container)
     })
   })
   describe('Edge Cases', () => {

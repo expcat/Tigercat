@@ -6,6 +6,7 @@ import {
   onBeforeUnmount,
   PropType,
   h,
+  useId,
   type VNodeChild
 } from 'vue'
 import {
@@ -17,6 +18,13 @@ import {
   validateCurrentPage,
   getPageNumbers,
   formatPaginationTotal,
+  formatPaginationPageIndicator,
+  normalizePaginationTotal,
+  normalizePaginationPageSize,
+  resolvePageSizeOptions,
+  getQuickJumperPrefixClasses,
+  chevronLeftSolidIcon20PathD,
+  icon20ViewBox,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
   getPaginationEllipsisClasses,
@@ -26,7 +34,6 @@ import {
   getSizeTextClasses,
   getPaginationLabels,
   getLocaleDirection,
-  formatPageAriaLabel,
   createPaginationIdleValidationScheduler,
   getImmediateTigerLocale,
   getPaginationJumperPage,
@@ -43,6 +50,8 @@ import {
   type TigerLocalePagination
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+
+export type PaginationProps = VuePaginationProps
 
 export interface VuePaginationProps {
   current?: number
@@ -299,6 +308,7 @@ export const Pagination = defineComponent({
     const labels = computed(() => getPaginationLabels(mergedLocale.value, props.labels))
     const localeCode = computed(() => mergedLocale.value?.locale)
     const isRtl = computed(() => getLocaleDirection(mergedLocale.value) === 'rtl')
+    const jumperId = `tiger-pagination-jumper-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
 
     // Internal state for uncontrolled mode
     const internalCurrent = ref<number>(props.defaultCurrent)
@@ -327,25 +337,23 @@ export const Pagination = defineComponent({
       return props.current !== undefined ? props.current : internalCurrent.value
     })
 
-    // Computed page size (controlled or uncontrolled)
-    const currentPageSize = computed(() => {
-      return props.pageSize !== undefined ? props.pageSize : internalPageSize.value
-    })
+    const currentPageSize = computed(() =>
+      normalizePaginationPageSize(
+        props.pageSize !== undefined ? props.pageSize : internalPageSize.value
+      )
+    )
 
-    // Calculate total pages
-    const totalPages = computed(() => {
-      return getTotalPages(props.total, currentPageSize.value)
-    })
+    const itemTotal = computed(() => normalizePaginationTotal(props.total))
 
-    // Validate and adjust current page
-    const validatedCurrentPage = computed(() => {
-      return validateCurrentPage(currentPage.value, totalPages.value)
-    })
+    const totalPages = computed(() => getTotalPages(itemTotal.value, currentPageSize.value))
 
-    // Calculate current page range
-    const pageRange = computed(() => {
-      return getPageRange(validatedCurrentPage.value, currentPageSize.value, props.total)
-    })
+    const validatedCurrentPage = computed(() =>
+      validateCurrentPage(currentPage.value, totalPages.value)
+    )
+
+    const pageRange = computed(() =>
+      getPageRange(validatedCurrentPage.value, currentPageSize.value, itemTotal.value)
+    )
 
     // Check if should hide on single page
     const shouldHide = computed(() => {
@@ -355,24 +363,22 @@ export const Pagination = defineComponent({
     // Handle page change
     const handlePageChange = (page: number) => {
       if (props.disabled) return
-      if (page === validatedCurrentPage.value) return
-      if (page < 1 || page > totalPages.value) return
+      const next = validateCurrentPage(page, totalPages.value)
+      if (next === validatedCurrentPage.value) return
 
-      // Update internal state if uncontrolled
       if (props.current === undefined) {
-        internalCurrent.value = page
+        internalCurrent.value = next
       }
 
-      // Emit events
-      emit('update:current', page)
-      emit('change', page, currentPageSize.value)
+      emit('update:current', next)
+      emit('change', next, currentPageSize.value)
     }
 
     // Handle page size change
     const handlePageSizeChange = (newPageSize: number) => {
       if (props.disabled) return
 
-      const newTotalPages = getTotalPages(props.total, newPageSize)
+      const newTotalPages = getTotalPages(itemTotal.value, normalizePaginationPageSize(newPageSize))
       let newPage = validatedCurrentPage.value
 
       // Adjust current page if it exceeds new total pages
@@ -436,19 +442,13 @@ export const Pagination = defineComponent({
 
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
-    const normalizedPageSizeOptions = computed(() => {
-      return (props.pageSizeOptions || []).map((option) => {
-        if (typeof option === 'number') {
-          return {
-            value: option,
-            label: `${option} ${labels.value.itemsPerPageText}`
-          }
-        }
-
-        const label = option.label ?? `${option.value} ${labels.value.itemsPerPageText}`
-        return { value: option.value, label }
-      })
-    })
+    const normalizedPageSizeOptions = computed(() =>
+      resolvePageSizeOptions(
+        props.pageSizeOptions || [],
+        currentPageSize.value,
+        labels.value.itemsPerPageText
+      )
+    )
 
     return () => {
       if (shouldHide.value) {
@@ -469,7 +469,11 @@ export const Pagination = defineComponent({
           ((value: number, range: [number, number]) =>
             formatPaginationTotal(labels.value.totalText, value, range, localeCode.value))
         elements.push(
-          h('span', { class: getTotalTextClasses(size) }, totalTextFn(props.total, pageRange.value))
+          h(
+            'span',
+            { class: getTotalTextClasses(size) },
+            totalTextFn(itemTotal.value, pageRange.value)
+          )
         )
       }
 
@@ -484,24 +488,36 @@ export const Pagination = defineComponent({
             onClick: () => handlePageChange(page - 1),
             'aria-label': labels.value.prevPageAriaLabel
           },
-          isRtl.value ? '›' : '‹'
+          h(
+            'svg',
+            {
+              class: 'h-4 w-4 rtl:-scale-x-100',
+              viewBox: icon20ViewBox,
+              fill: 'currentColor',
+              'aria-hidden': 'true'
+            },
+            h('path', {
+              'fill-rule': 'evenodd',
+              d: chevronLeftSolidIcon20PathD,
+              'clip-rule': 'evenodd'
+            })
+          )
         )
       )
 
       if (props.simple) {
-        // Simple mode: current / total
         const indicatorText = props.pageIndicatorText
           ? props.pageIndicatorText(page, pages)
-          : `${page} / ${pages}`
+          : formatPaginationPageIndicator(
+              labels.value.pageIndicatorText,
+              page,
+              pages,
+              localeCode.value
+            )
         elements.push(
-          h(
-            'span',
-            { class: classNames('mx-2', getSizeTextClasses(size)), 'aria-label': indicatorText },
-            indicatorText
-          )
+          h('span', { class: classNames('mx-2', getSizeTextClasses(size)) }, indicatorText)
         )
       } else {
-        // Full mode: page number buttons
         getPageNumbers(page, pages, props.showLessItems).forEach((pageNum) => {
           if (pageNum === '...') {
             elements.push(
@@ -516,12 +532,7 @@ export const Pagination = defineComponent({
                   type: 'button',
                   class: getPaginationButtonBaseClasses(size, isActive),
                   disabled: props.disabled,
-                  onClick: () => handlePageChange(pageNum as number),
-                  'aria-label': formatPageAriaLabel(
-                    labels.value.pageAriaLabel,
-                    pageNum as number,
-                    localeCode.value
-                  ),
+                  onClick: () => handlePageChange(pageNum),
                   'aria-current': isActive ? 'page' : undefined
                 },
                 String(pageNum)
@@ -542,7 +553,20 @@ export const Pagination = defineComponent({
             onClick: () => handlePageChange(page + 1),
             'aria-label': labels.value.nextPageAriaLabel
           },
-          isRtl.value ? '‹' : '›'
+          h(
+            'svg',
+            {
+              class: 'h-4 w-4 -scale-x-100 rtl:scale-x-100',
+              viewBox: icon20ViewBox,
+              fill: 'currentColor',
+              'aria-hidden': 'true'
+            },
+            h('path', {
+              'fill-rule': 'evenodd',
+              d: chevronLeftSolidIcon20PathD,
+              'clip-rule': 'evenodd'
+            })
+          )
         )
       )
 
@@ -558,7 +582,7 @@ export const Pagination = defineComponent({
               onChange: (e: Event) => {
                 handlePageSizeChange(parseInt((e.target as HTMLSelectElement).value, 10))
               },
-              'aria-label': labels.value.itemsPerPageText
+              'aria-label': labels.value.pageSizeAriaLabel
             },
             normalizedPageSizeOptions.value.map((sizeOption) =>
               h('option', { value: sizeOption.value, key: sizeOption.value }, sizeOption.label)
@@ -570,10 +594,18 @@ export const Pagination = defineComponent({
       // Quick jumper
       if (props.showQuickJumper) {
         const sizeText = getSizeTextClasses(size)
-        elements.push(h('span', { class: classNames('ml-2', sizeText) }, labels.value.jumpToText))
+        elements.push(
+          h(
+            'label',
+            { class: getQuickJumperPrefixClasses(size), for: jumperId },
+            labels.value.jumpToText
+          )
+        )
         elements.push(
           h('input', {
-            type: 'number',
+            id: jumperId,
+            type: 'text',
+            inputmode: 'numeric',
             class: classNames(getQuickJumperInputClasses(size), 'mx-2'),
             disabled: props.disabled,
             value: quickJumperValue.value,
@@ -581,9 +613,7 @@ export const Pagination = defineComponent({
               handleQuickJumperInput((e.target as HTMLInputElement).value)
             },
             onKeydown: handleQuickJumperKeypress,
-            min: 1,
-            max: pages,
-            'aria-label': labels.value.jumpToText
+            onBlur: handleQuickJumperSubmit
           })
         )
         elements.push(h('span', { class: sizeText }, labels.value.pageText))
@@ -606,8 +636,9 @@ export const Pagination = defineComponent({
           ...restAttrs,
           class: containerClasses.value,
           style: mergedStyle.value,
-          role: 'navigation',
-          'aria-label': typeof ariaLabelAttr === 'string' ? ariaLabelAttr : 'Pagination'
+          dir: isRtl.value ? 'rtl' : 'ltr',
+          'aria-label':
+            typeof ariaLabelAttr === 'string' ? ariaLabelAttr : labels.value.paginationAriaLabel
         },
         elements
       )

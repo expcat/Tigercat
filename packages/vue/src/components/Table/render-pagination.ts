@@ -1,6 +1,5 @@
 import { h, type VNodeChild } from 'vue'
 import {
-  formatPaginationPageIndicator,
   formatPaginationTotal,
   getBuiltInPaginationContainerClasses,
   getPaginationLabels,
@@ -43,10 +42,7 @@ export function renderPagination(
     ((value: number, range: [number, number]) =>
       formatPaginationTotal(labels.totalText, value, range, localeCode))
 
-  const pageIndicatorText =
-    paginationConfig.pageIndicatorText ??
-    ((current: number, pages: number) =>
-      formatPaginationPageIndicator(labels.pageIndicatorText, current, pages, localeCode))
+  const pageIndicatorText = paginationConfig.pageIndicatorText
 
   // When i18n is disabled the Pagination component must not pick up the
   // ConfigProvider locale, so lock every label to the resolved defaults.

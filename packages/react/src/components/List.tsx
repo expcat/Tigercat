@@ -30,7 +30,6 @@ import {
   getPaginationLabels,
   getListLabels,
   formatPaginationTotal,
-  formatPaginationPageIndicator,
   observeElementSize,
   devWarn,
   type ComponentSize,
@@ -352,9 +351,6 @@ function ListInner<T extends ListItem>(
       paginationConfig.totalText ??
       ((value: number, range: [number, number]) =>
         formatPaginationTotal(paginationLabels.totalText, value, range, localeCode))
-    const pageIndicatorText = (current: number, pages: number) =>
-      formatPaginationPageIndicator(paginationLabels.pageIndicatorText, current, pages, localeCode)
-
     return (
       <div className={getBuiltInPaginationContainerClasses()}>
         <Pagination
@@ -368,7 +364,7 @@ function ListInner<T extends ListItem>(
           showSizeChanger={paginationConfig.showSizeChanger !== false}
           showTotal={paginationConfig.showTotal !== false}
           totalText={totalText}
-          pageIndicatorText={pageIndicatorText}
+          pageIndicatorText={paginationConfig.pageIndicatorText}
           pageSizeOptions={paginationConfig.pageSizeOptions || [10, 20, 50, 100]}
           locale={mergedLocale}
           onChange={(page) => handlePageChange(page)}

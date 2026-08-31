@@ -8,7 +8,13 @@ import {
   getTimePickerOptionAriaLabel,
   getPaginationJumperPage,
   getValidatedPaginationJumperValue,
-  resolveTigerLocale
+  resolveTigerLocale,
+  getTotalPages,
+  getPageRange,
+  validateCurrentPage,
+  getPageNumbers,
+  normalizePaginationTotal,
+  normalizePaginationPageSize
 } from '@expcat/tigercat-core'
 
 describe('pagination-utils', () => {
@@ -69,6 +75,29 @@ describe('pagination-utils', () => {
   it('defaultTotalText uses English Total N items, not Chinese', () => {
     expect(defaultTotalText(240, [1, 20])).toBe('Total 240 items')
     expect(defaultTotalText(240, [1, 20])).not.toBe('共 240 条')
+  })
+
+  it('clamps NaN, fractions, and out-of-range pages to finite integers', () => {
+    expect(normalizePaginationTotal(-50)).toBe(0)
+    expect(normalizePaginationPageSize(NaN)).toBe(10)
+    expect(normalizePaginationPageSize(0)).toBe(10)
+    expect(getTotalPages(100, 10)).toBe(10)
+    expect(getTotalPages(NaN, 10)).toBe(0)
+    expect(getTotalPages(100, 0)).toBe(10)
+    expect(validateCurrentPage(NaN, 10)).toBe(1)
+    expect(validateCurrentPage(1.9, 10)).toBe(1)
+    expect(validateCurrentPage(99, 10)).toBe(10)
+    expect(validateCurrentPage(Infinity, 10)).toBe(10)
+    expect(getPageRange(1, 10, 25)).toEqual([1, 10])
+  })
+
+  it('fills a one-page gap instead of inserting ellipsis', () => {
+    expect(getPageNumbers(5, 5)).toEqual([1, 2, 3, 4, 5])
+    expect(getPageNumbers(1, 1)).toEqual([1])
+    expect(getPageNumbers(1, 2)).toEqual([1, 2])
+    expect(getPageNumbers(NaN, 10)[0]).toBe(1)
+    expect(getPageNumbers(1, 0)).toEqual([])
+    expect(getPageNumbers(5, 10, true)).toEqual([1, '...', 4, 5, 6, '...', 10])
   })
 
   it('resolves TimePicker labels from locale objects, not language codes', () => {
