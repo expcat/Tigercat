@@ -1,17 +1,26 @@
 import { Carousel } from '@expcat/tigercat-react/Carousel'
-
-const slides = ['Slide 1 · 产品概览', 'Slide 2 · 关键能力', 'Slide 3 · 立即开始']
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 
 export default function App() {
   return (
-    <Carousel autoplay autoplaySpeed={4000} arrows effect="fade" pauseOnHover>
-      {slides.map((slide, index) => (
-        <div
-          key={slide}
-          className="flex h-48 items-center justify-center rounded-lg bg-blue-600 text-xl font-semibold text-white">
-          {slide}
+    <ConfigProvider locale={zhTW}>
+      <Carousel>
+        <div className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg bg-blue-600 p-6 text-white">
+          <p>預設滾動 · 第一頁</p>
+          <button type="button" className="rounded bg-white px-3 py-1 text-blue-700">
+            僅當前頁可 Tab
+          </button>
         </div>
-      ))}
-    </Carousel>
+        <div className="flex min-h-40 items-center justify-center rounded-lg bg-blue-700 p-6 text-white">
+          <a href="#carousel-next" className="underline">
+            第二頁連結
+          </a>
+        </div>
+        <div className="flex min-h-28 items-center justify-center rounded-lg bg-blue-800 p-6 text-lg text-white">
+          第三頁
+        </div>
+      </Carousel>
+    </ConfigProvider>
   )
 }

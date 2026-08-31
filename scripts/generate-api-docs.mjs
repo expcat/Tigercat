@@ -120,6 +120,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。'
   },
+  Carousel: {
+    notes:
+      '子节点才是 slides。`infinite` 在 scroll 下走首尾 clone，不会整段倒带。无名不是 landmark。非当前页 `inert`。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。'
+  },
   Image: {
     notes:
       '默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。'

@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Carousel 默认不再是名为 “Image carousel” / “图片轮播” 的 `region`。需要 landmark 时传 `aria-label` / `aria-labelledby` 或 `labels.ariaLabel`。`aria-roledescription` 走 locale。圆点改为 `role="tab"`，测请用 `getByRole('tab')` / `aria-selected`，不要再找 `tablist button` + `aria-current`。手势是 `pointer*`，不再听 `touch*`。`infinite` 循环不再把轨道从末张滑回开头。Vue 类型名是 `CarouselProps` / `CarouselMethods`（`VueCarouselProps` 仍是别名）。
+
 List `bordered` 改为外框布尔（默认 `false`），项间线只走 `split`（默认 `true`）。删除 `'none' | 'divided' | 'bordered'` 和 `ListBorderStyle`。`bordered="divided"` 改成不传或 `split`；`bordered="none"` 改成 `bordered={false}`。`pagination.current` / `pageSize` 只要传入就是受控。拖拽下标是数据源下标，行上不再 HTML5 `draggable`（手柄 + `useDrag`）。loading 不再卸 listitem。
 
 Descriptions / Masonry / List 网格的断点对象跟**容器宽**和 `--tiger-breakpoint-*`（`xs`…`2xl`）。删除 `xxl` / `xxxl`。竖向 Descriptions 也按 `column`/`span` 排格。

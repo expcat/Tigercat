@@ -1,16 +1,26 @@
 <script setup lang="ts">
 import { Carousel } from '@expcat/tigercat-vue/Carousel'
-
-const slides = ['Slide 1 · 产品概览', 'Slide 2 · 关键能力', 'Slide 3 · 立即开始']
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 </script>
 
 <template>
-  <Carousel autoplay :autoplay-speed="4000" arrows effect="fade" pause-on-hover>
-    <div
-      v-for="slide in slides"
-      :key="slide"
-      class="flex h-48 items-center justify-center rounded-lg bg-blue-600 text-xl font-semibold text-white">
-      {{ slide }}
-    </div>
-  </Carousel>
+  <ConfigProvider :locale="zhTW">
+    <Carousel>
+      <div
+        class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg bg-blue-600 p-6 text-white">
+        <p>預設滾動 · 第一頁</p>
+        <button type="button" class="rounded bg-white px-3 py-1 text-blue-700">
+          僅當前頁可 Tab
+        </button>
+      </div>
+      <div class="flex min-h-40 items-center justify-center rounded-lg bg-blue-700 p-6 text-white">
+        <a href="#carousel-next" class="underline">第二頁連結</a>
+      </div>
+      <div
+        class="flex min-h-28 items-center justify-center rounded-lg bg-blue-800 p-6 text-lg text-white">
+        第三頁
+      </div>
+    </Carousel>
+  </ConfigProvider>
 </template>

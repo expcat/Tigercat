@@ -1,7 +1,7 @@
 {
   "id": "carousel-01",
-  "title": "代表配置",
-  "description": "一个轮播图组合展示自动播放、箭头与渐变切换。",
+  "title": "默认滚动",
+  "description": "不传 effect / arrows / autoplay。圆点是真正的 tab；非当前页 inert，不能 Tab 到页内按钮。文案走官方 zh-TW。",
   "entry": "App.tsx",
   "order": 1
 }

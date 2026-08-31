@@ -1,7 +1,7 @@
 {
   "id": "carousel-02",
-  "title": "编程控制",
-  "description": "通过组件引用控制上一页、下一页与指定页。",
+  "title": "渐变、自动播放与编程控制",
+  "description": "fade 三张高度不同；autoplay 自带可聚焦暂停。第二块 infinite={false}，末张 next 停在原地。",
   "entry": "App.vue",
   "order": 2
 }

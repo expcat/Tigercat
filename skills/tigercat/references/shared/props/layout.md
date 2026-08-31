@@ -40,13 +40,20 @@ Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根
 
 ## Carousel
 
-`packages/core/src/types/carousel.ts` · `CarouselProps` · 3/17 props
+`packages/core/src/types/carousel.ts` · `CarouselProps` · 8/17 props
 
-| Prop             | Type                   | Default | Notes                                                   |
-| ---------------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `locale?`        | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
-| `autoplay?`      | `boolean`              | `false` | Whether to enable automatic slide switching             |
-| `autoplaySpeed?` | `number`               | `3000`  | Time interval for auto-play in milliseconds             |
+Note: 子节点才是 slides。`infinite` 在 scroll 下走首尾 clone，不会整段倒带。无名不是 landmark。非当前页 `inert`。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。
+
+| Prop             | Type             | Default    | Notes                                       |
+| ---------------- | ---------------- | ---------- | ------------------------------------------- |
+| `autoplay?`      | `boolean`        | `false`    | Whether to enable automatic slide switching |
+| `autoplaySpeed?` | `number`         | `3000`     | Time interval for auto-play in milliseconds |
+| `dots?`          | `boolean`        | `true`     | Whether to show navigation dots             |
+| `arrows?`        | `boolean`        | `false`    | Whether to show prev/next arrows            |
+| `effect?`        | `CarouselEffect` | `'scroll'` | Transition effect type                      |
+| `infinite?`      | `boolean`        | `true`     | Whether to enable infinite loop             |
+| `currentIndex?`  | `number`         | `-`        | Controlled current slide index (0-based)    |
+| `pauseOnHover?`  | `boolean`        | `true`     | Whether to pause autoplay on hover          |
 
 ## Col
 

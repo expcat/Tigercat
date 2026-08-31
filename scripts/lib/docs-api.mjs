@@ -144,6 +144,19 @@ export const COMPONENT_PROP_PRIORITY = {
     'footerText?',
     'showPageBreaks?'
   ],
+  Carousel: [
+    'autoplay?',
+    'autoplaySpeed?',
+    'dots?',
+    'arrows?',
+    'effect?',
+    'infinite?',
+    'currentIndex?',
+    'pauseOnHover?',
+    'pauseOnFocus?',
+    'dotPosition?',
+    'speed?'
+  ],
   Button: [
     'variant?',
     'size?',
@@ -299,7 +312,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Descriptions: '<Descriptions :items="items" />',
     ScrollArea: '<ScrollArea max-height="200" aria-label="Log"><slot /></ScrollArea>',
     Masonry: '<Masonry :columns="3"><slot /></Masonry>',
-    PrintLayout: '<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>'
+    PrintLayout:
+      '<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>',
+    Carousel: '<Carousel><div>One</div><div>Two</div></Carousel>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -316,7 +331,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Descriptions: '<Descriptions items={items} />',
     ScrollArea: '<ScrollArea maxHeight={200} ariaLabel="Log">{children}</ScrollArea>',
     Masonry: '<Masonry columns={3}>{children}</Masonry>',
-    PrintLayout: '<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>'
+    PrintLayout:
+      '<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>',
+    Carousel: '<Carousel><div>One</div><div>Two</div></Carousel>'
   }
 }
 
