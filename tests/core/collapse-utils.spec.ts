@@ -2,6 +2,10 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   createCollapseTransitionController,
   getInitialCollapseContentStyle,
+  getNextAccordionHeaderIndex,
+  isPanelActive,
+  normalizeActiveKeys,
+  togglePanelKey,
   type CollapseTransitionElement
 } from '@expcat/tigercat-core'
 
@@ -54,6 +58,33 @@ function createTransitionElement(scrollHeight = 120) {
     }
   }
 }
+
+describe('collapse-utils keys', () => {
+  it('treats numeric and string keys as the same panel', () => {
+    expect(isPanelActive(1, ['1'])).toBe(true)
+    expect(isPanelActive('1', [1])).toBe(true)
+    expect(togglePanelKey(1, ['1'], false)).toEqual([])
+    expect(togglePanelKey('1', [1], true)).toEqual([])
+  })
+
+  it('accordion keeps the last key and empty stays []', () => {
+    expect(normalizeActiveKeys(['1', '2'], { accordion: true })).toEqual(['2'])
+    expect(normalizeActiveKeys([], { accordion: true })).toEqual([])
+    expect(togglePanelKey('a', ['a'], true)).toEqual([])
+  })
+
+  it('wraps accordion header focus across enabled panels', () => {
+    const headers = [
+      { key: 'a', el: { focus: vi.fn() }, disabled: false },
+      { key: 'b', el: { focus: vi.fn() }, disabled: true },
+      { key: 'c', el: { focus: vi.fn() }, disabled: false }
+    ]
+    expect(getNextAccordionHeaderIndex(headers, 'a', 'next')).toBe(2)
+    expect(getNextAccordionHeaderIndex(headers, 'c', 'next')).toBe(0)
+    expect(getNextAccordionHeaderIndex(headers, 'c', 'prev')).toBe(0)
+    expect(getNextAccordionHeaderIndex(headers, 'a', 'last')).toBe(2)
+  })
+})
 
 describe('collapse-utils transition controller', () => {
   it('returns initial content styles for expanded and collapsed panels', () => {
@@ -120,6 +151,23 @@ describe('collapse-utils transition controller', () => {
 
     scheduler.flush(2)
     expect(element.style.maxHeight).toBe('0px')
+  })
+
+  it('skips frames when reduced motion is preferred', () => {
+    const scheduler = createFrameScheduler()
+    const { element } = createTransitionElement(80)
+    const controller = createCollapseTransitionController(element, {
+      expanded: false,
+      requestAnimationFrame: scheduler.requestAnimationFrame,
+      cancelAnimationFrame: scheduler.cancelAnimationFrame,
+      prefersReducedMotion: () => true
+    })
+
+    controller.update(true)
+
+    expect(scheduler.requestAnimationFrame).not.toHaveBeenCalled()
+    expect(element.style.maxHeight).toBe('none')
+    expect(element.style.opacity).toBe('1')
   })
 
   it('removes the transition listener when disposed', () => {

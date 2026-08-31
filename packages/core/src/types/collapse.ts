@@ -20,7 +20,9 @@ export interface CollapseProps {
    */
   defaultActiveKey?: string | number | (string | number)[]
   /**
-   * Accordion mode - only one panel can be expanded at a time
+   * Accordion mode — only one panel can be expanded at a time.
+   * Extra keys in `activeKey` / `defaultActiveKey` are dropped (last wins).
+   * `onChange` / `update:activeKey` always emit an array (empty when none open).
    * @default false
    */
   accordion?: boolean
@@ -71,6 +73,10 @@ export interface CollapsePanelProps {
    * @default true
    */
   showArrow?: boolean
+  /**
+   * Extra content rendered beside the header button (not inside it).
+   */
+  extra?: unknown
   /**
    * Additional CSS classes
    */

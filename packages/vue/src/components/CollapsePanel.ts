@@ -1,26 +1,29 @@
 import {
-  defineComponent,
   computed,
-  inject,
-  PropType,
+  defineComponent,
   h,
-  ref,
-  onMounted,
+  inject,
   onBeforeUnmount,
-  watch
+  onMounted,
+  ref,
+  watch,
+  PropType
 } from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  collapseExtraClasses,
+  collapseHeaderRowClasses,
+  collapseHeaderTextClasses,
+  collapseKeyOf,
+  collapsePanelContentBaseClasses,
+  collapsePanelContentWrapperClasses,
+  createAriaId,
+  createCollapseTransitionController,
+  getCollapseIconClasses,
   getCollapsePanelClasses,
   getCollapsePanelHeaderClasses,
-  getCollapseIconClasses,
-  createCollapseTransitionController,
-  getInitialCollapseContentStyle,
-  collapseHeaderTextClasses,
-  collapsePanelContentWrapperClasses,
-  collapsePanelContentBaseClasses,
-  isPanelActive,
-  coerceClassValue
+  isPanelActive
 } from '@expcat/tigercat-core'
 import { CollapseContextKey, type CollapseContext } from './Collapse'
 
@@ -33,11 +36,14 @@ export interface VueCollapsePanelProps {
   style?: Record<string, string | number>
 }
 
+export type CollapsePanelProps = VueCollapsePanelProps
+
 export const CollapsePanel = defineComponent({
   name: 'TigerCollapsePanel',
+  inheritAttrs: false,
   props: {
     /**
-     * Unique key for the panel (required)
+     * Unique key for the panel (required). `1` and `"1"` match.
      */
     panelKey: {
       type: [String, Number] as PropType<string | number>,
@@ -51,7 +57,7 @@ export const CollapsePanel = defineComponent({
       default: undefined
     },
     /**
-     * Whether the panel is disabled
+     * Disabled headers stay in the tab order and expose `aria-disabled`.
      * @default false
      */
     disabled: {
@@ -82,23 +88,24 @@ export const CollapsePanel = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    // Inject collapse context
     const collapseContext = inject<CollapseContext>(CollapseContextKey)
 
     if (!collapseContext) {
       throw new Error('CollapsePanel must be used within a Collapse component')
     }
 
-    // Check if this panel is active
     const isActive = computed(() => {
       return isPanelActive(props.panelKey, collapseContext.activeKeys)
     })
 
     const contentRef = ref<HTMLElement>()
-    const initialContentStyle = getInitialCollapseContentStyle(isActive.value)
+    const headerRef = ref<HTMLButtonElement>()
+    const controllerReady = ref(false)
+    const initialActive = isActive.value
+    const headerId = createAriaId({ prefix: 'tiger-collapse-header' })
+    const contentId = createAriaId({ prefix: 'tiger-collapse-content' })
     let transitionController: ReturnType<typeof createCollapseTransitionController> | undefined
 
-    // Panel classes
     const panelClasses = computed(() => {
       return classNames(
         getCollapsePanelClasses(collapseContext.ghost, props.className),
@@ -106,46 +113,85 @@ export const CollapsePanel = defineComponent({
       )
     })
 
-    // Header classes
     const headerClasses = computed(() => {
       return getCollapsePanelHeaderClasses(isActive.value, props.disabled)
     })
 
-    // Icon classes
     const iconClasses = computed(() => {
       return getCollapseIconClasses(isActive.value, collapseContext.expandIconPosition)
     })
 
-    // Handle header click
     const handleClick = () => {
       if (!props.disabled) {
         collapseContext.handlePanelClick(props.panelKey)
       }
     }
 
-    const handleExtraClick = (event: Event) => {
-      event.stopPropagation()
-    }
-
-    // Handle keyboard navigation
     const handleKeydown = (event: KeyboardEvent) => {
       if (props.disabled) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+        }
         return
       }
 
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         collapseContext.handlePanelClick(props.panelKey)
+        return
       }
+
+      if (!collapseContext.accordion) return
+
+      const action =
+        event.key === 'ArrowDown'
+          ? 'next'
+          : event.key === 'ArrowUp'
+            ? 'prev'
+            : event.key === 'Home'
+              ? 'first'
+              : event.key === 'End'
+                ? 'last'
+                : null
+
+      if (!action) return
+      event.preventDefault()
+      collapseContext.moveHeaderFocus(collapseKeyOf(props.panelKey), action)
     }
 
     onMounted(() => {
-      if (!contentRef.value) return
+      if (contentRef.value) {
+        transitionController = createCollapseTransitionController(contentRef.value, {
+          expanded: initialActive
+        })
+        controllerReady.value = true
+      }
 
-      transitionController = createCollapseTransitionController(contentRef.value, {
-        expanded: isActive.value
+      collapseContext.registerHeader({
+        key: collapseKeyOf(props.panelKey),
+        el: {
+          focus: () => {
+            headerRef.value?.focus()
+          }
+        },
+        disabled: props.disabled
       })
     })
+
+    watch(
+      () => props.disabled,
+      (disabled) => {
+        collapseContext.registerHeader({
+          key: collapseKeyOf(props.panelKey),
+          el: {
+            focus: () => {
+              headerRef.value?.focus()
+            }
+          },
+          disabled
+        })
+      }
+    )
 
     watch(
       isActive,
@@ -158,13 +204,13 @@ export const CollapsePanel = defineComponent({
     onBeforeUnmount(() => {
       transitionController?.dispose()
       transitionController = undefined
+      collapseContext.unregisterHeader(collapseKeyOf(props.panelKey))
     })
 
     return () => {
       const headerSlot = slots.header?.()
       const extraSlot = slots.extra?.()
 
-      // Arrow icon SVG
       const arrowIcon = h(
         'svg',
         {
@@ -173,10 +219,11 @@ export const CollapsePanel = defineComponent({
           height: '16',
           viewBox: '0 0 16 16',
           fill: 'none',
-          xmlns: 'http://www.w3.org/2000/svg'
+          xmlns: 'http://www.w3.org/2000/svg',
+          'aria-hidden': 'true'
         },
         h('path', {
-          d: 'M6 12L10 8L6 4',
+          d: 'M4 6L8 10L12 6',
           stroke: 'currentColor',
           'stroke-width': '2',
           'stroke-linecap': 'round',
@@ -184,15 +231,12 @@ export const CollapsePanel = defineComponent({
         })
       )
 
-      // Header content
       const headerContent = []
 
-      // Add arrow icon at start if enabled
       if (props.showArrow && collapseContext.expandIconPosition === 'start') {
         headerContent.push(arrowIcon)
       }
 
-      // Add header text or slot
       headerContent.push(
         h(
           'span',
@@ -203,48 +247,45 @@ export const CollapsePanel = defineComponent({
         )
       )
 
-      // Extra sits inside role="button"; stop click from toggling the panel
-      if (extraSlot) {
-        headerContent.push(
-          h(
-            'span',
-            {
-              class: 'ml-auto',
-              onClick: handleExtraClick
-            },
-            extraSlot
-          )
-        )
-      }
-
-      // Add arrow icon at end if enabled
       if (props.showArrow && collapseContext.expandIconPosition === 'end') {
         headerContent.push(arrowIcon)
       }
 
-      // Panel header
-      const header = h(
-        'div',
+      const headerButton = h(
+        'button',
         {
+          ref: headerRef,
+          type: 'button',
+          id: headerId,
           class: headerClasses.value,
-          role: 'button',
-          tabindex: props.disabled ? -1 : 0,
           'aria-expanded': isActive.value,
-          'aria-disabled': props.disabled,
+          'aria-controls': contentId,
+          'aria-disabled': props.disabled || undefined,
           onClick: handleClick,
           onKeydown: handleKeydown
         },
         headerContent
       )
 
-      // Collapsed wrapper is inert + aria-hidden; content stays mounted for the height transition
+      const extraNode = extraSlot
+        ? h('span', { class: collapseExtraClasses }, extraSlot)
+        : null
+
+      const initialClass = controllerReady.value
+        ? undefined
+        : initialActive
+          ? 'max-h-none opacity-100'
+          : 'max-h-0 opacity-0'
+
       const content = h(
         'div',
         {
           ref: contentRef,
+          id: contentId,
           'data-tiger-collapse-content': '',
-          class: collapsePanelContentWrapperClasses,
-          style: initialContentStyle,
+          class: classNames(collapsePanelContentWrapperClasses, initialClass),
+          role: isActive.value ? 'region' : undefined,
+          'aria-labelledby': isActive.value ? headerId : undefined,
           ...(isActive.value
             ? {}
             : {
@@ -263,14 +304,16 @@ export const CollapsePanel = defineComponent({
         ]
       )
 
-      // Complete panel
       return h(
         'div',
         {
           class: panelClasses.value,
           style: props.style
         },
-        [header, content]
+        [
+          h('div', { class: collapseHeaderRowClasses }, [headerButton, extraNode]),
+          content
+        ]
       )
     }
   }

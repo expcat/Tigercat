@@ -7,7 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Collapse } from '@expcat/tigercat-react/Collapse'
 import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 function createFrameScheduler() {
   let nextFrame = 1
@@ -69,7 +69,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const collapse = container.querySelector('[role="region"]')
+      const collapse = container.firstElementChild
       expect(collapse).toHaveClass('border')
     })
 
@@ -82,7 +82,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const collapse = container.querySelector('[role="region"]')
+      const collapse = container.firstElementChild
       expect(collapse).toHaveClass('border-0')
     })
 
@@ -95,7 +95,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const collapse = container.querySelector('[role="region"]')
+      const collapse = container.firstElementChild
       expect(collapse).toHaveClass('bg-transparent')
     })
   })
@@ -113,8 +113,8 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
-      const panel2Header = screen.getByText('Panel 2').closest('[role="button"]')
+      const panel1Header = screen.getByText('Panel 1').closest('button')
+      const panel2Header = screen.getByText('Panel 2').closest('button')
 
       expect(panel1Header).toHaveAttribute('aria-expanded', 'false')
       expect(panel2Header).toHaveAttribute('aria-expanded', 'true')
@@ -135,9 +135,9 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
-      const panel2Header = screen.getByText('Panel 2').closest('[role="button"]')
-      const panel3Header = screen.getByText('Panel 3').closest('[role="button"]')
+      const panel1Header = screen.getByText('Panel 1').closest('button')
+      const panel2Header = screen.getByText('Panel 2').closest('button')
+      const panel3Header = screen.getByText('Panel 3').closest('button')
 
       expect(panel1Header).toHaveAttribute('aria-expanded', 'true')
       expect(panel2Header).toHaveAttribute('aria-expanded', 'true')
@@ -158,7 +158,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel2Header = screen.getByText('Panel 2').closest('[role="button"]')
+      const panel2Header = screen.getByText('Panel 2').closest('button')
       expect(panel2Header).toHaveAttribute('aria-expanded', 'true')
     })
 
@@ -177,9 +177,9 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
-      const panel2Header = screen.getByText('Panel 2').closest('[role="button"]')
-      const panel3Header = screen.getByText('Panel 3').closest('[role="button"]')
+      const panel1Header = screen.getByText('Panel 1').closest('button')
+      const panel2Header = screen.getByText('Panel 2').closest('button')
+      const panel3Header = screen.getByText('Panel 3').closest('button')
 
       expect(panel1Header).toHaveAttribute('aria-expanded', 'true')
       expect(panel2Header).toHaveAttribute('aria-expanded', 'false')
@@ -200,8 +200,8 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
-      const panel2Header = screen.getByText('Panel 2').closest('[role="button"]')
+      const panel1Header = screen.getByText('Panel 1').closest('button')
+      const panel2Header = screen.getByText('Panel 2').closest('button')
 
       expect(panel1Header).toHaveAttribute('aria-expanded', 'true')
       expect(panel2Header).toHaveAttribute('aria-expanded', 'false')
@@ -213,7 +213,7 @@ describe('Collapse', () => {
       expect(panel2Header).toHaveAttribute('aria-expanded', 'true')
     })
 
-    it('should call onChange with undefined when all panels are collapsed in accordion mode', async () => {
+    it('should call onChange with [] when all panels are collapsed in accordion mode', async () => {
       const onChange = vi.fn()
 
       render(
@@ -227,15 +227,42 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
+      const panel1Header = screen.getByText('Panel 1').closest('button')
 
       expect(panel1Header).toHaveAttribute('aria-expanded', 'true')
 
-      // Click the active panel to collapse it
       await fireEvent.click(panel1Header!)
 
       expect(panel1Header).toHaveAttribute('aria-expanded', 'false')
-      expect(onChange).toHaveBeenCalledWith(undefined)
+      expect(onChange).toHaveBeenCalledWith([])
+    })
+
+    it('keeps accordion controlled when closing the last panel', async () => {
+      function Harness() {
+        const [activeKey, setActiveKey] = React.useState<(string | number)[]>(['faq-1'])
+        return (
+          <Collapse accordion activeKey={activeKey} onChange={setActiveKey}>
+            <CollapsePanel panelKey="faq-1" header="FAQ 1">
+              A
+            </CollapsePanel>
+            <CollapsePanel panelKey="faq-2" header="FAQ 2">
+              B
+            </CollapsePanel>
+          </Collapse>
+        )
+      }
+
+      render(<Harness />)
+
+      const first = screen.getByRole('button', { name: 'FAQ 1' })
+      await fireEvent.click(first)
+      expect(first).toHaveAttribute('aria-expanded', 'false')
+
+      await fireEvent.click(first)
+      expect(first).toHaveAttribute('aria-expanded', 'true')
+
+      await fireEvent.click(first)
+      expect(first).toHaveAttribute('aria-expanded', 'false')
     })
   })
 
@@ -249,7 +276,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
 
       expect(panelHeader).toHaveAttribute('aria-expanded', 'false')
 
@@ -269,7 +296,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
 
       expect(panelHeader).toHaveAttribute('aria-expanded', 'false')
       expect(panelHeader).toHaveAttribute('aria-disabled', 'true')
@@ -287,7 +314,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
 
       expect(panelHeader).toHaveAttribute('aria-expanded', 'false')
 
@@ -305,7 +332,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
 
       expect(panelHeader).toHaveAttribute('aria-expanded', 'false')
 
@@ -330,7 +357,7 @@ describe('Collapse', () => {
       const wrapper = getContentWrapper('Content 1')
       Object.defineProperty(wrapper, 'scrollHeight', { value: 80, configurable: true })
 
-      await fireEvent.click(screen.getByText('Panel 1').closest('[role="button"]')!)
+      await fireEvent.click(screen.getByText('Panel 1').closest('button')!)
 
       expect(scheduler.requestAnimationFrame).toHaveBeenCalledTimes(1)
       expect(wrapper.style.maxHeight).toBe('0px')
@@ -356,7 +383,7 @@ describe('Collapse', () => {
       const wrapper = getContentWrapper('Content 1')
       Object.defineProperty(wrapper, 'scrollHeight', { value: 64, configurable: true })
 
-      await fireEvent.click(screen.getByText('Panel 1').closest('[role="button"]')!)
+      await fireEvent.click(screen.getByText('Panel 1').closest('button')!)
 
       expect(wrapper.style.maxHeight).toBe('64px')
       scheduler.flush()
@@ -377,7 +404,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
       await fireEvent.click(panelHeader!)
 
       expect(onChange).toHaveBeenCalledWith(['1'])
@@ -397,10 +424,10 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
+      const panel1Header = screen.getByText('Panel 1').closest('button')
       await fireEvent.click(panel1Header!)
 
-      expect(onChange).toHaveBeenCalledWith('1')
+      expect(onChange).toHaveBeenCalledWith(['1'])
     })
   })
 
@@ -441,7 +468,7 @@ describe('Collapse', () => {
       )
 
       const arrow = container.querySelector('svg')
-      expect(arrow).toHaveClass('ml-auto')
+      expect(arrow).toHaveClass('ms-auto')
     })
 
     it('should render extra content', () => {
@@ -467,7 +494,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
       expect(panelHeader).toHaveAttribute('aria-expanded', 'true')
 
       await fireEvent.click(screen.getByText('已更新'))
@@ -503,13 +530,12 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
-      expect(panelHeader).toHaveAttribute('role', 'button')
+      const panelHeader = screen.getByRole('button', { name: 'Panel 1' })
+      expect(panelHeader.tagName).toBe('BUTTON')
       expect(panelHeader).toHaveAttribute('aria-expanded')
-      expect(panelHeader).toHaveAttribute('tabindex', '0')
     })
 
-    it('should have tabindex -1 for disabled panel', () => {
+    it('keeps a disabled header in the tab order', () => {
       render(
         <Collapse>
           <CollapsePanel panelKey="1" header="Panel 1" disabled>
@@ -518,9 +544,11 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
-      expect(panelHeader).toHaveAttribute('tabindex', '-1')
+      const panelHeader = screen.getByRole('button', { name: 'Panel 1' })
       expect(panelHeader).toHaveAttribute('aria-disabled', 'true')
+      expect(panelHeader).not.toHaveAttribute('disabled')
+      panelHeader.focus()
+      expect(panelHeader).toHaveFocus()
     })
 
     it('should mark a default-collapsed panel content wrapper as inert and aria-hidden', () => {
@@ -560,7 +588,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
+      const panelHeader = screen.getByText('Panel 1').closest('button')
       const wrapper = getContentWrapper('Content 1')
 
       expect(wrapper).not.toHaveAttribute('inert')
@@ -576,8 +604,77 @@ describe('Collapse', () => {
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Collapse />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(
+        <Collapse>
+          <CollapsePanel panelKey="1" header="Panel 1" extra={<button type="button">已更新</button>}>
+            Content 1
+          </CollapsePanel>
+          <CollapsePanel panelKey="2" header="Panel 2">
+            Content 2
+          </CollapsePanel>
+        </Collapse>
+      )
+      await expectNoA11yViolations(container)
+    })
+
+    it('names the header from the title only and points aria-controls at the region', () => {
+      render(
+        <Collapse defaultActiveKey="1">
+          <CollapsePanel panelKey="1" header="Panel 1" extra="已更新">
+            Content 1
+          </CollapsePanel>
+        </Collapse>
+      )
+
+      const header = screen.getByRole('button', { name: 'Panel 1' })
+      expect(header).not.toHaveAccessibleName('已更新')
+      const region = screen.getByRole('region', { name: 'Panel 1' })
+      expect(header).toHaveAttribute('aria-controls', region.id)
+    })
+
+    it('treats numeric and string panel keys as the same panel', () => {
+      render(
+        <Collapse activeKey="1">
+          <CollapsePanel panelKey={1} header="Panel 1">
+            Content 1
+          </CollapsePanel>
+        </Collapse>
+      )
+
+      expect(screen.getByRole('button', { name: 'Panel 1' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      )
+    })
+
+    it('keeps the first panel expanded when a sibling opens', async () => {
+      const scheduler = createFrameScheduler()
+      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
+      vi.stubGlobal('cancelAnimationFrame', scheduler.cancelAnimationFrame)
+
+      render(
+        <Collapse>
+          <CollapsePanel panelKey="1" header="Panel 1">
+            Content 1
+          </CollapsePanel>
+          <CollapsePanel panelKey="2" header="Panel 2">
+            Content 2
+          </CollapsePanel>
+        </Collapse>
+      )
+
+      const firstWrapper = getContentWrapper('Content 1')
+      Object.defineProperty(firstWrapper, 'scrollHeight', { value: 80, configurable: true })
+      await fireEvent.click(screen.getByRole('button', { name: 'Panel 1' }))
+      scheduler.flush()
+      expect(firstWrapper.style.maxHeight).toBe('80px')
+
+      await fireEvent.click(screen.getByRole('button', { name: 'Panel 2' }))
+      expect(screen.getByRole('button', { name: 'Panel 1' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      )
+      expect(firstWrapper.style.maxHeight).not.toBe('0px')
     })
   })
 })

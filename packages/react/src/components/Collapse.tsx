@@ -1,14 +1,23 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
   classNames,
   getCollapseContainerClasses,
+  getNextAccordionHeaderIndex,
   normalizeActiveKeys,
   togglePanelKey,
+  type CollapseHeaderFocusAction,
+  type CollapseHeaderRecord,
   type ExpandIconPosition,
   type CollapseProps as CoreCollapseProps
 } from '@expcat/tigercat-core'
 
-// Collapse context interface
 export interface CollapseContextValue {
   activeKeys: (string | number)[]
   accordion: boolean
@@ -16,30 +25,26 @@ export interface CollapseContextValue {
   bordered: boolean
   ghost: boolean
   handlePanelClick: (key: string | number) => void
+  registerHeader: (record: CollapseHeaderRecord) => void
+  unregisterHeader: (key: string) => void
+  moveHeaderFocus: (currentKey: string, action: CollapseHeaderFocusAction) => void
 }
 
-// Create collapse context
 const CollapseContext = createContext<CollapseContextValue | null>(null)
 
-// Hook to use collapse context
 export function useCollapseContext(): CollapseContextValue | null {
   return useContext(CollapseContext)
 }
 
-export interface CollapseProps extends Omit<CoreCollapseProps, 'style'> {
+export interface CollapseProps
+  extends
+    Omit<CoreCollapseProps, 'style'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /**
-   * Collapse change event handler
+   * Always an array. Empty `[]` is a controlled all-closed state.
    */
-  onChange?: (activeKey: string | number | (string | number)[] | undefined) => void
-
-  /**
-   * Collapse panels
-   */
+  onChange?: (activeKey: (string | number)[]) => void
   children?: React.ReactNode
-
-  /**
-   * Custom styles
-   */
   style?: React.CSSProperties
 }
 
@@ -53,50 +58,58 @@ export const Collapse: React.FC<CollapseProps> = ({
   className,
   style,
   onChange,
-  children
+  children,
+  ...rest
 }) => {
-  // Internal state for uncontrolled mode
-  const [internalActiveKeys, setInternalActiveKeys] = useState<(string | number)[]>(
-    normalizeActiveKeys(defaultActiveKey)
+  const [internalActiveKeys, setInternalActiveKeys] = useState<(string | number)[]>(() =>
+    normalizeActiveKeys(defaultActiveKey, { accordion })
   )
+  const headersRef = useRef<CollapseHeaderRecord[]>([])
 
-  // Get current active keys (controlled or uncontrolled)
   const activeKeys = useMemo(() => {
     return controlledActiveKey !== undefined
-      ? normalizeActiveKeys(controlledActiveKey)
+      ? normalizeActiveKeys(controlledActiveKey, { accordion })
       : internalActiveKeys
-  }, [controlledActiveKey, internalActiveKeys])
+  }, [controlledActiveKey, internalActiveKeys, accordion])
 
-  // Handle panel click
   const handlePanelClick = useCallback(
     (key: string | number) => {
       const newKeys = togglePanelKey(key, activeKeys, accordion)
 
-      // Update internal state if uncontrolled
       if (controlledActiveKey === undefined) {
         setInternalActiveKeys(newKeys)
       }
 
-      // Emit change event
-      // In accordion mode, emit single value or undefined
-      // In normal mode, emit array
-      if (onChange) {
-        if (accordion) {
-          onChange(newKeys.length > 0 ? newKeys[0] : undefined)
-        } else {
-          onChange(newKeys)
-        }
-      }
+      onChange?.(newKeys)
     },
     [activeKeys, accordion, controlledActiveKey, onChange]
   )
 
-  // Container classes
+  const registerHeader = useCallback((record: CollapseHeaderRecord) => {
+    const headers = headersRef.current
+    const index = headers.findIndex((header) => header.key === record.key)
+    if (index >= 0) {
+      headers[index] = record
+    } else {
+      headers.push(record)
+    }
+  }, [])
+
+  const unregisterHeader = useCallback((key: string) => {
+    headersRef.current = headersRef.current.filter((header) => header.key !== key)
+  }, [])
+
+  const moveHeaderFocus = useCallback((currentKey: string, action: CollapseHeaderFocusAction) => {
+    const next = getNextAccordionHeaderIndex(headersRef.current, currentKey, action)
+    if (next >= 0) {
+      headersRef.current[next]?.el.focus()
+    }
+  }, [])
+
   const containerClasses = useMemo(() => {
     return classNames(getCollapseContainerClasses(bordered, ghost, className))
   }, [bordered, ghost, className])
 
-  // Collapse context value
   const contextValue = useMemo<CollapseContextValue>(
     () => ({
       activeKeys,
@@ -104,14 +117,27 @@ export const Collapse: React.FC<CollapseProps> = ({
       expandIconPosition,
       bordered,
       ghost,
-      handlePanelClick
+      handlePanelClick,
+      registerHeader,
+      unregisterHeader,
+      moveHeaderFocus
     }),
-    [activeKeys, accordion, expandIconPosition, bordered, ghost, handlePanelClick]
+    [
+      activeKeys,
+      accordion,
+      expandIconPosition,
+      bordered,
+      ghost,
+      handlePanelClick,
+      registerHeader,
+      unregisterHeader,
+      moveHeaderFocus
+    ]
   )
 
   return (
     <CollapseContext.Provider value={contextValue}>
-      <div className={containerClasses} style={style} role="region">
+      <div className={containerClasses} style={style} {...rest}>
         {children}
       </div>
     </CollapseContext.Provider>

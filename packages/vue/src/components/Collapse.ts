@@ -1,17 +1,18 @@
-import { defineComponent, computed, ref, provide, PropType, h, reactive } from 'vue'
+import { computed, defineComponent, h, inject, provide, reactive, ref, PropType } from 'vue'
 import {
   classNames,
+  coerceClassValue,
   getCollapseContainerClasses,
+  getNextAccordionHeaderIndex,
   normalizeActiveKeys,
   togglePanelKey,
-  type ExpandIconPosition,
-  coerceClassValue
+  type CollapseHeaderFocusAction,
+  type CollapseHeaderRecord,
+  type ExpandIconPosition
 } from '@expcat/tigercat-core'
 
-// Collapse context key
 export const CollapseContextKey = Symbol('CollapseContext')
 
-// Collapse context interface
 export interface CollapseContext {
   activeKeys: (string | number)[]
   accordion: boolean
@@ -19,6 +20,13 @@ export interface CollapseContext {
   bordered: boolean
   ghost: boolean
   handlePanelClick: (key: string | number) => void
+  registerHeader: (record: CollapseHeaderRecord) => void
+  unregisterHeader: (key: string) => void
+  moveHeaderFocus: (currentKey: string, action: CollapseHeaderFocusAction) => void
+}
+
+export function useCollapseContext(): CollapseContext | undefined {
+  return inject<CollapseContext>(CollapseContextKey)
 }
 
 export interface VueCollapseProps {
@@ -32,11 +40,15 @@ export interface VueCollapseProps {
   style?: Record<string, string | number>
 }
 
+export type CollapseProps = VueCollapseProps
+
 export const Collapse = defineComponent({
   name: 'TigerCollapse',
+  inheritAttrs: false,
   props: {
     /**
-     * Currently active panel keys (controlled mode)
+     * Currently active panel keys (controlled mode).
+     * Empty `[]` is a controlled all-closed state.
      */
     activeKey: {
       type: [String, Number, Array] as PropType<string | number | (string | number)[]>,
@@ -50,7 +62,8 @@ export const Collapse = defineComponent({
       default: undefined
     },
     /**
-     * Accordion mode - only one panel can be expanded at a time
+     * Accordion mode — only one panel. Extra keys are dropped (last wins).
+     * `update:activeKey` / `change` always emit an array.
      * @default false
      */
     accordion: {
@@ -98,38 +111,48 @@ export const Collapse = defineComponent({
   },
   emits: ['update:activeKey', 'change'],
   setup(props, { slots, emit, attrs }) {
-    // Internal state for uncontrolled mode
-    const internalActiveKeys = ref<(string | number)[]>(normalizeActiveKeys(props.defaultActiveKey))
+    const internalActiveKeys = ref<(string | number)[]>(
+      normalizeActiveKeys(props.defaultActiveKey, { accordion: props.accordion })
+    )
+    const headers = ref<CollapseHeaderRecord[]>([])
 
-    // Computed active keys (controlled or uncontrolled)
     const currentActiveKeys = computed(() => {
       return props.activeKey !== undefined
-        ? normalizeActiveKeys(props.activeKey)
+        ? normalizeActiveKeys(props.activeKey, { accordion: props.accordion })
         : internalActiveKeys.value
     })
 
-    // Handle panel click
     const handlePanelClick = (key: string | number) => {
       const newKeys = togglePanelKey(key, currentActiveKeys.value, props.accordion)
 
-      // Update internal state if uncontrolled
       if (props.activeKey === undefined) {
         internalActiveKeys.value = newKeys
       }
 
-      // Emit events
-      // In accordion mode, emit single value or undefined
-      // In normal mode, emit array
-      if (props.accordion) {
-        emit('update:activeKey', newKeys.length > 0 ? newKeys[0] : undefined)
-        emit('change', newKeys.length > 0 ? newKeys[0] : undefined)
+      emit('update:activeKey', newKeys)
+      emit('change', newKeys)
+    }
+
+    const registerHeader = (record: CollapseHeaderRecord) => {
+      const index = headers.value.findIndex((header) => header.key === record.key)
+      if (index >= 0) {
+        headers.value[index] = record
       } else {
-        emit('update:activeKey', newKeys)
-        emit('change', newKeys)
+        headers.value.push(record)
       }
     }
 
-    // Container classes
+    const unregisterHeader = (key: string) => {
+      headers.value = headers.value.filter((header) => header.key !== key)
+    }
+
+    const moveHeaderFocus = (currentKey: string, action: CollapseHeaderFocusAction) => {
+      const next = getNextAccordionHeaderIndex(headers.value, currentKey, action)
+      if (next >= 0) {
+        headers.value[next]?.el.focus()
+      }
+    }
+
     const containerClasses = computed(() => {
       return classNames(
         getCollapseContainerClasses(props.bordered, props.ghost, props.className),
@@ -137,7 +160,6 @@ export const Collapse = defineComponent({
       )
     })
 
-    // Provide collapse context to child components (reactive getters auto-track dependencies)
     const collapseContextValue = reactive<CollapseContext>({
       get activeKeys() {
         return currentActiveKeys.value
@@ -154,7 +176,10 @@ export const Collapse = defineComponent({
       get ghost() {
         return props.ghost
       },
-      handlePanelClick
+      handlePanelClick,
+      registerHeader,
+      unregisterHeader,
+      moveHeaderFocus
     })
 
     provide<CollapseContext>(CollapseContextKey, collapseContextValue)
@@ -165,9 +190,9 @@ export const Collapse = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: containerClasses.value,
-          style: props.style,
-          role: 'region'
+          style: props.style
         },
         children
       )
