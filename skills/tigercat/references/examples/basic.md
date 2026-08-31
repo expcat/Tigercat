@@ -64,11 +64,12 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | Rate         | `<Rate :default-value="3" />`                                                                        | `<Rate defaultValue={3} />`                                                                          |
 | Result       | `<Result status="success" title="提交成功" />`                                                       | `<Result status="success" title="提交成功" />`                                                       |
 | Segmented    | `<Segmented :options="options" aria-label="View" />`                                                 | `<Segmented options={options} aria-label="View" />`                                                  |
+| SplitButton  | `<SplitButton @click="onSave">Save<DropdownItem>Save as</DropdownItem></SplitButton>`                | `<SplitButton onClick={onSave}>Save<DropdownItem>Save as</DropdownItem></SplitButton>`               |
 | Statistic    | `<Statistic title="Users" :value="1234" />`                                                          | `<Statistic title="Users" value={1234} />`                                                           |
 | Tag          | `<Tag closable>标签</Tag>`                                                                           | `<Tag closable>标签</Tag>`                                                                           |
 | Text         | `<Text tag="h1" align="start">Title</Text>`                                                          | `<Text tag="h1" align="start">Title</Text>`                                                          |
 | Watermark    | `<Watermark content="机密" />`                                                                       | `<Watermark content="机密" />`                                                                       |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, ConfigProvider, Divider, Empty, ImageGroup, SplitButton.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, ConfigProvider, Divider, Empty, ImageGroup.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

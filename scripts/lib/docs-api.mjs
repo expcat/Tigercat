@@ -198,6 +198,42 @@ export const COMPONENT_PROP_PRIORITY = {
     'iconPosition?',
     'block?'
   ],
+  SplitButton: [
+    'variant?',
+    'size?',
+    'disabled?',
+    'loading?',
+    'htmlType?',
+    'open?',
+    'portal?',
+    'placement?',
+    'triggerAriaLabel?'
+  ],
+  Dropdown: [
+    'trigger?',
+    'open?',
+    'disabled?',
+    'portal?',
+    'closeOnClick?',
+    'placement?',
+    'asChild?'
+  ],
+  DropdownItem: ['disabled?', 'divided?', 'closeOnClick?', 'href?', 'itemKey?'],
+  ContextMenu: ['open?', 'disabled?', 'portal?', 'closeOnClick?', 'placement?', 'asChild?'],
+  ContextMenuItem: ['disabled?', 'divided?', 'href?', 'itemKey?'],
+  ContextMenuSub: ['title?', 'disabled?'],
+  Popover: ['trigger?', 'content?', 'placement?', 'open?', 'width?', 'asChild?'],
+  Tooltip: ['content?', 'trigger?', 'placement?', 'open?', 'asChild?'],
+  Popconfirm: [
+    'title?',
+    'description?',
+    'okText?',
+    'cancelText?',
+    'okType?',
+    'placement?',
+    'open?',
+    'asChild?'
+  ],
   ConfigProvider: ['locale?', 'theme?', 'colorScheme?', 'direction?'],
   BackTop: ['position?', 'placement?', 'offset?'],
   FloatButton: ['floating?', 'placement?', 'offset?'],
@@ -591,7 +627,22 @@ export const REQUIRED_USAGE_SNIPPETS = {
     VirtualList:
       '<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>',
     InfiniteScroll:
-      '<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>'
+      '<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>',
+    Dropdown:
+      '<Dropdown><template #trigger>Open</template><DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu></Dropdown>',
+    ContextMenu:
+      '<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>',
+    Popover: '<Popover content="Note"><button>Trigger</button></Popover>',
+    Tooltip: '<Tooltip content="Hint"><button>Save</button></Tooltip>',
+    Popconfirm: '<Popconfirm @confirm="onConfirm"><button>Delete</button></Popconfirm>',
+    SplitButton:
+      '<SplitButton @click="onSave">Save<DropdownItem>Save as</DropdownItem></SplitButton>',
+    DropdownMenu: '<DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu>',
+    DropdownItem: '<DropdownItem>Item</DropdownItem>',
+    ContextMenuMenu: '<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>',
+    ContextMenuItem: '<ContextMenuItem>Copy</ContextMenuItem>',
+    ContextMenuSub:
+      '<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -658,7 +709,22 @@ export const REQUIRED_USAGE_SNIPPETS = {
     VirtualList:
       '<VirtualList itemCount={count} itemHeight={40} renderItem={({ index }) => <div>{index}</div>} />',
     InfiniteScroll:
-      '<InfiniteScroll hasMore={hasMore} height={288} onLoadMore={loadMore}>{items}</InfiniteScroll>'
+      '<InfiniteScroll hasMore={hasMore} height={288} onLoadMore={loadMore}>{items}</InfiniteScroll>',
+    Dropdown:
+      '<Dropdown renderTrigger={() => <button>Open</button>}><DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu></Dropdown>',
+    ContextMenu:
+      '<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>',
+    Popover: '<Popover content="Note"><button>Trigger</button></Popover>',
+    Tooltip: '<Tooltip content="Hint"><button>Save</button></Tooltip>',
+    Popconfirm: '<Popconfirm onConfirm={onConfirm}><button>Delete</button></Popconfirm>',
+    SplitButton:
+      '<SplitButton onClick={onSave}>Save<DropdownItem>Save as</DropdownItem></SplitButton>',
+    DropdownMenu: '<DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu>',
+    DropdownItem: '<DropdownItem>Item</DropdownItem>',
+    ContextMenuMenu: '<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>',
+    ContextMenuItem: '<ContextMenuItem>Copy</ContextMenuItem>',
+    ContextMenuSub:
+      '<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>'
   }
 }
 

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Button } from '@expcat/tigercat-react/Button'
 import { Dropdown } from '@expcat/tigercat-react/Dropdown'
 import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
 import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
@@ -9,11 +8,12 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <Dropdown trigger="click">
-        <Button>操作</Button>
+      <Dropdown>
+        操作
         <DropdownMenu>
           <DropdownItem onClick={() => setLastAction('编辑')}>编辑</DropdownItem>
           <DropdownItem onClick={() => setLastAction('复制')}>复制</DropdownItem>
+          <DropdownItem disabled>不可用</DropdownItem>
           <DropdownItem divided onClick={() => setLastAction('删除')}>
             删除
           </DropdownItem>

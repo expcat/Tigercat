@@ -4,6 +4,16 @@
 
 ## 未发布
 
+Dropdown 默认 `trigger` 从 `hover` 改为 `click`。需要悬停打开请显式 `trigger="hover"`（仍可用键盘和点按打开）。触发器不再是带 `aria-haspopup` 的包装 div：不传 `asChild` 时自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 把 ARIA 合并到那颗节点。SplitButton / DataExport 已走 `asChild`。
+
+Tooltip 默认 hover 同时响应 focus 和 click。`aria-describedby` 只在打开时写在焦点节点上。
+
+Popconfirm 默认文案走 locale（en-US `OK` / `Cancel` / `Are you sure you want to continue?`），不再写死简体。打开后焦点进 Cancel。OK/Cancel 是 Button。`onConfirm` 返回 Promise 时 pending 不关层。
+
+SplitButton 根不再是 ButtonGroup；不要把它塞进 ButtonGroup。chevron 默认名走 `locale.common.moreOptionsText`。Vue `type` / `htmlType` 写到主按钮。无菜单时不渲染 chevron。
+
+ContextMenu 触发面进 Tab（自渲 button，或 asChild 合并到子控件）。点 Sub 标题会打开子菜单。
+
 Tree 的 `1` 与 `'1'` 是同一 key。`filterValue` 会摘掉不匹配的节点（不是整棵高亮）；内置搜索与 `filterValue` 共用 `searchValue` / `onSearch`。`loadData` 必须返回新 children，不要写 `node.children =`；受控树听 `onTreeDataChange` / `update:treeData`。`onCheck` 第一参和 `checkedNodes` 是同一批 strategy 过滤后的 key，没有 `checkedNodesPositions`。`onDrop` 现在是 `{ dragKey, dropKey, dropPosition, treeData }`；不绑的话非受控树会自己重排。默认 `aria-label` 走 locale（「树」/「樹」），有 `aria-labelledby` 时不要再写 label。`height` 只收 px 数字。`showIcon` 只控制 `node.icon`，展开三角一直在。Vue 从主入口引 `TreeProps` 才是组件 props。
 
 DataExport 增加 `csv`。`fileName="report.xlsx"` 不再变成 `report.xlsx.xlsx`。只有 `render`、记录上没有对应字段的列默认不导出；要跳过隐藏列传 `hiddenColumnKeys`。多格式触发器的 `aria-haspopup` / `aria-expanded` 在那颗 button 上，不要再给可见按钮另写一套不含该文本的 `aria-label`。Vue 主入口导出 `DataExportProps`。

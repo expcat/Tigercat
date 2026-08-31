@@ -429,13 +429,18 @@ Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labell
 
 ## SplitButton
 
-`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 3/22 props
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 8/23 props
 
-| Prop        | Type      | Default | Notes                                                                             |
-| ----------- | --------- | ------- | --------------------------------------------------------------------------------- |
-| `disabled?` | `boolean` | `false` | Whether both the primary action and the menu trigger are disabled                 |
-| `loading?`  | `boolean` | `false` | Whether the primary action is in a loading state. Also disables the menu trigger. |
-| `open?`     | `boolean` | `-`     | Whether the menu is open (controlled mode)                                        |
+| Prop         | Type                | Default        | Notes                                                                             |
+| ------------ | ------------------- | -------------- | --------------------------------------------------------------------------------- |
+| `variant?`   | `ButtonVariant`     | `'primary'`    | Visual variant applied to the primary action and the menu trigger                 |
+| `size?`      | `ButtonSize`        | `'md'`         | Size applied to the primary action and the menu trigger                           |
+| `disabled?`  | `boolean`           | `false`        | Whether both the primary action and the menu trigger are disabled                 |
+| `loading?`   | `boolean`           | `false`        | Whether the primary action is in a loading state. Also disables the menu trigger. |
+| `htmlType?`  | `ButtonHtmlType`    | `'button'`     | HTML button type for the primary action                                           |
+| `open?`      | `boolean`           | `-`            | Whether the menu is open (controlled mode)                                        |
+| `portal?`    | `boolean`           | `true`         | Render the menu into document.body (portal/Teleport)                              |
+| `placement?` | `FloatingPlacement` | `'bottom-end'` | Dropdown placement relative to the chevron trigger                                |
 
 ## Statistic
 

@@ -8,10 +8,8 @@ export default function App() {
   return (
     <div className="space-y-3">
       <Popconfirm
-        title="删除这条记录？"
         description="删除后无法恢复。"
         okType="danger"
-        okText="删除"
         onConfirm={() => setResult('已删除')}
         onCancel={() => setResult('已取消')}>
         <Button variant="secondary">删除记录</Button>

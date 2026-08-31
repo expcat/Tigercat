@@ -59,9 +59,10 @@ Stable behavior:
 - Controlled and uncontrolled `open` modes.
 - Floating UI position state: `x`, `y`, `actualPlacement`, `floatingStyles`. Vue `placement` / `offset` are reactive after open.
 - Click-outside and Escape dismissal.
-- Trigger modes: `click`, `hover`, `focus`, `manual`.
+- Trigger modes: `click`, `hover`, `focus`, `manual`. Dropdown defaults to `click`. Hover is co-joined with click (touch) and focus (keyboard). Popconfirm is click-only.
+- Overlay triggers are the focus node: `asChild` (or a unique native `button`/`a`) merges `ref`, click/keyboard, and `aria-haspopup` / `aria-expanded` / `aria-controls` / `data-state` onto that child. Otherwise the component renders `<button type="button">`. Do not put haspopup on a wrapping div.
 - Root trigger exposes `data-state="open" | "closed"` for CSS state styling.
-- Interactive triggers also expose `aria-expanded`; generic Popover wrappers expose only `data-state`.
+- Interactive triggers also expose `aria-expanded`. Tooltip writes `aria-describedby` on the focus node only while open.
 - Portal target chain: nearest `[data-tiger-overlay-host]` → `[data-tiger-config-root]` → `document.body`. Body portals wrap the same layer+host so nested overlays stay inside. The layer copies `dir` / `lang`.
 - Stacking: `OVERLAY_Z_INDEX` viewport (200) < overlay (1000) < modal/tour (1100) < message (1200) < loading-bar (1300).
 - Popup default placement `top` / offset `8`; pickers and dropdowns `bottom-start` / offset `4`.

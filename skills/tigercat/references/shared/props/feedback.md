@@ -101,23 +101,34 @@ Imperative notification API supports inline toast actions via `notification.info
 
 ## Popconfirm
 
-`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 3/13 props
+`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 8/16 props
 
-| Prop           | Type      | Default | Notes                                            |
-| -------------- | --------- | ------- | ------------------------------------------------ |
-| `open?`        | `boolean` | `-`     | Whether the popconfirm is open (controlled mode) |
-| `disabled?`    | `boolean` | `false` | Whether the popconfirm is disabled               |
-| `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)           |
+| Prop           | Type                    | Default     | Notes                                                                                      |
+| -------------- | ----------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `title?`       | `string`                | `-`         | Popconfirm title/question text. Defaults to `locale.common.confirmTitle`.                  |
+| `description?` | `string`                | `-`         | Popconfirm description text (optional, displayed below title)                              |
+| `okText?`      | `string`                | `-`         | Confirm button text. Defaults to `locale.common.okText`.                                   |
+| `cancelText?`  | `string`                | `-`         | Cancel button text. Defaults to `locale.common.cancelText`.                                |
+| `okType?`      | `'primary' \| 'danger'` | `'primary'` | Confirm button type                                                                        |
+| `placement?`   | `FloatingPlacement`     | `'top'`     | Placement relative to trigger                                                              |
+| `open?`        | `boolean`               | `-`         | Whether the popup is open (controlled mode)                                                |
+| `asChild?`     | `boolean`               | `false`     | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
+
+Events/callback props: `onConfirm?`, `onCancel?`.
 
 ## Popover
 
-`packages/core/src/types/popover.ts` · `PopoverProps` · 3/11 props
+`packages/core/src/types/popover.ts` · `PopoverProps` · 7/12 props
 
-| Prop        | Type      | Default | Notes                                                         |
-| ----------- | --------- | ------- | ------------------------------------------------------------- |
-| `open?`     | `boolean` | `-`     | Whether the popover is open (controlled mode)                 |
-| `content?`  | `string`  | `-`     | Popover content text (can be overridden by content slot/prop) |
-| `disabled?` | `boolean` | `false` | Whether the popover is disabled                               |
+| Prop         | Type                | Default   | Notes                                                                                      |
+| ------------ | ------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `trigger?`   | `PopoverTrigger`    | `'click'` | Trigger type for showing/hiding popover                                                    |
+| `content?`   | `string`            | `-`       | Popover content text (can be overridden by content slot/prop)                              |
+| `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                                              |
+| `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                                                |
+| `width?`     | `number \| string`  | `-`       | Popover width in pixels. Custom width drops the default max-width cap.                     |
+| `asChild?`   | `boolean`           | `false`   | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
+| `disabled?`  | `boolean`           | `false`   | Whether the popup is disabled                                                              |
 
 ## Progress
 
@@ -135,13 +146,16 @@ Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`form
 
 ## Tooltip
 
-`packages/core/src/types/tooltip.ts` · `TooltipProps` · 3/9 props
+`packages/core/src/types/tooltip.ts` · `TooltipProps` · 6/10 props
 
-| Prop        | Type      | Default | Notes                                         |
-| ----------- | --------- | ------- | --------------------------------------------- |
-| `open?`     | `boolean` | `-`     | Whether the tooltip is open (controlled mode) |
-| `content?`  | `string`  | `-`     | Tooltip content text                          |
-| `disabled?` | `boolean` | `false` | Whether the tooltip is disabled               |
+| Prop         | Type                | Default   | Notes                                                                                      |
+| ------------ | ------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `content?`   | `string`            | `-`       | Tooltip content. Interactive descendants are not allowed (`role="tooltip"`).               |
+| `trigger?`   | `TooltipTrigger`    | `'hover'` | Trigger type. Default hover is co-joined with focus and click so keyboard and touch can... |
+| `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                                              |
+| `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                                                |
+| `asChild?`   | `boolean`           | `false`   | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
+| `disabled?`  | `boolean`           | `false`   | Whether the popup is disabled                                                              |
 
 ## Tour
 

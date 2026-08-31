@@ -83,7 +83,7 @@ const COMPONENT_USAGE_NOTES = {
   Dropdown: {
     uses: ['DropdownMenu', 'DropdownItem'],
     notes:
-      '菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`，zIndex 用 `OVERLAY_Z_INDEX.overlay`），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。触发器（trigger）上会暴露稳定的 `data-state="open" | "closed"` 属性（与 `aria-expanded` 同步），可用于自定义样式联动或无障碍钩子（此约定对所有浮层触发器统一适用，详见 patterns/common 的“浮层触发器状态属性”）。需要在渲染自定义触发器时拿到开启状态，可用 Vue `#trigger="{ open }"` 作用域插槽 / React `renderTrigger={({ open }) => …}` prop。'
+      '默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点那颗 button 上：文本触发器自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 子节点则合并到该节点。菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`）。`data-state="open" | "closed"` 与 `aria-expanded` 同步。Vue `#trigger="{ open }"` / React `renderTrigger={({ open }) => …}`。SplitButton 与 DataExport 走 `asChild`。'
   },
   Button: {
     notes:

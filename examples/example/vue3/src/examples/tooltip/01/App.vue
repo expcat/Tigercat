@@ -4,7 +4,7 @@ import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 </script>
 
 <template>
-  <Tooltip content="保存当前草稿" placement="top" trigger="hover">
+  <Tooltip content="保存当前草稿">
     <Button>保存</Button>
   </Tooltip>
 </template>

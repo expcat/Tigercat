@@ -71,23 +71,27 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenu
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 3/10 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 6/11 props
 
-| Prop           | Type      | Default | Notes                                      |
-| -------------- | --------- | ------- | ------------------------------------------ |
-| `disabled?`    | `boolean` | `false` | Whether the context menu is disabled       |
-| `open?`        | `boolean` | `-`     | Whether the menu is open (controlled mode) |
-| `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)     |
+| Prop            | Type                | Default          | Notes                                                                                      |
+| --------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `open?`         | `boolean`           | `-`              | Whether the menu is open (controlled mode)                                                 |
+| `disabled?`     | `boolean`           | `false`          | Whether the context menu is disabled                                                       |
+| `portal?`       | `boolean`           | `true`           | Portal the menu through the overlay target chain (overlay-host, then ConfigProvider roo... |
+| `closeOnClick?` | `boolean`           | `true`           | Whether to close the menu on item click                                                    |
+| `placement?`    | `FloatingPlacement` | `'bottom-start'` | Menu placement relative to the cursor point                                                |
+| `asChild?`      | `boolean`           | `false`          | Merge trigger ARIA / handlers onto the unique focusable child.                             |
 
 ## ContextMenuItem
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 3/5 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 4/6 props
 
-| Prop        | Type               | Default | Notes                                              |
-| ----------- | ------------------ | ------- | -------------------------------------------------- |
-| `disabled?` | `boolean`          | `false` | Whether the item is disabled                       |
-| `key?`      | `string \| number` | `-`     | Unique key for the menu item                       |
-| `divided?`  | `boolean`          | `false` | Whether the item is divided from the previous item |
+| Prop        | Type               | Default | Notes                                                                 |
+| ----------- | ------------------ | ------- | --------------------------------------------------------------------- |
+| `disabled?` | `boolean`          | `false` | Whether the item is disabled                                          |
+| `divided?`  | `boolean`          | `false` | Whether the item is divided from the previous item                    |
+| `href?`     | `string`           | `-`     | When set, the item renders as a link (`<a role="menuitem">`).         |
+| `itemKey?`  | `string \| number` | `-`     | Stable item identity when rendering lists. Not a React/Vue vnode key. |
 
 ## ContextMenuMenu
 
@@ -101,37 +105,43 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenuSub
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/6 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/5 props
 
-| Prop        | Type               | Default | Notes                                   |
-| ----------- | ------------------ | ------- | --------------------------------------- |
-| `disabled?` | `boolean`          | `false` | Whether the submenu trigger is disabled |
-| `itemKey?`  | `string \| number` | `-`     | Unique key for the submenu              |
-| `title?`    | `string`           | `-`     | Submenu trigger label                   |
+| Prop         | Type      | Default | Notes                                   |
+| ------------ | --------- | ------- | --------------------------------------- |
+| `title?`     | `string`  | `-`     | Submenu trigger label                   |
+| `disabled?`  | `boolean` | `false` | Whether the submenu trigger is disabled |
+| `className?` | `string`  | `-`     | Additional CSS classes                  |
 
 ## Dropdown
 
-`packages/core/src/types/dropdown.ts` · `DropdownProps` · 3/14 props
+`packages/core/src/types/dropdown.ts` · `DropdownProps` · 7/14 props
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
-Note: 菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`，zIndex 用 `OVERLAY_Z_INDEX.overlay`），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。触发器（trigger）上会暴露稳定的 `data-state="open" | "closed"` 属性（与 `aria-expanded` 同步），可用于自定义样式联动或无障碍钩子（此约定对所有浮层触发器统一适用，详见 patterns/common 的“浮层触发器状态属性”）。需要在渲染自定义触发器时拿到开启状态，可用 Vue `#trigger="{ open }"` 作用域插槽 / React `renderTrigger={({ open }) => …}` prop。
+Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点那颗 button 上：文本触发器自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 子节点则合并到该节点。菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`）。`data-state="open" | "closed"` 与 `aria-expanded` 同步。Vue `#trigger="{ open }"` / React `renderTrigger={({ open }) => …}`。SplitButton 与 DataExport 走 `asChild`。
 
-| Prop        | Type              | Default   | Notes                                          |
-| ----------- | ----------------- | --------- | ---------------------------------------------- |
-| `disabled?` | `boolean`         | `false`   | Whether the dropdown is disabled               |
-| `open?`     | `boolean`         | `-`       | Whether the dropdown is open (controlled mode) |
-| `trigger?`  | `DropdownTrigger` | `'hover'` | Trigger mode - click or hover                  |
+| Prop            | Type                | Default          | Notes                                                                                      |
+| --------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `trigger?`      | `DropdownTrigger`   | `'click'`        | Trigger mode - click or hover. Hover also opens on click, focus, and ArrowDown / ArrowUp.  |
+| `open?`         | `boolean`           | `-`              | Whether the dropdown is open (controlled mode)                                             |
+| `disabled?`     | `boolean`           | `false`          | Whether the dropdown is disabled                                                           |
+| `portal?`       | `boolean`           | `true`           | Portal the menu through the overlay target chain (nearest overlay-host, then ConfigProv... |
+| `closeOnClick?` | `boolean`           | `true`           | Whether to close dropdown on menu item click                                               |
+| `placement?`    | `FloatingPlacement` | `'bottom-start'` | Dropdown placement relative to trigger                                                     |
+| `asChild?`      | `boolean`           | `false`          | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
 
 ## DropdownItem
 
-`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 3/7 props
+`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 5/7 props
 
-| Prop        | Type               | Default | Notes                                          |
-| ----------- | ------------------ | ------- | ---------------------------------------------- |
-| `disabled?` | `boolean`          | `false` | Whether the item is disabled                   |
-| `key?`      | `string \| number` | `-`     | Unique key for the dropdown item               |
-| `divided?`  | `boolean`          | `false` | Whether the item is divided from previous item |
+| Prop            | Type               | Default | Notes                                                                                      |
+| --------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `disabled?`     | `boolean`          | `false` | Whether the item is disabled                                                               |
+| `divided?`      | `boolean`          | `false` | Whether the item is divided from previous item                                             |
+| `closeOnClick?` | `boolean`          | `-`     | When set, overrides the parent Dropdown `closeOnClick`. Omitted inherits the parent (de... |
+| `href?`         | `string`           | `-`     | When set, the item renders as a link (`<a role="menuitem">`).                              |
+| `itemKey?`      | `string \| number` | `-`     | Stable item identity when rendering lists. Not a React/Vue vnode key.                      |
 
 ## DropdownMenu
 
@@ -141,7 +151,7 @@ Note: 菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider
 | ------------ | ------------------------- | ------- | ---------------------- |
 | `className?` | `string`                  | `-`     | Additional CSS classes |
 | `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
-| `children?`  | `React.ReactNode`         | `-`     | Menu content           |
+| `children?`  | `React.ReactNode`         | `-`     | -                      |
 
 ## FloatButton
 

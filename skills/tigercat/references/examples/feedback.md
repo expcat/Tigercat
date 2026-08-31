@@ -18,13 +18,16 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component  | Vue                             | React                          |
-| ---------- | ------------------------------- | ------------------------------ |
-| LoadingBar | `LoadingBar.start()`            | `LoadingBar.start()`           |
-| Message    | `Message.info('Saved')`         | `Message.info('Saved')`        |
-| Progress   | `<Progress :percentage="64" />` | `<Progress percentage={64} />` |
-| Tour       | `<Tour :steps="steps" />`       | `<Tour steps={steps} />`       |
+| Component  | Vue                                                                     | React                                                                    |
+| ---------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| LoadingBar | `LoadingBar.start()`                                                    | `LoadingBar.start()`                                                     |
+| Message    | `Message.info('Saved')`                                                 | `Message.info('Saved')`                                                  |
+| Popconfirm | `<Popconfirm @confirm="onConfirm"><button>Delete</button></Popconfirm>` | `<Popconfirm onConfirm={onConfirm}><button>Delete</button></Popconfirm>` |
+| Popover    | `<Popover content="Note"><button>Trigger</button></Popover>`            | `<Popover content="Note"><button>Trigger</button></Popover>`             |
+| Progress   | `<Progress :percentage="64" />`                                         | `<Progress percentage={64} />`                                           |
+| Tooltip    | `<Tooltip content="Hint"><button>Save</button></Tooltip>`               | `<Tooltip content="Hint"><button>Save</button></Tooltip>`                |
+| Tour       | `<Tour :steps="steps" />`                                               | `<Tour steps={steps} />`                                                 |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, Loading, LoadingBarContainer, MessageContainer, Modal, NotificationContainer, Popconfirm, Popover, Tooltip.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, Loading, LoadingBarContainer, MessageContainer, Modal, NotificationContainer.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
