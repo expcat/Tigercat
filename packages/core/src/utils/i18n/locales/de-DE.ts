@@ -292,10 +292,14 @@ export const deDE: TigerLocale = {
     overflowAriaLabel: '{count} weitere'
   },
   carousel: {
-    ariaLabel: 'Bildkarussell',
+    ariaLabel: 'Karussell',
+    roleDescription: 'Karussell',
+    slideRoleDescription: 'Folie',
     navigationAriaLabel: 'Karussellnavigation',
     previousSlideAriaLabel: 'Vorherige Folie',
     nextSlideAriaLabel: 'Nächste Folie',
+    pauseAriaLabel: 'Automatische Wiedergabe pausieren',
+    playAriaLabel: 'Automatische Wiedergabe starten',
     goToSlideAriaLabel: 'Zu Folie {index} springen',
     slideAriaLabel: 'Folie {index} von {total}'
   },

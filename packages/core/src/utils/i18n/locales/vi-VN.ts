@@ -292,10 +292,14 @@ export const viVN: TigerLocale = {
     overflowAriaLabel: 'còn {count} người'
   },
   carousel: {
-    ariaLabel: 'Băng chuyền ảnh',
+    ariaLabel: 'Băng chuyền',
+    roleDescription: 'băng chuyền',
+    slideRoleDescription: 'trang',
     navigationAriaLabel: 'Điều hướng băng chuyền',
     previousSlideAriaLabel: 'Trang trước',
     nextSlideAriaLabel: 'Trang sau',
+    pauseAriaLabel: 'Tạm dừng tự chạy',
+    playAriaLabel: 'Bắt đầu tự chạy',
     goToSlideAriaLabel: 'Đến trang {index}',
     slideAriaLabel: 'Trang {index} / {total}'
   },

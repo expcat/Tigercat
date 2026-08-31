@@ -292,10 +292,14 @@ export const koKR: TigerLocale = {
     overflowAriaLabel: '{count}명 더보기'
   },
   carousel: {
-    ariaLabel: '이미지 캐러셀',
+    ariaLabel: '캐러셀',
+    roleDescription: '캐러셀',
+    slideRoleDescription: '슬라이드',
     navigationAriaLabel: '캐러셀 탐색',
     previousSlideAriaLabel: '이전 슬라이드',
     nextSlideAriaLabel: '다음 슬라이드',
+    pauseAriaLabel: '자동 재생 일시 정지',
+    playAriaLabel: '자동 재생 시작',
     goToSlideAriaLabel: '{index}번째 슬라이드로 이동',
     slideAriaLabel: '슬라이드 {index} / {total}'
   },

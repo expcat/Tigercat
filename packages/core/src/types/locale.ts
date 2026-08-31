@@ -382,10 +382,15 @@ export interface TigerLocaleAvatarGroup {
 }
 
 export interface TigerLocaleCarousel {
+  /** Used only when the caller names the carousel; omitted name is not a landmark. */
   ariaLabel?: string
+  roleDescription?: string
+  slideRoleDescription?: string
   navigationAriaLabel?: string
   previousSlideAriaLabel?: string
   nextSlideAriaLabel?: string
+  pauseAriaLabel?: string
+  playAriaLabel?: string
   /** Template: supports {index} */
   goToSlideAriaLabel?: string
   /** Template: supports {index} and {total} */

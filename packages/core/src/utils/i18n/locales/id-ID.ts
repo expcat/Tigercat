@@ -292,10 +292,14 @@ export const idID: TigerLocale = {
     overflowAriaLabel: '{count} lainnya'
   },
   carousel: {
-    ariaLabel: 'Karusel gambar',
+    ariaLabel: 'Karusel',
+    roleDescription: 'karusel',
+    slideRoleDescription: 'salindia',
     navigationAriaLabel: 'Navigasi karusel',
     previousSlideAriaLabel: 'Slide sebelumnya',
     nextSlideAriaLabel: 'Slide berikutnya',
+    pauseAriaLabel: 'Jeda putar otomatis',
+    playAriaLabel: 'Mulai putar otomatis',
     goToSlideAriaLabel: 'Ke slide {index}',
     slideAriaLabel: 'Slide {index} dari {total}'
   },

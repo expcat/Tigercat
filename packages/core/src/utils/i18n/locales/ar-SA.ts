@@ -292,10 +292,14 @@ export const arSA: TigerLocale = {
     overflowAriaLabel: '{count} أكثر'
   },
   carousel: {
-    ariaLabel: 'عرض شرائح الصور',
+    ariaLabel: 'عرض شرائح',
+    roleDescription: 'عرض شرائح',
+    slideRoleDescription: 'شريحة',
     navigationAriaLabel: 'تنقل العرض',
     previousSlideAriaLabel: 'الشريحة السابقة',
     nextSlideAriaLabel: 'الشريحة التالية',
+    pauseAriaLabel: 'إيقاف التشغيل التلقائي',
+    playAriaLabel: 'بدء التشغيل التلقائي',
     goToSlideAriaLabel: 'الانتقال إلى الشريحة {index}',
     slideAriaLabel: 'الشريحة {index} من {total}'
   },

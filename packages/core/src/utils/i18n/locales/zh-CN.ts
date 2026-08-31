@@ -292,10 +292,14 @@ export const zhCN: TigerLocale = {
     overflowAriaLabel: '还有 {count} 位'
   },
   carousel: {
-    ariaLabel: '图片轮播',
+    ariaLabel: '轮播',
+    roleDescription: '轮播',
+    slideRoleDescription: '幻灯片',
     navigationAriaLabel: '轮播导航',
     previousSlideAriaLabel: '上一张',
     nextSlideAriaLabel: '下一张',
+    pauseAriaLabel: '暂停自动播放',
+    playAriaLabel: '开始自动播放',
     goToSlideAriaLabel: '跳转到第 {index} 张',
     slideAriaLabel: '第 {index} 张，共 {total} 张'
   },

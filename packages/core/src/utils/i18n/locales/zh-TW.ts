@@ -292,10 +292,14 @@ export const zhTW: TigerLocale = {
     overflowAriaLabel: '還有 {count} 位'
   },
   carousel: {
-    ariaLabel: '圖片輪播',
+    ariaLabel: '輪播',
+    roleDescription: '輪播',
+    slideRoleDescription: '投影片',
     navigationAriaLabel: '輪播導覽',
     previousSlideAriaLabel: '上一張',
     nextSlideAriaLabel: '下一張',
+    pauseAriaLabel: '暫停自動播放',
+    playAriaLabel: '開始自動播放',
     goToSlideAriaLabel: '跳到第 {index} 張',
     slideAriaLabel: '第 {index} 張，共 {total} 張'
   },

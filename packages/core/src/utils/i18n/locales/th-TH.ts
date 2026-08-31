@@ -292,10 +292,14 @@ export const thTH: TigerLocale = {
     overflowAriaLabel: 'อีก {count} คน'
   },
   carousel: {
-    ariaLabel: 'แกลเลอรีภาพสไลด์',
+    ariaLabel: 'สไลด์โชว์',
+    roleDescription: 'สไลด์โชว์',
+    slideRoleDescription: 'สไลด์',
     navigationAriaLabel: 'การนำทางสไลด์',
     previousSlideAriaLabel: 'สไลด์ก่อนหน้า',
     nextSlideAriaLabel: 'สไลด์ถัดไป',
+    pauseAriaLabel: 'หยุดเล่นอัตโนมัติ',
+    playAriaLabel: 'เริ่มเล่นอัตโนมัติ',
     goToSlideAriaLabel: 'ไปยังสไลด์ {index}',
     slideAriaLabel: 'สไลด์ {index} จาก {total}'
   },

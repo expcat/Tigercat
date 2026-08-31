@@ -292,10 +292,14 @@ export const jaJP: TigerLocale = {
     overflowAriaLabel: '他 {count} 人'
   },
   carousel: {
-    ariaLabel: '画像カルーセル',
+    ariaLabel: 'カルーセル',
+    roleDescription: 'カルーセル',
+    slideRoleDescription: 'スライド',
     navigationAriaLabel: 'カルーセルの操作',
     previousSlideAriaLabel: '前のスライド',
     nextSlideAriaLabel: '次のスライド',
+    pauseAriaLabel: '自動再生を一時停止',
+    playAriaLabel: '自動再生を開始',
     goToSlideAriaLabel: 'スライド {index} へ',
     slideAriaLabel: 'スライド {index} / {total}'
   },
