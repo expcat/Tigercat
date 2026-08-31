@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import {
   classNames,
   calculateAffixState,
-  resolveAffixTarget,
+  resolveScrollRoot,
   createAffixObserver,
   type AffixProps as CoreAffixProps,
   type AffixState
@@ -56,7 +56,7 @@ export const Affix: React.FC<AffixProps> = ({
       }
       if (!originalRectRef.current) return
 
-      const resolved = resolveAffixTarget(target)
+      const resolved = resolveScrollRoot(target)
       const containerRect = resolved.getRect()
 
       if (!affixed) {
@@ -99,8 +99,8 @@ export const Affix: React.FC<AffixProps> = ({
 
   useEffect(() => {
     if (!sentinelRef.current) return undefined
-    const resolved = resolveAffixTarget(target)
-    const root = resolved.element === window ? null : (resolved.element as Element)
+    const resolved = resolveScrollRoot(target)
+    const root = resolved.isWindow ? null : (resolved.target as Element | null)
     const stop = createAffixObserver(sentinelRef.current, {
       offsetTop,
       offsetBottom,

@@ -23,5 +23,6 @@ export * from '../animation'
 
 // --- Component helpers ---
 export * from './slider-utils'
+export * from '../scroll-root'
 export * from '../back-top-utils'
 export * from '../imperative-api'

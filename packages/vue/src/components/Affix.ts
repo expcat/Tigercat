@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   mergeStyleValues,
   calculateAffixState,
-  resolveAffixTarget,
+  resolveScrollRoot,
   createAffixObserver,
   type AffixState
 } from '@expcat/tigercat-core'
@@ -57,7 +57,7 @@ export const Affix = defineComponent({
       }
       if (!originalRect.value) return
 
-      const resolved = resolveAffixTarget(props.target)
+      const resolved = resolveScrollRoot(props.target)
       const containerRect = resolved.getRect()
 
       if (!affixed) {
@@ -105,8 +105,8 @@ export const Affix = defineComponent({
       stopObserver?.()
       const sentinel = sentinelRef.value
       if (!sentinel) return
-      const resolved = resolveAffixTarget(props.target)
-      const root = resolved.element === window ? null : (resolved.element as Element)
+      const resolved = resolveScrollRoot(props.target)
+      const root = resolved.isWindow ? null : (resolved.target as Element | null)
       stopObserver = createAffixObserver(sentinel, {
         offsetTop: props.offsetTop,
         offsetBottom: props.offsetBottom,

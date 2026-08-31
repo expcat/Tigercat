@@ -80,45 +80,6 @@ export function calculateAffixState(
   return { affixed: false, style: {} }
 }
 
-/**
- * Resolve scrollable container element from a CSS selector string.
- * Returns `window` proxy info if selector is undefined.
- */
-export function resolveAffixTarget(selector?: string): {
-  element: Element | Window
-  getRect: () => { top: number; bottom: number }
-} {
-  if (!isBrowser()) {
-    return {
-      element: null as unknown as Window,
-      getRect: () => ({ top: 0, bottom: 0 })
-    }
-  }
-
-  if (!selector) {
-    return {
-      element: window,
-      getRect: () => ({ top: 0, bottom: window.innerHeight })
-    }
-  }
-
-  const el = document.querySelector(selector)
-  if (!el) {
-    return {
-      element: window,
-      getRect: () => ({ top: 0, bottom: window.innerHeight })
-    }
-  }
-
-  return {
-    element: el,
-    getRect: () => {
-      const r = el.getBoundingClientRect()
-      return { top: r.top, bottom: r.bottom }
-    }
-  }
-}
-
 // ---------------------------------------------------------------------------
 // IntersectionObserver-based affix detection (preferred over scroll listeners)
 // ---------------------------------------------------------------------------
