@@ -1,15 +1,17 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type {
   CronEditorProps as CoreCronEditorProps,
-  CronFieldControl,
+  CronFieldDraft,
+  CronFieldKey,
   CronFieldMeta,
+  CronFieldMode,
   CronPreset,
   CronValidationResult,
-  TigerLocale,
-  TigerLocaleCronEditor
+  InputStatus
 } from '@expcat/tigercat-core'
 import {
-  buildCronFieldValue,
+  applyCronFieldMode,
+  buildCronFieldValueFromDraft,
   classNames,
   cronEditorBaseClasses,
   cronEditorErrorClasses,
@@ -17,58 +19,62 @@ import {
   cronEditorFieldsClasses,
   cronEditorLabelClasses,
   cronFieldMetas,
-  defaultCronExpression,
+  cronFieldModes,
+  formatCronControlLabel,
   getCronEditorControlClasses,
   getCronEditorLabels,
+  getCronExpressionIssue,
   getCronFieldIssue,
   getCronFieldValue,
+  getCronModeLabels,
+  getDefaultCronPresets,
+  isCronExpressionEmpty,
+  isCronFieldCountValid,
+  markFormItemGroupControl,
+  mergeAriaDescribedBy,
   mergeTigerLocale,
-  normalizeCronExpression,
-  parseCronFieldControl,
+  parseOptionalInt,
+  seedCronFieldDraft,
   updateCronExpressionField,
   validateCronExpressionWithLabels
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface CronEditorProps extends CoreCronEditorProps {
   value?: string
   defaultValue?: string
-  /** Locale overrides merged on top of ConfigProvider locale */
-  locale?: Partial<TigerLocale>
-  /** Text/aria label overrides */
-  labels?: Partial<TigerLocaleCronEditor>
   onChange?: (value: string, validation: CronValidationResult) => void
   onValidate?: (validation: CronValidationResult) => void
+  onBlur?: React.FocusEventHandler<HTMLElement>
+  style?: React.CSSProperties
 }
 
-const modeOptions: Array<{ label: string; value: CronFieldControl['mode'] }> = [
-  { label: 'Any', value: 'any' },
-  { label: 'Every', value: 'every' },
-  { label: 'Specific', value: 'specific' },
-  { label: 'Range', value: 'range' },
-  { label: 'Custom', value: 'custom' }
-]
-
-function formatCronControlLabel(template: string, field: string): string {
-  return template.replace('{field}', field)
-}
-
-export const CronEditor: React.FC<CronEditorProps> = ({
-  value,
-  defaultValue = defaultCronExpression,
-  disabled = false,
-  readonly = false,
-  size = 'md',
-  presets,
-  ariaLabel,
-  locale,
-  labels: labelsOverride,
-  className,
-  onChange,
-  onValidate
-}) => {
+const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function CronEditor(
+  {
+    value,
+    defaultValue,
+    disabled = false,
+    readonly = false,
+    size = 'md',
+    presets,
+    ariaLabel,
+    locale,
+    labels: labelsOverride,
+    className,
+    name,
+    id,
+    status: statusProp,
+    onChange,
+    onValidate,
+    onBlur,
+    style
+  },
+  ref
+) {
   const config = useTigerConfig()
+  const formItemControl = useFormItemControlContext()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
@@ -77,7 +83,7 @@ export const CronEditor: React.FC<CronEditorProps> = ({
     () => getCronEditorLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const fieldLabels = useMemo<Record<CronFieldMeta['key'], string>>(
+  const fieldLabels = useMemo<Record<CronFieldKey, string>>(
     () => ({
       minute: labels.minuteLabel,
       hour: labels.hourLabel,
@@ -92,146 +98,163 @@ export const CronEditor: React.FC<CronEditorProps> = ({
     [fieldLabels]
   )
   const resolvedPresets = useMemo<CronPreset[]>(
-    () =>
-      presets ?? [
-        { label: labels.everyMinutePreset, value: '* * * * *' },
-        { label: labels.hourlyPreset, value: '0 * * * *' },
-        { label: labels.dailyPreset, value: '0 0 * * *' },
-        { label: labels.weeklyPreset, value: '0 0 * * 1' },
-        { label: labels.monthlyPreset, value: '0 0 1 * *' }
-      ],
+    () => (presets === undefined ? getDefaultCronPresets(labels) : presets),
     [labels, presets]
   )
-  const modeLabels = useMemo<Record<CronFieldControl['mode'], string>>(
-    () => ({
-      any: labels.modeAnyLabel,
-      every: labels.modeEveryLabel,
-      specific: labels.modeSpecificLabel,
-      range: labels.modeRangeLabel,
-      custom: labels.modeCustomLabel
-    }),
-    [labels]
-  )
+  const modeLabels = useMemo(() => getCronModeLabels(labels), [labels])
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const inactive = effectiveDisabled || readonly
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const describedBy = mergeAriaDescribedBy(formItemControl?.describedBy, undefined)
+  const labelledby = formItemControl?.labelId
+  const parsedValue = value !== undefined ? value : (formItemControl?.value as string | undefined)
+
   const [expression, setExpression] = useControlledState<string, [CronValidationResult]>({
-    value,
-    defaultValue,
+    value: value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
+    defaultValue: defaultValue ?? '',
     onChange: (next, validation) => {
       onChange?.(next, validation)
       onValidate?.(validation)
+      formItemControl?.onChange?.(next)
     }
   })
+
+  const currentExpression = expression ?? ''
   const validation = useMemo(
-    () => validateCronExpressionWithLabels(expression, labels, fieldLabels),
-    [expression, labels, fieldLabels]
+    () => validateCronExpressionWithLabels(currentExpression, labels, fieldLabels),
+    [currentExpression, labels, fieldLabels]
   )
-  const inactive = disabled || readonly
+  const fieldsReady = isCronFieldCountValid(currentExpression)
+  const instanceId = useId()
+  const errorId = `${instanceId}-error`
+  const stickyModes = useRef<Partial<Record<CronFieldKey, CronFieldMode>>>({})
+  const [drafts, setDrafts] = useState<Record<CronFieldKey, CronFieldDraft>>(() =>
+    seedAllDrafts(currentExpression, stickyModes.current)
+  )
+
+  useEffect(() => {
+    setDrafts(seedAllDrafts(currentExpression, stickyModes.current))
+  }, [currentExpression])
 
   function commit(nextValue: string) {
-    const normalized = normalizeCronExpression(nextValue)
-    const nextValidation = validateCronExpressionWithLabels(normalized, labels, fieldLabels)
-    setExpression(normalized, nextValidation)
-  }
-
-  function handleRawExpressionChange(nextValue: string) {
     const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
     setExpression(nextValue, nextValidation)
   }
 
-  function handleFieldRawChange(meta: CronFieldMeta, raw: string) {
-    commit(updateCronExpressionField(expression, meta.key, raw))
+  function handleRawExpressionChange(nextValue: string) {
+    stickyModes.current = {}
+    const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
+    setExpression(nextValue, nextValidation)
   }
 
-  function handleModeChange(
-    meta: CronFieldMeta,
-    control: CronFieldControl,
-    mode: CronFieldControl['mode']
-  ) {
-    const nextControl: CronFieldControl = {
-      ...control,
-      mode,
-      value: control.value ?? meta.min,
-      start: control.start ?? meta.min,
-      end: control.end ?? meta.max,
-      step: control.step ?? 1
+  function writeField(meta: CronFieldMeta, draft: CronFieldDraft) {
+    const raw = buildCronFieldValueFromDraft(draft, meta)
+    if (isCronExpressionEmpty(currentExpression)) {
+      const parts = ['*', '*', '*', '*', '*']
+      const index = cronFieldMetas.findIndex((item) => item.key === meta.key)
+      parts[index] = raw
+      commit(parts.join(' '))
+      return
     }
-    handleFieldRawChange(meta, buildCronFieldValue(nextControl, meta))
+    const updated = updateCronExpressionField(currentExpression, meta.key, raw)
+    if (updated == null) return
+    commit(updated)
   }
 
-  function renderFieldControl(meta: CronFieldMeta, control: CronFieldControl) {
-    if (control.mode === 'any') return null
+  function handleModeChange(meta: CronFieldMeta, mode: CronFieldMode) {
+    stickyModes.current[meta.key] = mode
+    const next = applyCronFieldMode(drafts[meta.key], mode, meta)
+    setDrafts((prev) => ({ ...prev, [meta.key]: next }))
+    writeField(meta, next)
+  }
 
-    if (control.mode === 'every') {
+  function patchDraft(meta: CronFieldMeta, patch: Partial<CronFieldDraft>, commitNow: boolean) {
+    const next = { ...drafts[meta.key], ...patch }
+    setDrafts((prev) => ({ ...prev, [meta.key]: next }))
+    if (commitNow) writeField(meta, next)
+  }
+
+  function handleBlur(event: React.FocusEvent<HTMLElement>) {
+    const next = event.relatedTarget as Node | null
+    const root = event.currentTarget.closest('[data-tiger-croneditor]')
+    if (root && next && root.contains(next)) return
+    formItemControl?.onBlur?.()
+    onBlur?.(event)
+  }
+
+  function renderFieldControl(meta: CronFieldMeta, draft: CronFieldDraft, invalid: boolean) {
+    if (draft.mode === 'any') return null
+
+    if (draft.mode === 'every') {
       return (
         <input
-          type="number"
-          min={1}
-          max={meta.max}
-          className={getCronEditorControlClasses(size)}
-          value={control.step ?? 1}
-          disabled={inactive}
+          type="text"
+          inputMode="numeric"
+          className={getCronEditorControlClasses(size, invalid)}
+          value={draft.stepText}
+          disabled={inactive || !fieldsReady}
           aria-label={formatCronControlLabel(labels.stepAriaLabel, meta.label)}
-          onChange={(event) =>
-            handleFieldRawChange(
-              meta,
-              buildCronFieldValue({ ...control, step: Number(event.target.value) }, meta)
-            )
-          }
+          onChange={(event) => {
+            const text = event.target.value
+            patchDraft(meta, { stepText: text, mode: 'every' }, parseOptionalInt(text) != null)
+          }}
         />
       )
     }
 
-    if (control.mode === 'specific') {
+    if (draft.mode === 'specific') {
       return (
         <input
-          type="number"
-          min={meta.min}
-          max={meta.max}
-          className={getCronEditorControlClasses(size)}
-          value={control.value ?? meta.min}
-          disabled={inactive}
+          type="text"
+          inputMode="numeric"
+          className={getCronEditorControlClasses(size, invalid)}
+          value={draft.valueText}
+          disabled={inactive || !fieldsReady}
           aria-label={formatCronControlLabel(labels.valueAriaLabel, meta.label)}
-          onChange={(event) =>
-            handleFieldRawChange(
-              meta,
-              buildCronFieldValue({ ...control, value: Number(event.target.value) }, meta)
-            )
-          }
+          onChange={(event) => {
+            const text = event.target.value
+            patchDraft(meta, { valueText: text, mode: 'specific' }, parseOptionalInt(text) != null)
+          }}
         />
       )
     }
 
-    if (control.mode === 'range') {
+    if (draft.mode === 'range') {
       return (
         <div className="grid grid-cols-2 gap-1">
           <input
-            type="number"
-            min={meta.min}
-            max={meta.max}
-            className={getCronEditorControlClasses(size)}
-            value={control.start ?? meta.min}
-            disabled={inactive}
+            type="text"
+            inputMode="numeric"
+            className={getCronEditorControlClasses(size, invalid)}
+            value={draft.startText}
+            disabled={inactive || !fieldsReady}
             aria-label={formatCronControlLabel(labels.rangeStartAriaLabel, meta.label)}
-            onChange={(event) =>
-              handleFieldRawChange(
+            onChange={(event) => {
+              const text = event.target.value
+              patchDraft(
                 meta,
-                buildCronFieldValue({ ...control, start: Number(event.target.value) }, meta)
+                { startText: text, mode: 'range' },
+                parseOptionalInt(text) != null && parseOptionalInt(draft.endText) != null
               )
-            }
+            }}
           />
           <input
-            type="number"
-            min={meta.min}
-            max={meta.max}
-            className={getCronEditorControlClasses(size)}
-            value={control.end ?? meta.max}
-            disabled={inactive}
+            type="text"
+            inputMode="numeric"
+            className={getCronEditorControlClasses(size, invalid)}
+            value={draft.endText}
+            disabled={inactive || !fieldsReady}
             aria-label={formatCronControlLabel(labels.rangeEndAriaLabel, meta.label)}
-            onChange={(event) =>
-              handleFieldRawChange(
+            onChange={(event) => {
+              const text = event.target.value
+              patchDraft(
                 meta,
-                buildCronFieldValue({ ...control, end: Number(event.target.value) }, meta)
+                { endText: text, mode: 'range' },
+                parseOptionalInt(draft.startText) != null && parseOptionalInt(text) != null
               )
-            }
+            }}
           />
         </div>
       )
@@ -240,38 +263,60 @@ export const CronEditor: React.FC<CronEditorProps> = ({
     return (
       <input
         type="text"
-        className={getCronEditorControlClasses(size)}
-        value={control.raw}
-        disabled={inactive}
+        className={getCronEditorControlClasses(size, invalid)}
+        value={draft.raw}
+        disabled={inactive || !fieldsReady}
         aria-label={formatCronControlLabel(labels.customValueAriaLabel, meta.label)}
-        onChange={(event) => handleFieldRawChange(meta, event.target.value)}
+        onChange={(event) => patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true)}
       />
     )
   }
 
+  const expressionIssue = getCronExpressionIssue(validation)
+  const expressionInvalid = Boolean(expressionIssue) && !isCronExpressionEmpty(currentExpression)
+  const groupName = ariaLabel ?? labels.ariaLabel
+
   return (
     <div
       className={classNames(cronEditorBaseClasses, className)}
+      style={style}
       role="group"
-      aria-label={ariaLabel ?? labels.ariaLabel}>
+      data-tiger-croneditor=""
+      aria-label={labelledby ? undefined : groupName}
+      aria-labelledby={labelledby}
+      aria-describedby={describedBy}
+      aria-invalid={status === 'error' || expressionInvalid ? true : undefined}
+      onBlur={handleBlur}>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
+          ref={ref}
           type="text"
-          className={classNames(getCronEditorControlClasses(size, !validation.valid), 'flex-1')}
-          value={expression}
-          disabled={disabled}
+          id={effectiveId}
+          name={effectiveName}
+          className={classNames(getCronEditorControlClasses(size, expressionInvalid), 'flex-1')}
+          value={currentExpression}
+          disabled={effectiveDisabled}
           readOnly={readonly}
           aria-label={labels.expressionAriaLabel}
+          aria-invalid={expressionInvalid || undefined}
+          aria-describedby={expressionIssue ? errorId : describedBy}
           onChange={(event) => handleRawExpressionChange(event.target.value)}
         />
         {resolvedPresets.length > 0 && (
           <select
             className={getCronEditorControlClasses(size)}
-            value={resolvedPresets.some((preset) => preset.value === expression) ? expression : ''}
+            value={
+              resolvedPresets.some((preset) => preset.value === currentExpression)
+                ? currentExpression
+                : ''
+            }
             disabled={inactive}
             aria-label={labels.presetAriaLabel}
             onChange={(event) => {
-              if (event.target.value) commit(event.target.value)
+              if (event.target.value) {
+                stickyModes.current = {}
+                commit(event.target.value)
+              }
             }}>
             <option value="">{labels.presetPlaceholder}</option>
             {resolvedPresets.map((preset) => (
@@ -283,45 +328,66 @@ export const CronEditor: React.FC<CronEditorProps> = ({
         )}
       </div>
 
-      {validation.issues
-        .filter((issue) => issue.field === 'expression')
-        .map((issue) => (
-          <div key={issue.message} className={cronEditorErrorClasses}>
-            {issue.message}
-          </div>
-        ))}
+      {expressionIssue ? (
+        <div id={errorId} className={cronEditorErrorClasses} role="alert">
+          {expressionIssue.message}
+        </div>
+      ) : null}
 
       <div className={cronEditorFieldsClasses}>
         {localizedMetas.map((meta) => {
-          const raw = getCronFieldValue(expression, meta.key)
-          const control = parseCronFieldControl(raw)
+          const draft = drafts[meta.key]
           const issue = getCronFieldIssue(validation, meta.key)
+          const modeId = `${instanceId}-${meta.key}-mode`
+          const fieldErrorId = `${instanceId}-${meta.key}-error`
 
           return (
             <div key={meta.key} className={cronEditorFieldClasses}>
-              <label className={cronEditorLabelClasses}>{meta.label}</label>
+              <label className={cronEditorLabelClasses} htmlFor={modeId}>
+                {meta.label}
+              </label>
               <select
-                className={getCronEditorControlClasses(size, !!issue)}
-                value={control.mode}
-                disabled={inactive}
+                id={modeId}
+                className={getCronEditorControlClasses(size, Boolean(issue))}
+                value={draft.mode}
+                disabled={inactive || !fieldsReady}
+                aria-invalid={issue ? true : undefined}
+                aria-describedby={issue ? fieldErrorId : undefined}
                 aria-label={formatCronControlLabel(labels.modeAriaLabel, meta.label)}
-                onChange={(event) =>
-                  handleModeChange(meta, control, event.target.value as CronFieldControl['mode'])
-                }>
-                {modeOptions.map((mode) => (
-                  <option key={mode.value} value={mode.value}>
-                    {modeLabels[mode.value]}
+                onChange={(event) => handleModeChange(meta, event.target.value as CronFieldMode)}>
+                {cronFieldModes.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {modeLabels[mode]}
                   </option>
                 ))}
               </select>
-              {renderFieldControl(meta, control)}
-              {issue && <div className={cronEditorErrorClasses}>{issue.message}</div>}
+              {renderFieldControl(meta, draft, Boolean(issue))}
+              {issue ? (
+                <div id={fieldErrorId} className={cronEditorErrorClasses}>
+                  {issue.message}
+                </div>
+              ) : null}
             </div>
           )
         })}
       </div>
     </div>
   )
+})
+
+export const CronEditor = markFormItemGroupControl(CronEditorInner)
+
+function seedAllDrafts(
+  expression: string,
+  sticky: Partial<Record<CronFieldKey, CronFieldMode>>
+): Record<CronFieldKey, CronFieldDraft> {
+  const ready = isCronFieldCountValid(expression)
+  return Object.fromEntries(
+    cronFieldMetas.map((meta) => {
+      const raw = ready ? (getCronFieldValue(expression, meta.key) ?? '*') : '*'
+      return [meta.key, seedCronFieldDraft(raw, sticky[meta.key])]
+    })
+  ) as Record<CronFieldKey, CronFieldDraft>
 }
 
 export default CronEditor

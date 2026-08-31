@@ -8,15 +8,15 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { CronEditor } from '@expcat/tigercat-react/CronEditor'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('CronEditor', () => {
-  it('renders the default expression and field editors', () => {
+  it('renders an empty unselected editor, not every-minute', () => {
     render(<CronEditor />)
 
     expect(screen.getByRole('group', { name: 'Cron editor' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Cron expression')).toHaveValue('* * * * *')
-    expect(screen.getByLabelText('Minute mode')).toHaveValue('any')
+    expect(screen.getByLabelText('Cron expression')).toHaveValue('')
+    expect(screen.getByLabelText('Minute mode')).toBeDisabled()
   })
 
   it('uses controlled value', () => {
@@ -28,7 +28,7 @@ describe('CronEditor', () => {
 
   it('calls onChange when raw expression changes', () => {
     const onChange = vi.fn()
-    render(<CronEditor onChange={onChange} />)
+    render(<CronEditor defaultValue="" onChange={onChange} />)
 
     fireEvent.change(screen.getByLabelText('Cron expression'), { target: { value: '0 8 * * 1' } })
 
@@ -43,7 +43,7 @@ describe('CronEditor', () => {
 
   it('applies presets', () => {
     const onChange = vi.fn()
-    render(<CronEditor onChange={onChange} />)
+    render(<CronEditor defaultValue="" onChange={onChange} />)
 
     fireEvent.change(screen.getByLabelText('Cron preset'), { target: { value: '0 0 * * *' } })
 
@@ -60,7 +60,7 @@ describe('CronEditor', () => {
     expect(screen.getByRole('group', { name: 'Cron 表达式编辑器' })).toBeInTheDocument()
     expect(screen.getByLabelText('Cron 表达式')).toHaveValue('60 * * * *')
     expect(screen.getByLabelText('分钟模式')).toHaveValue('specific')
-    expect(screen.getByLabelText('分钟值')).toHaveValue(60)
+    expect(screen.getByLabelText('分钟值')).toHaveValue('60')
     expect(screen.getByLabelText('Cron 预设')).toHaveTextContent('选择预设')
     expect(screen.getByLabelText('Cron 预设')).toHaveTextContent('每天')
     expect(screen.getByText('分钟必须在 0 到 59 之间')).toBeInTheDocument()
@@ -68,7 +68,7 @@ describe('CronEditor', () => {
 
   it('updates field mode and step', () => {
     const onChange = vi.fn()
-    render(<CronEditor onChange={onChange} />)
+    render(<CronEditor defaultValue="* * * * *" onChange={onChange} />)
 
     fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'every' } })
     expect(onChange).toHaveBeenLastCalledWith(
@@ -84,7 +84,7 @@ describe('CronEditor', () => {
 
   it('supports range editing', () => {
     const onChange = vi.fn()
-    render(<CronEditor onChange={onChange} />)
+    render(<CronEditor defaultValue="* * * * *" onChange={onChange} />)
 
     fireEvent.change(screen.getByLabelText('Hour mode'), { target: { value: 'range' } })
     fireEvent.change(screen.getByLabelText('Hour range start'), { target: { value: '9' } })
@@ -110,10 +110,10 @@ describe('CronEditor', () => {
     expect(screen.getByLabelText('Cron expression').className).toContain('h-10')
   })
 
-  it('has no accessibility violations', async () => {
-    const { container } = render(<CronEditor />)
+  it('has no accessibility violations for an invalid expression', async () => {
+    const { container } = render(<CronEditor value="60 * * * *" />)
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
   describe('Edge Cases and Boundary', () => {
@@ -131,31 +131,24 @@ describe('CronEditor', () => {
       expect(screen.getByLabelText('Minute mode')).toBeDisabled()
     })
 
-    it('clamps specific values to field boundaries', () => {
-      const onChange = vi.fn()
-      render(<CronEditor onChange={onChange} />)
+    it('keeps custom mode when switching from any', () => {
+      render(<CronEditor defaultValue="* * * * *" />)
 
-      fireEvent.change(screen.getByLabelText('Hour mode'), { target: { value: 'specific' } })
-      fireEvent.change(screen.getByLabelText('Hour value'), { target: { value: '99' } })
-
-      expect(onChange).toHaveBeenLastCalledWith(
-        '* 23 * * *',
-        expect.objectContaining({ valid: true })
-      )
+      fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'custom' } })
+      expect(screen.getByLabelText('Minute mode')).toHaveValue('custom')
+      const custom = screen.getByLabelText('Minute custom value')
+      fireEvent.change(custom, { target: { value: '1,15,30' } })
+      expect(screen.getByLabelText('Cron expression')).toHaveValue('1,15,30 * * * *')
     })
 
-    it('normalizes reversed ranges to ascending order', () => {
+    it('does not rewrite a 6-field expression when a column changes', () => {
       const onChange = vi.fn()
-      render(<CronEditor onChange={onChange} />)
+      render(<CronEditor value="0 0 0 * * *" onChange={onChange} />)
 
-      fireEvent.change(screen.getByLabelText('Month mode'), { target: { value: 'range' } })
-      fireEvent.change(screen.getByLabelText('Month range start'), { target: { value: '12' } })
-      fireEvent.change(screen.getByLabelText('Month range end'), { target: { value: '1' } })
-
-      expect(onChange).toHaveBeenLastCalledWith(
-        '* * * 1-12 *',
-        expect.objectContaining({ valid: true })
-      )
+      expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+      fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'specific' } })
+      expect(onChange).not.toHaveBeenCalled()
+      expect(screen.getByLabelText('Cron expression')).toHaveValue('0 0 0 * * *')
     })
 
     it('reports invalid custom field values', () => {
