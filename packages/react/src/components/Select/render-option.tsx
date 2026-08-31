@@ -1,144 +1,176 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {
+  classNames,
   getSelectOptionClasses,
-  selectGroupLabelClasses,
   selectEmptyStateClasses,
-  isOptionGroup,
-  getPickerOptionAria,
+  selectGroupLabelClasses,
+  selectListboxClasses,
   getCreateSelectOptionLabel,
+  getPickerOptionAria,
   getSelectVirtualItemHeight,
-  fixedSizeStrategy,
+  getSelectVirtualRange,
+  getSelectActiveAlignScrollTop,
+  getSelectRowIndexForOption,
+  buildSelectListRows,
+  type SelectListRow,
   type SelectOption
 } from '@expcat/tigercat-core'
 import { SelectCheckIcon } from './icons'
-import type { SelectContext } from './types'
+import type { SelectRenderContext } from './types'
 
-export function renderOption(
-  ctx: SelectContext,
-  option: SelectOption,
-  index: number,
-  displayLabel = option.label
-): React.ReactNode {
-  const optionSelected = ctx.isSelected(option)
-  const optionActive = index === ctx.activeIndex
+function OptionRow({
+  ctx,
+  row
+}: {
+  ctx: SelectRenderContext
+  row: Extract<SelectListRow, { kind: 'option' }>
+}) {
+  const option = row.option
+  const selected = ctx.isSelected(option)
+  const active = row.optionIndex === ctx.activeIndex
+  const displayLabel = row.isCreate
+    ? getCreateSelectOptionLabel(option, ctx.createOptionLabel)
+    : option.label
   const optionAria = getPickerOptionAria({
-    selected: optionSelected,
+    selected,
     disabled: !!option.disabled
+  })
+  const custom = ctx.renderOption?.({
+    value: option.value,
+    label: displayLabel,
+    disabled: option.disabled,
+    selected,
+    active
   })
 
   return (
     <div
-      key={option.value}
-      id={ctx.getOptionId(index)}
-      data-option-index={index}
+      id={ctx.getOptionId(row.optionIndex)}
+      data-option-index={row.optionIndex}
+      data-active={active ? '' : undefined}
       {...optionAria}
-      tabIndex={optionActive ? 0 : -1}
-      className={getSelectOptionClasses(optionSelected, !!option.disabled, ctx.size)}
+      className={getSelectOptionClasses({
+        isSelected: selected,
+        isDisabled: !!option.disabled,
+        isActive: active,
+        size: ctx.size
+      })}
       onMouseEnter={() => {
-        if (!option.disabled) {
-          ctx.setActiveIndex(index)
-        }
+        if (!option.disabled) ctx.setActiveIndex(row.optionIndex)
       }}
+      onMouseDown={(event) => event.preventDefault()}
       onClick={() => ctx.selectOption(option)}>
-      <span className="flex items-center justify-between w-full">
-        <span>{displayLabel}</span>
-        {optionSelected && <SelectCheckIcon />}
-      </span>
+      {custom ?? (
+        <span className="flex items-center justify-between w-full gap-2">
+          <span className="truncate">{displayLabel}</span>
+          {selected ? <SelectCheckIcon /> : null}
+        </span>
+      )}
     </div>
   )
 }
 
-/**
- * Virtualized flat-option list. Renders only the options inside the scroll
- * window (height = `listHeight`) and follows the active index with the keyboard.
- */
-const VirtualSelectOptions: React.FC<{ ctx: SelectContext; options: SelectOption[] }> = ({
-  ctx,
-  options
-}) => {
+function renderRows(ctx: SelectRenderContext, rows: SelectListRow[]) {
+  return rows.map((row) => {
+    if (row.kind === 'group') {
+      return (
+        <div key={row.key} role="group" aria-label={row.label}>
+          <div className={selectGroupLabelClasses} aria-hidden="true">
+            {row.label}
+          </div>
+        </div>
+      )
+    }
+    return <OptionRow key={row.key} ctx={ctx} row={row} />
+  })
+}
+
+function VirtualSelectRows({ ctx, rows }: { ctx: SelectRenderContext; rows: SelectListRow[] }) {
   const itemHeight = getSelectVirtualItemHeight(ctx.size)
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
-  const strategy = fixedSizeStrategy(itemHeight)
-  const { startIndex, endIndex, totalHeight } = strategy.getRange(
+  const rafRef = useRef<number | undefined>(undefined)
+  const { startIndex, endIndex, totalHeight } = getSelectVirtualRange(
     scrollTop,
     ctx.listHeight,
-    options.length,
-    5
+    rows.length,
+    itemHeight
   )
 
-  // Keep the active option within the scroll window during keyboard navigation.
   useEffect(() => {
     const el = containerRef.current
     if (!el || ctx.activeIndex < 0) return
-    const top = ctx.activeIndex * itemHeight
-    if (top < el.scrollTop) el.scrollTop = top
-    else if (top + itemHeight > el.scrollTop + ctx.listHeight)
-      el.scrollTop = top + itemHeight - ctx.listHeight
-  }, [ctx.activeIndex, itemHeight, ctx.listHeight])
+    const rowIndex = getSelectRowIndexForOption(rows, ctx.activeIndex)
+    const next = getSelectActiveAlignScrollTop({
+      scrollTop: el.scrollTop,
+      listHeight: ctx.listHeight,
+      rowIndex,
+      itemHeight
+    })
+    if (next !== el.scrollTop) {
+      el.scrollTop = next
+      setScrollTop(next)
+    }
+  }, [ctx.activeIndex, ctx.listHeight, itemHeight, rows])
 
-  const visible: React.ReactNode[] = []
-  for (let i = startIndex; i <= endIndex; i++) {
-    visible.push(renderOption(ctx, options[i], i))
-  }
+  useEffect(
+    () => () => {
+      if (rafRef.current !== undefined) cancelAnimationFrame(rafRef.current)
+    },
+    []
+  )
+
+  const visible = rows.slice(startIndex, endIndex + 1)
 
   return (
     <div
       ref={containerRef}
       data-tiger-select-virtual=""
-      style={{ maxHeight: `${ctx.listHeight}px`, overflowY: 'auto' }}
-      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}>
+      className={selectListboxClasses}
+      style={{ maxHeight: `${ctx.listHeight}px` }}
+      {...ctx.listboxAria}
+      aria-multiselectable={ctx.multiple ? true : undefined}
+      aria-busy={ctx.loading || undefined}
+      onScroll={(event) => {
+        const top = event.currentTarget.scrollTop
+        if (rafRef.current !== undefined) cancelAnimationFrame(rafRef.current)
+        rafRef.current = requestAnimationFrame(() => setScrollTop(top))
+      }}>
       <div style={{ height: `${totalHeight}px`, position: 'relative' }}>
-        <div style={{ transform: `translateY(${startIndex * itemHeight}px)` }}>{visible}</div>
+        <div style={{ transform: `translateY(${startIndex * itemHeight}px)` }}>
+          {renderRows(ctx, visible)}
+        </div>
       </div>
     </div>
   )
 }
 
-export function renderOptions(ctx: SelectContext): React.ReactNode {
-  if (!ctx.hasOptions && !ctx.creatableOption) {
-    return <div className={selectEmptyStateClasses}>{ctx.emptyText}</div>
-  }
-
-  // Virtual mode: only for flat option lists (no groups). Groups fall back to
-  // full rendering.
-  const hasGroups = ctx.filteredOptions.some(isOptionGroup)
-  if (ctx.virtual && !hasGroups) {
-    const flat = ctx.filteredOptions.filter((o): o is SelectOption => !isOptionGroup(o))
-    const all = ctx.creatableOption ? [...flat, ctx.creatableOption] : flat
-    return <VirtualSelectOptions ctx={ctx} options={all} />
-  }
-
-  let optionIndex = -1
-
-  const optionNodes = ctx.filteredOptions.map((item) => {
-    if (isOptionGroup(item)) {
-      return (
-        <div key={item.label}>
-          <div className={selectGroupLabelClasses}>{item.label}</div>
-          {item.options.map((option) => {
-            optionIndex += 1
-            return renderOption(ctx, option, optionIndex)
-          })}
-        </div>
-      )
-    }
-
-    optionIndex += 1
-    return renderOption(ctx, item, optionIndex)
-  })
-
-  if (ctx.creatableOption) {
-    optionIndex += 1
-    optionNodes.push(
-      renderOption(
-        ctx,
-        ctx.creatableOption,
-        optionIndex,
-        getCreateSelectOptionLabel(ctx.creatableOption, ctx.createOptionText)
-      )
-    )
-  }
-
-  return optionNodes
+export function hasSelectOptionRows(ctx: SelectRenderContext): boolean {
+  return buildSelectListRows(ctx.filteredOptions, ctx.creatableOption).some(
+    (row) => row.kind === 'option'
+  )
 }
+
+export function renderSelectPanelBody(ctx: SelectRenderContext): React.ReactNode {
+  const rows = buildSelectListRows(ctx.filteredOptions, ctx.creatableOption)
+  if (!rows.some((row) => row.kind === 'option')) return null
+  if (ctx.virtual) return <VirtualSelectRows ctx={ctx} rows={rows} />
+  return (
+    <div
+      className={selectListboxClasses}
+      style={{ maxHeight: `${ctx.listHeight}px` }}
+      {...ctx.listboxAria}
+      aria-multiselectable={ctx.multiple ? true : undefined}
+      aria-busy={ctx.loading || undefined}>
+      {renderRows(ctx, rows)}
+    </div>
+  )
+}
+
+export function renderSelectEmpty(ctx: SelectRenderContext): React.ReactNode {
+  return (
+    <div className={selectEmptyStateClasses}>{ctx.loading ? ctx.loadingText : ctx.emptyText}</div>
+  )
+}
+
+export type { SelectOption }

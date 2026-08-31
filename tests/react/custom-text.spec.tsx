@@ -62,10 +62,10 @@ describe('custom text (no i18n) — React', () => {
     })
 
     it('Select done action uses labels', () => {
-      const { container } = render(
+      const { getByRole } = render(
         <Select options={[{ label: 'One', value: 1 }]} labels={{ doneText: 'Complete' }} />
       )
-      fireEvent.click(container.querySelector('button')!)
+      fireEvent.click(getByRole('combobox'))
       expect(screen.getByRole('button', { name: 'Complete' })).toBeInTheDocument()
     })
   })
@@ -100,12 +100,12 @@ describe('custom text (no i18n) — React', () => {
     })
 
     it('Select labels prop wins over global config text', () => {
-      const { container } = render(
+      const { getByRole } = render(
         <ConfigProvider locale={{ select: { doneText: 'GlobalDone' } }}>
           <Select options={[{ label: 'One', value: 1 }]} labels={{ doneText: 'LocalDone' }} />
         </ConfigProvider>
       )
-      fireEvent.click(container.querySelector('button')!)
+      fireEvent.click(getByRole('combobox'))
       expect(screen.getByRole('button', { name: 'LocalDone' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'GlobalDone' })).toBeNull()
     })
@@ -182,33 +182,33 @@ describe('custom text (no i18n) — React', () => {
     })
 
     it('Select emptyText (empty options) reads global config emptyText', () => {
-      const { container, getByText } = render(
-        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+      const { getByRole, getByText } = render(
+        <ConfigProvider locale={{ select: { emptyText: '暂无数据' } }}>
           <Select options={[]} />
         </ConfigProvider>
       )
-      fireEvent.click(container.querySelector('button')!)
+      fireEvent.click(getByRole('combobox'))
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
     it('Select emptyText (no search results) reads global config emptyText', () => {
-      const { container, getByText } = render(
-        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+      const { getByRole, getByText } = render(
+        <ConfigProvider locale={{ select: { emptyText: '暂无数据' } }}>
           <Select options={[{ label: 'One', value: 1 }]} searchable />
         </ConfigProvider>
       )
-      fireEvent.click(container.querySelector('button')!)
+      fireEvent.click(getByRole('combobox'))
       fireEvent.change(document.body.querySelector('input')!, { target: { value: 'zzz' } })
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
     it('Select emptyText prop wins over global config', () => {
-      const { container, getByText, queryByText } = render(
-        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+      const { getByRole, getByText, queryByText } = render(
+        <ConfigProvider locale={{ select: { emptyText: '暂无数据' } }}>
           <Select options={[]} emptyText="没有可选项" />
         </ConfigProvider>
       )
-      fireEvent.click(container.querySelector('button')!)
+      fireEvent.click(getByRole('combobox'))
       expect(getByText('没有可选项')).toBeInTheDocument()
       expect(queryByText('暂无数据')).toBeNull()
     })
@@ -259,8 +259,8 @@ describe('custom text (no i18n) — React', () => {
     })
 
     it('Select empty options outside a ConfigProvider keeps default English text', () => {
-      const { container, getByText } = render(<Select options={[]} />)
-      fireEvent.click(container.querySelector('button')!)
+      const { getByRole, getByText } = render(<Select options={[]} />)
+      fireEvent.click(getByRole('combobox'))
       expect(getByText('No options found')).toBeInTheDocument()
     })
 

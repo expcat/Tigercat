@@ -397,6 +397,7 @@ export interface UseAnchoredOverlayOptions {
   layout?: AnchoredOverlayLayout
   matchReferenceWidth?: boolean
   portal?: boolean
+  getContainer?: () => HTMLElement | null
   dismissOnOutside?: boolean
   dismissOnEscape?: boolean
   restoreFocusOnDismiss?: boolean
@@ -415,6 +416,13 @@ export interface UseAnchoredOverlayReturn {
   y: number
 }
 
+function resolveOverlayPortalTarget(
+  reference: HTMLElement | null,
+  getContainer?: () => HTMLElement | null
+): HTMLElement | null {
+  return getContainer?.() ?? resolveAnchoredOverlayTarget(reference)
+}
+
 export function useAnchoredOverlay({
   enabled,
   referenceRef,
@@ -426,6 +434,7 @@ export function useAnchoredOverlay({
   layout = 'anchored',
   matchReferenceWidth = false,
   portal = true,
+  getContainer,
   dismissOnOutside = false,
   dismissOnEscape = false,
   restoreFocusOnDismiss = false,
@@ -446,14 +455,16 @@ export function useAnchoredOverlay({
       setTarget(null)
       return
     }
-    setTarget(resolveAnchoredOverlayTarget(referenceRef.current))
-  }, [portal, referenceRef])
+    setTarget(resolveOverlayPortalTarget(referenceRef.current, getContainer))
+  }, [portal, referenceRef, getContainer])
 
   // Opening from an already-mounted trigger can resolve the layer during render.
   // This keeps the floating subtree in the same Portal from its first open frame,
   // so autofocus and keyboard state are not lost to a follow-up Portal remount.
   const resolvedTarget =
-    portal && referenceRef.current ? resolveAnchoredOverlayTarget(referenceRef.current) : null
+    portal && referenceRef.current
+      ? resolveOverlayPortalTarget(referenceRef.current, getContainer)
+      : null
   const effectiveTarget = resolvedTarget ?? target
 
   const {

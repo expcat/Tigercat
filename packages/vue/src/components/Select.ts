@@ -1,105 +1,120 @@
-import { defineComponent, computed, ref, h, PropType, watch, nextTick, onBeforeUnmount } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  inject,
+  watch,
+  nextTick,
+  onBeforeUnmount,
+  useId,
+  type PropType,
+  type CSSProperties
+} from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  TIGER_CHROME_ATTR,
+  SHAKE_CLASS,
+  runShakeAnimation,
+  mergeAriaDescribedBy,
   getSelectTriggerClasses,
   getSelectOptionClasses,
-  selectBaseClasses,
+  getSelectRootClasses,
   selectDropdownBaseClasses,
   selectGroupLabelClasses,
-  selectSearchInputClasses,
   selectEmptyStateClasses,
   selectDoneActionClasses,
   selectDoneButtonClasses,
-  isOptionGroup,
+  selectListboxClasses,
+  selectTrailingSlotClasses,
+  selectClearButtonClasses,
+  selectChevronWrapClasses,
+  selectCheckIconClasses,
+  selectChromeIconClasses,
+  selectClearIconClasses,
   createSelectSearchDebouncer,
+  createSelectTypeaheadBuffer,
   getCreateSelectOptionLabel,
   flattenSelectOptions,
   resolveCreatableSelectOption,
   resolveSelectFilteredOptions,
   getSelectVirtualItemHeight,
-  fixedSizeStrategy,
+  getSelectVirtualRange,
+  getSelectActiveAlignScrollTop,
+  getSelectRowIndexForOption,
+  buildSelectListRows,
   getPickerOptionAria,
-  findFirstEnabledIndex as pickerFindFirstEnabledIndex,
-  findLastEnabledIndex as pickerFindLastEnabledIndex,
-  findNextEnabledIndex as pickerFindNextEnabledIndex,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerOptionId,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
   checkSolidIcon20PathD,
+  resolveLocaleText,
+  mergeTigerLocale,
+  getSelectLabels,
+  normalizeSelectValue,
+  pruneCreatedSelectOptions,
+  rememberSelectOptions,
+  resolveSelectDisplayText,
+  commitSelectOption,
+  clearSelectValue,
+  getSelectSelectedValues,
+  getSelectTriggerKeyIntent,
+  findSelectTypeaheadIndex,
+  isSelectTypeaheadCharacter,
+  isSelectOptionSelected,
+  shouldShowSelectClear,
+  navigateSelectActiveIndex,
+  getSelectClosedHomeEndIndex,
+  serializeSelectFormValues,
+  coerceSelectFormValue,
   type SelectOption,
   type SelectOptions,
   type ComponentSize,
   type SelectModelValue,
   type SelectSearchDebouncer,
-  resolveLocaleText,
-  mergeTigerLocale,
-  getSelectLabels,
+  type InputStatus,
   type TigerLocale,
-  type TigerLocaleSelect
+  type TigerLocaleSelect,
+  type SelectFilterOption,
+  type SelectOptionSlotContext,
+  type FloatingPlacement,
+  type SelectListRow
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
-let selectInstanceId = 0
-
-// Chevron down icon
-const ChevronDownIcon = h(
-  'svg',
-  {
-    class:
-      'w-5 h-5 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] transition-transform',
-    xmlns: 'http://www.w3.org/2000/svg',
-    viewBox: icon20ViewBox,
-    fill: 'currentColor'
-  },
-  [
-    h('path', {
-      'fill-rule': 'evenodd',
-      d: chevronDownSolidIcon20PathD,
-      'clip-rule': 'evenodd'
-    })
-  ]
-)
-
-// Close icon (X)
-const CloseIcon = h(
-  'svg',
-  {
-    class:
-      'w-4 h-4 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-select-icon-hover,var(--tiger-text-muted,#6b7280))]',
-    xmlns: 'http://www.w3.org/2000/svg',
-    viewBox: icon20ViewBox,
-    fill: 'currentColor'
-  },
-  [
-    h('path', {
-      'fill-rule': 'evenodd',
-      d: closeSolidIcon20PathD,
-      'clip-rule': 'evenodd'
-    })
-  ]
-)
-
-// Check icon
-const CheckIcon = h(
-  'svg',
-  {
-    class: 'w-5 h-5 text-[var(--tiger-select-check-icon,var(--tiger-primary,#2563eb))]',
-    xmlns: 'http://www.w3.org/2000/svg',
-    viewBox: icon20ViewBox,
-    fill: 'currentColor'
-  },
-  [
-    h('path', {
-      'fill-rule': 'evenodd',
-      d: checkSolidIcon20PathD,
-      'clip-rule': 'evenodd'
-    })
-  ]
-)
+function iconVNode(path: string, className: string) {
+  return h(
+    'svg',
+    {
+      class: className,
+      xmlns: 'http://www.w3.org/2000/svg',
+      viewBox: icon20ViewBox,
+      fill: 'currentColor',
+      'aria-hidden': 'true',
+      focusable: 'false'
+    },
+    [
+      h('path', {
+        'fill-rule': 'evenodd',
+        d: path,
+        'clip-rule': 'evenodd'
+      })
+    ]
+  )
+}
 
 export interface VueSelectProps {
   modelValue?: SelectModelValue
+  defaultValue?: SelectModelValue
+  open?: boolean
+  defaultOpen?: boolean
   options?: SelectOptions
   size?: ComponentSize
   disabled?: boolean
@@ -117,409 +132,349 @@ export interface VueSelectProps {
   creatable?: boolean
   createOptionText?: string
   listHeight?: number
+  autoClearSearchValue?: boolean
+  loading?: boolean
+  status?: InputStatus
+  name?: string
+  filterOption?: SelectFilterOption
+  placement?: FloatingPlacement
+  offset?: number
+  dropdownClassName?: string
+  getPopupContainer?: () => HTMLElement | null
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleSelect>
+  className?: string
 }
+
+export type SelectProps = VueSelectProps
+export type { SelectOption, SelectOptions } from '@expcat/tigercat-core'
 
 export const Select = defineComponent({
   name: 'TigerSelect',
+  inheritAttrs: false,
   props: {
-    /**
-     * Selected value(s) (for v-model)
-     */
-    modelValue: {
-      type: [String, Number, Array] as PropType<SelectModelValue>
-    },
-    /**
-     * Available options or option groups
-     * @default []
-     */
-    options: {
-      type: Array as PropType<SelectOptions>,
-      default: () => []
-    },
-    /**
-     * Select size
-     * @default 'md'
-     */
-    size: {
-      type: String as PropType<ComponentSize>,
-      default: 'md' as ComponentSize
-    },
-    /**
-     * Whether the select is disabled
-     */
+    modelValue: { type: [String, Number, Array] as PropType<SelectModelValue> },
+    defaultValue: { type: [String, Number, Array] as PropType<SelectModelValue> },
+    open: { type: Boolean, default: undefined },
+    defaultOpen: { type: Boolean, default: false },
+    options: { type: Array as PropType<SelectOptions>, default: () => [] },
+    size: { type: String as PropType<ComponentSize>, default: 'md' as ComponentSize },
     disabled: Boolean,
-    /**
-     * Placeholder text. Defaults to ConfigProvider locale `select.placeholder`.
-     */
-    placeholder: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Enable search functionality
-     */
+    placeholder: { type: String, default: undefined },
     searchable: Boolean,
-    searchValue: {
-      type: String,
-      default: undefined
-    },
-    defaultSearchValue: {
-      type: String,
-      default: ''
-    },
-    /**
-     * Allow multiple selection
-     */
+    searchValue: { type: String, default: undefined },
+    defaultSearchValue: { type: String, default: '' },
     multiple: Boolean,
-    /**
-     * Show clear button
-     * @default true
-     */
-    clearable: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Text shown when the options list is empty or no search result matches
-     */
-    emptyText: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Maximum number of tags in multi-select display
-     * @since 0.5.0
-     */
-    maxTagCount: {
-      type: Number,
-      default: undefined
-    },
-    /**
-     * Whether to use virtual scrolling
-     * @since 0.5.0
-     */
+    clearable: { type: Boolean, default: true },
+    emptyText: { type: String, default: undefined },
+    maxTagCount: { type: Number, default: undefined },
     virtual: Boolean,
-    /**
-     * Whether search is handled remotely
-     */
     remote: Boolean,
-    /**
-     * Debounce delay for search callbacks in milliseconds
-     * @default 0
-     */
-    searchDebounce: {
-      type: Number,
-      default: 0
-    },
-    /**
-     * Whether users can create a new option from the search query
-     */
+    searchDebounce: { type: Number, default: 0 },
     creatable: Boolean,
-    /**
-     * Prefix text used for the creatable option row
-     * @default 'Create'
-     */
-    createOptionText: {
-      type: String,
-      default: 'Create'
-    },
-    /**
-     * Height of the dropdown panel in pixels
-     * @default 256
-     * @since 0.5.0
-     */
-    listHeight: {
-      type: Number,
-      default: 256
-    },
-    /**
-     * Locale overrides merged on top of ConfigProvider locale
-     */
-    locale: {
-      type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined
-    },
-    /**
-     * UI labels for custom text. Takes precedence over locale and ConfigProvider text.
-     */
-    labels: {
-      type: Object as PropType<Partial<TigerLocaleSelect>>,
-      default: undefined
-    }
+    createOptionText: { type: String, default: undefined },
+    listHeight: { type: Number, default: 256 },
+    autoClearSearchValue: { type: Boolean, default: true },
+    loading: Boolean,
+    status: { type: String as PropType<InputStatus>, default: undefined },
+    name: String,
+    filterOption: { type: Function as PropType<SelectFilterOption> },
+    placement: { type: String as PropType<FloatingPlacement>, default: 'bottom-start' },
+    offset: { type: Number, default: 4 },
+    dropdownClassName: String,
+    getPopupContainer: { type: Function as PropType<() => HTMLElement | null> },
+    locale: { type: Object as PropType<Partial<TigerLocale>> },
+    labels: { type: Object as PropType<Partial<TigerLocaleSelect>> },
+    className: String
   },
-  emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change', 'create'],
-  setup(props, { emit }) {
+  emits: [
+    'update:modelValue',
+    'update:searchValue',
+    'update:open',
+    'change',
+    'search-change',
+    'create',
+    'open-change',
+    'blur'
+  ],
+  setup(props, { emit, attrs, slots, expose }) {
     const config = useTigerConfig()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const instanceId = ++selectInstanceId
+    const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
+    const instanceId = useId()
     const listboxId = `tiger-select-listbox-${instanceId}`
-    const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
+    const getOptionId = (index: number) => getPickerOptionId(listboxId, index)
 
-    const isOpen = ref(false)
-    const uncontrolledSearchValue = ref(props.defaultSearchValue)
-    const searchQuery = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
+    const localValue = ref<SelectModelValue>(
+      normalizeSelectValue(
+        props.modelValue ??
+          coerceSelectFormValue(formItemControl?.value.value, props.options, props.multiple) ??
+          props.defaultValue ??
+          (props.multiple ? [] : undefined),
+        props.multiple,
+        false
+      )
+    )
+    const localOpen = ref(props.defaultOpen)
+    const localSearch = ref(props.defaultSearchValue)
     const activeIndex = ref(-1)
     const createdOptions = ref<SelectOption[]>([])
-    const dropdownRef = ref<HTMLElement | null>(null)
+    const optionCache = ref(new Map<string | number, SelectOption>())
+    const rootRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const searchInputRef = ref<HTMLInputElement | null>(null)
+    const dropdownRef = ref<HTMLElement | null>(null)
+    const virtualScrollTop = ref(0)
+    const virtualScrollRef = ref<HTMLElement | null>(null)
+    const activeValue = ref<string | number | undefined>(undefined)
+
+    const selected = computed(() =>
+      props.modelValue !== undefined
+        ? normalizeSelectValue(props.modelValue, props.multiple, true)
+        : (coerceSelectFormValue(formItemControl?.value.value, props.options, props.multiple) ??
+          localValue.value)
+    )
+    const isOpen = computed(() => (props.open !== undefined ? props.open : localOpen.value))
+    const searchQuery = computed(() => props.searchValue ?? localSearch.value)
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
+
+    watch(
+      () => [props.modelValue, formItemControl?.value.value] as const,
+      ([model, formValue]) => {
+        const next =
+          model !== undefined
+            ? model
+            : coerceSelectFormValue(formValue, props.options, props.multiple)
+        if (next === undefined) return
+        localValue.value = normalizeSelectValue(next, props.multiple, false)
+      }
+    )
+
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      (current, previous) => {
+        if (!previous) return
+        if (current[0] === 'error') runShakeAnimation(rootRef.value)
+      },
+      { flush: 'post' }
+    )
+
     const overlay = useVueAnchoredOverlay({
       enabled: isOpen,
       referenceRef: triggerRef,
       floatingRef: dropdownRef,
-      placement: 'bottom-start',
-      offset: 4,
+      placement: () => props.placement ?? 'bottom-start',
+      offset: () => props.offset ?? 4,
       layout: 'fullscreen-sm',
       matchReferenceWidth: true,
       dismissOnOutside: true,
       dismissOnEscape: true,
       restoreFocusOnDismiss: true,
+      getContainer: () => props.getPopupContainer?.() ?? null,
       onDismiss: closeDropdown
     })
-    // Virtual scrolling (flat options only)
-    const virtualScrollTop = ref(0)
-    const virtualScrollRef = ref<HTMLElement | null>(null)
-    // Keep the active option within the virtual scroll window during keyboard nav.
-    watch(activeIndex, (idx) => {
-      if (!props.virtual || idx < 0) return
-      const el = virtualScrollRef.value
-      if (!el) return
-      const itemH = getSelectVirtualItemHeight(props.size)
-      const top = idx * itemH
-      if (top < el.scrollTop) el.scrollTop = top
-      else if (top + itemH > el.scrollTop + props.listHeight)
-        el.scrollTop = top + itemH - props.listHeight
-    })
+
     let searchDebouncer: SelectSearchDebouncer = createSelectSearchDebouncer({
       delay: props.searchDebounce,
       onSearchChange: (query) => emit('search-change', query)
     })
-
-    function updateSearchValue(query: string) {
-      if (props.searchValue === undefined) {
-        uncontrolledSearchValue.value = query
+    const typeahead = createSelectTypeaheadBuffer({
+      onQuery: (query) => {
+        const index = findSelectTypeaheadIndex(flatSelectableOptions.value, query, -1)
+        if (index >= 0) activeIndex.value = index
       }
+    })
+
+    function setOpen(next: boolean) {
+      if (props.open === undefined) localOpen.value = next
+      emit('update:open', next)
+      emit('open-change', next)
+    }
+
+    function setSearch(query: string) {
+      if (props.searchValue === undefined) localSearch.value = query
       emit('update:searchValue', query)
       searchDebouncer.schedule(query)
     }
 
-    const filteredOptions = computed(() => {
-      return resolveSelectFilteredOptions(props.options, searchQuery.value, {
-        searchable: props.searchable,
-        remote: props.remote
-      })
-    })
+    function setSelected(next: SelectModelValue) {
+      const normalized = normalizeSelectValue(next, props.multiple)
+      if (props.modelValue === undefined) localValue.value = normalized
+      emit('update:modelValue', normalized)
+      emit('change', normalized)
+      formItemControl?.onChange(normalized)
+    }
 
-    const allOptions = computed(() => flattenSelectOptions(props.options))
-    const flatFilteredOptions = computed(() => flattenSelectOptions(filteredOptions.value))
+    const liveCreated = computed(() =>
+      pruneCreatedSelectOptions(createdOptions.value, props.options)
+    )
+    const filteredOptions = computed(() =>
+      resolveSelectFilteredOptions(props.options, searchQuery.value, {
+        searchable: props.searchable,
+        remote: props.remote,
+        filterOption: props.filterOption
+      })
+    )
     const creatableOption = computed(() =>
-      resolveCreatableSelectOption([...props.options, ...createdOptions.value], searchQuery.value, {
+      resolveCreatableSelectOption([...props.options, ...liveCreated.value], searchQuery.value, {
         creatable: props.creatable && props.searchable
       })
     )
     const flatSelectableOptions = computed(() => {
-      return creatableOption.value
-        ? [...flatFilteredOptions.value, creatableOption.value]
-        : flatFilteredOptions.value
+      const flat = flattenSelectOptions(filteredOptions.value)
+      return creatableOption.value ? [...flat, creatableOption.value] : flat
     })
-
-    const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
+    const selectedValues = computed(() => getSelectSelectedValues(selected.value, props.multiple))
     const placeholderText = computed(() =>
       resolveLocaleText(labels.value.placeholder, props.placeholder)
     )
-    const doneText = computed(() => resolveLocaleText(labels.value.doneText))
-
+    const createOptionLabel = computed(() => {
+      if (props.createOptionText) {
+        return props.createOptionText.includes('{label}')
+          ? props.createOptionText
+          : `${props.createOptionText} "{label}"`
+      }
+      return labels.value.createOptionLabel
+    })
     const displayText = computed(() => {
-      if (props.multiple && Array.isArray(props.modelValue)) {
-        if (props.modelValue.length === 0) {
-          return placeholderText.value
-        }
-        const currentValue = props.modelValue
-        const selectedOptions = [...allOptions.value, ...createdOptions.value].filter((opt) =>
-          currentValue.includes(opt.value)
-        )
-        const optionLabels = selectedOptions.map((opt) => opt.label)
-        if (props.maxTagCount !== undefined && optionLabels.length > props.maxTagCount) {
-          const visible = optionLabels.slice(0, props.maxTagCount)
-          return `${visible.join(', ')} +${optionLabels.length - props.maxTagCount}`
-        }
-        return optionLabels.join(', ')
-      }
-
-      const value = Array.isArray(props.modelValue) ? undefined : props.modelValue
-      if (value === undefined || value === null || value === '') {
-        return placeholderText.value
-      }
-      const option = [...allOptions.value, ...createdOptions.value].find(
-        (opt) => opt.value === value
+      optionCache.value = rememberSelectOptions(
+        optionCache.value,
+        [...flattenSelectOptions(props.options), ...liveCreated.value],
+        selectedValues.value
       )
-      return option ? option.label : placeholderText.value
-    })
-
-    const showClearButton = computed(() => {
-      return (
-        props.clearable &&
-        !props.disabled &&
-        props.modelValue !== undefined &&
-        props.modelValue !== null &&
-        props.modelValue !== '' &&
-        (!Array.isArray(props.modelValue) || props.modelValue.length > 0)
-      )
-    })
-
-    function isSelected(option: SelectOption): boolean {
-      if (props.multiple && Array.isArray(props.modelValue)) {
-        return props.modelValue.includes(option.value)
-      }
-      return props.modelValue === option.value
-    }
-
-    const findFirstEnabledIndex = (): number =>
-      pickerFindFirstEnabledIndex(flatSelectableOptions.value)
-
-    const findLastEnabledIndex = (): number =>
-      pickerFindLastEnabledIndex(flatSelectableOptions.value)
-
-    const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
-      pickerFindNextEnabledIndex(flatSelectableOptions.value, current, direction)
-
-    const focusOptionAt = (index: number) => {
-      if (index < 0) {
-        return
-      }
-
-      nextTick(() => {
-        const el = dropdownRef.value?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)
-        el?.focus()
-        el?.scrollIntoView({ block: 'nearest' })
+      return resolveSelectDisplayText({
+        value: selected.value,
+        multiple: props.multiple,
+        options: props.options,
+        createdOptions: liveCreated.value,
+        optionCache: optionCache.value,
+        placeholder: placeholderText.value,
+        maxTagCount: props.maxTagCount,
+        moreCountText: labels.value.moreCountText
       })
+    })
+    const showClear = computed(() =>
+      shouldShowSelectClear({
+        clearable: props.clearable,
+        disabled: effectiveDisabled.value,
+        value: selected.value,
+        multiple: props.multiple
+      })
+    )
+
+    function closeDropdown() {
+      setOpen(false)
+      setSearch('')
+      activeIndex.value = -1
+      activeValue.value = undefined
     }
 
-    const setActiveAndFocus = (index: number) => {
-      activeIndex.value = index
-      focusOptionAt(index)
+    function openDropdown() {
+      if (effectiveDisabled.value) return
+      setOpen(true)
     }
 
     function toggleDropdown() {
-      if (!props.disabled) {
-        isOpen.value = !isOpen.value
-        if (isOpen.value && props.searchable) {
-          // Focus search input when dropdown opens
-          nextTick(() => {
-            searchInputRef.value?.focus()
-          })
-        }
-      }
-    }
-
-    function closeDropdown() {
-      isOpen.value = false
-      updateSearchValue('')
-      activeIndex.value = -1
+      if (effectiveDisabled.value) return
+      if (isOpen.value) closeDropdown()
+      else openDropdown()
     }
 
     function selectOption(option: SelectOption) {
-      if (option.disabled) {
-        return
-      }
-
+      if (option.disabled || effectiveDisabled.value) return
       if (creatableOption.value && option.value === creatableOption.value.value) {
-        createdOptions.value = [...createdOptions.value, option]
+        if (!createdOptions.value.some((item) => item.value === option.value)) {
+          createdOptions.value = [...createdOptions.value, option]
+        }
         emit('create', option)
       }
-
+      const next = commitSelectOption({
+        option,
+        value: selected.value,
+        multiple: props.multiple
+      })
+      setSelected(next)
       if (props.multiple) {
-        const currentValue = Array.isArray(props.modelValue) ? props.modelValue : []
-        let newValue: typeof currentValue
-
-        if (currentValue.includes(option.value)) {
-          newValue = currentValue.filter((v) => v !== option.value)
-        } else {
-          newValue = [...currentValue, option.value]
-        }
-
-        emit('update:modelValue', newValue)
-        emit('change', newValue)
-      } else {
-        emit('update:modelValue', option.value)
-        emit('change', option.value)
-        closeDropdown()
-        nextTick(() => {
-          ;(triggerRef.value as HTMLButtonElement | null)?.focus()
-        })
-      }
-    }
-
-    function clearSelection(event: Event) {
-      event.stopPropagation()
-      const newValue = props.multiple ? [] : undefined
-      emit('update:modelValue', newValue)
-      emit('change', newValue)
-    }
-
-    function handleSearchInput(event: Event) {
-      const target = event.target as HTMLInputElement
-      updateSearchValue(target.value)
-    }
-
-    function getActiveOption(): SelectOption | undefined {
-      if (activeIndex.value < 0) {
-        return undefined
-      }
-      return flatSelectableOptions.value[activeIndex.value]
-    }
-
-    function selectActiveOption() {
-      const option = getActiveOption()
-      if (!option || option.disabled) {
+        const nextIndex = flatSelectableOptions.value.findIndex(
+          (item) => item.value === option.value
+        )
+        activeIndex.value = nextIndex
+        activeValue.value = option.value
+        if (props.autoClearSearchValue) setSearch('')
         return
       }
-      selectOption(option)
+      closeDropdown()
+      nextTick(() => triggerRef.value?.focus())
     }
 
-    function handleTriggerKeyDown(event: KeyboardEvent) {
-      if (props.disabled) {
+    function clearSelection(event?: Event) {
+      event?.stopPropagation()
+      setSelected(clearSelectValue(props.multiple))
+      nextTick(() => triggerRef.value?.focus())
+    }
+
+    function handleKeyDown(event: KeyboardEvent, fromSearchInput = false) {
+      if (effectiveDisabled.value) return
+      if (!isOpen.value && isSelectTypeaheadCharacter(event.key, event)) {
+        event.preventDefault()
+        openDropdown()
+        if (props.searchable) setSearch(event.key)
+        else typeahead.push(event.key)
         return
       }
-
-      switch (event.key) {
-        case 'ArrowDown': {
+      const intent = getSelectTriggerKeyIntent({
+        key: event.key,
+        open: isOpen.value,
+        searchable: props.searchable,
+        clearable: props.clearable,
+        hasValue: showClear.value,
+        fromSearchInput
+      })
+      switch (intent.type) {
+        case 'open':
           event.preventDefault()
-          if (!isOpen.value) {
-            isOpen.value = true
-            return
-          }
-          const next = findNextEnabledIndex(activeIndex.value, 1)
-          setActiveAndFocus(next)
+          openDropdown()
           return
-        }
-        case 'ArrowUp': {
+        case 'close':
+          if (event.key !== 'Tab') event.preventDefault()
+          closeDropdown()
+          triggerRef.value?.focus()
+          return
+        case 'clear':
           event.preventDefault()
-          if (!isOpen.value) {
-            isOpen.value = true
-            return
-          }
-          const next = findNextEnabledIndex(activeIndex.value, -1)
-          setActiveAndFocus(next)
+          clearSelection()
           return
-        }
-        case 'Enter':
-        case ' ': {
+        case 'prevent-scroll':
           event.preventDefault()
-          if (!isOpen.value) {
-            isOpen.value = true
-            return
-          }
-          selectActiveOption()
+          openDropdown()
+          activeIndex.value = getSelectClosedHomeEndIndex(
+            flatSelectableOptions.value,
+            event.key as 'Home' | 'End'
+          )
           return
-        }
-        case 'Escape': {
-          if (isOpen.value) {
-            event.preventDefault()
-            closeDropdown()
-          }
+        case 'navigate':
+          event.preventDefault()
+          activeIndex.value = navigateSelectActiveIndex(
+            flatSelectableOptions.value,
+            activeIndex.value,
+            intent.key
+          )
+          activeValue.value = flatSelectableOptions.value[activeIndex.value]?.value
+          return
+        case 'select-active': {
+          event.preventDefault()
+          const option = flatSelectableOptions.value[activeIndex.value]
+          if (option) selectOption(option)
           return
         }
         default:
@@ -527,139 +482,52 @@ export const Select = defineComponent({
       }
     }
 
-    function handleDropdownKeyDown(event: KeyboardEvent) {
-      switch (event.key) {
-        case 'ArrowDown': {
-          event.preventDefault()
-          const next = findNextEnabledIndex(activeIndex.value, 1)
-          setActiveAndFocus(next)
-          return
-        }
-        case 'ArrowUp': {
-          event.preventDefault()
-          const next = findNextEnabledIndex(activeIndex.value, -1)
-          setActiveAndFocus(next)
-          return
-        }
-        case 'Home': {
-          event.preventDefault()
-          const next = findFirstEnabledIndex()
-          setActiveAndFocus(next)
-          return
-        }
-        case 'End': {
-          event.preventDefault()
-          const next = findLastEnabledIndex()
-          setActiveAndFocus(next)
-          return
-        }
-        case 'Enter':
-        case ' ': {
-          event.preventDefault()
-          selectActiveOption()
-          return
-        }
-        case 'Escape': {
-          event.preventDefault()
-          closeDropdown()
-          nextTick(() => {
-            ;(triggerRef.value as HTMLButtonElement | null)?.focus()
-          })
-          return
-        }
-        case 'Tab': {
-          closeDropdown()
-          return
-        }
-        default:
-          return
+    function handleFocusOut(event: FocusEvent) {
+      const next = event.relatedTarget as Node | null
+      if (
+        (rootRef.value && next && rootRef.value.contains(next)) ||
+        (dropdownRef.value && next && dropdownRef.value.contains(next))
+      ) {
+        return
       }
+      formItemControl?.onBlur()
+      emit('blur', event)
     }
 
-    function handleSearchKeyDown(event: KeyboardEvent) {
-      switch (event.key) {
-        case ' ': {
-          event.stopPropagation()
-          return
-        }
-        case 'ArrowDown': {
-          event.preventDefault()
-          event.stopPropagation()
-          const next = activeIndex.value >= 0 ? activeIndex.value : findFirstEnabledIndex()
-          setActiveAndFocus(next)
-          return
-        }
-        case 'ArrowUp': {
-          event.preventDefault()
-          event.stopPropagation()
-          const next = activeIndex.value >= 0 ? activeIndex.value : findLastEnabledIndex()
-          setActiveAndFocus(next)
-          return
-        }
-        case 'Enter': {
-          if (activeIndex.value >= 0) {
-            event.preventDefault()
-            event.stopPropagation()
-            selectActiveOption()
-          }
-          return
-        }
-        case 'Escape': {
-          event.preventDefault()
-          event.stopPropagation()
-          closeDropdown()
-          nextTick(() => {
-            ;(triggerRef.value as HTMLButtonElement | null)?.focus()
-          })
-          return
-        }
-        default:
-          return
+    watch(isOpen, (open) => {
+      if (!open) {
+        activeIndex.value = -1
+        activeValue.value = undefined
+        return
       }
-    }
-
-    watch(
-      isOpen,
-      (open) => {
-        if (open) {
-          const selectedIndex = (() => {
-            if (props.multiple && Array.isArray(props.modelValue)) {
-              const values = props.modelValue
-              if (values.length === 0) {
-                return -1
-              }
-              return flatSelectableOptions.value.findIndex(
-                (opt) => values.includes(opt.value) && !opt.disabled
-              )
-            }
-
-            const value = Array.isArray(props.modelValue) ? undefined : props.modelValue
-            if (value === undefined || value === null || value === '') {
-              return -1
-            }
-            return flatSelectableOptions.value.findIndex(
-              (opt) => opt.value === value && !opt.disabled
-            )
-          })()
-
-          const nextActive = selectedIndex >= 0 ? selectedIndex : findFirstEnabledIndex()
-          activeIndex.value = nextActive
-
-          if (!props.searchable) {
-            focusOptionAt(nextActive)
-          }
-        }
-      },
-      { immediate: true }
-    )
+      const next = resolveSelectActiveIndexSafe()
+      activeIndex.value = next
+      activeValue.value = flatSelectableOptions.value[next]?.value
+      if (props.searchable) {
+        nextTick(() => searchInputRef.value?.focus())
+      }
+    })
 
     watch(flatSelectableOptions, () => {
-      if (!isOpen.value) {
-        return
-      }
-
-      activeIndex.value = findFirstEnabledIndex()
+      if (!isOpen.value) return
+      const next = resolveSelectActiveIndexSafe(true)
+      activeIndex.value = next
+      activeValue.value = flatSelectableOptions.value[next]?.value
     })
+
+    function resolveSelectActiveIndexSafe(fromFilter = false) {
+      const items = flatSelectableOptions.value
+      if (items.length === 0) return -1
+      if (fromFilter && activeValue.value !== undefined) {
+        const still = items.findIndex((item) => item.value === activeValue.value && !item.disabled)
+        if (still >= 0) return still
+      }
+      const selectedIndex = items.findIndex(
+        (item) => selectedValues.value.includes(item.value) && !item.disabled
+      )
+      if (selectedIndex >= 0) return selectedIndex
+      return items.findIndex((item) => !item.disabled)
+    }
 
     watch(
       () => props.searchDebounce,
@@ -672,285 +540,320 @@ export const Select = defineComponent({
       }
     )
 
-    onBeforeUnmount(() => {
-      searchDebouncer.cancel()
+    watch(activeIndex, (idx) => {
+      if (!props.virtual || idx < 0) return
+      const el = virtualScrollRef.value
+      if (!el) return
+      const rows = buildSelectListRows(filteredOptions.value, creatableOption.value)
+      const rowIndex = getSelectRowIndexForOption(rows, idx)
+      const itemH = getSelectVirtualItemHeight(props.size)
+      const next = getSelectActiveAlignScrollTop({
+        scrollTop: el.scrollTop,
+        listHeight: props.listHeight,
+        rowIndex,
+        itemHeight: itemH
+      })
+      if (next !== el.scrollTop) el.scrollTop = next
     })
 
-    return () => {
-      const triggerClasses = getSelectTriggerClasses(props.size, props.disabled, isOpen.value)
+    onBeforeUnmount(() => searchDebouncer.cancel())
 
-      return h('div', { class: selectBaseClasses }, [
-        // Trigger button
-        h(
-          'button',
+    expose({
+      focus: () => {
+        if (props.searchable && isOpen.value) searchInputRef.value?.focus()
+        else triggerRef.value?.focus()
+      },
+      open: openDropdown,
+      close: closeDropdown
+    })
+
+    function renderOptionRow(row: Extract<SelectListRow, { kind: 'option' }>) {
+      const option = row.option
+      const selectedOption = isSelectOptionSelected(option, selected.value, props.multiple)
+      const active = row.optionIndex === activeIndex.value
+      const displayLabel = row.isCreate
+        ? getCreateSelectOptionLabel(option, createOptionLabel.value)
+        : option.label
+      const slotCtx: SelectOptionSlotContext = {
+        value: option.value,
+        label: displayLabel,
+        disabled: option.disabled,
+        selected: selectedOption,
+        active
+      }
+      const custom = slots.option?.(slotCtx)
+      return h(
+        'div',
+        {
+          key: row.key,
+          id: getOptionId(row.optionIndex),
+          'data-option-index': row.optionIndex,
+          'data-active': active ? '' : undefined,
+          ...getPickerOptionAria({ selected: selectedOption, disabled: !!option.disabled }),
+          class: getSelectOptionClasses({
+            isSelected: selectedOption,
+            isDisabled: !!option.disabled,
+            isActive: active,
+            size: props.size
+          }),
+          onMouseenter: () => {
+            if (!option.disabled) {
+              activeIndex.value = row.optionIndex
+              activeValue.value = option.value
+            }
+          },
+          onMousedown: (event: MouseEvent) => event.preventDefault(),
+          onClick: () => selectOption(option)
+        },
+        custom ?? [
+          h('span', { class: 'flex items-center justify-between w-full gap-2' }, [
+            h('span', { class: 'truncate' }, displayLabel),
+            selectedOption ? iconVNode(checkSolidIcon20PathD, selectCheckIconClasses) : null
+          ])
+        ]
+      )
+    }
+
+    function renderRows(rows: SelectListRow[]) {
+      return rows.map((row) => {
+        if (row.kind === 'group') {
+          return h('div', { key: row.key, role: 'group', 'aria-label': row.label }, [
+            h('div', { class: selectGroupLabelClasses, 'aria-hidden': 'true' }, row.label)
+          ])
+        }
+        return renderOptionRow(row)
+      })
+    }
+
+    return () => {
+      const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+      const ariaLabel =
+        typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined
+      const attrLabelledby =
+        typeof restAttrs['aria-labelledby'] === 'string' ? restAttrs['aria-labelledby'] : undefined
+      const labelledby = attrLabelledby?.trim() ? attrLabelledby : formItemControl?.labelId.value
+      const describedBy = mergeAriaDescribedBy(
+        typeof restAttrs['aria-describedby'] === 'string'
+          ? restAttrs['aria-describedby']
+          : undefined,
+        formItemControl?.describedBy.value
+      )
+      const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
+      const effectiveId = attrId ?? formItemControl?.id.value
+      const effectiveName = props.name ?? formItemControl?.name.value
+      const comboboxAria = getPickerComboboxAria({
+        expanded: isOpen.value,
+        listboxId,
+        activeIndex: activeIndex.value
+      })
+      const searchOpen = props.searchable && isOpen.value
+      const triggerClasses = getSelectTriggerClasses({
+        size: props.size,
+        disabled: effectiveDisabled.value,
+        isOpen: isOpen.value,
+        status: status.value,
+        hasClear: showClear.value
+      })
+      const comboboxProps = {
+        ...comboboxAria,
+        id: effectiveId,
+        'aria-label': ariaLabel,
+        'aria-labelledby': labelledby,
+        'aria-describedby': describedBy,
+        'aria-invalid': status.value === 'error' ? true : undefined,
+        'aria-required': formItemControl?.required.value ? true : undefined,
+        'aria-autocomplete': props.searchable ? 'list' : 'none'
+      }
+      const trigger = searchOpen
+        ? h('input', {
+            ref: (node: HTMLInputElement | null) => {
+              searchInputRef.value = node
+              triggerRef.value = node
+            },
+            type: 'text',
+            class: classNames(triggerClasses, 'bg-transparent'),
+            disabled: effectiveDisabled.value,
+            value: searchQuery.value,
+            placeholder: displayText.value,
+            onInput: (event: Event) => setSearch((event.target as HTMLInputElement).value),
+            onKeydown: (event: KeyboardEvent) => handleKeyDown(event, true),
+            onFocusout: handleFocusOut,
+            ...comboboxProps
+          })
+        : h(
+            'div',
+            {
+              ref: triggerRef,
+              tabindex: effectiveDisabled.value ? -1 : 0,
+              class: triggerClasses,
+              onClick: toggleDropdown,
+              onKeydown: (event: KeyboardEvent) => handleKeyDown(event, false),
+              onFocusout: handleFocusOut,
+              ...comboboxProps
+            },
+            [
+              h(
+                'span',
+                {
+                  class: classNames(
+                    'flex-1 truncate',
+                    displayText.value === placeholderText.value &&
+                      'text-[var(--tiger-text-muted,#9ca3af)]'
+                  )
+                },
+                displayText.value
+              )
+            ]
+          )
+
+      const rows = buildSelectListRows(filteredOptions.value, creatableOption.value)
+      const hasOptions = rows.some((row) => row.kind === 'option')
+      const listboxAria = getPickerListboxAria({ id: listboxId })
+      let listNode = null
+      if (hasOptions && props.virtual) {
+        const itemH = getSelectVirtualItemHeight(props.size)
+        const { startIndex, endIndex, totalHeight } = getSelectVirtualRange(
+          virtualScrollTop.value,
+          props.listHeight,
+          rows.length,
+          itemH
+        )
+        listNode = h(
+          'div',
           {
-            ref: triggerRef,
-            type: 'button',
-            class: classNames(triggerClasses, showClearButton.value ? 'pr-14' : 'pr-9'),
-            disabled: props.disabled,
-            onClick: toggleDropdown,
-            onKeydown: handleTriggerKeyDown,
-            'aria-haspopup': 'listbox',
-            'aria-expanded': isOpen.value,
-            'aria-controls': listboxId,
-            'aria-activedescendant':
-              isOpen.value && activeIndex.value >= 0 ? getOptionId(activeIndex.value) : undefined,
-            'data-state': isOpen.value ? 'open' : 'closed'
+            ref: virtualScrollRef,
+            'data-tiger-select-virtual': '',
+            class: selectListboxClasses,
+            style: { maxHeight: `${props.listHeight}px` },
+            ...listboxAria,
+            'aria-multiselectable': props.multiple ? true : undefined,
+            'aria-busy': props.loading || undefined,
+            onScroll: (event: Event) => {
+              virtualScrollTop.value = (event.target as HTMLElement).scrollTop
+            }
           },
           [
-            h(
-              'span',
-              {
-                class: classNames(
-                  'flex-1 text-left truncate',
-                  displayText.value === placeholderText.value &&
-                    'text-[var(--tiger-select-placeholder,var(--tiger-text-muted,#9ca3af))]'
-                )
-              },
-              displayText.value
-            )
-          ]
-        ),
-        h(
-          'span',
-          { class: 'pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1' },
-          [
-            showClearButton.value &&
+            h('div', { style: { height: `${totalHeight}px`, position: 'relative' } }, [
               h(
-                'button',
-                {
-                  type: 'button',
-                  class:
-                    'pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]',
-                  'data-tiger-select-clear': '',
-                  'aria-label': resolveLocaleText(
-                    'Clear selection',
-                    mergedLocale.value?.common?.clearText
-                  ),
-                  onClick: clearSelection
-                },
-                CloseIcon
-              ),
-            h(
-              'span',
-              {
-                class: classNames('inline-flex', isOpen.value && 'rotate-180'),
-                'aria-hidden': 'true'
-              },
-              ChevronDownIcon
-            )
+                'div',
+                { style: { transform: `translateY(${startIndex * itemH}px)` } },
+                renderRows(rows.slice(startIndex, endIndex + 1))
+              )
+            ])
           ]
-        ),
-        // Dropdown
-        isOpen.value &&
-          renderVueOverlayTeleport(
+        )
+      } else if (hasOptions) {
+        listNode = h(
+          'div',
+          {
+            class: selectListboxClasses,
+            style: { maxHeight: `${props.listHeight}px` },
+            ...listboxAria,
+            'aria-multiselectable': props.multiple ? true : undefined,
+            'aria-busy': props.loading || undefined
+          },
+          renderRows(rows)
+        )
+      } else {
+        listNode = h(
+          'div',
+          { class: selectEmptyStateClasses },
+          props.loading
+            ? labels.value.loadingText
+            : resolveLocaleText(labels.value.emptyText, props.emptyText)
+        )
+      }
+
+      const dropdown = isOpen.value
+        ? renderVueOverlayTeleport(
             h(
               'div',
               {
                 ref: dropdownRef,
-                class: classNames(selectDropdownBaseClasses, overlay.floatingClasses.value),
-                style: overlay.floatingStyles.value,
+                class: classNames(
+                  selectDropdownBaseClasses,
+                  overlay.floatingClasses.value,
+                  props.dropdownClassName
+                ),
+                style: overlay.floatingStyles.value as CSSProperties,
                 'data-positioned': overlay.positioned.value,
-                role: 'listbox',
-                id: listboxId,
-                'aria-multiselectable': props.multiple ? true : undefined,
-                onKeydown: handleDropdownKeyDown
+                'data-tiger-select-dropdown': '',
+                onMousedown: (event: MouseEvent) => event.preventDefault(),
+                onFocusout: handleFocusOut
               },
               [
-                // Search input
-                props.searchable &&
-                  h('input', {
-                    ref: searchInputRef,
-                    type: 'text',
-                    class: selectSearchInputClasses,
-                    placeholder: resolveLocaleText(
-                      'Search...',
-                      mergedLocale.value?.common?.searchPlaceholder
-                    ),
-                    value: searchQuery.value,
-                    onInput: handleSearchInput,
-                    onKeydown: handleSearchKeyDown
-                  }),
-                // Options list
-                filteredOptions.value.length > 0
-                  ? (() => {
-                      let optionIndex = -1
-
-                      const renderOptionItem = (
-                        option: SelectOption,
-                        idx: number,
-                        displayLabel = option.label
-                      ) => {
-                        const selected = isSelected(option)
-                        const active = idx === activeIndex.value
-                        const optionAria = getPickerOptionAria({
-                          selected,
-                          disabled: !!option.disabled
-                        })
-
-                        return h(
-                          'div',
-                          {
-                            key: option.value,
-                            id: getOptionId(idx),
-                            'data-option-index': idx,
-                            ...optionAria,
-                            tabindex: active ? 0 : -1,
-                            class: getSelectOptionClasses(selected, !!option.disabled, props.size),
-                            onMouseenter: () => {
-                              if (!option.disabled) {
-                                activeIndex.value = idx
-                              }
-                            },
-                            onClick: () => selectOption(option)
-                          },
-                          [
-                            h('span', { class: 'flex items-center justify-between w-full' }, [
-                              h('span', displayLabel),
-                              selected && h('span', CheckIcon)
-                            ])
-                          ]
-                        )
-                      }
-
-                      const hasGroups = filteredOptions.value.some(isOptionGroup)
-
-                      // Virtual mode: only for flat option lists (no groups).
-                      if (props.virtual && !hasGroups) {
-                        const flat = filteredOptions.value.filter(
-                          (o): o is SelectOption => !isOptionGroup(o)
-                        )
-                        const all = creatableOption.value ? [...flat, creatableOption.value] : flat
-                        const itemH = getSelectVirtualItemHeight(props.size)
-                        const { startIndex, endIndex, totalHeight } = fixedSizeStrategy(
-                          itemH
-                        ).getRange(virtualScrollTop.value, props.listHeight, all.length, 5)
-                        const visible = []
-                        for (let i = startIndex; i <= endIndex; i++) {
-                          const isCreate = creatableOption.value && i === all.length - 1
-                          visible.push(
-                            renderOptionItem(
-                              all[i],
-                              i,
-                              isCreate
-                                ? getCreateSelectOptionLabel(all[i], props.createOptionText)
-                                : all[i].label
-                            )
-                          )
-                        }
-                        return h(
-                          'div',
-                          {
-                            ref: virtualScrollRef,
-                            'data-tiger-select-virtual': '',
-                            style: { maxHeight: `${props.listHeight}px`, overflowY: 'auto' },
-                            onScroll: (e: Event) => {
-                              virtualScrollTop.value = (e.target as HTMLElement).scrollTop
-                            }
-                          },
-                          [
-                            h(
-                              'div',
-                              { style: { height: `${totalHeight}px`, position: 'relative' } },
-                              [
-                                h(
-                                  'div',
-                                  { style: { transform: `translateY(${startIndex * itemH}px)` } },
-                                  visible
-                                )
-                              ]
-                            )
-                          ]
-                        )
-                      }
-
-                      const optionNodes = filteredOptions.value.map((item) => {
-                        if (isOptionGroup(item)) {
-                          return h('div', { key: item.label }, [
-                            h('div', { class: selectGroupLabelClasses }, item.label),
-                            item.options.map((option) => {
-                              optionIndex += 1
-                              return renderOptionItem(option, optionIndex)
-                            })
-                          ])
-                        }
-
-                        optionIndex += 1
-                        return renderOptionItem(item, optionIndex)
-                      })
-
-                      if (creatableOption.value) {
-                        optionIndex += 1
-                        optionNodes.push(
-                          renderOptionItem(
-                            creatableOption.value,
-                            optionIndex,
-                            getCreateSelectOptionLabel(
-                              creatableOption.value,
-                              props.createOptionText
-                            )
-                          )
-                        )
-                      }
-
-                      return optionNodes
-                    })()
-                  : creatableOption.value
-                    ? (() => {
-                        const optionLabel = getCreateSelectOptionLabel(
-                          creatableOption.value,
-                          props.createOptionText
-                        )
-                        return h(
-                          'div',
-                          {
-                            key: creatableOption.value.value,
-                            id: getOptionId(0),
-                            'data-option-index': 0,
-                            role: 'option',
-                            'aria-selected': false,
-                            tabindex: activeIndex.value === 0 ? 0 : -1,
-                            class: getSelectOptionClasses(false, false, props.size),
-                            onMouseenter: () => {
-                              activeIndex.value = 0
-                            },
-                            onClick: () => selectOption(creatableOption.value!)
-                          },
-                          [
-                            h(
-                              'span',
-                              { class: 'flex items-center justify-between w-full' },
-                              optionLabel
-                            )
-                          ]
-                        )
-                      })()
-                    : h(
-                        'div',
-                        { class: selectEmptyStateClasses },
-                        resolveLocaleText(labels.value.emptyText, props.emptyText)
-                      ),
+                listNode,
                 h('div', { class: selectDoneActionClasses }, [
                   h(
                     'button',
                     {
                       type: 'button',
                       class: selectDoneButtonClasses,
-                      onClick: closeDropdown,
-                      onKeydown: (event: KeyboardEvent) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.stopPropagation()
-                        }
-                      }
+                      onClick: closeDropdown
                     },
-                    doneText.value
+                    labels.value.doneText
                   )
                 ])
               ]
             ),
             overlay.target.value
           )
-      ])
+        : null
+
+      const hiddenValues = effectiveName
+        ? serializeSelectFormValues(selected.value, props.multiple)
+        : []
+
+      return h(
+        'div',
+        {
+          ref: rootRef,
+          class: getSelectRootClasses(
+            inputGroup != null,
+            classNames(props.className, coerceClassValue(attrClass))
+          ),
+          style: (attrStyle as CSSProperties) ?? undefined,
+          [TIGER_CHROME_ATTR]: '',
+          onAnimationend: () => rootRef.value?.classList.remove(SHAKE_CLASS)
+        },
+        [
+          h('div', { class: 'relative' }, [
+            trigger,
+            h('span', { class: selectTrailingSlotClasses }, [
+              showClear.value
+                ? h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: selectClearButtonClasses,
+                      'data-tiger-select-clear': '',
+                      'aria-label': labels.value.clearAriaLabel,
+                      onClick: clearSelection
+                    },
+                    iconVNode(closeSolidIcon20PathD, selectClearIconClasses)
+                  )
+                : null,
+              h(
+                'span',
+                {
+                  class: classNames(selectChevronWrapClasses, isOpen.value && 'rotate-180'),
+                  'aria-hidden': 'true'
+                },
+                iconVNode(chevronDownSolidIcon20PathD, selectChromeIconClasses)
+              )
+            ])
+          ]),
+          ...hiddenValues.map((value, index) =>
+            h('input', {
+              key: `${effectiveName}-${index}-${value}`,
+              type: 'hidden',
+              name: effectiveName,
+              value
+            })
+          ),
+          dropdown
+        ]
+      )
     }
   }
 })

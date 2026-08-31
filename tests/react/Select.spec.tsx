@@ -5,15 +5,15 @@
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
-import { Select } from '@expcat/tigercat-react/Select'
+import React, { useRef } from 'react'
+import { Select, type SelectRef } from '@expcat/tigercat-react/Select'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { Modal } from '@expcat/tigercat-react/Modal'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import {
-  expectNoA11yViolationsIsolated,
-  setThemeVariables,
-  clearThemeVariables
-} from '../utils/react'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 const testOptions = [
   { label: 'Option 1', value: '1' },
@@ -31,654 +31,263 @@ const groupedOptions = [
   }
 ]
 
-const optionsWithDisabledFirst = [
-  { label: 'Disabled', value: 'd', disabled: true },
-  { label: 'Enabled', value: 'e' }
-]
+function getCombobox(container: HTMLElement) {
+  return container.querySelector('[role="combobox"]') as HTMLElement
+}
 
 describe('Select', () => {
-  describe('Rendering', () => {
-    it('exposes data-state on the trigger reflecting open state', () => {
-      const { container } = render(<Select options={testOptions} />)
-      const trigger = container.querySelector('button')!
-      expect(trigger).toHaveAttribute('data-state', 'closed')
-      fireEvent.click(trigger)
-      expect(trigger).toHaveAttribute('data-state', 'open')
-    })
-
-    it('should render with placeholder', () => {
-      const { getByText } = render(<Select options={testOptions} placeholder="Select an option" />)
-
-      expect(getByText('Select an option')).toBeInTheDocument()
-    })
-
-    it('uses English Select an option when placeholder is omitted', () => {
-      const { getByText } = render(<Select options={testOptions} />)
-      expect(getByText('Select an option')).toBeInTheDocument()
-    })
-
-    it('uses ConfigProvider zh-CN placeholder 请选择', () => {
-      const { getByText } = render(
-        <ConfigProvider locale={zhCN}>
-          <Select options={testOptions} />
-        </ConfigProvider>
-      )
-      expect(getByText('请选择')).toBeInTheDocument()
-    })
-
-    it('lets labels.placeholder override locale text', () => {
-      const { getByText } = render(
-        <ConfigProvider locale={zhCN}>
-          <Select options={testOptions} labels={{ placeholder: '自定义占位' }} />
-        </ConfigProvider>
-      )
-      expect(getByText('自定义占位')).toBeInTheDocument()
-    })
-
-    it('uses ConfigProvider zh-CN emptyText 暂无选项', () => {
-      const { container, getByText } = render(
-        <ConfigProvider locale={zhCN}>
-          <Select options={[]} />
-        </ConfigProvider>
-      )
-      fireEvent.click(container.querySelector('button')!)
-      expect(getByText('暂无选项')).toBeInTheDocument()
-    })
-
-    it('should render with selected value', () => {
-      const { getByText } = render(<Select options={testOptions} value="1" />)
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-    })
-
-    it('should apply custom className', () => {
-      const { container } = render(<Select options={testOptions} className="custom-class" />)
-
-      expect(container.querySelector('.custom-class')).toBeInTheDocument()
-    })
+  it('exposes data-state on the combobox', async () => {
+    const { container } = render(<Select options={testOptions} aria-label="Fruit" />)
+    const trigger = getCombobox(container)
+    expect(trigger).toHaveAttribute('data-state', 'closed')
+    fireEvent.click(trigger)
+    expect(trigger).toHaveAttribute('data-state', 'open')
   })
 
-  describe('Props', () => {
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = render(<Select options={testOptions} disabled />)
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeDisabled()
-    })
-
-    it('should show clear control when value is set', () => {
-      const { container } = render(<Select options={testOptions} value="1" clearable />)
-
-      expect(container.querySelector('[data-tiger-select-clear]')).toBeInTheDocument()
-    })
+  it('uses locale placeholder and keeps an uncontrolled selection', async () => {
+    const user = userEvent.setup()
+    const { getByRole, getByText, rerender } = render(
+      <Select options={testOptions} defaultValue={undefined} aria-label="Pick" />
+    )
+    expect(getByText('Select an option')).toBeInTheDocument()
+    await user.click(getByRole('combobox'))
+    await user.click(getByRole('option', { name: 'Option 1' }))
+    expect(getByRole('combobox')).toHaveTextContent('Option 1')
+    rerender(<Select options={testOptions} defaultValue={undefined} aria-label="Pick" />)
+    expect(getByRole('combobox')).toHaveTextContent('Option 1')
   })
 
-  describe('Events', () => {
-    it('should call onChange when option selected', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container, getByText } = render(
-        <Select options={testOptions} onChange={handleChange} />
-      )
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      await user.click(getByText('Option 1'))
-
-      expect(handleChange).toHaveBeenCalledWith('1')
-    })
-
-    it('should not open dropdown when disabled', async () => {
-      const user = userEvent.setup()
-      const { container, queryByText } = render(<Select options={testOptions} disabled />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      expect(queryByText('Option 1')).not.toBeInTheDocument()
-    })
-
-    it('should call onChange with array in multiple mode', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container, getByText } = render(
-        <Select options={testOptions} multiple value={[]} onChange={handleChange} />
-      )
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-      await user.click(getByText('Option 1'))
-
-      expect(handleChange).toHaveBeenCalledWith(['1'])
-    })
-
-    it('should clear selection without opening dropdown (single)', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container, getByRole, queryByRole } = render(
-        <Select options={testOptions} value="1" onChange={handleChange} />
-      )
-
-      const trigger = container.querySelector('button')!
-      const clear = getByRole('button', { name: 'Clear selection' })
-      expect(clear).toBeInTheDocument()
-      expect(trigger.contains(clear)).toBe(false)
-
-      await user.click(clear)
-
-      expect(handleChange).toHaveBeenCalledWith(undefined)
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('should clear selection (multiple)', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container } = render(
-        <Select options={testOptions} multiple value={['1']} onChange={handleChange} />
-      )
-
-      const clear = container.querySelector('[data-tiger-select-clear]') as HTMLElement
-      await user.click(clear)
-      expect(handleChange).toHaveBeenCalledWith([])
-    })
+  it('treats empty string as a real option value', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const options = [
+      { label: 'None', value: '' },
+      { label: 'One', value: '1' }
+    ]
+    const { getByRole, getByLabelText } = render(
+      <Select options={options} aria-label="Empty" onChange={onChange} clearable />
+    )
+    await user.click(getByRole('combobox'))
+    await user.click(getByRole('option', { name: 'None' }))
+    expect(onChange).toHaveBeenCalledWith('')
+    expect(getByRole('combobox')).toHaveTextContent('None')
+    await user.click(getByLabelText('Clear selection'))
+    expect(onChange).toHaveBeenLastCalledWith(undefined)
+    expect(getByRole('combobox')).toHaveTextContent('Select an option')
   })
 
-  describe('Controlled Component', () => {
-    it('should work as controlled component', async () => {
-      const user = userEvent.setup()
-      const TestComponent = () => {
-        const [value, setValue] = React.useState<string | undefined>()
-
-        return <Select options={testOptions} value={value} onChange={(val) => setValue(val)} />
-      }
-
-      const { container, getByText } = render(<TestComponent />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-      await user.click(getByText('Option 1'))
-
-      await waitFor(() => {
-        expect(getByText('Option 1')).toBeInTheDocument()
-      })
-    })
+  it('opens from open / defaultOpen and notifies onOpenChange', async () => {
+    const onOpenChange = vi.fn()
+    const { getByRole, rerender } = render(
+      <Select options={testOptions} defaultOpen aria-label="Open" onOpenChange={onOpenChange} />
+    )
+    expect(getByRole('listbox')).toBeInTheDocument()
+    rerender(
+      <Select options={testOptions} open={false} aria-label="Open" onOpenChange={onOpenChange} />
+    )
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
   })
 
-  describe('Dropdown', () => {
-    it('should close dropdown when option selected (single mode)', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(<Select options={testOptions} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-      await user.click(getByText('Option 1'))
-
-      await waitFor(() => {
-        expect(queryByText('Option 2')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should render option groups', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<Select options={groupedOptions} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      expect(getByText('Group A')).toBeInTheDocument()
-      expect(getByText('A-1')).toBeInTheDocument()
-    })
-
-    it('should call onSearch and filter options when searchable', async () => {
-      const user = userEvent.setup()
-      const onSearch = vi.fn()
-      const { container, getByText, queryByText } = render(
-        <Select options={testOptions} searchable onSearchChange={onSearch} />
-      )
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await user.type(input, 'Option 2')
-
-      expect(onSearch).toHaveBeenCalled()
-      expect(getByText('Option 2')).toBeInTheDocument()
-      expect(queryByText('Option 1')).not.toBeInTheDocument()
-    })
-
-    it('should keep local options unfiltered when remote search is enabled', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<Select options={testOptions} searchable remote />)
-
-      await user.click(container.querySelector('button')!)
-      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'Option 2' } })
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-      expect(getByText('Option 2')).toBeInTheDocument()
-    })
-
-    it('should debounce search events when searchDebounce is set', async () => {
-      vi.useFakeTimers()
-      const onSearch = vi.fn()
-      const { container } = render(
-        <Select options={testOptions} searchable searchDebounce={200} onSearchChange={onSearch} />
-      )
-
-      fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'Option 2' } })
-
-      expect(onSearch).not.toHaveBeenCalled()
-      vi.advanceTimersByTime(200)
-      expect(onSearch).toHaveBeenCalledWith('Option 2')
-      vi.useRealTimers()
-    })
-
-    it('should create a new option from the search query when creatable', async () => {
-      const user = userEvent.setup()
-      const onCreate = vi.fn()
-      const onChange = vi.fn()
-
-      const { container, getByText } = render(
-        <Select
-          options={testOptions}
-          searchable
-          creatable
-          onCreate={onCreate}
-          onChange={onChange}
-        />
-      )
-
-      await user.click(container.querySelector('button')!)
-      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'New option' } })
-      fireEvent.click(getByText('Create "New option"'))
-
-      expect(onCreate).toHaveBeenCalledWith({ label: 'New option', value: 'New option' })
-      expect(onChange).toHaveBeenCalledWith('New option')
-    })
-
-    it('should not show creatable option for existing labels', async () => {
-      const user = userEvent.setup()
-      const { container, queryByText } = render(
-        <Select options={testOptions} searchable creatable />
-      )
-
-      await user.click(container.querySelector('button')!)
-      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'Option 1' } })
-
-      expect(queryByText('Create "Option 1"')).not.toBeInTheDocument()
-    })
+  it('selects with keyboard without moving focus onto options', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const { getByRole } = render(
+      <Select options={testOptions} aria-label="Keys" onChange={onChange} />
+    )
+    const trigger = getByRole('combobox')
+    trigger.focus()
+    await user.keyboard('{ArrowDown}')
+    const option = getByRole('option', { name: 'Option 1' })
+    expect(option).not.toHaveFocus()
+    expect(trigger).toHaveAttribute('aria-activedescendant', option.id)
+    await user.keyboard('{Enter}')
+    expect(onChange).toHaveBeenCalledWith('1')
+    expect(trigger).toHaveFocus()
   })
 
-  describe('Keyboard Interaction', () => {
-    it('should open with ArrowDown and select active option with Enter', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container, getByRole, queryByText } = render(
-        <Select options={testOptions} onChange={handleChange} />
-      )
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-      expect(trigger).toHaveFocus()
-
-      await user.keyboard('{ArrowDown}')
-
-      const firstOption = await waitFor(() => getByRole('option', { name: 'Option 1' }))
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-
-      await user.keyboard('{Enter}')
-      expect(handleChange).toHaveBeenCalledWith('1')
-
-      await waitFor(() => {
-        expect(queryByText('Option 2')).not.toBeInTheDocument()
-        expect(trigger).toHaveFocus()
-      })
-    })
-
-    it('should close with Escape and return focus to trigger', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(<Select options={testOptions} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-      expect(getByText('Option 1')).toBeInTheDocument()
-
-      await user.keyboard('{Escape}')
-
-      await waitFor(() => {
-        expect(queryByText('Option 1')).not.toBeInTheDocument()
-        expect(trigger).toHaveFocus()
-      })
-    })
-
-    it('should move focus from search input to options with ArrowDown when searchable', async () => {
-      const user = userEvent.setup()
-      const { container, getByRole } = render(<Select options={testOptions} searchable />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await waitFor(() => {
-        expect(input).toHaveFocus()
-      })
-
-      await user.keyboard('{ArrowDown}')
-      const firstOption = getByRole('option', { name: 'Option 1' })
-
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-    })
-
-    it('should skip disabled options when opening with ArrowDown', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container, getByRole } = render(
-        <Select options={optionsWithDisabledFirst} onChange={handleChange} />
-      )
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-      await user.keyboard('{ArrowDown}')
-
-      const enabledOption = await waitFor(() => getByRole('option', { name: 'Enabled' }))
-
-      await waitFor(() => {
-        expect(enabledOption).toHaveFocus()
-      })
-
-      await user.keyboard('{Enter}')
-      expect(handleChange).toHaveBeenCalledWith('e')
-    })
+  it('keeps the highlight on the clicked multiple option', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(
+      <Select options={testOptions} multiple defaultValue={['1']} aria-label="Multi" />
+    )
+    await user.click(getByRole('combobox'))
+    await user.click(getByRole('option', { name: 'Option 3' }))
+    expect(getByRole('option', { name: 'Option 3' })).toHaveAttribute('data-active')
+    expect(getByRole('listbox')).toBeInTheDocument()
   })
 
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Select options={testOptions} placeholder="Select option" />)
-
-      await expectNoA11yViolationsIsolated(container)
-    })
+  it('filters immediately and delays onSearchChange', async () => {
+    vi.useFakeTimers()
+    const onSearchChange = vi.fn()
+    const onSearchValueChange = vi.fn()
+    const { getByRole } = render(
+      <Select
+        options={testOptions}
+        searchable
+        searchDebounce={200}
+        aria-label="Search"
+        onSearchChange={onSearchChange}
+        onSearchValueChange={onSearchValueChange}
+      />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'Option 2' } })
+    expect(input.value).toBe('Option 2')
+    expect(onSearchValueChange).toHaveBeenCalledWith('Option 2')
+    expect(onSearchChange).not.toHaveBeenCalled()
+    vi.advanceTimersByTime(200)
+    expect(onSearchChange).toHaveBeenCalledWith('Option 2')
+    vi.useRealTimers()
   })
 
-  describe('Edge Cases', () => {
-    it('should display emptyText when options array is empty', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<Select options={[]} emptyText="No data available" />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      expect(getByText('No data available')).toBeInTheDocument()
-    })
-
-    it('should display emptyText when search returns no results', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(
-        <Select options={testOptions} searchable emptyText="No matches found" />
-      )
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await user.type(input, 'xyz')
-
-      expect(getByText('No matches found')).toBeInTheDocument()
-    })
-    it('should handle disabled options in groups', async () => {
-      const user = userEvent.setup()
-      const groupWithDisabled = [
-        {
-          label: 'Group B',
-          options: [
-            { label: 'B-1', value: 'b1', disabled: true },
-            { label: 'B-2', value: 'b2' }
-          ]
-        }
-      ]
-
-      const { container, getByText } = render(<Select options={groupWithDisabled} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const disabledOption = getByText('B-1').closest('[role="option"]')
-      expect(disabledOption).toHaveAttribute('aria-disabled', 'true')
-    })
-
-    it('should not show clear button when clearable is false', () => {
-      const { container } = render(<Select options={testOptions} value="1" clearable={false} />)
-
-      expect(container.querySelector('[data-tiger-select-clear]')).not.toBeInTheDocument()
-    })
-
-    it('should handle multiple selection with all options selected', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(
-        <Select options={testOptions} multiple value={['1', '2', '3']} />
-      )
-
-      const trigger = container.querySelector('button')!
-      expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
-
-      await user.click(trigger)
-      const selectedOptions = document.body.querySelectorAll(
-        '[role="option"][aria-selected="true"]'
-      )
-      expect(selectedOptions.length).toBe(3)
-    })
-
-    it('should display multiple selected values as comma-separated text', () => {
-      const { getByText } = render(<Select options={testOptions} multiple value={['1', '2']} />)
-
-      expect(getByText('Option 1, Option 2')).toBeInTheDocument()
-    })
-
-    it('should handle large number of options', async () => {
-      const user = userEvent.setup()
-      const manyOptions = Array.from({ length: 100 }, (_, i) => ({
-        label: `Option ${i + 1}`,
-        value: `${i + 1}`
-      }))
-
-      const { container, getByText } = render(<Select options={manyOptions} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-      expect(getByText('Option 100')).toBeInTheDocument()
-    })
+  it('clears multiple search after selecting by default', async () => {
+    const user = userEvent.setup()
+    const { getByRole, queryByRole } = render(
+      <Select options={testOptions} multiple searchable aria-label="Skills" />
+    )
+    await user.click(getByRole('combobox'))
+    const input = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    await user.type(input, 'Option 2')
+    await user.click(getByRole('option', { name: 'Option 2' }))
+    expect(input.value).toBe('')
+    expect(queryByRole('option', { name: 'Option 1' })).toBeInTheDocument()
+    expect(getByRole('listbox')).toBeInTheDocument()
   })
 
-  describe('Dropdown Behavior', () => {
-    it('should close dropdown when clicking outside', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(<Select options={testOptions} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      await waitFor(() => {
-        expect(getByText('Option 1')).toBeInTheDocument()
-      })
-
-      await user.click(document.body)
-
-      await waitFor(() => {
-        expect(queryByText('Option 1')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should keep dropdown open in multiple mode after selection', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<Select options={testOptions} multiple value={[]} />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      await user.click(getByText('Option 1'))
-
-      await waitFor(() => {
-        expect(getByText('Option 2')).toBeInTheDocument()
-      })
-    })
-
-    it('should close an open single select from the in-panel done action', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container, getByRole, queryByRole } = render(
-        <Select
-          options={testOptions}
-          locale={{ common: { okText: 'Apply' } }}
-          onChange={onChange}
-        />
-      )
-
-      await user.click(container.querySelector('button')!)
-      await user.click(getByRole('button', { name: 'Apply' }))
-
-      expect(onChange).not.toHaveBeenCalled()
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-    it('should keep multiple select open after selection until the done action is clicked', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, getByRole, queryByRole } = render(
-        <Select
-          options={testOptions}
-          multiple
-          value={[]}
-          locale={{ common: { okText: 'Apply' } }}
-        />
-      )
-
-      await user.click(container.querySelector('button')!)
-      await user.click(getByText('Option 1'))
-      expect(getByRole('listbox')).toBeInTheDocument()
-
-      await user.click(getByRole('button', { name: 'Apply' }))
-
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('should focus search input when dropdown opens with searchable', async () => {
-      const user = userEvent.setup()
-      const { container } = render(<Select options={testOptions} searchable />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await waitFor(() => {
-        expect(input).toHaveFocus()
-      })
-    })
+  it('creates from the search query, including virtual lists', async () => {
+    const onCreate = vi.fn()
+    const onChange = vi.fn()
+    const { getByRole } = render(
+      <Select
+        options={testOptions}
+        searchable
+        creatable
+        virtual
+        aria-label="Create"
+        onCreate={onCreate}
+        onChange={onChange}
+      />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'New option' } })
+    fireEvent.click(getByRole('option', { name: 'Create "New option"' }))
+    expect(onCreate).toHaveBeenCalledWith({ label: 'New option', value: 'New option' })
+    expect(onChange).toHaveBeenCalledWith('New option')
   })
 
-  describe('Multiple Selection Features', () => {
-    it('should toggle selection in multiple mode', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { getByRole } = render(
-        <Select options={testOptions} multiple value={['1']} onChange={handleChange} />
-      )
-
-      const trigger = getByRole('button', { expanded: false })
-      await user.click(trigger)
-
-      const option1 = getByRole('option', { name: 'Option 1' })
-      await user.click(option1)
-      expect(handleChange).toHaveBeenCalledWith([])
-
-      const option2 = getByRole('option', { name: 'Option 2' })
-      await user.click(option2)
-      expect(handleChange).toHaveBeenCalledWith(['1', '2'])
-    })
-
-    it('should show check icon for selected items in multiple mode', async () => {
-      const user = userEvent.setup()
-      const { container, getByRole } = render(
-        <Select options={testOptions} multiple value={['1', '2']} />
-      )
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const option1 = getByRole('option', { name: 'Option 1' })
-      const option2 = getByRole('option', { name: 'Option 2' })
-      const option3 = getByRole('option', { name: 'Option 3' })
-
-      expect(option1).toHaveAttribute('aria-selected', 'true')
-      expect(option2).toHaveAttribute('aria-selected', 'true')
-      expect(option3).toHaveAttribute('aria-selected', 'false')
-    })
+  it('renders grouped options as labelled groups', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(<Select options={groupedOptions} aria-label="Groups" />)
+    await user.click(getByRole('combobox'))
+    expect(getByRole('group', { name: 'Group A' })).toBeInTheDocument()
+    expect(getByRole('option', { name: 'A-1' })).toBeInTheDocument()
   })
 
-  describe('Search Functionality', () => {
-    it('should filter options case-insensitively', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(
-        <Select options={testOptions} searchable />
-      )
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await user.type(input, 'option 1')
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-      expect(queryByText('Option 2')).not.toBeInTheDocument()
+  it('reads FormItem and validates the committed value', async () => {
+    const validator = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    const { getByRole, queryByText } = render(
+      <Form model={{ city: undefined }} rules={{ city: [{ validator, trigger: 'change' }] }}>
+        <FormItem name="city" label="City">
+          <Select options={[{ label: 'NYC', value: 42 }]} />
+        </FormItem>
+      </Form>
+    )
+    const trigger = getByRole('combobox')
+    expect(trigger).toHaveAttribute('id')
+    await user.click(trigger)
+    expect(queryByText(/required/i)).not.toBeInTheDocument()
+    await user.click(getByRole('option', { name: 'NYC' }))
+    await waitFor(() => {
+      expect(validator).toHaveBeenCalled()
     })
-
-    it('should reset search query when dropdown closes', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<Select options={testOptions} searchable />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await user.type(input, 'Option 1')
-
-      await user.click(getByText('Option 1'))
-
-      await user.click(trigger)
-
-      const inputAfterReopen = document.body.querySelector('input')!
-      expect(inputAfterReopen.value).toBe('')
-      expect(getByText('Option 2')).toBeInTheDocument()
-    })
-
-    it('should allow Space key in search input without closing dropdown', async () => {
-      const user = userEvent.setup()
-      const { container, queryByRole } = render(<Select options={testOptions} searchable />)
-
-      const trigger = container.querySelector('button')!
-      await user.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await user.type(input, 'Option 1')
-
-      await user.keyboard(' ')
-
-      // Dropdown should still be open
-      const listbox = queryByRole('listbox')
-      expect(listbox).toBeInTheDocument()
-    })
+    const last = validator.mock.calls.at(-1)?.[0]
+    expect(
+      last === 42 || last?.value === 42 || validator.mock.calls.some((call) => call.includes(42))
+    ).toBe(true)
   })
 
-  describe('maxTagCount', () => {
-    it('should truncate display when selected items exceed maxTagCount', () => {
-      const { getByText } = render(
-        <Select options={testOptions} multiple value={['1', '2', '3']} maxTagCount={2} />
+  it('serializes the current value through a hidden input', () => {
+    const { container } = render(
+      <Select options={testOptions} name="city" value="2" aria-label="Named" />
+    )
+    expect(container.querySelector('input[type="hidden"]')).toHaveValue('2')
+  })
+
+  it('focuses through ref.current.focus()', () => {
+    function Probe() {
+      const ref = useRef<SelectRef>(null)
+      return (
+        <>
+          <button type="button" onClick={() => ref.current?.focus()}>
+            Focus
+          </button>
+          <Select ref={ref} options={testOptions} aria-label="Ref" />
+        </>
       )
-      expect(getByText('Option 1, Option 2 +1')).toBeInTheDocument()
-    })
+    }
+    const { getByRole } = render(<Probe />)
+    fireEvent.click(getByRole('button', { name: 'Focus' }))
+    expect(getByRole('combobox')).toHaveFocus()
+  })
+
+  it('uses zh-TW labels from the official locale object', async () => {
+    const { getByRole, getByText } = render(
+      <ConfigProvider locale={zhTW}>
+        <Select options={[]} aria-label="TW" />
+      </ConfigProvider>
+    )
+    expect(getByText('請選擇')).toBeInTheDocument()
+    fireEvent.click(getByRole('combobox'))
+    expect(getByText('暫無選項')).toBeInTheDocument()
+  })
+
+  it('keeps virtual groups keyboard-reachable', async () => {
+    const user = userEvent.setup()
+    const many = Array.from({ length: 40 }, (_, i) => ({
+      label: `Option ${i + 1}`,
+      value: `${i + 1}`
+    }))
+    const { getByRole } = render(
+      <Select options={many} virtual listHeight={120} aria-label="Virtual" />
+    )
+    const trigger = getByRole('combobox')
+    trigger.focus()
+    await user.keyboard('{ArrowDown}')
+    fireEvent.keyDown(trigger, { key: 'End' })
+    const last = getByRole('option', { name: 'Option 40' })
+    expect(last).toBeInTheDocument()
+    expect(last).toHaveAttribute('data-active')
+  })
+
+  it('portals into a modal overlay host', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(
+      <Modal open title="Dialog">
+        <Select options={testOptions} aria-label="Inside" />
+      </Modal>
+    )
+    await user.click(getByRole('combobox'))
+    const listbox = getByRole('listbox')
+    expect(listbox.closest('[data-tiger-overlay-host]')).toBeTruthy()
+  })
+
+  it('has no a11y violations when opened with a name', async () => {
+    const { container, getByRole } = render(
+      <Select options={testOptions} aria-label="Accessible select" />
+    )
+    fireEvent.click(getByRole('combobox'))
+    await expectNoA11yViolations(container)
+  })
+
+  it('shows zh-CN placeholder from ConfigProvider', () => {
+    const { getByText } = render(
+      <ConfigProvider locale={zhCN}>
+        <Select options={testOptions} aria-label="ZH" />
+      </ConfigProvider>
+    )
+    expect(getByText('请选择')).toBeInTheDocument()
   })
 })

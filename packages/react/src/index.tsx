@@ -82,7 +82,7 @@ export { Footer } from './components/Footer'
 export type { ReactFooterProps as FooterProps } from './components/Footer'
 
 export { Select } from './components/Select'
-export type { SelectProps } from './components/Select'
+export type { SelectProps, SelectRef, SelectOption, SelectOptions } from './components/Select'
 
 export { Cascader } from './components/Cascader'
 export type { CascaderProps } from './components/Cascader'

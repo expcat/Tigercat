@@ -70,13 +70,13 @@ describe('custom text (no i18n) — Vue', () => {
     })
 
     it('Select done action uses labels', async () => {
-      const { container } = render(Select, {
+      const { getByRole } = render(Select, {
         props: {
           options: [{ label: 'One', value: 1 }],
           labels: { doneText: 'Complete' }
         }
       })
-      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.click(getByRole('combobox'))
       expect(screen.getByRole('button', { name: 'Complete' })).toBeInTheDocument()
     })
   })
@@ -130,7 +130,7 @@ describe('custom text (no i18n) — Vue', () => {
     })
 
     it('Select labels prop wins over global config text', async () => {
-      const { container } = render(
+      const { getByRole } = render(
         defineComponent({
           setup() {
             return () =>
@@ -143,7 +143,7 @@ describe('custom text (no i18n) — Vue', () => {
           }
         })
       )
-      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.click(getByRole('combobox'))
       expect(screen.getByRole('button', { name: 'LocalDone' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'GlobalDone' })).toBeNull()
     })
@@ -273,48 +273,48 @@ describe('custom text (no i18n) — Vue', () => {
     })
 
     it('Select emptyText (empty options) reads global config emptyText', async () => {
-      const { container, getByText } = render(
+      const { getByRole, getByText } = render(
         defineComponent({
           setup() {
             return () =>
-              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
+              h(ConfigProvider, { locale: { select: { emptyText: '暂无数据' } } }, () =>
                 h(Select, { options: [] })
               )
           }
         })
       )
-      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.click(getByRole('combobox'))
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
     it('Select emptyText (no search results) reads global config emptyText', async () => {
-      const { container, getByText } = render(
+      const { getByRole, getByText } = render(
         defineComponent({
           setup() {
             return () =>
-              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
+              h(ConfigProvider, { locale: { select: { emptyText: '暂无数据' } } }, () =>
                 h(Select, { options: [{ label: 'One', value: 1 }], searchable: true })
               )
           }
         })
       )
-      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.click(getByRole('combobox'))
       await fireEvent.update(document.body.querySelector('input')!, 'zzz')
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
     it('Select emptyText prop wins over global config', async () => {
-      const { container, getByText, queryByText } = render(
+      const { getByRole, getByText, queryByText } = render(
         defineComponent({
           setup() {
             return () =>
-              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
+              h(ConfigProvider, { locale: { select: { emptyText: '暂无数据' } } }, () =>
                 h(Select, { options: [], emptyText: '没有可选项' })
               )
           }
         })
       )
-      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.click(getByRole('combobox'))
       expect(getByText('没有可选项')).toBeInTheDocument()
       expect(queryByText('暂无数据')).toBeNull()
     })
@@ -385,8 +385,8 @@ describe('custom text (no i18n) — Vue', () => {
     })
 
     it('Select empty options outside a ConfigProvider keeps default English text', async () => {
-      const { container, getByText } = render(Select, { props: { options: [] } })
-      await fireEvent.click(container.querySelector('button')!)
+      const { getByRole, getByText } = render(Select, { props: { options: [] } })
+      await fireEvent.click(getByRole('combobox'))
       expect(getByText('No options found')).toBeInTheDocument()
     })
 

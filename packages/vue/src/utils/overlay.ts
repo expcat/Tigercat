@@ -450,6 +450,7 @@ export interface UseVueAnchoredOverlayOptions {
   layout?: MaybeRefOrGetter<AnchoredOverlayLayout>
   matchReferenceWidth?: MaybeRefOrGetter<boolean>
   portal?: Ref<boolean> | boolean
+  getContainer?: MaybeRefOrGetter<HTMLElement | null | undefined>
   dismissOnOutside?: Ref<boolean> | boolean
   dismissOnEscape?: Ref<boolean> | boolean
   restoreFocusOnDismiss?: boolean
@@ -469,7 +470,7 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
 
   const target = computed(() => {
     if (!portalEnabled() || !isBrowser()) return null
-    return resolveAnchoredOverlayTarget(options.referenceRef.value)
+    return toValue(options.getContainer) ?? resolveAnchoredOverlayTarget(options.referenceRef.value)
   })
 
   watch(

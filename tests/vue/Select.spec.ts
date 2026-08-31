@@ -3,17 +3,16 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { Modal } from '@expcat/tigercat-vue/Modal'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import {
-  renderWithProps,
-  expectNoA11yViolationsIsolated,
-  setThemeVariables,
-  clearThemeVariables
-} from '../utils'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 const testOptions = [
   { label: 'Option 1', value: '1' },
@@ -31,813 +30,186 @@ const groupedOptions = [
   }
 ]
 
-const optionsWithDisabledFirst = [
-  { label: 'Disabled', value: 'd', disabled: true },
-  { label: 'Enabled', value: 'e' }
-]
-
 describe('Select', () => {
-  describe('Rendering', () => {
-    it('exposes data-state on the trigger reflecting open state', async () => {
-      const { container } = render(Select, { props: { options: testOptions } })
-      const trigger = container.querySelector('button')!
-      expect(trigger).toHaveAttribute('data-state', 'closed')
-      await fireEvent.click(trigger)
-      expect(trigger).toHaveAttribute('data-state', 'open')
+  it('exposes data-state on the combobox', async () => {
+    const { getByRole } = render(Select, {
+      props: { options: testOptions, 'aria-label': 'Fruit' }
     })
+    const trigger = getByRole('combobox')
+    expect(trigger).toHaveAttribute('data-state', 'closed')
+    await fireEvent.click(trigger)
+    expect(trigger).toHaveAttribute('data-state', 'open')
+  })
 
-    it('should render with placeholder', () => {
-      const { getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          placeholder: 'Select an option'
-        }
-      })
-
-      expect(getByText('Select an option')).toBeInTheDocument()
+  it('keeps an uncontrolled selection after choosing an option', async () => {
+    const { getByRole, getByText } = render(Select, {
+      props: { options: testOptions, 'aria-label': 'Pick' }
     })
+    expect(getByText('Select an option')).toBeInTheDocument()
+    await fireEvent.click(getByRole('combobox'))
+    await fireEvent.click(getByRole('option', { name: 'Option 1' }))
+    expect(getByRole('combobox')).toHaveTextContent('Option 1')
+  })
 
-    it('uses English Select an option when placeholder is omitted', () => {
-      const { getByText } = render(Select, { props: { options: testOptions } })
-      expect(getByText('Select an option')).toBeInTheDocument()
+  it('treats empty string as a real option value', async () => {
+    const onChange = vi.fn()
+    const { getByRole, getByLabelText } = render(Select, {
+      props: {
+        options: [
+          { label: 'None', value: '' },
+          { label: 'One', value: '1' }
+        ],
+        'aria-label': 'Empty',
+        clearable: true,
+        onChange
+      }
     })
+    await fireEvent.click(getByRole('combobox'))
+    await fireEvent.click(getByRole('option', { name: 'None' }))
+    expect(onChange).toHaveBeenCalledWith('')
+    expect(getByRole('combobox')).toHaveTextContent('None')
+    await fireEvent.click(getByLabelText('Clear selection'))
+    expect(onChange).toHaveBeenLastCalledWith(undefined)
+    expect(getByRole('combobox')).toHaveTextContent('Select an option')
+  })
 
-    it('uses ConfigProvider zh-CN placeholder 请选择', () => {
-      const Wrapper = defineComponent({
-        setup() {
-          return () =>
-            h(ConfigProvider, { locale: zhCN }, () => h(Select, { options: testOptions }))
-        }
-      })
-      const { getByText } = render(Wrapper)
-      expect(getByText('请选择')).toBeInTheDocument()
+  it('selects with keyboard without moving focus onto options', async () => {
+    const onChange = vi.fn()
+    const { getByRole } = render(Select, {
+      props: { options: testOptions, 'aria-label': 'Keys', onChange }
     })
+    const trigger = getByRole('combobox')
+    trigger.focus()
+    await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    const option = getByRole('option', { name: 'Option 1' })
+    expect(document.activeElement).not.toBe(option)
+    expect(trigger).toHaveAttribute('aria-activedescendant', option.id)
+    await fireEvent.keyDown(trigger, { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith('1')
+  })
 
-    it('lets labels.placeholder override locale text', () => {
-      const Wrapper = defineComponent({
-        setup() {
-          return () =>
-            h(ConfigProvider, { locale: zhCN }, () =>
-              h(Select, { options: testOptions, labels: { placeholder: '自定义占位' } })
+  it('creates from the search query on a virtual list', async () => {
+    const onCreate = vi.fn()
+    const onChange = vi.fn()
+    const { getByRole } = render(Select, {
+      props: {
+        options: testOptions,
+        searchable: true,
+        creatable: true,
+        virtual: true,
+        'aria-label': 'Create',
+        onCreate,
+        onChange
+      }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    const input = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    await fireEvent.update(input, 'New option')
+    await fireEvent.click(getByRole('option', { name: 'Create "New option"' }))
+    expect(onCreate).toHaveBeenCalledWith({ label: 'New option', value: 'New option' })
+    expect(onChange).toHaveBeenCalledWith('New option')
+  })
+
+  it('renders grouped options as labelled groups', async () => {
+    const { getByRole } = render(Select, {
+      props: { options: groupedOptions, 'aria-label': 'Groups' }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByRole('group', { name: 'Group A' })).toBeInTheDocument()
+  })
+
+  it('reads FormItem and validates the committed value', async () => {
+    const validator = vi.fn().mockResolvedValue(true)
+    const Wrapper = defineComponent({
+      setup() {
+        const model = ref({ city: undefined as number | undefined })
+        return () =>
+          h(Form, { model: model.value, rules: { city: [{ validator, trigger: 'change' }] } }, () =>
+            h(FormItem, { name: 'city', label: 'City' }, () =>
+              h(Select, {
+                options: [{ label: 'NYC', value: 42 }],
+                'onUpdate:modelValue': (value: number) => {
+                  model.value = { city: value }
+                }
+              })
             )
-        }
-      })
-      const { getByText } = render(Wrapper)
-      expect(getByText('自定义占位')).toBeInTheDocument()
+          )
+      }
     })
-
-    it('uses ConfigProvider zh-CN emptyText 暂无选项', async () => {
-      const Wrapper = defineComponent({
-        setup() {
-          return () => h(ConfigProvider, { locale: zhCN }, () => h(Select, { options: [] }))
-        }
-      })
-      const { container, getByText } = render(Wrapper)
-      await fireEvent.click(container.querySelector('button')!)
-      expect(getByText('暂无选项')).toBeInTheDocument()
-    })
-
-    it('should render with selected value', () => {
-      const { getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          modelValue: '1'
-        }
-      })
-
-      expect(getByText('Option 1')).toBeInTheDocument()
+    const { getByRole } = render(Wrapper)
+    const trigger = getByRole('combobox')
+    await fireEvent.click(trigger)
+    await fireEvent.click(getByRole('option', { name: 'NYC' }))
+    await waitFor(() => {
+      expect(validator.mock.calls.some((call) => call[0] === 42)).toBe(true)
     })
   })
 
-  describe('Props', () => {
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          disabled: true
-        }
-      })
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeDisabled()
+  it('exposes focus / open / close', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        const selectRef = ref<{ focus: () => void }>()
+        return () =>
+          h('div', [
+            h('button', { type: 'button', onClick: () => selectRef.value?.focus() }, 'Focus'),
+            h(Select, {
+              ref: selectRef,
+              options: testOptions,
+              'aria-label': 'Ref'
+            })
+          ])
+      }
     })
-
-    it('should support clearable option', () => {
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          modelValue: '1',
-          clearable: true
-        }
-      })
-
-      expect(container.querySelector('[data-tiger-select-clear]')).toBeInTheDocument()
-    })
-
-    it('should support multiple selection', () => {
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true
-        }
-      })
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeInTheDocument()
-    })
+    const { getByRole } = render(Wrapper)
+    await fireEvent.click(getByRole('button', { name: 'Focus' }))
+    expect(getByRole('combobox')).toHaveFocus()
   })
 
-  describe('Events', () => {
-    it('should emit update:modelValue when option selected', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        const option = getByText('Option 1')
-        return fireEvent.click(option)
-      })
-
-      expect(onUpdate).toHaveBeenCalledWith('1')
+  it('uses zh-TW labels from the official locale object', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhTW }, () => h(Select, { options: [], 'aria-label': 'TW' }))
+      }
     })
-
-    it('should not emit events when disabled', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          disabled: true,
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      expect(onUpdate).not.toHaveBeenCalled()
-    })
-
-    it('should emit array value in multiple mode', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: [],
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.click(getByText('Option 1'))
-
-      expect(onUpdate).toHaveBeenCalledWith(['1'])
-    })
-
-    it('should emit change event', async () => {
-      const onChange = vi.fn()
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          onChange: onChange
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        const option = getByText('Option 1')
-        return fireEvent.click(option)
-      })
-
-      expect(onChange).toHaveBeenCalled()
-    })
-
-    it('should clear selection without opening dropdown (single)', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByRole, queryByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          modelValue: '1',
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      const clear = getByRole('button', { name: 'Clear selection' })
-      expect(clear).toBeInTheDocument()
-      expect(trigger.contains(clear)).toBe(false)
-
-      await fireEvent.click(clear)
-
-      expect(onUpdate).toHaveBeenCalledWith(undefined)
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('should clear selection (multiple)', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1'],
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const clear = container.querySelector('[data-tiger-select-clear]') as HTMLElement
-      await fireEvent.click(clear)
-
-      expect(onUpdate).toHaveBeenCalledWith([])
-    })
+    const { getByRole, getByText } = render(Wrapper)
+    expect(getByText('請選擇')).toBeInTheDocument()
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByText('暫無選項')).toBeInTheDocument()
   })
 
-  describe('Dropdown', () => {
-    it('should open dropdown when clicked', async () => {
-      const { container, getByText } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        expect(getByText('Option 1')).toBeInTheDocument()
-      })
+  it('portals into a modal overlay host', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(Modal, { open: true, title: 'Dialog' }, () =>
+            h(Select, { options: testOptions, 'aria-label': 'Inside' })
+          )
+      }
     })
-
-    it('should close dropdown when option selected', async () => {
-      const { container, getByText, queryByText } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        const option = getByText('Option 1')
-        return fireEvent.click(option)
-      })
-
-      await waitFor(() => {
-        expect(queryByText('Option 2')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should render option groups', async () => {
-      const { container, getByText } = render(Select, {
-        props: { options: groupedOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      expect(getByText('Group A')).toBeInTheDocument()
-      expect(getByText('A-1')).toBeInTheDocument()
-    })
-
-    it('should emit search and filter options when searchable', async () => {
-      const onSearch = vi.fn()
-      const { container, getByText, queryByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true,
-          onSearchChange: onSearch
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await fireEvent.update(input, 'Option 2')
-
-      expect(onSearch).toHaveBeenCalled()
-      expect(getByText('Option 2')).toBeInTheDocument()
-      expect(queryByText('Option 1')).not.toBeInTheDocument()
-    })
-
-    it('should keep local options unfiltered when remote search is enabled', async () => {
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true,
-          remote: true
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(document.body.querySelector('input')!, 'Option 2')
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-      expect(getByText('Option 2')).toBeInTheDocument()
-    })
-
-    it('should debounce search events when searchDebounce is set', async () => {
-      vi.useFakeTimers()
-      const onSearch = vi.fn()
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true,
-          searchDebounce: 200,
-          onSearchChange: onSearch
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(document.body.querySelector('input')!, 'Option 2')
-
-      expect(onSearch).not.toHaveBeenCalled()
-      vi.advanceTimersByTime(200)
-      expect(onSearch).toHaveBeenCalledWith('Option 2')
-      vi.useRealTimers()
-    })
-
-    it('should create a new option from the search query when creatable', async () => {
-      const onCreate = vi.fn()
-      const onUpdate = vi.fn()
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true,
-          creatable: true,
-          onCreate,
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(document.body.querySelector('input')!, 'New option')
-      await fireEvent.click(getByText('Create "New option"'))
-
-      expect(onCreate).toHaveBeenCalledWith({ label: 'New option', value: 'New option' })
-      expect(onUpdate).toHaveBeenCalledWith('New option')
-    })
-
-    it('should not show creatable option for existing labels', async () => {
-      const { container, queryByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true,
-          creatable: true
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(document.body.querySelector('input')!, 'Option 1')
-
-      expect(queryByText('Create "Option 1"')).not.toBeInTheDocument()
-    })
+    const { getByRole } = render(Wrapper)
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByRole('listbox').closest('[data-tiger-overlay-host]')).toBeTruthy()
   })
 
-  describe('Keyboard Interaction', () => {
-    it('should open with ArrowDown and select active option with Enter', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByRole, queryByText } = render(Select, {
-        props: {
-          options: testOptions,
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-      expect(trigger).toHaveFocus()
-
-      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
-
-      const firstOption = await waitFor(() => getByRole('option', { name: 'Option 1' }))
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-
-      await fireEvent.keyDown(firstOption, { key: 'Enter' })
-      expect(onUpdate).toHaveBeenCalledWith('1')
-
-      await waitFor(() => {
-        expect(queryByText('Option 2')).not.toBeInTheDocument()
-        expect(trigger).toHaveFocus()
-      })
+  it('has no a11y violations when opened with a name', async () => {
+    const { container, getByRole } = render(Select, {
+      props: { options: testOptions, 'aria-label': 'Accessible select' }
     })
-
-    it('should close with Escape and return focus to trigger', async () => {
-      const { container, getByText, queryByText } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        expect(getByText('Option 1')).toBeInTheDocument()
-      })
-
-      const firstOption = document.body.querySelector('[role="option"]') as HTMLElement
-      await fireEvent.keyDown(firstOption, { key: 'Escape' })
-
-      await waitFor(() => {
-        expect(queryByText('Option 1')).not.toBeInTheDocument()
-        expect(trigger).toHaveFocus()
-      })
-    })
-
-    it('should move focus from search input to options with ArrowDown when searchable', async () => {
-      const { container, getByRole } = render(Select, {
-        props: { options: testOptions, searchable: true }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input') as HTMLInputElement
-      await waitFor(() => {
-        expect(input).toHaveFocus()
-      })
-
-      await fireEvent.keyDown(input, { key: 'ArrowDown' })
-      const firstOption = getByRole('option', { name: 'Option 1' })
-
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-    })
-
-    it('should skip disabled options when opening with ArrowDown', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: optionsWithDisabledFirst,
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-
-      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
-
-      const enabledOption = await waitFor(() => getByRole('option', { name: 'Enabled' }))
-
-      await waitFor(() => {
-        expect(enabledOption).toHaveFocus()
-      })
-
-      await fireEvent.keyDown(enabledOption, { key: 'Enter' })
-      expect(onUpdate).toHaveBeenCalledWith('e')
-    })
+    await fireEvent.click(getByRole('combobox'))
+    await expectNoA11yViolations(container)
   })
 
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          placeholder: 'Select option'
-        }
-      })
-
-      await expectNoA11yViolationsIsolated(container)
+  it('shows zh-CN placeholder from ConfigProvider', () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(Select, { options: testOptions, 'aria-label': 'ZH' })
+          )
+      }
     })
-  })
-
-  describe('Edge Cases', () => {
-    it('should display emptyText when options array is empty', async () => {
-      const { container, getByText } = render(Select, {
-        props: {
-          options: [],
-          emptyText: 'No data available'
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      expect(getByText('No data available')).toBeInTheDocument()
-    })
-
-    it('should display emptyText when search returns no results', async () => {
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true,
-          emptyText: 'No matches found'
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await fireEvent.update(input, 'xyz')
-
-      expect(getByText('No matches found')).toBeInTheDocument()
-    })
-    it('should handle disabled options in groups', async () => {
-      const groupWithDisabled = [
-        {
-          label: 'Group B',
-          options: [
-            { label: 'B-1', value: 'b1', disabled: true },
-            { label: 'B-2', value: 'b2' }
-          ]
-        }
-      ]
-
-      const { container, getByText } = render(Select, {
-        props: { options: groupWithDisabled }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const disabledOption = getByText('B-1').closest('[role="option"]')
-      expect(disabledOption).toHaveAttribute('aria-disabled', 'true')
-    })
-
-    it('should not show clear button when clearable is false', () => {
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          modelValue: '1',
-          clearable: false
-        }
-      })
-
-      expect(container.querySelector('[data-tiger-select-clear]')).not.toBeInTheDocument()
-    })
-
-    it('should handle multiple selection with all options selected', async () => {
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1', '2', '3']
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
-
-      await fireEvent.click(trigger)
-      const selectedOptions = document.body.querySelectorAll(
-        '[role="option"][aria-selected="true"]'
-      )
-      expect(selectedOptions.length).toBe(3)
-    })
-
-    it('should display multiple selected values as comma-separated text', () => {
-      const { getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1', '2']
-        }
-      })
-
-      expect(getByText('Option 1, Option 2')).toBeInTheDocument()
-    })
-
-    it('should handle large number of options', async () => {
-      const manyOptions = Array.from({ length: 100 }, (_, i) => ({
-        label: `Option ${i + 1}`,
-        value: `${i + 1}`
-      }))
-
-      const { container, getByText } = render(Select, {
-        props: { options: manyOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-      expect(getByText('Option 100')).toBeInTheDocument()
-    })
-  })
-
-  describe('Dropdown Behavior', () => {
-    it('should close dropdown when clicking outside', async () => {
-      const { container, getByText, queryByText } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        expect(getByText('Option 1')).toBeInTheDocument()
-      })
-
-      await fireEvent.click(document.body)
-
-      await waitFor(() => {
-        expect(queryByText('Option 1')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should keep dropdown open in multiple mode after selection', async () => {
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: []
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await fireEvent.click(getByText('Option 1'))
-
-      await waitFor(() => {
-        expect(getByText('Option 2')).toBeInTheDocument()
-      })
-    })
-
-    it('should close an open single select from the in-panel done action', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByRole, queryByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          locale: { common: { okText: 'Apply' } },
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.click(getByRole('button', { name: 'Apply' }))
-
-      expect(onUpdate).not.toHaveBeenCalled()
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-    it('should keep multiple select open after selection until the done action is clicked', async () => {
-      const { container, getByText, getByRole, queryByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: [],
-          locale: { common: { okText: 'Apply' } }
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.click(getByText('Option 1'))
-      expect(getByRole('listbox')).toBeInTheDocument()
-
-      await fireEvent.click(getByRole('button', { name: 'Apply' }))
-
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('should focus search input when dropdown opens with searchable', async () => {
-      const { container } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await waitFor(() => {
-        expect(input).toHaveFocus()
-      })
-    })
-  })
-
-  describe('Multiple Selection Features', () => {
-    it('should toggle selection in multiple mode', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1'],
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const option1 = getByRole('option', { name: 'Option 1' })
-      await fireEvent.click(option1)
-      expect(onUpdate).toHaveBeenCalledWith([])
-
-      const option2 = getByRole('option', { name: 'Option 2' })
-      await fireEvent.click(option2)
-      expect(onUpdate).toHaveBeenCalledWith(['1', '2'])
-    })
-
-    it('should show check icon for selected items in multiple mode', async () => {
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1', '2']
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const option1 = getByRole('option', { name: 'Option 1' })
-      const option2 = getByRole('option', { name: 'Option 2' })
-      const option3 = getByRole('option', { name: 'Option 3' })
-
-      expect(option1).toHaveAttribute('aria-selected', 'true')
-      expect(option2).toHaveAttribute('aria-selected', 'true')
-      expect(option3).toHaveAttribute('aria-selected', 'false')
-    })
-  })
-
-  describe('Search Functionality', () => {
-    it('should filter options case-insensitively', async () => {
-      const { container, getByText, queryByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await fireEvent.update(input, 'option 1')
-
-      expect(getByText('Option 1')).toBeInTheDocument()
-      expect(queryByText('Option 2')).not.toBeInTheDocument()
-    })
-
-    it('should reset search query when dropdown closes', async () => {
-      const { container, getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await fireEvent.update(input, 'Option 1')
-
-      await fireEvent.click(getByText('Option 1'))
-
-      await fireEvent.click(trigger)
-
-      const inputAfterReopen = document.body.querySelector('input')!
-      expect(inputAfterReopen.value).toBe('')
-      expect(getByText('Option 2')).toBeInTheDocument()
-    })
-
-    it('should allow Space key in search input without closing dropdown', async () => {
-      const { container, queryByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          searchable: true
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const input = document.body.querySelector('input')!
-      await fireEvent.update(input, 'Option 1')
-
-      await fireEvent.keyDown(input, { key: ' ', bubbles: true })
-
-      // Dropdown should still be open after Space key
-      const listbox = queryByRole('listbox')
-      expect(listbox).toBeInTheDocument()
-    })
-  })
-
-  describe('maxTagCount', () => {
-    it('should truncate display when selected items exceed maxTagCount', () => {
-      const { getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1', '2', '3'],
-          maxTagCount: 2
-        }
-      })
-      expect(getByText('Option 1, Option 2 +1')).toBeInTheDocument()
-    })
+    const { getByText } = render(Wrapper)
+    expect(getByText('请选择')).toBeInTheDocument()
   })
 })

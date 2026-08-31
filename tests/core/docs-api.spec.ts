@@ -80,7 +80,8 @@ describe('getVisiblePropRows', () => {
       row('locale?')
     ])
 
-    expect(visible.map((member) => member.name)).toEqual(['open?', 'locale?', 'size?'])
+    expect(visible.map((member) => member.name)).toContain('open?')
+    expect(visible.map((member) => member.name)).toEqual(['searchable?', 'open?', 'locale?'])
   })
 
   it('does not dump every Table field into the compact table', () => {

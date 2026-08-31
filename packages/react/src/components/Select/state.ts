@@ -1,54 +1,52 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
-  getSelectTriggerClasses,
-  selectBaseClasses,
+  TIGER_CHROME_ATTR,
   createSelectSearchDebouncer,
+  createSelectTypeaheadBuffer,
   flattenSelectOptions,
-  resolveCreatableSelectOption,
-  resolveSelectFilteredOptions,
-  findFirstEnabledIndex as pickerFindFirstEnabledIndex,
-  findLastEnabledIndex as pickerFindLastEnabledIndex,
-  findNextEnabledIndex as pickerFindNextEnabledIndex,
-  resolveLocaleText,
-  mergeTigerLocale,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerOptionId,
   getSelectLabels,
+  getSelectRootClasses,
+  getSelectTriggerClasses,
+  mergeAriaDescribedBy,
+  mergeTigerLocale,
+  normalizeSelectValue,
+  pruneCreatedSelectOptions,
+  rememberSelectOptions,
+  resolveCreatableSelectOption,
+  resolveLocaleText,
+  resolveSelectActiveIndex,
+  resolveSelectDisplayText,
+  resolveSelectFilteredOptions,
+  commitSelectOption,
+  clearSelectValue,
+  getSelectSelectedValues,
+  getSelectTriggerKeyIntent,
+  findSelectTypeaheadIndex,
+  isSelectTypeaheadCharacter,
+  isSelectOptionSelected,
+  shouldShowSelectClear,
+  navigateSelectActiveIndex,
+  getSelectClosedHomeEndIndex,
+  serializeSelectFormValues,
+  coerceSelectFormValue,
+  type InputStatus,
+  type SelectModelValue,
   type SelectOption,
   type SelectSearchDebouncer,
-  type SelectValue,
-  type SelectValues
+  type SelectValue
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../../hooks/useControlledState'
 import { useTigerConfig } from '../ConfigProvider'
-import type { SelectContext, SelectProps } from './types'
+import { useInputGroupContext } from '../InputGroup'
+import { useFormItemControlContext } from '../FormItemContext'
+import { isMultipleSelect, type SelectProps, type SelectRenderContext } from './types'
 
-const SELECT_KEYS = new Set([
-  'options',
-  'size',
-  'disabled',
-  'placeholder',
-  'searchable',
-  'searchValue',
-  'defaultSearchValue',
-  'clearable',
-  'emptyText',
-  'maxTagCount',
-  'virtual',
-  'remote',
-  'searchDebounce',
-  'creatable',
-  'createOptionText',
-  'listHeight',
-  'labels',
-  'onSearchChange',
-  'onCreate',
-  'className',
-  'value',
-  'onChange',
-  'multiple',
-  'locale'
-])
-
-export function useSelectState(props: SelectProps): SelectContext {
+export function useSelectController(props: SelectProps) {
+  const isMultiple = isMultipleSelect(props)
   const {
     options = [],
     size = 'md',
@@ -63,20 +61,33 @@ export function useSelectState(props: SelectProps): SelectContext {
     remote = false,
     searchDebounce = 0,
     creatable = false,
-    createOptionText = 'Create',
+    createOptionText,
     virtual = false,
     listHeight = 256,
     labels: labelsOverride,
     onSearchChange,
+    onSearchValueChange,
     onCreate,
+    onOpenChange,
     className,
     value,
+    defaultValue,
     onChange,
-    multiple,
-    locale
+    open,
+    defaultOpen = false,
+    autoClearSearchValue = true,
+    loading = false,
+    status: statusProp,
+    name,
+    filterOption,
+    locale,
+    id,
+    onBlur,
+    renderOption
   } = props
 
-  const isMultiple = multiple === true
+  const inputGroup = useInputGroupContext()
+  const formItemControl = useFormItemControlContext()
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -86,196 +97,207 @@ export function useSelectState(props: SelectProps): SelectContext {
     () => getSelectLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const resolvedPlaceholder = resolveLocaleText(labels.placeholder, placeholder)
 
-  const divProps: Record<string, unknown> = {}
-  for (const [k, v] of Object.entries(props)) {
-    if (!SELECT_KEYS.has(k)) divProps[k] = v
-  }
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const shakeTrigger = formItemControl?.shakeTrigger
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const describedBy = mergeAriaDescribedBy(
+    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    formItemControl?.describedBy
+  )
+  const labelledby =
+    typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
+      ? props['aria-labelledby']
+      : formItemControl?.labelId
+  const ariaLabel =
+    typeof props['aria-label'] === 'string' && props['aria-label'].trim()
+      ? props['aria-label']
+      : undefined
+
+  const incomingValue =
+    value !== undefined ? value : coerceSelectFormValue(formItemControl?.value, options, isMultiple)
+  const [selected, setSelected] = useControlledState<SelectModelValue>({
+    value: incomingValue,
+    defaultValue: defaultValue ?? (isMultiple ? [] : undefined),
+    onChange: (next) => {
+      const normalized = normalizeSelectValue(next, isMultiple)
+      if (isMultiple) {
+        ;(onChange as ((value: SelectValue[]) => void) | undefined)?.(
+          (Array.isArray(normalized) ? normalized : []) as SelectValue[]
+        )
+      } else {
+        ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(
+          normalized as SelectValue | undefined
+        )
+      }
+      formItemControl?.onChange?.(normalized)
+    },
+    postState: (next) => normalizeSelectValue(next, isMultiple)
+  })
+
+  const [isOpen, setOpen] = useControlledState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange
+  })
+
+  const [searchQuery, setSearchQuery] = useControlledState({
+    value: searchValue,
+    defaultValue: defaultSearchValue,
+    onChange: onSearchValueChange
+  })
 
   const instanceId = useId()
   const listboxId = `tiger-select-listbox-${instanceId}`
+  const getOptionId = (index: number) => getPickerOptionId(listboxId, index)
 
-  const [isOpen, setIsOpen] = useState(false)
-  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(defaultSearchValue)
-  const searchQuery = searchValue ?? uncontrolledSearchValue
   const [activeIndex, setActiveIndex] = useState(-1)
   const [createdOptions, setCreatedOptions] = useState<SelectOption[]>([])
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
+  const optionCacheRef = useRef(new Map<SelectValue, SelectOption>())
+  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const searchDebouncerRef = useRef<SelectSearchDebouncer | null>(null)
+  const activeValueRef = useRef<SelectValue | undefined>(undefined)
+  const typeaheadRef = useRef(
+    createSelectTypeaheadBuffer({
+      onQuery: (query) => {
+        const index = findSelectTypeaheadIndex(flatSelectableOptionsRef.current, query, -1)
+        if (index >= 0) setActiveIndex(index)
+      }
+    })
+  )
 
+  const liveCreated = useMemo(
+    () => pruneCreatedSelectOptions(createdOptions, options),
+    [createdOptions, options]
+  )
+  const allOptions = useMemo(
+    () => [...flattenSelectOptions(options), ...liveCreated],
+    [options, liveCreated]
+  )
   const filteredOptions = useMemo(
-    () => resolveSelectFilteredOptions(options, searchQuery, { searchable, remote }),
-    [options, remote, searchable, searchQuery]
+    () =>
+      resolveSelectFilteredOptions(options, searchQuery, {
+        searchable,
+        remote,
+        filterOption
+      }),
+    [filterOption, options, remote, searchable, searchQuery]
   )
-
-  const flatFilteredOptions = useMemo(
-    () => flattenSelectOptions(filteredOptions),
-    [filteredOptions]
-  )
-
   const creatableOption = useMemo(
     () =>
-      resolveCreatableSelectOption([...options, ...createdOptions], searchQuery, {
+      resolveCreatableSelectOption([...options, ...liveCreated], searchQuery, {
         creatable: creatable && searchable
       }),
-    [creatable, createdOptions, options, searchable, searchQuery]
+    [creatable, liveCreated, options, searchable, searchQuery]
   )
+  const flatSelectableOptions = useMemo(() => {
+    const flat = flattenSelectOptions(filteredOptions)
+    return creatableOption ? [...flat, creatableOption] : flat
+  }, [creatableOption, filteredOptions])
+  const flatSelectableOptionsRef = useRef(flatSelectableOptions)
+  flatSelectableOptionsRef.current = flatSelectableOptions
 
-  const flatSelectableOptions = useMemo(
-    () => (creatableOption ? [...flatFilteredOptions, creatableOption] : flatFilteredOptions),
-    [creatableOption, flatFilteredOptions]
-  )
+  const selectedValues = getSelectSelectedValues(selected, isMultiple)
+  optionCacheRef.current = rememberSelectOptions(optionCacheRef.current, allOptions, selectedValues)
 
-  const allOptions = useMemo(() => flattenSelectOptions(options), [options])
+  const displayText = resolveSelectDisplayText({
+    value: selected,
+    multiple: isMultiple,
+    options,
+    createdOptions: liveCreated,
+    optionCache: optionCacheRef.current,
+    placeholder: resolveLocaleText(labels.placeholder, placeholder),
+    maxTagCount,
+    moreCountText: labels.moreCountText
+  })
+  const showClear = shouldShowSelectClear({
+    clearable,
+    disabled: effectiveDisabled,
+    value: selected,
+    multiple: isMultiple
+  })
+  const createOptionLabel = createOptionText
+    ? createOptionText.includes('{label}')
+      ? createOptionText
+      : `${createOptionText} "{label}"`
+    : labels.createOptionLabel
 
-  const displayText = useMemo(() => {
-    if (isMultiple) {
-      const values = Array.isArray(value) ? value : []
-      if (values.length === 0) return resolvedPlaceholder
-      const labels = [...allOptions, ...createdOptions]
-        .filter((opt) => values.includes(opt.value))
-        .map((opt) => opt.label)
-      if (maxTagCount !== undefined && labels.length > maxTagCount) {
-        const visible = labels.slice(0, maxTagCount)
-        return `${visible.join(', ')} +${labels.length - maxTagCount}`
-      }
-      return labels.join(', ')
-    }
-
-    if (value === undefined || value === null || value === '') return resolvedPlaceholder
-    return (
-      [...allOptions, ...createdOptions].find((opt) => opt.value === value)?.label ??
-      resolvedPlaceholder
-    )
-  }, [isMultiple, value, allOptions, createdOptions, resolvedPlaceholder, maxTagCount])
-
-  const showClearButton = useMemo(
-    () =>
-      clearable &&
-      !disabled &&
-      value !== undefined &&
-      value !== null &&
-      value !== '' &&
-      (!Array.isArray(value) || value.length > 0),
-    [clearable, disabled, value]
-  )
-
-  const isSelected = (option: SelectOption): boolean => {
-    if (isMultiple) {
-      return (Array.isArray(value) ? value : []).includes(option.value)
-    }
-    return value === option.value
-  }
-
-  const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
-
-  const findFirstEnabledIndex = useCallback(
-    (): number => pickerFindFirstEnabledIndex(flatSelectableOptions),
-    [flatSelectableOptions]
-  )
-
-  const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatSelectableOptions)
-
-  const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
-    pickerFindNextEnabledIndex(flatSelectableOptions, current, direction)
-
-  const focusOptionAt = useCallback((index: number) => {
-    if (index < 0) {
-      return
-    }
-
-    requestAnimationFrame(() => {
-      const el = dropdownRef.current?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)
-      el?.focus()
-      el?.scrollIntoView({ block: 'nearest' })
-    })
-  }, [])
-
-  const setActiveAndFocus = (index: number) => {
-    setActiveIndex(index)
-    focusOptionAt(index)
-  }
-
-  const closeDropdown = () => {
-    setIsOpen(false)
-    updateSearchValue('')
+  const closeDropdown = useCallback(() => {
+    setOpen(false)
+    setSearchQuery('')
+    searchDebouncerRef.current?.schedule('')
     setActiveIndex(-1)
-  }
+  }, [setOpen, setSearchQuery])
 
-  const toggleDropdown = () => {
-    if (!disabled) {
-      setIsOpen((prev) => !prev)
-    }
-  }
+  const openDropdown = useCallback(() => {
+    if (effectiveDisabled) return
+    setOpen(true)
+  }, [effectiveDisabled, setOpen])
 
-  const getActiveOption = (): SelectOption | undefined => {
-    if (activeIndex < 0) {
-      return undefined
-    }
-    return flatSelectableOptions[activeIndex]
-  }
+  const toggleDropdown = useCallback(() => {
+    if (effectiveDisabled) return
+    if (isOpen) closeDropdown()
+    else openDropdown()
+  }, [closeDropdown, effectiveDisabled, isOpen, openDropdown])
 
-  const selectActiveOption = () => {
-    const option = getActiveOption()
-    if (!option || option.disabled) {
-      return
-    }
-    selectOption(option)
-  }
+  const selectOption = useCallback(
+    (option: SelectOption) => {
+      if (option.disabled || effectiveDisabled) return
+      if (creatableOption && option.value === creatableOption.value) {
+        setCreatedOptions((current) =>
+          current.some((item) => item.value === option.value) ? current : [...current, option]
+        )
+        onCreate?.(option)
+      }
+      const next = commitSelectOption({ option, value: selected, multiple: isMultiple })
+      setSelected(next)
+      activeValueRef.current = option.value
+      if (isMultiple) {
+        const nextIndex = flatSelectableOptions.findIndex((item) => item.value === option.value)
+        setActiveIndex(nextIndex)
+        if (autoClearSearchValue) {
+          setSearchQuery('')
+          searchDebouncerRef.current?.schedule('')
+        }
+        return
+      }
+      closeDropdown()
+      requestAnimationFrame(() => triggerRef.current?.focus())
+    },
+    [
+      autoClearSearchValue,
+      closeDropdown,
+      creatableOption,
+      effectiveDisabled,
+      flatSelectableOptions,
+      isMultiple,
+      onCreate,
+      selected,
+      setSearchQuery,
+      setSelected
+    ]
+  )
 
-  const selectOption = (option: SelectOption) => {
-    if (option.disabled) {
-      return
-    }
-
-    if (creatableOption && option.value === creatableOption.value) {
-      setCreatedOptions((current) => [...current, option])
-      onCreate?.(option)
-    }
-
-    if (isMultiple) {
-      const currentValue = Array.isArray(value) ? value : []
-      const nextValue = currentValue.includes(option.value)
-        ? currentValue.filter((v) => v !== option.value)
-        : [...currentValue, option.value]
-
-      ;(onChange as ((value: SelectValues) => void) | undefined)?.(nextValue)
-      return
-    }
-
-    ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(option.value)
-    closeDropdown()
-    requestAnimationFrame(() => {
-      triggerRef.current?.focus()
-    })
-  }
-
-  const clearSelection = (event: React.MouseEvent) => {
-    event.stopPropagation()
-
-    if (isMultiple) {
-      ;(onChange as ((value: SelectValues) => void) | undefined)?.([])
-      return
-    }
-
-    ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(undefined)
-  }
-
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    updateSearchValue(event.target.value)
-  }
+  const clearSelection = useCallback(
+    (event?: { stopPropagation: () => void }) => {
+      event?.stopPropagation()
+      setSelected(clearSelectValue(isMultiple))
+      requestAnimationFrame(() => triggerRef.current?.focus())
+    },
+    [isMultiple, setSelected]
+  )
 
   const updateSearchValue = useCallback(
     (query: string) => {
-      if (searchValue === undefined) {
-        setUncontrolledSearchValue(query)
-      }
+      setSearchQuery(query)
       searchDebouncerRef.current?.schedule(query)
     },
-    [searchValue]
+    [setSearchQuery]
   )
 
   useEffect(() => {
@@ -284,144 +306,27 @@ export function useSelectState(props: SelectProps): SelectContext {
       delay: searchDebounce,
       onSearchChange: (query) => onSearchChange?.(query)
     })
-
     return () => searchDebouncerRef.current?.cancel()
   }, [onSearchChange, searchDebounce])
 
-  const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (disabled) {
+  useEffect(() => {
+    if (!isOpen) {
+      setActiveIndex(-1)
+      activeValueRef.current = undefined
       return
     }
-
-    switch (event.key) {
-      case 'ArrowDown': {
-        event.preventDefault()
-        if (!isOpen) {
-          setIsOpen(true)
-          return
-        }
-        const next = findNextEnabledIndex(activeIndex, 1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        if (!isOpen) {
-          setIsOpen(true)
-          return
-        }
-        const next = findNextEnabledIndex(activeIndex, -1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Enter':
-      case ' ': {
-        event.preventDefault()
-        if (!isOpen) {
-          setIsOpen(true)
-          return
-        }
-        selectActiveOption()
-        return
-      }
-      case 'Escape': {
-        if (isOpen) {
-          event.preventDefault()
-          closeDropdown()
-        }
-        return
-      }
-      default:
-        return
-    }
-  }
-
-  const handleDropdownKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (event.key) {
-      case 'ArrowDown': {
-        event.preventDefault()
-        const next = findNextEnabledIndex(activeIndex, 1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        const next = findNextEnabledIndex(activeIndex, -1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Home': {
-        event.preventDefault()
-        const next = findFirstEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'End': {
-        event.preventDefault()
-        const next = findLastEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Enter':
-      case ' ': {
-        event.preventDefault()
-        selectActiveOption()
-        return
-      }
-      case 'Escape': {
-        event.preventDefault()
-        closeDropdown()
-        triggerRef.current?.focus()
-        return
-      }
-      case 'Tab': {
-        closeDropdown()
-        return
-      }
-      default:
-        return
-    }
-  }
-
-  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    switch (event.key) {
-      case ' ': {
-        event.stopPropagation()
-        return
-      }
-      case 'ArrowDown': {
-        event.preventDefault()
-        event.stopPropagation()
-        const next = activeIndex >= 0 ? activeIndex : findFirstEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        event.stopPropagation()
-        const next = activeIndex >= 0 ? activeIndex : findLastEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Enter': {
-        if (activeIndex >= 0) {
-          event.preventDefault()
-          event.stopPropagation()
-          selectActiveOption()
-        }
-        return
-      }
-      case 'Escape': {
-        event.preventDefault()
-        event.stopPropagation()
-        closeDropdown()
-        triggerRef.current?.focus()
-        return
-      }
-      default:
-        return
-    }
-  }
+    setActiveIndex((previous) => {
+      const next = resolveSelectActiveIndex({
+        items: flatSelectableOptions,
+        previousIndex: previous,
+        previousValue: activeValueRef.current,
+        selectedValues,
+        reason: previous >= 0 ? 'filter' : 'open'
+      })
+      activeValueRef.current = flatSelectableOptions[next]?.value
+      return next
+    })
+  }, [flatSelectableOptions, isOpen, selectedValues])
 
   useEffect(() => {
     if (isOpen && searchable) {
@@ -429,89 +334,161 @@ export function useSelectState(props: SelectProps): SelectContext {
     }
   }, [isOpen, searchable])
 
-  useEffect(() => {
-    if (!isOpen) {
+  const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (effectiveDisabled) return
+    const fromSearchInput = event.currentTarget.tagName === 'INPUT'
+    if (!isOpen && isSelectTypeaheadCharacter(event.key, event)) {
+      event.preventDefault()
+      openDropdown()
+      if (searchable) updateSearchValue(event.key)
+      else typeaheadRef.current.push(event.key)
       return
     }
+    const intent = getSelectTriggerKeyIntent({
+      key: event.key,
+      open: isOpen,
+      searchable,
+      clearable,
+      hasValue: shouldShowSelectClear({
+        clearable: true,
+        disabled: false,
+        value: selected,
+        multiple: isMultiple
+      }),
+      fromSearchInput
+    })
+    switch (intent.type) {
+      case 'open':
+        event.preventDefault()
+        openDropdown()
+        return
+      case 'close':
+        if (event.key !== 'Tab') event.preventDefault()
+        closeDropdown()
+        triggerRef.current?.focus()
+        return
+      case 'clear':
+        event.preventDefault()
+        clearSelection()
+        return
+      case 'prevent-scroll': {
+        event.preventDefault()
+        openDropdown()
+        const next = getSelectClosedHomeEndIndex(flatSelectableOptions, event.key as 'Home' | 'End')
+        setActiveIndex(next)
+        return
+      }
+      case 'navigate': {
+        event.preventDefault()
+        setActiveIndex((current) => {
+          const next = navigateSelectActiveIndex(flatSelectableOptions, current, intent.key)
+          activeValueRef.current = flatSelectableOptions[next]?.value
+          return next
+        })
+        return
+      }
+      case 'select-active': {
+        event.preventDefault()
+        const option = flatSelectableOptions[activeIndex]
+        if (option) selectOption(option)
+        return
+      }
+      default:
+        return
+    }
+  }
 
-    if (flatSelectableOptions.length === 0) {
-      setActiveIndex(-1)
+  const handleFocusOut = (event: React.FocusEvent<HTMLElement>) => {
+    const next = event.relatedTarget as Node | null
+    if (
+      (rootRef.current && next && rootRef.current.contains(next)) ||
+      (dropdownRef.current && next && dropdownRef.current.contains(next))
+    ) {
       return
     }
+    formItemControl?.onBlur?.()
+    onBlur?.(event)
+  }
 
-    const selectedIndex = (() => {
-      if (isMultiple) {
-        const values = Array.isArray(value) ? value : []
-        if (values.length === 0) {
-          return -1
-        }
-        return flatSelectableOptions.findIndex((opt) => values.includes(opt.value) && !opt.disabled)
-      }
-
-      if (value === undefined || value === null || value === '') {
-        return -1
-      }
-      return flatSelectableOptions.findIndex((opt) => opt.value === value && !opt.disabled)
-    })()
-
-    const nextActive = selectedIndex >= 0 ? selectedIndex : findFirstEnabledIndex()
-    setActiveIndex(nextActive)
-
-    if (!searchable) {
-      focusOptionAt(nextActive)
-    }
-  }, [
-    isOpen,
-    searchable,
-    flatSelectableOptions,
-    isMultiple,
-    value,
-    findFirstEnabledIndex,
-    focusOptionAt
-  ])
-
-  return {
+  const comboboxAria = getPickerComboboxAria({
+    expanded: isOpen,
     listboxId,
+    activeIndex
+  })
+  const listboxAria = getPickerListboxAria({ id: listboxId })
+
+  const renderCtx: SelectRenderContext = {
+    listboxId,
+    listboxAria,
+    multiple: isMultiple,
+    loading,
     getOptionId,
-    isOpen,
-    searchQuery,
     activeIndex,
     setActiveIndex,
-    dropdownRef,
-    triggerRef,
-    searchInputRef,
-    isMultiple,
     size,
     virtual,
     listHeight,
-    disabled,
-    placeholder: resolvedPlaceholder,
-    searchable,
-    clearable,
     emptyText: resolveLocaleText(labels.emptyText, emptyText),
-    createOptionText,
-    className,
-    divProps,
-    searchPlaceholder: resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder),
-    clearAriaLabel: resolveLocaleText('Clear selection', mergedLocale?.common?.clearText),
-    doneText: resolveLocaleText(labels.doneText),
-    filteredOptions,
-    flatSelectableOptions,
-    creatableOption,
-    hasOptions: filteredOptions.length > 0,
-    optionsLength: options.length,
-    displayText,
-    showClearButton,
-    containerClasses: classNames(selectBaseClasses, className),
-    triggerClasses: getSelectTriggerClasses(size, disabled, isOpen),
-    isSelected,
+    loadingText: labels.loadingText,
+    createOptionLabel,
     selectOption,
-    clearSelection,
-    closeDropdown,
+    isSelected: (option) => isSelectOptionSelected(option, selected, isMultiple),
+    filteredOptions,
+    creatableOption,
+    renderOption
+  }
+
+  return {
+    rootRef,
+    triggerRef,
+    searchInputRef,
+    dropdownRef,
+    listboxId,
+    comboboxAria,
+    listboxAria,
+    isOpen,
+    isMultiple,
+    searchable,
+    effectiveDisabled,
+    status,
+    shakeTrigger,
+    effectiveId,
+    effectiveName,
+    describedBy,
+    labelledby,
+    ariaLabel,
+    required: formItemControl?.required,
+    displayText,
+    placeholder: resolveLocaleText(labels.placeholder, placeholder),
+    showClear,
+    searchQuery,
+    searchPlaceholder: resolveLocaleText(labels.searchPlaceholder),
+    clearAriaLabel: labels.clearAriaLabel,
+    doneText: labels.doneText,
+    loading,
+    size,
+    className: getSelectRootClasses(inputGroup != null, className),
+    triggerClasses: getSelectTriggerClasses({
+      size,
+      disabled: effectiveDisabled,
+      isOpen,
+      status,
+      hasClear: showClear
+    }),
+    chromeAttr: TIGER_CHROME_ATTR,
+    hiddenValues: effectiveName ? serializeSelectFormValues(selected, isMultiple) : [],
+    renderCtx,
     toggleDropdown,
-    handleSearchInput,
+    closeDropdown,
+    openDropdown,
+    clearSelection,
+    updateSearchValue,
     handleTriggerKeyDown,
-    handleDropdownKeyDown,
-    handleSearchKeyDown
+    handleFocusOut,
+    rootClassName: classNames,
+    focusCombobox: () => {
+      if (searchable && isOpen) searchInputRef.current?.focus()
+      else triggerRef.current?.focus()
+    }
   }
 }
