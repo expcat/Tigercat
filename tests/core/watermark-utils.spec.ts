@@ -94,7 +94,7 @@ describe('watermark-utils', () => {
       fontSize: 16,
       fontFamily: 'sans-serif',
       fontWeight: 'normal',
-      color: 'rgba(0,0,0,0.15)'
+      color: 'color-mix(in srgb, var(--tiger-text, #111827) 15%, transparent)'
     })
   })
 
@@ -145,7 +145,9 @@ describe('watermark-utils', () => {
     vi.stubGlobal('window', originalWindow)
   })
 
-  it('falls back from image loading failure to undefined', async () => {
+  it('falls back from image loading failure to text content', async () => {
+    const { canvas, ctx } = createCanvasMock()
+    const createElement = mockCanvasElement(canvas)
     class ImageMock {
       onload: (() => void) | null = null
       onerror: (() => void) | null = null
@@ -158,7 +160,9 @@ describe('watermark-utils', () => {
 
     await expect(
       renderWatermarkDataUrl({ ...renderOptions(), image: '/missing.png' })
-    ).resolves.toBeUndefined()
+    ).resolves.toBe('data:image/png;base64,canvas')
+    expect(ctx.fillText).toHaveBeenCalledWith('Demo', 60, 32)
+    createElement.mockRestore()
   })
 
   it('renders loaded images into the DOM canvas path', async () => {
@@ -183,23 +187,25 @@ describe('watermark-utils', () => {
   })
 
   it('builds overlay background style', () => {
-    expect(
-      getWatermarkOverlayStyle({
-        base64Url: 'data:image/png;base64,abc',
-        width: watermarkDefaults.width,
-        height: watermarkDefaults.height,
-        gapX: watermarkDefaults.gapX,
-        gapY: watermarkDefaults.gapY,
-        offsetX: 4,
-        offsetY: 8,
-        zIndex: 12
-      })
-    ).toMatchObject({
+    const style = getWatermarkOverlayStyle({
+      base64Url: 'data:image/png;base64,abc',
+      width: watermarkDefaults.width,
+      height: watermarkDefaults.height,
+      gapX: watermarkDefaults.gapX,
+      gapY: watermarkDefaults.gapY,
+      offsetX: 4,
+      offsetY: 8,
+      zIndex: 12
+    })
+    expect(style).toMatchObject({
       zIndex: '12',
       backgroundImage: 'url(data:image/png;base64,abc)',
-      backgroundSize: '220px 164px',
-      backgroundPosition: '4px 8px'
+      backgroundPosition: '4px 8px',
+      printColorAdjust: 'exact'
     })
+    expect(style.backgroundSize).toBe(
+      `${watermarkDefaults.width + watermarkDefaults.gapX}px ${watermarkDefaults.height + watermarkDefaults.gapY}px`
+    )
   })
 
   it('batches render requests to one animation frame', async () => {

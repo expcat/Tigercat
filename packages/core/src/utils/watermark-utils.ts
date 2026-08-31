@@ -14,18 +14,21 @@ export const watermarkDefaults = {
   width: 120,
   height: 64,
   rotate: -22,
-  zIndex: 9,
+  zIndex: 20,
   gapX: 100,
   gapY: 100,
   offsetX: 0,
   offsetY: 0
 } as const
 
+export const WATERMARK_DEFAULT_INK =
+  'color-mix(in srgb, var(--tiger-text, #111827) 15%, transparent)'
+
 export const watermarkFontDefaults: Required<WatermarkFont> = {
   fontSize: 16,
   fontFamily: 'sans-serif',
   fontWeight: 'normal',
-  color: 'rgba(0,0,0,0.15)'
+  color: WATERMARK_DEFAULT_INK
 }
 
 // ---------------------------------------------------------------------------
@@ -44,6 +47,8 @@ export interface WatermarkRenderOptions {
   image?: string
   width: number
   height: number
+  gapX?: number
+  gapY?: number
   rotate: number
   font: Required<WatermarkFont>
 }
@@ -93,6 +98,16 @@ function drawWatermarkContent(
   }
 }
 
+function tileSize(opts: Pick<WatermarkRenderOptions, 'width' | 'height' | 'gapX' | 'gapY'>): {
+  tileW: number
+  tileH: number
+} {
+  return {
+    tileW: opts.width + Math.max(0, opts.gapX ?? 0),
+    tileH: opts.height + Math.max(0, opts.gapY ?? 0)
+  }
+}
+
 function renderWatermarkToDomCanvas(
   opts: WatermarkRenderOptions,
   image?: CanvasImageSource
@@ -100,12 +115,13 @@ function renderWatermarkToDomCanvas(
   if (!isBrowser()) return undefined
 
   const { content, width, height, rotate, font } = opts
+  const { tileW, tileH } = tileSize(opts)
   const canvas = document.createElement('canvas')
   const dpr = getWatermarkDpr()
-  canvas.width = width * dpr
-  canvas.height = height * dpr
-  canvas.style.width = `${width}px`
-  canvas.style.height = `${height}px`
+  canvas.width = tileW * dpr
+  canvas.height = tileH * dpr
+  canvas.style.width = `${tileW}px`
+  canvas.style.height = `${tileH}px`
 
   const ctx = canvas.getContext('2d')
   if (!ctx) return undefined
@@ -118,7 +134,11 @@ function renderWatermarkToDomCanvas(
     drawWatermarkContent(ctx, content, width, height, font)
   }
 
-  return canvas.toDataURL()
+  try {
+    return canvas.toDataURL()
+  } catch {
+    return undefined
+  }
 }
 
 function blobToDataUrl(blob: Blob): Promise<string | undefined> {
@@ -138,8 +158,9 @@ async function renderWatermarkToOffscreenCanvas(
   if (typeof OffscreenCanvas === 'undefined') return undefined
 
   const { content, width, height, rotate, font } = opts
+  const { tileW, tileH } = tileSize(opts)
   const dpr = getWatermarkDpr()
-  const canvas = new OffscreenCanvas(width * dpr, height * dpr)
+  const canvas = new OffscreenCanvas(tileW * dpr, tileH * dpr)
   const ctx = canvas.getContext('2d')
   if (!ctx) return undefined
 
@@ -185,7 +206,10 @@ export async function renderWatermarkDataUrl(
 ): Promise<string | undefined> {
   if (opts.image) {
     const image = await loadWatermarkImage(opts.image)
-    return image ? renderWatermarkToDomCanvas(opts, image) : undefined
+    if (image) {
+      const painted = renderWatermarkToDomCanvas(opts, image)
+      if (painted) return painted
+    }
   }
 
   const offscreenResult = await renderWatermarkToOffscreenCanvas(opts)
@@ -210,6 +234,8 @@ export type WatermarkResizeObserverFactory = (
 export interface WatermarkRenderControllerOptions {
   getRenderOptions: () => WatermarkRenderOptions
   onRender: (base64Url: string | undefined) => void
+  /** Bump overlay mount when the node is removed or its style is stripped. */
+  onTamper?: () => void
   requestFrame?: WatermarkFrameRequest
   cancelFrame?: WatermarkFrameCancel
   createResizeObserver?: WatermarkResizeObserverFactory
@@ -256,6 +282,7 @@ export function createWatermarkRenderController(
   const createResizeObserver = options.createResizeObserver ?? createDefaultWatermarkResizeObserver
 
   let observer: WatermarkResizeObserverLike | undefined
+  let mutationObserver: MutationObserver | undefined
   let observedTarget: Element | undefined
   let frameHandle: number | undefined
   let pending = false
@@ -267,10 +294,14 @@ export function createWatermarkRenderController(
 
     pending = false
     const currentVersion = renderVersion
-    const result = await render(options.getRenderOptions())
-    if (currentVersion !== renderVersion) return
-
-    options.onRender(result)
+    try {
+      const result = await render(options.getRenderOptions())
+      if (currentVersion !== renderVersion) return
+      options.onRender(result)
+    } catch {
+      if (currentVersion !== renderVersion) return
+      options.onRender(undefined)
+    }
   }
 
   function renderNextFrame(): void {
@@ -286,6 +317,8 @@ export function createWatermarkRenderController(
   function disconnect(): void {
     observer?.disconnect()
     observer = undefined
+    mutationObserver?.disconnect()
+    mutationObserver = undefined
     observedTarget = undefined
     pending = false
     renderVersion += 1
@@ -302,7 +335,31 @@ export function createWatermarkRenderController(
     disconnect()
     observedTarget = target
 
-    if (options.createResizeObserver || typeof ResizeObserver !== 'undefined') {
+    if (typeof MutationObserver !== 'undefined') {
+      mutationObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          for (const node of Array.from(mutation.removedNodes)) {
+            if ((node as HTMLElement).dataset?.watermark === 'true') {
+              options.onTamper?.()
+              return
+            }
+          }
+          const el = mutation.target as HTMLElement
+          if (mutation.type === 'attributes' && el.dataset?.watermark === 'true') {
+            options.onTamper?.()
+            return
+          }
+        }
+      })
+      mutationObserver.observe(target, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class', 'hidden']
+      })
+    }
+
+    if (options.createResizeObserver) {
       observer = createResizeObserver((entries) => {
         if (!entries.some((entry) => entry.target === target)) return
         renderNextFrame()
@@ -332,7 +389,7 @@ export function createWatermarkRenderController(
 // Overlay style helpers
 // ---------------------------------------------------------------------------
 
-export const watermarkWrapperClasses = 'relative'
+export const watermarkWrapperClasses = 'relative isolate'
 
 /**
  * Build the inline `style` object for the watermark overlay <div>.
@@ -356,6 +413,8 @@ export function getWatermarkOverlayStyle(opts: {
     backgroundImage: opts.base64Url ? `url(${opts.base64Url})` : 'none',
     backgroundRepeat: 'repeat',
     backgroundSize: bgSize,
-    backgroundPosition: `${opts.offsetX}px ${opts.offsetY}px`
+    backgroundPosition: `${opts.offsetX}px ${opts.offsetY}px`,
+    printColorAdjust: 'exact',
+    WebkitPrintColorAdjust: 'exact'
   }
 }

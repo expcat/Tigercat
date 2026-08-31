@@ -12,7 +12,7 @@ export interface WatermarkFont {
   fontFamily?: string
   /** Font weight @default 'normal' */
   fontWeight?: 'normal' | 'bold' | 'lighter' | number
-  /** Font color @default 'rgba(0,0,0,0.15)' */
+  /** Font color @default mix of `--tiger-text` */
   color?: string
 }
 
@@ -50,7 +50,7 @@ export interface WatermarkProps {
 
   /**
    * Z-index of the watermark layer
-   * @default 9
+   * @default 20
    */
   zIndex?: number
 

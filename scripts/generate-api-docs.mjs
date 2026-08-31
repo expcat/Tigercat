@@ -179,6 +179,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。'
   },
+  Watermark: {
+    notes:
+      '`gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。需要打印时 overlay 带 print-color-adjust。'
+  },
   Tag: {
     notes:
       '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。'

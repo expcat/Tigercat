@@ -3584,6 +3584,7 @@
       "warnStandaloneBadgeChildren",
       "warnUnknownIconName",
       "warnUnsupportedColorProp",
+      "WATERMARK_DEFAULT_INK",
       "watermarkDefaults",
       "WatermarkFont",
       "watermarkFontDefaults",

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import {
   classNames,
   watermarkDefaults,
@@ -15,42 +15,52 @@ export interface WatermarkProps
   children?: React.ReactNode
 }
 
-export const Watermark: React.FC<WatermarkProps> = ({
-  content,
-  image,
-  width = watermarkDefaults.width,
-  height = watermarkDefaults.height,
-  rotate = watermarkDefaults.rotate,
-  zIndex = watermarkDefaults.zIndex,
-  gapX = watermarkDefaults.gapX,
-  gapY = watermarkDefaults.gapY,
-  offsetX = watermarkDefaults.offsetX,
-  offsetY = watermarkDefaults.offsetY,
-  font,
-  className,
-  children,
-  ...props
-}) => {
+export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Watermark(
+  {
+    content,
+    image,
+    width = watermarkDefaults.width,
+    height = watermarkDefaults.height,
+    rotate = watermarkDefaults.rotate,
+    zIndex = watermarkDefaults.zIndex,
+    gapX = watermarkDefaults.gapX,
+    gapY = watermarkDefaults.gapY,
+    offsetX = watermarkDefaults.offsetX,
+    offsetY = watermarkDefaults.offsetY,
+    font,
+    className,
+    children,
+    ...props
+  },
+  ref
+) {
   const [base64, setBase64] = useState<string | undefined>()
+  const [overlayKey, setOverlayKey] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const renderControllerRef = useRef<WatermarkRenderController | null>(null)
-
-  const resolvedFont = useMemo(() => resolveWatermarkFont(font), [font])
+  const optionsRef = useRef({ content, image, width, height, rotate, gapX, gapY, font })
+  optionsRef.current = { content, image, width, height, rotate, gapX, gapY, font }
 
   useEffect(() => {
     const target = wrapperRef.current
     if (!target) return
 
     const controller = createWatermarkRenderController({
-      getRenderOptions: () => ({
-        content,
-        image,
-        width,
-        height,
-        rotate,
-        font: resolvedFont
-      }),
-      onRender: setBase64
+      getRenderOptions: () => {
+        const next = optionsRef.current
+        return {
+          content: next.content,
+          image: next.image,
+          width: next.width,
+          height: next.height,
+          gapX: next.gapX,
+          gapY: next.gapY,
+          rotate: next.rotate,
+          font: resolveWatermarkFont(next.font)
+        }
+      },
+      onRender: setBase64,
+      onTamper: () => setOverlayKey((key) => key + 1)
     })
 
     renderControllerRef.current = controller
@@ -63,46 +73,37 @@ export const Watermark: React.FC<WatermarkProps> = ({
         renderControllerRef.current = null
       }
     }
-  }, [content, image, width, height, rotate, resolvedFont])
-
-  // MutationObserver: re-apply if overlay is removed
-  useEffect(() => {
-    if (typeof MutationObserver === 'undefined' || !wrapperRef.current) return
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        for (const node of Array.from(m.removedNodes)) {
-          if ((node as HTMLElement).dataset?.watermark === 'true') {
-            renderControllerRef.current?.render()
-            return
-          }
-        }
-      }
-    })
-    observer.observe(wrapperRef.current, { childList: true })
-    return () => observer.disconnect()
   }, [])
 
-  const overlayStyle = useMemo(
-    () =>
-      getWatermarkOverlayStyle({
-        base64Url: base64,
-        width,
-        height,
-        gapX,
-        gapY,
-        offsetX,
-        offsetY,
-        zIndex
-      }),
-    [base64, width, height, gapX, gapY, offsetX, offsetY, zIndex]
-  )
+  const fontKey = `${font?.fontSize ?? ''}|${font?.fontFamily ?? ''}|${font?.fontWeight ?? ''}|${font?.color ?? ''}`
+  const contentKey = Array.isArray(content) ? content.join('\n') : (content ?? '')
 
-  const wrapperClasses = useMemo(() => classNames(watermarkWrapperClasses, className), [className])
+  useEffect(() => {
+    renderControllerRef.current?.render()
+  }, [contentKey, image, width, height, rotate, gapX, gapY, fontKey])
+
+  const overlayStyle = getWatermarkOverlayStyle({
+    base64Url: base64,
+    width,
+    height,
+    gapX,
+    gapY,
+    offsetX,
+    offsetY,
+    zIndex
+  })
 
   return (
-    <div ref={wrapperRef} className={wrapperClasses} {...props}>
+    <div
+      ref={(node) => {
+        wrapperRef.current = node
+        if (typeof ref === 'function') ref(node)
+        else if (ref) ref.current = node
+      }}
+      className={classNames(watermarkWrapperClasses, className)}
+      {...props}>
       {children}
-      <div data-watermark="true" aria-hidden="true" style={overlayStyle} />
+      <div key={overlayKey} data-watermark="true" aria-hidden="true" style={overlayStyle} />
     </div>
   )
-}
+})

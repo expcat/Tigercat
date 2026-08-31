@@ -60,14 +60,9 @@ export const Watermark = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const base64 = ref<string | undefined>()
+    const overlayKey = ref(0)
     const wrapperRef = ref<HTMLElement | null>(null)
     let renderController: WatermarkRenderController | undefined
-
-    const resolvedFont = computed(() => resolveWatermarkFont(props.font))
-
-    const generate = () => {
-      renderController?.render()
-    }
 
     onMounted(() => {
       if (!wrapperRef.value) return
@@ -78,11 +73,16 @@ export const Watermark = defineComponent({
           image: props.image,
           width: props.width,
           height: props.height,
+          gapX: props.gapX,
+          gapY: props.gapY,
           rotate: props.rotate,
-          font: resolvedFont.value
+          font: resolveWatermarkFont(props.font)
         }),
         onRender: (base64Url) => {
           base64.value = base64Url
+        },
+        onTamper: () => {
+          overlayKey.value += 1
         }
       })
       renderController.observe(wrapperRef.value)
@@ -90,28 +90,25 @@ export const Watermark = defineComponent({
     })
 
     watch(
-      () => [props.content, props.image, props.width, props.height, props.rotate, props.font],
-      generate
+      () => [
+        props.content,
+        props.image,
+        props.width,
+        props.height,
+        props.rotate,
+        props.gapX,
+        props.gapY,
+        props.font?.color,
+        props.font?.fontSize,
+        props.font?.fontFamily,
+        props.font?.fontWeight
+      ],
+      () => {
+        renderController?.render()
+      }
     )
 
-    // MutationObserver: re-apply if the overlay is removed externally
-    let observer: MutationObserver | undefined
-    onMounted(() => {
-      if (typeof MutationObserver === 'undefined' || !wrapperRef.value) return
-      observer = new MutationObserver((mutations) => {
-        for (const m of mutations) {
-          for (const node of Array.from(m.removedNodes)) {
-            if ((node as HTMLElement).dataset?.watermark === 'true') {
-              generate()
-              return
-            }
-          }
-        }
-      })
-      observer.observe(wrapperRef.value, { childList: true })
-    })
     onBeforeUnmount(() => {
-      observer?.disconnect()
       renderController?.disconnect()
       renderController = undefined
     })
@@ -146,6 +143,7 @@ export const Watermark = defineComponent({
         [
           slots.default?.(),
           h('div', {
+            key: overlayKey.value,
             'data-watermark': 'true',
             'aria-hidden': 'true',
             style: overlayStyle.value

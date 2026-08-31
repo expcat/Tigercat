@@ -477,10 +477,15 @@ Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/sma
 
 ## Watermark
 
-`packages/core/src/types/watermark.ts` · `WatermarkProps` · 3/14 props
+`packages/core/src/types/watermark.ts` · `WatermarkProps` · 6/14 props
+
+Note: `gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。需要打印时 overlay 带 print-color-adjust。
 
 | Prop       | Type                 | Default | Notes                                                       |
 | ---------- | -------------------- | ------- | ----------------------------------------------------------- |
 | `content?` | `string \| string[]` | `-`     | Watermark text content. Array means multi-line.             |
+| `font?`    | `WatermarkFont`      | `-`     | Font configuration                                          |
+| `gapX?`    | `number`             | `100`   | Horizontal gap between watermarks in px                     |
+| `gapY?`    | `number`             | `100`   | Vertical gap between watermarks in px                       |
 | `image?`   | `string`             | `-`     | Image URL to use as watermark (takes priority over content) |
-| `width?`   | `number`             | `120`   | Watermark width in px                                       |
+| `rotate?`  | `number`             | `-22`   | Rotation angle in degrees                                   |

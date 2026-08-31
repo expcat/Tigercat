@@ -93,6 +93,7 @@ export const COMPONENT_PROP_PRIORITY = {
   Statistic: ['title?', 'value?', 'groupSeparator?', 'animated?', 'prefix?', 'suffix?'],
   Rate: ['allowHalf?', 'allowClear?', 'character?', 'readOnly?', 'disabled?', 'size?', 'count?'],
   Segmented: ['options?', 'block?', 'disabled?', 'size?', 'name?'],
+  Watermark: ['content?', 'font?', 'gapX?', 'gapY?', 'image?', 'rotate?'],
   Button: [
     'variant?',
     'size?',
@@ -242,6 +243,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Statistic: '<Statistic title="Users" :value="1234" />',
     Rate: '<Rate :default-value="3" />',
     Segmented: '<Segmented :options="options" aria-label="View" />',
+    Watermark: '<Watermark content="机密" />',
     Tour: '<Tour :steps="steps" />'
   },
   React: {
@@ -253,6 +255,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Statistic: '<Statistic title="Users" value={1234} />',
     Rate: '<Rate defaultValue={3} />',
     Segmented: '<Segmented options={options} aria-label="View" />',
+    Watermark: '<Watermark content="机密" />',
     Tour: '<Tour steps={steps} />'
   }
 }
