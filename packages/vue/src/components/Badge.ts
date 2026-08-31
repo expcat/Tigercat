@@ -10,10 +10,8 @@ import {
   badgeTypeClasses,
   badgeWrapperClasses,
   badgePositionClasses,
-  formatBadgeContent,
-  shouldHideBadge,
-  getStatusLabels,
-  mergeTigerLocale,
+  resolveBadgeContent,
+  warnStandaloneBadgeChildren,
   type BadgeProps,
   type BadgeVariant,
   type BadgeSize,
@@ -21,7 +19,6 @@ import {
   type BadgePosition,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
 
 export interface VueBadgeProps extends BadgeProps {
   style?: Record<string, string | number>
@@ -77,15 +74,16 @@ export const Badge = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const config = useTigerConfig()
-    const labels = computed(() =>
-      getStatusLabels(mergeTigerLocale(config.value.locale, props.locale))
+    const resolved = computed(() =>
+      resolveBadgeContent({
+        type: props.type,
+        content: props.content,
+        max: props.max,
+        showZero: props.showZero
+      })
     )
-    const isDot = computed(() => props.type === 'dot')
-    const isHidden = computed(() => shouldHideBadge(props.content, props.type, props.showZero))
-    const displayContent = computed(() =>
-      formatBadgeContent(props.content, props.max, props.showZero)
-    )
+    const isDot = computed(() => resolved.value.kind === 'dot')
+    const isHidden = computed(() => resolved.value.kind === 'hidden')
 
     const badgeClasses = computed(() =>
       classNames(
@@ -98,40 +96,57 @@ export const Badge = defineComponent({
     )
 
     return () => {
-      if (isHidden.value) {
-        return props.standalone ? null : (slots.default?.() ?? null)
-      }
+      const defaultSlot = slots.default?.() ?? []
+      warnStandaloneBadgeChildren(defaultSlot.length > 0, props.standalone)
 
       const attrsRecord = attrs as Record<string, unknown>
-      const ariaLabel =
-        (attrsRecord['aria-label'] as string | undefined) ??
-        (isDot.value
-          ? labels.value.badgeLabel
-          : props.type === 'number'
-            ? labels.value.badgeCountLabel.replace('{count}', String(displayContent.value))
-            : `${displayContent.value ?? ''}`)
+      const ariaLabel = attrsRecord['aria-label'] as string | undefined
+      const ariaLabelledby = attrsRecord['aria-labelledby'] as string | undefined
+      const ariaHidden = attrsRecord['aria-hidden'] as boolean | string | undefined
+      const userNamed = Boolean(ariaLabel || ariaLabelledby)
+      const hideFromAT = ariaHidden ?? (!userNamed && (isDot.value || !props.standalone))
 
-      const badgeElement = h(
-        'span',
-        {
-          ...attrs,
-          class: classNames(
-            badgeClasses.value,
-            props.className,
-            coerceClassValue(attrsRecord.class)
-          ),
-          style: mergeStyleValues(attrsRecord.style, props.style),
-          role: 'status',
-          'aria-label': ariaLabel
-        },
-        isDot.value ? undefined : displayContent.value || ''
-      )
+      const {
+        class: attrsClass,
+        style: attrsStyle,
+        'aria-label': _ariaLabel,
+        'aria-labelledby': _ariaLabelledby,
+        'aria-hidden': _ariaHidden,
+        ...restAttrs
+      } = attrsRecord
+
+      const badgeElement = isHidden.value
+        ? null
+        : h(
+            'span',
+            {
+              ...(props.standalone ? restAttrs : undefined),
+              class: classNames(
+                badgeClasses.value,
+                props.standalone && props.className,
+                props.standalone && coerceClassValue(attrsClass)
+              ),
+              style: props.standalone ? mergeStyleValues(attrsStyle, props.style) : undefined,
+              'aria-hidden': hideFromAT ? true : ariaHidden,
+              'aria-label': hideFromAT ? undefined : ariaLabel,
+              'aria-labelledby': hideFromAT ? undefined : ariaLabelledby
+            },
+            resolved.value.kind === 'text' ? resolved.value.value : undefined
+          )
 
       if (props.standalone) {
         return badgeElement
       }
 
-      return h('span', { class: badgeWrapperClasses }, [...(slots.default?.() ?? []), badgeElement])
+      return h(
+        'span',
+        {
+          ...restAttrs,
+          class: classNames(badgeWrapperClasses, props.className, coerceClassValue(attrsClass)),
+          style: mergeStyleValues(attrsStyle, props.style)
+        },
+        [...defaultSlot, badgeElement]
+      )
     }
   }
 })

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef } from 'react'
 import {
   classNames,
   getBadgeVariantClasses,
@@ -8,22 +8,19 @@ import {
   badgeTypeClasses,
   badgeWrapperClasses,
   badgePositionClasses,
-  formatBadgeContent,
-  shouldHideBadge,
-  getStatusLabels,
-  mergeTigerLocale,
+  resolveBadgeContent,
+  warnStandaloneBadgeChildren,
   type BadgeProps as CoreBadgeProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
 
 export type BadgeProps = CoreBadgeProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, 'children' | 'content'> & {
     children?: React.ReactNode
   }
 
-export const Badge: React.FC<BadgeProps> = React.memo(
-  ({
-    locale,
+export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
+  {
+    locale: _locale,
     variant = 'danger',
     size = 'md',
     type = 'number',
@@ -35,54 +32,50 @@ export const Badge: React.FC<BadgeProps> = React.memo(
     className,
     children,
     ['aria-label']: ariaLabelProp,
+    ['aria-labelledby']: ariaLabelledbyProp,
+    ['aria-hidden']: ariaHiddenProp,
     ...props
-  }) => {
-    const config = useTigerConfig()
-    const labels = useMemo(
-      () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
-      [config.locale, locale]
-    )
-    const isDot = type === 'dot'
-    const isHidden = shouldHideBadge(content, type, showZero)
-    const displayContent = formatBadgeContent(content, max, showZero)
+  },
+  ref
+) {
+  warnStandaloneBadgeChildren(children != null && children !== false, standalone)
 
-    const badgeClasses = classNames(
-      badgeBaseClasses,
-      getBadgeVariantClasses(variant),
-      isDot ? dotSizeClasses[size] : badgeSizeClasses[size],
-      badgeTypeClasses[type],
-      !standalone && badgePositionClasses[position],
-      className
-    )
+  const resolved = resolveBadgeContent({ type, content, max, showZero })
+  const isDot = resolved.kind === 'dot'
+  const isHidden = resolved.kind === 'hidden'
 
-    const computedAriaLabel =
-      ariaLabelProp ??
-      (isDot
-        ? labels.badgeLabel
-        : type === 'number'
-          ? labels.badgeCountLabel.replace('{count}', String(displayContent))
-          : `${displayContent ?? ''}`)
+  const badgeClasses = classNames(
+    badgeBaseClasses,
+    getBadgeVariantClasses(variant),
+    isDot ? dotSizeClasses[size] : badgeSizeClasses[size],
+    badgeTypeClasses[type],
+    !standalone && badgePositionClasses[position]
+  )
 
-    if (isHidden) {
-      return standalone ? null : <>{children}</>
-    }
+  const userNamed = Boolean(ariaLabelProp || ariaLabelledbyProp)
+  const hideFromAT = ariaHiddenProp ?? (!userNamed && (isDot || !standalone))
 
-    const badgeElement = (
-      <span {...props} className={badgeClasses} role="status" aria-label={computedAriaLabel}>
-        {!isDot && displayContent}
-      </span>
-    )
+  const badgeElement = !isHidden ? (
+    <span
+      {...(standalone ? props : undefined)}
+      ref={standalone ? ref : undefined}
+      className={classNames(badgeClasses, standalone && className)}
+      aria-hidden={hideFromAT ? true : ariaHiddenProp}
+      aria-label={hideFromAT ? undefined : ariaLabelProp}
+      aria-labelledby={hideFromAT ? undefined : ariaLabelledbyProp}>
+      {resolved.kind === 'text' ? resolved.value : null}
+    </span>
+  ) : null
 
-    if (standalone) {
-      return badgeElement
-    }
-
-    return (
-      <span className={badgeWrapperClasses}>
-        {children}
-        {badgeElement}
-      </span>
-    )
+  if (standalone) {
+    return badgeElement
   }
-)
+
+  return (
+    <span ref={ref} className={classNames(badgeWrapperClasses, className)} {...props}>
+      {children}
+      {badgeElement}
+    </span>
+  )
+})
 Badge.displayName = 'Badge'

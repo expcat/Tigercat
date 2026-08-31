@@ -28,16 +28,29 @@ export interface BadgeProps {
   type?: BadgeType
   /**
    * Badge content (number or text).
-   * Ignored when type='dot'.
+   * Ignored when type='dot'. Empty number/text badges do not render.
    */
   content?: number | string
-  /** Maximum count (type='number' only). Exceeds shows 'max+'. @default 99 */
+  /**
+   * Maximum count (`type='number'` only). Exceeds shows 'max+'.
+   * Text badges are never capped.
+   * @default 99
+   */
   max?: number
-  /** Whether to show zero count @default false */
+  /**
+   * Whether to show a number badge whose value is `0` or `'0'`.
+   * @default false
+   */
   showZero?: boolean
-  /** Badge position in non-standalone mode @default 'top-right' */
+  /**
+   * Overlay position. `right`/`left` follow the reading direction.
+   * @default 'top-right'
+   */
   position?: BadgePosition
-  /** Standalone (inline) or wrapping children @default true */
+  /**
+   * Standalone (inline) or wrapping children. Overlay requires `standalone={false}`.
+   * @default true
+   */
   standalone?: boolean
   /** Additional CSS classes */
   className?: string

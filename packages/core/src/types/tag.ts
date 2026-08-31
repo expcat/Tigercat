@@ -42,8 +42,20 @@ export interface TagProps {
   closable?: boolean
 
   /**
-   * Accessible label for the close button (when `closable` is true)
-   * @default 'Close tag'
+   * Accessible label for the close button (when `closable` is true).
+   * Defaults to ConfigProvider locale `status.tagCloseAriaLabel`.
    */
   closeAriaLabel?: string
+
+  /**
+   * When `false`, the tag is not rendered. Omitted / `true` keeps it visible.
+   * Closing never hides internally — the parent unmounts or sets `visible={false}`.
+   */
+  visible?: boolean
+
+  /**
+   * Fully rounded pill shape
+   * @default false
+   */
+  pill?: boolean
 }

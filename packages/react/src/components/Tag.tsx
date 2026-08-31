@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
   classNames,
   getTagVariantClasses,
@@ -9,6 +9,7 @@ import {
   icon24ViewBox,
   tagBaseClasses,
   tagSizeClasses,
+  tagPillClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
   omitUnsupportedColorProp,
@@ -21,7 +22,8 @@ import { useTigerConfig } from './ConfigProvider'
 export type TagProps = CoreTagProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, keyof CoreTagProps | 'onClose'> & {
     /**
-     * Close event handler
+     * Close event handler. The tag stays mounted unless the parent unmounts
+     * it or sets `visible={false}`.
      */
     onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void
 
@@ -49,29 +51,39 @@ const CloseIcon: React.FC = () => (
   </svg>
 )
 
-export const Tag: React.FC<TagProps> = ({
-  locale,
-  variant = 'default',
-  size = 'md',
-  closable = false,
-  closeAriaLabel,
-  onClose,
-  children,
-  className,
-  ...props
-}) => {
+export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
+  {
+    locale,
+    variant = 'default',
+    size = 'md',
+    closable = false,
+    closeAriaLabel,
+    visible,
+    pill = false,
+    onClose,
+    children,
+    className,
+    ...props
+  },
+  ref
+) {
   const config = useTigerConfig()
   const labels = useMemo(
     () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
     [config.locale, locale]
   )
   const rest = omitUnsupportedColorProp('Tag', props as Record<string, unknown>)
-  const [isVisible, setIsVisible] = useState(true)
 
   const tagClasses = useMemo(
     () =>
-      classNames(tagBaseClasses, getTagVariantClasses(variant), tagSizeClasses[size], className),
-    [variant, size, className]
+      classNames(
+        tagBaseClasses,
+        getTagVariantClasses(variant),
+        tagSizeClasses[size],
+        pill && tagPillClasses,
+        className
+      ),
+    [variant, size, pill, className]
   )
 
   const closeButtonClasses = useMemo(() => {
@@ -82,18 +94,14 @@ export const Tag: React.FC<TagProps> = ({
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     onClose?.(event)
-
-    if (!event.defaultPrevented) {
-      setIsVisible(false)
-    }
   }
 
-  if (!isVisible) {
+  if (visible === false) {
     return null
   }
 
   return (
-    <span className={tagClasses} role="status" {...rest}>
+    <span ref={ref} className={tagClasses} {...rest}>
       {children != null && <span>{children}</span>}
       {closable && (
         <button
@@ -106,4 +114,6 @@ export const Tag: React.FC<TagProps> = ({
       )}
     </span>
   )
-}
+})
+
+Tag.displayName = 'Tag'

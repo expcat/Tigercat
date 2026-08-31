@@ -162,7 +162,7 @@ describe('CommentThread (React)', () => {
     render(<CommentThread nodes={nodes} />)
 
     for (const label of ['Owner', 'Pinned']) {
-      const tag = screen.getByText(label).closest('[role="status"]')
+      const tag = screen.getByText(label).parentElement
       expect(tag?.className).toContain('bg-current/10')
       expect(tag?.className).not.toContain('bg-opacity-')
     }

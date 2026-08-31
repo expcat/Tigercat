@@ -3,6 +3,8 @@
  * Supports CSS variables for real-time theme switching
  */
 
+import { mixStatusTowardTextClass } from './status-mix'
+
 /**
  * Button color scheme interface
  * Defines all color-related classes for button variants
@@ -428,31 +430,31 @@ export const defaultTagThemeColors: TagThemeColors = {
   },
   primary: {
     bg: 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
-    text: 'text-[var(--tiger-primary,#2563eb)]',
+    text: mixStatusTowardTextClass('text', '--tiger-primary', '#2563eb'),
     border: 'border-[var(--tiger-primary-disabled,#93c5fd)]',
     closeBgHover: 'hover:bg-[var(--tiger-primary-disabled,#93c5fd)]'
   },
   success: {
     bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
-    text: 'text-[var(--tiger-success,#16a34a)]',
+    text: mixStatusTowardTextClass('text', '--tiger-success', '#16a34a'),
     border: 'border-[var(--tiger-border,#e5e7eb)]',
     closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
   },
   warning: {
     bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
-    text: 'text-[var(--tiger-warning,#d97706)]',
+    text: mixStatusTowardTextClass('text', '--tiger-warning', '#d97706'),
     border: 'border-[var(--tiger-border,#e5e7eb)]',
     closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
   },
   danger: {
     bg: 'bg-[var(--tiger-error-bg-hover,#fef2f2)]',
-    text: 'text-[var(--tiger-error,#dc2626)]',
+    text: mixStatusTowardTextClass('text', '--tiger-error', '#dc2626'),
     border: 'border-[var(--tiger-error-disabled,#fca5a5)]',
     closeBgHover: 'hover:bg-[var(--tiger-error-disabled,#fca5a5)]'
   },
   info: {
     bg: 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
-    text: 'text-[var(--tiger-info,#3b82f6)]',
+    text: mixStatusTowardTextClass('text', '--tiger-info', '#3b82f6'),
     border: 'border-[var(--tiger-primary-disabled,#93c5fd)]',
     closeBgHover: 'hover:bg-[var(--tiger-primary-disabled,#93c5fd)]'
   }
@@ -501,27 +503,27 @@ export interface BadgeThemeColors {
  */
 export const defaultBadgeThemeColors: BadgeThemeColors = {
   default: {
-    bg: 'bg-[var(--tiger-text-muted,#6b7280)]',
+    bg: mixStatusTowardTextClass('bg', '--tiger-text-muted', '#6b7280'),
     text: 'text-[var(--tiger-secondary-foreground,#ffffff)]'
   },
   primary: {
-    bg: 'bg-[var(--tiger-primary,#2563eb)]',
+    bg: mixStatusTowardTextClass('bg', '--tiger-primary', '#2563eb'),
     text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   success: {
-    bg: 'bg-[var(--tiger-success,#16a34a)]',
+    bg: mixStatusTowardTextClass('bg', '--tiger-success', '#16a34a'),
     text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-warning,#d97706)]',
+    bg: mixStatusTowardTextClass('bg', '--tiger-warning', '#d97706'),
     text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   danger: {
-    bg: 'bg-[var(--tiger-error,#dc2626)]',
+    bg: mixStatusTowardTextClass('bg', '--tiger-error', '#dc2626'),
     text: 'text-[var(--tiger-error-foreground,#ffffff)]'
   },
   info: {
-    bg: 'bg-[var(--tiger-info,#3b82f6)]',
+    bg: mixStatusTowardTextClass('bg', '--tiger-info', '#3b82f6'),
     text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   }
 }

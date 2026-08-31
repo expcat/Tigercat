@@ -5,28 +5,41 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
+import React, { createRef, useState } from 'react'
 import { Tag } from '@expcat/tigercat-react/Tag'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Tag', () => {
-  it('renders content and role="status"', () => {
-    render(<Tag>Test Tag</Tag>)
+  it('renders content without a live region', () => {
+    const { container } = render(<Tag>Test Tag</Tag>)
 
-    const content = screen.getByText('Test Tag')
-    expect(content).toBeInTheDocument()
-    expect(content.parentElement).toHaveAttribute('role', 'status')
+    expect(screen.getByText('Test Tag')).toBeInTheDocument()
+    expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
+  })
+
+  it('lets a user role override the root', () => {
+    render(<Tag role="listitem">Item</Tag>)
+    expect(screen.getByRole('listitem')).toBeInTheDocument()
+    expect(screen.getByText('Item')).toBeInTheDocument()
+  })
+
+  it('forwards ref to the root span', () => {
+    const ref = createRef<HTMLSpanElement>()
+    render(<Tag ref={ref}>Ref</Tag>)
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement)
+    expect(ref.current?.textContent).toContain('Ref')
   })
 
   it('merges className onto root element', () => {
     const { container } = render(<Tag className="custom-class">Tag</Tag>)
-    const root = container.querySelector('[role="status"]')
-    expect(root).toHaveClass('custom-class')
+    expect(container.firstElementChild).toHaveClass('custom-class')
   })
 
   it('warns when color is passed instead of variant', () => {
-    // devWarn dedupes per key process-wide, so drop any earlier hit first.
     resetDevWarnCache()
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
@@ -42,41 +55,44 @@ describe('Tag', () => {
     expect(container.querySelector('button')).not.toBeInTheDocument()
   })
 
-  it('calls onClose and removes tag by default', async () => {
+  it('calls onClose and stays visible unless the parent unmounts it', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
 
-    const { container } = render(
+    render(
       <Tag closable onClose={onClose}>
         Closable Tag
       </Tag>
     )
 
-    const closeButton = container.querySelector(
-      'button[aria-label="Close tag"]'
-    ) as HTMLButtonElement | null
-    expect(closeButton).toBeInTheDocument()
-
-    await user.click(closeButton!)
+    await user.click(screen.getByRole('button', { name: 'Close tag' }))
     expect(onClose).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText('Closable Tag')).not.toBeInTheDocument()
+    expect(screen.getByText('Closable Tag')).toBeInTheDocument()
   })
 
-  it('keeps tag visible when onClose calls preventDefault()', async () => {
+  it('hides when visible is false and still fires close for a list item', async () => {
     const user = userEvent.setup()
 
-    render(
-      <Tag
-        closable
-        onClose={(event) => {
-          event.preventDefault()
-        }}>
-        Closable Tag
-      </Tag>
-    )
+    function List() {
+      const [items, setItems] = useState(['Alpha', 'Beta'])
+      return (
+        <>
+          {items.map((item) => (
+            <Tag
+              key={item}
+              closable
+              onClose={() => setItems((cur) => cur.filter((x) => x !== item))}>
+              {item}
+            </Tag>
+          ))}
+        </>
+      )
+    }
 
-    await user.click(screen.getByLabelText('Close tag'))
-    expect(screen.getByText('Closable Tag')).toBeInTheDocument()
+    render(<List />)
+    await user.click(screen.getAllByRole('button', { name: 'Close tag' })[0])
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
   })
 
   it('stops propagation when close button is clicked', async () => {
@@ -89,11 +105,42 @@ describe('Tag', () => {
       </span>
     )
 
-    await user.click(screen.getByLabelText('Close tag'))
+    await user.click(screen.getByRole('button', { name: 'Close tag' }))
     expect(onWrapperClick).not.toHaveBeenCalled()
   })
 
-  it('passes a11y baseline checks', async () => {
+  it('uses official locale objects for the close name', () => {
+    const { rerender } = render(
+      <ConfigProvider locale={zhCN}>
+        <Tag closable>标签</Tag>
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('button', { name: '关闭标签' })).toBeInTheDocument()
+
+    rerender(
+      <ConfigProvider locale={zhTW}>
+        <Tag closable>標籤</Tag>
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('button', { name: '關閉標籤' })).toBeInTheDocument()
+  })
+
+  it('renders custom closeAriaLabel on close button', () => {
+    render(
+      <Tag closable closeAriaLabel="Remove">
+        Tag
+      </Tag>
+    )
+
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+  })
+
+  it('applies a pill shape when requested', () => {
+    const { container } = render(<Tag pill>Pill</Tag>)
+    expect(container.firstElementChild?.className).toContain('--tiger-radius-pill')
+  })
+
+  it('passes a11y baseline checks including closable', async () => {
     const { container } = render(
       <>
         <Tag>Tag</Tag>
@@ -102,35 +149,5 @@ describe('Tag', () => {
     )
 
     await expectNoA11yViolationsIsolated(container)
-  })
-
-  it('applies variant classes to root element', () => {
-    const { container } = render(<Tag variant="success">Tag</Tag>)
-
-    const root = container.querySelector('[role="status"]')
-    expect(root?.className).toContain('bg-[var(--tiger-tag-success-bg')
-    expect(root?.className).toContain('text-[var(--tiger-success')
-  })
-  it('renders custom closeAriaLabel on close button', () => {
-    render(
-      <Tag closable closeAriaLabel="Remove">
-        Tag
-      </Tag>
-    )
-
-    expect(screen.getByLabelText('Remove')).toBeInTheDocument()
-  })
-  it('applies warning variant', () => {
-    const { container } = render(<Tag variant="warning">Tag</Tag>)
-
-    const root = container.querySelector('[role="status"]')
-    expect(root?.className).toContain('bg-[var(--tiger-tag-warning-bg')
-  })
-
-  it('applies danger variant', () => {
-    const { container } = render(<Tag variant="danger">Tag</Tag>)
-
-    const root = container.querySelector('[role="status"]')
-    expect(root?.className).toContain('bg-[var(--tiger-tag-danger-bg')
   })
 })

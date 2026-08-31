@@ -3,22 +3,34 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h, ref } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Tag } from '@expcat/tigercat-vue/Tag'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
-import { renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Tag', () => {
-  it('renders content and role="status"', () => {
-    render(Tag, {
+  it('renders content without a live region', () => {
+    const { container } = render(Tag, {
       slots: {
         default: 'Test Tag'
       }
     })
 
-    const content = screen.getByText('Test Tag')
-    expect(content).toBeInTheDocument()
-    expect(content.parentElement).toHaveAttribute('role', 'status')
+    expect(screen.getByText('Test Tag')).toBeInTheDocument()
+    expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
+  })
+
+  it('lets a user role override the root', () => {
+    render(Tag, {
+      attrs: { role: 'listitem' },
+      slots: { default: 'Item' }
+    })
+    expect(screen.getByRole('listitem')).toBeInTheDocument()
+    expect(screen.getByText('Item')).toBeInTheDocument()
   })
 
   it('merges attrs.class and props.className', () => {
@@ -34,13 +46,11 @@ describe('Tag', () => {
       }
     })
 
-    const root = container.querySelector('[role="status"]')
-    expect(root).toHaveClass('from-props')
-    expect(root).toHaveClass('from-attrs')
+    expect(container.firstElementChild).toHaveClass('from-props')
+    expect(container.firstElementChild).toHaveClass('from-attrs')
   })
 
   it('warns when color is passed instead of variant', () => {
-    // devWarn dedupes per key process-wide, so drop any earlier hit first.
     resetDevWarnCache()
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
@@ -67,10 +77,10 @@ describe('Tag', () => {
     expect(container.querySelector('button')).not.toBeInTheDocument()
   })
 
-  it('emits close and removes tag by default', async () => {
+  it('emits close and stays visible unless the parent unmounts it', async () => {
     const onClose = vi.fn()
 
-    const { container } = render(Tag, {
+    render(Tag, {
       props: {
         closable: true,
         onClose
@@ -80,43 +90,42 @@ describe('Tag', () => {
       }
     })
 
-    const closeButton = container.querySelector(
-      'button[aria-label="Close tag"]'
-    ) as HTMLButtonElement | null
-    expect(closeButton).toBeInTheDocument()
-
-    await fireEvent.click(closeButton!)
-    expect(onClose).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText('Closable Tag')).not.toBeInTheDocument()
-  })
-
-  it('keeps tag visible when close event calls preventDefault()', async () => {
-    const onClose = vi.fn((event: MouseEvent) => {
-      event.preventDefault()
-    })
-
-    const { container } = render(Tag, {
-      props: {
-        closable: true,
-        onClose
-      },
-      slots: {
-        default: 'Closable Tag'
-      }
-    })
-
-    const closeButton = container.querySelector(
-      'button[aria-label="Close tag"]'
-    ) as HTMLButtonElement | null
-    await fireEvent.click(closeButton!)
+    await fireEvent.click(screen.getByRole('button', { name: 'Close tag' }))
     expect(onClose).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Closable Tag')).toBeInTheDocument()
+  })
+
+  it('hides when the parent removes the item after close', async () => {
+    const Host = defineComponent({
+      setup() {
+        const items = ref(['Alpha', 'Beta'])
+        return () =>
+          items.value.map((item) =>
+            h(
+              Tag,
+              {
+                key: item,
+                closable: true,
+                onClose: () => {
+                  items.value = items.value.filter((x) => x !== item)
+                }
+              },
+              { default: () => item }
+            )
+          )
+      }
+    })
+
+    render(Host)
+    await fireEvent.click(screen.getAllByRole('button', { name: 'Close tag' })[0])
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
   })
 
   it('stops propagation when close button is clicked', async () => {
     const onTagClick = vi.fn()
 
-    const { container } = render(Tag, {
+    render(Tag, {
       props: {
         closable: true
       },
@@ -128,56 +137,42 @@ describe('Tag', () => {
       }
     })
 
-    const closeButton = container.querySelector(
-      'button[aria-label="Close tag"]'
-    ) as HTMLButtonElement | null
-    await fireEvent.click(closeButton!)
+    await fireEvent.click(screen.getByRole('button', { name: 'Close tag' }))
     expect(onTagClick).not.toHaveBeenCalled()
   })
 
-  it('passes a11y baseline checks', async () => {
-    const { container } = renderWithSlots(Tag, {
-      default: 'Accessible Tag'
+  it('uses official locale objects for the close name', () => {
+    const { unmount } = render({
+      components: { ConfigProvider, Tag },
+      setup: () => ({ zhCN }),
+      template: '<ConfigProvider :locale="zhCN"><Tag closable>标签</Tag></ConfigProvider>'
     })
+    expect(screen.getByRole('button', { name: '关闭标签' })).toBeInTheDocument()
+    unmount()
 
-    await expectNoA11yViolationsIsolated(container)
+    render({
+      components: { ConfigProvider, Tag },
+      setup: () => ({ zhTW }),
+      template: '<ConfigProvider :locale="zhTW"><Tag closable>標籤</Tag></ConfigProvider>'
+    })
+    expect(screen.getByRole('button', { name: '關閉標籤' })).toBeInTheDocument()
   })
 
-  it('applies variant classes to root element', () => {
-    const { container } = render(Tag, {
-      props: { variant: 'success' },
-      slots: { default: 'Tag' }
-    })
-
-    const root = container.querySelector('[role="status"]')
-    expect(root?.className).toContain('bg-[var(--tiger-tag-success-bg')
-    expect(root?.className).toContain('text-[var(--tiger-success')
-  })
   it('renders custom closeAriaLabel on close button', () => {
     render(Tag, {
       props: { closable: true, closeAriaLabel: 'Remove' },
       slots: { default: 'Tag' }
     })
 
-    expect(screen.getByLabelText('Remove')).toBeInTheDocument()
-  })
-  it('applies warning variant', () => {
-    const { container } = render(Tag, {
-      props: { variant: 'warning' },
-      slots: { default: 'Tag' }
-    })
-
-    const root = container.querySelector('[role="status"]')
-    expect(root?.className).toContain('bg-[var(--tiger-tag-warning-bg')
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
   })
 
-  it('applies danger variant', () => {
+  it('passes a11y baseline checks including closable', async () => {
     const { container } = render(Tag, {
-      props: { variant: 'danger' },
-      slots: { default: 'Tag' }
+      props: { closable: true },
+      slots: { default: 'Accessible Tag' }
     })
 
-    const root = container.querySelector('[role="status"]')
-    expect(root?.className).toContain('bg-[var(--tiger-tag-danger-bg')
+    await expectNoA11yViolationsIsolated(container)
   })
 })

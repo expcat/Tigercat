@@ -35,7 +35,7 @@ describe('ActivityFeed (Vue)', () => {
     expect(screen.getByText('今天')).toBeInTheDocument()
     expect(screen.getByText('更新访问策略')).toBeInTheDocument()
     expect(screen.getByText('查看详情')).toBeInTheDocument()
-    const statusChip = screen.getByText('已完成').closest('[role="status"]')
+    const statusChip = screen.getByText('已完成').parentElement
     expect(statusChip?.className).toContain('bg-current/10')
     expect(statusChip?.className).not.toContain('bg-opacity-')
   })

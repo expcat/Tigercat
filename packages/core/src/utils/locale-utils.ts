@@ -448,6 +448,18 @@ export function getStatusLabels(
   return resolveLocaleSection(enSection('status'), locale?.status, overrides)
 }
 
+/**
+ * Fill `{count}` with an Intl number and `{plural}` with an English suffix
+ * (`''` for `one`, `'s'` otherwise). Locales that write a complete sentence
+ * omit `{plural}` so they are not given an English `s`.
+ */
+export function formatBadgeCountLabel(template: string, count: number, locale?: string): string {
+  const category = getIntlPluralCategory(count, locale)
+  return template
+    .replace('{count}', formatIntlNumber(count, locale))
+    .replace('{plural}', category === 'one' ? '' : 's')
+}
+
 export function getFormValidationLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFormValidation>

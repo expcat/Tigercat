@@ -199,7 +199,7 @@ export const enUS: TigerLocale = {
   status: {
     tagCloseAriaLabel: 'Close tag',
     badgeLabel: 'notification',
-    badgeCountLabel: '{count} notifications'
+    badgeCountLabel: '{count} notification{plural}'
   },
   taskBoard: {
     emptyColumnText: 'No tasks',

@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -11,6 +11,7 @@ import {
   mergeStyleValues,
   tagBaseClasses,
   tagSizeClasses,
+  tagPillClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
   omitUnsupportedColorProp,
@@ -28,6 +29,8 @@ export interface VueTagProps {
   size?: TagSize
   closable?: boolean
   closeAriaLabel?: string
+  visible?: boolean
+  pill?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -88,12 +91,29 @@ export const Tag = defineComponent({
     },
 
     /**
-     * Accessible label for the close button (when `closable` is true)
-     * @default 'Close tag'
+     * Accessible label for the close button (when `closable` is true).
+     * Defaults to ConfigProvider locale `status.tagCloseAriaLabel`.
      */
     closeAriaLabel: {
       type: String,
       default: undefined
+    },
+
+    /**
+     * When `false`, the tag is not rendered. Closing never hides internally.
+     */
+    visible: {
+      type: Boolean,
+      default: undefined
+    },
+
+    /**
+     * Fully rounded pill shape
+     * @default false
+     */
+    pill: {
+      type: Boolean,
+      default: false
     },
 
     /**
@@ -118,13 +138,13 @@ export const Tag = defineComponent({
     const labels = computed(() =>
       getStatusLabels(mergeTigerLocale(config.value.locale, props.locale))
     )
-    const isVisible = ref(true)
 
     const tagClasses = computed(() =>
       classNames(
         tagBaseClasses,
         getTagVariantClasses(props.variant),
         tagSizeClasses[props.size],
+        props.pill && tagPillClasses,
         props.className
       )
     )
@@ -137,20 +157,16 @@ export const Tag = defineComponent({
     const handleClose = (event: MouseEvent) => {
       event.stopPropagation()
       emit('close', event)
-
-      if (!event.defaultPrevented) {
-        isVisible.value = false
-      }
     }
 
     return () => {
-      const attrsRecord = omitUnsupportedColorProp('Tag', {
-        ...(attrs as Record<string, unknown>)
-      })
-      if (!isVisible.value) {
+      if (props.visible === false) {
         return null
       }
 
+      const attrsRecord = omitUnsupportedColorProp('Tag', {
+        ...(attrs as Record<string, unknown>)
+      })
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
 
@@ -159,8 +175,7 @@ export const Tag = defineComponent({
         {
           ...attrsRecord,
           class: classNames(tagClasses.value, coerceClassValue(attrsClass)),
-          style: mergeStyleValues(attrsStyle, props.style),
-          role: 'status'
+          style: mergeStyleValues(attrsStyle, props.style)
         },
         [
           slots.default ? h('span', {}, slots.default()) : null,
