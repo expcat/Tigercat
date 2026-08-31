@@ -4,7 +4,6 @@
  * Pure functions for virtual scroll calculation and styling.
  */
 
-import type { VirtualTableRange } from '../types/virtual-table'
 import type { TableColumn } from '../types/table'
 import {
   getFixedColumnOffsets,
@@ -57,41 +56,6 @@ export const virtualTableEmptyClasses =
 export const virtualTableLoadingClasses =
   'absolute inset-0 flex items-center justify-center bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]/60 z-20'
 
-// ─── Virtual range calculation ────────────────────────────────────
-
-/**
- * Calculate the visible range of rows based on scroll position.
- */
-export function calculateVirtualRange(
-  scrollTop: number,
-  viewportHeight: number,
-  totalRows: number,
-  rowHeight: number,
-  overscan: number = 5
-): VirtualTableRange {
-  const safeTotalRows = Number.isFinite(totalRows) ? Math.max(0, Math.floor(totalRows)) : 0
-  const safeRowHeight = Number.isFinite(rowHeight) ? rowHeight : 0
-  const safeViewportHeight = Number.isFinite(viewportHeight) ? Math.max(0, viewportHeight) : 0
-  const safeScrollTop = Number.isFinite(scrollTop) ? Math.max(0, scrollTop) : 0
-  const safeOverscan = Number.isFinite(overscan) ? Math.max(0, Math.floor(overscan)) : 0
-
-  if (safeTotalRows === 0 || safeRowHeight <= 0 || safeViewportHeight <= 0) {
-    return { start: 0, end: 0, offsetTop: 0, totalHeight: 0 }
-  }
-
-  const totalHeight = safeTotalRows * safeRowHeight
-
-  const startRaw = Math.floor(safeScrollTop / safeRowHeight)
-  const visibleCount = Math.ceil(safeViewportHeight / safeRowHeight)
-
-  const start = Math.max(0, Math.min(safeTotalRows, startRaw - safeOverscan))
-  const end = Math.max(start, Math.min(safeTotalRows, startRaw + visibleCount + safeOverscan))
-
-  const offsetTop = start * safeRowHeight
-
-  return { start, end, offsetTop, totalHeight }
-}
-
 /** Visible column window for horizontal (column) virtualization. */
 export interface VirtualColumnRange {
   /** Start column index (inclusive) */
@@ -118,28 +82,31 @@ export function calculateVirtualColumnRange(
   overscan = 2
 ): VirtualColumnRange {
   const count = columnWidths.length
-  if (count === 0 || viewportWidth <= 0) {
-    return { start: 0, end: count, leftPad: 0, rightPad: 0 }
+  const safeViewportWidth = Number.isFinite(viewportWidth) ? Math.max(0, viewportWidth) : 0
+  const safeScrollLeft = Number.isFinite(scrollLeft) ? Math.max(0, scrollLeft) : 0
+  const safeOverscan = Number.isFinite(overscan) ? Math.max(0, Math.floor(overscan)) : 0
+  const widths = columnWidths.map((width) => (Number.isFinite(width) && width > 0 ? width : 0))
+
+  if (count === 0 || safeViewportWidth <= 0) {
+    return { start: 0, end: 0, leftPad: 0, rightPad: 0 }
   }
-  const safeScrollLeft = Math.max(0, Number.isFinite(scrollLeft) ? scrollLeft : 0)
-  const safeOverscan = Math.max(0, Math.floor(overscan))
 
   let acc = 0
   let rawStart = 0
   for (let i = 0; i < count; i++) {
-    if (acc + columnWidths[i] > safeScrollLeft) {
+    if (acc + widths[i] > safeScrollLeft) {
       rawStart = i
       break
     }
-    acc += columnWidths[i]
+    acc += widths[i]
     if (i === count - 1) rawStart = count - 1
   }
 
-  const viewEnd = safeScrollLeft + viewportWidth
+  const viewEnd = safeScrollLeft + safeViewportWidth
   let endExclusive = rawStart
   let endAcc = acc
   while (endExclusive < count && endAcc < viewEnd) {
-    endAcc += columnWidths[endExclusive]
+    endAcc += widths[endExclusive]
     endExclusive++
   }
 
@@ -147,9 +114,9 @@ export function calculateVirtualColumnRange(
   const end = Math.min(count, endExclusive + safeOverscan)
 
   let leftPad = 0
-  for (let i = 0; i < start; i++) leftPad += columnWidths[i]
+  for (let i = 0; i < start; i++) leftPad += widths[i]
   let rightPad = 0
-  for (let i = end; i < count; i++) rightPad += columnWidths[i]
+  for (let i = end; i < count; i++) rightPad += widths[i]
 
   return { start, end, leftPad, rightPad }
 }

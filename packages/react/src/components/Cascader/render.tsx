@@ -11,6 +11,7 @@ import {
   getCascaderColumnClasses,
   getCascaderColumnStyle,
   getCascaderOptionClasses,
+  getCascaderVirtualRange,
   type CascaderFlattenedOption,
   type CascaderOption
 } from '@expcat/tigercat-core'
@@ -34,13 +35,7 @@ function VirtualWindow<T>({
   onScrollTop: (top: number) => void
   renderItem: (item: T, index: number) => React.ReactNode
 }) {
-  const range = {
-    startIndex: Math.max(0, Math.floor(scrollTop / itemHeight) - 5),
-    endIndex: Math.min(items.length - 1, Math.ceil((scrollTop + listHeight) / itemHeight) + 5),
-    totalHeight: items.length * itemHeight,
-    offsetTop: 0
-  }
-  range.offsetTop = range.startIndex * itemHeight
+  const range = getCascaderVirtualRange(scrollTop, listHeight, items.length, itemHeight)
   const slice = items.slice(range.startIndex, range.endIndex + 1)
   return (
     <div

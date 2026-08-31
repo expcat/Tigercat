@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   calculateVirtualRange,
+  calculateVirtualColumnRange,
   getVirtualRowKey,
   getVirtualTableContainerClasses,
   getVirtualTableFixedCellClasses,
@@ -92,6 +93,48 @@ describe('virtual-table-utils', () => {
         offsetTop: 0,
         totalHeight: 0
       })
+      expect(calculateVirtualRange(0, 400, 100, Number.NaN, 5)).toEqual({
+        start: 0,
+        end: 0,
+        offsetTop: 0,
+        totalHeight: 0
+      })
+    })
+  })
+
+  describe('calculateVirtualColumnRange', () => {
+    const widths = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
+
+    it('returns the visible columns at scroll 0', () => {
+      const range = calculateVirtualColumnRange(0, 400, widths, 1)
+      expect(range.start).toBe(0)
+      expect(range.end).toBeGreaterThan(0)
+      expect(range.end).toBeLessThan(widths.length)
+      expect(range.leftPad).toBe(0)
+    })
+
+    it('advances the window after a horizontal scroll', () => {
+      const range = calculateVirtualColumnRange(360, 400, widths, 0)
+      expect(range.start).toBe(3)
+      expect(range.end).toBeGreaterThan(range.start)
+      expect(range.leftPad).toBe(360)
+    })
+
+    it('returns an empty window for NaN, zero, or negative viewport', () => {
+      expect(calculateVirtualColumnRange(0, Number.NaN, widths, 2)).toEqual({
+        start: 0,
+        end: 0,
+        leftPad: 0,
+        rightPad: 0
+      })
+      expect(calculateVirtualColumnRange(0, 0, widths, 2).end).toBe(0)
+      expect(calculateVirtualColumnRange(0, -40, widths, 2).end).toBe(0)
+    })
+
+    it('treats negative column widths as 0', () => {
+      const range = calculateVirtualColumnRange(0, 200, [100, -50, 100], 0)
+      expect(range.start).toBe(0)
+      expect(range.end).toBe(3)
     })
   })
 

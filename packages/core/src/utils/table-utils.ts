@@ -15,6 +15,7 @@ import type {
   TableFixedPosition,
   TableCardLayoutItem
 } from '../types/table'
+import { calculateVirtualRange } from './virtual-list-utils'
 
 /**
  * Base table container classes
@@ -925,18 +926,14 @@ export function getTableVirtualWindow(
   rowCount: number,
   overscan = 5
 ): TableVirtualWindow {
-  if (rowCount <= 0 || itemHeight <= 0) {
-    return { startIndex: 0, endIndex: -1, topPad: 0, bottomPad: 0 }
-  }
-  const safeScrollTop = Math.max(0, Number.isFinite(scrollTop) ? scrollTop : 0)
-  const startIndex = Math.max(0, Math.floor(safeScrollTop / itemHeight) - overscan)
-  const visibleCount = Math.ceil(Math.max(0, viewportHeight) / itemHeight) + overscan * 2
-  const endIndex = Math.min(rowCount - 1, startIndex + visibleCount)
+  const range = calculateVirtualRange(scrollTop, viewportHeight, rowCount, itemHeight, overscan)
+  const endIndex = range.end - 1
+  const rowHeight = Number.isFinite(itemHeight) && itemHeight > 0 ? itemHeight : 0
   return {
-    startIndex,
+    startIndex: range.start,
     endIndex,
-    topPad: startIndex * itemHeight,
-    bottomPad: Math.max(0, (rowCount - 1 - endIndex) * itemHeight)
+    topPad: range.offsetTop,
+    bottomPad: Math.max(0, range.totalHeight - range.end * rowHeight)
   }
 }
 

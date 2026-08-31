@@ -1,13 +1,28 @@
 /**
- * VirtualList item height mode
+ * Exclusive `[start, end)` window shared by VirtualList, VirtualTable, and Table.
+ *
+ * Overscan is applied symmetrically: `start = startRaw - overscan`,
+ * `end = startRaw + visibleCount + overscan`.
  */
-export type VirtualListItemSize = 'fixed' | 'variable' | 'dynamic'
+export interface ExclusiveVirtualRange {
+  /** First visible index (inclusive) */
+  start: number
+  /** One past the last visible index (exclusive). `0` when the window is empty. */
+  end: number
+  /** Offset in px from top for the first rendered item */
+  offsetTop: number
+  /** Total scrollable height in px */
+  totalHeight: number
+}
 
 /**
- * Virtual range result returned by size strategies
+ * Inclusive window consumed by VirtualList / Select / Cascader render loops
+ * (`for (i = startIndex; i <= endIndex)`). Empty windows use `endIndex = -1`.
  */
 export interface VirtualRange {
+  /** First visible index (inclusive) */
   startIndex: number
+  /** Last visible index (inclusive). `-1` when the window is empty. */
   endIndex: number
   offsetTop: number
   totalHeight: number

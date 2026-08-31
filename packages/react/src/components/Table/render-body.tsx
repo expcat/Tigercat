@@ -305,7 +305,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
   }
 
   // Virtual row windowing: render only the visible slice with spacer rows.
-  if (virtualWindow && virtualWindow.endIndex >= virtualWindow.startIndex) {
+  if (virtualWindow) {
     const { startIndex, endIndex, topPad, bottomPad } = virtualWindow
     const windowed: React.ReactNode[] = []
     if (topPad > 0) {
@@ -316,7 +316,9 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
       )
     }
     for (let index = startIndex; index <= endIndex; index++) {
-      windowed.push(renderDataRow(ctx.paginatedData[index], index))
+      const record = ctx.paginatedData[index]
+      if (record === undefined) continue
+      windowed.push(renderDataRow(record, index))
     }
     if (bottomPad > 0) {
       windowed.push(

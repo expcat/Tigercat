@@ -6,6 +6,7 @@
  * with fixed headers, column virtualization, and overscan support.
  */
 
+import type { ExclusiveVirtualRange } from './virtual-list'
 import type { RowSelectionConfig, TableColumn } from './table'
 
 export interface VirtualTableProps<T = Record<string, unknown>> {
@@ -43,13 +44,5 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   className?: string
 }
 
-export interface VirtualTableRange {
-  /** Start index (inclusive) */
-  start: number
-  /** End index (exclusive) */
-  end: number
-  /** Offset in px from top for first visible row */
-  offsetTop: number
-  /** Total scrollable height in px */
-  totalHeight: number
-}
+/** Exclusive `[start, end)` row window. Same arithmetic as VirtualList / Table. */
+export type VirtualTableRange = ExclusiveVirtualRange

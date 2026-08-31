@@ -174,9 +174,8 @@ describe('VirtualList', () => {
     const outer = container.firstElementChild as HTMLElement
     const inner = outer.firstElementChild as HTMLElement
     const itemContainer = inner.firstElementChild as HTMLElement
-    // 200/40 = 5 visible, overscan 0, endIndex inclusive → 6 items
-    expect(itemContainer.children.length).toBeLessThanOrEqual(6)
-    expect(itemContainer.children.length).toBeGreaterThanOrEqual(5)
+    // 200/40 = 5 visible, overscan 0, exclusive end → 5 items
+    expect(itemContainer.children.length).toBe(5)
   })
 
   it('renders with estimatedItemHeight (dynamic strategy)', () => {

@@ -3,7 +3,55 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { fixedSizeStrategy, variableSizeStrategy, dynamicSizeStrategy } from '@expcat/tigercat-core'
+import {
+  calculateVirtualRange,
+  exclusiveRangeToInclusive,
+  fixedSizeStrategy,
+  getFixedVirtualRange,
+  variableSizeStrategy,
+  dynamicSizeStrategy
+} from '@expcat/tigercat-core'
+
+describe('calculateVirtualRange', () => {
+  it('matches exclusive [start, end) with symmetric overscan at scroll 0', () => {
+    const exclusive = calculateVirtualRange(0, 400, 1000, 40, 5)
+    expect(exclusive).toEqual({ start: 0, end: 15, offsetTop: 0, totalHeight: 40000 })
+    expect(exclusiveRangeToInclusive(exclusive)).toEqual({
+      startIndex: 0,
+      endIndex: 14,
+      offsetTop: 0,
+      totalHeight: 40000
+    })
+  })
+
+  it('matches exclusive mid-scroll and inclusive adapter', () => {
+    const exclusive = calculateVirtualRange(2000, 400, 1000, 40, 5)
+    expect(exclusive.start).toBe(45)
+    expect(exclusive.end).toBe(65)
+    expect(getFixedVirtualRange(2000, 400, 40, 1000, 5)).toEqual({
+      startIndex: 45,
+      endIndex: 64,
+      offsetTop: 45 * 40,
+      totalHeight: 40000
+    })
+  })
+
+  it('uses overscan=0 without an extra inclusive row', () => {
+    const exclusive = calculateVirtualRange(0, 400, 1000, 40, 0)
+    expect(exclusive.end).toBe(10)
+    expect(getFixedVirtualRange(0, 400, 40, 1000, 0).endIndex).toBe(9)
+  })
+
+  it('returns an empty window for NaN item height', () => {
+    expect(calculateVirtualRange(0, 400, 100, Number.NaN, 5)).toEqual({
+      start: 0,
+      end: 0,
+      offsetTop: 0,
+      totalHeight: 0
+    })
+    expect(getFixedVirtualRange(0, 400, Number.NaN, 100, 5).endIndex).toBe(-1)
+  })
+})
 
 describe('fixedSizeStrategy', () => {
   const strategy = fixedSizeStrategy(50)
@@ -18,16 +66,17 @@ describe('fixedSizeStrategy', () => {
     expect(strategy.getItemOffset(5)).toBe(250)
   })
 
-  it('computes range with correct totalHeight', () => {
+  it('computes range with correct totalHeight and endIndex', () => {
     const range = strategy.getRange(0, 200, 100, 2)
     expect(range.totalHeight).toBe(5000)
     expect(range.startIndex).toBe(0)
-    expect(range.endIndex).toBeLessThanOrEqual(10)
+    expect(range.endIndex).toBe(5)
   })
 
   it('computes range from scrolled position', () => {
     const range = strategy.getRange(500, 200, 100, 0)
     expect(range.startIndex).toBe(10)
+    expect(range.endIndex).toBe(13)
     expect(range.offsetTop).toBe(500)
   })
 
@@ -61,10 +110,11 @@ describe('variableSizeStrategy', () => {
     expect(strategy.getItemOffset(3)).toBe(120) // 20 + 40 + 60
   })
 
-  it('computes range with correct totalHeight', () => {
+  it('computes range with correct totalHeight and last intersecting endIndex', () => {
     const range = strategy.getRange(0, 100, 5, 0)
-    expect(range.totalHeight).toBe(200) // 20+40+60+30+50
+    expect(range.totalHeight).toBe(200)
     expect(range.startIndex).toBe(0)
+    expect(range.endIndex).toBe(2)
   })
 
   it('returns empty range for zero items', () => {
@@ -140,5 +190,15 @@ describe('dynamicSizeStrategy', () => {
     const range = strategy.getRange(0, 100, 0, 2)
     expect(range.endIndex).toBe(-1)
     expect(range.totalHeight).toBe(0)
+  })
+
+  it('keeps measured heights when itemCount grows', () => {
+    const strategy = dynamicSizeStrategy(30, 10)
+    strategy.updateItemHeight!(0, 50)
+    expect(strategy.getItemHeight(0)).toBe(50)
+    const grown = strategy.getRange(0, 200, 20, 0)
+    expect(grown.totalHeight).toBe(50 + 19 * 30)
+    expect(strategy.getItemHeight(0)).toBe(50)
+    expect(strategy.getItemOffset(1)).toBe(50)
   })
 })

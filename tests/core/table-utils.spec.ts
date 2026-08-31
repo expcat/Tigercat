@@ -20,6 +20,7 @@ import {
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
+  getTableVirtualWindow,
   getTableRowClasses,
   getTableHeaderClasses,
   hasTableSelectionColumn,
@@ -711,6 +712,45 @@ describe('table-utils', () => {
     it('falls back to the filters key when no column matches', () => {
       const filtered = filterTableData(rows, columns, { name: 'Bob' })
       expect(filtered.map((row) => row.name)).toEqual(['Bob'])
+    })
+  })
+
+  describe('getTableVirtualWindow', () => {
+    it('matches exclusive VirtualTable arithmetic at scroll 0', () => {
+      const window = getTableVirtualWindow(0, 400, 40, 1000, 5)
+      expect(window.startIndex).toBe(0)
+      expect(window.endIndex).toBe(14)
+      expect(window.topPad).toBe(0)
+      expect(window.bottomPad).toBe((1000 - 15) * 40)
+    })
+
+    it('computes a mid-scroll window', () => {
+      const window = getTableVirtualWindow(2000, 400, 40, 1000, 5)
+      expect(window.startIndex).toBe(45)
+      expect(window.endIndex).toBe(64)
+      expect(window.topPad).toBe(45 * 40)
+    })
+
+    it('clamps the last window to the final row', () => {
+      const window = getTableVirtualWindow(3900, 400, 40, 100, 5)
+      expect(window.endIndex).toBe(99)
+      expect(window.bottomPad).toBe(0)
+    })
+
+    it('returns an empty window for non-positive item height or row count', () => {
+      expect(getTableVirtualWindow(0, 400, 0, 100, 5)).toEqual({
+        startIndex: 0,
+        endIndex: -1,
+        topPad: 0,
+        bottomPad: 0
+      })
+      expect(getTableVirtualWindow(0, 400, 40, 0, 5).endIndex).toBe(-1)
+    })
+
+    it('returns an empty window when the viewport is 0', () => {
+      const window = getTableVirtualWindow(0, 0, 40, 100, 5)
+      expect(window.startIndex).toBe(0)
+      expect(window.endIndex).toBe(-1)
     })
   })
 })
