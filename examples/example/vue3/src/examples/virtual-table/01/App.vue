@@ -18,13 +18,18 @@ const rows = Array.from({ length: 500 }, (_, index) => ({
 </script>
 
 <template>
-  <VirtualTable
-    :columns="columns"
-    :data-source="rows"
-    row-key="id"
-    :virtual-height="360"
-    :virtual-item-height="44"
-    bordered
-    striped
-    :row-selection="{ defaultSelectedRowKeys: [2] }" />
+  <div class="space-y-2">
+    <p class="text-sm text-gray-500">
+      固定列、边框与条纹。选择是点行，没有 checkbox 列；本块未开列虚拟化。
+    </p>
+    <VirtualTable
+      :columns="columns"
+      :data-source="rows"
+      row-key="id"
+      :virtual-height="360"
+      :virtual-item-height="44"
+      bordered
+      striped
+      :row-selection="{ defaultSelectedRowKeys: [2] }" />
+  </div>
 </template>

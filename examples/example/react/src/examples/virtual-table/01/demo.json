@@ -1,7 +1,7 @@
 {
   "id": "virtual-table-01",
   "title": "组合展示",
-  "description": "一个虚拟表格组合展示固定列、边框、条纹与默认行选择。",
+  "description": "固定列、边框与条纹。选择是点行，没有 checkbox；列虚拟化未开。",
   "entry": "App.tsx",
   "order": 1
 }

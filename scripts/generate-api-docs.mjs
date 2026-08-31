@@ -78,7 +78,7 @@ const COMPONENT_USAGE_NOTES = {
   DataExport: {
     uses: ['Dropdown', 'DropdownMenu', 'DropdownItem'],
     notes:
-      "将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import('@expcat/tigercat-core/utils/data-export')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。"
+      "将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。"
   },
   Dropdown: {
     uses: ['DropdownMenu', 'DropdownItem'],
@@ -346,7 +346,7 @@ const COMPONENT_USAGE_NOTES = {
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
     notes:
-      '复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。'
+      '行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。'
   },
   FormWizard: {
     uses: ['Steps/StepsItem', 'Button', 'ConfigProvider'],

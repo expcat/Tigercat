@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
-import type { RowSelectionConfig, TableColumn } from '@expcat/tigercat-core'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 type TableView = 'data' | 'loading' | 'empty'
 
@@ -45,9 +45,8 @@ const viewOptions: Array<{ value: TableView; label: string }> = [
   { value: 'empty', label: '空状态' }
 ]
 const visibleRows = computed(() => (view.value === 'data' ? rows : []))
-const rowSelection = computed<RowSelectionConfig>(() => ({
-  selectedRowKeys: selectedKeys.value,
-  getRowKey: (row) => row.id as number
+const rowSelection = computed(() => ({
+  selectedRowKeys: selectedKeys.value
 }))
 
 const handleSelectionChange = (nextKeys: (string | number)[]) => {

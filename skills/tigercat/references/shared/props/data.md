@@ -70,18 +70,22 @@ Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后�
 
 ## DataExport
 
-`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/10 props
+`packages/core/src/types/data-export.ts` · `DataExportProps` · 8/11 props
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
-Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import('@expcat/tigercat-core/utils/data-export')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。
+Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。
 
-| Prop         | Type                   | Default | Notes                                                                                      |
-| ------------ | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns`    | `TableColumn<T>[]`     | `-`     | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
-| `dataSource` | `T[]`                  | `-`     | Records to export                                                                          |
-| `disabled?`  | `boolean`              | `false` | Whether the export trigger is disabled                                                     |
-| `locale?`    | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                                    |
+| Prop             | Type                                    | Default                | Notes                                                                                      |
+| ---------------- | --------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
+| `columns`        | `TableColumn<T>[]`                      | `-`                    | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
+| `dataSource`     | `T[]`                                   | `-`                    | Records to export                                                                          |
+| `formats?`       | `DataExportFormat[]`                    | `['xlsx', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
+| `fileName?`      | `string`                                | `'export'`             | Download file name. An existing matching suffix is kept; path characters are stripped....  |
+| `sheetName?`     | `string`                                | `-`                    | -                                                                                          |
+| `cellFormatter?` | `DataExportOptions<T>['cellFormatter']` | `-`                    | -                                                                                          |
+| `disabled?`      | `boolean`                               | `false`                | Whether the export trigger is disabled                                                     |
+| `locale?`        | `Partial<TigerLocale>`                  | `-`                    | Locale overrides merged on top of ConfigProvider locale                                    |
 
 ## Table
 

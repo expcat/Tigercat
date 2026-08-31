@@ -17,15 +17,20 @@ const rows = Array.from({ length: 500 }, (_, index) => ({
 
 export default function App() {
   return (
-    <VirtualTable
-      columns={columns}
-      dataSource={rows}
-      rowKey="id"
-      virtualHeight={360}
-      virtualItemHeight={44}
-      bordered
-      striped
-      rowSelection={{ defaultSelectedRowKeys: [2] }}
-    />
+    <div className="space-y-2">
+      <p className="text-sm text-gray-500">
+        固定列、边框与条纹。选择是点行，没有 checkbox 列；本块未开列虚拟化。
+      </p>
+      <VirtualTable
+        columns={columns}
+        dataSource={rows}
+        rowKey="id"
+        virtualHeight={360}
+        virtualItemHeight={44}
+        bordered
+        striped
+        rowSelection={{ defaultSelectedRowKeys: [2] }}
+      />
+    </div>
   )
 }

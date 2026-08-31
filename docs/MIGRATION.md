@@ -4,6 +4,10 @@
 
 ## 未发布
 
+DataExport 增加 `csv`。`fileName="report.xlsx"` 不再变成 `report.xlsx.xlsx`。只有 `render`、记录上没有对应字段的列默认不导出；要跳过隐藏列传 `hiddenColumnKeys`。多格式触发器的 `aria-haspopup` / `aria-expanded` 在那颗 button 上，不要再给可见按钮另写一套不含该文本的 `aria-label`。Vue 主入口导出 `DataExportProps`。
+
+VirtualTable 选择按 `rowKey`（默认 `id`），不要再用窗口下标 `0` 当选中。点行即选，没有 checkbox 列。列虚拟化必须数字 `width` 且无固定列。删除 React `renderCell`，用 `column.render`。命令式滚动用 `scrollToIndex`。Vue 主入口导出 `VirtualTableProps`。
+
 Table 行身份是 `rowKey`（及 `rowSelection.getRowKey`），缺键时用 **dataSource 下标**，不要再当页内 `0,1,…`。`onCellChange` / `onRowClick` / `column.render` / `editableCells` 都是这份下标。`editableCells` 从 `Map<string, Set<number>>` 改成 `{ [columnKey]: number[] }`。
 
 `pagination.total: 0` 不再被当成「没传」。remote 默认不跑本地 filter/sort/group（要当前页再筛设 `pagination.localProcessing`）。省略 `pagination` 仍默认开（`pageSize` 10），关掉请 `false`；传入的分页对象与默认浅合并。`autoVirtual` 默认 `false`。

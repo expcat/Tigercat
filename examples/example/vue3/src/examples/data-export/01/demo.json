@@ -1,7 +1,7 @@
 {
   "id": "data-export-01",
-  "title": "组合展示",
-  "description": "一个导出入口组合展示文件命名、单元格格式化与导出回调。",
+  "title": "下拉与单按钮",
+  "description": "默认 xlsx+markdown 下拉；单一 formats 才是一颗按钮。不跑 render 列，隐藏列需 hiddenColumnKeys。",
   "entry": "App.vue",
   "order": 1
 }

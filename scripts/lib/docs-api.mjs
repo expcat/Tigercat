@@ -212,6 +212,25 @@ export const COMPONENT_PROP_PRIORITY = {
     'rowKey?',
     'virtual?'
   ],
+  DataExport: [
+    'columns',
+    'dataSource?',
+    'formats?',
+    'fileName?',
+    'sheetName?',
+    'cellFormatter?',
+    'disabled?'
+  ],
+  VirtualTable: [
+    'dataSource?',
+    'columns?',
+    'virtualHeight?',
+    'virtualItemHeight?',
+    'rowKey?',
+    'rowSelection?',
+    'virtualizeColumns?',
+    'width?'
+  ],
   Message: ['type?', 'content?', 'closable?', 'position?', 'closeAriaLabel?'],
   Form: ['model?', 'rules?', 'conditions?', 'disabled?', 'loading?', 'locale?', 'controller?'],
   FormItem: ['name?', 'label?', 'required?', 'rules?', 'error?', 'errorDisplayMode?'],

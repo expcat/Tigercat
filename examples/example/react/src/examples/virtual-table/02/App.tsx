@@ -80,8 +80,7 @@ export default function App() {
         bordered
         striped
         rowSelection={{
-          selectedRowKeys: selectedKeys,
-          getRowKey: (row) => row.id as number
+          selectedRowKeys: selectedKeys
         }}
         onSelectionChange={setSelectedKeys}
       />

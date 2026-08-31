@@ -153,17 +153,19 @@ Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps ex
 
 ## VirtualTable
 
-`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 6/18 props
+`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 8/19 props
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
-Note: 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。
+Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。
 
-| Prop            | Type                                                       | Default | Notes                                                         |
-| --------------- | ---------------------------------------------------------- | ------- | ------------------------------------------------------------- |
-| `dataSource?`   | `T[]`                                                      | `-`     | Data rows                                                     |
-| `columns?`      | `TableColumn<T>[]`                                         | `-`     | Column definitions — reuses Table's TableColumn type          |
-| `rowKey?`       | `keyof T \| ((row: T, index: number) => string \| number)` | `-`     | Unique row key field                                          |
-| `loading?`      | `boolean`                                                  | `-`     | Loading state                                                 |
-| `rowSelection?` | `RowSelectionConfig<T>`                                    | `-`     | Row selection configuration — mirrors Table's selection model |
-| `locale?`       | `Partial<TigerLocale>`                                     | `-`     | -                                                             |
+| Prop                 | Type                                                       | Default  | Notes                                                                                      |
+| -------------------- | ---------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `dataSource?`        | `T[]`                                                      | `-`      | Data rows                                                                                  |
+| `columns?`           | `TableColumn<T>[]`                                         | `-`      | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /...  |
+| `virtualHeight?`     | `number`                                                   | `400`    | Viewport height in px                                                                      |
+| `virtualItemHeight?` | `number`                                                   | `48`     | Fixed row height in px. Visible rows are clipped to this height.                           |
+| `rowKey?`            | `keyof T \| ((row: T, index: number) => string \| number)` | `'id'`   | Unique row key field. Defaults to `id`, matching Table. Missing identities are not used... |
+| `rowSelection?`      | `RowSelectionConfig<T>`                                    | `-`      | Row selection. Clicking a row toggles it; there is no checkbox column. Cell controls mu... |
+| `virtualizeColumns?` | `boolean`                                                  | `-`      | Enable horizontal column virtualization. Requires a numeric `width` and no fixed column... |
+| `width?`             | `number \| 'auto'`                                         | `'auto'` | Viewport width in px or auto. Column virtualization requires a number.                     |

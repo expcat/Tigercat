@@ -11,11 +11,11 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## Component Notes
 
-| Component    | Uses                                                          | Notes                                                                                                                                               |
-| ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ImageViewer  | -                                                             | ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。                                                 |
-| Kanban       | `TaskBoard`                                                   | Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。                                              |
-| VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。 |
+| Component    | Uses                                                          | Notes                                                                                                                                                                                                                                                                             |
+| ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ImageViewer  | -                                                             | ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。                                                                                                                                                                               |
+| Kanban       | `TaskBoard`                                                   | Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。                                                                                                                                                                            |
+| VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。 |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 

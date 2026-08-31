@@ -111,7 +111,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Dropdown
 
-`packages/core/src/types/dropdown.ts` · `DropdownProps` · 3/13 props
+`packages/core/src/types/dropdown.ts` · `DropdownProps` · 3/14 props
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
