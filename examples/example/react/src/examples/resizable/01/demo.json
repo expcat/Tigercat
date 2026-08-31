@@ -1,12 +1,12 @@
 {
   "id": "resizable-01",
   "title": "自由调整",
-  "description": "一个 Resizable 在最小宽高约束内自由调整两个轴，并通过 onResize 回显当前尺寸。",
+  "description": "含左侧手柄：往左拉时左缘跟着走。onResize 回显尺寸，defaultWidth/Height 只是初值。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 200,
     "maxHeight": 720
   }
 }

@@ -174,13 +174,20 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Resizable
 
-`packages/core/src/types/resizable.ts` · `ResizableProps` · 3/13 props
+`packages/core/src/types/resizable.ts` · `ResizableProps` · 8/15 props
 
-| Prop             | Type      | Default | Notes                        |
-| ---------------- | --------- | ------- | ---------------------------- |
-| `disabled?`      | `boolean` | `false` | Whether resizing is disabled |
-| `defaultWidth?`  | `number`  | `-`     | Default width in pixels      |
-| `defaultHeight?` | `number`  | `-`     | Default height in pixels     |
+Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。角手柄不进 Tab。`width`/`height` 传入即受控。
+
+| Prop               | Type                     | Default                               | Notes                                                                                      |
+| ------------------ | ------------------------ | ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `width?`           | `number`                 | `-`                                   | Controlled width in pixels. Omit to stay uncontrolled. Dropping `width` keeps the last...  |
+| `height?`          | `number`                 | `-`                                   | Controlled height in pixels. Omit to stay uncontrolled.                                    |
+| `defaultWidth?`    | `number`                 | `-`                                   | Default width in pixels                                                                    |
+| `defaultHeight?`   | `number`                 | `-`                                   | Default height in pixels                                                                   |
+| `lockAspectRatio?` | `boolean`                | `false`                               | Whether to maintain aspect ratio. Edge handles follow that axis; corners follow the lar... |
+| `handles?`         | `ResizeHandlePosition[]` | `['right', 'bottom', 'bottom-right']` | Which handles to show                                                                      |
+| `axis?`            | `ResizeAxis`             | `'both'`                              | Constraint axis. Handles that cannot move this axis are not rendered.                      |
+| `disabled?`        | `boolean`                | `false`                               | Whether resizing is disabled                                                               |
 
 ## Row
 
@@ -255,10 +262,15 @@ Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基
 
 ## Splitter
 
-`packages/core/src/types/splitter.ts` · `SplitterProps` · 3/9 props
+`packages/core/src/types/splitter.ts` · `SplitterProps` · 6/9 props
 
-| Prop         | Type                   | Default        | Notes                                                                                      |
-| ------------ | ---------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| `disabled?`  | `boolean`              | `false`        | Whether the splitter is disabled                                                           |
-| `direction?` | `SplitDirection`       | `'horizontal'` | Direction of the split                                                                     |
-| `sizes?`     | `(number \| string)[]` | `-`            | Initial sizes of each pane in pixels or percentage / px strings (`'30%'`, `'200px'`). N... |
+Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。水平几何读 `dir`。gutter 是带名字的 `separator`。
+
+| Prop          | Type                   | Default        | Notes                                                                                      |
+| ------------- | ---------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `direction?`  | `SplitDirection`       | `'horizontal'` | Direction of the split                                                                     |
+| `sizes?`      | `(number \| string)[]` | `-`            | Pane sizes in pixels or percentage / px strings (`'30%'`, `'200px'`). Numbers are pixel... |
+| `min?`        | `number`               | `0`            | Minimum size of any pane in pixels. When `min * paneCount + gutters` exceeds the contai... |
+| `gutterSize?` | `number`               | `4`            | Width of the gutter/divider in pixels                                                      |
+| `disabled?`   | `boolean`              | `false`        | Whether the splitter is disabled                                                           |
+| `max?`        | `number`               | `-`            | Maximum size of any pane in pixels                                                         |

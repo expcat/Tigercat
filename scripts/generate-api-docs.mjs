@@ -143,6 +143,14 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。'
   },
+  Splitter: {
+    notes:
+      '子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。水平几何读 `dir`。gutter 是带名字的 `separator`。'
+  },
+  Resizable: {
+    notes:
+      '`left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。角手柄不进 Tab。`width`/`height` 传入即受控。'
+  },
   Image: {
     notes:
       '默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。'

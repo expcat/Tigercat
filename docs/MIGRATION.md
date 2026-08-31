@@ -4,6 +4,10 @@
 
 ## 未发布
 
+Splitter 删除公开类型 `SplitterPaneConfig`（组件从未读取，也没有 `Splitter.Pane` / 折叠）。`sizes` 按值受控：父级回写才改比例，仅数组身份变化不会重置拖拽。拿掉 `sizes` 后停在最后比例，不会均分。百分比随容器重算。gutter 需要可读名（locale 默认「Resize panes {index}」）。水平拖拽在 `dir=rtl` 下跟着指针。
+
+Resizable 新增受控 `width` / `height`。`left` / `top` 手柄会移动原点。`lockAspectRatio` 时上下手柄也会改宽度。`axis="horizontal"` 不再渲染 `top`/`bottom`。角手柄不进 Tab，只给指针用。默认名走 `locale.resizable.handleAriaLabel`。Vue 的内部宽高覆盖用户 `style.width` / `style.height`。
+
 Carousel 默认不再是名为 “Image carousel” / “图片轮播” 的 `region`。需要 landmark 时传 `aria-label` / `aria-labelledby` 或 `labels.ariaLabel`。`aria-roledescription` 走 locale。圆点改为 `role="tab"`，测请用 `getByRole('tab')` / `aria-selected`，不要再找 `tablist button` + `aria-current`。手势是 `pointer*`，不再听 `touch*`。`infinite` 循环不再把轨道从末张滑回开头。Vue 类型名是 `CarouselProps` / `CarouselMethods`（`VueCarouselProps` 仍是别名）。
 
 List `bordered` 改为外框布尔（默认 `false`），项间线只走 `split`（默认 `true`）。删除 `'none' | 'divided' | 'bordered'` 和 `ListBorderStyle`。`bordered="divided"` 改成不传或 `split`；`bordered="none"` 改成 `bordered={false}`。`pagination.current` / `pageSize` 只要传入就是受控。拖拽下标是数据源下标，行上不再 HTML5 `draggable`（手柄 + `useDrag`）。loading 不再卸 listitem。

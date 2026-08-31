@@ -9,17 +9,16 @@ export default function App() {
   }, [])
 
   return (
-    <>
-      <Resizable
-        defaultWidth={300}
-        defaultHeight={150}
-        minWidth={100}
-        minHeight={60}
-        onResize={onResize}>
-        <div className="w-full h-full bg-blue-50 border border-blue-200 rounded flex items-center justify-center text-sm text-blue-600">
-          {size.width} × {size.height}
-        </div>
-      </Resizable>
-    </>
+    <Resizable
+      defaultWidth={300}
+      defaultHeight={150}
+      minWidth={100}
+      minHeight={60}
+      handles={['left', 'right', 'bottom', 'bottom-right']}
+      onResize={onResize}>
+      <div className="flex h-full w-full items-center justify-center rounded border border-blue-200 bg-blue-50 text-sm text-blue-600">
+        {size.width} × {size.height}
+      </div>
+    </Resizable>
   )
 }

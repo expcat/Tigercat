@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **Splitter**：`sizes` 按值受控（同一组百分数/像素的新数组不会把拖拽弹回）；未传或拿掉 `sizes` 停在最后比例。百分比和均分跟容器走（ResizeObserver）。水平指针和方向键读 `dir`，gutter 跟着指针。键盘也发 `resize-end`。gutter 是带 `aria-valuenow` 和 locale 名的 window splitter；命中区 24px。pane 数以摊平后的子节点为准。删除未实现的 `SplitterPaneConfig`。
+- **Resizable**：从被抓的边改尺寸并平移原点（左/上不再往反方向长）。`lockAspectRatio` 按手柄选主轴，clamp 保比例。`axis` 不渲空操作手柄。角手柄不进 Tab。`width`/`height` 传入即受控；未传 default 时从 bounding box 起拖。手柄名走 `locale.resizable`。水平定位用逻辑 inset。
 - **Carousel**：`infinite` 的 scroll 轨道用首尾 clone + 关 transition 瞬移，末张再 next 不再整段倒带。水平几何走逻辑方向（transform 符号、箭头 `start`/`end`、swipe 读 `dir`）。圆点是真 tab（`role="tab"` + `aria-selected` + 方向键，只有当前项进 Tab）。非当前页和 clone 同时 `inert` + `aria-hidden`。无名不是 landmark。开 autoplay 时有可聚焦暂停；hover/focus 暂停拆开；`autoplaySpeed<=0` 和 `prefers-reduced-motion` 都不自动播。手势只走 pointer（capture / cancel）。控件色走 surface/text token；`overflow-hidden` 只在视口。Vue 导出 `CarouselProps` / `CarouselMethods`。文案走 locale（含 `roleDescription` / 暂停），不再启发式「图片轮播」。
 - **布局原语 B（Descriptions / List / ScrollArea / Masonry / PrintLayout）**：Descriptions 竖向也按 `column`/`span` 排格，冒号走 locale，标题绑表，列数跟容器。List 外框/分割线拆开，分页受控，拖拽用数据源下标和手柄，loading 不卸项，空态不是 live region。ScrollArea 滚轮落到视口、键盘滚动、逻辑横轴、双轴让角、不溢出不进 Tab。Masonry 跟容器宽、换列不卸子树、全 0 高度保持 round-robin。PrintLayout 写入 `@page`、屏幕看得见页眉页脚、断页节点打印仍在。
 - **布局原语 A（Space / Divider / AspectRatio / Skeleton / Card）**：AspectRatio 根默认裁切媒体，不必调用方再写 `overflow-hidden`。Skeleton `wave` 真扫光并进 reduced-motion；默认尺寸走 class，用户 `style.height` / `h-*` 生效；`custom` 无默认几何。Card `hoverable` 不再假装按钮，`onClick`/`href` 才进 Tab；封面自己裁圆角，根不 `overflow-hidden`。竖 Divider 在默认 Space 里 `self-stretch`；gradient 吃 `color`/`thickness`。Vue Space/Divider 声明 `className`。

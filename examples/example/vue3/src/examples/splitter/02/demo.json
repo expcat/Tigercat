@@ -1,12 +1,12 @@
 {
   "id": "splitter-02",
   "title": "垂直分割",
-  "description": "一个垂直 Splitter 按 40/60 初始比例划分上下两个必要面板。",
+  "description": "垂直 Splitter 按 40/60 划分上下两格。下面一块 disabled，gutter 不拖。示例给了高度，组件本身不自带视口高。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 360,
     "maxHeight": 720
   }
 }

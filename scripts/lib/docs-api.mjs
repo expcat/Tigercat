@@ -162,6 +162,19 @@ export const COMPONENT_PROP_PRIORITY = {
   Timeline: ['items?', 'mode?', 'pending?', 'reverse?'],
   Countdown: ['value?', 'now?', 'format?', 'interval?', 'title?'],
   Progress: ['percentage?', 'status?', 'showText?', 'type?', 'striped?'],
+  Splitter: ['direction?', 'sizes?', 'min?', 'gutterSize?', 'disabled?', 'max?'],
+  Resizable: [
+    'width?',
+    'height?',
+    'defaultWidth?',
+    'defaultHeight?',
+    'lockAspectRatio?',
+    'handles?',
+    'axis?',
+    'disabled?',
+    'minWidth?',
+    'minHeight?'
+  ],
   Button: [
     'variant?',
     'size?',
@@ -325,7 +338,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     CollapsePanel: '<CollapsePanel panel-key="1" header="FAQ">Answer</CollapsePanel>',
     Timeline: '<Timeline :items="items" />',
     Countdown: '<Countdown :value="deadline" />',
-    Progress: '<Progress :percentage="64" />'
+    Progress: '<Progress :percentage="64" />',
+    Splitter: '<Splitter :sizes="sizes"><div>A</div><div>B</div></Splitter>',
+    Resizable: '<Resizable :default-width="300" :default-height="150"><slot /></Resizable>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -350,7 +365,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     CollapsePanel: '<CollapsePanel panelKey="1" header="FAQ">Answer</CollapsePanel>',
     Timeline: '<Timeline items={items} />',
     Countdown: '<Countdown value={deadline} />',
-    Progress: '<Progress percentage={64} />'
+    Progress: '<Progress percentage={64} />',
+    Splitter: '<Splitter sizes={sizes}><div>A</div><div>B</div></Splitter>',
+    Resizable: '<Resizable defaultWidth={300} defaultHeight={150}>{children}</Resizable>'
   }
 }
 

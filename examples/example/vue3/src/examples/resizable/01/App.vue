@@ -17,9 +17,10 @@ const onResize = (e: { width: number; height: number }) => {
       :default-height="150"
       :min-width="100"
       :min-height="60"
+      :handles="['left', 'right', 'bottom', 'bottom-right']"
       @resize="onResize">
       <div
-        class="w-full h-full bg-blue-50 border border-blue-200 rounded flex items-center justify-center text-sm text-blue-600">
+        class="flex h-full w-full items-center justify-center rounded border border-blue-200 bg-blue-50 text-sm text-blue-600">
         {{ size.width }} × {{ size.height }}
       </div>
     </Resizable>
