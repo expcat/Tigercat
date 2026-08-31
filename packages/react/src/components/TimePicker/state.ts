@@ -1,469 +1,487 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
-  classNames,
-  parseTime,
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  TIME_PICKER_DESKTOP_QUERY,
+  adjacentTimePickerColumn,
+  applyTimePickerColumn,
+  applyTimePickerRangeColumn,
+  buildTimePickerColumns,
+  coerceTimePickerRange,
+  coerceTimePickerSingle,
+  commitTimePickerNow,
+  commitTimePickerOk,
+  emptyTimePickerValue,
+  focusTimePickerOption,
   formatTime,
-  formatTimeDisplayWithLocale,
+  formatTimePickerDisplay,
+  formTimePickerValue,
+  getInputFieldClasses,
+  getInputWrapperClasses,
+  getLocaleDirection,
   getTimePeriodLabels,
   getTimePickerLabels,
+  isTimePickerDesktopLayout,
+  isTimePickerValueEmpty,
+  mergeAriaDescribedBy,
   mergeTigerLocale,
-  to12HourFormat,
-  to24HourFormat,
-  isTimeInRange,
-  generateHours,
-  generateMinutes,
-  generateSeconds,
-  getCurrentTime,
-  timePickerBaseClasses,
-  getTimePickerInputClasses,
-  getTimePickerIconButtonClasses,
-  focusTimePickerOption
+  parseTypedTimePickerValue,
+  resolveInputTrailingLayout,
+  resolveReadOnlyFlag,
+  runShakeAnimation,
+  seedTimePickerDraft,
+  visibleTimePickerColumns,
+  type InputStatus,
+  type TimeFormat,
+  type TimePickerConstraints,
+  type TimePickerDraft,
+  type TimePickerFocusUnit,
+  type TimePickerRangeTuple
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
 import { useTigerConfig } from '../ConfigProvider'
-import type { TimePickerContext, TimePickerProps } from './types'
+import { useInputGroupContext } from '../InputGroup'
+import { useFormItemControlContext } from '../FormItemContext'
+import { isRangeTimePicker, type TimePickerProps } from './types'
 
-type TimePickerSingleInputValue = string | null
-type TimePickerRangeInputValue = [string | null, string | null]
-
-export function useTimePickerState(allProps: TimePickerProps): TimePickerContext {
-  const config = useTigerConfig()
+export function useTimePickerController(props: TimePickerProps) {
+  const isRangeMode = isRangeTimePicker(props)
   const {
     size = 'md',
-    format = '24',
+    disabled = false,
+    readonly: readonlyProp,
+    required = false,
+    clearable = true,
+    format = '24' as TimeFormat,
     showSeconds = false,
     hourStep = 1,
     minuteStep = 1,
     secondStep = 1,
-    disabled = false,
-    readonly = false,
-    required = false,
-    minTime,
-    maxTime,
-    clearable = true,
+    open,
+    defaultOpen = false,
+    onOpenChange,
+    status: statusProp,
     name,
     id,
+    locale,
+    labels: labelsOverride,
     className,
     onClear,
-    locale,
-    labels: labelsOverrides,
-    value,
-    defaultValue,
-    range,
-    ...restProps
-  } = allProps
+    onBlur
+  } = props
 
-  const divProps = (({ onChange: _omitOnChange, ...rest }) => rest)(restProps)
-
-  const isRangeMode = range === true
-
-  const [isOpen, setIsOpen] = useState(false)
-
-  // Controlled/uncontrolled value handled by useControlledState. The stored
-  // value space (`string | null` / range tuple) already matches the `onChange`
-  // value space (the C-4 "aligned" case, no parse transform), so the setter
-  // can own both internal state and onChange, replacing the previous manual
-  // `isControlled` branches.
-  const normalizeRangeValue = (
-    input: TimePickerProps['value'] | null | undefined
-  ): TimePickerRangeInputValue => {
-    if (Array.isArray(input)) return [input[0] ?? null, input[1] ?? null]
-    return [null, null]
-  }
-
-  const singleControlled: string | null | undefined =
-    !isRangeMode && value !== undefined && (typeof value === 'string' || value === null)
-      ? value
+  const isReadOnly = resolveReadOnlyFlag(readonlyProp, (props as { readOnly?: boolean }).readOnly)
+  const config = useTigerConfig()
+  const inputGroup = useInputGroupContext()
+  const formItemControl = useFormItemControlContext()
+  const inGroup = inputGroup != null
+  const effectiveSize = size ?? inputGroup?.size ?? 'md'
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const shakeTrigger = formItemControl?.shakeTrigger
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const describedBy = mergeAriaDescribedBy(
+    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    formItemControl?.describedBy
+  )
+  const labelledby =
+    typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
+      ? props['aria-labelledby']
+      : formItemControl?.labelId
+  const ariaLabel =
+    typeof props['aria-label'] === 'string' && props['aria-label'].trim()
+      ? props['aria-label']
       : undefined
 
-  const singleDefault: string | null = (() => {
-    const dv = defaultValue
-    if (typeof dv === 'string' || dv === null || dv === undefined) return dv ?? null
-    return null
-  })()
-
-  const [singleValue, setSingleValue] = useControlledState<string | null>({
-    value: singleControlled,
-    defaultValue: singleDefault,
-    onChange: allProps.onChange as ((time: TimePickerSingleInputValue) => void) | undefined
-  })
-
-  const [rangeValue, setRangeValue] = useControlledState<TimePickerRangeInputValue>({
-    value: isRangeMode && value !== undefined ? normalizeRangeValue(value) : undefined,
-    defaultValue: normalizeRangeValue(defaultValue),
-    onChange: allProps.onChange as ((time: TimePickerRangeInputValue) => void) | undefined
-  })
-
-  const [activePart, setActivePart] = useState<'start' | 'end'>('start')
-
-  const panelRef = useRef<HTMLDivElement>(null)
-  const inputWrapperRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const currentSingleValue: string | null = isRangeMode ? null : singleValue
-  const currentRangeValue: TimePickerRangeInputValue = isRangeMode ? rangeValue : [null, null]
-
-  const activeValue: string | null = isRangeMode
-    ? currentRangeValue[activePart === 'start' ? 0 : 1]
-    : currentSingleValue
-
-  const parsedTime = parseTime(activeValue)
-
-  // Internal state for time selection
-  const [selectedHours, setSelectedHours] = useState<number>(parsedTime?.hours ?? 0)
-  const [selectedMinutes, setSelectedMinutes] = useState<number>(parsedTime?.minutes ?? 0)
-  const [selectedSeconds, setSelectedSeconds] = useState<number>(parsedTime?.seconds ?? 0)
-  const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM')
-
-  const localeOverride = useMemo(() => (typeof locale === 'string' ? { locale } : locale), [locale])
   const mergedLocale = useMemo(
-    () => mergeTigerLocale(config.locale, localeOverride),
-    [config.locale, localeOverride]
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
   )
   const localeCode = mergedLocale?.locale
-
-  // Update internal state when value changes (or active part changes in range mode)
-  const syncFromActiveValue = useCallback(() => {
-    const parsed = parseTime(activeValue)
-    if (!parsed) return
-
-    setSelectedHours(parsed.hours)
-    setSelectedMinutes(parsed.minutes)
-    setSelectedSeconds(parsed.seconds)
-
-    if (format === '12') {
-      const { period } = to12HourFormat(parsed.hours)
-      setSelectedPeriod(period)
-    }
-  }, [activeValue, format])
-
-  useEffect(() => {
-    syncFromActiveValue()
-  }, [syncFromActiveValue])
-
   const labels = useMemo(
-    () => getTimePickerLabels(mergedLocale, labelsOverrides),
-    [mergedLocale, labelsOverrides]
+    () => getTimePickerLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const periodLabels = useMemo(() => getTimePeriodLabels(localeCode), [localeCode])
+  const dir = getLocaleDirection(mergedLocale)
+
+  const parsedValue = useMemo(() => {
+    if (isRangeMode) {
+      if (props.value === undefined) {
+        return coerceTimePickerRange(formItemControl?.value)
+      }
+      return coerceTimePickerRange(props.value)
+    }
+    if (props.value === undefined) {
+      return coerceTimePickerSingle(formItemControl?.value)
+    }
+    return coerceTimePickerSingle(props.value)
+  }, [formItemControl?.value, isRangeMode, props.value])
+
+  const parsedDefault = useMemo(
+    () =>
+      isRangeMode
+        ? coerceTimePickerRange(props.defaultValue)
+        : coerceTimePickerSingle(props.defaultValue),
+    [isRangeMode, props.defaultValue]
   )
 
+  const [committed, setCommitted] = useControlledState<string | null | TimePickerRangeTuple>({
+    value:
+      props.value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
+    defaultValue: parsedDefault ?? emptyTimePickerValue(isRangeMode),
+    onChange: (next) => {
+      if (isRangeMode) {
+        ;(props.onChange as ((value: TimePickerRangeTuple | null) => void) | undefined)?.(
+          next as TimePickerRangeTuple | null
+        )
+      } else {
+        ;(props.onChange as ((value: string | null) => void) | undefined)?.(next as string | null)
+      }
+      formItemControl?.onChange?.(formTimePickerValue(isRangeMode, next))
+    }
+  })
+
+  const [isOpen, setOpen] = useControlledState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange
+  })
+
+  const [draft, setDraft] = useState<TimePickerDraft>(() =>
+    seedTimePickerDraft(isRangeMode ? null : (parsedDefault as string | null), format)
+  )
+  const [draftRange, setDraftRange] = useState<TimePickerRangeTuple | null>(
+    isRangeMode ? (parsedDefault as TimePickerRangeTuple | null) : null
+  )
+  const [activePart, setActivePart] = useState<'start' | 'end'>('start')
+  const [draftText, setDraftText] = useState<string | null>(null)
+  const [desktop, setDesktop] = useState(isTimePickerDesktopLayout)
+
+  const constraints: TimePickerConstraints = useMemo(
+    () => ({
+      minTime: props.minTime,
+      maxTime: props.maxTime,
+      disabledTime: props.disabledTime,
+      hourStep,
+      minuteStep,
+      secondStep,
+      format,
+      showSeconds
+    }),
+    [
+      format,
+      hourStep,
+      minuteStep,
+      props.disabledTime,
+      props.maxTime,
+      props.minTime,
+      secondStep,
+      showSeconds
+    ]
+  )
+
+  const displaySource = isOpen
+    ? isRangeMode
+      ? draftRange
+      : draft.parts
+        ? formatTime(draft.parts.hours, draft.parts.minutes, draft.parts.seconds, showSeconds)
+        : null
+    : committed
+  const displayValue =
+    draftText ??
+    formatTimePickerDisplay(isRangeMode, displaySource, format, showSeconds, localeCode)
   const placeholder =
-    allProps.placeholder ?? (isRangeMode ? labels.selectTimeRange : labels.selectTime)
+    props.placeholder ?? (isRangeMode ? labels.selectTimeRange : labels.selectTime)
 
-  const periodLabels = useMemo(() => getTimePeriodLabels(localeCode), [localeCode])
+  const showClear = Boolean(
+    clearable &&
+    !effectiveDisabled &&
+    !isReadOnly &&
+    !isTimePickerValueEmpty(isRangeMode, committed)
+  )
+  const trailing = resolveInputTrailingLayout({
+    clearable,
+    disabled: effectiveDisabled,
+    readOnly: isReadOnly,
+    valueLength: showClear ? 1 : 0,
+    hasCustomSuffix: true
+  })
 
-  const displayValue = (() => {
-    if (!isRangeMode) {
-      return parsedTime
-        ? formatTimeDisplayWithLocale(
-            parsedTime.hours,
-            parsedTime.minutes,
-            parsedTime.seconds,
-            format,
-            showSeconds,
-            localeCode
-          )
-        : ''
+  const rootRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const inputWrapperRef = useRef<HTMLDivElement>(null)
+  const instanceId = useId()
+  const panelId = `tiger-timepicker-panel-${instanceId}`
+
+  const mountedRef = useRef(false)
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
     }
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, shakeTrigger])
 
-    const toDisplay = (timeStr: string | null): string => {
-      const parsed = parseTime(timeStr)
-      if (!parsed) return ''
-      return formatTimeDisplayWithLocale(
-        parsed.hours,
-        parsed.minutes,
-        parsed.seconds,
-        format,
-        showSeconds,
-        localeCode
-      )
-    }
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+    const mq = window.matchMedia(TIME_PICKER_DESKTOP_QUERY)
+    const update = () => setDesktop(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
-    const start = toDisplay(currentRangeValue[0])
-    const end = toDisplay(currentRangeValue[1])
-    if (!start && !end) return ''
-    return `${start} - ${end}`
-  })()
-
-  const showClearButton = (() => {
-    if (!clearable || disabled || readonly) return false
-    if (!isRangeMode) return currentSingleValue !== null
-    return currentRangeValue[0] !== null || currentRangeValue[1] !== null
-  })()
-
-  const hoursList = useMemo(() => generateHours(hourStep, format), [hourStep, format])
-  const minutesList = useMemo(() => generateMinutes(minuteStep), [minuteStep])
-  const secondsList = useMemo(() => generateSeconds(secondStep), [secondStep])
-
-  const togglePanel = () => {
-    if (!disabled && !readonly) {
-      if (isOpen) {
-        closePanel()
+  const seedPanel = useCallback(
+    (value: string | null | TimePickerRangeTuple, part: 'start' | 'end') => {
+      if (isRangeMode) {
+        const tuple = (value as TimePickerRangeTuple | null) ?? null
+        setDraftRange(tuple)
+        const active = tuple?.[part === 'start' ? 0 : 1] ?? null
+        setDraft(seedTimePickerDraft(active, format))
         return
       }
+      setDraft(seedTimePickerDraft(value as string | null, format))
+    },
+    [format, isRangeMode]
+  )
 
-      setIsOpen(true)
-      syncFromActiveValue()
-    }
-  }
-
-  const closePanel = () => {
-    setIsOpen(false)
-    inputRef.current?.focus()
-  }
-
-  const focusOptionInUnit = (
-    unit: 'hour' | 'minute' | 'second' | 'period',
-    action: 'prev' | 'next' | 'first' | 'last'
-  ) => {
-    focusTimePickerOption(panelRef.current, unit, action)
-  }
-
-  const handlePanelKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      closePanel()
-      return
-    }
-
-    const active = document.activeElement as HTMLElement | null
-    const unit = active?.getAttribute('data-tiger-timepicker-unit') as
-      'hour' | 'minute' | 'second' | 'period' | null
-
-    if (!unit) return
-
-    if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      focusOptionInUnit(unit, 'prev')
-      return
-    }
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      focusOptionInUnit(unit, 'next')
-      return
-    }
-
-    if (event.key === 'Home') {
-      event.preventDefault()
-      focusOptionInUnit(unit, 'first')
-      return
-    }
-
-    if (event.key === 'End') {
-      event.preventDefault()
-      focusOptionInUnit(unit, 'last')
-      return
-    }
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      const el = document.activeElement as HTMLButtonElement | null
-      if (el && el.tagName === 'BUTTON' && !el.disabled) {
-        event.preventDefault()
-        el.click()
-      }
-    }
-  }
-
-  const selectHour = (hour: number) => {
-    const hours24 = format === '12' ? to24HourFormat(hour, selectedPeriod) : hour
-    setSelectedHours(hours24)
-    updateTime(hours24, selectedMinutes, selectedSeconds)
-  }
-
-  const selectMinute = (minute: number) => {
-    setSelectedMinutes(minute)
-    updateTime(selectedHours, minute, selectedSeconds)
-  }
-
-  const selectSecond = (second: number) => {
-    setSelectedSeconds(second)
-    updateTime(selectedHours, selectedMinutes, second)
-  }
-
-  const selectPeriod = (period: 'AM' | 'PM') => {
-    setSelectedPeriod(period)
-    // Convert current hour to 12-hour format, then back to 24-hour with new period
-    const { hours: hours12 } = to12HourFormat(selectedHours)
-    const hours24 = to24HourFormat(hours12, period)
-    setSelectedHours(hours24)
-    updateTime(hours24, selectedMinutes, selectedSeconds)
-  }
-
-  const updateTime = (hours: number, minutes: number, seconds: number) => {
-    if (!isTimeInRange(hours, minutes, minTime, maxTime, seconds)) {
-      return
-    }
-
-    let timeString = formatTime(hours, minutes, seconds, showSeconds)
-
-    if (!isRangeMode) {
-      setSingleValue(timeString)
-      return
-    }
-
-    const index = activePart === 'start' ? 0 : 1
-
-    const parsedStart = parseTime(currentRangeValue[0])
-    const parsedEnd = parseTime(currentRangeValue[1])
-    const candidateSeconds = hours * 3600 + minutes * 60 + seconds
-    const startSeconds = parsedStart
-      ? parsedStart.hours * 3600 + parsedStart.minutes * 60 + parsedStart.seconds
-      : null
-    const endSeconds = parsedEnd
-      ? parsedEnd.hours * 3600 + parsedEnd.minutes * 60 + parsedEnd.seconds
-      : null
-
-    // Keep range ordered: end should never be earlier than start.
-    // If user selects an out-of-order time, clamp the opposite side to match.
-    if (activePart === 'end' && parsedStart && startSeconds !== null) {
-      if (candidateSeconds < startSeconds) {
-        timeString = formatTime(
-          parsedStart.hours,
-          parsedStart.minutes,
-          parsedStart.seconds,
-          showSeconds
-        )
-        setSelectedHours(parsedStart.hours)
-        setSelectedMinutes(parsedStart.minutes)
-        setSelectedSeconds(parsedStart.seconds)
-        if (format === '12') {
-          const { period } = to12HourFormat(parsedStart.hours)
-          setSelectedPeriod(period)
-        }
-      }
-    }
-    const nextRange: TimePickerRangeInputValue = [currentRangeValue[0], currentRangeValue[1]]
-    nextRange[index] = timeString
-
-    if (activePart === 'start' && endSeconds !== null && candidateSeconds > endSeconds) {
-      nextRange[1] = timeString
-    }
-
-    setRangeValue(nextRange)
-
-    if (activePart === 'start' && nextRange[1] === null) {
-      setActivePart('end')
-    }
-  }
-
-  const clearTime = (event: React.MouseEvent) => {
-    event.stopPropagation()
-
-    if (!isRangeMode) {
-      setSingleValue(null)
-      onClear?.()
-      return
-    }
-
-    setRangeValue([null, null])
-    onClear?.()
-  }
-
-  const setNow = () => {
-    const now = getCurrentTime(showSeconds)
-    const parsed = parseTime(now)
-    if (parsed) {
-      setSelectedHours(parsed.hours)
-      setSelectedMinutes(parsed.minutes)
-      setSelectedSeconds(parsed.seconds)
-
-      if (format === '12') {
-        const { period } = to12HourFormat(parsed.hours)
-        setSelectedPeriod(period)
-      }
-
-      updateTime(parsed.hours, parsed.minutes, parsed.seconds)
-    }
-  }
-
-  const isHourDisabled = (hour: number): boolean => {
-    const hours24 = format === '12' ? to24HourFormat(hour, selectedPeriod) : hour
-    return !isTimeInRange(hours24, selectedMinutes, minTime, maxTime, selectedSeconds)
-  }
-
-  const isMinuteDisabled = (minute: number): boolean => {
-    return !isTimeInRange(selectedHours, minute, minTime, maxTime, selectedSeconds)
-  }
-
-  const isSecondDisabled = (second: number): boolean => {
-    return !isTimeInRange(selectedHours, selectedMinutes, minTime, maxTime, second)
-  }
-
-  const handleInputClick = () => {
-    togglePanel()
-  }
+  const setOpenSafe = useCallback(
+    (next: boolean) => {
+      if (effectiveDisabled || isReadOnly) return
+      setOpen(next)
+      if (!next) setDraftText(null)
+    },
+    [effectiveDisabled, isReadOnly, setOpen]
+  )
 
   useEffect(() => {
     if (!isOpen) return
-    const panel = panelRef.current
-    if (!panel) return
+    setActivePart('start')
+    seedPanel(committed, 'start')
+    // Seed from the committed value only when the panel opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
-    const focusTimer = window.setTimeout(() => {
-      const selectedHour = panel.querySelector<HTMLButtonElement>(
-        'button[data-tiger-timepicker-unit="hour"][aria-selected="true"]:not([disabled])'
-      )
-      if (selectedHour) {
-        selectedHour.focus()
+  const writeCommitted = useCallback(
+    (next: string | null | TimePickerRangeTuple) => {
+      setCommitted(next)
+      setDraftText(null)
+    },
+    [setCommitted]
+  )
+
+  const confirmDraft = useCallback(() => {
+    const result = commitTimePickerOk({
+      range: isRangeMode,
+      draft,
+      draftRange,
+      constraints
+    })
+    if (!result) {
+      setOpenSafe(false)
+      return
+    }
+    writeCommitted(result.nextCommitted)
+    if (result.close) setOpenSafe(false)
+  }, [constraints, draft, draftRange, isRangeMode, setOpenSafe, writeCommitted])
+
+  const selectColumn = useCallback(
+    (unit: TimePickerFocusUnit, option: number | 'AM' | 'PM') => {
+      if (isRangeMode) {
+        const next = applyTimePickerRangeColumn({
+          draftRange,
+          activePart,
+          column: unit,
+          option,
+          constraints
+        })
+        setDraftRange(next.nextRange)
+        setActivePart(next.nextActivePart)
+        const active = next.nextRange?.[next.nextActivePart === 'start' ? 0 : 1] ?? null
+        setDraft(seedTimePickerDraft(active, format))
         return
       }
+      setDraft(applyTimePickerColumn(draft, unit, option, constraints))
+    },
+    [activePart, constraints, draft, draftRange, format, isRangeMode]
+  )
 
-      const firstHour = panel.querySelector<HTMLButtonElement>(
-        'button[data-tiger-timepicker-unit="hour"]:not([disabled])'
+  const selectNow = useCallback(() => {
+    const result = commitTimePickerNow(isRangeMode, props.now ?? new Date(), constraints)
+    writeCommitted(result.nextCommitted)
+    seedPanel(result.nextCommitted, 'start')
+    if (result.close) setOpenSafe(false)
+  }, [constraints, isRangeMode, props.now, seedPanel, setOpenSafe, writeCommitted])
+
+  const clearValue = useCallback(() => {
+    writeCommitted(emptyTimePickerValue(isRangeMode))
+    onClear?.()
+    inputRef.current?.focus()
+  }, [isRangeMode, onClear, writeCommitted])
+
+  const parseDraftInput = useCallback(() => {
+    if (draftText == null) return
+    const parsed = parseTypedTimePickerValue(
+      draftText,
+      format,
+      showSeconds,
+      isRangeMode,
+      periodLabels
+    )
+    writeCommitted(parsed)
+  }, [draftText, format, isRangeMode, periodLabels, showSeconds, writeCommitted])
+
+  const handleFocusOut = (event: React.FocusEvent<HTMLElement>) => {
+    const next = event.relatedTarget as Node | null
+    if (
+      (rootRef.current && next && rootRef.current.contains(next)) ||
+      (panelRef.current && next && panelRef.current.contains(next))
+    ) {
+      return
+    }
+    parseDraftInput()
+    formItemControl?.onBlur?.()
+    onBlur?.(event)
+  }
+
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (effectiveDisabled || isReadOnly) return
+    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+      if (event.key === 'Enter' && draftText != null) {
+        event.preventDefault()
+        parseDraftInput()
+        return
+      }
+      if (event.key === 'Enter' && isOpen) {
+        event.preventDefault()
+        confirmDraft()
+        return
+      }
+      event.preventDefault()
+      setOpenSafe(true)
+    }
+  }
+
+  const handlePanelKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    const unit = (event.target as HTMLElement).getAttribute(
+      'data-tiger-timepicker-unit'
+    ) as TimePickerFocusUnit | null
+    if (!unit) return
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      focusTimePickerOption(panelRef.current, unit, 'prev')
+      return
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      focusTimePickerOption(panelRef.current, unit, 'next')
+      return
+    }
+    if (event.key === 'Home') {
+      event.preventDefault()
+      focusTimePickerOption(panelRef.current, unit, 'first')
+      return
+    }
+    if (event.key === 'End') {
+      event.preventDefault()
+      focusTimePickerOption(panelRef.current, unit, 'last')
+      return
+    }
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault()
+      const next = adjacentTimePickerColumn(
+        unit,
+        visibleTimePickerColumns(format, showSeconds),
+        dir,
+        event.key
       )
-      firstHour?.focus()
-    }, 0)
+      if (next) focusTimePickerOption(panelRef.current, next, 'first')
+    }
+  }
 
-    return () => window.clearTimeout(focusTimer)
-  }, [isOpen, activePart])
+  const switchPart = useCallback(
+    (part: 'start' | 'end') => {
+      setActivePart(part)
+      const active = draftRange?.[part === 'start' ? 0 : 1] ?? null
+      setDraft(seedTimePickerDraft(active, format))
+    },
+    [draftRange, format]
+  )
 
-  const inputClasses = getTimePickerInputClasses(size, disabled || readonly, showClearButton)
-  const iconButtonClasses = getTimePickerIconButtonClasses(size)
+  const columns = useMemo(
+    () =>
+      buildTimePickerColumns({
+        instanceId: panelId,
+        draft,
+        constraints,
+        labels,
+        periodLabels
+      }),
+    [constraints, draft, labels, panelId, periodLabels]
+  )
+
+  const inputClasses = getInputFieldClasses({
+    size: effectiveSize,
+    status,
+    hasSuffix: trailing.hasSuffix,
+    hasDualSuffix: trailing.hasDualSuffix
+  })
+  const wrapperClasses = getInputWrapperClasses(status, { inGroup })
 
   return {
+    rootRef,
+    inputRef,
     panelRef,
     inputWrapperRef,
-    inputRef,
     isOpen,
-    activePart,
-    setActivePart,
+    setOpenSafe,
     isRangeMode,
-    placeholder,
-    disabled,
-    readonly,
-    required,
-    name,
-    id,
-    format,
-    showSeconds,
-    locale: mergedLocale,
-    labelsOverrides,
-    containerClasses: classNames(timePickerBaseClasses, className),
-    divProps,
-    displayValue,
-    showClearButton,
-    inputClasses,
-    iconButtonClasses,
     labels,
     periodLabels,
-    hoursList,
-    minutesList,
-    secondsList,
-    selectedHours,
-    selectedMinutes,
-    selectedSeconds,
-    selectedPeriod,
-    togglePanel,
-    closePanel,
-    handleInputClick,
-    clearTime,
-    setNow,
+    mergedLocale,
+    localeCode,
+    dir,
+    format,
+    showSeconds,
+    displayValue,
+    placeholder,
+    effectiveDisabled,
+    isReadOnly,
+    required: required || Boolean(formItemControl?.required),
+    effectiveId,
+    effectiveName,
+    describedBy,
+    labelledby,
+    ariaLabel,
+    status,
+    panelId,
+    showClear,
+    trailing,
+    inputClasses,
+    wrapperClasses,
+    chromeAttr: TIGER_CHROME_ATTR,
+    shakeClass: SHAKE_CLASS,
+    className,
+    size: effectiveSize,
+    desktop,
+    columns,
+    activePart,
+    switchPart,
+    selectColumn,
+    selectNow,
+    confirmDraft,
+    clearValue,
+    handleFocusOut,
+    handleInputKeyDown,
     handlePanelKeyDown,
-    selectHour,
-    selectMinute,
-    selectSecond,
-    selectPeriod,
-    isHourDisabled,
-    isMinuteDisabled,
-    isSecondDisabled
+    onDraftChange: (text: string) => setDraftText(text),
+    parseDraftInput,
+    placement: props.placement ?? 'bottom-start',
+    offset: props.offset ?? 4,
+    dropdownClassName: props.dropdownClassName,
+    getPopupContainer: props.getPopupContainer
   }
 }

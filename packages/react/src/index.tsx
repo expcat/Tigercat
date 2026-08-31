@@ -113,7 +113,7 @@ export { DatePicker } from './components/DatePicker'
 export type { DatePickerProps, DatePickerRef } from './components/DatePicker'
 
 export { TimePicker } from './components/TimePicker'
-export type { TimePickerProps } from './components/TimePicker'
+export type { TimePickerProps, TimePickerRef } from './components/TimePicker'
 
 export { Upload } from './components/Upload'
 export type { UploadProps } from './components/Upload'

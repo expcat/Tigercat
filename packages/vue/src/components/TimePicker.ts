@@ -1,67 +1,111 @@
-import { defineComponent, computed, ref, h, nextTick, PropType, watch } from 'vue'
 import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  inject,
+  watch,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  useId,
+  type PropType,
+  type CSSProperties
+} from 'vue'
+import {
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  TIME_PICKER_DESKTOP_QUERY,
+  adjacentTimePickerColumn,
+  applyTimePickerColumn,
+  applyTimePickerRangeColumn,
+  buildTimePickerColumns,
   classNames,
+  clockSolidIcon20PathD,
+  closeSolidIcon20PathD,
   coerceClassValue,
-  mergeStyleValues,
-  parseTime,
+  coerceTimePickerRange,
+  coerceTimePickerSingle,
+  commitTimePickerNow,
+  commitTimePickerOk,
+  datePickerSheetScrimClasses,
+  emptyTimePickerValue,
+  focusTimePickerOption,
   formatTime,
-  formatTimeDisplayWithLocale,
+  formatTimePickerDisplay,
+  formTimePickerValue,
+  getInputClearButtonClasses,
+  getInputFieldClasses,
+  getInputPasswordToggleClasses,
+  getInputWrapperClasses,
+  getLocaleDirection,
   getTimePeriodLabels,
+  getTimePickerItemClasses,
   getTimePickerLabels,
-  getTimePickerOptionAriaLabel,
-  mergeTigerLocale,
-  to12HourFormat,
-  to24HourFormat,
-  isTimeInRange,
-  generateHours,
-  generateMinutes,
-  generateSeconds,
-  getCurrentTime,
-  padTwo,
-  timePickerBaseClasses,
-  timePickerInputWrapperClasses,
-  getTimePickerInputClasses,
-  getTimePickerIconButtonClasses,
-  timePickerClearButtonClasses,
-  timePickerPanelClasses,
-  timePickerDesktopPanelContentClasses,
-  timePickerMobileWheelClasses,
-  timePickerMobileWheelSelectClasses,
-  timePickerRangeHeaderClasses,
+  getTimePickerMobileSelectRowClasses,
   getTimePickerRangeTabButtonClasses,
+  icon20ViewBox,
+  isTimePickerDesktopLayout,
+  isTimePickerValueEmpty,
+  mergeAriaDescribedBy,
+  mergeStyleValues,
+  mergeTigerLocale,
+  parseTypedTimePickerValue,
+  resolveInputTrailingLayout,
+  resolveReadOnlyFlag,
+  runShakeAnimation,
+  seedTimePickerDraft,
+  timePickerBaseClasses,
   timePickerColumnClasses,
   timePickerColumnHeaderClasses,
   timePickerColumnListClasses,
-  getTimePickerItemClasses,
-  getTimePickerPeriodButtonClasses,
-  timePickerFooterClasses,
+  timePickerDesktopColumnsClasses,
   timePickerFooterButtonClasses,
-  focusTimePickerOption,
-  clockSolidIcon20PathD,
-  closeSolidIcon20PathD,
-  type TimePickerModelValue,
-  type TimePickerLabels,
+  timePickerFooterClasses,
+  timePickerMobileSelectClasses,
+  timePickerPanelClasses,
+  timePickerRangeHeaderClasses,
+  visibleTimePickerColumns,
   type ComponentSize,
+  type FloatingPlacement,
+  type InputStatus,
   type TimeFormat,
+  type TimePickerConstraints,
+  type TimePickerDraft,
+  type TimePickerFocusUnit,
+  type TimePickerLabels,
+  type TimePickerModelValue,
+  type TimePickerRangeTuple,
   type TigerLocale
 } from '@expcat/tigercat-core'
-
-import { createFilledIcon } from '../utils/icon-helpers'
 import { useTigerConfig } from './ConfigProvider'
-import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay, useVueFocusTrap } from '../utils/overlay'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
-// Icons
-const ClockIcon = createFilledIcon(clockSolidIcon20PathD, 'w-5 h-5')
-const CloseIcon = createFilledIcon(closeSolidIcon20PathD, 'w-4 h-4')
-
-export type VueTimePickerModelValue = TimePickerModelValue
-type TimePickerRangeInputValue = [string | null, string | null]
+function filledIcon(path: string, className: string) {
+  return h(
+    'svg',
+    {
+      class: className,
+      xmlns: 'http://www.w3.org/2000/svg',
+      viewBox: icon20ViewBox,
+      fill: 'currentColor',
+      'aria-hidden': 'true',
+      focusable: 'false'
+    },
+    [h('path', { 'fill-rule': 'evenodd', d: path, 'clip-rule': 'evenodd' })]
+  )
+}
 
 export interface VueTimePickerProps {
-  modelValue?: VueTimePickerModelValue
-  locale?: string | Partial<TigerLocale>
-  labels?: Partial<TimePickerLabels>
   range?: boolean
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TimePickerLabels>
+  modelValue?: TimePickerModelValue | null
+  defaultValue?: TimePickerModelValue | null
+  open?: boolean
+  defaultOpen?: boolean
   size?: ComponentSize
   format?: TimeFormat
   showSeconds?: boolean
@@ -74,904 +118,652 @@ export interface VueTimePickerProps {
   required?: boolean
   minTime?: string | null
   maxTime?: string | null
+  disabledTime?: (time: string) => boolean
+  now?: Date
   clearable?: boolean
   name?: string
   id?: string
+  status?: InputStatus
+  placement?: FloatingPlacement
+  offset?: number
+  dropdownClassName?: string
+  getPopupContainer?: () => HTMLElement | null
   className?: string
-  style?: Record<string, string | number>
 }
+
+export type TimePickerProps = VueTimePickerProps
+export type VueTimePickerModelValue = TimePickerModelValue
 
 export const TimePicker = defineComponent({
   name: 'TigerTimePicker',
   inheritAttrs: false,
   props: {
-    /**
-     * Selected time value (for v-model)
-     */
+    range: { type: Boolean, default: false },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TimePickerLabels>>, default: undefined },
     modelValue: {
-      type: [String, Array, null] as PropType<string | null | [string | null, string | null]>,
+      type: [String, Array, null] as PropType<TimePickerModelValue | null>,
       default: undefined
     },
-
-    /**
-     * Locale used for UI labels and display formatting.
-     */
-    locale: {
-      type: [String, Object] as PropType<string | Partial<TigerLocale>>,
+    defaultValue: {
+      type: [String, Array, null] as PropType<TimePickerModelValue | null>,
       default: undefined
     },
-
-    /**
-     * UI labels for i18n.
-     * When provided, merges with locale-based defaults.
-     */
-    labels: {
-      type: Object as PropType<Partial<TimePickerLabels>>,
-      default: undefined
-    },
-
-    /**
-     * Enable range selection (start/end).
-     */
-    range: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Time picker size
-     * @default 'md'
-     */
-    size: {
-      type: String as PropType<ComponentSize>,
-      default: 'md' as ComponentSize
-    },
-    /**
-     * Time format (12-hour or 24-hour)
-     * @default '24'
-     */
-    format: {
-      type: String as PropType<TimeFormat>,
-      default: '24' as TimeFormat
-    },
-    /**
-     * Show seconds selector
-     * @default false
-     */
-    showSeconds: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Step size for hours
-     * @default 1
-     */
-    hourStep: {
-      type: Number,
-      default: 1
-    },
-    /**
-     * Step size for minutes
-     * @default 1
-     */
-    minuteStep: {
-      type: Number,
-      default: 1
-    },
-    /**
-     * Step size for seconds
-     * @default 1
-     */
-    secondStep: {
-      type: Number,
-      default: 1
-    },
-    /**
-     * Placeholder text
-     */
-    placeholder: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Whether the time picker is disabled
-     * @default false
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Whether the time picker is readonly
-     * @default false
-     */
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Whether the time picker is required
-     * @default false
-     */
-    required: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Minimum selectable time
-     */
-    minTime: {
-      type: [String, null] as PropType<string | null>,
-      default: null
-    },
-    /**
-     * Maximum selectable time
-     */
-    maxTime: {
-      type: [String, null] as PropType<string | null>,
-      default: null
-    },
-    /**
-     * Show clear button
-     * @default true
-     */
-    clearable: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Input name attribute
-     */
-    name: {
-      type: String
-    },
-    /**
-     * Input id attribute
-     */
-    id: {
-      type: String
-    },
-
-    className: {
-      type: String,
-      default: undefined
-    },
-
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
+    open: { type: Boolean, default: undefined },
+    defaultOpen: { type: Boolean, default: false },
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
+    format: { type: String as PropType<TimeFormat>, default: '24' },
+    showSeconds: Boolean,
+    hourStep: { type: Number, default: 1 },
+    minuteStep: { type: Number, default: 1 },
+    secondStep: { type: Number, default: 1 },
+    placeholder: { type: String, default: undefined },
+    disabled: Boolean,
+    readonly: { type: Boolean, default: undefined },
+    required: Boolean,
+    minTime: { type: String as PropType<string | null>, default: undefined },
+    maxTime: { type: String as PropType<string | null>, default: undefined },
+    disabledTime: { type: Function as PropType<(time: string) => boolean>, default: undefined },
+    now: { type: Date as PropType<Date>, default: undefined },
+    clearable: { type: Boolean, default: true },
+    name: String,
+    id: String,
+    status: { type: String as PropType<InputStatus>, default: undefined },
+    placement: { type: String as PropType<FloatingPlacement>, default: 'bottom-start' },
+    offset: { type: Number, default: 4 },
+    dropdownClassName: String,
+    getPopupContainer: { type: Function as PropType<() => HTMLElement | null> },
+    className: String
   },
-  emits: {
-    /**
-     * Emitted when time changes (for v-model)
-     */
-    'update:modelValue': (value: TimePickerModelValue) =>
-      value === null || typeof value === 'string' || (Array.isArray(value) && value.length === 2),
-    /**
-     * Emitted when time changes
-     */
-    change: (value: TimePickerModelValue) =>
-      value === null || typeof value === 'string' || (Array.isArray(value) && value.length === 2),
-    /**
-     * Emitted when clear button is clicked
-     */
-    clear: () => true
-  },
-  setup(props, { emit, attrs }) {
+  emits: ['update:modelValue', 'update:open', 'change', 'input', 'open-change', 'clear', 'blur'],
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
-    const isOpen = ref(false)
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const localeCode = computed(() => mergedLocale.value?.locale)
+    const labels = computed(() => getTimePickerLabels(mergedLocale.value, props.labels))
+    const periodLabels = computed(() => getTimePeriodLabels(localeCode.value))
+    const dir = computed(() => getLocaleDirection(mergedLocale.value))
+    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly))
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
+    const inGroup = computed(() => inputGroup != null)
+    const effectiveSize = computed(() => props.size ?? inputGroup?.size ?? 'md')
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const required = computed(() => props.required || Boolean(formItemControl?.required.value))
+
+    const localValue = ref<string | null | TimePickerRangeTuple>(
+      props.range
+        ? coerceTimePickerRange(props.defaultValue)
+        : coerceTimePickerSingle(props.defaultValue)
+    )
+    const localOpen = ref(props.defaultOpen)
+    const draft = ref<TimePickerDraft>(seedTimePickerDraft(null, props.format))
+    const draftRange = ref<TimePickerRangeTuple | null>(null)
+    const activePart = ref<'start' | 'end'>('start')
+    const draftText = ref<string | null>(null)
+    const desktop = ref(isTimePickerDesktopLayout())
+
+    const committed = computed(() => {
+      if (props.modelValue !== undefined) {
+        return props.range
+          ? coerceTimePickerRange(props.modelValue)
+          : coerceTimePickerSingle(props.modelValue)
+      }
+      if (formItemControl?.value.value !== undefined) {
+        return props.range
+          ? coerceTimePickerRange(formItemControl.value.value)
+          : coerceTimePickerSingle(formItemControl.value.value)
+      }
+      return localValue.value
+    })
+    const isOpen = computed(() => (props.open !== undefined ? props.open : localOpen.value))
+
+    const constraints = computed<TimePickerConstraints>(() => ({
+      minTime: props.minTime,
+      maxTime: props.maxTime,
+      disabledTime: props.disabledTime,
+      hourStep: props.hourStep,
+      minuteStep: props.minuteStep,
+      secondStep: props.secondStep,
+      format: props.format,
+      showSeconds: props.showSeconds
+    }))
+
+    function writeCommitted(next: string | null | TimePickerRangeTuple) {
+      if (props.modelValue === undefined && formItemControl?.value.value === undefined) {
+        localValue.value = next
+      }
+      emit('update:modelValue', next)
+      emit('change', next)
+      emit('input', next)
+      formItemControl?.onChange(formTimePickerValue(props.range, next))
+      draftText.value = null
+    }
+
+    function seedPanel(value: string | null | TimePickerRangeTuple, part: 'start' | 'end') {
+      if (props.range) {
+        const tuple = (value as TimePickerRangeTuple | null) ?? null
+        draftRange.value = tuple
+        const active = tuple?.[part === 'start' ? 0 : 1] ?? null
+        draft.value = seedTimePickerDraft(active, props.format)
+        return
+      }
+      draft.value = seedTimePickerDraft(value as string | null, props.format)
+    }
+
+    function setOpenSafe(next: boolean) {
+      if (effectiveDisabled.value || isReadOnly.value) return
+      if (props.open === undefined) localOpen.value = next
+      emit('update:open', next)
+      emit('open-change', next)
+      if (!next) draftText.value = null
+    }
+
+    const displaySource = computed(() => {
+      if (!isOpen.value) return committed.value
+      if (props.range) return draftRange.value
+      return draft.value.parts
+        ? formatTime(
+            draft.value.parts.hours,
+            draft.value.parts.minutes,
+            draft.value.parts.seconds,
+            props.showSeconds
+          )
+        : null
+    })
+    const displayValue = computed(
+      () =>
+        draftText.value ??
+        formatTimePickerDisplay(
+          props.range,
+          displaySource.value,
+          props.format,
+          props.showSeconds,
+          localeCode.value
+        )
+    )
+    const placeholderText = computed(
+      () =>
+        props.placeholder ?? (props.range ? labels.value.selectTimeRange : labels.value.selectTime)
+    )
+    const showClear = computed(
+      () =>
+        props.clearable &&
+        !effectiveDisabled.value &&
+        !isReadOnly.value &&
+        !isTimePickerValueEmpty(props.range, committed.value)
+    )
+    const trailing = computed(() =>
+      resolveInputTrailingLayout({
+        clearable: props.clearable,
+        disabled: effectiveDisabled.value,
+        readOnly: isReadOnly.value,
+        valueLength: showClear.value ? 1 : 0,
+        hasCustomSuffix: true
+      })
+    )
+    const columns = computed(() =>
+      buildTimePickerColumns({
+        instanceId: panelId.value,
+        draft: draft.value,
+        constraints: constraints.value,
+        labels: labels.value,
+        periodLabels: periodLabels.value
+      })
+    )
+
+    const rootRef = ref<HTMLElement | null>(null)
+    const inputRef = ref<HTMLInputElement | null>(null)
     const panelRef = ref<HTMLElement | null>(null)
     const inputWrapperRef = ref<HTMLElement | null>(null)
-    const inputRef = ref<HTMLInputElement | null>(null)
+    const instanceId = useId()
+    const panelId = computed(() => `tiger-timepicker-panel-${instanceId}`)
+
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      () => {
+        if (status.value === 'error') runShakeAnimation(rootRef.value)
+      }
+    )
+
     const overlay = useVueAnchoredOverlay({
       enabled: isOpen,
       referenceRef: inputWrapperRef,
       floatingRef: panelRef,
-      placement: 'bottom-start',
-      offset: 4,
+      placement: () => props.placement ?? 'bottom-start',
+      offset: () => props.offset ?? 4,
       layout: 'bottom-sheet-sm',
       dismissOnOutside: true,
       dismissOnEscape: true,
-      onDismiss: closePanel
+      restoreFocusOnDismiss: true,
+      getContainer: () => props.getPopupContainer?.() ?? null,
+      onDismiss: () => setOpenSafe(false)
     })
+    useVueFocusTrap({ enabled: isOpen, containerRef: panelRef, inert: true })
 
-    const isRangeMode = computed(() => props.range === true)
-    const activePart = ref<'start' | 'end'>('start')
-    const isControlled = computed(() => props.modelValue !== undefined)
-    const innerValue = ref<VueTimePickerModelValue | undefined>(undefined)
+    function focusPanel() {
+      const panel = panelRef.value
+      if (!panel) return
+      if (desktop.value) {
+        const selected = panel.querySelector<HTMLElement>(
+          '[data-tiger-timepicker-unit="hour"][aria-selected="true"]'
+        )
+        const first = panel.querySelector<HTMLElement>(
+          '[data-tiger-timepicker-unit="hour"]:not([aria-disabled="true"])'
+        )
+        ;(selected ?? first)?.focus()
+        panel.querySelectorAll('[aria-selected="true"]').forEach((node) => {
+          ;(node as HTMLElement).scrollIntoView({ block: 'nearest' })
+        })
+        return
+      }
+      panel.querySelector('select')?.focus()
+    }
 
     watch(
-      () => props.modelValue,
-      (next) => {
-        if (next !== undefined) innerValue.value = next
-      }
+      isOpen,
+      (open) => {
+        if (!open) return
+        activePart.value = 'start'
+        seedPanel(committed.value, 'start')
+        nextTick(focusPanel)
+      },
+      { immediate: true }
     )
+    watch(activePart, () => {
+      if (isOpen.value) nextTick(focusPanel)
+    })
 
-    const currentModel = computed(() => (isControlled.value ? props.modelValue : innerValue.value))
+    let media: MediaQueryList | null = null
+    const syncDesktop = () => {
+      desktop.value = isTimePickerDesktopLayout()
+    }
+    onMounted(() => {
+      syncDesktop()
+      if (typeof window.matchMedia !== 'function') return
+      media = window.matchMedia(TIME_PICKER_DESKTOP_QUERY)
+      media.addEventListener('change', syncDesktop)
+    })
+    onUnmounted(() => {
+      media?.removeEventListener('change', syncDesktop)
+    })
 
-    const commitValue = (value: TimePickerModelValue) => {
-      if (!isControlled.value) innerValue.value = value
-      emit('update:modelValue', value)
-      emit('change', value)
+    function selectColumn(unit: TimePickerFocusUnit, option: number | 'AM' | 'PM') {
+      if (props.range) {
+        const next = applyTimePickerRangeColumn({
+          draftRange: draftRange.value,
+          activePart: activePart.value,
+          column: unit,
+          option,
+          constraints: constraints.value
+        })
+        draftRange.value = next.nextRange
+        activePart.value = next.nextActivePart
+        const active = next.nextRange?.[next.nextActivePart === 'start' ? 0 : 1] ?? null
+        draft.value = seedTimePickerDraft(active, props.format)
+        return
+      }
+      draft.value = applyTimePickerColumn(draft.value, unit, option, constraints.value)
     }
 
-    const normalizeRangeValue = (value: unknown): TimePickerRangeInputValue => {
-      if (Array.isArray(value)) return [value[0] ?? null, value[1] ?? null]
-      return [null, null]
+    function confirmDraft() {
+      const result = commitTimePickerOk({
+        range: props.range,
+        draft: draft.value,
+        draftRange: draftRange.value,
+        constraints: constraints.value
+      })
+      if (!result) {
+        setOpenSafe(false)
+        return
+      }
+      writeCommitted(result.nextCommitted)
+      if (result.close) setOpenSafe(false)
     }
 
-    const currentRangeValue = computed<TimePickerRangeInputValue>(() => {
-      if (!isRangeMode.value) return [null, null]
-      return normalizeRangeValue(currentModel.value)
-    })
-
-    const currentSingleValue = computed<string | null>(() => {
-      if (isRangeMode.value) return null
-      return typeof currentModel.value === 'string' || currentModel.value === null
-        ? currentModel.value
-        : null
-    })
-
-    const activeValue = computed<string | null>(() => {
-      if (!isRangeMode.value) return currentSingleValue.value
-      return currentRangeValue.value[activePart.value === 'start' ? 0 : 1]
-    })
-
-    const parsedTime = computed(() => parseTime(activeValue.value))
-
-    // Internal state for time selection
-    const selectedHours = ref<number>(parsedTime.value?.hours ?? 0)
-    const selectedMinutes = ref<number>(parsedTime.value?.minutes ?? 0)
-    const selectedSeconds = ref<number>(parsedTime.value?.seconds ?? 0)
-    const selectedPeriod = ref<'AM' | 'PM'>('AM')
-
-    const syncSelectionFromActiveValue = () => {
-      const parsed = parseTime(activeValue.value)
-      if (!parsed) return
-
-      selectedHours.value = parsed.hours
-      selectedMinutes.value = parsed.minutes
-      selectedSeconds.value = parsed.seconds
-
-      if (props.format === '12') {
-        const { period } = to12HourFormat(parsed.hours)
-        selectedPeriod.value = period
-      }
+    function selectNow() {
+      const result = commitTimePickerNow(props.range, props.now ?? new Date(), constraints.value)
+      writeCommitted(result.nextCommitted)
+      seedPanel(result.nextCommitted, 'start')
+      if (result.close) setOpenSafe(false)
     }
 
-    watch(() => [activeValue.value, props.format] as const, syncSelectionFromActiveValue, {
-      immediate: true
-    })
-
-    const localeOverride = computed(() =>
-      typeof props.locale === 'string' ? { locale: props.locale } : props.locale
-    )
-    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, localeOverride.value))
-    const localeCode = computed(() => mergedLocale.value?.locale)
-
-    const labels = computed(() => getTimePickerLabels(mergedLocale.value, props.labels))
-
-    const computedPlaceholder = computed(
-      () =>
-        props.placeholder ??
-        (isRangeMode.value ? labels.value.selectTimeRange : labels.value.selectTime)
-    )
-
-    const periodLabels = computed(() => getTimePeriodLabels(localeCode.value))
-
-    const rootClasses = computed(() =>
-      classNames(timePickerBaseClasses, props.className, coerceClassValue(attrs.class))
-    )
-
-    const rootStyle = computed(() => mergeStyleValues(attrs.style, props.style))
-
-    const displayValue = computed(() => {
-      if (!isRangeMode.value) {
-        if (!parsedTime.value) return ''
-        return formatTimeDisplayWithLocale(
-          parsedTime.value.hours,
-          parsedTime.value.minutes,
-          parsedTime.value.seconds,
-          props.format,
-          props.showSeconds,
-          localeCode.value
-        )
-      }
-
-      const toDisplay = (timeStr: string | null): string => {
-        const parsed = parseTime(timeStr)
-        if (!parsed) return ''
-        return formatTimeDisplayWithLocale(
-          parsed.hours,
-          parsed.minutes,
-          parsed.seconds,
-          props.format,
-          props.showSeconds,
-          localeCode.value
-        )
-      }
-
-      const start = toDisplay(currentRangeValue.value[0])
-      const end = toDisplay(currentRangeValue.value[1])
-      if (!start && !end) return ''
-      return `${start} - ${end}`
-    })
-
-    const showClearButton = computed(() => {
-      if (!props.clearable || props.disabled || props.readonly) return false
-      if (!isRangeMode.value) return currentSingleValue.value !== null
-      return currentRangeValue.value[0] !== null || currentRangeValue.value[1] !== null
-    })
-
-    const hoursList = computed(() => generateHours(props.hourStep, props.format))
-    const minutesList = computed(() => generateMinutes(props.minuteStep))
-    const secondsList = computed(() => generateSeconds(props.secondStep))
-
-    function togglePanel() {
-      if (!props.disabled && !props.readonly) {
-        isOpen.value = !isOpen.value
-        if (isOpen.value) {
-          syncSelectionFromActiveValue()
-        }
-      }
-    }
-
-    function closePanel() {
-      isOpen.value = false
+    function clearValue() {
+      writeCommitted(emptyTimePickerValue(props.range))
+      emit('clear')
       inputRef.value?.focus()
     }
 
-    function focusOptionInUnit(
-      unit: 'hour' | 'minute' | 'second' | 'period',
-      action: 'prev' | 'next' | 'first' | 'last'
-    ) {
-      focusTimePickerOption(panelRef.value, unit, action)
+    function parseDraft() {
+      if (draftText.value == null) return
+      const parsed = parseTypedTimePickerValue(
+        draftText.value,
+        props.format,
+        props.showSeconds,
+        props.range,
+        periodLabels.value
+      )
+      writeCommitted(parsed)
     }
 
-    function handlePanelKeydown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        closePanel()
-        return
-      }
-
-      const active = document.activeElement as HTMLElement | null
-      const unit = active?.getAttribute('data-tiger-timepicker-unit') as
-        'hour' | 'minute' | 'second' | 'period' | null
-
-      if (!unit) return
-
-      if (event.key === 'ArrowUp') {
-        event.preventDefault()
-        focusOptionInUnit(unit, 'prev')
-        return
-      }
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault()
-        focusOptionInUnit(unit, 'next')
-        return
-      }
-
-      if (event.key === 'Home') {
-        event.preventDefault()
-        focusOptionInUnit(unit, 'first')
-        return
-      }
-
-      if (event.key === 'End') {
-        event.preventDefault()
-        focusOptionInUnit(unit, 'last')
-        return
-      }
-
-      if (event.key === 'Enter' || event.key === ' ') {
-        const el = document.activeElement as HTMLButtonElement | null
-        if (el && el.tagName === 'BUTTON' && !el.disabled) {
-          event.preventDefault()
-          el.click()
-        }
-      }
-    }
-
-    function selectHour(hour: number) {
-      if (props.format === '12') {
-        selectedHours.value = to24HourFormat(hour, selectedPeriod.value)
-      } else {
-        selectedHours.value = hour
-      }
-      updateTime()
-    }
-
-    function selectMinute(minute: number) {
-      selectedMinutes.value = minute
-      updateTime()
-    }
-
-    function selectSecond(second: number) {
-      selectedSeconds.value = second
-      updateTime()
-    }
-
-    function selectPeriod(period: 'AM' | 'PM') {
-      selectedPeriod.value = period
-      // Convert current hour to 12-hour format, then back to 24-hour with new period
-      const { hours: hours12 } = to12HourFormat(selectedHours.value)
-      selectedHours.value = to24HourFormat(hours12, period)
-      updateTime()
-    }
-
-    function updateTime() {
+    function handleFocusOut(event: FocusEvent) {
+      const next = event.relatedTarget as Node | null
       if (
-        !isTimeInRange(
-          selectedHours.value,
-          selectedMinutes.value,
-          props.minTime,
-          props.maxTime,
-          selectedSeconds.value
-        )
+        (rootRef.value && next && rootRef.value.contains(next)) ||
+        (panelRef.value && next && panelRef.value.contains(next))
       ) {
         return
       }
+      parseDraft()
+      formItemControl?.onBlur()
+      emit('blur', event)
+    }
 
-      let timeString = formatTime(
-        selectedHours.value,
-        selectedMinutes.value,
-        selectedSeconds.value,
-        props.showSeconds
-      )
-
-      if (!isRangeMode.value) {
-        commitValue(timeString)
+    function handleInputKeyDown(event: KeyboardEvent) {
+      if (effectiveDisabled.value || isReadOnly.value) return
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        setOpenSafe(true)
         return
       }
-
-      const nextRange: [string | null, string | null] = [...currentRangeValue.value]
-      const index = activePart.value === 'start' ? 0 : 1
-
-      const parsedStart = parseTime(currentRangeValue.value[0])
-      const parsedEnd = parseTime(currentRangeValue.value[1])
-      const candidateSeconds =
-        selectedHours.value * 3600 + selectedMinutes.value * 60 + selectedSeconds.value
-      const startSeconds = parsedStart
-        ? parsedStart.hours * 3600 + parsedStart.minutes * 60 + parsedStart.seconds
-        : null
-      const endSeconds = parsedEnd
-        ? parsedEnd.hours * 3600 + parsedEnd.minutes * 60 + parsedEnd.seconds
-        : null
-
-      // Keep range ordered: end should never be earlier than start.
-      // If user selects an out-of-order time, clamp the opposite side to match.
-      if (activePart.value === 'end' && parsedStart && startSeconds !== null) {
-        if (candidateSeconds < startSeconds) {
-          timeString = formatTime(
-            parsedStart.hours,
-            parsedStart.minutes,
-            parsedStart.seconds,
-            props.showSeconds
-          )
-          selectedHours.value = parsedStart.hours
-          selectedMinutes.value = parsedStart.minutes
-          selectedSeconds.value = parsedStart.seconds
-
-          if (props.format === '12') {
-            const { period } = to12HourFormat(parsedStart.hours)
-            selectedPeriod.value = period
-          }
-        }
-      }
-
-      nextRange[index] = timeString
-
-      if (activePart.value === 'start' && endSeconds !== null && candidateSeconds > endSeconds) {
-        nextRange[1] = timeString
-      }
-      commitValue(nextRange)
-
-      if (activePart.value === 'start' && nextRange[1] === null) {
-        activePart.value = 'end'
-      }
-    }
-
-    function clearTime(event: Event) {
-      event.stopPropagation()
-
-      if (!isRangeMode.value) {
-        commitValue(null)
-        emit('clear')
-        return
-      }
-
-      const cleared: [string | null, string | null] = [null, null]
-      commitValue(cleared)
-      emit('clear')
-    }
-
-    function setNow() {
-      const now = getCurrentTime(props.showSeconds)
-      const parsed = parseTime(now)
-      if (parsed) {
-        selectedHours.value = parsed.hours
-        selectedMinutes.value = parsed.minutes
-        selectedSeconds.value = parsed.seconds
-
-        if (props.format === '12') {
-          const { period } = to12HourFormat(parsed.hours)
-          selectedPeriod.value = period
-        }
-
-        updateTime()
-      }
-    }
-
-    function isHourDisabled(hour: number): boolean {
-      const hours24 = props.format === '12' ? to24HourFormat(hour, selectedPeriod.value) : hour
-      return !isTimeInRange(
-        hours24,
-        selectedMinutes.value,
-        props.minTime,
-        props.maxTime,
-        selectedSeconds.value
-      )
-    }
-
-    function isMinuteDisabled(minute: number): boolean {
-      return !isTimeInRange(
-        selectedHours.value,
-        minute,
-        props.minTime,
-        props.maxTime,
-        selectedSeconds.value
-      )
-    }
-
-    function isSecondDisabled(second: number): boolean {
-      return !isTimeInRange(
-        selectedHours.value,
-        selectedMinutes.value,
-        props.minTime,
-        props.maxTime,
-        second
-      )
-    }
-
-    function handleInputClick() {
-      togglePanel()
-    }
-
-    watch(isOpen, async (newValue) => {
-      if (newValue) {
-        await nextTick()
-        const panel = panelRef.value
-        if (!panel) return
-
-        const selectedHour = panel.querySelector(
-          'button[data-tiger-timepicker-unit="hour"][aria-selected="true"]:not([disabled])'
-        ) as HTMLButtonElement | null
-
-        if (selectedHour) {
-          selectedHour.focus()
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        if (draftText.value != null) {
+          parseDraft()
           return
         }
-
-        const firstHour = panel.querySelector(
-          'button[data-tiger-timepicker-unit="hour"]:not([disabled])'
-        ) as HTMLButtonElement | null
-
-        firstHour?.focus()
+        if (isOpen.value) {
+          confirmDraft()
+          return
+        }
+        setOpenSafe(true)
       }
+    }
+
+    function handlePanelKeyDown(event: KeyboardEvent) {
+      const unit = (event.target as HTMLElement).getAttribute(
+        'data-tiger-timepicker-unit'
+      ) as TimePickerFocusUnit | null
+      if (!unit) return
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        focusTimePickerOption(panelRef.value, unit, 'prev')
+        return
+      }
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        focusTimePickerOption(panelRef.value, unit, 'next')
+        return
+      }
+      if (event.key === 'Home') {
+        event.preventDefault()
+        focusTimePickerOption(panelRef.value, unit, 'first')
+        return
+      }
+      if (event.key === 'End') {
+        event.preventDefault()
+        focusTimePickerOption(panelRef.value, unit, 'last')
+        return
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        const next = adjacentTimePickerColumn(
+          unit,
+          visibleTimePickerColumns(props.format, props.showSeconds),
+          dir.value,
+          event.key
+        )
+        if (next) focusTimePickerOption(panelRef.value, next, 'first')
+      }
+    }
+
+    function switchPart(part: 'start' | 'end') {
+      activePart.value = part
+      const active = draftRange.value?.[part === 'start' ? 0 : 1] ?? null
+      draft.value = seedTimePickerDraft(active, props.format)
+    }
+
+    expose({
+      focus: () => inputRef.value?.focus(),
+      open: () => setOpenSafe(true),
+      close: () => setOpenSafe(false)
     })
 
     return () => {
-      const inputClasses = getTimePickerInputClasses(
-        props.size,
-        props.disabled || props.readonly,
-        showClearButton.value
+      const attrRecord = attrs as Record<string, unknown>
+      const describedBy = mergeAriaDescribedBy(
+        typeof attrRecord['aria-describedby'] === 'string'
+          ? (attrRecord['aria-describedby'] as string)
+          : undefined,
+        formItemControl?.describedBy.value
       )
-      const iconButtonClasses = getTimePickerIconButtonClasses(props.size)
+      const labelledby =
+        typeof attrRecord['aria-labelledby'] === 'string' &&
+        (attrRecord['aria-labelledby'] as string).trim()
+          ? (attrRecord['aria-labelledby'] as string)
+          : formItemControl?.labelId.value
+      const ariaLabel =
+        typeof attrRecord['aria-label'] === 'string' && (attrRecord['aria-label'] as string).trim()
+          ? (attrRecord['aria-label'] as string)
+          : undefined
+      const trailingLayout = trailing.value
+      const input = h('input', {
+        ref: inputRef,
+        type: 'text',
+        class: getInputFieldClasses({
+          size: effectiveSize.value,
+          status: status.value,
+          hasSuffix: trailingLayout.hasSuffix,
+          hasDualSuffix: trailingLayout.hasDualSuffix
+        }),
+        value: displayValue.value,
+        placeholder: placeholderText.value,
+        disabled: effectiveDisabled.value,
+        readonly: isReadOnly.value,
+        required: required.value,
+        name: effectiveName.value,
+        id: effectiveId.value,
+        autocomplete: 'off',
+        'aria-label': ariaLabel ?? (labelledby ? undefined : placeholderText.value),
+        'aria-labelledby': labelledby,
+        'aria-describedby': describedBy,
+        'aria-invalid': status.value === 'error' ? true : undefined,
+        'aria-required': required.value ? true : undefined,
+        'aria-controls': isOpen.value ? panelId.value : undefined,
+        onInput: (event: Event) => {
+          draftText.value = (event.target as HTMLInputElement).value
+        },
+        onClick: () => setOpenSafe(true),
+        onKeydown: handleInputKeyDown,
+        onBlur: parseDraft
+      })
+      const clearBtn = showClear.value
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: getInputClearButtonClasses(effectiveSize.value, {
+                offsetSlots: trailingLayout.clearOffsetSlots
+              }),
+              'aria-label': labels.value.clear,
+              onMousedown: (event: MouseEvent) => event.preventDefault(),
+              onClick: clearValue
+            },
+            [filledIcon(closeSolidIcon20PathD, 'w-4 h-4')]
+          )
+        : null
+      const clockBtn = h(
+        'button',
+        {
+          type: 'button',
+          class: getInputPasswordToggleClasses(effectiveSize.value, { offsetSlots: 0 }),
+          disabled: effectiveDisabled.value || isReadOnly.value,
+          'aria-label': labels.value.toggle,
+          onMousedown: (event: MouseEvent) => event.preventDefault(),
+          onClick: () => setOpenSafe(!isOpen.value)
+        },
+        [filledIcon(clockSolidIcon20PathD, 'w-5 h-5')]
+      )
 
-      return h('div', { ...attrs, class: rootClasses.value, style: rootStyle.value }, [
-        // Input wrapper
-        h(
-          'div',
-          {
-            ref: inputWrapperRef,
-            class: timePickerInputWrapperClasses
-          },
-          [
-            // Input field for time display
-            h('input', {
-              ref: inputRef,
-              type: 'text',
-              class: inputClasses,
-              value: displayValue.value,
-              placeholder: computedPlaceholder.value,
-              disabled: props.disabled,
-              readonly: true,
-              required: props.required,
-              name: props.name,
-              id: props.id,
-              onClick: handleInputClick,
-              'aria-label': computedPlaceholder.value
-            }),
-            // Clear button
-            showClearButton.value &&
-              h(
-                'button',
+      const columnTree = desktop.value
+        ? h(
+            'div',
+            { class: timePickerDesktopColumnsClasses },
+            columns.value.map((column) => {
+              const active =
+                column.options.find((option) => option.selected) ??
+                column.options.find((option) => !option.disabled)
+              return h('div', { class: timePickerColumnClasses, key: column.unit }, [
+                h(
+                  'div',
+                  { id: column.headerId, class: timePickerColumnHeaderClasses },
+                  column.label
+                ),
+                h(
+                  'div',
+                  {
+                    id: column.listId,
+                    role: 'listbox',
+                    'aria-labelledby': column.headerId,
+                    'aria-activedescendant': active
+                      ? `${column.listId}-${String(active.value)}`
+                      : undefined,
+                    class: timePickerColumnListClasses,
+                    onKeydown: handlePanelKeyDown
+                  },
+                  column.options.map((option) => {
+                    const selected = option.selected
+                    const tabIndex = option.disabled ? -1 : selected || option === active ? 0 : -1
+                    return h(
+                      'div',
+                      {
+                        key: String(option.value),
+                        id: `${column.listId}-${String(option.value)}`,
+                        role: 'option',
+                        tabindex: tabIndex,
+                        'aria-selected': selected,
+                        'aria-disabled': option.disabled || undefined,
+                        'aria-label': option.ariaLabel,
+                        'data-tiger-timepicker-unit': column.unit,
+                        class: getTimePickerItemClasses(selected, option.disabled),
+                        onClick: () => {
+                          if (!option.disabled) selectColumn(column.unit, option.value)
+                        }
+                      },
+                      option.label
+                    )
+                  })
+                )
+              ])
+            })
+          )
+        : h(
+            'div',
+            { class: getTimePickerMobileSelectRowClasses(columns.value.length as 2 | 3 | 4) },
+            columns.value.map((column) => {
+              const selected = column.options.find((option) => option.selected)
+              return h(
+                'select',
                 {
-                  type: 'button',
-                  class: timePickerClearButtonClasses,
-                  onClick: clearTime,
-                  'aria-label': labels.value.clear
+                  key: column.unit,
+                  class: timePickerMobileSelectClasses,
+                  'aria-label': column.label,
+                  value: selected ? String(selected.value) : '',
+                  onChange: (event: Event) => {
+                    const raw = (event.target as HTMLSelectElement).value
+                    const option = column.unit === 'period' ? (raw as 'AM' | 'PM') : Number(raw)
+                    selectColumn(column.unit, option)
+                  }
                 },
-                CloseIcon
-              ),
-            // Clock icon button
-            h(
-              'button',
-              {
-                type: 'button',
-                class: iconButtonClasses,
-                disabled: props.disabled || props.readonly,
-                onClick: togglePanel,
-                'aria-label': labels.value.toggle
-              },
-              ClockIcon
-            )
-          ]
-        ),
-        // Time picker panel
-        isOpen.value &&
-          renderVueOverlayTeleport(
+                [
+                  selected ? null : h('option', { value: '', disabled: true }),
+                  ...column.options.map((option) =>
+                    h(
+                      'option',
+                      {
+                        value: String(option.value),
+                        disabled: option.disabled
+                      },
+                      option.label
+                    )
+                  )
+                ]
+              )
+            })
+          )
+
+      const panel = isOpen.value
+        ? [
+            h('button', {
+              type: 'button',
+              class: datePickerSheetScrimClasses,
+              tabindex: -1,
+              'aria-hidden': 'true',
+              onClick: () => setOpenSafe(false)
+            }),
             h(
               'div',
               {
                 ref: panelRef,
-                class: classNames(timePickerPanelClasses, overlay.floatingClasses.value),
+                id: panelId.value,
+                role: 'dialog',
+                'aria-modal': 'true',
+                'aria-label': labels.value.dialog,
+                class: classNames(
+                  timePickerPanelClasses,
+                  overlay.floatingClasses.value,
+                  props.dropdownClassName
+                ),
                 style: overlay.floatingStyles.value,
                 'data-positioned': overlay.positioned.value,
-                role: 'dialog',
-                'aria-label': labels.value.dialog,
-                onKeydown: handlePanelKeydown
+                'data-tiger': 'timepicker-panel',
+                onFocusout: handleFocusOut
               },
               [
-                // Range header
-                isRangeMode.value &&
-                  h('div', { class: timePickerRangeHeaderClasses }, [
-                    h(
-                      'button',
-                      {
-                        type: 'button',
-                        class: getTimePickerRangeTabButtonClasses(activePart.value === 'start'),
-                        onClick: () => (activePart.value = 'start'),
-                        'aria-label': labels.value.start,
-                        'aria-selected': activePart.value === 'start'
-                      },
-                      labels.value.start
-                    ),
-                    h(
-                      'button',
-                      {
-                        type: 'button',
-                        class: getTimePickerRangeTabButtonClasses(activePart.value === 'end'),
-                        onClick: () => (activePart.value = 'end'),
-                        'aria-label': labels.value.end,
-                        'aria-selected': activePart.value === 'end'
-                      },
-                      labels.value.end
-                    )
-                  ]),
-
-                // Columns container
-                h('div', { class: timePickerMobileWheelClasses }, [
-                  h(
-                    'select',
-                    {
-                      class: timePickerMobileWheelSelectClasses,
-                      value:
-                        props.format === '12'
-                          ? to12HourFormat(selectedHours.value).hours
-                          : selectedHours.value,
-                      'aria-label': labels.value.hour,
-                      onChange: (event: Event) =>
-                        selectHour(Number((event.target as HTMLSelectElement).value))
-                    },
-                    hoursList.value.map((hour) =>
-                      h('option', { value: hour, disabled: isHourDisabled(hour) }, padTwo(hour))
-                    )
-                  ),
-                  h(
-                    'select',
-                    {
-                      class: timePickerMobileWheelSelectClasses,
-                      value: selectedMinutes.value,
-                      'aria-label': labels.value.minute,
-                      onChange: (event: Event) =>
-                        selectMinute(Number((event.target as HTMLSelectElement).value))
-                    },
-                    minutesList.value.map((minute) =>
+                props.range
+                  ? h('div', { class: timePickerRangeHeaderClasses, role: 'tablist' }, [
                       h(
-                        'option',
-                        { value: minute, disabled: isMinuteDisabled(minute) },
-                        padTwo(minute)
-                      )
-                    )
-                  ),
-                  props.showSeconds &&
-                    h(
-                      'select',
-                      {
-                        class: timePickerMobileWheelSelectClasses,
-                        value: selectedSeconds.value,
-                        'aria-label': labels.value.second,
-                        onChange: (event: Event) =>
-                          selectSecond(Number((event.target as HTMLSelectElement).value))
-                      },
-                      secondsList.value.map((second) =>
-                        h(
-                          'option',
-                          { value: second, disabled: isSecondDisabled(second) },
-                          padTwo(second)
-                        )
-                      )
-                    ),
-                  props.format === '12' &&
-                    h(
-                      'select',
-                      {
-                        class: timePickerMobileWheelSelectClasses,
-                        value: selectedPeriod.value,
-                        'aria-label': 'Period',
-                        onChange: (event: Event) =>
-                          selectPeriod((event.target as HTMLSelectElement).value as 'AM' | 'PM')
-                      },
-                      [
-                        h('option', { value: 'AM' }, periodLabels.value.am),
-                        h('option', { value: 'PM' }, periodLabels.value.pm)
-                      ]
-                    )
-                ]),
-
-                h('div', { class: timePickerDesktopPanelContentClasses }, [
-                  // Hours column
-                  h('div', { class: timePickerColumnClasses }, [
-                    h('div', { class: timePickerColumnHeaderClasses }, labels.value.hour),
-                    h(
-                      'div',
-                      { class: timePickerColumnListClasses },
-                      hoursList.value.map((hour) => {
-                        const hours24 =
-                          props.format === '12' ? to24HourFormat(hour, selectedPeriod.value) : hour
-                        const isSelected = selectedHours.value === hours24
-                        const isDisabled = isHourDisabled(hour)
-
-                        return h(
-                          'button',
-                          {
-                            key: hour,
-                            type: 'button',
-                            class: getTimePickerItemClasses(isSelected, isDisabled),
-                            disabled: isDisabled,
-                            onClick: () => selectHour(hour),
-                            'data-tiger-timepicker-unit': 'hour',
-                            'aria-label': getTimePickerOptionAriaLabel(
-                              hour,
-                              'hour',
-                              mergedLocale.value,
-                              props.labels
-                            ),
-                            'aria-selected': isSelected
-                          },
-                          padTwo(hour)
-                        )
-                      })
-                    )
-                  ]),
-                  // Minutes column
-                  h('div', { class: timePickerColumnClasses }, [
-                    h('div', { class: timePickerColumnHeaderClasses }, labels.value.minute),
-                    h(
-                      'div',
-                      { class: timePickerColumnListClasses },
-                      minutesList.value.map((minute) => {
-                        const isSelected = selectedMinutes.value === minute
-                        const isDisabled = isMinuteDisabled(minute)
-
-                        return h(
-                          'button',
-                          {
-                            key: minute,
-                            type: 'button',
-                            class: getTimePickerItemClasses(isSelected, isDisabled),
-                            disabled: isDisabled,
-                            onClick: () => selectMinute(minute),
-                            'data-tiger-timepicker-unit': 'minute',
-                            'aria-label': getTimePickerOptionAriaLabel(
-                              minute,
-                              'minute',
-                              mergedLocale.value,
-                              props.labels
-                            ),
-                            'aria-selected': isSelected
-                          },
-                          padTwo(minute)
-                        )
-                      })
-                    )
-                  ]),
-                  // Seconds column (if enabled)
-                  props.showSeconds &&
-                    h('div', { class: timePickerColumnClasses }, [
-                      h('div', { class: timePickerColumnHeaderClasses }, labels.value.second),
+                        'button',
+                        {
+                          type: 'button',
+                          role: 'tab',
+                          class: getTimePickerRangeTabButtonClasses(activePart.value === 'start'),
+                          'aria-selected': activePart.value === 'start',
+                          onClick: () => switchPart('start')
+                        },
+                        labels.value.start
+                      ),
                       h(
-                        'div',
-                        { class: timePickerColumnListClasses },
-                        secondsList.value.map((second) => {
-                          const isSelected = selectedSeconds.value === second
-                          const isDisabled = isSecondDisabled(second)
-
-                          return h(
-                            'button',
-                            {
-                              key: second,
-                              type: 'button',
-                              class: getTimePickerItemClasses(isSelected, isDisabled),
-                              disabled: isDisabled,
-                              onClick: () => selectSecond(second),
-                              'data-tiger-timepicker-unit': 'second',
-                              'aria-label': getTimePickerOptionAriaLabel(
-                                second,
-                                'second',
-                                mergedLocale.value,
-                                props.labels
-                              ),
-                              'aria-selected': isSelected
-                            },
-                            padTwo(second)
-                          )
-                        })
+                        'button',
+                        {
+                          type: 'button',
+                          role: 'tab',
+                          class: getTimePickerRangeTabButtonClasses(activePart.value === 'end'),
+                          'aria-selected': activePart.value === 'end',
+                          onClick: () => switchPart('end')
+                        },
+                        labels.value.end
                       )
-                    ]),
-                  // AM/PM column (if 12-hour format)
-                  props.format === '12' &&
-                    h('div', { class: timePickerColumnClasses }, [
-                      h('div', { class: timePickerColumnHeaderClasses }, ' '),
-                      h('div', { class: 'flex flex-col' }, [
-                        h(
-                          'button',
-                          {
-                            type: 'button',
-                            class: getTimePickerPeriodButtonClasses(selectedPeriod.value === 'AM'),
-                            onClick: () => selectPeriod('AM'),
-                            'data-tiger-timepicker-unit': 'period',
-                            'aria-label': periodLabels.value.am,
-                            'aria-selected': selectedPeriod.value === 'AM'
-                          },
-                          periodLabels.value.am
-                        ),
-                        h(
-                          'button',
-                          {
-                            type: 'button',
-                            class: getTimePickerPeriodButtonClasses(selectedPeriod.value === 'PM'),
-                            onClick: () => selectPeriod('PM'),
-                            'data-tiger-timepicker-unit': 'period',
-                            'aria-label': periodLabels.value.pm,
-                            'aria-selected': selectedPeriod.value === 'PM'
-                          },
-                          periodLabels.value.pm
-                        )
-                      ])
                     ])
-                ]),
-                // Footer
+                  : null,
+                columnTree,
                 h('div', { class: timePickerFooterClasses }, [
                   h(
                     'button',
                     {
                       type: 'button',
                       class: timePickerFooterButtonClasses,
-                      onClick: setNow
+                      onClick: selectNow
                     },
                     labels.value.now
                   ),
@@ -980,16 +772,40 @@ export const TimePicker = defineComponent({
                     {
                       type: 'button',
                       class: timePickerFooterButtonClasses,
-                      onClick: closePanel
+                      onClick: confirmDraft
                     },
                     labels.value.ok
                   )
                 ])
               ]
-            ),
-            overlay.target.value
-          )
-      ])
+            )
+          ]
+        : null
+
+      const { class: _class, style: attrStyle, ...restAttrs } = attrRecord
+      return h(
+        'div',
+        {
+          ...restAttrs,
+          ref: rootRef,
+          class: classNames(timePickerBaseClasses, props.className, coerceClassValue(_class)),
+          style: mergeStyleValues(attrStyle) as CSSProperties | undefined,
+          [TIGER_CHROME_ATTR]: '',
+          onAnimationend: () => rootRef.value?.classList.remove(SHAKE_CLASS),
+          onFocusout: handleFocusOut
+        },
+        [
+          h(
+            'div',
+            {
+              ref: inputWrapperRef,
+              class: getInputWrapperClasses(status.value, { inGroup: inGroup.value })
+            },
+            [input, clearBtn, clockBtn]
+          ),
+          renderVueOverlayTeleport(panel, overlay.target.value)
+        ]
+      )
     }
   }
 })

@@ -4,6 +4,8 @@
 
 ## 未发布
 
+TimePicker 列点只改面板草稿，Footer OK 才写入；Escape / 点外面丢草稿。`Now` 立即提交当前时刻。空单选是 `null`，空 range 也是 `null`（不要再用 `[null, null]` 当空）。存储值永远是 24 小时 `'HH:mm'` / `'HH:mm:ss'`（由 `showSeconds` 决定）；`format="12"` 只影响显示和键入解析。`locale` 只收官方 locale 对象，不要传 `'zh-CN'`。新增 `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）、`disabledTime`、`status`、`placement` / `offset` / `dropdownClassName` / `getPopupContainer`。输入框可按当前 `format` 键入；`readonly` 才禁止打开。小屏是原生 `<select>`，不再同时挂桌面列。删除 `getTimePickerInputClasses` / `getTimePickerIconButtonClasses` / `timePickerClearButtonClasses` / `timePickerPanelContentClasses` / `timePickerDesktopPanelContentClasses` / `timePickerMobileWheelClasses` / `timePickerMobileWheelSelectClasses` / `timePickerInputWrapperClasses`（chrome 走 Input helpers）。Vue 主入口导出 `TimePickerProps`。React `forwardRef` 接到 input。
+
 Cascader 未选是 `undefined`（不要再用 `[]` 当空）。Clear 发出 `undefined`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）和 `loadData`。打开不再清空 `defaultSearchValue`。trigger 不再是 native `button`，而是 `role="combobox"`；搜索时 combobox 是输入框。列模式只有当前列是 `listbox`。空态走 `empty.noResults`，placeholder 走 `select.placeholder`。删除假 token `--tiger-cascader-*`。Vue 主入口导出 `CascaderProps` 与 `CascaderOption`。
 
 TreeSelect 未选是 `undefined`（多选 `[]`），`''` / `0` 是合法 key。新增 `defaultValue` / `open` / `expandedKeys` / `loadData`。下拉是 `role="tree"`，不是扁平 listbox。多选接 Tree 的 checkbox + `checkStrictly`（默认 true）/ `checkStrategy`。空态走 `empty.noResults`。删除假 token `--tiger-treeselect-*` 以及 `flattenTreeSelectNodes` / `filterTreeSelectNodes` / `findTreeSelectNode` / `getAllTreeSelectKeys`（改用 `tree-utils`）。Vue 主入口导出 `TreeSelectProps` 与 `TreeSelectValue`。

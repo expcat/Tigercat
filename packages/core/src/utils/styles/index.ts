@@ -30,17 +30,11 @@ export * from '../date-utils'
 export * from '../datepicker-styles'
 export * from '../time-utils'
 export {
-  // Style classes
   timePickerBaseClasses,
-  timePickerInputWrapperClasses,
-  getTimePickerInputClasses,
-  getTimePickerIconButtonClasses,
-  timePickerClearButtonClasses,
   timePickerPanelClasses,
-  timePickerPanelContentClasses,
-  timePickerDesktopPanelContentClasses,
-  timePickerMobileWheelClasses,
-  timePickerMobileWheelSelectClasses,
+  timePickerDesktopColumnsClasses,
+  getTimePickerMobileSelectRowClasses,
+  timePickerMobileSelectClasses,
   timePickerRangeHeaderClasses,
   getTimePickerRangeTabButtonClasses,
   timePickerColumnClasses,
@@ -50,7 +44,6 @@ export {
   getTimePickerPeriodButtonClasses,
   timePickerFooterClasses,
   timePickerFooterButtonClasses,
-  // Keyboard focus
   focusTimePickerOption,
   type TimePickerFocusUnit,
   type TimePickerFocusAction

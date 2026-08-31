@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **TimePicker**：open / 草稿 / range 两步 / Now 下沉 core。列点不立刻 `onChange`，OK 才提交；空值是 `null`。`minTime="09:30"` 能选 09 再选 30。12 小时制小时列含 12；`parseTime` 认 `02:30 PM` / locale dayPeriod。locale 只收官方对象，13 套包带 `timePicker.period`。读 FormItem；打开不当 blur。弹层 dialog + trap + DatePicker 同一套 sheet 遮罩。按断点只挂桌面 listbox 或小屏原生 select。chrome 复用 Input。React `forwardRef` / Vue `expose({ focus, open, close })`。
 - **Cascader**：open / 选中 path / 搜索 / 列焦点下沉 core。非受控 `defaultValue`，未选是 `undefined`。读 FormItem；combobox 在焦点节点上。列导航读 `dir`。`listHeight` 管每一列。小屏全屏有 Done。空态走 `empty.noResults`。React `forwardRef` / Vue `expose({ focus, open, close })`。
 - **TreeSelect**：open / 选中 / 搜索 / expandedKeys 下沉 core，flatten 复用 `tree-utils`。下拉是 tree。键盘走 `getTreeKeyboardAction`（含 `dir`）。读 FormItem。多选 checkbox + `checkStrictly` / `checkStrategy`。空态走 `empty.noResults`。React `forwardRef` / Vue `expose({ focus, open, close })`。
 - **AutoComplete**：`value` 只表示已提交值，输入框走 `searchValue`；打字不再每键 `onChange`。未选是 `undefined`，`''` 是合法值。补 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。失焦离开 input+listbox 关层。`allowFreeInput={false}` 只在点选、Enter 高亮或 blur 匹配成功时提交。读 FormItem；id/aria/`name` 在 combobox input。弹层复用 Select overlay（`fullscreen-sm`、host 链、`listHeight`）。空态走 `empty.noResults`。React `forwardRef` 到 input；Vue `expose({ focus, open, close, input })`。
