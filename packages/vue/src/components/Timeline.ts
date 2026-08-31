@@ -1,23 +1,26 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { computed, defineComponent, h, PropType } from 'vue'
 import {
+  EMPTY_TIMELINE_ITEMS,
   classNames,
   coerceClassValue,
-  mergeStyleValues,
-  getTimelineContainerClasses,
-  getTimelineItemClasses,
-  getTimelineTailClasses,
-  getTimelineHeadClasses,
-  getTimelineDotClasses,
-  getTimelineContentClasses,
   getPendingDotClasses,
-  timelineListClasses,
-  timelineLabelClasses,
-  timelineDescriptionClasses,
-  resolveLocaleText,
+  getTimelineContainerClasses,
+  getTimelineContentClasses,
+  getTimelineDotClasses,
+  getTimelineHeadClasses,
+  getTimelineItemClasses,
+  getTimelineItemKey,
+  getTimelineTailClasses,
+  mergeStyleValues,
   mergeTigerLocale,
-  type TimelineMode,
+  processTimelineItems,
+  resolveLocaleText,
+  timelineDescriptionClasses,
+  timelineLabelClasses,
+  timelineListClasses,
   type TimelineItem,
   type TimelineItemPosition,
+  type TimelineMode,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -27,6 +30,10 @@ type HChildren = Parameters<typeof h>[2]
 export interface VueTimelineProps {
   items?: TimelineItem[]
   mode?: TimelineMode
+  /**
+   * Append a pending item after the (optionally reversed) list.
+   * Pending stays at the DOM end even when `reverse` is set.
+   */
   pending?: boolean
   pendingDot?: unknown
   reverse?: boolean
@@ -35,41 +42,28 @@ export interface VueTimelineProps {
   locale?: Partial<TigerLocale>
 }
 
+export type TimelineProps = VueTimelineProps
+
 export const Timeline = defineComponent({
   name: 'TigerTimeline',
   inheritAttrs: false,
   props: {
-    /**
-     * Timeline data source
-     */
     items: {
       type: Array as PropType<TimelineItem[]>,
-      default: () => []
+      default: undefined
     },
-    /**
-     * Timeline mode/direction
-     */
     mode: {
       type: String as PropType<TimelineMode>,
       default: 'left' as TimelineMode
     },
-    /**
-     * Whether to show pending state
-     */
     pending: {
       type: Boolean,
       default: false
     },
-    /**
-     * Pending item dot content
-     */
     pendingDot: {
       type: [String, Object] as PropType<unknown>,
-      default: null
+      default: undefined
     },
-    /**
-     * Whether to reverse the timeline order
-     */
     reverse: {
       type: Boolean,
       default: false
@@ -90,23 +84,12 @@ export const Timeline = defineComponent({
   setup(props, { slots, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const processedItems = computed(() => {
-      let items = [...props.items]
-
-      if (props.reverse) {
-        items = items.reverse()
-      }
-
-      // Assign positions for alternate mode
-      if (props.mode === 'alternate') {
-        return items.map((item, index) => ({
-          ...item,
-          position: (item.position || (index % 2 === 0 ? 'left' : 'right')) as TimelineItemPosition
-        }))
-      }
-
-      return items
-    })
+    const processedItems = computed(() =>
+      processTimelineItems(props.items ?? EMPTY_TIMELINE_ITEMS, {
+        reverse: props.reverse,
+        mode: props.mode
+      })
+    )
 
     const containerClasses = computed(() => {
       return classNames(
@@ -119,17 +102,23 @@ export const Timeline = defineComponent({
 
     const containerStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
-    function getItemKey(item: TimelineItem, index: number): string | number {
-      return item.key || index
-    }
-
     function renderDot(item: TimelineItem, isPending = false) {
-      // Custom dot from slot
-      if (slots.dot) {
-        return h('div', { class: getTimelineDotClasses(undefined, true) }, slots.dot({ item }))
+      if (isPending && props.pendingDot) {
+        return h(
+          'div',
+          { class: getTimelineDotClasses(undefined, true) },
+          props.pendingDot as unknown as HChildren
+        )
       }
 
-      // Custom dot from item
+      if (slots.dot) {
+        return h(
+          'div',
+          { class: getTimelineDotClasses(undefined, true) },
+          slots.dot({ item, pending: isPending })
+        )
+      }
+
       if (item.dot) {
         return h(
           'div',
@@ -138,19 +127,10 @@ export const Timeline = defineComponent({
         )
       }
 
-      // Pending dot
       if (isPending) {
-        if (props.pendingDot) {
-          return h(
-            'div',
-            { class: getTimelineDotClasses(undefined, true) },
-            props.pendingDot as unknown as HChildren
-          )
-        }
         return h('div', { class: getPendingDotClasses() })
       }
 
-      // Default dot with optional color
       const dotClasses = getTimelineDotClasses(item.color)
       const dotStyle = item.color ? { backgroundColor: item.color } : {}
 
@@ -158,7 +138,7 @@ export const Timeline = defineComponent({
     }
 
     function renderTimelineItem(item: TimelineItem, index: number) {
-      const key = getItemKey(item, index)
+      const key = getTimelineItemKey(item, index)
       const isLast = index === processedItems.value.length - 1 && !props.pending
       const position = item.position
 
@@ -167,7 +147,6 @@ export const Timeline = defineComponent({
       const headClasses = getTimelineHeadClasses(props.mode)
       const contentClasses = getTimelineContentClasses(props.mode, position)
 
-      // Custom render from slot
       if (slots.item) {
         return h('li', { key, class: itemClasses }, [
           h('div', { class: tailClasses }),
@@ -176,7 +155,6 @@ export const Timeline = defineComponent({
         ])
       }
 
-      // Default item render
       const contentChildren = []
 
       if (item.label) {
@@ -211,7 +189,6 @@ export const Timeline = defineComponent({
       const headClasses = getTimelineHeadClasses(props.mode)
       const contentClasses = getTimelineContentClasses(props.mode, position)
 
-      // Pending content from slot
       if (slots.pending) {
         return h('li', { key: 'pending', class: itemClasses }, [
           h('div', { class: headClasses }, [renderDot({}, true)]),
@@ -242,6 +219,7 @@ export const Timeline = defineComponent({
           ...attrs,
           class: containerClasses.value,
           style: containerStyle.value,
+          role: 'list',
           'aria-busy': attrs['aria-busy'] ?? (props.pending ? 'true' : undefined)
         },
         [

@@ -1,73 +1,54 @@
 import React, { useMemo } from 'react'
 import {
+  EMPTY_TIMELINE_ITEMS,
   classNames,
-  mergeTigerLocale,
-  resolveLocaleText,
-  getTimelineContainerClasses,
-  getTimelineItemClasses,
-  getTimelineTailClasses,
-  getTimelineHeadClasses,
-  getTimelineDotClasses,
-  getTimelineContentClasses,
   getPendingDotClasses,
-  timelineListClasses,
-  timelineLabelClasses,
+  getTimelineContainerClasses,
+  getTimelineContentClasses,
+  getTimelineDotClasses,
+  getTimelineHeadClasses,
+  getTimelineItemClasses,
+  getTimelineItemKey,
+  getTimelineTailClasses,
+  mergeTigerLocale,
+  processTimelineItems,
+  resolveLocaleText,
   timelineDescriptionClasses,
-  type TimelineMode,
+  timelineLabelClasses,
+  timelineListClasses,
   type TimelineItem,
   type TimelineItemPosition,
+  type TimelineMode,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLUListElement>, 'children'> {
-  /**
-   * Timeline data source
-   */
   items?: TimelineItem[]
   /**
-   * Timeline mode/direction
    * @default 'left'
    */
   mode?: TimelineMode
   /**
-   * Whether to show pending state
-   * @default false
+   * Append a pending item after the (optionally reversed) list.
+   * Pending stays at the DOM end even when `reverse` is set.
    */
   pending?: boolean
-  /**
-   * Pending item dot content
-   */
   pendingDot?: React.ReactNode
-  /**
-   * Custom pending content
-   */
   pendingContent?: React.ReactNode
-  /**
-   * Whether to reverse the timeline order
-   * @default false
-   */
   reverse?: boolean
-  /**
-   * Custom render function for timeline items
-   */
   renderItem?: (item: TimelineItem, index: number) => React.ReactNode
   /**
-   * Custom render function for dot
+   * Custom dot. Pending items prefer `pendingDot` unless this renderer
+   * is the only source.
    */
-  renderDot?: (item: TimelineItem) => React.ReactNode
-  /**
-   * Additional CSS classes
-   */
+  renderDot?: (item: TimelineItem, options: { pending: boolean }) => React.ReactNode
   className?: string
-  /**
-   * Locale override; falls back to ConfigProvider locale
-   */
   locale?: Partial<TigerLocale>
 }
 
 export const Timeline: React.FC<TimelineProps> = ({
-  items = [],
+  items,
   mode = 'left',
   pending = false,
   pendingDot,
@@ -84,41 +65,33 @@ export const Timeline: React.FC<TimelineProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const processedItems = useMemo(() => {
-    let result = reverse ? [...items].reverse() : [...items]
-    if (mode === 'alternate') {
-      result = result.map((item, index) => ({
-        ...item,
-        position: (item.position || (index % 2 === 0 ? 'left' : 'right')) as TimelineItemPosition
-      }))
-    }
-    return result
-  }, [items, reverse, mode])
+  const processedItems = useMemo(
+    () => processTimelineItems(items ?? EMPTY_TIMELINE_ITEMS, { reverse, mode }),
+    [items, reverse, mode]
+  )
 
   const containerClasses = useMemo(
     () => classNames(getTimelineContainerClasses(mode), timelineListClasses, className),
     [mode, className]
   )
 
-  const getItemKey = (item: TimelineItem, index: number): string | number => item.key || index
-
   const wrapCustomDot = (node: React.ReactNode) => (
     <div className={getTimelineDotClasses(undefined, true)}>{node}</div>
   )
 
   const renderDotElement = (item: TimelineItem, isPending = false): React.ReactNode => {
-    if (customRenderDot) return wrapCustomDot(customRenderDot(item))
+    if (isPending && pendingDot) {
+      return wrapCustomDot(pendingDot)
+    }
+    if (customRenderDot) {
+      return wrapCustomDot(customRenderDot(item, { pending: isPending }))
+    }
     if (item.dot) return wrapCustomDot(item.dot as React.ReactNode)
 
-    // Pending dot
     if (isPending) {
-      if (pendingDot) {
-        return wrapCustomDot(pendingDot)
-      }
       return <div className={getPendingDotClasses()} />
     }
 
-    // Default dot with optional color
     const dotClasses = getTimelineDotClasses(item.color)
     const dotStyle = item.color ? { backgroundColor: item.color } : {}
 
@@ -126,9 +99,9 @@ export const Timeline: React.FC<TimelineProps> = ({
   }
 
   const renderTimelineItem = (item: TimelineItem, index: number) => {
-    const key = getItemKey(item, index)
+    const key = getTimelineItemKey(item, index)
     const isLast = index === processedItems.length - 1 && !pending
-    const position = item.position
+    const position = item.position as TimelineItemPosition | undefined
 
     const itemClasses = getTimelineItemClasses(mode, position, isLast)
     const tailClasses = getTimelineTailClasses(mode, isLast)
@@ -145,7 +118,6 @@ export const Timeline: React.FC<TimelineProps> = ({
       )
     }
 
-    // Default item render
     return (
       <li key={key} className={itemClasses}>
         <div className={tailClasses} />
@@ -194,6 +166,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     <ul
       {...ulProps}
       className={containerClasses}
+      role="list"
       aria-busy={ulProps['aria-busy'] ?? (pending ? true : undefined)}>
       {processedItems.map((item, index) => renderTimelineItem(item, index))}
       {renderPendingItem()}

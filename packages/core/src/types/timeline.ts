@@ -51,17 +51,22 @@ export interface TimelineItem {
  */
 export interface TimelineProps {
   /**
+   * Timeline items
+   */
+  items?: TimelineItem[]
+  /**
    * Timeline mode/direction
    * @default 'left'
    */
   mode?: TimelineMode
   /**
-   * Whether to show the connector line in pending state
+   * Append a pending item after the (optionally reversed) list.
+   * Pending stays at the DOM end even when `reverse` is set.
    * @default false
    */
   pending?: boolean
   /**
-   * Pending item dot content
+   * Pending item dot content. Wins over `renderDot` for the pending item.
    */
   pendingDot?: unknown
   /**

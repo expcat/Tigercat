@@ -3,8 +3,10 @@ import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Timeline } from '@expcat/tigercat-vue/Timeline'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Timeline (Vue)', () => {
   it('renders labels and content', () => {
@@ -35,15 +37,16 @@ describe('Timeline (Vue)', () => {
     const { container: rightContainer } = render(Timeline, {
       props: { items, mode: 'right' }
     })
-    expect(rightContainer.querySelector('li')?.className).toContain('pr-8')
-    expect(rightContainer.querySelector('li')?.className).toContain('text-right')
+    expect(rightContainer.querySelector('li')?.className).toContain('pe-8')
 
     const { container: altContainer } = render(Timeline, {
       props: { items, mode: 'alternate' }
     })
     const listItems = altContainer.querySelectorAll('li')
-    expect(listItems[0].className).toContain('flex-row-reverse')
-    expect(listItems[1].className).toContain('pl-8')
+    expect(listItems[0].className).toContain('grid-cols-2')
+    const contents = altContainer.querySelectorAll('[class*="col-start"]')
+    expect(contents[0].className).toContain('col-start-1')
+    expect(contents[1].className).toContain('col-start-2')
   })
 
   it('renders pending item and supports pending slot + pendingDot prop', () => {
@@ -78,12 +81,16 @@ describe('Timeline (Vue)', () => {
 
   it('uses ConfigProvider timeline locale for default pending content', () => {
     render({
-      render: () =>
-        h(ConfigProvider, { locale: { timeline: { pendingText: '全局加载中' } } }, () =>
-          h(Timeline, { pending: true })
-        )
+      render: () => h(ConfigProvider, { locale: zhCN }, () => h(Timeline, { pending: true }))
     })
-    expect(screen.getByText('全局加载中')).toBeInTheDocument()
+    expect(screen.getByText(zhCN.timeline!.pendingText!)).toBeInTheDocument()
+  })
+
+  it('uses zh-TW pending text from the official locale object', () => {
+    render({
+      render: () => h(ConfigProvider, { locale: zhTW }, () => h(Timeline, { pending: true }))
+    })
+    expect(screen.getByText(zhTW.timeline!.pendingText!)).toBeInTheDocument()
   })
 
   it('lets the timeline locale prop override ConfigProvider pending text', () => {
@@ -119,6 +126,37 @@ describe('Timeline (Vue)', () => {
     expect(contents[0].textContent).toBe('Event 3')
   })
 
+  it('keeps pending at the DOM end when reversed', () => {
+    render(Timeline, {
+      props: {
+        items: [
+          { key: 1, content: 'Event 1' },
+          { key: 2, content: 'Event 2' }
+        ],
+        reverse: true,
+        pending: true
+      }
+    })
+    const items = screen.getAllByRole('listitem')
+    expect(items[0]).toHaveTextContent('Event 2')
+    expect(items[items.length - 1]).toHaveTextContent('Loading...')
+  })
+
+  it('prefers pendingDot over the dot slot for the pending item', () => {
+    render(Timeline, {
+      props: {
+        items: [{ key: 1, content: 'Event 1' }],
+        pending: true,
+        pendingDot: h('span', {}, 'Pending Dot')
+      },
+      slots: {
+        dot: () => h('span', {}, 'Custom Dot')
+      }
+    })
+    expect(screen.getByText('Pending Dot')).toBeInTheDocument()
+    expect(screen.getAllByText('Custom Dot')).toHaveLength(1)
+  })
+
   it('supports item and dot slots', () => {
     const items: TimelineItem[] = [{ key: 1, content: 'Event 1' }]
     render(Timeline, {
@@ -143,8 +181,17 @@ describe('Timeline (Vue)', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(Timeline)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(Timeline, {
+        props: {
+          pending: true,
+          items: [
+            { key: 1, label: 'Start', content: 'Created' },
+            { key: 2, label: 'Next', content: 'Shipped' }
+          ]
+        }
+      })
+      expect(container.querySelector('ul')).toHaveAttribute('role', 'list')
+      await expectNoA11yViolations(container)
     })
   })
   describe('Edge Cases', () => {

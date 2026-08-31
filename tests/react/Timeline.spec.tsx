@@ -3,8 +3,10 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Timeline } from '@expcat/tigercat-react/Timeline'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Timeline (React)', () => {
   it('renders labels and content', () => {
@@ -33,13 +35,14 @@ describe('Timeline (React)', () => {
     ]
 
     const { container: rightContainer } = render(<Timeline items={items} mode="right" />)
-    expect(rightContainer.querySelector('li')?.className).toContain('pr-8')
-    expect(rightContainer.querySelector('li')?.className).toContain('text-right')
+    expect(rightContainer.querySelector('li')?.className).toContain('pe-8')
 
     const { container: altContainer } = render(<Timeline items={items} mode="alternate" />)
     const listItems = altContainer.querySelectorAll('li')
-    expect(listItems[0].className).toContain('flex-row-reverse')
-    expect(listItems[1].className).toContain('pl-8')
+    expect(listItems[0].className).toContain('grid-cols-2')
+    const contents = altContainer.querySelectorAll('[class*="col-start"]')
+    expect(contents[0].className).toContain('col-start-1')
+    expect(contents[1].className).toContain('col-start-2')
   })
 
   it('renders pending item and supports custom pending UI', () => {
@@ -67,11 +70,20 @@ describe('Timeline (React)', () => {
 
   it('uses ConfigProvider timeline locale for default pending content', () => {
     render(
-      <ConfigProvider locale={{ timeline: { pendingText: '全局加载中' } }}>
+      <ConfigProvider locale={zhCN}>
         <Timeline pending />
       </ConfigProvider>
     )
-    expect(screen.getByText('全局加载中')).toBeInTheDocument()
+    expect(screen.getByText(zhCN.timeline!.pendingText!)).toBeInTheDocument()
+  })
+
+  it('uses zh-TW pending text from the official locale object', () => {
+    render(
+      <ConfigProvider locale={zhTW}>
+        <Timeline pending />
+      </ConfigProvider>
+    )
+    expect(screen.getByText(zhTW.timeline!.pendingText!)).toBeInTheDocument()
   })
 
   it('lets the timeline locale prop override ConfigProvider pending text', () => {
@@ -107,6 +119,44 @@ describe('Timeline (React)', () => {
     expect(contents[0].textContent).toBe('Event 3')
   })
 
+  it('keeps pending at the DOM end when reversed', () => {
+    render(
+      <Timeline
+        items={[
+          { key: 1, content: 'Event 1' },
+          { key: 2, content: 'Event 2' }
+        ]}
+        reverse
+        pending
+      />
+    )
+    const items = screen.getAllByRole('listitem')
+    expect(items[0]).toHaveTextContent('Event 2')
+    expect(items[items.length - 1]).toHaveTextContent('Loading...')
+  })
+
+  it('prefers pendingDot over renderDot for the pending item', () => {
+    render(
+      <Timeline
+        items={[{ key: 1, content: 'Event 1' }]}
+        pending
+        pendingDot={<span>Pending Dot</span>}
+        renderDot={() => <span>Custom Dot</span>}
+      />
+    )
+    expect(screen.getByText('Pending Dot')).toBeInTheDocument()
+    expect(screen.getAllByText('Custom Dot')).toHaveLength(1)
+  })
+
+  it('keeps key 0 as the item identity', () => {
+    const { rerender } = render(
+      <Timeline items={[{ key: 0, content: 'Zero' }, { key: 1, content: 'One' }]} />
+    )
+    expect(screen.getByText('Zero')).toBeInTheDocument()
+    rerender(<Timeline items={[{ key: 1, content: 'One' }, { key: 0, content: 'Zero' }]} />)
+    expect(screen.getByText('Zero')).toBeInTheDocument()
+  })
+
   it('supports renderItem and renderDot', () => {
     const items: TimelineItem[] = [{ key: 1, content: 'Event 1' }]
 
@@ -133,8 +183,17 @@ describe('Timeline (React)', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Timeline />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(
+        <Timeline
+          pending
+          items={[
+            { key: 1, label: 'Start', content: 'Created' },
+            { key: 2, label: 'Next', content: 'Shipped' }
+          ]}
+        />
+      )
+      expect(container.querySelector('ul')).toHaveAttribute('role', 'list')
+      await expectNoA11yViolations(container)
     })
   })
   describe('Edge Cases', () => {
