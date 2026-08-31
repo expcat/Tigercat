@@ -14,6 +14,7 @@ export interface PickerComboboxAriaOptions {
   activeIndex?: number
   activeOptionId?: string
   haspopup?: 'listbox' | 'tree'
+  autocomplete?: 'list' | 'none'
 }
 
 export interface PickerListboxAriaOptions {
@@ -107,17 +108,35 @@ export function getInitialPickerActiveIndex<T>(
   return activeFirst ? findFirstEnabledIndex(items, isDisabled) : -1
 }
 
+export function findNextEnabledIndexCyclic<T>(
+  items: readonly T[],
+  current: number,
+  direction: 1 | -1,
+  isDisabled: IsItemDisabled<T> = defaultIsDisabled
+): number {
+  if (items.length === 0) return -1
+  const len = items.length
+  let i = current < 0 ? (direction === 1 ? 0 : len - 1) : (current + direction + len) % len
+  for (let step = 0; step < len; step++) {
+    if (!isDisabled(items[i])) return i
+    i = (i + direction + len) % len
+  }
+  return current < 0 ? -1 : current
+}
+
 export function getPickerNavigationIndex<T>(
   items: readonly T[],
   current: number,
   key: string,
-  isDisabled: IsItemDisabled<T> = defaultIsDisabled
+  isDisabled: IsItemDisabled<T> = defaultIsDisabled,
+  options?: { wrap?: boolean }
 ): number {
+  const next = options?.wrap ? findNextEnabledIndexCyclic : findNextEnabledIndex
   switch (key) {
     case 'ArrowDown':
-      return findNextEnabledIndex(items, current, 1, isDisabled)
+      return next(items, current, 1, isDisabled)
     case 'ArrowUp':
-      return findNextEnabledIndex(items, current, -1, isDisabled)
+      return next(items, current, -1, isDisabled)
     case 'Home':
       return findFirstEnabledIndex(items, isDisabled)
     case 'End':
@@ -147,13 +166,15 @@ export function getPickerComboboxAria({
   listboxId,
   activeIndex = -1,
   activeOptionId,
-  haspopup = 'listbox'
+  haspopup = 'listbox',
+  autocomplete
 }: PickerComboboxAriaOptions): {
   role: 'combobox'
   'aria-expanded': boolean
   'aria-haspopup': 'listbox' | 'tree'
   'aria-controls': string | undefined
   'aria-activedescendant': string | undefined
+  'aria-autocomplete'?: 'list' | 'none'
   'data-state': 'open' | 'closed'
 } {
   return {
@@ -165,6 +186,7 @@ export function getPickerComboboxAria({
       ? (activeOptionId ??
         (activeIndex >= 0 ? getPickerOptionId(listboxId, activeIndex) : undefined))
       : undefined,
+    ...(autocomplete ? { 'aria-autocomplete': autocomplete } : {}),
     'data-state': expanded ? 'open' : 'closed'
   }
 }

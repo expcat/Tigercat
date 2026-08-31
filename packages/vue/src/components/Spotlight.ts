@@ -6,6 +6,7 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
+  useId,
   watch,
   type PropType,
   type VNodeChild
@@ -14,19 +15,22 @@ import {
   captureActiveElement,
   classNames,
   coerceClassValue,
+  findSpotlightShortcutItem,
   focusFirst,
+  getEmptyLabels,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
   getPickerListboxAria,
   getPickerNavigationIndex,
   getPickerOptionAria,
   getPickerOptionId,
+  getSpotlightLabels,
   getSpotlightOptionClasses,
   getSpotlightSearchState,
   getSpotlightShortcutLabel,
+  isSpotlightToggleHotkey,
   mergeStyleValues,
   mergeTigerLocale,
-  resolveLocaleText,
   restoreFocus,
   shouldCloseOnMaskClick,
   spotlightEmptyClasses,
@@ -34,10 +38,12 @@ import {
   spotlightGroupLabelClasses,
   spotlightHeaderClasses,
   spotlightInputClasses,
+  spotlightItemDescriptionClasses,
   spotlightListClasses,
   spotlightMaskClasses,
   spotlightPanelClasses,
   spotlightRootClasses,
+  spotlightShortcutClasses,
   spotlightTitleClasses,
   type SpotlightItem,
   type SpotlightItemFilter,
@@ -52,10 +58,8 @@ import {
   useVueFocusTrap
 } from '../utils/overlay'
 
-let spotlightIdCounter = 0
-const createSpotlightId = () => `tiger-spotlight-${++spotlightIdCounter}`
-
 export type VueSpotlightProps = InstanceType<typeof Spotlight>['$props']
+export type SpotlightProps = VueSpotlightProps
 
 export const Spotlight = defineComponent({
   name: 'TigerSpotlight',
@@ -83,7 +87,7 @@ export const Spotlight = defineComponent({
     },
     title: {
       type: String,
-      default: 'Spotlight'
+      default: undefined
     },
     placeholder: {
       type: String,
@@ -137,28 +141,35 @@ export const Spotlight = defineComponent({
       type: Number,
       default: undefined
     },
+    hotkey: {
+      type: [Boolean, String] as PropType<boolean | string>,
+      default: true
+    },
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
-    },
-    disableTeleport: {
-      type: Boolean,
-      default: false
     }
   },
   emits: ['update:open', 'open-change', 'update:query', 'query-change', 'select'],
-  setup(props, { emit, attrs, slots }) {
+  setup(props, { emit, attrs, slots, expose }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const placeholderText = computed(() =>
-      resolveLocaleText('Search', props.placeholder, mergedLocale.value?.common?.searchPlaceholder)
+    const labels = computed(() => getSpotlightLabels(mergedLocale.value))
+    const emptyLabels = computed(() => getEmptyLabels(mergedLocale.value))
+    const resolvedTitle = computed(() =>
+      props.title === undefined ? labels.value.title : props.title
     )
+    const placeholderText = computed(() => props.placeholder ?? labels.value.placeholder)
+    const emptyMessage = computed(() => props.emptyText ?? emptyLabels.value.noResults)
+
     const uncontrolledOpen = ref(props.defaultOpen)
     const uncontrolledQuery = ref(props.defaultQuery)
     const activeIndex = ref(-1)
-    const instanceId = createSpotlightId()
-    const titleId = `${instanceId}-title`
-    const listboxId = `${instanceId}-listbox`
+    const instanceId = useId()
+    const dialogId = `tiger-spotlight-${instanceId}`
+    const titleId = `${dialogId}-title`
+    const listboxId = `${dialogId}-listbox`
+    const overlayHostId = `${dialogId}-overlay-host`
     const rootRef = ref<HTMLElement | null>(null)
     const dialogRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
@@ -186,6 +197,14 @@ export const Spotlight = defineComponent({
     }
 
     const closeSpotlight = () => setOpenValue(false)
+    const openSpotlight = () => setOpenValue(true)
+    const toggleSpotlight = () => setOpenValue(!resolvedOpen.value)
+
+    expose({
+      open: openSpotlight,
+      close: closeSpotlight,
+      toggle: toggleSpotlight
+    })
 
     const selectItem = (item: SpotlightItem) => {
       if (item.disabled) return
@@ -214,7 +233,8 @@ export const Spotlight = defineComponent({
             searchState.value.flatResults,
             activeIndex.value,
             event.key,
-            (result) => result.item.disabled === true
+            (result) => result.item.disabled === true,
+            { wrap: true }
           )
           break
         case 'Enter': {
@@ -240,16 +260,45 @@ export const Spotlight = defineComponent({
     useVueFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
     let cleanupEscape: (() => void) | undefined
 
-    onMounted(() => {
-      cleanupEscape = useVueEscapeKey({ enabled: resolvedOpen, onEscape: closeSpotlight })
-      if (resolvedOpen.value) {
-        nextTick(() => focusFirst([inputRef.value, dialogRef.value]))
+    const onDocumentKeyDown = (event: KeyboardEvent) => {
+      if (isSpotlightToggleHotkey(event, props.hotkey)) {
+        event.preventDefault()
+        toggleSpotlight()
+        return
       }
+      if (!resolvedOpen.value) return
+      const item = findSpotlightShortcutItem(event, props.items)
+      if (!item) return
+      event.preventDefault()
+      selectItem(item)
+    }
+
+    onMounted(() => {
+      cleanupEscape = useVueEscapeKey({
+        enabled: resolvedOpen,
+        onEscape: closeSpotlight,
+        layerRef: rootRef
+      })
+      document.addEventListener('keydown', onDocumentKeyDown)
     })
 
-    onBeforeUnmount(() => cleanupEscape?.())
+    onBeforeUnmount(() => {
+      cleanupEscape?.()
+      document.removeEventListener('keydown', onDocumentKeyDown)
+    })
 
-    watch([resolvedOpen, resolvedQuery, () => props.items], updateActiveIndex, { immediate: true })
+    watch(
+      [
+        resolvedOpen,
+        resolvedQuery,
+        () => props.items,
+        () => props.filterItem,
+        () => props.limit,
+        () => props.defaultActiveFirstItem
+      ],
+      updateActiveIndex,
+      { immediate: true }
+    )
 
     watch(
       resolvedOpen,
@@ -263,8 +312,15 @@ export const Spotlight = defineComponent({
         await nextTick()
         focusFirst([inputRef.value, dialogRef.value])
       },
-      { flush: 'post' }
+      { flush: 'post', immediate: true }
     )
+
+    watch(activeIndex, (index) => {
+      if (!resolvedOpen.value || index < 0) return
+      document
+        .getElementById(getPickerOptionId(listboxId, index))
+        ?.scrollIntoView({ block: 'nearest' })
+    })
 
     return () => {
       if (!resolvedOpen.value) return null
@@ -274,6 +330,44 @@ export const Spotlight = defineComponent({
       const activeOptionId = activeResult
         ? getPickerOptionId(listboxId, activeResult.flatIndex)
         : undefined
+      const showTitle = Boolean(resolvedTitle.value)
+
+      const renderOption = (result: (typeof state.flatResults)[number]) => {
+        const active = result.flatIndex === activeIndex.value
+        const shortcutLabel = getSpotlightShortcutLabel(result.item.shortcut)
+        const iconNode = slots.icon
+          ? slots.icon({ item: result.item })
+          : (result.item.icon as VNodeChild | undefined)
+
+        return h(
+          'div',
+          {
+            key: String(result.item.key),
+            id: getPickerOptionId(listboxId, result.flatIndex),
+            ...getPickerOptionAria({
+              selected: false,
+              disabled: result.item.disabled
+            }),
+            class: getSpotlightOptionClasses(active, result.item.disabled === true),
+            onMouseenter: () => {
+              if (result.item.disabled) return
+              activeIndex.value = result.flatIndex
+            },
+            onMousedown: (event: MouseEvent) => event.preventDefault(),
+            onClick: () => selectItem(result.item)
+          },
+          [
+            iconNode ? h('span', { class: 'shrink-0' }, iconNode) : null,
+            h('span', { class: 'min-w-0 flex-1' }, [
+              h('span', { class: 'block truncate text-sm font-medium' }, result.item.label),
+              result.item.description
+                ? h('span', { class: spotlightItemDescriptionClasses }, result.item.description)
+                : null
+            ]),
+            shortcutLabel ? h('kbd', { class: spotlightShortcutClasses }, shortcutLabel) : null
+          ]
+        )
+      }
 
       const content = h(
         'div',
@@ -297,10 +391,12 @@ export const Spotlight = defineComponent({
             {
               ...attrs,
               ref: dialogRef,
-              id: instanceId,
+              id: dialogId,
               role: 'dialog',
               'aria-modal': 'true',
-              'aria-labelledby': props.title ? titleId : undefined,
+              'aria-labelledby': showTitle ? titleId : undefined,
+              'aria-label': showTitle ? undefined : labels.value.title,
+              'aria-owns': overlayHostId,
               tabindex: -1,
               class: classNames(
                 spotlightPanelClasses,
@@ -314,8 +410,8 @@ export const Spotlight = defineComponent({
             },
             [
               h('div', { class: spotlightHeaderClasses }, [
-                props.title
-                  ? h('div', { id: titleId, class: spotlightTitleClasses }, props.title)
+                showTitle
+                  ? h('div', { id: titleId, class: spotlightTitleClasses }, resolvedTitle.value)
                   : null,
                 h('input', {
                   ref: inputRef,
@@ -328,111 +424,54 @@ export const Spotlight = defineComponent({
                   ...getPickerComboboxAria({
                     expanded: true,
                     listboxId,
-                    activeOptionId
+                    activeOptionId,
+                    autocomplete: 'list'
                   }),
                   onInput: (event: Event) =>
                     setQueryValue((event.target as HTMLInputElement).value),
                   onKeydown: handleKeyDown
                 })
               ]),
-              state.flatResults.length > 0
-                ? h(
-                    'div',
-                    {
-                      ...getPickerListboxAria({ id: listboxId, label: props.listboxLabel }),
-                      class: spotlightListClasses
-                    },
-                    state.groups.map((group, groupIndex) =>
-                      h(
-                        'div',
-                        {
-                          key: group.label ?? `group-${groupIndex}`,
-                          class: spotlightGroupClasses,
-                          role: group.label ? 'group' : undefined,
-                          'aria-label': group.label
-                        },
-                        [
+              h(
+                'div',
+                {
+                  ...getPickerListboxAria({ id: listboxId, label: props.listboxLabel }),
+                  class: spotlightListClasses
+                },
+                state.groups.flatMap((group, groupIndex) => {
+                  const options = group.items.map(renderOption)
+                  if (!group.label) return options
+                  return [
+                    h(
+                      'div',
+                      {
+                        key: group.label ?? `group-${groupIndex}`,
+                        class: spotlightGroupClasses,
+                        role: 'group',
+                        'aria-label': group.label
+                      },
+                      [
+                        h(
+                          'div',
+                          { class: spotlightGroupLabelClasses, 'aria-hidden': 'true' },
                           group.label
-                            ? h('div', { class: spotlightGroupLabelClasses }, group.label)
-                            : null,
-                          ...group.items.map((result) => {
-                            const active = result.flatIndex === activeIndex.value
-                            const shortcutLabel = getSpotlightShortcutLabel(result.item.shortcut)
-                            const iconNode = slots.icon
-                              ? slots.icon({ item: result.item })
-                              : (result.item.icon as VNodeChild | undefined)
-
-                            return h(
-                              'div',
-                              {
-                                key: String(result.item.key),
-                                id: getPickerOptionId(listboxId, result.flatIndex),
-                                ...getPickerOptionAria({
-                                  selected: active,
-                                  disabled: result.item.disabled
-                                }),
-                                class: getSpotlightOptionClasses(
-                                  active,
-                                  result.item.disabled === true
-                                ),
-                                onMouseenter: () => {
-                                  activeIndex.value = result.flatIndex
-                                },
-                                onMousedown: (event: MouseEvent) => event.preventDefault(),
-                                onClick: () => selectItem(result.item)
-                              },
-                              [
-                                iconNode ? h('span', { class: 'shrink-0' }, iconNode) : null,
-                                h('span', { class: 'min-w-0 flex-1' }, [
-                                  h(
-                                    'span',
-                                    { class: 'block truncate text-sm font-medium' },
-                                    result.item.label
-                                  ),
-                                  result.item.description
-                                    ? h(
-                                        'span',
-                                        {
-                                          class:
-                                            'block truncate text-xs text-[var(--tiger-spotlight-item-description,var(--tiger-text-muted,#6b7280))]'
-                                        },
-                                        result.item.description
-                                      )
-                                    : null
-                                ]),
-                                shortcutLabel
-                                  ? h(
-                                      'kbd',
-                                      {
-                                        class:
-                                          'shrink-0 rounded border border-[var(--tiger-spotlight-shortcut-border,var(--tiger-border,#d1d5db))] px-1.5 py-0.5 text-xs text-[var(--tiger-spotlight-shortcut-text,var(--tiger-text-muted,#6b7280))]'
-                                      },
-                                      shortcutLabel
-                                    )
-                                  : null
-                              ]
-                            )
-                          })
-                        ]
-                      )
+                        ),
+                        ...options
+                      ]
                     )
-                  )
-                : h(
-                    'div',
-                    { class: spotlightEmptyClasses },
-                    resolveLocaleText(
-                      'No results found',
-                      props.emptyText,
-                      mergedLocale.value?.common?.emptyText
-                    )
-                  )
+                  ]
+                })
+              ),
+              state.flatResults.length === 0
+                ? h('div', { class: spotlightEmptyClasses }, emptyMessage.value)
+                : null
             ]
           ),
-          h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
+          h('div', { id: overlayHostId, class: 'contents', 'data-tiger-overlay-host': '' })
         ]
       )
 
-      return renderVueBodyTeleport(content, props.disableTeleport)
+      return renderVueBodyTeleport(content)
     }
   }
 })

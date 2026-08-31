@@ -4,6 +4,8 @@ import {
   getSpotlightSearchState,
   getSpotlightSearchText,
   getSpotlightShortcutLabel,
+  isSpotlightToggleHotkey,
+  matchesSpotlightShortcut,
   normalizeSpotlightText,
   type SpotlightItem
 } from '@expcat/tigercat-core'
@@ -70,19 +72,40 @@ describe('spotlight-utils', () => {
     expect(state.groups[0].label).toBe('Navigation')
   })
 
-  it('supports custom item filters and limits', () => {
-    const state = getSpotlightSearchState(items, 'anything', {
+  it('ANDs custom filters with fuzzy matching', () => {
+    const state = getSpotlightSearchState(items, 'open', {
       filterItem: (_query, item) => item.group === 'Navigation',
       limit: 1
     })
 
     expect(state.flatResults).toHaveLength(1)
-    expect(state.flatResults[0].item.group).toBe('Navigation')
+    expect(state.flatResults[0].item.key).toBe('dashboard')
+  })
+
+  it('ranks keyword alias hits with a finite fuzzy score', () => {
+    const aliasItems: SpotlightItem[] = [
+      { key: 'settings', label: 'Settings', keywords: ['prefs'] },
+      { key: 'home', label: 'Dashboard' }
+    ]
+    const state = getSpotlightSearchState(aliasItems, 'prefs')
+    expect(state.flatResults[0]?.item.key).toBe('settings')
+    expect(Number.isFinite(state.flatResults[0]?.score)).toBe(true)
   })
 
   it('formats shortcut labels', () => {
     expect(getSpotlightShortcutLabel(['⌘', 'K'])).toBe('⌘ K')
     expect(getSpotlightShortcutLabel('Ctrl K')).toBe('Ctrl K')
     expect(getSpotlightShortcutLabel(undefined)).toBe('')
+  })
+
+  it('matches modifier chords and the default toggle hotkey', () => {
+    const metaD = new KeyboardEvent('keydown', { key: 'd', metaKey: true })
+    const ctrlK = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
+    const bareD = new KeyboardEvent('keydown', { key: 'd' })
+    expect(matchesSpotlightShortcut(metaD, ['⌘', 'D'])).toBe(true)
+    expect(matchesSpotlightShortcut(bareD, ['⌘', 'D'])).toBe(false)
+    expect(isSpotlightToggleHotkey(ctrlK, true)).toBe(true)
+    expect(isSpotlightToggleHotkey(bareD, true)).toBe(false)
+    expect(isSpotlightToggleHotkey(ctrlK, false)).toBe(false)
   })
 })

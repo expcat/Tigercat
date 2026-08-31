@@ -3,12 +3,14 @@
  */
 
 import React, { useState } from 'react'
-import { render } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { Spotlight } from '@expcat/tigercat-react/Spotlight'
-import type { SpotlightItem } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import type { SpotlightHandle, SpotlightItem } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { expectNoA11yViolations } from '../utils/react'
 
 const items: SpotlightItem[] = [
   {
@@ -208,7 +210,81 @@ describe('Spotlight (React)', () => {
   })
 
   it('has no accessibility violations', async () => {
-    render(<Spotlight open items={items} />)
-    await expectNoA11yViolationsIsolated(document.body)
+    render(<Spotlight open items={items} hotkey={false} />)
+    await expectNoA11yViolations(document.body)
+  })
+
+  it('opens from the default hotkey and imperative handle', async () => {
+    const ref = React.createRef<SpotlightHandle>()
+    render(<Spotlight ref={ref} items={items} />)
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+
+    act(() => {
+      ref.current?.close()
+    })
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    })
+    act(() => {
+      ref.current?.open()
+    })
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+  })
+
+  it('selects an item from its shortcut while open', async () => {
+    const onSelect = vi.fn()
+    render(<Spotlight open items={items} onSelect={onSelect} hotkey={false} />)
+    await fireEvent.keyDown(document, { key: 'd', metaKey: true })
+    expect(onSelect).toHaveBeenCalledWith(items[0])
+  })
+
+  it('keeps listbox mounted when there are no matches and names the dialog from locale', async () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <Spotlight open items={items} hotkey={false} />
+      </ConfigProvider>
+    )
+    expect(document.querySelector('[role="dialog"]')).toHaveAccessibleName('命令面板')
+    fireEvent.change(document.querySelector('input')!, { target: { value: 'zzzzzzz' } })
+    expect(document.querySelector('[role="listbox"]')).toBeInTheDocument()
+    expect(document.body).toHaveTextContent('暂无结果')
+  })
+
+  it('hosts nested overlays on the trap root and skips disabled hover', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<Spotlight open items={items} onSelect={onSelect} hotkey={false} />)
+    const root = document.querySelector('[data-tiger-spotlight-root]')
+    expect(root?.querySelector(':scope > [data-tiger-overlay-host]')).toBeTruthy()
+
+    const disabled = document.body.querySelector('[aria-disabled="true"]')!
+    await fireEvent.mouseEnter(disabled)
+    await user.keyboard('{Enter}')
+    expect(onSelect).toHaveBeenCalledWith(items[0])
+  })
+
+  it('restores focus after defaultOpen Escape', async () => {
+    const user = userEvent.setup()
+    const App = () => {
+      const [show, setShow] = useState(false)
+      return (
+        <>
+          <button type="button" onClick={() => setShow(true)}>
+            Before
+          </button>
+          {show ? <Spotlight defaultOpen items={items} hotkey={false} /> : null}
+        </>
+      )
+    }
+    render(<App />)
+    const opener = screen.getByRole('button', { name: 'Before' })
+    opener.focus()
+    await user.click(opener)
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    expect(opener).toHaveFocus()
   })
 })

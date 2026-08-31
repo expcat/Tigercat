@@ -3,11 +3,13 @@
  */
 
 import { defineComponent, h, ref } from 'vue'
-import { fireEvent, render } from '@testing-library/vue'
+import { fireEvent, render, waitFor } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { SpotlightItem } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { expectNoA11yViolations } from '../utils'
 
 const items: SpotlightItem[] = [
   {
@@ -187,7 +189,64 @@ describe('Spotlight (Vue)', () => {
   })
 
   it('has no accessibility violations', async () => {
-    render(Spotlight, { props: { open: true, items } })
-    await expectNoA11yViolationsIsolated(document.body)
+    render(Spotlight, { props: { open: true, items, hotkey: false } })
+    await expectNoA11yViolations(document.body)
+  })
+
+  it('opens from the default hotkey', async () => {
+    render(Spotlight, { props: { items } })
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+  })
+
+  it('selects an item from its shortcut while open', async () => {
+    const { emitted } = render(Spotlight, {
+      props: { open: true, items, hotkey: false }
+    })
+    await fireEvent.keyDown(document, { key: 'd', metaKey: true })
+    expect(emitted().select).toEqual([[items[0]]])
+  })
+
+  it('keeps listbox mounted when there are no matches and names the dialog from locale', async () => {
+    render({
+      setup: () => () =>
+        h(ConfigProvider, { locale: zhCN }, () =>
+          h(Spotlight, { open: true, items, hotkey: false })
+        )
+    })
+    expect(document.querySelector('[role="dialog"]')).toHaveAccessibleName('命令面板')
+    await fireEvent.update(document.querySelector('input')!, 'zzzz')
+    expect(document.querySelector('[role="listbox"]')).toBeInTheDocument()
+    expect(document.body).toHaveTextContent('暂无结果')
+  })
+
+  it('hosts nested overlays on the trap root', () => {
+    render(Spotlight, { props: { open: true, items, hotkey: false } })
+    const root = document.querySelector('[data-tiger-spotlight-root]')
+    expect(root?.querySelector(':scope > [data-tiger-overlay-host]')).toBeTruthy()
+  })
+
+  it('restores focus after defaultOpen Escape', async () => {
+    const App = defineComponent({
+      setup() {
+        const show = ref(false)
+        return () =>
+          h('div', [
+            h('button', { type: 'button', onClick: () => (show.value = true) }, 'Before'),
+            show.value ? h(Spotlight, { defaultOpen: true, items, hotkey: false }) : null
+          ])
+      }
+    })
+    const { getByRole } = render(App)
+    const opener = getByRole('button', { name: 'Before' })
+    opener.focus()
+    await fireEvent.click(opener)
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+    await fireEvent.keyDown(document, { key: 'Escape' })
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    })
+    expect(opener).toHaveFocus()
   })
 })
