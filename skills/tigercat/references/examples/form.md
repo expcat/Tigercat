@@ -18,6 +18,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | InputGroup   | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                           |
 | InputNumber  | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                    |
 | Select       | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。 |
+| TimePicker   | -    | 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。                                                                  |
 | TreeSelect   | -    | 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。                                                                     |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
@@ -43,8 +44,9 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | Stepper         | `<Stepper v-model="value" />`                                                                               | `<Stepper value={value} onChange={setValue} />`                                                             |
 | Switch          | `<Switch v-model="checked">Label</Switch>`                                                                  | `<Switch checked={checked} onChange={setChecked}>Label</Switch>`                                            |
 | Textarea        | `<Textarea v-model="value" :rows="4" />`                                                                    | `<Textarea value={value} onChange={(event) => setValue(event.target.value)} />`                             |
+| TimePicker      | `<TimePicker v-model="value" />`                                                                            | `<TimePicker value={value} onChange={setValue} />`                                                          |
 | TreeSelect      | `<TreeSelect v-model="value" :tree-data="treeData" />`                                                      | `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`                      |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：ColorPicker, ColorSwatch, CronEditor, InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, TimePicker, Transfer, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：ColorPicker, ColorSwatch, CronEditor, InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, Transfer, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

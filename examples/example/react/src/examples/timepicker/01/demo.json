@@ -1,7 +1,7 @@
 {
   "id": "timepicker-01",
   "title": "基础用法",
-  "description": "基础的时间选择器组件。",
+  "description": "空值从 minTime 09:30 选起。12 小时制可按显示格式键入。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

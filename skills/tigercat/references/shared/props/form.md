@@ -354,14 +354,22 @@ Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React �
 
 ## TimePicker
 
-`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/23 props
+`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 8/31 props
 
-| Prop        | Type                             | Default | Notes                                                                                      |
-| ----------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `locale?`   | `string \| Partial<TigerLocale>` | `-`     | Locale used for UI labels (e.g. AM/PM) and display formatting. Example: 'zh-CN', 'en-US... |
-| `value?`    | `TimePickerModelValue`           | `-`     | Controlled value. Format: 'HH:mm' or 'HH:mm:ss'                                            |
-| `disabled?` | `boolean`                        | `false` | Whether the timepicker is disabled                                                         |
-| `name?`     | `string`                         | `-`     | Input name attribute                                                                       |
+Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。
+
+| Prop            | Type                           | Default | Notes                                                    |
+| --------------- | ------------------------------ | ------- | -------------------------------------------------------- |
+| `value?`        | `TimePickerModelValue \| null` | `-`     | -                                                        |
+| `defaultValue?` | `TimePickerModelValue \| null` | `-`     | -                                                        |
+| `range?`        | `boolean`                      | `false` | -                                                        |
+| `format?`       | `TimeFormat`                   | `'24'`  | Display / typed-parse clock. Stored value stays 24-hour. |
+| `showSeconds?`  | `boolean`                      | `false` | -                                                        |
+| `open?`         | `boolean`                      | `-`     | -                                                        |
+| `placeholder?`  | `string`                       | `-`     | -                                                        |
+| `disabled?`     | `boolean`                      | `false` | -                                                        |
+
+Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## Transfer
 

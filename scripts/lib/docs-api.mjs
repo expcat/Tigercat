@@ -281,6 +281,21 @@ export const COMPONENT_PROP_PRIORITY = {
     'weekStartsOn?',
     'locale?'
   ],
+  TimePicker: [
+    'value?',
+    'defaultValue?',
+    'range?',
+    'format?',
+    'showSeconds?',
+    'open?',
+    'placeholder?',
+    'disabled?',
+    'clearable?',
+    'minTime?',
+    'maxTime?',
+    'disabledTime?',
+    'locale?'
+  ],
   TreeSelect: [
     'treeData?',
     'value?',
@@ -449,7 +464,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
     AutoComplete: '<AutoComplete v-model="value" :options="options" />',
     Cascader: '<Cascader v-model="value" :options="options" />',
     TreeSelect: '<TreeSelect v-model="value" :tree-data="treeData" />',
-    DatePicker: '<DatePicker v-model="value" />'
+    DatePicker: '<DatePicker v-model="value" />',
+    TimePicker: '<TimePicker v-model="value" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -498,7 +514,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Cascader: '<Cascader value={value} options={options} onChange={(next) => setValue(next)} />',
     TreeSelect:
       '<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />',
-    DatePicker: '<DatePicker value={date} onChange={setDate} />'
+    DatePicker: '<DatePicker value={date} onChange={setDate} />',
+    TimePicker: '<TimePicker value={value} onChange={setValue} />'
   }
 }
 

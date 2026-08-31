@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { TimePicker } from '@expcat/tigercat-vue/TimePicker'
-
-const value = ref<string | null>('09:30:00')
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 </script>
 
 <template>
-  <TimePicker
-    v-model="value"
-    show-seconds
-    :minute-step="5"
-    size="lg"
-    clearable
-    class="w-full max-w-[280px]" />
+  <ConfigProvider :locale="zhTW">
+    <div class="flex flex-col gap-6">
+      <FormItem label="時間">
+        <TimePicker min-time="09:30" />
+      </FormItem>
+      <TimePicker format="12" />
+    </div>
+  </ConfigProvider>
 </template>
