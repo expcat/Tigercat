@@ -166,10 +166,7 @@ export const jaJP: TigerLocale = {
     previousMonth: '前月',
     nextMonth: '翌月',
     previousYear: '前年',
-    nextYear: '翌年',
-    yearSelectAriaLabel: '年',
-    monthSelectAriaLabel: '月',
-    daySelectAriaLabel: '日'
+    nextYear: '翌年'
   },
   fileManager: {
     rootText: 'ルート'

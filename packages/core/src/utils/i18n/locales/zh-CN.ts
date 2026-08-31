@@ -166,10 +166,7 @@ export const zhCN: TigerLocale = {
     previousMonth: '上个月',
     nextMonth: '下个月',
     previousYear: '上一年',
-    nextYear: '下一年',
-    yearSelectAriaLabel: '年份',
-    monthSelectAriaLabel: '月份',
-    daySelectAriaLabel: '日期'
+    nextYear: '下一年'
   },
   fileManager: {
     rootText: '根目录'

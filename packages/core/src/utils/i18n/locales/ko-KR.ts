@@ -166,10 +166,7 @@ export const koKR: TigerLocale = {
     previousMonth: '이전 달',
     nextMonth: '다음 달',
     previousYear: '이전 해',
-    nextYear: '다음 해',
-    yearSelectAriaLabel: '연도',
-    monthSelectAriaLabel: '월',
-    daySelectAriaLabel: '일'
+    nextYear: '다음 해'
   },
   fileManager: {
     rootText: '루트'

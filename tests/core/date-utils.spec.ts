@@ -52,7 +52,7 @@ describe('date-utils calendar month cache', () => {
   })
 
   it('returns fresh Date instances from cached values', () => {
-    const firstRead = getCalendarDays(2024, 5) as Date[]
+    const firstRead = getCalendarDays(2024, 5)
     firstRead[0].setFullYear(1999)
 
     const secondRead = getCalendarDays(2024, 5)
@@ -92,8 +92,10 @@ describe('date-utils calendar month cache', () => {
     expect(parseDate(null)).toBeNull()
     expect(parseDate('not-a-date')).toBeNull()
     expect(parseDate(new Date(Number.NaN))).toBeNull()
-    expect(parseDate(date)).toBe(date)
+    expect(parseDate(date)).toEqual(new Date(2024, 0, 5))
     expect(parseDate('2024-01-05')?.getFullYear()).toBe(2024)
+    expect(parseDate('15/01/2024', 'dd/MM/yyyy')).toEqual(new Date(2024, 0, 15))
+    expect(parseDate('01/15/2024', 'dd/MM/yyyy')).toBeNull()
   })
 
   it('formats legacy dates for every supported ASCII pattern', () => {
@@ -150,6 +152,8 @@ describe('date-utils calendar month cache', () => {
       'Saturday'
     ])
     expect(getShortDayNames()[0]).toBe('Sun')
+    expect(getShortDayNames('en-US', 1)[0]).toBe('Mon')
+    expect(getCalendarDays(2024, 5, 1)[0]).toEqual(new Date(2024, 4, 27))
     expect(getMonthNames('fr-FR')[0]).toBeTruthy()
     expect(getShortMonthNames('fr-FR')).toHaveLength(12)
     expect(getDayNames('de-DE')).toHaveLength(7)
@@ -247,8 +251,10 @@ describe('parseDate', () => {
     expect(parseDate('')).toBeNull()
     expect(parseDate('not-a-date')).toBeNull()
     expect(parseDate(new Date(Number.NaN))).toBeNull()
-    expect(parseDate(date)).toBe(date)
+    expect(parseDate(date)).toEqual(new Date(2024, 0, 5))
     expect(parseDate('2024-01-05')?.getFullYear()).toBe(2024)
+    expect(parseDate('15/01/2024', 'dd/MM/yyyy')).toEqual(new Date(2024, 0, 15))
+    expect(parseDate('01/15/2024', 'dd/MM/yyyy')).toBeNull()
   })
 
   it('still parses ISO datetime strings that include a time component', () => {

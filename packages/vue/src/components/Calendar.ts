@@ -1,261 +1,293 @@
-import { defineComponent, h, ref, computed, nextTick, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  nextTick,
+  useId,
+  type PropType
+} from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type {
   CalendarMode,
+  WeekStartsOn,
   TigerLocale,
   CalendarProps as CoreCalendarProps
 } from '@expcat/tigercat-core'
 import {
-  getCalendarContainerClasses,
+  calendarGridClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
   calendarTitleClasses,
   calendarWeekdayClasses,
+  chunkDaysIntoWeeks,
+  chunkMonths,
+  followCalendarValue,
+  formatCalendarDayLabel,
+  formatCalendarDayNumber,
+  formatMonthYear,
+  getCalendarContainerClasses,
   getCalendarDayClasses,
+  getCalendarDayKeyAction,
+  getCalendarLabels,
   getCalendarMonthClasses,
-  isCalendarMonthDisabled,
-  isSameDay,
+  getCalendarMonthKeyAction,
+  getInitialCalendarView,
+  getLocaleDirection,
   getMonthDays,
   getShortDayNames,
   getShortMonthNames,
-  formatMonthYear,
-  formatDate,
-  parseDate,
-  addDays,
-  getCalendarLabels,
-  mergeTigerLocale
+  getWeekStartsOn,
+  isCalendarDateDisabled,
+  isCalendarMonthDisabled,
+  isSameDay,
+  mergeTigerLocale,
+  mergeStyleValues,
+  moveCalendarDayFocus,
+  moveCalendarMonthFocus,
+  panelDate,
+  resolveCalendarRovingIso,
+  resolveCalendarRovingMonth,
+  selectCalendarDay,
+  selectCalendarMonth,
+  shiftCalendarMonth,
+  shiftCalendarYear,
+  toCalendarDate,
+  toIsoDate
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-/**
- * Vue Calendar props. Reuses the shared core props except `value`/callbacks —
- * Vue binds the selected date with `v-model` (`modelValue`) and emits `change` /
- * `panel-change` instead of `onChange` / `onPanelChange`.
- */
 export interface VueCalendarProps extends Omit<
   CoreCalendarProps,
   'value' | 'onChange' | 'onPanelChange'
 > {
-  modelValue?: Date
+  modelValue?: Date | string | null
 }
+
+export type CalendarProps = VueCalendarProps
 
 export const Calendar = defineComponent({
   name: 'TigerCalendar',
   inheritAttrs: false,
   props: {
-    modelValue: { type: Date as PropType<Date>, default: undefined },
-    mode: { type: String as PropType<CalendarMode>, default: 'month' },
+    modelValue: {
+      type: [Date, String, null] as PropType<Date | string | null>,
+      default: undefined
+    },
+    defaultValue: {
+      type: [Date, String, null] as PropType<Date | string | null>,
+      default: undefined
+    },
+    mode: { type: String as PropType<CalendarMode>, default: undefined },
+    defaultMode: { type: String as PropType<CalendarMode>, default: 'month' },
     fullscreen: { type: Boolean, default: false },
     disabledDate: { type: Function as PropType<(date: Date) => boolean>, default: undefined },
+    weekStartsOn: { type: Number as PropType<WeekStartsOn>, default: undefined },
+    now: { type: Date as PropType<Date>, default: undefined },
+    rangeValue: {
+      type: Array as unknown as PropType<[Date | null, Date | null]>,
+      default: undefined
+    },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined }
   },
-  emits: ['update:modelValue', 'change', 'panel-change'],
-  setup(props, { emit, attrs }) {
+  emits: ['update:modelValue', 'update:mode', 'change', 'panel-change'],
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const localeCode = computed(() => mergedLocale.value?.locale)
+    const dir = computed(() => getLocaleDirection(mergedLocale.value))
     const labels = computed(() => getCalendarLabels(mergedLocale.value))
-    const weekdayNames = computed(() => getShortDayNames(localeCode.value))
+    const weekStartsOn = computed(() => props.weekStartsOn ?? getWeekStartsOn(localeCode.value))
+    const weekdayNames = computed(() => getShortDayNames(localeCode.value, weekStartsOn.value))
     const monthNames = computed(() => getShortMonthNames(localeCode.value))
-    const today = new Date()
-    const viewYear = ref(props.modelValue?.getFullYear() ?? today.getFullYear())
-    const viewMonth = ref(props.modelValue?.getMonth() ?? today.getMonth())
 
-    const days = computed(() => getMonthDays(viewYear.value, viewMonth.value))
+    const clientNow = ref<Date | null>(null)
+    onMounted(() => {
+      if (!props.now) clientNow.value = new Date()
+    })
+    const today = computed(() => props.now ?? clientNow.value)
 
-    function prevMonth() {
-      if (viewMonth.value === 0) {
-        viewMonth.value = 11
-        viewYear.value--
-      } else {
-        viewMonth.value--
+    const innerSelected = ref<Date | null>(toCalendarDate(props.defaultValue) ?? null)
+    const selected = computed(() =>
+      props.modelValue !== undefined ? toCalendarDate(props.modelValue) : innerSelected.value
+    )
+
+    const innerMode = ref<CalendarMode>(props.defaultMode ?? 'month')
+    const mode = computed(() => props.mode ?? innerMode.value)
+
+    const view = ref(getInitialCalendarView(selected.value, today.value ?? props.now))
+    const followedYmd = ref(selected.value ? toIsoDate(selected.value) : null)
+
+    watch(
+      () => (selected.value ? toIsoDate(selected.value) : null),
+      (ymd) => {
+        const next = followCalendarValue(view.value, selected.value, followedYmd.value)
+        followedYmd.value = ymd
+        if (next) view.value = next
       }
-      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+    )
+
+    const days = computed(() =>
+      getMonthDays(view.value.viewYear, view.value.viewMonth, weekStartsOn.value)
+    )
+    const weeks = computed(() => chunkDaysIntoWeeks(days.value))
+    const monthRows = computed(() => chunkMonths(monthNames.value))
+
+    function emitPanel(nextView: { viewYear: number; viewMonth: number }, nextMode: CalendarMode) {
+      emit('panel-change', panelDate(nextView), nextMode)
     }
 
-    function nextMonth() {
-      if (viewMonth.value === 11) {
-        viewMonth.value = 0
-        viewYear.value++
-      } else {
-        viewMonth.value++
-      }
-      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+    function navigate(nextView: { viewYear: number; viewMonth: number }) {
+      view.value = nextView
+      emitPanel(nextView, mode.value)
     }
 
-    function prevYear() {
-      viewYear.value--
-      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
-    }
-
-    function nextYear() {
-      viewYear.value++
-      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+    function commitSelected(date: Date) {
+      if (props.modelValue === undefined) innerSelected.value = date
+      emit('update:modelValue', date)
+      emit('change', date)
     }
 
     function selectDay(date: Date) {
-      if (props.disabledDate?.(date)) return
-      emit('update:modelValue', date)
-      emit('change', date)
+      const result = selectCalendarDay(date, props.disabledDate)
+      if (!result) return
+      const next = toCalendarDate(result.iso)
+      if (!next) return
+      view.value = { viewYear: result.viewYear, viewMonth: result.viewMonth }
+      commitSelected(next)
     }
 
     function selectMonth(monthIdx: number) {
-      if (isCalendarMonthDisabled(viewYear.value, monthIdx, props.disabledDate)) return
-      viewMonth.value = monthIdx
-      const date = new Date(viewYear.value, monthIdx, 1)
-      emit('update:modelValue', date)
-      emit('change', date)
-      emit('panel-change', date, 'month')
+      const result = selectCalendarMonth(view.value.viewYear, monthIdx, props.disabledDate)
+      if (!result) return
+      view.value = { viewYear: view.value.viewYear, viewMonth: monthIdx }
+      if (props.mode === undefined) innerMode.value = 'month'
+      emit('update:mode', 'month')
+      commitSelected(result.date)
+      emit('panel-change', result.date, 'month')
     }
 
-    // ----- Keyboard navigation (roving focus stays in the framework layer) -----
+    function toggleMode() {
+      const next: CalendarMode = mode.value === 'month' ? 'year' : 'month'
+      if (props.mode === undefined) innerMode.value = next
+      emit('update:mode', next)
+      emitPanel(view.value, next)
+    }
+
     const dayGridEl = ref<HTMLElement | null>(null)
     const monthGridEl = ref<HTMLElement | null>(null)
+    const rootEl = ref<HTMLElement | null>(null)
     const activeIso = ref<string | null>(null)
     const activeMonthIdx = ref<number | null>(null)
+    const titleId = useId()
 
-    const toIso = (d: Date) => formatDate(d, 'yyyy-MM-dd')
-
-    function getDefaultDayIso(): string {
-      const v = props.modelValue
-      if (v && v.getFullYear() === viewYear.value && v.getMonth() === viewMonth.value)
-        return toIso(v)
-      if (today.getFullYear() === viewYear.value && today.getMonth() === viewMonth.value)
-        return toIso(today)
-      return toIso(new Date(viewYear.value, viewMonth.value, 1))
-    }
-
-    function navigate(y: number, m: number) {
-      viewYear.value = y
-      viewMonth.value = m
-      emit('panel-change', new Date(y, m, 1), props.mode)
-    }
-
-    function focusDayIso(iso: string): boolean {
-      const el = dayGridEl.value?.querySelector<HTMLButtonElement>(`button[data-date="${iso}"]`)
-      if (el && !el.disabled) {
-        el.focus()
-        activeIso.value = iso
-        return true
+    function handleDayGridKeyDown(event: KeyboardEvent) {
+      const action = getCalendarDayKeyAction(event.key, dir.value, event.altKey)
+      if (action.kind === 'none') return
+      event.preventDefault()
+      const roving = resolveCalendarRovingIso({
+        days: days.value,
+        selected: selected.value,
+        today: today.value,
+        view: view.value,
+        disabledDate: props.disabledDate,
+        activeIso: activeIso.value
+      })
+      const currentIso = (event.target as HTMLElement).getAttribute('data-date') ?? roving
+      if (!currentIso) return
+      const result = moveCalendarDayFocus({
+        currentIso,
+        kind: action.kind,
+        delta: action.delta,
+        weekStartsOn: weekStartsOn.value,
+        disabledDate: props.disabledDate
+      })
+      if (!result) return
+      activeIso.value = result.iso
+      if (result.viewYear !== view.value.viewYear || result.viewMonth !== view.value.viewMonth) {
+        navigate({ viewYear: result.viewYear, viewMonth: result.viewMonth })
+        nextTick(() => {
+          dayGridEl.value
+            ?.querySelector<HTMLButtonElement>(`button[data-date="${result.iso}"]`)
+            ?.focus()
+        })
+        return
       }
-      return false
+      dayGridEl.value
+        ?.querySelector<HTMLButtonElement>(`button[data-date="${result.iso}"]`)
+        ?.focus()
     }
 
-    function moveDayFocus(deltaDays: number) {
-      const activeEl = document.activeElement as HTMLElement | null
-      const currentIso =
-        activeEl?.getAttribute('data-date') ?? activeIso.value ?? getDefaultDayIso()
-      const base = parseDate(currentIso)
-      if (!base) return
-      let candidate = addDays(base, deltaDays)
-      for (let attempts = 0; attempts < 42; attempts++) {
-        const iso = toIso(candidate)
-        const el = dayGridEl.value?.querySelector<HTMLButtonElement>(`button[data-date="${iso}"]`)
-        if (el && !el.disabled) {
-          el.focus()
-          activeIso.value = iso
-          return
-        }
-        if (!el) {
-          activeIso.value = iso
-          navigate(candidate.getFullYear(), candidate.getMonth())
-          nextTick(() => {
-            dayGridEl.value?.querySelector<HTMLButtonElement>(`button[data-date="${iso}"]`)?.focus()
-          })
-          return
-        }
-        candidate = addDays(candidate, deltaDays)
+    function handleMonthKeyDown(event: KeyboardEvent, idx: number) {
+      const action = getCalendarMonthKeyAction(event.key, dir.value)
+      if (action.kind === 'none') return
+      event.preventDefault()
+      const next = moveCalendarMonthFocus({
+        current: idx,
+        kind: action.kind,
+        delta: action.delta,
+        viewYear: view.value.viewYear,
+        disabledDate: props.disabledDate
+      })
+      if (next == null) return
+      activeMonthIdx.value = next
+      monthGridEl.value
+        ?.querySelectorAll<HTMLButtonElement>('button[role="gridcell"]')
+        [next]?.focus()
+    }
+
+    expose({
+      focus: () => {
+        const iso = resolveCalendarRovingIso({
+          days: days.value,
+          selected: selected.value,
+          today: today.value,
+          view: view.value,
+          disabledDate: props.disabledDate,
+          activeIso: activeIso.value
+        })
+        const el = iso
+          ? dayGridEl.value?.querySelector<HTMLButtonElement>(`button[data-date="${iso}"]`)
+          : null
+        ;(el ?? rootEl.value)?.focus?.()
       }
-    }
-
-    function handleDayGridKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case 'ArrowLeft':
-          e.preventDefault()
-          moveDayFocus(-1)
-          break
-        case 'ArrowRight':
-          e.preventDefault()
-          moveDayFocus(1)
-          break
-        case 'ArrowUp':
-          e.preventDefault()
-          moveDayFocus(-7)
-          break
-        case 'ArrowDown':
-          e.preventDefault()
-          moveDayFocus(7)
-          break
-        case 'Home':
-          e.preventDefault()
-          focusDayIso(toIso(new Date(viewYear.value, viewMonth.value, 1)))
-          break
-        case 'End':
-          e.preventDefault()
-          focusDayIso(toIso(new Date(viewYear.value, viewMonth.value + 1, 0)))
-          break
-        case 'Enter':
-        case ' ': {
-          const activeEl = document.activeElement as HTMLElement | null
-          const iso = activeEl?.getAttribute('data-date')
-          if (iso) {
-            e.preventDefault()
-            const d = parseDate(iso)
-            if (d) selectDay(d)
-          }
-          break
-        }
-        default:
-          break
-      }
-    }
-
-    function focusMonthIdx(idx: number) {
-      const els = monthGridEl.value?.querySelectorAll<HTMLButtonElement>('button[role="gridcell"]')
-      els?.[idx]?.focus()
-      activeMonthIdx.value = idx
-    }
-
-    function handleMonthKeyDown(e: KeyboardEvent, idx: number) {
-      let target = idx
-      switch (e.key) {
-        case 'ArrowRight':
-          target = Math.min(11, idx + 1)
-          break
-        case 'ArrowLeft':
-          target = Math.max(0, idx - 1)
-          break
-        case 'ArrowDown':
-          target = Math.min(11, idx + 3)
-          break
-        case 'ArrowUp':
-          target = Math.max(0, idx - 3)
-          break
-        case 'Home':
-          target = 0
-          break
-        case 'End':
-          target = 11
-          break
-        case 'Enter':
-        case ' ':
-          e.preventDefault()
-          selectMonth(idx)
-          return
-        default:
-          return
-      }
-      e.preventDefault()
-      focusMonthIdx(target)
-    }
+    })
 
     return () => {
+      const attrRecord = attrs as Record<string, unknown>
       const containerClass = classNames(
         getCalendarContainerClasses(!!props.fullscreen),
         props.className,
-        coerceClassValue((attrs as Record<string, unknown>).class)
+        coerceClassValue(attrRecord.class)
       )
+      const title =
+        mode.value === 'month'
+          ? formatMonthYear(view.value.viewYear, view.value.viewMonth, localeCode.value)
+          : `${view.value.viewYear}`
+      const prevLabel =
+        mode.value === 'month' ? labels.value.previousMonth : labels.value.previousYear
+      const nextLabel = mode.value === 'month' ? labels.value.nextMonth : labels.value.nextYear
+      const prevChar = dir.value === 'rtl' ? '\u203A' : '\u2039'
+      const nextChar = dir.value === 'rtl' ? '\u2039' : '\u203A'
+      const rovingDayIso = resolveCalendarRovingIso({
+        days: days.value,
+        selected: selected.value,
+        today: today.value,
+        view: view.value,
+        disabledDate: props.disabledDate,
+        activeIso: activeIso.value
+      })
+      const rovingMonthIdx = resolveCalendarRovingMonth({
+        viewMonth: view.value.viewMonth,
+        viewYear: view.value.viewYear,
+        disabledDate: props.disabledDate,
+        activeMonthIdx: activeMonthIdx.value
+      })
+      const rangeStart = props.rangeValue?.[0] ?? null
+      const rangeEnd = props.rangeValue?.[1] ?? null
 
       const header = h('div', { class: calendarHeaderClasses }, [
         h(
@@ -263,64 +295,84 @@ export const Calendar = defineComponent({
           {
             type: 'button',
             class: calendarNavButtonClasses,
-            'aria-label':
-              props.mode === 'month' ? labels.value.previousMonth : labels.value.previousYear,
-            onClick: props.mode === 'month' ? prevMonth : prevYear
+            'aria-label': prevLabel,
+            onClick: () =>
+              navigate(
+                mode.value === 'month'
+                  ? shiftCalendarMonth(view.value, -1)
+                  : shiftCalendarYear(view.value, -1)
+              )
           },
-          '\u2039'
+          prevChar
         ),
         h(
-          'span',
-          { class: calendarTitleClasses },
-          props.mode === 'month'
-            ? formatMonthYear(viewYear.value, viewMonth.value, localeCode.value)
-            : `${viewYear.value}`
+          'button',
+          {
+            type: 'button',
+            id: titleId,
+            class: calendarTitleClasses,
+            onClick: toggleMode
+          },
+          title
         ),
         h(
           'button',
           {
             type: 'button',
             class: calendarNavButtonClasses,
-            'aria-label': props.mode === 'month' ? labels.value.nextMonth : labels.value.nextYear,
-            onClick: props.mode === 'month' ? nextMonth : nextYear
+            'aria-label': nextLabel,
+            onClick: () =>
+              navigate(
+                mode.value === 'month'
+                  ? shiftCalendarMonth(view.value, 1)
+                  : shiftCalendarYear(view.value, 1)
+              )
           },
-          '\u203A'
+          nextChar
         )
       ])
 
-      const rovingDayIso = activeIso.value ?? getDefaultDayIso()
-      const rovingMonthIdx = activeMonthIdx.value ?? viewMonth.value
-
       let body: ReturnType<typeof h>
-      if (props.mode === 'year') {
-        const monthRows: string[][] = []
-        for (let i = 0; i < monthNames.value.length; i += 3)
-          monthRows.push(monthNames.value.slice(i, i + 3))
+      if (mode.value === 'year') {
         body = h(
           'div',
-          { class: 'grid grid-cols-1 gap-2', role: 'grid', ref: monthGridEl },
-          monthRows.map((row, ri) =>
+          {
+            class: 'grid grid-cols-1 gap-2',
+            role: 'grid',
+            'aria-colcount': 3,
+            'aria-labelledby': titleId,
+            ref: monthGridEl
+          },
+          monthRows.value.map((row, ri) =>
             h(
               'div',
               { key: ri, class: 'grid grid-cols-3 gap-2', role: 'row' },
-              row.map((m, ci) => {
+              row.map((name, ci) => {
                 const i = ri * 3 + ci
-                const isDisabled = isCalendarMonthDisabled(viewYear.value, i, props.disabledDate)
+                const isDisabled = isCalendarMonthDisabled(
+                  view.value.viewYear,
+                  i,
+                  props.disabledDate
+                )
                 return h(
                   'button',
                   {
                     key: i,
                     type: 'button',
                     role: 'gridcell',
-                    'aria-selected': viewMonth.value === i,
+                    'aria-selected': view.value.viewMonth === i,
                     disabled: isDisabled,
                     tabindex: rovingMonthIdx === i && !isDisabled ? 0 : -1,
-                    class: getCalendarMonthClasses(viewMonth.value === i, isDisabled),
+                    class: getCalendarMonthClasses({
+                      isSelected: view.value.viewMonth === i,
+                      isDisabled,
+                      isActive: activeMonthIdx.value === i
+                    }),
                     onClick: () => selectMonth(i),
                     onFocus: () => (activeMonthIdx.value = i),
-                    onKeydown: (e: KeyboardEvent) => handleMonthKeyDown(e, i)
+                    onKeydown: (event: KeyboardEvent) => handleMonthKeyDown(event, i)
                   },
-                  m
+                  name
                 )
               })
             )
@@ -329,23 +381,31 @@ export const Calendar = defineComponent({
       } else {
         const weekdayRow = h(
           'div',
-          { class: 'grid grid-cols-7', role: 'row' },
+          { class: calendarGridClasses, role: 'row' },
           weekdayNames.value.map((wd) =>
             h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
           )
         )
-        const weeks: Date[][] = []
-        for (let i = 0; i < days.value.length; i += 7) weeks.push(days.value.slice(i, i + 7))
-        const weekRows = weeks.map((week, wi) =>
+        const weekRows = weeks.value.map((week, wi) =>
           h(
             'div',
-            { key: wi, class: 'grid grid-cols-7', role: 'row', onKeydown: handleDayGridKeyDown },
+            { key: wi, class: calendarGridClasses, role: 'row' },
             week.map((date) => {
-              const isCurrentMonth = date.getMonth() === viewMonth.value
-              const isSelected = props.modelValue ? isSameDay(date, props.modelValue) : false
-              const isTodayDate = isSameDay(date, today)
-              const isDisabled = !!props.disabledDate?.(date)
-              const iso = toIso(date)
+              const iso = toIsoDate(date)
+              const isCurrentMonth = date.getMonth() === view.value.viewMonth
+              const isSelected = selected.value ? isSameDay(date, selected.value) : false
+              const isRangeStart = rangeStart ? isSameDay(date, rangeStart) : false
+              const isRangeEnd = rangeEnd ? isSameDay(date, rangeEnd) : false
+              const isInRange = Boolean(
+                rangeStart &&
+                rangeEnd &&
+                date >= rangeStart &&
+                date <= rangeEnd &&
+                !isRangeStart &&
+                !isRangeEnd
+              )
+              const isTodayDate = today.value ? isSameDay(date, today.value) : false
+              const isDisabled = isCalendarDateDisabled(date, props.disabledDate)
               return h(
                 'button',
                 {
@@ -353,30 +413,56 @@ export const Calendar = defineComponent({
                   type: 'button',
                   role: 'gridcell',
                   'data-date': iso,
-                  'aria-label': iso,
-                  'aria-selected': isSelected,
+                  'aria-label': formatCalendarDayLabel(date, localeCode.value),
+                  'aria-selected': isSelected || isRangeStart || isRangeEnd,
                   'aria-current': isTodayDate ? 'date' : undefined,
                   disabled: isDisabled,
                   tabindex: rovingDayIso === iso && !isDisabled ? 0 : -1,
-                  class: classNames(
-                    getCalendarDayClasses(isSelected, isTodayDate, isCurrentMonth, isDisabled),
-                    'justify-self-center my-0.5'
-                  ),
+                  class: getCalendarDayClasses({
+                    isSelected,
+                    isToday: isTodayDate,
+                    isCurrentMonth,
+                    isDisabled,
+                    isActive: activeIso.value === iso,
+                    isInRange,
+                    isRangeStart,
+                    isRangeEnd
+                  }),
                   onClick: () => selectDay(date),
                   onFocus: () => (activeIso.value = iso)
                 },
-                date.getDate()
+                formatCalendarDayNumber(date, localeCode.value)
               )
             })
           )
         )
-        body = h('div', { role: 'grid', 'aria-rowcount': 7, 'aria-colcount': 7, ref: dayGridEl }, [
-          weekdayRow,
-          ...weekRows
-        ])
+        body = h(
+          'div',
+          {
+            role: 'grid',
+            'aria-rowcount': 7,
+            'aria-colcount': 7,
+            'aria-labelledby': titleId,
+            ref: dayGridEl,
+            onKeydown: handleDayGridKeyDown
+          },
+          [weekdayRow, ...weekRows]
+        )
       }
 
-      return h('div', { ...attrs, class: containerClass, role: 'group' }, [header, body])
+      const { class: _class, style: attrStyle, ...restAttrs } = attrRecord
+      return h(
+        'div',
+        {
+          ...restAttrs,
+          ref: rootEl,
+          dir: dir.value,
+          class: containerClass,
+          style: mergeStyleValues(attrStyle),
+          'data-tiger': 'calendar'
+        },
+        [header, body]
+      )
     }
   }
 })

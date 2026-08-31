@@ -223,9 +223,6 @@ export interface TigerLocaleCalendar {
   nextMonth?: string
   previousYear?: string
   nextYear?: string
-  yearSelectAriaLabel?: string
-  monthSelectAriaLabel?: string
-  daySelectAriaLabel?: string
 }
 
 export interface TigerLocaleFileManager {

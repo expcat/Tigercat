@@ -1,7 +1,7 @@
 {
   "id": "calendar-01",
-  "title": "代表视图",
-  "description": "受控月视图并回显当前选中日期。",
+  "title": "月视图",
+  "description": "非受控点选会留下选中；受控时父级改到另一月，面板跟着跳转。",
   "entry": "App.tsx",
   "order": 1
 }

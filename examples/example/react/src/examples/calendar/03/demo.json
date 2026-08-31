@@ -1,0 +1,7 @@
+{
+  "id": "calendar-03",
+  "title": "年视图",
+  "description": "点月份会把选中写成该月 1 日，并切到月视图。",
+  "entry": "App.tsx",
+  "order": 3
+}

@@ -2,10 +2,88 @@
  * Date utility functions for DatePicker
  */
 
+import type { WeekStartsOn } from '../types/calendar'
 import type { DateFormat } from '../types/datepicker'
 
 /** Date-only ISO (`YYYY-MM-DD`) with optional surrounding whitespace. */
 const DATE_ONLY_ISO_RE = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/
+
+const ASCII_DIGIT_RE = /[０-９٠-٩۰-۹]/g
+
+export function toAsciiDigits(value: string): string {
+  return value.replace(ASCII_DIGIT_RE, (ch) => {
+    const code = ch.charCodeAt(0)
+    if (code >= 0xff10 && code <= 0xff19) return String(code - 0xff10)
+    if (code >= 0x0660 && code <= 0x0669) return String(code - 0x0660)
+    if (code >= 0x06f0 && code <= 0x06f9) return String(code - 0x06f0)
+    return ch
+  })
+}
+
+/**
+ * Convert a Date or date-only string to a local-midnight calendar date.
+ * UTC-midnight instants (`new Date('2024-01-15')`) use UTC Y-M-D so the
+ * same calendar day is shown in every timezone.
+ */
+export function toCalendarDate(value: Date | string | null | undefined): Date | null {
+  if (value == null || value === '') return null
+  if (typeof value === 'string') return parseDate(value)
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) return null
+  const isLocalMidnight =
+    value.getHours() === 0 &&
+    value.getMinutes() === 0 &&
+    value.getSeconds() === 0 &&
+    value.getMilliseconds() === 0
+  const isUtcMidnight =
+    value.getUTCHours() === 0 &&
+    value.getUTCMinutes() === 0 &&
+    value.getUTCSeconds() === 0 &&
+    value.getUTCMilliseconds() === 0
+  if (isUtcMidnight && !isLocalMidnight) {
+    return new Date(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate())
+  }
+  if (isLocalMidnight) return value
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate())
+}
+
+function parseFormattedDate(value: string, format: DateFormat): Date | null {
+  const ascii = toAsciiDigits(value).trim()
+  const separator = format.includes('/') ? '/' : '-'
+  const parts = ascii.split(separator)
+  if (parts.length !== 3) return null
+  let year: number
+  let month: number
+  let day: number
+  switch (format) {
+    case 'MM/dd/yyyy':
+      month = Number(parts[0])
+      day = Number(parts[1])
+      year = Number(parts[2])
+      break
+    case 'dd/MM/yyyy':
+      day = Number(parts[0])
+      month = Number(parts[1])
+      year = Number(parts[2])
+      break
+    case 'yyyy/MM/dd':
+      year = Number(parts[0])
+      month = Number(parts[1])
+      day = Number(parts[2])
+      break
+    case 'yyyy-MM-dd':
+    default:
+      year = Number(parts[0])
+      month = Number(parts[1])
+      day = Number(parts[2])
+      break
+  }
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return null
+  const local = new Date(year, month - 1, day)
+  if (local.getFullYear() !== year || local.getMonth() !== month - 1 || local.getDate() !== day) {
+    return null
+  }
+  return local
+}
 
 /**
  * Parse `YYYY-MM-DD` as local calendar midnight (`Date(year, monthIndex, day)`).
@@ -34,15 +112,24 @@ function parseDateOnlyLocal(value: string): Date | null | undefined {
  * @param value - Date string, Date object, or null/undefined
  * @returns Date instance or null if invalid
  */
-export function parseDate(value: Date | string | null | undefined): Date | null {
-  if (!value) return null
-  if (value instanceof Date) {
-    return isNaN(value.getTime()) ? null : value
+export function parseDate(
+  value: Date | string | null | undefined,
+  format?: DateFormat
+): Date | null {
+  if (value == null || value === '') return null
+  if (value instanceof Date) return toCalendarDate(value)
+  if (typeof value !== 'string') return null
+  const ascii = toAsciiDigits(value)
+  if (format) {
+    const formatted = parseFormattedDate(ascii, format)
+    if (formatted) return formatted
+    if (format !== 'yyyy-MM-dd') return null
   }
-  const dateOnly = parseDateOnlyLocal(value)
+  const dateOnly = parseDateOnlyLocal(ascii)
   if (dateOnly !== undefined) return dateOnly
-  const parsed = new Date(value)
-  return isNaN(parsed.getTime()) ? null : parsed
+  const parsed = new Date(ascii)
+  if (Number.isNaN(parsed.getTime())) return null
+  return toCalendarDate(parsed)
 }
 
 const defaultDateFormatOptions: Intl.DateTimeFormatOptions = {
@@ -240,8 +327,12 @@ function getNormalizedMonth(year: number, month: number): { year: number; month:
   }
 }
 
-function getCalendarMonthDaysCacheKey(year: number, month: number): string {
-  return `${year}:${month}`
+function getCalendarMonthDaysCacheKey(
+  year: number,
+  month: number,
+  weekStartsOn: WeekStartsOn
+): string {
+  return `${year}:${month}:${weekStartsOn}`
 }
 
 export function clearCalendarMonthDaysCache(): void {
@@ -252,19 +343,24 @@ export function getCalendarMonthDaysCacheSize(): number {
   return calendarMonthDaysCache.size
 }
 
-function getCalendarDayTimeValues(year: number, month: number): readonly number[] {
+function getCalendarDayTimeValues(
+  year: number,
+  month: number,
+  weekStartsOn: WeekStartsOn = 0
+): readonly number[] {
   const normalized = getNormalizedMonth(year, month)
-  const cacheKey = getCalendarMonthDaysCacheKey(normalized.year, normalized.month)
+  const cacheKey = getCalendarMonthDaysCacheKey(normalized.year, normalized.month, weekStartsOn)
   const cachedDays = calendarMonthDaysCache.get(cacheKey)
   if (cachedDays) return cachedDays
 
   const firstDay = getFirstDayOfMonth(normalized.year, normalized.month)
+  const leading = (firstDay - weekStartsOn + 7) % 7
   const daysInMonth = getDaysInMonth(normalized.year, normalized.month)
   const daysInPrevMonth = getDaysInMonth(normalized.year, normalized.month - 1)
 
   const days: number[] = []
 
-  for (let i = firstDay - 1; i >= 0; i--) {
+  for (let i = leading - 1; i >= 0; i--) {
     days.push(new Date(normalized.year, normalized.month - 1, daysInPrevMonth - i).getTime())
   }
 
@@ -290,11 +386,46 @@ function getCalendarDayTimeValues(year: number, month: number): readonly number[
 }
 
 /**
- * Get calendar days for a given month
- * Returns array of dates including padding days from previous/next months
+ * Get calendar days for a given month.
+ * Always returns 42 dates including padding days from previous/next months.
  */
-export function getCalendarDays(year: number, month: number): (Date | null)[] {
-  return getCalendarDayTimeValues(year, month).map((time) => new Date(time))
+export function getCalendarDays(
+  year: number,
+  month: number,
+  weekStartsOn: WeekStartsOn = 0
+): Date[] {
+  return getCalendarDayTimeValues(year, month, weekStartsOn).map((time) => new Date(time))
+}
+
+/**
+ * Locale week start (0 = Sunday). Uses `Intl.Locale` weekInfo when available.
+ */
+export function getWeekStartsOn(locale?: string): WeekStartsOn {
+  if (!locale) return 0
+  const language = locale.split('-')[0]?.toLowerCase()
+  if (language === 'ar') return 6
+  try {
+    const intlLocale = new Intl.Locale(locale)
+    const weekInfo =
+      (intlLocale as { weekInfo?: { firstDay?: number } }).weekInfo ??
+      (typeof (intlLocale as { getWeekInfo?: () => { firstDay: number } }).getWeekInfo ===
+      'function'
+        ? (intlLocale as { getWeekInfo: () => { firstDay: number } }).getWeekInfo()
+        : undefined)
+    const firstDay = weekInfo?.firstDay
+    if (firstDay === 7) return 0
+    if (firstDay === 0) return 0
+    if (firstDay != null && firstDay >= 1 && firstDay <= 6) return firstDay as WeekStartsOn
+  } catch {
+    /* ignore invalid locale ids */
+  }
+  if (language === 'en') return 0
+  return 1
+}
+
+export function rotateWeekdayNames<T>(names: readonly T[], weekStartsOn: WeekStartsOn): T[] {
+  if (weekStartsOn === 0) return names.slice() as T[]
+  return names.slice(weekStartsOn).concat(names.slice(0, weekStartsOn)) as T[]
 }
 
 const intlCache = new Map<string, Intl.DateTimeFormat>()
@@ -421,10 +552,10 @@ export function getShortMonthNames(locale?: string): string[] {
 /**
  * Get day names
  */
-export function getDayNames(locale?: string): string[] {
+export function getDayNames(locale?: string, weekStartsOn: WeekStartsOn = 0): string[] {
   const fallback = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-  if (!locale) return fallback
+  if (!locale) return rotateWeekdayNames(fallback, weekStartsOn)
 
   // 2021-08-01 is a Sunday
   const base = new Date(2021, 7, 1)
@@ -436,16 +567,16 @@ export function getDayNames(locale?: string): string[] {
     )
   )
 
-  return names.every(Boolean) ? names : fallback
+  return rotateWeekdayNames(names.every(Boolean) ? names : fallback, weekStartsOn)
 }
 
 /**
  * Get short day names
  */
-export function getShortDayNames(locale?: string): string[] {
+export function getShortDayNames(locale?: string, weekStartsOn: WeekStartsOn = 0): string[] {
   const fallback = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-  if (!locale) return fallback
+  if (!locale) return rotateWeekdayNames(fallback, weekStartsOn)
 
   // 2021-08-01 is a Sunday
   const base = new Date(2021, 7, 1)
@@ -457,15 +588,34 @@ export function getShortDayNames(locale?: string): string[] {
     )
   )
 
-  return names.every(Boolean) ? names : fallback
+  return rotateWeekdayNames(names.every(Boolean) ? names : fallback, weekStartsOn)
 }
 
 /**
- * Check if a date is today
+ * Check if a date is the same calendar day as `now` (defaults to wall clock).
  */
-export function isToday(date: Date): boolean {
-  const today = new Date()
-  return isSameDay(date, today)
+export function isToday(date: Date, now: Date = new Date()): boolean {
+  return isSameDay(date, now)
+}
+
+export function formatCalendarDayNumber(date: Date, locale?: string): string {
+  if (locale) {
+    const text = safeIntlFormat(locale, { day: 'numeric' }, date)
+    if (text) return text
+  }
+  return String(date.getDate())
+}
+
+export function formatCalendarDayLabel(date: Date, locale?: string): string {
+  if (locale) {
+    const text = safeIntlFormat(
+      locale,
+      { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
+      date
+    )
+    if (text) return text
+  }
+  return formatDate(date, 'yyyy-MM-dd')
 }
 
 export interface DatePickerCalendarCellStateInput {
@@ -475,6 +625,7 @@ export interface DatePickerCalendarCellStateInput {
   isRangeMode?: boolean
   isCurrentMonth?: (date: Date) => boolean
   isDateDisabled?: (date: Date) => boolean
+  now?: Date | null
 }
 
 export interface DatePickerCalendarCellState {
@@ -515,7 +666,7 @@ export function getDatePickerCalendarCellState(
     iso: formatDate(date, 'yyyy-MM-dd'),
     isCurrentMonthDay: input.isCurrentMonth?.(date) ?? true,
     isSelected,
-    isTodayDay: isToday(date),
+    isTodayDay: input.now === null ? false : isToday(date, input.now ?? new Date()),
     isDisabled,
     isInRange,
     isRangeStart,

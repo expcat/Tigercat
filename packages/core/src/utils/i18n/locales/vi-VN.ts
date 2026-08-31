@@ -166,10 +166,7 @@ export const viVN: TigerLocale = {
     previousMonth: 'Tháng trước',
     nextMonth: 'Tháng sau',
     previousYear: 'Năm trước',
-    nextYear: 'Năm sau',
-    yearSelectAriaLabel: 'Năm',
-    monthSelectAriaLabel: 'Tháng',
-    daySelectAriaLabel: 'Ngày'
+    nextYear: 'Năm sau'
   },
   fileManager: {
     rootText: 'Gốc'

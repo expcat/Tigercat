@@ -166,10 +166,7 @@ export const arSA: TigerLocale = {
     previousMonth: 'الشهر السابق',
     nextMonth: 'الشهر التالي',
     previousYear: 'السنة السابقة',
-    nextYear: 'السنة التالية',
-    yearSelectAriaLabel: 'السنة',
-    monthSelectAriaLabel: 'الشهر',
-    daySelectAriaLabel: 'اليوم'
+    nextYear: 'السنة التالية'
   },
   fileManager: {
     rootText: 'الجذر'

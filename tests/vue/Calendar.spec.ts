@@ -5,281 +5,150 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Calendar } from '@expcat/tigercat-vue/Calendar'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { expectNoA11yViolations } from '../utils'
+import { h } from 'vue'
+
+const testDate = new Date(2024, 5, 15)
+const now = new Date(2024, 5, 15)
+
+function dayButton(iso: string): HTMLElement {
+  const el = document.querySelector(`[data-date="${iso}"]`)
+  if (!el) throw new Error(`missing ${iso}`)
+  return el as HTMLElement
+}
+
+function renderCalendar(props: Record<string, unknown> = {}) {
+  return render(Calendar, { props: { now, ...props } })
+}
 
 describe('Calendar', () => {
-  const testDate = new Date(2024, 5, 15) // June 15, 2024
-
-  // --- Basic rendering ---
-  it('renders with default props', () => {
-    const { container } = renderWithProps(Calendar, {})
-    expect(container.querySelector('[role="group"]')).toBeInTheDocument()
-  })
-
-  it('renders weekday headers in month mode', () => {
-    renderWithProps(Calendar, { mode: 'month' })
-    expect(screen.getByText('Sun')).toBeInTheDocument()
-    expect(screen.getByText('Mon')).toBeInTheDocument()
-    expect(screen.getByText('Sat')).toBeInTheDocument()
-  })
-
-  it('displays current month and year', () => {
-    renderWithProps(Calendar, { modelValue: testDate })
+  it('renders the month title and weekday headers', () => {
+    renderCalendar({ modelValue: testDate })
     expect(screen.getByText('June 2024')).toBeInTheDocument()
+    expect(screen.getByText('Sun')).toBeInTheDocument()
+    expect(screen.getByRole('grid')).toHaveAttribute('aria-labelledby')
   })
 
-  it('uses component locale for calendar labels and date text', () => {
-    renderWithProps(Calendar, { modelValue: testDate, locale: { locale: 'zh-CN' } })
-    expect(screen.getByText('2024年6月')).toBeInTheDocument()
-    expect(screen.getByText('周日')).toBeInTheDocument()
-    expect(screen.getByLabelText('下个月')).toBeInTheDocument()
+  it('keeps an uncontrolled selection after click', async () => {
+    renderCalendar({ defaultValue: testDate })
+    await fireEvent.click(dayButton('2024-06-20'))
+    expect(dayButton('2024-06-20')).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('renders day numbers', () => {
-    renderWithProps(Calendar, { modelValue: testDate })
-    expect(screen.getByText('15')).toBeInTheDocument()
-    const ones = screen.getAllByText('1')
-    expect(ones.length).toBeGreaterThanOrEqual(1)
+  it('follows a controlled value into another month', async () => {
+    const { rerender } = renderCalendar({ modelValue: testDate })
+    expect(screen.getByText('June 2024')).toBeInTheDocument()
+    await rerender({ modelValue: new Date(2024, 7, 20), now })
+    expect(screen.getByText('August 2024')).toBeInTheDocument()
+    expect(dayButton('2024-08-20')).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('applies className prop', () => {
-    const { container } = renderWithProps(Calendar, { className: 'my-cal' })
-    expect(container.querySelector('.my-cal')).toBeInTheDocument()
-  })
-
-  // --- Navigation ---
-  it('navigates to previous month', async () => {
-    renderWithProps(Calendar, { modelValue: testDate })
-    const prevBtn = screen.getByLabelText('Previous month')
-    await fireEvent.click(prevBtn)
-    expect(screen.getByText('May 2024')).toBeInTheDocument()
-  })
-
-  it('navigates to next month', async () => {
-    renderWithProps(Calendar, { modelValue: testDate })
-    const nextBtn = screen.getByLabelText('Next month')
-    await fireEvent.click(nextBtn)
-    expect(screen.getByText('July 2024')).toBeInTheDocument()
-  })
-
-  it('wraps year on December→January', async () => {
-    renderWithProps(Calendar, { modelValue: new Date(2024, 11, 1) })
-    expect(screen.getByText('December 2024')).toBeInTheDocument()
-    const nextBtn = screen.getByLabelText('Next month')
-    await fireEvent.click(nextBtn)
+  it('navigates months and wraps the year', async () => {
+    renderCalendar({ modelValue: new Date(2024, 11, 1) })
+    await fireEvent.click(screen.getByLabelText('Next month'))
     expect(screen.getByText('January 2025')).toBeInTheDocument()
   })
 
-  // --- Selection ---
-  it('selects a day on click', async () => {
-    const onChange = vi.fn()
-    render(Calendar, {
-      props: { modelValue: testDate, 'onUpdate:modelValue': onChange }
-    })
-    const day20 = screen.getByText('20')
-    await fireEvent.click(day20)
-    expect(onChange).toHaveBeenCalled()
-    const picked = onChange.mock.calls[0][0] as Date
-    expect(picked.getDate()).toBe(20)
-  })
-
-  // --- Disabled dates ---
-  it('does not select disabled dates', async () => {
-    const onChange = vi.fn()
-    render(Calendar, {
-      props: {
-        modelValue: testDate,
-        disabledDate: (d: Date) => d.getDate() === 20,
-        'onUpdate:modelValue': onChange
-      }
-    })
-    const day20 = screen.getByText('20')
-    await fireEvent.click(day20)
-    expect(onChange).not.toHaveBeenCalled()
-  })
-
-  // --- Fullscreen ---
-  it('applies fullscreen styles', () => {
-    const { container } = renderWithProps(Calendar, { fullscreen: true })
-    const el = container.querySelector('[role="group"]')
-    expect(el?.className).toContain('w-full')
-  })
-
-  // --- Year mode ---
-  it('renders month names in year mode', () => {
-    renderWithProps(Calendar, { mode: 'year', modelValue: testDate })
-    expect(screen.getByText('Jan')).toBeInTheDocument()
-    expect(screen.getByText('Dec')).toBeInTheDocument()
-  })
-
-  it('navigates years in year mode', async () => {
-    renderWithProps(Calendar, { mode: 'year', modelValue: testDate })
-    expect(screen.getByText('2024')).toBeInTheDocument()
-    const nextBtn = screen.getByLabelText('Next year')
-    await fireEvent.click(nextBtn)
-    expect(screen.getByText('2025')).toBeInTheDocument()
-  })
-
-  it("year mode: clicking a month emits that month's 1st", async () => {
+  it('emits update:modelValue for an enabled day and ignores a disabled day', async () => {
     const onUpdate = vi.fn()
-    const onChange = vi.fn()
-    const onPanelChange = vi.fn()
     render(Calendar, {
       props: {
-        mode: 'year',
         modelValue: testDate,
-        'onUpdate:modelValue': onUpdate,
-        onChange,
-        'onPanel-change': onPanelChange
+        now,
+        disabledDate: (date: Date) => date.getDate() === 20,
+        'onUpdate:modelValue': onUpdate
       }
     })
-    await fireEvent.click(screen.getByRole('gridcell', { name: 'Mar' }))
-    expect(onUpdate).toHaveBeenCalled()
-    const picked = onUpdate.mock.calls[0][0] as Date
-    expect(picked.getFullYear()).toBe(2024)
-    expect(picked.getMonth()).toBe(2)
-    expect(picked.getDate()).toBe(1)
-    expect(onChange).toHaveBeenCalled()
-    const changed = onChange.mock.calls[0][0] as Date
-    expect(changed.getFullYear()).toBe(2024)
-    expect(changed.getMonth()).toBe(2)
-    expect(changed.getDate()).toBe(1)
-    expect(onPanelChange).toHaveBeenCalled()
-  })
-
-  it('year mode: disables a month when every day is disabled', async () => {
-    const onUpdate = vi.fn()
-    const onChange = vi.fn()
-    const onPanelChange = vi.fn()
-    render(Calendar, {
-      props: {
-        mode: 'year',
-        modelValue: testDate,
-        disabledDate: (d: Date) => d.getMonth() === 2,
-        'onUpdate:modelValue': onUpdate,
-        onChange,
-        'onPanel-change': onPanelChange
-      }
-    })
-    const mar = screen.getByRole('gridcell', { name: 'Mar' })
-    expect(mar).toBeDisabled()
-    await fireEvent.click(mar)
-    await fireEvent.keyDown(mar, { key: 'Enter' })
+    await fireEvent.click(dayButton('2024-06-20'))
     expect(onUpdate).not.toHaveBeenCalled()
-    expect(onChange).not.toHaveBeenCalled()
-    expect(onPanelChange).not.toHaveBeenCalled()
-
-    const jun = screen.getByRole('gridcell', { name: 'Jun' })
-    expect(jun).not.toBeDisabled()
-    await fireEvent.click(jun)
-    expect(onUpdate).toHaveBeenCalled()
-    const picked = onUpdate.mock.calls[0][0] as Date
-    expect(picked.getFullYear()).toBe(2024)
-    expect(picked.getMonth()).toBe(5)
-    expect(picked.getDate()).toBe(1)
+    await fireEvent.click(dayButton('2024-06-21'))
+    expect((onUpdate.mock.calls[0][0] as Date).getDate()).toBe(21)
   })
 
-  it('year mode: weekend-only disabledDate does not disable any month', () => {
-    renderWithProps(Calendar, {
-      mode: 'year',
-      modelValue: testDate,
-      disabledDate: (d: Date) => d.getDay() === 0 || d.getDay() === 6
+  it('clicks a padding day and jumps to that month', async () => {
+    const onUpdate = vi.fn()
+    render(Calendar, {
+      props: { modelValue: testDate, now, 'onUpdate:modelValue': onUpdate }
     })
-    const cells = screen.getAllByRole('gridcell')
-    expect(cells).toHaveLength(12)
-    for (const cell of cells) {
-      expect(cell).not.toBeDisabled()
-    }
+    await fireEvent.click(dayButton('2024-07-01'))
+    expect(screen.getByText('July 2024')).toBeInTheDocument()
+    expect((onUpdate.mock.calls[0][0] as Date).getMonth()).toBe(6)
   })
 
-  // --- Keyboard navigation (C16-2) ---
-  describe('Keyboard navigation', () => {
-    it('renders day cells as gridcell buttons with a single roving tab-stop', () => {
-      renderWithProps(Calendar, { modelValue: testDate })
-      const selected = screen.getByRole('gridcell', { name: '2024-06-15' })
-      expect(selected.tagName).toBe('BUTTON')
-      expect(selected).toHaveAttribute('tabindex', '0')
-      expect(screen.getByRole('gridcell', { name: '2024-06-16' })).toHaveAttribute('tabindex', '-1')
+  it('year view click selects the 1st and switches to month mode when mode is uncontrolled', async () => {
+    const onUpdate = vi.fn()
+    const onPanelChange = vi.fn()
+    render(Calendar, {
+      props: {
+        defaultValue: testDate,
+        now,
+        'onUpdate:modelValue': onUpdate,
+        onPanelChange
+      }
     })
-
-    it('moves focus with arrow keys', async () => {
-      renderWithProps(Calendar, { modelValue: testDate })
-      const start = screen.getByRole('gridcell', { name: '2024-06-15' })
-      start.focus()
-      await fireEvent.keyDown(start, { key: 'ArrowRight' })
-      expect(screen.getByRole('gridcell', { name: '2024-06-16' })).toHaveFocus()
-      await fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' })
-      expect(screen.getByRole('gridcell', { name: '2024-06-23' })).toHaveFocus()
-    })
-
-    it('selects the focused day with Enter', async () => {
-      const onChange = vi.fn()
-      render(Calendar, { props: { modelValue: testDate, 'onUpdate:modelValue': onChange } })
-      const cell = screen.getByRole('gridcell', { name: '2024-06-20' })
-      cell.focus()
-      await fireEvent.keyDown(cell, { key: 'Enter' })
-      expect(onChange).toHaveBeenCalled()
-      expect((onChange.mock.calls[0][0] as Date).getDate()).toBe(20)
-    })
-
-    it('Home/End focus the first/last day of the month', async () => {
-      renderWithProps(Calendar, { modelValue: testDate })
-      const cell = screen.getByRole('gridcell', { name: '2024-06-15' })
-      cell.focus()
-      await fireEvent.keyDown(cell, { key: 'Home' })
-      expect(screen.getByRole('gridcell', { name: '2024-06-01' })).toHaveFocus()
-      await fireEvent.keyDown(document.activeElement!, { key: 'End' })
-      expect(screen.getByRole('gridcell', { name: '2024-06-30' })).toHaveFocus()
-    })
-
-    it('arrows across the month boundary and navigates the view', async () => {
-      renderWithProps(Calendar, { modelValue: new Date(2024, 5, 30) })
-      const cell = screen.getByRole('gridcell', { name: '2024-06-30' })
-      cell.focus()
-      await fireEvent.keyDown(cell, { key: 'ArrowDown' })
-      expect(screen.getByText('July 2024')).toBeInTheDocument()
-      expect(screen.getByRole('gridcell', { name: '2024-07-07' })).toHaveFocus()
-    })
-
-    it('year mode: months are keyboard-navigable gridcell buttons', async () => {
-      const onUpdate = vi.fn()
-      const onChange = vi.fn()
-      const onPanelChange = vi.fn()
-      render(Calendar, {
-        props: {
-          mode: 'year',
-          modelValue: testDate,
-          'onUpdate:modelValue': onUpdate,
-          onChange,
-          'onPanel-change': onPanelChange
-        }
-      })
-      const jun = screen.getByRole('gridcell', { name: 'Jun' })
-      expect(jun).toHaveAttribute('tabindex', '0')
-      jun.focus()
-      await fireEvent.keyDown(jun, { key: 'ArrowRight' })
-      expect(screen.getByRole('gridcell', { name: 'Jul' })).toHaveFocus()
-      await fireEvent.keyDown(document.activeElement!, { key: 'Enter' })
-      expect(onPanelChange).toHaveBeenCalled()
-      expect(onUpdate).toHaveBeenCalled()
-      const picked = onUpdate.mock.calls[0][0] as Date
-      expect(picked.getFullYear()).toBe(2024)
-      expect(picked.getMonth()).toBe(6)
-      expect(picked.getDate()).toBe(1)
-      expect(onChange).toHaveBeenCalled()
-    })
+    await fireEvent.click(screen.getByText('June 2024'))
+    expect(screen.getByText('2024')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('gridcell', { name: 'Mar' }))
+    expect((onUpdate.mock.calls[0][0] as Date).getMonth()).toBe(2)
+    expect(onPanelChange).toHaveBeenCalledWith(expect.any(Date), 'month')
+    expect(screen.getByText('March 2024')).toBeInTheDocument()
   })
 
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Calendar)
-      await expectNoA11yViolationsIsolated(container)
+  it('moves focus with arrows and skips disabled days', async () => {
+    renderCalendar({
+      modelValue: new Date(2024, 5, 14),
+      disabledDate: (date: Date) => date.getDay() === 0 || date.getDay() === 6
     })
+    const start = dayButton('2024-06-14')
+    start.focus()
+    await fireEvent.keyDown(start, { key: 'ArrowRight' })
+    expect(dayButton('2024-06-17')).toHaveFocus()
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Calendar)
-      expect(container.firstChild).toBeTruthy()
+
+  it('uses official locale objects for navigation copy and week start', () => {
+    render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () => h(Calendar, { modelValue: testDate, now }))
+      }
     })
+    expect(screen.getByLabelText('下个月')).toBeInTheDocument()
+    expect(screen.getByText('周一')).toBeInTheDocument()
+  })
+
+  it('uses Traditional Chinese navigation copy from zhTW', () => {
+    render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhTW }, () => h(Calendar, { modelValue: testDate, now }))
+      }
+    })
+    expect(screen.getByLabelText('下個月')).toBeInTheDocument()
+  })
+
+  it('uses Japanese navigation copy from jaJP', () => {
+    render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: jaJP }, () => h(Calendar, { modelValue: testDate, now }))
+      }
+    })
+    expect(screen.getByLabelText('翌月')).toBeInTheDocument()
+  })
+
+  it('has no axe violations for a labelled month view with disabled dates', async () => {
+    const { container } = render(Calendar, {
+      props: {
+        modelValue: testDate,
+        now,
+        disabledDate: (date: Date) => date.getDay() === 0,
+        'aria-label': 'June calendar'
+      }
+    })
+    await expectNoA11yViolations(container)
   })
 })

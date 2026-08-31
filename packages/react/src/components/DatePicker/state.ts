@@ -109,18 +109,27 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
     return [parseDate(tuple[0]), parseDate(tuple[1])]
   }
 
-  const [singleValue, setSingleValue] = useControlledState<Date | null>({
-    value:
+  const parsedSingleValue = useMemo(
+    () =>
       !isRangeMode && singleProps.value !== undefined
         ? parseDate(singleProps.value ?? null)
         : undefined,
+    [isRangeMode, singleProps.value]
+  )
+  const parsedRangeValue = useMemo(
+    () =>
+      isRangeMode && rangeProps.value !== undefined ? parseRangeTuple(rangeProps.value) : undefined,
+    [isRangeMode, rangeProps.value]
+  )
+
+  const [singleValue, setSingleValue] = useControlledState<Date | null>({
+    value: parsedSingleValue,
     defaultValue: parseDate(singleProps.defaultValue ?? null),
     onChange: singleProps.onChange
   })
 
   const [rangeValue, setRangeValue] = useControlledState<DatePickerRangeResolvedValue>({
-    value:
-      isRangeMode && rangeProps.value !== undefined ? parseRangeTuple(rangeProps.value) : undefined,
+    value: parsedRangeValue,
     defaultValue: parseRangeTuple(rangeProps.defaultValue),
     onChange: rangeProps.onChange
   })

@@ -166,10 +166,7 @@ export const idID: TigerLocale = {
     previousMonth: 'Bulan sebelumnya',
     nextMonth: 'Bulan berikutnya',
     previousYear: 'Tahun sebelumnya',
-    nextYear: 'Tahun berikutnya',
-    yearSelectAriaLabel: 'Tahun',
-    monthSelectAriaLabel: 'Bulan',
-    daySelectAriaLabel: 'Hari'
+    nextYear: 'Tahun berikutnya'
   },
   fileManager: {
     rootText: 'Akar'

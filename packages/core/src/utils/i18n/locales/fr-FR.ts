@@ -166,10 +166,7 @@ export const frFR: TigerLocale = {
     previousMonth: 'Mois précédent',
     nextMonth: 'Mois suivant',
     previousYear: 'Année précédente',
-    nextYear: 'Année suivante',
-    yearSelectAriaLabel: 'Année',
-    monthSelectAriaLabel: 'Mois',
-    daySelectAriaLabel: 'Jour'
+    nextYear: 'Année suivante'
   },
   fileManager: {
     rootText: 'Racine'

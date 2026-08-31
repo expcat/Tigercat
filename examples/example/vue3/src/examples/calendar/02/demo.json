@@ -1,7 +1,7 @@
 {
   "id": "calendar-02",
-  "title": "禁用日期",
-  "description": "全屏月视图，周末不可选。",
+  "title": "禁用周末",
+  "description": "全屏月视图，周末不可选。初值是工作日。",
   "entry": "App.vue",
   "order": 2
 }

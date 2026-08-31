@@ -166,10 +166,7 @@ export const ptBR: TigerLocale = {
     previousMonth: 'Mês anterior',
     nextMonth: 'Próximo mês',
     previousYear: 'Ano anterior',
-    nextYear: 'Próximo ano',
-    yearSelectAriaLabel: 'Ano',
-    monthSelectAriaLabel: 'Mês',
-    daySelectAriaLabel: 'Dia'
+    nextYear: 'Próximo ano'
   },
   fileManager: {
     rootText: 'Raiz'

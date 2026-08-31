@@ -166,10 +166,7 @@ export const deDE: TigerLocale = {
     previousMonth: 'Vorheriger Monat',
     nextMonth: 'Nächster Monat',
     previousYear: 'Vorheriges Jahr',
-    nextYear: 'Nächstes Jahr',
-    yearSelectAriaLabel: 'Jahr',
-    monthSelectAriaLabel: 'Monat',
-    daySelectAriaLabel: 'Tag'
+    nextYear: 'Nächstes Jahr'
   },
   fileManager: {
     rootText: 'Stammverzeichnis'
