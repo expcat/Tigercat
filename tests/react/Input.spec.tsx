@@ -7,6 +7,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Input } from '@expcat/tigercat-react/Input'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import type { InputType, InputStatus } from '@expcat/tigercat-core'
 import {
   renderWithProps,
@@ -90,8 +92,8 @@ describe('Input', () => {
       const { container } = render(<Input status="error" />)
       const wrapper = container.firstChild as HTMLElement
       const input = container.querySelector('input')
-      expect(wrapper.className).toContain('border-red-500')
-      expect(input?.className).not.toContain('border-red-500')
+      expect(wrapper.className).toContain('--tiger-error')
+      expect(input?.className).not.toContain('border-[var(--tiger-error')
     })
 
     it('puts border and radius on the wrapper, not the native input', () => {
@@ -114,7 +116,7 @@ describe('Input', () => {
 
       expect(getByText('Bad input')).toBeInTheDocument()
       expect(getByText('Still visible')).toBeInTheDocument()
-      expect(chrome.className).toContain('border-red-500')
+      expect(chrome.className).toContain('--tiger-error')
       expect(errorEl).toBeInTheDocument()
       expect(chrome.contains(errorEl)).toBe(false)
       expect(errorEl?.className).not.toContain('inset-y-0')
@@ -624,6 +626,43 @@ describe('Input', () => {
       const { container } = render(<Input status="error" suffix="Visible" />)
       expect(container.querySelector('[aria-live]')).toBeNull()
       expect(container).toHaveTextContent('Visible')
+    })
+  })
+
+  describe('ref, readOnly, trailing actions', () => {
+    it('forwards a ref to the native input', () => {
+      const ref = React.createRef<HTMLInputElement>()
+      render(<Input ref={ref} />)
+      expect(ref.current).toBeInstanceOf(HTMLInputElement)
+      ref.current?.focus()
+      expect(ref.current).toHaveFocus()
+    })
+
+    it('honors React readOnly the same as readonly', () => {
+      const { rerender } = render(<Input readOnly defaultValue="x" />)
+      expect(screen.getByRole('textbox')).toHaveAttribute('readonly')
+      rerender(<Input readonly defaultValue="x" />)
+      expect(screen.getByRole('textbox')).toHaveAttribute('readonly')
+    })
+
+    it('renders clear and password toggle together and returns focus after click', async () => {
+      const user = userEvent.setup()
+      render(<Input type="password" clearable showPassword defaultValue="secret" />)
+      const input = screen.getByDisplayValue('secret')
+      expect(screen.getByLabelText('Clear input')).toBeInTheDocument()
+      expect(screen.getByLabelText('Show password')).toBeInTheDocument()
+      await user.click(screen.getByLabelText('Show password'))
+      expect(input).toHaveFocus()
+      expect(input).toHaveAttribute('type', 'text')
+    })
+
+    it('names trailing buttons from the official locale object', () => {
+      render(
+        <ConfigProvider locale={zhTW}>
+          <Input clearable defaultValue="x" />
+        </ConfigProvider>
+      )
+      expect(screen.getByLabelText(zhTW.input!.clearAriaLabel!)).toBeInTheDocument()
     })
   })
 })

@@ -430,6 +430,16 @@ export const thTH: TigerLocale = {
   tagsInput: {
     removeTagLabel: 'ลบ {tag}',
     clearAllLabel: 'ล้างแท็กทั้งหมด'
+  },
+  input: {
+    clearAriaLabel: 'ล้างช่องป้อน',
+    showPasswordAriaLabel: 'แสดงรหัสผ่าน',
+    hidePasswordAriaLabel: 'ซ่อนรหัสผ่าน'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'เพิ่ม',
+    decrementAriaLabel: 'ลด',
+    emptyAriaValueText: 'ว่าง'
   }
 }
 

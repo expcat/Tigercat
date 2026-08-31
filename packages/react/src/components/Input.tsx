@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useId, forwardRef } from 'react'
 import {
   classNames,
   mergeAriaDescribedBy,
@@ -9,14 +9,21 @@ import {
   getInputClearButtonClasses,
   getInputPasswordToggleClasses,
   getInputCountClasses,
+  formatInputCountText,
   parseInputValue,
-  injectShakeStyle,
+  runShakeAnimation,
   SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  getInputLabels,
+  resolveInputTrailingLayout,
+  resolveReadOnlyFlag,
   type InputProps as CoreInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
 import { useInputGroupContext } from './InputGroup'
 import { useFormItemControlContext } from './FormItemContext'
+import { Icon } from './Icon'
 
 export interface InputProps
   extends
@@ -35,94 +42,66 @@ export interface InputProps
       | 'readOnly'
       | 'prefix'
     > {
-  /**
-   * Input event handler
-   */
   onInput?: (event: React.FormEvent<HTMLInputElement>) => void
-
-  /**
-   * Change event handler
-   */
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
-
-  /**
-   * Focus event handler
-   */
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
-
-  /**
-   * Blur event handler
-   */
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
-
-  /**
-   * Additional CSS classes
-   */
   className?: string
-
-  /**
-   * Internal shake trigger counter (used by FormItem)
-   * @internal
-   */
+  /** @internal */
   _shakeTrigger?: number
-
-  /**
-   * Prefix content
-   */
   prefix?: React.ReactNode
-
-  /**
-   * Suffix content
-   */
   suffix?: React.ReactNode
-
-  /**
-   * Clear event handler
-   * @since 0.5.0
-   */
   onClear?: () => void
+  readOnly?: boolean
 }
 
-export const Input: React.FC<InputProps> = ({
-  size,
-  type = 'text',
-  status: statusProp,
-  errorMessage: errorMessageProp,
-  _shakeTrigger: shakeTriggerProp,
-  prefix,
-  suffix,
-  value,
-  defaultValue,
-  placeholder = '',
-  disabled = false,
-  readonly = false,
-  required = false,
-  maxLength,
-  minLength,
-  name,
-  id,
-  autoComplete,
-  autoFocus = false,
-  clearable = false,
-  showPassword = false,
-  showCount = false,
-  onInput,
-  onChange,
-  onFocus,
-  onBlur,
-  onClear,
-  className,
-  style,
-  ...props
-}) => {
-  injectShakeStyle()
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    size,
+    type = 'text',
+    status: statusProp,
+    errorMessage: errorMessageProp,
+    _shakeTrigger: shakeTriggerProp,
+    prefix,
+    suffix,
+    value,
+    defaultValue,
+    placeholder = '',
+    disabled = false,
+    readonly: readonlyProp,
+    readOnly: readOnlyProp,
+    required = false,
+    maxLength,
+    minLength,
+    name,
+    id,
+    autoComplete,
+    autoFocus = false,
+    clearable = false,
+    showPassword = false,
+    showCount = false,
+    onInput,
+    onChange,
+    onFocus,
+    onBlur,
+    onClear,
+    className,
+    style,
+    ...props
+  },
+  ref
+) {
   const inputGroup = useInputGroupContext()
   const formItemControl = useFormItemControlContext()
+  const config = useTigerConfig()
+  const labels = getInputLabels(config.locale)
+  const inGroup = inputGroup != null
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const status = statusProp ?? formItemControl?.status ?? 'default'
   const errorMessage = errorMessageProp
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
   const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+  const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
   const formBoundValue = formItemControl?.value
@@ -137,6 +116,7 @@ export const Input: React.FC<InputProps> = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const mountedRef = useRef(false)
   const reactId = useId()
   const errorMsgId = `tiger-input-error-${reactId}`
   const [inputValue, setInputValue] = useControlledState<string | number>({
@@ -145,14 +125,18 @@ export const Input: React.FC<InputProps> = ({
   })
   const [passwordVisible, setPasswordVisible] = useState(false)
 
-  // Trigger shake animation via direct DOM manipulation for reliable re-trigger
+  const setInputRefs = (node: HTMLInputElement | null) => {
+    inputRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }
+
   useEffect(() => {
-    if (status === 'error' && wrapperRef.current) {
-      const el = wrapperRef.current
-      el.classList.remove(SHAKE_CLASS)
-      void el.offsetWidth // force reflow to restart animation
-      el.classList.add(SHAKE_CLASS)
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
     }
+    if (status === 'error') runShakeAnimation(wrapperRef.current)
   }, [status, shakeTrigger])
 
   const handleAnimationEnd = useCallback(() => {
@@ -160,6 +144,15 @@ export const Input: React.FC<InputProps> = ({
   }, [])
 
   const currentValStr = String(inputValue)
+  const trailing = resolveInputTrailingLayout({
+    clearable,
+    showPassword,
+    type,
+    disabled: effectiveDisabled,
+    readOnly: isReadOnly,
+    valueLength: currentValStr.length,
+    hasCustomSuffix: !!suffix
+  })
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
     const next = parseInputValue(event.currentTarget, type)
@@ -175,11 +168,15 @@ export const Input: React.FC<InputProps> = ({
     onChange?.(event)
   }
 
+  const focusInput = () => {
+    inputRef.current?.focus()
+  }
+
   const handleClear = () => {
     setInputValue('')
     formItemControl?.onChange?.('')
     onClear?.()
-    inputRef.current?.focus()
+    focusInput()
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -189,71 +186,45 @@ export const Input: React.FC<InputProps> = ({
 
   const togglePasswordVisibility = () => {
     setPasswordVisible((v) => !v)
+    focusInput()
   }
 
-  const hasPrefix = !!prefix
-  const hasSuffix = !!suffix || clearable || showPassword
   const activeError = status === 'error' && !!errorMessage
-  const showClear = clearable && !effectiveDisabled && !readonly && currentValStr.length > 0
-  const showPasswordToggle = showPassword && type === 'password' && !effectiveDisabled
-
+  const hasExtras = activeError || showCount
   const effectiveType =
     showPassword && type === 'password' ? (passwordVisible ? 'text' : 'password') : type
 
   const inputClasses = getInputFieldClasses({
     size: effectiveSize,
     status,
-    hasPrefix,
-    hasSuffix
+    hasPrefix: !!prefix,
+    hasSuffix: trailing.hasSuffix,
+    hasDualSuffix: trailing.hasDualSuffix,
+    hasTripleSuffix: trailing.hasTripleSuffix
   })
 
-  const renderSuffix = () => {
-    if (showClear) {
-      return (
-        <button
-          type="button"
-          className={getInputClearButtonClasses(effectiveSize)}
-          onClick={handleClear}
-          aria-label="Clear input"
-          tabIndex={-1}>
-          ✕
-        </button>
-      )
-    }
-    if (showPasswordToggle) {
-      return (
-        <button
-          type="button"
-          className={getInputPasswordToggleClasses(effectiveSize)}
-          onClick={togglePasswordVisibility}
-          aria-label={passwordVisible ? 'Hide password' : 'Show password'}
-          tabIndex={-1}>
-          {passwordVisible ? '🙈' : '👁'}
-        </button>
-      )
-    }
-    if (suffix) {
-      return <div className={getInputAffixClasses('suffix', effectiveSize)}>{suffix}</div>
-    }
-    return null
-  }
-
-  const wrapperNode = (
+  const chrome = (
     <div
       ref={wrapperRef}
-      className={classNames(getInputWrapperClasses(status), className)}
-      style={style}
+      {...{ [TIGER_CHROME_ATTR]: '' }}
+      className={classNames(
+        getInputWrapperClasses(status, { inGroup: inGroup && !hasExtras }),
+        !hasExtras ? className : undefined
+      )}
+      style={!hasExtras ? style : undefined}
       onAnimationEnd={handleAnimationEnd}>
-      {hasPrefix && <div className={getInputAffixClasses('prefix', effectiveSize)}>{prefix}</div>}
+      {prefix ? (
+        <div className={getInputAffixClasses('prefix', effectiveSize)}>{prefix}</div>
+      ) : null}
       <input
         {...props}
-        ref={inputRef}
+        ref={setInputRefs}
         className={inputClasses}
         type={effectiveType}
         value={inputValue}
         placeholder={placeholder}
         disabled={effectiveDisabled}
-        readOnly={readonly}
+        readOnly={isReadOnly}
         required={required}
         maxLength={maxLength}
         minLength={minLength}
@@ -261,7 +232,7 @@ export const Input: React.FC<InputProps> = ({
         id={effectiveId}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
-        aria-invalid={status === 'error' ? true : undefined}
+        aria-invalid={status === 'error' ? true : props['aria-invalid']}
         aria-required={formItemControl?.required || required ? true : undefined}
         aria-describedby={mergeAriaDescribedBy(
           mergeAriaDescribedBy(
@@ -275,11 +246,45 @@ export const Input: React.FC<InputProps> = ({
         onFocus={onFocus}
         onBlur={handleBlur}
       />
-      {renderSuffix()}
+      {trailing.showClear ? (
+        <button
+          type="button"
+          className={getInputClearButtonClasses(effectiveSize, {
+            offsetSlots: trailing.clearOffsetSlots
+          })}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={handleClear}
+          aria-label={labels.clearAriaLabel}>
+          <Icon name="close" size="sm" aria-hidden />
+        </button>
+      ) : null}
+      {trailing.showPasswordToggle ? (
+        <button
+          type="button"
+          className={getInputPasswordToggleClasses(effectiveSize, {
+            offsetSlots: trailing.passwordOffsetSlots
+          })}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={togglePasswordVisibility}
+          aria-label={
+            passwordVisible ? labels.hidePasswordAriaLabel : labels.showPasswordAriaLabel
+          }>
+          <Icon name={passwordVisible ? 'eye-off' : 'eye'} size="sm" aria-hidden />
+        </button>
+      ) : null}
+      {trailing.showCustomSuffix ? (
+        <div
+          className={getInputAffixClasses('suffix', effectiveSize, {
+            offsetSlots: trailing.suffixOffsetSlots
+          })}>
+          {suffix}
+        </div>
+      ) : null}
     </div>
   )
 
-  // Extras sit below the chrome: error first, then count.
+  if (!hasExtras) return chrome
+
   const extras: React.ReactNode[] = []
   if (activeError) {
     extras.push(
@@ -294,23 +299,26 @@ export const Input: React.FC<InputProps> = ({
   }
   if (showCount) {
     const count = currentValStr.length
-    const isOver = maxLength !== undefined && count > maxLength
-    const countText = maxLength !== undefined ? `${count} / ${maxLength}` : `${count}`
     extras.push(
-      <div key="count" className={getInputCountClasses(isOver)}>
-        {countText}
+      <div
+        key="count"
+        className={getInputCountClasses(maxLength !== undefined && count > maxLength)}>
+        {formatInputCountText(count, maxLength)}
       </div>
     )
   }
 
-  if (extras.length === 0) {
-    return wrapperNode
-  }
-
   return (
-    <div className="w-full">
-      {wrapperNode}
+    <div
+      className={classNames(
+        inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+        className
+      )}
+      style={style}>
+      {chrome}
       {extras}
     </div>
   )
-}
+})
+
+Input.displayName = 'Input'

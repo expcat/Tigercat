@@ -430,6 +430,16 @@ export const zhTW: TigerLocale = {
   tagsInput: {
     removeTagLabel: '移除 {tag}',
     clearAllLabel: '清空全部標籤'
+  },
+  input: {
+    clearAriaLabel: '清除輸入',
+    showPasswordAriaLabel: '顯示密碼',
+    hidePasswordAriaLabel: '隱藏密碼'
+  },
+  inputNumber: {
+    incrementAriaLabel: '增加',
+    decrementAriaLabel: '減少',
+    emptyAriaValueText: '空白'
   }
 }
 

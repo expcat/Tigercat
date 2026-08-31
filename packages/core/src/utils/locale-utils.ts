@@ -58,6 +58,8 @@ import type {
   TigerLocaleFormValidation,
   TigerLocaleInputOTP,
   TigerLocaleTagsInput,
+  TigerLocaleInputLabels,
+  TigerLocaleInputNumber,
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
@@ -553,4 +555,18 @@ export function getTagsInputLabels(
   overrides?: Partial<TigerLocaleTagsInput>
 ): Required<TigerLocaleTagsInput> {
   return resolveLocaleSection(enSection('tagsInput'), locale?.tagsInput, overrides)
+}
+
+export function getInputLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleInputLabels>
+): Required<TigerLocaleInputLabels> {
+  return resolveLocaleSection(enSection('input'), locale?.input, overrides)
+}
+
+export function getInputNumberLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleInputNumber>
+): Required<TigerLocaleInputNumber> {
+  return resolveLocaleSection(enSection('inputNumber'), locale?.inputNumber, overrides)
 }

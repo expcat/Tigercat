@@ -573,6 +573,21 @@ export interface TigerLocaleTagsInput {
   clearAllLabel?: string
 }
 
+/** Input trailing-button labels. */
+export interface TigerLocaleInputLabels {
+  clearAriaLabel?: string
+  showPasswordAriaLabel?: string
+  hidePasswordAriaLabel?: string
+}
+
+/** InputNumber spinbutton and step-button labels. */
+export interface TigerLocaleInputNumber {
+  incrementAriaLabel?: string
+  decrementAriaLabel?: string
+  /** Spoken value when the field is empty */
+  emptyAriaValueText?: string
+}
+
 export interface TigerLocale {
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
@@ -627,6 +642,8 @@ export interface TigerLocale {
   formValidation?: TigerLocaleFormValidation
   inputOtp?: TigerLocaleInputOTP
   tagsInput?: TigerLocaleTagsInput
+  input?: TigerLocaleInputLabels
+  inputNumber?: TigerLocaleInputNumber
 }
 
 /**

@@ -65,7 +65,9 @@ export const TIGER_LOCALE_KEY_SET = {
   cronEditor: true,
   formValidation: true,
   inputOtp: true,
-  tagsInput: true
+  tagsInput: true,
+  input: true,
+  inputNumber: true
 } as const satisfies Record<TigerLocaleKey, true>
 
 export const TIGER_LOCALE_KEYS = Object.keys(TIGER_LOCALE_KEY_SET) as TigerLocaleKey[]

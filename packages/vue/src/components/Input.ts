@@ -1,8 +1,19 @@
-import { defineComponent, computed, ref, watch, h, inject, getCurrentInstance, PropType } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  h,
+  inject,
+  getCurrentInstance,
+  useId,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeAriaDescribedBy,
+  callUnknownEventHandler,
   getInputFieldClasses,
   getInputWrapperClasses,
   getInputAffixClasses,
@@ -10,17 +21,21 @@ import {
   getInputClearButtonClasses,
   getInputPasswordToggleClasses,
   getInputCountClasses,
+  formatInputCountText,
   parseInputValue,
-  injectShakeStyle,
+  runShakeAnimation,
   SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  getInputLabels,
+  resolveInputTrailingLayout,
   type ComponentSize,
   type InputType,
   type InputStatus
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
-
-let inputIdCounter = 0
+import { useTigerConfig } from './ConfigProvider'
+import { Icon } from './Icon'
 
 export interface VueInputProps {
   modelValue?: string | number
@@ -51,112 +66,45 @@ export const Input = defineComponent({
   name: 'TigerInput',
   inheritAttrs: false,
   props: {
-    /**
-     * Input value (for v-model)
-     */
     modelValue: {
       type: [String, Number] as PropType<string | number>
     },
-    /**
-     * Input size
-     * @default 'md'
-     */
     size: {
       type: String as PropType<ComponentSize>,
       default: 'md'
     },
-    /**
-     * Input type
-     * @default 'text'
-     */
     type: {
       type: String as PropType<InputType>,
       default: 'text'
     },
-    /**
-     * Input status
-     * @default 'default'
-     */
     status: {
       type: String as PropType<InputStatus>,
       default: 'default'
     },
-    /**
-     * Error message to default display
-     */
     errorMessage: String,
-    /**
-     * Prefix text/icon
-     */
     prefix: String,
-    /**
-     * Suffix text/icon
-     */
     suffix: String,
-    /**
-     * Placeholder text
-     */
     placeholder: {
       type: String,
       default: ''
     },
-    /**
-     * Whether the input is disabled
-     */
     disabled: Boolean,
-    /**
-     * Whether the input is readonly
-     */
     readonly: Boolean,
-    /**
-     * Whether the input is required
-     */
     required: Boolean,
-    /** Maximum length */
     maxLength: Number,
-    /** Minimum length */
     minLength: Number,
-    /** Input name attribute */
     name: String,
-    /** Input id attribute */
     id: String,
-    /** Autocomplete attribute */
     autoComplete: String,
-    /**
-     * Whether to autofocus on mount
-     */
     autoFocus: Boolean,
-
-    /**
-     * Whether to show a clear button
-     */
     clearable: Boolean,
-
-    /**
-     * Whether to show a password toggle button
-     */
     showPassword: Boolean,
-
-    /**
-     * Whether to show a character count
-     */
     showCount: Boolean,
-
-    /**
-     * Internal shake trigger counter (used by FormItem)
-     * @internal
-     */
     _shakeTrigger: {
       type: Number,
       default: undefined
     },
-
-    /** Additional CSS classes */
     className: String,
-
-    /**
-     * Inline styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>
     }
@@ -169,14 +117,16 @@ export const Input = defineComponent({
     blur: null,
     clear: null
   },
-  setup(props, { emit, attrs, slots }) {
-    injectShakeStyle()
+  setup(props, { emit, attrs, slots, expose }) {
     const instance = getCurrentInstance()
+    const config = useTigerConfig()
+    const labels = computed(() => getInputLabels(config.value.locale))
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
     )
+    const inGroup = computed(() => inputGroup != null)
     const effectiveSize = computed(() => {
       const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
       return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
@@ -206,10 +156,13 @@ export const Input = defineComponent({
           : '')
     )
     const passwordVisible = ref(false)
-    const instanceId = ++inputIdCounter
-    const errorMsgId = `tiger-input-error-${instanceId}`
+    const errorMsgId = `tiger-input-error-${useId()}`
 
-    // Sync localValue with modelValue prop
+    expose({
+      focus: () => inputRef.value?.focus(),
+      input: inputRef
+    })
+
     watch(
       () => [props.modelValue, formValue.value] as const,
       ([modelValue, controlValue]) => {
@@ -226,17 +179,11 @@ export const Input = defineComponent({
       }
     )
 
-    // flush post: wrapper class now includes status chrome, which Vue would
-    // otherwise patch over a pre-flush classList.add(SHAKE_CLASS).
     watch(
       [effectiveStatus, effectiveShakeTrigger] as const,
-      ([newStatus]) => {
-        if (newStatus === 'error' && wrapperRef.value) {
-          const el = wrapperRef.value
-          el.classList.remove(SHAKE_CLASS)
-          void el.offsetWidth // force reflow to restart animation
-          el.classList.add(SHAKE_CLASS)
-        }
+      ([newStatus], oldValue) => {
+        if (oldValue === undefined) return
+        if (newStatus === 'error') runShakeAnimation(wrapperRef.value)
       },
       { flush: 'post' }
     )
@@ -246,9 +193,7 @@ export const Input = defineComponent({
     }
 
     const hasPrefix = computed(() => !!slots.prefix || !!props.prefix)
-    const hasSuffix = computed(
-      () => !!slots.suffix || !!props.suffix || props.clearable || props.showPassword
-    )
+    const hasCustomSuffix = computed(() => !!slots.suffix || !!props.suffix)
     const activeError = computed(
       () => effectiveStatus.value === 'error' && !!effectiveErrorMessage.value
     )
@@ -276,74 +221,98 @@ export const Input = defineComponent({
       emit('blur', event)
     }
 
+    const focusInput = () => {
+      inputRef.value?.focus()
+    }
+
     const handleClear = () => {
       localValue.value = ''
       emit('update:modelValue', '')
       emit('clear')
       formItemControl?.onChange('')
-      inputRef.value?.focus()
+      focusInput()
     }
 
     const togglePasswordVisibility = () => {
       passwordVisible.value = !passwordVisible.value
+      focusInput()
     }
 
     return () => {
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
       const currentValStr = String(localValue.value)
-      const showClear =
-        props.clearable && !effectiveDisabled.value && !props.readonly && currentValStr.length > 0
-      const showPasswordToggle =
-        props.showPassword && props.type === 'password' && !effectiveDisabled.value
-      const dualSuffix = showClear && showPasswordToggle
+      const trailing = resolveInputTrailingLayout({
+        clearable: props.clearable,
+        showPassword: props.showPassword,
+        type: props.type,
+        disabled: effectiveDisabled.value,
+        readOnly: props.readonly,
+        valueLength: currentValStr.length,
+        hasCustomSuffix: hasCustomSuffix.value
+      })
+      const hasExtras = activeError.value || props.showCount
       const inputClasses = getInputFieldClasses({
         size: effectiveSize.value,
         status: effectiveStatus.value,
         hasPrefix: hasPrefix.value,
-        hasSuffix: hasSuffix.value,
-        hasDualSuffix: dualSuffix
+        hasSuffix: trailing.hasSuffix,
+        hasDualSuffix: trailing.hasDualSuffix,
+        hasTripleSuffix: trailing.hasTripleSuffix
       })
 
       const suffixNodes: ReturnType<typeof h>[] = []
 
-      if (showClear) {
+      if (trailing.showClear) {
         suffixNodes.push(
           h(
             'button',
             {
               type: 'button',
-              class: getInputClearButtonClasses(
-                effectiveSize.value,
-                dualSuffix ? { offset: true } : undefined
-              ),
+              class: getInputClearButtonClasses(effectiveSize.value, {
+                offsetSlots: trailing.clearOffsetSlots
+              }),
+              onMousedown: (event: MouseEvent) => event.preventDefault(),
               onClick: handleClear,
-              'aria-label': 'Clear input',
-              tabindex: -1
+              'aria-label': labels.value.clearAriaLabel
             },
-            '✕'
+            [h(Icon, { name: 'close', size: 'sm', 'aria-hidden': true })]
           )
         )
       }
-      if (showPasswordToggle) {
+      if (trailing.showPasswordToggle) {
         suffixNodes.push(
           h(
             'button',
             {
               type: 'button',
-              class: getInputPasswordToggleClasses(effectiveSize.value),
+              class: getInputPasswordToggleClasses(effectiveSize.value, {
+                offsetSlots: trailing.passwordOffsetSlots
+              }),
+              onMousedown: (event: MouseEvent) => event.preventDefault(),
               onClick: togglePasswordVisibility,
-              'aria-label': passwordVisible.value ? 'Hide password' : 'Show password',
-              tabindex: -1
+              'aria-label': passwordVisible.value
+                ? labels.value.hidePasswordAriaLabel
+                : labels.value.showPasswordAriaLabel
             },
-            passwordVisible.value ? '🙈' : '👁'
+            [
+              h(Icon, {
+                name: passwordVisible.value ? 'eye-off' : 'eye',
+                size: 'sm',
+                'aria-hidden': true
+              })
+            ]
           )
         )
       }
-      if (!showClear && !showPasswordToggle && hasSuffix.value) {
+      if (trailing.showCustomSuffix) {
         suffixNodes.push(
           h(
             'div',
-            { class: getInputAffixClasses('suffix', effectiveSize.value) },
+            {
+              class: getInputAffixClasses('suffix', effectiveSize.value, {
+                offsetSlots: trailing.suffixOffsetSlots
+              })
+            },
             slots.suffix ? slots.suffix() : props.suffix
           )
         )
@@ -381,10 +350,22 @@ export const Input = defineComponent({
             ),
             formItemControl?.describedBy.value
           ),
-          onInput: handleInput,
-          onChange: handleChange,
-          onFocus: handleFocus,
-          onBlur: handleBlur
+          onInput: (event: Event) => {
+            handleInput(event)
+            callUnknownEventHandler(restAttrs.onInput, event)
+          },
+          onChange: (event: Event) => {
+            handleChange(event)
+            callUnknownEventHandler(restAttrs.onChange, event)
+          },
+          onFocus: (event: FocusEvent) => {
+            handleFocus(event)
+            callUnknownEventHandler(restAttrs.onFocus, event)
+          },
+          onBlur: (event: FocusEvent) => {
+            handleBlur(event)
+            callUnknownEventHandler(restAttrs.onBlur, event)
+          }
         }),
         ...suffixNodes
       ]
@@ -393,18 +374,20 @@ export const Input = defineComponent({
         'div',
         {
           ref: wrapperRef,
+          [TIGER_CHROME_ATTR]: '',
           class: classNames(
-            getInputWrapperClasses(effectiveStatus.value),
-            props.className,
-            coerceClassValue(attrClass)
+            getInputWrapperClasses(effectiveStatus.value, {
+              inGroup: inGroup.value && !hasExtras
+            }),
+            !hasExtras ? props.className : undefined,
+            !hasExtras ? coerceClassValue(attrClass) : undefined
           ),
-          style: [attrStyle, props.style],
+          style: !hasExtras ? [attrStyle, props.style] : undefined,
           onAnimationend: handleAnimationEnd
         },
         wrapperChildren
       )
 
-      // Extras sit below the chrome: error first, then count.
       const extras: ReturnType<typeof h>[] = []
       if (activeError.value) {
         extras.push(
@@ -421,15 +404,31 @@ export const Input = defineComponent({
       }
       if (props.showCount) {
         const count = currentValStr.length
-        const isOver = props.maxLength !== undefined && count > props.maxLength
-        const countText =
-          props.maxLength !== undefined ? `${count} / ${props.maxLength}` : `${count}`
-        extras.push(h('div', { class: getInputCountClasses(isOver) }, countText))
+        extras.push(
+          h(
+            'div',
+            {
+              class: getInputCountClasses(props.maxLength !== undefined && count > props.maxLength)
+            },
+            formatInputCountText(count, props.maxLength)
+          )
+        )
       }
 
-      return extras.length === 0
-        ? chromeNode
-        : h('div', { class: 'w-full' }, [chromeNode, ...extras])
+      if (!hasExtras) return chromeNode
+
+      return h(
+        'div',
+        {
+          class: classNames(
+            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
+            props.className,
+            coerceClassValue(attrClass)
+          ),
+          style: [attrStyle, props.style]
+        },
+        [chromeNode, ...extras]
+      )
     }
   }
 })

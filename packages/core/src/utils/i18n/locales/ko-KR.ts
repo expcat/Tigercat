@@ -430,6 +430,16 @@ export const koKR: TigerLocale = {
   tagsInput: {
     removeTagLabel: '{tag} 제거',
     clearAllLabel: '모든 태그 지우기'
+  },
+  input: {
+    clearAriaLabel: '입력 지우기',
+    showPasswordAriaLabel: '비밀번호 표시',
+    hidePasswordAriaLabel: '비밀번호 숨기기'
+  },
+  inputNumber: {
+    incrementAriaLabel: '증가',
+    decrementAriaLabel: '감소',
+    emptyAriaValueText: '비어 있음'
   }
 }
 

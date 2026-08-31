@@ -407,37 +407,40 @@ const SHAKE_ANIMATION_CSS = `
 
 @media (prefers-reduced-motion: reduce) {
   .tiger-animate-shake {
-    animation-duration: 0ms;
+    animation: none !important;
   }
 }
 `
 
-let isStyleInjected = false
+const SHAKE_STYLE_ID = 'tiger-ui-animation-styles'
+
+/** CSS class to apply shake animation */
+export const SHAKE_CLASS = 'tiger-animate-shake'
 
 /**
  * Inject shake animation styles into the document head.
- * Safe to call multiple times - will only inject once.
+ * Re-injects if the style node was removed.
  */
 export function injectShakeStyle(): void {
-  if (!isBrowser() || isStyleInjected) return
-
-  const styleId = 'tiger-ui-animation-styles'
-  if (document.getElementById(styleId)) {
-    isStyleInjected = true
-    return
-  }
+  if (!isBrowser()) return
+  if (document.getElementById(SHAKE_STYLE_ID)) return
 
   const style = document.createElement('style')
-  style.id = styleId
+  style.id = SHAKE_STYLE_ID
   style.textContent = SHAKE_ANIMATION_CSS
   document.head.appendChild(style)
-  isStyleInjected = true
 }
 
 /**
- * CSS class to apply shake animation
+ * Restart the shake animation on `el`. No-ops when reduced-motion is on.
  */
-export const SHAKE_CLASS = 'tiger-animate-shake'
+export function runShakeAnimation(el: HTMLElement | null | undefined): void {
+  if (!el || hasReducedMotionPreference()) return
+  injectShakeStyle()
+  el.classList.remove(SHAKE_CLASS)
+  void el.offsetWidth
+  el.classList.add(SHAKE_CLASS)
+}
 
 // ============================================================================
 // SVG Path Animation Utilities

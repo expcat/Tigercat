@@ -280,6 +280,8 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('marquee')
     expect(TIGER_LOCALE_KEYS).toContain('image')
     expect(TIGER_LOCALE_KEYS).toContain('imageCompare')
+    expect(TIGER_LOCALE_KEYS).toContain('input')
+    expect(TIGER_LOCALE_KEYS).toContain('inputNumber')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

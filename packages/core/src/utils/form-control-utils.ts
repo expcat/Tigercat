@@ -55,6 +55,16 @@ export function extractFormChangeValue(argument: unknown): ExtractedFormChange {
   return { found: true, value: argument }
 }
 
+export function callUnknownEventHandler(handler: unknown, event: Event): void {
+  if (typeof handler === 'function') {
+    handler(event)
+    return
+  }
+  if (Array.isArray(handler)) {
+    for (const item of handler) callUnknownEventHandler(item, event)
+  }
+}
+
 export function mergeAriaDescribedBy(
   existing: string | undefined,
   next: string | undefined

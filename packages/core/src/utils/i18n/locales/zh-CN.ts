@@ -430,5 +430,15 @@ export const zhCN: TigerLocale = {
   tagsInput: {
     removeTagLabel: '移除 {tag}',
     clearAllLabel: '清空全部标签'
+  },
+  input: {
+    clearAriaLabel: '清除输入',
+    showPasswordAriaLabel: '显示密码',
+    hidePasswordAriaLabel: '隐藏密码'
+  },
+  inputNumber: {
+    incrementAriaLabel: '增加',
+    decrementAriaLabel: '减少',
+    emptyAriaValueText: '空'
   }
 }

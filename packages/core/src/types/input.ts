@@ -125,4 +125,16 @@ export interface InputProps {
    * @since 0.5.0
    */
   showCount?: boolean
+
+  /**
+   * Leading affix inside the field chrome.
+   * Framework layers type this as a node; core only records the slot.
+   */
+  prefix?: unknown
+
+  /**
+   * Trailing affix inside the field chrome. Shown beside clear / password
+   * actions when those are on; it is not replaced by them.
+   */
+  suffix?: unknown
 }

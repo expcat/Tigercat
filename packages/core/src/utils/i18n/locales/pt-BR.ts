@@ -431,6 +431,16 @@ export const ptBR: TigerLocale = {
   tagsInput: {
     removeTagLabel: 'Remover {tag}',
     clearAllLabel: 'Limpar todas as tags'
+  },
+  input: {
+    clearAriaLabel: 'Limpar entrada',
+    showPasswordAriaLabel: 'Mostrar senha',
+    hidePasswordAriaLabel: 'Ocultar senha'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'Aumentar',
+    decrementAriaLabel: 'Diminuir',
+    emptyAriaValueText: 'Vazio'
   }
 }
 

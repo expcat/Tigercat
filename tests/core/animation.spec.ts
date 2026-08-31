@@ -38,6 +38,14 @@ describe('animation utilities', () => {
     )
   })
 
+  it('re-injects shake styles after the node is removed', async () => {
+    const { injectShakeStyle } = await loadFreshAnimation()
+    injectShakeStyle()
+    document.getElementById('tiger-ui-animation-styles')?.remove()
+    injectShakeStyle()
+    expect(document.getElementById('tiger-ui-animation-styles')).not.toBeNull()
+  })
+
   it('does not inject shake styles outside a browser environment', async () => {
     const originalWindow = globalThis.window
     vi.stubGlobal('window', undefined)

@@ -430,6 +430,16 @@ export const jaJP: TigerLocale = {
   tagsInput: {
     removeTagLabel: '{tag} を削除',
     clearAllLabel: 'すべてのタグをクリア'
+  },
+  input: {
+    clearAriaLabel: '入力をクリア',
+    showPasswordAriaLabel: 'パスワードを表示',
+    hidePasswordAriaLabel: 'パスワードを隠す'
+  },
+  inputNumber: {
+    incrementAriaLabel: '増やす',
+    decrementAriaLabel: '減らす',
+    emptyAriaValueText: '空'
   }
 }
 

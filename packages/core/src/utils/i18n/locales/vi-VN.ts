@@ -430,6 +430,16 @@ export const viVN: TigerLocale = {
   tagsInput: {
     removeTagLabel: 'Xóa {tag}',
     clearAllLabel: 'Xóa tất cả thẻ'
+  },
+  input: {
+    clearAriaLabel: 'Xóa nội dung',
+    showPasswordAriaLabel: 'Hiện mật khẩu',
+    hidePasswordAriaLabel: 'Ẩn mật khẩu'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'Tăng',
+    decrementAriaLabel: 'Giảm',
+    emptyAriaValueText: 'Trống'
   }
 }
 

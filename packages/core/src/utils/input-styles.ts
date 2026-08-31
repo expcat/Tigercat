@@ -5,16 +5,29 @@
 import type { ComponentSize } from '../types/base'
 import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
+import { devWarn } from './dev-warn'
+import { mixStatusTowardText, mixStatusTowardTextClass } from './status-mix'
+
+const errorTextClass = mixStatusTowardTextClass('text', '--tiger-error', '#dc2626')
+const successTextClass = mixStatusTowardTextClass('text', '--tiger-success', '#16a34a')
+const warningTextClass = mixStatusTowardTextClass('text', '--tiger-warning', '#d97706')
+const errorPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-error', '#dc2626')}]`
+const successPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-success', '#16a34a')}]`
+const warningPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-warning', '#d97706')}]`
+
+const FOCUS_RING =
+  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-error,#dc2626)]/40'
 
 /**
  * Field-only classes (padding, type, disabled text). Chrome lives on the
  * group-child root via {@link getInputChromeClasses}.
  */
 const INPUT_FIELD_BASE_CLASSES = [
-  'w-full',
   'bg-transparent',
   'text-[var(--tiger-text,#111827)]',
   'focus:outline-none',
+  FOCUS_RING,
   'disabled:text-[var(--tiger-text-muted,#6b7280)]',
   'disabled:cursor-not-allowed',
   'placeholder:text-[var(--tiger-text-muted,#6b7280)]'
@@ -22,49 +35,55 @@ const INPUT_FIELD_BASE_CLASSES = [
 
 /**
  * Border / radius / surface for a chrome node. Native fields that ARE the
- * chrome node (Textarea, MaskInput) keep `focus:`; Input's wrapper uses
- * `focus-within:` because the focused node is nested.
+ * chrome node (Textarea, MaskInput) keep `focus-visible`; Input's wrapper
+ * does not paint a ring — the nested field does.
  */
 const INPUT_CHROME_BASE_CLASSES = [
   'border',
   'rounded-[var(--tiger-radius-md,0.5rem)]',
   'bg-[var(--tiger-surface,#ffffff)]',
-  'transition-colors'
+  'tiger-motion-aware',
+  '[transition:var(--tiger-transition-base,color_150ms_ease)]'
 ] as const
 
-const NATIVE_CHROME_FOCUS_CLASSES = [
-  'focus:ring-2',
-  'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]'
-] as const
+const NATIVE_CHROME_FOCUS_CLASSES = ['disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]'] as const
 
 const WRAPPER_CHROME_FOCUS_CLASSES = [
-  'focus-within:ring-2',
   'has-[:disabled]:bg-[var(--tiger-surface-muted,#f3f4f6)]'
 ] as const
 
 const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
-  default:
-    'border-[var(--tiger-border,#e5e7eb)] focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:border-transparent',
-  error: 'border-red-500 focus:ring-red-500 focus:border-red-500 text-red-900 placeholder-red-300',
-  success:
-    'border-green-500 focus:ring-green-500 focus:border-green-500 text-green-900 placeholder-green-300',
-  warning:
-    'border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-yellow-900 placeholder-yellow-300'
+  default: 'border-[var(--tiger-border,#e5e7eb)] focus-visible:border-transparent',
+  error: classNames(
+    'border-[var(--tiger-error,#dc2626)]',
+    ERROR_FOCUS_RING,
+    errorTextClass,
+    errorPlaceholderClass
+  ),
+  success: classNames(
+    'border-[var(--tiger-success,#16a34a)]',
+    successTextClass,
+    successPlaceholderClass
+  ),
+  warning: classNames(
+    'border-[var(--tiger-warning,#d97706)]',
+    warningTextClass,
+    warningPlaceholderClass
+  )
 }
 
 const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
-  default:
-    'border-[var(--tiger-border,#e5e7eb)] focus-within:ring-[var(--tiger-primary,#2563eb)]/40 focus-within:border-transparent',
-  error: 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500',
-  success: 'border-green-500 focus-within:ring-green-500 focus-within:border-green-500',
-  warning: 'border-yellow-500 focus-within:ring-yellow-500 focus-within:border-yellow-500'
+  default: 'border-[var(--tiger-border,#e5e7eb)]',
+  error: 'border-[var(--tiger-error,#dc2626)]',
+  success: 'border-[var(--tiger-success,#16a34a)]',
+  warning: 'border-[var(--tiger-warning,#d97706)]'
 }
 
 const FIELD_STATUS_CLASSES: Record<InputStatus, string> = {
   default: '',
-  error: 'text-red-900 placeholder-red-300',
-  success: 'text-green-900 placeholder-green-300',
-  warning: 'text-yellow-900 placeholder-yellow-300'
+  error: classNames(errorTextClass, errorPlaceholderClass, ERROR_FOCUS_RING),
+  success: classNames(successTextClass, successPlaceholderClass),
+  warning: classNames(warningTextClass, warningPlaceholderClass)
 }
 
 const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
@@ -76,41 +95,44 @@ const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
 const INPUT_PADDING: Record<
   ComponentSize,
   {
-    left: string
-    right: string
-    prefixLeft: string
-    suffixRight: string
-    dualSuffixRight: string
+    start: string
+    end: string
+    prefixStart: string
+    suffixEnd: string
+    dualSuffixEnd: string
+    tripleSuffixEnd: string
   }
 > = {
   sm: {
-    left: 'pl-2',
-    right: 'pr-2',
-    prefixLeft: 'pl-8',
-    suffixRight: 'pr-8',
-    dualSuffixRight: 'pr-16'
+    start: 'ps-2',
+    end: 'pe-2',
+    prefixStart: 'ps-8',
+    suffixEnd: 'pe-8',
+    dualSuffixEnd: 'pe-16',
+    tripleSuffixEnd: 'pe-24'
   },
   md: {
-    left: 'pl-3',
-    right: 'pr-3',
-    prefixLeft: 'pl-10',
-    suffixRight: 'pr-10',
-    dualSuffixRight: 'pr-20'
+    start: 'ps-3',
+    end: 'pe-3',
+    prefixStart: 'ps-10',
+    suffixEnd: 'pe-10',
+    dualSuffixEnd: 'pe-20',
+    tripleSuffixEnd: 'pe-[7.5rem]'
   },
   lg: {
-    left: 'pl-4',
-    right: 'pr-4',
-    prefixLeft: 'pl-12',
-    suffixRight: 'pr-12',
-    dualSuffixRight: 'pr-24'
+    start: 'ps-4',
+    end: 'pe-4',
+    prefixStart: 'ps-12',
+    suffixEnd: 'pe-12',
+    dualSuffixEnd: 'pe-24',
+    tripleSuffixEnd: 'pe-36'
   }
 }
 
-/** One affix-slot inset so a second trailing button sits beside `right-0`. */
-const INPUT_SUFFIX_SLOT_INSET: Record<ComponentSize, string> = {
-  sm: 'right-8',
-  md: 'right-10',
-  lg: 'right-12'
+const INPUT_INLINE_END_INSET: Record<ComponentSize, readonly [string, string, string]> = {
+  sm: ['end-0', 'end-8', 'end-16'],
+  md: ['end-0', 'end-10', 'end-20'],
+  lg: ['end-0', 'end-12', 'end-24']
 }
 
 export interface GetInputClassesOptions {
@@ -118,29 +140,103 @@ export interface GetInputClassesOptions {
   status?: InputStatus
   hasPrefix?: boolean
   hasSuffix?: boolean
-  /** Two trailing actions (clear + password) — double-slot right padding. @default false */
+  /** Two trailing slots (clear + password, or suffix + one action). @default false */
   hasDualSuffix?: boolean
+  /** Three trailing slots (suffix + clear + password). @default false */
+  hasTripleSuffix?: boolean
+  /** Group child uses remaining flex space instead of 100% of the group. */
+  inGroup?: boolean
 }
 
 export interface GetInputTrailingButtonOptions {
-  /** Shift one affix-slot left of `right-0`. @default false */
-  offset?: boolean
+  /** How many end-side slots sit closer to the inline end than this button. */
+  offsetSlots?: number
+}
+
+export interface InputTrailingLayout {
+  showClear: boolean
+  showPasswordToggle: boolean
+  showCustomSuffix: boolean
+  slotCount: number
+  clearOffsetSlots: number
+  passwordOffsetSlots: number
+  suffixOffsetSlots: number
+  hasSuffix: boolean
+  hasDualSuffix: boolean
+  hasTripleSuffix: boolean
+}
+
+export function resolveInputTrailingLayout(input: {
+  clearable?: boolean
+  showPassword?: boolean
+  type?: string
+  disabled?: boolean
+  readOnly?: boolean
+  valueLength: number
+  hasCustomSuffix?: boolean
+}): InputTrailingLayout {
+  const showClear = Boolean(
+    input.clearable && !input.disabled && !input.readOnly && input.valueLength > 0
+  )
+  const showPasswordToggle = Boolean(
+    input.showPassword && input.type === 'password' && !input.disabled
+  )
+  const showCustomSuffix = Boolean(input.hasCustomSuffix)
+  const buttonCount = Number(showClear) + Number(showPasswordToggle)
+  const slotCount = buttonCount + Number(showCustomSuffix)
+
+  return {
+    showClear,
+    showPasswordToggle,
+    showCustomSuffix,
+    slotCount,
+    passwordOffsetSlots: 0,
+    clearOffsetSlots: showPasswordToggle ? 1 : 0,
+    suffixOffsetSlots: buttonCount,
+    hasSuffix: slotCount >= 1,
+    hasDualSuffix: slotCount >= 2,
+    hasTripleSuffix: slotCount >= 3
+  }
+}
+
+export function resolveReadOnlyFlag(readonly?: boolean, readOnly?: boolean): boolean {
+  if (typeof readonly === 'boolean' && typeof readOnly === 'boolean' && readonly !== readOnly) {
+    devWarn(
+      'Input.readOnly',
+      'Both `readonly` and `readOnly` were passed and they disagree; using `readonly`.'
+    )
+    return readonly
+  }
+  return Boolean(readonly ?? readOnly)
+}
+
+function getInputWidthClass(inGroup?: boolean): string {
+  return inGroup ? 'flex-1 min-w-0' : 'w-full'
 }
 
 function getInputLayoutClasses(options: GetInputClassesOptions = {}): string {
-  const { size = 'md', hasPrefix, hasSuffix, hasDualSuffix } = options
+  const { size = 'md', hasPrefix, hasSuffix, hasDualSuffix, hasTripleSuffix } = options
   const pad = INPUT_PADDING[size]
+  const endPad = hasTripleSuffix
+    ? pad.tripleSuffixEnd
+    : hasDualSuffix
+      ? pad.dualSuffixEnd
+      : hasSuffix
+        ? pad.suffixEnd
+        : pad.end
 
-  return classNames(
-    INPUT_SIZE_CLASSES[size],
-    hasPrefix ? pad.prefixLeft : pad.left,
-    hasDualSuffix ? pad.dualSuffixRight : hasSuffix ? pad.suffixRight : pad.right
-  )
+  return classNames(INPUT_SIZE_CLASSES[size], hasPrefix ? pad.prefixStart : pad.start, endPad)
+}
+
+function insetInlineEndClass(size: ComponentSize, offsetSlots = 0): string {
+  const slots = INPUT_INLINE_END_INSET[size]
+  const index = Math.min(Math.max(offsetSlots, 0), slots.length - 1)
+  return slots[index]
 }
 
 /**
- * Chrome (border / radius / surface / status / focus ring) for a group-child
- * root. Uses `focus-within` so a nested native field still raises the ring.
+ * Chrome (border / radius / surface / status) for a group-child root.
+ * Focus ring lives on the native field (`:focus-visible`).
  */
 export function getInputChromeClasses(status: InputStatus = 'default'): string {
   return classNames(
@@ -155,8 +251,9 @@ export function getInputChromeClasses(status: InputStatus = 'default'): string {
  * placeholder, and disabled text stay here.
  */
 export function getInputFieldClasses(options: GetInputClassesOptions = {}): string {
-  const { status = 'default' } = options
+  const { status = 'default', inGroup } = options
   return classNames(
+    getInputWidthClass(inGroup),
     ...INPUT_FIELD_BASE_CLASSES,
     FIELD_STATUS_CLASSES[status],
     getInputLayoutClasses(options)
@@ -169,13 +266,14 @@ export function getInputFieldClasses(options: GetInputClassesOptions = {}): stri
  * {@link getInputFieldClasses} on the `<input>`.
  */
 export function getInputClasses(options: GetInputClassesOptions = {}): string {
-  const { status = 'default' } = options
+  const { status = 'default', inGroup } = options
 
   return classNames(
-    'w-full',
+    getInputWidthClass(inGroup),
     ...INPUT_CHROME_BASE_CLASSES,
     'text-[var(--tiger-text,#111827)]',
     'focus:outline-none',
+    status === 'error' ? ERROR_FOCUS_RING : FOCUS_RING,
     ...NATIVE_CHROME_FOCUS_CLASSES,
     'disabled:text-[var(--tiger-text-muted,#6b7280)]',
     'disabled:cursor-not-allowed',
@@ -185,19 +283,26 @@ export function getInputClasses(options: GetInputClassesOptions = {}): string {
   )
 }
 
-export function getInputWrapperClasses(status?: InputStatus): string {
+export function getInputWrapperClasses(
+  status?: InputStatus,
+  options: { inGroup?: boolean } = {}
+): string {
   return classNames(
-    'relative w-full',
+    'relative',
+    getInputWidthClass(options.inGroup),
     status !== undefined ? getInputChromeClasses(status) : undefined
   )
 }
 
 export function getInputAffixClasses(
   position: 'prefix' | 'suffix',
-  size: ComponentSize = 'md'
+  size: ComponentSize = 'md',
+  options: { offsetSlots?: number } = {}
 ): string {
-  const base = 'absolute top-0 bottom-0 flex items-center justify-center text-gray-500'
-  const posClass = position === 'prefix' ? 'left-0' : 'right-0'
+  const base =
+    'absolute top-0 bottom-0 flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]'
+  const posClass =
+    position === 'prefix' ? 'start-0' : insetInlineEndClass(size, options.offsetSlots)
   const widthClass = {
     sm: 'w-8',
     md: 'w-10',
@@ -212,36 +317,40 @@ export function getInputAffixClasses(
  * `size` is unused; kept so existing callers do not break.
  */
 export function getInputErrorClasses(_size: ComponentSize = 'md'): string {
-  return classNames('text-red-500 text-sm mt-1 text-left break-words')
+  return classNames('text-[var(--tiger-error,#dc2626)] text-sm mt-1 text-start break-words')
 }
 
-function getInputTrailingButtonClasses(size: ComponentSize, rightClass: string): string {
+function getInputTrailingButtonPositionClasses(size: ComponentSize, offsetSlots = 0): string {
   return classNames(
     'absolute inset-y-0 flex items-center cursor-pointer',
-    rightClass,
+    'focus:outline-none',
+    FOCUS_RING,
+    insetInlineEndClass(size, offsetSlots),
     'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
-    INPUT_PADDING[size].right
+    INPUT_PADDING[size].end
   )
 }
 
 /**
- * Clear button classes — positioned inside the input on the right
+ * Clear button classes — positioned inside the input on the inline end
  * @since 0.5.0
  */
 export function getInputClearButtonClasses(
   size: ComponentSize = 'md',
   options: GetInputTrailingButtonOptions = {}
 ): string {
-  const rightClass = options.offset ? INPUT_SUFFIX_SLOT_INSET[size] : 'right-0'
-  return getInputTrailingButtonClasses(size, rightClass)
+  return getInputTrailingButtonPositionClasses(size, options.offsetSlots)
 }
 
 /**
  * Password toggle button classes
  * @since 0.5.0
  */
-export function getInputPasswordToggleClasses(size: ComponentSize = 'md'): string {
-  return getInputTrailingButtonClasses(size, 'right-0')
+export function getInputPasswordToggleClasses(
+  size: ComponentSize = 'md',
+  options: GetInputTrailingButtonOptions = {}
+): string {
+  return getInputTrailingButtonPositionClasses(size, options.offsetSlots)
 }
 
 /**
@@ -250,9 +359,13 @@ export function getInputPasswordToggleClasses(size: ComponentSize = 'md'): strin
  */
 export function getInputCountClasses(isOverLimit: boolean = false): string {
   return classNames(
-    'text-xs mt-1 text-right',
+    'text-xs mt-1 text-end',
     isOverLimit ? 'text-[var(--tiger-error,#dc2626)]' : 'text-[var(--tiger-text-muted,#6b7280)]'
   )
+}
+
+export function formatInputCountText(count: number, maxLength?: number): string {
+  return maxLength !== undefined ? `${count} / ${maxLength}` : `${count}`
 }
 
 /**

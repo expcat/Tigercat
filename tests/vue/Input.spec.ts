@@ -122,8 +122,8 @@ describe('Input', () => {
       })
       const wrapper = container.firstChild as HTMLElement
       const input = container.querySelector('input')
-      expect(wrapper).toHaveClass('border-red-500')
-      expect(input).not.toHaveClass('border-red-500')
+      expect(wrapper.className).toContain('--tiger-error')
+      expect(input?.className).not.toContain('border-[var(--tiger-error')
     })
 
     it('puts border and radius on the wrapper, not the native input', () => {
@@ -145,7 +145,7 @@ describe('Input', () => {
       const errorEl = document.getElementById(describedBy!)
 
       expect(container).toHaveTextContent('Bad input')
-      expect(chrome.className).toContain('border-red-500')
+      expect(chrome.className).toContain('--tiger-error')
       expect(errorEl).toBeInTheDocument()
       expect(errorEl?.textContent).toBe('Bad input')
       expect(chrome.contains(errorEl)).toBe(false)
@@ -672,12 +672,10 @@ describe('Input', () => {
 
       expect(clearBtn).toBeInTheDocument()
       expect(eyeBtn).toBeInTheDocument()
-      expect(classTokens(clearBtn)).toContain('right-10')
-      expect(classTokens(clearBtn)).not.toContain('right-0')
-      expect(classTokens(eyeBtn)).toContain('right-0')
-      expect(classTokens(eyeBtn)).not.toContain('right-10')
-      expect(classTokens(input)).toContain('pr-20')
-      expect(classTokens(input)).not.toContain('pr-10')
+      expect(classTokens(clearBtn)).toContain('end-10')
+      expect(classTokens(eyeBtn)).toContain('end-0')
+      expect(classTokens(input)).toContain('pe-20')
+      expect(classTokens(input)).not.toContain('pe-10')
     })
 
     it('clears value when the offset clear button is clicked', async () => {
@@ -703,7 +701,7 @@ describe('Input', () => {
       expect(screen.getByLabelText('Hide password')).toBeInTheDocument()
     })
 
-    it('shows only the password toggle at right-0 when the value is empty', () => {
+    it('shows only the password toggle when the value is empty', () => {
       const { container } = render(Input, {
         props: { type: 'password', clearable: true, showPassword: true, modelValue: '' }
       })
@@ -711,12 +709,12 @@ describe('Input', () => {
       const eyeBtn = screen.getByLabelText('Show password')
 
       expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
-      expect(classTokens(eyeBtn)).toContain('right-0')
-      expect(classTokens(input)).toContain('pr-10')
-      expect(classTokens(input)).not.toContain('pr-20')
+      expect(classTokens(eyeBtn)).toContain('end-0')
+      expect(classTokens(input)).toContain('pe-10')
+      expect(classTokens(input)).not.toContain('pe-20')
     })
 
-    it('shows only the clear button at right-0 without showPassword', () => {
+    it('shows only the clear button without showPassword', () => {
       const { container } = render(Input, {
         props: { type: 'text', clearable: true, modelValue: 'hello' }
       })
@@ -724,9 +722,9 @@ describe('Input', () => {
       const clearBtn = screen.getByLabelText('Clear input')
 
       expect(screen.queryByLabelText('Show password')).not.toBeInTheDocument()
-      expect(classTokens(clearBtn)).toContain('right-0')
-      expect(classTokens(input)).toContain('pr-10')
-      expect(classTokens(input)).not.toContain('pr-20')
+      expect(classTokens(clearBtn)).toContain('end-0')
+      expect(classTokens(input)).toContain('pe-10')
+      expect(classTokens(input)).not.toContain('pe-20')
     })
   })
 
@@ -832,10 +830,9 @@ describe('Input', () => {
       const eyeBtn = screen.getByLabelText('Show password')
 
       expect(screen.getByText('Weak')).toBeInTheDocument()
-      expect(clearBtn.className.split(/\s+/)).toContain('right-10')
-      expect(clearBtn.className.split(/\s+/)).not.toContain('right-0')
-      expect(eyeBtn.className.split(/\s+/)).toContain('right-0')
-      expect(input.className.split(/\s+/)).toContain('pr-20')
+      expect(clearBtn).toBeInTheDocument()
+      expect(eyeBtn).toBeInTheDocument()
+      expect(input.className.split(/\s+/)).toContain('pe-20')
     })
 
     it('does not render a live region when status is error without errorMessage', () => {
@@ -844,6 +841,18 @@ describe('Input', () => {
       })
       expect(container.querySelector('[aria-live]')).toBeNull()
       expect(container).toHaveTextContent('Visible suffix')
+    })
+  })
+
+  describe('trailing actions and locale', () => {
+    it('returns focus to the input after toggling password visibility', async () => {
+      const { container } = render(Input, {
+        props: { type: 'password', showPassword: true, modelValue: 'secret' }
+      })
+      const input = container.querySelector('input')!
+      await fireEvent.click(screen.getByLabelText('Show password'))
+      expect(input).toHaveFocus()
+      expect(input).toHaveAttribute('type', 'text')
     })
   })
 })

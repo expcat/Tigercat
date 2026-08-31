@@ -430,6 +430,16 @@ export const idID: TigerLocale = {
   tagsInput: {
     removeTagLabel: 'Hapus {tag}',
     clearAllLabel: 'Hapus semua tag'
+  },
+  input: {
+    clearAriaLabel: 'Hapus isian',
+    showPasswordAriaLabel: 'Tampilkan kata sandi',
+    hidePasswordAriaLabel: 'Sembunyikan kata sandi'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'Naikkan',
+    decrementAriaLabel: 'Turunkan',
+    emptyAriaValueText: 'Kosong'
   }
 }
 

@@ -430,5 +430,15 @@ export const enUS: TigerLocale = {
   tagsInput: {
     removeTagLabel: 'Remove {tag}',
     clearAllLabel: 'Clear all tags'
+  },
+  input: {
+    clearAriaLabel: 'Clear input',
+    showPasswordAriaLabel: 'Show password',
+    hidePasswordAriaLabel: 'Hide password'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'Increase',
+    decrementAriaLabel: 'Decrease',
+    emptyAriaValueText: 'Empty'
   }
 }

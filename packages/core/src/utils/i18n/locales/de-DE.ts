@@ -431,6 +431,16 @@ export const deDE: TigerLocale = {
   tagsInput: {
     removeTagLabel: '{tag} entfernen',
     clearAllLabel: 'Alle Tags löschen'
+  },
+  input: {
+    clearAriaLabel: 'Eingabe löschen',
+    showPasswordAriaLabel: 'Passwort anzeigen',
+    hidePasswordAriaLabel: 'Passwort verbergen'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'Erhöhen',
+    decrementAriaLabel: 'Verringern',
+    emptyAriaValueText: 'Leer'
   }
 }
 

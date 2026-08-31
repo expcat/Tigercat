@@ -430,6 +430,16 @@ export const arSA: TigerLocale = {
   tagsInput: {
     removeTagLabel: 'إزالة {tag}',
     clearAllLabel: 'مسح كل الوسوم'
+  },
+  input: {
+    clearAriaLabel: 'مسح الإدخال',
+    showPasswordAriaLabel: 'إظهار كلمة المرور',
+    hidePasswordAriaLabel: 'إخفاء كلمة المرور'
+  },
+  inputNumber: {
+    incrementAriaLabel: 'زيادة',
+    decrementAriaLabel: 'إنقاص',
+    emptyAriaValueText: 'فارغ'
   }
 }
 
