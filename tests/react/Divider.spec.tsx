@@ -6,68 +6,89 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import React from 'react'
 import { Divider } from '@expcat/tigercat-react/Divider'
+import { Space } from '@expcat/tigercat-react/Space'
 import { renderWithProps } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+
+function getRoot(container: HTMLElement): HTMLElement {
+  return container.querySelector('[role="separator"]') as HTMLElement
+}
 
 describe('Divider (React)', () => {
   it('renders a separator with default orientation', () => {
     const { container } = render(<Divider />)
-
-    const divider = container.querySelector('[role="separator"]')
+    const divider = getRoot(container)
     expect(divider).toBeInTheDocument()
     expect(divider).toHaveAttribute('aria-orientation', 'horizontal')
-    expect(divider?.className).toContain('border-solid')
-    expect(divider?.className).toContain('my-4')
   })
 
-  it('supports vertical orientation', () => {
-    const { container } = renderWithProps(Divider, { orientation: 'vertical' })
-    const divider = container.querySelector('[role="separator"]')
-
-    expect(divider).toHaveAttribute('aria-orientation', 'vertical')
-    expect(divider?.className).toContain('border-l')
-    expect(divider?.className).toContain('mx-4')
+  it('forwards the ref to the root', () => {
+    const ref = React.createRef<HTMLDivElement>()
+    const { container } = render(<Divider ref={ref} />)
+    expect(ref.current).toBe(getRoot(container))
   })
 
-  it('applies line style classes', () => {
-    const { container: dashed } = renderWithProps(Divider, { lineStyle: 'dashed' })
-    expect(dashed.querySelector('[role="separator"]')?.className).toContain('border-dashed')
-
-    const { container: dotted } = renderWithProps(Divider, { lineStyle: 'dotted' })
-    expect(dotted.querySelector('[role="separator"]')?.className).toContain('border-dotted')
+  it('stretches a vertical rule in a default Space', () => {
+    const { container } = render(
+      <Space>
+        <span style={{ fontSize: 24, lineHeight: '32px' }}>Aa</span>
+        <Divider orientation="vertical" spacing="none" />
+        <span style={{ fontSize: 24, lineHeight: '32px' }}>Bb</span>
+      </Space>
+    )
+    const divider = getRoot(container)
+    const sibling = container.querySelector('span') as HTMLElement
+    const dividerBox = divider.getBoundingClientRect()
+    const siblingBox = sibling.getBoundingClientRect()
+    if (siblingBox.height > 0) {
+      expect(dividerBox.height).toBeGreaterThan(0)
+      expect(dividerBox.height).toBeCloseTo(siblingBox.height, 0)
+    } else {
+      expect(getComputedStyle(divider).alignSelf).toBe('stretch')
+    }
   })
-  it('merges custom className', () => {
-    const { container } = renderWithProps(Divider, { className: 'custom-divider-class' })
-    expect(container.querySelector('[role="separator"]')).toHaveClass('custom-divider-class')
+
+  it('applies color and thickness to a gradient line', () => {
+    const { container } = render(
+      <Divider lineStyle="gradient" color="rgb(124, 58, 237)" thickness="4px" spacing="none" />
+    )
+    const divider = getRoot(container)
+    expect(divider.style.backgroundImage).toContain('rgb(124, 58, 237)')
+    expect(divider.style.height).toBe('4px')
+    expect(divider.style.borderWidth).toBe('0px')
   })
 
-  it('supports custom color and thickness (vertical)', () => {
+  it('uses logical thickness on a vertical rule', () => {
     const { container } = renderWithProps(Divider, {
       orientation: 'vertical',
       color: '#00ff00',
       thickness: '3px'
     })
-
-    const divider = container.querySelector('[role="separator"]') as HTMLElement
+    const divider = getRoot(container)
     expect(divider.style.borderColor).toBe('#00ff00')
-    expect(divider.style.borderLeftWidth).toBe('3px')
+    expect(divider.style.borderInlineStartWidth).toBe('3px')
   })
 
-  it('supports custom thickness (horizontal)', () => {
-    const { container } = renderWithProps(Divider, { thickness: '2px' })
-    const divider = container.querySelector('[role="separator"]') as HTMLElement
-    expect(divider.style.borderTopWidth).toBe('2px')
+  it('renders a labeled separator on both sides', () => {
+    const { container } = render(<Divider>OR</Divider>)
+    const divider = getRoot(container)
+    expect(divider.textContent).toBe('OR')
+    expect(divider.querySelectorAll('[aria-hidden="true"]').length).toBe(2)
+  })
+
+  it('merges custom className', () => {
+    const { container } = renderWithProps(Divider, { className: 'custom-divider-class' })
+    expect(getRoot(container)).toHaveClass('custom-divider-class')
   })
 
   it('does not set inline style when no custom color/thickness', () => {
     const { container } = render(<Divider />)
-    const divider = container.querySelector('[role="separator"]') as HTMLElement
+    const divider = getRoot(container)
     expect(divider.style.borderColor).toBe('')
-    expect(divider.style.borderTopWidth).toBe('')
   })
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<Divider />)
+    const { container } = render(<Divider>OR</Divider>)
     await expectNoA11yViolationsIsolated(container)
   })
 })

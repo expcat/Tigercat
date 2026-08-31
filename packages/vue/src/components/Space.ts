@@ -1,5 +1,8 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
+  classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getSpaceClasses,
   getSpaceStyle,
   type SpaceProps,
@@ -10,6 +13,7 @@ export type VueSpaceProps = SpaceProps
 
 export const Space = defineComponent({
   name: 'TigerSpace',
+  inheritAttrs: false,
   props: {
     direction: {
       type: String as PropType<SpaceProps['direction']>,
@@ -26,22 +30,33 @@ export const Space = defineComponent({
     wrap: {
       type: Boolean,
       default: false
+    },
+    className: {
+      type: String,
+      default: undefined
+    },
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => getSpaceClasses(props))
-    const style = computed(() => getSpaceStyle(props.size))
+    const gapStyle = computed(() => getSpaceStyle(props.size))
 
-    return () =>
-      h(
+    return () => {
+      const attrsRecord = attrs as Record<string, unknown>
+      return h(
         'div',
         {
           ...attrs,
-          class: [classes.value, attrs.class],
-          style: [style.value, attrs.style]
+          class: classNames(classes.value, props.className, coerceClassValue(attrsRecord.class)),
+          style: mergeStyleValues(gapStyle.value, attrsRecord.style, props.style),
+          'data-tiger-space': ''
         },
         slots.default?.()
       )
+    }
   }
 })
 

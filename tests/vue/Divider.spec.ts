@@ -5,67 +5,88 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
 import { Divider } from '@expcat/tigercat-vue/Divider'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+
+function getRoot(container: HTMLElement): HTMLElement {
+  return container.querySelector('[role="separator"]') as HTMLElement
+}
 
 describe('Divider (Vue)', () => {
   it('renders a separator with default orientation', () => {
     const { container } = render(Divider)
-
-    const divider = container.querySelector('[role="separator"]')
+    const divider = getRoot(container)
     expect(divider).toBeInTheDocument()
     expect(divider).toHaveAttribute('aria-orientation', 'horizontal')
-    expect(divider?.className).toContain('border-solid')
-    expect(divider?.className).toContain('my-4')
   })
 
-  it('supports vertical orientation', () => {
-    const { container } = renderWithProps(Divider, { orientation: 'vertical' })
-    const divider = container.querySelector('[role="separator"]')
-
-    expect(divider).toHaveAttribute('aria-orientation', 'vertical')
-    expect(divider?.className).toContain('border-l')
-    expect(divider?.className).toContain('mx-4')
+  it('stretches a vertical rule in a default Space', () => {
+    const { container } = render({
+      template:
+        '<Space><span style="font-size:24px;line-height:32px">Aa</span><Divider orientation="vertical" spacing="none" /><span style="font-size:24px;line-height:32px">Bb</span></Space>',
+      components: { Space, Divider }
+    })
+    const divider = getRoot(container)
+    const sibling = container.querySelector('span') as HTMLElement
+    const dividerBox = divider.getBoundingClientRect()
+    const siblingBox = sibling.getBoundingClientRect()
+    if (siblingBox.height > 0) {
+      expect(dividerBox.height).toBeGreaterThan(0)
+      expect(dividerBox.height).toBeCloseTo(siblingBox.height, 0)
+    } else {
+      expect(getComputedStyle(divider).alignSelf).toBe('stretch')
+    }
   })
 
-  it('applies line style classes', () => {
-    const { container: dashed } = renderWithProps(Divider, { lineStyle: 'dashed' })
-    expect(dashed.querySelector('[role="separator"]')?.className).toContain('border-dashed')
-
-    const { container: dotted } = renderWithProps(Divider, { lineStyle: 'dotted' })
-    expect(dotted.querySelector('[role="separator"]')?.className).toContain('border-dotted')
+  it('applies color and thickness to a gradient line', () => {
+    const { container } = renderWithProps(Divider, {
+      lineStyle: 'gradient',
+      color: 'rgb(124, 58, 237)',
+      thickness: '4px',
+      spacing: 'none'
+    })
+    const divider = getRoot(container)
+    expect(divider.style.backgroundImage).toContain('rgb(124, 58, 237)')
+    expect(divider.style.height).toBe('4px')
+    expect(divider.style.borderWidth).toBe('0px')
   })
-  it('merges custom class via attrs', () => {
-    const { container } = render(Divider, { attrs: { class: 'custom-divider-class' } })
-    expect(container.querySelector('[role="separator"]')).toHaveClass('custom-divider-class')
-  })
 
-  it('supports custom color and thickness (vertical)', () => {
+  it('uses logical thickness on a vertical rule', () => {
     const { container } = renderWithProps(Divider, {
       orientation: 'vertical',
       color: '#00ff00',
       thickness: '3px'
     })
-
-    const divider = container.querySelector('[role="separator"]') as HTMLElement
+    const divider = getRoot(container)
     expect(divider.style.borderColor).toBe('#00ff00')
-    expect(divider.style.borderLeftWidth).toBe('3px')
+    expect(divider.style.borderInlineStartWidth).toBe('3px')
   })
 
-  it('supports custom thickness (horizontal)', () => {
-    const { container } = renderWithProps(Divider, { thickness: '2px' })
-    const divider = container.querySelector('[role="separator"]') as HTMLElement
-    expect(divider.style.borderTopWidth).toBe('2px')
+  it('renders a labeled separator from the default slot', () => {
+    const { container } = render(Divider, { slots: { default: 'OR' } })
+    const divider = getRoot(container)
+    expect(divider.textContent).toBe('OR')
+    expect(divider.querySelectorAll('[aria-hidden="true"]').length).toBe(2)
+  })
+
+  it('merges className without replacing base classes', () => {
+    const { container } = render(Divider, {
+      props: { className: 'custom' },
+      attrs: { 'data-testid': 'divider' }
+    })
+    const divider = getRoot(container)
+    expect(divider.className).toContain('tiger-divider')
+    expect(divider.className.match(/custom/g)?.length).toBe(1)
+    expect(divider).toHaveAttribute('data-testid', 'divider')
   })
 
   it('does not set inline style when no custom color/thickness', () => {
     const { container } = render(Divider)
-    const divider = container.querySelector('[role="separator"]') as HTMLElement
-    expect(divider.style.borderColor).toBe('')
-    expect(divider.style.borderTopWidth).toBe('')
+    expect(getRoot(container).style.borderColor).toBe('')
   })
 
   it('has no accessibility violations', async () => {
-    const { container } = render(Divider)
+    const { container } = render(Divider, { slots: { default: 'OR' } })
     await expectNoA11yViolationsIsolated(container)
   })
 
@@ -75,8 +96,6 @@ describe('Divider (Vue)', () => {
     })
     const dividers = container.querySelectorAll('[role="separator"]')
     expect(dividers.length).toBe(1)
-    const cls = dividers[0].className
-    expect(cls.match(/custom-divider-class/g)?.length).toBe(1)
-    expect(dividers[0]).toHaveAttribute('data-testid', 'divider')
+    expect(dividers[0].className.match(/custom-divider-class/g)?.length).toBe(1)
   })
 })

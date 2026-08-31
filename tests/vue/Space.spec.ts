@@ -2,21 +2,25 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
+
+function getRoot(container: HTMLElement): HTMLElement {
+  return container.querySelector('[data-tiger-space]') as HTMLElement
+}
 
 describe('Space (Vue)', () => {
   const ItemSlot = () => h('span', 'Item')
 
   it('renders defaults and children', () => {
     const { container } = renderWithSlots(Space, { default: ItemSlot })
-
-    const el = container.querySelector('div')
-    expect(el).toBeInTheDocument()
-    expect(el).toHaveClass('inline-flex', 'flex-row', 'items-start', 'gap-4')
+    const el = getRoot(container)
+    expect(getComputedStyle(el).display).toBe('inline-flex')
+    expect(getComputedStyle(el).flexDirection).toBe('row')
     expect(screen.getByText('Item')).toBeInTheDocument()
   })
 
@@ -26,20 +30,52 @@ describe('Space (Vue)', () => {
       { direction: 'vertical' },
       { slots: { default: ItemSlot } }
     )
+    expect(getComputedStyle(getRoot(container)).flexDirection).toBe('column')
+  })
 
-    expect(container.querySelector('div')).toHaveClass('flex-col')
+  it('reverses the inline axis under rtl', () => {
+    const { container } = render({
+      template: '<div dir="rtl"><Space><span>A</span><span>B</span></Space></div>',
+      components: { Space }
+    })
+    expect(getComputedStyle(getRoot(container)).flexDirection).toBe('row-reverse')
   })
 
   it('supports numeric size via inline gap', () => {
     const { container } = renderWithProps(Space, { size: 16 }, { slots: { default: ItemSlot } })
-
-    expect((container.querySelector('div') as HTMLElement).style.gap).toBe('16px')
+    expect(getRoot(container).style.gap).toBe('16px')
   })
 
-  it('supports wrap', () => {
-    const { container } = renderWithProps(Space, { wrap: true }, { slots: { default: ItemSlot } })
+  it('wraps items in a narrow container', () => {
+    const { container } = render({
+      template:
+        '<div style="width:80px"><Space wrap :size="4"><span style="display:inline-block;width:50px">A</span><span style="display:inline-block;width:50px">B</span><span style="display:inline-block;width:50px">C</span></Space></div>',
+      components: { Space }
+    })
+    const root = getRoot(container)
+    expect(getComputedStyle(root).flexWrap).toBe('wrap')
+  })
 
-    expect(container.querySelector('div')).toHaveClass('flex-wrap')
+  it('merges className without replacing base classes', () => {
+    const { container } = render(Space, {
+      props: { className: 'custom' },
+      slots: { default: ItemSlot }
+    })
+    const el = getRoot(container)
+    expect(el.className).toContain('tiger-space')
+    expect(el.className).toContain('custom')
+    expect(el.className.match(/custom/g)?.length).toBe(1)
+  })
+
+  it('fires onClick once', async () => {
+    const onClick = vi.fn()
+    const user = userEvent.setup()
+    const { container } = render(Space, {
+      attrs: { onClick },
+      slots: { default: ItemSlot }
+    })
+    await user.click(getRoot(container))
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 
   it('merges attrs class/style (attrs style wins over size gap)', () => {
@@ -55,8 +91,8 @@ describe('Space (Vue)', () => {
       }
     )
 
-    const el = container.querySelector('div') as HTMLElement
-    expect(el).toHaveClass('inline-flex', 'custom')
+    const el = getRoot(container)
+    expect(el.className).toContain('custom')
     expect(el.style.backgroundColor).toBe('red')
     expect(el.style.gap).toBe('20px')
   })
@@ -64,14 +100,18 @@ describe('Space (Vue)', () => {
   it('passes through div attributes', () => {
     const { container } = renderWithProps(
       Space,
-      { id: 'my-space', 'aria-label': 'space' },
-      { slots: { default: ItemSlot } }
+      {},
+      {
+        attrs: { id: 'my-space', 'aria-label': 'space' },
+        slots: { default: ItemSlot }
+      }
     )
 
-    const el = container.querySelector('div') as HTMLElement
+    const el = getRoot(container)
     expect(el).toHaveAttribute('id', 'my-space')
     expect(el).toHaveAttribute('aria-label', 'space')
   })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Space)

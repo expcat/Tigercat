@@ -1,18 +1,21 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
+  classNames,
   getDividerClasses,
+  getDividerLineClasses,
   getDividerStyle,
+  hasDividerLabel,
   type DividerProps as CoreDividerProps
 } from '@expcat/tigercat-core'
 
 export interface DividerProps
-  extends CoreDividerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
-  /** Additional CSS classes */
+  extends CoreDividerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'color' | 'children'> {
   className?: string
+  children?: React.ReactNode
 }
 
-export const Divider: React.FC<DividerProps> = React.memo(
-  ({
+export const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
+  {
     orientation = 'horizontal',
     lineStyle = 'solid',
     spacing = 'md',
@@ -20,30 +23,50 @@ export const Divider: React.FC<DividerProps> = React.memo(
     thickness,
     className,
     style: styleProp,
+    children,
     ...props
-  }) => {
-    const classes = useMemo(() => {
-      const base = getDividerClasses(orientation, lineStyle, spacing)
-      return className ? `${base} ${className}` : base
-    }, [orientation, lineStyle, spacing, className])
+  },
+  ref
+) {
+  const labeled = hasDividerLabel(children)
+  const classes = useMemo(() => {
+    const base = getDividerClasses(orientation, lineStyle, spacing, labeled)
+    return classNames(base, className)
+  }, [orientation, lineStyle, spacing, labeled, className])
 
-    const style = useMemo(
-      () => ({
-        ...(getDividerStyle(orientation, color, thickness) as React.CSSProperties | undefined),
-        ...styleProp
-      }),
-      [color, thickness, orientation, styleProp]
-    )
+  const lineStyleObj = useMemo(
+    () =>
+      getDividerStyle(orientation, color, thickness, lineStyle) as React.CSSProperties | undefined,
+    [color, thickness, orientation, lineStyle]
+  )
 
-    return (
-      <div
-        {...props}
-        className={classes}
-        style={style}
-        role="separator"
-        aria-orientation={orientation}
-      />
-    )
-  }
-)
+  const style = useMemo(
+    () => ({
+      ...lineStyleObj,
+      ...styleProp
+    }),
+    [lineStyleObj, styleProp]
+  )
+
+  const lineClass = getDividerLineClasses(orientation, lineStyle, true)
+
+  return (
+    <div
+      {...props}
+      ref={ref}
+      className={classes}
+      style={labeled ? styleProp : style}
+      role="separator"
+      aria-orientation={orientation}
+      data-tiger-divider="">
+      {labeled ? (
+        <>
+          <span aria-hidden="true" className={lineClass} style={lineStyleObj} />
+          <span>{children}</span>
+          <span aria-hidden="true" className={lineClass} style={lineStyleObj} />
+        </>
+      ) : null}
+    </div>
+  )
+})
 Divider.displayName = 'Divider'

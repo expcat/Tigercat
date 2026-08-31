@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import {
   getSpaceClasses,
   getSpaceStyle,
@@ -12,24 +12,30 @@ export type SpaceProps = CoreSpaceProps &
     style?: React.CSSProperties
   }
 
-export const Space: React.FC<SpaceProps> = ({
-  direction = 'horizontal',
-  size = 'md',
-  align = 'start',
-  wrap = false,
-  children,
-  className,
-  style,
-  ...props
-}) => {
+export const Space = forwardRef<HTMLDivElement, SpaceProps>(function Space(
+  {
+    direction = 'horizontal',
+    size = 'md',
+    align = 'start',
+    wrap = false,
+    children,
+    className,
+    style,
+    ...props
+  },
+  ref
+) {
   const gapStyle = getSpaceStyle(size)
 
   return (
     <div
       {...props}
+      ref={ref}
+      data-tiger-space=""
       className={getSpaceClasses({ direction, size, align, wrap }, className)}
       style={gapStyle ? { ...gapStyle, ...style } : style}>
       {children}
     </div>
   )
-}
+})
+Space.displayName = 'Space'
