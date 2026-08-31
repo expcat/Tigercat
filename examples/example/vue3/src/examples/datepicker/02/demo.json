@@ -1,7 +1,7 @@
 {
   "id": "datepicker-02",
-  "title": "范围选择",
-  "description": "选择开始日期与结束日期。",
+  "title": "区间",
+  "description": "两点成段，点 OK 关闭。默认打开面板。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

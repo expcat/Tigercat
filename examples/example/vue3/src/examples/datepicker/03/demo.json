@@ -1,7 +1,7 @@
 {
   "id": "datepicker-03",
-  "title": "日期约束",
-  "description": "一个受控 DatePicker 通过 minDate 和 maxDate 将可选日期限制在 2026 年。",
+  "title": "范围与禁用",
+  "description": "minDate / maxDate 与 disabledDate 走同一条是否可选判断。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

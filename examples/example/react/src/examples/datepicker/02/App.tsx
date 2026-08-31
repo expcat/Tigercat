@@ -7,9 +7,9 @@ export default function App() {
   return (
     <DatePicker
       range
+      defaultOpen
       value={range}
       onChange={setRange}
-      placeholder="选择开始和结束日期"
       className="w-full max-w-[360px]"
     />
   )

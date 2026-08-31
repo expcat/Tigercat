@@ -1,7 +1,7 @@
 {
   "id": "datepicker-01",
   "title": "基础用法",
-  "description": "基础的日期选择器组件。",
+  "description": "FormItem 标签命名字段。默认文案来自官方 zhTW locale 对象，不传 placeholder。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

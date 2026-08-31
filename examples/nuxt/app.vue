@@ -5,7 +5,7 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
-const selectedDate = new Date(2024, 0, 15)
+const selectedDate = '2024-01-15'
 const chartData = [
   { x: 'Vue SSR', y: 18 },
   { x: 'Hydration', y: 24 },
@@ -25,7 +25,10 @@ const chartData = [
         </p>
         <div class="toolbar">
           <Button variant="primary">保存</Button>
-          <DatePicker :model-value="selectedDate" locale="zh-CN" />
+          <DatePicker
+            :model-value="selectedDate"
+            format="yyyy-MM-dd"
+            @update:model-value="() => undefined" />
         </div>
       </section>
 

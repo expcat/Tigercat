@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 
-const value = ref<Date | null>(null)
+const weekday = new Date(2026, 5, 15)
+const value = ref<Date | null>(weekday)
+const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6
 </script>
 
 <template>
@@ -10,6 +12,6 @@ const value = ref<Date | null>(null)
     v-model="value"
     min-date="2026-01-01"
     max-date="2026-12-31"
-    placeholder="仅可选择 2026 年日期"
+    :disabled-date="isWeekend"
     class="w-full max-w-[280px]" />
 </template>

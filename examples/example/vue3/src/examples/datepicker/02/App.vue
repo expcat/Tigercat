@@ -6,5 +6,5 @@ const range = ref<[Date | null, Date | null]>([null, null])
 </script>
 
 <template>
-  <DatePicker v-model="range" range placeholder="选择开始和结束日期" class="w-full max-w-[360px]" />
+  <DatePicker v-model="range" range default-open class="w-full max-w-[360px]" />
 </template>

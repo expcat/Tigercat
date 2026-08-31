@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
-
-const value = ref<Date | null>(null)
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 </script>
 
 <template>
-  <DatePicker
-    v-model="value"
-    size="lg"
-    clearable
-    placeholder="请选择日期"
-    class="w-full max-w-[280px]" />
+  <ConfigProvider :locale="zhTW">
+    <div class="flex flex-col gap-6">
+      <FormItem label="日期" class="w-full max-w-[280px]">
+        <DatePicker />
+      </FormItem>
+      <p class="text-sm text-[var(--tiger-text-muted)]">上面不绑 v-model，点格子仍会改显示。</p>
+    </div>
+  </ConfigProvider>
 </template>

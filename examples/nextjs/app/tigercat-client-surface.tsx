@@ -6,7 +6,7 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { DatePicker } from '@expcat/tigercat-react/DatePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
-const selectedDate = new Date(2024, 0, 15)
+const selectedDate = '2024-01-15'
 const chartData = [
   { x: 'React SSR', y: 22 },
   { x: 'Hydration', y: 28 },
@@ -19,7 +19,7 @@ export function TigercatClientSurface() {
       <section className="ssr-panel">
         <div className="toolbar">
           <Button variant="primary">保存</Button>
-          <DatePicker value={selectedDate} locale="zh-CN" />
+          <DatePicker value={selectedDate} format="yyyy-MM-dd" onChange={() => undefined} />
         </div>
       </section>
 
