@@ -8,6 +8,10 @@ Image 默认 `preview=true` 时宿主是 `<button>`，不再是 `div role=button
 
 ImagePreview 与 ImageViewer 收成**一套**全屏 dialog（overlay-host、滚锁、焦点陷阱、Escape 栈）。公开名仍两个：`ImageViewer` 是同一实现的配置别名，`minZoom`/`maxZoom` 映射到 `minScale`/`maxScale`。导航改为到头 disable，不再 `% length` 循环。`images` 为 `string | { src, alt? }`；空列表会 emit 关闭。默认缩放范围统一为 0.25–5。删除 `ImagePreviewToolbarAction` 与 `clampZoom`。文案走 `locale.imageViewer`（含 `previewImageAriaLabel`），不再写死 `Preview image n` / `Image n`。
 
+ImageCompare 滑块名走 `locale.imageCompare.ariaLabel`。删除 `DEFAULT_IMAGE_COMPARE_ARIA_LABEL` 与 `--tiger-image-compare-position`。空 `ariaLabel` 不再回落成英文；有 `aria-labelledby` 时不写默认 `aria-label`。水平模式从 inline-start 裁切（RTL 下 ArrowRight 减少）。拖拽只绑 `pointer*`。
+
+ImageCropper 坏图进入错误态，不再无限转圈。显示用的 `<img>` 不再写死 CORS。`getCropResult()` 在未 ready / canvas 失败时 reject。删除假 token `--tiger-image-cropper-*`。缩放柄默认不进 Tab。产出仍是 `getCropResult()`，不是 `value`。Vue 导出 `ImageCropperRef`。
+
 Marquee 默认不再是名为 “Scrolling content” 的 `region`。需要 landmark 时传 `ariaLabel` / `aria-label` / `aria-labelledby`。`repeat={0}` 现在是静态一份，不再回落到 2。`pauseOnHover={false}` 不再关掉焦点暂停（用 `pauseOnFocus={false}`）。删除 `DEFAULT_MARQUEE_ARIA_LABEL`，文案在 `enUS.marquee.ariaLabel` / `getMarqueeLabels`。纵向不要再靠外挂 `h-*` 才能像跑马灯。
 
 Text `align` 改为逻辑值：`start` / `center` / `end` / `justify`。运行时仍接受 `left`/`right` 并映射到 `start`/`end`。

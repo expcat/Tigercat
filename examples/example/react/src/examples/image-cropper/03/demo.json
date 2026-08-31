@@ -1,0 +1,8 @@
+{
+  "id": "image-cropper-03",
+  "title": "加载失败",
+  "description": "src 无法加载时进入错误态，而不是一直转圈。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 240, "maxHeight": 720 }
+}

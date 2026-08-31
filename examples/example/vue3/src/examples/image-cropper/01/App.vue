@@ -7,5 +7,5 @@ const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
 </script>
 
 <template>
-  <ImageCropper :src="source" :aspect-ratio="1" />
+  <ImageCropper :src="source" />
 </template>

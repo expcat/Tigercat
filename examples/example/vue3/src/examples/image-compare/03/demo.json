@@ -1,7 +1,7 @@
 {
   "id": "image-compare-03",
   "title": "插槽与受控位置",
-  "description": "before/after 插槽可自定义内容；v-model:position 受控同步滑块位置。",
+  "description": "before/after 插槽可自定义内容；after 可见侧的按钮可点，不会拖动手柄。v-model:position 受控同步滑块位置。",
   "entry": "App.vue",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 320, "maxHeight": 720 }

@@ -136,6 +136,13 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       'ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。'
   },
+  ImageCompare: {
+    notes:
+      '受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。'
+  },
+  ImageCropper: {
+    notes: '`src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。'
+  },
   Card: {
     notes:
       '`padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。'
@@ -406,6 +413,9 @@ const COMPONENT_SNIPPETS = {
     Kbd: "<Kbd :keys=\"['Ctrl', 'K']\" />",
     Highlight: '<Highlight keywords="Vue">Learn Vue</Highlight>',
     Marquee: '<Marquee aria-label="News"><span>Item</span></Marquee>',
+    ImageCompare:
+      '<ImageCompare :before-src="beforeSrc" :after-src="afterSrc" :width="480" :height="280" />',
+    ImageCropper: '<ImageCropper :src="src" />',
     ChatWindow: '<ChatWindow :messages="messages" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" />',
@@ -453,6 +463,9 @@ const COMPONENT_SNIPPETS = {
     Kbd: "<Kbd keys={['Ctrl', 'K']} />",
     Highlight: '<Highlight keywords="Vue">Learn Vue</Highlight>',
     Marquee: '<Marquee aria-label="News"><span>Item</span></Marquee>',
+    ImageCompare:
+      '<ImageCompare beforeSrc={beforeSrc} afterSrc={afterSrc} width={480} height={280} />',
+    ImageCropper: '<ImageCropper src={src} />',
     ChatWindow: '<ChatWindow messages={messages} />',
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} />',

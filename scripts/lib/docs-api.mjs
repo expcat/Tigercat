@@ -72,6 +72,17 @@ export const COMPONENT_PROP_PRIORITY = {
   ],
   ImagePreview: ['images', 'open?', 'currentIndex?', 'maskClosable?', 'minScale?', 'locale?'],
   ImageViewer: ['images', 'open?', 'currentIndex?', 'showNav?', 'minZoom?', 'locale?'],
+  ImageCompare: [
+    'beforeSrc?',
+    'afterSrc?',
+    'position?',
+    'orientation?',
+    'disabled?',
+    'step?',
+    'ariaLabel?',
+    'width?'
+  ],
+  ImageCropper: ['src', 'aspectRatio?', 'minWidth?', 'outputType?', 'guides?', 'locale?'],
   Button: [
     'variant?',
     'size?',

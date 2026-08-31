@@ -240,23 +240,35 @@ Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `loc
 
 ## ImageCompare
 
-`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 3/17 props
+`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 8/17 props
 
-| Prop         | Type      | Default | Notes                                                                                      |
-| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
-| `disabled?`  | `boolean` | `false` | Whether pointer and keyboard adjustment are disabled                                       |
-| `beforeSrc?` | `string`  | `-`     | Before (starting) image URL. Vue `before` slot / React `before` node take precedence wh... |
-| `afterSrc?`  | `string`  | `-`     | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
+Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。
+
+| Prop           | Type                      | Default        | Notes                                                                                      |
+| -------------- | ------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `beforeSrc?`   | `string`                  | `-`            | Before (starting) image URL. Vue `before` slot / React `before` node take precedence wh... |
+| `afterSrc?`    | `string`                  | `-`            | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
+| `position?`    | `number`                  | `-`            | Handle position as a percentage of the before image that is visible (controlled mode)      |
+| `orientation?` | `ImageCompareOrientation` | `'horizontal'` | Comparison axis                                                                            |
+| `disabled?`    | `boolean`                 | `false`        | Whether pointer and keyboard adjustment are disabled                                       |
+| `step?`        | `number`                  | `1`            | Keyboard and pointer snap increment, in percentage points                                  |
+| `ariaLabel?`   | `string`                  | `-`            | Accessible name for the comparison handle. Empty or whitespace is treated as omitted; t... |
+| `width?`       | `number \| string`        | `-`            | Root width (CSS value). A number is treated as pixels.                                     |
 
 ## ImageCropper
 
-`packages/core/src/types/image.ts` · `ImageCropperProps` · 3/10 props
+`packages/core/src/types/image.ts` · `ImageCropperProps` · 6/12 props
 
-| Prop           | Type                   | Default | Notes                                                                   |
-| -------------- | ---------------------- | ------- | ----------------------------------------------------------------------- |
-| `src`          | `string`               | `-`     | Image source URL to crop                                                |
-| `locale?`      | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                 |
-| `aspectRatio?` | `number`               | `-`     | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
+Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。
+
+| Prop           | Type                                          | Default       | Notes                                                                   |
+| -------------- | --------------------------------------------- | ------------- | ----------------------------------------------------------------------- |
+| `src`          | `string`                                      | `-`           | Image source URL to crop                                                |
+| `aspectRatio?` | `number`                                      | `-`           | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
+| `minWidth?`    | `number`                                      | `20`          | Minimum crop width in pixels                                            |
+| `outputType?`  | `'image/png' \| 'image/jpeg' \| 'image/webp'` | `'image/png'` | Output image MIME type                                                  |
+| `guides?`      | `boolean`                                     | `true`        | Whether to show crop guide lines (rule of thirds)                       |
+| `locale?`      | `Partial<TigerLocale>`                        | `-`           | Locale override merged on top of ConfigProvider locale.                 |
 
 ## ImageGroup
 

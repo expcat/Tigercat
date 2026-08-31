@@ -1,8 +1,8 @@
 {
   "id": "image-cropper-02",
-  "title": "输出格式",
-  "description": "通过 outputType 和 quality 将裁剪结果配置为 JPEG；默认输出 PNG。",
+  "title": "导出 JPEG",
+  "description": "调用 getCropResult() 按 outputType=image/jpeg 和 quality 产出 blob，并展示结果。",
   "entry": "App.vue",
   "order": 2,
-  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 720 }
+  "viewport": { "mode": "auto", "minHeight": 420, "maxHeight": 720 }
 }

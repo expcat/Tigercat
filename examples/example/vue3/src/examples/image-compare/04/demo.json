@@ -1,0 +1,8 @@
+{
+  "id": "image-compare-04",
+  "title": "RTL 水平对比",
+  "description": "dir=rtl 时 before 从 inline-start（右侧）展开，ArrowRight 减少可见比例。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 280, "maxHeight": 720 }
+}

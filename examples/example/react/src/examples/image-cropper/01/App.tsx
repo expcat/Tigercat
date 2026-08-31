@@ -5,5 +5,5 @@ const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
 )}`
 
 export default function App() {
-  return <ImageCropper src={source} aspectRatio={1} />
+  return <ImageCropper src={source} />
 }
