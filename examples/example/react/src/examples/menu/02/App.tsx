@@ -16,20 +16,14 @@ const items: MenuItemData[] = [
 ]
 
 export default function App() {
-  const [collapsed, setCollapsed] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
 
   return (
     <div className="space-y-3">
       <Button size="sm" onClick={() => setCollapsed((value) => !value)}>
         {collapsed ? '展开菜单' : '收起菜单'}
       </Button>
-      <Menu
-        items={items}
-        mode="inline"
-        theme="dark"
-        collapsed={collapsed}
-        defaultSelectedKeys={['dashboard']}
-      />
+      <Menu items={items} searchable collapsed={collapsed} defaultSelectedKeys={['dashboard']} />
     </div>
   )
 }

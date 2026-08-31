@@ -16,7 +16,7 @@ const items: MenuItemData[] = [
   }
 ]
 
-const collapsed = ref(true)
+const collapsed = ref(false)
 </script>
 
 <template>
@@ -24,11 +24,6 @@ const collapsed = ref(true)
     <Button size="sm" @click="collapsed = !collapsed">
       {{ collapsed ? '展开菜单' : '收起菜单' }}
     </Button>
-    <Menu
-      :items="items"
-      mode="inline"
-      theme="dark"
-      :collapsed="collapsed"
-      :default-selected-keys="['dashboard']" />
+    <Menu :items="items" searchable :collapsed="collapsed" :default-selected-keys="['dashboard']" />
   </div>
 </template>

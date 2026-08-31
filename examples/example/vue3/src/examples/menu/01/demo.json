@@ -1,7 +1,7 @@
 {
   "id": "menu-01",
-  "title": "完整菜单",
-  "description": "一个 inline Menu 组合嵌套项、禁用项、搜索，以及受控的选中项和展开项。",
+  "title": "默认垂直菜单",
+  "description": "不传 mode 即为 vertical。带链接的项渲成 <a>，选中链接带 aria-current=page。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

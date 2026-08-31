@@ -1,7 +1,7 @@
 {
   "id": "menu-02",
-  "title": "折叠菜单",
-  "description": "一个暗色 inline Menu 通过 collapsed 状态在展开和收起之间切换，并保留最小嵌套数据。",
+  "title": "搜索与折叠",
+  "description": "内置搜索会展开匹配子孙的祖先。collapsed 初值展开；收起后 inline/vertical 走 popup。placeholder 走 locale。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {
