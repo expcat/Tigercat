@@ -141,6 +141,7 @@ export const viVN: TigerLocale = {
     hour: 'Giờ',
     minute: 'Phút',
     second: 'Giây',
+    period: 'Buổi',
     now: 'Bây giờ',
     ok: 'Đồng ý',
     start: 'Bắt đầu',

@@ -141,6 +141,7 @@ export const esES: TigerLocale = {
     hour: 'Hora',
     minute: 'Minuto',
     second: 'Seg',
+    period: 'Periodo',
     now: 'Ahora',
     ok: 'Aceptar',
     start: 'Inicio',

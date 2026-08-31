@@ -141,6 +141,7 @@ export const koKR: TigerLocale = {
     hour: '시',
     minute: '분',
     second: '초',
+    period: '오전/오후',
     now: '지금',
     ok: '확인',
     start: '시작',

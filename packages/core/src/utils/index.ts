@@ -121,6 +121,7 @@ export * from './stepper-utils'
 export * from './calendar-utils'
 export * from './calendar-controller'
 export * from './datepicker-controller'
+export * from './timepicker-controller'
 export * from './mentions-utils'
 export * from './qrcode-utils'
 

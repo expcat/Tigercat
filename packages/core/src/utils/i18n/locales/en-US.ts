@@ -141,6 +141,7 @@ export const enUS: TigerLocale = {
     hour: 'Hour',
     minute: 'Min',
     second: 'Sec',
+    period: 'Period',
     now: 'Now',
     ok: 'OK',
     start: 'Start',

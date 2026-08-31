@@ -1,15 +1,20 @@
 /** TimePicker shared types */
 import type { ComponentSize } from './base'
+import type { InputStatus } from './input'
+import type { FloatingPlacement } from '../utils/floating'
 import type { TigerLocale } from './locale'
 
 export type TimeFormat = '12' | '24'
 
-export type TimePickerModelValue = string | null | [string | null, string | null]
+export type TimePickerRangeTuple = [string | null, string | null]
+
+export type TimePickerModelValue = string | null | TimePickerRangeTuple
 
 export interface TimePickerLabels {
   hour: string
   minute: string
   second: string
+  period: string
   now: string
   ok: string
   start: string
@@ -21,115 +26,95 @@ export interface TimePickerLabels {
   selectTimeRange: string
 }
 
+/**
+ * Shared TimePicker props. React adds `value`/`onChange`; Vue binds
+ * `modelValue` / `update:modelValue` and `open` / `update:open`.
+ *
+ * The stored value is always 24-hour `'HH:mm'` or `'HH:mm:ss'` (`showSeconds`).
+ * `format` is display and typed parse only — it is never written back to `value`.
+ * Empty single is `null`. Empty range is `null`. A complete range is `[start, end]`.
+ * `name` submits the formatted display string.
+ *
+ * Column clicks edit a panel draft. Footer OK commits the draft and closes.
+ * Escape / outside dismiss drops the draft. `Now` commits the clock time.
+ */
 export interface TimePickerProps {
-  /**
-   * Locale used for UI labels (e.g. AM/PM) and display formatting.
-   * Example: 'zh-CN', 'en-US', or a Tigercat locale object.
-   */
-  locale?: string | Partial<TigerLocale>
-
-  /**
-   * UI labels for i18n.
-   * When provided, merges with locale-based defaults.
-   */
+  /** Locale object merged on top of ConfigProvider. Do not pass a language id string. */
+  locale?: Partial<TigerLocale>
   labels?: Partial<TimePickerLabels>
-
   /**
-   * TimePicker size
    * @default 'md'
    */
   size?: ComponentSize
-
-  /** Controlled value. Format: 'HH:mm' or 'HH:mm:ss' */
-  value?: TimePickerModelValue
-
-  /** Uncontrolled default value. Format: 'HH:mm' or 'HH:mm:ss' */
-  defaultValue?: TimePickerModelValue
-
+  value?: TimePickerModelValue | null
+  defaultValue?: TimePickerModelValue | null
   /**
-   * Enable range selection (start/end).
-   * When true, value/defaultValue use a tuple: [start, end].
    * @default false
    */
   range?: boolean
-
   /**
-   * Time format (12-hour or 24-hour)
+   * Display / typed-parse clock. Stored value stays 24-hour.
    * @default '24'
    */
   format?: TimeFormat
-
   /**
-   * Whether to show seconds
    * @default false
    */
   showSeconds?: boolean
-
   /**
-   * Hour step
    * @default 1
    */
   hourStep?: number
-
   /**
-   * Minute step
    * @default 1
    */
   minuteStep?: number
-
   /**
-   * Second step
    * @default 1
    */
   secondStep?: number
-
-  /**
-   * Placeholder text
-   * @default 'Select time'
-   */
   placeholder?: string
-
   /**
-   * Whether the timepicker is disabled
    * @default false
    */
   disabled?: boolean
-
   /**
-   * Whether the timepicker is readonly
+   * When true, the field cannot be typed and the panel cannot open.
    * @default false
    */
   readonly?: boolean
-
   /**
-   * Whether the timepicker is required
    * @default false
    */
   required?: boolean
-
-  /**
-   * Minimum selectable time (HH:mm format)
-   */
   minTime?: string | null
-
-  /**
-   * Maximum selectable time (HH:mm format)
-   */
   maxTime?: string | null
-
+  disabledTime?: (time: string) => boolean
+  now?: Date
   /**
-   * Whether to show the clear button
    * @default true
    */
   clearable?: boolean
-
-  /**
-   * Input name attribute
-   */
   name?: string
-
-  /**
-   * Input id attribute
-   */
   id?: string
+  open?: boolean
+  /**
+   * @default false
+   */
+  defaultOpen?: boolean
+  status?: InputStatus
+  /**
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
+  /**
+   * @default 4
+   */
+  offset?: number
+  dropdownClassName?: string
+  getPopupContainer?: () => HTMLElement | null
+  onChange?: (value: string | null | TimePickerRangeTuple) => void
+  onClear?: () => void
+  onOpenChange?: (open: boolean) => void
+  className?: string
 }

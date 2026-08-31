@@ -141,6 +141,7 @@ export const zhCN: TigerLocale = {
     hour: '时',
     minute: '分',
     second: '秒',
+    period: '时段',
     now: '现在',
     ok: '确定',
     start: '开始',

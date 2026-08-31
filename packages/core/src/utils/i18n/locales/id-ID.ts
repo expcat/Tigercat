@@ -141,6 +141,7 @@ export const idID: TigerLocale = {
     hour: 'Jam',
     minute: 'Menit',
     second: 'Detik',
+    period: 'Periode',
     now: 'Sekarang',
     ok: 'OK',
     start: 'Mulai',

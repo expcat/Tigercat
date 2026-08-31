@@ -44,33 +44,91 @@ export function padTwo(value: number): string {
   return value.toString().padStart(2, '0')
 }
 
-/**
- * Parse time string to hours, minutes, and seconds
- * @param timeString - Time string in 'HH:mm' or 'HH:mm:ss' format
- * @returns Object with hours, minutes, and seconds, or null if invalid
- */
-export function parseTime(timeString: string | null | undefined): {
+export interface TimeParts {
   hours: number
   minutes: number
   seconds: number
-} | null {
-  if (!timeString) return null
+}
 
-  const timeParts = timeString.split(':')
+export interface ParseTimeOptions {
+  periodLabels?: { am: string; pm: string }
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const ASCII_PERIOD = /(a\.?\s*m\.?|p\.?\s*m\.?)$/i
+
+function stripPeriodSuffix(
+  text: string,
+  periodLabels?: { am: string; pm: string }
+): { rest: string; period: 'AM' | 'PM' | null } {
+  const trimmed = text.trim()
+  if (periodLabels) {
+    const candidates: Array<{ period: 'AM' | 'PM'; label: string }> = [
+      { period: 'AM', label: periodLabels.am },
+      { period: 'PM', label: periodLabels.pm }
+    ]
+    for (const candidate of candidates) {
+      const label = candidate.label.trim()
+      if (!label) continue
+      const pattern = new RegExp(`(?:\\s|^)${escapeRegExp(label)}$`, 'i')
+      if (pattern.test(trimmed)) {
+        return {
+          rest: trimmed.replace(new RegExp(`\\s*${escapeRegExp(label)}\\s*$`, 'i'), '').trim(),
+          period: candidate.period
+        }
+      }
+    }
+  }
+
+  const ascii = trimmed.match(ASCII_PERIOD)
+  if (ascii && ascii.index != null && ascii.index > 0) {
+    return {
+      rest: trimmed.slice(0, ascii.index).trim(),
+      period: ascii[1].toLowerCase().startsWith('p') ? 'PM' : 'AM'
+    }
+  }
+
+  return { rest: trimmed, period: null }
+}
+
+/**
+ * Parse a time string. Accepts 24-hour `'HH:mm'` / `'HH:mm:ss'` and 12-hour
+ * display strings such as `'02:30 PM'` or a locale dayPeriod suffix.
+ * Tokens must be digits — `'30 PM'` as a minute field is invalid.
+ */
+export function parseTime(
+  timeString: string | null | undefined,
+  options?: ParseTimeOptions
+): TimeParts | null {
+  if (timeString == null) return null
+  const trimmed = timeString.trim()
+  if (!trimmed) return null
+
+  const { rest, period } = stripPeriodSuffix(trimmed, options?.periodLabels)
+  const timeParts = rest.split(':')
   if (timeParts.length < 2 || timeParts.length > 3) return null
 
-  const hours = parseInt(timeParts[0], 10)
-  const minutes = parseInt(timeParts[1], 10)
-  const seconds = timeParts.length === 3 ? parseInt(timeParts[2], 10) : 0
+  const hoursToken = timeParts[0]
+  const minutesToken = timeParts[1]
+  const secondsToken = timeParts[2]
+  if (!/^\d{1,2}$/.test(hoursToken) || !/^\d{1,2}$/.test(minutesToken)) return null
+  if (secondsToken !== undefined && !/^\d{1,2}$/.test(secondsToken)) return null
 
-  // Validate all components
-  if (
-    !isValidTimeValue(hours, 0, 23) ||
-    !isValidTimeValue(minutes, 0, 59) ||
-    !isValidTimeValue(seconds, 0, 59)
-  ) {
+  let hours = parseInt(hoursToken, 10)
+  const minutes = parseInt(minutesToken, 10)
+  const seconds = secondsToken !== undefined ? parseInt(secondsToken, 10) : 0
+
+  if (period) {
+    if (!isValidTimeValue(hours, 1, 12)) return null
+    hours = to24HourFormat(hours, period)
+  } else if (!isValidTimeValue(hours, 0, 23)) {
     return null
   }
+
+  if (!isValidTimeValue(minutes, 0, 59) || !isValidTimeValue(seconds, 0, 59)) return null
 
   return { hours, minutes, seconds }
 }
@@ -240,15 +298,19 @@ export function isTimeInRange(
  * @returns Array of hour values
  */
 export function generateHours(step: number = 1, format: TimeFormat = '24'): number[] {
-  const max = format === '12' ? 12 : 23
-  const start = format === '12' ? 1 : 0
-  const hours: number[] = []
   const validStep = validateStep(step)
-
-  for (let i = start; i <= max; i += validStep) {
-    hours.push(i)
+  if (format === '12') {
+    const hours = [12]
+    for (let i = validStep; i < 12; i += validStep) {
+      hours.push(i)
+    }
+    return hours
   }
 
+  const hours: number[] = []
+  for (let i = 0; i <= 23; i += validStep) {
+    hours.push(i)
+  }
   return hours
 }
 

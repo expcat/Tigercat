@@ -8,7 +8,7 @@
 
 import type { TimePickerLabels } from '../types/timepicker'
 import type { TigerLocale } from '../types/locale'
-import { formatIntlNumber, getIntlPluralCategory, resolveLocaleSection } from './locale-utils'
+import { resolveLocaleSection } from './locale-utils'
 import { enUS } from './i18n/locales/en-US'
 import { findFirstEnabledIndex, findLastEnabledIndex, findNextEnabledIndex } from './picker-utils'
 
@@ -17,14 +17,6 @@ import { findFirstEnabledIndex, findLastEnabledIndex, findNextEnabledIndex } fro
 // ============================================================================
 
 type TimePickerLocaleInput = string | Partial<TigerLocale>
-
-function getTimePickerLocaleCode(locale?: TimePickerLocaleInput): string | undefined {
-  return typeof locale === 'string' ? locale : locale?.locale
-}
-
-function isZhLocale(locale?: TimePickerLocaleInput): boolean {
-  return (getTimePickerLocaleCode(locale) ?? '').toLowerCase().startsWith('zh')
-}
 
 export function getTimePickerLabels(
   locale?: TimePickerLocaleInput,
@@ -40,10 +32,6 @@ export function getTimePickerLabels(
 
 export type TimePickerOptionUnit = 'hour' | 'minute' | 'second'
 
-function pluralizeEn(value: number, singular: string): string {
-  return getIntlPluralCategory(value, 'en') === 'one' ? singular : `${singular}s`
-}
-
 export function getTimePickerOptionAriaLabel(
   value: number,
   unit: TimePickerOptionUnit,
@@ -51,20 +39,9 @@ export function getTimePickerOptionAriaLabel(
   labelOverrides?: Partial<TimePickerLabels>
 ): string {
   const labels = getTimePickerLabels(locale, labelOverrides)
-  const localeCode = getTimePickerLocaleCode(locale)
   const unitLabel =
     unit === 'hour' ? labels.hour : unit === 'minute' ? labels.minute : labels.second
-
-  // Chinese: no space between value and unit
-  if (isZhLocale(locale)) return `${formatIntlNumber(value, localeCode)}${unitLabel}`
-
-  // English pluralization when locale is explicitly English or using default EN labels
-  const lc = (localeCode ?? '').toLowerCase()
-  if (lc.startsWith('en') || (!lc && !labelOverrides)) {
-    return `${formatIntlNumber(value, localeCode)} ${pluralizeEn(value, unit)}`
-  }
-
-  return `${formatIntlNumber(value, localeCode)} ${unitLabel}`
+  return `${String(value).padStart(2, '0')} ${unitLabel}`
 }
 
 // ============================================================================

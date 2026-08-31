@@ -141,6 +141,7 @@ export const arSA: TigerLocale = {
     hour: 'ساعة',
     minute: 'دقيقة',
     second: 'ثانية',
+    period: 'الفترة',
     now: 'الآن',
     ok: 'موافق',
     start: 'البداية',

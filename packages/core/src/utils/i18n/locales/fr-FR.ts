@@ -141,6 +141,7 @@ export const frFR: TigerLocale = {
     hour: 'Heure',
     minute: 'Mn',
     second: 'S',
+    period: 'Période',
     now: 'Maintenant',
     ok: 'OK',
     start: 'Début',

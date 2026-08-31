@@ -141,6 +141,7 @@ export const jaJP: TigerLocale = {
     hour: '時',
     minute: '分',
     second: '秒',
+    period: '午前/午後',
     now: '現在',
     ok: 'OK',
     start: '開始',

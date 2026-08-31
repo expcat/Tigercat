@@ -141,6 +141,7 @@ export const deDE: TigerLocale = {
     hour: 'Stunde',
     minute: 'Minute',
     second: 'Sek',
+    period: 'Tageszeit',
     now: 'Jetzt',
     ok: 'OK',
     start: 'Beginn',

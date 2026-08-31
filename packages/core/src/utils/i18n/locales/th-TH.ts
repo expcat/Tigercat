@@ -141,6 +141,7 @@ export const thTH: TigerLocale = {
     hour: 'ชั่วโมง',
     minute: 'นาที',
     second: 'วินาที',
+    period: 'ช่วงเวลา',
     now: 'ตอนนี้',
     ok: 'ตกลง',
     start: 'เริ่ม',

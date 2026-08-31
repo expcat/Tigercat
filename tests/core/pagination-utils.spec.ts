@@ -76,6 +76,6 @@ describe('pagination-utils', () => {
     expect(
       getTimePickerLabels({ timePicker: { selectTime: 'Seleccionar hora', ok: 'موافق' } }).ok
     ).toBe('موافق')
-    expect(getTimePickerOptionAriaLabel(2, 'hour', 'en-US')).toBe('2 hours')
+    expect(getTimePickerOptionAriaLabel(2, 'hour', 'en-US')).toBe('02 Hour')
   })
 })

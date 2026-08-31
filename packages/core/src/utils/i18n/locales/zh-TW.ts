@@ -141,6 +141,7 @@ export const zhTW: TigerLocale = {
     hour: '時',
     minute: '分',
     second: '秒',
+    period: '時段',
     now: '現在',
     ok: '確定',
     start: '開始',

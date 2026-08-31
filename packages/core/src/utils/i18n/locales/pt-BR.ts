@@ -141,6 +141,7 @@ export const ptBR: TigerLocale = {
     hour: 'Hora',
     minute: 'Minuto',
     second: 'Seg',
+    period: 'Período',
     now: 'Agora',
     ok: 'OK',
     start: 'Início',
