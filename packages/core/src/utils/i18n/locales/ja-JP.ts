@@ -135,7 +135,9 @@ export const jaJP: TigerLocale = {
     triggerAriaLabel: 'データを書き出す',
     xlsxText: 'Excel を書き出す',
     markdownText: 'Markdown を書き出す',
-    exportingText: '書き出し中...'
+    csvText: 'CSV を書き出す',
+    exportingText: '書き出し中...',
+    errorText: '書き出しに失敗しました'
   },
   timePicker: {
     hour: '時',

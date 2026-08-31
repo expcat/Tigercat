@@ -145,6 +145,11 @@ export interface DropdownProps
    * because `trigger` already configures the open event.)
    */
   renderTrigger?: (state: { open: boolean }) => React.ReactNode
+  /**
+   * Merge menu ARIA onto the trigger child instead of a wrapping div.
+   * The child must be a single element that can receive a ref (e.g. a button).
+   */
+  asChild?: boolean
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -162,6 +167,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   onOpenChange,
   children,
   renderTrigger,
+  asChild = false,
   ...divProps
 }) => {
   // Internal state for uncontrolled mode
@@ -325,19 +331,62 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
   })
 
-  const chevronNode = showArrow ? (
-    <svg
-      className={getDropdownChevronClasses(visible)}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true">
-      <path d={DROPDOWN_CHEVRON_PATH} />
-    </svg>
-  ) : null
+  const triggerAria = {
+    'aria-haspopup': 'menu' as const,
+    'aria-expanded': visible,
+    'aria-controls': visible ? menuId : undefined,
+    'data-state': visible ? 'open' : 'closed'
+  }
+
+  const asChildTrigger =
+    asChild && React.isValidElement(triggerElement)
+      ? React.cloneElement(triggerElement as React.ReactElement<Record<string, unknown>>, {
+          ref: triggerRef,
+          onClick: (event: React.MouseEvent) => {
+            const childOnClick = (
+              triggerElement as React.ReactElement<{
+                onClick?: (event: React.MouseEvent) => void
+              }>
+            ).props.onClick
+            childOnClick?.(event)
+            handleClick()
+          },
+          onMouseEnter: (event: React.MouseEvent) => {
+            const childOnMouseEnter = (
+              triggerElement as React.ReactElement<{
+                onMouseEnter?: (event: React.MouseEvent) => void
+              }>
+            ).props.onMouseEnter
+            childOnMouseEnter?.(event)
+            handleMouseEnter()
+          },
+          onMouseLeave: (event: React.MouseEvent) => {
+            const childOnMouseLeave = (
+              triggerElement as React.ReactElement<{
+                onMouseLeave?: (event: React.MouseEvent) => void
+              }>
+            ).props.onMouseLeave
+            childOnMouseLeave?.(event)
+            handleMouseLeave()
+          },
+          ...triggerAria
+        })
+      : null
+
+  const chevronNode =
+    showArrow && !asChild ? (
+      <svg
+        className={getDropdownChevronClasses(visible)}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true">
+        <path d={DROPDOWN_CHEVRON_PATH} />
+      </svg>
+    ) : null
 
   const menuWrapperNode = (
     <div
@@ -361,19 +410,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <DropdownContext.Provider value={contextValue}>
       <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
-        <div
-          ref={triggerRef}
-          className={triggerClasses}
-          onClick={handleClick}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          aria-haspopup="menu"
-          aria-expanded={visible}
-          aria-controls={visible ? menuId : undefined}
-          data-state={visible ? 'open' : 'closed'}>
-          {triggerElement}
-          {chevronNode}
-        </div>
+        {asChildTrigger ?? (
+          <div
+            ref={triggerRef}
+            className={triggerClasses}
+            onClick={handleClick}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            {...triggerAria}>
+            {triggerElement}
+            {chevronNode}
+          </div>
+        )}
         {renderOverlayPortal(menuWrapperNode, overlay.target, !portal)}
       </div>
     </DropdownContext.Provider>

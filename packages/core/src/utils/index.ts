@@ -132,6 +132,7 @@ export * from './table-filter-utils'
 export * from './table-group-utils'
 export * from './table-resize-utils'
 export * from './table-export-utils'
+export * from './data-export-value'
 
 // Form v0.6.0 upgrades
 export * from './form-dependency-utils'

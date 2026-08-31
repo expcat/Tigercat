@@ -135,7 +135,9 @@ export const idID: TigerLocale = {
     triggerAriaLabel: 'Ekspor data',
     xlsxText: 'Ekspor Excel',
     markdownText: 'Ekspor Markdown',
-    exportingText: 'Mengekspor...'
+    csvText: 'Ekspor CSV',
+    exportingText: 'Mengekspor...',
+    errorText: 'Ekspor gagal'
   },
   timePicker: {
     hour: 'Jam',

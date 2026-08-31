@@ -135,7 +135,9 @@ export const thTH: TigerLocale = {
     triggerAriaLabel: 'ส่งออกข้อมูล',
     xlsxText: 'ส่งออก Excel',
     markdownText: 'ส่งออก Markdown',
-    exportingText: 'กำลังส่งออก...'
+    csvText: 'ส่งออก CSV',
+    exportingText: 'กำลังส่งออก...',
+    errorText: 'ส่งออกไม่สำเร็จ'
   },
   timePicker: {
     hour: 'ชั่วโมง',

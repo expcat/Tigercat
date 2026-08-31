@@ -11,6 +11,7 @@ export function resolveLocaleText(
   return fallback
 }
 
+import type { DataExportFormat } from '../types/data-export'
 import type {
   TigerLocale,
   TigerLocaleInput,
@@ -296,6 +297,15 @@ export function getDataExportLabels(
   overrides?: Partial<TigerLocaleDataExport>
 ): Required<TigerLocaleDataExport> {
   return resolveLocaleSection(enSection('dataExport'), locale?.dataExport, overrides)
+}
+
+export function getDataExportFormatLabel(
+  format: DataExportFormat,
+  labels: Required<TigerLocaleDataExport>
+): string {
+  if (format === 'xlsx') return labels.xlsxText
+  if (format === 'csv') return labels.csvText
+  return labels.markdownText
 }
 
 export function getTaskBoardLabels(

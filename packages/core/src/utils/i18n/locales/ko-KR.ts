@@ -135,7 +135,9 @@ export const koKR: TigerLocale = {
     triggerAriaLabel: '데이터 내보내기',
     xlsxText: 'Excel 내보내기',
     markdownText: 'Markdown 내보내기',
-    exportingText: '내보내는 중...'
+    csvText: 'CSV 내보내기',
+    exportingText: '내보내는 중...',
+    errorText: '내보내기 실패'
   },
   timePicker: {
     hour: '시',

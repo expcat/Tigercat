@@ -8,9 +8,13 @@
 import type { TableColumn } from '../types/table'
 import { isBrowser } from './env'
 import { getTableColumnDataKey } from './table-utils'
+import {
+  formatDataExportCellValue,
+  resolveDataExportFilename,
+  sanitizeDataExportText
+} from './data-export-value'
 
 const CSV_BOM = '\uFEFF'
-const FORMULA_PREFIX = /^[=+\-@]/
 
 function needsCsvQuotes(value: string): boolean {
   return /[",\n\r]/.test(value)
@@ -20,10 +24,7 @@ function needsCsvQuotes(value: string): boolean {
  * Escape a value for RFC 4180 CSV output.
  */
 export function escapeCsvValue(value: unknown): string {
-  let str = value === null || value === undefined ? '' : String(value)
-  if (FORMULA_PREFIX.test(str)) {
-    str = `'${str}`
-  }
+  const str = sanitizeDataExportText(formatDataExportCellValue(value))
   if (needsCsvQuotes(str)) {
     return `"${str.replace(/"/g, '""')}"`
   }
@@ -31,7 +32,7 @@ export function escapeCsvValue(value: unknown): string {
 }
 
 function withCsvExtension(filename: string): string {
-  return filename.toLowerCase().endsWith('.csv') ? filename : `${filename}.csv`
+  return resolveDataExportFilename(filename, 'csv')
 }
 
 /**

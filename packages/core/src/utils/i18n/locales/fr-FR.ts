@@ -135,7 +135,9 @@ export const frFR: TigerLocale = {
     triggerAriaLabel: 'Exporter les données',
     xlsxText: 'Exporter Excel',
     markdownText: 'Exporter Markdown',
-    exportingText: 'Exportation...'
+    csvText: 'Exporter CSV',
+    exportingText: 'Exportation...',
+    errorText: "Échec de l'export"
   },
   timePicker: {
     hour: 'Heure',

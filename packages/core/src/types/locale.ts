@@ -201,14 +201,18 @@ export interface TigerLocaleTable {
 export interface TigerLocaleDataExport {
   /** Trigger button text when multiple formats are offered */
   triggerText?: string
-  /** Aria label for the export trigger button */
+  /** Aria label for the export trigger when it has no visible text */
   triggerAriaLabel?: string
   /** Button/menu-item text for xlsx export */
   xlsxText?: string
   /** Button/menu-item text for markdown export */
   markdownText?: string
+  /** Button/menu-item text for csv export */
+  csvText?: string
   /** Trigger text while an export is running */
   exportingText?: string
+  /** Visible error when serialization or download fails */
+  errorText?: string
 }
 
 export interface TigerLocaleFormWizard {

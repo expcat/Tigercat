@@ -137,7 +137,9 @@ export const zhCN: TigerLocale = {
     triggerAriaLabel: '导出数据',
     xlsxText: '导出 Excel',
     markdownText: '导出 Markdown',
-    exportingText: '导出中...'
+    csvText: '导出 CSV',
+    exportingText: '导出中...',
+    errorText: '导出失败'
   },
   datePicker: ZH_CN_DATEPICKER_LOCALE,
   timePicker: {

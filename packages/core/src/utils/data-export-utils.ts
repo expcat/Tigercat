@@ -13,15 +13,43 @@
 import type { TableColumn } from '../types/table'
 import type { DataExportFormat, DataExportOptions } from '../types/data-export'
 import { isBrowser } from './env'
+import { devWarn } from './dev-warn'
+import {
+  DATA_EXPORT_SOFT_CELL_LIMIT,
+  formatDataExportCellValue,
+  getDataExportCellValue,
+  isDataExportFormat,
+  resolveDataExportColumns,
+  resolveDataExportFilename,
+  sanitizeDataExportText
+} from './data-export-value'
+
+function needsCsvQuotes(value: string): boolean {
+  return /[",\n\r]/.test(value)
+}
+
+function escapeExportCsvValue(value: unknown): string {
+  const str = sanitizeDataExportText(formatDataExportCellValue(value))
+  if (needsCsvQuotes(str)) {
+    return `"${str.replace(/"/g, '""')}"`
+  }
+  return str
+}
 
 function getCellValue<T>(
   record: T,
   column: TableColumn<T>,
   options?: DataExportOptions<T>
 ): unknown {
-  const key = column.dataKey || column.key
-  const raw = (record as Record<string, unknown>)[key]
-  return options?.cellFormatter ? options.cellFormatter(raw, column, record) : raw
+  return getDataExportCellValue(record, column, options?.cellFormatter)
+}
+
+function resolveExportColumns<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  options?: DataExportOptions<T>
+): TableColumn<T>[] {
+  return resolveDataExportColumns(columns, data, options?.hiddenColumnKeys)
 }
 
 // --- CRC-32 (polynomial 0xEDB88320, standard table-driven implementation) ---
@@ -189,7 +217,7 @@ function buildSheetCell(value: unknown, columnIndex: number, rowNumber: number):
     return `<c r="${ref}"><v>${value}</v></c>`
   }
 
-  const str = value === null || value === undefined ? '' : String(value)
+  const str = sanitizeDataExportText(value)
   if (str === '') return ''
   return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${escapeXml(str)}</t></is></c>`
 }
@@ -202,14 +230,15 @@ export function exportDataToXlsx<T>(
   data: T[],
   options?: DataExportOptions<T>
 ): Uint8Array {
-  const headerCells = columns
+  const exportColumns = resolveExportColumns(columns, data, options)
+  const headerCells = exportColumns
     .map((column, index) => buildSheetCell(column.title, index, 1))
     .join('')
   const rows = [`<row r="1">${headerCells}</row>`]
 
   data.forEach((record, rowIndex) => {
     const rowNumber = rowIndex + 2
-    const cells = columns
+    const cells = exportColumns
       .map((column, columnIndex) =>
         buildSheetCell(getCellValue(record, column, options), columnIndex, rowNumber)
       )
@@ -255,16 +284,35 @@ export function exportDataToMarkdown<T>(
   data: T[],
   options?: DataExportOptions<T>
 ): string {
-  const header = `| ${columns.map((column) => escapeMarkdownCell(column.title)).join(' | ')} |`
-  const separator = `| ${columns.map((column) => markdownSeparator(column.align)).join(' | ')} |`
+  const exportColumns = resolveExportColumns(columns, data, options)
+  const header = `| ${exportColumns.map((column) => escapeMarkdownCell(column.title)).join(' | ')} |`
+  const separator = `| ${exportColumns.map((column) => markdownSeparator(column.align)).join(' | ')} |`
   const rows = data.map(
     (record) =>
-      `| ${columns
+      `| ${exportColumns
         .map((column) => escapeMarkdownCell(getCellValue(record, column, options)))
         .join(' | ')} |`
   )
 
   return [header, separator, ...rows].join('\n')
+}
+
+/**
+ * Serialize columns + records into UTF-8 BOM + CRLF CSV.
+ */
+export function exportDataToCsv<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  options?: DataExportOptions<T>
+): string {
+  const exportColumns = resolveExportColumns(columns, data, options)
+  const headers = exportColumns.map((column) => escapeExportCsvValue(column.title))
+  const rows = data.map((record) =>
+    exportColumns
+      .map((column) => escapeExportCsvValue(getCellValue(record, column, options)))
+      .join(',')
+  )
+  return `\uFEFF${[headers.join(','), ...rows].join('\r\n')}`
 }
 
 // --- Serialize + download ---
@@ -278,9 +326,11 @@ export function exportData<T>(
   format: DataExportFormat,
   options?: DataExportOptions<T>
 ): Uint8Array | string {
-  return format === 'xlsx'
-    ? exportDataToXlsx(columns, data, options)
-    : exportDataToMarkdown(columns, data, options)
+  if (format === 'xlsx') return exportDataToXlsx(columns, data, options)
+  if (format === 'csv') return exportDataToCsv(columns, data, options)
+  if (format === 'markdown') return exportDataToMarkdown(columns, data, options)
+  devWarn('DataExport.format', `Unknown export format "${String(format)}"`)
+  throw new Error(`Unknown export format: ${String(format)}`)
 }
 
 const DATA_EXPORT_FILE_META: Record<DataExportFormat, { extension: string; mime: string }> = {
@@ -288,7 +338,8 @@ const DATA_EXPORT_FILE_META: Record<DataExportFormat, { extension: string; mime:
     extension: 'xlsx',
     mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   },
-  markdown: { extension: 'md', mime: 'text/markdown;charset=utf-8;' }
+  markdown: { extension: 'md', mime: 'text/markdown;charset=utf-8;' },
+  csv: { extension: 'csv', mime: 'text/csv;charset=utf-8;' }
 }
 
 /**
@@ -300,16 +351,53 @@ export function downloadDataExport(
   format: DataExportFormat = 'xlsx'
 ): void {
   if (!isBrowser()) return
+  if (!isDataExportFormat(format)) {
+    devWarn('DataExport.format', `Unknown export format "${String(format)}"`)
+    return
+  }
 
   const meta = DATA_EXPORT_FILE_META[format]
   const blob = new Blob([content as BlobPart], { type: meta.mime })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `${filename}.${meta.extension}`
+  link.download = resolveDataExportFilename(filename, meta.extension)
   link.style.display = 'none'
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
+}
+
+export interface RunDataExportInput<T = Record<string, unknown>> extends DataExportOptions<T> {
+  columns: TableColumn<T>[]
+  dataSource: T[]
+  format: string
+  fileName?: string
+}
+
+/**
+ * Serialize and download one format. Unknown formats warn and throw.
+ */
+export function runDataExport<T>(input: RunDataExportInput<T>): DataExportFormat {
+  if (!isDataExportFormat(input.format)) {
+    devWarn('DataExport.format', `Unknown export format "${String(input.format)}"`)
+    throw new Error(`Unknown export format: ${String(input.format)}`)
+  }
+
+  const columns = resolveDataExportColumns(input.columns, input.dataSource, input.hiddenColumnKeys)
+  const cellCount = columns.length * (input.dataSource.length + 1)
+  if (cellCount > DATA_EXPORT_SOFT_CELL_LIMIT) {
+    devWarn(
+      'DataExport.size',
+      `Export has ${cellCount} cells; files above ${DATA_EXPORT_SOFT_CELL_LIMIT} may be slow or fail to open`
+    )
+  }
+
+  const content = exportData(columns, input.dataSource, input.format, {
+    sheetName: input.sheetName,
+    cellFormatter: input.cellFormatter
+  })
+  downloadDataExport(content, input.fileName, input.format)
+  return input.format
 }

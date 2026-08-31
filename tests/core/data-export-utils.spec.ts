@@ -7,10 +7,16 @@ import {
   crc32,
   buildStoredZip,
   exportData,
+  exportDataToCsv,
   exportDataToMarkdown,
   exportDataToXlsx,
   downloadDataExport
 } from '@expcat/tigercat-core/utils/data-export'
+import {
+  resolveDataExportFilename,
+  resolveDataExportColumns,
+  formatDataExportCellValue
+} from '@expcat/tigercat-core'
 import type { TableColumn } from '@expcat/tigercat-core'
 
 const columns: TableColumn[] = [
@@ -156,13 +162,64 @@ describe('exportData', () => {
   it('dispatches to the matching serializer', () => {
     expect(exportData(columns, data, 'xlsx')).toBeInstanceOf(Uint8Array)
     expect(typeof exportData(columns, data, 'markdown')).toBe('string')
+    expect(typeof exportData(columns, data, 'csv')).toBe('string')
+    expect(exportDataToCsv(columns, data).startsWith('\uFEFF')).toBe(true)
+  })
+
+  it('rejects an unknown format', () => {
+    expect(() => exportData(columns, data, 'pdf' as never)).toThrow(/Unknown export format/)
+  })
+})
+
+describe('export cell contract', () => {
+  it('skips render-only columns and hidden keys', () => {
+    const mixed: TableColumn[] = [
+      { key: 'name', title: 'Name' },
+      { key: 'actions', title: 'Ops', render: () => 'edit' },
+      { key: 'secret', title: 'Secret' }
+    ]
+    const rows = [{ name: 'Ada', secret: 'x' }]
+    const visible = resolveDataExportColumns(mixed, rows, ['secret'])
+    expect(visible.map((column) => column.key)).toEqual(['name'])
+
+    const sheet = readZipEntries(
+      exportDataToXlsx(mixed, rows, { hiddenColumnKeys: ['secret'] })
+    ).get('xl/worksheets/sheet1.xml')!
+    expect(sheet).toContain('Ada')
+    expect(sheet).not.toContain('Secret')
+    expect(sheet).not.toContain('edit')
+  })
+
+  it('writes ISO dates, JSON objects, and prefixes formulas', () => {
+    expect(formatDataExportCellValue(new Date('2026-01-02T00:00:00.000Z'))).toBe(
+      '2026-01-02T00:00:00.000Z'
+    )
+    expect(formatDataExportCellValue({ a: 1 })).toBe('{"a":1}')
+
+    const csv = exportDataToCsv([{ key: 'v', title: 'V' }], [{ v: '=SUM(A1)' }])
+    expect(csv).toContain("'=SUM(A1)")
+
+    const sheet = readZipEntries(exportDataToXlsx([{ key: 'v', title: 'V' }], [{ v: '=cmd' }])).get(
+      'xl/worksheets/sheet1.xml'
+    )!
+    expect(sheet).toContain('&apos;=cmd')
+  })
+})
+
+describe('resolveDataExportFilename', () => {
+  it('keeps an existing suffix and falls back when empty', () => {
+    expect(resolveDataExportFilename('report.xlsx', 'xlsx')).toBe('report.xlsx')
+    expect(resolveDataExportFilename('report', 'xlsx')).toBe('report.xlsx')
+    expect(resolveDataExportFilename('', 'xlsx')).toBe('export.xlsx')
+    expect(resolveDataExportFilename('a/b:c', 'csv')).toBe('a-b-c.csv')
   })
 })
 
 describe('downloadDataExport', () => {
   it.each([
     ['xlsx' as const, 'report.xlsx'],
-    ['markdown' as const, 'report.md']
+    ['markdown' as const, 'report.md'],
+    ['csv' as const, 'report.csv']
   ])('creates and clicks a link for %s downloads', (format, expectedName) => {
     const clickSpy = vi.fn()
     const link = { href: '', download: '', style: { display: '' }, click: clickSpy }
@@ -172,8 +229,8 @@ describe('downloadDataExport', () => {
     const revokeURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
 
     downloadDataExport(
-      format === 'xlsx' ? exportDataToXlsx(columns, data) : '| a |',
-      'report',
+      format === 'xlsx' ? exportDataToXlsx(columns, data) : format === 'csv' ? 'a,b' : '| a |',
+      format === 'xlsx' ? 'report.xlsx' : 'report',
       format
     )
 

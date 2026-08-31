@@ -135,7 +135,9 @@ export const arSA: TigerLocale = {
     triggerAriaLabel: 'تصدير البيانات',
     xlsxText: 'تصدير Excel',
     markdownText: 'تصدير Markdown',
-    exportingText: 'جارٍ التصدير...'
+    csvText: 'تصدير CSV',
+    exportingText: 'جارٍ التصدير...',
+    errorText: 'فشل التصدير'
   },
   timePicker: {
     hour: 'ساعة',

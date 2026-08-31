@@ -138,7 +138,9 @@ export const zhTW: TigerLocale = {
     triggerAriaLabel: '匯出資料',
     xlsxText: '匯出 Excel',
     markdownText: '匯出 Markdown',
-    exportingText: '匯出中...'
+    csvText: '匯出 CSV',
+    exportingText: '匯出中...',
+    errorText: '匯出失敗'
   },
   timePicker: {
     hour: '時',

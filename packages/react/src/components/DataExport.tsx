@@ -1,9 +1,21 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
   classNames,
+  DEFAULT_DATA_EXPORT_FORMATS,
+  devWarn,
+  getDataExportFormatLabel,
   getDataExportLabels,
+  isDataExportFormat,
   mergeTigerLocale,
-  tableExportButtonClasses,
+  resolveButtonClasses,
+  yieldDataExportFrame,
   type DataExportFormat,
   type DataExportProps as CoreDataExportProps,
   type TigerLocale,
@@ -14,8 +26,6 @@ import { Dropdown, DropdownMenu, DropdownItem } from './Dropdown'
 
 type DataExportModule = typeof import('@expcat/tigercat-core/utils/data-export')
 
-// The serializers (zip/xlsx/markdown writers) are only fetched when an export is
-// actually triggered, mirroring the MessageRoot on-demand loading pattern.
 let dataExportModulePromise: Promise<DataExportModule> | null = null
 
 function loadDataExportModule(): Promise<DataExportModule> {
@@ -23,34 +33,45 @@ function loadDataExportModule(): Promise<DataExportModule> {
   return dataExportModulePromise
 }
 
-const DEFAULT_FORMATS: DataExportFormat[] = ['xlsx', 'markdown']
-
-export interface DataExportProps<T = Record<string, unknown>> extends CoreDataExportProps<T> {
+export interface DataExportProps<T = Record<string, unknown>>
+  extends
+    CoreDataExportProps<T>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onError' | 'disabled' | 'type'> {
   /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
   /** UI labels for custom text. Takes precedence over locale and ConfigProvider text. */
   labels?: Partial<TigerLocaleDataExport>
-  className?: string
   /** Called after the download for the given format has been triggered */
   onExport?: (format: DataExportFormat) => void
   /** Called when serialization or download fails */
   onError?: (error: unknown) => void
 }
 
-export const DataExport = <T extends Record<string, unknown>>({
-  columns,
-  dataSource,
-  formats = DEFAULT_FORMATS,
-  fileName = 'export',
-  sheetName,
-  cellFormatter,
-  disabled = false,
-  locale,
-  labels,
-  className,
-  onExport,
-  onError
-}: DataExportProps<T>): React.ReactElement | null => {
+export interface DataExportHandle {
+  export: (format: DataExportFormat) => Promise<void>
+}
+
+function DataExportInner<T extends Record<string, unknown>>(
+  {
+    columns,
+    dataSource,
+    formats = DEFAULT_DATA_EXPORT_FORMATS as DataExportFormat[],
+    fileName = 'export',
+    sheetName,
+    cellFormatter,
+    hiddenColumnKeys,
+    disabled = false,
+    locale,
+    labels,
+    className,
+    id,
+    style,
+    onExport,
+    onError,
+    ...rest
+  }: DataExportProps<T>,
+  ref: React.ForwardedRef<DataExportHandle>
+): React.ReactElement {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -60,71 +81,133 @@ export const DataExport = <T extends Record<string, unknown>>({
     () => getDataExportLabels(mergedLocale, labels),
     [mergedLocale, labels]
   )
+  const exportingLockRef = useRef(false)
   const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const formatsEmpty = formats.length === 0
+  const offeredFormats = formatsEmpty
+    ? (DEFAULT_DATA_EXPORT_FORMATS as DataExportFormat[])
+    : formats
+  const triggerDisabled = disabled || exporting || formatsEmpty
 
   const handleExport = useCallback(
     async (format: DataExportFormat) => {
-      if (disabled || exporting) return
+      if (triggerDisabled || exportingLockRef.current) return
+      if (!isDataExportFormat(format)) {
+        devWarn('DataExport.format', `Unknown export format "${String(format)}"`)
+        return
+      }
 
+      exportingLockRef.current = true
       setExporting(true)
+      setExportError(null)
       try {
+        await yieldDataExportFrame()
         const mod = await loadDataExportModule()
-        const content = mod.exportData(columns, dataSource, format, { sheetName, cellFormatter })
-        mod.downloadDataExport(content, fileName, format)
+        mod.runDataExport({
+          columns,
+          dataSource,
+          format,
+          fileName,
+          sheetName,
+          cellFormatter,
+          hiddenColumnKeys
+        })
         onExport?.(format)
       } catch (error) {
+        setExportError(resolvedLabels.errorText)
         onError?.(error)
       } finally {
+        exportingLockRef.current = false
         setExporting(false)
       }
     },
     [
+      triggerDisabled,
       columns,
       dataSource,
+      fileName,
       sheetName,
       cellFormatter,
-      fileName,
-      disabled,
-      exporting,
+      hiddenColumnKeys,
       onExport,
-      onError
+      onError,
+      resolvedLabels.errorText
     ]
   )
 
-  const formatLabel = (format: DataExportFormat) =>
-    format === 'xlsx' ? resolvedLabels.xlsxText : resolvedLabels.markdownText
+  useImperativeHandle(ref, () => ({ export: handleExport }), [handleExport])
 
-  if (formats.length === 0) return null
+  if (formatsEmpty) {
+    devWarn('DataExport.formats', 'formats is empty; the export trigger stays disabled')
+  }
 
-  if (formats.length === 1) {
+  const triggerText = exporting
+    ? resolvedLabels.exportingText
+    : offeredFormats.length === 1
+      ? getDataExportFormatLabel(offeredFormats[0], resolvedLabels)
+      : resolvedLabels.triggerText
+
+  const triggerButton = (
+    <button
+      type="button"
+      id={id}
+      style={style}
+      className={classNames(
+        resolveButtonClasses({
+          variant: 'outline',
+          size: 'sm',
+          disabled: triggerDisabled
+        }),
+        className
+      )}
+      disabled={triggerDisabled}
+      aria-busy={exporting || undefined}
+      onClick={
+        offeredFormats.length === 1 && !formatsEmpty
+          ? () => void handleExport(offeredFormats[0])
+          : undefined
+      }
+      {...rest}>
+      {triggerText}
+    </button>
+  )
+
+  const errorStatus = exportError ? (
+    <span role="status" aria-live="polite">
+      {exportError}
+    </span>
+  ) : null
+
+  if (offeredFormats.length === 1 || formatsEmpty) {
     return (
-      <button
-        type="button"
-        className={classNames(tableExportButtonClasses, className)}
-        aria-label={resolvedLabels.triggerAriaLabel}
-        disabled={disabled || exporting}
-        onClick={() => void handleExport(formats[0])}>
-        {exporting ? resolvedLabels.exportingText : formatLabel(formats[0])}
-      </button>
+      <>
+        {triggerButton}
+        {errorStatus}
+      </>
     )
   }
 
   return (
-    <Dropdown trigger="click" disabled={disabled || exporting} className={className}>
-      <button
-        type="button"
-        className={tableExportButtonClasses}
-        aria-label={resolvedLabels.triggerAriaLabel}
-        disabled={disabled || exporting}>
-        {exporting ? resolvedLabels.exportingText : resolvedLabels.triggerText}
-      </button>
-      <DropdownMenu>
-        {formats.map((format) => (
-          <DropdownItem key={format} onClick={() => void handleExport(format)}>
-            {formatLabel(format)}
-          </DropdownItem>
-        ))}
-      </DropdownMenu>
-    </Dropdown>
+    <>
+      <Dropdown trigger="click" disabled={triggerDisabled} asChild showArrow={false}>
+        {triggerButton}
+        <DropdownMenu>
+          {offeredFormats.map((format) => (
+            <DropdownItem key={format} onClick={() => void handleExport(format)}>
+              {getDataExportFormatLabel(format, resolvedLabels)}
+            </DropdownItem>
+          ))}
+        </DropdownMenu>
+      </Dropdown>
+      {errorStatus}
+    </>
   )
 }
+
+export const DataExport = forwardRef(DataExportInner) as <
+  T extends Record<string, unknown> = Record<string, unknown>
+>(
+  props: DataExportProps<T> & { ref?: React.Ref<DataExportHandle> }
+) => React.ReactElement

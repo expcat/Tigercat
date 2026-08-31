@@ -316,6 +316,13 @@ export const Dropdown = defineComponent({
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
+    },
+    /**
+     * Merge menu ARIA onto the trigger child instead of a wrapping div.
+     */
+    asChild: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:open', 'open-change'],
@@ -498,23 +505,35 @@ export const Dropdown = defineComponent({
           )
         : null
 
-      const trigger = triggerNode
-        ? h(
-            'div',
-            {
+      const triggerAria = {
+        'aria-haspopup': 'menu',
+        'aria-expanded': currentVisible.value,
+        'aria-controls': currentVisible.value ? menuId : undefined,
+        'data-state': currentVisible.value ? 'open' : 'closed'
+      }
+
+      const trigger = !triggerNode
+        ? null
+        : props.asChild
+          ? cloneVNode(triggerNode as VNode, {
               ref: triggerRef,
-              class: triggerClasses.value,
               onClick: handleClick,
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,
-              'aria-haspopup': 'menu',
-              'aria-expanded': currentVisible.value,
-              'aria-controls': currentVisible.value ? menuId : undefined,
-              'data-state': currentVisible.value ? 'open' : 'closed'
-            },
-            [triggerNode, chevronNode]
-          )
-        : null
+              ...triggerAria
+            })
+          : h(
+              'div',
+              {
+                ref: triggerRef,
+                class: triggerClasses.value,
+                onClick: handleClick,
+                onMouseenter: handleMouseEnter,
+                onMouseleave: handleMouseLeave,
+                ...triggerAria
+              },
+              [triggerNode, chevronNode]
+            )
 
       // Clone menuNode with id for aria-controls
       const menuWrapper = menuNode

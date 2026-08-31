@@ -135,7 +135,9 @@ export const viVN: TigerLocale = {
     triggerAriaLabel: 'Xuất dữ liệu',
     xlsxText: 'Xuất Excel',
     markdownText: 'Xuất Markdown',
-    exportingText: 'Đang xuất...'
+    csvText: 'Xuất CSV',
+    exportingText: 'Đang xuất...',
+    errorText: 'Xuất thất bại'
   },
   timePicker: {
     hour: 'Giờ',

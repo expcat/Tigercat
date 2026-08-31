@@ -1,9 +1,16 @@
 import { computed, defineComponent, h, ref, PropType } from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  DEFAULT_DATA_EXPORT_FORMATS,
+  devWarn,
+  getDataExportFormatLabel,
   getDataExportLabels,
+  isDataExportFormat,
+  mergeStyleValues,
   mergeTigerLocale,
-  tableExportButtonClasses,
+  resolveButtonClasses,
+  yieldDataExportFrame,
   type DataExportFormat,
   type DataExportOptions,
   type TableColumn,
@@ -15,8 +22,6 @@ import { Dropdown, DropdownMenu, DropdownItem } from './Dropdown'
 
 type DataExportModule = typeof import('@expcat/tigercat-core/utils/data-export')
 
-// The serializers (zip/xlsx/markdown writers) are only fetched when an export is
-// actually triggered, mirroring the MessageRoot on-demand loading pattern.
 let dataExportModulePromise: Promise<DataExportModule> | null = null
 
 function loadDataExportModule(): Promise<DataExportModule> {
@@ -31,14 +36,18 @@ export interface VueDataExportProps<T = Record<string, unknown>> {
   fileName?: string
   sheetName?: string
   cellFormatter?: DataExportOptions<T>['cellFormatter']
+  hiddenColumnKeys?: string[]
   disabled?: boolean
   className?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleDataExport>
 }
 
+export type DataExportProps = VueDataExportProps
+
 export const DataExport = defineComponent({
   name: 'TigerDataExport',
+  inheritAttrs: false,
   props: {
     columns: {
       type: Array as PropType<TableColumn[]>,
@@ -54,9 +63,9 @@ export const DataExport = defineComponent({
      */
     formats: {
       type: Array as PropType<DataExportFormat[]>,
-      default: () => ['xlsx', 'markdown'] as DataExportFormat[]
+      default: () => [...DEFAULT_DATA_EXPORT_FORMATS]
     },
-    /** Download file name without extension */
+    /** Download file name. Matching suffixes are not duplicated. */
     fileName: {
       type: String,
       default: 'export'
@@ -71,6 +80,10 @@ export const DataExport = defineComponent({
       type: Function as PropType<
         (value: unknown, column: TableColumn, record: Record<string, unknown>) => unknown
       >,
+      default: undefined
+    },
+    hiddenColumnKeys: {
+      type: Array as PropType<string[]>,
       default: undefined
     },
     disabled: {
@@ -96,88 +109,135 @@ export const DataExport = defineComponent({
     export: (_format: DataExportFormat) => true,
     error: (_error: unknown) => true
   },
-  setup(props, { emit }) {
+  setup(props, { emit, expose, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const resolvedLabels = computed(() => getDataExportLabels(mergedLocale.value, props.labels))
     const exporting = ref(false)
+    const exportError = ref<string | null>(null)
+
+    const formatsEmpty = computed(() => props.formats.length === 0)
+    const offeredFormats = computed(() =>
+      formatsEmpty.value ? [...DEFAULT_DATA_EXPORT_FORMATS] : props.formats
+    )
+    const triggerDisabled = computed(() => props.disabled || exporting.value || formatsEmpty.value)
 
     const handleExport = async (format: DataExportFormat) => {
-      if (props.disabled || exporting.value) return
+      if (triggerDisabled.value || exporting.value) return
+      if (!isDataExportFormat(format)) {
+        devWarn('DataExport.format', `Unknown export format "${String(format)}"`)
+        return
+      }
 
       exporting.value = true
+      exportError.value = null
       try {
+        await yieldDataExportFrame()
         const mod = await loadDataExportModule()
-        const content = mod.exportData(props.columns, props.dataSource, format, {
+        mod.runDataExport({
+          columns: props.columns,
+          dataSource: props.dataSource,
+          format,
+          fileName: props.fileName,
           sheetName: props.sheetName,
-          cellFormatter: props.cellFormatter
+          cellFormatter: props.cellFormatter,
+          hiddenColumnKeys: props.hiddenColumnKeys
         })
-        mod.downloadDataExport(content, props.fileName, format)
         emit('export', format)
       } catch (error) {
+        exportError.value = resolvedLabels.value.errorText
         emit('error', error)
       } finally {
         exporting.value = false
       }
     }
 
-    const formatLabel = (format: DataExportFormat) =>
-      format === 'xlsx' ? resolvedLabels.value.xlsxText : resolvedLabels.value.markdownText
-
-    const renderTrigger = (text: string, onClick?: (event: MouseEvent) => void) =>
-      h(
-        'button',
-        {
-          type: 'button',
-          class: classNames(tableExportButtonClasses, onClick ? props.className : undefined),
-          'aria-label': resolvedLabels.value.triggerAriaLabel,
-          disabled: props.disabled || exporting.value,
-          onClick
-        },
-        text
-      )
+    expose({ export: handleExport })
 
     return () => {
-      if (props.formats.length === 0) return null
-
-      if (props.formats.length === 1) {
-        const format = props.formats[0]
-        return renderTrigger(
-          exporting.value ? resolvedLabels.value.exportingText : formatLabel(format),
-          () => void handleExport(format)
-        )
+      if (formatsEmpty.value) {
+        devWarn('DataExport.formats', 'formats is empty; the export trigger stays disabled')
       }
 
-      return h(
-        Dropdown,
+      const attrsRecord = attrs as Record<string, unknown>
+      const {
+        class: attrsClass,
+        style: attrsStyle,
+        ...restAttrs
+      } = attrsRecord as {
+        class?: unknown
+        style?: unknown
+      } & Record<string, unknown>
+
+      const triggerText = exporting.value
+        ? resolvedLabels.value.exportingText
+        : offeredFormats.value.length === 1
+          ? getDataExportFormatLabel(offeredFormats.value[0], resolvedLabels.value)
+          : resolvedLabels.value.triggerText
+
+      const triggerButton = h(
+        'button',
         {
-          trigger: 'click' as const,
-          disabled: props.disabled || exporting.value,
-          className: props.className
+          ...restAttrs,
+          type: 'button',
+          class: classNames(
+            resolveButtonClasses({
+              variant: 'outline',
+              size: 'sm',
+              disabled: triggerDisabled.value
+            }),
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
+          style: mergeStyleValues(attrsStyle),
+          disabled: triggerDisabled.value,
+          'aria-busy': exporting.value || undefined,
+          onClick:
+            offeredFormats.value.length === 1 && !formatsEmpty.value
+              ? () => void handleExport(offeredFormats.value[0])
+              : undefined
         },
-        {
-          default: () => [
-            renderTrigger(
-              exporting.value
-                ? resolvedLabels.value.exportingText
-                : resolvedLabels.value.triggerText
-            ),
-            h(DropdownMenu, null, {
-              default: () =>
-                props.formats.map((format) =>
-                  h(
-                    DropdownItem,
-                    {
-                      key: format,
-                      onClick: () => void handleExport(format)
-                    },
-                    { default: () => formatLabel(format) }
-                  )
-                )
-            })
-          ]
-        }
+        triggerText
       )
+
+      const errorStatus = exportError.value
+        ? h('span', { role: 'status', 'aria-live': 'polite' }, exportError.value)
+        : null
+
+      if (offeredFormats.value.length === 1 || formatsEmpty.value) {
+        return [triggerButton, errorStatus]
+      }
+
+      return [
+        h(
+          Dropdown,
+          {
+            trigger: 'click' as const,
+            disabled: triggerDisabled.value,
+            asChild: true,
+            showArrow: false
+          },
+          {
+            default: () => [
+              triggerButton,
+              h(DropdownMenu, null, {
+                default: () =>
+                  offeredFormats.value.map((format) =>
+                    h(
+                      DropdownItem,
+                      {
+                        key: format,
+                        onClick: () => void handleExport(format)
+                      },
+                      { default: () => getDataExportFormatLabel(format, resolvedLabels.value) }
+                    )
+                  )
+              })
+            ]
+          }
+        ),
+        errorStatus
+      ]
     }
   }
 })
