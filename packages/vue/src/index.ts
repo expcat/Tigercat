@@ -339,7 +339,7 @@ export type { VueCronEditorProps, CronEditorProps } from './components/CronEdito
 export { Calendar } from './components/Calendar'
 export type { VueCalendarProps, CalendarProps } from './components/Calendar'
 export { Mentions } from './components/Mentions'
-export type { VueMentionsProps } from './components/Mentions'
+export type { VueMentionsProps, MentionsProps, MentionOption } from './components/Mentions'
 export { QRCode } from './components/QRCode'
 export type { VueQRCodeProps } from './components/QRCode'
 
