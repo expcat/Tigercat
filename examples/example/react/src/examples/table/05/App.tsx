@@ -26,7 +26,6 @@ export default function App() {
       columns={columns}
       dataSource={rows}
       responsiveMode="card"
-      cardBreakpoint="lg"
       cardFieldGap="gap-2"
       pagination={false}
     />

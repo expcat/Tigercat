@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref } from 'vue'
+import { ref } from 'vue'
 import { Table } from '@expcat/tigercat-vue/Table'
 import type { TableColumn } from '@expcat/tigercat-vue'
 
@@ -14,8 +14,6 @@ const rows = [
 ]
 
 const expandedRowKeys = ref<(string | number)[]>([1])
-const renderExpandedRow = (record: Record<string, unknown>) =>
-  h('div', { class: 'p-3 text-sm' }, String(record.detail))
 </script>
 
 <template>
@@ -24,9 +22,13 @@ const renderExpandedRow = (record: Record<string, unknown>) =>
     :data-source="rows"
     :expandable="{
       expandedRowKeys,
-      expandedRowRender: renderExpandedRow,
       expandRowByClick: true
     }"
     :pagination="false"
-    @expand-change="expandedRowKeys = $event" />
+    @expand-change="expandedRowKeys = $event">
+    <template #cell-name="{ record }">{{ record.name }}</template>
+    <template #expanded-row="{ record }">
+      <div class="p-3 text-sm">{{ record.detail }}</div>
+    </template>
+  </Table>
 </template>

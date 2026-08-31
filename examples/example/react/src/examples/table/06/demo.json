@@ -1,7 +1,7 @@
 {
   "id": "table-06",
   "title": "固定列体系",
-  "description": "组合展示左右固定列、固定表头与表头锁定。",
+  "description": "左右固定列与固定表头；行数超过 maxHeight 才会纵向滚动。",
   "entry": "App.tsx",
   "order": 6
 }

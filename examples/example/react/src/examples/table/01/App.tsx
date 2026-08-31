@@ -20,15 +20,17 @@ const rows: Row[] = [
 
 export default function App() {
   return (
-    <Table<Row>
-      columns={columns}
-      dataSource={rows}
-      rowKey="id"
-      bordered
-      striped
-      size="sm"
-      tableLayout="fixed"
-      pagination={false}
-    />
+    <section aria-label="成员表">
+      <Table<Row>
+        columns={columns}
+        dataSource={rows}
+        rowKey="id"
+        bordered
+        striped
+        size="sm"
+        tableLayout="fixed"
+        pagination={false}
+      />
+    </section>
   )
 }

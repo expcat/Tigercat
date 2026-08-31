@@ -15,13 +15,15 @@ const rows = [
 </script>
 
 <template>
-  <Table
-    :columns="columns"
-    :data-source="rows"
-    row-key="id"
-    bordered
-    striped
-    size="sm"
-    table-layout="fixed"
-    :pagination="false" />
+  <section aria-label="成员表">
+    <Table
+      :columns="columns"
+      :data-source="rows"
+      row-key="id"
+      bordered
+      striped
+      size="sm"
+      table-layout="fixed"
+      :pagination="false" />
+  </section>
 </template>

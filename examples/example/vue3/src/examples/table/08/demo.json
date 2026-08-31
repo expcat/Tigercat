@@ -1,7 +1,7 @@
 {
   "id": "table-08",
   "title": "可展开行",
-  "description": "受控展开行并展示行级详情。",
+  "description": "受控展开行；用 #cell-name 与 #expanded-row 插槽渲染单元格和详情。",
   "entry": "App.vue",
   "order": 8
 }

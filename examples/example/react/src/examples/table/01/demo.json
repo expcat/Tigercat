@@ -1,7 +1,7 @@
 {
   "id": "table-01",
   "title": "基础外观",
-  "description": "一个表格组合展示边框、条纹、紧凑尺寸与固定布局。",
+  "description": "基础表格：边框、条纹、紧凑尺寸与固定布局，外层有可访问名。",
   "entry": "App.tsx",
   "order": 1
 }

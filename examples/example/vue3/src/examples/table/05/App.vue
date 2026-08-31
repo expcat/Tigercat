@@ -20,7 +20,13 @@ const rows = [
     :columns="columns"
     :data-source="rows"
     responsive-mode="card"
-    card-breakpoint="lg"
     card-field-gap="gap-2"
-    :pagination="false" />
+    :pagination="false">
+    <template #card="{ record }">
+      <div class="space-y-1">
+        <div class="text-sm font-semibold">{{ record.name }}</div>
+        <div class="text-sm">{{ record.status }} · {{ record.email }}</div>
+      </div>
+    </template>
+  </Table>
 </template>
