@@ -44,6 +44,11 @@ export const frFR: TigerLocale = {
   marquee: {
     ariaLabel: 'Contenu défilant'
   },
+  image: {
+    previewAriaLabel: 'Aperçu de {alt}',
+    previewFallbackAlt: 'image',
+    groupAriaLabel: "Groupe d'images"
+  },
   timeline: {
     pendingText: 'Chargement...'
   },

@@ -120,6 +120,36 @@ export interface ImageProps {
   lazy?: boolean
 
   /**
+   * Responsive image candidates. Lands on the inner `<img>`, not the host.
+   */
+  srcSet?: string
+
+  /**
+   * Sizes hint for `srcSet`. Lands on the inner `<img>`.
+   */
+  sizes?: string
+
+  /**
+   * CORS mode for the inner `<img>`.
+   */
+  crossOrigin?: '' | 'anonymous' | 'use-credentials'
+
+  /**
+   * Decode hint for the inner `<img>`.
+   */
+  decoding?: 'async' | 'auto' | 'sync'
+
+  /**
+   * Referrer policy for the inner `<img>`.
+   */
+  referrerPolicy?: string
+
+  /**
+   * Fetch priority for the inner `<img>` (LCP).
+   */
+  fetchPriority?: 'high' | 'low' | 'auto'
+
+  /**
    * Additional CSS classes
    */
   className?: string
@@ -208,6 +238,11 @@ export interface ImageGroupProps {
    * @default true
    */
   preview?: boolean
+
+  /**
+   * Additional CSS classes. Merged with the group base class.
+   */
+  className?: string
 }
 
 /**

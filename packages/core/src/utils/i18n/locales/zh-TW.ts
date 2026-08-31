@@ -44,6 +44,11 @@ export const zhTW: TigerLocale = {
   marquee: {
     ariaLabel: '滾動內容'
   },
+  image: {
+    previewAriaLabel: '預覽 {alt}',
+    previewFallbackAlt: '圖片',
+    groupAriaLabel: '圖片組'
+  },
   timeline: {
     pendingText: '載入中...'
   },

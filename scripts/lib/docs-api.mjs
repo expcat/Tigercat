@@ -60,6 +60,16 @@ export const COMPONENT_PROP_PRIORITY = {
     'repeat?',
     'ariaLabel?'
   ],
+  Image: [
+    'src?',
+    'alt?',
+    'preview?',
+    'previewTrigger?',
+    'lazy?',
+    'fallbackSrc?',
+    'fit?',
+    'height?'
+  ],
   Button: [
     'variant?',
     'size?',
@@ -201,14 +211,14 @@ export const COMMAND_API_USAGE = {
 
 export const REQUIRED_USAGE_SNIPPETS = {
   Vue: {
-    Image: '<Image src="..." />',
+    Image: '<Image src="..." alt="..." />',
     Calendar: '<Calendar :value="date" />',
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
     Tour: '<Tour :steps="steps" />'
   },
   React: {
-    Image: '<Image src="..." />',
+    Image: '<Image src="..." alt="..." />',
     Calendar: '<Calendar value={date} />',
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',

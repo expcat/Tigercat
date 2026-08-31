@@ -122,7 +122,11 @@ const COMPONENT_USAGE_NOTES = {
   },
   Image: {
     notes:
-      '支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。'
+      '默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。'
+  },
+  ImageGroup: {
+    notes:
+      '只收集子 Image 的 URL，不是图库布局；间距用 class。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。'
   },
   Card: {
     notes:

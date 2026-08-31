@@ -48,21 +48,31 @@ describe('group-utils', () => {
     expect(getButtonGroupClasses(true)).toContain('-mt-px')
   })
 
-  it('returns image group classes with backward compatible custom class behavior', () => {
+  it('merges image group classes instead of replacing the base class', () => {
     expect(getImageGroupClasses()).toBe(imageGroupBaseClasses)
-    expect(getImageGroupClasses('custom-image-group')).toBe('custom-image-group')
+    expect(getImageGroupClasses('custom-image-group')).toContain(imageGroupBaseClasses)
+    expect(getImageGroupClasses('custom-image-group')).toContain('custom-image-group')
   })
 
-  it('registers and unregisters image group items without mutating input arrays', () => {
-    const initial = ['one.jpg']
-    const registered = registerImageGroupItem(initial, 'two.jpg')
+  it('registers image group items by instance id so duplicate src stays distinct', () => {
+    const initial = [{ id: 'a', src: 'one.jpg' }]
+    const registered = registerImageGroupItem(initial, { id: 'b', src: 'one.jpg' })
 
-    expect(initial).toEqual(['one.jpg'])
+    expect(initial).toEqual([{ id: 'a', src: 'one.jpg' }])
     expect(registered.index).toBe(1)
-    expect(registered.items).toEqual(['one.jpg', 'two.jpg'])
+    expect(registered.items).toEqual([
+      { id: 'a', src: 'one.jpg' },
+      { id: 'b', src: 'one.jpg' }
+    ])
 
-    const unregistered = unregisterImageGroupItem(registered.items, 'one.jpg')
-    expect(registered.items).toEqual(['one.jpg', 'two.jpg'])
-    expect(unregistered).toEqual(['two.jpg'])
+    const updated = registerImageGroupItem(registered.items, { id: 'b', src: 'two.jpg' })
+    expect(updated.index).toBe(1)
+    expect(updated.items).toEqual([
+      { id: 'a', src: 'one.jpg' },
+      { id: 'b', src: 'two.jpg' }
+    ])
+
+    const unregistered = unregisterImageGroupItem(updated.items, 'a')
+    expect(unregistered).toEqual([{ id: 'b', src: 'two.jpg' }])
   })
 })

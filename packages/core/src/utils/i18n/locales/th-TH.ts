@@ -44,6 +44,11 @@ export const thTH: TigerLocale = {
   marquee: {
     ariaLabel: 'เนื้อหาเลื่อน'
   },
+  image: {
+    previewAriaLabel: 'ดูตัวอย่าง {alt}',
+    previewFallbackAlt: 'รูปภาพ',
+    groupAriaLabel: 'กลุ่มรูปภาพ'
+  },
   timeline: {
     pendingText: 'กำลังโหลด...'
   },

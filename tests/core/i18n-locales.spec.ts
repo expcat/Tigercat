@@ -46,7 +46,8 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
   'pt-BR:timePicker.ok',
   'id-ID:common.okText',
   'id-ID:modal.okText',
-  'id-ID:timePicker.ok'
+  'id-ID:timePicker.ok',
+  'fr-FR:image.previewFallbackAlt'
 ])
 
 function leafEntries(value: unknown, prefix = ''): Array<{ path: string; value: string }> {
@@ -268,6 +269,7 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('common')
     expect(TIGER_LOCALE_KEYS).toContain('timePicker')
     expect(TIGER_LOCALE_KEYS).toContain('marquee')
+    expect(TIGER_LOCALE_KEYS).toContain('image')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

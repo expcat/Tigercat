@@ -50,6 +50,15 @@ export interface TigerLocaleMarquee {
   ariaLabel?: string
 }
 
+export interface TigerLocaleImage {
+  /** Preview control name. Template: supports {alt} */
+  previewAriaLabel?: string
+  /** Substituted for {alt} when the image has no alternative text */
+  previewFallbackAlt?: string
+  /** Accessible name for ImageGroup */
+  groupAriaLabel?: string
+}
+
 export interface TigerLocaleTimeline {
   pendingText?: string
 }
@@ -515,6 +524,7 @@ export interface TigerLocale {
   drawer?: TigerLocaleDrawer
   qrcode?: TigerLocaleQRCode
   marquee?: TigerLocaleMarquee
+  image?: TigerLocaleImage
   timeline?: TigerLocaleTimeline
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination

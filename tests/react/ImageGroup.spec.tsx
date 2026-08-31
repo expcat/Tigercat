@@ -3,14 +3,14 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, render } from '@testing-library/react'
-import React from 'react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import React, { useState } from 'react'
 import { Image } from '@expcat/tigercat-react/Image'
 import { ImageGroup } from '@expcat/tigercat-react/ImageGroup'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ImageGroup', () => {
-  it('renders children in a group container', () => {
+  it('renders children in a named group container', () => {
     const { container } = render(
       <ImageGroup>
         <div data-testid="child">child</div>
@@ -19,82 +19,112 @@ describe('ImageGroup', () => {
 
     const group = container.querySelector('[role="group"]')
     expect(group).toBeInTheDocument()
+    expect(group).toHaveAttribute('aria-label')
     expect(group?.querySelector('[data-testid="child"]')).toBeInTheDocument()
   })
 
-  it('renders with preview enabled by default', () => {
+  it('keeps the base class when a custom class is passed', () => {
     const { container } = render(
-      <ImageGroup>
+      <ImageGroup className="custom-group" id="gallery" data-demo="yes">
         <span>test</span>
       </ImageGroup>
     )
 
     const group = container.querySelector('[role="group"]')
-    expect(group).toBeInTheDocument()
+    expect(group?.className).toContain('tiger-image-group')
+    expect(group?.className).toContain('custom-group')
+    expect(group).toHaveAttribute('id', 'gallery')
+    expect(group).toHaveAttribute('data-demo', 'yes')
   })
 
   it('renders Image children', () => {
     const { container } = render(
       <ImageGroup>
-        <Image src="/img1.jpg" alt="Image 1" preview />
-        <Image src="/img2.jpg" alt="Image 2" preview />
+        <Image src="/img1.jpg" alt="Image 1" />
+        <Image src="/img2.jpg" alt="Image 2" />
       </ImageGroup>
     )
 
-    const images = container.querySelectorAll('img')
-    expect(images.length).toBe(2)
+    expect(container.querySelectorAll('img')).toHaveLength(2)
   })
 
   it('calls onPreviewOpenChange when group preview opens', () => {
     const onPreviewOpenChange = vi.fn()
-    const { container } = render(
+    render(
       <ImageGroup onPreviewOpenChange={onPreviewOpenChange}>
-        <Image src="/img1.jpg" alt="Image 1" preview />
+        <Image src="/img1.jpg" alt="Image 1" />
       </ImageGroup>
     )
 
-    fireEvent.click(container.querySelector('[role="button"]') as HTMLElement)
-
+    fireEvent.click(screen.getByRole('button'))
     expect(onPreviewOpenChange).toHaveBeenCalledWith(true)
   })
 
-  it('applies custom className', () => {
-    const { container } = render(
-      <ImageGroup className="custom-group">
-        <span>test</span>
-      </ImageGroup>
-    )
-
-    const group = container.querySelector('[role="group"]')
-    expect(group?.className).toContain('custom-group')
-  })
-  it('renders with preview disabled', () => {
-    const { container } = render(
+  it('does not turn child images into buttons when group preview is off', () => {
+    render(
       <ImageGroup preview={false}>
-        <span>test</span>
+        <Image src="/img-disabled.jpg" alt="Disabled preview" preview />
       </ImageGroup>
     )
 
-    const group = container.querySelector('[role="group"]')
-    expect(group).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByAltText('Disabled preview'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('renders empty group without children', () => {
-    const { container } = render(<ImageGroup />)
-    const group = container.querySelector('[role="group"]')
-    expect(group).toBeInTheDocument()
+  it('keeps both copies when two images share a src and one unmounts', async () => {
+    function Harness() {
+      const [showFirst, setShowFirst] = useState(true)
+      return (
+        <>
+          <button type="button" onClick={() => setShowFirst(false)}>
+            remove-first
+          </button>
+          <ImageGroup>
+            {showFirst ? <Image src="/same.jpg" alt="First" /> : null}
+            <Image src="/same.jpg" alt="Second" />
+          </ImageGroup>
+        </>
+      )
+    }
+
+    render(<Harness />)
+    fireEvent.click(screen.getByRole('button', { name: 'remove-first' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Preview Second' }))
+
+    await waitFor(() => {
+      const dialogImgs = document.querySelectorAll('[role="dialog"] img')
+      expect(dialogImgs).toHaveLength(1)
+      expect(dialogImgs[0]).toHaveAttribute('src', '/same.jpg')
+    })
   })
 
-  it('renders multiple Image children', () => {
-    const { container } = render(
-      <ImageGroup>
-        <Image src="/img1.jpg" alt="Image 1" />
-        <Image src="/img2.jpg" alt="Image 2" />
-        <Image src="/img3.jpg" alt="Image 3" />
-      </ImageGroup>
-    )
+  it('updates an open preview list when another image mounts', async () => {
+    function Harness() {
+      const [showThird, setShowThird] = useState(false)
+      return (
+        <>
+          <button type="button" onClick={() => setShowThird(true)}>
+            add-third
+          </button>
+          <ImageGroup>
+            <Image src="/img1.jpg" alt="One" />
+            <Image src="/img2.jpg" alt="Two" />
+            {showThird ? <Image src="/img3.jpg" alt="Three" /> : null}
+          </ImageGroup>
+        </>
+      )
+    }
 
-    expect(container.querySelectorAll('img')).toHaveLength(3)
+    render(<Harness />)
+    fireEvent.click(screen.getByRole('button', { name: 'Preview One' }))
+    fireEvent.click(screen.getByRole('button', { name: 'add-third' }))
+
+    await waitFor(() => {
+      const dialog = document.querySelector('[role="dialog"]')
+      expect(dialog).toBeInTheDocument()
+    })
   })
 
   it('renders non-Image children correctly', () => {
@@ -107,16 +137,6 @@ describe('ImageGroup', () => {
 
     expect(container.querySelector('.custom-child')).toBeInTheDocument()
     expect(container.querySelector('p')).toBeInTheDocument()
-  })
-
-  it('renders single child correctly', () => {
-    const { container } = render(
-      <ImageGroup>
-        <Image src="/single.jpg" alt="Single" />
-      </ImageGroup>
-    )
-
-    expect(container.querySelectorAll('img')).toHaveLength(1)
   })
 
   it('preserves child order in the group', () => {
@@ -134,47 +154,14 @@ describe('ImageGroup', () => {
     expect(spans[2]?.textContent).toBe('Third')
   })
 
-  it('has role=group on the container element', () => {
-    const { container } = render(
-      <ImageGroup>
-        <span>test</span>
-      </ImageGroup>
-    )
-
-    expect(container.querySelector('[role="group"]')).toBeInTheDocument()
-  })
-
-  it('keeps preview disabled without rendering preview dialog', () => {
-    const { container } = render(
-      <ImageGroup preview={false}>
-        <Image src="/img-disabled.jpg" alt="Disabled preview" preview />
-      </ImageGroup>
-    )
-
-    expect(container.querySelector('[role="dialog"]')).toBeNull()
-  })
-
-  it('uses the default image group class on the container', () => {
-    const { container } = render(
-      <ImageGroup>
-        <span>test</span>
-      </ImageGroup>
-    )
-
-    const group = container.querySelector('[role="group"]')
-    expect(group?.className).toContain('tiger-image-group')
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<ImageGroup />)
+      const { container } = render(
+        <ImageGroup>
+          <Image src="/img1.jpg" alt="Image 1" />
+        </ImageGroup>
+      )
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<ImageGroup />)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

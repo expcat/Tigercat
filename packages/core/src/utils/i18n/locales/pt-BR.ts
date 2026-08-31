@@ -44,6 +44,11 @@ export const ptBR: TigerLocale = {
   marquee: {
     ariaLabel: 'Conteúdo em rolagem'
   },
+  image: {
+    previewAriaLabel: 'Pré-visualizar {alt}',
+    previewFallbackAlt: 'imagem',
+    groupAriaLabel: 'Grupo de imagens'
+  },
   timeline: {
     pendingText: 'Carregando...'
   },

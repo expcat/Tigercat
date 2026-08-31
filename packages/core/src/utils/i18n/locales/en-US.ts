@@ -43,6 +43,11 @@ export const enUS: TigerLocale = {
   marquee: {
     ariaLabel: 'Scrolling content'
   },
+  image: {
+    previewAriaLabel: 'Preview {alt}',
+    previewFallbackAlt: 'image',
+    groupAriaLabel: 'Image group'
+  },
   timeline: {
     pendingText: 'Loading...'
   },

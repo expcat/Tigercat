@@ -44,6 +44,11 @@ export const jaJP: TigerLocale = {
   marquee: {
     ariaLabel: 'スクロール中のコンテンツ'
   },
+  image: {
+    previewAriaLabel: '{alt} をプレビュー',
+    previewFallbackAlt: '画像',
+    groupAriaLabel: '画像グループ'
+  },
   timeline: {
     pendingText: '読み込み中...'
   },

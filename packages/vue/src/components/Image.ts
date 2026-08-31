@@ -7,26 +7,43 @@ import {
   onMounted,
   onBeforeUnmount,
   inject,
+  useId,
   PropType
 } from 'vue'
 import {
+  applyImageLoadError,
+  applyImageLoadSuccess,
   classNames,
   coerceClassValue,
-  mergeStyleValues,
-  imageBaseClasses,
+  createImageLoadState,
+  formatImagePreviewAriaLabel,
   getImageImgClasses,
+  getImageLabels,
+  imageBaseClasses,
   imageErrorClasses,
-  imageLoadingClasses,
-  imagePreviewCursorClass,
   imageErrorIconPath,
+  imageFrameClasses,
+  imageLoadingClasses,
+  imageLoadingOverlayClasses,
+  imageLoadingSpinnerClasses,
+  imageLoadingSpinnerPath,
+  imagePreviewCursorClass,
+  imagePreviewHostClasses,
+  isImageHoverPreviewEnabled,
+  mergeStyleValues,
+  resetImageLoadState,
+  resolveImageHoverPlacement,
+  resolveImagePreviewEnabled,
+  resolveImagePreviewSrc,
   toCSSSize,
   type ImageFit,
   type ImagePreviewTrigger
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
-import type { ImageGroupContext } from './ImageGroup'
+import { IMAGE_GROUP_INJECTION_KEY, type ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueImageProps {
   src?: string
@@ -38,11 +55,77 @@ export interface VueImageProps {
   preview?: boolean
   previewTrigger?: ImagePreviewTrigger
   lazy?: boolean
+  srcSet?: string
+  sizes?: string
+  crossOrigin?: '' | 'anonymous' | 'use-credentials'
+  decoding?: 'async' | 'auto' | 'sync'
+  referrerPolicy?: string
+  fetchPriority?: 'high' | 'low' | 'auto'
   className?: string
   style?: Record<string, string | number>
 }
 
-export const IMAGE_GROUP_INJECTION_KEY = 'tiger-image-group'
+function invokeListener(handler: unknown, event: Event): void {
+  if (typeof handler === 'function') {
+    handler(event)
+    return
+  }
+  if (Array.isArray(handler)) {
+    for (const fn of handler) {
+      if (typeof fn === 'function') fn(event)
+    }
+  }
+}
+
+function renderErrorIcon() {
+  return h(
+    'svg',
+    {
+      class: 'w-8 h-8',
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      stroke: 'currentColor'
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'stroke-width': '1.5',
+        d: imageErrorIconPath
+      })
+    ]
+  )
+}
+
+function renderLoadingSpinner() {
+  return h(
+    'svg',
+    {
+      class: imageLoadingSpinnerClasses,
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      'aria-hidden': true
+    },
+    [
+      h('circle', {
+        class: 'opacity-25',
+        cx: '12',
+        cy: '12',
+        r: '10',
+        stroke: 'currentColor',
+        'stroke-width': '4',
+        fill: 'none'
+      }),
+      h('path', {
+        class: 'opacity-75',
+        fill: 'currentColor',
+        d: imageLoadingSpinnerPath
+      })
+    ]
+  )
+}
 
 export const Image = defineComponent({
   name: 'TigerImage',
@@ -60,37 +143,47 @@ export const Image = defineComponent({
       default: 'click' as ImagePreviewTrigger
     },
     lazy: { type: Boolean, default: false },
+    srcSet: { type: String, default: undefined },
+    sizes: { type: String, default: undefined },
+    crossOrigin: {
+      type: String as PropType<'' | 'anonymous' | 'use-credentials'>,
+      default: undefined
+    },
+    decoding: { type: String as PropType<'async' | 'auto' | 'sync'>, default: undefined },
+    referrerPolicy: { type: String, default: undefined },
+    fetchPriority: { type: String as PropType<'high' | 'low' | 'auto'>, default: undefined },
     className: { type: String, default: undefined },
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
-  emits: ['load', 'error', 'preview-open-change'],
-  setup(props, { slots, emit, attrs }) {
-    const loading = ref(true)
-    const error = ref(false)
-    const actualSrc = ref(props.lazy ? '' : props.src)
+  emits: ['load', 'error', 'preview-open-change', 'click', 'keydown', 'focus', 'blur'],
+  setup(props, { slots, emit, attrs, expose }) {
+    const config = useTigerConfig()
+    const loadState = ref(createImageLoadState(props.src, props.lazy))
     const containerRef = ref<HTMLElement | null>(null)
+    const imgRef = ref<HTMLImageElement | null>(null)
     const previewVisible = ref(false)
+    const inView = ref(!props.lazy)
     let observer: IntersectionObserver | null = null
+    const instanceId = `tiger-image-${useId()}`
 
     const group = inject<ImageGroupContext | null>(IMAGE_GROUP_INJECTION_KEY, null)
 
-    // Preview behaviour: click opens the full-screen viewer, hover shows a
-    // floating enlarged overlay.
-    const hoverPreviewEnabled = computed(
-      () => props.preview && props.previewTrigger === 'hover' && !group
+    const previewEnabled = computed(() => resolveImagePreviewEnabled(props.preview, group?.preview))
+    const hoverPreviewEnabled = computed(() =>
+      isImageHoverPreviewEnabled(previewEnabled.value, props.previewTrigger, Boolean(group))
     )
-    const clickPreviewEnabled = computed(() => props.preview && props.previewTrigger !== 'hover')
+    const clickPreviewEnabled = computed(() => previewEnabled.value)
+    const hoverPlacement = computed(() => resolveImageHoverPlacement(config.value.direction))
 
-    // Hover preview positioning (reuses the shared floating-popup composable).
     const floatingPopupProps = {
       get trigger() {
         return 'hover' as const
       },
       get placement() {
-        return 'right' as const
+        return hoverPlacement.value
       },
       get offset() {
         return 12
@@ -107,10 +200,10 @@ export const Image = defineComponent({
       floatingClasses: hoverFloatingClasses,
       positioned: hoverPositioned,
       overlayTarget: hoverOverlayTarget,
+      setVisible: setHoverVisible,
       triggerHandlers: hoverTriggerHandlers
     } = usePopup({
       props: floatingPopupProps,
-      // Hover visibility is internal; popup model events are not Image events.
       emit: () => {}
     })
 
@@ -119,79 +212,113 @@ export const Image = defineComponent({
       hoverTriggerRef.value = el as HTMLElement | null
     }
 
-    // Registration with ImageGroup
-    const registeredIndex = ref(-1)
-
-    onMounted(() => {
-      if (group && props.src) {
-        registeredIndex.value = group.register(props.src)
-      }
-
-      if (props.lazy && containerRef.value) {
-        observer = new IntersectionObserver(
-          (entries) => {
-            if (entries[0]?.isIntersecting) {
-              actualSrc.value = props.src
-              observer?.disconnect()
-              observer = null
-            }
-          },
-          { threshold: 0.01 }
-        )
-        observer.observe(containerRef.value)
-      }
-    })
-
-    onBeforeUnmount(() => {
+    const disconnectObserver = () => {
       observer?.disconnect()
-      if (group && props.src) {
-        group.unregister(props.src)
-      }
-    })
+      observer = null
+    }
 
-    // Reset image state when src changes (non-lazy). Mirrors the React
-    // implementation so a dynamic src updates the rendered <img>.
+    const observeLazy = () => {
+      disconnectObserver()
+      if (!props.lazy || inView.value || !containerRef.value) return
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries[0]?.isIntersecting) return
+          inView.value = true
+          loadState.value = resetImageLoadState(props.src, true, true)
+          disconnectObserver()
+        },
+        { threshold: 0.01 }
+      )
+      observer.observe(containerRef.value)
+    }
+
     watch(
-      () => props.src,
-      (newSrc) => {
-        if (props.lazy) return
-        actualSrc.value = newSrc
-        error.value = false
-        loading.value = true
+      () => [props.src, props.lazy] as const,
+      () => {
+        if (!props.lazy) {
+          inView.value = true
+          loadState.value = resetImageLoadState(props.src, false, true)
+          disconnectObserver()
+          return
+        }
+        loadState.value = resetImageLoadState(props.src, true, inView.value)
+        if (!inView.value) observeLazy()
       }
     )
 
-    const handleLoad = () => {
-      loading.value = false
-      error.value = false
-      emit('load')
+    watch(
+      () => [group, props.src] as const,
+      () => {
+        if (!group) return
+        if (!props.src) {
+          group.unregister(instanceId)
+          return
+        }
+        group.register({ id: instanceId, src: props.src })
+      },
+      { immediate: true }
+    )
+
+    watch(containerRef, () => {
+      if (props.lazy && !inView.value) observeLazy()
+    })
+
+    onMounted(() => {
+      if (props.lazy && !inView.value) observeLazy()
+    })
+
+    onBeforeUnmount(() => {
+      disconnectObserver()
+      group?.unregister(instanceId)
+    })
+
+    expose({
+      img: imgRef
+    })
+
+    const handleLoad = (event: Event) => {
+      loadState.value = applyImageLoadSuccess(loadState.value)
+      emit('load', event)
     }
 
-    const handleError = () => {
-      loading.value = false
-      error.value = true
-      if (props.fallbackSrc && actualSrc.value !== props.fallbackSrc) {
-        actualSrc.value = props.fallbackSrc
-        error.value = false
-        loading.value = true
-      }
-      emit('error')
+    const handleError = (event: Event) => {
+      loadState.value = applyImageLoadError(loadState.value, props.fallbackSrc)
+      emit('error', event)
     }
 
-    const handleClick = () => {
-      if (!clickPreviewEnabled.value) return
+    const handleClick = (event: MouseEvent) => {
+      invokeListener(attrs.onClick, event)
+      emit('click', event)
+      if (event.defaultPrevented || !clickPreviewEnabled.value) return
       if (group) {
-        group.openPreview(registeredIndex.value >= 0 ? registeredIndex.value : 0)
-      } else {
-        previewVisible.value = true
-        emit('preview-open-change', true)
+        group.openPreview(instanceId)
+        return
       }
+      previewVisible.value = true
+      emit('preview-open-change', true)
+    }
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      invokeListener(attrs.onKeydown, event)
+      emit('keydown', event)
+    }
+
+    const handleFocus = (event: FocusEvent) => {
+      invokeListener(attrs.onFocus, event)
+      emit('focus', event)
+      if (hoverPreviewEnabled.value) setHoverVisible(true)
+    }
+
+    const handleBlur = (event: FocusEvent) => {
+      invokeListener(attrs.onBlur, event)
+      emit('blur', event)
+      if (hoverPreviewEnabled.value) setHoverVisible(false)
     }
 
     const containerClasses = computed(() =>
       classNames(
-        imageBaseClasses,
-        props.preview && imagePreviewCursorClass,
+        previewEnabled.value ? imagePreviewHostClasses : imageBaseClasses,
+        previewEnabled.value && imagePreviewCursorClass,
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -210,75 +337,71 @@ export const Image = defineComponent({
 
     return () => {
       const forwardedAttrs = Object.fromEntries(
-        Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
+        Object.entries(attrs).filter(
+          ([key]) =>
+            key !== 'class' &&
+            key !== 'style' &&
+            key !== 'onClick' &&
+            key !== 'onKeydown' &&
+            key !== 'onFocus' &&
+            key !== 'onBlur' &&
+            key !== 'onFocusin' &&
+            key !== 'onFocusout'
+        )
       )
 
+      const labels = getImageLabels(config.value.locale)
+      const previewSrc = resolveImagePreviewSrc(loadState.value, props.src)
+      const previewName = formatImagePreviewAriaLabel(
+        labels.previewAriaLabel,
+        props.alt,
+        labels.previewFallbackAlt
+      )
+      const loadingPlaceholder = slots.placeholder
+        ? slots.placeholder()
+        : [
+            h(
+              'div',
+              {
+                class: loadState.value.actualSrc ? imageLoadingOverlayClasses : imageLoadingClasses
+              },
+              [renderLoadingSpinner()]
+            )
+          ]
+      const errorPlaceholder = slots.error
+        ? slots.error()
+        : [h('div', { class: imageErrorClasses }, [renderErrorIcon()])]
+
       let content
-      if (error.value && !props.fallbackSrc) {
-        // Error state
-        content = slots.error
-          ? slots.error()
-          : h('div', { class: imageErrorClasses }, [
-              h(
-                'svg',
-                {
-                  class: 'w-8 h-8',
-                  xmlns: 'http://www.w3.org/2000/svg',
-                  fill: 'none',
-                  viewBox: '0 0 24 24',
-                  stroke: 'currentColor'
-                },
-                [
-                  h('path', {
-                    'stroke-linecap': 'round',
-                    'stroke-linejoin': 'round',
-                    'stroke-width': '1.5',
-                    d: imageErrorIconPath
-                  })
-                ]
-              )
-            ])
-      } else if (loading.value && !actualSrc.value) {
-        // Loading placeholder
-        content = slots.placeholder
-          ? slots.placeholder()
-          : h('div', { class: imageLoadingClasses }, [
-              h(
-                'svg',
-                {
-                  class: 'w-8 h-8',
-                  xmlns: 'http://www.w3.org/2000/svg',
-                  fill: 'none',
-                  viewBox: '0 0 24 24',
-                  stroke: 'currentColor'
-                },
-                [
-                  h('path', {
-                    'stroke-linecap': 'round',
-                    'stroke-linejoin': 'round',
-                    'stroke-width': '1.5',
-                    d: imageErrorIconPath
-                  })
-                ]
-              )
-            ])
+      if (loadState.value.error) {
+        content = errorPlaceholder
+      } else if (!loadState.value.actualSrc) {
+        content = loadingPlaceholder
       } else {
-        // Image
-        content = h('img', {
-          src: actualSrc.value,
-          alt: props.alt,
-          class: imgClasses.value,
-          onLoad: handleLoad,
-          onError: handleError
-        })
+        content = [
+          h('img', {
+            ref: imgRef,
+            src: loadState.value.actualSrc,
+            alt: previewEnabled.value ? '' : props.alt,
+            class: imgClasses.value,
+            srcset: props.srcSet,
+            sizes: props.sizes,
+            crossorigin: props.crossOrigin,
+            decoding: props.decoding,
+            referrerpolicy: props.referrerPolicy,
+            fetchpriority: props.fetchPriority,
+            onLoad: handleLoad,
+            onError: handleError
+          }),
+          loadState.value.loading ? loadingPlaceholder : null
+        ]
       }
 
-      // Standalone preview (only when not in group)
       const previewEl =
-        !group && previewVisible.value && props.src
+        !group && previewVisible.value && previewSrc
           ? h(ImagePreview, {
               open: previewVisible.value,
-              images: [props.src!],
+              images: [previewSrc],
               currentIndex: 0,
               'onUpdate:open': (val: boolean) => {
                 previewVisible.value = val
@@ -287,9 +410,8 @@ export const Image = defineComponent({
             })
           : null
 
-      // Hover preview overlay (enlarged floating image)
       const hoverPreviewEl =
-        hoverPreviewEnabled.value && hoverVisible.value && props.src
+        hoverPreviewEnabled.value && hoverVisible.value && previewSrc
           ? renderVueOverlayTeleport(
               h(
                 'div',
@@ -305,7 +427,7 @@ export const Image = defineComponent({
                 },
                 [
                   h('img', {
-                    src: props.src,
+                    src: previewSrc,
                     alt: '',
                     class: 'block max-w-[16rem] max-h-[16rem] object-contain'
                   })
@@ -315,26 +437,27 @@ export const Image = defineComponent({
             )
           : null
 
+      const hostTag = previewEnabled.value ? 'button' : 'div'
+      const inner = previewEnabled.value
+        ? h('span', { class: imageFrameClasses }, content)
+        : content
+
       return h(
-        'div',
+        hostTag,
         {
           ...forwardedAttrs,
           ref: setContainerRef,
           class: containerClasses.value,
           style: containerStyle.value,
-          role: clickPreviewEnabled.value ? 'button' : undefined,
-          tabindex: clickPreviewEnabled.value ? 0 : undefined,
-          'aria-label': clickPreviewEnabled.value ? `Preview ${props.alt || 'image'}` : undefined,
+          type: previewEnabled.value ? 'button' : undefined,
+          'aria-label': previewEnabled.value ? previewName : undefined,
           onClick: handleClick,
-          onKeydown: (e: KeyboardEvent) => {
-            if (clickPreviewEnabled.value && (e.key === 'Enter' || e.key === ' ')) {
-              e.preventDefault()
-              handleClick()
-            }
-          },
+          onKeydown: handleKeydown,
+          onFocus: handleFocus,
+          onBlur: handleBlur,
           ...(hoverPreviewEnabled.value ? hoverTriggerHandlers.value : {})
         },
-        [content, previewEl, hoverPreviewEl]
+        [inner, previewEl, hoverPreviewEl]
       )
     }
   }

@@ -44,6 +44,11 @@ export const idID: TigerLocale = {
   marquee: {
     ariaLabel: 'Konten bergulir'
   },
+  image: {
+    previewAriaLabel: 'Pratinjau {alt}',
+    previewFallbackAlt: 'gambar',
+    groupAriaLabel: 'Grup gambar'
+  },
   timeline: {
     pendingText: 'Memuat...'
   },

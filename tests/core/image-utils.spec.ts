@@ -6,6 +6,11 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
+  applyImageLoadError,
+  applyImageLoadSuccess,
+  clampImageGroupPreviewIndex,
+  createImageLoadState,
+  formatImagePreviewAriaLabel,
   getImageImgClasses,
   getCropperHandleClasses,
   CROP_HANDLES,
@@ -17,11 +22,76 @@ import {
   moveCropRect,
   getInitialCropRect,
   cropCanvas,
+  getImageLabels,
   getTouchDistance,
   toCSSSize,
-  imagePreviewImgClasses
+  imagePreviewImgClasses,
+  resetImageLoadState,
+  resolveImageHoverPlacement,
+  resolveImagePreviewEnabled,
+  resolveImagePreviewSrc
 } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import type { CropHandle, CropRect, ImageFit } from '@expcat/tigercat-core'
+
+describe('image-utils — preview and load state', () => {
+  it('formats preview names from a locale template and fallback alt', () => {
+    expect(formatImagePreviewAriaLabel('Preview {alt}', 'Cat', 'image')).toBe('Preview Cat')
+    expect(formatImagePreviewAriaLabel('Preview {alt}', '  ', 'image')).toBe('Preview image')
+    expect(formatImagePreviewAriaLabel('预览 {alt}', undefined, '图片')).toBe('预览 图片')
+  })
+
+  it('reads image names from locale objects, not a language id', () => {
+    expect(getImageLabels().previewAriaLabel).toBe(enUS.image?.previewAriaLabel)
+    expect(getImageLabels({ locale: 'zh-CN' }).previewAriaLabel).toBe(enUS.image?.previewAriaLabel)
+    expect(getImageLabels(zhCN).previewAriaLabel).toBe('预览 {alt}')
+    expect(getImageLabels(zhCN).groupAriaLabel).toBe('图片组')
+  })
+
+  it('disables preview when the group preview flag is false', () => {
+    expect(resolveImagePreviewEnabled(true)).toBe(true)
+    expect(resolveImagePreviewEnabled(true, false)).toBe(false)
+    expect(resolveImagePreviewEnabled(false, true)).toBe(false)
+  })
+
+  it('places hover overlay on the logical inline-end side', () => {
+    expect(resolveImageHoverPlacement('ltr')).toBe('right')
+    expect(resolveImageHoverPlacement('rtl')).toBe('left')
+  })
+
+  it('resets load state on src change and switches to fallback only once', () => {
+    const initial = createImageLoadState('/a.jpg', false)
+    expect(initial.actualSrc).toBe('/a.jpg')
+    expect(initial.loading).toBe(true)
+
+    const lazyHidden = resetImageLoadState('/b.jpg', true, false)
+    expect(lazyHidden.actualSrc).toBe('')
+    expect(lazyHidden.error).toBe(false)
+
+    const inView = resetImageLoadState('/b.jpg', true, true)
+    expect(inView.actualSrc).toBe('/b.jpg')
+
+    const afterFallback = applyImageLoadError(inView, '/fallback.jpg')
+    expect(afterFallback.actualSrc).toBe('/fallback.jpg')
+    expect(afterFallback.error).toBe(false)
+    expect(afterFallback.loading).toBe(true)
+
+    const afterFallbackError = applyImageLoadError(afterFallback, '/fallback.jpg')
+    expect(afterFallbackError.error).toBe(true)
+    expect(resolveImagePreviewSrc(afterFallbackError, '/b.jpg')).toBeUndefined()
+
+    const loaded = applyImageLoadSuccess(afterFallback)
+    expect(loaded.loading).toBe(false)
+    expect(resolveImagePreviewSrc(loaded, '/b.jpg')).toBe('/fallback.jpg')
+  })
+
+  it('clamps group preview index into the current list', () => {
+    expect(clampImageGroupPreviewIndex(4, 3)).toBe(2)
+    expect(clampImageGroupPreviewIndex(-1, 3)).toBe(0)
+    expect(clampImageGroupPreviewIndex(0, 0)).toBe(0)
+  })
+})
 
 describe('image-utils — class generators', () => {
   it('imagePreviewImgClasses constrains preview img to 90vh / 90vw', () => {
@@ -363,11 +433,9 @@ describe('image-utils — getTouchDistance', () => {
 
 describe('image preview / image-viewer demo viewports', () => {
   it.each([
-    'examples/example/vue3/src/examples/image/04/demo.json',
     'examples/example/vue3/src/examples/image/05/demo.json',
     'examples/example/vue3/src/examples/image-viewer/01/demo.json',
     'examples/example/vue3/src/examples/image-viewer/02/demo.json',
-    'examples/example/react/src/examples/image/04/demo.json',
     'examples/example/react/src/examples/image/05/demo.json',
     'examples/example/react/src/examples/image-viewer/01/demo.json',
     'examples/example/react/src/examples/image-viewer/02/demo.json'

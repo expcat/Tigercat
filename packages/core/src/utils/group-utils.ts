@@ -22,8 +22,13 @@ export interface VisibleGroupItems<T> {
   overflowCount: number
 }
 
+export interface ImageGroupItem {
+  id: string
+  src: string
+}
+
 export interface ImageGroupRegistrationResult {
-  items: string[]
+  items: ImageGroupItem[]
   index: number
 }
 
@@ -78,23 +83,65 @@ export function getButtonGroupClasses(vertical = false, ...classes: ClassValue[]
   )
 }
 
-export function getImageGroupClasses(className?: string): string {
-  return className || imageGroupBaseClasses
+export function getImageGroupClasses(...classes: ClassValue[]): string {
+  return classNames(imageGroupBaseClasses, ...classes)
 }
 
 export function registerImageGroupItem(
-  items: readonly string[],
-  src: string
+  items: readonly ImageGroupItem[],
+  item: ImageGroupItem
 ): ImageGroupRegistrationResult {
+  const existing = items.findIndex((entry) => entry.id === item.id)
+  if (existing >= 0) {
+    const next = items.slice()
+    next[existing] = { id: item.id, src: item.src }
+    return { items: next, index: existing }
+  }
+
   return {
-    items: [...items, src],
+    items: [...items, { id: item.id, src: item.src }],
     index: items.length
   }
 }
 
-export function unregisterImageGroupItem(items: readonly string[], src: string): string[] {
-  const index = items.indexOf(src)
-  if (index < 0) return [...items]
+export function unregisterImageGroupItem(
+  items: readonly ImageGroupItem[],
+  id: string
+): ImageGroupItem[] {
+  return items.filter((entry) => entry.id !== id)
+}
 
-  return [...items.slice(0, index), ...items.slice(index + 1)]
+export function getImageGroupItemIndex(items: readonly ImageGroupItem[], id: string): number {
+  return items.findIndex((entry) => entry.id === id)
+}
+
+export function getImageGroupSrcs(items: readonly ImageGroupItem[]): string[] {
+  return items.map((entry) => entry.src)
+}
+
+export function clampImageGroupPreviewIndex(index: number, length: number): number {
+  if (length <= 0) return 0
+  if (!Number.isFinite(index)) return 0
+  return Math.min(Math.max(0, Math.floor(index)), length - 1)
+}
+
+export function resolveImageGroupName(input: {
+  ariaLabel?: unknown
+  ariaLabelledby?: unknown
+  localeLabel: string
+}): { role: 'group'; 'aria-label'?: string; 'aria-labelledby'?: string } {
+  const labelledby =
+    typeof input.ariaLabelledby === 'string' && input.ariaLabelledby.trim()
+      ? input.ariaLabelledby.trim()
+      : undefined
+  if (labelledby) {
+    return { role: 'group', 'aria-labelledby': labelledby }
+  }
+
+  const label =
+    typeof input.ariaLabel === 'string' && input.ariaLabel.trim()
+      ? input.ariaLabel.trim()
+      : input.localeLabel
+
+  return { role: 'group', 'aria-label': label }
 }

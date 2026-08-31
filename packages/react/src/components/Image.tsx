@@ -1,12 +1,36 @@
-import React, { useState, useRef, useEffect, useMemo, useContext, useCallback } from 'react'
+import React, {
+  forwardRef,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useContext,
+  useCallback,
+  useId
+} from 'react'
 import {
+  applyImageLoadError,
+  applyImageLoadSuccess,
   classNames,
-  imageBaseClasses,
+  createImageLoadState,
+  formatImagePreviewAriaLabel,
   getImageImgClasses,
+  getImageLabels,
+  imageBaseClasses,
+  imageFrameClasses,
   imageErrorClasses,
-  imageLoadingClasses,
-  imagePreviewCursorClass,
   imageErrorIconPath,
+  imageLoadingClasses,
+  imageLoadingOverlayClasses,
+  imageLoadingSpinnerClasses,
+  imageLoadingSpinnerPath,
+  imagePreviewCursorClass,
+  imagePreviewHostClasses,
+  isImageHoverPreviewEnabled,
+  resetImageLoadState,
+  resolveImageHoverPlacement,
+  resolveImagePreviewEnabled,
+  resolveImagePreviewSrc,
   toCSSSize,
   type ImageProps as CoreImageProps
 } from '@expcat/tigercat-core'
@@ -14,11 +38,15 @@ import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
 import { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ImageProps
   extends
     Omit<CoreImageProps, 'className'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'width' | 'height'> {
+    Omit<
+      React.HTMLAttributes<HTMLElement>,
+      'width' | 'height' | 'onLoad' | 'onError' | 'crossOrigin'
+    > {
   /**
    * Custom error placeholder
    */
@@ -31,6 +59,8 @@ export interface ImageProps
    * Callback when preview visibility changes
    */
   onPreviewOpenChange?: (open: boolean) => void
+  onLoad?: React.ReactEventHandler<HTMLImageElement>
+  onError?: React.ReactEventHandler<HTMLImageElement>
 }
 
 const SvgIcon: React.FC<{ d: string; className?: string }> = ({ d, className = 'w-8 h-8' }) => (
@@ -44,39 +74,76 @@ const SvgIcon: React.FC<{ d: string; className?: string }> = ({ d, className = '
   </svg>
 )
 
-export const Image: React.FC<ImageProps> = ({
-  src,
-  alt = '',
-  width,
-  height,
-  fit = 'cover',
-  fallbackSrc,
-  preview = true,
-  previewTrigger = 'click',
-  lazy = false,
-  className,
-  errorRender,
-  placeholderRender,
-  onPreviewOpenChange,
-  onClick,
-  onKeyDown,
-  style,
-  ...props
-}) => {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [actualSrc, setActualSrc] = useState(lazy ? '' : src)
+const LoadingSpinner: React.FC = () => (
+  <svg
+    className={imageLoadingSpinnerClasses}
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    aria-hidden>
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+      fill="none"
+    />
+    <path className="opacity-75" fill="currentColor" d={imageLoadingSpinnerPath} />
+  </svg>
+)
+
+export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
+  {
+    src,
+    alt = '',
+    width,
+    height,
+    fit = 'cover',
+    fallbackSrc,
+    preview = true,
+    previewTrigger = 'click',
+    lazy = false,
+    srcSet,
+    sizes,
+    crossOrigin,
+    decoding,
+    referrerPolicy,
+    fetchPriority,
+    className,
+    errorRender,
+    placeholderRender,
+    onPreviewOpenChange,
+    onClick,
+    onKeyDown,
+    onLoad,
+    onError,
+    onFocus,
+    onBlur,
+    style,
+    ...props
+  },
+  forwardedRef
+) {
+  const config = useTigerConfig()
+  const labels = useMemo(() => getImageLabels(config.locale), [config.locale])
+  const [loadState, setLoadState] = useState(() => createImageLoadState(src, lazy))
   const [previewVisible, setPreviewVisible] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLElement | null>(null)
+  const inViewRef = useRef(!lazy)
   const group = useContext(ImageGroupContext)
-  const registeredIndexRef = useRef(-1)
+  const instanceId = useId()
 
-  // Preview behaviour: click opens the full-screen viewer, hover shows a
-  // floating enlarged overlay.
-  const hoverPreviewEnabled = preview && previewTrigger === 'hover' && !group
-  const clickPreviewEnabled = preview && previewTrigger !== 'hover'
+  const previewEnabled = resolveImagePreviewEnabled(preview, group?.preview)
+  const hoverPreviewEnabled = isImageHoverPreviewEnabled(
+    previewEnabled,
+    previewTrigger,
+    Boolean(group)
+  )
+  const clickPreviewEnabled = previewEnabled
+  const hoverPlacement = resolveImageHoverPlacement(config.direction)
 
-  // Hover preview positioning (reuses the shared popup hook).
   const {
     currentVisible: hoverVisible,
     triggerRef: hoverTriggerRef,
@@ -85,157 +152,206 @@ export const Image: React.FC<ImageProps> = ({
     floatingClasses: hoverFloatingClasses,
     positioned: hoverPositioned,
     overlayTarget: hoverOverlayTarget,
+    setVisible: setHoverVisible,
     triggerHandlers: hoverTriggerHandlers
   } = usePopup({
     trigger: 'hover',
-    placement: 'right',
+    placement: hoverPlacement,
     offset: 12,
     disabled: !hoverPreviewEnabled
   })
 
   const setRootRef = useCallback(
-    (el: HTMLDivElement | null) => {
+    (el: HTMLElement | null) => {
       containerRef.current = el
-      hoverTriggerRef.current = el
+      hoverTriggerRef.current = el as HTMLDivElement | null
     },
     [hoverTriggerRef]
   )
 
-  // Register/unregister with group
   useEffect(() => {
-    if (group && src) {
-      registeredIndexRef.current = group.register(src)
-      return () => {
-        group.unregister(src)
-      }
+    if (!group) return
+    if (!src) {
+      group.unregister(instanceId)
+      return
     }
-  }, [group, src])
+    group.register({ id: instanceId, src })
+    return () => {
+      group.unregister(instanceId)
+    }
+  }, [group, instanceId, src])
 
-  // Lazy loading
   useEffect(() => {
-    if (!lazy || !containerRef.current) return
+    if (!lazy) {
+      inViewRef.current = true
+      setLoadState(resetImageLoadState(src, false, true))
+      return
+    }
+
+    setLoadState(resetImageLoadState(src, true, inViewRef.current))
+    if (inViewRef.current) return
+
+    const root = containerRef.current
+    if (!root) return
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setActualSrc(src)
-          observer.disconnect()
-        }
+        if (!entries[0]?.isIntersecting) return
+        inViewRef.current = true
+        setLoadState(resetImageLoadState(src, true, true))
+        observer.disconnect()
       },
       { threshold: 0.01 }
     )
-    observer.observe(containerRef.current)
+    observer.observe(root)
     return () => observer.disconnect()
   }, [lazy, src])
 
-  // Update actualSrc when src changes (non-lazy)
-  useEffect(() => {
-    if (!lazy) {
-      setActualSrc(src)
-      setError(false)
-      setLoading(true)
-    }
-  }, [src, lazy])
+  const handleLoad = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      setLoadState((current) => applyImageLoadSuccess(current))
+      onLoad?.(event)
+    },
+    [onLoad]
+  )
 
-  const handleLoad = useCallback(() => {
-    setLoading(false)
-    setError(false)
-  }, [])
-
-  const handleError = useCallback(() => {
-    setLoading(false)
-    setError(true)
-    if (fallbackSrc && actualSrc !== fallbackSrc) {
-      setActualSrc(fallbackSrc)
-      setError(false)
-      setLoading(true)
-    }
-  }, [fallbackSrc, actualSrc])
+  const handleError = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      setLoadState((current) => applyImageLoadError(current, fallbackSrc))
+      onError?.(event)
+    },
+    [fallbackSrc, onError]
+  )
 
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      onClick?.(e)
-      if (!clickPreviewEnabled) return
+    (event: React.MouseEvent<HTMLElement>) => {
+      onClick?.(event)
+      if (event.defaultPrevented || !clickPreviewEnabled) return
       if (group) {
-        group.openPreview(registeredIndexRef.current >= 0 ? registeredIndexRef.current : 0)
-      } else {
-        setPreviewVisible(true)
-        onPreviewOpenChange?.(true)
+        group.openPreview(instanceId)
+        return
       }
+      setPreviewVisible(true)
+      onPreviewOpenChange?.(true)
     },
-    [clickPreviewEnabled, group, onClick, onPreviewOpenChange]
+    [clickPreviewEnabled, group, instanceId, onClick, onPreviewOpenChange]
   )
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      onKeyDown?.(e)
-      if (clickPreviewEnabled && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        handleClick(e as unknown as React.MouseEvent<HTMLDivElement>)
-      }
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      onKeyDown?.(event)
     },
-    [clickPreviewEnabled, handleClick, onKeyDown]
+    [onKeyDown]
+  )
+
+  const handleFocus = useCallback(
+    (event: React.FocusEvent<HTMLElement>) => {
+      onFocus?.(event)
+      if (hoverPreviewEnabled) setHoverVisible(true)
+    },
+    [hoverPreviewEnabled, onFocus, setHoverVisible]
+  )
+
+  const handleBlur = useCallback(
+    (event: React.FocusEvent<HTMLElement>) => {
+      onBlur?.(event)
+      if (hoverPreviewEnabled) setHoverVisible(false)
+    },
+    [hoverPreviewEnabled, onBlur, setHoverVisible]
   )
 
   const containerClasses = useMemo(
-    () => classNames(imageBaseClasses, preview && imagePreviewCursorClass, className),
-    [preview, className]
+    () =>
+      classNames(
+        previewEnabled ? imagePreviewHostClasses : imageBaseClasses,
+        previewEnabled && imagePreviewCursorClass,
+        className
+      ),
+    [previewEnabled, className]
   )
 
   const imgClasses = useMemo(() => getImageImgClasses(fit), [fit])
 
   const containerStyle = useMemo(() => {
-    const s: React.CSSProperties = { ...style }
+    const next: React.CSSProperties = { ...style }
     const w = toCSSSize(width)
     const h = toCSSSize(height)
-    if (w) s.width = w
-    if (h) s.height = h
-    return s
+    if (w) next.width = w
+    if (h) next.height = h
+    return next
   }, [width, height, style])
 
+  const previewSrc = resolveImagePreviewSrc(loadState, src)
+  const previewName = formatImagePreviewAriaLabel(
+    labels.previewAriaLabel,
+    alt,
+    labels.previewFallbackAlt
+  )
+  const loadingPlaceholder = placeholderRender ?? (
+    <div className={loadState.actualSrc ? imageLoadingOverlayClasses : imageLoadingClasses}>
+      <LoadingSpinner />
+    </div>
+  )
+  const errorPlaceholder = errorRender ?? (
+    <div className={imageErrorClasses}>
+      <SvgIcon d={imageErrorIconPath} />
+    </div>
+  )
+
   let content: React.ReactNode
-  if (error && !fallbackSrc) {
-    content = errorRender || (
-      <div className={imageErrorClasses}>
-        <SvgIcon d={imageErrorIconPath} />
-      </div>
-    )
-  } else if (loading && !actualSrc) {
-    content = placeholderRender || (
-      <div className={imageLoadingClasses}>
-        <SvgIcon d={imageErrorIconPath} />
-      </div>
-    )
+  if (loadState.error) {
+    content = errorPlaceholder
+  } else if (!loadState.actualSrc) {
+    content = loadingPlaceholder
   } else {
     content = (
-      <img
-        src={actualSrc}
-        alt={alt}
-        className={imgClasses}
-        onLoad={handleLoad}
-        onError={handleError}
-      />
+      <>
+        <img
+          ref={forwardedRef}
+          src={loadState.actualSrc}
+          alt={previewEnabled ? '' : alt}
+          className={imgClasses}
+          srcSet={srcSet}
+          sizes={sizes}
+          crossOrigin={crossOrigin}
+          decoding={decoding}
+          referrerPolicy={referrerPolicy}
+          fetchPriority={fetchPriority}
+          onLoad={handleLoad}
+          onError={handleError}
+        />
+        {loadState.loading ? loadingPlaceholder : null}
+      </>
     )
   }
 
+  const hostTag = previewEnabled ? 'button' : 'div'
+
   return (
     <>
-      <div
-        {...props}
-        ref={setRootRef}
-        className={containerClasses}
-        style={containerStyle}
-        role={clickPreviewEnabled ? 'button' : undefined}
-        tabIndex={clickPreviewEnabled ? 0 : undefined}
-        aria-label={clickPreviewEnabled ? `Preview ${alt || 'image'}` : undefined}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        {...(hoverPreviewEnabled ? hoverTriggerHandlers : {})}>
-        {content}
-      </div>
-      {!group && previewVisible && src && (
+      {React.createElement(
+        hostTag,
+        {
+          ...props,
+          ref: setRootRef,
+          className: containerClasses,
+          style: containerStyle,
+          type: previewEnabled ? 'button' : undefined,
+          'aria-label': previewEnabled ? previewName : undefined,
+          onClick: handleClick,
+          onKeyDown: handleKeyDown,
+          onFocus: handleFocus,
+          onBlur: handleBlur,
+          ...(hoverPreviewEnabled ? hoverTriggerHandlers : {})
+        },
+        previewEnabled
+          ? React.createElement('span', { className: imageFrameClasses }, content)
+          : content
+      )}
+      {!group && previewVisible && previewSrc && (
         <ImagePreview
           open={previewVisible}
-          images={[src]}
+          images={[previewSrc]}
           currentIndex={0}
           onOpenChange={(val) => {
             setPreviewVisible(val)
@@ -245,7 +361,7 @@ export const Image: React.FC<ImageProps> = ({
       )}
       {hoverPreviewEnabled &&
         hoverVisible &&
-        src &&
+        previewSrc &&
         renderOverlayPortal(
           <div
             ref={hoverFloatingRef}
@@ -256,10 +372,14 @@ export const Image: React.FC<ImageProps> = ({
             )}
             data-positioned={hoverPositioned}
             aria-hidden>
-            <img src={src} alt="" className="block max-w-[16rem] max-h-[16rem] object-contain" />
+            <img
+              src={previewSrc}
+              alt=""
+              className="block max-w-[16rem] max-h-[16rem] object-contain"
+            />
           </div>,
           hoverOverlayTarget
         )}
     </>
   )
-}
+})

@@ -44,6 +44,11 @@ export const koKR: TigerLocale = {
   marquee: {
     ariaLabel: '스크롤 콘텐츠'
   },
+  image: {
+    previewAriaLabel: '{alt} 미리보기',
+    previewFallbackAlt: '이미지',
+    groupAriaLabel: '이미지 그룹'
+  },
   timeline: {
     pendingText: '로딩 중...'
   },

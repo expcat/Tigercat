@@ -44,6 +44,11 @@ export const arSA: TigerLocale = {
   marquee: {
     ariaLabel: 'محتوى التمرير'
   },
+  image: {
+    previewAriaLabel: 'معاينة {alt}',
+    previewFallbackAlt: 'صورة',
+    groupAriaLabel: 'مجموعة الصور'
+  },
   timeline: {
     pendingText: 'جار التحميل...'
   },

@@ -5,16 +5,31 @@
 
 import { classNames } from './class-names'
 import { isBrowser } from './env'
-import type { ImageFit, CropRect, CropHandle, PreviewNavState } from '../types/image'
+import type {
+  ImageFit,
+  ImagePreviewTrigger,
+  CropRect,
+  CropHandle,
+  PreviewNavState
+} from '../types/image'
 
 // ============================================================================
 // Image component styles
 // ============================================================================
 
 /**
- * Base classes for Image wrapper
+ * Inner frame: clips the bitmap. Preview focus ring lives on the outer host.
  */
 export const imageBaseClasses = 'relative inline-block overflow-hidden'
+
+/** Fills the preview host and clips the bitmap. */
+export const imageFrameClasses = 'relative block h-full w-full overflow-hidden'
+
+/**
+ * Real preview control host. Ring is outside overflow-hidden via ring-offset.
+ */
+export const imagePreviewHostClasses =
+  'relative inline-block p-0 m-0 border-0 bg-transparent appearance-none align-top text-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
 
 /**
  * Classes for the <img> element based on fit
@@ -34,18 +49,96 @@ export function getImageImgClasses(fit: ImageFit): string {
  * Classes for the error placeholder
  */
 export const imageErrorClasses =
-  'flex items-center justify-center w-full h-full bg-[var(--tiger-image-error-bg,#f3f4f6)] text-[var(--tiger-image-error-text,#9ca3af)]'
+  'flex items-center justify-center w-full h-full bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#4b5563)]'
 
 /**
- * Classes for the loading placeholder
+ * In-flow loading placeholder (lazy, no src yet)
  */
 export const imageLoadingClasses =
-  'flex items-center justify-center w-full h-full bg-[var(--tiger-image-error-bg,#f3f4f6)] text-[var(--tiger-image-error-text,#9ca3af)] animate-pulse'
+  'flex items-center justify-center w-full h-full bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#4b5563)]'
+
+/**
+ * Overlay on top of a bitmap that has not fired load
+ */
+export const imageLoadingOverlayClasses =
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#4b5563)]'
 
 /**
  * Cursor class when preview is enabled
  */
 export const imagePreviewCursorClass = 'cursor-pointer'
+
+export function resolveImagePreviewEnabled(preview: boolean, groupPreview?: boolean): boolean {
+  if (groupPreview === false) return false
+  return preview
+}
+
+export function isImageHoverPreviewEnabled(
+  previewEnabled: boolean,
+  previewTrigger: ImagePreviewTrigger,
+  inGroup: boolean
+): boolean {
+  return previewEnabled && previewTrigger === 'hover' && !inGroup
+}
+
+export function resolveImageHoverPlacement(direction?: string): 'left' | 'right' {
+  return direction === 'rtl' ? 'left' : 'right'
+}
+
+export function formatImagePreviewAriaLabel(
+  template: string,
+  alt: string | undefined,
+  fallbackAlt: string
+): string {
+  const name = alt?.trim() ? alt.trim() : fallbackAlt
+  return template.replace('{alt}', name)
+}
+
+export interface ImageLoadState {
+  actualSrc: string
+  error: boolean
+  loading: boolean
+}
+
+export function createImageLoadState(src: string | undefined, lazy: boolean): ImageLoadState {
+  return {
+    actualSrc: lazy ? '' : (src ?? ''),
+    error: false,
+    loading: true
+  }
+}
+
+export function resetImageLoadState(
+  src: string | undefined,
+  lazy: boolean,
+  inView: boolean
+): ImageLoadState {
+  const shouldLoad = !lazy || inView
+  return {
+    actualSrc: shouldLoad ? (src ?? '') : '',
+    error: false,
+    loading: true
+  }
+}
+
+export function applyImageLoadSuccess(state: ImageLoadState): ImageLoadState {
+  return { ...state, error: false, loading: false }
+}
+
+export function applyImageLoadError(
+  state: ImageLoadState,
+  fallbackSrc: string | undefined
+): ImageLoadState {
+  if (fallbackSrc && state.actualSrc !== fallbackSrc) {
+    return { actualSrc: fallbackSrc, error: false, loading: true }
+  }
+  return { ...state, error: true, loading: false }
+}
+
+export function resolveImagePreviewSrc(state: ImageLoadState, src?: string): string | undefined {
+  if (state.error) return undefined
+  return state.actualSrc || src
+}
 
 // ============================================================================
 // SVG icon path data for image-related icons
@@ -54,6 +147,12 @@ export const imagePreviewCursorClass = 'cursor-pointer'
 /** Broken image icon path (used in error state) */
 export const imageErrorIconPath =
   'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+
+/** Spinner arc path (loading, not the broken-image icon) */
+export const imageLoadingSpinnerPath =
+  'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+
+export const imageLoadingSpinnerClasses = 'w-8 h-8 animate-spin'
 
 /** Zoom in icon path */
 export const zoomInIconPath = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7'

@@ -43,6 +43,11 @@ export const zhCN: TigerLocale = {
   marquee: {
     ariaLabel: '滚动内容'
   },
+  image: {
+    previewAriaLabel: '预览 {alt}',
+    previewFallbackAlt: '图片',
+    groupAriaLabel: '图片组'
+  },
   timeline: {
     pendingText: '加载中...'
   },

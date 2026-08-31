@@ -44,6 +44,11 @@ export const viVN: TigerLocale = {
   marquee: {
     ariaLabel: 'Nội dung cuộn'
   },
+  image: {
+    previewAriaLabel: 'Xem trước {alt}',
+    previewFallbackAlt: 'hình ảnh',
+    groupAriaLabel: 'Nhóm hình ảnh'
+  },
   timeline: {
     pendingText: 'Đang tải...'
   },
