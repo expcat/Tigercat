@@ -1,161 +1,279 @@
-import { defineComponent, h, ref, computed, watch, nextTick, type PropType } from 'vue'
-import type { AutoCompleteOption, ComponentSize, TigerLocale } from '@expcat/tigercat-core'
 import {
-  resolveLocaleText,
-  mergeTigerLocale,
-  autoCompleteBaseClasses,
+  defineComponent,
+  computed,
+  ref,
+  h,
+  inject,
+  watch,
+  nextTick,
+  useId,
+  type PropType,
+  type CSSProperties
+} from 'vue'
+import type {
+  AutoCompleteFilterOption,
+  AutoCompleteOption,
+  AutoCompleteValue,
+  ComponentSize,
+  FloatingPlacement,
+  InputStatus,
+  TigerLocale
+} from '@expcat/tigercat-core'
+import {
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  autoCompleteClearButtonClasses,
+  autoCompleteClearIconClasses,
+  autoCompleteDoneActionClasses,
+  autoCompleteDoneButtonClasses,
   autoCompleteDropdownClasses,
   autoCompleteEmptyStateClasses,
-  getAutoCompleteInputClasses,
-  getAutoCompleteOptionClasses,
+  autoCompleteListboxClasses,
+  autoCompleteTrailingSlotClasses,
+  classNames,
+  closeSolidIcon20PathD,
+  coerceAutoCompleteFormValue,
+  coerceClassValue,
   filterAutoCompleteOptions,
-  resolveAutoCompleteDisplayValue,
+  getAutoCompleteInputClasses,
+  getAutoCompleteKeyIntent,
+  getAutoCompleteOptionClasses,
+  getAutoCompleteOptionKey,
+  getAutoCompletePanelStyle,
+  getAutoCompleteRootClasses,
+  getEmptyLabels,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
   getPickerListboxAria,
   getPickerNavigationIndex,
   getPickerOptionAria,
   getPickerOptionId,
-  coerceClassValue,
-  classNames,
+  getSelectLabels,
   icon20ViewBox,
-  closeSolidIcon20PathD
+  isSameAutoCompleteValue,
+  mergeAriaDescribedBy,
+  mergeTigerLocale,
+  resolveAutoCompleteBlurCommit,
+  resolveAutoCompleteIdleQuery,
+  resolveAutoCompleteInitialQuery,
+  resolveLocaleText,
+  runShakeAnimation,
+  shouldShowAutoCompleteClear
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
-let autoCompleteInstanceId = 0
+function iconVNode(path: string, className: string) {
+  return h(
+    'svg',
+    {
+      class: className,
+      xmlns: 'http://www.w3.org/2000/svg',
+      viewBox: icon20ViewBox,
+      fill: 'currentColor',
+      'aria-hidden': 'true',
+      focusable: 'false'
+    },
+    [
+      h('path', {
+        'fill-rule': 'evenodd',
+        d: path,
+        'clip-rule': 'evenodd'
+      })
+    ]
+  )
+}
 
-const ClearIcon = h(
-  'svg',
-  {
-    class: 'w-4 h-4',
-    viewBox: icon20ViewBox,
-    fill: 'currentColor',
-    xmlns: 'http://www.w3.org/2000/svg'
-  },
-  [
-    h('path', {
-      d: closeSolidIcon20PathD,
-      'fill-rule': 'evenodd',
-      'clip-rule': 'evenodd'
-    })
-  ]
-)
+export interface VueAutoCompleteProps {
+  modelValue?: AutoCompleteValue
+  defaultValue?: AutoCompleteValue
+  open?: boolean
+  defaultOpen?: boolean
+  options?: AutoCompleteOption[]
+  placeholder?: string
+  searchValue?: string
+  defaultSearchValue?: string
+  size?: ComponentSize
+  disabled?: boolean
+  clearable?: boolean
+  emptyText?: string
+  filterOption?: AutoCompleteFilterOption
+  defaultActiveFirstOption?: boolean
+  allowFreeInput?: boolean
+  loading?: boolean
+  status?: InputStatus
+  name?: string
+  placement?: FloatingPlacement
+  offset?: number
+  dropdownClassName?: string
+  getPopupContainer?: () => HTMLElement | null
+  listHeight?: number
+  locale?: Partial<TigerLocale>
+  className?: string
+}
 
-export type VueAutoCompleteProps = InstanceType<typeof AutoComplete>['$props']
+export type AutoCompleteProps = VueAutoCompleteProps
+export type { AutoCompleteOption }
 
 export const AutoComplete = defineComponent({
   name: 'TigerAutoComplete',
+  inheritAttrs: false,
   props: {
-    modelValue: {
-      type: [String, Number] as PropType<string | number>,
-      default: ''
-    },
-    options: {
-      type: Array as PropType<AutoCompleteOption[]>,
-      default: () => []
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
-    searchValue: {
-      type: String,
-      default: undefined
-    },
-    defaultSearchValue: {
-      type: String,
-      default: ''
-    },
-    size: {
-      type: String as PropType<ComponentSize>,
-      default: 'md'
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    clearable: {
-      type: Boolean,
-      default: false
-    },
-    emptyText: {
-      type: String,
-      default: undefined
-    },
+    modelValue: { type: [String, Number] as PropType<AutoCompleteValue> },
+    defaultValue: { type: [String, Number] as PropType<AutoCompleteValue> },
+    open: { type: Boolean, default: undefined },
+    defaultOpen: { type: Boolean, default: false },
+    options: { type: Array as PropType<AutoCompleteOption[]>, default: () => [] },
+    placeholder: { type: String, default: '' },
+    searchValue: { type: String, default: undefined },
+    defaultSearchValue: { type: String, default: undefined },
+    size: { type: String as PropType<ComponentSize>, default: 'md' as ComponentSize },
+    disabled: Boolean,
+    clearable: Boolean,
+    emptyText: { type: String, default: undefined },
     filterOption: {
-      type: [Boolean, Function] as PropType<
-        boolean | ((inputValue: string, option: AutoCompleteOption) => boolean)
-      >,
+      type: [Boolean, Function] as PropType<AutoCompleteFilterOption>,
       default: true
     },
-    defaultActiveFirstOption: {
-      type: Boolean,
-      default: true
-    },
-    allowFreeInput: {
-      type: Boolean,
-      default: true
-    },
-    locale: {
-      type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined
-    }
+    defaultActiveFirstOption: { type: Boolean, default: true },
+    allowFreeInput: { type: Boolean, default: true },
+    loading: Boolean,
+    status: { type: String as PropType<InputStatus>, default: undefined },
+    name: String,
+    placement: { type: String as PropType<FloatingPlacement>, default: 'bottom-start' },
+    offset: { type: Number, default: 4 },
+    dropdownClassName: String,
+    getPopupContainer: { type: Function as PropType<() => HTMLElement | null> },
+    listHeight: { type: Number, default: 256 },
+    locale: { type: Object as PropType<Partial<TigerLocale>> },
+    className: String
   },
-  emits: ['update:modelValue', 'update:searchValue', 'select', 'search-change', 'change'],
-  setup(props, { emit, attrs }) {
+  emits: [
+    'update:modelValue',
+    'update:searchValue',
+    'update:open',
+    'change',
+    'select',
+    'search-change',
+    'open-change',
+    'blur',
+    'focus'
+  ],
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const instanceId = ++autoCompleteInstanceId
+    const emptyLabels = computed(() => getEmptyLabels(mergedLocale.value))
+    const selectLabels = computed(() => getSelectLabels(mergedLocale.value))
+    const instanceId = useId()
     const listboxId = `tiger-autocomplete-listbox-${instanceId}`
 
-    const isOpen = ref(false)
-    const uncontrolledSearchValue = ref(
-      props.searchValue ??
-        resolveAutoCompleteDisplayValue(props.modelValue, props.options, props.defaultSearchValue)
+    const initialCommitted =
+      props.modelValue ??
+      coerceAutoCompleteFormValue(formItemControl?.value.value) ??
+      props.defaultValue
+    const localValue = ref<AutoCompleteValue | undefined>(initialCommitted)
+    const localOpen = ref(props.defaultOpen)
+    const localSearch = ref(
+      resolveAutoCompleteInitialQuery({
+        searchValue: props.searchValue,
+        defaultSearchValue: props.defaultSearchValue,
+        committed: initialCommitted,
+        optionList: props.options
+      })
     )
-    const inputValue = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const activeIndex = ref(-1)
-    const containerRef = ref<HTMLElement | null>(null)
+    const isEditing = ref(false)
+    const hadCommitted = ref(initialCommitted !== undefined)
+    const rootRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
     const dropdownRef = ref<HTMLElement | null>(null)
-    const overlay = useVueAnchoredOverlay({
-      enabled: isOpen,
-      referenceRef: inputRef,
-      floatingRef: dropdownRef,
-      containerRef,
-      placement: 'bottom-start',
-      offset: 4,
-      matchReferenceWidth: true,
-      dismissOnOutside: true,
-      dismissOnEscape: true,
-      restoreFocusOnDismiss: true,
-      onDismiss: closeDropdown
-    })
 
+    const selected = computed(() =>
+      props.modelValue !== undefined
+        ? props.modelValue
+        : (coerceAutoCompleteFormValue(formItemControl?.value.value) ?? localValue.value)
+    )
+    const isOpen = computed(() => (props.open !== undefined ? props.open : localOpen.value))
+    const searchQuery = computed(() => props.searchValue ?? localSearch.value)
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
     const filteredOptions = computed(() =>
-      filterAutoCompleteOptions(props.options, inputValue.value, props.filterOption)
+      filterAutoCompleteOptions(props.options, searchQuery.value, props.filterOption)
+    )
+    const hasOptions = computed(() => filteredOptions.value.length > 0)
+    const showClear = computed(() =>
+      shouldShowAutoCompleteClear({
+        clearable: props.clearable,
+        disabled: effectiveDisabled.value,
+        query: searchQuery.value,
+        committed: selected.value
+      })
     )
 
-    const showClearButton = computed(
-      () => props.clearable && !props.disabled && inputValue.value !== ''
-    )
-
-    // Sync external modelValue / options into the input display
-    watch([() => props.modelValue, () => props.options], () => {
-      if (props.searchValue === undefined) {
-        uncontrolledSearchValue.value = resolveAutoCompleteDisplayValue(
-          props.modelValue,
-          props.options,
-          props.defaultSearchValue
-        )
+    watch(
+      () => [props.modelValue, formItemControl?.value.value] as const,
+      ([model, formValue]) => {
+        const next = model !== undefined ? model : coerceAutoCompleteFormValue(formValue)
+        if (next === undefined) return
+        localValue.value = next
       }
+    )
+
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      (current, previous) => {
+        if (!previous) return
+        if (current[0] === 'error') runShakeAnimation(rootRef.value)
+      },
+      { flush: 'post' }
+    )
+
+    watch([selected, () => props.options], () => {
+      if (props.searchValue !== undefined) return
+      if (isEditing.value) return
+      if (selected.value === undefined) {
+        if (hadCommitted.value) localSearch.value = ''
+        hadCommitted.value = false
+        return
+      }
+      hadCommitted.value = true
+      localSearch.value = resolveAutoCompleteIdleQuery(selected.value, props.options)
     })
+
+    function setOpen(next: boolean) {
+      if (props.open === undefined) localOpen.value = next
+      emit('update:open', next)
+      emit('open-change', next)
+    }
+
+    function setSearch(query: string) {
+      if (props.searchValue === undefined) localSearch.value = query
+      emit('update:searchValue', query)
+      emit('search-change', query)
+    }
+
+    function setSelected(next: AutoCompleteValue | undefined, option?: AutoCompleteOption) {
+      if (props.modelValue === undefined) localValue.value = next
+      emit('update:modelValue', next)
+      emit('change', next)
+      formItemControl?.onChange(next)
+      if (option) emit('select', option.value, option)
+    }
 
     function openDropdown() {
-      if (props.disabled) return
-      isOpen.value = true
+      if (effectiveDisabled.value) return
+      setOpen(true)
       activeIndex.value = getInitialPickerActiveIndex(
         filteredOptions.value,
         props.defaultActiveFirstOption
@@ -163,203 +281,317 @@ export const AutoComplete = defineComponent({
     }
 
     function closeDropdown() {
-      isOpen.value = false
+      setOpen(false)
       activeIndex.value = -1
     }
 
-    // When free input is disallowed, snap the committed value to an existing
-    // option on blur/Enter — reverting input that doesn't match any option.
-    function constrainToOption() {
-      if (props.allowFreeInput) return
-      const match = props.options.find((o) => !o.disabled && o.label === inputValue.value)
-      if (match) {
-        if (String(match.value) !== String(props.modelValue)) {
-          emit('update:modelValue', match.value)
-          emit('select', match.value, match)
-          emit('change', match.value)
-        }
+    function commitCurrentQuery() {
+      const result = resolveAutoCompleteBlurCommit({
+        query: searchQuery.value,
+        committed: selected.value,
+        optionList: props.options,
+        allowFreeInput: props.allowFreeInput
+      })
+      setSearch(result.query)
+      if (result.didCommit) setSelected(result.value, result.option)
+      return result
+    }
+
+    function revertQuery() {
+      setSearch(resolveAutoCompleteIdleQuery(selected.value, props.options))
+    }
+
+    function handleDismiss(reason: 'outside' | 'escape') {
+      if (reason === 'escape') {
+        isEditing.value = false
+        revertQuery()
+        closeDropdown()
         return
       }
-      const current = props.options.find((o) => String(o.value) === String(props.modelValue))
-      const revertLabel = current ? current.label : ''
-      if (revertLabel !== inputValue.value) {
-        uncontrolledSearchValue.value = revertLabel
-        emit('update:searchValue', revertLabel)
-        emit('search-change', revertLabel)
-        emit('update:modelValue', current ? current.value : '')
-        emit('change', current ? current.value : '')
-      }
-    }
-
-    function handleInput(e: Event) {
-      const val = (e.target as HTMLInputElement).value
-      if (props.searchValue === undefined) {
-        uncontrolledSearchValue.value = val
-      }
-      emit('update:modelValue', val)
-      emit('update:searchValue', val)
-      emit('search-change', val)
-      emit('change', val)
-      if (!isOpen.value) openDropdown()
-      if (props.defaultActiveFirstOption) {
-        activeIndex.value = getInitialPickerActiveIndex(filteredOptions.value, true)
-      }
-    }
-
-    function handleSelect(option: AutoCompleteOption) {
-      if (option.disabled) return
-      if (props.searchValue === undefined) {
-        uncontrolledSearchValue.value = option.label
-      }
-      emit('update:modelValue', option.value)
-      emit('update:searchValue', option.label)
-      emit('select', option.value, option)
-      emit('search-change', option.label)
-      emit('change', option.value)
+      isEditing.value = false
+      commitCurrentQuery()
       closeDropdown()
     }
 
-    function handleClear(e: Event) {
-      e.stopPropagation()
-      if (props.searchValue === undefined) {
-        uncontrolledSearchValue.value = ''
-      }
-      emit('update:modelValue', '')
-      emit('update:searchValue', '')
-      emit('change', '')
-      nextTick(() => inputRef.value?.focus())
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: inputRef,
+      floatingRef: dropdownRef,
+      containerRef: rootRef,
+      placement: () => props.placement ?? 'bottom-start',
+      offset: () => props.offset ?? 4,
+      layout: 'fullscreen-sm',
+      matchReferenceWidth: true,
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      getContainer: () => props.getPopupContainer?.() ?? null,
+      onDismiss: handleDismiss
+    })
+
+    function handleSelect(option: AutoCompleteOption) {
+      if (option.disabled || effectiveDisabled.value) return
+      isEditing.value = false
+      setSearch(option.label)
+      setSelected(option.value, option)
+      closeDropdown()
     }
 
-    function handleKeyDown(e: KeyboardEvent) {
-      if (!isOpen.value) {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-          e.preventDefault()
-          openDropdown()
-        }
+    function handleInput(event: Event) {
+      if (effectiveDisabled.value) return
+      const next = (event.target as HTMLInputElement).value
+      isEditing.value = true
+      setSearch(next)
+      if (!isOpen.value) setOpen(true)
+      activeIndex.value = getInitialPickerActiveIndex(
+        filterAutoCompleteOptions(props.options, next, props.filterOption),
+        props.defaultActiveFirstOption
+      )
+    }
+
+    function handleClear(event: Event) {
+      event.preventDefault()
+      event.stopPropagation()
+      isEditing.value = true
+      setSearch('')
+      setSelected(undefined)
+      nextTick(() => inputRef.value?.focus())
+      if (!isOpen.value) setOpen(true)
+      activeIndex.value = getInitialPickerActiveIndex(props.options, props.defaultActiveFirstOption)
+    }
+
+    function handleFocus(event: FocusEvent) {
+      isEditing.value = true
+      openDropdown()
+      emit('focus', event)
+    }
+
+    function handleFocusOut(event: FocusEvent) {
+      const next = event.relatedTarget as Node | null
+      if (
+        (rootRef.value && next && rootRef.value.contains(next)) ||
+        (dropdownRef.value && next && dropdownRef.value.contains(next))
+      ) {
         return
       }
+      isEditing.value = false
+      commitCurrentQuery()
+      closeDropdown()
+      formItemControl?.onBlur()
+      emit('blur', event)
+    }
 
-      const options = filteredOptions.value
-      switch (e.key) {
-        case 'ArrowDown':
-        case 'ArrowUp':
-        case 'Home':
-        case 'End':
-          e.preventDefault()
-          activeIndex.value = getPickerNavigationIndex(options, activeIndex.value, e.key)
-          break
-        case 'Enter':
-          e.preventDefault()
-          if (activeIndex.value >= 0 && activeIndex.value < options.length) {
-            handleSelect(options[activeIndex.value])
-          } else {
-            constrainToOption()
-            closeDropdown()
-          }
-          break
-        case 'Escape':
-          e.preventDefault()
+    function handleKeyDown(event: KeyboardEvent) {
+      const intent = getAutoCompleteKeyIntent(event.key, isOpen.value, activeIndex.value)
+      switch (intent.type) {
+        case 'open':
+          event.preventDefault()
+          openDropdown()
+          return
+        case 'navigate':
+          event.preventDefault()
+          activeIndex.value = getPickerNavigationIndex(
+            filteredOptions.value,
+            activeIndex.value,
+            intent.key
+          )
+          return
+        case 'select-active': {
+          event.preventDefault()
+          const option = filteredOptions.value[activeIndex.value]
+          if (option) handleSelect(option)
+          return
+        }
+        case 'commit-query':
+          event.preventDefault()
+          isEditing.value = false
+          commitCurrentQuery()
           closeDropdown()
-          break
+          return
+        case 'close':
+          event.preventDefault()
+          isEditing.value = false
+          revertQuery()
+          closeDropdown()
+          return
+        default:
+          return
       }
     }
 
+    expose({
+      focus: () => inputRef.value?.focus(),
+      open: openDropdown,
+      close: closeDropdown,
+      input: inputRef
+    })
+
     return () => {
-      const containerClasses = classNames(autoCompleteBaseClasses, coerceClassValue(attrs.class))
+      const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+      const ariaLabel =
+        typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined
+      const attrLabelledby =
+        typeof restAttrs['aria-labelledby'] === 'string' ? restAttrs['aria-labelledby'] : undefined
+      const labelledby = attrLabelledby?.trim() ? attrLabelledby : formItemControl?.labelId.value
+      const describedBy = mergeAriaDescribedBy(
+        typeof restAttrs['aria-describedby'] === 'string'
+          ? restAttrs['aria-describedby']
+          : undefined,
+        formItemControl?.describedBy.value
+      )
+      const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
+      const effectiveId = attrId ?? formItemControl?.id.value
+      const effectiveName = props.name ?? formItemControl?.name.value
+      const expanded = isOpen.value && hasOptions.value
+      const comboboxAria = {
+        ...getPickerComboboxAria({
+          expanded,
+          listboxId,
+          activeIndex: expanded ? activeIndex.value : -1
+        }),
+        'aria-autocomplete': 'list' as const,
+        id: effectiveId,
+        name: effectiveName,
+        'aria-label': ariaLabel,
+        'aria-labelledby': labelledby,
+        'aria-describedby': describedBy,
+        'aria-invalid': status.value === 'error' ? true : undefined,
+        'aria-required': formItemControl?.required.value ? true : undefined
+      }
 
       const options = filteredOptions.value
-
-      return h(
-        'div',
-        {
-          ref: containerRef,
-          class: containerClasses
-        },
-        [
-          // Input
-          h('input', {
-            ref: inputRef,
-            type: 'text',
-            class: getAutoCompleteInputClasses(props.size, props.disabled, isOpen.value),
-            value: inputValue.value,
-            placeholder: props.placeholder,
-            disabled: props.disabled,
-            ...getPickerComboboxAria({
-              expanded: isOpen.value,
-              listboxId,
-              activeIndex: activeIndex.value
-            }),
-            autocomplete: 'off',
-            onInput: handleInput,
-            onFocus: openDropdown,
-            onKeydown: handleKeyDown,
-            onBlur: constrainToOption
-          }),
-
-          // Clear button
-          showClearButton.value
-            ? h(
-                'button',
-                {
-                  type: 'button',
-                  class:
-                    'absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-autocomplete-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-autocomplete-clear-hover,var(--tiger-text,#111827))] transition-colors',
-                  'aria-label': resolveLocaleText('Clear', mergedLocale.value?.common?.clearText),
-                  onClick: handleClear
-                },
-                [ClearIcon]
-              )
-            : null,
-
-          // Dropdown
-          isOpen.value && (options.length > 0 || inputValue.value)
-            ? renderVueOverlayTeleport(
-                h(
-                  'div',
-                  {
-                    ref: dropdownRef,
-                    ...(options.length > 0 ? getPickerListboxAria({ id: listboxId }) : {}),
-                    class: classNames(
-                      autoCompleteDropdownClasses,
-                      options.length === 0 && autoCompleteEmptyStateClasses,
-                      overlay.floatingClasses.value
-                    ),
-                    style: overlay.floatingStyles.value,
-                    'data-positioned': overlay.positioned.value
-                  },
-                  options.length > 0
-                    ? options.map((option, index) =>
-                        h(
+      const dropdown = isOpen.value
+        ? renderVueOverlayTeleport(
+            h(
+              'div',
+              {
+                ref: dropdownRef,
+                class: classNames(
+                  autoCompleteDropdownClasses,
+                  overlay.floatingClasses.value,
+                  props.dropdownClassName
+                ),
+                style: overlay.floatingStyles.value as CSSProperties,
+                'data-positioned': overlay.positioned.value,
+                'data-tiger-autocomplete-dropdown': '',
+                onMousedown: (event: Event) => event.preventDefault(),
+                onFocusout: handleFocusOut
+              },
+              [
+                hasOptions.value
+                  ? h(
+                      'div',
+                      {
+                        class: autoCompleteListboxClasses,
+                        style: getAutoCompletePanelStyle(props.listHeight),
+                        ...getPickerListboxAria({ id: listboxId })
+                      },
+                      options.map((option, index) => {
+                        const selectedFlag = isSameAutoCompleteValue(option.value, selected.value)
+                        const isActive = index === activeIndex.value
+                        return h(
                           'div',
                           {
+                            key: getAutoCompleteOptionKey(option, index),
                             id: getPickerOptionId(listboxId, index),
+                            'data-active': isActive || undefined,
                             ...getPickerOptionAria({
-                              selected: String(option.value) === String(props.modelValue),
+                              selected: selectedFlag,
                               disabled: !!option.disabled
                             }),
-                            class: getAutoCompleteOptionClasses(
-                              String(option.value) === String(props.modelValue),
-                              !!option.disabled,
-                              props.size
-                            ),
-                            onMousedown: (e: Event) => e.preventDefault(),
+                            class: getAutoCompleteOptionClasses({
+                              isSelected: selectedFlag,
+                              isDisabled: !!option.disabled,
+                              isActive,
+                              size: props.size
+                            }),
+                            onMousedown: (event: Event) => event.preventDefault(),
                             onClick: () => handleSelect(option),
                             onMouseenter: () => {
-                              activeIndex.value = index
+                              if (!option.disabled) activeIndex.value = index
                             }
                           },
                           option.label
                         )
-                      )
-                    : resolveLocaleText(
-                        'No matches found',
-                        props.emptyText,
-                        mergedLocale.value?.common?.emptyText
-                      )
-                ),
-                overlay.target.value
-              )
-            : null
+                      })
+                    )
+                  : h(
+                      'div',
+                      { class: autoCompleteEmptyStateClasses },
+                      props.loading
+                        ? (mergedLocale.value?.common?.loadingText ?? 'Loading...')
+                        : resolveLocaleText(emptyLabels.value.noResults, props.emptyText)
+                    ),
+                h('div', { class: autoCompleteDoneActionClasses }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: autoCompleteDoneButtonClasses,
+                      onClick: closeDropdown
+                    },
+                    selectLabels.value.doneText
+                  )
+                ])
+              ]
+            ),
+            overlay.target.value
+          )
+        : null
+
+      return h(
+        'div',
+        {
+          ref: rootRef,
+          class: getAutoCompleteRootClasses(
+            inputGroup != null,
+            classNames(props.className, coerceClassValue(attrClass))
+          ),
+          style: (attrStyle as CSSProperties) ?? undefined,
+          [TIGER_CHROME_ATTR]: '',
+          onAnimationend: () => rootRef.value?.classList.remove(SHAKE_CLASS)
+        },
+        [
+          h('div', { class: 'relative' }, [
+            h('input', {
+              ...restAttrs,
+              ref: inputRef,
+              type: 'text',
+              class: getAutoCompleteInputClasses({
+                size: props.size,
+                disabled: effectiveDisabled.value,
+                isOpen: isOpen.value,
+                status: status.value,
+                hasClear: showClear.value
+              }),
+              value: searchQuery.value,
+              placeholder: props.placeholder,
+              disabled: effectiveDisabled.value,
+              autocomplete: 'off',
+              onInput: handleInput,
+              onFocus: handleFocus,
+              onKeydown: handleKeyDown,
+              onFocusout: handleFocusOut,
+              ...comboboxAria
+            }),
+            showClear.value
+              ? h('span', { class: autoCompleteTrailingSlotClasses }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: autoCompleteClearButtonClasses,
+                      'data-tiger-autocomplete-clear': '',
+                      'aria-label': mergedLocale.value?.common?.clearText ?? 'Clear',
+                      onMousedown: (event: Event) => event.preventDefault(),
+                      onClick: handleClear
+                    },
+                    [iconVNode(closeSolidIcon20PathD, autoCompleteClearIconClasses)]
+                  )
+                ])
+              : null
+          ]),
+          dropdown
         ]
       )
     }

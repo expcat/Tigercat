@@ -3,9 +3,14 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { AutoComplete } from '@expcat/tigercat-vue/AutoComplete'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 const options = [
   { label: 'Apple', value: 'apple' },
@@ -20,263 +25,404 @@ const optionsWithDisabled = [
   { label: 'Cherry', value: 'cherry' }
 ]
 
-describe('AutoComplete', () => {
-  describe('Rendering', () => {
-    it('should render an input element', () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
+const cityOptions = [
+  { label: '北京 Beijing', value: 'beijing' },
+  { label: '上海 Shanghai', value: 'shanghai' },
+  { label: '深圳 Shenzhen', value: 'shenzhen' }
+]
 
-      const input = container.querySelector('input')
-      expect(input).toBeInTheDocument()
+const jumpOptions = [{ label: 'Apple', value: 'app' }]
+
+describe('AutoComplete', () => {
+  it('renders a combobox input', () => {
+    const { getByRole } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+    expect(input).toHaveAttribute('aria-haspopup', 'listbox')
+    expect(input).toHaveAttribute('aria-autocomplete', 'list')
+  })
+
+  it('opens on focus and filters while typing without committing', async () => {
+    const { getByRole, getByText, queryByText, emitted } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    expect(getByRole('listbox')).toBeInTheDocument()
+    await fireEvent.update(input, 'App')
+    expect(getByText('Apple')).toBeInTheDocument()
+    expect(queryByText('Banana')).not.toBeInTheDocument()
+    expect(emitted()['update:modelValue']).toBeUndefined()
+    expect(emitted()['search-change']?.at(-1)).toEqual(['App'])
+    expect(input).toHaveValue('App')
+  })
+
+  it('does not rewrite the query to a matching option label while typing', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        const value = ref<string | number | undefined>()
+        return () =>
+          h(AutoComplete, {
+            modelValue: value.value,
+            options: jumpOptions,
+            'aria-label': 'Fruit',
+            'onUpdate:modelValue': (next: string | number | undefined) => {
+              value.value = next
+            }
+          })
+      }
+    })
+    const { getByRole } = render(Wrapper)
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'app')
+    expect(input).toHaveValue('app')
+  })
+
+  it('commits the option value and shows its label on click', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: { options: cityOptions, 'aria-label': 'City' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.click(getByRole('option', { name: '北京 Beijing' }))
+    expect(emitted()['update:modelValue']?.at(-1)).toEqual(['beijing'])
+    expect(emitted().select?.at(-1)?.[0]).toBe('beijing')
+    expect(input).toHaveValue('北京 Beijing')
+  })
+
+  it('keeps typing beijing as beijing until an option is chosen', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        const value = ref<string | number | undefined>()
+        return () =>
+          h(AutoComplete, {
+            modelValue: value.value,
+            options: cityOptions,
+            'aria-label': 'City',
+            'onUpdate:modelValue': (next: string | number | undefined) => {
+              value.value = next
+            }
+          })
+      }
+    })
+    const { getByRole } = render(Wrapper)
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'beijing')
+    expect(input).toHaveValue('beijing')
+    await fireEvent.click(getByRole('option', { name: '北京 Beijing' }))
+    expect(input).toHaveValue('北京 Beijing')
+  })
+
+  it('uses defaultValue and defaultSearchValue when modelValue is omitted', async () => {
+    const { getByRole, rerender } = render(AutoComplete, {
+      props: { options, defaultValue: 'apple', 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    expect(input).toHaveValue('Apple')
+    await fireEvent.focus(input)
+    expect(getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'true')
+    await rerender({ options, defaultValue: 'apple', 'aria-label': 'Fruit' })
+    expect(input).toHaveValue('Apple')
+  })
+
+  it('uses defaultSearchValue when unselected', () => {
+    const { getByRole } = render(AutoComplete, {
+      props: { options, defaultSearchValue: 'q', 'aria-label': 'Query' }
+    })
+    expect(getByRole('combobox')).toHaveValue('q')
+  })
+
+  it('does not clear the query when options get a new identity while typing', async () => {
+    const { getByRole, rerender } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'Ch')
+    await rerender({ options: [...options], 'aria-label': 'Fruit' })
+    expect(input).toHaveValue('Ch')
+  })
+
+  it('closes on Tab and reports open-change', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h('div', [
+            h(AutoComplete, { options, 'aria-label': 'Fruit' }),
+            h('button', { type: 'button' }, 'Next')
+          ])
+      }
+    })
+    const { getByRole, queryByRole } = render(Wrapper)
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    input.focus()
+    await fireEvent.focusOut(input, { relatedTarget: getByRole('button', { name: 'Next' }) })
+    await waitFor(() => {
+      expect(queryByRole('listbox')).not.toBeInTheDocument()
+      expect(input).toHaveAttribute('aria-expanded', 'false')
     })
   })
 
-  describe('Dropdown', () => {
-    it('should open dropdown on focus', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-
-      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
+  it('does not commit while typing when allowFreeInput is false and reverts on blur', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: {
+        options,
+        defaultValue: 'apple',
+        allowFreeInput: false,
+        'aria-label': 'Fruit'
+      }
     })
-
-    it('should show filtered options when typing', async () => {
-      const { container, getByText, queryByText } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.update(input, 'App')
-
-      expect(getByText('Apple')).toBeInTheDocument()
-      expect(queryByText('Banana')).not.toBeInTheDocument()
-    })
-
-    it('should select option on click', async () => {
-      const { container, getByText, emitted, rerender } = render(AutoComplete, {
-        props: { options, modelValue: '' }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.click(getByText('Apple'))
-
-      expect(emitted()['update:modelValue']).toBeTruthy()
-      expect(emitted()['select']).toBeTruthy()
-      expect(emitted()['update:modelValue'].at(-1)).toEqual(['apple'])
-      await rerender({ options, modelValue: 'apple' })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'xyz')
+    expect(emitted()['update:modelValue']).toBeUndefined()
+    await fireEvent.focusOut(input, { relatedTarget: document.body })
+    await waitFor(() => {
       expect(input).toHaveValue('Apple')
     })
-    it('should show not found text when no matches', async () => {
-      const { container, getByText } = render(AutoComplete, {
-        props: { options, emptyText: 'Nothing found' }
-      })
+    expect(emitted()['update:modelValue']).toBeUndefined()
+  })
 
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.update(input, 'xyz nonexistent')
-
-      expect(getByText('Nothing found')).toBeInTheDocument()
+  it('commits free text on blur when allowFreeInput is true', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
     })
-
-    it('keeps focus on the outside click target and stays closed', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-      const outside = document.createElement('button')
-      document.body.appendChild(outside)
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
-
-      outside.focus()
-      await fireEvent.click(outside)
-      expect(document.body.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-      expect(outside).toHaveFocus()
-      outside.remove()
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'kiwi')
+    await fireEvent.focusOut(input, { relatedTarget: document.body })
+    await waitFor(() => {
+      expect(emitted()['update:modelValue']?.at(-1)).toEqual(['kiwi'])
     })
   })
 
-  describe('Clear', () => {
-    it('should clear value on clear click', async () => {
-      const { container, emitted } = render(AutoComplete, {
-        props: { options, modelValue: 'test', clearable: true }
-      })
+  it('selects the first option on Enter when defaultActiveFirstOption is true', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.keyDown(input, { key: 'Enter' })
+    expect(emitted().select?.at(-1)?.[0]).toBe('apple')
+  })
 
-      const clearBtn = container.querySelector('[aria-label="Clear"]')!
-      await fireEvent.click(clearBtn)
+  it('commits the query on Enter when defaultActiveFirstOption is false', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: { options, defaultActiveFirstOption: false, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'kiwi')
+    await fireEvent.keyDown(input, { key: 'Enter' })
+    expect(emitted().select).toBeUndefined()
+    expect(emitted()['update:modelValue']?.at(-1)).toEqual(['kiwi'])
+  })
 
-      expect(emitted()['update:modelValue']).toBeTruthy()
-      const lastEmit = emitted()['update:modelValue']
-      expect(lastEmit[lastEmit.length - 1]).toEqual([''])
+  it('clears once, keeps focus, and emits search-change', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: { options, defaultValue: 'apple', clearable: true, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.mouseDown(getByRole('button', { name: 'Clear' }))
+    await fireEvent.click(getByRole('button', { name: 'Clear' }))
+    await nextTick()
+    expect(emitted()['update:modelValue']?.at(-1)).toEqual([undefined])
+    expect(emitted()['search-change']?.at(-1)).toEqual([''])
+    expect(input).toHaveFocus()
+  })
+
+  it('skips disabled options with the keyboard and does not select them', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: {
+        options: optionsWithDisabled,
+        defaultActiveFirstOption: false,
+        'aria-label': 'Fruit'
+      }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.keyDown(input, { key: 'ArrowDown' })
+    await fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active', 'true')
+    await fireEvent.click(getByRole('option', { name: 'Banana' }))
+    expect(emitted().select).toBeUndefined()
+  })
+
+  it('moves to the first and last enabled options with Home and End', async () => {
+    const { getByRole } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit', defaultActiveFirstOption: false }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.keyDown(input, { key: 'End' })
+    expect(getByRole('option', { name: 'Date' })).toHaveAttribute('data-active', 'true')
+    await fireEvent.keyDown(input, { key: 'Home' })
+    expect(getByRole('option', { name: 'Apple' })).toHaveAttribute('data-active', 'true')
+  })
+
+  it('honors a controlled searchValue', async () => {
+    const { getByRole, emitted } = render(AutoComplete, {
+      props: { options, searchValue: 'Ban', 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    expect(input).toHaveValue('Ban')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'Bana')
+    expect(emitted()['update:searchValue']?.at(-1)).toEqual(['Bana'])
+    expect(emitted()['search-change']?.at(-1)).toEqual(['Bana'])
+  })
+
+  it('shows loading instead of empty when filterOption is false', async () => {
+    const { getByRole, getByText, queryByRole } = render(AutoComplete, {
+      props: { options: [], filterOption: false, loading: true, 'aria-label': 'Fruit' }
+    })
+    await fireEvent.focus(getByRole('combobox'))
+    expect(queryByRole('listbox')).not.toBeInTheDocument()
+    expect(getByText('Loading...')).toBeInTheDocument()
+  })
+
+  it('does not leave aria-controls pointing at a missing listbox', async () => {
+    const { getByRole } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'zzzz')
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+    expect(input).not.toHaveAttribute('aria-controls')
+  })
+
+  it('reads FormItem and validates the committed value', async () => {
+    const validator = vi.fn().mockResolvedValue(true)
+    const Wrapper = defineComponent({
+      setup() {
+        const model = ref({ fruit: undefined as string | undefined })
+        return () =>
+          h(
+            Form,
+            { model: model.value, rules: { fruit: [{ validator, trigger: 'change' }] } },
+            () =>
+              h(FormItem, { name: 'fruit', label: 'Fruit' }, () =>
+                h(AutoComplete, {
+                  options,
+                  'onUpdate:modelValue': (value: string | undefined) => {
+                    model.value = { fruit: value }
+                  }
+                })
+              )
+          )
+      }
+    })
+    const { getByRole, queryByText } = render(Wrapper)
+    const input = getByRole('combobox')
+    expect(input).toHaveAttribute('id')
+    await fireEvent.focus(input)
+    expect(queryByText(/required/i)).not.toBeInTheDocument()
+    await fireEvent.click(getByRole('option', { name: 'Apple' }))
+    await waitFor(() => {
+      expect(validator.mock.calls.some((call) => call[0] === 'apple')).toBe(true)
     })
   })
 
-  describe('Disabled', () => {
-    it('should disable the input when disabled', () => {
-      const { container } = render(AutoComplete, {
-        props: { options, disabled: true }
-      })
-
-      const input = container.querySelector('input')
-      expect(input).toBeDisabled()
+  it('exposes focus / open / close', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        const autoCompleteRef = ref<{ focus: () => void }>()
+        return () =>
+          h('div', [
+            h('button', { type: 'button', onClick: () => autoCompleteRef.value?.focus() }, 'Focus'),
+            h(AutoComplete, {
+              ref: autoCompleteRef,
+              options,
+              'aria-label': 'Ref'
+            })
+          ])
+      }
     })
-
-    it('should not open dropdown when disabled', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options, disabled: true }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
+    const { getByRole } = render(Wrapper)
+    await fireEvent.click(getByRole('button', { name: 'Focus' }))
+    expect(getByRole('combobox')).toHaveFocus()
   })
 
-  describe('Keyboard', () => {
-    it('should open on ArrowDown', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.keyDown(input, { key: 'ArrowDown' })
-
-      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
+  it('uses zh-TW empty and clear labels from the official locale object', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhTW }, () =>
+            h(AutoComplete, {
+              options,
+              defaultValue: 'apple',
+              clearable: true,
+              'aria-label': 'TW'
+            })
+          )
+      }
     })
-    it('should select on Enter', async () => {
-      const { container, emitted } = render(AutoComplete, {
-        props: { options, defaultActiveFirstOption: true }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.keyDown(input, { key: 'Enter' })
-
-      expect(emitted()['select']).toBeTruthy()
-    })
+    const { getByRole, getByText } = render(Wrapper)
+    expect(getByRole('button', { name: '清除' })).toBeInTheDocument()
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'zzzz')
+    expect(getByText('暫無結果')).toBeInTheDocument()
   })
 
-  describe('Accessibility', () => {
-    it('should have combobox role on input', () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      expect(input.getAttribute('role')).toBe('combobox')
-      expect(input.getAttribute('aria-expanded')).toBe('false')
-      expect(input.getAttribute('aria-haspopup')).toBe('listbox')
+  it('has no a11y violations when opened with a name', async () => {
+    const { container, getByRole } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Accessible autocomplete' }
     })
-
-    it('should update aria-expanded when open', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-
-      expect(input.getAttribute('aria-expanded')).toBe('true')
-    })
-    it('should have no accessibility violations', async () => {
-      const { container } = render(AutoComplete)
-      await expectNoA11yViolationsIsolated(container)
-    })
+    await fireEvent.focus(getByRole('combobox'))
+    await expectNoA11yViolations(container)
   })
 
-  describe('Filter', () => {
-    it('should use custom filter function', async () => {
-      const customFilter = (input: string, option: { label: string }) =>
-        option.label.startsWith(input)
-
-      const { container, getByText, queryByText } = render(AutoComplete, {
-        props: { options, filterOption: customFilter }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.update(input, 'Ch')
-
-      expect(getByText('Cherry')).toBeInTheDocument()
-      expect(queryByText('Apple')).not.toBeInTheDocument()
+  it('has no a11y violations when opened with no matches', async () => {
+    const { container, getByRole } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Empty autocomplete' }
     })
-
-    it('should not filter when filterOption is false', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options, filterOption: false }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.update(input, 'xyz')
-
-      const opts = document.body.querySelectorAll('[role="option"]')
-      expect(opts.length).toBe(4)
-    })
+    await fireEvent.focus(getByRole('combobox'))
+    await fireEvent.update(getByRole('combobox'), 'zzzz')
+    await expectNoA11yViolations(container)
   })
 
-  describe('Controlled display writeback', () => {
-    const cityOptions = [
-      { label: '北京 Beijing', value: 'beijing' },
-      { label: '上海 Shanghai', value: 'shanghai' },
-      { label: '深圳 Shenzhen', value: 'shenzhen' }
-    ]
-
-    it('shows option.label after selecting when parent writes back option.value', async () => {
-      const { container, getByText, emitted, rerender } = render(AutoComplete, {
-        props: { options: cityOptions, modelValue: '' }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.click(getByText('北京 Beijing'))
-
-      expect(emitted()['update:modelValue'].at(-1)).toEqual(['beijing'])
-      await rerender({ options: cityOptions, modelValue: 'beijing' })
-      expect(input).toHaveValue('北京 Beijing')
+  it('has no a11y violations inside a labelled FormItem', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(Form, () =>
+            h(FormItem, { name: 'fruit', label: 'Fruit' }, () => h(AutoComplete, { options }))
+          )
+      }
     })
+    const { container, getByRole } = render(Wrapper)
+    await fireEvent.focus(getByRole('combobox'))
+    await expectNoA11yViolations(container)
+  })
 
-    it('shows option.label when modelValue is an option value', async () => {
-      const { container, rerender } = render(AutoComplete, {
-        props: { options: cityOptions, modelValue: 'beijing' }
-      })
-
-      const input = container.querySelector('input')!
-      expect(input).toHaveValue('北京 Beijing')
-
-      await rerender({ options: cityOptions, modelValue: 'shanghai' })
-      expect(input).toHaveValue('上海 Shanghai')
+  it('uses a custom filter and keeps all options when filterOption is false', async () => {
+    const customFilter = (input: string, option: { label: string }) =>
+      option.label.startsWith(input)
+    const { getByRole, getByText, queryByText, rerender } = render(AutoComplete, {
+      props: { options, filterOption: customFilter, 'aria-label': 'Fruit' }
     })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    await fireEvent.update(input, 'Ch')
+    expect(getByText('Cherry')).toBeInTheDocument()
+    expect(queryByText('Apple')).not.toBeInTheDocument()
+    await rerender({ options, filterOption: false, 'aria-label': 'Fruit' })
+    await fireEvent.update(input, 'xyz')
+    expect(getByRole('listbox').querySelectorAll('[role="option"]')).toHaveLength(4)
+  })
 
-    it('resolves option.label when options arrive after the controlled value', async () => {
-      const { container, rerender } = render(AutoComplete, {
-        props: { options: [], modelValue: 'beijing' }
-      })
-
-      const input = container.querySelector('input')!
-      expect(input).toHaveValue('beijing')
-
-      await rerender({ options: cityOptions, modelValue: 'beijing' })
-      expect(input).toHaveValue('北京 Beijing')
+  it('disables the input', () => {
+    const { getByRole } = render(AutoComplete, {
+      props: { options, disabled: true, 'aria-label': 'Fruit' }
     })
-
-    it('keeps unmatched free input after writeback', async () => {
-      const { container, rerender } = render(AutoComplete, {
-        props: { options: cityOptions, modelValue: '' }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.update(input, 'not-a-city')
-      await rerender({ options: cityOptions, modelValue: 'not-a-city' })
-      expect(input).toHaveValue('not-a-city')
-    })
+    expect(getByRole('combobox')).toBeDisabled()
   })
 })

@@ -35,7 +35,11 @@ export type { VueSelectProps, SelectProps, SelectOption, SelectOptions } from '.
 export { Cascader } from './components/Cascader'
 export type { VueCascaderProps } from './components/Cascader'
 export { AutoComplete } from './components/AutoComplete'
-export type { VueAutoCompleteProps } from './components/AutoComplete'
+export type {
+  VueAutoCompleteProps,
+  AutoCompleteProps,
+  AutoCompleteOption
+} from './components/AutoComplete'
 export { Signature } from './components/Signature'
 export type { VueSignatureProps } from './components/Signature'
 export { NumberKeyboard } from './components/NumberKeyboard'

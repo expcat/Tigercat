@@ -88,7 +88,7 @@ export { Cascader } from './components/Cascader'
 export type { CascaderProps } from './components/Cascader'
 
 export { AutoComplete } from './components/AutoComplete'
-export type { AutoCompleteProps } from './components/AutoComplete'
+export type { AutoCompleteProps, AutoCompleteOption } from './components/AutoComplete'
 export { Signature } from './components/Signature'
 export type { SignatureProps, SignatureRef } from './components/Signature'
 export { NumberKeyboard } from './components/NumberKeyboard'
