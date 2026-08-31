@@ -5,9 +5,9 @@ import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
 
 const open = ref(false)
 const photos = [
-  'https://picsum.photos/seed/tiger-preview-1/800/600',
-  'https://picsum.photos/seed/tiger-preview-2/800/600',
-  'https://picsum.photos/seed/tiger-preview-3/800/600'
+  { src: 'https://picsum.photos/seed/tiger-preview-1/800/600', alt: '林间小径' },
+  { src: 'https://picsum.photos/seed/tiger-preview-2/800/600', alt: '湖面倒影' },
+  { src: 'https://picsum.photos/seed/tiger-preview-3/800/600', alt: '山脊云雾' }
 ]
 </script>
 

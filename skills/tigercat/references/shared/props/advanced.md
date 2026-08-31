@@ -44,13 +44,19 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## ImageViewer
 
-`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 3/13 props
+`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 7/19 props
 
-| Prop      | Type                   | Default | Notes                                                   |
-| --------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `images`  | `string[]`             | `-`     | Array of image URLs to preview                          |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
-| `open?`   | `boolean`              | `-`     | Whether the preview is open                             |
+Note: ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。
+
+| Prop            | Type                   | Default | Notes                                                                                     |
+| --------------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `images`        | `ImageLightboxItem[]`  | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
+| `open?`         | `boolean`              | `-`     | Whether the preview is open                                                               |
+| `currentIndex?` | `number`               | `0`     | Current image index (for multi-image preview)                                             |
+| `showNav?`      | `boolean`              | `true`  | Whether previous/next controls and arrow-key navigation are shown. Hidden for a single... |
+| `minZoom?`      | `number`               | `-`     | Alias of `minScale`. Prefer `minScale` on new call sites.                                 |
+| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                                   |
+| `maxZoom?`      | `number`               | `-`     | Alias of `maxScale`. Prefer `maxScale` on new call sites.                                 |
 
 ## InfiniteScroll
 

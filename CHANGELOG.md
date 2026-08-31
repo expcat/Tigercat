@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **ImagePreview / ImageViewer 一套全屏看图**：同一棵 overlay dialog（portal host 链、滚锁、焦点陷阱、Escape 栈、`OVERLAY_Z_INDEX.modal`）。ImageViewer 是配置别名（`minZoom`/`maxZoom` → `minScale`/`maxScale`，`onClose` 仍在关时触发）。指针手势一份（capture + document pointermove）；滚轮 `applyWheelZoom` 且 `{ passive: false }`。`currentIndex` 夹紧；空 `images` emit 关闭；切图/重开清变换；到头 disable 不循环。`images` 支持 `{ src, alt? }`；chrome 走 `locale.imageViewer`；导航/关闭用逻辑 inset。删除第二套 DOM、`ImagePreviewToolbarAction`、`clampZoom`、假 `--tiger-image-mask` token。
 - **Image / ImageGroup**：默认 preview 是可聚焦 `<button>`，读屏名走 `locale.image`（不再写死 Preview image）。preview 开启时内层 img `alt=""`。`onLoad` / `srcSet` / `sizes` 落在 `<img>`，React `forwardRef` 指向 img。fallback 二次失败走 error 槽；加载中用 spinner 叠在 img 上，不再画损坏图标。`previewTrigger="hover"` 仍可用 focus 和 click。ImageGroup 按实例 id 登记（重复 src 合法），登记表走 state；`getImageGroupClasses` 合并而非替换；组 `preview={false}` 时子图不是按钮。
 - **Marquee**：clone 同时 `inert` + `aria-hidden`，Tab 只落在第一份。无名默认不是 landmark（删硬编码 `Scrolling content` / `DEFAULT_MARQUEE_ARIA_LABEL`，短语在 `locale.marquee.ariaLabel`）。横向 `left`/`right` 走逻辑方向；纵向视口吃第一份，repeat 不再撑高。`repeat < 2`（含 0）静态一份；短内容不自动铺满。`pauseOnHover` 只管指针，焦点暂停是 `pauseOnFocus`（默认开）；受控 `paused`。style inject 以 DOM 节点为准，React `useLayoutEffect` / Vue `onMounted`。
 - **排版 + Icon**：Icon fill 不再描边；SVG 构造与 1.5 线宽在 core。Link `_blank` 合并安全 rel、disabled 保留 href、静止态下划线。Text `align` 用 start/end，非法 tag 回退 `p`。Code 复制状态、live region、逻辑 end。Kbd 组合键可读名；Highlight 保树，`global={false}` 是每个 keyword 一次。

@@ -1,7 +1,7 @@
 {
   "id": "image-05",
   "title": "ImagePreview",
-  "description": "用一份 open 状态受控打开独立 ImagePreview，并通过 currentIndex 指定初始图片。",
+  "description": "独立 ImagePreview：open + 带 alt 的 images。点缩略图打开同一层见 01 / 04。",
   "entry": "App.vue",
   "order": 5,
   "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }

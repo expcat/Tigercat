@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
 
 const images = [
-  'https://picsum.photos/seed/tiger-controlled-viewer-1/800/600',
-  'https://picsum.photos/seed/tiger-controlled-viewer-2/800/600',
-  'https://picsum.photos/seed/tiger-controlled-viewer-3/800/600'
+  { src: 'https://picsum.photos/seed/tiger-controlled-viewer-1/800/600', alt: '林间小径' },
+  { src: 'https://picsum.photos/seed/tiger-controlled-viewer-2/800/600', alt: '湖面倒影' },
+  { src: 'https://picsum.photos/seed/tiger-controlled-viewer-3/800/600', alt: '山脊云雾' }
 ]
 
 const open = ref(false)
@@ -20,39 +21,32 @@ const openImage = (index: number) => {
 
 const handleOpenChange = (nextOpen: boolean) => {
   open.value = nextOpen
+  if (!nextOpen) {
+    status.value = `查看器已从第 ${currentIndex.value + 1} 张图片关闭`
+  }
 }
 
 const handleCurrentIndexChange = (nextIndex: number) => {
   currentIndex.value = nextIndex
   status.value = `已切换到第 ${nextIndex + 1} 张图片`
 }
-
-const handleClose = () => {
-  status.value = `查看器已从第 ${currentIndex.value + 1} 张图片关闭`
-}
 </script>
 
 <template>
   <div class="space-y-3">
     <div class="flex flex-wrap gap-2" role="group" aria-label="选择要查看的图片">
-      <button
-        v-for="(_, index) in images"
-        :key="index"
-        type="button"
-        class="rounded px-3 py-1.5 text-sm"
-        :class="
-          currentIndex === index
-            ? 'bg-blue-600 text-white'
-            : 'border border-gray-300 dark:border-gray-600'
-        "
-        :aria-pressed="currentIndex === index"
+      <Button
+        v-for="(image, index) in images"
+        :key="image.src"
+        size="sm"
+        :variant="currentIndex === index ? 'primary' : 'secondary'"
         @click="openImage(index)">
-        打开图片 {{ index + 1 }}
-      </button>
+        打开 {{ image.alt }}
+      </Button>
     </div>
 
-    <p class="text-sm text-gray-500" aria-live="polite">
-      {{ status }}；缩放范围 0.75×–2×，遮罩点击不会关闭。
+    <p class="text-sm text-[var(--tiger-text-secondary,#6b7280)]" aria-live="polite">
+      {{ status }}；缩放范围 0.75×–2×，遮罩点击不会关闭。切图后缩放回到 1。
     </p>
 
     <ImageViewer
@@ -63,7 +57,6 @@ const handleClose = () => {
       :max-zoom="2"
       :mask-closable="false"
       @update:open="handleOpenChange"
-      @update:current-index="handleCurrentIndexChange"
-      @close="handleClose" />
+      @update:current-index="handleCurrentIndexChange" />
   </div>
 </template>

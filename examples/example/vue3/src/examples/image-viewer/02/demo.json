@@ -1,7 +1,7 @@
 {
   "id": "image-viewer-02",
   "title": "索引、缩放与关闭控制",
-  "description": "受控 currentIndex 跟随导航回调更新，将缩放限制在 0.75×–2×，并记录关闭事件。",
+  "description": "受控 currentIndex；minZoom/maxZoom 限制缩放。切图后变换重置为 1。关闭走 v-model:open。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

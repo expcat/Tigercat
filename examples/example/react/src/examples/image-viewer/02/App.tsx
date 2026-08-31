@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { Button } from '@expcat/tigercat-react/Button'
 import { ImageViewer } from '@expcat/tigercat-react/ImageViewer'
 
 const images = [
-  'https://picsum.photos/seed/tiger-controlled-viewer-1/800/600',
-  'https://picsum.photos/seed/tiger-controlled-viewer-2/800/600',
-  'https://picsum.photos/seed/tiger-controlled-viewer-3/800/600'
+  { src: 'https://picsum.photos/seed/tiger-controlled-viewer-1/800/600', alt: '林间小径' },
+  { src: 'https://picsum.photos/seed/tiger-controlled-viewer-2/800/600', alt: '湖面倒影' },
+  { src: 'https://picsum.photos/seed/tiger-controlled-viewer-3/800/600', alt: '山脊云雾' }
 ]
 
 export default function App() {
@@ -20,6 +21,9 @@ export default function App() {
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen)
+    if (!nextOpen) {
+      setStatus(`查看器已从第 ${currentIndex + 1} 张图片关闭`)
+    }
   }
 
   const handleCurrentIndexChange = (nextIndex: number) => {
@@ -27,31 +31,22 @@ export default function App() {
     setStatus(`已切换到第 ${nextIndex + 1} 张图片`)
   }
 
-  const handleClose = () => {
-    setStatus(`查看器已从第 ${currentIndex + 1} 张图片关闭`)
-  }
-
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2" role="group" aria-label="选择要查看的图片">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            className={`rounded px-3 py-1.5 text-sm ${
-              currentIndex === index
-                ? 'bg-blue-600 text-white'
-                : 'border border-gray-300 dark:border-gray-600'
-            }`}
-            aria-pressed={currentIndex === index}
+        {images.map((image, index) => (
+          <Button
+            key={image.src}
+            size="sm"
+            variant={currentIndex === index ? 'primary' : 'secondary'}
             onClick={() => openImage(index)}>
-            打开图片 {index + 1}
-          </button>
+            打开 {image.alt}
+          </Button>
         ))}
       </div>
 
-      <p className="text-sm text-gray-500" aria-live="polite">
-        {status}；缩放范围 0.75×–2×，遮罩点击不会关闭。
+      <p className="text-sm text-[var(--tiger-text-secondary,#6b7280)]" aria-live="polite">
+        {status}；缩放范围 0.75×–2×，遮罩点击不会关闭。切图后缩放回到 1。
       </p>
 
       <ImageViewer
@@ -63,7 +58,6 @@ export default function App() {
         maskClosable={false}
         onOpenChange={handleOpenChange}
         onCurrentIndexChange={handleCurrentIndexChange}
-        onClose={handleClose}
       />
     </div>
   )

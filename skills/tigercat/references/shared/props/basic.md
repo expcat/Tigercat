@@ -262,7 +262,7 @@ Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `loc
 
 `packages/core/src/types/image.ts` · `ImageGroupProps`
 
-Note: 只收集子 Image 的 URL，不是图库布局；间距用 class。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。
+Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。
 
 | Prop         | Type      | Default | Notes                                                     |
 | ------------ | --------- | ------- | --------------------------------------------------------- |
@@ -271,13 +271,18 @@ Note: 只收集子 Image 的 URL，不是图库布局；间距用 class。组 `p
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/12 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 6/16 props
 
-| Prop      | Type                   | Default | Notes                                                   |
-| --------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `images`  | `string[]`             | `-`     | Array of image URLs to preview                          |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
-| `open?`   | `boolean`              | `-`     | Whether the preview is open                             |
+Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。与 ImageViewer 同一 dialog。到头 disable；空列表关闭。
+
+| Prop            | Type                   | Default | Notes                                                                  |
+| --------------- | ---------------------- | ------- | ---------------------------------------------------------------------- |
+| `images`        | `ImageLightboxItem[]`  | `-`     | Gallery entries to preview. Required; an empty list closes the dialog. |
+| `open?`         | `boolean`              | `-`     | Whether the preview is open                                            |
+| `currentIndex?` | `number`               | `0`     | Current image index (for multi-image preview)                          |
+| `maskClosable?` | `boolean`              | `true`  | Whether clicking the mask closes the preview                           |
+| `minScale?`     | `number`               | `0.25`  | Minimum scale factor                                                   |
+| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                |
 
 ## Kbd
 

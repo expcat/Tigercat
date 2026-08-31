@@ -13,6 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 | Component    | Uses                                                          | Notes                                                                                                                                               |
 | ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ImageViewer  | -                                                             | ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。                                                 |
 | Kanban       | `TaskBoard`                                                   | Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。                                              |
 | VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。 |
 
