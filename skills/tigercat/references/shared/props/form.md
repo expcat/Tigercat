@@ -28,15 +28,20 @@ Note: 打字只改 query，点选项才 `onChange(option.value)`。未选是 `un
 
 ## Cascader
 
-`packages/core/src/types/cascader.ts` · `CascaderProps` · 5/18 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 8/30 props
 
-| Prop        | Type                   | Default | Notes                                                                                      |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `options?`  | `CascaderOption[]`     | `-`     | Cascader options data                                                                      |
-| `disabled?` | `boolean`              | `false` | Whether the cascader is disabled                                                           |
-| `virtual?`  | `boolean`              | `false` | Whether to use virtual scrolling for large column / search lists. When enabled, only vi... |
-| `value?`    | `CascaderValue`        | `-`     | Current selected value path                                                                |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                                    |
+Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。
+
+| Prop              | Type                              | Default   | Notes                                                             |
+| ----------------- | --------------------------------- | --------- | ----------------------------------------------------------------- |
+| `options?`        | `CascaderOption[]`                | `-`       | Cascader options data                                             |
+| `value?`          | `CascaderModelValue`              | `-`       | Selected path. `undefined` is empty / uncontrolled.               |
+| `defaultValue?`   | `CascaderModelValue`              | `-`       | Initial path when `value` is omitted.                             |
+| `searchable?`     | `boolean \| CascaderSearchConfig` | `false`   | Whether to allow search/filter                                    |
+| `changeOnSelect?` | `boolean`                         | `false`   | Whether to select value on each level (not just leaf)             |
+| `expandTrigger?`  | `CascaderExpandTrigger`           | `'click'` | Trigger type for expanding sub-options                            |
+| `clearable?`      | `boolean`                         | `true`    | Whether to allow clearing the selection                           |
+| `virtual?`        | `boolean`                         | `false`   | Whether to use virtual scrolling for large column / search lists. |
 
 ## Checkbox
 
@@ -365,14 +370,20 @@ Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React �
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/17 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 8/36 props
 
-| Prop        | Type                   | Default | Notes                                                                                     |
-| ----------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `disabled?` | `boolean`              | `-`     | Whether the component is disabled                                                         |
-| `virtual?`  | `boolean`              | `false` | Enable virtualized rendering of the dropdown tree. Visible flattened rows are rendered... |
-| `value?`    | `TreeSelectValue`      | `-`     | Controlled value                                                                          |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale                                   |
+Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。
+
+| Prop                | Type              | Default | Notes                                                                                      |
+| ------------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `treeData?`         | `TreeNode[]`      | `-`     | Tree data                                                                                  |
+| `value?`            | `TreeSelectValue` | `-`     | Selected key(s). `undefined` is empty / uncontrolled; `''` is a legal key.                 |
+| `defaultValue?`     | `TreeSelectValue` | `-`     | Initial value when `value` is omitted.                                                     |
+| `multiple?`         | `boolean`         | `false` | Multiple selection with checkboxes. Parent/child cascade follows `checkStrictly` / `che... |
+| `searchable?`       | `boolean`         | `-`     | Whether to show search input in the trigger when open                                      |
+| `clearable?`        | `boolean`         | `-`     | Whether to show clear button                                                               |
+| `virtual?`          | `boolean`         | `false` | Enable virtualized rendering of the dropdown tree.                                         |
+| `defaultExpandAll?` | `boolean`         | `-`     | Whether to expand all tree nodes by default                                                |
 
 ## Upload
 

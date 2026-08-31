@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
 
-const value = ref<(string | number)[]>([])
+const value = ref<(string | number)[] | undefined>(undefined)
 const options = [
   {
     label: '浙江',
@@ -27,5 +28,7 @@ const options = [
 </script>
 
 <template>
-  <Cascader v-model="value" :options="options" placeholder="请选择地区" class="w-full max-w-sm" />
+  <FormItem label="地区" class="w-full max-w-sm">
+    <Cascader v-model="value" :options="options" />
+  </FormItem>
 </template>

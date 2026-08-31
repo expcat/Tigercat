@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Cascader } from '@expcat/tigercat-react/Cascader'
 
 const options = [
@@ -24,15 +25,11 @@ const options = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<(string | number)[]>([])
+  const [value, setValue] = useState<(string | number)[] | undefined>(undefined)
 
   return (
-    <Cascader
-      value={value}
-      onChange={setValue}
-      options={options}
-      placeholder="请选择地区"
-      className="w-full max-w-sm"
-    />
+    <FormItem label="地区" className="w-full max-w-sm">
+      <Cascader value={value} onChange={setValue} options={options} />
+    </FormItem>
   )
 }

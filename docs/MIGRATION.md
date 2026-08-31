@@ -4,6 +4,10 @@
 
 ## 未发布
 
+Cascader 未选是 `undefined`（不要再用 `[]` 当空）。Clear 发出 `undefined`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）和 `loadData`。打开不再清空 `defaultSearchValue`。trigger 不再是 native `button`，而是 `role="combobox"`；搜索时 combobox 是输入框。列模式只有当前列是 `listbox`。空态走 `empty.noResults`，placeholder 走 `select.placeholder`。删除假 token `--tiger-cascader-*`。Vue 主入口导出 `CascaderProps` 与 `CascaderOption`。
+
+TreeSelect 未选是 `undefined`（多选 `[]`），`''` / `0` 是合法 key。新增 `defaultValue` / `open` / `expandedKeys` / `loadData`。下拉是 `role="tree"`，不是扁平 listbox。多选接 Tree 的 checkbox + `checkStrictly`（默认 true）/ `checkStrategy`。空态走 `empty.noResults`。删除假 token `--tiger-treeselect-*` 以及 `flattenTreeSelectNodes` / `filterTreeSelectNodes` / `findTreeSelectNode` / `getAllTreeSelectKeys`（改用 `tree-utils`）。Vue 主入口导出 `TreeSelectProps` 与 `TreeSelectValue`。
+
 AutoComplete 的 `value` / `modelValue` 只表示已提交值，输入框走 `searchValue`。打字不再每键 `onChange` / `update:modelValue`。未选是 `undefined`（不要再用 `''` 当空）；`''` 是合法已选值。Clear 发出 `undefined`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用 blur 提交或关掉该 prop。空态走 `empty.noResults`。删除假 token `--tiger-autocomplete-*`。Vue 主入口导出 `AutoCompleteProps` 与 `AutoCompleteOption`。
 
 Select 未选是 `undefined`（多选 `[]`），`''` 是合法选项值。React `onChange` 单选 Clear 第一参是 `undefined`，不要 `next ?? ''`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。搜索输入即时更新，`onSearchChange` 才 debounce；React 即时通道是 `onSearchValueChange`。trigger 不再是 native `button`，而是 `role="combobox"`；搜索时 combobox 是输入框。选项不再抢焦点（`aria-activedescendant`）。删除假 token `--tiger-select-*`。`listHeight` 是面板内容区高度。Vue 主入口导出 `SelectProps`。

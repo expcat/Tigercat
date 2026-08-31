@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
 
-const value = ref<(string | number)[]>([])
+const value = ref<(string | number)[] | undefined>(undefined)
 const options = [
   {
     label: '产品',
@@ -24,10 +24,5 @@ const options = [
 </script>
 
 <template>
-  <Cascader
-    v-model="value"
-    :options="options"
-    searchable
-    placeholder="搜索部门"
-    class="w-full max-w-sm" />
+  <Cascader v-model="value" :options="options" searchable class="w-full max-w-sm" />
 </template>

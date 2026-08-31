@@ -109,6 +109,14 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       "打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。"
   },
+  Cascader: {
+    notes:
+      'value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。'
+  },
+  TreeSelect: {
+    notes:
+      "选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。"
+  },
   Icon: {
     notes:
       '内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。'

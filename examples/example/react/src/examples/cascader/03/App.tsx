@@ -3,20 +3,17 @@ import { Cascader } from '@expcat/tigercat-react/Cascader'
 
 const options = [
   {
-    label: '产品',
-    value: 'product',
+    label: '华东',
+    value: 'east',
     children: [
-      { label: '设计', value: 'design' },
-      { label: '运营', value: 'operations' }
+      { label: '上海', value: 'shanghai' },
+      { label: '杭州', value: 'hangzhou' }
     ]
   },
   {
-    label: '研发',
-    value: 'engineering',
-    children: [
-      { label: '前端', value: 'frontend' },
-      { label: '后端', value: 'backend' }
-    ]
+    label: '华南',
+    value: 'south',
+    children: [{ label: '广州', value: 'guangzhou' }]
   }
 ]
 
@@ -28,7 +25,8 @@ export default function App() {
       value={value}
       onChange={setValue}
       options={options}
-      searchable
+      changeOnSelect
+      expandTrigger="hover"
       className="w-full max-w-sm"
     />
   )

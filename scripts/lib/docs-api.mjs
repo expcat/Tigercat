@@ -244,6 +244,28 @@ export const COMPONENT_PROP_PRIORITY = {
     'clearable?',
     'open?',
     'loading?'
+  ],
+  Cascader: [
+    'options?',
+    'value?',
+    'defaultValue?',
+    'searchable?',
+    'changeOnSelect?',
+    'expandTrigger?',
+    'clearable?',
+    'virtual?',
+    'open?'
+  ],
+  TreeSelect: [
+    'treeData?',
+    'value?',
+    'defaultValue?',
+    'multiple?',
+    'searchable?',
+    'clearable?',
+    'virtual?',
+    'defaultExpandAll?',
+    'open?'
   ]
 }
 
@@ -399,7 +421,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Slider: '<Slider v-model="value" />',
     Stepper: '<Stepper v-model="value" />',
     Select: '<Select v-model="value" :options="options" />',
-    AutoComplete: '<AutoComplete v-model="value" :options="options" />'
+    AutoComplete: '<AutoComplete v-model="value" :options="options" />',
+    Cascader: '<Cascader v-model="value" :options="options" />',
+    TreeSelect: '<TreeSelect v-model="value" :tree-data="treeData" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -444,7 +468,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Stepper: '<Stepper value={value} onChange={setValue} />',
     Select: '<Select value={value} options={options} onChange={(next) => setValue(next)} />',
     AutoComplete:
-      '<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />'
+      '<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />',
+    Cascader: '<Cascader value={value} options={options} onChange={(next) => setValue(next)} />',
+    TreeSelect:
+      '<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />'
   }
 }
 

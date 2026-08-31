@@ -1,0 +1,12 @@
+{
+  "id": "tree-select-03",
+  "title": "多选",
+  "description": "multiple 勾选多个 key",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

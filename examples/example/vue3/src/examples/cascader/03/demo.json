@@ -1,0 +1,12 @@
+{
+  "id": "cascader-03",
+  "title": "选中即改 / 悬停展开",
+  "description": "changeOnSelect 提交中间级，expandTrigger=hover 展开子列",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

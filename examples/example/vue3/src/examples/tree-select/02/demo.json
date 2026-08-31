@@ -1,7 +1,7 @@
 {
   "id": "tree-select-02",
-  "title": "可搜索",
-  "description": "searchable 开启搜索",
+  "title": "搜索与清除",
+  "description": "searchable 过滤节点，clearable 清空已选",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

@@ -3,26 +3,26 @@ import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
 
 const treeData = [
   {
-    key: 'china',
-    label: '中国',
+    key: 'eng',
+    label: '工程',
     children: [
-      { key: 'beijing', label: '北京' },
-      { key: 'shanghai', label: '上海' }
+      { key: 'fe', label: '前端' },
+      { key: 'be', label: '后端' }
     ]
   },
-  { key: 'singapore', label: '新加坡' }
+  { key: 'design', label: '设计' }
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number | undefined>(undefined)
+  const [value, setValue] = useState<(string | number)[] | undefined>(undefined)
 
   return (
     <TreeSelect
       value={value}
       onChange={setValue}
       treeData={treeData}
-      searchable
-      clearable
+      multiple
+      defaultExpandAll
       className="w-full max-w-sm"
     />
   )
