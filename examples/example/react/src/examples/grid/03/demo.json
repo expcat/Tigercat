@@ -1,7 +1,7 @@
 {
   "id": "grid-03",
   "title": "对齐与 Flex",
-  "description": "一个 Row 组合展示 justify、align、wrap=false 与固定/自适应 flex。",
+  "description": "justify、align、wrap=false。传入 flex 即走 flex 项，不必再写 span={0}。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

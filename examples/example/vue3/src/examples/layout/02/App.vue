@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { Layout } from '@expcat/tigercat-vue/Layout'
-import { Header } from '@expcat/tigercat-vue/Header'
-import { Content } from '@expcat/tigercat-vue/Content'
-import { Footer } from '@expcat/tigercat-vue/Footer'
+import { Container } from '@expcat/tigercat-vue/Container'
+
+const box =
+  'rounded border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] p-3 text-sm'
 </script>
 
 <template>
-  <Layout class="min-h-64 overflow-hidden rounded border border-gray-300">
-    <Header class="!bg-blue-600 !p-4 !text-white">Header</Header>
-    <Content class="!p-4">Content</Content>
-    <Footer class="!bg-gray-800 !p-4 !text-white">Footer</Footer>
-  </Layout>
+  <div class="space-y-3">
+    <Container :max-width="false" :class-name="box">
+      maxWidth=false：无 max-width，仍 width 100%
+    </Container>
+    <Container max-width="full" :class-name="box"> maxWidth="full"：max-width 100% </Container>
+    <Container max-width="lg" :class-name="box">
+      maxWidth="lg"：max-width 跟 --tiger-breakpoint-lg
+    </Container>
+    <Container max-width="lg" :padding="false" :center="false" :class-name="box">
+      padding 与 center 都关掉
+    </Container>
+  </div>
 </template>

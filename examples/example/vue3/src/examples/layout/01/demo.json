@@ -1,7 +1,7 @@
 {
   "id": "layout-01",
-  "title": "Container 容器",
-  "description": "最小 Container 示例，组合展示 maxWidth、居中和响应式内边距。",
+  "title": "默认 Layout 壳",
+  "description": "默认 Header / Content / Footer。固定高度时 overflow 在 Content 上；玻璃顶栏 sticky 盖住滚动内容。预览里第二个 Content 用 as=div，避免一页两个 main。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

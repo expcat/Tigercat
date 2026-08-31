@@ -1,7 +1,7 @@
 {
   "id": "grid-02",
-  "title": "响应式栅格",
-  "description": "使用 xs、md、lg 断点改变两列的 span。",
+  "title": "响应式与偏移",
+  "description": "数字 gutter={16} 只开横缝。offset、span=0 隐藏、dir=rtl 下 offset 走逻辑边。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

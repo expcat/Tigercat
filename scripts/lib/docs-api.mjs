@@ -40,7 +40,13 @@ export const BEHAVIOR_PROP_STEMS = new Set([
   'conditions',
   'rules',
   'name',
-  'animated'
+  'animated',
+  'collapsed',
+  'wrap',
+  'flex',
+  'gutter',
+  'hasSider',
+  'fullHeight'
 ])
 
 export const COMPONENT_PROP_PRIORITY = {
@@ -94,6 +100,14 @@ export const COMPONENT_PROP_PRIORITY = {
   Rate: ['allowHalf?', 'allowClear?', 'character?', 'readOnly?', 'disabled?', 'size?', 'count?'],
   Segmented: ['options?', 'block?', 'disabled?', 'size?', 'name?'],
   Watermark: ['content?', 'font?', 'gapX?', 'gapY?', 'image?', 'rotate?'],
+  Layout: ['hasSider?', 'fullHeight?', 'direction?'],
+  Header: ['variant?', 'height?'],
+  Sidebar: ['collapsed?', 'width?', 'collapsedWidth?', 'side?'],
+  Content: ['as?', 'padding?'],
+  Footer: ['as?', 'height?'],
+  Container: ['maxWidth?', 'center?', 'padding?', 'as?'],
+  Row: ['gutter?', 'wrap?', 'align?', 'justify?'],
+  Col: ['span?', 'flex?', 'offset?', 'order?'],
   Button: [
     'variant?',
     'size?',

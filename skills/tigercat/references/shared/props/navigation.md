@@ -168,11 +168,11 @@ Note: 菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider
 
 `packages/core/src/types/menu.ts` · `MenuProps` · 3/18 props
 
-| Prop     | Type         | Default      | Notes                                                                 |
-| -------- | ------------ | ------------ | --------------------------------------------------------------------- |
-| `items?` | `MenuItem[]` | `-`          | Data-driven menu items. Slot/children based usage is still supported. |
-| `mode?`  | `MenuMode`   | `'vertical'` | Menu mode - horizontal, vertical, or inline                           |
-| `theme?` | `MenuTheme`  | `'light'`    | Menu theme - light or dark                                            |
+| Prop         | Type         | Default      | Notes                                                                                      |
+| ------------ | ------------ | ------------ | ------------------------------------------------------------------------------------------ |
+| `items?`     | `MenuItem[]` | `-`          | Data-driven menu items. Slot/children based usage is still supported.                      |
+| `collapsed?` | `boolean`    | `false`      | Whether the menu is collapsed (for vertical mode) When used with `mode="inline"`, colla... |
+| `mode?`      | `MenuMode`   | `'vertical'` | Menu mode - horizontal, vertical, or inline                                                |
 
 ### Collapsed mode behavior
 
@@ -188,21 +188,21 @@ Note: 菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider
 
 `packages/core/src/types/menu.ts` · `MenuItemProps` · 3/7 props
 
-| Prop        | Type      | Default | Notes                             |
-| ----------- | --------- | ------- | --------------------------------- |
-| `itemKey`   | `MenuKey` | `-`     | Unique key for the menu item      |
-| `disabled?` | `boolean` | `-`     | Whether the menu item is disabled |
-| `icon?`     | `unknown` | `-`     | Icon for the menu item            |
+| Prop         | Type      | Default | Notes                             |
+| ------------ | --------- | ------- | --------------------------------- |
+| `itemKey`    | `MenuKey` | `-`     | Unique key for the menu item      |
+| `disabled?`  | `boolean` | `-`     | Whether the menu item is disabled |
+| `collapsed?` | `boolean` | `-`     | -                                 |
 
 ## MenuItemGroup
 
 `packages/core/src/types/menu.ts` · `MenuItemGroupProps` · 3/5 props
 
-| Prop         | Type     | Default | Notes                  |
-| ------------ | -------- | ------- | ---------------------- |
-| `title?`     | `string` | `-`     | Group title            |
-| `className?` | `string` | `-`     | Additional CSS classes |
-| `level?`     | `number` | `-`     | -                      |
+| Prop         | Type      | Default | Notes                  |
+| ------------ | --------- | ------- | ---------------------- |
+| `collapsed?` | `boolean` | `-`     | -                      |
+| `title?`     | `string`  | `-`     | Group title            |
+| `className?` | `string`  | `-`     | Additional CSS classes |
 
 ## NavigationMenu
 
@@ -318,11 +318,11 @@ Note: 菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider
 
 `packages/core/src/types/menu.ts` · `SubMenuProps` · 3/8 props
 
-| Prop        | Type      | Default | Notes                           |
-| ----------- | --------- | ------- | ------------------------------- |
-| `itemKey`   | `MenuKey` | `-`     | Unique key for the submenu      |
-| `disabled?` | `boolean` | `-`     | Whether the submenu is disabled |
-| `title?`    | `string`  | `-`     | Submenu title                   |
+| Prop         | Type      | Default | Notes                           |
+| ------------ | --------- | ------- | ------------------------------- |
+| `itemKey`    | `MenuKey` | `-`     | Unique key for the submenu      |
+| `disabled?`  | `boolean` | `-`     | Whether the submenu is disabled |
+| `collapsed?` | `boolean` | `-`     | -                               |
 
 ## TabPane
 

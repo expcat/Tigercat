@@ -1,14 +1,23 @@
-import { Layout } from '@expcat/tigercat-react/Layout'
-import { Header } from '@expcat/tigercat-react/Header'
-import { Content } from '@expcat/tigercat-react/Content'
-import { Footer } from '@expcat/tigercat-react/Footer'
+import { Container } from '@expcat/tigercat-react/Container'
+
+const box =
+  'rounded border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] p-3 text-sm'
 
 export default function App() {
   return (
-    <Layout className="min-h-64 overflow-hidden rounded border border-gray-300">
-      <Header className="!bg-blue-600 !p-4 !text-white">Header</Header>
-      <Content className="!p-4">Content</Content>
-      <Footer className="!bg-gray-800 !p-4 !text-white">Footer</Footer>
-    </Layout>
+    <div className="space-y-3">
+      <Container maxWidth={false} className={box}>
+        maxWidth=false：无 max-width，仍 width 100%
+      </Container>
+      <Container maxWidth="full" className={box}>
+        maxWidth=&quot;full&quot;：max-width 100%
+      </Container>
+      <Container maxWidth="lg" className={box}>
+        maxWidth=&quot;lg&quot;：max-width 跟 --tiger-breakpoint-lg
+      </Container>
+      <Container maxWidth="lg" padding={false} center={false} className={box}>
+        padding 与 center 都关掉
+      </Container>
+    </div>
   )
 }

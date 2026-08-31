@@ -6,10 +6,10 @@ import { Col } from '@expcat/tigercat-vue/Col'
 <template>
   <Row :gutter="16" justify="space-between" align="middle" :wrap="false">
     <Col flex="120px">
-      <div class="rounded bg-amber-500 p-3 text-center text-white">固定</div>
+      <div class="rounded bg-amber-500 p-3 text-center text-white">固定 120px</div>
     </Col>
     <Col flex="auto">
-      <div class="rounded bg-amber-400 p-6 text-center text-white">自适应</div>
+      <div class="rounded bg-amber-400 p-6 text-center text-white">自适应剩余</div>
     </Col>
   </Row>
 </template>

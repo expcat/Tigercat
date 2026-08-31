@@ -183,6 +183,37 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。需要打印时 overlay 带 print-color-adjust。'
   },
+  Layout: {
+    notes:
+      '默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSider` / `direction="horizontal"`）时改横排。嵌套内层 `flex-1 min-h-0`，`fullHeight` 只作用在最外层。'
+  },
+  Header: {
+    notes:
+      '未传 `height` 时默认 `h-16`，不写 inline height。`translucent` / `blur` 替换不透明底并 `sticky`，z 走 `OVERLAY_Z_INDEX.viewport`。'
+  },
+  Sidebar: {
+    notes:
+      '`collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开 Tab。边框是 `border-inline-end`。未传 `width` 时默认宽走 class。未传名时 landmark 走 locale。内层未传 `collapsed` 的 Menu 跟随侧栏。'
+  },
+  Content: {
+    notes:
+      '默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作为 Layout 直子时自己滚动（`flex-1 min-h-0 overflow-auto`）。React `ref` 是滚动根。'
+  },
+  Footer: {
+    notes: '未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避免多个 `contentinfo`。'
+  },
+  Container: {
+    notes:
+      '`maxWidth={false}` 没有 max-width；`"full"` 是 `max-width: 100%`；命名尺寸读 `--tiger-breakpoint-*`。Vue 声明 `className`，不会盖掉基类。'
+  },
+  Row: {
+    notes:
+      '数字 `gutter` 只开横缝，双轴传 `[h, v]`。缝是 CSS gap，不是负 margin。`wrap={false}` 不折行。'
+  },
+  Col: {
+    notes:
+      '传入 `flex` 即走 flex 项，不必 `span={0}`。`span={0}` 是该断点隐藏。`order` 只改视觉，不改 Tab / 读屏顺序。offset 走逻辑边。'
+  },
   Tag: {
     notes:
       '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。'
@@ -499,7 +530,16 @@ const COMPONENT_SNIPPETS = {
     RadarChart: '<RadarChart :data="data" />',
     ScatterChart: '<ScatterChart :data="data" />',
     SunburstChart: '<SunburstChart :data="data" />',
-    TreeMapChart: '<TreeMapChart :data="data" />'
+    TreeMapChart: '<TreeMapChart :data="data" />',
+    Layout:
+      '<Layout><Header>Title</Header><Layout><Sidebar /><Content as="div">Body</Content></Layout></Layout>',
+    Header: '<Header>Title</Header>',
+    Sidebar: '<Sidebar :collapsed="collapsed">Nav</Sidebar>',
+    Content: '<Content as="div">Body</Content>',
+    Footer: '<Footer>©</Footer>',
+    Container: '<Container max-width="lg">Body</Container>',
+    Row: '<Row :gutter="16"><Col :span="12">A</Col><Col :span="12">B</Col></Row>',
+    Col: '<Col :span="12">A</Col>'
   },
   React: {
     Button: '<Button htmlType="submit">Save</Button>',
@@ -553,7 +593,16 @@ const COMPONENT_SNIPPETS = {
     RadarChart: '<RadarChart data={data} />',
     ScatterChart: '<ScatterChart data={data} />',
     SunburstChart: '<SunburstChart data={data} />',
-    TreeMapChart: '<TreeMapChart data={data} />'
+    TreeMapChart: '<TreeMapChart data={data} />',
+    Layout:
+      '<Layout><Header>Title</Header><Layout><Sidebar /><Content as="div">Body</Content></Layout></Layout>',
+    Header: '<Header>Title</Header>',
+    Sidebar: '<Sidebar collapsed={collapsed}>Nav</Sidebar>',
+    Content: '<Content as="div">Body</Content>',
+    Footer: '<Footer>©</Footer>',
+    Container: '<Container maxWidth="lg">Body</Container>',
+    Row: '<Row gutter={16}><Col span={12}>A</Col><Col span={12}>B</Col></Row>',
+    Col: '<Col span={12}>A</Col>'
   }
 }
 

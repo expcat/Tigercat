@@ -1,7 +1,7 @@
 {
   "id": "grid-01",
   "title": "基础栅格",
-  "description": "一个 Row 组合展示三等分栅格与水平/垂直 gutter。",
+  "description": "三个 span=8 加 [16, 16] gutter。缝是 CSS gap，Row 不会被负 margin 拉出父级。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

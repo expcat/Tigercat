@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Layout 默认不再写 `min-h-screen`。有 Sidebar 直子时根是横排；标准壳是外层列、内层再一个 Layout 包 Sidebar + Content，不要再手写一层 `flex`。全屏壳用 `fullHeight`。Content 默认仍是 `<main>`，一页多个预览请 `as="div"`。Header / Footer 未传 `height` 不再写 inline（Footer 也不再写 `height: auto`）。`collapsedWidth="0px"` 的 Sidebar 会 `inert`。数字 `gutter={n}` 只开横缝；双轴传 `[h, v]`。Col 传 `flex` 不必再 `span={0}`；`span={0}` 改为隐藏。删除 `getGutterStyles` / `getColGutterClasses` / `rowGutterClasses` / `colGutterClasses`。Container `maxWidth="full"` 是 `max-width: 100%`，与 `false`（无 max-width）不同。
+
 Tag 不再是 live region（无默认 `role="status"`）。点关闭只发 `onClose` / `close`，组件不会自己 `return null`；从列表删或设 `visible={false}`。关闭钮名走 locale `status.tagCloseAriaLabel`，不是写死 `Close tag`。新增 `pill`。
 
 Badge 默认不是 `role="status"`。`type="number"` 只接受有限数字或十进制串（`content="NEW"` 请设 `type="text"`）。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，并把计数写进宿主可访问名。`position` 的 left/right 跟阅读方向。删除 `formatBadgeContent` / `shouldHideBadge`，改用 `resolveBadgeContent`。

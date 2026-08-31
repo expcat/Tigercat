@@ -43,33 +43,41 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Col
 
-`packages/core/src/types/grid.ts` · `ColProps` · 3/4 props
+`packages/core/src/types/grid.ts` · `ColProps` · 4/5 props
 
-| Prop      | Type                                            | Default | Notes                                         |
-| --------- | ----------------------------------------------- | ------- | --------------------------------------------- |
-| `span?`   | `ColSpan`                                       | `24`    | Number of cells to span, or responsive object |
-| `offset?` | `number \| Partial<Record<Breakpoint, number>>` | `0`     | Number of cells to offset                     |
-| `order?`  | `number \| Partial<Record<Breakpoint, number>>` | `-`     | Number of cells to order                      |
+Note: 传入 `flex` 即走 flex 项，不必 `span={0}`。`span={0}` 是该断点隐藏。`order` 只改视觉，不改 Tab / 读屏顺序。offset 走逻辑边。
+
+| Prop      | Type                                            | Default | Notes                                                                                      |
+| --------- | ----------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `span?`   | `ColSpan`                                       | `24`    | Number of cells to span (1–24), or a responsive object. `0` (including `{ md: 0 }`) hid... |
+| `flex?`   | `string \| number`                              | `-`     | Flex item (`flex-basis` / shorthand). When set, span width is not applied. `span={0}` m... |
+| `offset?` | `number \| Partial<Record<Breakpoint, number>>` | `0`     | Number of cells to offset                                                                  |
+| `order?`  | `number \| Partial<Record<Breakpoint, number>>` | `-`     | Visual flex `order` only. DOM / Tab / screen-reader order stay as written.                 |
 
 ## Container
 
-`packages/core/src/types/container.ts` · `ContainerProps` · 3/4 props
+`packages/core/src/types/container.ts` · `ContainerProps` · 4/5 props
 
-| Prop        | Type                | Default | Notes                                                                                      |
-| ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `maxWidth?` | `ContainerMaxWidth` | `false` | Maximum width constraint for the container - 'sm': max-w-screen-sm (640px) - 'md': max-... |
-| `center?`   | `boolean`           | `true`  | Whether to center the container horizontally                                               |
-| `padding?`  | `boolean`           | `true`  | Whether to add horizontal padding                                                          |
+Note: `maxWidth={false}` 没有 max-width；`"full"` 是 `max-width: 100%`；命名尺寸读 `--tiger-breakpoint-*`。Vue 声明 `className`，不会盖掉基类。
+
+| Prop        | Type                          | Default | Notes                                                                 |
+| ----------- | ----------------------------- | ------- | --------------------------------------------------------------------- |
+| `maxWidth?` | `ContainerMaxWidth`           | `false` | Maximum width constraint, read from `--tiger-breakpoint-*`. - 'sm' \\ | 'md' \\ | 'lg' \\ | '... |
+| `center?`   | `boolean`                     | `true`  | Whether to center the container horizontally                          |
+| `padding?`  | `boolean`                     | `true`  | Whether to add horizontal padding                                     |
+| `as?`       | `keyof HTMLElementTagNameMap` | `'div'` | HTML element to render as                                             |
 
 ## Content
 
-`packages/core/src/types/layout.ts` · `ContentProps`
+`packages/core/src/types/layout.ts` · `ContentProps` · 3/4 props
 
-| Prop         | Type                               | Default | Notes                                                                                      |
-| ------------ | ---------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `className?` | `string`                           | `-`     | Additional CSS classes                                                                     |
-| `padding?`   | `boolean \| string`                | `true`  | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
-| `style?`     | `Record<string, string \| number>` | `-`     | -                                                                                          |
+Note: 默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作为 Layout 直子时自己滚动（`flex-1 min-h-0 overflow-auto`）。React `ref` 是滚动根。
+
+| Prop         | Type                | Default  | Notes                                                                                      |
+| ------------ | ------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `as?`        | `string`            | `'main'` | HTML tag. Default `main` — a document may only have one visible main. Nested / preview...  |
+| `padding?`   | `boolean \| string` | `true`   | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
+| `className?` | `string`            | `-`      | Additional CSS classes                                                                     |
 
 ## Descriptions
 
@@ -83,32 +91,39 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Footer
 
-`packages/core/src/types/layout.ts` · `FooterProps`
+`packages/core/src/types/layout.ts` · `FooterProps` · 3/4 props
 
-| Prop         | Type                               | Default  | Notes                  |
-| ------------ | ---------------------------------- | -------- | ---------------------- |
-| `className?` | `string`                           | `-`      | Additional CSS classes |
-| `height?`    | `string`                           | `'auto'` | Footer height          |
-| `style?`     | `Record<string, string \| number>` | `-`      | -                      |
+Note: 未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避免多个 `contentinfo`。
+
+| Prop         | Type     | Default    | Notes                                                                                      |
+| ------------ | -------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `as?`        | `string` | `'footer'` | HTML tag. Default `footer`. Nested / preview shells should use `div` so the page does n... |
+| `height?`    | `string` | `-`        | Footer height. When omitted, no inline height is written (`auto` is the CSS initial val... |
+| `className?` | `string` | `-`        | Additional CSS classes                                                                     |
 
 ## Header
 
 `packages/core/src/types/layout.ts` · `HeaderProps` · 3/4 props
 
-| Prop         | Type            | Default     | Notes                  |
-| ------------ | --------------- | ----------- | ---------------------- |
-| `className?` | `string`        | `-`         | Additional CSS classes |
-| `variant?`   | `HeaderVariant` | `'default'` | Header visual style.   |
-| `height?`    | `string`        | `'64px'`    | Header height          |
+Note: 未传 `height` 时默认 `h-16`，不写 inline height。`translucent` / `blur` 替换不透明底并 `sticky`，z 走 `OVERLAY_Z_INDEX.viewport`。
+
+| Prop         | Type            | Default     | Notes                                                                                      |
+| ------------ | --------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `variant?`   | `HeaderVariant` | `'default'` | Header visual style.                                                                       |
+| `height?`    | `string`        | `-`         | Header height. When omitted, default height is `h-16` via class so caller `style.height... |
+| `className?` | `string`        | `-`         | Additional CSS classes                                                                     |
 
 ## Layout
 
-`packages/core/src/types/layout.ts` · `LayoutProps`
+`packages/core/src/types/layout.ts` · `LayoutProps` · 3/5 props
 
-| Prop         | Type                               | Default | Notes                  |
-| ------------ | ---------------------------------- | ------- | ---------------------- |
-| `className?` | `string`                           | `-`     | Additional CSS classes |
-| `style?`     | `Record<string, string \| number>` | `-`     | -                      |
+Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSider` / `direction="horizontal"`）时改横排。嵌套内层 `flex-1 min-h-0`，`fullHeight` 只作用在最外层。
+
+| Prop          | Type              | Default | Notes                                                                                      |
+| ------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `hasSider?`   | `boolean`         | `-`     | Treat this Layout as having a sider even if Sidebar is wrapped.                            |
+| `fullHeight?` | `boolean`         | `false` | Viewport-height app shell: `h-dvh overflow-hidden` so Content becomes the scroller. Nes... |
+| `direction?`  | `LayoutDirection` | `-`     | Force a horizontal shell (Sidebar beside Content). When omitted, a direct Sidebar child... |
 
 ## List
 
@@ -147,13 +162,16 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Row
 
-`packages/core/src/types/grid.ts` · `RowProps` · 3/4 props
+`packages/core/src/types/grid.ts` · `RowProps` · 4/5 props
 
-| Prop       | Type         | Default   | Notes                                                      |
-| ---------- | ------------ | --------- | ---------------------------------------------------------- |
-| `gutter?`  | `GutterSize` | `0`       | Grid gutter, could be horizontal or [horizontal, vertical] |
-| `align?`   | `Align`      | `'top'`   | Vertical alignment of flex layout                          |
-| `justify?` | `Justify`    | `'start'` | Horizontal arrangement of flex layout                      |
+Note: 数字 `gutter` 只开横缝，双轴传 `[h, v]`。缝是 CSS gap，不是负 margin。`wrap={false}` 不折行。
+
+| Prop       | Type         | Default   | Notes                                                                                      |
+| ---------- | ------------ | --------- | ------------------------------------------------------------------------------------------ |
+| `gutter?`  | `GutterSize` | `0`       | Grid gutter in px. A number is **horizontal only**; pass `[horizontal, vertical]` for b... |
+| `wrap?`    | `boolean`    | `true`    | Whether to wrap                                                                            |
+| `align?`   | `Align`      | `'top'`   | Vertical alignment of flex layout                                                          |
+| `justify?` | `Justify`    | `'start'` | Horizontal arrangement of flex layout                                                      |
 
 ## ScrollArea
 
@@ -167,13 +185,16 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 ## Sidebar
 
-`packages/core/src/types/layout.ts` · `SidebarProps` · 3/5 props
+`packages/core/src/types/layout.ts` · `SidebarProps` · 4/6 props
 
-| Prop              | Type     | Default   | Notes                                                                                    |
-| ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
-| `className?`      | `string` | `-`       | Additional CSS classes                                                                   |
-| `width?`          | `string` | `'256px'` | Sidebar width                                                                            |
-| `collapsedWidth?` | `string` | `'64px'`  | Width when collapsed (mini mode). Set to '0px' to fully hide the sidebar when collapsed. |
+Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开 Tab。边框是 `border-inline-end`。未传 `width` 时默认宽走 class。未传名时 landmark 走 locale。内层未传 `collapsed` 的 Menu 跟随侧栏。
+
+| Prop              | Type              | Default   | Notes                                                                                     |
+| ----------------- | ----------------- | --------- | ----------------------------------------------------------------------------------------- |
+| `collapsed?`      | `boolean`         | `false`   | Whether sidebar is collapsed                                                              |
+| `width?`          | `string`          | `-`       | Sidebar width. When omitted, default width is `w-64` via class so caller `style.width`... |
+| `collapsedWidth?` | `string`          | `'64px'`  | Width when collapsed (mini mode). Set to '0px' to fully hide the sidebar when collapsed.  |
+| `side?`           | `LayoutSiderSide` | `'start'` | Logical side of the shell. `start` is inline-start (left in LTR).                         |
 
 ## Skeleton
 

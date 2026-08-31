@@ -1,7 +1,7 @@
 {
   "id": "layout-03",
-  "title": "折叠侧栏",
-  "description": "受控 Sidebar 在标准 Layout Shell 中切换展开与折叠。",
+  "title": "标准 Layout Shell",
+  "description": "外层列、内层行。Sidebar 与 Content 是内层 Layout 的直子。未传 collapsed 的 Menu 跟随侧栏；collapsedWidth=0px 时侧栏 inert，里面的控件离开 Tab。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {
