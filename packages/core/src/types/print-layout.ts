@@ -3,10 +3,23 @@
  * @since 0.9.0
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Print page size presets
  */
-export type PrintPageSize = 'A4' | 'A3' | 'Letter' | 'Legal' | 'custom'
+export type PrintPageSize = 'A4' | 'A3' | 'Letter' | 'Legal'
+
+/**
+ * Custom page size in CSS lengths. Used when `pageSize` is omitted and both
+ * `pageWidth` / `pageHeight` are set.
+ */
+export interface PrintPageBox {
+  width: string
+  height: string
+  /** Value for `@page { size: … }` */
+  pageSize: string
+}
 
 /**
  * Print orientation
@@ -30,24 +43,24 @@ export interface PrintLayoutProps {
   orientation?: PrintOrientation
 
   /**
-   * Whether to show print-only header
+   * Whether to show a repeating header on every printed page
    * @default false
    */
   showHeader?: boolean
 
   /**
-   * Whether to show print-only footer
+   * Whether to show a repeating footer on every printed page
    * @default false
    */
   showFooter?: boolean
 
   /**
-   * Header text content (appears only in print)
+   * Header text content (visible in the screen preview and on every printed page)
    */
   headerText?: string
 
   /**
-   * Footer text content (appears only in print)
+   * Footer text content (visible in the screen preview and on every printed page)
    */
   footerText?: string
 
@@ -58,7 +71,32 @@ export interface PrintLayoutProps {
   showPageBreaks?: boolean
 
   /**
+   * Custom page width (CSS length, or a number in mm). Used with `pageHeight`
+   * when no named `pageSize` preset should apply.
+   */
+  pageWidth?: number | string
+
+  /**
+   * Custom page height (CSS length, or a number in mm).
+   */
+  pageHeight?: number | string
+
+  /**
+   * Locale overlay
+   */
+  locale?: Partial<TigerLocale>
+
+  /**
    * Additional CSS classes
    */
   className?: string
+}
+
+/**
+ * Imperative handle on PrintLayout.
+ */
+export interface PrintLayoutInstance {
+  /** Restrict `window.print()` to this root, then restore. */
+  print: () => void
+  getRoot: () => HTMLElement | null
 }

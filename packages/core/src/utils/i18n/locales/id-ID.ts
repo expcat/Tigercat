@@ -53,6 +53,19 @@ export const idID: TigerLocale = {
   imageCompare: {
     ariaLabel: 'Perbandingan gambar'
   },
+  descriptions: {
+    colon: ':'
+  },
+  list: {
+    avatarAlt: 'Foto profil',
+    dragHandleAriaLabel: 'Ubah urutan'
+  },
+  scrollArea: {
+    ariaLabel: 'Area gulir'
+  },
+  printLayout: {
+    pageBreak: 'Pemisah halaman'
+  },
   timeline: {
     pendingText: 'Memuat...'
   },

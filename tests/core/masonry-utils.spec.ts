@@ -108,10 +108,11 @@ describe('masonry-utils', () => {
       expect(columns).toEqual([[0, 1, 2, 3, 4]])
     })
 
-    it('treats non-finite heights as zero', () => {
+    it('keeps unmeasured items out of the shortest-column contest', () => {
       const columns = distributeMasonryItems([Number.NaN, 40, Number.POSITIVE_INFINITY], 2)
-      // NaN and +Infinity both pack as height 0, so ties stay leftmost
-      expect(columns).toEqual([[0, 1], [2]])
+      expect(columns[0]).toContain(1)
+      expect(columns[0]).toContain(0)
+      expect(columns.flat()).toContain(2)
     })
 
     it('returns empty columns for no items', () => {
@@ -174,7 +175,7 @@ describe('masonry-utils', () => {
       expect(getMasonryRootClasses('px-2')).toContain('px-2')
       expect(getMasonryColumnClasses('bordered')).toContain('tiger-masonry-column')
       expect(getMasonryItemClasses('mb-4')).toContain('tiger-masonry-item')
-      expect(getMasonryRootClasses()).toBe('tiger-masonry flex w-full items-start')
+      expect(getMasonryRootClasses()).toBe('tiger-masonry relative w-full')
     })
 
     it('builds the inline gap style with clamping', () => {

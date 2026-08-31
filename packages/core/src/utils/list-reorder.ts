@@ -212,10 +212,13 @@ export function createListReorderController(
   }
 
   const startPointerReorder = (item: DragItem, event: DragPointerBindingEvent): void => {
-    if (event.pointerType === 'mouse' || event.button !== 0) return
+    if (event.button !== 0) return
+    const target = event.currentTarget as Element | null
+    if (event.pointerType === 'mouse' && target instanceof HTMLElement && target.draggable) {
+      return
+    }
     const config = configOf()
     if (!isDragEnabled(config)) return
-    const target = event.currentTarget as Element | null
     if (target && !isValidDragHandle(target, config)) return
     event.preventDefault()
     startDrag(item)

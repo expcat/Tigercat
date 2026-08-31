@@ -53,6 +53,19 @@ export const viVN: TigerLocale = {
   imageCompare: {
     ariaLabel: 'So sánh hình ảnh'
   },
+  descriptions: {
+    colon: ':'
+  },
+  list: {
+    avatarAlt: 'Ảnh đại diện',
+    dragHandleAriaLabel: 'Sắp xếp lại'
+  },
+  scrollArea: {
+    ariaLabel: 'Vùng cuộn'
+  },
+  printLayout: {
+    pageBreak: 'Ngắt trang'
+  },
   timeline: {
     pendingText: 'Đang tải...'
   },

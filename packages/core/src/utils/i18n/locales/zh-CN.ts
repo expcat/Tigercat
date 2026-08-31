@@ -52,6 +52,19 @@ export const zhCN: TigerLocale = {
   imageCompare: {
     ariaLabel: '图片对比'
   },
+  descriptions: {
+    colon: '：'
+  },
+  list: {
+    avatarAlt: '头像',
+    dragHandleAriaLabel: '拖动排序'
+  },
+  scrollArea: {
+    ariaLabel: '可滚动区域'
+  },
+  printLayout: {
+    pageBreak: '分页符'
+  },
   timeline: {
     pendingText: '加载中...'
   },

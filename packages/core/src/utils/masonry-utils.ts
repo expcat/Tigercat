@@ -18,11 +18,11 @@ export const MASONRY_DEFAULT_GAP = 16
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const masonryRootClasses = 'tiger-masonry flex w-full items-start'
+export const masonryRootClasses = 'tiger-masonry relative w-full'
 
 export const masonryColumnClasses = 'tiger-masonry-column flex min-w-0 flex-1 flex-col'
 
-export const masonryItemClasses = 'tiger-masonry-item'
+export const masonryItemClasses = 'tiger-masonry-item min-w-0 break-inside-avoid'
 
 // ─── Resolution ───────────────────────────────────────────────────
 
@@ -70,8 +70,9 @@ export function resolveMasonryGap(gap: MasonryResponsiveValue | undefined, width
 /**
  * Pack measured item heights into the currently shortest column.
  *
- * Ties go to the leftmost column, and items keep their relative order within
- * a column. Returns the item indices grouped per column.
+ * Ties go to the leftmost column. Items with height `<= 0` are skipped from
+ * the shortest-column contest and fall back to modulo so they do not pull
+ * later items into column 0.
  */
 export function distributeMasonryItems(heights: number[], columnCount: number): number[][] {
   const count = clampMasonryColumnCount(columnCount)
@@ -79,7 +80,11 @@ export function distributeMasonryItems(heights: number[], columnCount: number): 
   const totals = new Array<number>(count).fill(0)
 
   heights.forEach((rawHeight, index) => {
-    const height = Number.isFinite(rawHeight) ? rawHeight : 0
+    const height = Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 0
+    if (height === 0) {
+      columns[index % count].push(index)
+      return
+    }
     let target = 0
     for (let column = 1; column < count; column++) {
       if (totals[column] < totals[target]) target = column
@@ -89,6 +94,52 @@ export function distributeMasonryItems(heights: number[], columnCount: number): 
   })
 
   return columns
+}
+
+export function hasMeasuredMasonryHeights(heights: number[]): boolean {
+  return heights.some((height) => Number.isFinite(height) && height > 0)
+}
+
+export interface MasonryItemPosition {
+  column: number
+  left: number
+  top: number
+  width: number
+}
+
+/**
+ * Absolute positions for packed items. `containerWidth` is the masonry root.
+ */
+export function computeMasonryPositions(
+  heights: number[],
+  columnCount: number,
+  gap: number,
+  containerWidth: number
+): MasonryItemPosition[] {
+  const count = clampMasonryColumnCount(columnCount)
+  const spacing = clampMasonryGap(gap)
+  const width =
+    containerWidth > 0 ? Math.max((containerWidth - spacing * (count - 1)) / count, 0) : 0
+  const columns = hasMeasuredMasonryHeights(heights)
+    ? distributeMasonryItems(heights, count)
+    : moduloDistributeMasonryItems(heights.length, count)
+  const tops = new Array<number>(count).fill(0)
+  const positions: MasonryItemPosition[] = new Array(heights.length)
+
+  columns.forEach((indices, column) => {
+    indices.forEach((index) => {
+      const height = Number.isFinite(heights[index]) ? heights[index] : 0
+      positions[index] = {
+        column,
+        left: column * (width + spacing),
+        top: tops[column],
+        width
+      }
+      tops[column] += height + spacing
+    })
+  })
+
+  return positions
 }
 
 /**
@@ -173,4 +224,35 @@ export function getMasonryGapStyle(gap: number): { gap: string } {
  */
 export function getMasonryColumnStyle(gap: number): { rowGap: string } {
   return { rowGap: `${clampMasonryGap(gap)}px` }
+}
+
+export function getMasonryPackedRootStyle(
+  height: number,
+  gap: number
+): { position: 'relative'; height: string; gap?: undefined } {
+  return { position: 'relative', height: `${Math.max(height, 0)}px` }
+}
+
+export function getMasonryFlowRootStyle(
+  columnCount: number,
+  gap: number
+): { columnCount: number; columnGap: string } {
+  return {
+    columnCount: clampMasonryColumnCount(columnCount),
+    columnGap: `${clampMasonryGap(gap)}px`
+  }
+}
+
+export function getMasonryItemPositionStyle(position: MasonryItemPosition): {
+  position: 'absolute'
+  left: string
+  top: string
+  width: string
+} {
+  return {
+    position: 'absolute',
+    left: `${position.left}px`,
+    top: `${position.top}px`,
+    width: `${position.width}px`
+  }
 }

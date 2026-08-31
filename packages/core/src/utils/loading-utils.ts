@@ -61,13 +61,13 @@ export const DEFAULT_LOADING_BACKGROUND =
 /**
  * Base classes for spinner animation
  */
-export const loadingSpinnerBaseClasses = 'animate-spin'
+export const loadingSpinnerBaseClasses = 'tiger-motion-aware animate-spin'
 
 /**
  * Base classes for loading overlay spinner used by components like List/Table
  */
 export const loadingOverlaySpinnerBaseClasses =
-  'animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]'
+  'tiger-motion-aware animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]'
 
 export function getLoadingOverlaySpinnerClasses(customClassName?: string): string {
   return classNames(loadingOverlaySpinnerBaseClasses, customClassName)

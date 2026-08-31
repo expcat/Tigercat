@@ -53,6 +53,19 @@ export const thTH: TigerLocale = {
   imageCompare: {
     ariaLabel: 'เปรียบเทียบรูปภาพ'
   },
+  descriptions: {
+    colon: ':'
+  },
+  list: {
+    avatarAlt: 'อวาตาร์',
+    dragHandleAriaLabel: 'จัดลำดับ'
+  },
+  scrollArea: {
+    ariaLabel: 'พื้นที่เลื่อน'
+  },
+  printLayout: {
+    pageBreak: 'ตัวแบ่งหน้า'
+  },
   timeline: {
     pendingText: 'กำลังโหลด...'
   },

@@ -47,7 +47,16 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
   'id-ID:common.okText',
   'id-ID:modal.okText',
   'id-ID:timePicker.ok',
-  'fr-FR:image.previewFallbackAlt'
+  'fr-FR:image.previewFallbackAlt',
+  'ko-KR:descriptions.colon',
+  'th-TH:descriptions.colon',
+  'vi-VN:descriptions.colon',
+  'id-ID:descriptions.colon',
+  'es-ES:descriptions.colon',
+  'fr-FR:descriptions.colon',
+  'de-DE:descriptions.colon',
+  'pt-BR:descriptions.colon',
+  'ar-SA:descriptions.colon'
 ])
 
 function leafEntries(value: unknown, prefix = ''): Array<{ path: string; value: string }> {

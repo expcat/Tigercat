@@ -88,13 +88,25 @@ describe('scroll-area-utils', () => {
       expect(state.x.scrollable).toBe(false)
     })
 
-    it('normalizes the negative scrollLeft of RTL viewports', () => {
-      const state = computeScrollAreaState({
-        ...metrics,
-        scrollLeft: -200,
-        scrollWidth: 400
-      })
-      expect(state.x.progress).toBeCloseTo(1)
+    it('maps RTL negative, RTL 0=physical-left, and LTR onto the same logical progress', () => {
+      const rtlNegative = computeScrollAreaState(
+        { ...metrics, scrollLeft: -200, scrollWidth: 400, clientWidth: 200 },
+        undefined,
+        'rtl'
+      )
+      const rtlPhysical = computeScrollAreaState(
+        { ...metrics, scrollLeft: 0, scrollWidth: 400, clientWidth: 200 },
+        undefined,
+        'rtl'
+      )
+      const ltr = computeScrollAreaState(
+        { ...metrics, scrollLeft: 200, scrollWidth: 400, clientWidth: 200 },
+        undefined,
+        'ltr'
+      )
+      expect(rtlNegative.x.progress).toBeCloseTo(1)
+      expect(rtlPhysical.x.progress).toBeCloseTo(1)
+      expect(ltr.x.progress).toBeCloseTo(1)
     })
 
     it('starts empty before the viewport is measured', () => {
@@ -209,7 +221,7 @@ describe('scroll-area-utils', () => {
     it('ignores an axis the direction disables', () => {
       const state = computeScrollAreaState({ ...metrics, scrollWidth: 400 })
       expect(getScrollAreaShadowSides(state, 'vertical')).toEqual(['top', 'bottom'])
-      expect(getScrollAreaShadowSides(state, 'both')).toEqual(['top', 'bottom', 'right'])
+      expect(getScrollAreaShadowSides(state, 'both')).toEqual(['top', 'bottom', 'inline-end'])
     })
 
     it('returns nothing when nothing overflows', () => {
@@ -259,7 +271,7 @@ describe('scroll-area-utils', () => {
     it('lets horizontal content grow past the viewport', () => {
       expect(getScrollAreaContentClasses('vertical')).not.toContain('min-w-max')
       expect(getScrollAreaContentClasses('horizontal')).toContain('min-w-max')
-      expect(getScrollAreaContentClasses('both')).toContain('min-w-max')
+      expect(getScrollAreaContentClasses('both')).not.toContain('min-w-max')
     })
 
     it('fades the scrollbar only in hover mode', () => {
@@ -288,7 +300,10 @@ describe('scroll-area-utils', () => {
 
     it('sizes the horizontal thumb along the inline axis', () => {
       const axisState = computeScrollAreaAxisState(100, 400, 200)
-      expect(getScrollAreaThumbStyle('x', axisState)).toEqual({ width: '100px', left: '50px' })
+      expect(getScrollAreaThumbStyle('x', axisState)).toEqual({
+        width: '100px',
+        insetInlineStart: '50px'
+      })
     })
   })
 

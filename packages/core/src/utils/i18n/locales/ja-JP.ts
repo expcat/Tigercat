@@ -53,6 +53,19 @@ export const jaJP: TigerLocale = {
   imageCompare: {
     ariaLabel: '画像比較'
   },
+  descriptions: {
+    colon: '：'
+  },
+  list: {
+    avatarAlt: 'アバター',
+    dragHandleAriaLabel: '並べ替え'
+  },
+  scrollArea: {
+    ariaLabel: 'スクロール領域'
+  },
+  printLayout: {
+    pageBreak: '改ページ'
+  },
   timeline: {
     pendingText: '読み込み中...'
   },

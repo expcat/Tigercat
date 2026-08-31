@@ -53,6 +53,19 @@ export const ptBR: TigerLocale = {
   imageCompare: {
     ariaLabel: 'Comparação de imagens'
   },
+  descriptions: {
+    colon: ':'
+  },
+  list: {
+    avatarAlt: 'Foto de perfil',
+    dragHandleAriaLabel: 'Reordenar'
+  },
+  scrollArea: {
+    ariaLabel: 'Área rolável'
+  },
+  printLayout: {
+    pageBreak: 'Quebra de página'
+  },
   timeline: {
     pendingText: 'Carregando...'
   },

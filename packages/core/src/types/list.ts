@@ -2,16 +2,12 @@
  * List component types and interfaces
  */
 import type { ComponentSize } from './base'
+import type { TigerLocale } from './locale'
 
 /**
  * List item layout types
  */
 export type ListItemLayout = 'horizontal' | 'vertical'
-
-/**
- * List border style types
- */
-export type ListBorderStyle = 'none' | 'divided' | 'bordered'
 
 /**
  * List data item interface
@@ -42,6 +38,24 @@ export interface ListItem {
    */
   [key: string]: unknown
 }
+
+/**
+ * Grid layout for List. Column counts resolve against the **list container**
+ * width using `--tiger-breakpoint-*` (`xs` … `2xl`).
+ */
+export interface ListGrid {
+  gutter?: number
+  column?: number
+  xs?: number
+  sm?: number
+  md?: number
+  lg?: number
+  xl?: number
+  '2xl'?: number
+}
+
+export type ListRowKey<T extends ListItem = ListItem> =
+  string | ((item: T, index: number) => string | number)
 
 /**
  * Pagination configuration for list
@@ -99,17 +113,21 @@ export interface ListPaginationConfig {
 /**
  * Base list props interface
  */
-export interface ListProps {
+export interface ListProps<T extends ListItem = ListItem> {
+  /**
+   * List data source
+   */
+  dataSource?: T[]
   /**
    * List size
    * @default 'md'
    */
   size?: ComponentSize
   /**
-   * List border style
-   * @default 'divided'
+   * Outer card frame. Split lines are `split`, not this flag.
+   * @default false
    */
-  bordered?: ListBorderStyle
+  bordered?: boolean
   /**
    * Loading state
    * @default false
@@ -117,9 +135,13 @@ export interface ListProps {
   loading?: boolean
   /**
    * Empty state text
-   * @default 'No data'
+   * @default locale.common.emptyText
    */
   emptyText?: string
+  /**
+   * Locale overlay
+   */
+  locale?: Partial<TigerLocale>
   /**
    * Whether to show split line between items
    * @default true
@@ -144,7 +166,7 @@ export interface ListProps {
   pagination?: ListPaginationConfig | false
   /**
    * Enable fixed-height virtual rendering via VirtualList.
-   * Recommended for large non-grid lists.
+   * Mutually exclusive with `grid`.
    * @default false
    */
   virtual?: boolean
@@ -154,8 +176,7 @@ export interface ListProps {
    */
   virtualHeight?: number
   /**
-   * Fixed virtual item height in pixels.
-   * @default 40
+   * Fixed virtual item height in pixels. Defaults to the size row height.
    */
   virtualItemHeight?: number
   /**
@@ -166,16 +187,16 @@ export interface ListProps {
   /**
    * Grid configuration for grid layout
    */
-  grid?: {
-    gutter?: number
-    column?: number
-    xs?: number
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-    xxl?: number
-  }
+  grid?: ListGrid
+  /**
+   * Function to get item key
+   */
+  rowKey?: ListRowKey<T>
+  /**
+   * Hover background on items. Does not make the row a control.
+   * @default false
+   */
+  hoverable?: boolean
   /**
    * Additional CSS classes
    */

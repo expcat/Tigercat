@@ -53,6 +53,19 @@ export const zhTW: TigerLocale = {
   imageCompare: {
     ariaLabel: '圖片對比'
   },
+  descriptions: {
+    colon: '：'
+  },
+  list: {
+    avatarAlt: '頭像',
+    dragHandleAriaLabel: '拖曳排序'
+  },
+  scrollArea: {
+    ariaLabel: '可捲動區域'
+  },
+  printLayout: {
+    pageBreak: '分頁符號'
+  },
   timeline: {
     pendingText: '載入中...'
   },

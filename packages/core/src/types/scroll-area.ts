@@ -2,6 +2,8 @@
  * ScrollArea component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Scrollable axes the ScrollArea manages.
  */
@@ -29,8 +31,9 @@ export type ScrollAreaAxis = 'x' | 'y'
 
 /**
  * Edge that renders a scroll shadow when content overflows past it.
+ * Horizontal edges are logical (`inline-start` / `inline-end`).
  */
-export type ScrollAreaShadowSide = 'top' | 'bottom' | 'left' | 'right'
+export type ScrollAreaShadowSide = 'top' | 'bottom' | 'inline-start' | 'inline-end'
 
 /**
  * Raw viewport measurements used to derive scrollbar geometry.
@@ -101,11 +104,11 @@ export interface ScrollAreaThumbStyle {
   height?: string
   width?: string
   top?: string
-  left?: string
+  insetInlineStart?: string
 }
 
 /**
- * Inline style patch for the ScrollArea root box.
+ * Inline style patch for the ScrollArea viewport box (the overflowing node).
  */
 export interface ScrollAreaBoxStyle {
   height?: string
@@ -169,10 +172,20 @@ export interface ScrollAreaProps {
   maxWidth?: number | string
 
   /**
+   * Fired on every viewport scroll with the derived scroll state.
+   */
+  onScroll?: (detail: ScrollAreaScrollDetail) => void
+
+  /**
    * Accessible name for the scrollable region. When set, the viewport is
    * exposed as `role="region"` with this label.
    */
   ariaLabel?: string
+
+  /**
+   * Locale overlay
+   */
+  locale?: Partial<TigerLocale>
 
   /**
    * Additional CSS class name for the root element

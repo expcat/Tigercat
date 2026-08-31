@@ -1,14 +1,54 @@
+/**
+ * @vitest-environment node
+ */
+
 import { describe, expect, it } from 'vitest'
-import { getGridColumnClasses } from '@expcat/tigercat-core'
+import {
+  getListGridColumnClass,
+  getListGridGapStyle,
+  getListSourceIndex,
+  resolveListGridColumnCount,
+  resolveListVirtualItemHeight
+} from '@expcat/tigercat-core'
 
 describe('list-utils', () => {
-  it('returns scan-safe static grid column classes', () => {
-    expect(getGridColumnClasses(3, undefined, 4, 6, 8, 10, 12)).toBe(
-      'grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12'
-    )
+  it('resolves a single column count from container width', () => {
+    expect(
+      resolveListGridColumnCount({ xs: 1, md: 3, '2xl': 4 }, 400, {
+        xs: 0,
+        sm: 640,
+        md: 768,
+        lg: 1024,
+        xl: 1280,
+        '2xl': 1536
+      })
+    ).toBe(1)
+    expect(
+      resolveListGridColumnCount({ xs: 1, md: 3 }, 800, {
+        xs: 0,
+        sm: 640,
+        md: 768,
+        lg: 1024,
+        xl: 1280,
+        '2xl': 1536
+      })
+    ).toBe(3)
   })
 
-  it('uses xs as the base class and ignores invalid values', () => {
-    expect(getGridColumnClasses(3, 2, -1, Number.NaN, 99, 4.9)).toBe('grid-cols-2 xl:grid-cols-4')
+  it('treats gutter 0 as 0 and leaves the default gap to class when omitted', () => {
+    expect(getListGridGapStyle(0)).toEqual({ gap: '0px' })
+    expect(getListGridGapStyle(12)).toEqual({ gap: '12px' })
+    expect(getListGridGapStyle(undefined)).toBeUndefined()
+  })
+
+  it('maps page-local indices onto the dataSource', () => {
+    expect(getListSourceIndex(0, 2, 10, false)).toBe(10)
+    expect(getListSourceIndex(0, 2, 10, true)).toBe(0)
+  })
+
+  it('defaults virtual item height from size', () => {
+    expect(resolveListVirtualItemHeight('md')).toBe(52)
+    expect(resolveListVirtualItemHeight('md', 80)).toBe(80)
+    expect(getListGridColumnClass(3)).toBe('grid-cols-3')
   })
 })

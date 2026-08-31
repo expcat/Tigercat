@@ -66,6 +66,28 @@ export interface TigerLocaleImageCompare {
   ariaLabel?: string
 }
 
+export interface TigerLocaleDescriptions {
+  /** Glyph appended to labels when `colon` is on */
+  colon?: string
+}
+
+export interface TigerLocaleList {
+  /** Fallback `alt` when a default item has an image avatar but no title */
+  avatarAlt?: string
+  /** Accessible name for the reorder handle */
+  dragHandleAriaLabel?: string
+}
+
+export interface TigerLocaleScrollArea {
+  /** Accessible name when the viewport is a tab stop without a user label */
+  ariaLabel?: string
+}
+
+export interface TigerLocalePrintLayout {
+  /** On-screen page-break indicator */
+  pageBreak?: string
+}
+
 export interface TigerLocaleTimeline {
   pendingText?: string
 }
@@ -544,6 +566,10 @@ export interface TigerLocale {
   marquee?: TigerLocaleMarquee
   image?: TigerLocaleImage
   imageCompare?: TigerLocaleImageCompare
+  descriptions?: TigerLocaleDescriptions
+  list?: TigerLocaleList
+  scrollArea?: TigerLocaleScrollArea
+  printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination

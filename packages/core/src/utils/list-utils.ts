@@ -1,129 +1,82 @@
 /**
  * List component utilities
- * Shared styles and helpers for List components
  */
 
 import type { ComponentSize } from '../types/base'
-import type { ListBorderStyle, ListItemLayout } from '../types/list'
+import type { ListGrid, ListItemLayout } from '../types/list'
+import { classNames } from './class-names'
+import {
+  RESPONSIVE_BREAKPOINT_FALLBACK_PX,
+  type ResponsiveBreakpoint,
+  resolveResponsiveValue
+} from './responsive'
 
-/**
- * Base classes for list container
- */
-export const listBaseClasses =
-  'bg-[var(--tiger-surface,#ffffff)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden'
+export const listBaseClasses = 'w-full'
 
-/**
- * List wrapper classes
- */
+export const listBorderedClasses =
+  'bg-[var(--tiger-surface,#ffffff)] rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] overflow-hidden'
+
 export const listWrapperClasses = 'w-full'
 
-/**
- * Size classes for list padding and spacing
- */
 export const listSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg'
 } as const
 
-/**
- * List item size classes
- */
 export const listItemSizeClasses: Record<ComponentSize, string> = {
   sm: 'px-3 py-2',
   md: 'px-4 py-3',
   lg: 'px-6 py-4'
 } as const
 
-/**
- * Border style classes
- */
-export const listBorderClasses: Record<ListBorderStyle, string> = {
-  none: '',
-  divided: '',
-  bordered: 'border border-[var(--tiger-border,#e5e7eb)]'
-} as const
+/** Default virtual row height: padding + one line. */
+export const listVirtualItemHeight: Record<ComponentSize, number> = {
+  sm: 40,
+  md: 52,
+  lg: 64
+}
 
-/**
- * List item base classes
- */
-export const listItemBaseClasses = 'flex w-full transition-colors duration-200'
+export const listItemBaseClasses = 'flex w-full tiger-motion-aware transition-colors duration-200'
 
-/**
- * List item hover classes
- */
 export const listItemHoverClasses = 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
 
-/**
- * List item divided classes (border between items)
- */
 export const listItemDividedClasses =
   'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0'
 
-/**
- * List item layout classes
- */
 export const listItemLayoutClasses: Record<ListItemLayout, string> = {
   horizontal: 'flex-row items-center',
   vertical: 'flex-col items-start'
 } as const
 
-/**
- * List header/footer base classes
- */
 export const listHeaderFooterBaseClasses =
   'border-b border-[var(--tiger-border,#e5e7eb)] font-medium text-[var(--tiger-text,#111827)]'
 
-/**
- * List footer specific classes
- */
 export const listFooterClasses = 'border-t border-b-0'
 
-/**
- * List empty state classes
- */
-export const listEmptyStateClasses = 'py-8 text-center text-[var(--tiger-text-muted,#6b7280)]'
+export const listEmptyStateClasses = 'py-8'
 
-/**
- * List loading overlay classes
- */
 export const listLoadingOverlayClasses =
-  'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/75 flex items-center justify-center z-10'
+  'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/75 flex items-center justify-center z-10 pointer-events-none'
 
-/**
- * List item meta classes (for avatar + content)
- */
-export const listItemMetaClasses = 'flex items-center gap-3 flex-1'
+export const listItemMetaClasses = 'flex items-center gap-3 flex-1 min-w-0'
 
-/**
- * List item avatar classes
- */
 export const listItemAvatarClasses = 'flex-shrink-0'
 
-/**
- * List item content classes
- */
 export const listItemContentClasses = 'flex-1 min-w-0'
 
-/**
- * List item title classes
- */
 export const listItemTitleClasses = 'font-medium text-[var(--tiger-text,#111827)] truncate'
 
-/**
- * List item description classes
- */
 export const listItemDescriptionClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)] mt-1'
 
-/**
- * List item extra classes
- */
-export const listItemExtraClasses = 'flex-shrink-0 ml-4'
+export const listItemExtraHorizontalClasses = 'flex-shrink-0 ms-4'
 
-/**
- * Grid container classes
- */
-export const listGridContainerClasses = 'grid gap-4'
+export const listItemExtraVerticalClasses = 'flex-shrink-0 mt-2'
+
+export const listGridContainerClasses = 'grid'
+
+export const listDragHandleClasses =
+  'inline-flex shrink-0 items-center justify-center rounded-sm p-1 text-[var(--tiger-text-muted,#6b7280)] cursor-grab touch-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
 const GRID_COLUMNS: Record<number, string> = {
   1: 'grid-cols-1',
@@ -140,178 +93,96 @@ const GRID_COLUMNS: Record<number, string> = {
   12: 'grid-cols-12'
 }
 
-const SM_GRID_COLUMNS: Record<number, string> = {
-  1: 'sm:grid-cols-1',
-  2: 'sm:grid-cols-2',
-  3: 'sm:grid-cols-3',
-  4: 'sm:grid-cols-4',
-  5: 'sm:grid-cols-5',
-  6: 'sm:grid-cols-6',
-  7: 'sm:grid-cols-7',
-  8: 'sm:grid-cols-8',
-  9: 'sm:grid-cols-9',
-  10: 'sm:grid-cols-10',
-  11: 'sm:grid-cols-11',
-  12: 'sm:grid-cols-12'
+function clampGridColumns(value: number | undefined): number | undefined {
+  if (value === undefined || !Number.isFinite(value)) return undefined
+  const n = Math.floor(value)
+  if (n < 1 || n > 12) return undefined
+  return n
 }
 
-const MD_GRID_COLUMNS: Record<number, string> = {
-  1: 'md:grid-cols-1',
-  2: 'md:grid-cols-2',
-  3: 'md:grid-cols-3',
-  4: 'md:grid-cols-4',
-  5: 'md:grid-cols-5',
-  6: 'md:grid-cols-6',
-  7: 'md:grid-cols-7',
-  8: 'md:grid-cols-8',
-  9: 'md:grid-cols-9',
-  10: 'md:grid-cols-10',
-  11: 'md:grid-cols-11',
-  12: 'md:grid-cols-12'
+export function resolveListGridColumnCount(
+  grid: ListGrid | undefined,
+  width: number,
+  minWidths: Record<ResponsiveBreakpoint, number> = RESPONSIVE_BREAKPOINT_FALLBACK_PX
+): number {
+  if (!grid) return 1
+  const map: Partial<Record<ResponsiveBreakpoint, number>> = {}
+  if (grid.xs !== undefined) map.xs = grid.xs
+  if (grid.sm !== undefined) map.sm = grid.sm
+  if (grid.md !== undefined) map.md = grid.md
+  if (grid.lg !== undefined) map.lg = grid.lg
+  if (grid.xl !== undefined) map.xl = grid.xl
+  if (grid['2xl'] !== undefined) map['2xl'] = grid['2xl']
+  const hasMap = Object.keys(map).length > 0
+  const resolved = hasMap
+    ? resolveResponsiveValue(map, width, grid.column ?? 1, minWidths)
+    : (grid.column ?? 1)
+  return clampGridColumns(resolved) ?? 1
 }
 
-const LG_GRID_COLUMNS: Record<number, string> = {
-  1: 'lg:grid-cols-1',
-  2: 'lg:grid-cols-2',
-  3: 'lg:grid-cols-3',
-  4: 'lg:grid-cols-4',
-  5: 'lg:grid-cols-5',
-  6: 'lg:grid-cols-6',
-  7: 'lg:grid-cols-7',
-  8: 'lg:grid-cols-8',
-  9: 'lg:grid-cols-9',
-  10: 'lg:grid-cols-10',
-  11: 'lg:grid-cols-11',
-  12: 'lg:grid-cols-12'
+export function getListGridColumnClass(columnCount: number): string {
+  return GRID_COLUMNS[clampGridColumns(columnCount) ?? 1] ?? GRID_COLUMNS[1]
 }
 
-const XL_GRID_COLUMNS: Record<number, string> = {
-  1: 'xl:grid-cols-1',
-  2: 'xl:grid-cols-2',
-  3: 'xl:grid-cols-3',
-  4: 'xl:grid-cols-4',
-  5: 'xl:grid-cols-5',
-  6: 'xl:grid-cols-6',
-  7: 'xl:grid-cols-7',
-  8: 'xl:grid-cols-8',
-  9: 'xl:grid-cols-9',
-  10: 'xl:grid-cols-10',
-  11: 'xl:grid-cols-11',
-  12: 'xl:grid-cols-12'
+export function getListGridGapStyle(gutter: number | undefined): { gap: string } | undefined {
+  if (gutter === undefined) return undefined
+  const value = Number.isFinite(gutter) && gutter >= 0 ? gutter : 0
+  return { gap: `${value}px` }
 }
 
-const XXL_GRID_COLUMNS: Record<number, string> = {
-  1: '2xl:grid-cols-1',
-  2: '2xl:grid-cols-2',
-  3: '2xl:grid-cols-3',
-  4: '2xl:grid-cols-4',
-  5: '2xl:grid-cols-5',
-  6: '2xl:grid-cols-6',
-  7: '2xl:grid-cols-7',
-  8: '2xl:grid-cols-8',
-  9: '2xl:grid-cols-9',
-  10: '2xl:grid-cols-10',
-  11: '2xl:grid-cols-11',
-  12: '2xl:grid-cols-12'
+export function getListClasses(bordered: boolean): string {
+  return classNames(listBaseClasses, bordered && listBorderedClasses)
 }
 
-function getColumnClass(map: Record<number, string>, value?: number): string | undefined {
-  if (!value || !Number.isFinite(value)) return undefined
-  return map[Math.floor(value)]
-}
-
-/**
- * Get list container classes
- * @param bordered - Border style
- * @returns Combined class string for list container
- */
-export function getListClasses(bordered: ListBorderStyle): string {
-  const classes = [listBaseClasses, listBorderClasses[bordered]]
-  return classes.filter(Boolean).join(' ')
-}
-
-/**
- * Get list item classes
- * @param size - List size
- * @param layout - Item layout
- * @param divided - Whether to show divider
- * @param hoverable - Whether item is hoverable
- * @returns Combined class string for list item
- */
 export function getListItemClasses(
   size: ComponentSize,
   layout: ListItemLayout,
   divided: boolean,
   hoverable = false
 ): string {
-  const classes = [listItemBaseClasses, listItemSizeClasses[size], listItemLayoutClasses[layout]]
-
-  if (divided) {
-    classes.push(listItemDividedClasses)
-  }
-
-  if (hoverable) {
-    classes.push(listItemHoverClasses)
-  }
-
-  return classes.join(' ')
+  return classNames(
+    listItemBaseClasses,
+    listItemSizeClasses[size],
+    listItemLayoutClasses[layout],
+    divided && listItemDividedClasses,
+    hoverable && listItemHoverClasses
+  )
 }
 
-/**
- * Get list header/footer classes
- * @param size - List size
- * @param isFooter - Whether it's a footer (instead of header)
- * @returns Combined class string for header/footer
- */
+export function getListItemExtraClasses(layout: ListItemLayout): string {
+  return layout === 'vertical' ? listItemExtraVerticalClasses : listItemExtraHorizontalClasses
+}
+
 export function getListHeaderFooterClasses(size: ComponentSize, isFooter = false): string {
-  const classes = [listHeaderFooterBaseClasses, listItemSizeClasses[size]]
-
-  if (isFooter) {
-    classes.push(listFooterClasses)
-  }
-
-  return classes.join(' ')
+  return classNames(
+    listHeaderFooterBaseClasses,
+    listItemSizeClasses[size],
+    isFooter && listFooterClasses
+  )
 }
 
-/**
- * Get grid column classes based on breakpoint
- * @param column - Default column count
- * @param xs - Extra small breakpoint columns
- * @param sm - Small breakpoint columns
- * @param md - Medium breakpoint columns
- * @param lg - Large breakpoint columns
- * @param xl - Extra large breakpoint columns
- * @param xxl - 2x Extra large breakpoint columns
- * @returns Combined grid column classes
- */
-export function getGridColumnClasses(
-  column?: number,
-  xs?: number,
-  sm?: number,
-  md?: number,
-  lg?: number,
-  xl?: number,
-  xxl?: number
-): string {
-  const classes: string[] = []
+export function resolveListVirtualItemHeight(
+  size: ComponentSize,
+  virtualItemHeight?: number
+): number {
+  if (
+    virtualItemHeight !== undefined &&
+    Number.isFinite(virtualItemHeight) &&
+    virtualItemHeight > 0
+  ) {
+    return virtualItemHeight
+  }
+  return listVirtualItemHeight[size]
+}
 
-  const baseClass = getColumnClass(GRID_COLUMNS, xs ?? column)
-  if (baseClass) classes.push(baseClass)
-
-  const smClass = getColumnClass(SM_GRID_COLUMNS, sm)
-  if (smClass) classes.push(smClass)
-
-  const mdClass = getColumnClass(MD_GRID_COLUMNS, md)
-  if (mdClass) classes.push(mdClass)
-
-  const lgClass = getColumnClass(LG_GRID_COLUMNS, lg)
-  if (lgClass) classes.push(lgClass)
-
-  const xlClass = getColumnClass(XL_GRID_COLUMNS, xl)
-  if (xlClass) classes.push(xlClass)
-
-  const xxlClass = getColumnClass(XXL_GRID_COLUMNS, xxl)
-  if (xxlClass) classes.push(xxlClass)
-
-  return classes.join(' ')
+export function getListSourceIndex(
+  pageIndex: number,
+  currentPage: number,
+  pageSize: number,
+  remote: boolean
+): number {
+  if (remote) return pageIndex
+  const page = currentPage > 0 ? currentPage : 1
+  const size = pageSize > 0 ? pageSize : 10
+  return (page - 1) * size + pageIndex
 }

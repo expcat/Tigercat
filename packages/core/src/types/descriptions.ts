@@ -2,6 +2,8 @@
  * Descriptions component types and interfaces
  */
 import type { ComponentSize } from './base'
+import type { ResponsiveBreakpoint } from '../utils/responsive'
+import type { TigerLocale } from './locale'
 
 /**
  * Descriptions layout types
@@ -54,6 +56,11 @@ export interface DescriptionsProps {
   extra?: unknown
 
   /**
+   * Description items. This is the data source — default slot/children are not items.
+   */
+  items?: DescriptionsItem[]
+
+  /**
    * Whether to show border
    * @default false
    */
@@ -61,11 +68,11 @@ export interface DescriptionsProps {
 
   /**
    * Number of columns per row.
-   * Can be a number or responsive object { xs?: number, sm?: number, md?: number, lg?: number, xl?: number, xxl?: number }
+   * A breakpoint map is resolved against the **container** width, using
+   * `--tiger-breakpoint-*` (`xs` … `2xl`).
    * @default 3
-   * @since 0.6.0 — responsive object support
    */
-  column?: number | Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>
+  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
 
   /**
    * Descriptions size
@@ -94,6 +101,11 @@ export interface DescriptionsProps {
    * Content style (CSS properties object)
    */
   contentStyle?: Record<string, string>
+
+  /**
+   * Locale overlay
+   */
+  locale?: Partial<TigerLocale>
 
   /**
    * Additional CSS classes

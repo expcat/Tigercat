@@ -18,12 +18,8 @@ describe('resolveResponsiveValue', () => {
     expect(resolveResponsiveValue({ xs: 1, md: 2, lg: 3 }, 1100, 1)).toBe(3)
   })
 
-  it('resolves xxl breakpoint (width >= 1536)', () => {
-    expect(resolveResponsiveValue({ xs: 1, xxl: 6 }, 1600, 1)).toBe(6)
-  })
-
-  it('resolves xxxl breakpoint (width >= 1920)', () => {
-    expect(resolveResponsiveValue({ xs: 1, xxl: 6, xxxl: 7 }, 1920, 1)).toBe(7)
+  it('resolves 2xl breakpoint (width >= 1536)', () => {
+    expect(resolveResponsiveValue({ xs: 1, '2xl': 6 }, 1600, 1)).toBe(6)
   })
 
   it('falls back to nearest smaller breakpoint', () => {

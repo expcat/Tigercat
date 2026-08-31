@@ -43,6 +43,10 @@ import type {
   TigerLocaleMarquee,
   TigerLocaleImage,
   TigerLocaleImageCompare,
+  TigerLocaleDescriptions,
+  TigerLocaleList,
+  TigerLocaleScrollArea,
+  TigerLocalePrintLayout,
   TigerLocaleTransfer,
   TigerLocaleChart,
   TigerLocaleMarkdownEditor,
@@ -397,6 +401,34 @@ export function getImageCompareLabels(
   overrides?: Partial<TigerLocaleImageCompare>
 ): Required<TigerLocaleImageCompare> {
   return resolveLocaleSection(enSection('imageCompare'), locale?.imageCompare, overrides)
+}
+
+export function getDescriptionsLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleDescriptions>
+): Required<TigerLocaleDescriptions> {
+  return resolveLocaleSection(enSection('descriptions'), locale?.descriptions, overrides)
+}
+
+export function getListLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleList>
+): Required<TigerLocaleList> {
+  return resolveLocaleSection(enSection('list'), locale?.list, overrides)
+}
+
+export function getScrollAreaLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleScrollArea>
+): Required<TigerLocaleScrollArea> {
+  return resolveLocaleSection(enSection('scrollArea'), locale?.scrollArea, overrides)
+}
+
+export function getPrintLayoutLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocalePrintLayout>
+): Required<TigerLocalePrintLayout> {
+  return resolveLocaleSection(enSection('printLayout'), locale?.printLayout, overrides)
 }
 
 export function getTransferLabels(

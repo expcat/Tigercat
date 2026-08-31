@@ -53,6 +53,19 @@ export const arSA: TigerLocale = {
   imageCompare: {
     ariaLabel: 'مقارنة الصور'
   },
+  descriptions: {
+    colon: ':'
+  },
+  list: {
+    avatarAlt: 'صورة رمزية',
+    dragHandleAriaLabel: 'إعادة ترتيب'
+  },
+  scrollArea: {
+    ariaLabel: 'منطقة التمرير'
+  },
+  printLayout: {
+    pageBreak: 'فاصل صفحات'
+  },
   timeline: {
     pendingText: 'جار التحميل...'
   },

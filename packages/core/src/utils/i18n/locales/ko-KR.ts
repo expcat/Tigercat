@@ -53,6 +53,19 @@ export const koKR: TigerLocale = {
   imageCompare: {
     ariaLabel: '이미지 비교'
   },
+  descriptions: {
+    colon: ':'
+  },
+  list: {
+    avatarAlt: '아바타',
+    dragHandleAriaLabel: '순서 변경'
+  },
+  scrollArea: {
+    ariaLabel: '스크롤 영역'
+  },
+  printLayout: {
+    pageBreak: '페이지 나누기'
+  },
   timeline: {
     pendingText: '로딩 중...'
   },
