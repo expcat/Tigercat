@@ -10,6 +10,7 @@ export default function App() {
         status="error"
         errorMessage="日期无效"
         defaultValue="1301"
+        clearable
       />
       <MaskInput mask="****-****" size="lg" defaultValue="ab12" clearable />
     </div>

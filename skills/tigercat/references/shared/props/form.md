@@ -216,34 +216,45 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 
 ## InputOTP
 
-`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 3/20 props
+`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 7/20 props
 
-| Prop        | Type      | Default | Notes                                                                      |
-| ----------- | --------- | ------- | -------------------------------------------------------------------------- |
-| `value?`    | `string`  | `-`     | Value (for controlled mode) — the joined characters, at most `length` long |
-| `disabled?` | `boolean` | `false` | Whether the input is disabled                                              |
-| `name?`     | `string`  | `-`     | Name for the hidden input carrying the joined value (form submission)      |
+| Prop        | Type           | Default     | Notes                                                                                      |
+| ----------- | -------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `length?`   | `number`       | `6`         | Number of character slots                                                                  |
+| `value?`    | `string`       | `-`         | Value (for controlled mode) — the joined characters, at most `length` long                 |
+| `type?`     | `InputOTPType` | `'numeric'` | Allowed character set; drives per-character filtering and `inputmode`                      |
+| `masked?`   | `boolean`      | `false`     | Hide entered characters — each filled slot renders `maskChar` instead                      |
+| `groups?`   | `number[]`     | `-`         | Visual slot grouping, e.g. `[3, 3]`; ignored (with a dev warning) unless the group size... |
+| `disabled?` | `boolean`      | `false`     | Whether the input is disabled                                                              |
+| `name?`     | `string`       | `-`         | Name for the hidden input carrying the joined value (form submission)                      |
 
 ## MaskInput
 
-`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 4/17 props
+`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 6/18 props
 
-| Prop        | Type      | Default | Notes                                                                                      |
-| ----------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
-| `mask`      | `string`  | `-`     | Mask template. Built-in tokens: `#` digit, `a` letter, `*` alphanumeric; `!` escapes th... |
-| `value?`    | `string`  | `-`     | Raw (unmasked) value (for controlled mode)                                                 |
-| `disabled?` | `boolean` | `false` | Whether the input is disabled                                                              |
-| `name?`     | `string`  | `-`     | Input name attribute. When set, a hidden input with this name submits the raw (unmasked... |
+| Prop         | Type                        | Default | Notes                                                                                      |
+| ------------ | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `mask`       | `string`                    | `-`     | Mask template. Built-in tokens: `#` digit, `a` letter, `*` alphanumeric; `!` escapes th... |
+| `value?`     | `string`                    | `-`     | Raw (unmasked) value (for controlled mode)                                                 |
+| `tokens?`    | `Record<string, MaskToken>` | `-`     | Custom tokens merged over the built-ins                                                    |
+| `clearable?` | `boolean`                   | `false` | Whether to show a clear button when the input has value                                    |
+| `disabled?`  | `boolean`                   | `false` | Whether the input is disabled                                                              |
+| `name?`      | `string`                    | `-`     | Input name attribute. When set, a hidden input with this name submits the raw (unmasked... |
 
 ## Mentions
 
-`packages/core/src/types/mentions.ts` · `MentionsProps` · 3/10 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 8/24 props
 
-| Prop        | Type              | Default | Notes                     |
-| ----------- | ----------------- | ------- | ------------------------- |
-| `options?`  | `MentionOption[]` | `-`     | Available mention options |
-| `disabled?` | `boolean`         | `-`     | Disabled state            |
-| `value?`    | `string`          | `-`     | -                         |
+| Prop            | Type                   | Default | Notes                                                                    |
+| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------ |
+| `options?`      | `MentionOption[]`      | `-`     | Available mention options                                                |
+| `value?`        | `string`               | `-`     | Textarea value. `undefined` is uncontrolled; `''` is a legal empty body. |
+| `prefix?`       | `string \| string[]`   | `'@'`   | Trigger character(s). A single character or several (`['@', '#']`).      |
+| `filterOption?` | `MentionsFilterOption` | `true`  | Local filter. Default matches both `label` and `value`.                  |
+| `open?`         | `boolean`              | `-`     | Controlled open state. `undefined` is uncontrolled.                      |
+| `disabled?`     | `boolean`              | `-`     | Disabled state                                                           |
+| `loading?`      | `boolean`              | `-`     | Show a loading state instead of treating an empty list as no match       |
+| `name?`         | `string`               | `-`     | Native name attribute on the textarea                                    |
 
 ## NumberKeyboard
 
@@ -369,13 +380,18 @@ Events/callback props: `onChange?`.
 
 ## TagsInput
 
-`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 3/19 props
+`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 8/20 props
 
-| Prop        | Type       | Default | Notes                                                                 |
-| ----------- | ---------- | ------- | --------------------------------------------------------------------- |
-| `value?`    | `string[]` | `-`     | Tags (for controlled mode)                                            |
-| `disabled?` | `boolean`  | `false` | Whether the input is disabled                                         |
-| `name?`     | `string`   | `-`     | Name for the hidden input carrying the joined value (form submission) |
+| Prop               | Type       | Default | Notes                                                                                      |
+| ------------------ | ---------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`           | `string[]` | `-`     | Tags (for controlled mode)                                                                 |
+| `max?`             | `number`   | `-`     | Maximum number of tags; further adds are rejected while the input stays focusable for r... |
+| `delimiters?`      | `string[]` | `[',']` | Characters that commit the pending input while typing and split pasted text into multip... |
+| `allowDuplicates?` | `boolean`  | `false` | Whether the same tag may be added more than once (case-sensitive comparison). When dupl... |
+| `addOnBlur?`       | `boolean`  | `false` | Commit the pending input as a tag on blur                                                  |
+| `clearable?`       | `boolean`  | `false` | Whether to show a clear-all button when there are tags                                     |
+| `disabled?`        | `boolean`  | `false` | Whether the input is disabled                                                              |
+| `name?`            | `string`   | `-`     | Name for the hidden input carrying the joined value (form submission)                      |
 
 ## Textarea
 

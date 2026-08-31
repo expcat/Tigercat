@@ -41,7 +41,9 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | InputGroup      | `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>` | `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>` |
 | InputGroupAddon | `<InputGroupAddon>https://</InputGroupAddon>`                                                               | `<InputGroupAddon>https://</InputGroupAddon>`                                                               |
 | InputNumber     | `<InputNumber v-model="value" />`                                                                           | `<InputNumber value={value} onChange={setValue} />`                                                         |
-| MaskInput       | `<MaskInput :mask="mask" />`                                                                                | `<MaskInput mask={mask} />`                                                                                 |
+| InputOTP        | `<InputOTP v-model="value" />`                                                                              | `<InputOTP value={value} onChange={setValue} />`                                                            |
+| MaskInput       | `<MaskInput v-model="value" mask="##/##/####" />`                                                           | `<MaskInput value={value} mask="##/##/####" onChange={(raw) => setValue(raw)} />`                           |
+| Mentions        | `<Mentions v-model="value" :options="options" />`                                                           | `<Mentions value={value} options={options} onChange={setValue} />`                                          |
 | NumberKeyboard  | `<NumberKeyboard v-model="value" />`                                                                        | `<NumberKeyboard value={value} onChange={setValue} />`                                                      |
 | Radio           | `<Radio v-model="checked" value="a">A</Radio>`                                                              | `<Radio checked={checked} onChange={setChecked} value="a">A</Radio>`                                        |
 | RadioGroup      | `<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>`                                       | `<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>`                     |
@@ -50,10 +52,11 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | Slider          | `<Slider v-model="value" />`                                                                                | `<Slider value={value} onChange={setValue} />`                                                              |
 | Stepper         | `<Stepper v-model="value" />`                                                                               | `<Stepper value={value} onChange={setValue} />`                                                             |
 | Switch          | `<Switch v-model="checked">Label</Switch>`                                                                  | `<Switch checked={checked} onChange={setChecked}>Label</Switch>`                                            |
+| TagsInput       | `<TagsInput v-model="tags" />`                                                                              | `<TagsInput value={tags} onChange={setTags} />`                                                             |
 | Textarea        | `<Textarea v-model="value" :rows="4" />`                                                                    | `<Textarea value={value} onChange={(event) => setValue(event.target.value)} />`                             |
 | TimePicker      | `<TimePicker v-model="value" />`                                                                            | `<TimePicker value={value} onChange={setValue} />`                                                          |
 | TreeSelect      | `<TreeSelect v-model="value" :tree-data="treeData" />`                                                      | `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`                      |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：InputOTP, Mentions, TagsInput, Transfer, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Transfer, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -10,7 +10,8 @@ import { MaskInput } from '@expcat/tigercat-vue/MaskInput'
       size="md"
       status="error"
       error-message="日期无效"
-      default-value="1301" />
+      default-value="1301"
+      clearable />
     <MaskInput mask="****-****" size="lg" default-value="ab12" clearable />
   </div>
 </template>

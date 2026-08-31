@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Mentions } from '@expcat/tigercat-vue/Mentions'
 
 const value = ref('')
 const topics = [
   { label: '前端', value: 'frontend' },
   { label: '设计系统', value: 'design-system' },
-  { label: '可访问性', value: 'a11y' }
+  { label: '可访问性', value: 'a11y', disabled: true }
 ]
 </script>
 
 <template>
-  <Mentions
-    v-model="value"
-    :options="topics"
-    prefix="#"
-    placeholder="输入 # 添加话题"
-    class="w-full max-w-lg" />
+  <FormItem label="话题" class="w-full max-w-lg">
+    <Mentions
+      v-model="value"
+      :options="topics"
+      prefix="#"
+      placeholder="输入 # 添加话题（可访问性不可选）" />
+  </FormItem>
 </template>

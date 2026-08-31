@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Mentions } from '@expcat/tigercat-vue/Mentions'
 
 const value = ref('')
@@ -11,9 +12,14 @@ const users = [
 </script>
 
 <template>
-  <Mentions
-    v-model="value"
-    :options="users"
-    placeholder="输入 @ 提及成员"
-    class="w-full max-w-lg" />
+  <div class="w-full max-w-lg space-y-2">
+    <FormItem label="提及成员">
+      <Mentions v-model="value" :options="users" placeholder="输入 @ 提及成员" />
+    </FormItem>
+    <p class="text-sm text-gray-600 dark:text-gray-300">
+      搜「张」或「zhang」都能出张三；选中插入
+      <code>@zhangsan</code>
+      。当前：{{ value || '暂无' }}
+    </p>
+  </div>
 </template>

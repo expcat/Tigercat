@@ -1,12 +1,12 @@
 {
   "id": "mentions-01",
   "title": "基本用法",
-  "description": "输入 @ 触发用户列表",
+  "description": "输入 @ 触发用户列表。搜「张」和「zhang」都能出，插入的是 @zhangsan。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 280,
     "maxHeight": 720
   }
 }

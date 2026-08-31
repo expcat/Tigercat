@@ -451,7 +451,7 @@ Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat`
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 7/9 props
+`packages/core/src/types/tag.ts` · `TagProps` · 7/10 props
 
 Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
 

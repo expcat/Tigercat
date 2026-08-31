@@ -4,6 +4,14 @@
 
 ## 未发布
 
+Mentions 省略 `value` / `modelValue` 是非受控（不要再默认 `''`）；空正文才是 `''`。插入格式是 `prefix + option.value + 空格`，过滤同时匹配 `label` 和 `value`。新增 `defaultValue` / `open` / `onSearch` / `loading` / `filterOption` / `status`。弹层走 overlay-host。删除 `--tiger-mentions-*` 和 `getMentionsInputClasses`。Vue 导出 `MentionsProps` 与 `MentionOption`。
+
+MaskInput `v-model` 仍是 raw；`disabled` 时 hidden 不再提交。Clear 与 error 同时存在。自定义 token 的 `/g` 不再跳字。
+
+InputOTP 默认一个 Tab 停（roving）。多字只在第一格或 autofill 时整段覆盖。`pattern` 会改 `inputMode`。
+
+TagsInput 关闭钮不进 Tab。被拒的 pending 留在输入框。多值粘贴会先带上正在打的字。`name` 改为每个 tag 一个 hidden（`FormData.getAll`）。
+
 TimePicker 列点只改面板草稿，Footer OK 才写入；Escape / 点外面丢草稿。`Now` 立即提交当前时刻。空单选是 `null`，空 range 也是 `null`（不要再用 `[null, null]` 当空）。存储值永远是 24 小时 `'HH:mm'` / `'HH:mm:ss'`（由 `showSeconds` 决定）；`format="12"` 只影响显示和键入解析。`locale` 只收官方 locale 对象，不要传 `'zh-CN'`。新增 `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）、`disabledTime`、`status`、`placement` / `offset` / `dropdownClassName` / `getPopupContainer`。输入框可按当前 `format` 键入；`readonly` 才禁止打开。小屏是原生 `<select>`，不再同时挂桌面列。删除 `getTimePickerInputClasses` / `getTimePickerIconButtonClasses` / `timePickerClearButtonClasses` / `timePickerPanelContentClasses` / `timePickerDesktopPanelContentClasses` / `timePickerMobileWheelClasses` / `timePickerMobileWheelSelectClasses` / `timePickerInputWrapperClasses`（chrome 走 Input helpers）。Vue 主入口导出 `TimePickerProps`。React `forwardRef` 接到 input。
 
 Cascader 未选是 `undefined`（不要再用 `[]` 当空）。Clear 发出 `undefined`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）和 `loadData`。打开不再清空 `defaultSearchValue`。trigger 不再是 native `button`，而是 `role="combobox"`；搜索时 combobox 是输入框。列模式只有当前列是 `listbox`。空态走 `empty.noResults`，placeholder 走 `select.placeholder`。删除假 token `--tiger-cascader-*`。Vue 主入口导出 `CascaderProps` 与 `CascaderOption`。

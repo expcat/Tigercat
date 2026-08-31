@@ -4,6 +4,10 @@
 
 ## 未发布
 
+- **Mentions**：省略 `value` 能打字（`undefined` 非受控，`''` 是空正文）。过滤/插入/开合下沉 core；插入用 textarea 当前值。读 FormItem；textarea 是 combobox；弹层 overlay-host + `fullscreen-sm`。默认过滤匹配 label 和 value。删除假 `--tiger-mentions-*`。
+- **MaskInput**：chrome 与 Input 同层（clear 在内、error 在下，可同时有）。`/g` token 不跳字。`disabled` 时 hidden 不提交。读 FormItem；React `forwardRef`。Clear 走 `locale.input`。
+- **InputOTP**：一个 Tab 停；方向键读 `dir`。多字只在第一格/autofill 时整段覆盖。读 FormItem；id/aria 在当前格。`pattern` 改 `inputMode`。
+- **TagsInput**：一个 Tab 停（关闭钮 `tabIndex=-1`）。重复/满员留下 pending。粘贴先带上正在打的字。读 FormItem；id 在 textbox。`name` 每个 tag 一个 hidden。
 - **Signature**：笔迹会话下沉 core（pointerId、一次 finish）。受控值是 SVG data URL 或 `''`，能回灌；光栅从离屏逻辑尺寸导出，不再吃显示 canvas 的 DPR。空签不发空白图。读 FormItem；画板是可聚焦 widget；Undo + locale；假 `--tiger-signature-*` 删掉。React `forwardRef` / Vue `expose({ focus, clear, undo, toDataURL, toSVG, isEmpty })`。
 - **NumberKeyboard**：`applyNumberKeyboardKey` 一份。Confirm 的颜色单独解析，不再和普通键对打。假 `--tiger-number-keyboard-*` 删掉。组是一个 Tab 停，方向键和物理数字走同一份 apply。`open` 经 overlay-host 挂底栏。empty 是 spacer。读 FormItem。`phone`/`id-card` 写进 JSDoc。Confirm 走 `common.okText`。
 - **ColorPicker / ColorSwatch**：HSV 在拖动期间当事实源，面板有 SV 平面和光谱色相轨；所有操作按 `format` emit（hex+alpha 用 8 位）。未选是 `undefined`，Clear 是 `''`。补 `defaultValue` / `open` / `placement`。预设复用 ColorSwatch。读 FormItem；trigger 是 native button；弹层 dialog + trap + `fullscreen-sm` + Done。假 `--tiger-colorpicker-*` / `--tiger-colorswatch-*` 删掉。方向键读 `dir` 并环绕。勾按亮度选 on-color。

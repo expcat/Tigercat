@@ -328,6 +328,10 @@ export const COMPONENT_PROP_PRIORITY = {
     'disabled?',
     'readonly?'
   ],
+  Mentions: ['options?', 'value?', 'prefix?', 'filterOption?', 'open?', 'disabled?', 'loading?'],
+  MaskInput: ['mask', 'value?', 'tokens?', 'clearable?', 'disabled?', 'name?'],
+  InputOTP: ['length?', 'value?', 'type?', 'masked?', 'groups?', 'disabled?'],
+  TagsInput: ['value?', 'max?', 'delimiters?', 'allowDuplicates?', 'addOnBlur?', 'clearable?'],
   ColorSwatch: [
     'value?',
     'defaultValue?',
@@ -512,7 +516,11 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ColorSwatch: '<ColorSwatch v-model="value" :colors="colors" />',
     CronEditor: '<CronEditor v-model="value" />',
     Signature: '<Signature v-model="value" />',
-    NumberKeyboard: '<NumberKeyboard v-model="value" />'
+    NumberKeyboard: '<NumberKeyboard v-model="value" />',
+    Mentions: '<Mentions v-model="value" :options="options" />',
+    MaskInput: '<MaskInput v-model="value" mask="##/##/####" />',
+    InputOTP: '<InputOTP v-model="value" />',
+    TagsInput: '<TagsInput v-model="tags" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -567,7 +575,11 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ColorSwatch: '<ColorSwatch value={value} colors={colors} onChange={setValue} />',
     CronEditor: '<CronEditor value={value} onChange={setValue} />',
     Signature: '<Signature value={value} onChange={setValue} />',
-    NumberKeyboard: '<NumberKeyboard value={value} onChange={setValue} />'
+    NumberKeyboard: '<NumberKeyboard value={value} onChange={setValue} />',
+    Mentions: '<Mentions value={value} options={options} onChange={setValue} />',
+    MaskInput: '<MaskInput value={value} mask="##/##/####" onChange={(raw) => setValue(raw)} />',
+    InputOTP: '<InputOTP value={value} onChange={setValue} />',
+    TagsInput: '<TagsInput value={tags} onChange={setTags} />'
   }
 }
 
