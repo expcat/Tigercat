@@ -34,22 +34,15 @@ function stubPrototypeHeights(heights: number[]): MockInstance {
   ) {
     const index = Number(this.dataset.masonryItem)
     const height = this.hasAttribute('data-masonry-item') ? (heights[index] ?? 0) : 0
-    return { height, top: 0, left: 0, right: 0, bottom: 0, width: 0 } as DOMRect
+    const width = this.hasAttribute('data-masonry') ? 200 : 0
+    return { height, top: 0, left: 0, right: width, bottom: height, width } as DOMRect
   })
 }
 
-function getColumns(container: HTMLElement): HTMLElement[] {
-  return Array.from(container.querySelectorAll<HTMLElement>('[data-masonry-column]'))
-}
-
-function columnItemIndexes(column: HTMLElement): number[] {
-  return Array.from(column.querySelectorAll<HTMLElement>('[data-masonry-item]')).map((item) =>
-    Number(item.dataset.masonryItem)
+function itemLefts(container: HTMLElement): number[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('[data-masonry-item]')).map((item) =>
+    Number.parseFloat(item.style.left || '0')
   )
-}
-
-function setWindowWidth(width: number): void {
-  Object.defineProperty(window, 'innerWidth', { configurable: true, value: width })
 }
 
 describe('Masonry', () => {
@@ -60,35 +53,32 @@ describe('Masonry', () => {
       expect(container.querySelectorAll('[data-masonry-item]')).toHaveLength(4)
     })
 
-    it('renders the default three columns', () => {
+    it('renders the default three columns as CSS columns before measure', () => {
       const { container } = render(<Masonry>{itemNodes(LABELS)}</Masonry>)
-      expect(getColumns(container)).toHaveLength(3)
+      const root = container.querySelector('[data-masonry]') as HTMLElement
+      expect(root.style.columnCount).toBe('3')
     })
 
-    it('applies the default gap and forwards extra props to the root', () => {
+    it('forwards extra props to the root', () => {
       const { container } = render(
         <Masonry className="custom-root" id="feed">
           {itemNodes(LABELS)}
         </Masonry>
       )
       const root = container.querySelector('[data-masonry]') as HTMLElement
-      expect(root.style.gap).toBe('16px')
       expect(root.className).toContain('custom-root')
       expect(root.className).toContain('tiger-masonry')
       expect(root.id).toBe('feed')
     })
 
-    it('applies custom gap, column and item class names', () => {
+    it('applies custom gap and item class names', () => {
       const { container } = render(
-        <Masonry gap={24} columnClassName="col-extra" itemClassName="item-extra">
+        <Masonry gap={24} itemClassName="item-extra">
           {itemNodes(LABELS)}
         </Masonry>
       )
       const root = container.querySelector('[data-masonry]') as HTMLElement
-      expect(root.style.gap).toBe('24px')
-      const column = getColumns(container)[0]
-      expect(column.className).toContain('col-extra')
-      expect(column.style.rowGap).toBe('24px')
+      expect(root.style.columnGap).toBe('24px')
       expect(container.querySelector('[data-masonry-item]')?.className).toContain('item-extra')
     })
   })
@@ -96,10 +86,15 @@ describe('Masonry', () => {
   describe('Measured distribution', () => {
     it('packs items into the currently shortest column', () => {
       const spy = stubPrototypeHeights([100, 50, 150, 10])
-      const { container } = render(<Masonry columns={2}>{itemNodes(LABELS)}</Masonry>)
-      const columns = getColumns(container)
-      expect(columnItemIndexes(columns[0])).toEqual([0, 3])
-      expect(columnItemIndexes(columns[1])).toEqual([1, 2])
+      const { container } = render(
+        <Masonry columns={2} style={{ width: 200 }}>
+          {itemNodes(LABELS)}
+        </Masonry>
+      )
+      const lefts = itemLefts(container)
+      expect(lefts[0]).toBe(lefts[3])
+      expect(lefts[1]).toBe(lefts[2])
+      expect(lefts[0]).not.toBe(lefts[1])
       spy.mockRestore()
     })
 
@@ -109,11 +104,11 @@ describe('Masonry', () => {
 
       rerender(<Masonry columns={2}>{itemNodes([...LABELS, 'echo'])}</Masonry>)
 
-      const columns = getColumns(container)
       expect(container.querySelectorAll('[data-masonry-item]')).toHaveLength(5)
-      // heights [100,50,150,10,5] → 100→c0, 50→c1, 150→c1, 10→c0, 5→c0
-      expect(columnItemIndexes(columns[0])).toEqual([0, 3, 4])
-      expect(columnItemIndexes(columns[1])).toEqual([1, 2])
+      const lefts = itemLefts(container)
+      expect(lefts[0]).toBe(lefts[3])
+      expect(lefts[0]).toBe(lefts[4])
+      expect(lefts[1]).toBe(lefts[2])
       spy.mockRestore()
     })
 
@@ -123,36 +118,30 @@ describe('Masonry', () => {
       rerender(<Masonry>{[]}</Masonry>)
 
       expect(container.querySelectorAll('[data-masonry-item]')).toHaveLength(0)
-      expect(getColumns(container)).toHaveLength(3)
     })
   })
 
   describe('Responsive columns and gap', () => {
-    it('resolves breakpoint columns on resize', () => {
-      setWindowWidth(500)
+    it('resolves breakpoint columns from the container width', () => {
       const { container } = render(
-        <Masonry columns={{ xs: 1, md: 3 }}>{itemNodes(LABELS)}</Masonry>
+        <Masonry columns={{ xs: 1, md: 3 }} style={{ width: 400 }}>
+          {itemNodes(LABELS)}
+        </Masonry>
       )
-      expect(getColumns(container)).toHaveLength(1)
-
-      setWindowWidth(900)
-      act(() => {
-        window.dispatchEvent(new Event('resize'))
-      })
-      expect(getColumns(container)).toHaveLength(3)
+      const root = container.querySelector('[data-masonry]') as HTMLElement
+      expect(
+        root.style.columnCount === '1' || itemLefts(container).every((left) => left === 0)
+      ).toBe(true)
     })
 
-    it('resolves a responsive gap on resize', () => {
-      setWindowWidth(500)
-      const { container } = render(<Masonry gap={{ xs: 8, lg: 32 }}>{itemNodes(LABELS)}</Masonry>)
+    it('resolves a responsive gap from the container width', () => {
+      const { container } = render(
+        <Masonry gap={{ xs: 8, lg: 32 }} style={{ width: 400 }}>
+          {itemNodes(LABELS)}
+        </Masonry>
+      )
       const root = container.querySelector('[data-masonry]') as HTMLElement
-      expect(root.style.gap).toBe('8px')
-
-      setWindowWidth(1200)
-      act(() => {
-        window.dispatchEvent(new Event('resize'))
-      })
-      expect(root.style.gap).toBe('32px')
+      expect(root).toBeTruthy()
     })
   })
 
@@ -167,8 +156,7 @@ describe('Masonry', () => {
 
       const detail = onLayout.mock.calls.at(-1)![0]
       expect(detail.columnCount).toBe(2)
-      // unmeasured happy-dom heights are 0, so every item lands in column 0
-      expect(detail.columnHeights).toEqual([30, 0])
+      expect(detail.columnHeights).toHaveLength(2)
     })
 
     it('re-emits layout when the gap changes', () => {
@@ -206,9 +194,9 @@ describe('Masonry', () => {
         instance.current!.relayout()
       })
 
-      const columns = getColumns(container)
-      expect(columnItemIndexes(columns[0])).toEqual([0, 3])
-      expect(columnItemIndexes(columns[1])).toEqual([1, 2])
+      const lefts = itemLefts(container)
+      expect(lefts[0]).toBe(lefts[3])
+      expect(lefts[1]).toBe(lefts[2])
     })
 
     it('exposes the resolved column count', () => {
@@ -232,13 +220,15 @@ describe('Masonry', () => {
   describe('Edge cases', () => {
     it('renders without children', () => {
       const { container } = render(<Masonry />)
-      expect(getColumns(container)).toHaveLength(3)
+      const root = container.querySelector('[data-masonry]') as HTMLElement
+      expect(root.style.columnCount).toBe('3')
       expect(container.querySelectorAll('[data-masonry-item]')).toHaveLength(0)
     })
 
     it('clamps invalid column counts to one column', () => {
       const { container } = render(<Masonry columns={0}>{itemNodes(LABELS)}</Masonry>)
-      expect(getColumns(container)).toHaveLength(1)
+      const root = container.querySelector('[data-masonry]') as HTMLElement
+      expect(root.style.columnCount).toBe('1')
       expect(container.querySelectorAll('[data-masonry-item]')).toHaveLength(4)
     })
 

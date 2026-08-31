@@ -41,7 +41,7 @@ describe('Descriptions (React)', () => {
     const items: DescriptionsItem[] = [{ label: 'CPU', content: '8C' }]
     const { container } = render(<Descriptions items={items} layout="vertical" bordered />)
     expect(container.querySelector('table')).toBeInTheDocument()
-    expect(container.querySelector('th')?.textContent).toContain('CPU')
+    expect(container.querySelector('td')?.textContent).toContain('CPU')
     expect(container.querySelector('td')?.textContent).toContain('8C')
   })
 
@@ -63,6 +63,20 @@ describe('Descriptions (React)', () => {
     expect(c2.querySelectorAll('td')[1].getAttribute('colspan')).toBe('3')
   })
 
+  it('lays vertical items out in columns', () => {
+    const items: DescriptionsItem[] = [
+      { label: 'A', content: '1' },
+      { label: 'B', content: '2' },
+      { label: 'C', content: '3', span: 2 }
+    ]
+    const { container } = render(
+      <Descriptions items={items} layout="vertical" column={2} bordered />
+    )
+    const cells = container.querySelectorAll('td')
+    expect(cells).toHaveLength(3)
+    expect(cells[2].getAttribute('colspan')).toBe('2')
+  })
+
   it('hides colon when colon=false', () => {
     const { container } = render(
       <Descriptions items={[{ label: 'Key', content: 'Val' }]} colon={false} />
@@ -72,7 +86,8 @@ describe('Descriptions (React)', () => {
 
   it('shows colon by default', () => {
     const { container } = render(<Descriptions items={[{ label: 'Key', content: 'Val' }]} />)
-    expect(container.querySelector('th')?.textContent).toBe('Key:')
+    expect(container.querySelector('th')?.textContent).toContain('Key')
+    expect(container.querySelector('th')?.textContent).not.toBe('Key')
   })
 
   it('applies size classes', () => {

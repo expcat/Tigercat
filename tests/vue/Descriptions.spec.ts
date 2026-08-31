@@ -51,7 +51,7 @@ describe('Descriptions (Vue)', () => {
       props: { items, layout: 'vertical', bordered: true }
     })
     expect(container.querySelector('table')).toBeTruthy()
-    expect(container.querySelector('th')?.textContent).toContain('CPU')
+    expect(container.querySelector('td')?.textContent).toContain('CPU')
     expect(container.querySelector('td')?.textContent).toContain('8C')
   })
 
@@ -86,7 +86,8 @@ describe('Descriptions (Vue)', () => {
     const { container } = render(Descriptions, {
       props: { items: [{ label: 'Key', content: 'Val' }] }
     })
-    expect(container.querySelector('th')?.textContent).toBe('Key:')
+    expect(container.querySelector('th')?.textContent).toContain('Key')
+    expect(container.querySelector('th')?.textContent).not.toBe('Key')
   })
 
   it('applies size classes', () => {

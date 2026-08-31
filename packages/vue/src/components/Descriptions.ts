@@ -1,339 +1,332 @@
-import { defineComponent, computed, h, ref, onMounted, onUnmounted, PropType } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref, watch, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  mergeStyleValues,
+  devWarn,
   getDescriptionsClasses,
-  getDescriptionsTableClasses,
-  getDescriptionsLabelClasses,
   getDescriptionsContentClasses,
+  getDescriptionsHorizontalColSpan,
+  getDescriptionsLabelClasses,
+  getDescriptionsLabels,
+  getDescriptionsTableClasses,
+  getDescriptionsVerticalGridStyle,
   getDescriptionsVerticalItemClasses,
   groupItemsIntoRows,
-  descriptionsWrapperClasses,
+  descriptionsCaptionClasses,
+  descriptionsExtraClasses,
   descriptionsHeaderClasses,
   descriptionsTitleClasses,
-  descriptionsExtraClasses,
-  descriptionsVerticalWrapperClasses,
+  isResponsiveMap,
+  mergeStyleValues,
+  mergeTigerLocale,
+  observeElementSize,
   resolveResponsiveValue,
-  isBrowser,
   type ComponentSize,
-  type DescriptionsLayout,
   type DescriptionsItem,
-  type ResponsiveBreakpoint
+  type DescriptionsLayout,
+  type DescriptionsProps as CoreDescriptionsProps,
+  type ResponsiveBreakpoint,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 type HChildren = Parameters<typeof h>[2]
 
-export interface VueDescriptionsProps {
+export interface VueDescriptionsProps extends Omit<
+  CoreDescriptionsProps,
+  'title' | 'extra' | 'labelStyle' | 'contentStyle'
+> {
   title?: string | number
   extra?: unknown
-  bordered?: boolean
-  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
-  size?: ComponentSize
-  layout?: DescriptionsLayout
-  colon?: boolean
   labelStyle?: Record<string, string | number>
   contentStyle?: Record<string, string | number>
   items?: DescriptionsItem[]
+  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
+  locale?: Partial<TigerLocale>
   className?: string
   style?: Record<string, string | number> | string
 }
+
+export type DescriptionsProps = VueDescriptionsProps
+
+let descriptionsId = 0
 
 export const Descriptions = defineComponent({
   name: 'TigerDescriptions',
   inheritAttrs: false,
   props: {
-    /**
-     * Descriptions title
-     */
-    title: {
-      type: [String, Number] as PropType<string | number>,
-      default: undefined
-    },
-    /**
-     * Extra content (actions, links, etc.)
-     */
-    extra: {
-      type: null as unknown as PropType<unknown>,
-      default: undefined
-    },
-    /**
-     * Whether to show border
-     * @default false
-     */
-    bordered: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Number of columns per row (number or responsive object)
-     * @default 3
-     */
+    title: { type: [String, Number] as PropType<string | number>, default: undefined },
+    extra: { type: null as unknown as PropType<unknown>, default: undefined },
+    bordered: { type: Boolean, default: false },
     column: {
       type: [Number, Object] as PropType<number | Partial<Record<ResponsiveBreakpoint, number>>>,
       default: 3
     },
-    /**
-     * Descriptions size
-     * @default 'md'
-     */
-    size: {
-      type: String as PropType<ComponentSize>,
-      default: 'md'
-    },
-    /**
-     * Descriptions layout
-     * @default 'horizontal'
-     */
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
     layout: {
       type: String as PropType<DescriptionsLayout>,
       default: 'horizontal' as DescriptionsLayout
     },
-    /**
-     * Whether to show colon after label
-     * @default true
-     */
-    colon: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Label style
-     */
+    colon: { type: Boolean, default: true },
     labelStyle: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     },
-    /**
-     * Content style
-     */
     contentStyle: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     },
-    /**
-     * Items data source (alternative to using slots)
-     */
-    items: {
-      type: Array as PropType<DescriptionsItem[]>,
-      default: () => []
-    },
-    className: {
-      type: String,
-      default: undefined
-    },
+    items: { type: Array as PropType<DescriptionsItem[]>, default: () => [] },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    className: { type: String, default: undefined },
     style: {
       type: [Object, String] as PropType<Record<string, string | number> | string>,
       default: undefined
     }
   },
   setup(props, { slots, attrs }) {
-    // Track window width for responsive column
-    const windowWidth = ref(isBrowser() ? window.innerWidth : 1024)
-    let onResize: (() => void) | undefined
-    if (isBrowser() && typeof props.column === 'object') {
-      onResize = () => {
-        windowWidth.value = window.innerWidth
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const colonGlyph = computed(() => getDescriptionsLabels(mergedLocale.value).colon)
+    const titleId = `tiger-descriptions-title-${++descriptionsId}`
+    const rootRef = ref<HTMLElement | null>(null)
+    const containerWidth = ref(0)
+    let stopSize: (() => void) | undefined
+
+    const bindSize = (): void => {
+      stopSize?.()
+      stopSize = undefined
+      if (!isResponsiveMap(props.column)) {
+        containerWidth.value = 0
+        return
       }
-    }
-    onMounted(() => {
-      if (onResize) window.addEventListener('resize', onResize)
-    })
-    onUnmounted(() => {
-      if (onResize) window.removeEventListener('resize', onResize)
-    })
-
-    const effectiveColumn = computed(() => {
-      return resolveResponsiveValue(props.column, windowWidth.value, 3)
-    })
-
-    const descriptionsClasses = computed(() => {
-      return getDescriptionsClasses(props.size)
-    })
-
-    const tableClasses = computed(() => {
-      return getDescriptionsTableClasses(props.bordered)
-    })
-
-    // Render header section
-    function renderHeader() {
-      if (!props.title && !slots.title && !props.extra && !slots.extra) {
-        return null
-      }
-
-      return h('div', { class: descriptionsHeaderClasses }, [
-        props.title || slots.title
-          ? h('div', { class: descriptionsTitleClasses }, slots.title?.() || props.title)
-          : null,
-        props.extra || slots.extra
-          ? h(
-              'div',
-              { class: descriptionsExtraClasses },
-              slots.extra?.() || (props.extra as HChildren)
-            )
-          : null
-      ])
-    }
-
-    // Render horizontal layout (table-based)
-    function renderHorizontalLayout() {
-      const items = props.items
-      if (items.length === 0 && !slots.default) {
-        return null
-      }
-
-      const rows = groupItemsIntoRows(items, effectiveColumn.value)
-
-      return h('table', { class: tableClasses.value }, [
-        h(
-          'tbody',
-          {},
-          rows.map((row) => renderRow(row))
-        )
-      ])
-    }
-
-    // Render a single row in horizontal layout
-    function renderRow(rowItems: DescriptionsItem[]) {
-      const cells: ReturnType<typeof h>[] = []
-
-      rowItems.forEach((item) => {
-        const span = Math.min(item.span || 1, effectiveColumn.value)
-        const labelClass = classNames(
-          getDescriptionsLabelClasses(props.bordered, props.size, props.layout),
-          item.labelClassName
-        )
-        const contentClass = classNames(
-          getDescriptionsContentClasses(props.bordered, props.size, props.layout),
-          item.contentClassName
-        )
-
-        // Label cell
-        cells.push(
-          h(
-            'th',
-            {
-              class: labelClass,
-              style: props.labelStyle
-            },
-            [item.label, props.colon ? ':' : '']
-          )
-        )
-
-        // Content cell
-        cells.push(
-          h(
-            'td',
-            {
-              class: contentClass,
-              style: props.contentStyle,
-              colspan: span > 1 ? span * 2 - 1 : 1
-            },
-            item.content as HChildren
-          )
-        )
+      stopSize = observeElementSize(rootRef.value, ({ width }) => {
+        containerWidth.value = width
       })
-
-      return h('tr', {}, cells)
     }
 
-    // Render vertical layout (stacked)
-    function renderVerticalLayout() {
-      const items = props.items
-      if (items.length === 0 && !slots.default) {
-        return null
-      }
+    onMounted(bindSize)
+    onBeforeUnmount(() => stopSize?.())
+    watch(
+      () => props.column,
+      () => bindSize()
+    )
 
-      if (props.bordered) {
-        // Use table for bordered vertical layout
-        return h('table', { class: tableClasses.value }, [
+    const column = computed(() => resolveResponsiveValue(props.column, containerWidth.value, 3))
+    const rows = computed(() => groupItemsIntoRows(props.items, column.value))
+    const useCaption = computed(() =>
+      Boolean(
+        props.title &&
+        !props.extra &&
+        !slots.extra &&
+        (props.layout === 'horizontal' || props.bordered)
+      )
+    )
+    const showHeader = computed(() =>
+      Boolean(props.extra || slots.extra || slots.title || (props.title && !useCaption.value))
+    )
+
+    function labelText(item: DescriptionsItem): HChildren {
+      return [item.label, props.colon ? colonGlyph.value : '']
+    }
+
+    function renderHorizontal() {
+      if (props.items.length === 0) return null
+      return h(
+        'table',
+        {
+          class: getDescriptionsTableClasses(props.bordered),
+          'aria-labelledby': props.title ? titleId : undefined
+        },
+        [
+          useCaption.value
+            ? h('caption', { class: descriptionsCaptionClasses, id: titleId }, props.title)
+            : null,
           h(
             'tbody',
             {},
-            items.map((item) => renderVerticalItem(item))
+            rows.value.map((rowItems) =>
+              h(
+                'tr',
+                {},
+                rowItems.flatMap((item) => [
+                  h(
+                    'th',
+                    {
+                      scope: 'row',
+                      class: classNames(
+                        getDescriptionsLabelClasses(props.bordered, props.size, 'horizontal'),
+                        item.labelClassName
+                      ),
+                      style: props.labelStyle
+                    },
+                    labelText(item)
+                  ),
+                  h(
+                    'td',
+                    {
+                      class: classNames(
+                        getDescriptionsContentClasses(props.bordered, props.size, 'horizontal'),
+                        item.contentClassName
+                      ),
+                      style: props.contentStyle,
+                      colspan: getDescriptionsHorizontalColSpan(item.span || 1)
+                    },
+                    item.content as HChildren
+                  )
+                ])
+              )
+            )
           )
-        ])
+        ]
+      )
+    }
+
+    function renderVertical() {
+      if (props.items.length === 0) return null
+      if (props.bordered) {
+        return h(
+          'table',
+          {
+            class: getDescriptionsTableClasses(true),
+            'aria-labelledby': props.title ? titleId : undefined
+          },
+          [
+            useCaption.value
+              ? h('caption', { class: descriptionsCaptionClasses, id: titleId }, props.title)
+              : null,
+            h(
+              'tbody',
+              {},
+              rows.value.map((rowItems) =>
+                h(
+                  'tr',
+                  {},
+                  rowItems.map((item) =>
+                    h(
+                      'td',
+                      {
+                        colspan: item.span || 1,
+                        class: getDescriptionsVerticalItemClasses(props.size, true)
+                      },
+                      [
+                        h(
+                          'div',
+                          {
+                            class: classNames(
+                              getDescriptionsLabelClasses(true, props.size, 'vertical'),
+                              item.labelClassName
+                            ),
+                            style: props.labelStyle
+                          },
+                          labelText(item)
+                        ),
+                        h(
+                          'div',
+                          {
+                            class: classNames(
+                              getDescriptionsContentClasses(true, props.size, 'vertical'),
+                              item.contentClassName
+                            ),
+                            style: props.contentStyle
+                          },
+                          item.content as HChildren
+                        )
+                      ]
+                    )
+                  )
+                )
+              )
+            )
+          ]
+        )
       }
 
       return h(
         'dl',
-        { class: descriptionsVerticalWrapperClasses },
-        items.map((item) => renderVerticalItem(item))
-      )
-    }
-
-    // Render a single item in vertical layout
-    function renderVerticalItem(item: DescriptionsItem) {
-      const labelClass = classNames(
-        getDescriptionsLabelClasses(props.bordered, props.size, props.layout),
-        item.labelClassName
-      )
-      const contentClass = classNames(
-        getDescriptionsContentClasses(props.bordered, props.size, props.layout),
-        item.contentClassName
-      )
-
-      if (props.bordered) {
-        // Table row for bordered layout
-        return h('tr', {}, [
-          h(
-            'th',
-            {
-              class: labelClass,
-              style: props.labelStyle
-            },
-            [item.label, props.colon ? ':' : '']
-          ),
-          h(
-            'td',
-            {
-              class: contentClass,
-              style: props.contentStyle
-            },
-            item.content as HChildren
+        {
+          class: 'grid w-full',
+          style: getDescriptionsVerticalGridStyle(column.value),
+          'aria-labelledby': props.title ? titleId : undefined
+        },
+        rows.value.flatMap((rowItems) =>
+          rowItems.map((item) =>
+            h(
+              'div',
+              {
+                class: getDescriptionsVerticalItemClasses(props.size, false),
+                style: { gridColumn: `span ${item.span || 1}` }
+              },
+              [
+                h(
+                  'dt',
+                  {
+                    class: classNames(
+                      getDescriptionsLabelClasses(false, props.size, 'vertical'),
+                      item.labelClassName
+                    ),
+                    style: props.labelStyle
+                  },
+                  labelText(item)
+                ),
+                h(
+                  'dd',
+                  {
+                    class: classNames(
+                      getDescriptionsContentClasses(false, props.size, 'vertical'),
+                      item.contentClassName
+                    ),
+                    style: props.contentStyle
+                  },
+                  item.content as HChildren
+                )
+              ]
+            )
           )
-        ])
-      }
-
-      // Simple div for non-bordered layout
-      const itemClasses = getDescriptionsVerticalItemClasses(props.size)
-      return h('div', { class: itemClasses }, [
-        h(
-          'dt',
-          {
-            class: labelClass,
-            style: props.labelStyle
-          },
-          [item.label, props.colon ? ':' : '']
-        ),
-        h(
-          'dd',
-          {
-            class: contentClass,
-            style: props.contentStyle
-          },
-          item.content as HChildren
         )
-      ])
+      )
     }
 
     return () => {
+      if (slots.default && props.items.length === 0) {
+        devWarn(
+          'Descriptions.children',
+          'Descriptions: `items` is the data source. Default slot content is ignored and is not description rows.'
+        )
+      }
+
       return h(
         'div',
         {
           ...attrs,
+          ref: rootRef,
           class: classNames(
-            descriptionsWrapperClasses,
-            descriptionsClasses.value,
+            getDescriptionsClasses(props.size, props.bordered),
             props.className,
             coerceClassValue(attrs.class)
           ),
           style: mergeStyleValues(props.style, attrs.style)
         },
         [
-          renderHeader(),
-          props.layout === 'horizontal' ? renderHorizontalLayout() : renderVerticalLayout(),
-          slots.default?.()
+          showHeader.value
+            ? h('div', { class: descriptionsHeaderClasses }, [
+                props.title || slots.title
+                  ? h(
+                      'div',
+                      { class: descriptionsTitleClasses, id: titleId },
+                      slots.title?.() || props.title
+                    )
+                  : null,
+                props.extra || slots.extra
+                  ? h(
+                      'div',
+                      { class: descriptionsExtraClasses },
+                      slots.extra?.() || (props.extra as HChildren)
+                    )
+                  : null
+              ])
+            : null,
+          props.layout === 'horizontal' ? renderHorizontal() : renderVertical()
         ]
       )
     }

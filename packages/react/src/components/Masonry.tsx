@@ -4,21 +4,22 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
-  useState,
-  useSyncExternalStore
+  useState
 } from 'react'
 import {
   classNames,
-  computeMasonryColumnHeights,
-  distributeMasonryItems,
-  getMasonryColumnClasses,
-  getMasonryColumnStyle,
-  getMasonryGapStyle,
+  computeMasonryPositions,
+  getMasonryFlowRootStyle,
   getMasonryItemClasses,
+  getMasonryItemPositionStyle,
+  getMasonryPackedRootStyle,
   getMasonryRootClasses,
-  moduloDistributeMasonryItems,
+  hasMeasuredMasonryHeights,
+  isResponsiveMap,
+  observeElementSize,
   observeScrollAreaSize,
   readMasonryItemHeight,
   resolveMasonryColumnCount,
@@ -32,7 +33,6 @@ import {
 
 export interface MasonryProps
   extends CoreMasonryProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  /** Fired after the layout is (re)computed */
   onLayout?: (detail: MasonryLayoutDetail) => void
 }
 
@@ -51,148 +51,163 @@ function sameHeights(previous: number[], next: number[]): boolean {
   )
 }
 
-function subscribeToResize(onChange: () => void): () => void {
-  window.addEventListener('resize', onChange)
-  return () => window.removeEventListener('resize', onChange)
-}
+export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonry(
+  {
+    columns = MASONRY_DEFAULT_COLUMNS,
+    gap = MASONRY_DEFAULT_GAP,
+    className,
+    columnClassName: _columnClassName,
+    itemClassName,
+    children,
+    onLayout,
+    style,
+    ...rest
+  },
+  ref
+) {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef(new Map<number, HTMLDivElement>())
+  const heightsRef = useRef<number[]>([])
+  const lastSignatureRef = useRef('')
+  const onLayoutRef = useRef(onLayout)
+  onLayoutRef.current = onLayout
+  const [containerWidth, setContainerWidth] = useState(0)
+  const [heights, setHeights] = useState<number[]>([])
 
-const noopSubscribe = () => () => undefined
+  const childNodes = useMemo(() => Children.toArray(children), [children])
+  const signature = childSignature(childNodes)
+  const isResponsive = isResponsiveMap(columns) || isResponsiveMap(gap)
+  const widthForResolve = isResponsive ? containerWidth : 1024
 
-export const Masonry = forwardRef<MasonryInstance, MasonryProps>(
-  (
-    {
-      columns = MASONRY_DEFAULT_COLUMNS,
-      gap = MASONRY_DEFAULT_GAP,
-      className,
-      columnClassName,
-      itemClassName,
-      children,
-      onLayout,
-      style,
-      ...rest
+  const columnCount = resolveMasonryColumnCount(columns, widthForResolve)
+  const gapPx = resolveMasonryGap(gap, widthForResolve)
+  const packed =
+    hasMeasuredMasonryHeights(heights) &&
+    containerWidth > 0 &&
+    heights.length === childNodes.length
+  const positions = packed
+    ? computeMasonryPositions(heights, columnCount, gapPx, containerWidth)
+    : []
+
+  const emitLayout = useCallback(
+    (nextHeights: number[]) => {
+      const packedPositions = hasMeasuredMasonryHeights(nextHeights)
+        ? computeMasonryPositions(nextHeights, columnCount, gapPx, containerWidth)
+        : []
+      const columnHeights = Array.from({ length: columnCount }, () => 0)
+      packedPositions.forEach((position, index) => {
+        const bottom = position.top + (nextHeights[index] || 0)
+        if (bottom > columnHeights[position.column]) columnHeights[position.column] = bottom
+      })
+      onLayoutRef.current?.({ columnCount, columnHeights })
     },
-    ref
-  ) => {
-    const itemRefs = useRef(new Map<number, HTMLDivElement>())
-    const heightsRef = useRef<number[]>([])
-    const lastSignatureRef = useRef('')
-    const onLayoutRef = useRef(onLayout)
-    onLayoutRef.current = onLayout
-    const [distribution, setDistribution] = useState<number[][]>([])
+    [columnCount, containerWidth, gapPx]
+  )
 
-    const childNodes = useMemo(() => Children.toArray(children), [children])
-    const signature = childSignature(childNodes)
-
-    const isResponsive = typeof columns === 'object' || typeof gap === 'object'
-
-    const subscribe = useMemo(
-      () => (isResponsive ? subscribeToResize : noopSubscribe),
-      [isResponsive]
-    )
-    const windowWidth = useSyncExternalStore(
-      subscribe,
-      () => window.innerWidth,
-      () => 1024
-    )
-
-    const columnCount = resolveMasonryColumnCount(columns, windowWidth)
-    const gapPx = resolveMasonryGap(gap, windowWidth)
-
-    const relayout = useCallback(() => {
-      const elements = itemRefs.current
-      const indices = Array.from(elements.keys())
-      const maxIndex = indices.length > 0 ? Math.max(...indices) : -1
-      const nextHeights: number[] = []
-      for (let index = 0; index <= maxIndex; index++) {
-        const element = elements.get(index)
-        nextHeights.push(element ? readMasonryItemHeight(element) : 0)
-      }
-
-      // ResizeObserver fires once per (re)observe — bail out when neither the
-      // item set nor any height changed, so observation never loops.
-      const countChanged = nextHeights.length !== heightsRef.current.length
-      if (!countChanged && sameHeights(heightsRef.current, nextHeights)) return
-
+  const measure = useCallback(() => {
+    const nextHeights: number[] = childNodes.map((_, index) => {
+      const element = itemRefs.current.get(index)
+      return element ? readMasonryItemHeight(element) : 0
+    })
+    if (!sameHeights(heightsRef.current, nextHeights)) {
       heightsRef.current = nextHeights
-      const nextDistribution = distributeMasonryItems(nextHeights, columnCount)
-      setDistribution(nextDistribution)
-      onLayoutRef.current?.({
-        columnCount,
-        columnHeights: computeMasonryColumnHeights(nextHeights, nextDistribution, gapPx)
-      })
-    }, [columnCount, gapPx])
+      setHeights(nextHeights)
+    }
+    emitLayout(nextHeights)
+  }, [childNodes, emitLayout])
 
-    useEffect(() => {
-      // Children changed → re-measure; only the width changed → reuse cached
-      // heights and redistribute.
-      if (lastSignatureRef.current !== signature) {
-        lastSignatureRef.current = signature
-        relayout()
-        return
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root) return undefined
+    setContainerWidth(root.getBoundingClientRect().width)
+    return observeElementSize(root, ({ width }) => setContainerWidth(width))
+  }, [])
+
+  useEffect(() => {
+    if (lastSignatureRef.current !== signature) {
+      lastSignatureRef.current = signature
+      heightsRef.current = []
+      setHeights([])
+    }
+    measure()
+  }, [signature, columnCount, gapPx, containerWidth, measure])
+
+  useEffect(() => {
+    if (childNodes.length === 0) return undefined
+    const items = Array.from(itemRefs.current.values())
+    const stopRo = observeScrollAreaSize(items, measure)
+    const medias = items.flatMap((el) => Array.from(el.querySelectorAll('img, video')))
+    const onLoad = () => measure()
+    for (const media of medias) {
+      media.addEventListener('load', onLoad)
+      media.addEventListener('error', onLoad)
+    }
+    return () => {
+      stopRo()
+      for (const media of medias) {
+        media.removeEventListener('load', onLoad)
+        media.removeEventListener('error', onLoad)
       }
-      if (heightsRef.current.length === 0) return
+    }
+  }, [signature, measure, childNodes.length])
 
-      const nextDistribution = distributeMasonryItems(heightsRef.current, columnCount)
-      setDistribution(nextDistribution)
-      onLayoutRef.current?.({
-        columnCount,
-        columnHeights: computeMasonryColumnHeights(heightsRef.current, nextDistribution, gapPx)
-      })
-    }, [signature, columnCount, gapPx, relayout])
+  useImperativeHandle(
+    ref,
+    () => ({
+      relayout: measure,
+      getColumnCount: () => columnCount
+    }),
+    [measure, columnCount]
+  )
 
-    // Re-observe whenever the rendered item set changes: new elements need a
-    // fresh observer and removed elements must be released.
-    useEffect(() => {
-      if (childNodes.length === 0) return
-      return observeScrollAreaSize(Array.from(itemRefs.current.values()), relayout)
-    }, [signature, distribution, relayout, childNodes.length])
+  const packedHeight = packed
+    ? Math.max(0, ...positions.map((position, index) => position.top + (heights[index] || 0)))
+    : 0
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        relayout,
-        getColumnCount: () => columnCount
-      }),
-      [relayout, columnCount]
-    )
+  const rootStyle = packed
+    ? { ...getMasonryPackedRootStyle(packedHeight, gapPx), ...style }
+    : { ...getMasonryFlowRootStyle(columnCount, gapPx), ...style }
 
-    // Until the post-render measurement catches up, fall back to round-robin
-    // so inserted items are never dropped and removed wrappers disappear.
-    const activeDistribution =
-      distribution.length > 0 && heightsRef.current.length === childNodes.length
-        ? distribution
-        : moduloDistributeMasonryItems(childNodes.length, columnCount)
+  const labelled = Boolean(rest['aria-label'] || rest['aria-labelledby'])
 
-    return (
-      <div
-        {...rest}
-        className={classNames(getMasonryRootClasses(className))}
-        style={{ ...getMasonryGapStyle(gapPx), ...style }}
-        data-masonry="">
-        {activeDistribution.map((indices, columnIndex) => (
+  return (
+    <div
+      {...rest}
+      ref={rootRef}
+      role={labelled ? 'list' : rest.role}
+      className={classNames(getMasonryRootClasses(className))}
+      style={rootStyle}
+      data-masonry="">
+      {childNodes.map((child, index) => {
+        const key =
+          typeof child === 'object' && child !== null && 'key' in child && child.key != null
+            ? child.key
+            : `item-${index}`
+        return (
           <div
-            key={`column-${columnIndex}`}
-            className={getMasonryColumnClasses(columnClassName)}
-            style={getMasonryColumnStyle(gapPx)}
-            data-masonry-column={columnIndex}>
-            {indices.map((index) => (
-              <div
-                key={`item-${index}`}
-                className={getMasonryItemClasses(itemClassName)}
-                data-masonry-item={index}
-                ref={(el) => {
-                  if (el) itemRefs.current.set(index, el)
-                  else itemRefs.current.delete(index)
-                }}>
-                {childNodes[index]}
-              </div>
-            ))}
+            key={key}
+            role={labelled ? 'listitem' : undefined}
+            className={getMasonryItemClasses(itemClassName)}
+            style={
+              packed && positions[index]
+                ? getMasonryItemPositionStyle(positions[index])
+                : undefined
+            }
+            data-masonry-item={index}
+            ref={(el) => {
+              if (el) itemRefs.current.set(index, el)
+              else {
+                const existing = itemRefs.current.get(index)
+                if (!existing || !existing.isConnected) itemRefs.current.delete(index)
+              }
+            }}>
+            {child}
           </div>
-        ))}
-      </div>
-    )
-  }
-)
+        )
+      })}
+    </div>
+  )
+})
 
 Masonry.displayName = 'Masonry'
 

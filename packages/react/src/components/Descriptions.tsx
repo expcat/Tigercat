@@ -1,252 +1,256 @@
-import React, { useMemo, useSyncExternalStore } from 'react'
+import React, { forwardRef, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  devWarn,
   getDescriptionsClasses,
-  getDescriptionsTableClasses,
-  getDescriptionsLabelClasses,
   getDescriptionsContentClasses,
+  getDescriptionsHorizontalColSpan,
+  getDescriptionsLabelClasses,
+  getDescriptionsTableClasses,
+  getDescriptionsVerticalGridStyle,
   getDescriptionsVerticalItemClasses,
+  getDescriptionsLabels,
   groupItemsIntoRows,
-  descriptionsWrapperClasses,
+  descriptionsCaptionClasses,
+  descriptionsExtraClasses,
   descriptionsHeaderClasses,
   descriptionsTitleClasses,
-  descriptionsExtraClasses,
-  descriptionsVerticalWrapperClasses,
+  isResponsiveMap,
+  mergeTigerLocale,
+  observeElementSize,
   resolveResponsiveValue,
   type ComponentSize,
-  type DescriptionsLayout,
   type DescriptionsItem,
-  type ResponsiveBreakpoint
+  type DescriptionsLayout,
+  type DescriptionsProps as CoreDescriptionsProps,
+  type ResponsiveBreakpoint,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
-export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-  /**
-   * Descriptions title
-   */
+export interface DescriptionsProps
+  extends
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
+    Omit<CoreDescriptionsProps, 'title' | 'extra' | 'labelStyle' | 'contentStyle'> {
   title?: React.ReactNode
-
-  /**
-   * Extra content (actions, links, etc.)
-   */
   extra?: React.ReactNode
-
-  /**
-   * Whether to show border
-   * @default false
-   */
-  bordered?: boolean
-
-  /**
-   * Number of columns per row (number or responsive object)
-   * @default 3
-   */
-  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
-
-  /**
-   * Descriptions size
-   * @default 'md'
-   */
-  size?: ComponentSize
-
-  /**
-   * Descriptions layout
-   * @default 'horizontal'
-   */
-  layout?: DescriptionsLayout
-
-  /**
-   * Whether to show colon after label
-   * @default true
-   */
-  colon?: boolean
-
-  /**
-   * Label style
-   */
   labelStyle?: React.CSSProperties
-
-  /**
-   * Content style
-   */
   contentStyle?: React.CSSProperties
-
-  /**
-   * Items data source
-   */
   items?: DescriptionsItem[]
+  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
+  locale?: Partial<TigerLocale>
 }
 
-export const Descriptions: React.FC<DescriptionsProps> = ({
-  title,
-  extra,
-  bordered = false,
-  column: columnProp = 3,
-  size = 'md',
-  layout = 'horizontal',
-  colon = true,
-  labelStyle,
-  contentStyle,
-  items = [],
-  className,
-  children,
-  ...props
-}) => {
-  // Responsive column resolution
-  const isResponsive = typeof columnProp === 'object' && columnProp !== null
-  const subscribe = useMemo(() => {
-    if (!isResponsive) {
-      return () => () => {}
-    }
-    return (cb: () => void) => {
-      window.addEventListener('resize', cb)
-      return () => window.removeEventListener('resize', cb)
-    }
+function renderColon(show: boolean, glyph: string): string {
+  return show ? glyph : ''
+}
+
+export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(function Descriptions(
+  {
+    title,
+    extra,
+    bordered = false,
+    column: columnProp = 3,
+    size = 'md' as ComponentSize,
+    layout = 'horizontal' as DescriptionsLayout,
+    colon = true,
+    labelStyle,
+    contentStyle,
+    items = [],
+    className,
+    children,
+    locale,
+    ...props
+  },
+  ref
+) {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const colonGlyph = getDescriptionsLabels(mergedLocale).colon
+  const titleId = useId()
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const isResponsive = isResponsiveMap(columnProp)
+  const [containerWidth, setContainerWidth] = useState(0)
+
+  useLayoutEffect(() => {
+    if (!isResponsive) return undefined
+    return observeElementSize(rootRef.current, ({ width }) => setContainerWidth(width))
   }, [isResponsive])
-  const getSnapshot = () => window.innerWidth
-  const getServerSnapshot = () => 1024
-  const windowWidth = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+
   const column = useMemo(
-    () => resolveResponsiveValue(columnProp, windowWidth, 3),
-    [columnProp, windowWidth]
+    () => resolveResponsiveValue(columnProp, containerWidth, 3),
+    [columnProp, containerWidth]
   )
 
-  const renderHeader = () => {
-    if (!title && !extra) return null
-
-    return (
-      <div className={descriptionsHeaderClasses}>
-        {title ? <div className={descriptionsTitleClasses}>{title}</div> : null}
-        {extra ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
-      </div>
+  if (children && items.length === 0) {
+    devWarn(
+      'Descriptions.children',
+      'Descriptions: `items` is the data source. Default children are ignored and are not description rows.'
     )
   }
 
-  const renderRow = (rowItems: DescriptionsItem[], rowIndex: number) => {
-    const cells: React.ReactNode[] = []
+  const rows = groupItemsIntoRows(items, column)
+  const labelledBy = title ? titleId : undefined
+  const rootClasses = classNames(getDescriptionsClasses(size, bordered), className)
 
-    rowItems.forEach((item, itemIndex) => {
-      const span = Math.min(item.span || 1, column)
-      const labelClass = classNames(
-        getDescriptionsLabelClasses(bordered, size, layout),
-        item.labelClassName
-      )
-      const contentClass = classNames(
-        getDescriptionsContentClasses(bordered, size, layout),
-        item.contentClassName
-      )
-
-      const key = `${rowIndex}-${itemIndex}`
-
-      cells.push(
-        <th key={`${key}-label`} className={labelClass} style={labelStyle}>
-          {item.label}
-          {colon ? ':' : ''}
-        </th>
-      )
-
-      cells.push(
-        <td
-          key={`${key}-content`}
-          className={contentClass}
-          style={contentStyle}
-          colSpan={span > 1 ? span * 2 - 1 : 1}>
-          {item.content as React.ReactNode}
-        </td>
-      )
-    })
-
-    return <tr key={rowIndex}>{cells}</tr>
+  const setRootRef = (node: HTMLDivElement | null) => {
+    rootRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
   }
 
-  // Render horizontal layout (table-based)
-  const renderHorizontalLayout = () => {
-    if (items.length === 0 && !children) {
-      return null
-    }
+  const renderLabel = (item: DescriptionsItem) => (
+    <>
+      {item.label}
+      {renderColon(colon, colonGlyph)}
+    </>
+  )
 
-    const rows = groupItemsIntoRows(items, column)
-
+  const renderHorizontal = () => {
+    if (items.length === 0) return null
     return (
-      <table className={getDescriptionsTableClasses(bordered)}>
-        <tbody>{rows.map((row, index) => renderRow(row, index))}</tbody>
+      <table className={getDescriptionsTableClasses(bordered)} aria-labelledby={labelledBy}>
+        {useCaption ? (
+          <caption className={descriptionsCaptionClasses} id={titleId}>
+            {title}
+          </caption>
+        ) : null}
+        <tbody>
+          {rows.map((rowItems, rowIndex) => (
+            <tr key={rowIndex}>
+              {rowItems.map((item, itemIndex) => {
+                const span = item.span || 1
+                return (
+                  <React.Fragment key={`${rowIndex}-${itemIndex}`}>
+                    <th
+                      scope="row"
+                      className={classNames(
+                        getDescriptionsLabelClasses(bordered, size, 'horizontal'),
+                        item.labelClassName
+                      )}
+                      style={labelStyle}>
+                      {renderLabel(item)}
+                    </th>
+                    <td
+                      className={classNames(
+                        getDescriptionsContentClasses(bordered, size, 'horizontal'),
+                        item.contentClassName
+                      )}
+                      style={contentStyle}
+                      colSpan={getDescriptionsHorizontalColSpan(span)}>
+                      {item.content as React.ReactNode}
+                    </td>
+                  </React.Fragment>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
       </table>
     )
   }
 
-  // Render a single item in vertical layout
-  const renderVerticalItem = (item: DescriptionsItem, index: number) => {
-    const labelClass = classNames(
-      getDescriptionsLabelClasses(bordered, size, layout),
-      item.labelClassName
-    )
-    const contentClass = classNames(
-      getDescriptionsContentClasses(bordered, size, layout),
-      item.contentClassName
-    )
+  const renderVertical = () => {
+    if (items.length === 0) return null
 
     if (bordered) {
       return (
-        <tr key={index}>
-          <th className={labelClass} style={labelStyle}>
-            {item.label}
-            {colon ? ':' : ''}
-          </th>
-          <td className={contentClass} style={contentStyle}>
-            {item.content as React.ReactNode}
-          </td>
-        </tr>
-      )
-    }
-
-    const itemClasses = getDescriptionsVerticalItemClasses(size)
-    return (
-      <div key={index} className={itemClasses}>
-        <dt className={labelClass} style={labelStyle}>
-          {item.label}
-          {colon ? ':' : ''}
-        </dt>
-        <dd className={contentClass} style={contentStyle}>
-          {item.content as React.ReactNode}
-        </dd>
-      </div>
-    )
-  }
-
-  // Render vertical layout (stacked)
-  const renderVerticalLayout = () => {
-    if (items.length === 0 && !children) {
-      return null
-    }
-
-    if (bordered) {
-      // Use table for bordered vertical layout
-      return (
-        <table className={getDescriptionsTableClasses(bordered)}>
-          <tbody>{items.map((item, index) => renderVerticalItem(item, index))}</tbody>
+        <table className={getDescriptionsTableClasses(true)} aria-labelledby={labelledBy}>
+          {useCaption ? (
+            <caption className={descriptionsCaptionClasses} id={titleId}>
+              {title}
+            </caption>
+          ) : null}
+          <tbody>
+            {rows.map((rowItems, rowIndex) => (
+              <tr key={rowIndex}>
+                {rowItems.map((item, itemIndex) => (
+                  <td
+                    key={`${rowIndex}-${itemIndex}`}
+                    colSpan={item.span || 1}
+                    className={getDescriptionsVerticalItemClasses(size, true)}>
+                    <div
+                      className={classNames(
+                        getDescriptionsLabelClasses(true, size, 'vertical'),
+                        item.labelClassName
+                      )}
+                      style={labelStyle}>
+                      {renderLabel(item)}
+                    </div>
+                    <div
+                      className={classNames(
+                        getDescriptionsContentClasses(true, size, 'vertical'),
+                        item.contentClassName
+                      )}
+                      style={contentStyle}>
+                      {item.content as React.ReactNode}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
         </table>
       )
     }
 
     return (
-      <dl className={descriptionsVerticalWrapperClasses}>
-        {items.map((item, index) => renderVerticalItem(item, index))}
+      <dl
+        className={classNames('grid w-full')}
+        style={getDescriptionsVerticalGridStyle(column)}
+        aria-labelledby={labelledBy}>
+        {rows.flatMap((rowItems, rowIndex) =>
+          rowItems.map((item, itemIndex) => (
+            <div
+              key={`${rowIndex}-${itemIndex}`}
+              className={getDescriptionsVerticalItemClasses(size, false)}
+              style={{ gridColumn: `span ${item.span || 1}` }}>
+              <dt
+                className={classNames(
+                  getDescriptionsLabelClasses(false, size, 'vertical'),
+                  item.labelClassName
+                )}
+                style={labelStyle}>
+                {renderLabel(item)}
+              </dt>
+              <dd
+                className={classNames(
+                  getDescriptionsContentClasses(false, size, 'vertical'),
+                  item.contentClassName
+                )}
+                style={contentStyle}>
+                {item.content as React.ReactNode}
+              </dd>
+            </div>
+          ))
+        )}
       </dl>
     )
   }
 
-  const descriptionsClasses = classNames(
-    descriptionsWrapperClasses,
-    getDescriptionsClasses(size),
-    className
-  )
+  const useCaption = Boolean(title && !extra && (layout === 'horizontal' || bordered))
+  const showHeader = Boolean(extra || (title && !useCaption))
 
   return (
-    <div className={descriptionsClasses} {...props}>
-      {renderHeader()}
-      {layout === 'horizontal' ? renderHorizontalLayout() : renderVerticalLayout()}
-      {children}
+    <div ref={setRootRef} className={rootClasses} {...props}>
+      {showHeader ? (
+        <div className={descriptionsHeaderClasses}>
+          {title ? (
+            <div className={descriptionsTitleClasses} id={titleId}>
+              {title}
+            </div>
+          ) : null}
+          {extra ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
+        </div>
+      ) : null}
+      {layout === 'horizontal' ? renderHorizontal() : renderVertical()}
     </div>
   )
-}
+})
+
+Descriptions.displayName = 'Descriptions'
 
 export default Descriptions
