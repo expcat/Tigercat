@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { render, screen } from '@testing-library/vue'
 import { Countdown } from '@expcat/tigercat-vue/Countdown'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const baseTime = 1704067200000
 
@@ -91,9 +91,14 @@ describe('Countdown', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('1:2:3')
   })
 
-  it('supports ariaLabel', () => {
-    renderWithProps(Countdown, { ariaLabel: 'Campaign countdown' })
-    expect(screen.getByRole('timer', { name: 'Campaign countdown' })).toBeInTheDocument()
+  it('names the root from ariaLabel and keeps the timer as the formatted time', () => {
+    renderWithProps(Countdown, {
+      ariaLabel: '付款倒计时',
+      value: baseTime + 5000,
+      now: baseTime
+    })
+    expect(screen.getByLabelText('付款倒计时')).toBeInTheDocument()
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:05')
   })
 
   it('ticks using Date.now after the initial SSR-safe value', async () => {
@@ -192,6 +197,24 @@ describe('Countdown', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('00:00:03')
   })
 
+  it('does not tick or finish when the target is already elapsed', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(baseTime)
+
+    const { emitted, unmount } = renderWithProps(Countdown, {
+      value: baseTime - 1000,
+      now: baseTime,
+      interval: 1000
+    })
+
+    vi.advanceTimersByTime(3000)
+    await nextTick()
+    expect(emitted().change).toBeUndefined()
+    expect(emitted().finish).toBeUndefined()
+    unmount()
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   describe('Edge Cases', () => {
     it('handles invalid value without crashing', () => {
       renderWithProps(Countdown, { value: 'invalid-date' })
@@ -201,10 +224,15 @@ describe('Countdown', () => {
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(baseTime)
       const { container } = render(Countdown, {
         props: { value: baseTime + 5000, now: baseTime }
       })
-      await expectNoA11yViolationsIsolated(container)
+      vi.advanceTimersByTime(1000)
+      await nextTick()
+      vi.useRealTimers()
+      await expectNoA11yViolations(container)
     })
   })
 })

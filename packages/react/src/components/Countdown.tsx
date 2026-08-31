@@ -19,11 +19,22 @@ import {
 
 export interface CountdownProps
   extends
-    Omit<CoreCountdownProps, 'className'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'onClick'> {
+    Omit<CoreCountdownProps, 'className' | 'title' | 'prefix' | 'suffix'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'title'> {
   className?: string
+  title?: React.ReactNode
+  prefix?: React.ReactNode
+  suffix?: React.ReactNode
   onChange?: (payload: CountdownChangePayload) => void
+  /**
+   * Fires once when remaining crosses 0. Already-elapsed mounts do not fire.
+   */
   onFinish?: (payload: CountdownChangePayload) => void
+}
+
+function initialRemaining(value: CountdownValue | undefined, now: CountdownValue | undefined): number {
+  if (now === undefined) return 0
+  return getCountdownRemaining(value, now)
 }
 
 export const Countdown: React.FC<CountdownProps> = ({
@@ -41,7 +52,7 @@ export const Countdown: React.FC<CountdownProps> = ({
   onFinish,
   ...rest
 }) => {
-  const [remaining, setRemaining] = useState(() => getCountdownRemaining(value, now))
+  const [remaining, setRemaining] = useState(() => initialRemaining(value, now))
   const finishedRef = useRef(remaining <= 0)
   const onChangeRef = useRef(onChange)
   const onFinishRef = useRef(onFinish)
@@ -51,13 +62,16 @@ export const Countdown: React.FC<CountdownProps> = ({
   const formatted = useMemo(() => formatCountdown(remaining, format), [format, remaining])
 
   useEffect(() => {
-    const nextRemaining = getCountdownRemaining(value, now)
+    const nextRemaining = now === undefined ? getCountdownRemaining(value) : getCountdownRemaining(value, now)
     setRemaining(nextRemaining)
     finishedRef.current = nextRemaining <= 0
   }, [value, now])
 
   useEffect(() => {
     if (interval <= 0 || value === undefined) return undefined
+
+    const current = getCountdownRemaining(value)
+    if (current <= 0) return undefined
 
     let timerId: number
 
@@ -68,9 +82,11 @@ export const Countdown: React.FC<CountdownProps> = ({
       setRemaining(nextRemaining)
       onChangeRef.current?.(payload)
 
-      if (nextRemaining <= 0 && !finishedRef.current) {
-        finishedRef.current = true
-        onFinishRef.current?.(payload)
+      if (nextRemaining <= 0) {
+        if (!finishedRef.current) {
+          finishedRef.current = true
+          onFinishRef.current?.(payload)
+        }
         window.clearInterval(timerId)
       }
     }
@@ -80,15 +96,15 @@ export const Countdown: React.FC<CountdownProps> = ({
   }, [format, interval, value])
 
   return (
-    <div className={classNames(countdownBaseClasses, className)} {...rest}>
+    <div
+      {...rest}
+      className={classNames(countdownBaseClasses, className)}
+      role={ariaLabel ? 'group' : rest.role}
+      aria-label={ariaLabel}>
       {title ? <div className={getCountdownTitleClasses(size)}>{title}</div> : null}
       <div className={countdownValueWrapperClasses}>
         {prefix ? <span className={countdownPrefixClasses}>{prefix}</span> : null}
-        <span
-          className={getCountdownValueClasses(size)}
-          role="timer"
-          aria-live="polite"
-          aria-label={ariaLabel}>
+        <span className={getCountdownValueClasses(size)} role="timer">
           {formatted}
         </span>
         {suffix ? <span className={countdownSuffixClasses}>{suffix}</span> : null}

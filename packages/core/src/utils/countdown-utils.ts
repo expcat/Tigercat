@@ -13,10 +13,8 @@ export const countdownBaseClasses = 'inline-block'
 
 export const countdownValueWrapperClasses = 'flex items-baseline'
 
-export const countdownPrefixClasses =
-  'mr-1 text-[var(--tiger-countdown-prefix,var(--tiger-text,#111827))]'
-export const countdownSuffixClasses =
-  'ml-1 text-[var(--tiger-countdown-suffix,var(--tiger-text-muted,#6b7280))]'
+export const countdownPrefixClasses = 'me-1 text-[var(--tiger-text,#111827)]'
+export const countdownSuffixClasses = 'ms-1 text-[var(--tiger-text-muted,#6b7280)]'
 
 const titleSize: Record<CountdownSize, string> = {
   sm: 'text-xs',
@@ -31,17 +29,11 @@ const valueSize: Record<CountdownSize, string> = {
 }
 
 export function getCountdownTitleClasses(size: CountdownSize): string {
-  return classNames(
-    titleSize[size],
-    'mb-1 text-[var(--tiger-countdown-title,var(--tiger-text-muted,#6b7280))]'
-  )
+  return classNames(titleSize[size], 'mb-1 text-[var(--tiger-text-muted,#6b7280)]')
 }
 
 export function getCountdownValueClasses(size: CountdownSize): string {
-  return classNames(
-    valueSize[size],
-    'text-[var(--tiger-countdown-value,var(--tiger-text,#111827))]'
-  )
+  return classNames(valueSize[size], 'text-[var(--tiger-text,#111827)]')
 }
 
 export function parseCountdownTimestamp(value: CountdownValue | undefined): number | undefined {
@@ -86,11 +78,21 @@ export function padCountdownNumber(value: number, length: number = 2): string {
   return String(Math.max(0, Math.floor(value))).padStart(length, '0')
 }
 
+/**
+ * Sub-second remainders would floor to `00:00:00` while still unfinished.
+ * Without an `SSS` token, bump `(0, 1000)` ms up to one displayed second.
+ */
+export function getCountdownDisplayRemaining(remaining: number, format: string): number {
+  if (remaining <= 0) return 0
+  if (remaining < 1000 && !/SSS/.test(format)) return 1000
+  return remaining
+}
+
 export function formatCountdown(
   remaining: number,
   format: string = COUNTDOWN_DEFAULT_FORMAT
 ): string {
-  const parts = getCountdownParts(remaining)
+  const parts = getCountdownParts(getCountdownDisplayRemaining(remaining, format))
   const usesDayToken = /D/.test(format)
   const totalHours = Math.floor(parts.total / 3600000)
   const hours = usesDayToken ? parts.hours : totalHours

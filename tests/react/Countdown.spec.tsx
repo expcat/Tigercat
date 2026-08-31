@@ -6,7 +6,7 @@ import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import { Countdown } from '@expcat/tigercat-react/Countdown'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 const baseTime = 1704067200000
 
@@ -75,9 +75,10 @@ describe('Countdown', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('1:2:3')
   })
 
-  it('supports ariaLabel', () => {
-    render(<Countdown ariaLabel="Campaign countdown" />)
-    expect(screen.getByRole('timer', { name: 'Campaign countdown' })).toBeInTheDocument()
+  it('names the root from ariaLabel and keeps the timer as the formatted time', () => {
+    render(<Countdown ariaLabel="付款倒计时" value={baseTime + 5000} now={baseTime} />)
+    expect(screen.getByLabelText('付款倒计时')).toBeInTheDocument()
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:05')
   })
 
   it('ticks using Date.now after the initial SSR-safe value', () => {
@@ -157,6 +158,29 @@ describe('Countdown', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('00:00:03')
   })
 
+  it('does not tick or finish when the target is already elapsed', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(baseTime)
+    const onChange = vi.fn()
+    const onFinish = vi.fn()
+
+    const { unmount } = render(
+      <Countdown
+        value={baseTime - 1000}
+        now={baseTime}
+        interval={1000}
+        onChange={onChange}
+        onFinish={onFinish}
+      />
+    )
+
+    act(() => vi.advanceTimersByTime(3000))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(onFinish).not.toHaveBeenCalled()
+    unmount()
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   describe('Edge Cases', () => {
     it('handles invalid value without crashing', () => {
       render(<Countdown value="invalid-date" />)
@@ -166,8 +190,12 @@ describe('Countdown', () => {
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(baseTime)
       const { container } = render(<Countdown value={baseTime + 5000} now={baseTime} />)
-      await expectNoA11yViolationsIsolated(container)
+      act(() => vi.advanceTimersByTime(1000))
+      vi.useRealTimers()
+      await expectNoA11yViolations(container)
     })
   })
 })

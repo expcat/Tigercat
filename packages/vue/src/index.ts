@@ -144,7 +144,7 @@ export type { VueDescriptionsProps, DescriptionsProps } from './components/Descr
 export { Timeline } from './components/Timeline'
 export type { VueTimelineProps, TimelineProps } from './components/Timeline'
 export { Countdown } from './components/Countdown'
-export type { VueCountdownProps } from './components/Countdown'
+export type { VueCountdownProps, CountdownProps } from './components/Countdown'
 export { Tree } from './components/Tree'
 export type { VueTreeProps } from './components/Tree'
 export { Skeleton } from './components/Skeleton'

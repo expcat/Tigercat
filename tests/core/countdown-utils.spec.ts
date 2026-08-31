@@ -108,6 +108,15 @@ describe('countdown-utils', () => {
     it('formats zero duration', () => {
       expect(formatCountdown(0)).toBe('00:00:00')
     })
+
+    it('does not show all zeros for a sub-second remainder', () => {
+      expect(formatCountdown(999)).toBe('00:00:01')
+      expect(createCountdownPayload(999).finished).toBe(false)
+    })
+
+    it('keeps milliseconds when SSS is in the format', () => {
+      expect(formatCountdown(999, 'ss.SSS')).toBe('00.999')
+    })
   })
 
   describe('payload', () => {
