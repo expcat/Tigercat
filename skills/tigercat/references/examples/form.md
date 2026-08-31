@@ -9,20 +9,30 @@ description: Compact Tigercat Form Vue and React usage routes
 
 Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
+## Component Notes
+
+| Component   | Uses | Notes                                                                                                                                                                                |
+| ----------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| InputGroup  | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。 |
+| InputNumber | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                          |
+
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component | Vue                                                                                  | React                                                                                                  |
-| --------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| Checkbox  | `<Checkbox v-model="value" />`                                                       | `<Checkbox value={value} onChange={setValue} />`                                                       |
-| Form      | `<Form :model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>` | `<Form model={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>` |
-| FormItem  | `<FormItem name="name" label="Name"><Input /></FormItem>`                            | `<FormItem name="name" label="Name"><Input /></FormItem>`                                              |
-| Input     | `<Input v-model="value" />`                                                          | `<Input value={value} onChange={setValue} />`                                                          |
-| MaskInput | `<MaskInput :mask="mask" />`                                                         | `<MaskInput mask={mask} />`                                                                            |
-| Radio     | `<Radio v-model="value" />`                                                          | `<Radio value={value} onChange={setValue} />`                                                          |
-| Select    | `<Select v-model="value" />`                                                         | `<Select value={value} onChange={setValue} />`                                                         |
-| Switch    | `<Switch v-model="value" />`                                                         | `<Switch value={value} onChange={setValue} />`                                                         |
-| Textarea  | `<Textarea v-model="value" />`                                                       | `<Textarea value={value} onChange={setValue} />`                                                       |
+| Component       | Vue                                                                                                         | React                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Checkbox        | `<Checkbox v-model="value" />`                                                                              | `<Checkbox value={value} onChange={setValue} />`                                                            |
+| Form            | `<Form :model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>`                        | `<Form model={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>`      |
+| FormItem        | `<FormItem name="name" label="Name"><Input /></FormItem>`                                                   | `<FormItem name="name" label="Name"><Input /></FormItem>`                                                   |
+| Input           | `<Input v-model="value" />`                                                                                 | `<Input value={value} onChange={(event) => setValue(event.target.value)} />`                                |
+| InputGroup      | `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>` | `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>` |
+| InputGroupAddon | `<InputGroupAddon>https://</InputGroupAddon>`                                                               | `<InputGroupAddon>https://</InputGroupAddon>`                                                               |
+| InputNumber     | `<InputNumber v-model="value" />`                                                                           | `<InputNumber value={value} onChange={setValue} />`                                                         |
+| MaskInput       | `<MaskInput :mask="mask" />`                                                                                | `<MaskInput mask={mask} />`                                                                                 |
+| Radio           | `<Radio v-model="value" />`                                                                                 | `<Radio value={value} onChange={setValue} />`                                                               |
+| Select          | `<Select v-model="value" />`                                                                                | `<Select value={value} onChange={setValue} />`                                                              |
+| Switch          | `<Switch v-model="value" />`                                                                                | `<Switch value={value} onChange={setValue} />`                                                              |
+| Textarea        | `<Textarea v-model="value" :rows="4" />`                                                                    | `<Textarea value={value} onChange={(event) => setValue(event.target.value)} />`                             |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, InputGroup, InputGroupAddon, InputNumber, InputOTP, Mentions, NumberKeyboard, RadioGroup, Signature, Slider, Stepper, TagsInput, TimePicker, Transfer, TreeSelect, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, InputOTP, Mentions, NumberKeyboard, RadioGroup, Signature, Slider, Stepper, TagsInput, TimePicker, Transfer, TreeSelect, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -1,0 +1,8 @@
+{
+  "id": "input-group-04",
+  "title": "计数仍接缝",
+  "description": "compact + Addon + showCount。字数在 chrome 下面，接缝仍打在输入框上。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

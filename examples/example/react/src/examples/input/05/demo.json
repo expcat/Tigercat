@@ -1,0 +1,8 @@
+{
+  "id": "input-05",
+  "title": "禁用与只读",
+  "description": "disabled 不可编辑且离开 Tab；readOnly 可聚焦但不能改。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

@@ -32,6 +32,7 @@ const WatermarkDemo = lazy(() => import('./pages/WatermarkDemo'))
 
 // Form
 const InputDemo = lazy(() => import('./pages/InputDemo'))
+const InputNumberDemo = lazy(() => import('./pages/InputNumberDemo'))
 const InputGroupDemo = lazy(() => import('./pages/InputGroupDemo'))
 const TextareaDemo = lazy(() => import('./pages/TextareaDemo'))
 const CheckboxDemo = lazy(() => import('./pages/CheckboxDemo'))
@@ -190,7 +191,7 @@ const router = createHashRouter([
       { path: 'watermark', element: <WatermarkDemo /> },
       // Form
       { path: 'input', element: <InputDemo /> },
-      { path: 'input-number', element: <InputDemo /> },
+      { path: 'input-number', element: <InputNumberDemo /> },
       { path: 'input-group', element: <InputGroupDemo /> },
       { path: 'textarea', element: <TextareaDemo /> },
       { path: 'checkbox', element: <CheckboxDemo /> },

@@ -122,17 +122,24 @@ description: Compact generated Tigercat Form props reference
 
 ## Input
 
-`packages/core/src/types/input.ts` · `InputProps` · 3/25 props
+`packages/core/src/types/input.ts` · `InputProps` · 8/26 props
 
-| Prop        | Type               | Default | Notes                             |
-| ----------- | ------------------ | ------- | --------------------------------- |
-| `value?`    | `string \| number` | `-`     | Input value (for controlled mode) |
-| `disabled?` | `boolean`          | `false` | Whether the input is disabled     |
-| `name?`     | `string`           | `-`     | Input name attribute              |
+| Prop            | Type               | Default  | Notes                                                                        |
+| --------------- | ------------------ | -------- | ---------------------------------------------------------------------------- |
+| `type?`         | `InputType`        | `'text'` | Input type                                                                   |
+| `clearable?`    | `boolean`          | `false`  | Whether to show a clear button when the input has value                      |
+| `showPassword?` | `boolean`          | `false`  | Whether to show a password toggle button (only works with type='password')   |
+| `showCount?`    | `boolean`          | `false`  | Whether to show a character count (requires maxLength to show "current/max") |
+| `disabled?`     | `boolean`          | `false`  | Whether the input is disabled                                                |
+| `readonly?`     | `boolean`          | `false`  | Whether the input is readonly                                                |
+| `value?`        | `string \| number` | `-`      | Input value (for controlled mode)                                            |
+| `name?`         | `string`           | `-`      | Input name attribute                                                         |
 
 ## InputGroup
 
 `packages/core/src/types/input-group.ts` · `InputGroupProps`
+
+Note: 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。
 
 | Prop         | Type            | Default | Notes                                        |
 | ------------ | --------------- | ------- | -------------------------------------------- |
@@ -144,21 +151,26 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/input-group.ts` · `InputGroupAddonProps`
 
-| Prop         | Type               | Default  | Notes                  |
-| ------------ | ------------------ | -------- | ---------------------- |
-| `type?`      | `'text' \| 'icon'` | `'text'` | Addon type             |
-| `className?` | `string`           | `-`      | Additional CSS classes |
-| `addonType?` | `'text' \| 'icon'` | `-`      | -                      |
+| Prop         | Type     | Default | Notes                  |
+| ------------ | -------- | ------- | ---------------------- |
+| `className?` | `string` | `-`     | Additional CSS classes |
 
 ## InputNumber
 
-`packages/core/src/types/input-number.ts` · `InputNumberProps` · 3/23 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 8/25 props
 
-| Prop        | Type             | Default | Notes                           |
-| ----------- | ---------------- | ------- | ------------------------------- |
-| `value?`    | `number \| null` | `-`     | Current value (controlled mode) |
-| `disabled?` | `boolean`        | `false` | Whether the input is disabled   |
-| `name?`     | `string`         | `-`     | Input name attribute            |
+Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。
+
+| Prop                | Type                | Default     | Notes                                                                         |
+| ------------------- | ------------------- | ----------- | ----------------------------------------------------------------------------- |
+| `min?`              | `number`            | `-Infinity` | Minimum value                                                                 |
+| `max?`              | `number`            | `Infinity`  | Maximum value                                                                 |
+| `step?`             | `number`            | `1`         | Step increment                                                                |
+| `precision?`        | `number`            | `-`         | Number of decimal places                                                      |
+| `controls?`         | `boolean`           | `true`      | Whether to show +/- step buttons                                              |
+| `controlsPosition?` | `'right' \| 'both'` | `'right'`   | Position of step controls. `'right'` is the inline-end stack (trailing side). |
+| `disabled?`         | `boolean`           | `false`     | Whether the input is disabled                                                 |
+| `value?`            | `number \| null`    | `-`         | Current value (controlled mode)                                               |
 
 ## InputOTP
 
@@ -285,13 +297,17 @@ description: Compact generated Tigercat Form props reference
 
 ## Textarea
 
-`packages/core/src/types/textarea.ts` · `TextareaProps` · 3/21 props
+`packages/core/src/types/textarea.ts` · `TextareaProps` · 7/25 props
 
-| Prop        | Type      | Default | Notes                                |
-| ----------- | --------- | ------- | ------------------------------------ |
-| `value?`    | `string`  | `-`     | Textarea value (for controlled mode) |
-| `disabled?` | `boolean` | `false` | Whether the textarea is disabled     |
-| `name?`     | `string`  | `-`     | Textarea name attribute              |
+| Prop          | Type          | Default     | Notes                                |
+| ------------- | ------------- | ----------- | ------------------------------------ |
+| `rows?`       | `number`      | `3`         | Number of visible text rows          |
+| `autoResize?` | `boolean`     | `false`     | Enable auto-resize to fit content    |
+| `showCount?`  | `boolean`     | `false`     | Show character count                 |
+| `status?`     | `InputStatus` | `'default'` | Validation status                    |
+| `value?`      | `string`      | `-`         | Textarea value (for controlled mode) |
+| `disabled?`   | `boolean`     | `false`     | Whether the textarea is disabled     |
+| `name?`       | `string`      | `-`         | Textarea name attribute              |
 
 ## TimePicker
 

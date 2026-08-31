@@ -1,0 +1,8 @@
+{
+  "id": "input-number-01",
+  "title": "步进",
+  "description": "受控 InputNumber，min/max 与 0.1 步进。增减名走 locale。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

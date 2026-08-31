@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Input React 支持 `readOnly`（与 `readonly` 同一属性）。Input 的 clear / 密码按钮进 Tab，文案走 `locale.input`。InputGroup 没有可访问名时不再写 `role="group"`。删除 InputGroupAddon 的 `type` / `addonType`（从未改视觉）。InputNumber `parser` 可返回 `null`，`NaN` 当空；`controlsPosition="right"` 是阅读方向的尾侧。React InputNumber `onChange` 仍是 `(value: number | null)`。Textarea 新增 `status` / `errorMessage`。
+
 Splitter 删除公开类型 `SplitterPaneConfig`（组件从未读取，也没有 `Splitter.Pane` / 折叠）。`sizes` 按值受控：父级回写才改比例，仅数组身份变化不会重置拖拽。拿掉 `sizes` 后停在最后比例，不会均分。百分比随容器重算。gutter 需要可读名（locale 默认「Resize panes {index}」）。水平拖拽在 `dir=rtl` 下跟着指针。
 
 Resizable 新增受控 `width` / `height`。`left` / `top` 手柄会移动原点。`lockAspectRatio` 时上下手柄也会改宽度。`axis="horizontal"` 不再渲染 `top`/`bottom`。角手柄不进 Tab，只给指针用。默认名走 `locale.resizable.handleAriaLabel`。Vue 的内部宽高覆盖用户 `style.width` / `style.height`。

@@ -1,7 +1,7 @@
 {
   "id": "input-01",
-  "title": "Input",
-  "description": "一个受控搜索 Input 组合 lg 尺寸、前后缀与输入回显；其他 type、size、disabled 和 readonly 取值可直接替换。",
+  "title": "受控搜索",
+  "description": "受控 search Input，lg 尺寸，带文本前后缀。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

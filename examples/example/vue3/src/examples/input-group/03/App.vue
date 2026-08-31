@@ -8,14 +8,19 @@ const sizes = ['sm', 'md', 'lg'] as const
 
 <template>
   <div class="space-y-3">
-    <InputGroup v-for="size in sizes" :key="size" compact :size="size" class="w-full max-w-md">
-      <Input :aria-label="`尺寸 ${size}`" :placeholder="`size=${size}`" style="flex: 1" />
+    <InputGroup
+      v-for="size in sizes"
+      :key="size"
+      compact
+      :size="size"
+      class="w-full max-w-md"
+      :aria-label="`尺寸 ${size}`">
+      <Input :aria-label="`尺寸 ${size}`" :placeholder="`size=${size}`" />
       <Button variant="primary">确定</Button>
     </InputGroup>
-    <InputGroup size="md" class="w-full max-w-md">
-      <Input aria-label="非紧凑" placeholder="compact=false（带间距）" style="flex: 1" />
+    <InputGroup size="md" class="w-full max-w-md" aria-label="非紧凑">
+      <Input aria-label="非紧凑" placeholder="compact=false（带间距）" />
       <Button variant="outline">操作</Button>
     </InputGroup>
-    <p class="text-sm text-gray-500">size 统一控制子项高度；compact=false 时子项之间保留间距。</p>
   </div>
 </template>

@@ -6,14 +6,14 @@ import { Input } from '@expcat/tigercat-vue/Input'
 
 <template>
   <div class="space-y-3">
-    <InputGroup compact class="w-full max-w-md">
+    <InputGroup compact class="w-full max-w-md" aria-label="网址">
       <InputGroupAddon>https://</InputGroupAddon>
-      <Input aria-label="站点域名" placeholder="example" style="flex: 1" />
+      <Input aria-label="站点域名" placeholder="example" />
       <InputGroupAddon>.com</InputGroupAddon>
     </InputGroup>
-    <InputGroup compact class="w-full max-w-md">
-      <InputGroupAddon type="icon">🔍</InputGroupAddon>
-      <Input aria-label="搜索" placeholder="搜索内容" style="flex: 1" />
+    <InputGroup compact class="w-full max-w-md" aria-label="搜索带图标">
+      <InputGroupAddon>🔍</InputGroupAddon>
+      <Input aria-label="搜索" placeholder="搜索内容" />
     </InputGroup>
   </div>
 </template>

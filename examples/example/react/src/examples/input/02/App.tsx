@@ -1,23 +1,17 @@
 import { useState } from 'react'
-import { InputNumber } from '@expcat/tigercat-react/InputNumber'
+import { Input } from '@expcat/tigercat-react/Input'
 
 export default function App() {
-  const [value, setValue] = useState<number | null>(12.5)
+  const [value, setValue] = useState('可清除的内容')
 
   return (
-    <div className="w-full max-w-xs space-y-2">
-      <InputNumber
+    <div className="w-full max-w-md space-y-2">
+      <Input
         value={value}
-        onChange={setValue}
-        min={0}
-        max={100}
-        step={0.5}
-        precision={1}
-        size="lg"
-        incrementAriaLabel="增加数值"
-        decrementAriaLabel="减少数值"
+        onChange={(event) => setValue(event.target.value)}
+        clearable
+        placeholder="输入后显示清除按钮"
       />
-      <p className="text-sm text-gray-600 dark:text-gray-300">当前数值：{value ?? '未填写'}</p>
     </div>
   )
 }

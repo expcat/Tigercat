@@ -1,12 +1,8 @@
 {
   "id": "input-03",
-  "title": "格式化与双侧控件",
-  "description": "通过 formatter/parser 显示并解析人民币金额，同时将增减控件分列在输入框两侧。",
+  "title": "密码显隐",
+  "description": "type=password 且 showPassword 时，清除和眼睛按钮并排。",
   "entry": "App.vue",
   "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

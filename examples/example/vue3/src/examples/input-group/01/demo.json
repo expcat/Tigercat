@@ -1,12 +1,8 @@
 {
   "id": "input-group-01",
-  "title": "基本用法",
-  "description": "输入框 + 按钮组合",
+  "title": "紧凑搜索",
+  "description": "compact Input + Button。组有可访问名，Input 在组内自己撑开。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

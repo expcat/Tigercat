@@ -163,6 +163,19 @@ export const COMPONENT_PROP_PRIORITY = {
   Countdown: ['value?', 'now?', 'format?', 'interval?', 'title?'],
   Progress: ['percentage?', 'status?', 'showText?', 'type?', 'striped?'],
   Splitter: ['direction?', 'sizes?', 'min?', 'gutterSize?', 'disabled?', 'max?'],
+  Input: ['type?', 'clearable?', 'showPassword?', 'showCount?', 'disabled?', 'readonly?'],
+  Textarea: ['rows?', 'autoResize?', 'showCount?', 'status?'],
+  InputNumber: [
+    'min?',
+    'max?',
+    'step?',
+    'precision?',
+    'controls?',
+    'controlsPosition?',
+    'disabled?'
+  ],
+  InputGroup: ['size?', 'compact?'],
+  InputGroupAddon: ['className?'],
   Resizable: [
     'width?',
     'height?',
@@ -340,7 +353,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Countdown: '<Countdown :value="deadline" />',
     Progress: '<Progress :percentage="64" />',
     Splitter: '<Splitter :sizes="sizes"><div>A</div><div>B</div></Splitter>',
-    Resizable: '<Resizable :default-width="300" :default-height="150"><slot /></Resizable>'
+    Resizable: '<Resizable :default-width="300" :default-height="150"><slot /></Resizable>',
+    Input: '<Input v-model="value" />',
+    Textarea: '<Textarea v-model="value" :rows="4" />',
+    InputNumber: '<InputNumber v-model="value" />',
+    InputGroup:
+      '<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>',
+    InputGroupAddon: '<InputGroupAddon>https://</InputGroupAddon>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -367,7 +386,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Countdown: '<Countdown value={deadline} />',
     Progress: '<Progress percentage={64} />',
     Splitter: '<Splitter sizes={sizes}><div>A</div><div>B</div></Splitter>',
-    Resizable: '<Resizable defaultWidth={300} defaultHeight={150}>{children}</Resizable>'
+    Resizable: '<Resizable defaultWidth={300} defaultHeight={150}>{children}</Resizable>',
+    Input: '<Input value={value} onChange={(event) => setValue(event.target.value)} />',
+    Textarea: '<Textarea value={value} onChange={(event) => setValue(event.target.value)} />',
+    InputNumber: '<InputNumber value={value} onChange={setValue} />',
+    InputGroup:
+      '<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>',
+    InputGroupAddon: '<InputGroupAddon>https://</InputGroupAddon>'
   }
 }
 

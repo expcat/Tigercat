@@ -1,0 +1,8 @@
+{
+  "id": "input-number-02",
+  "title": "格式化与双侧控件",
+  "description": "formatter/parser 与 controlsPosition=both。parser 空值是 null。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

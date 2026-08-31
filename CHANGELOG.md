@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Input 族（Input / InputGroup / Textarea / InputNumber）**：React 把 ref 转到原生控件，Vue expose `focus`/`input`。`readOnly` 与 `readonly` 同一属性。clear 与密码钮并排，文案走 `locale.input`，点完还焦。error/count 不再把组接缝打到 `w-full` 空壳；组内 `flex-1 min-w-0`。InputGroup compact 复用 chrome 选择器（`data-tiger-chrome`），单直子保留四角；无名不加 `role="group"`；删除未实现的 `type`/`addonType`。Textarea 有 `status`/`errorMessage`、读 FormItem，autoResize 按 border-box 算高。InputNumber 步进用十进制整数加减；聚焦时保持裸数字；读 FormItem；步进钮 locale + Home/End；逻辑 padding。
 - **Splitter**：`sizes` 按值受控（同一组百分数/像素的新数组不会把拖拽弹回）；未传或拿掉 `sizes` 停在最后比例。百分比和均分跟容器走（ResizeObserver）。水平指针和方向键读 `dir`，gutter 跟着指针。键盘也发 `resize-end`。gutter 是带 `aria-valuenow` 和 locale 名的 window splitter；命中区 24px。pane 数以摊平后的子节点为准。删除未实现的 `SplitterPaneConfig`。
 - **Resizable**：从被抓的边改尺寸并平移原点（左/上不再往反方向长）。`lockAspectRatio` 按手柄选主轴，clamp 保比例。`axis` 不渲空操作手柄。角手柄不进 Tab。`width`/`height` 传入即受控；未传 default 时从 bounding box 起拖。手柄名走 `locale.resizable`。水平定位用逻辑 inset。
 - **Carousel**：`infinite` 的 scroll 轨道用首尾 clone + 关 transition 瞬移，末张再 next 不再整段倒带。水平几何走逻辑方向（transform 符号、箭头 `start`/`end`、swipe 读 `dir`）。圆点是真 tab（`role="tab"` + `aria-selected` + 方向键，只有当前项进 Tab）。非当前页和 clone 同时 `inert` + `aria-hidden`。无名不是 landmark。开 autoplay 时有可聚焦暂停；hover/focus 暂停拆开；`autoplaySpeed<=0` 和 `prefers-reduced-motion` 都不自动播。手势只走 pointer（capture / cancel）。控件色走 surface/text token；`overflow-hidden` 只在视口。Vue 导出 `CarouselProps` / `CarouselMethods`。文案走 locale（含 `roleDescription` / 暂停），不再启发式「图片轮播」。

@@ -47,7 +47,7 @@ const router = createRouter({
         { path: 'watermark', component: () => import('./pages/WatermarkDemo.vue') },
         // Form
         { path: 'input', component: () => import('./pages/InputDemo.vue') },
-        { path: 'input-number', component: () => import('./pages/InputDemo.vue') },
+        { path: 'input-number', component: () => import('./pages/InputNumberDemo.vue') },
         { path: 'input-group', component: () => import('./pages/InputGroupDemo.vue') },
         { path: 'textarea', component: () => import('./pages/TextareaDemo.vue') },
         { path: 'checkbox', component: () => import('./pages/CheckboxDemo.vue') },

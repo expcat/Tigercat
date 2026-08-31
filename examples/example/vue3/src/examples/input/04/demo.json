@@ -1,0 +1,8 @@
+{
+  "id": "input-04",
+  "title": "字数",
+  "description": "showCount 配合 maxLength 显示当前字数。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

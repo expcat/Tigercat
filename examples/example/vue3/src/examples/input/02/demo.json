@@ -1,12 +1,8 @@
 {
   "id": "input-02",
-  "title": "InputNumber",
-  "description": "一个受控 InputNumber 组合最小值、最大值、步长、精度、lg 尺寸和增减按钮无障碍文案。",
+  "title": "可清除",
+  "description": "clearable 在有值时显示清除按钮，点完焦点回到输入框。",
   "entry": "App.vue",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

@@ -1,0 +1,8 @@
+{
+  "id": "textarea-03",
+  "title": "校验与超额",
+  "description": "status=error、errorMessage，以及长于 maxLength 的计数变色。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}
