@@ -500,7 +500,6 @@ export const NotificationCenter = defineComponent({
         {
           dataSource: items,
           split: true,
-          bordered: 'divided',
           hoverable: true,
           emptyText: resolveLocaleText(labels.value.emptyText, props.emptyText),
           onItemClick: handleItemClick

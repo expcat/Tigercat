@@ -36,39 +36,38 @@ describe('List - Drag Enhancements', () => {
     expect(listItems[0]).not.toHaveAttribute('draggable')
   })
 
-  it('adds draggable attribute when draggable is true', () => {
+  it('puts a reorder handle on each row instead of HTML5-dragging the row', () => {
     render(List, {
       props: { dataSource: sampleListData, draggable: true }
     })
     const listItems = screen.getAllByRole('listitem')
-    expect(listItems[0]).toHaveAttribute('draggable', 'true')
+    expect(listItems[0]).not.toHaveAttribute('draggable')
+    expect(screen.getAllByRole('button', { name: 'Reorder' })).toHaveLength(3)
   })
 
-  it('emits reorder event on drag and drop', async () => {
+  it('emits reorder from Alt+Arrow on the handle', async () => {
     const { emitted } = render(List, {
       props: { dataSource: sampleListData, draggable: true }
     })
-    const listItems = screen.getAllByRole('listitem')
-
-    await fireEvent.dragStart(listItems[0])
-    await fireEvent.dragOver(listItems[2])
-    await fireEvent.drop(listItems[2])
+    await fireEvent.keyDown(screen.getAllByRole('button', { name: 'Reorder' })[0], {
+      key: 'ArrowDown',
+      altKey: true
+    })
 
     expect(emitted()).toHaveProperty('reorder')
     const reorderPayload = emitted()['reorder'][0] as unknown[]
-    // Should contain the reordered items array, fromIndex, toIndex
-    expect(reorderPayload[1]).toBe(0) // fromIndex
-    expect(reorderPayload[2]).toBe(2) // toIndex
+    expect(reorderPayload[1]).toBe(0)
+    expect(reorderPayload[2]).toBe(1)
   })
 
-  it('does not emit reorder when dropping on same position', async () => {
+  it('does not emit reorder when Alt+Arrow would leave the list', async () => {
     const { emitted } = render(List, {
       props: { dataSource: sampleListData, draggable: true }
     })
-    const listItems = screen.getAllByRole('listitem')
-
-    await fireEvent.dragStart(listItems[0])
-    await fireEvent.drop(listItems[0])
+    await fireEvent.keyDown(screen.getAllByRole('button', { name: 'Reorder' })[0], {
+      key: 'ArrowUp',
+      altKey: true
+    })
 
     expect(emitted()['reorder']).toBeUndefined()
   })

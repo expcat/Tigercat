@@ -1,13 +1,17 @@
-import React, { useMemo, useState } from 'react'
+import React, { forwardRef, useMemo, useRef, useState, useLayoutEffect } from 'react'
 import {
   classNames,
   reorderSequence,
-  resolveLocaleText,
   mergeTigerLocale,
   getListClasses,
   getListItemClasses,
+  getListItemExtraClasses,
   getListHeaderFooterClasses,
-  getGridColumnClasses,
+  getListGridColumnClass,
+  getListGridGapStyle,
+  getListSourceIndex,
+  resolveListGridColumnCount,
+  resolveListVirtualItemHeight,
   paginateData,
   calculatePagination,
   listWrapperClasses,
@@ -19,207 +23,110 @@ import {
   listItemContentClasses,
   listItemTitleClasses,
   listItemDescriptionClasses,
-  listItemExtraClasses,
   listGridContainerClasses,
-  getSpinnerSVG,
-  getLoadingOverlaySpinnerClasses,
+  listDragHandleClasses,
   getBuiltInPaginationContainerClasses,
   resolvePaginationDisplayMode,
   getPaginationLabels,
+  getListLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
+  observeElementSize,
+  devWarn,
   type ComponentSize,
-  type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
   type ListPaginationConfig,
+  type ListProps as CoreListProps,
+  type ListGrid,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
 import { Pagination } from './Pagination'
+import { Empty } from './Empty'
+import { Loading } from './Loading'
 import { useTigerConfig } from './ConfigProvider'
 import { useDrag } from '../hooks/useDrag'
 
-const spinnerSvg = getSpinnerSVG('spinner')
-
-// Loading spinner component
-const LoadingSpinner: React.FC = () => (
-  <svg
-    className={getLoadingOverlaySpinnerClasses()}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox={spinnerSvg.viewBox}>
-    {spinnerSvg.elements.map((el, index) => {
-      if (el.type === 'circle') return <circle key={index} {...el.attrs} />
-      if (el.type === 'path') return <path key={index} {...el.attrs} />
-      return null
-    })}
-  </svg>
-)
-
-export interface ListProps<
-  T extends ListItem = ListItem
-> extends React.HTMLAttributes<HTMLDivElement> {
-  /**
-   * List data source
-   */
+export interface ListProps<T extends ListItem = ListItem>
+  extends
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>,
+    Omit<CoreListProps<T>, 'header' | 'footer'> {
   dataSource?: T[]
-  /**
-   * List size
-   * @default 'md'
-   */
-  size?: ComponentSize
-  /**
-   * Border style
-   * @default 'divided'
-   */
-  bordered?: ListBorderStyle
-  /**
-   * Loading state
-   * @default false
-   */
-  loading?: boolean
-  /**
-   * Empty state text
-   * @default 'No data'
-   */
-  emptyText?: string
-  /**
-   * Locale override; falls back to ConfigProvider locale
-   */
-  locale?: Partial<TigerLocale>
-  /**
-   * Whether to show split line between items
-   * @default true
-   */
-  split?: boolean
-  /**
-   * Item layout
-   * @default 'horizontal'
-   */
-  itemLayout?: ListItemLayout
-  /**
-   * List header content
-   */
   header?: React.ReactNode
-  /**
-   * List footer content
-   */
   footer?: React.ReactNode
-  /**
-   * Pagination configuration, set to false to disable
-   * @default false
-   */
-  pagination?: ListPaginationConfig | false
-  /**
-   * Grid configuration
-   */
-  grid?: {
-    gutter?: number
-    column?: number
-    xs?: number
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-    xxl?: number
-  }
-  /**
-   * Enable fixed-height virtual rendering via VirtualList.
-   * Virtual mode applies to the current paginated data window and is ignored for grid lists.
-   * @default false
-   */
-  virtual?: boolean
-  /**
-   * Virtual viewport height in pixels.
-   * @default 400
-   */
-  virtualHeight?: number
-  /**
-   * Fixed virtual item height in pixels.
-   * @default 40
-   */
-  virtualItemHeight?: number
-  /**
-   * Number of extra virtual items to render above/below the viewport.
-   * @default 5
-   */
-  virtualOverscan?: number
-  /**
-   * Function to get item key
-   */
+  grid?: ListGrid
   rowKey?: string | ((item: T, index: number) => string | number)
-  /**
-   * Whether items are hoverable
-   * @default false
-   */
-  hoverable?: boolean
-  /**
-   * Custom render function for list items
-   */
   renderItem?: (item: T, index: number) => React.ReactNode
-  /**
-   * Item click handler
-   */
   onItemClick?: (item: T, index: number) => void
-  /**
-   * Page change handler
-   */
   onPageChange?: (page: { current: number; pageSize: number }) => void
-  className?: string
-  /**
-   * Whether list items are draggable for reorder
-   */
-  draggable?: boolean
-  /**
-   * Called when items are reordered via drag
-   */
   onReorder?: (items: T[], from: number, to: number) => void
+  locale?: Partial<TigerLocale>
 }
 
-export const List = <T extends ListItem = ListItem>({
-  dataSource = [],
-  size = 'md',
-  bordered = 'divided',
-  loading = false,
-  emptyText,
-  locale,
-  split = true,
-  itemLayout = 'horizontal',
-  header,
-  footer,
-  pagination = false,
-  grid,
-  virtual = false,
-  virtualHeight = 400,
-  virtualItemHeight = 40,
-  virtualOverscan = 5,
-  rowKey = 'key',
-  hoverable = false,
-  renderItem,
-  onItemClick,
-  onPageChange,
-  className,
-  draggable: isDraggable = false,
-  onReorder,
-  ...divProps
-}: ListProps<T>) => {
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false
+  return Boolean(target.closest('button, a, input, textarea, select, [data-list-drag-handle]'))
+}
+
+function ListInner<T extends ListItem>(
+  {
+    dataSource = [],
+    size = 'md' as ComponentSize,
+    bordered = false,
+    loading = false,
+    emptyText,
+    locale,
+    split = true,
+    itemLayout = 'horizontal' as ListItemLayout,
+    header,
+    footer,
+    pagination = false,
+    grid,
+    virtual = false,
+    virtualHeight = 400,
+    virtualItemHeight,
+    virtualOverscan = 5,
+    rowKey = 'key',
+    hoverable = false,
+    renderItem,
+    onItemClick,
+    onPageChange,
+    className,
+    draggable: isDraggable = false,
+    onReorder,
+    ...divProps
+  }: ListProps<T>,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
+  const labels = getListLabels(mergedLocale)
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const [containerWidth, setContainerWidth] = useState(0)
+
+  useLayoutEffect(() => {
+    if (!grid) return undefined
+    return observeElementSize(rootRef.current, ({ width }) => setContainerWidth(width))
+  }, [grid])
+
   const paginationCfg = pagination !== false && typeof pagination === 'object' ? pagination : null
   const isRemotePagination = paginationCfg?.remote === true
-
   const [internalCurrentPage, setInternalCurrentPage] = useState(paginationCfg?.current || 1)
-
   const [internalCurrentPageSize, setInternalCurrentPageSize] = useState(
     paginationCfg?.pageSize || 10
   )
+  const currentPage =
+    paginationCfg?.current !== undefined ? paginationCfg.current : internalCurrentPage
+  const currentPageSize =
+    paginationCfg?.pageSize !== undefined ? paginationCfg.pageSize : internalCurrentPageSize
 
   const drag = useDrag({
     containerId: 'list',
+    config: { handleSelector: '[data-list-drag-handle]' },
     onDrop: (event) => {
       if (event.fromIndex === event.toIndex) return
       onReorder?.(
@@ -230,103 +137,50 @@ export const List = <T extends ListItem = ListItem>({
     }
   })
 
-  // Remote mode treats current/pageSize as controlled props.
-  const currentPage = isRemotePagination
-    ? (paginationCfg?.current ?? internalCurrentPage)
-    : internalCurrentPage
-  const currentPageSize = isRemotePagination
-    ? (paginationCfg?.pageSize ?? internalCurrentPageSize)
-    : internalCurrentPageSize
+  if (virtual && grid) {
+    devWarn('List.virtualGrid', 'List: `virtual` is ignored when `grid` is set.')
+  }
+  const useVirtual = virtual && !grid
+  const itemHeight = resolveListVirtualItemHeight(size, virtualItemHeight)
 
-  // Paginated data
   const paginatedData = useMemo(() => {
-    if (pagination === false) {
-      return dataSource
-    }
-
-    // Remote mode: dataSource already holds only the current page — no slicing.
-    if (isRemotePagination) {
-      return dataSource
-    }
-
+    if (pagination === false) return dataSource
+    if (isRemotePagination) return dataSource
     return paginateData(dataSource, currentPage, currentPageSize)
   }, [dataSource, currentPage, currentPageSize, pagination, isRemotePagination])
 
   const paginationTotal = isRemotePagination
     ? (paginationCfg?.total ?? dataSource.length)
     : dataSource.length
+  const paginationInfo =
+    pagination === false ? null : calculatePagination(paginationTotal, currentPage, currentPageSize)
 
-  // Pagination info
-  const paginationInfo = useMemo(() => {
-    if (pagination === false) {
-      return null
-    }
-
-    return calculatePagination(paginationTotal, currentPage, currentPageSize)
-  }, [paginationTotal, currentPage, currentPageSize, pagination])
-
-  // List classes
-  const listClasses = useMemo(() => {
-    return classNames(getListClasses(bordered), listSizeClasses[size], className)
-  }, [bordered, size, className])
-
-  // Grid classes
-  const gridClasses = useMemo(() => {
-    if (!grid) return ''
-
-    return classNames(
-      listGridContainerClasses,
-      getGridColumnClasses(grid.column, grid.xs, grid.sm, grid.md, grid.lg, grid.xl, grid.xxl)
-    )
-  }, [grid])
+  const gridColumnCount = grid ? resolveListGridColumnCount(grid, containerWidth) : 1
 
   const handlePageChange = (page: number) => {
-    setInternalCurrentPage(page)
+    if (paginationCfg?.current === undefined) setInternalCurrentPage(page)
     onPageChange?.({ current: page, pageSize: currentPageSize })
   }
-
   const handlePageSizeChange = (pageSize: number) => {
-    setInternalCurrentPageSize(pageSize)
-    setInternalCurrentPage(1)
+    if (paginationCfg?.pageSize === undefined) setInternalCurrentPageSize(pageSize)
+    if (paginationCfg?.current === undefined) setInternalCurrentPage(1)
     onPageChange?.({ current: 1, pageSize })
   }
 
-  const handleItemClick = (item: T, index: number) => {
-    onItemClick?.(item, index)
-  }
-
   const getItemKey = (item: T, index: number): string | number => {
-    if (typeof rowKey === 'function') {
-      return rowKey(item, index)
-    }
+    if (typeof rowKey === 'function') return rowKey(item, index)
     return (item[rowKey] as string | number) || index
   }
 
-  const renderListHeader = () => {
-    if (!header) return null
-
-    return <div className={getListHeaderFooterClasses(size, false)}>{header}</div>
-  }
-
-  const renderListFooter = () => {
-    if (!footer) return null
-
-    return <div className={getListHeaderFooterClasses(size, true)}>{footer}</div>
-  }
-
-  const renderDefaultListItem = (item: T, _index: number) => {
-    const itemContent: React.ReactNode[] = []
-
-    // Meta section (avatar + content)
+  const renderDefaultListItem = (item: T) => {
     const metaContent: React.ReactNode[] = []
-
     if (item.avatar) {
       metaContent.push(
         <div key="avatar" className={listItemAvatarClasses}>
           {typeof item.avatar === 'string' ? (
             <img
               src={item.avatar}
-              alt={item.title || 'Avatar'}
+              alt={item.title ? '' : labels.avatarAlt}
               className="w-10 h-10 rounded-full object-cover"
             />
           ) : (
@@ -335,7 +189,6 @@ export const List = <T extends ListItem = ListItem>({
         </div>
       )
     }
-
     const contentChildren: React.ReactNode[] = []
     if (item.title) {
       contentChildren.push(
@@ -351,7 +204,6 @@ export const List = <T extends ListItem = ListItem>({
         </div>
       )
     }
-
     if (contentChildren.length > 0) {
       metaContent.push(
         <div key="content" className={listItemContentClasses}>
@@ -359,79 +211,99 @@ export const List = <T extends ListItem = ListItem>({
         </div>
       )
     }
-
-    if (metaContent.length > 0) {
-      itemContent.push(
-        <div key="meta" className={listItemMetaClasses}>
-          {metaContent}
-        </div>
-      )
-    }
-
-    // Extra content
-    if (item.extra) {
-      itemContent.push(
-        <div key="extra" className={listItemExtraClasses}>
-          {item.extra as React.ReactNode}
-        </div>
-      )
-    }
-
-    return itemContent
+    return (
+      <>
+        {metaContent.length > 0 ? <div className={listItemMetaClasses}>{metaContent}</div> : null}
+        {item.extra ? (
+          <div
+            className={getListItemExtraClasses(itemLayout)}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}>
+            {item.extra as React.ReactNode}
+          </div>
+        ) : null}
+      </>
+    )
   }
 
-  const renderListItem = (item: T, index: number) => {
-    const key = getItemKey(item, index)
-    const itemClasses = getListItemClasses(
-      size,
-      itemLayout,
-      split && bordered === 'divided' && !grid,
-      hoverable
+  const renderListItem = (item: T, pageIndex: number) => {
+    const sourceIndex = getListSourceIndex(
+      pageIndex,
+      currentPage,
+      currentPageSize,
+      isRemotePagination
     )
-
+    const key = getItemKey(item, sourceIndex)
+    const divided = split && !grid
+    const itemClasses = getListItemClasses(size, itemLayout, divided, hoverable)
     const clickable = typeof onItemClick === 'function'
-    const handleClick = clickable ? () => handleItemClick(item, index) : undefined
-    const handleKeyDown = clickable
-      ? (e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            handleItemClick(item, index)
-          }
-        }
-      : undefined
-    const dragBindings = isDraggable
-      ? drag.getDragItemProps({ id: String(key), index, containerId: 'list' })
+    const bindings = isDraggable
+      ? drag.getDragItemProps({ id: String(key), index: sourceIndex, containerId: 'list' })
       : {}
-    const { className: dragClassName, ...dragRest } = dragBindings
+    const {
+      className: dragClassName,
+      onPointerDown,
+      draggable: _d,
+      ...dragRest
+    } = bindings as Record<string, unknown>
+
+    const body = renderItem ? renderItem(item, sourceIndex) : renderDefaultListItem(item)
+    const handleReorderKey = (event: React.KeyboardEvent) => {
+      if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return
+      event.preventDefault()
+      event.stopPropagation()
+      const to = event.key === 'ArrowUp' ? sourceIndex - 1 : sourceIndex + 1
+      if (to < 0 || to >= dataSource.length) return
+      onReorder?.(reorderSequence(dataSource, sourceIndex, to), sourceIndex, to)
+    }
 
     return (
-      <div
+      <li
         key={key}
-        className={classNames(
-          itemClasses,
-          clickable && 'cursor-pointer',
-          isDraggable && 'cursor-grab touch-none',
-          dragClassName as string | undefined
+        className={classNames(itemClasses, dragClassName as string | undefined)}
+        onClick={
+          clickable
+            ? (event) => {
+                if (isInteractiveTarget(event.target)) return
+                onItemClick?.(item, sourceIndex)
+              }
+            : undefined
+        }
+        {...(dragRest as React.HTMLAttributes<HTMLLIElement>)}>
+        {isDraggable ? (
+          <button
+            type="button"
+            data-list-drag-handle=""
+            className={listDragHandleClasses}
+            aria-label={labels.dragHandleAriaLabel}
+            onPointerDown={(event) => {
+              event.stopPropagation()
+              ;(onPointerDown as ((e: React.PointerEvent) => void) | undefined)?.(event)
+            }}
+            onKeyDown={handleReorderKey}
+            onClick={(event) => event.stopPropagation()}>
+            ⋮⋮
+          </button>
+        ) : null}
+        {clickable && !renderItem ? (
+          <button
+            type="button"
+            className="flex min-w-0 flex-1 items-center text-start"
+            onClick={() => onItemClick?.(item, sourceIndex)}>
+            {body}
+          </button>
+        ) : (
+          body
         )}
-        role="listitem"
-        tabIndex={clickable ? 0 : undefined}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        {...dragRest}>
-        {renderItem ? renderItem(item, index) : renderDefaultListItem(item, index)}
-      </div>
+      </li>
     )
   }
 
-  const renderListItems = () => {
-    if (loading) {
-      return null
-    }
-
+  const renderItems = () => {
     if (paginatedData.length === 0) {
       return (
-        <div className={listEmptyStateClasses} role="status" aria-live="polite">
-          {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
+        <div className={listEmptyStateClasses}>
+          <Empty description={emptyText} showImage={false} locale={mergedLocale} />
         </div>
       )
     }
@@ -439,21 +311,25 @@ export const List = <T extends ListItem = ListItem>({
     const items = paginatedData.map((item, index) => renderListItem(item, index))
 
     if (grid) {
-      const gutter = grid.gutter
       return (
-        <div
-          className={gridClasses}
-          style={gutter ? ({ gap: `${gutter}px` } as React.CSSProperties) : undefined}>
+        <ul
+          className={classNames(
+            listGridContainerClasses,
+            getListGridColumnClass(gridColumnCount),
+            grid.gutter === undefined && 'gap-4'
+          )}
+          style={getListGridGapStyle(grid.gutter)}
+          {...(isDraggable ? drag.getDropZoneProps() : {})}>
           {items}
-        </div>
+        </ul>
       )
     }
 
-    if (virtual) {
+    if (useVirtual) {
       return (
         <VirtualList
           itemCount={paginatedData.length}
-          itemHeight={virtualItemHeight}
+          itemHeight={itemHeight}
           height={virtualHeight}
           overscan={virtualOverscan}
           renderItem={({ index }) => renderListItem(paginatedData[index], index)}
@@ -461,40 +337,31 @@ export const List = <T extends ListItem = ListItem>({
       )
     }
 
-    return items
+    return <ul {...(isDraggable ? drag.getDropZoneProps() : {})}>{items}</ul>
   }
 
-  const renderPagination = () => {
-    if (pagination === false || !paginationInfo) {
-      return null
-    }
-
+  const renderPaginationBar = () => {
+    if (pagination === false || !paginationInfo) return null
     const { totalPages } = paginationInfo
-    const total = paginationTotal
     const paginationConfig = pagination as ListPaginationConfig
     const paginationLabels = getPaginationLabels(mergedLocale)
     const localeCode = mergedLocale?.locale
-
-    // More than 3 pages: full page-number buttons plus quick jumper;
-    // otherwise the simple prev/next indicator (config values override).
     const { simple, showQuickJumper } = resolvePaginationDisplayMode(totalPages, paginationConfig)
-
     const totalText =
       paginationConfig.totalText ??
       ((value: number, range: [number, number]) =>
         formatPaginationTotal(paginationLabels.totalText, value, range, localeCode))
-
     const pageIndicatorText = (current: number, pages: number) =>
       formatPaginationPageIndicator(paginationLabels.pageIndicatorText, current, pages, localeCode)
 
     return (
       <div className={getBuiltInPaginationContainerClasses()}>
         <Pagination
-          size="small"
+          size={size === 'lg' ? 'large' : size === 'sm' ? 'small' : 'medium'}
           align="right"
           current={currentPage}
           pageSize={currentPageSize}
-          total={total}
+          total={paginationTotal}
           simple={simple}
           showQuickJumper={showQuickJumper}
           showSizeChanger={paginationConfig.showSizeChanger !== false}
@@ -510,30 +377,39 @@ export const List = <T extends ListItem = ListItem>({
     )
   }
 
+  const setRef = (node: HTMLDivElement | null) => {
+    rootRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }
+
   return (
-    <div className={listWrapperClasses}>
-      <div className="relative">
-        <div
-          {...divProps}
-          {...(isDraggable ? drag.getDropZoneProps() : {})}
-          className={listClasses}
-          role="list"
-          aria-busy={loading || undefined}>
-          {renderListHeader()}
-          {renderListItems()}
-          {renderListFooter()}
-        </div>
-
-        {/* Loading overlay */}
-        {loading && (
-          <div className={listLoadingOverlayClasses} role="status" aria-live="polite">
-            <LoadingSpinner />
+    <div
+      {...divProps}
+      ref={setRef}
+      className={classNames(
+        listWrapperClasses,
+        getListClasses(bordered),
+        listSizeClasses[size],
+        className
+      )}>
+      {header ? <div className={getListHeaderFooterClasses(size, false)}>{header}</div> : null}
+      <div className="relative" aria-busy={loading || undefined}>
+        {renderItems()}
+        {loading ? (
+          <div className={listLoadingOverlayClasses}>
+            <Loading variant="spinner" aria-hidden role="presentation" />
           </div>
-        )}
+        ) : null}
       </div>
-
-      {/* Pagination */}
-      {renderPagination()}
+      {footer ? <div className={getListHeaderFooterClasses(size, true)}>{footer}</div> : null}
+      {renderPaginationBar()}
     </div>
   )
 }
+
+export const List = forwardRef(ListInner) as <T extends ListItem = ListItem>(
+  props: ListProps<T> & { ref?: React.Ref<HTMLDivElement> }
+) => React.ReactElement | null
+
+export default List

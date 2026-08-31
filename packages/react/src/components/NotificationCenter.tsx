@@ -345,7 +345,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       <List
         dataSource={listItems}
         split
-        bordered="divided"
         hoverable
         emptyText={resolvedEmptyText}
         onItemClick={(item, index) => onItemClick?.(item, index)}

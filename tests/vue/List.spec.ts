@@ -32,7 +32,8 @@ describe('List', () => {
       }
     })
 
-    expect(screen.getByRole('status')).toHaveTextContent('No data')
+    expect(screen.getByText('No data')).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   it('renders custom empty text', () => {
@@ -43,10 +44,10 @@ describe('List', () => {
       }
     })
 
-    expect(screen.getByRole('status')).toHaveTextContent('No items')
+    expect(screen.getByText('No items')).toBeInTheDocument()
   })
 
-  it('sets aria-busy and shows loading overlay', () => {
+  it('sets aria-busy and keeps listitems mounted while loading', () => {
     render(List, {
       props: {
         dataSource: sampleData,
@@ -54,9 +55,9 @@ describe('List', () => {
       }
     })
 
-    expect(screen.getByRole('list')).toHaveAttribute('aria-busy', 'true')
-    expect(screen.getByRole('status')).toBeInTheDocument()
-    expect(screen.queryByText('Item 1')).not.toBeInTheDocument()
+    expect(document.querySelector('[aria-busy="true"]')).toBeTruthy()
+    expect(screen.getByText('Item 1')).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem')).toHaveLength(3)
   })
 
   it('renders header and footer slots', () => {
@@ -85,10 +86,9 @@ describe('List', () => {
     })
 
     const firstItem = screen.getAllByRole('listitem')[0]
-    expect(firstItem).toHaveAttribute('tabindex', '0')
+    expect(firstItem.getAttribute('tabindex')).toBeNull()
 
-    await fireEvent.click(firstItem)
-    await fireEvent.keyDown(firstItem, { key: 'Enter' })
+    await fireEvent.click(screen.getAllByRole('button')[0])
 
     expect(onItemClick).toHaveBeenCalledWith(expect.objectContaining({ title: 'Item 1' }), 0)
   })

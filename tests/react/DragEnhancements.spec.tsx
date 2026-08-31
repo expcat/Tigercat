@@ -35,34 +35,34 @@ describe('List - Drag Enhancements', () => {
     expect(listItems[0]).not.toHaveAttribute('draggable')
   })
 
-  it('adds draggable attribute when draggable is true', () => {
+  it('puts a reorder handle on each row instead of HTML5-dragging the row', () => {
     render(<List dataSource={sampleListData} draggable />)
     const listItems = screen.getAllByRole('listitem')
-    expect(listItems[0]).toHaveAttribute('draggable', 'true')
+    expect(listItems[0]).not.toHaveAttribute('draggable')
+    expect(screen.getAllByRole('button', { name: 'Reorder' })).toHaveLength(3)
   })
 
-  it('calls onReorder on drag and drop', () => {
+  it('calls onReorder from Alt+Arrow on the handle', () => {
     const onReorder = vi.fn()
     render(<List dataSource={sampleListData} draggable onReorder={onReorder} />)
-    const listItems = screen.getAllByRole('listitem')
-
-    fireEvent.dragStart(listItems[0])
-    fireEvent.dragOver(listItems[2])
-    fireEvent.drop(listItems[2])
+    fireEvent.keyDown(screen.getAllByRole('button', { name: 'Reorder' })[0], {
+      key: 'ArrowDown',
+      altKey: true
+    })
 
     expect(onReorder).toHaveBeenCalledTimes(1)
-    const [reorderedItems, fromIndex, toIndex] = onReorder.mock.calls[0]
+    const [, fromIndex, toIndex] = onReorder.mock.calls[0]
     expect(fromIndex).toBe(0)
-    expect(toIndex).toBe(2)
+    expect(toIndex).toBe(1)
   })
 
-  it('does not call onReorder when dropping on same position', () => {
+  it('does not call onReorder when Alt+Arrow would leave the list', () => {
     const onReorder = vi.fn()
     render(<List dataSource={sampleListData} draggable onReorder={onReorder} />)
-    const listItems = screen.getAllByRole('listitem')
-
-    fireEvent.dragStart(listItems[0])
-    fireEvent.drop(listItems[0])
+    fireEvent.keyDown(screen.getAllByRole('button', { name: 'Reorder' })[0], {
+      key: 'ArrowUp',
+      altKey: true
+    })
 
     expect(onReorder).not.toHaveBeenCalled()
   })

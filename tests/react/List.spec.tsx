@@ -24,12 +24,13 @@ describe('List', () => {
 
   it('renders empty state', () => {
     render(<List dataSource={[]} />)
-    expect(screen.getByRole('status')).toHaveTextContent('No data')
+    expect(screen.getByText('No data')).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   it('renders custom empty text', () => {
     render(<List dataSource={[]} emptyText="No items" />)
-    expect(screen.getByRole('status')).toHaveTextContent('No items')
+    expect(screen.getByText('No items')).toBeInTheDocument()
   })
 
   it('renders header and footer', () => {
@@ -39,12 +40,12 @@ describe('List', () => {
     expect(screen.getByText('Footer')).toBeInTheDocument()
   })
 
-  it('sets aria-busy and shows loading overlay', () => {
+  it('sets aria-busy and keeps listitems mounted while loading', () => {
     render(<List dataSource={sampleData} loading />)
 
-    expect(screen.getByRole('list')).toHaveAttribute('aria-busy', 'true')
-    expect(screen.getByRole('status')).toBeInTheDocument()
-    expect(screen.queryByText('Item 1')).not.toBeInTheDocument()
+    expect(document.querySelector('[aria-busy="true"]')).toBeTruthy()
+    expect(screen.getByText('Item 1')).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem')).toHaveLength(3)
   })
 
   it('calls onPageChange when clicking next page', async () => {
@@ -113,14 +114,28 @@ describe('List', () => {
 
     rerender(<List dataSource={sampleData} onItemClick={onItemClick} />)
     const clickableItem = screen.getAllByRole('listitem')[0]
-    expect(clickableItem).toHaveAttribute('tabindex', '0')
-
-    await fireEvent.keyDown(clickableItem, { key: 'Enter' })
+    expect(clickableItem.getAttribute('tabindex')).toBeNull()
+    const rowButton = screen.getAllByRole('button')[0]
+    await fireEvent.click(rowButton)
     expect(onItemClick).toHaveBeenCalledWith(expect.objectContaining({ title: 'Item 1' }), 0)
   })
 
+  it('honours a later pagination.current prop', () => {
+    const items = Array.from({ length: 15 }, (_, i) => ({
+      key: i + 1,
+      title: `Item ${i + 1}`
+    }))
+    const { rerender } = render(
+      <List dataSource={items} pagination={{ current: 2, pageSize: 10 }} />
+    )
+    expect(screen.getByText('Item 11')).toBeInTheDocument()
+    rerender(<List dataSource={items} pagination={{ current: 1, pageSize: 10 }} />)
+    expect(screen.getByText('Item 1')).toBeInTheDocument()
+    expect(screen.queryByText('Item 11')).not.toBeInTheDocument()
+  })
+
   it('applies grid gutter as gap style', () => {
-    render(<List dataSource={sampleData} grid={{ gutter: 12, column: 3 }} bordered="none" />)
+    render(<List dataSource={sampleData} grid={{ gutter: 12, column: 3 }} bordered={false} />)
 
     const grid = document.querySelector('.grid') as HTMLElement | null
     expect(grid).toBeTruthy()
