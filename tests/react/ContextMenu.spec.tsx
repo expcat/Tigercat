@@ -227,9 +227,7 @@ describe('ContextMenu', () => {
       await act(async () => {
         await Promise.resolve()
       })
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
-      })
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 

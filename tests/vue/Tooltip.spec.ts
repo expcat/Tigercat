@@ -260,18 +260,14 @@ describe('Tooltip', () => {
       { content: 'Tooltip content' }
     )
 
-    const triggerWrapper = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
-    expect(triggerWrapper).toBeTruthy()
+    const trigger = getByText('Trigger')
+    expect(trigger.getAttribute('aria-describedby')).toBeNull()
 
-    // aria-describedby should exist even before tooltip is shown
-    expect(triggerWrapper.getAttribute('aria-describedby')).toBeTruthy()
-
-    // Show tooltip and verify role
-    await user.hover(triggerWrapper)
+    await user.hover(trigger)
     await waitFor(() => {
       const tooltipEl = document.querySelector('[role="tooltip"]') as HTMLElement
       expect(tooltipEl).toBeTruthy()
-      expect(triggerWrapper.getAttribute('aria-describedby')).toBe(tooltipEl.id)
+      expect(trigger.getAttribute('aria-describedby')).toBe(tooltipEl.id)
     })
   })
 

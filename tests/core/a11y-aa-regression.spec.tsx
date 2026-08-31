@@ -333,15 +333,15 @@ describe('Tooltip a11y regression', () => {
       </ReactTooltip>
     )
 
-    const trigger = reactScreen.getByText('Hover me')
-    reactFireEvent.mouseEnter(trigger)
+    const trigger = reactScreen.getByRole('button', { name: 'Hover me' })
+    trigger.focus()
 
     await waitFor(() => {
       const describedBy = trigger.getAttribute('aria-describedby')
-      if (describedBy) {
-        const tooltip = document.getElementById(describedBy)
-        expect(tooltip).toBeTruthy()
-      }
+      expect(describedBy).toBeTruthy()
+      const tooltip = document.getElementById(describedBy!)
+      expect(tooltip).toBeTruthy()
+      expect(tooltip).toHaveAttribute('role', 'tooltip')
     })
   })
 
@@ -351,13 +351,13 @@ describe('Tooltip a11y regression', () => {
       slots: { default: () => h('button', 'Hover me') }
     })
 
-    const trigger = vueScreen.getByText('Hover me')
-    await vueFireEvent.mouseEnter(trigger)
+    const trigger = vueScreen.getByRole('button', { name: 'Hover me' })
+    await vueFireEvent.focusIn(trigger)
 
     const describedBy = trigger.getAttribute('aria-describedby')
-    if (describedBy) {
-      const tooltip = document.getElementById(describedBy)
-      expect(tooltip).toBeTruthy()
-    }
+    expect(describedBy).toBeTruthy()
+    const tooltip = document.getElementById(describedBy!)
+    expect(tooltip).toBeTruthy()
+    expect(tooltip).toHaveAttribute('role', 'tooltip')
   })
 })

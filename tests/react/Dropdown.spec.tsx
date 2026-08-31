@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { act, render, screen, fireEvent } from '@testing-library/react'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-react/Dropdown'
 import React from 'react'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {
@@ -100,10 +100,10 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const trigger = container.querySelector('.tiger-dropdown-trigger')
-    expect(trigger).toHaveClass('cursor-not-allowed', 'opacity-50', 'pointer-events-none')
+    const trigger = screen.getByRole('button', { name: 'Trigger' })
+    expect(trigger).toBeDisabled()
 
-    await fireEvent.click(screen.getByText('Trigger'))
+    await fireEvent.click(trigger)
     // Floating UI uses `hidden` attribute now
     const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
     expect(wrapper).toHaveAttribute('hidden')
@@ -197,10 +197,10 @@ describe('Dropdown', () => {
     expect(wrapper).not.toHaveAttribute('hidden')
   })
 
-  it('renders chevron indicator by default', () => {
+  it('renders chevron indicator by default on a self-rendered button', () => {
     const { container } = render(
       <Dropdown>
-        <button>Trigger</button>
+        Trigger
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
         </DropdownMenu>
@@ -229,7 +229,7 @@ describe('Dropdown', () => {
   it('rotates chevron when dropdown is open', async () => {
     const { container } = render(
       <Dropdown trigger="click">
-        <button>Trigger</button>
+        Trigger
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
         </DropdownMenu>
@@ -244,7 +244,7 @@ describe('Dropdown', () => {
   })
 
   describe('a11y', () => {
-    it('trigger has aria-haspopup and aria-expanded', () => {
+    it('trigger has aria-haspopup and aria-expanded on the focus node', () => {
       render(
         <Dropdown>
           <button>Trigger</button>
@@ -254,9 +254,10 @@ describe('Dropdown', () => {
         </Dropdown>
       )
 
-      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')
+      const trigger = screen.getByRole('button', { name: 'Trigger' })
       expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      expect(document.querySelectorAll('[aria-haspopup]')).toHaveLength(1)
     })
 
     it('trigger has aria-controls pointing to menu id when open', async () => {
@@ -269,7 +270,7 @@ describe('Dropdown', () => {
         </Dropdown>
       )
 
-      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')!
+      const trigger = screen.getByRole('button', { name: 'Trigger' })
       expect(trigger).not.toHaveAttribute('aria-controls')
 
       await fireEvent.click(screen.getByText('Trigger'))
@@ -299,21 +300,38 @@ describe('Dropdown', () => {
       })
     })
 
-    it('should have no accessibility violations', async () => {
-      const { container } = render(
+    it('should have no accessibility violations when open', async () => {
+      render(
         <Dropdown defaultOpen>
-          <button>Trigger</button>
+          Trigger
           <DropdownMenu>
             <DropdownItem>Item 1</DropdownItem>
+            <DropdownItem disabled>Item 2</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       )
       await act(async () => {
         await Promise.resolve()
       })
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
+      await expectNoA11yViolations(screen.getByRole('menu'))
+    })
+
+    it('opens from a text trigger with ArrowDown', async () => {
+      render(
+        <Dropdown>
+          Trigger
+          <DropdownMenu>
+            <DropdownItem>Item 1</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const trigger = screen.getByRole('button', { name: 'Trigger' })
+      trigger.focus()
+      await act(async () => {
+        fireEvent.keyDown(trigger, { key: 'ArrowDown' })
       })
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
     })
   })
 

@@ -201,9 +201,7 @@ describe('ContextMenu', () => {
 
     it('should have no accessibility violations', async () => {
       const { container } = renderMenu({ defaultOpen: true })
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
-      })
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 

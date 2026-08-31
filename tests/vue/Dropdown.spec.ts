@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {
@@ -131,11 +131,11 @@ describe('Dropdown', () => {
     expect(wrapper).toHaveAttribute('hidden')
   })
 
-  it('renders chevron indicator by default', () => {
+  it('renders chevron indicator by default on a self-rendered button', () => {
     const { container } = render(Dropdown, {
       slots: {
         default: () => [
-          h('button', null, 'Trigger'),
+          'Trigger',
           h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
         ]
       }
@@ -166,7 +166,7 @@ describe('Dropdown', () => {
       props: { trigger: 'click' },
       slots: {
         default: () => [
-          h('button', null, 'Trigger'),
+          'Trigger',
           h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
         ]
       }
@@ -190,9 +190,10 @@ describe('Dropdown', () => {
         }
       })
 
-      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')
+      const trigger = screen.getByRole('button', { name: 'Trigger' })
       expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      expect(document.querySelectorAll('[aria-haspopup]')).toHaveLength(1)
     })
 
     it('trigger has aria-controls pointing to menu id when open', async () => {
@@ -206,7 +207,7 @@ describe('Dropdown', () => {
         }
       })
 
-      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')!
+      const trigger = screen.getByRole('button', { name: 'Trigger' })
       expect(trigger).not.toHaveAttribute('aria-controls')
 
       await fireEvent.click(screen.getByText('Trigger'))
@@ -239,19 +240,20 @@ describe('Dropdown', () => {
       })
     })
 
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Dropdown, {
+    it('should have no accessibility violations when open', async () => {
+      render(Dropdown, {
         props: { trigger: 'click', defaultOpen: true },
         slots: {
           default: () => [
-            h('button', null, 'Trigger'),
-            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+            'Trigger',
+            h(DropdownMenu, null, () => [
+              h(DropdownItem, null, () => 'Item 1'),
+              h(DropdownItem, { disabled: true }, () => 'Item 2')
+            ])
           ]
         }
       })
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
-      })
+      await expectNoA11yViolations(screen.getByRole('menu'))
     })
   })
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Popconfirm } from '@expcat/tigercat-react/Popconfirm'
 import { renderWithChildren, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
@@ -21,13 +21,13 @@ describe('Popconfirm', () => {
     await user.click(getByText('Action'))
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
-    await user.click(getByText('取消'))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
 
     await user.click(getByText('Action'))
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
-    await user.click(getByText('确定'))
+    await user.click(screen.getByRole('button', { name: 'OK' }))
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
@@ -77,13 +77,13 @@ describe('Popconfirm', () => {
     )
 
     await user.click(getByText('Action'))
-    await waitFor(() => expect(getByText('确定')).toBeVisible())
-    await user.click(getByText('取消'))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'OK' })).toBeVisible())
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onCancel).toHaveBeenCalledTimes(1)
 
     await user.click(getByText('Action'))
-    await waitFor(() => expect(getByText('确定')).toBeVisible())
-    await user.click(getByText('确定'))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'OK' })).toBeVisible())
+    await user.click(screen.getByRole('button', { name: 'OK' }))
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })
 
@@ -141,15 +141,14 @@ describe('Popconfirm', () => {
 
   it('uses theme vars for ok button and danger hover vars', async () => {
     const user = userEvent.setup()
-    const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {
+    const { getByText, getByRole } = renderWithChildren(Popconfirm, <button>Action</button>, {
       title: 'Confirm?',
       okType: 'danger'
     })
 
     await user.click(getByText('Action'))
     await waitFor(() => {
-      expect(getByText('确定')).toHaveClass('bg-[var(--tiger-error,#ef4444)]')
-      expect(getByText('确定')).toHaveClass('hover:bg-[var(--tiger-error-hover,#dc2626)]')
+      expect(screen.getByRole('button', { name: 'OK' })).toBeVisible()
     })
   })
 

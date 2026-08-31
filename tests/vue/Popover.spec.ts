@@ -235,8 +235,8 @@ describe('Popover', () => {
       await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        const contentElement = document.querySelector('.tiger-popover-content')
-        expect(contentElement).toHaveClass('w-[300px]')
+        const contentElement = document.querySelector('.tiger-popover-content') as HTMLElement
+        expect(contentElement.style.width).toBe('300px')
       })
     })
   })
@@ -417,7 +417,7 @@ describe('Popover', () => {
         }
       )
 
-      const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
+      const trigger = getByText('Hover trigger')
       await user.hover(trigger)
       await waitFor(() => {
         expect(getByText('Hover content')).toBeVisible()

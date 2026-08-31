@@ -143,11 +143,12 @@ describe('SplitButton', () => {
       expect(getMenuWrapper()).toHaveAttribute('hidden')
     })
 
-    it('puts the primary action into a loading state and disables the trigger', () => {
+    it('puts the primary action into a loading state without disabling the trigger', () => {
       const { container } = renderSplitButton({ loading: true })
       expect(getPrimary(container)).toHaveAttribute('aria-busy', 'true')
       expect(getPrimary(container)).not.toBeDisabled()
-      expect(getTrigger(container)).toBeDisabled()
+      expect(getTrigger(container)).not.toBeDisabled()
+      expect(getTrigger(container)).toHaveAttribute('aria-disabled', 'true')
     })
   })
 
@@ -189,9 +190,7 @@ describe('SplitButton', () => {
 
       await userEvent.click(trigger)
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
-      })
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('uses a custom trigger aria-label', () => {
@@ -201,17 +200,15 @@ describe('SplitButton', () => {
 
     it('passes a11y checks when disabled', async () => {
       const { container } = renderSplitButton({ disabled: true })
-      await expectNoA11yViolationsIsolated(container, {
-        rules: { 'aria-allowed-attr': { enabled: false } }
-      })
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 
   describe('boundary', () => {
-    it('still renders the chevron trigger when no menu is provided', () => {
+    it('does not render the chevron trigger when no menu is provided', () => {
       const { container } = render(<SplitButton>Save</SplitButton>)
       expect(getPrimary(container)).toHaveTextContent('Save')
-      expect(getTrigger(container)).toBeInTheDocument()
+      expect(getTrigger(container)).toBeNull()
     })
 
     it('does not open the menu when the trigger is loading-disabled', () => {

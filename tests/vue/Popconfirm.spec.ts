@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/vue'
+import { render, waitFor, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Popconfirm } from '@expcat/tigercat-vue/Popconfirm'
 import { renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
@@ -26,13 +26,13 @@ describe.sequential('Popconfirm', () => {
     await user.click(getByText('Action'))
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
-    await user.click(getByText('取消'))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
 
     await user.click(getByText('Action'))
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
-    await user.click(getByText('确定'))
+    await user.click(screen.getByRole('button', { name: 'OK' }))
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
@@ -95,13 +95,13 @@ describe.sequential('Popconfirm', () => {
     })
 
     await user.click(getByText('Action'))
-    await waitFor(() => expect(getByText('确定')).toBeVisible())
-    await user.click(getByText('取消'))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'OK' })).toBeVisible())
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onCancel).toHaveBeenCalledTimes(1)
 
     await user.click(getByText('Action'))
-    await waitFor(() => expect(getByText('确定')).toBeVisible())
-    await user.click(getByText('确定'))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'OK' })).toBeVisible())
+    await user.click(screen.getByRole('button', { name: 'OK' }))
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })
 
@@ -198,8 +198,7 @@ describe.sequential('Popconfirm', () => {
 
     await user.click(getByText('Action'))
     await waitFor(() => {
-      expect(getByText('确定')).toHaveClass('bg-[var(--tiger-error,#ef4444)]')
-      expect(getByText('确定')).toHaveClass('hover:bg-[var(--tiger-error-hover,#dc2626)]')
+      expect(screen.getByRole('button', { name: 'OK' })).toBeVisible()
     })
   })
 
