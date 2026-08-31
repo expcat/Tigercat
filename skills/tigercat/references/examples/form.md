@@ -11,16 +11,18 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Component Notes
 
-| Component   | Uses | Notes                                                                                                                                                                                                          |
-| ----------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| InputGroup  | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                           |
-| InputNumber | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                    |
-| Select      | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。 |
+| Component    | Uses | Notes                                                                                                                                                                                                          |
+| ------------ | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AutoComplete | -    | 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。      |
+| InputGroup   | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                           |
+| InputNumber  | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                    |
+| Select       | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。 |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
 | Component       | Vue                                                                                                         | React                                                                                                       |
 | --------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| AutoComplete    | `<AutoComplete v-model="value" :options="options" />`                                                       | `<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />`                      |
 | Checkbox        | `<Checkbox v-model="checked">Label</Checkbox>`                                                              | `<Checkbox checked={checked} onChange={setChecked}>Label</Checkbox>`                                        |
 | CheckboxGroup   | `<CheckboxGroup v-model="values"><Checkbox value="a">A</Checkbox></CheckboxGroup>`                          | `<CheckboxGroup value={values} onChange={setValues}><Checkbox value="a">A</Checkbox></CheckboxGroup>`       |
 | Form            | `<Form :model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>`                        | `<Form model={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>`      |
@@ -38,6 +40,6 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | Switch          | `<Switch v-model="checked">Label</Switch>`                                                                  | `<Switch checked={checked} onChange={setChecked}>Label</Switch>`                                            |
 | Textarea        | `<Textarea v-model="value" :rows="4" />`                                                                    | `<Textarea value={value} onChange={(event) => setValue(event.target.value)} />`                             |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, ColorPicker, ColorSwatch, CronEditor, DatePicker, InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, TimePicker, Transfer, TreeSelect, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Cascader, ColorPicker, ColorSwatch, CronEditor, DatePicker, InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, TimePicker, Transfer, TreeSelect, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

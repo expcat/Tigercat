@@ -11,14 +11,20 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 4/14 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 8/27 props
 
-| Prop        | Type                   | Default | Notes                                                  |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------ |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
-| `options?`  | `AutoCompleteOption[]` | `-`     | Options list                                           |
-| `disabled?` | `boolean`              | `-`     | Whether the component is disabled                      |
-| `value?`    | `string \| number`     | `-`     | Controlled value                                       |
+Note: 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。
+
+| Prop              | Type                       | Default | Notes                                                                                      |
+| ----------------- | -------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `options?`        | `AutoCompleteOption[]`     | `-`     | Options list                                                                               |
+| `value?`          | `AutoCompleteValue`        | `-`     | Committed value. `undefined` is unselected; `''` is a legal value. Typing updates the q... |
+| `defaultValue?`   | `AutoCompleteValue`        | `-`     | Initial committed value when `value` is omitted.                                           |
+| `searchValue?`    | `string`                   | `-`     | Controlled search input value                                                              |
+| `filterOption?`   | `AutoCompleteFilterOption` | `-`     | Whether to filter options locally based on input value (default: true)                     |
+| `allowFreeInput?` | `boolean`                  | `-`     | Allow committing text that is not an option (default: true). Typing always updates the...  |
+| `clearable?`      | `boolean`                  | `-`     | Whether to show clear button                                                               |
+| `open?`           | `boolean`                  | `-`     | Controlled open state. `undefined` is uncontrolled.                                        |
 
 ## Cascader
 

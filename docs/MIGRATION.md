@@ -4,6 +4,8 @@
 
 ## 未发布
 
+AutoComplete 的 `value` / `modelValue` 只表示已提交值，输入框走 `searchValue`。打字不再每键 `onChange` / `update:modelValue`。未选是 `undefined`（不要再用 `''` 当空）；`''` 是合法已选值。Clear 发出 `undefined`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用 blur 提交或关掉该 prop。空态走 `empty.noResults`。删除假 token `--tiger-autocomplete-*`。Vue 主入口导出 `AutoCompleteProps` 与 `AutoCompleteOption`。
+
 Select 未选是 `undefined`（多选 `[]`），`''` 是合法选项值。React `onChange` 单选 Clear 第一参是 `undefined`，不要 `next ?? ''`。新增 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。搜索输入即时更新，`onSearchChange` 才 debounce；React 即时通道是 `onSearchValueChange`。trigger 不再是 native `button`，而是 `role="combobox"`；搜索时 combobox 是输入框。选项不再抢焦点（`aria-activedescendant`）。删除假 token `--tiger-select-*`。`listHeight` 是面板内容区高度。Vue 主入口导出 `SelectProps`。
 
 Input React 支持 `readOnly`（与 `readonly` 同一属性）。Input 的 clear / 密码按钮进 Tab，文案走 `locale.input`。InputGroup 没有可访问名时不再写 `role="group"`。删除 InputGroupAddon 的 `type` / `addonType`（从未改视觉）。InputNumber `parser` 可返回 `null`，`NaN` 当空；`controlsPosition="right"` 是阅读方向的尾侧。React InputNumber `onChange` 仍是 `(value: number | null)`。Textarea 新增 `status` / `errorMessage`。

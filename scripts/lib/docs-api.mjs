@@ -233,6 +233,17 @@ export const COMPONENT_PROP_PRIORITY = {
     'creatable?',
     'remote?',
     'open?'
+  ],
+  AutoComplete: [
+    'options?',
+    'value?',
+    'defaultValue?',
+    'searchValue?',
+    'filterOption?',
+    'allowFreeInput?',
+    'clearable?',
+    'open?',
+    'loading?'
   ]
 }
 
@@ -387,7 +398,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Switch: '<Switch v-model="checked">Label</Switch>',
     Slider: '<Slider v-model="value" />',
     Stepper: '<Stepper v-model="value" />',
-    Select: '<Select v-model="value" :options="options" />'
+    Select: '<Select v-model="value" :options="options" />',
+    AutoComplete: '<AutoComplete v-model="value" :options="options" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -430,7 +442,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Switch: '<Switch checked={checked} onChange={setChecked}>Label</Switch>',
     Slider: '<Slider value={value} onChange={setValue} />',
     Stepper: '<Stepper value={value} onChange={setValue} />',
-    Select: '<Select value={value} options={options} onChange={(next) => setValue(next)} />'
+    Select: '<Select value={value} options={options} onChange={(next) => setValue(next)} />',
+    AutoComplete:
+      '<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />'
   }
 }
 

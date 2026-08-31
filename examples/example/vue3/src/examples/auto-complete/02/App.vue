@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { AutoComplete } from '@expcat/tigercat-vue/AutoComplete'
 
-const value = ref('')
+const value = ref<string | number | undefined>()
 const options = [
   { label: '北京 Beijing', value: 'beijing' },
   { label: '上海 Shanghai', value: 'shanghai' },

@@ -1,7 +1,7 @@
 {
   "id": "auto-complete-01",
   "title": "基本用法",
-  "description": "输入时自动过滤匹配选项",
+  "description": "输入时过滤选项，点选才提交已选值。未选是空，不是空字符串。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

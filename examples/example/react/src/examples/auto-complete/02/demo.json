@@ -1,7 +1,7 @@
 {
   "id": "auto-complete-02",
-  "title": "自定义选项",
-  "description": "options 支持 {label, value} 对象",
+  "title": "label 与 value 不同",
+  "description": "输入 beijing 框里仍是 beijing，点选项后才显示「北京 Beijing」。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

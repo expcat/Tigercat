@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **AutoComplete**：`value` 只表示已提交值，输入框走 `searchValue`；打字不再每键 `onChange`。未选是 `undefined`，`''` 是合法值。补 `defaultValue` / `open` / `defaultOpen` / `onOpenChange`（Vue `v-model:open`）。失焦离开 input+listbox 关层。`allowFreeInput={false}` 只在点选、Enter 高亮或 blur 匹配成功时提交。读 FormItem；id/aria/`name` 在 combobox input。弹层复用 Select overlay（`fullscreen-sm`、host 链、`listHeight`）。空态走 `empty.noResults`。React `forwardRef` 到 input；Vue `expose({ focus, open, close, input })`。
 - **Select**：open / 选中 / 搜索 / activeIndex 下沉 core。非受控 `defaultValue`，`open` 真受控。`''` 是合法值，未选是 `undefined` / `[]`。读 FormItem；combobox 语义在焦点节点上，选项走 `aria-activedescendant`。搜索即时、`onSearchChange` 才 debounce。虚拟列表把组头和选项放进同一窗口。`listHeight` 管面板。文案走 `locale.select`。React `forwardRef` / Vue `expose({ focus, open, close })`。
 - **Input 族（Input / InputGroup / Textarea / InputNumber）**：React 把 ref 转到原生控件，Vue expose `focus`/`input`。`readOnly` 与 `readonly` 同一属性。clear 与密码钮并排，文案走 `locale.input`，点完还焦。error/count 不再把组接缝打到 `w-full` 空壳；组内 `flex-1 min-w-0`。InputGroup compact 复用 chrome 选择器（`data-tiger-chrome`），单直子保留四角；无名不加 `role="group"`；删除未实现的 `type`/`addonType`。Textarea 有 `status`/`errorMessage`、读 FormItem，autoResize 按 border-box 算高。InputNumber 步进用十进制整数加减；聚焦时保持裸数字；读 FormItem；步进钮 locale + Home/End；逻辑 padding。
 - **Splitter**：`sizes` 按值受控（同一组百分数/像素的新数组不会把拖拽弹回）；未传或拿掉 `sizes` 停在最后比例。百分比和均分跟容器走（ResizeObserver）。水平指针和方向键读 `dir`，gutter 跟着指针。键盘也发 `resize-end`。gutter 是带 `aria-valuenow` 和 locale 名的 window splitter；命中区 24px。pane 数以摊平后的子节点为准。删除未实现的 `SplitterPaneConfig`。

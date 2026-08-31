@@ -8,12 +8,12 @@ const options = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState<string | number | undefined>()
 
   return (
     <AutoComplete
       value={value}
-      onChange={(next) => setValue(String(next))}
+      onChange={setValue}
       options={options}
       placeholder="输入城市中英文名称"
       className="w-full max-w-sm"
