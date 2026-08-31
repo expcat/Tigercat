@@ -9,6 +9,6 @@ const modules = getDemoModules('segmented')
 <template>
   <DemoPage
     title="Segmented 分段控制器"
-    description="分段选择器，类似 iOS UISegmentedControl。"
+    description="真 radiogroup。每组需要 aria-label。指示条跟阅读方向。"
     :modules="modules" />
 </template>

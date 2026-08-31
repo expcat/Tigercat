@@ -16,7 +16,11 @@ const mood = ref(4)
     </p>
     <div class="flex items-center gap-3">
       <span class="w-16 text-sm text-gray-500">只读</span>
-      <Rate :model-value="4.5" disabled allow-half />
+      <Rate :model-value="4.5" read-only allow-half />
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="w-16 text-sm text-gray-500">禁用</span>
+      <Rate :model-value="2" disabled />
     </div>
   </div>
 </template>

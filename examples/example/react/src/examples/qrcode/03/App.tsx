@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { QRCode } from '@expcat/tigercat-react/QRCode'
 
 export default function App() {
+  const [nonce, setNonce] = useState(0)
+
   return (
     <div className="flex flex-wrap gap-6">
       <div className="text-center">
@@ -8,7 +11,12 @@ export default function App() {
         <p className="mt-1 text-xs text-gray-500">自定义配色</p>
       </div>
       <div className="text-center">
-        <QRCode value="https://tigercat.dev" size={120} status="expired" />
+        <QRCode
+          value={`https://tigercat.dev?n=${nonce}`}
+          size={120}
+          status="expired"
+          onRefresh={() => setNonce((n) => n + 1)}
+        />
         <p className="mt-1 text-xs text-gray-500">status=&quot;expired&quot;</p>
       </div>
       <div className="text-center">

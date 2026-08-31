@@ -9,6 +9,6 @@ const modules = getDemoModules('result')
 <template>
   <DemoPage
     title="Result 结果页"
-    description="用于反馈操作结果，包括成功、失败、警告和 HTTP 状态码。"
+    description="操作结果页。有 title 时用 heading；HTTP 状态画数字，不自动补文案。默认不是 live region。"
     :modules="modules" />
 </template>

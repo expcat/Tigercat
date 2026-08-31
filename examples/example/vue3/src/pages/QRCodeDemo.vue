@@ -9,6 +9,6 @@ const modules = getDemoModules('qrcode')
 <template>
   <DemoPage
     title="QRCode 二维码"
-    description="将文本转换为二维码，支持自定义颜色、大小和纠错等级。"
+    description="把 value 编成可扫描的 QR。过期态仅在绑定刷新回调时出现 button。"
     :modules="modules" />
 </template>

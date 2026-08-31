@@ -13,8 +13,11 @@ const options = [
 
 <template>
   <div class="space-y-3">
-    <Segmented v-model="value" :options="options" block />
-    <Segmented v-model="disabledValue" :options="options" disabled />
+    <Segmented v-model="value" :options="options" block aria-label="任务筛选" />
+    <Segmented v-model="disabledValue" :options="options" disabled aria-label="禁用筛选" />
+    <div dir="rtl">
+      <Segmented v-model="value" :options="options" aria-label="RTL" />
+    </div>
     <p class="text-sm text-gray-500">block 撑满容器宽度；disabled 禁用整个控件。</p>
   </div>
 </template>

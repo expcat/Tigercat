@@ -1,7 +1,7 @@
 {
   "id": "empty-01",
   "title": "空状态与操作",
-  "description": "单个 Empty 组合预设、描述与操作按钮；preset 还支持 no-data 和 error。",
+  "description": "preset 换默认文案；description 覆盖；extra 放操作。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }

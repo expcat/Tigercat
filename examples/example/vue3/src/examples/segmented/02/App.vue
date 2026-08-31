@@ -13,6 +13,12 @@ const sizes = ['sm', 'md', 'lg'] as const
 
 <template>
   <div class="space-y-3">
-    <Segmented v-for="size in sizes" :key="size" v-model="value" :options="options" :size="size" />
+    <Segmented
+      v-for="size in sizes"
+      :key="size"
+      v-model="value"
+      :options="options"
+      :size="size"
+      :aria-label="`视图 ${size}`" />
   </div>
 </template>

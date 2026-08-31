@@ -15,7 +15,11 @@ export default function App() {
       </p>
       <div className="flex items-center gap-3">
         <span className="w-16 text-sm text-gray-500">只读</span>
-        <Rate value={4.5} disabled allowHalf />
+        <Rate value={4.5} readOnly allowHalf />
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="w-16 text-sm text-gray-500">禁用</span>
+        <Rate value={2} disabled />
       </div>
     </div>
   )

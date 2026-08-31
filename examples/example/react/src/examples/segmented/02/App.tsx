@@ -14,7 +14,14 @@ export default function App() {
   return (
     <div className="space-y-3">
       {sizes.map((size) => (
-        <Segmented key={size} value={value} onChange={setValue} options={options} size={size} />
+        <Segmented
+          key={size}
+          value={value}
+          onChange={setValue}
+          options={options}
+          size={size}
+          aria-label={`视图 ${size}`}
+        />
       ))}
     </div>
   )

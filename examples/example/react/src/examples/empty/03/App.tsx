@@ -4,7 +4,7 @@ import { Empty } from '@expcat/tigercat-react/Empty'
 export default function App() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      <Empty showImage={false} description="精简模式：隐藏插图，仅保留文字说明。" />
+      <Empty preset="simple" />
       <Empty
         preset="no-data"
         description="还没有任何数据，先创建一条吧"

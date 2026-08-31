@@ -5,7 +5,7 @@ const logo =
 
 export default function App() {
   return (
-    <Watermark image={logo} width={120} height={64} gapX={120} gapY={80}>
+    <Watermark image={logo} content="Tigercat" width={120} height={64} gapX={120} gapY={80}>
       <div className="h-56 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
         图片水印适合品牌标识或图形化保密标记。
       </div>

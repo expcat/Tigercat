@@ -5,7 +5,7 @@ import { Empty } from '@expcat/tigercat-vue/Empty'
 
 <template>
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    <Empty :show-image="false" description="精简模式：隐藏插图，仅保留文字说明。" />
+    <Empty preset="simple" />
     <Empty preset="no-data" description="还没有任何数据，先创建一条吧">
       <template #extra>
         <div class="flex justify-center gap-2">

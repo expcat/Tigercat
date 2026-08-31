@@ -9,6 +9,6 @@ const modules = getDemoModules('empty')
 <template>
   <DemoPage
     title="Empty 空状态"
-    description="空状态时的占位提示，支持多种预设样式。"
+    description="空状态占位。preset 换默认文案和内置插图（simple 无图）。"
     :modules="modules" />
 </template>

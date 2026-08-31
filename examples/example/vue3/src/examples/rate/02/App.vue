@@ -14,7 +14,7 @@ const sizes = ['sm', 'md', 'lg'] as const
     </div>
     <div class="flex items-center gap-3">
       <span class="w-10 text-sm text-gray-500">count</span>
-      <Rate v-model="value" :count="10" />
+      <Rate :default-value="8" :count="10" />
     </div>
   </div>
 </template>

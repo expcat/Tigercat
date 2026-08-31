@@ -6,7 +6,7 @@ const logo =
 </script>
 
 <template>
-  <Watermark :image="logo" :width="120" :height="64" :gap-x="120" :gap-y="80">
+  <Watermark :image="logo" content="Tigercat" :width="120" :height="64" :gap-x="120" :gap-y="80">
     <div class="h-56 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
       图片水印适合品牌标识或图形化保密标记。
     </div>

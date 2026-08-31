@@ -16,7 +16,7 @@ export default function App() {
       ))}
       <div className="flex items-center gap-3">
         <span className="w-10 text-sm text-gray-500">count</span>
-        <Rate value={value} onChange={setValue} count={10} />
+        <Rate defaultValue={8} count={10} />
       </div>
     </div>
   )

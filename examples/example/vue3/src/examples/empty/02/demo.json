@@ -1,7 +1,7 @@
 {
   "id": "empty-02",
   "title": "预设一览",
-  "description": "preset 覆盖 default、simple、no-data、no-results、error 五种内置空状态。",
+  "description": "preset 换默认文案和插图：simple 无图，error / no-results 各自有标，其余开盒。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 540, "maxHeight": 720 }

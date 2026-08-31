@@ -12,8 +12,11 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <Segmented value={value} onChange={setValue} options={options} block />
-      <Segmented value="active" options={options} disabled />
+      <Segmented value={value} onChange={setValue} options={options} block aria-label="任务筛选" />
+      <Segmented value="active" options={options} disabled aria-label="禁用筛选" />
+      <div dir="rtl">
+        <Segmented value={value} onChange={setValue} options={options} aria-label="RTL" />
+      </div>
       <p className="text-sm text-gray-500">block 撑满容器宽度；disabled 禁用整个控件。</p>
     </div>
   )

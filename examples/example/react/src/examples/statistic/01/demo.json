@@ -1,7 +1,7 @@
 {
   "id": "statistic-01",
   "title": "代表配置",
-  "description": "单个 Statistic 组合精度、分组、前后缀和 lg 尺寸；替换 value 即可用于不同指标。",
+  "description": "分组走 Intl + zh-CN locale。title 是指标名。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

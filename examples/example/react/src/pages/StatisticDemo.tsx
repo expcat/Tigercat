@@ -7,7 +7,7 @@ export default function StatisticDemo() {
   return (
     <DemoPage
       title="Statistic 统计"
-      description="展示统计数值，支持精度、前缀后缀和千分位分隔。"
+      description="数字走 Intl + ConfigProvider locale。animated 在 mount 后播；减少动态时直接终值。"
       modules={modules}
     />
   )
