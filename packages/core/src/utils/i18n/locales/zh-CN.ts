@@ -504,6 +504,16 @@ export const zhCN: TigerLocale = {
   anchor: {
     ariaLabel: '本页导航'
   },
+  floatButton: {
+    ariaLabel: '添加'
+  },
+  spotlight: {
+    title: '命令面板',
+    placeholder: '搜索'
+  },
+  scrollSpy: {
+    ariaLabel: '章节导航'
+  },
   steps: {
     ariaLabel: '步骤',
     waitStatus: '等待',

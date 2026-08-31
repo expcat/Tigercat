@@ -501,6 +501,16 @@ export const viVN: TigerLocale = {
   anchor: {
     ariaLabel: 'Trên trang này'
   },
+  floatButton: {
+    ariaLabel: 'Thêm'
+  },
+  spotlight: {
+    title: 'Bảng lệnh',
+    placeholder: 'Tìm kiếm'
+  },
+  scrollSpy: {
+    ariaLabel: 'Điều hướng mục'
+  },
   steps: {
     ariaLabel: 'Các bước',
     waitStatus: 'Đang chờ',

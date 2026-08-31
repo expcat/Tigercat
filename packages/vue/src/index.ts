@@ -381,7 +381,12 @@ export type { VueResultProps } from './components/Result'
 export { Empty } from './components/Empty'
 export type { VueEmptyProps } from './components/Empty'
 export { FloatButton, FloatButtonGroup } from './components/FloatButton'
-export type { VueFloatButtonProps, VueFloatButtonGroupProps } from './components/FloatButton'
+export type {
+  VueFloatButtonProps,
+  VueFloatButtonGroupProps,
+  FloatButtonProps,
+  FloatButtonGroupProps
+} from './components/FloatButton'
 export { Watermark } from './components/Watermark'
 export type { VueWatermarkProps } from './components/Watermark'
 export { Tour } from './components/Tour'

@@ -501,6 +501,16 @@ export const thTH: TigerLocale = {
   anchor: {
     ariaLabel: 'ในหน้านี้'
   },
+  floatButton: {
+    ariaLabel: 'เพิ่ม'
+  },
+  spotlight: {
+    title: 'แผงคำสั่ง',
+    placeholder: 'ค้นหา'
+  },
+  scrollSpy: {
+    ariaLabel: 'การนำทางส่วน'
+  },
   steps: {
     ariaLabel: 'ขั้นตอน',
     waitStatus: 'รอดำเนินการ',

@@ -502,6 +502,16 @@ export const frFR: TigerLocale = {
   anchor: {
     ariaLabel: 'Sur cette page'
   },
+  floatButton: {
+    ariaLabel: 'Ajouter'
+  },
+  spotlight: {
+    title: 'Palette de commandes',
+    placeholder: 'Rechercher'
+  },
+  scrollSpy: {
+    ariaLabel: 'Navigation des sections'
+  },
   steps: {
     ariaLabel: 'Étapes',
     waitStatus: 'En attente',

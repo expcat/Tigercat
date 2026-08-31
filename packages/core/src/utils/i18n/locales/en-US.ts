@@ -504,6 +504,16 @@ export const enUS: TigerLocale = {
   anchor: {
     ariaLabel: 'On this page'
   },
+  floatButton: {
+    ariaLabel: 'Add'
+  },
+  spotlight: {
+    title: 'Spotlight',
+    placeholder: 'Search'
+  },
+  scrollSpy: {
+    ariaLabel: 'Section navigation'
+  },
   steps: {
     ariaLabel: 'Steps',
     waitStatus: 'Pending',

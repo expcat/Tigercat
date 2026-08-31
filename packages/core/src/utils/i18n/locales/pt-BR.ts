@@ -502,6 +502,16 @@ export const ptBR: TigerLocale = {
   anchor: {
     ariaLabel: 'Nesta página'
   },
+  floatButton: {
+    ariaLabel: 'Adicionar'
+  },
+  spotlight: {
+    title: 'Paleta de comandos',
+    placeholder: 'Pesquisar'
+  },
+  scrollSpy: {
+    ariaLabel: 'Navegação das seções'
+  },
   steps: {
     ariaLabel: 'Etapas',
     waitStatus: 'Pendente',

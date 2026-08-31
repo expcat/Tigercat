@@ -457,6 +457,23 @@ export interface TigerLocaleAnchor {
   ariaLabel?: string
 }
 
+export interface TigerLocaleFloatButton {
+  /** Default accessible name for an icon-only FloatButton */
+  ariaLabel?: string
+}
+
+export interface TigerLocaleSpotlight {
+  /** Default command-palette dialog title */
+  title?: string
+  /** Default search-field placeholder */
+  placeholder?: string
+}
+
+export interface TigerLocaleScrollSpy {
+  /** Default ScrollSpy landmark name */
+  ariaLabel?: string
+}
+
 export interface TigerLocaleSteps {
   /** Default steps list accessible name */
   ariaLabel?: string
@@ -765,6 +782,9 @@ export interface TigerLocale {
   pageHeader?: TigerLocalePageHeader
   backTop?: TigerLocaleBackTop
   anchor?: TigerLocaleAnchor
+  floatButton?: TigerLocaleFloatButton
+  spotlight?: TigerLocaleSpotlight
+  scrollSpy?: TigerLocaleScrollSpy
   steps?: TigerLocaleSteps
   rate?: TigerLocaleRate
   avatarGroup?: TigerLocaleAvatarGroup

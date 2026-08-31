@@ -5,256 +5,152 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { floatButtonPlusIconPath } from '@expcat/tigercat-core'
+import { VIEWPORT_FLOATING_FAB_OFFSET } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-vue/FloatButton'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 describe('FloatButton (Vue)', () => {
-  describe('Rendering', () => {
-    it('renders a button element', () => {
-      render(FloatButton, { slots: { default: 'Click' } })
-      expect(screen.getByRole('button')).toBeInTheDocument()
+  it('names an icon-only button from locale', () => {
+    render({
+      setup: () => () => h(ConfigProvider, { locale: zhCN }, () => h(FloatButton))
     })
-
-    it('renders slot content', () => {
-      render(FloatButton, { slots: { default: 'Action' } })
-      expect(screen.getByText('Action')).toBeInTheDocument()
-    })
-
-    it('renders a plus SVG when the default slot is empty', () => {
-      const { container } = render(FloatButton)
-      const svg = container.querySelector('svg')
-      expect(svg).not.toBeNull()
-      expect(svg).toHaveAttribute('aria-hidden', 'true')
-      expect(svg?.querySelector('path')?.getAttribute('d')).toBe(floatButtonPlusIconPath)
-    })
-
-    it('does not render the plus path when the default slot has content', () => {
-      const { container } = render(FloatButton, { slots: { default: 'Action' } })
-      expect(screen.getByText('Action')).toBeInTheDocument()
-      expect(container.querySelector('path')?.getAttribute('d')).not.toBe(floatButtonPlusIconPath)
-    })
-
-    it('has type="button"', () => {
-      render(FloatButton)
-      expect(screen.getByRole('button')).toHaveAttribute('type', 'button')
-    })
-
-    it('applies circle shape class by default', () => {
-      const { container } = render(FloatButton)
-      expect(container.querySelector('button')?.className).toContain('rounded-full')
-    })
-
-    it('applies square shape class', () => {
-      const { container } = render(FloatButton, { props: { shape: 'square' } })
-      expect(container.querySelector('button')?.className).toContain('rounded-')
-      expect(container.querySelector('button')?.className).not.toContain('rounded-full')
-    })
+    expect(screen.getByRole('button', { name: '添加' })).toBeInTheDocument()
   })
 
-  describe('Tooltip', () => {
-    it('sets title from tooltip prop', () => {
-      render(FloatButton, { props: { tooltip: 'Help' } })
-      expect(screen.getByRole('button')).toHaveAttribute('title', 'Help')
+  it('uses zhTW locale name', () => {
+    render({
+      setup: () => () => h(ConfigProvider, { locale: zhTW }, () => h(FloatButton))
     })
-
-    it('uses tooltip as aria-label when ariaLabel is not set', () => {
-      render(FloatButton, { props: { tooltip: 'Help' } })
-      expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Help')
-    })
-
-    it('uses ariaLabel over tooltip for aria-label', () => {
-      render(FloatButton, { props: { tooltip: 'Help', ariaLabel: 'Custom' } })
-      expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Custom')
-    })
+    expect(screen.getByRole('button', { name: '新增' })).toBeInTheDocument()
   })
 
-  describe('Disabled', () => {
-    it('sets disabled attribute', () => {
-      render(FloatButton, { props: { disabled: true } })
-      expect(screen.getByRole('button')).toBeDisabled()
-    })
-
-    it('does not emit click when disabled', async () => {
-      const { emitted } = render(FloatButton, { props: { disabled: true } })
-      await fireEvent.click(screen.getByRole('button'))
-      expect(emitted().click).toBeUndefined()
-    })
-
-    it('emits click when enabled', async () => {
-      const { emitted } = render(FloatButton)
-      await fireEvent.click(screen.getByRole('button'))
-      expect(emitted().click).toHaveLength(1)
-    })
+  it('keeps visible text as the accessible name when tooltip is set', () => {
+    render(FloatButton, { props: { tooltip: 'Help' }, slots: { default: '保存' } })
+    expect(screen.getByRole('button', { name: '保存' })).toBeInTheDocument()
+    expect(screen.getByRole('button')).toHaveAttribute('title', 'Help')
   })
 
-  describe('Type variants', () => {
-    it('applies primary type classes by default', () => {
-      const { container } = render(FloatButton)
-      const btn = container.querySelector('button')!
-      expect(btn.className).toContain('bg-')
-    })
-
-    it('applies default type classes', () => {
-      const { container } = render(FloatButton, { props: { type: 'default' } })
-      const btn = container.querySelector('button')!
-      expect(btn.className).toContain('bg-')
-    })
+  it('places a floating button on the logical end/block axes', () => {
+    render(FloatButton, { props: { floating: true } })
+    const button = screen.getByRole('button')
+    expect(button.style.insetInlineEnd).toBe(`${VIEWPORT_FLOATING_FAB_OFFSET.x}px`)
+    expect(button.style.insetBlockEnd).toBe(`${VIEWPORT_FLOATING_FAB_OFFSET.y}px`)
   })
 
-  describe('className and attrs', () => {
-    it('merges className prop', () => {
-      const { container } = render(FloatButton, { props: { className: 'my-btn' } })
-      expect(container.querySelector('button')).toHaveClass('my-btn')
-    })
-
-    it('merges attrs class', () => {
-      const { container } = render(FloatButton, { attrs: { class: 'extra' } })
-      expect(container.querySelector('button')).toHaveClass('extra')
-    })
-
-    it('does not apply fixed positioning by default', () => {
-      const { container } = render(FloatButton)
-      expect(container.querySelector('button')).not.toHaveClass('fixed')
-    })
-
-    it('supports standalone floating placement', () => {
-      const { container } = render(FloatButton, {
-        props: { floating: true, placement: 'bottom-left', offset: { x: 32, y: '3rem' } }
-      })
-      const button = container.querySelector('button')
-      expect(button).toHaveClass('fixed')
-      expect(button).toHaveClass('bottom-0')
-      expect(button).toHaveClass('left-0')
-      expect(button?.style.left).toBe('32px')
-      expect(button?.style.bottom).toBe('3rem')
-    })
+  it('does not fire click when disabled', async () => {
+    const onClick = vi.fn()
+    render(FloatButton, { props: { disabled: true }, attrs: { onClick } })
+    await fireEvent.click(screen.getByRole('button'))
+    expect(onClick).not.toHaveBeenCalled()
   })
 })
 
 describe('FloatButtonGroup (Vue)', () => {
-  it('renders trigger slot', () => {
-    render(FloatButtonGroup, {
-      slots: {
-        trigger: () => h('button', 'Open'),
-        default: () => h('button', 'Child')
-      }
+  it('is a disclosure: trigger expands and lists actions', async () => {
+    render({
+      setup: () => () =>
+        h(
+          FloatButtonGroup,
+          { portal: false },
+          {
+            trigger: () => h(FloatButton, { ariaLabel: 'Open actions' }),
+            default: () => h(FloatButton, { ariaLabel: 'Edit' })
+          }
+        )
     })
-    expect(screen.getByText('Open')).toBeInTheDocument()
+    const trigger = screen.getByRole('button', { name: 'Open actions' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+
+    await fireEvent.click(trigger)
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
+    expect(trigger).toHaveAttribute('aria-controls')
   })
 
-  it('does not show children when closed', () => {
-    render(FloatButtonGroup, {
-      slots: {
-        trigger: () => h('button', 'Open'),
-        default: () => h('button', 'Child')
-      }
+  it('opens from click when trigger is hover', async () => {
+    const onOpenChange = vi.fn()
+    render({
+      setup: () => () =>
+        h(
+          FloatButtonGroup,
+          { portal: false, trigger: 'hover', onOpenChange, 'onOpen-change': onOpenChange },
+          {
+            trigger: () => h(FloatButton, { ariaLabel: 'Hover' }),
+            default: () => h(FloatButton, { ariaLabel: 'Child' })
+          }
+        )
     })
-    expect(screen.queryByText('Child')).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'Hover' }))
+    expect(onOpenChange).toHaveBeenCalledWith(true)
+    expect(screen.getByRole('button', { name: 'Child' })).toBeInTheDocument()
   })
 
-  it('shows children when open prop is true', () => {
-    render(FloatButtonGroup, {
-      props: { open: true },
-      slots: {
-        trigger: () => h('button', 'Open'),
-        default: () => h('button', 'Child')
-      }
+  it('closes on Escape when defaultOpen', async () => {
+    render({
+      setup: () => () =>
+        h(
+          FloatButtonGroup,
+          { portal: false, defaultOpen: true },
+          {
+            trigger: () => h(FloatButton, { ariaLabel: 'Open' }),
+            default: () => h(FloatButton, { ariaLabel: 'Child' })
+          }
+        )
     })
-    expect(screen.getByText('Child')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Child' })).toBeInTheDocument()
+    await fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
   })
 
-  it('toggles children on trigger click', async () => {
-    const { emitted } = render(FloatButtonGroup, {
-      props: { trigger: 'click' },
-      slots: {
-        trigger: () => h('button', 'Toggle'),
-        default: () => h('button', 'Child')
-      }
+  it('inherits group square shape on child buttons', () => {
+    render({
+      setup: () => () =>
+        h(
+          FloatButtonGroup,
+          { portal: false, open: true, shape: 'square' },
+          {
+            trigger: () => h(FloatButton, { ariaLabel: 'Open' }),
+            default: () => h(FloatButton, { ariaLabel: 'Child' })
+          }
+        )
     })
-    await fireEvent.click(screen.getByText('Toggle'))
-    expect(emitted()['update:open']).toBeTruthy()
-    expect(emitted()['update:open'][0]).toEqual([true])
-  })
-
-  it('opens on hover when trigger=hover', async () => {
-    const { emitted, container } = render(FloatButtonGroup, {
-      props: { trigger: 'hover' },
-      slots: {
-        trigger: () => h('button', 'Hover'),
-        default: () => h('button', 'Child')
-      }
-    })
-    const group = container.querySelector('[class]')
-    if (group) {
-      await fireEvent.mouseEnter(group)
-      expect(emitted()['update:open']).toBeTruthy()
+    for (const button of screen.getAllByRole('button')) {
+      expect(button.className).not.toContain('rounded-full')
     }
   })
 
-  it('merges className prop', () => {
-    render(FloatButtonGroup, {
-      props: { open: true, className: 'custom-group' },
-      slots: { default: () => h('button', 'A') }
-    })
-    const group = document.querySelector('.custom-group')
-    expect(group).toBeInTheDocument()
-  })
-
-  it('portals to document.body as fixed when portal is omitted', () => {
-    render(FloatButtonGroup, {
-      props: { className: 'portal-default-group' },
-      slots: {
-        trigger: () => h('button', 'Open')
-      }
+  it('portals the group to document.body by default', () => {
+    render({
+      setup: () => () =>
+        h(
+          FloatButtonGroup,
+          { className: 'portal-default-group' },
+          {
+            trigger: () => h(FloatButton, { ariaLabel: 'Open' })
+          }
+        )
     })
     const group = document.body.querySelector('.portal-default-group')
     expect(group).toBeTruthy()
-    expect(group).toHaveClass('fixed')
-    expect(group?.parentElement).toBe(document.body)
+    expect(group?.className).toContain('fixed')
   })
 
-  it('renders in place with absolute when portal is false', () => {
-    const { container } = render({
-      components: { FloatButtonGroup },
-      template: `
-        <div class="relative" data-testid="shell">
-          <FloatButtonGroup :portal="false" class="in-place-group">
-            <template #trigger><button>Open</button></template>
-          </FloatButtonGroup>
-        </div>
-      `
+  it('has no a11y violations when open on document.body', async () => {
+    render({
+      setup: () => () =>
+        h(
+          FloatButtonGroup,
+          { open: true },
+          {
+            trigger: () => h(FloatButton, { ariaLabel: 'Open actions' }),
+            default: () => h(FloatButton, { ariaLabel: 'Edit' })
+          }
+        )
     })
-    const shell = container.querySelector('[data-testid="shell"]')
-    const group = shell?.querySelector('.in-place-group')
-    expect(group).toBeTruthy()
-    expect(group).toHaveClass('absolute')
-    expect(group).not.toHaveClass('fixed')
-    expect(group?.parentElement).not.toBe(document.body)
-  })
-
-  it('applies placement and offset styles', () => {
-    render(FloatButtonGroup, {
-      props: {
-        portal: false,
-        placement: 'bottom-left',
-        offset: { x: 32, y: '3rem' },
-        className: 'placed-group'
-      },
-      slots: {
-        trigger: () => h('button', 'Open')
-      }
-    })
-    const group = document.querySelector('.placed-group') as HTMLElement | null
-    expect(group).toHaveClass('bottom-0')
-    expect(group).toHaveClass('left-0')
-    expect(group?.style.left).toBe('32px')
-    expect(group?.style.bottom).toBe('3rem')
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(FloatButton)
-      await expectNoA11yViolationsIsolated(container)
-    })
+    await expectNoA11yViolations(document.body)
   })
 })

@@ -501,6 +501,16 @@ export const arSA: TigerLocale = {
   anchor: {
     ariaLabel: 'في هذه الصفحة'
   },
+  floatButton: {
+    ariaLabel: 'إضافة'
+  },
+  spotlight: {
+    title: 'لوحة الأوامر',
+    placeholder: 'بحث'
+  },
+  scrollSpy: {
+    ariaLabel: 'تنقل الأقسام'
+  },
   steps: {
     ariaLabel: 'الخطوات',
     waitStatus: 'قيد الانتظار',

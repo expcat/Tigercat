@@ -7,7 +7,11 @@ import type { ViewportOffset, ViewportPlacement } from '../types/viewport'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
 import { overlayZIndexClass } from './floating'
-import { getViewportOffsetStyle, viewportFloatingBaseClasses } from './viewport-floating-utils'
+import {
+  getViewportOffsetStyle,
+  viewportFloatingBaseClasses,
+  viewportPlacementClasses
+} from './viewport-floating-utils'
 
 export type BackTopFrameCallback = (timestamp: number) => void
 
@@ -30,13 +34,6 @@ export interface BackTopVisibilityController {
 }
 
 const DEFAULT_VISIBILITY_HEIGHT = 400
-
-const BACK_TOP_PLACEMENT_CLASSES: Record<ViewportPlacement, string> = {
-  'top-left': 'top-0 start-0',
-  'top-right': 'top-0 end-0',
-  'bottom-left': 'bottom-0 start-0',
-  'bottom-right': 'bottom-0 end-0'
-}
 
 function isWindowTarget(target: HTMLElement | Window): target is Window {
   return isBrowser() && target === window
@@ -158,7 +155,7 @@ export function getBackTopPositionClasses(options: {
   if (position === 'sticky') return backTopStickyClasses
   return classNames(
     viewportFloatingBaseClasses,
-    BACK_TOP_PLACEMENT_CLASSES[placement],
+    viewportPlacementClasses[placement],
     backTopBaseClasses
   )
 }
@@ -169,13 +166,7 @@ export function getBackTopOffsetStyle(
   offset?: ViewportOffset
 ): Record<string, string> | undefined {
   if ((position ?? 'auto') === 'sticky') return undefined
-  const physical = getViewportOffsetStyle(placement ?? 'bottom-right', offset)
-  const style: Record<string, string> = {}
-  if (physical.top) style.top = physical.top
-  if (physical.bottom) style.bottom = physical.bottom
-  if (physical.left) style.insetInlineStart = physical.left
-  if (physical.right) style.insetInlineEnd = physical.right
-  return style
+  return getViewportOffsetStyle(placement ?? 'bottom-right', offset)
 }
 
 export function getBackTopVisibilityClasses(visible: boolean): string {

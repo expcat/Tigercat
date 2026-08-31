@@ -501,6 +501,16 @@ export const jaJP: TigerLocale = {
   anchor: {
     ariaLabel: 'このページ'
   },
+  floatButton: {
+    ariaLabel: '追加'
+  },
+  spotlight: {
+    title: 'コマンドパレット',
+    placeholder: '検索'
+  },
+  scrollSpy: {
+    ariaLabel: 'セクションナビゲーション'
+  },
   steps: {
     ariaLabel: 'ステップ',
     waitStatus: '待機',

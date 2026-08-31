@@ -42,6 +42,9 @@ import type {
   TigerLocalePageHeader,
   TigerLocaleBackTop,
   TigerLocaleAnchor,
+  TigerLocaleFloatButton,
+  TigerLocaleSpotlight,
+  TigerLocaleScrollSpy,
   TigerLocaleSteps,
   TigerLocaleRate,
   TigerLocaleAvatarGroup,
@@ -415,6 +418,27 @@ export function getAnchorLabels(
   overrides?: Partial<TigerLocaleAnchor>
 ): Required<TigerLocaleAnchor> {
   return resolveLocaleSection(enSection('anchor'), locale?.anchor, overrides)
+}
+
+export function getFloatButtonLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleFloatButton>
+): Required<TigerLocaleFloatButton> {
+  return resolveLocaleSection(enSection('floatButton'), locale?.floatButton, overrides)
+}
+
+export function getSpotlightLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSpotlight>
+): Required<TigerLocaleSpotlight> {
+  return resolveLocaleSection(enSection('spotlight'), locale?.spotlight, overrides)
+}
+
+export function getScrollSpyLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleScrollSpy>
+): Required<TigerLocaleScrollSpy> {
+  return resolveLocaleSection(enSection('scrollSpy'), locale?.scrollSpy, overrides)
 }
 
 export function getStepsLabels(

@@ -501,6 +501,16 @@ export const koKR: TigerLocale = {
   anchor: {
     ariaLabel: '이 페이지'
   },
+  floatButton: {
+    ariaLabel: '추가'
+  },
+  spotlight: {
+    title: '명령 팔레트',
+    placeholder: '검색'
+  },
+  scrollSpy: {
+    ariaLabel: '섹션 탐색'
+  },
   steps: {
     ariaLabel: '단계',
     waitStatus: '대기',

@@ -501,6 +501,16 @@ export const idID: TigerLocale = {
   anchor: {
     ariaLabel: 'Di halaman ini'
   },
+  floatButton: {
+    ariaLabel: 'Tambah'
+  },
+  spotlight: {
+    title: 'Palet perintah',
+    placeholder: 'Cari'
+  },
+  scrollSpy: {
+    ariaLabel: 'Navigasi bagian'
+  },
   steps: {
     ariaLabel: 'Langkah',
     waitStatus: 'Menunggu',

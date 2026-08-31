@@ -4,11 +4,24 @@ import { overlayZIndexClass } from './floating'
 
 export const viewportFloatingBaseClasses = `fixed ${overlayZIndexClass.viewport}`
 
+/** Default inset for viewport chrome (BackTop). */
+export const VIEWPORT_FLOATING_DEFAULT_OFFSET = 24
+
+/**
+ * FloatButton / Group default inset. Block axis sits one chrome control
+ * (40px BackTop) plus a 12px gap above the default BackTop corner so the
+ * two never occupy the same pixel.
+ */
+export const VIEWPORT_FLOATING_FAB_OFFSET: { x: number; y: number } = {
+  x: VIEWPORT_FLOATING_DEFAULT_OFFSET,
+  y: VIEWPORT_FLOATING_DEFAULT_OFFSET + 40 + 12
+}
+
 export const viewportPlacementClasses: Record<ViewportPlacement, string> = {
-  'top-left': 'top-0 left-0',
-  'top-right': 'top-0 right-0',
-  'bottom-left': 'bottom-0 left-0',
-  'bottom-right': 'bottom-0 right-0'
+  'top-left': 'top-0 start-0',
+  'top-right': 'top-0 end-0',
+  'bottom-left': 'bottom-0 start-0',
+  'bottom-right': 'bottom-0 end-0'
 }
 
 function toCssLength(value: number | string): string {
@@ -20,7 +33,7 @@ function resolveAxisOffset(offset: ViewportOffset | undefined): {
   y: number | string
 } {
   if (offset === undefined) {
-    return { x: 24, y: 24 }
+    return { x: VIEWPORT_FLOATING_DEFAULT_OFFSET, y: VIEWPORT_FLOATING_DEFAULT_OFFSET }
   }
 
   if (typeof offset === 'number' || typeof offset === 'string') {
@@ -28,8 +41,8 @@ function resolveAxisOffset(offset: ViewportOffset | undefined): {
   }
 
   return {
-    x: offset.x ?? 24,
-    y: offset.y ?? 24
+    x: offset.x ?? VIEWPORT_FLOATING_DEFAULT_OFFSET,
+    y: offset.y ?? VIEWPORT_FLOATING_DEFAULT_OFFSET
   }
 }
 
@@ -41,15 +54,15 @@ export function getViewportOffsetStyle(
   const style: Record<string, string> = {}
 
   if (placement.startsWith('top')) {
-    style.top = toCssLength(y)
+    style.insetBlockStart = toCssLength(y)
   } else {
-    style.bottom = toCssLength(y)
+    style.insetBlockEnd = toCssLength(y)
   }
 
   if (placement.endsWith('left')) {
-    style.left = toCssLength(x)
+    style.insetInlineStart = toCssLength(x)
   } else {
-    style.right = toCssLength(x)
+    style.insetInlineEnd = toCssLength(x)
   }
 
   return style

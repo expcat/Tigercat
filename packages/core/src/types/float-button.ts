@@ -98,6 +98,18 @@ export interface FloatButtonGroupProps {
   open?: boolean
 
   /**
+   * Initial open state in uncontrolled mode.
+   * @default false
+   */
+  defaultOpen?: boolean
+
+  /**
+   * Close the group after an action button is activated.
+   * @default true
+   */
+  closeOnAction?: boolean
+
+  /**
    * Additional CSS class name
    */
   className?: string

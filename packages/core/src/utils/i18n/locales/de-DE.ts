@@ -502,6 +502,16 @@ export const deDE: TigerLocale = {
   anchor: {
     ariaLabel: 'Auf dieser Seite'
   },
+  floatButton: {
+    ariaLabel: 'Hinzufügen'
+  },
+  spotlight: {
+    title: 'Befehlspalette',
+    placeholder: 'Suchen'
+  },
+  scrollSpy: {
+    ariaLabel: 'Abschnittsnavigation'
+  },
   steps: {
     ariaLabel: 'Schritte',
     waitStatus: 'Ausstehend',

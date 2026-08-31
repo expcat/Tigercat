@@ -119,7 +119,7 @@ describe('BackTop', () => {
     expect(button).toHaveClass('start-0')
     expect(button).not.toHaveClass('sticky')
     expect(button?.style.insetInlineStart).toBe('24px')
-    expect(button?.style.bottom).toBe('2rem')
+    expect(button?.style.insetBlockEnd).toBe('2rem')
 
     await user.click(button!)
     expect(scrollContainer.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' })

@@ -504,6 +504,16 @@ export const zhTW: TigerLocale = {
   anchor: {
     ariaLabel: '本頁導覽'
   },
+  floatButton: {
+    ariaLabel: '新增'
+  },
+  spotlight: {
+    title: '命令面板',
+    placeholder: '搜尋'
+  },
+  scrollSpy: {
+    ariaLabel: '章節導覽'
+  },
   steps: {
     ariaLabel: '步驟',
     waitStatus: '等待',

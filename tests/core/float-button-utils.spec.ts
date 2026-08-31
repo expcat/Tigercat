@@ -1,76 +1,79 @@
 import { describe, it, expect } from 'vitest'
 import {
-  floatButtonBaseClasses,
-  floatButtonShapeClasses,
-  floatButtonSizeClasses,
-  floatButtonTypeClasses,
-  floatButtonDisabledClasses,
-  floatButtonGroupClasses,
-  floatButtonIconSizeClasses,
   floatButtonPlusIconPath,
-  getFloatButtonGroupClasses
+  getFloatButtonClasses,
+  getFloatButtonGroupClasses,
+  getFloatButtonOffsetStyle,
+  resolveFloatButtonAriaLabel,
+  resolveFloatButtonShape,
+  VIEWPORT_FLOATING_FAB_OFFSET
 } from '@expcat/tigercat-core'
 
 describe('float-button-utils', () => {
-  it('base classes include focus ring', () => {
-    expect(floatButtonBaseClasses).toContain('focus:ring')
+  it('resolves shape with child winning over group', () => {
+    expect(resolveFloatButtonShape(undefined, undefined)).toBe('circle')
+    expect(resolveFloatButtonShape(undefined, 'square')).toBe('square')
+    expect(resolveFloatButtonShape('circle', 'square')).toBe('circle')
   })
 
-  it('shape classes cover circle and square', () => {
-    expect(floatButtonShapeClasses.circle).toContain('rounded-full')
-    expect(floatButtonShapeClasses.square).toContain('rounded')
+  it('uses visible text as the name and locale for icon-only', () => {
+    expect(
+      resolveFloatButtonAriaLabel({
+        ariaLabel: undefined,
+        tooltip: 'Help',
+        hasVisibleText: true,
+        localeLabel: 'Add'
+      })
+    ).toBeUndefined()
+    expect(
+      resolveFloatButtonAriaLabel({
+        ariaLabel: undefined,
+        tooltip: undefined,
+        hasVisibleText: false,
+        localeLabel: 'Add'
+      })
+    ).toBe('Add')
+    expect(
+      resolveFloatButtonAriaLabel({
+        ariaLabel: 'Custom',
+        tooltip: 'Help',
+        hasVisibleText: false,
+        localeLabel: 'Add'
+      })
+    ).toBe('Custom')
   })
 
-  it('size classes cover sm, md, lg with increasing dimensions', () => {
-    expect(floatButtonSizeClasses.sm).toContain('h-10')
-    expect(floatButtonSizeClasses.md).toContain('h-12')
-    expect(floatButtonSizeClasses.lg).toContain('h-14')
+  it('places FAB offset on logical inset so it sits above default BackTop', () => {
+    const style = getFloatButtonOffsetStyle('bottom-right')
+    expect(style?.insetInlineEnd).toBe(`${VIEWPORT_FLOATING_FAB_OFFSET.x}px`)
+    expect(style?.insetBlockEnd).toBe(`${VIEWPORT_FLOATING_FAB_OFFSET.y}px`)
+    expect(style).not.toHaveProperty('left')
+    expect(style).not.toHaveProperty('right')
   })
 
-  it('type classes cover primary and default', () => {
-    expect(floatButtonTypeClasses.primary).toContain('bg-')
-    expect(floatButtonTypeClasses.default).toContain('border')
+  it('grows the group away from the anchored corner', () => {
+    const bottom = getFloatButtonGroupClasses({ placement: 'bottom-right', portal: true })
+    const top = getFloatButtonGroupClasses({ placement: 'top-left', portal: false })
+    expect(bottom).toContain('flex-col-reverse')
+    expect(bottom).toContain('end-0')
+    expect(bottom).not.toContain('right-0')
+    expect(top).toMatch(/flex-col(?!-reverse)/)
+    expect(top).toContain('start-0')
+    expect(top).toContain('absolute')
   })
 
-  it('disabled classes include opacity and pointer-events-none', () => {
-    expect(floatButtonDisabledClasses).toContain('opacity-50')
-    expect(floatButtonDisabledClasses).toContain('pointer-events-none')
+  it('ignores floating when the button is inside a group', () => {
+    const standalone = getFloatButtonClasses({ floating: true, placement: 'bottom-left' })
+    const grouped = getFloatButtonClasses({
+      floating: true,
+      inGroup: true,
+      placement: 'bottom-left'
+    })
+    expect(standalone).toContain('fixed')
+    expect(grouped).not.toContain('fixed')
   })
 
-  it('group stack chrome does not hardcode a viewport corner', () => {
-    expect(floatButtonGroupClasses).toContain('flex')
-    expect(floatButtonGroupClasses).toContain('flex-col-reverse')
-    expect(floatButtonGroupClasses).toContain('gap')
-    expect(floatButtonGroupClasses).not.toContain('fixed')
-    expect(floatButtonGroupClasses).not.toContain('right-6')
-    expect(floatButtonGroupClasses).not.toContain('bottom-6')
-  })
-
-  it('portal-on group classes are fixed to a corner', () => {
-    const classes = getFloatButtonGroupClasses({ placement: 'bottom-right', portal: true })
-    expect(classes).toContain('fixed')
-    expect(classes).toContain('bottom-0')
-    expect(classes).toContain('right-0')
-    expect(classes).not.toContain('absolute')
-  })
-
-  it('portal-off group classes are absolute to a corner', () => {
-    const classes = getFloatButtonGroupClasses({ placement: 'bottom-left', portal: false })
-    expect(classes).toContain('absolute')
-    expect(classes).toContain('bottom-0')
-    expect(classes).toContain('left-0')
-    expect(classes).not.toContain('fixed')
-  })
-
-  it('plus icon path is a non-empty M path', () => {
+  it('plus icon path is a stroke plus', () => {
     expect(floatButtonPlusIconPath.startsWith('M')).toBe(true)
-    expect(floatButtonPlusIconPath.length).toBeGreaterThan(1)
-  })
-
-  it('icon size classes match button sizes', () => {
-    expect(Object.keys(floatButtonIconSizeClasses)).toEqual(['sm', 'md', 'lg'])
-    expect(floatButtonIconSizeClasses.sm).toContain('h-4')
-    expect(floatButtonIconSizeClasses.md).toContain('h-5')
-    expect(floatButtonIconSizeClasses.lg).toContain('h-6')
   })
 })
