@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Slider } from '@expcat/tigercat-vue/Slider'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 
 const sizes = ['sm', 'md', 'lg'] as const
 const value = ref<number | [number, number]>(60)
@@ -8,13 +9,11 @@ const value = ref<number | [number, number]>(60)
 
 <template>
   <div class="w-full max-w-lg space-y-6">
-    <div v-for="size in sizes" :key="size">
-      <p class="mb-1 text-sm text-gray-500">size={{ size }}</p>
+    <FormItem v-for="size in sizes" :key="size" :label="`size=${size}`">
       <Slider v-model="value" :size="size" />
-    </div>
-    <div>
-      <p class="mb-1 text-sm text-gray-500">disabled + tooltip=false</p>
+    </FormItem>
+    <FormItem label="disabled">
       <Slider :model-value="40" disabled :tooltip="false" />
-    </div>
+    </FormItem>
   </div>
 </template>

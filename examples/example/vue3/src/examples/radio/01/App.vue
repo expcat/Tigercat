@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Radio } from '@expcat/tigercat-vue/Radio'
+import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
 
-const checked = ref(false)
+const value = ref<string | number>('monthly')
 </script>
 
 <template>
-  <Radio value="agreement" v-model="checked" size="lg">同意服务条款</Radio>
+  <RadioGroup v-model="value" size="lg" aria-label="订阅周期">
+    <Radio value="monthly">按月</Radio>
+    <Radio value="yearly">按年</Radio>
+    <Radio value="once">一次性</Radio>
+  </RadioGroup>
 </template>

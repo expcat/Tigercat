@@ -1,7 +1,7 @@
 {
   "id": "radio-01",
-  "title": "单个单选框",
-  "description": "一个受控 Radio 脱离 RadioGroup 单独使用，并组合 lg 尺寸与选中状态。",
+  "title": "单选组",
+  "description": "带可见选项的 RadioGroup。受控 value 是选项身份，不是布尔选中。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { Radio } from '@expcat/tigercat-react/Radio'
+import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
 
 export default function App() {
-  const [checked, setChecked] = useState(false)
+  const [value, setValue] = useState<string | number>('monthly')
 
   return (
-    <Radio value="agreement" checked={checked} onChange={() => setChecked(true)} size="lg">
-      同意服务条款
-    </Radio>
+    <RadioGroup value={value} onChange={setValue} size="lg" aria-label="订阅周期">
+      <Radio value="monthly">按月</Radio>
+      <Radio value="yearly">按年</Radio>
+      <Radio value="once">一次性</Radio>
+    </RadioGroup>
   )
 }

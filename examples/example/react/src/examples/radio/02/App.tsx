@@ -6,7 +6,7 @@ export default function App() {
   const [value, setValue] = useState<string | number>('monthly')
 
   return (
-    <RadioGroup value={value} onChange={setValue} className="flex flex-wrap gap-4">
+    <RadioGroup value={value} onChange={setValue} direction="horizontal" aria-label="付款周期">
       <Radio value="monthly">按月</Radio>
       <Radio value="yearly">按年</Radio>
       <Radio value="once">一次性</Radio>

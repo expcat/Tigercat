@@ -8,9 +8,8 @@ const sizes = ['sm', 'md', 'lg'] as const
 
 <template>
   <div class="flex items-center gap-6">
-    <div v-for="size in sizes" :key="size" class="flex items-center gap-2">
-      <Switch v-model="on" :size="size" :aria-label="`尺寸 ${size}`" />
-      <span class="text-sm text-gray-500">{{ size }}</span>
-    </div>
+    <Switch v-for="size in sizes" :key="size" v-model="on" :size="size">
+      {{ size }}
+    </Switch>
   </div>
 </template>

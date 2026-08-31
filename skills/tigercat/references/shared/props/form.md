@@ -34,23 +34,27 @@ description: Compact generated Tigercat Form props reference
 
 ## Checkbox
 
-`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 3/11 props
+`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 5/12 props
 
-| Prop        | Type            | Default | Notes                                       |
-| ----------- | --------------- | ------- | ------------------------------------------- |
-| `disabled?` | `boolean`       | `false` | Whether the checkbox is disabled            |
-| `value?`    | `CheckboxValue` | `-`     | Checkbox value (for use in checkbox groups) |
-| `checked?`  | `boolean`       | `-`     | Checkbox checked state (controlled mode)    |
+| Prop             | Type            | Default | Notes                                          |
+| ---------------- | --------------- | ------- | ---------------------------------------------- |
+| `checked?`       | `boolean`       | `-`     | Checked state (controlled mode)                |
+| `indeterminate?` | `boolean`       | `false` | Whether the checkbox is in indeterminate state |
+| `disabled?`      | `boolean`       | `false` | Whether the checkbox is disabled               |
+| `size?`          | `ComponentSize` | `'md'`  | Checkbox size                                  |
+| `value?`         | `CheckboxValue` | `-`     | Checkbox value (for use in checkbox groups)    |
 
 ## CheckboxGroup
 
-`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 3/8 props
+`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 5/10 props
 
-| Prop        | Type                 | Default | Notes                                         |
-| ----------- | -------------------- | ------- | --------------------------------------------- |
-| `disabled?` | `boolean`            | `false` | Whether the checkbox group is disabled        |
-| `value?`    | `CheckboxGroupValue` | `-`     | Selected values (controlled mode)             |
-| `size?`     | `ComponentSize`      | `'md'`  | Checkbox size for all checkboxes in the group |
+| Prop            | Type                   | Default      | Notes                                         |
+| --------------- | ---------------------- | ------------ | --------------------------------------------- |
+| `value?`        | `CheckboxGroupValue`   | `-`          | Selected values (controlled mode)             |
+| `defaultValue?` | `CheckboxGroupValue`   | `[]`         | Default selected values (uncontrolled mode)   |
+| `disabled?`     | `boolean`              | `false`      | Whether the checkbox group is disabled        |
+| `size?`         | `ComponentSize`        | `'md'`       | Checkbox size for all checkboxes in the group |
+| `direction?`    | `ChoiceGroupDirection` | `'vertical'` | Layout direction                              |
 
 ## ColorPicker
 
@@ -215,24 +219,27 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 
 ## Radio
 
-`packages/core/src/types/radio.ts` · `RadioProps` · 4/11 props
+`packages/core/src/types/radio.ts` · `RadioProps` · 4/12 props
 
 | Prop        | Type               | Default | Notes                                             |
 | ----------- | ------------------ | ------- | ------------------------------------------------- |
 | `value`     | `string \| number` | `-`     | The value of the radio                            |
-| `disabled?` | `boolean`          | `false` | Whether the radio is disabled                     |
-| `name?`     | `string`           | `-`     | Name attribute for the radio input (for grouping) |
 | `checked?`  | `boolean`          | `-`     | Whether the radio is checked (controlled mode)    |
+| `name?`     | `string`           | `-`     | Name attribute for the radio input (for grouping) |
+| `disabled?` | `boolean`          | `false` | Whether the radio is disabled                     |
 
 ## RadioGroup
 
-`packages/core/src/types/radio.ts` · `RadioGroupProps` · 3/9 props
+`packages/core/src/types/radio.ts` · `RadioGroupProps` · 6/11 props
 
-| Prop        | Type               | Default | Notes                                        |
-| ----------- | ------------------ | ------- | -------------------------------------------- |
-| `value?`    | `string \| number` | `-`     | Current selected value (controlled mode)     |
-| `name?`     | `string`           | `-`     | Name attribute for radio inputs in the group |
-| `disabled?` | `boolean`          | `false` | Whether all radios in the group are disabled |
+| Prop            | Type                   | Default      | Notes                                        |
+| --------------- | ---------------------- | ------------ | -------------------------------------------- |
+| `value?`        | `string \| number`     | `-`          | Current selected value (controlled mode)     |
+| `defaultValue?` | `string \| number`     | `-`          | Default selected value (uncontrolled mode)   |
+| `name?`         | `string`               | `-`          | Name attribute for radio inputs in the group |
+| `disabled?`     | `boolean`              | `false`      | Whether all radios in the group are disabled |
+| `size?`         | `ComponentSize`        | `'md'`       | Radio size for all radios in the group       |
+| `direction?`    | `ChoiceGroupDirection` | `'vertical'` | Layout direction                             |
 
 ## Select
 
@@ -257,33 +264,46 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 
 ## Slider
 
-`packages/core/src/types/slider.ts` · `SliderProps` · 3/13 props
+`packages/core/src/types/slider.ts` · `SliderProps` · 8/14 props
 
-| Prop            | Type                         | Default | Notes                                                                                     |
-| --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `value?`        | `number \| [number, number]` | `-`     | Current value of the slider For single slider, this is a number For range slider, this... |
-| `disabled?`     | `boolean`                    | `false` | Whether the slider is disabled                                                            |
-| `defaultValue?` | `number \| [number, number]` | `-`     | Default value                                                                             |
+| Prop            | Type                                | Default | Notes                                                                                     |
+| --------------- | ----------------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `value?`        | `number \| [number, number]`        | `-`     | Current value of the slider For single slider, this is a number For range slider, this... |
+| `defaultValue?` | `number \| [number, number]`        | `-`     | Default value                                                                             |
+| `min?`          | `number`                            | `0`     | Minimum value                                                                             |
+| `max?`          | `number`                            | `100`   | Maximum value                                                                             |
+| `step?`         | `number`                            | `1`     | Step value for slider movement                                                            |
+| `range?`        | `boolean`                           | `false` | Whether to enable range selection                                                         |
+| `marks?`        | `boolean \| Record<number, string>` | `false` | Whether to show marks on the slider                                                       |
+| `disabled?`     | `boolean`                           | `false` | Whether the slider is disabled                                                            |
 
 ## Stepper
 
-`packages/core/src/types/stepper.ts` · `StepperProps` · 3/11 props
+`packages/core/src/types/stepper.ts` · `StepperProps` · 8/12 props
 
-| Prop        | Type      | Default | Notes                           |
-| ----------- | --------- | ------- | ------------------------------- |
-| `disabled?` | `boolean` | `-`     | Whether the stepper is disabled |
-| `value?`    | `number`  | `-`     | Controlled value                |
-| `min?`      | `number`  | `-`     | Minimum value                   |
+| Prop            | Type            | Default     | Notes                           |
+| --------------- | --------------- | ----------- | ------------------------------- |
+| `value?`        | `number`        | `-`         | Controlled value                |
+| `defaultValue?` | `number`        | `-`         | Uncontrolled initial value      |
+| `min?`          | `number`        | `-Infinity` | Minimum value                   |
+| `max?`          | `number`        | `Infinity`  | Maximum value                   |
+| `step?`         | `number`        | `1`         | Step increment                  |
+| `disabled?`     | `boolean`       | `false`     | Whether the stepper is disabled |
+| `size?`         | `ComponentSize` | `'md'`      | Component size                  |
+| `precision?`    | `number`        | `-`         | Precision (decimal places)      |
 
 ## Switch
 
-`packages/core/src/types/switch.ts` · `SwitchProps` · 3/8 props
+`packages/core/src/types/switch.ts` · `SwitchProps` · 6/12 props
 
-| Prop        | Type            | Default | Notes                          |
-| ----------- | --------------- | ------- | ------------------------------ |
-| `checked?`  | `boolean`       | `false` | Whether the switch is checked  |
-| `disabled?` | `boolean`       | `false` | Whether the switch is disabled |
-| `size?`     | `ComponentSize` | `'md'`  | Switch size                    |
+| Prop              | Type            | Default | Notes                                     |
+| ----------------- | --------------- | ------- | ----------------------------------------- |
+| `checked?`        | `boolean`       | `false` | Whether the switch is checked             |
+| `defaultChecked?` | `boolean`       | `false` | Default checked state (uncontrolled mode) |
+| `disabled?`       | `boolean`       | `false` | Whether the switch is disabled            |
+| `size?`           | `ComponentSize` | `'md'`  | Switch size                               |
+| `name?`           | `string`        | `-`     | Native form name (hidden checkbox)        |
+| `value?`          | `string`        | `'on'`  | Native form value when checked            |
 
 ## TagsInput
 

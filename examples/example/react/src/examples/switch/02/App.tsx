@@ -9,10 +9,9 @@ export default function App() {
   return (
     <div className="flex items-center gap-6">
       {sizes.map((size) => (
-        <div key={size} className="flex items-center gap-2">
-          <Switch checked={on} onChange={setOn} size={size} aria-label={`尺寸 ${size}`} />
-          <span className="text-sm text-gray-500">{size}</span>
-        </div>
+        <Switch key={size} checked={on} onChange={setOn} size={size}>
+          {size}
+        </Switch>
       ))}
     </div>
   )

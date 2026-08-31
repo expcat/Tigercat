@@ -6,7 +6,7 @@ export default function App() {
   const [values, setValues] = useState<(string | number | boolean)[]>(['email'])
 
   return (
-    <CheckboxGroup value={values} onChange={setValues} size="lg">
+    <CheckboxGroup value={values} onChange={setValues} size="lg" aria-label="通知渠道">
       <Checkbox value="email">邮件</Checkbox>
       <Checkbox value="sms">短信</Checkbox>
       <Checkbox value="app">应用内</Checkbox>

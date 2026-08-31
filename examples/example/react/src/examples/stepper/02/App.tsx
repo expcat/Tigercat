@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Stepper } from '@expcat/tigercat-react/Stepper'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 
 const sizes = ['sm', 'md', 'lg'] as const
 
@@ -9,10 +10,9 @@ export default function App() {
   return (
     <div className="space-y-3">
       {sizes.map((size) => (
-        <div key={size} className="flex items-center gap-3">
-          <span className="w-8 text-sm text-gray-500">{size}</span>
+        <FormItem key={size} label={size}>
           <Stepper value={value} onChange={setValue} size={size} />
-        </div>
+        </FormItem>
       ))}
     </div>
   )

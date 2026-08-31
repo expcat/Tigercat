@@ -7,7 +7,11 @@ export default function App() {
 
   return (
     <div className="space-y-2">
-      <RadioGroup defaultValue="standard" onChange={setLastValue} className="flex flex-wrap gap-4">
+      <RadioGroup
+        defaultValue="standard"
+        onChange={setLastValue}
+        direction="horizontal"
+        aria-label="配送方式">
         <Radio value="standard">标准</Radio>
         <Radio value="express">加急</Radio>
       </RadioGroup>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Slider } from '@expcat/tigercat-react/Slider'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 
 const sizes = ['sm', 'md', 'lg'] as const
 
@@ -9,15 +10,13 @@ export default function App() {
   return (
     <div className="w-full max-w-lg space-y-6">
       {sizes.map((size) => (
-        <div key={size}>
-          <p className="mb-1 text-sm text-gray-500">size={size}</p>
+        <FormItem key={size} label={`size=${size}`}>
           <Slider value={value} onChange={setValue} size={size} />
-        </div>
+        </FormItem>
       ))}
-      <div>
-        <p className="mb-1 text-sm text-gray-500">disabled + tooltip=false</p>
+      <FormItem label="disabled">
         <Slider value={40} disabled tooltip={false} />
-      </div>
+      </FormItem>
     </div>
   )
 }
