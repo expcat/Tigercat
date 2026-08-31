@@ -15,12 +15,20 @@ import {
   editableCellInputClasses,
   tableGroupHeaderClasses,
   getGroupHeaderCellClasses,
+  getTableChromeSlots,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
+  formatTableSelectRowAriaLabel,
+  formatTableGroupHeaderText,
+  tableVirtualSpacerCellClasses,
   type RowSelectionConfig,
   type ExpandableConfig,
   type TableSize,
   type TableVirtualWindow,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
+import { Checkbox } from '../Checkbox'
+import { Radio } from '../Radio'
 import { ExpandIcon } from './icons'
 import type { TableContext } from './types'
 
@@ -39,6 +47,7 @@ export interface RenderBodyViewProps {
   interactiveRows?: boolean
   /** When set, only the windowed row slice is rendered (virtual scrolling). */
   virtualWindow?: TableVirtualWindow
+  selectionName?: string
 }
 
 export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): React.ReactNode {
@@ -54,8 +63,14 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     rowClassName,
     rowDraggable,
     interactiveRows,
-    virtualWindow
+    virtualWindow,
+    selectionName
   } = view
+  const hasRowControls = hasTableSelectionColumn(rowSelection) || Boolean(expandable)
+  const chrome = getTableChromeSlots({
+    hasSelectionColumn: hasTableSelectionColumn(rowSelection),
+    expand: resolveTableExpandSlot(expandable)
+  })
 
   if (loading) {
     return null
@@ -135,7 +150,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     const rowClass =
       typeof rowClassName === 'function' ? rowClassName(record, sourceIndex) : rowClassName
 
-    const expandToggleCell = expandable ? (
+    const expandToggleCell = (
       <td className={getExpandIconCellClasses(size)}>
         {isRowExpandable && (
           <button
@@ -151,9 +166,37 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           </button>
         )}
       </td>
-    ) : null
+    )
 
-    const expandAtStart = expandable?.expandIconPosition !== 'end'
+    const selectionCell = (
+      <td className={getCheckboxCellClasses(size)} onClick={(e) => e.stopPropagation()}>
+        {rowSelection?.type === 'radio' ? (
+          <Radio
+            size="sm"
+            name={selectionName}
+            value={key}
+            checked={isSelected}
+            disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
+            aria-label={formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, sourceIndex + 1)}
+            onChange={(checked) => {
+              if (checked) ctx.handleSelectRow(key, true)
+            }}
+          />
+        ) : (
+          <Checkbox
+            size="sm"
+            checked={isSelected}
+            disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
+            aria-label={formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, sourceIndex + 1)}
+            onChange={(checked) => ctx.handleSelectRow(key, checked)}
+          />
+        )}
+      </td>
+    )
+
+    function renderChromeTd(slot: 'expand' | 'selection'): React.ReactNode {
+      return slot === 'expand' ? expandToggleCell : selectionCell
+    }
 
     const rowNode = (
       <tr
@@ -164,11 +207,10 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'
         )}
         aria-selected={rowSelection ? isSelected : undefined}
-        tabIndex={interactiveRows ? 0 : undefined}
+        tabIndex={interactiveRows && !hasRowControls ? 0 : undefined}
         onKeyDown={
-          interactiveRows
+          interactiveRows && !hasRowControls
             ? (e) => {
-                // Ignore activation bubbling up from interactive cell content.
                 if (e.target !== e.currentTarget) return
                 if (isActivationKey(e)) {
                   e.preventDefault()
@@ -178,24 +220,9 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             : undefined
         }
         draggable={rowDraggable ? true : undefined}>
-        {expandAtStart && expandToggleCell}
-
-        {rowSelection && rowSelection.showCheckbox !== false && (
-          <td className={getCheckboxCellClasses(size)}>
-            <input
-              type={rowSelection?.type === 'radio' ? 'radio' : 'checkbox'}
-              className={
-                rowSelection?.type === 'radio'
-                  ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                  : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-              }
-              checked={isSelected}
-              disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
-              onChange={(e) => ctx.handleSelectRow(key, e.target.checked)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </td>
-        )}
+        {chrome.leading.map((slot) => (
+          <React.Fragment key={slot}>{renderChromeTd(slot)}</React.Fragment>
+        ))}
 
         {ctx.displayColumns.map((column) => {
           const dataKey = column.dataKey || column.key
@@ -262,7 +289,9 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           )
         })}
 
-        {!expandAtStart && expandToggleCell}
+        {chrome.trailing.map((slot) => (
+          <React.Fragment key={slot}>{renderChromeTd(slot)}</React.Fragment>
+        ))}
       </tr>
     )
 
@@ -297,7 +326,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           <React.Fragment key={`group-${groupKey}`}>
             <tr className={tableGroupHeaderClasses}>
               <td colSpan={ctx.totalColumnCount} className={getGroupHeaderCellClasses(size)}>
-                {groupKey} ({groupItems.length})
+                {formatTableGroupHeaderText(labels.groupHeaderText, groupKey, groupItems.length)}
               </td>
             </tr>
             {groupItems.map((record, idx) => {
@@ -316,8 +345,12 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     const windowed: React.ReactNode[] = []
     if (topPad > 0) {
       windowed.push(
-        <tr key="virtual-top" aria-hidden="true">
-          <td colSpan={ctx.totalColumnCount} style={{ height: `${topPad}px`, padding: 0 }} />
+        <tr key="virtual-top" data-tiger-table-virtual-spacer="" aria-hidden="true">
+          <td
+            colSpan={ctx.totalColumnCount}
+            className={tableVirtualSpacerCellClasses}
+            style={{ height: `${topPad}px` }}
+          />
         </tr>
       )
     }
@@ -328,8 +361,12 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     }
     if (bottomPad > 0) {
       windowed.push(
-        <tr key="virtual-bottom" aria-hidden="true">
-          <td colSpan={ctx.totalColumnCount} style={{ height: `${bottomPad}px`, padding: 0 }} />
+        <tr key="virtual-bottom" data-tiger-table-virtual-spacer="" aria-hidden="true">
+          <td
+            colSpan={ctx.totalColumnCount}
+            className={tableVirtualSpacerCellClasses}
+            style={{ height: `${bottomPad}px` }}
+          />
         </tr>
       )
     }

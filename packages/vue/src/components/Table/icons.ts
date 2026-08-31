@@ -34,7 +34,8 @@ export const SortIcon = (direction: SortDirection): VNodeChild => {
       width: '16',
       height: '16',
       viewBox: icon16ViewBox,
-      fill: 'currentColor'
+      fill: 'currentColor',
+      'aria-hidden': 'true'
     },
     [h('path', { d: pathD })]
   )

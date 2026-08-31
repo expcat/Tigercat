@@ -1,18 +1,30 @@
 import { h, type Slots, type VNodeChild } from 'vue'
 import {
   classNames,
-  getTableHeaderClasses,
-  getTableHeaderCellClasses,
-  getTableFixedHeaderCellClasses,
-  getFixedColumnStyle,
+  formatTableFilterColumnAriaLabel,
+  formatTableSortByText,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
-  formatTableSortByText,
+  getFixedColumnStyle,
+  getInputClasses,
+  getTableChromeSlots,
+  getTableFixedHeaderCellClasses,
+  getTableHeaderCellClasses,
+  getTableHeaderClasses,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
   tableSortButtonClasses,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
+import { Checkbox } from '../Checkbox'
+import { Input } from '../Input'
 import { LockIcon, SortIcon } from './icons'
 import type { TableContext, TableInternalProps } from './types'
+
+function isHeaderSortClickTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false
+  return Boolean(target.closest('[data-tiger-table-filter], button:not([data-tiger-table-sort])'))
+}
 
 export function renderTableHeader(
   ctx: TableContext,
@@ -20,44 +32,33 @@ export function renderTableHeader(
   slots: Slots,
   labels: Required<TigerLocaleTable>
 ): VNodeChild {
-  const headerCells: VNodeChild[] = []
-  const expandAtStart = props.expandable && props.expandable.expandIconPosition !== 'end'
-  const expandAtEnd = props.expandable && props.expandable.expandIconPosition === 'end'
-  const expandHeaderTh = props.expandable
-    ? h('th', {
-        class: getExpandIconCellClasses(props.size),
-        'aria-label': labels.expandText
-      })
-    : null
+  const chrome = getTableChromeSlots({
+    hasSelectionColumn: hasTableSelectionColumn(props.rowSelection),
+    expand: resolveTableExpandSlot(props.expandable)
+  })
 
-  if (expandAtStart && expandHeaderTh) {
-    headerCells.push(expandHeaderTh)
-  }
-
-  if (
-    props.rowSelection &&
-    props.rowSelection.showCheckbox !== false &&
-    props.rowSelection.type !== 'radio'
-  ) {
-    headerCells.push(
-      h(
-        'th',
-        {
-          class: getCheckboxCellClasses(props.size)
-        },
-        [
-          h('input', {
-            type: 'checkbox',
-            class:
-              'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
-            checked: ctx.allSelected.value,
+  const expandHeaderTh = h('th', {
+    class: getExpandIconCellClasses(props.size),
+    'aria-hidden': 'true'
+  })
+  const selectionHeaderTh =
+    props.rowSelection?.type === 'radio'
+      ? h('th', { class: getCheckboxCellClasses(props.size), 'aria-hidden': 'true' })
+      : h('th', { class: getCheckboxCellClasses(props.size) }, [
+          h(Checkbox, {
+            size: 'sm',
+            modelValue: ctx.allSelected.value,
             indeterminate: ctx.someSelected.value,
-            onChange: (e: Event) => ctx.handleSelectAll((e.target as HTMLInputElement).checked)
+            'aria-label': labels.selectAllText,
+            onChange: (checked: boolean) => ctx.handleSelectAll(checked)
           })
-        ]
-      )
-    )
+        ])
+
+  function chromeTh(slot: 'expand' | 'selection'): VNodeChild {
+    return slot === 'expand' ? expandHeaderTh : selectionHeaderTh
   }
+
+  const headerCells: VNodeChild[] = chrome.leading.map((slot) => chromeTh(slot))
 
   ctx.displayColumns.value.forEach((column) => {
     const isSorted = ctx.sortState.value.key === column.key
@@ -102,7 +103,11 @@ export function renderTableHeader(
             type: 'button',
             'data-tiger-table-sort': '',
             class: tableSortButtonClasses,
-            onClick: () => ctx.handleSort(column.key)
+            'aria-label': formatTableSortByText(labels.sortByText, String(column.title)),
+            onClick: (event: Event) => {
+              event.stopPropagation()
+              ctx.handleSort(column.key)
+            }
           },
           [...titleContent, SortIcon(sortDirection)]
         )
@@ -121,7 +126,7 @@ export function renderTableHeader(
               'inline-flex items-center',
               column.fixed === 'left' || column.fixed === 'right'
                 ? 'text-[var(--tiger-primary,#2563eb)]'
-                : 'text-gray-400 hover:text-gray-700'
+                : 'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
             ),
             'aria-label': formatTableSortByText(
               column.fixed === 'left' || column.fixed === 'right'
@@ -139,11 +144,15 @@ export function renderTableHeader(
       )
     }
 
+    const filterValue = ctx.filterState.value[column.key]
+    const filterText = filterValue == null ? '' : String(filterValue)
+
     headerCells.push(
       h(
         'th',
         {
           key: column.key,
+          scope: 'col',
           'data-tiger-table-column-key': column.key,
           'aria-sort': ariaSort,
           class: classNames(
@@ -162,6 +171,12 @@ export function renderTableHeader(
           ),
           style,
           draggable: props.columnDraggable ? 'true' : undefined,
+          onClick: column.sortable
+            ? (event: MouseEvent) => {
+                if (isHeaderSortClickTarget(event.target)) return
+                ctx.handleSort(column.key)
+              }
+            : undefined,
           onDragstart: props.columnDraggable ? () => ctx.handleDragStart(column.key) : undefined,
           onDragover: props.columnDraggable ? (e: DragEvent) => e.preventDefault() : undefined,
           onDrop: props.columnDraggable ? () => ctx.handleDrop(column.key) : undefined
@@ -170,32 +185,54 @@ export function renderTableHeader(
           h('div', { class: 'flex items-center gap-2' }, headerContent),
           ...(column.filter
             ? [
-                h('div', { class: 'mt-2' }, [
-                  column.filter.type === 'select' && column.filter.options
-                    ? h(
-                        'select',
-                        {
-                          class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                          onChange: (e: Event) =>
-                            ctx.handleFilter(column.key, (e.target as HTMLSelectElement).value),
-                          onClick: (e: Event) => e.stopPropagation()
-                        },
-                        [
-                          h('option', { value: '' }, labels.allText),
-                          ...column.filter.options.map((opt) =>
-                            h('option', { value: opt.value }, opt.label)
-                          )
-                        ]
-                      )
-                    : h('input', {
-                        type: 'text',
-                        class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                        placeholder: column.filter.placeholder || labels.filterPlaceholder,
-                        onInput: (e: Event) =>
-                          ctx.handleFilter(column.key, (e.target as HTMLInputElement).value),
-                        onClick: (e: Event) => e.stopPropagation()
-                      })
-                ])
+                h(
+                  'div',
+                  {
+                    class: 'mt-2',
+                    'data-tiger-table-filter': '',
+                    draggable: false,
+                    onClick: (e: Event) => e.stopPropagation(),
+                    onDragstart: (e: DragEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }
+                  },
+                  [
+                    column.filter.type === 'select' && column.filter.options
+                      ? h(
+                          'select',
+                          {
+                            class: getInputClasses({ size: 'sm' }),
+                            'aria-label': formatTableFilterColumnAriaLabel(
+                              labels.filterColumnAriaLabel,
+                              String(column.title)
+                            ),
+                            value: filterText,
+                            draggable: false,
+                            onChange: (e: Event) =>
+                              ctx.handleFilter(column.key, (e.target as HTMLSelectElement).value)
+                          },
+                          [
+                            h('option', { value: '' }, labels.allText),
+                            ...column.filter.options.map((opt) =>
+                              h('option', { value: opt.value }, opt.label)
+                            )
+                          ]
+                        )
+                      : h(Input, {
+                          size: 'sm',
+                          modelValue: filterText,
+                          'aria-label': formatTableFilterColumnAriaLabel(
+                            labels.filterColumnAriaLabel,
+                            String(column.title)
+                          ),
+                          placeholder: column.filter.placeholder || labels.filterPlaceholder,
+                          draggable: false,
+                          'onUpdate:modelValue': (value: string | number | undefined) =>
+                            ctx.handleFilter(column.key, value ?? '')
+                        })
+                  ]
+                )
               ]
             : [])
         ]
@@ -203,9 +240,7 @@ export function renderTableHeader(
     )
   })
 
-  if (expandAtEnd && expandHeaderTh) {
-    headerCells.push(expandHeaderTh)
-  }
+  headerCells.push(...chrome.trailing.map((slot) => chromeTh(slot)))
 
   return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [h('tr', headerCells)])
 }

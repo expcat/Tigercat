@@ -1,9 +1,12 @@
 import React from 'react'
 import {
   getTableCellClasses,
+  getTableChromeSlots,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
   tableSummaryRowClasses,
-  type RowSelectionConfig,
   type ExpandableConfig,
+  type RowSelectionConfig,
   type TableSize
 } from '@expcat/tigercat-core'
 import type { TableContext } from './types'
@@ -18,18 +21,23 @@ export interface RenderSummaryViewProps {
 export function renderSummaryRow(ctx: TableContext, view: RenderSummaryViewProps): React.ReactNode {
   const { size, rowSelection, expandable, summaryRow } = view
   if (!summaryRow?.show) return null
+  const chrome = getTableChromeSlots({
+    hasSelectionColumn: hasTableSelectionColumn(rowSelection),
+    expand: resolveTableExpandSlot(expandable)
+  })
+  const emptyCell = (key: string) => <td key={key} className={getTableCellClasses(size, 'left')} />
   return (
     <tfoot>
       <tr className={tableSummaryRowClasses}>
-        {rowSelection && rowSelection.showCheckbox !== false && (
-          <td className={getTableCellClasses(size, 'left')} />
-        )}
-        {expandable && <td className={getTableCellClasses(size, 'left')} />}
+        {chrome.leading.map((slot) => emptyCell(slot))}
         {ctx.displayColumns.map((column) => (
-          <td key={column.key} className={getTableCellClasses(size, column.align || 'left')}>
+          <td
+            key={column.key}
+            className={getTableCellClasses(size, column.align || 'left', column.className)}>
             {(summaryRow.data[column.dataKey || column.key] as React.ReactNode) ?? ''}
           </td>
         ))}
+        {chrome.trailing.map((slot) => emptyCell(`end-${slot}`))}
       </tr>
     </tfoot>
   )

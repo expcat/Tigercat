@@ -1,19 +1,26 @@
 import React from 'react'
 import {
   classNames,
-  getTableHeaderClasses,
-  getTableHeaderCellClasses,
-  getTableFixedHeaderCellClasses,
-  getFixedColumnStyle,
+  formatTableFilterColumnAriaLabel,
+  formatTableSortByText,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
-  formatTableSortByText,
+  getFixedColumnStyle,
+  getInputClasses,
+  getTableChromeSlots,
+  getTableFixedHeaderCellClasses,
+  getTableHeaderCellClasses,
+  getTableHeaderClasses,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
   tableSortButtonClasses,
-  type RowSelectionConfig,
   type ExpandableConfig,
+  type RowSelectionConfig,
   type TableSize,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
+import { Checkbox } from '../Checkbox'
+import { Input } from '../Input'
 import { LockIcon, SortIcon } from './icons'
 import type { TableContext } from './types'
 
@@ -27,6 +34,12 @@ export interface RenderHeaderViewProps {
   lockColumnAriaLabel: string
   unlockColumnAriaLabel: string
   labels: Required<TigerLocaleTable>
+  selectionName?: string
+}
+
+function isHeaderSortClickTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false
+  return Boolean(target.closest('[data-tiger-table-filter], button:not([data-tiger-table-sort])'))
 }
 
 export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps): React.ReactNode {
@@ -41,29 +54,37 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
     unlockColumnAriaLabel,
     labels
   } = view
-  const expandHeaderTh = expandable ? (
-    <th className={getExpandIconCellClasses(size)} aria-label={labels.expandText} />
-  ) : null
-  const expandAtStart = expandable?.expandIconPosition !== 'end'
+  const chrome = getTableChromeSlots({
+    hasSelectionColumn: hasTableSelectionColumn(rowSelection),
+    expand: resolveTableExpandSlot(expandable)
+  })
+
+  const expandHeaderTh = <th className={getExpandIconCellClasses(size)} aria-hidden="true" />
+  const selectionHeaderTh =
+    rowSelection?.type === 'radio' ? (
+      <th className={getCheckboxCellClasses(size)} aria-hidden="true" />
+    ) : (
+      <th className={getCheckboxCellClasses(size)}>
+        <Checkbox
+          size="sm"
+          checked={ctx.allSelected}
+          indeterminate={ctx.someSelected}
+          aria-label={labels.selectAllText}
+          onChange={(checked) => ctx.handleSelectAll(checked)}
+        />
+      </th>
+    )
+
+  function renderChromeTh(slot: 'expand' | 'selection'): React.ReactNode {
+    return slot === 'expand' ? expandHeaderTh : selectionHeaderTh
+  }
 
   return (
     <thead className={getTableHeaderClasses(stickyHeader)}>
       <tr>
-        {expandAtStart && expandHeaderTh}
-
-        {rowSelection && rowSelection.showCheckbox !== false && rowSelection.type !== 'radio' && (
-          <th className={getCheckboxCellClasses(size)}>
-            <input
-              type="checkbox"
-              className="rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
-              checked={ctx.allSelected}
-              ref={(el) => {
-                if (el) el.indeterminate = ctx.someSelected
-              }}
-              onChange={(e) => ctx.handleSelectAll(e.target.checked)}
-            />
-          </th>
-        )}
+        {chrome.leading.map((slot) => (
+          <React.Fragment key={slot}>{renderChromeTh(slot)}</React.Fragment>
+        ))}
 
         {ctx.displayColumns.map((column) => {
           const isSorted = ctx.sortState.key === column.key
@@ -91,9 +112,13 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
             ? (column.renderHeader() as React.ReactNode)
             : column.title
 
+          const filterValue = ctx.filterState[column.key]
+          const filterText = filterValue == null ? '' : String(filterValue)
+
           return (
             <th
               key={column.key}
+              scope="col"
               data-tiger-table-column-key={column.key}
               aria-sort={ariaSort}
               className={classNames(
@@ -112,6 +137,14 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
               )}
               style={style}
               draggable={columnDraggable ? true : undefined}
+              onClick={
+                column.sortable
+                  ? (event) => {
+                      if (isHeaderSortClickTarget(event.target)) return
+                      ctx.handleSort(column.key)
+                    }
+                  : undefined
+              }
               onDragStart={columnDraggable ? () => ctx.handleDragStart(column.key) : undefined}
               onDragOver={columnDraggable ? (e) => e.preventDefault() : undefined}
               onDrop={columnDraggable ? () => ctx.handleDrop(column.key) : undefined}>
@@ -121,7 +154,11 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                     type="button"
                     data-tiger-table-sort=""
                     className={tableSortButtonClasses}
-                    onClick={() => ctx.handleSort(column.key)}>
+                    aria-label={formatTableSortByText(labels.sortByText, String(column.title))}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      ctx.handleSort(column.key)
+                    }}>
                     {titleNode}
                     <SortIcon direction={sortDirection} />
                   </button>
@@ -142,7 +179,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                       'inline-flex items-center',
                       column.fixed === 'left' || column.fixed === 'right'
                         ? 'text-[var(--tiger-primary,#2563eb)]'
-                        : 'text-gray-400 hover:text-gray-700'
+                        : 'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
                     )}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -154,28 +191,43 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
               </div>
 
               {column.filter && (
-                <div className="mt-2">
+                <div
+                  className="mt-2"
+                  data-tiger-table-filter=""
+                  draggable={false}
+                  onClick={(e) => e.stopPropagation()}
+                  onDragStart={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}>
                   {column.filter.type === 'select' && column.filter.options ? (
                     <select
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                      onChange={(e) => ctx.handleFilter(column.key, e.target.value)}
-                      onClick={(e) => e.stopPropagation()}>
+                      className={getInputClasses({ size: 'sm' })}
+                      aria-label={formatTableFilterColumnAriaLabel(
+                        labels.filterColumnAriaLabel,
+                        String(column.title)
+                      )}
+                      value={filterText}
+                      draggable={false}
+                      onChange={(e) => ctx.handleFilter(column.key, e.target.value)}>
                       <option value="">{labels.allText}</option>
                       {column.filter.options.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
+                        <option key={String(opt.value)} value={opt.value}>
                           {opt.label}
                         </option>
                       ))}
                     </select>
                   ) : (
-                    <input
-                      type="text"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                    <Input
+                      size="sm"
+                      value={filterText}
+                      aria-label={formatTableFilterColumnAriaLabel(
+                        labels.filterColumnAriaLabel,
+                        String(column.title)
+                      )}
                       placeholder={column.filter.placeholder || labels.filterPlaceholder}
-                      onInput={(e) =>
-                        ctx.handleFilter(column.key, (e.target as HTMLInputElement).value)
-                      }
-                      onClick={(e) => e.stopPropagation()}
+                      draggable={false}
+                      onChange={(e) => ctx.handleFilter(column.key, e.target.value)}
                     />
                   )}
                 </div>
@@ -184,7 +236,9 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
           )
         })}
 
-        {!expandAtStart && expandHeaderTh}
+        {chrome.trailing.map((slot) => (
+          <React.Fragment key={slot}>{renderChromeTh(slot)}</React.Fragment>
+        ))}
       </tr>
     </thead>
   )

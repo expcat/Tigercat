@@ -6,6 +6,7 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
+  useId,
   watch,
   type VNodeChild
 } from 'vue'
@@ -18,6 +19,9 @@ import {
   getCardColumns,
   getCardGridInfo,
   getTableColgroup,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
+  tableExportBarClasses,
   getImmediateTigerLocale,
   getTableLabels,
   getTableWrapperClasses,
@@ -45,9 +49,8 @@ import {
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
-import { tableExportButtonClasses } from '@expcat/tigercat-core'
-
 import { useTigerConfig } from './ConfigProvider'
+import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { Empty } from './Empty'
 import { Radio } from './Radio'
@@ -76,6 +79,7 @@ export const Table = defineComponent({
     const measuredRowHeights = ref<Record<number, number>>({})
     const measuredContainerSize = ref({ width: 0, height: 0 })
     const isCardViewport = ref(false)
+    const selectionGroupName = useId()
     let stopCardViewport: (() => void) | undefined
     const ctx = useTableState(
       props as TableInternalProps,
@@ -313,8 +317,12 @@ export const Table = defineComponent({
         // row selection is enabled (mirrors React's onRowClick/rowSelection).
         interactiveRows:
           !!resolvedProps.rowSelection || typeof instance?.vnode.props?.onRowClick === 'function',
-        virtualWindow
-      } as TableInternalProps & { virtualWindow?: ReturnType<typeof getTableVirtualWindow> }
+        virtualWindow,
+        selectionName: selectionGroupName
+      } as TableInternalProps & {
+        virtualWindow?: ReturnType<typeof getTableVirtualWindow>
+        selectionName?: string
+      }
 
       const shouldPinColumns =
         resolvedProps.columnLockable || ctx.fixedColumnsInfo.value.hasFixedColumns
@@ -325,13 +333,8 @@ export const Table = defineComponent({
               columns: ctx.displayColumns.value,
               frozenWidths: ctx.frozenColumnWidths.value,
               size: resolvedProps.size,
-              hasSelectionColumn:
-                !!resolvedProps.rowSelection && resolvedProps.rowSelection.showCheckbox !== false,
-              expand: resolvedProps.expandable
-                ? resolvedProps.expandable.expandIconPosition === 'end'
-                  ? 'end'
-                  : 'start'
-                : false
+              hasSelectionColumn: hasTableSelectionColumn(resolvedProps.rowSelection),
+              expand: resolveTableExpandSlot(resolvedProps.expandable)
             }).map((entry, index) =>
               h('col', {
                 key: `${entry.key}-${index}`,
@@ -636,8 +639,9 @@ export const Table = defineComponent({
                   h('span', { onClick: (event: Event) => event.stopPropagation() }, [
                     resolvedProps.rowSelection.type === 'radio'
                       ? h(Radio, {
+                          name: selectionGroupName,
                           value: key,
-                          checked: isSelected,
+                          modelValue: isSelected,
                           disabled: checkboxProps.disabled,
                           'aria-label': formatTableSelectRowAriaLabel(
                             tableLabels.value.selectRowAriaLabel,
@@ -808,16 +812,17 @@ export const Table = defineComponent({
         },
         [
           resolvedProps.exportable &&
-            h('div', { class: 'flex justify-end p-2' }, [
+            h('div', { class: tableExportBarClasses }, [
               h(
-                'button',
+                Button,
                 {
                   type: 'button',
-                  class: tableExportButtonClasses,
+                  variant: 'secondary',
+                  size: 'sm',
                   onClick: ctx.handleExport,
                   'aria-label': tableLabels.value.exportCsvAriaLabel
                 },
-                tableLabels.value.exportCsvText
+                { default: () => tableLabels.value.exportCsvText }
               )
             ]),
 

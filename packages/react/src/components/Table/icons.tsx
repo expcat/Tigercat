@@ -31,7 +31,8 @@ export const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direc
       width="16"
       height="16"
       viewBox={icon16ViewBox}
-      fill="currentColor">
+      fill="currentColor"
+      aria-hidden="true">
       <path d={pathD} />
     </svg>
   )

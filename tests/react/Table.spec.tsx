@@ -857,7 +857,7 @@ describe('Table', () => {
       expect(firstCell).toHaveTextContent('Bob Johnson')
 
       const filterInput = container.querySelector('thead input[type="text"]') as HTMLInputElement
-      await fireEvent.input(filterInput, { target: { value: '32' } })
+      await fireEvent.change(filterInput, { target: { value: '32' } })
 
       const rows = container.querySelectorAll('tbody tr')
       expect(rows).toHaveLength(1)
@@ -910,6 +910,40 @@ describe('Table', () => {
 
       const filterSelect = container.querySelector('select')
       expect(filterSelect).toBeInTheDocument()
+    })
+
+    it('binds controlled filters and names the filter control', () => {
+      const filterColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', filter: { type: 'text' } }
+      ]
+      const { container, getByLabelText } = render(
+        <Table
+          columns={filterColumns}
+          dataSource={dataSource}
+          filters={{ name: 'Jane' }}
+          pagination={false}
+        />
+      )
+
+      const filterInput = getByLabelText('Filter Name') as HTMLInputElement
+      expect(filterInput).toHaveValue('Jane')
+      expect(container.querySelector('thead [data-tiger-table-filter]')).toBeInTheDocument()
+    })
+
+    it('sorts when the header cell is clicked', async () => {
+      const onSortChange = vi.fn()
+      const sortableColumns: TableColumn[] = [{ key: 'name', title: 'Name', sortable: true }]
+      const { getByText } = render(
+        <Table
+          columns={sortableColumns}
+          dataSource={dataSource}
+          pagination={false}
+          onSortChange={onSortChange}
+        />
+      )
+
+      await fireEvent.click(getByText('Name').closest('th')!)
+      expect(onSortChange).toHaveBeenCalledWith({ key: 'name', direction: 'asc' })
     })
   })
 
@@ -1070,6 +1104,33 @@ describe('Table', () => {
 
       const radios = container.querySelectorAll('input[type="radio"]')
       expect(radios.length).toBe(dataSource.length)
+      expect(container.querySelectorAll('thead th')).toHaveLength(columns.length + 1)
+      expect(container.querySelectorAll('tbody tr:first-child td')).toHaveLength(columns.length + 1)
+      expect(radios[0]).toHaveAttribute('name')
+      expect(radios[0]).toHaveAttribute('aria-label')
+    })
+
+    it('keeps radio, expand, and summary chrome in the same order', () => {
+      const { container } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={false}
+          rowSelection={{ type: 'radio' }}
+          expandable={{ expandedRowRender: () => <div>more</div> }}
+          summaryRow={{ show: true, data: { name: 'Total', age: '', email: '' } }}
+        />
+      )
+
+      expect(container.querySelectorAll('thead tr:first-child > *')).toHaveLength(
+        columns.length + 2
+      )
+      expect(container.querySelectorAll('tbody tr:first-child > *')).toHaveLength(
+        columns.length + 2
+      )
+      expect(container.querySelectorAll('tfoot tr:first-child > *')).toHaveLength(
+        columns.length + 2
+      )
     })
 
     it('should respect controlled selectedRowKeys on rerender', () => {
@@ -1209,7 +1270,7 @@ describe('Table', () => {
       const rows = container.querySelectorAll('tbody tr')
       expect(rows[0]).toHaveAttribute('aria-selected', 'true')
       expect(rows[1]).toHaveAttribute('aria-selected', 'false')
-      expect(rows[0]).toHaveAttribute('tabindex', '0')
+      expect(rows[0]).not.toHaveAttribute('tabindex')
 
       rerender(<Table columns={columns} dataSource={dataSource} />)
       const plainRow = container.querySelector('tbody tr')!

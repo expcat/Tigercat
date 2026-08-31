@@ -15,18 +15,35 @@ import {
   editableCellInputClasses,
   tableGroupHeaderClasses,
   getGroupHeaderCellClasses,
+  getTableChromeSlots,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
+  formatTableSelectRowAriaLabel,
+  formatTableGroupHeaderText,
+  tableVirtualSpacerCellClasses,
   type TableVirtualWindow,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
+import { Checkbox } from '../Checkbox'
+import { Radio } from '../Radio'
 import { ExpandIcon } from './icons'
 import type { TableContext, TableInternalProps } from './types'
 
 export function renderTableBody(
   ctx: TableContext,
-  props: TableInternalProps & { interactiveRows?: boolean; virtualWindow?: TableVirtualWindow },
+  props: TableInternalProps & {
+    interactiveRows?: boolean
+    virtualWindow?: TableVirtualWindow
+    selectionName?: string
+  },
   slots: Slots,
   labels: Required<TigerLocaleTable>
 ): VNodeChild {
+  const hasRowControls = hasTableSelectionColumn(props.rowSelection) || Boolean(props.expandable)
+  const chrome = getTableChromeSlots({
+    hasSelectionColumn: hasTableSelectionColumn(props.rowSelection),
+    expand: resolveTableExpandSlot(props.expandable)
+  })
   if (props.loading) {
     return null
   }
@@ -125,67 +142,73 @@ export function renderTableBody(
         : props.rowClassName
 
     const cells: VNodeChild[] = []
-    const expandAtStart = props.expandable && props.expandable.expandIconPosition !== 'end'
+    const checkboxProps = props.rowSelection?.getCheckboxProps?.(record) || {}
 
-    const expandToggleCell = props.expandable
-      ? h(
-          'td',
-          {
-            class: getExpandIconCellClasses(props.size)
-          },
-          isRowExpandable
-            ? [
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'inline-flex items-center justify-center',
-                    'aria-label': isExpanded
-                      ? labels.collapseRowAriaLabel
-                      : labels.expandRowAriaLabel,
-                    'aria-expanded': isExpanded,
-                    onClick: (e: Event) => {
-                      e.stopPropagation()
-                      ctx.handleToggleExpand(key, record)
-                    }
-                  },
-                  [ExpandIcon(isExpanded)]
-                )
-              ]
-            : []
-        )
-      : null
-
-    if (expandAtStart && expandToggleCell) {
-      cells.push(expandToggleCell)
-    }
-
-    if (props.rowSelection && props.rowSelection.showCheckbox !== false) {
-      const checkboxProps = props.rowSelection?.getCheckboxProps?.(record) || {}
-
-      cells.push(
-        h(
-          'td',
-          {
-            class: getCheckboxCellClasses(props.size)
-          },
-          [
-            h('input', {
-              type: props.rowSelection?.type === 'radio' ? 'radio' : 'checkbox',
-              class:
-                props.rowSelection?.type === 'radio'
-                  ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                  : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
-              checked: isSelected,
-              disabled: checkboxProps.disabled,
-              onClick: (e: Event) => e.stopPropagation(),
-              onChange: (e: Event) =>
-                ctx.handleSelectRow(key, (e.target as HTMLInputElement).checked)
-            })
+    const expandToggleCell = h(
+      'td',
+      {
+        class: getExpandIconCellClasses(props.size)
+      },
+      isRowExpandable
+        ? [
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'inline-flex items-center justify-center',
+                'aria-label': isExpanded ? labels.collapseRowAriaLabel : labels.expandRowAriaLabel,
+                'aria-expanded': isExpanded,
+                onClick: (e: Event) => {
+                  e.stopPropagation()
+                  ctx.handleToggleExpand(key, record)
+                }
+              },
+              [ExpandIcon(isExpanded)]
+            )
           ]
-        )
-      )
+        : []
+    )
+
+    const selectionCell = h(
+      'td',
+      {
+        class: getCheckboxCellClasses(props.size),
+        onClick: (e: Event) => e.stopPropagation()
+      },
+      [
+        props.rowSelection?.type === 'radio'
+          ? h(Radio, {
+              size: 'sm',
+              name: props.selectionName,
+              value: key,
+              modelValue: isSelected,
+              disabled: checkboxProps.disabled,
+              'aria-label': formatTableSelectRowAriaLabel(
+                labels.selectRowAriaLabel,
+                sourceIndex + 1
+              ),
+              onChange: (checked: boolean) => {
+                if (checked) ctx.handleSelectRow(key, true)
+              }
+            })
+          : h(Checkbox, {
+              size: 'sm',
+              modelValue: isSelected,
+              disabled: checkboxProps.disabled,
+              'aria-label': formatTableSelectRowAriaLabel(
+                labels.selectRowAriaLabel,
+                sourceIndex + 1
+              ),
+              onChange: (checked: boolean) => ctx.handleSelectRow(key, checked)
+            })
+      ]
+    )
+
+    function chromeTd(slot: 'expand' | 'selection'): VNodeChild {
+      return slot === 'expand' ? expandToggleCell : selectionCell
     }
+
+    cells.push(...chrome.leading.map((slot) => chromeTd(slot)))
 
     ctx.displayColumns.value.forEach((column) => {
       const dataKey = column.dataKey || column.key
@@ -257,9 +280,7 @@ export function renderTableBody(
       )
     })
 
-    if (!expandAtStart && expandToggleCell) {
-      cells.push(expandToggleCell)
-    }
+    cells.push(...chrome.trailing.map((slot) => chromeTd(slot)))
 
     const rowNode = h(
       'tr',
@@ -271,17 +292,17 @@ export function renderTableBody(
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'
         ),
         'aria-selected': props.rowSelection ? isSelected : undefined,
-        tabindex: props.interactiveRows ? 0 : undefined,
-        // Delegated mouse click stays on tbody; add per-row keyboard activation.
-        onKeydown: props.interactiveRows
-          ? (e: KeyboardEvent) => {
-              if (e.target !== e.currentTarget) return
-              if (isActivationKey(e)) {
-                e.preventDefault()
-                ctx.handleRowClick(record, sourceIndex, key)
+        tabindex: props.interactiveRows && !hasRowControls ? 0 : undefined,
+        onKeydown:
+          props.interactiveRows && !hasRowControls
+            ? (e: KeyboardEvent) => {
+                if (e.target !== e.currentTarget) return
+                if (isActivationKey(e)) {
+                  e.preventDefault()
+                  ctx.handleRowClick(record, sourceIndex, key)
+                }
               }
-            }
-          : undefined,
+            : undefined,
         draggable: props.rowDraggable ? 'true' : undefined
       },
       cells
@@ -329,7 +350,7 @@ export function renderTableBody(
               colspan: ctx.totalColumnCount.value,
               class: getGroupHeaderCellClasses(props.size)
             },
-            `${props.groupBy}: ${groupKey} (${groupItems.length})`
+            formatTableGroupHeaderText(labels.groupHeaderText, groupKey, groupItems.length)
           )
         ])
       )
@@ -352,12 +373,17 @@ export function renderTableBody(
     const windowed: VNodeChild[] = []
     if (vw.topPad > 0) {
       windowed.push(
-        h('tr', { key: 'virtual-top', 'aria-hidden': 'true' }, [
-          h('td', {
-            colspan: ctx.totalColumnCount.value,
-            style: { height: `${vw.topPad}px`, padding: 0 }
-          })
-        ])
+        h(
+          'tr',
+          { key: 'virtual-top', 'aria-hidden': 'true', 'data-tiger-table-virtual-spacer': '' },
+          [
+            h('td', {
+              colspan: ctx.totalColumnCount.value,
+              class: tableVirtualSpacerCellClasses,
+              style: { height: `${vw.topPad}px` }
+            })
+          ]
+        )
       )
     }
     for (let index = vw.startIndex; index <= vw.endIndex; index++) {
@@ -369,12 +395,21 @@ export function renderTableBody(
     }
     if (vw.bottomPad > 0) {
       windowed.push(
-        h('tr', { key: 'virtual-bottom', 'aria-hidden': 'true' }, [
-          h('td', {
-            colspan: ctx.totalColumnCount.value,
-            style: { height: `${vw.bottomPad}px`, padding: 0 }
-          })
-        ])
+        h(
+          'tr',
+          {
+            key: 'virtual-bottom',
+            'aria-hidden': 'true',
+            'data-tiger-table-virtual-spacer': ''
+          },
+          [
+            h('td', {
+              colspan: ctx.totalColumnCount.value,
+              class: tableVirtualSpacerCellClasses,
+              style: { height: `${vw.bottomPad}px` }
+            })
+          ]
+        )
       )
     }
     return h('tbody', delegatedBodyHandlers, windowed)

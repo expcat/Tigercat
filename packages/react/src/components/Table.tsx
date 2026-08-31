@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   canUseTableVirtualWindow,
@@ -7,6 +7,9 @@ import {
   getCardColumns,
   getCardGridInfo,
   getTableColgroup,
+  hasTableSelectionColumn,
+  resolveTableExpandSlot,
+  tableExportBarClasses,
   getTableResponsiveCardClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
@@ -38,9 +41,8 @@ import {
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
-import { tableExportButtonClasses } from '@expcat/tigercat-core'
-
 import { useTigerConfig } from './ConfigProvider'
+import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { Empty } from './Empty'
 import { LoadingSpinner } from './Table/icons'
@@ -129,6 +131,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [measuredRowHeights, setMeasuredRowHeights] = useState<Record<number, number>>({})
   const [measuredContainerSize, setMeasuredContainerSize] = useState({ width: 0, height: 0 })
   const [isCardViewport, setIsCardViewport] = useState(false)
+  const selectionGroupName = useId()
   const internalRowSelection = rowSelection as
     RowSelectionConfig<Record<string, unknown>> | undefined
   const internalExpandable = expandable as ExpandableConfig<Record<string, unknown>> | undefined
@@ -399,13 +402,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             columns: ctx.displayColumns,
             frozenWidths: ctx.frozenColumnWidths,
             size,
-            hasSelectionColumn:
-              !!internalRowSelection && internalRowSelection.showCheckbox !== false,
-            expand: internalExpandable
-              ? internalExpandable.expandIconPosition === 'end'
-                ? 'end'
-                : 'start'
-              : false
+            hasSelectionColumn: hasTableSelectionColumn(internalRowSelection),
+            expand: resolveTableExpandSlot(internalExpandable)
           }).map((entry, index) => (
             <col
               key={`${entry.key}-${index}`}
@@ -423,7 +421,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         columnDraggable,
         lockColumnAriaLabel: tableLabels.lockColumnAriaLabel,
         unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel,
-        labels: tableLabels
+        labels: tableLabels,
+        selectionName: selectionGroupName
       })}
       {renderTableBody(ctx, {
         size,
@@ -437,7 +436,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         rowClassName: internalRowClassName,
         rowDraggable,
         interactiveRows: !!onRowClick || !!internalRowSelection,
-        virtualWindow
+        virtualWindow,
+        selectionName: selectionGroupName
       })}
       {renderSummaryRow(ctx, {
         size,
@@ -479,14 +479,15 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-tiger-table-layout={showCardTree ? 'card' : 'table'}
       aria-busy={loading}>
       {exportable && (
-        <div className="mb-2 flex justify-end">
-          <button
+        <div className={tableExportBarClasses}>
+          <Button
             type="button"
-            className={tableExportButtonClasses}
+            variant="secondary"
+            size="sm"
             aria-label={tableLabels.exportCsvAriaLabel}
             onClick={ctx.handleExport}>
             {tableLabels.exportCsvText}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -600,6 +601,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                           <span onClick={(event) => event.stopPropagation()}>
                             {internalRowSelection.type === 'radio' ? (
                               <Radio
+                                name={selectionGroupName}
                                 value={key}
                                 checked={isSelected}
                                 disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}

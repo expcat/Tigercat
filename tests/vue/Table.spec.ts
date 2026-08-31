@@ -723,6 +723,31 @@ describe('Table', () => {
       const filterSelect = container.querySelector('select')
       expect(filterSelect).toBeInTheDocument()
     })
+
+    it('binds controlled filters and names the filter control', () => {
+      const { getByLabelText, container } = renderWithProps(Table, {
+        columns: [{ key: 'name', title: 'Name', filter: { type: 'text' } }],
+        dataSource,
+        filters: { name: 'Jane' },
+        pagination: false
+      })
+
+      expect(getByLabelText('Filter Name')).toHaveValue('Jane')
+      expect(container.querySelector('thead [data-tiger-table-filter]')).toBeInTheDocument()
+    })
+
+    it('sorts when the header cell is clicked', async () => {
+      const onSortChange = vi.fn()
+      const { getByText } = renderWithProps(Table, {
+        columns: [{ key: 'name', title: 'Name', sortable: true }],
+        dataSource,
+        pagination: false,
+        onSortChange
+      })
+
+      await fireEvent.click(getByText('Name').closest('th')!)
+      expect(onSortChange).toHaveBeenCalledWith({ key: 'name', direction: 'asc' })
+    })
   })
 
   describe('Pagination', () => {
@@ -1116,6 +1141,31 @@ describe('Table', () => {
 
       const radios = container.querySelectorAll('input[type="radio"]')
       expect(radios.length).toBe(dataSource.length)
+      expect(container.querySelectorAll('thead th')).toHaveLength(columns.length + 1)
+      expect(container.querySelectorAll('tbody tr:first-child td')).toHaveLength(columns.length + 1)
+      expect(radios[0]).toHaveAttribute('name')
+      expect(radios[0]).toHaveAttribute('aria-label')
+    })
+
+    it('keeps radio, expand, and summary chrome in the same order', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        pagination: false,
+        rowSelection: { type: 'radio' },
+        expandable: { expandedRowRender: () => h('div', 'more') },
+        summaryRow: { show: true, data: { name: 'Total', age: '', email: '' } }
+      })
+
+      expect(container.querySelectorAll('thead tr:first-child > *')).toHaveLength(
+        columns.length + 2
+      )
+      expect(container.querySelectorAll('tbody tr:first-child > *')).toHaveLength(
+        columns.length + 2
+      )
+      expect(container.querySelectorAll('tfoot tr:first-child > *')).toHaveLength(
+        columns.length + 2
+      )
     })
   })
 
@@ -1242,7 +1292,7 @@ describe('Table', () => {
       const rows = selected.container.querySelectorAll('tbody tr')
       expect(rows[0].getAttribute('aria-selected')).toBe('true')
       expect(rows[1].getAttribute('aria-selected')).toBe('false')
-      expect(rows[0].getAttribute('tabindex')).toBe('0')
+      expect(rows[0].getAttribute('tabindex')).toBeNull()
 
       const plain = render(Table, { props: { columns, dataSource } })
       const plainRow = plain.container.querySelector('tbody tr')!
