@@ -29,17 +29,21 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component | Vue                                                                                                   | React                                                                                                 |
-| --------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Col       | `<Col :span="12">A</Col>`                                                                             | `<Col span={12}>A</Col>`                                                                              |
-| Container | `<Container max-width="lg">Body</Container>`                                                          | `<Container maxWidth="lg">Body</Container>`                                                           |
-| Content   | `<Content as="div">Body</Content>`                                                                    | `<Content as="div">Body</Content>`                                                                    |
-| Footer    | `<Footer>©</Footer>`                                                                                  | `<Footer>©</Footer>`                                                                                  |
-| Header    | `<Header>Title</Header>`                                                                              | `<Header>Title</Header>`                                                                              |
-| Layout    | `<Layout><Header>Title</Header><Layout><Sidebar /><Content as="div">Body</Content></Layout></Layout>` | `<Layout><Header>Title</Header><Layout><Sidebar /><Content as="div">Body</Content></Layout></Layout>` |
-| Row       | `<Row :gutter="16"><Col :span="12">A</Col><Col :span="12">B</Col></Row>`                              | `<Row gutter={16}><Col span={12}>A</Col><Col span={12}>B</Col></Row>`                                 |
-| Sidebar   | `<Sidebar :collapsed="collapsed">Nav</Sidebar>`                                                       | `<Sidebar collapsed={collapsed}>Nav</Sidebar>`                                                        |
+| Component    | Vue                                                                                                   | React                                                                                                 |
+| ------------ | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Col          | `<Col :span="12">A</Col>`                                                                             | `<Col span={12}>A</Col>`                                                                              |
+| Container    | `<Container max-width="lg">Body</Container>`                                                          | `<Container maxWidth="lg">Body</Container>`                                                           |
+| Content      | `<Content as="div">Body</Content>`                                                                    | `<Content as="div">Body</Content>`                                                                    |
+| Descriptions | `<Descriptions :items="items" />`                                                                     | `<Descriptions items={items} />`                                                                      |
+| Footer       | `<Footer>©</Footer>`                                                                                  | `<Footer>©</Footer>`                                                                                  |
+| Header       | `<Header>Title</Header>`                                                                              | `<Header>Title</Header>`                                                                              |
+| Layout       | `<Layout><Header>Title</Header><Layout><Sidebar /><Content as="div">Body</Content></Layout></Layout>` | `<Layout><Header>Title</Header><Layout><Sidebar /><Content as="div">Body</Content></Layout></Layout>` |
+| List         | `<List :data-source="items" />`                                                                       | `<List dataSource={items} />`                                                                         |
+| Masonry      | `<Masonry :columns="3"><slot /></Masonry>`                                                            | `<Masonry columns={3}>{children}</Masonry>`                                                           |
+| Row          | `<Row :gutter="16"><Col :span="12">A</Col><Col :span="12">B</Col></Row>`                              | `<Row gutter={16}><Col span={12}>A</Col><Col span={12}>B</Col></Row>`                                 |
+| ScrollArea   | `<ScrollArea max-height="200" aria-label="Log"><slot /></ScrollArea>`                                 | `<ScrollArea maxHeight={200} ariaLabel="Log">{children}</ScrollArea>`                                 |
+| Sidebar      | `<Sidebar :collapsed="collapsed">Nav</Sidebar>`                                                       | `<Sidebar collapsed={collapsed}>Nav</Sidebar>`                                                        |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AspectRatio, Card, Carousel, Descriptions, List, Masonry, Resizable, ScrollArea, Skeleton, Space, Splitter.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AspectRatio, Card, Carousel, Resizable, Skeleton, Space, Splitter.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -24,9 +24,10 @@ description: Compact Tigercat Advanced Vue and React usage routes
 | ImageAnnotation | `<ImageAnnotation :src="src" />`                                                                               | `<ImageAnnotation src={src} />`                                                                        |
 | ImageViewer     | `<ImageViewer :images="images" />`                                                                             | `<ImageViewer images={images} />`                                                                      |
 | Kanban          | `<Kanban :columns="columns" />`                                                                                | `<Kanban columns={columns} />`                                                                         |
+| PrintLayout     | `<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>`                          | `<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>`                   |
 | VirtualList     | `<VirtualList :render-item="renderItem" />`                                                                    | `<VirtualList renderItem={renderItem} />`                                                              |
 | VirtualTable    | `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />` | `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />` |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：CodeEditor, FileManager, InfiniteScroll, MarkdownEditor, PrintLayout, PrintPageBreak, RichTextEditor.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：CodeEditor, FileManager, InfiniteScroll, MarkdownEditor, PrintPageBreak, RichTextEditor.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

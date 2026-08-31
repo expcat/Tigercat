@@ -122,6 +122,28 @@ export const COMPONENT_PROP_PRIORITY = {
     'size?',
     'padding?'
   ],
+  Descriptions: ['items?', 'column?', 'layout?', 'colon?', 'bordered?', 'size?', 'title?'],
+  List: [
+    'dataSource?',
+    'pagination?',
+    'grid?',
+    'itemLayout?',
+    'emptyText?',
+    'split?',
+    'draggable?',
+    'virtual?'
+  ],
+  ScrollArea: ['maxHeight?', 'height?', 'shadow?', 'ariaLabel?', 'direction?', 'scrollbar?'],
+  Masonry: ['columns?', 'gap?', 'columnClassName?', 'itemClassName?'],
+  PrintLayout: [
+    'pageSize?',
+    'orientation?',
+    'showHeader?',
+    'showFooter?',
+    'headerText?',
+    'footerText?',
+    'showPageBreaks?'
+  ],
   Button: [
     'variant?',
     'size?',
@@ -272,7 +294,12 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Rate: '<Rate :default-value="3" />',
     Segmented: '<Segmented :options="options" aria-label="View" />',
     Watermark: '<Watermark content="机密" />',
-    Tour: '<Tour :steps="steps" />'
+    Tour: '<Tour :steps="steps" />',
+    List: '<List :data-source="items" />',
+    Descriptions: '<Descriptions :items="items" />',
+    ScrollArea: '<ScrollArea max-height="200" aria-label="Log"><slot /></ScrollArea>',
+    Masonry: '<Masonry :columns="3"><slot /></Masonry>',
+    PrintLayout: '<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -284,7 +311,12 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Rate: '<Rate defaultValue={3} />',
     Segmented: '<Segmented options={options} aria-label="View" />',
     Watermark: '<Watermark content="机密" />',
-    Tour: '<Tour steps={steps} />'
+    Tour: '<Tour steps={steps} />',
+    List: '<List dataSource={items} />',
+    Descriptions: '<Descriptions items={items} />',
+    ScrollArea: '<ScrollArea maxHeight={200} ariaLabel="Log">{children}</ScrollArea>',
+    Masonry: '<Masonry columns={3}>{children}</Masonry>',
+    PrintLayout: '<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>'
   }
 }
 

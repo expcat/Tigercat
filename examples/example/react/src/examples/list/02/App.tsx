@@ -15,7 +15,7 @@ export default function App() {
         <div className="flex w-full items-center justify-between">
           <div>
             <div className="font-medium">{String(item.name)}</div>
-            <div className="text-sm text-gray-500">库存：{String(item.stock)}</div>
+            <div className="text-sm text-[var(--tiger-text-muted)]">库存：{String(item.stock)}</div>
           </div>
           <Button size="sm">{String(item.price)} 购买</Button>
         </div>

@@ -88,13 +88,18 @@ Note: 默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作�
 
 ## Descriptions
 
-`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 3/12 props
+`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 8/13 props
 
-| Prop     | Type                 | Default | Notes                                |
-| -------- | -------------------- | ------- | ------------------------------------ |
-| `items?` | `DescriptionsItem[]` | `-`     | Items data source                    |
-| `title?` | `string`             | `-`     | Descriptions title                   |
-| `extra?` | `unknown`            | `-`     | Extra content (actions, links, etc.) |
+| Prop        | Type                                                      | Default        | Notes                                                                                      |
+| ----------- | --------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `items?`    | `DescriptionsItem[]`                                      | `-`            | Description items. This is the data source — default slot/children are not items.          |
+| `column?`   | `number \| Partial<Record<ResponsiveBreakpoint, number>>` | `3`            | Number of columns per row. A breakpoint map is resolved against the **container** width... |
+| `layout?`   | `DescriptionsLayout`                                      | `'horizontal'` | Descriptions layout                                                                        |
+| `colon?`    | `boolean`                                                 | `true`         | Whether to show colon after label                                                          |
+| `bordered?` | `boolean`                                                 | `false`        | Whether to show border                                                                     |
+| `size?`     | `ComponentSize`                                           | `'md'`         | Descriptions size                                                                          |
+| `title?`    | `string`                                                  | `-`            | Descriptions title                                                                         |
+| `locale?`   | `Partial<TigerLocale>`                                    | `-`            | Locale overlay                                                                             |
 
 ## Footer
 
@@ -134,28 +139,31 @@ Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSide
 
 ## List
 
-`packages/core/src/types/list.ts` · `ListProps` · 6/22 props
+`packages/core/src/types/list.ts` · `ListProps` · 8/22 props
 
 Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。
 
-| Prop          | Type                                                       | Default | Notes                                                                                      |
-| ------------- | ---------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `loading?`    | `boolean`                                                  | `false` | Loading state                                                                              |
-| `pagination?` | `ListPaginationConfig \| false`                            | `-`     | Pagination configuration, set to false to disable                                          |
-| `virtual?`    | `boolean`                                                  | `false` | Enable fixed-height virtual rendering via VirtualList. Recommended for large non-grid l... |
-| `dataSource?` | `T[]`                                                      | `-`     | List data source                                                                           |
-| `locale?`     | `Partial<TigerLocale>`                                     | `-`     | Locale override; falls back to ConfigProvider locale                                       |
-| `rowKey?`     | `string \| ((item: T, index: number) => string \| number)` | `-`     | Function to get item key                                                                   |
+| Prop          | Type                            | Default                   | Notes                                                                                  |
+| ------------- | ------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| `dataSource?` | `T[]`                           | `-`                       | List data source                                                                       |
+| `pagination?` | `ListPaginationConfig \| false` | `-`                       | Pagination configuration, set to false to disable                                      |
+| `grid?`       | `ListGrid`                      | `-`                       | Grid configuration for grid layout                                                     |
+| `itemLayout?` | `ListItemLayout`                | `'horizontal'`            | Item layout                                                                            |
+| `emptyText?`  | `string`                        | `locale.common.emptyText` | Empty state text                                                                       |
+| `split?`      | `boolean`                       | `true`                    | Whether to show split line between items                                               |
+| `draggable?`  | `boolean`                       | `false`                   | Whether list items are draggable for reorder                                           |
+| `virtual?`    | `boolean`                       | `false`                   | Enable fixed-height virtual rendering via VirtualList. Mutually exclusive with `grid`. |
 
 ## Masonry
 
-`packages/core/src/types/masonry.ts` · `MasonryProps` · 3/5 props
+`packages/core/src/types/masonry.ts` · `MasonryProps` · 4/5 props
 
-| Prop         | Type                     | Default | Notes                                                                            |
-| ------------ | ------------------------ | ------- | -------------------------------------------------------------------------------- |
-| `columns?`   | `MasonryResponsiveValue` | `3`     | Column count. Pass a breakpoint map for responsive columns.                      |
-| `gap?`       | `MasonryResponsiveValue` | `16`    | Gap between columns and items in px. Pass a breakpoint map for a responsive gap. |
-| `className?` | `string`                 | `-`     | Additional CSS class name for the root element                                   |
+| Prop               | Type                     | Default | Notes                                                                            |
+| ------------------ | ------------------------ | ------- | -------------------------------------------------------------------------------- |
+| `columns?`         | `MasonryResponsiveValue` | `3`     | Column count. Pass a breakpoint map for responsive columns.                      |
+| `gap?`             | `MasonryResponsiveValue` | `16`    | Gap between columns and items in px. Pass a breakpoint map for a responsive gap. |
+| `columnClassName?` | `string`                 | `-`     | Additional CSS class name for every column element                               |
+| `itemClassName?`   | `string`                 | `-`     | Additional CSS class name for every item wrapper element                         |
 
 ## Resizable
 
@@ -182,13 +190,19 @@ Note: 数字 `gutter` 只开横缝，双轴传 `[h, v]`。缝是 CSS gap，不�
 
 ## ScrollArea
 
-`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 3/12 props
+`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 7/13 props
 
-| Prop             | Type                            | Default      | Notes                                |
-| ---------------- | ------------------------------- | ------------ | ------------------------------------ |
-| `direction?`     | `ScrollAreaDirection`           | `'vertical'` | Axes that may scroll                 |
-| `scrollbar?`     | `ScrollAreaScrollbarVisibility` | `'auto'`     | Custom scrollbar visibility strategy |
-| `scrollbarSize?` | `ScrollAreaScrollbarSize`       | `'md'`       | Custom scrollbar thickness           |
+| Prop         | Type                            | Default      | Notes                                                                                      |
+| ------------ | ------------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `maxHeight?` | `number \| string`              | `-`          | Maximum viewport height. Numbers are treated as px.                                        |
+| `height?`    | `number \| string`              | `-`          | Fixed viewport height. Numbers are treated as px.                                          |
+| `shadow?`    | `boolean`                       | `false`      | Render a gradient shadow on every edge that has content scrolled past it                   |
+| `ariaLabel?` | `string`                        | `-`          | Accessible name for the scrollable region. When set, the viewport is exposed as `role="... |
+| `direction?` | `ScrollAreaDirection`           | `'vertical'` | Axes that may scroll                                                                       |
+| `scrollbar?` | `ScrollAreaScrollbarVisibility` | `'auto'`     | Custom scrollbar visibility strategy                                                       |
+| `locale?`    | `Partial<TigerLocale>`          | `-`          | Locale overlay                                                                             |
+
+Events/callback props: `onScroll?`.
 
 ## Sidebar
 

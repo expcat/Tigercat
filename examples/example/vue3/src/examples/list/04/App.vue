@@ -10,11 +10,14 @@ const items = [
 </script>
 
 <template>
-  <List :data-source="items" bordered="none" :grid="{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3 }">
+  <List
+    :data-source="items"
+    item-layout="vertical"
+    :grid="{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3 }">
     <template #renderItem="{ item }">
       <Card variant="shadow">
         <h3 class="font-semibold">{{ item.title }}</h3>
-        <p class="text-sm text-gray-500">{{ item.content }}</p>
+        <p class="text-sm text-[var(--tiger-text-muted)]">{{ item.content }}</p>
       </Card>
     </template>
   </List>

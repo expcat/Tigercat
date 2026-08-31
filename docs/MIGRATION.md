@@ -4,6 +4,14 @@
 
 ## 未发布
 
+List `bordered` 改为外框布尔（默认 `false`），项间线只走 `split`（默认 `true`）。删除 `'none' | 'divided' | 'bordered'` 和 `ListBorderStyle`。`bordered="divided"` 改成不传或 `split`；`bordered="none"` 改成 `bordered={false}`。`pagination.current` / `pageSize` 只要传入就是受控。拖拽下标是数据源下标，行上不再 HTML5 `draggable`（手柄 + `useDrag`）。loading 不再卸 listitem。
+
+Descriptions / Masonry / List 网格的断点对象跟**容器宽**和 `--tiger-breakpoint-*`（`xs`…`2xl`）。删除 `xxl` / `xxxl`。竖向 Descriptions 也按 `column`/`span` 排格。
+
+ScrollArea 的 `className` / 高度约束打在视口上；不溢出时视口不进 Tab。横轴阴影/拇指用逻辑边。`direction="both"` 不再强制 `min-w-max`。
+
+PrintLayout `pageSize` 写入 `@page size`。删除 `custom` 枚举（改 `pageWidth`/`pageHeight`）。页眉页脚在屏幕上可见并随打印重复。`PrintPageBreak` 打印时不再 `display:none`。删除假 token `--tiger-print-ink`。`ref.print()` 只打这一份。
+
 Layout 默认不再写 `min-h-screen`。有 Sidebar 直子时根是横排；标准壳是外层列、内层再一个 Layout 包 Sidebar + Content，不要再手写一层 `flex`。全屏壳用 `fullHeight`。Content 默认仍是 `<main>`，一页多个预览请 `as="div"`。Header / Footer 未传 `height` 不再写 inline（Footer 也不再写 `height: auto`）。`collapsedWidth="0px"` 的 Sidebar 会 `inert`。数字 `gutter={n}` 只开横缝；双轴传 `[h, v]`。Col 传 `flex` 不必再 `span={0}`；`span={0}` 改为隐藏。删除 `getGutterStyles` / `getColGutterClasses` / `rowGutterClasses` / `colGutterClasses`。Container `maxWidth="full"` 是 `max-width: 100%`，与 `false`（无 max-width）不同。
 
 Tag 不再是 live region（无默认 `role="status"`）。点关闭只发 `onClose` / `close`，组件不会自己 `return null`；从列表删或设 `visible={false}`。关闭钮名走 locale `status.tagCloseAriaLabel`，不是写死 `Close tag`。新增 `pill`。

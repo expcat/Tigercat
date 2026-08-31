@@ -79,7 +79,7 @@ const App: React.FC = () => {
           <nav>
             <h2 className="text-lg font-semibold mb-4">组件导航</h2>
             <List
-              bordered="none"
+              bordered={false}
               split={false}
               size="sm"
               dataSource={[

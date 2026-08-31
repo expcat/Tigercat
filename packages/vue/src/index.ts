@@ -138,9 +138,9 @@ export type { VueImageCropperProps, ImageCropperRef } from './components/ImageCr
 export { ImageAnnotation } from './components/ImageAnnotation'
 export type { VueImageAnnotationProps } from './components/ImageAnnotation'
 export { List } from './components/List'
-export type { VueListProps } from './components/List'
+export type { VueListProps, ListProps } from './components/List'
 export { Descriptions } from './components/Descriptions'
-export type { VueDescriptionsProps } from './components/Descriptions'
+export type { VueDescriptionsProps, DescriptionsProps } from './components/Descriptions'
 export { Timeline } from './components/Timeline'
 export type { VueTimelineProps } from './components/Timeline'
 export { Countdown } from './components/Countdown'
@@ -358,11 +358,15 @@ export type { VueResizableProps } from './components/Resizable'
 
 // ScrollArea (v2.1.0+)
 export { ScrollArea } from './components/ScrollArea'
-export type { VueScrollAreaProps } from './components/ScrollArea'
+export type {
+  VueScrollAreaProps,
+  ScrollAreaProps,
+  ScrollAreaInstance
+} from './components/ScrollArea'
 
 // Masonry (v2.1.0+)
 export { Masonry } from './components/Masonry'
-export type { VueMasonryProps } from './components/Masonry'
+export type { VueMasonryProps, MasonryProps } from './components/Masonry'
 
 // CodeEditor (v0.8.0+)
 export { CodeEditor } from './components/CodeEditor'
@@ -404,7 +408,12 @@ export type { VueInputGroupProps, VueInputGroupAddonProps } from './components/I
 
 // PrintLayout (v0.9.0+)
 export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
-export type { VuePrintLayoutProps } from './components/PrintLayout'
+export type {
+  VuePrintLayoutProps,
+  PrintLayoutProps,
+  PrintPageBreakProps
+} from './components/PrintLayout'
+export type { PrintLayoutInstance } from '@expcat/tigercat-core'
 
 // ImageViewer (v0.9.0+)
 export { ImageViewer } from './components/ImageViewer'

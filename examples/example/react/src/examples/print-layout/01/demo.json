@@ -9,5 +9,5 @@
     "minHeight": 120,
     "maxHeight": 720
   },
-  "permissions": ["downloads"]
+  "permissions": []
 }

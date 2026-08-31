@@ -11,12 +11,12 @@ export default function App() {
   return (
     <List
       dataSource={items}
-      bordered="none"
+      itemLayout="vertical"
       grid={{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3 }}
       renderItem={(item) => (
         <Card variant="shadow">
           <h3 className="font-semibold">{String(item.title)}</h3>
-          <p className="text-sm text-gray-500">{String(item.content)}</p>
+          <p className="text-sm text-[var(--tiger-text-muted)]">{String(item.content)}</p>
         </Card>
       )}
     />

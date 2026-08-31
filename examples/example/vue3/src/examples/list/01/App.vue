@@ -9,5 +9,5 @@ const items = [
 </script>
 
 <template>
-  <List :data-source="items" size="md" bordered="divided" hoverable />
+  <List :data-source="items" size="md" split />
 </template>

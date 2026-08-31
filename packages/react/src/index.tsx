@@ -395,11 +395,12 @@ export type { ResizableProps } from './components/Resizable'
 
 // ScrollArea (v2.1.0+)
 export { ScrollArea } from './components/ScrollArea'
-export type { ScrollAreaProps } from './components/ScrollArea'
+export type { ScrollAreaProps, ScrollAreaInstance } from './components/ScrollArea'
 
 // Masonry (v2.1.0+)
 export { Masonry } from './components/Masonry'
 export type { MasonryProps } from './components/Masonry'
+export type { MasonryInstance } from '@expcat/tigercat-core'
 
 // CodeEditor (v0.8.0+)
 export { CodeEditor } from './components/CodeEditor'
@@ -441,7 +442,11 @@ export type { InputGroupProps, InputGroupAddonProps } from './components/InputGr
 
 // PrintLayout (v0.9.0+)
 export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
-export type { PrintLayoutProps, PrintPageBreakProps } from './components/PrintLayout'
+export type {
+  PrintLayoutProps,
+  PrintPageBreakProps,
+  PrintLayoutInstance
+} from './components/PrintLayout'
 
 // ImageViewer (v0.9.0+)
 export { ImageViewer } from './components/ImageViewer'

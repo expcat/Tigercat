@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { List } from '@expcat/tigercat-vue/List'
-import { Pagination } from '@expcat/tigercat-vue/Pagination'
 
 const items = Array.from({ length: 12 }, (_, index) => ({
   key: index + 1,
@@ -9,13 +8,15 @@ const items = Array.from({ length: 12 }, (_, index) => ({
   description: '分页数据'
 }))
 const page = ref(1)
-const pageSize = 4
-const visible = computed(() => items.slice((page.value - 1) * pageSize, page.value * pageSize))
+
+function onPageChange(next: { current: number }): void {
+  page.value = next.current
+}
 </script>
 
 <template>
-  <div class="space-y-3">
-    <List :data-source="visible" />
-    <Pagination v-model:current="page" :page-size="pageSize" :total="items.length" />
-  </div>
+  <List
+    :data-source="items"
+    :pagination="{ current: page, pageSize: 4 }"
+    @page-change="onPageChange" />
 </template>

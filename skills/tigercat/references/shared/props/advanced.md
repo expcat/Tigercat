@@ -97,17 +97,27 @@ Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCa
 
 ## PrintLayout
 
-`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 3/11 props
+`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 8/14 props
 
-| Prop           | Type               | Default      | Notes                             |
-| -------------- | ------------------ | ------------ | --------------------------------- |
-| `pageSize?`    | `PrintPageSize`    | `'A4'`       | Page size preset                  |
-| `orientation?` | `PrintOrientation` | `'portrait'` | Page orientation                  |
-| `showHeader?`  | `boolean`          | `false`      | Whether to show print-only header |
+| Prop              | Type                   | Default      | Notes                                                                         |
+| ----------------- | ---------------------- | ------------ | ----------------------------------------------------------------------------- |
+| `pageSize?`       | `PrintPageSize`        | `'A4'`       | Page size preset                                                              |
+| `orientation?`    | `PrintOrientation`     | `'portrait'` | Page orientation                                                              |
+| `showHeader?`     | `boolean`              | `false`      | Whether to show a repeating header on every printed page                      |
+| `showFooter?`     | `boolean`              | `false`      | Whether to show a repeating footer on every printed page                      |
+| `headerText?`     | `string`               | `-`          | Header text content (visible in the screen preview and on every printed page) |
+| `footerText?`     | `string`               | `-`          | Footer text content (visible in the screen preview and on every printed page) |
+| `showPageBreaks?` | `boolean`              | `true`       | Whether to show page break indicators in screen view                          |
+| `locale?`         | `Partial<TigerLocale>` | `-`          | Locale overlay                                                                |
 
 ## PrintPageBreak
 
 `packages/react/src/components/PrintLayout.tsx and packages/vue/src/components/PrintLayout.ts` · `PrintPageBreakProps`
+
+| Prop         | Type                   | Default | Notes |
+| ------------ | ---------------------- | ------- | ----- |
+| `locale?`    | `Partial<TigerLocale>` | `-`     | -     |
+| `className?` | `string`               | `-`     | -     |
 
 Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps extends div attributes.
 

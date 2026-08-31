@@ -23,6 +23,8 @@ const cards = heights.map((height, index) => ({
         {{ card.title }}
       </div>
     </Masonry>
-    <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">调整窗口宽度观察列数与间距变化。</p>
+    <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
+      列数和间距跟预览容器宽度走，不是整窗。
+    </p>
   </div>
 </template>
