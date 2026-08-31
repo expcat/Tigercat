@@ -8,6 +8,7 @@ import {
   getSpinnerSVG,
   omitUnsupportedColorProp,
   warnMissingAccessibleName,
+  TIGER_CHROME_ATTR,
   type ButtonHtmlType,
   type ButtonProps as CoreButtonProps,
   type ButtonSize
@@ -122,6 +123,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       {...domRest}
       ref={ref}
+      {...{ [TIGER_CHROME_ATTR]: '' }}
       className={buttonClasses}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledby}

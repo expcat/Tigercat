@@ -4,6 +4,7 @@ import {
   coerceClassValue,
   getInputGroupClasses,
   getInputGroupAddonClasses,
+  TIGER_CHROME_ATTR,
   type ComponentSize
 } from '@expcat/tigercat-core'
 
@@ -21,7 +22,6 @@ export interface VueInputGroupProps {
 }
 
 export interface VueInputGroupAddonProps {
-  type?: 'text' | 'icon'
   className?: string
 }
 
@@ -59,16 +59,18 @@ export const InputGroup = defineComponent({
       )
     )
 
-    return () =>
-      h(
+    return () => {
+      const named = Boolean(attrs['aria-label'] || attrs['aria-labelledby'])
+      return h(
         'div',
         {
           ...attrs,
           class: classes.value,
-          role: 'group'
+          role: named ? 'group' : undefined
         },
         slots.default?.()
       )
+    }
   }
 })
 
@@ -76,10 +78,6 @@ export const InputGroupAddon = defineComponent({
   name: 'TigerInputGroupAddon',
   inheritAttrs: false,
   props: {
-    type: {
-      type: String as PropType<'text' | 'icon'>,
-      default: 'text'
-    },
     className: {
       type: String,
       default: undefined
@@ -90,12 +88,13 @@ export const InputGroupAddon = defineComponent({
 
     return () => {
       const size = ctx?.size ?? 'md'
-      const compact = ctx?.compact ?? true
+      const compact = ctx?.compact ?? false
 
       return h(
         'span',
         {
           ...attrs,
+          [TIGER_CHROME_ATTR]: '',
           class: classNames(
             getInputGroupAddonClasses(size, compact, props.className),
             coerceClassValue(attrs.class)

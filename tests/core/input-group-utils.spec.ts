@@ -7,6 +7,7 @@ describe('getInputGroupClasses compact', () => {
     expect(compact).toContain('focus-within')
     expect(compact).not.toContain('[&>*:focus]:z-10')
     expect(compact).toContain('-ms-px')
+    expect(compact).toContain('data-tiger-chrome')
     expect(compact).toContain(':first-child:not(:last-child)')
     expect(compact).toContain(':last-child:not(:first-child)')
     expect(compact).not.toContain('[&>*:first-child]:!rounded-e-none')

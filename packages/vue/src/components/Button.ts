@@ -11,6 +11,7 @@ import {
   normalizeSvgAttrs,
   omitUnsupportedColorProp,
   warnMissingAccessibleName,
+  TIGER_CHROME_ATTR,
   type ButtonVariant,
   type ButtonSize,
   type ButtonIconPosition,
@@ -155,6 +156,7 @@ export const Button = defineComponent({
         'button',
         {
           ...domAttrs,
+          [TIGER_CHROME_ATTR]: '',
           class: buttonClasses.value,
           style: mergedStyle.value,
           'aria-busy': attrs['aria-busy'] ?? (props.loading ? 'true' : undefined),

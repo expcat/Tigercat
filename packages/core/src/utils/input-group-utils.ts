@@ -5,7 +5,8 @@
  */
 
 import type { ComponentSize } from '../types/base'
-import { getJoinedGroupItemClasses } from './joined-group-utils'
+import { classNames } from './class-names'
+import { getJoinedChromeGroupItemClasses } from './joined-group-utils'
 
 /**
  * Base classes for InputGroup container
@@ -13,9 +14,11 @@ import { getJoinedGroupItemClasses } from './joined-group-utils'
 export const inputGroupBaseClasses = 'inline-flex items-stretch w-full'
 
 /**
- * Compact mode classes — merges borders of adjacent children
+ * Compact mode classes — joins chrome marked `data-tiger-chrome`.
  */
-export const inputGroupCompactClasses = getJoinedGroupItemClasses({ focus: 'focus-within' })
+export const inputGroupCompactClasses = getJoinedChromeGroupItemClasses({
+  focus: 'focus-within'
+})
 
 /**
  * Non-compact mode spacing
@@ -26,7 +29,7 @@ export const inputGroupSpacedClasses = 'gap-2'
  * Addon base classes
  */
 export const inputGroupAddonBaseClasses =
-  'inline-flex items-center justify-center border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)] whitespace-nowrap'
+  'inline-flex items-center justify-center border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)] whitespace-nowrap rounded-[var(--tiger-radius-md,0.5rem)]'
 
 /**
  * Addon size classes
@@ -41,28 +44,20 @@ export const inputGroupAddonSizeClasses: Record<ComponentSize, string> = {
  * Get InputGroup container classes
  */
 export function getInputGroupClasses(compact: boolean, className?: string): string {
-  const classes = [
+  return classNames(
     inputGroupBaseClasses,
-    compact ? inputGroupCompactClasses : inputGroupSpacedClasses
-  ]
-  if (className) classes.push(className)
-  return classes.join(' ')
+    compact ? inputGroupCompactClasses : inputGroupSpacedClasses,
+    className
+  )
 }
 
 /**
- * Get InputGroup addon classes
+ * Get InputGroup addon classes. Compact first/last radius is the group's job.
  */
 export function getInputGroupAddonClasses(
   size: ComponentSize,
-  compact: boolean,
+  _compact: boolean,
   className?: string
 ): string {
-  const classes = [inputGroupAddonBaseClasses, inputGroupAddonSizeClasses[size]]
-  if (compact) {
-    classes.push('first:rounded-l-md last:rounded-r-md')
-  } else {
-    classes.push('rounded-[var(--tiger-radius-md,0.5rem)]')
-  }
-  if (className) classes.push(className)
-  return classes.join(' ')
+  return classNames(inputGroupAddonBaseClasses, inputGroupAddonSizeClasses[size], className)
 }

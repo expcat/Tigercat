@@ -3,6 +3,7 @@ import {
   classNames,
   getInputGroupClasses,
   getInputGroupAddonClasses,
+  TIGER_CHROME_ATTR,
   type ComponentSize
 } from '@expcat/tigercat-core'
 
@@ -30,6 +31,7 @@ export const InputGroup: React.FC<InputGroupProps> = ({
   ...rest
 }) => {
   const contextValue = useMemo(() => ({ size, compact }), [size, compact])
+  const named = Boolean(rest['aria-label'] || rest['aria-labelledby'])
 
   const groupClasses = useMemo(
     () => classNames(getInputGroupClasses(compact, className)),
@@ -38,26 +40,23 @@ export const InputGroup: React.FC<InputGroupProps> = ({
 
   return (
     <InputGroupContext.Provider value={contextValue}>
-      <div {...rest} className={groupClasses} role="group">
+      <div {...rest} className={groupClasses} role={named ? 'group' : undefined}>
         {children}
       </div>
     </InputGroupContext.Provider>
   )
 }
 
-export interface InputGroupAddonProps extends React.HTMLAttributes<HTMLSpanElement> {
-  addonType?: 'text' | 'icon'
-}
+export interface InputGroupAddonProps extends React.HTMLAttributes<HTMLSpanElement> {}
 
 export const InputGroupAddon: React.FC<InputGroupAddonProps> = ({
-  addonType: _addonType = 'text',
   className,
   children,
   ...rest
 }) => {
   const ctx = useInputGroupContext()
   const size = ctx?.size ?? 'md'
-  const compact = ctx?.compact ?? true
+  const compact = ctx?.compact ?? false
 
   const addonClasses = useMemo(
     () => classNames(getInputGroupAddonClasses(size, compact, className)),
@@ -65,7 +64,7 @@ export const InputGroupAddon: React.FC<InputGroupAddonProps> = ({
   )
 
   return (
-    <span {...rest} className={addonClasses}>
+    <span {...rest} {...{ [TIGER_CHROME_ATTR]: '' }} className={addonClasses}>
       {children}
     </span>
   )

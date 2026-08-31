@@ -32,13 +32,14 @@ describe('getJoinedGroupItemClasses', () => {
 
   it('is what ButtonGroup and InputGroup compact consume', () => {
     const buttons = getJoinedGroupItemClasses({ child: 'button' })
-    const inputs = getJoinedGroupItemClasses({ focus: 'focus-within' })
     expect(getButtonGroupClasses(false)).toContain(buttons)
     expect(getButtonGroupClasses(true)).toContain(
       getJoinedGroupItemClasses({ orientation: 'vertical', child: 'button' })
     )
-    expect(getInputGroupClasses(true)).toContain(inputs)
-    expect(inputs).toContain('focus-within')
-    expect(inputs).toContain(':first-child:not(:last-child)')
+    const compact = getInputGroupClasses(true)
+    expect(compact).toContain('data-tiger-chrome')
+    expect(compact).toContain('focus-within')
+    expect(compact).toContain(':first-child:not(:last-child)')
+    expect(compact).toContain('rounded-e-none')
   })
 })

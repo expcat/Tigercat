@@ -32,12 +32,6 @@ export interface InputGroupProps {
  */
 export interface InputGroupAddonProps {
   /**
-   * Addon type
-   * @default 'text'
-   */
-  type?: 'text' | 'icon'
-
-  /**
    * Additional CSS classes
    */
   className?: string
