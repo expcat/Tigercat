@@ -218,9 +218,23 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。'
   },
+  Space: {
+    notes: '`wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。'
+  },
+  Divider: {
+    notes:
+      '竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。'
+  },
+  AspectRatio: {
+    notes: '根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `overflow-hidden`。'
+  },
+  Skeleton: {
+    notes:
+      '`wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰默认 `aria-hidden`；有名字时是 `status`。加载态也可由父级 `aria-busy` 负责。'
+  },
   Card: {
     notes:
-      '`padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。'
+      '`hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。'
   },
   Drawer: {
     notes: '`bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。'

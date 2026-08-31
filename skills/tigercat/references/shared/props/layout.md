@@ -13,6 +13,8 @@ description: Compact generated Tigercat Layout props reference
 
 `packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps`
 
+Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `overflow-hidden`。
+
 | Prop                | Type               | Default  | Notes                                                                   |
 | ------------------- | ------------------ | -------- | ----------------------------------------------------------------------- |
 | `ratio?`            | `AspectRatioValue` | `'16/9'` | Width-to-height ratio                                                   |
@@ -21,15 +23,20 @@ description: Compact generated Tigercat Layout props reference
 
 ## Card
 
-`packages/core/src/types/card.ts` · `CardProps` · 3/13 props
+`packages/core/src/types/card.ts` · `CardProps` · 8/14 props
 
-Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。
+Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。
 
-| Prop       | Type                | Default     | Notes                                                                                      |
-| ---------- | ------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `variant?` | `CardVariant`       | `'default'` | Card variant style                                                                         |
-| `size?`    | `CardSize`          | `'md'`      | Card size (affects padding)                                                                |
-| `padding?` | `boolean \| string` | `-`         | Padding override for the card content sections. Takes precedence over the `size`-derive... |
+| Prop         | Type                           | Default      | Notes                                                                                      |
+| ------------ | ------------------------------ | ------------ | ------------------------------------------------------------------------------------------ |
+| `hoverable?` | `boolean`                      | `false`      | Visual lift on hover. Does not make the card a control; pass `onClick` or `href` for that. |
+| `direction?` | `BaseLayoutProps['direction']` | `'vertical'` | Card layout direction                                                                      |
+| `cover?`     | `string`                       | `-`          | Cover image URL. Framework layers also accept a custom node / `#cover` slot.               |
+| `coverAlt?`  | `string`                       | `''`         | Accessible name for a URL cover. Empty by default (decorative).                            |
+| `href?`      | `string`                       | `-`          | When set, the root is a link (`<a>` unless nested actions force a role).                   |
+| `variant?`   | `CardVariant`                  | `'default'`  | Card variant style                                                                         |
+| `size?`      | `CardSize`                     | `'md'`       | Card size (affects padding)                                                                |
+| `padding?`   | `boolean \| string`            | `-`          | Padding override for the card content sections. Takes precedence over the `size`-derive... |
 
 ## Carousel
 
@@ -198,10 +205,16 @@ Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开
 
 ## Skeleton
 
-`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 3/9 props
+`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 7/9 props
+
+Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰默认 `aria-hidden`；有名字时是 `status`。加载态也可由父级 `aria-busy` 负责。
 
 | Prop         | Type                | Default                             | Notes                                                                   |
 | ------------ | ------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
+| `rows?`      | `number`            | `1`                                 | Number of skeleton items to render (for text variant)                   |
+| `paragraph?` | `boolean`           | `false`                             | Whether to render as a paragraph with varying widths (for text variant) |
+| `height?`    | `string`            | `undefined (uses variant defaults)` | Height of the skeleton Can be a CSS value (e.g., '20px', '100px')       |
+| `shape?`     | `SkeletonShape`     | `'circle'`                          | Shape of the skeleton (for avatar variant)                              |
 | `variant?`   | `SkeletonVariant`   | `'text'`                            | Skeleton variant - determines the placeholder shape                     |
 | `animation?` | `SkeletonAnimation` | `'pulse'`                           | Animation type                                                          |
 | `width?`     | `string`            | `undefined (uses variant defaults)` | Width of the skeleton Can be a CSS value (e.g., '100px', '50%', '100%') |
@@ -210,12 +223,14 @@ Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开
 
 `packages/core/src/types/space.ts` · `SpaceProps` · 4/5 props
 
+Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。
+
 | Prop         | Type                           | Default        | Notes                                                  |
 | ------------ | ------------------------------ | -------------- | ------------------------------------------------------ |
+| `wrap?`      | `BaseLayoutProps['wrap']`      | `false`        | Whether to wrap items                                  |
 | `direction?` | `BaseLayoutProps['direction']` | `'horizontal'` | Space direction                                        |
 | `size?`      | `SpaceSize`                    | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
 | `align?`     | `BaseLayoutProps['align']`     | `'start'`      | Align items in the space                               |
-| `wrap?`      | `BaseLayoutProps['wrap']`      | `false`        | Whether to wrap items                                  |
 
 ## Splitter
 

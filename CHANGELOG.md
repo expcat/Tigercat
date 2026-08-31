@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **布局原语 A（Space / Divider / AspectRatio / Skeleton / Card）**：AspectRatio 根默认裁切媒体，不必调用方再写 `overflow-hidden`。Skeleton `wave` 真扫光并进 reduced-motion；默认尺寸走 class，用户 `style.height` / `h-*` 生效；`custom` 无默认几何。Card `hoverable` 不再假装按钮，`onClick`/`href` 才进 Tab；封面自己裁圆角，根不 `overflow-hidden`。竖 Divider 在默认 Space 里 `self-stretch`；gradient 吃 `color`/`thickness`。Vue Space/Divider 声明 `className`。
 - **Layout 壳 + Grid**：有 Sidebar 直子（或 `hasSider` / `direction="horizontal"`）时根横排，嵌套内层不再贴一份 `min-h-screen`。`fullHeight` 才是视口壳，Content 吃剩余高度并自己滚。Header / Footer 未传 `height` 不写 inline；玻璃变体替换不透明底并 sticky。Sidebar 逻辑边框、`collapsedWidth="0px"` 时 inert 离 Tab，未传名走 locale，内层 Menu 跟随折叠。Content / Footer 有 `as`。Row 缝改为 CSS gap，数字 gutter 只开横缝；Col 传入 `flex` 即走 flex 项，`span={0}` 隐藏，offset 逻辑边。删除 `getGutterStyles` 与负 margin 链。Container `full` 与 `false` 分道，宽度读 `--tiger-breakpoint-*`。React 壳与栅格转发 ref。
 - **Avatar / AvatarGroup**：`src` 变化清 error，不必换 `key`。图片名落在 `img alt`（`text` / `aria-label` 也算）。`onLoad` / `srcSet` 绑 img；React 转发根 span ref。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色（canonical token）。`#`/`rgb()`/`var()` 走 style。CJK 才双字，`José` 是 `J`。组叠缝逻辑 margin；`shape` 进 context；overflow `role="img"`；`max` 只计 Avatar；`max={0}` 无负边距。Vue 只摊 Fragment、丢掉 Comment。
 - **Badge**：按 `type` 决议内容（text 不被 `max` 封顶；非法数字隐藏）。默认不是 live region。叠放 class/ref 在包装上，隐藏计数包装仍在。`right`/`left` 跟阅读方向。实心字混向 `--tiger-text` 过 AA。

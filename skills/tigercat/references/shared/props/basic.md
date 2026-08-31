@@ -132,13 +132,17 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 
 ## Divider
 
-`packages/core/src/types/divider.ts` · `DividerProps` · 3/6 props
+`packages/core/src/types/divider.ts` · `DividerProps` · 5/8 props
 
-| Prop           | Type                 | Default        | Notes                               |
-| -------------- | -------------------- | -------------- | ----------------------------------- |
-| `orientation?` | `DividerOrientation` | `'horizontal'` | Orientation of the divider          |
-| `lineStyle?`   | `DividerLineStyle`   | `'solid'`      | Line style of the divider           |
-| `spacing?`     | `DividerSpacing`     | `'md'`         | Spacing (margin) around the divider |
+Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。
+
+| Prop           | Type                 | Default                                                         | Notes                                                                 |
+| -------------- | -------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `orientation?` | `DividerOrientation` | `'horizontal'`                                                  | Orientation of the divider                                            |
+| `lineStyle?`   | `DividerLineStyle`   | `'solid'`                                                       | Line style of the divider                                             |
+| `color?`       | `string`             | `undefined (uses default border color)`                         | Custom color for the divider Can be a CSS color value or CSS variable |
+| `thickness?`   | `string`             | `undefined (uses default 1px for horizontal, 1px for vertical)` | Custom thickness of the divider line                                  |
+| `spacing?`     | `DividerSpacing`     | `'md'`                                                          | Spacing (margin) around the divider                                   |
 
 ## Empty
 

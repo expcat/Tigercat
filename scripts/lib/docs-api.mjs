@@ -108,6 +108,20 @@ export const COMPONENT_PROP_PRIORITY = {
   Container: ['maxWidth?', 'center?', 'padding?', 'as?'],
   Row: ['gutter?', 'wrap?', 'align?', 'justify?'],
   Col: ['span?', 'flex?', 'offset?', 'order?'],
+  Space: ['wrap?', 'direction?', 'size?', 'align?'],
+  Divider: ['orientation?', 'lineStyle?', 'color?', 'thickness?', 'spacing?'],
+  AspectRatio: ['ratio?'],
+  Skeleton: ['rows?', 'paragraph?', 'height?', 'shape?', 'variant?', 'animation?', 'width?'],
+  Card: [
+    'hoverable?',
+    'direction?',
+    'cover?',
+    'coverAlt?',
+    'href?',
+    'variant?',
+    'size?',
+    'padding?'
+  ],
   Button: [
     'variant?',
     'size?',
