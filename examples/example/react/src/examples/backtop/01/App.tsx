@@ -6,9 +6,11 @@ export default function App() {
 
   return (
     <div className="min-h-[720px] rounded border p-4">
-      <p>向下滚动后使用回到顶部按钮。</p>
+      <p>向下滚动后使用回到顶部按钮。未达阈值时按钮不进 Tab。</p>
       <p className="mt-2 text-sm text-gray-500">点击次数：{clicks}</p>
-      <BackTop visibilityHeight={120} onClick={() => setClicks((value) => value + 1)} />
+      <BackTop visibilityHeight={120} onClick={() => setClicks((value) => value + 1)}>
+        顶部
+      </BackTop>
     </div>
   )
 }

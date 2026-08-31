@@ -1,7 +1,7 @@
 {
   "id": "backtop-01",
   "title": "页面滚动与回调",
-  "description": "一个 BackTop 使用 visibilityHeight 控制出现时机，并通过 onClick 回显点击次数；自定义内容可作为 children 传入。",
+  "description": "滚过 visibilityHeight 才出现。默认名走 locale；可见 children 就是可访问名。placement/offset 在默认 auto 下生效。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

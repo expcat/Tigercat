@@ -12,7 +12,7 @@ export default function App() {
           <h3 className="font-semibold">API</h3>
         </section>
       </div>
-      <Anchor affix={false} direction="vertical">
+      <Anchor>
         <AnchorLink href="#anchor-overview" title="概览" />
         <AnchorLink href="#anchor-api" title="API" />
       </Anchor>

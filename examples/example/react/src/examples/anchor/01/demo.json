@@ -1,7 +1,7 @@
 {
   "id": "anchor-01",
   "title": "文档锚点",
-  "description": "一个纵向 Anchor 关联两段文档内容，并关闭 affix 以便直接复制；水平导航可将 direction 改为 horizontal。",
+  "description": "默认 Affix 占位固定，带墨水。点链接会 onChange 并写入 hash。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

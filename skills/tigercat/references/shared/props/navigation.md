@@ -11,43 +11,53 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Affix
 
-`packages/core/src/types/affix.ts` · `AffixProps` · 3/7 props
+`packages/core/src/types/affix.ts` · `AffixProps` · 4/7 props
 
-| Prop            | Type     | Default | Notes                                                                                      |
-| --------------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
-| `offsetTop?`    | `number` | `0`     | Distance from the top of the viewport to trigger fixed positioning (px) Mutually exclus... |
-| `offsetBottom?` | `number` | `-`     | Distance from the bottom of the target container to trigger fixed positioning (px). Whe... |
-| `target?`       | `string` | `-`     | The scrollable container. Defaults to `window`. CSS selector string.                       |
+| Prop            | Type              | Default | Notes                                                                                      |
+| --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `offsetTop?`    | `number`          | `0`     | Distance from the top of the scroll root to trigger fixed positioning (px). Mutually ex... |
+| `offsetBottom?` | `number`          | `-`     | Distance from the bottom of the scroll root to trigger fixed positioning (px). When `ta... |
+| `target?`       | `ScrollRootInput` | `-`     | The scrollable container. Selector, Element, Window, or getter. Defaults to `window`. I... |
+| `zIndex?`       | `number`          | `10`    | Z-index of the affixed element                                                             |
+
+Events/callback props: `onChange?`.
 
 ## Anchor
 
-`packages/core/src/types/anchor.ts` · `AnchorProps` · 3/11 props
+`packages/core/src/types/anchor.ts` · `AnchorProps` · 6/14 props
 
-| Prop         | Type      | Default | Notes                                     |
-| ------------ | --------- | ------- | ----------------------------------------- |
-| `affix?`     | `boolean` | `true`  | Whether to fix the anchor to the viewport |
-| `bounds?`    | `number`  | `5`     | Anchor detection boundary in pixels       |
-| `offsetTop?` | `number`  | `0`     | Offset from top of viewport when fixed    |
+| Prop            | Type                   | Default      | Notes                                                                                      |
+| --------------- | ---------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `getContainer?` | `ScrollRootInput`      | `window`     | Scroll container for spy / scrollTo. Selector, Element, Window, or getter.                 |
+| `direction?`    | `AnchorDirection`      | `'vertical'` | Direction of the anchor navigation                                                         |
+| `targetOffset?` | `number`               | `-`          | Offset when scrolling to a target section                                                  |
+| `affix?`        | `boolean`              | `true`       | Whether to pin the anchor with Affix (placeholder + live geometry).                        |
+| `offsetTop?`    | `number`               | `0`          | Offset from top of the scroll root when Affix is on, and fallback scroll offset when `t... |
+| `locale?`       | `Partial<TigerLocale>` | `-`          | -                                                                                          |
+
+Events/callback props: `onClick?`, `onChange?`.
 
 ## AnchorLink
 
 `packages/core/src/types/anchor.ts` · `AnchorLinkProps` · 3/5 props
 
-| Prop      | Type     | Default | Notes                     |
-| --------- | -------- | ------- | ------------------------- |
-| `href`    | `string` | `-`     | Target anchor ID (with #) |
-| `title?`  | `string` | `-`     | Link title/text           |
-| `target?` | `string` | `-`     | Link target attribute     |
+| Prop      | Type     | Default | Notes                                                             |
+| --------- | -------- | ------- | ----------------------------------------------------------------- |
+| `href`    | `string` | `-`     | Target anchor ID (with #)                                         |
+| `title?`  | `string` | `-`     | Link title/text. Nested `AnchorLink` children go below the title. |
+| `target?` | `string` | `-`     | Link target attribute                                             |
 
 ## BackTop
 
-`packages/core/src/types/back-top.ts` · `BackTopProps` · 3/9 props
+`packages/core/src/types/back-top.ts` · `BackTopProps` · 5/11 props
 
-| Prop         | Type                | Default          | Notes                                                                                      |
-| ------------ | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| `position?`  | `BackTopPosition`   | `'auto'`         | Positioning strategy. Auto preserves the historical window=fixed/container=sticky behav... |
-| `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when position is fixed.                                         |
-| `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when position is fixed.                                         |
+| Prop                | Type                   | Default          | Notes                                                                         |
+| ------------------- | ---------------------- | ---------------- | ----------------------------------------------------------------------------- |
+| `visibilityHeight?` | `number`               | `400`            | Scroll height to show the BackTop button. Non-finite values fall back to 400. |
+| `target?`           | `ScrollRootInput`      | `-`              | Scroll container. Selector, Element, Window, or getter. Defaults to `window`. |
+| `placement?`        | `ViewportPlacement`    | `'bottom-right'` | Viewport corner used when position is auto or fixed.                          |
+| `offset?`           | `ViewportOffset`       | `24`             | Viewport offset used when position is auto or fixed.                          |
+| `locale?`           | `Partial<TigerLocale>` | `-`              | -                                                                             |
 
 ## Breadcrumb
 

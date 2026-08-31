@@ -1,7 +1,7 @@
 {
   "id": "affix-01",
-  "title": "容器滚动固定",
-  "description": "一个 Affix 监听自定义滚动容器，在越过 8 px 顶部偏移后固定，并通过 onChange 回显状态；底部固定可改用 offsetBottom。",
+  "title": "视口顶栏",
+  "description": "不传 target 时 Affix 钉在视口顶部。占位在文档流里，钉住后宽度仍跟父级走。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

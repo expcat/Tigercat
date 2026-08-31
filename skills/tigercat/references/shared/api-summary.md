@@ -199,4 +199,5 @@ description: Compact generated route map for Tigercat core type files
 | Type File          | Props Interfaces    |
 | ------------------ | ------------------- |
 | config-provider.ts | ConfigProviderProps |
+| scroll-root.ts     | -                   |
 | viewport.ts        | -                   |

@@ -279,7 +279,10 @@ export const COMPONENT_PROP_PRIORITY = {
     'asChild?'
   ],
   ConfigProvider: ['locale?', 'theme?', 'colorScheme?', 'direction?'],
-  BackTop: ['position?', 'placement?', 'offset?'],
+  Affix: ['offsetTop?', 'offsetBottom?', 'target?', 'zIndex?'],
+  Anchor: ['getContainer?', 'direction?', 'targetOffset?', 'affix?', 'offsetTop?'],
+  AnchorLink: ['href', 'title?', 'target?'],
+  BackTop: ['visibilityHeight?', 'target?', 'placement?', 'offset?'],
   FloatButton: ['floating?', 'placement?', 'offset?'],
   Notification: ['actions?', 'type?', 'position?'],
   Table: [
@@ -714,7 +717,11 @@ export const REQUIRED_USAGE_SNIPPETS = {
     PageHeader: '<PageHeader title="订单详情" />',
     Steps: '<Steps :current="1"><StepsItem title="填写" /><StepsItem title="确认" /></Steps>',
     StepsItem: '<Steps><StepsItem title="填写" /></Steps>',
-    Pagination: '<Pagination :total="100" :current="1" />'
+    Pagination: '<Pagination :total="100" :current="1" />',
+    Affix: '<Affix :offset-top="0"><div>Header</div></Affix>',
+    Anchor: '<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>',
+    AnchorLink: '<AnchorLink href="#intro" title="Intro" />',
+    BackTop: '<BackTop :visibility-height="400" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -824,7 +831,11 @@ export const REQUIRED_USAGE_SNIPPETS = {
     PageHeader: '<PageHeader title="订单详情" />',
     Steps: '<Steps current={1}><StepsItem title="填写" /><StepsItem title="确认" /></Steps>',
     StepsItem: '<Steps><StepsItem title="填写" /></Steps>',
-    Pagination: '<Pagination total={100} current={1} />'
+    Pagination: '<Pagination total={100} current={1} />',
+    Affix: '<Affix offsetTop={0}><div>Header</div></Affix>',
+    Anchor: '<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>',
+    AnchorLink: '<AnchorLink href="#intro" title="Intro" />',
+    BackTop: '<BackTop visibilityHeight={400} />'
   }
 }
 

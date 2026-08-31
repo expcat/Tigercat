@@ -1,7 +1,7 @@
 {
   "id": "affix-02",
   "title": "固定到底部",
-  "description": "offsetBottom 让元素在滚动到容器底部一定距离时固定；与 offsetTop 互斥。",
+  "description": "target 是滚动根选择器，节点必须在容器内。offsetBottom 钉在容器底；非法选择器回退 window 且不抛。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "fixed", "height": 200 }

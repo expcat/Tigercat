@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Affix / BackTop / Anchor 共用 `resolveScrollRoot`。Affix `target` 不再只是字符串，也可以是节点或 getter。非法选择器不再抛，回退 window。
+
+BackTop `duration` 不是毫秒：`0` 立刻滚到顶，正数用浏览器原生 smooth。默认 `auto` 走 viewport `placement`/`offset`（24px），不再是 window 专用的 `bottom-8 right-8`。自定义容器默认也是视口 fixed；要贴在容器里请显式 `position="sticky"` 且按钮是容器子孙。隐身时不进 Tab。默认 `aria-label` 走 `locale.backTop`。
+
+Anchor 默认 `affix` 使用 Affix（有占位），不再给根加裸 `fixed`。默认有 ink。根是 `<nav>`，链接在 `ul > li`，当前项 `aria-current="location"`。点链接会 `onChange` 并写入 hash；`ctrl`/`meta`/`_blank` 不 preventDefault。`getContainer` 与 Affix `target` 同一套输入。删除 `AnchorClickInfo` / `AnchorChangeInfo` / `getContainerHeight`。Vue 从主入口引 `AffixProps` / `BackTopProps` / `AnchorProps` / `AnchorContextKey`。
+
 NavigationMenu 默认不再悬停或聚焦就开层。用点击或 Enter / Space / ArrowDown；需要悬停请显式 `openOnHover`。再点同一 Trigger 会关上。不要依赖默认 `aria-label="Main"`，多个导航请各自命名。`1` 与 `'1'` 是同一项。Mega 面板是 `menu` 不是孤立 `group`。Vue 从主入口引 `NavigationMenuProps` 和 `NavigationMenuList`。
 
 Menu 点选永远是单选：`selectedKeys` 长度 0/1，再点已选项变成 `[]`。`multiple` 只表示可否同时打开多个 submenu，不再让初值多选、一点就塌成一项。`1` 与 `'1'` 是同一 key。

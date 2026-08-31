@@ -1,7 +1,7 @@
 {
   "id": "anchor-03",
   "title": "嵌套锚点",
-  "description": "一个 Anchor 用必要的父子 AnchorLink 展示嵌套层级，并保留固定态墨水指示器配置。",
+  "description": "父子 AnchorLink 对应页面里真实 id。链接按 DOM 序，子节可以成为当前项。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

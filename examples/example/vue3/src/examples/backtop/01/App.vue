@@ -7,8 +7,8 @@ const clicks = ref(0)
 
 <template>
   <div class="min-h-[720px] rounded border p-4">
-    <p>向下滚动后使用回到顶部按钮。</p>
+    <p>向下滚动后使用回到顶部按钮。未达阈值时按钮不进 Tab。</p>
     <p class="mt-2 text-sm text-gray-500">点击次数：{{ clicks }}</p>
-    <BackTop :visibility-height="120" @click="clicks += 1" />
+    <BackTop :visibility-height="120" @click="clicks += 1">顶部</BackTop>
   </div>
 </template>

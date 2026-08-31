@@ -1,7 +1,7 @@
 {
   "id": "backtop-02",
   "title": "自定义滚动容器",
-  "description": "指定 target 监听自定义容器的滚动。",
+  "description": "target 与 Affix 同一套滚动根（选择器 / 节点 / getter）。sticky 时按钮必须是容器子孙。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

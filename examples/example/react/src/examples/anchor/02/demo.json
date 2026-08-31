@@ -1,7 +1,7 @@
 {
   "id": "anchor-02",
   "title": "自定义容器",
-  "description": "通过 getContainer 让一个 Anchor 监听内部滚动容器，并关联两段最小内容。",
+  "description": "getContainer 与 Affix/BackTop 同一套滚动根。这里用选择器，不要 ?? window。horizontal 是横向目录。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

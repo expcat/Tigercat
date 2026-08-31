@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 179,
+  "component_count": 180,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -570,6 +570,7 @@
       "vue": "skills/tigercat/references/vue/index.md",
       "react": "skills/tigercat/references/react/index.md",
       "components": [
+        "AnchorContextKey",
         "BreadcrumbContextKey",
         "CollapseContextKey",
         "FORM_ITEM_CONTROL_INJECTION_KEY",
@@ -4049,6 +4050,26 @@
         "componentIndex": "skills/tigercat/references/component-index.md",
         "props": "skills/tigercat/references/shared/props/navigation.md",
         "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "AnchorContextKey": {
+      "name": "AnchorContextKey",
+      "aliases": [],
+      "category": "Other",
+      "slug": "other",
+      "testGroup": "other",
+      "packageSubpath": "./AnchorContextKey",
+      "packageTarget": "AnchorContextKey",
+      "typeSource": "unknown",
+      "sourceFiles": [],
+      "propsInterfaces": [],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/other.md",
+        "examples": "skills/tigercat/references/examples/other.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
       }
