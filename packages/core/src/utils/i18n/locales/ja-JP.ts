@@ -440,6 +440,17 @@ export const jaJP: TigerLocale = {
     incrementAriaLabel: '増やす',
     decrementAriaLabel: '減らす',
     emptyAriaValueText: '空'
+  },
+  slider: {
+    ariaLabel: 'スライダー',
+    minAriaLabel: '最小値',
+    maxAriaLabel: '最大値'
+  },
+  stepper: {
+    ariaLabel: 'ステッパー',
+    valueAriaLabel: '値',
+    incrementAriaLabel: '増やす',
+    decrementAriaLabel: '減らす'
   }
 }
 

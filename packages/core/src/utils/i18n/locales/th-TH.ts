@@ -440,6 +440,17 @@ export const thTH: TigerLocale = {
     incrementAriaLabel: 'เพิ่ม',
     decrementAriaLabel: 'ลด',
     emptyAriaValueText: 'ว่าง'
+  },
+  slider: {
+    ariaLabel: 'แถบเลื่อน',
+    minAriaLabel: 'ค่าต่ำสุด',
+    maxAriaLabel: 'ค่าสูงสุด'
+  },
+  stepper: {
+    ariaLabel: 'ตัวปรับค่า',
+    valueAriaLabel: 'ค่า',
+    incrementAriaLabel: 'เพิ่ม',
+    decrementAriaLabel: 'ลด'
   }
 }
 

@@ -440,6 +440,17 @@ export const zhTW: TigerLocale = {
     incrementAriaLabel: '增加',
     decrementAriaLabel: '減少',
     emptyAriaValueText: '空白'
+  },
+  slider: {
+    ariaLabel: '滑桿',
+    minAriaLabel: '下限',
+    maxAriaLabel: '上限'
+  },
+  stepper: {
+    ariaLabel: '步進器',
+    valueAriaLabel: '數值',
+    incrementAriaLabel: '遞增',
+    decrementAriaLabel: '遞減'
   }
 }
 

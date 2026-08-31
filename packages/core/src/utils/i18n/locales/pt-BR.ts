@@ -441,6 +441,17 @@ export const ptBR: TigerLocale = {
     incrementAriaLabel: 'Aumentar',
     decrementAriaLabel: 'Diminuir',
     emptyAriaValueText: 'Vazio'
+  },
+  slider: {
+    ariaLabel: 'Controle deslizante',
+    minAriaLabel: 'Valor mínimo',
+    maxAriaLabel: 'Valor máximo'
+  },
+  stepper: {
+    ariaLabel: 'Seletor numérico',
+    valueAriaLabel: 'Valor',
+    incrementAriaLabel: 'Aumentar',
+    decrementAriaLabel: 'Diminuir'
   }
 }
 

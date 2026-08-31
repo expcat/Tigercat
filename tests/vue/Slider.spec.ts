@@ -113,15 +113,15 @@ describe('Slider', () => {
 
   describe('Keyboard', () => {
     it.each([
-      ['ArrowRight', 100, 100],
-      ['ArrowLeft', 0, 0]
-    ])('should clamp %s at the boundary', async (key, value, expected) => {
+      ['ArrowRight', 100],
+      ['ArrowLeft', 0]
+    ])('should not emit %s at the boundary', async (key, value) => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
         props: { value: value as number, min: 0, max: 100, 'onUpdate:value': onUpdate }
       })
       await fireEvent.keyDown(getThumb(container), { key: key as string })
-      expect(onUpdate).toHaveBeenCalledWith(expected)
+      expect(onUpdate).not.toHaveBeenCalled()
     })
 
     it('should be focusable', () => {
@@ -176,13 +176,13 @@ describe('Slider', () => {
       expect(thumbs[1]).toHaveAttribute('aria-valuenow', '75')
     })
 
-    it('should render inverted range values as-is (no normalization)', () => {
+    it('should sort inverted range values for rendering', () => {
       const { container } = render(Slider, {
-        props: { value: [60, 40], range: true, min: 0, max: 100 }
+        props: { modelValue: [60, 40], range: true, min: 0, max: 100 }
       })
       const thumbs = getThumbs(container)
-      expect(thumbs[0]).toHaveAttribute('aria-valuenow', '60')
-      expect(thumbs[1]).toHaveAttribute('aria-valuenow', '40')
+      expect(thumbs[0]).toHaveAttribute('aria-valuenow', '40')
+      expect(thumbs[1]).toHaveAttribute('aria-valuenow', '60')
     })
 
     it('should emit an array value in range mode', async () => {
@@ -207,14 +207,22 @@ describe('Slider', () => {
       const { container } = render(Slider, {
         props: { value: 0, min: 0, max: 100, step: 1, 'onUpdate:value': onUpdate }
       })
-      await fireEvent.click(stubTrackRect(container, 200), { clientX: 80 })
+      await fireEvent.pointerDown(stubTrackRect(container, 200), {
+        clientX: 80,
+        pointerId: 1,
+        button: 0
+      })
       expect(onUpdate).toHaveBeenCalledWith(40)
 
       const off = vi.fn()
       const { container: disabled } = render(Slider, {
         props: { value: 0, disabled: true, 'onUpdate:value': off }
       })
-      await fireEvent.click(stubTrackRect(disabled, 200), { clientX: 80 })
+      await fireEvent.pointerDown(stubTrackRect(disabled, 200), {
+        clientX: 80,
+        pointerId: 1,
+        button: 0
+      })
       expect(off).not.toHaveBeenCalled()
     })
 
@@ -230,7 +238,11 @@ describe('Slider', () => {
           'onUpdate:value': onUpdate
         }
       })
-      await fireEvent.click(stubTrackRect(container, 200), { clientX: 60 })
+      await fireEvent.pointerDown(stubTrackRect(container, 200), {
+        clientX: 60,
+        pointerId: 1,
+        button: 0
+      })
       expect(onUpdate.mock.calls.at(-1)![0]).toEqual([30, 80])
     })
   })

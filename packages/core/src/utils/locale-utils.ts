@@ -60,6 +60,8 @@ import type {
   TigerLocaleTagsInput,
   TigerLocaleInputLabels,
   TigerLocaleInputNumber,
+  TigerLocaleSlider,
+  TigerLocaleStepper,
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
@@ -569,4 +571,18 @@ export function getInputNumberLabels(
   overrides?: Partial<TigerLocaleInputNumber>
 ): Required<TigerLocaleInputNumber> {
   return resolveLocaleSection(enSection('inputNumber'), locale?.inputNumber, overrides)
+}
+
+export function getSliderLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSlider>
+): Required<TigerLocaleSlider> {
+  return resolveLocaleSection(enSection('slider'), locale?.slider, overrides)
+}
+
+export function getStepperLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleStepper>
+): Required<TigerLocaleStepper> {
+  return resolveLocaleSection(enSection('stepper'), locale?.stepper, overrides)
 }

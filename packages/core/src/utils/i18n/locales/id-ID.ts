@@ -440,6 +440,17 @@ export const idID: TigerLocale = {
     incrementAriaLabel: 'Naikkan',
     decrementAriaLabel: 'Turunkan',
     emptyAriaValueText: 'Kosong'
+  },
+  slider: {
+    ariaLabel: 'Penggeser',
+    minAriaLabel: 'Nilai terendah',
+    maxAriaLabel: 'Nilai tertinggi'
+  },
+  stepper: {
+    ariaLabel: 'Pengatur angka',
+    valueAriaLabel: 'Nilai',
+    incrementAriaLabel: 'Tambah',
+    decrementAriaLabel: 'Kurangi'
   }
 }
 

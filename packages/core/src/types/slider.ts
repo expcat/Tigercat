@@ -3,6 +3,7 @@
  */
 
 import type { ComponentSize } from './base'
+import type { InputStatus } from './input'
 
 /**
  * Base slider props interface
@@ -67,4 +68,10 @@ export interface SliderProps {
    * @default false
    */
   range?: boolean
+
+  /**
+   * Validation status
+   * @default 'default'
+   */
+  status?: InputStatus
 }

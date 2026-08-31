@@ -440,6 +440,17 @@ export const koKR: TigerLocale = {
     incrementAriaLabel: '증가',
     decrementAriaLabel: '감소',
     emptyAriaValueText: '비어 있음'
+  },
+  slider: {
+    ariaLabel: '슬라이더',
+    minAriaLabel: '최솟값',
+    maxAriaLabel: '최댓값'
+  },
+  stepper: {
+    ariaLabel: '스테퍼',
+    valueAriaLabel: '값',
+    incrementAriaLabel: '증가',
+    decrementAriaLabel: '감소'
   }
 }
 

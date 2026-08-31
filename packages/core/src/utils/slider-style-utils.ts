@@ -3,42 +3,27 @@
  */
 
 import type { ComponentSize } from '../types/base'
+import { classNames } from './class-names'
 
-/**
- * Base classes for Slider component
- */
 export const sliderBaseClasses = 'relative w-full'
 
-/**
- * Slider track classes
- */
-export const sliderTrackClasses = 'bg-[var(--tiger-border,#e5e7eb)] rounded-full'
+export const sliderTrackClasses = 'relative w-full rounded-full bg-[var(--tiger-border,#e5e7eb)]'
 
-/**
- * Slider range (filled portion) classes
- */
-export const sliderRangeClasses = 'bg-[var(--tiger-primary,#2563eb)] rounded-full absolute h-full'
+export const sliderHitAreaClasses = 'relative w-full py-2 min-h-6'
 
-/**
- * Slider thumb classes
- */
+export const sliderRangeClasses =
+  'bg-[var(--tiger-primary,#2563eb)] rounded-full absolute inset-y-0'
+
 export const sliderThumbClasses =
-  'bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer tiger-motion-aware hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
-/**
- * Slider disabled classes
- */
+export const sliderThumbDraggingClasses = '[transition:none] hover:scale-100'
+
 export const sliderDisabledClasses = 'opacity-50 cursor-not-allowed'
 
-/**
- * Slider tooltip classes
- */
 export const sliderTooltipClasses =
   'absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--tiger-text,#111827)] text-[var(--tiger-surface,#ffffff)] rounded whitespace-nowrap pointer-events-none'
 
-/**
- * Slider size-specific classes
- */
 export const sliderSizeClasses: Record<
   ComponentSize,
   {
@@ -64,37 +49,34 @@ export const sliderSizeClasses: Record<
   }
 }
 
-/**
- * Get slider track classes based on size and state
- */
 export function getSliderTrackClasses(
   size: ComponentSize = 'md',
   disabled: boolean = false
 ): string {
-  const sizeClass = sliderSizeClasses[size].track
-  const disabledClass = disabled ? sliderDisabledClasses : ''
-
-  return [sliderTrackClasses, sizeClass, disabledClass].filter(Boolean).join(' ')
+  return classNames(
+    sliderTrackClasses,
+    sliderSizeClasses[size].track,
+    disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+  )
 }
 
-/**
- * Get slider thumb classes based on size and state
- */
 export function getSliderThumbClasses(
   size: ComponentSize = 'md',
-  disabled: boolean = false
+  disabled: boolean = false,
+  dragging: boolean = false
 ): string {
-  const sizeClass = sliderSizeClasses[size].thumb
-  const disabledClass = disabled ? sliderDisabledClasses : ''
-
-  return [sliderThumbClasses, sizeClass, disabledClass].filter(Boolean).join(' ')
+  return classNames(
+    sliderThumbClasses,
+    sliderSizeClasses[size].thumb,
+    dragging && sliderThumbDraggingClasses,
+    disabled && 'cursor-not-allowed'
+  )
 }
 
-/**
- * Get slider tooltip classes based on size
- */
 export function getSliderTooltipClasses(size: ComponentSize = 'md'): string {
-  const sizeClass = sliderSizeClasses[size].tooltip
+  return classNames(sliderTooltipClasses, sliderSizeClasses[size].tooltip)
+}
 
-  return [sliderTooltipClasses, sizeClass].filter(Boolean).join(' ')
+export function getSliderRootClasses(disabled: boolean = false, className?: string): string {
+  return classNames(sliderBaseClasses, disabled && sliderDisabledClasses, className)
 }

@@ -67,7 +67,9 @@ export const TIGER_LOCALE_KEY_SET = {
   inputOtp: true,
   tagsInput: true,
   input: true,
-  inputNumber: true
+  inputNumber: true,
+  slider: true,
+  stepper: true
 } as const satisfies Record<TigerLocaleKey, true>
 
 export const TIGER_LOCALE_KEYS = Object.keys(TIGER_LOCALE_KEY_SET) as TigerLocaleKey[]

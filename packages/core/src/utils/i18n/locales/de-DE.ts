@@ -441,6 +441,17 @@ export const deDE: TigerLocale = {
     incrementAriaLabel: 'Erhöhen',
     decrementAriaLabel: 'Verringern',
     emptyAriaValueText: 'Leer'
+  },
+  slider: {
+    ariaLabel: 'Schieberegler',
+    minAriaLabel: 'Mindestwert',
+    maxAriaLabel: 'Höchstwert'
+  },
+  stepper: {
+    ariaLabel: 'Schrittwähler',
+    valueAriaLabel: 'Wert',
+    incrementAriaLabel: 'Erhöhen',
+    decrementAriaLabel: 'Verringern'
   }
 }
 

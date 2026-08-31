@@ -440,6 +440,17 @@ export const arSA: TigerLocale = {
     incrementAriaLabel: 'زيادة',
     decrementAriaLabel: 'إنقاص',
     emptyAriaValueText: 'فارغ'
+  },
+  slider: {
+    ariaLabel: 'شريط التمرير',
+    minAriaLabel: 'الحد الأدنى',
+    maxAriaLabel: 'الحد الأعلى'
+  },
+  stepper: {
+    ariaLabel: 'عداد الخطوات',
+    valueAriaLabel: 'القيمة',
+    incrementAriaLabel: 'زيادة',
+    decrementAriaLabel: 'إنقاص'
   }
 }
 

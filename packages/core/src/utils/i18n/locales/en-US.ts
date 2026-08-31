@@ -440,5 +440,16 @@ export const enUS: TigerLocale = {
     incrementAriaLabel: 'Increase',
     decrementAriaLabel: 'Decrease',
     emptyAriaValueText: 'Empty'
+  },
+  slider: {
+    ariaLabel: 'Slider',
+    minAriaLabel: 'Minimum value',
+    maxAriaLabel: 'Maximum value'
+  },
+  stepper: {
+    ariaLabel: 'Stepper',
+    valueAriaLabel: 'Value',
+    incrementAriaLabel: 'Increase',
+    decrementAriaLabel: 'Decrease'
   }
 }

@@ -164,13 +164,13 @@ describe('Slider', () => {
         <Slider value={[20, 80]} range aria-label="Brightness" />
       )
       const labelled = getThumbs(withLabel)
-      expect(labelled[0]).toHaveAttribute('aria-label', 'Brightness (min)')
-      expect(labelled[1]).toHaveAttribute('aria-label', 'Brightness (max)')
+      expect(labelled[0]).toHaveAttribute('aria-label', 'Brightness (Minimum value)')
+      expect(labelled[1]).toHaveAttribute('aria-label', 'Brightness (Maximum value)')
 
       const { container: noLabel } = render(<Slider value={[20, 80]} range />)
       const fallback = getThumbs(noLabel)
-      expect(fallback[0]).toHaveAttribute('aria-label', 'Minimum value')
-      expect(fallback[1]).toHaveAttribute('aria-label', 'Maximum value')
+      expect(fallback[0]).toHaveAttribute('aria-label', 'Slider (Minimum value)')
+      expect(fallback[1]).toHaveAttribute('aria-label', 'Slider (Maximum value)')
     })
   })
 
@@ -181,18 +181,18 @@ describe('Slider', () => {
         <Slider value={0} min={0} max={100} step={1} onChange={onChange} />
       )
       stubTrackRect(container, 200)
-      fireEvent.mouseDown(getThumb(container), { clientX: 0 })
-      fireEvent.mouseMove(document, { clientX: 100 })
-      fireEvent.mouseUp(document)
+      fireEvent.pointerDown(getThumb(container), { clientX: 0, pointerId: 1, button: 0 })
+      fireEvent.pointerMove(document, { clientX: 100, pointerId: 1 })
+      fireEvent.pointerUp(document, { clientX: 100, pointerId: 1 })
       expect(onChange.mock.calls.at(-1)![0]).toBe(50)
     })
     it('should not start drag when disabled', () => {
       const onChange = vi.fn()
       const { container } = render(<Slider value={0} disabled onChange={onChange} />)
       stubTrackRect(container, 200)
-      fireEvent.mouseDown(getThumb(container), { clientX: 0 })
-      fireEvent.mouseMove(document, { clientX: 100 })
-      fireEvent.mouseUp(document)
+      fireEvent.pointerDown(getThumb(container), { clientX: 0, pointerId: 1, button: 0 })
+      fireEvent.pointerMove(document, { clientX: 100, pointerId: 1 })
+      fireEvent.pointerUp(document, { clientX: 100, pointerId: 1 })
       expect(onChange).not.toHaveBeenCalled()
     })
 
@@ -207,9 +207,13 @@ describe('Slider', () => {
       stubTrackRect(container, 200)
       const thumbs = getThumbs(container)
 
-      fireEvent.mouseDown(thumbs[index as number], { clientX: from as number })
-      fireEvent.mouseMove(document, { clientX: to as number })
-      fireEvent.mouseUp(document)
+      fireEvent.pointerDown(thumbs[index as number], {
+        clientX: from as number,
+        pointerId: 1,
+        button: 0
+      })
+      fireEvent.pointerMove(document, { clientX: to as number, pointerId: 1 })
+      fireEvent.pointerUp(document, { clientX: to as number, pointerId: 1 })
       expect(onChange.mock.calls.at(-1)![0]).toEqual(expected)
     })
 
@@ -220,9 +224,9 @@ describe('Slider', () => {
       )
       stubTrackRect(container, 200)
       const thumbs = getThumbs(container)
-      fireEvent.mouseDown(thumbs[0], { clientX: 40 })
-      fireEvent.mouseMove(document, { clientX: 180 })
-      fireEvent.mouseUp(document)
+      fireEvent.pointerDown(thumbs[0], { clientX: 40, pointerId: 1, button: 0 })
+      fireEvent.pointerMove(document, { clientX: 180, pointerId: 1 })
+      fireEvent.pointerUp(document, { clientX: 180, pointerId: 1 })
       expect(onChange.mock.calls.at(-1)![0]).toEqual([60, 60])
     })
   })
@@ -233,12 +237,12 @@ describe('Slider', () => {
       const { container } = render(
         <Slider value={0} min={0} max={100} step={1} onChange={onChange} />
       )
-      fireEvent.click(stubTrackRect(container, 200), { clientX: 80 })
+      fireEvent.pointerDown(stubTrackRect(container, 200), { clientX: 80, pointerId: 1, button: 0 })
       expect(onChange).toHaveBeenCalledWith(40)
 
       const off = vi.fn()
       const { container: disabled } = render(<Slider value={0} disabled onChange={off} />)
-      fireEvent.click(stubTrackRect(disabled, 200), { clientX: 80 })
+      fireEvent.pointerDown(stubTrackRect(disabled, 200), { clientX: 80, pointerId: 1, button: 0 })
       expect(off).not.toHaveBeenCalled()
     })
 
@@ -250,7 +254,11 @@ describe('Slider', () => {
       const { container } = render(
         <Slider value={[20, 80]} range min={0} max={100} step={1} onChange={onChange} />
       )
-      fireEvent.click(stubTrackRect(container, 200), { clientX: clientX as number })
+      fireEvent.pointerDown(stubTrackRect(container, 200), {
+        clientX: clientX as number,
+        pointerId: 1,
+        button: 0
+      })
       expect(onChange.mock.calls.at(-1)![0]).toEqual(expected)
     })
   })

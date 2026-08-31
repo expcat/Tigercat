@@ -440,6 +440,17 @@ export const viVN: TigerLocale = {
     incrementAriaLabel: 'Tăng',
     decrementAriaLabel: 'Giảm',
     emptyAriaValueText: 'Trống'
+  },
+  slider: {
+    ariaLabel: 'Thanh trượt',
+    minAriaLabel: 'Giá trị tối thiểu',
+    maxAriaLabel: 'Giá trị tối đa'
+  },
+  stepper: {
+    ariaLabel: 'Bộ đếm bước',
+    valueAriaLabel: 'Giá trị',
+    incrementAriaLabel: 'Tăng',
+    decrementAriaLabel: 'Giảm'
   }
 }
 

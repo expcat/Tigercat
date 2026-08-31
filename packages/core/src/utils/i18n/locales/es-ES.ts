@@ -441,6 +441,17 @@ export const esES: TigerLocale = {
     incrementAriaLabel: 'Aumentar',
     decrementAriaLabel: 'Disminuir',
     emptyAriaValueText: 'Vacío'
+  },
+  slider: {
+    ariaLabel: 'Control deslizante',
+    minAriaLabel: 'Valor mínimo',
+    maxAriaLabel: 'Valor máximo'
+  },
+  stepper: {
+    ariaLabel: 'Contador',
+    valueAriaLabel: 'Valor',
+    incrementAriaLabel: 'Aumentar',
+    decrementAriaLabel: 'Disminuir'
   }
 }
 

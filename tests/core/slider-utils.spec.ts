@@ -3,7 +3,10 @@ import {
   sliderGetKeyboardValue,
   sliderGetPercentage,
   sliderGetValueFromPosition,
-  sliderNormalizeValue
+  sliderNormalizeValue,
+  sliderResolveMarks,
+  sliderSortRange,
+  sliderValuesEqual
 } from '@expcat/tigercat-core'
 
 describe('slider-utils', () => {
@@ -11,6 +14,41 @@ describe('slider-utils', () => {
     expect(sliderNormalizeValue(Number.NaN, 100, 0, 0)).toBe(0)
     expect(sliderNormalizeValue(45, 100, 0, -5)).toBe(45)
     expect(sliderNormalizeValue(47, 0, 100, Number.NaN)).toBe(47)
+  })
+
+  it('snaps with decimal integer arithmetic', () => {
+    expect(sliderNormalizeValue(0.3, 0, 1, 0.1)).toBe(0.3)
+    expect(sliderNormalizeValue(0.1 + 0.2, 0, 1, 0.1)).toBe(0.3)
+  })
+
+  it('takes the first arrow from an unaligned value to the next step', () => {
+    expect(sliderGetKeyboardValue('ArrowRight', 47, 0, 100, 10)).toBe(50)
+    expect(sliderGetKeyboardValue('ArrowLeft', 47, 0, 100, 10)).toBe(40)
+  })
+
+  it('does not walk past min/max', () => {
+    expect(sliderGetKeyboardValue('ArrowRight', 100, 0, 100, 1)).toBe(100)
+    expect(sliderGetKeyboardValue('ArrowLeft', 0, 0, 100, 1)).toBe(0)
+  })
+
+  it('flips inline arrows in RTL', () => {
+    expect(sliderGetKeyboardValue('ArrowRight', 40, 0, 100, 10, undefined, true)).toBe(30)
+    expect(sliderGetKeyboardValue('ArrowLeft', 40, 0, 100, 10, undefined, true)).toBe(50)
+  })
+
+  it('builds step marks when marks is true', () => {
+    expect(sliderResolveMarks(true, 0, 100, 25)).toEqual({
+      0: '0',
+      25: '25',
+      50: '50',
+      75: '75',
+      100: '100'
+    })
+  })
+
+  it('sorts inverted range tuples', () => {
+    expect(sliderSortRange([60, 40])).toEqual([40, 60])
+    expect(sliderValuesEqual([40, 60], [40, 60])).toBe(true)
   })
 
   it('clamps percentages and positions with reversed or invalid ranges', () => {

@@ -440,5 +440,16 @@ export const zhCN: TigerLocale = {
     incrementAriaLabel: '增加',
     decrementAriaLabel: '减少',
     emptyAriaValueText: '空'
+  },
+  slider: {
+    ariaLabel: '滑块',
+    minAriaLabel: '最小值',
+    maxAriaLabel: '最大值'
+  },
+  stepper: {
+    ariaLabel: '步进器',
+    valueAriaLabel: '数值',
+    incrementAriaLabel: '增加',
+    decrementAriaLabel: '减少'
   }
 }

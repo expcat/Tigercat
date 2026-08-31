@@ -1,20 +1,38 @@
-import { defineComponent, computed, ref, watch, watchEffect, h, PropType } from 'vue'
+import { defineComponent, computed, ref, h, inject, onBeforeUnmount, type PropType } from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  callUnknownEventHandler,
   type ComponentSize,
-  sliderBaseClasses,
+  type InputStatus,
   sliderRangeClasses,
+  sliderHitAreaClasses,
+  getSliderRootClasses,
   getSliderTrackClasses,
   getSliderThumbClasses,
   getSliderTooltipClasses,
   sliderGetPercentage,
-  sliderGetValueFromPosition,
+  sliderGetValueFromClientX,
   sliderGetKeyboardValue,
-  sliderResolveMarks
+  sliderResolveMarks,
+  sliderValuesEqual,
+  sliderApplyThumbValue,
+  sliderPickRangeThumb,
+  sliderThumbInsetStyle,
+  sliderRangeFillStyle,
+  sliderSortRange,
+  resolveSliderThumbName,
+  getSliderLabels,
+  mergeAriaDescribedBy,
+  mergeStyleValues,
+  createDocumentDragSession,
+  getElementTextDirection,
+  type DocumentDragSession
 } from '@expcat/tigercat-core'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueSliderProps {
-  value?: number | [number, number]
   modelValue?: number | [number, number]
   defaultValue?: number | [number, number]
   min?: number
@@ -25,440 +43,390 @@ export interface VueSliderProps {
   tooltip?: boolean
   size?: ComponentSize
   range?: boolean
+  status?: InputStatus
   className?: string
   style?: Record<string, string | number>
 }
 
+function displaySliderValue(
+  value: number | [number, number],
+  range: boolean,
+  min: number,
+  max: number
+): number | [number, number] {
+  if (range) {
+    const tuple = Array.isArray(value) ? value : [min, max]
+    const a = Math.min(Math.max(tuple[0], min), max)
+    const b = Math.min(Math.max(tuple[1], min), max)
+    return sliderSortRange([a, b])
+  }
+  const n = typeof value === 'number' ? value : value[0]
+  return Math.min(Math.max(n, min), max)
+}
+
 export const Slider = defineComponent({
   name: 'TigerSlider',
+  inheritAttrs: false,
   props: {
-    /**
-     * Slider value (for v-model:value) - controlled mode
-     */
-    value: {
-      type: [Number, Array] as PropType<number | [number, number]>
-    },
-    /**
-     * Slider value (for default v-model) - controlled mode
-     */
     modelValue: {
       type: [Number, Array] as PropType<number | [number, number]>
     },
-    /**
-     * Default slider value - uncontrolled mode
-     */
+    value: {
+      type: [Number, Array] as PropType<number | [number, number]>
+    },
     defaultValue: {
       type: [Number, Array] as PropType<number | [number, number]>
     },
-    /**
-     * Minimum value
-     * @default 0
-     */
-    min: {
-      type: Number,
-      default: 0
-    },
-    /**
-     * Maximum value
-     * @default 100
-     */
-    max: {
-      type: Number,
-      default: 100
-    },
-    /**
-     * Step size for value changes
-     * @default 1
-     */
-    step: {
-      type: Number,
-      default: 1
-    },
-    /**
-     * Whether the slider is disabled
-     * @default false
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Marks to display (true for default marks or object with custom marks)
-     * @default false
-     */
+    min: { type: Number, default: 0 },
+    max: { type: Number, default: 100 },
+    step: { type: Number, default: 1 },
+    disabled: { type: Boolean, default: false },
     marks: {
       type: [Boolean, Object] as PropType<boolean | Record<number, string>>,
       default: false
     },
-    /**
-     * Show value tooltip on thumb
-     * @default true
-     */
-    tooltip: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Slider size
-     * @default 'md'
-     */
+    tooltip: { type: Boolean, default: true },
     size: {
       type: String as PropType<ComponentSize>,
       default: 'md' as ComponentSize
     },
-    /**
-     * Enable range selection mode
-     * @default false
-     */
-    range: {
-      type: Boolean,
-      default: false
-    },
-
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String,
-      default: undefined
-    },
-
-    /**
-     * Custom styles
-     */
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
+    range: { type: Boolean, default: false },
+    status: { type: String as PropType<InputStatus> },
+    className: { type: String },
+    style: { type: Object as PropType<Record<string, string | number>> }
   },
   emits: {
-    /**
-     * Emitted when value changes (for v-model:value)
-     */
     'update:value': (value: number | [number, number]) =>
       typeof value === 'number' || Array.isArray(value),
-    /**
-     * Emitted when value changes (for default v-model)
-     */
     'update:modelValue': (value: number | [number, number]) =>
       typeof value === 'number' || Array.isArray(value),
-    /**
-     * Emitted when value changes
-     */
     change: (value: number | [number, number]) => typeof value === 'number' || Array.isArray(value)
   },
-  setup(props, { emit, attrs }) {
-    // Prefer explicit `value` (v-model:value) over default `modelValue` (v-model).
-    // An undefined sibling must not wipe a defined bound value.
+  setup(props, { emit, attrs, expose }) {
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
+    const config = useTigerConfig()
+    const labels = computed(() => getSliderLabels(config.value.locale))
+
     const resolveBoundValue = (): number | [number, number] | undefined => {
-      if (props.value !== undefined) return props.value
       if (props.modelValue !== undefined) return props.modelValue
+      if (props.value !== undefined) return props.value
       return undefined
     }
 
-    const getInitialValue = (): number | [number, number] => {
-      const bound = resolveBoundValue()
-      if (bound !== undefined) return bound
-      if (props.defaultValue !== undefined) return props.defaultValue
-      return props.range ? [props.min, props.max] : props.min
-    }
-
     const isControlled = computed(() => resolveBoundValue() !== undefined)
-    const internalValue = ref<number | [number, number]>(getInitialValue())
+    const internalValue = ref<number | [number, number]>(
+      resolveBoundValue() ??
+        props.defaultValue ??
+        (props.range ? [props.min, props.max] : props.min)
+    )
     const currentValue = computed(() =>
       isControlled.value ? (resolveBoundValue() as number | [number, number]) : internalValue.value
     )
+    const displayed = computed(() =>
+      displaySliderValue(currentValue.value, props.range, props.min, props.max)
+    )
+
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
+    )
+    const status = computed<InputStatus>(
+      () => props.status ?? formItemControl?.status.value ?? 'default'
+    )
+
     const isDragging = ref(false)
     const activeThumb = ref<'min' | 'max' | null>(null)
     const showTooltip = ref(false)
+    const focusedThumb = ref<'min' | 'max' | 'single' | null>(null)
     const trackElement = ref<HTMLElement | null>(null)
+    const rootElement = ref<HTMLElement | null>(null)
+    const thumbElement = ref<HTMLElement | null>(null)
+    let dragSession: DocumentDragSession | null = null
+    let activeThumbLive: 'min' | 'max' | null = null
 
-    watch(
-      () => [props.value, props.modelValue] as const,
-      () => {
-        const bound = resolveBoundValue()
-        if (bound !== undefined) {
-          internalValue.value = bound
-        }
-      }
-    )
+    expose({
+      focus: () => thumbElement.value?.focus(),
+      el: rootElement
+    })
 
-    const getPercentage = (val: number): number => sliderGetPercentage(val, props.min, props.max)
-
-    const getValueFromPosition = (clientX: number, el: HTMLElement): number => {
-      const rect = el.getBoundingClientRect()
-      return sliderGetValueFromPosition(
-        clientX - rect.left,
-        rect.width,
-        props.min,
-        props.max,
-        props.step
-      )
+    const commit = (next: number | [number, number]) => {
+      if (sliderValuesEqual(displayed.value, next)) return
+      if (!isControlled.value) internalValue.value = next
+      emit('update:modelValue', next)
+      emit('update:value', next)
+      emit('change', next)
+      formItemControl?.onChange(next)
     }
 
-    // Update value
-    const updateValue = (newValue: number | [number, number]) => {
-      if (!isControlled.value) internalValue.value = newValue
-      emit('update:value', newValue)
-      emit('update:modelValue', newValue)
-      emit('change', newValue)
-    }
-
-    // Handle mouse/touch move
-    const handleMove = (event: MouseEvent | TouchEvent, el: HTMLElement) => {
-      if (props.disabled || !isDragging.value) return
-
-      const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
-      const newValue = getValueFromPosition(clientX, el)
-
-      if (props.range && Array.isArray(currentValue.value)) {
-        const [minVal, maxVal] = currentValue.value
-        if (activeThumb.value === 'min') {
-          updateValue([Math.min(newValue, maxVal), maxVal])
-        } else if (activeThumb.value === 'max') {
-          updateValue([minVal, Math.max(newValue, minVal)])
-        }
-      } else {
-        updateValue(newValue)
-      }
-    }
-
-    // Handle mouse/touch start
-    const handleStart = (event: MouseEvent | TouchEvent, thumb: 'min' | 'max' | null) => {
-      if (props.disabled) return
-
-      event.preventDefault()
-      isDragging.value = true
-      activeThumb.value = thumb
-      showTooltip.value = props.tooltip
-    }
-
-    // Handle mouse/touch end
-    const handleEnd = () => {
+    const stopDrag = () => {
+      dragSession?.dispose()
+      dragSession = null
       isDragging.value = false
       activeThumb.value = null
+      activeThumbLive = null
       showTooltip.value = false
     }
 
-    // Computed styles
-    const trackClasses = computed(() => getSliderTrackClasses(props.size, props.disabled))
+    onBeforeUnmount(stopDrag)
 
-    const rangeStyles = computed(() => {
-      if (props.range && Array.isArray(currentValue.value)) {
-        const [minVal, maxVal] = currentValue.value
-        const left = getPercentage(minVal)
-        const width = getPercentage(maxVal) - left
-        return {
-          left: `${left}%`,
-          width: `${width}%`
-        }
-      } else {
-        const val =
-          typeof currentValue.value === 'number' ? currentValue.value : currentValue.value[0]
-        return {
-          left: '0%',
-          width: `${getPercentage(val)}%`
-        }
-      }
-    })
+    const handlePointerDown = (event: PointerEvent, thumb: 'min' | 'max' | null) => {
+      callUnknownEventHandler(attrs.onPointerdown, event)
+      if (event.defaultPrevented || effectiveDisabled.value) return
+      if (event.button !== 0) return
+      event.preventDefault()
+      const track = trackElement.value
+      if (!track) return
+      const rect = track.getBoundingClientRect()
+      const isRtl = getElementTextDirection(track) === 'rtl'
+      const pointerValue = sliderGetValueFromClientX(
+        event.clientX,
+        rect,
+        props.min,
+        props.max,
+        props.step,
+        isRtl
+      )
+      const current = displayed.value
+      const which =
+        props.range && Array.isArray(current)
+          ? (thumb ?? sliderPickRangeThumb(current, pointerValue))
+          : null
+      activeThumbLive = which
+      activeThumb.value = which
+      isDragging.value = true
+      if (props.tooltip) showTooltip.value = true
+      commit(sliderApplyThumbValue(current, pointerValue, which, props.range))
+      ;(event.currentTarget as HTMLElement).focus()
 
-    const thumbClasses = computed(() => getSliderThumbClasses(props.size, props.disabled))
-
-    const tooltipClasses = computed(() => getSliderTooltipClasses(props.size))
-
-    // Event handlers for dragging
-    const handleTrackMouseMove = (e: MouseEvent) => {
-      if (trackElement.value) handleMove(e, trackElement.value)
+      dragSession?.dispose()
+      dragSession = createDocumentDragSession({
+        startX: event.clientX,
+        startY: event.clientY,
+        ownerDocument: (event.currentTarget as HTMLElement).ownerDocument,
+        pointerId: event.pointerId,
+        pointerTarget: event.currentTarget as Element,
+        onMove: ({ event: moveEvent, currentX }) => {
+          if (moveEvent.cancelable) moveEvent.preventDefault()
+          const box = trackElement.value?.getBoundingClientRect()
+          if (!box) return
+          const dir = getElementTextDirection(trackElement.value) === 'rtl'
+          const moved = sliderGetValueFromClientX(
+            currentX,
+            box,
+            props.min,
+            props.max,
+            props.step,
+            dir
+          )
+          commit(sliderApplyThumbValue(displayed.value, moved, activeThumbLive, props.range))
+        },
+        onEnd: stopDrag
+      })
     }
 
-    const handleTrackTouchMove = (e: TouchEvent) => {
-      if (trackElement.value) handleMove(e, trackElement.value)
-    }
-
-    // Setup event listeners based on dragging state
-    watchEffect((onCleanup) => {
-      if (isDragging.value) {
-        document.addEventListener('mousemove', handleTrackMouseMove)
-        document.addEventListener('mouseup', handleEnd)
-        document.addEventListener('touchmove', handleTrackTouchMove)
-        document.addEventListener('touchend', handleEnd)
-
-        onCleanup(() => {
-          document.removeEventListener('mousemove', handleTrackMouseMove)
-          document.removeEventListener('mouseup', handleEnd)
-          document.removeEventListener('touchmove', handleTrackTouchMove)
-          document.removeEventListener('touchend', handleEnd)
-        })
-      }
-    })
-
-    // Cleanup on component unmount
     return () => {
-      const ariaLabel = (attrs as Record<string, unknown>)['aria-label']
-      const ariaLabelledby = (attrs as Record<string, unknown>)['aria-labelledby']
-      const ariaDescribedby = (attrs as Record<string, unknown>)['aria-describedby']
-
-      const attrsWithoutClassStyle: Record<string, unknown> = { ...attrs }
-      const attrsClass = (attrsWithoutClassStyle as { class?: unknown }).class
-      const attrsStyle = (attrsWithoutClassStyle as { style?: unknown }).style
-
-      delete (attrsWithoutClassStyle as { class?: unknown }).class
-      delete (attrsWithoutClassStyle as { style?: unknown }).style
-
-      // Create thumbs
-      const createThumb = (value: number, thumbType: 'min' | 'max' | null = null) => {
-        const left = getPercentage(value)
-        const showThumbTooltip =
-          showTooltip.value && (thumbType === activeThumb.value || thumbType === null)
-
-        let resolvedAriaLabel: unknown = ariaLabel
-        if (props.range) {
-          if (typeof ariaLabel === 'string') {
-            if (thumbType === 'min') resolvedAriaLabel = `${ariaLabel} (min)`
-            if (thumbType === 'max') resolvedAriaLabel = `${ariaLabel} (max)`
-          } else if (!ariaLabel && !ariaLabelledby) {
-            if (thumbType === 'min') resolvedAriaLabel = 'Minimum value'
-            if (thumbType === 'max') resolvedAriaLabel = 'Maximum value'
-          }
+      const { class: _class, style: _style, onPointerdown: _onPointerdown, ...restAttrs } = attrs
+      const ariaLabel =
+        typeof restAttrs['aria-label'] === 'string'
+          ? (restAttrs['aria-label'] as string)
+          : undefined
+      const attrLabelledby =
+        typeof restAttrs['aria-labelledby'] === 'string'
+          ? (restAttrs['aria-labelledby'] as string)
+          : undefined
+      const labelledby = attrLabelledby?.trim() ? attrLabelledby : formItemControl?.labelId.value
+      const describedBy = mergeAriaDescribedBy(
+        typeof restAttrs['aria-describedby'] === 'string'
+          ? (restAttrs['aria-describedby'] as string)
+          : undefined,
+        formItemControl?.describedBy.value
+      )
+      const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
+      const effectiveId = attrId ?? formItemControl?.id.value
+      const rtl = getElementTextDirection(trackElement.value ?? rootElement.value) === 'rtl'
+      const getPercentage = (val: number) => sliderGetPercentage(val, props.min, props.max)
+      const current = displayed.value
+      const rangeStyles = (() => {
+        if (props.range && Array.isArray(current)) {
+          return sliderRangeFillStyle(getPercentage(current[0]), getPercentage(current[1]), rtl)
         }
+        const val = typeof current === 'number' ? current : current[0]
+        return sliderRangeFillStyle(0, getPercentage(val), rtl)
+      })()
+      const thumbClasses = getSliderThumbClasses(
+        props.size,
+        effectiveDisabled.value,
+        isDragging.value
+      )
+      const tooltipClasses = getSliderTooltipClasses(props.size)
+      const marksObj = sliderResolveMarks(props.marks, props.min, props.max, props.step)
+
+      const createThumb = (
+        value: number,
+        thumbType: 'min' | 'max' | null,
+        name: { ariaLabel?: string; ariaLabelledby?: string },
+        thumbId?: string
+      ) => {
+        const focused =
+          (thumbType === 'min' && focusedThumb.value === 'min') ||
+          (thumbType === 'max' && focusedThumb.value === 'max') ||
+          (thumbType === null && focusedThumb.value === 'single')
+        const showThumbTooltip =
+          props.tooltip &&
+          (showTooltip.value || focused) &&
+          (thumbType === activeThumb.value || thumbType === null)
+        const zIndex =
+          activeThumb.value && thumbType ? (activeThumb.value === thumbType ? 2 : 1) : undefined
 
         return h(
           'div',
           {
-            class: thumbClasses.value,
-            style: { left: `${left}%` },
-            tabindex: props.disabled ? -1 : 0,
+            ref: thumbType === null ? thumbElement : undefined,
+            id: thumbId,
+            class: thumbClasses,
+            style: { ...sliderThumbInsetStyle(getPercentage(value), rtl), zIndex },
+            tabindex: effectiveDisabled.value ? -1 : 0,
             role: 'slider',
             'aria-valuenow': value,
             'aria-valuemin': props.min,
             'aria-valuemax': props.max,
             'aria-orientation': 'horizontal',
-            'aria-disabled': props.disabled,
-            'aria-label': resolvedAriaLabel,
-            'aria-labelledby': ariaLabelledby,
-            'aria-describedby': ariaDescribedby,
-            onMousedown: (e: MouseEvent) => handleStart(e, thumbType),
-            onTouchstart: (e: TouchEvent) => handleStart(e, thumbType),
+            'aria-disabled': effectiveDisabled.value || undefined,
+            'aria-label': name.ariaLabel,
+            'aria-labelledby': name.ariaLabelledby,
+            'aria-describedby': describedBy,
+            'aria-valuetext': String(value),
+            onPointerdown: (e: PointerEvent) => handlePointerDown(e, thumbType),
             onMouseenter: () => {
               if (props.tooltip) showTooltip.value = true
             },
             onMouseleave: () => {
               if (!isDragging.value) showTooltip.value = false
             },
+            onFocus: () => {
+              focusedThumb.value = thumbType ?? 'single'
+            },
+            onBlur: () => {
+              focusedThumb.value = null
+              formItemControl?.onBlur()
+            },
             onKeydown: (e: KeyboardEvent) => {
-              if (props.disabled) return
-
+              if (effectiveDisabled.value) return
+              const isRtl = getElementTextDirection(trackElement.value) === 'rtl'
               const newValue = sliderGetKeyboardValue(
                 e.key,
                 value,
                 props.min,
                 props.max,
-                props.step
+                props.step,
+                undefined,
+                isRtl
               )
-
               if (newValue === null) return
               e.preventDefault()
-
-              if (props.range && Array.isArray(currentValue.value)) {
-                const [minVal, maxVal] = currentValue.value
-                if (thumbType === 'min') {
-                  updateValue([Math.min(newValue, maxVal), maxVal])
-                } else if (thumbType === 'max') {
-                  updateValue([minVal, Math.max(newValue, minVal)])
-                }
-              } else {
-                updateValue(newValue)
-              }
+              commit(sliderApplyThumbValue(displayed.value, newValue, thumbType, props.range))
             }
           },
-          showThumbTooltip && props.tooltip
-            ? h('div', { class: tooltipClasses.value }, value.toString())
-            : undefined
+          showThumbTooltip ? [h('div', { class: tooltipClasses }, String(value))] : undefined
         )
       }
 
-      // Create marks
-      const createMarks = () => {
-        if (!props.marks) return null
+      const singleName = resolveSliderThumbName({
+        thumb: null,
+        range: false,
+        ariaLabel,
+        ariaLabelledby: labelledby,
+        labels: labels.value
+      })
+      const minName = resolveSliderThumbName({
+        thumb: 'min',
+        range: true,
+        ariaLabel,
+        ariaLabelledby: labelledby,
+        labels: labels.value
+      })
+      const maxName = resolveSliderThumbName({
+        thumb: 'max',
+        range: true,
+        ariaLabel,
+        ariaLabelledby: labelledby,
+        labels: labels.value
+      })
 
-        const marks = sliderResolveMarks(props.marks, props.min, props.max)
-        if (Object.keys(marks).length === 0) return null
-
-        return h(
-          'div',
-          { class: 'absolute w-full top-full mt-2' },
-          Object.entries(marks).map(([key, label]) => {
-            const value = Number(key)
-            const left = getPercentage(value)
-            return h(
-              'div',
-              {
-                class: 'absolute text-xs text-[var(--tiger-text-muted,#6b7280)]',
-                style: { left: `${left}%`, transform: 'translateX(-50%)' }
-              },
-              label
+      const thumbs =
+        props.range && Array.isArray(current)
+          ? [
+              createThumb(current[0], 'min', minName, effectiveId),
+              createThumb(current[1], 'max', maxName)
+            ]
+          : createThumb(
+              typeof current === 'number' ? current : current[0],
+              null,
+              singleName,
+              effectiveId
             )
-          })
-        )
-      }
+
+      const markNodes =
+        Object.keys(marksObj).length === 0
+          ? null
+          : h(
+              'div',
+              { class: 'relative w-full mt-2 h-4' },
+              Object.entries(marksObj).map(([key, label]) =>
+                h(
+                  'div',
+                  {
+                    class:
+                      'absolute text-xs text-[var(--tiger-text-muted,#6b7280)] -translate-x-1/2',
+                    style: sliderThumbInsetStyle(getPercentage(Number(key)), rtl)
+                  },
+                  label
+                )
+              )
+            )
 
       return h(
         'div',
         {
-          ...attrsWithoutClassStyle,
-          class: [
-            classNames(sliderBaseClasses, props.disabled && 'cursor-not-allowed', props.className),
-            attrsClass
-          ],
-          style: [props.style, attrsStyle]
+          ...restAttrs,
+          ref: rootElement,
+          class: getSliderRootClasses(
+            effectiveDisabled.value,
+            classNames(props.className, coerceClassValue(attrs.class))
+          ),
+          style: mergeStyleValues(attrs.style, props.style),
+          'data-status': status.value === 'default' ? undefined : status.value
         },
         [
-          // Track
           h(
             'div',
             {
-              ref: trackElement,
-              class: trackClasses.value,
-              onClick: (e: MouseEvent) => {
-                if (props.disabled || !trackElement.value) return
-                const newValue = getValueFromPosition(e.clientX, trackElement.value)
-
-                if (props.range && Array.isArray(currentValue.value)) {
-                  const [minVal, maxVal] = currentValue.value
-                  const distToMin = Math.abs(newValue - minVal)
-                  const distToMax = Math.abs(newValue - maxVal)
-
-                  if (distToMin < distToMax) {
-                    updateValue([newValue, maxVal])
-                  } else {
-                    updateValue([minVal, newValue])
-                  }
-                } else {
-                  updateValue(newValue)
-                }
+              class: sliderHitAreaClasses,
+              onPointerdown: (e: PointerEvent) => {
+                const target = e.target as HTMLElement
+                if (target.closest('[role="slider"]')) return
+                handlePointerDown(e, null)
               }
             },
             [
-              // Range
-              h('div', {
-                class: sliderRangeClasses,
-                style: rangeStyles.value
-              }),
-              // Thumbs
-              props.range && Array.isArray(currentValue.value)
-                ? [
-                    createThumb(currentValue.value[0], 'min'),
-                    createThumb(currentValue.value[1], 'max')
-                  ]
-                : createThumb(
-                    typeof currentValue.value === 'number'
-                      ? currentValue.value
-                      : currentValue.value[0]
-                  )
+              h(
+                'div',
+                {
+                  ref: trackElement,
+                  class: getSliderTrackClasses(props.size, effectiveDisabled.value),
+                  onPointerdown: (e: PointerEvent) => {
+                    const target = e.target as HTMLElement
+                    if (target.closest('[role="slider"]')) return
+                    handlePointerDown(e, null)
+                  }
+                },
+                [h('div', { class: sliderRangeClasses, style: rangeStyles }), thumbs]
+              )
             ]
           ),
-          // Marks
-          createMarks()
+          markNodes
         ]
       )
     }

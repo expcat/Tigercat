@@ -15,4 +15,9 @@ describe('stepper-utils', () => {
     expect(clampStepperValue(1.234, 0, 10, -1)).toBe(1.234)
     expect(clampStepperValue(1.234, 0, 10, Number.POSITIVE_INFINITY)).toBe(1.234)
   })
+
+  it('snaps to step with decimal arithmetic when a step is given', () => {
+    expect(clampStepperValue(0.3, 0, 1, undefined, 0.1)).toBe(0.3)
+    expect(clampStepperValue(0.1 + 0.2, 0, 1, undefined, 0.1)).toBe(0.3)
+  })
 })

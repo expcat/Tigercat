@@ -588,6 +588,26 @@ export interface TigerLocaleInputNumber {
   emptyAriaValueText?: string
 }
 
+/** Slider thumb names. */
+export interface TigerLocaleSlider {
+  /** Default accessible name when none is passed */
+  ariaLabel?: string
+  /** Range thumb name for the lower value */
+  minAriaLabel?: string
+  /** Range thumb name for the upper value */
+  maxAriaLabel?: string
+}
+
+/** Stepper group / spinbutton / step-button labels. */
+export interface TigerLocaleStepper {
+  /** Accessible name for the control group */
+  ariaLabel?: string
+  /** Accessible name for the value spinbutton */
+  valueAriaLabel?: string
+  incrementAriaLabel?: string
+  decrementAriaLabel?: string
+}
+
 export interface TigerLocale {
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
@@ -644,6 +664,8 @@ export interface TigerLocale {
   tagsInput?: TigerLocaleTagsInput
   input?: TigerLocaleInputLabels
   inputNumber?: TigerLocaleInputNumber
+  slider?: TigerLocaleSlider
+  stepper?: TigerLocaleStepper
 }
 
 /**
