@@ -13,6 +13,16 @@ export interface VisibleTreeItem {
   node: TreeNode
 }
 
+/**
+ * Whether a node can expand. `isLeaf: true` never expands, even with children.
+ * Empty children with `isLeaf: false` are loadable when `hasLoadData` is set.
+ */
+export function isTreeNodeExpandable(node: TreeNode, hasLoadData = false): boolean {
+  if (node.isLeaf === true) return false
+  if (node.children && node.children.length > 0) return true
+  return hasLoadData && node.isLeaf === false
+}
+
 export function getVisibleTreeItems(
   treeData: TreeNode[],
   expandedKeys: Set<string | number> = new Set(),
@@ -28,7 +38,12 @@ export function getVisibleTreeItems(
 
       result.push({ key: node.key, level, parentKey, node })
 
-      if (node.children && node.children.length > 0 && expandedKeys.has(node.key)) {
+      if (
+        isTreeNodeExpandable(node) &&
+        node.children &&
+        node.children.length > 0 &&
+        expandedKeys.has(node.key)
+      ) {
         traverse(node.children, level + 1, node.key)
       }
     }
@@ -106,6 +121,8 @@ export interface TreeKeyboardContext {
   selectable: boolean
   /** Whether checkboxes are enabled. */
   checkable: boolean
+  /** Text direction. RTL swaps ArrowLeft / ArrowRight. */
+  dir?: 'ltr' | 'rtl'
 }
 
 /**
@@ -134,7 +151,8 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
     isParentExpanded,
     isChecked,
     selectable,
-    checkable
+    checkable,
+    dir = 'ltr'
   } = ctx
 
   const currentIndex = focusableKeys.findIndex((k) => k === currentKey)
@@ -142,6 +160,8 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
     type: 'focus',
     key: focusableKeys[index] ?? currentKey
   })
+  const intoKey = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+  const outKey = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'
 
   switch (key) {
     case 'ArrowDown':
@@ -152,11 +172,11 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
       return focusAt(0)
     case 'End':
       return focusAt(focusableKeys.length - 1)
-    case 'ArrowRight':
+    case intoKey:
       if (isExpandable && !isExpanded) return { type: 'toggleExpand', key: nodeKey }
       if (isExpandable && isExpanded) return { type: 'focus', key: firstChildKey ?? currentKey }
       return { type: 'none' }
-    case 'ArrowLeft':
+    case outKey:
       if (isExpandable && isExpanded) return { type: 'toggleExpand', key: nodeKey }
       return { type: 'focus', key: parentKey ?? currentKey }
     case 'Escape':

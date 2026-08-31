@@ -33,7 +33,13 @@ export type { VueSwitchProps } from './components/Switch'
 export { Select } from './components/Select'
 export type { VueSelectProps, SelectProps, SelectOption, SelectOptions } from './components/Select'
 export { Cascader } from './components/Cascader'
-export type { VueCascaderProps } from './components/Cascader'
+export type {
+  VueCascaderProps,
+  CascaderProps,
+  CascaderOption,
+  CascaderValue,
+  CascaderModelValue
+} from './components/Cascader'
 export { AutoComplete } from './components/AutoComplete'
 export type {
   VueAutoCompleteProps,
@@ -53,7 +59,7 @@ export type { VueMaskInputProps } from './components/MaskInput'
 export { Transfer } from './components/Transfer'
 export type { VueTransferProps } from './components/Transfer'
 export { TreeSelect } from './components/TreeSelect'
-export type { VueTreeSelectProps } from './components/TreeSelect'
+export type { VueTreeSelectProps, TreeSelectProps, TreeSelectValue } from './components/TreeSelect'
 export { Checkbox } from './components/Checkbox'
 export type { VueCheckboxProps } from './components/Checkbox'
 export { CheckboxGroup } from './components/CheckboxGroup'

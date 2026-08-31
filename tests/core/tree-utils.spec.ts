@@ -379,6 +379,31 @@ describe('getTreeKeyboardAction', () => {
         type: 'none'
       })
     })
+
+    it('swaps into/out keys in RTL', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({
+            key: 'ArrowLeft',
+            nodeKey: 'child-b',
+            isExpandable: true,
+            isExpanded: false,
+            dir: 'rtl'
+          })
+        )
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({
+            key: 'ArrowRight',
+            nodeKey: 'child-b',
+            isExpandable: true,
+            isExpanded: true,
+            dir: 'rtl'
+          })
+        )
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+    })
   })
 
   describe('ArrowLeft', () => {

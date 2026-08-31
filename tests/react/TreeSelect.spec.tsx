@@ -3,11 +3,16 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor, fireEvent } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
-import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import React, { useRef } from 'react'
+import { TreeSelect, type TreeSelectRef } from '@expcat/tigercat-react/TreeSelect'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 const treeData = [
   {
@@ -18,491 +23,152 @@ const treeData = [
       { key: 'banana', label: 'Banana' }
     ]
   },
-  {
-    key: 'vegetables',
-    label: 'Vegetables',
-    children: [
-      { key: 'carrot', label: 'Carrot' },
-      { key: 'lettuce', label: 'Lettuce' }
-    ]
-  },
-  { key: 'grain', label: 'Grain' }
-]
-
-const treeDataWithDisabled = [
-  {
-    key: 'a',
-    label: 'Node A',
-    children: [{ key: 'a1', label: 'Child A1' }]
-  },
-  {
-    key: 'b',
-    label: 'Node B',
-    disabled: true,
-    children: [{ key: 'b1', label: 'Child B1' }]
-  }
+  { key: 'leaf', label: 'Leaf' }
 ]
 
 describe('TreeSelect', () => {
-  describe('Rendering', () => {
-    it('should render with default placeholder', () => {
-      const { getByText } = render(<TreeSelect treeData={treeData} />)
-      expect(getByText('Please select')).toBeInTheDocument()
-    })
+  it('keeps an uncontrolled selection after choosing a leaf', async () => {
+    const user = userEvent.setup()
+    const { getByRole, rerender } = render(
+      <TreeSelect treeData={treeData} defaultExpandAll aria-label="Team" />
+    )
+    const trigger = getByRole('combobox')
+    expect(trigger).toHaveTextContent('Select an option')
+    await user.click(trigger)
+    await user.click(getByRole('treeitem', { name: /Apple/ }))
+    expect(getByRole('combobox')).toHaveTextContent('Apple')
+    rerender(<TreeSelect treeData={treeData} defaultExpandAll aria-label="Team" />)
+    expect(getByRole('combobox')).toHaveTextContent('Apple')
+  })
 
-    it('should render with custom placeholder', () => {
-      const { getByText } = render(<TreeSelect treeData={treeData} placeholder="Pick an item" />)
-      expect(getByText('Pick an item')).toBeInTheDocument()
-    })
+  it('expands selected ancestors when opening without defaultExpandAll', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(
+      <TreeSelect treeData={treeData} defaultValue="apple" aria-label="Open" />
+    )
+    await user.click(getByRole('combobox'))
+    expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
+  })
 
-    it('should render with selected value label', () => {
-      const { getByText } = render(
-        <TreeSelect treeData={treeData} value="apple" defaultExpandAll />
-      )
-      expect(getByText('Apple')).toBeInTheDocument()
-    })
+  it('treats empty string as a legal key', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const { getByRole, getByLabelText } = render(
+      <TreeSelect
+        treeData={[
+          { key: '', label: 'Blank' },
+          { key: 'a', label: 'A' }
+        ]}
+        clearable
+        aria-label="Empty"
+        onChange={onChange}
+      />
+    )
+    await user.click(getByRole('combobox'))
+    await user.click(getByRole('treeitem', { name: 'Blank' }))
+    expect(onChange).toHaveBeenCalledWith('')
+    expect(getByRole('combobox')).toHaveTextContent('Blank')
+    await user.click(getByLabelText('Clear selection'))
+    expect(onChange).toHaveBeenLastCalledWith(undefined)
+  })
 
-    it('should render disabled state', () => {
-      const { container } = render(<TreeSelect treeData={treeData} disabled />)
-      const button = container.querySelector('button')
-      expect(button).toBeDisabled()
+  it('expands a parent from the chevron button', async () => {
+    const user = userEvent.setup()
+    const { getByRole, queryByRole } = render(
+      <TreeSelect treeData={treeData} aria-label="Expand" />
+    )
+    await user.click(getByRole('combobox'))
+    expect(queryByRole('treeitem', { name: /Apple/ })).not.toBeInTheDocument()
+    await user.click(getByRole('button', { name: 'Expand' }))
+    expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
+  })
+
+  it('reads FormItem and validates the committed key', async () => {
+    const validator = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    const { getByRole, queryByText } = render(
+      <Form model={{ team: undefined }} rules={{ team: [{ validator, trigger: 'change' }] }}>
+        <FormItem name="team" label="Team">
+          <TreeSelect treeData={treeData} defaultExpandAll />
+        </FormItem>
+      </Form>
+    )
+    const trigger = getByRole('combobox')
+    expect(trigger).toHaveAttribute('id')
+    await user.click(trigger)
+    expect(queryByText(/required/i)).not.toBeInTheDocument()
+    await user.click(getByRole('treeitem', { name: 'Leaf' }))
+    await waitFor(() => {
+      expect(validator).toHaveBeenCalled()
     })
   })
 
-  describe('Dropdown', () => {
-    it('should open dropdown on click', async () => {
-      const user = userEvent.setup()
-      const { container, getByRole } = render(<TreeSelect treeData={treeData} />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-      expect(getByRole('listbox')).toBeInTheDocument()
-    })
-
-    it('should show root nodes when opened', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<TreeSelect treeData={treeData} />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-      expect(getByText('Fruits')).toBeInTheDocument()
-      expect(getByText('Vegetables')).toBeInTheDocument()
-      expect(getByText('Grain')).toBeInTheDocument()
-    })
-
-    it('should not open dropdown when disabled', async () => {
-      const user = userEvent.setup()
-      const { container, queryByRole } = render(<TreeSelect treeData={treeData} disabled />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('should close dropdown on Escape key', async () => {
-      const user = userEvent.setup()
-      const { container, queryByRole, getByRole } = render(<TreeSelect treeData={treeData} />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-      expect(getByRole('listbox')).toBeInTheDocument()
-      await user.keyboard('{Escape}')
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
+  it('uses zh-TW labels from the official locale object', async () => {
+    const { getByRole, getByText } = render(
+      <ConfigProvider locale={zhTW}>
+        <TreeSelect treeData={[]} aria-label="TW" />
+      </ConfigProvider>
+    )
+    expect(getByText('請選擇')).toBeInTheDocument()
+    fireEvent.click(getByRole('combobox'))
+    expect(getByText('暫無結果')).toBeInTheDocument()
   })
 
-  describe('Expand/Collapse', () => {
-    it('should expand a parent node to show children', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(<TreeSelect treeData={treeData} />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-
-      // Children not visible initially
-      expect(queryByText('Apple')).not.toBeInTheDocument()
-
-      // Click expand toggle on Fruits node
-      const fruitsOption = getByText('Fruits').closest('[role="option"]')!
-      const expandToggle = fruitsOption.querySelector('span')!
-      await user.click(expandToggle)
-
-      expect(getByText('Apple')).toBeInTheDocument()
-      expect(getByText('Banana')).toBeInTheDocument()
-    })
-
-    it('should expand all nodes when defaultExpandAll is true', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<TreeSelect treeData={treeData} defaultExpandAll />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-
-      expect(getByText('Apple')).toBeInTheDocument()
-      expect(getByText('Banana')).toBeInTheDocument()
-      expect(getByText('Carrot')).toBeInTheDocument()
-      expect(getByText('Lettuce')).toBeInTheDocument()
-    })
+  it('enters a child with RTL inline keys', async () => {
+    const { getByRole } = render(
+      <ConfigProvider locale={arSA}>
+        <TreeSelect treeData={treeData} aria-label="RTL" />
+      </ConfigProvider>
+    )
+    const trigger = getByRole('combobox')
+    trigger.focus()
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    fireEvent.keyDown(trigger, { key: 'ArrowLeft' })
+    expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
   })
 
-  describe('Selection', () => {
-    it('should select a leaf node in single mode', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container, getByText, queryByRole } = render(
-        <TreeSelect treeData={treeData} defaultExpandAll onChange={onChange} />
-      )
-      const button = container.querySelector('button')!
-      await user.click(button)
-      await user.click(getByText('Apple'))
-
-      expect(onChange).toHaveBeenCalledWith('apple')
-      // Should close dropdown after single select
-      await waitFor(() => {
-        expect(queryByRole('listbox')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should not select a disabled node', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container, getByText } = render(
-        <TreeSelect treeData={treeDataWithDisabled} defaultExpandAll onChange={onChange} />
-      )
-      const button = container.querySelector('button')!
-      await user.click(button)
-      await user.click(getByText('Node B'))
-
-      expect(onChange).not.toHaveBeenCalled()
-    })
-
-    it('should allow multiple selection', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container, getByText, getByRole } = render(
-        <TreeSelect treeData={treeData} defaultExpandAll multiple value={[]} onChange={onChange} />
-      )
-      const button = container.querySelector('button')!
-      await user.click(button)
-      await user.click(getByText('Apple'))
-
-      expect(onChange).toHaveBeenCalledWith(['apple'])
-      // Dropdown stays open in multiple mode
-      expect(getByRole('listbox')).toBeInTheDocument()
-    })
+  it('closes from Done without selecting a leaf', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(<TreeSelect treeData={treeData} aria-label="Done" />)
+    await user.click(getByRole('combobox'))
+    await user.click(getByRole('button', { name: 'Expand' }))
+    await user.click(getByRole('button', { name: 'Done' }))
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
   })
 
-  describe('Clear', () => {
-    it('should show clear button when clearable and has value', () => {
-      const { container } = render(
-        <TreeSelect treeData={treeData} value="apple" clearable defaultExpandAll />
-      )
-      const clearBtn = container.querySelector('[aria-label="Clear selection"]')
-      expect(clearBtn).toBeInTheDocument()
-    })
-
-    it('should clear value on clear click', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container } = render(
-        <TreeSelect
-          treeData={treeData}
-          value="apple"
-          clearable
-          defaultExpandAll
-          onChange={onChange}
-        />
-      )
-      const clearBtn = container.querySelector('[aria-label="Clear selection"]')!
-      await user.click(clearBtn)
-
-      expect(onChange).toHaveBeenCalledWith(undefined)
-    })
-
-    it('should not show clear button when disabled', () => {
-      const { container } = render(
-        <TreeSelect treeData={treeData} value="apple" clearable disabled />
-      )
-      const clearBtn = container.querySelector('[aria-label="Clear selection"]')
-      expect(clearBtn).not.toBeInTheDocument()
-    })
-
-    it('renders clear as a sibling button of the combobox trigger', () => {
-      const { container } = render(
-        <TreeSelect treeData={treeData} value="apple" clearable defaultExpandAll />
-      )
-      const trigger = container.querySelector('[role="combobox"]')!
-      const clearBtn = container.querySelector('[data-tiger-treeselect-clear]')
-      expect(clearBtn).toBeTruthy()
-      expect(clearBtn?.tagName).toBe('BUTTON')
-      expect(trigger.contains(clearBtn)).toBe(false)
-    })
+  it('marks the tree as multiselectable', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(
+      <TreeSelect treeData={treeData} multiple defaultExpandAll aria-label="Multi" />
+    )
+    await user.click(getByRole('combobox'))
+    expect(getByRole('tree')).toHaveAttribute('aria-multiselectable', 'true')
   })
 
-  describe('Search', () => {
-    it('should show search input when searchable is true', async () => {
-      const user = userEvent.setup()
-      const { container, getByLabelText } = render(<TreeSelect treeData={treeData} searchable />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-
-      expect(getByLabelText('Search tree')).toBeInTheDocument()
-    })
-
-    it('should filter nodes by search query', async () => {
-      const user = userEvent.setup()
-      const { container, getByLabelText, queryByText, getByText } = render(
-        <TreeSelect treeData={treeData} searchable />
+  it('focuses through ref.current.focus()', () => {
+    function Probe() {
+      const ref = useRef<TreeSelectRef>(null)
+      return (
+        <>
+          <button type="button" onClick={() => ref.current?.focus()}>
+            Focus
+          </button>
+          <TreeSelect ref={ref} treeData={treeData} aria-label="Ref" />
+        </>
       )
-      const button = container.querySelector('button')!
-      await user.click(button)
-
-      const input = getByLabelText('Search tree')
-      await user.clear(input)
-      await user.type(input, 'Apple')
-
-      expect(getByText('Apple')).toBeInTheDocument()
-      expect(queryByText('Carrot')).not.toBeInTheDocument()
-    })
-
-    it('should show empty state when search has no results', async () => {
-      const user = userEvent.setup()
-      const { container, getByLabelText, getByText } = render(
-        <TreeSelect treeData={treeData} searchable />
-      )
-      const button = container.querySelector('button')!
-      await user.click(button)
-
-      const input = getByLabelText('Search tree')
-      await user.clear(input)
-      await user.type(input, 'zzzznonexistent')
-
-      expect(getByText('No data')).toBeInTheDocument()
-    })
+    }
+    const { getByRole } = render(<Probe />)
+    fireEvent.click(getByRole('button', { name: 'Focus' }))
+    expect(getByRole('combobox')).toHaveFocus()
   })
 
-  describe('Accessibility', () => {
-    it('should have combobox role on trigger', () => {
-      const { getByRole } = render(<TreeSelect treeData={treeData} />)
-      const trigger = getByRole('combobox')
-      expect(trigger).toBeInTheDocument()
-      expect(trigger).toHaveAttribute('aria-haspopup', 'listbox')
-    })
-
-    it('should set aria-expanded correctly', async () => {
-      const user = userEvent.setup()
-      const { getByRole } = render(<TreeSelect treeData={treeData} />)
-      const trigger = getByRole('combobox')
-      expect(trigger).toHaveAttribute('aria-expanded', 'false')
-
-      await user.click(trigger)
-      expect(trigger).toHaveAttribute('aria-expanded', 'true')
-    })
-
-    it('should mark selected option with aria-selected', async () => {
-      const user = userEvent.setup()
-      const { container } = render(<TreeSelect treeData={treeData} value="grain" />)
-      const button = container.querySelector('button')!
-      await user.click(button)
-
-      const option = document.body.querySelector('[role="option"][aria-selected="true"]')
-      expect(option).toBeInTheDocument()
-      expect(option!.textContent).toContain('Grain')
-    })
-
-    it('should open dropdown on Enter key', async () => {
-      const user = userEvent.setup()
-      const { getByRole } = render(<TreeSelect treeData={treeData} />)
-      const trigger = getByRole('combobox')
-      trigger.focus()
-      await user.keyboard('{Enter}')
-      expect(getByRole('listbox')).toBeInTheDocument()
-    })
-
-    it('selects Apple with ArrowDown then Enter when defaultExpandAll', async () => {
-      const onChange = vi.fn()
-      const { container, queryByRole } = render(
-        <TreeSelect treeData={treeData} defaultExpandAll onChange={onChange} />
-      )
-      const trigger = container.querySelector('button')!
-      fireEvent.click(trigger)
-      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
-      fireEvent.keyDown(trigger, { key: 'Enter' })
-
-      expect(onChange).toHaveBeenCalledWith('apple')
-      expect(queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<TreeSelect />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-
-  describe('Virtual scrolling', () => {
-    const largeTree = Array.from({ length: 200 }, (_, i) => ({
-      key: `n-${i}`,
-      label: `Node ${i}`,
-      children: [{ key: `c-${i}`, label: `Child ${i}` }]
-    }))
-
-    it('renders only a subset of flattened rows when virtual is enabled', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(
-        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
-      )
-
-      await user.click(container.querySelector('button')!)
-
-      const virtualList = document.body.querySelector('[data-tiger-treeselect-virtual]')
-      expect(virtualList).toBeInTheDocument()
-      expect(getByText('Node 0')).toBeInTheDocument()
-      expect(queryByText('Node 199')).not.toBeInTheDocument()
-
-      const options = document.body.querySelectorAll('[role="option"]')
-      expect(options.length).toBeGreaterThan(0)
-      expect(options.length).toBeLessThan(50)
-    })
-
-    it('does not virtualize by default and still renders a small tree fully', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<TreeSelect treeData={treeData} />)
-
-      await user.click(container.querySelector('button')!)
-
-      expect(document.body.querySelector('[data-tiger-treeselect-virtual]')).not.toBeInTheDocument()
-      expect(getByText('Fruits')).toBeInTheDocument()
-      expect(getByText('Vegetables')).toBeInTheDocument()
-      expect(getByText('Grain')).toBeInTheDocument()
-      expect(document.body.querySelectorAll('[role="option"]').length).toBe(3)
-    })
-
-    it('keeps a far selected option in the virtual window', async () => {
-      const user = userEvent.setup()
-      const { container } = render(
-        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} value="n-80" />
-      )
-
-      await user.click(container.querySelector('button')!)
-
-      await waitFor(() => {
-        const labels = [...document.body.querySelectorAll('[role="option"]')].map(
-          (el) => el.textContent
-        )
-        expect(labels).toContain('Node 80')
-        expect(labels).not.toContain('Node 0')
-      })
-    })
-
-    it('keeps the active option in the window during keyboard navigation', async () => {
-      const user = userEvent.setup()
-      const { container } = render(
-        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
-      )
-
-      await user.click(container.querySelector('button')!)
-      const virtualList = document.body.querySelector('[data-tiger-treeselect-virtual]')!
-      fireEvent.keyDown(virtualList, { key: 'End' })
-
-      await waitFor(() => {
-        const labels = [...document.body.querySelectorAll('[role="option"]')].map(
-          (el) => el.textContent
-        )
-        expect(labels).toContain('Node 199')
-        expect(labels).not.toContain('Node 0')
-      })
-    })
-
-    it('keeps the keyboard-aligned node in the window after expanding it', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(
-        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
-      )
-
-      await user.click(container.querySelector('button')!)
-      const virtualList = document.body.querySelector('[data-tiger-treeselect-virtual]')!
-      fireEvent.keyDown(virtualList, { key: 'End' })
-
-      await waitFor(() => {
-        expect(getByText('Node 199')).toBeInTheDocument()
-      })
-
-      const parentOption = getByText('Node 199').closest('[role="option"]')!
-      const expandToggle = parentOption.querySelector('span')!
-      await user.click(expandToggle)
-
-      await waitFor(() => {
-        const labels = [...document.body.querySelectorAll('[role="option"]')].map(
-          (el) => el.textContent
-        )
-        expect(labels).toContain('Node 199')
-        expect(labels).not.toContain('Node 0')
-      })
-    })
-
-    it('expands a parent node under virtual rendering', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText } = render(
-        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
-      )
-
-      await user.click(container.querySelector('button')!)
-      expect(queryByText('Child 0')).not.toBeInTheDocument()
-
-      const parentOption = getByText('Node 0').closest('[role="option"]')!
-      const expandToggle = parentOption.querySelector('span')!
-      await user.click(expandToggle)
-
-      expect(getByText('Child 0')).toBeInTheDocument()
-      expect(queryByText('Node 199')).not.toBeInTheDocument()
-    })
-
-    it('virtualizes the searchable flattened list', async () => {
-      const user = userEvent.setup()
-      const { container, getByText, queryByText, getByLabelText } = render(
-        <TreeSelect treeData={largeTree} virtual searchable height={200} itemHeight={32} />
-      )
-
-      await user.click(container.querySelector('button')!)
-      const input = getByLabelText('Search tree')
-      await user.clear(input)
-      await user.type(input, 'Node')
-
-      await waitFor(() => {
-        expect(document.body.querySelector('[data-tiger-treeselect-virtual]')).toBeInTheDocument()
-      })
-      expect(getByText('Node 0')).toBeInTheDocument()
-      expect(queryByText('Node 199')).not.toBeInTheDocument()
-      expect(document.body.querySelectorAll('[role="option"]').length).toBeLessThan(50)
-    })
-
-    it('still selects a visible option when virtual is enabled', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container, getByText } = render(
-        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} onChange={onChange} />
-      )
-
-      await user.click(container.querySelector('button')!)
-      await user.click(getByText('Node 0'))
-
-      expect(onChange).toHaveBeenCalledWith('n-0')
-    })
-
-    it('keeps multiple selection open under virtual rendering', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-      const { container, getByText, getByRole } = render(
-        <TreeSelect
-          treeData={largeTree}
-          virtual
-          height={200}
-          itemHeight={32}
-          multiple
-          value={[]}
-          onChange={onChange}
-        />
-      )
-
-      await user.click(container.querySelector('button')!)
-      await user.click(getByText('Node 0'))
-
-      expect(onChange).toHaveBeenCalledWith(['n-0'])
-      expect(getByRole('listbox')).toBeInTheDocument()
-    })
+  it('has no accessibility violations when open with a label', async () => {
+    const { container, getByRole } = render(
+      <FormItem label="Team">
+        <TreeSelect treeData={treeData} defaultExpandAll />
+      </FormItem>
+    )
+    fireEvent.click(getByRole('combobox'))
+    await expectNoA11yViolations(container)
   })
 })

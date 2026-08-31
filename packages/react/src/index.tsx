@@ -85,7 +85,8 @@ export { Select } from './components/Select'
 export type { SelectProps, SelectRef, SelectOption, SelectOptions } from './components/Select'
 
 export { Cascader } from './components/Cascader'
-export type { CascaderProps } from './components/Cascader'
+export type { CascaderProps, CascaderRef } from './components/Cascader'
+export type { CascaderOption, CascaderValue, CascaderModelValue } from '@expcat/tigercat-core'
 
 export { AutoComplete } from './components/AutoComplete'
 export type { AutoCompleteProps, AutoCompleteOption } from './components/AutoComplete'
@@ -105,7 +106,8 @@ export { Transfer } from './components/Transfer'
 export type { TransferProps } from './components/Transfer'
 
 export { TreeSelect } from './components/TreeSelect'
-export type { TreeSelectProps } from './components/TreeSelect'
+export type { TreeSelectProps, TreeSelectRef } from './components/TreeSelect'
+export type { TreeSelectValue } from '@expcat/tigercat-core'
 
 export { DatePicker } from './components/DatePicker'
 export type { DatePickerProps } from './components/DatePicker'
