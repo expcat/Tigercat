@@ -83,7 +83,9 @@ describe('PrintLayout', () => {
   it('applies page size class', () => {
     const { container } = render(<PrintLayout pageSize="A4">content</PrintLayout>)
     const el = container.firstElementChild as HTMLElement
-    expect(el.className).toContain('max-w-[210mm]')
+    expect(el.style.width).toBe('210mm')
+    expect(el.style.minHeight).toBe('297mm')
+    expect(el.getAttribute('data-tiger-print')).toContain('A4')
   })
 
   it('applies landscape orientation dimensions', () => {
@@ -93,7 +95,8 @@ describe('PrintLayout', () => {
       </PrintLayout>
     )
     const el = container.firstElementChild as HTMLElement
-    expect(el.className).toContain('max-w-[297mm]')
+    expect(el.style.width).toBe('297mm')
+    expect(el.style.minHeight).toBe('210mm')
   })
 
   it('merges custom className', () => {
@@ -165,8 +168,8 @@ describe('PrintPageBreak', () => {
       </PrintLayout>
     )
     const el = container.querySelector('[aria-hidden="true"]') as HTMLElement
-    expect(el.className).toContain('border-dashed')
     expect(el.className).toContain('print:break-before-page')
+    expect(el.textContent?.trim().length).toBeGreaterThan(0)
   })
 
   it('hides the on-screen indicator but keeps the print break when showPageBreaks is false', () => {
@@ -176,8 +179,8 @@ describe('PrintPageBreak', () => {
       </PrintLayout>
     )
     const el = container.querySelector('[aria-hidden="true"]') as HTMLElement
-    expect(el.className).not.toContain('border-dashed')
     expect(el.className).toContain('print:break-before-page')
+    expect(el.textContent?.trim()).toBe('')
   })
 
   describe('a11y', () => {

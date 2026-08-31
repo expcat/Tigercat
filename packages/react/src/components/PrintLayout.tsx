@@ -1,86 +1,164 @@
-import React, { useMemo, useContext } from 'react'
+import React, {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef
+} from 'react'
 import {
   classNames,
+  getPrintLayoutBoxStyle,
   getPrintLayoutClasses,
-  printLayoutHeaderClasses,
+  getPrintLayoutLabels,
+  getPrintLayoutPageKey,
+  injectPrintLayoutStyles,
+  mergeTigerLocale,
   printLayoutFooterClasses,
+  printLayoutHeaderClasses,
   printLayoutPageBreakClasses,
+  printLayoutPageBreakLabelClasses,
+  printPrintLayoutRoot,
+  resolvePrintPageBox,
+  type PrintLayoutInstance,
+  type PrintLayoutProps as CorePrintLayoutProps,
+  type PrintOrientation,
   type PrintPageSize,
-  type PrintOrientation
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
-/**
- * Shares `showPageBreaks` from a PrintLayout down to nested PrintPageBreak
- * indicators. Defaults to showing indicators when used standalone.
- */
 const PrintLayoutContext = React.createContext<{ showPageBreaks: boolean }>({
   showPageBreaks: true
 })
 
-export interface PrintLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  pageSize?: PrintPageSize
-  orientation?: PrintOrientation
-  showHeader?: boolean
-  showFooter?: boolean
-  headerText?: string
-  footerText?: string
+export type { PrintLayoutInstance }
+
+export interface PrintLayoutProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>, CorePrintLayoutProps {
   headerRender?: React.ReactNode
   footerRender?: React.ReactNode
-  showPageBreaks?: boolean
-  className?: string
   children?: React.ReactNode
+  locale?: Partial<TigerLocale>
 }
 
-export const PrintLayout: React.FC<PrintLayoutProps> = ({
-  pageSize = 'A4',
-  orientation = 'portrait',
-  showHeader = false,
-  showFooter = false,
-  headerText,
-  footerText,
-  headerRender,
-  footerRender,
-  showPageBreaks = true,
-  className,
-  children,
-  ...rest
-}) => {
-  const classes = useMemo(
-    () => getPrintLayoutClasses(pageSize, orientation, className),
-    [pageSize, orientation, className]
+export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(function PrintLayout(
+  {
+    pageSize = 'A4',
+    orientation = 'portrait',
+    showHeader = false,
+    showFooter = false,
+    headerText,
+    footerText,
+    headerRender,
+    footerRender,
+    showPageBreaks = true,
+    pageWidth,
+    pageHeight,
+    className,
+    children,
+    locale,
+    ...rest
+  },
+  ref
+) {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const box = useMemo(
+    () =>
+      resolvePrintPageBox(
+        pageSize as PrintPageSize,
+        orientation as PrintOrientation,
+        pageWidth,
+        pageHeight
+      ),
+    [pageSize, orientation, pageWidth, pageHeight]
+  )
+  const pageKey = getPrintLayoutPageKey(box)
+
+  useEffect(() => {
+    injectPrintLayoutStyles()
+  }, [])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      print: () => printPrintLayoutRoot(rootRef.current),
+      getRoot: () => rootRef.current
+    }),
+    []
   )
 
-  const contextValue = useMemo(() => ({ showPageBreaks }), [showPageBreaks])
+  const header = showHeader ? headerRender || headerText : null
+  const footer = showFooter ? footerRender || footerText : null
 
   return (
-    <PrintLayoutContext.Provider value={contextValue}>
-      <div {...rest} className={classes}>
-        {showHeader && (headerRender || headerText) && (
-          <div className={printLayoutHeaderClasses}>{headerRender || headerText}</div>
-        )}
-        <div className="tiger-print-content">{children}</div>
-        {showFooter && (footerRender || footerText) && (
-          <div className={printLayoutFooterClasses}>{footerRender || footerText}</div>
-        )}
+    <PrintLayoutContext.Provider value={{ showPageBreaks }}>
+      <div
+        {...rest}
+        ref={rootRef}
+        className={getPrintLayoutClasses(className)}
+        style={{ ...getPrintLayoutBoxStyle(box), ...(rest.style as React.CSSProperties) }}
+        data-tiger-print={pageKey}>
+        <table className="w-full border-collapse">
+          {header ? (
+            <thead>
+              <tr>
+                <th className={printLayoutHeaderClasses}>{header}</th>
+              </tr>
+            </thead>
+          ) : null}
+          <tbody>
+            <tr>
+              <td className="tiger-print-content">{children}</td>
+            </tr>
+          </tbody>
+          {footer ? (
+            <tfoot>
+              <tr>
+                <td className={printLayoutFooterClasses}>{footer}</td>
+              </tr>
+            </tfoot>
+          ) : null}
+        </table>
       </div>
     </PrintLayoutContext.Provider>
   )
+})
+
+PrintLayout.displayName = 'PrintLayout'
+
+export interface PrintPageBreakProps extends React.HTMLAttributes<HTMLDivElement> {
+  locale?: Partial<TigerLocale>
 }
 
-export interface PrintPageBreakProps extends React.HTMLAttributes<HTMLDivElement> {}
+export const PrintPageBreak = forwardRef<HTMLDivElement, PrintPageBreakProps>(
+  function PrintPageBreak(
+    { className, locale, children, 'aria-hidden': ariaHidden, ...rest },
+    ref
+  ) {
+    const { showPageBreaks } = useContext(PrintLayoutContext)
+    const config = useTigerConfig()
+    const label = getPrintLayoutLabels(mergeTigerLocale(config.locale, locale)).pageBreak
+    return (
+      <div
+        {...rest}
+        ref={ref}
+        className={classNames('print:break-before-page', className)}
+        aria-hidden={ariaHidden ?? true}>
+        {showPageBreaks ? (
+          <div
+            className={classNames(printLayoutPageBreakClasses, printLayoutPageBreakLabelClasses)}>
+            {children ?? label}
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+)
 
-export const PrintPageBreak: React.FC<PrintPageBreakProps> = (props) => {
-  const { showPageBreaks } = useContext(PrintLayoutContext)
-  return (
-    <div
-      {...props}
-      // Always force the print page break; only show the on-screen dashed indicator
-      // when the enclosing PrintLayout has `showPageBreaks` enabled.
-      className={classNames(
-        showPageBreaks && printLayoutPageBreakClasses,
-        'print:break-before-page'
-      )}
-      aria-hidden="true"
-    />
-  )
-}
+PrintPageBreak.displayName = 'PrintPageBreak'
