@@ -1,7 +1,7 @@
 {
   "id": "color-picker-03",
-  "title": "预设与禁用",
-  "description": "presets 提供快速选色；disabled 锁定为只读展示。",
+  "title": "非受控与透明",
+  "description": "defaultValue 非受控；showAlpha 且 alpha=0 的棋盘格；官方 zhTW 默认触发器名。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }

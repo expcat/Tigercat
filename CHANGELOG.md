@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **ColorPicker / ColorSwatch**：HSV 在拖动期间当事实源，面板有 SV 平面和光谱色相轨；所有操作按 `format` emit（hex+alpha 用 8 位）。未选是 `undefined`，Clear 是 `''`。补 `defaultValue` / `open` / `placement`。预设复用 ColorSwatch。读 FormItem；trigger 是 native button；弹层 dialog + trap + `fullscreen-sm` + Done。假 `--tiger-colorpicker-*` / `--tiger-colorswatch-*` 删掉。方向键读 `dir` 并环绕。勾按亮度选 on-color。
+- **CronEditor**：方言是 5 段数字 unix（0/7 周日，不认名字和 Quartz）。空值是 `''` 不是每分钟。段数不对时不把原文改写成 `* * * * *`。Custom 模式是状态。数字不每键 clamp。读 FormItem；出错写 `aria-invalid`。假 `--tiger-croneditor-*` / `--tiger-danger` 删掉。
 - **TimePicker**：open / 草稿 / range 两步 / Now 下沉 core。列点不立刻 `onChange`，OK 才提交；空值是 `null`。`minTime="09:30"` 能选 09 再选 30。12 小时制小时列含 12；`parseTime` 认 `02:30 PM` / locale dayPeriod。locale 只收官方对象，13 套包带 `timePicker.period`。读 FormItem；打开不当 blur。弹层 dialog + trap + DatePicker 同一套 sheet 遮罩。按断点只挂桌面 listbox 或小屏原生 select。chrome 复用 Input。React `forwardRef` / Vue `expose({ focus, open, close })`。
 - **Cascader**：open / 选中 path / 搜索 / 列焦点下沉 core。非受控 `defaultValue`，未选是 `undefined`。读 FormItem；combobox 在焦点节点上。列导航读 `dir`。`listHeight` 管每一列。小屏全屏有 Done。空态走 `empty.noResults`。React `forwardRef` / Vue `expose({ focus, open, close })`。
 - **TreeSelect**：open / 选中 / 搜索 / expandedKeys 下沉 core，flatten 复用 `tree-utils`。下拉是 tree。键盘走 `getTreeKeyboardAction`（含 `dir`）。读 FormItem。多选 checkbox + `checkStrictly` / `checkStrategy`。空态走 `empty.noResults`。React `forwardRef` / Vue `expose({ focus, open, close })`。

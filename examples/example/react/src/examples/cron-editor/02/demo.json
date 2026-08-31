@@ -1,7 +1,7 @@
 {
   "id": "cron-editor-02",
-  "title": "预设、校验与状态",
-  "description": "支持预设选择、字段可视化编辑和错误提示。",
+  "title": "非法段数与 Custom",
+  "description": "6 段不会被改写成五段；Custom 模式可输入逗号列表。presets=[]。方言是 5 段数字 unix。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

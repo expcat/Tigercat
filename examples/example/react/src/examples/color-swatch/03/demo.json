@@ -1,7 +1,7 @@
 {
   "id": "color-swatch-03",
-  "title": "列数与禁用",
-  "description": "columns 控制每行色块数量；disabled 禁用整组选择。",
+  "title": "RTL 与默认名",
+  "description": "dir=rtl 下的色板；不传 ariaLabel，官方 zhTW 提供 radiogroup 默认名。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }

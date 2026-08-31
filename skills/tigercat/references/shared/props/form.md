@@ -69,33 +69,54 @@ Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发
 
 ## ColorPicker
 
-`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/9 props
+`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 8/24 props
 
-| Prop        | Type                   | Default | Notes                                                  |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------ |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
-| `disabled?` | `boolean`              | `-`     | Whether the picker is disabled                         |
-| `value?`    | `string`               | `-`     | Controlled color value (hex)                           |
+| Prop            | Type          | Default | Notes                                                                                      |
+| --------------- | ------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `string`      | `-`     | Controlled color. `undefined` is unselected; `''` is cleared.                              |
+| `defaultValue?` | `string`      | `-`     | -                                                                                          |
+| `format?`       | `ColorFormat` | `'hex'` | Format of committed values. Hue / SV / alpha / text / presets all emit this format. Hex... |
+| `showAlpha?`    | `boolean`     | `false` | -                                                                                          |
+| `presets?`      | `string[]`    | `-`     | Preset colors rendered with ColorSwatch                                                    |
+| `open?`         | `boolean`     | `-`     | -                                                                                          |
+| `clearable?`    | `boolean`     | `true`  | -                                                                                          |
+| `disabled?`     | `boolean`     | `false` | -                                                                                          |
+
+Events/callback props: `onChange?`, `onOpenChange?`.
 
 ## ColorSwatch
 
-`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 3/9 props
+`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 8/18 props
 
-| Prop        | Type      | Default | Notes |
-| ----------- | --------- | ------- | ----- |
-| `disabled?` | `boolean` | `-`     | -     |
-| `columns?`  | `number`  | `-`     | -     |
-| `value?`    | `string`  | `-`     | -     |
+| Prop            | Type                       | Default | Notes                                                                         |
+| --------------- | -------------------------- | ------- | ----------------------------------------------------------------------------- |
+| `value?`        | `string`                   | `-`     | -                                                                             |
+| `defaultValue?` | `string`                   | `-`     | -                                                                             |
+| `colors?`       | `ColorSwatchOptionInput[]` | `-`     | -                                                                             |
+| `groups?`       | `ColorSwatchGroup[]`       | `-`     | -                                                                             |
+| `columns?`      | `number`                   | `6`     | Visual columns of the **current group** grid. ArrowUp/Down stay in that grid. |
+| `disabled?`     | `boolean`                  | `-`     | -                                                                             |
+| `ariaLabel?`    | `string`                   | `-`     | -                                                                             |
+| `locale?`       | `Partial<TigerLocale>`     | `-`     | Locale object merged on top of ConfigProvider. Do not pass a language id.     |
+
+Events/callback props: `onChange?`.
 
 ## CronEditor
 
-`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 3/10 props
+`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 8/14 props
 
-| Prop        | Type                   | Default | Notes                                                   |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `disabled?` | `boolean`              | `-`     | -                                                       |
-| `value?`    | `string`               | `-`     | -                                                       |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
+| Prop            | Type                   | Default | Notes                                                                      |
+| --------------- | ---------------------- | ------- | -------------------------------------------------------------------------- |
+| `value?`        | `string`               | `-`     | 5-field unix expression. `undefined` is unselected; `''` is cleared empty. |
+| `defaultValue?` | `string`               | `-`     | -                                                                          |
+| `presets?`      | `CronPreset[]`         | `-`     | -                                                                          |
+| `disabled?`     | `boolean`              | `false` | -                                                                          |
+| `readonly?`     | `boolean`              | `false` | -                                                                          |
+| `size?`         | `CronEditorSize`       | `'md'`  | -                                                                          |
+| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale object merged on top of ConfigProvider. Do not pass a language id.  |
+| `name?`         | `string`               | `-`     | -                                                                          |
+
+Events/callback props: `onChange?`, `onValidate?`.
 
 ## DatePicker
 

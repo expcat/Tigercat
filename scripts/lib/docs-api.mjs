@@ -296,6 +296,26 @@ export const COMPONENT_PROP_PRIORITY = {
     'disabledTime?',
     'locale?'
   ],
+  ColorPicker: [
+    'value?',
+    'defaultValue?',
+    'format?',
+    'showAlpha?',
+    'presets?',
+    'open?',
+    'clearable?',
+    'disabled?'
+  ],
+  ColorSwatch: [
+    'value?',
+    'defaultValue?',
+    'colors?',
+    'groups?',
+    'columns?',
+    'disabled?',
+    'ariaLabel?'
+  ],
+  CronEditor: ['value?', 'defaultValue?', 'presets?', 'disabled?', 'readonly?', 'size?', 'locale?'],
   TreeSelect: [
     'treeData?',
     'value?',
@@ -465,7 +485,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Cascader: '<Cascader v-model="value" :options="options" />',
     TreeSelect: '<TreeSelect v-model="value" :tree-data="treeData" />',
     DatePicker: '<DatePicker v-model="value" />',
-    TimePicker: '<TimePicker v-model="value" />'
+    TimePicker: '<TimePicker v-model="value" />',
+    ColorPicker: '<ColorPicker v-model="value" />',
+    ColorSwatch: '<ColorSwatch v-model="value" :colors="colors" />',
+    CronEditor: '<CronEditor v-model="value" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -515,7 +538,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     TreeSelect:
       '<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />',
     DatePicker: '<DatePicker value={date} onChange={setDate} />',
-    TimePicker: '<TimePicker value={value} onChange={setValue} />'
+    TimePicker: '<TimePicker value={value} onChange={setValue} />',
+    ColorPicker: '<ColorPicker value={value} onChange={setValue} />',
+    ColorSwatch: '<ColorSwatch value={value} colors={colors} onChange={setValue} />',
+    CronEditor: '<CronEditor value={value} onChange={setValue} />'
   }
 }
 

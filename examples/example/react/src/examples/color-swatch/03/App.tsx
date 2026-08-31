@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { ColorSwatch } from '@expcat/tigercat-react/ColorSwatch'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 
 const palette = [
   '#0ea5e9',
@@ -16,21 +18,10 @@ export default function App() {
   const [color, setColor] = useState('#22c55e')
 
   return (
-    <div className="space-y-4">
-      <div>
-        <p className="mb-2 text-sm text-gray-500">columns=4</p>
-        <ColorSwatch
-          value={color}
-          onChange={setColor}
-          colors={palette}
-          columns={4}
-          ariaLabel="四列色板"
-        />
+    <ConfigProvider locale={zhTW}>
+      <div className="space-y-4" dir="rtl">
+        <ColorSwatch value={color} onChange={setColor} colors={palette} columns={4} />
       </div>
-      <div>
-        <p className="mb-2 text-sm text-gray-500">disabled</p>
-        <ColorSwatch value={color} colors={palette} columns={8} disabled ariaLabel="禁用色板" />
-      </div>
-    </div>
+    </ConfigProvider>
   )
 }

@@ -1,7 +1,7 @@
 {
   "id": "color-picker-01",
   "title": "代表配置",
-  "description": "单个受控 ColorPicker 组合透明度、RGB 格式、预设色和 lg 尺寸；format 还支持 hex、hsl。",
+  "description": "FormItem 包裹的受控 ColorPicker：透明度、RGB 格式、预设色和 lg 尺寸。旁边回显当前字符串。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

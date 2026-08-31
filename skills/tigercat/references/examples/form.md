@@ -29,6 +29,9 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | Cascader        | `<Cascader v-model="value" :options="options" />`                                                           | `<Cascader value={value} options={options} onChange={(next) => setValue(next)} />`                          |
 | Checkbox        | `<Checkbox v-model="checked">Label</Checkbox>`                                                              | `<Checkbox checked={checked} onChange={setChecked}>Label</Checkbox>`                                        |
 | CheckboxGroup   | `<CheckboxGroup v-model="values"><Checkbox value="a">A</Checkbox></CheckboxGroup>`                          | `<CheckboxGroup value={values} onChange={setValues}><Checkbox value="a">A</Checkbox></CheckboxGroup>`       |
+| ColorPicker     | `<ColorPicker v-model="value" />`                                                                           | `<ColorPicker value={value} onChange={setValue} />`                                                         |
+| ColorSwatch     | `<ColorSwatch v-model="value" :colors="colors" />`                                                          | `<ColorSwatch value={value} colors={colors} onChange={setValue} />`                                         |
+| CronEditor      | `<CronEditor v-model="value" />`                                                                            | `<CronEditor value={value} onChange={setValue} />`                                                          |
 | DatePicker      | `<DatePicker v-model="value" />`                                                                            | `<DatePicker value={date} onChange={setDate} />`                                                            |
 | Form            | `<Form :model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>`                        | `<Form model={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>`      |
 | FormItem        | `<FormItem name="name" label="Name"><Input /></FormItem>`                                                   | `<FormItem name="name" label="Name"><Input /></FormItem>`                                                   |
@@ -47,6 +50,6 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | TimePicker      | `<TimePicker v-model="value" />`                                                                            | `<TimePicker value={value} onChange={setValue} />`                                                          |
 | TreeSelect      | `<TreeSelect v-model="value" :tree-data="treeData" />`                                                      | `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`                      |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：ColorPicker, ColorSwatch, CronEditor, InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, Transfer, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：InputOTP, Mentions, NumberKeyboard, Signature, TagsInput, Transfer, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
