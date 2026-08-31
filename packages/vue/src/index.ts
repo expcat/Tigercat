@@ -380,7 +380,7 @@ export type { VueWatermarkProps } from './components/Watermark'
 export { Tour } from './components/Tour'
 export type { VueTourProps } from './components/Tour'
 export { Affix } from './components/Affix'
-export type { VueAffixProps } from './components/Affix'
+export type { VueAffixProps, AffixProps } from './components/Affix'
 
 // Composables
 export { useChartInteraction } from './composables/useChartInteraction'

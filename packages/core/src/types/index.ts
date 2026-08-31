@@ -13,6 +13,7 @@
 // Base shared interfaces (v1.0+)
 export * from './base'
 export * from './viewport'
+export * from './scroll-root'
 
 // Form components
 export * from './button'

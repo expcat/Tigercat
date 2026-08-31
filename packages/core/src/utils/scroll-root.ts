@@ -5,17 +5,11 @@
  * invalid or missing targets become `window` and `devWarn`, they never throw.
  */
 
+import type { ScrollRootInput } from '../types/scroll-root'
 import { devWarn } from './dev-warn'
 import { isBrowser } from './env'
 
-export type ScrollRootInput =
-  | string
-  | Window
-  | Element
-  | Document
-  | (() => ScrollRootInput | null | undefined)
-  | null
-  | undefined
+export type { ScrollRootInput }
 
 export interface ScrollRootRect {
   top: number

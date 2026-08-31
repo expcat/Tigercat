@@ -1,22 +1,36 @@
-import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  onUpdated,
+  watch,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
-  calculateAffixState,
+  createAffixController,
+  getAffixSentinelStyle,
   resolveScrollRoot,
-  createAffixObserver,
-  type AffixState
+  type AffixState,
+  type ScrollRootInput,
+  AFFIX_UNPINNED_STATE
 } from '@expcat/tigercat-core'
 
 export interface VueAffixProps {
   offsetTop?: number
   offsetBottom?: number
-  target?: string
+  target?: ScrollRootInput
   zIndex?: number
   className?: string
   style?: Record<string, string | number>
 }
+
+export type AffixProps = VueAffixProps
 
 export const Affix = defineComponent({
   name: 'TigerAffix',
@@ -24,7 +38,10 @@ export const Affix = defineComponent({
   props: {
     offsetTop: { type: Number, default: 0 },
     offsetBottom: { type: Number, default: undefined },
-    target: { type: String, default: undefined },
+    target: {
+      type: [String, Object, Function] as PropType<ScrollRootInput>,
+      default: undefined
+    },
     zIndex: { type: Number, default: 10 },
     className: { type: String, default: undefined },
     style: {
@@ -33,147 +50,71 @@ export const Affix = defineComponent({
     }
   },
   emits: ['change'],
-  setup(props, { slots, emit, attrs }) {
+  setup(props, { slots, emit, attrs, expose }) {
     const wrapperRef = ref<HTMLElement | null>(null)
     const sentinelRef = ref<HTMLElement | null>(null)
-    const state = ref<AffixState>({ affixed: false, style: {} })
-    const originalRect = ref<{ top: number; left: number; width: number; height: number } | null>(
-      null
-    )
+    const placeholderRef = ref<HTMLElement | null>(null)
+    const state = ref<AffixState>({ ...AFFIX_UNPINNED_STATE })
 
-    const recalcStyle = (affixed: boolean) => {
-      const el = wrapperRef.value
-      if (!el) return
+    const controller = createAffixController({
+      getSentinel: () => sentinelRef.value,
+      getPlaceholder: () => placeholderRef.value,
+      getContent: () => wrapperRef.value,
+      getTarget: () => props.target,
+      getOffsetTop: () => props.offsetTop,
+      getOffsetBottom: () => props.offsetBottom,
+      getZIndex: () => props.zIndex,
+      onState: (next) => {
+        state.value = next
+      },
+      onChange: (affixed) => emit('change', affixed)
+    })
 
-      // Capture original layout rect when not affixed
-      if (!state.value.affixed) {
-        const rect = el.getBoundingClientRect()
-        originalRect.value = {
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height
-        }
-      }
-      if (!originalRect.value) return
-
+    const resolvedTargetKey = computed(() => {
       const resolved = resolveScrollRoot(props.target)
-      const containerRect = resolved.getRect()
-
-      if (!affixed) {
-        if (state.value.affixed) {
-          state.value = { affixed: false, style: {} }
-          emit('change', false)
-        }
-        return
-      }
-
-      // Force-affixed: build the fixed style using the captured rect.
-      const forcedTop =
-        props.offsetBottom !== undefined
-          ? containerRect.bottom - originalRect.value.height + props.offsetBottom + 1
-          : -1
-      const next = calculateAffixState(
-        {
-          top: forcedTop,
-          left: originalRect.value.left,
-          width: originalRect.value.width,
-          height: originalRect.value.height
-        },
-        containerRect,
-        props.offsetBottom !== undefined ? undefined : props.offsetTop,
-        props.offsetBottom,
-        props.zIndex
-      )
-      if (!next.affixed) {
-        // Calc didn't think we should affix (e.g. container changed). Mirror it.
-        if (state.value.affixed) {
-          state.value = { affixed: false, style: {} }
-          emit('change', false)
-        }
-        return
-      }
-      const wasAffixed = state.value.affixed
-      state.value = next
-      if (!wasAffixed) emit('change', true)
-    }
-
-    let stopObserver: (() => void) | null = null
-    let resizeObserver: ResizeObserver | null = null
-
-    const setupObserver = () => {
-      stopObserver?.()
-      const sentinel = sentinelRef.value
-      if (!sentinel) return
-      const resolved = resolveScrollRoot(props.target)
-      const root = resolved.isWindow ? null : (resolved.target as Element | null)
-      stopObserver = createAffixObserver(sentinel, {
-        offsetTop: props.offsetTop,
-        offsetBottom: props.offsetBottom,
-        root,
-        onToggle: (affixed) => recalcStyle(affixed)
-      })
-    }
-
-    const onResize = () => {
-      if (state.value.affixed) recalcStyle(true)
-    }
+      return resolved.isWindow ? 'window' : resolved.target
+    })
 
     onMounted(() => {
-      setupObserver()
-      if (typeof ResizeObserver !== 'undefined' && wrapperRef.value) {
-        resizeObserver = new ResizeObserver(() => onResize())
-        resizeObserver.observe(wrapperRef.value)
-      }
-      window.addEventListener('resize', onResize, { passive: true })
+      controller.bind()
+    })
+
+    watch([resolvedTargetKey, () => props.offsetTop, () => props.offsetBottom], () => {
+      controller.bind()
     })
 
     watch(
-      () => [props.target, props.offsetTop, props.offsetBottom],
-      () => setupObserver()
+      () => props.zIndex,
+      () => {
+        controller.updateStyle()
+      }
     )
 
+    onUpdated(() => {
+      controller.observeFlow()
+    })
+
     onBeforeUnmount(() => {
-      stopObserver?.()
-      resizeObserver?.disconnect()
-      window.removeEventListener('resize', onResize)
+      controller.unbind()
+    })
+
+    expose({
+      getElement: () => wrapperRef.value
     })
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const children = slots.default?.()
       const useBottom = props.offsetBottom !== undefined
-
-      // offsetTop: sentinel before content (original top). offsetBottom: after
-      // the wrapper, or after the placeholder when affixed (content bottom).
       const sentinel = h('div', {
         ref: sentinelRef,
         'aria-hidden': 'true',
-        style: { display: 'block', width: '0', height: '0', pointerEvents: 'none' }
+        style: getAffixSentinelStyle()
       })
 
-      if (state.value.affixed) {
-        const placeholder = h('div', {
-          style: {
-            width: `${originalRect.value?.width ?? 0}px`,
-            height: `${originalRect.value?.height ?? 0}px`
-          }
-        })
-        const content = h(
-          'div',
-          {
-            ref: wrapperRef,
-            ...attrs,
-            class: classNames(props.className, coerceClassValue(attrsRecord.class)),
-            style: mergeStyleValues(state.value.style, props.style)
-          },
-          children
-        )
-        return h(
-          'div',
-          useBottom ? [placeholder, content, sentinel] : [sentinel, placeholder, content]
-        )
-      }
+      const contentStyle = state.value.affixed
+        ? mergeStyleValues(attrsRecord.style, props.style, state.value.style)
+        : mergeStyleValues(attrsRecord.style, props.style)
 
       const content = h(
         'div',
@@ -181,11 +122,27 @@ export const Affix = defineComponent({
           ref: wrapperRef,
           ...attrs,
           class: classNames(props.className, coerceClassValue(attrsRecord.class)),
-          style: mergeStyleValues(attrsRecord.style, props.style)
+          style: contentStyle
         },
         children
       )
-      return h('div', useBottom ? [content, sentinel] : [sentinel, content])
+
+      const placeholder = state.value.affixed
+        ? h('div', {
+            ref: placeholderRef,
+            'aria-hidden': 'true',
+            style: {
+              width: state.value.placeholder.width,
+              height: state.value.placeholder.height
+            }
+          })
+        : null
+
+      return h(
+        'div',
+        { style: { display: 'contents' } },
+        useBottom ? [placeholder, content, sentinel] : [sentinel, placeholder, content]
+      )
     }
   }
 })

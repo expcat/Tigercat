@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { calculateAffixState } from '@expcat/tigercat-core'
+import { buildAffixRootMargin, calculateAffixState } from '@expcat/tigercat-core'
 
 describe('calculateAffixState', () => {
   it('window-like container keeps offsetBottom as viewport bottom offset', () => {
@@ -40,6 +40,13 @@ describe('calculateAffixState', () => {
     expect(result.style.bottom).toBe('28px')
     expect(result.style.bottom).not.toBe('8px')
     expect(result.style.position).toBe('fixed')
+  })
+
+  it('NaN and negative offsets become 0 in rootMargin', () => {
+    expect(buildAffixRootMargin(Number.NaN, undefined)).toBe('0px 0px 0px 0px')
+    expect(buildAffixRootMargin(undefined, Number.NaN)).toBe('0px 0px -0px 0px')
+    expect(buildAffixRootMargin(undefined, -20)).toBe('0px 0px -0px 0px')
+    expect(buildAffixRootMargin(24, undefined)).toBe('-24px 0px 0px 0px')
   })
 
   it('custom target offsetTop still uses containerRect.top + offset', () => {

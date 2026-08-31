@@ -99,7 +99,7 @@ describe('Affix', () => {
       color: 'red'
     })
     expect(screen.getByTestId('affix-content').previousElementSibling).toHaveStyle({
-      width: '180px',
+      width: '100%',
       height: '36px'
     })
     expect(handleChange).toHaveBeenCalledWith(true)
@@ -304,7 +304,7 @@ describe('Affix', () => {
 
     await waitFor(() => expect(screen.getByTestId('affix-reset').style.position).toBe('fixed'))
     const placeholder = screen.getByTestId('affix-reset').previousElementSibling as HTMLElement
-    expect(placeholder).toHaveStyle({ width: '150px', height: '25px' })
+    expect(placeholder).toHaveStyle({ width: '100%', height: '25px' })
 
     act(() => {
       MockIntersectionObserver.instances[0].trigger({
@@ -329,9 +329,107 @@ describe('Affix', () => {
     expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
   })
 
+  it('does not throw when the target selector is illegal', async () => {
+    expect(() => {
+      render(
+        <Affix target="[" offsetTop={0} data-testid="affix-bad">
+          Content
+        </Affix>
+      )
+    }).not.toThrow()
+
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+    expect(MockIntersectionObserver.instances[0].root).toBeNull()
+  })
+
+  it('follows placeholder width after the parent grows while pinned', async () => {
+    render(
+      <Affix offsetTop={0} data-testid="affix-follow">
+        Header
+      </Affix>
+    )
+
+    const content = screen.getByTestId('affix-follow')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 180, 32))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    act(() => {
+      MockIntersectionObserver.instances[0].trigger({
+        isIntersecting: false,
+        boundingClientRect: new DOMRect(0, -1, 0, 0),
+        rootBounds: new DOMRect(0, 0, 100, 600)
+      })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-follow')).toHaveStyle('position: fixed'))
+    const placeholder = screen.getByTestId('affix-follow').previousElementSibling as HTMLElement
+    expect(placeholder).toHaveStyle({ width: '100%', height: '32px' })
+
+    vi.spyOn(placeholder, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 400, 32))
+    act(() => {
+      MockResizeObserver.instances.at(-1)?.trigger(400, 32)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-follow')).toHaveStyle({ width: '400px' }))
+  })
+
+  it('updates z-index without rebuilding the observer', async () => {
+    const { rerender } = render(
+      <Affix offsetTop={0} zIndex={10} data-testid="affix-z-live">
+        Content
+      </Affix>
+    )
+
+    const content = screen.getByTestId('affix-z-live')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 30))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    act(() => {
+      MockIntersectionObserver.instances[0].trigger({
+        isIntersecting: false,
+        boundingClientRect: new DOMRect(0, -1, 0, 0),
+        rootBounds: new DOMRect(0, 0, 100, 600)
+      })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-z-live')).toHaveStyle({ zIndex: '10' }))
+    const observer = MockIntersectionObserver.instances[0]
+
+    rerender(
+      <Affix offsetTop={0} zIndex={99} data-testid="affix-z-live">
+        Content
+      </Affix>
+    )
+
+    expect(MockIntersectionObserver.instances).toHaveLength(1)
+    expect(observer.disconnect).not.toHaveBeenCalled()
+    await waitFor(() => expect(screen.getByTestId('affix-z-live')).toHaveStyle({ zIndex: '99' }))
+    expect(screen.getByTestId('affix-z-live')).toHaveStyle({ position: 'fixed' })
+  })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Affix />)
+    it('keeps focusable content when pinned', async () => {
+      const { container } = render(
+        <Affix offsetTop={0}>
+          <button type="button">Toolbar</button>
+        </Affix>
+      )
+
+      const button = screen.getByRole('button', { name: 'Toolbar' })
+      const content = button.parentElement as HTMLElement
+      vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 200, 40))
+      await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+      act(() => {
+        MockIntersectionObserver.instances[0].trigger({
+          isIntersecting: false,
+          boundingClientRect: new DOMRect(0, -1, 0, 0),
+          rootBounds: new DOMRect(0, 0, 100, 600)
+        })
+      })
+
+      await waitFor(() => expect(content).toHaveStyle({ position: 'fixed' }))
+      expect(button).not.toHaveAttribute('tabindex', '-1')
       await expectNoA11yViolationsIsolated(container)
     })
   })
