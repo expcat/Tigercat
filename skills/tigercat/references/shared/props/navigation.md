@@ -51,23 +51,25 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Breadcrumb
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 3/5 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 4/7 props
 
-| Prop         | Type                  | Default | Notes                                                                                      |
-| ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `separator?` | `BreadcrumbSeparator` | `'/'`   | Custom separator between breadcrumb items                                                  |
-| `extra?`     | `unknown`             | `-`     | Extra content aligned to the end of the breadcrumb                                         |
-| `maxItems?`  | `number`              | `-`     | Maximum number of visible items before collapsing. When set, middle items are collapsed... |
+| Prop         | Type                   | Default | Notes                                                                                      |
+| ------------ | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `separator?` | `BreadcrumbSeparator`  | `'/'`   | Custom separator between breadcrumb items                                                  |
+| `maxItems?`  | `number`               | `-`     | Maximum number of visible items before collapsing. When set, middle items are collapsed... |
+| `extra?`     | `unknown`              | `-`     | Extra content aligned to the end of the breadcrumb                                         |
+| `locale?`    | `Partial<TigerLocale>` | `-`     | -                                                                                          |
 
 ## BreadcrumbItem
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 3/8 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 4/9 props
 
-| Prop       | Type                                         | Default | Notes                                 |
-| ---------- | -------------------------------------------- | ------- | ------------------------------------- |
-| `href?`    | `string`                                     | `-`     | Navigation link URL                   |
-| `target?`  | `'_blank' \| '_self' \| '_parent' \| '_top'` | `-`     | Link target attribute                 |
-| `current?` | `boolean`                                    | `false` | Whether this is the current/last item |
+| Prop         | Type                  | Default | Notes                                                                                     |
+| ------------ | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `href?`      | `string`              | `-`     | Navigation link URL                                                                       |
+| `current?`   | `boolean`             | `-`     | Marks the current page (`aria-current="page"`). When omitted, the last item is treated... |
+| `separator?` | `BreadcrumbSeparator` | `-`     | Custom separator for this item (overrides global separator)                               |
+| `icon?`      | `unknown`             | `-`     | Icon shown before the item content                                                        |
 
 ## ContextMenu
 
@@ -285,23 +287,31 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## PageHeader
 
-`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 3/11 props
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 6/14 props
 
-| Prop             | Type      | Default  | Notes                                                                                      |
-| ---------------- | --------- | -------- | ------------------------------------------------------------------------------------------ |
-| `showBack?`      | `boolean` | `-`      | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
-| `backHref?`      | `string`  | `-`      | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
-| `backAriaLabel?` | `string`  | `'Back'` | Accessible name for the default back control                                               |
+| Prop             | Type                   | Default | Notes                                                                                      |
+| ---------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `title?`         | `string`               | `-`     | Page title. Rendered as a heading (`h1` by default).                                       |
+| `subTitle?`      | `string`               | `-`     | Secondary text shown beside the title                                                      |
+| `showBack?`      | `boolean`              | `-`     | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
+| `backHref?`      | `string`               | `-`     | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
+| `backAriaLabel?` | `string`               | `-`     | Accessible name for the default back control. Falls back to the locale `pageHeader.back... |
+| `locale?`        | `Partial<TigerLocale>` | `-`     | -                                                                                          |
 
 ## Pagination
 
-`packages/core/src/types/pagination.ts` · `PaginationProps` · 3/22 props
+`packages/core/src/types/pagination.ts` · `PaginationProps` · 8/22 props
 
-| Prop        | Type               | Default | Notes                                                                 |
-| ----------- | ------------------ | ------- | --------------------------------------------------------------------- |
-| `disabled?` | `boolean`          | `false` | Whether pagination is disabled                                        |
-| `locale?`   | `TigerLocaleInput` | `-`     | Locale configuration. Accepts a sync locale, promise, or lazy loader. |
-| `current?`  | `number`           | `1`     | Current page number (1-indexed)                                       |
+| Prop                | Type      | Default | Notes                                                |
+| ------------------- | --------- | ------- | ---------------------------------------------------- |
+| `total?`            | `number`  | `0`     | Total number of items                                |
+| `current?`          | `number`  | `1`     | Current page number (1-indexed)                      |
+| `pageSize?`         | `number`  | `10`    | Number of items per page                             |
+| `simple?`           | `boolean` | `false` | Simple mode - only show prev/next buttons            |
+| `showQuickJumper?`  | `boolean` | `false` | Whether to show quick jumper (input for page number) |
+| `showSizeChanger?`  | `boolean` | `false` | Whether to show page size selector                   |
+| `disabled?`         | `boolean` | `false` | Whether pagination is disabled                       |
+| `hideOnSinglePage?` | `boolean` | `false` | Whether to hide pagination on single page            |
 
 ## ScrollSpy
 
@@ -325,23 +335,29 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## Steps
 
-`packages/core/src/types/steps.ts` · `StepsProps` · 3/9 props
+`packages/core/src/types/steps.ts` · `StepsProps` · 8/12 props
 
-| Prop         | Type             | Default        | Notes                          |
-| ------------ | ---------------- | -------------- | ------------------------------ |
-| `current?`   | `number`         | `0`            | Current step index (0-based)   |
-| `status?`    | `StepStatus`     | `'process'`    | Step status (for current step) |
-| `direction?` | `StepsDirection` | `'horizontal'` | Steps direction/orientation    |
+| Prop         | Type                   | Default        | Notes                                                           |
+| ------------ | ---------------------- | -------------- | --------------------------------------------------------------- |
+| `current?`   | `number`               | `0`            | Current step index (0-based)                                    |
+| `clickable?` | `boolean`              | `false`        | Whether steps are clickable for navigation                      |
+| `status?`    | `StepStatus`           | `'process'`    | Step status (for current step)                                  |
+| `direction?` | `StepsDirection`       | `'horizontal'` | Steps direction/orientation                                     |
+| `simple?`    | `boolean`              | `false`        | Whether to use simple style (no description, smaller icons)     |
+| `size?`      | `StepSize`             | `'default'`    | Step size                                                       |
+| `items?`     | `StepItem[]`           | `-`            | Data-driven items. When set, `StepsItem` children are optional. |
+| `locale?`    | `Partial<TigerLocale>` | `-`            | -                                                               |
 
 ## StepsItem
 
-`packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 3/9 props
+`packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 4/9 props
 
-| Prop           | Type      | Default | Notes                        |
-| -------------- | --------- | ------- | ---------------------------- |
-| `title`        | `string`  | `-`     | Step title                   |
-| `disabled?`    | `boolean` | `-`     | Whether the step is disabled |
-| `description?` | `string`  | `-`     | Step description             |
+| Prop           | Type         | Default | Notes                                    |
+| -------------- | ------------ | ------- | ---------------------------------------- |
+| `title`        | `string`     | `-`     | Step title                               |
+| `status?`      | `StepStatus` | `-`     | Step status (overrides automatic status) |
+| `disabled?`    | `boolean`    | `-`     | Whether the step is disabled             |
+| `description?` | `string`     | `-`     | Step description                         |
 
 ## SubMenu
 
@@ -367,13 +383,18 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## Tabs
 
-`packages/core/src/types/tabs.ts` · `TabsProps` · 3/15 props
+`packages/core/src/types/tabs.ts` · `TabsProps` · 8/18 props
 
-| Prop         | Type                   | Default | Notes                                                           |
-| ------------ | ---------------------- | ------- | --------------------------------------------------------------- |
-| `closable?`  | `boolean`              | `false` | Whether tabs can be closed (only works with editable-card type) |
-| `locale?`    | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale         |
-| `activeKey?` | `string \| number`     | `-`     | Currently active tab key                                        |
+| Prop                      | Type                   | Default  | Notes                                                                                      |
+| ------------------------- | ---------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `activeKey?`              | `string \| number`     | `-`      | Currently active tab key                                                                   |
+| `tabPosition?`            | `TabPosition`          | `'top'`  | Tab position - top, bottom, left, or right                                                 |
+| `closable?`               | `boolean`              | `false`  | Root close switch. Only draws close buttons when `type` is `'editable-card'`. Pane-leve... |
+| `destroyInactiveTabPane?` | `boolean`              | `false`  | Whether to destroy inactive tab panes                                                      |
+| `lazy?`                   | `boolean`              | `false`  | Whether to lazily render tab panes (only render when first activated)                      |
+| `swipeable?`              | `boolean`              | `false`  | Whether touch swipes switch tabs. Off by default so nested scrollers keep their gesture... |
+| `type?`                   | `TabType`              | `'line'` | Tab type: line, card, editable-card, or pills                                              |
+| `locale?`                 | `Partial<TigerLocale>` | `-`      | -                                                                                          |
 
 ## Tree
 

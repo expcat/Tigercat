@@ -65,8 +65,8 @@ export interface PageHeaderProps {
   backHref?: string
 
   /**
-   * Accessible name for the default back control
-   * @default 'Back'
+   * Accessible name for the default back control.
+   * Falls back to the locale `pageHeader.backAriaLabel`.
    */
   backAriaLabel?: string
 

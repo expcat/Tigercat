@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Pagination } from '@expcat/tigercat-vue/Pagination'
-
-const current = ref(1)
-const labels = {
-  totalText: '共 {total} 条记录',
-  itemsPerPageText: '条/页',
-  jumpToText: '跳至',
-  pageText: '页',
-  prevPageAriaLabel: '上一页',
-  nextPageAriaLabel: '下一页'
-}
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 </script>
 
 <template>
-  <Pagination v-model:current="current" :total="96" :labels="labels" show-quick-jumper />
+  <div class="space-y-6">
+    <div>
+      <p class="mb-1 text-sm text-gray-500">zh-CN，不传 labels</p>
+      <ConfigProvider :locale="zhCN">
+        <Pagination :total="96" show-quick-jumper show-size-changer />
+      </ConfigProvider>
+    </div>
+    <div>
+      <p class="mb-1 text-sm text-gray-500">zh-TW</p>
+      <ConfigProvider :locale="zhTW">
+        <Pagination :total="96" show-quick-jumper />
+      </ConfigProvider>
+    </div>
+  </div>
 </template>

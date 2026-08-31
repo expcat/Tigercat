@@ -1,7 +1,7 @@
 {
   "id": "breadcrumb-02",
   "title": "分隔符与图标",
-  "description": "separator 支持 slash/arrow/chevron 及任意自定义字符；BreadcrumbItem 可添加 icon。",
+  "description": "separator 支持 slash/arrow/chevron 及自定义字符。无 href 只有 onClick 的项渲成按钮。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }

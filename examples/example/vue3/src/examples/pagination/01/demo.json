@@ -1,7 +1,7 @@
 {
   "id": "pagination-01",
-  "title": "受控分页",
-  "description": "一个 Pagination 同时受控 current 和 pageSize，并组合快速跳页、每页条数切换与总数显示。",
+  "title": "基础分页",
+  "description": "只传 total 的默认分页。跳页和每页条数见后面的块。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

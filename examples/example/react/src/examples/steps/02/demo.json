@@ -1,7 +1,7 @@
 {
   "id": "steps-02",
-  "title": "纵向步骤",
-  "description": "一个纵向 Steps 用三个必要步骤展示受控 current，并通过上一步、下一步按钮推进流程。",
+  "title": "纵向可点步骤",
+  "description": "纵向 Steps 可点整项（含圆圈）。中间项 error，末项 disabled。也可用上一步/下一步推进。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

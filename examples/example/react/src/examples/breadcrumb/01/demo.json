@@ -1,7 +1,7 @@
 {
   "id": "breadcrumb-01",
   "title": "路径导航",
-  "description": "一个 Breadcrumb 用必要的三级路径组合 chevron 分隔符、当前项和 extra 内容；separator 可替换为其他样式。",
+  "description": "末项不传 current 也会标成当前页。extra 在 landmark 外面。祖先链接 preventDefault，避免把 playground 点走。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

@@ -4,6 +4,10 @@ import { BreadcrumbItem } from '@expcat/tigercat-react/BreadcrumbItem'
 import { Button } from '@expcat/tigercat-react/Button'
 import { PageHeader } from '@expcat/tigercat-react/PageHeader'
 
+function stay(event: { preventDefault: () => void }) {
+  event.preventDefault()
+}
+
 export default function App() {
   const [lastAction, setLastAction] = useState('尚未操作')
 
@@ -12,12 +16,20 @@ export default function App() {
       <PageHeader
         title="商品编辑"
         subTitle="SKU-8848"
-        onBack={() => setLastAction('返回目录')}
+        backHref="#catalog"
+        onBack={(event) => {
+          event.preventDefault()
+          setLastAction('返回目录')
+        }}
         breadcrumb={
           <Breadcrumb separator="chevron">
-            <BreadcrumbItem href="/">首页</BreadcrumbItem>
-            <BreadcrumbItem href="/products">商品</BreadcrumbItem>
-            <BreadcrumbItem current>编辑</BreadcrumbItem>
+            <BreadcrumbItem href="/" onClick={stay}>
+              首页
+            </BreadcrumbItem>
+            <BreadcrumbItem href="/products" onClick={stay}>
+              商品
+            </BreadcrumbItem>
+            <BreadcrumbItem>编辑</BreadcrumbItem>
           </Breadcrumb>
         }
         actions={

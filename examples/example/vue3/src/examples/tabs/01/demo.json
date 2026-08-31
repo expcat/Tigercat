@@ -1,7 +1,7 @@
 {
   "id": "tabs-01",
   "title": "基础标签页",
-  "description": "一个受控 Tabs 用两个必要页签组合 card 类型与 large 尺寸；默认线型可移除 type。",
+  "description": "默认线型 Tabs。第一项 tabKey 用数字，未传 type 和 size。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

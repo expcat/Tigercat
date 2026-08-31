@@ -30,7 +30,7 @@ export interface TabsProps {
    */
   defaultActiveKey?: string | number
   /**
-   * Tab type: `'line' | 'card' | 'editable-card' | 'pills'`
+   * Tab type: line, card, editable-card, or pills
    * @default 'line'
    */
   type?: TabType

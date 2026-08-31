@@ -1,7 +1,7 @@
 {
   "id": "steps-01",
   "title": "横向步骤",
-  "description": "一个横向 Steps 用三个必要步骤组合受控 current、clickable 和 small 尺寸。",
+  "description": "默认横向、不可点、默认尺寸。从第一步开始。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -240,6 +240,32 @@ export const COMPONENT_PROP_PRIORITY = {
   NavigationMenuContent: ['mega?'],
   NavigationMenuList: ['className?'],
   NavigationMenuItem: ['value?', 'disabled?'],
+  Tabs: [
+    'activeKey?',
+    'tabPosition?',
+    'closable?',
+    'destroyInactiveTabPane?',
+    'lazy?',
+    'swipeable?',
+    'type?'
+  ],
+  TabPane: ['tabKey', 'label', 'disabled?', 'closable?'],
+  Breadcrumb: ['separator?', 'maxItems?', 'extra?'],
+  BreadcrumbItem: ['href?', 'current?', 'separator?', 'icon?'],
+  PageHeader: ['title?', 'subTitle?', 'showBack?', 'backHref?', 'backAriaLabel?'],
+  Steps: ['current?', 'clickable?', 'status?', 'direction?', 'simple?', 'size?'],
+  StepsItem: ['title', 'status?', 'disabled?', 'description?'],
+  Pagination: [
+    'total?',
+    'current?',
+    'pageSize?',
+    'simple?',
+    'showQuickJumper?',
+    'showSizeChanger?',
+    'disabled?',
+    'hideOnSinglePage?',
+    'locale?'
+  ],
   Popover: ['trigger?', 'content?', 'placement?', 'open?', 'width?', 'asChild?'],
   Tooltip: ['content?', 'trigger?', 'placement?', 'open?', 'asChild?'],
   Popconfirm: [
@@ -678,7 +704,17 @@ export const REQUIRED_USAGE_SNIPPETS = {
     NavigationMenuContent:
       '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
     NavigationMenuLink:
-      '<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>'
+      '<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>',
+    Tabs: '<Tabs v-model:active-key="activeKey"><TabPane :tab-key="1" label="Overview">Panel</TabPane></Tabs>',
+    TabPane: '<Tabs><TabPane tab-key="1" label="Overview">Panel</TabPane></Tabs>',
+    Breadcrumb:
+      '<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>',
+    BreadcrumbItem:
+      '<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>',
+    PageHeader: '<PageHeader title="订单详情" />',
+    Steps: '<Steps :current="1"><StepsItem title="填写" /><StepsItem title="确认" /></Steps>',
+    StepsItem: '<Steps><StepsItem title="填写" /></Steps>',
+    Pagination: '<Pagination :total="100" :current="1" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -778,7 +814,17 @@ export const REQUIRED_USAGE_SNIPPETS = {
     NavigationMenuContent:
       '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
     NavigationMenuLink:
-      '<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>'
+      '<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>',
+    Tabs: '<Tabs activeKey={activeKey}><TabPane tabKey={1} label="Overview">Panel</TabPane></Tabs>',
+    TabPane: '<Tabs><TabPane tabKey="1" label="Overview">Panel</TabPane></Tabs>',
+    Breadcrumb:
+      '<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>',
+    BreadcrumbItem:
+      '<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>',
+    PageHeader: '<PageHeader title="订单详情" />',
+    Steps: '<Steps current={1}><StepsItem title="填写" /><StepsItem title="确认" /></Steps>',
+    StepsItem: '<Steps><StepsItem title="填写" /></Steps>',
+    Pagination: '<Pagination total={100} current={1} />'
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "id": "page-header-01",
   "title": "返回、标题与操作",
-  "description": "页头左侧是返回按钮加标题/副标题，右侧是操作区。showBack 打开内置 Button 返回控件，点击或键盘激活都会触发 onBack。",
+  "description": "title 渲成 h1。不传 backAriaLabel 时返回钮名走 locale。showBack 打开内置 Button，点击或键盘激活都会触发 onBack。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

@@ -1,12 +1,12 @@
 {
   "id": "pagination-02",
   "title": "本地化分页",
-  "description": "一个受控 Pagination 通过 labels 自定义总数、每页条数、跳页和上一页/下一页无障碍文案。",
+  "description": "不传 labels，用地标和跳页文案对照官方 zh-CN / zh-TW 对象。跳页和每页条数在这一块打开。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 180,
     "maxHeight": 720
   }
 }

@@ -6,16 +6,21 @@ import { Button } from '@expcat/tigercat-vue/Button'
 import { PageHeader } from '@expcat/tigercat-vue/PageHeader'
 
 const lastAction = ref('尚未操作')
+
+function onBack(event: Event) {
+  event.preventDefault()
+  lastAction.value = '返回目录'
+}
 </script>
 
 <template>
   <div class="space-y-3">
-    <PageHeader title="商品编辑" sub-title="SKU-8848" @back="lastAction = '返回目录'">
+    <PageHeader title="商品编辑" sub-title="SKU-8848" back-href="#catalog" @back="onBack">
       <template #breadcrumb>
         <Breadcrumb separator="chevron">
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products">商品</BreadcrumbItem>
-          <BreadcrumbItem current>编辑</BreadcrumbItem>
+          <BreadcrumbItem href="/" @click.prevent>首页</BreadcrumbItem>
+          <BreadcrumbItem href="/products" @click.prevent>商品</BreadcrumbItem>
+          <BreadcrumbItem>编辑</BreadcrumbItem>
         </Breadcrumb>
       </template>
       <template #actions>

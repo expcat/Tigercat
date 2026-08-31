@@ -1,8 +1,8 @@
 {
   "id": "tabs-04",
-  "title": "位置、尺寸与禁用",
-  "description": "tabPosition 放置标签栏（left）；TabPane 可 disabled；size 与 centered 调整密度与对齐。",
+  "title": "位置、禁用与懒渲染",
+  "description": "第一项 disabled 时默认落到下一个启用项；tabPosition 含 left/bottom；lazy 未激活面板不进 DOM。默认不抢面板横滑。",
   "entry": "App.vue",
   "order": 4,
-  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
+  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 720 }
 }

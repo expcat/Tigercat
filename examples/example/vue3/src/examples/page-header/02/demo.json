@@ -1,7 +1,7 @@
 {
   "id": "page-header-02",
   "title": "面包屑与标题",
-  "description": "breadcrumb 插槽放入 Breadcrumb，与标题、操作区共用同一行弹性布局：左回退/路径/标题，右操作。",
+  "description": "backHref 把默认返回渲成 Link。breadcrumb 与标题、操作区共用同一行：左回退/路径/标题，右操作。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

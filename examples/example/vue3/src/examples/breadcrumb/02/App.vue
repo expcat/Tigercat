@@ -6,19 +6,19 @@ import { BreadcrumbItem } from '@expcat/tigercat-vue/BreadcrumbItem'
 <template>
   <div class="space-y-3">
     <Breadcrumb separator="slash">
-      <BreadcrumbItem href="/">首页</BreadcrumbItem>
-      <BreadcrumbItem href="/settings">设置</BreadcrumbItem>
-      <BreadcrumbItem current>账户</BreadcrumbItem>
+      <BreadcrumbItem href="/" @click.prevent>首页</BreadcrumbItem>
+      <BreadcrumbItem href="/settings" @click.prevent>设置</BreadcrumbItem>
+      <BreadcrumbItem>账户</BreadcrumbItem>
     </Breadcrumb>
     <Breadcrumb separator="arrow">
-      <BreadcrumbItem href="/">首页</BreadcrumbItem>
-      <BreadcrumbItem href="/settings">设置</BreadcrumbItem>
-      <BreadcrumbItem current>账户</BreadcrumbItem>
+      <BreadcrumbItem href="/" @click.prevent>首页</BreadcrumbItem>
+      <BreadcrumbItem href="/settings" @click.prevent>设置</BreadcrumbItem>
+      <BreadcrumbItem>账户</BreadcrumbItem>
     </Breadcrumb>
     <Breadcrumb separator="›">
-      <BreadcrumbItem href="/" icon="🏠">首页</BreadcrumbItem>
-      <BreadcrumbItem href="/files" icon="📁">文件</BreadcrumbItem>
-      <BreadcrumbItem current icon="📄">文档</BreadcrumbItem>
+      <BreadcrumbItem href="/" icon="🏠" @click.prevent>首页</BreadcrumbItem>
+      <BreadcrumbItem icon="📁" @click="() => undefined">文件</BreadcrumbItem>
+      <BreadcrumbItem icon="📄">文档</BreadcrumbItem>
     </Breadcrumb>
   </div>
 </template>
