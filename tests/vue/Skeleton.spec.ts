@@ -7,22 +7,20 @@ import { render } from '@testing-library/vue'
 import { Skeleton } from '@expcat/tigercat-vue/Skeleton'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
-const skeletonVariants = ['text', 'avatar', 'image', 'button', 'custom'] as const
-const skeletonAnimations = ['pulse', 'wave', 'none'] as const
-const skeletonShapes = ['circle', 'square'] as const
+function getRoot(container: HTMLElement): HTMLElement {
+  return container.querySelector('[data-tiger-skeleton]') as HTMLElement
+}
+
+function getBars(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll('.tiger-skeleton')) as HTMLElement[]
+}
 
 describe('Skeleton', () => {
-  const getSkeletonElements = (container: HTMLElement) => {
-    return Array.from(container.querySelectorAll('div')).filter((el) =>
-      (el as HTMLElement).className.includes('tiger-skeleton-bg')
-    ) as HTMLElement[]
-  }
-
   describe('Rendering', () => {
     it('should render single skeleton element by default', () => {
       const { container } = renderWithProps(Skeleton, {})
-
-      expect(getSkeletonElements(container)).toHaveLength(1)
+      expect(getBars(container)).toHaveLength(1)
+      expect(getRoot(container)).toBe(getBars(container)[0])
     })
   })
 
@@ -32,9 +30,36 @@ describe('Skeleton', () => {
         width: '300px',
         height: '100px'
       })
+      expect(getRoot(container)).toHaveStyle({ width: '300px', height: '100px' })
+    })
 
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toHaveStyle({ width: '300px', height: '100px' })
+    it('lets style.height win over the text default', () => {
+      const { container } = render(Skeleton, {
+        props: { style: { height: '32px' } }
+      })
+      expect(getRoot(container).style.height).toBe('32px')
+    })
+
+    it('does not give custom a default size', () => {
+      const { container } = renderWithProps(Skeleton, { variant: 'custom' })
+      expect(getRoot(container).style.height).toBe('')
+      expect(getRoot(container).style.width).toBe('')
+    })
+  })
+
+  describe('Animation', () => {
+    it('sweeps a highlight for wave and stays still for none', () => {
+      const wave = render(Skeleton, { props: { animation: 'wave' } })
+      expect(getComputedStyle(getRoot(wave.container)).animationName).toBe('tiger-skeleton-wave')
+      wave.unmount()
+
+      const pulse = render(Skeleton, { props: { animation: 'pulse' } })
+      expect(getComputedStyle(getRoot(pulse.container)).animationName).toBe('tiger-skeleton-pulse')
+      pulse.unmount()
+
+      const none = render(Skeleton, { props: { animation: 'none' } })
+      const noneName = getComputedStyle(getRoot(none.container)).animationName
+      expect(noneName === 'none' || noneName === '').toBe(true)
     })
   })
 
@@ -44,25 +69,36 @@ describe('Skeleton', () => {
         variant: 'text',
         rows: 3
       })
+      expect(getBars(container)).toHaveLength(3)
+    })
 
-      expect(getSkeletonElements(container)).toHaveLength(3)
+    it('keeps className on the root when rows change', async () => {
+      const { container, rerender } = render(Skeleton, {
+        props: { className: 'custom-host' }
+      })
+      expect(getRoot(container).className).toContain('custom-host')
+      await rerender({ className: 'custom-host', rows: 3 })
+      expect(getRoot(container).className).toContain('custom-host')
+      getBars(container).forEach((bar) => {
+        expect(bar.className).not.toContain('custom-host')
+      })
     })
   })
 
   describe('Paragraph Mode', () => {
-    it('should vary row widths in paragraph mode', () => {
+    it('varies row widths inside the caller width', () => {
       const { container } = renderWithProps(Skeleton, {
         variant: 'text',
         rows: 3,
-        paragraph: true
+        paragraph: true,
+        width: '240px'
       })
-
-      const skeletons = getSkeletonElements(container)
-      expect(skeletons).toHaveLength(3)
-
-      // Check that widths are different (paragraph mode applies varying widths)
-      const lastRow = skeletons[skeletons.length - 1] as HTMLElement
-      expect(lastRow.style.width).toBe('60%')
+      const root = getRoot(container)
+      const bars = getBars(container)
+      expect(root.style.width).toBe('240px')
+      expect(bars).toHaveLength(3)
+      expect(bars[2].style.width).toBe('60%')
+      expect(bars[0].style.width).not.toBe(bars[2].style.width)
     })
   })
 
@@ -71,26 +107,9 @@ describe('Skeleton', () => {
       const { container } = renderWithProps(Skeleton, {
         className: 'custom-class'
       })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('tiger-skeleton-bg')
+      const skeleton = getRoot(container)
+      expect(skeleton.className).toContain('tiger-skeleton')
       expect(skeleton.className).toContain('custom-class')
-    })
-
-    it('should apply className to wrapper only in multi-row mode', () => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'text',
-        rows: 3,
-        className: 'custom-wrapper'
-      })
-
-      const wrapper = container.querySelector('.flex.flex-col')
-      expect(wrapper?.className).toContain('custom-wrapper')
-
-      const skeletons = getSkeletonElements(container)
-      skeletons.forEach((skeleton) => {
-        expect(skeleton.className).not.toContain('custom-wrapper')
-      })
     })
   })
 
@@ -98,6 +117,25 @@ describe('Skeleton', () => {
     it('should have no a11y violations with default props', async () => {
       const { container } = render(Skeleton)
       await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('names a live status when aria-label is set', async () => {
+      const { container } = render(Skeleton, {
+        attrs: { 'aria-label': 'Loading profile' }
+      })
+      const root = getRoot(container)
+      expect(root.getAttribute('aria-hidden')).toBeNull()
+      expect(root).toHaveAttribute('role', 'status')
+      expect(root).toHaveAttribute('aria-busy', 'true')
+      expect(root).toHaveAttribute('aria-label', 'Loading profile')
+      await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('treats aria-hidden="false" as visible', () => {
+      const { container } = render(Skeleton, {
+        attrs: { 'aria-hidden': 'false' }
+      })
+      expect(getRoot(container).getAttribute('aria-hidden')).toBe('false')
     })
   })
 })

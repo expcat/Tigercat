@@ -5,8 +5,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   getSkeletonClasses,
+  getSkeletonInlineStyle,
+  resolveSkeletonAriaHidden,
   skeletonAnimationClasses,
-  skeletonBaseClasses
+  skeletonBaseClasses,
+  skeletonVariantSizeClasses
 } from '@expcat/tigercat-core'
 
 const OLD_LOCKED_SKELETON_BG = '--tiger-skeleton-bg,#e5e7eb'
@@ -27,17 +30,17 @@ describe('skeleton-utils surface-muted bars', () => {
     expect(classes).not.toContain(OLD_LOCKED_SKELETON_BG)
   })
 
-  it('uses the same surface-muted chain for wave from/to, not locked gray-200', () => {
+  it('uses the same surface-muted chain for wave, not locked gray-200', () => {
     const wave = skeletonAnimationClasses.wave
-    expect(wave).toContain('--tiger-surface-muted')
-    expect(wave).toContain('from-[var(--tiger-skeleton-bg,var(--tiger-surface-muted')
-    expect(wave).toContain('to-[var(--tiger-skeleton-bg,var(--tiger-surface-muted')
+    expect(wave).not.toContain('animate-pulse')
+    expect(wave).toContain('tiger-skeleton-wave')
+    expect(wave).toContain('tiger-motion-aware')
     expect(wave).not.toContain(OLD_LOCKED_SKELETON_BG)
     expect(wave).not.toContain('--tiger-fill')
 
     const classes = getSkeletonClasses('text', 'wave')
-    expect(classes).toContain('--tiger-surface-muted')
-    expect(classes).toContain(wave)
+    expect(classes).toContain('tiger-skeleton-wave')
+    expect(classes).not.toContain('animate-pulse')
     expect(classes).not.toContain(OLD_LOCKED_SKELETON_BG)
   })
 
@@ -45,6 +48,42 @@ describe('skeleton-utils surface-muted bars', () => {
     const wave = skeletonAnimationClasses.wave
     expect(wave).not.toContain('#d1d5db')
     expect(wave).not.toContain(OLD_LOCKED_SKELETON_BG_ALT)
-    expect(wave).toContain('--tiger-skeleton-bg-alt')
+  })
+
+  it('keeps pulse as opacity motion, also reduced-motion aware', () => {
+    expect(skeletonAnimationClasses.pulse).toContain('tiger-skeleton-pulse')
+    expect(skeletonAnimationClasses.pulse).toContain('tiger-motion-aware')
+    expect(skeletonAnimationClasses.pulse).not.toContain('tiger-skeleton-wave')
+  })
+})
+
+describe('skeleton sizing', () => {
+  it('does not inline default width or height', () => {
+    expect(getSkeletonInlineStyle()).toBeUndefined()
+    expect(getSkeletonInlineStyle(undefined, undefined)).toBeUndefined()
+  })
+
+  it('only inlines caller width and height', () => {
+    expect(getSkeletonInlineStyle('80%', '32px')).toEqual({ width: '80%', height: '32px' })
+    expect(getSkeletonInlineStyle(undefined, '32px')).toEqual({ height: '32px' })
+  })
+
+  it('gives custom no default size and skips size classes when props are set', () => {
+    expect(skeletonVariantSizeClasses.custom).toEqual({})
+    const custom = getSkeletonClasses('custom')
+    expect(custom).not.toContain('h-4')
+    expect(custom).not.toContain('w-full')
+
+    const withHeight = getSkeletonClasses('text', 'pulse', 'circle', { height: '32px' })
+    expect(withHeight).not.toContain('h-4')
+  })
+})
+
+describe('resolveSkeletonAriaHidden', () => {
+  it('treats string false as visible, matching React', () => {
+    expect(resolveSkeletonAriaHidden('false', false)).toBe(false)
+    expect(resolveSkeletonAriaHidden('true', false)).toBe(true)
+    expect(resolveSkeletonAriaHidden(undefined, false)).toBe(true)
+    expect(resolveSkeletonAriaHidden(undefined, true)).toBeUndefined()
   })
 })

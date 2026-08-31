@@ -3,8 +3,10 @@ import {
   classNames,
   coerceClassValue,
   getSkeletonClasses,
-  getSkeletonDimensions,
+  getSkeletonInlineStyle,
   getParagraphRowWidth,
+  isSkeletonNamed,
+  resolveSkeletonAriaHidden,
   mergeStyleValues,
   type SkeletonVariant,
   type SkeletonAnimation,
@@ -58,42 +60,45 @@ export const Skeleton = defineComponent({
     }
   },
   setup(props, { attrs }) {
-    const visualClasses = computed(() =>
-      getSkeletonClasses(props.variant, props.animation, props.shape)
-    )
-
-    const dimensions = computed(() =>
-      getSkeletonDimensions(props.variant, props.width, props.height)
-    )
+    const visualOptions = computed(() => ({
+      width: props.width,
+      height: props.height
+    }))
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
-      const hasAriaLabel =
-        typeof attrsRecord['aria-label'] === 'string' ||
-        typeof attrsRecord['aria-labelledby'] === 'string'
-      const ariaHiddenRaw = attrsRecord['aria-hidden']
-      const computedAriaHidden =
-        typeof ariaHiddenRaw === 'boolean' ? ariaHiddenRaw : hasAriaLabel ? undefined : true
+      const named = isSkeletonNamed(attrsRecord['aria-label'], attrsRecord['aria-labelledby'])
+      const computedAriaHidden = resolveSkeletonAriaHidden(attrsRecord['aria-hidden'], named)
+      const namedStatus = named && computedAriaHidden !== true
+      const inlineStyle = getSkeletonInlineStyle(props.width, props.height)
+      const a11y = {
+        'aria-hidden': computedAriaHidden,
+        role: namedStatus ? 'status' : undefined,
+        'aria-busy': namedStatus ? true : undefined
+      }
 
-      // Multi-row text variant
       if (props.variant === 'text' && props.rows > 1) {
         const rows = []
         for (let i = 0; i < props.rows; i++) {
-          const rowStyle: Record<string, string> = {
-            height: dimensions.value.height
-          }
+          const rowStyle: Record<string, string> = {}
           if (props.paragraph) {
             rowStyle.width = getParagraphRowWidth(i, props.rows)
-          } else if (dimensions.value.width) {
-            rowStyle.width = dimensions.value.width
           }
+          if (props.height) rowStyle.height = props.height
           rows.push(
             h('div', {
               key: i,
-              class: classNames(visualClasses.value, i < props.rows - 1 && 'mb-2'),
-              style: rowStyle
+              class: classNames(
+                getSkeletonClasses(props.variant, props.animation, props.shape, {
+                  height: props.height,
+                  omitWidth: true
+                }),
+                !props.paragraph && 'w-full',
+                i < props.rows - 1 && 'mb-2'
+              ),
+              style: Object.keys(rowStyle).length > 0 ? rowStyle : undefined
             })
           )
         }
@@ -102,24 +107,30 @@ export const Skeleton = defineComponent({
           'div',
           {
             ...attrs,
-            class: classNames('flex flex-col', props.className, coerceClassValue(attrsClass)),
-            style: mergeStyleValues(attrsStyle, props.style),
-            'aria-hidden': computedAriaHidden
+            class: classNames(
+              'flex flex-col',
+              !props.width && 'w-full',
+              props.className,
+              coerceClassValue(attrsClass)
+            ),
+            style: mergeStyleValues(inlineStyle, attrsStyle, props.style),
+            'data-tiger-skeleton': '',
+            ...a11y
           },
           rows
         )
       }
 
-      // Single skeleton element
-      const dim = dimensions.value
       return h('div', {
         ...attrs,
-        class: classNames(visualClasses.value, props.className, coerceClassValue(attrsClass)),
-        style: mergeStyleValues(attrsStyle, props.style, {
-          ...(dim.width ? { width: dim.width } : undefined),
-          height: dim.height
-        }),
-        'aria-hidden': computedAriaHidden
+        class: classNames(
+          getSkeletonClasses(props.variant, props.animation, props.shape, visualOptions.value),
+          props.className,
+          coerceClassValue(attrsClass)
+        ),
+        style: mergeStyleValues(inlineStyle, attrsStyle, props.style),
+        'data-tiger-skeleton': '',
+        ...a11y
       })
     }
   }
