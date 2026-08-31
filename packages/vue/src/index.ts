@@ -412,7 +412,7 @@ export type { VueVirtualTableProps } from './components/VirtualTable'
 
 // InfiniteScroll (v0.8.0+)
 export { InfiniteScroll } from './components/InfiniteScroll'
-export type { VueInfiniteScrollProps } from './components/InfiniteScroll'
+export type { VueInfiniteScrollProps, InfiniteScrollProps } from './components/InfiniteScroll'
 
 // FileManager (v0.8.0+)
 export { FileManager } from './components/FileManager'

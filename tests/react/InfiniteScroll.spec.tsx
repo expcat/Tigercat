@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import React from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('InfiniteScroll (React)', () => {
   it('renders children', () => {
@@ -129,16 +129,117 @@ describe('InfiniteScroll (React)', () => {
     expect(container.firstElementChild).toBeTruthy()
   })
 
-  it('sentinel has height 0 and is hidden', () => {
+  it('gives the sentinel a non-zero area', () => {
     const { container } = render(<InfiniteScroll hasMore />)
     const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
-    expect(sentinel.style.height).toBe('0px')
+    expect(Number.parseInt(sentinel.style.height, 10)).toBeGreaterThan(0)
     expect(sentinel.style.overflow).toBe('hidden')
   })
+
+  it('gives a horizontal sentinel width and height', () => {
+    const { container } = render(<InfiniteScroll hasMore direction="horizontal" />)
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
+    expect(Number.parseInt(sentinel.style.width, 10)).toBeGreaterThan(0)
+    expect(sentinel.style.height).toBe('100%')
+  })
+
+  it('puts end chrome on the start edge when inverse', () => {
+    const { container } = render(
+      <InfiniteScroll hasMore={false} loading={false} inverse>
+        <div data-testid="content">Content</div>
+      </InfiniteScroll>
+    )
+    const children = Array.from(container.firstElementChild?.children ?? [])
+    const endIdx = children.findIndex((node) => node.textContent === 'No more data')
+    const contentIdx = children.findIndex((node) => node.getAttribute('data-testid') === 'content')
+    expect(endIdx).toBeGreaterThanOrEqual(0)
+    expect(endIdx).toBeLessThan(contentIdx)
+  })
+
+  it('forwards data attributes and height onto the scroller', () => {
+    const { getByTestId } = render(
+      <InfiniteScroll data-testid="feed" height={288} hasMore>
+        <div>row</div>
+      </InfiniteScroll>
+    )
+    expect(getByTestId('feed').style.height).toBe('288px')
+  })
+
+  it('loads more when the first page does not fill the box', async () => {
+    const onLoadMore = vi.fn()
+    render(
+      <InfiniteScroll hasMore height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    await waitFor(() => expect(onLoadMore).toHaveBeenCalled())
+  })
+
+  it('does not load while loading is true', async () => {
+    const onLoadMore = vi.fn()
+    render(
+      <InfiniteScroll hasMore loading height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
+  it('loads again after loading returns to false while the sentinel stays in view', async () => {
+    const onLoadMore = vi.fn()
+    const { rerender } = render(
+      <InfiniteScroll hasMore loading={false} height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    await waitFor(() => expect(onLoadMore).toHaveBeenCalledTimes(1))
+    rerender(
+      <InfiniteScroll hasMore loading height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    rerender(
+      <InfiniteScroll hasMore loading={false} height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    await waitFor(() => expect(onLoadMore).toHaveBeenCalledTimes(2))
+  })
+
+  it('does not load when disabled or exhausted', async () => {
+    const onLoadMore = vi.fn()
+    const { rerender } = render(
+      <InfiniteScroll hasMore disabled height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
+    rerender(
+      <InfiniteScroll hasMore={false} height={288} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<InfiniteScroll />)
-      await expectNoA11yViolationsIsolated(container)
+    it('marks loading and has no axe violations with content', async () => {
+      const { container, rerender } = render(
+        <InfiniteScroll hasMore loading height={288}>
+          <div>Row</div>
+        </InfiniteScroll>
+      )
+      expect(container.firstElementChild).toHaveAttribute('aria-busy', 'true')
+      await expectNoA11yViolations(container)
+      rerender(
+        <InfiniteScroll hasMore={false} height={288}>
+          <div>Row</div>
+        </InfiniteScroll>
+      )
+      await expectNoA11yViolations(container)
     })
   })
 })

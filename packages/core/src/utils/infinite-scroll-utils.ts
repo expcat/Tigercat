@@ -9,10 +9,10 @@
 export const infiniteScrollContainerClasses = 'tiger-infinite-scroll relative overflow-auto'
 
 export const infiniteScrollLoaderClasses =
-  'flex items-center justify-center py-4 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
+  'flex items-center justify-center py-4 text-sm text-[var(--tiger-text-secondary,#6b7280)]'
 
 export const infiniteScrollEndClasses =
-  'flex items-center justify-center py-4 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
+  'flex items-center justify-center py-4 text-sm text-[var(--tiger-text-secondary,#6b7280)]'
 
 export const infiniteScrollSentinelClasses = 'tiger-infinite-scroll-sentinel'
 
@@ -27,6 +27,12 @@ export const infiniteScrollSentinelClasses = 'tiger-infinite-scroll-sentinel'
  * this function is intentionally retained as the progressive-enhancement
  * fallback path and is not deprecated.
  */
+function getLogicalInlineScroll(scrollLeft: number, maxScroll: number, dir: 'ltr' | 'rtl'): number {
+  if (dir !== 'rtl') return Math.max(0, scrollLeft)
+  if (scrollLeft <= 0) return Math.abs(scrollLeft)
+  return Math.max(0, maxScroll - scrollLeft)
+}
+
 export function shouldLoadMore(
   el: {
     scrollTop: number
@@ -38,22 +44,39 @@ export function shouldLoadMore(
   },
   threshold: number,
   direction: 'vertical' | 'horizontal' = 'vertical',
-  inverse: boolean = false
+  inverse: boolean = false,
+  dir: 'ltr' | 'rtl' = 'ltr'
 ): boolean {
   if (direction === 'horizontal') {
     const scrollLeft = el.scrollLeft ?? 0
     const scrollWidth = el.scrollWidth ?? 0
     const clientWidth = el.clientWidth ?? 0
-    if (inverse) {
-      return scrollLeft <= threshold
-    }
-    return scrollWidth - scrollLeft - clientWidth <= threshold
+    const maxScroll = scrollWidth - clientWidth
+    const fromStart = getLogicalInlineScroll(scrollLeft, maxScroll, dir)
+    if (inverse) return fromStart <= threshold
+    return maxScroll - fromStart <= threshold
   }
 
   if (inverse) {
     return el.scrollTop <= threshold
   }
   return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold
+}
+
+export function getInfiniteScrollSentinelStyle(
+  direction: 'vertical' | 'horizontal'
+): Record<string, string | number> {
+  if (direction === 'horizontal') {
+    return { width: '1px', height: '100%', overflow: 'hidden', flexShrink: 0 }
+  }
+  return { height: '1px', width: '100%', overflow: 'hidden' }
+}
+
+export function getInfiniteScrollChromeClasses(
+  direction: 'vertical' | 'horizontal',
+  base: string
+): string {
+  return direction === 'horizontal' ? `${base} shrink-0` : base
 }
 
 // ─── IntersectionObserver sentinel ────────────────────────────────
@@ -128,7 +151,7 @@ export function getInfiniteScrollContainerClasses(
 ): string {
   const parts = [infiniteScrollContainerClasses]
   if (direction === 'horizontal') {
-    parts.push('flex flex-row')
+    parts.push('flex flex-row flex-nowrap min-w-0')
   }
   if (className) parts.push(className)
   return parts.join(' ')

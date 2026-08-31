@@ -87,6 +87,24 @@ describe('infinite-scroll-utils', () => {
       }
       expect(shouldLoadMore(el, 100, 'horizontal', true)).toBe(true)
     })
+
+    it('uses logical start for rtl negative scrollLeft', () => {
+      const atStart = {
+        scrollTop: 0,
+        scrollHeight: 0,
+        clientHeight: 0,
+        scrollLeft: 0,
+        scrollWidth: 1000,
+        clientWidth: 200
+      }
+      const atEnd = {
+        ...atStart,
+        scrollLeft: -800
+      }
+      expect(shouldLoadMore(atStart, 100, 'horizontal', true, 'rtl')).toBe(true)
+      expect(shouldLoadMore(atEnd, 100, 'horizontal', false, 'rtl')).toBe(true)
+      expect(shouldLoadMore(atEnd, 100, 'horizontal', true, 'rtl')).toBe(false)
+    })
   })
 
   // ─── getInfiniteScrollContainerClasses ────────────────────
@@ -100,7 +118,7 @@ describe('infinite-scroll-utils', () => {
 
     it('adds flex-row for horizontal', () => {
       const cls = getInfiniteScrollContainerClasses('horizontal')
-      expect(cls).toContain('flex flex-row')
+      expect(cls).toContain('flex-row')
     })
 
     it('appends custom className', () => {

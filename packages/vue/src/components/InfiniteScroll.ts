@@ -1,12 +1,26 @@
-import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  onUpdated,
+  PropType,
+  type CSSProperties
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
+  mergeStyleValues,
   shouldLoadMore,
   createInfiniteScrollObserver,
   resolveLocaleText,
   mergeTigerLocale,
   getInfiniteScrollContainerClasses,
+  getInfiniteScrollSentinelStyle,
+  getInfiniteScrollChromeClasses,
   infiniteScrollLoaderClasses,
   infiniteScrollEndClasses,
   infiniteScrollSentinelClasses,
@@ -14,18 +28,8 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface VueInfiniteScrollProps {
-  hasMore?: boolean
-  loading?: boolean
-  threshold?: number
-  loadingText?: string
-  endText?: string
-  direction?: 'vertical' | 'horizontal'
-  inverse?: boolean
-  disabled?: boolean
-  className?: string
-  locale?: Partial<TigerLocale>
-}
+export type VueInfiniteScrollProps = InstanceType<typeof InfiniteScroll>['$props']
+export type InfiniteScrollProps = VueInfiniteScrollProps
 
 export const InfiniteScroll = defineComponent({
   name: 'TigerInfiniteScroll',
@@ -43,15 +47,25 @@ export const InfiniteScroll = defineComponent({
     },
     inverse: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    height: { type: Number, default: undefined },
+    root: {
+      type: [Object, String] as PropType<Element | null | 'container'>,
+      default: 'container'
+    },
     className: { type: String, default: undefined }
   },
   emits: ['load-more'],
   setup(props, { emit, slots, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const containerRef = ref<HTMLElement | null>(null)
     const sentinelRef = ref<HTMLElement | null>(null)
     let cleanupObserver: (() => void) | null = null
+    let pending = false
+    let wasLoading = props.loading
+    let prevScrollHeight: number | null = null
+
     const containerClasses = computed(() =>
       classNames(
         getInfiniteScrollContainerClasses(props.direction, props.className),
@@ -59,53 +73,88 @@ export const InfiniteScroll = defineComponent({
       )
     )
 
-    function handleLoadMore() {
-      if (props.disabled || props.loading || !props.hasMore) return
+    function requestLoad() {
+      if (props.disabled || props.loading || !props.hasMore || pending) return
+      pending = true
       emit('load-more')
     }
 
-    // Fallback: scroll event (when IO unavailable)
+    function syncPendingFromLoading() {
+      if (wasLoading && !props.loading) pending = false
+      if (props.loading) pending = true
+      wasLoading = props.loading
+    }
+
+    function resolveObserverRoot(): Element | null {
+      if (props.root === 'container' || props.root === undefined) return containerRef.value
+      return props.root
+    }
+
     function checkScroll() {
-      if (props.disabled || props.loading || !props.hasMore) return
       const el = containerRef.value
       if (!el) return
-      if (shouldLoadMore(el, props.threshold, props.direction, props.inverse)) {
-        emit('load-more')
+      if (shouldLoadMore(el, props.threshold, props.direction, props.inverse, dir.value)) {
+        requestLoad()
       }
     }
 
     function setupObserver() {
       cleanupObserver?.()
       cleanupObserver = null
+      syncPendingFromLoading()
       if (props.disabled || !props.hasMore) return
 
       const sentinel = sentinelRef.value
       if (!sentinel) return
 
+      const observerRoot = resolveObserverRoot()
       const teardown = createInfiniteScrollObserver(sentinel, {
         threshold: props.threshold,
         direction: props.direction,
-        root: containerRef.value,
+        root: observerRoot,
         inverse: props.inverse,
-        onLoadMore: handleLoadMore
+        onLoadMore: requestLoad
       })
 
       if (teardown) {
         cleanupObserver = teardown
-      } else {
-        // IO unavailable — fall back to scroll events
-        containerRef.value?.addEventListener('scroll', checkScroll, { passive: true })
-        cleanupObserver = () => {
-          containerRef.value?.removeEventListener('scroll', checkScroll)
-        }
+        if (observerRoot && observerRoot === containerRef.value) checkScroll()
+        return
+      }
+
+      containerRef.value?.addEventListener('scroll', checkScroll, { passive: true })
+      checkScroll()
+      cleanupObserver = () => {
+        containerRef.value?.removeEventListener('scroll', checkScroll)
       }
     }
 
+    function restoreInverseScroll() {
+      if (!props.inverse) return
+      const el = containerRef.value
+      if (!el) return
+      const next = el.scrollHeight
+      if (prevScrollHeight != null && next !== prevScrollHeight) {
+        el.scrollTop += next - prevScrollHeight
+      }
+      prevScrollHeight = next
+    }
+
     onMounted(setupObserver)
+    onUpdated(restoreInverseScroll)
 
     watch(
-      () => [props.hasMore, props.disabled, props.threshold, props.direction, props.inverse],
-      setupObserver
+      () => [
+        props.hasMore,
+        props.disabled,
+        props.loading,
+        props.threshold,
+        props.direction,
+        props.inverse,
+        props.root
+      ],
+      setupObserver,
+      { flush: 'post' }
     )
 
     onBeforeUnmount(() => {
@@ -113,6 +162,7 @@ export const InfiniteScroll = defineComponent({
     })
 
     return () => {
+      const { class: _attrClass, style: attrStyle, ...restAttrs } = attrs as Record<string, unknown>
       const content = slots.default?.()
 
       const sentinel = props.hasMore
@@ -120,7 +170,7 @@ export const InfiniteScroll = defineComponent({
             ref: sentinelRef,
             class: infiniteScrollSentinelClasses,
             'aria-hidden': 'true',
-            style: 'height:0;overflow:hidden'
+            style: getInfiniteScrollSentinelStyle(props.direction)
           })
         : null
 
@@ -128,7 +178,7 @@ export const InfiniteScroll = defineComponent({
         ? h(
             'div',
             {
-              class: infiniteScrollLoaderClasses,
+              class: getInfiniteScrollChromeClasses(props.direction, infiniteScrollLoaderClasses),
               role: 'status',
               'aria-live': 'polite'
             },
@@ -145,7 +195,10 @@ export const InfiniteScroll = defineComponent({
         !props.hasMore && !props.loading
           ? h(
               'div',
-              { class: infiniteScrollEndClasses },
+              {
+                class: getInfiniteScrollChromeClasses(props.direction, infiniteScrollEndClasses),
+                'aria-live': 'polite'
+              },
               slots.end?.() ??
                 resolveLocaleText(
                   'No more data',
@@ -155,15 +208,20 @@ export const InfiniteScroll = defineComponent({
             )
           : null
 
-      const children = props.inverse
-        ? [sentinel, loader, content, end]
-        : [content, sentinel, loader, end]
+      const chrome = [sentinel, loader, end]
+      const children = props.inverse ? [...chrome, content] : [content, ...chrome]
 
       return h(
         'div',
         {
+          ...restAttrs,
           ref: containerRef,
-          class: containerClasses.value
+          class: containerClasses.value,
+          style: mergeStyleValues(
+            attrStyle,
+            props.height !== undefined ? { height: `${props.height}px` } : undefined
+          ) as CSSProperties,
+          'aria-busy': props.loading || undefined
         },
         children
       )
