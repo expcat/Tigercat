@@ -35,8 +35,11 @@ describe('group-utils', () => {
   it('composes avatar group classes and overflow metadata', () => {
     expect(getAvatarGroupClasses('custom')).toContain('inline-flex')
     expect(getAvatarGroupClasses('custom')).toContain('custom')
-    expect(getAvatarGroupItemClasses()).toContain('-ml-2')
-    expect(getAvatarGroupOverflowClasses('lg')).toContain('h-12')
+    expect(getAvatarGroupItemClasses()).toContain('-ms-2')
+    expect(getAvatarGroupItemClasses()).not.toContain('-ml-2')
+    expect(getAvatarGroupOverflowClasses('lg')).toContain('--tiger-component-avatar-size-lg')
+    expect(getAvatarGroupOverflowClasses('md', 'square', false)).not.toContain('-ms-2')
+    expect(getAvatarGroupOverflowClasses('md', 'square', true)).toContain('-ms-2')
     expect(getAvatarGroupOverflowLabel(3)).toBe('3 more')
     expect(getAvatarGroupOverflowText(3)).toBe('+3')
   })

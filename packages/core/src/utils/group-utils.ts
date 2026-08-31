@@ -3,7 +3,8 @@ import { enUS } from './i18n/locales/en-US'
 import {
   avatarGroupBaseClasses,
   avatarGroupItemClasses,
-  avatarGroupOverflowClasses,
+  avatarGroupOverflowBaseClasses,
+  avatarShapeClasses,
   avatarSizeClasses
 } from './avatar-utils'
 import {
@@ -13,7 +14,7 @@ import {
   buttonGroupItemVerticalClasses,
   buttonGroupVerticalClasses
 } from './button-utils'
-import type { AvatarSize } from '../types/avatar'
+import type { AvatarShape, AvatarSize } from '../types/avatar'
 
 export interface VisibleGroupItems<T> {
   visibleItems: T[]
@@ -59,9 +60,17 @@ export function getAvatarGroupItemClasses(...classes: ClassValue[]): string {
 
 export function getAvatarGroupOverflowClasses(
   size: AvatarSize = 'md',
+  shape: AvatarShape = 'circle',
+  overlap = true,
   ...classes: ClassValue[]
 ): string {
-  return classNames(avatarGroupOverflowClasses, avatarSizeClasses[size], ...classes)
+  return classNames(
+    avatarGroupOverflowBaseClasses,
+    overlap && '-ms-2',
+    avatarSizeClasses[size],
+    avatarShapeClasses[shape],
+    ...classes
+  )
 }
 
 export function getAvatarGroupOverflowLabel(

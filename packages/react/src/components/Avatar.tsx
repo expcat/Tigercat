@@ -1,97 +1,162 @@
-import React, { useState, useMemo, useContext } from 'react'
+import React, { forwardRef, useContext, useEffect, useMemo, useState } from 'react'
 import {
-  classNames,
   avatarBaseClasses,
-  avatarSizeClasses,
-  avatarShapeClasses,
   avatarDefaultBgColor,
   avatarDefaultTextColor,
+  avatarGeneratedTextColor,
   avatarImageClasses,
+  avatarShapeClasses,
+  avatarSizeClasses,
+  classNames,
+  generateAvatarColor,
   getInitials,
-  type AvatarProps as CoreAvatarProps
+  pickAvatarImageAttrs,
+  resolveAvatarName,
+  resolveAvatarPaint,
+  type AvatarImageProps,
+  type AvatarProps as CoreAvatarProps,
+  type AvatarShape
 } from '@expcat/tigercat-core'
 import { AvatarGroupContext } from './AvatarGroup'
 
 export interface AvatarProps
-  extends Omit<CoreAvatarProps, 'icon'>, React.HTMLAttributes<HTMLSpanElement> {
-  /**
-   * Icon content (children for icon mode)
-   */
+  extends
+    Omit<CoreAvatarProps, 'icon'>,
+    AvatarImageProps,
+    Omit<React.HTMLAttributes<HTMLSpanElement>, 'onLoad' | 'onError' | 'crossOrigin'> {
   children?: React.ReactNode
+  onLoad?: React.ReactEventHandler<HTMLImageElement>
+  onError?: React.ReactEventHandler<HTMLImageElement>
 }
 
-export const Avatar: React.FC<AvatarProps> = ({
-  size,
-  shape = 'circle',
-  src,
-  alt = '',
-  text,
-  bgColor = avatarDefaultBgColor,
-  textColor = avatarDefaultTextColor,
-  className,
-  children,
-  ...props
-}) => {
+export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
+  {
+    size,
+    shape,
+    src,
+    alt = '',
+    text,
+    bgColor,
+    textColor,
+    srcSet,
+    sizes,
+    crossOrigin,
+    referrerPolicy,
+    decoding,
+    fetchPriority,
+    className,
+    children,
+    onLoad,
+    onError,
+    ...props
+  },
+  ref
+) {
   const [imageError, setImageError] = useState(false)
-
   const group = useContext(AvatarGroupContext)
+
+  useEffect(() => {
+    setImageError(false)
+  }, [src])
 
   const hasImage = Boolean(src) && !imageError
   const displayText = text ? getInitials(text) : ''
   const resolvedSize = size ?? group?.size ?? 'md'
+  const resolvedShape: AvatarShape = shape ?? group?.shape ?? 'circle'
 
-  const ariaLabelProp = props['aria-label']
-  const ariaLabelledbyProp = props['aria-labelledby']
-  const ariaHiddenProp = props['aria-hidden']
+  const { rest: spanRest } = pickAvatarImageAttrs(props as Record<string, unknown>)
+  const { computedLabel, isDecorative } = resolveAvatarName({
+    alt,
+    text,
+    ariaLabel: spanRest['aria-label'],
+    ariaLabelledby: spanRest['aria-labelledby'],
+    ariaHidden: spanRest['aria-hidden']
+  })
 
-  const computedLabel =
-    ariaLabelProp ?? (alt.trim() ? alt : undefined) ?? (text?.trim() || undefined)
-
-  const isDecorative = ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp)
+  const autoBg = !bgColor && text ? generateAvatarColor(text) : undefined
+  const bgPaint = resolveAvatarPaint(bgColor, 'bg', autoBg ?? avatarDefaultBgColor)
+  const textPaint = resolveAvatarPaint(
+    textColor,
+    'text',
+    autoBg ? avatarGeneratedTextColor : avatarDefaultTextColor
+  )
 
   const avatarClasses = useMemo(
     () =>
       classNames(
         avatarBaseClasses,
         avatarSizeClasses[resolvedSize],
-        avatarShapeClasses[shape],
+        avatarShapeClasses[resolvedShape],
         group?.itemClass,
-        !hasImage && bgColor,
-        !hasImage && textColor,
+        !hasImage && bgPaint.className,
+        !hasImage && textPaint.className,
         className
       ),
-    [resolvedSize, shape, group?.itemClass, hasImage, bgColor, textColor, className]
+    [
+      resolvedSize,
+      resolvedShape,
+      group?.itemClass,
+      hasImage,
+      bgPaint.className,
+      textPaint.className,
+      className
+    ]
   )
 
-  // Priority: image > text > icon (children)
+  const paintStyle =
+    !hasImage && (bgPaint.style || textPaint.style)
+      ? { ...bgPaint.style, ...textPaint.style }
+      : undefined
 
-  // If src is provided and not errored, show image
+  const handleError: React.ReactEventHandler<HTMLImageElement> = (event) => {
+    onError?.(event)
+    if (!event.defaultPrevented) setImageError(true)
+  }
+
   if (hasImage) {
     return (
-      <span {...props} className={avatarClasses} aria-hidden={isDecorative ? true : ariaHiddenProp}>
+      <span
+        ref={ref}
+        {...spanRest}
+        className={avatarClasses}
+        aria-hidden={isDecorative ? true : (spanRest['aria-hidden'] as boolean | undefined)}>
         <img
           src={src}
-          alt={alt}
+          alt={computedLabel ?? ''}
+          srcSet={srcSet}
+          sizes={sizes}
+          crossOrigin={crossOrigin}
+          referrerPolicy={referrerPolicy}
+          decoding={decoding}
+          fetchPriority={fetchPriority}
           className={avatarImageClasses}
-          onError={() => setImageError(true)}
+          onLoad={onLoad}
+          onError={handleError}
         />
       </span>
     )
   }
 
-  // Text or icon (children) fallback
   return (
     <span
-      {...props}
+      ref={ref}
+      {...spanRest}
       className={avatarClasses}
+      style={
+        paintStyle || spanRest.style
+          ? { ...(spanRest.style as React.CSSProperties), ...paintStyle }
+          : undefined
+      }
       {...(isDecorative
         ? { 'aria-hidden': true }
         : {
             role: 'img',
             'aria-label': computedLabel,
-            'aria-labelledby': ariaLabelledbyProp
+            'aria-labelledby': spanRest['aria-labelledby'] as string | undefined
           })}>
       {displayText || children}
     </span>
   )
-}
+})
+
+Avatar.displayName = 'Avatar'

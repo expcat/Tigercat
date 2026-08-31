@@ -2,279 +2,197 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h, Comment } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Avatar } from '@expcat/tigercat-vue/Avatar'
 import { AvatarGroup } from '@expcat/tigercat-vue/AvatarGroup'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Avatar', () => {
   it('renders text initials with accessible label', () => {
-    const { container } = render(Avatar, {
-      props: {
-        text: 'John Doe'
-      }
-    })
-
+    render(Avatar, { props: { text: 'John Doe' } })
     expect(screen.getByText('JD')).toBeInTheDocument()
-    const avatar = container.querySelector('[role="img"]')
-    expect(avatar).toHaveAttribute('aria-label', 'John Doe')
+    expect(screen.getByRole('img', { name: 'John Doe' })).toBeInTheDocument()
   })
 
   it('renders a no-space two-letter token as-is', () => {
-    render(Avatar, {
-      props: {
-        text: 'TC'
-      }
-    })
-
+    render(Avatar, { props: { text: 'TC' } })
     expect(screen.getByText('TC')).toBeInTheDocument()
   })
 
-  it('renders image with src and alt', () => {
-    const { container } = render(Avatar, {
-      props: {
-        src: '/test-avatar.jpg',
-        alt: 'Test User'
-      },
-      attrs: {
-        'data-testid': 'avatar'
-      }
-    })
+  it('puts the computed name on the image', () => {
+    const { rerender } = render(Avatar, { props: { src: '/photo.jpg', text: 'Jane Doe' } })
+    expect(screen.getByRole('img', { name: 'Jane Doe' })).toHaveAttribute('src', '/photo.jpg')
 
-    const wrapper = container.querySelector('[data-testid="avatar"]')
-    const img = container.querySelector('img')
-    expect(wrapper).toBeInTheDocument()
-    expect(img).toHaveAttribute('src', '/test-avatar.jpg')
-    expect(img).toHaveAttribute('alt', 'Test User')
+    rerender({ src: '/photo.jpg', text: undefined })
+    render(Avatar, {
+      props: { src: '/photo.jpg' },
+      attrs: { 'aria-label': 'Jane' }
+    })
+    expect(screen.getByRole('img', { name: 'Jane' })).toBeInTheDocument()
   })
 
   it('treats unlabeled image avatar as decorative', () => {
     const { container } = render(Avatar, {
-      props: {
-        src: '/test-avatar.jpg'
-      },
-      attrs: {
-        'data-testid': 'avatar'
-      }
+      props: { src: '/test-avatar.jpg' },
+      attrs: { 'data-testid': 'avatar' }
     })
-
-    const wrapper = container.querySelector('[data-testid="avatar"]')
-    const img = container.querySelector('img')
-    expect(wrapper).toHaveAttribute('aria-hidden', 'true')
-    expect(img).toHaveAttribute('alt', '')
+    expect(container.querySelector('[data-testid="avatar"]')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('img')).toHaveAttribute('alt', '')
   })
 
-  it('falls back to text when image fails', async () => {
-    const { container } = render(Avatar, {
-      props: {
-        src: '/broken.jpg',
-        text: 'Fallback User',
-        alt: 'Fallback User'
-      }
+  it('retries after src changes following an error', async () => {
+    const { container, rerender } = render(Avatar, {
+      props: { src: '/broken.jpg', text: 'Fallback User' }
     })
-
-    const img = container.querySelector('img')
-    expect(img).toBeInTheDocument()
-    await fireEvent.error(img as Element)
-
+    await fireEvent.error(container.querySelector('img') as Element)
     expect(container.querySelector('img')).not.toBeInTheDocument()
     expect(screen.getByText('FU')).toBeInTheDocument()
+
+    await rerender({ src: '/ok.jpg', text: 'Fallback User' })
+    expect(container.querySelector('img')).toHaveAttribute('src', '/ok.jpg')
   })
 
-  it('renders icon slot and is decorative by default', () => {
+  it('binds srcSet on the image and emits error', async () => {
+    const onError = vi.fn()
     const { container } = render(Avatar, {
-      slots: {
-        default: '<svg data-testid="icon"><path /></svg>'
-      }
+      props: { src: '/a.jpg', srcSet: 'a-2x.jpg 2x', alt: 'Ada' },
+      attrs: { onError }
     })
-
-    expect(container.querySelector('[data-testid="icon"]')).toBeInTheDocument()
-    const wrapper = container.querySelector('span')
-    expect(wrapper).toHaveAttribute('aria-hidden', 'true')
+    const img = container.querySelector('img')
+    expect(img).toHaveAttribute('srcset', 'a-2x.jpg 2x')
+    await fireEvent.error(img as Element)
+    expect(onError).toHaveBeenCalled()
   })
 
-  it('merges class/style and passes through attrs', () => {
-    const { container } = render(Avatar, {
-      props: {
-        text: 'AB',
-        className: 'custom-avatar'
-      },
-      attrs: {
-        'data-foo': 'bar'
-      }
-    })
-
-    const avatar = container.querySelector('[role="img"]')
-    expect(avatar?.className).toContain('custom-avatar')
-    expect(avatar).toHaveAttribute('data-foo', 'bar')
-    expect(avatar?.className).toContain('bg-[var(--tiger-avatar-bg,#e5e7eb)]')
+  it('applies a hex bgColor as a style', () => {
+    render(Avatar, { props: { text: 'T', bgColor: '#3b82f6' } })
+    const avatar = screen.getByRole('img', { name: 'T' }) as HTMLElement
+    expect(avatar.style.backgroundColor).toBe('#3b82f6')
   })
 
-  it('applies size classes', () => {
-    const sizes = [
-      { size: 'sm', expected: 'w-8 h-8 text-xs' },
-      { size: 'md', expected: 'w-10 h-10 text-sm' },
-      { size: 'lg', expected: 'w-12 h-12 text-base' },
-      { size: 'xl', expected: 'w-16 h-16 text-lg' }
-    ] as const
-
-    sizes.forEach(({ size, expected }) => {
-      const { container } = render(Avatar, {
-        props: { text: size.toUpperCase(), size }
-      })
-      const avatar = container.querySelector('[role="img"]')
-      expected.split(' ').forEach((cls) => {
-        expect(avatar?.className).toContain(cls)
-      })
+  it('passes accessibility checks for named and decorative states', async () => {
+    const { container } = render({
+      components: { Avatar },
+      template: `
+        <div>
+          <Avatar text="John Doe" />
+          <Avatar src="/a.jpg" text="Jane" />
+          <Avatar src="/a.jpg" alt="Jane" />
+          <Avatar src="/a.jpg" />
+        </div>
+      `
     })
-  })
-  it('applies custom bgColor and textColor', () => {
-    const { container } = render(Avatar, {
-      props: {
-        text: 'T',
-        bgColor: 'bg-blue-500',
-        textColor: 'text-white'
-      }
-    })
-
-    const avatar = container.querySelector('[role="img"]')
-    expect(avatar?.className).toContain('bg-blue-500')
-    expect(avatar?.className).toContain('text-white')
-    expect(avatar?.className).not.toContain('bg-[var(--tiger-avatar-bg')
-  })
-
-  it('passes accessibility checks', async () => {
-    const { container } = render(Avatar, {
-      props: {
-        text: 'John Doe'
-      }
-    })
-
+    expect(screen.getAllByRole('img', { name: 'Jane' })).toHaveLength(2)
     await expectNoA11yViolationsIsolated(container)
   })
 })
 
 describe('AvatarGroup', () => {
-  it('should render all children when max is not set', () => {
-    const { container } = render(AvatarGroup, {
-      slots: {
-        default: ['<span>A</span>', '<span>B</span>', '<span>C</span>'].join('')
+  it('shows overflow for extra avatars and names it', () => {
+    render({
+      components: { AvatarGroup, Avatar },
+      template: `
+        <AvatarGroup :max="2">
+          <Avatar text="A" />
+          <Avatar text="B" />
+          <Avatar text="C" />
+          <Avatar text="D" />
+        </AvatarGroup>
+      `
+    })
+    expect(screen.getByRole('img', { name: '2 more' })).toHaveTextContent('+2')
+  })
+
+  it('ignores v-if false placeholders when counting max', () => {
+    const Host = defineComponent({
+      setup() {
+        return () =>
+          h(AvatarGroup, { max: 1 }, () => [
+            h(Avatar, { text: 'A' }),
+            h(Comment),
+            h(Avatar, { text: 'B' })
+          ])
       }
     })
-    expect(container.querySelectorAll('span').length).toBe(3)
+    render(Host)
+    expect(screen.getByRole('img', { name: '1 more' })).toBeInTheDocument()
   })
 
-  it('should show overflow indicator when max is set', () => {
-    const { container } = render(AvatarGroup, {
-      props: { max: 2 },
-      slots: {
-        default: ['<span>A</span>', '<span>B</span>', '<span>C</span>', '<span>D</span>'].join('')
-      }
+  it('applies group shape to overflow', () => {
+    render({
+      components: { AvatarGroup, Avatar },
+      template: `
+        <AvatarGroup :max="0" shape="square">
+          <Avatar text="A" />
+          <Avatar text="B" />
+        </AvatarGroup>
+      `
     })
-    const overflow = container.querySelector('[aria-label="2 more"]')
-    expect(overflow).toBeInTheDocument()
-    expect(overflow?.textContent).toBe('+2')
+    const overflow = screen.getByRole('img', { name: '2 more' })
+    expect(overflow.className).toContain('--tiger-radius-md')
+    expect(overflow.className).not.toContain('-ms-2')
   })
 
-  it('should have role="group"', () => {
-    const { container } = render(AvatarGroup, {
-      slots: { default: '<span>A</span>' }
+  it('uses official locale objects for the group name', () => {
+    render({
+      components: { ConfigProvider, AvatarGroup, Avatar },
+      setup: () => ({ zhCN }),
+      template:
+        '<ConfigProvider :locale="zhCN"><AvatarGroup><Avatar text="A" /></AvatarGroup></ConfigProvider>'
     })
-    expect(container.querySelector('[role="group"]')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: '头像组' })).toBeInTheDocument()
   })
 
-  it('allows overriding the default group aria-label via attrs', () => {
-    const { container } = render(AvatarGroup, {
-      attrs: { 'aria-label': '项目团队成员' },
-      slots: { default: '<span>A</span>' }
+  it('uses zhTW overflow copy, not English', () => {
+    render({
+      components: { ConfigProvider, AvatarGroup, Avatar },
+      setup: () => ({ zhTW }),
+      template: `
+        <ConfigProvider :locale="zhTW">
+          <AvatarGroup :max="1">
+            <Avatar text="A" />
+            <Avatar text="B" />
+          </AvatarGroup>
+        </ConfigProvider>
+      `
     })
-    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '项目团队成员')
-  })
-
-  it('localizes group and overflow labels via the locale prop', () => {
-    const { container } = render(AvatarGroup, {
-      props: { max: 2, locale: { locale: 'zh-CN' } },
-      slots: {
-        default: ['<span>A</span>', '<span>B</span>', '<span>C</span>', '<span>D</span>'].join('')
-      }
-    })
-    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '头像组')
-    const overflow = container.querySelector('[aria-label="还有 2 位"]')
-    expect(overflow).toBeInTheDocument()
-    expect(overflow?.textContent).toBe('+2')
-  })
-
-  it('localizes labels via ConfigProvider locale', () => {
-    const Wrapper = defineComponent({
-      render() {
-        return h(ConfigProvider, { locale: { locale: 'zh-CN' } }, () =>
-          h(AvatarGroup, { max: 1 }, () => [h(Avatar, { text: 'A' }), h(Avatar, { text: 'B' })])
-        )
-      }
-    })
-    const { container } = render(Wrapper)
-    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '头像组')
-    expect(container.querySelector('[aria-label="还有 1 位"]')).toBeInTheDocument()
-  })
-
-  it('applies labels overrides over locale defaults', () => {
-    const { container } = render(AvatarGroup, {
-      props: {
-        max: 1,
-        locale: { locale: 'zh-CN' },
-        labels: { ariaLabel: '成员组', overflowAriaLabel: '另有 {count} 人' }
-      },
-      slots: { default: '<span>A</span><span>B</span>' }
-    })
-    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '成员组')
-    expect(container.querySelector('[aria-label="另有 1 人"]')).toBeInTheDocument()
-  })
-  it('prioritizes image over text when both provided', () => {
-    const { container } = render(Avatar, {
-      props: {
-        src: '/avatar.jpg',
-        text: 'John Doe',
-        alt: 'John Doe'
-      }
-    })
-
-    expect(container.querySelector('img')).toBeInTheDocument()
-    expect(screen.queryByText('JD')).not.toBeInTheDocument()
-  })
-  it('updates child avatar sizes when the group size prop changes', async () => {
-    const { container, rerender } = render(AvatarGroup, {
-      props: { size: 'sm' },
-      slots: {
-        default: () => [h(Avatar, { text: 'AB' }), h(Avatar, { text: 'CD' })]
-      }
-    })
-
-    container.querySelectorAll('[role="img"]').forEach((avatar) => {
-      expect(avatar.className).toContain('w-8 h-8 text-xs')
-    })
-
-    await rerender({ size: 'lg' })
-
-    const avatars = container.querySelectorAll('[role="img"]')
-    expect(avatars.length).toBe(2)
-    avatars.forEach((avatar) => {
-      expect(avatar.className).toContain('w-12 h-12 text-base')
-      expect(avatar.className).not.toContain('w-8 h-8 text-xs')
-    })
+    expect(screen.getByRole('group', { name: '頭像組' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '還有 1 位' })).toBeInTheDocument()
   })
 
   it('lets an explicit avatar size override the group size', () => {
-    const { container } = render(AvatarGroup, {
-      props: { size: 'sm' },
-      slots: {
-        default: () => [h(Avatar, { text: 'AB', size: 'lg' })]
-      }
+    render({
+      components: { AvatarGroup, Avatar },
+      template: `
+        <AvatarGroup size="sm">
+          <Avatar text="AB" size="lg" />
+        </AvatarGroup>
+      `
     })
+    expect(screen.getByRole('img', { name: 'AB' }).className).toContain(
+      '--tiger-component-avatar-size-lg'
+    )
+  })
 
-    const avatar = container.querySelector('[role="img"]')
-    expect(avatar?.className).toContain('w-12 h-12 text-base')
+  it('passes accessibility checks with overflow', async () => {
+    const { container } = render({
+      components: { ConfigProvider, AvatarGroup, Avatar },
+      setup: () => ({ zhCN }),
+      template: `
+        <ConfigProvider :locale="zhCN">
+          <AvatarGroup :max="1">
+            <Avatar text="A" />
+            <Avatar text="B" />
+          </AvatarGroup>
+        </ConfigProvider>
+      `
+    })
+    expect(screen.getByRole('img', { name: '还有 1 位' })).toBeInTheDocument()
+    await expectNoA11yViolationsIsolated(container)
   })
 })

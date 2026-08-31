@@ -1,16 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  watch,
-  onMounted,
-  onUnmounted,
-  PropType,
-  h,
-  Comment,
-  Fragment,
-  type VNode
-} from 'vue'
+import { defineComponent, computed, ref, watch, onMounted, onUnmounted, PropType, h } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -41,6 +29,7 @@ import {
   type TigerLocale,
   type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
+import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueCarouselProps {
@@ -410,15 +399,7 @@ export const Carousel = defineComponent({
     return () => {
       // Get slot content and flatten Fragments (from v-for)
       const defaultSlot = slots.default?.() || []
-      const flattenSlots = (nodes: VNode[]): VNode[] => {
-        return nodes.flatMap((node) => {
-          if (node.type === Fragment && Array.isArray(node.children)) {
-            return flattenSlots(node.children as VNode[])
-          }
-          return node
-        })
-      }
-      const slides = flattenSlots(defaultSlot).filter((child) => child.type !== Comment)
+      const slides = flattenSlotVNodes(defaultSlot)
       slideCount.value = slides.length
 
       // Arrow button helper

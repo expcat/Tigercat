@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, inject, PropType } from 'vue'
+import { defineComponent, computed, h, ref, watch, inject, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -8,8 +8,13 @@ import {
   avatarShapeClasses,
   avatarDefaultBgColor,
   avatarDefaultTextColor,
+  avatarGeneratedTextColor,
   avatarImageClasses,
+  generateAvatarColor,
   getInitials,
+  pickAvatarImageAttrs,
+  resolveAvatarName,
+  resolveAvatarPaint,
   type AvatarSize,
   type AvatarShape
 } from '@expcat/tigercat-core'
@@ -23,148 +28,170 @@ export interface VueAvatarProps {
   text?: string
   bgColor?: string
   textColor?: string
+  srcSet?: string
+  sizes?: string
+  crossOrigin?: '' | 'anonymous' | 'use-credentials'
+  referrerPolicy?: string
+  decoding?: 'async' | 'auto' | 'sync'
+  fetchPriority?: 'high' | 'low' | 'auto'
   className?: string
   style?: Record<string, string | number>
+}
+
+function invokeListener(handler: unknown, event: Event): void {
+  if (typeof handler === 'function') {
+    handler(event)
+    return
+  }
+  if (Array.isArray(handler)) {
+    for (const fn of handler) {
+      if (typeof fn === 'function') fn(event)
+    }
+  }
 }
 
 export const Avatar = defineComponent({
   name: 'TigerAvatar',
   inheritAttrs: false,
   props: {
-    /**
-     * Avatar size
-     * @default 'md'
-     */
     size: {
       type: String as PropType<AvatarSize>,
       default: undefined
     },
-    /**
-     * Avatar shape
-     * @default 'circle'
-     */
     shape: {
       type: String as PropType<AvatarShape>,
-      default: 'circle' as AvatarShape
+      default: undefined
     },
-    /**
-     * Image source URL
-     */
     src: {
       type: String,
       default: undefined
     },
-    /**
-     * Alternative text for image
-     */
     alt: {
       type: String,
       default: ''
     },
-    /**
-     * Text content to display (e.g., initials)
-     */
     text: {
       type: String,
       default: undefined
     },
-    /**
-     * Background color for text/icon avatars
-     */
     bgColor: {
       type: String,
-      default: avatarDefaultBgColor
+      default: undefined
     },
-    /**
-     * Text color for text/icon avatars
-     */
     textColor: {
       type: String,
-      default: avatarDefaultTextColor
+      default: undefined
     },
-    /**
-     * Additional CSS classes
-     */
+    srcSet: { type: String, default: undefined },
+    sizes: { type: String, default: undefined },
+    crossOrigin: {
+      type: String as PropType<'' | 'anonymous' | 'use-credentials'>,
+      default: undefined
+    },
+    referrerPolicy: { type: String, default: undefined },
+    decoding: { type: String as PropType<'async' | 'auto' | 'sync'>, default: undefined },
+    fetchPriority: { type: String as PropType<'high' | 'low' | 'auto'>, default: undefined },
     className: {
       type: String,
       default: undefined
     },
-
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
-  setup(props, { slots, attrs }) {
+  emits: ['load', 'error'],
+  setup(props, { slots, attrs, emit }) {
     const imageError = ref(false)
-
     const group = inject<AvatarGroupContext | null>(AVATAR_GROUP_INJECTION_KEY, null)
 
-    const hasImage = computed(() => Boolean(props.src) && !imageError.value)
-
-    const resolvedSize = computed<AvatarSize>(() => props.size ?? group?.size ?? 'md')
-
-    const avatarClasses = computed(() =>
-      classNames(
-        avatarBaseClasses,
-        avatarSizeClasses[resolvedSize.value],
-        avatarShapeClasses[props.shape],
-        group?.itemClass,
-        !hasImage.value && props.bgColor,
-        !hasImage.value && props.textColor
-      )
+    watch(
+      () => props.src,
+      () => {
+        imageError.value = false
+      }
     )
 
-    const displayText = computed(() => (props.text ? getInitials(props.text) : ''))
+    const hasImage = computed(() => Boolean(props.src) && !imageError.value)
+    const resolvedSize = computed<AvatarSize>(() => props.size ?? group?.size ?? 'md')
+    const resolvedShape = computed<AvatarShape>(() => props.shape ?? group?.shape ?? 'circle')
 
     return () => {
-      // Priority: image > text > icon (slot)
-
       const attrsRecord = attrs as Record<string, unknown>
-      const attrsClass = attrsRecord.class
-      const attrsStyle = attrsRecord.style
-      const ariaLabelProp = attrsRecord['aria-label'] as string | undefined
-      const ariaLabelledbyProp = attrsRecord['aria-labelledby'] as string | undefined
-      const ariaHiddenProp = attrsRecord['aria-hidden'] as boolean | undefined
+      const { image: imageAttrs, rest: spanAttrs } = pickAvatarImageAttrs(attrsRecord)
+      const { computedLabel, isDecorative } = resolveAvatarName({
+        alt: props.alt,
+        text: props.text,
+        ariaLabel: spanAttrs['aria-label'],
+        ariaLabelledby: spanAttrs['aria-labelledby'],
+        ariaHidden: spanAttrs['aria-hidden']
+      })
 
-      const computedLabel =
-        ariaLabelProp ??
-        (props.alt.trim() ? props.alt : undefined) ??
-        (props.text?.trim() || undefined)
+      const autoBg = !props.bgColor && props.text ? generateAvatarColor(props.text) : undefined
+      const bgPaint = resolveAvatarPaint(props.bgColor, 'bg', autoBg ?? avatarDefaultBgColor)
+      const textPaint = resolveAvatarPaint(
+        props.textColor,
+        'text',
+        autoBg ? avatarGeneratedTextColor : avatarDefaultTextColor
+      )
 
-      const isDecorative = ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp)
+      const avatarClasses = classNames(
+        avatarBaseClasses,
+        avatarSizeClasses[resolvedSize.value],
+        avatarShapeClasses[resolvedShape.value],
+        group?.itemClass,
+        !hasImage.value && bgPaint.className,
+        !hasImage.value && textPaint.className,
+        props.className,
+        coerceClassValue(spanAttrs.class)
+      )
+
+      const paintStyle =
+        !hasImage.value && (bgPaint.style || textPaint.style)
+          ? { ...bgPaint.style, ...textPaint.style }
+          : undefined
 
       const baseSpanProps = {
-        ...attrs,
-        class: classNames(avatarClasses.value, props.className, coerceClassValue(attrsClass)),
-        style: mergeStyleValues(attrsStyle, props.style)
+        ...spanAttrs,
+        class: avatarClasses,
+        style: mergeStyleValues(spanAttrs.style, props.style, paintStyle)
       }
 
-      // If src is provided and not errored, show image
+      const handleError = (event: Event) => {
+        invokeListener(imageAttrs.onError ?? spanAttrs.onError, event)
+        emit('error', event)
+        if (!event.defaultPrevented) imageError.value = true
+      }
+
+      const handleLoad = (event: Event) => {
+        invokeListener(imageAttrs.onLoad ?? spanAttrs.onLoad, event)
+        emit('load', event)
+      }
+
       if (hasImage.value) {
         return h(
           'span',
-          {
-            ...baseSpanProps,
-            'aria-hidden': isDecorative ? true : ariaHiddenProp
-          },
+          { ...baseSpanProps, 'aria-hidden': isDecorative ? true : spanAttrs['aria-hidden'] },
           [
             h('img', {
               src: props.src,
-              alt: props.alt,
+              alt: computedLabel ?? '',
+              srcset: props.srcSet ?? imageAttrs.srcSet,
+              sizes: props.sizes ?? imageAttrs.sizes,
+              crossorigin: props.crossOrigin ?? imageAttrs.crossOrigin,
+              referrerpolicy: props.referrerPolicy ?? imageAttrs.referrerPolicy,
+              decoding: props.decoding ?? imageAttrs.decoding,
+              fetchpriority: props.fetchPriority ?? imageAttrs.fetchPriority,
               class: avatarImageClasses,
-              onError: () => {
-                imageError.value = true
-              }
+              onLoad: handleLoad,
+              onError: handleError
             })
           ]
         )
       }
 
-      // Text or icon (slot) fallback
+      const displayText = props.text ? getInitials(props.text) : ''
+
       return h(
         'span',
         {
@@ -174,10 +201,10 @@ export const Avatar = defineComponent({
             : {
                 role: 'img',
                 'aria-label': computedLabel,
-                'aria-labelledby': ariaLabelledbyProp
+                'aria-labelledby': spanAttrs['aria-labelledby']
               })
         },
-        displayText.value || slots.default?.()
+        displayText || slots.default?.()
       )
     }
   }

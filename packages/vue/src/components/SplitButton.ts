@@ -1,4 +1,4 @@
-import { Comment, Fragment, defineComponent, h, PropType, type VNode } from 'vue'
+import { defineComponent, h, PropType, type VNode } from 'vue'
 import {
   DROPDOWN_CHEVRON_PATH,
   composeComponentClasses,
@@ -16,6 +16,7 @@ import {
   type ButtonVariant,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
+import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { Button } from './Button'
 import { ButtonGroup } from './ButtonGroup'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
@@ -40,21 +41,8 @@ export interface VueSplitButtonProps {
   style?: Record<string, unknown>
 }
 
-function flattenVNodes(nodes: VNode[] | undefined): VNode[] {
-  const out: VNode[] = []
-  for (const node of nodes ?? []) {
-    if (!node || node.type === Comment) continue
-    if (node.type === Fragment && Array.isArray(node.children)) {
-      out.push(...flattenVNodes(node.children as VNode[]))
-      continue
-    }
-    out.push(node)
-  }
-  return out
-}
-
 function wrapMenu(nodes: VNode[] | undefined): VNode | null {
-  const flattened = flattenVNodes(nodes)
+  const flattened = flattenSlotVNodes(nodes)
   if (flattened.length === 0) return null
   const existing = flattened.find((node) => node.type === DropdownMenu)
   if (existing) return existing
@@ -69,7 +57,7 @@ function partitionDefaultSlot(nodes: VNode[] | undefined): {
   const menuItems: VNode[] = []
   let menu: VNode | null = null
 
-  for (const node of flattenVNodes(nodes)) {
+  for (const node of flattenSlotVNodes(nodes)) {
     if (node.type === DropdownMenu) {
       menu = node
       continue

@@ -1,4 +1,4 @@
-import React, { createContext, useMemo } from 'react'
+import React, { createContext, isValidElement, useMemo } from 'react'
 import {
   getAvatarGroupClasses,
   getAvatarGroupItemClasses,
@@ -8,6 +8,7 @@ import {
   getAvatarGroupOverflowText,
   getVisibleGroupItems,
   mergeTigerLocale,
+  type AvatarShape,
   type AvatarSize,
   type AvatarGroupProps as CoreAvatarGroupProps,
   type TigerLocale,
@@ -17,6 +18,7 @@ import { useTigerConfig } from './ConfigProvider'
 
 export interface AvatarGroupContextValue {
   size?: AvatarSize
+  shape?: AvatarShape
   itemClass: string
 }
 
@@ -25,15 +27,20 @@ export const AvatarGroupContext = createContext<AvatarGroupContextValue | null>(
 export interface AvatarGroupProps
   extends CoreAvatarGroupProps, React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
-  /** Text/aria label overrides */
   labels?: Partial<TigerLocaleAvatarGroup>
+}
+
+function isAvatarElement(child: React.ReactNode): boolean {
+  if (!isValidElement(child)) return false
+  const type = child.type as { displayName?: string; name?: string }
+  return type.displayName === 'Avatar' || type.name === 'Avatar'
 }
 
 export const AvatarGroup: React.FC<AvatarGroupProps> = ({
   max,
   size,
+  shape,
   className,
   locale,
   labels: labelsOverride,
@@ -51,12 +58,13 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
   )
 
   const contextValue = useMemo<AvatarGroupContextValue>(
-    () => ({ size, itemClass: getAvatarGroupItemClasses() }),
-    [size]
+    () => ({ size, shape, itemClass: getAvatarGroupItemClasses() }),
+    [size, shape]
   )
 
-  const childArray = React.Children.toArray(children)
-  const { visibleItems, overflowCount } = getVisibleGroupItems(childArray, max)
+  const childArray = React.Children.toArray(children).filter(isAvatarElement)
+  const { visibleItems, overflowCount, visibleCount } = getVisibleGroupItems(childArray, max)
+  const overflowShape = shape ?? 'circle'
 
   return (
     <AvatarGroupContext.Provider value={contextValue}>
@@ -68,7 +76,8 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
         {visibleItems}
         {overflowCount > 0 && (
           <span
-            className={getAvatarGroupOverflowClasses(size ?? 'md')}
+            className={getAvatarGroupOverflowClasses(size ?? 'md', overflowShape, visibleCount > 0)}
+            role="img"
             aria-label={getAvatarGroupOverflowLabel(overflowCount, labels.overflowAriaLabel)}>
             {getAvatarGroupOverflowText(overflowCount)}
           </span>
