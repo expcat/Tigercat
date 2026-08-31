@@ -336,6 +336,10 @@ export function getSelectLabels(
   return resolveLocaleSection(enSection('select'), locale?.select, overrides)
 }
 
+export function formatSelectLevelLabel(template: string, level: number): string {
+  return template.replace('{level}', String(level))
+}
+
 export function getColorPickerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleColorPicker>

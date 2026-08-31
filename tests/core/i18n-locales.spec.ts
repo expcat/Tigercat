@@ -162,6 +162,10 @@ describe('i18n locale presets', () => {
       expect(locale.select?.createOptionLabel).toBeDefined()
       expect(locale.select?.moreCountText).toBeDefined()
       expect(locale.select?.loadingText).toBeDefined()
+      expect(locale.select?.levelLabel).toBeDefined()
+      expect(locale.select?.backText).toBeDefined()
+      expect(locale.select?.expandAriaLabel).toBeDefined()
+      expect(locale.select?.collapseAriaLabel).toBeDefined()
     }
   })
 

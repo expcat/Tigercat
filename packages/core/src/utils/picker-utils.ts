@@ -13,6 +13,7 @@ export interface PickerComboboxAriaOptions {
   listboxId: string
   activeIndex?: number
   activeOptionId?: string
+  haspopup?: 'listbox' | 'tree'
 }
 
 export interface PickerListboxAriaOptions {
@@ -145,11 +146,12 @@ export function getPickerComboboxAria({
   expanded,
   listboxId,
   activeIndex = -1,
-  activeOptionId
+  activeOptionId,
+  haspopup = 'listbox'
 }: PickerComboboxAriaOptions): {
   role: 'combobox'
   'aria-expanded': boolean
-  'aria-haspopup': 'listbox'
+  'aria-haspopup': 'listbox' | 'tree'
   'aria-controls': string | undefined
   'aria-activedescendant': string | undefined
   'data-state': 'open' | 'closed'
@@ -157,13 +159,35 @@ export function getPickerComboboxAria({
   return {
     role: 'combobox',
     'aria-expanded': expanded,
-    'aria-haspopup': 'listbox',
+    'aria-haspopup': haspopup,
     'aria-controls': expanded ? listboxId : undefined,
     'aria-activedescendant': expanded
       ? (activeOptionId ??
         (activeIndex >= 0 ? getPickerOptionId(listboxId, activeIndex) : undefined))
       : undefined,
     'data-state': expanded ? 'open' : 'closed'
+  }
+}
+
+export function getPickerTreeAria({
+  id,
+  label,
+  multiselectable
+}: {
+  id?: string
+  label?: string
+  multiselectable?: boolean
+} = {}): {
+  id: string | undefined
+  role: 'tree'
+  'aria-label': string | undefined
+  'aria-multiselectable': true | undefined
+} {
+  return {
+    id,
+    role: 'tree',
+    'aria-label': label,
+    'aria-multiselectable': multiselectable ? true : undefined
   }
 }
 

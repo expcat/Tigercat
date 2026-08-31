@@ -281,7 +281,11 @@ export const ptBR: TigerLocale = {
     clearAriaLabel: 'Limpar seleção',
     createOptionLabel: 'Criar "{label}"',
     moreCountText: '+{count} mais',
-    loadingText: 'Carregando...'
+    loadingText: 'Carregando...',
+    levelLabel: 'Nível {level}',
+    backText: 'Voltar',
+    expandAriaLabel: 'Expandir',
+    collapseAriaLabel: 'Recolher'
   },
   colorPicker: {
     trigger: 'Escolher cor',

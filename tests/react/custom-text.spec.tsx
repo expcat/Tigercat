@@ -154,31 +154,32 @@ describe('custom text (no i18n) — React', () => {
   })
 
   describe('common.empty/noMore empty-state fallback (I18N-1 / I18N-2)', () => {
-    it('Cascader search empty state reads global config emptyText', () => {
-      const { container, getByText } = render(
-        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
-          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} searchable />
+    it('Cascader search empty state reads empty.noResults', () => {
+      const { getByRole, getByText } = render(
+        <ConfigProvider locale={{ empty: { noResults: '暂无结果' } }}>
+          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} searchable aria-label="City" />
         </ConfigProvider>
       )
-      fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(document.body.querySelector('input[aria-label="Search options"]')!, {
-        target: { value: 'zzz' }
-      })
-      expect(getByText('暂无数据')).toBeInTheDocument()
+      fireEvent.click(getByRole('combobox'))
+      fireEvent.change(getByRole('combobox'), { target: { value: 'zzz' } })
+      expect(getByText('暂无结果')).toBeInTheDocument()
     })
 
-    it('Cascader emptyText prop wins over global config', () => {
-      const { container, getByText, queryByText } = render(
-        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
-          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} searchable emptyText="查无此项" />
+    it('Cascader emptyText prop wins over locale empty.noResults', () => {
+      const { getByRole, getByText, queryByText } = render(
+        <ConfigProvider locale={{ empty: { noResults: '暂无结果' } }}>
+          <Cascader
+            options={[{ label: 'Beijing', value: 'bj' }]}
+            searchable
+            emptyText="查无此项"
+            aria-label="City"
+          />
         </ConfigProvider>
       )
-      fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(document.body.querySelector('input[aria-label="Search options"]')!, {
-        target: { value: 'zzz' }
-      })
+      fireEvent.click(getByRole('combobox'))
+      fireEvent.change(getByRole('combobox'), { target: { value: 'zzz' } })
       expect(getByText('查无此项')).toBeInTheDocument()
-      expect(queryByText('暂无数据')).toBeNull()
+      expect(queryByText('暂无结果')).toBeNull()
     })
 
     it('Select emptyText (empty options) reads global config emptyText', () => {

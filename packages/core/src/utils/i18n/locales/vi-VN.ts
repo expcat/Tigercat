@@ -281,7 +281,11 @@ export const viVN: TigerLocale = {
     clearAriaLabel: 'Xóa lựa chọn',
     createOptionLabel: 'Tạo "{label}"',
     moreCountText: '+{count} nữa',
-    loadingText: 'Đang tải...'
+    loadingText: 'Đang tải...',
+    levelLabel: 'Cấp {level}',
+    backText: 'Quay lại',
+    expandAriaLabel: 'Mở rộng',
+    collapseAriaLabel: 'Thu gọn'
   },
   colorPicker: {
     trigger: 'Chọn màu',

@@ -281,7 +281,11 @@ export const koKR: TigerLocale = {
     clearAriaLabel: '선택 지우기',
     createOptionLabel: '"{label}" 만들기',
     moreCountText: '외 {count}개',
-    loadingText: '불러오는 중...'
+    loadingText: '불러오는 중...',
+    levelLabel: '{level}단계',
+    backText: '뒤로',
+    expandAriaLabel: '펼치기',
+    collapseAriaLabel: '접기'
   },
   colorPicker: {
     trigger: '색 선택',

@@ -281,7 +281,11 @@ export const idID: TigerLocale = {
     clearAriaLabel: 'Hapus pilihan',
     createOptionLabel: 'Buat "{label}"',
     moreCountText: '+{count} lagi',
-    loadingText: 'Memuat...'
+    loadingText: 'Memuat...',
+    levelLabel: 'Tingkat {level}',
+    backText: 'Kembali',
+    expandAriaLabel: 'Bentangkan',
+    collapseAriaLabel: 'Ciutkan'
   },
   colorPicker: {
     trigger: 'Pilih warna',

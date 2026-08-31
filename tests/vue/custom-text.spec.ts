@@ -229,47 +229,46 @@ describe('custom text (no i18n) — Vue', () => {
   })
 
   describe('common.empty/noMore empty-state fallback (I18N-1 / I18N-2)', () => {
-    it('Cascader search empty state reads global config emptyText', async () => {
-      const { container, getByText } = render(
+    it('Cascader search empty state reads empty.noResults', async () => {
+      const { getByRole, getByText } = render(
         defineComponent({
           setup() {
             return () =>
-              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
-                h(Cascader, { options: [{ label: 'Beijing', value: 'bj' }], searchable: true })
-              )
-          }
-        })
-      )
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(
-        document.body.querySelector('input[aria-label="Search options"]')!,
-        'zzz'
-      )
-      expect(getByText('暂无数据')).toBeInTheDocument()
-    })
-
-    it('Cascader emptyText prop wins over global config', async () => {
-      const { container, getByText, queryByText } = render(
-        defineComponent({
-          setup() {
-            return () =>
-              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
+              h(ConfigProvider, { locale: { empty: { noResults: '暂无结果' } } }, () =>
                 h(Cascader, {
                   options: [{ label: 'Beijing', value: 'bj' }],
                   searchable: true,
-                  emptyText: '查无此项'
+                  'aria-label': 'City'
                 })
               )
           }
         })
       )
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(
-        document.body.querySelector('input[aria-label="Search options"]')!,
-        'zzz'
+      await fireEvent.click(getByRole('combobox'))
+      await fireEvent.update(getByRole('combobox'), 'zzz')
+      expect(getByText('暂无结果')).toBeInTheDocument()
+    })
+
+    it('Cascader emptyText prop wins over locale empty.noResults', async () => {
+      const { getByRole, getByText, queryByText } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { empty: { noResults: '暂无结果' } } }, () =>
+                h(Cascader, {
+                  options: [{ label: 'Beijing', value: 'bj' }],
+                  searchable: true,
+                  emptyText: '查无此项',
+                  'aria-label': 'City'
+                })
+              )
+          }
+        })
       )
+      await fireEvent.click(getByRole('combobox'))
+      await fireEvent.update(getByRole('combobox'), 'zzz')
       expect(getByText('查无此项')).toBeInTheDocument()
-      expect(queryByText('暂无数据')).toBeNull()
+      expect(queryByText('暂无结果')).toBeNull()
     })
 
     it('Select emptyText (empty options) reads global config emptyText', async () => {

@@ -1,150 +1,154 @@
 import type { ComponentSize } from '../types/base'
+import type { InputStatus } from '../types/input'
 import type {
-  CascaderOption,
-  CascaderValue,
   CascaderFlattenedOption,
-  CascaderSearchConfig
+  CascaderModelValue,
+  CascaderOption,
+  CascaderSearchConfig,
+  CascaderValue
 } from '../types/cascader'
 import type { VirtualRange } from '../types/virtual-list'
 import { classNames } from './class-names'
-import { getSelectVirtualItemHeight } from './select-utils'
+import { findFirstEnabledIndex, getPickerNavigationIndex } from './picker-utils'
+import {
+  getSelectTriggerClasses,
+  getSelectVirtualItemHeight,
+  selectBaseClasses,
+  selectDoneActionClasses,
+  selectDoneButtonClasses,
+  selectDropdownBaseClasses,
+  selectEmptyStateClasses,
+  selectInGroupClasses,
+  selectListboxClasses,
+  selectSearchInputClasses,
+  selectSearchWrapClasses,
+  selectStandaloneClasses,
+  selectTrailingSlotClasses
+} from './select-utils'
 import { fixedSizeStrategy } from './virtual-list-utils'
 
-// ============================================================================
-// STYLE CLASSES
-// ============================================================================
+export const CASCADER_DEFAULT_LIST_HEIGHT = 256
+export const CASCADER_DEFAULT_SEARCH_LIMIT = 50
+export const CASCADER_DEFAULT_SEPARATOR = ' / '
 
-/**
- * Base cascader container classes
- */
-export const cascaderBaseClasses = 'relative inline-block w-full'
+const CASCADER_VIRTUAL_OVERSCAN = 5
 
-/**
- * Cascader trigger base classes
- */
-const CASCADER_TRIGGER_BASE_CLASSES = [
-  'w-full',
-  'flex',
-  'items-center',
-  'justify-between',
-  'gap-2',
-  'px-3',
-  'bg-[var(--tiger-cascader-trigger-bg,var(--tiger-surface,#ffffff))]',
-  'border',
-  'border-[var(--tiger-cascader-trigger-border,var(--tiger-border,#d1d5db))]',
-  'text-[var(--tiger-cascader-trigger-text,var(--tiger-text,#111827))]',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'shadow-sm',
-  'cursor-pointer',
-  'transition-all',
-  'duration-150',
-  'focus:outline-none',
-  'focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-cascader-ring,var(--tiger-primary,#2563eb))]',
-  'focus-visible:border-[var(--tiger-cascader-trigger-border-focus,var(--tiger-primary,#2563eb))]',
-  'active:scale-[0.99]'
-] as const
-
-const CASCADER_TRIGGER_DISABLED_CLASSES =
-  'disabled:bg-[var(--tiger-cascader-trigger-bg-disabled,var(--tiger-surface-muted,#f3f4f6))] disabled:text-[var(--tiger-cascader-trigger-text-disabled,var(--tiger-text-muted,#6b7280))] disabled:cursor-not-allowed disabled:border-[var(--tiger-cascader-trigger-border-disabled,var(--tiger-border,#e5e7eb))]'
-
-/**
- * Cascader dropdown panel classes
- */
-export const cascaderDropdownClasses =
-  'flex bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-cascader-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg max-sm:flex-col max-sm:rounded-none max-sm:border-0 max-sm:shadow-none max-sm:pt-[env(safe-area-inset-top)] max-sm:pb-[env(safe-area-inset-bottom)]'
-
-/**
- * Cascader column (single level) classes
- */
-export const cascaderColumnClasses =
-  'min-w-[160px] max-h-64 overflow-auto border-r border-[var(--tiger-cascader-column-border,var(--tiger-border,#e5e7eb))] last:border-r-0 max-sm:min-w-0 max-sm:flex-1 max-sm:max-h-none'
-
-/**
- * Cascader option base classes
- */
-export const cascaderOptionBaseClasses =
-  'w-full px-3 py-2 flex items-center justify-between text-left cursor-pointer transition-colors text-[var(--tiger-cascader-option-text,var(--tiger-text,#111827))] hover:bg-[var(--tiger-cascader-option-bg-hover,var(--tiger-outline-bg-hover,#eff6ff))]'
-
-/**
- * Cascader option selected classes
- */
-export const cascaderOptionSelectedClasses =
-  'bg-[var(--tiger-cascader-option-bg-selected,var(--tiger-outline-bg-hover,#eff6ff))] text-[var(--tiger-cascader-option-text-selected,var(--tiger-primary,#2563eb))] font-medium'
-
-/**
- * Cascader option disabled classes
- */
-export const cascaderOptionDisabledClasses =
-  'opacity-50 cursor-not-allowed hover:bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))]'
-
-/**
- * Cascader search input classes
- */
-export const cascaderSearchInputClasses =
-  'w-full px-3 py-2 bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-cascader-search-text,var(--tiger-text,#111827))] placeholder:text-[var(--tiger-cascader-search-placeholder,var(--tiger-text-muted,#9ca3af))] border-b border-[var(--tiger-cascader-dropdown-border,var(--tiger-border,#e5e7eb))] focus:outline-none focus:ring-0'
-
-/**
- * Cascader empty state classes
- */
-export const cascaderEmptyStateClasses =
-  'px-3 py-8 text-center text-[var(--tiger-cascader-empty-text,var(--tiger-text-muted,#6b7280))] text-sm'
-
-/**
- * Cascader search result item classes
- */
-export const cascaderSearchResultClasses =
-  'w-full px-3 py-2 text-left cursor-pointer transition-colors text-[var(--tiger-cascader-option-text,var(--tiger-text,#111827))] hover:bg-[var(--tiger-cascader-option-bg-hover,var(--tiger-outline-bg-hover,#eff6ff))]'
-
-/**
- * Size classes map
- */
-const CASCADER_SIZE_CLASSES: Record<ComponentSize, string> = {
+const CASCADER_OPTION_PAD_Y: Record<ComponentSize, string> = {
   sm: 'text-sm py-1.5',
   md: 'text-base py-2',
   lg: 'text-lg py-2.5'
 }
 
-/**
- * Get cascader trigger classes
- */
-export function getCascaderTriggerClasses(
-  size: ComponentSize,
-  disabled: boolean,
-  isOpen: boolean
-): string {
+export const cascaderBaseClasses = selectBaseClasses
+export const cascaderDropdownClasses = classNames(selectDropdownBaseClasses, 'min-w-0')
+export const cascaderSearchInputClasses = selectSearchInputClasses
+export const cascaderSearchWrapClasses = selectSearchWrapClasses
+export const cascaderEmptyStateClasses = selectEmptyStateClasses
+export const cascaderListboxClasses = selectListboxClasses
+export const cascaderDoneActionClasses = selectDoneActionClasses
+export const cascaderDoneButtonClasses = selectDoneButtonClasses
+export const cascaderTrailingSlotClasses = selectTrailingSlotClasses
+
+export const cascaderColumnsClasses = 'flex min-w-0 max-sm:block'
+export const cascaderBackButtonClasses = classNames(
+  'hidden max-sm:flex items-center gap-1 shrink-0 px-3 py-2 text-sm',
+  'text-start text-[var(--tiger-text,#111827)]',
+  'border-b border-[var(--tiger-border,#e5e7eb)]',
+  'bg-[var(--tiger-surface,#ffffff)]',
+  'focus:outline-none focus-visible:ring-2',
+  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+)
+
+export type CascaderTriggerKeyIntent =
+  | { type: 'none' }
+  | { type: 'open' }
+  | { type: 'close' }
+  | { type: 'clear' }
+  | { type: 'navigate'; key: string }
+  | { type: 'into' }
+  | { type: 'out' }
+  | { type: 'select-active' }
+  | { type: 'prevent-scroll' }
+
+export type CascaderColumn = {
+  options: CascaderOption[]
+  selectedValue?: string | number
+}
+
+export function getCascaderRootClasses(inGroup: boolean, className?: string): string {
   return classNames(
-    ...CASCADER_TRIGGER_BASE_CLASSES,
-    CASCADER_SIZE_CLASSES[size],
-    disabled && CASCADER_TRIGGER_DISABLED_CLASSES,
-    isOpen &&
-      'ring-2 ring-[var(--tiger-cascader-ring,var(--tiger-primary,#2563eb))] border-[var(--tiger-cascader-trigger-border-focus,var(--tiger-primary,#2563eb))]'
+    cascaderBaseClasses,
+    inGroup ? selectInGroupClasses : selectStandaloneClasses,
+    className
   )
 }
 
-/**
- * Get cascader option classes
- */
-export function getCascaderOptionClasses(
-  isSelected: boolean,
-  isDisabled: boolean,
-  size: ComponentSize
-): string {
+export function getCascaderTriggerClasses(options: {
+  size?: ComponentSize
+  disabled?: boolean
+  isOpen?: boolean
+  status?: InputStatus
+  hasClear?: boolean
+}): string {
+  return getSelectTriggerClasses(options)
+}
+
+export function getCascaderOptionClasses(options: {
+  isSelected: boolean
+  isDisabled: boolean
+  isActive: boolean
+  size?: ComponentSize
+}): string {
+  const size = options.size ?? 'md'
   return classNames(
-    cascaderOptionBaseClasses,
-    CASCADER_SIZE_CLASSES[size],
-    isSelected && cascaderOptionSelectedClasses,
-    isDisabled && cascaderOptionDisabledClasses
+    'w-full px-3 flex items-center justify-between gap-2 text-start',
+    CASCADER_OPTION_PAD_Y[size],
+    'tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease,color_150ms_ease)]',
+    options.isDisabled
+      ? 'opacity-50 cursor-not-allowed'
+      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+    options.isSelected &&
+      'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium',
+    options.isActive &&
+      !options.isDisabled &&
+      'ring-2 ring-inset ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
   )
 }
 
-// ============================================================================
-// LOGIC UTILITIES
-// ============================================================================
+export function getCascaderColumnClasses(focused: boolean): string {
+  return classNames(
+    'min-w-[160px] overflow-auto border-e last:border-e-0',
+    'border-[var(--tiger-border,#e5e7eb)]',
+    'max-sm:min-w-0 max-sm:w-full max-sm:border-e-0',
+    !focused && 'max-sm:hidden'
+  )
+}
 
-/**
- * Find option by value in a flat list of options at a given level
- */
+export function getCascaderPanelStyle(listHeight: number): { maxHeight: string } {
+  return { maxHeight: `${listHeight}px` }
+}
+
+export function getCascaderColumnStyle(listHeight: number): {
+  height: string
+  maxHeight: string
+} {
+  return { height: `${listHeight}px`, maxHeight: `${listHeight}px` }
+}
+
+export function getCascaderVirtualItemHeight(size: ComponentSize = 'md'): number {
+  return getSelectVirtualItemHeight(size)
+}
+
+export function getCascaderOptionKey(option: CascaderOption, index: number): string {
+  return `${index}-${String(option.value)}`
+}
+
+export function isCascaderOptionExpandable(option: CascaderOption, hasLoadData = false): boolean {
+  if (option.isLeaf === true) return false
+  if (option.children && option.children.length > 0) return true
+  return hasLoadData && option.isLeaf === false
+}
+
 export function findCascaderOption(
   options: CascaderOption[],
   value: string | number
@@ -152,9 +156,6 @@ export function findCascaderOption(
   return options.find((opt) => opt.value === value)
 }
 
-/**
- * Get the full option path for a given value path
- */
 export function getCascaderOptionPath(
   options: CascaderOption[],
   valuePath: CascaderValue
@@ -172,80 +173,112 @@ export function getCascaderOptionPath(
   return result
 }
 
-/**
- * Get the display label for a value path
- */
-export function getCascaderDisplayLabel(
-  options: CascaderOption[],
-  valuePath: CascaderValue,
-  separator: string = ' / '
-): string {
-  const path = getCascaderOptionPath(options, valuePath)
-  return path.map((opt) => opt.label).join(separator)
+export function cascaderPathKey(valuePath: CascaderValue): string {
+  return valuePath.map(String).join('\0')
 }
 
-/**
- * Get options at a specific level based on selected path
- */
+export function rememberCascaderLabel(
+  cache: Map<string, string>,
+  valuePath: CascaderValue,
+  label: string
+): void {
+  if (valuePath.length === 0 || !label) return
+  cache.set(cascaderPathKey(valuePath), label)
+}
+
+export function getCascaderDisplayLabel(
+  options: CascaderOption[],
+  valuePath: CascaderModelValue,
+  separator: string = CASCADER_DEFAULT_SEPARATOR,
+  cache?: Map<string, string>
+): string {
+  if (!valuePath || valuePath.length === 0) return ''
+  const path = getCascaderOptionPath(options, valuePath)
+  if (path.length === valuePath.length) {
+    return path.map((opt) => opt.label).join(separator)
+  }
+  return cache?.get(cascaderPathKey(valuePath)) ?? path.map((opt) => opt.label).join(separator)
+}
+
+export function isCascaderValueEmpty(value: CascaderModelValue): boolean {
+  return value === undefined || value.length === 0
+}
+
+export function normalizeCascaderValue(value: CascaderModelValue): CascaderModelValue {
+  if (value === undefined || value.length === 0) return undefined
+  return value
+}
+
+export function shouldShowCascaderClear(options: {
+  clearable: boolean
+  disabled: boolean
+  value: CascaderModelValue
+}): boolean {
+  return options.clearable && !options.disabled && !isCascaderValueEmpty(options.value)
+}
+
+export function serializeCascaderFormValue(value: CascaderModelValue): string | undefined {
+  if (isCascaderValueEmpty(value) || !value) return undefined
+  return JSON.stringify(value)
+}
+
+export function coerceCascaderFormValue(value: unknown): CascaderModelValue {
+  if (value === undefined || value === null) return undefined
+  if (Array.isArray(value)) {
+    return normalizeCascaderValue(value as CascaderValue)
+  }
+  if (typeof value === 'string' && value.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(value) as unknown
+      if (Array.isArray(parsed)) return normalizeCascaderValue(parsed as CascaderValue)
+    } catch {
+      return undefined
+    }
+  }
+  return undefined
+}
+
 export function getCascaderOptionsAtLevel(
   options: CascaderOption[],
   selectedPath: CascaderValue,
   level: number
 ): CascaderOption[] {
-  if (level === 0) return options
-
-  let currentOptions = options
-  for (let i = 0; i < level; i++) {
-    const value = selectedPath[i]
-    if (value === undefined) return []
-    const option = findCascaderOption(currentOptions, value)
-    if (!option?.children) return []
-    currentOptions = option.children
-  }
-
-  return currentOptions
+  return getCascaderColumns(options, selectedPath.slice(0, level))[level]?.options ?? []
 }
 
-/**
- * Check if an option has children (is expandable)
- */
-export function isCascaderOptionExpandable(option: CascaderOption): boolean {
-  if (option.isLeaf) return false
-  return !!(option.children && option.children.length > 0)
-}
-
-/**
- * Flatten all option paths for search
- */
 export function flattenCascaderOptions(
   options: CascaderOption[],
   parentPath: CascaderOption[] = [],
   parentValuePath: CascaderValue = [],
-  changeOnSelect = false
+  changeOnSelect = false,
+  separator: string = CASCADER_DEFAULT_SEPARATOR
 ): CascaderFlattenedOption[] {
   const result: CascaderFlattenedOption[] = []
 
   for (const option of options) {
     const currentPath = [...parentPath, option]
     const currentValuePath = [...parentValuePath, option.value]
-    const isDisabled = currentPath.some((o) => o.disabled)
-    const isLeaf = !option.children || option.children.length === 0 || !!option.isLeaf
+    const expandable = isCascaderOptionExpandable(option)
+    const isDisabled = currentPath.some((item) => item.disabled)
 
-    // Add leaf options; with `changeOnSelect`, intermediate nodes are also
-    // selectable search results.
-    if (isLeaf || changeOnSelect) {
+    if (!expandable || changeOnSelect) {
       result.push({
         path: currentPath,
         valuePath: currentValuePath,
-        label: currentPath.map((o) => o.label).join(' / '),
+        label: currentPath.map((item) => item.label).join(separator),
         disabled: isDisabled
       })
     }
 
-    // Recurse into children
-    if (option.children && option.children.length > 0) {
+    if (expandable && option.children) {
       result.push(
-        ...flattenCascaderOptions(option.children, currentPath, currentValuePath, changeOnSelect)
+        ...flattenCascaderOptions(
+          option.children,
+          currentPath,
+          currentValuePath,
+          changeOnSelect,
+          separator
+        )
       )
     }
   }
@@ -253,17 +286,18 @@ export function flattenCascaderOptions(
   return result
 }
 
-/**
- * Default search filter function
- */
 export function defaultCascaderFilter(inputValue: string, path: CascaderOption[]): boolean {
   const searchLower = inputValue.toLowerCase()
   return path.some((option) => option.label.toLowerCase().includes(searchLower))
 }
 
-/**
- * Filter flattened options by search query
- */
+export function resolveCascaderSearchLimit(searchable?: boolean | CascaderSearchConfig): number {
+  if (typeof searchable === 'object' && typeof searchable.limit === 'number') {
+    return searchable.limit
+  }
+  return CASCADER_DEFAULT_SEARCH_LIMIT
+}
+
 export function filterCascaderOptions(
   flattenedOptions: CascaderFlattenedOption[],
   inputValue: string,
@@ -273,34 +307,24 @@ export function filterCascaderOptions(
 
   const filterFn =
     typeof searchable === 'object' && searchable.filter ? searchable.filter : defaultCascaderFilter
-
-  const limit = typeof searchable === 'object' && searchable.limit ? searchable.limit : 50
-
-  const filtered = flattenedOptions.filter((item) => filterFn(inputValue, item.path))
-
-  return filtered.slice(0, limit)
+  const limit = resolveCascaderSearchLimit(searchable)
+  return flattenedOptions.filter((item) => filterFn(inputValue, item.path)).slice(0, limit)
 }
 
-/**
- * Get columns to display based on active path
- * Returns an array of { options, selectedValue } for each visible column
- */
 export function getCascaderColumns(
   options: CascaderOption[],
-  activePath: CascaderValue
-): Array<{ options: CascaderOption[]; selectedValue?: string | number }> {
-  const columns: Array<{ options: CascaderOption[]; selectedValue?: string | number }> = []
+  activePath: CascaderValue,
+  hasLoadData = false
+): CascaderColumn[] {
+  if (!options.length) return []
 
-  // First column is always root options
-  columns.push({ options, selectedValue: activePath[0] })
-
-  // Add subsequent columns based on active path
+  const columns: CascaderColumn[] = [{ options, selectedValue: activePath[0] }]
   let currentOptions = options
-  for (let i = 0; i < activePath.length; i++) {
-    const value = activePath[i]
-    const option = findCascaderOption(currentOptions, value)
-    if (!option?.children || option.children.length === 0) break
 
+  for (let i = 0; i < activePath.length; i++) {
+    const option = findCascaderOption(currentOptions, activePath[i])
+    if (!option || !isCascaderOptionExpandable(option, hasLoadData)) break
+    if (!option.children || option.children.length === 0) break
     currentOptions = option.children
     columns.push({
       options: currentOptions,
@@ -311,28 +335,116 @@ export function getCascaderColumns(
   return columns
 }
 
-// ============================================================================
-// VIRTUAL SCROLLING (mirrors Select fixed-size virtual mode)
-// ============================================================================
+export function setCascaderOptionChildren(
+  options: CascaderOption[],
+  valuePath: CascaderValue,
+  children: CascaderOption[]
+): CascaderOption[] {
+  if (valuePath.length === 0) return children
 
-/** Default panel height (px) when `virtual` is true — same as Select `listHeight`. */
-export const CASCADER_DEFAULT_LIST_HEIGHT = 256
-
-/** Extra rows rendered above/below the viewport — same overscan as Select. */
-const CASCADER_VIRTUAL_OVERSCAN = 5
-
-/**
- * Virtual-scroll row height (px) for a cascader size.
- * Cascader option rows share Select size padding, so the Select height map is reused.
- */
-export function getCascaderVirtualItemHeight(size: ComponentSize = 'md'): number {
-  return getSelectVirtualItemHeight(size)
+  const [head, ...rest] = valuePath
+  return options.map((option) => {
+    if (option.value !== head) return option
+    if (rest.length === 0) {
+      return { ...option, children, isLeaf: children.length === 0 ? true : option.isLeaf }
+    }
+    return {
+      ...option,
+      children: setCascaderOptionChildren(option.children ?? [], rest, children)
+    }
+  })
 }
 
-/**
- * Visible window for a cascader column or searchable flat list.
- * Uses the shared `fixedSizeStrategy` / `getRange` path Select virtual mode uses.
- */
+export function getCascaderInlineNav(
+  key: string,
+  dir: 'ltr' | 'rtl' = 'ltr'
+): 'into' | 'out' | null {
+  const into = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+  const out = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'
+  if (key === into) return 'into'
+  if (key === out) return 'out'
+  return null
+}
+
+export function getCascaderTriggerKeyIntent(options: {
+  key: string
+  open: boolean
+  searchable: boolean
+  searchMode?: boolean
+  clearable: boolean
+  hasValue: boolean
+  fromSearchInput?: boolean
+  dir?: 'ltr' | 'rtl'
+}): CascaderTriggerKeyIntent {
+  const { key, open, searchable, searchMode, fromSearchInput, dir = 'ltr' } = options
+  if (key === 'Escape') {
+    return open ? { type: 'close' } : { type: 'none' }
+  }
+  if (key === 'Tab') {
+    return open ? { type: 'close' } : { type: 'none' }
+  }
+  if (!open) {
+    if ((key === 'Backspace' || key === 'Delete') && options.clearable && options.hasValue) {
+      return { type: 'clear' }
+    }
+    if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Enter' || key === ' ') {
+      return { type: 'open' }
+    }
+    if (key === 'Home' || key === 'End') {
+      return { type: 'prevent-scroll' }
+    }
+    return { type: 'none' }
+  }
+  if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+    return { type: 'navigate', key }
+  }
+  if (!searchMode) {
+    const inline = getCascaderInlineNav(key, dir)
+    if (inline === 'into') return { type: 'into' }
+    if (inline === 'out') return { type: 'out' }
+  }
+  if (key === 'Enter' || (key === ' ' && !fromSearchInput && !searchable)) {
+    return { type: 'select-active' }
+  }
+  return { type: 'none' }
+}
+
+export function navigateCascaderColumnIndex(
+  items: readonly CascaderOption[],
+  current: number,
+  key: string
+): number {
+  return getPickerNavigationIndex(items, current, key, (item) => Boolean(item.disabled))
+}
+
+export function getCascaderColumnOptionId(
+  listboxId: string,
+  colIndex: number,
+  optionIndex: number
+): string {
+  return `${listboxId}-col${colIndex}-opt${optionIndex}`
+}
+
+export function resolveCascaderActivePath(value: CascaderModelValue): CascaderValue {
+  return value ?? []
+}
+
+export function selectedIndexInColumn(
+  options: CascaderOption[],
+  selectedValue: string | number | undefined
+): number {
+  if (selectedValue === undefined) return -1
+  return options.findIndex((option) => option.value === selectedValue)
+}
+
+export function initialCascaderColumnActiveIndices(columns: CascaderColumn[]): number[] {
+  return columns.map((column) => {
+    const selected = selectedIndexInColumn(column.options, column.selectedValue)
+    if (selected >= 0 && !column.options[selected]?.disabled) return selected
+    return findFirstEnabledIndex(column.options, (item) => Boolean(item.disabled))
+  })
+}
+
 export function getCascaderVirtualRange(
   scrollTop: number,
   listHeight: number,
@@ -341,8 +453,6 @@ export function getCascaderVirtualRange(
   overscan: number = CASCADER_VIRTUAL_OVERSCAN
 ): VirtualRange {
   const range = fixedSizeStrategy(itemHeight).getRange(scrollTop, listHeight, itemCount, overscan)
-  // Select's getRange does not clamp startIndex to itemCount, so a stale
-  // scrollTop (e.g. End, then a tighter search) can yield startIndex > endIndex.
   if (range.endIndex < 0 || range.startIndex <= range.endIndex) return range
   return {
     ...range,
@@ -351,10 +461,6 @@ export function getCascaderVirtualRange(
   }
 }
 
-/**
- * Next `scrollTop` that keeps `index` inside the virtual window.
- * Returns `scrollTop` unchanged when `index` is out of range.
- */
 export function getCascaderVirtualAlignScrollTop(
   scrollTop: number,
   index: number,

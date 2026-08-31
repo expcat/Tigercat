@@ -281,7 +281,11 @@ export const jaJP: TigerLocale = {
     clearAriaLabel: '選択をクリア',
     createOptionLabel: '「{label}」を作成',
     moreCountText: 'ほか{count}件',
-    loadingText: '読み込み中...'
+    loadingText: '読み込み中...',
+    levelLabel: 'レベル {level}',
+    backText: '戻る',
+    expandAriaLabel: '展開',
+    collapseAriaLabel: '折りたたむ'
   },
   colorPicker: {
     trigger: '色を選択',

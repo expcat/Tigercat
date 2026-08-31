@@ -281,7 +281,11 @@ export const zhTW: TigerLocale = {
     clearAriaLabel: '清除選取',
     createOptionLabel: '建立「{label}」',
     moreCountText: '等 {count} 項',
-    loadingText: '載入中...'
+    loadingText: '載入中...',
+    levelLabel: '第 {level} 級',
+    backText: '返回',
+    expandAriaLabel: '展開',
+    collapseAriaLabel: '收合'
   },
   colorPicker: {
     trigger: '選擇顏色',

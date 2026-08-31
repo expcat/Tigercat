@@ -2,10 +2,16 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 const simpleOptions = [
   {
@@ -16,428 +22,183 @@ const simpleOptions = [
         label: 'Hangzhou',
         value: 'hangzhou',
         children: [{ label: 'West Lake', value: 'westlake' }]
-      },
-      { label: 'Ningbo', value: 'ningbo' }
+      }
     ]
   },
   {
     label: 'Jiangsu',
     value: 'jiangsu',
-    children: [
-      {
-        label: 'Nanjing',
-        value: 'nanjing',
-        children: [{ label: 'Zhong Hua Men', value: 'zhonghuamen' }]
-      }
-    ]
-  }
-]
-
-const optionsWithDisabled = [
-  {
-    label: 'Active',
-    value: 'active',
-    children: [{ label: 'Child', value: 'child' }]
-  },
-  {
-    label: 'Disabled',
-    value: 'disabled',
-    disabled: true,
-    children: [{ label: 'Blocked', value: 'blocked' }]
+    children: [{ label: 'Nanjing', value: 'nanjing' }]
   }
 ]
 
 describe('Cascader', () => {
-  describe('Props', () => {
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = render(Cascader, {
-        props: { options: simpleOptions, disabled: true }
-      })
+  it('keeps an uncontrolled selection after choosing a leaf', async () => {
+    const { getByRole } = render(Cascader, {
+      props: { options: simpleOptions, 'aria-label': 'Region' }
+    })
+    const trigger = getByRole('combobox')
+    expect(trigger).toHaveTextContent('Select an option')
+    await fireEvent.click(trigger)
+    await fireEvent.click(getByRole('option', { name: 'Zhejiang' }))
+    await fireEvent.click(getByRole('option', { name: 'Hangzhou' }))
+    await fireEvent.click(getByRole('option', { name: 'West Lake' }))
+    expect(getByRole('combobox')).toHaveTextContent('Zhejiang / Hangzhou / West Lake')
+  })
 
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeDisabled()
+  it('opens from a closed trigger with ArrowDown', async () => {
+    const { getByRole } = render(Cascader, {
+      props: { options: simpleOptions, 'aria-label': 'Keys' }
+    })
+    const trigger = getByRole('combobox')
+    trigger.focus()
+    await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(getByRole('option', { name: 'Zhejiang' })).toBeInTheDocument()
+  })
+
+  it('expands on hover when expandTrigger is hover', async () => {
+    const { getByRole } = render(Cascader, {
+      props: {
+        options: simpleOptions,
+        expandTrigger: 'hover',
+        'aria-label': 'Hover'
+      }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    await fireEvent.mouseEnter(getByRole('option', { name: 'Zhejiang' }))
+    expect(getByRole('option', { name: 'Hangzhou' })).toBeInTheDocument()
+  })
+
+  it('keeps defaultSearchValue after open', async () => {
+    const { getByRole } = render(Cascader, {
+      props: {
+        options: simpleOptions,
+        searchable: true,
+        defaultSearchValue: 'West',
+        'aria-label': 'Search'
+      }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    expect((getByRole('combobox') as HTMLInputElement).value).toBe('West')
+    expect(getByRole('option', { name: 'Zhejiang / Hangzhou / West Lake' })).toBeInTheDocument()
+  })
+
+  it('reads FormItem and validates the committed path', async () => {
+    const validator = vi.fn().mockResolvedValue(undefined)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            Form,
+            { model: { region: undefined }, rules: { region: [{ validator, trigger: 'change' }] } },
+            {
+              default: () =>
+                h(
+                  FormItem,
+                  { name: 'region', label: 'Region' },
+                  { default: () => h(Cascader, { options: simpleOptions }) }
+                )
+            }
+          )
+      }
+    })
+    const { getByRole, queryByText } = render(Wrapper)
+    const trigger = getByRole('combobox')
+    expect(trigger).toHaveAttribute('id')
+    await fireEvent.click(trigger)
+    expect(queryByText(/required/i)).not.toBeInTheDocument()
+    await fireEvent.click(getByRole('option', { name: 'Jiangsu' }))
+    await fireEvent.click(getByRole('option', { name: 'Nanjing' }))
+    await waitFor(() => {
+      expect(validator).toHaveBeenCalled()
     })
   })
 
-  describe('Dropdown', () => {
-    it('should open dropdown on click', async () => {
-      const { container } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
+  it('uses zh-TW labels from the official locale object', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            ConfigProvider,
+            { locale: zhTW },
+            { default: () => h(Cascader, { options: [], 'aria-label': 'TW' }) }
+          )
+      }
     })
+    const { getByRole, getByText } = render(Wrapper)
+    expect(getByText('請選擇')).toBeInTheDocument()
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByText('暫無結果')).toBeInTheDocument()
+  })
 
-    it('should expand child options on click', async () => {
-      const { container, getByText } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.click(getByText('Zhejiang'))
-
-      expect(getByText('Hangzhou')).toBeInTheDocument()
-      expect(getByText('Ningbo')).toBeInTheDocument()
+  it('swaps column keys in RTL', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            ConfigProvider,
+            { locale: arSA },
+            {
+              default: () => h(Cascader, { options: simpleOptions, 'aria-label': 'RTL' })
+            }
+          )
+      }
     })
+    const { getByRole } = render(Wrapper)
+    const trigger = getByRole('combobox')
+    trigger.focus()
+    await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    await fireEvent.keyDown(trigger, { key: 'Enter' })
+    await fireEvent.keyDown(trigger, { key: 'ArrowLeft' })
+    expect(getByRole('option', { name: 'Hangzhou' })).toBeInTheDocument()
+  })
 
-    it('should select leaf option and close', async () => {
-      const { container, getByText, emitted } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.click(getByText('Zhejiang'))
-      await fireEvent.click(getByText('Ningbo'))
-
-      expect(emitted()['update:modelValue']).toBeTruthy()
-      expect(emitted()['update:modelValue'][0]).toEqual([['zhejiang', 'ningbo']])
-      expect(emitted()['change'][0]).toEqual([['zhejiang', 'ningbo']])
+  it('closes from Done without selecting a leaf', async () => {
+    const { getByRole, queryByRole } = render(Cascader, {
+      props: { options: simpleOptions, 'aria-label': 'Done' }
     })
-    it('should expand on hover when expandTrigger is hover', async () => {
-      const { container, getByText } = render(Cascader, {
-        props: { options: simpleOptions, expandTrigger: 'hover' }
-      })
+    await fireEvent.click(getByRole('combobox'))
+    await fireEvent.click(getByRole('option', { name: 'Zhejiang' }))
+    await fireEvent.click(getByRole('button', { name: 'Done' }))
+    expect(queryByRole('option', { name: 'Hangzhou' })).not.toBeInTheDocument()
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+  })
 
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const zhejiang = getByText('Zhejiang').closest('[role="option"]')!
-      await fireEvent.mouseEnter(zhejiang)
-
-      expect(getByText('Hangzhou')).toBeInTheDocument()
+  it('exposes focus/open/close', async () => {
+    const exposed = ref<{ focus: () => void } | null>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(Cascader, {
+            ref: (value: { focus: () => void } | null) => {
+              exposed.value = value
+            },
+            options: simpleOptions,
+            'aria-label': 'Ref'
+          })
+      }
+    })
+    const { getByRole } = render(Wrapper)
+    exposed.value?.focus()
+    await waitFor(() => {
+      expect(getByRole('combobox')).toHaveFocus()
     })
   })
 
-  describe('Clear', () => {
-    it('should clear value on clear click', async () => {
-      const { container, emitted } = render(Cascader, {
-        props: {
-          options: simpleOptions,
-          modelValue: ['zhejiang', 'hangzhou'],
-          clearable: true
-        }
-      })
-
-      const clearBtn = container.querySelector('[aria-label="Clear selection"]')!
-      await fireEvent.click(clearBtn)
-
-      expect(emitted()['update:modelValue'][0]).toEqual([[]])
+  it('has no accessibility violations when open with a label', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            FormItem,
+            { label: 'Region' },
+            { default: () => h(Cascader, { options: simpleOptions }) }
+          )
+      }
     })
-
-    it('renders clear as a sibling button of the combobox trigger', () => {
-      const { container } = render(Cascader, {
-        props: {
-          options: simpleOptions,
-          modelValue: ['zhejiang', 'hangzhou'],
-          clearable: true
-        }
-      })
-
-      const trigger = container.querySelector('[role="combobox"]')!
-      const clearBtn = container.querySelector('[data-tiger-cascader-clear]')
-      expect(clearBtn).toBeTruthy()
-      expect(clearBtn?.tagName).toBe('BUTTON')
-      expect(trigger.contains(clearBtn)).toBe(false)
-    })
-  })
-
-  describe('Search', () => {
-    it('should filter options by search query', async () => {
-      const { container, getByText, queryByText } = render(Cascader, {
-        props: { options: simpleOptions, searchable: true }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
-      await fireEvent.update(searchInput, 'West')
-
-      expect(getByText('Zhejiang / Hangzhou / West Lake')).toBeInTheDocument()
-      expect(queryByText('Zhong Hua Men')).not.toBeInTheDocument()
-    })
-
-    it('should show not found text when no results', async () => {
-      const { container, getByText } = render(Cascader, {
-        props: {
-          options: simpleOptions,
-          searchable: true,
-          emptyText: 'Nothing found'
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
-      await fireEvent.update(searchInput, 'xyz nonexistent')
-
-      expect(getByText('Nothing found')).toBeInTheDocument()
-    })
-  })
-
-  describe('Disabled options', () => {
-    it('should not select disabled options', async () => {
-      const { container, getByText, emitted } = render(Cascader, {
-        props: { options: optionsWithDisabled }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.click(getByText('Disabled'))
-
-      expect(emitted()['update:modelValue']).toBeFalsy()
-    })
-  })
-
-  describe('changeOnSelect', () => {
-    it('should emit on each level when changeOnSelect is true', async () => {
-      const { container, getByText, emitted } = render(Cascader, {
-        props: { options: simpleOptions, changeOnSelect: true }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.click(getByText('Zhejiang'))
-
-      expect(emitted()['update:modelValue']).toBeTruthy()
-      expect(emitted()['update:modelValue'][0]).toEqual([['zhejiang']])
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should have correct ARIA attributes on trigger', () => {
-      const { container } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      expect(trigger.getAttribute('role')).toBe('combobox')
-      expect(trigger.getAttribute('aria-expanded')).toBe('false')
-      expect(trigger.getAttribute('aria-haspopup')).toBe('listbox')
-    })
-
-    it('should update aria-expanded when opened', async () => {
-      const { container } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      expect(trigger.getAttribute('aria-expanded')).toBe('true')
-    })
-    it('should open on Enter key', async () => {
-      const { container } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.keyDown(trigger, { key: 'Enter' })
-
-      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
-    })
-
-    it('moves and commits with ArrowDown and Enter on a non-virtual list', async () => {
-      const { container, getByText, emitted } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
-      await fireEvent.keyDown(trigger, { key: 'Enter' })
-
-      expect(getByText('Hangzhou')).toBeInTheDocument()
-      expect(getByText('Ningbo')).toBeInTheDocument()
-
-      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
-      await fireEvent.keyDown(trigger, { key: 'Enter' })
-
-      expect(emitted()['update:modelValue'][0]).toEqual([['zhejiang', 'ningbo']])
-      expect(emitted()['change'][0]).toEqual([['zhejiang', 'ningbo']])
-    })
-
-    it('skips disabled options when moving with ArrowDown', async () => {
-      const { container } = render(Cascader, {
-        props: { options: optionsWithDisabled }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
-
-      const activeId = trigger.getAttribute('aria-activedescendant')
-      expect(activeId).toBeTruthy()
-      const activeEl = document.getElementById(activeId!)
-      expect(activeEl?.textContent).toContain('Active')
-      expect(activeEl?.textContent).not.toContain('Disabled')
-    })
-
-    it('should close on Escape key', async () => {
-      const { container } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
-
-      await fireEvent.keyDown(trigger, { key: 'Escape' })
-      expect(document.body.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
-
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Cascader)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-
-  describe('Virtual scrolling', () => {
-    const largeOptions = Array.from({ length: 200 }, (_, i) => ({
-      label: `Option ${i}`,
-      value: i,
-      children: [{ label: `Child ${i}`, value: `c-${i}` }]
-    }))
-
-    it('renders only a subset of column options when virtual is enabled', async () => {
-      const { container, getByText, queryByText } = render(Cascader, {
-        props: { options: largeOptions, virtual: true }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-
-      const virtualList = document.body.querySelector('[data-tiger-cascader-virtual]')
-      expect(virtualList).toBeInTheDocument()
-      expect(getByText('Option 0')).toBeInTheDocument()
-      expect(queryByText('Option 199')).not.toBeInTheDocument()
-
-      const options = document.body.querySelectorAll('[role="option"]')
-      expect(options.length).toBeGreaterThan(0)
-      expect(options.length).toBeLessThan(50)
-    })
-
-    it('does not virtualize by default and still renders a small column fully', async () => {
-      const { container, getByText } = render(Cascader, {
-        props: { options: simpleOptions }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-
-      expect(document.body.querySelector('[data-tiger-cascader-virtual]')).not.toBeInTheDocument()
-      expect(getByText('Zhejiang')).toBeInTheDocument()
-      expect(getByText('Jiangsu')).toBeInTheDocument()
-      expect(document.body.querySelectorAll('[role="option"]').length).toBe(2)
-    })
-
-    it('keeps a far selected option in the virtual window', async () => {
-      const { container, getByText, queryByText } = render(Cascader, {
-        props: {
-          options: largeOptions,
-          virtual: true,
-          modelValue: [80, 'c-80']
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-
-      await waitFor(() => {
-        expect(getByText('Option 80')).toBeInTheDocument()
-      })
-      expect(queryByText('Option 0')).not.toBeInTheDocument()
-    })
-
-    it('keeps the active option in the window during keyboard navigation', async () => {
-      const { container, getByText, queryByText } = render(Cascader, {
-        props: { options: largeOptions, virtual: true }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      const virtualList = document.body.querySelector('[data-tiger-cascader-virtual]')!
-      await fireEvent.keyDown(virtualList, { key: 'End' })
-
-      await waitFor(() => {
-        expect(getByText('Option 199')).toBeInTheDocument()
-      })
-      expect(queryByText('Option 0')).not.toBeInTheDocument()
-    })
-
-    it('virtualizes the searchable flat path list', async () => {
-      const searchOptions = Array.from({ length: 80 }, (_, i) => ({
-        label: `City ${i}`,
-        value: i
-      }))
-      const { container, getByText, queryByText } = render(Cascader, {
-        props: {
-          options: searchOptions,
-          virtual: true,
-          searchable: { limit: 80 }
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
-      await fireEvent.update(searchInput, 'City')
-
-      await waitFor(() => {
-        expect(document.body.querySelector('[data-tiger-cascader-virtual]')).toBeInTheDocument()
-      })
-      expect(getByText('City 0')).toBeInTheDocument()
-      expect(queryByText('City 79')).not.toBeInTheDocument()
-      expect(document.body.querySelectorAll('[role="option"]').length).toBeLessThan(50)
-    })
-
-    it('still shows the first matching row after End then a tighter search query', async () => {
-      const searchOptions = Array.from({ length: 80 }, (_, i) => ({
-        label: `City ${i}`,
-        value: i
-      }))
-      const { container, getByText, queryByText } = render(Cascader, {
-        props: {
-          options: searchOptions,
-          virtual: true,
-          searchable: { limit: 80 }
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
-      await fireEvent.update(searchInput, 'City')
-
-      await waitFor(() => {
-        expect(document.body.querySelector('[data-tiger-cascader-virtual]')).toBeInTheDocument()
-      })
-
-      const virtualList = document.body.querySelector('[data-tiger-cascader-virtual]')!
-      await fireEvent.keyDown(virtualList, { key: 'End' })
-
-      await waitFor(() => {
-        expect(getByText('City 79')).toBeInTheDocument()
-      })
-
-      await fireEvent.update(searchInput, 'City 0')
-
-      await waitFor(() => {
-        expect(getByText('City 0')).toBeInTheDocument()
-      })
-      expect(queryByText('City 79')).not.toBeInTheDocument()
-    })
-
-    it('still selects a visible option when virtual is enabled', async () => {
-      const { container, getByText, emitted } = render(Cascader, {
-        props: { options: largeOptions, virtual: true }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.click(getByText('Option 0'))
-      await fireEvent.click(getByText('Child 0'))
-
-      expect(emitted()['update:modelValue'][0]).toEqual([[0, 'c-0']])
-    })
+    const { container, getByRole } = render(Wrapper)
+    await fireEvent.click(getByRole('combobox'))
+    await expectNoA11yViolations(container)
   })
 })

@@ -281,7 +281,11 @@ export const thTH: TigerLocale = {
     clearAriaLabel: 'ล้างรายการที่เลือก',
     createOptionLabel: 'สร้าง "{label}"',
     moreCountText: '+อีก {count}',
-    loadingText: 'กำลังโหลด...'
+    loadingText: 'กำลังโหลด...',
+    levelLabel: 'ระดับ {level}',
+    backText: 'ย้อนกลับ',
+    expandAriaLabel: 'ขยาย',
+    collapseAriaLabel: 'ยุบ'
   },
   colorPicker: {
     trigger: 'เลือกสี',

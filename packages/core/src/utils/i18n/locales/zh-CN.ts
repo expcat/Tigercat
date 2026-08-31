@@ -281,7 +281,11 @@ export const zhCN: TigerLocale = {
     clearAriaLabel: '清除选择',
     createOptionLabel: '创建“{label}”',
     moreCountText: '等 {count} 项',
-    loadingText: '加载中...'
+    loadingText: '加载中...',
+    levelLabel: '第 {level} 级',
+    backText: '返回',
+    expandAriaLabel: '展开',
+    collapseAriaLabel: '收起'
   },
   colorPicker: {
     trigger: '选择颜色',

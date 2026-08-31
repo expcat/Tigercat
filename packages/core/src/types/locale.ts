@@ -367,6 +367,14 @@ export interface TigerLocaleSelect {
   moreCountText?: string
   /** Remote-loading copy shown in the panel */
   loadingText?: string
+  /** Column accessible name. Template: supports {level} */
+  levelLabel?: string
+  /** Small-screen drill-down back control */
+  backText?: string
+  /** Expand-parent control accessible name */
+  expandAriaLabel?: string
+  /** Collapse-parent control accessible name */
+  collapseAriaLabel?: string
 }
 
 export interface TigerLocaleColorPicker {

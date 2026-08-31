@@ -281,7 +281,11 @@ export const arSA: TigerLocale = {
     clearAriaLabel: 'مسح التحديد',
     createOptionLabel: 'إنشاء "{label}"',
     moreCountText: '+{count} إضافية',
-    loadingText: 'جار التحميل...'
+    loadingText: 'جار التحميل...',
+    levelLabel: 'المستوى {level}',
+    backText: 'رجوع',
+    expandAriaLabel: 'توسيع',
+    collapseAriaLabel: 'طي'
   },
   colorPicker: {
     trigger: 'اختيار لون',

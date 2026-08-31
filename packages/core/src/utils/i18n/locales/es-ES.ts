@@ -281,7 +281,11 @@ export const esES: TigerLocale = {
     clearAriaLabel: 'Borrar selección',
     createOptionLabel: 'Crear "{label}"',
     moreCountText: '+{count} más',
-    loadingText: 'Cargando...'
+    loadingText: 'Cargando...',
+    levelLabel: 'Nivel {level}',
+    backText: 'Atrás',
+    expandAriaLabel: 'Expandir',
+    collapseAriaLabel: 'Contraer'
   },
   colorPicker: {
     trigger: 'Elegir color',
