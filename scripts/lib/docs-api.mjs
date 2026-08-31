@@ -89,6 +89,7 @@ export const COMPONENT_PROP_PRIORITY = {
   Tag: ['closable?', 'visible?', 'pill?', 'variant?', 'size?', 'closeAriaLabel?'],
   Empty: ['preset?', 'description?', 'showImage?'],
   Result: ['status?', 'title?', 'subTitle?', 'headingLevel?'],
+  QRCode: ['value', 'status?', 'size?', 'color?', 'bgColor?'],
   Button: [
     'variant?',
     'size?',

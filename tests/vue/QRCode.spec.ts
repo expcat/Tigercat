@@ -4,164 +4,105 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { QRCode } from '@expcat/tigercat-vue/QRCode'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('QRCode', () => {
-  // --- Basic rendering ---
   it('renders with required value prop', () => {
     const { container } = renderWithProps(QRCode, { value: 'https://example.com' })
     expect(container.querySelector('svg')).toBeInTheDocument()
   })
 
-  it('renders SVG with correct size', () => {
+  it('renders SVG with the given size', () => {
     const { container } = renderWithProps(QRCode, { value: 'test', size: 200 })
     const svg = container.querySelector('svg')
     expect(svg).toHaveAttribute('width', '200')
     expect(svg).toHaveAttribute('height', '200')
   })
 
-  it('renders an accessible img role', () => {
-    const { container } = renderWithProps(QRCode, { value: 'test' })
-    expect(container.querySelector('[role="img"]')).toBeInTheDocument()
+  it('names the active code with the encoded value', () => {
+    renderWithProps(QRCode, { value: 'https://tigercat.dev' })
+    expect(screen.getByRole('img', { name: /https:\/\/tigercat\.dev/ })).toBeInTheDocument()
   })
 
-  it('has aria-label QR Code', () => {
-    const { container } = renderWithProps(QRCode, { value: 'test' })
-    const svg = container.querySelector('svg')
-    expect(svg).toHaveAttribute('aria-label', 'QR Code')
-  })
-
-  it('keeps default English status text outside ConfigProvider', () => {
-    renderWithProps(QRCode, { value: 'test', status: 'expired' })
-    expect(screen.getByLabelText('QR Code')).toBeInTheDocument()
-    expect(screen.getByText('QR code expired')).toBeInTheDocument()
-    expect(screen.getByText('Refresh')).toBeInTheDocument()
-  })
-
-  it('applies className prop', () => {
+  it('merges className with the container', () => {
     const { container } = renderWithProps(QRCode, { value: 'test', className: 'my-qr' })
-    const root = container.querySelector('.my-qr')
-    expect(root).toBeInTheDocument()
-    // className must merge with base container classes, not replace them
-    expect(root?.className).toContain('relative')
+    const root = container.firstElementChild
+    expect(root).toHaveClass('my-qr')
+    expect(root).toHaveClass('relative')
   })
 
-  // --- Sizes ---
+  it('forwards root attrs', () => {
+    renderWithProps(QRCode, { value: 'test', id: 'qr-root', 'data-testid': 'qr' })
+    expect(screen.getByTestId('qr')).toHaveAttribute('id', 'qr-root')
+  })
+
   it('defaults to 128px', () => {
     const { container } = renderWithProps(QRCode, { value: 'test' })
-    const svg = container.querySelector('svg')
-    expect(svg).toHaveAttribute('width', '128')
+    expect(container.querySelector('svg')).toHaveAttribute('width', '128')
   })
 
-  it('applies custom size', () => {
-    const { container } = renderWithProps(QRCode, { value: 'test', size: 256 })
-    const svg = container.querySelector('svg')
-    expect(svg).toHaveAttribute('width', '256')
+  it('applies background and module colors', () => {
+    const { container } = renderWithProps(QRCode, {
+      value: 'test',
+      bgColor: '#eeeeee',
+      color: '#ff0000'
+    })
+    expect(container.querySelector('svg > rect')).toHaveAttribute('fill', '#eeeeee')
+    expect(container.querySelectorAll('svg rect[fill="#ff0000"]').length).toBeGreaterThan(0)
   })
 
-  // --- Colors ---
-  it('applies background color', () => {
-    const { container } = renderWithProps(QRCode, { value: 'test', bgColor: '#eeeeee' })
-    const bgRect = container.querySelector('svg > rect')
-    expect(bgRect).toHaveAttribute('fill', '#eeeeee')
-  })
-
-  it('applies foreground color to modules', () => {
-    const { container } = renderWithProps(QRCode, { value: 'test', color: '#ff0000' })
-    const rects = container.querySelectorAll('svg rect[fill="#ff0000"]')
-    expect(rects.length).toBeGreaterThan(0)
-  })
-
-  // --- Status ---
-  it('shows expired overlay', () => {
+  it('does not paint a refresh control without a handler', () => {
     renderWithProps(QRCode, { value: 'test', status: 'expired' })
     expect(screen.getByText('QR code expired')).toBeInTheDocument()
-    expect(screen.getByText('Refresh')).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('emits refresh on expired click', async () => {
+  it('exposes a refresh button when @refresh is bound', async () => {
     const onRefresh = vi.fn()
     render(QRCode, {
-      props: { value: 'test', status: 'expired', onRefresh }
+      props: { value: 'test', status: 'expired' },
+      attrs: { onRefresh }
     })
-    await fireEvent.click(screen.getByText('Refresh'))
-    expect(onRefresh).toHaveBeenCalled()
+    await fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+    expect(onRefresh).toHaveBeenCalledTimes(1)
   })
 
-  it('shows loading overlay', () => {
-    renderWithProps(QRCode, { value: 'test', status: 'loading' })
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
-  })
-
-  it('uses ConfigProvider qrcode locale for aria and status text', () => {
-    const { unmount } = render({
-      render: () =>
-        h(
-          ConfigProvider,
-          {
-            locale: {
-              qrcode: {
-                ariaLabel: '全局二维码',
-                expiredText: '全局已过期',
-                refreshText: '全局刷新',
-                loadingText: '全局加载中'
-              }
-            }
-          },
-          () => h(QRCode, { value: 'test', status: 'expired' })
-        )
+  it('hides the matrix while expired or loading', () => {
+    const { container, unmount } = render(QRCode, {
+      props: { value: 'test', status: 'expired' },
+      attrs: { onRefresh: () => undefined }
     })
-
-    expect(screen.getByLabelText('全局二维码')).toBeInTheDocument()
-    expect(screen.getByText('全局已过期')).toBeInTheDocument()
-    expect(screen.getByText('全局刷新')).toBeInTheDocument()
-
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('status', { name: /QR code expired/ })).toBeInTheDocument()
     unmount()
-    render({
-      render: () =>
-        h(ConfigProvider, { locale: { qrcode: { loadingText: '全局加载中' } } }, () =>
-          h(QRCode, { value: 'test', status: 'loading' })
-        )
-    })
-    expect(screen.getByText('全局加载中')).toBeInTheDocument()
+
+    const loading = renderWithProps(QRCode, { value: 'test', status: 'loading' })
+    expect(loading.container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('status', { name: /Loading/ })).toBeInTheDocument()
   })
 
-  it('lets the qrcode locale prop override ConfigProvider text', () => {
-    render({
-      render: () =>
-        h(
-          ConfigProvider,
-          {
-            locale: {
-              qrcode: {
-                ariaLabel: '全局二维码',
-                expiredText: '全局已过期',
-                refreshText: '全局刷新'
-              }
-            }
-          },
-          () =>
-            h(QRCode, {
-              value: 'test',
-              status: 'expired',
-              locale: {
-                qrcode: {
-                  ariaLabel: '局部二维码',
-                  expiredText: '局部已过期',
-                  refreshText: '局部刷新'
-                }
-              }
-            })
-        )
+  it('uses official locale objects for aria and status text', () => {
+    const { unmount } = render({
+      components: { ConfigProvider, QRCode },
+      setup: () => ({ locale: zhCN, onRefresh: () => undefined }),
+      template:
+        '<ConfigProvider :locale="locale"><QRCode value="test" status="expired" @refresh="onRefresh" /></ConfigProvider>'
     })
+    expect(screen.getByRole('button', { name: zhCN.qrcode!.refreshText })).toBeInTheDocument()
+    expect(screen.getByText(zhCN.qrcode!.expiredText!)).toBeInTheDocument()
+    unmount()
 
-    expect(screen.getByLabelText('局部二维码')).toBeInTheDocument()
-    expect(screen.getByText('局部已过期')).toBeInTheDocument()
-    expect(screen.getByText('局部刷新')).toBeInTheDocument()
-    expect(screen.queryByText('全局已过期')).toBeNull()
+    render({
+      components: { ConfigProvider, QRCode },
+      setup: () => ({ locale: zhTW, onRefresh: () => undefined }),
+      template:
+        '<ConfigProvider :locale="locale"><QRCode value="test" status="expired" @refresh="onRefresh" /></ConfigProvider>'
+    })
+    expect(screen.getByRole('button', { name: zhTW.qrcode!.refreshText })).toBeInTheDocument()
   })
 
   it('does not show overlay when active', () => {
@@ -170,32 +111,19 @@ describe('QRCode', () => {
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
   })
 
-  // --- Deterministic rendering ---
-  it('generates different patterns for different values', () => {
-    const { container: c1 } = renderWithProps(QRCode, { value: 'aaa' })
-    const { container: c2 } = renderWithProps(QRCode, { value: 'bbb' })
-    const rects1 = c1.querySelectorAll('svg rect').length
-    const rects2 = c2.querySelectorAll('svg rect').length
-    // Different values should produce different matrix (different rect counts)
-    // This is a weak assertion but validates the hash varies
-    expect(rects1).toBeGreaterThan(1)
-    expect(rects2).toBeGreaterThan(1)
-  })
-
-  it('renders the same module-rect count for the same value and size', () => {
-    const { container: a } = renderWithProps(QRCode, { value: 'https://tigercat.dev', size: 128 })
-    const { container: b } = renderWithProps(QRCode, { value: 'https://tigercat.dev', size: 128 })
-    const countA = a.querySelectorAll('svg rect').length
-    const countB = b.querySelectorAll('svg rect').length
-    expect(countA).toBe(countB)
-    expect(countA).toBeGreaterThan(1)
-  })
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(QRCode, {
-        props: { value: 'https://example.com' }
+    it('has no violations for active, expired-with-refresh, and loading', async () => {
+      const active = renderWithProps(QRCode, { value: 'https://example.com' })
+      await expectNoA11yViolationsIsolated(active.container)
+
+      const expired = render(QRCode, {
+        props: { value: 'https://example.com', status: 'expired' },
+        attrs: { onRefresh: () => undefined }
       })
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolationsIsolated(expired.container)
+
+      const loading = renderWithProps(QRCode, { value: 'https://example.com', status: 'loading' })
+      await expectNoA11yViolationsIsolated(loading.container)
     })
   })
 })

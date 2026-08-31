@@ -1,74 +1,93 @@
-import React, { useMemo } from 'react'
-import { classNames, mergeTigerLocale, resolveLocaleText } from '@expcat/tigercat-core'
-import type { QRCodeStatus, TigerLocale } from '@expcat/tigercat-core'
+import React, { forwardRef, useMemo } from 'react'
 import {
+  classNames,
+  mergeTigerLocale,
+  getQRCodeLabels,
+  generateQRMatrix,
   qrcodeContainerClasses,
   qrcodeOverlayClasses,
-  qrcodeExpiredTextClasses,
+  qrcodeStatusTextClasses,
   qrcodeRefreshClasses,
-  generateQRMatrix
+  QRCODE_DEFAULT_COLOR,
+  QRCODE_DEFAULT_BG,
+  QR_QUIET_ZONE,
+  qrViewBoxSize,
+  qrNeedsContrastWarning,
+  devWarn,
+  type QRCodeProps as CoreQRCodeProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-/** QRCode renders a decorative hash matrix (not a real/scannable QR). */
-export interface QRCodeProps {
-  value: string
-  size?: number
-  color?: string
-  bgColor?: string
-  status?: QRCodeStatus
+export interface QRCodeProps
+  extends CoreQRCodeProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
   onRefresh?: () => void
-  className?: string
-  locale?: Partial<TigerLocale>
 }
 
-export const QRCode: React.FC<QRCodeProps> = ({
-  value,
-  size = 128,
-  color = '#000000',
-  bgColor = '#ffffff',
-  status = 'active',
-  onRefresh,
-  className,
-  locale
-}) => {
+export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
+  {
+    value,
+    size = 128,
+    color = QRCODE_DEFAULT_COLOR,
+    bgColor = QRCODE_DEFAULT_BG,
+    status = 'active',
+    onRefresh,
+    className,
+    locale,
+    style,
+    ...rest
+  },
+  ref
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const matrix = useMemo(() => generateQRMatrix(value), [value])
-  const moduleSize = useMemo(() => size / matrix.length, [size, matrix.length])
+  const labels = useMemo(() => getQRCodeLabels(mergedLocale), [mergedLocale])
+  const matrix = useMemo(() => generateQRMatrix(value ?? ''), [value])
+  const moduleCount = matrix.length
+  const viewBox = qrViewBoxSize(moduleCount)
+  const overlay = status === 'expired' || status === 'loading'
+  const namedValue = value ? ` (${value})` : ''
+  const imgLabel =
+    status === 'expired'
+      ? `${labels.expiredText}${namedValue}`
+      : status === 'loading'
+        ? `${labels.loadingText}${namedValue}`
+        : `${labels.ariaLabel}${namedValue}`
 
-  const containerClass = classNames(qrcodeContainerClasses, className)
-  const ariaLabel = resolveLocaleText('QR Code', mergedLocale?.qrcode?.ariaLabel)
-  const expiredText = resolveLocaleText('QR code expired', mergedLocale?.qrcode?.expiredText)
-  const refreshText = resolveLocaleText('Refresh', mergedLocale?.qrcode?.refreshText)
-  const loadingText = resolveLocaleText(
-    'Loading...',
-    mergedLocale?.qrcode?.loadingText,
-    mergedLocale?.common?.loadingText
-  )
+  if (qrNeedsContrastWarning(color, bgColor)) {
+    devWarn(
+      'QRCode.contrast',
+      'QRCode: `color` and `bgColor` are under 3:1 contrast; scanners may fail.'
+    )
+  }
 
   return (
-    <div className={containerClass} style={{ width: size, height: size }}>
+    <div
+      ref={ref}
+      className={classNames(qrcodeContainerClasses, className)}
+      style={{ ...style, width: size, height: size }}
+      {...rest}>
       <svg
         width={size}
         height={size}
-        viewBox={`0 0 ${size} ${size}`}
+        viewBox={`0 0 ${viewBox} ${viewBox}`}
         xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        aria-label={ariaLabel}>
-        <rect width={size} height={size} fill={bgColor} />
+        role={overlay ? undefined : 'img'}
+        aria-hidden={overlay ? true : undefined}
+        aria-label={overlay ? undefined : imgLabel}
+        className="block h-full w-full">
+        <rect width={viewBox} height={viewBox} fill={bgColor} />
         {matrix.flatMap((row, r) =>
           row.map((cell, c) =>
             cell ? (
               <rect
                 key={`${r}-${c}`}
-                x={c * moduleSize}
-                y={r * moduleSize}
-                width={moduleSize}
-                height={moduleSize}
+                x={c + QR_QUIET_ZONE}
+                y={r + QR_QUIET_ZONE}
+                width={1}
+                height={1}
                 fill={color}
               />
             ) : null
@@ -76,22 +95,24 @@ export const QRCode: React.FC<QRCodeProps> = ({
         )}
       </svg>
 
-      {status === 'expired' && (
-        <div className={qrcodeOverlayClasses}>
-          <span className={qrcodeExpiredTextClasses}>{expiredText}</span>
-          <span className={qrcodeRefreshClasses} onClick={onRefresh}>
-            {refreshText}
-          </span>
+      {status === 'expired' ? (
+        <div className={qrcodeOverlayClasses} role="status" aria-label={imgLabel}>
+          <span className={qrcodeStatusTextClasses}>{labels.expiredText}</span>
+          {onRefresh ? (
+            <button type="button" className={qrcodeRefreshClasses} onClick={onRefresh}>
+              {labels.refreshText}
+            </button>
+          ) : null}
         </div>
-      )}
+      ) : null}
 
-      {status === 'loading' && (
-        <div className={qrcodeOverlayClasses}>
-          <span className="text-sm text-gray-500">{loadingText}</span>
+      {status === 'loading' ? (
+        <div className={qrcodeOverlayClasses} role="status" aria-label={imgLabel}>
+          <span className={qrcodeStatusTextClasses}>{labels.loadingText}</span>
         </div>
-      )}
+      ) : null}
     </div>
   )
-}
+})
 
 export default QRCode

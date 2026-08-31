@@ -1,79 +1,84 @@
 import { classNames } from './class-names'
+import { encodeQRMatrix, QR_QUIET_ZONE } from './qrcode-encoder'
+
+export {
+  encodeQRMatrix,
+  decodeQRMatrixBytes,
+  QR_QUIET_ZONE,
+  qrChooseVersion
+} from './qrcode-encoder'
+export type { QREccLevel } from './qrcode-encoder'
 
 export const qrcodeContainerClasses = classNames(
-  'relative inline-flex items-center justify-center',
-  'bg-[var(--tiger-qrcode-bg,#ffffff)]',
+  'relative inline-flex items-center justify-center overflow-hidden',
   'rounded-[var(--tiger-radius-md,0.5rem)]'
 )
 
 export const qrcodeOverlayClasses = classNames(
-  'absolute inset-0 flex flex-col items-center justify-center',
-  'bg-white/80 rounded-[var(--tiger-radius-md,0.5rem)]'
+  'absolute inset-0 flex flex-col items-center justify-center gap-1',
+  'bg-[color-mix(in_srgb,var(--tiger-surface,#ffffff)_80%,transparent)]'
 )
 
-export const qrcodeExpiredTextClasses = classNames(
-  'text-sm text-[var(--tiger-qrcode-expired-text,var(--tiger-text-muted,#6b7280))]',
-  'mb-1'
-)
+export const qrcodeStatusTextClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
 
 export const qrcodeRefreshClasses = classNames(
-  'text-sm cursor-pointer',
-  'text-[var(--tiger-qrcode-refresh,var(--tiger-primary,#2563eb))]',
-  'hover:underline'
+  'text-sm underline-offset-2 hover:underline',
+  'text-[var(--tiger-primary,#2563eb)]',
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
+  'rounded-[var(--tiger-radius-sm,0.25rem)]'
 )
 
+export const QRCODE_DEFAULT_COLOR = 'var(--tiger-text,#111827)'
+export const QRCODE_DEFAULT_BG = 'var(--tiger-surface,#ffffff)'
+
 /**
- * Deterministic hash matrix for display (not a scannable QR).
- * `level` is not an input; the second argument is matrix size (default 21).
+ * Encode `value` as a scannable QR module matrix (no quiet zone).
+ * Dark modules are `true`. Size depends on the payload (version 1 is 21).
  */
-export function generateQRMatrix(value: string, size: number = 21): boolean[][] {
-  // Simple hash-based pseudo QR matrix for visual representation
-  const matrix: boolean[][] = Array.from({ length: size }, () =>
-    Array.from({ length: size }, () => false)
-  )
+export function generateQRMatrix(value: string): boolean[][] {
+  return encodeQRMatrix(value ?? '')
+}
 
-  // Position detection patterns (top-left, top-right, bottom-left)
-  const drawFinderPattern = (row: number, col: number) => {
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 7; c++) {
-        if (row + r >= size || col + c >= size) continue
-        const isOuter = r === 0 || r === 6 || c === 0 || c === 6
-        const isInner = r >= 2 && r <= 4 && c >= 2 && c <= 4
-        matrix[row + r][col + c] = isOuter || isInner
-      }
-    }
-  }
+const HEX = /^#([\da-f]{3}|[\da-f]{6})$/i
 
-  drawFinderPattern(0, 0)
-  drawFinderPattern(0, size - 7)
-  drawFinderPattern(size - 7, 0)
+function hexToRgb(color: string): [number, number, number] | null {
+  const match = HEX.exec(color.trim())
+  if (!match) return null
+  let hex = match[1]
+  if (hex.length === 3)
+    hex = hex
+      .split('')
+      .map((ch) => ch + ch)
+      .join('')
+  const n = parseInt(hex, 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
 
-  // Timing patterns
-  for (let i = 8; i < size - 8; i++) {
-    matrix[6][i] = i % 2 === 0
-    matrix[i][6] = i % 2 === 0
-  }
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  const lin = [r, g, b].map((c) => {
+    const s = c / 255
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+}
 
-  // Fill data area with deterministic pattern from string hash
-  let hash = 0
-  for (let i = 0; i < value.length; i++) {
-    hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0
-  }
-  let seed = Math.abs(hash)
+/** WCAG contrast for two hex colors. `null` when a color is not parseable hex. */
+export function qrColorContrast(foreground: string, background: string): number | null {
+  const a = hexToRgb(foreground)
+  const b = hexToRgb(background)
+  if (!a || !b) return null
+  const l1 = relativeLuminance(a)
+  const l2 = relativeLuminance(b)
+  const [hi, lo] = l1 >= l2 ? [l1, l2] : [l2, l1]
+  return (hi + 0.05) / (lo + 0.05)
+}
 
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      if (matrix[r][c]) continue
-      // Skip finder pattern areas + separators
-      if (r < 8 && c < 8) continue
-      if (r < 8 && c >= size - 8) continue
-      if (r >= size - 8 && c < 8) continue
-      if (r === 6 || c === 6) continue
+export function qrNeedsContrastWarning(foreground: string, background: string): boolean {
+  const ratio = qrColorContrast(foreground, background)
+  return ratio !== null && ratio < 3
+}
 
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff
-      matrix[r][c] = seed % 3 === 0
-    }
-  }
-
-  return matrix
+export function qrViewBoxSize(moduleCount: number): number {
+  return moduleCount + QR_QUIET_ZONE * 2
 }

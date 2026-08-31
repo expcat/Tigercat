@@ -17,6 +17,7 @@ import type {
   TigerLocaleLoader,
   TigerLocaleLazyModule,
   TigerLocaleEmpty,
+  TigerLocaleQRCode,
   TigerLocalePagination,
   TigerLocaleTable,
   TigerLocaleDataExport,
@@ -166,6 +167,13 @@ export function getEmptyLabels(
   overrides?: Partial<TigerLocaleEmpty>
 ): Required<TigerLocaleEmpty> {
   return resolveLocaleSection(enSection('empty'), locale?.empty, overrides)
+}
+
+export function getQRCodeLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleQRCode>
+): Required<TigerLocaleQRCode> {
+  return resolveLocaleSection(enSection('qrcode'), locale?.qrcode, overrides)
 }
 
 export function getTourLabels(

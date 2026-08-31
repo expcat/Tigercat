@@ -361,13 +361,18 @@ Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃�
 
 ## QRCode
 
-`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 3/7 props
+`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 6/7 props
 
-| Prop      | Type                   | Default | Notes                |
-| --------- | ---------------------- | ------- | -------------------- |
-| `value`   | `string`               | `-`     | Text / URL to encode |
-| `locale?` | `Partial<TigerLocale>` | `-`     | -                    |
-| `size?`   | `number`               | `-`     | Size in pixels       |
+Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Refresh 仅在绑定 `onRefresh` / `@refresh` 时是 button。默认色走 `--tiger-text` / `--tiger-surface`。
+
+| Prop       | Type                   | Default    | Notes                                                                                      |
+| ---------- | ---------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `value`    | `string`               | `-`        | Text / URL to encode into a scannable QR                                                   |
+| `status?`  | `QRCodeStatus`         | `'active'` | Overlay status. `expired` shows a refresh control when a handler is passed.                |
+| `size?`    | `number`               | `128`      | Size in pixels, including the quiet zone                                                   |
+| `color?`   | `string`               | `-`        | Foreground (module) color. Defaults to `--tiger-text`. Hex pairs with `bgColor` that fa... |
+| `bgColor?` | `string`               | `-`        | Background color. Defaults to `--tiger-surface`.                                           |
+| `locale?`  | `Partial<TigerLocale>` | `-`        | Locale override merged on top of ConfigProvider locale.                                    |
 
 ## Rate
 
