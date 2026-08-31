@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Menu**：选中 / 展开 / 搜索下沉 core。`1` 与 `'1'` 是同一 key。点选永远单选（再点已选项变成 `[]`），`multiple` 只管 submenu。搜索会展开祖先，父标题匹配仍是 SubMenu。搜索框在 `role="menu"` / 列表外面，文案走 `common.searchPlaceholder` / `common.emptyText`。垂直导航是 `<nav>` + 列表（有 `href` 才是链接，`aria-current="page"` 只打在链接上）；horizontal 是 `menubar`。popup 与 inline 共用 `openKeys`，`popupPortal` 默认 `true`。icon 只收节点或已登记 icon 名。Vue 导出 `MenuProps` / `useMenuContext`。
 - **Overlay 触发器**：`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点节点上（`asChild` 或自渲 `<button type="button">`），不再写在包装 div。Dropdown 默认 `trigger="click"`；hover 合取 click/focus。Tooltip `aria-describedby` 只在打开时写在焦点节点。Popconfirm 打开进焦 Cancel，文案走 locale，OK/Cancel 用 Button。SplitButton 不再套 ButtonGroup，chevron 名走 locale。ContextMenu 触发面进 Tab，点 Sub 能开。Vue 导出对应 `*Props`。
 - **Tree**：展开 / 选中 / 勾选 / 过滤 / 懒加载 / 拖拽下沉 core。`1` 与 `'1'` 是同一节点。flatten 一行渲染，虚拟和非虚拟缩进、连线同一套。`filterValue` / `searchValue` 是同一条查询（摘节点，匹配子串走 `<mark>`）；`searchable` 只决定是否画输入框。`loadData` 不得改传入对象，失败清转圈。`checkStrategy` 会走过半选祖先；级联跳过 disabled。`onDrop` 带 `before` / `after` / `inside` 和下一棵不可变树。默认名走 `locale.tree`。搜索框在 `role="tree"` 外面。Vue 主入口导出 `TreeProps`。
 - **DataExport**：真 xlsx / CSV / Markdown 一条栈。CSV 带 BOM、CRLF、公式前缀；Date 写 ISO，对象写 JSON；只有 `render` 的操作列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不再拼接。闸、序列化、下载下沉 `runDataExport`；连点只跑一次；失败有 `aria-live`。多格式触发器 `asChild` 把 ARIA 打在同一颗 button 上。空 `formats` 不再卸组件。Vue 导出 `DataExportProps`。

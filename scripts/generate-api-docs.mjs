@@ -461,13 +461,13 @@ Imperative notification API supports inline toast actions via \`notification.inf
   Menu: `
 ### Collapsed mode behavior
 
-当 \`collapsed\` 为 \`true\` 时（仅 vertical 模式），菜单项呈现以下行为：
+\`collapsed\` 只作用于 vertical / inline：容器收窄到图标列，子菜单改走 popup（\`inline\`+\`collapsed\` 会把 mode 收成 vertical）。horizontal 会忽略该 prop 并 \`devWarn\`。
 
-- **图标居中**：折叠态图标去除 \`mr-2\` 右间距，仅保留 \`flex-shrink-0\`，确保图标在容器内视觉居中。
-- **标签 sr-only 保留**：完整标签文本以 \`sr-only\` 元素保留在 DOM 中，对视觉用户不可见但屏幕阅读器可读。折叠菜单项的可访问名称为完整标签（如 \`name: 'alpha'\`），而非首字母。
-- **首字母回退**：无图标的菜单项显示首字母（大写），该 span 附带 \`aria-hidden="true"\` 避免可访问名称出现 "A alpha" 的重复拼接。
-- **子菜单箭头隐藏**：折叠态下 SubMenu 的展开箭头（ExpandIcon）不渲染。
-- **SubMenu 标题**：同样遵循上述图标/标签/首字母/箭头规则。
+- **图标居中**：折叠态去掉图标的 \`me-2\`，只留 \`flex-shrink-0\`。
+- **标签 sr-only 保留**：可访问名称仍是完整标签，不是首字母。
+- **首字母回退**：无图标且 children 是纯文本时显示首字母（\`aria-hidden\`）。非文本 children 不造 \`[\`。
+- **子菜单箭头隐藏**：折叠态不渲染 ExpandIcon；标题走同一套 collapsed item class。
+- **popupPortal**：默认 \`true\`，飞出层走 overlay-host 链，避免父级 overflow 裁切。
 `
 }
 

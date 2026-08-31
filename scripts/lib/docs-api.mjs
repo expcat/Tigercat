@@ -222,6 +222,10 @@ export const COMPONENT_PROP_PRIORITY = {
   ContextMenu: ['open?', 'disabled?', 'portal?', 'closeOnClick?', 'placement?', 'asChild?'],
   ContextMenuItem: ['disabled?', 'divided?', 'href?', 'itemKey?'],
   ContextMenuSub: ['title?', 'disabled?'],
+  Menu: ['items?', 'selectedKeys?', 'openKeys?', 'collapsed?', 'searchable?', 'mode?'],
+  MenuItem: ['itemKey', 'href?', 'disabled?'],
+  MenuItemGroup: ['title?'],
+  SubMenu: ['itemKey', 'title?', 'disabled?'],
   Popover: ['trigger?', 'content?', 'placement?', 'open?', 'width?', 'asChild?'],
   Tooltip: ['content?', 'trigger?', 'placement?', 'open?', 'asChild?'],
   Popconfirm: [
@@ -642,7 +646,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ContextMenuMenu: '<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>',
     ContextMenuItem: '<ContextMenuItem>Copy</ContextMenuItem>',
     ContextMenuSub:
-      '<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>'
+      '<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>',
+    Menu: '<Menu :items="items" />',
+    MenuItem: '<Menu><MenuItem :item-key="itemKey">Home</MenuItem></Menu>',
+    MenuItemGroup:
+      '<Menu><MenuItemGroup title="Team"><MenuItem :item-key="a">A</MenuItem></MenuItemGroup></Menu>',
+    SubMenu:
+      '<Menu><SubMenu :item-key="itemKey" title="More"><MenuItem :item-key="a">A</MenuItem></SubMenu></Menu>'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -724,7 +734,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ContextMenuMenu: '<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>',
     ContextMenuItem: '<ContextMenuItem>Copy</ContextMenuItem>',
     ContextMenuSub:
-      '<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>'
+      '<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>',
+    Menu: '<Menu items={items} />',
+    MenuItem: '<Menu><MenuItem itemKey={itemKey}>Home</MenuItem></Menu>',
+    MenuItemGroup:
+      '<Menu><MenuItemGroup title="Team"><MenuItem itemKey="a">A</MenuItem></MenuItemGroup></Menu>',
+    SubMenu:
+      '<Menu><SubMenu itemKey={itemKey} title="More"><MenuItem itemKey="a">A</MenuItem></SubMenu></Menu>'
   }
 }
 

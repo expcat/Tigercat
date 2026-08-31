@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Menu 点选永远是单选：`selectedKeys` 长度 0/1，再点已选项变成 `[]`。`multiple` 只表示可否同时打开多个 submenu，不再让初值多选、一点就塌成一项。`1` 与 `'1'` 是同一 key。
+
+`popupPortal` 默认 `true`。popup（horizontal / collapsed vertical）也读写 `openKeys`，点 horizontal 标题会 toggle。搜索会把匹配子孙的祖先写进 `openKeys`；受控时请回写。未传 `searchPlaceholder` / `emptyText` 走 locale `common`。
+
+垂直/inline 根不再是 `role="menu"`（是 `<nav>` + `<ul>`）；horizontal 是 `menubar`。有 `href` 的项是 `<a>`。字符串 `icon` 不再当 HTML。Vue 从主入口引 `MenuProps`。
+
 Dropdown 默认 `trigger` 从 `hover` 改为 `click`。需要悬停打开请显式 `trigger="hover"`（仍可用键盘和点按打开）。触发器不再是带 `aria-haspopup` 的包装 div：不传 `asChild` 时自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 把 ARIA 合并到那颗节点。SplitButton / DataExport 已走 `asChild`。
 
 Tooltip 默认 hover 同时响应 focus 和 click。`aria-describedby` 只在打开时写在焦点节点上。
