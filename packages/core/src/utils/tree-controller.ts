@@ -31,7 +31,6 @@ import {
   handleNodeCheck,
   isTreeAncestor,
   isTreeNodeExpandable,
-  lookupTreeNode,
   nodeHasChildren,
   sameTreeKey,
   treeKeyId,
@@ -451,7 +450,7 @@ export function resolveTreeKeyboardAction(options: {
   hasLoadData: boolean
   dir?: 'ltr' | 'rtl'
 }): TreeKeyboardAction | null {
-  const entry = lookupTreeNode(options.view.index, options.nodeKey)
+  const entry = options.view.index.byId.get(String(options.nodeKey))
   const node = entry?.node
   if (!node || node.disabled) return null
   const expandedIds = createTreeKeyIdSet(options.expandedKeys)

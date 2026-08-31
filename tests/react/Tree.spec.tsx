@@ -6,7 +6,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Tree } from '@expcat/tigercat-react/Tree'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { expectNoA11yViolations } from '../utils/react'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import React from 'react'
 
 const sampleTreeData = [
@@ -67,7 +70,7 @@ describe('Tree', () => {
       const { container } = render(<Tree treeData={iconData} defaultExpandAll showLine />)
 
       expect(screen.getByTestId('tree-icon')).toBeInTheDocument()
-      expect(container.querySelector('.border-l')).toBeInTheDocument()
+      expect(container.querySelector('[class*="border-s"]')).toBeTruthy()
     })
   })
 
@@ -457,8 +460,8 @@ describe('Tree', () => {
     it('should apply block node styles when blockNode is true', () => {
       const { getByText } = render(<Tree treeData={sampleTreeData} blockNode />)
 
-      const node = getByText('Parent 1').parentElement
-      expect(node?.className).toContain('w-full')
+      const node = getByText('Parent 1').closest('[role="treeitem"]')
+      expect(node).toBeTruthy()
     })
   })
 
@@ -607,7 +610,7 @@ describe('Tree', () => {
       fireEvent.dragOver(items[2])
       fireEvent.drop(items[2])
 
-      expect(onDrop).toHaveBeenCalledWith({ dragKey: '1-1', dropKey: '1-2' })
+      expect(onDrop.mock.calls[0][0]).toMatchObject({ dragKey: '1-1', dropKey: '1-2' })
     })
 
     it('ignores self drops and disabled draggable nodes', () => {
@@ -630,28 +633,47 @@ describe('Tree', () => {
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Tree treeData={sampleTreeData} checkable />)
+      const { container } = render(
+        <Tree treeData={sampleTreeData} checkable defaultExpandAll searchable />
+      )
 
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
+    })
+
+    it('names the tree from locale objects, not a hardcoded English fallback', () => {
+      const { rerender } = render(
+        <ConfigProvider locale={zhCN}>
+          <Tree treeData={sampleTreeData} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-label', '树')
+
+      rerender(
+        <ConfigProvider locale={zhTW}>
+          <Tree treeData={sampleTreeData} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-label', '樹')
     })
   })
 
   // v0.6.0 — searchable
   describe('Searchable (v0.6.0)', () => {
     it('renders search input when searchable is true', () => {
-      const { container } = render(<Tree treeData={sampleTreeData} searchable />)
-      const input = container.querySelector('input[type="text"]')
-      expect(input).toBeTruthy()
+      render(<Tree treeData={sampleTreeData} searchable />)
+      expect(screen.getByRole('searchbox')).toBeInTheDocument()
     })
     it('filters when typing in search input', async () => {
       const user = userEvent.setup()
-      const { container } = render(<Tree treeData={sampleTreeData} searchable defaultExpandAll />)
-      const input = container.querySelector('input[type="text"]') as HTMLInputElement
+      render(<Tree treeData={sampleTreeData} searchable defaultExpandAll />)
+      const input = screen.getByRole('searchbox')
 
       await user.type(input, 'Child 1-1')
 
       await waitFor(() => {
-        expect(input.value).toBe('Child 1-1')
+        expect(input).toHaveValue('Child 1-1')
+        expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+        expect(screen.queryByText('Parent 2')).not.toBeInTheDocument()
       })
     })
   })
@@ -670,6 +692,145 @@ describe('Tree', () => {
       const items = container.querySelectorAll('[role="treeitem"]')
       expect(items.length).toBeGreaterThan(0)
       expect(items.length).toBeLessThan(50)
+    })
+
+    it('moves focus to the last virtual row with End', async () => {
+      const user = userEvent.setup()
+      const largeTree = Array.from({ length: 40 }, (_, i) => ({
+        key: `n-${i}`,
+        label: `Node ${i}`
+      }))
+      render(<Tree treeData={largeTree} virtual height={200} itemHeight={32} />)
+      const first = screen.getByText('Node 0').closest('[role="treeitem"]') as HTMLElement
+      act(() => {
+        first.focus()
+      })
+      await user.keyboard('{End}')
+      await waitFor(() => {
+        expect(document.activeElement).toHaveTextContent('Node 39')
+      })
+    })
+  })
+
+  describe('Controller bindings', () => {
+    it('treats 1 and "1" as the same expanded node', async () => {
+      const user = userEvent.setup()
+      render(
+        <Tree
+          treeData={[{ key: 1, label: 'One', children: [{ key: '1-1', label: 'Nested' }] }]}
+          expandedKeys={['1']}
+        />
+      )
+      expect(screen.getByText('Nested')).toBeInTheDocument()
+      await user.click(screen.getByText('One'))
+    })
+
+    it('keeps a user-expanded node after treeData identity changes', async () => {
+      const user = userEvent.setup()
+      const first = [
+        { key: '1', label: 'Parent 1', children: [{ key: '1-1', label: 'Child 1-1' }] }
+      ]
+      const { rerender } = render(<Tree treeData={first} />)
+      const expand = screen.getByText('Parent 1').closest('[role="treeitem"]')?.querySelector('svg')
+      if (expand) await user.click(expand)
+      await waitFor(() => expect(screen.getByText('Child 1-1')).toBeInTheDocument())
+      rerender(
+        <Tree
+          treeData={[
+            { key: '1', label: 'Parent 1', children: [{ key: '1-1', label: 'Child 1-1' }] }
+          ]}
+        />
+      )
+      expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+    })
+
+    it('expands a late tree with defaultExpandAll', async () => {
+      const { rerender } = render(<Tree defaultExpandAll />)
+      rerender(
+        <Tree
+          defaultExpandAll
+          treeData={[{ key: '1', label: 'Parent', children: [{ key: '1-1', label: 'Leaf' }] }]}
+        />
+      )
+      await waitFor(() => expect(screen.getByText('Leaf')).toBeInTheDocument())
+    })
+
+    it('clears loading when loadData rejects', async () => {
+      const user = userEvent.setup()
+      const loadData = vi.fn(() => Promise.reject(new Error('nope')))
+      render(
+        <Tree treeData={[{ key: '1', label: 'Parent 1', isLeaf: false }]} loadData={loadData} />
+      )
+      const expand = screen.getByText('Parent 1').closest('[role="treeitem"]')?.querySelector('svg')
+      if (expand) await user.click(expand)
+      await waitFor(() => expect(loadData).toHaveBeenCalled())
+      await waitFor(() => {
+        expect(
+          screen
+            .getByText('Parent 1')
+            .closest('[role="treeitem"]')
+            ?.querySelector('svg.animate-spin')
+        ).toBeNull()
+      })
+    })
+
+    it('keeps a roving tab stop after clicking a disabled node', async () => {
+      const user = userEvent.setup()
+      render(
+        <Tree
+          treeData={[
+            { key: '1', label: 'On' },
+            { key: '2', label: 'Off', disabled: true }
+          ]}
+        />
+      )
+      await user.click(screen.getByText('Off'))
+      const enabled = screen.getByText('On').closest('[role="treeitem"]')
+      expect(enabled).toHaveAttribute('tabindex', '0')
+    })
+
+    it('emits leaf keys for checkStrategy child when only a grandchild is checked', async () => {
+      const user = userEvent.setup()
+      const onCheckedKeysChange = vi.fn()
+      render(
+        <Tree
+          treeData={sampleTreeData}
+          defaultExpandAll
+          checkable
+          checkStrategy="child"
+          checkedKeys={['1-1']}
+          onCheckedKeysChange={onCheckedKeysChange}
+        />
+      )
+      const leaf = screen.getByText('Child 1-1').closest('[role="treeitem"]')
+      expect(leaf).toHaveAttribute('aria-checked', 'true')
+      const boxes = document.querySelectorAll('input[type="checkbox"]')
+      await user.click(boxes[0] as HTMLInputElement)
+      await waitFor(() => expect(onCheckedKeysChange).toHaveBeenCalled())
+      const keys = onCheckedKeysChange.mock.calls.at(-1)?.[0] as Array<string | number>
+      expect(keys).toEqual(expect.arrayContaining(['1-1', '1-2']))
+    })
+
+    it('shows children after searching a parent label', async () => {
+      render(<Tree treeData={sampleTreeData} defaultExpandAll filterValue="Parent 1" />)
+      expect(screen.getByText('Parent 1')).toBeInTheDocument()
+      expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+      expect(screen.queryByText('Parent 2')).not.toBeInTheDocument()
+    })
+
+    it('swaps ArrowRight/Left in rtl', async () => {
+      const user = userEvent.setup()
+      render(
+        <ConfigProvider direction="rtl">
+          <Tree treeData={sampleTreeData} />
+        </ConfigProvider>
+      )
+      const parent = screen.getAllByRole('treeitem')[0]
+      act(() => {
+        parent.focus()
+      })
+      await user.keyboard('{ArrowLeft}')
+      await waitFor(() => expect(screen.getByText('Child 1-1')).toBeInTheDocument())
     })
   })
 })

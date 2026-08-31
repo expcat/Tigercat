@@ -1,138 +1,172 @@
 import React from 'react'
 import {
   classNames,
+  getHighlightSegments,
+  getTreeIndentSlotClasses,
+  getTreeIndentSlots,
   getTreeNodeClasses,
-  treeNodeIndentClasses,
-  treeNodeCheckboxClasses,
+  highlightMarkClasses,
+  sameTreeKey,
+  treeDropAfterClasses,
+  treeDropBeforeClasses,
+  treeDropInsideClasses,
+  treeItemKeyAttr,
+  treeKeyId,
   treeNodeIconClasses,
   treeNodeLabelClasses,
-  resolveLocaleText,
+  treeNodeLabelMatchedClasses,
   type TreeNode
 } from '@expcat/tigercat-core'
+import { Checkbox } from '../Checkbox'
 import { ExpandIcon, LoadingSpinner } from './icons'
 import type { TreeContext } from './types'
 
-export function renderTreeRow(ctx: TreeContext, node: TreeNode, level: number): React.ReactNode {
-  const hasChildren = !!(node.children && node.children.length > 0)
-  const isExpanded = ctx.computedExpandedKeys.has(node.key)
-  const isSelected = ctx.computedSelectedKeys.has(node.key)
-  const isChecked = ctx.checkedSets.checkedSet.has(node.key)
-  const isHalfChecked = ctx.checkedSets.halfCheckedSet.has(node.key)
-  const isLoading = ctx.loadingNodes.has(node.key)
-  const isFiltered = ctx.filteredNodeKeys.size > 0
-  const isMatched = ctx.filteredNodeKeys.has(node.key)
-  const isVisible = !isFiltered || isMatched
+function renderNodeIcon(icon: unknown): React.ReactNode {
+  if (icon == null || typeof icon === 'boolean') return null
+  if (typeof icon === 'string' || typeof icon === 'number') return icon
+  return icon as React.ReactNode
+}
 
-  const isExpandable = hasChildren || !!(ctx.loadData && !node.isLeaf)
-  const isFocusable = !node.disabled && node.key === (ctx.activeKey ?? ctx.defaultActiveKey)
+function renderLabel(label: string, query: string, matched: boolean): React.ReactNode {
+  if (!query || !matched) return label
+  const segments = getHighlightSegments(label, query, { global: true, caseSensitive: false })
+  if (segments.length === 0) return label
+  return segments.map((segment, index) =>
+    segment.highlighted ? (
+      <mark key={index} className={highlightMarkClasses}>
+        {segment.text}
+      </mark>
+    ) : (
+      <React.Fragment key={index}>{segment.text}</React.Fragment>
+    )
+  )
+}
 
-  if (!isVisible) {
-    return null
-  }
-
-  const indent = []
-  for (let i = 0; i < level; i++) {
-    indent.push(<span key={i} className={treeNodeIndentClasses} />)
-  }
+export function renderTreeRow(
+  ctx: TreeContext,
+  rowIndex: number,
+  fillHeight: boolean
+): React.ReactNode {
+  const row = ctx.view.rows[rowIndex]
+  if (!row) return null
+  const { item } = row
+  const node = item.node
+  const isFocusable =
+    !row.disabled && sameTreeKey(node.key, ctx.activeKey ?? ctx.view.defaultActiveKey)
+  const indent = getTreeIndentSlots(item, ctx.showLine)
+  const dropping = ctx.draggable && ctx.dropKey !== undefined && sameTreeKey(ctx.dropKey, node.key)
 
   return (
     <div
-      className={getTreeNodeClasses(isSelected, !!node.disabled, ctx.blockNode)}
+      key={treeKeyId(node.key)}
+      className={classNames(
+        getTreeNodeClasses(row.selected, row.disabled, ctx.blockNode || fillHeight, {
+          active: isFocusable,
+          interactive: ctx.selectable || row.expandable || ctx.checkable
+        }),
+        fillHeight && 'h-full min-h-0 overflow-hidden',
+        dropping && ctx.dropPosition === 'before' && treeDropBeforeClasses,
+        dropping && ctx.dropPosition === 'after' && treeDropAfterClasses,
+        dropping && ctx.dropPosition === 'inside' && treeDropInsideClasses
+      )}
       ref={(el) => {
-        ctx.itemRefs.current.set(node.key, el)
+        const id = treeKeyId(node.key)
+        if (el) ctx.itemRefs.current.set(id, el)
+        else ctx.itemRefs.current.delete(id)
       }}
       role="treeitem"
-      aria-level={level + 1}
-      aria-disabled={node.disabled || undefined}
-      aria-selected={ctx.effectiveSelectable ? isSelected : undefined}
-      aria-expanded={isExpandable ? isExpanded : undefined}
-      aria-checked={ctx.checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined}
+      data-tiger-treeitem-key={treeItemKeyAttr(node.key)}
+      aria-level={item.level}
+      aria-setsize={row.setsize}
+      aria-posinset={row.posinset}
+      aria-disabled={row.disabled || undefined}
+      aria-selected={ctx.selectable ? row.selected : undefined}
+      aria-expanded={row.expandable ? row.expanded : undefined}
+      aria-checked={ctx.checkable ? (row.halfChecked ? 'mixed' : row.checked) : undefined}
       tabIndex={isFocusable ? 0 : -1}
-      draggable={ctx.isDraggable && !node.disabled ? true : undefined}
+      draggable={ctx.draggable && !row.disabled ? true : undefined}
       onDragStart={
-        ctx.isDraggable && !node.disabled
-          ? (e) => {
-              e.stopPropagation()
-              ctx.startTreeDrag(node.key, e)
+        ctx.draggable && !row.disabled
+          ? (event) => {
+              event.stopPropagation()
+              ctx.startTreeDrag(node.key, event)
             }
           : undefined
       }
       onDragOver={
-        ctx.isDraggable
-          ? (e) => {
-              e.stopPropagation()
-              ctx.overTreeDrag(node.key, e)
+        ctx.draggable
+          ? (event) => {
+              event.stopPropagation()
+              ctx.overTreeDrag(node.key, event)
             }
           : undefined
       }
       onDrop={
-        ctx.isDraggable
-          ? (e) => {
-              e.stopPropagation()
-              ctx.dropTreeDrag(e)
+        ctx.draggable
+          ? (event) => {
+              event.stopPropagation()
+              ctx.dropTreeDrag(event)
             }
           : undefined
       }
-      onDragEnd={ctx.isDraggable ? () => ctx.endTreeDrag() : undefined}
+      onDragEnd={ctx.draggable ? () => ctx.endTreeDrag() : undefined}
       onFocus={() => {
-        if (!node.disabled) ctx.setActiveKey(node.key)
+        if (!row.disabled) ctx.setActiveKey(node.key)
       }}
-      onKeyDown={(e) => ctx.handleKeyDown(e, node, isExpanded, isChecked)}
-      onClick={(e) => {
-        ctx.setActiveKey(node.key)
-        if (!node.disabled) ctx.onNodeClick?.(node, e)
-        if (ctx.effectiveSelectable && !node.disabled) {
-          ctx.handleSelect(node.key, e)
-        }
-      }}>
-      {indent}
-      <span
-        className={isExpandable ? 'cursor-pointer' : ''}
-        onClick={(e) => {
-          e.stopPropagation()
-          if (isExpandable) {
-            ctx.setActiveKey(node.key)
-            ctx.handleExpand(node.key)
-          }
-        }}>
-        <ExpandIcon expanded={isExpanded} hasChildren={isExpandable} />
-      </span>
-      {ctx.checkable && (
-        <input
-          type="checkbox"
-          aria-label={resolveLocaleText(
-            `Select ${node.label}`,
-            ctx.mergedLocale?.locale?.toLowerCase().startsWith('zh')
-              ? `选择${node.label}`
-              : undefined
-          )}
-          className={treeNodeCheckboxClasses}
-          checked={isChecked}
-          ref={(input) => {
-            if (input) {
-              input.indeterminate = isHalfChecked
+      onKeyDown={(event) => ctx.handleKeyDown(event, node.key)}
+      onClick={(event) => ctx.handleNodeClick(node, event)}>
+      {indent.map((slot) => (
+        <span key={slot.key} className={getTreeIndentSlotClasses(slot)} aria-hidden="true" />
+      ))}
+      {row.expandable ? (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="inline-flex items-center justify-center w-6 h-6 shrink-0"
+          onClick={(event) => {
+            event.stopPropagation()
+            if (!row.disabled) {
+              ctx.setActiveKey(node.key)
+              ctx.handleExpand(node.key)
             }
-          }}
-          disabled={node.disabled}
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-          onChange={(e) => {
-            ctx.handleCheck(node.key, e.target.checked)
+          }}>
+          <ExpandIcon expanded={row.expanded} expandable />
+        </button>
+      ) : (
+        <ExpandIcon expanded={false} expandable={false} />
+      )}
+      {ctx.checkable ? (
+        <Checkbox
+          tabIndex={-1}
+          size="sm"
+          checked={row.checked}
+          indeterminate={row.halfChecked}
+          disabled={row.disabled}
+          aria-label={ctx.selectNodeLabel(node.label)}
+          className="me-2 shrink-0"
+          onClick={(event) => event.stopPropagation()}
+          onChange={(checked, event) => {
+            event.stopPropagation()
+            ctx.handleCheck(node.key, checked)
           }}
         />
-      )}
-      {ctx.showIcon && node.icon ? (
-        <span className={treeNodeIconClasses}>{node.icon as React.ReactNode}</span>
+      ) : null}
+      {ctx.showIcon && node.icon != null ? (
+        <span className={treeNodeIconClasses}>{renderNodeIcon(node.icon)}</span>
       ) : null}
       <span
         className={classNames(
           treeNodeLabelClasses,
-          isFiltered && isMatched ? 'font-semibold text-[var(--tiger-primary,#2563eb)]' : ''
+          row.matched && ctx.searchQuery ? treeNodeLabelMatchedClasses : undefined
         )}>
-        {node.label}
+        {renderLabel(node.label, ctx.searchQuery, row.matched)}
       </span>
-      {isLoading && <LoadingSpinner />}
+      {row.loading ? <LoadingSpinner /> : null}
     </div>
   )
+}
+
+export function renderTreeRows(ctx: TreeContext, fillHeight: boolean): React.ReactNode {
+  return ctx.view.rows.map((_, index) => renderTreeRow(ctx, index, fillHeight))
 }

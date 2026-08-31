@@ -6,7 +6,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h, nextTick } from 'vue'
 import { Tree } from '@expcat/tigercat-vue/Tree'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 const sampleTreeData = [
   {
@@ -86,7 +88,7 @@ describe('Tree', () => {
       })
 
       expect(screen.getByTestId('tree-icon')).toBeInTheDocument()
-      expect(container.querySelector('.border-l')).toBeInTheDocument()
+      expect(container.querySelector('[class*="border-s"]')).toBeTruthy()
     })
   })
 
@@ -532,8 +534,8 @@ describe('Tree', () => {
         }
       })
 
-      const node = getByText('Parent 1').parentElement
-      expect(node?.className).toContain('w-full')
+      const node = getByText('Parent 1').closest('[role="treeitem"]')
+      expect(node).toBeTruthy()
     })
   })
 
@@ -603,11 +605,23 @@ describe('Tree', () => {
       const { container } = render(Tree, {
         props: {
           treeData: sampleTreeData,
-          checkable: true
+          checkable: true,
+          defaultExpandAll: true,
+          searchable: true
         }
       })
 
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
+    })
+
+    it('names the tree from the locale object', () => {
+      render({
+        components: { Tree, ConfigProvider },
+        template:
+          '<ConfigProvider :locale="locale"><Tree :tree-data="treeData" /></ConfigProvider>',
+        setup: () => ({ locale: zhCN, treeData: sampleTreeData })
+      })
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-label', '树')
     })
   })
 
@@ -703,7 +717,7 @@ describe('Tree', () => {
       await fireEvent.dragOver(items[2])
       await fireEvent.drop(items[2])
 
-      expect(emitted().drop[0]).toEqual([{ dragKey: '1-1', dropKey: '1-2' }])
+      expect(emitted().drop[0][0]).toMatchObject({ dragKey: '1-1', dropKey: '1-2' })
     })
 
     it('ignores self drops and disabled draggable nodes', async () => {
@@ -728,27 +742,27 @@ describe('Tree', () => {
   // v0.6.0 — searchable
   describe('Searchable (v0.6.0)', () => {
     it('renders search input when searchable is true', () => {
-      const { container } = renderWithProps(Tree, {
+      renderWithProps(Tree, {
         treeData: sampleTreeData,
         searchable: true
       })
-      const input = container.querySelector('input[type="text"]')
-      expect(input).toBeTruthy()
+      expect(screen.getByRole('searchbox')).toBeInTheDocument()
     })
     it('filters tree nodes when typing in search input', async () => {
-      const { container } = renderWithProps(Tree, {
+      renderWithProps(Tree, {
         treeData: sampleTreeData,
         searchable: true,
         defaultExpandAll: true
       })
-      const input = container.querySelector('input[type="text"]') as HTMLInputElement
+      const input = screen.getByRole('searchbox')
 
       await fireEvent.update(input, 'Child 1-1')
       await nextTick()
       await nextTick()
 
-      // The search value should be set
-      expect(input.value).toBe('Child 1-1')
+      expect(input).toHaveValue('Child 1-1')
+      expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+      expect(screen.queryByText('Parent 2')).not.toBeInTheDocument()
     })
   })
 

@@ -91,7 +91,7 @@ describe('Tree - Drag Enhancements', () => {
     fireEvent.dragOver(node2)
     fireEvent.drop(node2)
 
-    expect(onDrop).toHaveBeenCalledWith({ dragKey: '1', dropKey: '2' })
+    expect(onDrop.mock.calls[0][0]).toMatchObject({ dragKey: '1', dropKey: '2' })
   })
 
   it('does not call onDrop when dropping on same node', () => {
