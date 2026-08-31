@@ -25,6 +25,7 @@ export interface VisibleGroupItems<T> {
 export interface ImageGroupItem {
   id: string
   src: string
+  alt?: string
 }
 
 export interface ImageGroupRegistrationResult {
@@ -94,12 +95,12 @@ export function registerImageGroupItem(
   const existing = items.findIndex((entry) => entry.id === item.id)
   if (existing >= 0) {
     const next = items.slice()
-    next[existing] = { id: item.id, src: item.src }
+    next[existing] = { id: item.id, src: item.src, alt: item.alt }
     return { items: next, index: existing }
   }
 
   return {
-    items: [...items, { id: item.id, src: item.src }],
+    items: [...items, { id: item.id, src: item.src, alt: item.alt }],
     index: items.length
   }
 }
@@ -117,6 +118,14 @@ export function getImageGroupItemIndex(items: readonly ImageGroupItem[], id: str
 
 export function getImageGroupSrcs(items: readonly ImageGroupItem[]): string[] {
   return items.map((entry) => entry.src)
+}
+
+export function getImageGroupLightboxItems(
+  items: readonly ImageGroupItem[]
+): Array<string | { src: string; alt?: string }> {
+  return items.map((entry) =>
+    entry.alt === undefined ? entry.src : { src: entry.src, alt: entry.alt }
+  )
 }
 
 export function clampImageGroupPreviewIndex(index: number, length: number): number {

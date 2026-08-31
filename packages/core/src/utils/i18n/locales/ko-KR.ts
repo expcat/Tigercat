@@ -159,7 +159,8 @@ export const koKR: TigerLocale = {
     resetAriaLabel: '재설정',
     zoomInAriaLabel: '확대',
     rotateLeftAriaLabel: '왼쪽으로 회전',
-    rotateRightAriaLabel: '오른쪽으로 회전'
+    rotateRightAriaLabel: '오른쪽으로 회전',
+    previewImageAriaLabel: '이미지 {index} / {total}'
   },
   imageEditor: {
     selectImageText: '이미지 선택',

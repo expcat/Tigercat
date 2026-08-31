@@ -2,420 +2,225 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
+import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h, ref } from 'vue'
+import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
 import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
+import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
+import { Modal } from '@expcat/tigercat-vue/Modal'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { getImageViewerLabels } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
+const labels = getImageViewerLabels()
+const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg']
+
 describe('ImagePreview', () => {
-  const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg']
-
-  it('renders nothing when not visible', () => {
-    const { container } = render(ImagePreview, {
-      props: {
-        open: false,
-        images
-      }
-    })
-
-    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+  it('renders nothing when closed', () => {
+    render(ImagePreview, { props: { open: false, images } })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('renders preview dialog when visible', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
-
-    // Teleported to body
+  it('renders a modal dialog when open', () => {
+    render(ImagePreview, { props: { open: true, images } })
     const dialog = document.querySelector('[role="dialog"]')
     expect(dialog).toBeInTheDocument()
     expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(dialog).toHaveAttribute('aria-label', labels.previewDialogAriaLabel)
   })
 
-  it('locks body scroll while open and restores it on close', () => {
-    const { unmount } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
+  it('locks body scroll while open and restores it on unmount', () => {
+    const { unmount } = render(ImagePreview, { props: { open: true, images } })
     expect(document.body.style.overflow).toBe('hidden')
     unmount()
     expect(document.body.style.overflow).not.toBe('hidden')
   })
 
-  it('uses open prop as the only controlled visibility API', async () => {
-    const { rerender } = render(ImagePreview, {
-      props: {
-        open: false,
-        images
+  it('does not unlock a Modal when a closed preview mounts', () => {
+    render({
+      setup() {
+        return () => [
+          h(Modal, { open: true, title: 'Underneath' }, () => 'Still locked'),
+          h(ImagePreview, { open: false, images })
+        ]
       }
     })
+    expect(document.body.style.overflow).toBe('hidden')
+  })
 
-    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
-
-    await rerender({ open: true, images })
-
+  it('emits close and hides the dialog when the gallery is emptied', async () => {
+    const { emitted, rerender } = render(ImagePreview, {
+      props: { open: true, images }
+    })
     expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
-  })
-
-  it('renders nothing when images list is empty', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images: []
-      }
-    })
-
+    await rerender({ open: true, images: [] })
+    expect(emitted()['update:open']?.some((payload) => payload[0] === false)).toBe(true)
     expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
   })
 
-  it('displays current image', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        currentIndex: 1
-      }
-    })
-
-    const img = document.querySelector('[role="dialog"] img')
-    expect(img).toHaveAttribute('src', '/img2.jpg')
+  it('clamps currentIndex to the last image', () => {
+    render(ImagePreview, { props: { open: true, images, currentIndex: 9 } })
+    expect(document.querySelector('[role="dialog"] img')).toHaveAttribute('src', '/img3.jpg')
+    expect(document.body.textContent).toContain('3 / 3')
   })
 
-  it('constrains the open preview image to 90vh / 90vw', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
+  it('uses per-item alt and locale fallback', async () => {
+    const { rerender } = render(ImagePreview, {
+      props: { open: true, images: [{ src: '/cat.jpg', alt: 'Cat' }] }
     })
-
-    const img = document.querySelector('[role="dialog"] img')
-    expect(img).toBeInTheDocument()
-    expect(img?.className).toContain('max-h-[90vh]')
-    expect(img?.className).toContain('max-w-[90vw]')
+    expect(document.querySelector('[role="dialog"] img')).toHaveAttribute('alt', 'Cat')
+    await rerender({ open: true, images: ['/dog.jpg'] })
+    expect(document.querySelector('[role="dialog"] img')).toHaveAttribute(
+      'alt',
+      labels.previewImageAriaLabel.replace('{index}', '1').replace('{total}', '1')
+    )
   })
 
-  it('renders navigation buttons for multiple images', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images
+  it('reads chrome names from the locale object', () => {
+    const zhLabels = getImageViewerLabels(zhCN)
+    render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () => h(ImagePreview, { open: true, images }))
       }
     })
-
-    const prevBtn = document.querySelector('[aria-label="Previous image"]')
-    const nextBtn = document.querySelector('[aria-label="Next image"]')
-    expect(prevBtn).toBeInTheDocument()
-    expect(nextBtn).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: zhLabels.closePreviewAriaLabel })).toBeInTheDocument()
   })
 
-  it('disables prev button on first image', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        currentIndex: 0
-      }
-    })
-
-    const prevBtn = document.querySelector('[aria-label="Previous image"]')
-    expect(prevBtn).toHaveAttribute('disabled')
+  it('places previous at inline-start and close at inline-end', () => {
+    render(ImagePreview, { props: { open: true, images } })
+    expect(screen.getByRole('button', { name: labels.previousImageAriaLabel }).className).toMatch(
+      /inset-inline-start/
+    )
+    expect(screen.getByRole('button', { name: labels.closePreviewAriaLabel }).className).toMatch(
+      /inset-inline-end/
+    )
   })
 
-  it('disables next button on last image', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        currentIndex: 2
-      }
-    })
-
-    const nextBtn = document.querySelector('[aria-label="Next image"]')
-    expect(nextBtn).toHaveAttribute('disabled')
-  })
-
-  it('renders toolbar with zoom buttons', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
-
-    expect(document.querySelector('[aria-label="Zoom in"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Zoom out"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Rotate left"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Rotate right"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Reset"]')).toBeInTheDocument()
-  })
-
-  it('renders close button', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
-
-    expect(document.querySelector('[aria-label="Close preview"]')).toBeInTheDocument()
-  })
-
-  it('emits update:open on close button click', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
-
-    const closeBtn = document.querySelector('[aria-label="Close preview"]') as HTMLElement
-    await fireEvent.click(closeBtn)
-
-    expect(emitted()['update:open']).toBeTruthy()
-    expect(emitted()['update:open'][0]).toEqual([false])
-  })
-
-  it('emits update:open when Escape is pressed', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
+  it('closes from the close button, Escape, and the mask', async () => {
+    const { emitted } = render(ImagePreview, { props: { open: true, images } })
+    await fireEvent.click(screen.getByRole('button', { name: labels.closePreviewAriaLabel }))
+    expect(emitted()['update:open']?.[0]).toEqual([false])
 
     await fireEvent.keyDown(document, { key: 'Escape' })
+    expect(emitted()['update:open']?.length).toBeGreaterThan(1)
 
-    expect(emitted()['update:open']).toBeTruthy()
-    expect(emitted()['update:open'][0]).toEqual([false])
+    await fireEvent.click(
+      document.querySelector('[role="dialog"] [aria-hidden="true"]') as HTMLElement
+    )
+    expect(emitted()['update:open']?.length).toBeGreaterThan(2)
   })
 
-  it('emits update:open when the mask is clicked (maskClosable default true)', async () => {
+  it('navigates with buttons and stops at the ends', async () => {
     const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
+      props: { open: true, images, currentIndex: 1 }
     })
-
-    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
-    await fireEvent.click(mask)
-
-    expect(emitted()['update:open']).toBeTruthy()
-    expect(emitted()['update:open'][0]).toEqual([false])
-  })
-
-  it('does not emit update:open when the mask is clicked with maskClosable false', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        maskClosable: false
-      }
-    })
-
-    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
-    await fireEvent.click(mask)
-
-    expect(emitted()['update:open']).toBeUndefined()
-  })
-
-  it('does not emit update:open when the preview image is clicked', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLElement
-    await fireEvent.click(img)
-
-    expect(emitted()['update:open']).toBeUndefined()
-  })
-
-  it('updates current image from navigation button clicks', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        currentIndex: 1
-      }
-    })
-
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    await fireEvent.click(document.querySelector('[aria-label="Next image"]') as HTMLElement)
-
-    expect(emitted()['update:currentIndex'][0]).toEqual([2])
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(emitted()['update:currentIndex']?.[0]).toEqual([2])
     expect(img).toHaveAttribute('src', '/img3.jpg')
-
-    await fireEvent.click(document.querySelector('[aria-label="Previous image"]') as HTMLElement)
-
-    expect(emitted()['update:currentIndex'][1]).toEqual([1])
-    expect(img).toHaveAttribute('src', '/img2.jpg')
+    expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeDisabled()
   })
 
-  it('updates current image from keyboard navigation', async () => {
+  it('does not listen to arrows when showNav is false', async () => {
     const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
+      props: { open: true, images, showNav: false }
     })
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    expect(
+      screen.queryByRole('button', { name: labels.previousImageAriaLabel })
+    ).not.toBeInTheDocument()
     await fireEvent.keyDown(document, { key: 'ArrowRight' })
-
-    expect(emitted()['update:currentIndex'][0]).toEqual([1])
-    expect(img).toHaveAttribute('src', '/img2.jpg')
-
-    await fireEvent.keyDown(document, { key: 'ArrowLeft' })
-
-    expect(emitted()['update:currentIndex'][1]).toEqual([0])
-    expect(img).toHaveAttribute('src', '/img1.jpg')
+    expect(emitted()['update:currentIndex']).toBeFalsy()
   })
 
-  it('updates current image from one-finger horizontal touch swipes at base scale', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        currentIndex: 1
-      }
-    })
-
+  it('zooms from the toolbar and a small wheel delta', async () => {
+    const { emitted } = render(ImagePreview, { props: { open: true, images } })
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    await fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
-    await fireEvent.touchMove(img, { touches: [{ clientX: 80, clientY: 66 }] })
-    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
-
-    expect(emitted()['update:currentIndex'][0]).toEqual([2])
-    expect(img).toHaveAttribute('src', '/img3.jpg')
-
-    await fireEvent.touchStart(img, { touches: [{ clientX: 80, clientY: 60 }] })
-    await fireEvent.touchMove(img, { touches: [{ clientX: 180, clientY: 66 }] })
-    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 180, clientY: 66 }] })
-
-    expect(emitted()['update:currentIndex'][1]).toEqual([1])
-    expect(img).toHaveAttribute('src', '/img2.jpg')
-  })
-
-  it('honors touch swipe switch and threshold configuration', async () => {
-    const { emitted, rerender } = render(ImagePreview, {
-      props: {
-        open: true,
-        images,
-        touchSwipeable: false
-      }
-    })
-
-    let img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    await fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
-    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
-    expect(emitted()['update:currentIndex']).toBeUndefined()
-
-    await rerender({
-      open: true,
-      images,
-      touchSwipeable: true,
-      touchSwipeThreshold: 120
-    })
-    img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    await fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
-    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
-
-    expect(emitted()['update:currentIndex']).toBeUndefined()
-  })
-
-  it('updates zoom and rotation from toolbar actions and reset', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
-      }
-    })
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-
-    await fireEvent.click(document.querySelector('[aria-label="Zoom in"]') as HTMLElement)
-    expect(emitted()['scale-change'][0]).toEqual([1.5])
+    await fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    expect(emitted()['scale-change']?.[0]).toEqual([1.5])
     expect(img.style.transform).toContain('scale(1.5)')
 
-    await fireEvent.click(document.querySelector('[aria-label="Rotate right"]') as HTMLElement)
-    expect(img.style.transform).toContain('rotate(90deg)')
-
-    await fireEvent.click(document.querySelector('[aria-label="Rotate left"]') as HTMLElement)
-    expect(img.style.transform).toContain('rotate(0deg)')
-
-    await fireEvent.click(document.querySelector('[aria-label="Reset"]') as HTMLElement)
-    expect(emitted()['scale-change'][1]).toEqual([1])
-    expect(img.style.transform).toContain('translate(0px, 0px) scale(1) rotate(0deg)')
+    await fireEvent.wheel(document.querySelector('[role="dialog"]') as HTMLElement, { deltaY: -20 })
+    const afterWheel = Number(/scale\(([^)]+)\)/.exec(img.style.transform)?.[1])
+    expect(afterWheel).toBeGreaterThan(1)
+    expect(afterWheel).toBeLessThan(2)
   })
 
-  it('supports touch pinch zoom and pan', async () => {
-    const { emitted } = render(ImagePreview, {
-      props: {
-        open: true,
-        images
+  it('keeps panning after the pointer leaves the bitmap', async () => {
+    render(ImagePreview, { props: { open: true, images: ['/solo.jpg'] } })
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.pointerDown(img, {
+      pointerId: 1,
+      button: 0,
+      clientX: 10,
+      clientY: 10,
+      pointerType: 'mouse'
+    })
+    await fireEvent.pointerMove(document, { pointerId: 1, clientX: 40, clientY: 50 })
+    expect(img.style.transform).toContain('translate(30px, 40px)')
+    await fireEvent.pointerCancel(document, { pointerId: 1 })
+    await fireEvent.pointerMove(document, { pointerId: 1, clientX: 80, clientY: 90 })
+    expect(img.style.transform).toContain('translate(30px, 40px)')
+  })
+
+  it('resets transform when the image changes', async () => {
+    const Harness = defineComponent({
+      setup() {
+        const currentIndex = ref(0)
+        return () => [
+          h(
+            'button',
+            {
+              type: 'button',
+              onClick: () => {
+                currentIndex.value = 1
+              }
+            },
+            'next-item'
+          ),
+          h(ImagePreview, { open: true, images, currentIndex: currentIndex.value })
+        ]
       }
     })
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    await fireEvent.touchStart(img, {
-      touches: [
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 }
-      ]
-    })
-    await fireEvent.touchMove(img, {
-      touches: [
-        { clientX: 0, clientY: 0 },
-        { clientX: 150, clientY: 0 }
-      ]
-    })
-
-    expect(emitted()['scale-change'][0]).toEqual([1.5])
-    expect(img.style.transform).toContain('scale(1.5)')
-
-    await fireEvent.touchEnd(img)
-    await fireEvent.touchStart(img, { touches: [{ clientX: 10, clientY: 10 }] })
-    await fireEvent.touchMove(img, { touches: [{ clientX: 30, clientY: 40 }] })
-    expect(img.style.transform).toContain('translate(20px, 30px)')
+    render(Harness)
+    await fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    await fireEvent.click(screen.getByRole('button', { name: 'next-item' }))
+    expect(
+      (document.querySelector('[role="dialog"] img') as HTMLImageElement).style.transform
+    ).toContain('scale(1)')
   })
 
-  it('shows image counter for multiple images', () => {
-    render(ImagePreview, {
+  it('moves focus into the dialog and keeps one name on the close button', async () => {
+    render(ImagePreview, { props: { open: true, images } })
+    const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+    await waitFor(() => {
+      expect(dialog.contains(document.activeElement)).toBe(true)
+    })
+    expect(screen.getAllByRole('button', { name: labels.closePreviewAriaLabel })).toHaveLength(1)
+  })
+
+  it('has no axe violations on an open gallery', async () => {
+    render(ImagePreview, { props: { open: true, images } })
+    await expectNoA11yViolationsIsolated(document.body)
+  })
+
+  it('shares one dialog tree with ImageViewer', async () => {
+    const { emitted } = render(ImageViewer, {
       props: {
         open: true,
         images,
-        currentIndex: 1
+        minZoom: 1,
+        maxZoom: 1,
+        showNav: false
       }
     })
-
-    const counter = document.body.textContent
-    expect(counter).toContain('2 / 3')
-  })
-
-  it('does not show navigation for single image', () => {
-    render(ImagePreview, {
-      props: {
-        open: true,
-        images: ['/single.jpg']
-      }
-    })
-
-    expect(document.querySelector('[aria-label="Previous image"]')).not.toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Next image"]')).not.toBeInTheDocument()
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(ImagePreview)
-      expect(container.firstChild).toBeTruthy()
-    })
+    expect(document.querySelector('[data-tiger-image-preview]')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: labels.previousImageAriaLabel })
+    ).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: labels.closePreviewAriaLabel }))
+    expect(emitted()['update:open']?.[0]).toEqual([false])
+    expect(emitted().close?.[0]).toEqual([])
   })
 })

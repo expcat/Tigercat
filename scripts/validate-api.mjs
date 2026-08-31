@@ -286,7 +286,7 @@ for (const compName of componentsWithOpen) {
 // 组件实现可能拆分到 `<Comp>/` 子目录（如 Table），故读取主文件 + 同名子目录。
 
 const CONTROLLED_PARITY = [
-  { prop: 'currentIndex', components: ['ImageViewer'] },
+  { prop: 'currentIndex', components: ['ImagePreview', 'ImageViewer'] },
   // React 端历史回调名为 onExpandedChange（非派生的 onExpandedKeysChange），显式登记。
   { prop: 'expandedKeys', components: ['CommentThread'], reactCallback: 'onExpandedChange' },
   { prop: 'query', components: ['Spotlight'] },

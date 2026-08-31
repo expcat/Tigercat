@@ -200,6 +200,8 @@ export interface TigerLocaleImageViewer {
   zoomInAriaLabel?: string
   rotateLeftAriaLabel?: string
   rotateRightAriaLabel?: string
+  /** Template for the current bitmap when the item has no `alt`. Uses `{index}` and `{total}`. */
+  previewImageAriaLabel?: string
 }
 
 export interface TigerLocaleImageEditor {

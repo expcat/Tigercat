@@ -50,10 +50,11 @@ export interface CropResult {
 export type CropHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
 /**
- * Image preview toolbar action types
+ * One gallery entry in a fullscreen lightbox.
+ * A string is the image URL; an object may carry a per-item `alt`.
+ * `alt: ''` marks the bitmap decorative (name stays on the dialog).
  */
-export type ImagePreviewToolbarAction =
-  'zoomIn' | 'zoomOut' | 'rotateLeft' | 'rotateRight' | 'reset' | 'prev' | 'next' | 'close'
+export type ImageLightboxItem = string | { src: string; alt?: string }
 
 /**
  * Navigation state for preview with multiple images
@@ -171,9 +172,9 @@ export interface ImageViewerBaseProps {
   open?: boolean
 
   /**
-   * Array of image URLs to preview
+   * Gallery entries to preview. Required; an empty list closes the dialog.
    */
-  images: string[]
+  images: ImageLightboxItem[]
 
   /**
    * Current image index (for multi-image preview)
@@ -227,6 +228,36 @@ export interface ImagePreviewProps extends ImageViewerBaseProps {
    * @default 48
    */
   touchSwipeThreshold?: number
+
+  /**
+   * Whether zoom controls (toolbar, wheel, pinch, `+`/`-`) are enabled.
+   * @default true
+   */
+  zoomable?: boolean
+
+  /**
+   * Whether rotation controls (toolbar, `[`/`]`) are enabled.
+   * @default true
+   */
+  rotatable?: boolean
+
+  /**
+   * Whether previous/next controls and arrow-key navigation are shown.
+   * Hidden for a single image. `false` also disables keyboard navigation.
+   * @default true
+   */
+  showNav?: boolean
+
+  /**
+   * Whether to show the "n / total" counter (multiple images only).
+   * @default true
+   */
+  showCounter?: boolean
+
+  /**
+   * Additional CSS classes on the dialog root.
+   */
+  className?: string
 }
 
 /**

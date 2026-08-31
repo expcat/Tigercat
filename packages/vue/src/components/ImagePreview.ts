@@ -1,42 +1,69 @@
-import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  onBeforeUnmount,
+  nextTick,
+  type PropType
+} from 'vue'
+import {
+  applyWheelZoom,
+  captureActiveElement,
+  clampLightboxIndex,
   classNames,
-  imagePreviewMaskClasses,
-  imagePreviewWrapperClasses,
-  imagePreviewImgClasses,
-  imagePreviewToolbarClasses,
-  imagePreviewToolbarBtnClasses,
-  imagePreviewNavBtnClasses,
+  coerceClassValue,
+  createDefaultTransform,
+  createLightboxGestureSession,
+  focusFirst,
+  formatLightboxImageAlt,
+  getImageTransformStyle,
+  getImageViewerLabels,
+  getLightboxNavState,
   imagePreviewCloseBtnClasses,
   imagePreviewCounterClasses,
+  imagePreviewImgClasses,
+  imagePreviewImgMotionClasses,
+  imagePreviewMaskClasses,
+  imagePreviewNavNextClasses,
+  imagePreviewNavPrevClasses,
+  imagePreviewToolbarBtnClasses,
+  imagePreviewToolbarClasses,
+  imagePreviewWrapperClasses,
+  imageViewerIcons,
+  isBrowser,
+  LIGHTBOX_SCALE_STEP,
+  lightboxShouldClose,
+  mergeTigerLocale,
+  nextIconPath,
+  normalizeRotation,
+  OVERLAY_Z_INDEX,
+  previewCloseIconPath,
+  prevIconPath,
+  resetIconPath,
+  resolveLightboxImages,
+  resolveLightboxKeyAction,
+  resolveLightboxNavIndex,
+  resolveLightboxScaleRange,
+  restoreFocus,
   zoomInIconPath,
   zoomOutIconPath,
-  resetIconPath,
-  prevIconPath,
-  nextIconPath,
-  previewCloseIconPath,
-  imageViewerIcons,
-  clampScale,
-  calculateTransform,
-  getPreviewNavState,
-  normalizeRotation,
-  createPanState,
-  startPan,
-  movePan,
-  createPinchState,
-  startPinch,
-  movePinch,
-  getImageViewerLabels,
-  mergeTigerLocale,
-  OVERLAY_Z_INDEX,
+  type GestureTransform,
+  type ImageLightboxItem,
   type ImagePreviewProps as CoreImagePreviewProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
-import { renderVueBodyTeleport, useVueBodyScrollLock } from '../utils/overlay'
+import {
+  renderVueBodyTeleport,
+  useVueBodyScrollLock,
+  useVueEscapeKey,
+  useVueFocusTrap
+} from '../utils/overlay'
 
-export interface VueImagePreviewProps extends Omit<CoreImagePreviewProps, 'images'> {
-  images?: string[]
+export interface VueImagePreviewProps extends CoreImagePreviewProps {
+  images: ImageLightboxItem[]
 }
 
 const svgIcon = (d: string, cls = 'w-5 h-5') =>
@@ -47,7 +74,8 @@ const svgIcon = (d: string, cls = 'w-5 h-5') =>
       xmlns: 'http://www.w3.org/2000/svg',
       fill: 'none',
       viewBox: '0 0 24 24',
-      stroke: 'currentColor'
+      stroke: 'currentColor',
+      'aria-hidden': 'true'
     },
     [
       h('path', {
@@ -64,87 +92,113 @@ export const ImagePreview = defineComponent({
   inheritAttrs: false,
   props: {
     open: { type: Boolean, default: undefined },
-    images: { type: Array as PropType<string[]>, default: () => [] },
+    images: { type: Array as PropType<ImageLightboxItem[]>, required: true },
     currentIndex: { type: Number, default: 0 },
-    zIndex: { type: Number, default: OVERLAY_Z_INDEX.modal },
+    zIndex: { type: Number, default: undefined },
     maskClosable: { type: Boolean, default: true },
-    scaleStep: { type: Number, default: 0.5 },
-    minScale: { type: Number, default: 0.25 },
-    maxScale: { type: Number, default: 5 },
+    scaleStep: { type: Number, default: LIGHTBOX_SCALE_STEP },
+    minScale: { type: Number, default: undefined },
+    maxScale: { type: Number, default: undefined },
     touchSwipeable: { type: Boolean, default: true },
     touchSwipeThreshold: { type: Number, default: 48 },
+    zoomable: { type: Boolean, default: true },
+    rotatable: { type: Boolean, default: true },
+    showNav: { type: Boolean, default: true },
+    showCounter: { type: Boolean, default: true },
+    className: { type: String, default: undefined },
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
     }
   },
   emits: ['update:open', 'update:currentIndex', 'scale-change'],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getImageViewerLabels(mergedLocale.value))
-    const scale = ref(1)
-    const rotation = ref(0)
-    const offsetX = ref(0)
-    const offsetY = ref(0)
+    const scaleRange = computed(() =>
+      resolveLightboxScaleRange({ minScale: props.minScale, maxScale: props.maxScale })
+    )
+    const resolved = computed(() => resolveLightboxImages(props.images))
+    const isOpen = computed(() => props.open ?? false)
+    const shouldRender = computed(() => isOpen.value && resolved.value.length > 0)
+
+    const transform = ref<GestureTransform>(createDefaultTransform())
     const index = ref(props.currentIndex)
     const dragging = ref(false)
-    const dragStart = ref({ x: 0, y: 0, ox: 0, oy: 0 })
-    let panState = createPanState()
-    let pinchState = createPinchState()
-    let touchSwipeState = {
-      isTracking: false,
-      startX: 0,
-      startY: 0,
-      currentX: 0,
-      currentY: 0
-    }
+    const rootRef = ref<HTMLElement | null>(null)
+    const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    let previousActive: HTMLElement | null = null
+    let gestureSession: ReturnType<typeof createLightboxGestureSession> | null = null
+    let detachWheel: (() => void) | undefined
+    let restoreOnClose = false
 
     const resetTransform = () => {
-      scale.value = 1
-      rotation.value = 0
-      offsetX.value = 0
-      offsetY.value = 0
-      panState = createPanState()
-      pinchState = createPinchState()
-      touchSwipeState.isTracking = false
+      transform.value = createDefaultTransform()
+      dragging.value = false
     }
 
     watch(
-      () => props.currentIndex,
-      (val) => {
-        index.value = val
-        resetTransform()
-      }
-    )
-
-    const isOpen = computed(() => props.open ?? false)
-
-    watch(
-      () => isOpen.value,
-      (val) => {
-        if (val) {
-          resetTransform()
-          index.value = props.currentIndex
+      () => [isOpen.value, resolved.value.length] as const,
+      ([open, length]) => {
+        if (lightboxShouldClose(open, length)) {
+          emit('update:open', false)
         }
       }
     )
-    useVueBodyScrollLock(isOpen)
 
-    const navState = computed(() => getPreviewNavState(index.value, props.images.length))
+    watch(
+      () => [isOpen.value, props.currentIndex, resolved.value.length] as const,
+      ([open, current, length]) => {
+        if (!open) return
+        index.value = clampLightboxIndex(current, length)
+        resetTransform()
+      },
+      { immediate: true }
+    )
+
+    useVueBodyScrollLock(shouldRender)
+    useVueFocusTrap({ enabled: shouldRender, containerRef: rootRef, inert: true })
 
     const handleClose = () => {
       emit('update:open', false)
     }
 
+    useVueEscapeKey({
+      enabled: shouldRender,
+      onEscape: handleClose,
+      layerRef: rootRef
+    })
+
+    const applyIndex = (next: number) => {
+      index.value = next
+      resetTransform()
+      emit('update:currentIndex', next)
+    }
+
+    const handlePrev = () => {
+      const next = resolveLightboxNavIndex(index.value, resolved.value.length, 'prev')
+      if (next === null) return
+      applyIndex(next)
+    }
+
+    const handleNext = () => {
+      const next = resolveLightboxNavIndex(index.value, resolved.value.length, 'next')
+      if (next === null) return
+      applyIndex(next)
+    }
+
+    const setScale = (next: number) => {
+      transform.value = { ...transform.value, scale: next }
+      emit('scale-change', next)
+    }
+
     const handleZoomIn = () => {
-      scale.value = clampScale(scale.value + props.scaleStep, props.minScale, props.maxScale)
-      emit('scale-change', scale.value)
+      setScale(Math.min(transform.value.scale + props.scaleStep, scaleRange.value.maxScale))
     }
 
     const handleZoomOut = () => {
-      scale.value = clampScale(scale.value - props.scaleStep, props.minScale, props.maxScale)
-      emit('scale-change', scale.value)
+      setScale(Math.max(transform.value.scale - props.scaleStep, scaleRange.value.minScale))
     }
 
     const handleReset = () => {
@@ -153,314 +207,333 @@ export const ImagePreview = defineComponent({
     }
 
     const handleRotateLeft = () => {
-      rotation.value = normalizeRotation(rotation.value - 90)
+      transform.value = {
+        ...transform.value,
+        rotation: normalizeRotation(transform.value.rotation - 90)
+      }
     }
 
     const handleRotateRight = () => {
-      rotation.value = normalizeRotation(rotation.value + 90)
-    }
-
-    const handlePrev = () => {
-      if (navState.value.hasPrev) {
-        index.value--
-        resetTransform()
-        emit('update:currentIndex', index.value)
+      transform.value = {
+        ...transform.value,
+        rotation: normalizeRotation(transform.value.rotation + 90)
       }
     }
 
-    const handleNext = () => {
-      if (navState.value.hasNext) {
-        index.value++
-        resetTransform()
-        emit('update:currentIndex', index.value)
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const action = resolveLightboxKeyAction(event.key, {
+        canNavigate: props.showNav && resolved.value.length > 1,
+        zoomable: props.zoomable,
+        rotatable: props.rotatable,
+        rtl: config.value.direction === 'rtl'
+      })
+      if (!action) return
+      event.preventDefault()
+      switch (action) {
+        case 'prev':
+          handlePrev()
+          break
+        case 'next':
+          handleNext()
+          break
+        case 'zoomIn':
+          handleZoomIn()
+          break
+        case 'zoomOut':
+          handleZoomOut()
+          break
+        case 'rotateLeft':
+          handleRotateLeft()
+          break
+        case 'rotateRight':
+          handleRotateRight()
+          break
+        case 'reset':
+          handleReset()
+          break
       }
     }
 
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault()
-      const delta = e.deltaY > 0 ? -props.scaleStep : props.scaleStep
-      scale.value = clampScale(scale.value + delta, props.minScale, props.maxScale)
-      emit('scale-change', scale.value)
-    }
-
-    const handleMouseDown = (e: MouseEvent) => {
-      if (e.button !== 0) return
-      e.preventDefault()
-      dragging.value = true
-      dragStart.value = {
-        x: e.clientX,
-        y: e.clientY,
-        ox: offsetX.value,
-        oy: offsetY.value
+    const attachWheel = () => {
+      detachWheel?.()
+      const root = rootRef.value
+      if (!root) return
+      const handler = (event: WheelEvent) => {
+        if (!props.zoomable) return
+        event.preventDefault()
+        setScale(applyWheelZoom(transform.value.scale, event.deltaY, scaleRange.value))
       }
+      root.addEventListener('wheel', handler, { passive: false })
+      detachWheel = () => root.removeEventListener('wheel', handler)
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragging.value) return
-      offsetX.value = dragStart.value.ox + (e.clientX - dragStart.value.x)
-      offsetY.value = dragStart.value.oy + (e.clientY - dragStart.value.y)
+    const attachGesture = () => {
+      gestureSession?.dispose()
+      gestureSession = createLightboxGestureSession({
+        getScale: () => transform.value.scale,
+        getTranslate: () => ({
+          x: transform.value.translateX,
+          y: transform.value.translateY
+        }),
+        minScale: scaleRange.value.minScale,
+        maxScale: scaleRange.value.maxScale,
+        zoomable: props.zoomable,
+        swipeable: props.touchSwipeable,
+        swipeThreshold: props.touchSwipeThreshold,
+        imageCount: resolved.value.length,
+        onTransform: (next) => {
+          transform.value = { ...transform.value, ...next }
+          if (next.scale != null) emit('scale-change', next.scale)
+        },
+        onSwipe: (direction) => {
+          if (direction === 'prev') handlePrev()
+          else handleNext()
+        },
+        onDraggingChange: (next) => {
+          dragging.value = next
+        }
+      })
     }
 
-    const handleMouseUp = () => {
-      dragging.value = false
-    }
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        e.preventDefault()
-        touchSwipeState.isTracking = false
-        pinchState = startPinch(e.touches[0], e.touches[1], scale.value)
-        return
-      }
-
-      if (e.touches.length === 1) {
-        const touch = e.touches[0]
-        if (props.touchSwipeable && props.images.length > 1 && scale.value === 1) {
-          touchSwipeState = {
-            isTracking: true,
-            startX: touch.clientX,
-            startY: touch.clientY,
-            currentX: touch.clientX,
-            currentY: touch.clientY
+    watch(
+      shouldRender,
+      async (open) => {
+        if (!isBrowser()) return
+        if (!open) {
+          detachWheel?.()
+          detachWheel = undefined
+          gestureSession?.dispose()
+          gestureSession = null
+          if (restoreOnClose) {
+            restoreFocus(previousActive)
+            restoreOnClose = false
           }
-          panState = createPanState()
+          document.removeEventListener('keydown', handleKeyDown)
           return
         }
 
-        touchSwipeState.isTracking = false
-        panState = startPan(touch.clientX, touch.clientY, offsetX.value, offsetY.value)
-      }
-    }
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 2 && pinchState.isPinching) {
-        e.preventDefault()
-        scale.value = movePinch(
-          pinchState,
-          e.touches[0],
-          e.touches[1],
-          props.minScale,
-          props.maxScale
-        )
-        emit('scale-change', scale.value)
-        return
-      }
-
-      if (e.touches.length === 1 && panState.isPanning) {
-        const next = movePan(panState, e.touches[0].clientX, e.touches[0].clientY)
-        offsetX.value = next.translateX
-        offsetY.value = next.translateY
-        return
-      }
-
-      if (e.touches.length === 1 && touchSwipeState.isTracking) {
-        const touch = e.touches[0]
-        touchSwipeState.currentX = touch.clientX
-        touchSwipeState.currentY = touch.clientY
-
-        const deltaX = touch.clientX - touchSwipeState.startX
-        const deltaY = touch.clientY - touchSwipeState.startY
-        if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-          e.preventDefault()
-        }
-      }
-    }
-
-    const handleTouchEnd = (e?: TouchEvent) => {
-      if (touchSwipeState.isTracking) {
-        const endedTouch = e?.changedTouches?.[0]
-        const currentX = endedTouch?.clientX ?? touchSwipeState.currentX
-        const currentY = endedTouch?.clientY ?? touchSwipeState.currentY
-        const deltaX = currentX - touchSwipeState.startX
-        const deltaY = currentY - touchSwipeState.startY
-        const threshold = Math.max(0, props.touchSwipeThreshold)
-
-        if (Math.abs(deltaX) >= threshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-          if (deltaX < 0) {
-            handleNext()
-          } else {
-            handlePrev()
-          }
-        }
-      }
-
-      touchSwipeState.isTracking = false
-      panState = createPanState()
-      pinchState = createPinchState()
-    }
-
-    const handleMaskClick = () => {
-      if (props.maskClosable) {
-        handleClose()
-      }
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen.value) return
-      switch (e.key) {
-        case 'Escape':
-          handleClose()
-          break
-        case 'ArrowLeft':
-          handlePrev()
-          break
-        case 'ArrowRight':
-          handleNext()
-          break
-      }
-    }
-
-    onMounted(() => {
-      document.addEventListener('keydown', handleKeyDown)
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('keydown', handleKeyDown)
-    })
-
-    const transform = computed(
-      () =>
-        `${calculateTransform(scale.value, offsetX.value, offsetY.value)} rotate(${rotation.value}deg)`
+        previousActive = captureActiveElement()
+        restoreOnClose = true
+        document.addEventListener('keydown', handleKeyDown)
+        attachGesture()
+        await nextTick()
+        attachWheel()
+        focusFirst([closeButtonRef.value, rootRef.value])
+      },
+      { flush: 'post', immediate: true }
     )
 
+    onBeforeUnmount(() => {
+      detachWheel?.()
+      gestureSession?.dispose()
+      if (isBrowser()) document.removeEventListener('keydown', handleKeyDown)
+      if (restoreOnClose) restoreFocus(previousActive)
+    })
+
     return () => {
-      if (!isOpen.value || !props.images.length) return null
+      if (!shouldRender.value) return null
 
-      const currentSrc = props.images[index.value] || props.images[0]
+      const items = resolved.value
+      const displayIndex = clampLightboxIndex(index.value, items.length)
+      const current = items[displayIndex]
+      if (!current) return null
 
-      const mask = h('div', {
-        class: imagePreviewMaskClasses,
-        'aria-hidden': 'true',
-        onClick: handleMaskClick
-      })
-
-      const img = h('img', {
-        src: currentSrc,
-        class: imagePreviewImgClasses,
-        style: { transform: transform.value },
-        alt: `Preview image ${index.value + 1}`,
-        draggable: false,
-        onMousedown: handleMouseDown,
-        onMousemove: handleMouseMove,
-        onMouseup: handleMouseUp,
-        onMouseleave: handleMouseUp,
-        onTouchstart: handleTouchStart,
-        onTouchmove: handleTouchMove,
-        onTouchend: handleTouchEnd,
-        onTouchcancel: handleTouchEnd
-      })
-
-      const closeBtn = h(
-        'button',
-        {
-          class: imagePreviewCloseBtnClasses,
-          onClick: handleClose,
-          'aria-label': labels.value.closePreviewAriaLabel,
-          type: 'button'
-        },
-        [svgIcon(previewCloseIconPath)]
+      const navState = getLightboxNavState(displayIndex, items.length)
+      const currentAlt = formatLightboxImageAlt(
+        current,
+        displayIndex,
+        items.length,
+        labels.value.previewImageAriaLabel
       )
+      const canZoomOut = transform.value.scale <= scaleRange.value.minScale + 1e-6
+      const canZoomIn = transform.value.scale >= scaleRange.value.maxScale - 1e-6
+      const showNavigation = props.showNav && items.length > 1
+      const showCount = props.showCounter && items.length > 1
 
-      const toolbar = h('div', { class: imagePreviewToolbarClasses }, [
-        h(
-          'button',
-          {
-            class: imagePreviewToolbarBtnClasses,
-            onClick: handleZoomOut,
-            'aria-label': labels.value.zoomOutAriaLabel,
-            type: 'button'
-          },
-          [svgIcon(zoomOutIconPath)]
-        ),
-        h(
-          'button',
-          {
-            class: imagePreviewToolbarBtnClasses,
-            onClick: handleReset,
-            'aria-label': labels.value.resetAriaLabel,
-            type: 'button'
-          },
-          [svgIcon(resetIconPath)]
-        ),
-        h(
-          'button',
-          {
-            class: imagePreviewToolbarBtnClasses,
-            onClick: handleZoomIn,
-            'aria-label': labels.value.zoomInAriaLabel,
-            type: 'button'
-          },
-          [svgIcon(zoomInIconPath)]
-        ),
-        h(
-          'button',
-          {
-            class: imagePreviewToolbarBtnClasses,
-            onClick: handleRotateLeft,
-            'aria-label': labels.value.rotateLeftAriaLabel,
-            type: 'button'
-          },
-          [svgIcon(imageViewerIcons.rotateLeft)]
-        ),
-        h(
-          'button',
-          {
-            class: imagePreviewToolbarBtnClasses,
-            onClick: handleRotateRight,
-            'aria-label': labels.value.rotateRightAriaLabel,
-            type: 'button'
-          },
-          [svgIcon(imageViewerIcons.rotateRight)]
-        ),
-        navState.value.counter
-          ? h('span', { class: imagePreviewCounterClasses }, navState.value.counter)
-          : null
-      ])
+      const {
+        class: attrClass,
+        className: attrClassName,
+        style: attrStyle,
+        onClick: attrOnClick,
+        onKeydown: attrOnKeydown,
+        ...restAttrs
+      } = attrs as Record<string, unknown> & {
+        class?: unknown
+        className?: unknown
+        style?: Record<string, unknown>
+        onClick?: (event: MouseEvent) => void
+        onKeydown?: (event: KeyboardEvent) => void
+      }
 
-      const prevBtn =
-        props.images.length > 1
-          ? h(
+      const rootStyle: Record<string, unknown> = {
+        ...(typeof attrStyle === 'object' && attrStyle ? attrStyle : {})
+      }
+      if (props.zIndex != null && props.zIndex !== OVERLAY_Z_INDEX.modal) {
+        rootStyle.zIndex = props.zIndex
+      }
+
+      const children = [
+        h('div', {
+          class: imagePreviewMaskClasses,
+          'aria-hidden': 'true',
+          onClick: () => {
+            if (props.maskClosable) handleClose()
+          }
+        }),
+        h('img', {
+          src: current.src,
+          class: classNames(
+            imagePreviewImgClasses,
+            !dragging.value && imagePreviewImgMotionClasses
+          ),
+          style: { transform: getImageTransformStyle(transform.value) },
+          alt: currentAlt,
+          draggable: false,
+          onPointerdown: (event: PointerEvent) => {
+            gestureSession?.pointerDown(event)
+          }
+        }),
+        h(
+          'button',
+          {
+            ref: closeButtonRef,
+            class: imagePreviewCloseBtnClasses,
+            onClick: handleClose,
+            'aria-label': labels.value.closePreviewAriaLabel,
+            type: 'button'
+          },
+          [svgIcon(previewCloseIconPath)]
+        )
+      ]
+
+      if (showNavigation) {
+        children.push(
+          h(
+            'button',
+            {
+              class: imagePreviewNavPrevClasses,
+              onClick: handlePrev,
+              disabled: !navState.hasPrev,
+              'aria-label': labels.value.previousImageAriaLabel,
+              type: 'button'
+            },
+            [svgIcon(prevIconPath)]
+          ),
+          h(
+            'button',
+            {
+              class: imagePreviewNavNextClasses,
+              onClick: handleNext,
+              disabled: !navState.hasNext,
+              'aria-label': labels.value.nextImageAriaLabel,
+              type: 'button'
+            },
+            [svgIcon(nextIconPath)]
+          )
+        )
+      }
+
+      if (props.zoomable || props.rotatable || showCount) {
+        const toolbar: ReturnType<typeof h>[] = []
+        if (props.zoomable) {
+          toolbar.push(
+            h(
               'button',
               {
-                class: classNames(imagePreviewNavBtnClasses, 'left-4'),
-                onClick: handlePrev,
-                disabled: !navState.value.hasPrev,
-                'aria-label': labels.value.previousImageAriaLabel,
+                class: imagePreviewToolbarBtnClasses,
+                onClick: handleZoomOut,
+                disabled: canZoomOut,
+                'aria-label': labels.value.zoomOutAriaLabel,
                 type: 'button'
               },
-              [svgIcon(prevIconPath)]
-            )
-          : null
-
-      const nextBtn =
-        props.images.length > 1
-          ? h(
+              [svgIcon(zoomOutIconPath)]
+            ),
+            h(
               'button',
               {
-                class: classNames(imagePreviewNavBtnClasses, 'right-4'),
-                onClick: handleNext,
-                disabled: !navState.value.hasNext,
-                'aria-label': labels.value.nextImageAriaLabel,
+                class: imagePreviewToolbarBtnClasses,
+                onClick: handleReset,
+                'aria-label': labels.value.resetAriaLabel,
                 type: 'button'
               },
-              [svgIcon(nextIconPath)]
+              [svgIcon(resetIconPath)]
+            ),
+            h(
+              'button',
+              {
+                class: imagePreviewToolbarBtnClasses,
+                onClick: handleZoomIn,
+                disabled: canZoomIn,
+                'aria-label': labels.value.zoomInAriaLabel,
+                type: 'button'
+              },
+              [svgIcon(zoomInIconPath)]
             )
-          : null
+          )
+        }
+        if (props.rotatable) {
+          toolbar.push(
+            h(
+              'button',
+              {
+                class: imagePreviewToolbarBtnClasses,
+                onClick: handleRotateLeft,
+                'aria-label': labels.value.rotateLeftAriaLabel,
+                type: 'button'
+              },
+              [svgIcon(imageViewerIcons.rotateLeft)]
+            ),
+            h(
+              'button',
+              {
+                class: imagePreviewToolbarBtnClasses,
+                onClick: handleRotateRight,
+                'aria-label': labels.value.rotateRightAriaLabel,
+                type: 'button'
+              },
+              [svgIcon(imageViewerIcons.rotateRight)]
+            )
+          )
+        }
+        if (showCount && navState.counter) {
+          toolbar.push(
+            h(
+              'span',
+              { class: imagePreviewCounterClasses, 'aria-live': 'polite' },
+              navState.counter
+            )
+          )
+        }
+        children.push(h('div', { class: imagePreviewToolbarClasses }, toolbar))
+      }
 
-      const wrapper = h(
-        'div',
-        {
-          class: imagePreviewWrapperClasses,
-          style: { zIndex: props.zIndex },
-          role: 'dialog',
-          'aria-modal': 'true',
-          'aria-label': labels.value.previewDialogAriaLabel,
-          onWheel: handleWheel
-        },
-        [mask, img, closeBtn, prevBtn, nextBtn, toolbar]
+      return renderVueBodyTeleport(
+        h(
+          'div',
+          {
+            ...restAttrs,
+            ref: rootRef,
+            class: classNames(
+              imagePreviewWrapperClasses,
+              props.className,
+              coerceClassValue(attrClass),
+              coerceClassValue(attrClassName)
+            ),
+            style: rootStyle,
+            role: 'dialog',
+            'aria-modal': 'true',
+            'aria-label': labels.value.previewDialogAriaLabel,
+            tabindex: -1,
+            'data-tiger-overlay-host': '',
+            'data-tiger-image-preview': '',
+            onClick: attrOnClick,
+            onKeydown: (event: KeyboardEvent) => {
+              attrOnKeydown?.(event)
+            }
+          },
+          children
+        )
       )
-
-      return renderVueBodyTeleport(wrapper)
     }
   }
 })

@@ -5,6 +5,7 @@
 
 import { classNames } from './class-names'
 import { isBrowser } from './env'
+import { overlayZIndexClass } from './floating'
 import type {
   ImageFit,
   ImagePreviewTrigger,
@@ -178,46 +179,57 @@ export const previewCloseIconPath = 'M6 18L18 6M6 6l12 12'
 // ============================================================================
 
 /**
- * Preview mask/backdrop classes
+ * Preview mask/backdrop classes (fills the dialog root).
  */
-export const imagePreviewMaskClasses =
-  'fixed inset-0 bg-[var(--tiger-image-mask,rgba(0,0,0,0.85))] transition-opacity'
+export const imagePreviewMaskClasses = 'absolute inset-0 bg-black/85'
 
 /**
- * Preview wrapper classes (full screen container)
+ * Preview wrapper classes (full screen container, modal stacking).
  */
-export const imagePreviewWrapperClasses =
-  'fixed inset-0 flex items-center justify-center select-none'
+export const imagePreviewWrapperClasses = `fixed inset-0 flex items-center justify-center select-none ${overlayZIndexClass.modal}`
 
 /**
- * Preview image classes
+ * Preview image classes. Motion duration is added only when not dragging.
  */
 export const imagePreviewImgClasses =
-  'max-h-[90vh] max-w-[90vw] select-none transition-transform duration-150 ease-out cursor-grab active:cursor-grabbing touch-none'
+  'max-h-[90vh] max-w-[90vw] select-none cursor-grab active:cursor-grabbing touch-none'
+
+/** Applied while the bitmap is not being panned or pinched. */
+export const imagePreviewImgMotionClasses = 'transition-transform duration-150 ease-out'
 
 /**
  * Preview toolbar classes
  */
 export const imagePreviewToolbarClasses =
-  'absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] text-white'
+  'absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 text-white'
 
 /**
  * Preview toolbar button classes
  */
 export const imagePreviewToolbarBtnClasses =
-  'flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
+  'flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
 
 /**
  * Preview navigation button classes (prev/next)
  */
 export const imagePreviewNavBtnClasses =
-  'absolute top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
+  'absolute top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-black/60 text-white hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
+
+export const imagePreviewNavPrevClasses = classNames(
+  imagePreviewNavBtnClasses,
+  'inset-inline-start-4'
+)
+
+export const imagePreviewNavNextClasses = classNames(
+  imagePreviewNavBtnClasses,
+  'inset-inline-end-4'
+)
 
 /**
  * Preview close button classes
  */
 export const imagePreviewCloseBtnClasses =
-  'absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50'
+  'absolute top-4 inset-inline-end-4 flex items-center justify-center w-10 h-10 rounded-full bg-black/60 text-white hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
 
 /**
  * Preview counter text classes
@@ -327,13 +339,19 @@ export function calculateTransform(scale: number, offsetX: number, offsetY: numb
 }
 
 /**
- * Get navigation state for multi-image preview
+ * Get navigation state for multi-image preview. Index is clamped first.
  */
 export function getPreviewNavState(currentIndex: number, total: number): PreviewNavState {
+  if (total <= 0) {
+    return { hasPrev: false, hasNext: false, counter: '' }
+  }
+  const index = Number.isFinite(currentIndex)
+    ? Math.min(Math.max(0, Math.floor(currentIndex)), total - 1)
+    : 0
   return {
-    hasPrev: currentIndex > 0,
-    hasNext: currentIndex < total - 1,
-    counter: total > 1 ? `${currentIndex + 1} / ${total}` : ''
+    hasPrev: index > 0,
+    hasNext: index < total - 1,
+    counter: total > 1 ? `${index + 1} / ${total}` : ''
   }
 }
 

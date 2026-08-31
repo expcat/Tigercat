@@ -159,7 +159,8 @@ export const jaJP: TigerLocale = {
     resetAriaLabel: 'リセット',
     zoomInAriaLabel: '拡大',
     rotateLeftAriaLabel: '左に回転',
-    rotateRightAriaLabel: '右に回転'
+    rotateRightAriaLabel: '右に回転',
+    previewImageAriaLabel: '画像 {index} / {total}'
   },
   imageEditor: {
     selectImageText: '画像を選択',

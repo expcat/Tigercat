@@ -126,7 +126,15 @@ const COMPONENT_USAGE_NOTES = {
   },
   ImageGroup: {
     notes:
-      '只收集子 Image 的 URL，不是图库布局；间距用 class。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。'
+      '只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。'
+  },
+  ImagePreview: {
+    notes:
+      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。与 ImageViewer 同一 dialog。到头 disable；空列表关闭。'
+  },
+  ImageViewer: {
+    notes:
+      'ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。'
   },
   Card: {
     notes:

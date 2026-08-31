@@ -1,9 +1,10 @@
 /**
  * ImageViewer component utilities
  * @since 0.9.0
+ *
+ * Chrome classes are aliases of the single ImagePreview set.
  */
 
-import { overlayZIndexClass } from './floating'
 import {
   clampScale,
   getTouchDistance,
@@ -11,45 +12,23 @@ import {
   zoomOutIconPath,
   prevIconPath,
   nextIconPath,
-  previewCloseIconPath
+  previewCloseIconPath,
+  imagePreviewWrapperClasses,
+  imagePreviewImgClasses,
+  imagePreviewToolbarClasses,
+  imagePreviewToolbarBtnClasses,
+  imagePreviewNavBtnClasses,
+  imagePreviewCloseBtnClasses,
+  imagePreviewCounterClasses
 } from './image-utils'
 
-/**
- * ImageViewer backdrop classes
- */
-export const imageViewerBackdropClasses = `fixed inset-0 bg-[var(--tiger-image-mask,rgba(0,0,0,0.85))] ${overlayZIndexClass.modal} flex items-center justify-center`
-
-/**
- * ImageViewer image classes
- */
-export const imageViewerImgClasses =
-  'max-h-[90vh] max-w-[90vw] select-none transition-transform duration-200 ease-out cursor-grab active:cursor-grabbing touch-none'
-
-/**
- * ImageViewer toolbar classes
- */
-export const imageViewerToolbarClasses = `fixed bottom-6 left-1/2 -translate-x-1/2 ${overlayZIndexClass.modal} flex items-center gap-2 bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] backdrop-blur-sm rounded-[var(--tiger-radius-md,0.5rem)] px-4 py-2`
-
-/**
- * ImageViewer toolbar button classes
- */
-export const imageViewerToolbarBtnClasses =
-  'p-2 text-white hover:bg-white/20 rounded-[var(--tiger-radius-md,0.5rem)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
-
-/**
- * ImageViewer navigation button classes
- */
-export const imageViewerNavBtnClasses = `fixed top-1/2 -translate-y-1/2 ${overlayZIndexClass.modal} p-3 text-white bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] hover:bg-white/20 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white`
-
-/**
- * ImageViewer close button classes
- */
-export const imageViewerCloseBtnClasses = `fixed top-4 right-4 ${overlayZIndexClass.modal} p-2 text-white hover:bg-white/20 rounded-[var(--tiger-radius-md,0.5rem)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white`
-
-/**
- * ImageViewer counter classes
- */
-export const imageViewerCounterClasses = `fixed top-4 left-1/2 -translate-x-1/2 ${overlayZIndexClass.modal} text-white text-sm bg-[var(--tiger-image-toolbar-bg,rgba(0,0,0,0.6))] rounded-full px-3 py-1`
+export const imageViewerBackdropClasses = imagePreviewWrapperClasses
+export const imageViewerImgClasses = imagePreviewImgClasses
+export const imageViewerToolbarClasses = imagePreviewToolbarClasses
+export const imageViewerToolbarBtnClasses = imagePreviewToolbarBtnClasses
+export const imageViewerNavBtnClasses = imagePreviewNavBtnClasses
+export const imageViewerCloseBtnClasses = imagePreviewCloseBtnClasses
+export const imageViewerCounterClasses = imagePreviewCounterClasses
 
 /**
  * SVG icon paths for ImageViewer.
@@ -65,13 +44,6 @@ export const imageViewerIcons = {
   close: previewCloseIconPath,
   prev: prevIconPath,
   next: nextIconPath
-}
-
-/**
- * Clamp zoom level within bounds (alias of the shared {@link clampScale}).
- */
-export function clampZoom(zoom: number, min: number, max: number): number {
-  return clampScale(zoom, min, max)
 }
 
 /**
@@ -107,8 +79,8 @@ export function getImageTransformStyle(t: GestureTransform): string {
 // ─── Wheel zoom ───────────────────────────────────────────────────
 
 export interface WheelZoomOptions {
-  minZoom: number
-  maxZoom: number
+  minScale: number
+  maxScale: number
   /** Zoom step per wheel delta (default 0.001) */
   step?: number
 }
@@ -123,7 +95,7 @@ export function applyWheelZoom(
 ): number {
   const step = options.step ?? 0.001
   const delta = -deltaY * step
-  return clampZoom(currentScale + delta, options.minZoom, options.maxZoom)
+  return clampScale(currentScale + delta, options.minScale, options.maxScale)
 }
 
 // ─── Pan (mouse drag) ─────────────────────────────────────────────
@@ -215,11 +187,11 @@ export function movePinch(
   pinch: PinchState,
   t1: { clientX: number; clientY: number },
   t2: { clientX: number; clientY: number },
-  minZoom: number,
-  maxZoom: number
+  minScale: number,
+  maxScale: number
 ): number {
   if (pinch.initialDistance === 0) return pinch.initialScale
   const currentDistance = getTouchDistance(t1, t2)
   const ratio = currentDistance / pinch.initialDistance
-  return clampZoom(pinch.initialScale * ratio, minZoom, maxZoom)
+  return clampScale(pinch.initialScale * ratio, minScale, maxScale)
 }

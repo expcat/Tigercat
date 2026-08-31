@@ -175,11 +175,11 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
       group.unregister(instanceId)
       return
     }
-    group.register({ id: instanceId, src })
+    group.register({ id: instanceId, src, alt })
     return () => {
       group.unregister(instanceId)
     }
-  }, [group, instanceId, src])
+  }, [group, instanceId, src, alt])
 
   useEffect(() => {
     if (!lazy) {
@@ -351,7 +351,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
       {!group && previewVisible && previewSrc && (
         <ImagePreview
           open={previewVisible}
-          images={[previewSrc]}
+          images={[{ src: previewSrc, alt }]}
           currentIndex={0}
           onOpenChange={(val) => {
             setPreviewVisible(val)

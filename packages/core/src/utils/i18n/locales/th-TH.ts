@@ -159,7 +159,8 @@ export const thTH: TigerLocale = {
     resetAriaLabel: 'รีเซ็ต',
     zoomInAriaLabel: 'ขยาย',
     rotateLeftAriaLabel: 'หมุนซ้าย',
-    rotateRightAriaLabel: 'หมุนขวา'
+    rotateRightAriaLabel: 'หมุนขวา',
+    previewImageAriaLabel: 'ภาพที่ {index} จาก {total}'
   },
   imageEditor: {
     selectImageText: 'เลือกรูปภาพ',

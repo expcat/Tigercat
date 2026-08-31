@@ -247,14 +247,14 @@ export const Image = defineComponent({
     )
 
     watch(
-      () => [group, props.src] as const,
+      () => [group, props.src, props.alt] as const,
       () => {
         if (!group) return
         if (!props.src) {
           group.unregister(instanceId)
           return
         }
-        group.register({ id: instanceId, src: props.src })
+        group.register({ id: instanceId, src: props.src, alt: props.alt })
       },
       { immediate: true }
     )
@@ -401,7 +401,7 @@ export const Image = defineComponent({
         !group && previewVisible.value && previewSrc
           ? h(ImagePreview, {
               open: previewVisible.value,
-              images: [previewSrc],
+              images: [{ src: previewSrc, alt: props.alt }],
               currentIndex: 0,
               'onUpdate:open': (val: boolean) => {
                 previewVisible.value = val

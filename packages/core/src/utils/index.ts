@@ -214,6 +214,7 @@ export * from './print-layout-utils'
 
 // ImageViewer utilities (v0.9.0+)
 export * from './image-viewer-utils'
+export * from './image-lightbox'
 
 // Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)
 export * from './form-wizard-utils'

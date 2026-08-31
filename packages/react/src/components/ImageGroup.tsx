@@ -3,7 +3,7 @@ import {
   clampImageGroupPreviewIndex,
   getImageGroupClasses,
   getImageGroupItemIndex,
-  getImageGroupSrcs,
+  getImageGroupLightboxItems,
   getImageLabels,
   registerImageGroupItem,
   resolveImageGroupName,
@@ -78,7 +78,7 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
     [preview, register, unregister, openPreview]
   )
 
-  const images = getImageGroupSrcs(items)
+  const images = getImageGroupLightboxItems(items)
   const currentIndex = clampImageGroupPreviewIndex(previewIndex, images.length)
   const groupName = resolveImageGroupName({
     ariaLabel,

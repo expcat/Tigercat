@@ -188,6 +188,14 @@ describe('image-utils — getPreviewNavState', () => {
   it('last: prev only', () => {
     expect(getPreviewNavState(2, 3)).toEqual({ hasPrev: true, hasNext: false, counter: '3 / 3' })
   })
+
+  it('clamps an out-of-range index before computing the counter', () => {
+    expect(getPreviewNavState(9, 3)).toEqual({ hasPrev: true, hasNext: false, counter: '3 / 3' })
+  })
+
+  it('empty gallery has no nav', () => {
+    expect(getPreviewNavState(0, 0)).toEqual({ hasPrev: false, hasNext: false, counter: '' })
+  })
 })
 
 describe('image-utils — constrainCropRect', () => {

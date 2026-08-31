@@ -159,7 +159,8 @@ export const idID: TigerLocale = {
     resetAriaLabel: 'Setel ulang',
     zoomInAriaLabel: 'Perbesar',
     rotateLeftAriaLabel: 'Putar kiri',
-    rotateRightAriaLabel: 'Putar kanan'
+    rotateRightAriaLabel: 'Putar kanan',
+    previewImageAriaLabel: 'Gambar {index} dari {total}'
   },
   imageEditor: {
     selectImageText: 'Pilih gambar',

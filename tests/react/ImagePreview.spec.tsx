@@ -2,27 +2,31 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
-import React from 'react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import React, { useState } from 'react'
 import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
+import { ImageViewer } from '@expcat/tigercat-react/ImageViewer'
+import { Modal } from '@expcat/tigercat-react/Modal'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { getImageViewerLabels } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
+const labels = getImageViewerLabels()
+const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg']
+
 describe('ImagePreview', () => {
-  const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg']
-
-  it('renders nothing when not visible', () => {
+  it('renders nothing when closed', () => {
     render(<ImagePreview open={false} images={images} />)
-
-    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('renders preview dialog when visible', () => {
+  it('renders a modal dialog when open', () => {
     render(<ImagePreview open images={images} />)
-
-    const dialog = document.querySelector('[role="dialog"]')
-    expect(dialog).toBeInTheDocument()
+    const dialog = screen.getByRole('dialog')
     expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(dialog).toHaveAttribute('aria-label', labels.previewDialogAriaLabel)
   })
 
   it('locks body scroll while open and restores it on close', () => {
@@ -32,125 +36,92 @@ describe('ImagePreview', () => {
     expect(document.body.style.overflow).not.toBe('hidden')
   })
 
-  it('uses open prop as the only controlled visibility API', () => {
-    const { rerender } = render(<ImagePreview open={false} images={images} />)
-
-    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
-
-    rerender(<ImagePreview open images={images} />)
-
-    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+  it('does not unlock a Modal when a closed preview mounts', () => {
+    render(
+      <>
+        <Modal open title="Underneath">
+          Still locked
+        </Modal>
+        <ImagePreview open={false} images={images} />
+      </>
+    )
+    expect(document.body.style.overflow).toBe('hidden')
   })
 
-  it('renders nothing when images list is empty', () => {
-    render(<ImagePreview open images={[]} />)
-
-    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
-  })
-
-  it('displays current image', () => {
-    render(<ImagePreview open images={images} currentIndex={1} />)
-
-    const img = document.querySelector('[role="dialog"] img')
-    expect(img).toHaveAttribute('src', '/img2.jpg')
-  })
-
-  it('constrains the open preview image to 90vh / 90vw', () => {
-    render(<ImagePreview open images={images} />)
-
-    const img = document.querySelector('[role="dialog"] img')
-    expect(img).toBeInTheDocument()
-    expect(img?.className).toContain('max-h-[90vh]')
-    expect(img?.className).toContain('max-w-[90vw]')
-  })
-
-  it('renders navigation buttons for multiple images', () => {
-    render(<ImagePreview open images={images} />)
-
-    expect(document.querySelector('[aria-label="Previous image"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Next image"]')).toBeInTheDocument()
-  })
-
-  it('disables prev button on first image', () => {
-    render(<ImagePreview open images={images} currentIndex={0} />)
-
-    const prevBtn = document.querySelector('[aria-label="Previous image"]')
-    expect(prevBtn).toHaveAttribute('disabled')
-  })
-
-  it('disables next button on last image', () => {
-    render(<ImagePreview open images={images} currentIndex={2} />)
-
-    const nextBtn = document.querySelector('[aria-label="Next image"]')
-    expect(nextBtn).toHaveAttribute('disabled')
-  })
-
-  it('renders toolbar with zoom buttons', () => {
-    render(<ImagePreview open images={images} />)
-
-    expect(document.querySelector('[aria-label="Zoom in"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Zoom out"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Rotate left"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Rotate right"]')).toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Reset"]')).toBeInTheDocument()
-  })
-
-  it('renders close button', () => {
-    render(<ImagePreview open images={images} />)
-
-    expect(document.querySelector('[aria-label="Close preview"]')).toBeInTheDocument()
-  })
-
-  it('calls onOpenChange on close button click', () => {
+  it('emits close and hides the dialog when the gallery is emptied', () => {
     const onOpenChange = vi.fn()
-    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
-
-    const closeBtn = document.querySelector('[aria-label="Close preview"]') as HTMLElement
-    fireEvent.click(closeBtn)
-
+    const { rerender } = render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    rerender(<ImagePreview open images={[]} onOpenChange={onOpenChange} />)
     expect(onOpenChange).toHaveBeenCalledWith(false)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('calls onOpenChange when Escape is pressed', () => {
-    const onOpenChange = vi.fn()
-    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+  it('clamps currentIndex to the last image', () => {
+    render(<ImagePreview open images={images} currentIndex={9} />)
+    expect(document.querySelector('[role="dialog"] img')).toHaveAttribute('src', '/img3.jpg')
+    expect(screen.getByText('3 / 3')).toBeInTheDocument()
+  })
 
+  it('uses per-item alt and locale fallback', () => {
+    const { rerender } = render(<ImagePreview open images={[{ src: '/cat.jpg', alt: 'Cat' }]} />)
+    expect(document.querySelector('[role="dialog"] img')).toHaveAttribute('alt', 'Cat')
+
+    rerender(<ImagePreview open images={['/dog.jpg']} />)
+    expect(document.querySelector('[role="dialog"] img')).toHaveAttribute(
+      'alt',
+      labels.previewImageAriaLabel.replace('{index}', '1').replace('{total}', '1')
+    )
+  })
+
+  it('reads chrome names from the locale object', () => {
+    const zhLabels = getImageViewerLabels(zhCN)
+    render(
+      <ConfigProvider locale={zhCN}>
+        <ImagePreview open images={images} />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('button', { name: zhLabels.closePreviewAriaLabel })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: zhLabels.previousImageAriaLabel })
+    ).toBeInTheDocument()
+  })
+
+  it('places previous at inline-start and close at inline-end', () => {
+    render(<ImagePreview open images={images} />)
+    expect(screen.getByRole('button', { name: labels.previousImageAriaLabel }).className).toMatch(
+      /inset-inline-start/
+    )
+    expect(screen.getByRole('button', { name: labels.closePreviewAriaLabel }).className).toMatch(
+      /inset-inline-end/
+    )
+  })
+
+  it('closes from the close button, Escape, and the mask', () => {
+    const onOpenChange = vi.fn()
+    const { rerender } = render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+    fireEvent.click(screen.getByRole('button', { name: labels.closePreviewAriaLabel }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+
+    onOpenChange.mockClear()
+    rerender(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
     fireEvent.keyDown(document, { key: 'Escape' })
+    expect(onOpenChange).toHaveBeenCalledWith(false)
 
+    onOpenChange.mockClear()
+    rerender(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
+    fireEvent.click(document.querySelector('[role="dialog"] [aria-hidden="true"]') as HTMLElement)
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('calls onOpenChange when the mask is clicked (maskClosable default true)', () => {
-    const onOpenChange = vi.fn()
-    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
-
-    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
-    fireEvent.click(mask)
-
-    expect(onOpenChange).toHaveBeenCalledWith(false)
-  })
-
-  it('does not call onOpenChange when the mask is clicked with maskClosable false', () => {
+  it('does not close from the mask when maskClosable is false', () => {
     const onOpenChange = vi.fn()
     render(<ImagePreview open images={images} maskClosable={false} onOpenChange={onOpenChange} />)
-
-    const mask = document.querySelector('[role="dialog"] > [aria-hidden="true"]') as HTMLElement
-    fireEvent.click(mask)
-
+    fireEvent.click(document.querySelector('[role="dialog"] [aria-hidden="true"]') as HTMLElement)
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
-  it('does not call onOpenChange when the preview image is clicked', () => {
-    const onOpenChange = vi.fn()
-    render(<ImagePreview open images={images} onOpenChange={onOpenChange} />)
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLElement
-    fireEvent.click(img)
-
-    expect(onOpenChange).not.toHaveBeenCalled()
-  })
-
-  it('updates current image from navigation button clicks', () => {
+  it('navigates with buttons and arrow keys and stops at the ends', () => {
     const onCurrentIndexChange = vi.fn()
     render(
       <ImagePreview
@@ -160,36 +131,82 @@ describe('ImagePreview', () => {
         onCurrentIndexChange={onCurrentIndexChange}
       />
     )
-
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    fireEvent.click(document.querySelector('[aria-label="Next image"]') as HTMLElement)
-
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
     expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
     expect(img).toHaveAttribute('src', '/img3.jpg')
+    expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeDisabled()
 
-    fireEvent.click(document.querySelector('[aria-label="Previous image"]') as HTMLElement)
-
-    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
-    expect(img).toHaveAttribute('src', '/img2.jpg')
-  })
-
-  it('updates current image from keyboard navigation', () => {
-    const onCurrentIndexChange = vi.fn()
-    render(<ImagePreview open images={images} onCurrentIndexChange={onCurrentIndexChange} />)
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
     fireEvent.keyDown(document, { key: 'ArrowRight' })
+    expect(onCurrentIndexChange).toHaveBeenLastCalledWith(2)
 
+    fireEvent.click(screen.getByRole('button', { name: labels.previousImageAriaLabel }))
     expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
-    expect(img).toHaveAttribute('src', '/img2.jpg')
-
-    fireEvent.keyDown(document, { key: 'ArrowLeft' })
-
-    expect(onCurrentIndexChange).toHaveBeenCalledWith(0)
-    expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
-  it('updates current image from one-finger horizontal touch swipes at base scale', () => {
+  it('does not listen to arrows when showNav is false', () => {
+    const onCurrentIndexChange = vi.fn()
+    render(
+      <ImagePreview
+        open
+        images={images}
+        showNav={false}
+        onCurrentIndexChange={onCurrentIndexChange}
+      />
+    )
+    expect(
+      screen.queryByRole('button', { name: labels.previousImageAriaLabel })
+    ).not.toBeInTheDocument()
+    fireEvent.keyDown(document, { key: 'ArrowRight' })
+    expect(onCurrentIndexChange).not.toHaveBeenCalled()
+  })
+
+  it('zooms from the toolbar and keyboard', () => {
+    const onScaleChange = vi.fn()
+    render(<ImagePreview open images={images} onScaleChange={onScaleChange} />)
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+
+    fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    expect(onScaleChange).toHaveBeenCalledWith(1.5)
+    expect(img.style.transform).toContain('scale(1.5)')
+
+    fireEvent.keyDown(document, { key: '-' })
+    expect(img.style.transform).toContain('scale(1)')
+  })
+
+  it('applies a small wheel delta without jumping to max scale', () => {
+    render(<ImagePreview open images={images} />)
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    fireEvent.wheel(screen.getByRole('dialog'), { deltaY: -20 })
+    const afterWheel = Number(/scale\(([^)]+)\)/.exec(img.style.transform)?.[1] ?? '1')
+    expect(afterWheel).toBeGreaterThan(1)
+    expect(afterWheel).toBeLessThan(1.5)
+  })
+
+  it('disables zoom buttons at the scale bounds', () => {
+    render(<ImagePreview open images={['/a.jpg']} minScale={1} maxScale={1} />)
+    expect(screen.getByRole('button', { name: labels.zoomInAriaLabel })).toBeDisabled()
+    expect(screen.getByRole('button', { name: labels.zoomOutAriaLabel })).toBeDisabled()
+  })
+
+  it('keeps panning after the pointer leaves the bitmap', () => {
+    render(<ImagePreview open images={['/solo.jpg']} />)
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    fireEvent.pointerDown(img, {
+      pointerId: 1,
+      button: 0,
+      clientX: 10,
+      clientY: 10,
+      pointerType: 'mouse'
+    })
+    fireEvent.pointerMove(document, { pointerId: 1, clientX: 40, clientY: 50 })
+    expect(img.style.transform).toContain('translate(30px, 40px)')
+    fireEvent.pointerCancel(document, { pointerId: 1 })
+    fireEvent.pointerMove(document, { pointerId: 1, clientX: 80, clientY: 90 })
+    expect(img.style.transform).toContain('translate(30px, 40px)')
+  })
+
+  it('swipes to the next image at base scale', () => {
     const onCurrentIndexChange = vi.fn()
     render(
       <ImagePreview
@@ -199,124 +216,83 @@ describe('ImagePreview', () => {
         onCurrentIndexChange={onCurrentIndexChange}
       />
     )
-
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
-    fireEvent.touchMove(img, { touches: [{ clientX: 80, clientY: 66 }] })
-    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
-
+    fireEvent.pointerDown(img, {
+      pointerId: 7,
+      clientX: 180,
+      clientY: 60,
+      pointerType: 'touch'
+    })
+    fireEvent.pointerMove(document, { pointerId: 7, clientX: 80, clientY: 66 })
+    fireEvent.pointerUp(document, { pointerId: 7, clientX: 80, clientY: 66 })
     expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
-    expect(img).toHaveAttribute('src', '/img3.jpg')
-
-    fireEvent.touchStart(img, { touches: [{ clientX: 80, clientY: 60 }] })
-    fireEvent.touchMove(img, { touches: [{ clientX: 180, clientY: 66 }] })
-    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 180, clientY: 66 }] })
-
-    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
-    expect(img).toHaveAttribute('src', '/img2.jpg')
   })
 
-  it('honors touch swipe switch and threshold configuration', () => {
-    const onCurrentIndexChange = vi.fn()
-    const { rerender } = render(
-      <ImagePreview
+  it('resets transform when the image changes and when reopened', () => {
+    function Harness() {
+      const [open, setOpen] = useState(true)
+      const [currentIndex, setCurrentIndex] = useState(0)
+      return (
+        <>
+          <button type="button" onClick={() => setCurrentIndex(1)}>
+            next-item
+          </button>
+          <button type="button" onClick={() => setOpen((value) => !value)}>
+            toggle
+          </button>
+          <ImagePreview open={open} images={images} currentIndex={currentIndex} />
+        </>
+      )
+    }
+    render(<Harness />)
+    fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    fireEvent.click(screen.getByRole('button', { name: 'next-item' }))
+    expect(
+      (document.querySelector('[role="dialog"] img') as HTMLImageElement).style.transform
+    ).toContain('scale(1)')
+    fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    fireEvent.click(screen.getByRole('button', { name: 'toggle' }))
+    fireEvent.click(screen.getByRole('button', { name: 'toggle' }))
+    expect(
+      (document.querySelector('[role="dialog"] img') as HTMLImageElement).style.transform
+    ).toContain('scale(1)')
+  })
+
+  it('moves focus into the dialog and keeps one name on the close button', async () => {
+    render(<ImagePreview open images={images} />)
+    const dialog = screen.getByRole('dialog')
+    await waitFor(() => {
+      expect(dialog.contains(document.activeElement)).toBe(true)
+    })
+    expect(screen.getAllByRole('button', { name: labels.closePreviewAriaLabel })).toHaveLength(1)
+  })
+
+  it('has no axe violations on an open gallery', async () => {
+    render(<ImagePreview open images={images} />)
+    await expectNoA11yViolationsIsolated(document.body)
+  })
+
+  it('shares one dialog tree with ImageViewer, including minZoom mapping', () => {
+    const onClose = vi.fn()
+    const onOpenChange = vi.fn()
+    render(
+      <ImageViewer
         open
         images={images}
-        touchSwipeable={false}
-        onCurrentIndexChange={onCurrentIndexChange}
+        minZoom={1}
+        maxZoom={1}
+        showNav={false}
+        onClose={onClose}
+        onOpenChange={onOpenChange}
       />
     )
-
-    let img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
-    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
-    expect(onCurrentIndexChange).not.toHaveBeenCalled()
-
-    rerender(
-      <ImagePreview
-        open
-        images={images}
-        touchSwipeThreshold={120}
-        onCurrentIndexChange={onCurrentIndexChange}
-      />
-    )
-    img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-    fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
-    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
-
-    expect(onCurrentIndexChange).not.toHaveBeenCalled()
-  })
-
-  it('updates zoom and rotation from toolbar actions and reset', () => {
-    const onScaleChange = vi.fn()
-    render(<ImagePreview open images={images} onScaleChange={onScaleChange} />)
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-
-    fireEvent.click(document.querySelector('[aria-label="Zoom in"]') as HTMLElement)
-    expect(onScaleChange).toHaveBeenCalledWith(1.5)
-    expect(img.style.transform).toContain('scale(1.5)')
-
-    fireEvent.click(document.querySelector('[aria-label="Rotate right"]') as HTMLElement)
-    expect(img.style.transform).toContain('rotate(90deg)')
-
-    fireEvent.click(document.querySelector('[aria-label="Rotate left"]') as HTMLElement)
-    expect(img.style.transform).toContain('rotate(0deg)')
-
-    fireEvent.click(document.querySelector('[aria-label="Reset"]') as HTMLElement)
-    expect(onScaleChange).toHaveBeenCalledWith(1)
-    expect(img.style.transform).toContain('translate(0px, 0px) scale(1) rotate(0deg)')
-  })
-
-  it('supports touch pinch zoom and pan', () => {
-    const onScaleChange = vi.fn()
-    render(<ImagePreview open images={images} onScaleChange={onScaleChange} />)
-
-    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
-
-    fireEvent.touchStart(img, {
-      touches: [
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 }
-      ]
-    })
-    fireEvent.touchMove(img, {
-      touches: [
-        { clientX: 0, clientY: 0 },
-        { clientX: 150, clientY: 0 }
-      ]
-    })
-
-    expect(onScaleChange).toHaveBeenCalledWith(1.5)
-    expect(img.style.transform).toContain('scale(1.5)')
-
-    fireEvent.touchEnd(img)
-    fireEvent.touchStart(img, { touches: [{ clientX: 10, clientY: 10 }] })
-    fireEvent.touchMove(img, { touches: [{ clientX: 30, clientY: 40 }] })
-    expect(img.style.transform).toContain('translate(20px, 30px)')
-  })
-
-  it('shows image counter for multiple images', () => {
-    render(<ImagePreview open images={images} currentIndex={1} />)
-
-    expect(document.body.textContent).toContain('2 / 3')
-  })
-
-  it('does not show navigation for single image', () => {
-    render(<ImagePreview open images={['/single.jpg']} />)
-
-    expect(document.querySelector('[aria-label="Previous image"]')).not.toBeInTheDocument()
-    expect(document.querySelector('[aria-label="Next image"]')).not.toBeInTheDocument()
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<ImagePreview open={false} images={['/img1.jpg']} />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      expect(() => render(<ImagePreview open={false} images={[]} />)).not.toThrow()
-    })
+    expect(screen.getByRole('dialog')).toHaveAttribute('data-tiger-image-preview')
+    expect(
+      screen.queryByRole('button', { name: labels.previousImageAriaLabel })
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: labels.zoomInAriaLabel })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: labels.closePreviewAriaLabel }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 })

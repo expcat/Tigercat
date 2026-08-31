@@ -159,7 +159,8 @@ export const viVN: TigerLocale = {
     resetAriaLabel: 'Đặt lại',
     zoomInAriaLabel: 'Phóng to',
     rotateLeftAriaLabel: 'Xoay trái',
-    rotateRightAriaLabel: 'Xoay phải'
+    rotateRightAriaLabel: 'Xoay phải',
+    previewImageAriaLabel: 'Ảnh {index} / {total}'
   },
   imageEditor: {
     selectImageText: 'Chọn ảnh',

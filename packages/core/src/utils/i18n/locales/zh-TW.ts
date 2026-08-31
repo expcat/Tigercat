@@ -159,7 +159,8 @@ export const zhTW: TigerLocale = {
     resetAriaLabel: '重設',
     zoomInAriaLabel: '放大',
     rotateLeftAriaLabel: '向左旋轉',
-    rotateRightAriaLabel: '向右旋轉'
+    rotateRightAriaLabel: '向右旋轉',
+    previewImageAriaLabel: '第 {index} 張，共 {total} 張'
   },
   imageEditor: {
     selectImageText: '選擇圖片',

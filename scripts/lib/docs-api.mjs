@@ -70,6 +70,8 @@ export const COMPONENT_PROP_PRIORITY = {
     'fit?',
     'height?'
   ],
+  ImagePreview: ['images', 'open?', 'currentIndex?', 'maskClosable?', 'minScale?', 'locale?'],
+  ImageViewer: ['images', 'open?', 'currentIndex?', 'showNav?', 'minZoom?', 'locale?'],
   Button: [
     'variant?',
     'size?',

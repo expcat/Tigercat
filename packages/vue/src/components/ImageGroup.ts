@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   getImageGroupClasses,
   getImageGroupItemIndex,
-  getImageGroupSrcs,
+  getImageGroupLightboxItems,
   getImageLabels,
   registerImageGroupItem,
   resolveImageGroupName,
@@ -71,7 +71,7 @@ export const ImageGroup = defineComponent({
     return () => {
       const children = slots.default?.()
       const labels = getImageLabels(config.value.locale)
-      const srcs = getImageGroupSrcs(images.value)
+      const srcs = getImageGroupLightboxItems(images.value)
       const currentIndex = clampImageGroupPreviewIndex(previewIndex.value, srcs.length)
       const groupName = resolveImageGroupName({
         ariaLabel: attrs['aria-label'],

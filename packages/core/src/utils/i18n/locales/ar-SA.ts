@@ -159,7 +159,8 @@ export const arSA: TigerLocale = {
     resetAriaLabel: 'إعادة تعيين',
     zoomInAriaLabel: 'تكبير',
     rotateLeftAriaLabel: 'تدوير لليسار',
-    rotateRightAriaLabel: 'تدوير لليمين'
+    rotateRightAriaLabel: 'تدوير لليمين',
+    previewImageAriaLabel: 'صورة {index} من {total}'
   },
   imageEditor: {
     selectImageText: 'اختر صورة',

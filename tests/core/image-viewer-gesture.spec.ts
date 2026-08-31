@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  clampZoom,
+  clampScale,
   normalizeRotation,
   createDefaultTransform,
   getImageTransformStyle,
@@ -14,13 +14,11 @@ import {
 } from '@expcat/tigercat-core'
 
 describe('image-viewer gesture utils', () => {
-  // ─── clampZoom / normalizeRotation ────────────────────────
-
-  describe('clampZoom', () => {
+  describe('clampScale', () => {
     it('clamps within bounds', () => {
-      expect(clampZoom(2, 0.5, 3)).toBe(2)
-      expect(clampZoom(0.1, 0.5, 3)).toBe(0.5)
-      expect(clampZoom(5, 0.5, 3)).toBe(3)
+      expect(clampScale(2, 0.5, 3)).toBe(2)
+      expect(clampScale(0.1, 0.5, 3)).toBe(0.5)
+      expect(clampScale(5, 0.5, 3)).toBe(3)
     })
   })
 
@@ -63,27 +61,27 @@ describe('image-viewer gesture utils', () => {
 
   describe('applyWheelZoom', () => {
     it('zooms in with negative deltaY', () => {
-      const result = applyWheelZoom(1, -100, { minZoom: 0.5, maxZoom: 3 })
+      const result = applyWheelZoom(1, -100, { minScale: 0.5, maxScale: 3 })
       expect(result).toBeGreaterThan(1)
     })
 
     it('zooms out with positive deltaY', () => {
-      const result = applyWheelZoom(1, 100, { minZoom: 0.5, maxZoom: 3 })
+      const result = applyWheelZoom(1, 100, { minScale: 0.5, maxScale: 3 })
       expect(result).toBeLessThan(1)
     })
 
     it('clamps to minZoom', () => {
-      const result = applyWheelZoom(0.5, 10000, { minZoom: 0.5, maxZoom: 3 })
+      const result = applyWheelZoom(0.5, 10000, { minScale: 0.5, maxScale: 3 })
       expect(result).toBe(0.5)
     })
 
     it('clamps to maxZoom', () => {
-      const result = applyWheelZoom(3, -10000, { minZoom: 0.5, maxZoom: 3 })
+      const result = applyWheelZoom(3, -10000, { minScale: 0.5, maxScale: 3 })
       expect(result).toBe(3)
     })
 
     it('uses custom step', () => {
-      const result = applyWheelZoom(1, -100, { minZoom: 0.5, maxZoom: 3, step: 0.01 })
+      const result = applyWheelZoom(1, -100, { minScale: 0.5, maxScale: 3, step: 0.01 })
       expect(result).toBe(2)
     })
   })

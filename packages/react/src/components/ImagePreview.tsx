@@ -1,53 +1,60 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type HTMLAttributes
+} from 'react'
 import {
+  applyWheelZoom,
+  captureActiveElement,
   classNames,
-  imagePreviewMaskClasses,
-  imagePreviewWrapperClasses,
-  imagePreviewImgClasses,
-  imagePreviewToolbarClasses,
-  imagePreviewToolbarBtnClasses,
-  imagePreviewNavBtnClasses,
+  createDefaultTransform,
+  createLightboxGestureSession,
+  focusFirst,
+  formatLightboxImageAlt,
+  getImageTransformStyle,
+  getImageViewerLabels,
+  getLightboxNavState,
+  clampLightboxIndex,
   imagePreviewCloseBtnClasses,
   imagePreviewCounterClasses,
+  imagePreviewImgClasses,
+  imagePreviewImgMotionClasses,
+  imagePreviewMaskClasses,
+  imagePreviewNavNextClasses,
+  imagePreviewNavPrevClasses,
+  imagePreviewToolbarBtnClasses,
+  imagePreviewToolbarClasses,
+  imagePreviewWrapperClasses,
+  imageViewerIcons,
+  LIGHTBOX_SCALE_STEP,
+  lightboxShouldClose,
+  mergeTigerLocale,
+  nextIconPath,
+  normalizeRotation,
+  OVERLAY_Z_INDEX,
+  previewCloseIconPath,
+  prevIconPath,
+  resetIconPath,
+  resolveLightboxImages,
+  resolveLightboxKeyAction,
+  resolveLightboxNavIndex,
+  resolveLightboxScaleRange,
+  restoreFocus,
   zoomInIconPath,
   zoomOutIconPath,
-  resetIconPath,
-  prevIconPath,
-  nextIconPath,
-  previewCloseIconPath,
-  imageViewerIcons,
-  clampScale,
-  calculateTransform,
-  getPreviewNavState,
-  normalizeRotation,
-  createPanState,
-  startPan,
-  movePan,
-  createPinchState,
-  startPinch,
-  movePinch,
-  getImageViewerLabels,
-  mergeTigerLocale,
-  OVERLAY_Z_INDEX,
+  type GestureTransform,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
-import { useEscapeKey, useBodyScrollLock, renderBodyPortal } from '../utils/overlay'
+import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface ImagePreviewProps extends CoreImagePreviewProps {
-  /**
-   * Callback when open state changes
-   * @since 0.9.0
-   */
+export interface ImagePreviewProps
+  extends CoreImagePreviewProps, Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   onOpenChange?: (open: boolean) => void
-
-  /**
-   * Callback when current index changes
-   */
   onCurrentIndexChange?: (index: number) => void
-  /**
-   * Callback when scale changes
-   */
   onScaleChange?: (scale: number) => void
 }
 
@@ -57,7 +64,8 @@ const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) 
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
-    stroke="currentColor">
+    stroke="currentColor"
+    aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={d} />
   </svg>
 )
@@ -66,18 +74,25 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   open,
   images,
   currentIndex = 0,
-  zIndex = OVERLAY_Z_INDEX.modal,
+  zIndex,
   maskClosable = true,
-  scaleStep = 0.5,
-  minScale = 0.25,
-  maxScale = 5,
+  scaleStep = LIGHTBOX_SCALE_STEP,
+  minScale,
+  maxScale,
   touchSwipeable = true,
   touchSwipeThreshold = 48,
+  zoomable = true,
+  rotatable = true,
+  showNav = true,
+  showCounter = true,
   locale,
+  className,
+  style,
   onOpenChange,
-
   onCurrentIndexChange,
-  onScaleChange
+  onScaleChange,
+  onKeyDown,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -85,285 +100,298 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     [config.locale, locale]
   )
   const labels = useMemo(() => getImageViewerLabels(mergedLocale), [mergedLocale])
+  const scaleRange = useMemo(
+    () => resolveLightboxScaleRange({ minScale, maxScale }),
+    [minScale, maxScale]
+  )
+  const resolved = useMemo(() => resolveLightboxImages(images), [images])
   const isOpen = open ?? false
+  const shouldRender = isOpen && resolved.length > 0
 
-  const [scale, setScale] = useState(1)
-  const [rotation, setRotation] = useState(0)
-  const [offsetX, setOffsetX] = useState(0)
-  const [offsetY, setOffsetY] = useState(0)
-  const [index, setIndex] = useState(currentIndex)
-  const draggingRef = useRef(false)
-  const dragStartRef = useRef({ x: 0, y: 0, ox: 0, oy: 0 })
-  const panRef = useRef(createPanState())
-  const pinchRef = useRef(createPinchState())
-  const touchSwipeRef = useRef({
-    isTracking: false,
-    startX: 0,
-    startY: 0,
-    currentX: 0,
-    currentY: 0
-  })
+  const [transform, setTransform] = useState<GestureTransform>(createDefaultTransform)
+  const [index, setIndex] = useState(() =>
+    resolved.length ? Math.min(Math.max(0, currentIndex), resolved.length - 1) : 0
+  )
+  const [dragging, setDragging] = useState(false)
+
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const previousActiveRef = useRef<HTMLElement | null>(null)
+  const transformRef = useRef(transform)
+  const indexRef = useRef(index)
+  const resolvedRef = useRef(resolved)
+  const onCurrentIndexChangeRef = useRef(onCurrentIndexChange)
+  const onScaleChangeRef = useRef(onScaleChange)
+  const gestureRef = useRef<ReturnType<typeof createLightboxGestureSession> | null>(null)
+
+  transformRef.current = transform
+  indexRef.current = index
+  resolvedRef.current = resolved
+  onCurrentIndexChangeRef.current = onCurrentIndexChange
+  onScaleChangeRef.current = onScaleChange
 
   const resetTransform = useCallback(() => {
-    setScale(1)
-    setRotation(0)
-    setOffsetX(0)
-    setOffsetY(0)
-    panRef.current = createPanState()
-    pinchRef.current = createPinchState()
-    touchSwipeRef.current.isTracking = false
+    setTransform(createDefaultTransform())
+    setDragging(false)
   }, [])
 
   useEffect(() => {
-    setIndex(currentIndex)
-    resetTransform()
-  }, [currentIndex, resetTransform])
+    if (lightboxShouldClose(isOpen, resolved.length)) {
+      onOpenChange?.(false)
+    }
+  }, [isOpen, resolved.length, onOpenChange])
 
   useEffect(() => {
-    if (isOpen) {
-      resetTransform()
-      setIndex(currentIndex)
-    }
-  }, [isOpen, currentIndex, resetTransform])
+    if (!isOpen) return
+    const nextIndex =
+      resolved.length === 0
+        ? 0
+        : Math.min(Math.max(0, Math.floor(currentIndex)), resolved.length - 1)
+    setIndex(nextIndex)
+    resetTransform()
+  }, [isOpen, currentIndex, resolved.length, resetTransform])
 
-  useBodyScrollLock({ enabled: Boolean(isOpen) })
+  useBodyScrollLock({ enabled: shouldRender })
+  useFocusTrap({ enabled: shouldRender, containerRef: rootRef, inert: true })
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false)
   }, [onOpenChange])
 
-  useEscapeKey({ enabled: !!isOpen, onEscape: handleClose })
+  useEscapeKey({ enabled: shouldRender, onEscape: handleClose, layerRef: rootRef })
 
-  const navState = useMemo(() => getPreviewNavState(index, images.length), [index, images.length])
+  const applyIndex = useCallback(
+    (next: number) => {
+      setIndex(next)
+      resetTransform()
+      onCurrentIndexChangeRef.current?.(next)
+    },
+    [resetTransform]
+  )
+
+  const handlePrev = useCallback(() => {
+    const next = resolveLightboxNavIndex(indexRef.current, resolvedRef.current.length, 'prev')
+    if (next === null) return
+    applyIndex(next)
+  }, [applyIndex])
+
+  const handleNext = useCallback(() => {
+    const next = resolveLightboxNavIndex(indexRef.current, resolvedRef.current.length, 'next')
+    if (next === null) return
+    applyIndex(next)
+  }, [applyIndex])
+
+  const setScale = useCallback((next: number) => {
+    setTransform((current) => ({ ...current, scale: next }))
+    onScaleChangeRef.current?.(next)
+  }, [])
 
   const handleZoomIn = useCallback(() => {
-    setScale((s) => {
-      const next = clampScale(s + scaleStep, minScale, maxScale)
-      onScaleChange?.(next)
-      return next
-    })
-  }, [scaleStep, minScale, maxScale, onScaleChange])
+    const current = transformRef.current.scale
+    setScale(Math.min(current + scaleStep, scaleRange.maxScale))
+  }, [scaleRange.maxScale, scaleStep, setScale])
 
   const handleZoomOut = useCallback(() => {
-    setScale((s) => {
-      const next = clampScale(s - scaleStep, minScale, maxScale)
-      onScaleChange?.(next)
-      return next
-    })
-  }, [scaleStep, minScale, maxScale, onScaleChange])
+    const current = transformRef.current.scale
+    setScale(Math.max(current - scaleStep, scaleRange.minScale))
+  }, [scaleRange.minScale, scaleStep, setScale])
 
   const handleReset = useCallback(() => {
     resetTransform()
-    onScaleChange?.(1)
-  }, [resetTransform, onScaleChange])
+    onScaleChangeRef.current?.(1)
+  }, [resetTransform])
 
   const handleRotateLeft = useCallback(() => {
-    setRotation((value) => normalizeRotation(value - 90))
+    setTransform((current) => ({ ...current, rotation: normalizeRotation(current.rotation - 90) }))
   }, [])
 
   const handleRotateRight = useCallback(() => {
-    setRotation((value) => normalizeRotation(value + 90))
+    setTransform((current) => ({ ...current, rotation: normalizeRotation(current.rotation + 90) }))
   }, [])
 
-  const handlePrev = useCallback(() => {
-    if (index > 0) {
-      const next = index - 1
-      setIndex(next)
-      resetTransform()
-      onCurrentIndexChange?.(next)
-    }
-  }, [index, resetTransform, onCurrentIndexChange])
-
-  const handleNext = useCallback(() => {
-    if (index < images.length - 1) {
-      const next = index + 1
-      setIndex(next)
-      resetTransform()
-      onCurrentIndexChange?.(next)
-    }
-  }, [index, images.length, resetTransform, onCurrentIndexChange])
-
-  // Keyboard navigation
   useEffect(() => {
-    if (!isOpen) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') handlePrev()
-      if (e.key === 'ArrowRight') handleNext()
+    if (!shouldRender) return
+    previousActiveRef.current = captureActiveElement()
+    const timer = window.setTimeout(() => {
+      focusFirst([closeButtonRef.current, rootRef.current])
+    }, 0)
+    return () => {
+      window.clearTimeout(timer)
+      restoreFocus(previousActiveRef.current)
+    }
+  }, [shouldRender])
+
+  useEffect(() => {
+    if (!shouldRender) return
+    const handler = (event: KeyboardEvent) => {
+      const action = resolveLightboxKeyAction(event.key, {
+        canNavigate: showNav && resolvedRef.current.length > 1,
+        zoomable,
+        rotatable,
+        rtl: config.direction === 'rtl'
+      })
+      if (!action) return
+      event.preventDefault()
+      switch (action) {
+        case 'prev':
+          handlePrev()
+          break
+        case 'next':
+          handleNext()
+          break
+        case 'zoomIn':
+          handleZoomIn()
+          break
+        case 'zoomOut':
+          handleZoomOut()
+          break
+        case 'rotateLeft':
+          handleRotateLeft()
+          break
+        case 'rotateRight':
+          handleRotateRight()
+          break
+        case 'reset':
+          handleReset()
+          break
+      }
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [isOpen, handlePrev, handleNext])
+  }, [
+    config.direction,
+    handleNext,
+    handlePrev,
+    handleReset,
+    handleRotateLeft,
+    handleRotateRight,
+    handleZoomIn,
+    handleZoomOut,
+    rotatable,
+    shouldRender,
+    showNav,
+    zoomable
+  ])
 
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      e.preventDefault()
-      const delta = e.deltaY > 0 ? -scaleStep : scaleStep
-      setScale((s) => {
-        const next = clampScale(s + delta, minScale, maxScale)
-        onScaleChange?.(next)
-        return next
-      })
-    },
-    [scaleStep, minScale, maxScale, onScaleChange]
+  useEffect(() => {
+    if (!shouldRender) return
+    const root = rootRef.current
+    if (!root) return
+    const handler = (event: WheelEvent) => {
+      if (!zoomable) return
+      event.preventDefault()
+      const next = applyWheelZoom(transformRef.current.scale, event.deltaY, scaleRange)
+      setScale(next)
+    }
+    root.addEventListener('wheel', handler, { passive: false })
+    return () => root.removeEventListener('wheel', handler)
+  }, [scaleRange, setScale, shouldRender, zoomable])
+
+  useEffect(() => {
+    if (!shouldRender) {
+      gestureRef.current?.dispose()
+      gestureRef.current = null
+      return
+    }
+    const session = createLightboxGestureSession({
+      getScale: () => transformRef.current.scale,
+      getTranslate: () => ({
+        x: transformRef.current.translateX,
+        y: transformRef.current.translateY
+      }),
+      minScale: scaleRange.minScale,
+      maxScale: scaleRange.maxScale,
+      zoomable,
+      swipeable: touchSwipeable,
+      swipeThreshold: touchSwipeThreshold,
+      imageCount: resolved.length,
+      onTransform: (next) => {
+        setTransform((current) => ({ ...current, ...next }))
+        if (next.scale != null) onScaleChangeRef.current?.(next.scale)
+      },
+      onSwipe: (direction) => {
+        if (direction === 'prev') handlePrev()
+        else handleNext()
+      },
+      onDraggingChange: setDragging
+    })
+    gestureRef.current = session
+    return () => {
+      session.dispose()
+      if (gestureRef.current === session) gestureRef.current = null
+    }
+  }, [
+    handleNext,
+    handlePrev,
+    resolved.length,
+    scaleRange.maxScale,
+    scaleRange.minScale,
+    shouldRender,
+    touchSwipeThreshold,
+    touchSwipeable,
+    zoomable
+  ])
+
+  const displayIndex = clampLightboxIndex(index, resolved.length)
+  const navState = getLightboxNavState(displayIndex, resolved.length)
+  const current = resolved[displayIndex]
+  const currentAlt = formatLightboxImageAlt(
+    current,
+    displayIndex,
+    resolved.length,
+    labels.previewImageAriaLabel
   )
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.button !== 0) return
-      e.preventDefault()
-      draggingRef.current = true
-      dragStartRef.current = { x: e.clientX, y: e.clientY, ox: offsetX, oy: offsetY }
-    },
-    [offsetX, offsetY]
-  )
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!draggingRef.current) return
-    setOffsetX(dragStartRef.current.ox + (e.clientX - dragStartRef.current.x))
-    setOffsetY(dragStartRef.current.oy + (e.clientY - dragStartRef.current.y))
-  }, [])
-
-  const handleMouseUp = useCallback(() => {
-    draggingRef.current = false
-  }, [])
-
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (e.touches.length === 2) {
-        e.preventDefault()
-        touchSwipeRef.current.isTracking = false
-        pinchRef.current = startPinch(e.touches[0], e.touches[1], scale)
-        return
-      }
-
-      if (e.touches.length === 1) {
-        const touch = e.touches[0]
-        if (touchSwipeable && images.length > 1 && scale === 1) {
-          touchSwipeRef.current = {
-            isTracking: true,
-            startX: touch.clientX,
-            startY: touch.clientY,
-            currentX: touch.clientX,
-            currentY: touch.clientY
-          }
-          panRef.current = createPanState()
-          return
-        }
-
-        touchSwipeRef.current.isTracking = false
-        panRef.current = startPan(touch.clientX, touch.clientY, offsetX, offsetY)
-      }
-    },
-    [images.length, offsetX, offsetY, scale, touchSwipeable]
-  )
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (e.touches.length === 2 && pinchRef.current.isPinching) {
-        e.preventDefault()
-        const next = movePinch(pinchRef.current, e.touches[0], e.touches[1], minScale, maxScale)
-        setScale(next)
-        onScaleChange?.(next)
-        return
-      }
-
-      if (e.touches.length === 1 && panRef.current.isPanning) {
-        const next = movePan(panRef.current, e.touches[0].clientX, e.touches[0].clientY)
-        setOffsetX(next.translateX)
-        setOffsetY(next.translateY)
-        return
-      }
-
-      if (e.touches.length === 1 && touchSwipeRef.current.isTracking) {
-        const touch = e.touches[0]
-        touchSwipeRef.current.currentX = touch.clientX
-        touchSwipeRef.current.currentY = touch.clientY
-
-        const deltaX = touch.clientX - touchSwipeRef.current.startX
-        const deltaY = touch.clientY - touchSwipeRef.current.startY
-        if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-          e.preventDefault()
-        }
-      }
-    },
-    [maxScale, minScale, onScaleChange]
-  )
-
-  const handleTouchEnd = useCallback(
-    (e?: React.TouchEvent) => {
-      if (touchSwipeRef.current.isTracking) {
-        const endedTouch = e?.changedTouches?.[0]
-        const currentX = endedTouch?.clientX ?? touchSwipeRef.current.currentX
-        const currentY = endedTouch?.clientY ?? touchSwipeRef.current.currentY
-        const deltaX = currentX - touchSwipeRef.current.startX
-        const deltaY = currentY - touchSwipeRef.current.startY
-        const threshold = Math.max(0, touchSwipeThreshold)
-
-        if (Math.abs(deltaX) >= threshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-          if (deltaX < 0) {
-            handleNext()
-          } else {
-            handlePrev()
-          }
-        }
-      }
-
-      touchSwipeRef.current.isTracking = false
-      panRef.current = createPanState()
-      pinchRef.current = createPinchState()
-    },
-    [handleNext, handlePrev, touchSwipeThreshold]
-  )
+  const canZoomOut = transform.scale <= scaleRange.minScale + 1e-6
+  const canZoomIn = transform.scale >= scaleRange.maxScale - 1e-6
+  const showNavigation = showNav && resolved.length > 1
+  const showCount = showCounter && resolved.length > 1
 
   const handleMaskClick = useCallback(() => {
-    if (maskClosable) {
-      handleClose()
-    }
-  }, [maskClosable, handleClose])
+    if (maskClosable) handleClose()
+  }, [handleClose, maskClosable])
 
-  const transform = useMemo(
-    () => `${calculateTransform(scale, offsetX, offsetY)} rotate(${rotation}deg)`,
-    [scale, offsetX, offsetY, rotation]
-  )
+  const handlePointerDown = useCallback((event: React.PointerEvent<HTMLImageElement>) => {
+    gestureRef.current?.pointerDown(event.nativeEvent)
+  }, [])
 
-  if (!isOpen || !images.length) return null
+  if (!shouldRender || !current) return null
 
-  const currentSrc = images[index] || images[0]
+  const rootStyle =
+    zIndex != null && zIndex !== OVERLAY_Z_INDEX.modal ? { ...style, zIndex } : style
 
   return renderBodyPortal(
     <div
-      className={imagePreviewWrapperClasses}
-      style={{ zIndex }}
+      {...rest}
+      ref={rootRef}
+      className={classNames(imagePreviewWrapperClasses, className)}
+      style={rootStyle}
       role="dialog"
       aria-modal="true"
       aria-label={labels.previewDialogAriaLabel}
-      onWheel={handleWheel}>
+      tabIndex={-1}
+      data-tiger-overlay-host=""
+      data-tiger-image-preview=""
+      onKeyDown={onKeyDown}>
       <div className={imagePreviewMaskClasses} aria-hidden="true" onClick={handleMaskClick} />
       <img
-        src={currentSrc}
-        className={imagePreviewImgClasses}
-        style={{ transform }}
-        alt={`Preview image ${index + 1}`}
+        src={current.src}
+        className={classNames(imagePreviewImgClasses, !dragging && imagePreviewImgMotionClasses)}
+        style={{ transform: getImageTransformStyle(transform) }}
+        alt={currentAlt}
         draggable={false}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
+        onPointerDown={handlePointerDown}
       />
       <button
+        ref={closeButtonRef}
         className={imagePreviewCloseBtnClasses}
         onClick={handleClose}
         aria-label={labels.closePreviewAriaLabel}
         type="button">
         <SvgIcon d={previewCloseIconPath} />
       </button>
-      {images.length > 1 && (
+      {showNavigation && (
         <button
-          className={classNames(imagePreviewNavBtnClasses, 'left-4')}
+          className={imagePreviewNavPrevClasses}
           onClick={handlePrev}
           disabled={!navState.hasPrev}
           aria-label={labels.previousImageAriaLabel}
@@ -371,9 +399,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           <SvgIcon d={prevIconPath} />
         </button>
       )}
-      {images.length > 1 && (
+      {showNavigation && (
         <button
-          className={classNames(imagePreviewNavBtnClasses, 'right-4')}
+          className={imagePreviewNavNextClasses}
           onClick={handleNext}
           disabled={!navState.hasNext}
           aria-label={labels.nextImageAriaLabel}
@@ -381,44 +409,60 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           <SvgIcon d={nextIconPath} />
         </button>
       )}
-      <div className={imagePreviewToolbarClasses}>
-        <button
-          className={imagePreviewToolbarBtnClasses}
-          onClick={handleZoomOut}
-          aria-label={labels.zoomOutAriaLabel}
-          type="button">
-          <SvgIcon d={zoomOutIconPath} />
-        </button>
-        <button
-          className={imagePreviewToolbarBtnClasses}
-          onClick={handleReset}
-          aria-label={labels.resetAriaLabel}
-          type="button">
-          <SvgIcon d={resetIconPath} />
-        </button>
-        <button
-          className={imagePreviewToolbarBtnClasses}
-          onClick={handleZoomIn}
-          aria-label={labels.zoomInAriaLabel}
-          type="button">
-          <SvgIcon d={zoomInIconPath} />
-        </button>
-        <button
-          className={imagePreviewToolbarBtnClasses}
-          onClick={handleRotateLeft}
-          aria-label={labels.rotateLeftAriaLabel}
-          type="button">
-          <SvgIcon d={imageViewerIcons.rotateLeft} />
-        </button>
-        <button
-          className={imagePreviewToolbarBtnClasses}
-          onClick={handleRotateRight}
-          aria-label={labels.rotateRightAriaLabel}
-          type="button">
-          <SvgIcon d={imageViewerIcons.rotateRight} />
-        </button>
-        {navState.counter && <span className={imagePreviewCounterClasses}>{navState.counter}</span>}
-      </div>
+      {(zoomable || rotatable || showCount) && (
+        <div className={imagePreviewToolbarClasses}>
+          {zoomable && (
+            <>
+              <button
+                className={imagePreviewToolbarBtnClasses}
+                onClick={handleZoomOut}
+                disabled={canZoomOut}
+                aria-label={labels.zoomOutAriaLabel}
+                type="button">
+                <SvgIcon d={zoomOutIconPath} />
+              </button>
+              <button
+                className={imagePreviewToolbarBtnClasses}
+                onClick={handleReset}
+                aria-label={labels.resetAriaLabel}
+                type="button">
+                <SvgIcon d={resetIconPath} />
+              </button>
+              <button
+                className={imagePreviewToolbarBtnClasses}
+                onClick={handleZoomIn}
+                disabled={canZoomIn}
+                aria-label={labels.zoomInAriaLabel}
+                type="button">
+                <SvgIcon d={zoomInIconPath} />
+              </button>
+            </>
+          )}
+          {rotatable && (
+            <>
+              <button
+                className={imagePreviewToolbarBtnClasses}
+                onClick={handleRotateLeft}
+                aria-label={labels.rotateLeftAriaLabel}
+                type="button">
+                <SvgIcon d={imageViewerIcons.rotateLeft} />
+              </button>
+              <button
+                className={imagePreviewToolbarBtnClasses}
+                onClick={handleRotateRight}
+                aria-label={labels.rotateRightAriaLabel}
+                type="button">
+                <SvgIcon d={imageViewerIcons.rotateRight} />
+              </button>
+            </>
+          )}
+          {showCount && navState.counter ? (
+            <span className={imagePreviewCounterClasses} aria-live="polite">
+              {navState.counter}
+            </span>
+          ) : null}
+        </div>
+      )}
     </div>
   )
 }

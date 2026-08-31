@@ -159,7 +159,8 @@ export const ptBR: TigerLocale = {
     resetAriaLabel: 'Redefinir',
     zoomInAriaLabel: 'Aumentar zoom',
     rotateLeftAriaLabel: 'Girar à esquerda',
-    rotateRightAriaLabel: 'Girar à direita'
+    rotateRightAriaLabel: 'Girar à direita',
+    previewImageAriaLabel: 'Imagem {index} de {total}'
   },
   imageEditor: {
     selectImageText: 'Selecionar imagem',

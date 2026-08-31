@@ -159,7 +159,8 @@ export const esES: TigerLocale = {
     resetAriaLabel: 'Restablecer',
     zoomInAriaLabel: 'Acercar',
     rotateLeftAriaLabel: 'Girar a la izquierda',
-    rotateRightAriaLabel: 'Girar a la derecha'
+    rotateRightAriaLabel: 'Girar a la derecha',
+    previewImageAriaLabel: 'Imagen {index} de {total}'
   },
   imageEditor: {
     selectImageText: 'Seleccionar imagen',
