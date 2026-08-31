@@ -1,590 +1,370 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
-  classNames,
-  parseDate,
-  formatDate,
-  addDays,
-  addMonths,
-  isDateInRange,
-  getCalendarDays,
-  getShortDayNames,
-  normalizeDate,
-  datePickerBaseClasses,
-  getDatePickerInputClasses,
-  getDatePickerIconButtonClasses,
-  getDatePickerLocaleCode,
+  SHAKE_CLASS,
+  TIGER_CHROME_ATTR,
+  coerceDatePickerRange,
+  coerceDatePickerSingle,
+  commitDatePickerDay,
+  commitDatePickerToday,
+  emptyDatePickerValue,
+  formatDatePickerDisplay,
+  formDatePickerValue,
   getDatePickerLabels,
+  getDatePickerLocaleCode,
+  getInputFieldClasses,
+  getInputWrapperClasses,
   getLocaleDirection,
+  getWeekStartsOn,
+  isDatePickerValueEmpty,
+  mergeAriaDescribedBy,
   mergeTigerLocale,
-  type DatePickerLocaleInput,
-  type DatePickerLocalePreset,
-  type TigerLocale,
-  type DatePickerShortcut
+  parseDatePickerShortcut,
+  parseTypedDatePickerValue,
+  resolveDatePickerDisabled,
+  resolveInputTrailingLayout,
+  resolveReadOnlyFlag,
+  runShakeAnimation,
+  toCalendarDate,
+  type DateFormat,
+  type DatePickerShortcut,
+  type InputStatus
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
 import { useTigerConfig } from '../ConfigProvider'
-import {
-  isRangeDatePicker,
-  type DatePickerContext,
-  type DatePickerProps,
-  type DatePickerSingleProps,
-  type DatePickerRangeProps
-} from './types'
+import { useInputGroupContext } from '../InputGroup'
+import { useFormItemControlContext } from '../FormItemContext'
+import { isRangeDatePicker, type DatePickerProps, type DatePickerRangeResolvedValue } from './types'
 
-type DatePickerRangeInputValue = [Date | string | null, Date | string | null]
-type DatePickerRangeResolvedValue = [Date | null, Date | null]
-
-function normalizeDatePickerLocale(
-  locale?: DatePickerLocaleInput
-): Partial<TigerLocale> | undefined {
-  if (!locale) return undefined
-  if (typeof locale === 'string') return { locale }
-  if ('datePicker' in locale) return locale as Partial<TigerLocale>
-  const preset = locale as Partial<DatePickerLocalePreset>
-  return {
-    locale: hasDatePickerLocaleCode(preset) ? preset.locale : undefined,
-    datePicker: preset
-  }
-}
-
-function hasDatePickerLocaleCode(
-  locale: Partial<DatePickerLocalePreset>
-): locale is Partial<DatePickerLocalePreset> & { locale: string } {
-  return typeof locale.locale === 'string'
-}
-
-export function useDatePickerState(props: DatePickerProps): DatePickerContext {
-  const config = useTigerConfig()
+export function useDatePickerController(props: DatePickerProps) {
+  const isRangeMode = isRangeDatePicker(props)
   const {
     size = 'md',
     disabled = false,
-    readonly = false,
+    readonly: readonlyProp,
     required = false,
     clearable = true,
-    format = 'yyyy-MM-dd'
+    format = 'yyyy-MM-dd' as DateFormat,
+    open,
+    defaultOpen = false,
+    onOpenChange,
+    status: statusProp,
+    name,
+    id,
+    locale,
+    labels: labelsOverride,
+    className,
+    onClear,
+    onBlur
   } = props
 
-  const isRangeMode = isRangeDatePicker(props)
-
-  const divProps = (({
-    value: _value,
-    defaultValue: _defaultValue,
-    range: _range,
-    locale: _locale,
-    labels: _labels,
-    size: _size,
-    format: _format,
-    placeholder: _placeholder,
-    disabled: _disabled,
-    readonly: _readonly,
-    required: _required,
-    minDate: _minDate,
-    maxDate: _maxDate,
-    clearable: _clearable,
-    name: _name,
-    id: _id,
-    onChange: _onChange,
-    onClear: _onClear,
-    className: _className,
-    shortcuts: _shortcuts,
-    ...rest
-  }) => rest)(props)
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [activeDateIso, setActiveDateIso] = useState<string | null>(null)
-  const [activeRangePart, setActiveRangePart] = useState<'start' | 'end'>('start')
-
-  // Controlled/uncontrolled value handled by useControlledState. Values are
-  // parsed to the resolved `Date | null` space at the hook boundary so the
-  // stored value space and the `onChange` value space align (the C-4 "aligned"
-  // case): the setter writes internal state only when uncontrolled and always
-  // fires onChange, replacing the previous manual `isControlled` branches.
-  const singleProps = props as DatePickerSingleProps
-  const rangeProps = props as DatePickerRangeProps
-
-  const parseRangeTuple = (
-    tuple: DatePickerRangeInputValue | null | undefined
-  ): DatePickerRangeResolvedValue => {
-    if (!tuple || !Array.isArray(tuple)) return [null, null]
-    return [parseDate(tuple[0]), parseDate(tuple[1])]
-  }
-
-  const parsedSingleValue = useMemo(
-    () =>
-      !isRangeMode && singleProps.value !== undefined
-        ? parseDate(singleProps.value ?? null)
-        : undefined,
-    [isRangeMode, singleProps.value]
+  const isReadOnly = resolveReadOnlyFlag(readonlyProp, (props as { readOnly?: boolean }).readOnly)
+  const config = useTigerConfig()
+  const inputGroup = useInputGroupContext()
+  const formItemControl = useFormItemControlContext()
+  const inGroup = inputGroup != null
+  const effectiveSize = size ?? inputGroup?.size ?? 'md'
+  const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const shakeTrigger = formItemControl?.shakeTrigger
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const describedBy = mergeAriaDescribedBy(
+    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    formItemControl?.describedBy
   )
-  const parsedRangeValue = useMemo(
-    () =>
-      isRangeMode && rangeProps.value !== undefined ? parseRangeTuple(rangeProps.value) : undefined,
-    [isRangeMode, rangeProps.value]
-  )
+  const labelledby =
+    typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
+      ? props['aria-labelledby']
+      : formItemControl?.labelId
+  const ariaLabel =
+    typeof props['aria-label'] === 'string' && props['aria-label'].trim()
+      ? props['aria-label']
+      : undefined
 
-  const [singleValue, setSingleValue] = useControlledState<Date | null>({
-    value: parsedSingleValue,
-    defaultValue: parseDate(singleProps.defaultValue ?? null),
-    onChange: singleProps.onChange
-  })
-
-  const [rangeValue, setRangeValue] = useControlledState<DatePickerRangeResolvedValue>({
-    value: parsedRangeValue,
-    defaultValue: parseRangeTuple(rangeProps.defaultValue),
-    onChange: rangeProps.onChange
-  })
-
-  const calendarRef = useRef<HTMLDivElement>(null)
-  const mobileCalendarRef = useRef<HTMLDivElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-  const inputWrapperRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const pendingFocusIsoRef = useRef<string | null>(null)
-  const restoreFocusRef = useRef<HTMLElement | null>(null)
-
-  const selectedDate = isRangeMode ? null : singleValue
-  const selectedRange: DatePickerRangeResolvedValue = useMemo(
-    () => (isRangeMode ? rangeValue : [null, null]),
-    [isRangeMode, rangeValue]
-  )
-
-  const minDateParsed = useMemo(() => parseDate(props.minDate ?? null), [props.minDate])
-  const maxDateParsed = useMemo(() => parseDate(props.maxDate ?? null), [props.maxDate])
   const mergedLocale = useMemo(
-    () => mergeTigerLocale(config.locale, normalizeDatePickerLocale(props.locale)),
-    [config.locale, props.locale]
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
   )
-  const localeCode = useMemo(() => getDatePickerLocaleCode(mergedLocale), [mergedLocale])
-
-  // Current viewing month/year in calendar
-  const [viewingMonth, setViewingMonth] = useState(
-    (selectedDate ?? selectedRange[0])?.getMonth() ?? new Date().getMonth()
-  )
-  const [viewingYear, setViewingYear] = useState(
-    (selectedDate ?? selectedRange[0])?.getFullYear() ?? new Date().getFullYear()
-  )
-
-  const displayValue = (() => {
-    if (!isRangeMode) {
-      return selectedDate ? formatDate(selectedDate, format, localeCode) : ''
-    }
-
-    const [start, end] = selectedRange
-    const startText = start ? formatDate(start, format, localeCode) : ''
-    const endText = end ? formatDate(end, format, localeCode) : ''
-
-    if (!startText && !endText) return ''
-    if (startText && endText) return `${startText} - ${endText}`
-    return startText ? `${startText} - ` : ` - ${endText}`
-  })()
-
-  const showClearButton = (() => {
-    if (!clearable || disabled || readonly) return false
-    if (!isRangeMode) return selectedDate !== null
-    return selectedRange[0] !== null || selectedRange[1] !== null
-  })()
-
-  const calendarDays = useMemo(
-    () => getCalendarDays(viewingYear, viewingMonth),
-    [viewingYear, viewingMonth]
-  )
-  const selectedDateRef = useRef<Date | null>(selectedDate)
-  const selectedRangeRef = useRef<DatePickerRangeResolvedValue>(selectedRange)
-  const minDateParsedRef = useRef<Date | null>(minDateParsed)
-  const maxDateParsedRef = useRef<Date | null>(maxDateParsed)
-  const calendarDaysRef = useRef<Array<Date | null>>(calendarDays)
-
-  selectedDateRef.current = selectedDate
-  selectedRangeRef.current = selectedRange
-  minDateParsedRef.current = minDateParsed
-  maxDateParsedRef.current = maxDateParsed
-  calendarDaysRef.current = calendarDays
-
-  const dayNames = useMemo(() => getShortDayNames(localeCode), [localeCode])
-  const isRtl = getLocaleDirection(localeCode) === 'rtl'
-
+  const localeCode = getDatePickerLocaleCode(mergedLocale)
   const labels = useMemo(
-    () => getDatePickerLabels(mergedLocale, props.labels),
-    [mergedLocale, props.labels]
+    () => getDatePickerLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
   )
+  const weekStartsOn = props.weekStartsOn ?? getWeekStartsOn(localeCode)
+  const dir = getLocaleDirection(mergedLocale)
+
+  const parsedValue = useMemo(() => {
+    if (isRangeMode) {
+      if (props.value === undefined) {
+        return coerceDatePickerRange(formItemControl?.value) as DatePickerRangeResolvedValue
+      }
+      return coerceDatePickerRange(props.value)
+    }
+    if (props.value === undefined) {
+      return coerceDatePickerSingle(formItemControl?.value)
+    }
+    return coerceDatePickerSingle(props.value)
+  }, [formItemControl?.value, isRangeMode, props.value])
+
+  const parsedDefault = useMemo(
+    () =>
+      isRangeMode
+        ? coerceDatePickerRange(props.defaultValue)
+        : coerceDatePickerSingle(props.defaultValue),
+    [isRangeMode, props.defaultValue]
+  )
+
+  const [committed, setCommitted] = useControlledState<Date | null | DatePickerRangeResolvedValue>({
+    value:
+      props.value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
+    defaultValue: parsedDefault ?? emptyDatePickerValue(isRangeMode),
+    onChange: (next) => {
+      if (isRangeMode) {
+        ;(props.onChange as ((value: DatePickerRangeResolvedValue) => void) | undefined)?.(
+          next as DatePickerRangeResolvedValue
+        )
+      } else {
+        ;(props.onChange as ((value: Date | null) => void) | undefined)?.(next as Date | null)
+      }
+      formItemControl?.onChange?.(formDatePickerValue(isRangeMode, next, null))
+    }
+  })
+
+  const [isOpen, setOpen] = useControlledState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange
+  })
+
+  const [previewRange, setPreviewRange] = useState<DatePickerRangeResolvedValue | null>(null)
+  const [draftText, setDraftText] = useState<string | null>(null)
+
+  const displaySource = isRangeMode ? (previewRange ?? committed) : committed
+  const displayValue =
+    draftText ?? formatDatePickerDisplay(isRangeMode, displaySource, format, localeCode)
   const placeholder =
     props.placeholder ?? (isRangeMode ? labels.rangePlaceholder : labels.placeholder)
 
-  const mobileDate = useMemo(() => {
-    if (!isRangeMode) return selectedDate ?? normalizeDate(new Date())
-    const [start, end] = selectedRange
-    return (activeRangePart === 'start' ? start : end) ?? start ?? end ?? normalizeDate(new Date())
-  }, [activeRangePart, isRangeMode, selectedDate, selectedRange])
+  const minDate = useMemo(() => toCalendarDate(props.minDate ?? null), [props.minDate])
+  const maxDate = useMemo(() => toCalendarDate(props.maxDate ?? null), [props.maxDate])
+  const now = props.now
 
-  const mobileYears = useMemo(() => {
-    const baseYear = mobileDate.getFullYear()
-    return Array.from({ length: 101 }, (_, index) => baseYear - 50 + index)
-  }, [mobileDate])
-
-  const mobileDays = useMemo(() => {
-    const daysInMonth = new Date(mobileDate.getFullYear(), mobileDate.getMonth() + 1, 0).getDate()
-    return Array.from({ length: daysInMonth }, (_, index) => index + 1)
-  }, [mobileDate])
-
-  const toggleCalendar = () => {
-    if (!disabled && !readonly) {
-      setIsOpen(!isOpen)
-      if (!isOpen) {
-        restoreFocusRef.current = inputRef.current ?? null
-        // Reset viewing month to selected date or current month
-        const baseDate = selectedDate ?? selectedRange[0]
-        if (baseDate) {
-          setViewingMonth(baseDate.getMonth())
-          setViewingYear(baseDate.getFullYear())
-        }
-      }
-    }
-  }
-
-  const closeCalendar = useCallback(() => {
-    setIsOpen(false)
-  }, [])
-
-  const isDateDisabled = useCallback((date: Date | null): boolean => {
-    if (!date) return true
-    return !isDateInRange(date, minDateParsedRef.current, maxDateParsedRef.current)
-  }, [])
-
-  const getFirstEnabledIsoInView = useCallback((): string | null => {
-    for (const date of calendarDaysRef.current) {
-      if (!date) continue
-      const iso = formatDate(date, 'yyyy-MM-dd')
-      const isDisabled = isDateDisabled(date)
-      if (!isDisabled) return iso
-    }
-    return null
-  }, [isDateDisabled])
-
-  const getPreferredFocusIso = useCallback((): string | null => {
-    const focusDate = isRangeMode
-      ? (selectedRangeRef.current[0] ?? selectedRangeRef.current[1])
-      : selectedDateRef.current
-
-    if (focusDate) {
-      return formatDate(focusDate, 'yyyy-MM-dd')
-    }
-
-    const today = normalizeDate(new Date())
-    if (isDateInRange(today, minDateParsedRef.current, maxDateParsedRef.current)) {
-      return formatDate(today, 'yyyy-MM-dd')
-    }
-
-    return getFirstEnabledIsoInView()
-  }, [isRangeMode, getFirstEnabledIsoInView])
-
-  const focusDateButtonByIso = useCallback((iso: string): boolean => {
-    const button = calendarRef.current?.querySelector(
-      `button[data-date="${iso}"]`
-    ) as HTMLButtonElement | null
-
-    if (!button || button.disabled) return false
-    button.focus()
-    setActiveDateIso(iso)
-    return true
-  }, [])
-
-  const restoreFocus = useCallback(() => {
-    const target = restoreFocusRef.current ?? inputRef.current
-    if (!target) return
-    if (typeof (target as HTMLElement).focus === 'function') {
-      ;(target as HTMLElement).focus()
-    }
-  }, [])
-
-  const moveFocus = (deltaDays: number) => {
-    const activeEl = document.activeElement as HTMLElement | null
-    const currentIso = activeEl?.getAttribute('data-date') ?? activeDateIso ?? null
-
-    const baseIso = currentIso ?? getPreferredFocusIso()
-    if (!baseIso) return
-
-    const baseDate = parseDate(baseIso)
-    if (!baseDate) return
-
-    let candidate = addDays(baseDate, deltaDays)
-    for (let attempts = 0; attempts < 42; attempts++) {
-      const iso = formatDate(candidate, 'yyyy-MM-dd')
-
-      const el = calendarRef.current?.querySelector(
-        `button[data-date="${iso}"]`
-      ) as HTMLButtonElement | null
-
-      if (el && !el.disabled) {
-        el.focus()
-        setActiveDateIso(iso)
-        return
-      }
-
-      if (!el) {
-        pendingFocusIsoRef.current = iso
-        setViewingYear(candidate.getFullYear())
-        setViewingMonth(candidate.getMonth())
-        setActiveDateIso(iso)
-        return
-      }
-
-      candidate = addDays(candidate, deltaDays)
-    }
-  }
-
-  const handleCalendarKeyDown = (event: React.KeyboardEvent) => {
-    if (!isOpen) return
-
-    switch (event.key) {
-      case 'Escape': {
-        event.preventDefault()
-        closeCalendar()
-        return
-      }
-      case 'ArrowRight': {
-        event.preventDefault()
-        moveFocus(1)
-        return
-      }
-      case 'ArrowLeft': {
-        event.preventDefault()
-        moveFocus(-1)
-        return
-      }
-      case 'ArrowDown': {
-        event.preventDefault()
-        moveFocus(7)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        moveFocus(-7)
-        return
-      }
-      case 'Enter':
-      case ' ': {
-        const activeEl = document.activeElement as HTMLButtonElement | null
-        if (activeEl?.tagName === 'BUTTON' && activeEl.dataset.date) {
-          event.preventDefault()
-          if (!activeEl.disabled) activeEl.click()
-        }
-        return
-      }
-    }
-  }
-
-  const selectDate = (date: Date | null) => {
-    if (!date) return
-
-    const normalizedDate = normalizeDate(date)
-
-    // Check if date is disabled
-    if (!isDateInRange(normalizedDate, minDateParsed, maxDateParsed)) {
-      return
-    }
-
-    if (!isRangeMode) {
-      setSingleValue(normalizedDate)
-      closeCalendar()
-      return
-    }
-
-    const [start, end] = selectedRange
-
-    if (!start || (start && end)) {
-      setRangeValue([normalizedDate, null])
-      return
-    }
-
-    // Range rule: end cannot be earlier than start
-    setRangeValue([start, normalizedDate < start ? start : normalizedDate])
-  }
-
-  const setToday = () => {
-    selectDate(new Date())
-  }
-
-  const commitMobileDate = (date: Date) => {
-    const normalized = normalizeDate(date)
-    if (!isDateInRange(normalized, minDateParsed, maxDateParsed)) return
-
-    setViewingYear(normalized.getFullYear())
-    setViewingMonth(normalized.getMonth())
-
-    if (!isRangeMode) {
-      setSingleValue(normalized)
-      return
-    }
-
-    const [start, end] = selectedRange
-    if (activeRangePart === 'start') {
-      const next: DatePickerRangeResolvedValue = [
-        normalized,
-        end && end < normalized ? normalized : end
-      ]
-      setRangeValue(next)
-      setActiveRangePart('end')
-      return
-    }
-
-    setRangeValue([start ?? normalized, start && normalized < start ? start : normalized])
-  }
-
-  const updateMobileDate = (part: 'year' | 'month' | 'day', value: number) => {
-    const nextYear = part === 'year' ? value : mobileDate.getFullYear()
-    const nextMonth = part === 'month' ? value : mobileDate.getMonth()
-    const maxDay = new Date(nextYear, nextMonth + 1, 0).getDate()
-    const nextDay = Math.min(part === 'day' ? value : mobileDate.getDate(), maxDay)
-    commitMobileDate(new Date(nextYear, nextMonth, nextDay))
-  }
-
-  const handleShortcut = (shortcut: DatePickerShortcut) => {
-    const val = typeof shortcut.value === 'function' ? shortcut.value() : shortcut.value
-    if (!isRangeMode) {
-      const date =
-        val instanceof Date
-          ? normalizeDate(val)
-          : val
-            ? normalizeDate(parseDate(val as string)!)
-            : null
-      setSingleValue(date)
-    } else {
-      const range = val as DatePickerRangeInputValue | null
-      if (range && Array.isArray(range)) {
-        const parsed: DatePickerRangeResolvedValue = [
-          range[0]
-            ? normalizeDate(range[0] instanceof Date ? range[0] : parseDate(range[0])!)
-            : null,
-          range[1]
-            ? normalizeDate(range[1] instanceof Date ? range[1] : parseDate(range[1])!)
-            : null
-        ]
-        setRangeValue(parsed)
-      }
-    }
-    closeCalendar()
-  }
-
-  const clearDate = (event: React.MouseEvent) => {
-    event.stopPropagation()
-
-    if (!isRangeMode) {
-      setSingleValue(null)
-    } else {
-      setRangeValue([null, null])
-    }
-
-    props.onClear?.()
-  }
-
-  const stepViewingMonth = (delta: number) => {
-    const next = addMonths(new Date(viewingYear, viewingMonth, 1), delta)
-    setViewingYear(next.getFullYear())
-    setViewingMonth(next.getMonth())
-  }
-
-  const previousMonth = () => stepViewingMonth(-1)
-
-  const nextMonth = () => stepViewingMonth(1)
-
-  const isCurrentMonth = (date: Date | null): boolean => {
-    if (!date) return false
-    return date.getMonth() === viewingMonth
-  }
-
-  // Consolidated open/close effect: focus management is component-specific;
-  // dismissal is owned by the shared anchored-overlay adapter.
-  useEffect(() => {
-    if (isOpen) {
-      const preferred = pendingFocusIsoRef.current ?? getPreferredFocusIso()
-      pendingFocusIsoRef.current = null
-
-      setTimeout(() => {
-        if (preferred && focusDateButtonByIso(preferred)) return
-        const fallback = getFirstEnabledIsoInView()
-        if (fallback) focusDateButtonByIso(fallback)
-      }, 0)
-
-      return
-    }
-
-    setTimeout(() => restoreFocus(), 0)
-  }, [
-    isOpen,
-    closeCalendar,
-    focusDateButtonByIso,
-    getFirstEnabledIsoInView,
-    getPreferredFocusIso,
-    restoreFocus
-  ])
-
-  useEffect(() => {
-    if (!isOpen) return
-    const pending = pendingFocusIsoRef.current
-    if (!pending) return
-    pendingFocusIsoRef.current = null
-
-    setTimeout(() => {
-      if (focusDateButtonByIso(pending)) return
-      const fallback = getFirstEnabledIsoInView()
-      if (fallback) focusDateButtonByIso(fallback)
-    }, 0)
-  }, [isOpen, focusDateButtonByIso, getFirstEnabledIsoInView])
-
-  const inputClasses = useMemo(
-    () => getDatePickerInputClasses(size, disabled || readonly, showClearButton),
-    [size, disabled, readonly, showClearButton]
+  const calendarValue = isRangeMode
+    ? (previewRange?.[0] ?? (committed as DatePickerRangeResolvedValue)[0] ?? null)
+    : (committed as Date | null)
+  const rangeHighlight = isRangeMode
+    ? (previewRange ?? (committed as DatePickerRangeResolvedValue))
+    : undefined
+  const rangeSelectingEnd = Boolean(
+    isRangeMode && previewRange && previewRange[0] && !previewRange[1]
   )
-  const iconButtonClasses = useMemo(() => getDatePickerIconButtonClasses(size), [size])
+
+  const isDateDisabled = useCallback(
+    (date: Date) =>
+      resolveDatePickerDisabled(date, {
+        minDate,
+        maxDate,
+        disabledDate: props.disabledDate,
+        rangeStart: previewRange?.[0] ?? null,
+        rangeSelectingEnd
+      }),
+    [minDate, maxDate, previewRange, props.disabledDate, rangeSelectingEnd]
+  )
+
+  const showClear = Boolean(
+    clearable &&
+    !effectiveDisabled &&
+    !isReadOnly &&
+    !isDatePickerValueEmpty(isRangeMode, committed)
+  )
+  const trailing = resolveInputTrailingLayout({
+    clearable,
+    disabled: effectiveDisabled,
+    readOnly: isReadOnly,
+    valueLength: showClear ? 1 : 0,
+    hasCustomSuffix: true
+  })
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const inputWrapperRef = useRef<HTMLDivElement>(null)
+  const instanceId = useId()
+  const panelId = `tiger-datepicker-panel-${instanceId}`
+
+  const mountedRef = useRef(false)
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
+    }
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, shakeTrigger])
+
+  const setOpenSafe = useCallback(
+    (next: boolean) => {
+      if (effectiveDisabled || isReadOnly) return
+      setOpen(next)
+      if (!next) setPreviewRange(null)
+    },
+    [effectiveDisabled, isReadOnly, setOpen]
+  )
+
+  const commit = useCallback(
+    (
+      next: Date | null | DatePickerRangeResolvedValue,
+      preview: DatePickerRangeResolvedValue | null
+    ) => {
+      setCommitted(next)
+      setPreviewRange(preview)
+      setDraftText(null)
+    },
+    [setCommitted]
+  )
+
+  const selectDay = useCallback(
+    (date: Date) => {
+      const result = commitDatePickerDay({
+        range: isRangeMode,
+        picked: date,
+        committed,
+        preview: previewRange
+      })
+      commit(result.nextCommitted, result.nextPreview)
+      if (result.close) setOpenSafe(false)
+    },
+    [commit, committed, isRangeMode, previewRange, setOpenSafe]
+  )
+
+  const selectToday = useCallback(() => {
+    const today = now ?? new Date()
+    if (isDateDisabled(today)) return
+    const result = commitDatePickerToday(isRangeMode, today)
+    commit(result.nextCommitted, null)
+    if (result.close) setOpenSafe(false)
+  }, [commit, isDateDisabled, isRangeMode, now, setOpenSafe])
+
+  const applyShortcut = useCallback(
+    (shortcut: DatePickerShortcut) => {
+      const parsed = parseDatePickerShortcut(shortcut, isRangeMode)
+      if (parsed == null) return
+      commit(parsed, null)
+      if (!isRangeMode) setOpenSafe(false)
+    },
+    [commit, isRangeMode, setOpenSafe]
+  )
+
+  const clearValue = useCallback(() => {
+    commit(emptyDatePickerValue(isRangeMode), null)
+    onClear?.()
+    inputRef.current?.focus()
+  }, [commit, isRangeMode, onClear])
+
+  const confirmOpen = useCallback(() => {
+    setOpenSafe(false)
+  }, [setOpenSafe])
+
+  const parseDraft = useCallback(() => {
+    if (draftText == null) return
+    const parsed = parseTypedDatePickerValue(draftText, format, isRangeMode)
+    if (isRangeMode) {
+      const tuple = (parsed as DatePickerRangeResolvedValue | null) ?? [null, null]
+      commit(tuple, null)
+    } else {
+      commit((parsed as Date | null) ?? null, null)
+    }
+  }, [commit, draftText, format, isRangeMode])
+
+  const handleFocusOut = (event: React.FocusEvent<HTMLElement>) => {
+    const next = event.relatedTarget as Node | null
+    if (
+      (rootRef.current && next && rootRef.current.contains(next)) ||
+      (panelRef.current && next && panelRef.current.contains(next))
+    ) {
+      return
+    }
+    parseDraft()
+    formItemControl?.onBlur?.()
+    onBlur?.(event)
+  }
+
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (effectiveDisabled || isReadOnly) return
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setOpenSafe(true)
+      return
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      if (isOpen) {
+        parseDraft()
+        return
+      }
+      if (draftText != null) parseDraft()
+      else setOpenSafe(true)
+    }
+  }
+
+  const inputClasses = getInputFieldClasses({
+    size: effectiveSize,
+    status,
+    hasSuffix: trailing.hasSuffix,
+    hasDualSuffix: trailing.hasDualSuffix
+  })
+  const wrapperClasses = getInputWrapperClasses(status, { inGroup })
 
   return {
-    inputWrapperRef,
+    rootRef,
     inputRef,
     panelRef,
-    calendarRef,
-    mobileCalendarRef,
+    inputWrapperRef,
     isOpen,
-    activeRangePart,
-    setActiveRangePart,
-    activeDateIso,
-    setActiveDateIso,
+    setOpenSafe,
     isRangeMode,
-    placeholder,
-    disabled,
-    readonly,
-    required,
-    name: props.name,
-    id: props.id,
-    shortcuts: props.shortcuts,
-    containerClasses: classNames(datePickerBaseClasses, props.className),
-    divProps,
-    displayValue,
-    showClearButton,
-    inputClasses,
-    iconButtonClasses,
     labels,
+    mergedLocale,
     localeCode,
-    isRtl,
-    dayNames,
-    calendarDays,
-    selectedDate,
-    selectedRange,
-    viewingMonth,
-    viewingYear,
-    mobileDate,
-    mobileYears,
-    mobileDays,
-    toggleCalendar,
-    closeCalendar,
-    clearDate,
-    selectDate,
-    setToday,
-    handleShortcut,
-    handleCalendarKeyDown,
-    previousMonth,
-    nextMonth,
-    updateMobileDate,
-    isCurrentMonth,
-    isDateDisabled
+    weekStartsOn,
+    dir,
+    format,
+    displayValue,
+    placeholder,
+    effectiveDisabled,
+    isReadOnly,
+    required: required || Boolean(formItemControl?.required),
+    effectiveId,
+    effectiveName,
+    describedBy,
+    labelledby,
+    ariaLabel,
+    status,
+    panelId,
+    calendarValue,
+    rangeHighlight,
+    isDateDisabled,
+    now,
+    showClear,
+    trailing,
+    inputClasses,
+    wrapperClasses,
+    chromeAttr: TIGER_CHROME_ATTR,
+    shakeClass: SHAKE_CLASS,
+    className,
+    size: effectiveSize,
+    shortcuts: props.shortcuts,
+    selectDay,
+    selectToday,
+    applyShortcut,
+    clearValue,
+    confirmOpen,
+    handleFocusOut,
+    handleInputKeyDown,
+    onDraftChange: (text: string) => setDraftText(text),
+    parseDraft,
+    placement: props.placement ?? 'bottom-start',
+    offset: props.offset ?? 4,
+    dropdownClassName: props.dropdownClassName,
+    getPopupContainer: props.getPopupContainer
   }
 }

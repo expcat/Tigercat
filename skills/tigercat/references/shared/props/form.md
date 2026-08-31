@@ -99,14 +99,20 @@ Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发
 
 ## DatePicker
 
-`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/20 props
+`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 8/29 props
 
-| Prop        | Type                           | Default | Notes                                                                         |
-| ----------- | ------------------------------ | ------- | ----------------------------------------------------------------------------- |
-| `locale?`   | `DatePickerLocaleInput`        | `-`     | Locale used for month/day names in the calendar UI. Example: 'zh-CN', 'en-US' |
-| `value?`    | `DatePickerModelValue \| null` | `-`     | Selected date value (for controlled mode)                                     |
-| `disabled?` | `boolean`                      | `false` | Whether the datepicker is disabled                                            |
-| `name?`     | `string`                       | `-`     | Input name attribute                                                          |
+| Prop            | Type                           | Default        | Notes |
+| --------------- | ------------------------------ | -------------- | ----- |
+| `value?`        | `DatePickerModelValue \| null` | `-`            | -     |
+| `defaultValue?` | `DatePickerModelValue \| null` | `-`            | -     |
+| `range?`        | `boolean`                      | `false`        | -     |
+| `format?`       | `DateFormat`                   | `'yyyy-MM-dd'` | -     |
+| `open?`         | `boolean`                      | `-`            | -     |
+| `placeholder?`  | `string`                       | `-`            | -     |
+| `disabled?`     | `boolean`                      | `false`        | -     |
+| `clearable?`    | `boolean`                      | `true`         | -     |
+
+Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## Form
 

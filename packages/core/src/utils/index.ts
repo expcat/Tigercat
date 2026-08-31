@@ -120,6 +120,7 @@ export * from './virtual-list-utils'
 export * from './stepper-utils'
 export * from './calendar-utils'
 export * from './calendar-controller'
+export * from './datepicker-controller'
 export * from './mentions-utils'
 export * from './qrcode-utils'
 

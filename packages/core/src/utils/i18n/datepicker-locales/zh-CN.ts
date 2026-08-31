@@ -14,7 +14,9 @@ export const ZH_CN_DATEPICKER_LOCALE: DatePickerLocalePreset = {
     nextMonth: '下个月',
     year: '年份',
     month: '月份',
-    day: '日期'
+    day: '日期',
+    start: '开始',
+    end: '结束'
   }
 }
 

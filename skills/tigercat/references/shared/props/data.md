@@ -11,13 +11,18 @@ description: Compact generated Tigercat Data props reference
 
 ## Calendar
 
-`packages/core/src/types/calendar.ts` · `CalendarProps` · 3/7 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 8/12 props
 
-| Prop      | Type                   | Default | Notes                                                  |
-| --------- | ---------------------- | ------- | ------------------------------------------------------ |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
-| `value?`  | `Date`                 | `-`     | Currently selected date (controlled)                   |
-| `mode?`   | `CalendarMode`         | `-`     | Calendar display mode                                  |
+| Prop            | Type                      | Default   | Notes                                                                                      |
+| --------------- | ------------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `Date \| string \| null`  | `-`       | Currently selected date (controlled). Invalid Date is treated as empty.                    |
+| `defaultValue?` | `Date \| string \| null`  | `-`       | Initial selected date when `value` is omitted                                              |
+| `mode?`         | `CalendarMode`            | `'month'` | Calendar display mode.                                                                     |
+| `fullscreen?`   | `boolean`                 | `-`       | Whether the calendar is full-screen or card-style                                          |
+| `disabledDate?` | `(date: Date) => boolean` | `-`       | Function that determines if a date is disabled                                             |
+| `weekStartsOn?` | `WeekStartsOn`            | `-`       | First column of the week. Defaults to the locale week start (en-US Sunday, zh/de Monday... |
+| `now?`          | `Date`                    | `-`       | Clock snapshot for “today” and the default panel month. Omit on the client to use the w... |
+| `locale?`       | `Partial<TigerLocale>`    | `-`       | Locale override merged on top of ConfigProvider locale                                     |
 
 Events/callback props: `onChange?`, `onPanelChange?`.
 

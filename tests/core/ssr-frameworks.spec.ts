@@ -13,7 +13,7 @@ import { ConfigProvider as VueConfigProvider } from '@expcat/tigercat-vue/Config
 import { DatePicker as VueDatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
-const selectedDate = new Date(2024, 0, 15)
+const selectedDate = '2024-01-15'
 const chartData = [
   { x: 'SSR', y: 12 },
   { x: 'Hydration', y: 18 }
@@ -28,7 +28,7 @@ function renderReactSsrTree(): string {
         createElement(ReactDatePicker, {
           key: 'date',
           value: selectedDate,
-          locale: 'zh-CN'
+          format: 'yyyy-MM-dd'
         }),
         createElement(ReactBackTop, { key: 'backtop' }),
         createElement(ReactBarChart, {
@@ -50,7 +50,7 @@ async function renderVueSsrTree(): Promise<string> {
       return h(VueConfigProvider, { locale: zhCN }, () => [
         h(VueDatePicker, {
           modelValue: selectedDate,
-          locale: 'zh-CN'
+          format: 'yyyy-MM-dd'
         }),
         h(VueBackTop),
         h(VueBarChart, {

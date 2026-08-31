@@ -3,6 +3,10 @@
  */
 
 import type { ComponentSize } from './base'
+import type { WeekStartsOn } from './calendar'
+import type { InputStatus } from './input'
+import type { FloatingPlacement } from '../utils/floating'
+import type { TigerLocale } from './locale'
 
 export type DatePickerInputDate = Date | string
 
@@ -22,6 +26,8 @@ export interface DatePickerLabels {
   year: string
   month: string
   day: string
+  start: string
+  end: string
 }
 
 export interface DatePickerLocalePreset {
@@ -33,122 +39,84 @@ export interface DatePickerLocaleConfig {
   datePicker?: Partial<DatePickerLocalePreset>
 }
 
-export type DatePickerLocaleInput =
-  string | Partial<DatePickerLocalePreset> | DatePickerLocaleConfig
-
-/**
- * Date format types
- */
 export type DateFormat = 'yyyy-MM-dd' | 'MM/dd/yyyy' | 'dd/MM/yyyy' | 'yyyy/MM/dd'
 
-/**
- * Base DatePicker props interface
- */
-export interface DatePickerProps {
-  /**
-   * Locale used for month/day names in the calendar UI.
-   * Example: 'zh-CN', 'en-US'
-   */
-  locale?: DatePickerLocaleInput
-
-  /**
-   * UI labels for i18n.
-   * When provided, merges with locale-based defaults.
-   */
-  labels?: Partial<DatePickerLabels>
-
-  /**
-   * DatePicker size
-   * @default 'md'
-   */
-  size?: ComponentSize
-
-  /**
-   * Selected date value (for controlled mode)
-   */
-  value?: DatePickerModelValue | null
-
-  /**
-   * Default date value (for uncontrolled mode)
-   */
-  defaultValue?: DatePickerModelValue | null
-
-  /**
-   * Enable range selection (start/end).
-   * When true, value/defaultValue use a tuple: [start, end].
-   * @default false
-   */
-  range?: boolean
-
-  /**
-   * Date format string
-   * @default 'yyyy-MM-dd'
-   */
-  format?: DateFormat
-
-  /**
-   * Placeholder text
-   * @default 'Select date'
-   */
-  placeholder?: string
-
-  /**
-   * Whether the datepicker is disabled
-   * @default false
-   */
-  disabled?: boolean
-
-  /**
-   * Whether the datepicker is readonly
-   * @default false
-   */
-  readonly?: boolean
-
-  /**
-   * Whether the datepicker is required
-   * @default false
-   */
-  required?: boolean
-
-  /**
-   * Minimum selectable date
-   */
-  minDate?: DatePickerInputDate | null
-
-  /**
-   * Maximum selectable date
-   */
-  maxDate?: DatePickerInputDate | null
-
-  /**
-   * Whether to show the clear button
-   * @default true
-   */
-  clearable?: boolean
-
-  /**
-   * Input name attribute
-   */
-  name?: string
-
-  /**
-   * Input id attribute
-   */
-  id?: string
-
-  /**
-   * Shortcut presets for quick date selection.
-   * Each shortcut has a label and a value (or getter function).
-   */
-  shortcuts?: DatePickerShortcut[]
+export interface DatePickerShortcut {
+  label: string
+  value: DatePickerModelValue | (() => DatePickerModelValue)
 }
 
 /**
- * DatePicker shortcut preset
+ * Shared DatePicker props. React adds `value`/`onChange`; Vue binds
+ * `modelValue` / `update:modelValue` and `open` / `update:open`.
+ *
+ * Dates are calendar days (local midnight). A UTC-midnight `Date` such as
+ * `new Date('2024-01-15')` is that calendar day in every timezone.
+ * `format` is used for both the input display and typed parse.
+ * Empty range is `[null, null]`. `name` submits the formatted display string.
  */
-export interface DatePickerShortcut {
-  /** Display label */
-  label: string
-  /** Date value or getter function returning a date value */
-  value: DatePickerModelValue | (() => DatePickerModelValue)
+export interface DatePickerProps {
+  /** Locale object merged on top of ConfigProvider. Do not pass a language id string. */
+  locale?: Partial<TigerLocale>
+  labels?: Partial<DatePickerLabels>
+  /**
+   * @default 'md'
+   */
+  size?: ComponentSize
+  value?: DatePickerModelValue | null
+  defaultValue?: DatePickerModelValue | null
+  /**
+   * @default false
+   */
+  range?: boolean
+  /**
+   * @default 'yyyy-MM-dd'
+   */
+  format?: DateFormat
+  placeholder?: string
+  /**
+   * @default false
+   */
+  disabled?: boolean
+  /**
+   * When true, the field cannot be typed and the calendar cannot open.
+   * @default false
+   */
+  readonly?: boolean
+  /**
+   * @default false
+   */
+  required?: boolean
+  minDate?: DatePickerInputDate | null
+  maxDate?: DatePickerInputDate | null
+  disabledDate?: (date: Date) => boolean
+  weekStartsOn?: WeekStartsOn
+  now?: Date
+  /**
+   * @default true
+   */
+  clearable?: boolean
+  name?: string
+  id?: string
+  shortcuts?: DatePickerShortcut[]
+  open?: boolean
+  /**
+   * @default false
+   */
+  defaultOpen?: boolean
+  status?: InputStatus
+  /**
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
+  /**
+   * @default 4
+   */
+  offset?: number
+  dropdownClassName?: string
+  getPopupContainer?: () => HTMLElement | null
+  onChange?: (value: Date | null | [Date | null, Date | null]) => void
+  onClear?: () => void
+  onOpenChange?: (open: boolean) => void
+  className?: string
 }

@@ -116,7 +116,11 @@ export type { VueMarqueeProps } from './components/Marquee'
 export { Icon } from './components/Icon'
 export type { VueIconProps } from './components/Icon'
 export { DatePicker } from './components/DatePicker'
-export type { VueDatePickerProps, VueDatePickerModelValue } from './components/DatePicker'
+export type {
+  VueDatePickerProps,
+  VueDatePickerModelValue,
+  DatePickerProps
+} from './components/DatePicker'
 export { TimePicker } from './components/TimePicker'
 export type { VueTimePickerProps, VueTimePickerModelValue } from './components/TimePicker'
 export { Upload } from './components/Upload'

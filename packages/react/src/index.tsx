@@ -110,7 +110,7 @@ export type { TreeSelectProps, TreeSelectRef } from './components/TreeSelect'
 export type { TreeSelectValue } from '@expcat/tigercat-core'
 
 export { DatePicker } from './components/DatePicker'
-export type { DatePickerProps } from './components/DatePicker'
+export type { DatePickerProps, DatePickerRef } from './components/DatePicker'
 
 export { TimePicker } from './components/TimePicker'
 export type { TimePickerProps } from './components/TimePicker'

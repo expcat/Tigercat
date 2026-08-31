@@ -14,7 +14,9 @@ export const EN_US_DATEPICKER_LOCALE: DatePickerLocalePreset = {
     nextMonth: 'Next month',
     year: 'Year',
     month: 'Month',
-    day: 'Day'
+    day: 'Day',
+    start: 'Start',
+    end: 'End'
   }
 }
 

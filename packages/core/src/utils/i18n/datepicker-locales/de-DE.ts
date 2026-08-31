@@ -3,13 +3,20 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const DE_DE_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'de-DE',
   labels: {
+    placeholder: 'Datum auswählen',
+    rangePlaceholder: 'Zeitraum auswählen',
     today: 'Heute',
     ok: 'OK',
     calendar: 'Kalender',
     toggleCalendar: 'Kalender öffnen',
     clearDate: 'Datum löschen',
     previousMonth: 'Vorheriger Monat',
-    nextMonth: 'Nächster Monat'
+    nextMonth: 'Nächster Monat',
+    year: 'Jahr',
+    month: 'Monat',
+    day: 'Tag',
+    start: 'Beginn',
+    end: 'Ende'
   }
 }
 

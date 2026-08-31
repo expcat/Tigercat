@@ -46,7 +46,7 @@ if (isBrowser()) {
 
 | 能力            | 风险                                        | 建议                                                                              |
 | --------------- | ------------------------------------------- | --------------------------------------------------------------------------------- |
-| DatePicker      | locale、时区或当前日期不同                  | 传稳定 `value`、`locale` 和格式化配置                                             |
+| DatePicker      | locale、时区或当前日期不同                  | ConfigProvider 传官方 locale 对象；`value` 用 date-only 字符串并写死 `format`     |
 | Charts          | 随机 id 或客户端尺寸影响 SVG                | 使用稳定 id；尺寸依赖客户端时给容器尺寸                                           |
 | Modal/Drawer    | 初始 `open` 状态不同                        | 服务端和客户端使用同一初始 open 值                                                |
 | Tooltip/Popover | 首屏定位依赖 DOM                            | 首屏关闭，打开后再计算定位                                                        |
