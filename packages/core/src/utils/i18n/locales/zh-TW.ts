@@ -276,7 +276,12 @@ export const zhTW: TigerLocale = {
   select: {
     doneText: '完成',
     placeholder: '請選擇',
-    emptyText: '暫無選項'
+    emptyText: '暫無選項',
+    searchPlaceholder: '搜尋',
+    clearAriaLabel: '清除選取',
+    createOptionLabel: '建立「{label}」',
+    moreCountText: '等 {count} 項',
+    loadingText: '載入中...'
   },
   colorPicker: {
     trigger: '選擇顏色',

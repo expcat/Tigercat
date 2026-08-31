@@ -276,7 +276,12 @@ export const thTH: TigerLocale = {
   select: {
     doneText: 'เสร็จสิ้น',
     placeholder: 'เลือกตัวเลือก',
-    emptyText: 'ไม่พบตัวเลือก'
+    emptyText: 'ไม่พบตัวเลือก',
+    searchPlaceholder: 'ค้นหา',
+    clearAriaLabel: 'ล้างรายการที่เลือก',
+    createOptionLabel: 'สร้าง "{label}"',
+    moreCountText: '+อีก {count}',
+    loadingText: 'กำลังโหลด...'
   },
   colorPicker: {
     trigger: 'เลือกสี',

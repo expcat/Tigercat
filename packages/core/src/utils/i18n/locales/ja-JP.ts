@@ -276,7 +276,12 @@ export const jaJP: TigerLocale = {
   select: {
     doneText: '完了',
     placeholder: '選択してください',
-    emptyText: 'オプションがありません'
+    emptyText: 'オプションがありません',
+    searchPlaceholder: '検索',
+    clearAriaLabel: '選択をクリア',
+    createOptionLabel: '「{label}」を作成',
+    moreCountText: 'ほか{count}件',
+    loadingText: '読み込み中...'
   },
   colorPicker: {
     trigger: '色を選択',

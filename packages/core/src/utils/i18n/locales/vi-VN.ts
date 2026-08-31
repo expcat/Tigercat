@@ -276,7 +276,12 @@ export const viVN: TigerLocale = {
   select: {
     doneText: 'Hoàn thành',
     placeholder: 'Chọn một tùy chọn',
-    emptyText: 'Không có tùy chọn'
+    emptyText: 'Không có tùy chọn',
+    searchPlaceholder: 'Tìm kiếm',
+    clearAriaLabel: 'Xóa lựa chọn',
+    createOptionLabel: 'Tạo "{label}"',
+    moreCountText: '+{count} nữa',
+    loadingText: 'Đang tải...'
   },
   colorPicker: {
     trigger: 'Chọn màu',

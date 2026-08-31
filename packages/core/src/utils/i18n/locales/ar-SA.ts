@@ -276,7 +276,12 @@ export const arSA: TigerLocale = {
   select: {
     doneText: 'إنهاء',
     placeholder: 'اختر خياراً',
-    emptyText: 'لا توجد خيارات'
+    emptyText: 'لا توجد خيارات',
+    searchPlaceholder: 'بحث',
+    clearAriaLabel: 'مسح التحديد',
+    createOptionLabel: 'إنشاء "{label}"',
+    moreCountText: '+{count} إضافية',
+    loadingText: 'جار التحميل...'
   },
   colorPicker: {
     trigger: 'اختيار لون',

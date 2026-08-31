@@ -276,7 +276,12 @@ export const idID: TigerLocale = {
   select: {
     doneText: 'Selesai',
     placeholder: 'Pilih opsi',
-    emptyText: 'Tidak ada opsi'
+    emptyText: 'Tidak ada opsi',
+    searchPlaceholder: 'Cari',
+    clearAriaLabel: 'Hapus pilihan',
+    createOptionLabel: 'Buat "{label}"',
+    moreCountText: '+{count} lagi',
+    loadingText: 'Memuat...'
   },
   colorPicker: {
     trigger: 'Pilih warna',

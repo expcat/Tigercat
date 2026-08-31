@@ -357,6 +357,16 @@ export interface TigerLocaleSelect {
   placeholder?: string
   /** Empty options list / no-match copy */
   emptyText?: string
+  /** Search input placeholder */
+  searchPlaceholder?: string
+  /** Clear-selection control accessible name */
+  clearAriaLabel?: string
+  /** Creatable row sentence. Template: supports {label} */
+  createOptionLabel?: string
+  /** Overflow count after maxTagCount. Template: supports {count} */
+  moreCountText?: string
+  /** Remote-loading copy shown in the panel */
+  loadingText?: string
 }
 
 export interface TigerLocaleColorPicker {

@@ -276,7 +276,12 @@ export const zhCN: TigerLocale = {
   select: {
     doneText: '完成',
     placeholder: '请选择',
-    emptyText: '暂无选项'
+    emptyText: '暂无选项',
+    searchPlaceholder: '搜索',
+    clearAriaLabel: '清除选择',
+    createOptionLabel: '创建“{label}”',
+    moreCountText: '等 {count} 项',
+    loadingText: '加载中...'
   },
   colorPicker: {
     trigger: '选择颜色',

@@ -276,7 +276,12 @@ export const deDE: TigerLocale = {
   select: {
     doneText: 'Fertigstellen',
     placeholder: 'Option auswählen',
-    emptyText: 'Keine Optionen gefunden'
+    emptyText: 'Keine Optionen gefunden',
+    searchPlaceholder: 'Suchen',
+    clearAriaLabel: 'Auswahl löschen',
+    createOptionLabel: '"{label}" erstellen',
+    moreCountText: '+{count} weitere',
+    loadingText: 'Wird geladen...'
   },
   colorPicker: {
     trigger: 'Farbe wählen',

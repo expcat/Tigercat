@@ -152,11 +152,16 @@ describe('i18n locale presets', () => {
     }
   })
 
-  it('all locales have select.doneText, placeholder, and emptyText', () => {
+  it('all locales have select.doneText, placeholder, emptyText, and createOptionLabel', () => {
     for (const [, locale] of Object.entries(locales)) {
       expect(locale.select?.doneText).toBeDefined()
       expect(locale.select?.placeholder).toBeDefined()
       expect(locale.select?.emptyText).toBeDefined()
+      expect(locale.select?.searchPlaceholder).toBeDefined()
+      expect(locale.select?.clearAriaLabel).toBeDefined()
+      expect(locale.select?.createOptionLabel).toBeDefined()
+      expect(locale.select?.moreCountText).toBeDefined()
+      expect(locale.select?.loadingText).toBeDefined()
     }
   })
 

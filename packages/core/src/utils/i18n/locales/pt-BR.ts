@@ -276,7 +276,12 @@ export const ptBR: TigerLocale = {
   select: {
     doneText: 'Concluir',
     placeholder: 'Selecione uma opção',
-    emptyText: 'Nenhuma opção encontrada'
+    emptyText: 'Nenhuma opção encontrada',
+    searchPlaceholder: 'Pesquisar',
+    clearAriaLabel: 'Limpar seleção',
+    createOptionLabel: 'Criar "{label}"',
+    moreCountText: '+{count} mais',
+    loadingText: 'Carregando...'
   },
   colorPicker: {
     trigger: 'Escolher cor',

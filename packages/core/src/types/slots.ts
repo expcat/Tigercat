@@ -86,6 +86,8 @@ export interface SelectOptionSlotContext<T extends string | number = string | nu
   disabled?: boolean
   /** Whether option is currently selected */
   selected?: boolean
+  /** Whether the option is the keyboard highlight */
+  active?: boolean
 }
 
 // ---------------------------------------------------------------------------

@@ -276,7 +276,12 @@ export const koKR: TigerLocale = {
   select: {
     doneText: '완료',
     placeholder: '옵션 선택',
-    emptyText: '옵션 없음'
+    emptyText: '옵션 없음',
+    searchPlaceholder: '검색',
+    clearAriaLabel: '선택 지우기',
+    createOptionLabel: '"{label}" 만들기',
+    moreCountText: '외 {count}개',
+    loadingText: '불러오는 중...'
   },
   colorPicker: {
     trigger: '색 선택',

@@ -26,8 +26,10 @@ export type NumberChangeHandler = (value: number) => void
 /** Callback when a boolean value changes (Switch, Checkbox single, etc.) */
 export type BooleanChangeHandler = (checked: boolean) => void
 
-/** Callback when a selection value changes (Select, Radio, etc.) */
-export type SelectChangeHandler<T extends string | number = string | number> = (value: T) => void
+/** Callback when a selection value changes (Select single; clear emits `undefined`) */
+export type SelectChangeHandler<T extends string | number = string | number> = (
+  value: T | undefined
+) => void
 
 /** Callback when multiple selection values change (Select multiple, Checkbox group, etc.) */
 export type MultiSelectChangeHandler<T extends string | number = string | number> = (

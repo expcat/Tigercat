@@ -10,6 +10,7 @@
 
 import type { FormRuleTrigger, FormRuleType } from './form'
 import type { ComponentSize } from './base'
+import type { SelectOption, SelectOptionGroup, SelectProps } from './select'
 
 // ---------------------------------------------------------------------------
 // Select<T> generics
@@ -18,27 +19,25 @@ import type { ComponentSize } from './base'
 /**
  * A Select option whose value is constrained to T.
  */
-export interface GenericSelectOption<T extends string | number = string | number> {
-  /** Option value */
+export type GenericSelectOption<T extends string | number = string | number> = Omit<
+  SelectOption,
+  'value'
+> & {
   value: T
-  /** Display label */
-  label: string
-  /** Whether option is disabled @default false */
-  disabled?: boolean
 }
 
 /**
  * A Select option group.
  */
-export interface GenericSelectOptionGroup<T extends string | number = string | number> {
-  /** Group label */
-  label: string
-  /** Options within this group */
+export type GenericSelectOptionGroup<T extends string | number = string | number> = Omit<
+  SelectOptionGroup,
+  'options'
+> & {
   options: GenericSelectOption<T>[]
 }
 
 /**
- * Generic Select props with type-safe value/options.
+ * Generic Select props with type-safe value/options. Same contract as {@link SelectProps}.
  *
  * @example
  * ```ts
@@ -50,23 +49,13 @@ export interface GenericSelectOptionGroup<T extends string | number = string | n
  * }
  * ```
  */
-export interface GenericSelectProps<T extends string | number = string | number> {
-  /** Select size @default 'md' */
-  size?: ComponentSize
-  /** Whether disabled @default false */
-  disabled?: boolean
-  /** Placeholder text */
-  placeholder?: string
-  /** Allow search @default false */
-  searchable?: boolean
-  /** Allow multiple selection @default false */
-  multiple?: boolean
-  /** Allow clearing @default true */
-  clearable?: boolean
-  /** Typed options list */
+export interface GenericSelectProps<T extends string | number = string | number> extends Omit<
+  SelectProps,
+  'options' | 'value' | 'defaultValue'
+> {
   options?: Array<GenericSelectOption<T> | GenericSelectOptionGroup<T>>
-  /** Text when the options list is empty or no search result matches */
-  emptyText?: string
+  value?: T | T[]
+  defaultValue?: T | T[]
 }
 
 // ---------------------------------------------------------------------------

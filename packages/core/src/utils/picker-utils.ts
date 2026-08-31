@@ -200,6 +200,7 @@ export function getPickerTriggerKeyAction(key: string, expanded: boolean): Picke
     case ' ':
       return 'toggle'
     case 'ArrowDown':
+    case 'ArrowUp':
       return expanded ? 'none' : 'open'
     case 'Escape':
       return expanded ? 'close' : 'none'
