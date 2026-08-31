@@ -49,6 +49,9 @@ export const thTH: TigerLocale = {
     previewFallbackAlt: 'รูปภาพ',
     groupAriaLabel: 'กลุ่มรูปภาพ'
   },
+  imageCompare: {
+    ariaLabel: 'เปรียบเทียบรูปภาพ'
+  },
   timeline: {
     pendingText: 'กำลังโหลด...'
   },

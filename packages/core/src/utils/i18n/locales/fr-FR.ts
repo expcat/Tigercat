@@ -49,6 +49,9 @@ export const frFR: TigerLocale = {
     previewFallbackAlt: 'image',
     groupAriaLabel: "Groupe d'images"
   },
+  imageCompare: {
+    ariaLabel: "Comparaison d'images"
+  },
   timeline: {
     pendingText: 'Chargement...'
   },

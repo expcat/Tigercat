@@ -49,6 +49,9 @@ export const jaJP: TigerLocale = {
     previewFallbackAlt: '画像',
     groupAriaLabel: '画像グループ'
   },
+  imageCompare: {
+    ariaLabel: '画像比較'
+  },
   timeline: {
     pendingText: '読み込み中...'
   },

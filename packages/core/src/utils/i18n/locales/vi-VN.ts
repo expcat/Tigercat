@@ -49,6 +49,9 @@ export const viVN: TigerLocale = {
     previewFallbackAlt: 'hình ảnh',
     groupAriaLabel: 'Nhóm hình ảnh'
   },
+  imageCompare: {
+    ariaLabel: 'So sánh hình ảnh'
+  },
   timeline: {
     pendingText: 'Đang tải...'
   },

@@ -8,7 +8,7 @@
 import type { ImageFit } from './image'
 
 /**
- * Comparison axis. `horizontal` clips the before image from the left;
+ * Comparison axis. `horizontal` clips the before image from inline-start;
  * `vertical` clips it from the top.
  */
 export type ImageCompareOrientation = 'horizontal' | 'vertical'
@@ -32,11 +32,6 @@ export const DEFAULT_IMAGE_COMPARE_ORIENTATION: ImageCompareOrientation = 'horiz
  * Default object-fit, matching {@link import('./image').ImageProps}
  */
 export const DEFAULT_IMAGE_COMPARE_FIT: ImageFit = 'cover'
-
-/**
- * Default accessible name for the comparison handle
- */
-export const DEFAULT_IMAGE_COMPARE_ARIA_LABEL = 'Image comparison'
 
 /**
  * Base ImageCompare props interface (framework-agnostic)
@@ -113,8 +108,9 @@ export interface ImageCompareProps {
   height?: number | string
 
   /**
-   * Accessible name for the comparison handle
-   * @default 'Image comparison'
+   * Accessible name for the comparison handle.
+   * Empty or whitespace is treated as omitted; the ConfigProvider
+   * `locale.imageCompare.ariaLabel` is used when no `aria-labelledby` is set.
    */
   ariaLabel?: string
 

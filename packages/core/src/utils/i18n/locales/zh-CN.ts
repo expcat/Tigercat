@@ -48,6 +48,9 @@ export const zhCN: TigerLocale = {
     previewFallbackAlt: '图片',
     groupAriaLabel: '图片组'
   },
+  imageCompare: {
+    ariaLabel: '图片对比'
+  },
   timeline: {
     pendingText: '加载中...'
   },

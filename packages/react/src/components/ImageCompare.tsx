@@ -1,5 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import {
+  createDocumentDragSession,
   getImageCompareAfterClasses,
   getImageCompareBeforeClasses,
   getImageCompareClipStyle,
@@ -8,6 +9,7 @@ import {
   getImageCompareImgClasses,
   getImageCompareKeyboardPosition,
   getImageCompareKnobClasses,
+  getImageCompareLabels,
   getImageCompareLineClasses,
   getImageComparePointerClientPoint,
   getImageComparePositionFromPointer,
@@ -19,10 +21,13 @@ import {
   resolveImageCompareFit,
   resolveImageCompareOrientation,
   resolveImageComparePosition,
+  resolveImageCompareRtl,
   resolveImageCompareStep,
+  type DocumentDragSession,
   type ImageCompareProps as CoreImageCompareProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ImageCompareProps
   extends
@@ -76,9 +81,9 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
       before,
       after,
       onChange,
-      onMouseDown,
-      onTouchStart,
+      onPointerDown,
       onKeyDown,
+      dir,
       ...rest
     },
     ref
@@ -90,8 +95,12 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
       ...domProps
     } = rest
 
+    const config = useTigerConfig()
+    const labels = getImageCompareLabels(config.locale)
     const resolvedOrientation = resolveImageCompareOrientation(orientation)
     const resolvedStep = resolveImageCompareStep(step)
+    const resolvedDir = typeof dir === 'string' ? dir : config.direction
+    const rtl = resolveImageCompareRtl(resolvedDir)
     const [current, setCurrent] = useControlledState({
       value: controlledPosition,
       defaultValue: defaultPosition ?? 50,
@@ -101,11 +110,14 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
     const [dragging, setDragging] = useState(false)
     const rootRef = useRef<HTMLDivElement | null>(null)
     const handleRef = useRef<HTMLDivElement | null>(null)
-    const draggingRef = useRef(false)
+    const dragSessionRef = useRef<DocumentDragSession | null>(null)
     const vertical = isImageCompareVertical(resolvedOrientation)
-    const resolvedAriaLabel = resolveImageCompareAriaLabel(
+    const explicitAriaLabel = resolveImageCompareAriaLabel(
       typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
     )
+    const resolvedAriaLabel = ariaLabelledby
+      ? explicitAriaLabel
+      : (explicitAriaLabel ?? labels.ariaLabel)
 
     const setRootRef = useCallback(
       (node: HTMLDivElement | null) => {
@@ -123,84 +135,62 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
       [setCurrent]
     )
 
-    const positionFromEvent = useCallback(
-      (event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent): number | null => {
+    const positionFromPoint = useCallback(
+      (clientX: number, clientY: number): number | null => {
         const root = rootRef.current
-        const source = 'nativeEvent' in event ? event.nativeEvent : event
-        const point = getImageComparePointerClientPoint(source)
-        if (!root || !point) return null
+        if (!root) return null
         return getImageComparePositionFromPointer({
-          clientX: point.clientX,
-          clientY: point.clientY,
+          clientX,
+          clientY,
           rect: root.getBoundingClientRect(),
           orientation: resolvedOrientation,
-          step: resolvedStep
+          step: resolvedStep,
+          rtl
         })
       },
-      [resolvedOrientation, resolvedStep]
+      [resolvedOrientation, resolvedStep, rtl]
     )
 
-    const handleMove = useCallback(
-      (event: MouseEvent | TouchEvent) => {
-        if (disabled || !draggingRef.current) return
-        const next = positionFromEvent(event)
-        if (next === null) return
-        commit(next)
-      },
-      [commit, disabled, positionFromEvent]
-    )
-
-    const handleEnd = useCallback(() => {
-      draggingRef.current = false
+    const stopDrag = useCallback(() => {
+      dragSessionRef.current?.dispose()
+      dragSessionRef.current = null
       setDragging(false)
     }, [])
 
-    useEffect(() => {
-      if (!dragging) return
+    useEffect(() => stopDrag, [stopDrag])
 
-      document.addEventListener('mousemove', handleMove)
-      document.addEventListener('mouseup', handleEnd)
-      document.addEventListener('touchmove', handleMove)
-      document.addEventListener('touchend', handleEnd)
-
-      return () => {
-        document.removeEventListener('mousemove', handleMove)
-        document.removeEventListener('mouseup', handleEnd)
-        document.removeEventListener('touchmove', handleMove)
-        document.removeEventListener('touchend', handleEnd)
-      }
-    }, [dragging, handleEnd, handleMove])
-
-    const startDrag = useCallback(
-      (event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    const handlePointerDown = useCallback(
+      (event: React.PointerEvent<HTMLDivElement>) => {
+        onPointerDown?.(event)
+        if (event.defaultPrevented) return
         if (disabled) return
-        if ('button' in event && event.button !== 0) return
+        if (event.button !== 0) return
         if (isImageCompareInteractiveTarget(event.target, handleRef.current)) return
 
         event.preventDefault()
-        draggingRef.current = true
-        setDragging(true)
-        const next = positionFromEvent(event)
+        const next = positionFromPoint(event.clientX, event.clientY)
         if (next !== null) commit(next)
         handleRef.current?.focus()
+        setDragging(true)
+        dragSessionRef.current?.dispose()
+        dragSessionRef.current = createDocumentDragSession({
+          startX: event.clientX,
+          startY: event.clientY,
+          ownerDocument: event.currentTarget.ownerDocument,
+          pointerId: event.pointerId,
+          pointerTarget: event.currentTarget,
+          onMove: ({ event: moveEvent, currentX, currentY }) => {
+            if (moveEvent.cancelable) moveEvent.preventDefault()
+            const moved = positionFromPoint(currentX, currentY)
+            if (moved !== null) commit(moved)
+          },
+          onEnd: () => {
+            dragSessionRef.current = null
+            setDragging(false)
+          }
+        })
       },
-      [commit, disabled, positionFromEvent]
-    )
-
-    const handleMouseDown = useCallback(
-      (event: React.MouseEvent<HTMLDivElement>) => {
-        startDrag(event)
-        onMouseDown?.(event)
-      },
-      [onMouseDown, startDrag]
-    )
-
-    const handleTouchStart = useCallback(
-      (event: React.TouchEvent<HTMLDivElement>) => {
-        startDrag(event)
-        onTouchStart?.(event)
-      },
-      [onTouchStart, startDrag]
+      [commit, disabled, onPointerDown, positionFromPoint]
     )
 
     const handleKeyDown = useCallback(
@@ -209,20 +199,24 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
           onKeyDown?.(event)
           return
         }
-        const next = getImageCompareKeyboardPosition(event.key, current, resolvedStep)
+        const next = getImageCompareKeyboardPosition(event.key, current, resolvedStep, {
+          orientation: resolvedOrientation,
+          rtl
+        })
         if (next !== null) {
           event.preventDefault()
           commit(next)
         }
         onKeyDown?.(event)
       },
-      [commit, current, disabled, onKeyDown, resolvedStep]
+      [commit, current, disabled, onKeyDown, resolvedOrientation, resolvedStep, rtl]
     )
 
     return (
       <div
         {...domProps}
         ref={setRootRef}
+        dir={resolvedDir}
         data-image-compare=""
         data-image-compare-orientation={resolvedOrientation}
         data-image-compare-position={String(current)}
@@ -235,21 +229,18 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
         })}
         style={{
           ...getImageCompareRootStyle({
-            position: current,
-            step: resolvedStep,
             width,
             height
           }),
           ...style
         }}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}>
+        onPointerDown={handlePointerDown}>
         <div className={getImageCompareAfterClasses()} data-image-compare-after="">
           {renderPaneContent(after, afterSrc, afterAlt, fit)}
         </div>
         <div
           className={getImageCompareBeforeClasses()}
-          style={getImageCompareClipStyle(current, resolvedOrientation, resolvedStep)}
+          style={getImageCompareClipStyle(current, resolvedOrientation, resolvedStep, rtl)}
           data-image-compare-before="">
           {renderPaneContent(before, beforeSrc, beforeAlt, fit)}
         </div>
@@ -259,7 +250,7 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
             orientation: resolvedOrientation,
             disabled
           })}
-          style={getImageCompareHandleStyle(current, resolvedOrientation, resolvedStep)}
+          style={getImageCompareHandleStyle(current, resolvedOrientation, resolvedStep, rtl)}
           data-image-compare-handle=""
           role="slider"
           tabIndex={disabled ? -1 : 0}

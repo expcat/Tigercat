@@ -7,7 +7,6 @@
  */
 
 import {
-  DEFAULT_IMAGE_COMPARE_ARIA_LABEL,
   DEFAULT_IMAGE_COMPARE_FIT,
   DEFAULT_IMAGE_COMPARE_ORIENTATION,
   DEFAULT_IMAGE_COMPARE_POSITION,
@@ -23,12 +22,9 @@ import {
   sliderNormalizeValue
 } from './helpers/slider-utils'
 
-/** CSS custom property written onto the root for the visible before portion */
-export const IMAGE_COMPARE_POSITION_VAR = '--tiger-image-compare-position'
-
-/** Root overflow clip */
+/** Root surface. Overflow clip lives on the panes so the handle knob stays visible. */
 export const imageCompareRootClasses =
-  'tiger-image-compare relative overflow-hidden select-none touch-none max-w-full'
+  'tiger-image-compare relative select-none touch-none max-w-full'
 
 /** Horizontal axis */
 export const imageCompareHorizontalClasses = 'tiger-image-compare-horizontal'
@@ -41,21 +37,21 @@ export const imageCompareDisabledClasses = 'tiger-image-compare-disabled cursor-
 
 /** After (ending) image sits in flow and sizes the widget */
 export const imageCompareAfterClasses =
-  'tiger-image-compare-after relative block w-full h-full [&>img]:pointer-events-none [&>img]:select-none [&>img]:max-w-none'
+  'tiger-image-compare-after relative block w-full h-full overflow-hidden [&>img]:pointer-events-none [&>img]:select-none [&>img]:max-w-none'
 
 /** Before (starting) image overlays and is clipped by handle position */
 export const imageCompareBeforeClasses =
-  'tiger-image-compare-before absolute inset-0 overflow-hidden [&>img]:pointer-events-none [&>img]:select-none [&>img]:max-w-none'
+  'tiger-image-compare-before absolute inset-0 overflow-hidden pointer-events-none [&>img]:pointer-events-none [&>img]:select-none [&>img]:max-w-none'
 
 /** Focusable divider / slider handle */
 export const imageCompareHandleClasses =
-  'tiger-image-compare-handle absolute z-10 flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2'
+  'tiger-image-compare-handle absolute z-10 flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
-/** Horizontal handle hit area */
-export const imageCompareHandleHorizontalClasses = 'inset-y-0 w-6 -translate-x-1/2 cursor-ew-resize'
+/** Horizontal handle hit area. Centering uses inline transform, not a physical -translate-x. */
+export const imageCompareHandleHorizontalClasses = 'inset-y-0 w-6 cursor-ew-resize'
 
 /** Vertical handle hit area */
-export const imageCompareHandleVerticalClasses = 'inset-x-0 h-6 -translate-y-1/2 cursor-ns-resize'
+export const imageCompareHandleVerticalClasses = 'inset-x-0 h-6 cursor-ns-resize'
 
 /** Disabled handle */
 export const imageCompareHandleDisabledClasses = 'cursor-not-allowed'
@@ -94,6 +90,13 @@ export function isImageCompareVertical(orientation?: ImageCompareOrientation): b
 }
 
 /**
+ * Whether comparison geometry should use RTL inline axes.
+ */
+export function resolveImageCompareRtl(dir?: string): boolean {
+  return dir === 'rtl'
+}
+
+/**
  * Resolve object-fit, falling back to {@link DEFAULT_IMAGE_COMPARE_FIT}.
  */
 export function resolveImageCompareFit(fit?: ImageFit): ImageFit {
@@ -124,15 +127,15 @@ export function resolveImageComparePosition(position?: number, step?: number): n
 }
 
 /**
- * Resolve the accessible name. Empty or whitespace-only values fall back
- * to {@link DEFAULT_IMAGE_COMPARE_ARIA_LABEL}.
+ * Resolve an explicit accessible name. Empty or whitespace-only values are
+ * omitted so the caller can fall back to locale or `aria-labelledby`.
  */
-export function resolveImageCompareAriaLabel(label?: string): string {
+export function resolveImageCompareAriaLabel(label?: string): string | undefined {
   if (typeof label === 'string') {
     const trimmed = label.trim()
     if (trimmed) return trimmed
   }
-  return DEFAULT_IMAGE_COMPARE_ARIA_LABEL
+  return undefined
 }
 
 export interface ImageComparePointerRect {
@@ -142,7 +145,17 @@ export interface ImageComparePointerRect {
   height: number
 }
 
-const IMAGE_COMPARE_INTERACTIVE_SELECTOR = 'a, button, input, textarea, select, [role="button"]'
+const IMAGE_COMPARE_INTERACTIVE_SELECTOR =
+  'a, button, input, textarea, select, label, summary, [contenteditable], [role="button"], [role="link"], [role="slider"]'
+
+function asElement(target: EventTarget | null): Element | null {
+  if (target instanceof Element) return target
+  if (target instanceof Node) {
+    const parent = target.parentElement
+    return parent instanceof Element ? parent : null
+  }
+  return null
+}
 
 /**
  * Whether a pointer target is an interactive slot child that should not start
@@ -152,13 +165,14 @@ export function isImageCompareInteractiveTarget(
   target: EventTarget | null,
   handle: EventTarget | null
 ): boolean {
-  if (!(target instanceof Element)) return false
-  if (handle instanceof Node && handle.contains(target)) return false
-  return target.closest(IMAGE_COMPARE_INTERACTIVE_SELECTOR) !== null
+  const element = asElement(target)
+  if (!element) return false
+  if (handle instanceof Node && handle.contains(element)) return false
+  return element.closest(IMAGE_COMPARE_INTERACTIVE_SELECTOR) !== null
 }
 
 /**
- * Read client coordinates from a mouse or touch event-like object.
+ * Read client coordinates from a mouse, touch, or pointer event-like object.
  */
 export function getImageComparePointerClientPoint(event: {
   clientX?: number
@@ -177,7 +191,7 @@ export function getImageComparePointerClientPoint(event: {
 
 /**
  * Convert a pointer location inside the comparison surface into a snapped
- * 0..100 position.
+ * 0..100 position. Horizontal RTL measures from inline-start (the right edge).
  */
 export function getImageComparePositionFromPointer(input: {
   clientX: number
@@ -185,6 +199,7 @@ export function getImageComparePositionFromPointer(input: {
   rect: ImageComparePointerRect
   orientation?: ImageCompareOrientation
   step?: number
+  rtl?: boolean
 }): number {
   const orientation = resolveImageCompareOrientation(input.orientation)
   const step = resolveImageCompareStep(input.step)
@@ -192,20 +207,34 @@ export function getImageComparePositionFromPointer(input: {
   if (orientation === 'vertical') {
     return sliderGetValueFromPosition(input.clientY - rect.top, rect.height, 0, 100, step)
   }
-  return sliderGetValueFromPosition(input.clientX - rect.left, rect.width, 0, 100, step)
+  const offset = input.rtl ? rect.left + rect.width - input.clientX : input.clientX - rect.left
+  return sliderGetValueFromPosition(offset, rect.width, 0, 100, step)
+}
+
+export interface ImageCompareKeyboardOptions {
+  orientation?: ImageCompareOrientation
+  rtl?: boolean
 }
 
 /**
- * Keyboard adjustment for the comparison handle. Reuses slider key mapping:
- * ArrowRight/ArrowUp increase, ArrowLeft/ArrowDown decrease, Home/End, PageUp/PageDown.
+ * Keyboard adjustment for the comparison handle. Reuses slider key mapping.
+ * Horizontal RTL swaps ArrowLeft/ArrowRight so ArrowRight decreases.
  */
 export function getImageCompareKeyboardPosition(
   key: string,
   current: number,
-  step?: number
+  step?: number,
+  options?: ImageCompareKeyboardOptions
 ): number | null {
+  const vertical = isImageCompareVertical(options?.orientation)
+  const rtl = Boolean(options?.rtl) && !vertical
+  let mapped = key
+  if (rtl) {
+    if (key === 'ArrowRight') mapped = 'ArrowLeft'
+    else if (key === 'ArrowLeft') mapped = 'ArrowRight'
+  }
   return sliderGetKeyboardValue(
-    key,
+    mapped,
     resolveImageComparePosition(current, step),
     0,
     100,
@@ -214,51 +243,55 @@ export function getImageCompareKeyboardPosition(
 }
 
 /**
- * Clip-path that reveals `position` percent of the before image.
+ * Clip-path that reveals `position` percent of the before image from
+ * inline-start (or from the top when vertical).
  */
 export function getImageCompareClipStyle(
   position?: number,
   orientation?: ImageCompareOrientation,
-  step?: number
+  step?: number,
+  rtl?: boolean
 ): Record<string, string> {
   const resolved = resolveImageComparePosition(position, step)
   const clipped = `${100 - resolved}%`
   if (isImageCompareVertical(orientation)) {
     return { clipPath: `inset(0 0 ${clipped} 0)` }
   }
+  if (rtl) {
+    return { clipPath: `inset(0 0 0 ${clipped})` }
+  }
   return { clipPath: `inset(0 ${clipped} 0 0)` }
 }
 
 /**
- * Absolute offset for the divider handle.
+ * Absolute offset for the divider handle, from inline-start (or top).
  */
 export function getImageCompareHandleStyle(
   position?: number,
   orientation?: ImageCompareOrientation,
-  step?: number
+  step?: number,
+  rtl?: boolean
 ): Record<string, string> {
   const resolved = resolveImageComparePosition(position, step)
   if (isImageCompareVertical(orientation)) {
-    return { top: `${resolved}%` }
+    return { top: `${resolved}%`, transform: 'translateY(-50%)' }
   }
-  return { left: `${resolved}%` }
+  return {
+    insetInlineStart: `${resolved}%`,
+    transform: rtl ? 'translateX(50%)' : 'translateX(-50%)'
+  }
 }
 
 /**
- * CSS variables and optional width/height on the root.
+ * Optional width/height on the root.
  */
 export function getImageCompareRootStyle(
   input: {
-    position?: number
-    step?: number
     width?: number | string
     height?: number | string
   } = {}
 ): Record<string, string> {
-  const position = resolveImageComparePosition(input.position, input.step)
-  const style: Record<string, string> = {
-    [IMAGE_COMPARE_POSITION_VAR]: `${position}%`
-  }
+  const style: Record<string, string> = {}
   const width = toCSSSize(input.width)
   const height = toCSSSize(input.height)
   if (width) style.width = width

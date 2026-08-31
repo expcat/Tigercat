@@ -5,7 +5,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { ImageCompare } from '@expcat/tigercat-react/ImageCompare'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
@@ -58,7 +60,16 @@ describe('ImageCompare', () => {
       expect(handle).toHaveAttribute('aria-valuemin', '0')
       expect(handle).toHaveAttribute('aria-valuemax', '100')
       expect(handle).toHaveAttribute('aria-orientation', 'horizontal')
-      expect(screen.getByRole('slider', { name: 'Image comparison' })).toBe(handle)
+      expect(screen.getByRole('slider')).toBe(handle)
+    })
+
+    it('names the slider from ConfigProvider locale when no override is passed', () => {
+      const { container } = render(
+        <ConfigProvider locale={zhCN}>
+          <ImageCompare beforeSrc="/b.jpg" afterSrc="/a.jpg" />
+        </ConfigProvider>
+      )
+      expect(getHandle(container)).toHaveAttribute('aria-label', '图片对比')
     })
 
     it('forwards the ref to the root surface', () => {
@@ -111,6 +122,22 @@ describe('ImageCompare', () => {
       expect(onChange).toHaveBeenCalledWith(51)
     })
 
+    it('decreases on ArrowRight in RTL horizontal mode', () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <ImageCompare
+          dir="rtl"
+          beforeSrc="/b.jpg"
+          afterSrc="/a.jpg"
+          position={30}
+          onChange={onChange}
+        />
+      )
+      expect(getImageCompareClip(container)).toContain('inset(0 0 0 70%)')
+      fireEvent.keyDown(getHandle(container), { key: 'ArrowRight' })
+      expect(onChange).toHaveBeenCalledWith(29)
+    })
+
     it('does not emit when disabled', () => {
       const onChange = vi.fn()
       const { container } = render(
@@ -147,13 +174,75 @@ describe('ImageCompare', () => {
       )
       const root = getRoot(container)
       stubRootRect(root)
-      fireEvent.mouseDown(root, { clientX: 80, clientY: 10, button: 0 })
+      fireEvent.pointerDown(root, { pointerId: 1, clientX: 80, clientY: 10, button: 0 })
       expect(onChange).toHaveBeenCalledWith(40)
       expect(root).toHaveAttribute('data-image-compare-position', '40')
-      fireEvent.mouseMove(document, { clientX: 160, clientY: 10 })
+      fireEvent.pointerMove(document, { pointerId: 1, clientX: 160, clientY: 10 })
       expect(onChange).toHaveBeenCalledWith(80)
-      fireEvent.mouseUp(document)
+      fireEvent.pointerUp(document, { pointerId: 1 })
       expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
+    })
+
+    it('stops dragging on pointercancel', () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <ImageCompare
+          beforeSrc="/b.jpg"
+          afterSrc="/a.jpg"
+          defaultPosition={50}
+          onChange={onChange}
+        />
+      )
+      const root = getRoot(container)
+      stubRootRect(root)
+      fireEvent.pointerDown(root, { pointerId: 1, clientX: 80, clientY: 10, button: 0 })
+      onChange.mockClear()
+      fireEvent.pointerCancel(document, { pointerId: 1 })
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
+      fireEvent.pointerMove(document, { pointerId: 1, clientX: 160, clientY: 10 })
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('does not start a drag when the user listener prevents default', () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <ImageCompare
+          beforeSrc="/b.jpg"
+          afterSrc="/a.jpg"
+          onChange={onChange}
+          onPointerDown={(event) => event.preventDefault()}
+        />
+      )
+      stubRootRect(getRoot(container))
+      fireEvent.pointerDown(getRoot(container), {
+        pointerId: 1,
+        clientX: 80,
+        clientY: 10,
+        button: 0
+      })
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('lets a visible after-slot button receive click without moving the handle', () => {
+      const onChange = vi.fn()
+      const onClick = vi.fn()
+      const { container } = render(
+        <ImageCompare
+          beforeSrc="/b.jpg"
+          afterSrc="/a.jpg"
+          position={20}
+          onChange={onChange}
+          after={
+            <button type="button" onClick={onClick}>
+              After action
+            </button>
+          }
+        />
+      )
+      fireEvent.click(screen.getByRole('button', { name: 'After action' }))
+      expect(onClick).toHaveBeenCalled()
+      expect(onChange).not.toHaveBeenCalled()
+      expect(getRoot(container)).toHaveAttribute('data-image-compare-dragging', 'false')
     })
   })
 
@@ -175,6 +264,14 @@ describe('ImageCompare', () => {
       expect(handle).toHaveAttribute('aria-valuenow', '50')
       fireEvent.keyDown(handle, { key: 'ArrowRight' })
       expect(handle).toHaveAttribute('aria-valuenow', '51')
+    })
+
+    it('keeps the last position when dropping controlled position', () => {
+      const { container, rerender } = render(
+        <ImageCompare beforeSrc="/b.jpg" afterSrc="/a.jpg" position={80} />
+      )
+      rerender(<ImageCompare beforeSrc="/b.jpg" afterSrc="/a.jpg" />)
+      expect(getHandle(container)).toHaveAttribute('aria-valuenow', '80')
     })
   })
 
@@ -203,6 +300,17 @@ describe('ImageCompare', () => {
         <ImageCompare beforeSrc="/b.jpg" afterSrc="/a.jpg" aria-label="Renovation progress" />
       )
       expect(getHandle(container)).toHaveAttribute('aria-label', 'Renovation progress')
+    })
+
+    it('omits aria-label when named by aria-labelledby', () => {
+      const { container } = render(
+        <>
+          <span id="compare-name">Renovation</span>
+          <ImageCompare beforeSrc="/b.jpg" afterSrc="/a.jpg" aria-labelledby="compare-name" />
+        </>
+      )
+      expect(getHandle(container)).not.toHaveAttribute('aria-label')
+      expect(getHandle(container)).toHaveAttribute('aria-labelledby', 'compare-name')
     })
   })
 
@@ -233,3 +341,8 @@ describe('ImageCompare', () => {
     })
   })
 })
+
+function getImageCompareClip(container: HTMLElement): string {
+  const before = container.querySelector('[data-image-compare-before]') as HTMLElement
+  return before.style.clipPath
+}

@@ -24,6 +24,7 @@ export const TIGER_LOCALE_KEY_SET = {
   qrcode: true,
   marquee: true,
   image: true,
+  imageCompare: true,
   timeline: true,
   upload: true,
   pagination: true,

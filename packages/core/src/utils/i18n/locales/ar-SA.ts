@@ -49,6 +49,9 @@ export const arSA: TigerLocale = {
     previewFallbackAlt: 'صورة',
     groupAriaLabel: 'مجموعة الصور'
   },
+  imageCompare: {
+    ariaLabel: 'مقارنة الصور'
+  },
   timeline: {
     pendingText: 'جار التحميل...'
   },

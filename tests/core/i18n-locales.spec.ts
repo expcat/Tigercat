@@ -270,6 +270,7 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('timePicker')
     expect(TIGER_LOCALE_KEYS).toContain('marquee')
     expect(TIGER_LOCALE_KEYS).toContain('image')
+    expect(TIGER_LOCALE_KEYS).toContain('imageCompare')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

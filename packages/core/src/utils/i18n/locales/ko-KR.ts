@@ -49,6 +49,9 @@ export const koKR: TigerLocale = {
     previewFallbackAlt: '이미지',
     groupAriaLabel: '이미지 그룹'
   },
+  imageCompare: {
+    ariaLabel: '이미지 비교'
+  },
   timeline: {
     pendingText: '로딩 중...'
   },

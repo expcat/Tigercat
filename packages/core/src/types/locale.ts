@@ -59,6 +59,11 @@ export interface TigerLocaleImage {
   groupAriaLabel?: string
 }
 
+export interface TigerLocaleImageCompare {
+  /** Accessible name for the comparison slider handle */
+  ariaLabel?: string
+}
+
 export interface TigerLocaleTimeline {
   pendingText?: string
 }
@@ -527,6 +532,7 @@ export interface TigerLocale {
   qrcode?: TigerLocaleQRCode
   marquee?: TigerLocaleMarquee
   image?: TigerLocaleImage
+  imageCompare?: TigerLocaleImageCompare
   timeline?: TigerLocaleTimeline
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination

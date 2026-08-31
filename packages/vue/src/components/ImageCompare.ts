@@ -1,6 +1,7 @@
 import { defineComponent, h, onBeforeUnmount, PropType, ref, watch, type VNodeChild } from 'vue'
 import {
   composeComponentClasses,
+  createDocumentDragSession,
   getImageCompareAfterClasses,
   getImageCompareBeforeClasses,
   getImageCompareClipStyle,
@@ -9,11 +10,11 @@ import {
   getImageCompareImgClasses,
   getImageCompareKeyboardPosition,
   getImageCompareKnobClasses,
+  getImageCompareLabels,
   getImageCompareLineClasses,
   getImageComparePositionFromPointer,
   getImageCompareRootClasses,
   getImageCompareRootStyle,
-  getImageComparePointerClientPoint,
   isImageCompareInteractiveTarget,
   isImageCompareVertical,
   mergeStyleValues,
@@ -21,10 +22,13 @@ import {
   resolveImageCompareFit,
   resolveImageCompareOrientation,
   resolveImageComparePosition,
+  resolveImageCompareRtl,
   resolveImageCompareStep,
+  type DocumentDragSession,
   type ImageCompareOrientation,
   type ImageFit
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueImageCompareProps {
   beforeSrc?: string
@@ -44,10 +48,15 @@ export interface VueImageCompareProps {
   style?: Record<string, unknown>
 }
 
-function callAttrHandler(handler: unknown, event: Event): void {
+function invokeListener(handler: unknown, event: Event): void {
   if (typeof handler === 'function') {
-    const listener = handler as (event: Event) => void
-    listener(event)
+    handler(event)
+    return
+  }
+  if (Array.isArray(handler)) {
+    for (const fn of handler) {
+      if (typeof fn === 'function') fn(event)
+    }
   }
 }
 
@@ -148,8 +157,8 @@ export const ImageCompare = defineComponent({
       default: undefined
     },
     /**
-     * Accessible name for the comparison handle
-     * @default 'Image comparison'
+     * Accessible name for the comparison handle.
+     * Empty values fall back to `locale.imageCompare.ariaLabel`.
      */
     ariaLabel: {
       type: String,
@@ -181,12 +190,14 @@ export const ImageCompare = defineComponent({
     change: (value: number) => typeof value === 'number'
   },
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
     const rootRef = ref<HTMLElement | null>(null)
     const handleRef = ref<HTMLElement | null>(null)
     const dragging = ref(false)
     const internalPosition = ref(
       resolveImageComparePosition(props.position ?? props.defaultPosition, props.step)
     )
+    let dragSession: DocumentDragSession | null = null
 
     watch(
       () => props.position,
@@ -212,54 +223,62 @@ export const ImageCompare = defineComponent({
       emit('change', resolved)
     }
 
-    const positionFromEvent = (event: MouseEvent | TouchEvent): number | null => {
+    const resolvedDir = (): string | undefined => {
+      const attrDir = attrs.dir
+      if (typeof attrDir === 'string') return attrDir
+      return config.value.direction
+    }
+
+    const positionFromPoint = (clientX: number, clientY: number): number | null => {
       const root = rootRef.value
-      const point = getImageComparePointerClientPoint(event)
-      if (!root || !point) return null
+      if (!root) return null
       return getImageComparePositionFromPointer({
-        clientX: point.clientX,
-        clientY: point.clientY,
+        clientX,
+        clientY,
         rect: root.getBoundingClientRect(),
         orientation: props.orientation,
-        step: props.step
+        step: props.step,
+        rtl: resolveImageCompareRtl(resolvedDir())
       })
     }
 
-    const handleMove = (event: MouseEvent | TouchEvent): void => {
-      if (props.disabled || !dragging.value) return
-      const next = positionFromEvent(event)
-      if (next === null) return
-      commit(next)
-    }
-
-    const handleEnd = (): void => {
+    const stopDrag = (): void => {
+      dragSession?.dispose()
+      dragSession = null
       dragging.value = false
-      document.removeEventListener('mousemove', handleMove)
-      document.removeEventListener('mouseup', handleEnd)
-      document.removeEventListener('touchmove', handleMove)
-      document.removeEventListener('touchend', handleEnd)
     }
 
-    const startDrag = (event: MouseEvent | TouchEvent): void => {
+    const startDrag = (event: PointerEvent): void => {
       if (props.disabled) return
-      if ('button' in event && event.button !== 0) return
+      if (event.button !== 0) return
       if (isImageCompareInteractiveTarget(event.target, handleRef.value)) return
 
       event.preventDefault()
-      const alreadyDragging = dragging.value
-      dragging.value = true
-      const next = positionFromEvent(event)
+      const next = positionFromPoint(event.clientX, event.clientY)
       if (next !== null) commit(next)
       handleRef.value?.focus()
-
-      if (alreadyDragging) return
-      document.addEventListener('mousemove', handleMove)
-      document.addEventListener('mouseup', handleEnd)
-      document.addEventListener('touchmove', handleMove)
-      document.addEventListener('touchend', handleEnd)
+      dragging.value = true
+      dragSession?.dispose()
+      dragSession = createDocumentDragSession({
+        startX: event.clientX,
+        startY: event.clientY,
+        ownerDocument:
+          event.currentTarget instanceof Node ? event.currentTarget.ownerDocument : undefined,
+        pointerId: event.pointerId,
+        pointerTarget: event.currentTarget instanceof Element ? event.currentTarget : null,
+        onMove: ({ event: moveEvent, currentX, currentY }) => {
+          if (moveEvent.cancelable) moveEvent.preventDefault()
+          const moved = positionFromPoint(currentX, currentY)
+          if (moved !== null) commit(moved)
+        },
+        onEnd: () => {
+          dragSession = null
+          dragging.value = false
+        }
+      })
     }
 
-    onBeforeUnmount(handleEnd)
+    onBeforeUnmount(stopDrag)
 
     const renderPaneContent = (
       slot: (() => VNodeChild) | undefined,
@@ -282,27 +301,33 @@ export const ImageCompare = defineComponent({
       const step = resolveImageCompareStep(props.step)
       const position = currentPosition()
       const vertical = isImageCompareVertical(orientation)
+      const dir = resolvedDir()
+      const rtl = resolveImageCompareRtl(dir)
+      const labels = getImageCompareLabels(config.value.locale)
       const attrAriaLabel =
         typeof attrsRecord['aria-label'] === 'string' ? attrsRecord['aria-label'] : undefined
-      const ariaLabel = resolveImageCompareAriaLabel(attrAriaLabel ?? props.ariaLabel)
+      const explicitAriaLabel = resolveImageCompareAriaLabel(attrAriaLabel ?? props.ariaLabel)
       const {
         class: _class,
         style: _style,
+        dir: _dir,
         'aria-label': _ariaLabel,
         'aria-labelledby': ariaLabelledby,
         'aria-describedby': ariaDescribedby,
-        onMousedown,
-        onMouseDown,
-        onTouchstart,
-        onTouchStart,
+        onPointerdown,
+        onPointerDown,
         ...restAttrs
       } = attrsRecord
+      const resolvedAriaLabel = ariaLabelledby
+        ? explicitAriaLabel
+        : (explicitAriaLabel ?? labels.ariaLabel)
 
       return h(
         'div',
         {
           ...restAttrs,
           ref: rootRef,
+          dir,
           class: composeComponentClasses(
             getImageCompareRootClasses({
               orientation,
@@ -313,8 +338,6 @@ export const ImageCompare = defineComponent({
           ),
           style: mergeStyleValues(
             getImageCompareRootStyle({
-              position,
-              step,
               width: props.width,
               height: props.height
             }),
@@ -326,13 +349,10 @@ export const ImageCompare = defineComponent({
           'data-image-compare-position': String(position),
           'data-image-compare-disabled': props.disabled ? 'true' : 'false',
           'data-image-compare-dragging': dragging.value ? 'true' : 'false',
-          onMousedown: (event: MouseEvent) => {
+          onPointerdown: (event: PointerEvent) => {
+            invokeListener(onPointerdown ?? onPointerDown, event)
+            if (event.defaultPrevented) return
             startDrag(event)
-            callAttrHandler(onMousedown ?? onMouseDown, event)
-          },
-          onTouchstart: (event: TouchEvent) => {
-            startDrag(event)
-            callAttrHandler(onTouchstart ?? onTouchStart, event)
           }
         },
         [
@@ -348,7 +368,7 @@ export const ImageCompare = defineComponent({
             'div',
             {
               class: getImageCompareBeforeClasses(),
-              style: getImageCompareClipStyle(position, orientation, step),
+              style: getImageCompareClipStyle(position, orientation, step, rtl),
               'data-image-compare-before': ''
             },
             [renderPaneContent(slots.before, props.beforeSrc, props.beforeAlt)]
@@ -361,11 +381,11 @@ export const ImageCompare = defineComponent({
                 orientation,
                 disabled: props.disabled
               }),
-              style: getImageCompareHandleStyle(position, orientation, step),
+              style: getImageCompareHandleStyle(position, orientation, step, rtl),
               'data-image-compare-handle': '',
               role: 'slider',
               tabindex: props.disabled ? -1 : 0,
-              'aria-label': ariaLabel,
+              'aria-label': resolvedAriaLabel,
               'aria-labelledby': ariaLabelledby,
               'aria-describedby': ariaDescribedby,
               'aria-valuemin': 0,
@@ -376,7 +396,10 @@ export const ImageCompare = defineComponent({
               'aria-disabled': props.disabled,
               onKeydown: (event: KeyboardEvent) => {
                 if (props.disabled) return
-                const next = getImageCompareKeyboardPosition(event.key, position, step)
+                const next = getImageCompareKeyboardPosition(event.key, position, step, {
+                  orientation,
+                  rtl
+                })
                 if (next === null) return
                 event.preventDefault()
                 commit(next)

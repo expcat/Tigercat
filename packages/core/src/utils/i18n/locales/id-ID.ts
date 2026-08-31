@@ -49,6 +49,9 @@ export const idID: TigerLocale = {
     previewFallbackAlt: 'gambar',
     groupAriaLabel: 'Grup gambar'
   },
+  imageCompare: {
+    ariaLabel: 'Perbandingan gambar'
+  },
   timeline: {
     pendingText: 'Memuat...'
   },

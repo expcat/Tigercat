@@ -41,6 +41,7 @@ import type {
   TigerLocaleCarousel,
   TigerLocaleMarquee,
   TigerLocaleImage,
+  TigerLocaleImageCompare,
   TigerLocaleTransfer,
   TigerLocaleChart,
   TigerLocaleMarkdownEditor,
@@ -375,6 +376,13 @@ export function getImageLabels(
   overrides?: Partial<TigerLocaleImage>
 ): Required<TigerLocaleImage> {
   return resolveLocaleSection(enSection('image'), locale?.image, overrides)
+}
+
+export function getImageCompareLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleImageCompare>
+): Required<TigerLocaleImageCompare> {
+  return resolveLocaleSection(enSection('imageCompare'), locale?.imageCompare, overrides)
 }
 
 export function getTransferLabels(

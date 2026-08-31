@@ -49,6 +49,9 @@ export const zhTW: TigerLocale = {
     previewFallbackAlt: '圖片',
     groupAriaLabel: '圖片組'
   },
+  imageCompare: {
+    ariaLabel: '圖片對比'
+  },
   timeline: {
     pendingText: '載入中...'
   },
