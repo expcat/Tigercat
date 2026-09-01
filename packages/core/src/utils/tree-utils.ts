@@ -112,7 +112,7 @@ export function lookupTreeNode(index: TreeIndex, key: TreeNodeKey): TreeNode | n
 export function isTreeNodeExpandable(node: TreeNode, hasLoadData = false): boolean {
   if (node.isLeaf === true) return false
   if (node.children && node.children.length > 0) return true
-  return hasLoadData && node.isLeaf !== true
+  return hasLoadData
 }
 
 export function nodeHasChildren(node: TreeNode): boolean {
