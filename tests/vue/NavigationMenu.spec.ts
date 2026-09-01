@@ -108,7 +108,7 @@ describe('NavigationMenu', () => {
     await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
     expect(getPanel()).not.toHaveAttribute('hidden')
     await waitFor(() => {
-      expect(document.activeElement).toHaveTextContent('Overview')
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
     })
 
     await fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Escape' })
@@ -126,7 +126,7 @@ describe('NavigationMenu', () => {
 
     await fireEvent.keyDown(docs, { key: 'ArrowDown' })
     await waitFor(() => {
-      expect(document.activeElement).toHaveTextContent('Guide')
+      expect(screen.getByRole('menuitem', { name: 'Guide' })).toHaveFocus()
     })
     expect(docs.tabIndex).toBe(0)
     expect(products.tabIndex).toBe(-1)
@@ -142,7 +142,7 @@ describe('NavigationMenu', () => {
     await fireEvent.click(products)
     await fireEvent.keyDown(products, { key: 'ArrowDown' })
     await waitFor(() => {
-      expect(document.activeElement).toHaveTextContent('Overview')
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
     })
 
     await fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), { key: 'Tab' })
@@ -176,13 +176,40 @@ describe('NavigationMenu', () => {
     expect(document.activeElement).toHaveTextContent('Docs')
   })
 
+  it('moves ArrowDown one item per key in a two-item panel', async () => {
+    render(NavigationMenu, {
+      props: { delayDuration: 0, skipDelayDuration: 0 },
+      slots: {
+        default: () => [
+          h(NavigationMenuItem, { value: 'docs' }, () => [
+            h(NavigationMenuTrigger, null, () => 'Docs'),
+            h(NavigationMenuContent, null, () => [
+              h(NavigationMenuLink, { href: '#guide' }, () => 'Guide'),
+              h(NavigationMenuLink, { href: '#api' }, () => 'API')
+            ])
+          ])
+        ]
+      }
+    })
+    const docs = screen.getByRole('menuitem', { name: 'Docs' })
+    docs.focus()
+    await fireEvent.keyDown(docs, { key: 'ArrowDown' })
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: 'Guide' })).toHaveFocus()
+    })
+    await fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Guide' }), {
+      key: 'ArrowDown'
+    })
+    expect(screen.getByRole('menuitem', { name: 'API' })).toHaveFocus()
+  })
+
   it('skips a disabled panel link when moving with ArrowDown', async () => {
     renderNav()
     const products = screen.getByRole('menuitem', { name: 'Products' })
     await fireEvent.click(products)
     await fireEvent.keyDown(products, { key: 'ArrowDown' })
     await waitFor(() => {
-      expect(document.activeElement).toHaveTextContent('Overview')
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
     })
     await fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), {
       key: 'ArrowDown'

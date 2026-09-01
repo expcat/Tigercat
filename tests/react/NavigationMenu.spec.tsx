@@ -142,10 +142,10 @@ describe('NavigationMenu', () => {
     fireEvent.click(products)
     fireEvent.keyDown(products, { key: 'ArrowDown' })
     await waitFor(() => {
-      expect(document.activeElement).toHaveTextContent('Overview')
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
     })
 
-    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Tab' })
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), { key: 'Tab' })
     expect(screen.getByRole('button', { name: 'After' })).toHaveFocus()
     expect(products).toHaveAttribute('aria-expanded', 'false')
   })
@@ -179,13 +179,35 @@ describe('NavigationMenu', () => {
     expect(document.activeElement).toHaveTextContent('Docs')
   })
 
+  it('moves ArrowDown one item per key in a two-item panel', async () => {
+    render(
+      <NavigationMenu delayDuration={0} skipDelayDuration={0}>
+        <NavigationMenuItem value="docs">
+          <NavigationMenuTrigger>Docs</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <NavigationMenuLink href="#guide">Guide</NavigationMenuLink>
+            <NavigationMenuLink href="#api">API</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenu>
+    )
+    const docs = screen.getByRole('menuitem', { name: 'Docs' })
+    docs.focus()
+    fireEvent.keyDown(docs, { key: 'ArrowDown' })
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: 'Guide' })).toHaveFocus()
+    })
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Guide' }), { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'API' })).toHaveFocus()
+  })
+
   it('skips a disabled panel link when moving with ArrowDown', async () => {
     render(<Demo />)
     const products = screen.getByRole('menuitem', { name: 'Products' })
     fireEvent.click(products)
     fireEvent.keyDown(products, { key: 'ArrowDown' })
     await waitFor(() => {
-      expect(document.activeElement).toHaveTextContent('Overview')
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
     })
     fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), { key: 'ArrowDown' })
     expect(screen.getByRole('menuitem', { name: 'Pricing' })).toHaveFocus()

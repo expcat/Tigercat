@@ -12,7 +12,9 @@ import {
   getScrollAreaBoxStyle,
   getScrollAreaContentClasses,
   getScrollAreaScrollbarClasses,
+  getScrollAreaScrollbarPlacementStyle,
   getScrollAreaShadowSides,
+  getScrollAreaShadowStyle,
   getScrollAreaThumbClasses,
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
@@ -295,14 +297,45 @@ describe('scroll-area-utils', () => {
   describe('getScrollAreaThumbStyle', () => {
     it('sizes the vertical thumb along the block axis', () => {
       const axisState = computeScrollAreaAxisState(100, 400, 200)
-      expect(getScrollAreaThumbStyle('y', axisState)).toEqual({ height: '100px', top: '50px' })
+      expect(getScrollAreaThumbStyle('y', axisState)).toEqual({
+        position: 'absolute',
+        height: '100px',
+        top: '50px',
+        insetInlineStart: '2px',
+        insetInlineEnd: '2px'
+      })
     })
 
     it('sizes the horizontal thumb along the inline axis', () => {
       const axisState = computeScrollAreaAxisState(100, 400, 200)
       expect(getScrollAreaThumbStyle('x', axisState)).toEqual({
+        position: 'absolute',
         width: '100px',
-        insetInlineStart: '50px'
+        insetInlineStart: '50px',
+        top: '2px',
+        bottom: '2px'
+      })
+    })
+  })
+
+  describe('overlay chrome geometry', () => {
+    it('pins the vertical track with inline logical insets', () => {
+      expect(getScrollAreaScrollbarPlacementStyle('y', 'md', false)).toMatchObject({
+        position: 'absolute',
+        width: '10px',
+        insetBlockStart: '0px',
+        insetBlockEnd: '0px',
+        insetInlineEnd: '0px'
+      })
+    })
+
+    it('gives the top shadow a non-empty box without Tailwind inset utilities', () => {
+      expect(getScrollAreaShadowStyle('top')).toMatchObject({
+        position: 'absolute',
+        insetInlineStart: '0px',
+        insetInlineEnd: '0px',
+        top: '0px',
+        height: '0.75rem'
       })
     })
   })

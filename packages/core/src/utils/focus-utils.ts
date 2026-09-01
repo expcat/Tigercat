@@ -136,3 +136,26 @@ export function focusFirstMenuItem(container: HTMLElement): boolean {
   items[0].focus()
   return true
 }
+
+/** Focus the first item once the panel is painted (not `hidden` / `visibility:hidden`). */
+export function focusFirstMenuItemWhenVisible(container: HTMLElement, attempts = 16): boolean {
+  const tryFocus = (): boolean => {
+    if (container.hidden || container.hasAttribute('hidden')) return false
+    if (
+      typeof getComputedStyle === 'function' &&
+      getComputedStyle(container).visibility === 'hidden'
+    ) {
+      return false
+    }
+    return focusFirstMenuItem(container)
+  }
+  if (tryFocus()) return true
+  if (typeof requestAnimationFrame !== 'function' || attempts <= 0) return false
+  const tick = (left: number): void => {
+    requestAnimationFrame(() => {
+      if (!tryFocus() && left > 1) tick(left - 1)
+    })
+  }
+  tick(attempts)
+  return false
+}

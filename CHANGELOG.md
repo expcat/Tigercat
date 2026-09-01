@@ -6,9 +6,9 @@
 
 - **Watermark**：防篡改只看直子 overlay 是否还在覆盖宿主；自身绘制和 remount 不再当成篡改，避免 MutationObserver 循环撑崩 playground。
 - **锚点浮层**：Modal/Drawer 根是 `pointer-events-none`，overlay-host 是 `contents`。portaled 层补 `pointer-events-auto`，否则 Select 等点击会穿透到 dialog 内容。
-- **ScrollArea**：`className` / attrs.class 打在根上（viewport 用 `viewportClassName`）。根 `overflow-hidden`；竖轨 `inset-block-end-0` 铺满。01 示例固定 `height` 才有溢出。
+- **ScrollArea**：`className` / attrs.class 打在根上（viewport 用 `viewportClassName`）。根是 column flex + `overflow-hidden`；`height` / `maxHeight` 写在真正 overflow 的 viewport 上，所以只传 `maxHeight` 就会溢出。轨道 / 滑块 / 阴影的几何用 inline 逻辑属性，不依赖 playground 是否生成 `inset-inline-*`。01 示例与文档一样只传 `maxHeight`。e2e 用 `scrollIntoViewIfNeeded` 滚 Layout Content（不是 `window`），后面的 playground 模块才会进 IntersectionObserver。
 - **Vue 示例 playground**：CodeEditor 走 `modelValue` / `update:modelValue`，编辑才会标 dirty。
-- **NavigationMenu**：面板 keydown 同步重入锁，避免 vnode + addEventListener 把一次 ArrowDown 走两步。`getMenuItems` 把非 `false` 的 `aria-disabled` 都当禁用。
+- **NavigationMenu**：Vue 面板只走 vnode `onKeydown`（与 React 对称）。vnode + `addEventListener` 会把一次 ArrowDown 走两步，两项面板从「指南」绕回自身。打开后面板在真正可见后再 `focusFirstMenuItem`（Firefox 在 `visibility:hidden` 上 focus 无效）。`getMenuItems` 把非 `false` 的 `aria-disabled` 都当禁用。
 - **SSR 示例（Next 16 / Nuxt 4）**：两站接 Tailwind plugin + `@source` dist。ConfigProvider 在应用根，`<html lang>` 与 `zhCN` 对齐。DatePicker 用 date-only 值；门禁锁产物 HTML、主题 CSS 与 hydrate。不要从 Next Server Component 直接 import 组件。
 - **TaskBoard / Kanban**：过滤和 `hiddenColumns` 只改显示；WIP / 计数 / 拖拽下标用源数组。列拖按 `column.id` 映回源。键盘可放进空列；`beforeCardMove` 的 Promise 会等完再清指示器。无回调加卡/加列插入 locale 标题。Vue `onCardAdd` 会真调用。泳道是列内分组，未分组走 locale，收起的卡不进 DOM。Kanban 只改默认值并透传，不再第二份列状态。
 - **Feed 组合（ChatWindow / CommentThread / ActivityFeed / NotificationCenter）**：时间格式一份 `formatCompositeTime`（`0` 合法，ISO 才 parse，Invalid Date 空串，接 locale）。`groups` / `nodes` 一旦传入（含 `[]`）不再回落 `items`。Chat 贴底才跟最新，IME Enter 不发，`onSend` 不 push。评论 overlay 在 `nodes` 换引用后丢弃，Load more 按 `maxReplies` 揭剩余。Activity Vue 点走 `#dot`。NC 光 `items` 走 List，已读钮常显，全部已读管所有组。这不是命令式 `notification` toast。

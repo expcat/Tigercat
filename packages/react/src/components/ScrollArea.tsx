@@ -24,6 +24,7 @@ import {
   getScrollAreaScrollbarPlacementStyle,
   getScrollAreaShadowClasses,
   getScrollAreaShadowSides,
+  getScrollAreaShadowStyle,
   getScrollAreaThumbClasses,
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
@@ -348,13 +349,15 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
       {...(rootRest as React.HTMLAttributes<HTMLDivElement>)}
       ref={rootRef}
       className={classNames(scrollAreaRootClasses, className)}
-      style={getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth })}
       data-scroll-area=""
       data-scrolling={scrolling ? '' : undefined}>
       <div
         ref={viewportRef}
         className={getScrollAreaViewportClasses(direction, viewportClassName)}
-        style={getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)}
+        style={{
+          ...getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth }),
+          ...getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)
+        }}
         tabIndex={tabIndex}
         role={viewportName ? 'region' : undefined}
         aria-label={
@@ -377,6 +380,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
         <div
           key={side}
           className={getScrollAreaShadowClasses(side)}
+          style={getScrollAreaShadowStyle(side)}
           data-scroll-area-shadow={side}
           aria-hidden="true"
         />

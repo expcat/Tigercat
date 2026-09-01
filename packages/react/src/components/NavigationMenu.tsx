@@ -13,7 +13,7 @@ import {
   applyNavigationMenuPanelKey,
   classNames,
   createNavigationMenuHoverSession,
-  focusFirstMenuItem,
+  focusFirstMenuItemWhenVisible,
   captureActiveElement,
   restoreFocus,
   getNavigationMenuBarItems,
@@ -503,9 +503,9 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       root.setValue(itemValue)
       root.setTabStopValue(itemValue)
       if (!focusPanel) return
-      requestAnimationFrame(() => {
+      queueMicrotask(() => {
         const panel = contentRef.current ?? document.getElementById(contentId)
-        if (panel) focusFirstMenuItem(panel)
+        if (panel) focusFirstMenuItemWhenVisible(panel)
       })
     },
     [contentId, disabled, itemValue, root]

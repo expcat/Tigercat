@@ -99,12 +99,45 @@ export interface ScrollAreaScrollToOptions {
 
 /**
  * Inline style patch for a scrollbar thumb.
+ * Geometry is inline so playground CSS does not have to emit logical inset utilities.
  */
 export interface ScrollAreaThumbStyle {
+  position?: 'absolute'
   height?: string
   width?: string
   top?: string
+  bottom?: string
   insetInlineStart?: string
+  insetInlineEnd?: string
+}
+
+/**
+ * Inline style patch for a scrollbar track.
+ */
+export interface ScrollAreaScrollbarStyle {
+  position?: 'absolute'
+  width?: string
+  height?: string
+  insetBlockStart?: string
+  insetBlockEnd?: string
+  insetInlineStart?: string
+  insetInlineEnd?: string
+}
+
+/**
+ * Inline style patch for an overflow shadow.
+ */
+export interface ScrollAreaShadowStyle {
+  position?: 'absolute'
+  top?: string
+  bottom?: string
+  height?: string
+  width?: string
+  insetInlineStart?: string
+  insetInlineEnd?: string
+  insetBlockStart?: string
+  insetBlockEnd?: string
+  backgroundImage?: string
 }
 
 /**

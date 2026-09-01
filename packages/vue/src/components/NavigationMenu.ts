@@ -9,7 +9,6 @@ import {
   onBeforeUnmount,
   onMounted,
   nextTick,
-  watch,
   useId,
   Fragment,
   isVNode,
@@ -49,7 +48,7 @@ import {
   resolveElementDir,
   isNavigationMenuTriggerOpenKey,
   handleMenubarNavigation,
-  focusFirstMenuItem,
+  focusFirstMenuItemWhenVisible,
   captureActiveElement,
   restoreFocus,
   getSecureRel,
@@ -477,21 +476,11 @@ export const NavigationMenuContent = defineComponent({
       root?.handleFocusLeave(event)
     }
 
-    let keydownLocked = false
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (keydownLocked) return
       const panel = item?.contentRef.value
       if (!panel || !item || !root) return
       if (!panel.contains(event.target as Node | null)) return
-      keydownLocked = true
-      try {
-        handlePanelKeyDown(event, panel)
-      } finally {
-        keydownLocked = false
-      }
-    }
 
-    const handlePanelKeyDown = (event: KeyboardEvent, panel: HTMLElement) => {
       const dir = resolveElementDir(root.rootRef.value ?? root.menubarRef.value)
       const action = applyNavigationMenuPanelKey({ event, panel, dir })
       if (!action || action === 'menu-nav') return
@@ -522,16 +511,6 @@ export const NavigationMenuContent = defineComponent({
         target?.focus()
       }
     }
-
-    watch(
-      () => item?.contentRef.value,
-      (panel, _previous, onCleanup) => {
-        if (!panel) return
-        panel.addEventListener('keydown', handleKeyDown)
-        onCleanup(() => panel.removeEventListener('keydown', handleKeyDown))
-      },
-      { flush: 'post' }
-    )
 
     const panelClasses = computed(() =>
       classNames(overlay.floatingClasses.value, NAVIGATION_MENU_ENTER_CLASS)
@@ -641,10 +620,8 @@ export const NavigationMenuItem = defineComponent({
       root.setTabStopValue(itemValue.value)
       if (!focusPanel) return
       nextTick(() => {
-        requestAnimationFrame(() => {
-          const panel = contentRef.value ?? document.getElementById(contentId)
-          if (panel) focusFirstMenuItem(panel)
-        })
+        const panel = contentRef.value ?? document.getElementById(contentId)
+        if (panel) focusFirstMenuItemWhenVisible(panel)
       })
     }
 

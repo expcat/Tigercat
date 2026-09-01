@@ -12,7 +12,8 @@ import {
   getActiveElement,
   getMenuItems,
   handleMenuNavigation,
-  focusFirstMenuItem
+  focusFirstMenuItem,
+  focusFirstMenuItemWhenVisible
 } from '@expcat/tigercat-core'
 
 describe('focus-utils', () => {
@@ -383,6 +384,34 @@ describe('focus-utils', () => {
       cleanup.push(container)
 
       expect(focusFirstMenuItem(container)).toBe(false)
+    })
+  })
+
+  describe('focusFirstMenuItemWhenVisible', () => {
+    it('focuses once the panel is no longer hidden', () => {
+      const container = document.createElement('div')
+      container.hidden = true
+      const item = document.createElement('button')
+      item.setAttribute('role', 'menuitem')
+      container.appendChild(item)
+      document.body.appendChild(container)
+      cleanup.push(container)
+
+      const frames: FrameRequestCallback[] = []
+      const originalRaf = globalThis.requestAnimationFrame
+      globalThis.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+        frames.push(cb)
+        return frames.length
+      }) as typeof requestAnimationFrame
+      try {
+        expect(focusFirstMenuItemWhenVisible(container, 3)).toBe(false)
+        expect(document.activeElement).not.toBe(item)
+        container.hidden = false
+        frames[0]?.(0)
+        expect(document.activeElement).toBe(item)
+      } finally {
+        globalThis.requestAnimationFrame = originalRaf
+      }
     })
   })
 })

@@ -48,14 +48,14 @@ describe('ScrollArea', () => {
       expect(getViewport(container).contains(getByText('panel body'))).toBe(true)
     })
 
-    it('applies the dimension props to the root', () => {
+    it('applies the dimension props to the overflowing viewport', () => {
       const { container } = render(ScrollArea, {
         props: { maxHeight: 240, width: '100%' },
         slots: { default: () => h('p', 'body') }
       })
-      const root = container.querySelector('[data-scroll-area]') as HTMLElement
-      expect(root.style.maxHeight).toBe('240px')
-      expect(root.style.width).toBe('100%')
+      const viewport = getViewport(container)
+      expect(viewport.style.maxHeight).toBe('240px')
+      expect(viewport.style.width).toBe('100%')
     })
 
     it('merges attrs class onto the root', () => {

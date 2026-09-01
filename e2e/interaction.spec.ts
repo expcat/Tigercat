@@ -56,7 +56,8 @@ for (const { framework, baseUrl } of exampleApps) {
       await listbox.getByRole('option', { name: 'Alice' }).click()
       await expect(listbox).toBeHidden()
       await revealDemoIframe(moduleRoot)
-      await drawer.getByRole('button', { name: '关闭', exact: true }).click()
+      // Footer Button has text 关闭; header X only has aria-label 关闭.
+      await drawer.getByText('关闭', { exact: true }).click()
       await expect(drawer).toBeHidden()
     })
 

@@ -12,6 +12,8 @@ import type {
   ScrollAreaScrollbarSize,
   ScrollAreaScrollbarVisibility,
   ScrollAreaShadowSide,
+  ScrollAreaShadowStyle,
+  ScrollAreaScrollbarStyle,
   ScrollAreaState,
   ScrollAreaThumbStyle,
   ScrollAreaViewportMetrics
@@ -28,10 +30,12 @@ export const SCROLL_AREA_THICKNESS_PX: Record<ScrollAreaScrollbarSize, number> =
   lg: 14
 }
 
-export const scrollAreaRootClasses = 'tiger-scroll-area group/scroll-area relative overflow-hidden'
+/** Column flex so height/maxHeight (or a root `h-*` class) actually constrain the viewport. */
+export const scrollAreaRootClasses =
+  'tiger-scroll-area group/scroll-area relative flex flex-col overflow-hidden'
 
 export const scrollAreaViewportBaseClasses =
-  'tiger-scroll-area-viewport h-full w-full min-h-0 min-w-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'tiger-scroll-area-viewport w-full min-h-0 min-w-0 grow [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
 export const scrollAreaScrollbarBaseClasses =
   'tiger-scroll-area-scrollbar absolute z-10 select-none rounded-full bg-[var(--tiger-surface-muted,#f9fafb)] tiger-motion-aware transition-opacity duration-200'
@@ -57,19 +61,9 @@ const SCROLLBAR_THICKNESS_CLASSES: Record<ScrollAreaScrollbarSize, { x: string; 
   lg: { x: 'h-3.5', y: 'w-3.5' }
 }
 
-const THUMB_AXIS_CLASSES: Record<ScrollAreaAxis, string> = {
-  x: 'top-0.5 bottom-0.5',
-  y: 'inline-start-0.5 inline-end-0.5'
-}
-
+const THUMB_EDGE_INSET = '2px'
+const SHADOW_LENGTH = '0.75rem'
 const SHADOW_TINT = 'color-mix(in srgb, var(--tiger-text, #111827) 12%, transparent)'
-
-const SHADOW_SIDE_CLASSES: Record<ScrollAreaShadowSide, string> = {
-  top: `inset-inline-0 top-0 h-3 bg-[linear-gradient(to_bottom,${SHADOW_TINT},transparent)]`,
-  bottom: `inset-inline-0 bottom-0 h-3 bg-[linear-gradient(to_top,${SHADOW_TINT},transparent)]`,
-  'inline-start': `inset-block-0 inset-inline-start-0 w-3 bg-[linear-gradient(to_inline-end,${SHADOW_TINT},transparent)]`,
-  'inline-end': `inset-block-0 inset-inline-end-0 w-3 bg-[linear-gradient(to_inline-start,${SHADOW_TINT},transparent)]`
-}
 
 function clamp(value: number, min: number, max: number): number {
   if (Number.isNaN(value)) return min
@@ -322,22 +316,32 @@ export function getScrollAreaScrollbarClasses(
     visibility === 'hover'
       ? 'opacity-0 pointer-events-none group-hover/scroll-area:opacity-100 group-hover/scroll-area:pointer-events-auto group-focus-within/scroll-area:opacity-100 group-focus-within/scroll-area:pointer-events-auto group-data-[scrolling]/scroll-area:opacity-100 group-data-[scrolling]/scroll-area:pointer-events-auto data-[dragging]:opacity-100 data-[dragging]:pointer-events-auto'
       : 'opacity-100'
-  const place =
-    axis === 'y'
-      ? 'inset-block-start-0 inset-block-end-0 inset-inline-end-0'
-      : 'inset-inline-start-0 inset-inline-end-0 bottom-0'
-  return classNames(scrollAreaScrollbarBaseClasses, place, thickness, fade)
+  return classNames(scrollAreaScrollbarBaseClasses, thickness, fade)
 }
 
 export function getScrollAreaScrollbarPlacementStyle(
   axis: ScrollAreaAxis,
   size: ScrollAreaScrollbarSize,
   otherAxisVisible: boolean
-): { insetBlockEnd?: string; insetInlineEnd?: string } {
-  if (!otherAxisVisible) return {}
+): ScrollAreaScrollbarStyle {
   const thickness = `${SCROLL_AREA_THICKNESS_PX[size]}px`
-  if (axis === 'y') return { insetBlockEnd: thickness }
-  return { insetInlineEnd: thickness }
+  const corner = otherAxisVisible ? thickness : '0px'
+  if (axis === 'y') {
+    return {
+      position: 'absolute',
+      width: thickness,
+      insetBlockStart: '0px',
+      insetBlockEnd: corner,
+      insetInlineEnd: '0px'
+    }
+  }
+  return {
+    position: 'absolute',
+    height: thickness,
+    insetInlineStart: '0px',
+    insetInlineEnd: corner,
+    insetBlockEnd: '0px'
+  }
 }
 
 export function getScrollAreaGutterStyle(
@@ -352,12 +356,8 @@ export function getScrollAreaGutterStyle(
   return style
 }
 
-export function getScrollAreaThumbClasses(axis: ScrollAreaAxis, dragging: boolean): string {
-  return classNames(
-    scrollAreaThumbBaseClasses,
-    THUMB_AXIS_CLASSES[axis],
-    dragging && scrollAreaThumbDraggingClasses
-  )
+export function getScrollAreaThumbClasses(_axis: ScrollAreaAxis, dragging: boolean): string {
+  return classNames(scrollAreaThumbBaseClasses, dragging && scrollAreaThumbDraggingClasses)
 }
 
 export function getScrollAreaThumbStyle(
@@ -365,13 +365,66 @@ export function getScrollAreaThumbStyle(
   axisState: ScrollAreaAxisState
 ): ScrollAreaThumbStyle {
   if (axis === 'y') {
-    return { height: `${axisState.thumbSize}px`, top: `${axisState.thumbOffset}px` }
+    return {
+      position: 'absolute',
+      height: `${axisState.thumbSize}px`,
+      top: `${axisState.thumbOffset}px`,
+      insetInlineStart: THUMB_EDGE_INSET,
+      insetInlineEnd: THUMB_EDGE_INSET
+    }
   }
-  return { width: `${axisState.thumbSize}px`, insetInlineStart: `${axisState.thumbOffset}px` }
+  return {
+    position: 'absolute',
+    width: `${axisState.thumbSize}px`,
+    insetInlineStart: `${axisState.thumbOffset}px`,
+    top: THUMB_EDGE_INSET,
+    bottom: THUMB_EDGE_INSET
+  }
 }
 
-export function getScrollAreaShadowClasses(side: ScrollAreaShadowSide): string {
-  return `${scrollAreaShadowBaseClasses} ${SHADOW_SIDE_CLASSES[side]}`
+export function getScrollAreaShadowClasses(_side: ScrollAreaShadowSide): string {
+  return scrollAreaShadowBaseClasses
+}
+
+export function getScrollAreaShadowStyle(side: ScrollAreaShadowSide): ScrollAreaShadowStyle {
+  if (side === 'top') {
+    return {
+      position: 'absolute',
+      insetInlineStart: '0px',
+      insetInlineEnd: '0px',
+      top: '0px',
+      height: SHADOW_LENGTH,
+      backgroundImage: `linear-gradient(to bottom, ${SHADOW_TINT}, transparent)`
+    }
+  }
+  if (side === 'bottom') {
+    return {
+      position: 'absolute',
+      insetInlineStart: '0px',
+      insetInlineEnd: '0px',
+      bottom: '0px',
+      height: SHADOW_LENGTH,
+      backgroundImage: `linear-gradient(to top, ${SHADOW_TINT}, transparent)`
+    }
+  }
+  if (side === 'inline-start') {
+    return {
+      position: 'absolute',
+      insetBlockStart: '0px',
+      insetBlockEnd: '0px',
+      insetInlineStart: '0px',
+      width: SHADOW_LENGTH,
+      backgroundImage: `linear-gradient(to right, ${SHADOW_TINT}, transparent)`
+    }
+  }
+  return {
+    position: 'absolute',
+    insetBlockStart: '0px',
+    insetBlockEnd: '0px',
+    insetInlineEnd: '0px',
+    width: SHADOW_LENGTH,
+    backgroundImage: `linear-gradient(to left, ${SHADOW_TINT}, transparent)`
+  }
 }
 
 export function applyScrollAreaWheel(

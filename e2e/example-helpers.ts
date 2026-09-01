@@ -32,13 +32,25 @@ export async function openDemo(
     await page.goto('about:blank')
     return openDemo(page, baseUrl, route, demoId, attempt + 1)
   }
+  // Example shell scrolls Layout Content, not the window.
+  await moduleRoot.scrollIntoViewIfNeeded()
   await moduleRoot.evaluate((el: HTMLElement) => {
     const sticky = document.querySelector<HTMLElement>(
       '.sticky.top-0, [class*="sticky"][class*="top-0"]'
     )
-    const offset = sticky ? sticky.getBoundingClientRect().height + 8 : 8
-    const top = el.getBoundingClientRect().top + window.scrollY - offset
-    window.scrollTo({ top: Math.max(0, top) })
+    if (!sticky) return
+    const overlap = sticky.getBoundingClientRect().bottom - el.getBoundingClientRect().top + 8
+    if (overlap <= 0) return
+    let node: HTMLElement | null = el.parentElement
+    while (node) {
+      const style = getComputedStyle(node)
+      if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight) {
+        node.scrollTop -= overlap
+        return
+      }
+      node = node.parentElement
+    }
+    document.scrollingElement && (document.scrollingElement.scrollTop -= overlap)
   })
   try {
     await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })

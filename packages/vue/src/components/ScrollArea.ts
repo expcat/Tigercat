@@ -28,10 +28,10 @@ import {
   getScrollAreaScrollbarPlacementStyle,
   getScrollAreaShadowClasses,
   getScrollAreaShadowSides,
+  getScrollAreaShadowStyle,
   getScrollAreaThumbClasses,
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
-  mergeStyleValues,
   mergeTigerLocale,
   observeScrollAreaSize,
   physicalInlineScrollFromLogical,
@@ -354,7 +354,7 @@ export const ScrollArea = defineComponent({
         {
           ...restRoot,
           class: classNames(scrollAreaRootClasses, props.className, coerceClassValue(attrClass)),
-          style: mergeStyleValues(getScrollAreaBoxStyle(props), attrStyle),
+          style: attrStyle,
           'data-scroll-area': '',
           'data-scrolling': scrolling.value ? '' : undefined
         },
@@ -364,7 +364,10 @@ export const ScrollArea = defineComponent({
             {
               ref: viewportRef,
               class: getScrollAreaViewportClasses(props.direction, props.viewportClassName),
-              style: getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY),
+              style: {
+                ...getScrollAreaBoxStyle(props),
+                ...getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY)
+              },
               tabindex: tabIndex,
               role: viewportName ? 'region' : undefined,
               'aria-label': attrLabel || (tabIndex === 0 ? labels.value.ariaLabel : undefined),
@@ -419,6 +422,7 @@ export const ScrollArea = defineComponent({
             h('div', {
               key: `shadow-${side}`,
               class: getScrollAreaShadowClasses(side),
+              style: getScrollAreaShadowStyle(side),
               'data-scroll-area-shadow': side,
               'aria-hidden': 'true'
             })
