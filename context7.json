@@ -345,7 +345,6 @@
       "vue": "skills/tigercat/references/vue/index.md",
       "react": "skills/tigercat/references/react/index.md",
       "components": [
-        "Alert",
         "Avatar",
         "AvatarGroup",
         "Badge",
@@ -441,6 +440,7 @@
       "vue": "skills/tigercat/references/vue/index.md",
       "react": "skills/tigercat/references/react/index.md",
       "components": [
+        "Alert",
         "Drawer",
         "Loading",
         "LoadingBar",
@@ -821,26 +821,6 @@
         "componentIndex": "skills/tigercat/references/component-index.md",
         "props": "skills/tigercat/references/shared/props/advanced.md",
         "examples": "skills/tigercat/references/examples/advanced.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "Alert": {
-      "name": "Alert",
-      "aliases": ["警告提示"],
-      "category": "Basic",
-      "slug": "basic",
-      "testGroup": "basic",
-      "packageSubpath": "./Alert",
-      "packageTarget": "Alert",
-      "typeSource": "packages/core/src/types/alert.ts",
-      "sourceFiles": ["packages/core/src/types/alert.ts"],
-      "propsInterfaces": ["AlertProps"],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
-        "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
       }
@@ -2101,6 +2081,26 @@
         "componentIndex": "skills/tigercat/references/component-index.md",
         "props": "skills/tigercat/references/shared/props/data.md",
         "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Alert": {
+      "name": "Alert",
+      "aliases": ["警告提示"],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Alert",
+      "packageTarget": "Alert",
+      "typeSource": "packages/core/src/types/alert.ts",
+      "sourceFiles": ["packages/core/src/types/alert.ts"],
+      "propsInterfaces": ["AlertProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
       }

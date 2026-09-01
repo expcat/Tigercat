@@ -1,7 +1,7 @@
 {
   "id": "loading-03",
   "title": "全屏加载",
-  "description": "使用一份短时状态展示 fullscreen 页面遮罩。",
+  "description": "fullscreen 不传 text，名走 locale。打开时背后页面 inert，不能 Tab 进去。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

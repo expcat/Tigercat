@@ -70,6 +70,6 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | Text         | `<Text tag="h1" align="start">Title</Text>`                                                          | `<Text tag="h1" align="start">Title</Text>`                                                          |
 | Watermark    | `<Watermark content="机密" />`                                                                       | `<Watermark content="机密" />`                                                                       |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, ConfigProvider, Divider, Empty, ImageGroup.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：ConfigProvider, Divider, Empty, ImageGroup.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

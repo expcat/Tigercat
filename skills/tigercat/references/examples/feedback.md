@@ -20,6 +20,8 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 | Component  | Vue                                                                     | React                                                                    |
 | ---------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Alert      | `<Alert type="info" title="Saved" />`                                   | `<Alert type="info" title="Saved" />`                                    |
+| Loading    | `<Loading :spinning="loading"><slot /></Loading>`                       | `<Loading spinning={loading}>{children}</Loading>`                       |
 | LoadingBar | `LoadingBar.start()`                                                    | `LoadingBar.start()`                                                     |
 | Message    | `Message.info('Saved')`                                                 | `Message.info('Saved')`                                                  |
 | Popconfirm | `<Popconfirm @confirm="onConfirm"><button>Delete</button></Popconfirm>` | `<Popconfirm onConfirm={onConfirm}><button>Delete</button></Popconfirm>` |
@@ -28,6 +30,6 @@ description: Compact Tigercat Feedback Vue and React usage routes
 | Tooltip    | `<Tooltip content="Hint"><button>Save</button></Tooltip>`               | `<Tooltip content="Hint"><button>Save</button></Tooltip>`                |
 | Tour       | `<Tour :steps="steps" />`                                               | `<Tour steps={steps} />`                                                 |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, Loading, LoadingBarContainer, MessageContainer, Modal, NotificationContainer.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, LoadingBarContainer, MessageContainer, Modal, NotificationContainer.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -42,7 +42,7 @@ for (const { framework, baseUrl } of exampleApps) {
       await expect(opened.preview.locator('[aria-haspopup="listbox"]').first()).toBeVisible()
 
       opened = await openDemo(page, baseUrl, 'alert', 'alert-01')
-      await expect(opened.preview.getByRole('alert').first()).toBeVisible()
+      await expect(opened.preview.getByText('配置已检查')).toBeVisible()
     })
 
     test('modal and tooltip stay interactive in the sandbox', async ({ page }) => {

@@ -17,7 +17,6 @@ description: Compact generated route map for Tigercat core type files
 
 | Type File        | Props Interfaces                                                                                         |
 | ---------------- | -------------------------------------------------------------------------------------------------------- |
-| alert.ts         | AlertProps                                                                                               |
 | avatar.ts        | AvatarProps, AvatarGroupProps                                                                            |
 | badge.ts         | BadgeProps                                                                                               |
 | button.ts        | ButtonProps, ButtonGroupProps                                                                            |
@@ -77,6 +76,7 @@ description: Compact generated route map for Tigercat core type files
 
 | Type File       | Props Interfaces                          |
 | --------------- | ----------------------------------------- |
+| alert.ts        | AlertProps                                |
 | drawer.ts       | DrawerProps                               |
 | loading.ts      | LoadingProps                              |
 | message.ts      | MessageProps                              |

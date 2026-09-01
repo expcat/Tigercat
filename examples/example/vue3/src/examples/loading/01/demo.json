@@ -1,7 +1,7 @@
 {
   "id": "loading-01",
-  "title": "内联加载",
-  "description": "用一个实例复合展示 dots 动画、lg 尺寸、主题色和加载文字；variant 还支持 spinner、bars、ring、pulse。",
+  "title": "默认指示器",
+  "description": "不传 variant / size / text。可访问名走 locale（en-US 是 Loading...，中文页是「加载中...」）。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

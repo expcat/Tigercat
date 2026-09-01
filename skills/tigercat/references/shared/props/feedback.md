@@ -7,7 +7,22 @@ description: Compact generated Tigercat Feedback props reference
 
 # Feedback Props
 
-覆盖层、提示、加载、结果和进度反馈组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+覆盖层、提示、加载、结果和进度反馈组件。 共 14 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+
+## Alert
+
+`packages/core/src/types/alert.ts` · `AlertProps` · 8/17 props
+
+| Prop             | Type        | Default  | Notes                                                                                      |
+| ---------------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |
+| `type?`          | `AlertType` | `'info'` | Alert type (success, warning, error, info)                                                 |
+| `title?`         | `string`    | `-`      | Alert title (main message)                                                                 |
+| `closable?`      | `boolean`   | `false`  | Whether the alert can be closed                                                            |
+| `duration?`      | `number`    | `-`      | Auto-close duration in milliseconds. Set to 0 or undefined to disable auto-close. Indep... |
+| `banner?`        | `boolean`   | `false`  | Whether to display as full-width banner across the page                                    |
+| `showIcon?`      | `boolean`   | `true`   | Whether to show the type icon                                                              |
+| `visible?`       | `boolean`   | `-`      | When `false`, the alert is not rendered. Closing never hides internally — the parent un... |
+| `showCountdown?` | `boolean`   | `false`  | Whether to show countdown progress bar (requires `duration`)                               |
 
 ## Drawer
 
@@ -23,13 +38,18 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 ## Loading
 
-`packages/core/src/types/loading.ts` · `LoadingProps` · 3/12 props
+`packages/core/src/types/loading.ts` · `LoadingProps` · 8/14 props
 
-| Prop       | Type                   | Default     | Notes                                                   |
-| ---------- | ---------------------- | ----------- | ------------------------------------------------------- |
-| `locale?`  | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
-| `variant?` | `LoadingVariant`       | `'spinner'` | Loading spinner variant - determines animation style    |
-| `size?`    | `LoadingSize`          | `'md'`      | Size of the loading indicator                           |
+| Prop          | Type                   | Default     | Notes                                                                                      |
+| ------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `text?`       | `string`               | `-`         | Custom text to display below the spinner                                                   |
+| `fullscreen?` | `boolean`              | `false`     | Whether to show loading as fullscreen overlay                                              |
+| `spinning?`   | `boolean`              | `true`      | Cover children / the default slot with a relative overlay. When `false`, only the conte... |
+| `delay?`      | `number`               | `0`         | Delay before showing the loading indicator (ms) Useful to prevent flashing on quick ope... |
+| `variant?`    | `LoadingVariant`       | `'spinner'` | Loading spinner variant - determines animation style                                       |
+| `size?`       | `LoadingSize`          | `'md'`      | Size of the loading indicator                                                              |
+| `color?`      | `LoadingColor`         | `'primary'` | Color variant                                                                              |
+| `locale?`     | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
 
 ## LoadingBar
 

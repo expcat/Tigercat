@@ -15,5 +15,5 @@ function start() {
 
 <template>
   <Button @click="start">模拟页面加载</Button>
-  <Loading v-if="loading" fullscreen text="页面加载中…" />
+  <Loading v-if="loading" fullscreen />
 </template>

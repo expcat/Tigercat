@@ -11,7 +11,6 @@ export default function App() {
       title="配置已保存"
       description="点击关闭按钮隐藏提示。"
       closable
-      closeAriaLabel="关闭保存提示"
       onClose={() => setVisible(false)}
     />
   ) : (

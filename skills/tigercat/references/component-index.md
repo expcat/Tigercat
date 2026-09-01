@@ -31,7 +31,6 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | RichTextEditor                  | Advanced   | `advanced`   | rich-text-editor.ts                                 | ./RichTextEditor                  |
 | VirtualList                     | Advanced   | `advanced`   | virtual-list.ts                                     | ./VirtualList                     |
 | VirtualTable                    | Advanced   | `advanced`   | virtual-table.ts                                    | ./VirtualTable                    |
-| Alert                           | Basic      | `basic`      | alert.ts                                            | ./Alert                           |
 | Avatar                          | Basic      | `basic`      | avatar.ts                                           | ./Avatar                          |
 | AvatarGroup                     | Basic      | `basic`      | avatar.ts                                           | ./AvatarGroup                     |
 | Badge                           | Basic      | `basic`      | badge.ts                                            | ./Badge                           |
@@ -95,6 +94,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | DataExport                      | Data       | `data`       | data-export.ts                                      | ./DataExport                      |
 | Table                           | Data       | `data`       | table.ts                                            | ./Table                           |
 | Timeline                        | Data       | `data`       | timeline.ts                                         | ./Timeline                        |
+| Alert                           | Feedback   | `feedback`   | alert.ts                                            | ./Alert                           |
 | Drawer                          | Feedback   | `feedback`   | drawer.ts                                           | ./Drawer                          |
 | Loading                         | Feedback   | `feedback`   | loading.ts                                          | ./Loading                         |
 | LoadingBar                      | Feedback   | `feedback`   | loading-bar.ts                                      | ./LoadingBar                      |

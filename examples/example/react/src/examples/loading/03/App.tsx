@@ -13,7 +13,7 @@ export default function App() {
   return (
     <>
       <Button onClick={start}>模拟页面加载</Button>
-      {loading ? <Loading fullscreen text="页面加载中…" /> : null}
+      {loading ? <Loading fullscreen /> : null}
     </>
   )
 }

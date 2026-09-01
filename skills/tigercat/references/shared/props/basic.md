@@ -7,17 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 30 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
-
-## Alert
-
-`packages/core/src/types/alert.ts` · `AlertProps` · 3/15 props
-
-| Prop        | Type        | Default  | Notes                                      |
-| ----------- | ----------- | -------- | ------------------------------------------ |
-| `closable?` | `boolean`   | `false`  | Whether the alert can be closed            |
-| `type?`     | `AlertType` | `'info'` | Alert type (success, warning, error, info) |
-| `size?`     | `AlertSize` | `'md'`   | Alert size                                 |
+基础展示与低级交互组件。 共 29 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Avatar
 

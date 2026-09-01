@@ -1,7 +1,7 @@
 {
   "id": "alert-03",
   "title": "四种类型与图标",
-  "description": "type 覆盖 success/info/warning/error 四种语义色；showIcon 控制是否显示类型图标。",
+  "description": "四种 type 与无图标。有 title 时默认槽仍渲染（操作按钮）。只有 error 默认 role=alert。",
   "entry": "App.vue",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }

@@ -17,8 +17,7 @@ const show = ref(true)
       v-if="show"
       type="info"
       title="5 秒后自动关闭"
-      description="duration + showCountdown 显示倒计时进度条。"
-      closable
+      description="duration 不必配 closable；showCountdown 显示倒计时条。"
       :duration="5000"
       show-countdown
       @close="show = false" />

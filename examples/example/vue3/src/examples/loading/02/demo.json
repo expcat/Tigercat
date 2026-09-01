@@ -1,12 +1,12 @@
 {
   "id": "loading-02",
   "title": "区域加载",
-  "description": "在局部容器中切换一份加载遮罩和业务内容。",
+  "description": "默认槽 + spinning 覆盖一块业务内容，不要手写 absolute inset-0。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {
     "mode": "auto",
-    "minHeight": 560,
+    "minHeight": 220,
     "maxHeight": 720
   }
 }

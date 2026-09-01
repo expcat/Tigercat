@@ -1,7 +1,7 @@
 {
   "id": "alert-02",
   "title": "可关闭提示",
-  "description": "展示自定义关闭标签和关闭后的恢复流程。",
+  "description": "closable 不传 closeAriaLabel 时关闭名走 locale（中文页是「关闭提示」）。关闭后由父级卸载。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

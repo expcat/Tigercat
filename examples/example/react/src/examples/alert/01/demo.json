@@ -1,7 +1,7 @@
 {
   "id": "alert-01",
-  "title": "代表提示状态",
-  "description": "用一个实例复合展示 warning、lg、图标与描述；其余类型可取 info、success、error，尺寸可取 sm、md。",
+  "title": "默认提示",
+  "description": "不传 type / size 时是 info、md。静态 info 不是 live region；error 才会用 role=alert。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {
