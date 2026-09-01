@@ -354,6 +354,7 @@ export const ScrollArea = defineComponent({
         {
           ...restRoot,
           class: classNames(scrollAreaRootClasses, props.className, coerceClassValue(attrClass)),
+          style: mergeStyleValues(getScrollAreaBoxStyle(props), attrStyle),
           'data-scroll-area': '',
           'data-scrolling': scrolling.value ? '' : undefined
         },
@@ -363,13 +364,7 @@ export const ScrollArea = defineComponent({
             {
               ref: viewportRef,
               class: getScrollAreaViewportClasses(props.direction, props.viewportClassName),
-              style: mergeStyleValues(
-                {
-                  ...getScrollAreaBoxStyle(props),
-                  ...getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY)
-                },
-                attrStyle
-              ),
+              style: getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY),
               tabindex: tabIndex,
               role: viewportName ? 'region' : undefined,
               'aria-label': attrLabel || (tabIndex === 0 ? labels.value.ariaLabel : undefined),

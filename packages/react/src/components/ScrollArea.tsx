@@ -311,10 +311,6 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     }
   }
 
-  const boxStyle = {
-    ...getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth }),
-    ...getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)
-  }
   const shadowSides = useMemo(
     () => (shadow ? getScrollAreaShadowSides(state, direction) : []),
     [shadow, state, direction]
@@ -352,12 +348,13 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
       {...(rootRest as React.HTMLAttributes<HTMLDivElement>)}
       ref={rootRef}
       className={classNames(scrollAreaRootClasses, className)}
+      style={getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth })}
       data-scroll-area=""
       data-scrolling={scrolling ? '' : undefined}>
       <div
         ref={viewportRef}
         className={getScrollAreaViewportClasses(direction, viewportClassName)}
-        style={boxStyle}
+        style={getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)}
         tabIndex={tabIndex}
         role={viewportName ? 'region' : undefined}
         aria-label={

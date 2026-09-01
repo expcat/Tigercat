@@ -31,7 +31,7 @@ export const SCROLL_AREA_THICKNESS_PX: Record<ScrollAreaScrollbarSize, number> =
 export const scrollAreaRootClasses = 'tiger-scroll-area group/scroll-area relative overflow-hidden'
 
 export const scrollAreaViewportBaseClasses =
-  'tiger-scroll-area-viewport w-full min-h-0 min-w-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'tiger-scroll-area-viewport h-full w-full min-h-0 min-w-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
 export const scrollAreaScrollbarBaseClasses =
   'tiger-scroll-area-scrollbar absolute z-10 select-none rounded-full bg-[var(--tiger-surface-muted,#f9fafb)] tiger-motion-aware transition-opacity duration-200'
