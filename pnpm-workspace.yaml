@@ -27,6 +27,7 @@ catalog:
   # ── Styling ────────────────────────────────────
   tailwindcss: ^4.3.2
   '@tailwindcss/vite': ^4.3.2
+  '@tailwindcss/postcss': ^4.3.2
   '@tailwindcss/browser': ^4.3.2
 
   # ── Vite plugins ───────────────────────────────
