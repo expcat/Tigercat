@@ -136,9 +136,9 @@ describe('mapToolbarAction', () => {
     expect(result).toEqual({ command: 'bold' })
   })
 
-  it('maps heading1 to formatBlock H1', () => {
+  it('maps heading1 to formatBlock h1', () => {
     const result = mapToolbarAction('heading1')
-    expect(result).toEqual({ command: 'formatBlock', argument: 'H1' })
+    expect(result).toEqual({ command: 'formatBlock', argument: 'h1' })
   })
 
   it('maps bulletList to insertUnorderedList', () => {
@@ -358,6 +358,40 @@ describe('sanitizeHtml', () => {
     const result = sanitizeHtml('<img src="data:text/html,<script>alert(1)</script>" />')
     expect(result).not.toContain('data:')
   })
+
+  it('drops unquoted javascript href', () => {
+    const result = sanitizeHtml('<a href=javascript:alert(1)>x</a>')
+    expect(result).not.toContain('javascript:')
+    expect(result).toContain('x')
+  })
+
+  it('drops entity-encoded javascript href', () => {
+    const result = sanitizeHtml('<a href="java&#115;cript:alert(1)">x</a>')
+    expect(result.toLowerCase()).not.toContain('javascript:')
+    expect(result).not.toContain('alert')
+  })
+
+  it('drops unclosed iframe', () => {
+    const result = sanitizeHtml('<p>safe</p><iframe src="javascript:alert(1)">after')
+    expect(result).not.toContain('iframe')
+    expect(result).not.toContain('javascript:')
+  })
+
+  it('drops style url javascript', () => {
+    const result = sanitizeHtml('<div style="background:url(javascript:alert(1))">x</div>')
+    expect(result).not.toContain('javascript:')
+    expect(result).not.toContain('style=')
+    expect(result).toContain('x')
+  })
+
+  it('does not eat content= when stripping events', () => {
+    const result = sanitizeHtml(
+      '<p>keep</p><meta http-equiv="refresh" content="0;url=javascript:alert(1)">'
+    )
+    expect(result).toContain('<p>keep</p>')
+    expect(result).not.toContain('meta')
+    expect(result).not.toContain('javascript:')
+  })
 })
 
 // ─── isValidUrl ───────────────────────────────────────────────────
@@ -393,6 +427,17 @@ describe('isValidUrl', () => {
 
   it('rejects whitespace-only string', () => {
     expect(isValidUrl('   ')).toBe(false)
+  })
+
+  it('accepts relative paths and hash fragments', () => {
+    expect(isValidUrl('/guide')).toBe(true)
+    expect(isValidUrl('#anchor')).toBe(true)
+    expect(isValidUrl('./logo.png')).toBe(true)
+  })
+
+  it('rejects protocol-relative and tab-obfuscated javascript', () => {
+    expect(isValidUrl('//evil.example')).toBe(false)
+    expect(isValidUrl('java\tscript:alert(1)')).toBe(false)
   })
 })
 

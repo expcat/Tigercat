@@ -153,9 +153,19 @@ describe('MarkdownEditor utilities', () => {
       const html = renderMarkdownToHtml('x', {
         render: () => '<p onclick="alert(1)">x</p><script>alert(1)</script>'
       })
-      expect(html).toContain('<p >x</p>')
+      expect(html).toContain('<p>x</p>')
       expect(html).not.toContain('<script>')
       expect(html).not.toContain('onclick')
+    })
+
+    it('sanitizes bypass payloads from a custom renderer', () => {
+      const html = renderMarkdownToHtml('x', {
+        render: () =>
+          '<a href=javascript:alert(1)>js</a><a href="java&#115;cript:alert(1)">ent</a><img src=x onerror=alert(1)>'
+      })
+      expect(html).not.toContain('javascript:')
+      expect(html).not.toContain('onerror')
+      expect(html).not.toContain('alert')
     })
   })
 

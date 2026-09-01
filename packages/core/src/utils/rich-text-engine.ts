@@ -27,7 +27,8 @@ import {
   isValidUrl,
   getToolbarButtons,
   richTextModeToHtml,
-  richTextHtmlToMode
+  richTextHtmlToMode,
+  sanitizeHtml
 } from './rich-text-editor-utils'
 import { isBrowser } from './env'
 import type { RichTextEditorMode, ToolbarItem } from '../types/rich-text-editor'
@@ -36,9 +37,20 @@ function canUseExecCommand(): boolean {
   return isBrowser() && typeof document.execCommand === 'function'
 }
 
-function promptForRichTextUrl(message: string): string | null {
-  if (!isBrowser() || typeof window.prompt !== 'function') return null
-  return window.prompt(message)
+function insertSanitizedHtml(html: string): boolean {
+  if (!canUseExecCommand()) return false
+  return document.execCommand('insertHTML', false, sanitizeHtml(html))
+}
+
+function clipboardHtml(event: ClipboardEvent | DragEvent): string {
+  const data = 'clipboardData' in event ? event.clipboardData : event.dataTransfer
+  if (!data) return ''
+  const html = data.getData('text/html')
+  if (html) return html
+  const text = data.getData('text/plain')
+  return text
+    ? text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+    : ''
 }
 
 export interface RichTextEngineMountContext {
@@ -60,6 +72,11 @@ export interface RichTextEngineMountContext {
   notifyChange(html: string): void
   /** Called by the engine when active inline formats may have changed. */
   notifyActiveFormats(active: Set<string>): void
+  /**
+   * Optional URL prompt for link / image actions. Built-in engine never
+   * calls `window.prompt`. Return `null` to cancel.
+   */
+  requestUrl?(kind: 'link' | 'image'): string | null
 }
 
 export interface RichTextEngineInstance {
@@ -73,6 +90,10 @@ export interface RichTextEngineInstance {
   refreshActiveFormats(): void
   /** Update read-only state without remount. */
   setReadOnly(readOnly: boolean, disabled: boolean): void
+  /** Switch public value mode without remounting. */
+  setMode(mode: RichTextEditorMode): void
+  /** Replace the toolbar table used by `exec` (custom actions). */
+  setToolbar(toolbar: ToolbarItem[]): void
   /** Tear down listeners and detach DOM artefacts. */
   destroy(): void
 }
@@ -89,12 +110,43 @@ export interface RichTextEngine {
  * components can share one implementation and so tests can verify the
  * engine contract without a real DOM editor library.
  */
+function execFormatBlock(tag: string): boolean {
+  if (!canUseExecCommand()) return false
+  const names = [`<${tag}>`, tag, tag.toUpperCase()]
+  for (const argument of names) {
+    if (document.execCommand('formatBlock', false, argument)) return true
+  }
+  return false
+}
+
+function blockFormatsFromSelection(host: HTMLElement): Set<string> {
+  const next = new Set<string>()
+  if (!isBrowser()) return next
+  const selection = document.getSelection()
+  const anchor = selection?.anchorNode
+  if (!anchor || !host.contains(anchor)) return next
+  let node: Node | null = anchor
+  while (node && node !== host) {
+    if (node instanceof HTMLElement) {
+      const tag = node.tagName.toLowerCase()
+      if (tag === 'h1') next.add('heading1')
+      else if (tag === 'h2') next.add('heading2')
+      else if (tag === 'h3') next.add('heading3')
+      else if (tag === 'blockquote') next.add('blockquote')
+      else if (tag === 'pre') next.add('codeBlock')
+    }
+    node = node.parentNode
+  }
+  return next
+}
+
 export function createBuiltinRichTextEngine(): RichTextEngine {
   return {
     name: 'builtin',
     create(ctx) {
       const { element } = ctx
-      const mode = ctx.mode ?? 'html'
+      let mode = ctx.mode ?? 'html'
+      let toolbar = ctx.toolbar
       let readOnly = ctx.readOnly
       let disabled = ctx.disabled
       element.contentEditable = String(!(readOnly || disabled))
@@ -103,31 +155,79 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       if (initial) element.innerHTML = initial
 
       const handleInput = () => {
-        const html = element.innerHTML
-        ctx.notifyChange(richTextHtmlToMode(html, mode))
+        ctx.notifyChange(richTextHtmlToMode(sanitizeHtml(element.innerHTML), mode))
       }
 
       const refreshActiveFormats = () => {
         if (!isBrowser()) return
-        const next = new Set<string>()
-        if (typeof document.queryCommandState !== 'function') {
-          ctx.notifyActiveFormats(next)
-          return
+        const next = blockFormatsFromSelection(element)
+        if (typeof document.queryCommandState === 'function') {
+          if (document.queryCommandState('bold')) next.add('bold')
+          if (document.queryCommandState('italic')) next.add('italic')
+          if (document.queryCommandState('underline')) next.add('underline')
+          if (document.queryCommandState('strikeThrough')) next.add('strikethrough')
+          if (document.queryCommandState('insertUnorderedList')) next.add('bulletList')
+          if (document.queryCommandState('insertOrderedList')) next.add('orderedList')
         }
-        if (document.queryCommandState('bold')) next.add('bold')
-        if (document.queryCommandState('italic')) next.add('italic')
-        if (document.queryCommandState('underline')) next.add('underline')
-        if (document.queryCommandState('strikeThrough')) next.add('strikethrough')
-        if (document.queryCommandState('insertUnorderedList')) next.add('bulletList')
-        if (document.queryCommandState('insertOrderedList')) next.add('orderedList')
         ctx.notifyActiveFormats(next)
       }
 
+      const handlePaste = (event: Event) => {
+        if (readOnly || disabled) return
+        const pasteEvent = event as ClipboardEvent
+        const html = clipboardHtml(pasteEvent)
+        if (!html) return
+        pasteEvent.preventDefault()
+        insertSanitizedHtml(html)
+        handleInput()
+        refreshActiveFormats()
+      }
+
+      const handleDrop = (event: Event) => {
+        if (readOnly || disabled) return
+        const dragEvent = event as DragEvent
+        const html = clipboardHtml(dragEvent)
+        if (!html) return
+        dragEvent.preventDefault()
+        insertSanitizedHtml(html)
+        handleInput()
+        refreshActiveFormats()
+      }
+
+      const handleBeforeInput = (event: Event) => {
+        if (readOnly || disabled) return
+        const inputEvent = event as InputEvent
+        if (
+          inputEvent.inputType !== 'insertFromPaste' &&
+          inputEvent.inputType !== 'insertFromDrop' &&
+          inputEvent.inputType !== 'insertHTML'
+        ) {
+          return
+        }
+        const data =
+          inputEvent.dataTransfer?.getData('text/html') ||
+          inputEvent.dataTransfer?.getData('text/plain') ||
+          inputEvent.data ||
+          ''
+        if (!data) return
+        inputEvent.preventDefault()
+        insertSanitizedHtml(data)
+        handleInput()
+        refreshActiveFormats()
+      }
+
       element.addEventListener('input', handleInput)
+      element.addEventListener('paste', handlePaste)
+      element.addEventListener('drop', handleDrop)
+      element.addEventListener('beforeinput', handleBeforeInput)
 
       let selectionHandler: (() => void) | null = null
       if (isBrowser()) {
-        selectionHandler = refreshActiveFormats
+        selectionHandler = () => {
+          const selection = document.getSelection()
+          if (!selection?.anchorNode || !element.contains(selection.anchorNode)) return
+          refreshActiveFormats()
+        }
         document.addEventListener('selectionchange', selectionHandler)
       }
 
@@ -135,8 +235,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         if (readOnly || disabled) return
         if (typeof element.focus === 'function') element.focus()
 
-        // Check for custom action on the toolbar button first
-        const buttons = getToolbarButtons(ctx.toolbar)
+        const buttons = getToolbarButtons(toolbar)
         const btn = buttons.find((b) => b.name === actionName)
         if (btn?.action) {
           btn.action(element)
@@ -148,21 +247,25 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         const mapping = mapToolbarAction(actionName)
         if (mapping) {
           if (!canUseExecCommand()) return
-          document.execCommand(mapping.command, false, mapping.argument)
+          if (mapping.command === 'formatBlock' && mapping.argument) {
+            execFormatBlock(mapping.argument.replace(/[<>]/g, '').toLowerCase())
+          } else {
+            document.execCommand(mapping.command, false, mapping.argument)
+          }
           handleInput()
           refreshActiveFormats()
           return
         }
 
         if (actionName === 'codeBlock') {
-          if (!canUseExecCommand()) return
-          document.execCommand('formatBlock', false, 'PRE')
+          execFormatBlock('pre')
           handleInput()
+          refreshActiveFormats()
           return
         }
         if (actionName === 'link') {
           if (!canUseExecCommand()) return
-          const url = promptForRichTextUrl('Enter URL:')
+          const url = ctx.requestUrl?.('link') ?? null
           if (url && isValidUrl(url)) {
             document.execCommand('createLink', false, url)
             handleInput()
@@ -171,7 +274,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         }
         if (actionName === 'image') {
           if (!canUseExecCommand()) return
-          const url = promptForRichTextUrl('Enter image URL:')
+          const url = ctx.requestUrl?.('image') ?? null
           if (url && isValidUrl(url)) {
             document.execCommand('insertImage', false, url)
             handleInput()
@@ -194,8 +297,20 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           disabled = nextDisabled
           element.contentEditable = String(!(readOnly || disabled))
         },
+        setMode(nextMode) {
+          if (mode === nextMode) return
+          const html = element.innerHTML
+          mode = nextMode
+          ctx.notifyChange(richTextHtmlToMode(html, mode))
+        },
+        setToolbar(nextToolbar) {
+          toolbar = nextToolbar
+        },
         destroy() {
           element.removeEventListener('input', handleInput)
+          element.removeEventListener('paste', handlePaste)
+          element.removeEventListener('drop', handleDrop)
+          element.removeEventListener('beforeinput', handleBeforeInput)
           if (selectionHandler && isBrowser()) {
             document.removeEventListener('selectionchange', selectionHandler)
           }

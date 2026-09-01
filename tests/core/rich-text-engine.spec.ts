@@ -240,85 +240,111 @@ describe('rich-text-engine', () => {
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
     instance.exec('heading2')
-    expect(exec).toHaveBeenCalledWith('formatBlock', false, 'H2')
+    expect(exec).toHaveBeenCalledWith('formatBlock', false, '<h2>')
     exec.mockRestore()
   })
 
-  it('exec handles codeBlock action via formatBlock=PRE', () => {
+  it('exec handles codeBlock action via formatBlock pre', () => {
     const { ctx, changes } = makeContext()
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
     instance.exec('codeBlock')
-    expect(exec).toHaveBeenCalledWith('formatBlock', false, 'PRE')
+    expect(exec).toHaveBeenCalledWith('formatBlock', false, '<pre>')
     expect(changes.length).toBeGreaterThanOrEqual(1)
     exec.mockRestore()
   })
 
-  it('exec link prompts for URL and createLink with valid URL', () => {
-    const { ctx } = makeContext()
+  it('exec link uses requestUrl and createLink with valid URL', () => {
+    const requestUrl = vi.fn(() => 'https://example.com')
+    const { ctx } = makeContext({ requestUrl })
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('https://example.com')
     instance.exec('link')
-    expect(prompt).toHaveBeenCalled()
+    expect(requestUrl).toHaveBeenCalledWith('link')
     expect(exec).toHaveBeenCalledWith('createLink', false, 'https://example.com')
     exec.mockRestore()
-    prompt.mockRestore()
   })
 
-  it('exec link with cancelled prompt is a no-op', () => {
+  it('exec link without requestUrl is a no-op', () => {
     const { ctx } = makeContext()
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue(null)
+    const prompt = vi.spyOn(window, 'prompt')
     instance.exec('link')
+    expect(prompt).not.toHaveBeenCalled()
     expect(exec).not.toHaveBeenCalled()
     exec.mockRestore()
     prompt.mockRestore()
   })
 
   it('exec link with invalid URL is a no-op', () => {
-    const { ctx } = makeContext()
+    const { ctx } = makeContext({ requestUrl: () => 'javascript:alert(1)' })
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('not a url')
     instance.exec('link')
     expect(exec).not.toHaveBeenCalled()
     exec.mockRestore()
-    prompt.mockRestore()
   })
 
-  it('exec image prompts for URL and insertImage with valid URL', () => {
-    const { ctx } = makeContext()
+  it('exec image uses requestUrl and insertImage with valid URL', () => {
+    const requestUrl = vi.fn(() => 'https://example.com/x.png')
+    const { ctx } = makeContext({ requestUrl })
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('https://example.com/x.png')
     instance.exec('image')
+    expect(requestUrl).toHaveBeenCalledWith('image')
     expect(exec).toHaveBeenCalledWith('insertImage', false, 'https://example.com/x.png')
     exec.mockRestore()
-    prompt.mockRestore()
   })
 
-  it('exec image with cancelled prompt is a no-op', () => {
+  it('exec image without requestUrl is a no-op', () => {
     const { ctx } = makeContext()
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue(null)
     instance.exec('image')
     expect(exec).not.toHaveBeenCalled()
     exec.mockRestore()
-    prompt.mockRestore()
   })
 
   it('exec image with invalid URL is a no-op', () => {
-    const { ctx } = makeContext()
+    const { ctx } = makeContext({ requestUrl: () => 'javascript:alert(1)' })
     instance = builtinRichTextEngine.create(ctx)
     const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true)
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('javascript:alert(1)')
     instance.exec('image')
     expect(exec).not.toHaveBeenCalled()
     exec.mockRestore()
-    prompt.mockRestore()
+  })
+
+  it('paste inserts sanitised HTML and never keeps onerror', () => {
+    const { ctx, changes } = makeContext()
+    instance = builtinRichTextEngine.create(ctx)
+    const exec = vi.spyOn(document, 'execCommand').mockImplementation((command, _ui, value) => {
+      if (command === 'insertHTML' && typeof value === 'string') {
+        ctx.element.innerHTML = value
+        return true
+      }
+      return true
+    })
+    const paste = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
+    Object.defineProperty(paste, 'clipboardData', {
+      value: {
+        getData: (type: string) => (type === 'text/html' ? '<img src=x onerror=alert(1)>' : '')
+      }
+    })
+    ctx.element.dispatchEvent(paste)
+    expect(ctx.element.innerHTML).not.toContain('onerror')
+    expect(changes.at(-1) ?? '').not.toContain('onerror')
+    exec.mockRestore()
+  })
+
+  it('setMode re-emits the current host HTML in the new public mode', () => {
+    const { ctx, changes } = makeContext({
+      mode: 'html',
+      initialValue: '<h1>Title</h1>'
+    })
+    instance = builtinRichTextEngine.create(ctx)
+    instance.setMode('markdown')
+    expect(changes.at(-1)).toContain('# Title')
   })
 
   it('exec ignores unknown action names', () => {
@@ -341,9 +367,19 @@ describe('rich-text-engine', () => {
     exec.mockRestore()
   })
 
-  it('selectionchange event triggers refreshActiveFormats', () => {
-    const { ctx, formats } = makeContext()
+  it('selectionchange only refreshes when the caret is inside this host', () => {
+    const { ctx, formats } = makeContext({ initialValue: '<p>Hello</p>' })
     instance = builtinRichTextEngine.create(ctx)
+    formats.length = 0
+    document.dispatchEvent(new Event('selectionchange'))
+    expect(formats).toHaveLength(0)
+
+    const text = ctx.element.querySelector('p') ?? ctx.element
+    const range = document.createRange()
+    range.selectNodeContents(text)
+    const selection = document.getSelection()
+    selection?.removeAllRanges()
+    selection?.addRange(range)
     formats.length = 0
     document.dispatchEvent(new Event('selectionchange'))
     expect(formats.length).toBeGreaterThanOrEqual(1)
