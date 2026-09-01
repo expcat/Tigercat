@@ -58,12 +58,14 @@ describe('ScrollArea', () => {
       expect(viewport.style.width).toBe('100%')
     })
 
-    it('merges attrs class onto the viewport', () => {
+    it('merges attrs class onto the root', () => {
       const { container } = render(ScrollArea, {
         attrs: { class: 'custom-root' },
         slots: { default: () => h('p', 'body') }
       })
-      expect(getViewport(container).className).toContain('custom-root')
+      const root = container.querySelector('[data-scroll-area]') as HTMLElement
+      expect(root.className).toContain('custom-root')
+      expect(getViewport(container).className).not.toContain('custom-root')
     })
   })
 

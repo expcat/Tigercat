@@ -261,6 +261,23 @@ describe('focus-utils', () => {
       expect(items).toEqual([item1, item3])
     })
 
+    it('skips menuitems with aria-disabled even when the value is empty', () => {
+      const container = document.createElement('div')
+      const item1 = document.createElement('button')
+      item1.setAttribute('role', 'menuitem')
+      const item2 = document.createElement('a')
+      item2.setAttribute('role', 'menuitem')
+      item2.setAttribute('aria-disabled', '')
+      const item3 = document.createElement('a')
+      item3.setAttribute('role', 'menuitem')
+      item3.setAttribute('aria-disabled', 'true')
+      container.append(item1, item2, item3)
+      document.body.appendChild(container)
+      cleanup.push(container)
+
+      expect(getMenuItems(container)).toEqual([item1])
+    })
+
     it('skips menuitems inside a hidden nested menu', () => {
       const container = document.createElement('div')
       const menu = document.createElement('div')

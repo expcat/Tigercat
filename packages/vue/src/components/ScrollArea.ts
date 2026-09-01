@@ -353,7 +353,7 @@ export const ScrollArea = defineComponent({
         'div',
         {
           ...restRoot,
-          class: scrollAreaRootClasses,
+          class: classNames(scrollAreaRootClasses, props.className, coerceClassValue(attrClass)),
           'data-scroll-area': '',
           'data-scrolling': scrolling.value ? '' : undefined
         },
@@ -362,10 +362,7 @@ export const ScrollArea = defineComponent({
             'div',
             {
               ref: viewportRef,
-              class: getScrollAreaViewportClasses(
-                props.direction,
-                classNames(props.className, props.viewportClassName, coerceClassValue(attrClass))
-              ),
+              class: getScrollAreaViewportClasses(props.direction, props.viewportClassName),
               style: mergeStyleValues(
                 {
                   ...getScrollAreaBoxStyle(props),

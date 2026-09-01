@@ -477,10 +477,21 @@ export const NavigationMenuContent = defineComponent({
       root?.handleFocusLeave(event)
     }
 
+    let keydownLocked = false
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (keydownLocked) return
       const panel = item?.contentRef.value
       if (!panel || !item || !root) return
       if (!panel.contains(event.target as Node | null)) return
+      keydownLocked = true
+      try {
+        handlePanelKeyDown(event, panel)
+      } finally {
+        keydownLocked = false
+      }
+    }
+
+    const handlePanelKeyDown = (event: KeyboardEvent, panel: HTMLElement) => {
       const dir = resolveElementDir(root.rootRef.value ?? root.menubarRef.value)
       const action = applyNavigationMenuPanelKey({ event, panel, dir })
       if (!action || action === 'menu-nav') return

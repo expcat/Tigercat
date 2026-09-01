@@ -351,15 +351,12 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     <div
       {...(rootRest as React.HTMLAttributes<HTMLDivElement>)}
       ref={rootRef}
-      className={scrollAreaRootClasses}
+      className={classNames(scrollAreaRootClasses, className)}
       data-scroll-area=""
       data-scrolling={scrolling ? '' : undefined}>
       <div
         ref={viewportRef}
-        className={getScrollAreaViewportClasses(
-          direction,
-          classNames(className, viewportClassName)
-        )}
+        className={getScrollAreaViewportClasses(direction, viewportClassName)}
         style={boxStyle}
         tabIndex={tabIndex}
         role={viewportName ? 'region' : undefined}

@@ -10,10 +10,10 @@ for (const app of exampleApps) {
 
     await expect(preview.getByRole('button', { name: sourceLabel, exact: true })).toBeVisible()
     await moduleRoot.getByTestId('demo-edit-source').click()
-    const editor = moduleRoot.getByRole('textbox', { name: 'Code editor', exact: true })
+    const editor = moduleRoot.getByRole('textbox', { name: /Code editor|代码编辑器/ })
     const source = await editor.inputValue()
     await editor.fill(source.replace(sourceLabel, editedLabel))
-    await expect(moduleRoot.getByText('已修改 · 尚未运行', { exact: true })).toBeVisible()
+    await expect(moduleRoot.getByText(/已修改 · 尚未运行|Edited · not run yet/)).toBeVisible()
 
     await moduleRoot.getByTestId('demo-run').click()
     await expect(preview.getByRole('button', { name: editedLabel, exact: true })).toBeVisible()

@@ -69,7 +69,8 @@ describe('ScrollArea', () => {
         </ScrollArea>
       )
       const root = container.querySelector('[data-scroll-area]') as HTMLElement
-      expect(getViewport(container).className).toContain('custom-root')
+      expect(root.className).toContain('custom-root')
+      expect(getViewport(container).className).not.toContain('custom-root')
       expect(root.id).toBe('log-panel')
     })
   })

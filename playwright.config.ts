@@ -11,6 +11,7 @@ export default defineConfig({
   workers: 1,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'html',
   use: {
+    locale: 'zh-CN',
     trace: 'on-first-retry'
   },
   projects: [

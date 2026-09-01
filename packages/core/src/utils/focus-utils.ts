@@ -77,7 +77,10 @@ export function getMenuItems(container: HTMLElement): HTMLElement[] {
   return Array.from(menu.querySelectorAll<HTMLElement>('[role="menuitem"]')).filter((el) => {
     const owner = el.closest<HTMLElement>('[role="menu"]')
     if (owner && owner !== menu) return false
-    if (el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true') return false
+    const ariaDisabled = el.getAttribute('aria-disabled')
+    if (el.hasAttribute('disabled') || (ariaDisabled !== null && ariaDisabled !== 'false')) {
+      return false
+    }
     if (isHiddenOrInert(el, menu)) return false
     return true
   })
