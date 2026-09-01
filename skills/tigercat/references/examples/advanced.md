@@ -22,7 +22,8 @@ description: Compact Tigercat Advanced Vue and React usage routes
 | Component       | Vue                                                                                                                      | React                                                                                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
 | CodeEditor      | `<CodeEditor v-model="code" language="javascript" />`                                                                    | `<CodeEditor value={code} onChange={setCode} language="javascript" />`                                 |
-| ImageAnnotation | `<ImageAnnotation :src="src" />`                                                                                         | `<ImageAnnotation src={src} />`                                                                        |
+| FileManager     | `<FileManager :files="files" />`                                                                                         | `<FileManager files={files} />`                                                                        |
+| ImageAnnotation | `<ImageAnnotation src="..." v-model="value" />`                                                                          | `<ImageAnnotation src="..." value={value} onChange={setValue} />`                                      |
 | ImageViewer     | `<ImageViewer :images="images" />`                                                                                       | `<ImageViewer images={images} />`                                                                      |
 | InfiniteScroll  | `<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>`                   | `<InfiniteScroll hasMore={hasMore} height={288} onLoadMore={loadMore}>{items}</InfiniteScroll>`        |
 | Kanban          | `<Kanban :columns="columns" />`                                                                                          | `<Kanban columns={columns} />`                                                                         |
@@ -32,6 +33,6 @@ description: Compact Tigercat Advanced Vue and React usage routes
 | VirtualList     | `<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>` | `<VirtualList itemCount={count} itemHeight={40} renderItem={({ index }) => <div>{index}</div>} />`     |
 | VirtualTable    | `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />`           | `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />` |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：FileManager, PrintPageBreak.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：PrintPageBreak.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

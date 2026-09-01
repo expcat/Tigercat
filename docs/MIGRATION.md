@@ -4,6 +4,10 @@
 
 ## 未发布
 
+FileManager `currentPath` 是文件夹 **key** 数组，不是显示名。省略 `currentPath` / `searchText` 时组件自己记路径和搜索；`''` 是空搜索。`v-model:files` / `onFilesChange` 回写的是整棵树，不是当前页扁列表。`columns` 不再含 `name`。删除写死英文 `File path` / `Empty folder`。
+
+ImageAnnotation 只认 pointer（不再绑 `mouse*`）。`onChange` meta 只剩 `'add' | 'remove'`。形状名走 locale，不再是 `` `${type} annotation` ``。删除 `getImageAnnotationToolLabel`。`selectedId=""` 是受控未选；`disabled` 不能选。
+
 Vue `CodeEditor` / `RichTextEditor` / `MarkdownEditor` 从 `v-model:value` 改成默认 `v-model`（`modelValue` / `update:modelValue`），和 Input 族同一套。React 仍是 `value` + `onChange`。删除 `markdownModeLabels`。
 
 `sanitizeHtml` 是白名单解析，不再是正则。粘贴进 RichTextEditor 会先消毒再写入。自定义 `engine` / `highlighter` / `renderer` / toolbar `icon` 的 HTML 是 TRUSTED。Markdown 预览允许相对路径和 `#hash`，仍拒绝 `javascript:` / `data:` / `//`。

@@ -49,7 +49,7 @@ export default function App() {
           删除选中
         </button>
       </div>
-      <div className="h-96 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="h-96 rounded-lg border border-gray-200 dark:border-gray-700">
         <FileManager
           files={files}
           viewMode="grid"

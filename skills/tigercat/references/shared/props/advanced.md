@@ -26,26 +26,34 @@ description: Compact generated Tigercat Advanced props reference
 
 ## FileManager
 
-`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 3/18 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 8/21 props
 
-| Prop       | Type                   | Default | Notes                                                  |
-| ---------- | ---------------------- | ------- | ------------------------------------------------------ |
-| `columns?` | `FileSortField[]`      | `-`     | Which columns to show in list view                     |
-| `loading?` | `boolean`              | `-`     | Loading state                                          |
-| `locale?`  | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
+| Prop            | Type                   | Default | Notes                                                                                      |
+| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `files?`        | `FileItem[]`           | `-`     | File/folder tree data                                                                      |
+| `currentPath?`  | `string[]`             | `-`     | Current directory as folder **keys** (controlled). Omit for an internal path buffer. Do... |
+| `selectedKeys?` | `(string \| number)[]` | `-`     | Currently selected file keys (controlled)                                                  |
+| `searchable?`   | `boolean`              | `-`     | Searchable                                                                                 |
+| `draggable?`    | `boolean`              | `-`     | Enable HTML5 reorder of the current folder. Disabled while search or hidden-file filter... |
+| `viewMode?`     | `FileViewMode`         | `-`     | View mode                                                                                  |
+| `multiple?`     | `boolean`              | `-`     | Allow multiple selection                                                                   |
+| `columns?`      | `FileColumn[]`         | `-`     | Extra list-view columns (`size` / `type` / `modified`). Name is always shown.              |
 
 Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, ....
 
 ## ImageAnnotation
 
-`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/18 props
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 7/18 props
 
-| Prop        | Type                   | Default | Notes |
-| ----------- | ---------------------- | ------- | ----- |
-| `src`       | `string`               | `-`     | -     |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | -     |
-| `value?`    | `ImageAnnotation[]`    | `-`     | -     |
-| `disabled?` | `boolean`              | `-`     | -     |
+| Prop          | Type                   | Default | Notes                                                                                    |
+| ------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `src`         | `string`               | `-`     | -                                                                                        |
+| `value?`      | `ImageAnnotation[]`    | `-`     | -                                                                                        |
+| `tool?`       | `ImageAnnotationTool`  | `-`     | -                                                                                        |
+| `selectedId?` | `string`               | `-`     | Controlled selected id. `undefined` is uncontrolled; `''` is controlled none.            |
+| `readonly?`   | `boolean`              | `-`     | -                                                                                        |
+| `disabled?`   | `boolean`              | `-`     | Disables drawing, selection, and tab stops on shapes. `readonly` still allows selection. |
+| `locale?`     | `Partial<TigerLocale>` | `-`     | -                                                                                        |
 
 ## ImageViewer
 

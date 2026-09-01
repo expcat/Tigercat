@@ -3,6 +3,10 @@ import { ref } from 'vue'
 import { ImageAnnotation } from '@expcat/tigercat-vue/ImageAnnotation'
 import type { ImageAnnotation as Annotation, ImageAnnotationTool } from '@expcat/tigercat-core'
 
+const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="#f1f5f9"/><rect x="40" y="60" width="220" height="160" fill="#bfdbfe"/><ellipse cx="430" cy="180" rx="110" ry="90" fill="#bbf7d0"/></svg>'
+)}`
+
 const tools: ImageAnnotationTool[] = ['select', 'rectangle', 'ellipse', 'polygon', 'freehand']
 
 const annotations = ref<Annotation[]>([
@@ -30,6 +34,7 @@ const annotations = ref<Annotation[]>([
 const tool = ref<ImageAnnotationTool>('select')
 const selectedId = ref('entrance')
 const readOnly = ref(false)
+const disabled = ref(false)
 
 const handleToolControl = (event: Event) => {
   tool.value = (event.target as HTMLSelectElement).value as ImageAnnotationTool
@@ -56,7 +61,7 @@ const handleSelect = (annotation: Annotation | null) => {
         <select
           class="rounded border border-gray-300 bg-white px-2 py-1.5 dark:border-gray-600 dark:bg-gray-900"
           :value="tool"
-          :disabled="readOnly"
+          :disabled="readOnly || disabled"
           @change="handleToolControl">
           <option v-for="item in tools" :key="item" :value="item">{{ item }}</option>
         </select>
@@ -67,6 +72,7 @@ const handleSelect = (annotation: Annotation | null) => {
         <select
           class="rounded border border-gray-300 bg-white px-2 py-1.5 dark:border-gray-600 dark:bg-gray-900"
           :value="selectedId"
+          :disabled="disabled"
           @change="handleSelectionControl">
           <option value="">无</option>
           <option v-for="annotation in annotations" :key="annotation.id" :value="annotation.id">
@@ -79,20 +85,28 @@ const handleSelect = (annotation: Annotation | null) => {
         <input v-model="readOnly" type="checkbox" />
         只读模式
       </label>
+
+      <label class="flex items-center gap-2 pb-1.5 text-sm">
+        <input v-model="disabled" type="checkbox" />
+        禁用
+      </label>
     </div>
 
     <ImageAnnotation
       v-model="annotations"
-      src="https://picsum.photos/seed/annotation-controlled/900/600"
+      :src="source"
       :tool="tool"
       :selected-id="selectedId"
       :readonly="readOnly"
+      :disabled="disabled"
       :tools="tools"
       @tool-change="handleToolChange"
       @select="handleSelect" />
 
     <p class="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
-      当前工具：{{ tool }}；当前选区：{{ selectedId || '无' }}；{{ readOnly ? '只读' : '可编辑' }}。
+      selectedId 空字符串是受控未选；点空白会清选中。当前工具：{{ tool }}；当前选区：{{
+        selectedId || '无'
+      }}；{{ disabled ? '禁用' : readOnly ? '只读' : '可编辑' }}。
     </p>
   </div>
 </template>

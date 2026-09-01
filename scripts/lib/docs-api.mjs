@@ -728,6 +728,16 @@ export const COMPONENT_PROP_PRIORITY = {
     'placeholder?',
     'readOnly?'
   ],
+  FileManager: [
+    'files?',
+    'currentPath?',
+    'selectedKeys?',
+    'searchable?',
+    'draggable?',
+    'viewMode?',
+    'multiple?'
+  ],
+  ImageAnnotation: ['src', 'value?', 'tool?', 'selectedId?', 'readonly?', 'disabled?'],
   Gantt: [
     'scale?',
     'rowHeight?',
@@ -995,7 +1005,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ChartTooltip: '<ChartTooltip :content="label" :open="open" :x="x" :y="y" />',
     CodeEditor: '<CodeEditor v-model="code" language="javascript" />',
     RichTextEditor: '<RichTextEditor v-model="html" />',
-    MarkdownEditor: '<MarkdownEditor v-model="md" />'
+    MarkdownEditor: '<MarkdownEditor v-model="md" />',
+    FileManager: '<FileManager :files="files" />',
+    ImageAnnotation: '<ImageAnnotation src="..." v-model="value" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -1130,7 +1142,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ChartTooltip: '<ChartTooltip content={label} open={open} x={x} y={y} />',
     CodeEditor: '<CodeEditor value={code} onChange={setCode} language="javascript" />',
     RichTextEditor: '<RichTextEditor value={html} onChange={setHtml} />',
-    MarkdownEditor: '<MarkdownEditor value={md} onChange={setMd} />'
+    MarkdownEditor: '<MarkdownEditor value={md} onChange={setMd} />',
+    FileManager: '<FileManager files={files} />',
+    ImageAnnotation: '<ImageAnnotation src="..." value={value} onChange={setValue} />'
   }
 }
 

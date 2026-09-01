@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **FileManager**：`currentPath` / `searchText` 与 `selectedKeys` 同一套受控探测，不绑回调时双击文件夹会进入。路径是文件夹 key。搜索 `''` 是真清空，只匹配当前层名称。`draggable` 重排当前层源数组并回写整棵 `files` 树。面包屑是 button，listbox 有 locale 名，越界 roving 会夹紧。根节点 `h-full`，高度/style 进 DOM。
+- **ImageAnnotation**：绘制走 pointer 会话（含触控和 `pointercancel`）。id 不与已有 `value` 撞。读图有 generation / onerror，失败不再无限转圈。`disabled` 时形状不能选。形状名和画布名走 locale。点空白清选中。
 - **编辑器族（CodeEditor / RichTextEditor / MarkdownEditor）**：`sanitizeHtml` 改白名单解析，粘贴写入 DOM 前消毒。CodeEditor 只留一个 scroller，行号与代码对齐；Tab 缩进、`readOnly` 不改值。Vue 三个编辑器都走 `v-model` / `modelValue`。RTE 工具条 `mousedown` 保住选区，engine 的 `mode` / `toolbar` 挂载后仍生效。Markdown 预览放行相对 URL，preview 下隐藏格式工具条。自定义 `highlighter` / `engine` / `renderer` / `icon` 是 TRUSTED。删除 `markdownModeLabels`。
 - **径向图（Pie / Donut / Radar / Funnel / Gauge）**：几何下沉 `layoutPieSlices` / `layoutRadar` / `layoutFunnel` / `layoutGauge`。Donut 把决议后的半径交给 Pie（`outside` 标签时 inner 相对缩小后的 outer）。缺 label 走 locale（`sliceName` / `stageName` / `seriesName`），不要 `Stage N` / `Slice N` 写死在 core。扇区/点/段默认 `aria-hidden`，不要每片 `role=img`。`responsive` 接 Canvas 尺寸宿主。Funnel `direction="horizontal"` 真水平。Gauge 角度 0 = 12 点钟顺时针，默认 `-135…135` 底开口；`animated` 可关，reduced-motion 不插值。入场动画走 plugin class。01 只传 `data` / `value`。
 - **笛卡尔图（Bar / Line / Area / Scatter）**：几何下沉 `layoutBarRects` / `layoutLineSeries` / `layoutAreaSeries` / `layoutScatterPoints`。四图同一份 `DEFAULT_CHART_PADDING`。`barRadius` 传入即盖过 token；负柱标签在柱底外侧。`showArea` 基线是 `yScale.map(0)`。堆叠面积复用上一层顶边，缺 x 补 0，正负分堆。Scatter 默认不再用 24 裁轴标；`sizeScale` 把 `size` 映成半径；gradient 不丢 `item.color`。点默认 `aria-hidden`，不要每点 `role=img`。画线/入场动画走 plugin class，禁止运行时插 `<style>`。01 只传 `data` 即可看。

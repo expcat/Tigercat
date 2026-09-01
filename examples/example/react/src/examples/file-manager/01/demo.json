@@ -1,7 +1,7 @@
 {
   "id": "file-manager-01",
   "title": "列表与导航",
-  "description": "一个 FileManager 组合展示列表视图、多选、搜索和受控路径；网格视图可将 viewMode 改为 grid。",
+  "description": "不绑 currentPath 时双击文件夹会进入。搜索只匹配当前文件夹的名称，不会递归子目录。高度写在组件根节点上。",
   "entry": "App.tsx",
   "order": 1
 }

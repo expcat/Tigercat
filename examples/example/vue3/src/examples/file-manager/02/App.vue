@@ -58,9 +58,9 @@ const handleSearch = (text: string) => {
         删除选中
       </button>
     </div>
-    <div class="h-96 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+    <div class="h-96 rounded-lg border border-gray-200 dark:border-gray-700">
       <FileManager
-        v-model:files="files"
+        :files="files"
         :selected-keys="selectedKeys"
         :search-text="searchText"
         view-mode="grid"

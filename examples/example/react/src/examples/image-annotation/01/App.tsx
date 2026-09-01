@@ -1,30 +1,9 @@
-import { useState } from 'react'
 import { ImageAnnotation } from '@expcat/tigercat-react/ImageAnnotation'
-import type { ImageAnnotation as Annotation } from '@expcat/tigercat-core'
 
-const initialAnnotations: Annotation[] = [
-  {
-    id: 'region-1',
-    type: 'rectangle',
-    x: 0.12,
-    y: 0.18,
-    width: 0.22,
-    height: 0.2,
-    label: '入口',
-    color: '#2563eb'
-  }
-]
+const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="#e0f2fe"/><circle cx="470" cy="105" r="55" fill="#facc15"/><path d="M0 330 170 150l110 120 90-95 270 225H0Z" fill="#0f766e"/></svg>'
+)}`
 
 export default function App() {
-  const [annotations, setAnnotations] = useState(initialAnnotations)
-
-  return (
-    <ImageAnnotation
-      src="https://picsum.photos/seed/annotation/900/600"
-      value={annotations}
-      onChange={setAnnotations}
-      tools={['select', 'rectangle', 'ellipse', 'polygon', 'freehand']}
-      defaultTool="rectangle"
-    />
-  )
+  return <ImageAnnotation src={source} />
 }

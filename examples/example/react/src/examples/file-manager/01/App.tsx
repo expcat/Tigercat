@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { FileManager } from '@expcat/tigercat-react/FileManager'
 
 const files = [
@@ -18,18 +17,5 @@ const files = [
 ]
 
 export default function App() {
-  const [currentPath, setCurrentPath] = useState<string[]>([])
-
-  return (
-    <div className="h-80 overflow-hidden rounded-lg border border-gray-200">
-      <FileManager
-        files={files}
-        viewMode="list"
-        multiple
-        searchable
-        currentPath={currentPath}
-        onNavigate={setCurrentPath}
-      />
-    </div>
-  )
+  return <FileManager files={files} viewMode="list" multiple searchable style={{ height: 360 }} />
 }

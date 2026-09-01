@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { FileManager } from '@expcat/tigercat-vue/FileManager'
 
 const files = [
@@ -17,8 +16,6 @@ const files = [
   },
   { key: 'readme', name: 'README.md', type: 'file' as const, size: 2048 }
 ]
-
-const currentPath = ref<string[]>([])
 </script>
 
 <template>
@@ -27,7 +24,5 @@ const currentPath = ref<string[]>([])
     view-mode="list"
     multiple
     searchable
-    :current-path="currentPath"
-    style="height: 360px; border: 1px solid #e5e7eb; border-radius: 8px"
-    @navigate="currentPath = $event" />
+    style="height: 360px; border: 1px solid #e5e7eb; border-radius: 8px" />
 </template>

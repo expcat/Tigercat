@@ -1,7 +1,7 @@
 {
   "id": "image-annotation-01",
-  "title": "受控多工具标注",
-  "description": "一个 ImageAnnotation 组合展示受控标注和多形状工具；defaultTool 可替换为任一启用工具。",
+  "title": "默认选择工具",
+  "description": "本地图 + 默认 select 工具。失败会显示错误态，不会无限转圈。",
   "entry": "App.tsx",
   "order": 1
 }

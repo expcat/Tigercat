@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { ImageAnnotation } from '@expcat/tigercat-react/ImageAnnotation'
 import type { ImageAnnotation as Annotation, ImageAnnotationTool } from '@expcat/tigercat-core'
 
+const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="#f1f5f9"/><rect x="40" y="60" width="220" height="160" fill="#bfdbfe"/><ellipse cx="430" cy="180" rx="110" ry="90" fill="#bbf7d0"/></svg>'
+)}`
+
 const tools: ImageAnnotationTool[] = ['select', 'rectangle', 'ellipse', 'polygon', 'freehand']
 
 const initialAnnotations: Annotation[] = [
@@ -32,6 +36,7 @@ export default function App() {
   const [tool, setTool] = useState<ImageAnnotationTool>('select')
   const [selectedId, setSelectedId] = useState('entrance')
   const [readOnly, setReadOnly] = useState(false)
+  const [disabled, setDisabled] = useState(false)
 
   return (
     <div className="space-y-3">
@@ -41,7 +46,7 @@ export default function App() {
           <select
             className="rounded border border-gray-300 bg-white px-2 py-1.5 dark:border-gray-600 dark:bg-gray-900"
             value={tool}
-            disabled={readOnly}
+            disabled={readOnly || disabled}
             onChange={(event) => setTool(event.target.value as ImageAnnotationTool)}>
             {tools.map((item) => (
               <option key={item} value={item}>
@@ -56,6 +61,7 @@ export default function App() {
           <select
             className="rounded border border-gray-300 bg-white px-2 py-1.5 dark:border-gray-600 dark:bg-gray-900"
             value={selectedId}
+            disabled={disabled}
             onChange={(event) => setSelectedId(event.target.value)}>
             <option value="">无</option>
             {annotations.map((annotation) => (
@@ -74,14 +80,24 @@ export default function App() {
           />
           只读模式
         </label>
+
+        <label className="flex items-center gap-2 pb-1.5 text-sm">
+          <input
+            type="checkbox"
+            checked={disabled}
+            onChange={(event) => setDisabled(event.target.checked)}
+          />
+          禁用
+        </label>
       </div>
 
       <ImageAnnotation
-        src="https://picsum.photos/seed/annotation-controlled/900/600"
+        src={source}
         value={annotations}
         tool={tool}
         selectedId={selectedId}
         readonly={readOnly}
+        disabled={disabled}
         tools={tools}
         onChange={setAnnotations}
         onToolChange={setTool}
@@ -89,7 +105,8 @@ export default function App() {
       />
 
       <p className="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
-        当前工具：{tool}；当前选区：{selectedId || '无'}；{readOnly ? '只读' : '可编辑'}。
+        selectedId 空字符串是受控未选；点空白会清选中。当前工具：{tool}；当前选区：
+        {selectedId || '无'}；{disabled ? '禁用' : readOnly ? '只读' : '可编辑'}。
       </p>
     </div>
   )
