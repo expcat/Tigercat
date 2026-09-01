@@ -333,7 +333,7 @@ export type { VueFunnelChartProps, FunnelChartProps } from './components/FunnelC
 export { GaugeChart } from './components/GaugeChart'
 export type { VueGaugeChartProps, GaugeChartProps } from './components/GaugeChart'
 export { HeatmapChart } from './components/HeatmapChart'
-export type { VueHeatmapChartProps } from './components/HeatmapChart'
+export type { VueHeatmapChartProps, HeatmapChartProps } from './components/HeatmapChart'
 export { TreeMapChart } from './components/TreeMapChart'
 export type { VueTreeMapChartProps } from './components/TreeMapChart'
 export { SunburstChart } from './components/SunburstChart'

@@ -354,7 +354,17 @@ export const arSA: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'مفتاح الرسم البياني',
-    pointAriaLabel: 'النقطة {index}: ({x}, {y})'
+    pointAriaLabel: 'النقطة {index}: ({x}, {y})',
+    seriesName: 'السلسلة {index}',
+    sliceName: 'الشريحة {index}',
+    sliceAriaLabel: '{label}: {value} ({percent}٪)',
+    stageName: 'المرحلة {index}',
+    heatmapTooltip: '{x} × {y} = {value}',
+    treemapTooltip: '{label}: {value} ({percent}٪)',
+    sunburstTooltip: '{label}: {value} ({percent}٪)',
+    orgChartAriaLabel: 'المخطط التنظيمي',
+    ganttAriaLabel: 'مخطط غانت',
+    ganttTaskAriaLabel: '{label}، {start} إلى {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'تنسيق Markdown',

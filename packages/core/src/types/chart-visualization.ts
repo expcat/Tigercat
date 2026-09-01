@@ -6,6 +6,7 @@ import type {
   BaseChartProps,
   ChartInteractionProps,
   ChartLegendToggleProps,
+  ChartPadding,
   ChartScaleValue,
   ChartBuiltInTooltipProps
 } from './chart-core'
@@ -82,9 +83,13 @@ export interface FunnelChartProps
 // -------------------------------------------------------------------
 
 export interface HeatmapChartDatum {
-  /** X-axis index or label */
+  /**
+   * Column label matching `xLabels`, or a 0-based column index.
+   */
   x: ChartScaleValue
-  /** Y-axis index or label */
+  /**
+   * Row label matching `yLabels`, or a 0-based row index.
+   */
   y: ChartScaleValue
   /** Heat value */
   value: number
@@ -93,7 +98,9 @@ export interface HeatmapChartDatum {
 export interface HeatmapChartProps
   extends BaseChartProps, ChartInteractionProps, ChartBuiltInTooltipProps {
   /**
-   * Data points
+   * Data points. Lookup is by label, or by 0-based column/row index.
+   * `hoveredIndex` / `selectedIndex` are row-major cell indices
+   * (`row * xLabels.length + col`), not `data[]` offsets.
    */
   data: HeatmapChartDatum[]
 
@@ -108,6 +115,24 @@ export interface HeatmapChartProps
   yLabels: string[]
 
   /**
+   * Chart width
+   * @default 400
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 300
+   */
+  height?: number
+
+  /**
+   * Padding for self-drawn axis labels (not cartesian axis titles)
+   * @default 40
+   */
+  padding?: ChartPadding
+
+  /**
    * Min color (for lowest value)
    * @default '#f0f9ff'
    */
@@ -115,12 +140,23 @@ export interface HeatmapChartProps
 
   /**
    * Max color (for highest value)
-   * @default 'var(--tiger-primary,#2563eb)'
+   * @default '#2563eb'
    */
   maxColor?: string
 
   /**
-   * Cell border radius in px
+   * Override the colour-domain minimum. Default is the data min
+   * (missing cells and non-finite values are skipped).
+   */
+  min?: number
+
+  /**
+   * Override the colour-domain maximum. Default is the data max.
+   */
+  max?: number
+
+  /**
+   * Cell border radius in px. The SVG `rx` attribute wins over theme tokens.
    * @default 2
    */
   cellRadius?: number
@@ -143,17 +179,16 @@ export interface HeatmapChartProps
   valueFormatter?: (value: number) => string
 
   /**
-   * Palette of colors
+   * Tooltip formatter. Receives the cell's original datum (or `null` for a
+   * missing cell) and the row-major cell index.
    */
-  colors?: string[]
+  tooltipFormatter?: (datum: HeatmapChartDatum | null, index: number) => string
 
   /**
    * Colour interpolation space for cell fills.
-   * - `'rgb'` (default): legacy linear hex interpolation between
-   *   `minColor` and `maxColor`.
-   * - `'oklch'`: emit a CSS `color-mix(in oklch, ...)` expression so the
-   *   browser performs perceptually-uniform shading. Recommended when
-   *   `minColor`/`maxColor` are CSS colour functions or theme tokens.
+   * - `'rgb'` (default): linear hex interpolation between `minColor` and
+   *   `maxColor`. Unparseable colours fall back to the default hex range.
+   * - `'oklch'`: emit a CSS `color-mix(in oklch, ...)` expression.
    * @default 'rgb'
    */
   colorSpace?: 'rgb' | 'oklch'

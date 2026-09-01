@@ -361,7 +361,13 @@ export const enUS: TigerLocale = {
     seriesName: 'Series {index}',
     sliceName: 'Slice {index}',
     sliceAriaLabel: '{label}: {value} ({percent}%)',
-    stageName: 'Stage {index}'
+    stageName: 'Stage {index}',
+    heatmapTooltip: '{x} × {y}: {value}',
+    treemapTooltip: '{label}: {value} ({percent}%)',
+    sunburstTooltip: '{label}: {value} ({percent}%)',
+    orgChartAriaLabel: 'Organization chart',
+    ganttAriaLabel: 'Gantt chart',
+    ganttTaskAriaLabel: '{label}, {start} to {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown formatting',

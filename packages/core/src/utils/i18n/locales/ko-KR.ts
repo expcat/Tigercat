@@ -354,7 +354,17 @@ export const koKR: TigerLocale = {
   },
   chart: {
     legendAriaLabel: '차트 범례',
-    pointAriaLabel: '포인트 {index}: ({x}, {y})'
+    pointAriaLabel: '포인트 {index}: ({x}, {y})',
+    seriesName: '시리즈 {index}',
+    sliceName: '슬라이스 {index}',
+    sliceAriaLabel: '{label}: {value} ({percent}％)',
+    stageName: '단계 {index}',
+    heatmapTooltip: '{x} × {y}：{value}',
+    treemapTooltip: '{label}: {value} ({percent}％)',
+    sunburstTooltip: '{label}: {value} ({percent}％)',
+    orgChartAriaLabel: '조직도',
+    ganttAriaLabel: '간트 차트',
+    ganttTaskAriaLabel: '{label}, {start} ~ {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown 서식',

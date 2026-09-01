@@ -361,7 +361,13 @@ export const zhCN: TigerLocale = {
     seriesName: '系列 {index}',
     sliceName: '切片 {index}',
     sliceAriaLabel: '{label}：{value}（{percent}%）',
-    stageName: '阶段 {index}'
+    stageName: '阶段 {index}',
+    heatmapTooltip: '{x} × {y}：{value}',
+    treemapTooltip: '{label}：{value}（{percent}%）',
+    sunburstTooltip: '{label}：{value}（{percent}%）',
+    orgChartAriaLabel: '组织架构图',
+    ganttAriaLabel: '甘特图',
+    ganttTaskAriaLabel: '{label}，{start} 至 {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown 格式工具栏',

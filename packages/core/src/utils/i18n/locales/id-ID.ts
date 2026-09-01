@@ -354,7 +354,17 @@ export const idID: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'Legenda bagan',
-    pointAriaLabel: 'Titik {index}: ({x}, {y})'
+    pointAriaLabel: 'Titik {index}: ({x}, {y})',
+    seriesName: 'Seri {index}',
+    sliceName: 'Irisan {index}',
+    sliceAriaLabel: '{label}: {value} ({percent} %)',
+    stageName: 'Tahap {index}',
+    heatmapTooltip: '{x} × {y} = {value}',
+    treemapTooltip: '{label}: {value} ({percent} %)',
+    sunburstTooltip: '{label}: {value} ({percent} %)',
+    orgChartAriaLabel: 'Bagan organisasi',
+    ganttAriaLabel: 'Bagan Gantt',
+    ganttTaskAriaLabel: '{label}, {start} sampai {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Pemformatan Markdown',

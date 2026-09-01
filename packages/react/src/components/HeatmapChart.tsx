@@ -1,13 +1,29 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
-  computeHeatmapCells,
+  layoutHeatmap,
   getHeatmapCellIndexAtPoint,
-  getChartElementOpacity,
-  getChartInnerRect,
+  getHeatmapDevicePixelRatio,
+  paintHeatmapCanvas,
   resolveHeatmapRenderMode,
-  resolveChartTooltipContent,
+  formatHeatmapTooltip,
+  heatmapLabelFill,
+  heatmapCellTransitionClasses,
+  getChartElementOpacity,
+  getCartesianChartShellClasses,
   chartAxisTickTextClasses,
+  chartMarkTabIndex,
+  isChartNavigationKey,
+  nextHeatmapCellIndex,
+  getChartLabels,
+  mergeTigerLocale,
+  DEFAULT_HEATMAP_WIDTH,
+  DEFAULT_HEATMAP_HEIGHT,
+  DEFAULT_HEATMAP_PADDING,
+  DEFAULT_HEATMAP_MIN_COLOR,
+  DEFAULT_HEATMAP_MAX_COLOR,
+  DEFAULT_HEATMAP_CELL_RADIUS,
+  DEFAULT_HEATMAP_CELL_GAP,
   type ChartPadding,
   type HeatmapChartDatum,
   type HeatmapChartProps as CoreHeatmapChartProps
@@ -15,27 +31,32 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface HeatmapChartProps extends CoreHeatmapChartProps {
   padding?: ChartPadding
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
-  onCellClick?: (index: number, datum: HeatmapChartDatum) => void
+  onCellClick?: (index: number, datum: HeatmapChartDatum | null) => void
   onCellHover?: (index: number | null, datum: HeatmapChartDatum | null) => void
 }
 
 export const HeatmapChart: React.FC<HeatmapChartProps> = ({
-  width = 400,
-  height = 300,
-  padding = 40,
+  width = DEFAULT_HEATMAP_WIDTH,
+  height = DEFAULT_HEATMAP_HEIGHT,
+  padding = DEFAULT_HEATMAP_PADDING,
+  responsive = false,
   data,
   xLabels,
   yLabels,
-  minColor = '#f0f9ff',
-  maxColor = '#2563eb',
+  minColor = DEFAULT_HEATMAP_MIN_COLOR,
+  maxColor = DEFAULT_HEATMAP_MAX_COLOR,
+  min,
+  max,
   colorSpace = 'rgb',
-  cellRadius = 2,
-  cellGap = 1,
+  cellRadius = DEFAULT_HEATMAP_CELL_RADIUS,
+  cellGap = DEFAULT_HEATMAP_CELL_GAP,
   showValues = false,
   valueFormatter,
   renderMode = 'auto',
@@ -47,6 +68,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   selectable = false,
   selectedIndex: selectedIndexProp,
   showTooltip = true,
+  tooltipFormatter,
   title,
   desc,
   className,
@@ -55,40 +77,19 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   onCellClick,
   onCellHover
 }) => {
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const interactive = hoverable || selectable || Boolean(onCellClick)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const {
-    tooltipPosition,
-    resolvedHoveredIndex,
-    activeIndex,
-    handleMouseEnter,
-    handleMouseMove,
-    handleMouseLeave,
-    handleClick
-  } = useChartInteraction<HeatmapChartDatum>({
-    hoverable,
-    showTooltip,
-    hoveredIndexProp,
-    selectable,
-    selectedIndexProp,
-    activeOpacity,
-    inactiveOpacity,
-    getData: (index: number) => data[index],
-    onHoveredIndexChange: (index) => {
-      onHoveredIndexChange?.(index)
-      onCellHover?.(index, index !== null ? data[index] : null)
-    },
-    onSelectedIndexChange,
-    onClick: onCellClick
-  })
-
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
-
-  const cells = useMemo(
+  const layout = useMemo(
     () =>
-      computeHeatmapCells(data, {
+      layoutHeatmap(data, {
         xLabels,
         yLabels,
         width: innerRect.width,
@@ -96,7 +97,9 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         cellGap,
         minColor,
         maxColor,
-        colorSpace
+        colorSpace,
+        min,
+        max
       }),
     [
       data,
@@ -107,90 +110,88 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
       cellGap,
       minColor,
       maxColor,
-      colorSpace
+      colorSpace,
+      min,
+      max
     ]
   )
+  const cells = layout.cells
+  const {
+    tooltipPosition,
+    resolvedHoveredIndex,
+    activeIndex,
+    handleMouseEnter,
+    handleMouseMove,
+    handleMouseLeave,
+    handleClick,
+    handleKeyDown
+  } = useChartInteraction<HeatmapChartDatum | null>({
+    hoverable,
+    showTooltip,
+    hoveredIndexProp,
+    selectable,
+    selectedIndexProp,
+    activeOpacity,
+    inactiveOpacity,
+    getData: (index: number) => cells[index]?.datum ?? null,
+    onHoveredIndexChange: (index) => {
+      onHoveredIndexChange?.(index)
+      onCellHover?.(index, index !== null ? (cells[index]?.datum ?? null) : null)
+    },
+    onSelectedIndexChange,
+    onClick: (index, datum) => onCellClick?.(index, datum ?? null)
+  })
 
-  const tooltipContent = useMemo(
-    () =>
-      resolveChartTooltipContent(resolvedHoveredIndex, cells, undefined, (cell) => {
-        const val = valueFormatter ? valueFormatter(cell.value) : `${cell.value}`
-        return `${cell.xLabel} × ${cell.yLabel}: ${val}`
-      }),
-    [resolvedHoveredIndex, cells, valueFormatter]
+  const formatValue = useCallback(
+    (value: number | null) => {
+      if (value === null) return ''
+      return valueFormatter ? valueFormatter(value) : `${value}`
+    },
+    [valueFormatter]
   )
 
-  const interactive = hoverable || selectable
+  const tooltipContent = useMemo(() => {
+    if (resolvedHoveredIndex === null) return ''
+    const cell = cells[resolvedHoveredIndex]
+    if (!cell) return ''
+    if (tooltipFormatter) return tooltipFormatter(cell.datum, cell.index)
+    return formatHeatmapTooltip(labels.heatmapTooltip, cell, formatValue(cell.value))
+  }, [resolvedHoveredIndex, cells, tooltipFormatter, labels.heatmapTooltip, formatValue])
+
   const pointerInteractive = interactive || showTooltip
-  const rect = innerRect
-  const cellW = (rect.width - cellGap * (xLabels.length - 1)) / xLabels.length
-  const cellH = (rect.height - cellGap * (yLabels.length - 1)) / yLabels.length
   const resolvedRenderMode = resolveHeatmapRenderMode(cells.length, {
     renderMode,
     canvasThreshold
   })
   const shouldRenderCanvas = resolvedRenderMode === 'canvas'
+  const visualActive = cells.findIndex(
+    (cell) => cell.index === (activeIndex ?? resolvedHoveredIndex)
+  )
 
   useEffect(() => {
     if (!shouldRenderCanvas) return
-
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d')
     if (!canvas || !context) return
-
-    context.clearRect(0, 0, rect.width, rect.height)
-    context.textAlign = 'center'
-    context.textBaseline = 'middle'
-    context.font = '10px sans-serif'
-
-    cells.forEach((cell, idx) => {
-      context.globalAlpha =
-        getChartElementOpacity(idx, activeIndex, {
-          activeOpacity,
-          inactiveOpacity
-        }) ?? 1
-      context.fillStyle = cell.fill
-
-      const radius = Math.max(0, Math.min(cellRadius, cell.w / 2, cell.h / 2))
-      if (radius > 0) {
-        context.beginPath()
-        context.moveTo(cell.x + radius, cell.y)
-        context.lineTo(cell.x + cell.w - radius, cell.y)
-        context.quadraticCurveTo(cell.x + cell.w, cell.y, cell.x + cell.w, cell.y + radius)
-        context.lineTo(cell.x + cell.w, cell.y + cell.h - radius)
-        context.quadraticCurveTo(
-          cell.x + cell.w,
-          cell.y + cell.h,
-          cell.x + cell.w - radius,
-          cell.y + cell.h
-        )
-        context.lineTo(cell.x + radius, cell.y + cell.h)
-        context.quadraticCurveTo(cell.x, cell.y + cell.h, cell.x, cell.y + cell.h - radius)
-        context.lineTo(cell.x, cell.y + radius)
-        context.quadraticCurveTo(cell.x, cell.y, cell.x + radius, cell.y)
-        context.closePath()
-        context.fill()
-      } else {
-        context.fillRect(cell.x, cell.y, cell.w, cell.h)
-      }
-
-      if (showValues) {
-        context.globalAlpha = 1
-        context.fillStyle = 'var(--tiger-text,#374151)'
-        context.fillText(
-          valueFormatter ? valueFormatter(cell.value) : `${cell.value}`,
-          cell.x + cell.w / 2,
-          cell.y + cell.h / 2
-        )
-      }
+    const dpr = getHeatmapDevicePixelRatio()
+    canvas.width = Math.max(0, Math.round(innerRect.width * dpr))
+    canvas.height = Math.max(0, Math.round(innerRect.height * dpr))
+    paintHeatmapCanvas(context, cells, {
+      width: innerRect.width,
+      height: innerRect.height,
+      dpr,
+      cellRadius,
+      showValues,
+      valueFormatter,
+      activeIndex,
+      activeOpacity,
+      inactiveOpacity
     })
-
-    context.globalAlpha = 1
   }, [
     shouldRenderCanvas,
     cells,
-    rect.width,
-    rect.height,
+    innerRect.width,
+    innerRect.height,
     activeIndex,
     activeOpacity,
     inactiveOpacity,
@@ -199,23 +200,18 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     valueFormatter
   ])
 
-  const getCanvasPoint = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = event.currentTarget
-    const bounds = canvas.getBoundingClientRect()
-    const nativeEvent = event.nativeEvent
-    const offsetX =
-      typeof nativeEvent.offsetX === 'number' && Number.isFinite(nativeEvent.offsetX)
-        ? nativeEvent.offsetX
-        : event.clientX - bounds.left
-    const offsetY =
-      typeof nativeEvent.offsetY === 'number' && Number.isFinite(nativeEvent.offsetY)
-        ? nativeEvent.offsetY
-        : event.clientY - bounds.top
-    const scaleX = bounds.width > 0 ? canvas.width / bounds.width : 1
-    const scaleY = bounds.height > 0 ? canvas.height / bounds.height : 1
-
-    return { x: offsetX * scaleX, y: offsetY * scaleY }
-  }, [])
+  const getCanvasPoint = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = event.currentTarget
+      const bounds = canvas.getBoundingClientRect()
+      const cssWidth = innerRect.width
+      const cssHeight = innerRect.height
+      const x = bounds.width > 0 ? ((event.clientX - bounds.left) / bounds.width) * cssWidth : 0
+      const y = bounds.height > 0 ? ((event.clientY - bounds.top) / bounds.height) * cssHeight : 0
+      return { x, y }
+    },
+    [innerRect.width, innerRect.height]
+  )
 
   const handleCanvasMouseMove = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -225,7 +221,6 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         handleMouseLeave()
         return
       }
-
       handleMouseEnter(index, event)
       handleMouseMove(event)
     },
@@ -236,11 +231,54 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     (event: React.MouseEvent<HTMLCanvasElement>) => {
       const point = getCanvasPoint(event)
       const index = getHeatmapCellIndexAtPoint(cells, point.x, point.y)
-      if (index !== null) {
-        handleClick(index)
-      }
+      if (index !== null) handleClick(index)
     },
     [cells, getCanvasPoint, handleClick]
+  )
+
+  const handleCellKeyDown = (
+    event: React.KeyboardEvent<SVGRectElement | HTMLCanvasElement>,
+    index: number
+  ) => {
+    if (isChartNavigationKey(event.key)) {
+      event.preventDefault()
+      const next = nextHeatmapCellIndex(index, event.key, layout.cols, layout.rows)
+      if (!shouldRenderCanvas) {
+        const node = event.currentTarget.parentElement?.querySelector(
+          `[data-heatmap-cell][data-index="${next}"]`
+        )
+        if (node instanceof SVGElement) node.focus()
+      }
+      handleMouseEnter(next, event)
+      return
+    }
+    handleKeyDown(event, index)
+  }
+
+  const hiddenTable = (
+    <table className="sr-only" data-heatmap-table="">
+      <thead>
+        <tr>
+          <td />
+          {xLabels.map((label) => (
+            <th key={`hx-${label}`} scope="col">
+              {label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {yLabels.map((yLabel, row) => (
+          <tr key={`hy-${yLabel}`}>
+            <th scope="row">{yLabel}</th>
+            {xLabels.map((xLabel, col) => {
+              const cell = cells[row * layout.cols + col]
+              return <td key={`hv-${xLabel}-${yLabel}`}>{formatValue(cell?.value ?? null)}</td>
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 
   const chart = (
@@ -248,43 +286,44 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
-      {/* X axis labels */}
-      {xLabels.map((lbl, i) => (
+      onResolvedSizeChange={onResolvedSizeChange}>
+      {layout.xAxisLabels.map((label, i) => (
         <text
           key={`x-${i}`}
-          x={i * (cellW + cellGap) + cellW / 2}
-          y={rect.height + 16}
+          x={label.x}
+          y={label.y}
           className={chartAxisTickTextClasses}
           textAnchor="middle">
-          {lbl}
+          {label.text}
         </text>
       ))}
-
-      {/* Y axis labels */}
-      {yLabels.map((lbl, i) => (
+      {layout.yAxisLabels.map((label, i) => (
         <text
           key={`y-${i}`}
-          x={-8}
-          y={i * (cellH + cellGap) + cellH / 2}
+          x={label.x}
+          y={label.y}
           className={chartAxisTickTextClasses}
           textAnchor="end"
           dominantBaseline="middle">
-          {lbl}
+          {label.text}
         </text>
       ))}
-
-      {/* Cells */}
       {!shouldRenderCanvas &&
-        cells.map((cell, idx) => {
-          const opacity = getChartElementOpacity(idx, activeIndex, {
+        cells.map((cell, visualIndex) => {
+          const opacity = getChartElementOpacity(cell.index, activeIndex, {
             activeOpacity,
             inactiveOpacity
           })
+          const ariaLabel = formatHeatmapTooltip(
+            labels.heatmapTooltip,
+            cell,
+            formatValue(cell.value)
+          )
           return (
-            <React.Fragment key={`cell-${idx}`}>
+            <React.Fragment key={`cell-${cell.index}`}>
               <rect
                 x={cell.x}
                 y={cell.y}
@@ -293,27 +332,37 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
                 rx={cellRadius}
                 fill={cell.fill}
                 opacity={opacity}
-                className={classNames(interactive && 'cursor-pointer')}
-                style={
-                  {
-                    transition:
-                      'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
-                    rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
-                  } as React.CSSProperties
+                data-heatmap-cell=""
+                data-index={cell.index}
+                className={classNames(
+                  interactive && 'cursor-pointer',
+                  heatmapCellTransitionClasses
+                )}
+                tabIndex={
+                  interactive
+                    ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                    : undefined
                 }
-                onMouseEnter={(e) => handleMouseEnter(idx, e)}
+                role={interactive ? 'button' : undefined}
+                aria-hidden={interactive ? undefined : true}
+                aria-label={interactive ? ariaLabel : undefined}
+                onMouseEnter={(e) => handleMouseEnter(cell.index, e)}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                onClick={() => handleClick(idx)}
+                onFocus={(e) => handleMouseEnter(cell.index, e)}
+                onClick={() => handleClick(cell.index)}
+                onKeyDown={(e) => handleCellKeyDown(e, cell.index)}
               />
-              {showValues && (
+              {showValues && cell.value !== null && (
                 <text
                   x={cell.x + cell.w / 2}
                   y={cell.y + cell.h / 2}
-                  className="fill-[color:var(--tiger-text,#374151)] text-[10px]"
+                  fill={heatmapLabelFill(cell.fill, cell.heat)}
+                  className="text-[10px] pointer-events-none"
                   textAnchor="middle"
-                  dominantBaseline="middle">
-                  {valueFormatter ? valueFormatter(cell.value) : `${cell.value}`}
+                  dominantBaseline="middle"
+                  aria-hidden="true">
+                  {formatValue(cell.value)}
                 </text>
               )}
             </React.Fragment>
@@ -332,30 +381,44 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   ) : null
 
   return (
-    <div className="inline-block relative">
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend: false,
+        responsive,
+        className
+      })}>
       {chart}
       {shouldRenderCanvas && (
         <canvas
           ref={canvasRef}
-          width={rect.width}
-          height={rect.height}
           data-heatmap-canvas="true"
           data-heatmap-render-mode={resolvedRenderMode}
           className={classNames(interactive && 'cursor-pointer')}
+          tabIndex={interactive ? 0 : undefined}
+          aria-hidden={interactive ? undefined : true}
           style={{
             position: 'absolute',
-            left: `${rect.x}px`,
-            top: `${rect.y}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
+            left: `${innerRect.x}px`,
+            top: `${innerRect.y}px`,
+            width: `${innerRect.width}px`,
+            height: `${innerRect.height}px`,
             pointerEvents: pointerInteractive ? 'auto' : 'none'
           }}
           onMouseMove={pointerInteractive ? handleCanvasMouseMove : undefined}
           onMouseLeave={pointerInteractive ? handleMouseLeave : undefined}
           onClick={interactive ? handleCanvasClick : undefined}
+          onKeyDown={
+            interactive
+              ? (event) =>
+                  handleCellKeyDown(event, visualActive < 0 ? 0 : (cells[visualActive]?.index ?? 0))
+              : undefined
+          }
         />
       )}
+      {hiddenTable}
       {tooltip}
     </div>
   )
 }
+
+export default HeatmapChart

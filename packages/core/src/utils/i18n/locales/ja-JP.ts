@@ -354,7 +354,17 @@ export const jaJP: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'グラフの凡例',
-    pointAriaLabel: 'ポイント {index}: ({x}, {y})'
+    pointAriaLabel: 'ポイント {index}: ({x}, {y})',
+    seriesName: 'シリーズ {index}',
+    sliceName: 'スライス {index}',
+    sliceAriaLabel: '{label}：{value}（{percent}%）',
+    stageName: 'ステージ {index}',
+    heatmapTooltip: '{x} × {y}：{value}',
+    treemapTooltip: '{label}：{value}（{percent}%）',
+    sunburstTooltip: '{label}：{value}（{percent}%）',
+    orgChartAriaLabel: '組織図',
+    ganttAriaLabel: 'ガントチャート',
+    ganttTaskAriaLabel: '{label}、{start} から {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown の書式',

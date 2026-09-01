@@ -546,6 +546,16 @@ export interface TigerLocaleChart {
   sliceAriaLabel?: string
   /** Template: supports {index} */
   stageName?: string
+  /** Template: supports {x}, {y}, {value} */
+  heatmapTooltip?: string
+  /** Template: supports {label}, {value}, {percent} */
+  treemapTooltip?: string
+  /** Template: supports {label}, {value}, {percent} */
+  sunburstTooltip?: string
+  orgChartAriaLabel?: string
+  ganttAriaLabel?: string
+  /** Template: supports {label}, {start}, {end}, {progress} */
+  ganttTaskAriaLabel?: string
 }
 
 export interface TigerLocaleMarkdownEditor {

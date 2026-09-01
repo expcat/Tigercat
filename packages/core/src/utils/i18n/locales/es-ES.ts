@@ -354,7 +354,17 @@ export const esES: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'Leyenda del gráfico',
-    pointAriaLabel: 'Punto {index}: ({x}, {y})'
+    pointAriaLabel: 'Punto {index}: ({x}, {y})',
+    seriesName: 'Serie {index}',
+    sliceName: 'Porción {index}',
+    sliceAriaLabel: '{label}: {value} ({percent} %)',
+    stageName: 'Etapa {index}',
+    heatmapTooltip: '{x} × {y} = {value}',
+    treemapTooltip: '{label}: {value} ({percent} %)',
+    sunburstTooltip: '{label}: {value} ({percent} %)',
+    orgChartAriaLabel: 'Organigrama',
+    ganttAriaLabel: 'Diagrama de Gantt',
+    ganttTaskAriaLabel: '{label}, {start} a {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Formato Markdown',

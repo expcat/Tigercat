@@ -354,7 +354,17 @@ export const viVN: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'Chú giải biểu đồ',
-    pointAriaLabel: 'Điểm {index}: ({x}, {y})'
+    pointAriaLabel: 'Điểm {index}: ({x}, {y})',
+    seriesName: 'Chuỗi {index}',
+    sliceName: 'Lát {index}',
+    sliceAriaLabel: '{label}: {value} ({percent} %)',
+    stageName: 'Giai đoạn {index}',
+    heatmapTooltip: '{x} × {y} = {value}',
+    treemapTooltip: '{label}: {value} ({percent} %)',
+    sunburstTooltip: '{label}: {value} ({percent} %)',
+    orgChartAriaLabel: 'Sơ đồ tổ chức',
+    ganttAriaLabel: 'Biểu đồ Gantt',
+    ganttTaskAriaLabel: '{label}, {start} đến {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Định dạng Markdown',

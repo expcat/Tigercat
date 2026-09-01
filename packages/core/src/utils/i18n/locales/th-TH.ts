@@ -354,7 +354,17 @@ export const thTH: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'คำอธิบายแผนภูมิ',
-    pointAriaLabel: 'จุด {index}: ({x}, {y})'
+    pointAriaLabel: 'จุด {index}: ({x}, {y})',
+    seriesName: 'ชุดข้อมูล {index}',
+    sliceName: 'ชิ้น {index}',
+    sliceAriaLabel: '{label}: {value} ({percent} %)',
+    stageName: 'ขั้น {index}',
+    heatmapTooltip: '{x} × {y} = {value}',
+    treemapTooltip: '{label}: {value} ({percent} %)',
+    sunburstTooltip: '{label}: {value} ({percent} %)',
+    orgChartAriaLabel: 'แผนผังองค์กร',
+    ganttAriaLabel: 'แผนภูมิแกนต์',
+    ganttTaskAriaLabel: '{label}, {start} ถึง {end}{progress}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'จัดรูปแบบ Markdown',
