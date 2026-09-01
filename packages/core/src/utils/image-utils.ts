@@ -356,27 +356,6 @@ export function isPositiveFinite(value: number): boolean {
 }
 
 // ============================================================================
-// CropUpload styles
-// ============================================================================
-
-/**
- * CropUpload trigger button classes
- */
-export const cropUploadTriggerClasses =
-  'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-secondary,#4b5563)] bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] hover:scale-[1.02] active:scale-[0.98] hover:shadow-md transition-all duration-300 ease-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2 dark:bg-neutral-900 dark:hover:bg-neutral-800'
-
-/**
- * CropUpload disabled trigger classes
- */
-export const cropUploadTriggerDisabledClasses =
-  'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-disabled,#9ca3af)] bg-[var(--tiger-surface-muted,#f9fafb)] cursor-not-allowed opacity-60 dark:bg-neutral-900/50'
-
-/**
- * Upload icon path (plus sign in a frame)
- */
-export const uploadPlusIconPath = 'M12 4v16m8-8H4'
-
-// ============================================================================
 // Calculation utilities (framework-agnostic pure functions)
 // ============================================================================
 
