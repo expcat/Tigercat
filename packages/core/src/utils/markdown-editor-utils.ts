@@ -153,21 +153,58 @@ function isBlockStart(line: string): boolean {
   )
 }
 
+/** Private-use mark that cannot appear in escaped markdown source. */
+const MARKDOWN_SLOT_MARK = '\uE000'
+
+function stashMarkdownSlot(slots: string[], fragment: string): string {
+  const token = `${MARKDOWN_SLOT_MARK}MD${slots.length}${MARKDOWN_SLOT_MARK}`
+  slots.push(fragment)
+  return token
+}
+
+function restoreMarkdownSlots(html: string, slots: string[]): string {
+  const open = `${MARKDOWN_SLOT_MARK}MD`
+  let output = ''
+  let cursor = 0
+  while (cursor < html.length) {
+    const start = html.indexOf(open, cursor)
+    if (start === -1) {
+      output += html.slice(cursor)
+      break
+    }
+    output += html.slice(cursor, start)
+    let digitsEnd = start + open.length
+    while (digitsEnd < html.length) {
+      const code = html.charCodeAt(digitsEnd)
+      if (code < 48 || code > 57) break
+      digitsEnd++
+    }
+    if (
+      digitsEnd > start + open.length &&
+      html.charCodeAt(digitsEnd) === MARKDOWN_SLOT_MARK.charCodeAt(0)
+    ) {
+      const index = Number(html.slice(start + open.length, digitsEnd))
+      output += slots[index] ?? ''
+      cursor = digitsEnd + 1
+      continue
+    }
+    output += html[start]
+    cursor = start + 1
+  }
+  return output
+}
+
 export function renderMarkdownInline(value: string): string {
   let html = escapeMarkdownHtml(value)
   const slots: string[] = []
-  const stash = (fragment: string) => {
-    const token = `\u0000MD${slots.length}\u0000`
-    slots.push(fragment)
-    return token
-  }
-  html = html.replace(/`([^`]+)`/g, (_m, code) => stash(`<code>${code}</code>`))
+  html = html.replace(/`([^`]+)`/g, (_m, code) => stashMarkdownSlot(slots, `<code>${code}</code>`))
   html = html.replace(
     /!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g,
     (_m, alt, src, title) => {
       if (!isValidUrl(src)) return ''
       const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ''
-      return stash(
+      return stashMarkdownSlot(
+        slots,
         `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${titleAttr} />`
       )
     }
@@ -177,7 +214,8 @@ export function renderMarkdownInline(value: string): string {
     (_m, text, href, title) => {
       if (!isValidUrl(href)) return text
       const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ''
-      return stash(
+      return stashMarkdownSlot(
+        slots,
         `<a href="${escapeAttribute(href)}"${titleAttr} target="_blank" rel="noreferrer">${text}</a>`
       )
     }
@@ -187,8 +225,7 @@ export function renderMarkdownInline(value: string): string {
   html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>')
   html = html.replace(/(^|\W)\*([^*]+)\*/g, '$1<em>$2</em>')
   html = html.replace(/(^|\W)_([^_]+)_/g, '$1<em>$2</em>')
-  html = html.replace(/\u0000MD(\d+)\u0000/g, (_m, index) => slots[Number(index)] ?? '')
-  return html.replace(/\n/g, '<br />')
+  return restoreMarkdownSlots(html, slots).replace(/\n/g, '<br />')
 }
 
 function renderList(

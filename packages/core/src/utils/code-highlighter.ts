@@ -63,7 +63,7 @@ export function renderTokensHtml(tokens: Token[], theme: CodeEditorTheme): strin
  */
 export const builtinCodeHighlighter: CodeHighlighter = {
   name: 'builtin',
-  highlightLine(line, language, theme) {
+  highlightLine(line: string, language: CodeLanguage, theme: CodeEditorTheme) {
     const tokens = tokenizeLine(line, language)
     return renderTokensHtml(tokens, theme)
   }

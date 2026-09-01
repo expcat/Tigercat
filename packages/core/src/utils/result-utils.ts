@@ -99,7 +99,9 @@ const HTTP_COLOR_BY_STATUS: Record<string, SemanticResultStatus> = {
   '500': 'error'
 }
 
-function resolveSemanticStatus(status: string | undefined | null): SemanticResultStatus {
+function resolveSemanticStatus(
+  status: ResultStatus | string | undefined | null
+): SemanticResultStatus {
   if (status && (SEMANTIC_RESULT_STATUSES as readonly string[]).includes(status)) {
     return status as SemanticResultStatus
   }
@@ -109,7 +111,9 @@ function resolveSemanticStatus(status: string | undefined | null): SemanticResul
 /**
  * Get the color scheme for a given result status. Unknown values fall back to info.
  */
-export function getResultColorScheme(status: string | undefined | null): ResultColorScheme {
+export function getResultColorScheme(
+  status: ResultStatus | string | undefined | null
+): ResultColorScheme {
   return semanticColors[resolveSemanticStatus(status)]
 }
 
@@ -128,7 +132,7 @@ const resultIconPaths: Record<SemanticResultStatus, string> = {
  * Get the icon SVG path for a given status. HTTP codes and unknown values
  * fall back to the info path; the component does not draw a path for HTTP.
  */
-export function getResultIconPath(status: string | undefined | null): string {
+export function getResultIconPath(status: ResultStatus | string | undefined | null): string {
   const semantic = (SEMANTIC_RESULT_STATUSES as readonly string[]).includes(status ?? '')
     ? (status as SemanticResultStatus)
     : 'info'
@@ -147,6 +151,6 @@ const HTTP_RESULT_STATUSES = new Set(['404', '403', '500'])
  * For these statuses the Result component renders the code itself as the icon
  * content; use `isHttpResultStatus(status) ? status : undefined` at the call site.
  */
-export function isHttpResultStatus(status: string | undefined | null): boolean {
+export function isHttpResultStatus(status: ResultStatus | string | undefined | null): boolean {
   return HTTP_RESULT_STATUSES.has(status ?? '')
 }

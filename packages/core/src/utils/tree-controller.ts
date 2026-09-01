@@ -4,7 +4,6 @@
  */
 
 import type {
-  TreeCheckStrategy,
   TreeCheckedState,
   TreeDropPosition,
   TreeFilterFn,

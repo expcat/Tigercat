@@ -207,7 +207,7 @@ export const Masonry = defineComponent({
           )
         : 0
       const rootStyle = packedNow
-        ? getMasonryPackedRootStyle(packedHeight, gapPx.value)
+        ? getMasonryPackedRootStyle(packedHeight)
         : getMasonryFlowRootStyle(columnCount.value, gapPx.value)
       const labelled = Boolean(attrs['aria-label'] || attrs['aria-labelledby'])
 

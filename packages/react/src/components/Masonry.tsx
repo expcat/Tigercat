@@ -163,7 +163,7 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
     : 0
 
   const rootStyle = packed
-    ? { ...getMasonryPackedRootStyle(packedHeight, gapPx), ...style }
+    ? { ...getMasonryPackedRootStyle(packedHeight), ...style }
     : { ...getMasonryFlowRootStyle(columnCount, gapPx), ...style }
 
   const labelled = Boolean(rest['aria-label'] || rest['aria-labelledby'])

@@ -9,7 +9,6 @@
  */
 
 import type { FormRuleTrigger, FormRuleType } from './form'
-import type { ComponentSize } from './base'
 import type { SelectOption, SelectOptionGroup, SelectProps } from './select'
 
 // ---------------------------------------------------------------------------

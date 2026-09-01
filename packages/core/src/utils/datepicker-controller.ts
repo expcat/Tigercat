@@ -2,7 +2,7 @@
  * DatePicker selection / display helpers. Vue/React bind DOM and overlay.
  */
 
-import type { DateFormat, DatePickerModelValue, DatePickerShortcut } from '../types/datepicker'
+import type { DateFormat, DatePickerShortcut } from '../types/datepicker'
 import { devWarn } from './dev-warn'
 import { toIsoDate } from './calendar-controller'
 import { formatDate, isDateInRange, isSameDay, parseDate, toCalendarDate } from './date-utils'

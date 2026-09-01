@@ -20,7 +20,7 @@ export const uploadPlusIconPath = 'M12 4v16m8-8H4'
 export function validateUploadFile(file: File | null | undefined, maxSize?: number): Error | null {
   if (!file) return null
   if (!validateFileSize(file, maxSize)) {
-    return new Error(`File size exceeds maximum of ${maxSize} bytes`)
+    return new Error(`File size exceeds maximum of ${formatBytes(maxSize)}`)
   }
   return null
 }

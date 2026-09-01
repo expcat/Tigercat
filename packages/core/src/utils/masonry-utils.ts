@@ -226,10 +226,10 @@ export function getMasonryColumnStyle(gap: number): { rowGap: string } {
   return { rowGap: `${clampMasonryGap(gap)}px` }
 }
 
-export function getMasonryPackedRootStyle(
-  height: number,
-  gap: number
-): { position: 'relative'; height: string; gap?: undefined } {
+export function getMasonryPackedRootStyle(height: number): {
+  position: 'relative'
+  height: string
+} {
   return { position: 'relative', height: `${Math.max(height, 0)}px` }
 }
 

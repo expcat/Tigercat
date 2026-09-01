@@ -26,7 +26,6 @@ import {
   getParentKeys,
   getVisibleTreeItems,
   handleNodeCheck,
-  isTreeNodeExpandable,
   type VisibleTreeItem
 } from './tree-utils'
 

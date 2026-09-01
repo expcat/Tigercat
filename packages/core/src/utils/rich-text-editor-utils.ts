@@ -338,8 +338,18 @@ function isNameStart(ch: string): boolean {
   return /[A-Za-z]/.test(ch)
 }
 
+function isUrlNoiseChar(code: number): boolean {
+  return code <= 0x20 || code === 0xa0 || code === 0x200b || code === 0xfeff
+}
+
 function stripUrlNoise(value: string): string {
-  return decodeHtmlEntities(value).replace(/[\u0000-\u0020\u00a0\u200b\ufeff]/g, '')
+  const decoded = decodeHtmlEntities(value)
+  let out = ''
+  for (let i = 0; i < decoded.length; i++) {
+    if (isUrlNoiseChar(decoded.charCodeAt(i))) continue
+    out += decoded[i]
+  }
+  return out
 }
 
 function protocolName(url: string): string | null {
