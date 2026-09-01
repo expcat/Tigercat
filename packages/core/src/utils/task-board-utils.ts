@@ -1,5 +1,4 @@
 import type {
-  TaskBoardCard,
   TaskBoardColumn,
   TaskBoardCardMoveEvent,
   TaskBoardColumnMoveEvent
