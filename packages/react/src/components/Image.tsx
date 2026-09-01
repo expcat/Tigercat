@@ -338,11 +338,11 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
           style: containerStyle,
           type: previewEnabled ? 'button' : undefined,
           'aria-label': previewEnabled ? previewName : undefined,
+          ...(hoverPreviewEnabled ? hoverTriggerHandlers : {}),
           onClick: handleClick,
           onKeyDown: handleKeyDown,
           onFocus: handleFocus,
-          onBlur: handleBlur,
-          ...(hoverPreviewEnabled ? hoverTriggerHandlers : {})
+          onBlur: handleBlur
         },
         previewEnabled
           ? React.createElement('span', { className: imageFrameClasses }, content)

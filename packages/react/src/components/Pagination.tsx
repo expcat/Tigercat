@@ -315,7 +315,8 @@ export const Pagination: React.FC<PaginationProps> = ({
             className={getPaginationButtonBaseClasses(size, isActive)}
             disabled={disabled}
             onClick={() => handlePageChange(pageNum)}
-            aria-current={isActive ? 'page' : undefined}>
+            aria-current={isActive ? 'page' : undefined}
+            aria-label={labels.pageAriaLabel.replace('{page}', String(pageNum))}>
             {String(pageNum)}
           </button>
         )
@@ -399,6 +400,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     <nav
       className={containerClasses}
       {...navProps}
+      role="navigation"
       dir={isRtl ? 'rtl' : 'ltr'}
       aria-label={ariaLabelProp ?? (ariaLabelledbyProp ? undefined : labels.paginationAriaLabel)}
       aria-labelledby={ariaLabelledbyProp}

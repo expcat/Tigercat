@@ -356,7 +356,11 @@ export const List = defineComponent({
       }
       if (paginatedData.value.length === 0) {
         return h('div', { class: listEmptyStateClasses }, [
-          h(Empty, { description: props.emptyText, showImage: false, locale: mergedLocale.value })
+          h(Empty, {
+            description: props.emptyText ?? mergedLocale.value?.common?.emptyText,
+            showImage: false,
+            locale: mergedLocale.value
+          })
         ])
       }
       const items = paginatedData.value.map((item, index) => renderListItem(item, index))

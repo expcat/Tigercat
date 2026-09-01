@@ -407,7 +407,14 @@ export const FileManager = defineComponent({
               },
               model.value.processedItems.map(renderItem)
             )
-          : h('div', { class: fileManagerEmptyClasses }, props.emptyText ?? labels.value.emptyText)
+          : h(
+              'div',
+              { class: fileManagerEmptyClasses },
+              props.emptyText ??
+                mergedLocale.value?.fileManager?.emptyText ??
+                mergedLocale.value?.common?.emptyText ??
+                labels.value.emptyText
+            )
 
       const loadingEl = props.loading
         ? h(

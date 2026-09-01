@@ -259,7 +259,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
     [drag, model.canReorder]
   )
 
-  const emptyLabel = emptyText ?? labels.emptyText
+  const emptyLabel =
+    emptyText ??
+    mergedLocale?.fileManager?.emptyText ??
+    mergedLocale?.common?.emptyText ??
+    labels.emptyText
   const loadingLabel = mergedLocale?.common?.loadingText
 
   return (

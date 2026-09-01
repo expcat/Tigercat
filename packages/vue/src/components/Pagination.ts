@@ -533,7 +533,8 @@ export const Pagination = defineComponent({
                   class: getPaginationButtonBaseClasses(size, isActive),
                   disabled: props.disabled,
                   onClick: () => handlePageChange(pageNum),
-                  'aria-current': isActive ? 'page' : undefined
+                  'aria-current': isActive ? 'page' : undefined,
+                  'aria-label': labels.value.pageAriaLabel.replace('{page}', String(pageNum))
                 },
                 String(pageNum)
               )
@@ -636,6 +637,7 @@ export const Pagination = defineComponent({
           ...restAttrs,
           class: containerClasses.value,
           style: mergedStyle.value,
+          role: 'navigation',
           dir: isRtl.value ? 'rtl' : 'ltr',
           'aria-label':
             typeof ariaLabelAttr === 'string' ? ariaLabelAttr : labels.value.paginationAriaLabel

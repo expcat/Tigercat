@@ -302,7 +302,11 @@ function ListInner<T extends ListItem>(
     if (paginatedData.length === 0) {
       return (
         <div className={listEmptyStateClasses}>
-          <Empty description={emptyText} showImage={false} locale={mergedLocale} />
+          <Empty
+            description={emptyText ?? mergedLocale?.common?.emptyText}
+            showImage={false}
+            locale={mergedLocale}
+          />
         </div>
       )
     }

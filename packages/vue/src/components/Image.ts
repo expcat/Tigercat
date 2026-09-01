@@ -451,11 +451,11 @@ export const Image = defineComponent({
           style: containerStyle.value,
           type: previewEnabled.value ? 'button' : undefined,
           'aria-label': previewEnabled.value ? previewName : undefined,
+          ...(hoverPreviewEnabled.value ? hoverTriggerHandlers.value : {}),
           onClick: handleClick,
           onKeydown: handleKeydown,
           onFocus: handleFocus,
-          onBlur: handleBlur,
-          ...(hoverPreviewEnabled.value ? hoverTriggerHandlers.value : {})
+          onBlur: handleBlur
         },
         [inner, previewEl, hoverPreviewEl]
       )
