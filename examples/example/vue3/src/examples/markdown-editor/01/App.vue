@@ -7,8 +7,8 @@ const content = ref('# Release notes\n\nTigercat supports **Markdown editing** w
 
 <template>
   <MarkdownEditor
-    v-model:value="content"
+    v-model="content"
     default-mode="split"
     :height="320"
-    placeholder="Write markdown..." />
+    placeholder="写一段 Markdown…" />
 </template>

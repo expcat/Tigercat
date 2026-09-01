@@ -1,7 +1,7 @@
 {
   "id": "markdown-editor-02",
   "title": "受控模式与扩展渲染",
-  "description": "外部按钮控制 edit/preview，自定义 renderer 负责预览输出，自定义 toolbar 混合内置格式动作与提示块动作。",
+  "description": "外部按钮控制 edit/preview。自定义 renderer 的返回值仍经组件消毒；把未转义 HTML 交给 renderer 视为 TRUSTED。preview 下格式工具条会隐藏。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

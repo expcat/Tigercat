@@ -1,7 +1,7 @@
 {
   "id": "rich-text-editor-01",
   "title": "富文本编辑",
-  "description": "最小受控编辑示例；只读与禁用模式分别通过 readOnly、disabled 设置。",
+  "description": "最小受控 HTML 编辑。只读与禁用见下一块。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

@@ -11,13 +11,18 @@ description: Compact generated Tigercat Advanced props reference
 
 ## CodeEditor
 
-`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 3/17 props
+`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 8/22 props
 
-| Prop            | Type      | Default | Notes                                    |
-| --------------- | --------- | ------- | ---------------------------------------- |
-| `value?`        | `string`  | `-`     | The code content                         |
-| `disabled?`     | `boolean` | `false` | Whether the editor is disabled           |
-| `defaultValue?` | `string`  | `-`     | Default code content (uncontrolled mode) |
+| Prop           | Type              | Default   | Notes                                                   |
+| -------------- | ----------------- | --------- | ------------------------------------------------------- |
+| `language?`    | `CodeLanguage`    | `'plain'` | Programming language for syntax highlighting            |
+| `theme?`       | `CodeEditorTheme` | `'light'` | Editor theme                                            |
+| `wordWrap?`    | `boolean`         | `false`   | Whether to wrap long lines                              |
+| `minLines?`    | `number`          | `3`       | Minimum number of visible lines                         |
+| `highlighter?` | `CodeHighlighter` | `-`       | Optional pluggable highlighter. Output is TRUSTED HTML. |
+| `readOnly?`    | `boolean`         | `false`   | Whether the editor is read-only                         |
+| `tabSize?`     | `number`          | `2`       | Tab size in spaces                                      |
+| `value?`       | `string`          | `-`       | The code content                                        |
 
 ## FileManager
 
@@ -92,13 +97,18 @@ Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCa
 
 ## MarkdownEditor
 
-`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 3/15 props
+`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 8/20 props
 
-| Prop        | Type                   | Default | Notes                                                   |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `value?`    | `string`               | `-`     | Current markdown content (controlled)                   |
-| `disabled?` | `boolean`              | `-`     | Disabled state                                          |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
+| Prop              | Type                             | Default | Notes                                                            |
+| ----------------- | -------------------------------- | ------- | ---------------------------------------------------------------- |
+| `mode?`           | `MarkdownEditorMode`             | `-`     | Editor display mode                                              |
+| `renderer?`       | `MarkdownRenderer`               | `-`     | Optional markdown preview renderer                               |
+| `toolbar?`        | `MarkdownToolbarItem[] \| false` | `-`     | Toolbar items configuration, or false to hide formatting toolbar |
+| `showModeSwitch?` | `boolean`                        | `-`     | Whether to render the edit/split/preview mode switch             |
+| `placeholder?`    | `string`                         | `-`     | Placeholder text                                                 |
+| `readOnly?`       | `boolean`                        | `-`     | Read-only mode                                                   |
+| `value?`          | `string`                         | `-`     | Current markdown content (controlled)                            |
+| `disabled?`       | `boolean`                        | `-`     | Disabled state                                                   |
 
 ## PrintLayout
 
@@ -128,13 +138,20 @@ Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps ex
 
 ## RichTextEditor
 
-`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 3/12 props
+`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 8/16 props
 
-| Prop        | Type                   | Default | Notes                                                   |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `value?`    | `string`               | `-`     | Current HTML content (controlled)                       |
-| `disabled?` | `boolean`              | `-`     | Disabled state                                          |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides merged on top of ConfigProvider locale |
+| Prop           | Type                 | Default | Notes                                                                                      |
+| -------------- | -------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `toolbar?`     | `ToolbarItem[]`      | `-`     | Toolbar items configuration (buttons and separators)                                       |
+| `readOnly?`    | `boolean`            | `-`     | Read-only mode                                                                             |
+| `mode?`        | `RichTextEditorMode` | `-`     | Editing mode                                                                               |
+| `engine?`      | `unknown`            | `-`     | Pluggable editor engine. Default is builtin contenteditable. Custom engines are TRUSTED... |
+| `placeholder?` | `string`             | `-`     | Placeholder text                                                                           |
+| `height?`      | `number \| string`   | `-`     | Editor height                                                                              |
+| `value?`       | `string`             | `-`     | Current HTML content (controlled)                                                          |
+| `disabled?`    | `boolean`            | `-`     | Disabled state                                                                             |
+
+Events/callback props: `onRequestUrl?`.
 
 ## VirtualList
 

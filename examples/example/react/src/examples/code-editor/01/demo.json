@@ -1,7 +1,7 @@
 {
   "id": "code-editor-01",
   "title": "代码编辑",
-  "description": "单个可编辑实例组合展示语言、主题、缩进、换行和行数配置；只读模式使用 readOnly。",
+  "description": "默认 light 主题的受控编辑器，省略 language 时按纯文本显示。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

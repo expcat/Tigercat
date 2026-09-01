@@ -710,6 +710,24 @@ export const COMPONENT_PROP_PRIORITY = {
     'title?',
     'ariaLabel?'
   ],
+  CodeEditor: [
+    'language?',
+    'theme?',
+    'wordWrap?',
+    'minLines?',
+    'highlighter?',
+    'readOnly?',
+    'tabSize?'
+  ],
+  RichTextEditor: ['toolbar?', 'readOnly?', 'mode?', 'engine?', 'placeholder?', 'height?'],
+  MarkdownEditor: [
+    'mode?',
+    'renderer?',
+    'toolbar?',
+    'showModeSwitch?',
+    'placeholder?',
+    'readOnly?'
+  ],
   Gantt: [
     'scale?',
     'rowHeight?',
@@ -974,7 +992,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />',
     ChartSeries: '<ChartSeries :data="data" type="bar"><slot /></ChartSeries>',
     ChartLegend: '<ChartLegend :items="items" />',
-    ChartTooltip: '<ChartTooltip :content="label" :open="open" :x="x" :y="y" />'
+    ChartTooltip: '<ChartTooltip :content="label" :open="open" :x="x" :y="y" />',
+    CodeEditor: '<CodeEditor v-model="code" language="javascript" />',
+    RichTextEditor: '<RichTextEditor v-model="html" />',
+    MarkdownEditor: '<MarkdownEditor v-model="md" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -1106,7 +1127,10 @@ export const REQUIRED_USAGE_SNIPPETS = {
     ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />',
     ChartSeries: '<ChartSeries data={data} type="bar">{marks}</ChartSeries>',
     ChartLegend: '<ChartLegend items={items} />',
-    ChartTooltip: '<ChartTooltip content={label} open={open} x={x} y={y} />'
+    ChartTooltip: '<ChartTooltip content={label} open={open} x={x} y={y} />',
+    CodeEditor: '<CodeEditor value={code} onChange={setCode} language="javascript" />',
+    RichTextEditor: '<RichTextEditor value={html} onChange={setHtml} />',
+    MarkdownEditor: '<MarkdownEditor value={md} onChange={setMd} />'
   }
 }
 

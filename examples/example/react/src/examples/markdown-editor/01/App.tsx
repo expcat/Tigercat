@@ -13,7 +13,7 @@ export default function App() {
       onChange={setContent}
       defaultMode="split"
       height={320}
-      placeholder="Write markdown..."
+      placeholder="写一段 Markdown…"
     />
   )
 }

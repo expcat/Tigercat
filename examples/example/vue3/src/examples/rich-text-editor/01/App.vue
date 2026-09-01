@@ -6,5 +6,5 @@ const content = ref('<p>Hello <strong>Tigercat</strong>!</p>')
 </script>
 
 <template>
-  <RichTextEditor v-model:value="content" :height="260" placeholder="在这里编辑富文本..." />
+  <RichTextEditor v-model="content" :height="260" placeholder="在这里编辑富文本..." />
 </template>

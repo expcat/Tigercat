@@ -24,7 +24,7 @@ const compactToolbar: ToolbarItem[] = [
     <section class="space-y-2">
       <h3 class="text-sm font-medium">自定义工具栏</h3>
       <RichTextEditor
-        v-model:value="content"
+        v-model="content"
         :toolbar="compactToolbar"
         :height="220"
         placeholder="编写发布说明..." />
@@ -33,12 +33,20 @@ const compactToolbar: ToolbarItem[] = [
     <div class="grid gap-4 md:grid-cols-2">
       <section class="space-y-2">
         <h3 class="text-sm font-medium">只读内容</h3>
-        <RichTextEditor :value="initialContent" :toolbar="compactToolbar" :height="180" read-only />
+        <RichTextEditor
+          :model-value="initialContent"
+          :toolbar="compactToolbar"
+          :height="180"
+          read-only />
       </section>
 
       <section class="space-y-2">
         <h3 class="text-sm font-medium">禁用编辑器</h3>
-        <RichTextEditor :value="initialContent" :toolbar="compactToolbar" :height="180" disabled />
+        <RichTextEditor
+          :model-value="initialContent"
+          :toolbar="compactToolbar"
+          :height="180"
+          disabled />
       </section>
     </div>
   </div>

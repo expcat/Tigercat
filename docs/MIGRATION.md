@@ -4,6 +4,12 @@
 
 ## 未发布
 
+Vue `CodeEditor` / `RichTextEditor` / `MarkdownEditor` 从 `v-model:value` 改成默认 `v-model`（`modelValue` / `update:modelValue`），和 Input 族同一套。React 仍是 `value` + `onChange`。删除 `markdownModeLabels`。
+
+`sanitizeHtml` 是白名单解析，不再是正则。粘贴进 RichTextEditor 会先消毒再写入。自定义 `engine` / `highlighter` / `renderer` / toolbar `icon` 的 HTML 是 TRUSTED。Markdown 预览允许相对路径和 `#hash`，仍拒绝 `javascript:` / `data:` / `//`。
+
+Tab 在 CodeEditor / MarkdownEditor 里缩进；`readOnly` 时 Tab 离开。Escape 后再按 Tab 也会离开。link / image 不再调用 `window.prompt`，请传 `onRequestUrl`。
+
 Pie 默认从 12 点钟起（`startAngle = -Math.PI / 2`）。Donut 默认 `innerRadiusRatio` 是 0.6，色板与 Pie 同一份 `--tiger-chart-*`。扇区不再是 `role="img"`。Vue 从主入口引 `PieChartProps` / `DonutChartProps`。
 
 Radar 多系列共用第一列的角域（或 `indicators`）。负值 / 非有限不再拉进圆心。默认 padding 36。点默认 `aria-hidden`。Vue 从主入口引 `RadarChartProps`。`gradient` 写在 core。

@@ -17,6 +17,7 @@ const htmlEscapes: Record<string, string> = {
   "'": '&#39;'
 }
 
+/** TRUSTED custom renderer: this example escapes first. Returning raw HTML is still sanitised by the editor. */
 const renderer: MarkdownRenderer = {
   render(markdown) {
     const escaped = markdown.replace(/[&<>"']/g, (character) => htmlEscapes[character])

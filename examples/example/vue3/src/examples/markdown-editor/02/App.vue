@@ -20,6 +20,7 @@ const htmlEscapes: Record<string, string> = {
   "'": '&#39;'
 }
 
+/** TRUSTED custom renderer: this example escapes first. Returning raw HTML is still sanitised by the editor. */
 const renderer: MarkdownRenderer = {
   render(markdown) {
     const escaped = markdown.replace(/[&<>"']/g, (character) => htmlEscapes[character])
@@ -66,7 +67,7 @@ const toolbar: MarkdownToolbarItem[] = [
     </div>
 
     <MarkdownEditor
-      v-model:value="content"
+      v-model="content"
       :mode="mode"
       :toolbar="toolbar"
       :renderer="renderer"

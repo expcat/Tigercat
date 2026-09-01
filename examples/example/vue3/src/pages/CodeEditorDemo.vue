@@ -9,6 +9,6 @@ const modules = getDemoModules('code-editor')
 <template>
   <DemoPage
     title="CodeEditor 代码编辑器"
-    description="轻量级代码编辑器，支持语法高亮、行号和主题切换。"
+    description="轻量级代码编辑器，支持语法高亮和行号。"
     :modules="modules" />
 </template>
