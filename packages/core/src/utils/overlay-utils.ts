@@ -54,6 +54,24 @@ export function shouldCloseOnMaskClick(event: MaskClickLikeEvent, maskClosable: 
   return maskClosable && event.target === event.currentTarget
 }
 
+export interface OverlayPresence {
+  open: boolean
+  hasOpened: boolean
+  leaving: boolean
+  destroyOnClose: boolean
+}
+
+/** Open and leave frames always render. `destroyOnClose` only gates the idle closed tree. */
+export function shouldRenderOverlay(presence: OverlayPresence): boolean {
+  if (presence.open || presence.leaving) return true
+  if (presence.destroyOnClose) return false
+  return presence.hasOpened
+}
+
+export function isOverlayVisuallyHidden(open: boolean, leaving: boolean): boolean {
+  return !open && !leaving
+}
+
 export function isEventOutside(
   event: Event,
   containers: Array<ElementLike | null | undefined>,

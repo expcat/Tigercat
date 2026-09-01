@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useCallback, useRef, useId } from 'react'
 import {
   ANIMATION_DURATION_MS,
-  captureActiveElement,
   classNames,
-  focusFirst,
   closeIconViewBox,
   closeIconPathD,
   closeIconPathStrokeLinecap,
@@ -21,7 +19,7 @@ import {
   modalCloseButtonClasses,
   modalBodyClasses,
   modalFooterClasses,
-  restoreFocus,
+  shouldRenderOverlay,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   mergeTigerLocale,
@@ -140,7 +138,7 @@ export const Modal: React.FC<ModalProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
+  const [hasOpened, setHasOpened] = React.useState(open)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
   const prevOpenRef = useRef(open)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
@@ -152,7 +150,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     if (open) {
-      setHasBeenOpened(true)
+      setHasOpened(true)
     } else {
       cleanupDragSession()
       setDragOffset({ x: 0, y: 0 })
@@ -196,7 +194,12 @@ export const Modal: React.FC<ModalProps> = ({
     prevOpenRef.current = open
   }, [open, onAfterClose])
 
-  const shouldRender = destroyOnClose ? open : hasBeenOpened
+  const shouldRender = shouldRenderOverlay({
+    open,
+    hasOpened,
+    leaving: false,
+    destroyOnClose
+  })
 
   const handleClose = useCallback(() => {
     onCancel?.()
@@ -270,27 +273,12 @@ export const Modal: React.FC<ModalProps> = ({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
-  const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
 
-  useEffect(() => {
-    if (open) {
-      previousActiveElementRef.current = captureActiveElement()
-
-      const timer = setTimeout(() => {
-        focusFirst([closeButtonRef.current, dialogRef.current])
-      }, 0)
-
-      return () => clearTimeout(timer)
-    }
-
-    restoreFocus(previousActiveElementRef.current)
-  }, [open])
-
   useEscapeKey({ enabled: open, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true })
+  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true, autoFocus: true })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null

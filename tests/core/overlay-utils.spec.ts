@@ -9,7 +9,9 @@ import {
   isEventOutside,
   registerEscapeDismiss,
   setBackgroundInert,
-  shouldCloseOnMaskClick
+  shouldCloseOnMaskClick,
+  shouldRenderOverlay,
+  isOverlayVisuallyHidden
 } from '@expcat/tigercat-core'
 
 describe('overlay-utils (core)', () => {
@@ -69,6 +71,26 @@ describe('overlay-utils (core)', () => {
     })
 
     expect(isEventOutside(event, [container])).toBe(false)
+  })
+
+  it('shouldRenderOverlay keeps the first open frame and idle closed trees apart', () => {
+    expect(
+      shouldRenderOverlay({ open: true, hasOpened: false, leaving: false, destroyOnClose: false })
+    ).toBe(true)
+    expect(
+      shouldRenderOverlay({ open: false, hasOpened: false, leaving: false, destroyOnClose: false })
+    ).toBe(false)
+    expect(
+      shouldRenderOverlay({ open: false, hasOpened: true, leaving: false, destroyOnClose: false })
+    ).toBe(true)
+    expect(
+      shouldRenderOverlay({ open: false, hasOpened: true, leaving: false, destroyOnClose: true })
+    ).toBe(false)
+    expect(
+      shouldRenderOverlay({ open: false, hasOpened: true, leaving: true, destroyOnClose: true })
+    ).toBe(true)
+    expect(isOverlayVisuallyHidden(false, true)).toBe(false)
+    expect(isOverlayVisuallyHidden(false, false)).toBe(true)
   })
 
   it('shouldCloseOnMaskClick should only close for direct mask clicks when enabled', () => {

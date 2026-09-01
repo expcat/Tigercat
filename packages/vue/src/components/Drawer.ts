@@ -7,11 +7,10 @@ import {
   h,
   onMounted,
   onBeforeUnmount,
-  nextTick
+  useId
 } from 'vue'
 import {
   ANIMATION_DURATION_MS,
-  captureActiveElement,
   classNames,
   coerceClassValue,
   closeIconViewBox,
@@ -19,7 +18,6 @@ import {
   closeIconPathStrokeLinecap,
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
-  focusFirst,
   resolveLocaleText,
   mergeTigerLocale,
   mergeStyleValues,
@@ -35,8 +33,8 @@ import {
   getDrawerTitleClasses,
   getGestureTouchPoint,
   isDrawerSwipeCloseGesture,
-  restoreFocus,
   resolveSwipeGesture,
+  shouldRenderOverlay,
   shouldCloseOnMaskClick,
   type GesturePoint,
   type DrawerPlacement,
@@ -51,9 +49,6 @@ import {
   useVueFocusTrap
 } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
-
-let drawerIdCounter = 0
-const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`
 
 export interface VueDrawerProps {
   open?: boolean
@@ -256,30 +251,26 @@ export const Drawer = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
-    const instanceId = ref<string>(createDrawerId())
-    const hasBeenOpened = ref(false)
+    const instanceId = ref(`tiger-drawer-${useId()}`)
+    const hasOpened = ref(props.open)
     const deferredRendered = ref(props.open)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
-    const previousActiveElement = ref<HTMLElement | null>(null)
     let touchStartPoint: GesturePoint | null = null
     let touchCurrentPoint: GesturePoint | null = null
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
-    const shouldRender = computed(() => {
-      if (props.open) {
-        hasBeenOpened.value = true
-        return true
-      }
-
-      if (props.destroyOnClose) {
-        return props.deferDestroyOnClose ? deferredRendered.value : false
-      }
-      return hasBeenOpened.value
-    })
+    const shouldRender = computed(() =>
+      shouldRenderOverlay({
+        open: props.open,
+        hasOpened: props.destroyOnClose ? deferredRendered.value : hasOpened.value,
+        leaving: false,
+        destroyOnClose: props.destroyOnClose && !props.deferDestroyOnClose
+      })
+    )
 
     const handleClose = () => {
       emit('update:open', false)
@@ -331,7 +322,12 @@ export const Drawer = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(escapeEnabled)
-    useVueFocusTrap({ enabled: escapeEnabled, containerRef: rootRef, inert: true })
+    useVueFocusTrap({
+      enabled: escapeEnabled,
+      containerRef: rootRef,
+      inert: true,
+      autoFocus: true
+    })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
@@ -347,20 +343,16 @@ export const Drawer = defineComponent({
 
     watch(
       () => props.open,
-      async (nextVisible) => {
+      (nextVisible) => {
         if (nextVisible) {
+          hasOpened.value = true
           deferredRendered.value = true
-          previousActiveElement.value = captureActiveElement()
-
-          await nextTick()
-          focusFirst([closeButtonRef.value, dialogRef.value])
           return
         }
 
         if (props.destroyOnClose && !props.deferDestroyOnClose) {
           deferredRendered.value = false
         }
-        restoreFocus(previousActiveElement.value)
       }
     )
 

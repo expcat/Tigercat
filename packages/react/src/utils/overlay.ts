@@ -24,6 +24,8 @@ import {
   OVERLAY_Z_INDEX,
   getTransformOrigin,
   restoreFocus,
+  captureActiveElement,
+  focusFirst,
   registerEscapeDismiss,
   type AnchoredOverlayLayout,
   type FloatingPlacement,
@@ -153,14 +155,41 @@ export interface UseFocusTrapOptions {
   containerRef: React.RefObject<HTMLElement | null>
   /** Inert the rest of the document while the trap is active. */
   inert?: boolean
+  /** Capture the active element, focus the trap, and restore on disable or unmount. */
+  autoFocus?: boolean
 }
 
-export function useFocusTrap({ enabled, containerRef, inert = false }: UseFocusTrapOptions): void {
-  useEffect(() => {
+export function useFocusTrap({
+  enabled,
+  containerRef,
+  inert = false,
+  autoFocus = false
+}: UseFocusTrapOptions): void {
+  const restoreTargetRef = useRef<HTMLElement | null>(null)
+  const wasEnabledRef = useRef(false)
+
+  if (autoFocus && enabled && !wasEnabledRef.current) {
+    restoreTargetRef.current = captureActiveElement()
+  }
+  wasEnabledRef.current = enabled
+
+  useLayoutEffect(() => {
+    if (!enabled) {
+      if (autoFocus) {
+        restoreFocus(restoreTargetRef.current)
+        restoreTargetRef.current = null
+      }
+      return
+    }
+
     const container = containerRef.current
-    if (!enabled || !container) return
+    if (!container) return
     const ownerDocument = container.ownerDocument
     const releaseInert = inert ? setBackgroundInert(container) : undefined
+    if (autoFocus) {
+      const focusables = getFocusableElements(container)
+      focusFirst([...focusables, container])
+    }
 
     const handler = (event: KeyboardEvent) => {
       const focusables = getFocusableElements(container)
@@ -185,7 +214,15 @@ export function useFocusTrap({ enabled, containerRef, inert = false }: UseFocusT
       ownerDocument.removeEventListener('keydown', handler, true)
       releaseInert?.()
     }
-  }, [enabled, containerRef, inert])
+  }, [enabled, containerRef, inert, autoFocus])
+
+  useLayoutEffect(() => {
+    return () => {
+      if (!autoFocus) return
+      restoreFocus(restoreTargetRef.current)
+      restoreTargetRef.current = null
+    }
+  }, [autoFocus])
 }
 
 // ============================================================================

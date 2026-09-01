@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import {
   ANIMATION_DURATION_MS,
-  captureActiveElement,
   classNames,
   closeIconViewBox,
   closeIconPathD,
   closeIconPathStrokeLinecap,
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
-  focusFirst,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
   getDrawerPanelClasses,
@@ -21,7 +19,7 @@ import {
   isDrawerSwipeCloseGesture,
   resolveLocaleText,
   resolveSwipeGesture,
-  restoreFocus,
+  shouldRenderOverlay,
   shouldCloseOnMaskClick,
   mergeTigerLocale,
   OVERLAY_Z_INDEX,
@@ -103,12 +101,12 @@ export const Drawer: React.FC<DrawerProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
+  const [hasOpened, setHasOpened] = React.useState(open)
   const [deferredRendered, setDeferredRendered] = React.useState(open)
 
   useEffect(() => {
     if (open) {
-      setHasBeenOpened(true)
+      setHasOpened(true)
       setDeferredRendered(true)
       return
     }
@@ -118,11 +116,12 @@ export const Drawer: React.FC<DrawerProps> = ({
     }
   }, [destroyOnClose, deferDestroyOnClose, open])
 
-  const shouldRender = destroyOnClose
-    ? deferDestroyOnClose
-      ? deferredRendered
-      : open
-    : hasBeenOpened
+  const shouldRender = shouldRenderOverlay({
+    open,
+    hasOpened: destroyOnClose ? deferredRendered : hasOpened,
+    leaving: false,
+    destroyOnClose: destroyOnClose && !deferDestroyOnClose
+  })
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false)
@@ -177,7 +176,6 @@ export const Drawer: React.FC<DrawerProps> = ({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
-  const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
 
@@ -191,20 +189,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     mergedLocale?.common?.closeText
   )
 
-  useEffect(() => {
-    if (open) {
-      previousActiveElementRef.current = captureActiveElement()
-
-      const timer = window.setTimeout(() => {
-        focusFirst([closeButtonRef.current, dialogRef.current])
-      }, 0)
-
-      return () => window.clearTimeout(timer)
-    }
-    restoreFocus(previousActiveElementRef.current)
-  }, [open])
-
-  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true })
+  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true, autoFocus: true })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null

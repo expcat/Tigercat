@@ -14,6 +14,8 @@ import {
   OVERLAY_Z_INDEX,
   getTransformOrigin,
   restoreFocus,
+  captureActiveElement,
+  focusFirst,
   registerEscapeDismiss,
   type AnchoredOverlayLayout,
   type FloatingPlacement,
@@ -175,38 +177,60 @@ export interface UseVueFocusTrapOptions {
   containerRef: Ref<HTMLElement | null>
   /** Inert the rest of the document while the trap is active. */
   inert?: Ref<boolean> | boolean
+  /** Capture the active element, focus the trap, and restore on disable or unmount. */
+  autoFocus?: boolean
 }
 
 export function useVueFocusTrap({
   enabled,
   containerRef,
-  inert = false
+  inert = false,
+  autoFocus = false
 }: UseVueFocusTrapOptions): void {
   let releaseInert: (() => void) | undefined
   let detachTrap: (() => void) | undefined
+  let restoreTarget: HTMLElement | null = null
 
-  const teardown = () => {
+  const detach = () => {
     detachTrap?.()
     detachTrap = undefined
     releaseInert?.()
     releaseInert = undefined
   }
 
+  const restore = () => {
+    if (!autoFocus) return
+    restoreFocus(restoreTarget)
+    restoreTarget = null
+  }
+
+  const teardown = () => {
+    detach()
+    restore()
+  }
+
   watch(
     enabled,
     (isEnabled) => {
+      if (autoFocus && isEnabled && !restoreTarget) {
+        restoreTarget = captureActiveElement()
+      }
       if (!isEnabled || !isBrowser()) teardown()
     },
-    { flush: 'sync' }
+    { flush: 'sync', immediate: true }
   )
 
   watch(
     [enabled, containerRef, () => toValue(inert)],
     ([isEnabled, container, inertEnabled]) => {
-      teardown()
+      detach()
       if (!isEnabled || !container || !isBrowser()) return
       const ownerDocument = container.ownerDocument
       releaseInert = inertEnabled ? setBackgroundInert(container) : undefined
+      if (autoFocus) {
+        const focusables = getFocusableElements(container)
+        focusFirst([...focusables, container])
+      }
 
       const handler = (event: KeyboardEvent) => {
         const focusables = getFocusableElements(container)

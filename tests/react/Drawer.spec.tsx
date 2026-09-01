@@ -164,6 +164,55 @@ describe('Drawer', () => {
     })
   })
 
+  it('should trap Tab after opening from closed', async () => {
+    const user = userEvent.setup()
+
+    function Harness() {
+      const [open, setOpen] = React.useState(false)
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            Open
+          </button>
+          <Drawer open={open} onOpenChange={setOpen} title="Focus Drawer">
+            <button type="button">First action</button>
+            <button type="button">Last action</button>
+          </Drawer>
+        </>
+      )
+    }
+
+    render(<Harness />)
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const dialog = await screen.findByRole('dialog')
+    await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true))
+
+    screen.getByText('Last action').focus()
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Close drawer' })).toHaveFocus()
+  })
+
+  it('should restore focus when the open instance is unmounted', async () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'Open drawer'
+    document.body.appendChild(trigger)
+    trigger.focus()
+
+    const { unmount } = render(
+      <Drawer open={true} title="Focus Drawer">
+        <button type="button">Inside</button>
+      </Drawer>
+    )
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')?.contains(document.activeElement)).toBe(true)
+    })
+
+    unmount()
+    await waitFor(() => expect(trigger).toHaveFocus())
+    trigger.remove()
+  })
+
   it('should trap focus inside the drawer', async () => {
     const user = userEvent.setup()
 

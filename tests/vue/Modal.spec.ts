@@ -360,11 +360,37 @@ describe('Modal', () => {
       })
 
       await waitFor(() => {
-        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+        const dialog = document.querySelector('[role="dialog"]')
+        expect(dialog).toBeInTheDocument()
+        expect(dialog?.contains(document.activeElement)).toBe(true)
       })
 
       await rerender({ open: false })
 
+      await waitFor(() => expect(trigger).toHaveFocus())
+      trigger.remove()
+    })
+
+    it('should restore focus when the open instance is unmounted', async () => {
+      const trigger = document.createElement('button')
+      trigger.textContent = 'Open modal'
+      document.body.appendChild(trigger)
+      trigger.focus()
+
+      const { unmount } = render(Modal, {
+        props: {
+          open: true,
+          title: 'Test Modal'
+        }
+      })
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')?.contains(document.activeElement)).toBe(
+          true
+        )
+      })
+
+      unmount()
       await waitFor(() => expect(trigger).toHaveFocus())
       trigger.remove()
     })
@@ -527,6 +553,43 @@ describe('Modal', () => {
   })
 
   describe('Focus Trap', () => {
+    it('should trap Tab after opening from closed', async () => {
+      const user = userEvent.setup()
+      const { rerender } = render(Modal, {
+        props: {
+          open: false,
+          title: 'Focus Trap Test',
+          showDefaultFooter: true
+        },
+        slots: {
+          default: '<input data-testid="modal-input" />'
+        }
+      })
+
+      await rerender({
+        open: true,
+        title: 'Focus Trap Test',
+        showDefaultFooter: true
+      })
+
+      await waitFor(() => {
+        const dialog = document.querySelector('[role="dialog"]')
+        expect(dialog).toBeInTheDocument()
+        expect(dialog?.contains(document.activeElement)).toBe(true)
+      })
+
+      const dialog = document.querySelector('[role="dialog"]')!
+      const focusableElements = dialog.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      const firstFocusable = focusableElements[0] as HTMLElement
+      const lastFocusable = focusableElements[focusableElements.length - 1] as HTMLElement
+
+      lastFocusable.focus()
+      await user.tab()
+      expect(firstFocusable).toHaveFocus()
+    })
+
     it('should trap focus within modal on Tab key', async () => {
       const user = userEvent.setup()
       const { container } = render(Modal, {
@@ -628,7 +691,7 @@ describe('Modal', () => {
       const host = hostId ? document.getElementById(hostId) : null
       expect(host).toHaveAttribute('data-tiger-overlay-host')
 
-      await fireEvent.click(dialog.querySelector('button[data-state="closed"]')!)
+      await fireEvent.click(dialog.querySelector('[role="combobox"]')!)
       const listbox = await screen.findByRole('listbox')
 
       const selectLayer = listbox.closest('[data-tiger-overlay-layer]')

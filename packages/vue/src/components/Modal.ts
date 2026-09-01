@@ -7,7 +7,7 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
-  nextTick
+  useId
 } from 'vue'
 import {
   ANIMATION_DURATION_MS,
@@ -34,6 +34,7 @@ import {
   mergeTigerLocale,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
+  shouldRenderOverlay,
   createDocumentDragSession,
   type DocumentDragSession,
   type GesturePoint,
@@ -51,9 +52,6 @@ import {
   useVueEscapeKey,
   useVueFocusTrap
 } from '../utils/overlay'
-
-let modalIdCounter = 0
-const createModalId = () => `tiger-modal-${++modalIdCounter}`
 
 export interface VueModalProps {
   open?: boolean
@@ -246,13 +244,12 @@ export const Modal = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
-    const instanceId = ref<string>(createModalId())
-    const hasBeenOpened = ref(props.open)
+    const instanceId = ref(`tiger-modal-${useId()}`)
+    const hasOpened = ref(props.open)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
-    const previousActiveElement = ref<HTMLElement | null>(null)
     let touchStartPoint: GesturePoint | null = null
     let touchCurrentPoint: GesturePoint | null = null
 
@@ -288,11 +285,14 @@ export const Modal = defineComponent({
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
-    const shouldRender = computed(() => {
-      if (props.open) return true
-      if (props.destroyOnClose) return false
-      return hasBeenOpened.value
-    })
+    const shouldRender = computed(() =>
+      shouldRenderOverlay({
+        open: props.open,
+        hasOpened: hasOpened.value,
+        leaving: false,
+        destroyOnClose: props.destroyOnClose
+      })
+    )
 
     const handleClose = () => {
       emit('update:open', false)
@@ -351,7 +351,7 @@ export const Modal = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(overlayOpen)
-    useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef, inert: true })
+    useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef, inert: true, autoFocus: true })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
@@ -368,24 +368,16 @@ export const Modal = defineComponent({
 
     watch(
       () => props.open,
-      async (nextVisible, previousVisible, onCleanup) => {
+      (nextVisible, previousVisible, onCleanup) => {
         if (nextVisible) {
-          hasBeenOpened.value = true
-
-          const active = document.activeElement
-          previousActiveElement.value = active instanceof HTMLElement ? active : null
-
-          await nextTick()
-          const el = closeButtonRef.value ?? dialogRef.value
-          el?.focus?.()
-        } else {
-          previousActiveElement.value?.focus?.()
-          cleanupDragSession()
-          dragOffset.value = { x: 0, y: 0 }
-          if (previousVisible) {
-            const timer = window.setTimeout(() => emit('after-close'), ANIMATION_DURATION_MS)
-            onCleanup(() => window.clearTimeout(timer))
-          }
+          hasOpened.value = true
+          return
+        }
+        cleanupDragSession()
+        dragOffset.value = { x: 0, y: 0 }
+        if (previousVisible) {
+          const timer = window.setTimeout(() => emit('after-close'), ANIMATION_DURATION_MS)
+          onCleanup(() => window.clearTimeout(timer))
         }
       }
     )

@@ -226,6 +226,54 @@ describe('Drawer', () => {
     })
   })
 
+  it('should trap Tab after opening from closed', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(Drawer, {
+      props: { open: false, title: 'Focus Drawer' },
+      slots: {
+        default: () =>
+          h('div', [
+            h('button', { type: 'button' }, 'First action'),
+            h('button', { type: 'button' }, 'Last action')
+          ])
+      }
+    })
+
+    await rerender({ open: true, title: 'Focus Drawer' })
+
+    await waitFor(() => {
+      const dialog = document.querySelector('[role="dialog"]')
+      expect(dialog).toBeInTheDocument()
+      expect(dialog?.contains(document.activeElement)).toBe(true)
+    })
+
+    screen.getByText('Last action').focus()
+    await user.tab()
+    expect(screen.getByLabelText('Close drawer')).toHaveFocus()
+  })
+
+  it('should restore focus when the open instance is unmounted', async () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'Open drawer'
+    document.body.appendChild(trigger)
+    trigger.focus()
+
+    const { unmount } = render(Drawer, {
+      props: { open: true, title: 'Focus Drawer' },
+      slots: {
+        default: () => h('button', { type: 'button' }, 'Inside')
+      }
+    })
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')?.contains(document.activeElement)).toBe(true)
+    })
+
+    unmount()
+    await waitFor(() => expect(trigger).toHaveFocus())
+    trigger.remove()
+  })
+
   it('should trap focus inside the drawer', async () => {
     const user = userEvent.setup()
 
