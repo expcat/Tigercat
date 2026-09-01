@@ -1,18 +1,27 @@
-import { defineComponent, computed, h, PropType, onMounted, ref, useId } from 'vue'
+import { defineComponent, computed, h, PropType, onMounted, ref, useId, watch } from 'vue'
 import {
   classNames,
   createLinearScale,
-  getChartElementOpacity,
   getNumberExtent,
   getStableChartGradientPrefix,
   getScatterHoverShadow,
-  getScatterHoverSize,
-  getScatterPointPath,
   scatterPointTransitionClasses,
-  SCATTER_ENTRANCE_KEYFRAMES,
   SCATTER_ENTRANCE_CLASS,
+  layoutScatterPoints,
+  scatterPointDisplayLabel,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
+  CHART_SURFACE_FILL,
+  SCATTER_ENTRANCE_STAGGER_MS,
+  SCATTER_ENTRANCE_STAGGER_MAX_MS,
+  formatChartTemplate,
+  coerceClassValue,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
+  DEFAULT_CHART_PADDING,
   resolveChartTooltipContent,
   mergeTigerLocale,
   getChartLabels,
@@ -44,16 +53,20 @@ export interface VueScatterChartProps extends CoreScatterChartProps {
   yScale?: ChartScale
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleChart>
+  onPointClick?: (index: number, datum: ScatterChartDatum) => void
 }
+
+export type ScatterChartProps = VueScatterChartProps
 
 export const ScatterChart = defineComponent({
   name: 'TigerScatterChart',
+  inheritAttrs: false,
   props: {
     width: { type: Number, default: 320 },
     height: { type: Number, default: 200 },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
-      default: 24
+      default: () => ({ ...DEFAULT_CHART_PADDING })
     },
     responsive: { type: Boolean, default: false },
     data: {
@@ -75,7 +88,11 @@ export const ScatterChart = defineComponent({
     gradient: { type: Boolean, default: false },
     animated: { type: Boolean, default: false },
     pointBorderWidth: { type: Number, default: 0 },
-    pointBorderColor: { type: String, default: 'white' },
+    pointBorderColor: { type: String, default: CHART_SURFACE_FILL },
+    sizeScale: {
+      type: [Boolean, Object] as PropType<boolean | { minRadius?: number; maxRadius?: number }>,
+      default: false
+    },
     showGrid: { type: Boolean, default: true },
     showAxis: { type: Boolean, default: true },
     showXAxis: { type: Boolean, default: true },
@@ -111,6 +128,9 @@ export const ScatterChart = defineComponent({
       type: Number as PropType<number | null>,
       default: undefined
     },
+    onPointClick: {
+      type: Function as PropType<(index: number, datum: ScatterChartDatum) => void>
+    },
     // Legend
     showLegend: { type: Boolean, default: false },
     legendPosition: {
@@ -136,7 +156,7 @@ export const ScatterChart = defineComponent({
     className: { type: String }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'point-click', 'point-hover'],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const gradientPrefix = getStableChartGradientPrefix('scatter', useId())
     const mounted = ref(false)
@@ -146,11 +166,18 @@ export const ScatterChart = defineComponent({
     onMounted(() => {
       if (props.animated) mounted.value = true
     })
+    watch(
+      () => props.animated,
+      (value) => {
+        if (value) mounted.value = true
+      }
+    )
 
     const {
       tooltipPosition,
       resolvedHoveredIndex,
       activeIndex,
+      resolvedSelectedIndex,
       handleMouseEnter,
       handleMouseMove,
       handleMouseLeave,
@@ -158,8 +185,7 @@ export const ScatterChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave,
-      wrapperClasses
+      handleLegendLeave
     } = useChartInteraction<ScatterChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -169,9 +195,14 @@ export const ScatterChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index: number) => props.data[index],
-      eventNames: { hover: 'point-hover', click: 'point-click' }
+      onHover: (index, datum) => emit('point-hover', index, datum),
+      onClick: (index, datum) => {
+        props.onPointClick?.(index, datum as ScatterChartDatum)
+        emit('point-click', index, datum)
+      }
     })
 
     const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
@@ -202,26 +233,18 @@ export const ScatterChart = defineComponent({
     const palette = computed(() => resolveChartPalette(props.colors, props.pointColor))
 
     const points = computed(() =>
-      props.data.map((item, index) => {
-        const color = item.color ?? palette.value[index % palette.value.length]
-        const opacity = getChartElementOpacity(index, activeIndex.value, {
-          activeOpacity: props.activeOpacity,
-          inactiveOpacity: props.inactiveOpacity
-        })
-        const isHovered = resolvedHoveredIndex.value === index
-        const baseSize = item.size ?? props.pointSize
-        const r = isHovered ? getScatterHoverSize(baseSize) : baseSize
-
-        return {
-          cx: resolvedXScale.value.map(item.x),
-          cy: resolvedYScale.value.map(item.y),
-          r,
-          baseSize,
-          color,
-          opacity: props.pointOpacity ?? opacity,
-          isHovered,
-          datum: item
-        }
+      layoutScatterPoints(props.data, resolvedXScale.value, resolvedYScale.value, {
+        pointSize: props.pointSize,
+        pointStyle: props.pointStyle,
+        palette: palette.value,
+        activeIndex: activeIndex.value,
+        hoveredIndex: resolvedHoveredIndex.value,
+        gradient: props.gradient,
+        gradientPrefix,
+        sizeScale: props.sizeScale,
+        pointOpacity: props.pointOpacity,
+        activeOpacity: props.activeOpacity,
+        inactiveOpacity: props.inactiveOpacity
       })
     )
 
@@ -230,8 +253,11 @@ export const ScatterChart = defineComponent({
         data: props.data,
         palette: palette.value,
         activeIndex: activeIndex.value,
+        selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d, i) =>
-          props.legendFormatter ? props.legendFormatter(d, i) : (d.label ?? `(${d.x}, ${d.y})`),
+          props.legendFormatter
+            ? props.legendFormatter(d, i)
+            : scatterPointDisplayLabel(d, i, labels.value.pointAriaLabel),
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
       })
     )
@@ -241,10 +267,12 @@ export const ScatterChart = defineComponent({
         resolvedHoveredIndex.value,
         props.data,
         props.tooltipFormatter,
-        (datum, index) => {
-          const label = datum.label ?? `Point ${index + 1}`
-          return `${label}: (${datum.x}, ${datum.y})`
-        }
+        (datum, index) =>
+          formatChartTemplate(labels.value.pointAriaLabel, {
+            index: index + 1,
+            x: datum.x,
+            y: datum.y
+          })
       )
     )
 
@@ -254,23 +282,36 @@ export const ScatterChart = defineComponent({
         ? h(
             'defs',
             null,
-            palette.value.map((color, i) =>
+            points.value.map((point) =>
               h(
                 'radialGradient',
-                { id: `${gradientPrefix}-${i}`, cx: '35%', cy: '35%', r: '65%' },
+                {
+                  id: `${gradientPrefix}-${point.index}`,
+                  cx: '35%',
+                  cy: '35%',
+                  r: '65%'
+                },
                 [
-                  h('stop', { offset: '0%', 'stop-color': '#fff', 'stop-opacity': '0.5' }),
-                  h('stop', { offset: '50%', 'stop-color': color, 'stop-opacity': '0.95' }),
-                  h('stop', { offset: '100%', 'stop-color': color, 'stop-opacity': '1' })
+                  h('stop', {
+                    offset: '0%',
+                    'stop-color': CHART_SURFACE_FILL,
+                    'stop-opacity': '0.5'
+                  }),
+                  h('stop', {
+                    offset: '50%',
+                    'stop-color': point.color,
+                    'stop-opacity': '0.95'
+                  }),
+                  h('stop', {
+                    offset: '100%',
+                    'stop-color': point.color,
+                    'stop-opacity': '1'
+                  })
                 ]
               )
             )
           )
         : null
-
-      // Animation keyframes
-      const animStyle =
-        props.animated && mounted.value ? h('style', null, SCATTER_ENTRANCE_KEYFRAMES) : null
 
       const chart = h(
         ChartCanvas,
@@ -281,14 +322,12 @@ export const ScatterChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className),
           onResolvedSizeChange
         },
         {
           default: () =>
             [
               defs,
-              animStyle,
               props.showGrid
                 ? h(ChartGrid, {
                     xScale: resolvedXScale.value,
@@ -328,59 +367,80 @@ export const ScatterChart = defineComponent({
                 { data: props.data, type: 'scatter' },
                 {
                   default: () =>
-                    points.value.map((point, index) => {
-                      const paletteIdx = index % palette.value.length
-                      const fill = props.gradient
-                        ? `url(#${gradientPrefix}-${paletteIdx})`
-                        : point.color
-                      const interactive = props.hoverable || props.selectable
-
+                    points.value.map((point, visualIndex) => {
+                      const interactive =
+                        props.hoverable ||
+                        props.selectable ||
+                        typeof props.onPointClick === 'function'
                       const filterStyle = point.isHovered
                         ? getScatterHoverShadow(point.color)
                         : undefined
-
                       const animDelay =
-                        props.animated && mounted.value ? `${index * 60}ms` : undefined
-
+                        props.animated && mounted.value
+                          ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
+                          : undefined
+                      const visualActive = points.value.findIndex(
+                        (item) => item.index === (activeIndex.value ?? 0)
+                      )
                       const styleStr = [
                         filterStyle ? `filter:${filterStyle}` : '',
-                        animDelay
-                          ? `animation:${SCATTER_ENTRANCE_CLASS} var(--tiger-motion-duration-slow,500ms) var(--tiger-motion-ease-spring,cubic-bezier(.34,1.56,.64,1)) ${animDelay} both`
-                          : ''
+                        animDelay ? `animation-delay:${animDelay}` : ''
                       ]
                         .filter(Boolean)
                         .join(';')
 
                       const shared = {
-                        fill,
+                        fill: point.fill,
                         opacity: point.opacity,
                         stroke: props.pointBorderColor,
                         'stroke-width': props.pointBorderWidth,
                         class: classNames(
-                          scatterPointTransitionClasses,
+                          props.animated ? scatterPointTransitionClasses : undefined,
                           animDelay && SCATTER_ENTRANCE_CLASS,
                           interactive && 'cursor-pointer'
                         ),
                         style: styleStr || undefined,
-                        tabindex: props.selectable ? 0 : undefined,
-                        role: props.selectable ? 'button' : 'img',
-                        'aria-label':
-                          point.datum.label ??
-                          labels.value.pointAriaLabel
-                            .replace('{index}', String(index + 1))
-                            .replace('{x}', String(point.datum.x))
-                            .replace('{y}', String(point.datum.y)),
-                        'data-point-index': index,
-                        onMouseenter: (e: MouseEvent) => handleMouseEnter(index, e),
+                        tabindex: interactive
+                          ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
+                          : undefined,
+                        role: interactive ? 'button' : undefined,
+                        'aria-hidden': interactive ? undefined : true,
+                        'aria-label': interactive
+                          ? (point.datum.label ??
+                            formatChartTemplate(labels.value.pointAriaLabel, {
+                              index: point.index + 1,
+                              x: point.datum.x,
+                              y: point.datum.y
+                            }))
+                          : undefined,
+                        'data-point-index': point.index,
+                        onMouseenter: (e: MouseEvent) => handleMouseEnter(point.index, e),
                         onMousemove: handleMouseMove,
                         onMouseleave: handleMouseLeave,
-                        onClick: () => handleClick(index),
-                        onKeydown: (e: KeyboardEvent) => handleKeyDown(e, index)
+                        onClick: () => handleClick(point.index),
+                        onKeydown: (e: KeyboardEvent) => {
+                          if (isChartNavigationKey(e.key)) {
+                            e.preventDefault()
+                            const nextVisual = nextChartRovingIndex(
+                              visualIndex,
+                              e.key,
+                              points.value.length
+                            )
+                            const next = points.value[nextVisual]
+                            const node = (
+                              e.currentTarget as SVGElement
+                            ).parentElement?.querySelector(`[data-point-index="${next.index}"]`)
+                            if (node instanceof SVGElement) node.focus()
+                            handleMouseEnter(next.index, e)
+                            return
+                          }
+                          handleKeyDown(e, point.index)
+                        }
                       }
 
                       if (props.pointStyle === 'circle') {
                         return h('circle', {
-                          key: `point-${index}`,
+                          key: `point-${point.index}`,
                           cx: point.cx,
                           cy: point.cy,
                           r: point.r,
@@ -388,16 +448,14 @@ export const ScatterChart = defineComponent({
                         })
                       }
 
-                      // CSS entrance `transform:scale()` would override an SVG
-                      // transform on the same <path>; keep translate on a wrapper.
                       return h(
                         'g',
                         {
-                          key: `point-${index}`,
+                          key: `point-${point.index}`,
                           transform: `translate(${point.cx},${point.cy})`
                         },
                         h('path', {
-                          d: getScatterPointPath(props.pointStyle, point.r),
+                          d: point.d,
                           ...shared
                         })
                       )
@@ -417,35 +475,31 @@ export const ScatterChart = defineComponent({
           })
         : null
 
-      if (!props.showLegend) {
-        return h(
-          'div',
-          {
-            class: classNames(
-              'relative',
-              props.responsive ? 'block w-full min-w-0' : 'inline-block'
-            )
-          },
-          [chart, tooltip]
-        )
-      }
-
       return h(
         'div',
-        { class: classNames(wrapperClasses.value, props.responsive && 'w-full min-w-0') },
+        {
+          class: getCartesianChartShellClasses({
+            showLegend: props.showLegend,
+            legendPosition: props.legendPosition,
+            responsive: props.responsive,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
+        },
         [
           chart,
-          h(ChartLegend, {
-            items: legendItems.value,
-            position: props.legendPosition,
-            markerSize: props.legendMarkerSize,
-            gap: props.legendGap,
-            ariaLabel: labels.value.legendAriaLabel,
-            interactive: props.hoverable || props.selectable,
-            onItemClick: handleLegendClick,
-            onItemHover: handleLegendHover,
-            onItemLeave: handleLegendLeave
-          }),
+          props.showLegend
+            ? h(ChartLegend, {
+                items: legendItems.value,
+                orientation: chartLegendOrientationFromPosition(props.legendPosition),
+                markerSize: props.legendMarkerSize,
+                gap: props.legendGap,
+                ariaLabel: labels.value.legendAriaLabel,
+                interactive: props.hoverable || props.selectable,
+                onItemClick: handleLegendClick,
+                onItemHover: handleLegendHover,
+                onItemLeave: handleLegendLeave
+              })
+            : null,
           tooltip
         ]
       )

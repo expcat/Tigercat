@@ -3,9 +3,10 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { waitFor } from '@testing-library/vue'
+import { fireEvent, waitFor } from '@testing-library/vue'
 import { ScatterChart } from '@expcat/tigercat-vue/ScatterChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const defaultSize = { width: 240, height: 160 }
 
@@ -25,10 +26,11 @@ describe('ScatterChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(ScatterChart, {
-      data: [{ x: 10, y: 20 }]
+      data: [{ x: 10, y: 20 }],
+      title: 'Stores'
     })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
   it('renders empty state with no data', () => {
@@ -64,7 +66,7 @@ describe('ScatterChart', () => {
         ...defaultSize
       })
 
-      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+      expect(container.querySelector('[data-chart-legend="true"]')).toBeTruthy()
     })
   })
 
@@ -140,6 +142,24 @@ describe('ScatterChart', () => {
       expect(keys.size).toBe(translates.length)
       expect(translates.every(([x, y]) => x === 0 && y === 0)).toBe(false)
     })
+  })
+
+  it('fires point-click without selectable and localizes legend and tooltip', async () => {
+    const view = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20, color: '#abc' }],
+      gradient: true,
+      showLegend: true,
+      locale: zhCN,
+      ...defaultSize
+    })
+    expect(view.container.querySelector('circle[data-point-index]')?.getAttribute('fill')).toMatch(
+      /^url\(#tiger-scatter-grad-/
+    )
+    await fireEvent.click(view.container.querySelector('circle[data-point-index]')!)
+    expect(view.emitted()['point-click']).toBeTruthy()
+    expect(view.container.querySelector('[aria-label="图表图例"]')).toBeTruthy()
+    await fireEvent.mouseEnter(view.container.querySelector('circle[data-point-index]')!)
+    expect(document.body.querySelector('[data-chart-tooltip]')?.textContent).toContain('第 1 个点')
   })
 })
 

@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { waitFor } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { ScatterChart } from '@expcat/tigercat-react/ScatterChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 
 const defaultSize = { width: 240, height: 160 }
@@ -22,10 +22,11 @@ describe('ScatterChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(ScatterChart, {
-      data: [{ x: 10, y: 20 }]
+      data: [{ x: 10, y: 20 }],
+      title: 'Stores'
     })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
   it('localizes generated point and legend aria labels', () => {
@@ -36,7 +37,6 @@ describe('ScatterChart', () => {
       ...defaultSize
     })
 
-    expect(container.querySelector('[aria-label="第 1 个点：(10, 20)"]')).toBeInTheDocument()
     expect(container.querySelector('[data-chart-legend="true"]')).toHaveAttribute(
       'aria-label',
       '图表图例'
@@ -76,7 +76,7 @@ describe('ScatterChart', () => {
         ...defaultSize
       })
 
-      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+      expect(container.querySelector('[data-chart-legend="true"]')).toBeTruthy()
     })
   })
 
@@ -152,6 +152,30 @@ describe('ScatterChart', () => {
       expect(keys.size).toBe(translates.length)
       expect(translates.every(([x, y]) => x === 0 && y === 0)).toBe(false)
     })
+  })
+
+  it('fires onPointClick without selectable and keeps item.color under gradient', () => {
+    const onPointClick = vi.fn()
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20, color: '#abc' }],
+      gradient: true,
+      onPointClick,
+      ...defaultSize
+    })
+    const point = container.querySelector('circle[data-point-index]')!
+    expect(point.getAttribute('fill')).toMatch(/^url\(#tiger-scatter-grad-/)
+    fireEvent.click(point)
+    expect(onPointClick).toHaveBeenCalledWith(0, expect.objectContaining({ x: 10, y: 20 }))
+  })
+
+  it('localizes the tooltip when a point has no label', () => {
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      locale: zhCN,
+      ...defaultSize
+    })
+    fireEvent.mouseEnter(container.querySelector('circle[data-point-index]')!)
+    expect(document.body.querySelector('[data-chart-tooltip]')?.textContent).toContain('第 1 个点')
   })
 })
 
