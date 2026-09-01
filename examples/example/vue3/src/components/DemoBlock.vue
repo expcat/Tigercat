@@ -143,7 +143,8 @@ function rebuildSandbox(result: DemoCompileSuccess) {
       lang: demoLang.value,
       theme: ThemeManager.getCurrentTheme(),
       colorScheme: ThemeManager.getResolvedColorScheme(),
-      cssVars: collectTigerCssVars(document.documentElement)
+      cssVars: collectTigerCssVars(document.documentElement),
+      modules: result.modules
     })
   }
 }

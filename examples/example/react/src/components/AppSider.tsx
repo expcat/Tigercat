@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
 import { Button } from '@expcat/tigercat-react/Button'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
 import { Collapse } from '@expcat/tigercat-react/Collapse'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
 
 export interface AppSiderProps {
@@ -37,6 +38,8 @@ export const AppSider: React.FC<AppSiderProps> = ({
   onClose
 }) => {
   const location = useLocation()
+  const chrome = demoChrome(lang)
+  const [query, setQuery] = useState('')
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() =>
     getStoredCollapsedNavGroups()
   )
@@ -45,7 +48,6 @@ export const AppSider: React.FC<AppSiderProps> = ({
     setStoredCollapsedNavGroups(collapsedGroups)
   }, [collapsedGroups])
 
-  // Close on Escape key in mobile mode
   useEffect(() => {
     if (!isMobile || isSiderCollapsed) return
     const onKey = (e: KeyboardEvent) => {
@@ -55,13 +57,25 @@ export const AppSider: React.FC<AppSiderProps> = ({
     return () => document.removeEventListener('keydown', onKey)
   }, [isMobile, isSiderCollapsed, onClose])
 
-  const activeKeys = DEMO_NAV_GROUPS.filter((group) => !collapsedGroups[group.key]).map(
-    (group) => group.key
-  )
+  const visibleGroups = useMemo(() => {
+    const needle = query.trim().toLowerCase()
+    return DEMO_NAV_GROUPS.map((group) => ({
+      ...group,
+      items: needle
+        ? group.items.filter(
+            (item) => item.label[lang].toLowerCase().includes(needle) || item.key.includes(needle)
+          )
+        : group.items
+    })).filter((group) => group.items.length > 0)
+  }, [lang, query])
+
+  const openKeys = query.trim()
+    ? visibleGroups.map((group) => group.key)
+    : DEMO_NAV_GROUPS.filter((group) => !collapsedGroups[group.key]).map((group) => group.key)
 
   const handleCollapseChange = (next: string | number | (string | number)[] | undefined) => {
+    if (query.trim()) return
     const nextKeys = Array.isArray(next) ? next : next !== undefined ? [next] : []
-
     setCollapsedGroups((prev) => {
       const updated = { ...prev }
       DEMO_NAV_GROUPS.forEach((group) => {
@@ -75,7 +89,6 @@ export const AppSider: React.FC<AppSiderProps> = ({
     if (isMobile) onClose()
   }, [isMobile, onClose])
 
-  // Shared menu content renderer
   const renderMenuContent = (collapsed: boolean) => (
     <div
       className={cn(
@@ -83,16 +96,25 @@ export const AppSider: React.FC<AppSiderProps> = ({
         'transition-[padding] duration-300 ease-in-out',
         collapsed ? 'px-2' : 'px-3'
       )}>
-      <div className="mt-4">
+      {!collapsed ? (
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={chrome.navSearch}
+          aria-label={chrome.navSearch}
+          className="mb-3 w-full rounded-md border border-gray-200 bg-white px-2 py-1.5 text-sm text-gray-900 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+        />
+      ) : null}
+      <div className="mt-2">
         <Collapse
           bordered={false}
           ghost
-          accordion
           expandIconPosition="end"
-          activeKey={activeKeys}
+          activeKey={openKeys}
           onChange={handleCollapseChange}
           className="space-y-2">
-          {DEMO_NAV_GROUPS.map((group) => (
+          {visibleGroups.map((group) => (
             <CollapsePanel
               key={group.key}
               panelKey={group.key}
@@ -158,16 +180,12 @@ export const AppSider: React.FC<AppSiderProps> = ({
     </div>
   )
 
-  // Mobile overlay mode
   if (isMobile) {
     if (isSiderCollapsed) return null
     return createPortal(
       <div className="fixed inset-0 z-50 demo-sider-overlay-enter">
-        {/* Backdrop */}
         <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-        {/* Sidebar panel */}
-        <aside className="absolute left-0 top-0 bottom-0 w-56 bg-white border-r border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col demo-sider-slide-enter">
-          {/* Panel header with close button */}
+        <aside className="absolute inset-inline-start-0 top-0 bottom-0 w-56 bg-white border-e border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col demo-sider-slide-enter">
           <div className="shrink-0 h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
             <Link
               to="/"
@@ -180,7 +198,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
               variant="outline"
               size="sm"
               onClick={onClose}
-              aria-label={lang === 'zh-CN' ? '关闭菜单' : 'Close menu'}
+              aria-label={chrome.closeMenu}
               className="size-8 p-0 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900">
               <span className="text-sm leading-none">✕</span>
             </Button>
@@ -192,11 +210,10 @@ export const AppSider: React.FC<AppSiderProps> = ({
     )
   }
 
-  // Desktop mode
   return (
     <aside
       className={cn(
-        'shrink-0 overflow-hidden border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
+        'shrink-0 overflow-hidden border-e border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
         'transition-[width] duration-300 ease-in-out',
         isSiderCollapsed ? 'w-20' : 'w-56'
       )}>

@@ -53,10 +53,18 @@ h2[data-demo-anchor='true'] {
 }
 @keyframes demo-sider-slide-in {
   from {
-    transform: translateX(-100%);
+    translate: -100% 0;
   }
   to {
-    transform: translateX(0);
+    translate: 0 0;
+  }
+}
+@keyframes demo-sider-slide-in-rtl {
+  from {
+    translate: 100% 0;
+  }
+  to {
+    translate: 0 0;
   }
 }
 .demo-sider-overlay-enter {
@@ -65,5 +73,6 @@ h2[data-demo-anchor='true'] {
 .demo-sider-slide-enter {
   animation: demo-sider-slide-in 0.3s ease;
 }
-
-
+html[dir='rtl'] .demo-sider-slide-enter {
+  animation-name: demo-sider-slide-in-rtl;
+}

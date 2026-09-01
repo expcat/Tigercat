@@ -5,11 +5,8 @@ import { createJiti } from 'jiti'
 import { collectFiles, readText } from './utils/files.mjs'
 import { c } from './utils/term.mjs'
 
-// Load the exact transform + import-scan used by the browser workers so this
-// gate cannot drift from runtime behaviour (see the playground compiler
-// proposal, §4). The shared modules are TypeScript; jiti transpiles them.
 const jiti = createJiti(import.meta.url)
-const { transformModule, scanImports } = await jiti.import(
+const { compileDemoBundle, transformModule } = await jiti.import(
   '../examples/example/shared/playground/compiler-utils.ts'
 )
 const { compileVueFile } = await jiti.import('../examples/example/vue3/src/playground/vue-sfc.ts')
@@ -27,23 +24,44 @@ const failures = []
 const counts = { React: 0, Vue: 0 }
 
 for (const framework of frameworks) {
-  const entryFiles = collectFiles(framework.root, ['.json'])
+  const metadataFiles = collectFiles(framework.root, ['.json'])
     .filter((file) => basename(file) === 'demo.json')
-    .map((file) => join(dirname(file), framework.entry))
     .sort()
 
-  for (const entryFile of entryFiles) {
-    const path = displayPath(entryFile)
+  for (const metadataFile of metadataFiles) {
+    const path = displayPath(metadataFile)
+    const directory = dirname(metadataFile)
     try {
-      const source = readText(entryFile)
-      const js =
-        framework.name === 'Vue'
-          ? transformModule(compileVueFile(entryFile, source).code, {
-              filename: entryFile,
-              jsx: false
-            })
-          : transformModule(source, { filename: entryFile, jsx: true })
-      await scanImports(js)
+      const meta = JSON.parse(readText(metadataFile))
+      const files = {}
+      for (const file of collectFiles(directory, [
+        '.ts',
+        '.tsx',
+        '.js',
+        '.jsx',
+        '.vue',
+        '.css',
+        '.json'
+      ])) {
+        if (basename(file) === 'demo.json') continue
+        files[`/${basename(file)}`] = readText(file)
+      }
+      const entry = `/${meta.entry}`
+      await compileDemoBundle({
+        bundle: { entry, files, sourceHash: 'check' },
+        compileFile(filename, source) {
+          if (framework.name === 'Vue' && filename.endsWith('.vue')) {
+            return compileVueFile(filename, source)
+          }
+          return {
+            code: transformModule(source, {
+              filename,
+              jsx: framework.name === 'React' && /\.[jt]sx$/.test(filename)
+            }),
+            css: ''
+          }
+        }
+      })
       counts[framework.name]++
     } catch (error) {
       failures.push(`${path}: ${error instanceof Error ? error.message : String(error)}`)

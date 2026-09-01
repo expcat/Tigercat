@@ -8,7 +8,6 @@
       :root {
         color-scheme: light;
         --tc-primary: #2563eb;
-        --tc-primary-hover: #1d4ed8;
         --tc-bg: #f8fafc;
         --tc-surface: #ffffff;
         --tc-text: #0f172a;
@@ -16,8 +15,7 @@
         --tc-border: #e2e8f0;
         --tc-shadow: rgba(15, 23, 42, 0.08);
       }
-
-      html[data-theme='dark'] {
+      html.dark {
         color-scheme: dark;
         --tc-bg: #0f172a;
         --tc-surface: #1e293b;
@@ -26,7 +24,6 @@
         --tc-border: #334155;
         --tc-shadow: rgba(0, 0, 0, 0.3);
       }
-
       * {
         box-sizing: border-box;
         margin: 0;
@@ -37,8 +34,6 @@
         color: var(--tc-text);
         line-height: 1.6;
       }
-
-      /* Header */
       .header {
         padding: 48px 16px 32px;
         text-align: center;
@@ -65,8 +60,6 @@
         margin-left: 8px;
         vertical-align: middle;
       }
-
-      /* Toolbar */
       .toolbar {
         max-width: 960px;
         margin: 0 auto 24px;
@@ -87,10 +80,6 @@
         color: var(--tc-text);
         outline: none;
       }
-      .search-input:focus {
-        border-color: var(--tc-primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-      }
       .theme-toggle {
         padding: 8px 16px;
         border: 1px solid var(--tc-border);
@@ -100,12 +89,9 @@
         cursor: pointer;
         font-size: 14px;
       }
-      .theme-toggle:hover {
-        border-color: var(--tc-primary);
-      }
-
-      /* Framework Cards */
-      .fw-section {
+      .fw-section,
+      .section,
+      .stats {
         max-width: 960px;
         margin: 0 auto 40px;
         padding: 0 16px;
@@ -122,13 +108,6 @@
         box-shadow: 0 12px 30px var(--tc-shadow);
         text-decoration: none;
         color: inherit;
-        transition:
-          transform 0.2s ease,
-          box-shadow 0.2s ease;
-      }
-      .fw-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 18px 36px var(--tc-shadow);
       }
       .fw-card h2 {
         font-size: 20px;
@@ -144,13 +123,6 @@
         font-weight: 600;
         color: var(--tc-primary);
       }
-
-      /* Component Overview */
-      .section {
-        max-width: 960px;
-        margin: 0 auto 40px;
-        padding: 0 16px;
-      }
       .section h2 {
         font-size: 22px;
         font-weight: 700;
@@ -163,7 +135,7 @@
         gap: 8px;
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       }
-      .component-tag {
+      a.component-tag {
         padding: 6px 12px;
         background: var(--tc-surface);
         border: 1px solid var(--tc-border);
@@ -171,20 +143,13 @@
         font-size: 13px;
         font-weight: 500;
         text-align: center;
-        transition: border-color 0.15s;
+        text-decoration: none;
+        color: inherit;
       }
-      .component-tag:hover {
-        border-color: var(--tc-primary);
-      }
-      .component-tag.hidden {
+      a.component-tag.hidden {
         display: none;
       }
-
-      /* Stats */
       .stats {
-        max-width: 960px;
-        margin: 0 auto 40px;
-        padding: 0 16px;
         display: grid;
         gap: 16px;
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -206,8 +171,6 @@
         color: var(--tc-text-muted);
         margin-top: 4px;
       }
-
-      /* Footer */
       .footer {
         text-align: center;
         padding: 32px 16px;
@@ -224,31 +187,19 @@
   <body>
     <div class="header">
       <h1>Tigercat <span class="version-badge">v2.1.2</span></h1>
-      <p>Tailwind CSS 驱动的跨框架 UI 组件库，支持 Vue 3 与 React，172 个组件开箱即用。</p>
+      <p>Tailwind CSS 驱动的跨框架 UI 组件库。入口清单来自示例站导航，共 134 个可打开的示例页。</p>
     </div>
 
     <div class="stats">
       <div class="stat">
-        <div class="stat-value">149+</div>
-        <div class="stat-label">组件</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">7600+</div>
-        <div class="stat-label">测试用例</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">13</div>
-        <div class="stat-label">语言</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">7</div>
-        <div class="stat-label">预设主题</div>
+        <div class="stat-value">134</div>
+        <div class="stat-label">示例页</div>
       </div>
     </div>
 
     <div class="toolbar">
       <input class="search-input" type="text" placeholder="搜索组件…" id="searchInput" />
-      <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 暗色模式</button>
     </div>
 
     <div class="fw-section">
@@ -272,174 +223,399 @@
     </div>
 
     <div class="section" id="basic">
-      <h2>基础组件 (Basic)</h2>
+      <h2>基础组件 (Basics)</h2>
       <div class="component-grid" data-category="basic">
-        <div class="component-tag">Button</div>
-        <div class="component-tag">ButtonGroup</div>
-        <div class="component-tag">Link</div>
-        <div class="component-tag">Icon</div>
-        <div class="component-tag">Text</div>
-        <div class="component-tag">Image</div>
-        <div class="component-tag">ImageCropper</div>
-        <div class="component-tag">Avatar</div>
-        <div class="component-tag">AvatarGroup</div>
-        <div class="component-tag">Badge</div>
-        <div class="component-tag">Tag</div>
-        <div class="component-tag">Divider</div>
-        <div class="component-tag">Code</div>
+        <a class="component-tag" href="./vue/#/button" data-react="./react/#/button">Button</a>
+        <a class="component-tag" href="./vue/#/split-button" data-react="./react/#/split-button"
+          >SplitButton</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/config-provider"
+          data-react="./react/#/config-provider"
+          >ConfigProvider</a
+        >
+        <a class="component-tag" href="./vue/#/icon" data-react="./react/#/icon">Icon</a>
+        <a class="component-tag" href="./vue/#/link" data-react="./react/#/link">Link</a>
+        <a class="component-tag" href="./vue/#/text" data-react="./react/#/text">Text</a>
+        <a class="component-tag" href="./vue/#/code" data-react="./react/#/code">Code</a>
+        <a class="component-tag" href="./vue/#/kbd" data-react="./react/#/kbd">Kbd</a>
+        <a class="component-tag" href="./vue/#/highlight" data-react="./react/#/highlight"
+          >Highlight</a
+        >
+        <a class="component-tag" href="./vue/#/marquee" data-react="./react/#/marquee">Marquee</a>
+        <a class="component-tag" href="./vue/#/image" data-react="./react/#/image">Image</a>
+        <a class="component-tag" href="./vue/#/image-compare" data-react="./react/#/image-compare"
+          >ImageCompare</a
+        >
+        <a class="component-tag" href="./vue/#/image-cropper" data-react="./react/#/image-cropper"
+          >ImageCropper</a
+        >
+        <a class="component-tag" href="./vue/#/image-viewer" data-react="./react/#/image-viewer"
+          >ImageViewer</a
+        >
+        <a class="component-tag" href="./vue/#/avatar" data-react="./react/#/avatar">Avatar</a>
+        <a class="component-tag" href="./vue/#/badge" data-react="./react/#/badge">Badge</a>
+        <a class="component-tag" href="./vue/#/tag" data-react="./react/#/tag">Tag</a>
+        <a class="component-tag" href="./vue/#/empty" data-react="./react/#/empty">Empty</a>
+        <a class="component-tag" href="./vue/#/result" data-react="./react/#/result">Result</a>
+        <a class="component-tag" href="./vue/#/qrcode" data-react="./react/#/qrcode">QRCode</a>
+        <a class="component-tag" href="./vue/#/statistic" data-react="./react/#/statistic"
+          >Statistic</a
+        >
+        <a class="component-tag" href="./vue/#/rate" data-react="./react/#/rate">Rate</a>
+        <a class="component-tag" href="./vue/#/segmented" data-react="./react/#/segmented"
+          >Segmented</a
+        >
+        <a class="component-tag" href="./vue/#/watermark" data-react="./react/#/watermark"
+          >Watermark</a
+        >
       </div>
     </div>
 
     <div class="section" id="form">
-      <h2>表单组件 (Form)</h2>
+      <h2>表单组件 (Forms)</h2>
       <div class="component-grid" data-category="form">
-        <div class="component-tag">Input</div>
-        <div class="component-tag">InputNumber</div>
-        <div class="component-tag">InputGroup</div>
-        <div class="component-tag">Textarea</div>
-        <div class="component-tag">Select</div>
-        <div class="component-tag">Cascader</div>
-        <div class="component-tag">TreeSelect</div>
-        <div class="component-tag">AutoComplete</div>
-        <div class="component-tag">Checkbox</div>
-        <div class="component-tag">Radio</div>
-        <div class="component-tag">Switch</div>
-        <div class="component-tag">Slider</div>
-        <div class="component-tag">Stepper</div>
-        <div class="component-tag">DatePicker</div>
-        <div class="component-tag">TimePicker</div>
-        <div class="component-tag">ColorPicker</div>
-        <div class="component-tag">ColorSwatch</div>
-        <div class="component-tag">Rate</div>
-        <div class="component-tag">Upload</div>
-        <div class="component-tag">Transfer</div>
-        <div class="component-tag">Mentions</div>
-        <div class="component-tag">CronEditor</div>
-        <div class="component-tag">Signature</div>
-        <div class="component-tag">NumberKeyboard</div>
-        <div class="component-tag">Form</div>
-      </div>
-    </div>
-
-    <div class="section" id="data">
-      <h2>数据展示 (Data Display)</h2>
-      <div class="component-grid" data-category="data">
-        <div class="component-tag">Table</div>
-        <div class="component-tag">VirtualTable</div>
-        <div class="component-tag">Card</div>
-        <div class="component-tag">List</div>
-        <div class="component-tag">Descriptions</div>
-        <div class="component-tag">Timeline</div>
-        <div class="component-tag">Tree</div>
-        <div class="component-tag">Collapse</div>
-        <div class="component-tag">Carousel</div>
-        <div class="component-tag">Progress</div>
-        <div class="component-tag">Skeleton</div>
-        <div class="component-tag">Statistic</div>
-        <div class="component-tag">Calendar</div>
-        <div class="component-tag">Countdown</div>
-        <div class="component-tag">QRCode</div>
-        <div class="component-tag">Segmented</div>
-        <div class="component-tag">Empty</div>
-        <div class="component-tag">DataExport</div>
-      </div>
-    </div>
-
-    <div class="section" id="navigation">
-      <h2>导航组件 (Navigation)</h2>
-      <div class="component-grid" data-category="navigation">
-        <div class="component-tag">Menu</div>
-        <div class="component-tag">Tabs</div>
-        <div class="component-tag">Breadcrumb</div>
-        <div class="component-tag">Dropdown</div>
-        <div class="component-tag">Pagination</div>
-        <div class="component-tag">Steps</div>
-        <div class="component-tag">Anchor</div>
-        <div class="component-tag">ScrollSpy</div>
-        <div class="component-tag">Spotlight</div>
-      </div>
-    </div>
-
-    <div class="section" id="feedback">
-      <h2>反馈组件 (Feedback)</h2>
-      <div class="component-grid" data-category="feedback">
-        <div class="component-tag">Alert</div>
-        <div class="component-tag">Modal</div>
-        <div class="component-tag">Drawer</div>
-        <div class="component-tag">Message</div>
-        <div class="component-tag">Notification</div>
-        <div class="component-tag">Loading</div>
-        <div class="component-tag">Popconfirm</div>
-        <div class="component-tag">Popover</div>
-        <div class="component-tag">Tooltip</div>
-        <div class="component-tag">Result</div>
-        <div class="component-tag">Watermark</div>
+        <a class="component-tag" href="./vue/#/input" data-react="./react/#/input">Input</a>
+        <a class="component-tag" href="./vue/#/input-number" data-react="./react/#/input-number"
+          >InputNumber</a
+        >
+        <a class="component-tag" href="./vue/#/input-group" data-react="./react/#/input-group"
+          >InputGroup</a
+        >
+        <a class="component-tag" href="./vue/#/textarea" data-react="./react/#/textarea"
+          >Textarea</a
+        >
+        <a class="component-tag" href="./vue/#/checkbox" data-react="./react/#/checkbox"
+          >Checkbox</a
+        >
+        <a class="component-tag" href="./vue/#/radio" data-react="./react/#/radio">Radio</a>
+        <a class="component-tag" href="./vue/#/switch" data-react="./react/#/switch">Switch</a>
+        <a class="component-tag" href="./vue/#/slider" data-react="./react/#/slider">Slider</a>
+        <a class="component-tag" href="./vue/#/stepper" data-react="./react/#/stepper">Stepper</a>
+        <a class="component-tag" href="./vue/#/select" data-react="./react/#/select">Select</a>
+        <a class="component-tag" href="./vue/#/auto-complete" data-react="./react/#/auto-complete"
+          >AutoComplete</a
+        >
+        <a class="component-tag" href="./vue/#/cascader" data-react="./react/#/cascader"
+          >Cascader</a
+        >
+        <a class="component-tag" href="./vue/#/tree-select" data-react="./react/#/tree-select"
+          >TreeSelect</a
+        >
+        <a class="component-tag" href="./vue/#/color-picker" data-react="./react/#/color-picker"
+          >ColorPicker</a
+        >
+        <a class="component-tag" href="./vue/#/color-swatch" data-react="./react/#/color-swatch"
+          >ColorSwatch</a
+        >
+        <a class="component-tag" href="./vue/#/cron-editor" data-react="./react/#/cron-editor"
+          >CronEditor</a
+        >
+        <a class="component-tag" href="./vue/#/signature" data-react="./react/#/signature"
+          >Signature</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/number-keyboard"
+          data-react="./react/#/number-keyboard"
+          >NumberKeyboard</a
+        >
+        <a class="component-tag" href="./vue/#/input-otp" data-react="./react/#/input-otp"
+          >InputOTP</a
+        >
+        <a class="component-tag" href="./vue/#/tags-input" data-react="./react/#/tags-input"
+          >TagsInput</a
+        >
+        <a class="component-tag" href="./vue/#/mask-input" data-react="./react/#/mask-input"
+          >MaskInput</a
+        >
+        <a class="component-tag" href="./vue/#/mentions" data-react="./react/#/mentions"
+          >Mentions</a
+        >
+        <a class="component-tag" href="./vue/#/transfer" data-react="./react/#/transfer"
+          >Transfer</a
+        >
+        <a class="component-tag" href="./vue/#/datepicker" data-react="./react/#/datepicker"
+          >DatePicker</a
+        >
+        <a class="component-tag" href="./vue/#/timepicker" data-react="./react/#/timepicker"
+          >TimePicker</a
+        >
+        <a class="component-tag" href="./vue/#/upload" data-react="./react/#/upload">Upload</a>
+        <a class="component-tag" href="./vue/#/form" data-react="./react/#/form">Form</a>
       </div>
     </div>
 
     <div class="section" id="layout">
       <h2>布局组件 (Layout)</h2>
       <div class="component-grid" data-category="layout">
-        <div class="component-tag">Container</div>
-        <div class="component-tag">Grid</div>
-        <div class="component-tag">Layout</div>
-        <div class="component-tag">Space</div>
-        <div class="component-tag">Splitter</div>
-        <div class="component-tag">Resizable</div>
+        <a class="component-tag" href="./vue/#/layout" data-react="./react/#/layout">Layout</a>
+        <a class="component-tag" href="./vue/#/grid" data-react="./react/#/grid">Grid</a>
+        <a class="component-tag" href="./vue/#/space" data-react="./react/#/space">Space</a>
+        <a class="component-tag" href="./vue/#/divider" data-react="./react/#/divider">Divider</a>
+        <a class="component-tag" href="./vue/#/card" data-react="./react/#/card">Card</a>
+        <a class="component-tag" href="./vue/#/descriptions" data-react="./react/#/descriptions"
+          >Descriptions</a
+        >
+        <a class="component-tag" href="./vue/#/list" data-react="./react/#/list">List</a>
+        <a class="component-tag" href="./vue/#/skeleton" data-react="./react/#/skeleton"
+          >Skeleton</a
+        >
+        <a class="component-tag" href="./vue/#/scroll-area" data-react="./react/#/scroll-area"
+          >ScrollArea</a
+        >
+        <a class="component-tag" href="./vue/#/masonry" data-react="./react/#/masonry">Masonry</a>
+        <a class="component-tag" href="./vue/#/aspect-ratio" data-react="./react/#/aspect-ratio"
+          >AspectRatio</a
+        >
+        <a class="component-tag" href="./vue/#/print-layout" data-react="./react/#/print-layout"
+          >PrintLayout</a
+        >
+      </div>
+    </div>
+
+    <div class="section" id="data">
+      <h2>数据展示 (Data Display)</h2>
+      <div class="component-grid" data-category="data">
+        <a class="component-tag" href="./vue/#/table" data-react="./react/#/table">Table</a>
+        <a class="component-tag" href="./vue/#/data-export" data-react="./react/#/data-export"
+          >DataExport</a
+        >
+        <a class="component-tag" href="./vue/#/virtual-table" data-react="./react/#/virtual-table"
+          >VirtualTable</a
+        >
+        <a class="component-tag" href="./vue/#/timeline" data-react="./react/#/timeline"
+          >Timeline</a
+        >
+        <a class="component-tag" href="./vue/#/progress" data-react="./react/#/progress"
+          >Progress</a
+        >
+        <a class="component-tag" href="./vue/#/tree" data-react="./react/#/tree">Tree</a>
+        <a class="component-tag" href="./vue/#/collapse" data-react="./react/#/collapse"
+          >Collapse</a
+        >
+        <a class="component-tag" href="./vue/#/carousel" data-react="./react/#/carousel"
+          >Carousel</a
+        >
+        <a class="component-tag" href="./vue/#/calendar" data-react="./react/#/calendar"
+          >Calendar</a
+        >
+        <a class="component-tag" href="./vue/#/countdown" data-react="./react/#/countdown"
+          >Countdown</a
+        >
+      </div>
+    </div>
+
+    <div class="section" id="navigation">
+      <h2>导航 (Navigation)</h2>
+      <div class="component-grid" data-category="navigation">
+        <a class="component-tag" href="./vue/#/menu" data-react="./react/#/menu">Menu</a>
+        <a class="component-tag" href="./vue/#/breadcrumb" data-react="./react/#/breadcrumb"
+          >Breadcrumb</a
+        >
+        <a class="component-tag" href="./vue/#/dropdown" data-react="./react/#/dropdown"
+          >Dropdown</a
+        >
+        <a class="component-tag" href="./vue/#/context-menu" data-react="./react/#/context-menu"
+          >ContextMenu</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/navigation-menu"
+          data-react="./react/#/navigation-menu"
+          >NavigationMenu</a
+        >
+        <a class="component-tag" href="./vue/#/page-header" data-react="./react/#/page-header"
+          >PageHeader</a
+        >
+        <a class="component-tag" href="./vue/#/tabs" data-react="./react/#/tabs">Tabs</a>
+        <a class="component-tag" href="./vue/#/steps" data-react="./react/#/steps">Steps</a>
+        <a class="component-tag" href="./vue/#/pagination" data-react="./react/#/pagination"
+          >Pagination</a
+        >
+        <a class="component-tag" href="./vue/#/anchor" data-react="./react/#/anchor">Anchor</a>
+        <a class="component-tag" href="./vue/#/backtop" data-react="./react/#/backtop">BackTop</a>
+        <a class="component-tag" href="./vue/#/affix" data-react="./react/#/affix">Affix</a>
+        <a class="component-tag" href="./vue/#/tour" data-react="./react/#/tour">Tour</a>
+        <a class="component-tag" href="./vue/#/float-button" data-react="./react/#/float-button"
+          >FloatButton</a
+        >
+        <a class="component-tag" href="./vue/#/spotlight" data-react="./react/#/spotlight"
+          >Spotlight</a
+        >
+        <a class="component-tag" href="./vue/#/scroll-spy" data-react="./react/#/scroll-spy"
+          >ScrollSpy</a
+        >
+      </div>
+    </div>
+
+    <div class="section" id="feedback">
+      <h2>反馈 (Feedback)</h2>
+      <div class="component-grid" data-category="feedback">
+        <a class="component-tag" href="./vue/#/alert" data-react="./react/#/alert">Alert</a>
+        <a class="component-tag" href="./vue/#/message" data-react="./react/#/message">Message</a>
+        <a class="component-tag" href="./vue/#/modal" data-react="./react/#/modal">Modal</a>
+        <a class="component-tag" href="./vue/#/popconfirm" data-react="./react/#/popconfirm"
+          >Popconfirm</a
+        >
+        <a class="component-tag" href="./vue/#/popover" data-react="./react/#/popover">Popover</a>
+        <a class="component-tag" href="./vue/#/tooltip" data-react="./react/#/tooltip">Tooltip</a>
+        <a class="component-tag" href="./vue/#/notification" data-react="./react/#/notification"
+          >Notification</a
+        >
+        <a class="component-tag" href="./vue/#/drawer" data-react="./react/#/drawer">Drawer</a>
+        <a class="component-tag" href="./vue/#/loading" data-react="./react/#/loading">Loading</a>
+        <a class="component-tag" href="./vue/#/loading-bar" data-react="./react/#/loading-bar"
+          >LoadingBar</a
+        >
       </div>
     </div>
 
     <div class="section" id="charts">
-      <h2>图表组件 (Charts)</h2>
+      <h2>图表 (Charts)</h2>
       <div class="component-grid" data-category="charts">
-        <div class="component-tag">BarChart</div>
-        <div class="component-tag">LineChart</div>
-        <div class="component-tag">AreaChart</div>
-        <div class="component-tag">PieChart</div>
-        <div class="component-tag">DonutChart</div>
-        <div class="component-tag">ScatterChart</div>
-        <div class="component-tag">RadarChart</div>
-        <div class="component-tag">TreeMapChart</div>
-        <div class="component-tag">HeatmapChart</div>
-        <div class="component-tag">FunnelChart</div>
-        <div class="component-tag">GaugeChart</div>
-        <div class="component-tag">SunburstChart</div>
-        <div class="component-tag">OrgChart</div>
-        <div class="component-tag">Gantt</div>
+        <a class="component-tag" href="./vue/#/bar-chart" data-react="./react/#/bar-chart"
+          >BarChart</a
+        >
+        <a class="component-tag" href="./vue/#/line-chart" data-react="./react/#/line-chart"
+          >LineChart</a
+        >
+        <a class="component-tag" href="./vue/#/area-chart" data-react="./react/#/area-chart"
+          >AreaChart</a
+        >
+        <a class="component-tag" href="./vue/#/pie-chart" data-react="./react/#/pie-chart"
+          >PieChart</a
+        >
+        <a class="component-tag" href="./vue/#/donut-chart" data-react="./react/#/donut-chart"
+          >DonutChart</a
+        >
+        <a class="component-tag" href="./vue/#/scatter-chart" data-react="./react/#/scatter-chart"
+          >ScatterChart</a
+        >
+        <a class="component-tag" href="./vue/#/radar-chart" data-react="./react/#/radar-chart"
+          >RadarChart</a
+        >
+        <a class="component-tag" href="./vue/#/funnel-chart" data-react="./react/#/funnel-chart"
+          >FunnelChart</a
+        >
+        <a class="component-tag" href="./vue/#/gauge-chart" data-react="./react/#/gauge-chart"
+          >GaugeChart</a
+        >
+        <a class="component-tag" href="./vue/#/heatmap-chart" data-react="./react/#/heatmap-chart"
+          >HeatmapChart</a
+        >
+        <a class="component-tag" href="./vue/#/treemap-chart" data-react="./react/#/treemap-chart"
+          >TreeMapChart</a
+        >
+        <a class="component-tag" href="./vue/#/sunburst-chart" data-react="./react/#/sunburst-chart"
+          >SunburstChart</a
+        >
+        <a class="component-tag" href="./vue/#/org-chart" data-react="./react/#/org-chart"
+          >OrgChart</a
+        >
+        <a class="component-tag" href="./vue/#/gantt" data-react="./react/#/gantt">Gantt</a>
       </div>
     </div>
 
     <div class="section" id="advanced">
-      <h2>高级组件 (Advanced)</h2>
+      <h2>高级交互 (Advanced)</h2>
       <div class="component-grid" data-category="advanced">
-        <div class="component-tag">CodeEditor</div>
-        <div class="component-tag">RichTextEditor</div>
-        <div class="component-tag">MarkdownEditor</div>
-        <div class="component-tag">Kanban</div>
-        <div class="component-tag">FileManager</div>
-        <div class="component-tag">VirtualList</div>
-        <div class="component-tag">InfiniteScroll</div>
-        <div class="component-tag">Tour</div>
-        <div class="component-tag">FloatButton</div>
-        <div class="component-tag">Affix</div>
-        <div class="component-tag">BackTop</div>
-        <div class="component-tag">PrintLayout</div>
-        <div class="component-tag">ImageViewer</div>
-        <div class="component-tag">ImageAnnotation</div>
+        <a class="component-tag" href="./vue/#/splitter" data-react="./react/#/splitter"
+          >Splitter</a
+        >
+        <a class="component-tag" href="./vue/#/resizable" data-react="./react/#/resizable"
+          >Resizable</a
+        >
+        <a class="component-tag" href="./vue/#/virtual-list" data-react="./react/#/virtual-list"
+          >VirtualList</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/infinite-scroll"
+          data-react="./react/#/infinite-scroll"
+          >InfiniteScroll</a
+        >
+        <a class="component-tag" href="./vue/#/code-editor" data-react="./react/#/code-editor"
+          >CodeEditor</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/rich-text-editor"
+          data-react="./react/#/rich-text-editor"
+          >RichTextEditor</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/markdown-editor"
+          data-react="./react/#/markdown-editor"
+          >MarkdownEditor</a
+        >
+        <a class="component-tag" href="./vue/#/kanban" data-react="./react/#/kanban">Kanban</a>
+        <a class="component-tag" href="./vue/#/file-manager" data-react="./react/#/file-manager"
+          >FileManager</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/image-annotation"
+          data-react="./react/#/image-annotation"
+          >ImageAnnotation</a
+        >
       </div>
     </div>
 
     <div class="section" id="composite">
       <h2>组合组件 (Composite)</h2>
       <div class="component-grid" data-category="composite">
-        <div class="component-tag">ChatWindow</div>
-        <div class="component-tag">CommentThread</div>
-        <div class="component-tag">NotificationCenter</div>
-        <div class="component-tag">FormWizard</div>
-        <div class="component-tag">DataTableWithToolbar</div>
-        <div class="component-tag">ActivityFeed</div>
-        <div class="component-tag">CropUpload</div>
-        <div class="component-tag">TaskBoard</div>
+        <a
+          class="component-tag"
+          href="./vue/#/data-table-with-toolbar"
+          data-react="./react/#/data-table-with-toolbar"
+          >DataTableWithToolbar</a
+        >
+        <a class="component-tag" href="./vue/#/form-wizard" data-react="./react/#/form-wizard"
+          >FormWizard</a
+        >
+        <a class="component-tag" href="./vue/#/chat-window" data-react="./react/#/chat-window"
+          >ChatWindow</a
+        >
+        <a class="component-tag" href="./vue/#/comment-thread" data-react="./react/#/comment-thread"
+          >CommentThread</a
+        >
+        <a class="component-tag" href="./vue/#/activity-feed" data-react="./react/#/activity-feed"
+          >ActivityFeed</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/notification-center"
+          data-react="./react/#/notification-center"
+          >NotificationCenter</a
+        >
+        <a class="component-tag" href="./vue/#/crop-upload" data-react="./react/#/crop-upload"
+          >CropUpload</a
+        >
+        <a class="component-tag" href="./vue/#/task-board" data-react="./react/#/task-board"
+          >TaskBoard</a
+        >
+      </div>
+    </div>
+
+    <div class="section" id="hooks">
+      <h2>Hooks 组合式函数 (Hooks)</h2>
+      <div class="component-grid" data-category="hooks">
+        <a class="component-tag" href="./vue/#/use-drag" data-react="./react/#/use-drag">useDrag</a>
+        <a
+          class="component-tag"
+          href="./vue/#/use-controlled-state"
+          data-react="./react/#/use-controlled-state"
+          >useControlledState (React)</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/use-chart-interaction"
+          data-react="./react/#/use-chart-interaction"
+          >useChartInteraction</a
+        >
       </div>
     </div>
 
@@ -451,29 +627,22 @@
     </div>
 
     <script>
-      // Dark mode toggle
       const toggle = document.getElementById('themeToggle')
       const html = document.documentElement
-      const savedTheme = localStorage.getItem('tc-theme')
-      if (
-        savedTheme === 'dark' ||
-        (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)
-      ) {
-        html.dataset.theme = 'dark'
-        toggle.textContent = '☀️ 浅色模式'
-      }
+      const darkKey = 'tigercat-example-dark'
+      const savedDark = localStorage.getItem(darkKey)
+      const preferDark =
+        savedDark === '1' ||
+        (savedDark !== '0' && matchMedia('(prefers-color-scheme: dark)').matches)
+      if (preferDark) html.classList.add('dark')
+      toggle.textContent = html.classList.contains('dark') ? '☀️ 浅色模式' : '🌙 暗色模式'
       toggle.addEventListener('click', () => {
-        const isDark = html.dataset.theme === 'dark'
-        if (isDark) {
-          html.removeAttribute('data-theme')
-        } else {
-          html.dataset.theme = 'dark'
-        }
-        toggle.textContent = isDark ? '🌙 暗色模式' : '☀️ 浅色模式'
-        localStorage.setItem('tc-theme', isDark ? 'light' : 'dark')
+        const next = !html.classList.contains('dark')
+        html.classList.toggle('dark', next)
+        localStorage.setItem(darkKey, next ? '1' : '0')
+        toggle.textContent = next ? '☀️ 浅色模式' : '🌙 暗色模式'
       })
 
-      // Client-side search
       const searchInput = document.getElementById('searchInput')
       const allTags = document.querySelectorAll('.component-tag')
       const allSections = document.querySelectorAll('.section')

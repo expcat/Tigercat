@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { AnchorLink } from '@expcat/tigercat-react/AnchorLink'
 import { Breadcrumb } from '@expcat/tigercat-react/Breadcrumb'
 import { BreadcrumbItem } from '@expcat/tigercat-react/BreadcrumbItem'
@@ -101,38 +101,44 @@ export const AppLayout: React.FC = () => {
     const root = pageRootRef.current
     if (!root) return
 
-    const h1 = root.querySelector('h1')
-    const nextTitle = (h1?.textContent ?? '').trim()
-    setPageTitle(nextTitle)
+    const collect = () => {
+      const h1 = root.querySelector('h1')
+      setPageTitle((h1?.textContent ?? '').trim())
 
-    const headings = Array.from(root.querySelectorAll('h2'))
-      .map((el) => el as HTMLHeadingElement)
-      .filter((el) => el.textContent && el.textContent.trim().length > 0)
+      const headings = Array.from(root.querySelectorAll('h2'))
+        .map((el) => el as HTMLHeadingElement)
+        .filter((el) => el.textContent && el.textContent.trim().length > 0)
 
-    const usedIds = new Set<string>()
-    const nextSections: DemoSection[] = []
+      const usedIds = new Set<string>()
+      const nextSections: DemoSection[] = []
 
-    for (const h2 of headings) {
-      const label = (h2.textContent ?? '').trim()
-      let id = h2.id?.trim()
-      if (!id) id = slugify(label)
-      if (!id) continue
+      for (const h2 of headings) {
+        const label = (h2.textContent ?? '').trim()
+        let id = h2.id?.trim()
+        if (!id) id = slugify(label)
+        if (!id) continue
 
-      let uniqueId = id
-      let counter = 2
-      while (usedIds.has(uniqueId) || document.getElementById(uniqueId)) {
-        uniqueId = `${id}-${counter}`
-        counter += 1
+        let uniqueId = id
+        let counter = 2
+        while (usedIds.has(uniqueId) || document.getElementById(uniqueId)) {
+          uniqueId = `${id}-${counter}`
+          counter += 1
+        }
+
+        usedIds.add(uniqueId)
+        h2.id = uniqueId
+        h2.setAttribute('data-demo-anchor', 'true')
+
+        nextSections.push({ id: uniqueId, label })
       }
 
-      usedIds.add(uniqueId)
-      h2.id = uniqueId
-      h2.setAttribute('data-demo-anchor', 'true')
-
-      nextSections.push({ id: uniqueId, label })
+      setSections(nextSections)
     }
 
-    setSections(nextSections)
+    collect()
+    const observer = new MutationObserver(() => collect())
+    observer.observe(root, { childList: true, subtree: true })
+    return () => observer.disconnect()
   }, [location.pathname])
 
   const headerTitle = pageTitle
@@ -214,7 +220,12 @@ export const AppLayout: React.FC = () => {
                 )}
 
                 <div ref={pageRootRef} className="px-6 py-6">
-                  <Outlet />
+                  <Suspense
+                    fallback={
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Loading…</div>
+                    }>
+                    <Outlet />
+                  </Suspense>
                 </div>
               </div>
             </main>

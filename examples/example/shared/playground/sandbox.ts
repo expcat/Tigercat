@@ -13,6 +13,7 @@ interface SandboxDocumentOptions {
   theme: string
   colorScheme: 'light' | 'dark'
   cssVars: string
+  modules?: Record<string, string>
 }
 
 function safeJson(value: unknown): string {
@@ -117,7 +118,21 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' blob: http: https:; style-src 'unsafe-inline' http: https:; img-src data: blob: http: https:; font-src data: http: https:; media-src data: blob: http: https:; connect-src http: https:;" />
-    <script type="importmap">${safeJson({ imports: importMap })}</script>
+    <script type="importmap" id="demo-importmap">${safeJson({ imports: importMap })}</script>
+    <script>
+      ;(function () {
+        var mapEl = document.getElementById('demo-importmap')
+        if (!mapEl) return
+        var json = JSON.parse(mapEl.textContent || '{"imports":{}}')
+        var modules = ${safeJson(options.modules ?? {})}
+        for (var spec in modules) {
+          json.imports[spec] = URL.createObjectURL(
+            new Blob([modules[spec]], { type: 'text/javascript' })
+          )
+        }
+        mapEl.textContent = JSON.stringify(json)
+      })()
+    </script>
     <link rel="stylesheet" href="${options.stylesheetUrl}" />
     <style>${options.css}</style>
     <style>html,body{margin:0;min-height:100%;background:transparent}body{padding:1rem;box-sizing:border-box}#root{min-height:1px}</style>
@@ -201,7 +216,7 @@ export function isSandboxEvent(value: unknown): value is DemoSandboxEvent {
 }
 
 export function getSandboxAttribute(meta: DemoModuleMeta): string {
-  const tokens = new Set(['allow-scripts', 'allow-forms'])
+  const tokens = new Set(['allow-scripts', 'allow-forms', 'allow-same-origin'])
   for (const permission of meta.permissions ?? []) {
     if (permission === 'downloads') tokens.add('allow-downloads')
     if (permission === 'modals') tokens.add('allow-modals')

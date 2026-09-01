@@ -40,7 +40,11 @@ Tailwind integration must use Tailwind CSS v4 and `@tailwindcss/vite`.
 
 ```css
 @import 'tailwindcss';
-@plugin "@expcat/tigercat-core/tailwind/modern";
+@plugin "@expcat/tigercat-core/tailwind";
+@source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
+
+Runtime theme switching uses `ConfigProvider` `theme` / `colorScheme` (or `ThemeManager`).
+`@plugin "@expcat/tigercat-core/tailwind/modern"` is the CSS equivalent of `theme="modern"`.
 
 Run `tigercat doctor --json` in an application to verify Node, pnpm, Tailwind v4, framework peers, and template dependencies.

@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
+import { Modal } from '@expcat/tigercat-react/Modal'
 import type { DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 
 interface AxeNode {
   target: string[]
   html: string
-  failureSummary?: string
 }
 interface AxeViolation {
   id: string
   impact?: 'minor' | 'moderate' | 'serious' | 'critical' | null
-  description: string
   help: string
   helpUrl: string
   nodes: AxeNode[]
@@ -21,7 +21,6 @@ interface AxeResults {
 
 export interface A11yDebugPanelProps {
   lang?: DemoLang
-  targetSelector?: string
 }
 
 const impactColor = (impact?: string | null) => {
@@ -39,16 +38,26 @@ const impactColor = (impact?: string | null) => {
   }
 }
 
-export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({
-  lang = 'zh-CN',
-  targetSelector
-}) => {
+function collectPreviewRoots(): HTMLElement[] {
+  const roots: HTMLElement[] = []
+  for (const iframe of document.querySelectorAll<HTMLIFrameElement>('[data-demo-id] iframe')) {
+    try {
+      const body = iframe.contentDocument?.body
+      if (body) roots.push(body)
+    } catch {
+      // opaque origin
+    }
+  }
+  return roots
+}
+
+export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({ lang = 'zh-CN' }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [ranAt, setRanAt] = useState('')
   const [results, setResults] = useState<AxeResults | null>(null)
+  const [scopedToPreview, setScopedToPreview] = useState(true)
   const [error, setError] = useState('')
-
   const t = (zh: string, en: string) => (lang === 'zh-CN' ? zh : en)
 
   const runScan = async () => {
@@ -56,11 +65,15 @@ export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({
     setError('')
     try {
       const axe = (await import('axe-core')).default
-      const target = targetSelector ? document.querySelector(targetSelector) : document.body
-      const r = (await axe.run(target ?? document.body, {
-        resultTypes: ['violations']
-      })) as AxeResults
-      setResults(r)
+      const roots = collectPreviewRoots()
+      const targets = roots.length > 0 ? roots : [document.body]
+      setScopedToPreview(roots.length > 0)
+      const merged: AxeViolation[] = []
+      for (const target of targets) {
+        const r = (await axe.run(target, { resultTypes: ['violations'] })) as AxeResults
+        merged.push(...r.violations)
+      }
+      setResults({ violations: merged })
       setRanAt(new Date().toLocaleTimeString())
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
@@ -76,102 +89,56 @@ export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({
         aria-label={t('A11y 调试面板', 'A11y debug panel')}
         aria-expanded={open}
         className="size-11 rounded-full shadow-lg bg-[var(--tiger-primary,#2563eb)] text-white font-bold text-base hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tiger-primary,#2563eb)]"
-        onClick={() => setOpen((p) => !p)}>
+        onClick={() => setOpen(true)}>
         ♿
       </button>
 
-      {open && (
-        <div
-          role="dialog"
-          aria-label={t('A11y 调试面板', 'A11y debug panel')}
-          className="absolute bottom-14 right-0 w-[min(420px,calc(100vw-2rem))] max-h-[70vh] flex flex-col rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-950">
-          <header className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800">
-            <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {t('无障碍扫描 (axe-core)', 'A11y scan (axe-core)')}
-            </div>
-            <button
-              type="button"
-              className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-              aria-label={t('关闭', 'Close')}
-              onClick={() => setOpen(false)}>
-              ✕
-            </button>
-          </header>
-
-          <div className="px-3 py-2 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
-            <Button size="sm" loading={loading} onClick={runScan}>
-              {t('运行扫描', 'Run scan')}
-            </Button>
-            {ranAt && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {t('最近扫描', 'Last scan')}: {ranAt}
-              </span>
-            )}
-            {results && (
-              <span className="ml-auto text-xs text-gray-700 dark:text-gray-300">
-                {results.violations.length} {t('个问题', 'issues')}
-              </span>
-            )}
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 text-sm">
-            {error ? (
-              <p className="text-red-600 dark:text-red-400">{error}</p>
-            ) : !results ? (
-              <p className="text-gray-500 dark:text-gray-400">
-                {t(
-                  '点击「运行扫描」查看当前页面的无障碍问题。',
-                  'Click "Run scan" to inspect the current page.'
-                )}
-              </p>
-            ) : results.violations.length === 0 ? (
-              <p className="text-emerald-700 dark:text-emerald-300">
-                {t('未发现问题 ✓', 'No violations found ✓')}
-              </p>
-            ) : (
-              <ul className="space-y-3">
-                {results.violations.map((v) => (
-                  <li
-                    key={v.id}
-                    className="rounded-md border border-gray-200 p-2 dark:border-gray-800">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`text-[10px] font-semibold uppercase rounded px-1.5 py-0.5 ${impactColor(v.impact)}`}>
-                        {v.impact ?? 'n/a'}
-                      </span>
-                      <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
-                        {v.id}
-                      </span>
-                    </div>
-                    <div className="text-gray-900 dark:text-gray-100">{v.help}</div>
-                    <a
-                      href={v.helpUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-[var(--tiger-primary,#2563eb)] hover:underline">
-                      {t('查看详情 →', 'Learn more →')}
-                    </a>
-                    <details className="mt-1">
-                      <summary className="text-xs text-gray-500 cursor-pointer dark:text-gray-400">
-                        {v.nodes.length} {t('个节点', 'node(s)')}
-                      </summary>
-                      <ul className="mt-1 space-y-1">
-                        {v.nodes.map((n, i) => (
-                          <li
-                            key={i}
-                            className="text-xs font-mono text-gray-600 dark:text-gray-300 break-all">
-                            {n.target.join(' ')}
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t('无障碍扫描 (axe-core)', 'A11y scan (axe-core)')}
+        footer={null}>
+        <div className="flex items-center gap-2 mb-3">
+          <Button size="sm" loading={loading} onClick={() => void runScan()}>
+            {t('运行扫描', 'Run scan')}
+          </Button>
+          {ranAt ? (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {t('最近扫描', 'Last scan')}: {ranAt}
+            </span>
+          ) : null}
         </div>
-      )}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          {scopedToPreview
+            ? t('扫描当前页可见的示例预览。', 'Scans visible example previews.')
+            : t('只扫壳，不含预览。', 'Shell only; previews were not readable.')}
+        </p>
+        {error ? <p className="text-red-600 dark:text-red-400">{error}</p> : null}
+        {results && results.violations.length === 0 ? (
+          <p className="text-emerald-700 dark:text-emerald-300">
+            {t('未发现问题 ✓', 'No violations found ✓')}
+          </p>
+        ) : null}
+        {results && results.violations.length > 0 ? (
+          <ul className="space-y-3 max-h-[50vh] overflow-y-auto">
+            {results.violations.map((v, index) => (
+              <li
+                key={`${v.id}-${index}`}
+                className="rounded-md border border-gray-200 p-2 dark:border-gray-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`text-[10px] font-semibold uppercase rounded px-1.5 py-0.5 ${impactColor(v.impact)}`}>
+                    {v.impact ?? 'n/a'}
+                  </span>
+                  <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{v.id}</span>
+                </div>
+                <div className="text-gray-900 dark:text-gray-100">{v.help}</div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <span className="sr-only">{demoChrome(lang).settings}</span>
+      </Modal>
     </div>
   )
 }

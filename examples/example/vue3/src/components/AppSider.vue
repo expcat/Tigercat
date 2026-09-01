@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Collapse } from '@expcat/tigercat-vue/Collapse'
 import { CollapsePanel } from '@expcat/tigercat-vue/CollapsePanel'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
 
@@ -11,20 +12,37 @@ const props = defineProps<{ lang: DemoLang; isSiderCollapsed: boolean; isMobile:
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 const route = useRoute()
+const query = ref('')
 const collapsedGroups = ref<Record<string, boolean>>(getStoredCollapsedNavGroups())
+const chrome = computed(() => demoChrome(props.lang))
 
 const isActive = (targetPath: string) => {
   if (targetPath === '/') return route.path === '/'
   return route.path === targetPath
 }
 
-const activeGroupKeys = computed(() =>
-  DEMO_NAV_GROUPS.filter((group) => !collapsedGroups.value[group.key]).map((group) => group.key)
+const visibleGroups = computed(() => {
+  const needle = query.value.trim().toLowerCase()
+  return DEMO_NAV_GROUPS.map((group) => ({
+    ...group,
+    items: needle
+      ? group.items.filter(
+          (item) =>
+            item.label[props.lang].toLowerCase().includes(needle) || item.key.includes(needle)
+        )
+      : group.items
+  })).filter((group) => group.items.length > 0)
+})
+
+const openKeys = computed(() =>
+  query.value.trim()
+    ? visibleGroups.value.map((group) => group.key)
+    : DEMO_NAV_GROUPS.filter((group) => !collapsedGroups.value[group.key]).map((group) => group.key)
 )
 
 const handleCollapseChange = (next: string | number | (string | number)[] | undefined) => {
+  if (query.value.trim()) return
   const nextKeys = Array.isArray(next) ? next : next !== undefined ? [next] : []
-
   const nextState: Record<string, boolean> = { ...collapsedGroups.value }
   DEMO_NAV_GROUPS.forEach((group) => {
     nextState[group.key] = !nextKeys.includes(group.key)
@@ -44,22 +62,22 @@ watch(
   (v) => setStoredCollapsedNavGroups(v),
   { deep: true }
 )
+
+const onDocumentKey = (event: KeyboardEvent) => {
+  if (props.isMobile && !props.isSiderCollapsed && event.key === 'Escape') emit('close')
+}
+
+onMounted(() => document.addEventListener('keydown', onDocumentKey))
+onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
 </script>
 
 <template>
-  <!-- Mobile overlay mode -->
   <Teleport to="body" v-if="props.isMobile">
     <Transition name="sider-overlay">
-      <div
-        v-if="!props.isSiderCollapsed"
-        class="fixed inset-0 z-50"
-        @keydown.escape="emit('close')">
-        <!-- Backdrop -->
+      <div v-if="!props.isSiderCollapsed" class="fixed inset-0 z-50">
         <div class="absolute inset-0 bg-black/30 transition-opacity" @click="emit('close')" />
-        <!-- Sidebar panel -->
         <aside
-          class="absolute left-0 top-0 bottom-0 w-56 bg-white border-r border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col">
-          <!-- Panel header with close button -->
+          class="absolute inset-inline-start-0 top-0 bottom-0 w-56 bg-white border-e border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col">
           <div
             class="shrink-0 h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
             <router-link
@@ -72,24 +90,29 @@ watch(
               type="button"
               variant="outline"
               size="sm"
-              :aria-label="props.lang === 'zh-CN' ? '关闭菜单' : 'Close menu'"
+              :aria-label="chrome.closeMenu"
               class="size-8 p-0 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900"
               @click="emit('close')">
               <span class="text-sm leading-none">✕</span>
             </Button>
           </div>
           <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden demo-scrollbar py-4 px-3">
-            <div class="mt-4">
+            <input
+              v-model="query"
+              type="search"
+              :placeholder="chrome.navSearch"
+              :aria-label="chrome.navSearch"
+              class="mb-3 w-full rounded-md border border-gray-200 bg-white px-2 py-1.5 text-sm text-gray-900 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100" />
+            <div class="mt-2">
               <Collapse
                 :bordered="false"
                 ghost
-                accordion
                 expand-icon-position="end"
-                :activeKey="activeGroupKeys"
+                :activeKey="openKeys"
                 class="space-y-2"
                 @change="handleCollapseChange">
                 <CollapsePanel
-                  v-for="group in DEMO_NAV_GROUPS"
+                  v-for="group in visibleGroups"
                   :key="group.key"
                   :panelKey="group.key"
                   :showArrow="true">
@@ -141,11 +164,10 @@ watch(
     </Transition>
   </Teleport>
 
-  <!-- Desktop mode -->
   <aside
     v-else
     :class="[
-      'shrink-0 overflow-hidden border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
+      'shrink-0 overflow-hidden border-e border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
       'transition-[width] duration-300 ease-in-out',
       props.isSiderCollapsed ? 'w-20' : 'w-56'
     ]">
@@ -155,17 +177,23 @@ watch(
         'transition-[padding] duration-300 ease-in-out',
         props.isSiderCollapsed ? 'px-2' : 'px-3'
       ]">
-      <div class="mt-4">
+      <input
+        v-if="!props.isSiderCollapsed"
+        v-model="query"
+        type="search"
+        :placeholder="chrome.navSearch"
+        :aria-label="chrome.navSearch"
+        class="mb-3 w-full rounded-md border border-gray-200 bg-white px-2 py-1.5 text-sm text-gray-900 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100" />
+      <div class="mt-2">
         <Collapse
           :bordered="false"
           ghost
-          accordion
           expand-icon-position="end"
-          :activeKey="activeGroupKeys"
+          :activeKey="openKeys"
           class="space-y-2"
           @change="handleCollapseChange">
           <CollapsePanel
-            v-for="group in DEMO_NAV_GROUPS"
+            v-for="group in visibleGroups"
             :key="group.key"
             :panelKey="group.key"
             :showArrow="!props.isSiderCollapsed">
@@ -242,5 +270,9 @@ watch(
 .sider-overlay-enter-from aside,
 .sider-overlay-leave-to aside {
   transform: translateX(-100%);
+}
+:global(html[dir='rtl']) .sider-overlay-enter-from aside,
+:global(html[dir='rtl']) .sider-overlay-leave-to aside {
+  transform: translateX(100%);
 }
 </style>

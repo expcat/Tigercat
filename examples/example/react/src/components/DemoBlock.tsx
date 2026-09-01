@@ -157,7 +157,8 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
           lang,
           theme: ThemeManager.getCurrentTheme(),
           colorScheme: ThemeManager.getResolvedColorScheme(),
-          cssVars: collectTigerCssVars(document.documentElement)
+          cssVars: collectTigerCssVars(document.documentElement),
+          modules: result.modules
         })
       })
     },

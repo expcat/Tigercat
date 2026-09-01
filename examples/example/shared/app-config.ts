@@ -99,6 +99,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     items: [
       { key: 'input', path: '/input', label: { 'zh-CN': 'Input 输入框', 'en-US': 'Input' } },
       {
+        key: 'input-number',
+        path: '/input-number',
+        label: { 'zh-CN': 'InputNumber 数字输入', 'en-US': 'InputNumber' }
+      },
+      {
         key: 'input-group',
         path: '/input-group',
         label: { 'zh-CN': 'InputGroup 输入框组', 'en-US': 'InputGroup' }

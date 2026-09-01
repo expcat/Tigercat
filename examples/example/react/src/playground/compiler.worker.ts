@@ -1,6 +1,10 @@
 /// <reference lib="webworker" />
 
-import { scanImports, toDiagnostic, transformModule } from '@demo-shared/playground/compiler-utils'
+import {
+  compileDemoBundle,
+  toDiagnostic,
+  transformModule
+} from '@demo-shared/playground/compiler-utils'
 import type {
   DemoCompileRequest,
   DemoCompileResponse,
@@ -12,16 +16,25 @@ self.onmessage = async (event: MessageEvent<DemoCompileRequest>) => {
   if (request.type !== 'compile') return
 
   try {
-    const source = request.bundle.files[request.bundle.entry]
-    if (source === undefined) throw new Error(`找不到示例入口：${request.bundle.entry}`)
-    const js = transformModule(source, { filename: request.bundle.entry, jsx: true })
-    const imports = await scanImports(js)
+    const compiled = await compileDemoBundle({
+      bundle: request.bundle,
+      compileFile(filename, source) {
+        return {
+          code: transformModule(source, {
+            filename,
+            jsx: /\.[jt]sx$/.test(filename)
+          }),
+          css: ''
+        }
+      }
+    })
     const response: DemoCompileSuccess = {
       type: 'compiled',
       requestId: request.requestId,
-      js,
-      css: '',
-      imports
+      js: compiled.js,
+      css: compiled.css,
+      imports: compiled.imports,
+      modules: compiled.modules
     }
     self.postMessage(response satisfies DemoCompileResponse)
   } catch (error) {

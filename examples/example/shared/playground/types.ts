@@ -51,6 +51,7 @@ export interface DemoCompileSuccess {
   js: string
   css: string
   imports: string[]
+  modules: Record<string, string>
 }
 
 export interface DemoCompileFailure {
