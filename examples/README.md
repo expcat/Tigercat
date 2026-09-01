@@ -82,7 +82,8 @@ SSR 示例（Next 16 / Nuxt 4）必须接上面的 Tailwind 配方。页面 HTML
 ```css
 @import 'tailwindcss';
 @plugin '@expcat/tigercat-core/tailwind';
-@source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-react/dist';
+@source '../node_modules/@expcat/tigercat-core/dist';
 ```
 
 运行时换肤走 `ConfigProvider` 的 `theme` / `colorScheme`（或 `ThemeManager`），不要再手写一套 hex 盘。

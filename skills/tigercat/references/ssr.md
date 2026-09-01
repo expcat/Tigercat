@@ -19,11 +19,11 @@ React 包尚未打 `'use client'`：不要从 Next Server Component 直接 impor
 @import 'tailwindcss';
 @plugin '@expcat/tigercat-core/tailwind';
 @custom-variant dark (&:where(.dark, .dark *));
-@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-react/dist';
+@source '../node_modules/@expcat/tigercat-core/dist';
 ```
 
-Next 用 `@tailwindcss/postcss`；Nuxt 用 `@tailwindcss/vite`。Vue 把 react 换成 `tigercat-vue`。`@plugin '.../tailwind/modern'` 与 `theme="modern"` 等价。
+Next 用 `@tailwindcss/postcss`；Nuxt 用 `@tailwindcss/vite`。Vue 把 react 换成 `tigercat-vue`。`@plugin '.../tailwind/modern'` 与 `theme="modern"` 等价。路径相对 CSS 文件。pnpm workspace 里若扫描不跟随 `node_modules` 符号链接，改为指向真实 `dist`（本仓库 Next 示例扫 `packages/*/dist`）。
 
 ## Rules
 

@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 @plugin '@expcat/tigercat-core/tailwind';
 @custom-variant dark (&:where(.dark, .dark *));
-@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-vue/dist';
+@source '../node_modules/@expcat/tigercat-core/dist';
 
 :root {
   color-scheme: light;
