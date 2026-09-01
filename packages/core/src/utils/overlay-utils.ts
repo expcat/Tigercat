@@ -405,7 +405,7 @@ export function setBackgroundInert(overlayRoot: HTMLElement): () => void {
   let current: HTMLElement | null = overlayRoot
 
   while (current && current !== current.ownerDocument.body) {
-    const parent = current.parentElement
+    const parent: HTMLElement | null = current.parentElement
     if (!parent) break
 
     for (const child of Array.from(parent.children)) {
