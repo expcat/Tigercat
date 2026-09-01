@@ -28,7 +28,10 @@ useHead({
         <h1>Tigercat Vue SSR smoke page</h1>
         <p class="copy">
           This page renders Tigercat Vue components during Nuxt SSR and then hydrates the same
-          component tree on the client.
+          component tree on the client. DatePicker is closed: the smoke covers the formatted input
+          (2024-01-15 with format yyyy-MM-dd), not an open calendar. Locale comes from the root
+          ConfigProvider object. An unbound default DatePicker calls <code>new Date()</code> during
+          render.
         </p>
         <div class="toolbar">
           <Button variant="primary">保存</Button>
