@@ -323,7 +323,9 @@ export function getScrollAreaScrollbarClasses(
       ? 'opacity-0 pointer-events-none group-hover/scroll-area:opacity-100 group-hover/scroll-area:pointer-events-auto group-focus-within/scroll-area:opacity-100 group-focus-within/scroll-area:pointer-events-auto group-data-[scrolling]/scroll-area:opacity-100 group-data-[scrolling]/scroll-area:pointer-events-auto data-[dragging]:opacity-100 data-[dragging]:pointer-events-auto'
       : 'opacity-100'
   const place =
-    axis === 'y' ? 'inset-block-start-0 inset-inline-end-0' : 'inset-inline-start-0 bottom-0'
+    axis === 'y'
+      ? 'inset-block-start-0 inset-block-end-0 inset-inline-end-0'
+      : 'inset-inline-start-0 inset-inline-end-0 bottom-0'
   return classNames(scrollAreaScrollbarBaseClasses, place, thickness, fade)
 }
 

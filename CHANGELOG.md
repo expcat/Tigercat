@@ -6,7 +6,8 @@
 
 - **Watermark**：防篡改只看直子 overlay 是否还在覆盖宿主；自身绘制和 remount 不再当成篡改，避免 MutationObserver 循环撑崩 playground。
 - **锚点浮层**：Modal/Drawer 根是 `pointer-events-none`，overlay-host 是 `contents`。portaled 层补 `pointer-events-auto`，否则 Select 等点击会穿透到 dialog 内容。
-- **ScrollArea**：`className` / attrs.class 打在根上（viewport 用 `viewportClassName`）。根 `overflow-hidden`，边框和圆角不再算进 viewport gutter。
+- **ScrollArea**：`className` / attrs.class 打在根上（viewport 用 `viewportClassName`）。根 `overflow-hidden`；竖轨 `inset-block-end-0` 铺满。01 示例固定 `height` 才有溢出。
+- **Vue 示例 playground**：CodeEditor 走 `modelValue` / `update:modelValue`，编辑才会标 dirty。
 - **NavigationMenu**：面板 keydown 同步重入锁，避免 vnode + addEventListener 把一次 ArrowDown 走两步。`getMenuItems` 把非 `false` 的 `aria-disabled` 都当禁用。
 - **SSR 示例（Next 16 / Nuxt 4）**：两站接 Tailwind plugin + `@source` dist。ConfigProvider 在应用根，`<html lang>` 与 `zhCN` 对齐。DatePicker 用 date-only 值；门禁锁产物 HTML、主题 CSS 与 hydrate。不要从 Next Server Component 直接 import 组件。
 - **TaskBoard / Kanban**：过滤和 `hiddenColumns` 只改显示；WIP / 计数 / 拖拽下标用源数组。列拖按 `column.id` 映回源。键盘可放进空列；`beforeCardMove` 的 Promise 会等完再清指示器。无回调加卡/加列插入 locale 标题。Vue `onCardAdd` 会真调用。泳道是列内分组，未分组走 locale，收起的卡不进 DOM。Kanban 只改默认值并透传，不再第二份列状态。

@@ -7,6 +7,7 @@ const items = Array.from({ length: 24 }, (_, index) => `第 ${index + 1} 条更�
 <template>
   <div class="w-full max-w-md">
     <ScrollArea
+      :height="200"
       :max-height="200"
       shadow
       aria-label="更新日志"

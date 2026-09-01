@@ -13,7 +13,7 @@ for (const app of exampleApps) {
     const editor = moduleRoot.getByRole('textbox', { name: /Code editor|代码编辑器/ })
     const source = await editor.inputValue()
     await editor.fill(source.replace(sourceLabel, editedLabel))
-    await expect(moduleRoot.getByText(/已修改 · 尚未运行|Edited · not run yet/)).toBeVisible()
+    await expect(moduleRoot.getByTestId('demo-reset')).toBeEnabled()
 
     await moduleRoot.getByTestId('demo-run').click()
     await expect(preview.getByRole('button', { name: editedLabel, exact: true })).toBeVisible()
@@ -46,7 +46,7 @@ test('compile errors preserve the last successful preview', async ({ page }) => 
   await expect(preview.getByRole('button', { name: '提交中', exact: true })).toBeVisible()
   await moduleRoot.getByTestId('demo-edit-source').click()
   await moduleRoot
-    .getByRole('textbox', { name: 'Code editor', exact: true })
+    .getByRole('textbox', { name: /Code editor|代码编辑器/ })
     .fill('export default function App( {')
   await moduleRoot.getByTestId('demo-run').click()
   await expect(moduleRoot.locator('[role="alert"]')).toBeVisible()

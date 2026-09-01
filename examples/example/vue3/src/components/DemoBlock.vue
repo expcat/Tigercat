@@ -358,12 +358,12 @@ onBeforeUnmount(() => {
         </div>
         <div @keydown="handleEditorKeydown">
           <CodeEditor
-            :value="selectedSource"
+            :model-value="selectedSource"
             :language="languageForFile(selectedFile)"
             :theme="editorTheme"
             :min-lines="8"
             :max-lines="24"
-            @update:value="updateSelectedSource" />
+            @update:model-value="updateSelectedSource" />
         </div>
       </div>
 

@@ -6,6 +6,7 @@ export default function App() {
   return (
     <div className="w-full max-w-md">
       <ScrollArea
+        height={200}
         maxHeight={200}
         shadow
         ariaLabel="更新日志"
