@@ -1,23 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { Switch } from '@expcat/tigercat-vue/Switch'
-import { applyDarkMode, getStoredDarkMode, setStoredDarkMode } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'
 
-const props = defineProps<{ lang?: DemoLang }>()
+const props = defineProps<{ lang?: DemoLang; modelValue: boolean }>()
+const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>()
 
 const lang = computed<DemoLang>(() => props.lang ?? 'zh-CN')
-const enabled = ref(getStoredDarkMode())
-
-const handleChange = (next: boolean) => {
-  enabled.value = next
-  setStoredDarkMode(next)
-  applyDarkMode(next)
-}
-
-onMounted(() => {
-  applyDarkMode(enabled.value)
-})
 </script>
 
 <template>
@@ -25,6 +14,9 @@ onMounted(() => {
     <span class="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
       {{ lang === 'zh-CN' ? '暗色：' : 'Dark:' }}
     </span>
-    <Switch :model-value="enabled" size="sm" @update:model-value="handleChange" />
+    <Switch
+      :model-value="props.modelValue"
+      size="sm"
+      @update:model-value="(next: boolean) => emit('update:modelValue', next)" />
   </div>
 </template>

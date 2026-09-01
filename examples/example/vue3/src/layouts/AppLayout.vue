@@ -9,10 +9,14 @@ import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
 import { Anchor } from '@expcat/tigercat-vue/Anchor'
 import {
+  getStoredColorScheme,
   getStoredLang,
   getStoredSiderCollapsed,
+  getStoredTheme,
+  setStoredDarkMode,
   setStoredLang,
-  setStoredSiderCollapsed
+  setStoredSiderCollapsed,
+  setStoredTheme
 } from '@demo-shared/prefs'
 import AppHeader from '../components/AppHeader.vue'
 import AppSider from '../components/AppSider.vue'
@@ -41,6 +45,8 @@ const mainScrollRef = ref<HTMLElement | null>(null)
 const sections = ref<DemoSection[]>([])
 const pageTitle = ref('')
 const lang = ref<DemoLang>(getStoredLang())
+const theme = ref(getStoredTheme())
+const colorScheme = ref(getStoredColorScheme())
 const isSiderCollapsed = ref<boolean>(getStoredSiderCollapsed())
 
 provide('demo-lang', lang)
@@ -85,6 +91,14 @@ const handleLangChange = (v: DemoLang) => {
   lang.value = v
 }
 
+const handleThemeChange = (v: string) => {
+  theme.value = v
+}
+
+const handleDarkChange = (enabled: boolean) => {
+  colorScheme.value = enabled ? 'dark' : 'light'
+}
+
 const toggleSider = () => {
   isSiderCollapsed.value = !isSiderCollapsed.value
 }
@@ -107,6 +121,22 @@ watch(
   () => lang.value,
   (v) => {
     setStoredLang(v)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => theme.value,
+  (v) => {
+    setStoredTheme(v)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => colorScheme.value,
+  (v) => {
+    setStoredDarkMode(v === 'dark')
   },
   { immediate: true }
 )
@@ -201,15 +231,19 @@ watch(
 </script>
 
 <template>
-  <ConfigProvider :locale="tigerLocale">
+  <ConfigProvider :locale="tigerLocale" :theme="theme" :color-scheme="colorScheme">
     <div class="h-screen overflow-hidden box-border bg-gray-50 dark:bg-gray-950 pt-14">
       <AppHeader
         :lang="lang"
+        :theme="theme"
+        :dark="colorScheme === 'dark'"
         :is-sider-collapsed="isSiderCollapsed"
         :is-mobile="isMobile"
         :is-compact-header="isCompactHeader"
         right-hint="Vue 3"
         @update:lang="handleLangChange"
+        @update:theme="handleThemeChange"
+        @update:dark="handleDarkChange"
         @toggle-sider="toggleSider" />
 
       <div class="flex h-full">

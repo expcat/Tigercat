@@ -10,8 +10,9 @@ interface SandboxDocumentOptions {
   stylesheetUrl: string
   channelId: string
   lang: 'zh-CN' | 'en-US'
-  dark: boolean
-  modern: boolean
+  theme: string
+  colorScheme: 'light' | 'dark'
+  cssVars: string
 }
 
 function safeJson(value: unknown): string {
@@ -53,8 +54,10 @@ function createImportMap(
 
 export function createSandboxDocument(options: SandboxDocumentOptions): string {
   const importMap = createImportMap(options.framework, options.imports, options.runtimeUrls)
-  const htmlClass = options.dark ? 'dark' : ''
-  const tigerStyle = options.modern ? 'modern' : 'classic'
+  const htmlClass = options.colorScheme === 'dark' ? 'dark' : ''
+  const tigerStyleAttr =
+    options.theme === 'modern' ? ' data-tiger-style="modern"' : ' data-tiger-style="classic"'
+  const cssVarsAttr = options.cssVars ? ` style="${options.cssVars.replace(/"/g, '&quot;')}"` : ''
   const reactRefreshUrl =
     options.framework === 'react' && options.runtimeUrls.framework.includes('/src/')
       ? new URL('/@react-refresh', options.runtimeUrls.framework).href
@@ -84,7 +87,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             { value: { lang } },
             React.createElement(
               Tiger.ConfigProvider,
-              { locale: Shared.getDemoTigerLocale(lang) },
+              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme },
               React.createElement(demo.default)
             )
           )
@@ -99,7 +102,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             Vue.provide('demo-lang', Vue.ref(lang))
             return () => Vue.h(
               Tiger.ConfigProvider,
-              { locale: Shared.getDemoTigerLocale(lang) },
+              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme },
               { default: () => Vue.h(demo.default) }
             )
           }
@@ -108,7 +111,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
       `
 
   return `<!doctype html>
-<html lang="${options.lang}" class="${htmlClass}" data-tiger-style="${tigerStyle}">
+<html lang="${options.lang}" class="${htmlClass}"${tigerStyleAttr}${cssVarsAttr}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -124,6 +127,8 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
     <script type="module">
       const channelId = ${safeJson(options.channelId)}
       const lang = ${safeJson(options.lang)}
+      const theme = ${safeJson(options.theme)}
+      const colorScheme = ${safeJson(options.colorScheme)}
       const send = (event) => parent.postMessage({ channelId, ...event }, '*')
       const stringify = (value) => {
         try {

@@ -2,7 +2,8 @@
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { CodeEditor } from '@expcat/tigercat-vue/CodeEditor'
-import { copyTextToClipboard } from '@expcat/tigercat-core'
+import { copyTextToClipboard, ThemeManager } from '@expcat/tigercat-core'
+import { collectTigerCssVars } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type { DemoLang } from '@demo-shared/app-config'
 import type {
@@ -135,8 +136,9 @@ function rebuildSandbox(result: DemoCompileSuccess) {
       stylesheetUrl: new URL(stylesheetUrl, window.location.origin).href,
       channelId,
       lang: demoLang.value,
-      dark: document.documentElement.classList.contains('dark'),
-      modern: document.documentElement.dataset.tigerStyle === 'modern'
+      theme: ThemeManager.getCurrentTheme(),
+      colorScheme: ThemeManager.getResolvedColorScheme(),
+      cssVars: collectTigerCssVars(document.documentElement)
     })
   }
 }
@@ -244,7 +246,7 @@ onMounted(() => {
   themeObserver = new MutationObserver(() => themeVersion.value++)
   themeObserver.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['class', 'data-tiger-style']
+    attributeFilter: ['class', 'data-tiger-style', 'style']
   })
   window.addEventListener('message', onMessage)
 })

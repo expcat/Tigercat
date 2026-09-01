@@ -4,11 +4,12 @@ import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { Button } from '@expcat/tigercat-vue/Button'
 import ThemeSwitch from './ThemeSwitch.vue'
 import DarkModeSwitch from './DarkModeSwitch.vue'
-import ModernStyleSwitch from './ModernStyleSwitch.vue'
 import LanguageSwitch from './LanguageSwitch.vue'
 
 const props = defineProps<{
   lang: DemoLang
+  theme: string
+  dark: boolean
   isSiderCollapsed: boolean
   isMobile: boolean
   isCompactHeader: boolean
@@ -16,6 +17,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (e: 'update:lang', v: DemoLang): void
+  (e: 'update:theme', v: string): void
+  (e: 'update:dark', v: boolean): void
   (e: 'toggle-sider'): void
 }>()
 
@@ -69,9 +72,14 @@ const handleLangChange = (v: DemoLang) => {
 
       <div v-if="!props.isCompactHeader" class="hidden items-center gap-3 sm:flex">
         <LanguageSwitch :model-value="props.lang" @update:model-value="handleLangChange" />
-        <ThemeSwitch :lang="props.lang" />
-        <ModernStyleSwitch :lang="props.lang" />
-        <DarkModeSwitch :lang="props.lang" />
+        <ThemeSwitch
+          :lang="props.lang"
+          :model-value="props.theme"
+          @update:model-value="(v: string) => emit('update:theme', v)" />
+        <DarkModeSwitch
+          :lang="props.lang"
+          :model-value="props.dark"
+          @update:model-value="(v: boolean) => emit('update:dark', v)" />
       </div>
 
       <details v-else class="relative shrink-0 sm:hidden">
@@ -84,9 +92,14 @@ const handleLangChange = (v: DemoLang) => {
           class="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-950">
           <div class="flex flex-col gap-3">
             <LanguageSwitch :model-value="props.lang" @update:model-value="handleLangChange" />
-            <ThemeSwitch :lang="props.lang" />
-            <ModernStyleSwitch :lang="props.lang" />
-            <DarkModeSwitch :lang="props.lang" />
+            <ThemeSwitch
+              :lang="props.lang"
+              :model-value="props.theme"
+              @update:model-value="(v: string) => emit('update:theme', v)" />
+            <DarkModeSwitch
+              :lang="props.lang"
+              :model-value="props.dark"
+              @update:model-value="(v: boolean) => emit('update:dark', v)" />
           </div>
         </div>
       </details>

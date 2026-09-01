@@ -1,40 +1,25 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
-import { themes, applyTheme } from '@demo-shared/themes'
-import { getStoredTheme, setStoredTheme } from '@demo-shared/prefs'
+import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
 import type { DemoLang } from '@demo-shared/app-config'
 
-const props = defineProps<{ lang?: DemoLang }>()
+const props = defineProps<{ lang?: DemoLang; modelValue: string }>()
+const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
 
 const lang = computed<DemoLang>(() => props.lang ?? 'zh-CN')
 
-const themeNameByValue: Record<string, Record<DemoLang, string>> = {
-  default: { 'zh-CN': '默认蓝色', 'en-US': 'Default Blue' },
-  green: { 'zh-CN': '绿色主题', 'en-US': 'Green' },
-  purple: { 'zh-CN': '紫色主题', 'en-US': 'Purple' },
-  orange: { 'zh-CN': '橙色主题', 'en-US': 'Orange' },
-  pink: { 'zh-CN': '粉色主题', 'en-US': 'Pink' }
-}
-
-const currentTheme = ref(getStoredTheme())
-
-const handleThemeChange = (value: string) => {
-  currentTheme.value = value
-  setStoredTheme(value)
-  applyTheme(value)
+const handleThemeChange = (value: string | number | (string | number)[] | undefined) => {
+  const themeValue = String(Array.isArray(value) ? value[0] : value)
+  if (themeValue) emit('update:modelValue', themeValue)
 }
 
 const themeOptions = computed(() =>
-  themes.map((t) => ({
-    label: themeNameByValue[t.value]?.[lang.value] ?? t.name,
-    value: t.value
+  DEMO_THEME_PRESETS.map((preset) => ({
+    label: preset.label[lang.value],
+    value: preset.value
   }))
 )
-
-onMounted(() => {
-  applyTheme(currentTheme.value)
-})
 </script>
 
 <template>
@@ -43,7 +28,7 @@ onMounted(() => {
       {{ lang === 'zh-CN' ? '主题：' : 'Theme:' }}
     </span>
     <Select
-      :model-value="currentTheme"
+      :model-value="props.modelValue"
       @update:model-value="handleThemeChange"
       :options="themeOptions"
       size="sm"

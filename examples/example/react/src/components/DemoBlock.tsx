@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { CodeEditor } from '@expcat/tigercat-react/CodeEditor'
-import { copyTextToClipboard } from '@expcat/tigercat-core'
+import { copyTextToClipboard, ThemeManager } from '@expcat/tigercat-core'
+import { collectTigerCssVars } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type {
   DemoCompileResponse,
@@ -121,7 +122,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
     const observer = new MutationObserver(() => setThemeVersion((value) => value + 1))
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class', 'data-tiger-style']
+      attributeFilter: ['class', 'data-tiger-style', 'style']
     })
     return () => observer.disconnect()
   }, [])
@@ -135,8 +136,6 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
     (result: DemoCompileSuccess) => {
       sandboxReadyRef.current = false
       const channelId = crypto.randomUUID()
-      const dark = document.documentElement.classList.contains('dark')
-      const modern = document.documentElement.dataset.tigerStyle === 'modern'
       setSandbox({
         channelId,
         document: createSandboxDocument({
@@ -149,8 +148,9 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
           stylesheetUrl: new URL(stylesheetUrl, window.location.origin).href,
           channelId,
           lang,
-          dark,
-          modern
+          theme: ThemeManager.getCurrentTheme(),
+          colorScheme: ThemeManager.getResolvedColorScheme(),
+          cssVars: collectTigerCssVars(document.documentElement)
         })
       })
     },

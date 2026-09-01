@@ -1,38 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
-import { themes, applyTheme } from '@demo-shared/themes'
-import { getStoredTheme, setStoredTheme } from '@demo-shared/prefs'
+import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
 import type { DemoLang } from '@demo-shared/app-config'
 
 export interface ThemeSwitchProps {
   lang?: DemoLang
+  value: string
+  onChange: (theme: string) => void
 }
 
-const themeNameByValue: Record<string, Record<DemoLang, string>> = {
-  default: { 'zh-CN': '默认蓝色', 'en-US': 'Default Blue' },
-  green: { 'zh-CN': '绿色主题', 'en-US': 'Green' },
-  purple: { 'zh-CN': '紫色主题', 'en-US': 'Purple' },
-  orange: { 'zh-CN': '橙色主题', 'en-US': 'Orange' },
-  pink: { 'zh-CN': '粉色主题', 'en-US': 'Pink' }
-}
-
-const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN' }) => {
-  const [currentTheme, setCurrentTheme] = useState(() => getStoredTheme())
-
-  useEffect(() => {
-    applyTheme(currentTheme)
-  }, [])
-
-  const handleThemeChange = (value: string | number | (string | number)[] | undefined) => {
-    const themeValue = String(value)
-    setCurrentTheme(themeValue)
-    setStoredTheme(themeValue)
-    applyTheme(themeValue)
+const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN', value, onChange }) => {
+  const handleThemeChange = (next: string | number | (string | number)[] | undefined) => {
+    const themeValue = String(Array.isArray(next) ? next[0] : next)
+    if (themeValue) onChange(themeValue)
   }
 
-  const themeOptions = themes.map((t) => ({
-    label: themeNameByValue[t.value]?.[lang] ?? t.name,
-    value: t.value
+  const themeOptions = DEMO_THEME_PRESETS.map((preset) => ({
+    label: preset.label[lang],
+    value: preset.value
   }))
 
   return (
@@ -41,7 +26,7 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN' }) => {
         {lang === 'zh-CN' ? '主题：' : 'Theme:'}
       </span>
       <Select
-        value={currentTheme}
+        value={value}
         onChange={handleThemeChange}
         options={themeOptions}
         size="sm"

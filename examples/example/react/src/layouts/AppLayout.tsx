@@ -8,13 +8,15 @@ import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
 import { Anchor } from '@expcat/tigercat-react/Anchor'
 import {
+  getStoredColorScheme,
   getStoredLang,
   getStoredSiderCollapsed,
   getStoredTheme,
+  setStoredDarkMode,
   setStoredLang,
-  setStoredSiderCollapsed
+  setStoredSiderCollapsed,
+  setStoredTheme
 } from '@demo-shared/prefs'
-import { applyTheme } from '@demo-shared/themes'
 import { LangContext } from '../context/lang'
 import AppHeader from '../components/AppHeader'
 import AppSider from '../components/AppSider'
@@ -44,6 +46,8 @@ export const AppLayout: React.FC = () => {
   const [sections, setSections] = useState<DemoSection[]>([])
   const [pageTitle, setPageTitle] = useState('')
   const [lang, setLang] = useState<DemoLang>(() => getStoredLang())
+  const [theme, setTheme] = useState(() => getStoredTheme())
+  const [colorScheme, setColorScheme] = useState(() => getStoredColorScheme())
   const [isSiderCollapsed, setIsSiderCollapsed] = useState<boolean>(() => getStoredSiderCollapsed())
   const [isMobile, setIsMobile] = useState(false)
   const [isCompactHeader, setIsCompactHeader] = useState(false)
@@ -75,13 +79,16 @@ export const AppLayout: React.FC = () => {
   }, [lang])
 
   useEffect(() => {
-    if (!isMobile) setStoredSiderCollapsed(isSiderCollapsed)
-  }, [isSiderCollapsed, isMobile])
+    setStoredTheme(theme)
+  }, [theme])
 
   useEffect(() => {
-    const storedTheme = getStoredTheme()
-    applyTheme(storedTheme)
-  }, [])
+    setStoredDarkMode(colorScheme === 'dark')
+  }, [colorScheme])
+
+  useEffect(() => {
+    if (!isMobile) setStoredSiderCollapsed(isSiderCollapsed)
+  }, [isSiderCollapsed, isMobile])
 
   // Scroll to top & auto-close sider on route change
   useEffect(() => {
@@ -145,11 +152,15 @@ export const AppLayout: React.FC = () => {
 
   return (
     <LangContext.Provider value={{ lang }}>
-      <ConfigProvider locale={tigerLocale}>
+      <ConfigProvider locale={tigerLocale} theme={theme} colorScheme={colorScheme}>
         <div className="h-screen overflow-hidden box-border bg-gray-50 dark:bg-gray-950 pt-14">
           <AppHeader
             lang={lang}
             onLangChange={setLang}
+            theme={theme}
+            onThemeChange={setTheme}
+            dark={colorScheme === 'dark'}
+            onDarkChange={(enabled) => setColorScheme(enabled ? 'dark' : 'light')}
             rightHint="React"
             isSiderCollapsed={isSiderCollapsed}
             isMobile={isMobile}

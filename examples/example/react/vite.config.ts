@@ -118,6 +118,10 @@ export default defineConfig(({ command }) => ({
         replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/data-export.ts')
       },
       {
+        find: /^@expcat\/tigercat-core\/locales\/(.+)$/,
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/i18n/locales/$1.ts')
+      },
+      {
         find: '@expcat/tigercat-core',
         replacement: path.resolve(workspaceRoot, 'packages/core/src/index.ts')
       }
