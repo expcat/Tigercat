@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { Gantt } from '@expcat/tigercat-vue/Gantt'
 import type { GanttScale, GanttTask } from '@expcat/tigercat-core'
 
-const tasks: GanttTask[] = [
+const tasks = ref<GanttTask[]>([
   { id: 'research', label: '需求调研', start: '2026-01-02', end: '2026-01-08', progress: 100 },
   {
     id: 'design',
@@ -21,7 +21,7 @@ const tasks: GanttTask[] = [
     progress: 45,
     dependencies: ['design']
   }
-]
+])
 
 const scaleOptions: Array<{ value: GanttScale; label: string }> = [
   { value: 'day', label: '日' },
@@ -40,13 +40,13 @@ const formatDate = (date: Date, currentScale: GanttScale) => {
 
 const handleSelectedIdChange = (nextId: string | number | null) => {
   selectedId.value = nextId
-  const selectedTask = tasks.find((task) => task.id === nextId)
+  const selectedTask = tasks.value.find((task) => task.id === nextId)
   selectionStatus.value = selectedTask ? `已选择：${selectedTask.label}` : '已清除选择'
 }
 </script>
 
 <template>
-  <div class="space-y-4 overflow-x-auto">
+  <div class="space-y-4">
     <div class="flex flex-wrap items-center gap-3">
       <div class="flex gap-2" role="group" aria-label="甘特图时间刻度">
         <button
@@ -68,13 +68,14 @@ const handleSelectedIdChange = (nextId: string | number | null) => {
     </div>
 
     <Gantt
-      :data="tasks"
+      v-model:data="tasks"
       :width="860"
       :height="280"
       :scale="scale"
       min-date="2026-01-01"
       max-date="2026-02-01"
       :date-formatter="formatDate"
+      draggable
       selectable
       :selected-id="selectedId"
       title="R34 delivery plan"

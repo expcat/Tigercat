@@ -57,7 +57,7 @@ const selectedId = ref<string | number | null>('product')
 </script>
 
 <template>
-  <div class="space-y-3 overflow-x-auto">
+  <div class="space-y-3">
     <p class="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
       当前选择：{{ selectedId ?? '无' }}
     </p>

@@ -146,13 +146,18 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 3/29 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 8/31 props
 
-| Prop         | Type          | Default | Notes |
-| ------------ | ------------- | ------- | ----- |
-| `data`       | `GanttTask[]` | `-`     | -     |
-| `scale?`     | `GanttScale`  | `-`     | -     |
-| `rowHeight?` | `number`      | `-`     | -     |
+| Prop              | Type             | Default | Notes |
+| ----------------- | ---------------- | ------- | ----- |
+| `data`            | `GanttTask[]`    | `-`     | -     |
+| `scale?`          | `GanttScale`     | `-`     | -     |
+| `rowHeight?`      | `number`         | `-`     | -     |
+| `barHeight?`      | `number`         | `-`     | -     |
+| `taskLabelWidth?` | `number`         | `-`     | -     |
+| `minDate?`        | `GanttDateValue` | `-`     | -     |
+| `maxDate?`        | `GanttDateValue` | `-`     | -     |
+| `showToday?`      | `boolean`        | `-`     | -     |
 
 ## GaugeChart
 
@@ -171,13 +176,18 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## HeatmapChart
 
-`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 3/27 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 8/29 props
 
-| Prop      | Type                  | Default | Notes         |
-| --------- | --------------------- | ------- | ------------- |
-| `data`    | `HeatmapChartDatum[]` | `-`     | Data points   |
-| `xLabels` | `string[]`            | `-`     | X-axis labels |
-| `yLabels` | `string[]`            | `-`     | Y-axis labels |
+| Prop          | Type                  | Default     | Notes                                                                                      |
+| ------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `data`        | `HeatmapChartDatum[]` | `-`         | Data points. Lookup is by label, or by 0-based column/row index. `hoveredIndex` / `sele... |
+| `xLabels`     | `string[]`            | `-`         | X-axis labels                                                                              |
+| `yLabels`     | `string[]`            | `-`         | Y-axis labels                                                                              |
+| `minColor?`   | `string`              | `'#f0f9ff'` | Min color (for lowest value)                                                               |
+| `maxColor?`   | `string`              | `'#2563eb'` | Max color (for highest value)                                                              |
+| `colorSpace?` | `'rgb' \| 'oklch'`    | `'rgb'`     | Colour interpolation space for cell fills. - `'rgb'` (default): linear hex interpolatio... |
+| `cellGap?`    | `number`              | `1`         | Gap between cells in px                                                                    |
+| `cellRadius?` | `number`              | `2`         | Cell border radius in px. The SVG `rx` attribute wins over theme tokens.                   |
 
 ## LineChart
 
@@ -196,13 +206,18 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## OrgChart
 
-`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 3/24 props
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 8/24 props
 
-| Prop          | Type                             | Default | Notes |
-| ------------- | -------------------------------- | ------- | ----- |
-| `data`        | `OrgChartNode \| OrgChartNode[]` | `-`     | -     |
-| `nodeWidth?`  | `number`                         | `-`     | -     |
-| `nodeHeight?` | `number`                         | `-`     | -     |
+| Prop          | Type                             | Default      | Notes                                                                 |
+| ------------- | -------------------------------- | ------------ | --------------------------------------------------------------------- |
+| `data`        | `OrgChartNode \| OrgChartNode[]` | `-`          | -                                                                     |
+| `direction?`  | `OrgChartDirection`              | `'vertical'` | `horizontal` is left-to-right. Cards keep `nodeWidth` × `nodeHeight`. |
+| `nodeWidth?`  | `number`                         | `-`          | -                                                                     |
+| `nodeHeight?` | `number`                         | `-`          | -                                                                     |
+| `levelGap?`   | `number`                         | `-`          | -                                                                     |
+| `siblingGap?` | `number`                         | `-`          | -                                                                     |
+| `selectedId?` | `string \| number \| null`       | `-`          | -                                                                     |
+| `hoverable?`  | `boolean`                        | `false`      | Enable hover highlight                                                |
 
 ## PieChart
 
@@ -251,20 +266,30 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## SunburstChart
 
-`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 3/24 props
+`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 8/24 props
 
-| Prop                | Type                   | Default | Notes                                              |
-| ------------------- | ---------------------- | ------- | -------------------------------------------------- |
-| `data`              | `SunburstChartDatum[]` | `-`     | Hierarchical data                                  |
-| `innerRadiusRatio?` | `number`               | `0`     | Inner radius ratio (0 = no hole, 0.3 = donut-like) |
-| `showLabels?`       | `boolean`              | `true`  | Whether to show labels on arcs                     |
+| Prop                | Type                   | Default | Notes                                                                                      |
+| ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `data`              | `SunburstChartDatum[]` | `-`     | Hierarchical data. Arcs start at 12 o'clock and run clockwise. Shallow leaves fill thro... |
+| `innerRadiusRatio?` | `number`               | `0`     | Inner radius ratio (0 = no hole, 0.3 = donut-like)                                         |
+| `showLabels?`       | `boolean`              | `true`  | Whether to show labels on arcs                                                             |
+| `colors?`           | `string[]`             | `-`     | Palette of colors. Children inherit the parent colour unless they set `color`.             |
+| `gradient?`         | `boolean`              | `false` | Whether to apply a 12-o'clock vertical alpha gradient in user space                        |
+| `hoverable?`        | `boolean`              | `false` | Enable hover highlight                                                                     |
+| `selectable?`       | `boolean`              | `false` | Enable click selection                                                                     |
+| `showLegend?`       | `boolean`              | `false` | Whether to show legend                                                                     |
 
 ## TreeMapChart
 
-`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 3/25 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 8/26 props
 
-| Prop          | Type                  | Default | Notes                               |
-| ------------- | --------------------- | ------- | ----------------------------------- |
-| `data`        | `TreeMapChartDatum[]` | `-`     | Hierarchical data                   |
-| `gap?`        | `number`              | `2`     | Gap between nodes in px             |
-| `showLabels?` | `boolean`             | `true`  | Whether to show labels inside nodes |
+| Prop            | Type                  | Default | Notes                                                                    |
+| --------------- | --------------------- | ------- | ------------------------------------------------------------------------ |
+| `data`          | `TreeMapChartDatum[]` | `-`     | Hierarchical data. Parent rectangles contain children (nested squarify). |
+| `gap?`          | `number`              | `2`     | Gap between nodes in px                                                  |
+| `showLabels?`   | `boolean`             | `true`  | Whether to show labels inside nodes                                      |
+| `minLabelSize?` | `number`              | `10`    | Minimum font size for labels (hide if cell too small)                    |
+| `nodeRadius?`   | `number`              | `2`     | Node corner radius in px. The SVG `rx` attribute wins over theme tokens. |
+| `colors?`       | `string[]`            | `-`     | Palette of colors                                                        |
+| `gradient?`     | `boolean`             | `false` | Whether to apply a top-to-bottom alpha gradient in chart user space      |
+| `hoverable?`    | `boolean`             | `false` | Enable hover highlight                                                   |

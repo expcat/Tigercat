@@ -23,17 +23,5 @@ const data = [
 ]
 
 export default function App() {
-  return (
-    <SunburstChart
-      data={data}
-      width={380}
-      height={380}
-      innerRadiusRatio={0.3}
-      showLabels
-      colors={['#6366f1', '#ec4899', '#14b8a6', '#f59e0b']}
-      hoverable
-      selectable
-      showLegend
-    />
-  )
+  return <SunburstChart data={data} />
 }

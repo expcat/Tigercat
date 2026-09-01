@@ -21,17 +21,5 @@ const data = [
 ]
 
 export default function App() {
-  return (
-    <TreeMapChart
-      data={data}
-      width={500}
-      height={300}
-      gap={4}
-      showLabels
-      colors={['#3b82f6', '#10b981', '#f59e0b', '#ef4444']}
-      hoverable
-      selectable
-      showLegend
-    />
-  )
+  return <TreeMapChart data={data} />
 }

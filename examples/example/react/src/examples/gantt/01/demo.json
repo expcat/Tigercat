@@ -1,7 +1,7 @@
 {
   "id": "gantt-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、月份刻度，减少重复示例块。",
+  "title": "闭区间排期",
+  "description": "YYYY-MM-DD 的 end 含当天；默认只读。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

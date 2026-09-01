@@ -23,14 +23,5 @@ const data = [
 </script>
 
 <template>
-  <TreeMapChart
-    :data="data"
-    :width="500"
-    :height="300"
-    :gap="4"
-    show-labels
-    :colors="['#3b82f6', '#10b981', '#f59e0b', '#ef4444']"
-    hoverable
-    selectable
-    show-legend />
+  <TreeMapChart :data="data" />
 </template>

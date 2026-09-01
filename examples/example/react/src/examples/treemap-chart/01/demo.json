@@ -1,7 +1,7 @@
 {
   "id": "treemap-chart-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、层级数据、自定义样式，减少重复示例块。",
+  "title": "嵌套矩形",
+  "description": "父矩形包住子节点。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

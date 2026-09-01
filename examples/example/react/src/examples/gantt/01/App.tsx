@@ -6,7 +6,7 @@ const tasks: GanttTask[] = [
   {
     id: 'design',
     label: '交互设计',
-    start: '2026-01-06',
+    start: '2026-01-08',
     end: '2026-01-15',
     progress: 75,
     dependencies: ['research']
@@ -14,7 +14,7 @@ const tasks: GanttTask[] = [
   {
     id: 'build',
     label: '功能开发',
-    start: '2026-01-13',
+    start: '2026-01-16',
     end: '2026-02-05',
     progress: 45,
     dependencies: ['design']
@@ -22,19 +22,5 @@ const tasks: GanttTask[] = [
 ]
 
 export default function App() {
-  return (
-    <Gantt
-      data={tasks}
-      width={820}
-      height={280}
-      scale="month"
-      minDate="2026-01-01"
-      maxDate="2026-03-01"
-      dateFormatter={(date) => `${date.getMonth() + 1}月`}
-      hoverable
-      selectable
-      title="Release plan"
-      desc="Feature delivery timeline"
-    />
-  )
+  return <Gantt data={tasks} />
 }

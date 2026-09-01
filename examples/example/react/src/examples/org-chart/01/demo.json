@@ -1,7 +1,7 @@
 {
   "id": "org-chart-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、横向布局，减少重复示例块。",
+  "title": "基础用法",
+  "description": "默认竖直布局。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

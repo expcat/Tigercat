@@ -25,14 +25,5 @@ const data = [
 </script>
 
 <template>
-  <SunburstChart
-    :data="data"
-    :width="380"
-    :height="380"
-    :inner-radius-ratio="0.3"
-    show-labels
-    :colors="['#6366f1', '#ec4899', '#14b8a6', '#f59e0b']"
-    hoverable
-    selectable
-    show-legend />
+  <SunburstChart :data="data" />
 </template>

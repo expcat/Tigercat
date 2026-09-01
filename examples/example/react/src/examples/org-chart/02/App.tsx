@@ -56,7 +56,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState<string | number | null>('product')
 
   return (
-    <div className="space-y-3 overflow-x-auto">
+    <div className="space-y-3">
       <p className="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
         当前选择：{selectedId ?? '无'}
       </p>

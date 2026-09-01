@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Gantt } from '@expcat/tigercat-react/Gantt'
 import type { GanttScale, GanttTask } from '@expcat/tigercat-core'
 
-const tasks: GanttTask[] = [
+const initialTasks: GanttTask[] = [
   { id: 'research', label: '需求调研', start: '2026-01-02', end: '2026-01-08', progress: 100 },
   {
     id: 'design',
@@ -34,6 +34,7 @@ const formatDate = (date: Date, scale: GanttScale) => {
 }
 
 export default function App() {
+  const [tasks, setTasks] = useState<GanttTask[]>(initialTasks)
   const [scale, setScale] = useState<GanttScale>('week')
   const [selectedId, setSelectedId] = useState<string | number | null>('design')
   const [selectionStatus, setSelectionStatus] = useState('已选择：交互设计')
@@ -45,7 +46,7 @@ export default function App() {
   }
 
   return (
-    <div className="space-y-4 overflow-x-auto">
+    <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex gap-2" role="group" aria-label="甘特图时间刻度">
           {scaleOptions.map((option) => (
@@ -79,6 +80,7 @@ export default function App() {
         selectable
         selectedId={selectedId}
         onSelectedIdChange={handleSelectedIdChange}
+        onDataChange={setTasks}
         title="R34 delivery plan"
         desc="Switchable time scale with controlled task selection"
       />
