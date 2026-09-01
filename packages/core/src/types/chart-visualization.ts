@@ -227,9 +227,27 @@ export interface TreeMapChartDatum {
 export interface TreeMapChartProps
   extends BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
-   * Hierarchical data
+   * Hierarchical data. Parent rectangles contain children (nested squarify).
    */
   data: TreeMapChartDatum[]
+
+  /**
+   * Chart width
+   * @default 400
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 300
+   */
+  height?: number
+
+  /**
+   * Gap around nodes, not cartesian axis padding
+   * @default 8
+   */
+  padding?: ChartPadding
 
   /**
    * Gap between nodes in px
@@ -250,16 +268,26 @@ export interface TreeMapChartProps
   minLabelSize?: number
 
   /**
+   * Node corner radius in px. The SVG `rx` attribute wins over theme tokens.
+   * @default 2
+   */
+  nodeRadius?: number
+
+  /**
    * Palette of colors
    */
   colors?: string[]
 
   /**
-   * Whether to apply a top-to-bottom alpha gradient to each node fill
-   * for a subtle "lit from above" depth effect (opt-in, default `false`).
+   * Whether to apply a top-to-bottom alpha gradient in chart user space
    * @default false
    */
   gradient?: boolean
+
+  /**
+   * Tooltip formatter. Receives the node's original datum and layout index.
+   */
+  tooltipFormatter?: (datum: TreeMapChartDatum, index: number) => string
 }
 
 // -------------------------------------------------------------------
@@ -280,9 +308,28 @@ export interface SunburstChartDatum {
 export interface SunburstChartProps
   extends BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
-   * Hierarchical data
+   * Hierarchical data. Arcs start at 12 o'clock and run clockwise.
+   * Shallow leaves fill through to the outer radius.
    */
   data: SunburstChartDatum[]
+
+  /**
+   * Chart width
+   * @default 320
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 320
+   */
+  height?: number
+
+  /**
+   * Padding around the rings (not cartesian axis padding)
+   * @default 24
+   */
+  padding?: ChartPadding
 
   /**
    * Inner radius ratio (0 = no hole, 0.3 = donut-like)
@@ -297,14 +344,18 @@ export interface SunburstChartProps
   showLabels?: boolean
 
   /**
-   * Palette of colors
+   * Palette of colors. Children inherit the parent colour unless they set `color`.
    */
   colors?: string[]
 
   /**
-   * Whether to apply a top-to-bottom alpha gradient to each arc fill
-   * for a subtle "lit from above" depth effect (opt-in, default `false`).
+   * Whether to apply a 12-o'clock vertical alpha gradient in user space
    * @default false
    */
   gradient?: boolean
+
+  /**
+   * Tooltip formatter. Receives the arc's original datum and layout index.
+   */
+  tooltipFormatter?: (datum: SunburstChartDatum, index: number) => string
 }

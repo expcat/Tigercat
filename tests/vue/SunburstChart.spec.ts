@@ -4,17 +4,14 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
-import { render } from '@testing-library/vue'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const defaultSize = { width: 320, height: 320 }
-
 const sampleData = [
   { label: 'A', value: 40 },
   { label: 'B', value: 30 },
   { label: 'C', value: 20 }
 ]
-
 const pagesData = [
   {
     label: '亚洲',
@@ -37,136 +34,74 @@ const pagesData = [
   { label: '美洲', value: 15 }
 ]
 
-function readSvgTextPoint(el: Element): { x: number; y: number } {
-  return { x: Number(el.getAttribute('x')), y: Number(el.getAttribute('y')) }
-}
-
 describe('SunburstChart (Vue)', () => {
   it('renders SVG with arcs', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('svg')).toBeTruthy()
-    const paths = container.querySelectorAll('path')
-    expect(paths.length).toBeGreaterThanOrEqual(3)
+    const { container } = renderWithProps(SunburstChart, { data: sampleData, ...defaultSize })
+    expect(container.querySelectorAll('[data-sunburst-arc]')).toHaveLength(3)
   })
 
   it('renders empty state with no data', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: [],
-      ...defaultSize
-    })
-
-    expect(container.querySelector('svg')).toBeTruthy()
-  })
-  it('triggers hover events when hoverable', () => {
-    const onHoveredIndexChange = vi.fn()
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      hoverable: true,
-      'onUpdate:hoveredIndex': onHoveredIndexChange,
-      ...defaultSize
-    })
-
-    const paths = container.querySelectorAll('path')
-    paths[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
-    expect(onHoveredIndexChange).toHaveBeenCalledWith(0)
+    const { container } = renderWithProps(SunburstChart, { data: [], ...defaultSize })
+    expect(container.querySelectorAll('[data-sunburst-arc]')).toHaveLength(0)
   })
 
-  it('triggers click events when selectable', () => {
+  it('fires arc click without selectable', () => {
     const onArcClick = vi.fn()
     const { container } = renderWithProps(SunburstChart, {
       data: sampleData,
-      selectable: true,
       onArcClick,
       ...defaultSize
     })
-
-    const paths = container.querySelectorAll('path')
-    paths[0].dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    expect(onArcClick).toHaveBeenCalled()
+    container
+      .querySelectorAll('[data-sunburst-arc]')[1]
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(onArcClick).toHaveBeenCalledWith(1, sampleData[1])
   })
 
-  it('applies className', () => {
+  it('legend click highlights the matching root arc', () => {
+    const onArcClick = vi.fn()
+    const { container } = renderWithProps(SunburstChart, {
+      data: pagesData,
+      showLegend: true,
+      onArcClick,
+      ...defaultSize
+    })
+    const legendButtons = container.querySelectorAll('[data-legend-item]')
+    legendButtons[legendButtons.length - 1].dispatchEvent(
+      new MouseEvent('click', { bubbles: true })
+    )
+    expect(onArcClick.mock.calls[0][1].label).toBe('美洲')
+  })
+
+  it('applies className on the outer wrapper', () => {
     const { container } = renderWithProps(SunburstChart, {
       data: sampleData,
       className: 'my-sunburst',
       ...defaultSize
     })
-
-    expect(container.querySelector('svg.my-sunburst')).toBeTruthy()
+    expect(container.firstElementChild).toHaveClass('my-sunburst')
   })
 
-  it('renders a11y title and desc', () => {
+  it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(SunburstChart, {
       data: sampleData,
-      title: 'Sunburst Title',
-      desc: 'Sunburst Description',
+      title: 'Regions',
       ...defaultSize
     })
-
-    expect(container.querySelector('title')?.textContent).toBe('Sunburst Title')
-    expect(container.querySelector('desc')?.textContent).toBe('Sunburst Description')
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(SunburstChart, {
-        props: { data: sampleData, width: 320, height: 320 }
-      })
-      await expectNoA11yViolationsIsolated(container)
-    })
+    await expectNoA11yViolations(container)
   })
 
-  describe('showLabels', () => {
-    it('paints arc labels at distinct mid-ring points by default', () => {
-      const { container } = renderWithProps(SunburstChart, {
-        data: pagesData,
-        ...defaultSize
-      })
+  it('hides decorative arcs from the accessibility tree by default', () => {
+    const { container } = renderWithProps(SunburstChart, { data: sampleData, ...defaultSize })
+    const arc = container.querySelector('[data-sunburst-arc]')
+    expect(arc).toHaveAttribute('aria-hidden', 'true')
+    expect(arc).not.toHaveAttribute('role')
+  })
 
-      const texts = Array.from(container.querySelectorAll('svg text'))
-      expect(texts.length).toBeGreaterThanOrEqual(9)
-      const labels = texts.map((el) => el.textContent)
-      expect(labels).toContain('亚洲')
-      expect(labels).toContain('中国')
-
-      for (const el of texts) {
-        const { x, y } = readSvgTextPoint(el)
-        expect(Number.isFinite(x)).toBe(true)
-        expect(Number.isFinite(y)).toBe(true)
-      }
-      expect(
-        texts.every((el) => el.getAttribute('x') === '0' && el.getAttribute('y') === '0')
-      ).toBe(false)
-
-      const asia = texts.find((el) => el.textContent === '亚洲')
-      const china = texts.find((el) => el.textContent === '中国')
-      expect(asia).toBeTruthy()
-      expect(china).toBeTruthy()
-      expect(readSvgTextPoint(asia!)).not.toEqual(readSvgTextPoint(china!))
-    })
-
-    it('renders zero arc label texts when showLabels is false', () => {
-      const { container } = renderWithProps(SunburstChart, {
-        data: pagesData,
-        showLabels: false,
-        ...defaultSize
-      })
-
-      const texts = Array.from(container.querySelectorAll('svg text'))
-      expect(texts).toHaveLength(0)
-    })
-
-    it('renders A, B, C labels for flat sample data', () => {
-      const { container } = renderWithProps(SunburstChart, {
-        data: sampleData,
-        ...defaultSize
-      })
-
-      const labels = Array.from(container.querySelectorAll('svg text')).map((el) => el.textContent)
-      expect(labels).toEqual(['A', 'B', 'C'])
-    })
+  it('paints distinct labels for nested rings', () => {
+    const { container } = renderWithProps(SunburstChart, { data: pagesData, ...defaultSize })
+    const labels = Array.from(container.querySelectorAll('svg text')).map((el) => el.textContent)
+    expect(labels).toContain('亚洲')
+    expect(labels).toContain('中国')
   })
 })

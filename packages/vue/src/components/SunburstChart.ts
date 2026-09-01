@@ -1,15 +1,23 @@
 import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
-  computeSunburstArcs,
-  getSunburstLabelPoint,
+  coerceClassValue,
+  layoutSunburst,
   getChartElementOpacity,
-  getChartInnerRect,
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
-  resolveChartTooltipContent,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  isChartNavigationKey,
+  nextSunburstArcIndex,
+  getChartLabels,
+  mergeTigerLocale,
+  formatChartTemplate,
+  sunburstArcTransitionClasses,
+  DEFAULT_SUNBURST_SIZE,
+  DEFAULT_SUNBURST_PADDING,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,
@@ -18,50 +26,86 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
-import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueSunburstChartProps extends CoreSunburstChartProps {
   data: SunburstChartDatum[]
   padding?: ChartPadding
+  onArcClick?: (index: number, datum: SunburstChartDatum) => void
 }
+
+export type SunburstChartProps = VueSunburstChartProps
 
 export const SunburstChart = defineComponent({
   name: 'TigerSunburstChart',
+  inheritAttrs: false,
   props: {
-    width: { type: Number, default: 320 },
-    height: { type: Number, default: 320 },
-    padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
+    width: { type: Number, default: DEFAULT_SUNBURST_SIZE },
+    height: { type: Number, default: DEFAULT_SUNBURST_SIZE },
+    padding: {
+      type: [Number, Object] as PropType<ChartPadding>,
+      default: DEFAULT_SUNBURST_PADDING
+    },
+    responsive: { type: Boolean, default: false },
     data: { type: Array as PropType<SunburstChartDatum[]>, required: true },
     innerRadiusRatio: { type: Number, default: 0 },
     showLabels: { type: Boolean, default: true },
     colors: { type: Array as PropType<string[]> },
     gradient: { type: Boolean, default: false },
-    // Interaction
     hoverable: { type: Boolean, default: false },
     hoveredIndex: { type: Number as PropType<number | null>, default: undefined },
     activeOpacity: { type: Number, default: 1 },
     inactiveOpacity: { type: Number, default: 0.25 },
     selectable: { type: Boolean, default: false },
     selectedIndex: { type: Number as PropType<number | null>, default: undefined },
-    // Legend
     showLegend: { type: Boolean, default: false },
     legendPosition: { type: String as PropType<ChartLegendPosition>, default: 'bottom' },
     legendMarkerSize: { type: Number, default: 10 },
     legendGap: { type: Number, default: 8 },
-    // Tooltip
     showTooltip: { type: Boolean, default: true },
     tooltipFormatter: {
       type: Function as PropType<(datum: SunburstChartDatum, index: number) => string>
     },
-    // a11y
     title: { type: String },
     desc: { type: String },
-    className: { type: String }
+    className: { type: String },
+    onArcClick: {
+      type: Function as PropType<(index: number, datum: SunburstChartDatum) => void>
+    }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'arc-click', 'arc-hover'],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const interactive = computed(
+      () => props.hoverable || props.selectable || typeof props.onArcClick === 'function'
+    )
+    const gradientPrefix = getStableChartGradientPrefix('sunburst', useId())
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
+    const palette = computed(() => resolveChartPalette(props.colors))
+    const cx = computed(() => innerRect.value.width / 2)
+    const cy = computed(() => innerRect.value.height / 2)
+    const outerRadius = computed(() => Math.min(innerRect.value.width, innerRect.value.height) / 2)
+    const innerRadius = computed(
+      () => outerRadius.value * Math.max(0, Math.min(1, props.innerRadiusRatio))
+    )
+    const arcs = computed(() =>
+      layoutSunburst(props.data, {
+        cx: cx.value,
+        cy: cy.value,
+        innerRadius: innerRadius.value,
+        outerRadius: outerRadius.value,
+        colors: palette.value
+      })
+    )
     const {
       tooltipPosition,
       resolvedHoveredIndex,
@@ -71,10 +115,10 @@ export const SunburstChart = defineComponent({
       handleMouseMove,
       handleMouseLeave,
       handleClick,
+      handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave,
-      wrapperClasses
+      handleLegendLeave
     } = useChartInteraction<SunburstChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -84,89 +128,84 @@ export const SunburstChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
+      getData: (index) => arcs.value[index]?.datum,
       onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
       onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
-      getData: (index: number) => {
-        const arc = arcs.value[index]
-        return arc ? ({ label: arc.label, value: arc.value } as SunburstChartDatum) : undefined
-      },
       onHover: (index, datum) => emit('arc-hover', index, datum),
-      onClick: (index, datum) => emit('arc-click', index, datum)
+      onClick: (index, datum) => {
+        if (datum) props.onArcClick?.(index, datum)
+        emit('arc-click', index, datum)
+      }
     })
-
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
-    const palette = computed(() => resolveChartPalette(props.colors))
-    const gradientPrefix = getStableChartGradientPrefix('sunburst', useId())
-
-    const outerRadius = computed(() => Math.min(innerRect.value.width, innerRect.value.height) / 2)
-    const innerRadius = computed(
-      () => outerRadius.value * Math.max(0, Math.min(1, props.innerRadiusRatio))
-    )
-
-    const cx = computed(() => innerRect.value.width / 2)
-    const cy = computed(() => innerRect.value.height / 2)
-
-    const arcs = computed(() =>
-      computeSunburstArcs(props.data, {
-        cx: cx.value,
-        cy: cy.value,
-        innerRadius: innerRadius.value,
-        outerRadius: outerRadius.value,
-        colors: palette.value
-      })
-    )
-
-    // Legend uses only root-level items (depth === 0)
-    const rootArcs = computed(() => arcs.value.filter((a) => a.depth === 0))
-
+    const roots = computed(() => arcs.value.filter((arc) => arc.depth === 0))
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
-        data: rootArcs.value,
+        data: roots.value.map((arc) => arc.datum),
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d) => d.label,
-        getColor: (d) => d.color
+        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length]
+      }).map((item, i) => ({ ...item, index: roots.value[i]?.index ?? item.index }))
+    )
+    const tooltipContent = computed(() => {
+      if (resolvedHoveredIndex.value === null) return ''
+      const arc = arcs.value[resolvedHoveredIndex.value]
+      if (!arc) return ''
+      if (props.tooltipFormatter) return props.tooltipFormatter(arc.datum, arc.index)
+      return formatChartTemplate(labels.value.sunburstTooltip, {
+        label: arc.label,
+        value: arc.value,
+        percent: arc.percent.toFixed(1)
       })
-    )
+    })
 
-    const tooltipContent = computed(() =>
-      resolveChartTooltipContent(
-        resolvedHoveredIndex.value,
-        arcs.value,
-        undefined,
-        (arc) => `${arc.label}: ${arc.value}`
-      )
-    )
+    const handleArcKeyDown = (event: KeyboardEvent, index: number) => {
+      if (isChartNavigationKey(event.key)) {
+        event.preventDefault()
+        const next = nextSunburstArcIndex(index, event.key, arcs.value)
+        const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
+          `[data-sunburst-arc][data-index="${next}"]`
+        )
+        if (node instanceof SVGElement) node.focus()
+        handleMouseEnter(next, event)
+        return
+      }
+      handleKeyDown(event, index)
+    }
 
     return () => {
-      const interactive = props.hoverable || props.selectable
-
+      const current = arcs.value
+      const visualActive = current.findIndex(
+        (arc) => arc.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+      )
       const chart = h(
         ChartCanvas,
         {
           width: props.width,
           height: props.height,
           padding: props.padding,
+          responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          onResolvedSizeChange
         },
         {
-          default: () => {
-            const gradientDefs = props.gradient
+          default: () => [
+            props.gradient
               ? h(
                   'defs',
-                  null,
-                  arcs.value.map((arc) =>
+                  current.map((arc) =>
                     h(
                       'linearGradient',
                       {
+                        key: `grad-${arc.index}`,
                         id: `${gradientPrefix}-${arc.index}`,
-                        x1: '0',
-                        y1: '0',
-                        x2: '0',
-                        y2: '1'
+                        gradientUnits: 'userSpaceOnUse',
+                        x1: cx.value,
+                        y1: cy.value - outerRadius.value,
+                        x2: cx.value,
+                        y2: cy.value + outerRadius.value
                       },
                       [
                         h('stop', {
@@ -183,70 +222,69 @@ export const SunburstChart = defineComponent({
                     )
                   )
                 )
-              : null
-
-            const paths = arcs.value.map((arc) => {
-              const opacity = getChartElementOpacity(arc.index, activeIndex.value, {
-                activeOpacity: props.activeOpacity,
-                inactiveOpacity: props.inactiveOpacity
-              })
-              return h('path', {
-                key: `arc-${arc.index}`,
-                d: arc.path,
-                fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
-                opacity,
-                stroke: 'var(--tiger-surface,#ffffff)',
-                'stroke-width': 1,
-                class: classNames(interactive && 'cursor-pointer'),
-                style: {
-                  transition:
-                    'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
-                  filter:
-                    activeIndex.value === arc.index
-                      ? 'var(--tiger-chart-block-active-filter, none)'
-                      : 'none'
-                },
-                tabindex: props.selectable ? 0 : undefined,
-                role: props.selectable ? 'button' : 'img',
-                'aria-label': arc.label,
-                onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
-                onMousemove: handleMouseMove,
-                onMouseleave: handleMouseLeave,
-                onClick: () => handleClick(arc.index)
-              })
-            })
-
-            const labels = props.showLabels
-              ? arcs.value.map((arc) => {
-                  const { x, y } = getSunburstLabelPoint(arc, cx.value, cy.value)
-                  return h(
-                    'text',
-                    {
-                      key: `label-${arc.index}`,
-                      x,
-                      y,
-                      'text-anchor': 'middle',
-                      'dominant-baseline': 'middle',
-                      class: 'fill-white text-xs',
-                      style: { pointerEvents: 'none' },
-                      'aria-hidden': 'true'
-                    },
-                    arc.label
-                  )
+              : null,
+            h('g', { 'data-series-type': 'sunburst' }, [
+              ...current.map((arc, visualIndex) =>
+                h('path', {
+                  key: `arc-${arc.index}`,
+                  d: arc.path,
+                  fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
+                  opacity: getChartElementOpacity(arc.index, activeIndex.value, {
+                    activeOpacity: props.activeOpacity,
+                    inactiveOpacity: props.inactiveOpacity
+                  }),
+                  stroke: 'var(--tiger-surface,#ffffff)',
+                  'stroke-width': 1,
+                  'data-sunburst-arc': '',
+                  'data-index': arc.index,
+                  class: classNames(
+                    interactive.value && 'cursor-pointer',
+                    sunburstArcTransitionClasses
+                  ),
+                  tabindex: interactive.value
+                    ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                    : undefined,
+                  role: interactive.value ? 'button' : undefined,
+                  'aria-hidden': interactive.value ? undefined : true,
+                  'aria-label': interactive.value
+                    ? formatChartTemplate(labels.value.sunburstTooltip, {
+                        label: arc.label,
+                        value: arc.value,
+                        percent: arc.percent.toFixed(1)
+                      })
+                    : undefined,
+                  onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
+                  onMousemove: handleMouseMove,
+                  onMouseleave: handleMouseLeave,
+                  onFocus: (e: FocusEvent) => handleMouseEnter(arc.index, e),
+                  onClick: () => handleClick(arc.index),
+                  onKeydown: (e: KeyboardEvent) => handleArcKeyDown(e, arc.index)
                 })
-              : []
-
-            return h(
-              ChartSeries,
-              { data: arcs.value, type: 'sunburst' },
-              {
-                default: () => [gradientDefs, ...paths, ...labels]
-              }
-            )
-          }
+              ),
+              ...(props.showLabels
+                ? current
+                    .filter((arc) => arc.showLabel)
+                    .map((arc) =>
+                      h(
+                        'text',
+                        {
+                          key: `label-${arc.index}`,
+                          x: arc.labelX,
+                          y: arc.labelY,
+                          fill: arc.labelFill,
+                          class: 'text-xs pointer-events-none select-none',
+                          'text-anchor': 'middle',
+                          'dominant-baseline': 'middle',
+                          'aria-hidden': 'true'
+                        },
+                        arc.label
+                      )
+                    )
+                : [])
+            ])
+          ]
         }
       )
-
       const tooltip = props.showTooltip
         ? h(ChartTooltip, {
             content: tooltipContent.value,
@@ -255,25 +293,34 @@ export const SunburstChart = defineComponent({
             y: tooltipPosition.value.y
           })
         : null
-
-      if (!props.showLegend) {
-        return h('div', { class: 'inline-block relative' }, [chart, tooltip])
-      }
-
-      return h('div', { class: wrapperClasses.value }, [
-        chart,
-        h(ChartLegend, {
-          items: legendItems.value,
-          orientation: chartLegendOrientationFromPosition(props.legendPosition),
-          markerSize: props.legendMarkerSize,
-          gap: props.legendGap,
-          interactive,
-          onItemClick: handleLegendClick,
-          onItemHover: handleLegendHover,
-          onItemLeave: handleLegendLeave
-        }),
-        tooltip
-      ])
+      return h(
+        'div',
+        {
+          class: getCartesianChartShellClasses({
+            showLegend: props.showLegend,
+            legendPosition: props.legendPosition,
+            responsive: props.responsive,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
+        },
+        [
+          chart,
+          props.showLegend
+            ? h(ChartLegend, {
+                items: legendItems.value,
+                orientation: chartLegendOrientationFromPosition(props.legendPosition),
+                markerSize: props.legendMarkerSize,
+                gap: props.legendGap,
+                interactive: interactive.value,
+                ariaLabel: labels.value.legendAriaLabel,
+                onItemClick: handleLegendClick,
+                onItemHover: handleLegendHover,
+                onItemLeave: handleLegendLeave
+              })
+            : null,
+          tooltip
+        ]
+      )
     }
   }
 })

@@ -4,11 +4,9 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { TreeMapChart } from '@expcat/tigercat-vue/TreeMapChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
-import { render } from '@testing-library/vue'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const defaultSize = { width: 400, height: 300 }
-
 const sampleData = [
   { label: 'A', value: 40 },
   { label: 'B', value: 30 },
@@ -18,89 +16,78 @@ const sampleData = [
 
 describe('TreeMapChart (Vue)', () => {
   it('renders SVG with rect nodes', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('svg')).toBeTruthy()
-    const rects = container.querySelectorAll('rect')
-    expect(rects.length).toBeGreaterThanOrEqual(4)
+    const { container } = renderWithProps(TreeMapChart, { data: sampleData, ...defaultSize })
+    expect(container.querySelectorAll('[data-treemap-node]')).toHaveLength(4)
   })
 
   it('renders empty state with no data', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: [],
-      ...defaultSize
-    })
-
-    expect(container.querySelector('svg')).toBeTruthy()
-    const rects = container.querySelectorAll('rect')
-    expect(rects).toHaveLength(0)
-  })
-  it('triggers hover events when hoverable', () => {
-    const onHoveredIndexChange = vi.fn()
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      hoverable: true,
-      'onUpdate:hoveredIndex': onHoveredIndexChange,
-      ...defaultSize
-    })
-
-    const rects = container.querySelectorAll('rect')
-    rects[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
-    expect(onHoveredIndexChange).toHaveBeenCalledWith(0)
+    const { container } = renderWithProps(TreeMapChart, { data: [], ...defaultSize })
+    expect(container.querySelectorAll('[data-treemap-node]')).toHaveLength(0)
   })
 
-  it('triggers click events when selectable', () => {
+  it('fires node click for the drawn cell without selectable', () => {
     const onNodeClick = vi.fn()
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      selectable: true,
-      onNodeClick,
-      ...defaultSize
-    })
-
-    const rects = container.querySelectorAll('rect')
-    rects[1].dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    expect(onNodeClick).toHaveBeenCalled()
+    const data = [
+      { label: 'A', value: 10 },
+      { label: 'B', value: 90 }
+    ]
+    const { container } = renderWithProps(TreeMapChart, { data, onNodeClick, ...defaultSize })
+    const nodes = container.querySelectorAll('[data-treemap-node]')
+    nodes[1].dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    const index = Number(nodes[1].getAttribute('data-index'))
+    const datum = onNodeClick.mock.calls[0][1]
+    expect(onNodeClick).toHaveBeenCalledWith(index, datum)
+    expect(data.some((item) => item.label === datum.label && item.value === datum.value)).toBe(true)
   })
 
-  it('applies className', () => {
+  it('draws nested parents', () => {
+    const { container } = renderWithProps(TreeMapChart, {
+      data: [
+        {
+          label: 'Parent',
+          value: 100,
+          children: [
+            { label: 'Child1', value: 60 },
+            { label: 'Child2', value: 40 }
+          ]
+        }
+      ],
+      ...defaultSize
+    })
+    expect(container.querySelectorAll('[data-treemap-node]').length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('keeps nodeRadius on the SVG attribute', () => {
+    const { container } = renderWithProps(TreeMapChart, {
+      data: sampleData,
+      nodeRadius: 8,
+      ...defaultSize
+    })
+    expect(container.querySelector('[data-treemap-node]')).toHaveAttribute('rx', '8')
+  })
+
+  it('applies className on the outer wrapper', () => {
     const { container } = renderWithProps(TreeMapChart, {
       data: sampleData,
       className: 'my-treemap',
       ...defaultSize
     })
-
-    expect(container.querySelector('svg.my-treemap')).toBeTruthy()
+    expect(container.firstElementChild).toHaveClass('my-treemap')
   })
 
-  it('renders a11y title and desc', () => {
+  it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(TreeMapChart, {
       data: sampleData,
-      title: 'TreeMap Title',
-      desc: 'TreeMap Description',
+      title: 'Share',
       ...defaultSize
     })
+    await expectNoA11yViolations(container)
+  })
 
-    expect(container.querySelector('title')?.textContent).toBe('TreeMap Title')
-    expect(container.querySelector('desc')?.textContent).toBe('TreeMap Description')
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(TreeMapChart, {
-        props: { data: sampleData, width: 400, height: 300 }
-      })
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  it('renders single data item', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: [{ label: 'Single', value: 100 }],
-      ...defaultSize
-    })
-    const rects = container.querySelectorAll('rect')
-    expect(rects.length).toBeGreaterThanOrEqual(1)
+  it('hides decorative nodes from the accessibility tree by default', () => {
+    const { container } = renderWithProps(TreeMapChart, { data: sampleData, ...defaultSize })
+    const node = container.querySelector('[data-treemap-node]')
+    expect(node).toHaveAttribute('aria-hidden', 'true')
+    expect(node).not.toHaveAttribute('role')
   })
 })

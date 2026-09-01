@@ -335,9 +335,9 @@ export type { VueGaugeChartProps, GaugeChartProps } from './components/GaugeChar
 export { HeatmapChart } from './components/HeatmapChart'
 export type { VueHeatmapChartProps, HeatmapChartProps } from './components/HeatmapChart'
 export { TreeMapChart } from './components/TreeMapChart'
-export type { VueTreeMapChartProps } from './components/TreeMapChart'
+export type { VueTreeMapChartProps, TreeMapChartProps } from './components/TreeMapChart'
 export { SunburstChart } from './components/SunburstChart'
-export type { VueSunburstChartProps } from './components/SunburstChart'
+export type { VueSunburstChartProps, SunburstChartProps } from './components/SunburstChart'
 
 // Other components
 export { Carousel } from './components/Carousel'

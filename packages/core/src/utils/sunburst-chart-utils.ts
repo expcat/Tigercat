@@ -1,39 +1,101 @@
 /**
- * Sunburst chart utilities
- * Multi-level arc layout for hierarchical data
+ * Multi-level sunburst layout. Starts at 12 o'clock and runs clockwise.
+ * Vue/React only bind the returned geometry.
  */
 
 import type { SunburstChartDatum } from '../types/chart'
 import { DEFAULT_CHART_COLORS, createPieArcPath, polarToCartesian } from './chart-utils'
+import { heatmapLabelFill } from './heatmap-chart-utils'
+import { isFiniteNumber } from './chart/layout'
+import { devWarn } from './dev-warn'
+
+export const DEFAULT_SUNBURST_SIZE = 320
+export const DEFAULT_SUNBURST_PADDING = 24
+export const DEFAULT_SUNBURST_START_ANGLE = -Math.PI / 2
+export const DEFAULT_SUNBURST_END_ANGLE = (3 * Math.PI) / 2
+
+export const sunburstArcTransitionClasses =
+  'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
 
 export interface SunburstArc {
-  /** Flat list index */
   index: number
-  /** Label */
   label: string
-  /** Value */
   value: number
-  /** Ring depth (0 = innermost) */
   depth: number
-  /** Start angle in radians */
   startAngle: number
-  /** End angle in radians */
   endAngle: number
-  /** Fill color */
   color: string
-  /** SVG arc path */
   path: string
-  /** Midpoint angle (for labels) */
   midAngle: number
-  /** Inner radius of this ring */
   innerRadius: number
-  /** Outer radius of this ring */
   outerRadius: number
+  datum: SunburstChartDatum
+  parentIndex: number | null
+  childIndices: number[]
+  showLabel: boolean
+  labelX: number
+  labelY: number
+  labelFill: string
+  percent: number
 }
 
-/**
- * Label anchor at the ring midpoint along `midAngle`.
- */
+export interface LayoutSunburstOptions {
+  cx: number
+  cy: number
+  innerRadius: number
+  outerRadius: number
+  colors?: string[]
+}
+
+function nodeValue(datum: SunburstChartDatum): number | null {
+  const children = datum.children
+  if (children && children.length > 0) {
+    let sum = 0
+    let any = false
+    for (const child of children) {
+      const childValue = nodeValue(child)
+      if (childValue === null) continue
+      any = true
+      sum += childValue
+    }
+    if (any) {
+      if (isFiniteNumber(datum.value) && datum.value !== sum) {
+        devWarn(
+          'SunburstChart.parentValue',
+          'SunburstChart parent value differs from the sum of children; children sum is used for sweep'
+        )
+      }
+      return sum
+    }
+  }
+  if (!isFiniteNumber(datum.value)) {
+    devWarn('SunburstChart.nonFinite', 'SunburstChart skipped a datum with a non-finite value')
+    return null
+  }
+  if (datum.value < 0) {
+    devWarn('SunburstChart.negative', 'SunburstChart skipped a datum with a negative value')
+    return null
+  }
+  if (datum.value === 0) {
+    devWarn('SunburstChart.zero', 'SunburstChart skipped a datum with value 0')
+    return null
+  }
+  return datum.value
+}
+
+function maxDrawnDepth(data: readonly SunburstChartDatum[]): number {
+  let max = 0
+  const walk = (items: readonly SunburstChartDatum[], depth: number) => {
+    for (const item of items) {
+      if (nodeValue(item) === null) continue
+      max = Math.max(max, depth)
+      if (item.children && item.children.length > 0) walk(item.children, depth + 1)
+    }
+  }
+  walk(data, 0)
+  return max
+}
+
 export function getSunburstLabelPoint(
   arc: Pick<SunburstArc, 'innerRadius' | 'outerRadius' | 'midAngle'>,
   cx: number,
@@ -43,81 +105,70 @@ export function getSunburstLabelPoint(
   return polarToCartesian(cx, cy, midRadius, arc.midAngle)
 }
 
-function sumValue(d: SunburstChartDatum): number {
-  let v: number
-  if (d.children && d.children.length > 0) {
-    v = d.children.reduce((s, c) => s + sumValue(c), 0)
-  } else {
-    v = d.value
+export function nextSunburstArcIndex(
+  index: number,
+  key: string,
+  arcs: readonly SunburstArc[]
+): number {
+  const arc = arcs[index]
+  if (!arc) return index
+  if (key === 'ArrowUp' && arc.parentIndex !== null) return arc.parentIndex
+  if (key === 'ArrowDown' && arc.childIndices.length > 0) return arc.childIndices[0]
+  if (key === 'ArrowLeft' || key === 'ArrowRight') {
+    const siblings = arcs.filter(
+      (item) => item.depth === arc.depth && item.parentIndex === arc.parentIndex
+    )
+    const pos = siblings.findIndex((item) => item.index === arc.index)
+    if (pos < 0 || siblings.length === 0) return index
+    const delta = key === 'ArrowRight' ? 1 : -1
+    const next = siblings[(pos + delta + siblings.length) % siblings.length]
+    return next.index
   }
-  return Number.isFinite(v) ? Math.max(0, v) : 0
+  return index
 }
 
-/**
- * Flatten hierarchical data into arc descriptors with depth levels.
- */
-export function computeSunburstArcs(
-  data: SunburstChartDatum[],
-  opts: {
-    cx: number
-    cy: number
-    innerRadius: number
-    outerRadius: number
-    colors?: string[]
-  }
+export function layoutSunburst(
+  data: readonly SunburstChartDatum[],
+  opts: LayoutSunburstOptions
 ): SunburstArc[] {
-  const { innerRadius, outerRadius, colors } = opts
-  const cx = Number.isFinite(opts.cx) ? opts.cx : 0
-  const cy = Number.isFinite(opts.cy) ? opts.cy : 0
-  const safeInnerRadius = Number.isFinite(innerRadius) ? Math.max(0, innerRadius) : 0
-  const safeOuterRadius = Number.isFinite(outerRadius)
-    ? Math.max(safeInnerRadius, outerRadius)
-    : safeInnerRadius
-  const palette = colors ?? DEFAULT_CHART_COLORS
-
-  // Determine max depth
-  function maxDepth(items: SunburstChartDatum[], d: number): number {
-    let m = d
-    for (const item of items) {
-      if (item.children && item.children.length > 0) {
-        m = Math.max(m, maxDepth(item.children, d + 1))
-      }
-    }
-    return m
-  }
-
-  const depth = maxDepth(data, 0)
-  const ringWidth =
-    depth > 0
-      ? (safeOuterRadius - safeInnerRadius) / (depth + 1)
-      : safeOuterRadius - safeInnerRadius
-
+  const cx = isFiniteNumber(opts.cx) ? opts.cx : 0
+  const cy = isFiniteNumber(opts.cy) ? opts.cy : 0
+  const safeInner = isFiniteNumber(opts.innerRadius) ? Math.max(0, opts.innerRadius) : 0
+  const safeOuter = isFiniteNumber(opts.outerRadius)
+    ? Math.max(safeInner, opts.outerRadius)
+    : safeInner
+  if (!(safeOuter > safeInner) && safeOuter <= 0) return []
+  const palette = opts.colors && opts.colors.length > 0 ? opts.colors : DEFAULT_CHART_COLORS
+  const depth = maxDrawnDepth(data)
+  const ringCount = depth + 1
+  const ringWidth = ringCount > 0 ? (safeOuter - safeInner) / ringCount : 0
   const arcs: SunburstArc[] = []
-  let flatIndex = 0
+  const rootTotal = data.reduce((sum, item) => sum + (nodeValue(item) ?? 0), 0)
+  if (!(rootTotal > 0)) return []
 
-  function layoutLevel(
-    items: SunburstChartDatum[],
+  const layoutLevel = (
+    items: readonly SunburstChartDatum[],
     startAngle: number,
     endAngle: number,
     level: number,
-    parentColorIdx: number
-  ): void {
-    const total = items.reduce((s, d) => s + sumValue(d), 0)
-    if (total === 0) return
-
+    parentIndex: number | null,
+    parentColor: string
+  ): number[] => {
+    const sized = items
+      .map((datum) => ({ datum, value: nodeValue(datum) }))
+      .filter((item): item is { datum: SunburstChartDatum; value: number } => item.value !== null)
+    const total = sized.reduce((sum, item) => sum + item.value, 0)
+    if (!(total > 0)) return []
+    const childIndices: number[] = []
     let angle = startAngle
-    items.forEach((item, i) => {
-      const val = sumValue(item)
-      const sweep = ((endAngle - startAngle) * val) / total
+    sized.forEach((item, i) => {
+      const sweep = ((endAngle - startAngle) * item.value) / total
       const sa = angle
       const ea = angle + sweep
-
-      const iR = safeInnerRadius + level * ringWidth
-      const oR = Math.max(iR, iR + ringWidth - 1) // 1px gap between rings
-
-      const colorIdx = level === 0 ? i : parentColorIdx
-      const color = item.color ?? palette[colorIdx % palette.length]
-
+      const hasChildren = Boolean(item.datum.children && item.datum.children.length > 0)
+      const iR = safeInner + level * ringWidth
+      const oR = hasChildren ? Math.max(iR, iR + ringWidth - 1) : safeOuter
+      const color = item.datum.color ?? (level === 0 ? palette[i % palette.length] : parentColor)
       const path = createPieArcPath({
         cx,
         cy,
@@ -126,30 +177,59 @@ export function computeSunburstArcs(
         startAngle: sa,
         endAngle: ea
       })
-
+      if (!path || path.includes('NaN')) {
+        angle = ea
+        return
+      }
+      const midAngle = (sa + ea) / 2
+      const midRadius = (iR + oR) / 2
+      const arcLength = Math.abs(ea - sa) * midRadius
+      const labelPos = polarToCartesian(cx, cy, midRadius, midAngle)
+      const index = arcs.length
       arcs.push({
-        index: flatIndex++,
-        label: item.label,
-        value: val,
+        index,
+        label: item.datum.label,
+        value: item.value,
         depth: level,
         startAngle: sa,
         endAngle: ea,
         color,
         path,
-        midAngle: (sa + ea) / 2,
+        midAngle,
         innerRadius: iR,
-        outerRadius: oR
+        outerRadius: oR,
+        datum: item.datum,
+        parentIndex,
+        childIndices: [],
+        showLabel: arcLength >= 14 && oR - iR >= 10,
+        labelX: labelPos.x,
+        labelY: labelPos.y,
+        labelFill: heatmapLabelFill(color, 0.6),
+        percent: rootTotal > 0 ? (item.value / rootTotal) * 100 : 0
       })
-
-      if (item.children && item.children.length > 0) {
-        layoutLevel(item.children, sa, ea, level + 1, colorIdx)
+      childIndices.push(index)
+      if (hasChildren) {
+        arcs[index].childIndices = layoutLevel(
+          item.datum.children!,
+          sa,
+          ea,
+          level + 1,
+          index,
+          color
+        )
       }
-
       angle = ea
     })
+    return childIndices
   }
 
-  layoutLevel(data, -Math.PI / 2, (3 * Math.PI) / 2, 0, 0)
-
+  layoutLevel(data, DEFAULT_SUNBURST_START_ANGLE, DEFAULT_SUNBURST_END_ANGLE, 0, null, palette[0])
   return arcs
+}
+
+export function computeSunburstArcs(
+  data: SunburstChartDatum[],
+  opts: LayoutSunburstOptions
+): SunburstArc[] {
+  return layoutSunburst(data, opts)
 }

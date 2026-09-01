@@ -1,14 +1,26 @@
 import React, { useId, useMemo } from 'react'
 import {
   classNames,
-  computeTreeMapNodes,
+  layoutTreeMap,
   getChartElementOpacity,
-  getChartInnerRect,
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
-  resolveChartTooltipContent,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
+  formatChartTemplate,
+  treemapNodeTransitionClasses,
+  DEFAULT_TREEMAP_WIDTH,
+  DEFAULT_TREEMAP_HEIGHT,
+  DEFAULT_TREEMAP_PADDING,
+  DEFAULT_TREEMAP_GAP,
+  DEFAULT_TREEMAP_NODE_RADIUS,
+  DEFAULT_TREEMAP_MIN_LABEL_SIZE,
   type ChartLegendItem,
   type ChartPadding,
   type TreeMapChartDatum,
@@ -18,11 +30,12 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface TreeMapChartProps extends CoreTreeMapChartProps {
   data: TreeMapChartDatum[]
   padding?: ChartPadding
-  tooltipFormatter?: (datum: TreeMapChartDatum, index: number) => string
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
   onNodeClick?: (index: number, datum: TreeMapChartDatum) => void
@@ -30,13 +43,15 @@ export interface TreeMapChartProps extends CoreTreeMapChartProps {
 }
 
 export const TreeMapChart: React.FC<TreeMapChartProps> = ({
-  width = 400,
-  height = 300,
-  padding = 8,
+  width = DEFAULT_TREEMAP_WIDTH,
+  height = DEFAULT_TREEMAP_HEIGHT,
+  padding = DEFAULT_TREEMAP_PADDING,
+  responsive = false,
   data,
-  gap = 2,
+  gap = DEFAULT_TREEMAP_GAP,
   showLabels = true,
-  minLabelSize = 10,
+  minLabelSize = DEFAULT_TREEMAP_MIN_LABEL_SIZE,
+  nodeRadius = DEFAULT_TREEMAP_NODE_RADIUS,
   colors,
   gradient = false,
   hoverable = false,
@@ -50,7 +65,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   legendMarkerSize = 10,
   legendGap = 8,
   showTooltip = true,
-  tooltipFormatter: _tooltipFormatter,
+  tooltipFormatter,
   title,
   desc,
   className,
@@ -59,9 +74,14 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   onNodeClick,
   onNodeHover
 }) => {
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const interactive = hoverable || selectable || Boolean(onNodeClick)
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
   const gradientId = useId()
@@ -69,18 +89,17 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     () => getStableChartGradientPrefix('treemap', gradientId),
     [gradientId]
   )
-
   const nodes = useMemo(
     () =>
-      computeTreeMapNodes(data, {
+      layoutTreeMap(data, {
         width: innerRect.width,
         height: innerRect.height,
         gap,
-        colors: palette
+        colors: palette,
+        minLabelSize
       }),
-    [data, innerRect.width, innerRect.height, gap, palette]
+    [data, innerRect.width, innerRect.height, gap, palette, minLabelSize]
   )
-
   const {
     tooltipPosition,
     resolvedHoveredIndex,
@@ -90,10 +109,10 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     handleMouseMove,
     handleMouseLeave,
     handleClick,
+    handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<TreeMapChartDatum>({
     hoverable,
     showTooltip,
@@ -103,77 +122,103 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     activeOpacity,
     inactiveOpacity,
     legendPosition,
-    getData: (index: number) => {
-      const node = nodes[index]
-      return node ? ({ label: node.label, value: node.value } as TreeMapChartDatum) : undefined
-    },
+    getData: (index: number) => nodes[index]?.datum,
     onHoveredIndexChange: (index) => {
       onHoveredIndexChange?.(index)
-      const node = index !== null ? nodes[index] : null
-      onNodeHover?.(
-        index,
-        node ? ({ label: node.label, value: node.value } as TreeMapChartDatum) : null
-      )
+      onNodeHover?.(index, index !== null ? (nodes[index]?.datum ?? null) : null)
     },
     onSelectedIndexChange,
     onClick: onNodeClick
   })
-
-  const total = useMemo(() => nodes.reduce((s, n) => s + n.value, 0), [nodes])
-
+  const rootTotal = useMemo(
+    () => nodes.filter((node) => node.depth === 0).reduce((sum, node) => sum + node.value, 0),
+    [nodes]
+  )
+  const roots = useMemo(() => nodes.filter((node) => node.depth === 0), [nodes])
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
-        data: nodes,
+        data: roots.map((node) => node.datum),
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
         getLabel: (d) => d.label,
-        getColor: (d) => d.color
-      }),
-    [nodes, palette, activeIndex, resolvedSelectedIndex]
+        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length]
+      }).map((item, i) => ({ ...item, index: roots[i]?.index ?? item.index })),
+    [roots, palette, activeIndex, resolvedSelectedIndex]
+  )
+  const tooltipContent = useMemo(() => {
+    if (resolvedHoveredIndex === null) return ''
+    const node = nodes[resolvedHoveredIndex]
+    if (!node) return ''
+    if (tooltipFormatter) return tooltipFormatter(node.datum, node.index)
+    const percent = rootTotal > 0 ? ((node.value / rootTotal) * 100).toFixed(1) : '0'
+    return formatChartTemplate(labels.treemapTooltip, {
+      label: node.label,
+      value: node.value,
+      percent
+    })
+  }, [resolvedHoveredIndex, nodes, tooltipFormatter, rootTotal, labels.treemapTooltip])
+  const visualActive = nodes.findIndex(
+    (node) => node.index === (activeIndex ?? resolvedHoveredIndex)
   )
 
-  const tooltipContent = useMemo(
-    () =>
-      resolveChartTooltipContent(resolvedHoveredIndex, nodes, undefined, (node) => {
-        const pct = total > 0 ? ((node.value / total) * 100).toFixed(1) : '0'
-        return `${node.label}: ${node.value} (${pct}%)`
-      }),
-    [resolvedHoveredIndex, nodes, total]
-  )
-
-  const interactive = hoverable || selectable
+  const handleNodeKeyDown = (event: React.KeyboardEvent<SVGRectElement>, visualIndex: number) => {
+    if (isChartNavigationKey(event.key)) {
+      event.preventDefault()
+      const nextVisual = nextChartRovingIndex(visualIndex, event.key, nodes.length)
+      const next = nodes[nextVisual]
+      const node = event.currentTarget.parentElement?.querySelector(
+        `[data-treemap-node][data-index="${next.index}"]`
+      )
+      if (node instanceof SVGElement) node.focus()
+      handleMouseEnter(next.index, event)
+      return
+    }
+    handleKeyDown(event, nodes[visualIndex].index)
+  }
 
   const chart = (
     <ChartCanvas
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      onResolvedSizeChange={onResolvedSizeChange}>
+      <defs>
+        {gradient &&
+          nodes.map((node) => (
+            <linearGradient
+              key={`grad-${node.index}`}
+              id={`${gradientPrefix}-${node.index}`}
+              gradientUnits="userSpaceOnUse"
+              x1={0}
+              y1={0}
+              x2={0}
+              y2={innerRect.height}>
+              <stop offset="0%" stopColor={node.color} stopOpacity={1} />
+              <stop offset="100%" stopColor={node.color} stopOpacity={0.7} />
+            </linearGradient>
+          ))}
+        {nodes.map((node) => (
+          <clipPath key={`clip-${node.index}`} id={`${gradientPrefix}-clip-${node.index}`}>
+            <rect x={node.x} y={node.y} width={node.w} height={node.h} />
+          </clipPath>
+        ))}
+      </defs>
       <g data-series-type="treemap">
-        {gradient && (
-          <defs>
-            {nodes.map((node) => (
-              <linearGradient
-                key={`grad-${node.index}`}
-                id={`${gradientPrefix}-${node.index}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1">
-                <stop offset="0%" stopColor={node.color} stopOpacity={1} />
-                <stop offset="100%" stopColor={node.color} stopOpacity={0.7} />
-              </linearGradient>
-            ))}
-          </defs>
-        )}
-        {nodes.map((node) => {
+        {nodes.map((node, visualIndex) => {
           const opacity = getChartElementOpacity(node.index, activeIndex, {
             activeOpacity,
             inactiveOpacity
+          })
+          const percent = rootTotal > 0 ? ((node.value / rootTotal) * 100).toFixed(1) : '0'
+          const ariaLabel = formatChartTemplate(labels.treemapTooltip, {
+            label: node.label,
+            value: node.value,
+            percent
           })
           return (
             <React.Fragment key={`node-${node.index}`}>
@@ -182,37 +227,41 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 y={node.y}
                 width={node.w}
                 height={node.h}
-                rx={2}
+                rx={nodeRadius}
                 fill={gradient ? `url(#${gradientPrefix}-${node.index})` : node.color}
                 opacity={opacity}
-                className={classNames(interactive && 'cursor-pointer')}
-                style={
-                  {
-                    transition:
-                      'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
-                    rx: 'var(--tiger-chart-block-radius, 2px)',
-                    filter:
-                      activeIndex === node.index
-                        ? 'var(--tiger-chart-block-active-filter, none)'
-                        : 'none'
-                  } as React.CSSProperties
+                data-treemap-node=""
+                data-index={node.index}
+                className={classNames(
+                  interactive && 'cursor-pointer',
+                  treemapNodeTransitionClasses
+                )}
+                tabIndex={
+                  interactive
+                    ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                    : undefined
                 }
+                role={interactive ? 'button' : undefined}
+                aria-hidden={interactive ? undefined : true}
+                aria-label={interactive ? ariaLabel : undefined}
                 onMouseEnter={(e) => handleMouseEnter(node.index, e)}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
+                onFocus={(e) => handleMouseEnter(node.index, e)}
                 onClick={() => handleClick(node.index)}
+                onKeyDown={(e) => handleNodeKeyDown(e, visualIndex)}
               />
-              {showLabels && node.w > 30 && node.h > minLabelSize + 4 && (
+              {showLabels && node.showLabel && (
                 <text
                   x={node.x + node.w / 2}
-                  y={node.y + node.h / 2}
-                  className="fill-white text-xs"
+                  y={node.y + Math.min(14, node.h / 2)}
+                  fill={node.labelFill}
+                  className="pointer-events-none select-none"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  style={{
-                    pointerEvents: 'none',
-                    fontSize: `${Math.min(12, node.h * 0.3)}px`
-                  }}>
+                  fontSize={node.fontSize}
+                  clipPath={`url(#${gradientPrefix}-clip-${node.index})`}
+                  aria-hidden="true">
                   {node.label}
                 </text>
               )}
@@ -232,29 +281,31 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     />
   ) : null
 
-  if (!showLegend) {
-    return (
-      <div className="inline-block relative">
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
-
   return (
-    <div className={wrapperClasses}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        orientation={chartLegendOrientationFromPosition(legendPosition)}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={interactive}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={interactive}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )
 }
+
+export default TreeMapChart

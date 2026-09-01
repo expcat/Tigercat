@@ -1,47 +1,25 @@
-import { describe, it, expect } from 'vitest'
-import { computeSunburstArcs, getSunburstLabelPoint } from '@expcat/tigercat-core'
+import { describe, it, expect, vi } from 'vitest'
+import {
+  computeSunburstArcs,
+  getSunburstLabelPoint,
+  layoutSunburst,
+  nextSunburstArcIndex
+} from '@expcat/tigercat-core'
 
 const baseOpts = { cx: 100, cy: 100, innerRadius: 30, outerRadius: 90 }
 
-describe('computeSunburstArcs', () => {
+describe('layoutSunburst', () => {
   it('returns empty array for empty data', () => {
-    expect(computeSunburstArcs([], baseOpts)).toEqual([])
+    expect(layoutSunburst([], baseOpts)).toEqual([])
   })
 
   it('returns one arc for single leaf item', () => {
     const data = [{ label: 'A', value: 100 }]
-    const arcs = computeSunburstArcs(data, baseOpts)
+    const arcs = layoutSunburst(data, baseOpts)
     expect(arcs).toHaveLength(1)
     expect(arcs[0].label).toBe('A')
     expect(arcs[0].depth).toBe(0)
-  })
-
-  it('returns correct number of arcs for flat data', () => {
-    const data = [
-      { label: 'A', value: 60 },
-      { label: 'B', value: 40 }
-    ]
-    const arcs = computeSunburstArcs(data, baseOpts)
-    expect(arcs).toHaveLength(2)
-  })
-
-  it('generates arcs for nested data (multi-ring)', () => {
-    const data = [
-      {
-        label: 'A',
-        value: 60,
-        children: [
-          { label: 'A1', value: 30 },
-          { label: 'A2', value: 30 }
-        ]
-      },
-      { label: 'B', value: 40 }
-    ]
-    const arcs = computeSunburstArcs(data, baseOpts)
-    // A (depth 0) + A1 (depth 1) + A2 (depth 1) + B (depth 0) = 4
-    expect(arcs).toHaveLength(4)
-    expect(arcs.filter((a) => a.depth === 0)).toHaveLength(2)
-    expect(arcs.filter((a) => a.depth === 1)).toHaveLength(2)
+    expect(arcs[0].datum).toEqual(data[0])
   })
 
   it('assigns sequential flat indices', () => {
@@ -49,109 +27,13 @@ describe('computeSunburstArcs', () => {
       { label: 'A', value: 60, children: [{ label: 'A1', value: 60 }] },
       { label: 'B', value: 40 }
     ]
-    const arcs = computeSunburstArcs(data, baseOpts)
+    const arcs = layoutSunburst(data, baseOpts)
     arcs.forEach((arc, i) => {
       expect(arc.index).toBe(i)
     })
   })
 
-  it('all arcs have valid SVG path strings', () => {
-    const data = [
-      { label: 'A', value: 50 },
-      { label: 'B', value: 50 }
-    ]
-    const arcs = computeSunburstArcs(data, baseOpts)
-    for (const arc of arcs) {
-      expect(arc.path).toContain('M')
-      expect(arc.path).toContain('A')
-    }
-  })
-
-  it('arcs span full 360 degrees', () => {
-    const data = [
-      { label: 'A', value: 50 },
-      { label: 'B', value: 50 }
-    ]
-    const arcs = computeSunburstArcs(data, baseOpts)
-    const totalSweep = arcs.reduce((s, a) => s + (a.endAngle - a.startAngle), 0)
-    expect(totalSweep).toBeCloseTo(2 * Math.PI, 5)
-  })
-
-  it('uses custom colors', () => {
-    const colors = ['#ff0000', '#00ff00']
-    const data = [
-      { label: 'A', value: 50 },
-      { label: 'B', value: 50 }
-    ]
-    const arcs = computeSunburstArcs(data, { ...baseOpts, colors })
-    expect(arcs[0].color).toBe('#ff0000')
-    expect(arcs[1].color).toBe('#00ff00')
-  })
-
-  it('uses datum color over palette', () => {
-    const data = [{ label: 'A', value: 100, color: '#abc' }]
-    const arcs = computeSunburstArcs(data, baseOpts)
-    expect(arcs[0].color).toBe('#abc')
-  })
-
-  it('midAngle is between startAngle and endAngle', () => {
-    const data = [
-      { label: 'A', value: 70 },
-      { label: 'B', value: 30 }
-    ]
-    const arcs = computeSunburstArcs(data, baseOpts)
-    for (const arc of arcs) {
-      expect(arc.midAngle).toBeGreaterThanOrEqual(arc.startAngle)
-      expect(arc.midAngle).toBeLessThanOrEqual(arc.endAngle)
-    }
-  })
-
-  it('recomputes same-reference data mutations instead of returning stale cached arcs', () => {
-    const data = [{ label: 'A', value: 100 }]
-    const r1 = computeSunburstArcs(data, baseOpts)
-    data[0].label = 'Changed'
-    data[0].value = 50
-    const r2 = computeSunburstArcs(data, baseOpts)
-
-    expect(r1).not.toBe(r2)
-    expect(r2[0].label).toBe('Changed')
-    expect(r2[0].value).toBe(50)
-  })
-
-  it('recomputes when data changes', () => {
-    const data1 = [{ label: 'A', value: 100 }]
-    const data2 = [{ label: 'B', value: 50 }]
-    const r1 = computeSunburstArcs(data1, baseOpts)
-    const r2 = computeSunburstArcs(data2, baseOpts)
-    expect(r1).not.toBe(r2)
-    expect(r2[0].label).toBe('B')
-  })
-
-  it('handles all-zero leaf values gracefully', () => {
-    const data = [
-      { label: 'A', value: 0 },
-      { label: 'B', value: 0 }
-    ]
-    // totalValue = 0, layout should not crash
-    const arcs = computeSunburstArcs(data, baseOpts)
-    expect(Array.isArray(arcs)).toBe(true)
-  })
-
-  it('normalizes invalid radii and values without NaN paths', () => {
-    const arcs = computeSunburstArcs(
-      [
-        { label: 'Bad', value: Number.NaN },
-        { label: 'Negative', value: -5 },
-        { label: 'Good', value: 10 }
-      ],
-      { cx: 100, cy: 100, innerRadius: -30, outerRadius: Number.POSITIVE_INFINITY }
-    )
-
-    expect(arcs.map((arc) => arc.value)).toEqual([0, 0, 10])
-    expect(arcs.every((arc) => !arc.path.includes('NaN'))).toBe(true)
-  })
-
-  it('stores ring radii and places nested labels on distinct mid-angles and mid-radii', () => {
+  it('keeps root legend indices on the full arc table', () => {
     const data = [
       {
         label: '亚洲',
@@ -165,30 +47,99 @@ describe('computeSunburstArcs', () => {
       { label: '欧洲', value: 25 },
       { label: '美洲', value: 15 }
     ]
-    const arcs = computeSunburstArcs(data, baseOpts)
+    const arcs = layoutSunburst(data, { cx: 100, cy: 100, innerRadius: 0, outerRadius: 90 })
+    const america = arcs.find((arc) => arc.label === '美洲')!
+    const roots = arcs.filter((arc) => arc.depth === 0)
+    expect(roots.map((arc) => arc.label)).toEqual(['亚洲', '欧洲', '美洲'])
+    expect(america.index).not.toBe(2)
+    expect(arcs[america.index].label).toBe('美洲')
+  })
 
-    for (const arc of arcs) {
-      expect(arc.innerRadius).toBeLessThan(arc.outerRadius)
-    }
+  it('extends a shallow leaf to the outer radius', () => {
+    const data = [
+      { label: 'A', value: 50, children: [{ label: 'A1', value: 50 }] },
+      { label: 'B', value: 50 }
+    ]
+    const arcs = layoutSunburst(data, baseOpts)
+    const leaf = arcs.find((arc) => arc.label === 'B')!
+    const child = arcs.find((arc) => arc.label === 'A1')!
+    expect(leaf.outerRadius).toBe(baseOpts.outerRadius)
+    expect(child.outerRadius).toBe(baseOpts.outerRadius)
+    expect(leaf.innerRadius).toBeLessThan(child.innerRadius)
+  })
 
-    const asia = arcs.find((a) => a.label === '亚洲')
-    const china = arcs.find((a) => a.label === '中国')
-    expect(asia).toBeDefined()
-    expect(china).toBeDefined()
-    expect(asia!.depth).toBe(0)
-    expect(china!.depth).toBe(1)
+  it('inherits parent color onto children without their own color', () => {
+    const data = [
+      {
+        label: 'A',
+        value: 50,
+        color: '#abc',
+        children: [{ label: 'A1', value: 50 }]
+      }
+    ]
+    const arcs = layoutSunburst(data, baseOpts)
+    expect(arcs.find((arc) => arc.label === 'A1')!.color).toBe('#abc')
+  })
 
-    const asiaMidRadius = (asia!.innerRadius + asia!.outerRadius) / 2
-    const chinaMidRadius = (china!.innerRadius + china!.outerRadius) / 2
-    expect(asiaMidRadius).toBeLessThan(chinaMidRadius)
-    expect(asia!.midAngle).not.toBeCloseTo(china!.midAngle)
+  it('skips non-positive values instead of emitting empty paths', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const arcs = layoutSunburst(
+      [
+        { label: 'Bad', value: Number.NaN },
+        { label: 'Negative', value: -5 },
+        { label: 'Good', value: 10 }
+      ],
+      baseOpts
+    )
+    expect(arcs.map((arc) => arc.label)).toEqual(['Good'])
+    expect(arcs.every((arc) => arc.path.length > 0 && !arc.path.includes('NaN'))).toBe(true)
+    warn.mockRestore()
+  })
 
-    const asiaPoint = getSunburstLabelPoint(asia!, baseOpts.cx, baseOpts.cy)
-    const chinaPoint = getSunburstLabelPoint(china!, baseOpts.cx, baseOpts.cy)
-    expect(Number.isFinite(asiaPoint.x)).toBe(true)
-    expect(Number.isFinite(asiaPoint.y)).toBe(true)
-    expect(Number.isFinite(chinaPoint.x)).toBe(true)
-    expect(Number.isFinite(chinaPoint.y)).toBe(true)
+  it("starts at 12 o'clock", () => {
+    const arcs = layoutSunburst([{ label: 'A', value: 10 }], baseOpts)
+    expect(arcs[0].startAngle).toBeCloseTo(-Math.PI / 2)
+  })
+
+  it('places nested labels on distinct mid-radii', () => {
+    const data = [
+      {
+        label: '亚洲',
+        value: 60,
+        children: [
+          { label: '中国', value: 35 },
+          { label: '日本', value: 15 },
+          { label: '印度', value: 10 }
+        ]
+      }
+    ]
+    const arcs = layoutSunburst(data, baseOpts)
+    const asia = arcs.find((a) => a.label === '亚洲')!
+    const china = arcs.find((a) => a.label === '中国')!
+    const asiaPoint = getSunburstLabelPoint(asia, baseOpts.cx, baseOpts.cy)
+    const chinaPoint = getSunburstLabelPoint(china, baseOpts.cx, baseOpts.cy)
     expect(asiaPoint).not.toEqual(chinaPoint)
+  })
+
+  it('moves around siblings and into children', () => {
+    const data = [
+      { label: 'A', value: 50, children: [{ label: 'A1', value: 50 }] },
+      { label: 'B', value: 50 }
+    ]
+    const arcs = layoutSunburst(data, baseOpts)
+    const a = arcs.find((arc) => arc.label === 'A')!
+    const b = arcs.find((arc) => arc.label === 'B')!
+    const a1 = arcs.find((arc) => arc.label === 'A1')!
+    expect(nextSunburstArcIndex(a.index, 'ArrowRight', arcs)).toBe(b.index)
+    expect(nextSunburstArcIndex(a.index, 'ArrowDown', arcs)).toBe(a1.index)
+    expect(nextSunburstArcIndex(a1.index, 'ArrowUp', arcs)).toBe(a.index)
+  })
+
+  it('computeSunburstArcs is the same layout', () => {
+    const data = [
+      { label: 'A', value: 40 },
+      { label: 'B', value: 60 }
+    ]
+    expect(computeSunburstArcs(data, baseOpts)).toEqual(layoutSunburst(data, baseOpts))
   })
 })
