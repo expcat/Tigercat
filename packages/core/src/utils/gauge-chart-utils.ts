@@ -1,7 +1,12 @@
 /**
  * Gauge chart utilities
  * Arc geometry helpers for rendering gauge (speedometer) charts
+ *
+ * Angles are degrees, 0 = 12 o'clock, clockwise.
  */
+
+import { prefersReducedMotion } from './transition'
+import { DEFAULT_GAUGE_END_ANGLE, DEFAULT_GAUGE_START_ANGLE } from './chart/polar'
 
 export interface GaugeArc {
   /** SVG arc path `d` */
@@ -54,7 +59,7 @@ export function createGaugeAnimation(options: GaugeAnimationOptions): GaugeAnima
       ? globalThis.cancelAnimationFrame.bind(globalThis)
       : undefined)
 
-  if (!requestFrame || duration <= 0 || options.from === options.to) {
+  if (!requestFrame || duration <= 0 || options.from === options.to || prefersReducedMotion()) {
     options.onUpdate(options.to)
     options.onComplete?.()
     return { stop: () => undefined }
@@ -107,7 +112,7 @@ function safeNumber(value: number, fallback = 0): number {
 /**
  * Create an SVG arc path for a gauge segment.
  *
- * Angles are in degrees, measured clockwise from 12-o'clock (CSS-style).
+ * Angles are in degrees, 0 = 12 o'clock, clockwise.
  */
 export function createGaugeArcPath(
   cx: number,
@@ -117,6 +122,9 @@ export function createGaugeArcPath(
   endDeg: number,
   arcWidth: number
 ): string {
+  if (![cx, cy, radius, startDeg, endDeg, arcWidth].every((value) => Number.isFinite(value))) {
+    return ''
+  }
   const outerR = Math.max(0, safeNumber(radius))
   const safeArcWidth = Math.max(0, safeNumber(arcWidth))
   const innerR = Math.max(0, outerR - safeArcWidth)
@@ -214,7 +222,16 @@ export function computeGaugeTicks(
   startAngle: number,
   endAngle: number,
   tickCount: number
-): Array<{ x1: number; y1: number; x2: number; y2: number; value: number; label: string }> {
+): Array<{
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+  value: number
+  label: string
+  labelX: number
+  labelY: number
+}> {
   const ticks = []
   const safeTickCount = Math.max(1, Math.floor(safeNumber(tickCount, 1)))
   const safeRadius = Math.max(0, safeNumber(radius))
@@ -232,14 +249,112 @@ export function computeGaugeTicks(
     const outerY = cy + safeRadius * Math.sin(rad)
     const innerX = cx + innerRadius * Math.cos(rad)
     const innerY = cy + innerRadius * Math.sin(rad)
+    const labelRadius = safeRadius + 12
     ticks.push({
       x1: innerX,
       y1: innerY,
       x2: outerX,
       y2: outerY,
       value: val,
-      label: Math.round(val).toString()
+      label: Math.round(val).toString(),
+      labelX: cx + labelRadius * Math.cos(rad),
+      labelY: cy + labelRadius * Math.sin(rad)
     })
   }
   return ticks
+}
+
+export interface LayoutGaugeOptions {
+  innerWidth: number
+  innerHeight: number
+  value: number
+  min: number
+  max: number
+  startAngle?: number
+  endAngle?: number
+  arcWidth?: number
+  showTicks?: boolean
+  tickCount?: number
+  segments?: Array<{ range: [number, number]; color: string }>
+  valueFormatter?: (value: number) => string
+  label?: string
+}
+
+export interface LaidOutGauge {
+  cx: number
+  cy: number
+  radius: number
+  startAngle: number
+  endAngle: number
+  valueAngle: number
+  trackPath: string
+  valuePath: string | null
+  segmentPaths: Array<{ path: string; color: string }>
+  ticks: ReturnType<typeof computeGaugeTicks>
+  needlePath: string
+  valueText: { x: number; y: number; text: string }
+  labelText: { x: number; y: number; text: string } | null
+}
+
+export function layoutGauge(options: LayoutGaugeOptions): LaidOutGauge {
+  const cx = options.innerWidth / 2
+  const cy = options.innerHeight / 2
+  const startAngle = Number.isFinite(options.startAngle)
+    ? (options.startAngle as number)
+    : DEFAULT_GAUGE_START_ANGLE
+  const endAngle = Number.isFinite(options.endAngle)
+    ? (options.endAngle as number)
+    : DEFAULT_GAUGE_END_ANGLE
+  const arcWidth = Math.max(0, options.arcWidth ?? 20)
+  const tickSpace = options.showTicks === false ? 4 : 20
+  const radius = Math.max(0, Math.min(options.innerWidth, options.innerHeight) / 2 - tickSpace)
+  const min = options.min
+  const max = options.max
+  const valueAngle = valueToGaugeAngle(options.value, min, max, startAngle, endAngle)
+  const trackPath = createGaugeArcPath(cx, cy, radius, startAngle, endAngle, arcWidth)
+  const valuePath =
+    valueAngle === startAngle
+      ? null
+      : createGaugeArcPath(cx, cy, radius, startAngle, valueAngle, arcWidth)
+  const segmentPaths = (options.segments ?? [])
+    .map((seg) => {
+      const sStart = valueToGaugeAngle(seg.range[0], min, max, startAngle, endAngle)
+      const sEnd = valueToGaugeAngle(seg.range[1], min, max, startAngle, endAngle)
+      return {
+        path: createGaugeArcPath(cx, cy, radius, sStart, sEnd, arcWidth),
+        color: seg.color
+      }
+    })
+    .filter((seg) => seg.path !== '')
+  const ticks =
+    options.showTicks === false
+      ? []
+      : computeGaugeTicks(cx, cy, radius, min, max, startAngle, endAngle, options.tickCount ?? 5)
+  const formatted = options.valueFormatter
+    ? options.valueFormatter(options.value)
+    : `${options.value}`
+  if (options.valueFormatter) {
+    ticks.forEach((tick) => {
+      tick.label = options.valueFormatter!(tick.value)
+    })
+  }
+  return {
+    cx,
+    cy,
+    radius,
+    startAngle,
+    endAngle,
+    valueAngle,
+    trackPath,
+    valuePath,
+    segmentPaths,
+    ticks,
+    needlePath: createGaugeNeedlePath(cx, cy, Math.max(0, radius - arcWidth - 6), valueAngle),
+    valueText: {
+      x: cx,
+      y: cy + radius * 0.35,
+      text: formatted
+    },
+    labelText: options.label ? { x: cx, y: cy + radius * 0.35 + 20, text: options.label } : null
+  }
 }

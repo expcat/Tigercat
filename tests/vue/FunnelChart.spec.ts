@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { FunnelChart } from '@expcat/tigercat-vue/FunnelChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { render } from '@testing-library/vue'
 
 const defaultSize = { width: 320, height: 300 }
@@ -83,7 +83,7 @@ describe('FunnelChart (Vue)', () => {
       ...defaultSize
     })
 
-    expect(container.querySelector('svg.my-funnel')).toBeTruthy()
+    expect(container.firstElementChild?.classList.contains('my-funnel')).toBe(true)
   })
 
   it('renders a11y title and desc', () => {
@@ -102,7 +102,7 @@ describe('FunnelChart (Vue)', () => {
       const { container } = render(FunnelChart, {
         props: { data: sampleData, width: 320, height: 300 }
       })
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
   })
 })

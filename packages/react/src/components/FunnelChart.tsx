@@ -1,15 +1,23 @@
 import React, { useId, useMemo } from 'react'
 import {
   classNames,
-  computeFunnelSegments,
+  layoutFunnel,
   getChartElementOpacity,
-  getChartInnerRect,
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
-  chartAxisTickTextClasses,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
+  funnelStageDisplayLabel,
+  funnelSegmentTransitionClasses,
+  pieSliceLabelInsideClasses,
+  DEFAULT_FUNNEL_HEIGHT,
   type ChartLegendItem,
   type ChartPadding,
   type FunnelChartDatum,
@@ -19,11 +27,12 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface FunnelChartProps extends CoreFunnelChartProps {
   data: FunnelChartDatum[]
   padding?: ChartPadding
-  tooltipFormatter?: (datum: FunnelChartDatum, index: number) => string
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
   onSegmentClick?: (index: number, datum: FunnelChartDatum) => void
@@ -32,14 +41,16 @@ export interface FunnelChartProps extends CoreFunnelChartProps {
 
 export const FunnelChart: React.FC<FunnelChartProps> = ({
   width = 320,
-  height = 300,
+  height = DEFAULT_FUNNEL_HEIGHT,
   padding = 24,
+  responsive = false,
   data,
-  direction: _direction = 'vertical',
+  direction = 'vertical',
   gap = 2,
   pinch = false,
   colors,
   gradient = false,
+  showLabels = true,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -60,6 +71,9 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   onSegmentClick,
   onSegmentHover
 }) => {
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const interactive = hoverable || selectable || Boolean(onSegmentClick)
   const {
     tooltipPosition,
     resolvedHoveredIndex,
@@ -72,8 +86,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<FunnelChartDatum>({
     hoverable,
     showTooltip,
@@ -92,33 +105,33 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     onClick: onSegmentClick
   })
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
-
   const segments = useMemo(
     () =>
-      computeFunnelSegments(data, {
+      layoutFunnel(data, {
         width: innerRect.width,
         height: innerRect.height,
         gap,
         pinch,
-        colors: palette
+        colors: palette,
+        direction
       }),
-    [data, innerRect.width, innerRect.height, gap, pinch, palette]
+    [data, innerRect.width, innerRect.height, gap, pinch, palette, direction]
   )
-
-  const total = useMemo(() => data.reduce((s, d) => s + d.value, 0), [data])
-
-  // Stable gradient ID prefix per FunnelChart instance
+  const total = useMemo(() => segments.reduce((sum, segment) => sum + segment.value, 0), [segments])
+  const stageName = (datum: FunnelChartDatum, index: number) =>
+    funnelStageDisplayLabel(datum, index, labels.stageName)
   const gradientId = useId()
   const gradientPrefix = useMemo(
     () => getStableChartGradientPrefix('funnel', gradientId),
     [gradientId]
   )
-
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
@@ -126,42 +139,61 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
-        getLabel: (d, i) => d.label ?? `Stage ${i + 1}`,
+        getLabel: (d, i) => stageName(d, i),
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [data, palette, activeIndex, resolvedSelectedIndex]
+    [data, palette, activeIndex, resolvedSelectedIndex, labels.stageName]
   )
-
   const tooltipContent = useMemo(
     () =>
       resolveChartTooltipContent(resolvedHoveredIndex, data, tooltipFormatter, (datum, index) => {
         const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
-        const label = datum.label ?? `Stage ${index + 1}`
-        return `${label}: ${datum.value} (${pct}%)`
+        return `${stageName(datum, index)}: ${datum.value} (${pct}%)`
       }),
-    [resolvedHoveredIndex, data, tooltipFormatter, total]
+    [resolvedHoveredIndex, data, tooltipFormatter, total, labels.stageName]
+  )
+  const visualActive = segments.findIndex(
+    (segment) => segment.index === (activeIndex ?? resolvedHoveredIndex)
   )
 
-  const interactive = hoverable || selectable
+  const handleSegmentKeyDown = (
+    event: React.KeyboardEvent<SVGPathElement>,
+    visualIndex: number
+  ) => {
+    if (isChartNavigationKey(event.key)) {
+      event.preventDefault()
+      const nextVisual = nextChartRovingIndex(visualIndex, event.key, segments.length)
+      const next = segments[nextVisual]
+      const node = event.currentTarget.parentElement?.querySelector(
+        `[data-funnel-segment][data-index="${next.index}"]`
+      )
+      if (node instanceof SVGElement) node.focus()
+      handleMouseEnter(next.index, event)
+      return
+    }
+    handleKeyDown(event, segments[visualIndex].index)
+  }
 
   const chart = (
     <ChartCanvas
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>
           {segments.map((seg) => (
             <linearGradient
               key={`grad-${seg.index}`}
               id={`${gradientPrefix}-${seg.index}`}
-              x1={0}
+              gradientUnits="userSpaceOnUse"
+              x1={direction === 'horizontal' ? 0 : 0}
               y1={0}
-              x2={0}
-              y2={1}>
+              x2={direction === 'horizontal' ? innerRect.width : 0}
+              y2={direction === 'horizontal' ? 0 : innerRect.height}>
               <stop offset="0%" stopColor={seg.color} stopOpacity={1} />
               <stop offset="100%" stopColor={seg.color} stopOpacity={0.55} />
             </linearGradient>
@@ -169,7 +201,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         </defs>
       )}
       <g data-series-type="funnel">
-        {segments.map((seg) => {
+        {segments.map((seg, visualIndex) => {
           const opacity = getChartElementOpacity(seg.index, activeIndex, {
             activeOpacity,
             inactiveOpacity
@@ -180,34 +212,42 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               d={seg.path}
               fill={gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color}
               opacity={opacity}
-              className={classNames(interactive && 'cursor-pointer')}
-              style={{
-                transition:
-                  'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)'
-              }}
-              tabIndex={selectable ? 0 : undefined}
-              role={selectable ? 'button' : 'img'}
-              aria-label={seg.label}
+              className={classNames(
+                interactive && 'cursor-pointer',
+                funnelSegmentTransitionClasses
+              )}
+              data-funnel-segment=""
+              data-index={seg.index}
+              tabIndex={
+                interactive
+                  ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                  : undefined
+              }
+              role={interactive ? 'button' : undefined}
+              aria-hidden={interactive ? undefined : true}
               onMouseEnter={(e) => handleMouseEnter(seg.index, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
+              onFocus={(e) => handleMouseEnter(seg.index, e)}
               onClick={() => handleClick(seg.index)}
-              onKeyDown={(e) => handleKeyDown(e, seg.index)}
+              onKeyDown={(e) => handleSegmentKeyDown(e, visualIndex)}
             />
           )
         })}
       </g>
-      {segments.map((seg) => (
-        <text
-          key={`label-${seg.index}`}
-          x={seg.cx}
-          y={seg.cy}
-          className={chartAxisTickTextClasses}
-          textAnchor="middle"
-          dominantBaseline="middle">
-          {seg.label}
-        </text>
-      ))}
+      {showLabels &&
+        segments.map((seg) => (
+          <text
+            key={`label-${seg.index}`}
+            x={seg.cx}
+            y={seg.cy}
+            className={pieSliceLabelInsideClasses}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            aria-hidden="true">
+            {stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)}
+          </text>
+        ))}
     </ChartCanvas>
   )
 
@@ -220,29 +260,31 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     />
   ) : null
 
-  if (!showLegend) {
-    return (
-      <div className="inline-block relative">
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
-
   return (
-    <div className={wrapperClasses}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        orientation={chartLegendOrientationFromPosition(legendPosition)}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={interactive}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={hoverable || selectable}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )
 }
+
+export default FunnelChart

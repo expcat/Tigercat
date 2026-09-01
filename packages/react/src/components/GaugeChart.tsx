@@ -1,33 +1,37 @@
-import React, { useId, useMemo, useState, useRef, useEffect } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
-  classNames,
+  layoutGauge,
+  createGaugeAnimation,
   createGaugeArcPath,
   createGaugeNeedlePath,
-  valueToGaugeAngle,
-  computeGaugeTicks,
-  getChartInnerRect,
-  chartAxisTickTextClasses,
   getStableChartGradientPrefix,
-  createGaugeAnimation,
+  chartAxisTickTextClasses,
+  getCartesianChartShellClasses,
+  DEFAULT_GAUGE_END_ANGLE,
+  DEFAULT_GAUGE_HEIGHT,
+  DEFAULT_GAUGE_START_ANGLE,
+  DEFAULT_GAUGE_WIDTH,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 
 export interface GaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
 }
 
 export const GaugeChart: React.FC<GaugeChartProps> = ({
-  width = 280,
-  height = 200,
+  width = DEFAULT_GAUGE_WIDTH,
+  height = DEFAULT_GAUGE_HEIGHT,
   padding = 24,
+  responsive = false,
   value,
   min = 0,
   max = 100,
-  startAngle = 135,
-  endAngle = 405,
+  startAngle = DEFAULT_GAUGE_START_ANGLE,
+  endAngle = DEFAULT_GAUGE_END_ANGLE,
   arcWidth = 20,
   showTicks = true,
   tickCount = 5,
@@ -38,67 +42,95 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   trackColor = 'var(--tiger-border,#e5e7eb)',
   color = 'var(--tiger-primary,#2563eb)',
   gradient = false,
+  animated = true,
   showTooltip = true,
   title: chartTitle,
   desc,
   className
 }) => {
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
-
-  const radius = useMemo(
-    () => Math.min(innerRect.width, innerRect.height) / 2 - 4,
-    [innerRect.width, innerRect.height]
+  const geometry = useMemo(
+    () =>
+      layoutGauge({
+        innerWidth: innerRect.width,
+        innerHeight: innerRect.height,
+        value,
+        min,
+        max,
+        startAngle,
+        endAngle,
+        arcWidth,
+        showTicks,
+        tickCount,
+        segments,
+        valueFormatter,
+        label
+      }),
+    [
+      innerRect.width,
+      innerRect.height,
+      value,
+      min,
+      max,
+      startAngle,
+      endAngle,
+      arcWidth,
+      showTicks,
+      tickCount,
+      segments,
+      valueFormatter,
+      label
+    ]
   )
-
-  const cx = innerRect.width / 2
-  const cy = innerRect.height / 2
-
-  const needleAngle = useMemo(
-    () => valueToGaugeAngle(value, min, max, startAngle, endAngle),
-    [value, min, max, startAngle, endAngle]
-  )
-
-  // rAF-driven animated angle
-  const [animatedAngle, setAnimatedAngle] = useState(needleAngle)
-  const prevAngleRef = useRef(needleAngle)
+  const [animatedAngle, setAnimatedAngle] = useState(geometry.valueAngle)
+  const prevAngleRef = useRef(geometry.valueAngle)
 
   useEffect(() => {
     const from = prevAngleRef.current
-    const to = needleAngle
+    const to = geometry.valueAngle
     prevAngleRef.current = to
-    if (from === to) return
+    if (!animated || from === to) {
+      setAnimatedAngle(to)
+      return
+    }
     const ctrl = createGaugeAnimation({
       from,
       to,
-      onUpdate: (v) => setAnimatedAngle(v)
+      onUpdate: (next) => setAnimatedAngle(next)
     })
     return () => ctrl.stop()
-  }, [needleAngle])
+  }, [geometry.valueAngle, animated])
 
-  const ticks = useMemo(
+  const needlePath = useMemo(
     () =>
-      showTicks ? computeGaugeTicks(cx, cy, radius, min, max, startAngle, endAngle, tickCount) : [],
-    [showTicks, cx, cy, radius, min, max, startAngle, endAngle, tickCount]
+      createGaugeNeedlePath(
+        geometry.cx,
+        geometry.cy,
+        Math.max(0, geometry.radius - arcWidth - 6),
+        animatedAngle
+      ),
+    [geometry.cx, geometry.cy, geometry.radius, arcWidth, animatedAngle]
   )
 
-  const trackPath = createGaugeArcPath(cx, cy, radius, startAngle, endAngle, arcWidth)
-  const valuePath =
-    animatedAngle > startAngle
-      ? createGaugeArcPath(cx, cy, radius, startAngle, animatedAngle, arcWidth)
-      : null
-  const needlePath = createGaugeNeedlePath(cx, cy, radius - arcWidth - 6, animatedAngle)
+  const valuePath = useMemo(() => {
+    if (animatedAngle === geometry.startAngle) return null
+    return createGaugeArcPath(
+      geometry.cx,
+      geometry.cy,
+      geometry.radius,
+      geometry.startAngle,
+      animatedAngle,
+      arcWidth
+    )
+  }, [animatedAngle, geometry.cx, geometry.cy, geometry.radius, geometry.startAngle, arcWidth])
 
-  const formattedValue = valueFormatter ? valueFormatter(value) : `${value}`
-
-  // Tooltip (hover / focus over the gauge)
-  const [tooltip, setTooltip] = useState<{ open: boolean; x: number; y: number }>({
-    open: false,
-    x: 0,
-    y: 0
-  })
+  const formattedValue = geometry.valueText.text
+  const [tooltip, setTooltip] = useState({ open: false, x: 0, y: 0 })
   const tooltipContent = tooltipFormatter
     ? tooltipFormatter(value)
     : label
@@ -108,9 +140,6 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
     if (!showTooltip) return
     setTooltip({ open: true, x: e.clientX, y: e.clientY })
   }
-  const handleTooltipLeave = () => setTooltip((t) => ({ ...t, open: false }))
-
-  // Per-instance gradient ID (only used when gradient prop is on)
   const gradientId = useId()
   const gradientPrefix = useMemo(
     () => getStableChartGradientPrefix('gauge', gradientId),
@@ -118,70 +147,63 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   )
   const valueGradientId = `${gradientPrefix}-value`
 
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const handleTooltipFocus = () => {
-    if (!showTooltip) return
-    const rect = wrapperRef.current?.getBoundingClientRect()
-    if (rect)
-      setTooltip({ open: true, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
-  }
-
   return (
     <div
-      ref={wrapperRef}
-      className="inline-block relative"
-      tabIndex={showTooltip ? 0 : undefined}
-      role="img"
-      aria-label={label ? `${label}: ${formattedValue}` : formattedValue}
+      className={getCartesianChartShellClasses({
+        showLegend: false,
+        responsive,
+        className
+      })}
+      role="meter"
+      aria-valuenow={Number.isFinite(value) ? value : undefined}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuetext={formattedValue}
+      aria-label={label ?? chartTitle ?? formattedValue}
       onMouseMove={handleTooltipMove}
-      onMouseLeave={handleTooltipLeave}
-      onFocus={handleTooltipFocus}
-      onBlur={handleTooltipLeave}>
+      onMouseLeave={() => setTooltip((current) => ({ ...current, open: false }))}>
       <ChartCanvas
         width={width}
         height={height}
         padding={padding}
-        title={chartTitle}
-        desc={desc}
-        className={classNames(className)}>
-        {/* Gradient defs (opt-in, only when gradient mode is on and value arc renders) */}
-        {gradient && !segments && valuePath && (
+        responsive={responsive}
+        title={undefined}
+        desc={undefined}
+        onResolvedSizeChange={onResolvedSizeChange}>
+        {gradient && valuePath && (
           <defs>
-            <linearGradient id={valueGradientId} x1={0} y1={0} x2={0} y2={1}>
+            <linearGradient
+              id={valueGradientId}
+              gradientUnits="userSpaceOnUse"
+              x1={geometry.cx}
+              y1={geometry.cy - geometry.radius}
+              x2={geometry.cx}
+              y2={geometry.cy + geometry.radius}>
               <stop offset="0%" stopColor={color} stopOpacity={1} />
               <stop offset="100%" stopColor={color} stopOpacity={0.55} />
             </linearGradient>
           </defs>
         )}
-
-        {/* Track */}
-        <path d={trackPath} fill={trackColor} strokeWidth={0} />
-
-        {/* Segments or value arc */}
-        {segments
-          ? segments.map((seg, i) => {
-              const sStart = valueToGaugeAngle(seg.range[0], min, max, startAngle, endAngle)
-              const sEnd = valueToGaugeAngle(seg.range[1], min, max, startAngle, endAngle)
-              return (
-                <path
-                  key={`seg-${i}`}
-                  d={createGaugeArcPath(cx, cy, radius, sStart, sEnd, arcWidth)}
-                  fill={seg.color}
-                  strokeWidth={0}
-                />
-              )
-            })
-          : valuePath && (
-              <path
-                d={valuePath}
-                fill={gradient ? `url(#${valueGradientId})` : color}
-                strokeWidth={0}
-              />
-            )}
-
-        {/* Ticks */}
-        {ticks.map((tick, i) => (
-          <React.Fragment key={`tick-${i}`}>
+        <path d={geometry.trackPath} fill={trackColor} strokeWidth={0} aria-hidden="true" />
+        {geometry.segmentPaths.map((seg, index) => (
+          <path
+            key={`seg-${index}`}
+            d={seg.path}
+            fill={seg.color}
+            strokeWidth={0}
+            aria-hidden="true"
+          />
+        ))}
+        {valuePath && (
+          <path
+            d={valuePath}
+            fill={gradient ? `url(#${valueGradientId})` : color}
+            strokeWidth={0}
+            aria-hidden="true"
+          />
+        )}
+        {geometry.ticks.map((tick, index) => (
+          <React.Fragment key={`tick-${index}`}>
             <line
               x1={tick.x1}
               y1={tick.y1}
@@ -189,44 +211,46 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
               y2={tick.y2}
               stroke="var(--tiger-text-secondary,#6b7280)"
               strokeWidth={1}
+              aria-hidden="true"
             />
             <text
-              x={tick.x2 + (tick.x2 - tick.x1) * 1.5}
-              y={tick.y2 + (tick.y2 - tick.y1) * 1.5}
+              x={tick.labelX}
+              y={tick.labelY}
               className={chartAxisTickTextClasses}
               textAnchor="middle"
               dominantBaseline="middle"
-              style={{ fontSize: '10px' }}>
+              style={{ fontSize: '10px' }}
+              aria-hidden="true">
               {tick.label}
             </text>
           </React.Fragment>
         ))}
-
-        {/* Needle */}
-        <path d={needlePath} fill="var(--tiger-text,#374151)" />
-
-        {/* Center dot */}
-        <circle cx={cx} cy={cy} r={5} fill="var(--tiger-text,#374151)" />
-
-        {/* Value text */}
+        <path d={needlePath} fill="var(--tiger-text,#374151)" aria-hidden="true" />
+        <circle
+          cx={geometry.cx}
+          cy={geometry.cy}
+          r={5}
+          fill="var(--tiger-text,#374151)"
+          aria-hidden="true"
+        />
         <text
-          x={cx}
-          y={cy + radius * 0.35}
+          x={geometry.valueText.x}
+          y={geometry.valueText.y}
           className="fill-[color:var(--tiger-text,#374151)] text-lg font-semibold tabular-nums"
           textAnchor="middle"
-          dominantBaseline="middle">
+          dominantBaseline="middle"
+          aria-hidden="true">
           {formattedValue}
         </text>
-
-        {/* Label */}
-        {label && (
+        {geometry.labelText && (
           <text
-            x={cx}
-            y={cy + radius * 0.35 + 20}
+            x={geometry.labelText.x}
+            y={geometry.labelText.y}
             className={chartAxisTickTextClasses}
             textAnchor="middle"
-            dominantBaseline="middle">
-            {label}
+            dominantBaseline="middle"
+            aria-hidden="true">
+            {geometry.labelText.text}
           </text>
         )}
       </ChartCanvas>
@@ -241,3 +265,5 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
     </div>
   )
 }
+
+export default GaugeChart

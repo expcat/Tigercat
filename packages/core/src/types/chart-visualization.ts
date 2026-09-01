@@ -7,7 +7,6 @@ import type {
   ChartInteractionProps,
   ChartLegendToggleProps,
   ChartScaleValue,
-  ChartSeriesPoint,
   ChartBuiltInTooltipProps
 } from './chart-core'
 
@@ -15,7 +14,7 @@ import type {
 // Funnel Chart
 // -------------------------------------------------------------------
 
-export interface FunnelChartDatum extends ChartSeriesPoint {
+export interface FunnelChartDatum {
   /** Stage / step label */
   label?: string
   /** Numeric value (determines width) */
@@ -32,7 +31,13 @@ export interface FunnelChartProps
   data: FunnelChartDatum[]
 
   /**
-   * Vertical or horizontal layout
+   * Chart height
+   * @default 300
+   */
+  height?: number
+
+  /**
+   * Vertical or horizontal layout. Horizontal grows along x; height follows value.
    * @default 'vertical'
    */
   direction?: 'vertical' | 'horizontal'
@@ -55,11 +60,21 @@ export interface FunnelChartProps
   colors?: string[]
 
   /**
-   * Render each segment with a vertical alpha gradient (top opaque → bottom faded).
-   * Opt-in; defaults to flat fill so existing visuals stay 1:1.
+   * Render each segment with a vertical alpha gradient in funnel user space.
    * @default false
    */
   gradient?: boolean
+
+  /**
+   * Whether to draw stage labels on the segments
+   * @default true
+   */
+  showLabels?: boolean
+
+  /**
+   * Tooltip formatter
+   */
+  tooltipFormatter?: (datum: FunnelChartDatum, index: number) => string
 }
 
 // -------------------------------------------------------------------

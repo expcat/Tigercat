@@ -5,6 +5,9 @@ import {
   valueToGaugeAngle,
   computeGaugeTicks,
   createGaugeAnimation,
+  layoutGauge,
+  DEFAULT_GAUGE_END_ANGLE,
+  DEFAULT_GAUGE_START_ANGLE,
   GAUGE_ANIMATION_DURATION_MS
 } from '@expcat/tigercat-core'
 
@@ -214,5 +217,22 @@ describe('createGaugeAnimation', () => {
 
   it('exports default duration constant', () => {
     expect(GAUGE_ANIMATION_DURATION_MS).toBe(600)
+  })
+})
+
+describe('layoutGauge', () => {
+  it('defaults to a bottom-opening arc', () => {
+    const laid = layoutGauge({
+      innerWidth: 232,
+      innerHeight: 152,
+      value: 50,
+      min: 0,
+      max: 100
+    })
+    expect(laid.startAngle).toBe(DEFAULT_GAUGE_START_ANGLE)
+    expect(laid.endAngle).toBe(DEFAULT_GAUGE_END_ANGLE)
+    expect(laid.ticks).toHaveLength(6)
+    expect(laid.valuePath).toBeTruthy()
+    expect(laid.trackPath.includes('NaN')).toBe(false)
   })
 })

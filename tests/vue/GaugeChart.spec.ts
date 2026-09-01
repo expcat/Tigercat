@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { GaugeChart } from '@expcat/tigercat-vue/GaugeChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { render } from '@testing-library/vue'
 
 const defaultSize = { width: 280, height: 200 }
@@ -62,7 +62,7 @@ describe('GaugeChart (Vue)', () => {
       ...defaultSize
     })
 
-    expect(container.querySelector('svg.my-gauge')).toBeTruthy()
+    expect(container.firstElementChild?.classList.contains('my-gauge')).toBe(true)
   })
 
   it('renders a11y title and desc', () => {
@@ -73,8 +73,7 @@ describe('GaugeChart (Vue)', () => {
       ...defaultSize
     })
 
-    expect(container.querySelector('title')?.textContent).toBe('Gauge Title')
-    expect(container.querySelector('desc')?.textContent).toBe('Gauge Description')
+    expect(container.querySelector('[role="meter"]')).toHaveAttribute('aria-label', 'Gauge Title')
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
@@ -84,7 +83,7 @@ describe('GaugeChart (Vue)', () => {
           ...defaultSize
         }
       })
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
   })
   it('clamps value that exceeds max', () => {

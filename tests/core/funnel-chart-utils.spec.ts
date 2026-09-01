@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { computeFunnelSegments } from '@expcat/tigercat-core'
 
 describe('computeFunnelSegments', () => {
@@ -33,10 +33,10 @@ describe('computeFunnelSegments', () => {
     expect(result[2].label).toBe('C')
   })
 
-  it('assigns default label when missing', () => {
+  it('keeps a missing label empty so locale can fill it', () => {
     const noLabel = [{ value: 50 }]
     const result = computeFunnelSegments(noLabel as any, { width: 200, height: 300 })
-    expect(result[0].label).toBe('Stage 1')
+    expect(result[0].label).toBeUndefined()
   })
 
   it('generates valid SVG path strings', () => {
@@ -118,6 +118,7 @@ describe('computeFunnelSegments', () => {
   it('normalizes invalid values and dimensions without NaN geometry', () => {
     expect(computeFunnelSegments(data, { width: -200, height: 300 })).toEqual([])
 
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const result = computeFunnelSegments(
       [
         { label: 'Bad', value: Number.NaN },
@@ -127,7 +128,20 @@ describe('computeFunnelSegments', () => {
       { width: 200, height: 80, gap: 999 }
     )
 
-    expect(result.map((segment) => segment.value)).toEqual([0, 0, 50])
+    expect(result.map((segment) => segment.value)).toEqual([50])
     expect(result.every((segment) => !segment.path.includes('NaN'))).toBe(true)
+    warn.mockRestore()
+  })
+
+  it('lays out a horizontal funnel on a different axis than vertical', () => {
+    const vertical = computeFunnelSegments(data, { width: 200, height: 300, direction: 'vertical' })
+    const horizontal = computeFunnelSegments(data, {
+      width: 200,
+      height: 300,
+      direction: 'horizontal'
+    })
+    expect(horizontal).toHaveLength(3)
+    expect(horizontal[0].path).not.toBe(vertical[0].path)
+    expect(horizontal[0].cx).toBeLessThan(horizontal[1].cx)
   })
 })

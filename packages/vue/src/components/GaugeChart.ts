@@ -1,36 +1,45 @@
 import { defineComponent, computed, h, ref, watch, onBeforeUnmount, PropType, useId } from 'vue'
 import {
+  coerceClassValue,
   classNames,
+  layoutGauge,
   createGaugeArcPath,
   createGaugeNeedlePath,
-  valueToGaugeAngle,
-  computeGaugeTicks,
-  getChartInnerRect,
-  chartAxisTickTextClasses,
-  getStableChartGradientPrefix,
   createGaugeAnimation,
+  getStableChartGradientPrefix,
+  chartAxisTickTextClasses,
+  getCartesianChartShellClasses,
+  DEFAULT_GAUGE_END_ANGLE,
+  DEFAULT_GAUGE_HEIGHT,
+  DEFAULT_GAUGE_START_ANGLE,
+  DEFAULT_GAUGE_WIDTH,
   type GaugeAnimationController,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 
 export interface VueGaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
 }
 
+export type GaugeChartProps = VueGaugeChartProps
+
 export const GaugeChart = defineComponent({
   name: 'TigerGaugeChart',
+  inheritAttrs: false,
   props: {
-    width: { type: Number, default: 280 },
-    height: { type: Number, default: 200 },
+    width: { type: Number, default: DEFAULT_GAUGE_WIDTH },
+    height: { type: Number, default: DEFAULT_GAUGE_HEIGHT },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
+    responsive: { type: Boolean, default: false },
     value: { type: Number, required: true },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
-    startAngle: { type: Number, default: 135 },
-    endAngle: { type: Number, default: 405 },
+    startAngle: { type: Number, default: DEFAULT_GAUGE_START_ANGLE },
+    endAngle: { type: Number, default: DEFAULT_GAUGE_END_ANGLE },
     arcWidth: { type: Number, default: 20 },
     showTicks: { type: Boolean, default: true },
     tickCount: { type: Number, default: 5 },
@@ -44,277 +53,235 @@ export const GaugeChart = defineComponent({
     trackColor: { type: String, default: 'var(--tiger-border,#e5e7eb)' },
     color: { type: String, default: 'var(--tiger-primary,#2563eb)' },
     gradient: { type: Boolean, default: false },
-    // a11y
+    animated: { type: Boolean, default: true },
     title: { type: String },
     desc: { type: String },
     className: { type: String }
   },
-  setup(props) {
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+  setup(props, { attrs }) {
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
+    const geometry = computed(() =>
+      layoutGauge({
+        innerWidth: innerRect.value.width,
+        innerHeight: innerRect.value.height,
+        value: props.value,
+        min: props.min,
+        max: props.max,
+        startAngle: props.startAngle,
+        endAngle: props.endAngle,
+        arcWidth: props.arcWidth,
+        showTicks: props.showTicks,
+        tickCount: props.tickCount,
+        segments: props.segments,
+        valueFormatter: props.valueFormatter,
+        label: props.label
+      })
+    )
+    const animatedAngle = ref(geometry.value.valueAngle)
+    const prevAngle = ref(geometry.value.valueAngle)
+    let controller: GaugeAnimationController | null = null
 
-    const radius = computed(() => Math.min(innerRect.value.width, innerRect.value.height) / 2 - 4)
+    watch(
+      () => geometry.value.valueAngle,
+      (to) => {
+        const from = prevAngle.value
+        prevAngle.value = to
+        controller?.stop()
+        if (!props.animated || from === to) {
+          animatedAngle.value = to
+          return
+        }
+        controller = createGaugeAnimation({
+          from,
+          to,
+          onUpdate: (next) => {
+            animatedAngle.value = next
+          }
+        })
+      }
+    )
+    onBeforeUnmount(() => controller?.stop())
 
-    const cx = computed(() => innerRect.value.width / 2)
-    const cy = computed(() => innerRect.value.height / 2)
-
-    // Per-instance gradient ID prefix (only used when props.gradient is true)
+    const needlePath = computed(() =>
+      createGaugeNeedlePath(
+        geometry.value.cx,
+        geometry.value.cy,
+        Math.max(0, geometry.value.radius - props.arcWidth - 6),
+        animatedAngle.value
+      )
+    )
+    const valuePath = computed(() => {
+      if (animatedAngle.value === geometry.value.startAngle) return null
+      return createGaugeArcPath(
+        geometry.value.cx,
+        geometry.value.cy,
+        geometry.value.radius,
+        geometry.value.startAngle,
+        animatedAngle.value,
+        props.arcWidth
+      )
+    })
+    const tooltip = ref({ open: false, x: 0, y: 0 })
+    const formattedValue = computed(() => geometry.value.valueText.text)
+    const tooltipContent = computed(() =>
+      props.tooltipFormatter
+        ? props.tooltipFormatter(props.value)
+        : props.label
+          ? `${props.label}: ${formattedValue.value}`
+          : formattedValue.value
+    )
     const gradientPrefix = getStableChartGradientPrefix('gauge', useId())
     const valueGradientId = `${gradientPrefix}-value`
 
-    const targetAngle = computed(() =>
-      valueToGaugeAngle(props.value, props.min, props.max, props.startAngle, props.endAngle)
-    )
-
-    // Animated needle angle — driven by rAF
-    const animatedAngle = ref(targetAngle.value)
-    let animCtrl: GaugeAnimationController | null = null
-
-    watch(targetAngle, (to, from) => {
-      animCtrl?.stop()
-      animCtrl = createGaugeAnimation({
-        from,
-        to,
-        onUpdate: (v) => {
-          animatedAngle.value = v
-        }
-      })
-    })
-
-    onBeforeUnmount(() => {
-      animCtrl?.stop()
-    })
-
-    // Tooltip (hover / focus over the gauge)
-    const wrapperRef = ref<HTMLElement | null>(null)
-    const tooltipState = ref({ open: false, x: 0, y: 0 })
-    const handleTooltipMove = (e: MouseEvent) => {
-      if (!props.showTooltip) return
-      tooltipState.value = { open: true, x: e.clientX, y: e.clientY }
-    }
-    const handleTooltipLeave = () => {
-      tooltipState.value = { ...tooltipState.value, open: false }
-    }
-    const handleTooltipFocus = () => {
-      if (!props.showTooltip) return
-      const rect = wrapperRef.value?.getBoundingClientRect()
-      if (rect) {
-        tooltipState.value = {
-          open: true,
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
-        }
-      }
-    }
-
-    const ticks = computed(() =>
-      props.showTicks
-        ? computeGaugeTicks(
-            cx.value,
-            cy.value,
-            radius.value,
-            props.min,
-            props.max,
-            props.startAngle,
-            props.endAngle,
-            props.tickCount
-          )
-        : []
-    )
-
     return () => {
-      const r = radius.value
-      const c = cx.value
-      const cY = cy.value
-      const aw = props.arcWidth
-
-      // Track arc
-      const trackPath = createGaugeArcPath(c, cY, r, props.startAngle, props.endAngle, aw)
-
-      // Value arc
-      const valuePath =
-        animatedAngle.value > props.startAngle
-          ? createGaugeArcPath(c, cY, r, props.startAngle, animatedAngle.value, aw)
-          : null
-
-      // Segment arcs
-      const segmentArcs =
-        props.segments?.map((seg, i) => {
-          const sStart = valueToGaugeAngle(
-            seg.range[0],
-            props.min,
-            props.max,
-            props.startAngle,
-            props.endAngle
-          )
-          const sEnd = valueToGaugeAngle(
-            seg.range[1],
-            props.min,
-            props.max,
-            props.startAngle,
-            props.endAngle
-          )
-          return h('path', {
-            key: `seg-${i}`,
-            d: createGaugeArcPath(c, cY, r, sStart, sEnd, aw),
-            fill: seg.color,
-            'stroke-width': 0
-          })
-        }) ?? []
-
-      // Needle
-      const needlePath = createGaugeNeedlePath(c, cY, r - aw - 6, animatedAngle.value)
-
-      const formattedValue = props.valueFormatter
-        ? props.valueFormatter(props.value)
-        : `${props.value}`
-
-      const tooltipContent = props.tooltipFormatter
-        ? props.tooltipFormatter(props.value)
-        : props.label
-          ? `${props.label}: ${formattedValue}`
-          : formattedValue
-
-      const canvas = h(
-        ChartCanvas,
+      const geo = geometry.value
+      return h(
+        'div',
         {
-          width: props.width,
-          height: props.height,
-          padding: props.padding,
-          title: props.title,
-          desc: props.desc,
-          className: classNames(props.className)
+          class: getCartesianChartShellClasses({
+            showLegend: false,
+            responsive: props.responsive,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          }),
+          role: 'meter',
+          'aria-valuenow': Number.isFinite(props.value) ? props.value : undefined,
+          'aria-valuemin': props.min,
+          'aria-valuemax': props.max,
+          'aria-valuetext': formattedValue.value,
+          'aria-label': props.label ?? props.title ?? formattedValue.value,
+          onMousemove: (e: MouseEvent) => {
+            if (!props.showTooltip) return
+            tooltip.value = { open: true, x: e.clientX, y: e.clientY }
+          },
+          onMouseleave: () => {
+            tooltip.value = { ...tooltip.value, open: false }
+          }
         },
-        {
-          default: () => [
-            // Gradient defs (opt-in, only when gradient mode is on and value arc renders)
-            props.gradient && !props.segments && valuePath
-              ? h('defs', {}, [
-                  h(
-                    'linearGradient',
-                    {
-                      id: valueGradientId,
-                      x1: 0,
-                      y1: 0,
-                      x2: 0,
-                      y2: 1
-                    },
-                    [
-                      h('stop', { offset: '0%', 'stop-color': props.color, 'stop-opacity': 1 }),
-                      h('stop', { offset: '100%', 'stop-color': props.color, 'stop-opacity': 0.55 })
-                    ]
-                  )
-                ])
-              : null,
-            // Track
-            h('path', {
-              d: trackPath,
-              fill: props.trackColor,
-              'stroke-width': 0
-            }),
-            // Segments or value arc
-            ...(props.segments
-              ? segmentArcs
-              : valuePath
-                ? [
-                    h('path', {
-                      d: valuePath,
+        [
+          h(
+            ChartCanvas,
+            {
+              width: props.width,
+              height: props.height,
+              padding: props.padding,
+              responsive: props.responsive,
+              onResolvedSizeChange
+            },
+            {
+              default: () => [
+                props.gradient && valuePath.value
+                  ? h('defs', null, [
+                      h(
+                        'linearGradient',
+                        {
+                          id: valueGradientId,
+                          gradientUnits: 'userSpaceOnUse',
+                          x1: geo.cx,
+                          y1: geo.cy - geo.radius,
+                          x2: geo.cx,
+                          y2: geo.cy + geo.radius
+                        },
+                        [
+                          h('stop', {
+                            offset: '0%',
+                            'stop-color': props.color,
+                            'stop-opacity': '1'
+                          }),
+                          h('stop', {
+                            offset: '100%',
+                            'stop-color': props.color,
+                            'stop-opacity': '0.55'
+                          })
+                        ]
+                      )
+                    ])
+                  : null,
+                h('path', { d: geo.trackPath, fill: props.trackColor, 'stroke-width': 0 }),
+                ...geo.segmentPaths.map((seg, index) =>
+                  h('path', {
+                    key: `seg-${index}`,
+                    d: seg.path,
+                    fill: seg.color,
+                    'stroke-width': 0
+                  })
+                ),
+                valuePath.value
+                  ? h('path', {
+                      d: valuePath.value,
                       fill: props.gradient ? `url(#${valueGradientId})` : props.color,
                       'stroke-width': 0
                     })
-                  ]
-                : []),
-            // Ticks
-            ...ticks.value
-              .map((tick, i) => [
-                h('line', {
-                  key: `tick-${i}`,
-                  x1: tick.x1,
-                  y1: tick.y1,
-                  x2: tick.x2,
-                  y2: tick.y2,
-                  stroke: 'var(--tiger-text-secondary,#6b7280)',
-                  'stroke-width': 1
+                  : null,
+                ...geo.ticks.flatMap((tick, index) => [
+                  h('line', {
+                    key: `tick-${index}`,
+                    x1: tick.x1,
+                    y1: tick.y1,
+                    x2: tick.x2,
+                    y2: tick.y2,
+                    stroke: 'var(--tiger-text-secondary,#6b7280)',
+                    'stroke-width': 1
+                  }),
+                  h(
+                    'text',
+                    {
+                      key: `tick-label-${index}`,
+                      x: tick.labelX,
+                      y: tick.labelY,
+                      class: chartAxisTickTextClasses,
+                      'text-anchor': 'middle',
+                      'dominant-baseline': 'middle',
+                      style: { fontSize: '10px' }
+                    },
+                    tick.label
+                  )
+                ]),
+                h('path', { d: needlePath.value, fill: 'var(--tiger-text,#374151)' }),
+                h('circle', {
+                  cx: geo.cx,
+                  cy: geo.cy,
+                  r: 5,
+                  fill: 'var(--tiger-text,#374151)'
                 }),
                 h(
                   'text',
                   {
-                    key: `tick-label-${i}`,
-                    x: tick.x2 + (tick.x2 - tick.x1) * 1.5,
-                    y: tick.y2 + (tick.y2 - tick.y1) * 1.5,
-                    class: chartAxisTickTextClasses,
+                    x: geo.valueText.x,
+                    y: geo.valueText.y,
+                    class:
+                      'fill-[color:var(--tiger-text,#374151)] text-lg font-semibold tabular-nums',
                     'text-anchor': 'middle',
-                    'dominant-baseline': 'middle',
-                    style: { fontSize: '10px' }
+                    'dominant-baseline': 'middle'
                   },
-                  tick.label
-                )
-              ])
-              .flat(),
-            // Needle
-            h('path', {
-              d: needlePath,
-              fill: 'var(--tiger-text,#374151)'
-            }),
-            // Center dot
-            h('circle', {
-              cx: c,
-              cy: cY,
-              r: 5,
-              fill: 'var(--tiger-text,#374151)'
-            }),
-            // Value text
-            h(
-              'text',
-              {
-                x: c,
-                y: cY + r * 0.35,
-                class: 'fill-[color:var(--tiger-text,#374151)] text-lg font-semibold tabular-nums',
-                'text-anchor': 'middle',
-                'dominant-baseline': 'middle'
-              },
-              formattedValue
-            ),
-            // Label
-            ...(props.label
-              ? [
-                  h(
-                    'text',
-                    {
-                      x: c,
-                      y: cY + r * 0.35 + 20,
-                      class: chartAxisTickTextClasses,
-                      'text-anchor': 'middle',
-                      'dominant-baseline': 'middle'
-                    },
-                    props.label
-                  )
-                ]
-              : [])
-          ]
-        }
-      )
-
-      return h(
-        'div',
-        {
-          ref: wrapperRef,
-          class: 'inline-block relative',
-          tabindex: props.showTooltip ? 0 : undefined,
-          role: 'img',
-          'aria-label': props.label ? `${props.label}: ${formattedValue}` : formattedValue,
-          onMousemove: handleTooltipMove,
-          onMouseleave: handleTooltipLeave,
-          onFocus: handleTooltipFocus,
-          onBlur: handleTooltipLeave
-        },
-        [
-          canvas,
+                  formattedValue.value
+                ),
+                geo.labelText
+                  ? h(
+                      'text',
+                      {
+                        x: geo.labelText.x,
+                        y: geo.labelText.y,
+                        class: chartAxisTickTextClasses,
+                        'text-anchor': 'middle',
+                        'dominant-baseline': 'middle'
+                      },
+                      geo.labelText.text
+                    )
+                  : null
+              ]
+            }
+          ),
           props.showTooltip
             ? h(ChartTooltip, {
-                content: tooltipContent,
-                open: tooltipState.value.open && tooltipContent !== '',
-                x: tooltipState.value.x,
-                y: tooltipState.value.y
+                content: tooltipContent.value,
+                open: tooltip.value.open && tooltipContent.value !== '',
+                x: tooltip.value.x,
+                y: tooltip.value.y
               })
             : null
         ]

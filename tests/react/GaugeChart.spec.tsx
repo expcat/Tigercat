@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { GaugeChart } from '@expcat/tigercat-react/GaugeChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { render } from '@testing-library/react'
 
 const defaultSize = { width: 280, height: 200 }
@@ -57,24 +57,23 @@ describe('GaugeChart (React)', () => {
       ...defaultSize
     })
 
-    expect(container.querySelector('svg.my-gauge')).toBeTruthy()
+    expect(container.firstElementChild).toHaveClass('my-gauge')
   })
 
-  it('renders a11y title and desc', () => {
+  it('exposes a meter with the current value', () => {
     const { container } = renderWithProps(GaugeChart, {
       value: 50,
-      title: 'Gauge Title',
-      desc: 'Gauge Description',
+      label: 'CPU',
       ...defaultSize
     })
-
-    expect(container.querySelector('title')?.textContent).toBe('Gauge Title')
-    expect(container.querySelector('desc')?.textContent).toBe('Gauge Description')
+    const meter = container.querySelector('[role="meter"]')
+    expect(meter).toHaveAttribute('aria-valuenow', '50')
+    expect(meter).toHaveAttribute('aria-label', 'CPU')
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<GaugeChart />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(<GaugeChart value={50} />)
+      await expectNoA11yViolations(container)
     })
   })
   it('clamps value that exceeds max', () => {

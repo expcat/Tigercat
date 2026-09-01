@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { FunnelChart } from '@expcat/tigercat-react/FunnelChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { fireEvent, render } from '@testing-library/react'
 
 const defaultSize = { width: 320, height: 300 }
@@ -70,7 +70,7 @@ describe('FunnelChart (React)', () => {
 
     const paths = container.querySelector('g[data-series-type="funnel"]')!.querySelectorAll('path')
     fireEvent.click(paths[1])
-    expect(onSegmentClick).toHaveBeenCalled()
+    expect(onSegmentClick).toHaveBeenCalledWith(1, sampleData[1])
   })
 
   it('applies className', () => {
@@ -80,7 +80,7 @@ describe('FunnelChart (React)', () => {
       ...defaultSize
     })
 
-    expect(container.querySelector('svg.my-funnel')).toBeTruthy()
+    expect(container.firstElementChild).toHaveClass('my-funnel')
   })
 
   it('renders a11y title and desc', () => {
@@ -97,7 +97,7 @@ describe('FunnelChart (React)', () => {
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<FunnelChart data={sampleData} width={320} height={300} />)
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolations(container)
     })
   })
 })
