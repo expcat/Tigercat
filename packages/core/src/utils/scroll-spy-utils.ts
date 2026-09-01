@@ -4,34 +4,45 @@ import type {
   ScrollSpyItem,
   ScrollSpyKey
 } from '../types/scroll-spy'
-import { createAnchorObserver, findActiveAnchor, scrollToAnchor } from './anchor-utils'
+import type { ScrollRootInput } from '../types/scroll-root'
+import {
+  createAnchorObserver,
+  getAnchorTargetElement,
+  replaceAnchorHash,
+  scrollToAnchor,
+  shouldHandleAnchorClick,
+  type AnchorClickLike
+} from './anchor-utils'
+import { overlayZIndexClass } from './floating'
 import { isBrowser } from './env'
+import { resolveScrollRoot } from './scroll-root'
 
 export interface FlatScrollSpyItem extends ScrollSpyItem {
   depth: number
 }
 
 export interface ScrollSpyObserverOptions {
-  container: HTMLElement | Window
+  container?: ScrollRootInput
   offsetTop?: number
   targetOffset?: number
   bounds?: number
+  holdUntilScroll?: boolean
   onChange: (item: ScrollSpyItem) => void
 }
 
 export const scrollSpyRootClasses = 'relative text-sm text-[var(--tiger-text-muted,#6b7280)]'
 
-export const scrollSpyStickyClasses = 'sticky top-0'
+export const scrollSpyStickyClasses = `sticky ${overlayZIndexClass.viewport}`
 
 export const scrollSpyListVerticalClasses = 'flex flex-col gap-1'
 
 export const scrollSpyListHorizontalClasses = 'flex flex-wrap items-center gap-2'
 
 export const scrollSpyNestedListClasses =
-  'mt-1 ml-3 flex flex-col gap-1 border-l border-[var(--tiger-border,#e5e7eb)] pl-3'
+  'mt-1 ms-3 flex flex-col gap-1 border-s border-[var(--tiger-border,#e5e7eb)] ps-3'
 
 export const scrollSpyItemBaseClasses =
-  'block rounded-md px-3 py-1.5 text-left transition-colors duration-200 motion-reduce:transition-none hover:bg-[var(--tiger-surface-muted,#f3f4f6)] hover:text-[var(--tiger-primary,#2563eb)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#fff)]'
+  'block rounded-md px-3 py-1.5 text-start transition-colors duration-200 motion-reduce:transition-none hover:bg-[var(--tiger-surface-muted,#f3f4f6)] hover:text-[var(--tiger-primary,#2563eb)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#fff)]'
 
 export const scrollSpyItemActiveClasses =
   'bg-[var(--tiger-primary,#2563eb)]/10 font-medium text-[var(--tiger-primary,#2563eb)]'
@@ -40,6 +51,10 @@ export const scrollSpyItemDisabledClasses = 'cursor-not-allowed opacity-50 hover
 
 export function getScrollSpyKeyString(key: ScrollSpyKey): string {
   return String(key)
+}
+
+export function resolveScrollSpyOffset(targetOffset?: number, offsetTop?: number): number {
+  return targetOffset ?? offsetTop ?? 0
 }
 
 export function flattenScrollSpyItems(
@@ -90,7 +105,12 @@ export function getInitialScrollSpyActiveKey(
   return getEnabledScrollSpyItems(items)[0]?.key
 }
 
-export function getScrollSpyListClasses(direction: ScrollSpyDirection): string {
+export function getScrollSpyListClasses(direction: ScrollSpyDirection, nested = false): string {
+  if (nested) {
+    return direction === 'horizontal'
+      ? 'mt-1 flex flex-wrap items-center gap-2'
+      : scrollSpyNestedListClasses
+  }
   return direction === 'horizontal' ? scrollSpyListHorizontalClasses : scrollSpyListVerticalClasses
 }
 
@@ -98,6 +118,18 @@ export function getScrollSpyRootClasses(sticky: boolean, className?: string): st
   return [scrollSpyRootClasses, sticky && scrollSpyStickyClasses, className]
     .filter(Boolean)
     .join(' ')
+}
+
+export function getScrollSpyRootStyle(
+  sticky: boolean,
+  offset: number,
+  style?: Record<string, string | number>
+): Record<string, string | number> | undefined {
+  if (!sticky && !style) return style
+  return {
+    ...(sticky ? { top: `${offset}px` } : {}),
+    ...style
+  }
 }
 
 export function getScrollSpyItemClasses(
@@ -136,6 +168,28 @@ export function scrollToScrollSpyItem(
   scrollToAnchor(item.href, container, targetOffset)
 }
 
+export function resolveScrollSpyContainer(input?: ScrollRootInput): HTMLElement | Window {
+  const root = resolveScrollRoot(input)
+  if (!root.target || root.isWindow) return isBrowser() ? window : (null as unknown as Window)
+  return root.target as HTMLElement
+}
+
+export function shouldActivateScrollSpyClick(item: ScrollSpyItem, event: AnchorClickLike): boolean {
+  if (item.disabled || !item.href) return false
+  return shouldHandleAnchorClick(event, {
+    hasTargetElement: Boolean(getAnchorTargetElement(item.href))
+  })
+}
+
+export function activateScrollSpyClick(
+  item: ScrollSpyItem,
+  container: HTMLElement | Window,
+  offset: number
+): void {
+  replaceAnchorHash(item.href)
+  scrollToScrollSpyItem(item, container, offset)
+}
+
 export function createScrollSpyObserver(
   items: ScrollSpyItem[] = [],
   options: ScrollSpyObserverOptions
@@ -146,35 +200,22 @@ export function createScrollSpyObserver(
   if (enabledItems.length === 0) return () => {}
 
   const hrefs = enabledItems.map((item) => item.href)
-  const itemByHref = new Map(enabledItems.map((item) => [item.href, item]))
-  const offset = options.targetOffset ?? options.offsetTop ?? 0
-
-  const notify = (href: string) => {
-    const item = itemByHref.get(href)
-    if (item) options.onChange(item)
+  const itemByHref = new Map<string, ScrollSpyItem>()
+  for (const item of enabledItems) {
+    if (!itemByHref.has(item.href)) itemByHref.set(item.href, item)
   }
+  const offset = resolveScrollSpyOffset(options.targetOffset, options.offsetTop)
+  const container = resolveScrollSpyContainer(options.container)
+  const root = container === window ? null : (container as Element)
 
-  if (typeof IntersectionObserver !== 'undefined') {
-    const root = options.container === window ? null : (options.container as Element)
-    return createAnchorObserver(hrefs, {
-      offsetTop: offset,
-      bounds: options.bounds ?? 5,
-      root,
-      onChange: notify
-    })
-  }
-
-  const update = () => {
-    const activeHref = findActiveAnchor(hrefs, options.container, options.bounds ?? 5, offset)
-    notify(activeHref)
-  }
-
-  const scrollTarget = options.container === window ? window : (options.container as HTMLElement)
-  scrollTarget.addEventListener('scroll', update, { passive: true })
-  window.addEventListener('resize', update, { passive: true })
-
-  return () => {
-    scrollTarget.removeEventListener('scroll', update)
-    window.removeEventListener('resize', update)
-  }
+  return createAnchorObserver(hrefs, {
+    offsetTop: offset,
+    bounds: options.bounds ?? 5,
+    root,
+    holdUntilScroll: options.holdUntilScroll ?? true,
+    onChange: (href) => {
+      const item = itemByHref.get(href)
+      if (item) options.onChange(item)
+    }
+  })
 }

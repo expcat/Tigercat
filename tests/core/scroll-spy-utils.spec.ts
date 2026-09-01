@@ -96,6 +96,14 @@ describe('scroll-spy-utils', () => {
       expect(getScrollSpyItemByHref(items, '#missing')).toBeUndefined()
     })
 
+    it('uses the first item when the same href appears twice', () => {
+      const dup: ScrollSpyItem[] = [
+        { key: 'first', href: '#same', label: 'First' },
+        { key: 'second', href: '#same', label: 'Second' }
+      ]
+      expect(getScrollSpyItemByHref(dup, '#same')?.key).toBe('first')
+    })
+
     it('normalizes string and numeric keys for DOM attributes', () => {
       expect(getScrollSpyKeyString('intro')).toBe('intro')
       expect(getScrollSpyKeyString(12)).toBe('12')

@@ -453,6 +453,11 @@ export interface AnchorObserverOptions {
   root?: Element | null
   /** Called whenever the active anchor changes. Empty string when none active. */
   onChange: (activeHref: string) => void
+  /**
+   * Keep the caller's current item until the user scrolls. IO and the no-IO
+   * fallback share this start rule.
+   */
+  holdUntilScroll?: boolean
 }
 
 /**
@@ -468,7 +473,8 @@ export interface AnchorObserverOptions {
 export function createAnchorObserver(links: string[], options: AnchorObserverOptions): () => void {
   if (!isBrowser()) return () => {}
 
-  const { offsetTop = 0, bounds = 5, root = null, onChange } = options
+  const { offsetTop = 0, bounds = 5, root = null, onChange, holdUntilScroll = false } = options
+  const scrollTarget: EventTarget = root ?? window
 
   const computeActive = (): string => {
     const rootTop = root ? root.getBoundingClientRect().top : 0
@@ -487,6 +493,8 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   }
 
   let last = ''
+  let following = !holdUntilScroll
+
   const emit = (): void => {
     const next = computeActive()
     if (next !== last) {
@@ -495,41 +503,64 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
     }
   }
 
-  const targets = new Map<Element, string>()
-  for (const href of links) {
-    const el = getAnchorTargetElement(href)
-    if (el) targets.set(el, href)
+  const gatedEmit = (): void => {
+    if (!following) return
+    emit()
   }
 
-  if (typeof IntersectionObserver === 'undefined') {
-    const scrollTarget: EventTarget = root ?? window
-    scrollTarget.addEventListener('scroll', emit, { passive: true })
-    window.addEventListener('resize', emit, { passive: true })
+  const onUserScroll = (): void => {
+    following = true
     emit()
-    return () => {
-      scrollTarget.removeEventListener('scroll', emit)
-      window.removeEventListener('resize', emit)
+  }
+
+  let io: IntersectionObserver | undefined
+  const observed = new Set<Element>()
+
+  const syncTargets = (): void => {
+    if (!io) return
+    const found = new Set<Element>()
+    for (const href of links) {
+      const el = getAnchorTargetElement(href)
+      if (!el) continue
+      found.add(el)
+      if (!observed.has(el)) {
+        io.observe(el)
+        observed.add(el)
+      }
+    }
+    for (const el of observed) {
+      if (found.has(el)) continue
+      io.unobserve(el)
+      observed.delete(el)
     }
   }
 
-  if (targets.size === 0) {
-    emit()
-    return () => {}
+  if (typeof IntersectionObserver !== 'undefined') {
+    io = new IntersectionObserver(gatedEmit, {
+      root,
+      rootMargin: `-${offsetTop}px 0px 0px 0px`,
+      threshold: [0, 1]
+    })
+    syncTargets()
   }
 
-  const observer = new IntersectionObserver(emit, {
-    root,
-    rootMargin: `-${offsetTop}px 0px 0px 0px`,
-    threshold: [0, 1]
-  })
-
-  for (const target of targets.keys()) observer.observe(target)
-
-  const initial = computeActive()
-  if (initial) {
-    last = initial
-    onChange(initial)
+  let mo: MutationObserver | undefined
+  if (typeof MutationObserver !== 'undefined') {
+    mo = new MutationObserver(() => {
+      syncTargets()
+      gatedEmit()
+    })
+    mo.observe(root ?? document.documentElement, { childList: true, subtree: true })
   }
 
-  return () => observer.disconnect()
+  scrollTarget.addEventListener('scroll', onUserScroll, { passive: true })
+  window.addEventListener('resize', gatedEmit, { passive: true })
+  if (following) emit()
+
+  return () => {
+    io?.disconnect()
+    mo?.disconnect()
+    scrollTarget.removeEventListener('scroll', onUserScroll)
+    window.removeEventListener('resize', gatedEmit)
+  }
 }

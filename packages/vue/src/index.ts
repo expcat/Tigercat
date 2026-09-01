@@ -245,7 +245,7 @@ export type { VuePageHeaderProps, PageHeaderProps } from './components/PageHeade
 export { Spotlight } from './components/Spotlight'
 export type { VueSpotlightProps, SpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'
-export type { VueScrollSpyProps } from './components/ScrollSpy'
+export type { VueScrollSpyProps, ScrollSpyProps } from './components/ScrollSpy'
 export { Drawer } from './components/Drawer'
 export type { VueDrawerProps } from './components/Drawer'
 export { Modal } from './components/Modal'

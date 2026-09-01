@@ -21,18 +21,24 @@ import {
   getScrollSpyItemClasses,
   getScrollSpyItemByKey,
   getScrollSpyKeyString,
+  getScrollSpyLabels,
   getScrollSpyListClasses,
   getScrollSpyRootClasses,
+  getScrollSpyRootStyle,
   mergeStyleValues,
-  scrollSpyNestedListClasses,
-  scrollToScrollSpyItem,
+  mergeTigerLocale,
+  resolveScrollSpyContainer,
+  resolveScrollSpyOffset,
+  shouldActivateScrollSpyClick,
+  activateScrollSpyClick,
+  type ScrollRootInput,
   type ScrollSpyChangePayload,
   type ScrollSpyDirection,
   type ScrollSpyItem,
-  type ScrollSpyKey
+  type ScrollSpyKey,
+  type TigerLocale
 } from '@expcat/tigercat-core'
-
-const getWindowContainer = () => window
+import { useTigerConfig } from './ConfigProvider'
 
 export const ScrollSpy = defineComponent({
   name: 'TigerScrollSpy',
@@ -72,11 +78,11 @@ export const ScrollSpy = defineComponent({
     },
     ariaLabel: {
       type: String,
-      default: 'Scroll navigation'
+      default: undefined
     },
     getContainer: {
-      type: Function as PropType<() => HTMLElement | Window>,
-      default: getWindowContainer
+      type: [String, Object, Function] as PropType<ScrollRootInput>,
+      default: undefined
     },
     className: {
       type: String,
@@ -85,10 +91,19 @@ export const ScrollSpy = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:activeKey', 'change', 'click'],
   setup(props, { attrs, emit }) {
+    const config = useTigerConfig()
+    const labels = computed(() =>
+      getScrollSpyLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
+    const offset = computed(() => resolveScrollSpyOffset(props.targetOffset, props.offsetTop))
     const innerActiveKey = ref<ScrollSpyKey | undefined>(
       getInitialScrollSpyActiveKey(props.items, props.activeKey, props.defaultActiveKey)
     )
@@ -101,7 +116,9 @@ export const ScrollSpy = defineComponent({
     )
     const flatItems = computed(() => flattenScrollSpyItems(props.items))
     let stopObserver: (() => void) | null = null
-    const scrollLock = createProgrammaticScrollLock(() => props.getContainer())
+    const scrollLock = createProgrammaticScrollLock(() =>
+      resolveScrollSpyContainer(props.getContainer)
+    )
 
     const emitActive = (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {
       const nextKeyString = getScrollSpyKeyString(item.key)
@@ -116,9 +133,8 @@ export const ScrollSpy = defineComponent({
     const setupObserver = () => {
       stopObserver?.()
       stopObserver = createScrollSpyObserver(props.items, {
-        container: props.getContainer(),
-        offsetTop: props.offsetTop,
-        targetOffset: props.targetOffset,
+        container: props.getContainer,
+        offsetTop: offset.value,
         bounds: props.bounds,
         onChange: (item) => {
           if (scrollLock.isLocked()) return
@@ -128,13 +144,17 @@ export const ScrollSpy = defineComponent({
     }
 
     const handleClick = (item: ScrollSpyItem, event: MouseEvent) => {
-      event.preventDefault()
-      if (item.disabled) return
+      if (item.disabled) {
+        event.preventDefault()
+        return
+      }
+      if (!shouldActivateScrollSpyClick(item, event)) return
 
+      event.preventDefault()
       emit('click', item, event)
       emitActive(item, 'click')
       scrollLock.lock()
-      scrollToScrollSpyItem(item, props.getContainer(), props.targetOffset ?? props.offsetTop)
+      activateScrollSpyClick(item, resolveScrollSpyContainer(props.getContainer), offset.value)
     }
 
     onMounted(() => {
@@ -142,7 +162,15 @@ export const ScrollSpy = defineComponent({
     })
 
     watch(
-      () => [props.items, props.offsetTop, props.targetOffset, props.bounds, props.getContainer],
+      [
+        () => props.items,
+        offset,
+        () => props.bounds,
+        () => {
+          const container = resolveScrollSpyContainer(props.getContainer)
+          return container === window ? 'window' : container
+        }
+      ],
       () => nextTick(() => setupObserver())
     )
 
@@ -169,22 +197,27 @@ export const ScrollSpy = defineComponent({
     const renderItems = (items: ScrollSpyItem[], nested = false): VNode =>
       h(
         'ul',
-        { class: nested ? scrollSpyNestedListClasses : getScrollSpyListClasses(props.direction) },
+        { class: getScrollSpyListClasses(props.direction, nested), role: 'list' },
         items.map((item) => {
           const keyString = getScrollSpyKeyString(item.key)
           const isActive = keyString === activeKeyString.value
-          const depth = flatItems.value.find((flat) => flat.key === item.key)?.depth ?? 0
+          const depth =
+            flatItems.value.find((flat) => getScrollSpyKeyString(flat.key) === keyString)?.depth ??
+            0
+          const hasHref = Boolean(item.href)
+          const tag = hasHref ? 'a' : 'span'
 
           return h('li', { key: keyString, 'data-depth': depth }, [
             h(
-              'a',
+              tag,
               {
-                href: item.href,
+                href: hasHref ? item.href : undefined,
                 class: getScrollSpyItemClasses(isActive, item.disabled),
                 'aria-current': isActive ? 'location' : undefined,
                 'aria-disabled': item.disabled || undefined,
+                tabindex: item.disabled ? -1 : undefined,
                 'data-key': keyString,
-                onClick: (event: MouseEvent) => handleClick(item, event)
+                onClick: hasHref ? (event: MouseEvent) => handleClick(item, event) : undefined
               },
               item.label
             ),
@@ -203,8 +236,12 @@ export const ScrollSpy = defineComponent({
             getScrollSpyRootClasses(props.sticky, props.className),
             coerceClassValue(attrsRecord.class)
           ),
-          style: mergeStyleValues(attrsRecord.style, props.style),
-          'aria-label': props.ariaLabel
+          style: mergeStyleValues(
+            getScrollSpyRootStyle(props.sticky, offset.value),
+            attrsRecord.style,
+            props.style
+          ),
+          'aria-label': props.ariaLabel ?? labels.value.ariaLabel
         },
         renderItems(props.items)
       )
@@ -213,5 +250,6 @@ export const ScrollSpy = defineComponent({
 })
 
 export type VueScrollSpyProps = InstanceType<typeof ScrollSpy>['$props']
+export type ScrollSpyProps = VueScrollSpyProps
 
 export default ScrollSpy

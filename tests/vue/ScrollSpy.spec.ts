@@ -6,8 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { nextTick } from 'vue'
 import { ScrollSpy } from '@expcat/tigercat-vue/ScrollSpy'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { ScrollSpyItem } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { expectNoA11yViolations } from '../utils'
+import { MockIntersectionObserver } from '../utils/mock-observers'
+import { h } from 'vue'
 
 const items: ScrollSpyItem[] = [
   { key: 'intro', href: '#intro', label: 'Intro' },
@@ -214,8 +218,19 @@ describe('ScrollSpy', () => {
 
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
-      const { container } = renderScrollSpy({ ariaLabel: 'Article navigation' })
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = renderScrollSpy()
+      await expectNoA11yViolations(container)
+    })
+
+    it('names the landmark from locale and skips disabled items in the tab order', () => {
+      render({
+        setup: () => () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(ScrollSpy, { items, getContainer: () => scrollContainer })
+          )
+      })
+      expect(screen.getByRole('navigation', { name: '章节导航' })).toBeInTheDocument()
+      expect(screen.getByText('Disabled')).toHaveAttribute('tabindex', '-1')
     })
 
     it('uses aria-current only on the active item', () => {
@@ -247,9 +262,47 @@ describe('ScrollSpy', () => {
 
     it('handles missing target elements without throwing', async () => {
       render(ScrollSpy, {
-        props: { items: [{ key: 'missing', href: '#missing', label: 'Missing' }] }
+        props: {
+          items: [
+            { key: 'intro', href: '#intro', label: 'Intro' },
+            { key: 'missing', href: '#missing', label: 'Missing' }
+          ]
+        }
       })
       await expect(fireEvent.click(screen.getByText('Missing'))).resolves.toBeUndefined()
+      expect(screen.getByText('Missing')).not.toHaveAttribute('aria-current')
+      expect(screen.getByText('Intro')).toHaveAttribute('aria-current', 'location')
+    })
+
+    it('uses the same offset for sticky top', () => {
+      const { container } = renderScrollSpy({ sticky: true, offsetTop: 48 })
+      expect((container.firstChild as HTMLElement).style.top).toBe('48px')
+    })
+  })
+
+  describe('scroll following', () => {
+    it('keeps defaultActiveKey until the user scrolls, then follows the viewport', async () => {
+      MockIntersectionObserver.reset()
+      vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+      const usage = document.getElementById('usage') as HTMLElement
+      const intro = document.getElementById('intro') as HTMLElement
+      const api = document.getElementById('api') as HTMLElement
+      vi.spyOn(intro, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, -200, 100, 40))
+      vi.spyOn(usage, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 4, 100, 40))
+      vi.spyOn(api, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 400, 100, 40))
+
+      renderScrollSpy({ defaultActiveKey: 'intro' })
+      await nextTick()
+      expect(screen.getByText('Intro')).toHaveAttribute('aria-current', 'location')
+
+      const observer = MockIntersectionObserver.instances.at(-1)
+      observer?.trigger([{ target: usage, isIntersecting: true }])
+      expect(screen.getByText('Intro')).toHaveAttribute('aria-current', 'location')
+
+      scrollContainer.dispatchEvent(new Event('scroll'))
+      await waitFor(() => {
+        expect(screen.getByText('Usage')).toHaveAttribute('aria-current', 'location')
+      })
     })
   })
 })
