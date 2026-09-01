@@ -137,7 +137,10 @@ export const thTH: TigerLocale = {
     exportCsvAriaLabel: 'ส่งออกเป็น CSV',
     exportExcelAriaLabel: 'ส่งออกเป็น Excel',
     expandRowAriaLabel: 'ขยายแถว',
-    collapseRowAriaLabel: 'ยุบแถว'
+    collapseRowAriaLabel: 'ยุบแถว',
+    sortMenuAriaLabel: 'เรียงลำดับ',
+    filterColumnAriaLabel: 'กรอง {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: 'ส่งออก',
@@ -166,7 +169,9 @@ export const thTH: TigerLocale = {
   formWizard: {
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
-    finishText: 'เสร็จสิ้น'
+    finishText: 'เสร็จสิ้น',
+    ariaLabel: 'ตัวช่วยสร้างฟอร์ม',
+    skippedText: 'ข้ามแล้ว'
   },
   tour: {
     prevText: 'ก่อนหน้า',

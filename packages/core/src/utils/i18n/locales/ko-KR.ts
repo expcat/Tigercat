@@ -137,7 +137,10 @@ export const koKR: TigerLocale = {
     exportCsvAriaLabel: 'CSV로 내보내기',
     exportExcelAriaLabel: 'Excel로 내보내기',
     expandRowAriaLabel: '행 펼치기',
-    collapseRowAriaLabel: '행 접기'
+    collapseRowAriaLabel: '행 접기',
+    sortMenuAriaLabel: '정렬',
+    filterColumnAriaLabel: '{column} 필터',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: '내보내기',
@@ -166,7 +169,9 @@ export const koKR: TigerLocale = {
   formWizard: {
     prevText: '이전',
     nextText: '다음',
-    finishText: '완료'
+    finishText: '완료',
+    ariaLabel: '양식 마법사',
+    skippedText: '건너뜀'
   },
   tour: {
     prevText: '이전',

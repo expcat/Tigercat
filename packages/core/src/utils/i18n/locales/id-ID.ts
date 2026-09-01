@@ -137,7 +137,10 @@ export const idID: TigerLocale = {
     exportCsvAriaLabel: 'Ekspor ke CSV',
     exportExcelAriaLabel: 'Ekspor ke Excel',
     expandRowAriaLabel: 'Bentangkan baris',
-    collapseRowAriaLabel: 'Ciutkan baris'
+    collapseRowAriaLabel: 'Ciutkan baris',
+    sortMenuAriaLabel: 'Urutkan',
+    filterColumnAriaLabel: 'Saring {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: 'Ekspor',
@@ -166,7 +169,9 @@ export const idID: TigerLocale = {
   formWizard: {
     prevText: 'Sebelumnya',
     nextText: 'Selanjutnya',
-    finishText: 'Selesai'
+    finishText: 'Selesai',
+    ariaLabel: 'Wisaya formulir',
+    skippedText: 'Dilewati'
   },
   tour: {
     prevText: 'Sebelumnya',

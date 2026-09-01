@@ -169,7 +169,9 @@ export const zhTW: TigerLocale = {
   formWizard: {
     prevText: '上一步',
     nextText: '下一步',
-    finishText: '完成'
+    finishText: '完成',
+    ariaLabel: '表單精靈',
+    skippedText: '已跳過'
   },
   tour: {
     prevText: '上一步',

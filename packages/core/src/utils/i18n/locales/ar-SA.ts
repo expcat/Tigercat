@@ -137,7 +137,10 @@ export const arSA: TigerLocale = {
     exportCsvAriaLabel: 'تصدير إلى CSV',
     exportExcelAriaLabel: 'تصدير إلى Excel',
     expandRowAriaLabel: 'توسيع الصف',
-    collapseRowAriaLabel: 'طي الصف'
+    collapseRowAriaLabel: 'طي الصف',
+    sortMenuAriaLabel: 'فرز',
+    filterColumnAriaLabel: 'تصفية {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: 'تصدير',
@@ -166,7 +169,9 @@ export const arSA: TigerLocale = {
   formWizard: {
     prevText: 'السابق',
     nextText: 'التالي',
-    finishText: 'إنهاء'
+    finishText: 'إنهاء',
+    ariaLabel: 'معالج النموذج',
+    skippedText: 'تم التخطي'
   },
   tour: {
     prevText: 'السابق',

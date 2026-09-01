@@ -76,7 +76,8 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
   ].flatMap((locale) => [
     `${locale}:colorPicker.formatHex`,
     `${locale}:colorPicker.formatRgb`,
-    `${locale}:colorPicker.formatHsl`
+    `${locale}:colorPicker.formatHsl`,
+    `${locale}:table.groupHeaderText`
   ])
 ])
 

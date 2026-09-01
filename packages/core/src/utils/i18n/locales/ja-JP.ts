@@ -137,7 +137,10 @@ export const jaJP: TigerLocale = {
     exportCsvAriaLabel: 'CSV に書き出す',
     exportExcelAriaLabel: 'Excel に書き出す',
     expandRowAriaLabel: '行を展開',
-    collapseRowAriaLabel: '行を折りたたむ'
+    collapseRowAriaLabel: '行を折りたたむ',
+    sortMenuAriaLabel: '並べ替え',
+    filterColumnAriaLabel: '{column} を絞り込む',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: '書き出す',
@@ -166,7 +169,9 @@ export const jaJP: TigerLocale = {
   formWizard: {
     prevText: '前へ',
     nextText: '次へ',
-    finishText: '完了'
+    finishText: '完了',
+    ariaLabel: 'フォームウィザード',
+    skippedText: 'スキップ済み'
   },
   tour: {
     prevText: '前へ',

@@ -137,7 +137,10 @@ export const esES: TigerLocale = {
     exportCsvAriaLabel: 'Exportar a CSV',
     exportExcelAriaLabel: 'Exportar a Excel',
     expandRowAriaLabel: 'Expandir fila',
-    collapseRowAriaLabel: 'Contraer fila'
+    collapseRowAriaLabel: 'Contraer fila',
+    sortMenuAriaLabel: 'Ordenar',
+    filterColumnAriaLabel: 'Filtrar {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: 'Exportar',
@@ -166,7 +169,9 @@ export const esES: TigerLocale = {
   formWizard: {
     prevText: 'Anterior',
     nextText: 'Siguiente',
-    finishText: 'Finalizar'
+    finishText: 'Finalizar',
+    ariaLabel: 'Asistente de formulario',
+    skippedText: 'Omitido'
   },
   tour: {
     prevText: 'Anterior',

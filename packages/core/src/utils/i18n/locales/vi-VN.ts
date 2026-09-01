@@ -137,7 +137,10 @@ export const viVN: TigerLocale = {
     exportCsvAriaLabel: 'Xuất sang CSV',
     exportExcelAriaLabel: 'Xuất sang Excel',
     expandRowAriaLabel: 'Mở rộng hàng',
-    collapseRowAriaLabel: 'Thu gọn hàng'
+    collapseRowAriaLabel: 'Thu gọn hàng',
+    sortMenuAriaLabel: 'Sắp xếp',
+    filterColumnAriaLabel: 'Lọc {column}',
+    groupHeaderText: '{key} ({count})'
   },
   dataExport: {
     triggerText: 'Xuất',
@@ -166,7 +169,9 @@ export const viVN: TigerLocale = {
   formWizard: {
     prevText: 'Trước',
     nextText: 'Tiếp',
-    finishText: 'Hoàn thành'
+    finishText: 'Hoàn thành',
+    ariaLabel: 'Trình hướng dẫn biểu mẫu',
+    skippedText: 'Đã bỏ qua'
   },
   tour: {
     prevText: 'Trước',
