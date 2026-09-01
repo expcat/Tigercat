@@ -6,7 +6,7 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import type { TableColumn } from '@expcat/tigercat-vue'
 import type { DataExportFormat } from '@expcat/tigercat-core'
 
-interface Row {
+interface Row extends Record<string, unknown> {
   id: number
   name: string
   hiredAt: Date

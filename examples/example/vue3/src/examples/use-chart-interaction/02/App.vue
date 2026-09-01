@@ -94,7 +94,7 @@ const legendItems = computed(() => [
             fill="#2563eb"
             :opacity="interaction.getElementOpacity(index)"
             role="button"
-            :tabindex="interaction.resolvedSelectedIndex === index ? 0 : -1"
+            :tabindex="interaction.resolvedSelectedIndex.value === index ? 0 : -1"
             :aria-label="`${item.x} 订单量 ${item.y}`"
             @mouseenter="interaction.handleMouseEnter(index, $event)"
             @mousemove="interaction.handleMouseMove"
@@ -112,8 +112,8 @@ const legendItems = computed(() => [
       @item-leave="interaction.handleLegendLeave" />
     <ChartTooltip
       :content="tooltipContent"
-      :open="interaction.resolvedHoveredIndex != null"
-      :x="interaction.tooltipPosition.x"
-      :y="interaction.tooltipPosition.y" />
+      :open="interaction.resolvedHoveredIndex.value != null"
+      :x="interaction.tooltipPosition.value.x"
+      :y="interaction.tooltipPosition.value.y" />
   </div>
 </template>

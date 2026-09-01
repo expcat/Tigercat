@@ -32,7 +32,7 @@ const rows: Row[] = [
         :columns="columns"
         :data-source="
           selectedKeys.length
-            ? dataSource.filter((row) => selectedKeys.includes(row.id as number))
+            ? dataSource.filter((row: Row) => selectedKeys.includes(row.id as number))
             : dataSource
         "
         :hidden-column-keys="hiddenColumnKeys"

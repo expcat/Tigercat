@@ -57,6 +57,7 @@ export default function App() {
           setActivity(`${liked ? '点赞' : '取消点赞'}：${node.user?.name ?? node.id}`)
         }}
         onReply={(node, value) => {
+          if (!node) return
           const reply: CommentNode = {
             id: `reply-${nextReplyId.current++}`,
             parentId: node.id,

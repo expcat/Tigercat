@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
-import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
+import { DEMO_THEME_PRESETS, resolveDemoTheme } from '@demo-shared/themes'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
+import type { ThemePresetName } from '@expcat/tigercat-core'
 
-const props = defineProps<{ lang?: DemoLang; modelValue: string }>()
-const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
+const props = defineProps<{ lang?: DemoLang; modelValue: ThemePresetName }>()
+const emit = defineEmits<{ (e: 'update:modelValue', value: ThemePresetName): void }>()
 
 const lang = computed<DemoLang>(() => props.lang ?? 'zh-CN')
 
 const handleThemeChange = (value: string | number | (string | number)[] | undefined) => {
   const themeValue = String(Array.isArray(value) ? value[0] : value)
-  if (themeValue) emit('update:modelValue', themeValue)
+  if (themeValue) emit('update:modelValue', resolveDemoTheme(themeValue))
 }
 
 const themeOptions = computed(() =>

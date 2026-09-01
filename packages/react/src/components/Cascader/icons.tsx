@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   icon20ViewBox,
   chevronDownSolidIcon20PathD,

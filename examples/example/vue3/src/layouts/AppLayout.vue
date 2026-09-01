@@ -5,6 +5,7 @@ import { BreadcrumbItem } from '@expcat/tigercat-vue/BreadcrumbItem'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { ThemePresetName } from '@expcat/tigercat-core'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
@@ -92,7 +93,7 @@ const handleLangChange = (v: DemoLang) => {
   lang.value = v
 }
 
-const handleThemeChange = (v: string) => {
+const handleThemeChange = (v: ThemePresetName) => {
   theme.value = v
 }
 

@@ -1,9 +1,9 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -19,6 +19,7 @@
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
+      "@expcat/tigercat-core/locales/*": ["../../../packages/core/src/utils/i18n/locales/*"],
       "@expcat/tigercat-vue": ["../../../packages/vue/src/index.ts"],
       "@expcat/tigercat-vue/AnchorLink": ["../../../packages/vue/src/components/Anchor"],
       "@expcat/tigercat-vue/BreadcrumbItem": ["../../../packages/vue/src/components/Breadcrumb"],

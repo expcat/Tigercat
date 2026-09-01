@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
+import type { ThemePresetName } from '@expcat/tigercat-core'
 import { Button } from '@expcat/tigercat-vue/Button'
 import ThemeSwitch from './ThemeSwitch.vue'
 import DarkModeSwitch from './DarkModeSwitch.vue'
@@ -9,7 +10,7 @@ import LanguageSwitch from './LanguageSwitch.vue'
 
 const props = defineProps<{
   lang: DemoLang
-  theme: string
+  theme: ThemePresetName
   dark: boolean
   isSiderCollapsed: boolean
   isMobile: boolean
@@ -18,7 +19,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (e: 'update:lang', v: DemoLang): void
-  (e: 'update:theme', v: string): void
+  (e: 'update:theme', v: ThemePresetName): void
   (e: 'update:dark', v: boolean): void
   (e: 'toggle-sider'): void
 }>()
@@ -73,7 +74,7 @@ const handleLangChange = (v: DemoLang) => {
         <ThemeSwitch
           :lang="props.lang"
           :model-value="props.theme"
-          @update:model-value="(v: string) => emit('update:theme', v)" />
+          @update:model-value="(v: ThemePresetName) => emit('update:theme', v)" />
         <DarkModeSwitch
           :lang="props.lang"
           :model-value="props.dark"
@@ -93,7 +94,7 @@ const handleLangChange = (v: DemoLang) => {
             <ThemeSwitch
               :lang="props.lang"
               :model-value="props.theme"
-              @update:model-value="(v: string) => emit('update:theme', v)" />
+              @update:model-value="(v: ThemePresetName) => emit('update:theme', v)" />
             <DarkModeSwitch
               :lang="props.lang"
               :model-value="props.dark"

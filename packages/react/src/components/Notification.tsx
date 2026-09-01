@@ -1,4 +1,4 @@
-import React, { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
 import {

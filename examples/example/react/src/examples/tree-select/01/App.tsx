@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
-import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
+import { TreeSelect, type TreeSelectValue } from '@expcat/tigercat-react/TreeSelect'
 
 const treeData = [
   {
@@ -15,7 +15,7 @@ const treeData = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number | undefined>(undefined)
+  const [value, setValue] = useState<TreeSelectValue>(undefined)
 
   return (
     <FormItem label="团队" className="w-full max-w-sm">

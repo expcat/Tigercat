@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -28,6 +28,7 @@
       "@demo-shared/*": ["../shared/*"],
       "@demo-runtime/context": ["./src/playground/runtime-context.ts"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
+      "@expcat/tigercat-core/locales/*": ["../../../packages/core/src/utils/i18n/locales/*"],
       "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
       "@expcat/tigercat-react/AnchorLink": ["../../../packages/react/src/components/Anchor"],
       "@expcat/tigercat-react/BreadcrumbItem": [

@@ -1,19 +1,20 @@
 import React from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
-import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
+import { DEMO_THEME_PRESETS, resolveDemoTheme } from '@demo-shared/themes'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
+import type { ThemePresetName } from '@expcat/tigercat-core'
 
 export interface ThemeSwitchProps {
   lang?: DemoLang
-  value: string
-  onChange: (theme: string) => void
+  value: ThemePresetName
+  onChange: (theme: ThemePresetName) => void
 }
 
 const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN', value, onChange }) => {
   const handleThemeChange = (next: string | number | (string | number)[] | undefined) => {
     const themeValue = String(Array.isArray(next) ? next[0] : next)
-    if (themeValue) onChange(themeValue)
+    if (themeValue) onChange(resolveDemoTheme(themeValue))
   }
 
   const themeOptions = DEMO_THEME_PRESETS.map((preset) => ({

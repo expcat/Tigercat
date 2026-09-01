@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@expcat/tigercat-react/Button'
+import type { ThemePresetName } from '@expcat/tigercat-core'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 import ThemeSwitch from './ThemeSwitch'
@@ -10,8 +11,8 @@ import LanguageSwitch from './LanguageSwitch'
 export interface AppHeaderProps {
   lang: DemoLang
   onLangChange: (lang: DemoLang) => void
-  theme: string
-  onThemeChange: (theme: string) => void
+  theme: ThemePresetName
+  onThemeChange: (theme: ThemePresetName) => void
   dark: boolean
   onDarkChange: (enabled: boolean) => void
   isSiderCollapsed: boolean

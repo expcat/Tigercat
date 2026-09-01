@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
+import { TreeSelect, type TreeSelectValue } from '@expcat/tigercat-react/TreeSelect'
 
 const treeData = [
   {
@@ -14,7 +14,7 @@ const treeData = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<(string | number)[] | undefined>(undefined)
+  const [value, setValue] = useState<TreeSelectValue>(undefined)
 
   return (
     <TreeSelect

@@ -81,9 +81,9 @@ const legendItems = computed(() =>
       </svg>
       <ChartTooltip
         :content="tooltipContent"
-        :open="click.resolvedHoveredIndex != null"
-        :x="click.tooltipPosition.x"
-        :y="click.tooltipPosition.y" />
+        :open="click.resolvedHoveredIndex.value != null"
+        :x="click.tooltipPosition.value.x"
+        :y="click.tooltipPosition.value.y" />
     </Card>
     <Card>
       <p class="mb-2 text-sm text-[color:var(--tiger-text-secondary)]">
@@ -100,7 +100,7 @@ const legendItems = computed(() =>
           :fill="d.color"
           :opacity="selected.getElementOpacity(i)"
           rx="4"
-          :tabindex="selected.resolvedSelectedIndex === i ? 0 : -1"
+          :tabindex="selected.resolvedSelectedIndex.value === i ? 0 : -1"
           role="button"
           :aria-label="`${d.label}: ${d.value}`"
           class="cursor-pointer"

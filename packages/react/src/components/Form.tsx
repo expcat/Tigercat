@@ -73,256 +73,260 @@ const FormContext = createContext<FormContextValue | null>(null)
 
 export const useFormContext = (): FormContextValue | null => useContext(FormContext)
 
-export interface FormProps
+export interface FormProps<T extends FormValues = FormValues>
   extends
-    Omit<CoreFormProps, 'controller'>,
+    Omit<CoreFormProps, 'controller' | 'model'>,
     Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onChange' | 'onSubmit' | 'onReset'> {
+  model?: T
   controller?: FormController
   children?: React.ReactNode
   onSubmit?: (event: FormSubmitEvent) => void
   onValidate?: (fieldName: string, valid: boolean, error?: string | null) => void
-  onChange?: (values: FormValues) => void
+  onChange?: (values: T) => void
 }
 
 function isFormEngine(controller: FormController): controller is FormEngine {
   return typeof (controller as FormEngine).replaceValues === 'function'
 }
 
-export const Form = forwardRef<FormHandle, FormProps>(
-  (
-    {
-      model,
-      controller,
+function FormInner<T extends FormValues>(
+  {
+    model,
+    controller,
+    rules,
+    labelWidth,
+    labelPosition = 'left',
+    labelAlign,
+    size = 'md',
+    inlineMessage = true,
+    showRequiredAsterisk = true,
+    disabled = false,
+    loading = false,
+    children,
+    onSubmit,
+    onValidate,
+    onChange,
+    className,
+    fieldDependencies,
+    conditions,
+    validateDebounce = 0,
+    undoable = false,
+    maxHistorySize = 50,
+    locale,
+    ...domProps
+  }: FormProps<T>,
+  ref: React.ForwardedRef<FormHandle>
+): React.ReactElement {
+  const config = useTigerConfig()
+  const validationMessages = useMemo(
+    () => getFormValidationLabels(mergeTigerLocale(config.locale, locale)),
+    [config.locale, locale]
+  )
+
+  const optionsRef = useRef({
+    rules,
+    conditions,
+    fieldDependencies,
+    validateDebounce,
+    onValidate,
+    onChange,
+    validationMessages
+  })
+  optionsRef.current = {
+    rules,
+    conditions,
+    fieldDependencies,
+    validateDebounce,
+    onValidate,
+    onChange,
+    validationMessages
+  }
+
+  const ownedEngineRef = useRef<FormEngine | null>(null)
+  if (!controller && ownedEngineRef.current === null) {
+    ownedEngineRef.current = createFormEngine({
+      initialValues: model ?? {},
+      undoable,
+      maxHistorySize,
+      getRules: () => optionsRef.current.rules,
+      getConditions: () => optionsRef.current.conditions,
+      getFieldDependencies: () => optionsRef.current.fieldDependencies,
+      getMessages: () => optionsRef.current.validationMessages,
+      getValidateDebounce: () => optionsRef.current.validateDebounce,
+      onValidate: (fieldName, valid, error) =>
+        optionsRef.current.onValidate?.(fieldName, valid, error),
+      onValuesChange: (next) => optionsRef.current.onChange?.(next as T)
+    })
+  }
+
+  const engine: FormEngine | null =
+    controller && isFormEngine(controller) ? controller : ownedEngineRef.current
+  if (!engine) {
+    throw new Error('Form is missing a form engine')
+  }
+
+  if (!controller && model !== undefined) {
+    engine.replaceValues(model, { emit: false })
+  }
+
+  if (controller && isFormEngine(controller)) {
+    controller.setOptions({
+      rules,
+      conditions,
+      fieldDependencies,
+      messages: validationMessages,
+      validateDebounce,
+      onValidate
+    })
+  }
+
+  const [, rerender] = useReducer((count: number) => count + 1, 0)
+  useEffect(() => {
+    const unsubscribe = engine.subscribe(rerender)
+    return unsubscribe
+  }, [engine])
+
+  useEffect(() => {
+    const owned = ownedEngineRef.current
+    return () => {
+      owned?.dispose()
+      ownedEngineRef.current = null
+    }
+  }, [])
+
+  const formElementRef = useRef<HTMLFormElement>(null)
+  const values = engine.getValues()
+  const errors = engine.getErrors()
+  const errorsByField = useMemo(() => createFormErrorMap(errors), [errors])
+
+  const validateField = useCallback(
+    async (
+      fieldName: string,
+      rulesOverride?: FormRule | FormRule[],
+      trigger?: FormRuleTrigger
+    ): Promise<void> => {
+      await engine.validateField(fieldName, rulesOverride, trigger)
+    },
+    [engine]
+  )
+
+  const submitForm = useCallback(async (): Promise<boolean> => {
+    if (loading) return false
+    const valid = await engine.validate()
+    if (!valid) {
+      focusFirstInvalidField(formElementRef.current)
+    }
+    onSubmit?.({ valid, values: engine.getValues(), errors: engine.getErrors() })
+    return valid
+  }, [engine, loading, onSubmit])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      validate: () => engine.validate(),
+      validateFields: (fieldNames) => engine.validateFields(fieldNames),
+      validateField,
+      clearValidate: (fieldNames) => engine.clearValidate(fieldNames),
+      resetFields: () => engine.reset(),
+      addField: (fieldName, defaultValue) => engine.addField(fieldName, defaultValue),
+      removeField: (fieldName) => engine.removeField(fieldName),
+      undo: () => engine.undo(),
+      redo: () => engine.redo(),
+      snapshotHistory: () => engine.snapshotHistory(),
+      get canUndo() {
+        return engine.canUndo
+      },
+      get canRedo() {
+        return engine.canRedo
+      }
+    }),
+    [engine, validateField]
+  )
+
+  const contextValue = useMemo<FormContextValue>(
+    () => ({
+      model: values,
       rules,
       labelWidth,
-      labelPosition = 'left',
+      labelPosition,
       labelAlign,
-      size = 'md',
-      inlineMessage = true,
-      showRequiredAsterisk = true,
-      disabled = false,
-      loading = false,
-      children,
-      onSubmit,
-      onValidate,
-      onChange,
-      className,
-      fieldDependencies,
-      conditions,
-      validateDebounce = 0,
-      undoable = false,
-      maxHistorySize = 50,
-      locale,
-      ...domProps
-    },
-    ref
-  ) => {
-    const config = useTigerConfig()
-    const validationMessages = useMemo(
-      () => getFormValidationLabels(mergeTigerLocale(config.locale, locale)),
-      [config.locale, locale]
-    )
-
-    const optionsRef = useRef({
+      size,
+      inlineMessage,
+      showRequiredAsterisk,
+      disabled,
+      loading,
+      errors,
+      errorsByField,
+      registerFieldRules: engine.registerFieldRules,
+      registerFieldCondition: engine.registerFieldCondition,
+      getFieldConditionState: engine.getFieldConditionState,
+      validateField,
+      clearValidate: engine.clearValidate,
+      getFieldValue: engine.getFieldValue,
+      updateValue: engine.setFieldValue,
+      validate: () => engine.validate(),
+      validateFields: (fieldNames) => engine.validateFields(fieldNames),
+      getValues: () => engine.getValues(),
+      submit: submitForm
+    }),
+    [
+      values,
       rules,
-      conditions,
-      fieldDependencies,
-      validateDebounce,
-      onValidate,
-      onChange,
-      validationMessages
-    })
-    optionsRef.current = {
-      rules,
-      conditions,
-      fieldDependencies,
-      validateDebounce,
-      onValidate,
-      onChange,
-      validationMessages
-    }
+      labelWidth,
+      labelPosition,
+      labelAlign,
+      size,
+      inlineMessage,
+      showRequiredAsterisk,
+      disabled,
+      loading,
+      errors,
+      errorsByField,
+      engine,
+      submitForm,
+      validateField
+    ]
+  )
 
-    const ownedEngineRef = useRef<FormEngine | null>(null)
-    if (!controller && ownedEngineRef.current === null) {
-      ownedEngineRef.current = createFormEngine({
-        initialValues: model ?? {},
-        undoable,
-        maxHistorySize,
-        getRules: () => optionsRef.current.rules,
-        getConditions: () => optionsRef.current.conditions,
-        getFieldDependencies: () => optionsRef.current.fieldDependencies,
-        getMessages: () => optionsRef.current.validationMessages,
-        getValidateDebounce: () => optionsRef.current.validateDebounce,
-        onValidate: (fieldName, valid, error) =>
-          optionsRef.current.onValidate?.(fieldName, valid, error),
-        onValuesChange: (next) => optionsRef.current.onChange?.(next)
-      })
-    }
-
-    const engine: FormEngine | null =
-      controller && isFormEngine(controller) ? controller : ownedEngineRef.current
-    if (!engine) {
-      throw new Error('Form is missing a form engine')
-    }
-
-    if (!controller && model !== undefined) {
-      engine.replaceValues(model, { emit: false })
-    }
-
-    if (controller && isFormEngine(controller)) {
-      controller.setOptions({
-        rules,
-        conditions,
-        fieldDependencies,
-        messages: validationMessages,
-        validateDebounce,
-        onValidate
-      })
-    }
-
-    const [, rerender] = useReducer((count: number) => count + 1, 0)
-    useEffect(() => {
-      const unsubscribe = engine.subscribe(rerender)
-      return unsubscribe
-    }, [engine])
-
-    useEffect(() => {
-      const owned = ownedEngineRef.current
-      return () => {
-        owned?.dispose()
-        ownedEngineRef.current = null
-      }
-    }, [])
-
-    const formElementRef = useRef<HTMLFormElement>(null)
-    const values = engine.getValues()
-    const errors = engine.getErrors()
-    const errorsByField = useMemo(() => createFormErrorMap(errors), [errors])
-
-    const validateField = useCallback(
-      async (
-        fieldName: string,
-        rulesOverride?: FormRule | FormRule[],
-        trigger?: FormRuleTrigger
-      ): Promise<void> => {
-        await engine.validateField(fieldName, rulesOverride, trigger)
-      },
-      [engine]
-    )
-
-    const submitForm = useCallback(async (): Promise<boolean> => {
-      if (loading) return false
-      const valid = await engine.validate()
-      if (!valid) {
-        focusFirstInvalidField(formElementRef.current)
-      }
-      onSubmit?.({ valid, values: engine.getValues(), errors: engine.getErrors() })
-      return valid
-    }, [engine, loading, onSubmit])
-
-    useImperativeHandle(
-      ref,
-      () => ({
-        validate: () => engine.validate(),
-        validateFields: (fieldNames) => engine.validateFields(fieldNames),
-        validateField,
-        clearValidate: (fieldNames) => engine.clearValidate(fieldNames),
-        resetFields: () => engine.reset(),
-        addField: (fieldName, defaultValue) => engine.addField(fieldName, defaultValue),
-        removeField: (fieldName) => engine.removeField(fieldName),
-        undo: () => engine.undo(),
-        redo: () => engine.redo(),
-        snapshotHistory: () => engine.snapshotHistory(),
-        get canUndo() {
-          return engine.canUndo
-        },
-        get canRedo() {
-          return engine.canRedo
-        }
-      }),
-      [engine, validateField]
-    )
-
-    const contextValue = useMemo<FormContextValue>(
-      () => ({
-        model: values,
-        rules,
-        labelWidth,
-        labelPosition,
-        labelAlign,
-        size,
-        inlineMessage,
-        showRequiredAsterisk,
-        disabled,
-        loading,
-        errors,
-        errorsByField,
-        registerFieldRules: engine.registerFieldRules,
-        registerFieldCondition: engine.registerFieldCondition,
-        getFieldConditionState: engine.getFieldConditionState,
-        validateField,
-        clearValidate: engine.clearValidate,
-        getFieldValue: engine.getFieldValue,
-        updateValue: engine.setFieldValue,
-        validate: () => engine.validate(),
-        validateFields: (fieldNames) => engine.validateFields(fieldNames),
-        getValues: () => engine.getValues(),
-        submit: submitForm
-      }),
-      [
-        values,
-        rules,
-        labelWidth,
-        labelPosition,
-        labelAlign,
-        size,
-        inlineMessage,
-        showRequiredAsterisk,
-        disabled,
-        loading,
-        errors,
-        errorsByField,
-        engine,
-        submitForm,
-        validateField
-      ]
-    )
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-      event.preventDefault()
-      await submitForm()
-    }
-
-    const handleReset = (event: React.FormEvent<HTMLFormElement>): void => {
-      event.preventDefault()
-      engine.reset()
-    }
-
-    const formClasses = classNames(
-      'tiger-form',
-      `tiger-form--label-${labelPosition}`,
-      disabled && 'tiger-form--disabled',
-      loading && 'tiger-form--loading',
-      className
-    )
-
-    return (
-      <FormContext.Provider value={contextValue}>
-        <form
-          {...domProps}
-          ref={formElementRef}
-          className={formClasses}
-          noValidate
-          aria-busy={loading || undefined}
-          onSubmit={handleSubmit}
-          onReset={handleReset}>
-          <fieldset disabled={disabled || loading} className="contents m-0 min-w-0 border-0 p-0">
-            {children}
-          </fieldset>
-        </form>
-      </FormContext.Provider>
-    )
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault()
+    await submitForm()
   }
-)
 
-Form.displayName = 'TigerForm'
+  const handleReset = (event: React.FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    engine.reset()
+  }
+
+  const formClasses = classNames(
+    'tiger-form',
+    `tiger-form--label-${labelPosition}`,
+    disabled && 'tiger-form--disabled',
+    loading && 'tiger-form--loading',
+    className
+  )
+
+  return (
+    <FormContext.Provider value={contextValue}>
+      <form
+        {...domProps}
+        ref={formElementRef}
+        className={formClasses}
+        noValidate
+        aria-busy={loading || undefined}
+        onSubmit={handleSubmit}
+        onReset={handleReset}>
+        <fieldset disabled={disabled || loading} className="contents m-0 min-w-0 border-0 p-0">
+          {children}
+        </fieldset>
+      </form>
+    </FormContext.Provider>
+  )
+}
+
+const FormForward = forwardRef(FormInner)
+FormForward.displayName = 'TigerForm'
+
+export const Form = FormForward as <T extends FormValues = FormValues>(
+  props: FormProps<T> & { ref?: React.Ref<FormHandle> }
+) => React.ReactElement
