@@ -20,7 +20,13 @@ self.onmessage = async (event: MessageEvent<DemoCompileRequest>) => {
     const compiled = await compileDemoBundle({
       bundle: request.bundle,
       compileFile(filename, source) {
-        if (filename.endsWith('.vue')) return compileVueFile(filename, source)
+        if (filename.endsWith('.vue')) {
+          const compiled = compileVueFile(filename, source)
+          return {
+            code: transformModule(compiled.code, { filename, jsx: false }),
+            css: compiled.css
+          }
+        }
         return {
           code: transformModule(source, { filename, jsx: false }),
           css: ''
