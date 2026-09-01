@@ -397,6 +397,20 @@ export function getCalendarDays(
   return getCalendarDayTimeValues(year, month, weekStartsOn).map((time) => new Date(time))
 }
 
+interface LocaleWeekInfo {
+  firstDay?: number
+}
+
+function readLocaleWeekInfo(locale: Intl.Locale): LocaleWeekInfo | undefined {
+  const candidate = locale as Intl.Locale & {
+    weekInfo?: LocaleWeekInfo
+    getWeekInfo?: () => LocaleWeekInfo
+  }
+  if (candidate.weekInfo) return candidate.weekInfo
+  if (typeof candidate.getWeekInfo === 'function') return candidate.getWeekInfo()
+  return undefined
+}
+
 /**
  * Locale week start (0 = Sunday). Uses `Intl.Locale` weekInfo when available.
  */
@@ -406,12 +420,7 @@ export function getWeekStartsOn(locale?: string): WeekStartsOn {
   if (language === 'ar') return 6
   try {
     const intlLocale = new Intl.Locale(locale)
-    const weekInfo =
-      (intlLocale as { weekInfo?: { firstDay?: number } }).weekInfo ??
-      (typeof (intlLocale as { getWeekInfo?: () => { firstDay: number } }).getWeekInfo ===
-      'function'
-        ? (intlLocale as { getWeekInfo: () => { firstDay: number } }).getWeekInfo()
-        : undefined)
+    const weekInfo = readLocaleWeekInfo(intlLocale)
     const firstDay = weekInfo?.firstDay
     if (firstDay === 7) return 0
     if (firstDay === 0) return 0
