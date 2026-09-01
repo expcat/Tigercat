@@ -43,6 +43,7 @@ import { Tag } from './Tag'
 import { Card } from './Card'
 import { Text } from './Text'
 import { Link } from './Link'
+import { Button } from './Button'
 import { Loading } from './Loading'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -52,22 +53,42 @@ export interface ActivityFeedProps
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   renderItem?: (item: ActivityItem, index: number, group?: ActivityGroup) => React.ReactNode
   renderGroupHeader?: (group: ActivityGroup) => React.ReactNode
+  renderLoading?: () => React.ReactNode
+  renderEmpty?: () => React.ReactNode
 }
 
 const renderAction = (item: ActivityItem, action: ActivityAction, index: number) => {
   const key = action.key ?? `${item.id}-action-${index}`
-
+  const onClick = (event?: React.MouseEvent) => {
+    if (action.href === '#' || action.onClick) event?.preventDefault()
+    if (action.disabled) return
+    action.onClick?.(item, action)
+  }
+  if (!action.href) {
+    return (
+      <Button
+        key={key}
+        size="sm"
+        variant="ghost"
+        disabled={action.disabled}
+        className={activityFeedActionClasses}
+        onClick={onClick}>
+        {action.label}
+      </Button>
+    )
+  }
   return (
     <Link
       key={key}
       size="sm"
       variant="primary"
       underline={false}
-      href={action.href}
+      href={action.disabled ? undefined : action.href}
       target={action.target}
       disabled={action.disabled}
       className={activityFeedActionClasses}
-      onClick={() => action.onClick?.(item, action)}>
+      tabIndex={action.disabled ? -1 : undefined}
+      onClick={onClick}>
       {action.label}
     </Link>
   )
@@ -88,6 +109,8 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   showGroupTitle = true,
   renderItem,
   renderGroupHeader,
+  renderLoading,
+  renderEmpty,
   className,
   ...props
 }) => {
@@ -130,7 +153,11 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         ? String(item.content)
         : '')
 
-    const descriptionText = item.description
+    const descriptionText =
+      item.description ??
+      (item.title && (typeof item.content === 'string' || typeof item.content === 'number')
+        ? String(item.content)
+        : undefined)
     const timeText = showTime ? formatActivityTime(item.time, mergedLocale) : ''
 
     const actionNodes = item.actions?.map((action, actionIndex) =>
@@ -192,12 +219,16 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     )
   }
 
-  if (loading) {
+  const feedLabel = props['aria-labelledby']
+    ? undefined
+    : (props['aria-label'] ?? labels.listAriaLabel)
+
+  if (loading && resolvedGroups.length === 0) {
     return (
       <div
         className={wrapperClasses}
         role="feed"
-        aria-label="Activity"
+        aria-label={feedLabel}
         aria-busy
         {...props}
         data-tiger-activity-feed>
@@ -206,7 +237,9 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
           size="sm"
           className={classNames('tiger-activity-feed-loading', activityFeedStateCardClasses)}>
           <div className="flex items-center justify-center py-8">
-            <Loading text={resolvedLoadingText} className={activityFeedLoadingClasses} />
+            {renderLoading?.() ?? (
+              <Loading text={resolvedLoadingText} className={activityFeedLoadingClasses} />
+            )}
           </div>
         </Card>
       </div>
@@ -218,30 +251,33 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div
         className={wrapperClasses}
         role="feed"
-        aria-label="Activity"
+        aria-label={feedLabel}
         {...props}
         data-tiger-activity-feed>
         <Card
           variant="bordered"
           size="sm"
           className={classNames('tiger-activity-feed-empty', activityFeedStateCardClasses)}>
-          <div className="flex flex-col items-center justify-center py-12 px-4">
-            <svg
-              className={activityFeedEmptyIconClasses}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.5">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h10.5m-10.5 3h10.5m-13.5-9h16.5M3 5.25h18M3 18.75h18"
-              />
-            </svg>
-            <Text tag="div" size="sm" color="muted" className="font-medium">
-              {resolvedEmptyText}
-            </Text>
-          </div>
+          {renderEmpty?.() ?? (
+            <div className="flex flex-col items-center justify-center py-12 px-4">
+              <svg
+                aria-hidden="true"
+                className={activityFeedEmptyIconClasses}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.5">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h10.5m-10.5 3h10.5m-13.5-9h16.5M3 5.25h18M3 18.75h18"
+                />
+              </svg>
+              <Text tag="div" size="sm" color="muted" className="font-medium">
+                {resolvedEmptyText}
+              </Text>
+            </div>
+          )}
         </Card>
       </div>
     )
@@ -251,7 +287,8 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     <div
       className={wrapperClasses}
       role="feed"
-      aria-label="Activity"
+      aria-label={feedLabel}
+      aria-busy={loading || undefined}
       {...props}
       data-tiger-activity-feed>
       {resolvedGroups.map((group, groupIndex) => {
@@ -261,8 +298,9 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
         return (
           <div key={group.key ?? groupIndex} className="space-y-3">
-            {showGroupTitle && groupTitle
-              ? (headerNode ?? (
+            {showGroupTitle
+              ? (headerNode ??
+                (groupTitle ? (
                   <div className="flex items-center gap-2 mb-2">
                     <span className={activityFeedGroupMarkerClasses} />
                     <Text
@@ -273,7 +311,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                       {groupTitle}
                     </Text>
                   </div>
-                ))
+                ) : null))
               : null}
             <Timeline
               items={timelineItems}
@@ -283,7 +321,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                 const dotClasses = getActivityFeedDotClasses(statusVariant)
 
                 return (
-                  <div className="relative flex items-center justify-center w-4 h-4">
+                  <div className="relative flex items-center justify-center w-2.5 h-2.5">
                     {dotClasses.pulse ? (
                       <span className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`} />
                     ) : null}

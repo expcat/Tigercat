@@ -4,6 +4,7 @@ import {
   EMPTY_NOTIFICATION_ITEMS,
   buildNotificationGroups,
   formatActivityTime,
+  formatBadgeCountLabel,
   shouldUseNotificationTabs,
   getNotificationCenterLabels,
   mergeTigerLocale,
@@ -148,10 +149,19 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     () => new Map<string | number, boolean>()
   )
 
-  // Reset overrides when source items change
   useEffect(() => {
-    if (manageReadState) setReadStateOverrides(new Map())
-  }, [items, manageReadState])
+    if (!manageReadState) return
+    setReadStateOverrides((prev) => {
+      if (prev.size === 0) return prev
+      const source = (groups ?? []).flatMap((group) => group.items ?? []).concat(items)
+      const next = new Map(prev)
+      for (const [id, read] of prev) {
+        const item = source.find((entry) => entry.id === id)
+        if (!item || Boolean(item.read) === read) next.delete(id)
+      }
+      return next
+    })
+  }, [groups, items, manageReadState])
 
   const applyReadOverrides = useCallback(
     (list: NotificationItem[]): NotificationItem[] => {
@@ -188,10 +198,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   )
   const effectiveItems = useMemo(() => applyReadOverrides(items), [items, applyReadOverrides])
 
-  const hasUnread = useMemo(
-    () => effectiveCurrentGroupItems.some((item) => !item.read),
-    [effectiveCurrentGroupItems]
-  )
+  const allManagedItems = useMemo(() => {
+    const grouped = effectiveGroups.flatMap((group) => group.items)
+    return grouped.length > 0 ? grouped : effectiveItems
+  }, [effectiveGroups, effectiveItems])
+
+  const hasUnread = useMemo(() => allManagedItems.some((item) => !item.read), [allManagedItems])
 
   const totalUnread = useMemo(() => {
     const allItems = effectiveGroups.flatMap((group) => group.items)
@@ -252,11 +264,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     if (manageReadState) {
       setReadStateOverrides((prev) => {
         const next = new Map(prev)
-        effectiveCurrentGroupItems.forEach((item) => next.set(item.id, true))
+        allManagedItems.forEach((item) => next.set(item.id, true))
         return next
       })
     }
-    onMarkAllRead?.(currentGroupKey, effectiveCurrentGroupItems)
+    onMarkAllRead?.(undefined, allManagedItems)
   }
 
   const renderItem = (item: NotificationItem, _index: number) => {
@@ -281,7 +293,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 }>
                 {item.title}
               </Text>
-              {!isRead && <span className={notificationCenterUnreadDotClasses} />}
+              {!isRead && (
+                <span className={notificationCenterUnreadDotClasses} aria-hidden="true" />
+              )}
             </div>
             {timeText ? <span className={notificationCenterTimeClasses}>{timeText}</span> : null}
           </div>
@@ -346,25 +360,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     return (
       <List
         dataSource={listItems}
+        rowKey="id"
         split
-        hoverable
+        hoverable={typeof onItemClick === 'function'}
         emptyText={resolvedEmptyText}
-        onItemClick={(item, index) => onItemClick?.(item, index)}
+        onItemClick={onItemClick}
         renderItem={renderItem}
       />
     )
   }
 
-  const content = loading ? (
-    <div className="flex items-center justify-center py-16">
-      <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
-    </div>
-  ) : shouldUseNotificationTabs(groups, groupBy) ? (
+  const listBody = shouldUseNotificationTabs(groups, groupBy) ? (
     resolvedGroups.length > 0 ? (
       <div className="-mx-4 -mb-4">
         <Tabs
           type="line"
           size="small"
+          swipeable={false}
           activeKey={currentGroupKey}
           onActiveKeyChange={handleGroupChange}>
           {groupTabData.map((tab) => (
@@ -381,10 +393,30 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList(filteredFlatItems)}</div>
   )
 
+  const hasList = shouldUseNotificationTabs(groups, groupBy)
+    ? resolvedGroups.length > 0 || filteredFlatItems.length > 0
+    : filteredFlatItems.length > 0
+  const content =
+    loading && !hasList ? (
+      <div className="flex items-center justify-center py-16">
+        <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
+      </div>
+    ) : (
+      <div className="relative" aria-busy={loading || undefined}>
+        {listBody}
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface,#ffffff)]/70">
+            <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
+          </div>
+        ) : null}
+      </div>
+    )
+
   return (
     <div
       className={wrapperClasses}
       role={props.role ?? 'region'}
+      aria-busy={loading || undefined}
       aria-label={props['aria-label'] ?? (props['aria-labelledby'] ? undefined : resolvedTitle)}
       {...props}
       data-tiger-notification-center>
@@ -403,7 +435,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   {resolvedTitle}
                 </Text>
                 {totalUnread > 0 ? (
-                  <span className={notificationCenterUnreadBadgeClasses}>{totalUnread}</span>
+                  <span
+                    className={notificationCenterUnreadBadgeClasses}
+                    aria-label={formatBadgeCountLabel(
+                      labels.unreadCountText,
+                      totalUnread,
+                      mergedLocale?.locale
+                    )}>
+                    {totalUnread}
+                  </span>
                 ) : null}
               </div>
               <Button
@@ -420,10 +460,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 {resolvedMarkAllReadText}
               </Button>
             </div>
-            <div className={notificationCenterFilterGroupClasses}>
+            <div className={notificationCenterFilterGroupClasses} role="radiogroup">
               {filterButtons.map((option) => (
                 <button
                   key={option.key}
+                  type="button"
+                  role="radio"
+                  aria-checked={currentReadFilter === option.key}
                   className={classNames(
                     notificationCenterFilterButtonClasses,
                     currentReadFilter === option.key

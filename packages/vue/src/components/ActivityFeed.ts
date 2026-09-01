@@ -46,6 +46,7 @@ import { Tag } from './Tag'
 import { Card } from './Card'
 import { Text } from './Text'
 import { Link } from './Link'
+import { Button } from './Button'
 import { Loading } from './Loading'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -61,6 +62,25 @@ export interface VueActivityFeedProps extends Omit<
 
 const renderAction = (item: ActivityItem, action: ActivityAction, index: number) => {
   const key = action.key ?? `${item.id}-action-${index}`
+  const onClick = (event?: Event) => {
+    if (action.href === '#' || action.onClick) event?.preventDefault()
+    if (action.disabled) return
+    action.onClick?.(item, action)
+  }
+  if (!action.href) {
+    return h(
+      Button,
+      {
+        key,
+        size: 'sm',
+        variant: 'ghost',
+        disabled: action.disabled,
+        class: activityFeedActionClasses,
+        onClick
+      },
+      { default: () => action.label }
+    )
+  }
   return h(
     Link,
     {
@@ -68,15 +88,14 @@ const renderAction = (item: ActivityItem, action: ActivityAction, index: number)
       size: 'sm',
       variant: 'primary',
       underline: false,
-      href: action.href,
+      href: action.disabled ? undefined : action.href,
       target: action.target,
       disabled: action.disabled,
-      className: activityFeedActionClasses,
-      onClick: () => action.onClick?.(item, action)
+      class: activityFeedActionClasses,
+      tabindex: action.disabled ? -1 : undefined,
+      onClick
     },
-    {
-      default: () => action.label
-    }
+    { default: () => action.label }
   )
 }
 
@@ -275,12 +294,12 @@ export const ActivityFeed = defineComponent({
     const feedAriaLabel = computed(
       () =>
         (attrs['aria-label'] as string | undefined) ??
-        (attrs['aria-labelledby'] ? undefined : 'Activity')
+        (attrs['aria-labelledby'] ? undefined : labels.value.listAriaLabel)
     )
     const feedAriaBusy = computed(() => attrs['aria-busy'] ?? (props.loading ? 'true' : undefined))
 
     return () => {
-      if (props.loading) {
+      if (props.loading && resolvedGroups.value.length === 0) {
         const loadingNode = slots.loading
           ? slots.loading()
           : h(Loading, {
@@ -323,6 +342,7 @@ export const ActivityFeed = defineComponent({
               h(
                 'svg',
                 {
+                  'aria-hidden': 'true',
                   class: activityFeedEmptyIconClasses,
                   fill: 'none',
                   viewBox: '0 0 24 24',
@@ -381,49 +401,49 @@ export const ActivityFeed = defineComponent({
           'data-tiger-activity-feed': true
         },
         resolvedGroups.value.map((group, groupIndex) => {
-          const headerNode = slots.groupTitle ? slots.groupTitle({ group }) : undefined
+          const headerNode = slots.groupHeader?.({ group }) ?? slots.groupTitle?.({ group })
           const groupTitle = group.title
           const timelineItems = toActivityTimelineItems(group.items)
+          const renderDot = (timelineItem: ActivityTimelineItem) => {
+            const activity = timelineItem.activity
+            const statusVariant = (activity?.status?.variant ?? 'default') as string
+            const dotClasses = getActivityFeedDotClasses(statusVariant)
+            return h('div', { class: 'relative flex items-center justify-center w-2.5 h-2.5' }, [
+              dotClasses.pulse
+                ? h('span', {
+                    class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
+                  })
+                : null,
+              h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
+            ])
+          }
 
           return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
-            props.showGroupTitle && groupTitle
+            props.showGroupTitle
               ? (headerNode ??
-                h('div', { class: 'flex items-center gap-2 mb-2' }, [
-                  h('span', {
-                    class: activityFeedGroupMarkerClasses
-                  }),
-                  h(
-                    Text,
-                    {
-                      tag: 'span',
-                      size: 'sm',
-                      weight: 'bold',
-                      class: activityFeedGroupTitleClasses
-                    },
-                    { default: () => groupTitle }
-                  )
-                ]))
+                (groupTitle
+                  ? h('div', { class: 'flex items-center gap-2 mb-2' }, [
+                      h('span', {
+                        class: activityFeedGroupMarkerClasses
+                      }),
+                      h(
+                        Text,
+                        {
+                          tag: 'span',
+                          size: 'sm',
+                          weight: 'bold',
+                          class: activityFeedGroupTitleClasses
+                        },
+                        { default: () => groupTitle }
+                      )
+                    ])
+                  : null))
               : null,
             h(
               Timeline,
+              { items: timelineItems },
               {
-                items: timelineItems,
-                renderDot: (timelineItem: ActivityTimelineItem) => {
-                  const activity = timelineItem.activity
-                  const statusVariant = (activity?.status?.variant ?? 'default') as string
-                  const dotClasses = getActivityFeedDotClasses(statusVariant)
-
-                  return h('div', { class: 'relative flex items-center justify-center w-4 h-4' }, [
-                    dotClasses.pulse
-                      ? h('span', {
-                          class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
-                        })
-                      : null,
-                    h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
-                  ])
-                }
-              },
-              {
+                dot: ({ item }: { item: ActivityTimelineItem }) => renderDot(item),
                 item: ({ item, index }: { item: ActivityTimelineItem; index: number }) => {
                   const activity = item.activity
                   if (!activity) return null

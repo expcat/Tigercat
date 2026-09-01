@@ -1,10 +1,11 @@
-import { defineComponent, computed, ref, watch, PropType, h } from 'vue'
+import { defineComponent, computed, ref, watch, getCurrentInstance, PropType, h } from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
   buildNotificationGroups,
   formatActivityTime,
+  formatBadgeCountLabel,
   shouldUseNotificationTabs,
   getNotificationCenterLabels,
   mergeTigerLocale,
@@ -171,6 +172,8 @@ export const NotificationCenter = defineComponent({
     'item-read-change'
   ],
   setup(props, { emit, attrs }) {
+    const instance = getCurrentInstance()
+    const vnodeProps = () => (instance?.vnode.props ?? {}) as Record<string, unknown>
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getNotificationCenterLabels(mergedLocale.value, props.labels))
@@ -229,11 +232,19 @@ export const NotificationCenter = defineComponent({
       })
     }
 
-    // Reset overrides when source items change
     watch(
-      () => props.items,
+      () => [props.items, props.groups] as const,
       () => {
-        if (props.manageReadState) readStateOverrides.value = new Map()
+        if (!props.manageReadState || readStateOverrides.value.size === 0) return
+        const source = (props.groups ?? [])
+          .flatMap((group) => group.items ?? [])
+          .concat(props.items ?? [])
+        const next = new Map(readStateOverrides.value)
+        for (const [id, read] of readStateOverrides.value) {
+          const item = source.find((entry) => entry.id === id)
+          if (!item || Boolean(item.read) === read) next.delete(id)
+        }
+        readStateOverrides.value = next
       }
     )
 
@@ -275,7 +286,12 @@ export const NotificationCenter = defineComponent({
       })
     }
 
-    const hasUnread = computed(() => effectiveCurrentGroupItems.value.some((item) => !item.read))
+    const allManagedItems = computed(() => {
+      const grouped = effectiveGroups.value.flatMap((group) => group.items)
+      return grouped.length > 0 ? grouped : effectiveItems.value
+    })
+
+    const hasUnread = computed(() => allManagedItems.value.some((item) => !item.read))
 
     const groupTabData = computed(() =>
       resolvedGroups.value.map((group, index) => {
@@ -323,13 +339,13 @@ export const NotificationCenter = defineComponent({
     }
 
     const handleMarkAllRead = () => {
-      const items = effectiveCurrentGroupItems.value
+      const items = allManagedItems.value
       if (props.manageReadState) {
         const next = new Map(readStateOverrides.value)
         items.forEach((item) => next.set(item.id, true))
         readStateOverrides.value = next
       }
-      emit('mark-all-read', currentGroupKey.value, items)
+      emit('mark-all-read', undefined, items)
     }
 
     const handleItemClick = (item: NotificationItem, index: number) => {
@@ -355,13 +371,17 @@ export const NotificationCenter = defineComponent({
       return h(
         'div',
         {
-          class: notificationCenterFilterGroupClasses
+          class: notificationCenterFilterGroupClasses,
+          role: 'radiogroup'
         },
         options.map((option) =>
           h(
             'button',
             {
               key: option.key,
+              type: 'button',
+              role: 'radio',
+              'aria-checked': currentReadFilter.value === option.key,
               class: classNames(
                 notificationCenterFilterButtonClasses,
                 currentReadFilter.value === option.key
@@ -406,7 +426,8 @@ export const NotificationCenter = defineComponent({
                 ),
                 !isRead
                   ? h('span', {
-                      class: notificationCenterUnreadDotClasses
+                      class: notificationCenterUnreadDotClasses,
+                      'aria-hidden': 'true'
                     })
                   : null
               ]),
@@ -506,10 +527,11 @@ export const NotificationCenter = defineComponent({
         List,
         {
           dataSource: items,
+          rowKey: 'id',
           split: true,
-          hoverable: true,
+          hoverable: typeof vnodeProps().onItemClick === 'function',
           emptyText: resolveLocaleText(labels.value.emptyText, props.emptyText),
-          onItemClick: handleItemClick
+          onItemClick: typeof vnodeProps().onItemClick === 'function' ? handleItemClick : undefined
         },
         {
           renderItem: ({ item, index }: { item: NotificationItem; index: number }) =>
@@ -524,6 +546,7 @@ export const NotificationCenter = defineComponent({
         {
           type: 'line',
           size: 'small',
+          swipeable: false,
           activeKey: currentGroupKey.value,
           onChange: handleGroupChange
         },
@@ -568,7 +591,12 @@ export const NotificationCenter = defineComponent({
               ? h(
                   'span',
                   {
-                    class: notificationCenterUnreadBadgeClasses
+                    class: notificationCenterUnreadBadgeClasses,
+                    'aria-label': formatBadgeCountLabel(
+                      labels.value.unreadCountText,
+                      totalUnread.value,
+                      mergedLocale.value?.locale
+                    )
                   },
                   String(totalUnread.value)
                 )
@@ -596,19 +624,41 @@ export const NotificationCenter = defineComponent({
         renderReadFilterButtons()
       ])
 
-      const content = props.loading
-        ? h('div', { class: 'flex items-center justify-center py-16' }, [
-            h(Loading, {
-              text: resolveLocaleText(labels.value.loadingText, props.loadingText),
-              class: notificationCenterLoadingClasses
-            })
+      const listBody = shouldUseNotificationTabs(props.groups, props.groupBy)
+        ? resolvedGroups.value.length > 0
+          ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
+          : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [renderList([])])
+        : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [
+            renderList(filteredFlatItems.value)
           ])
-        : shouldUseNotificationTabs(props.groups, props.groupBy)
-          ? resolvedGroups.value.length > 0
-            ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
-            : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [renderList([])])
-          : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [
-              renderList(filteredFlatItems.value)
+      const hasList = shouldUseNotificationTabs(props.groups, props.groupBy)
+        ? resolvedGroups.value.length > 0 || filteredFlatItems.value.length > 0
+        : filteredFlatItems.value.length > 0
+      const content =
+        props.loading && !hasList
+          ? h('div', { class: 'flex items-center justify-center py-16' }, [
+              h(Loading, {
+                text: resolveLocaleText(labels.value.loadingText, props.loadingText),
+                class: notificationCenterLoadingClasses
+              })
+            ])
+          : h('div', { class: 'relative', 'aria-busy': props.loading ? 'true' : undefined }, [
+              listBody,
+              props.loading
+                ? h(
+                    'div',
+                    {
+                      class:
+                        'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface,#ffffff)]/70'
+                    },
+                    [
+                      h(Loading, {
+                        text: resolveLocaleText(labels.value.loadingText, props.loadingText),
+                        class: notificationCenterLoadingClasses
+                      })
+                    ]
+                  )
+                : null
             ])
 
       const ariaLabel =
@@ -622,6 +672,7 @@ export const NotificationCenter = defineComponent({
           class: wrapperClasses.value,
           style: wrapperStyle.value,
           role: (attrs.role as string | undefined) ?? 'region',
+          'aria-busy': props.loading ? 'true' : undefined,
           'aria-label': ariaLabel,
           'data-tiger-notification-center': true
         },

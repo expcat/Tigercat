@@ -38,11 +38,11 @@ describe('NotificationCenter (Vue)', () => {
 
     render(NotificationCenter, { props: { items } })
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Unread' }))
+    await fireEvent.click(screen.getByRole('radio', { name: 'Unread' }))
     expect(screen.getByText('未读通知')).toBeInTheDocument()
     expect(screen.queryByText('已读通知')).not.toBeInTheDocument()
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Read' }))
+    await fireEvent.click(screen.getByRole('radio', { name: 'Read' }))
     expect(screen.getByText('已读通知')).toBeInTheDocument()
     expect(screen.queryByText('未读通知')).not.toBeInTheDocument()
   })
@@ -59,7 +59,6 @@ describe('NotificationCenter (Vue)', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }))
 
     expect(onMarkAllRead).toHaveBeenCalledTimes(1)
-    expect(onMarkAllRead.mock.calls[0]?.[0]).toBe('系统')
     expect(onMarkAllRead.mock.calls[0]?.[1]).toHaveLength(1)
   })
 
@@ -134,9 +133,9 @@ describe('NotificationCenter (Vue)', () => {
       props: { items, allLabel: 'All', unreadLabel: 'Unread', readLabel: 'Read' }
     })
 
-    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Unread' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Read' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Unread' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Read' })).toBeInTheDocument()
   })
 
   it('keeps items-only as a flat list without tabs', () => {

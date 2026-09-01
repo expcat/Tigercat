@@ -9,7 +9,7 @@ export const activityFeedAvatarClasses =
   'tiger-motion-aware shrink-0 ring-2 ring-[var(--tiger-surface,#ffffff)] shadow-[var(--tiger-shadow-sm,0_1px_2px_rgb(0_0_0_/_0.05))] [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))] hover:scale-105'
 
 export const activityFeedTitleClasses =
-  'tiger-motion-aware text-[var(--tiger-text,#111827)] hover:text-[var(--tiger-primary,#2563eb)] transition-colors cursor-pointer truncate'
+  'tiger-motion-aware text-[var(--tiger-text,#111827)] truncate'
 
 export const activityFeedTimeClasses =
   'shrink-0 whitespace-nowrap font-medium text-[var(--tiger-text-muted,#6b7280)]'
@@ -40,22 +40,17 @@ export const activityFeedDotPulseBaseClasses =
 const dotVariantClasses: Record<string, string> = {
   success: 'bg-[var(--tiger-success,#16a34a)]',
   warning: 'bg-[var(--tiger-warning,#d97706)]',
-  error: 'bg-[var(--tiger-error,#dc2626)]',
   danger: 'bg-[var(--tiger-error,#dc2626)]',
   primary: 'bg-[var(--tiger-primary,#2563eb)]',
-  info: 'bg-[var(--tiger-primary,#2563eb)]'
+  info: 'bg-[var(--tiger-primary,#2563eb)]',
+  processing: 'bg-[var(--tiger-primary,#2563eb)]'
 }
 
 const dotPulseVariantClasses: Record<string, string> = {
-  success: 'bg-[var(--tiger-success,#16a34a)]/30',
-  warning: 'bg-[var(--tiger-warning,#d97706)]/30',
-  error: 'bg-[var(--tiger-error,#dc2626)]/30',
-  danger: 'bg-[var(--tiger-error,#dc2626)]/30',
-  primary: 'bg-[var(--tiger-primary,#2563eb)]/30',
-  info: 'bg-[var(--tiger-primary,#2563eb)]/30'
+  processing: 'bg-[var(--tiger-primary,#2563eb)]/30'
 }
 
 export const getActivityFeedDotClasses = (variant?: string) => ({
   dot: dotVariantClasses[variant ?? ''] ?? 'bg-[var(--tiger-border,#d1d5db)]',
-  pulse: dotPulseVariantClasses[variant ?? ''] ?? ''
+  pulse: variant === 'processing' ? (dotPulseVariantClasses.processing ?? '') : ''
 })

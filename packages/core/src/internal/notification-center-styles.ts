@@ -3,9 +3,9 @@ export const notificationCenterItemClasses =
   'tiger-motion-aware group relative flex items-start gap-3.5 w-full p-3.5 rounded-[var(--tiger-radius-lg,0.75rem)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))]'
 
 export const notificationCenterUnreadItemClasses =
-  'bg-[var(--tiger-outline-bg-hover,#eff6ff)] border-l-[3px] border-l-[var(--tiger-primary,#2563eb)] -ml-[3px] pl-[calc(0.875rem-3px)]'
+  'bg-[var(--tiger-outline-bg-hover,#eff6ff)] border-s-[3px] border-s-[var(--tiger-primary,#2563eb)] -ms-[3px] ps-[calc(0.875rem-3px)]'
 export const notificationCenterReadItemClasses =
-  'border-l-[3px] border-l-transparent -ml-[3px] pl-[calc(0.875rem-3px)]'
+  'border-s-[3px] border-s-transparent -ms-[3px] ps-[calc(0.875rem-3px)]'
 export const notificationCenterReadTitleClasses = 'text-[var(--tiger-text-secondary,#4b5563)]'
 export const notificationCenterUnreadTitleClasses = 'text-[var(--tiger-text,#111827)]'
 export const notificationCenterUnreadDotClasses =
@@ -16,7 +16,7 @@ export const notificationCenterReadDescriptionClasses = 'text-[var(--tiger-text-
 export const notificationCenterUnreadDescriptionClasses =
   'text-[var(--tiger-text-secondary,#4b5563)]'
 export const notificationCenterItemActionClasses =
-  'tiger-motion-aware opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-[var(--tiger-surface-muted,#f3f4f6)] hover:bg-[var(--tiger-fill-hover,#e5e7eb)] text-[var(--tiger-text-secondary,#374151)] border-0 flex-shrink-0 self-center [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))]'
+  'tiger-motion-aware rounded-full px-2.5 py-1 text-[11px] font-semibold bg-[var(--tiger-surface-muted,#f3f4f6)] hover:bg-[var(--tiger-fill-hover,#e5e7eb)] text-[var(--tiger-text-secondary,#374151)] border-0 flex-shrink-0 self-center [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))]'
 export const notificationCenterEmptyIconWrapperClasses =
   'p-3.5 bg-[var(--tiger-surface-muted,#f9fafb)] rounded-full mb-3 shadow-inner'
 export const notificationCenterEmptyIconClasses =
