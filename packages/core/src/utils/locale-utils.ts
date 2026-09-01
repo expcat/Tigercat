@@ -640,8 +640,21 @@ export function getAlertLabels(
 }
 
 export function getLoadingLabel(locale?: Partial<TigerLocale>, text?: string): string {
-  if (typeof text === 'string' && text.trim().length > 0) return text
+  if (typeof text === 'string' && text.trim().length > 0) return text.trim()
   return resolveLocaleSection(enSection('common'), locale?.common).loadingText
+}
+
+export function getMessageCloseAriaLabel(locale?: Partial<TigerLocale>, override?: string): string {
+  if (typeof override === 'string' && override.trim().length > 0) return override
+  return resolveLocaleSection(enSection('common'), locale?.common).closeMessageAriaLabel
+}
+
+export function getNotificationCloseAriaLabel(
+  locale?: Partial<TigerLocale>,
+  override?: string
+): string {
+  if (typeof override === 'string' && override.trim().length > 0) return override
+  return resolveLocaleSection(enSection('common'), locale?.common).closeNotificationAriaLabel
 }
 
 /**

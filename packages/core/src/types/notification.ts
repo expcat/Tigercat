@@ -200,7 +200,7 @@ export interface NotificationProps {
 
   /**
    * Close button aria-label when `closable` is true.
-   * @default 'Close notification'
+   * @default locale `common.closeNotificationAriaLabel`
    */
   closeAriaLabel?: string
 }

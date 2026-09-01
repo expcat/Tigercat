@@ -113,7 +113,7 @@ export interface MessageProps {
 
   /**
    * Close button aria-label when `closable` is true.
-   * @default 'Close message'
+   * @default locale `common.closeMessageAriaLabel`
    */
   closeAriaLabel?: string
 }

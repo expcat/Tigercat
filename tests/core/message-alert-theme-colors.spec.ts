@@ -33,10 +33,8 @@ describe('Message / Alert default theme chrome (P2-2)', () => {
       const classes = getMessageTypeClasses(type)
       const statusToken = MESSAGE_STATUS_TOKENS[type]
 
-      expect(scheme.bg).toBe(`bg-[var(--tiger-message-${type}-bg,var(--tiger-surface,#ffffff))]`)
-      expect(scheme.border).toBe(
-        `border-[var(--tiger-message-${type}-border,var(--tiger-border,#e5e7eb))]`
-      )
+      expect(scheme.bg).toBe('bg-[var(--tiger-surface,#ffffff)]')
+      expect(scheme.border).toBe('border-[var(--tiger-border,#e5e7eb)]')
       expect(scheme.text).toContain(statusToken)
       expect(scheme.icon).toContain(statusToken)
 
@@ -60,9 +58,7 @@ describe('Message / Alert default theme chrome (P2-2)', () => {
     const loading = defaultMessageThemeColors.loading
     const classes = getMessageTypeClasses('loading')
 
-    expect(loading.bg).toBe(
-      'bg-[var(--tiger-message-loading-bg,var(--tiger-surface-muted,#f9fafb))]'
-    )
+    expect(loading.bg).toBe('bg-[var(--tiger-surface-muted,#f9fafb)]')
     expect(loading.border).toContain('--tiger-border')
     expect(loading.text).toContain('--tiger-text')
     expect(loading.icon).toContain('--tiger-text-muted')

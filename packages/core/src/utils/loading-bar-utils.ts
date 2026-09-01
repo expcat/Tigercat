@@ -11,25 +11,25 @@ import type {
   LoadingBarOptions,
   LoadingBarStatus
 } from '../types/loading-bar'
-import { resolveAnchoredOverlayTarget } from './anchored-overlay'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
 import { overlayZIndexClass } from './floating'
+import { resolveImperativeMountTarget } from './imperative-host'
+import { getLoadingLabel } from './locale-utils'
+import { prefersReducedMotion } from './transition'
 
 export const DEFAULT_LOADING_BAR_HEIGHT = 2
 export const DEFAULT_LOADING_BAR_COLOR: LoadingBarColor = 'primary'
-export const DEFAULT_LOADING_BAR_ARIA_LABEL = 'Loading'
+export const DEFAULT_LOADING_BAR_ARIA_LABEL = 'Loading...'
 export const LOADING_BAR_START_PERCENTAGE = 8
 export const LOADING_BAR_MAX_TRICKLE_PERCENTAGE = 94
 export const LOADING_BAR_TRICKLE_INTERVAL_MS = 200
 export const LOADING_BAR_FINISH_HIDE_DELAY_MS = 300
-export const LOADING_BAR_CONTAINER_ID = 'tiger-loading-bar-container'
-export const LOADING_BAR_CONTAINER_ROOT_ID = `${LOADING_BAR_CONTAINER_ID}-root`
 
-export const loadingBarContainerBaseClasses = `fixed top-0 left-0 right-0 ${overlayZIndexClass.loadingBar} pointer-events-none overflow-hidden`
+export const loadingBarContainerBaseClasses = `fixed top-0 inset-inline-0 ${overlayZIndexClass.loadingBar} pointer-events-none overflow-hidden`
 
 export const loadingBarFillBaseClasses =
-  'block w-full origin-left transition-transform duration-200 ease-out motion-reduce:transition-none'
+  'block w-full origin-left rtl:origin-right tiger-motion-aware transition-transform duration-200 ease-out motion-reduce:transition-none'
 
 export const loadingBarColorClasses: Record<LoadingBarColor, string> = {
   primary: 'bg-[color:var(--tiger-primary,#2563eb)]',
@@ -66,6 +66,10 @@ export function clampLoadingBarPercentage(percentage: number): number {
   return Math.max(0, Math.min(100, percentage))
 }
 
+export function getLoadingBarProgressValue(percentage: number): number {
+  return Math.round(clampLoadingBarPercentage(percentage))
+}
+
 export function resolveLoadingBarColor(color?: LoadingBarColor): LoadingBarColor {
   if (color && color in loadingBarColorClasses) return color
   return DEFAULT_LOADING_BAR_COLOR
@@ -86,9 +90,11 @@ export function resolveLoadingBarFillColor(
   return resolveLoadingBarColor(color)
 }
 
-export function resolveLoadingBarAriaLabel(ariaLabel?: string): string {
-  const trimmed = ariaLabel?.trim()
-  return trimmed ? trimmed : DEFAULT_LOADING_BAR_ARIA_LABEL
+export function resolveLoadingBarAriaLabel(
+  ariaLabel?: string,
+  locale?: { common?: { loadingText?: string } }
+): string {
+  return getLoadingLabel(locale, ariaLabel?.trim())
 }
 
 export function getLoadingBarColorClasses(color: LoadingBarColor): string {
@@ -140,13 +146,7 @@ export function nextLoadingBarTricklePercentage(
 }
 
 export function resolveLoadingBarMountTarget(container?: string | HTMLElement): HTMLElement | null {
-  if (!isBrowser()) return null
-  if (typeof container === 'string') {
-    const found = document.querySelector(container)
-    return found instanceof HTMLElement ? found : resolveAnchoredOverlayTarget(null)
-  }
-  if (container) return container
-  return resolveAnchoredOverlayTarget(null)
+  return resolveImperativeMountTarget(container)
 }
 
 export type LoadingBarTimeoutId = ReturnType<typeof setTimeout>
@@ -154,11 +154,14 @@ export type LoadingBarTimeoutId = ReturnType<typeof setTimeout>
 export interface LoadingBarTimerHooks {
   setTimeout?: (handler: () => void, timeout: number) => LoadingBarTimeoutId
   clearTimeout?: (id: LoadingBarTimeoutId) => void
+  prefersReducedMotion?: () => boolean
 }
 
 export interface LoadingBarController {
   getState: () => LoadingBarRuntimeState
   start: (options?: LoadingBarOptions) => void
+  set: (percentage: number) => void
+  inc: (delta?: number) => void
   finish: () => void
   error: () => void
   clear: () => void
@@ -190,6 +193,14 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     hooks.setTimeout ?? ((handler, timeout) => globalThis.setTimeout(handler, timeout))
   const cancel = hooks.clearTimeout ?? ((id) => globalThis.clearTimeout(id))
 
+  function canMutate(): boolean {
+    return isBrowser() || Boolean(hooks.setTimeout)
+  }
+
+  function reduceMotion(): boolean {
+    return hooks.prefersReducedMotion ? hooks.prefersReducedMotion() : prefersReducedMotion()
+  }
+
   function emit(): void {
     listeners.forEach((listener) => listener())
   }
@@ -209,21 +220,13 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
   function hideNow(): void {
     stopTrickle()
     stopHide()
-    state = {
-      ...createInitialLoadingBarState(),
-      color: state.color,
-      height: state.height,
-      className: state.className,
-      style: state.style,
-      ariaLabel: state.ariaLabel,
-      container: state.container
-    }
+    state = createInitialLoadingBarState()
     emit()
   }
 
   function scheduleHide(): void {
     stopHide()
-    if (!isBrowser() && !hooks.setTimeout) {
+    if (reduceMotion() || (!isBrowser() && !hooks.setTimeout)) {
       hideNow()
       return
     }
@@ -248,11 +251,13 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
 
   function startTrickle(): void {
     stopTrickle()
+    if (reduceMotion()) return
     if (!isBrowser() && !hooks.setTimeout) return
     trickleTimer = schedule(tickTrickle, LOADING_BAR_TRICKLE_INTERVAL_MS)
   }
 
   function start(options?: LoadingBarOptions): void {
+    if (!canMutate()) return
     stopHide()
     const nextCount = state.startedCount + 1
     const isFresh = state.status !== 'loading' || !state.visible
@@ -272,7 +277,27 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     }
   }
 
+  function set(percentage: number): void {
+    if (!canMutate()) return
+    stopTrickle()
+    stopHide()
+    state = {
+      ...state,
+      visible: true,
+      status: 'loading',
+      startedCount: Math.max(1, state.startedCount),
+      percentage: clampLoadingBarPercentage(percentage)
+    }
+    emit()
+  }
+
+  function inc(delta = 8): void {
+    const amount = Number.isFinite(delta) ? delta : 0
+    set(state.percentage + amount)
+  }
+
   function finish(): void {
+    if (!canMutate()) return
     if (state.startedCount <= 0 && state.status !== 'loading') {
       return
     }
@@ -297,6 +322,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
   }
 
   function error(): void {
+    if (!canMutate()) return
     stopTrickle()
     state = {
       ...state,
@@ -310,6 +336,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
   }
 
   function clear(): void {
+    if (!canMutate()) return
     stopTrickle()
     stopHide()
     state = createInitialLoadingBarState()
@@ -317,8 +344,10 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
   }
 
   return {
-    getState: () => ({ ...state }),
+    getState: () => state,
     start,
+    set,
+    inc,
     finish,
     error,
     clear,

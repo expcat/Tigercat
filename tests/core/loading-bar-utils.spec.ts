@@ -57,6 +57,14 @@ describe('loading-bar-utils', () => {
       expect(resolveLoadingBarMountTarget()).toBeNull()
       expect(resolveLoadingBarMountTarget('#host')).toBeNull()
     })
+
+    it('does not mutate the controller across two SSR starts', () => {
+      const controller = createLoadingBarController()
+      controller.start()
+      controller.start()
+      expect(controller.getState().startedCount).toBe(0)
+      expect(controller.getState().visible).toBe(false)
+    })
   })
 
   describe('class and style builders', () => {
@@ -64,6 +72,7 @@ describe('loading-bar-utils', () => {
       expect(getLoadingBarContainerClasses('extra')).toContain('fixed')
       expect(getLoadingBarContainerClasses('extra')).toContain('extra')
       expect(getLoadingBarFillClasses('loading', 'primary')).toContain('origin-left')
+      expect(getLoadingBarFillClasses('loading', 'primary')).toContain('rtl:origin-right')
       expect(getLoadingBarFillClasses('error', 'primary')).toBe(
         getLoadingBarFillClasses('loading', 'danger')
       )
@@ -194,6 +203,51 @@ describe('loading-bar-utils', () => {
       controller.start()
       controller.clear()
       expect(controller.getState()).toMatchObject(createInitialLoadingBarState())
+    })
+
+    it('hide after finish resets sticky start options', () => {
+      const timers: Array<{ handler: () => void; timeout: number }> = []
+      const controller = createLoadingBarController({
+        setTimeout: (handler, timeout) => {
+          timers.push({ handler, timeout })
+          return timers.length
+        },
+        clearTimeout: () => undefined
+      })
+      controller.start({ color: 'success', height: 4 })
+      controller.finish()
+      timers.find((timer) => timer.timeout === LOADING_BAR_FINISH_HIDE_DELAY_MS)?.handler()
+      expect(controller.getState()).toMatchObject(createInitialLoadingBarState())
+    })
+
+    it('set and inc stop trickle and write a clamped percentage', () => {
+      const controller = createLoadingBarController({
+        setTimeout: () => 1,
+        clearTimeout: () => undefined
+      })
+      controller.start()
+      controller.set(150)
+      expect(controller.getState().percentage).toBe(100)
+      controller.set(40)
+      controller.inc(10)
+      expect(controller.getState().percentage).toBe(50)
+    })
+
+    it('skips trickle and hide delay when reduced motion is preferred', () => {
+      const timers: Array<{ handler: () => void; timeout: number }> = []
+      const controller = createLoadingBarController({
+        setTimeout: (handler, timeout) => {
+          timers.push({ handler, timeout })
+          return timers.length
+        },
+        clearTimeout: () => undefined,
+        prefersReducedMotion: () => true
+      })
+      controller.start()
+      expect(timers).toHaveLength(0)
+      expect(controller.getState().percentage).toBe(LOADING_BAR_START_PERCENTAGE)
+      controller.finish()
+      expect(controller.getState().visible).toBe(false)
     })
 
     it('start after finish cancels hide and restarts', () => {

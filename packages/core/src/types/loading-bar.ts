@@ -1,8 +1,8 @@
 /**
  * LoadingBar component types and interfaces
  *
- * Top-of-viewport progress bar with a discrete imperative API
- * (`start` / `finish` / `error`), similar to Naive UI / nprogress.
+ * Top-of-viewport progress bar with an imperative API
+ * (`start` / `set` / `inc` / `finish` / `error` / `clear`).
  */
 
 /**
@@ -32,12 +32,12 @@ export interface LoadingBarProps {
   height?: number
 
   /**
-   * Additional CSS classes merged onto the bar.
+   * Additional CSS classes merged onto the track container.
    */
   className?: string
 
   /**
-   * Inline styles merged onto the bar.
+   * Inline styles merged onto the track container.
    */
   style?: Record<string, string | number>
 
@@ -49,7 +49,7 @@ export interface LoadingBarProps {
 
   /**
    * Accessible name for the progressbar.
-   * @default locale `common.loadingText` or `'Loading'`
+   * @default locale `common.loadingText` (`'Loading...'`)
    */
   ariaLabel?: string
 }
@@ -99,7 +99,7 @@ export interface LoadingBarContainerProps {
 
   /**
    * Accessible name for the progressbar.
-   * @default 'Loading'
+   * @default locale `common.loadingText` (`'Loading...'`)
    */
   ariaLabel?: string
 }
@@ -113,6 +113,16 @@ export interface LoadingBarApi {
    * Nested `start()` calls require a matching number of `finish()` calls.
    */
   start: (options?: LoadingBarOptions) => void
+
+  /**
+   * Set an exact percentage and stop trickle (determinate mode).
+   */
+  set: (percentage: number) => void
+
+  /**
+   * Add to the current percentage and stop trickle.
+   */
+  inc: (delta?: number) => void
 
   /**
    * Complete the bar (100%) then hide it.
