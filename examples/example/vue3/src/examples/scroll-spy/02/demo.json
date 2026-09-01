@@ -1,7 +1,7 @@
 {
   "id": "scroll-spy-02",
   "title": "自定义滚动容器",
-  "description": "指定内部容器作为滚动监听目标。",
+  "description": "getContainer 只返回容器节点，缺失时由滚动根回退到 window。当前项从组件 change 回显。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

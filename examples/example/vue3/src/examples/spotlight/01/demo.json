@@ -1,7 +1,7 @@
 {
   "id": "spotlight-01",
-  "title": "基本用法与受控搜索",
-  "description": "合并展示基本用法、受控搜索，减少重复示例块。",
+  "title": "热键打开",
+  "description": "默认 Ctrl/⌘ K 打开命令面板。不传 title / placeholder / emptyText 时走 locale。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

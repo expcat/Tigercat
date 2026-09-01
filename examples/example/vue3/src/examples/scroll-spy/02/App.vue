@@ -9,8 +9,8 @@ const items: ScrollSpyItem[] = [
 ]
 
 const containerRef = ref<HTMLElement | null>(null)
-const activeLabel = ref('审计')
-const getContainer = () => containerRef.value ?? window
+const activeLabel = ref(items[0].label)
+const getContainer = () => containerRef.value
 const handleChange = (_key: string | number, item: ScrollSpyItem) => {
   activeLabel.value = item.label
 }
@@ -20,8 +20,8 @@ const handleChange = (_key: string | number, item: ScrollSpyItem) => {
   <div>
     <div class="grid gap-4 md:grid-cols-[1fr_160px]">
       <div ref="containerRef" class="h-64 overflow-auto rounded border">
-        <section id="spy-audit" class="h-52 bg-blue-50 p-4">审计</section>
-        <section id="spy-release" class="h-52 bg-green-50 p-4">发布</section>
+        <section id="spy-audit" class="min-h-[20rem] bg-blue-50 p-4">审计</section>
+        <section id="spy-release" class="min-h-[20rem] bg-green-50 p-4">发布</section>
       </div>
       <ScrollSpy :items="items" :get-container="getContainer" @change="handleChange" />
     </div>

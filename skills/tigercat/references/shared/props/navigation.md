@@ -167,24 +167,28 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## FloatButton
 
-`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/12 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 6/13 props
 
-| Prop         | Type                | Default          | Notes                                                          |
-| ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |
-| `floating?`  | `boolean`           | `false`          | Whether the standalone button should be fixed to the viewport. |
-| `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
-| `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when floating is true.              |
-| `disabled?`  | `boolean`           | `false`          | Whether the button is disabled                                 |
+| Prop         | Type                   | Default          | Notes                                                          |
+| ------------ | ---------------------- | ---------------- | -------------------------------------------------------------- |
+| `floating?`  | `boolean`              | `false`          | Whether the standalone button should be fixed to the viewport. |
+| `placement?` | `ViewportPlacement`    | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
+| `offset?`    | `ViewportOffset`       | `24`             | Fixed viewport offset used when floating is true.              |
+| `ariaLabel?` | `string`               | `-`              | Accessible label                                               |
+| `disabled?`  | `boolean`              | `false`          | Whether the button is disabled                                 |
+| `locale?`    | `Partial<TigerLocale>` | `-`              | -                                                              |
 
 ## FloatButtonGroup
 
-`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 3/10 props
+`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 5/12 props
 
-| Prop       | Type                 | Default    | Notes                                  |
-| ---------- | -------------------- | ---------- | -------------------------------------- |
-| `open?`    | `boolean`            | `-`        | Whether the group is open (controlled) |
-| `shape?`   | `FloatButtonShape`   | `'circle'` | Shape applied to all child buttons     |
-| `trigger?` | `'click' \| 'hover'` | `'click'`  | Whether the group expands on trigger   |
+| Prop         | Type                 | Default          | Notes                                                                                      |
+| ------------ | -------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `trigger?`   | `'click' \| 'hover'` | `'click'`        | Whether the group expands on trigger                                                       |
+| `open?`      | `boolean`            | `-`              | Whether the group is open (controlled)                                                     |
+| `portal?`    | `boolean`            | `true`           | Whether to portal the group to `document.body`. When false, the group is positioned `ab... |
+| `placement?` | `ViewportPlacement`  | `'bottom-right'` | Viewport corner used for the group.                                                        |
+| `shape?`     | `FloatButtonShape`   | `'circle'`       | Shape applied to all child buttons                                                         |
 
 ## Menu
 
@@ -325,23 +329,27 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## ScrollSpy
 
-`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 3/12 props
+`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 5/13 props
 
-| Prop                | Type              | Default | Notes |
-| ------------------- | ----------------- | ------- | ----- |
-| `items?`            | `ScrollSpyItem[]` | `-`     | -     |
-| `activeKey?`        | `ScrollSpyKey`    | `-`     | -     |
-| `defaultActiveKey?` | `ScrollSpyKey`    | `-`     | -     |
+| Prop            | Type                   | Default | Notes                                                                                    |
+| --------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `items?`        | `ScrollSpyItem[]`      | `-`     | Nav tree. Required for a useful TOC.                                                     |
+| `getContainer?` | `ScrollRootInput`      | `-`     | Scroll root: selector, element, window, or getter. Invalid values fall back to `window`. |
+| `direction?`    | `ScrollSpyDirection`   | `-`     | -                                                                                        |
+| `activeKey?`    | `ScrollSpyKey`         | `-`     | -                                                                                        |
+| `locale?`       | `Partial<TigerLocale>` | `-`     | -                                                                                        |
 
 ## Spotlight
 
-`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 3/19 props
+`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 5/21 props
 
-| Prop      | Type                   | Default | Notes |
-| --------- | ---------------------- | ------- | ----- |
-| `open?`   | `boolean`              | `-`     | -     |
-| `items?`  | `SpotlightItem[]`      | `-`     | -     |
-| `locale?` | `Partial<TigerLocale>` | `-`     | -     |
+| Prop      | Type                   | Default | Notes                                                                                      |
+| --------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`  | `SpotlightItem[]`      | `-`     | -                                                                                          |
+| `open?`   | `boolean`              | `-`     | -                                                                                          |
+| `hotkey?` | `boolean \| string`    | `-`     | Global toggle chord. `true` (default) is `Meta/Ctrl+K`; `false` disables; a string uses... |
+| `query?`  | `string`               | `-`     | -                                                                                          |
+| `locale?` | `Partial<TigerLocale>` | `-`     | -                                                                                          |
 
 ## Steps
 

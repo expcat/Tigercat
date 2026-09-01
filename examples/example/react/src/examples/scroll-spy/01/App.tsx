@@ -8,16 +8,19 @@ const items: ScrollSpyItem[] = [
 
 export default function App() {
   return (
-    <div className="grid gap-4 md:grid-cols-[1fr_160px]">
-      <div>
-        <section id="spy-overview" className="h-52 bg-blue-50 p-4">
-          概览
-        </section>
-        <section id="spy-workflow" className="h-52 bg-green-50 p-4">
-          工作流
-        </section>
+    <div className="space-y-4">
+      <ScrollSpy items={items} direction="horizontal" />
+      <div className="grid gap-4 md:grid-cols-[1fr_160px]">
+        <div className="max-h-64 overflow-auto rounded border">
+          <section id="spy-overview" className="min-h-[28rem] bg-blue-50 p-4">
+            概览
+          </section>
+          <section id="spy-workflow" className="min-h-[28rem] bg-green-50 p-4">
+            工作流
+          </section>
+        </div>
+        <ScrollSpy items={items} sticky direction="vertical" />
       </div>
-      <ScrollSpy items={items} sticky direction="vertical" />
     </div>
   )
 }

@@ -1,15 +1,13 @@
 import { FloatButton } from '@expcat/tigercat-react/FloatButton'
+import { FloatButtonGroup } from '@expcat/tigercat-react/FloatButtonGroup'
 
 export default function App() {
   return (
-    <FloatButton
-      floating
-      placement="bottom-right"
-      offset={{ x: 32, y: 32 }}
-      size="lg"
-      shape="square"
-      tooltip="新建"
-      ariaLabel="新建内容"
-    />
+    <div className="relative h-56 rounded border">
+      <FloatButtonGroup trigger="hover" placement="top-left">
+        <FloatButton type="default" ariaLabel="编辑" />
+        <FloatButton type="default" ariaLabel="分享" />
+      </FloatButtonGroup>
+    </div>
   )
 }

@@ -283,7 +283,10 @@ export const COMPONENT_PROP_PRIORITY = {
   Anchor: ['getContainer?', 'direction?', 'targetOffset?', 'affix?', 'offsetTop?'],
   AnchorLink: ['href', 'title?', 'target?'],
   BackTop: ['visibilityHeight?', 'target?', 'placement?', 'offset?'],
-  FloatButton: ['floating?', 'placement?', 'offset?'],
+  FloatButton: ['floating?', 'placement?', 'offset?', 'ariaLabel?'],
+  FloatButtonGroup: ['trigger?', 'open?', 'portal?', 'placement?', 'shape?'],
+  Spotlight: ['items?', 'open?', 'hotkey?', 'query?'],
+  ScrollSpy: ['items?', 'getContainer?', 'direction?', 'activeKey?'],
   Notification: ['actions?', 'type?', 'position?'],
   Table: [
     'dataSource?',
@@ -721,7 +724,12 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Affix: '<Affix :offset-top="0"><div>Header</div></Affix>',
     Anchor: '<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>',
     AnchorLink: '<AnchorLink href="#intro" title="Intro" />',
-    BackTop: '<BackTop :visibility-height="400" />'
+    BackTop: '<BackTop :visibility-height="400" />',
+    FloatButton: '<FloatButton floating />',
+    FloatButtonGroup:
+      '<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>',
+    Spotlight: '<Spotlight :items="items" />',
+    ScrollSpy: '<ScrollSpy :items="items" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -835,7 +843,12 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Affix: '<Affix offsetTop={0}><div>Header</div></Affix>',
     Anchor: '<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>',
     AnchorLink: '<AnchorLink href="#intro" title="Intro" />',
-    BackTop: '<BackTop visibilityHeight={400} />'
+    BackTop: '<BackTop visibilityHeight={400} />',
+    FloatButton: '<FloatButton floating />',
+    FloatButtonGroup:
+      '<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>',
+    Spotlight: '<Spotlight items={items} />',
+    ScrollSpy: '<ScrollSpy items={items} />'
   }
 }
 

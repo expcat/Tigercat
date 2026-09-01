@@ -1,7 +1,7 @@
 {
   "id": "scroll-spy-01",
   "title": "文档导航",
-  "description": "一个纵向 sticky ScrollSpy 关联两段页面文档内容；水平导航可将 direction 改为 horizontal。",
+  "description": "节明显高于视口，滚动会换当前项。同时展示 horizontal 与 sticky 纵向 TOC。不传 ariaLabel 时走 locale。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

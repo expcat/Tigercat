@@ -9,22 +9,22 @@ const items: ScrollSpyItem[] = [
 
 export default function App() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [activeLabel, setActiveLabel] = useState('审计')
+  const [activeLabel, setActiveLabel] = useState(items[0].label)
 
   return (
     <div>
       <div className="grid gap-4 md:grid-cols-[1fr_160px]">
         <div ref={containerRef} className="h-64 overflow-auto rounded border">
-          <section id="spy-audit" className="h-52 bg-blue-50 p-4">
+          <section id="spy-audit" className="min-h-[20rem] bg-blue-50 p-4">
             审计
           </section>
-          <section id="spy-release" className="h-52 bg-green-50 p-4">
+          <section id="spy-release" className="min-h-[20rem] bg-green-50 p-4">
             发布
           </section>
         </div>
         <ScrollSpy
           items={items}
-          getContainer={() => containerRef.current ?? window}
+          getContainer={() => containerRef.current}
           onActiveKeyChange={(_key, item) => setActiveLabel(item.label)}
         />
       </div>

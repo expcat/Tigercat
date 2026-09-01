@@ -1,7 +1,7 @@
 {
   "id": "spotlight-02",
-  "title": "自定义过滤与命令状态",
-  "description": "通过 filterItem 搜索自定义别名，并展示命令快捷键和不可选择的 disabled 项。",
+  "title": "别名与快捷键",
+  "description": "附加检索字段用 keywords。面板打开时 shortcut 会选中对应项。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

@@ -1,7 +1,7 @@
 {
   "id": "float-button-02",
-  "title": "独立悬浮",
-  "description": "单个 FloatButton 可直接固定到视口角落。",
+  "title": "悬浮按钮组",
+  "description": "Group 是 disclosure：默认 trigger 钮带 aria-expanded。hover 也能 click/Enter 开合，顶角打开后 trigger 留在该角。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {
