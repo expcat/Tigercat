@@ -82,8 +82,10 @@ export function getAnchoredOverlayLayoutClasses(
   layout: AnchoredOverlayLayout = 'anchored',
   matchReferenceWidth = false
 ): string {
+  // Modal/Drawer roots are pointer-events-none; overlay-host is display:contents,
+  // so the portaled layer must opt back in or clicks fall through to dialog content.
   const positioned =
-    'absolute left-[var(--tiger-overlay-x)] top-[var(--tiger-overlay-y)] max-w-[var(--tiger-overlay-available-width)]! max-h-[var(--tiger-overlay-available-height)]! invisible data-[positioned=true]:visible'
+    'pointer-events-auto absolute left-[var(--tiger-overlay-x)] top-[var(--tiger-overlay-y)] max-w-[var(--tiger-overlay-available-width)]! max-h-[var(--tiger-overlay-available-height)]! invisible data-[positioned=true]:visible'
 
   return classNames(
     positioned,
