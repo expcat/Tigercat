@@ -24,23 +24,9 @@
  * compose / fall back to it explicitly.
  */
 import { tokenizeLine, getTokenClasses, type Token, type TokenType } from './code-editor-utils'
-import type { CodeLanguage, CodeEditorTheme } from '../types/code-editor'
+import type { CodeHighlighter, CodeLanguage, CodeEditorTheme } from '../types/code-editor'
 
-export interface CodeHighlighter {
-  /** Optional identifier used by tests / devtools. */
-  name?: string
-  /**
-   * Render a single line of source to HTML. Returned string is injected
-   * verbatim — engines must escape any untrusted text themselves.
-   */
-  highlightLine?(line: string, language: CodeLanguage, theme: CodeEditorTheme): string
-  /**
-   * Render the whole code block to HTML. Used when `highlightLine` is
-   * not provided. Engines that emit one `<pre><code>` envelope per call
-   * should prefer this hook.
-   */
-  highlightCode?(code: string, language: CodeLanguage, theme: CodeEditorTheme): string
-}
+export type { CodeHighlighter }
 
 /** Escape characters that would otherwise break HTML interpolation. */
 export function escapeHighlightHtml(value: string): string {

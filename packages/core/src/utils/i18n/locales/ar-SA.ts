@@ -366,6 +366,10 @@ export const arSA: TigerLocale = {
     ganttAriaLabel: 'مخطط غانت',
     ganttTaskAriaLabel: '{label}، {start} إلى {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'محرر التعليمات البرمجية'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'تنسيق Markdown',
     modeToolbarAriaLabel: 'وضع عرض Markdown',
@@ -386,7 +390,17 @@ export const arSA: TigerLocale = {
     link: 'رابط',
     image: 'صورة',
     table: 'جدول',
-    horizontalRule: 'خط أفقي'
+    horizontalRule: 'خط أفقي',
+    placeholderStrong: 'نص عريض',
+    placeholderEmphasis: 'تأكيد',
+    placeholderDeleted: 'نص محذوف',
+    placeholderCode: 'شفرة',
+    placeholderHeading: 'عنوان',
+    placeholderQuote: 'اقتباس',
+    placeholderListItem: 'عنصر قائمة',
+    placeholderLinkText: 'نص الرابط',
+    placeholderImageAlt: 'نص بديل',
+    placeholderTable: '| عمود | قيمة |\n| --- | --- |\n| اسم | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'تنسيق النص',
@@ -407,7 +421,9 @@ export const arSA: TigerLocale = {
     horizontalRule: 'خط',
     undo: 'تراجع',
     redo: 'إعادة',
-    clear: 'مسح التنسيق'
+    clear: 'مسح التنسيق',
+    linkPrompt: 'أدخل الرابط',
+    imagePrompt: 'أدخل رابط الصورة'
   },
   cronEditor: {
     ariaLabel: 'محرر Cron',

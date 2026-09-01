@@ -366,6 +366,10 @@ export const ptBR: TigerLocale = {
     ganttAriaLabel: 'Gráfico de Gantt',
     ganttTaskAriaLabel: '{label}, {start} até {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'Editor de código'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Formatação Markdown',
     modeToolbarAriaLabel: 'Modo de visualização Markdown',
@@ -386,7 +390,17 @@ export const ptBR: TigerLocale = {
     link: 'Ligação',
     image: 'Imagem',
     table: 'Tabela',
-    horizontalRule: 'Linha horizontal'
+    horizontalRule: 'Linha horizontal',
+    placeholderStrong: 'texto em negrito',
+    placeholderEmphasis: 'ênfase',
+    placeholderDeleted: 'texto excluído',
+    placeholderCode: 'código',
+    placeholderHeading: 'Título',
+    placeholderQuote: 'Citação',
+    placeholderListItem: 'Item da lista',
+    placeholderLinkText: 'texto do link',
+    placeholderImageAlt: 'texto alternativo',
+    placeholderTable: '| Coluna | Valor |\n| --- | --- |\n| Nome | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'Formatação de texto',
@@ -407,7 +421,9 @@ export const ptBR: TigerLocale = {
     horizontalRule: 'Linha',
     undo: 'Desfazer',
     redo: 'Refazer',
-    clear: 'Limpar formatação'
+    clear: 'Limpar formatação',
+    linkPrompt: 'Inserir URL',
+    imagePrompt: 'Inserir URL da imagem'
   },
   cronEditor: {
     ariaLabel: 'Editor Cron',

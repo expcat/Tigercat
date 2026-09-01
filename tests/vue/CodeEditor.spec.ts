@@ -10,7 +10,7 @@ import { expectNoA11yViolationsIsolated } from '../utils'
 function renderCodeEditor(props: Record<string, unknown> = {}) {
   return render(CodeEditor, {
     props: {
-      value: 'const x = 1',
+      modelValue: 'const x = 1',
       language: 'javascript',
       ...props
     }
@@ -52,7 +52,7 @@ describe('CodeEditor', () => {
 
   describe('Line numbers', () => {
     it('should show line numbers by default', () => {
-      const { container } = renderCodeEditor({ value: 'a\nb\nc' })
+      const { container } = renderCodeEditor({ modelValue: 'a\nb\nc' })
       const lineNumbers = container.querySelector('[aria-hidden="true"]')
       expect(lineNumbers).toBeTruthy()
       expect(lineNumbers?.textContent).toContain('1')
@@ -71,13 +71,14 @@ describe('CodeEditor', () => {
     it('should apply light theme classes', () => {
       const { container } = renderCodeEditor({ theme: 'light' })
       const root = container.firstElementChild as HTMLElement
-      expect(root.className).toContain('bg-white')
+      expect(root.className).toContain('--tiger-surface')
     })
 
     it('should apply dark theme classes', () => {
       const { container } = renderCodeEditor({ theme: 'dark' })
       const root = container.firstElementChild as HTMLElement
-      expect(root.className).toContain('bg-gray-900')
+      expect(root.getAttribute('data-theme')).toBe('dark')
+      expect(root.className).toContain('--tiger-surface')
     })
   })
 
@@ -105,23 +106,42 @@ describe('CodeEditor', () => {
 
   describe('Events', () => {
     it('should emit change on input', async () => {
-      const onChange = vi.fn()
-      const { container } = renderCodeEditor({
+      const { container, emitted } = renderCodeEditor({
         defaultValue: 'hello',
-        value: undefined,
-        onChange
+        modelValue: undefined
       })
       const textarea = container.querySelector('textarea')!
       await fireEvent.update(textarea, 'hello world')
-      expect(onChange).toHaveBeenCalled()
+      expect(emitted()['update:modelValue'][0]).toEqual(['hello world'])
+      expect(emitted().change[0]).toEqual(['hello world'])
+    })
+
+    it('does not emit on Tab when readOnly', async () => {
+      const { container, emitted } = renderCodeEditor({
+        modelValue: undefined,
+        defaultValue: 'hello',
+        readOnly: true
+      })
+      const textarea = container.querySelector('textarea')!
+      await fireEvent.keyDown(textarea, { key: 'Tab' })
+      expect(emitted()['update:modelValue']).toBeUndefined()
     })
   })
 
   describe('Syntax highlighting', () => {
     it('should highlight keywords in JavaScript', () => {
       const { container } = renderCodeEditor({
-        value: 'const x = 1',
+        modelValue: 'const x = 1',
         language: 'javascript'
+      })
+      const highlighted = container.querySelector('[aria-hidden="true"] span')
+      expect(highlighted).toBeTruthy()
+    })
+
+    it('tokenizes html language', () => {
+      const { container } = renderCodeEditor({
+        modelValue: '<div>',
+        language: 'html'
       })
       const highlighted = container.querySelector('[aria-hidden="true"] span')
       expect(highlighted).toBeTruthy()
@@ -139,13 +159,35 @@ describe('CodeEditor', () => {
   describe('Placeholder', () => {
     it('should set placeholder on textarea', () => {
       const { container } = renderCodeEditor({
-        value: '',
+        modelValue: '',
         placeholder: 'Type code...'
       })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       expect(textarea.placeholder).toBe('Type code...')
+      expect(textarea.className).toContain('--tiger-text-muted')
     })
   })
+
+  describe('Overlay', () => {
+    it('keeps one scroller so highlight follows textarea overflow', () => {
+      const { container } = renderCodeEditor({
+        modelValue: Array.from({ length: 20 }, (_, i) => `line ${i}`).join('\n'),
+        maxLines: 3
+      })
+      const textarea = container.querySelector('textarea') as HTMLTextAreaElement
+      expect(textarea.className).not.toContain('overflow-auto')
+      const scroller = container.querySelector('[data-tiger-code-scroller]') as HTMLElement
+      expect(scroller.className).toContain('overflow-auto')
+    })
+
+    it('wordWrap uses pre-wrap without stacking pre', () => {
+      const { container } = renderCodeEditor({ wordWrap: true, modelValue: 'a'.repeat(80) })
+      const textarea = container.querySelector('textarea') as HTMLTextAreaElement
+      expect(textarea.className).toContain('whitespace-pre-wrap')
+      expect(textarea.className).not.toMatch(/whitespace-pre[^-]/)
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(CodeEditor)

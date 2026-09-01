@@ -366,6 +366,10 @@ export const thTH: TigerLocale = {
     ganttAriaLabel: 'แผนภูมิแกนต์',
     ganttTaskAriaLabel: '{label}, {start} ถึง {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'ตัวแก้ไขโค้ด'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'จัดรูปแบบ Markdown',
     modeToolbarAriaLabel: 'โหมดมุมมอง Markdown',
@@ -386,7 +390,17 @@ export const thTH: TigerLocale = {
     link: 'ลิงก์',
     image: 'รูปภาพ',
     table: 'ตาราง',
-    horizontalRule: 'เส้นคั่น'
+    horizontalRule: 'เส้นคั่น',
+    placeholderStrong: 'ข้อความตัวหนา',
+    placeholderEmphasis: 'ข้อความตัวเอียง',
+    placeholderDeleted: 'ข้อความที่ลบ',
+    placeholderCode: 'โค้ด',
+    placeholderHeading: 'หัวข้อ',
+    placeholderQuote: 'คำพูด',
+    placeholderListItem: 'รายการ',
+    placeholderLinkText: 'ข้อความลิงก์',
+    placeholderImageAlt: 'คำอธิบายรูป',
+    placeholderTable: '| คอลัมน์ | ค่า |\n| --- | --- |\n| ชื่อ | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'จัดรูปแบบข้อความ',
@@ -407,7 +421,9 @@ export const thTH: TigerLocale = {
     horizontalRule: 'เส้น',
     undo: 'เลิกทำ',
     redo: 'ทำซ้ำ',
-    clear: 'ล้างรูปแบบ'
+    clear: 'ล้างรูปแบบ',
+    linkPrompt: 'ป้อน URL',
+    imagePrompt: 'ป้อน URL รูปภาพ'
   },
   cronEditor: {
     ariaLabel: 'ตัวแก้ไข Cron',

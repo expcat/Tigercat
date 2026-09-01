@@ -69,6 +69,7 @@ export const TIGER_LOCALE_KEY_SET = {
   carousel: true,
   transfer: true,
   chart: true,
+  codeEditor: true,
   markdownEditor: true,
   richTextEditor: true,
   cronEditor: true,

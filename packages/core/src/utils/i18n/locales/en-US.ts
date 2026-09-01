@@ -369,6 +369,10 @@ export const enUS: TigerLocale = {
     ganttAriaLabel: 'Gantt chart',
     ganttTaskAriaLabel: '{label}, {start} to {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'Code editor'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown formatting',
     modeToolbarAriaLabel: 'Markdown view mode',
@@ -389,7 +393,17 @@ export const enUS: TigerLocale = {
     link: 'Link',
     image: 'Image',
     table: 'Table',
-    horizontalRule: 'Horizontal rule'
+    horizontalRule: 'Horizontal rule',
+    placeholderStrong: 'strong text',
+    placeholderEmphasis: 'emphasis',
+    placeholderDeleted: 'deleted text',
+    placeholderCode: 'code',
+    placeholderHeading: 'Heading',
+    placeholderQuote: 'Quote',
+    placeholderListItem: 'List item',
+    placeholderLinkText: 'link text',
+    placeholderImageAlt: 'alt text',
+    placeholderTable: '| Column | Value |\n| --- | --- |\n| Name | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'Text formatting',
@@ -410,7 +424,9 @@ export const enUS: TigerLocale = {
     horizontalRule: 'HR',
     undo: 'Undo',
     redo: 'Redo',
-    clear: 'Clear'
+    clear: 'Clear',
+    linkPrompt: 'Enter URL',
+    imagePrompt: 'Enter image URL'
   },
   cronEditor: {
     ariaLabel: 'Cron editor',

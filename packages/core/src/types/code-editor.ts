@@ -2,6 +2,8 @@
  * CodeEditor component types and interfaces
  */
 
+import type { TigerLocale, TigerLocaleCodeEditor } from './locale'
+
 /**
  * Supported programming languages for syntax highlighting
  */
@@ -12,6 +14,27 @@ export type CodeLanguage =
  * Code editor theme
  */
 export type CodeEditorTheme = 'light' | 'dark'
+
+/**
+ * Pluggable highlighter. Returned HTML is TRUSTED and injected as-is —
+ * callers must escape untrusted source themselves (or use
+ * `escapeHighlightHtml`).
+ */
+export interface CodeHighlighter {
+  /** Optional identifier used by tests / devtools. */
+  name?: string
+  /**
+   * Render a single line of source to HTML. Returned string is injected
+   * verbatim — engines must escape any untrusted text themselves.
+   */
+  highlightLine?(line: string, language: CodeLanguage, theme: CodeEditorTheme): string
+  /**
+   * Render the whole code block to HTML. Used when `highlightLine` is
+   * not provided. Engines that emit one `<pre><code>` envelope per call
+   * should prefer this hook.
+   */
+  highlightCode?(code: string, language: CodeLanguage, theme: CodeEditorTheme): string
+}
 
 /**
  * Base CodeEditor props interface
@@ -87,4 +110,14 @@ export interface CodeEditorProps {
    * Custom styles
    */
   style?: Record<string, string | number>
+  /**
+   * Optional pluggable highlighter. Output is TRUSTED HTML.
+   */
+  highlighter?: CodeHighlighter
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleCodeEditor>
+  /** Accessible name; falls back to locale then FormItem */
+  ariaLabel?: string
 }

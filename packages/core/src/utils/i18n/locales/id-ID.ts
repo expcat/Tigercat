@@ -366,6 +366,10 @@ export const idID: TigerLocale = {
     ganttAriaLabel: 'Bagan Gantt',
     ganttTaskAriaLabel: '{label}, {start} sampai {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'Editor kode'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Pemformatan Markdown',
     modeToolbarAriaLabel: 'Mode tampilan Markdown',
@@ -386,7 +390,17 @@ export const idID: TigerLocale = {
     link: 'Tautan',
     image: 'Gambar',
     table: 'Tabel',
-    horizontalRule: 'Garis horizontal'
+    horizontalRule: 'Garis horizontal',
+    placeholderStrong: 'teks tebal',
+    placeholderEmphasis: 'teks miring',
+    placeholderDeleted: 'teks terhapus',
+    placeholderCode: 'kode',
+    placeholderHeading: 'Judul',
+    placeholderQuote: 'Kutipan',
+    placeholderListItem: 'Butir daftar',
+    placeholderLinkText: 'teks tautan',
+    placeholderImageAlt: 'teks alt',
+    placeholderTable: '| Kolom | Nilai |\n| --- | --- |\n| Nama | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'Pemformatan teks',
@@ -407,7 +421,9 @@ export const idID: TigerLocale = {
     horizontalRule: 'Garis',
     undo: 'Urungkan',
     redo: 'Ulangi',
-    clear: 'Hapus format'
+    clear: 'Hapus format',
+    linkPrompt: 'Masukkan URL',
+    imagePrompt: 'Masukkan URL gambar'
   },
   cronEditor: {
     ariaLabel: 'Editor Cron',

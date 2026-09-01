@@ -61,10 +61,11 @@ describe('code-highlighter', () => {
       expect(actual).toBe(expected)
     })
 
-    it('respects the dark theme', () => {
+    it('uses the same token classes for light and dark (theme remaps CSS variables)', () => {
       const lightHtml = builtinCodeHighlighter.highlightLine!('const x', 'javascript', 'light')
       const darkHtml = builtinCodeHighlighter.highlightLine!('const x', 'javascript', 'dark')
-      expect(lightHtml).not.toBe(darkHtml)
+      expect(lightHtml).toBe(darkHtml)
+      expect(lightHtml).toContain('--tiger-primary')
     })
   })
 

@@ -7,6 +7,7 @@ import {
   countLines,
   generateLineNumbers,
   handleTabKey,
+  getActiveLineIndex,
   tokenClassesLight,
   tokenClassesDark
 } from '@expcat/tigercat-core'
@@ -62,6 +63,28 @@ describe('code-editor-utils', () => {
       expect(tokens[0]).toEqual({ type: 'number', value: '42' })
     })
 
+    it('stops number tokens at identifier characters', () => {
+      const tokens = tokenizeLine('1foo', 'javascript')
+      expect(tokens[0]).toEqual({ type: 'number', value: '1' })
+      expect(tokens[1]).toEqual({ type: 'plain', value: 'foo' })
+    })
+
+    it('tokenizes html tags instead of a whole-line plain token', () => {
+      const tokens = tokenizeLine('<div>', 'html')
+      expect(tokens.some((token) => token.type === 'keyword' && token.value === 'div')).toBe(true)
+      expect(tokens).not.toEqual([{ type: 'plain', value: '<div>' }])
+    })
+
+    it('tokenizes css property names', () => {
+      const tokens = tokenizeLine('color: red;', 'css')
+      expect(tokens[0]).toEqual({ type: 'keyword', value: 'color' })
+    })
+
+    it('tokenizes markdown headings', () => {
+      const tokens = tokenizeLine('# Title', 'markdown')
+      expect(tokens[0]).toEqual({ type: 'keyword', value: '#' })
+    })
+
     it('should tokenize punctuation', () => {
       const tokens = tokenizeLine('{}', 'javascript')
       expect(tokens[0]).toEqual({ type: 'punctuation', value: '{' })
@@ -98,6 +121,12 @@ describe('code-editor-utils', () => {
     })
   })
 
+  describe('getActiveLineIndex', () => {
+    it('returns the line containing the caret', () => {
+      expect(getActiveLineIndex('a\nb', 2)).toBe(1)
+    })
+  })
+
   describe('getTokenClasses', () => {
     it('should return light theme classes', () => {
       expect(getTokenClasses('keyword', 'light')).toBe(tokenClassesLight.keyword)
@@ -117,13 +146,13 @@ describe('code-editor-utils', () => {
   describe('getCodeEditorContainerClasses', () => {
     it('should return light theme classes', () => {
       const classes = getCodeEditorContainerClasses('light', false)
-      expect(classes).toContain('bg-white')
+      expect(classes).toContain('--tiger-surface')
       expect(classes).toContain('font-mono')
     })
 
     it('should return dark theme classes', () => {
       const classes = getCodeEditorContainerClasses('dark', false)
-      expect(classes).toContain('bg-gray-900')
+      expect(classes).toContain('--tiger-surface')
     })
 
     it('should include disabled classes', () => {
@@ -140,12 +169,12 @@ describe('code-editor-utils', () => {
   describe('getLineNumberClasses', () => {
     it('should return light line number classes', () => {
       const classes = getLineNumberClasses('light')
-      expect(classes).toContain('bg-gray-50')
+      expect(classes).toContain('--tiger-surface-muted')
     })
 
     it('should return dark line number classes', () => {
       const classes = getLineNumberClasses('dark')
-      expect(classes).toContain('bg-gray-800')
+      expect(classes).toContain('--tiger-surface-muted')
     })
   })
 
@@ -204,6 +233,16 @@ describe('code-editor-utils', () => {
       const result = handleTabKey('x', 1, 1, 4)
       expect(result.value).toBe('x    ')
       expect(result.selectionStart).toBe(5)
+    })
+
+    it('indents each selected line and keeps the original text', () => {
+      const result = handleTabKey('a\nb\nc', 0, 5, 2)
+      expect(result.value).toBe('  a\n  b\n  c')
+    })
+
+    it('clamps invalid tabSize so repeat does not throw', () => {
+      expect(handleTabKey('x', 0, 0, 0).value).toBe('  x')
+      expect(handleTabKey('x', 0, 0, Number.NaN).value).toBe('  x')
     })
   })
 })

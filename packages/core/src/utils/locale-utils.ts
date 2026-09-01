@@ -64,6 +64,7 @@ import type {
   TigerLocaleResizable,
   TigerLocaleTransfer,
   TigerLocaleChart,
+  TigerLocaleCodeEditor,
   TigerLocaleMarkdownEditor,
   TigerLocaleRichTextEditor,
   TigerLocaleCronEditor,
@@ -583,6 +584,13 @@ export function getChartLabels(
   overrides?: Partial<TigerLocaleChart>
 ): Required<TigerLocaleChart> {
   return resolveLocaleSection(enSection('chart'), locale?.chart, overrides)
+}
+
+export function getCodeEditorLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCodeEditor>
+): Required<TigerLocaleCodeEditor> {
+  return resolveLocaleSection(enSection('codeEditor'), locale?.codeEditor, overrides)
 }
 
 export function getMarkdownEditorLabels(

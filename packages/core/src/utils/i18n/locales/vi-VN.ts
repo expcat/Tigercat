@@ -366,6 +366,10 @@ export const viVN: TigerLocale = {
     ganttAriaLabel: 'Biểu đồ Gantt',
     ganttTaskAriaLabel: '{label}, {start} đến {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'Trình soạn mã'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Định dạng Markdown',
     modeToolbarAriaLabel: 'Chế độ xem Markdown',
@@ -386,7 +390,17 @@ export const viVN: TigerLocale = {
     link: 'Liên kết',
     image: 'Ảnh',
     table: 'Bảng',
-    horizontalRule: 'Đường ngang'
+    horizontalRule: 'Đường ngang',
+    placeholderStrong: 'chữ đậm',
+    placeholderEmphasis: 'chữ nghiêng',
+    placeholderDeleted: 'chữ đã xóa',
+    placeholderCode: 'mã',
+    placeholderHeading: 'Tiêu đề',
+    placeholderQuote: 'Trích dẫn',
+    placeholderListItem: 'Mục danh sách',
+    placeholderLinkText: 'văn bản liên kết',
+    placeholderImageAlt: 'mô tả ảnh',
+    placeholderTable: '| Cột | Giá trị |\n| --- | --- |\n| Tên | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'Định dạng văn bản',
@@ -407,7 +421,9 @@ export const viVN: TigerLocale = {
     horizontalRule: 'Đường',
     undo: 'Hoàn tác',
     redo: 'Làm lại',
-    clear: 'Xóa định dạng'
+    clear: 'Xóa định dạng',
+    linkPrompt: 'Nhập URL',
+    imagePrompt: 'Nhập URL hình ảnh'
   },
   cronEditor: {
     ariaLabel: 'Trình soạn Cron',

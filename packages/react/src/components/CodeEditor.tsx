@@ -1,80 +1,152 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react'
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  useLayoutEffect,
+  forwardRef,
+  useImperativeHandle
+} from 'react'
 import {
   classNames,
   getCodeEditorContainerClasses,
   getLineNumberClasses,
   getTokenClasses,
-  tokenizeLine,
-  countLines,
   generateLineNumbers,
   handleTabKey,
   getActiveLineIndex,
   getCodeEditorActiveLineClasses,
-  getCodeEditorCaretClasses,
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
+  codeEditorScrollerClasses,
+  getCodeEditorWrapClass,
+  getCodeEditorThemeVars,
+  getCodeEditorHeightStyle,
+  buildCodeEditorLineModels,
+  resolveEditorTabAction,
+  getCodeEditorLabels,
+  mergeTigerLocale,
   type CodeEditorProps as CoreCodeEditorProps,
   type Token,
   type CodeHighlighter
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface CodeEditorProps extends Omit<CoreCodeEditorProps, 'style'> {
   onChange?: (value: string) => void
-  children?: React.ReactNode
   style?: React.CSSProperties
   /**
-   * Optional pluggable highlighter (PR-17). When provided the built-in
-   * regex tokenizer is bypassed and the engine renders raw HTML for
-   * each line (or whole block via `highlightCode`). Output is treated
-   * as TRUSTED HTML — sanitise inside the engine if needed.
+   * Optional pluggable highlighter. Output is TRUSTED HTML — sanitise
+   * inside the engine if the source is untrusted.
    */
   highlighter?: CodeHighlighter
+  name?: string
+  id?: string
 }
 
-export const CodeEditor: React.FC<CodeEditorProps> = ({
-  value: controlledValue,
-  defaultValue = '',
-  language = 'plain',
-  theme = 'light',
-  readOnly = false,
-  lineNumbers = true,
-  tabSize = 2,
-  placeholder,
-  wordWrap = false,
-  minLines = 3,
-  maxLines = 0,
-  highlightActiveLine = true,
-  disabled = false,
-  className,
-  style,
-  onChange,
-  highlighter
-}) => {
-  const [code, setCode] = useControlledState({
+export interface CodeEditorHandle {
+  focus: () => void
+  textarea: HTMLTextAreaElement | null
+}
+
+export const CodeEditor = forwardRef<HTMLTextAreaElement, CodeEditorProps>(function CodeEditor(
+  {
     value: controlledValue,
+    defaultValue = '',
+    language = 'plain',
+    theme = 'light',
+    readOnly = false,
+    lineNumbers = true,
+    tabSize = 2,
+    placeholder,
+    wordWrap = false,
+    minLines = 3,
+    maxLines = 0,
+    highlightActiveLine = true,
+    disabled = false,
+    className,
+    style,
+    onChange,
+    highlighter,
+    locale,
+    labels: labelsOverride,
+    ariaLabel,
+    name,
+    id,
+    ...restProps
+  },
+  ref
+) {
+  const config = useTigerConfig()
+  const formItemControl = useFormItemControlContext()
+  const formBoundValue = formItemControl?.value
+  const resolvedValue =
+    controlledValue !== undefined
+      ? controlledValue
+      : typeof formBoundValue === 'string'
+        ? formBoundValue
+        : undefined
+  const [code, setCode] = useControlledState({
+    value: resolvedValue,
     defaultValue,
-    onChange
+    onChange: (next) => {
+      onChange?.(next)
+      formItemControl?.onChange?.(next)
+    }
   })
   const [activeLine, setActiveLine] = useState(0)
+  const [allowTabExit, setAllowTabExit] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const pendingSelection = useRef<{ start: number; end: number } | null>(null)
+  const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+  const effectiveId = id ?? formItemControl?.id
+  const effectiveName = name ?? formItemControl?.name
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getCodeEditorLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
-  const lines = useMemo(() => code.split('\n'), [code])
-  const lineCount = useMemo(() => countLines(code), [code])
-  const lineNums = useMemo(() => generateLineNumbers(lineCount), [lineCount])
+  useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement)
+
+  useLayoutEffect(() => {
+    const pending = pendingSelection.current
+    if (!pending || !textareaRef.current) return
+    pendingSelection.current = null
+    textareaRef.current.selectionStart = pending.start
+    textareaRef.current.selectionEnd = pending.end
+  })
+
+  const model = useMemo(
+    () =>
+      buildCodeEditorLineModels({
+        value: code,
+        language,
+        theme,
+        activeLine,
+        highlightActiveLine,
+        disabled: effectiveDisabled,
+        highlighter
+      }),
+    [code, language, theme, activeLine, highlightActiveLine, effectiveDisabled, highlighter]
+  )
+  const lineNums = useMemo(() => generateLineNumbers(model.lines.length), [model.lines.length])
 
   const containerClasses = useMemo(
-    () => getCodeEditorContainerClasses(theme, disabled, className),
-    [theme, disabled, className]
+    () => getCodeEditorContainerClasses(theme, effectiveDisabled, className),
+    [theme, effectiveDisabled, className]
   )
 
   const containerStyle = useMemo<React.CSSProperties>(() => {
-    const lineHeight = 1.625
-    const s: React.CSSProperties = { ...style }
-    if (minLines > 0) s.minHeight = `${minLines * lineHeight + 1.5}rem`
-    if (maxLines > 0) s.maxHeight = `${maxLines * lineHeight + 1.5}rem`
-    return s
-  }, [minLines, maxLines, style])
+    const height = getCodeEditorHeightStyle(minLines, maxLines)
+    const themeVars = getCodeEditorThemeVars(theme)
+    return { ...height, ...themeVars, ...style }
+  }, [minLines, maxLines, theme, style])
 
   const updateActiveLine = useCallback(() => {
     const ta = textareaRef.current
@@ -93,24 +165,63 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Tab') {
-        e.preventDefault()
-        const ta = textareaRef.current
-        if (!ta) return
-        const result = handleTabKey(ta.value, ta.selectionStart, ta.selectionEnd, tabSize)
-        setCode(result.value)
-        requestAnimationFrame(() => {
-          ta.selectionStart = result.selectionStart
-          ta.selectionEnd = result.selectionStart
-        })
+      const action = resolveEditorTabAction(e, {
+        readOnly,
+        disabled: effectiveDisabled,
+        allowTabExit
+      })
+      if (action === 'arm-exit') {
+        setAllowTabExit(true)
+        return
       }
+      if (action === 'passthrough') {
+        if (e.key !== 'Tab') setAllowTabExit(false)
+        return
+      }
+      e.preventDefault()
+      setAllowTabExit(false)
+      const ta = textareaRef.current
+      if (!ta) return
+      const result = handleTabKey(ta.value, ta.selectionStart, ta.selectionEnd, tabSize, {
+        shift: action === 'outdent'
+      })
+      pendingSelection.current = {
+        start: result.selectionStart,
+        end: result.selectionEnd
+      }
+      setCode(result.value)
     },
-    [tabSize, setCode]
+    [allowTabExit, effectiveDisabled, readOnly, setCode, tabSize]
   )
 
-  const wrapClass = wordWrap ? 'whitespace-pre-wrap break-all' : ''
-  const showActiveLine = highlightActiveLine && !disabled
+  const wrapClass = getCodeEditorWrapClass(wordWrap)
   const activeLineClass = getCodeEditorActiveLineClasses(theme)
+
+  const {
+    id: _ignoredId,
+    name: _ignoredName,
+    onFocus,
+    onBlur,
+    'aria-label': ariaLabelAttr,
+    'aria-labelledby': ariaLabelledBy,
+    ...containerRest
+  } = restProps as Record<string, unknown>
+
+  const hostRest: Record<string, unknown> = {}
+  const extraContainer: Record<string, unknown> = {}
+  for (const [key, val] of Object.entries(containerRest)) {
+    if (
+      key.startsWith('data-') ||
+      key.startsWith('aria-') ||
+      key === 'onFocus' ||
+      key === 'onBlur'
+    ) {
+      if (key === 'data-language' || key === 'data-theme') extraContainer[key] = val
+      else hostRest[key] = val
+    } else {
+      extraContainer[key] = val
+    }
+  }
 
   const renderToken = (token: Token, idx: number) => {
     const cls = getTokenClasses(token.type, theme)
@@ -123,46 +234,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     )
   }
 
-  const renderLine = (line: string, lineIndex: number) => {
-    const lineClass = classNames(
-      'min-h-[1.625rem]',
-      showActiveLine && lineIndex === activeLine && activeLineClass
-    )
-    if (highlighter?.highlightLine) {
-      const html = highlighter.highlightLine(line, language, theme) || (line === '' ? '\n' : '')
-      return (
-        <div
-          key={lineIndex}
-          className={lineClass}
-          data-active-line={showActiveLine && lineIndex === activeLine ? '' : undefined}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-      )
-    }
-    const tokens = tokenizeLine(line, language)
-    return (
-      <div
-        key={lineIndex}
-        className={lineClass}
-        data-active-line={showActiveLine && lineIndex === activeLine ? '' : undefined}>
-        {tokens.map(renderToken)}
-        {line === '' ? '\n' : null}
-      </div>
-    )
-  }
-
-  const blockHtml =
-    highlighter && !highlighter.highlightLine && highlighter.highlightCode
-      ? highlighter.highlightCode(code, language, theme)
-      : null
-
   return (
     <div
       className={containerClasses}
       style={containerStyle}
       data-language={language}
-      data-theme={theme}>
-      <div className="flex h-full">
+      data-theme={theme}
+      {...extraContainer}>
+      <div className={codeEditorScrollerClasses} data-tiger-code-scroller="">
         {lineNumbers && (
           <div className={getLineNumberClasses(theme)} aria-hidden="true">
             {lineNums.map((n) => (
@@ -172,47 +251,75 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             ))}
           </div>
         )}
-        <div className="relative flex-1 overflow-auto">
-          {blockHtml !== null ? (
+        <div className="relative flex-1">
+          {model.blockHtml !== null ? (
             <div
               className={classNames(codeEditorHighlightClasses, wrapClass)}
               aria-hidden="true"
-              dangerouslySetInnerHTML={{ __html: blockHtml }}
+              dangerouslySetInnerHTML={{ __html: model.blockHtml }}
             />
           ) : (
             <div className={classNames(codeEditorHighlightClasses, wrapClass)} aria-hidden="true">
-              {lines.map(renderLine)}
+              {model.lines.map((line) => {
+                const lineClass = classNames('min-h-[1.625rem]', line.isActive && activeLineClass)
+                if (line.html !== null) {
+                  return (
+                    <div
+                      key={line.index}
+                      className={lineClass}
+                      data-active-line={line.isActive ? '' : undefined}
+                      dangerouslySetInnerHTML={{ __html: line.html }}
+                    />
+                  )
+                }
+                return (
+                  <div
+                    key={line.index}
+                    className={lineClass}
+                    data-active-line={line.isActive ? '' : undefined}>
+                    {(line.tokens ?? []).map(renderToken)}
+                    {line.text === '' ? '\n' : null}
+                  </div>
+                )
+              })}
             </div>
           )}
           <textarea
             ref={textareaRef}
-            className={classNames(
-              codeEditorTextareaClasses,
-              getCodeEditorCaretClasses(theme),
-              wrapClass
-            )}
+            className={classNames(codeEditorTextareaClasses, wrapClass)}
             value={code}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
             onSelect={updateActiveLine}
             onClick={updateActiveLine}
             onKeyUp={updateActiveLine}
-            readOnly={readOnly || disabled}
-            disabled={disabled}
+            onFocus={onFocus as React.FocusEventHandler<HTMLTextAreaElement> | undefined}
+            onBlur={(event) => {
+              formItemControl?.onBlur?.()
+              ;(onBlur as React.FocusEventHandler<HTMLTextAreaElement> | undefined)?.(event)
+            }}
+            readOnly={readOnly || effectiveDisabled}
+            disabled={effectiveDisabled}
             placeholder={placeholder}
             spellCheck={false}
             autoCapitalize="off"
             autoComplete="off"
             autoCorrect="off"
             data-gramm="false"
-            aria-label="Code editor"
-            role="textbox"
+            id={effectiveId}
+            name={effectiveName}
+            aria-label={
+              ariaLabel ?? (ariaLabelAttr as string | undefined) ?? labels.editorAriaLabel
+            }
+            aria-labelledby={(ariaLabelledBy as string | undefined) ?? formItemControl?.labelId}
             aria-multiline={true}
+            aria-describedby={formItemControl?.describedBy}
+            {...hostRest}
           />
         </div>
       </div>
     </div>
   )
-}
+})
 
 export default CodeEditor

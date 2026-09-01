@@ -369,6 +369,10 @@ export const zhTW: TigerLocale = {
     ganttAriaLabel: '甘特圖',
     ganttTaskAriaLabel: '{label}，{start} 至 {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: '程式碼編輯器'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown 格式工具列',
     modeToolbarAriaLabel: 'Markdown 檢視模式',
@@ -389,7 +393,17 @@ export const zhTW: TigerLocale = {
     link: '連結',
     image: '圖片',
     table: '表格',
-    horizontalRule: '分隔線'
+    horizontalRule: '分隔線',
+    placeholderStrong: '粗體文字',
+    placeholderEmphasis: '斜體文字',
+    placeholderDeleted: '刪除文字',
+    placeholderCode: '程式碼',
+    placeholderHeading: '標題',
+    placeholderQuote: '引用',
+    placeholderListItem: '清單項目',
+    placeholderLinkText: '連結文字',
+    placeholderImageAlt: '圖片描述',
+    placeholderTable: '| 欄 | 值 |\n| --- | --- |\n| 名稱 | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: '富文本格式工具列',
@@ -410,7 +424,9 @@ export const zhTW: TigerLocale = {
     horizontalRule: '分隔線',
     undo: '復原',
     redo: '重做',
-    clear: '清除格式'
+    clear: '清除格式',
+    linkPrompt: '輸入連結網址',
+    imagePrompt: '輸入圖片網址'
   },
   cronEditor: {
     ariaLabel: 'Cron 運算式編輯器',

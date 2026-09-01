@@ -366,6 +366,10 @@ export const koKR: TigerLocale = {
     ganttAriaLabel: '간트 차트',
     ganttTaskAriaLabel: '{label}, {start} ~ {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: '코드 편집기'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown 서식',
     modeToolbarAriaLabel: 'Markdown 보기 모드',
@@ -386,7 +390,17 @@ export const koKR: TigerLocale = {
     link: '링크',
     image: '이미지',
     table: '표',
-    horizontalRule: '가로줄'
+    horizontalRule: '가로줄',
+    placeholderStrong: '굵은 텍스트',
+    placeholderEmphasis: '기울임 텍스트',
+    placeholderDeleted: '삭제된 텍스트',
+    placeholderCode: '코드',
+    placeholderHeading: '제목',
+    placeholderQuote: '인용',
+    placeholderListItem: '목록 항목',
+    placeholderLinkText: '링크 텍스트',
+    placeholderImageAlt: '이미지 설명',
+    placeholderTable: '| 열 | 값 |\n| --- | --- |\n| 이름 | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: '텍스트 서식',
@@ -407,7 +421,9 @@ export const koKR: TigerLocale = {
     horizontalRule: '가로줄',
     undo: '실행 취소',
     redo: '다시 실행',
-    clear: '서식 지우기'
+    clear: '서식 지우기',
+    linkPrompt: 'URL 입력',
+    imagePrompt: '이미지 URL 입력'
   },
   cronEditor: {
     ariaLabel: 'Cron 편집기',

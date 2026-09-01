@@ -366,6 +366,10 @@ export const jaJP: TigerLocale = {
     ganttAriaLabel: 'ガントチャート',
     ganttTaskAriaLabel: '{label}、{start} から {end}{progress}'
   },
+  codeEditor: {
+    editorAriaLabel: 'コードエディタ'
+  },
+
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown の書式',
     modeToolbarAriaLabel: 'Markdown の表示モード',
@@ -386,7 +390,17 @@ export const jaJP: TigerLocale = {
     link: 'リンク',
     image: '画像',
     table: '表',
-    horizontalRule: '水平線'
+    horizontalRule: '水平線',
+    placeholderStrong: '太字テキスト',
+    placeholderEmphasis: '斜体テキスト',
+    placeholderDeleted: '削除テキスト',
+    placeholderCode: 'コード',
+    placeholderHeading: '見出し',
+    placeholderQuote: '引用',
+    placeholderListItem: 'リスト項目',
+    placeholderLinkText: 'リンクテキスト',
+    placeholderImageAlt: '画像の説明',
+    placeholderTable: '| 列 | 値 |\n| --- | --- |\n| 名前 | Tigercat |'
   },
   richTextEditor: {
     formattingToolbarAriaLabel: 'テキストの書式',
@@ -407,7 +421,9 @@ export const jaJP: TigerLocale = {
     horizontalRule: '水平線',
     undo: '元に戻す',
     redo: 'やり直す',
-    clear: '書式をクリア'
+    clear: '書式をクリア',
+    linkPrompt: 'URL を入力',
+    imagePrompt: '画像 URL を入力'
   },
   cronEditor: {
     ariaLabel: 'Cron エディタ',

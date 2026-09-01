@@ -558,6 +558,10 @@ export interface TigerLocaleChart {
   ganttTaskAriaLabel?: string
 }
 
+export interface TigerLocaleCodeEditor {
+  editorAriaLabel?: string
+}
+
 export interface TigerLocaleMarkdownEditor {
   formattingToolbarAriaLabel?: string
   modeToolbarAriaLabel?: string
@@ -579,6 +583,16 @@ export interface TigerLocaleMarkdownEditor {
   image?: string
   table?: string
   horizontalRule?: string
+  placeholderStrong?: string
+  placeholderEmphasis?: string
+  placeholderDeleted?: string
+  placeholderCode?: string
+  placeholderHeading?: string
+  placeholderQuote?: string
+  placeholderListItem?: string
+  placeholderLinkText?: string
+  placeholderImageAlt?: string
+  placeholderTable?: string
 }
 
 export interface TigerLocaleRichTextEditor {
@@ -601,6 +615,8 @@ export interface TigerLocaleRichTextEditor {
   undo?: string
   redo?: string
   clear?: string
+  linkPrompt?: string
+  imagePrompt?: string
 }
 
 export interface TigerLocaleCronEditor {
@@ -820,6 +836,7 @@ export interface TigerLocale {
   carousel?: TigerLocaleCarousel
   transfer?: TigerLocaleTransfer
   chart?: TigerLocaleChart
+  codeEditor?: TigerLocaleCodeEditor
   markdownEditor?: TigerLocaleMarkdownEditor
   richTextEditor?: TigerLocaleRichTextEditor
   cronEditor?: TigerLocaleCronEditor
