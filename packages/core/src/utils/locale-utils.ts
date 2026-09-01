@@ -177,11 +177,16 @@ export function getIntlPluralCategory(value: number, locale?: string): Intl.LDML
  * Merge `overrides` onto `section` onto `defaults`, skipping `undefined`.
  * Missing keys always fall back to the en-US locale object — never a
  * language-id heuristic.
+ *
+ * Constraint is `object`, not `Record<string, unknown>`: locale sections are
+ * closed interfaces without an index signature, which TypeScript does not
+ * assign to `Record<string, unknown>`. `NoInfer` keeps T from the complete
+ * defaults object so partial locale/overrides cannot widen the return type.
  */
-export function resolveLocaleSection<T extends Record<string, unknown>>(
+export function resolveLocaleSection<T extends object>(
   defaults: T,
-  section?: Partial<T> | null,
-  overrides?: Partial<T> | null
+  section?: Partial<NoInfer<T>> | null,
+  overrides?: Partial<NoInfer<T>> | null
 ): T {
   return deepMergeLocale(
     deepMergeLocale(defaults, section ?? undefined),
@@ -189,8 +194,14 @@ export function resolveLocaleSection<T extends Record<string, unknown>>(
   ) as T
 }
 
-function enSection<K extends keyof TigerLocale>(key: K): Required<NonNullable<TigerLocale[K]>> {
-  return enUS[key] as Required<NonNullable<TigerLocale[K]>>
+type TigerLocaleSectionKey = Exclude<keyof TigerLocale, 'locale' | 'direction'>
+
+function enSection<K extends TigerLocaleSectionKey>(key: K): Required<NonNullable<TigerLocale[K]>> {
+  const section = enUS[key]
+  if (typeof section !== 'object' || section === null) {
+    throw new Error(`en-US locale is missing section "${String(key)}"`)
+  }
+  return section as Required<NonNullable<TigerLocale[K]>>
 }
 
 export function getEmptyLabels(
