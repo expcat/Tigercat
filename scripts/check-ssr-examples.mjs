@@ -15,7 +15,7 @@ const ARTIFACTS = [
   {
     label: 'Next.js',
     htmlDirs: [join(root, 'examples/nextjs/.next/server/app')],
-    cssDirs: [join(root, 'examples/nextjs/.next/static/css')]
+    cssDirs: [join(root, 'examples/nextjs/.next/static')]
   },
   {
     label: 'Nuxt',
