@@ -248,6 +248,9 @@ export const koKR: TigerLocale = {
     emptyColumnText: '작업 없음',
     addCardText: '작업 추가',
     addColumnText: '열 추가',
+    newCardTitle: '새 작업',
+    newColumnTitle: '새 열',
+    unassignedSwimlaneText: '미지정',
     wipLimitText: 'WIP 제한: {limit}',
     dragHintText: '드래그하여 이동',
     boardAriaLabel: '작업 보드'

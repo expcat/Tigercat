@@ -248,6 +248,9 @@ export const jaJP: TigerLocale = {
     emptyColumnText: 'タスクなし',
     addCardText: 'タスク追加',
     addColumnText: '列を追加',
+    newCardTitle: '新しいタスク',
+    newColumnTitle: '新しい列',
+    unassignedSwimlaneText: '未割り当て',
     wipLimitText: 'WIP制限: {limit}',
     dragHintText: 'ドラッグして移動',
     boardAriaLabel: 'タスクボード'

@@ -248,6 +248,9 @@ export const deDE: TigerLocale = {
     emptyColumnText: 'Keine Aufgaben',
     addCardText: 'Aufgabe hinzufügen',
     addColumnText: 'Spalte hinzufügen',
+    newCardTitle: 'Neue Aufgabe',
+    newColumnTitle: 'Neue Spalte',
+    unassignedSwimlaneText: 'Nicht zugewiesen',
     wipLimitText: 'WIP-Limit: {limit}',
     dragHintText: 'Zum Verschieben ziehen',
     boardAriaLabel: 'Aufgabenboard'

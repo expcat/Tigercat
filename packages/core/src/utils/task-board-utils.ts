@@ -238,7 +238,8 @@ export function isWipExceeded(column: TaskBoardColumn): boolean {
   return column.cards.length > column.wipLimit
 }
 
-const DEFAULT_TASK_BOARD_NEW_CARD_TITLE = 'New task'
+export const DEFAULT_TASK_BOARD_NEW_CARD_TITLE = 'New task'
+export const DEFAULT_TASK_BOARD_NEW_COLUMN_TITLE = 'New column'
 
 function nextDefaultTaskBoardCardId(columns: TaskBoardColumn[]): string {
   const used = new Set<string>()
@@ -273,6 +274,27 @@ export function appendDefaultTaskBoardCard(
   return columns.map((column, i) =>
     i === colIdx ? { ...column, cards: [...column.cards, card] } : column
   )
+}
+
+function nextDefaultTaskBoardColumnId(columns: TaskBoardColumn[]): string {
+  const used = new Set(columns.map((column) => String(column.id)))
+  let n = 1
+  let id = `column-${n}`
+  while (used.has(id)) {
+    n += 1
+    id = `column-${n}`
+  }
+  return id
+}
+
+/**
+ * Append a default empty column. Returns a **new** array.
+ */
+export function appendDefaultTaskBoardColumn(
+  columns: TaskBoardColumn[],
+  title = DEFAULT_TASK_BOARD_NEW_COLUMN_TITLE
+): TaskBoardColumn[] {
+  return [...columns, { id: nextDefaultTaskBoardColumnId(columns), title, cards: [] }]
 }
 
 // ============================================================================
@@ -334,13 +356,17 @@ export function mapVisibleCardIndexToSource(
 }
 
 /**
- * Given the horizontal centre of the pointer and the bounding rects of all
- * column elements, return the insertion index for column reordering.
+ * Given the pointer x and the bounding rects of visible columns, return the
+ * insertion index. `dir` uses inline-start so RTL inserts from the right.
  */
-export function getColumnDropIndex(pointerX: number, columnRects: DOMRect[]): number {
+export function getColumnDropIndex(
+  pointerX: number,
+  columnRects: DOMRect[],
+  dir: 'ltr' | 'rtl' = 'ltr'
+): number {
   for (let i = 0; i < columnRects.length; i++) {
     const mid = columnRects[i].left + columnRects[i].width / 2
-    if (pointerX < mid) return i
+    if (dir === 'rtl' ? pointerX > mid : pointerX < mid) return i
   }
   return columnRects.length
 }

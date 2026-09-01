@@ -85,6 +85,9 @@ export * from './countdown-utils'
 // TaskBoard utilities
 export * from './task-board-utils'
 
+// TaskBoard display view-model (filter / hidden / swimlane mapping)
+export * from './task-board-view'
+
 // TaskBoard drag controller (unified DnD + touch + keyboard)
 export * from './task-board-drag'
 

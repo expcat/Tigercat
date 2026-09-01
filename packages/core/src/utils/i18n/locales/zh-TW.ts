@@ -251,6 +251,9 @@ export const zhTW: TigerLocale = {
     emptyColumnText: '暫無任務',
     addCardText: '新增任務',
     addColumnText: '新增欄',
+    newCardTitle: '新任務',
+    newColumnTitle: '新欄',
+    unassignedSwimlaneText: '未分組',
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖曳以移動',
     boardAriaLabel: '任務看板'

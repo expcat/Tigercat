@@ -335,6 +335,12 @@ export interface TigerLocaleTaskBoard {
   addCardText?: string
   /** Label for the add-column button */
   addColumnText?: string
+  /** Title used when inserting a default card */
+  newCardTitle?: string
+  /** Title used when inserting a default column */
+  newColumnTitle?: string
+  /** Label for cards that match no swimlane */
+  unassignedSwimlaneText?: string
   /** Template: supports {limit} */
   wipLimitText?: string
   /** Aria hint for draggable items */

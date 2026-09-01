@@ -248,6 +248,9 @@ export const ptBR: TigerLocale = {
     emptyColumnText: 'Sem tarefas',
     addCardText: 'Adicionar tarefa',
     addColumnText: 'Adicionar coluna',
+    newCardTitle: 'Nova tarefa',
+    newColumnTitle: 'Nova coluna',
+    unassignedSwimlaneText: 'Não atribuído',
     wipLimitText: 'Limite WIP: {limit}',
     dragHintText: 'Arraste para mover',
     boardAriaLabel: 'Quadro de tarefas'

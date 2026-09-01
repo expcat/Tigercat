@@ -6,24 +6,22 @@
  * directly. `KanbanProps` only adds swim-lane specific extensions.
  */
 
-import type { TaskBoardProps } from './task-board'
+import type { TaskBoardProps, TaskBoardSwimlane } from './task-board'
 
-/** Kanban-specific swim-lane grouping */
-export interface KanbanSwimlane {
-  /** Unique id */
-  id: string | number
-  /** Display label */
-  label: string
-  /** Color badge for this lane */
-  color?: string
-  /** Collapsed state */
-  collapsed?: boolean
-}
+/** Swimlane grouping bucket. Same as {@link TaskBoardSwimlane}. */
+export type KanbanSwimlane = TaskBoardSwimlane
 
-/** Kanban props — extends TaskBoard with swim-lane support */
+/**
+ * Kanban props — TaskBoard with Kanban-friendly defaults
+ * (`showCardCount` / `allowAddCard` true). Swimlanes group cards **inside
+ * each column** by `swimlaneField`; they are not horizontal rows across columns.
+ */
 export interface KanbanProps extends TaskBoardProps {
-  /** Enable swim-lane grouping (horizontal lanes across columns) */
-  swimlanes?: KanbanSwimlane[]
-  /** Card field used to assign swim-lanes */
+  /**
+   * Group cards inside each column by `swimlaneField`.
+   * Not a horizontal row across columns.
+   */
+  swimlanes?: TaskBoardSwimlane[]
+  /** Card field used to assign a swimlane (`card[swimlaneField] === lane.id`). */
   swimlaneField?: string
 }

@@ -248,6 +248,9 @@ export const idID: TigerLocale = {
     emptyColumnText: 'Tidak ada tugas',
     addCardText: 'Tambah tugas',
     addColumnText: 'Tambah kolom',
+    newCardTitle: 'Tugas baru',
+    newColumnTitle: 'Kolom baru',
+    unassignedSwimlaneText: 'Belum ditetapkan',
     wipLimitText: 'Batas WIP: {limit}',
     dragHintText: 'Seret untuk memindahkan',
     boardAriaLabel: 'Papan Tugas'

@@ -248,6 +248,9 @@ export const thTH: TigerLocale = {
     emptyColumnText: 'ไม่มีงาน',
     addCardText: 'เพิ่มงาน',
     addColumnText: 'เพิ่มคอลัมน์',
+    newCardTitle: 'งานใหม่',
+    newColumnTitle: 'คอลัมน์ใหม่',
+    unassignedSwimlaneText: 'ยังไม่กำหนด',
     wipLimitText: 'จำกัด WIP: {limit}',
     dragHintText: 'ลากเพื่อย้าย',
     boardAriaLabel: 'บอร์ดงาน'

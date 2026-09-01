@@ -253,6 +253,9 @@ export const enUS: TigerLocale = {
     emptyColumnText: 'No tasks',
     addCardText: 'Add task',
     addColumnText: 'Add column',
+    newCardTitle: 'New task',
+    newColumnTitle: 'New column',
+    unassignedSwimlaneText: 'Unassigned',
     wipLimitText: 'WIP limit: {limit}',
     dragHintText: 'Drag to move',
     boardAriaLabel: 'Task Board'

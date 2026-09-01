@@ -248,6 +248,9 @@ export const arSA: TigerLocale = {
     emptyColumnText: 'لا توجد مهام',
     addCardText: 'إضافة مهمة',
     addColumnText: 'إضافة عمود',
+    newCardTitle: 'مهمة جديدة',
+    newColumnTitle: 'عمود جديد',
+    unassignedSwimlaneText: 'غير معيّن',
     wipLimitText: 'حد العمل الجاري: {limit}',
     dragHintText: 'اسحب للنقل',
     boardAriaLabel: 'لوحة المهام'

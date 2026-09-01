@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   createTaskBoardDragController,
   createDefaultDragSnapshot,
+  resolveTaskBoardView,
   type TaskBoardDragSnapshot,
   type TaskBoardDragCallbacks,
   type TaskBoardDragController,
@@ -35,7 +36,8 @@ function makeCols(): TaskBoardColumn[] {
 }
 
 function createMockCallbacks(
-  overrides: Partial<TaskBoardDragCallbacks> = {}
+  overrides: Partial<TaskBoardDragCallbacks> = {},
+  columns: TaskBoardColumn[] = makeCols()
 ): TaskBoardDragCallbacks & {
   lastSnap: TaskBoardDragSnapshot
   applyCardMoveFn: ReturnType<typeof vi.fn>
@@ -44,6 +46,7 @@ function createMockCallbacks(
   const applyCardMoveFn = vi.fn()
   const applyColumnMoveFn = vi.fn()
   let lastSnap = createDefaultDragSnapshot()
+  const source = columns
 
   return {
     get lastSnap() {
@@ -58,7 +61,9 @@ function createMockCallbacks(
     applyCardMove: overrides.applyCardMove ?? applyCardMoveFn,
     applyColumnMove: overrides.applyColumnMove ?? applyColumnMoveFn,
     getBoardEl: overrides.getBoardEl ?? (() => null),
-    getColumnCount: overrides.getColumnCount ?? (() => 3)
+    getView: overrides.getView ?? (() => resolveTaskBoardView({ columns: source })),
+    getSourceColumns: overrides.getSourceColumns ?? (() => source),
+    getDir: overrides.getDir ?? (() => 'ltr')
   }
 }
 
@@ -252,14 +257,39 @@ describe('createTaskBoardDragController', () => {
       expect(ctrl.getSnapshot()).toBe(before)
     })
 
-    it('columnDrop computes destination index from board columns', () => {
+    it('columnDrop maps a visible insertion point back to source indices', () => {
       const { board } = makeBoardWithColumns()
-      cbs = createMockCallbacks({ getBoardEl: () => board })
+      const columns = makeCols()
+      cbs = createMockCallbacks(
+        {
+          getBoardEl: () => board,
+          getView: () => resolveTaskBoardView({ columns, hiddenColumns: ['done'] })
+        },
+        columns
+      )
       ctrl = createTaskBoardDragController(cbs)
 
       ctrl.columnDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'todo', index: 0 })), 175)
 
-      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 2)
+      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 1)
+    })
+
+    it('columnDrop uses source id when the first column is hidden', () => {
+      const { board } = makeBoardWithColumns()
+      const columns = makeCols()
+      cbs = createMockCallbacks(
+        {
+          getBoardEl: () => board,
+          getView: () => resolveTaskBoardView({ columns, hiddenColumns: ['todo'] }),
+          getSourceColumns: () => columns
+        },
+        columns
+      )
+      ctrl = createTaskBoardDragController(cbs)
+
+      ctrl.columnDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'doing', index: 1 })), 175)
+
+      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(1, 2)
     })
 
     it('columnDrop ignores invalid data and missing board columns', () => {
@@ -311,8 +341,34 @@ describe('createTaskBoardDragController', () => {
       expect(ctrl.cardKeyDown('Escape', card0, col0)).toBe(false)
     })
 
-    it('non-drag keys return false', () => {
-      expect(ctrl.cardKeyDown('ArrowDown', card0, col0)).toBe(false)
+    it('ArrowDown after grab moves the drop indicator, including into an empty column', () => {
+      ctrl.cardKeyDown('Enter', cols[1].cards[0], cols[1])
+      expect(ctrl.cardKeyDown('ArrowDown', cols[1].cards[0], cols[1])).toBe(true)
+      expect(ctrl.cardKeyDown('ArrowDown', cols[1].cards[0], cols[1])).toBe(true)
+      expect(cbs.lastSnap.dropTargetColumnId).toBe('done')
+      expect(cbs.lastSnap.dropIndex).toBe(0)
+    })
+
+    it('Enter on an empty column body drops the grabbed card', () => {
+      ctrl.cardKeyDown('Enter', card0, col0)
+      expect(ctrl.columnBodyKeyDown('Enter', cols[2])).toBe(true)
+      expect(cbs.applyCardMoveFn).toHaveBeenCalledWith('c1', 'todo', 'done', 0)
+    })
+
+    it('ignores a second drop while beforeCardMove is pending', async () => {
+      let release: (value: void) => void = () => undefined
+      const pending = new Promise<void>((resolve) => {
+        release = resolve
+      })
+      const applyCardMove = vi.fn(() => pending)
+      cbs = createMockCallbacks({ applyCardMove })
+      ctrl = createTaskBoardDragController(cbs)
+      ctrl.cardKeyDown('Enter', card0, col0)
+      ctrl.columnBodyKeyDown('Enter', cols[2])
+      ctrl.columnBodyKeyDown('Enter', cols[1])
+      expect(applyCardMove).toHaveBeenCalledTimes(1)
+      release()
+      await pending
     })
 
     it('keyboard does nothing when draggable is false', () => {
@@ -354,7 +410,7 @@ describe('createTaskBoardDragController', () => {
       frames.flush()
       ctrl.cardTouchEnd()
 
-      expect(cbs.applyCardMoveFn).toHaveBeenCalledWith('c1', 'todo', 'doing', 2)
+      expect(cbs.applyCardMoveFn).toHaveBeenCalledWith('c1', 'todo', 'doing', 1)
 
       elementFromPoint.mockRestore()
       vi.unstubAllGlobals()
@@ -365,15 +421,22 @@ describe('createTaskBoardDragController', () => {
     it('moves a touched column by final x position', () => {
       const { board } = makeBoardWithColumns()
       Object.defineProperty(navigator, 'maxTouchPoints', { value: 1, configurable: true })
-      cbs = createMockCallbacks({ getBoardEl: () => board })
+      const columns = makeCols()
+      cbs = createMockCallbacks(
+        {
+          getBoardEl: () => board,
+          getView: () => resolveTaskBoardView({ columns, hiddenColumns: ['done'] })
+        },
+        columns
+      )
       ctrl = createTaskBoardDragController(cbs)
       ctrl.init()
 
-      ctrl.columnTouchStart(makeTouchEvent(10, 10), document.createElement('div'), col0, 0)
+      ctrl.columnTouchStart(makeTouchEvent(10, 10), document.createElement('div'), col0)
       ctrl.columnTouchMove(makeTouchEvent(175, 10))
       ctrl.columnTouchEnd()
 
-      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 2)
+      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 1)
     })
 
     it('resets a touched column when the board has no columns', () => {

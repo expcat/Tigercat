@@ -17,6 +17,22 @@ export interface TaskBoardCard {
 }
 
 /**
+ * Per-column grouping bucket (Kanban swimlane).
+ * Lanes are grouped inside each column by `swimlaneField`, not as a
+ * horizontal row spanning the board.
+ */
+export interface TaskBoardSwimlane {
+  /** Unique id */
+  id: string | number
+  /** Display label */
+  label: string
+  /** Color badge for this lane */
+  color?: string
+  /** Collapsed state — collapsed lanes are omitted from the DOM */
+  collapsed?: boolean
+}
+
+/**
  * A column (stage / lane) on the board.
  */
 export interface TaskBoardColumn {
@@ -123,7 +139,8 @@ export interface TaskBoardProps {
   onColumnsChange?: (columns: TaskBoardColumn[]) => void
   /**
    * Callback fired when the "add card" button of a column is clicked.
-   * If not provided the add-card button is hidden.
+   * The button is shown when this is set or `allowAddCard` is true.
+   * When omitted and `allowAddCard` is true, a locale-titled card is inserted.
    */
   onCardAdd?: (columnId: string | number) => void
   /**
@@ -154,25 +171,45 @@ export interface TaskBoardProps {
    */
   hiddenColumns?: (string | number)[]
   /**
-   * Show column card-count badges in the header.
+   * Show column card-count in the header.
+   * When true, a badge shows source `cards.length` (and `wipLimit` when set).
+   * When false, columns without a WIP limit show no number; columns with a
+   * `wipLimit` still show `(count/limit)` from the **source** array.
+   * Filter text never changes this count.
    * @default false
    */
   showCardCount?: boolean
   /**
    * Show an inline "add card" button in each column footer.
+   * Also shown when `onCardAdd` is provided. With no `onCardAdd`, a locale
+   * default card is inserted (blocked when `enforceWipLimit` is at limit).
    * @default false
    */
   allowAddCard?: boolean
   /**
    * Show an inline "add column" button after all columns.
+   * With no `onColumnAdd`, a locale default column is appended.
    * @default false
    */
   allowAddColumn?: boolean
   /**
    * Callback fired when the "add column" button is clicked.
-   * If not provided (and `allowAddColumn` is true), the button is still rendered.
+   * When omitted and `allowAddColumn` is true, a locale-titled column is inserted.
    */
   onColumnAdd?: () => void
+  /**
+   * Group cards inside each column by this field on the card.
+   * Lanes are per-column, not a horizontal row across the board.
+   */
+  swimlanes?: TaskBoardSwimlane[]
+  /**
+   * Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).
+   */
+  swimlaneField?: string
+  /**
+   * Fired when a swimlane header is toggled. `collapsed` is the next state.
+   */
+  onSwimlaneCollapse?: (laneId: string | number, collapsed: boolean) => void
   /**
    * Locale overrides for TaskBoard UI text
    */

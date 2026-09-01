@@ -4,6 +4,7 @@ import {
   reorderColumns,
   isWipExceeded,
   appendDefaultTaskBoardCard,
+  appendDefaultTaskBoardColumn,
   getDropIndex,
   getColumnDropIndex,
   mapVisibleCardIndexToSource,
@@ -358,6 +359,16 @@ describe('appendDefaultTaskBoardCard', () => {
   })
 })
 
+describe('appendDefaultTaskBoardColumn', () => {
+  it('appends an empty column with the given title', () => {
+    const cols = makeCols()
+    const result = appendDefaultTaskBoardColumn(cols, 'Review')
+    expect(result).toHaveLength(4)
+    expect(result[3]).toEqual({ id: 'column-1', title: 'Review', cards: [] })
+    expect(cols).toHaveLength(3)
+  })
+})
+
 // ---------------------------------------------------------------------------
 // getDropIndex / getColumnDropIndex
 // ---------------------------------------------------------------------------
@@ -390,6 +401,13 @@ describe('getColumnDropIndex', () => {
     expect(getColumnDropIndex(50, rects)).toBe(0)
     expect(getColumnDropIndex(250, rects)).toBe(1)
     expect(getColumnDropIndex(600, rects)).toBe(3)
+  })
+
+  it('uses inline-start in rtl so the right-most column is index 0', () => {
+    // DOM order with dir=rtl: first child sits on the right
+    const rects = [makeRectX(210, 200), makeRectX(0, 200)]
+    expect(getColumnDropIndex(350, rects, 'rtl')).toBe(0)
+    expect(getColumnDropIndex(50, rects, 'rtl')).toBe(2)
   })
 })
 

@@ -253,6 +253,9 @@ export const zhCN: TigerLocale = {
     emptyColumnText: '暂无任务',
     addCardText: '添加任务',
     addColumnText: '添加列',
+    newCardTitle: '新任务',
+    newColumnTitle: '新列',
+    unassignedSwimlaneText: '未分组',
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖拽以移动',
     boardAriaLabel: '任务看板'

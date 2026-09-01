@@ -1,16 +1,14 @@
 /**
  * Kanban utility functions
  *
- * Extends task-board-utils with kanban-specific features:
- * swimlane support, filtering, card counting, and column visibility.
- *
- * Since v0.9.0, filter/card-count/add-button features have been merged
- * into TaskBoard.  The utils here are still used by TaskBoard directly.
+ * Swimlanes group cards **inside each column** by a card field. Filter and
+ * hidden-column helpers only affect the display list — WIP / counts / moves
+ * stay on the source arrays (see `resolveTaskBoardView`).
  */
 
-import type { TaskBoardColumn, TaskBoardCard } from '../types/composite'
-import type { KanbanSwimlane } from '../types/kanban'
-import { taskBoardBaseClasses } from './task-board-utils'
+import type { TaskBoardColumn, TaskBoardCard, TaskBoardSwimlane } from '../types/task-board'
+
+export const UNASSIGNED_SWIMLANE_ID = '__unassigned'
 
 // ─── Kanban-specific class constants ──────────────────────────────
 
@@ -21,15 +19,12 @@ export const kanbanCardCountClasses =
 /** Swimlane row wrapper */
 export const kanbanSwimlaneClasses = 'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0'
 
-/** Swimlane header */
+/** Swimlane header (click / keyboard toggles collapsed) */
 export const kanbanSwimlaneHeaderClasses =
-  'flex items-center gap-2 px-4 py-2 text-sm font-medium text-[var(--tiger-text,#1f2937)] cursor-pointer select-none hover:bg-[var(--tiger-bg-hover,#f9fafb)]'
+  'flex items-center gap-2 w-full px-4 py-2 text-sm font-medium text-[var(--tiger-text,#1f2937)] cursor-pointer select-none hover:bg-[var(--tiger-bg-hover,#f9fafb)]'
 
 /** Swimlane color dot */
 export const kanbanSwimlaneDotClasses = 'w-2.5 h-2.5 rounded-full shrink-0'
-
-/** Collapsed swimlane */
-export const kanbanSwimlaneCollapsedClasses = 'hidden'
 
 /** Filter match highlight on card */
 export const kanbanFilterHighlightClasses = 'bg-[var(--tiger-warning,#fbbf24)]/20'
@@ -74,27 +69,27 @@ export function filterColumns(
 // ─── Swimlane grouping ────────────────────────────────────────────
 
 export interface SwimlaneGroup {
-  swimlane: KanbanSwimlane
+  swimlane: TaskBoardSwimlane
   cards: TaskBoardCard[]
 }
 
 /**
  * Group cards within a column by swimlane field.
- * Cards without a matching swimlane go into a default "Unassigned" group.
+ * Cards without a matching swimlane go into an unassigned bucket
+ * whose label comes from locale (never a hardcoded English string).
  */
 export function groupBySwimlane(
   cards: TaskBoardCard[],
-  swimlanes: KanbanSwimlane[],
-  fieldName: string
+  swimlanes: TaskBoardSwimlane[],
+  fieldName: string,
+  unassignedLabel = 'Unassigned'
 ): SwimlaneGroup[] {
   const groups: Map<string | number, TaskBoardCard[]> = new Map()
 
-  // Initialize groups for each swimlane
   for (const lane of swimlanes) {
     groups.set(lane.id, [])
   }
 
-  // Also prepare an "unassigned" bucket
   const unassigned: TaskBoardCard[] = []
 
   for (const card of cards) {
@@ -113,7 +108,7 @@ export function groupBySwimlane(
 
   if (unassigned.length > 0) {
     result.push({
-      swimlane: { id: '__unassigned', label: 'Unassigned' },
+      swimlane: { id: UNASSIGNED_SWIMLANE_ID, label: unassignedLabel },
       cards: unassigned
     })
   }
@@ -125,7 +120,7 @@ export function groupBySwimlane(
 
 /**
  * Get card count for a column, respecting WIP limits.
- * Returns { count, limit, exceeded }.
+ * Always pass the **source** column, not a filtered copy.
  */
 export function getColumnCardCount(column: TaskBoardColumn): {
   count: number
@@ -139,12 +134,4 @@ export function getColumnCardCount(column: TaskBoardColumn): {
     limit,
     exceeded: limit != null && count > limit
   }
-}
-
-// ─── Column class helpers ─────────────────────────────────────────
-
-export function getKanbanContainerClasses(className?: string): string {
-  const parts = [taskBoardBaseClasses]
-  if (className) parts.push(className)
-  return parts.join(' ')
 }

@@ -4,10 +4,9 @@ import {
   filterColumns,
   groupBySwimlane,
   getColumnCardCount,
-  getKanbanContainerClasses,
-  taskBoardBaseClasses,
   kanbanCardCountClasses,
   kanbanAddColumnClasses,
+  UNASSIGNED_SWIMLANE_ID,
   type TaskBoardColumn,
   type TaskBoardCard,
   type KanbanSwimlane
@@ -108,8 +107,14 @@ describe('groupBySwimlane', () => {
     expect(result[0].cards).toHaveLength(1)
     expect(result[1].swimlane.id).toBe('feature')
     expect(result[1].cards).toHaveLength(1)
-    expect(result[2].swimlane.id).toBe('__unassigned')
+    expect(result[2].swimlane.id).toBe(UNASSIGNED_SWIMLANE_ID)
+    expect(result[2].swimlane.label).toBe('Unassigned')
     expect(result[2].cards).toHaveLength(1)
+  })
+
+  it('uses the provided unassigned label', () => {
+    const result = groupBySwimlane(taggedCards, swimlanes, 'type', '未分组')
+    expect(result[2].swimlane.label).toBe('未分组')
   })
 
   it('handles empty cards', () => {
@@ -123,8 +128,8 @@ describe('groupBySwimlane', () => {
     const result = groupBySwimlane(taggedCards, swimlanes, 'priority')
     expect(result[0].cards).toHaveLength(0) // bug lane empty
     expect(result[1].cards).toHaveLength(0) // feature lane empty
-    expect(result[2].swimlane.id).toBe('__unassigned')
-    expect(result[2].cards).toHaveLength(3) // all unassigned
+    expect(result[2].swimlane.id).toBe(UNASSIGNED_SWIMLANE_ID)
+    expect(result[2].cards).toHaveLength(3)
   })
 })
 
@@ -165,20 +170,6 @@ describe('getColumnCardCount', () => {
     const result = getColumnCardCount(col)
     expect(result.limit).toBeUndefined()
     expect(result.exceeded).toBe(false)
-  })
-})
-
-// ─── getKanbanContainerClasses ────────────────────────────────────
-
-describe('getKanbanContainerClasses', () => {
-  it('returns base classes', () => {
-    const result = getKanbanContainerClasses()
-    expect(result).toContain(taskBoardBaseClasses)
-  })
-
-  it('appends custom className', () => {
-    const result = getKanbanContainerClasses('my-class')
-    expect(result).toContain('my-class')
   })
 })
 

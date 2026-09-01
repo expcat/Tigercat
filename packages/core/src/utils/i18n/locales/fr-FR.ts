@@ -248,6 +248,9 @@ export const frFR: TigerLocale = {
     emptyColumnText: 'Aucune tâche',
     addCardText: 'Ajouter une tâche',
     addColumnText: 'Ajouter une colonne',
+    newCardTitle: 'Nouvelle tâche',
+    newColumnTitle: 'Nouvelle colonne',
+    unassignedSwimlaneText: 'Non assigné',
     wipLimitText: 'Limite WIP : {limit}',
     dragHintText: 'Glisser pour déplacer',
     boardAriaLabel: 'Tableau des tâches'

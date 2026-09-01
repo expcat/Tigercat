@@ -248,6 +248,9 @@ export const esES: TigerLocale = {
     emptyColumnText: 'Sin tareas',
     addCardText: 'Agregar tarea',
     addColumnText: 'Agregar columna',
+    newCardTitle: 'Nueva tarea',
+    newColumnTitle: 'Nueva columna',
+    unassignedSwimlaneText: 'Sin asignar',
     wipLimitText: 'Límite WIP: {limit}',
     dragHintText: 'Arrastra para mover',
     boardAriaLabel: 'Tablero de tareas'

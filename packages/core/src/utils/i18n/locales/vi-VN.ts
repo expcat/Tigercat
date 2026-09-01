@@ -248,6 +248,9 @@ export const viVN: TigerLocale = {
     emptyColumnText: 'Không có nhiệm vụ',
     addCardText: 'Thêm nhiệm vụ',
     addColumnText: 'Thêm cột',
+    newCardTitle: 'Nhiệm vụ mới',
+    newColumnTitle: 'Cột mới',
+    unassignedSwimlaneText: 'Chưa gán',
     wipLimitText: 'Giới hạn WIP: {limit}',
     dragHintText: 'Kéo để di chuyển',
     boardAriaLabel: 'Bảng nhiệm vụ'
