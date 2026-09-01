@@ -165,9 +165,8 @@ export interface LightboxGestureSession {
   dispose(): void
 }
 
-interface TrackedPointer {
-  x: number
-  y: number
+function toGesturePoint(event: PointerEvent): LightboxGesturePoint {
+  return { clientX: event.clientX, clientY: event.clientY }
 }
 
 function isPrimaryPointer(event: PointerEvent): boolean {
@@ -179,7 +178,7 @@ export function createLightboxGestureSession(
   options: LightboxGestureSessionOptions
 ): LightboxGestureSession {
   const ownerDocument = options.ownerDocument ?? (isBrowser() ? document : undefined)
-  const pointers = new Map<number, TrackedPointer>()
+  const pointers = new Map<number, LightboxGesturePoint>()
   let pan: PanState = createPanState()
   let pinch: PinchState = createPinchState()
   let swipe = {
@@ -207,7 +206,7 @@ export function createLightboxGestureSession(
 
   const handlePointerMove = (event: PointerEvent) => {
     if (!pointers.has(event.pointerId)) return
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+    pointers.set(event.pointerId, toGesturePoint(event))
 
     if (pinch.isPinching && pointers.size >= 2) {
       const [first, second] = pointerList()
@@ -297,7 +296,7 @@ export function createLightboxGestureSession(
       if (event.pointerType === 'mouse' && !isPrimaryPointer(event)) return
 
       event.preventDefault()
-      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      pointers.set(event.pointerId, toGesturePoint(event))
       const target = event.currentTarget
       if (target instanceof Element && typeof target.setPointerCapture === 'function') {
         try {

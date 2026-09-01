@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   clampLightboxIndex,
+  createLightboxGestureSession,
   formatLightboxImageAlt,
   getLightboxNavState,
   lightboxShouldClose,
@@ -113,5 +114,55 @@ describe('lightbox gestures and keys', () => {
       minScale: 0.4,
       maxScale: 5
     })
+  })
+
+  it('pinches with clientX/clientY so scale follows finger distance', () => {
+    const scales: number[] = []
+    const session = createLightboxGestureSession({
+      getScale: () => 1,
+      getTranslate: () => ({ x: 0, y: 0 }),
+      minScale: 0.25,
+      maxScale: 5,
+      zoomable: true,
+      swipeable: false,
+      swipeThreshold: 48,
+      imageCount: 1,
+      onTransform: (next) => {
+        if (typeof next.scale === 'number') scales.push(next.scale)
+      },
+      onSwipe: () => {},
+      ownerDocument: document
+    })
+
+    session.pointerDown(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        pointerId: 1,
+        pointerType: 'touch',
+        clientX: 0,
+        clientY: 0
+      })
+    )
+    session.pointerDown(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        pointerId: 2,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 0
+      })
+    )
+    document.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        pointerId: 2,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 0
+      })
+    )
+
+    expect(scales.at(-1)).toBe(2)
+    session.dispose()
   })
 })
