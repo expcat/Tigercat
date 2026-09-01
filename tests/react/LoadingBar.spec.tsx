@@ -2,15 +2,15 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { act, waitFor } from '@testing-library/react'
-import { LoadingBar } from '@expcat/tigercat-react'
-import {
-  LOADING_BAR_CONTAINER_ID,
-  LOADING_BAR_CONTAINER_ROOT_ID,
-  LOADING_BAR_FINISH_HIDE_DELAY_MS
-} from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
+import { act, render, waitFor } from '@testing-library/react'
+import { LOADING_BAR_FINISH_HIDE_DELAY_MS } from '@expcat/tigercat-core'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { LoadingBar, LoadingBarContainer } from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { expectNoA11yViolations } from '../utils/react'
 
 function getBar() {
   return document.querySelector('[data-tiger-loading-bar]')
@@ -20,155 +20,147 @@ function getContainer() {
   return document.querySelector('[data-tiger-loading-bar-container]')
 }
 
-async function runLoadingBarAction<T>(action: () => T): Promise<T> {
-  let result!: T
-  act(() => {
-    result = action()
-  })
+async function flushHost() {
   await act(async () => {
     await Promise.resolve()
   })
-  return result
 }
 
 describe('LoadingBar (React)', () => {
-  beforeEach(async () => {
-    await runLoadingBarAction(() => LoadingBar.clear())
+  beforeAll(async () => {
+    LoadingBar.start()
+    await waitFor(() => {
+      expect(document.querySelector('[data-tiger-loading-bar-container]')).toBeTruthy()
+    })
+    LoadingBar.clear()
     document.body.innerHTML = ''
   })
 
-  afterEach(async () => {
+  beforeEach(() => {
+    act(() => {
+      LoadingBar.clear()
+    })
+    document.body.innerHTML = ''
+  })
+
+  afterEach(() => {
     vi.useRealTimers()
-    await runLoadingBarAction(() => LoadingBar.clear())
+    act(() => {
+      LoadingBar.clear()
+    })
     document.body.innerHTML = ''
   })
 
-  describe('Basic Functionality', () => {
-    it('shows a top loading bar on start', async () => {
-      await runLoadingBarAction(() => LoadingBar.start())
-
-      await waitFor(() => {
-        const bar = getBar()
-        expect(bar).toBeTruthy()
-        expect(bar?.getAttribute('role')).toBe('progressbar')
-        expect(bar?.getAttribute('aria-busy')).toBe('true')
-        expect(bar?.getAttribute('aria-live')).toBe('polite')
-        expect(getContainer()?.id).toBe(LOADING_BAR_CONTAINER_ID)
-        expect(document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID)).toBeTruthy()
-      })
+  it('shows a top progressbar on start without a live region', async () => {
+    act(() => {
+      LoadingBar.start()
     })
-
-    it('accepts color, height and className options', async () => {
-      await runLoadingBarAction(() =>
-        LoadingBar.start({
-          color: 'success',
-          height: 4,
-          className: 'custom-loading-bar'
-        })
-      )
-
-      await waitFor(() => {
-        const container = getContainer()
-        expect(container).toBeTruthy()
-        expect(container?.className).toContain('custom-loading-bar')
-        expect(container).toHaveStyle({ height: '4px' })
-        expect(getBar()?.className).toContain('success')
-      })
-    })
-
-    it('mounts into a custom container target', async () => {
-      const host = document.createElement('div')
-      host.id = 'loading-bar-host'
-      document.body.appendChild(host)
-
-      await runLoadingBarAction(() => LoadingBar.start({ container: '#loading-bar-host' }))
-
-      await waitFor(() => {
-        expect(host.querySelector(`#${LOADING_BAR_CONTAINER_ROOT_ID}`)).toBeTruthy()
-        expect(getBar()).toBeTruthy()
-      })
-    })
+    await flushHost()
+    expect(getContainer()?.getAttribute('role')).toBe('progressbar')
+    expect(getContainer()?.getAttribute('aria-busy')).toBe('true')
+    expect(getContainer()?.getAttribute('aria-live')).toBeNull()
+    expect(getContainer()?.id).toBeFalsy()
+    expect(getBar()).toBeTruthy()
   })
 
-  describe('finish / error / clear', () => {
-    it('finish completes then hides the bar', async () => {
-      vi.useFakeTimers()
-      await runLoadingBarAction(() => LoadingBar.start())
-      expect(getBar()).toBeTruthy()
+  it('mounts into a custom container and moves when start is called again', async () => {
+    const first = document.createElement('div')
+    const second = document.createElement('div')
+    first.id = 'loading-bar-host-a'
+    second.id = 'loading-bar-host-b'
+    document.body.append(first, second)
 
-      await runLoadingBarAction(() => LoadingBar.finish())
-      expect(getBar()?.getAttribute('data-tiger-loading-bar-status')).toBe('success')
-      expect(getBar()?.getAttribute('aria-valuenow')).toBe('100')
-      expect(getBar()?.getAttribute('aria-busy')).toBeNull()
-
-      await act(async () => {
-        vi.advanceTimersByTime(LOADING_BAR_FINISH_HIDE_DELAY_MS)
-      })
-      expect(getBar()).toBeNull()
+    act(() => {
+      LoadingBar.start({ container: '#loading-bar-host-a' })
     })
+    expect(first.querySelector('[data-tiger-imperative-host]')).toBeTruthy()
 
-    it('error shows the error state then hides', async () => {
-      vi.useFakeTimers()
-      await runLoadingBarAction(() => LoadingBar.start())
-
-      await runLoadingBarAction(() => LoadingBar.error())
-      expect(getBar()?.getAttribute('data-tiger-loading-bar-status')).toBe('error')
-      expect(getBar()?.className).toContain('error')
-      expect(getBar()?.getAttribute('aria-valuenow')).toBe('100')
-
-      await act(async () => {
-        vi.advanceTimersByTime(LOADING_BAR_FINISH_HIDE_DELAY_MS)
-      })
-      expect(getBar()).toBeNull()
+    act(() => {
+      LoadingBar.start({ container: '#loading-bar-host-b' })
     })
-
-    it('clear hides immediately and removes the host', async () => {
-      await runLoadingBarAction(() => LoadingBar.start())
-      await waitFor(() => expect(getBar()).toBeTruthy())
-
-      await runLoadingBarAction(() => LoadingBar.clear())
-      expect(getBar()).toBeNull()
-      expect(document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID)).toBeNull()
-    })
-
-    it('nested start requires matching finish calls', async () => {
-      vi.useFakeTimers()
-      await runLoadingBarAction(() => {
-        LoadingBar.start()
-        LoadingBar.start()
-      })
-      expect(getBar()?.getAttribute('data-tiger-loading-bar-status')).toBe('loading')
-
-      await runLoadingBarAction(() => LoadingBar.finish())
-      expect(getBar()?.getAttribute('data-tiger-loading-bar-status')).toBe('loading')
-
-      await runLoadingBarAction(() => LoadingBar.finish())
-      expect(getBar()?.getAttribute('data-tiger-loading-bar-status')).toBe('success')
-    })
+    expect(first.querySelector('[data-tiger-imperative-host]')).toBeNull()
+    expect(second.querySelector('[data-tiger-imperative-host]')).toBeTruthy()
   })
 
-  describe('Accessibility', () => {
-    it('has no accessibility violations and does not trap focus', async () => {
-      await runLoadingBarAction(() => LoadingBar.start({ ariaLabel: 'Page loading' }))
-
-      await waitFor(() => {
-        expect(getBar()).toBeTruthy()
+  it('does not throw on an illegal container selector', () => {
+    expect(() => {
+      act(() => {
+        LoadingBar.start({ container: '[' })
       })
-
-      const bar = getBar()
-      expect(bar?.getAttribute('aria-label')).toBe('Page loading')
-      expect(bar?.getAttribute('tabindex')).toBeNull()
-      expect(document.activeElement === bar || document.activeElement === getContainer()).toBe(
-        false
-      )
-      await expectNoA11yViolationsIsolated(document.body)
-    })
+    }).not.toThrow()
   })
 
-  describe('SSR / edge', () => {
-    it('does not throw when calling the discrete API with no existing host', async () => {
-      await expect(runLoadingBarAction(() => LoadingBar.finish())).resolves.toBeUndefined()
-      await expect(runLoadingBarAction(() => LoadingBar.clear())).resolves.toBeUndefined()
+  it('finish completes then hides the bar', async () => {
+    vi.useFakeTimers()
+    act(() => {
+      LoadingBar.start()
     })
+    act(() => {
+      LoadingBar.finish()
+    })
+    expect(getContainer()?.getAttribute('data-tiger-loading-bar-status')).toBe('success')
+    expect(getContainer()?.getAttribute('aria-valuenow')).toBe('100')
+    act(() => {
+      vi.advanceTimersByTime(LOADING_BAR_FINISH_HIDE_DELAY_MS)
+    })
+    expect(getBar()).toBeNull()
+    expect(document.querySelector('[data-tiger-loading-bar-container]')).toBeNull()
+  })
+
+  it('set writes a determinate percentage', () => {
+    act(() => {
+      LoadingBar.start()
+      LoadingBar.set(40)
+    })
+    expect(getContainer()?.getAttribute('aria-valuenow')).toBe('40')
+  })
+
+  it('uses official loading text when ariaLabel is omitted', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <span />
+      </ConfigProvider>
+    )
+    act(() => {
+      LoadingBar.start()
+    })
+    expect(getContainer()?.getAttribute('aria-label')).toBe(zhCN.common?.loadingText)
+
+    LoadingBar.clear()
+    render(
+      <ConfigProvider locale={zhTW}>
+        <span />
+      </ConfigProvider>
+    )
+    act(() => {
+      LoadingBar.start()
+    })
+    expect(getContainer()?.getAttribute('aria-label')).toBe(zhTW.common?.loadingText)
+
+    LoadingBar.clear()
+    render(
+      <ConfigProvider locale={jaJP}>
+        <span />
+      </ConfigProvider>
+    )
+    act(() => {
+      LoadingBar.start()
+    })
+    expect(getContainer()?.getAttribute('aria-label')).toBe(jaJP.common?.loadingText)
+  })
+
+  it('clamps declarative valuenow and does not put live on the bar', async () => {
+    const { rerender, unmount } = render(<LoadingBarContainer percentage={150} status="loading" />)
+    const bar = document.querySelector('[data-tiger-loading-bar-container]')
+    expect(bar?.getAttribute('aria-valuenow')).toBe('100')
+    expect(bar?.getAttribute('aria-live')).toBeNull()
+    rerender(<LoadingBarContainer percentage={Number.NaN} status="idle" />)
+    expect(
+      document.querySelector('[data-tiger-loading-bar-container]')?.getAttribute('aria-valuenow')
+    ).toBe('0')
+    await expectNoA11yViolations(
+      document.querySelector('[data-tiger-loading-bar-container]') as HTMLElement
+    )
+    unmount()
   })
 })

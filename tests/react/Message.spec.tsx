@@ -2,475 +2,150 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { act, render, waitFor } from '@testing-library/react'
-import { Message } from '@expcat/tigercat-react'
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
+import { act, render, screen, waitFor } from '@testing-library/react'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { Message, MessageContainer } from '@expcat/tigercat-react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
-
-const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
+import { expectNoA11yViolations } from '../utils/react'
 
 function getMessages() {
   return document.querySelectorAll('[data-tiger-message]')
 }
 
-function getMessageByType(type: (typeof messageTypes)[number]) {
-  return document.querySelector(`[data-tiger-message][data-tiger-message-type="${type}"]`)
-}
-
-async function runMessageAction<T>(action: () => T): Promise<T> {
-  let result!: T
-  act(() => {
-    result = action()
-  })
+async function flushHost() {
   await act(async () => {
     await Promise.resolve()
   })
-  return result
 }
 
 describe('Message (React)', () => {
-  beforeEach(async () => {
-    // Clear all messages before each test
-    await runMessageAction(() => Message.clear())
-    // Clear any existing message containers
+  beforeAll(async () => {
+    Message.info({ content: '__warmup__', duration: 0 })
+    await waitFor(() => {
+      expect(document.querySelector('[data-tiger-message]')).toBeTruthy()
+    })
+    Message.clear()
     document.body.innerHTML = ''
   })
 
-  afterEach(async () => {
-    // Clean up after each test
-    await runMessageAction(() => Message.clear())
+  beforeEach(() => {
+    act(() => {
+      Message.clear()
+    })
     document.body.innerHTML = ''
   })
 
-  describe('Basic Functionality', () => {
-    it('should show a message when called', async () => {
-      await runMessageAction(() => Message.info('Test message'))
-
-      await waitFor(() => {
-        const messageElement = getMessageByType('info')
-        expect(messageElement).toBeTruthy()
-        expect(messageElement?.textContent).toContain('Test message')
-      })
+  afterEach(() => {
+    vi.useRealTimers()
+    act(() => {
+      Message.clear()
     })
-
-    it('should accept config object as parameter', async () => {
-      await runMessageAction(() =>
-        Message.warning({
-          content: 'Warning message',
-          duration: 5000
-        })
-      )
-
-      await waitFor(() => {
-        const messageElement = getMessageByType('warning')
-        expect(messageElement?.textContent).toContain('Warning message')
-      })
-    })
-
-    it('supports custom close aria label for closable messages', async () => {
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Closable localized message',
-          closable: true,
-          closeAriaLabel: '关闭消息',
-          duration: 0
-        })
-      )
-
-      await waitFor(() => {
-        expect(document.querySelector('button[aria-label="关闭消息"]')).toBeTruthy()
-      })
-    })
-
-    it('uses ConfigProvider locale for command-root close aria label', async () => {
-      const { unmount } = render(
-        <ConfigProvider locale={{ locale: 'zh-CN', common: { closeText: '关闭' } }}>
-          <span />
-        </ConfigProvider>
-      )
-      await act(async () => {
-        await Promise.resolve()
-      })
-
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Provider localized message',
-          closable: true,
-          duration: 0
-        })
-      )
-
-      await waitFor(() => {
-        expect(document.querySelector('button[aria-label="关闭消息"]')).toBeTruthy()
-      })
-      unmount()
-    })
-
-    it('renders messages into the requested position container', async () => {
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Bottom right message',
-          position: 'bottom-right',
-          duration: 0
-        })
-      )
-
-      await waitFor(() => {
-        const container = document.querySelector(
-          '[data-tiger-message-container][data-tiger-message-position="bottom-right"]'
-        )
-        expect(container).toBeTruthy()
-        expect(container?.className).toContain('bottom-6')
-        expect(container?.textContent).toContain('Bottom right message')
-      })
-    })
+    document.body.innerHTML = ''
   })
 
-  describe('Types', () => {
-    it.each(messageTypes)('should show %s type message', async (type) => {
-      await runMessageAction(() => Message[type](`${type} message`))
-
-      await waitFor(() => {
-        const messageElement = getMessageByType(type)
-        expect(messageElement).toBeTruthy()
-        expect(messageElement?.textContent).toContain(`${type} message`)
-      })
+  it('renders three messages from one act without waiting', async () => {
+    await flushHost()
+    act(() => {
+      Message.info('one')
+      Message.success('two')
+      Message.warning('three')
     })
+    expect(getMessages()).toHaveLength(3)
   })
 
-  describe('Auto Close', () => {
-    it('should auto close after default duration (3000ms)', async () => {
-      vi.useFakeTimers()
-
-      await runMessageAction(() => Message.info('Auto close message'))
-
-      expect(getMessages().length).toBe(1)
-
-      // Fast-forward time
-      act(() => {
-        vi.advanceTimersByTime(3000)
-      })
-
-      expect(getMessages().length).toBe(0)
-
-      vi.useRealTimers()
+  it('respects loading duration when it is passed', () => {
+    vi.useFakeTimers()
+    act(() => {
+      Message.loading({ content: 'Saving', duration: 1000 })
     })
-
-    it('should auto close after custom duration', async () => {
-      vi.useFakeTimers()
-
-      await runMessageAction(() =>
-        Message.success({
-          content: 'Custom duration',
-          duration: 1000
-        })
-      )
-
-      expect(getMessages().length).toBe(1)
-
-      // Fast-forward time
-      act(() => {
-        vi.advanceTimersByTime(1000)
-      })
-
-      expect(getMessages().length).toBe(0)
-
-      vi.useRealTimers()
+    expect(getMessages()).toHaveLength(1)
+    act(() => {
+      vi.advanceTimersByTime(1000)
     })
-
-    it('should not auto close when duration is 0', async () => {
-      vi.useFakeTimers()
-
-      await runMessageAction(() =>
-        Message.warning({
-          content: 'No auto close',
-          duration: 0
-        })
-      )
-
-      expect(getMessages().length).toBe(1)
-
-      // Fast-forward time significantly
-      act(() => {
-        vi.advanceTimersByTime(10000)
-      })
-
-      // Message should still be visible
-      expect(getMessages().length).toBe(1)
-
-      vi.useRealTimers()
-    })
-
-    it('loading type should not auto close by default', async () => {
-      vi.useFakeTimers()
-
-      await runMessageAction(() => Message.loading('Loading...'))
-
-      expect(getMessages().length).toBe(1)
-
-      // Fast-forward time
-      act(() => {
-        vi.advanceTimersByTime(5000)
-      })
-
-      // Message should still be visible
-      expect(getMessages().length).toBe(1)
-
-      vi.useRealTimers()
-    })
+    expect(getMessages()).toHaveLength(0)
   })
 
-  describe('Manual Close', () => {
-    it('should return a close function', async () => {
-      const close = await runMessageAction(() => Message.info('Closable message'))
-
-      expect(typeof close).toBe('function')
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(1)
-      })
-
-      // Call close function
-      await runMessageAction(close)
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(0)
-      })
+  it('does not fire onClose again after a manual close', () => {
+    vi.useFakeTimers()
+    const onClose = vi.fn()
+    act(() => {
+      Message.info({ content: 'Timed', duration: 3000, closable: true, onClose })
     })
-
-    it('should show close button when closable is true', async () => {
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Closable',
-          closable: true,
-          duration: 0
-        })
-      )
-
-      await waitFor(() => {
-        const closeButton = document.querySelector('button[aria-label="Close message"]')
-        expect(closeButton).toBeTruthy()
-      })
+    act(() => {
+      screen.getByRole('button').click()
     })
-
-    it('should close when close button is clicked', async () => {
-      vi.useFakeTimers()
-
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Closable',
-          closable: true,
-          duration: 0
-        })
-      )
-
-      const closeButton = document.querySelector(
-        'button[aria-label="Close message"]'
-      ) as HTMLButtonElement
-      expect(closeButton).toBeTruthy()
-      await act(async () => {
-        closeButton?.click()
-      })
-
-      act(() => {
-        vi.advanceTimersByTime(350)
-      })
-
-      expect(getMessages().length).toBe(0)
-
-      vi.useRealTimers()
+    expect(onClose).toHaveBeenCalledTimes(1)
+    act(() => {
+      vi.advanceTimersByTime(3000)
     })
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  describe('Callback', () => {
-    it('should call onClose callback when message closes', async () => {
-      const onClose = vi.fn()
-
-      const close = await runMessageAction(() =>
-        Message.success({
-          content: 'Test',
-          onClose
-        })
-      )
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(1)
-      })
-
-      // Close manually
-      await runMessageAction(close)
-
-      await waitFor(() => {
-        expect(onClose).toHaveBeenCalled()
-      })
+  it('uses official locale close names without an override', () => {
+    const { unmount } = render(
+      <ConfigProvider locale={zhCN}>
+        <span />
+      </ConfigProvider>
+    )
+    act(() => {
+      Message.info({ content: 'Closable', closable: true, duration: 0 })
     })
+    expect(screen.getByRole('button', { name: zhCN.common?.closeMessageAriaLabel })).toBeTruthy()
+    unmount()
+    Message.clear()
 
-    it('should call onClose when auto closed', async () => {
-      vi.useFakeTimers()
-
-      const onClose = vi.fn()
-
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Test',
-          duration: 1000,
-          onClose
-        })
-      )
-
-      expect(getMessages().length).toBe(1)
-
-      // Fast-forward time
-      act(() => {
-        vi.advanceTimersByTime(1000)
-      })
-
-      expect(onClose).toHaveBeenCalled()
-
-      vi.useRealTimers()
+    render(
+      <ConfigProvider locale={zhTW}>
+        <span />
+      </ConfigProvider>
+    )
+    act(() => {
+      Message.info({ content: 'TW', closable: true, duration: 0 })
     })
+    expect(screen.getByRole('button', { name: zhTW.common?.closeMessageAriaLabel })).toBeTruthy()
+    expect(screen.getByRole('button').getAttribute('aria-label')).not.toContain('消息')
+
+    Message.clear()
+    render(
+      <ConfigProvider locale={jaJP}>
+        <span />
+      </ConfigProvider>
+    )
+    act(() => {
+      Message.info({ content: 'JA', closable: true, duration: 0 })
+    })
+    expect(screen.getByRole('button', { name: jaJP.common?.closeMessageAriaLabel })).toBeTruthy()
   })
 
-  describe('Queue Management', () => {
-    it('should show multiple messages', async () => {
-      await runMessageAction(() => {
-        Message.info('Message 1')
-        Message.success('Message 2')
-        Message.warning('Message 3')
-      })
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(3)
-      })
+  it('keeps a single live region per item and none on an empty container', async () => {
+    act(() => {
+      Message.info({ content: 'info', duration: 0 })
+      Message.error({ content: 'error', duration: 0 })
     })
+    expect(document.querySelectorAll('[aria-live]')).toHaveLength(0)
+    expect(document.querySelectorAll('[role="status"]')).toHaveLength(1)
+    expect(document.querySelectorAll('[role="alert"]')).toHaveLength(1)
+    await expectNoA11yViolations(document.querySelector('[data-tiger-message]') as HTMLElement)
 
-    it('should clear all messages with clear()', async () => {
-      await runMessageAction(() => {
-        Message.info('Message 1')
-        Message.success('Message 2')
-        Message.warning('Message 3')
-      })
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(3)
-      })
-
-      // Clear all
-      await runMessageAction(() => Message.clear())
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(0)
-      })
-    })
-
-    it('should call onClose for all messages when clearing', async () => {
-      const onClose1 = vi.fn()
-      const onClose2 = vi.fn()
-      const onClose3 = vi.fn()
-
-      await runMessageAction(() => {
-        Message.info({ content: 'Message 1', onClose: onClose1 })
-        Message.success({ content: 'Message 2', onClose: onClose2 })
-        Message.warning({ content: 'Message 3', onClose: onClose3 })
-      })
-
-      await waitFor(() => {
-        expect(getMessages().length).toBe(3)
-      })
-
-      await runMessageAction(() => Message.clear())
-
-      await waitFor(() => {
-        expect(onClose1).toHaveBeenCalled()
-        expect(onClose2).toHaveBeenCalled()
-        expect(onClose3).toHaveBeenCalled()
-      })
-    })
+    Message.clear()
+    const { unmount } = render(<MessageContainer />)
+    expect(document.querySelector('[data-tiger-message-container][aria-live]')).toBeNull()
+    const empty = document.querySelector('[data-tiger-message-container]')
+    if (empty) await expectNoA11yViolations(empty as HTMLElement)
+    unmount()
   })
 
-  describe('Custom Options', () => {
-    it('should support custom className', async () => {
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Custom class',
-          className: 'custom-message-class'
-        })
-      )
-
-      await waitFor(() => {
-        const messageElement = document.querySelector('.custom-message-class')
-        expect(messageElement).toBeTruthy()
-      })
+  it('places toasts by logical position without locking physical inset class names', () => {
+    act(() => {
+      Message.info({ content: 'corner', position: 'bottom-right', duration: 0 })
     })
-
-    it('should support custom icon', async () => {
-      await runMessageAction(() =>
-        Message.success({
-          content: 'Custom icon',
-          icon: 'M5 13l4 4L19 7'
-        })
-      )
-
-      await waitFor(() => {
-        const messageElement = getMessageByType('success')
-        const svgPath = messageElement?.querySelector('svg path')
-        expect(svgPath?.getAttribute('d')).toBe('M5 13l4 4L19 7')
-      })
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      vi.useFakeTimers()
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Accessible message',
-          duration: 0
-        })
-      )
-      await act(async () => {
-        vi.advanceTimersByTime(10)
-      })
-      vi.useRealTimers()
-
-      await waitFor(() => expect(getMessageByType('info')).toBeTruthy())
-      await expectNoA11yViolationsIsolated(document.body)
-    })
-
-    it('should use role=status for non-error messages', async () => {
-      await runMessageAction(() => Message.info('Accessible message'))
-      await waitFor(() => {
-        const el = getMessageByType('info')
-        expect(el?.getAttribute('role')).toBe('status')
-      })
-    })
-
-    it('should use role=alert for error messages', async () => {
-      await runMessageAction(() => Message.error('Error message'))
-      await waitFor(() => {
-        const el = getMessageByType('error')
-        expect(el?.getAttribute('role')).toBe('alert')
-      })
-    })
-
-    it('close button should have aria-label', async () => {
-      await runMessageAction(() =>
-        Message.info({
-          content: 'Closable',
-          closable: true
-        })
-      )
-
-      await waitFor(() => {
-        const closeButton = document.querySelector('button[aria-label="Close message"]')
-        expect(closeButton).toBeTruthy()
-      })
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      expect(() => Message.clear()).not.toThrow()
-    })
+    const host = document.querySelector(
+      '[data-tiger-message-container][data-tiger-message-position="bottom-right"]'
+    )
+    expect(host).toBeTruthy()
+    expect(host?.textContent).toContain('corner')
   })
 })

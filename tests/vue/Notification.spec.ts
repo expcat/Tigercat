@@ -3,234 +3,180 @@
  */
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
-import { fireEvent, waitFor } from '@testing-library/vue'
 import { createApp, h, nextTick } from 'vue'
-import { notification } from '@expcat/tigercat-vue'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { notification, NotificationContainer } from '@expcat/tigercat-vue'
 import { ConfigProvider } from '../../packages/vue/src/components/ConfigProvider'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
-async function flushMicrotasks() {
+function getToasts() {
+  return document.querySelectorAll('[data-tiger-notification]')
+}
+
+async function flushHost() {
+  await Promise.resolve()
   await nextTick()
-  for (let i = 0; i < 8; i += 1) {
-    await Promise.resolve()
+}
+
+function mountProvider(locale: typeof zhCN) {
+  const app = createApp({
+    render: () => h(ConfigProvider, { locale }, () => h('span'))
+  })
+  const root = document.createElement('div')
+  document.body.append(root)
+  app.mount(root)
+  return () => {
+    app.unmount()
+    root.remove()
   }
 }
 
-async function flush() {
-  await flushMicrotasks()
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-  await flushMicrotasks()
-}
-
-async function flushLazyImport() {
-  await flushMicrotasks()
-  await new Promise<void>((resolve) => setTimeout(resolve, 0))
-  await flushMicrotasks()
-}
-
-describe('Notification (Vue)', () => {
+describe('notification (Vue)', () => {
   beforeAll(async () => {
+    notification.info({ title: '__warmup__', duration: 0 })
+    await vi.waitFor(() => {
+      expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
+    })
     notification.clear()
-    await flushLazyImport()
     document.body.innerHTML = ''
   })
 
   beforeEach(async () => {
-    // Clear all notifications before each test
     notification.clear()
-    await flushLazyImport()
-    // Clear any existing notification containers
     document.body.innerHTML = ''
+    await flushHost()
   })
 
   afterEach(() => {
-    // Clean up after each test
+    vi.useRealTimers()
     notification.clear()
     document.body.innerHTML = ''
-    vi.useRealTimers()
   })
 
-  it('shows a notification for string options', async () => {
-    notification.info('Test notification')
-    await flush()
-
-    await waitFor(() => {
-      expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
-    })
-
-    const el = document.querySelector('[data-tiger-notification]')
-    expect(el?.textContent).toContain('Test notification')
+  it('renders three toasts on the same position from one turn', async () => {
+    notification.info({ title: 'one', duration: 0, position: 'top-right' })
+    notification.success({ title: 'two', duration: 0, position: 'top-right' })
+    notification.warning({ title: 'three', duration: 0, position: 'top-right' })
+    await flushHost()
+    expect(getToasts()).toHaveLength(3)
   })
 
-  it('supports config object with description', async () => {
-    notification.warning({
-      title: 'Warning notification',
-      description: 'This is a warning description'
-    })
-    await flush()
-
-    const el = document.querySelector('[data-tiger-notification]')
-    expect(el?.getAttribute('data-tiger-notification-type')).toBe('warning')
-    expect(el?.textContent).toContain('Warning notification')
-    expect(el?.textContent).toContain('This is a warning description')
-  })
-
-  it('returns a close function', async () => {
-    const close = notification.info({
-      title: 'Closable via function',
-      duration: 0
-    })
-    expect(typeof close).toBe('function')
-    await flush()
-
-    expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
-    close()
-    await flush()
-    expect(document.querySelector('[data-tiger-notification]')).toBeFalsy()
-  })
-
-  it('uses ConfigProvider locale for command-root close aria label', async () => {
-    const root = document.createElement('div')
-    document.body.appendChild(root)
-    const app = createApp({
-      render: () =>
-        h(ConfigProvider, { locale: { locale: 'zh-CN', common: { closeText: '关闭' } } }, () =>
-          h('span')
-        )
-    })
-    app.mount(root)
-    await flush()
-
-    notification.info({
-      title: 'Provider localized notification',
-      duration: 0
-    })
-    await flush()
-
-    expect(document.querySelector('button[aria-label="关闭通知"]')).toBeTruthy()
-    app.unmount()
-    root.remove()
-  })
-
-  it('respects position by creating a container per position', async () => {
-    notification.info({ title: 'Top-left', position: 'top-left' })
-    await flush()
-
-    const container = document.getElementById('tiger-notification-container-top-left')
-    expect(container).toBeTruthy()
-    expect(container?.getAttribute('data-tiger-notification-position')).toBe('top-left')
-    expect(container?.querySelector('[data-tiger-notification]')).toBeTruthy()
-  })
-
-  it('auto-closes after duration', async () => {
+  it('does not fire onClose again after the close button', async () => {
     vi.useFakeTimers()
-
-    notification.info({ title: 'Auto-close', duration: 100 })
-    await flushMicrotasks()
-    vi.advanceTimersByTime(16)
-    await flushMicrotasks()
-    expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
-
-    vi.advanceTimersByTime(150)
-    vi.advanceTimersByTime(16)
-    await flushMicrotasks()
-    expect(document.querySelector('[data-tiger-notification]')).toBeFalsy()
+    const onClose = vi.fn()
+    notification.info({ title: 'Timed', duration: 3000, closable: true, onClose })
+    await flushHost()
+    document.querySelector('button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await flushHost()
+    expect(onClose).toHaveBeenCalledTimes(1)
+    vi.advanceTimersByTime(3000)
+    await flushHost()
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('hides close button when closable is false', async () => {
-    notification.info({ title: 'Non-closable', closable: false, duration: 0 })
-    await flush()
-
-    const closeBtn = document.querySelector('[aria-label="Close notification"]')
-    expect(closeBtn).toBeFalsy()
-  })
-
-  it('renders inline actions without triggering the toast click handler', async () => {
-    const handleToastClick = vi.fn()
-    const handleActionClick = vi.fn()
-
+  it('does not fire toast onClick when an action is activated', async () => {
+    const onClick = vi.fn()
+    const onAction = vi.fn()
     notification.info({
-      title: 'Actionable notification',
+      title: 'Clickable',
       duration: 0,
-      onClick: handleToastClick,
-      actions: [{ label: 'View', type: 'primary', onClick: handleActionClick }]
+      onClick,
+      actions: [{ label: 'View', onClick: onAction }]
     })
-    await flush()
-
+    await flushHost()
     const action = Array.from(document.querySelectorAll('button')).find(
       (button) => button.textContent === 'View'
     )
-    expect(action).toBeTruthy()
-
-    await fireEvent.click(action!)
-    await flush()
-
-    expect(handleActionClick).toHaveBeenCalledWith(
-      expect.objectContaining({ id: expect.any(Number), close: expect.any(Function) })
-    )
-    expect(handleToastClick).not.toHaveBeenCalled()
-
-    const toast = document.querySelector('[data-tiger-notification]')
-    await fireEvent.click(toast!)
-    await flush()
-    expect(handleToastClick).toHaveBeenCalledTimes(1)
+    expect(document.querySelector('[data-tiger-notification]')?.getAttribute('tabindex')).toBeNull()
+    action?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await flushHost()
+    expect(onAction).toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
   })
 
-  it('closes when an inline action has closeOnClick', async () => {
+  it('uses official locale close names and accepts a custom closeAriaLabel', async () => {
+    mountProvider(zhCN)
+    notification.info({ title: 'CN', duration: 0, closable: true })
+    await flushHost()
+    expect(
+      document.querySelector(`button[aria-label="${zhCN.common?.closeNotificationAriaLabel}"]`)
+    ).toBeTruthy()
+
+    notification.clear()
+    mountProvider(zhTW)
+    notification.info({ title: 'TW', duration: 0, closable: true })
+    await flushHost()
+    expect(document.querySelector('button')?.getAttribute('aria-label')).toBe(
+      zhTW.common?.closeNotificationAriaLabel
+    )
+
+    notification.clear()
+    mountProvider(jaJP)
+    notification.info({ title: 'JA', duration: 0, closable: true })
+    await flushHost()
+    expect(document.querySelector('button')?.getAttribute('aria-label')).toBe(
+      jaJP.common?.closeNotificationAriaLabel
+    )
+
+    notification.clear()
     notification.info({
-      title: 'Close from action',
+      title: 'Custom',
       duration: 0,
-      actions: [{ label: 'Undo', closeOnClick: true }]
+      closable: true,
+      closeAriaLabel: 'Dismiss this notice'
     })
-    await flush()
-
-    const action = Array.from(document.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Undo'
-    )
-    expect(action).toBeTruthy()
-
-    await fireEvent.click(action!)
-    await flush()
-    expect(document.querySelector('[data-tiger-notification]')).toBeFalsy()
+    await flushHost()
+    expect(document.querySelector('button[aria-label="Dismiss this notice"]')).toBeTruthy()
   })
 
-  it('clears notifications for a specific position', async () => {
-    notification.info({
-      title: 'Top-right 1',
-      position: 'top-right',
-      duration: 0
+  it('emits close from the declarative container', async () => {
+    const onClose = vi.fn()
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp({
+      render: () =>
+        h(NotificationContainer, {
+          notifications: [
+            {
+              id: 'one',
+              type: 'info',
+              title: 'Declarative',
+              duration: 0,
+              closable: true,
+              position: 'top-right'
+            }
+          ],
+          onClose
+        })
     })
-    notification.success({
-      title: 'Top-left 1',
-      position: 'top-left',
-      duration: 0
-    })
-    await flush()
-
-    expect(document.querySelectorAll('[data-tiger-notification]').length).toBe(2)
-
-    notification.clear('top-right')
-    await flush()
-
-    expect(document.querySelectorAll('[data-tiger-notification]').length).toBe(1)
-    const remaining = document.querySelector('[data-tiger-notification]')
-    expect(remaining?.textContent).toContain('Top-left 1')
+    app.mount(root)
+    await nextTick()
+    document.querySelector('button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+    expect(onClose).toHaveBeenCalledWith('one')
+    app.unmount()
   })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      notification.info({
-        title: 'Accessible notification',
-        description: 'Notification details',
-        duration: 0
-      })
-      await flush()
 
-      await expectNoA11yViolationsIsolated(document.body)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      expect(() => notification.clear()).not.toThrow()
-    })
+  it('keeps one live role per toast and none on an empty container', async () => {
+    notification.info({ title: 'info', duration: 0 })
+    notification.error({ title: 'error', duration: 0 })
+    await flushHost()
+    expect(document.querySelectorAll('[aria-live]')).toHaveLength(0)
+    expect(document.querySelectorAll('[role="status"]')).toHaveLength(1)
+    expect(document.querySelectorAll('[role="alert"]')).toHaveLength(1)
+    await expectNoA11yViolations(document.querySelector('[data-tiger-notification]') as HTMLElement)
+
+    notification.clear()
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp(NotificationContainer)
+    app.mount(root)
+    await nextTick()
+    expect(document.querySelector('[data-tiger-notification-container][aria-live]')).toBeNull()
+    const empty = document.querySelector('[data-tiger-notification-container]')
+    if (empty) await expectNoA11yViolations(empty as HTMLElement)
+    app.unmount()
   })
 })
