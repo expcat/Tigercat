@@ -181,7 +181,18 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
         }
         return Math.ceil(height)
       }
-      const sendResize = () => send({ type: 'resize', height: measureHeight() })
+      let lastSentHeight = 0
+      let resizeFrame = 0
+      const sendResize = () => {
+        if (resizeFrame) return
+        resizeFrame = window.requestAnimationFrame(() => {
+          resizeFrame = 0
+          const height = measureHeight()
+          if (height === lastSentHeight) return
+          lastSentHeight = height
+          send({ type: 'resize', height })
+        })
+      }
       new ResizeObserver(sendResize).observe(document.body)
       new MutationObserver(sendResize).observe(document.documentElement, {
         childList: true,
