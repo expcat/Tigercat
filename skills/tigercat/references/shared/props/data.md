@@ -11,24 +11,20 @@ description: Compact generated Tigercat Data props reference
 
 ## Calendar
 
-`packages/core/src/types/calendar.ts` · `CalendarProps` · 8/12 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 4/12 props
 
-| Prop            | Type                      | Default   | Notes                                                                                      |
-| --------------- | ------------------------- | --------- | ------------------------------------------------------------------------------------------ |
-| `value?`        | `Date \| string \| null`  | `-`       | Currently selected date (controlled). Invalid Date is treated as empty.                    |
-| `defaultValue?` | `Date \| string \| null`  | `-`       | Initial selected date when `value` is omitted                                              |
-| `mode?`         | `CalendarMode`            | `'month'` | Calendar display mode.                                                                     |
-| `fullscreen?`   | `boolean`                 | `-`       | Whether the calendar is full-screen or card-style                                          |
-| `disabledDate?` | `(date: Date) => boolean` | `-`       | Function that determines if a date is disabled                                             |
-| `weekStartsOn?` | `WeekStartsOn`            | `-`       | First column of the week. Defaults to the locale week start (en-US Sunday, zh/de Monday... |
-| `now?`          | `Date`                    | `-`       | Clock snapshot for “today” and the default panel month. Omit on the client to use the w... |
-| `locale?`       | `Partial<TigerLocale>`    | `-`       | Locale override merged on top of ConfigProvider locale                                     |
+| Prop            | Type                     | Default   | Notes                                                                   |
+| --------------- | ------------------------ | --------- | ----------------------------------------------------------------------- |
+| `value?`        | `Date \| string \| null` | `-`       | Currently selected date (controlled). Invalid Date is treated as empty. |
+| `defaultValue?` | `Date \| string \| null` | `-`       | Initial selected date when `value` is omitted                           |
+| `mode?`         | `CalendarMode`           | `'month'` | Calendar display mode.                                                  |
+| `fullscreen?`   | `boolean`                | `-`       | Whether the calendar is full-screen or card-style                       |
 
 Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## Collapse
 
-`packages/core/src/types/collapse.ts` · `CollapseProps` · 5/9 props
+`packages/core/src/types/collapse.ts` · `CollapseProps` · 4/9 props
 
 Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion 多键只留最后一项。`1` 与 `"1"` 同一面板。header 是真 button；extra 是兄弟，不进可访问名。
 
@@ -38,11 +34,10 @@ Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion
 | `accordion?`          | `boolean`                                  | `false`   | Accordion mode — only one panel can be expanded at a time. Extra keys in `activeKey` /... |
 | `expandIconPosition?` | `ExpandIconPosition`                       | `'start'` | Position of the expand icon                                                               |
 | `bordered?`           | `boolean`                                  | `true`    | Whether to show border                                                                    |
-| `ghost?`              | `boolean`                                  | `false`   | Ghost mode - transparent without border                                                   |
 
 ## CollapsePanel
 
-`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 5/8 props
+`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 4/8 props
 
 Note: 必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 序并 `aria-disabled`。
 
@@ -52,11 +47,10 @@ Note: 必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 
 | `header?`    | `string`           | `-`     | Panel header/title                                               |
 | `extra?`     | `unknown`          | `-`     | Extra content rendered beside the header button (not inside it). |
 | `showArrow?` | `boolean`          | `true`  | Whether to show arrow icon                                       |
-| `disabled?`  | `boolean`          | `false` | Whether the panel is disabled                                    |
 
 ## Countdown
 
-`packages/core/src/types/countdown.ts` · `CountdownProps` · 5/10 props
+`packages/core/src/types/countdown.ts` · `CountdownProps` · 4/10 props
 
 Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。
 
@@ -66,58 +60,48 @@ Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后�
 | `now?`      | `CountdownValue` | `-`          | First-paint / SSR clock snapshot only. After mount, ticks use `Date.now()`. Changing `n... |
 | `format?`   | `string`         | `'HH:mm:ss'` | Display pattern. `HH` is total hours unless `D`/`DD` is present (then 24h remainder). `... |
 | `interval?` | `number`         | `1000`       | Tick period in ms. `<= 0` disables the timer.                                              |
-| `title?`    | `unknown`        | `-`          | Visible title above the value. Not an HTML tooltip.                                        |
 
 ## DataExport
 
-`packages/core/src/types/data-export.ts` · `DataExportProps` · 8/11 props
+`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/11 props
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
 Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。
 
-| Prop             | Type                                    | Default                | Notes                                                                                      |
-| ---------------- | --------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
-| `columns`        | `TableColumn<T>[]`                      | `-`                    | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
-| `dataSource`     | `T[]`                                   | `-`                    | Records to export                                                                          |
-| `formats?`       | `DataExportFormat[]`                    | `['xlsx', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
-| `fileName?`      | `string`                                | `'export'`             | Download file name. An existing matching suffix is kept; path characters are stripped....  |
-| `sheetName?`     | `string`                                | `-`                    | -                                                                                          |
-| `cellFormatter?` | `DataExportOptions<T>['cellFormatter']` | `-`                    | -                                                                                          |
-| `disabled?`      | `boolean`                               | `false`                | Whether the export trigger is disabled                                                     |
-| `locale?`        | `Partial<TigerLocale>`                  | `-`                    | Locale overrides merged on top of ConfigProvider locale                                    |
+| Prop         | Type                 | Default                | Notes                                                                                      |
+| ------------ | -------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
+| `columns`    | `TableColumn<T>[]`   | `-`                    | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
+| `dataSource` | `T[]`                | `-`                    | Records to export                                                                          |
+| `formats?`   | `DataExportFormat[]` | `['xlsx', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
+| `fileName?`  | `string`             | `'export'`             | Download file name. An existing matching suffix is kept; path characters are stripped....  |
 
 ## Table
 
-`packages/core/src/types/table.ts` · `TableProps` · 8/49 props
+`packages/core/src/types/table.ts` · `TableProps` · 4/49 props
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 
-Note: 固定列通过 `column.fixed`（`left` / `right`）开启；开启 `columnLockable` 后表头会出现锁定按钮，点击可交互切换该列进入左侧固定区，按钮的 `aria-label` 走 i18n，可用 `lockColumnAriaLabel` / `unlockColumnAriaLabel`（模板支持 `{column}`）自定义。推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。当存在固定列或开启 `columnLockable` 时，表格会渲染 `<colgroup>` + `<col>` 钉死每列宽度（有声明 `width` 的列用声明值，无声明宽度的列冻结首次实测宽度），使列宽与 `fixed`/锁定状态解耦——切换锁定不会改变任何列宽，sticky 偏移保持准确；代价是这类表格的自适应列在首次测量后宽度被冻结、不再随容器宽度回流（普通表格不受影响）。`tableLayout`（默认 `"auto"`，可设为 `"fixed"`）切换底层 `table-layout`，固定列/钉列场景配合列 `width` 时 `"fixed"` 列宽更稳定。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制（默认 `sm`），卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName`、`valueClassName` 做轻量布局调整，且 `cardFieldGap`（默认 "gap-3"，需传完整 Tailwind gap 类以便 Tailwind JIT 静态识别）可调整字段间的间距。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。为保证锁定/固定列在横向滚动时 `position: sticky` 稳定钉住，表格根使用 `border-separate` + `border-spacing-0`，行/表头分隔线落在单元格（`<td>`/`<th>`）而非 `<tr>`/`<thead>`。省略 `pagination` 时默认开启（`pageSize` 10）；关掉请传 `false`。传入的分页对象与该默认浅合并。`pagination.total` 未传才回落到本地长度，`0` 是合法总数。服务端模式 `pagination.remote: true` 跳过内部切片以及内置 filter/sort/group（当前页再筛请设 `localProcessing`）。`onCellChange` / `onRowClick` / `render` 的 index 是 dataSource 下标。内置 `exportable` 只出 CSV；xlsx 走 DataExport。`autoVirtual` 默认关。
+Note: `column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；`remote: true` 不做本地筛排切。内置导出只出 CSV。
 
-| Prop            | Type                                          | Default | Notes                                                                                      |
-| --------------- | --------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns`       | `TableColumn<T>[]`                            | `-`     | Table columns configuration                                                                |
-| `dataSource?`   | `T[]`                                         | `[]`    | Table data source                                                                          |
-| `pagination?`   | `PaginationConfig \| false`                   | `-`     | Pagination configuration. Omit to use the default pager (`pageSize` 10). Set to `false`... |
-| `sort?`         | `SortState`                                   | `-`     | Controlled sort state. When provided, internal sort state will not be mutated.             |
-| `filters?`      | `Record<string, unknown>`                     | `-`     | Controlled filters. When provided, internal filter state will not be mutated.              |
-| `rowSelection?` | `RowSelectionConfig<T>`                       | `-`     | Row selection configuration                                                                |
-| `expandable?`   | `ExpandableConfig<T>`                         | `-`     | Row expansion configuration. Adds an expand toggle column and renders expanded content...  |
-| `rowKey?`       | `string \| ((record: T) => string \| number)` | `'id'`  | Row identity. String form reads `record[rowKey]`. Missing keys fall back to the dataSou... |
+| Prop          | Type                        | Default | Notes                                                                                      |
+| ------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns`     | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                                |
+| `dataSource?` | `T[]`                       | `[]`    | Table data source                                                                          |
+| `pagination?` | `PaginationConfig \| false` | `-`     | Pagination configuration. Omit to use the default pager (`pageSize` 10). Set to `false`... |
+| `sort?`       | `SortState`                 | `-`     | Controlled sort state. When provided, internal sort state will not be mutated.             |
 
 Events/callback props: `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, `onFilterChange?`, `onHiddenColumnKeysChange?`, ....
 
 ## Timeline
 
-`packages/core/src/types/timeline.ts` · `TimelineProps` · 5/11 props
+`packages/core/src/types/timeline.ts` · `TimelineProps` · 4/11 props
 
 Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。
 
-| Prop       | Type                   | Default  | Notes                                                                                      |
-| ---------- | ---------------------- | -------- | ------------------------------------------------------------------------------------------ |
-| `items?`   | `TimelineItem[]`       | `-`      | Timeline items                                                                             |
-| `mode?`    | `TimelineMode`         | `'left'` | Timeline mode/direction                                                                    |
-| `pending?` | `boolean`              | `false`  | Append a pending item after the (optionally reversed) list. Pending stays at the DOM en... |
-| `reverse?` | `boolean`              | `false`  | Whether to reverse the timeline order                                                      |
-| `locale?`  | `Partial<TigerLocale>` | `-`      | -                                                                                          |
+| Prop       | Type             | Default  | Notes                                                                                      |
+| ---------- | ---------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `items?`   | `TimelineItem[]` | `-`      | Timeline items                                                                             |
+| `mode?`    | `TimelineMode`   | `'left'` | Timeline mode/direction                                                                    |
+| `pending?` | `boolean`        | `false`  | Append a pending item after the (optionally reversed) list. Pending stays at the DOM en... |
+| `reverse?` | `boolean`        | `false`  | Whether to reverse the timeline order                                                      |

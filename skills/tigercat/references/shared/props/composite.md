@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## ActivityFeed
 
-`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 7/18 props
+`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 4/18 props
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
@@ -23,158 +23,109 @@ Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走
 | `groups?`     | `ActivityGroup[]`                | `-`     | Activity groups                                     |
 | `groupBy?`    | `(item: ActivityItem) => string` | `-`     | Group by function (used when `groups` not provided) |
 | `groupOrder?` | `string[]`                       | `-`     | Optional group order                                |
-| `loading?`    | `boolean`                        | `false` | Whether to show loading state                       |
-| `showTime?`   | `boolean`                        | `true`  | Show time label                                     |
-| `locale?`     | `Partial<TigerLocale>`           | `-`     | Locale overrides for ActivityFeed UI text           |
 
 ## ChatWindow
 
-`packages/core/src/types/chat.ts` · `ChatWindowProps` · 8/33 props
+`packages/core/src/types/chat.ts` · `ChatWindowProps` · 4/32 props
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
 Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
 
-| Prop                  | Type                                                | Default | Notes                                                                                      |
-| --------------------- | --------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `messages?`           | `ChatMessage[]`                                     | `-`     | Message list                                                                               |
-| `virtual?`            | `boolean`                                           | `false` | Enable virtualized rendering for the message list. The VirtualList is the only scroller... |
-| `autoScrollToBottom?` | `boolean`                                           | `true`  | Follow the latest message only while the list is pinned to the bottom (within 32px) or...  |
-| `sendOnEnter?`        | `boolean`                                           | `true`  | Send on Enter                                                                              |
-| `labels?`             | `Partial<import('./locale').TigerLocaleChatWindow>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
-| `value?`              | `string`                                            | `-`     | Input value (controlled)                                                                   |
-| `disabled?`           | `boolean`                                           | `false` | Whether the input is disabled                                                              |
-| `locale?`             | `Partial<TigerLocale>`                              | `-`     | Locale overrides for ChatWindow UI text                                                    |
+| Prop                  | Type            | Default | Notes                                                                                      |
+| --------------------- | --------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `messages?`           | `ChatMessage[]` | `-`     | Message list                                                                               |
+| `virtual?`            | `boolean`       | `false` | Enable virtualized rendering for the message list. The VirtualList is the only scroller... |
+| `autoScrollToBottom?` | `boolean`       | `true`  | Follow the latest message only while the list is pinned to the bottom (within 32px) or...  |
+| `sendOnEnter?`        | `boolean`       | `true`  | Send on Enter                                                                              |
 
 Events/callback props: `onChange?`, `onSend?`.
 
 ## CommentThread
 
-`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 7/27 props
+`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 4/27 props
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
 Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。
 
-| Prop            | Type                      | Default | Notes                                                                                     |
-| --------------- | ------------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `nodes?`        | `CommentNode[]`           | `-`     | Comment nodes (tree)                                                                      |
-| `items?`        | `CommentNode[]`           | `-`     | Comment items (flat list)                                                                 |
-| `maxReplies?`   | `number`                  | `3`     | Maximum replies to show per node                                                          |
-| `expandedKeys?` | `Array<string \| number>` | `-`     | Expanded reply keys (controlled)                                                          |
-| `showMore?`     | `boolean`                 | `false` | Show more action. Default off; the control is rendered when `onMore` or node `actions`... |
-| `showComposer?` | `boolean`                 | `true`  | Show the root composer (including empty state).                                           |
-| `locale?`       | `Partial<TigerLocale>`    | `-`     | Locale overrides for CommentThread UI text                                                |
+| Prop            | Type                      | Default | Notes                            |
+| --------------- | ------------------------- | ------- | -------------------------------- |
+| `nodes?`        | `CommentNode[]`           | `-`     | Comment nodes (tree)             |
+| `items?`        | `CommentNode[]`           | `-`     | Comment items (flat list)        |
+| `maxReplies?`   | `number`                  | `3`     | Maximum replies to show per node |
+| `expandedKeys?` | `Array<string \| number>` | `-`     | Expanded reply keys (controlled) |
 
 Events/callback props: `onLike?`, `onReply?`, `onUserClick?`, `onMore?`, `onAction?`, `onExpandedChange?`, ....
 
 ## DataTableWithToolbar
 
-`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 8/54 props
+`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 4/54 props
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
 Note: 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。
 
-| Prop                | Type                        | Default | Notes                                                                                      |
-| ------------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns`           | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                                |
-| `toolbar?`          | `TableToolbarProps`         | `-`     | Toolbar configuration                                                                      |
-| `pagination?`       | `PaginationConfig \| false` | `-`     | Pagination configuration. Same default as Table (on, pageSize 10). Pass `false` to hide... |
-| `tableClassName?`   | `string`                    | `-`     | Class applied to the inner table element.                                                  |
-| `rowSelection?`     | `RowSelectionConfig<T>`     | `-`     | Row selection configuration                                                                |
-| `hiddenColumnKeys?` | `string[]`                  | `-`     | Controlled hidden column keys (matched against `columns[].key`). When provided, interna... |
-| `dataSource?`       | `T[]`                       | `[]`    | Table data source                                                                          |
-| `sort?`             | `SortState`                 | `-`     | Controlled sort state. When provided, internal sort state will not be mutated.             |
+| Prop              | Type                        | Default | Notes                                                                                      |
+| ----------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns`         | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                                |
+| `toolbar?`        | `TableToolbarProps`         | `-`     | Toolbar configuration                                                                      |
+| `pagination?`     | `PaginationConfig \| false` | `-`     | Pagination configuration. Same default as Table (on, pageSize 10). Pass `false` to hide... |
+| `tableClassName?` | `string`                    | `-`     | Class applied to the inner table element.                                                  |
 
 Events/callback props: `onPageChange?`, `onPageSizeChange?`, `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, ....
 
-卡片自定义（公开 API）：`renderCard(context)` / `cardClassName`（`string` 或 `(record, index) => string`）已在 `DataTableWithToolbar` 显式声明并转发给内部 Table；Vue 侧另有 `#card="{ record, index, columns, selected, expanded, toggleExpand, selectRow }"` 作用域插槽，**插槽优先于 `renderCard` prop**。
+`renderCard` / `cardClassName` forward to Table. Vue `#card` wins over `renderCard`.
 
-Custom filter context: `filters[].render({ filter, value, filters, setValue, setFilter })`. Use `setValue(value)` to update the current filter key, or `setFilter(key, value)` when one custom control updates another key. `TableToolbarFilterValue` accepts `string | number | Record<string, unknown> | null`, so range filters can emit `{ ageRange: { min, max } }`.
-
-### Per-filter container styling
-
-`filters[].itemClass` 和 `filters[].itemStyle` 可逐项定制 filter 容器样式。 `itemClass` 使用**替换语义**——提供时整体替换默认宽度类，不追加。默认宽度类：
-
-- Select 型 filter：`w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]`
-- 自定义 render 型 filter：`w-full sm:w-auto`
-
-如需保留部分默认类，请在 `itemClass` 中手动包含。
-
-### Toolbar container and search styling
-
-| Prop               | Semantics | Default classes                                                                                      |
-| ------------------ | --------- | ---------------------------------------------------------------------------------------------------- |
-| `className?`       | **追加**  | 追加到 `flex flex-wrap items-center gap-3 p-4` 之后                                                  |
-| `style?`           | 内联样式  | 作为 CSS 内联样式确定性覆盖间距等                                                                    |
-| `searchClassName?` | **替换**  | 替换默认 `w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]`，结构类 `flex items-center gap-2` 保留 |
-
-### Full toolbar replacement
-
-Vue 通过 `#toolbar` 作用域插槽，React 通过 `toolbar.render`（函数或 ReactNode），完全替换内置工具栏区域（含 `role="toolbar"` 容器）。
-
-`TableToolbarRenderContext` 字段：`searchValue`, `setSearch`, `submitSearch`, `filters`, `setFilter`, `selectedKeys`, `selectedCount`, `hiddenColumnKeys`, `setHiddenColumnKeys`。
-
-> **a11y 注意**：使用自定义 toolbar 时，内置 `role="toolbar"` 容器不再渲染，调用方应自行在自定义 toolbar 根元素上添加 `role="toolbar"` 和 `aria-label`。
+`filters[].render({ filter, value, filters, setValue, setFilter })` owns custom controls. `itemClass` replaces default width classes. Vue `#toolbar` / React `toolbar.render` replace the whole bar — add `role="toolbar"` yourself.
 
 ## FormWizard
 
-`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 7/21 props
+`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 4/21 props
 
 Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 
 Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。
 
-| Prop          | Type                                                           | Default | Notes                                                                                      |
-| ------------- | -------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `steps`       | `WizardStep[]`                                                 | `-`     | Steps configuration                                                                        |
-| `current?`    | `number`                                                       | `-`     | Current step index (0-based)                                                               |
-| `beforeNext?` | `FormWizardValidator`                                          | `-`     | Validation hook before moving to next step. `true` proceeds, `false` blocks, a string b... |
-| `clickable?`  | `boolean`                                                      | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
-| `autoSave?`   | `(current: number, step: WizardStep) => void \| Promise<void>` | `-`     | Called after a successful step change and after Finish. Awaited; a rejection stays on t... |
-| `labels?`     | `Partial<import('./locale').TigerLocaleFormWizard>`            | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
-| `locale?`     | `Partial<TigerLocale>`                                         | `-`     | Locale overrides for FormWizard UI text                                                    |
+| Prop          | Type                  | Default | Notes                                                                                      |
+| ------------- | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `steps`       | `WizardStep[]`        | `-`     | Steps configuration                                                                        |
+| `current?`    | `number`              | `-`     | Current step index (0-based)                                                               |
+| `beforeNext?` | `FormWizardValidator` | `-`     | Validation hook before moving to next step. `true` proceeds, `false` blocks, a string b... |
+| `clickable?`  | `boolean`             | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
 
 Events/callback props: `onChange?`, `onFinish?`.
 
 ## NotificationCenter
 
-`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 8/23 props
+`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 4/23 props
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 
 Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。
 
-| Prop               | Type                                                        | Default | Notes                                                                                      |
-| ------------------ | ----------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `items?`           | `NotificationItem[]`                                        | `-`     | Notification items (flat list)                                                             |
-| `groups?`          | `NotificationGroup[]`                                       | `-`     | Notification groups                                                                        |
-| `groupBy?`         | `(item: NotificationItem) => string`                        | `-`     | Group by function (used when `groups` not provided)                                        |
-| `manageReadState?` | `boolean`                                                   | `false` | Whether to manage read state internally. When true, the component tracks read/unread st... |
-| `readFilter?`      | `NotificationReadFilter`                                    | `'all'` | Read filter (controlled)                                                                   |
-| `labels?`          | `Partial<import('./locale').TigerLocaleNotificationCenter>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
-| `loading?`         | `boolean`                                                   | `false` | Loading state                                                                              |
-| `locale?`          | `Partial<TigerLocale>`                                      | `-`     | Locale overrides for NotificationCenter UI text                                            |
+| Prop               | Type                                 | Default | Notes                                                                                      |
+| ------------------ | ------------------------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`           | `NotificationItem[]`                 | `-`     | Notification items (flat list)                                                             |
+| `groups?`          | `NotificationGroup[]`                | `-`     | Notification groups                                                                        |
+| `groupBy?`         | `(item: NotificationItem) => string` | `-`     | Group by function (used when `groups` not provided)                                        |
+| `manageReadState?` | `boolean`                            | `false` | Whether to manage read state internally. When true, the component tracks read/unread st... |
 
 Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`, `onItemClick?`, `onItemReadChange?`.
 
 ## TaskBoard
 
-`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 7/22 props
+`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 4/22 props
 
 Uses: `ConfigProvider`, `task-board drag utilities`, `kanban utilities`.
 
 Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。
 
-| Prop               | Type                                      | Default | Notes                                                                                      |
-| ------------------ | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns?`         | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `filterText?`      | `string`                                  | `-`     | Quick filter / search term applied to card titles. When non-empty, only cards whose tit... |
-| `hiddenColumns?`   | `(string \| number)[]`                    | `-`     | Column IDs to hide from the board (e.g. for saved views).                                  |
-| `showCardCount?`   | `boolean`                                 | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
-| `allowAddCard?`    | `boolean`                                 | `false` | Show an inline "add card" button in each column footer. Also shown when `onCardAdd` is...  |
-| `enforceWipLimit?` | `boolean`                                 | `false` | Enforce WIP limit — when `true`, cards cannot be dropped into a column that has already... |
-| `locale?`          | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
+| Prop             | Type                   | Default | Notes                                                                                      |
+| ---------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns?`       | `TaskBoardColumn[]`    | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `filterText?`    | `string`               | `-`     | Quick filter / search term applied to card titles. When non-empty, only cards whose tit... |
+| `hiddenColumns?` | `(string \| number)[]` | `-`     | Column IDs to hide from the board (e.g. for saved views).                                  |
+| `showCardCount?` | `boolean`              | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.

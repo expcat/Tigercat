@@ -11,41 +11,35 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 8/27 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 4/27 props
 
 Note: 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。
 
-| Prop              | Type                       | Default | Notes                                                                                      |
-| ----------------- | -------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `options?`        | `AutoCompleteOption[]`     | `-`     | Options list                                                                               |
-| `value?`          | `AutoCompleteValue`        | `-`     | Committed value. `undefined` is unselected; `''` is a legal value. Typing updates the q... |
-| `defaultValue?`   | `AutoCompleteValue`        | `-`     | Initial committed value when `value` is omitted.                                           |
-| `searchValue?`    | `string`                   | `-`     | Controlled search input value                                                              |
-| `filterOption?`   | `AutoCompleteFilterOption` | `-`     | Whether to filter options locally based on input value (default: true)                     |
-| `allowFreeInput?` | `boolean`                  | `-`     | Allow committing text that is not an option (default: true). Typing always updates the...  |
-| `clearable?`      | `boolean`                  | `-`     | Whether to show clear button                                                               |
-| `open?`           | `boolean`                  | `-`     | Controlled open state. `undefined` is uncontrolled.                                        |
+| Prop            | Type                   | Default | Notes                                                                                      |
+| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `options?`      | `AutoCompleteOption[]` | `-`     | Options list                                                                               |
+| `value?`        | `AutoCompleteValue`    | `-`     | Committed value. `undefined` is unselected; `''` is a legal value. Typing updates the q... |
+| `defaultValue?` | `AutoCompleteValue`    | `-`     | Initial committed value when `value` is omitted.                                           |
+| `searchValue?`  | `string`               | `-`     | Controlled search input value                                                              |
 
 ## Cascader
 
-`packages/core/src/types/cascader.ts` · `CascaderProps` · 8/30 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 4/30 props
 
 Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。
 
-| Prop              | Type                              | Default   | Notes                                                             |
-| ----------------- | --------------------------------- | --------- | ----------------------------------------------------------------- |
-| `options?`        | `CascaderOption[]`                | `-`       | Cascader options data                                             |
-| `value?`          | `CascaderModelValue`              | `-`       | Selected path. `undefined` is empty / uncontrolled.               |
-| `defaultValue?`   | `CascaderModelValue`              | `-`       | Initial path when `value` is omitted.                             |
-| `searchable?`     | `boolean \| CascaderSearchConfig` | `false`   | Whether to allow search/filter                                    |
-| `changeOnSelect?` | `boolean`                         | `false`   | Whether to select value on each level (not just leaf)             |
-| `expandTrigger?`  | `CascaderExpandTrigger`           | `'click'` | Trigger type for expanding sub-options                            |
-| `clearable?`      | `boolean`                         | `true`    | Whether to allow clearing the selection                           |
-| `virtual?`        | `boolean`                         | `false`   | Whether to use virtual scrolling for large column / search lists. |
+| Prop            | Type                              | Default | Notes                                               |
+| --------------- | --------------------------------- | ------- | --------------------------------------------------- |
+| `options?`      | `CascaderOption[]`                | `-`     | Cascader options data                               |
+| `value?`        | `CascaderModelValue`              | `-`     | Selected path. `undefined` is empty / uncontrolled. |
+| `defaultValue?` | `CascaderModelValue`              | `-`     | Initial path when `value` is omitted.               |
+| `searchable?`   | `boolean \| CascaderSearchConfig` | `false` | Whether to allow search/filter                      |
+
+Events/callback props: `onOpenChange?`.
 
 ## Checkbox
 
-`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 5/12 props
+`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 4/12 props
 
 | Prop             | Type            | Default | Notes                                          |
 | ---------------- | --------------- | ------- | ---------------------------------------------- |
@@ -53,23 +47,21 @@ Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发
 | `indeterminate?` | `boolean`       | `false` | Whether the checkbox is in indeterminate state |
 | `disabled?`      | `boolean`       | `false` | Whether the checkbox is disabled               |
 | `size?`          | `ComponentSize` | `'md'`  | Checkbox size                                  |
-| `value?`         | `CheckboxValue` | `-`     | Checkbox value (for use in checkbox groups)    |
 
 ## CheckboxGroup
 
-`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 5/10 props
+`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 4/10 props
 
-| Prop            | Type                   | Default      | Notes                                         |
-| --------------- | ---------------------- | ------------ | --------------------------------------------- |
-| `value?`        | `CheckboxGroupValue`   | `-`          | Selected values (controlled mode)             |
-| `defaultValue?` | `CheckboxGroupValue`   | `[]`         | Default selected values (uncontrolled mode)   |
-| `disabled?`     | `boolean`              | `false`      | Whether the checkbox group is disabled        |
-| `size?`         | `ComponentSize`        | `'md'`       | Checkbox size for all checkboxes in the group |
-| `direction?`    | `ChoiceGroupDirection` | `'vertical'` | Layout direction                              |
+| Prop            | Type                 | Default | Notes                                         |
+| --------------- | -------------------- | ------- | --------------------------------------------- |
+| `value?`        | `CheckboxGroupValue` | `-`     | Selected values (controlled mode)             |
+| `defaultValue?` | `CheckboxGroupValue` | `[]`    | Default selected values (uncontrolled mode)   |
+| `disabled?`     | `boolean`            | `false` | Whether the checkbox group is disabled        |
+| `size?`         | `ComponentSize`      | `'md'`  | Checkbox size for all checkboxes in the group |
 
 ## ColorPicker
 
-`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 8/24 props
+`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 4/24 props
 
 | Prop            | Type          | Default | Notes                                                                                      |
 | --------------- | ------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -77,50 +69,38 @@ Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发
 | `defaultValue?` | `string`      | `-`     | -                                                                                          |
 | `format?`       | `ColorFormat` | `'hex'` | Format of committed values. Hue / SV / alpha / text / presets all emit this format. Hex... |
 | `showAlpha?`    | `boolean`     | `false` | -                                                                                          |
-| `presets?`      | `string[]`    | `-`     | Preset colors rendered with ColorSwatch                                                    |
-| `open?`         | `boolean`     | `-`     | -                                                                                          |
-| `clearable?`    | `boolean`     | `true`  | -                                                                                          |
-| `disabled?`     | `boolean`     | `false` | -                                                                                          |
 
 Events/callback props: `onChange?`, `onOpenChange?`.
 
 ## ColorSwatch
 
-`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 8/18 props
+`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 4/18 props
 
-| Prop            | Type                       | Default | Notes                                                                         |
-| --------------- | -------------------------- | ------- | ----------------------------------------------------------------------------- |
-| `value?`        | `string`                   | `-`     | -                                                                             |
-| `defaultValue?` | `string`                   | `-`     | -                                                                             |
-| `colors?`       | `ColorSwatchOptionInput[]` | `-`     | -                                                                             |
-| `groups?`       | `ColorSwatchGroup[]`       | `-`     | -                                                                             |
-| `columns?`      | `number`                   | `6`     | Visual columns of the **current group** grid. ArrowUp/Down stay in that grid. |
-| `disabled?`     | `boolean`                  | `-`     | -                                                                             |
-| `ariaLabel?`    | `string`                   | `-`     | -                                                                             |
-| `locale?`       | `Partial<TigerLocale>`     | `-`     | Locale object merged on top of ConfigProvider. Do not pass a language id.     |
+| Prop            | Type                       | Default | Notes |
+| --------------- | -------------------------- | ------- | ----- |
+| `value?`        | `string`                   | `-`     | -     |
+| `defaultValue?` | `string`                   | `-`     | -     |
+| `colors?`       | `ColorSwatchOptionInput[]` | `-`     | -     |
+| `groups?`       | `ColorSwatchGroup[]`       | `-`     | -     |
 
 Events/callback props: `onChange?`.
 
 ## CronEditor
 
-`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 8/14 props
+`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 4/14 props
 
-| Prop            | Type                   | Default | Notes                                                                      |
-| --------------- | ---------------------- | ------- | -------------------------------------------------------------------------- |
-| `value?`        | `string`               | `-`     | 5-field unix expression. `undefined` is unselected; `''` is cleared empty. |
-| `defaultValue?` | `string`               | `-`     | -                                                                          |
-| `presets?`      | `CronPreset[]`         | `-`     | -                                                                          |
-| `disabled?`     | `boolean`              | `false` | -                                                                          |
-| `readonly?`     | `boolean`              | `false` | -                                                                          |
-| `size?`         | `CronEditorSize`       | `'md'`  | -                                                                          |
-| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale object merged on top of ConfigProvider. Do not pass a language id.  |
-| `name?`         | `string`               | `-`     | -                                                                          |
+| Prop            | Type           | Default | Notes                                                                      |
+| --------------- | -------------- | ------- | -------------------------------------------------------------------------- |
+| `value?`        | `string`       | `-`     | 5-field unix expression. `undefined` is unselected; `''` is cleared empty. |
+| `defaultValue?` | `string`       | `-`     | -                                                                          |
+| `presets?`      | `CronPreset[]` | `-`     | -                                                                          |
+| `disabled?`     | `boolean`      | `false` | -                                                                          |
 
 Events/callback props: `onChange?`, `onValidate?`.
 
 ## DatePicker
 
-`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 8/29 props
+`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/29 props
 
 | Prop            | Type                           | Default        | Notes |
 | --------------- | ------------------------------ | -------------- | ----- |
@@ -128,54 +108,41 @@ Events/callback props: `onChange?`, `onValidate?`.
 | `defaultValue?` | `DatePickerModelValue \| null` | `-`            | -     |
 | `range?`        | `boolean`                      | `false`        | -     |
 | `format?`       | `DateFormat`                   | `'yyyy-MM-dd'` | -     |
-| `open?`         | `boolean`                      | `-`            | -     |
-| `placeholder?`  | `string`                       | `-`            | -     |
-| `disabled?`     | `boolean`                      | `false`        | -     |
-| `clearable?`    | `boolean`                      | `true`         | -     |
 
 Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## Form
 
-`packages/core/src/types/form.ts` · `FormProps` · 7/18 props
+`packages/core/src/types/form.ts` · `FormProps` · 4/18 props
 
-| Prop          | Type                   | Default | Notes                                                                                      |
-| ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `model?`      | `FormValues`           | `-`     | Form values                                                                                |
-| `rules?`      | `FormRules`            | `-`     | Form validation rules                                                                      |
-| `conditions?` | `FormConditions`       | `-`     | Conditional field behavior DSL for visibility, disabled state, and dynamic required rules. |
-| `disabled?`   | `boolean`              | `false` | Whether to disable the entire form                                                         |
-| `loading?`    | `boolean`              | `false` | Whether the form is in a loading state (prevents submit)                                   |
-| `locale?`     | `Partial<TigerLocale>` | `-`     | Locale override for built-in validation messages. Merged on top of the ConfigProvider l... |
-| `controller?` | `FormController`       | `-`     | Headless controller from `useFormController` / `createFormEngine`. When set, the contro... |
+| Prop          | Type             | Default | Notes                                                                                      |
+| ------------- | ---------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `model?`      | `FormValues`     | `-`     | Form values                                                                                |
+| `rules?`      | `FormRules`      | `-`     | Form validation rules                                                                      |
+| `conditions?` | `FormConditions` | `-`     | Conditional field behavior DSL for visibility, disabled state, and dynamic required rules. |
+| `disabled?`   | `boolean`        | `false` | Whether to disable the entire form                                                         |
 
 ## FormItem
 
-`packages/core/src/types/form.ts` · `FormItemProps` · 6/13 props
+`packages/core/src/types/form.ts` · `FormItemProps` · 4/13 props
 
-| Prop                | Type                     | Default    | Notes                                                                                      |
-| ------------------- | ------------------------ | ---------- | ------------------------------------------------------------------------------------------ |
-| `name?`             | `string`                 | `-`        | Field name (must match key in form model)                                                  |
-| `label?`            | `string`                 | `-`        | Label text                                                                                 |
-| `required?`         | `boolean`                | `-`        | Whether the field is required                                                              |
-| `rules?`            | `FormRule \| FormRule[]` | `-`        | Validation rules for this field                                                            |
-| `error?`            | `string`                 | `-`        | Error message (controlled mode)                                                            |
-| `errorDisplayMode?` | `FormErrorDisplayMode`   | `'inline'` | Error display mode - 'inline': shows error below the field (default) - 'popup': shows e... |
+| Prop        | Type                     | Default | Notes                                     |
+| ----------- | ------------------------ | ------- | ----------------------------------------- |
+| `name?`     | `string`                 | `-`     | Field name (must match key in form model) |
+| `label?`    | `string`                 | `-`     | Label text                                |
+| `required?` | `boolean`                | `-`     | Whether the field is required             |
+| `rules?`    | `FormRule \| FormRule[]` | `-`     | Validation rules for this field           |
 
 ## Input
 
-`packages/core/src/types/input.ts` · `InputProps` · 8/26 props
+`packages/core/src/types/input.ts` · `InputProps` · 4/26 props
 
-| Prop            | Type               | Default  | Notes                                                                        |
-| --------------- | ------------------ | -------- | ---------------------------------------------------------------------------- |
-| `type?`         | `InputType`        | `'text'` | Input type                                                                   |
-| `clearable?`    | `boolean`          | `false`  | Whether to show a clear button when the input has value                      |
-| `showPassword?` | `boolean`          | `false`  | Whether to show a password toggle button (only works with type='password')   |
-| `showCount?`    | `boolean`          | `false`  | Whether to show a character count (requires maxLength to show "current/max") |
-| `disabled?`     | `boolean`          | `false`  | Whether the input is disabled                                                |
-| `readonly?`     | `boolean`          | `false`  | Whether the input is readonly                                                |
-| `value?`        | `string \| number` | `-`      | Input value (for controlled mode)                                            |
-| `name?`         | `string`           | `-`      | Input name attribute                                                         |
+| Prop            | Type        | Default  | Notes                                                                        |
+| --------------- | ----------- | -------- | ---------------------------------------------------------------------------- |
+| `type?`         | `InputType` | `'text'` | Input type                                                                   |
+| `clearable?`    | `boolean`   | `false`  | Whether to show a clear button when the input has value                      |
+| `showPassword?` | `boolean`   | `false`  | Whether to show a password toggle button (only works with type='password')   |
+| `showCount?`    | `boolean`   | `false`  | Whether to show a character count (requires maxLength to show "current/max") |
 
 ## InputGroup
 
@@ -199,38 +166,31 @@ Note: 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 
 
 ## InputNumber
 
-`packages/core/src/types/input-number.ts` · `InputNumberProps` · 8/25 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 4/25 props
 
 Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。
 
-| Prop                | Type                | Default     | Notes                                                                         |
-| ------------------- | ------------------- | ----------- | ----------------------------------------------------------------------------- |
-| `min?`              | `number`            | `-Infinity` | Minimum value                                                                 |
-| `max?`              | `number`            | `Infinity`  | Maximum value                                                                 |
-| `step?`             | `number`            | `1`         | Step increment                                                                |
-| `precision?`        | `number`            | `-`         | Number of decimal places                                                      |
-| `controls?`         | `boolean`           | `true`      | Whether to show +/- step buttons                                              |
-| `controlsPosition?` | `'right' \| 'both'` | `'right'`   | Position of step controls. `'right'` is the inline-end stack (trailing side). |
-| `disabled?`         | `boolean`           | `false`     | Whether the input is disabled                                                 |
-| `value?`            | `number \| null`    | `-`         | Current value (controlled mode)                                               |
+| Prop         | Type     | Default     | Notes                    |
+| ------------ | -------- | ----------- | ------------------------ |
+| `min?`       | `number` | `-Infinity` | Minimum value            |
+| `max?`       | `number` | `Infinity`  | Maximum value            |
+| `step?`      | `number` | `1`         | Step increment           |
+| `precision?` | `number` | `-`         | Number of decimal places |
 
 ## InputOTP
 
-`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 7/20 props
+`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 4/20 props
 
-| Prop        | Type           | Default     | Notes                                                                                      |
-| ----------- | -------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `length?`   | `number`       | `6`         | Number of character slots                                                                  |
-| `value?`    | `string`       | `-`         | Value (for controlled mode) — the joined characters, at most `length` long                 |
-| `type?`     | `InputOTPType` | `'numeric'` | Allowed character set; drives per-character filtering and `inputmode`                      |
-| `masked?`   | `boolean`      | `false`     | Hide entered characters — each filled slot renders `maskChar` instead                      |
-| `groups?`   | `number[]`     | `-`         | Visual slot grouping, e.g. `[3, 3]`; ignored (with a dev warning) unless the group size... |
-| `disabled?` | `boolean`      | `false`     | Whether the input is disabled                                                              |
-| `name?`     | `string`       | `-`         | Name for the hidden input carrying the joined value (form submission)                      |
+| Prop      | Type           | Default     | Notes                                                                      |
+| --------- | -------------- | ----------- | -------------------------------------------------------------------------- |
+| `length?` | `number`       | `6`         | Number of character slots                                                  |
+| `value?`  | `string`       | `-`         | Value (for controlled mode) — the joined characters, at most `length` long |
+| `type?`   | `InputOTPType` | `'numeric'` | Allowed character set; drives per-character filtering and `inputmode`      |
+| `masked?` | `boolean`      | `false`     | Hide entered characters — each filled slot renders `maskChar` instead      |
 
 ## MaskInput
 
-`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 6/18 props
+`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 4/18 props
 
 | Prop         | Type                        | Default | Notes                                                                                      |
 | ------------ | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -238,12 +198,10 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 | `value?`     | `string`                    | `-`     | Raw (unmasked) value (for controlled mode)                                                 |
 | `tokens?`    | `Record<string, MaskToken>` | `-`     | Custom tokens merged over the built-ins                                                    |
 | `clearable?` | `boolean`                   | `false` | Whether to show a clear button when the input has value                                    |
-| `disabled?`  | `boolean`                   | `false` | Whether the input is disabled                                                              |
-| `name?`      | `string`                    | `-`     | Input name attribute. When set, a hidden input with this name submits the raw (unmasked... |
 
 ## Mentions
 
-`packages/core/src/types/mentions.ts` · `MentionsProps` · 8/24 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 4/24 props
 
 | Prop            | Type                   | Default | Notes                                                                    |
 | --------------- | ---------------------- | ------- | ------------------------------------------------------------------------ |
@@ -251,14 +209,10 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 | `value?`        | `string`               | `-`     | Textarea value. `undefined` is uncontrolled; `''` is a legal empty body. |
 | `prefix?`       | `string \| string[]`   | `'@'`   | Trigger character(s). A single character or several (`['@', '#']`).      |
 | `filterOption?` | `MentionsFilterOption` | `true`  | Local filter. Default matches both `label` and `value`.                  |
-| `open?`         | `boolean`              | `-`     | Controlled open state. `undefined` is uncontrolled.                      |
-| `disabled?`     | `boolean`              | `-`     | Disabled state                                                           |
-| `loading?`      | `boolean`              | `-`     | Show a loading state instead of treating an empty list as no match       |
-| `name?`         | `string`               | `-`     | Native name attribute on the textarea                                    |
 
 ## NumberKeyboard
 
-`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 8/20 props
+`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 4/20 props
 
 Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。
 
@@ -268,10 +222,6 @@ Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host �
 | `defaultValue?` | `string`             | `-`        | -                                                                                  |
 | `mode?`         | `NumberKeyboardMode` | `'number'` | -                                                                                  |
 | `open?`         | `boolean`            | `-`        | Controlled sheet visibility. Passing `open` or `defaultOpen` selects overlay mode. |
-| `maxLength?`    | `number`             | `-`        | -                                                                                  |
-| `precision?`    | `number`             | `2`        | Fractional digits in `amount` mode.                                                |
-| `showConfirm?`  | `boolean`            | `true`     | -                                                                                  |
-| `disabled?`     | `boolean`            | `false`    | -                                                                                  |
 
 Events/callback props: `onChange?`, `onOpenChange?`.
 
@@ -288,20 +238,18 @@ Events/callback props: `onChange?`, `onOpenChange?`.
 
 ## RadioGroup
 
-`packages/core/src/types/radio.ts` · `RadioGroupProps` · 6/11 props
+`packages/core/src/types/radio.ts` · `RadioGroupProps` · 4/11 props
 
-| Prop            | Type                   | Default      | Notes                                        |
-| --------------- | ---------------------- | ------------ | -------------------------------------------- |
-| `value?`        | `string \| number`     | `-`          | Current selected value (controlled mode)     |
-| `defaultValue?` | `string \| number`     | `-`          | Default selected value (uncontrolled mode)   |
-| `name?`         | `string`               | `-`          | Name attribute for radio inputs in the group |
-| `disabled?`     | `boolean`              | `false`      | Whether all radios in the group are disabled |
-| `size?`         | `ComponentSize`        | `'md'`       | Radio size for all radios in the group       |
-| `direction?`    | `ChoiceGroupDirection` | `'vertical'` | Layout direction                             |
+| Prop            | Type               | Default | Notes                                        |
+| --------------- | ------------------ | ------- | -------------------------------------------- |
+| `value?`        | `string \| number` | `-`     | Current selected value (controlled mode)     |
+| `defaultValue?` | `string \| number` | `-`     | Default selected value (uncontrolled mode)   |
+| `name?`         | `string`           | `-`     | Name attribute for radio inputs in the group |
+| `disabled?`     | `boolean`          | `false` | Whether all radios in the group are disabled |
 
 ## Select
 
-`packages/vue/src/components/Select.ts` · `VueSelectProps` · 8/33 props
+`packages/vue/src/components/Select.ts` · `VueSelectProps` · 4/33 props
 
 Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。
 
@@ -311,63 +259,47 @@ Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React �
 | `defaultValue?` | `SelectModelValue` | `-`     | -     |
 | `multiple?`     | `boolean`          | `-`     | -     |
 | `searchable?`   | `boolean`          | `-`     | -     |
-| `clearable?`    | `boolean`          | `-`     | -     |
-| `virtual?`      | `boolean`          | `-`     | -     |
-| `creatable?`    | `boolean`          | `-`     | -     |
-| `remote?`       | `boolean`          | `-`     | -     |
 
 ## Signature
 
-`packages/core/src/types/signature.ts` · `SignatureProps` · 8/21 props
+`packages/core/src/types/signature.ts` · `SignatureProps` · 4/21 props
 
 Note: 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。
 
-| Prop            | Type                  | Default       | Notes                                                                     |
-| --------------- | --------------------- | ------------- | ------------------------------------------------------------------------- |
-| `value?`        | `string`              | `-`           | Controlled value. SVG data URL or `''`. `undefined` is uncontrolled.      |
-| `defaultValue?` | `string`              | `-`           | Initial SVG data URL for uncontrolled mode.                               |
-| `exportType?`   | `SignatureExportType` | `'image/png'` | Format for `toDataURL()`. The controlled `value` is always SVG.           |
-| `readonly?`     | `boolean`             | `false`       | Focusable, not drawable. Distinct from `disabled`.                        |
-| `clearable?`    | `boolean`             | `true`        | -                                                                         |
-| `disabled?`     | `boolean`             | `false`       | -                                                                         |
-| `penColor?`     | `string`              | `-`           | Stroke color. Defaults to `--tiger-text` (resolved from computed styles). |
-| `width?`        | `number`              | `-`           | Logical canvas width in CSS pixels. Omit to follow the container (100%).  |
+| Prop            | Type                  | Default       | Notes                                                                |
+| --------------- | --------------------- | ------------- | -------------------------------------------------------------------- |
+| `value?`        | `string`              | `-`           | Controlled value. SVG data URL or `''`. `undefined` is uncontrolled. |
+| `defaultValue?` | `string`              | `-`           | Initial SVG data URL for uncontrolled mode.                          |
+| `exportType?`   | `SignatureExportType` | `'image/png'` | Format for `toDataURL()`. The controlled `value` is always SVG.      |
+| `readonly?`     | `boolean`             | `false`       | Focusable, not drawable. Distinct from `disabled`.                   |
 
 Events/callback props: `onChange?`.
 
 ## Slider
 
-`packages/core/src/types/slider.ts` · `SliderProps` · 8/14 props
+`packages/core/src/types/slider.ts` · `SliderProps` · 4/14 props
 
-| Prop            | Type                                | Default | Notes                                                                                     |
-| --------------- | ----------------------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `value?`        | `number \| [number, number]`        | `-`     | Current value of the slider For single slider, this is a number For range slider, this... |
-| `defaultValue?` | `number \| [number, number]`        | `-`     | Default value                                                                             |
-| `min?`          | `number`                            | `0`     | Minimum value                                                                             |
-| `max?`          | `number`                            | `100`   | Maximum value                                                                             |
-| `step?`         | `number`                            | `1`     | Step value for slider movement                                                            |
-| `range?`        | `boolean`                           | `false` | Whether to enable range selection                                                         |
-| `marks?`        | `boolean \| Record<number, string>` | `false` | Whether to show marks on the slider                                                       |
-| `disabled?`     | `boolean`                           | `false` | Whether the slider is disabled                                                            |
+| Prop            | Type                         | Default | Notes                                                                                     |
+| --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `value?`        | `number \| [number, number]` | `-`     | Current value of the slider For single slider, this is a number For range slider, this... |
+| `defaultValue?` | `number \| [number, number]` | `-`     | Default value                                                                             |
+| `min?`          | `number`                     | `0`     | Minimum value                                                                             |
+| `max?`          | `number`                     | `100`   | Maximum value                                                                             |
 
 ## Stepper
 
-`packages/core/src/types/stepper.ts` · `StepperProps` · 8/12 props
+`packages/core/src/types/stepper.ts` · `StepperProps` · 4/12 props
 
-| Prop            | Type            | Default     | Notes                           |
-| --------------- | --------------- | ----------- | ------------------------------- |
-| `value?`        | `number`        | `-`         | Controlled value                |
-| `defaultValue?` | `number`        | `-`         | Uncontrolled initial value      |
-| `min?`          | `number`        | `-Infinity` | Minimum value                   |
-| `max?`          | `number`        | `Infinity`  | Maximum value                   |
-| `step?`         | `number`        | `1`         | Step increment                  |
-| `disabled?`     | `boolean`       | `false`     | Whether the stepper is disabled |
-| `size?`         | `ComponentSize` | `'md'`      | Component size                  |
-| `precision?`    | `number`        | `-`         | Precision (decimal places)      |
+| Prop            | Type     | Default     | Notes                      |
+| --------------- | -------- | ----------- | -------------------------- |
+| `value?`        | `number` | `-`         | Controlled value           |
+| `defaultValue?` | `number` | `-`         | Uncontrolled initial value |
+| `min?`          | `number` | `-Infinity` | Minimum value              |
+| `max?`          | `number` | `Infinity`  | Maximum value              |
 
 ## Switch
 
-`packages/core/src/types/switch.ts` · `SwitchProps` · 6/12 props
+`packages/core/src/types/switch.ts` · `SwitchProps` · 4/12 props
 
 | Prop              | Type            | Default | Notes                                     |
 | ----------------- | --------------- | ------- | ----------------------------------------- |
@@ -375,12 +307,10 @@ Events/callback props: `onChange?`.
 | `defaultChecked?` | `boolean`       | `false` | Default checked state (uncontrolled mode) |
 | `disabled?`       | `boolean`       | `false` | Whether the switch is disabled            |
 | `size?`           | `ComponentSize` | `'md'`  | Switch size                               |
-| `name?`           | `string`        | `-`     | Native form name (hidden checkbox)        |
-| `value?`          | `string`        | `'on'`  | Native form value when checked            |
 
 ## TagsInput
 
-`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 8/20 props
+`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 4/20 props
 
 | Prop               | Type       | Default | Notes                                                                                      |
 | ------------------ | ---------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -388,28 +318,21 @@ Events/callback props: `onChange?`.
 | `max?`             | `number`   | `-`     | Maximum number of tags; further adds are rejected while the input stays focusable for r... |
 | `delimiters?`      | `string[]` | `[',']` | Characters that commit the pending input while typing and split pasted text into multip... |
 | `allowDuplicates?` | `boolean`  | `false` | Whether the same tag may be added more than once (case-sensitive comparison). When dupl... |
-| `addOnBlur?`       | `boolean`  | `false` | Commit the pending input as a tag on blur                                                  |
-| `clearable?`       | `boolean`  | `false` | Whether to show a clear-all button when there are tags                                     |
-| `disabled?`        | `boolean`  | `false` | Whether the input is disabled                                                              |
-| `name?`            | `string`   | `-`     | Name for the hidden input carrying the joined value (form submission)                      |
 
 ## Textarea
 
-`packages/core/src/types/textarea.ts` · `TextareaProps` · 7/25 props
+`packages/core/src/types/textarea.ts` · `TextareaProps` · 4/25 props
 
-| Prop          | Type          | Default     | Notes                                |
-| ------------- | ------------- | ----------- | ------------------------------------ |
-| `rows?`       | `number`      | `3`         | Number of visible text rows          |
-| `autoResize?` | `boolean`     | `false`     | Enable auto-resize to fit content    |
-| `showCount?`  | `boolean`     | `false`     | Show character count                 |
-| `status?`     | `InputStatus` | `'default'` | Validation status                    |
-| `value?`      | `string`      | `-`         | Textarea value (for controlled mode) |
-| `disabled?`   | `boolean`     | `false`     | Whether the textarea is disabled     |
-| `name?`       | `string`      | `-`         | Textarea name attribute              |
+| Prop          | Type          | Default     | Notes                             |
+| ------------- | ------------- | ----------- | --------------------------------- |
+| `rows?`       | `number`      | `3`         | Number of visible text rows       |
+| `autoResize?` | `boolean`     | `false`     | Enable auto-resize to fit content |
+| `showCount?`  | `boolean`     | `false`     | Show character count              |
+| `status?`     | `InputStatus` | `'default'` | Validation status                 |
 
 ## TimePicker
 
-`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 8/31 props
+`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/31 props
 
 Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。
 
@@ -419,16 +342,12 @@ Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显
 | `defaultValue?` | `TimePickerModelValue \| null` | `-`     | -                                                        |
 | `range?`        | `boolean`                      | `false` | -                                                        |
 | `format?`       | `TimeFormat`                   | `'24'`  | Display / typed-parse clock. Stored value stays 24-hour. |
-| `showSeconds?`  | `boolean`                      | `false` | -                                                        |
-| `open?`         | `boolean`                      | `-`     | -                                                        |
-| `placeholder?`  | `string`                       | `-`     | -                                                        |
-| `disabled?`     | `boolean`                      | `false` | -                                                        |
 
 Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## Transfer
 
-`packages/core/src/types/transfer.ts` · `TransferProps` · 7/21 props
+`packages/core/src/types/transfer.ts` · `TransferProps` · 4/21 props
 
 | Prop          | Type                   | Default | Notes                                                                                      |
 | ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -436,30 +355,25 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 | `value?`      | `(string \| number)[]` | `-`     | Controlled target keys. `undefined` is uncontrolled; `[]` is a real empty target list.     |
 | `targetKeys?` | `(string \| number)[]` | `-`     | Keys of items in the right (target) list. Alias of `value` with lower priority. Both se... |
 | `searchable?` | `boolean`              | `-`     | Whether to show search input in each panel                                                 |
-| `disabled?`   | `boolean`              | `-`     | Whether the component is disabled                                                          |
-| `name?`       | `string`               | `-`     | Native form field name. Each target key is one hidden input.                               |
-| `locale?`     | `Partial<TigerLocale>` | `-`     | Locale overlay merged on ConfigProvider locale                                             |
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 8/36 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/36 props
 
 Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。
 
-| Prop                | Type              | Default | Notes                                                                                      |
-| ------------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `treeData?`         | `TreeNode[]`      | `-`     | Tree data                                                                                  |
-| `value?`            | `TreeSelectValue` | `-`     | Selected key(s). `undefined` is empty / uncontrolled; `''` is a legal key.                 |
-| `defaultValue?`     | `TreeSelectValue` | `-`     | Initial value when `value` is omitted.                                                     |
-| `multiple?`         | `boolean`         | `false` | Multiple selection with checkboxes. Parent/child cascade follows `checkStrictly` / `che... |
-| `searchable?`       | `boolean`         | `-`     | Whether to show search input in the trigger when open                                      |
-| `clearable?`        | `boolean`         | `-`     | Whether to show clear button                                                               |
-| `virtual?`          | `boolean`         | `false` | Enable virtualized rendering of the dropdown tree.                                         |
-| `defaultExpandAll?` | `boolean`         | `-`     | Whether to expand all tree nodes by default                                                |
+| Prop            | Type              | Default | Notes                                                                                      |
+| --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `treeData?`     | `TreeNode[]`      | `-`     | Tree data                                                                                  |
+| `value?`        | `TreeSelectValue` | `-`     | Selected key(s). `undefined` is empty / uncontrolled; `''` is a legal key.                 |
+| `defaultValue?` | `TreeSelectValue` | `-`     | Initial value when `value` is omitted.                                                     |
+| `multiple?`     | `boolean`         | `false` | Multiple selection with checkboxes. Parent/child cascade follows `checkStrictly` / `che... |
+
+Events/callback props: `onOpenChange?`.
 
 ## Upload
 
-`packages/core/src/types/upload.ts` · `UploadProps` · 8/28 props
+`packages/core/src/types/upload.ts` · `UploadProps` · 4/28 props
 
 | Prop             | Type                                                                | Default  | Notes                                                                                      |
 | ---------------- | ------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
@@ -467,9 +381,5 @@ Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined
 | `drag?`          | `boolean`                                                           | `false`  | Whether to enable drag and drop                                                            |
 | `listType?`      | `UploadListType`                                                    | `'text'` | List type for displaying files                                                             |
 | `customRequest?` | `(options: UploadRequestOptions) => void \| { abort?: () => void }` | `-`      | Custom upload request. Return `{ abort }` or call `options.onAbort` in the same tick so... |
-| `action?`        | `string`                                                            | `-`      | Upload URL. Used when `customRequest` is omitted. Posts `FormData` with the file under...  |
-| `autoUpload?`    | `boolean`                                                           | `true`   | Whether to start uploading as soon as files are accepted. When `false`, files stay `rea... |
-| `disabled?`      | `boolean`                                                           | `false`  | Whether the upload is disabled                                                             |
-| `maxSize?`       | `number`                                                            | `-`      | Maximum file size in bytes. `undefined` or `0` means no limit.                             |
 
 Events/callback props: `onQueueChange?`, `onChunkProgress?`, `onChange?`, `onRemove?`, `onReject?`, `onPreview?`, ....

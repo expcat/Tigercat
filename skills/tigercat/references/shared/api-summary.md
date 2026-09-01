@@ -7,11 +7,11 @@ description: Compact generated route map for Tigercat core type files
 
 # Tigercat API Summary
 
-> 自动生成。只用于定位类型文件、Props 接口和公开 hook；组件路由看 component-index，字段细节看分类 props 文档或源码。
+> 自动生成。类型定位表；字段看分类 props 或源码。
 
 ## Public hooks
 
-`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue); `useResponsiveChartSize` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. React `useControlledState({ value, defaultValue, onChange, postState })`; T cannot be a function. `useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })`: wrap items with `getDragItemProps` / `getDragItemAttrs` and the parent with the drop-zone bindings; merge extra `className`/`class`. Cross-container needs `config.crossContainer` and distinct `containerId`s. Pointer reorder; keyboard via move buttons or your own keys. Types: `packages/core/src/types/drag.ts`. `useChartInteraction`: click is independent of `selectable`; deselect emits `null` on the select channel. `useResponsiveChartSize` shares ChartCanvas's observed size.
+`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue); `useResponsiveChartSize` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. See each hook's types for options.
 
 ## Basic
 
@@ -144,7 +144,6 @@ description: Compact generated route map for Tigercat core type files
 
 | Type File              | Props Interfaces                                                                                                                                                                                                     |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| chart.ts               | -                                                                                                                                                                                                                    |
 | chart-core.ts          | BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartLegendProps, ChartBuiltInTooltipProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps |
 | chart-cartesian.ts     | BarChartProps, ScatterChartProps, LineChartProps, AreaChartProps                                                                                                                                                     |
 | chart-radial.ts        | PieChartProps, DonutChartProps, RadarChartProps, GaugeChartProps                                                                                                                                                     |
@@ -157,7 +156,6 @@ description: Compact generated route map for Tigercat core type files
 | Type File           | Props Interfaces     |
 | ------------------- | -------------------- |
 | code-editor.ts      | CodeEditorProps      |
-| drag.ts             | -                    |
 | file-manager.ts     | FileManagerProps     |
 | image-annotation.ts | ImageAnnotationProps |
 | image-viewer.ts     | ImageViewerProps     |
@@ -176,7 +174,6 @@ description: Compact generated route map for Tigercat core type files
 | activity-feed.ts       | ActivityFeedProps                            |
 | chat.ts                | ChatWindowProps                              |
 | comment-thread.ts      | CommentThreadProps                           |
-| composite.ts           | -                                            |
 | form-wizard.ts         | FormWizardProps                              |
 | notification-center.ts | NotificationCenterProps                      |
 | table-toolbar.ts       | TableToolbarProps, DataTableWithToolbarProps |
@@ -187,17 +184,11 @@ description: Compact generated route map for Tigercat core type files
 | Type File         | Props Interfaces                                            |
 | ----------------- | ----------------------------------------------------------- |
 | base.ts           | BaseInteractiveProps, BaseFormControlProps, BaseLayoutProps |
-| events.ts         | -                                                           |
 | floating-popup.ts | BaseFloatingPopupProps                                      |
 | generics.ts       | GenericSelectProps, GenericFormFieldProps                   |
-| locale.ts         | -                                                           |
-| slots.ts          | -                                                           |
-| theme.ts          | -                                                           |
 
 ## Other
 
 | Type File          | Props Interfaces    |
 | ------------------ | ------------------- |
 | config-provider.ts | ConfigProviderProps |
-| scroll-root.ts     | -                   |
-| viewport.ts        | -                   |

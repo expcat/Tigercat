@@ -24,16 +24,14 @@ Events/callback props: `onChange?`.
 
 ## Anchor
 
-`packages/core/src/types/anchor.ts` · `AnchorProps` · 6/14 props
+`packages/core/src/types/anchor.ts` · `AnchorProps` · 4/14 props
 
-| Prop            | Type                   | Default      | Notes                                                                                      |
-| --------------- | ---------------------- | ------------ | ------------------------------------------------------------------------------------------ |
-| `getContainer?` | `ScrollRootInput`      | `window`     | Scroll container for spy / scrollTo. Selector, Element, Window, or getter.                 |
-| `direction?`    | `AnchorDirection`      | `'vertical'` | Direction of the anchor navigation                                                         |
-| `targetOffset?` | `number`               | `-`          | Offset when scrolling to a target section                                                  |
-| `affix?`        | `boolean`              | `true`       | Whether to pin the anchor with Affix (placeholder + live geometry).                        |
-| `offsetTop?`    | `number`               | `0`          | Offset from top of the scroll root when Affix is on, and fallback scroll offset when `t... |
-| `locale?`       | `Partial<TigerLocale>` | `-`          | -                                                                                          |
+| Prop            | Type              | Default      | Notes                                                                      |
+| --------------- | ----------------- | ------------ | -------------------------------------------------------------------------- |
+| `getContainer?` | `ScrollRootInput` | `window`     | Scroll container for spy / scrollTo. Selector, Element, Window, or getter. |
+| `direction?`    | `AnchorDirection` | `'vertical'` | Direction of the anchor navigation                                         |
+| `targetOffset?` | `number`          | `-`          | Offset when scrolling to a target section                                  |
+| `affix?`        | `boolean`         | `true`       | Whether to pin the anchor with Affix (placeholder + live geometry).        |
 
 Events/callback props: `onClick?`, `onChange?`.
 
@@ -49,15 +47,14 @@ Events/callback props: `onClick?`, `onChange?`.
 
 ## BackTop
 
-`packages/core/src/types/back-top.ts` · `BackTopProps` · 5/11 props
+`packages/core/src/types/back-top.ts` · `BackTopProps` · 4/11 props
 
-| Prop                | Type                   | Default          | Notes                                                                         |
-| ------------------- | ---------------------- | ---------------- | ----------------------------------------------------------------------------- |
-| `visibilityHeight?` | `number`               | `400`            | Scroll height to show the BackTop button. Non-finite values fall back to 400. |
-| `target?`           | `ScrollRootInput`      | `-`              | Scroll container. Selector, Element, Window, or getter. Defaults to `window`. |
-| `placement?`        | `ViewportPlacement`    | `'bottom-right'` | Viewport corner used when position is auto or fixed.                          |
-| `offset?`           | `ViewportOffset`       | `24`             | Viewport offset used when position is auto or fixed.                          |
-| `locale?`           | `Partial<TigerLocale>` | `-`              | -                                                                             |
+| Prop                | Type                | Default          | Notes                                                                         |
+| ------------------- | ------------------- | ---------------- | ----------------------------------------------------------------------------- |
+| `visibilityHeight?` | `number`            | `400`            | Scroll height to show the BackTop button. Non-finite values fall back to 400. |
+| `target?`           | `ScrollRootInput`   | `-`              | Scroll container. Selector, Element, Window, or getter. Defaults to `window`. |
+| `placement?`        | `ViewportPlacement` | `'bottom-right'` | Viewport corner used when position is auto or fixed.                          |
+| `offset?`           | `ViewportOffset`    | `24`             | Viewport offset used when position is auto or fixed.                          |
 
 ## Breadcrumb
 
@@ -83,16 +80,14 @@ Events/callback props: `onClick?`, `onChange?`.
 
 ## ContextMenu
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 6/11 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 4/11 props
 
-| Prop            | Type                | Default          | Notes                                                                                      |
-| --------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| `open?`         | `boolean`           | `-`              | Whether the menu is open (controlled mode)                                                 |
-| `disabled?`     | `boolean`           | `false`          | Whether the context menu is disabled                                                       |
-| `portal?`       | `boolean`           | `true`           | Portal the menu through the overlay target chain (overlay-host, then ConfigProvider roo... |
-| `closeOnClick?` | `boolean`           | `true`           | Whether to close the menu on item click                                                    |
-| `placement?`    | `FloatingPlacement` | `'bottom-start'` | Menu placement relative to the cursor point                                                |
-| `asChild?`      | `boolean`           | `false`          | Merge trigger ARIA / handlers onto the unique focusable child.                             |
+| Prop            | Type      | Default | Notes                                                                                      |
+| --------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `open?`         | `boolean` | `-`     | Whether the menu is open (controlled mode)                                                 |
+| `disabled?`     | `boolean` | `false` | Whether the context menu is disabled                                                       |
+| `portal?`       | `boolean` | `true`  | Portal the menu through the overlay target chain (overlay-host, then ConfigProvider roo... |
+| `closeOnClick?` | `boolean` | `true`  | Whether to close the menu on item click                                                    |
 
 ## ContextMenuItem
 
@@ -127,33 +122,29 @@ Events/callback props: `onClick?`, `onChange?`.
 
 ## Dropdown
 
-`packages/core/src/types/dropdown.ts` · `DropdownProps` · 7/14 props
+`packages/core/src/types/dropdown.ts` · `DropdownProps` · 4/14 props
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
 Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点那颗 button 上：文本触发器自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 子节点则合并到该节点。菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`）。`data-state="open" | "closed"` 与 `aria-expanded` 同步。Vue `#trigger="{ open }"` / React `renderTrigger={({ open }) => …}`。SplitButton 与 DataExport 走 `asChild`。
 
-| Prop            | Type                | Default          | Notes                                                                                      |
-| --------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| `trigger?`      | `DropdownTrigger`   | `'click'`        | Trigger mode - click or hover. Hover also opens on click, focus, and ArrowDown / ArrowUp.  |
-| `open?`         | `boolean`           | `-`              | Whether the dropdown is open (controlled mode)                                             |
-| `disabled?`     | `boolean`           | `false`          | Whether the dropdown is disabled                                                           |
-| `portal?`       | `boolean`           | `true`           | Portal the menu through the overlay target chain (nearest overlay-host, then ConfigProv... |
-| `closeOnClick?` | `boolean`           | `true`           | Whether to close dropdown on menu item click                                               |
-| `placement?`    | `FloatingPlacement` | `'bottom-start'` | Dropdown placement relative to trigger                                                     |
-| `asChild?`      | `boolean`           | `false`          | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
+| Prop        | Type              | Default   | Notes                                                                                      |
+| ----------- | ----------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `trigger?`  | `DropdownTrigger` | `'click'` | Trigger mode - click or hover. Hover also opens on click, focus, and ArrowDown / ArrowUp.  |
+| `open?`     | `boolean`         | `-`       | Whether the dropdown is open (controlled mode)                                             |
+| `disabled?` | `boolean`         | `false`   | Whether the dropdown is disabled                                                           |
+| `portal?`   | `boolean`         | `true`    | Portal the menu through the overlay target chain (nearest overlay-host, then ConfigProv... |
 
 ## DropdownItem
 
-`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 5/7 props
+`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 4/7 props
 
-| Prop            | Type               | Default | Notes                                                                                      |
-| --------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `disabled?`     | `boolean`          | `false` | Whether the item is disabled                                                               |
-| `divided?`      | `boolean`          | `false` | Whether the item is divided from previous item                                             |
-| `closeOnClick?` | `boolean`          | `-`     | When set, overrides the parent Dropdown `closeOnClick`. Omitted inherits the parent (de... |
-| `href?`         | `string`           | `-`     | When set, the item renders as a link (`<a role="menuitem">`).                              |
-| `itemKey?`      | `string \| number` | `-`     | Stable item identity when rendering lists. Not a React/Vue vnode key.                      |
+| Prop            | Type      | Default | Notes                                                                                      |
+| --------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `disabled?`     | `boolean` | `false` | Whether the item is disabled                                                               |
+| `divided?`      | `boolean` | `false` | Whether the item is divided from previous item                                             |
+| `closeOnClick?` | `boolean` | `-`     | When set, overrides the parent Dropdown `closeOnClick`. Omitted inherits the parent (de... |
+| `href?`         | `string`  | `-`     | When set, the item renders as a link (`<a role="menuitem">`).                              |
 
 ## DropdownMenu
 
@@ -167,20 +158,18 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## FloatButton
 
-`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 6/13 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/13 props
 
-| Prop         | Type                   | Default          | Notes                                                          |
-| ------------ | ---------------------- | ---------------- | -------------------------------------------------------------- |
-| `floating?`  | `boolean`              | `false`          | Whether the standalone button should be fixed to the viewport. |
-| `placement?` | `ViewportPlacement`    | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
-| `offset?`    | `ViewportOffset`       | `24`             | Fixed viewport offset used when floating is true.              |
-| `ariaLabel?` | `string`               | `-`              | Accessible label                                               |
-| `disabled?`  | `boolean`              | `false`          | Whether the button is disabled                                 |
-| `locale?`    | `Partial<TigerLocale>` | `-`              | -                                                              |
+| Prop         | Type                | Default          | Notes                                                          |
+| ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |
+| `floating?`  | `boolean`           | `false`          | Whether the standalone button should be fixed to the viewport. |
+| `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
+| `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when floating is true.              |
+| `ariaLabel?` | `string`            | `-`              | Accessible label                                               |
 
 ## FloatButtonGroup
 
-`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 5/12 props
+`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 4/12 props
 
 | Prop         | Type                 | Default          | Notes                                                                                      |
 | ------------ | -------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
@@ -188,30 +177,21 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 | `open?`      | `boolean`            | `-`              | Whether the group is open (controlled)                                                     |
 | `portal?`    | `boolean`            | `true`           | Whether to portal the group to `document.body`. When false, the group is positioned `ab... |
 | `placement?` | `ViewportPlacement`  | `'bottom-right'` | Viewport corner used for the group.                                                        |
-| `shape?`     | `FloatButtonShape`   | `'circle'`       | Shape applied to all child buttons                                                         |
+
+Events/callback props: `onOpenChange?`.
 
 ## Menu
 
-`packages/core/src/types/menu.ts` · `MenuProps` · 6/19 props
+`packages/core/src/types/menu.ts` · `MenuProps` · 4/19 props
 
-| Prop            | Type         | Default      | Notes                                                                                      |
-| --------------- | ------------ | ------------ | ------------------------------------------------------------------------------------------ |
-| `items?`        | `MenuItem[]` | `-`          | Data-driven menu items. Slot/children based usage is still supported.                      |
-| `selectedKeys?` | `MenuKey[]`  | `-`          | Currently selected menu item keys. Selection is always single-key: the array is empty o... |
-| `openKeys?`     | `MenuKey[]`  | `-`          | Currently opened submenu keys (inline, vertical, and popup).                               |
-| `collapsed?`    | `boolean`    | `false`      | Collapse vertical/inline menus to icons (or first letter) and popup submenus. Horizonta... |
-| `searchable?`   | `boolean`    | `false`      | Whether to render a built-in search field for filtering data-driven `items`.               |
-| `mode?`         | `MenuMode`   | `'vertical'` | Menu mode - horizontal, vertical, or inline                                                |
+| Prop            | Type         | Default | Notes                                                                                      |
+| --------------- | ------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`        | `MenuItem[]` | `-`     | Data-driven menu items. Slot/children based usage is still supported.                      |
+| `selectedKeys?` | `MenuKey[]`  | `-`     | Currently selected menu item keys. Selection is always single-key: the array is empty o... |
+| `openKeys?`     | `MenuKey[]`  | `-`     | Currently opened submenu keys (inline, vertical, and popup).                               |
+| `collapsed?`    | `boolean`    | `false` | Collapse vertical/inline menus to icons (or first letter) and popup submenus. Horizonta... |
 
-### Collapsed mode behavior
-
-`collapsed` 只作用于 vertical / inline：容器收窄到图标列，子菜单改走 popup（`inline`+`collapsed` 会把 mode 收成 vertical）。horizontal 会忽略该 prop 并 `devWarn`。
-
-- **图标居中**：折叠态去掉图标的 `me-2`，只留 `flex-shrink-0`。
-- **标签 sr-only 保留**：可访问名称仍是完整标签，不是首字母。
-- **首字母回退**：无图标且 children 是纯文本时显示首字母（`aria-hidden`）。非文本 children 不造 `[`。
-- **子菜单箭头隐藏**：折叠态不渲染 ExpandIcon；标题走同一套 collapsed item class。
-- **popupPortal**：默认 `true`，飞出层走 overlay-host 链，避免父级 overflow 裁切。
+`collapsed` only applies to vertical/inline (horizontal `devWarn`s). Labels stay `sr-only`; text-only items show a first-letter glyph. `popupPortal` defaults true.
 
 ## MenuItem
 
@@ -236,17 +216,14 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## NavigationMenu
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 7/16 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 4/16 props
 
-| Prop            | Type                          | Default          | Notes                                                                                      |
-| --------------- | ----------------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| `value?`        | `NavigationMenuValue \| null` | `-`              | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
-| `open?`         | `boolean`                     | `-`              | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
-| `portal?`       | `boolean`                     | `true`           | Portal panels through the overlay target chain (overlay-host, then ConfigProvider root,... |
-| `closeOnClick?` | `boolean`                     | `true`           | Whether to close the open panel when a link or item is clicked                             |
-| `disabled?`     | `boolean`                     | `false`          | Whether the navigation menu is disabled                                                    |
-| `placement?`    | `FloatingPlacement`           | `'bottom-start'` | Panel placement relative to the trigger                                                    |
-| `openOnHover?`  | `boolean`                     | `false`          | Open the hovered trigger's panel after `delayDuration`. Focus never opens a panel; Ente... |
+| Prop            | Type                          | Default | Notes                                                                                      |
+| --------------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
+| `open?`         | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
+| `portal?`       | `boolean`                     | `true`  | Portal panels through the overlay target chain (overlay-host, then ConfigProvider root,... |
+| `closeOnClick?` | `boolean`                     | `true`  | Whether to close the open panel when a link or item is clicked                             |
 
 ## NavigationMenuContent
 
@@ -301,70 +278,58 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## PageHeader
 
-`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 6/14 props
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 4/14 props
 
-| Prop             | Type                   | Default | Notes                                                                                      |
-| ---------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `title?`         | `string`               | `-`     | Page title. Rendered as a heading (`h1` by default).                                       |
-| `subTitle?`      | `string`               | `-`     | Secondary text shown beside the title                                                      |
-| `showBack?`      | `boolean`              | `-`     | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
-| `backHref?`      | `string`               | `-`     | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
-| `backAriaLabel?` | `string`               | `-`     | Accessible name for the default back control. Falls back to the locale `pageHeader.back... |
-| `locale?`        | `Partial<TigerLocale>` | `-`     | -                                                                                          |
+| Prop        | Type      | Default | Notes                                                                                      |
+| ----------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `title?`    | `string`  | `-`     | Page title. Rendered as a heading (`h1` by default).                                       |
+| `subTitle?` | `string`  | `-`     | Secondary text shown beside the title                                                      |
+| `showBack?` | `boolean` | `-`     | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
+| `backHref?` | `string`  | `-`     | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
 
 ## Pagination
 
-`packages/core/src/types/pagination.ts` · `PaginationProps` · 8/22 props
+`packages/core/src/types/pagination.ts` · `PaginationProps` · 4/22 props
 
-| Prop                | Type      | Default | Notes                                                |
-| ------------------- | --------- | ------- | ---------------------------------------------------- |
-| `total?`            | `number`  | `0`     | Total number of items                                |
-| `current?`          | `number`  | `1`     | Current page number (1-indexed)                      |
-| `pageSize?`         | `number`  | `10`    | Number of items per page                             |
-| `simple?`           | `boolean` | `false` | Simple mode - only show prev/next buttons            |
-| `showQuickJumper?`  | `boolean` | `false` | Whether to show quick jumper (input for page number) |
-| `showSizeChanger?`  | `boolean` | `false` | Whether to show page size selector                   |
-| `disabled?`         | `boolean` | `false` | Whether pagination is disabled                       |
-| `hideOnSinglePage?` | `boolean` | `false` | Whether to hide pagination on single page            |
+| Prop        | Type      | Default | Notes                                     |
+| ----------- | --------- | ------- | ----------------------------------------- |
+| `total?`    | `number`  | `0`     | Total number of items                     |
+| `current?`  | `number`  | `1`     | Current page number (1-indexed)           |
+| `pageSize?` | `number`  | `10`    | Number of items per page                  |
+| `simple?`   | `boolean` | `false` | Simple mode - only show prev/next buttons |
 
 ## ScrollSpy
 
-`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 5/13 props
+`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 4/13 props
 
-| Prop            | Type                   | Default | Notes                                                                                    |
-| --------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `items?`        | `ScrollSpyItem[]`      | `-`     | Nav tree. Required for a useful TOC.                                                     |
-| `getContainer?` | `ScrollRootInput`      | `-`     | Scroll root: selector, element, window, or getter. Invalid values fall back to `window`. |
-| `direction?`    | `ScrollSpyDirection`   | `-`     | -                                                                                        |
-| `activeKey?`    | `ScrollSpyKey`         | `-`     | -                                                                                        |
-| `locale?`       | `Partial<TigerLocale>` | `-`     | -                                                                                        |
+| Prop            | Type                 | Default | Notes                                                                                    |
+| --------------- | -------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `items?`        | `ScrollSpyItem[]`    | `-`     | Nav tree. Required for a useful TOC.                                                     |
+| `getContainer?` | `ScrollRootInput`    | `-`     | Scroll root: selector, element, window, or getter. Invalid values fall back to `window`. |
+| `direction?`    | `ScrollSpyDirection` | `-`     | -                                                                                        |
+| `activeKey?`    | `ScrollSpyKey`       | `-`     | -                                                                                        |
 
 ## Spotlight
 
-`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 5/21 props
+`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/21 props
 
-| Prop      | Type                   | Default | Notes                                                                                      |
-| --------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `items?`  | `SpotlightItem[]`      | `-`     | -                                                                                          |
-| `open?`   | `boolean`              | `-`     | -                                                                                          |
-| `hotkey?` | `boolean \| string`    | `-`     | Global toggle chord. `true` (default) is `Meta/Ctrl+K`; `false` disables; a string uses... |
-| `query?`  | `string`               | `-`     | -                                                                                          |
-| `locale?` | `Partial<TigerLocale>` | `-`     | -                                                                                          |
+| Prop      | Type                | Default | Notes                                                                                      |
+| --------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`  | `SpotlightItem[]`   | `-`     | -                                                                                          |
+| `open?`   | `boolean`           | `-`     | -                                                                                          |
+| `hotkey?` | `boolean \| string` | `-`     | Global toggle chord. `true` (default) is `Meta/Ctrl+K`; `false` disables; a string uses... |
+| `query?`  | `string`            | `-`     | -                                                                                          |
 
 ## Steps
 
-`packages/core/src/types/steps.ts` · `StepsProps` · 8/12 props
+`packages/core/src/types/steps.ts` · `StepsProps` · 4/12 props
 
-| Prop         | Type                   | Default        | Notes                                                           |
-| ------------ | ---------------------- | -------------- | --------------------------------------------------------------- |
-| `current?`   | `number`               | `0`            | Current step index (0-based)                                    |
-| `clickable?` | `boolean`              | `false`        | Whether steps are clickable for navigation                      |
-| `status?`    | `StepStatus`           | `'process'`    | Step status (for current step)                                  |
-| `direction?` | `StepsDirection`       | `'horizontal'` | Steps direction/orientation                                     |
-| `simple?`    | `boolean`              | `false`        | Whether to use simple style (no description, smaller icons)     |
-| `size?`      | `StepSize`             | `'default'`    | Step size                                                       |
-| `items?`     | `StepItem[]`           | `-`            | Data-driven items. When set, `StepsItem` children are optional. |
-| `locale?`    | `Partial<TigerLocale>` | `-`            | -                                                               |
+| Prop         | Type             | Default        | Notes                                      |
+| ------------ | ---------------- | -------------- | ------------------------------------------ |
+| `current?`   | `number`         | `0`            | Current step index (0-based)               |
+| `clickable?` | `boolean`        | `false`        | Whether steps are clickable for navigation |
+| `status?`    | `StepStatus`     | `'process'`    | Step status (for current step)             |
+| `direction?` | `StepsDirection` | `'horizontal'` | Steps direction/orientation                |
 
 ## StepsItem
 
@@ -401,22 +366,18 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 ## Tabs
 
-`packages/core/src/types/tabs.ts` · `TabsProps` · 8/18 props
+`packages/core/src/types/tabs.ts` · `TabsProps` · 4/18 props
 
-| Prop                      | Type                   | Default  | Notes                                                                                      |
-| ------------------------- | ---------------------- | -------- | ------------------------------------------------------------------------------------------ |
-| `activeKey?`              | `string \| number`     | `-`      | Currently active tab key                                                                   |
-| `tabPosition?`            | `TabPosition`          | `'top'`  | Tab position - top, bottom, left, or right                                                 |
-| `closable?`               | `boolean`              | `false`  | Root close switch. Only draws close buttons when `type` is `'editable-card'`. Pane-leve... |
-| `destroyInactiveTabPane?` | `boolean`              | `false`  | Whether to destroy inactive tab panes                                                      |
-| `lazy?`                   | `boolean`              | `false`  | Whether to lazily render tab panes (only render when first activated)                      |
-| `swipeable?`              | `boolean`              | `false`  | Whether touch swipes switch tabs. Off by default so nested scrollers keep their gesture... |
-| `type?`                   | `TabType`              | `'line'` | Tab type: line, card, editable-card, or pills                                              |
-| `locale?`                 | `Partial<TigerLocale>` | `-`      | -                                                                                          |
+| Prop                      | Type               | Default | Notes                                                                                      |
+| ------------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `activeKey?`              | `string \| number` | `-`     | Currently active tab key                                                                   |
+| `tabPosition?`            | `TabPosition`      | `'top'` | Tab position - top, bottom, left, or right                                                 |
+| `closable?`               | `boolean`          | `false` | Root close switch. Only draws close buttons when `type` is `'editable-card'`. Pane-leve... |
+| `destroyInactiveTabPane?` | `boolean`          | `false` | Whether to destroy inactive tab panes                                                      |
 
 ## Tree
 
-`packages/core/src/types/tree.ts` · `TreeProps` · 8/35 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 4/35 props
 
 | Prop            | Type                                | Default | Notes                                                                                      |
 | --------------- | ----------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -424,9 +385,5 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 | `expandedKeys?` | `TreeNodeKey[]`                     | `-`     | Expanded node keys. `undefined` is uncontrolled; an array (including `[]`) is controlle... |
 | `selectedKeys?` | `TreeNodeKey[]`                     | `-`     | Selected node keys. `undefined` is uncontrolled; `[]` is controlled empty.                 |
 | `checkedKeys?`  | `TreeNodeKey[] \| TreeCheckedState` | `-`     | Checked node keys. Arrays in, arrays out. Objects are accepted as an input snapshot (`c... |
-| `loadData?`     | `TreeLoadDataFn`                    | `-`     | Whether to load data asynchronously. Must not mutate the incoming node.                    |
-| `virtual?`      | `boolean`                           | `false` | Enable virtualized rendering through `VirtualList`.                                        |
-| `filterValue?`  | `string`                            | `-`     | Filter query that **hides** unmatched nodes. Same channel as `searchValue`.                |
-| `searchable?`   | `boolean`                           | `false` | Whether to show the built-in search input. Does not open a second query source; bind `s... |
 
 Events/callback props: `onExpand?`, `onExpandedKeysChange?`, `onSelect?`, `onSelectedKeysChange?`, `onCheck?`, `onCheckedKeysChange?`, ....

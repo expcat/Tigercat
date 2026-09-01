@@ -11,37 +11,29 @@ description: Compact generated Tigercat Charts props reference
 
 ## AreaChart
 
-`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 8/53 props
+`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 4/53 props
 
-| Prop           | Type                | Default                           | Notes                                                      |
-| -------------- | ------------------- | --------------------------------- | ---------------------------------------------------------- |
-| `series?`      | `AreaChartSeries[]` | `-`                               | Multiple series                                            |
-| `stacked?`     | `boolean`           | `false`                           | Whether to stack areas                                     |
-| `gradient?`    | `boolean`           | `false`                           | Enable linear gradient fill (top-to-bottom, ECharts style) |
-| `showPoints?`  | `boolean`           | `false`                           | Whether to show data points                                |
-| `includeZero?` | `boolean`           | `true (different from LineChart)` | Include zero in Y domain                                   |
-| `curve?`       | `ChartCurveType`    | `'linear'`                        | Curve interpolation type                                   |
-| `showLegend?`  | `boolean`           | `false`                           | Whether to show legend                                     |
-| `data?`        | `LineChartDatum[]`  | `-`                               | Chart data (single series)                                 |
+| Prop          | Type                | Default | Notes                                                      |
+| ------------- | ------------------- | ------- | ---------------------------------------------------------- |
+| `series?`     | `AreaChartSeries[]` | `-`     | Multiple series                                            |
+| `stacked?`    | `boolean`           | `false` | Whether to stack areas                                     |
+| `gradient?`   | `boolean`           | `false` | Enable linear gradient fill (top-to-bottom, ECharts style) |
+| `showPoints?` | `boolean`           | `false` | Whether to show data points                                |
 
 ## BarChart
 
-`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 8/49 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/49 props
 
-| Prop               | Type              | Default                                        | Notes                                                                                   |
-| ------------------ | ----------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `data`             | `BarChartDatum[]` | `-`                                            | Chart data                                                                              |
-| `padding?`         | `ChartPadding`    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
-| `showLegend?`      | `boolean`         | `false`                                        | Whether to show legend                                                                  |
-| `gradient?`        | `boolean`         | `false`                                        | Enable linear gradient fill on bars (top-to-bottom, lighter to full)                    |
-| `showValueLabels?` | `boolean`         | `false`                                        | Show value labels above or inside bars                                                  |
-| `hoverable?`       | `boolean`         | `false`                                        | Enable hover highlight                                                                  |
-| `selectable?`      | `boolean`         | `false`                                        | Enable click selection                                                                  |
-| `title?`           | `string`          | `-`                                            | Accessible title for the SVG                                                            |
+| Prop          | Type              | Default                                        | Notes                                                                                   |
+| ------------- | ----------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `data`        | `BarChartDatum[]` | `-`                                            | Chart data                                                                              |
+| `padding?`    | `ChartPadding`    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
+| `showLegend?` | `boolean`         | `false`                                        | Whether to show legend                                                                  |
+| `gradient?`   | `boolean`         | `false`                                        | Enable linear gradient fill on bars (top-to-bottom, lighter to full)                    |
 
 ## ChartAxis
 
-`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 5/12 props
+`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 4/12 props
 
 | Prop           | Type                                 | Default    | Notes                |
 | -------------- | ------------------------------------ | ---------- | -------------------- |
@@ -49,11 +41,10 @@ description: Compact generated Tigercat Charts props reference
 | `orientation?` | `ChartAxisOrientation`               | `'bottom'` | Axis orientation     |
 | `tickValues?`  | `ChartScaleValue[]`                  | `-`        | Explicit tick values |
 | `tickFormat?`  | `(value: ChartScaleValue) => string` | `-`        | Tick label formatter |
-| `label?`       | `string`                             | `-`        | Axis label           |
 
 ## ChartCanvas
 
-`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 5/8 props
+`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 4/8 props
 
 Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
 
@@ -63,7 +54,6 @@ Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padd
 | `height?`     | `number`       | `200`                                          | SVG height                                                             |
 | `responsive?` | `boolean`      | `false`                                        | Observe the canvas host (not a legend sibling) and resize the SVG      |
 | `padding?`    | `ChartPadding` | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Inner padding for chart drawing area. Default covers ChartAxis labels. |
-| `title?`      | `string`       | `-`                                            | Accessible title for the SVG                                           |
 
 Events/callback props: `onResolvedSizeChange?`.
 
@@ -116,52 +106,40 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## DonutChart
 
-`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 8/39 props
+`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 4/39 props
 
-| Prop                | Type                    | Default    | Notes                                                         |
-| ------------------- | ----------------------- | ---------- | ------------------------------------------------------------- |
-| `data`              | `PieChartDatum[]`       | `-`        | Chart data                                                    |
-| `innerRadiusRatio?` | `number`                | `0.6`      | Inner radius ratio based on outer radius                      |
-| `centerValue?`      | `string \| number`      | `-`        | Text shown as the main value in the donut center              |
-| `centerLabel?`      | `string`                | `-`        | Descriptive label shown below centerValue in the donut center |
-| `animated?`         | `boolean`               | `false`    | Enable entrance animation (fade + scale)                      |
-| `showLabels?`       | `boolean`               | `false`    | Whether to show labels                                        |
-| `labelPosition?`    | `'inside' \| 'outside'` | `'inside'` | Label position: inside the slice or outside with leader lines |
-| `showLegend?`       | `boolean`               | `false`    | Whether to show legend                                        |
+| Prop                | Type               | Default | Notes                                                         |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
+| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                    |
+| `innerRadiusRatio?` | `number`           | `0.6`   | Inner radius ratio based on outer radius                      |
+| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the donut center              |
+| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue in the donut center |
 
 ## FunnelChart
 
-`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 8/26 props
+`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/26 props
 
-| Prop          | Type                         | Default      | Notes                                                                          |
-| ------------- | ---------------------------- | ------------ | ------------------------------------------------------------------------------ |
-| `data`        | `FunnelChartDatum[]`         | `-`          | Data items — ordered from widest to narrowest                                  |
-| `direction?`  | `'vertical' \| 'horizontal'` | `'vertical'` | Vertical or horizontal layout. Horizontal grows along x; height follows value. |
-| `gap?`        | `number`                     | `2`          | Gap between funnel segments in px                                              |
-| `pinch?`      | `boolean`                    | `false`      | Whether the last segment tapers to a point                                     |
-| `gradient?`   | `boolean`                    | `false`      | Render each segment with a vertical alpha gradient in funnel user space.       |
-| `hoverable?`  | `boolean`                    | `false`      | Enable hover highlight                                                         |
-| `selectable?` | `boolean`                    | `false`      | Enable click selection                                                         |
-| `showLegend?` | `boolean`                    | `false`      | Whether to show legend                                                         |
+| Prop         | Type                         | Default      | Notes                                                                          |
+| ------------ | ---------------------------- | ------------ | ------------------------------------------------------------------------------ |
+| `data`       | `FunnelChartDatum[]`         | `-`          | Data items — ordered from widest to narrowest                                  |
+| `direction?` | `'vertical' \| 'horizontal'` | `'vertical'` | Vertical or horizontal layout. Horizontal grows along x; height follows value. |
+| `gap?`       | `number`                     | `2`          | Gap between funnel segments in px                                              |
+| `pinch?`     | `boolean`                    | `false`      | Whether the last segment tapers to a point                                     |
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 8/31 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 4/31 props
 
-| Prop              | Type             | Default | Notes |
-| ----------------- | ---------------- | ------- | ----- |
-| `data`            | `GanttTask[]`    | `-`     | -     |
-| `scale?`          | `GanttScale`     | `-`     | -     |
-| `rowHeight?`      | `number`         | `-`     | -     |
-| `barHeight?`      | `number`         | `-`     | -     |
-| `taskLabelWidth?` | `number`         | `-`     | -     |
-| `minDate?`        | `GanttDateValue` | `-`     | -     |
-| `maxDate?`        | `GanttDateValue` | `-`     | -     |
-| `showToday?`      | `boolean`        | `-`     | -     |
+| Prop         | Type          | Default | Notes |
+| ------------ | ------------- | ------- | ----- |
+| `data`       | `GanttTask[]` | `-`     | -     |
+| `scale?`     | `GanttScale`  | `-`     | -     |
+| `rowHeight?` | `number`      | `-`     | -     |
+| `barHeight?` | `number`      | `-`     | -     |
 
 ## GaugeChart
 
-`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 8/24 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/24 props
 
 | Prop          | Type                                               | Default | Notes                                                                                      |
 | ------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -169,29 +147,21 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `startAngle?` | `number`                                           | `-135`  | Start angle in degrees. `0` is 12 o'clock; positive is clockwise. Default is a bottom-o... |
 | `endAngle?`   | `number`                                           | `135`   | End angle in degrees (same convention as `startAngle`)                                     |
 | `segments?`   | `Array<{ range: [number, number] color: string }>` | `-`     | Color segments along the arc. Array of { range: [from, to], color }                        |
-| `showTicks?`  | `boolean`                                          | `true`  | Whether to show tick marks                                                                 |
-| `tickCount?`  | `number`                                           | `5`     | Number of intervals between min and max (renders `tickCount + 1` marks).                   |
-| `gradient?`   | `boolean`                                          | `false` | When true, the value arc is rendered with a vertical alpha gradient in gauge user space... |
-| `label?`      | `string`                                           | `-`     | Label shown below the value                                                                |
 
 ## HeatmapChart
 
-`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 8/29 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/29 props
 
-| Prop          | Type                  | Default     | Notes                                                                                      |
-| ------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `data`        | `HeatmapChartDatum[]` | `-`         | Data points. Lookup is by label, or by 0-based column/row index. `hoveredIndex` / `sele... |
-| `xLabels`     | `string[]`            | `-`         | X-axis labels                                                                              |
-| `yLabels`     | `string[]`            | `-`         | Y-axis labels                                                                              |
-| `minColor?`   | `string`              | `'#f0f9ff'` | Min color (for lowest value)                                                               |
-| `maxColor?`   | `string`              | `'#2563eb'` | Max color (for highest value)                                                              |
-| `colorSpace?` | `'rgb' \| 'oklch'`    | `'rgb'`     | Colour interpolation space for cell fills. - `'rgb'` (default): linear hex interpolatio... |
-| `cellGap?`    | `number`              | `1`         | Gap between cells in px                                                                    |
-| `cellRadius?` | `number`              | `2`         | Cell border radius in px. The SVG `rx` attribute wins over theme tokens.                   |
+| Prop        | Type                  | Default     | Notes                                                                                      |
+| ----------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `data`      | `HeatmapChartDatum[]` | `-`         | Data points. Lookup is by label, or by 0-based column/row index. `hoveredIndex` / `sele... |
+| `xLabels`   | `string[]`            | `-`         | X-axis labels                                                                              |
+| `yLabels`   | `string[]`            | `-`         | Y-axis labels                                                                              |
+| `minColor?` | `string`              | `'#f0f9ff'` | Min color (for lowest value)                                                               |
 
 ## LineChart
 
-`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 8/52 props
+`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 4/52 props
 
 | Prop          | Type                | Default    | Notes                               |
 | ------------- | ------------------- | ---------- | ----------------------------------- |
@@ -199,14 +169,10 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `showPoints?` | `boolean`           | `true`     | Whether to show data points         |
 | `showArea?`   | `boolean`           | `false`    | Show gradient area fill under lines |
 | `curve?`      | `ChartCurveType`    | `'linear'` | Curve interpolation type            |
-| `showLegend?` | `boolean`           | `false`    | Whether to show legend              |
-| `hoverable?`  | `boolean`           | `false`    | Enable hover highlight              |
-| `animated?`   | `boolean`           | `false`    | Enable line draw entrance animation |
-| `data?`       | `LineChartDatum[]`  | `-`        | Chart data (single series)          |
 
 ## OrgChart
 
-`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 8/24 props
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/24 props
 
 | Prop          | Type                             | Default      | Notes                                                                 |
 | ------------- | -------------------------------- | ------------ | --------------------------------------------------------------------- |
@@ -214,14 +180,10 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `direction?`  | `OrgChartDirection`              | `'vertical'` | `horizontal` is left-to-right. Cards keep `nodeWidth` × `nodeHeight`. |
 | `nodeWidth?`  | `number`                         | `-`          | -                                                                     |
 | `nodeHeight?` | `number`                         | `-`          | -                                                                     |
-| `levelGap?`   | `number`                         | `-`          | -                                                                     |
-| `siblingGap?` | `number`                         | `-`          | -                                                                     |
-| `selectedId?` | `string \| number \| null`       | `-`          | -                                                                     |
-| `hoverable?`  | `boolean`                        | `false`      | Enable hover highlight                                                |
 
 ## PieChart
 
-`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 8/39 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/39 props
 
 | Prop             | Type                    | Default        | Notes                                                                                      |
 | ---------------- | ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
@@ -229,29 +191,21 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `showLabels?`    | `boolean`               | `false`        | Whether to show labels                                                                     |
 | `labelPosition?` | `'inside' \| 'outside'` | `'inside'`     | Label position: inside the slice or outside with leader lines                              |
 | `startAngle?`    | `number`                | `-Math.PI / 2` | Start angle in radians. `0` is 3 o'clock; default is 12 o'clock. Sweep is clockwise bec... |
-| `padAngle?`      | `number`                | `0`            | Padding angle in radians                                                                   |
-| `gradient?`      | `boolean`               | `false`        | Fill slices with a vertical alpha gradient in pie user space.                              |
-| `shadow?`        | `boolean`               | `false`        | Enable drop shadow on slices                                                               |
-| `hoverable?`     | `boolean`               | `false`        | Enable hover highlight                                                                     |
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 8/55 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/55 props
 
-| Prop          | Type                    | Default        | Notes                                                   |
-| ------------- | ----------------------- | -------------- | ------------------------------------------------------- |
-| `data?`       | `RadarChartDatum[]`     | `-`            | Chart data (single series)                              |
-| `series?`     | `RadarChartSeries[]`    | `-`            | Multiple series                                         |
-| `maxValue?`   | `number`                | `-`            | Max value for radius scaling                            |
-| `startAngle?` | `number`                | `-Math.PI / 2` | Start angle in radians                                  |
-| `levels?`     | `number`                | `5`            | Grid levels                                             |
-| `showLabels?` | `boolean`               | `true`         | Whether to show labels                                  |
-| `showGrid?`   | `boolean`               | `true`         | Whether to show grid                                    |
-| `gridShape?`  | `'polygon' \| 'circle'` | `'polygon'`    | Grid shape: polygon (default) or circle (ECharts style) |
+| Prop          | Type                 | Default        | Notes                        |
+| ------------- | -------------------- | -------------- | ---------------------------- |
+| `data?`       | `RadarChartDatum[]`  | `-`            | Chart data (single series)   |
+| `series?`     | `RadarChartSeries[]` | `-`            | Multiple series              |
+| `maxValue?`   | `number`             | `-`            | Max value for radius scaling |
+| `startAngle?` | `number`             | `-Math.PI / 2` | Start angle in radians       |
 
 ## ScatterChart
 
-`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 8/50 props
+`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 4/50 props
 
 | Prop          | Type                                              | Default                                        | Notes                                                                                   |
 | ------------- | ------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -259,14 +213,10 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `pointSize?`  | `number`                                          | `6`                                            | Point size (radius)                                                                     |
 | `pointStyle?` | `'circle' \| 'square' \| 'triangle' \| 'diamond'` | `'circle'`                                     | Point shape                                                                             |
 | `padding?`    | `ChartPadding`                                    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
-| `hoverable?`  | `boolean`                                         | `false`                                        | Enable hover highlight                                                                  |
-| `selectable?` | `boolean`                                         | `false`                                        | Enable click selection                                                                  |
-| `showLegend?` | `boolean`                                         | `false`                                        | Whether to show legend                                                                  |
-| `gradient?`   | `boolean`                                         | `false`                                        | Enable radial gradient fill for points                                                  |
 
 ## SunburstChart
 
-`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 8/24 props
+`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 4/24 props
 
 | Prop                | Type                   | Default | Notes                                                                                      |
 | ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -274,14 +224,10 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `innerRadiusRatio?` | `number`               | `0`     | Inner radius ratio (0 = no hole, 0.3 = donut-like)                                         |
 | `showLabels?`       | `boolean`              | `true`  | Whether to show labels on arcs                                                             |
 | `colors?`           | `string[]`             | `-`     | Palette of colors. Children inherit the parent colour unless they set `color`.             |
-| `gradient?`         | `boolean`              | `false` | Whether to apply a 12-o'clock vertical alpha gradient in user space                        |
-| `hoverable?`        | `boolean`              | `false` | Enable hover highlight                                                                     |
-| `selectable?`       | `boolean`              | `false` | Enable click selection                                                                     |
-| `showLegend?`       | `boolean`              | `false` | Whether to show legend                                                                     |
 
 ## TreeMapChart
 
-`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 8/26 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/26 props
 
 | Prop            | Type                  | Default | Notes                                                                    |
 | --------------- | --------------------- | ------- | ------------------------------------------------------------------------ |
@@ -289,7 +235,3 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `gap?`          | `number`              | `2`     | Gap between nodes in px                                                  |
 | `showLabels?`   | `boolean`             | `true`  | Whether to show labels inside nodes                                      |
 | `minLabelSize?` | `number`              | `10`    | Minimum font size for labels (hide if cell too small)                    |
-| `nodeRadius?`   | `number`              | `2`     | Node corner radius in px. The SVG `rx` attribute wins over theme tokens. |
-| `colors?`       | `string[]`            | `-`     | Palette of colors                                                        |
-| `gradient?`     | `boolean`             | `false` | Whether to apply a top-to-bottom alpha gradient in chart user space      |
-| `hoverable?`    | `boolean`             | `false` | Enable hover highlight                                                   |

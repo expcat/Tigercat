@@ -11,50 +11,40 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Alert
 
-`packages/core/src/types/alert.ts` · `AlertProps` · 8/17 props
+`packages/core/src/types/alert.ts` · `AlertProps` · 4/17 props
 
-| Prop             | Type        | Default  | Notes                                                                                      |
-| ---------------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |
-| `type?`          | `AlertType` | `'info'` | Alert type (success, warning, error, info)                                                 |
-| `title?`         | `string`    | `-`      | Alert title (main message)                                                                 |
-| `closable?`      | `boolean`   | `false`  | Whether the alert can be closed                                                            |
-| `duration?`      | `number`    | `-`      | Auto-close duration in milliseconds. Set to 0 or undefined to disable auto-close. Indep... |
-| `banner?`        | `boolean`   | `false`  | Whether to display as full-width banner across the page                                    |
-| `showIcon?`      | `boolean`   | `true`   | Whether to show the type icon                                                              |
-| `visible?`       | `boolean`   | `-`      | When `false`, the alert is not rendered. Closing never hides internally — the parent un... |
-| `showCountdown?` | `boolean`   | `false`  | Whether to show countdown progress bar (requires `duration`)                               |
+| Prop        | Type        | Default  | Notes                                                                                      |
+| ----------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |
+| `type?`     | `AlertType` | `'info'` | Alert type (success, warning, error, info)                                                 |
+| `title?`    | `string`    | `-`      | Alert title (main message)                                                                 |
+| `closable?` | `boolean`   | `false`  | Whether the alert can be closed                                                            |
+| `duration?` | `number`    | `-`      | Auto-close duration in milliseconds. Set to 0 or undefined to disable auto-close. Indep... |
+
+Events/callback props: `onOpenChange?`.
 
 ## Drawer
 
-`packages/core/src/types/drawer.ts` · `DrawerProps` · 8/23 props
+`packages/core/src/types/drawer.ts` · `DrawerProps` · 4/23 props
 
 Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
 
-| Prop                  | Type                         | Default   | Notes                                                                                      |
-| --------------------- | ---------------------------- | --------- | ------------------------------------------------------------------------------------------ |
-| `open?`               | `boolean`                    | `false`   | Whether the drawer is open                                                                 |
-| `placement?`          | `DrawerPlacement`            | `'right'` | Drawer placement                                                                           |
-| `closable?`           | `boolean`                    | `true`    | Whether to show close button                                                               |
-| `maskClosable?`       | `boolean`                    | `true`    | Whether clicking mask closes the drawer                                                    |
-| `destroyOnClose?`     | `boolean`                    | `false`   | Whether to destroy content on close                                                        |
-| `fullscreenOnMobile?` | `boolean`                    | `true`    | Whether the drawer panel should become fullscreen on mobile viewports.                     |
-| `width?`              | `string \| number`           | `-`       | Custom width/height (overrides size). Accepts CSS value like '400px' or '50%'. Applied...  |
-| `labels?`             | `Partial<TigerLocaleDrawer>` | `-`       | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| Prop            | Type              | Default   | Notes                                   |
+| --------------- | ----------------- | --------- | --------------------------------------- |
+| `open?`         | `boolean`         | `false`   | Whether the drawer is open              |
+| `placement?`    | `DrawerPlacement` | `'right'` | Drawer placement                        |
+| `closable?`     | `boolean`         | `true`    | Whether to show close button            |
+| `maskClosable?` | `boolean`         | `true`    | Whether clicking mask closes the drawer |
 
 ## Loading
 
-`packages/core/src/types/loading.ts` · `LoadingProps` · 8/14 props
+`packages/core/src/types/loading.ts` · `LoadingProps` · 4/14 props
 
-| Prop          | Type                   | Default     | Notes                                                                                      |
-| ------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `text?`       | `string`               | `-`         | Custom text to display below the spinner                                                   |
-| `fullscreen?` | `boolean`              | `false`     | Whether to show loading as fullscreen overlay                                              |
-| `spinning?`   | `boolean`              | `true`      | Cover children / the default slot with a relative overlay. When `false`, only the conte... |
-| `delay?`      | `number`               | `0`         | Delay before showing the loading indicator (ms) Useful to prevent flashing on quick ope... |
-| `variant?`    | `LoadingVariant`       | `'spinner'` | Loading spinner variant - determines animation style                                       |
-| `size?`       | `LoadingSize`          | `'md'`      | Size of the loading indicator                                                              |
-| `color?`      | `LoadingColor`         | `'primary'` | Color variant                                                                              |
-| `locale?`     | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
+| Prop          | Type      | Default | Notes                                                                                      |
+| ------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `text?`       | `string`  | `-`     | Custom text to display below the spinner                                                   |
+| `fullscreen?` | `boolean` | `false` | Whether to show loading as fullscreen overlay                                              |
+| `spinning?`   | `boolean` | `true`  | Cover children / the default slot with a relative overlay. When `false`, only the conte... |
+| `delay?`      | `number`  | `0`     | Delay before showing the loading indicator (ms) Useful to prevent flashing on quick ope... |
 
 ## LoadingBar
 
@@ -80,15 +70,14 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 ## Message
 
-`packages/core/src/types/message.ts` · `MessageProps` · 5/8 props
+`packages/core/src/types/message.ts` · `MessageProps` · 4/8 props
 
-| Prop              | Type              | Default                                   | Notes                                            |
-| ----------------- | ----------------- | ----------------------------------------- | ------------------------------------------------ |
-| `type?`           | `MessageType`     | `'info'`                                  | Message type                                     |
-| `content?`        | `string`          | `-`                                       | Message content                                  |
-| `closable?`       | `boolean`         | `false`                                   | Whether the message can be closed manually       |
-| `position?`       | `MessagePosition` | `'top'`                                   | Message position on screen                       |
-| `closeAriaLabel?` | `string`          | `locale \`common.closeMessageAriaLabel\`` | Close button aria-label when `closable` is true. |
+| Prop        | Type              | Default  | Notes                                      |
+| ----------- | ----------------- | -------- | ------------------------------------------ |
+| `type?`     | `MessageType`     | `'info'` | Message type                               |
+| `content?`  | `string`          | `-`      | Message content                            |
+| `closable?` | `boolean`         | `false`  | Whether the message can be closed manually |
+| `position?` | `MessagePosition` | `'top'`  | Message position on screen                 |
 
 Events/callback props: `onClose?`.
 
@@ -106,20 +95,16 @@ Events/callback props: `onClose?`.
 
 ## Modal
 
-`packages/core/src/types/modal.ts` · `ModalProps` · 8/24 props
+`packages/core/src/types/modal.ts` · `ModalProps` · 4/24 props
 
 Note: `open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
 
-| Prop                 | Type                        | Default | Notes                                                                                      |
-| -------------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `closable?`          | `boolean`                   | `true`  | Whether to show the close button                                                           |
-| `maskClosable?`      | `boolean`                   | `true`  | Whether clicking the mask should close the modal                                           |
-| `destroyOnClose?`    | `boolean`                   | `false` | Whether to destroy the modal content when closed                                           |
-| `mobileSheet?`       | `boolean`                   | `false` | Whether the modal should render as a mobile bottom sheet below the md breakpoint.          |
-| `draggable?`         | `boolean`                   | `false` | Whether the modal can be dragged by its title bar                                          |
-| `centered?`          | `boolean`                   | `false` | Whether the modal should be centered vertically                                            |
-| `showDefaultFooter?` | `boolean`                   | `false` | Whether to render a default footer when no `footer` is provided.                           |
-| `labels?`            | `Partial<TigerLocaleModal>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| Prop              | Type      | Default | Notes                                                                             |
+| ----------------- | --------- | ------- | --------------------------------------------------------------------------------- |
+| `closable?`       | `boolean` | `true`  | Whether to show the close button                                                  |
+| `maskClosable?`   | `boolean` | `true`  | Whether clicking the mask should close the modal                                  |
+| `destroyOnClose?` | `boolean` | `false` | Whether to destroy the modal content when closed                                  |
+| `mobileSheet?`    | `boolean` | `false` | Whether the modal should render as a mobile bottom sheet below the md breakpoint. |
 
 ## NotificationContainer
 
@@ -137,38 +122,31 @@ Imperative notification API supports inline toast actions via `notification.info
 
 ## Popconfirm
 
-`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 8/16 props
+`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 4/16 props
 
-| Prop           | Type                    | Default     | Notes                                                                                      |
-| -------------- | ----------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `title?`       | `string`                | `-`         | Popconfirm title/question text. Defaults to `locale.common.confirmTitle`.                  |
-| `description?` | `string`                | `-`         | Popconfirm description text (optional, displayed below title)                              |
-| `okText?`      | `string`                | `-`         | Confirm button text. Defaults to `locale.common.okText`.                                   |
-| `cancelText?`  | `string`                | `-`         | Cancel button text. Defaults to `locale.common.cancelText`.                                |
-| `okType?`      | `'primary' \| 'danger'` | `'primary'` | Confirm button type                                                                        |
-| `placement?`   | `FloatingPlacement`     | `'top'`     | Placement relative to trigger                                                              |
-| `open?`        | `boolean`               | `-`         | Whether the popup is open (controlled mode)                                                |
-| `asChild?`     | `boolean`               | `false`     | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
+| Prop           | Type     | Default | Notes                                                                     |
+| -------------- | -------- | ------- | ------------------------------------------------------------------------- |
+| `title?`       | `string` | `-`     | Popconfirm title/question text. Defaults to `locale.common.confirmTitle`. |
+| `description?` | `string` | `-`     | Popconfirm description text (optional, displayed below title)             |
+| `okText?`      | `string` | `-`     | Confirm button text. Defaults to `locale.common.okText`.                  |
+| `cancelText?`  | `string` | `-`     | Cancel button text. Defaults to `locale.common.cancelText`.               |
 
 Events/callback props: `onConfirm?`, `onCancel?`.
 
 ## Popover
 
-`packages/core/src/types/popover.ts` · `PopoverProps` · 7/12 props
+`packages/core/src/types/popover.ts` · `PopoverProps` · 4/12 props
 
-| Prop         | Type                | Default   | Notes                                                                                      |
-| ------------ | ------------------- | --------- | ------------------------------------------------------------------------------------------ |
-| `trigger?`   | `PopoverTrigger`    | `'click'` | Trigger type for showing/hiding popover                                                    |
-| `content?`   | `string`            | `-`       | Popover content text (can be overridden by content slot/prop)                              |
-| `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                                              |
-| `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                                                |
-| `width?`     | `number \| string`  | `-`       | Popover width in pixels. Custom width drops the default max-width cap.                     |
-| `asChild?`   | `boolean`           | `false`   | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
-| `disabled?`  | `boolean`           | `false`   | Whether the popup is disabled                                                              |
+| Prop         | Type                | Default   | Notes                                                         |
+| ------------ | ------------------- | --------- | ------------------------------------------------------------- |
+| `trigger?`   | `PopoverTrigger`    | `'click'` | Trigger type for showing/hiding popover                       |
+| `content?`   | `string`            | `-`       | Popover content text (can be overridden by content slot/prop) |
+| `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                 |
+| `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                   |
 
 ## Progress
 
-`packages/core/src/types/progress.ts` · `ProgressProps` · 5/15 props
+`packages/core/src/types/progress.ts` · `ProgressProps` · 4/15 props
 
 Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。
 
@@ -178,11 +156,10 @@ Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`form
 | `status?`     | `ProgressStatus` | `'normal'`                        | Progress status When set, overrides variant color                            |
 | `showText?`   | `boolean`        | `true for line, false for circle` | Whether to show progress text. Line: outside the bar. Circle: in the center. |
 | `type?`       | `ProgressType`   | `'line'`                          | Progress type (shape)                                                        |
-| `striped?`    | `boolean`        | `false`                           | Whether to show striped animation Only applicable for line type              |
 
 ## Tooltip
 
-`packages/core/src/types/tooltip.ts` · `TooltipProps` · 6/10 props
+`packages/core/src/types/tooltip.ts` · `TooltipProps` · 4/10 props
 
 | Prop         | Type                | Default   | Notes                                                                                      |
 | ------------ | ------------------- | --------- | ------------------------------------------------------------------------------------------ |
@@ -190,22 +167,16 @@ Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`form
 | `trigger?`   | `TooltipTrigger`    | `'hover'` | Trigger type. Default hover is co-joined with focus and click so keyboard and touch can... |
 | `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                                              |
 | `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                                                |
-| `asChild?`   | `boolean`           | `false`   | Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but... |
-| `disabled?`  | `boolean`           | `false`   | Whether the popup is disabled                                                              |
 
 ## Tour
 
-`packages/core/src/types/tour.ts` · `TourProps` · 8/18 props
+`packages/core/src/types/tour.ts` · `TourProps` · 4/18 props
 
 Note: `current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。
 
-| Prop            | Type                   | Default | Notes                                                                                      |
-| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `steps`         | `TourStep[]`           | `-`     | Array of tour steps                                                                        |
-| `open?`         | `boolean`              | `false` | Whether the tour is open                                                                   |
-| `current?`      | `number`               | `-`     | Current step index (controlled). This is the **original** index in `steps`, not the ind... |
-| `closable?`     | `boolean`              | `true`  | Whether to show the close button. `false` only hides the X — Escape and mask click stil... |
-| `maskClosable?` | `boolean`              | `true`  | Whether clicking the mask closes the tour.                                                 |
-| `keyboard?`     | `boolean`              | `true`  | Whether Escape closes the tour.                                                            |
-| `loadSteps?`    | `TourStepLoader`       | `-`     | Load tour steps asynchronously when the tour opens.                                        |
-| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale override; falls back to ConfigProvider locale                                       |
+| Prop        | Type         | Default | Notes                                                                                      |
+| ----------- | ------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `steps`     | `TourStep[]` | `-`     | Array of tour steps                                                                        |
+| `open?`     | `boolean`    | `false` | Whether the tour is open                                                                   |
+| `current?`  | `number`     | `-`     | Current step index (controlled). This is the **original** index in `steps`, not the ind... |
+| `closable?` | `boolean`    | `true`  | Whether to show the close button. `false` only hides the X — Escape and mask click stil... |

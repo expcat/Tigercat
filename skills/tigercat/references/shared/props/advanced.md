@@ -11,22 +11,18 @@ description: Compact generated Tigercat Advanced props reference
 
 ## CodeEditor
 
-`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 8/22 props
+`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 4/22 props
 
-| Prop           | Type              | Default   | Notes                                                   |
-| -------------- | ----------------- | --------- | ------------------------------------------------------- |
-| `language?`    | `CodeLanguage`    | `'plain'` | Programming language for syntax highlighting            |
-| `theme?`       | `CodeEditorTheme` | `'light'` | Editor theme                                            |
-| `wordWrap?`    | `boolean`         | `false`   | Whether to wrap long lines                              |
-| `minLines?`    | `number`          | `3`       | Minimum number of visible lines                         |
-| `highlighter?` | `CodeHighlighter` | `-`       | Optional pluggable highlighter. Output is TRUSTED HTML. |
-| `readOnly?`    | `boolean`         | `false`   | Whether the editor is read-only                         |
-| `tabSize?`     | `number`          | `2`       | Tab size in spaces                                      |
-| `value?`       | `string`          | `-`       | The code content                                        |
+| Prop        | Type              | Default   | Notes                                        |
+| ----------- | ----------------- | --------- | -------------------------------------------- |
+| `language?` | `CodeLanguage`    | `'plain'` | Programming language for syntax highlighting |
+| `theme?`    | `CodeEditorTheme` | `'light'` | Editor theme                                 |
+| `wordWrap?` | `boolean`         | `false`   | Whether to wrap long lines                   |
+| `minLines?` | `number`          | `3`       | Minimum number of visible lines              |
 
 ## FileManager
 
-`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 8/21 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 4/21 props
 
 | Prop            | Type                   | Default | Notes                                                                                      |
 | --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -34,79 +30,64 @@ description: Compact generated Tigercat Advanced props reference
 | `currentPath?`  | `string[]`             | `-`     | Current directory as folder **keys** (controlled). Omit for an internal path buffer. Do... |
 | `selectedKeys?` | `(string \| number)[]` | `-`     | Currently selected file keys (controlled)                                                  |
 | `searchable?`   | `boolean`              | `-`     | Searchable                                                                                 |
-| `draggable?`    | `boolean`              | `-`     | Enable HTML5 reorder of the current folder. Disabled while search or hidden-file filter... |
-| `viewMode?`     | `FileViewMode`         | `-`     | View mode                                                                                  |
-| `multiple?`     | `boolean`              | `-`     | Allow multiple selection                                                                   |
-| `columns?`      | `FileColumn[]`         | `-`     | Extra list-view columns (`size` / `type` / `modified`). Name is always shown.              |
 
 Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, ....
 
 ## ImageAnnotation
 
-`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 7/18 props
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/18 props
 
-| Prop          | Type                   | Default | Notes                                                                                    |
-| ------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `src`         | `string`               | `-`     | -                                                                                        |
-| `value?`      | `ImageAnnotation[]`    | `-`     | -                                                                                        |
-| `tool?`       | `ImageAnnotationTool`  | `-`     | -                                                                                        |
-| `selectedId?` | `string`               | `-`     | Controlled selected id. `undefined` is uncontrolled; `''` is controlled none.            |
-| `readonly?`   | `boolean`              | `-`     | -                                                                                        |
-| `disabled?`   | `boolean`              | `-`     | Disables drawing, selection, and tab stops on shapes. `readonly` still allows selection. |
-| `locale?`     | `Partial<TigerLocale>` | `-`     | -                                                                                        |
+| Prop          | Type                  | Default | Notes                                                                         |
+| ------------- | --------------------- | ------- | ----------------------------------------------------------------------------- |
+| `src`         | `string`              | `-`     | -                                                                             |
+| `value?`      | `ImageAnnotation[]`   | `-`     | -                                                                             |
+| `tool?`       | `ImageAnnotationTool` | `-`     | -                                                                             |
+| `selectedId?` | `string`              | `-`     | Controlled selected id. `undefined` is uncontrolled; `''` is controlled none. |
 
 ## ImageViewer
 
-`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 7/19 props
+`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 4/19 props
 
 Note: ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。
 
-| Prop            | Type                   | Default | Notes                                                                                     |
-| --------------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `images`        | `ImageLightboxItem[]`  | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
-| `open?`         | `boolean`              | `-`     | Whether the preview is open                                                               |
-| `currentIndex?` | `number`               | `0`     | Current image index (for multi-image preview)                                             |
-| `showNav?`      | `boolean`              | `true`  | Whether previous/next controls and arrow-key navigation are shown. Hidden for a single... |
-| `minZoom?`      | `number`               | `-`     | Alias of `minScale`. Prefer `minScale` on new call sites.                                 |
-| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                                   |
-| `maxZoom?`      | `number`               | `-`     | Alias of `maxScale`. Prefer `maxScale` on new call sites.                                 |
+| Prop            | Type                  | Default | Notes                                                                                     |
+| --------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `images`        | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
+| `open?`         | `boolean`             | `-`     | Whether the preview is open                                                               |
+| `currentIndex?` | `number`              | `0`     | Current image index (for multi-image preview)                                             |
+| `showNav?`      | `boolean`             | `true`  | Whether previous/next controls and arrow-key navigation are shown. Hidden for a single... |
 
 ## InfiniteScroll
 
-`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 8/15 props
+`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/15 props
 
-| Prop           | Type                         | Default | Notes                                                                                      |
-| -------------- | ---------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `hasMore?`     | `boolean`                    | `-`     | Whether more data is available                                                             |
-| `loading?`     | `boolean`                    | `-`     | Whether a load is currently in progress                                                    |
-| `direction?`   | `'vertical' \| 'horizontal'` | `-`     | Scroll direction                                                                           |
-| `inverse?`     | `boolean`                    | `-`     | Inverse scroll (load at the start edge, e.g. chat history)                                 |
-| `disabled?`    | `boolean`                    | `-`     | Disable the infinite scroll trigger                                                        |
-| `threshold?`   | `number`                     | `-`     | Pixel `rootMargin` before the sentinel intersects (not the IO ratio). The padded edge f... |
-| `height?`      | `number`                     | `-`     | Optional px height. The box must be a scroll container (this prop, class, or style); wi... |
-| `loadingText?` | `string`                     | `-`     | Custom loading text                                                                        |
+| Prop         | Type                         | Default | Notes                                                      |
+| ------------ | ---------------------------- | ------- | ---------------------------------------------------------- |
+| `hasMore?`   | `boolean`                    | `-`     | Whether more data is available                             |
+| `loading?`   | `boolean`                    | `-`     | Whether a load is currently in progress                    |
+| `direction?` | `'vertical' \| 'horizontal'` | `-`     | Scroll direction                                           |
+| `inverse?`   | `boolean`                    | `-`     | Inverse scroll (load at the start edge, e.g. chat history) |
 
 ## Kanban
 
-`packages/core/src/types/kanban.ts` · `KanbanProps` · 5/22 props
+`packages/core/src/types/kanban.ts` · `KanbanProps` · 4/22 props
 
 Uses: `TaskBoard`.
 
 Note: Kanban 是 TaskBoard 薄封装，默认 `showCardCount` / `allowAddCard`。`swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
 
-| Prop             | Type                                               | Default | Notes                                                                                      |
-| ---------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `swimlanes?`     | `TaskBoardSwimlane[]`                              | `-`     | Group cards inside each column by `swimlaneField`. Not a horizontal row across columns.    |
-| `swimlaneField?` | `string`                                           | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
-| `columns?`       | `TaskBoardColumn[]`                                | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `locale?`        | `Partial<import('./locale').TigerLocale>`          | `-`     | Locale overrides for TaskBoard UI text                                                     |
-| `labels?`        | `Partial<import('./locale').TigerLocaleTaskBoard>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| Prop             | Type                                      | Default | Notes                                                                                      |
+| ---------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `swimlanes?`     | `TaskBoardSwimlane[]`                     | `-`     | Group cards inside each column by `swimlaneField`. Not a horizontal row across columns.    |
+| `swimlaneField?` | `string`                                  | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
+| `columns?`       | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 
 ## MarkdownEditor
 
-`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 8/20 props
+`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 4/20 props
 
 | Prop              | Type                             | Default | Notes                                                            |
 | ----------------- | -------------------------------- | ------- | ---------------------------------------------------------------- |
@@ -114,25 +95,17 @@ Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCa
 | `renderer?`       | `MarkdownRenderer`               | `-`     | Optional markdown preview renderer                               |
 | `toolbar?`        | `MarkdownToolbarItem[] \| false` | `-`     | Toolbar items configuration, or false to hide formatting toolbar |
 | `showModeSwitch?` | `boolean`                        | `-`     | Whether to render the edit/split/preview mode switch             |
-| `placeholder?`    | `string`                         | `-`     | Placeholder text                                                 |
-| `readOnly?`       | `boolean`                        | `-`     | Read-only mode                                                   |
-| `value?`          | `string`                         | `-`     | Current markdown content (controlled)                            |
-| `disabled?`       | `boolean`                        | `-`     | Disabled state                                                   |
 
 ## PrintLayout
 
-`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 8/14 props
+`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/14 props
 
-| Prop              | Type                   | Default      | Notes                                                                         |
-| ----------------- | ---------------------- | ------------ | ----------------------------------------------------------------------------- |
-| `pageSize?`       | `PrintPageSize`        | `'A4'`       | Page size preset                                                              |
-| `orientation?`    | `PrintOrientation`     | `'portrait'` | Page orientation                                                              |
-| `showHeader?`     | `boolean`              | `false`      | Whether to show a repeating header on every printed page                      |
-| `showFooter?`     | `boolean`              | `false`      | Whether to show a repeating footer on every printed page                      |
-| `headerText?`     | `string`               | `-`          | Header text content (visible in the screen preview and on every printed page) |
-| `footerText?`     | `string`               | `-`          | Footer text content (visible in the screen preview and on every printed page) |
-| `showPageBreaks?` | `boolean`              | `true`       | Whether to show page break indicators in screen view                          |
-| `locale?`         | `Partial<TigerLocale>` | `-`          | Locale overlay                                                                |
+| Prop           | Type               | Default      | Notes                                                    |
+| -------------- | ------------------ | ------------ | -------------------------------------------------------- |
+| `pageSize?`    | `PrintPageSize`    | `'A4'`       | Page size preset                                         |
+| `orientation?` | `PrintOrientation` | `'portrait'` | Page orientation                                         |
+| `showHeader?`  | `boolean`          | `false`      | Whether to show a repeating header on every printed page |
+| `showFooter?`  | `boolean`          | `false`      | Whether to show a repeating footer on every printed page |
 
 ## PrintPageBreak
 
@@ -147,51 +120,39 @@ Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps ex
 
 ## RichTextEditor
 
-`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 8/16 props
+`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 4/16 props
 
-| Prop           | Type                 | Default | Notes                                                                                      |
-| -------------- | -------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `toolbar?`     | `ToolbarItem[]`      | `-`     | Toolbar items configuration (buttons and separators)                                       |
-| `readOnly?`    | `boolean`            | `-`     | Read-only mode                                                                             |
-| `mode?`        | `RichTextEditorMode` | `-`     | Editing mode                                                                               |
-| `engine?`      | `unknown`            | `-`     | Pluggable editor engine. Default is builtin contenteditable. Custom engines are TRUSTED... |
-| `placeholder?` | `string`             | `-`     | Placeholder text                                                                           |
-| `height?`      | `number \| string`   | `-`     | Editor height                                                                              |
-| `value?`       | `string`             | `-`     | Current HTML content (controlled)                                                          |
-| `disabled?`    | `boolean`            | `-`     | Disabled state                                                                             |
+| Prop        | Type                 | Default | Notes                                                                                      |
+| ----------- | -------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `toolbar?`  | `ToolbarItem[]`      | `-`     | Toolbar items configuration (buttons and separators)                                       |
+| `readOnly?` | `boolean`            | `-`     | Read-only mode                                                                             |
+| `mode?`     | `RichTextEditorMode` | `-`     | Editing mode                                                                               |
+| `engine?`   | `unknown`            | `-`     | Pluggable editor engine. Default is builtin contenteditable. Custom engines are TRUSTED... |
 
 Events/callback props: `onRequestUrl?`.
 
 ## VirtualList
 
-`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 8/11 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/11 props
 
-| Prop                   | Type                                           | Default | Notes                                                                                      |
-| ---------------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `renderItem`           | `(info: { index: number }) => React.ReactNode` | `-`     | Render function for each item — receives { index }                                         |
-| `itemCount?`           | `number`                                       | `-`     | Total number of items                                                                      |
-| `itemHeight?`          | `number`                                       | `-`     | Fixed item height in px. Used when `getItemHeight` and `estimatedItemHeight` are omitte... |
-| `height?`              | `number`                                       | `400`   | Visible container height in px (not `%`, not observed from the parent).                    |
-| `overscan?`            | `number`                                       | `-`     | Extra items to render above and below the viewport (each side, not doubled).               |
-| `getItemHeight?`       | `(index: number) => number`                    | `-`     | Known height per index (variable mode). Takes precedence over estimated/fixed.             |
-| `estimatedItemHeight?` | `number`                                       | `-`     | Estimated item height for dynamic measurement. When set (and `getItemHeight` is not), t... |
-| `sizeStrategy?`        | `VirtualListSizeStrategy`                      | `-`     | Custom size strategy. Overrides `itemHeight` / `getItemHeight` / `estimatedItemHeight`.... |
+| Prop          | Type                                           | Default | Notes                                                                                      |
+| ------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `renderItem`  | `(info: { index: number }) => React.ReactNode` | `-`     | Render function for each item — receives { index }                                         |
+| `itemCount?`  | `number`                                       | `-`     | Total number of items                                                                      |
+| `itemHeight?` | `number`                                       | `-`     | Fixed item height in px. Used when `getItemHeight` and `estimatedItemHeight` are omitte... |
+| `height?`     | `number`                                       | `400`   | Visible container height in px (not `%`, not observed from the parent).                    |
 
 ## VirtualTable
 
-`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 8/19 props
+`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 4/19 props
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
 Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。
 
-| Prop                 | Type                                                       | Default  | Notes                                                                                      |
-| -------------------- | ---------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
-| `dataSource?`        | `T[]`                                                      | `-`      | Data rows                                                                                  |
-| `columns?`           | `TableColumn<T>[]`                                         | `-`      | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /...  |
-| `virtualHeight?`     | `number`                                                   | `400`    | Viewport height in px                                                                      |
-| `virtualItemHeight?` | `number`                                                   | `48`     | Fixed row height in px. Visible rows are clipped to this height.                           |
-| `rowKey?`            | `keyof T \| ((row: T, index: number) => string \| number)` | `'id'`   | Unique row key field. Defaults to `id`, matching Table. Missing identities are not used... |
-| `rowSelection?`      | `RowSelectionConfig<T>`                                    | `-`      | Row selection. Clicking a row toggles it; there is no checkbox column. Cell controls mu... |
-| `virtualizeColumns?` | `boolean`                                                  | `-`      | Enable horizontal column virtualization. Requires a numeric `width` and no fixed column... |
-| `width?`             | `number \| 'auto'`                                         | `'auto'` | Viewport width in px or auto. Column virtualization requires a number.                     |
+| Prop                 | Type               | Default | Notes                                                                                     |
+| -------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------- |
+| `dataSource?`        | `T[]`              | `-`     | Data rows                                                                                 |
+| `columns?`           | `TableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
+| `virtualHeight?`     | `number`           | `400`   | Viewport height in px                                                                     |
+| `virtualItemHeight?` | `number`           | `48`    | Fixed row height in px. Visible rows are clipped to this height.                          |

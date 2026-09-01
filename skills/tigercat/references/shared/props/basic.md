@@ -11,66 +11,55 @@ description: Compact generated Tigercat Basic props reference
 
 ## Avatar
 
-`packages/core/src/types/avatar.ts` · `AvatarProps` · 6/16 props
+`packages/core/src/types/avatar.ts` · `AvatarProps` · 4/16 props
 
 Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。
 
-| Prop       | Type          | Default    | Notes                                                                                      |
-| ---------- | ------------- | ---------- | ------------------------------------------------------------------------------------------ |
-| `src?`     | `string`      | `-`        | Image source URL                                                                           |
-| `alt?`     | `string`      | `-`        | Alternative text for the image. When omitted, `text` or `aria-label` is used as the acc... |
-| `text?`    | `string`      | `-`        | Text content to display (e.g., initials) when src is missing or fails. Also used as the... |
-| `bgColor?` | `string`      | `-`        | Background for text/icon avatars. Tailwind class, or a CSS color (`#rgb` / `rgb()` / `v... |
-| `size?`    | `AvatarSize`  | `'md'`     | Avatar size                                                                                |
-| `shape?`   | `AvatarShape` | `'circle'` | Avatar shape                                                                               |
+| Prop       | Type     | Default | Notes                                                                                      |
+| ---------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
+| `src?`     | `string` | `-`     | Image source URL                                                                           |
+| `alt?`     | `string` | `-`     | Alternative text for the image. When omitted, `text` or `aria-label` is used as the acc... |
+| `text?`    | `string` | `-`     | Text content to display (e.g., initials) when src is missing or fails. Also used as the... |
+| `bgColor?` | `string` | `-`     | Background for text/icon avatars. Tailwind class, or a CSS color (`#rgb` / `rgb()` / `v... |
 
 ## AvatarGroup
 
-`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 5/7 props
+`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 4/7 props
 
 Note: `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。
 
-| Prop      | Type                              | Default    | Notes                                                                                      |
-| --------- | --------------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
-| `max?`    | `number`                          | `-`        | Maximum number of **avatars** to show. Overflow is an extra slot, so `max={3}` with 5 c... |
-| `size?`   | `AvatarSize`                      | `'md'`     | Size applied to avatars that did not set their own size                                    |
-| `shape?`  | `AvatarShape`                     | `'circle'` | Shape applied to avatars that did not set their own shape, and to overflow                 |
-| `locale?` | `Partial<TigerLocale>`            | `-`        | -                                                                                          |
-| `labels?` | `Partial<TigerLocaleAvatarGroup>` | `-`        | -                                                                                          |
+| Prop      | Type                   | Default    | Notes                                                                                      |
+| --------- | ---------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `max?`    | `number`               | `-`        | Maximum number of **avatars** to show. Overflow is an extra slot, so `max={3}` with 5 c... |
+| `size?`   | `AvatarSize`           | `'md'`     | Size applied to avatars that did not set their own size                                    |
+| `shape?`  | `AvatarShape`          | `'circle'` | Shape applied to avatars that did not set their own shape, and to overflow                 |
+| `locale?` | `Partial<TigerLocale>` | `-`        | -                                                                                          |
 
 ## Badge
 
-`packages/core/src/types/badge.ts` · `BadgeProps` · 8/11 props
+`packages/core/src/types/badge.ts` · `BadgeProps` · 4/11 props
 
 Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。
 
-| Prop          | Type                   | Default       | Notes                                                                                      |
-| ------------- | ---------------------- | ------------- | ------------------------------------------------------------------------------------------ |
-| `content?`    | `number \| string`     | `-`           | Badge content (number or text). Ignored when type='dot'. Empty number/text badges do no... |
-| `type?`       | `BadgeType`            | `'number'`    | Badge display type                                                                         |
-| `standalone?` | `boolean`              | `true`        | Standalone (inline) or wrapping children. Overlay requires `standalone={false}`.           |
-| `max?`        | `number`               | `99`          | Maximum count (`type='number'` only). Exceeds shows 'max+'. Text badges are never capped.  |
-| `showZero?`   | `boolean`              | `false`       | Whether to show a number badge whose value is `0` or `'0'`.                                |
-| `position?`   | `BadgePosition`        | `'top-right'` | Overlay position. `right`/`left` follow the reading direction.                             |
-| `variant?`    | `BadgeVariant`         | `'danger'`    | Badge variant style                                                                        |
-| `locale?`     | `Partial<TigerLocale>` | `-`           | Locale override merged on top of ConfigProvider locale.                                    |
+| Prop          | Type               | Default    | Notes                                                                                      |
+| ------------- | ------------------ | ---------- | ------------------------------------------------------------------------------------------ |
+| `content?`    | `number \| string` | `-`        | Badge content (number or text). Ignored when type='dot'. Empty number/text badges do no... |
+| `type?`       | `BadgeType`        | `'number'` | Badge display type                                                                         |
+| `standalone?` | `boolean`          | `true`     | Standalone (inline) or wrapping children. Overlay requires `standalone={false}`.           |
+| `max?`        | `number`           | `99`       | Maximum count (`type='number'` only). Exceeds shows 'max+'. Text badges are never capped.  |
 
 ## Button
 
-`packages/core/src/types/button.ts` · `ButtonProps` · 8/13 props
+`packages/core/src/types/button.ts` · `ButtonProps` · 4/13 props
 
 Note: `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。
 
-| Prop            | Type                 | Default     | Notes                                                                                      |
-| --------------- | -------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `variant?`      | `ButtonVariant`      | `'primary'` | Button variant style                                                                       |
-| `size?`         | `ButtonSize`         | `-`         | Button size. When omitted, uses the enclosing ButtonGroup size, then `md`. Passing `und... |
-| `disabled?`     | `boolean`            | `false`     | Whether the button is disabled                                                             |
-| `loading?`      | `boolean`            | `false`     | Whether the button is in loading state                                                     |
-| `htmlType?`     | `ButtonHtmlType`     | `'button'`  | HTML `type`. Same attribute as native `type`: `htmlType ?? type ?? 'button'`. If both a... |
-| `danger?`       | `boolean`            | `false`     | Whether to apply danger/destructive styling Overrides variant colors with error/danger...  |
-| `iconPosition?` | `ButtonIconPosition` | `'start'`   | Position of the icon relative to button text. DOM order follows this value (`start`/`le... |
-| `block?`        | `boolean`            | `false`     | Whether the button should take full width of its parent                                    |
+| Prop        | Type            | Default     | Notes                                                                                      |
+| ----------- | --------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `variant?`  | `ButtonVariant` | `'primary'` | Button variant style                                                                       |
+| `size?`     | `ButtonSize`    | `-`         | Button size. When omitted, uses the enclosing ButtonGroup size, then `md`. Passing `und... |
+| `disabled?` | `boolean`       | `false`     | Whether the button is disabled                                                             |
+| `loading?`  | `boolean`       | `false`     | Whether the button is in loading state                                                     |
 
 ## ButtonGroup
 
@@ -86,18 +75,16 @@ Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `ari
 
 ## Code
 
-`packages/core/src/types/code.ts` · `CodeProps` · 6/9 props
+`packages/core/src/types/code.ts` · `CodeProps` · 4/9 props
 
 Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。
 
-| Prop               | Type                       | Default | Notes                                                                                      |
-| ------------------ | -------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `code`             | `string`                   | `-`     | -                                                                                          |
-| `copyable?`        | `boolean`                  | `true`  | -                                                                                          |
-| `locale?`          | `Partial<TigerLocale>`     | `-`     | Locale overrides for Code UI text                                                          |
-| `labels?`          | `Partial<TigerLocaleCode>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
-| `copiedLabel?`     | `string`                   | `-`     | -                                                                                          |
-| `copyFailedLabel?` | `string`                   | `-`     | -                                                                                          |
+| Prop        | Type                       | Default | Notes                                                                                      |
+| ----------- | -------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `code`      | `string`                   | `-`     | -                                                                                          |
+| `copyable?` | `boolean`                  | `true`  | -                                                                                          |
+| `locale?`   | `Partial<TigerLocale>`     | `-`     | Locale overrides for Code UI text                                                          |
+| `labels?`   | `Partial<TigerLocaleCode>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
 
 ## ConfigProvider
 
@@ -112,7 +99,7 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 
 ## CropUpload
 
-`packages/core/src/types/image.ts` · `CropUploadProps` · 5/10 props
+`packages/core/src/types/image.ts` · `CropUploadProps` · 4/10 props
 
 | Prop            | Type                                      | Default     | Notes                                                                                      |
 | --------------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -120,13 +107,12 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 | `maxSize?`      | `number`                                  | `-`         | Maximum file size in bytes                                                                 |
 | `cropperProps?` | `Partial<Omit<ImageCropperProps, 'src'>>` | `-`         | Props passed to the internal ImageCropper (`src` is owned by CropUpload). Outer `locale... |
 | `disabled?`     | `boolean`                                 | `false`     | Whether the component is disabled                                                          |
-| `locale?`       | `Partial<TigerLocale>`                    | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
 
 Events/callback props: `onCropComplete?`, `onError?`.
 
 ## Divider
 
-`packages/core/src/types/divider.ts` · `DividerProps` · 5/8 props
+`packages/core/src/types/divider.ts` · `DividerProps` · 4/8 props
 
 Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。
 
@@ -136,7 +122,6 @@ Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradi
 | `lineStyle?`   | `DividerLineStyle`   | `'solid'`                                                       | Line style of the divider                                             |
 | `color?`       | `string`             | `undefined (uses default border color)`                         | Custom color for the divider Can be a CSS color value or CSS variable |
 | `thickness?`   | `string`             | `undefined (uses default 1px for horizontal, 1px for vertical)` | Custom thickness of the divider line                                  |
-| `spacing?`     | `DividerSpacing`     | `'md'`                                                          | Spacing (margin) around the divider                                   |
 
 ## Empty
 
@@ -176,71 +161,11 @@ Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享�
 | `size?`  | `IconSize` | `'md'`  | Icon size                                                                                  |
 | `color?` | `string`   | `-`     | Icon color written onto the wrapper. Omitted values inherit CSS `color` (including `sty... |
 
-### Built-in icon set
-
-内置图标支持通过 `name` 属性直接渲染。所有内置图标均注册在图标注册表中，可以通过 `@expcat/tigercat-core/icons/registry` 导出相关 API 和定义。
-
-**内置图标名称列表 (`IconName`):**
-
-- `close` / `success` / `warning` / `error` / `info` / `check`
-- `chevron-up` / `chevron-down` / `chevron-left` / `chevron-right`
-- `arrow-up` / `arrow-down` / `arrow-left` / `arrow-right`
-- `search` / `plus` / `minus` / `edit` / `trash`
-- `user` / `users` / `settings` / `eye` / `eye-off` / `calendar` / `clock`
-- `menu` / `more-horizontal` / `more-vertical` / `external-link`
-- `home` / `bell` / `mail` / `phone` / `download` / `upload` / `filter` / `refresh` / `logout` / `lock`
-- `star` / `heart` / `copy` / `link` / `document` / `folder` / `image` / `map-pin` / `check-circle` / `x-circle` / `dashboard`
-
-完整列表以 `iconNames` 运行时导出为准。注册表刻意保持精简——每个内部用到 Icon 的组件都会打包整个注册表，新增全局图标会增加所有相关子路径的体积。
-
-### Extended icons（按需导入）
-
-扩展图标集（排序、媒体、商务、数据等约 60 个 Heroicons outline 图标）不注册全局名称，因此不进入组件包体积。按需导入 `IconDefinition` 常量，通过 `icon` 属性使用；常量带 `/*#__PURE__*/` 标注且包声明 `sideEffects: false`，bundler 可逐个 tree-shake 未使用的图标：
-
-```ts
-import { rocketIcon, sortAscendingIcon } from '@expcat/tigercat-core'
-```
-
-```tsx
-<Icon icon={rocketIcon} />
-```
-
-命名规则：kebab-case 图标名 → camelCase + `Icon` 后缀（`sort-ascending` → `sortAscendingIcon`）。全量集合可通过 `extendedIcons`（`Record<ExtendedIconName, IconDefinition>`）导入用于图标画廊等场景（导入该对象会打包全部扩展图标）。
-
-### Custom logo via `icon` prop
-
-自定义图标（如品牌 logo）可定义为 `IconDefinition` 常量，定义一次、处处复用，无需全局注册：
-
-```ts
-import type { IconDefinition } from '@expcat/tigercat-core'
-
-const myLogo: IconDefinition = { viewBox: '0 0 32 32', paths: ['…'], mode: 'fill' }
-```
-
-```tsx
-<Icon icon={myLogo} />
-```
-
-优先级：自定义 SVG children > `icon` > `name`。`IconDefinition` 仅支持 path 数据 + 单色 stroke/fill；多色、含 circle/rect/渐变的复杂 logo 请使用 children 方式内嵌完整 SVG。
-
-**图标注册表导出的辅助函数与类型:**
-
-- `iconRegistry`: 图标定义全局注册表对象。
-- `iconNames`: 包含所有内置图标名称的只读数组。
-- `getIconDefinition(name: string)`: 根据名称获取图标定义的方法。
-- `IconDefinition`: 图标定义接口类型。
-- `IconName`: 包含所有内置图标名称的联合类型。
-- `IconRenderMode`: 图标渲染模式联合类型 (`'stroke' | 'fill'`)。
-
-导入路径示例：
-
-```ts
-import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-core/icons/registry'
-```
+Priority: SVG children > `icon` > `name`. Built-in `name` values live in `iconNames`; registry helpers are `@expcat/tigercat-core/icons/registry`. Extended icons are tree-shakeable `*Icon` constants, not global names.
 
 ## Image
 
-`packages/core/src/types/image.ts` · `ImageProps` · 8/19 props
+`packages/core/src/types/image.ts` · `ImageProps` · 4/19 props
 
 Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。
 
@@ -250,14 +175,10 @@ Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `loc
 | `alt?`            | `string`              | `-`       | Alternative text for image                                                                 |
 | `preview?`        | `boolean`             | `true`    | Whether the image triggers preview                                                         |
 | `previewTrigger?` | `ImagePreviewTrigger` | `'click'` | How the preview is triggered when `preview` is enabled. - `click`: full-screen viewer o... |
-| `lazy?`           | `boolean`             | `false`   | Whether to lazy load the image using IntersectionObserver                                  |
-| `fallbackSrc?`    | `string`              | `-`       | Fallback image source when loading fails                                                   |
-| `fit?`            | `ImageFit`            | `'cover'` | Object-fit behavior for the image                                                          |
-| `height?`         | `number \| string`    | `-`       | Image height (CSS value)                                                                   |
 
 ## ImageCompare
 
-`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 8/17 props
+`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 4/17 props
 
 Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。
 
@@ -267,14 +188,10 @@ Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare
 | `afterSrc?`    | `string`                  | `-`            | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
 | `position?`    | `number`                  | `-`            | Handle position as a percentage of the before image that is visible (controlled mode)      |
 | `orientation?` | `ImageCompareOrientation` | `'horizontal'` | Comparison axis                                                                            |
-| `disabled?`    | `boolean`                 | `false`        | Whether pointer and keyboard adjustment are disabled                                       |
-| `step?`        | `number`                  | `1`            | Keyboard and pointer snap increment, in percentage points                                  |
-| `ariaLabel?`   | `string`                  | `-`            | Accessible name for the comparison handle. Empty or whitespace is treated as omitted; t... |
-| `width?`       | `number \| string`        | `-`            | Root width (CSS value). A number is treated as pixels.                                     |
 
 ## ImageCropper
 
-`packages/core/src/types/image.ts` · `ImageCropperProps` · 6/12 props
+`packages/core/src/types/image.ts` · `ImageCropperProps` · 4/12 props
 
 Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。
 
@@ -284,8 +201,6 @@ Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 
 | `aspectRatio?` | `number`                                      | `-`           | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
 | `minWidth?`    | `number`                                      | `20`          | Minimum crop width in pixels                                            |
 | `outputType?`  | `'image/png' \| 'image/jpeg' \| 'image/webp'` | `'image/png'` | Output image MIME type                                                  |
-| `guides?`      | `boolean`                                     | `true`        | Whether to show crop guide lines (rule of thirds)                       |
-| `locale?`      | `Partial<TigerLocale>`                        | `-`           | Locale override merged on top of ConfigProvider locale.                 |
 
 ## ImageGroup
 
@@ -300,18 +215,16 @@ Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 6/16 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 4/16 props
 
 Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。与 ImageViewer 同一 dialog。到头 disable；空列表关闭。
 
-| Prop            | Type                   | Default | Notes                                                                  |
-| --------------- | ---------------------- | ------- | ---------------------------------------------------------------------- |
-| `images`        | `ImageLightboxItem[]`  | `-`     | Gallery entries to preview. Required; an empty list closes the dialog. |
-| `open?`         | `boolean`              | `-`     | Whether the preview is open                                            |
-| `currentIndex?` | `number`               | `0`     | Current image index (for multi-image preview)                          |
-| `maskClosable?` | `boolean`              | `true`  | Whether clicking the mask closes the preview                           |
-| `minScale?`     | `number`               | `0.25`  | Minimum scale factor                                                   |
-| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                |
+| Prop            | Type                  | Default | Notes                                                                  |
+| --------------- | --------------------- | ------- | ---------------------------------------------------------------------- |
+| `images`        | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog. |
+| `open?`         | `boolean`             | `-`     | Whether the preview is open                                            |
+| `currentIndex?` | `number`              | `0`     | Current image index (for multi-image preview)                          |
+| `maskClosable?` | `boolean`             | `true`  | Whether clicking the mask closes the preview                           |
 
 ## Kbd
 
@@ -328,7 +241,7 @@ Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可�
 
 ## Link
 
-`packages/core/src/types/link.ts` · `LinkProps` · 5/8 props
+`packages/core/src/types/link.ts` · `LinkProps` · 4/8 props
 
 Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
 
@@ -338,11 +251,10 @@ Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener n
 | `target?`    | `'_blank' \| '_self' \| '_parent' \| '_top'` | `undefined` | Where to open the linked document                                           |
 | `variant?`   | `LinkVariant`                                | `'primary'` | Link variant style                                                          |
 | `underline?` | `boolean`                                    | `true`      | Whether to underline at rest. Hover is not a substitute for the rest state. |
-| `disabled?`  | `boolean`                                    | `false`     | Whether the link is disabled                                                |
 
 ## Marquee
 
-`packages/core/src/types/marquee.ts` · `MarqueeProps` · 8/11 props
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 4/11 props
 
 Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。
 
@@ -352,42 +264,32 @@ Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃�
 | `duration?`     | `number`           | `20000`  | Time for one full loop, in milliseconds                                                    |
 | `pauseOnHover?` | `boolean`          | `true`   | Pause looping while hovered. Does not control focus-within pause.                          |
 | `pauseOnFocus?` | `boolean`          | `true`   | Pause looping while focus is inside the region. Independent of `pauseOnHover`; default...  |
-| `paused?`       | `boolean`          | `-`      | Controlled pause. When set, hover/focus no longer derive the flag.                         |
-| `gap?`          | `MarqueeGap`       | `16`     | Gap between items and between duplicated copies. A number is pixels; a string is a CSS...  |
-| `repeat?`       | `number`           | `2`      | How many copies of the content to render for a seamless loop. Omitted or non-finite → 2... |
-| `ariaLabel?`    | `string`           | `-`      | Accessible name for the region. Omitted or blank: not a landmark. Pass `aria-label` / `... |
 
 ## QRCode
 
-`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 6/7 props
+`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 4/7 props
 
 Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Refresh 仅在绑定 `onRefresh` / `@refresh` 时是 button。默认色走 `--tiger-text` / `--tiger-surface`。
 
-| Prop       | Type                   | Default    | Notes                                                                                      |
-| ---------- | ---------------------- | ---------- | ------------------------------------------------------------------------------------------ |
-| `value`    | `string`               | `-`        | Text / URL to encode into a scannable QR                                                   |
-| `status?`  | `QRCodeStatus`         | `'active'` | Overlay status. `expired` shows a refresh control when a handler is passed.                |
-| `size?`    | `number`               | `128`      | Size in pixels, including the quiet zone                                                   |
-| `color?`   | `string`               | `-`        | Foreground (module) color. Defaults to `--tiger-text`. Hex pairs with `bgColor` that fa... |
-| `bgColor?` | `string`               | `-`        | Background color. Defaults to `--tiger-surface`.                                           |
-| `locale?`  | `Partial<TigerLocale>` | `-`        | Locale override merged on top of ConfigProvider locale.                                    |
+| Prop      | Type           | Default    | Notes                                                                                      |
+| --------- | -------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `value`   | `string`       | `-`        | Text / URL to encode into a scannable QR                                                   |
+| `status?` | `QRCodeStatus` | `'active'` | Overlay status. `expired` shows a refresh control when a handler is passed.                |
+| `size?`   | `number`       | `128`      | Size in pixels, including the quiet zone                                                   |
+| `color?`  | `string`       | `-`        | Foreground (module) color. Defaults to `--tiger-text`. Hex pairs with `bgColor` that fa... |
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 8/12 props
+`packages/core/src/types/rate.ts` · `RateProps` · 4/12 props
 
 Note: `readOnly` 可聚焦不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。
 
-| Prop          | Type       | Default | Notes                                                                        |
-| ------------- | ---------- | ------- | ---------------------------------------------------------------------------- |
-| `allowHalf?`  | `boolean`  | `-`     | Whether to allow half stars                                                  |
-| `allowClear?` | `boolean`  | `true`  | Whether to allow clearing by clicking the same value                         |
-| `character?`  | `string`   | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
-| `readOnly?`   | `boolean`  | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
-| `disabled?`   | `boolean`  | `-`     | Whether the component is disabled                                            |
-| `size?`       | `RateSize` | `'md'`  | Component size                                                               |
-| `count?`      | `number`   | `-`     | Number of stars                                                              |
-| `value?`      | `number`   | `-`     | -                                                                            |
+| Prop          | Type      | Default | Notes                                                                        |
+| ------------- | --------- | ------- | ---------------------------------------------------------------------------- |
+| `allowHalf?`  | `boolean` | `-`     | Whether to allow half stars                                                  |
+| `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                         |
+| `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
+| `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
 
 ## Result
 
@@ -404,69 +306,59 @@ Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTT
 
 ## Segmented
 
-`packages/core/src/types/segmented.ts` · `SegmentedProps` · 6/8 props
+`packages/core/src/types/segmented.ts` · `SegmentedProps` · 4/8 props
 
 Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。
 
-| Prop        | Type                | Default | Notes                                                            |
-| ----------- | ------------------- | ------- | ---------------------------------------------------------------- |
-| `options?`  | `SegmentedOption[]` | `-`     | Available options                                                |
-| `block?`    | `boolean`           | `false` | Whether the control fills full width                             |
-| `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled                            |
-| `size?`     | `ComponentSize`     | `-`     | Component size                                                   |
-| `name?`     | `string`            | `-`     | Native form name. Writes a hidden input with the selected value. |
-| `value?`    | `string \| number`  | `-`     | -                                                                |
+| Prop        | Type                | Default | Notes                                 |
+| ----------- | ------------------- | ------- | ------------------------------------- |
+| `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
+| `block?`    | `boolean`           | `false` | Whether the control fills full width  |
+| `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
+| `size?`     | `ComponentSize`     | `-`     | Component size                        |
 
 ## SplitButton
 
-`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 8/23 props
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/23 props
 
-| Prop         | Type                | Default        | Notes                                                                             |
-| ------------ | ------------------- | -------------- | --------------------------------------------------------------------------------- |
-| `variant?`   | `ButtonVariant`     | `'primary'`    | Visual variant applied to the primary action and the menu trigger                 |
-| `size?`      | `ButtonSize`        | `'md'`         | Size applied to the primary action and the menu trigger                           |
-| `disabled?`  | `boolean`           | `false`        | Whether both the primary action and the menu trigger are disabled                 |
-| `loading?`   | `boolean`           | `false`        | Whether the primary action is in a loading state. Also disables the menu trigger. |
-| `htmlType?`  | `ButtonHtmlType`    | `'button'`     | HTML button type for the primary action                                           |
-| `open?`      | `boolean`           | `-`            | Whether the menu is open (controlled mode)                                        |
-| `portal?`    | `boolean`           | `true`         | Render the menu into document.body (portal/Teleport)                              |
-| `placement?` | `FloatingPlacement` | `'bottom-end'` | Dropdown placement relative to the chevron trigger                                |
+| Prop        | Type            | Default     | Notes                                                                             |
+| ----------- | --------------- | ----------- | --------------------------------------------------------------------------------- |
+| `variant?`  | `ButtonVariant` | `'primary'` | Visual variant applied to the primary action and the menu trigger                 |
+| `size?`     | `ButtonSize`    | `'md'`      | Size applied to the primary action and the menu trigger                           |
+| `disabled?` | `boolean`       | `false`     | Whether both the primary action and the menu trigger are disabled                 |
+| `loading?`  | `boolean`       | `false`     | Whether the primary action is in a loading state. Also disables the menu trigger. |
 
 ## Statistic
 
-`packages/core/src/types/statistic.ts` · `StatisticProps` · 7/11 props
+`packages/core/src/types/statistic.ts` · `StatisticProps` · 4/11 props
 
 Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。
 
-| Prop              | Type                   | Default | Notes                                                     |
-| ----------------- | ---------------------- | ------- | --------------------------------------------------------- |
-| `title?`          | `string`               | `-`     | Title / label of the metric. Not the native HTML tooltip. |
-| `value?`          | `string \| number`     | `-`     | The numeric or text value                                 |
-| `groupSeparator?` | `boolean`              | `-`     | Whether to show grouping separator (e.g. 1,000)           |
-| `animated?`       | `boolean`              | `-`     | Whether to animate numeric values                         |
-| `prefix?`         | `string`               | `-`     | Prefix text or symbol before the value                    |
-| `suffix?`         | `string`               | `-`     | Suffix text or symbol after the value                     |
-| `locale?`         | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.   |
+| Prop              | Type               | Default | Notes                                                     |
+| ----------------- | ------------------ | ------- | --------------------------------------------------------- |
+| `title?`          | `string`           | `-`     | Title / label of the metric. Not the native HTML tooltip. |
+| `value?`          | `string \| number` | `-`     | The numeric or text value                                 |
+| `groupSeparator?` | `boolean`          | `-`     | Whether to show grouping separator (e.g. 1,000)           |
+| `animated?`       | `boolean`          | `-`     | Whether to animate numeric values                         |
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 7/10 props
+`packages/core/src/types/tag.ts` · `TagProps` · 4/10 props
 
 Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
 
-| Prop              | Type                   | Default     | Notes                                                                                      |
-| ----------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `closable?`       | `boolean`              | `false`     | Whether the tag can be closed                                                              |
-| `visible?`        | `boolean`              | `-`         | When `false`, the tag is not rendered. Omitted / `true` keeps it visible. Closing never... |
-| `pill?`           | `boolean`              | `false`     | Fully rounded pill shape                                                                   |
-| `variant?`        | `TagVariant`           | `'default'` | Tag variant style                                                                          |
-| `size?`           | `TagSize`              | `'md'`      | Tag size                                                                                   |
-| `closeAriaLabel?` | `string`               | `-`         | Accessible label for the close button (when `closable` is true). Defaults to ConfigProv... |
-| `locale?`         | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
+| Prop        | Type         | Default     | Notes                         |
+| ----------- | ------------ | ----------- | ----------------------------- |
+| `closable?` | `boolean`    | `false`     | Whether the tag can be closed |
+| `pill?`     | `boolean`    | `false`     | Fully rounded pill shape      |
+| `variant?`  | `TagVariant` | `'default'` | Tag variant style             |
+| `size?`     | `TagSize`    | `'md'`      | Tag size                      |
+
+Events/callback props: `onOpenChange?`.
 
 ## Text
 
-`packages/core/src/types/text.ts` · `TextProps` · 5/9 props
+`packages/core/src/types/text.ts` · `TextProps` · 4/9 props
 
 Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。
 
@@ -476,19 +368,16 @@ Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/sma
 | `align?`    | `TextAlign` | `-`         | Text alignment                         |
 | `color?`    | `TextColor` | `'default'` | Text color                             |
 | `truncate?` | `boolean`   | `false`     | Whether to truncate text with ellipsis |
-| `size?`     | `TextSize`  | `'base'`    | Text size                              |
 
 ## Watermark
 
-`packages/core/src/types/watermark.ts` · `WatermarkProps` · 6/14 props
+`packages/core/src/types/watermark.ts` · `WatermarkProps` · 4/14 props
 
 Note: `gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。需要打印时 overlay 带 print-color-adjust。
 
-| Prop       | Type                 | Default | Notes                                                       |
-| ---------- | -------------------- | ------- | ----------------------------------------------------------- |
-| `content?` | `string \| string[]` | `-`     | Watermark text content. Array means multi-line.             |
-| `font?`    | `WatermarkFont`      | `-`     | Font configuration                                          |
-| `gapX?`    | `number`             | `100`   | Horizontal gap between watermarks in px                     |
-| `gapY?`    | `number`             | `100`   | Vertical gap between watermarks in px                       |
-| `image?`   | `string`             | `-`     | Image URL to use as watermark (takes priority over content) |
-| `rotate?`  | `number`             | `-22`   | Rotation angle in degrees                                   |
+| Prop       | Type                 | Default | Notes                                           |
+| ---------- | -------------------- | ------- | ----------------------------------------------- |
+| `content?` | `string \| string[]` | `-`     | Watermark text content. Array means multi-line. |
+| `font?`    | `WatermarkFont`      | `-`     | Font configuration                              |
+| `gapX?`    | `number`             | `100`   | Horizontal gap between watermarks in px         |
+| `gapY?`    | `number`             | `100`   | Vertical gap between watermarks in px           |

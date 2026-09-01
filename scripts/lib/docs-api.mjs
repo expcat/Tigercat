@@ -8,7 +8,7 @@
 import { pascalToKebab } from './public-components.mjs'
 
 export const MIN_COMPACT_PROPS = 3
-export const MAX_COMPACT_PROPS = 8
+export const MAX_COMPACT_PROPS = 4
 /** Own fields kept in full only for small `extends` leaves (Donut, not ImagePreview). */
 export const MAX_THIN_OWN_PROPS = 4
 

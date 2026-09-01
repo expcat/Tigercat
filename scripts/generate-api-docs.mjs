@@ -367,7 +367,7 @@ const COMPONENT_USAGE_NOTES = {
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '固定列通过 `column.fixed`（`left` / `right`）开启；开启 `columnLockable` 后表头会出现锁定按钮，点击可交互切换该列进入左侧固定区，按钮的 `aria-label` 走 i18n，可用 `lockColumnAriaLabel` / `unlockColumnAriaLabel`（模板支持 `{column}`）自定义。推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。当存在固定列或开启 `columnLockable` 时，表格会渲染 `<colgroup>` + `<col>` 钉死每列宽度（有声明 `width` 的列用声明值，无声明宽度的列冻结首次实测宽度），使列宽与 `fixed`/锁定状态解耦——切换锁定不会改变任何列宽，sticky 偏移保持准确；代价是这类表格的自适应列在首次测量后宽度被冻结、不再随容器宽度回流（普通表格不受影响）。`tableLayout`（默认 `"auto"`，可设为 `"fixed"`）切换底层 `table-layout`，固定列/钉列场景配合列 `width` 时 `"fixed"` 列宽更稳定。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制（默认 `sm`），卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName`、`valueClassName` 做轻量布局调整，且 `cardFieldGap`（默认 "gap-3"，需传完整 Tailwind gap 类以便 Tailwind JIT 静态识别）可调整字段间的间距。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。为保证锁定/固定列在横向滚动时 `position: sticky` 稳定钉住，表格根使用 `border-separate` + `border-spacing-0`，行/表头分隔线落在单元格（`<td>`/`<th>`）而非 `<tr>`/`<thead>`。省略 `pagination` 时默认开启（`pageSize` 10）；关掉请传 `false`。传入的分页对象与该默认浅合并。`pagination.total` 未传才回落到本地长度，`0` 是合法总数。服务端模式 `pagination.remote: true` 跳过内部切片以及内置 filter/sort/group（当前页再筛请设 `localProcessing`）。`onCellChange` / `onRowClick` / `render` 的 index 是 dataSource 下标。内置 `exportable` 只出 CSV；xlsx 走 DataExport。`autoVirtual` 默认关。'
+      '`column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；`remote: true` 不做本地筛排切。内置导出只出 CSV。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -393,109 +393,19 @@ const COMPONENT_USAGE_NOTES = {
 
 const COMPONENT_PROPS_EXTRA = {
   Icon: `
-### Built-in icon set
-
-内置图标支持通过 \`name\` 属性直接渲染。所有内置图标均注册在图标注册表中，可以通过 \`@expcat/tigercat-core/icons/registry\` 导出相关 API 和定义。
-
-**内置图标名称列表 (\`IconName\`):**
-- \`close\` / \`success\` / \`warning\` / \`error\` / \`info\` / \`check\`
-- \`chevron-up\` / \`chevron-down\` / \`chevron-left\` / \`chevron-right\`
-- \`arrow-up\` / \`arrow-down\` / \`arrow-left\` / \`arrow-right\`
-- \`search\` / \`plus\` / \`minus\` / \`edit\` / \`trash\`
-- \`user\` / \`users\` / \`settings\` / \`eye\` / \`eye-off\` / \`calendar\` / \`clock\`
-- \`menu\` / \`more-horizontal\` / \`more-vertical\` / \`external-link\`
-- \`home\` / \`bell\` / \`mail\` / \`phone\` / \`download\` / \`upload\` / \`filter\` / \`refresh\` / \`logout\` / \`lock\`
-- \`star\` / \`heart\` / \`copy\` / \`link\` / \`document\` / \`folder\` / \`image\` / \`map-pin\` / \`check-circle\` / \`x-circle\` / \`dashboard\`
-
-完整列表以 \`iconNames\` 运行时导出为准。注册表刻意保持精简——每个内部用到 Icon 的组件都会打包整个注册表，新增全局图标会增加所有相关子路径的体积。
-
-### Extended icons（按需导入）
-
-扩展图标集（排序、媒体、商务、数据等约 60 个 Heroicons outline 图标）不注册全局名称，因此不进入组件包体积。按需导入 \`IconDefinition\` 常量，通过 \`icon\` 属性使用；常量带 \`/*#__PURE__*/\` 标注且包声明 \`sideEffects: false\`，bundler 可逐个 tree-shake 未使用的图标：
-
-\`\`\`ts
-import { rocketIcon, sortAscendingIcon } from '@expcat/tigercat-core'
-\`\`\`
-
-\`\`\`tsx
-<Icon icon={rocketIcon} />
-\`\`\`
-
-命名规则：kebab-case 图标名 → camelCase + \`Icon\` 后缀（\`sort-ascending\` → \`sortAscendingIcon\`）。全量集合可通过 \`extendedIcons\`（\`Record<ExtendedIconName, IconDefinition>\`）导入用于图标画廊等场景（导入该对象会打包全部扩展图标）。
-
-### Custom logo via \`icon\` prop
-
-自定义图标（如品牌 logo）可定义为 \`IconDefinition\` 常量，定义一次、处处复用，无需全局注册：
-
-\`\`\`ts
-import type { IconDefinition } from '@expcat/tigercat-core'
-
-const myLogo: IconDefinition = { viewBox: '0 0 32 32', paths: ['…'], mode: 'fill' }
-\`\`\`
-
-\`\`\`tsx
-<Icon icon={myLogo} />
-\`\`\`
-
-优先级：自定义 SVG children > \`icon\` > \`name\`。\`IconDefinition\` 仅支持 path 数据 + 单色 stroke/fill；多色、含 circle/rect/渐变的复杂 logo 请使用 children 方式内嵌完整 SVG。
-
-**图标注册表导出的辅助函数与类型:**
-- \`iconRegistry\`: 图标定义全局注册表对象。
-- \`iconNames\`: 包含所有内置图标名称的只读数组。
-- \`getIconDefinition(name: string)\`: 根据名称获取图标定义的方法。
-- \`IconDefinition\`: 图标定义接口类型。
-- \`IconName\`: 包含所有内置图标名称的联合类型。
-- \`IconRenderMode\`: 图标渲染模式联合类型 (\`'stroke' | 'fill'\`)。
-
-导入路径示例：
-\`\`\`ts
-import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-core/icons/registry'
-\`\`\`
+Priority: SVG children > \`icon\` > \`name\`. Built-in \`name\` values live in \`iconNames\`; registry helpers are \`@expcat/tigercat-core/icons/registry\`. Extended icons are tree-shakeable \`*Icon\` constants, not global names.
 `,
   TableToolbar: `
-Custom filter context: \`filters[].render({ filter, value, filters, setValue, setFilter })\`. Use \`setValue(value)\` to update the current filter key, or \`setFilter(key, value)\` when one custom control updates another key. \`TableToolbarFilterValue\` accepts \`string | number | Record<string, unknown> | null\`, so range filters can emit \`{ ageRange: { min, max } }\`.
-
-### Per-filter container styling
-
-\`filters[].itemClass\` 和 \`filters[].itemStyle\` 可逐项定制 filter 容器样式。 \`itemClass\` 使用**替换语义**——提供时整体替换默认宽度类，不追加。默认宽度类：
-
-- Select 型 filter：\`w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]\`
-- 自定义 render 型 filter：\`w-full sm:w-auto\`
-
-如需保留部分默认类，请在 \`itemClass\` 中手动包含。
-
-### Toolbar container and search styling
-
-| Prop | Semantics | Default classes |
-| ---- | --------- | --------------- |
-| \`className?\` | **追加** | 追加到 \`flex flex-wrap items-center gap-3 p-4\` 之后 |
-| \`style?\` | 内联样式 | 作为 CSS 内联样式确定性覆盖间距等 |
-| \`searchClassName?\` | **替换** | 替换默认 \`w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]\`，结构类 \`flex items-center gap-2\` 保留 |
-
-### Full toolbar replacement
-
-Vue 通过 \`#toolbar\` 作用域插槽，React 通过 \`toolbar.render\`（函数或 ReactNode），完全替换内置工具栏区域（含 \`role="toolbar"\` 容器）。
-
-\`TableToolbarRenderContext\` 字段：\`searchValue\`, \`setSearch\`, \`submitSearch\`, \`filters\`, \`setFilter\`, \`selectedKeys\`, \`selectedCount\`, \`hiddenColumnKeys\`, \`setHiddenColumnKeys\`。
-
-> **a11y 注意**：使用自定义 toolbar 时，内置 \`role="toolbar"\` 容器不再渲染，调用方应自行在自定义 toolbar 根元素上添加 \`role="toolbar"\` 和 \`aria-label\`。
+\`filters[].render({ filter, value, filters, setValue, setFilter })\` owns custom controls. \`itemClass\` replaces default width classes. Vue \`#toolbar\` / React \`toolbar.render\` replace the whole bar — add \`role="toolbar"\` yourself.
 `,
   DataTableWithToolbar: `
-卡片自定义（公开 API）：\`renderCard(context)\` / \`cardClassName\`（\`string\` 或 \`(record, index) => string\`）已在 \`DataTableWithToolbar\` 显式声明并转发给内部 Table；Vue 侧另有 \`#card="{ record, index, columns, selected, expanded, toggleExpand, selectRow }"\` 作用域插槽，**插槽优先于 \`renderCard\` prop**。
+\`renderCard\` / \`cardClassName\` forward to Table. Vue \`#card\` wins over \`renderCard\`.
 `,
   NotificationContainer: `
 Imperative notification API supports inline toast actions via \`notification.info({ title, actions: [{ label, type, closeOnClick, onClick }] })\`. Action clicks do not trigger the whole-toast \`onClick\`; use \`closeOnClick\` or the callback context \`close()\` to dismiss that toast.
 `,
   Menu: `
-### Collapsed mode behavior
-
-\`collapsed\` 只作用于 vertical / inline：容器收窄到图标列，子菜单改走 popup（\`inline\`+\`collapsed\` 会把 mode 收成 vertical）。horizontal 会忽略该 prop 并 \`devWarn\`。
-
-- **图标居中**：折叠态去掉图标的 \`me-2\`，只留 \`flex-shrink-0\`。
-- **标签 sr-only 保留**：可访问名称仍是完整标签，不是首字母。
-- **首字母回退**：无图标且 children 是纯文本时显示首字母（\`aria-hidden\`）。非文本 children 不造 \`[\`。
-- **子菜单箭头隐藏**：折叠态不渲染 ExpandIcon；标题走同一套 collapsed item class。
-- **popupPortal**：默认 \`true\`，飞出层走 overlay-host 链，避免父级 overflow 裁切。
+\`collapsed\` only applies to vertical/inline (horizontal \`devWarn\`s). Labels stay \`sr-only\`; text-only items show a first-letter glyph. \`popupPortal\` defaults true.
 `
 }
 
@@ -926,7 +836,7 @@ function generatePublicHooksSection(publicHooks) {
 
   const items = publicHooks.map((hook) => `\`${hook.name}\` (${hook.packages.join(', ')})`)
   let markdownText = '## Public hooks\n\n'
-  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. React \`useControlledState({ value, defaultValue, onChange, postState })\`; T cannot be a function. \`useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })\`: wrap items with \`getDragItemProps\` / \`getDragItemAttrs\` and the parent with the drop-zone bindings; merge extra \`className\`/\`class\`. Cross-container needs \`config.crossContainer\` and distinct \`containerId\`s. Pointer reorder; keyboard via move buttons or your own keys. Types: \`packages/core/src/types/drag.ts\`. \`useChartInteraction\`: click is independent of \`selectable\`; deselect emits \`null\` on the select channel. \`useResponsiveChartSize\` shares ChartCanvas's observed size.\n\n`
+  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. See each hook's types for options.\n\n`
   return markdownText
 }
 
@@ -937,8 +847,7 @@ function generateLlmApiSummary(categorizedFiles, publicHooks = []) {
   markdownText += '---\n\n'
   markdownText += '<!-- generated by pnpm docs:api -->\n\n'
   markdownText += '# Tigercat API Summary\n\n'
-  markdownText +=
-    '> 自动生成。只用于定位类型文件、Props 接口和公开 hook；组件路由看 component-index，字段细节看分类 props 文档或源码。\n\n'
+  markdownText += '> 自动生成。类型定位表；字段看分类 props 或源码。\n\n'
   markdownText += generatePublicHooksSection(publicHooks)
 
   for (const { category, files } of categorizedFiles) {
@@ -946,7 +855,8 @@ function generateLlmApiSummary(categorizedFiles, publicHooks = []) {
     markdownText += '| Type File | Props Interfaces |\n'
     markdownText += '| --------- | ---------------- |\n'
     for (const fileInfo of files) {
-      markdownText += `| ${fileInfo.fileName} | ${fileInfo.propsInterfaces.join(', ') || '-'} |\n`
+      if (!fileInfo.propsInterfaces.length) continue
+      markdownText += `| ${fileInfo.fileName} | ${fileInfo.propsInterfaces.join(', ')} |\n`
     }
     markdownText += '\n'
   }
