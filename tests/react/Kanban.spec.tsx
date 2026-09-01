@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, screen } from '@testing-library/react'
 import React from 'react'
 import { Kanban } from '@expcat/tigercat-react/Kanban'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
@@ -143,7 +143,7 @@ describe('Kanban', () => {
     })
 
     it('hides cards for collapsed swimlanes', () => {
-      const { container } = render(
+      const { container, queryByText } = render(
         <Kanban
           columns={swimlaneColumns}
           swimlaneField="type"
@@ -151,29 +151,27 @@ describe('Kanban', () => {
         />
       )
       const lane = container.querySelector('[data-tiger-kanban-swimlane-id="bug"]')
-      expect(lane?.querySelector('.hidden')).toBeTruthy()
+      expect(lane?.querySelector('[data-tiger-taskboard-card]')).toBeNull()
+      expect(queryByText('Bug task')).not.toBeInTheDocument()
     })
   })
 
   describe('Add card', () => {
     it('should show add card button when allowAddCard is true', () => {
       const { container } = renderKanban({ allowAddCard: true })
-      const addBtns = container.querySelectorAll('[role="button"]')
-      expect(addBtns.length).toBeGreaterThanOrEqual(3)
+      expect(container.querySelectorAll('button').length).toBeGreaterThanOrEqual(3)
     })
 
     it('should call onCardAdd when add card is clicked', () => {
       const onCardAdd = vi.fn()
-      const { container } = renderKanban({ allowAddCard: true, onCardAdd })
-      const addBtns = container.querySelectorAll('[role="button"]')
-      fireEvent.click(addBtns[0])
+      renderKanban({ allowAddCard: true, onCardAdd })
+      fireEvent.click(screen.getAllByRole('button', { name: /\+ Add task/ })[0])
       expect(onCardAdd).toHaveBeenCalledWith('todo')
     })
 
     it('should hide add card button when allowAddCard is false', () => {
       const { container } = renderKanban({ allowAddCard: false })
-      const addBtns = container.querySelectorAll('[role="button"]')
-      expect(addBtns.length).toBe(0)
+      expect(container.querySelectorAll('button').length).toBe(0)
     })
 
     it('inserts a default card when allowAddCard is on and no handler is provided', () => {
@@ -183,8 +181,7 @@ describe('Kanban', () => {
       }
       const { container } = render(<Bound />)
       expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
-      const addBtns = container.querySelectorAll('[role="button"]')
-      fireEvent.click(addBtns[0])
+      fireEvent.click(screen.getAllByRole('button', { name: /\+ Add task/ })[0])
       expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
       expect(container.textContent).toContain('New task')
     })
@@ -198,8 +195,7 @@ describe('Kanban', () => {
         )
       }
       const { container } = render(<Bound />)
-      const addBtns = container.querySelectorAll('[role="button"]')
-      fireEvent.click(addBtns[0])
+      fireEvent.click(screen.getAllByRole('button', { name: /\+ Add task/ })[0])
       expect(onCardAdd).toHaveBeenCalledWith('todo')
       expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
       expect(container.textContent).not.toContain('New task')
@@ -208,8 +204,7 @@ describe('Kanban', () => {
     it('inserts a default card from inner state when only defaultColumns is provided', () => {
       const { container } = render(<Kanban defaultColumns={columns} allowAddCard />)
       expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
-      const addBtns = container.querySelectorAll('[role="button"]')
-      fireEvent.click(addBtns[0])
+      fireEvent.click(screen.getAllByRole('button', { name: /\+ Add task/ })[0])
       expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(4)
       expect(container.textContent).toContain('New task')
     })
@@ -217,16 +212,14 @@ describe('Kanban', () => {
 
   describe('Add column', () => {
     it('should show add column button when allowAddColumn is true', () => {
-      const { container } = renderKanban({ allowAddColumn: true, allowAddCard: false })
-      const addBtns = container.querySelectorAll('[role="button"]')
-      expect(addBtns.length).toBe(1)
+      renderKanban({ allowAddColumn: true, allowAddCard: false })
+      expect(screen.getByRole('button', { name: '+ Add column' })).toBeInTheDocument()
     })
 
     it('should call onColumnAdd when add column is clicked', () => {
       const onColumnAdd = vi.fn()
-      const { container } = renderKanban({ allowAddColumn: true, allowAddCard: false, onColumnAdd })
-      const addBtns = container.querySelectorAll('[role="button"]')
-      fireEvent.click(addBtns[0])
+      renderKanban({ allowAddColumn: true, allowAddCard: false, onColumnAdd })
+      fireEvent.click(screen.getByRole('button', { name: '+ Add column' }))
       expect(onColumnAdd).toHaveBeenCalled()
     })
   })
@@ -261,8 +254,30 @@ describe('Kanban', () => {
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Kanban />)
+      const { container } = render(
+        <Kanban
+          columns={columns}
+          swimlanes={[
+            { id: 'bug', label: 'Bugs' },
+            { id: 'feature', label: 'Features' }
+          ]}
+          swimlaneField="type"
+          allowAddCard
+          showCardCount
+        />
+      )
       await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('accepts locale and labels like TaskBoard', () => {
+      render(
+        <Kanban
+          columns={columns}
+          allowAddColumn
+          locale={{ taskBoard: { addColumnText: '新增欄' } }}
+        />
+      )
+      expect(screen.getByRole('button', { name: '+ 新增欄' })).toBeInTheDocument()
     })
   })
 

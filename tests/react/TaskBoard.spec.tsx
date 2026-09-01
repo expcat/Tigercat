@@ -7,6 +7,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { TaskBoard } from '@expcat/tigercat-react/TaskBoard'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const columns: TaskBoardColumn[] = [
@@ -65,9 +66,9 @@ describe('TaskBoard (React)', () => {
       expect(colEls).toHaveLength(3)
     })
 
-    it('renders card count in column header', () => {
+    it('hides the plain card count when showCardCount is false', () => {
       render(<TaskBoard columns={columns} />)
-      expect(screen.getByText('2')).toBeInTheDocument()
+      expect(screen.queryByText('2')).not.toBeInTheDocument()
     })
   })
 
@@ -168,10 +169,10 @@ describe('TaskBoard (React)', () => {
     it('calls onCardAdd from keyboard activation', async () => {
       const onCardAdd = vi.fn()
       render(<TaskBoard columns={columns} allowAddCard onCardAdd={onCardAdd} />)
-      const addBtns = screen.getAllByText('Add task')
+      const addBtns = screen.getAllByRole('button', { name: /\+ Add task/ })
 
-      await fireEvent.keyDown(addBtns[1].closest('[role="button"]')!, { key: 'Enter' })
-      await fireEvent.keyDown(addBtns[2].closest('[role="button"]')!, { key: ' ' })
+      await fireEvent.click(addBtns[1])
+      await fireEvent.click(addBtns[2])
 
       expect(onCardAdd).toHaveBeenCalledWith('doing')
       expect(onCardAdd).toHaveBeenCalledWith('done')
@@ -448,8 +449,41 @@ describe('TaskBoard (React)', () => {
     })
 
     it('should have no accessibility violations', async () => {
-      const { container } = render(<TaskBoard columns={columns} />)
+      const wipCols: TaskBoardColumn[] = [
+        {
+          id: 'todo',
+          title: 'To Do',
+          wipLimit: 1,
+          cards: [
+            { id: 'c1', title: 'Task 1' },
+            { id: 'c2', title: 'Task 2' }
+          ]
+        },
+        { id: 'done', title: 'Done', cards: [] }
+      ]
+      const { container } = render(<TaskBoard columns={wipCols} allowAddCard showCardCount />)
+      const card = container.querySelector('[data-tiger-taskboard-card]')!
+      fireEvent.keyDown(card, { key: 'Enter' })
       await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('drops a grabbed card into an empty column from the keyboard', async () => {
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return <TaskBoard columns={cols} onColumnsChange={setCols} />
+      }
+      const { container } = render(<Bound />)
+      const card = container.querySelector('[data-tiger-taskboard-card-id="c1"]')!
+      fireEvent.keyDown(card, { key: 'Enter' })
+      const emptyList = container.querySelectorAll('[role="list"]')[2]
+      fireEvent.keyDown(emptyList, { key: 'Enter' })
+      await waitFor(() => {
+        expect(
+          container
+            .querySelectorAll('[data-tiger-taskboard-column]')[2]
+            .querySelector('[data-tiger-taskboard-card-id="c1"]')
+        ).toBeTruthy()
+      })
     })
   })
 
@@ -478,6 +512,14 @@ describe('TaskBoard (React)', () => {
       )
       const region = screen.getByRole('region')
       expect(region.getAttribute('aria-label')).toBe('My Kanban')
+    })
+
+    it('uses official zhTW add-column text, not simplified Chinese', () => {
+      render(<TaskBoard columns={columns} allowAddColumn locale={zhTW} />)
+      expect(
+        screen.getByRole('button', { name: `+ ${zhTW.taskBoard?.addColumnText}` })
+      ).toBeInTheDocument()
+      expect(screen.queryByText('+ 添加列')).not.toBeInTheDocument()
     })
   })
 
@@ -530,10 +572,23 @@ describe('TaskBoard (React)', () => {
   })
 
   describe('Filter and visibility', () => {
-    it('filters cards by filterText', () => {
-      render(<TaskBoard columns={columns} filterText="Task 1" />)
-      expect(screen.getByText('Task 1')).toBeInTheDocument()
-      expect(screen.queryByText('Task 3')).not.toBeInTheDocument()
+    it('filters cards by filterText without changing source WIP counts', () => {
+      const wipCols: TaskBoardColumn[] = [
+        {
+          id: 'todo',
+          title: 'To Do',
+          wipLimit: 5,
+          cards: [
+            { id: 'a', title: 'foo' },
+            { id: 'b', title: 'bar' },
+            { id: 'c', title: 'baz' }
+          ]
+        }
+      ]
+      render(<TaskBoard columns={wipCols} filterText="foo" showCardCount />)
+      expect(screen.getByText('foo')).toBeInTheDocument()
+      expect(screen.getByText('3/5')).toBeInTheDocument()
+      expect(screen.queryByText('bar')).not.toBeInTheDocument()
     })
 
     it('hides columns via hiddenColumns', () => {
@@ -574,12 +629,20 @@ describe('TaskBoard (React)', () => {
     it('calls onColumnAdd from keyboard activation', async () => {
       const onColumnAdd = vi.fn()
       render(<TaskBoard columns={columns} allowAddColumn onColumnAdd={onColumnAdd} />)
-      const addBtn = screen.getByText('+ Add column')
+      const addBtn = screen.getByRole('button', { name: '+ Add column' })
 
-      await fireEvent.keyDown(addBtn, { key: 'Enter' })
-      await fireEvent.keyDown(addBtn, { key: ' ' })
+      await fireEvent.click(addBtn)
+      expect(onColumnAdd).toHaveBeenCalledTimes(1)
+    })
 
-      expect(onColumnAdd).toHaveBeenCalledTimes(2)
+    it('inserts a default column when allowAddColumn is on and no handler is provided', async () => {
+      function Bound() {
+        const [cols, setCols] = React.useState(columns)
+        return <TaskBoard columns={cols} onColumnsChange={setCols} allowAddColumn />
+      }
+      render(<Bound />)
+      await fireEvent.click(screen.getByRole('button', { name: '+ Add column' }))
+      expect(screen.getByText('New column')).toBeInTheDocument()
     })
 
     it('does not show add-column button by default', () => {

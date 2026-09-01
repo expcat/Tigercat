@@ -5,143 +5,30 @@
  *   showCardCount  = true  (TaskBoard default: false)
  *   allowAddCard   = true  (TaskBoard default: false)
  *
- * All drag-and-drop logic (HTML5, touch, keyboard) is handled by TaskBoard.
+ * Swimlanes group cards inside each column by `swimlaneField`.
+ * All events and slots fall through to TaskBoard; this wrapper does not
+ * keep a second column state machine.
  */
-import { defineComponent, h, PropType, ref } from 'vue'
-import {
-  appendDefaultTaskBoardCard,
-  type TaskBoardColumn,
-  type KanbanSwimlane,
-  type TaskBoardCardMoveEvent,
-  type TaskBoardColumnMoveEvent,
-  type TaskBoardMoveValidator,
-  type TigerLocale
-} from '@expcat/tigercat-core'
-import { TaskBoard } from './TaskBoard'
+import { defineComponent, h } from 'vue'
+import { TaskBoard, type VueTaskBoardProps } from './TaskBoard'
 
-export interface VueKanbanProps {
-  columns?: TaskBoardColumn[]
-  defaultColumns?: TaskBoardColumn[]
-  draggable?: boolean
-  columnDraggable?: boolean
-  enforceWipLimit?: boolean
-  beforeCardMove?: TaskBoardMoveValidator<TaskBoardCardMoveEvent>
-  beforeColumnMove?: TaskBoardMoveValidator<TaskBoardColumnMoveEvent>
-  onCardAdd?: (columnId: string | number) => void
-  filterText?: string
-  hiddenColumns?: (string | number)[]
-  swimlanes?: KanbanSwimlane[]
-  swimlaneField?: string
-  showCardCount?: boolean
-  allowAddCard?: boolean
-  allowAddColumn?: boolean
-  locale?: Partial<TigerLocale>
-  className?: string
-  style?: Record<string, string | number>
-}
+export type VueKanbanProps = VueTaskBoardProps
 
 export const Kanban = defineComponent({
   name: 'TigerKanban',
   inheritAttrs: false,
   props: {
-    columns: {
-      type: Array as PropType<TaskBoardColumn[]>,
-      default: undefined
-    },
-    defaultColumns: {
-      type: Array as PropType<TaskBoardColumn[]>,
-      default: () => []
-    },
-    draggable: { type: Boolean, default: true },
-    columnDraggable: { type: Boolean, default: true },
-    enforceWipLimit: { type: Boolean, default: false },
-    beforeCardMove: {
-      type: Function as PropType<TaskBoardMoveValidator<TaskBoardCardMoveEvent>>,
-      default: undefined
-    },
-    beforeColumnMove: {
-      type: Function as PropType<TaskBoardMoveValidator<TaskBoardColumnMoveEvent>>,
-      default: undefined
-    },
-    onCardAdd: {
-      type: Function as PropType<(columnId: string | number) => void>,
-      default: undefined
-    },
-    filterText: { type: String, default: '' },
-    hiddenColumns: {
-      type: Array as PropType<(string | number)[]>,
-      default: () => []
-    },
-    swimlanes: {
-      type: Array as PropType<KanbanSwimlane[]>,
-      default: undefined
-    },
-    swimlaneField: {
-      type: String,
-      default: undefined
-    },
     showCardCount: { type: Boolean, default: true },
-    allowAddCard: { type: Boolean, default: true },
-    allowAddColumn: { type: Boolean, default: false },
-    locale: {
-      type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined
-    },
-    className: { type: String, default: undefined },
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
+    allowAddCard: { type: Boolean, default: true }
   },
-  emits: ['card-move', 'column-move', 'update:columns', 'card-add', 'column-add'],
-  setup(props, { emit, attrs, slots }) {
-    // Re-emitting card-add requires a TaskBoard listener, and Vue 3 folds
-    // onCardAdd / @card-add into the same prop — that would look like a
-    // consumer handler and skip TaskBoard's default insert. Insert here
-    // when the Kanban consumer did not pass onCardAdd / @card-add.
-    const pendingColumns = ref<TaskBoardColumn[] | undefined>(undefined)
-
-    const handleCardAdd = (colId: string | number) => {
-      if (props.onCardAdd == null) {
-        const source = props.columns ?? pendingColumns.value ?? props.defaultColumns
-        const next = appendDefaultTaskBoardCard(source, colId)
-        pendingColumns.value = next
-        emit('update:columns', next)
-      }
-      props.onCardAdd?.(colId)
-      emit('card-add', colId)
-    }
-
+  setup(props, { attrs, slots }) {
     return () =>
       h(
         TaskBoard,
         {
           ...attrs,
-          columns: props.columns !== undefined ? props.columns : pendingColumns.value,
-          defaultColumns: props.defaultColumns,
-          draggable: props.draggable,
-          columnDraggable: props.columnDraggable,
-          enforceWipLimit: props.enforceWipLimit,
-          beforeCardMove: props.beforeCardMove,
-          beforeColumnMove: props.beforeColumnMove,
-          onCardAdd: props.allowAddCard || props.onCardAdd ? handleCardAdd : undefined,
-          filterText: props.filterText,
-          hiddenColumns: props.hiddenColumns,
-          swimlanes: props.swimlanes,
-          swimlaneField: props.swimlaneField,
           showCardCount: props.showCardCount,
-          allowAddCard: props.allowAddCard,
-          allowAddColumn: props.allowAddColumn,
-          locale: props.locale,
-          className: props.className,
-          style: props.style,
-          'onCard-move': (e: TaskBoardCardMoveEvent) => emit('card-move', e),
-          'onColumn-move': (e: TaskBoardColumnMoveEvent) => emit('column-move', e),
-          'onUpdate:columns': (cols: TaskBoardColumn[]) => {
-            pendingColumns.value = cols
-            emit('update:columns', cols)
-          },
-          'onColumn-add': () => emit('column-add')
+          allowAddCard: props.allowAddCard
         },
         slots
       )

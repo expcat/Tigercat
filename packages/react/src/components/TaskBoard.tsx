@@ -20,31 +20,35 @@ import {
   kanbanSwimlaneClasses,
   kanbanSwimlaneHeaderClasses,
   kanbanSwimlaneDotClasses,
-  kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
-  filterColumns,
-  filterCards,
-  groupBySwimlane,
+  kanbanFilterHighlightClasses,
   getColumnCardCount,
   moveCard,
-  mapVisibleCardIndexToSource,
   reorderColumns,
   isWipExceeded,
   appendDefaultTaskBoardCard,
+  appendDefaultTaskBoardColumn,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
+  resolveTaskBoardView,
   type TaskBoardProps as CoreTaskBoardProps,
   type TaskBoardColumn,
   type TaskBoardCard,
-  type KanbanSwimlane,
   type TaskBoardDragSnapshot,
-  type TaskBoardDragController
+  type TaskBoardDragController,
+  type TaskBoardViewColumn
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
-/* ------------------------------------------------------------------ */
-/* Extracted memo sub-components for render performance                */
-/* ------------------------------------------------------------------ */
+function cardMatchesFilter(card: TaskBoardCard, filterText: string): boolean {
+  if (!filterText.trim()) return false
+  const lower = filterText.toLowerCase()
+  return (
+    (card.title ?? '').toLowerCase().includes(lower) ||
+    (card.description ?? '').toLowerCase().includes(lower)
+  )
+}
 
 interface CardItemProps {
   card: TaskBoardCard
@@ -53,346 +57,328 @@ interface CardItemProps {
   isKbGrabbed: boolean
   draggable: boolean
   dragHintText: string
+  filterHit: boolean
   renderCard?: (card: TaskBoardCard, columnId: string | number) => React.ReactNode
   dragCtrl: TaskBoardDragController
 }
 
-const CardItem = React.memo<CardItemProps>(
-  ({ card, column, isDragging, isKbGrabbed, draggable, dragHintText, renderCard, dragCtrl }) => {
-    const cardClasses = classNames(
-      taskBoardCardClasses,
-      isDragging && taskBoardCardDraggingClasses,
-      isKbGrabbed &&
-        'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
-    )
+const CardItem: React.FC<CardItemProps> = ({
+  card,
+  column,
+  isDragging,
+  isKbGrabbed,
+  draggable,
+  dragHintText,
+  filterHit,
+  renderCard,
+  dragCtrl
+}) => {
+  const cardClasses = classNames(
+    taskBoardCardClasses,
+    isDragging && taskBoardCardDraggingClasses,
+    filterHit && kanbanFilterHighlightClasses,
+    isKbGrabbed &&
+      'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
+  )
 
-    return (
-      <div
-        className={cardClasses}
-        draggable={draggable}
-        tabIndex={0}
-        role="listitem"
-        aria-roledescription={dragHintText}
-        aria-grabbed={isKbGrabbed ? 'true' : undefined}
-        data-tiger-taskboard-card=""
-        data-tiger-taskboard-card-id={String(card.id)}
-        onDragStart={(e) => {
-          if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column)
-        }}
-        onDragEnd={() => dragCtrl.dragEnd()}
-        onTouchStart={(e) =>
-          dragCtrl.cardTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, card, column)
+  return (
+    <div
+      className={cardClasses}
+      draggable={draggable}
+      tabIndex={0}
+      role="listitem"
+      title={dragHintText}
+      data-tiger-taskboard-card=""
+      data-tiger-taskboard-card-id={String(card.id)}
+      onDragStart={(e) => {
+        if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column)
+      }}
+      onDragEnd={() => dragCtrl.dragEnd()}
+      onTouchStart={(e) =>
+        dragCtrl.cardTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, card, column)
+      }
+      onTouchMove={(e) => dragCtrl.cardTouchMove(e.nativeEvent)}
+      onTouchEnd={() => dragCtrl.cardTouchEnd()}
+      onKeyDown={(e) => {
+        if (dragCtrl.cardKeyDown(e.key, card, column)) {
+          e.preventDefault()
+          e.stopPropagation()
         }
-        onTouchMove={(e) => dragCtrl.cardTouchMove(e.nativeEvent)}
-        onTouchEnd={() => dragCtrl.cardTouchEnd()}
-        onKeyDown={(e) => {
-          if (dragCtrl.cardKeyDown(e.key, card, column)) e.preventDefault()
-        }}>
-        {renderCard ? (
-          renderCard(card, column.id)
-        ) : (
-          <>
-            <div className="font-medium text-sm text-[var(--tiger-text,#1f2937)]">{card.title}</div>
-            {card.description && (
-              <div className="mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)] line-clamp-2">
-                {card.description}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    )
-  },
-  (prev, next) =>
-    prev.card.id === next.card.id &&
-    prev.isDragging === next.isDragging &&
-    prev.isKbGrabbed === next.isKbGrabbed &&
-    prev.draggable === next.draggable &&
-    prev.card === next.card
-)
-CardItem.displayName = 'TaskBoardCardItem'
+      }}>
+      {renderCard ? (
+        renderCard(card, column.id)
+      ) : (
+        <>
+          <div className="font-medium text-sm text-[var(--tiger-text,#1f2937)]">{card.title}</div>
+          {card.description && (
+            <div className="mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)] line-clamp-2">
+              {card.description}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
 
 interface ColumnItemProps {
-  column: TaskBoardColumn
-  colIndex: number
+  viewColumn: TaskBoardViewColumn
   isDropTarget: boolean
   isColDragging: boolean
   dropIdx: number
   draggable: boolean
   columnDraggable: boolean
   labels: ReturnType<typeof getTaskBoardLabels>
+  filterText: string
   renderCardProp?: (card: TaskBoardCard, columnId: string | number) => React.ReactNode
   renderColumnHeader?: (column: TaskBoardColumn) => React.ReactNode
   renderColumnFooter?: (column: TaskBoardColumn) => React.ReactNode
   renderEmptyColumn?: (column: TaskBoardColumn) => React.ReactNode
   onCardAdd?: (columnId: string | number) => void
+  addDisabled: boolean
   dragType: 'card' | 'column' | null
   dragCtrl: TaskBoardDragController
   dragStateId: string | number | null
   kbDragStateId: string | number | null
   showCardCount: boolean
-  allowAddCard: boolean
-  swimlanes?: KanbanSwimlane[]
-  swimlaneField?: string
+  onToggleSwimlane: (laneId: string | number, collapsed: boolean) => void
 }
 
-const ColumnItem = React.memo<ColumnItemProps>(
-  ({
-    column,
-    colIndex,
-    isDropTarget,
-    isColDragging,
-    dropIdx,
-    draggable,
-    columnDraggable,
-    labels,
-    renderCardProp,
-    renderColumnHeader,
-    renderColumnFooter,
-    renderEmptyColumn,
-    onCardAdd,
-    dragType,
-    dragCtrl,
-    dragStateId,
-    kbDragStateId,
-    showCardCount,
-    allowAddCard,
-    swimlanes,
-    swimlaneField
-  }) => {
-    const wipOver = isWipExceeded(column)
-    const cardCount = showCardCount ? getColumnCardCount(column) : null
+const ColumnItem: React.FC<ColumnItemProps> = ({
+  viewColumn,
+  isDropTarget,
+  isColDragging,
+  dropIdx,
+  draggable,
+  columnDraggable,
+  labels,
+  filterText,
+  renderCardProp,
+  renderColumnHeader,
+  renderColumnFooter,
+  renderEmptyColumn,
+  onCardAdd,
+  addDisabled,
+  dragType,
+  dragCtrl,
+  dragStateId,
+  kbDragStateId,
+  showCardCount,
+  onToggleSwimlane
+}) => {
+  const column = viewColumn.source
+  const wipOver = isWipExceeded(column)
+  const cardCount = getColumnCardCount(column)
 
-    const colClasses = classNames(
-      taskBoardColumnClasses,
-      isDropTarget && taskBoardColumnDropTargetClasses,
-      isColDragging && taskBoardColumnDraggingClasses
+  const colClasses = classNames(
+    taskBoardColumnClasses,
+    isDropTarget && taskBoardColumnDropTargetClasses,
+    isColDragging && taskBoardColumnDraggingClasses
+  )
+
+  const renderCardNode = (card: TaskBoardCard, visibleIndex: number) => {
+    const nodes: React.ReactNode[] = []
+    if (isDropTarget && dropIdx === visibleIndex) {
+      nodes.push(<div key={`drop-${visibleIndex}`} className={taskBoardDropIndicatorClasses} />)
+    }
+    nodes.push(
+      <CardItem
+        key={String(card.id)}
+        card={card}
+        column={column}
+        isDragging={dragStateId === card.id}
+        isKbGrabbed={kbDragStateId === card.id}
+        draggable={draggable}
+        dragHintText={labels.dragHintText}
+        filterHit={cardMatchesFilter(card, filterText)}
+        renderCard={renderCardProp}
+        dragCtrl={dragCtrl}
+      />
     )
+    return nodes
+  }
 
-    const renderCardNode = (card: TaskBoardCard, originalIndex: number) => {
-      const nodes: React.ReactNode[] = []
-      if (isDropTarget && dropIdx === originalIndex) {
-        nodes.push(<div key={`drop-${originalIndex}`} className={taskBoardDropIndicatorClasses} />)
-      }
-      const isDragging = dragStateId === card.id
-      const isKbGrabbed = kbDragStateId === card.id
-      nodes.push(
-        <CardItem
-          key={String(card.id)}
-          card={card}
-          column={column}
-          isDragging={isDragging}
-          isKbGrabbed={isKbGrabbed}
-          draggable={draggable}
-          dragHintText={labels.dragHintText}
-          renderCard={renderCardProp}
-          dragCtrl={dragCtrl}
-        />
-      )
-      return nodes
-    }
-
-    // Build cards list with drop indicators
-    let cardsContent: React.ReactNode
-    if (column.cards.length > 0) {
-      const nodes: React.ReactNode[] =
-        swimlanes && swimlaneField
-          ? groupBySwimlane(column.cards, swimlanes, swimlaneField).map((group) => (
-              <div
-                key={String(group.swimlane.id)}
-                className={kanbanSwimlaneClasses}
-                data-tiger-kanban-swimlane=""
-                data-tiger-kanban-swimlane-id={String(group.swimlane.id)}>
-                <div className={kanbanSwimlaneHeaderClasses}>
-                  {group.swimlane.color && (
-                    <span
-                      className={kanbanSwimlaneDotClasses}
-                      style={{ backgroundColor: group.swimlane.color }}
-                    />
-                  )}
-                  <span>{group.swimlane.label}</span>
-                  <span className="ml-auto text-xs text-[var(--tiger-text-muted,#6b7280)]">
-                    {group.cards.length}
-                  </span>
-                </div>
-                <div className={group.swimlane.collapsed ? kanbanSwimlaneCollapsedClasses : ''}>
-                  {group.cards.flatMap((card) =>
-                    renderCardNode(
-                      card,
-                      column.cards.findIndex((item) => item.id === card.id)
-                    )
-                  )}
-                </div>
-              </div>
-            ))
-          : column.cards.flatMap((card, i) => renderCardNode(card, i))
-      if (isDropTarget && dropIdx >= column.cards.length) {
-        nodes.push(<div key="drop-end" className={taskBoardDropIndicatorClasses} />)
-      }
-      cardsContent = nodes
-    } else {
-      cardsContent = isDropTarget ? (
-        <div key="drop-empty" className={taskBoardDropIndicatorClasses} />
-      ) : renderEmptyColumn ? (
-        renderEmptyColumn(column)
-      ) : (
-        <div className={taskBoardEmptyClasses}>{resolveLocaleText(labels.emptyColumnText)}</div>
-      )
-    }
-
-    const wipTitle =
-      column.wipLimit != null
-        ? resolveLocaleText(labels.wipLimitText.replace('{limit}', String(column.wipLimit)))
-        : undefined
-
-    return (
-      <div
-        className={colClasses}
-        data-tiger-taskboard-column=""
-        data-tiger-taskboard-column-id={String(column.id)}
-        onDragOver={
-          dragType === 'column'
-            ? (e: React.DragEvent) => {
-                e.preventDefault()
-                dragCtrl.columnDragOver()
-              }
-            : undefined
-        }
-        onDrop={
-          dragType === 'column'
-            ? (e: React.DragEvent) => {
-                e.preventDefault()
-                if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX)
-              }
-            : undefined
-        }>
-        {/* Column header */}
+  let cardsContent: React.ReactNode
+  if (viewColumn.groups && viewColumn.groups.length > 0) {
+    let offset = 0
+    const nodes: React.ReactNode[] = viewColumn.groups.map((group) => {
+      const prefix = offset
+      if (!group.swimlane.collapsed) offset += group.cards.length
+      return (
         <div
-          className={taskBoardColumnHeaderClasses}
-          draggable={columnDraggable}
-          onDragStart={(e) => {
-            if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column, colIndex)
-          }}
-          onDragEnd={() => dragCtrl.dragEnd()}
-          onTouchStart={(e) =>
-            dragCtrl.columnTouchStart(
-              e.nativeEvent,
-              e.currentTarget as HTMLElement,
-              column,
-              colIndex
-            )
-          }
-          onTouchMove={(e) => dragCtrl.columnTouchMove(e.nativeEvent)}
-          onTouchEnd={() => dragCtrl.columnTouchEnd()}
-          style={columnDraggable ? { cursor: 'grab' } : undefined}>
-          {renderColumnHeader ? (
-            renderColumnHeader(column)
-          ) : (
-            <>
-              <span className={wipOver ? taskBoardWipExceededClasses : undefined}>
-                {column.title}
-                {showCardCount && cardCount ? null : column.wipLimit != null ? (
-                  <span
-                    className={classNames(
-                      'ml-2 text-xs font-normal transition-all duration-200 px-1.5 py-0.5 rounded',
-                      wipOver
-                        ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error,#ef4444)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
-                        : 'opacity-70 bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)]'
-                    )}
-                    title={wipTitle}>
-                    ({column.cards.length}/{column.wipLimit})
-                  </span>
-                ) : (
-                  <span className="ml-2 text-xs font-normal px-1.5 py-0.5 rounded bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)] opacity-70">
-                    {column.cards.length}
-                  </span>
-                )}
-              </span>
-              {showCardCount && cardCount && (
+          key={String(group.swimlane.id)}
+          className={kanbanSwimlaneClasses}
+          data-tiger-kanban-swimlane=""
+          data-tiger-kanban-swimlane-id={String(group.swimlane.id)}>
+          <button
+            type="button"
+            className={kanbanSwimlaneHeaderClasses}
+            aria-expanded={!group.swimlane.collapsed}
+            onClick={() => onToggleSwimlane(group.swimlane.id, !group.swimlane.collapsed)}>
+            {group.swimlane.color && (
+              <span
+                className={kanbanSwimlaneDotClasses}
+                style={{ backgroundColor: group.swimlane.color }}
+              />
+            )}
+            <span>{group.swimlane.label}</span>
+            <span className="ms-auto text-xs text-[var(--tiger-text-muted,#6b7280)]">
+              {group.cards.length}
+            </span>
+          </button>
+          {!group.swimlane.collapsed &&
+            group.cards.flatMap((card, i) => renderCardNode(card, prefix + i))}
+        </div>
+      )
+    })
+    if (isDropTarget && dropIdx >= viewColumn.visibleCards.length) {
+      nodes.push(<div key="drop-end" className={taskBoardDropIndicatorClasses} />)
+    }
+    cardsContent = nodes
+  } else if (viewColumn.visibleCards.length > 0) {
+    const nodes: React.ReactNode[] = viewColumn.visibleCards.flatMap((card, i) =>
+      renderCardNode(card, i)
+    )
+    if (isDropTarget && dropIdx >= viewColumn.visibleCards.length) {
+      nodes.push(<div key="drop-end" className={taskBoardDropIndicatorClasses} />)
+    }
+    cardsContent = nodes
+  } else {
+    cardsContent = isDropTarget ? (
+      <div key="drop-empty" className={taskBoardDropIndicatorClasses} />
+    ) : renderEmptyColumn ? (
+      renderEmptyColumn(column)
+    ) : (
+      <div className={taskBoardEmptyClasses}>{resolveLocaleText(labels.emptyColumnText)}</div>
+    )
+  }
+
+  const wipTitle =
+    column.wipLimit != null
+      ? resolveLocaleText(labels.wipLimitText.replace('{limit}', String(column.wipLimit)))
+      : undefined
+  const countLabel = cardCount.limit
+    ? `${cardCount.count}/${cardCount.limit}`
+    : `${cardCount.count}`
+
+  return (
+    <div
+      className={colClasses}
+      data-tiger-taskboard-column=""
+      data-tiger-taskboard-column-id={String(column.id)}
+      onDragOver={
+        dragType === 'column'
+          ? (e: React.DragEvent) => {
+              e.preventDefault()
+              dragCtrl.columnDragOver()
+            }
+          : undefined
+      }
+      onDrop={
+        dragType === 'column'
+          ? (e: React.DragEvent) => {
+              e.preventDefault()
+              if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX)
+            }
+          : undefined
+      }>
+      <div
+        className={taskBoardColumnHeaderClasses}
+        draggable={columnDraggable}
+        tabIndex={columnDraggable ? 0 : undefined}
+        onDragStart={(e) => {
+          if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column)
+        }}
+        onDragEnd={() => dragCtrl.dragEnd()}
+        onTouchStart={(e) =>
+          dragCtrl.columnTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, column)
+        }
+        onTouchMove={(e) => dragCtrl.columnTouchMove(e.nativeEvent)}
+        onTouchEnd={() => dragCtrl.columnTouchEnd()}
+        onKeyDown={(e) => {
+          if (dragCtrl.columnKeyDown(e.key, column)) e.preventDefault()
+        }}
+        style={columnDraggable ? { cursor: 'grab' } : undefined}>
+        {renderColumnHeader ? (
+          renderColumnHeader(column)
+        ) : (
+          <>
+            <span className={wipOver ? taskBoardWipExceededClasses : undefined}>
+              {column.title}
+              {!showCardCount && cardCount.limit != null ? (
                 <span
                   className={classNames(
-                    kanbanCardCountClasses,
-                    wipOver &&
-                      `${taskBoardWipExceededClasses} bg-red-50 dark:bg-red-950/30 border border-red-200/50 dark:border-red-900/30 font-semibold shadow-xs`
-                  )}>
-                  {cardCount.limit ? `${cardCount.count}/${cardCount.limit}` : `${cardCount.count}`}
+                    'ms-2 text-xs font-normal transition-all duration-200 px-1.5 py-0.5 rounded',
+                    wipOver
+                      ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error,#ef4444)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
+                      : 'opacity-70 bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)]'
+                  )}
+                  title={wipTitle}>
+                  ({countLabel})
                 </span>
-              )}
-              {column.description && (
-                <span className="text-xs font-normal text-[var(--tiger-text-muted,#6b7280)] truncate max-w-[120px]">
-                  {column.description}
-                </span>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Column body */}
-        <div
-          className={taskBoardColumnBodyClasses}
-          role="list"
-          aria-label={column.title}
-          onDragOver={(e) => {
-            e.preventDefault()
-            dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column)
-          }}
-          onDrop={(e) => {
-            e.preventDefault()
-            if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column)
-          }}
-          onDragLeave={(e) =>
-            dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)
-          }>
-          {cardsContent}
-        </div>
-
-        {/* Column footer */}
-        {renderColumnFooter ? (
-          renderColumnFooter(column)
-        ) : onCardAdd || allowAddCard ? (
-          <div
-            className={classNames(
-              'border-t border-[var(--tiger-border,#e5e7eb)]',
-              taskBoardAddCardClasses
+              ) : null}
+            </span>
+            {showCardCount ? (
+              <span
+                className={classNames(
+                  kanbanCardCountClasses,
+                  wipOver &&
+                    `${taskBoardWipExceededClasses} bg-red-50 dark:bg-red-950/30 border border-red-200/50 dark:border-red-900/30 font-semibold shadow-xs`
+                )}
+                title={wipTitle}>
+                {countLabel}
+              </span>
+            ) : null}
+            {column.description && (
+              <span className="text-xs font-normal text-[var(--tiger-text-muted,#6b7280)] truncate max-w-[120px]">
+                {column.description}
+              </span>
             )}
-            role="button"
-            tabIndex={0}
-            onClick={() => onCardAdd?.(column.id)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onCardAdd?.(column.id)
-              }
-            }}>
-            <span>+</span>
-            <span>{resolveLocaleText(labels.addCardText)}</span>
-          </div>
-        ) : null}
+          </>
+        )}
       </div>
-    )
-  },
-  (prev, next) =>
-    prev.column === next.column &&
-    prev.colIndex === next.colIndex &&
-    prev.isDropTarget === next.isDropTarget &&
-    prev.isColDragging === next.isColDragging &&
-    prev.dropIdx === next.dropIdx &&
-    prev.draggable === next.draggable &&
-    prev.columnDraggable === next.columnDraggable &&
-    prev.dragType === next.dragType &&
-    prev.dragStateId === next.dragStateId &&
-    prev.kbDragStateId === next.kbDragStateId &&
-    prev.onCardAdd === next.onCardAdd &&
-    prev.showCardCount === next.showCardCount &&
-    prev.allowAddCard === next.allowAddCard &&
-    prev.swimlanes === next.swimlanes &&
-    prev.swimlaneField === next.swimlaneField
-)
-ColumnItem.displayName = 'TaskBoardColumnItem'
 
-/* ------------------------------------------------------------------ */
-/* Main TaskBoard component                                           */
-/* ------------------------------------------------------------------ */
+      <div
+        className={taskBoardColumnBodyClasses}
+        role="list"
+        aria-label={column.title}
+        tabIndex={viewColumn.visibleCards.length === 0 ? 0 : undefined}
+        onDragOver={(e) => {
+          e.preventDefault()
+          dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column)
+        }}
+        onDrop={(e) => {
+          e.preventDefault()
+          if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column)
+        }}
+        onDragLeave={(e) =>
+          dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)
+        }
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return
+          if (dragCtrl.columnBodyKeyDown(e.key, column)) e.preventDefault()
+        }}>
+        {cardsContent}
+      </div>
+
+      {renderColumnFooter ? (
+        renderColumnFooter(column)
+      ) : onCardAdd ? (
+        <button
+          type="button"
+          className={classNames(
+            'border-t border-[var(--tiger-border,#e5e7eb)]',
+            taskBoardAddCardClasses
+          )}
+          disabled={addDisabled}
+          onClick={() => onCardAdd(column.id)}>
+          <span>+</span>
+          <span>{resolveLocaleText(labels.addCardText)}</span>
+        </button>
+      ) : null}
+    </div>
+  )
+}
 
 export interface TaskBoardProps
   extends
@@ -405,8 +391,6 @@ export interface TaskBoardProps
   renderColumnHeader?: (column: TaskBoardColumn) => React.ReactNode
   renderColumnFooter?: (column: TaskBoardColumn) => React.ReactNode
   renderEmptyColumn?: (column: TaskBoardColumn) => React.ReactNode
-  swimlanes?: KanbanSwimlane[]
-  swimlaneField?: string
   style?: React.CSSProperties
 }
 
@@ -434,6 +418,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   renderEmptyColumn,
   swimlanes,
   swimlaneField,
+  onSwimlaneCollapse,
   locale,
   labels: labelsOverride,
   className,
@@ -449,54 +434,90 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     () => getTaskBoardLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
+  const dir: 'ltr' | 'rtl' = config.direction === 'rtl' ? 'rtl' : 'ltr'
 
-  // ---- controlled / uncontrolled ----
-  const [innerColumns, setInnerColumns] = useState<TaskBoardColumn[]>(defaultColumns)
+  const [currentColumns, setCurrentColumns] = useControlledState<TaskBoardColumn[]>({
+    value: controlledColumns,
+    defaultValue: defaultColumns,
+    onChange: onColumnsChange
+  })
 
-  useEffect(() => {
-    if (controlledColumns !== undefined) setInnerColumns(controlledColumns)
-  }, [controlledColumns])
+  const [collapsedOverride, setCollapsedOverride] = useState<Record<string, boolean>>({})
 
-  const currentColumns = controlledColumns ?? innerColumns
+  const view = useMemo(
+    () =>
+      resolveTaskBoardView({
+        columns: currentColumns,
+        filterText,
+        hiddenColumns,
+        swimlanes,
+        swimlaneField,
+        unassignedLabel: labels.unassignedSwimlaneText,
+        collapsedLaneState: collapsedOverride
+      }),
+    [
+      currentColumns,
+      filterText,
+      hiddenColumns,
+      swimlanes,
+      swimlaneField,
+      collapsedOverride,
+      labels.unassignedSwimlaneText
+    ]
+  )
 
-  // Apply filter and hidden columns (no-op when filterText is empty and hiddenColumns is empty)
-  const visibleColumns = useMemo(() => {
-    if (!filterText && (!hiddenColumns || hiddenColumns.length === 0)) {
-      return currentColumns
-    }
-    return filterColumns(currentColumns, filterText, hiddenColumns)
-  }, [currentColumns, filterText, hiddenColumns])
-
-  // Ref for async helpers to avoid stale closure
   const columnsRef = useRef(currentColumns)
   columnsRef.current = currentColumns
-
-  const updateColumns = useCallback(
-    (next: TaskBoardColumn[]) => {
-      setInnerColumns(next)
-      onColumnsChange?.(next)
-    },
-    [onColumnsChange]
-  )
+  const viewRef = useRef(view)
+  viewRef.current = view
+  const dirRef = useRef(dir)
+  dirRef.current = dir
 
   const consumerOnCardAdd = onCardAdd
   const showAddCard = Boolean(allowAddCard || consumerOnCardAdd)
   const handleCardAdd = useCallback(
     (columnId: string | number) => {
       if (consumerOnCardAdd == null) {
-        updateColumns(appendDefaultTaskBoardCard(columnsRef.current, columnId))
+        const col = columnsRef.current.find((item) => item.id === columnId)
+        if (
+          enforceWipLimit &&
+          col &&
+          col.wipLimit != null &&
+          col.wipLimit > 0 &&
+          col.cards.length >= col.wipLimit
+        ) {
+          return
+        }
+        setCurrentColumns(
+          appendDefaultTaskBoardCard(columnsRef.current, columnId, labels.newCardTitle)
+        )
       }
       consumerOnCardAdd?.(columnId)
     },
-    [consumerOnCardAdd, updateColumns]
+    [consumerOnCardAdd, enforceWipLimit, labels.newCardTitle, setCurrentColumns]
   )
 
-  // ---- drag controller (unified DnD + touch + keyboard) ----
-  const [dragSnap, setDragSnap] = useState<TaskBoardDragSnapshot>(createDefaultDragSnapshot)
+  const handleColumnAdd = useCallback(() => {
+    if (onColumnAdd == null) {
+      setCurrentColumns(appendDefaultTaskBoardColumn(columnsRef.current, labels.newColumnTitle))
+    }
+    onColumnAdd?.()
+  }, [onColumnAdd, labels.newColumnTitle, setCurrentColumns])
 
+  const handleToggleSwimlane = useCallback(
+    (laneId: string | number, collapsed: boolean) => {
+      if (onSwimlaneCollapse) {
+        onSwimlaneCollapse(laneId, collapsed)
+        return
+      }
+      setCollapsedOverride((prev) => ({ ...prev, [String(laneId)]: collapsed }))
+    },
+    [onSwimlaneCollapse]
+  )
+
+  const [dragSnap, setDragSnap] = useState<TaskBoardDragSnapshot>(createDefaultDragSnapshot)
   const boardRef = useRef<HTMLDivElement>(null)
 
-  // Stable refs for async validation callbacks
   const beforeCardMoveRef = useRef(beforeCardMove)
   beforeCardMoveRef.current = beforeCardMove
   const beforeColumnMoveRef = useRef(beforeColumnMove)
@@ -507,8 +528,6 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onColumnMoveRef.current = onColumnMove
   const enforceWipLimitRef = useRef(enforceWipLimit)
   enforceWipLimitRef.current = enforceWipLimit
-  const filterTextRef = useRef(filterText)
-  filterTextRef.current = filterText
 
   const applyCardMove = useCallback(
     async (
@@ -517,16 +536,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const sourceCol = columnsRef.current.find((c) => c.id === toColumnId)
-      const mappedIdx =
-        sourceCol == null
-          ? toIdx
-          : mapVisibleCardIndexToSource(
-              sourceCol.cards,
-              filterCards(sourceCol.cards, filterTextRef.current),
-              toIdx
-            )
-      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, mappedIdx, {
+      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, toIdx, {
         enforceWipLimit: enforceWipLimitRef.current
       })
       if (!result) return
@@ -536,16 +546,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
         if (!ok) return
       }
 
-      updateColumns(result.columns)
+      setCurrentColumns(result.columns)
       onCardMoveRef.current?.(result.event)
     },
-    [updateColumns]
+    [setCurrentColumns]
   )
 
   const applyColumnMove = useCallback(
     async (fromIdx: number, toIdx: number) => {
-      const cols = columnsRef.current
-      const result = reorderColumns(cols, fromIdx, Math.min(toIdx, cols.length - 1))
+      const result = reorderColumns(columnsRef.current, fromIdx, toIdx)
       if (!result) return
 
       if (beforeColumnMoveRef.current) {
@@ -553,11 +562,16 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
         if (!ok) return
       }
 
-      updateColumns(result.columns)
+      setCurrentColumns(result.columns)
       onColumnMoveRef.current?.(result.event)
     },
-    [updateColumns]
+    [setCurrentColumns]
   )
+
+  const applyCardMoveRef = useRef(applyCardMove)
+  applyCardMoveRef.current = applyCardMove
+  const applyColumnMoveRef = useRef(applyColumnMove)
+  applyColumnMoveRef.current = applyColumnMove
 
   const dragCtrlRef = useRef<TaskBoardDragController | null>(null)
   if (!dragCtrlRef.current) {
@@ -567,20 +581,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
         applyCardMove: (...args) => applyCardMoveRef.current(...args),
         applyColumnMove: (...args) => applyColumnMoveRef.current(...args),
         getBoardEl: () => boardRef.current,
-        getColumnCount: () => columnsRef.current.length
+        getView: () => viewRef.current,
+        getSourceColumns: () => columnsRef.current,
+        getDir: () => dirRef.current
       },
       { draggable, columnDraggable }
     )
   }
   const dragCtrl = dragCtrlRef.current
 
-  // Stable refs for apply callbacks (avoids stale closures in controller)
-  const applyCardMoveRef = useRef(applyCardMove)
-  applyCardMoveRef.current = applyCardMove
-  const applyColumnMoveRef = useRef(applyColumnMove)
-  applyColumnMoveRef.current = applyColumnMove
-
-  // Keep controller options in sync with props
   useEffect(() => {
     dragCtrl.setOptions({ draggable, columnDraggable })
   }, [draggable, columnDraggable, dragCtrl])
@@ -590,69 +599,68 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     return () => dragCtrl.dispose()
   }, [dragCtrl])
 
-  // ---- render ----
   const wrapperClasses = useMemo(() => classNames(taskBoardBaseClasses, className), [className])
 
   const dragType = dragSnap.drag?.type ?? null
   const dragStateId = (dragSnap.drag?.type === 'card' ? dragSnap.drag.id : null) as
     string | number | null
   const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
+  const kbGrabbing = dragSnap.kbDrag?.type === 'card'
+  const liveMessage = dragSnap.kbDrag ? labels.dragHintText : ''
 
   return (
     <div
+      {...rest}
       ref={boardRef}
       className={wrapperClasses}
       style={style}
       role="region"
       aria-label={resolveLocaleText(labels.boardAriaLabel)}
-      data-tiger-task-board=""
-      {...rest}>
-      {visibleColumns.map((col, i) => {
+      data-tiger-task-board="">
+      <div className="sr-only" aria-live="assertive">
+        {liveMessage}
+      </div>
+      {view.columns.map((viewColumn) => {
+        const col = viewColumn.source
         const isDropTarget =
-          dragSnap.drag?.type === 'card' && dragSnap.dropTargetColumnId === col.id
+          (dragSnap.drag?.type === 'card' || kbGrabbing) && dragSnap.dropTargetColumnId === col.id
         const isColDragging = dragSnap.drag?.type === 'column' && dragSnap.drag.id === col.id
+        const atWip =
+          enforceWipLimit &&
+          col.wipLimit != null &&
+          col.wipLimit > 0 &&
+          col.cards.length >= col.wipLimit
 
         return (
           <ColumnItem
             key={String(col.id)}
-            column={col}
-            colIndex={i}
-            isDropTarget={isDropTarget}
+            viewColumn={viewColumn}
+            isDropTarget={Boolean(isDropTarget)}
             isColDragging={isColDragging}
             dropIdx={isDropTarget ? dragSnap.dropIndex : -1}
             draggable={draggable}
             columnDraggable={columnDraggable}
             labels={labels}
+            filterText={filterText}
             renderCardProp={renderCardProp}
             renderColumnHeader={renderColumnHeader}
             renderColumnFooter={renderColumnFooter}
             renderEmptyColumn={renderEmptyColumn}
             onCardAdd={showAddCard ? handleCardAdd : undefined}
+            addDisabled={Boolean(atWip)}
             dragType={dragType}
             dragCtrl={dragCtrl}
             dragStateId={dragStateId}
             kbDragStateId={kbDragStateId}
             showCardCount={showCardCount}
-            allowAddCard={allowAddCard}
-            swimlanes={swimlanes}
-            swimlaneField={swimlaneField}
+            onToggleSwimlane={handleToggleSwimlane}
           />
         )
       })}
       {allowAddColumn && (
-        <div
-          className={kanbanAddColumnClasses}
-          role="button"
-          tabIndex={0}
-          onClick={() => onColumnAdd?.()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              onColumnAdd?.()
-            }
-          }}>
+        <button type="button" className={kanbanAddColumnClasses} onClick={handleColumnAdd}>
           + {resolveLocaleText(labels.addColumnText)}
-        </div>
+        </button>
       )}
     </div>
   )
