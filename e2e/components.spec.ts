@@ -33,7 +33,7 @@ for (const { framework, baseUrl } of exampleApps) {
       const switchControl = opened.preview.getByRole('switch').first()
       await expect(switchControl).toBeVisible()
       await expect(switchControl).toBeChecked()
-      await switchControl.click()
+      await opened.preview.locator('label').filter({ has: switchControl }).click()
       await expect(switchControl).not.toBeChecked()
     })
 

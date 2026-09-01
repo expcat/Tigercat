@@ -32,7 +32,14 @@ export async function openDemo(
     await page.goto('about:blank')
     return openDemo(page, baseUrl, route, demoId, attempt + 1)
   }
-  await moduleRoot.scrollIntoViewIfNeeded()
+  await moduleRoot.evaluate((el: HTMLElement) => {
+    const sticky = document.querySelector<HTMLElement>(
+      '.sticky.top-0, [class*="sticky"][class*="top-0"]'
+    )
+    const offset = sticky ? sticky.getBoundingClientRect().height + 8 : 8
+    const top = el.getBoundingClientRect().top + window.scrollY - offset
+    window.scrollTo({ top: Math.max(0, top) })
+  })
   try {
     await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
   } catch (error) {
