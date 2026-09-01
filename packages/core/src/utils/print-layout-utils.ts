@@ -137,6 +137,3 @@ export function printPrintLayoutRoot(root: HTMLElement | null): void {
   root.ownerDocument.defaultView?.addEventListener('afterprint', cleanup)
   root.ownerDocument.defaultView?.print()
 }
-
-/** @deprecated Injected via {@link injectPrintLayoutStyles}; kept so callers stop importing a dead string. */
-export const printLayoutPrintStyles = buildPrintLayoutCss()

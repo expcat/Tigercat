@@ -50,15 +50,6 @@ export function getDefaultCronPresets(labels: {
   ]
 }
 
-/** @deprecated Use `getDefaultCronPresets` with locale labels. */
-export const defaultCronPresets: CronPreset[] = [
-  { label: 'Every minute', value: '* * * * *' },
-  { label: 'Hourly', value: '0 * * * *' },
-  { label: 'Daily', value: '0 0 * * *' },
-  { label: 'Weekly', value: '0 0 * * 1' },
-  { label: 'Monthly', value: '0 0 1 * *' }
-]
-
 export const cronFieldModes: CronFieldMode[] = ['any', 'every', 'specific', 'range', 'custom']
 
 export const cronEditorBaseClasses = classNames(

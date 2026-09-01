@@ -180,8 +180,6 @@ export function getScatterHoverSize(baseSize: number): number {
 }
 
 export const SCATTER_ENTRANCE_CLASS = 'tiger-scatter-entrance motion-reduce:animate-none'
-/** @deprecated Runtime style injection is removed; the plugin owns the keyframes. */
-export const SCATTER_ENTRANCE_KEYFRAMES = ''
 export const LINE_DRAW_CLASS = 'tiger-line-animated motion-reduce:animate-none'
 export const AREA_DRAW_CLASS = 'tiger-area-animated motion-reduce:animate-none'
 

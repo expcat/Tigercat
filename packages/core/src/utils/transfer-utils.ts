@@ -57,14 +57,6 @@ export function getTransferButtonClasses(disabled: boolean): string {
   return resolveButtonClasses({ variant: 'outline', size: 'sm', disabled })
 }
 
-/** @deprecated Transfer rows reuse Checkbox visuals. */
-export function getTransferCheckboxClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    size === 'sm' ? 'w-3.5 h-3.5' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4',
-    'rounded border border-[var(--tiger-border,#d1d5db)] accent-[var(--tiger-primary,#2563eb)]'
-  )
-}
-
 export function transferKeyId(key: string | number): string {
   return String(key)
 }

@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   createCropUploadSession,
   validateUploadFile,
-  readFileAsDataUrl,
-  getCropperResult,
-  type CropResult
+  readFileAsDataUrl
 } from '@expcat/tigercat-core'
 
 const fakeFile = (size: number, name = 'a.png'): File => {
@@ -133,25 +131,6 @@ describe('crop-upload-utils', () => {
       }
       ;(globalThis as unknown as { FileReader: unknown }).FileReader = MockReader
       await expect(readFileAsDataUrl(fakeFile(10))).rejects.toThrow('boom')
-    })
-  })
-
-  describe('getCropperResult', () => {
-    it('returns null when cropper is missing', async () => {
-      expect(await getCropperResult(null)).toBeNull()
-      expect(await getCropperResult(undefined)).toBeNull()
-    })
-
-    it('awaits and returns the cropper result', async () => {
-      const result = { dataUrl: 'data:x', file: fakeFile(1) } as unknown as CropResult
-      const cropper = { getCropResult: vi.fn().mockResolvedValue(result) }
-      expect(await getCropperResult(cropper)).toBe(result)
-      expect(cropper.getCropResult).toHaveBeenCalledTimes(1)
-    })
-
-    it('propagates rejections from getCropResult', async () => {
-      const cropper = { getCropResult: vi.fn().mockRejectedValue(new Error('crop failed')) }
-      await expect(getCropperResult(cropper)).rejects.toThrow('crop failed')
     })
   })
 })

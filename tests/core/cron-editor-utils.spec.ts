@@ -5,7 +5,7 @@ import {
   buildCronFieldValueFromDraft,
   cronFieldMetas,
   defaultCronExpression,
-  defaultCronPresets,
+  defaultCronPresetValues,
   getCronExpressionParts,
   getCronFieldIssue,
   getCronFieldValue,
@@ -34,7 +34,7 @@ describe('cron-editor-utils', () => {
 
   it('keeps empty distinct from every-minute', () => {
     expect(defaultCronExpression).toBe('* * * * *')
-    expect(defaultCronPresets.map((preset) => preset.value)).toContain('0 0 * * *')
+    expect(defaultCronPresetValues).toContain('0 0 * * *')
     expect(normalizeCronExpression('')).toBe('')
     expect(isCronExpressionEmpty('')).toBe(true)
     expect(isCronExpressionEmpty('* * * * *')).toBe(false)

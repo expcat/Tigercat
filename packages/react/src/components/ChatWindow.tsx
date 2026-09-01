@@ -50,8 +50,6 @@ export interface ChatWindowProps
    * Custom render for the bubble body (not the whole row).
    */
   renderBubble?: (message: ChatMessage, index: number) => React.ReactNode
-  /** @deprecated Use `renderBubble`. Replaces only the bubble body. */
-  renderMessage?: (message: ChatMessage, index: number) => React.ReactNode
 }
 
 export type { ChatWindowHandle }
@@ -89,7 +87,6 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     onChange,
     onSend,
     renderBubble,
-    renderMessage,
     className,
     ...props
   },
@@ -206,7 +203,7 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     [allowShiftEnter, handleSend, inputType, sendOnEnter]
   )
 
-  const renderBubbleBody = renderBubble ?? renderMessage
+  const renderBubbleBody = renderBubble
 
   const renderMessageItem = useCallback(
     (message: ChatMessage, index: number) => {

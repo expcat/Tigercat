@@ -19,12 +19,6 @@ export const defaultColorSwatchPalette: ColorSwatchGroup[] = [
   }
 ]
 
-/** @deprecated Use `createDefaultColorSwatchGroups` with locale labels. */
-export const defaultColorSwatchGroups: ColorSwatchGroup[] = [
-  { label: 'Primary', colors: defaultColorSwatchPalette[0].colors },
-  { label: 'Accent', colors: defaultColorSwatchPalette[1].colors }
-]
-
 export function createDefaultColorSwatchGroups(
   primaryLabel: string,
   accentLabel: string
@@ -108,7 +102,7 @@ export function normalizeColorSwatchGroups(
       ? groups
       : colors
         ? [{ colors }]
-        : (fallbackGroups ?? defaultColorSwatchGroups)
+        : (fallbackGroups ?? createDefaultColorSwatchGroups('Primary', 'Accent'))
 
   return sourceGroups.map((group, groupIndex) => ({
     label: group.label,

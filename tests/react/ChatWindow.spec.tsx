@@ -90,7 +90,7 @@ describe('ChatWindow (React)', () => {
     render(
       <ChatWindow
         messages={messages}
-        renderMessage={(message) => <span>Custom: {message.content}</span>}
+        renderBubble={(message) => <span>Custom: {message.content}</span>}
       />
     )
 

@@ -64,11 +64,6 @@ export function getCheckboxVisualClasses({
   )
 }
 
-/** @deprecated Use {@link getCheckboxVisualClasses}. Kept for painted-box consumers. */
-export function getCheckboxClasses(size: ComponentSize = 'md', disabled: boolean = false): string {
-  return getCheckboxVisualClasses({ size, disabled })
-}
-
 export function getCheckboxLabelClasses(
   size: ComponentSize = 'md',
   disabled: boolean = false

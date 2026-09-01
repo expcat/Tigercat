@@ -6,8 +6,6 @@ export interface VueFormItemControlContext {
   labelId: ComputedRef<string | undefined>
   name: ComputedRef<string | undefined>
   status: ComputedRef<InputStatus | undefined>
-  /** @deprecated FormItem is the only error surface; always undefined. */
-  errorMessage: ComputedRef<string | undefined>
   shakeTrigger: ComputedRef<number | undefined>
   disabled: ComputedRef<boolean>
   describedBy: ComputedRef<string | undefined>

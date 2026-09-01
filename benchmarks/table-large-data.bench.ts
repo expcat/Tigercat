@@ -5,7 +5,7 @@ import {
   getTableRowClasses,
   getTableVirtualRecommendation,
   sortData,
-  filterData,
+  filterTableData,
   paginateData,
   type TableColumn
 } from '@expcat/tigercat-core'
@@ -65,7 +65,7 @@ describe('Table large data render prep', () => {
   })
 
   bench('filter 10k rows by string cell value', () => {
-    filterData(rows10k, { field_2: 'R99' })
+    filterTableData(rows10k, [], { field_2: 'R99' })
   })
 
   bench('paginate 10k rows at middle page', () => {
@@ -73,7 +73,7 @@ describe('Table large data render prep', () => {
   })
 
   bench('combined sort + filter + paginate 10k rows', () => {
-    const filtered = filterData(rows10k, { field_1: 'R1' })
+    const filtered = filterTableData(rows10k, [], { field_1: 'R1' })
     const sorted = sortData(filtered, 'id', 'asc')
     paginateData(sorted, 2, 100)
   })

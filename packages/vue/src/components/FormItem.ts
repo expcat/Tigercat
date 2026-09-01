@@ -243,7 +243,6 @@ export const FormItem = defineComponent({
       labelId: computed(() => (props.label ? labelId : undefined)),
       name: computed(() => props.name),
       status: computed(() => (hasError.value ? ('error' as InputStatus) : undefined)),
-      errorMessage: computed(() => undefined),
       shakeTrigger: computed(() => (hasError.value ? shakeTrigger.value : undefined)),
       disabled: controlDisabled,
       describedBy: describedById,

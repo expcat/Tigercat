@@ -382,32 +382,6 @@ export function measureTabIndicatorBox(
   }
 }
 
-/** @deprecated Use getTabIndicatorStyleFromBox with a measured tab. */
-export function getTabIndicatorStyle(
-  activeIndex: number,
-  tabCount: number,
-  position: TabPosition
-): TabIndicatorStyle {
-  if (activeIndex < 0 || tabCount <= 0) {
-    return { opacity: '0' }
-  }
-  const safeTabCount = Math.max(1, tabCount)
-  const safeActiveIndex = Math.min(Math.max(0, activeIndex), safeTabCount - 1)
-  const size = `calc(100% / ${safeTabCount})`
-  if (position === 'left' || position === 'right') {
-    return {
-      height: size,
-      insetBlockStart: `calc(${safeActiveIndex} * ${size})`,
-      opacity: '1'
-    }
-  }
-  return {
-    width: size,
-    insetInlineStart: `calc(${safeActiveIndex} * ${size})`,
-    opacity: '1'
-  }
-}
-
 function getCardChromeClasses(position: TabPosition, active: boolean): string {
   if (position === 'bottom') {
     return active ? 'rounded-b -mt-px border-t-[var(--tiger-surface,#fff)]' : 'rounded-b -mt-px'

@@ -14,9 +14,6 @@ export const cropUploadTriggerClasses =
 export const cropUploadTriggerDisabledClasses =
   'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-muted,#9ca3af)] bg-[var(--tiger-surface-muted,#f9fafb)] cursor-not-allowed opacity-60'
 
-/** @deprecated Use Icon name="plus". */
-export const uploadPlusIconPath = 'M12 4v16m8-8H4'
-
 export function validateUploadFile(file: File | null | undefined, maxSize?: number): Error | null {
   if (!file) return null
   if (!validateFileSize(file, maxSize)) {
@@ -166,14 +163,6 @@ export function getCropUploadTriggerClasses(disabled: boolean, className?: strin
     disabled ? cropUploadTriggerDisabledClasses : cropUploadTriggerClasses,
     className
   )
-}
-
-/** @deprecated Vue ImageCropper expose is typed; call getCropResult directly. */
-export async function getCropperResult(
-  cropper: { getCropResult: () => Promise<CropResult> } | null | undefined
-): Promise<CropResult | null> {
-  if (!cropper) return null
-  return await cropper.getCropResult()
 }
 
 export function readFileAsDataUrl(file: File): Promise<string> {

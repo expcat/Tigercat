@@ -961,17 +961,9 @@ function cellMatchesFilterValue(cellValue: unknown, filterValue: unknown): boole
 }
 
 /**
- * @deprecated Use {@link filterTableData} so `dataKey` and `filterFn` apply.
- * Kept as a thin wrapper for benches; not used by Table.
- */
-export function filterData<T>(data: T[], filters: Record<string, unknown>): T[] {
-  return filterTableData(data, [], filters)
-}
-
-/**
  * Filter data using per-column configuration.
  *
- * Like {@link filterData}, but a column's `filter.filterFn(cellValue, filterValue)`
+ * A column's `filter.filterFn(cellValue, filterValue)`
  * (when provided) overrides the default substring/equality matching for that key.
  * Columns without a custom `filterFn` fall back to the default behavior.
  * Filter state keys stay `column.key`; the record field is {@link getTableColumnDataKey}.

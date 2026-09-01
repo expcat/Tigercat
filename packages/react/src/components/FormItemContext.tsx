@@ -6,8 +6,6 @@ export interface FormItemControlContextValue {
   labelId?: string
   name?: string
   status?: InputStatus
-  /** @deprecated FormItem is the only error surface; always undefined. */
-  errorMessage?: string
   shakeTrigger?: number
   disabled?: boolean
   describedBy?: string
