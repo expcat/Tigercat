@@ -5,15 +5,33 @@ description: Tigercat SSR usage and component authoring guidance
 
 # SSR 支持
 
-Tigercat 可在 Nuxt、Next.js 等 SSR 框架中通过正常包入口使用：`@expcat/tigercat-vue`、`@expcat/tigercat-react`。组件实现和共享工具不得在服务端渲染阶段直接读取浏览器 API。
+Tigercat 可在 Nuxt 4、Next.js 16 中使用。组件导入走 PascalCase 子路径（`@expcat/tigercat-vue/Button`、`@expcat/tigercat-react/Button`）。实现不得在服务端读浏览器 API。
+
+React 包尚未打 `'use client'`：不要从 Next Server Component 直接 import 组件，放到 `'use client'` 边界里。长期会在产物加 `'use client'` 或 `next` 子路径。
+
+配方：`examples/nextjs`、`examples/nuxt`。`pnpm example:ssr:check` 锁构建 HTML 与 hydrate。
+
+## Tailwind
+
+两站必须接 Tailwind v4 + plugin + `@source` dist。只靠 SVG 能画不等于库接上了。
+
+```css
+@import 'tailwindcss';
+@plugin '@expcat/tigercat-core/tailwind';
+@custom-variant dark (&:where(.dark, .dark *));
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
+Next 用 `@tailwindcss/postcss`；Nuxt 用 `@tailwindcss/vite`。Vue 把 react 换成 `tigercat-vue`。`@plugin '.../tailwind/modern'` 与 `theme="modern"` 等价。
 
 ## Rules
 
-- 顶层模块代码不要读取 `window`、`document`、`navigator`、`localStorage`、`matchMedia`、DOM 尺寸或 `ResizeObserver`。
-- 客户端专属逻辑放进 Vue `onMounted` 或 React `useEffect` / 客户端组件。
-- 初始渲染不要依赖客户端尺寸、滚动位置、媒体查询、当前时间或随机值。
-- Portal、overlay、拖拽、复制、上传等能力在非浏览器环境返回稳定占位或跳过挂载。浮层：React 在非浏览器把 layer 渲染在原地；Vue Teleport `disabled`。默认目标链是 overlay-host → ConfigProvider 根 → `document.body`，不要写死 `to: 'body'`。
-- 主题 CSS 变量可静态注入；运行时主题读写只在客户端执行。要把 ConfigProvider 的 `theme` / `dir` / `lang` 写进首屏 HTML，在 `<html>` 上预置**同一套**值（`lang`、`dir`、`class="dark"`、`data-tiger-style="modern"`）。`colorScheme="auto"` 首屏当 light，不要等 hydrate 再闪 `.dark`；系统暗色请用 cookie / 预置 class。
+- 顶层模块不要读 `window`、`document`、`navigator`、`localStorage`、`matchMedia`、DOM 尺寸或 `ResizeObserver`。
+- 客户端逻辑放 Vue `onMounted` 或 React `useEffect` / 客户端组件。
+- 初始渲染不要依赖客户端尺寸、滚动、媒体查询、当前时间或随机值。
+- Portal / overlay 在非浏览器返回稳定占位。浮层：React 原地 layer；Vue Teleport `disabled`。目标链是 overlay-host → ConfigProvider 根 → `document.body`。
+- ConfigProvider 放应用根（Next：layout 里一层 client provider，页面不要再包）。`<html lang>` / `dir` 与 locale 对象对齐（本 smoke：`zh-CN` + `zhCN`）。plugin CSS 是首屏 theme；`colorScheme="light"` 与 html 不要 `.dark`。`colorScheme="auto"` 首屏当 light，系统暗色用 cookie / 预置 class。
 
 ## Browser Guard
 
@@ -25,32 +43,32 @@ if (isBrowser()) {
 }
 ```
 
-| 场景           | 做法                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------- |
-| DOM 查询/尺寸  | Vue `onMounted` / React `useEffect` 后读取                                                        |
-| 全局事件监听   | 客户端注册，卸载时移除                                                                            |
-| Portal/overlay | 非浏览器环境返回稳定 layer 占位（React 原地渲染，Vue Teleport `disabled`）；`open` 首屏也要有节点 |
-| 主题变量读写   | 客户端调用 `setThemeColors` / `getThemeColor`；应用层用 ConfigProvider，html 预置同一套值         |
-| 媒体查询/暗色  | `colorScheme="auto"` 首屏当 light；系统暗色用 cookie / `<html class="dark">`                      |
-| 图表尺寸       | 先给定容器尺寸；需要测量时延迟到客户端                                                            |
+| 场景           | 做法                                                         |
+| -------------- | ------------------------------------------------------------ |
+| DOM 查询/尺寸  | Vue `onMounted` / React `useEffect` 后读取                   |
+| 全局事件监听   | 客户端注册，卸载时移除                                       |
+| Portal/overlay | 非浏览器稳定 layer 占位；`open` 首屏也要有节点               |
+| 主题变量读写   | 应用层 ConfigProvider；html 预置同一套值                     |
+| 媒体查询/暗色  | `auto` 首屏 light；系统暗色用 cookie / `<html class="dark">` |
+| 图表尺寸       | 先给定容器尺寸                                               |
 
 ## Framework Checks
 
-| Framework | 验证命令                                              | 组件入口                 | 客户端逻辑位置                                                                          |
-| --------- | ----------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------- |
-| Nuxt 3    | `pnpm --filter @expcat/tigercat-example-nuxt build`   | `@expcat/tigercat-vue`   | `onMounted`                                                                             |
-| Next.js   | `pnpm --filter @expcat/tigercat-example-nextjs build` | `@expcat/tigercat-react` | `'use client'` island；包本身尚未打 `'use client'`，不要从 Server Component 直接 import |
-| Both      | `pnpm example:ssr:build`                              | 正常包入口               | 避免服务端访问浏览器对象                                                                |
+| Framework  | 验证命令                                              | 组件入口                        | 客户端逻辑                                               |
+| ---------- | ----------------------------------------------------- | ------------------------------- | -------------------------------------------------------- |
+| Nuxt 4     | `pnpm --filter @expcat/tigercat-example-nuxt build`   | `@expcat/tigercat-vue/Button`   | `onMounted`；示例 `typeCheck: false`，不保证 Vue 类型    |
+| Next.js 16 | `pnpm --filter @expcat/tigercat-example-nextjs build` | `@expcat/tigercat-react/Button` | `'use client'` 边界；不要从 Server Component 直接 import |
+| Both       | `pnpm example:ssr:check`                              | 子路径                          | 产物 HTML + 主题 CSS + hydrate                           |
 
 ## Hydration Risks
 
-| 能力            | 风险                                        | 建议                                                                              |
-| --------------- | ------------------------------------------- | --------------------------------------------------------------------------------- |
-| DatePicker      | locale、时区或当前日期不同                  | ConfigProvider 传官方 locale 对象；`value` 用 date-only 字符串并写死 `format`     |
-| Charts          | 随机 id 或客户端尺寸影响 SVG                | 使用稳定 id；尺寸依赖客户端时给容器尺寸                                           |
-| Modal/Drawer    | 初始 `open` 状态不同                        | 服务端和客户端使用同一初始 open 值                                                |
-| Tooltip/Popover | 首屏定位依赖 DOM                            | 首屏关闭，打开后再计算定位                                                        |
-| Theme           | hydrate 后才 `setTheme` / `auto` 加 `.dark` | `<html>` 预置与 ConfigProvider 同一套 class / `dir` / `lang`；`auto` 首屏当 light |
+| 能力                 | 本 smoke                                         | 建议                                                                   |
+| -------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
+| DatePicker           | 关着的输入，`2024-01-15` + `format="yyyy-MM-dd"` | 覆盖输入格式化，不是打开的日历。不传 value 会在 render 里 `new Date()` |
+| BarChart             | 定宽高 + `gradient`                              | 稳定 id `tiger-bar-grad-`                                              |
+| Button               | primary 文案                                     | 接上 Tailwind 后才是样式证据                                           |
+| Modal/Drawer/Tooltip | 不在本 smoke                                     | 关着或放到别的页；不要把未演示的 overlay 写成已覆盖                    |
+| Theme                | plugin 默认 light                                | html 与 ConfigProvider 同一套；不要 hydrate 后再加 `.dark`             |
 
 ## Component Checklist
 
@@ -59,4 +77,4 @@ if (isBrowser()) {
 - 事件监听和 observer 有清理逻辑。
 - 非浏览器环境有稳定 fallback。
 - 日期、id、可见文案和图表 gradient id 可复现。
-- SSR 行为有单测或通过 `pnpm example:ssr:build` 验证。
+- SSR 行为有单测或通过 `pnpm example:ssr:check` 验证。

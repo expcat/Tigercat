@@ -6,7 +6,7 @@
   "description": "Next.js SSR example for Tigercat React components",
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {

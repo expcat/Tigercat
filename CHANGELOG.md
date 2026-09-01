@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **SSR 示例（Next 16 / Nuxt 4）**：两站接 Tailwind plugin + `@source` dist。ConfigProvider 在应用根，`<html lang>` 与 `zhCN` 对齐。DatePicker 用 date-only 值；门禁锁产物 HTML、主题 CSS 与 hydrate。不要从 Next Server Component 直接 import 组件。
 - **TaskBoard / Kanban**：过滤和 `hiddenColumns` 只改显示；WIP / 计数 / 拖拽下标用源数组。列拖按 `column.id` 映回源。键盘可放进空列；`beforeCardMove` 的 Promise 会等完再清指示器。无回调加卡/加列插入 locale 标题。Vue `onCardAdd` 会真调用。泳道是列内分组，未分组走 locale，收起的卡不进 DOM。Kanban 只改默认值并透传，不再第二份列状态。
 - **Feed 组合（ChatWindow / CommentThread / ActivityFeed / NotificationCenter）**：时间格式一份 `formatCompositeTime`（`0` 合法，ISO 才 parse，Invalid Date 空串，接 locale）。`groups` / `nodes` 一旦传入（含 `[]`）不再回落 `items`。Chat 贴底才跟最新，IME Enter 不发，`onSend` 不 push。评论 overlay 在 `nodes` 换引用后丢弃，Load more 按 `maxReplies` 揭剩余。Activity Vue 点走 `#dot`。NC 光 `items` 走 List，已读钮常显，全部已读管所有组。这不是命令式 `notification` toast。
 - **DataTableWithToolbar**：搜索/筛选/隐列/页尺寸下沉 core。默认 `searchMode: 'local'` 写进当前表；批量订内层勾选。`onPageChange` 与 Table 同签名；省略 pagination 默认开。`id`/`style` 在外壳。Vue 补 `tableClassName`，props 复用 Table。

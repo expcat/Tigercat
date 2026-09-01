@@ -24,7 +24,7 @@ useHead({
   <ConfigProvider :locale="zhCN" color-scheme="light">
     <main class="ssr-shell">
       <section class="ssr-panel">
-        <p class="eyebrow">Nuxt 3 SSR</p>
+        <p class="eyebrow">Nuxt 4 SSR</p>
         <h1>Tigercat Vue SSR smoke page</h1>
         <p class="copy">
           This page renders Tigercat Vue components during Nuxt SSR and then hydrates the same

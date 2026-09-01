@@ -10,7 +10,7 @@
 
 ```text
 examples/
-├── nuxt/      # @expcat/tigercat-example-nuxt，Nuxt 3 SSR smoke
+├── nuxt/      # @expcat/tigercat-example-nuxt，Nuxt 4 SSR smoke
 ├── nextjs/    # @expcat/tigercat-example-nextjs，Next.js SSR smoke
 ├── example/
 │   ├── vue3/   # @expcat/tigercat-example-vue3
@@ -73,7 +73,7 @@ pnpm --filter @expcat/tigercat-example-nuxt build
 pnpm --filter @expcat/tigercat-example-nextjs build
 ```
 
-SSR 示例会渲染稳定的 `DatePicker` 与带 SVG gradient 的 `BarChart`，覆盖 locale/timezone 与 SVG id 的 hydration 风险。
+SSR 示例（Next 16 / Nuxt 4）必须接上面的 Tailwind 配方。页面 HTML 含 styled Button、关着的 DatePicker（`2024-01-15`）和定宽高 gradient BarChart。不要把未打开的日历或未演示的 Modal/Drawer/Tooltip 写成已覆盖。`pnpm example:ssr:check` 锁产物 HTML、主题 CSS 与 hydrate。
 
 ## 样式接入要点
 
