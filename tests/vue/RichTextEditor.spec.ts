@@ -13,7 +13,7 @@ import { expectNoA11yViolationsIsolated } from '../utils'
 function renderEditor(props: Record<string, unknown> = {}) {
   return render(RichTextEditor, {
     props: {
-      value: '<p>Hello</p>',
+      modelValue: '<p>Hello</p>',
       ...props
     }
   })
@@ -52,7 +52,7 @@ describe('RichTextEditor', () => {
   describe('Placeholder', () => {
     it('should show placeholder when empty', () => {
       const { container } = renderEditor({
-        value: '',
+        modelValue: '',
         placeholder: 'Type here...'
       })
       expect(container.textContent).toContain('Type here...')
@@ -60,7 +60,7 @@ describe('RichTextEditor', () => {
 
     it('should not show placeholder when content exists', () => {
       const { container } = renderEditor({
-        value: '<p>content</p>',
+        modelValue: '<p>content</p>',
         placeholder: 'Type here...'
       })
       const placeholders = container.querySelectorAll('[aria-hidden]')
@@ -140,7 +140,7 @@ describe('RichTextEditor', () => {
       const { container } = render({
         render() {
           return h(ConfigProvider, { locale: zhCN }, () =>
-            h(RichTextEditor, { value: '<p>你好</p>' })
+            h(RichTextEditor, { modelValue: '<p>你好</p>' })
           )
         }
       })
@@ -151,17 +151,15 @@ describe('RichTextEditor', () => {
       expect(container.querySelector('[aria-label="斜体"]')).toBeTruthy()
     })
 
-    it('should have aria-pressed on inline format buttons', () => {
+    it('should have aria-pressed on format buttons', () => {
       const toolbar = [
         { name: 'bold', label: 'Bold' },
         { name: 'heading1', label: 'H1' }
       ]
       const { container } = renderEditor({ toolbar })
       const buttons = container.querySelectorAll('[role="toolbar"] button')
-      // bold is inline -> aria-pressed should be present
-      expect(buttons[0].getAttribute('aria-pressed')).toBeTruthy()
-      // heading1 is block -> no aria-pressed
-      expect(buttons[1].getAttribute('aria-pressed')).toBeNull()
+      expect(buttons[0].getAttribute('aria-pressed')).toBe('false')
+      expect(buttons[1].getAttribute('aria-pressed')).toBe('false')
     })
   })
 
@@ -180,12 +178,12 @@ describe('RichTextEditor', () => {
   })
 
   describe('Events', () => {
-    it('should emit update:value on input', async () => {
+    it('should emit update:modelValue on input', async () => {
       const { container, emitted } = renderEditor()
       const editor = container.querySelector('[role="textbox"]') as HTMLElement
       editor.innerHTML = '<p>New content</p>'
       await fireEvent.input(editor)
-      const events = emitted()['update:value']
+      const events = emitted()['update:modelValue']
       expect(events).toBeTruthy()
       expect(events.length).toBeGreaterThan(0)
     })
@@ -213,21 +211,37 @@ describe('RichTextEditor', () => {
 
       await fireEvent.click(getByRole('button', { name: 'Custom' }))
 
-      expect(emitted()['update:value'].at(-1)?.[0]).toBe('<p>Custom value</p>')
+      expect(emitted()['update:modelValue'].at(-1)?.[0]).toBe('<p>Custom value</p>')
     })
 
     it('should render markdown mode content through the engine', () => {
-      const { container } = renderEditor({ value: '# Title', mode: 'markdown' })
+      const { container } = renderEditor({ modelValue: '# Title', mode: 'markdown' })
       const editor = container.querySelector('[role="textbox"]') as HTMLElement
       expect(editor.innerHTML).toContain('<h1>Title</h1>')
     })
 
     it('should emit plain mode content as text', async () => {
-      const { container, emitted } = renderEditor({ value: 'Hello', mode: 'plain' })
+      const { container, emitted } = renderEditor({ modelValue: 'Hello', mode: 'plain' })
       const editor = container.querySelector('[role="textbox"]') as HTMLElement
       editor.innerHTML = '<p>Hello <strong>world</strong></p>'
       await fireEvent.input(editor)
-      expect(emitted()['update:value'][0][0]).toBe('Hello world')
+      expect(emitted()['update:modelValue'][0][0]).toBe('Hello world')
+    })
+
+    it('prevents toolbar mousedown so the editor keeps its selection', async () => {
+      const { getByRole } = renderEditor({
+        toolbar: [{ name: 'bold', label: 'Bold' }]
+      })
+      const button = getByRole('button', { name: 'Bold' })
+      const event = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+      button.dispatchEvent(event)
+      expect(event.defaultPrevented).toBe(true)
+    })
+
+    it('lets a read-only editor take focus', () => {
+      const { container } = renderEditor({ readOnly: true })
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      expect(editor.tabIndex).toBe(0)
     })
   })
 })

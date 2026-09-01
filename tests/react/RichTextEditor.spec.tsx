@@ -144,15 +144,15 @@ describe('RichTextEditor', () => {
       expect(container.querySelector('[aria-label="斜体"]')).toBeTruthy()
     })
 
-    it('should have aria-pressed on inline format buttons', () => {
+    it('should have aria-pressed on format buttons', () => {
       const toolbar = [
         { name: 'bold', label: 'Bold' },
         { name: 'heading1', label: 'H1' }
       ]
       const { container } = renderEditor({ toolbar })
       const buttons = container.querySelectorAll('[role="toolbar"] button')
-      expect(buttons[0].getAttribute('aria-pressed')).toBeTruthy()
-      expect(buttons[1].getAttribute('aria-pressed')).toBeNull()
+      expect(buttons[0].getAttribute('aria-pressed')).toBe('false')
+      expect(buttons[1].getAttribute('aria-pressed')).toBe('false')
     })
   })
 

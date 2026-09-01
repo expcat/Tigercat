@@ -35,7 +35,7 @@ function toolbarTooltip(label: string, hotkey?: string): string {
 /** Build the built-in toolbar from resolved locale labels. */
 export function createDefaultRichTextToolbar(
   labels: Required<TigerLocaleRichTextEditor>
-): ToolbarButton[] {
+): ToolbarItem[] {
   return [
     {
       name: 'bold',
@@ -56,15 +56,20 @@ export function createDefaultRichTextToolbar(
       hotkey: 'Ctrl+U'
     },
     { name: 'strikethrough', label: labels.strikethrough, tooltip: labels.strikethrough },
+    { type: 'separator' },
     { name: 'heading1', label: labels.heading1, tooltip: labels.heading1 },
     { name: 'heading2', label: labels.heading2, tooltip: labels.heading2 },
     { name: 'heading3', label: labels.heading3, tooltip: labels.heading3 },
+    { type: 'separator' },
     { name: 'bulletList', label: labels.bulletList, tooltip: labels.bulletList },
     { name: 'orderedList', label: labels.orderedList, tooltip: labels.orderedList },
     { name: 'blockquote', label: labels.blockquote, tooltip: labels.blockquote },
     { name: 'codeBlock', label: labels.codeBlock, tooltip: labels.codeBlock },
+    { type: 'separator' },
     { name: 'link', label: labels.link, tooltip: labels.link },
+    { name: 'image', label: labels.image, tooltip: labels.image },
     { name: 'horizontalRule', label: labels.horizontalRule, tooltip: labels.horizontalRule },
+    { type: 'separator' },
     {
       name: 'undo',
       label: labels.undo,
@@ -81,7 +86,7 @@ export function createDefaultRichTextToolbar(
   ]
 }
 
-export const defaultToolbar: ToolbarButton[] = createDefaultRichTextToolbar(
+export const defaultToolbar: ToolbarItem[] = createDefaultRichTextToolbar(
   enUS.richTextEditor as Required<TigerLocaleRichTextEditor>
 )
 
@@ -98,7 +103,7 @@ export const richTextToolbarClasses =
   'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-rte-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
 
 export const richTextToolbarButtonBase =
-  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)]'
+  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-outline-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary,#2563eb)]'
 
 export const richTextToolbarButtonActive =
   'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
@@ -106,11 +111,11 @@ export const richTextToolbarButtonActive =
 export const richTextToolbarSeparatorClasses = 'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
 
 export const richTextEditorAreaBase =
-  'flex-1 p-4 outline-none text-[var(--tiger-text,#111827)] text-sm leading-relaxed overflow-y-auto'
+  'flex-1 p-4 outline-none text-[var(--tiger-text,#111827)] text-sm leading-relaxed overflow-y-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary,#2563eb)]'
 
 export const richTextEditorAreaReadOnly = 'cursor-default'
 
-export const richTextPlaceholderClasses = 'text-[var(--tiger-text-tertiary,#9ca3af)]'
+export const richTextPlaceholderClasses = 'text-[var(--tiger-text-muted,#9ca3af)]'
 
 // ─── Class generators ─────────────────────────────────────────────
 
@@ -197,13 +202,31 @@ export function matchesHotkey(
   event: { ctrlKey: boolean; shiftKey: boolean; altKey: boolean; metaKey: boolean; key: string },
   parsed: ParsedHotkey
 ): boolean {
+  const wantsMod = parsed.ctrl || parsed.meta
+  const hasMod = event.ctrlKey || event.metaKey
   return (
     event.key.toLowerCase() === parsed.key &&
-    event.ctrlKey === parsed.ctrl &&
+    wantsMod === hasMod &&
     event.shiftKey === parsed.shift &&
-    event.altKey === parsed.alt &&
-    event.metaKey === parsed.meta
+    event.altKey === parsed.alt
   )
+}
+
+/** Roving tabindex index for an APG toolbar. Arrow keys wrap. */
+export function nextToolbarRovingIndex(
+  current: number,
+  length: number,
+  key: string,
+  rtl = false
+): number | null {
+  if (length <= 0) return null
+  if (key === 'Home') return 0
+  if (key === 'End') return length - 1
+  const backward = key === 'ArrowLeft' || key === 'ArrowUp'
+  const forward = key === 'ArrowRight' || key === 'ArrowDown'
+  if (!backward && !forward) return null
+  const dir = (forward && !rtl) || (backward && rtl) ? 1 : -1
+  return (current + dir + length) % length
 }
 
 /**
@@ -581,6 +604,12 @@ function decodeHtmlEntities(value: string): string {
 
 function inlineMarkdownToHtml(value: string): string {
   return escapeHtml(value)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, alt, src) =>
+      isValidUrl(src) ? `<img src="${src}" alt="${alt}">` : _m
+    )
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, text, href) =>
+      isValidUrl(href) ? `<a href="${href}">${text}</a>` : text
+    )
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
@@ -600,20 +629,35 @@ export function richTextModeToHtml(value: string, mode: RichTextEditorMode = 'ht
   const lines = value.split(/\r?\n/)
   const html: string[] = []
   let listItems: string[] = []
+  let listKind: 'ul' | 'ol' | null = null
 
   const flushList = () => {
-    if (listItems.length === 0) return
+    if (!listKind || listItems.length === 0) {
+      listItems = []
+      listKind = null
+      return
+    }
     html.push(
-      `<ul>${listItems.map((item) => `<li>${inlineMarkdownToHtml(item)}</li>`).join('')}</ul>`
+      `<${listKind}>${listItems.map((item) => `<li>${inlineMarkdownToHtml(item)}</li>`).join('')}</${listKind}>`
     )
     listItems = []
+    listKind = null
   }
 
-  for (const line of lines) {
-    const trimmed = line.trim()
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim()
     const bullet = /^[-*]\s+(.+)$/.exec(trimmed)
+    const ordered = /^\d+[.)]\s+(.+)$/.exec(trimmed)
     if (bullet) {
+      if (listKind && listKind !== 'ul') flushList()
+      listKind = 'ul'
       listItems.push(bullet[1])
+      continue
+    }
+    if (ordered) {
+      if (listKind && listKind !== 'ol') flushList()
+      listKind = 'ol'
+      listItems.push(ordered[1])
       continue
     }
 
@@ -626,6 +670,26 @@ export function richTextModeToHtml(value: string, mode: RichTextEditorMode = 'ht
       html.push(`<h2>${inlineMarkdownToHtml(trimmed.slice(3))}</h2>`)
     } else if (trimmed.startsWith('# ')) {
       html.push(`<h1>${inlineMarkdownToHtml(trimmed.slice(2))}</h1>`)
+    } else if (/^>\s?/.test(trimmed)) {
+      const quote: string[] = []
+      while (i < lines.length && /^>\s?/.test(lines[i].trim())) {
+        quote.push(lines[i].trim().replace(/^>\s?/, ''))
+        i++
+      }
+      i--
+      html.push(
+        `<blockquote>${quote.map((line) => `<p>${inlineMarkdownToHtml(line)}</p>`).join('')}</blockquote>`
+      )
+    } else if (/^```/.test(trimmed)) {
+      const code: string[] = []
+      i++
+      while (i < lines.length && !/^```/.test(lines[i].trim())) {
+        code.push(lines[i])
+        i++
+      }
+      html.push(`<pre><code>${escapeHtml(code.join('\n'))}</code></pre>`)
+    } else if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      html.push('<hr>')
     } else {
       html.push(`<p>${inlineMarkdownToHtml(trimmed)}</p>`)
     }
@@ -657,8 +721,37 @@ export function richTextHtmlToMode(html: string, mode: RichTextEditorMode = 'htm
       .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, '# $1\n\n')
       .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '## $1\n\n')
       .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '### $1\n\n')
-      .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
-      .replace(/<\/ul>/gi, '\n')
+      .replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, (_m, inner: string) => {
+        let index = 1
+        return (
+          String(inner).replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_li, item: string) => {
+            const line = `${index}. ${item}\n`
+            index++
+            return line
+          }) + '\n'
+        )
+      })
+      .replace(
+        /<ul[^>]*>([\s\S]*?)<\/ul>/gi,
+        (_m, inner: string) => String(inner).replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n') + '\n'
+      )
+      .replace(
+        /<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi,
+        (_m, inner: string) =>
+          `${String(inner)
+            .replace(/<\/p>/gi, '\n')
+            .replace(/<[^>]+>/g, '')
+            .split('\n')
+            .map((line) => (line.trim() ? `> ${line.trim()}` : '>'))
+            .join('\n')}\n\n`
+      )
+      .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, (_m, inner: string) => {
+        const code = String(inner).replace(/<\/?code[^>]*>/gi, '')
+        return `\`\`\`\n${code}\n\`\`\`\n\n`
+      })
+      .replace(/<hr\s*\/?>/gi, '\n---\n')
+      .replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)')
+      .replace(/<img[^>]*src="([^"]*)"[^>]*(?:alt="([^"]*)")?[^>]*>/gi, '![$2]($1)')
       .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
       .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**')
       .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*')

@@ -1,4 +1,14 @@
-import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  inject,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -9,7 +19,6 @@ import {
   richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
   createDefaultRichTextToolbar,
-  isInlineFormat,
   findHotkeyMatch,
   isContentEmpty,
   parseHeight,
@@ -17,6 +26,8 @@ import {
   isToolbarSeparator,
   mergeTigerLocale,
   getRichTextEditorLabels,
+  getToolbarButtons,
+  nextToolbarRovingIndex,
   type RichTextEditorMode,
   type ToolbarButton,
   type ToolbarItem,
@@ -26,9 +37,10 @@ import {
   type TigerLocaleRichTextEditor
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export interface VueRichTextEditorProps {
-  value?: string
+  modelValue?: string
   defaultValue?: string
   placeholder?: string
   mode?: RichTextEditorMode
@@ -39,19 +51,22 @@ export interface VueRichTextEditorProps {
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleRichTextEditor>
   className?: string
+  ariaLabel?: string
+  name?: string
+  id?: string
   /**
-   * Optional pluggable editor engine (PR-17). Defaults to the
-   * built-in `contenteditable` + `document.execCommand` engine. Pass a
-   * custom engine to swap in Quill / TipTap / ProseMirror without
-   * touching this component.
+   * Optional pluggable editor engine. Custom engines are TRUSTED and
+   * must sanitise untrusted HTML themselves.
    */
   engine?: RichTextEngine
+  onRequestUrl?: (kind: 'link' | 'image') => string | null
 }
 
 export const RichTextEditor = defineComponent({
   name: 'TigerRichTextEditor',
+  inheritAttrs: false,
   props: {
-    value: { type: String, default: undefined },
+    modelValue: { type: String, default: undefined },
     defaultValue: { type: String, default: '' },
     placeholder: { type: String, default: undefined },
     mode: {
@@ -71,47 +86,66 @@ export const RichTextEditor = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleRichTextEditor>>, default: undefined },
     className: { type: String, default: undefined },
+    ariaLabel: { type: String, default: undefined },
+    name: { type: String, default: undefined },
+    id: { type: String, default: undefined },
     engine: {
       type: Object as PropType<RichTextEngine>,
       default: undefined
+    },
+    onRequestUrl: {
+      type: Function as PropType<(kind: 'link' | 'image') => string | null>,
+      default: undefined
     }
   },
-  emits: ['update:value', 'change'],
-  setup(props, { emit, attrs }) {
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
     const editorRef = ref<HTMLDivElement | null>(null)
     const internalValue = ref(props.defaultValue || '')
     const activeFormats = ref<Set<string>>(new Set())
+    const toolbarIndex = ref(0)
     let engineInstance: RichTextEngineInstance | null = null
 
-    const isControlled = computed(() => props.value !== undefined)
-    const currentContent = computed(() =>
-      props.value !== undefined ? props.value : internalValue.value
-    )
+    const formValue = computed(() => formItemControl?.value.value)
+    const isControlled = computed(() => props.modelValue !== undefined)
+    const currentContent = computed(() => {
+      if (props.modelValue !== undefined) return props.modelValue
+      if (typeof formValue.value === 'string') return formValue.value
+      return internalValue.value
+    })
     const isEmpty = computed(() => isContentEmpty(currentContent.value))
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getRichTextEditorLabels(mergedLocale.value, props.labels))
-    const toolbarItems = computed(() => props.toolbar ?? createDefaultRichTextToolbar(labels.value))
-
-    // Sync editor content when controlled value changes
-    watch(
-      () => props.value,
-      (newVal) => {
-        if (newVal !== undefined && engineInstance) {
-          engineInstance.setValue(newVal)
-        }
-      }
+    const toolbarItems = computed(() =>
+      props.mode === 'plain' ? [] : (props.toolbar ?? createDefaultRichTextToolbar(labels.value))
+    )
+    const toolbarButtons = computed(() => getToolbarButtons(toolbarItems.value))
+    const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
+    const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const effectiveDisabled = computed(
+      () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
 
-    // React to readOnly/disabled changes after mount
-    watch(
-      () => [props.readOnly, props.disabled] as const,
-      ([ro, dis]) => {
-        engineInstance?.setReadOnly(ro, dis)
-      }
-    )
+    expose({
+      focus: () => editorRef.value?.focus(),
+      editor: editorRef
+    })
 
-    onMounted(() => {
+    function commit(html: string) {
+      if (!isControlled.value) internalValue.value = html
+      emit('update:modelValue', html)
+      emit('change', html)
+      formItemControl?.onChange(html)
+    }
+
+    function mountEngine() {
+      engineInstance?.destroy()
+      engineInstance = null
       if (!editorRef.value) return
       const engine = props.engine ?? builtinRichTextEngine
       engineInstance = engine.create({
@@ -119,18 +153,56 @@ export const RichTextEditor = defineComponent({
         initialValue: currentContent.value,
         mode: props.mode,
         readOnly: props.readOnly,
-        disabled: props.disabled,
+        disabled: effectiveDisabled.value,
         placeholder: props.placeholder,
         toolbar: toolbarItems.value,
-        notifyChange(html) {
-          if (!isControlled.value) internalValue.value = html
-          emit('update:value', html)
-          emit('change', html)
-        },
+        requestUrl: props.onRequestUrl,
+        notifyChange: commit,
         notifyActiveFormats(next) {
           activeFormats.value = next
         }
       })
+    }
+
+    watch(
+      () => props.modelValue,
+      (newVal) => {
+        if (newVal !== undefined && engineInstance) {
+          engineInstance.setValue(newVal)
+        }
+      }
+    )
+
+    watch(
+      () => [props.readOnly, effectiveDisabled.value] as const,
+      ([ro, dis]) => {
+        engineInstance?.setReadOnly(ro, dis)
+      }
+    )
+
+    watch(
+      () => props.mode,
+      (mode) => {
+        engineInstance?.setMode(mode)
+      }
+    )
+
+    watch(
+      () => toolbarItems.value,
+      (items) => {
+        engineInstance?.setToolbar(items)
+      }
+    )
+
+    watch(
+      () => props.engine,
+      () => {
+        mountEngine()
+      }
+    )
+
+    onMounted(() => {
+      mountEngine()
     })
 
     onBeforeUnmount(() => {
@@ -138,16 +210,13 @@ export const RichTextEditor = defineComponent({
       engineInstance = null
     })
 
-    // ── Toolbar action handler ──
-
-    /** Execute action for a specific button (supports custom action) */
     function execButtonAction(btn: ToolbarButton) {
-      if (props.readOnly || props.disabled) return
+      if (props.readOnly || effectiveDisabled.value) return
       engineInstance?.exec(btn.name)
     }
 
-    // ── Keyboard handler ──
     function handleKeydown(e: KeyboardEvent) {
+      if (props.readOnly || effectiveDisabled.value) return
       const match = findHotkeyMatch(toolbarItems.value, e)
       if (match) {
         e.preventDefault()
@@ -155,9 +224,21 @@ export const RichTextEditor = defineComponent({
       }
     }
 
+    function handleToolbarKeydown(e: KeyboardEvent) {
+      const next = nextToolbarRovingIndex(toolbarIndex.value, toolbarButtons.value.length, e.key)
+      if (next === null) return
+      e.preventDefault()
+      toolbarIndex.value = next
+      const buttons = editorRef.value
+        ?.closest('[data-tiger-rte]')
+        ?.querySelectorAll('[role="toolbar"] button')
+      const target = buttons?.[next] as HTMLButtonElement | undefined
+      target?.focus()
+    }
+
     const containerClasses = computed(() =>
       classNames(
-        getRichTextContainerClasses(props.disabled, props.className),
+        getRichTextContainerClasses(effectiveDisabled.value, props.className),
         coerceClassValue(attrs.class)
       )
     )
@@ -166,79 +247,90 @@ export const RichTextEditor = defineComponent({
 
     const containerStyle = computed(() => {
       const ht = parseHeight(props.height)
-      if (!ht) return undefined
-      return { height: ht }
+      return {
+        ...(ht ? { height: ht } : {}),
+        ...(attrs.style as Record<string, string> | undefined)
+      }
     })
 
     return () => {
-      // Toolbar
-      const toolbarEl = h(
-        'div',
-        {
-          class: richTextToolbarClasses,
-          role: 'toolbar',
-          'aria-label': labels.value.formattingToolbarAriaLabel
-        },
-        toolbarItems.value.map((item, idx) => {
-          if (isToolbarSeparator(item)) {
-            return h('div', {
-              key: `sep-${idx}`,
-              class: richTextToolbarSeparatorClasses,
-              role: 'separator',
-              'aria-orientation': 'vertical'
-            })
-          }
-          const btn = item
-          return h(
-            'button',
+      const { class: _attrClass, style: _attrStyle, ...restAttrs } = attrs
+      const showToolbar = toolbarItems.value.length > 0
+      const toolbarEl = showToolbar
+        ? h(
+            'div',
             {
-              key: btn.name,
-              type: 'button',
-              class: getToolbarButtonClasses(activeFormats.value.has(btn.name)),
-              title: btn.tooltip ?? btn.label,
-              'aria-label': btn.label,
-              'aria-pressed': isInlineFormat(btn.name)
-                ? activeFormats.value.has(btn.name)
-                : undefined,
-              disabled: props.disabled || props.readOnly,
-              onClick: (e: Event) => {
-                e.preventDefault()
-                execButtonAction(btn)
-              }
+              class: richTextToolbarClasses,
+              role: 'toolbar',
+              'aria-label': labels.value.formattingToolbarAriaLabel,
+              onKeydown: handleToolbarKeydown
             },
-            btn.icon ? h('span', { innerHTML: btn.icon }) : btn.label
+            toolbarItems.value.map((item, idx) => {
+              if (isToolbarSeparator(item)) {
+                return h('div', {
+                  key: `sep-${idx}`,
+                  class: richTextToolbarSeparatorClasses,
+                  role: 'separator',
+                  'aria-orientation': 'vertical'
+                })
+              }
+              const btn = item
+              const buttonIndex = toolbarButtons.value.indexOf(btn)
+              return h(
+                'button',
+                {
+                  key: btn.name,
+                  type: 'button',
+                  class: getToolbarButtonClasses(activeFormats.value.has(btn.name)),
+                  title: btn.tooltip ?? btn.label,
+                  'aria-label': btn.label,
+                  'aria-pressed': activeFormats.value.has(btn.name),
+                  tabindex: buttonIndex === toolbarIndex.value ? 0 : -1,
+                  disabled: effectiveDisabled.value || props.readOnly,
+                  onMousedown: (e: Event) => e.preventDefault(),
+                  onClick: () => execButtonAction(btn)
+                },
+                btn.icon ? h('span', { innerHTML: btn.icon }) : btn.label
+              )
+            })
           )
-        })
-      )
+        : null
 
-      // Editable area
       const editorEl = h('div', {
+        ...restAttrs,
         ref: editorRef,
         class: editorAreaClasses.value,
         role: 'textbox',
-        'aria-label': labels.value.editorAriaLabel,
+        id: effectiveId.value,
+        'aria-label':
+          props.ariaLabel ??
+          (restAttrs['aria-label'] as string | undefined) ??
+          labels.value.editorAriaLabel,
+        'aria-labelledby':
+          (restAttrs['aria-labelledby'] as string | undefined) ?? formItemControl?.labelId.value,
         'aria-multiline': true,
         'aria-readonly': props.readOnly || undefined,
-        'aria-disabled': props.disabled || undefined,
+        'aria-disabled': effectiveDisabled.value || undefined,
         'aria-placeholder': props.placeholder,
         'data-placeholder': props.placeholder,
-        onKeydown: handleKeydown
+        'data-name': effectiveName.value,
+        tabindex: props.readOnly && !effectiveDisabled.value ? 0 : undefined,
+        onKeydown: handleKeydown,
+        onBlur: () => formItemControl?.onBlur()
       })
 
-      // Placeholder overlay
       const placeholderEl =
         isEmpty.value && props.placeholder
           ? h(
               'div',
               {
-                class: `${richTextPlaceholderClasses} absolute top-0 left-0 p-4 pointer-events-none text-sm`,
+                class: `${richTextPlaceholderClasses} absolute top-0 start-0 p-4 pointer-events-none text-sm`,
                 'aria-hidden': true
               },
               props.placeholder
             )
           : null
 
-      // Editor wrapper (relative for placeholder positioning)
       const editorWrapper = h('div', { class: 'relative flex-1 overflow-hidden' }, [
         editorEl,
         placeholderEl
@@ -248,7 +340,8 @@ export const RichTextEditor = defineComponent({
         'div',
         {
           class: containerClasses.value,
-          style: containerStyle.value
+          style: containerStyle.value,
+          'data-tiger-rte': ''
         },
         [toolbarEl, editorWrapper]
       )

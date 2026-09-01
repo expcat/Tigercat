@@ -2,6 +2,8 @@
  * RichTextEditor shared types
  */
 
+import type { TigerLocale, TigerLocaleRichTextEditor } from './locale'
+
 /** Editing mode */
 export type RichTextEditorMode = 'html' | 'markdown' | 'plain'
 
@@ -9,6 +11,10 @@ export type RichTextEditorMode = 'html' | 'markdown' | 'plain'
 export interface ToolbarButton {
   name: string
   label: string
+  /**
+   * Optional icon HTML. TRUSTED — injected with innerHTML; escape or
+   * sanitise untrusted strings before passing.
+   */
   icon?: string
   tooltip?: string
   hotkey?: string
@@ -68,4 +74,17 @@ export interface RichTextEditorProps {
   disabled?: boolean
   /** Additional CSS class */
   className?: string
+  /**
+   * Pluggable editor engine. Default is builtin contenteditable.
+   * Custom engines are TRUSTED and must sanitise untrusted HTML.
+   */
+  engine?: unknown
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleRichTextEditor>
+  /** Accessible name; falls back to locale then FormItem */
+  ariaLabel?: string
+  /** Called instead of window.prompt for link / image URLs */
+  onRequestUrl?: (kind: 'link' | 'image') => string | null
 }

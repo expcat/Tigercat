@@ -32,7 +32,7 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 describe('defaultToolbar', () => {
   it('has expected buttons', () => {
-    const names = defaultToolbar.map((b) => b.name)
+    const names = getToolbarButtons(defaultToolbar).map((b) => b.name)
     expect(names).toContain('bold')
     expect(names).toContain('italic')
     expect(names).toContain('underline')
@@ -45,18 +45,24 @@ describe('defaultToolbar', () => {
   })
 
   it('each button has name and label', () => {
-    for (const btn of defaultToolbar) {
+    for (const btn of getToolbarButtons(defaultToolbar)) {
       expect(btn.name).toBeTruthy()
       expect(btn.label).toBeTruthy()
     }
+  })
+
+  it('includes image and separators', () => {
+    expect(getToolbarButtons(defaultToolbar).some((btn) => btn.name === 'image')).toBe(true)
+    expect(defaultToolbar.some((item) => 'type' in item && item.type === 'separator')).toBe(true)
   })
 
   it('createDefaultRichTextToolbar uses locale labels for Bold / Italic', () => {
     const toolbar = createDefaultRichTextToolbar(
       zhCN.richTextEditor as Parameters<typeof createDefaultRichTextToolbar>[0]
     )
-    const bold = toolbar.find((btn) => btn.name === 'bold')
-    const italic = toolbar.find((btn) => btn.name === 'italic')
+    const buttons = getToolbarButtons(toolbar)
+    const bold = buttons.find((btn) => btn.name === 'bold')
+    const italic = buttons.find((btn) => btn.name === 'italic')
     expect(bold?.label).toBe('加粗')
     expect(italic?.label).toBe('斜体')
   })
@@ -215,6 +221,12 @@ describe('matchesHotkey', () => {
     const parsed = parseHotkey('Ctrl+B')
     const event = { ctrlKey: false, shiftKey: false, altKey: false, metaKey: false, key: 'b' }
     expect(matchesHotkey(event, parsed)).toBe(false)
+  })
+
+  it('matches Cmd+B against a Ctrl+B hotkey', () => {
+    const parsed = parseHotkey('Ctrl+B')
+    const event = { ctrlKey: false, shiftKey: false, altKey: false, metaKey: true, key: 'b' }
+    expect(matchesHotkey(event, parsed)).toBe(true)
   })
 })
 
