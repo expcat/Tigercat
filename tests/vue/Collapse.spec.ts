@@ -643,9 +643,7 @@ describe('Collapse', () => {
       render(Collapse, {
         props: { activeKey: '1' },
         slots: {
-          default: () => [
-            h(CollapsePanel, { panelKey: 1, header: 'Panel 1' }, () => 'Content 1')
-          ]
+          default: () => [h(CollapsePanel, { panelKey: 1, header: 'Panel 1' }, () => 'Content 1')]
         }
       })
 

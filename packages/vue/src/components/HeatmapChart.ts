@@ -246,9 +246,7 @@ export const HeatmapChart = defineComponent({
         h('thead', [
           h('tr', [
             h('td'),
-            ...props.xLabels.map((label) =>
-              h('th', { key: `hx-${label}`, scope: 'col' }, label)
-            )
+            ...props.xLabels.map((label) => h('th', { key: `hx-${label}`, scope: 'col' }, label))
           ])
         ]),
         h('tbody', [

@@ -150,10 +150,22 @@ describe('Timeline (React)', () => {
 
   it('keeps key 0 as the item identity', () => {
     const { rerender } = render(
-      <Timeline items={[{ key: 0, content: 'Zero' }, { key: 1, content: 'One' }]} />
+      <Timeline
+        items={[
+          { key: 0, content: 'Zero' },
+          { key: 1, content: 'One' }
+        ]}
+      />
     )
     expect(screen.getByText('Zero')).toBeInTheDocument()
-    rerender(<Timeline items={[{ key: 1, content: 'One' }, { key: 0, content: 'Zero' }]} />)
+    rerender(
+      <Timeline
+        items={[
+          { key: 1, content: 'One' },
+          { key: 0, content: 'Zero' }
+        ]}
+      />
+    )
     expect(screen.getByText('Zero')).toBeInTheDocument()
   })
 

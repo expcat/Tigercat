@@ -82,9 +82,7 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
   const columnCount = resolveMasonryColumnCount(columns, widthForResolve)
   const gapPx = resolveMasonryGap(gap, widthForResolve)
   const packed =
-    hasMeasuredMasonryHeights(heights) &&
-    containerWidth > 0 &&
-    heights.length === childNodes.length
+    hasMeasuredMasonryHeights(heights) && containerWidth > 0 && heights.length === childNodes.length
   const positions = packed
     ? computeMasonryPositions(heights, columnCount, gapPx, containerWidth)
     : []
@@ -189,9 +187,7 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
             role={labelled ? 'listitem' : undefined}
             className={getMasonryItemClasses(itemClassName)}
             style={
-              packed && positions[index]
-                ? getMasonryItemPositionStyle(positions[index])
-                : undefined
+              packed && positions[index] ? getMasonryItemPositionStyle(positions[index]) : undefined
             }
             data-masonry-item={index}
             ref={(el) => {
