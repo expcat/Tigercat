@@ -1,6 +1,6 @@
 import { isBrowser, type LoadingBarApi, type LoadingBarOptions } from '@expcat/tigercat-core'
 
-export type { LoadingBarOptions }
+export type { LoadingBarOptions, LoadingBarProps } from '@expcat/tigercat-core'
 
 type LoadingBarCommand =
   | { type: 'start'; options?: LoadingBarOptions }

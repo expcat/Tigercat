@@ -1,6 +1,6 @@
 import { isBrowser, type MessageOptions, type MessageType } from '@expcat/tigercat-core'
 
-export type { MessageOptions }
+export type { MessageOptions, MessageProps } from '@expcat/tigercat-core'
 
 type MessageClose = () => void
 
