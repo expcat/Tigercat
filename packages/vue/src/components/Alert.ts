@@ -39,7 +39,7 @@ export interface VueAlertProps {
   closable?: boolean
   closeAriaLabel?: string
   duration?: number
-  visible?: boolean
+  open?: boolean
   banner?: boolean
   showCountdown?: boolean
   className?: string
@@ -124,7 +124,7 @@ export const Alert = defineComponent({
     /**
      * When `false`, the alert is not rendered. Closing never hides internally.
      */
-    visible: {
+    open: {
       type: Boolean,
       default: undefined
     },
@@ -163,7 +163,7 @@ export const Alert = defineComponent({
       default: false
     }
   },
-  emits: ['close'],
+  emits: ['close', 'update:open'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const labels = computed(() =>
@@ -213,6 +213,7 @@ export const Alert = defineComponent({
 
     const requestClose = (event: Event) => {
       emit('close', event)
+      emit('update:open', false)
       clearTimer()
     }
 
@@ -222,10 +223,10 @@ export const Alert = defineComponent({
     }
 
     watch(
-      () => [props.duration, props.visible] as const,
+      () => [props.duration, props.open] as const,
       () => {
         clearTimer()
-        if (props.visible === false) return
+        if (props.open === false) return
         if (props.duration && props.duration > 0) {
           autoCloseTimer = setTimeout(() => {
             requestClose(new Event('close', { cancelable: true }))
@@ -238,7 +239,7 @@ export const Alert = defineComponent({
     onBeforeUnmount(clearTimer)
 
     return () => {
-      if (props.visible === false) {
+      if (props.open === false) {
         return null
       }
 

@@ -123,10 +123,10 @@ describe('Alert', () => {
     expect(screen.getByText('Closable')).toBeInTheDocument()
   })
 
-  it('hides when visible is false', () => {
-    const { rerender } = render(<Alert title="Closable" closable visible />)
+  it('hides when open is false', () => {
+    const { rerender } = render(<Alert title="Closable" closable open />)
     expect(screen.getByText('Closable')).toBeInTheDocument()
-    rerender(<Alert title="Closable" closable visible={false} />)
+    rerender(<Alert title="Closable" closable open={false} />)
     expect(screen.queryByText('Closable')).not.toBeInTheDocument()
   })
 

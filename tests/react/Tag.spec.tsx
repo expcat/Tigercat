@@ -70,7 +70,7 @@ describe('Tag', () => {
     expect(screen.getByText('Closable Tag')).toBeInTheDocument()
   })
 
-  it('hides when visible is false and still fires close for a list item', async () => {
+  it('hides when the parent unmounts a list item after close', async () => {
     const user = userEvent.setup()
 
     function List() {

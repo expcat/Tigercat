@@ -72,9 +72,10 @@ export interface AlertProps {
 
   /**
    * When `false`, the alert is not rendered. Closing never hides internally —
-   * the parent unmounts or sets `visible={false}`.
+   * the parent unmounts or sets `open={false}`.
    */
-  visible?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 
   /**
    * Whether to display as full-width banner across the page

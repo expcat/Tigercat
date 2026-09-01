@@ -44,7 +44,7 @@ export interface AlertProps
 
   /**
    * Close request. Click and auto-close both pass an event.
-   * Closing never hides internally — unmount or set `visible={false}`.
+   * Closing never hides internally — unmount or set `open={false}`.
    */
   onClose?: (event: Event) => void
 }
@@ -60,7 +60,8 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
     closable = false,
     closeAriaLabel,
     duration,
-    visible,
+    open,
+    onOpenChange,
     banner = false,
     showCountdown = false,
     className,
@@ -121,10 +122,14 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
   const clearTimerRef = useRef<(() => void) | undefined>(undefined)
 
-  const requestClose = useCallback((event: Event) => {
-    onCloseRef.current?.(event)
-    clearTimerRef.current?.()
-  }, [])
+  const requestClose = useCallback(
+    (event: Event) => {
+      onCloseRef.current?.(event)
+      onOpenChange?.(false)
+      clearTimerRef.current?.()
+    },
+    [onOpenChange]
+  )
 
   const handleClose = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -135,7 +140,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   )
 
   useEffect(() => {
-    if (visible === false || !(duration && duration > 0)) {
+    if (open === false || !(duration && duration > 0)) {
       return
     }
     const timer = window.setTimeout(() => {
@@ -149,9 +154,9 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
         clearTimerRef.current = undefined
       }
     }
-  }, [duration, visible, requestClose])
+  }, [duration, open, requestClose])
 
-  if (visible === false) {
+  if (open === false) {
     return null
   }
 

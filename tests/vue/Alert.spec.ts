@@ -154,14 +154,14 @@ describe('Alert', () => {
     expect(screen.getByText('Closable Alert')).toBeInTheDocument()
   })
 
-  it('hides when visible is false', async () => {
+  it('hides when open is false', async () => {
     const { rerender } = renderWithProps(Alert, {
       title: 'Closable Alert',
       closable: true,
-      visible: true
+      open: true
     })
     expect(screen.getByText('Closable Alert')).toBeInTheDocument()
-    await rerender({ title: 'Closable Alert', closable: true, visible: false })
+    await rerender({ title: 'Closable Alert', closable: true, open: false })
     expect(screen.queryByText('Closable Alert')).not.toBeInTheDocument()
   })
 

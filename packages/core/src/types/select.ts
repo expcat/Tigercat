@@ -136,6 +136,11 @@ export interface SelectProps {
   defaultOpen?: boolean
 
   /**
+   * Fired when the dropdown opens or closes.
+   */
+  onOpenChange?: (open: boolean) => void
+
+  /**
    * Text to display when the options list is empty or no search result matches.
    * Defaults to ConfigProvider locale `select.emptyText`.
    */

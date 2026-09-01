@@ -23,7 +23,7 @@ export type TagProps = CoreTagProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, keyof CoreTagProps | 'onClose'> & {
     /**
      * Close event handler. The tag stays mounted unless the parent unmounts
-     * it or sets `visible={false}`.
+     * it or sets `open={false}`.
      */
     onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void
 
@@ -59,7 +59,8 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
     closable = false,
     closeAriaLabel,
     closeTabIndex,
-    visible,
+    open,
+    onOpenChange,
     pill = false,
     onClose,
     children,
@@ -95,9 +96,10 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     onClose?.(event)
+    onOpenChange?.(false)
   }
 
-  if (visible === false) {
+  if (open === false) {
     return null
   }
 

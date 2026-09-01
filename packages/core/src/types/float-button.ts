@@ -104,6 +104,11 @@ export interface FloatButtonGroupProps {
   defaultOpen?: boolean
 
   /**
+   * Fired when the group opens or closes.
+   */
+  onOpenChange?: (open: boolean) => void
+
+  /**
    * Close the group after an action button is activated.
    * @default true
    */

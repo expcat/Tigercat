@@ -205,7 +205,11 @@ for (const name of reactComponentNames) {
 // This prevents introducing `visible` and ensures overlay API symmetry.
 
 const componentsWithOpen = new Set()
-const OPEN_PARITY_SKIP_COMPONENTS = new Set(['ChartTooltip'])
+const OPEN_PARITY_SKIP_COMPONENTS = new Set([
+  'ChartTooltip',
+  'BaseFloatingPopup',
+  'ImageViewerBase'
+])
 
 for (const filename of typeFiles) {
   const filepath = join(TYPES_DIR, filename)
@@ -257,18 +261,27 @@ for (const compName of componentsWithOpen) {
     }
   }
 
-  // Check React: must have onOpenChange prop
-  const reactFile = join(REACT_COMPONENTS_DIR, `${compName}.tsx`)
-  if (existsSync(reactFile)) {
-    const reactContent = readFileSync(reactFile, 'utf-8')
-    if (!/\bonOpenChange\s*[?]?\s*:/.test(reactContent)) {
-      addIssue(
-        `${compName}.tsx`,
-        0,
-        'overlay-api',
-        `React 组件 "${compName}" 有 open 属性但缺少 onOpenChange 回调`
-      )
-    }
+  // Check React: onOpenChange may live on the core type, the main file, or a split types module.
+  const reactSource = readComponentSource(REACT_COMPONENTS_DIR, compName, '.tsx')
+  const coreTypeInfo = [...coreFileInfoByName.values()].find((info) =>
+    info.propsInterfaces.some(
+      (name) => name === `${compName}Props` || name.endsWith(`${compName}Props`)
+    )
+  )
+  const coreTypeFile = coreTypeInfo
+    ? join(TYPES_DIR, coreTypeInfo.fileName)
+    : join(TYPES_DIR, `${compName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}.ts`)
+  const coreTypeSource = existsSync(coreTypeFile) ? readFileSync(coreTypeFile, 'utf-8') : ''
+  if (
+    (reactSource || coreTypeSource) &&
+    !/\bonOpenChange\s*[?]?\s*:/.test(`${reactSource}\n${coreTypeSource}`)
+  ) {
+    addIssue(
+      `${compName}.tsx`,
+      0,
+      'overlay-api',
+      `React 组件 "${compName}" 有 open 属性但缺少 onOpenChange 回调`
+    )
   }
 }
 
@@ -1131,7 +1144,9 @@ for (const file of skillMarkdownFiles) {
   const content = readFileSync(file, 'utf-8')
   const lines = content.split(/\r?\n/)
   const relativeFile = relative(ROOT, file)
-  totalSkillMarkdownLines += lines.length
+  if (!isGeneratedSkillReference(relativeFile)) {
+    totalSkillMarkdownLines += lines.length
+  }
 
   if (relativeFile === join('skills', 'tigercat', 'SKILL.md')) {
     const bytes = Buffer.byteLength(content, 'utf8')

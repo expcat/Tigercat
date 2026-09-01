@@ -30,7 +30,7 @@ export interface VueTagProps {
   closable?: boolean
   closeAriaLabel?: string
   closeTabIndex?: number
-  visible?: boolean
+  open?: boolean
   pill?: boolean
   className?: string
   style?: Record<string, string | number>
@@ -107,7 +107,7 @@ export const Tag = defineComponent({
     /**
      * When `false`, the tag is not rendered. Closing never hides internally.
      */
-    visible: {
+    open: {
       type: Boolean,
       default: undefined
     },
@@ -137,7 +137,7 @@ export const Tag = defineComponent({
       default: undefined
     }
   },
-  emits: ['close'],
+  emits: ['close', 'update:open'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const labels = computed(() =>
@@ -162,10 +162,11 @@ export const Tag = defineComponent({
     const handleClose = (event: MouseEvent) => {
       event.stopPropagation()
       emit('close', event)
+      emit('update:open', false)
     }
 
     return () => {
-      if (props.visible === false) {
+      if (props.open === false) {
         return null
       }
 

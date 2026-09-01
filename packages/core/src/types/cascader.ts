@@ -108,6 +108,11 @@ export interface CascaderProps {
   defaultOpen?: boolean
 
   /**
+   * Fired when the dropdown opens or closes.
+   */
+  onOpenChange?: (open: boolean) => void
+
+  /**
    * Placeholder text when nothing is selected.
    * Defaults to ConfigProvider locale `select.placeholder`.
    */

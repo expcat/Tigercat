@@ -54,10 +54,11 @@ export interface TagProps {
   closeTabIndex?: number
 
   /**
-   * When `false`, the tag is not rendered. Omitted / `true` keeps it visible.
-   * Closing never hides internally — the parent unmounts or sets `visible={false}`.
+   * When `false`, the tag is not rendered. Omitted / `true` keeps it shown.
+   * Closing never hides internally — the parent unmounts or sets `open={false}`.
    */
-  visible?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 
   /**
    * Fully rounded pill shape
