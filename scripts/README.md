@@ -23,7 +23,7 @@
 | `pnpm test:coverage:report`                 | 根 package scripts                      | 按需生成 text、JSON 与 HTML coverage 报告                                                       |
 | `pnpm test:group`                           | `scripts/run-component-group-tests.mjs` | 按组件组运行 Vitest；支持 `--group`、`--framework`、`--filter` 和 `--list`                      |
 | `pnpm test:validate`                        | `scripts/validate-tests.mjs`            | 按 [测试指南](../tests/README.md) 检查测试文件                                                  |
-| `pnpm example:ssr:check`                    | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，并检查 `examples/nextjs/next-env.d.ts` 没有被构建过程改写           |
+| `pnpm example:ssr:check`                    | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，校验产物 HTML/主题 CSS、`next-env.d.ts` 未改写，并跑 hydrate 测 |
 | `pnpm example:sources:check`                | `scripts/validate-example-sources.mjs`  | 校验 React/Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 契约                        |
 | `node ./scripts/generate-example-index.mjs` | `scripts/generate-example-index.mjs`    | 从 `DEMO_NAV_GROUPS` 生成 `examples/index.html`；`--check` 校验未漂移                           |
 | `pnpm docs:api`                             | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                            |

@@ -4,6 +4,9 @@ export default defineNuxtConfig({
   ssr: true,
   compatibilityDate: '2026-05-24',
   css: ['~/assets/main.css'],
+  routeRules: {
+    '/': { prerender: true }
+  },
   vite: {
     plugins: [tailwindcss()]
   },

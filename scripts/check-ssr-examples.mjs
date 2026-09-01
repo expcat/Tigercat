@@ -3,27 +3,64 @@
 import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { collectFiles } from './utils/files.mjs'
 
 const root = join(import.meta.dirname, '..')
 const nextEnvPath = join(root, 'examples/nextjs/next-env.d.ts')
 
-const before = readFileSync(nextEnvPath, 'utf8')
+const HTML_NEEDLES = ['保存', '2024-01-15', 'tiger-bar-grad-', 'url(#']
+const CSS_NEEDLES = ['--tiger-primary']
+
+const ARTIFACTS = [
+  {
+    label: 'Next.js',
+    htmlDirs: [join(root, 'examples/nextjs/.next/server/app')],
+    cssDirs: [join(root, 'examples/nextjs/.next/static/css')]
+  },
+  {
+    label: 'Nuxt',
+    htmlDirs: [join(root, 'examples/nuxt/.output/public')],
+    cssDirs: [join(root, 'examples/nuxt/.output/public/_nuxt')]
+  }
+]
+
 const pnpmExecPath = process.env.npm_execpath
 const command = pnpmExecPath ? process.execPath : process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
 const args = pnpmExecPath ? [pnpmExecPath, 'example:ssr:build'] : ['example:ssr:build']
-const result = spawnSync(command, args, {
-  cwd: root,
-  stdio: 'inherit'
-})
 
-if (result.error) {
-  console.error(result.error)
-  process.exit(1)
+function run(spawnArgs) {
+  const result = spawnSync(command, spawnArgs, {
+    cwd: root,
+    stdio: 'inherit'
+  })
+
+  if (result.error) {
+    console.error(result.error)
+    process.exit(1)
+  }
+
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1)
+  }
 }
 
-if (result.status !== 0) {
-  process.exit(result.status ?? 1)
+function readJoined(dirs, extensions) {
+  return dirs
+    .flatMap((dir) => collectFiles(dir, extensions, { skip: ['node_modules'] }))
+    .map((file) => readFileSync(file, 'utf8'))
+    .join('\n')
 }
+
+function assertNeedles(label, kind, content, needles) {
+  const missing = needles.filter((needle) => !content.includes(needle))
+  if (missing.length > 0) {
+    console.error(`${label} built ${kind} is missing: ${missing.join(', ')}`)
+    process.exit(1)
+  }
+}
+
+const before = readFileSync(nextEnvPath, 'utf8')
+run(args)
 
 const after = readFileSync(nextEnvPath, 'utf8')
 
@@ -33,4 +70,17 @@ if (before !== after) {
   process.exit(1)
 }
 
-console.log('SSR example build completed without next-env.d.ts drift.')
+for (const artifact of ARTIFACTS) {
+  const html = readJoined(artifact.htmlDirs, ['.html'])
+  const css = readJoined(artifact.cssDirs, ['.css'])
+  assertNeedles(artifact.label, 'HTML', html, HTML_NEEDLES)
+  assertNeedles(artifact.label, 'CSS', css, CSS_NEEDLES)
+}
+
+run(
+  pnpmExecPath
+    ? [pnpmExecPath, 'vitest', 'run', 'tests/core/ssr-frameworks.spec.ts']
+    : ['vitest', 'run', 'tests/core/ssr-frameworks.spec.ts']
+)
+
+console.log('SSR example HTML, theme CSS, next-env.d.ts, and hydration checks passed.')

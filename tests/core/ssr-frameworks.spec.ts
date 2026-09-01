@@ -1,90 +1,160 @@
-import { describe, expect, it } from 'vitest'
-import React, { createElement } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { act, createElement, type ReactNode } from 'react'
+import { hydrateRoot } from 'react-dom/client'
 import { renderToString as renderReactToString } from 'react-dom/server'
-import { createSSRApp, h } from 'vue'
+import { createSSRApp, h, type App } from 'vue'
 import { renderToString as renderVueToString } from '@vue/server-renderer'
-import { BackTop as ReactBackTop } from '@expcat/tigercat-react/BackTop'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { BarChart as ReactBarChart } from '@expcat/tigercat-react/BarChart'
+import { Button as ReactButton } from '@expcat/tigercat-react/Button'
 import { ConfigProvider as ReactConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { DatePicker as ReactDatePicker } from '@expcat/tigercat-react/DatePicker'
-import { BackTop as VueBackTop } from '@expcat/tigercat-vue/BackTop'
 import { BarChart as VueBarChart } from '@expcat/tigercat-vue/BarChart'
+import { Button as VueButton } from '@expcat/tigercat-vue/Button'
 import { ConfigProvider as VueConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { DatePicker as VueDatePicker } from '@expcat/tigercat-vue/DatePicker'
-import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 const selectedDate = '2024-01-15'
-const chartData = [
-  { x: 'SSR', y: 12 },
-  { x: 'Hydration', y: 18 }
+const reactChartData = [
+  { x: 'React SSR', y: 22 },
+  { x: 'Hydration', y: 28 },
+  { x: 'Next', y: 19 }
+]
+const vueChartData = [
+  { x: 'Vue SSR', y: 18 },
+  { x: 'Hydration', y: 24 },
+  { x: 'Nuxt', y: 16 }
 ]
 
-function renderReactSsrTree(): string {
-  return renderReactToString(
-    createElement(
-      ReactConfigProvider,
-      { locale: zhCN },
-      createElement('section', null, [
-        createElement(ReactDatePicker, {
-          key: 'date',
-          value: selectedDate,
-          format: 'yyyy-MM-dd'
-        }),
-        createElement(ReactBackTop, { key: 'backtop' }),
-        createElement(ReactBarChart, {
-          key: 'chart',
-          data: chartData,
-          width: 320,
-          height: 200,
-          title: 'React SSR chart',
-          gradient: true
-        })
-      ])
-    )
+function stringifyLog(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (value instanceof Error) return value.message
+  return String(value)
+}
+
+function isHydrationMismatch(value: unknown): boolean {
+  const text = stringifyLog(value)
+  return /hydrat/i.test(text) && /mismatch|did not match|failed|text content/i.test(text)
+}
+
+function expectSmokeHtml(html: string, title: string): void {
+  expect(html).toContain('保存')
+  expect(html).toContain(selectedDate)
+  expect(html).toContain('tiger-bar-grad-')
+  expect(html).toContain('url(#')
+  expect(html).toContain(title)
+}
+
+function createReactSmokeTree(): ReactNode {
+  return createElement(
+    ReactConfigProvider,
+    { locale: zhCN, colorScheme: 'light' },
+    createElement(ReactButton, { variant: 'primary' }, '保存'),
+    createElement(ReactDatePicker, {
+      value: selectedDate,
+      format: 'yyyy-MM-dd',
+      onChange: () => undefined
+    }),
+    createElement(ReactBarChart, {
+      data: reactChartData,
+      width: 420,
+      height: 240,
+      title: 'Next SSR chart',
+      desc: 'Bar chart rendered through Next.js SSR',
+      gradient: true
+    })
   )
 }
 
-async function renderVueSsrTree(): Promise<string> {
-  const app = createSSRApp({
+function createVueSmokeApp(): App {
+  return createSSRApp({
     render() {
-      return h(VueConfigProvider, { locale: zhCN }, () => [
+      return h(VueConfigProvider, { locale: zhCN, colorScheme: 'light' }, () => [
+        h(VueButton, { variant: 'primary' }, () => '保存'),
         h(VueDatePicker, {
           modelValue: selectedDate,
-          format: 'yyyy-MM-dd'
+          format: 'yyyy-MM-dd',
+          'onUpdate:modelValue': () => undefined
         }),
-        h(VueBackTop),
         h(VueBarChart, {
-          data: chartData,
-          width: 320,
-          height: 200,
-          title: 'Vue SSR chart',
+          data: vueChartData,
+          width: 420,
+          height: 240,
+          title: 'Nuxt SSR chart',
+          desc: 'Bar chart rendered through Nuxt SSR',
           gradient: true
         })
       ])
     }
   })
-
-  return renderVueToString(app)
 }
 
 describe('SSR framework smoke coverage', () => {
-  it('renders React components to stable HTML for Next.js SSR', () => {
-    const first = renderReactSsrTree()
-    const second = renderReactSsrTree()
+  it('renders the Next example tree to stable HTML', () => {
+    const first = renderReactToString(createReactSmokeTree())
+    const second = renderReactToString(createReactSmokeTree())
 
     expect(first).toBe(second)
-    expect(first).toContain('tiger-bar-grad-')
-    expect(first).toContain('React SSR chart')
-    expect(first).toContain('2024-01-15')
+    expectSmokeHtml(first, 'Next SSR chart')
   })
 
-  it('renders Vue components to stable HTML for Nuxt SSR', async () => {
-    const first = await renderVueSsrTree()
-    const second = await renderVueSsrTree()
+  it('hydrates the Next example tree without mismatch', async () => {
+    const html = renderReactToString(createReactSmokeTree())
+    const container = document.createElement('div')
+    container.innerHTML = html
+    document.body.append(container)
+
+    const recoverable: unknown[] = []
+    const consoleErrors: unknown[] = []
+    const spy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      consoleErrors.push(...args)
+    })
+
+    const root = await act(async () =>
+      hydrateRoot(container, createReactSmokeTree(), {
+        onRecoverableError(error) {
+          recoverable.push(error)
+        }
+      })
+    )
+
+    spy.mockRestore()
+    const mismatches = [...recoverable, ...consoleErrors].filter(isHydrationMismatch)
+    expect(mismatches).toEqual([])
+    expectSmokeHtml(container.innerHTML, 'Next SSR chart')
+    await act(async () => {
+      root.unmount()
+    })
+    container.remove()
+  })
+
+  it('renders the Nuxt example tree to stable HTML', async () => {
+    const first = await renderVueToString(createVueSmokeApp())
+    const second = await renderVueToString(createVueSmokeApp())
 
     expect(first).toBe(second)
-    expect(first).toContain('tiger-bar-grad-')
-    expect(first).toContain('Vue SSR chart')
-    expect(first).toContain('2024-01-15')
+    expectSmokeHtml(first, 'Nuxt SSR chart')
+  })
+
+  it('hydrates the Nuxt example tree without mismatch', async () => {
+    const html = await renderVueToString(createVueSmokeApp())
+    const container = document.createElement('div')
+    container.innerHTML = html
+    document.body.append(container)
+
+    const warnings: string[] = []
+    const app = createVueSmokeApp()
+    app.config.warnHandler = (message) => {
+      warnings.push(message)
+    }
+    app.config.errorHandler = (error) => {
+      warnings.push(stringifyLog(error))
+    }
+
+    app.mount(container)
+    expect(warnings.filter(isHydrationMismatch)).toEqual([])
+    expectSmokeHtml(container.innerHTML, 'Nuxt SSR chart')
+    app.unmount()
+    container.remove()
   })
 })
