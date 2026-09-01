@@ -38,6 +38,9 @@ export const arSA: TigerLocale = {
   drawer: {
     closeAriaLabel: 'إغلاق'
   },
+  alert: {
+    closeAriaLabel: 'إغلاق التنبيه'
+  },
   qrcode: {
     ariaLabel: 'رمز QR',
     expiredText: 'انتهت صلاحية رمز QR',

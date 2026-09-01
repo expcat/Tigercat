@@ -37,6 +37,9 @@ export const zhCN: TigerLocale = {
   drawer: {
     closeAriaLabel: '关闭'
   },
+  alert: {
+    closeAriaLabel: '关闭提示'
+  },
   qrcode: {
     ariaLabel: '二维码',
     expiredText: '二维码已过期',

@@ -38,6 +38,9 @@ export const idID: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Tutup'
   },
+  alert: {
+    closeAriaLabel: 'Tutup peringatan'
+  },
   qrcode: {
     ariaLabel: 'Kode QR',
     expiredText: 'Kode QR kedaluwarsa',

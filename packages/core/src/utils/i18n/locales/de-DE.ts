@@ -38,6 +38,9 @@ export const deDE: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Schließen'
   },
+  alert: {
+    closeAriaLabel: 'Warnung schließen'
+  },
   qrcode: {
     ariaLabel: 'QR-Code',
     expiredText: 'QR-Code ist abgelaufen',

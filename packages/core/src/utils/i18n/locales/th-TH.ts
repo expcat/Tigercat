@@ -38,6 +38,9 @@ export const thTH: TigerLocale = {
   drawer: {
     closeAriaLabel: 'ปิด'
   },
+  alert: {
+    closeAriaLabel: 'ปิดการแจ้งเตือน'
+  },
   qrcode: {
     ariaLabel: 'คิวอาร์โค้ด',
     expiredText: 'คิวอาร์โค้ดหมดอายุแล้ว',

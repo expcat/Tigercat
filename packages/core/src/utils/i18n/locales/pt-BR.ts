@@ -38,6 +38,9 @@ export const ptBR: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Fechar'
   },
+  alert: {
+    closeAriaLabel: 'Fechar alerta'
+  },
   qrcode: {
     ariaLabel: 'Código QR',
     expiredText: 'O código QR expirou',

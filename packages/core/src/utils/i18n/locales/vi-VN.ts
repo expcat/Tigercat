@@ -38,6 +38,9 @@ export const viVN: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Đóng'
   },
+  alert: {
+    closeAriaLabel: 'Đóng cảnh báo'
+  },
   qrcode: {
     ariaLabel: 'Mã QR',
     expiredText: 'Mã QR đã hết hạn',

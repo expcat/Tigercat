@@ -38,6 +38,9 @@ export const koKR: TigerLocale = {
   drawer: {
     closeAriaLabel: '닫기'
   },
+  alert: {
+    closeAriaLabel: '알림 닫기'
+  },
   qrcode: {
     ariaLabel: 'QR 코드',
     expiredText: 'QR 코드가 만료되었습니다',

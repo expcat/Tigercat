@@ -38,6 +38,9 @@ export const zhTW: TigerLocale = {
   drawer: {
     closeAriaLabel: '關閉'
   },
+  alert: {
+    closeAriaLabel: '關閉提示'
+  },
   qrcode: {
     ariaLabel: 'QR 碼',
     expiredText: 'QR 碼已過期',

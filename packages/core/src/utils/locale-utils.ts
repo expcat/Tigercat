@@ -18,6 +18,7 @@ import type {
   TigerLocaleLoader,
   TigerLocaleLazyModule,
   TigerLocaleEmpty,
+  TigerLocaleAlert,
   TigerLocaleQRCode,
   TigerLocalePagination,
   TigerLocaleTable,
@@ -629,6 +630,13 @@ export function getStatusLabels(
   overrides?: Partial<TigerLocaleStatus>
 ): Required<TigerLocaleStatus> {
   return resolveLocaleSection(enSection('status'), locale?.status, overrides)
+}
+
+export function getAlertLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleAlert>
+): Required<TigerLocaleAlert> {
+  return resolveLocaleSection(enSection('alert'), locale?.alert, overrides)
 }
 
 /**

@@ -44,6 +44,11 @@ export interface TigerLocaleDrawer {
   closeAriaLabel?: string
 }
 
+export interface TigerLocaleAlert {
+  /** Close-button accessible name */
+  closeAriaLabel?: string
+}
+
 export interface TigerLocaleQRCode {
   ariaLabel?: string
   expiredText?: string
@@ -744,6 +749,7 @@ export interface TigerLocale {
   empty?: TigerLocaleEmpty
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer
+  alert?: TigerLocaleAlert
   qrcode?: TigerLocaleQRCode
   marquee?: TigerLocaleMarquee
   image?: TigerLocaleImage

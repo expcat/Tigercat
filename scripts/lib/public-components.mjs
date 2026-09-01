@@ -3,7 +3,6 @@ import { join } from 'node:path'
 
 export const CATEGORIES = {
   Basic: [
-    'alert',
     'avatar',
     'badge',
     'button',
@@ -57,6 +56,7 @@ export const CATEGORIES = {
     'upload'
   ],
   Feedback: [
+    'alert',
     'drawer',
     'loading',
     'message',

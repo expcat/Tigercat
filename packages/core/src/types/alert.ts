@@ -2,6 +2,8 @@
  * Alert component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Alert type (determines the icon and color scheme)
  */
@@ -16,6 +18,11 @@ export type AlertSize = 'sm' | 'md' | 'lg'
  * Base alert props interface
  */
 export interface AlertProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Alert type (success, warning, error, info)
    * @default 'info'
@@ -53,15 +60,21 @@ export interface AlertProps {
   /**
    * Auto-close duration in milliseconds.
    * Set to 0 or undefined to disable auto-close.
-   * Requires closable to be true.
+   * Independent of `closable`.
    */
   duration?: number
 
   /**
-   * Accessible label for the close button (when `closable` is true)
-   * @default 'Close alert'
+   * Accessible label for the close button (when `closable` is true).
+   * Defaults to ConfigProvider locale `alert.closeAriaLabel`.
    */
   closeAriaLabel?: string
+
+  /**
+   * When `false`, the alert is not rendered. Closing never hides internally —
+   * the parent unmounts or sets `visible={false}`.
+   */
+  visible?: boolean
 
   /**
    * Whether to display as full-width banner across the page
@@ -71,7 +84,7 @@ export interface AlertProps {
   banner?: boolean
 
   /**
-   * Whether to show countdown progress bar (requires `duration` and `closable`)
+   * Whether to show countdown progress bar (requires `duration`)
    * @default false
    * @since 0.9.0
    */

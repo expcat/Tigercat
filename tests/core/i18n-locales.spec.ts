@@ -315,6 +315,7 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('tree')
     expect(TIGER_LOCALE_KEYS).toContain('backTop')
     expect(TIGER_LOCALE_KEYS).toContain('anchor')
+    expect(TIGER_LOCALE_KEYS).toContain('alert')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

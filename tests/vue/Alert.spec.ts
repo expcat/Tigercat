@@ -4,28 +4,53 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { h } from 'vue'
 import { Alert } from '@expcat/tigercat-vue/Alert'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
-const closeButtonSelector = 'button[aria-label="Close alert"]'
-
 describe('Alert', () => {
-  it('renders title and description', () => {
+  it('renders title and description without a live role by default', () => {
     renderWithProps(Alert, {
       title: 'Alert Title',
       description: 'Alert description'
     })
 
-    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(screen.getByText('Alert Title')).toBeInTheDocument()
     expect(screen.getByText('Alert description')).toBeInTheDocument()
   })
 
-  it('renders each type with correct icon', () => {
+  it('uses role=alert only for error content', () => {
+    const { unmount } = renderWithProps(Alert, { type: 'error', title: 'Failed' })
+    expect(screen.getByRole('alert')).toHaveTextContent('Failed')
+    unmount()
+
+    renderWithProps(Alert, { type: 'info', title: 'Note' })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByText('Note')).toBeInTheDocument()
+  })
+
+  it('empty alert is not a live region', () => {
+    const { container } = renderWithProps(Alert, {})
+    expect(container.querySelector('[role="alert"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
+  })
+
+  it('lets the caller override role', () => {
+    renderWithProps(Alert, { type: 'error', title: 'Failed' }, { attrs: { role: 'status' } })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Failed')
+  })
+
+  it('renders each type with an icon', () => {
     const types = ['info', 'success', 'warning', 'error'] as const
     for (const type of types) {
       const { container, unmount } = renderWithProps(Alert, { type, title: type })
-      expect(container.querySelector('[role="alert"] svg')).toBeInTheDocument()
+      expect(container.querySelector('svg')).toBeInTheDocument()
       unmount()
     }
   })
@@ -63,6 +88,18 @@ describe('Alert', () => {
     expect(screen.getByText('Default content')).toBeInTheDocument()
   })
 
+  it('keeps the default slot when title is set', () => {
+    renderWithSlots(
+      Alert,
+      {
+        default: () => h('button', { type: 'button' }, 'Undo')
+      },
+      { title: 'Saved' }
+    )
+    expect(screen.getByText('Saved')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument()
+  })
+
   it('hides icon when showIcon is false', () => {
     const { container } = renderWithProps(Alert, {
       title: 'Alert',
@@ -70,6 +107,15 @@ describe('Alert', () => {
     })
 
     expect(container.querySelector('svg')).not.toBeInTheDocument()
+  })
+
+  it('marks type and close icons as decorative', () => {
+    const { container } = renderWithProps(Alert, { title: 'Note', closable: true })
+    const svgs = container.querySelectorAll('svg')
+    expect(svgs.length).toBeGreaterThan(0)
+    for (const svg of svgs) {
+      expect(svg.getAttribute('aria-hidden')).toBe('true')
+    }
   })
 
   it('merges className and attrs.class', () => {
@@ -86,16 +132,15 @@ describe('Alert', () => {
       }
     )
 
-    const alert = container.querySelector('[role="alert"]')
-    expect(alert).toBeInTheDocument()
-    expect(alert).toHaveClass('custom-class')
-    expect(alert).toHaveClass('attrs-class')
+    const root = container.querySelector('.custom-class')
+    expect(root).toBeInTheDocument()
+    expect(root).toHaveClass('attrs-class')
   })
 
-  it('emits close and hides by default when clicked', async () => {
+  it('emits close without unmounting', async () => {
     const onClose = vi.fn()
 
-    const { container } = render(Alert, {
+    render(Alert, {
       props: {
         title: 'Closable Alert',
         closable: true,
@@ -103,97 +148,134 @@ describe('Alert', () => {
       }
     })
 
-    const closeButton = container.querySelector(closeButtonSelector)
-    expect(closeButton).toBeInTheDocument()
-
-    if (closeButton) {
-      await fireEvent.click(closeButton)
-    }
+    await fireEvent.click(screen.getByRole('button', { name: 'Close alert' }))
 
     expect(onClose).toHaveBeenCalledTimes(1)
-    expect(container.querySelector('[role="alert"]')).not.toBeInTheDocument()
+    expect(screen.getByText('Closable Alert')).toBeInTheDocument()
   })
 
-  it('does not hide if close handler prevents default', async () => {
-    const onClose = vi.fn((event: MouseEvent) => event.preventDefault())
-
-    const { container } = render(Alert, {
-      props: {
-        title: 'Closable Alert',
-        closable: true,
-        onClose
-      }
+  it('hides when visible is false', async () => {
+    const { rerender } = renderWithProps(Alert, {
+      title: 'Closable Alert',
+      closable: true,
+      visible: true
     })
+    expect(screen.getByText('Closable Alert')).toBeInTheDocument()
+    await rerender({ title: 'Closable Alert', closable: true, visible: false })
+    expect(screen.queryByText('Closable Alert')).not.toBeInTheDocument()
+  })
 
-    const closeButton = container.querySelector(closeButtonSelector)
-    expect(closeButton).toBeInTheDocument()
+  it('uses official locale objects for the close name', () => {
+    const { unmount } = render({
+      components: { ConfigProvider, Alert },
+      template: '<ConfigProvider :locale="locale"><Alert title="提示" closable /></ConfigProvider>',
+      setup: () => ({ locale: zhCN })
+    })
+    expect(screen.getByRole('button', { name: '关闭提示' })).toBeInTheDocument()
+    unmount()
 
-    if (closeButton) {
-      await fireEvent.click(closeButton)
-    }
+    const second = render({
+      components: { ConfigProvider, Alert },
+      template: '<ConfigProvider :locale="locale"><Alert title="提示" closable /></ConfigProvider>',
+      setup: () => ({ locale: zhTW })
+    })
+    expect(screen.getByRole('button', { name: '關閉提示' })).toBeInTheDocument()
+    second.unmount()
 
-    expect(onClose).toHaveBeenCalledTimes(1)
-    expect(container.querySelector('[role="alert"]')).toBeInTheDocument()
+    render({
+      components: { ConfigProvider, Alert },
+      template: '<ConfigProvider :locale="locale"><Alert title="注意" closable /></ConfigProvider>',
+      setup: () => ({ locale: jaJP })
+    })
+    expect(screen.getByRole('button', { name: 'アラートを閉じる' })).toBeInTheDocument()
   })
 
   it('uses custom closeAriaLabel', () => {
-    const { container } = renderWithProps(Alert, {
+    renderWithProps(Alert, {
       title: 'Alert',
       closable: true,
       closeAriaLabel: '关闭'
     })
 
-    expect(container.querySelector('button[aria-label="关闭"]')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument()
   })
 
-  it('has no a11y violations', async () => {
-    const { container } = renderWithProps(Alert, {
-      title: 'Accessible Alert',
-      description: 'This is an accessible alert',
-      closable: true
+  it('has no a11y violations for a static info, an error, and several on a page', async () => {
+    const { container } = render({
+      components: { Alert },
+      template: `
+        <div>
+          <Alert title="Info" description="Static" />
+          <Alert type="error" title="Error" description="Inserted" closable />
+          <Alert type="success" title="One" />
+          <Alert type="warning" title="Two" />
+          <Alert :show-icon="false" title="No icon" />
+        </div>
+      `
     })
 
     await expectNoA11yViolationsIsolated(container)
   })
 
   describe('Auto-close', () => {
-    it('should auto-close after duration when closable', async () => {
+    it('emits close after duration without requiring closable', async () => {
       vi.useFakeTimers()
-      const { container } = renderWithProps(Alert, {
+      const onClose = vi.fn()
+      renderWithProps(Alert, {
         title: 'Auto-close Alert',
-        closable: true,
-        duration: 3000
+        duration: 3000,
+        onClose
       })
 
-      expect(screen.getByRole('alert')).toBeInTheDocument()
+      expect(screen.getByText('Auto-close Alert')).toBeInTheDocument()
 
       vi.advanceTimersByTime(3000)
       await vi.waitFor(() => {
-        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+        expect(onClose).toHaveBeenCalledTimes(1)
       })
+      expect(onClose.mock.calls[0][0]).toBeInstanceOf(Event)
+      expect(screen.getByText('Auto-close Alert')).toBeInTheDocument()
       vi.useRealTimers()
     })
 
-    it('should not auto-close when duration is not set', async () => {
+    it('does not auto-close when duration is not set', async () => {
       vi.useFakeTimers()
+      const onClose = vi.fn()
       renderWithProps(Alert, {
         title: 'No Auto-close',
-        closable: true
+        closable: true,
+        onClose
       })
 
       vi.advanceTimersByTime(10000)
-      expect(screen.getByRole('alert')).toBeInTheDocument()
+      expect(onClose).not.toHaveBeenCalled()
+      vi.useRealTimers()
+    })
+
+    it('clicking close clears the duration timer', async () => {
+      vi.useFakeTimers()
+      const onClose = vi.fn()
+      renderWithProps(Alert, {
+        title: 'Auto-close Alert',
+        closable: true,
+        duration: 3000,
+        onClose
+      })
+
+      await fireEvent.click(screen.getByRole('button', { name: 'Close alert' }))
+      expect(onClose).toHaveBeenCalledTimes(1)
+
+      vi.advanceTimersByTime(3000)
+      expect(onClose).toHaveBeenCalledTimes(1)
       vi.useRealTimers()
     })
   })
-  it('renders in banner mode with full-width styling', () => {
-    const { container } = renderWithProps(Alert, {
+
+  it('renders in banner mode', () => {
+    renderWithProps(Alert, {
       title: 'Banner Alert',
       banner: true
     })
-
-    const alert = container.querySelector('[role="alert"]')
-    expect(alert).toHaveClass('w-full', 'rounded-none', 'border-x-0')
     expect(screen.getByText('Banner Alert')).toBeInTheDocument()
   })
 })

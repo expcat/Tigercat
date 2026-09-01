@@ -38,6 +38,9 @@ export const esES: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Cerrar'
   },
+  alert: {
+    closeAriaLabel: 'Cerrar alerta'
+  },
   qrcode: {
     ariaLabel: 'Código QR',
     expiredText: 'El código QR ha caducado',

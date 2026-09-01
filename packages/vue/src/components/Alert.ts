@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, onMounted, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, computed, h, watch, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -11,20 +11,26 @@ import {
   alertDescriptionSizeClasses,
   alertCloseButtonBaseClasses,
   alertIconContainerClasses,
-  alertContentClasses,
+  getAlertContentClasses,
   getAlertIconPath,
   alertCloseIconPath,
   alertBannerClasses,
   alertCountdownContainerClasses,
   alertCountdownBarClasses,
   alertCountdownColorClasses,
+  resolveAlertRole,
+  getAlertLabels,
+  mergeTigerLocale,
   mergeStyleValues,
   type AlertType,
-  type AlertSize
+  type AlertSize,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueAlertProps {
+  locale?: Partial<TigerLocale>
   type?: AlertType
   size?: AlertSize
   title?: string
@@ -32,16 +38,24 @@ export interface VueAlertProps {
   showIcon?: boolean
   closable?: boolean
   closeAriaLabel?: string
+  duration?: number
+  visible?: boolean
   banner?: boolean
   showCountdown?: boolean
   className?: string
   style?: Record<string, string | number>
 }
 
+export type AlertProps = VueAlertProps
+
 export const Alert = defineComponent({
   name: 'TigerAlert',
   inheritAttrs: false,
   props: {
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
     /**
      * Alert type (determines icon and color scheme)
      * @default 'info'
@@ -90,19 +104,28 @@ export const Alert = defineComponent({
     },
 
     /**
-     * Accessible label for the close button (when `closable` is true)
-     * @default 'Close alert'
+     * Accessible label for the close button (when `closable` is true).
+     * Defaults to ConfigProvider locale `alert.closeAriaLabel`.
      */
     closeAriaLabel: {
       type: String,
-      default: 'Close alert'
+      default: undefined
     },
 
     /**
      * Auto-close duration in milliseconds. 0 or undefined to disable.
+     * Independent of `closable`.
      */
     duration: {
       type: Number,
+      default: undefined
+    },
+
+    /**
+     * When `false`, the alert is not rendered. Closing never hides internally.
+     */
+    visible: {
+      type: Boolean,
       default: undefined
     },
 
@@ -142,7 +165,10 @@ export const Alert = defineComponent({
   },
   emits: ['close'],
   setup(props, { slots, emit, attrs }) {
-    const visible = ref(true)
+    const config = useTigerConfig()
+    const labels = computed(() =>
+      getAlertLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
     const colorScheme = computed(() => getAlertTypeClasses(props.type, defaultAlertThemeColors))
 
     const alertClasses = computed(() =>
@@ -176,75 +202,80 @@ export const Alert = defineComponent({
       )
     )
 
-    const handleClose = (event: MouseEvent) => {
-      emit('close', event)
+    let autoCloseTimer: ReturnType<typeof setTimeout> | undefined
 
-      if (!event.defaultPrevented) {
-        visible.value = false
+    const clearTimer = () => {
+      if (autoCloseTimer) {
+        clearTimeout(autoCloseTimer)
+        autoCloseTimer = undefined
       }
     }
 
-    let autoCloseTimer: ReturnType<typeof setTimeout> | undefined
-    const countdownProgress = ref(100)
-    let countdownInterval: ReturnType<typeof setInterval> | undefined
+    const requestClose = (event: Event) => {
+      emit('close', event)
+      clearTimer()
+    }
 
-    onMounted(() => {
-      if (props.duration && props.duration > 0 && props.closable) {
-        const duration = props.duration
-        autoCloseTimer = setTimeout(() => {
-          visible.value = false
-          emit('close', new MouseEvent('click'))
-        }, duration)
+    const handleClose = (event: MouseEvent) => {
+      event.stopPropagation()
+      requestClose(event)
+    }
 
-        if (props.showCountdown) {
-          const startTime = Date.now()
-          countdownInterval = setInterval(() => {
-            const elapsed = Date.now() - startTime
-            countdownProgress.value = Math.max(0, 100 - (elapsed / duration) * 100)
-          }, 50)
+    watch(
+      () => [props.duration, props.visible] as const,
+      () => {
+        clearTimer()
+        if (props.visible === false) return
+        if (props.duration && props.duration > 0) {
+          autoCloseTimer = setTimeout(() => {
+            requestClose(new Event('close', { cancelable: true }))
+          }, props.duration)
         }
-      }
-    })
-    onBeforeUnmount(() => {
-      if (autoCloseTimer) clearTimeout(autoCloseTimer)
-      if (countdownInterval) clearInterval(countdownInterval)
-    })
+      },
+      { immediate: true }
+    )
+
+    onBeforeUnmount(clearTimer)
 
     return () => {
-      if (!visible.value) {
+      if (props.visible === false) {
         return null
       }
 
       const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
+      const attrsRole = attrsRecord.role
 
       const children = []
 
-      // Add icon if showIcon is true
       if (props.showIcon) {
         const iconPath = getAlertIconPath(props.type)
         children.push(
           h(
             'div',
             { class: alertIconContainerClasses },
-            createStatusIcon(iconPath, iconClasses.value)
+            createStatusIcon(iconPath, iconClasses.value, {
+              'aria-hidden': 'true',
+              focusable: 'false'
+            })
           )
         )
       }
 
-      // Add content (title and/or description)
       const contentChildren = []
+      const hasTitle = !!(props.title || slots.title)
+      const hasDescription = !!(props.description || slots.description)
+      const hasDefault = !!slots.default
+      const defaultSlot = hasDefault ? slots.default?.() : undefined
 
-      // Add title
-      if (props.title || slots.title) {
+      if (hasTitle) {
         contentChildren.push(
           h('div', { class: titleClasses.value }, slots.title ? slots.title() : props.title)
         )
       }
 
-      // Add description
-      if (props.description || slots.description) {
+      if (hasDescription) {
         contentChildren.push(
           h(
             'div',
@@ -254,22 +285,20 @@ export const Alert = defineComponent({
         )
       }
 
-      // Add default slot content if no title/description
-      if (
-        !props.title &&
-        !props.description &&
-        !slots.title &&
-        !slots.description &&
-        slots.default
-      ) {
-        contentChildren.push(h('div', { class: titleClasses.value }, slots.default()))
+      if (hasDefault) {
+        contentChildren.push(
+          h(
+            'div',
+            { class: hasTitle || hasDescription ? descriptionClasses.value : titleClasses.value },
+            defaultSlot
+          )
+        )
       }
 
       if (contentChildren.length > 0) {
-        children.push(h('div', { class: alertContentClasses }, contentChildren))
+        children.push(h('div', { class: getAlertContentClasses(props.showIcon) }, contentChildren))
       }
 
-      // Add close button if closable
       if (props.closable) {
         children.push(
           h(
@@ -277,25 +306,31 @@ export const Alert = defineComponent({
             {
               class: closeButtonClasses.value,
               onClick: handleClose,
-              'aria-label': props.closeAriaLabel,
+              'aria-label': props.closeAriaLabel ?? labels.value.closeAriaLabel,
               type: 'button'
             },
-            createStatusIcon(alertCloseIconPath, 'h-4 w-4')
+            createStatusIcon(alertCloseIconPath, 'h-4 w-4', {
+              'aria-hidden': 'true',
+              focusable: 'false'
+            })
           )
         )
       }
 
-      // Add countdown bar
-      if (props.showCountdown && props.duration && props.duration > 0 && props.closable) {
+      if (props.showCountdown && props.duration && props.duration > 0) {
         children.push(
           h('div', { class: alertCountdownContainerClasses }, [
             h('div', {
               class: classNames(alertCountdownBarClasses, alertCountdownColorClasses[props.type]),
-              style: { width: `${countdownProgress.value}%` }
+              style: { animationDuration: `${props.duration}ms` }
             })
           ])
         )
       }
+
+      const hasContent = hasTitle || hasDescription || hasDefault
+      const role =
+        typeof attrsRole === 'string' ? attrsRole : resolveAlertRole(props.type, hasContent)
 
       return h(
         'div',
@@ -303,7 +338,7 @@ export const Alert = defineComponent({
           ...attrs,
           class: classNames(alertClasses.value, props.className, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
-          role: 'alert'
+          role
         },
         children
       )

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { forwardRef, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
   classNames,
   getAlertTypeClasses,
@@ -10,21 +10,25 @@ import {
   alertDescriptionSizeClasses,
   alertCloseButtonBaseClasses,
   alertIconContainerClasses,
-  alertContentClasses,
+  getAlertContentClasses,
   getAlertIconPath,
   alertCloseIconPath,
   alertBannerClasses,
   alertCountdownContainerClasses,
   alertCountdownBarClasses,
   alertCountdownColorClasses,
+  resolveAlertRole,
+  getAlertLabels,
+  mergeTigerLocale,
   type AlertProps as CoreAlertProps
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface AlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, CoreAlertProps {
   /**
-   * Alert content (React children)
+   * Alert content (React children). Rendered even when `title` is set.
    */
   children?: React.ReactNode
 
@@ -39,32 +43,43 @@ export interface AlertProps
   descriptionSlot?: React.ReactNode
 
   /**
-   * Callback when alert is closed.
-   * Receives the click event for manual close; called without an event on auto-close.
+   * Close request. Click and auto-close both pass an event.
+   * Closing never hides internally — unmount or set `visible={false}`.
    */
-  onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+  onClose?: (event: Event) => void
 }
 
-export const Alert: React.FC<AlertProps> = ({
-  type = 'info',
-  size = 'md',
-  title,
-  description,
-  showIcon = true,
-  closable = false,
-  closeAriaLabel = 'Close alert',
-  duration,
-  banner = false,
-  showCountdown = false,
-  className,
-  children,
-  titleSlot,
-  descriptionSlot,
-  onClose,
-  ...props
-}) => {
-  const [visible, setVisible] = useState(true)
-  const [countdownProgress, setCountdownProgress] = useState(100)
+export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  {
+    locale,
+    type = 'info',
+    size = 'md',
+    title,
+    description,
+    showIcon = true,
+    closable = false,
+    closeAriaLabel,
+    duration,
+    visible,
+    banner = false,
+    showCountdown = false,
+    className,
+    children,
+    titleSlot,
+    descriptionSlot,
+    onClose,
+    role: roleProp,
+    ...props
+  },
+  ref
+) {
+  const config = useTigerConfig()
+  const labels = useMemo(
+    () => getAlertLabels(mergeTigerLocale(config.locale, locale)),
+    [config.locale, locale]
+  )
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   const colorScheme = useMemo(() => getAlertTypeClasses(type, defaultAlertThemeColors), [type])
 
@@ -104,41 +119,39 @@ export const Alert: React.FC<AlertProps> = ({
     [colorScheme]
   )
 
+  const clearTimerRef = useRef<(() => void) | undefined>(undefined)
+
+  const requestClose = useCallback((event: Event) => {
+    onCloseRef.current?.(event)
+    clearTimerRef.current?.()
+  }, [])
+
   const handleClose = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
-      onClose?.(event)
-      if (!event.defaultPrevented) {
-        setVisible(false)
-      }
+      event.stopPropagation()
+      requestClose(event.nativeEvent)
     },
-    [onClose]
+    [requestClose]
   )
 
   useEffect(() => {
-    if (duration && duration > 0 && closable) {
-      setCountdownProgress(100)
-      const timer = setTimeout(() => {
-        setVisible(false)
-        onClose?.()
-      }, duration)
-
-      let countdownTimer: ReturnType<typeof setInterval> | undefined
-      if (showCountdown) {
-        const startTime = Date.now()
-        countdownTimer = setInterval(() => {
-          const elapsed = Date.now() - startTime
-          setCountdownProgress(Math.max(0, 100 - (elapsed / duration) * 100))
-        }, 50)
-      }
-
-      return () => {
-        clearTimeout(timer)
-        if (countdownTimer) clearInterval(countdownTimer)
+    if (visible === false || !(duration && duration > 0)) {
+      return
+    }
+    const timer = window.setTimeout(() => {
+      requestClose(new Event('close', { cancelable: true }))
+    }, duration)
+    const clear = () => window.clearTimeout(timer)
+    clearTimerRef.current = clear
+    return () => {
+      clear()
+      if (clearTimerRef.current === clear) {
+        clearTimerRef.current = undefined
       }
     }
-  }, [duration, closable, showCountdown, onClose])
+  }, [duration, visible, requestClose])
 
-  if (!visible) {
+  if (visible === false) {
     return null
   }
 
@@ -146,24 +159,34 @@ export const Alert: React.FC<AlertProps> = ({
 
   const hasTitle = !!(title || titleSlot)
   const hasDescription = !!(description || descriptionSlot)
-  const hasDefaultContent = !hasTitle && !hasDescription && !!children
-  const hasContent = hasTitle || hasDescription || hasDefaultContent
+  const hasChildren = children != null && children !== false
+  const hasContent = hasTitle || hasDescription || hasChildren
+  const role = roleProp ?? resolveAlertRole(type, hasContent)
 
   return (
-    <div {...props} className={alertClasses} role="alert">
+    <div {...props} ref={ref} className={alertClasses} role={role}>
       {showIcon && (
         <div className={alertIconContainerClasses}>
-          <StatusIcon path={iconPath} className={iconClasses} />
+          <StatusIcon
+            path={iconPath}
+            className={iconClasses}
+            aria-hidden="true"
+            focusable="false"
+          />
         </div>
       )}
 
       {hasContent && (
-        <div className={alertContentClasses}>
+        <div className={getAlertContentClasses(showIcon)}>
           {hasTitle && <div className={titleClasses}>{titleSlot || title}</div>}
           {hasDescription && (
             <div className={descriptionClasses}>{descriptionSlot || description}</div>
           )}
-          {hasDefaultContent && <div className={titleClasses}>{children}</div>}
+          {hasChildren && (
+            <div className={hasTitle || hasDescription ? descriptionClasses : titleClasses}>
+              {children}
+            </div>
+          )}
         </div>
       )}
 
@@ -171,20 +194,27 @@ export const Alert: React.FC<AlertProps> = ({
         <button
           className={closeButtonClasses}
           onClick={handleClose}
-          aria-label={closeAriaLabel}
+          aria-label={closeAriaLabel ?? labels.closeAriaLabel}
           type="button">
-          <StatusIcon path={alertCloseIconPath} className="h-4 w-4" />
+          <StatusIcon
+            path={alertCloseIconPath}
+            className="h-4 w-4"
+            aria-hidden="true"
+            focusable="false"
+          />
         </button>
       )}
 
-      {showCountdown && duration && duration > 0 && closable && (
+      {showCountdown && duration && duration > 0 && (
         <div className={alertCountdownContainerClasses}>
           <div
             className={classNames(alertCountdownBarClasses, alertCountdownColorClasses[type])}
-            style={{ width: `${countdownProgress}%` }}
+            style={{ animationDuration: `${duration}ms` }}
           />
         </div>
       )}
     </div>
   )
-}
+})
+
+Alert.displayName = 'Alert'

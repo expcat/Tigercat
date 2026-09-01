@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Alert 默认不再是 `role="alert"`。静态 info/success/warning 没有 live region；有内容的 `type="error"` 才是 `alert`。空 `<Alert />` 不是 live。关闭名走 `locale.alert.closeAriaLabel`（en-US `Close alert`，zh-CN `关闭提示`）。点关闭和 `duration` 只发 `onClose` / `close`（都带 Event），组件自己不 `return null`；父级卸载或 `visible={false}`。`duration` 不再要求 `closable`。有 `title` 时默认槽 / children 仍渲染。Vue 从主入口引 `AlertProps`。
+
 Affix / BackTop / Anchor 共用 `resolveScrollRoot`。Affix `target` 不再只是字符串，也可以是节点或 getter。非法选择器不再抛，回退 window。
 
 BackTop `duration` 不是毫秒：`0` 立刻滚到顶，正数用浏览器原生 smooth。默认 `auto` 走 viewport `placement`/`offset`（24px），不再是 window 专用的 `bottom-8 right-8`。自定义容器默认也是视口 fixed；要贴在容器里请显式 `position="sticky"` 且按钮是容器子孙。隐身时不进 Tab。默认 `aria-label` 走 `locale.backTop`。

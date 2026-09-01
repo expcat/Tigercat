@@ -38,6 +38,9 @@ export const jaJP: TigerLocale = {
   drawer: {
     closeAriaLabel: '閉じる'
   },
+  alert: {
+    closeAriaLabel: 'アラートを閉じる'
+  },
   qrcode: {
     ariaLabel: 'QRコード',
     expiredText: 'QRコードの有効期限が切れました',
