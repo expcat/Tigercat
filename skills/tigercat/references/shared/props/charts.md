@@ -11,87 +11,108 @@ description: Compact generated Tigercat Charts props reference
 
 ## AreaChart
 
-`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 3/53 props
+`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 8/53 props
 
-| Prop        | Type                | Default | Notes                               |
-| ----------- | ------------------- | ------- | ----------------------------------- |
-| `data?`     | `LineChartDatum[]`  | `-`     | Chart data (single series)          |
-| `animated?` | `boolean`           | `false` | Enable line draw entrance animation |
-| `series?`   | `AreaChartSeries[]` | `-`     | Multiple series                     |
+| Prop           | Type                | Default                           | Notes                                                      |
+| -------------- | ------------------- | --------------------------------- | ---------------------------------------------------------- |
+| `series?`      | `AreaChartSeries[]` | `-`                               | Multiple series                                            |
+| `stacked?`     | `boolean`           | `false`                           | Whether to stack areas                                     |
+| `gradient?`    | `boolean`           | `false`                           | Enable linear gradient fill (top-to-bottom, ECharts style) |
+| `showPoints?`  | `boolean`           | `false`                           | Whether to show data points                                |
+| `includeZero?` | `boolean`           | `true (different from LineChart)` | Include zero in Y domain                                   |
+| `curve?`       | `ChartCurveType`    | `'linear'`                        | Curve interpolation type                                   |
+| `showLegend?`  | `boolean`           | `false`                           | Whether to show legend                                     |
+| `data?`        | `LineChartDatum[]`  | `-`                               | Chart data (single series)                                 |
 
 ## BarChart
 
-`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 3/49 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 8/49 props
 
-| Prop        | Type              | Default | Notes                                         |
-| ----------- | ----------------- | ------- | --------------------------------------------- |
-| `data`      | `BarChartDatum[]` | `-`     | Chart data                                    |
-| `animated?` | `boolean`         | `false` | Enable CSS transitions for smooth bar updates |
-| `xScale?`   | `ChartScale`      | `-`     | Custom x scale                                |
+| Prop               | Type              | Default                                        | Notes                                                                                   |
+| ------------------ | ----------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `data`             | `BarChartDatum[]` | `-`                                            | Chart data                                                                              |
+| `padding?`         | `ChartPadding`    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
+| `showLegend?`      | `boolean`         | `false`                                        | Whether to show legend                                                                  |
+| `gradient?`        | `boolean`         | `false`                                        | Enable linear gradient fill on bars (top-to-bottom, lighter to full)                    |
+| `showValueLabels?` | `boolean`         | `false`                                        | Show value labels above or inside bars                                                  |
+| `hoverable?`       | `boolean`         | `false`                                        | Enable hover highlight                                                                  |
+| `selectable?`      | `boolean`         | `false`                                        | Enable click selection                                                                  |
+| `title?`           | `string`          | `-`                                            | Accessible title for the SVG                                                            |
 
 ## ChartAxis
 
-`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 3/12 props
+`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 5/12 props
 
-| Prop           | Type                   | Default    | Notes                                   |
-| -------------- | ---------------------- | ---------- | --------------------------------------- |
-| `scale`        | `ChartScale`           | `-`        | Axis scale                              |
-| `orientation?` | `ChartAxisOrientation` | `'bottom'` | Axis orientation                        |
-| `ticks?`       | `number`               | `5`        | Number of ticks (only for linear scale) |
+| Prop           | Type                                 | Default    | Notes                |
+| -------------- | ------------------------------------ | ---------- | -------------------- |
+| `scale`        | `ChartScale`                         | `-`        | Axis scale           |
+| `orientation?` | `ChartAxisOrientation`               | `'bottom'` | Axis orientation     |
+| `tickValues?`  | `ChartScaleValue[]`                  | `-`        | Explicit tick values |
+| `tickFormat?`  | `(value: ChartScaleValue) => string` | `-`        | Tick label formatter |
+| `label?`       | `string`                             | `-`        | Axis label           |
 
 ## ChartCanvas
 
-`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 3/7 props
+`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 5/8 props
 
-| Prop          | Type      | Default | Notes                                                       |
-| ------------- | --------- | ------- | ----------------------------------------------------------- |
-| `width?`      | `number`  | `320`   | SVG width                                                   |
-| `height?`     | `number`  | `200`   | SVG height                                                  |
-| `responsive?` | `boolean` | `false` | Resize the SVG to its parent container using ResizeObserver |
+Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
+
+| Prop          | Type           | Default                                        | Notes                                                                  |
+| ------------- | -------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
+| `width?`      | `number`       | `320`                                          | SVG width                                                              |
+| `height?`     | `number`       | `200`                                          | SVG height                                                             |
+| `responsive?` | `boolean`      | `false`                                        | Observe the canvas host (not a legend sibling) and resize the SVG      |
+| `padding?`    | `ChartPadding` | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Inner padding for chart drawing area. Default covers ChartAxis labels. |
+| `title?`      | `string`       | `-`                                            | Accessible title for the SVG                                           |
 
 Events/callback props: `onResolvedSizeChange?`.
 
 ## ChartGrid
 
-`packages/core/src/types/chart-core.ts` · `ChartGridProps` · 3/12 props
+`packages/core/src/types/chart-core.ts` · `ChartGridProps` · 4/16 props
 
-| Prop      | Type            | Default  | Notes           |
-| --------- | --------------- | -------- | --------------- |
-| `xScale?` | `ChartScale`    | `-`      | X axis scale    |
-| `yScale?` | `ChartScale`    | `-`      | Y axis scale    |
-| `show?`   | `ChartGridLine` | `'both'` | Show grid lines |
+| Prop         | Type                 | Default   | Notes           |
+| ------------ | -------------------- | --------- | --------------- |
+| `xScale?`    | `ChartScale`         | `-`       | X axis scale    |
+| `yScale?`    | `ChartScale`         | `-`       | Y axis scale    |
+| `show?`      | `ChartGridLine`      | `'both'`  | Show grid lines |
+| `lineStyle?` | `ChartGridLineStyle` | `'solid'` | Grid line style |
 
 ## ChartLegend
 
-`packages/react/src/components/ChartLegend.tsx and packages/vue/src/components/ChartLegend.ts` · `ChartLegendProps / VueChartLegendProps` · 3/7 props
+`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 4/7 props
 
-| Prop          | Type                  | Default | Notes |
-| ------------- | --------------------- | ------- | ----- |
-| `items`       | `ChartLegendItem[]`   | `-`     | -     |
-| `position?`   | `ChartLegendPosition` | `-`     | -     |
-| `markerSize?` | `number`              | `-`     | -     |
+Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。
 
-Events/callback props: `onItemClick?`, `onItemHover?`, `onItemLeave?`.
+| Prop           | Type                     | Default        | Notes                                                        |
+| -------------- | ------------------------ | -------------- | ------------------------------------------------------------ |
+| `items`        | `ChartLegendItem[]`      | `-`            | Legend items                                                 |
+| `orientation?` | `ChartLegendOrientation` | `'horizontal'` | Row vs column layout                                         |
+| `interactive?` | `boolean`                | `false`        | Whether items are buttons                                    |
+| `ariaLabel?`   | `string`                 | `-`            | Accessible name. Defaults to locale `chart.legendAriaLabel`. |
 
 ## ChartSeries
 
 `packages/core/src/types/chart-core.ts` · `ChartSeriesProps` · 3/7 props
 
-| Prop     | Type     | Default | Notes        |
-| -------- | -------- | ------- | ------------ |
-| `data`   | `T[]`    | `-`     | Series data  |
-| `name?`  | `string` | `-`     | Series name  |
-| `color?` | `string` | `-`     | Series color |
+| Prop    | Type              | Default | Notes            |
+| ------- | ----------------- | ------- | ---------------- |
+| `data`  | `T[]`             | `-`     | Series data      |
+| `type?` | `ChartSeriesType` | `-`     | Series type hint |
+| `name?` | `string`          | `-`     | Series name      |
 
 ## ChartTooltip
 
-`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 3/5 props
+`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 4/6 props
 
-| Prop      | Type      | Default | Notes                       |
-| --------- | --------- | ------- | --------------------------- |
-| `content` | `string`  | `-`     | Tooltip content             |
-| `open?`   | `boolean` | `false` | Whether the tooltip is open |
-| `x?`      | `number`  | `0`     | Viewport X position         |
+Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。
+
+| Prop       | Type      | Default | Notes                                                                      |
+| ---------- | --------- | ------- | -------------------------------------------------------------------------- |
+| `content?` | `string`  | `-`     | Tooltip content. Optional when the framework slot / children render nodes. |
+| `open?`    | `boolean` | `false` | Whether the tooltip is open                                                |
+| `x?`       | `number`  | `0`     | Viewport X position                                                        |
+| `y?`       | `number`  | `0`     | Viewport Y position                                                        |
 
 ## DonutChart
 
@@ -147,13 +168,18 @@ Events/callback props: `onItemClick?`, `onItemHover?`, `onItemLeave?`.
 
 ## LineChart
 
-`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 3/52 props
+`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 8/52 props
 
-| Prop        | Type                | Default | Notes                               |
-| ----------- | ------------------- | ------- | ----------------------------------- |
-| `data?`     | `LineChartDatum[]`  | `-`     | Chart data (single series)          |
-| `animated?` | `boolean`           | `false` | Enable line draw entrance animation |
-| `series?`   | `LineChartSeries[]` | `-`     | Multiple series                     |
+| Prop          | Type                | Default    | Notes                               |
+| ------------- | ------------------- | ---------- | ----------------------------------- |
+| `series?`     | `LineChartSeries[]` | `-`        | Multiple series                     |
+| `showPoints?` | `boolean`           | `true`     | Whether to show data points         |
+| `showArea?`   | `boolean`           | `false`    | Show gradient area fill under lines |
+| `curve?`      | `ChartCurveType`    | `'linear'` | Curve interpolation type            |
+| `showLegend?` | `boolean`           | `false`    | Whether to show legend              |
+| `hoverable?`  | `boolean`           | `false`    | Enable hover highlight              |
+| `animated?`   | `boolean`           | `false`    | Enable line draw entrance animation |
+| `data?`       | `LineChartDatum[]`  | `-`        | Chart data (single series)          |
 
 ## OrgChart
 
@@ -187,13 +213,18 @@ Events/callback props: `onItemClick?`, `onItemHover?`, `onItemLeave?`.
 
 ## ScatterChart
 
-`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 3/49 props
+`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 8/50 props
 
-| Prop        | Type                   | Default | Notes                                  |
-| ----------- | ---------------------- | ------- | -------------------------------------- |
-| `data`      | `ScatterChartDatum[]`  | `-`     | Chart data                             |
-| `animated?` | `boolean`              | `false` | Enable entrance animation with stagger |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | -                                      |
+| Prop          | Type                                              | Default                                        | Notes                                                                                   |
+| ------------- | ------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `data`        | `ScatterChartDatum[]`                             | `-`                                            | Chart data                                                                              |
+| `pointSize?`  | `number`                                          | `6`                                            | Point size (radius)                                                                     |
+| `pointStyle?` | `'circle' \| 'square' \| 'triangle' \| 'diamond'` | `'circle'`                                     | Point shape                                                                             |
+| `padding?`    | `ChartPadding`                                    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
+| `hoverable?`  | `boolean`                                         | `false`                                        | Enable hover highlight                                                                  |
+| `selectable?` | `boolean`                                         | `false`                                        | Enable click selection                                                                  |
+| `showLegend?` | `boolean`                                         | `false`                                        | Whether to show legend                                                                  |
+| `gradient?`   | `boolean`                                         | `false`                                        | Enable radial gradient fill for points                                                  |
 
 ## SunburstChart
 

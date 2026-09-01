@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
-import type { LineChartDatum } from '@expcat/tigercat-vue'
+import type { AreaChartSeries, LineChartDatum } from '@expcat/tigercat-vue'
 
 const data: LineChartDatum[] = [
   { x: 'Jan', y: 40 },
@@ -8,6 +8,25 @@ const data: LineChartDatum[] = [
   { x: 'Mar', y: 60 },
   { x: 'Apr', y: 70 },
   { x: 'May', y: 65 }
+]
+
+const stacked: AreaChartSeries[] = [
+  {
+    name: '线上',
+    data: [
+      { x: 'Jan', y: 4 },
+      { x: 'Feb', y: 8 },
+      { x: 'Mar', y: 3 }
+    ]
+  },
+  {
+    name: '门店',
+    data: [
+      { x: 'Jan', y: 2 },
+      { x: 'Mar', y: 6 },
+      { x: 'Apr', y: -1 }
+    ]
+  }
 ]
 </script>
 
@@ -23,13 +42,16 @@ const data: LineChartDatum[] = [
         :fill-opacity="0.35" />
     </div>
     <div>
-      <p class="mb-1 text-sm text-gray-500">showPoints=false + includeZero=false（紧凑基线）</p>
+      <p class="mb-1 text-sm text-gray-500">
+        stacked + monotone：缺的 x 补 0，负值单独堆在零线下方
+      </p>
       <AreaChart
-        :data="data"
+        :series="stacked"
         :width="420"
-        :height="200"
-        :show-points="false"
-        :include-zero="false" />
+        :height="220"
+        stacked
+        curve="monotone"
+        show-legend />
     </div>
   </div>
 </template>

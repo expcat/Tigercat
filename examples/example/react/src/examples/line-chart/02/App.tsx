@@ -30,6 +30,10 @@ export default function App() {
         <p className="mb-1 text-sm text-gray-500">showGrid=false + showYAxis=false（极简折线）</p>
         <LineChart data={data} width={420} height={160} showGrid={false} showYAxis={false} />
       </div>
+      <div>
+        <p className="mb-1 text-sm text-gray-500">showArea 填到 y=0，配合 includeZero</p>
+        <LineChart data={data} width={420} height={220} showArea includeZero />
+      </div>
     </div>
   )
 }

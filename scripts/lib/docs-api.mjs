@@ -537,6 +537,48 @@ export const COMPONENT_PROP_PRIORITY = {
     'virtual?',
     'filterValue?',
     'searchable?'
+  ],
+  ChartCanvas: ['width?', 'height?', 'responsive?', 'padding?', 'title?'],
+  ChartAxis: ['scale', 'orientation?', 'tickValues?', 'tickFormat?', 'label?'],
+  ChartGrid: ['xScale?', 'yScale?', 'show?', 'lineStyle?'],
+  ChartSeries: ['data', 'type?'],
+  ChartLegend: ['items', 'orientation?', 'interactive?', 'ariaLabel?'],
+  ChartTooltip: ['content?', 'open?', 'x?', 'y?'],
+  BarChart: [
+    'padding?',
+    'showLegend?',
+    'gradient?',
+    'showValueLabels?',
+    'hoverable?',
+    'selectable?',
+    'title?'
+  ],
+  LineChart: [
+    'series?',
+    'showPoints?',
+    'showArea?',
+    'curve?',
+    'showLegend?',
+    'hoverable?',
+    'animated?'
+  ],
+  AreaChart: [
+    'series?',
+    'stacked?',
+    'gradient?',
+    'showPoints?',
+    'includeZero?',
+    'curve?',
+    'showLegend?'
+  ],
+  ScatterChart: [
+    'pointSize?',
+    'pointStyle?',
+    'padding?',
+    'hoverable?',
+    'selectable?',
+    'showLegend?',
+    'gradient?'
   ]
 }
 
@@ -776,7 +818,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     FloatButtonGroup:
       '<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>',
     Spotlight: '<Spotlight :items="items" />',
-    ScrollSpy: '<ScrollSpy :items="items" />'
+    ScrollSpy: '<ScrollSpy :items="items" />',
+    ChartCanvas: '<ChartCanvas title="Sales" :width="320" :height="200"><slot /></ChartCanvas>',
+    ChartAxis: '<ChartAxis :scale="xScale" orientation="bottom" label="Month" />',
+    ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />',
+    ChartSeries: '<ChartSeries :data="data" type="bar"><slot /></ChartSeries>',
+    ChartLegend: '<ChartLegend :items="items" />',
+    ChartTooltip: '<ChartTooltip :content="label" :open="open" :x="x" :y="y" />'
   },
   React: {
     Image: '<Image src="..." alt="..." />',
@@ -902,7 +950,13 @@ export const REQUIRED_USAGE_SNIPPETS = {
     FloatButtonGroup:
       '<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>',
     Spotlight: '<Spotlight items={items} />',
-    ScrollSpy: '<ScrollSpy items={items} />'
+    ScrollSpy: '<ScrollSpy items={items} />',
+    ChartCanvas: '<ChartCanvas title="Sales" width={320} height={200}>{plot}</ChartCanvas>',
+    ChartAxis: '<ChartAxis scale={xScale} orientation="bottom" label="Month" />',
+    ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />',
+    ChartSeries: '<ChartSeries data={data} type="bar">{marks}</ChartSeries>',
+    ChartLegend: '<ChartLegend items={items} />',
+    ChartTooltip: '<ChartTooltip content={label} open={open} x={x} y={y} />'
   }
 }
 

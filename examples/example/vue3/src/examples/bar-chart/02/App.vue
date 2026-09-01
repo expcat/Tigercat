@@ -9,6 +9,13 @@ const data: BarChartDatum[] = [
   { x: '四月', y: 5200 }
 ]
 
+const signed: BarChartDatum[] = [
+  { x: 'Q1', y: 12 },
+  { x: 'Q2', y: -8 },
+  { x: 'Q3', y: 6 },
+  { x: 'Q4', y: -3 }
+]
+
 const valueLabelFormatter = (datum: BarChartDatum) => `¥${(datum.y / 1000).toFixed(1)}k`
 const tooltipFormatter = (datum: BarChartDatum) => `${datum.x}：${datum.y} 元`
 </script>
@@ -35,6 +42,10 @@ const tooltipFormatter = (datum: BarChartDatum) => `${datum.x}：${datum.y} 元`
         value-label-position="inside"
         show-tooltip
         :tooltip-formatter="tooltipFormatter" />
+    </div>
+    <div>
+      <p class="mb-1 text-sm text-gray-500">负值标签画在柱底外侧</p>
+      <BarChart :data="signed" :width="420" :height="220" show-value-labels />
     </div>
   </div>
 </template>

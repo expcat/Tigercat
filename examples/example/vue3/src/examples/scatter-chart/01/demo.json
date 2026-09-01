@@ -1,7 +1,7 @@
 {
   "id": "scatter-chart-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、自定义样式、入场动画、悬停 + 选中、菱形散点、渐变风格，减少重复示例块。",
+  "title": "基础散点图",
+  "description": "只传 data 即可画出笛卡尔散点。点大小是像素半径。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

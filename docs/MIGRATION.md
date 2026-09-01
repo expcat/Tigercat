@@ -4,6 +4,14 @@
 
 ## 未发布
 
+Bar / Line / Area / Scatter 默认 padding 与 ChartCanvas 同一份（底/左 52）。`barRadius` 传入后不再被 `--tiger-chart-bar-radius` 盖掉。Area `gradient` 默认是 false。Scatter `datum.size` 默认仍是像素半径并 clamp 到 40；要按数据度量缩放请开 `sizeScale`。点默认不再是 `role="img"`。Vue 从主入口引 `BarChartProps` / `LineChartProps` / `AreaChartProps` / `ScatterChartProps`。`onPointClick` 不必再开 `selectable`。
+
+ChartCanvas `responsive` 观察的是画布宿主，不是外面的 legend 壳。默认 padding 从 `24` 改成 `{ top: 24, right: 24, bottom: 52, left: 52 }`。有 `title` / `aria-label` 时 svg 是 `role="img"`。React children 可以是 `( { innerRect, width, height } ) => node`。
+
+`useChartInteraction`：`onClick` 在点到元素时就会发，不再先看 `selectable`。取消选中时 `onClick` 仍是原始 index，`onSelectedIndexChange` / `update:selectedIndex` 才是 `null`。Vue 不再要 `emit` + `eventNames`，和 React 一样传 `onClick` / `onHover` / `onHoveredIndexChange` / `onSelectedIndexChange`。删除 hook 的 `createLegendItems` 和公开的 `localHoveredIndex` / `localSelectedIndex`。`useResponsiveChartSize` 从根入口导出。
+
+高阶图的 legend mixin 改名 `ChartLegendToggleProps`。`ChartLegend` 组件 props 才叫 `ChartLegendProps`，必填 `items`；`position` 改成 `orientation`（`horizontal` | `vertical`）。`aria-pressed` 只表示选中。关着的 `ChartTooltip` 不再留在 DOM。删除 `defaultTooltipFormatter` / `chartInteractiveClasses` / `getChartAnimationStyle` / `getChartEntranceTransform` / `applyChartBrush` / `createChartLinkController`。
+
 Tour `current` 是 `steps` 的原始下标。非受控关掉再开会回到 0；受控请在 `onOpenChange(false)` / `@close` 里把 `current` 归零。`closable={false}` 只藏关闭钮，Esc 和点遮罩仍关，除非再设 `keyboard={false}` / `maskClosable={false}`。`target` 可以是选择器或 `HTMLElement`，非法选择器不再抛。Finish 事件顺序是 `finish` → `close` → `open=false`。Vue 从主入口引 `TourProps`。删除 `getTourSpotlightStyle`。
 
 Message / notification / LoadingBar 是命令式 API，不是空 `<Message />`。关闭名走 locale 字段（zh-TW 是「關閉訊息」不是「關閉消息」）。`Message.loading({ duration })` 尊重传入的 duration。Vue `MessageContainer` / `NotificationContainer` 发 `close`（`@close`），不要只绑 `:on-close`。LoadingBar 默认名是 `Loading...`；`finish` 后下一次 `start()` 不再粘上一次的 color；需要确定进度用 `set` / `inc`。根入口 `MessageProps` / `NotificationProps` 是组件字段，命令参数用 `MessageOptions` / `NotificationOptions`。

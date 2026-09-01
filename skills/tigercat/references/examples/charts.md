@@ -9,29 +9,37 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 图表组件共享数据、series、legend、tooltip 和 axes 模式，细节看 chart 类型源。
 
+## Component Notes
+
+| Component    | Uses | Notes                                                                                                                                                                          |
+| ------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ChartCanvas  | -    | `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。 |
+| ChartLegend  | -    | 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。                                      |
+| ChartTooltip | -    | `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。                                                                        |
+
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component     | Vue                                                                     | React                                                              |
-| ------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| AreaChart     | `<AreaChart :data="data" />`                                            | `<AreaChart data={data} />`                                        |
-| BarChart      | `<BarChart :data="data" />`                                             | `<BarChart data={data} />`                                         |
-| ChartAxis     | `<ChartAxis :scale="xScale" />`                                         | `<ChartAxis scale={xScale} />`                                     |
-| ChartCanvas   | `<ChartCanvas :width="320" :height="200" />`                            | `<ChartCanvas width={320} height={200} />`                         |
-| ChartGrid     | `<ChartGrid :x-scale="xScale" :y-scale="yScale" />`                     | `<ChartGrid xScale={xScale} yScale={yScale} />`                    |
-| ChartLegend   | `<ChartLegend :items="items" />`                                        | `<ChartLegend items={items} />`                                    |
-| ChartSeries   | `<ChartSeries :data="data" />`                                          | `<ChartSeries data={data} />`                                      |
-| ChartTooltip  | `<ChartTooltip :content="content" />`                                   | `<ChartTooltip content={content} />`                               |
-| DonutChart    | `<DonutChart :data="data" />`                                           | `<DonutChart data={data} />`                                       |
-| FunnelChart   | `<FunnelChart :data="data" />`                                          | `<FunnelChart data={data} />`                                      |
-| Gantt         | `<Gantt :data="tasks" />`                                               | `<Gantt data={tasks} />`                                           |
-| GaugeChart    | `<GaugeChart :value="72" />`                                            | `<GaugeChart value={72} />`                                        |
-| HeatmapChart  | `<HeatmapChart :data="data" :x-labels="xLabels" :y-labels="yLabels" />` | `<HeatmapChart data={data} xLabels={xLabels} yLabels={yLabels} />` |
-| LineChart     | `<LineChart :data="data" />`                                            | `<LineChart data={data} />`                                        |
-| OrgChart      | `<OrgChart :data="nodes" />`                                            | `<OrgChart data={nodes} />`                                        |
-| PieChart      | `<PieChart :data="data" />`                                             | `<PieChart data={data} />`                                         |
-| RadarChart    | `<RadarChart :data="data" />`                                           | `<RadarChart data={data} />`                                       |
-| ScatterChart  | `<ScatterChart :data="data" />`                                         | `<ScatterChart data={data} />`                                     |
-| SunburstChart | `<SunburstChart :data="data" />`                                        | `<SunburstChart data={data} />`                                    |
-| TreeMapChart  | `<TreeMapChart :data="data" />`                                         | `<TreeMapChart data={data} />`                                     |
+| Component     | Vue                                                                                 | React                                                                          |
+| ------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| AreaChart     | `<AreaChart :data="data" />`                                                        | `<AreaChart data={data} />`                                                    |
+| BarChart      | `<BarChart :data="data" />`                                                         | `<BarChart data={data} />`                                                     |
+| ChartAxis     | `<ChartAxis :scale="xScale" orientation="bottom" label="Month" />`                  | `<ChartAxis scale={xScale} orientation="bottom" label="Month" />`              |
+| ChartCanvas   | `<ChartCanvas title="Sales" :width="320" :height="200"><slot /></ChartCanvas>`      | `<ChartCanvas title="Sales" width={320} height={200}>{plot}</ChartCanvas>`     |
+| ChartGrid     | `<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />` | `<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />` |
+| ChartLegend   | `<ChartLegend :items="items" />`                                                    | `<ChartLegend items={items} />`                                                |
+| ChartSeries   | `<ChartSeries :data="data" type="bar"><slot /></ChartSeries>`                       | `<ChartSeries data={data} type="bar">{marks}</ChartSeries>`                    |
+| ChartTooltip  | `<ChartTooltip :content="label" :open="open" :x="x" :y="y" />`                      | `<ChartTooltip content={label} open={open} x={x} y={y} />`                     |
+| DonutChart    | `<DonutChart :data="data" />`                                                       | `<DonutChart data={data} />`                                                   |
+| FunnelChart   | `<FunnelChart :data="data" />`                                                      | `<FunnelChart data={data} />`                                                  |
+| Gantt         | `<Gantt :data="tasks" />`                                                           | `<Gantt data={tasks} />`                                                       |
+| GaugeChart    | `<GaugeChart :value="72" />`                                                        | `<GaugeChart value={72} />`                                                    |
+| HeatmapChart  | `<HeatmapChart :data="data" :x-labels="xLabels" :y-labels="yLabels" />`             | `<HeatmapChart data={data} xLabels={xLabels} yLabels={yLabels} />`             |
+| LineChart     | `<LineChart :data="data" />`                                                        | `<LineChart data={data} />`                                                    |
+| OrgChart      | `<OrgChart :data="nodes" />`                                                        | `<OrgChart data={nodes} />`                                                    |
+| PieChart      | `<PieChart :data="data" />`                                                         | `<PieChart data={data} />`                                                     |
+| RadarChart    | `<RadarChart :data="data" />`                                                       | `<RadarChart data={data} />`                                                   |
+| ScatterChart  | `<ScatterChart :data="data" />`                                                     | `<ScatterChart data={data} />`                                                 |
+| SunburstChart | `<SunburstChart :data="data" />`                                                    | `<SunburstChart data={data} />`                                                |
+| TreeMapChart  | `<TreeMapChart :data="data" />`                                                     | `<TreeMapChart data={data} />`                                                 |
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

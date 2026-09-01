@@ -101,6 +101,18 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。'
   },
+  ChartCanvas: {
+    notes:
+      '`responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。'
+  },
+  ChartLegend: {
+    notes:
+      '必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。'
+  },
+  ChartTooltip: {
+    notes:
+      '`open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。'
+  },
   ButtonGroup: {
     notes:
       '直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。'
@@ -606,11 +618,11 @@ const COMPONENT_SNIPPETS = {
       '<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />',
     AreaChart: '<AreaChart :data="data" />',
     BarChart: '<BarChart :data="data" />',
-    ChartAxis: '<ChartAxis :scale="xScale" />',
-    ChartCanvas: '<ChartCanvas :width="320" :height="200" />',
-    ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" />',
+    ChartAxis: '<ChartAxis :scale="xScale" orientation="bottom" label="Month" />',
+    ChartCanvas: '<ChartCanvas title="Sales" :width="320" :height="200"><slot /></ChartCanvas>',
+    ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />',
     ChartLegend: '<ChartLegend :items="items" />',
-    ChartSeries: '<ChartSeries :data="data" />',
+    ChartSeries: '<ChartSeries :data="data" type="bar"><slot /></ChartSeries>',
     DonutChart: '<DonutChart :data="data" />',
     FunnelChart: '<FunnelChart :data="data" />',
     Gantt: '<Gantt :data="tasks" />',
@@ -668,11 +680,11 @@ const COMPONENT_SNIPPETS = {
       '<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />',
     AreaChart: '<AreaChart data={data} />',
     BarChart: '<BarChart data={data} />',
-    ChartAxis: '<ChartAxis scale={xScale} />',
-    ChartCanvas: '<ChartCanvas width={320} height={200} />',
-    ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} />',
+    ChartAxis: '<ChartAxis scale={xScale} orientation="bottom" label="Month" />',
+    ChartCanvas: '<ChartCanvas title="Sales" width={320} height={200}>{plot}</ChartCanvas>',
+    ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />',
     ChartLegend: '<ChartLegend items={items} />',
-    ChartSeries: '<ChartSeries data={data} />',
+    ChartSeries: '<ChartSeries data={data} type="bar">{marks}</ChartSeries>',
     DonutChart: '<DonutChart data={data} />',
     FunnelChart: '<FunnelChart data={data} />',
     Gantt: '<Gantt data={tasks} />',
@@ -910,7 +922,7 @@ function generatePublicHooksSection(publicHooks) {
 
   const items = publicHooks.map((hook) => `\`${hook.name}\` (${hook.packages.join(', ')})`)
   let markdownText = '## Public hooks\n\n'
-  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. React \`useControlledState({ value, defaultValue, onChange, postState })\`; T cannot be a function. \`useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })\`: wrap items with \`getDragItemProps\` / \`getDragItemAttrs\` and the parent with the drop-zone bindings; merge extra \`className\`/\`class\`. Cross-container needs \`config.crossContainer\` and distinct \`containerId\`s. Pointer reorder; keyboard via move buttons or your own keys. Types: \`packages/core/src/types/drag.ts\`.\n\n`
+  markdownText += `${items.join('; ')}. \`undefined\` is uncontrolled; \`null\` is a legal empty value. React \`useControlledState({ value, defaultValue, onChange, postState })\`; T cannot be a function. \`useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })\`: wrap items with \`getDragItemProps\` / \`getDragItemAttrs\` and the parent with the drop-zone bindings; merge extra \`className\`/\`class\`. Cross-container needs \`config.crossContainer\` and distinct \`containerId\`s. Pointer reorder; keyboard via move buttons or your own keys. Types: \`packages/core/src/types/drag.ts\`. \`useChartInteraction\`: click is independent of \`selectable\`; deselect emits \`null\` on the select channel. \`useResponsiveChartSize\` shares ChartCanvas's observed size.\n\n`
   return markdownText
 }
 

@@ -12,18 +12,5 @@ const data: BarChartDatum[] = [
 </script>
 
 <template>
-  <BarChart
-    :data="data"
-    :width="420"
-    :height="240"
-    responsive
-    gradient
-    animated
-    :bar-radius="6"
-    grid-line-style="dashed"
-    show-value-labels
-    hoverable
-    selectable
-    show-legend
-    show-tooltip />
+  <BarChart :data="data" :width="420" :height="240" />
 </template>

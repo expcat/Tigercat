@@ -11,7 +11,7 @@ description: Compact generated route map for Tigercat core type files
 
 ## Public hooks
 
-`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. React `useControlledState({ value, defaultValue, onChange, postState })`; T cannot be a function. `useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })`: wrap items with `getDragItemProps` / `getDragItemAttrs` and the parent with the drop-zone bindings; merge extra `className`/`class`. Cross-container needs `config.crossContainer` and distinct `containerId`s. Pointer reorder; keyboard via move buttons or your own keys. Types: `packages/core/src/types/drag.ts`.
+`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue); `useResponsiveChartSize` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. React `useControlledState({ value, defaultValue, onChange, postState })`; T cannot be a function. `useDrag({ config, containerId, onDragStart, onDragOver, onDrop, onDragEnd })`: wrap items with `getDragItemProps` / `getDragItemAttrs` and the parent with the drop-zone bindings; merge extra `className`/`class`. Cross-container needs `config.crossContainer` and distinct `containerId`s. Pointer reorder; keyboard via move buttons or your own keys. Types: `packages/core/src/types/drag.ts`. `useChartInteraction`: click is independent of `selectable`; deselect emits `null` on the select channel. `useResponsiveChartSize` shares ChartCanvas's observed size.
 
 ## Basic
 
@@ -142,15 +142,15 @@ description: Compact generated route map for Tigercat core type files
 
 ## Charts
 
-| Type File              | Props Interfaces                                                                                                                                                                             |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| chart.ts               | -                                                                                                                                                                                            |
-| chart-core.ts          | BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps |
-| chart-cartesian.ts     | BarChartProps, ScatterChartProps, LineChartProps, AreaChartProps                                                                                                                             |
-| chart-radial.ts        | PieChartProps, DonutChartProps, RadarChartProps, GaugeChartProps                                                                                                                             |
-| chart-visualization.ts | FunnelChartProps, HeatmapChartProps, TreeMapChartProps, SunburstChartProps                                                                                                                   |
-| gantt.ts               | GanttProps                                                                                                                                                                                   |
-| org-chart.ts           | OrgChartProps                                                                                                                                                                                |
+| Type File              | Props Interfaces                                                                                                                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| chart.ts               | -                                                                                                                                                                                                                    |
+| chart-core.ts          | BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartLegendProps, ChartBuiltInTooltipProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps |
+| chart-cartesian.ts     | BarChartProps, ScatterChartProps, LineChartProps, AreaChartProps                                                                                                                                                     |
+| chart-radial.ts        | PieChartProps, DonutChartProps, RadarChartProps, GaugeChartProps                                                                                                                                                     |
+| chart-visualization.ts | FunnelChartProps, HeatmapChartProps, TreeMapChartProps, SunburstChartProps                                                                                                                                           |
+| gantt.ts               | GanttProps                                                                                                                                                                                                           |
+| org-chart.ts           | OrgChartProps                                                                                                                                                                                                        |
 
 ## Advanced
 

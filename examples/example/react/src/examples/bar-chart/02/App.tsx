@@ -8,6 +8,13 @@ const data: BarChartDatum[] = [
   { x: '四月', y: 5200 }
 ]
 
+const signed: BarChartDatum[] = [
+  { x: 'Q1', y: 12 },
+  { x: 'Q2', y: -8 },
+  { x: 'Q3', y: 6 },
+  { x: 'Q4', y: -3 }
+]
+
 export default function App() {
   return (
     <div className="space-y-6">
@@ -37,6 +44,10 @@ export default function App() {
           showTooltip
           tooltipFormatter={(datum) => `${datum.x}：${datum.y} 元`}
         />
+      </div>
+      <div>
+        <p className="mb-1 text-sm text-gray-500">负值标签画在柱底外侧</p>
+        <BarChart data={signed} width={420} height={220} showValueLabels />
       </div>
     </div>
   )

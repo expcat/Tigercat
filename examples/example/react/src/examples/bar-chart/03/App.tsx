@@ -36,6 +36,19 @@ export default function App() {
           showGrid={false}
         />
       </div>
+      <div>
+        <p className="mb-1 text-sm text-gray-500">barMinHeight 让接近 0 的柱仍可见</p>
+        <BarChart
+          data={[
+            { x: 'A', y: 0.2 },
+            { x: 'B', y: 40 },
+            { x: 'C', y: 0.4 }
+          ]}
+          width={420}
+          height={200}
+          barMinHeight={8}
+        />
+      </div>
     </div>
   )
 }

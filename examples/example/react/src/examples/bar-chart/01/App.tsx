@@ -10,21 +10,5 @@ const data: BarChartDatum[] = [
 ]
 
 export default function App() {
-  return (
-    <BarChart
-      data={data}
-      width={420}
-      height={240}
-      responsive
-      gradient
-      animated
-      barRadius={6}
-      gridLineStyle="dashed"
-      showValueLabels
-      hoverable
-      selectable
-      showLegend
-      showTooltip
-    />
-  )
+  return <BarChart data={data} width={420} height={240} />
 }

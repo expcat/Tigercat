@@ -1,7 +1,7 @@
 {
   "id": "area-chart-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、渐变填充 + 动画、多系列、堆叠面积图、交互功能，减少重复示例块。",
+  "title": "基础面积图",
+  "description": "只传 data 即可画出非堆叠面积。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {
