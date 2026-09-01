@@ -7,6 +7,7 @@ import {
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartLegendPosition,
@@ -65,6 +66,7 @@ export const TreeMapChart = defineComponent({
       tooltipPosition,
       resolvedHoveredIndex,
       activeIndex,
+      resolvedSelectedIndex,
       handleMouseEnter,
       handleMouseMove,
       handleMouseLeave,
@@ -82,14 +84,14 @@ export const TreeMapChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index: number) => {
         const node = nodes.value[index]
-        return node
-          ? ({ label: node.label, value: node.value } as TreeMapChartDatum)
-          : ({} as TreeMapChartDatum)
+        return node ? ({ label: node.label, value: node.value } as TreeMapChartDatum) : undefined
       },
-      eventNames: { hover: 'node-hover', click: 'node-click' }
+      onHover: (index, datum) => emit('node-hover', index, datum),
+      onClick: (index, datum) => emit('node-click', index, datum)
     })
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
@@ -112,6 +114,7 @@ export const TreeMapChart = defineComponent({
         data: nodes.value,
         palette: palette.value,
         activeIndex: activeIndex.value,
+        selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d) => d.label,
         getColor: (d) => d.color
       })
@@ -259,7 +262,7 @@ export const TreeMapChart = defineComponent({
         chart,
         h(ChartLegend, {
           items: legendItems.value,
-          position: props.legendPosition,
+          orientation: chartLegendOrientationFromPosition(props.legendPosition),
           markerSize: props.legendMarkerSize,
           gap: props.legendGap,
           interactive,

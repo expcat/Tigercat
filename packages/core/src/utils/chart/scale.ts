@@ -14,6 +14,22 @@ import type {
 
 const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
+/** Covers ChartAxis `labelOffset` 28 + tickSize 6 + tickPadding 4 + dy. */
+export const DEFAULT_CHART_PADDING = {
+  top: 24,
+  right: 24,
+  bottom: 52,
+  left: 52
+} as const
+
+export function scaleContainsValue(scale: ChartScale, value: ChartScaleValue): boolean {
+  if (scale.type === 'linear') {
+    const numeric = typeof value === 'number' ? value : Number(value)
+    return Number.isFinite(numeric)
+  }
+  return scale.domain.some((item) => String(item) === String(value))
+}
+
 export function normalizeChartPadding(padding?: ChartPadding): {
   top: number
   right: number

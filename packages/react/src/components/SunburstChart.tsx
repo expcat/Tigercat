@@ -8,6 +8,7 @@ import {
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartPadding,
@@ -97,6 +98,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     tooltipPosition,
     resolvedHoveredIndex,
     activeIndex,
+    resolvedSelectedIndex,
     handleMouseEnter,
     handleMouseMove,
     handleMouseLeave,
@@ -116,9 +118,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     legendPosition,
     getData: (index: number) => {
       const arc = arcs[index]
-      return arc
-        ? ({ label: arc.label, value: arc.value } as SunburstChartDatum)
-        : ({} as SunburstChartDatum)
+      return arc ? ({ label: arc.label, value: arc.value } as SunburstChartDatum) : undefined
     },
     onHoveredIndexChange: (index) => {
       onHoveredIndexChange?.(index)
@@ -129,7 +129,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       )
     },
     onSelectedIndexChange,
-    callbacks: { onClick: onArcClick }
+    onClick: onArcClick
   })
 
   const rootArcs = useMemo(() => arcs.filter((a) => a.depth === 0), [arcs])
@@ -140,10 +140,11 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
         data: rootArcs,
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (d) => d.label,
         getColor: (d) => d.color
       }),
-    [rootArcs, palette, activeIndex]
+    [rootArcs, palette, activeIndex, resolvedSelectedIndex]
   )
 
   const tooltipContent = useMemo(
@@ -257,7 +258,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       {chart}
       <ChartLegend
         items={legendItems}
-        position={legendPosition}
+        orientation={chartLegendOrientationFromPosition(legendPosition)}
         markerSize={legendMarkerSize}
         gap={legendGap}
         interactive={interactive}

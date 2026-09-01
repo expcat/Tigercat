@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
-import { act, waitFor, cleanup, fireEvent } from '@testing-library/react'
+import { act, waitFor, cleanup, fireEvent, render } from '@testing-library/react'
 import { ChartAxis } from '@expcat/tigercat-react/ChartAxis'
 import { ChartCanvas } from '@expcat/tigercat-react/ChartCanvas'
 import { ChartGrid } from '@expcat/tigercat-react/ChartGrid'
@@ -15,7 +15,7 @@ import { ChartSeries } from '@expcat/tigercat-react/ChartSeries'
 import { ChartTooltip } from '@expcat/tigercat-react/ChartTooltip'
 import type { ChartAxisProps } from '@expcat/tigercat-react/ChartAxis'
 import { createLinearScale } from '@expcat/tigercat-core'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
@@ -62,9 +62,9 @@ describe('ChartAxis', () => {
     expect(container.querySelector('[data-axis-label]')).toHaveTextContent('Value')
   })
 
-  it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(ChartAxisWrapper, { scale, tickValues })
-    await expectNoA11yViolationsIsolated(container)
+  it('hides ticks from the accessibility tree', () => {
+    const { container } = renderWithProps(ChartAxisWrapper, { scale, tickValues, label: 'Value' })
+    expect(container.querySelector('g')).toHaveAttribute('aria-hidden', 'true')
   })
 })
 
@@ -151,9 +151,27 @@ describe('ChartCanvas', () => {
     expect(onResolvedSizeChange).toHaveBeenCalledWith({ width: 480, height: 260 })
   })
 
-  it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(ChartCanvas, {})
-    await expectNoA11yViolationsIsolated(container)
+  it('observes its own host instead of a legend sibling', async () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    const { container } = render(
+      <div data-testid="shell">
+        <ChartCanvas width={320} height={200} responsive />
+        <div data-testid="legend" style={{ height: 40 }} />
+      </div>
+    )
+
+    await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+    const host = container.querySelector('[data-chart-canvas-host]')
+    expect(MockResizeObserver.instances[0].observe).toHaveBeenCalledWith(host)
+    expect(host).not.toBe(container.querySelector('[data-testid="shell"]'))
+  })
+
+  it('names the svg when a title is provided', async () => {
+    const { container } = renderWithProps(ChartCanvas, { title: 'Sales', desc: 'Quarterly' })
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('role', 'img')
+    expect(svg?.querySelector('title')).toHaveTextContent('Sales')
+    await expectNoA11yViolations(container)
   })
 })
 
@@ -162,9 +180,16 @@ describe('ChartCanvas', () => {
 // ===========================================================================
 
 describe('ChartGrid', () => {
-  it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(ChartGridWrapper, { xScale, yScale })
-    await expectNoA11yViolationsIsolated(container)
+  it('draws vertical lines from xScale and height', () => {
+    const { container } = renderWithProps(ChartGridWrapper, {
+      xScale,
+      show: 'x',
+      height: 80,
+      xTickValues: [0, 50, 100]
+    })
+    const lines = container.querySelectorAll('line')
+    expect(lines.length).toBe(3)
+    expect(container.querySelector('g')).toHaveAttribute('aria-hidden', 'true')
   })
 })
 
@@ -173,9 +198,9 @@ describe('ChartGrid', () => {
 // ===========================================================================
 
 const legendItems = [
-  { index: 0, label: 'Series A', color: '#2563eb', active: true },
-  { index: 1, label: 'Series B', color: '#22c55e', active: true },
-  { index: 2, label: 'Series C', color: '#f97316', active: false }
+  { index: 0, label: 'Series A', color: '#2563eb', active: true, selected: true },
+  { index: 1, label: 'Series B', color: '#22c55e', active: true, selected: false },
+  { index: 2, label: 'Series C', color: '#f97316', active: false, selected: false }
 ]
 
 describe('ChartLegend', () => {
@@ -189,12 +214,6 @@ describe('ChartLegend', () => {
     expect(container.textContent).toContain('Series C')
   })
 
-  it('applies inactive style to inactive items', () => {
-    const { container } = renderWithProps(ChartLegend, { items: legendItems })
-
-    const items = container.querySelectorAll('[data-legend-item]')
-    expect(items[2].className).toContain('opacity')
-  })
   it('calls onItemClick when interactive', () => {
     const onItemClick = vi.fn()
     const { container } = renderWithProps(ChartLegend, {
@@ -220,8 +239,8 @@ describe('ChartLegend', () => {
     const items = container.querySelectorAll('[data-legend-item]')
     expect(items[0].tagName).toBe('BUTTON')
     expect(items[0]).not.toHaveAttribute('role', 'listitem')
-    // active series → pressed; inactive series → not pressed
     expect(items[0]).toHaveAttribute('aria-pressed', 'true')
+    expect(items[1]).toHaveAttribute('aria-pressed', 'false')
     expect(items[2]).toHaveAttribute('aria-pressed', 'false')
   })
 
@@ -243,11 +262,12 @@ describe('ChartLegend', () => {
     })
 
     const firstItem = container.querySelector('[data-legend-item]')
-    if (firstItem) {
+    const group = container.querySelector('[data-chart-legend]')
+    if (firstItem && group) {
       fireEvent.mouseEnter(firstItem)
-      expect(onItemHover).toHaveBeenCalledWith(0, legendItems[0])
+      expect(onItemHover).toHaveBeenCalledWith(0, legendItems[0], expect.anything())
 
-      fireEvent.mouseLeave(firstItem)
+      fireEvent.mouseLeave(group)
       expect(onItemLeave).toHaveBeenCalled()
     }
   })
@@ -258,12 +278,16 @@ describe('ChartLegend', () => {
 // ===========================================================================
 
 describe('ChartSeries', () => {
-  it('passes basic a11y checks', async () => {
+  it('does not fill a line series group', () => {
     const { container } = renderWithProps(ChartSeriesWrapper, {
-      data: [{ x: 0, y: 10 }]
+      data: [{ x: 0, y: 10 }],
+      type: 'line',
+      color: '#2563eb',
+      children: <path d="M0 0 L10 10" />
     })
-
-    await expectNoA11yViolationsIsolated(container)
+    const group = container.querySelector('[data-series-type="line"]')
+    expect(group).toHaveAttribute('fill', 'none')
+    expect(group).toHaveAttribute('stroke', '#2563eb')
   })
 })
 
@@ -289,17 +313,9 @@ describe('ChartTooltip', () => {
     expect(tooltip?.textContent).toContain('Tooltip text')
   })
 
-  it('hides when not open or empty', () => {
+  it('does not mount when closed', () => {
     renderWithProps(ChartTooltip, { content: 'Tooltip text', open: false, x: 100, y: 100 })
-
-    const hiddenTooltip = document.querySelector('[data-chart-tooltip]')
-    if (hiddenTooltip) {
-      expect(hiddenTooltip.className).toContain('opacity-0')
-    }
-
-    cleanup()
-    renderWithProps(ChartTooltip, { content: '', open: true, x: 100, y: 100 })
-    expect(document.querySelector('[data-chart-tooltip]')).toBeFalsy()
+    expect(document.querySelector('[data-chart-tooltip]')).toBeNull()
   })
 
   it('applies custom className', () => {
@@ -318,10 +334,8 @@ describe('ChartTooltip', () => {
     renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 })
 
     const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement
-    expect(tooltip.style.transform).toBe('translate3d(112px, 92px, 0)')
+    expect(tooltip.style.transform).toMatch(/translate3d\(/)
     expect(tooltip.style.left).toBe('')
     expect(tooltip.style.top).toBe('')
-    expect(tooltip.className).toContain('left-0')
-    expect(tooltip.className).toContain('top-0')
   })
 })

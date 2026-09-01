@@ -12,6 +12,7 @@ import { defaultTheme } from './themes/default/theme'
 import { modernTheme } from './themes/modern/theme'
 import { resolvePresetThemeConfig, themeConfigToCssVars } from './themes/manager'
 import { alertCountdownBaseStyles } from './utils/alert-utils'
+import { cartesianChartAnimationBaseStyles } from './utils/chart/color'
 import { loadingAnimationBaseStyles } from './utils/loading-utils'
 
 function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {
@@ -69,7 +70,8 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
     '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
       MODERN_OVERRIDE_TOKENS_DARK,
     ...alertCountdownBaseStyles,
-    ...loadingAnimationBaseStyles
+    ...loadingAnimationBaseStyles,
+    ...cartesianChartAnimationBaseStyles
   })
 })
 
@@ -121,7 +123,10 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
         ...(modern ? MODERN_OVERRIDE_TOKENS_DARK : {})
       },
       ...tigercatDirectionBase,
-      ...tigercatReducedMotionBase
+      ...tigercatReducedMotionBase,
+      ...alertCountdownBaseStyles,
+      ...loadingAnimationBaseStyles,
+      ...cartesianChartAnimationBaseStyles
     })
 
     // Always emit the attribute layer so existing `data-tiger-style="modern"`

@@ -1,20 +1,29 @@
 import React, { useId, useMemo } from 'react'
 import {
   classNames,
-  clampBarWidth,
   createBandScale,
   createLinearScale,
-  ensureBarMinHeight,
   getStableChartGradientPrefix,
   getBarValueLabelY,
-  getChartElementOpacity,
   getNumberExtent,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
+  DEFAULT_CHART_PADDING,
   resolveChartTooltipContent,
   defaultXYTooltipFormatter,
   barValueLabelClasses,
   barValueLabelInsideClasses,
+  barInteractiveClasses,
+  BAR_ANIMATED_CLASS,
+  layoutBarRects,
+  resolveBarCornerRadius,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
   type BarChartDatum,
   type BarChartProps as CoreBarChartProps,
   type ChartLegendItem,
@@ -29,6 +38,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface BarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -41,20 +51,16 @@ export interface BarChartProps extends CoreBarChartProps {
   onBarHover?: (index: number | null, datum: BarChartDatum | null) => void
 }
 
-// Asymmetric default padding leaves room for the left y-axis tick labels
-// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
-const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 } as const
-
 export const BarChart: React.FC<BarChartProps> = ({
   width = 320,
   height = 200,
-  padding = DEFAULT_CARTESIAN_PADDING,
+  padding = DEFAULT_CHART_PADDING,
   responsive = false,
   data,
   xScale,
   yScale,
   barColor = 'var(--tiger-primary,#2563eb)',
-  barRadius = 4,
+  barRadius,
   barPaddingInner = 0.2,
   barPaddingOuter = 0.1,
   showGrid = true,
@@ -100,17 +106,20 @@ export const BarChart: React.FC<BarChartProps> = ({
   onBarClick,
   onBarHover
 }) => {
-  // Unique gradient prefix for this instance
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
   const gradientId = useId()
   const gradientPrefix = useMemo(
     () => getStableChartGradientPrefix('bar', gradientId),
     [gradientId]
   )
+  const interactive = hoverable || selectable || Boolean(onBarClick)
+  const corner = resolveBarCornerRadius(barRadius)
 
-  // Use shared interaction hook
   const {
     tooltipPosition,
     resolvedHoveredIndex,
+    resolvedSelectedIndex,
     activeIndex,
     handleMouseEnter,
     handleMouseMove,
@@ -119,8 +128,7 @@ export const BarChart: React.FC<BarChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<BarChartDatum>({
     hoverable,
     showTooltip,
@@ -136,9 +144,7 @@ export const BarChart: React.FC<BarChartProps> = ({
       onBarHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    callbacks: {
-      onClick: onBarClick
-    }
+    onClick: onBarClick
   })
 
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
@@ -148,7 +154,10 @@ export const BarChart: React.FC<BarChartProps> = ({
     responsive
   )
   const xDomain = useMemo(() => data.map((item) => String(item.x)), [data])
-  const yValues = useMemo(() => data.map((item) => item.y), [data])
+  const yValues = useMemo(
+    () => data.map((item) => item.y).filter((value) => Number.isFinite(value)),
+    [data]
+  )
 
   const resolvedXScale = useMemo(() => {
     if (xScale) return xScale
@@ -166,59 +175,30 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   const palette = useMemo(() => resolveChartPalette(colors, barColor), [colors, barColor])
 
-  const bars = useMemo(() => {
-    const scale = resolvedXScale
-    const rawBandWidth =
-      scale.bandwidth ??
-      (scale.step ? scale.step * 0.7 : (innerRect.width / Math.max(1, data.length)) * 0.8)
-    const bandWidth = clampBarWidth(rawBandWidth, barMaxWidth)
-    const bandOffset = rawBandWidth > bandWidth ? (rawBandWidth - bandWidth) / 2 : 0
-    const baseline = resolvedYScale.map(0)
-
-    return data.map((item, index) => {
-      const xKey = scale.type === 'linear' ? Number(item.x) : String(item.x)
-      const xPos = scale.map(xKey)
-      const barX = (scale.bandwidth ? xPos : xPos - rawBandWidth / 2) + bandOffset
-      const barYValue = resolvedYScale.map(item.y)
-      let barHeight = Math.abs(baseline - barYValue)
-      let barY = Math.min(baseline, barYValue)
-
-      // Apply minimum height constraint
-      if (barMinHeight > 0 && barHeight > 0) {
-        const clamped = ensureBarMinHeight(barY, barHeight, baseline, barMinHeight)
-        barY = clamped.y
-        barHeight = clamped.height
-      }
-
-      const color = item.color ?? palette[index % palette.length]
-      const opacity = getChartElementOpacity(index, activeIndex, {
+  const bars = useMemo(
+    () =>
+      layoutBarRects(data, resolvedXScale, resolvedYScale, {
+        barMaxWidth,
+        barMinHeight,
+        palette,
+        activeIndex,
         activeOpacity,
-        inactiveOpacity
-      })
-
-      return {
-        x: barX,
-        y: barY,
-        width: bandWidth,
-        height: barHeight,
-        color,
-        opacity,
-        datum: item,
-        index
-      }
-    })
-  }, [
-    resolvedXScale,
-    resolvedYScale,
-    data,
-    innerRect.width,
-    palette,
-    activeIndex,
-    activeOpacity,
-    inactiveOpacity,
-    barMinHeight,
-    barMaxWidth
-  ])
+        inactiveOpacity,
+        innerWidth: innerRect.width
+      }),
+    [
+      resolvedXScale,
+      resolvedYScale,
+      data,
+      innerRect.width,
+      palette,
+      activeIndex,
+      activeOpacity,
+      inactiveOpacity,
+      barMinHeight,
+      barMaxWidth
+    ]
+  )
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
@@ -226,10 +206,11 @@ export const BarChart: React.FC<BarChartProps> = ({
         data,
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? String(d.x))),
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [data, legendFormatter, palette, activeIndex]
+    [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex]
   )
 
   const tooltipContent = useMemo(
@@ -245,6 +226,22 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
+  const visualActive = bars.findIndex((bar) => bar.index === (activeIndex ?? resolvedHoveredIndex))
+
+  const handleBarKeyDown = (event: React.KeyboardEvent<SVGRectElement>, visualIndex: number) => {
+    if (isChartNavigationKey(event.key)) {
+      event.preventDefault()
+      const nextVisual = nextChartRovingIndex(visualIndex, event.key, bars.length)
+      const next = bars[nextVisual]
+      const node = event.currentTarget.parentElement?.querySelector(
+        `[data-bar-index="${next.index}"]`
+      )
+      if (node instanceof SVGElement) node.focus()
+      handleMouseEnter(next.index, event)
+      return
+    }
+    handleKeyDown(event, bars[visualIndex].index)
+  }
 
   const chart = (
     <ChartCanvas
@@ -254,7 +251,6 @@ export const BarChart: React.FC<BarChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}
       onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>
@@ -307,42 +303,47 @@ export const BarChart: React.FC<BarChartProps> = ({
         />
       )}
       <ChartSeries data={data} type="bar">
-        {bars.map((bar) => (
+        {bars.map((bar, visualIndex) => (
           <rect
             key={`bar-${bar.index}`}
             x={bar.x}
             y={bar.y}
             width={bar.width}
             height={bar.height}
-            rx={barRadius}
-            ry={barRadius}
+            rx={corner.rx}
+            ry={corner.ry}
             fill={gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color}
             opacity={bar.opacity}
             className={classNames(
-              'transition-[opacity,filter] [transition-duration:var(--tiger-motion-duration-base,200ms)] [transition-timing-function:var(--tiger-motion-ease-decelerate,ease-out)]',
-              (hoverable || selectable) && 'cursor-pointer hover:brightness-110'
+              animated && BAR_ANIMATED_CLASS,
+              interactive && barInteractiveClasses
             )}
             style={
-              {
-                rx: `var(--tiger-chart-bar-radius, ${barRadius}px)`,
-                ry: `var(--tiger-chart-bar-radius, ${barRadius}px)`,
-                ...(animated
-                  ? {
-                      transition:
-                        'y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out)'
-                    }
-                  : null)
-              } as React.CSSProperties
+              corner.style
+                ? ({
+                    rx: 'var(--tiger-chart-bar-radius, 4px)',
+                    ry: 'var(--tiger-chart-bar-radius, 4px)'
+                  } as React.CSSProperties)
+                : undefined
             }
-            tabIndex={selectable ? 0 : undefined}
-            role={selectable ? 'button' : 'img'}
-            aria-label={bar.datum.label ?? String(bar.datum.x)}
+            tabIndex={
+              interactive
+                ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                : undefined
+            }
+            role={interactive ? 'button' : undefined}
+            aria-hidden={interactive ? undefined : true}
+            aria-label={
+              interactive
+                ? (bar.datum.label ?? defaultXYTooltipFormatter(bar.datum, bar.index))
+                : undefined
+            }
             data-bar-index={bar.index}
             onMouseEnter={(e) => handleMouseEnter(bar.index, e)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleClick(bar.index)}
-            onKeyDown={(e) => handleKeyDown(e, bar.index)}
+            onKeyDown={(e) => handleBarKeyDown(e, visualIndex)}
           />
         ))}
       </ChartSeries>
@@ -351,7 +352,9 @@ export const BarChart: React.FC<BarChartProps> = ({
           const labelText = valueLabelFormatter
             ? valueLabelFormatter(bar.datum, bar.index)
             : String(bar.datum.y)
-          const labelY = getBarValueLabelY(bar.y, bar.height, valueLabelPosition, 8)
+          const labelY = getBarValueLabelY(bar.y, bar.height, valueLabelPosition, 8, {
+            negative: bar.negative
+          })
           const isInside = valueLabelPosition === 'inside'
           return (
             <text
@@ -359,7 +362,7 @@ export const BarChart: React.FC<BarChartProps> = ({
               x={bar.x + bar.width / 2}
               y={labelY}
               textAnchor="middle"
-              dominantBaseline={isInside ? 'central' : 'auto'}
+              dominantBaseline={isInside ? 'central' : bar.negative ? 'hanging' : 'auto'}
               className={isInside ? barValueLabelInsideClasses : barValueLabelClasses}
               opacity={bar.opacity}
               data-value-label="">
@@ -379,28 +382,28 @@ export const BarChart: React.FC<BarChartProps> = ({
     />
   )
 
-  if (!showLegend) {
-    return (
-      <div className={classNames('relative', responsive ? 'block w-full min-w-0' : 'inline-block')}>
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
-
   return (
-    <div className={classNames(wrapperClasses, responsive && 'w-full min-w-0')}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        position={legendPosition}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={hoverable || selectable}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={hoverable || selectable}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )

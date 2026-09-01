@@ -1,100 +1,54 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  classNames,
   createChartPointerMoveScheduler,
   getChartElementOpacity,
-  type ChartLegendItem,
+  getChartLegendShellClasses,
+  isChartActivationKey,
+  nextChartSelectedIndex,
+  resolveChartActiveIndex,
+  resolveChartIndex,
+  shouldTrackChartPointer,
+  tooltipPositionFromEvent,
   type ChartLegendPosition,
   type ChartPointerMoveScheduler
 } from '@expcat/tigercat-core'
 
-/**
- * Options for useChartInteraction hook
- */
 export interface UseChartInteractionOptions<T = unknown> {
-  /** Enable hover highlight */
   hoverable: boolean
-  /**
-   * Track hover for ChartTooltip without requiring highlight.
-   * Default true. Independent of `hoverable`.
-   */
   showTooltip?: boolean
-  /** Controlled hovered index from props */
   hoveredIndexProp?: number | null
-  /** Enable click selection */
   selectable: boolean
-  /** Controlled selected index from props */
   selectedIndexProp?: number | null
-  /** Opacity for active element */
   activeOpacity: number
-  /** Opacity for inactive elements */
   inactiveOpacity: number
-  /** Legend position for wrapper classes */
   legendPosition?: ChartLegendPosition
-  /** Callback when hover changes */
   onHoveredIndexChange?: (index: number | null) => void
-  /** Callback when selection changes */
   onSelectedIndexChange?: (index: number | null) => void
-  /** Get data item by index */
   getData?: (index: number) => T | undefined
-  /** Custom callbacks */
-  callbacks?: {
-    onHover?: (index: number | null, datum: T | null) => void
-    onClick?: (index: number, datum: T) => void
-  }
+  onHover?: (index: number | null, datum: T | null) => void
+  onClick?: (index: number, datum: T | undefined) => void
 }
 
-/**
- * Return type for useChartInteraction
- */
-export interface UseChartInteractionReturn {
-  /** Local hovered index state */
-  localHoveredIndex: number | null
-  /** Local selected index state */
-  localSelectedIndex: number | null
-  /** Tooltip position state */
+export interface UseChartInteractionReturn<T = unknown> {
   tooltipPosition: { x: number; y: number }
-  /** Resolved hovered index (controlled or uncontrolled) */
   resolvedHoveredIndex: number | null
-  /** Resolved selected index (controlled or uncontrolled) */
   resolvedSelectedIndex: number | null
-  /** Current active index for highlighting */
   activeIndex: number | null
-  /** Get element opacity based on active state */
   getElementOpacity: (index: number) => number | undefined
-  /** Handle mouse enter on chart element */
-  handleMouseEnter: (index: number, event: React.MouseEvent) => void
-  /** Handle mouse move for tooltip */
+  handleMouseEnter: (index: number, event: React.MouseEvent | React.FocusEvent) => void
   handleMouseMove: (event: React.MouseEvent) => void
-  /** Handle mouse leave */
   handleMouseLeave: () => void
-  /** Handle click on chart element */
   handleClick: (index: number) => void
-  /** Handle keydown for accessibility */
   handleKeyDown: (event: React.KeyboardEvent, index: number) => void
-  /** Handle legend item click */
   handleLegendClick: (index: number) => void
-  /** Handle legend item hover */
-  handleLegendHover: (index: number) => void
-  /** Handle legend item leave */
+  handleLegendHover: (index: number, _item?: unknown, event?: React.SyntheticEvent) => void
   handleLegendLeave: () => void
-  /** Wrapper classes for legend layout */
   wrapperClasses: string
-  /** Create legend items from data */
-  createLegendItems: (
-    items: Array<{ label?: string; color?: string; x?: unknown }>,
-    palette: string[],
-    labelFormatter?: (item: unknown, index: number) => string
-  ) => ChartLegendItem[]
 }
 
-/**
- * Hook for chart interaction state and handlers
- * Extracts common interaction logic from high-level chart components
- */
 export function useChartInteraction<T = unknown>(
   options: UseChartInteractionOptions<T>
-): UseChartInteractionReturn {
+): UseChartInteractionReturn<T> {
   const {
     hoverable,
     showTooltip = true,
@@ -107,40 +61,30 @@ export function useChartInteraction<T = unknown>(
     onHoveredIndexChange,
     onSelectedIndexChange,
     getData,
-    callbacks
+    onHover,
+    onClick
   } = options
 
-  // Local state
   const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
   const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
-  const tooltipSchedulerRef = useRef<ChartPointerMoveScheduler | null>(null)
-
-  if (tooltipSchedulerRef.current === null) {
-    tooltipSchedulerRef.current = createChartPointerMoveScheduler({
+  const [tooltipScheduler] = useState<ChartPointerMoveScheduler>(() =>
+    createChartPointerMoveScheduler({
       onPositionChange: setTooltipPosition
     })
-  }
-
-  const tooltipScheduler = tooltipSchedulerRef.current
+  )
 
   useEffect(() => {
     return () => tooltipScheduler.cancel()
   }, [tooltipScheduler])
 
-  // Resolved indices (controlled vs uncontrolled)
-  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
-  const resolvedSelectedIndex =
-    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
+  const resolvedHoveredIndex = resolveChartIndex(hoveredIndexProp, localHoveredIndex)
+  const resolvedSelectedIndex = resolveChartIndex(selectedIndexProp, localSelectedIndex)
+  const activeIndex = useMemo(
+    () => resolveChartActiveIndex(resolvedSelectedIndex, resolvedHoveredIndex, hoverable),
+    [resolvedSelectedIndex, resolvedHoveredIndex, hoverable]
+  )
 
-  // Active index for highlighting
-  const activeIndex = useMemo(() => {
-    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
-    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
-    return null
-  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
-
-  // Get element opacity
   const getElementOpacity = useCallback(
     (index: number): number | undefined => {
       return getChartElementOpacity(index, activeIndex, {
@@ -151,75 +95,65 @@ export function useChartInteraction<T = unknown>(
     [activeIndex, activeOpacity, inactiveOpacity]
   )
 
-  // Event handlers
-  const handleMouseEnter = useCallback(
-    (index: number, event: React.MouseEvent) => {
-      if (!hoverable && !showTooltip) return
+  const applyHover = useCallback(
+    (index: number | null, position?: { x: number; y: number }) => {
+      if (!shouldTrackChartPointer(hoverable, showTooltip)) return
       if (hoveredIndexProp === undefined) {
         setLocalHoveredIndex(index)
       }
-      setTooltipPosition({ x: event.clientX, y: event.clientY })
+      if (position) setTooltipPosition(position)
       if (!hoverable) return
       onHoveredIndexChange?.(index)
-      if (callbacks?.onHover && getData) {
-        callbacks.onHover(index, getData(index) ?? null)
-      }
+      onHover?.(index, index !== null ? (getData?.(index) ?? null) : null)
     },
-    [hoverable, showTooltip, hoveredIndexProp, onHoveredIndexChange, callbacks, getData]
+    [hoverable, showTooltip, hoveredIndexProp, onHoveredIndexChange, onHover, getData]
+  )
+
+  const handleMouseEnter = useCallback(
+    (index: number, event: React.MouseEvent | React.FocusEvent) => {
+      applyHover(index, tooltipPositionFromEvent(event))
+    },
+    [applyHover]
   )
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {
+      if (!shouldTrackChartPointer(hoverable, showTooltip)) return
       tooltipScheduler.schedule({ x: event.clientX, y: event.clientY })
     },
-    [tooltipScheduler]
+    [hoverable, showTooltip, tooltipScheduler]
   )
 
   const handleMouseLeave = useCallback(() => {
     tooltipScheduler.cancel()
-    if (!hoverable && !showTooltip) return
-    if (hoveredIndexProp === undefined) {
-      setLocalHoveredIndex(null)
-    }
-    if (!hoverable) return
-    onHoveredIndexChange?.(null)
-    callbacks?.onHover?.(null, null)
-  }, [hoverable, showTooltip, tooltipScheduler, hoveredIndexProp, onHoveredIndexChange, callbacks])
+    applyHover(null)
+  }, [tooltipScheduler, applyHover])
 
   const handleClick = useCallback(
     (index: number) => {
+      onClick?.(index, getData?.(index))
       if (!selectable) return
-      const nextIndex = resolvedSelectedIndex === index ? null : index
+      const nextIndex = nextChartSelectedIndex(resolvedSelectedIndex, index)
       if (selectedIndexProp === undefined) {
         setLocalSelectedIndex(nextIndex)
       }
       onSelectedIndexChange?.(nextIndex)
-      if (callbacks?.onClick && getData) {
-        const datum = getData(index)
-        if (datum) callbacks.onClick(index, datum)
-      }
     },
-    [
-      selectable,
-      resolvedSelectedIndex,
-      selectedIndexProp,
-      onSelectedIndexChange,
-      callbacks,
-      getData
-    ]
+    [selectable, resolvedSelectedIndex, selectedIndexProp, onSelectedIndexChange, onClick, getData]
   )
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, index: number) => {
-      if (!selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
+      if (!isChartActivationKey(event.key)) return
       event.preventDefault()
+      if (shouldTrackChartPointer(hoverable, showTooltip)) {
+        applyHover(index, tooltipPositionFromEvent(event))
+      }
       handleClick(index)
     },
-    [selectable, handleClick]
+    [hoverable, showTooltip, applyHover, handleClick]
   )
 
-  // Legend handlers
   const handleLegendClick = useCallback(
     (index: number) => {
       handleClick(index)
@@ -228,56 +162,19 @@ export function useChartInteraction<T = unknown>(
   )
 
   const handleLegendHover = useCallback(
-    (index: number) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      onHoveredIndexChange?.(index)
+    (index: number, _item?: unknown, event?: React.SyntheticEvent) => {
+      applyHover(index, event ? tooltipPositionFromEvent(event) : undefined)
     },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange]
+    [applyHover]
   )
 
   const handleLegendLeave = useCallback(() => {
     handleMouseLeave()
   }, [handleMouseLeave])
 
-  // Wrapper classes for legend layout
-  const wrapperClasses = useMemo(() => {
-    return classNames(
-      'inline-flex',
-      legendPosition === 'right'
-        ? 'flex-row items-start gap-4'
-        : legendPosition === 'left'
-          ? 'flex-row-reverse items-start gap-4'
-          : legendPosition === 'top'
-            ? 'flex-col-reverse gap-2'
-            : 'flex-col gap-2'
-    )
-  }, [legendPosition])
-
-  // Helper to create legend items
-  const createLegendItems = useCallback(
-    (
-      items: Array<{ label?: string; color?: string; x?: unknown }>,
-      palette: string[],
-      labelFormatter?: (item: unknown, index: number) => string
-    ): ChartLegendItem[] => {
-      return items.map((item, index) => ({
-        index,
-        label: labelFormatter
-          ? labelFormatter(item, index)
-          : (item.label ?? String(item.x ?? index)),
-        color: item.color ?? palette[index % palette.length],
-        active: activeIndex === null || activeIndex === index
-      }))
-    },
-    [activeIndex]
-  )
+  const wrapperClasses = useMemo(() => getChartLegendShellClasses(legendPosition), [legendPosition])
 
   return {
-    localHoveredIndex,
-    localSelectedIndex,
     tooltipPosition,
     resolvedHoveredIndex,
     resolvedSelectedIndex,
@@ -291,7 +188,6 @@ export function useChartInteraction<T = unknown>(
     handleLegendClick,
     handleLegendHover,
     handleLegendLeave,
-    wrapperClasses,
-    createLegendItems
+    wrapperClasses
   }
 }

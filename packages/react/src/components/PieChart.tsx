@@ -14,6 +14,7 @@ import {
   polarToCartesian,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartPadding,
@@ -79,6 +80,7 @@ export const PieChart: React.FC<PieChartProps> = ({
     tooltipPosition,
     resolvedHoveredIndex,
     activeIndex,
+    resolvedSelectedIndex,
     handleMouseEnter,
     handleMouseMove,
     handleMouseLeave,
@@ -103,9 +105,7 @@ export const PieChart: React.FC<PieChartProps> = ({
       onSliceHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    callbacks: {
-      onClick: onSliceClick
-    }
+    onClick: onSliceClick
   })
 
   const innerRect = useMemo(
@@ -157,10 +157,11 @@ export const PieChart: React.FC<PieChartProps> = ({
         data: arcs.map((a) => a.data),
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? `${i + 1}`)),
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [arcs, legendFormatter, palette, activeIndex]
+    [arcs, legendFormatter, palette, activeIndex, resolvedSelectedIndex]
   )
 
   const tooltipContent = useMemo(
@@ -337,7 +338,7 @@ export const PieChart: React.FC<PieChartProps> = ({
       {chart}
       <ChartLegend
         items={legendItems}
-        position={legendPosition}
+        orientation={chartLegendOrientationFromPosition(legendPosition)}
         markerSize={legendMarkerSize}
         gap={legendGap}
         interactive={interactive}

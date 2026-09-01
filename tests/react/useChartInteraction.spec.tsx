@@ -29,10 +29,8 @@ describe('useChartInteraction (React)', () => {
     legendPosition: 'bottom',
     onHoveredIndexChange: callbacks.onHoveredIndexChange,
     onSelectedIndexChange: callbacks.onSelectedIndexChange,
-    callbacks: {
-      onHover: callbacks.onHover,
-      onClick: callbacks.onClick
-    },
+    onHover: callbacks.onHover,
+    onClick: callbacks.onClick,
     getData: (index: number) => mockData[index],
     ...overrides
   })
@@ -46,8 +44,8 @@ describe('useChartInteraction (React)', () => {
     it('should initialize with null indices', () => {
       const { result } = renderHook(() => useChartInteraction(createTestOptions()))
 
-      expect(result.current.localHoveredIndex).toBe(null)
-      expect(result.current.localSelectedIndex).toBe(null)
+      expect(result.current.resolvedHoveredIndex).toBe(null)
+      expect(result.current.resolvedSelectedIndex).toBe(null)
       expect(result.current.activeIndex).toBe(null)
     })
 
@@ -71,7 +69,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleMouseEnter(1, mockEvent)
       })
 
-      expect(result.current.localHoveredIndex).toBe(1)
+      expect(result.current.resolvedHoveredIndex).toBe(1)
       expect(callbacks.onHoveredIndexChange).toHaveBeenCalledWith(1)
       expect(callbacks.onHover).toHaveBeenCalledWith(1, mockData[1])
     })
@@ -155,13 +153,13 @@ describe('useChartInteraction (React)', () => {
         }) as unknown as React.MouseEvent
         result.current.handleMouseEnter(1, mockEvent)
       })
-      expect(result.current.localHoveredIndex).toBe(1)
+      expect(result.current.resolvedHoveredIndex).toBe(1)
 
       act(() => {
         result.current.handleMouseLeave()
       })
 
-      expect(result.current.localHoveredIndex).toBe(null)
+      expect(result.current.resolvedHoveredIndex).toBe(null)
       expect(callbacks.onHoveredIndexChange).toHaveBeenLastCalledWith(null)
       expect(callbacks.onHover).toHaveBeenLastCalledWith(null, null)
     })
@@ -180,7 +178,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleMouseEnter(1, mockEvent)
       })
 
-      expect(result.current.localHoveredIndex).toBe(1)
+      expect(result.current.resolvedHoveredIndex).toBe(1)
       expect(result.current.tooltipPosition).toEqual({ x: 100, y: 200 })
       expect(result.current.activeIndex).toBe(null)
       expect(callbacks.onHoveredIndexChange).not.toHaveBeenCalled()
@@ -201,7 +199,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleMouseEnter(1, mockEvent)
       })
 
-      expect(result.current.localHoveredIndex).toBe(null)
+      expect(result.current.resolvedHoveredIndex).toBe(null)
       expect(result.current.tooltipPosition).toEqual({ x: 0, y: 0 })
       expect(callbacks.onHoveredIndexChange).not.toHaveBeenCalled()
       expect(callbacks.onHover).not.toHaveBeenCalled()
@@ -228,9 +226,6 @@ describe('useChartInteraction (React)', () => {
         result.current.handleMouseEnter(2, mockEvent)
       })
 
-      // Local state unchanged (controlled mode)
-      expect(result.current.localHoveredIndex).toBe(null)
-      // Resolved uses prop value
       expect(result.current.resolvedHoveredIndex).toBe(0)
       // But callback is called for parent to handle
       expect(callbacks.onHoveredIndexChange).toHaveBeenCalledWith(2)
@@ -250,7 +245,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleClick(1)
       })
 
-      expect(result.current.localSelectedIndex).toBe(1)
+      expect(result.current.resolvedSelectedIndex).toBe(1)
       expect(callbacks.onSelectedIndexChange).toHaveBeenCalledWith(1)
       expect(callbacks.onClick).toHaveBeenCalledWith(1, mockData[1])
     })
@@ -262,16 +257,16 @@ describe('useChartInteraction (React)', () => {
       act(() => {
         result.current.handleClick(1)
       })
-      expect(result.current.localSelectedIndex).toBe(1)
+      expect(result.current.resolvedSelectedIndex).toBe(1)
 
       act(() => {
         result.current.handleClick(1)
       })
-      expect(result.current.localSelectedIndex).toBe(null)
+      expect(result.current.resolvedSelectedIndex).toBe(null)
       expect(callbacks.onSelectedIndexChange).toHaveBeenLastCalledWith(null)
     })
 
-    it('should not update when selectable is false', () => {
+    it('fires click without selecting when selectable is false', () => {
       const callbacks = createMockCallbacks()
       const { result } = renderHook(() =>
         useChartInteraction(createTestOptions(callbacks, { selectable: false }))
@@ -281,8 +276,9 @@ describe('useChartInteraction (React)', () => {
         result.current.handleClick(1)
       })
 
-      expect(result.current.localSelectedIndex).toBe(null)
+      expect(result.current.resolvedSelectedIndex).toBe(null)
       expect(callbacks.onSelectedIndexChange).not.toHaveBeenCalled()
+      expect(callbacks.onClick).toHaveBeenCalledWith(1, mockData[1])
     })
   })
 
@@ -299,7 +295,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleKeyDown(mockEvent, 2)
       })
 
-      expect(result.current.localSelectedIndex).toBe(2)
+      expect(result.current.resolvedSelectedIndex).toBe(2)
     })
 
     it('should select on Space key', () => {
@@ -314,7 +310,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleKeyDown(mockEvent, 1)
       })
 
-      expect(result.current.localSelectedIndex).toBe(1)
+      expect(result.current.resolvedSelectedIndex).toBe(1)
     })
 
     it('should ignore other keys', () => {
@@ -329,7 +325,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleKeyDown(mockEvent, 1)
       })
 
-      expect(result.current.localSelectedIndex).toBe(null)
+      expect(result.current.resolvedSelectedIndex).toBe(null)
     })
   })
 
@@ -342,7 +338,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleLegendClick(2)
       })
 
-      expect(result.current.localSelectedIndex).toBe(2)
+      expect(result.current.resolvedSelectedIndex).toBe(2)
       expect(callbacks.onClick).toHaveBeenCalledWith(2, mockData[2])
     })
 
@@ -354,7 +350,7 @@ describe('useChartInteraction (React)', () => {
         result.current.handleLegendHover(1)
       })
 
-      expect(result.current.localHoveredIndex).toBe(1)
+      expect(result.current.resolvedHoveredIndex).toBe(1)
       expect(callbacks.onHoveredIndexChange).toHaveBeenCalledWith(1)
     })
 
@@ -365,12 +361,12 @@ describe('useChartInteraction (React)', () => {
       act(() => {
         result.current.handleLegendHover(1)
       })
-      expect(result.current.localHoveredIndex).toBe(1)
+      expect(result.current.resolvedHoveredIndex).toBe(1)
 
       act(() => {
         result.current.handleLegendLeave()
       })
-      expect(result.current.localHoveredIndex).toBe(null)
+      expect(result.current.resolvedHoveredIndex).toBe(null)
     })
   })
 
@@ -444,94 +440,6 @@ describe('useChartInteraction (React)', () => {
       expect(result.current.wrapperClasses).toContain('flex-row-reverse')
       expect(result.current.wrapperClasses).toContain('items-start')
       expect(result.current.wrapperClasses).toContain('gap-4')
-    })
-  })
-
-  describe('createLegendItems', () => {
-    it('should create legend items from data', () => {
-      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
-
-      const items = [
-        { label: 'Series A', color: '#ff0000' },
-        { label: 'Series B', color: '#00ff00' },
-        { label: 'Series C' }
-      ]
-      const palette = ['#0000ff', '#ffff00', '#ff00ff']
-
-      const legendItems = result.current.createLegendItems(items, palette)
-
-      expect(legendItems).toHaveLength(3)
-      expect(legendItems[0]).toEqual({
-        index: 0,
-        label: 'Series A',
-        color: '#ff0000',
-        active: true
-      })
-      expect(legendItems[1]).toEqual({
-        index: 1,
-        label: 'Series B',
-        color: '#00ff00',
-        active: true
-      })
-      expect(legendItems[2]).toEqual({
-        index: 2,
-        label: 'Series C',
-        color: '#ff00ff', // Falls back to palette
-        active: true
-      })
-    })
-
-    it('should mark inactive items when there is an active index', () => {
-      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
-
-      // Select index 1
-      act(() => {
-        result.current.handleClick(1)
-      })
-
-      const items = [{ label: 'A' }, { label: 'B' }, { label: 'C' }]
-      const palette = ['#f00', '#0f0', '#00f']
-
-      const legendItems = result.current.createLegendItems(items, palette)
-
-      expect(legendItems[0].active).toBe(false)
-      expect(legendItems[1].active).toBe(true)
-      expect(legendItems[2].active).toBe(false)
-    })
-
-    it('should support custom label formatter', () => {
-      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
-
-      const items = [{ x: 'Mon' }, { x: 'Tue' }, { x: 'Wed' }]
-      const palette = ['#f00', '#0f0', '#00f']
-      const formatter = (item: unknown, index: number) =>
-        `Day ${index + 1}: ${(item as { x: string }).x}`
-
-      const legendItems = result.current.createLegendItems(items, palette, formatter)
-
-      expect(legendItems[0].label).toBe('Day 1: Mon')
-      expect(legendItems[1].label).toBe('Day 2: Tue')
-      expect(legendItems[2].label).toBe('Day 3: Wed')
-    })
-
-    it('should fallback to x property or index for label', () => {
-      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
-
-      const items = [{ x: 'Monday' }, { label: 'Custom' }, {}]
-      const palette = ['#f00', '#0f0', '#00f']
-
-      const legendItems = result.current.createLegendItems(items, palette)
-
-      expect(legendItems[0].label).toBe('Monday')
-      expect(legendItems[1].label).toBe('Custom')
-      expect(legendItems[2].label).toBe('2') // Falls back to index
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
-      expect(result.current.createLegendItems([], [])).toEqual([])
     })
   })
 })

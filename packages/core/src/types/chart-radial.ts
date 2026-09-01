@@ -6,7 +6,7 @@ import type {
   BaseChartProps,
   ChartGridLineStyle,
   ChartInteractionProps,
-  ChartLegendProps,
+  ChartLegendToggleProps,
   ChartSeriesPoint,
   ChartBuiltInTooltipProps
 } from './chart-core'
@@ -18,7 +18,7 @@ export interface PieChartDatum extends ChartSeriesPoint {
 }
 
 export interface PieChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
    * Chart data
    */
@@ -220,7 +220,7 @@ export interface RadarChartSeries {
 }
 
 export interface RadarChartProps
-  extends BaseChartProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends BaseChartProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
    * Chart data (single series)
    */

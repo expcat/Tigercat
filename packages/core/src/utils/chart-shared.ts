@@ -2,7 +2,13 @@
  * Shared chart helpers — palette, legend, tooltip, series normalisation.
  */
 
-import type { ChartLegendItem, ChartScaleValue } from '../types/chart'
+import type {
+  ChartLegendItem,
+  ChartLegendPosition,
+  ChartLegendOrientation,
+  ChartScaleValue
+} from '../types/chart'
+import { classNames } from './class-names'
 import { DEFAULT_CHART_COLORS } from './chart-utils'
 
 export interface BuildChartSeriesKeysOptions<T> {
@@ -72,20 +78,61 @@ export interface BuildLegendItemsOptions<T> {
   data: T[]
   palette: string[]
   activeIndex: number | null
+  selectedIndex?: number | null
   getLabel: (datum: T, index: number) => string
   getColor?: (datum: T, index: number) => string
 }
 
 /** Build `ChartLegendItem[]` from data/series array. */
 export function buildChartLegendItems<T>(options: BuildLegendItemsOptions<T>): ChartLegendItem[] {
-  const { data, palette, activeIndex, getLabel, getColor } = options
+  const { data, palette, activeIndex, selectedIndex = null, getLabel, getColor } = options
 
   return data.map((datum, index) => ({
     index,
     label: getLabel(datum, index),
     color: getColor ? getColor(datum, index) : palette[index % palette.length],
-    active: activeIndex === null || activeIndex === index
+    active: activeIndex === null || activeIndex === index,
+    selected: selectedIndex !== null && selectedIndex === index
   }))
+}
+
+export function chartLegendOrientationFromPosition(
+  position: ChartLegendPosition
+): ChartLegendOrientation {
+  return position === 'left' || position === 'right' ? 'vertical' : 'horizontal'
+}
+
+export function getChartLegendShellClasses(position: ChartLegendPosition = 'bottom'): string {
+  return classNames(
+    'inline-flex',
+    position === 'right'
+      ? 'flex-row items-start gap-4'
+      : position === 'left'
+        ? 'flex-row-reverse items-start gap-4'
+        : position === 'top'
+          ? 'flex-col-reverse gap-2'
+          : 'flex-col gap-2'
+  )
+}
+
+export function getCartesianChartShellClasses(options: {
+  showLegend: boolean
+  legendPosition?: ChartLegendPosition
+  responsive?: boolean
+  className?: string
+}): string {
+  if (!options.showLegend) {
+    return classNames(
+      'relative',
+      options.responsive ? 'block w-full min-w-0' : 'inline-block',
+      options.className
+    )
+  }
+  return classNames(
+    getChartLegendShellClasses(options.legendPosition),
+    options.responsive && 'w-full min-w-0',
+    options.className
+  )
 }
 
 /** Resolve tooltip content for single-series charts (Bar, Scatter, Pie). */
@@ -191,6 +238,13 @@ export function downsampleSeriesData<T>(
   return result
 }
 
+function chartDatumX(datum: unknown): unknown {
+  if (typeof datum === 'object' && datum !== null && 'x' in datum) {
+    return (datum as { x?: unknown }).x
+  }
+  return undefined
+}
+
 /** Resolve tooltip content for multi-series charts (Line, Area, Radar). */
 export function resolveMultiSeriesTooltipContent<TDatum, TSeries extends { data: TDatum[] }>(
   hoveredPoint: { seriesIndex: number; pointIndex: number } | null,
@@ -210,8 +264,18 @@ export function resolveMultiSeriesTooltipContent<TDatum, TSeries extends { data:
   const s = series[seriesIndex]
   const datum = s?.data[pointIndex]
   if (!datum) return ''
-  const fmt = formatter ?? defaultFormatter
-  return fmt(datum, seriesIndex, pointIndex, s)
+  if (formatter) return formatter(datum, seriesIndex, pointIndex, s)
+
+  const x = chartDatumX(datum)
+  if (x === undefined) return defaultFormatter(datum, seriesIndex, pointIndex, s)
+
+  const lines: string[] = []
+  series.forEach((item, index) => {
+    const matchIndex = item.data.findIndex((point) => String(chartDatumX(point)) === String(x))
+    if (matchIndex < 0) return
+    lines.push(defaultFormatter(item.data[matchIndex], index, matchIndex, item))
+  })
+  return lines.length > 0 ? lines.join('\n') : defaultFormatter(datum, seriesIndex, pointIndex, s)
 }
 
 /**
@@ -239,14 +303,19 @@ export function defaultXYTooltipFormatter(
   return `${label}: ${datum.y ?? ''}`
 }
 
+export function defaultChartSeriesName(index: number, template = 'Series {index}'): string {
+  return template.replace('{index}', String(index + 1))
+}
+
 /** Default tooltip for multi-series x/y charts (Line, Area). */
 export function defaultSeriesXYTooltipFormatter<TSeries extends { name?: string }>(
   datum: { x?: ChartScaleValue; y?: number; label?: string },
   seriesIndex: number,
   _pointIndex: number,
-  series?: TSeries
+  series?: TSeries,
+  seriesNameTemplate = 'Series {index}'
 ): string {
-  const seriesName = series?.name ?? `Series ${seriesIndex + 1}`
+  const seriesName = series?.name ?? defaultChartSeriesName(seriesIndex, seriesNameTemplate)
   const label = datum.label ?? (datum.x !== undefined ? String(datum.x) : '')
   return `${seriesName} · ${label}: ${datum.y ?? ''}`
 }

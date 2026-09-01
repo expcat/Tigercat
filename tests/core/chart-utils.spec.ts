@@ -8,6 +8,9 @@ import {
   clearChartAxisTickCache,
   clearPieArcCache,
   getChartAxisTicks,
+  getChartAxisGeometry,
+  getChartGridLines,
+  getChartSeriesPaint,
   getChartAxisTickCacheSize,
   getPieArcCacheSize,
   getChartGridLineDasharray,
@@ -242,6 +245,56 @@ describe('chart-utils', () => {
       // Position should be base + bandwidth/2
       const bandwidth = scale.bandwidth!
       expect(ticks[0].position).toBe(scale.map('a') + bandwidth / 2)
+    })
+
+    it('skips point-scale ticks that are not in the domain', () => {
+      const scale = createPointScale(['a', 'b'], [0, 100])
+      const ticks = getChartAxisTicks(scale, { tickValues: ['z'] })
+      expect(ticks).toEqual([])
+    })
+  })
+
+  describe('getChartAxisGeometry', () => {
+    it('returns a bottom axis line and label', () => {
+      const scale = createLinearScale([0, 100], [0, 200])
+      const geometry = getChartAxisGeometry(scale, {
+        orientation: 'bottom',
+        tickValues: [0, 100],
+        label: 'X'
+      })
+      expect(geometry.axisLine).toEqual({ x1: 0, y1: 0, x2: 200, y2: 0 })
+      expect(geometry.ticks).toHaveLength(2)
+      expect(geometry.ticks[0].key).toBe('0-0')
+      expect(geometry.label?.text).toBe('X')
+    })
+  })
+
+  describe('getChartGridLines', () => {
+    it('draws vertical lines from xScale plus an explicit height', () => {
+      const xScale = createLinearScale([0, 100], [0, 200])
+      const lines = getChartGridLines({
+        xScale,
+        show: 'x',
+        height: 80,
+        xTickValues: [0, 50]
+      })
+      expect(lines.length).toBeGreaterThan(0)
+      expect(lines.every((line) => line.axis === 'x')).toBe(true)
+      expect(lines[0].y1).toBe(0)
+      expect(lines[0].y2).toBe(80)
+    })
+
+    it('draws no lines when the cross-axis extent is missing', () => {
+      const xScale = createLinearScale([0, 100], [0, 200])
+      expect(getChartGridLines({ xScale, show: 'x' })).toEqual([])
+    })
+  })
+
+  describe('getChartSeriesPaint', () => {
+    it('strokes line series and fills bar series', () => {
+      expect(getChartSeriesPaint('line', '#123')).toEqual({ fill: 'none', stroke: '#123' })
+      expect(getChartSeriesPaint('bar', '#123')).toEqual({ fill: '#123', stroke: 'none' })
+      expect(getChartSeriesPaint('custom', '#123')).toEqual({})
     })
   })
 
@@ -823,6 +876,10 @@ describe('chart-utils', () => {
     it('uses custom offset for top position', () => {
       const y = getBarValueLabelY(30, 50, 'top', 12)
       expect(y).toBe(18)
+    })
+
+    it('places a negative top label below the bar', () => {
+      expect(getBarValueLabelY(50, 20, 'top', 8, { negative: true })).toBe(78)
     })
   })
 

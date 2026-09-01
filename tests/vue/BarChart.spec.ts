@@ -4,9 +4,11 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { nextTick } from 'vue'
-import { fireEvent, waitFor } from '@testing-library/vue'
-import { BarChart } from '@expcat/tigercat-vue/BarChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { fireEvent, render, waitFor } from '@testing-library/vue'
+import { BarChart, ConfigProvider } from '@expcat/tigercat-vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
+import { h } from 'vue'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
@@ -58,10 +60,76 @@ describe('BarChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(BarChart, {
-      data: [{ x: 'A', y: 10 }]
+      data: [{ x: 'A', y: 10 }],
+      title: 'Sales'
     })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
+  })
+
+  it('hides decorative bars from the accessibility tree by default', () => {
+    const { container } = renderWithProps(BarChart, {
+      data: [
+        { x: 'A', y: 10, label: 'Alpha' },
+        { x: 'B', y: 20 }
+      ],
+      ...defaultSize
+    })
+    const bars = container.querySelectorAll('rect[data-bar-index]')
+    expect(bars[0]).toHaveAttribute('aria-hidden', 'true')
+    expect(bars[0]).not.toHaveAttribute('role')
+  })
+
+  it('uses a single tab stop when selectable', () => {
+    const { container } = renderWithProps(BarChart, {
+      data: [
+        { x: 'A', y: 10 },
+        { x: 'B', y: 20 }
+      ],
+      selectable: true,
+      ...defaultSize
+    })
+    const bars = container.querySelectorAll('rect[data-bar-index]')
+    expect(bars[0]).toHaveAttribute('role', 'button')
+    expect(bars[0]).toHaveAttribute('tabindex', '0')
+    expect(bars[1]).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('fires onBarClick without selectable', async () => {
+    const onBarClick = vi.fn()
+    const { container } = renderWithProps(BarChart, {
+      data: [{ x: 'A', y: 10 }],
+      onBarClick,
+      ...defaultSize
+    })
+    await fireEvent.click(container.querySelector('rect[data-bar-index]')!)
+    expect(onBarClick).toHaveBeenCalled()
+  })
+
+  it('applies legendFormatter to legend labels', () => {
+    const { container } = renderWithProps(BarChart, {
+      data: [{ x: 'A', y: 10 }],
+      showLegend: true,
+      legendFormatter: () => 'Formatted A',
+      ...defaultSize
+    })
+    expect(container.textContent).toContain('Formatted A')
+  })
+
+  it('renders a localized legend name', () => {
+    const { container } = render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(BarChart, {
+              data: [{ x: 'A', y: 10 }],
+              showLegend: true,
+              ...defaultSize
+            })
+          )
+      }
+    })
+    expect(container.querySelector('[role="list"][aria-label="图表图例"]')).toBeTruthy()
   })
 
   it('renders empty state with no data', () => {
@@ -156,7 +224,7 @@ describe('BarChart', () => {
         ...defaultSize
       })
 
-      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+      expect(container.querySelector('[data-chart-legend="true"]')).toBeTruthy()
     })
 
     it('opens the default tooltip on hover without hoverable', async () => {

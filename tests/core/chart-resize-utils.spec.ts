@@ -51,6 +51,15 @@ describe('chart-resize-utils', () => {
       width: 480,
       height: 200
     })
+    expect(
+      resolveResponsiveChartSize(
+        { width: Number.NaN, height: -10 },
+        { width: Number.NaN, height: 0 }
+      )
+    ).toEqual({
+      width: 320,
+      height: 200
+    })
   })
 
   it('batches ResizeObserver updates to one animation frame', () => {

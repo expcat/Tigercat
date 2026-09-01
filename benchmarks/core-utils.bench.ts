@@ -24,11 +24,8 @@ import {
   computeGaugeTicks,
   createChartInteractionHandlers,
   createChartPointerMoveScheduler,
-  getActiveIndex,
+  resolveChartActiveIndex,
   getChartElementOpacity,
-  getChartAnimationStyle,
-  getChartEntranceTransform,
-  defaultTooltipFormatter,
   type TreeMapChartDatum,
   type SunburstChartDatum,
   type ChartInteractionState
@@ -430,17 +427,9 @@ describe('Chart Interaction', () => {
     }
   })
 
-  bench('getActiveIndex (all 4 sources)', () => {
-    getActiveIndex(1, 2, 3, 4)
-  })
-
-  bench('getActiveIndex (500 lookups, mixed scenarios)', () => {
+  bench('resolveChartActiveIndex (500 lookups)', () => {
     for (let i = 0; i < 500; i++) {
-      const mod = i % 4
-      if (mod === 0) getActiveIndex(i, null, null, null)
-      else if (mod === 1) getActiveIndex(null, i, null, null)
-      else if (mod === 2) getActiveIndex(null, null, i, null)
-      else getActiveIndex(null, null, null, i)
+      resolveChartActiveIndex(i % 2 === 0 ? i : null, i, true)
     }
   })
 
@@ -451,31 +440,6 @@ describe('Chart Interaction', () => {
   bench('getChartElementOpacity (50 elements batch)', () => {
     for (let i = 0; i < 50; i++) {
       getChartElementOpacity(i, 25, { activeOpacity: 1, inactiveOpacity: 0.25 })
-    }
-  })
-
-  bench('getChartAnimationStyle (50 elements with stagger)', () => {
-    const config = { animated: true, duration: 300, easing: 'ease-out' as const, stagger: 50 }
-    for (let i = 0; i < 50; i++) {
-      getChartAnimationStyle(config, i)
-    }
-  })
-
-  bench('getChartEntranceTransform (scale, 100 frames)', () => {
-    for (let i = 0; i <= 100; i++) {
-      getChartEntranceTransform('scale', i / 100, { originX: 200, originY: 200 })
-    }
-  })
-
-  bench('getChartEntranceTransform (slide-up, 100 frames)', () => {
-    for (let i = 0; i <= 100; i++) {
-      getChartEntranceTransform('slide-up', i / 100)
-    }
-  })
-
-  bench('defaultTooltipFormatter (500 calls)', () => {
-    for (let i = 0; i < 500; i++) {
-      defaultTooltipFormatter(`Label ${i}`, i * 3.14, 'Series A', i)
     }
   })
 

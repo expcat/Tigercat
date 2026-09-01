@@ -357,7 +357,8 @@ export const zhCN: TigerLocale = {
   },
   chart: {
     legendAriaLabel: '图表图例',
-    pointAriaLabel: '第 {index} 个点：({x}, {y})'
+    pointAriaLabel: '第 {index} 个点：({x}, {y})',
+    seriesName: '系列 {index}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown 格式工具栏',

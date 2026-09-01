@@ -7,6 +7,7 @@ import {
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartPadding,
@@ -84,6 +85,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     tooltipPosition,
     resolvedHoveredIndex,
     activeIndex,
+    resolvedSelectedIndex,
     handleMouseEnter,
     handleMouseMove,
     handleMouseLeave,
@@ -103,9 +105,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     legendPosition,
     getData: (index: number) => {
       const node = nodes[index]
-      return node
-        ? ({ label: node.label, value: node.value } as TreeMapChartDatum)
-        : ({} as TreeMapChartDatum)
+      return node ? ({ label: node.label, value: node.value } as TreeMapChartDatum) : undefined
     },
     onHoveredIndexChange: (index) => {
       onHoveredIndexChange?.(index)
@@ -116,7 +116,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       )
     },
     onSelectedIndexChange,
-    callbacks: { onClick: onNodeClick }
+    onClick: onNodeClick
   })
 
   const total = useMemo(() => nodes.reduce((s, n) => s + n.value, 0), [nodes])
@@ -127,10 +127,11 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
         data: nodes,
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (d) => d.label,
         getColor: (d) => d.color
       }),
-    [nodes, palette, activeIndex]
+    [nodes, palette, activeIndex, resolvedSelectedIndex]
   )
 
   const tooltipContent = useMemo(
@@ -245,7 +246,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       {chart}
       <ChartLegend
         items={legendItems}
-        position={legendPosition}
+        orientation={chartLegendOrientationFromPosition(legendPosition)}
         markerSize={legendMarkerSize}
         gap={legendGap}
         interactive={interactive}

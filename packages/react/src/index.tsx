@@ -387,6 +387,8 @@ export type {
   UseChartInteractionOptions,
   UseChartInteractionReturn
 } from './hooks/useChartInteraction'
+export { useResponsiveChartSize } from './hooks/useResponsiveChartSize'
+export type { ResponsiveChartLayout } from './hooks/useResponsiveChartSize'
 export { useDrag } from './hooks/useDrag'
 export type { UseDragOptions, UseDragReturn } from './hooks/useDrag'
 export { useControlledState } from './hooks/useControlledState'

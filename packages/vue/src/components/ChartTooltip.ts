@@ -1,14 +1,16 @@
 import { defineComponent, h, computed, ref, watch } from 'vue'
 import {
   classNames,
+  coerceClassValue,
+  chartTooltipBaseClasses,
   getChartTooltipTransform,
-  overlayZIndexClass,
+  isBrowser,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
-import { renderVueBodyTeleport } from '../utils/overlay'
+import { renderVueOverlayTeleport, useVueOverlayPortalTarget } from '../utils/overlay'
 
 export interface VueChartTooltipProps {
-  content: string
+  content?: string
   open?: boolean
   x?: number
   y?: number
@@ -17,10 +19,11 @@ export interface VueChartTooltipProps {
 
 export const ChartTooltip = defineComponent({
   name: 'TigerChartTooltip',
+  inheritAttrs: false,
   props: {
     content: {
       type: String,
-      required: true
+      default: ''
     },
     open: {
       type: Boolean,
@@ -38,15 +41,15 @@ export const ChartTooltip = defineComponent({
       type: String
     }
   },
-  setup(props) {
+  setup(props, { slots, attrs }) {
     const tooltipRef = ref<HTMLDivElement | null>(null)
+    const { anchorRef, target } = useVueOverlayPortalTarget()
     const adjustedPosition = ref({ x: props.x, y: props.y })
 
-    // Adjust position to keep tooltip within viewport
     watch(
-      () => [props.x, props.y, props.open],
+      () => [props.x, props.y, props.open, props.content] as const,
       (_value, _oldValue, onCleanup) => {
-        if (!props.open) return
+        if (!props.open || !isBrowser()) return
 
         const initialPosition = resolveChartTooltipPosition({
           x: props.x,
@@ -55,7 +58,6 @@ export const ChartTooltip = defineComponent({
           viewport: { width: window.innerWidth, height: window.innerHeight }
         })
 
-        // Check bounds after render
         const frameHandle = requestAnimationFrame(() => {
           if (!tooltipRef.value) return
 
@@ -75,36 +77,33 @@ export const ChartTooltip = defineComponent({
     )
 
     const tooltipClasses = computed(() =>
-      classNames(
-        `fixed left-0 top-0 ${overlayZIndexClass.message} pointer-events-none will-change-transform`,
-        'px-3 py-2 rounded-[var(--tiger-radius-md,0.375rem)] shadow-[var(--tiger-shadow-glass,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]',
-        'bg-[color:var(--tiger-bg-elevated,#1f2937)]',
-        'text-[color:var(--tiger-text-inverse,#f9fafb)]',
-        'text-sm whitespace-nowrap',
-        'transition-opacity duration-150',
-        props.open ? 'opacity-100' : 'opacity-0',
-        props.className
-      )
+      classNames(chartTooltipBaseClasses, coerceClassValue(attrs.class), props.className)
     )
 
     return () => {
-      // Don't render if content is empty
-      if (!props.content) return null
+      const slotContent = slots.default?.()
+      const body = slotContent && slotContent.length > 0 ? slotContent : props.content
+      const tooltip =
+        props.open && body
+          ? h(
+              'div',
+              {
+                ref: tooltipRef,
+                class: tooltipClasses.value,
+                style: {
+                  transform: getChartTooltipTransform(adjustedPosition.value)
+                },
+                role: 'tooltip',
+                'data-chart-tooltip': 'true'
+              },
+              body
+            )
+          : null
 
-      const tooltip = h(
-        'div',
-        {
-          ref: tooltipRef,
-          class: tooltipClasses.value,
-          style: {
-            transform: getChartTooltipTransform(adjustedPosition.value)
-          },
-          role: 'tooltip',
-          'data-chart-tooltip': 'true'
-        },
-        props.content
-      )
-      return props.open ? renderVueBodyTeleport(tooltip) : tooltip
+      return [
+        h('span', { ref: anchorRef, hidden: true }),
+        tooltip ? renderVueOverlayTeleport(tooltip, target.value) : null
+      ]
     }
   }
 })

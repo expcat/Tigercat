@@ -7,6 +7,7 @@ import {
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
   chartAxisTickTextClasses,
   type ChartLegendItem,
@@ -63,6 +64,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     tooltipPosition,
     resolvedHoveredIndex,
     activeIndex,
+    resolvedSelectedIndex,
     handleMouseEnter,
     handleMouseMove,
     handleMouseLeave,
@@ -87,7 +89,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       onSegmentHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    callbacks: { onClick: onSegmentClick }
+    onClick: onSegmentClick
   })
 
   const innerRect = useMemo(
@@ -123,10 +125,11 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         data,
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (d, i) => d.label ?? `Stage ${i + 1}`,
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [data, palette, activeIndex]
+    [data, palette, activeIndex, resolvedSelectedIndex]
   )
 
   const tooltipContent = useMemo(
@@ -231,7 +234,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       {chart}
       <ChartLegend
         items={legendItems}
-        position={legendPosition}
+        orientation={chartLegendOrientationFromPosition(legendPosition)}
         markerSize={legendMarkerSize}
         gap={legendGap}
         interactive={interactive}

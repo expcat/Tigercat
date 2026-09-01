@@ -9,6 +9,7 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
 
 const composableEntries = [
   'src/composables/useChartInteraction.ts',
+  'src/composables/useResponsiveChartSize.ts',
   'src/composables/useDrag.ts',
   'src/composables/useFormController.ts'
 ]

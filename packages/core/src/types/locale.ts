@@ -538,6 +538,8 @@ export interface TigerLocaleChart {
   legendAriaLabel?: string
   /** Template: supports {index}, {x}, {y} */
   pointAriaLabel?: string
+  /** Template: supports {index} */
+  seriesName?: string
 }
 
 export interface TigerLocaleMarkdownEditor {

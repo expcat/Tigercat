@@ -1,39 +1,44 @@
 import React, { useMemo, useCallback } from 'react'
-import { classNames, type ChartLegendItem, type ChartLegendPosition } from '@expcat/tigercat-core'
+import {
+  classNames,
+  chartLegendListClasses,
+  getChartLabels,
+  getChartLegendItemClasses,
+  mergeTigerLocale,
+  type ChartLegendItem,
+  type ChartLegendProps as CoreChartLegendProps
+} from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
-export interface ChartLegendProps {
-  items: ChartLegendItem[]
-  position?: ChartLegendPosition
-  markerSize?: number
-  gap?: number
-  interactive?: boolean
-  ariaLabel?: string
-  className?: string
+export interface ChartLegendProps extends CoreChartLegendProps {
   onItemClick?: (index: number, item: ChartLegendItem) => void
-  onItemHover?: (index: number, item: ChartLegendItem) => void
+  onItemHover?: (index: number, item: ChartLegendItem, event?: React.SyntheticEvent) => void
   onItemLeave?: () => void
 }
 
 export const ChartLegend: React.FC<ChartLegendProps> = ({
   items,
-  position = 'bottom',
+  orientation = 'horizontal',
   markerSize = 10,
   gap = 8,
   interactive = false,
-  ariaLabel = 'Chart legend',
+  ariaLabel,
   className,
   onItemClick,
   onItemHover,
   onItemLeave
 }) => {
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const resolvedAriaLabel = ariaLabel ?? labels.legendAriaLabel
   const containerClasses = useMemo(
     () =>
       classNames(
-        'flex flex-wrap',
-        position === 'right' || position === 'left' ? 'flex-col' : 'flex-row',
+        chartLegendListClasses,
+        orientation === 'vertical' ? 'flex-col' : 'flex-row',
         className
       ),
-    [position, className]
+    [orientation, className]
   )
 
   const handleClick = useCallback(
@@ -45,49 +50,55 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   )
 
   const handleHover = useCallback(
-    (item: ChartLegendItem) => {
+    (item: ChartLegendItem, event: React.SyntheticEvent) => {
       if (!interactive) return
-      onItemHover?.(item.index, item)
+      onItemHover?.(item.index, item, event)
     },
     [interactive, onItemHover]
   )
 
-  const handleLeave = useCallback(() => {
-    if (!interactive) return
-    onItemLeave?.()
-  }, [interactive, onItemLeave])
+  const handleLeave = useCallback(
+    (event?: React.MouseEvent | React.FocusEvent) => {
+      if (!interactive) return
+      if (
+        event &&
+        event.relatedTarget instanceof Node &&
+        event.currentTarget.contains(event.relatedTarget)
+      ) {
+        return
+      }
+      onItemLeave?.()
+    },
+    [interactive, onItemLeave]
+  )
 
   return (
     <div
       className={containerClasses}
-      // A group of toggle buttons is not a "list"; only use list semantics for
-      // the static (non-interactive) legend.
       role={interactive ? 'group' : 'list'}
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       style={{ gap: `${gap}px` }}
-      data-chart-legend="true">
+      data-chart-legend="true"
+      onMouseLeave={interactive ? handleLeave : undefined}
+      onBlur={interactive ? handleLeave : undefined}>
       {items.map((item) => {
         const ItemComponent = interactive ? 'button' : 'div'
+        const highlighted = Boolean(item.active && items.some((entry) => entry.active === false))
         return (
           <ItemComponent
             key={`legend-${item.index}`}
             type={interactive ? 'button' : undefined}
-            className={classNames(
-              'flex items-center gap-2 text-sm rounded-[var(--tiger-chart-legend-row-radius,0)]',
-              'text-[color:var(--tiger-text-secondary,#6b7280)]',
-              interactive
-                ? 'cursor-pointer hover:text-[color:var(--tiger-text,#374151)] hover:bg-[var(--tiger-chart-legend-row-hover-bg,transparent)] transition-colors'
-                : 'cursor-default',
-              item.active === false ? 'opacity-50' : undefined
-            )}
-            // Interactive items are real buttons; `role="listitem"` would
-            // override the button role, so it is only set for the static legend.
+            className={getChartLegendItemClasses({
+              interactive,
+              dimmed: item.active === false
+            })}
             role={interactive ? undefined : 'listitem'}
-            aria-pressed={interactive ? item.active !== false : undefined}
+            aria-pressed={interactive ? Boolean(item.selected) : undefined}
+            aria-current={interactive && highlighted ? 'true' : undefined}
             data-legend-item="true"
             onClick={interactive ? () => handleClick(item) : undefined}
-            onMouseEnter={interactive ? () => handleHover(item) : undefined}
-            onMouseLeave={interactive ? handleLeave : undefined}>
+            onMouseEnter={interactive ? (event) => handleHover(item, event) : undefined}
+            onFocus={interactive ? (event) => handleHover(item, event) : undefined}>
             <span
               className="inline-block rounded-full shrink-0"
               style={

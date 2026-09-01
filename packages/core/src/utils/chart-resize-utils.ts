@@ -3,6 +3,26 @@ export interface ChartCanvasSize {
   height: number
 }
 
+export const DEFAULT_CHART_SIZE: ChartCanvasSize = { width: 320, height: 200 }
+
+function isFinitePositive(value: number): boolean {
+  return Number.isFinite(value) && value > 0
+}
+
+export function sanitizeChartSize(
+  size: ChartCanvasSize,
+  fallback: ChartCanvasSize = DEFAULT_CHART_SIZE
+): ChartCanvasSize {
+  const safeFallback = {
+    width: isFinitePositive(fallback.width) ? fallback.width : DEFAULT_CHART_SIZE.width,
+    height: isFinitePositive(fallback.height) ? fallback.height : DEFAULT_CHART_SIZE.height
+  }
+  return {
+    width: isFinitePositive(size.width) ? size.width : safeFallback.width,
+    height: isFinitePositive(size.height) ? size.height : safeFallback.height
+  }
+}
+
 export type ChartResizeFrameCallback = (timestamp: number) => void
 
 export type ChartResizeFrameRequest = (callback: ChartResizeFrameCallback) => number
@@ -75,9 +95,11 @@ export function resolveResponsiveChartSize(
   fallback: ChartCanvasSize,
   observedSize: ChartCanvasSize | null | undefined
 ): ChartCanvasSize {
+  const safeFallback = sanitizeChartSize(fallback)
+  if (!observedSize) return safeFallback
   return {
-    width: observedSize && observedSize.width > 0 ? observedSize.width : fallback.width,
-    height: observedSize && observedSize.height > 0 ? observedSize.height : fallback.height
+    width: isFinitePositive(observedSize.width) ? observedSize.width : safeFallback.width,
+    height: isFinitePositive(observedSize.height) ? observedSize.height : safeFallback.height
   }
 }
 

@@ -16,6 +16,7 @@ import {
   RADAR_SPLIT_AREA_COLORS,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
@@ -132,7 +133,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   // Use shared interaction hook for series-based interaction
   const {
     resolvedHoveredIndex: _resolvedHoveredIndex,
-    resolvedSelectedIndex: _resolvedSelectedIndex,
+    resolvedSelectedIndex,
     activeIndex: resolvedActiveIndex,
     tooltipPosition,
     handleMouseEnter: handleHoverEnter,
@@ -157,11 +158,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       onHoveredIndexChange?.(index)
       onSeriesHover?.(index, index !== null ? resolvedSeries[index] : null)
     },
-    onSelectedIndexChange: (index) => {
-      onSelectedIndexChange?.(index)
-      if (index !== null) {
-        onSeriesClick?.(index, resolvedSeries[index])
-      }
+    onSelectedIndexChange,
+    onClick: (index, series) => {
+      if (series) onSeriesClick?.(index, series)
     }
   })
 
@@ -378,11 +377,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         data: resolvedSeries,
         palette,
         activeIndex: resolvedActiveIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (s, i) =>
           legendFormatter ? legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
         getColor: (s, i) => s.color ?? palette[i % palette.length]
       }),
-    [resolvedSeries, palette, resolvedActiveIndex, legendFormatter]
+    [resolvedSeries, palette, resolvedActiveIndex, resolvedSelectedIndex, legendFormatter]
   )
 
   const chart = (
@@ -745,7 +745,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       {chart}
       <ChartLegend
         items={legendItems}
-        position={legendPosition}
+        orientation={chartLegendOrientationFromPosition(legendPosition)}
         markerSize={legendMarkerSize}
         gap={legendGap}
         interactive={hoverable || selectable}

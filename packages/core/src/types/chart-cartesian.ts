@@ -5,10 +5,8 @@
 import type {
   BaseChartProps,
   ChartCurveType,
-  ChartGridLineStyle,
   ChartInteractionProps,
-  ChartLegendProps,
-  ChartScale,
+  ChartLegendToggleProps,
   ChartScaleValue,
   ChartBuiltInTooltipProps,
   ChartWithAxesProps
@@ -27,21 +25,16 @@ export interface BarChartDatum {
 }
 
 export interface BarChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends
+    BaseChartProps,
+    ChartInteractionProps,
+    ChartLegendToggleProps,
+    ChartBuiltInTooltipProps,
+    ChartWithAxesProps {
   /**
    * Chart data
    */
   data: BarChartDatum[]
-
-  /**
-   * Custom x scale
-   */
-  xScale?: ChartScale
-
-  /**
-   * Custom y scale
-   */
-  yScale?: ChartScale
 
   /**
    * Bar color
@@ -54,8 +47,7 @@ export interface BarChartProps
   colors?: string[]
 
   /**
-   * Bar corner radius
-   * @default 4
+   * Bar corner radius in px. When omitted, uses `--tiger-chart-bar-radius` (4px).
    */
   barRadius?: number
 
@@ -70,84 +62,6 @@ export interface BarChartProps
    * @default 0.1
    */
   barPaddingOuter?: number
-
-  /**
-   * Whether to show grid
-   * @default true
-   */
-  showGrid?: boolean
-
-  /**
-   * Whether to show axes
-   * @default true
-   */
-  showAxis?: boolean
-
-  /**
-   * Whether to show X axis
-   * @default true
-   */
-  showXAxis?: boolean
-
-  /**
-   * Whether to show Y axis
-   * @default true
-   */
-  showYAxis?: boolean
-
-  /**
-   * X axis label
-   */
-  xAxisLabel?: string
-
-  /**
-   * Y axis label
-   */
-  yAxisLabel?: string
-
-  /**
-   * X ticks
-   * @default 5
-   */
-  xTicks?: number
-
-  /**
-   * Y ticks
-   * @default 5
-   */
-  yTicks?: number
-
-  /**
-   * X tick values
-   */
-  xTickValues?: ChartScaleValue[]
-
-  /**
-   * Y tick values
-   */
-  yTickValues?: ChartScaleValue[]
-
-  /**
-   * X tick format
-   */
-  xTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Y tick format
-   */
-  yTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Grid line style
-   * @default 'solid'
-   */
-  gridLineStyle?: ChartGridLineStyle
-
-  /**
-   * Grid stroke width
-   * @default 1
-   */
-  gridStrokeWidth?: number
 
   /**
    * Show value labels above or inside bars
@@ -203,6 +117,10 @@ export interface BarChartProps
 export interface ScatterChartDatum {
   x: number
   y: number
+  /**
+   * Point size. Pixel radius unless `sizeScale` is set, in which case this is
+   * a data metric mapped onto the radius range.
+   */
   size?: number
   color?: string
   label?: string
@@ -212,7 +130,7 @@ export interface ScatterChartProps
   extends
     BaseChartProps,
     ChartInteractionProps,
-    ChartLegendProps,
+    ChartLegendToggleProps,
     ChartBuiltInTooltipProps,
     ChartWithAxesProps {
   /**
@@ -262,9 +180,15 @@ export interface ScatterChartProps
 
   /**
    * Point border (stroke) color
-   * @default 'white'
+   * @default surface token
    */
   pointBorderColor?: string
+
+  /**
+   * Map `datum.size` through a radius scale instead of treating it as pixels.
+   * @default false
+   */
+  sizeScale?: boolean | { minRadius?: number; maxRadius?: number }
 
   /**
    * Include zero in domain
@@ -367,7 +291,12 @@ export interface LineChartSeries {
 }
 
 export interface LineChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends
+    BaseChartProps,
+    ChartInteractionProps,
+    ChartLegendToggleProps,
+    ChartBuiltInTooltipProps,
+    ChartWithAxesProps {
   /**
    * Chart data (single series)
    */
@@ -377,16 +306,6 @@ export interface LineChartProps
    * Multiple series
    */
   series?: LineChartSeries[]
-
-  /**
-   * Custom x scale
-   */
-  xScale?: ChartScale
-
-  /**
-   * Custom y scale
-   */
-  yScale?: ChartScale
 
   /**
    * Line color (for single series)
@@ -423,88 +342,10 @@ export interface LineChartProps
   pointColor?: string
 
   /**
-   * Whether to show grid
-   * @default true
-   */
-  showGrid?: boolean
-
-  /**
-   * Whether to show axes
-   * @default true
-   */
-  showAxis?: boolean
-
-  /**
-   * Whether to show X axis
-   * @default true
-   */
-  showXAxis?: boolean
-
-  /**
-   * Whether to show Y axis
-   * @default true
-   */
-  showYAxis?: boolean
-
-  /**
    * Include zero in Y domain
    * @default false
    */
   includeZero?: boolean
-
-  /**
-   * X axis label
-   */
-  xAxisLabel?: string
-
-  /**
-   * Y axis label
-   */
-  yAxisLabel?: string
-
-  /**
-   * X ticks
-   * @default 5
-   */
-  xTicks?: number
-
-  /**
-   * Y ticks
-   * @default 5
-   */
-  yTicks?: number
-
-  /**
-   * X tick values
-   */
-  xTickValues?: ChartScaleValue[]
-
-  /**
-   * Y tick values
-   */
-  yTickValues?: number[]
-
-  /**
-   * X tick format
-   */
-  xTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Y tick format
-   */
-  yTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Grid line style
-   * @default 'solid'
-   */
-  gridLineStyle?: ChartGridLineStyle
-
-  /**
-   * Grid stroke width
-   * @default 1
-   */
-  gridStrokeWidth?: number
 
   /**
    * Custom colors for multi-series
@@ -585,7 +426,12 @@ export interface AreaChartSeries extends LineChartSeries {
 }
 
 export interface AreaChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends
+    BaseChartProps,
+    ChartInteractionProps,
+    ChartLegendToggleProps,
+    ChartBuiltInTooltipProps,
+    ChartWithAxesProps {
   /**
    * Chart data (single series)
    */
@@ -595,16 +441,6 @@ export interface AreaChartProps
    * Multiple series
    */
   series?: AreaChartSeries[]
-
-  /**
-   * Custom x scale
-   */
-  xScale?: ChartScale
-
-  /**
-   * Custom y scale
-   */
-  yScale?: ChartScale
 
   /**
    * Line/area color (for single series)
@@ -653,88 +489,10 @@ export interface AreaChartProps
   stacked?: boolean
 
   /**
-   * Whether to show grid
-   * @default true
-   */
-  showGrid?: boolean
-
-  /**
-   * Whether to show axes
-   * @default true
-   */
-  showAxis?: boolean
-
-  /**
-   * Whether to show X axis
-   * @default true
-   */
-  showXAxis?: boolean
-
-  /**
-   * Whether to show Y axis
-   * @default true
-   */
-  showYAxis?: boolean
-
-  /**
    * Include zero in Y domain
    * @default true (different from LineChart)
    */
   includeZero?: boolean
-
-  /**
-   * X axis label
-   */
-  xAxisLabel?: string
-
-  /**
-   * Y axis label
-   */
-  yAxisLabel?: string
-
-  /**
-   * X ticks
-   * @default 5
-   */
-  xTicks?: number
-
-  /**
-   * Y ticks
-   * @default 5
-   */
-  yTicks?: number
-
-  /**
-   * X tick values
-   */
-  xTickValues?: ChartScaleValue[]
-
-  /**
-   * Y tick values
-   */
-  yTickValues?: number[]
-
-  /**
-   * X tick format
-   */
-  xTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Y tick format
-   */
-  yTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Grid line style
-   * @default 'solid'
-   */
-  gridLineStyle?: ChartGridLineStyle
-
-  /**
-   * Grid stroke width
-   * @default 1
-   */
-  gridStrokeWidth?: number
 
   /**
    * Custom colors for multi-series

@@ -1,4 +1,3 @@
-import { useState, type MouseEvent } from 'react'
 import { createBandScale, createLinearScale } from '@expcat/tigercat-core'
 import { ChartAxis } from '@expcat/tigercat-react/ChartAxis'
 import { ChartCanvas } from '@expcat/tigercat-react/ChartCanvas'
@@ -6,6 +5,7 @@ import { ChartGrid } from '@expcat/tigercat-react/ChartGrid'
 import { ChartLegend } from '@expcat/tigercat-react/ChartLegend'
 import { ChartSeries } from '@expcat/tigercat-react/ChartSeries'
 import { ChartTooltip } from '@expcat/tigercat-react/ChartTooltip'
+import { useChartInteraction } from '@expcat/tigercat-react'
 
 interface OrderDatum {
   x: string
@@ -19,90 +19,99 @@ const data: OrderDatum[] = [
   { x: 'Q4', y: 86 }
 ]
 
-const innerWidth = 290
-const innerHeight = 180
-const xScale = createBandScale(
-  data.map((item) => item.x),
-  [0, innerWidth],
-  { paddingInner: 0.3, paddingOuter: 0.1 }
-)
-const yScale = createLinearScale([0, 100], [innerHeight, 0])
-
 export default function ChartPrimitivesExample() {
-  const [active, setActive] = useState(true)
-  const [tooltip, setTooltip] = useState<{ content: string; x: number; y: number } | null>(null)
-
-  const showTooltip = (item: OrderDatum, event: MouseEvent<SVGRectElement>) => {
-    setTooltip({
-      content: `${item.x}：${item.y} 单`,
-      x: event.clientX,
-      y: event.clientY
-    })
-  }
+  const interaction = useChartInteraction<OrderDatum>({
+    hoverable: true,
+    selectable: true,
+    showTooltip: true,
+    activeOpacity: 1,
+    inactiveOpacity: 0.35,
+    getData: (index) => data[index]
+  })
 
   return (
-    <div style={{ display: 'grid', gap: 12, width: 'min(100%, 360px)' }}>
+    <div className={interaction.wrapperClasses} style={{ width: 'min(100%, 360px)' }}>
       <ChartCanvas
         width={360}
         height={240}
-        padding={{ top: 20, right: 20, bottom: 40, left: 50 }}
         title="季度订单量"
-        desc="使用 Tigercat 图表底层组件绘制的交互式柱状图"
-        style={{ maxWidth: '100%', height: 'auto' }}>
-        <ChartGrid
-          xScale={xScale}
-          yScale={yScale}
-          yTickValues={[0, 25, 50, 75, 100]}
-          lineStyle="dashed"
-        />
-        <ChartAxis scale={xScale} orientation="bottom" y={innerHeight} label="季度" />
-        <ChartAxis
-          scale={yScale}
-          orientation="left"
-          tickValues={[0, 25, 50, 75, 100]}
-          label="订单"
-        />
-        <ChartSeries
-          data={data}
-          name="orders"
-          color="#2563eb"
-          type="custom"
-          opacity={active ? 1 : 0.25}>
-          {({ data: seriesData, color }) =>
-            seriesData.map((item) => {
-              const y = yScale.map(item.y)
-              return (
-                <rect
-                  key={item.x}
-                  x={xScale.map(item.x)}
-                  y={y}
-                  width={xScale.bandwidth ?? 0}
-                  height={innerHeight - y}
-                  rx={4}
-                  fill={color}
-                  role="img"
-                  aria-label={`${item.x} 订单量 ${item.y}`}
-                  onMouseEnter={(event) => showTooltip(item, event)}
-                  onMouseMove={(event) => showTooltip(item, event)}
-                  onMouseLeave={() => setTooltip(null)}
-                />
-              )
-            })
-          }
-        </ChartSeries>
+        desc="组合原语 + useChartInteraction">
+        {({ innerRect }) => {
+          const xScale = createBandScale(
+            data.map((item) => item.x),
+            [0, innerRect.width],
+            { paddingInner: 0.3, paddingOuter: 0.1 }
+          )
+          const yScale = createLinearScale([0, 100], [innerRect.height, 0])
+          return (
+            <>
+              <ChartGrid
+                xScale={xScale}
+                yScale={yScale}
+                yTickValues={[0, 25, 50, 75, 100]}
+                lineStyle="dashed"
+              />
+              <ChartAxis scale={xScale} orientation="bottom" y={innerRect.height} label="季度" />
+              <ChartAxis
+                scale={yScale}
+                orientation="left"
+                tickValues={[0, 25, 50, 75, 100]}
+                label="订单"
+              />
+              <ChartSeries data={data} name="orders" color="#2563eb" type="bar">
+                {({ color }) =>
+                  data.map((item, index) => {
+                    const y = yScale.map(item.y)
+                    return (
+                      <rect
+                        key={item.x}
+                        x={xScale.map(item.x)}
+                        y={y}
+                        width={xScale.bandwidth ?? 0}
+                        height={innerRect.height - y}
+                        rx={4}
+                        fill={color}
+                        opacity={interaction.getElementOpacity(index)}
+                        role="button"
+                        tabIndex={interaction.resolvedSelectedIndex === index ? 0 : -1}
+                        aria-label={`${item.x} 订单量 ${item.y}`}
+                        onMouseEnter={(event) => interaction.handleMouseEnter(index, event)}
+                        onMouseMove={interaction.handleMouseMove}
+                        onMouseLeave={interaction.handleMouseLeave}
+                        onClick={() => interaction.handleClick(index)}
+                        onKeyDown={(event) => interaction.handleKeyDown(event, index)}
+                      />
+                    )
+                  })
+                }
+              </ChartSeries>
+            </>
+          )
+        }}
       </ChartCanvas>
-
       <ChartLegend
-        items={[{ index: 0, label: '订单量', color: '#2563eb', active }]}
+        items={[
+          {
+            index: 0,
+            label: '订单量',
+            color: '#2563eb',
+            selected: interaction.resolvedSelectedIndex === 0
+          }
+        ]}
         interactive
-        ariaLabel="切换图表序列"
-        onItemClick={() => setActive((value) => !value)}
+        onItemClick={interaction.handleLegendClick}
+        onItemHover={interaction.handleLegendHover}
+        onItemLeave={interaction.handleLegendLeave}
       />
       <ChartTooltip
-        content={tooltip?.content ?? ''}
-        open={Boolean(tooltip)}
-        x={tooltip?.x ?? 0}
-        y={tooltip?.y ?? 0}
+        content={
+          interaction.resolvedHoveredIndex == null
+            ? ''
+            : `${data[interaction.resolvedHoveredIndex]?.x}：${data[interaction.resolvedHoveredIndex]?.y} 单`
+        }
+        open={interaction.resolvedHoveredIndex != null}
+        x={interaction.tooltipPosition.x}
+        y={interaction.tooltipPosition.y}
       />
     </div>
   )

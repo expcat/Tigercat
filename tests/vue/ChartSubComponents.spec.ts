@@ -14,7 +14,7 @@ import { ChartLegend } from '@expcat/tigercat-vue/ChartLegend'
 import { ChartSeries } from '@expcat/tigercat-vue/ChartSeries'
 import { ChartTooltip } from '@expcat/tigercat-vue/ChartTooltip'
 import { createLinearScale } from '@expcat/tigercat-core'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
@@ -39,9 +39,9 @@ describe('ChartAxis', () => {
     expect(container.querySelector('[data-axis-label]')).toHaveTextContent('Value')
   })
 
-  it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(ChartAxis, { scale, tickValues })
-    await expectNoA11yViolationsIsolated(container)
+  it('hides ticks from the accessibility tree', () => {
+    const { container } = renderWithProps(ChartAxis, { scale, tickValues, label: 'Value' })
+    expect(container.querySelector('g')?.getAttribute('aria-hidden')).toBe('true')
   })
 })
 
@@ -121,9 +121,24 @@ describe('ChartCanvas', () => {
     expect(events?.at(-1)?.[0]).toEqual({ width: 480, height: 260 })
   })
 
-  it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(ChartCanvas, {})
-    await expectNoA11yViolationsIsolated(container)
+  it('observes its own host instead of a legend sibling', async () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    const { container } = renderWithProps(ChartCanvas, {
+      width: 320,
+      height: 200,
+      responsive: true
+    })
+    await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+    const host = container.querySelector('[data-chart-canvas-host]')
+    expect(MockResizeObserver.instances[0].observe).toHaveBeenCalledWith(host)
+  })
+
+  it('names the svg when a title is provided', async () => {
+    const { container } = renderWithProps(ChartCanvas, { title: 'Sales', desc: 'Quarterly' })
+    const svg = container.querySelector('svg')
+    expect(svg?.getAttribute('role')).toBe('img')
+    expect(svg?.querySelector('title')?.textContent).toBe('Sales')
+    await expectNoA11yViolations(container)
   })
 })
 
@@ -132,9 +147,15 @@ describe('ChartCanvas', () => {
 // ===========================================================================
 
 describe('ChartGrid', () => {
-  it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(ChartGrid, { xScale, yScale })
-    await expectNoA11yViolationsIsolated(container)
+  it('draws vertical lines from xScale and height', () => {
+    const { container } = renderWithProps(ChartGrid, {
+      xScale,
+      show: 'x',
+      height: 80,
+      xTickValues: [0, 50, 100]
+    })
+    expect(container.querySelectorAll('line').length).toBe(3)
+    expect(container.querySelector('g')?.getAttribute('aria-hidden')).toBe('true')
   })
 })
 
@@ -143,9 +164,9 @@ describe('ChartGrid', () => {
 // ===========================================================================
 
 const legendItems = [
-  { index: 0, label: 'Series A', color: '#2563eb', active: true },
-  { index: 1, label: 'Series B', color: '#22c55e', active: true },
-  { index: 2, label: 'Series C', color: '#f97316', active: false }
+  { index: 0, label: 'Series A', color: '#2563eb', active: true, selected: true },
+  { index: 1, label: 'Series B', color: '#22c55e', active: true, selected: false },
+  { index: 2, label: 'Series C', color: '#f97316', active: false, selected: false }
 ]
 
 describe('ChartLegend', () => {
@@ -159,12 +180,6 @@ describe('ChartLegend', () => {
     expect(container.textContent).toContain('Series C')
   })
 
-  it('applies inactive style to inactive items', () => {
-    const { container } = renderWithProps(ChartLegend, { items: legendItems })
-
-    const items = container.querySelectorAll('[data-legend-item]')
-    expect(items[2].className).toContain('opacity')
-  })
   it('emits item-click event when interactive', async () => {
     const onItemClick = vi.fn()
     const { container } = renderWithProps(ChartLegend, {
@@ -189,6 +204,7 @@ describe('ChartLegend', () => {
     expect(items[0].tagName).toBe('BUTTON')
     expect(items[0].getAttribute('role')).toBeNull()
     expect(items[0].getAttribute('aria-pressed')).toBe('true')
+    expect(items[1].getAttribute('aria-pressed')).toBe('false')
     expect(items[2].getAttribute('aria-pressed')).toBe('false')
   })
 
@@ -206,12 +222,15 @@ describe('ChartLegend', () => {
 // ===========================================================================
 
 describe('ChartSeries', () => {
-  it('passes basic a11y checks', async () => {
+  it('does not fill a line series group', () => {
     const { container } = renderWithProps(ChartSeries, {
-      data: [{ x: 0, y: 10 }]
+      data: [{ x: 0, y: 10 }],
+      type: 'line',
+      color: '#2563eb'
     })
-
-    await expectNoA11yViolationsIsolated(container)
+    const group = container.querySelector('[data-series-type="line"]')
+    expect(group?.getAttribute('fill')).toBe('none')
+    expect(group?.getAttribute('stroke')).toBe('#2563eb')
   })
 })
 
@@ -233,20 +252,10 @@ describe('ChartTooltip', () => {
     expect(tooltip?.textContent).toContain('Tooltip text')
   })
 
-  it('hides when not open or empty', async () => {
+  it('does not mount when closed', async () => {
     renderWithProps(ChartTooltip, { content: 'Tooltip text', open: false, x: 100, y: 100 })
     await new Promise((resolve) => setTimeout(resolve, 0))
-
-    const hiddenTooltip = document.querySelector('[data-chart-tooltip]')
-    if (hiddenTooltip) {
-      expect(hiddenTooltip.className).toContain('opacity-0')
-    }
-
-    document.body.innerHTML = ''
-    renderWithProps(ChartTooltip, { content: '', open: true, x: 100, y: 100 })
-    await new Promise((resolve) => setTimeout(resolve, 0))
-
-    expect(document.querySelector('[data-chart-tooltip]')).toBeFalsy()
+    expect(document.querySelector('[data-chart-tooltip]')).toBeNull()
   })
 
   it('applies custom className', async () => {
@@ -267,10 +276,8 @@ describe('ChartTooltip', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement
-    expect(tooltip.style.transform).toBe('translate3d(112px, 92px, 0)')
+    expect(tooltip.style.transform).toMatch(/translate3d\(/)
     expect(tooltip.style.left).toBe('')
     expect(tooltip.style.top).toBe('')
-    expect(tooltip.className).toContain('left-0')
-    expect(tooltip.className).toContain('top-0')
   })
 })

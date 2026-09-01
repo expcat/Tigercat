@@ -1,20 +1,30 @@
 import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
-  clampBarWidth,
+  coerceClassValue,
   createBandScale,
   createLinearScale,
-  ensureBarMinHeight,
   getStableChartGradientPrefix,
   getBarValueLabelY,
   getNumberExtent,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
+  DEFAULT_CHART_PADDING,
   resolveChartTooltipContent,
   defaultXYTooltipFormatter,
   barValueLabelClasses,
   barValueLabelInsideClasses,
-  barAnimatedTransition,
+  barInteractiveClasses,
+  BAR_ANIMATED_CLASS,
+  layoutBarRects,
+  resolveBarCornerRadius,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
   type BarChartDatum,
   type BarChartProps as CoreBarChartProps,
   type BarValueLabelPosition,
@@ -33,20 +43,21 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueBarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
   padding?: ChartPadding
   xScale?: ChartScale
   yScale?: ChartScale
+  onBarClick?: (index: number, datum: BarChartDatum) => void
 }
 
-// Asymmetric default padding leaves room for the left y-axis tick labels
-// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
-const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 }
+export type BarChartProps = VueBarChartProps
 
 export const BarChart = defineComponent({
   name: 'TigerBarChart',
+  inheritAttrs: false,
   props: {
     width: {
       type: Number,
@@ -58,7 +69,7 @@ export const BarChart = defineComponent({
     },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
-      default: () => DEFAULT_CARTESIAN_PADDING
+      default: () => ({ ...DEFAULT_CHART_PADDING })
     },
     responsive: { type: Boolean, default: false },
     data: {
@@ -76,8 +87,7 @@ export const BarChart = defineComponent({
       default: 'var(--tiger-primary,#2563eb)'
     },
     barRadius: {
-      type: Number,
-      default: 4
+      type: Number
     },
     barPaddingInner: {
       type: Number,
@@ -121,7 +131,7 @@ export const BarChart = defineComponent({
       type: Array as PropType<ChartScaleValue[]>
     },
     yTickValues: {
-      type: Array as PropType<number[]>
+      type: Array as PropType<ChartScaleValue[]>
     },
     xTickFormat: {
       type: Function as PropType<(value: ChartScaleValue) => string>
@@ -137,7 +147,6 @@ export const BarChart = defineComponent({
       type: Number,
       default: 1
     },
-    // Interaction props
     hoverable: {
       type: Boolean,
       default: false
@@ -162,7 +171,6 @@ export const BarChart = defineComponent({
       type: Number as PropType<number | null>,
       default: undefined
     },
-    // Legend props
     showLegend: {
       type: Boolean,
       default: false
@@ -179,7 +187,6 @@ export const BarChart = defineComponent({
       type: Number,
       default: 8
     },
-    // Tooltip props
     showTooltip: {
       type: Boolean,
       default: true
@@ -187,7 +194,9 @@ export const BarChart = defineComponent({
     tooltipFormatter: {
       type: Function as PropType<(datum: BarChartDatum, index: number) => string>
     },
-    // Value label props
+    legendFormatter: {
+      type: Function as PropType<(datum: BarChartDatum, index: number) => string>
+    },
     showValueLabels: {
       type: Boolean,
       default: false
@@ -199,7 +208,6 @@ export const BarChart = defineComponent({
     valueLabelFormatter: {
       type: Function as PropType<(datum: BarChartDatum, index: number) => string>
     },
-    // Bar constraint props
     barMinHeight: {
       type: Number,
       default: 0
@@ -207,7 +215,6 @@ export const BarChart = defineComponent({
     barMaxWidth: {
       type: Number
     },
-    // Visual enhancement props
     gradient: {
       type: Boolean,
       default: false
@@ -216,7 +223,6 @@ export const BarChart = defineComponent({
       type: Boolean,
       default: false
     },
-    // Other
     colors: {
       type: Array as PropType<string[]>
     },
@@ -228,19 +234,26 @@ export const BarChart = defineComponent({
     },
     className: {
       type: String
+    },
+    onBarClick: {
+      type: Function as PropType<(index: number, datum: BarChartDatum) => void>
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'bar-click', 'bar-hover'],
-  setup(props, { emit }) {
-    // Unique gradient prefix for this instance
+  setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
     const gradientPrefix = getStableChartGradientPrefix('bar', useId())
+    const interactive = computed(
+      () => props.hoverable || props.selectable || typeof props.onBarClick === 'function'
+    )
+    const corner = computed(() => resolveBarCornerRadius(props.barRadius))
 
-    // Use shared interaction composable
     const {
       tooltipPosition,
       resolvedHoveredIndex,
       activeIndex,
-      getElementOpacity,
+      resolvedSelectedIndex,
       handleMouseEnter,
       handleMouseMove,
       handleMouseLeave,
@@ -248,8 +261,7 @@ export const BarChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave,
-      wrapperClasses
+      handleLegendLeave
     } = useChartInteraction<BarChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -259,9 +271,14 @@ export const BarChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index) => props.data[index],
-      eventNames: { hover: 'bar-hover', click: 'bar-click' }
+      onHover: (index, datum) => emit('bar-hover', index, datum),
+      onClick: (index, datum) => {
+        props.onBarClick?.(index, datum as BarChartDatum)
+        emit('bar-click', index, datum)
+      }
     })
 
     const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
@@ -272,7 +289,9 @@ export const BarChart = defineComponent({
     )
 
     const xDomain = computed(() => props.data.map((item) => String(item.x)))
-    const yValues = computed(() => props.data.map((item) => item.y))
+    const yValues = computed(() =>
+      props.data.map((item) => item.y).filter((value) => Number.isFinite(value))
+    )
 
     const resolvedXScale = computed(() => {
       if (props.xScale) return props.xScale
@@ -290,57 +309,28 @@ export const BarChart = defineComponent({
 
     const shouldShowXAxis = computed(() => props.showAxis && props.showXAxis)
     const shouldShowYAxis = computed(() => props.showAxis && props.showYAxis)
-
     const palette = computed(() => resolveChartPalette(props.colors, props.barColor))
 
-    const bars = computed(() => {
-      const scale = resolvedXScale.value
-      const rawBandWidth =
-        scale.bandwidth ??
-        (scale.step
-          ? scale.step * 0.7
-          : (innerRect.value.width / Math.max(1, props.data.length)) * 0.8)
-      const bandWidth = clampBarWidth(rawBandWidth, props.barMaxWidth)
-      const bandOffset = rawBandWidth > bandWidth ? (rawBandWidth - bandWidth) / 2 : 0
-      const baseline = resolvedYScale.value.map(0)
-
-      return props.data.map((item, index) => {
-        const xKey = scale.type === 'linear' ? Number(item.x) : String(item.x)
-        const xPos = scale.map(xKey)
-        const barX = (scale.bandwidth ? xPos : xPos - rawBandWidth / 2) + bandOffset
-        const barYValue = resolvedYScale.value.map(item.y)
-        let barHeight = Math.abs(baseline - barYValue)
-        let barY = Math.min(baseline, barYValue)
-
-        // Apply minimum height constraint
-        if (props.barMinHeight > 0 && barHeight > 0) {
-          const clamped = ensureBarMinHeight(barY, barHeight, baseline, props.barMinHeight)
-          barY = clamped.y
-          barHeight = clamped.height
-        }
-
-        const color = item.color ?? palette.value[index % palette.value.length]
-        const opacity = getElementOpacity(index)
-
-        return {
-          x: barX,
-          y: barY,
-          width: bandWidth,
-          height: barHeight,
-          color,
-          opacity,
-          datum: item,
-          index
-        }
+    const bars = computed(() =>
+      layoutBarRects(props.data, resolvedXScale.value, resolvedYScale.value, {
+        barMaxWidth: props.barMaxWidth,
+        barMinHeight: props.barMinHeight,
+        palette: palette.value,
+        activeIndex: activeIndex.value,
+        activeOpacity: props.activeOpacity,
+        inactiveOpacity: props.inactiveOpacity,
+        innerWidth: innerRect.value.width
       })
-    })
+    )
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
         data: props.data,
         palette: palette.value,
         activeIndex: activeIndex.value,
-        getLabel: (d) => d.label ?? String(d.x),
+        selectedIndex: resolvedSelectedIndex.value,
+        getLabel: (d, i) =>
+          props.legendFormatter ? props.legendFormatter(d, i) : (d.label ?? String(d.x)),
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
       })
     )
@@ -355,16 +345,32 @@ export const BarChart = defineComponent({
     )
 
     return () => {
-      // Gradient defs (when gradient is enabled)
+      const visualActive = bars.value.findIndex(
+        (bar) => bar.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+      )
+      const handleBarKeyDown = (event: KeyboardEvent, visualIndex: number) => {
+        if (isChartNavigationKey(event.key)) {
+          event.preventDefault()
+          const nextVisual = nextChartRovingIndex(visualIndex, event.key, bars.value.length)
+          const next = bars.value[nextVisual]
+          const current = event.currentTarget as SVGElement
+          const node = current.parentElement?.querySelector(`[data-bar-index="${next.index}"]`)
+          if (node instanceof SVGElement) node.focus()
+          handleMouseEnter(next.index, event)
+          return
+        }
+        handleKeyDown(event, bars.value[visualIndex].index)
+      }
+
       const gradientDefs = props.gradient
         ? h(
             'defs',
             null,
-            bars.value.map((bar, index) =>
+            bars.value.map((bar) =>
               h(
                 'linearGradient',
                 {
-                  id: `${gradientPrefix}-${index}`,
+                  id: `${gradientPrefix}-${bar.index}`,
                   x1: '0',
                   y1: '0',
                   x2: '0',
@@ -387,23 +393,24 @@ export const BarChart = defineComponent({
           )
         : null
 
-      // Value labels
       const valueLabels =
         props.showValueLabels && bars.value.length > 0
-          ? bars.value.map((bar, index) => {
+          ? bars.value.map((bar) => {
               const labelText = props.valueLabelFormatter
-                ? props.valueLabelFormatter(bar.datum, index)
+                ? props.valueLabelFormatter(bar.datum, bar.index)
                 : String(bar.datum.y)
-              const labelY = getBarValueLabelY(bar.y, bar.height, props.valueLabelPosition, 8)
+              const labelY = getBarValueLabelY(bar.y, bar.height, props.valueLabelPosition, 8, {
+                negative: bar.negative
+              })
               const isInside = props.valueLabelPosition === 'inside'
               return h(
                 'text',
                 {
-                  key: `label-${index}`,
+                  key: `label-${bar.index}`,
                   x: bar.x + bar.width / 2,
                   y: labelY,
                   'text-anchor': 'middle',
-                  'dominant-baseline': isInside ? 'central' : 'auto',
+                  'dominant-baseline': isInside ? 'central' : bar.negative ? 'hanging' : 'auto',
                   class: isInside ? barValueLabelInsideClasses : barValueLabelClasses,
                   opacity: bar.opacity,
                   'data-value-label': ''
@@ -422,7 +429,6 @@ export const BarChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className),
           onResolvedSizeChange
         },
         {
@@ -471,34 +477,36 @@ export const BarChart = defineComponent({
                 },
                 {
                   default: () =>
-                    bars.value.map((bar, index) =>
+                    bars.value.map((bar, visualIndex) =>
                       h('rect', {
-                        key: `bar-${index}`,
+                        key: `bar-${bar.index}`,
                         x: bar.x,
                         y: bar.y,
                         width: bar.width,
                         height: bar.height,
-                        rx: props.barRadius,
-                        ry: props.barRadius,
-                        fill: props.gradient ? `url(#${gradientPrefix}-${index})` : bar.color,
+                        rx: corner.value.rx,
+                        ry: corner.value.ry,
+                        fill: props.gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color,
                         opacity: bar.opacity,
                         class: classNames(
-                          'transition-[opacity,filter] [transition-duration:var(--tiger-motion-duration-base,200ms)] [transition-timing-function:var(--tiger-motion-ease-decelerate,ease-out)]',
-                          (props.hoverable || props.selectable) &&
-                            'cursor-pointer hover:brightness-110'
+                          props.animated && BAR_ANIMATED_CLASS,
+                          interactive.value && barInteractiveClasses
                         ),
-                        style: props.animated
-                          ? `rx:var(--tiger-chart-bar-radius,${props.barRadius}px);ry:var(--tiger-chart-bar-radius,${props.barRadius}px);${barAnimatedTransition}`
-                          : `rx:var(--tiger-chart-bar-radius,${props.barRadius}px);ry:var(--tiger-chart-bar-radius,${props.barRadius}px)`,
-                        tabindex: props.selectable ? 0 : undefined,
-                        role: props.selectable ? 'button' : 'img',
-                        'aria-label': bar.datum.label ?? String(bar.datum.x),
-                        'data-bar-index': index,
-                        onMouseenter: (e: MouseEvent) => handleMouseEnter(index, e),
+                        style: corner.value.style,
+                        tabindex: interactive.value
+                          ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                          : undefined,
+                        role: interactive.value ? 'button' : undefined,
+                        'aria-hidden': interactive.value ? undefined : true,
+                        'aria-label': interactive.value
+                          ? (bar.datum.label ?? defaultXYTooltipFormatter(bar.datum, bar.index))
+                          : undefined,
+                        'data-bar-index': bar.index,
+                        onMouseenter: (e: MouseEvent) => handleMouseEnter(bar.index, e),
                         onMousemove: handleMouseMove,
                         onMouseleave: handleMouseLeave,
-                        onClick: () => handleClick(index),
-                        onKeydown: (e: KeyboardEvent) => handleKeyDown(e, index)
+                        onClick: () => handleClick(bar.index),
+                        onKeydown: (e: KeyboardEvent) => handleBarKeyDown(e, visualIndex)
                       })
                     )
                 }
@@ -517,34 +525,31 @@ export const BarChart = defineComponent({
           })
         : null
 
-      if (!props.showLegend) {
-        return h(
-          'div',
-          {
-            class: classNames(
-              'relative',
-              props.responsive ? 'block w-full min-w-0' : 'inline-block'
-            )
-          },
-          [chart, tooltip]
-        )
-      }
-
       return h(
         'div',
-        { class: classNames(wrapperClasses.value, props.responsive && 'w-full min-w-0') },
+        {
+          class: getCartesianChartShellClasses({
+            showLegend: props.showLegend,
+            legendPosition: props.legendPosition,
+            responsive: props.responsive,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
+        },
         [
           chart,
-          h(ChartLegend, {
-            items: legendItems.value,
-            position: props.legendPosition,
-            markerSize: props.legendMarkerSize,
-            gap: props.legendGap,
-            interactive: props.hoverable || props.selectable,
-            onItemClick: handleLegendClick,
-            onItemHover: handleLegendHover,
-            onItemLeave: handleLegendLeave
-          }),
+          props.showLegend
+            ? h(ChartLegend, {
+                items: legendItems.value,
+                orientation: chartLegendOrientationFromPosition(props.legendPosition),
+                markerSize: props.legendMarkerSize,
+                gap: props.legendGap,
+                interactive: props.hoverable || props.selectable,
+                ariaLabel: labels.value.legendAriaLabel,
+                onItemClick: handleLegendClick,
+                onItemHover: handleLegendHover,
+                onItemLeave: handleLegendLeave
+              })
+            : null,
           tooltip
         ]
       )

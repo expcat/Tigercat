@@ -628,16 +628,22 @@ export function ensureBarMinHeight(
 }
 
 /**
- * Get the Y coordinate for a value label on a bar
+ * Get the Y coordinate for a value label on a bar.
+ * `top` is outside the bar, away from the zero baseline (above a positive bar,
+ * below a negative bar).
  */
 export function getBarValueLabelY(
   barY: number,
   barHeight: number,
   position: 'top' | 'inside',
-  offset = 8
+  offset = 8,
+  options: { negative?: boolean } = {}
 ): number {
   if (position === 'inside') {
     return barY + barHeight / 2
+  }
+  if (options.negative) {
+    return barY + barHeight + offset
   }
   return barY - offset
 }
@@ -657,11 +663,9 @@ export function getScatterPointPath(
   switch (style) {
     case 'square':
       return `M ${-size} ${-size} L ${size} ${-size} L ${size} ${size} L ${-size} ${size} Z`
-    case 'triangle': {
-      const h = size * 1.15
-      return `M 0 ${-h} L ${size} ${h * 0.75} L ${-size} ${h * 0.75} Z`
-    }
+    case 'triangle':
+      return `M 0 ${-size} L ${size} ${size} L ${-size} ${size} Z`
     case 'diamond':
-      return `M 0 ${-size * 1.2} L ${size} 0 L 0 ${size * 1.2} L ${-size} 0 Z`
+      return `M 0 ${-size} L ${size} 0 L 0 ${size} L ${-size} 0 Z`
   }
 }

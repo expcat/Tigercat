@@ -1,9 +1,22 @@
-import { defineComponent, computed, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  ref,
+  useId,
+  watch
+} from 'vue'
 import {
   chartCanvasBaseClasses,
+  chartCanvasHostClasses,
   classNames,
   coerceClassValue,
   createChartResizeObserverController,
+  DEFAULT_CHART_PADDING,
+  DEFAULT_CHART_SIZE,
   getChartInnerRect,
   resolveResponsiveChartSize,
   type ChartCanvasProps,
@@ -24,11 +37,11 @@ export const ChartCanvas = defineComponent({
   props: {
     width: {
       type: Number,
-      default: 320
+      default: DEFAULT_CHART_SIZE.width
     },
     height: {
       type: Number,
-      default: 200
+      default: DEFAULT_CHART_SIZE.height
     },
     responsive: {
       type: Boolean,
@@ -36,7 +49,7 @@ export const ChartCanvas = defineComponent({
     },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
-      default: 24
+      default: () => ({ ...DEFAULT_CHART_PADDING })
     },
     className: {
       type: String
@@ -49,7 +62,8 @@ export const ChartCanvas = defineComponent({
     }
   },
   setup(props, { slots, attrs, emit }) {
-    const svgRef = ref<SVGSVGElement | null>(null)
+    const hostRef = ref<HTMLDivElement | null>(null)
+    const labelId = useId()
     const observedSize = ref<ChartCanvasSize | null>(null)
     const resizeController = createChartResizeObserverController({
       onSizeChange: (size) => {
@@ -80,7 +94,7 @@ export const ChartCanvas = defineComponent({
         return
       }
 
-      const target = svgRef.value?.parentElement
+      const target = hostRef.value
       if (target) {
         resizeController.observe(target)
       }
@@ -101,28 +115,43 @@ export const ChartCanvas = defineComponent({
     return () => {
       const rect = innerRect.value
       const size = resolvedSize.value
+      const titleId = props.title ? `${labelId}-title` : undefined
+      const descId = props.desc ? `${labelId}-desc` : undefined
+      const named = Boolean(props.title || attrs['aria-label'])
       return h(
-        'svg',
+        'div',
         {
-          ...attrs,
-          ref: svgRef,
-          width: size.width,
-          height: size.height,
-          viewBox: `0 0 ${size.width} ${size.height}`,
-          class: svgClasses.value,
-          style: svgStyle.value
+          ref: hostRef,
+          class: chartCanvasHostClasses,
+          'data-chart-canvas-host': ''
         },
         [
-          props.title ? h('title', props.title) : null,
-          props.desc ? h('desc', props.desc) : null,
           h(
-            'g',
+            'svg',
             {
-              transform: `translate(${rect.x}, ${rect.y})`
+              ...attrs,
+              width: size.width,
+              height: size.height,
+              viewBox: `0 0 ${size.width} ${size.height}`,
+              class: svgClasses.value,
+              style: svgStyle.value,
+              role: named ? 'img' : undefined,
+              'aria-labelledby': titleId,
+              'aria-describedby': descId
             },
-            slots.default?.({ innerRect: rect, width: size.width, height: size.height })
+            [
+              props.title ? h('title', { id: titleId }, props.title) : null,
+              props.desc ? h('desc', { id: descId }, props.desc) : null,
+              h(
+                'g',
+                {
+                  transform: `translate(${rect.x}, ${rect.y})`
+                },
+                slots.default?.({ innerRect: rect, width: size.width, height: size.height })
+              )
+            ].filter(Boolean)
           )
-        ].filter(Boolean)
+        ]
       )
     }
   }

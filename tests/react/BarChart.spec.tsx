@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { BarChart } from '@expcat/tigercat-react/BarChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
-import { act, fireEvent, waitFor } from '@testing-library/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
@@ -53,13 +55,14 @@ describe('BarChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(BarChart, {
-      data: [{ x: 'A', y: 10 }]
+      data: [{ x: 'A', y: 10 }],
+      title: 'Sales'
     })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
-  it('labels bars with role/aria-label, matching Vue/Scatter (C26-4)', () => {
+  it('hides decorative bars from the accessibility tree by default', () => {
     const { container } = renderWithProps(BarChart, {
       data: [
         { x: 'A', y: 10, label: 'Alpha' },
@@ -69,20 +72,23 @@ describe('BarChart', () => {
     })
     const bars = container.querySelectorAll('rect[data-bar-index]')
     expect(bars).toHaveLength(2)
-    expect(bars[0]).toHaveAttribute('role', 'img')
-    expect(bars[0]).toHaveAttribute('aria-label', 'Alpha')
-    expect(bars[1]).toHaveAttribute('aria-label', 'B')
+    expect(bars[0]).toHaveAttribute('aria-hidden', 'true')
+    expect(bars[0]).not.toHaveAttribute('role')
   })
 
-  it('uses button role on bars when selectable (C26-4)', () => {
+  it('uses a single tab stop when selectable', () => {
     const { container } = renderWithProps(BarChart, {
-      data: [{ x: 'A', y: 10 }],
+      data: [
+        { x: 'A', y: 10 },
+        { x: 'B', y: 20 }
+      ],
       selectable: true,
       ...defaultSize
     })
-    const bar = container.querySelector('rect[data-bar-index]')!
-    expect(bar).toHaveAttribute('role', 'button')
-    expect(bar).toHaveAttribute('tabindex', '0')
+    const bars = container.querySelectorAll('rect[data-bar-index]')
+    expect(bars[0]).toHaveAttribute('role', 'button')
+    expect(bars[0]).toHaveAttribute('tabindex', '0')
+    expect(bars[1]).toHaveAttribute('tabindex', '-1')
   })
 
   it('renders empty state with no data', () => {
@@ -113,6 +119,17 @@ describe('BarChart', () => {
       })
 
       expect(container.querySelectorAll('[data-value-label]')).toHaveLength(0)
+    })
+
+    it('keeps near-zero bars at least barMinHeight tall', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 0.1 }],
+        barMinHeight: 8,
+        ...defaultSize
+      })
+      expect(
+        Number(container.querySelector('rect[data-bar-index]')?.getAttribute('height'))
+      ).toBeGreaterThanOrEqual(8)
     })
   })
 
@@ -159,21 +176,74 @@ describe('BarChart', () => {
         ...defaultSize
       })
 
-      fireEvent.click(container.querySelectorAll('rect')[1])
+      fireEvent.click(container.querySelectorAll('rect[data-bar-index]')[1])
       expect(onBarClick).toHaveBeenCalled()
     })
 
-    it('renders legend when showLegend is true', () => {
+    it('fires onBarClick without selectable', () => {
+      const onBarClick = vi.fn()
       const { container } = renderWithProps(BarChart, {
-        data: [
-          { x: 'A', y: 10, color: '#ff0000' },
-          { x: 'B', y: 20, color: '#00ff00' }
-        ],
-        showLegend: true,
+        data: [{ x: 'A', y: 10 }],
+        onBarClick,
         ...defaultSize
       })
 
-      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+      fireEvent.click(container.querySelector('rect[data-bar-index]')!)
+      expect(onBarClick).toHaveBeenCalledWith(0, expect.objectContaining({ x: 'A', y: 10 }))
+    })
+
+    it('renders a localized legend name', () => {
+      const { container } = render(
+        <ConfigProvider locale={zhCN}>
+          <BarChart
+            data={[
+              { x: 'A', y: 10, color: '#ff0000' },
+              { x: 'B', y: 20, color: '#00ff00' }
+            ]}
+            showLegend
+            {...defaultSize}
+          />
+        </ConfigProvider>
+      )
+
+      expect(container.querySelector('[role="list"][aria-label="图表图例"]')).toBeTruthy()
+    })
+
+    it('honors barRadius over the theme token', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 10 }],
+        barRadius: 8,
+        ...defaultSize
+      })
+      const bar = container.querySelector('rect[data-bar-index]')!
+      expect(bar).toHaveAttribute('rx', '8')
+      expect(bar.getAttribute('style') ?? '').not.toContain('--tiger-chart-bar-radius')
+    })
+
+    it('places a negative value label below the zero baseline', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10 },
+          { x: 'B', y: -10 }
+        ],
+        showValueLabels: true,
+        ...defaultSize
+      })
+      const labels = container.querySelectorAll('[data-value-label]')
+      const baseline = Number(
+        container.querySelector('rect[data-bar-index="1"]')?.getAttribute('y')
+      )
+      expect(Number(labels[1].getAttribute('y'))).toBeGreaterThanOrEqual(baseline)
+    })
+
+    it('paints gradient fills with a stable id', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 10 }],
+        gradient: true,
+        ...defaultSize
+      })
+      const fill = container.querySelector('rect[data-bar-index]')?.getAttribute('fill') ?? ''
+      expect(fill).toMatch(/^url\(#tiger-bar-grad-/)
     })
 
     it('clears hover on mouse leave', () => {

@@ -86,9 +86,12 @@ describe('chart format utilities', () => {
       ],
       [
         { original: { x: 'Jan', y: 3 }, y0: 2, y1: 5 },
-        { original: { x: 'Feb', y: -1 }, y0: 4, y1: 3 }
+        { original: { x: 'Feb', y: -1 }, y0: 0, y1: -1 }
       ],
-      [{ original: { x: 'Jan', y: 5 }, y0: 5, y1: 10 }]
+      [
+        { original: { x: 'Jan', y: 5 }, y0: 5, y1: 10 },
+        { original: { x: 'Feb', y: 0 }, y0: 4, y1: 4 }
+      ]
     ])
   })
 

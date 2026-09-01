@@ -44,8 +44,9 @@ export interface BaseChartProps {
   height?: number
 
   /**
-   * Chart padding
-   * @default 24
+   * Chart padding. Default leaves room for ChartAxis labels
+   * (`labelOffset` 28 + tick + dy).
+   * @default { top: 24, right: 24, bottom: 52, left: 52 }
    */
   padding?: ChartPadding
 
@@ -111,9 +112,10 @@ export interface ChartInteractionProps {
 }
 
 /**
- * Common legend props for charts
+ * Legend toggle props mixed into high-level charts.
+ * Placement around the plot is the chart shell, not ChartLegend.
  */
-export interface ChartLegendProps {
+export interface ChartLegendToggleProps {
   /**
    * Whether to show legend
    * @default false
@@ -121,7 +123,7 @@ export interface ChartLegendProps {
   showLegend?: boolean
 
   /**
-   * Legend position
+   * Legend position around the plot
    * @default 'bottom'
    */
   legendPosition?: ChartLegendPosition
@@ -140,6 +142,55 @@ export interface ChartLegendProps {
 }
 
 /**
+ * Legend row orientation. Plot placement is the parent shell.
+ */
+export type ChartLegendOrientation = 'horizontal' | 'vertical'
+
+/**
+ * Standalone ChartLegend component props.
+ */
+export interface ChartLegendProps {
+  /**
+   * Legend items
+   */
+  items: ChartLegendItem[]
+
+  /**
+   * Row vs column layout
+   * @default 'horizontal'
+   */
+  orientation?: ChartLegendOrientation
+
+  /**
+   * Marker size in px
+   * @default 10
+   */
+  markerSize?: number
+
+  /**
+   * Item gap in px
+   * @default 8
+   */
+  gap?: number
+
+  /**
+   * Whether items are buttons
+   * @default false
+   */
+  interactive?: boolean
+
+  /**
+   * Accessible name. Defaults to locale `chart.legendAriaLabel`.
+   */
+  ariaLabel?: string
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+/**
  * Common built-in tooltip toggle props for high-level charts.
  */
 export interface ChartBuiltInTooltipProps {
@@ -155,9 +206,9 @@ export interface ChartBuiltInTooltipProps {
  */
 export interface ChartTooltipProps {
   /**
-   * Tooltip content
+   * Tooltip content. Optional when the framework slot / children render nodes.
    */
-  content: string
+  content?: string
 
   /**
    * Whether the tooltip is open
@@ -251,7 +302,7 @@ export interface ChartWithAxesProps {
   /**
    * Y tick values
    */
-  yTickValues?: number[]
+  yTickValues?: ChartScaleValue[]
 
   /**
    * X tick format
@@ -296,9 +347,14 @@ export interface ChartLegendItem {
   color: string
 
   /**
-   * Whether this item is active/selected
+   * Visual highlight (full opacity). Not pressed.
    */
   active?: boolean
+
+  /**
+   * Selection; drives `aria-pressed` when the legend is interactive.
+   */
+  selected?: boolean
 }
 
 export interface ChartCanvasProps {
@@ -315,7 +371,7 @@ export interface ChartCanvasProps {
   height?: number
 
   /**
-   * Resize the SVG to its parent container using ResizeObserver
+   * Observe the canvas host (not a legend sibling) and resize the SVG
    * @default false
    */
   responsive?: boolean
@@ -328,8 +384,8 @@ export interface ChartCanvasProps {
   onResolvedSizeChange?: (size: { width: number; height: number }) => void
 
   /**
-   * Inner padding for chart drawing area
-   * @default 24
+   * Inner padding for chart drawing area. Default covers ChartAxis labels.
+   * @default { top: 24, right: 24, bottom: 52, left: 52 }
    */
   padding?: ChartPadding
 
@@ -347,6 +403,17 @@ export interface ChartCanvasProps {
    * Accessible description for the SVG
    */
   desc?: string
+}
+
+export interface ChartCanvasRenderContext {
+  innerRect: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+  width: number
+  height: number
 }
 
 export interface ChartScale {
@@ -475,6 +542,26 @@ export interface ChartGridProps {
    * Y axis scale
    */
   yScale?: ChartScale
+
+  /**
+   * Explicit x extent when `yScale` is omitted (horizontal line endpoints)
+   */
+  xRange?: [number, number]
+
+  /**
+   * Explicit y extent when `xScale` is omitted (vertical line endpoints)
+   */
+  yRange?: [number, number]
+
+  /**
+   * Plot width used as `[0, width]` when `xRange` / `xScale.range` is missing
+   */
+  width?: number
+
+  /**
+   * Plot height used as `[0, height]` when `yRange` / `yScale.range` is missing
+   */
+  height?: number
 
   /**
    * Show grid lines

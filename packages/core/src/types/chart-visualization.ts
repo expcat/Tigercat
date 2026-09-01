@@ -5,7 +5,7 @@
 import type {
   BaseChartProps,
   ChartInteractionProps,
-  ChartLegendProps,
+  ChartLegendToggleProps,
   ChartScaleValue,
   ChartSeriesPoint,
   ChartBuiltInTooltipProps
@@ -25,7 +25,7 @@ export interface FunnelChartDatum extends ChartSeriesPoint {
 }
 
 export interface FunnelChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
    * Data items — ordered from widest to narrowest
    */
@@ -175,7 +175,7 @@ export interface TreeMapChartDatum {
 }
 
 export interface TreeMapChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
    * Hierarchical data
    */
@@ -228,7 +228,7 @@ export interface SunburstChartDatum {
 }
 
 export interface SunburstChartProps
-  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartBuiltInTooltipProps {
+  extends BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartBuiltInTooltipProps {
   /**
    * Hierarchical data
    */

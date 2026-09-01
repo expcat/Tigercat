@@ -1,7 +1,7 @@
 {
   "id": "use-chart-interaction-02",
   "title": "图表底层组件",
-  "description": "组合 ChartCanvas、ChartAxis、ChartGrid、ChartSeries、ChartLegend 与 ChartTooltip 构建可交互图表。",
+  "description": "ChartCanvas / Axis / Grid / Series / Legend / Tooltip 接 useChartInteraction。",
   "order": 2,
   "entry": "App.tsx"
 }

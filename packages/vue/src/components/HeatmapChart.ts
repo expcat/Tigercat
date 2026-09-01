@@ -75,9 +75,11 @@ export const HeatmapChart = defineComponent({
       selectedIndexProp: () => props.selectedIndex,
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index: number) => props.data[index],
-      eventNames: { hover: 'cell-hover', click: 'cell-click' }
+      onHover: (index, datum) => emit('cell-hover', index, datum),
+      onClick: (index, datum) => emit('cell-click', index, datum)
     })
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))

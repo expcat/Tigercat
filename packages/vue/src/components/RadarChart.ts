@@ -16,6 +16,7 @@ import {
   RADAR_SPLIT_AREA_COLORS,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
@@ -271,7 +272,7 @@ export const RadarChart = defineComponent({
     // Use shared interaction composable
     const {
       resolvedHoveredIndex: _resolvedHoveredIndex,
-      resolvedSelectedIndex: _resolvedSelectedIndex,
+      resolvedSelectedIndex,
       activeIndex: resolvedActiveIndex,
       tooltipPosition,
       handleMouseEnter: handleHoverEnter,
@@ -291,12 +292,11 @@ export const RadarChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index: number) => resolvedSeries.value[index],
-      eventNames: {
-        hover: 'series-hover',
-        click: 'series-click'
-      }
+      onHover: (index, datum) => emit('series-hover', index, datum),
+      onClick: (index, datum) => emit('series-click', index, datum)
     })
 
     // Point-level hover state for tooltip
@@ -498,6 +498,7 @@ export const RadarChart = defineComponent({
         data: resolvedSeries.value,
         palette: palette.value,
         activeIndex: resolvedActiveIndex.value,
+        selectedIndex: resolvedSelectedIndex.value,
         getLabel: (s, i) =>
           props.legendFormatter ? props.legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
         getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
@@ -891,7 +892,7 @@ export const RadarChart = defineComponent({
         chart,
         h(ChartLegend, {
           items: legendItems.value,
-          position: props.legendPosition,
+          orientation: chartLegendOrientationFromPosition(props.legendPosition),
           markerSize: props.legendMarkerSize,
           gap: props.legendGap,
           interactive: props.hoverable || props.selectable,

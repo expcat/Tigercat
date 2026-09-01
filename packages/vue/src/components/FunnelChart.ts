@@ -7,6 +7,7 @@ import {
   getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
   chartAxisTickTextClasses,
   type ChartLegendItem,
@@ -66,6 +67,7 @@ export const FunnelChart = defineComponent({
       tooltipPosition,
       resolvedHoveredIndex,
       activeIndex,
+      resolvedSelectedIndex,
       handleMouseEnter,
       handleMouseMove,
       handleMouseLeave,
@@ -84,9 +86,11 @@ export const FunnelChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index: number) => props.data[index],
-      eventNames: { hover: 'segment-hover', click: 'segment-click' }
+      onHover: (index, datum) => emit('segment-hover', index, datum),
+      onClick: (index, datum) => emit('segment-click', index, datum)
     })
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
@@ -112,6 +116,7 @@ export const FunnelChart = defineComponent({
         data: props.data,
         palette: palette.value,
         activeIndex: activeIndex.value,
+        selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d, i) => d.label ?? `Stage ${i + 1}`,
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
       })
@@ -243,7 +248,7 @@ export const FunnelChart = defineComponent({
         chart,
         h(ChartLegend, {
           items: legendItems.value,
-          position: props.legendPosition,
+          orientation: chartLegendOrientationFromPosition(props.legendPosition),
           markerSize: props.legendMarkerSize,
           gap: props.legendGap,
           interactive,

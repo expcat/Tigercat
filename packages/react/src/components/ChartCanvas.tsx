@@ -1,11 +1,15 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   chartCanvasBaseClasses,
+  chartCanvasHostClasses,
   classNames,
   createChartResizeObserverController,
+  DEFAULT_CHART_PADDING,
+  DEFAULT_CHART_SIZE,
   getChartInnerRect,
   resolveResponsiveChartSize,
   type ChartCanvasProps as CoreChartCanvasProps,
+  type ChartCanvasRenderContext,
   type ChartCanvasSize,
   type ChartPadding
 } from '@expcat/tigercat-core'
@@ -13,15 +17,16 @@ import {
 export interface ChartCanvasProps
   extends
     CoreChartCanvasProps,
-    Omit<React.SVGAttributes<SVGSVGElement>, keyof CoreChartCanvasProps> {
+    Omit<React.SVGAttributes<SVGSVGElement>, keyof CoreChartCanvasProps | 'children'> {
   padding?: ChartPadding
+  children?: React.ReactNode | ((ctx: ChartCanvasRenderContext) => React.ReactNode)
 }
 
 export const ChartCanvas: React.FC<ChartCanvasProps> = ({
-  width = 320,
-  height = 200,
+  width = DEFAULT_CHART_SIZE.width,
+  height = DEFAULT_CHART_SIZE.height,
   responsive = false,
-  padding = 24,
+  padding = DEFAULT_CHART_PADDING,
   className,
   title,
   desc,
@@ -29,7 +34,8 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
   onResolvedSizeChange,
   ...props
 }) => {
-  const svgRef = useRef<SVGSVGElement | null>(null)
+  const hostRef = useRef<HTMLDivElement | null>(null)
+  const labelId = useId()
   const [observedSize, setObservedSize] = useState<ChartCanvasSize | null>(null)
   const lastReportedSizeRef = useRef<ChartCanvasSize | null>(null)
   const resizeControllerRef = useRef(
@@ -46,6 +52,9 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
     [resolvedSize.width, resolvedSize.height, padding]
   )
   const svgClasses = useMemo(() => classNames(chartCanvasBaseClasses, className), [className])
+  const titleId = title ? `${labelId}-title` : undefined
+  const descId = desc ? `${labelId}-desc` : undefined
+  const named = Boolean(title || props['aria-label'])
 
   useEffect(() => {
     const controller = resizeControllerRef.current
@@ -55,7 +64,7 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
       return undefined
     }
 
-    const target = svgRef.current?.parentElement
+    const target = hostRef.current
     if (!target) return undefined
 
     controller.observe(target)
@@ -73,18 +82,27 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
     onResolvedSizeChange(nextSize)
   }, [resolvedSize.width, resolvedSize.height, onResolvedSizeChange])
 
+  const content =
+    typeof children === 'function'
+      ? children({ innerRect, width: resolvedSize.width, height: resolvedSize.height })
+      : children
+
   return (
-    <svg
-      {...props}
-      ref={svgRef}
-      width={resolvedSize.width}
-      height={resolvedSize.height}
-      viewBox={`0 0 ${resolvedSize.width} ${resolvedSize.height}`}
-      className={svgClasses}>
-      {title ? <title>{title}</title> : null}
-      {desc ? <desc>{desc}</desc> : null}
-      <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{children}</g>
-    </svg>
+    <div ref={hostRef} className={chartCanvasHostClasses} data-chart-canvas-host="">
+      <svg
+        {...props}
+        width={resolvedSize.width}
+        height={resolvedSize.height}
+        viewBox={`0 0 ${resolvedSize.width} ${resolvedSize.height}`}
+        className={svgClasses}
+        role={named ? 'img' : undefined}
+        aria-labelledby={titleId}
+        aria-describedby={descId}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        {desc ? <desc id={descId}>{desc}</desc> : null}
+        <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{content}</g>
+      </svg>
+    </div>
   )
 }
 

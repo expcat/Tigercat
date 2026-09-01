@@ -57,8 +57,20 @@ describe('buildChartLegendItems', () => {
     })
 
     expect(items).toHaveLength(2)
-    expect(items[0]).toEqual({ index: 0, label: 'A', color: '#r', active: true })
-    expect(items[1]).toEqual({ index: 1, label: 'B', color: '#g', active: true })
+    expect(items[0]).toEqual({
+      index: 0,
+      label: 'A',
+      color: '#r',
+      active: true,
+      selected: false
+    })
+    expect(items[1]).toEqual({
+      index: 1,
+      label: 'B',
+      color: '#g',
+      active: true,
+      selected: false
+    })
   })
 
   it('marks only activeIndex item as active', () => {

@@ -30,7 +30,7 @@ const FRAMEWORK_EXTRAS = {
   feedback: ['Notification', 'overlay-positioning', 'overlay-ssr'],
   layout: ['Grid', 'LayoutSections'],
   data: ['TableState'],
-  charts: ['ChartSubComponents', 'useChartInteraction'],
+  charts: ['ChartSubComponents', 'useChartInteraction', 'useResponsiveChartSize'],
   advanced: ['DragEnhancements', 'useDrag'],
   composite: ['useControlledState']
 }

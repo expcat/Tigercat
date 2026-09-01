@@ -1,8 +1,10 @@
 import React from 'react'
 import {
   classNames,
+  getChartSeriesPaint,
   type ChartSeriesPoint,
-  type ChartSeriesProps as CoreChartSeriesProps
+  type ChartSeriesProps as CoreChartSeriesProps,
+  type ChartSeriesType
 } from '@expcat/tigercat-core'
 
 export interface ChartSeriesRenderProps<T = ChartSeriesPoint> {
@@ -10,7 +12,7 @@ export interface ChartSeriesRenderProps<T = ChartSeriesPoint> {
   name?: string
   color?: string
   opacity?: number
-  type?: string
+  type?: ChartSeriesType
 }
 
 export interface ChartSeriesProps<T = ChartSeriesPoint>
@@ -33,6 +35,7 @@ export const ChartSeries = <T extends ChartSeriesPoint = ChartSeriesPoint>({
 }: ChartSeriesProps<T>) => {
   const content =
     typeof children === 'function' ? children({ data, name, color, opacity, type }) : children
+  const paint = getChartSeriesPaint(type, color)
 
   return (
     <g
@@ -40,8 +43,8 @@ export const ChartSeries = <T extends ChartSeriesPoint = ChartSeriesPoint>({
       className={classNames(className)}
       data-series-name={name}
       data-series-type={type}
-      fill={color}
-      stroke={color}
+      fill={paint.fill}
+      stroke={paint.stroke}
       opacity={opacity}>
       {content}
     </g>

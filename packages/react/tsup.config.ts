@@ -9,6 +9,7 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
 
 const hookEntries = [
   'src/hooks/useChartInteraction.ts',
+  'src/hooks/useResponsiveChartSize.ts',
   'src/hooks/useControlledState.ts',
   'src/hooks/useDrag.ts',
   'src/hooks/useFormController.ts'

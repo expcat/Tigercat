@@ -357,7 +357,8 @@ export const enUS: TigerLocale = {
   },
   chart: {
     legendAriaLabel: 'Chart legend',
-    pointAriaLabel: 'Point {index}: ({x}, {y})'
+    pointAriaLabel: 'Point {index}: ({x}, {y})',
+    seriesName: 'Series {index}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown formatting',

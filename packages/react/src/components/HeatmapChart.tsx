@@ -78,7 +78,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
       onCellHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    callbacks: { onClick: onCellClick }
+    onClick: onCellClick
   })
 
   const innerRect = useMemo(

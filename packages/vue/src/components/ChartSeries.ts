@@ -2,8 +2,10 @@ import { defineComponent, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  getChartSeriesPaint,
   type ChartSeriesPoint,
-  type ChartSeriesProps
+  type ChartSeriesProps,
+  type ChartSeriesType
 } from '@expcat/tigercat-core'
 
 export interface VueChartSeriesProps<
@@ -30,23 +32,24 @@ export const ChartSeries = defineComponent({
       type: Number
     },
     type: {
-      type: String
+      type: String as PropType<ChartSeriesType>
     },
     className: {
       type: String
     }
   },
   setup(props, { slots, attrs }) {
-    return () =>
-      h(
+    return () => {
+      const paint = getChartSeriesPaint(props.type, props.color)
+      return h(
         'g',
         {
           ...attrs,
           class: classNames(coerceClassValue(attrs.class), props.className),
           'data-series-name': props.name,
           'data-series-type': props.type,
-          fill: props.color,
-          stroke: props.color,
+          fill: paint.fill,
+          stroke: paint.stroke,
           opacity: props.opacity
         },
         slots.default?.({
@@ -57,6 +60,7 @@ export const ChartSeries = defineComponent({
           type: props.type
         })
       )
+    }
   }
 })
 
