@@ -10,7 +10,6 @@ import {
   useId
 } from 'vue'
 import {
-  ANIMATION_DURATION_MS,
   classNames,
   coerceClassValue,
   mergeStyleValues,
@@ -35,6 +34,8 @@ import {
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   shouldRenderOverlay,
+  isOverlayVisuallyHidden,
+  scheduleOverlayLeave,
   createDocumentDragSession,
   type DocumentDragSession,
   type GesturePoint,
@@ -56,10 +57,12 @@ import {
 export interface VueModalProps {
   open?: boolean
   size?: ModalSize
+  width?: string | number
   title?: string
   closable?: boolean
   mask?: boolean
   maskClosable?: boolean
+  keyboard?: boolean
   centered?: boolean
   mobileSheet?: boolean
   destroyOnClose?: boolean
@@ -69,9 +72,13 @@ export interface VueModalProps {
   closeAriaLabel?: string
   okText?: string
   cancelText?: string
+  showDefaultFooter?: boolean
+  draggable?: boolean
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleModal>
 }
+
+export type ModalProps = VueModalProps
 
 export const Modal = defineComponent({
   name: 'TigerModal',
@@ -128,6 +135,14 @@ export const Modal = defineComponent({
      * @default true
      */
     maskClosable: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * Whether Escape closes the modal
+     * @default true
+     */
+    keyboard: {
       type: Boolean,
       default: true
     },
@@ -246,6 +261,7 @@ export const Modal = defineComponent({
 
     const instanceId = ref(`tiger-modal-${useId()}`)
     const hasOpened = ref(props.open)
+    const leaving = ref(false)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
@@ -289,7 +305,7 @@ export const Modal = defineComponent({
       shouldRenderOverlay({
         open: props.open,
         hasOpened: hasOpened.value,
-        leaving: false,
+        leaving: leaving.value,
         destroyOnClose: props.destroyOnClose
       })
     )
@@ -348,6 +364,7 @@ export const Modal = defineComponent({
     }
 
     const overlayOpen = computed(() => props.open)
+    const escapeEnabled = computed(() => props.open && props.keyboard)
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(overlayOpen)
@@ -355,7 +372,7 @@ export const Modal = defineComponent({
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
-        enabled: overlayOpen,
+        enabled: escapeEnabled,
         onEscape: handleClose,
         layerRef: rootRef
       })
@@ -371,14 +388,21 @@ export const Modal = defineComponent({
       (nextVisible, previousVisible, onCleanup) => {
         if (nextVisible) {
           hasOpened.value = true
+          leaving.value = false
           return
         }
         cleanupDragSession()
         dragOffset.value = { x: 0, y: 0 }
-        if (previousVisible) {
-          const timer = window.setTimeout(() => emit('after-close'), ANIMATION_DURATION_MS)
-          onCleanup(() => window.clearTimeout(timer))
-        }
+        if (!previousVisible) return
+        leaving.value = true
+        onCleanup(
+          scheduleOverlayLeave({
+            onFinish: () => {
+              leaving.value = false
+              emit('after-close')
+            }
+          })
+        )
       }
     )
 
@@ -534,7 +558,7 @@ export const Modal = defineComponent({
           class: modalWrapperClasses,
           ref: rootRef,
           style: { zIndex: props.zIndex },
-          hidden: !props.open,
+          hidden: isOverlayVisuallyHidden(props.open, leaving.value),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-overlay-layer': '',
           'data-tiger-modal-root': ''
@@ -542,15 +566,15 @@ export const Modal = defineComponent({
         [
           props.mask &&
             h('div', {
-              class: modalMaskClasses,
+              class: classNames(modalMaskClasses, props.open ? 'opacity-100' : 'opacity-0'),
               'aria-hidden': 'true',
-              'data-tiger-modal-mask': ''
+              'data-tiger-modal-mask': '',
+              onClick: handleMaskClick
             }),
           h(
             'div',
             {
-              class: containerClasses.value,
-              onClick: handleMaskClick
+              class: containerClasses.value
             },
             [
               h(

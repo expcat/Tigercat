@@ -10,7 +10,6 @@ import {
   useId
 } from 'vue'
 import {
-  ANIMATION_DURATION_MS,
   classNames,
   coerceClassValue,
   closeIconViewBox,
@@ -35,6 +34,8 @@ import {
   isDrawerSwipeCloseGesture,
   resolveSwipeGesture,
   shouldRenderOverlay,
+  isOverlayVisuallyHidden,
+  scheduleOverlayLeave,
   shouldCloseOnMaskClick,
   type GesturePoint,
   type DrawerPlacement,
@@ -59,20 +60,21 @@ export interface VueDrawerProps {
   closable?: boolean
   mask?: boolean
   maskClosable?: boolean
+  keyboard?: boolean
   zIndex?: number
   className?: string
   bodyClassName?: string
   bodyPadding?: boolean | string
   destroyOnClose?: boolean
-  deferDestroyOnClose?: boolean
   fullscreenOnMobile?: boolean
   panelClassName?: string
   panelStyle?: StyleValue
-  style?: Record<string, unknown>
   closeAriaLabel?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleDrawer>
 }
+
+export type DrawerProps = VueDrawerProps
 
 export const Drawer = defineComponent({
   name: 'TigerDrawer',
@@ -141,6 +143,14 @@ export const Drawer = defineComponent({
       default: true
     },
     /**
+     * Whether Escape closes the drawer
+     * @default true
+     */
+    keyboard: {
+      type: Boolean,
+      default: true
+    },
+    /**
      * z-index of the drawer
      * @default 1000
      */
@@ -180,15 +190,6 @@ export const Drawer = defineComponent({
     },
 
     /**
-     * When destroyOnClose is true, wait for the close animation before unmounting.
-     * @default false
-     */
-    deferDestroyOnClose: {
-      type: Boolean,
-      default: false
-    },
-
-    /**
      * Whether the drawer panel should become fullscreen on mobile viewports.
      * @default true
      */
@@ -202,14 +203,6 @@ export const Drawer = defineComponent({
      */
     panelClassName: {
       type: String,
-      default: undefined
-    },
-
-    /**
-     * Custom inline style for drawer panel
-     */
-    style: {
-      type: Object as PropType<Record<string, unknown>>,
       default: undefined
     },
 
@@ -253,7 +246,7 @@ export const Drawer = defineComponent({
 
     const instanceId = ref(`tiger-drawer-${useId()}`)
     const hasOpened = ref(props.open)
-    const deferredRendered = ref(props.open)
+    const leaving = ref(false)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
@@ -266,9 +259,9 @@ export const Drawer = defineComponent({
     const shouldRender = computed(() =>
       shouldRenderOverlay({
         open: props.open,
-        hasOpened: props.destroyOnClose ? deferredRendered.value : hasOpened.value,
-        leaving: false,
-        destroyOnClose: props.destroyOnClose && !props.deferDestroyOnClose
+        hasOpened: hasOpened.value,
+        leaving: leaving.value,
+        destroyOnClose: props.destroyOnClose
       })
     )
 
@@ -318,7 +311,7 @@ export const Drawer = defineComponent({
       }
     }
 
-    const escapeEnabled = computed(() => props.open)
+    const escapeEnabled = computed(() => props.open && props.keyboard)
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(escapeEnabled)
@@ -343,34 +336,27 @@ export const Drawer = defineComponent({
 
     watch(
       () => props.open,
-      (nextVisible) => {
+      (nextVisible, prevVisible, onCleanup) => {
         if (nextVisible) {
           hasOpened.value = true
-          deferredRendered.value = true
+          leaving.value = false
+          onCleanup(
+            scheduleOverlayLeave({
+              onFinish: () => emit('after-enter')
+            })
+          )
           return
         }
-
-        if (props.destroyOnClose && !props.deferDestroyOnClose) {
-          deferredRendered.value = false
-        }
-      }
-    )
-
-    watch(
-      () => props.open,
-      (nextVisible, prevVisible, onCleanup) => {
-        // Skip initial mount when closed, or no actual change
-        if (nextVisible === prevVisible || (typeof prevVisible === 'undefined' && !nextVisible))
-          return
-
-        const timer = window.setTimeout(() => {
-          emit(nextVisible ? 'after-enter' : 'after-close')
-          if (!nextVisible && props.destroyOnClose && props.deferDestroyOnClose) {
-            deferredRendered.value = false
-          }
-        }, ANIMATION_DURATION_MS)
-
-        onCleanup(() => window.clearTimeout(timer))
+        if (prevVisible !== true) return
+        leaving.value = true
+        onCleanup(
+          scheduleOverlayLeave({
+            onFinish: () => {
+              leaving.value = false
+              emit('after-close')
+            }
+          })
+        )
       },
       { immediate: true }
     )
@@ -391,10 +377,7 @@ export const Drawer = defineComponent({
         ariaLabelledbyFromAttrs ?? (props.title || slots.header ? titleId.value : undefined)
       const overlayHostId = `${instanceId.value}-overlay-host`
 
-      const containerClasses = classNames(
-        getDrawerContainerClasses(),
-        !props.open && 'pointer-events-none'
-      )
+      const containerClasses = getDrawerContainerClasses()
 
       const maskClasses = getDrawerMaskClasses(props.open)
 
@@ -413,7 +396,7 @@ export const Drawer = defineComponent({
               typeof props.width === 'number' ? `${props.width}px` : props.width
           }
         : undefined
-      const mergedStyle = mergeStyleValues(attrs.style, props.panelStyle, props.style, widthStyle)
+      const mergedStyle = mergeStyleValues(attrs.style, props.panelStyle, widthStyle)
 
       const headerClasses = getDrawerHeaderClasses()
       const bodyClasses = getDrawerBodyClasses(props.bodyClassName, props.bodyPadding)
@@ -517,7 +500,7 @@ export const Drawer = defineComponent({
           class: containerClasses,
           ref: rootRef,
           style: { zIndex: props.zIndex },
-          hidden: !props.open && !(props.destroyOnClose && props.deferDestroyOnClose),
+          hidden: isOverlayVisuallyHidden(props.open, leaving.value),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-overlay-layer': '',
           'data-tiger-drawer-root': ''

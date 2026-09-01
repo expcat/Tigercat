@@ -54,6 +54,13 @@ export interface ModalProps {
   maskClosable?: boolean
 
   /**
+   * Whether Escape closes the modal. Independent of `closable`, which only
+   * shows or hides the close button.
+   * @default true
+   */
+  keyboard?: boolean
+
+  /**
    * Whether the modal should be centered vertically
    * @default false
    */

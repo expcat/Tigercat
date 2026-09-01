@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   getFocusableElements,
   getFocusTrapNavigation,
@@ -11,7 +11,8 @@ import {
   setBackgroundInert,
   shouldCloseOnMaskClick,
   shouldRenderOverlay,
-  isOverlayVisuallyHidden
+  isOverlayVisuallyHidden,
+  scheduleOverlayLeave
 } from '@expcat/tigercat-core'
 
 describe('overlay-utils (core)', () => {
@@ -91,6 +92,13 @@ describe('overlay-utils (core)', () => {
     ).toBe(true)
     expect(isOverlayVisuallyHidden(false, true)).toBe(false)
     expect(isOverlayVisuallyHidden(false, false)).toBe(true)
+  })
+
+  it('scheduleOverlayLeave finishes immediately when motion is reduced', () => {
+    const onFinish = vi.fn()
+    const cancel = scheduleOverlayLeave({ onFinish, reducedMotion: true })
+    expect(onFinish).toHaveBeenCalledTimes(1)
+    cancel()
   })
 
   it('shouldCloseOnMaskClick should only close for direct mask clicks when enabled', () => {

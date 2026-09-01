@@ -11,8 +11,8 @@ import type { SwipeGesture, SwipeDirection } from './gesture-utils'
  */
 export function getDrawerMaskClasses(visible: boolean): string {
   return classNames(
-    'fixed inset-0 bg-[var(--tiger-drawer-mask,rgba(0,0,0,0.5))] backdrop-blur-[2px] transition-opacity duration-300',
-    visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+    'fixed inset-0 bg-[var(--tiger-component-drawer-overlay-bg,rgba(0,0,0,0.45))] backdrop-blur-[2px] tiger-motion-aware [transition:var(--tiger-transition-base,opacity_300ms_ease)]',
+    visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
   )
 }
 
@@ -20,7 +20,7 @@ export function getDrawerMaskClasses(visible: boolean): string {
  * Get drawer container classes (wrapper positioned over mask)
  */
 export function getDrawerContainerClasses(): string {
-  return 'fixed inset-0 overflow-hidden'
+  return 'fixed inset-0 overflow-hidden pointer-events-none'
 }
 
 /**
@@ -33,15 +33,26 @@ export function getDrawerPanelClasses(
   fullscreenOnMobile: boolean = true
 ): string {
   const baseClasses =
-    'absolute bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-transform duration-300 ease-in-out pointer-events-auto'
+    'absolute bg-[var(--tiger-surface,#ffffff)] shadow-xl pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base,transform_300ms_ease)]'
   const mobileFullscreenClasses = 'max-md:inset-0 max-md:!w-screen max-md:!h-[100dvh]'
 
-  // Size mappings
   const sizeMap: Record<DrawerSize, { width: string; height: string }> = {
-    sm: { width: 'w-64', height: 'h-48' },
-    md: { width: 'w-96', height: 'h-64' },
-    lg: { width: 'w-[32rem]', height: 'h-96' },
-    xl: { width: 'w-[48rem]', height: 'h-[32rem]' },
+    sm: {
+      width: 'w-[var(--tiger-component-drawer-width-sm,256px)]',
+      height: 'h-48'
+    },
+    md: {
+      width: 'w-[var(--tiger-component-drawer-width-md,378px)]',
+      height: 'h-64'
+    },
+    lg: {
+      width: 'w-[var(--tiger-component-drawer-width-lg,520px)]',
+      height: 'h-96'
+    },
+    xl: {
+      width: 'w-[var(--tiger-component-drawer-width-xl,680px)]',
+      height: 'h-[32rem]'
+    },
     full: { width: 'w-full', height: 'h-full' }
   }
 

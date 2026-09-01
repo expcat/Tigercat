@@ -260,7 +260,7 @@ describe('Modal', () => {
       const onUpdateOpen = vi.fn()
       const onCancel = vi.fn()
 
-      const { container } = render(Modal, {
+      render(Modal, {
         props: {
           open: true,
           title: 'Test Modal',
@@ -270,14 +270,13 @@ describe('Modal', () => {
         }
       })
 
-      await waitFor(() => {
-        const containerEl = document.querySelector('.flex.min-h-full')
-        expect(containerEl).toBeInTheDocument()
+      const mask = await waitFor(() => {
+        const node = document.querySelector('[data-tiger-modal-mask]')
+        expect(node).toBeInTheDocument()
+        return node as HTMLElement
       })
 
-      const containerEl = document.querySelector('.flex.min-h-full')!
-      await user.click(containerEl)
-
+      await user.click(mask)
       expect(onUpdateOpen).toHaveBeenCalledWith(false)
       expect(onCancel).toHaveBeenCalled()
     })
@@ -287,7 +286,7 @@ describe('Modal', () => {
       const onUpdateOpen = vi.fn()
       const onCancel = vi.fn()
 
-      const { container } = render(Modal, {
+      render(Modal, {
         props: {
           open: true,
           title: 'Test Modal',
@@ -297,16 +296,48 @@ describe('Modal', () => {
         }
       })
 
-      await waitFor(() => {
-        const containerEl = document.querySelector('.flex.min-h-full')
-        expect(containerEl).toBeInTheDocument()
+      const mask = await waitFor(() => {
+        const node = document.querySelector('[data-tiger-modal-mask]')
+        expect(node).toBeInTheDocument()
+        return node as HTMLElement
       })
 
-      const containerEl = document.querySelector('.flex.min-h-full')!
-      await user.click(containerEl)
-
+      await user.click(mask)
       expect(onUpdateOpen).not.toHaveBeenCalled()
       expect(onCancel).not.toHaveBeenCalled()
+    })
+
+    it('does not close when mask is hidden and the empty frame is clicked', async () => {
+      const onUpdateOpen = vi.fn()
+      render(Modal, {
+        props: {
+          open: true,
+          title: 'Test Modal',
+          mask: false,
+          'onUpdate:open': onUpdateOpen
+        },
+        slots: { default: () => h('p', 'Body') }
+      })
+
+      await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeInTheDocument())
+      expect(document.querySelector('[data-tiger-modal-mask]')).not.toBeInTheDocument()
+      await fireEvent.click(document.querySelector('[data-tiger-modal-root]')!)
+      expect(onUpdateOpen).not.toHaveBeenCalled()
+    })
+
+    it('does not close on Escape when keyboard is false', async () => {
+      const onUpdateOpen = vi.fn()
+      render(Modal, {
+        props: {
+          open: true,
+          title: 'Test Modal',
+          keyboard: false,
+          'onUpdate:open': onUpdateOpen
+        }
+      })
+      await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeInTheDocument())
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      expect(onUpdateOpen).not.toHaveBeenCalled()
     })
 
     it('should not emit close event when open changes externally', async () => {
@@ -461,6 +492,9 @@ describe('Modal', () => {
         open: false,
         destroyOnClose: true
       })
+
+      expect(document.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
+      expect(document.querySelector('[data-tiger-modal-root]')).not.toHaveAttribute('hidden')
 
       await waitFor(() => {
         expect(document.querySelector('[data-testid="modal-content"]')).not.toBeInTheDocument()

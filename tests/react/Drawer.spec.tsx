@@ -117,6 +117,27 @@ describe('Drawer', () => {
     expect(onClose).not.toHaveBeenCalled()
   })
 
+  it('does not close when mask is hidden and the empty frame is clicked', async () => {
+    const onOpenChange = vi.fn()
+    render(
+      <Drawer open={true} title="Test Drawer" mask={false} onOpenChange={onOpenChange}>
+        <p>Body</p>
+      </Drawer>
+    )
+    await screen.findByRole('dialog')
+    expect(document.querySelector('[data-tiger-drawer-mask]')).not.toBeInTheDocument()
+    fireEvent.click(document.querySelector('[data-tiger-drawer-root]')!)
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('does not close on Escape when keyboard is false', async () => {
+    const onOpenChange = vi.fn()
+    render(<Drawer open={true} title="Test Drawer" keyboard={false} onOpenChange={onOpenChange} />)
+    await screen.findByRole('dialog')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
   it('should apply custom zIndex', async () => {
     render(<Drawer open={true} title="Test Drawer" zIndex={2000} />)
 
@@ -285,7 +306,7 @@ describe('Drawer', () => {
   it('should destroy content after close animation when requested', async () => {
     const onAfterClose = vi.fn()
     const { rerender } = render(
-      <Drawer open={true} destroyOnClose={true} deferDestroyOnClose onAfterClose={onAfterClose}>
+      <Drawer open={true} destroyOnClose={true} onAfterClose={onAfterClose}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -295,7 +316,7 @@ describe('Drawer', () => {
     })
 
     rerender(
-      <Drawer open={false} destroyOnClose={true} deferDestroyOnClose onAfterClose={onAfterClose}>
+      <Drawer open={false} destroyOnClose={true} onAfterClose={onAfterClose}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )

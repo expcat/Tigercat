@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import {
-  ANIMATION_DURATION_MS,
   classNames,
   closeIconViewBox,
   closeIconPathD,
@@ -20,6 +19,8 @@ import {
   resolveLocaleText,
   resolveSwipeGesture,
   shouldRenderOverlay,
+  isOverlayVisuallyHidden,
+  scheduleOverlayLeave,
   shouldCloseOnMaskClick,
   mergeTigerLocale,
   OVERLAY_Z_INDEX,
@@ -75,12 +76,12 @@ export const Drawer: React.FC<DrawerProps> = ({
   closable = true,
   mask = true,
   maskClosable = true,
+  keyboard = true,
   zIndex = OVERLAY_Z_INDEX.modal,
   className,
   bodyClassName,
   bodyPadding,
   destroyOnClose = false,
-  deferDestroyOnClose = false,
   fullscreenOnMobile = true,
   panelClassName,
   panelStyle,
@@ -102,25 +103,38 @@ export const Drawer: React.FC<DrawerProps> = ({
     [config.locale, locale]
   )
   const [hasOpened, setHasOpened] = React.useState(open)
-  const [deferredRendered, setDeferredRendered] = React.useState(open)
+  const [leaving, setLeaving] = React.useState(false)
+  const wasOpenRef = useRef(open)
+  const afterEnterRef = useRef(onAfterEnter)
+  const afterCloseRef = useRef(onAfterClose)
+  afterEnterRef.current = onAfterEnter
+  afterCloseRef.current = onAfterClose
 
   useEffect(() => {
     if (open) {
       setHasOpened(true)
-      setDeferredRendered(true)
-      return
+      setLeaving(false)
+      wasOpenRef.current = true
+      return scheduleOverlayLeave({
+        onFinish: () => afterEnterRef.current?.()
+      })
     }
-
-    if (destroyOnClose && !deferDestroyOnClose) {
-      setDeferredRendered(false)
-    }
-  }, [destroyOnClose, deferDestroyOnClose, open])
+    if (!wasOpenRef.current) return
+    wasOpenRef.current = false
+    setLeaving(true)
+    return scheduleOverlayLeave({
+      onFinish: () => {
+        setLeaving(false)
+        afterCloseRef.current?.()
+      }
+    })
+  }, [open])
 
   const shouldRender = shouldRenderOverlay({
     open,
-    hasOpened: destroyOnClose ? deferredRendered : hasOpened,
-    leaving: false,
-    destroyOnClose: destroyOnClose && !deferDestroyOnClose
+    hasOpened,
+    leaving,
+    destroyOnClose
   })
 
   const handleClose = useCallback(() => {
@@ -138,25 +152,6 @@ export const Drawer: React.FC<DrawerProps> = ({
   )
 
   useBodyScrollLock({ enabled: open })
-
-  const previousVisible = useRef(false)
-  useEffect(() => {
-    if (open === previousVisible.current) return
-    previousVisible.current = open
-
-    const timer = window.setTimeout(() => {
-      if (open) {
-        onAfterEnter?.()
-      } else {
-        onAfterClose?.()
-        if (destroyOnClose && deferDestroyOnClose) {
-          setDeferredRendered(false)
-        }
-      }
-    }, ANIMATION_DURATION_MS)
-
-    return () => window.clearTimeout(timer)
-  }, [destroyOnClose, deferDestroyOnClose, open, onAfterEnter, onAfterClose])
 
   const reactId = useId()
   const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
@@ -179,7 +174,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
 
-  useEscapeKey({ enabled: open, onEscape: handleClose, layerRef: rootRef })
+  useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
 
   const resolvedCloseAriaLabel = resolveLocaleText(
     'Close drawer',
@@ -247,7 +242,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     [dialogDivProps, resetTouchGesture]
   )
 
-  const containerClasses = classNames(getDrawerContainerClasses(), !open && 'pointer-events-none')
+  const containerClasses = getDrawerContainerClasses()
 
   const maskClasses = getDrawerMaskClasses(open)
   const panelClasses = classNames(
@@ -267,14 +262,12 @@ export const Drawer: React.FC<DrawerProps> = ({
     return null
   }
 
-  const isClosingBeforeDestroy = destroyOnClose && deferDestroyOnClose && !open
-
   const drawerContent = (
     <div
       ref={rootRef}
       className={containerClasses}
       style={{ zIndex }}
-      hidden={!open && !isClosingBeforeDestroy}
+      hidden={isOverlayVisuallyHidden(open, leaving)}
       aria-hidden={!open ? 'true' : undefined}
       data-tiger-overlay-layer=""
       data-tiger-drawer-root="">

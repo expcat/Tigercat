@@ -9,13 +9,13 @@ import type { SwipeGesture } from './gesture-utils'
 /**
  * Base modal wrapper classes
  */
-export const modalWrapperClasses = 'fixed inset-0 overflow-y-auto'
+export const modalWrapperClasses = 'fixed inset-0 overflow-y-auto pointer-events-none'
 
 /**
  * Modal mask/overlay classes
  */
 export const modalMaskClasses =
-  'fixed inset-0 bg-[var(--tiger-modal-mask,rgba(0,0,0,0.5))] backdrop-blur-[2px] transition-opacity'
+  'fixed inset-0 pointer-events-auto bg-[var(--tiger-component-modal-overlay-bg,rgba(0,0,0,0.45))] backdrop-blur-[2px] tiger-motion-aware [transition:var(--tiger-transition-base,opacity_300ms_ease)]'
 
 /**
  * Modal container classes (for centering)
@@ -31,20 +31,20 @@ export const getModalContainerClasses = (centered: boolean) => {
  * Modal content wrapper classes
  */
 export const modalContentWrapperClasses =
-  'relative transform overflow-hidden rounded-[var(--tiger-radius-xl,1rem)] bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-all'
+  'relative pointer-events-auto overflow-hidden rounded-[var(--tiger-radius-xl,1rem)] bg-[var(--tiger-surface,#ffffff)] shadow-xl tiger-motion-aware [transition:var(--tiger-transition-base,opacity_300ms_ease,transform_300ms_ease)]'
 
 export const modalMobileSheetClasses =
-  'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-auto max-md:!w-screen max-md:max-w-none max-md:rounded-t-[var(--tiger-radius-xl,1rem)] max-md:rounded-b-none'
+  'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-auto max-md:!w-screen max-md:max-w-none max-md:max-h-[90dvh] max-md:flex max-md:flex-col max-md:rounded-t-[var(--tiger-radius-xl,1rem)] max-md:rounded-b-none'
 
 /**
  * Modal size classes
  */
 export const modalSizeClasses: Record<ModalSize, string> = {
-  sm: 'max-w-sm w-full',
-  md: 'max-w-md w-full',
-  lg: 'max-w-lg w-full',
-  xl: 'max-w-xl w-full',
-  full: 'max-w-full w-full mx-4'
+  sm: 'w-full max-w-[var(--tiger-component-modal-width-sm,400px)]',
+  md: 'w-full max-w-[var(--tiger-component-modal-width-md,520px)]',
+  lg: 'w-full max-w-[var(--tiger-component-modal-width-lg,680px)]',
+  xl: 'w-full max-w-[var(--tiger-component-modal-width-xl,860px)]',
+  full: 'h-full w-full max-w-none rounded-none'
 }
 
 /**
@@ -67,7 +67,8 @@ export const modalCloseButtonClasses =
 /**
  * Modal body classes
  */
-export const modalBodyClasses = 'px-6 py-4 text-[var(--tiger-text,#374151)]'
+export const modalBodyClasses =
+  'min-h-0 flex-1 overflow-y-auto px-6 py-4 text-[var(--tiger-text,#374151)]'
 
 /**
  * Modal footer classes

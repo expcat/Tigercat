@@ -1,5 +1,7 @@
 import { isEscapeKey, isTabKey, type KeyLikeEvent } from './a11y-utils'
+import { ANIMATION_DURATION_MS } from './animation'
 import { isBrowser } from './env'
+import { prefersReducedMotion } from './transition'
 
 interface BodyScrollLockState {
   count: number
@@ -70,6 +72,20 @@ export function shouldRenderOverlay(presence: OverlayPresence): boolean {
 
 export function isOverlayVisuallyHidden(open: boolean, leaving: boolean): boolean {
   return !open && !leaving
+}
+
+export function scheduleOverlayLeave(options: {
+  onFinish: () => void
+  durationMs?: number
+  reducedMotion?: boolean
+}): () => void {
+  if (!isBrowser() || (options.reducedMotion ?? prefersReducedMotion())) {
+    options.onFinish()
+    return () => undefined
+  }
+
+  const timer = window.setTimeout(options.onFinish, options.durationMs ?? ANIMATION_DURATION_MS)
+  return () => window.clearTimeout(timer)
 }
 
 export function isEventOutside(

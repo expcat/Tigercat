@@ -168,6 +168,38 @@ describe('Drawer', () => {
     expect(onUpdateOpen).not.toHaveBeenCalled()
   })
 
+  it('does not close when mask is hidden and the empty frame is clicked', async () => {
+    const onUpdateOpen = vi.fn()
+    render(Drawer, {
+      props: {
+        open: true,
+        title: 'Test Drawer',
+        mask: false,
+        'onUpdate:open': onUpdateOpen
+      },
+      slots: { default: () => h('p', 'Body') }
+    })
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    expect(document.querySelector('[data-tiger-drawer-mask]')).not.toBeInTheDocument()
+    fireEvent.click(document.querySelector('[data-tiger-drawer-root]') as Element)
+    expect(onUpdateOpen).not.toHaveBeenCalled()
+  })
+
+  it('does not close on Escape when keyboard is false', async () => {
+    const onUpdateOpen = vi.fn()
+    render(Drawer, {
+      props: {
+        open: true,
+        title: 'Test Drawer',
+        keyboard: false,
+        'onUpdate:open': onUpdateOpen
+      }
+    })
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(onUpdateOpen).not.toHaveBeenCalled()
+  })
+
   it('should apply custom zIndex', async () => {
     render(Drawer, {
       props: { open: true, title: 'Test Drawer', zIndex: 2000 }
@@ -347,7 +379,6 @@ describe('Drawer', () => {
       props: {
         open: true,
         destroyOnClose: true,
-        deferDestroyOnClose: true,
         onAfterClose
       },
       slots: {
@@ -362,7 +393,6 @@ describe('Drawer', () => {
     await rerender({
       open: false,
       destroyOnClose: true,
-      deferDestroyOnClose: true,
       onAfterClose
     })
 

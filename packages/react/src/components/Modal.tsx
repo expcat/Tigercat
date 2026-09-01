@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useCallback, useRef, useId } from 'react'
 import {
-  ANIMATION_DURATION_MS,
   classNames,
   closeIconViewBox,
   closeIconPathD,
@@ -20,6 +19,8 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   shouldRenderOverlay,
+  isOverlayVisuallyHidden,
+  scheduleOverlayLeave,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   mergeTigerLocale,
@@ -111,6 +112,7 @@ export const Modal: React.FC<ModalProps> = ({
   closable = true,
   mask = true,
   maskClosable = true,
+  keyboard = true,
   centered = false,
   mobileSheet = false,
   destroyOnClose = false,
@@ -139,8 +141,11 @@ export const Modal: React.FC<ModalProps> = ({
     [config.locale, locale]
   )
   const [hasOpened, setHasOpened] = React.useState(open)
+  const [leaving, setLeaving] = React.useState(false)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
-  const prevOpenRef = useRef(open)
+  const wasOpenRef = useRef(open)
+  const afterCloseRef = useRef(onAfterClose)
+  afterCloseRef.current = onAfterClose
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
 
   const cleanupDragSession = useCallback(() => {
@@ -151,10 +156,21 @@ export const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     if (open) {
       setHasOpened(true)
-    } else {
-      cleanupDragSession()
-      setDragOffset({ x: 0, y: 0 })
+      setLeaving(false)
+      wasOpenRef.current = true
+      return
     }
+    cleanupDragSession()
+    setDragOffset({ x: 0, y: 0 })
+    if (!wasOpenRef.current) return
+    wasOpenRef.current = false
+    setLeaving(true)
+    return scheduleOverlayLeave({
+      onFinish: () => {
+        setLeaving(false)
+        afterCloseRef.current?.()
+      }
+    })
   }, [open, cleanupDragSession])
 
   useEffect(() => cleanupDragSession, [cleanupDragSession])
@@ -183,21 +199,10 @@ export const Modal: React.FC<ModalProps> = ({
     [isDraggable, dragOffset, cleanupDragSession]
   )
 
-  useEffect(() => {
-    if (prevOpenRef.current && !open) {
-      const timer = window.setTimeout(() => {
-        onAfterClose?.()
-      }, ANIMATION_DURATION_MS)
-      prevOpenRef.current = open
-      return () => window.clearTimeout(timer)
-    }
-    prevOpenRef.current = open
-  }, [open, onAfterClose])
-
   const shouldRender = shouldRenderOverlay({
     open,
     hasOpened,
-    leaving: false,
+    leaving,
     destroyOnClose
   })
 
@@ -276,7 +281,7 @@ export const Modal: React.FC<ModalProps> = ({
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
 
-  useEscapeKey({ enabled: open, onEscape: handleClose, layerRef: rootRef })
+  useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
   useFocusTrap({ enabled: open, containerRef: rootRef, inert: true, autoFocus: true })
 
@@ -360,9 +365,9 @@ export const Modal: React.FC<ModalProps> = ({
   const modalContent = (
     <div
       ref={rootRef}
-      className={classNames(modalWrapperClasses, !open && 'pointer-events-none')}
+      className={modalWrapperClasses}
       style={{ zIndex }}
-      hidden={!open}
+      hidden={isOverlayVisuallyHidden(open, leaving)}
       aria-hidden={!open ? 'true' : undefined}
       data-tiger-overlay-layer=""
       data-tiger-modal-root="">
@@ -372,11 +377,11 @@ export const Modal: React.FC<ModalProps> = ({
           className={classNames(modalMaskClasses, open ? 'opacity-100' : 'opacity-0')}
           aria-hidden="true"
           data-tiger-modal-mask=""
+          onClick={handleMaskClick}
         />
       )}
 
-      {/* Content Container */}
-      <div className={containerClasses} onClick={handleMaskClick}>
+      <div className={containerClasses}>
         <div
           className={contentClasses}
           style={{

@@ -252,14 +252,13 @@ describe('Modal', () => {
 
       render(<Modal open={true} title="Test Modal" maskClosable={true} onCancel={onCancel} />)
 
-      await waitFor(() => {
-        const containerEl = document.querySelector('.flex.min-h-full')
-        expect(containerEl).toBeInTheDocument()
+      const mask = await waitFor(() => {
+        const node = document.querySelector('[data-tiger-modal-mask]')
+        expect(node).toBeInTheDocument()
+        return node as HTMLElement
       })
 
-      const containerEl = document.querySelector('.flex.min-h-full')!
-      await user.click(containerEl)
-
+      await user.click(mask)
       expect(onCancel).toHaveBeenCalled()
     })
 
@@ -269,15 +268,36 @@ describe('Modal', () => {
 
       render(<Modal open={true} title="Test Modal" maskClosable={false} onCancel={onCancel} />)
 
-      await waitFor(() => {
-        const containerEl = document.querySelector('.flex.min-h-full')
-        expect(containerEl).toBeInTheDocument()
+      const mask = await waitFor(() => {
+        const node = document.querySelector('[data-tiger-modal-mask]')
+        expect(node).toBeInTheDocument()
+        return node as HTMLElement
       })
 
-      const containerEl = document.querySelector('.flex.min-h-full')!
-      await user.click(containerEl)
-
+      await user.click(mask)
       expect(onCancel).not.toHaveBeenCalled()
+    })
+
+    it('does not close when mask is hidden and the empty frame is clicked', async () => {
+      const onOpenChange = vi.fn()
+      render(
+        <Modal open={true} title="Test Modal" mask={false} onOpenChange={onOpenChange}>
+          <p>Body</p>
+        </Modal>
+      )
+
+      await screen.findByRole('dialog')
+      expect(document.querySelector('[data-tiger-modal-mask]')).not.toBeInTheDocument()
+      fireEvent.click(document.querySelector('[data-tiger-modal-root]')!)
+      expect(onOpenChange).not.toHaveBeenCalled()
+    })
+
+    it('does not close on Escape when keyboard is false', async () => {
+      const onOpenChange = vi.fn()
+      render(<Modal open={true} title="Test Modal" keyboard={false} onOpenChange={onOpenChange} />)
+      await screen.findByRole('dialog')
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      expect(onOpenChange).not.toHaveBeenCalled()
     })
 
     it('should call onClose for user close actions', async () => {
@@ -406,6 +426,9 @@ describe('Modal', () => {
           <div data-testid="modal-content">Content</div>
         </Modal>
       )
+
+      expect(screen.getByTestId('modal-content')).toBeInTheDocument()
+      expect(document.querySelector('[data-tiger-modal-root]')).not.toHaveAttribute('hidden')
 
       await waitFor(() => {
         expect(screen.queryByTestId('modal-content')).not.toBeInTheDocument()

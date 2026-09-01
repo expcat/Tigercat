@@ -66,13 +66,20 @@ export interface DrawerProps {
   maskClosable?: boolean
 
   /**
+   * Whether Escape closes the drawer. Independent of `closable`, which only
+   * shows or hides the close button.
+   * @default true
+   */
+  keyboard?: boolean
+
+  /**
    * z-index of the drawer
    * @default OVERLAY_Z_INDEX.modal
    */
   zIndex?: number
 
   /**
-   * Additional CSS class for the drawer container
+   * Additional CSS class for the drawer panel (same node as `panelClassName`)
    */
   className?: string
 
@@ -94,13 +101,6 @@ export interface DrawerProps {
    * @default false
    */
   destroyOnClose?: boolean
-
-  /**
-   * When `destroyOnClose` is enabled, keep the drawer mounted until the
-   * close animation finishes before destroying its content.
-   * @default false
-   */
-  deferDestroyOnClose?: boolean
 
   /**
    * Whether the drawer panel should become fullscreen on mobile viewports.
