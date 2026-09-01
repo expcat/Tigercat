@@ -2,7 +2,9 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
-## 未发布
+## v2.1.3
+
+v2.1.3：把未发布栏的组件根因修复收成正式版，含 NavigationMenu 键盘、ScrollArea playground 溢出、Watermark 防篡改循环和发版门禁。
 
 - **Watermark**：防篡改只看直子 overlay 是否还在覆盖宿主；自身绘制和 remount 不再当成篡改，避免 MutationObserver 循环撑崩 playground。
 - **锚点浮层**：Modal/Drawer 根是 `pointer-events-none`，overlay-host 是 `contents`。portaled 层补 `pointer-events-auto`，否则 Select 等点击会穿透到 dialog 内容。
