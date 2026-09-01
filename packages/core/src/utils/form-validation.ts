@@ -30,7 +30,8 @@ export interface FormValidationDebouncerOptions {
 }
 
 export interface FormValidationDebouncer {
-  schedule: (fieldName: string, validate: () => Promise<void> | void) => Promise<void>
+  /** Wait until `validate` settles; its return value is discarded. */
+  schedule: (fieldName: string, validate: () => unknown) => Promise<void>
   flush: (fieldName?: string) => Promise<void>
   cancel: (fieldName?: string) => void
   isPending: (fieldName?: string) => boolean
@@ -38,7 +39,7 @@ export interface FormValidationDebouncer {
 
 interface PendingValidation {
   timerHandle: number
-  validate: () => Promise<void> | void
+  validate: () => unknown
   resolveCallbacks: Array<() => void>
   rejectCallbacks: Array<(error: unknown) => void>
 }
@@ -246,9 +247,13 @@ export function createFormValidationDebouncer(
     }
   }
 
-  const schedule = (fieldName: string, validate: () => Promise<void> | void): Promise<void> => {
+  const schedule = (fieldName: string, validate: () => unknown): Promise<void> => {
     if (delay <= 0) {
-      return Promise.resolve(validate())
+      try {
+        return Promise.resolve(validate()).then(() => undefined)
+      } catch (error) {
+        return Promise.reject(error)
+      }
     }
 
     return new Promise((resolve, reject) => {
