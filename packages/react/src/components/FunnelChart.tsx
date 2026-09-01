@@ -1,4 +1,4 @@
-import React, { useId, useMemo } from 'react'
+import React, { useCallback, useId, useMemo } from 'react'
 import {
   classNames,
   layoutFunnel,
@@ -125,8 +125,11 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     [data, innerRect.width, innerRect.height, gap, pinch, palette, direction]
   )
   const total = useMemo(() => segments.reduce((sum, segment) => sum + segment.value, 0), [segments])
-  const stageName = (datum: FunnelChartDatum, index: number) =>
-    funnelStageDisplayLabel(datum, index, labels.stageName)
+  const stageName = useCallback(
+    (datum: FunnelChartDatum, index: number) =>
+      funnelStageDisplayLabel(datum, index, labels.stageName),
+    [labels.stageName]
+  )
   const gradientId = useId()
   const gradientPrefix = useMemo(
     () => getStableChartGradientPrefix('funnel', gradientId),
@@ -142,7 +145,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         getLabel: (d, i) => stageName(d, i),
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [data, palette, activeIndex, resolvedSelectedIndex, labels.stageName]
+    [data, palette, activeIndex, resolvedSelectedIndex, stageName]
   )
   const tooltipContent = useMemo(
     () =>
@@ -150,7 +153,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
         return `${stageName(datum, index)}: ${datum.value} (${pct}%)`
       }),
-    [resolvedHoveredIndex, data, tooltipFormatter, total, labels.stageName]
+    [resolvedHoveredIndex, data, tooltipFormatter, total, stageName]
   )
   const visualActive = segments.findIndex(
     (segment) => segment.index === (activeIndex ?? resolvedHoveredIndex)

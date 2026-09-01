@@ -275,6 +275,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     strokeWidth,
     showPoints,
     pointSize,
+    pointColor,
     pointHollow
   ])
 

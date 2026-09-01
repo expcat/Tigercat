@@ -150,7 +150,7 @@ export function useOverlayPortalTarget(): {
 
   useLayoutEffect(() => {
     setTarget(resolveAnchoredOverlayTarget(anchorRef.current))
-  })
+  }, [])
 
   return {
     anchorRef,

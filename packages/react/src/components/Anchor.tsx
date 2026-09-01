@@ -252,8 +252,9 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
   }, [bounds, links, scrollOffset, resolvedKey, applyActive])
 
   useEffect(() => {
+    const scrollLock = scrollLockRef.current
     return () => {
-      scrollLockRef.current.dispose()
+      scrollLock.dispose()
     }
   }, [])
 

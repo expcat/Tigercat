@@ -289,8 +289,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     [trackPointer, laid.angles, laid.cx, laid.cy, laid.radius, handleHoverEnter, handleMouseMove]
   )
 
-  const seriesName = (item: RadarChartSeries, index: number) =>
-    item.name ?? defaultChartSeriesName(index, labels.seriesName)
+  const seriesName = useCallback(
+    (item: RadarChartSeries, index: number) =>
+      item.name ?? defaultChartSeriesName(index, labels.seriesName),
+    [labels.seriesName]
+  )
 
   const tooltipContent = useMemo(() => {
     if (!hoveredPoint) return ''
@@ -331,7 +334,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       resolvedActiveIndex,
       resolvedSelectedIndex,
       legendFormatter,
-      labels.seriesName
+      seriesName
     ]
   )
 

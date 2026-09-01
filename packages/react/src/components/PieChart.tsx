@@ -1,4 +1,4 @@
-import React, { useId, useMemo } from 'react'
+import React, { useCallback, useId, useMemo } from 'react'
 import {
   classNames,
   getStableChartGradientPrefix,
@@ -190,8 +190,10 @@ export const PieChart: React.FC<PieChartProps> = ({
     ]
   )
   const total = useMemo(() => slices.reduce((sum, slice) => sum + slice.value, 0), [slices])
-  const sliceName = (datum: PieChartDatum, index: number) =>
-    pieSliceDisplayLabel(datum, index, labels.sliceName)
+  const sliceName = useCallback(
+    (datum: PieChartDatum, index: number) => pieSliceDisplayLabel(datum, index, labels.sliceName),
+    [labels.sliceName]
+  )
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
@@ -203,7 +205,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : sliceName(d, i)),
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, labels.sliceName]
+    [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, sliceName]
   )
 
   const tooltipContent = useMemo(
@@ -213,7 +215,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         const percentage = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
         return `${name}: ${datum.value} (${percentage}%)`
       }),
-    [resolvedHoveredIndex, data, tooltipFormatter, total, labels.sliceName]
+    [resolvedHoveredIndex, data, tooltipFormatter, total, sliceName]
   )
 
   const visualActive = slices.findIndex(

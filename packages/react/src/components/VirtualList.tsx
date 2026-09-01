@@ -4,6 +4,7 @@ import React, {
   useImperativeHandle,
   useLayoutEffect,
   useMemo,
+  useReducer,
   useRef,
   useState
 } from 'react'
@@ -56,7 +57,7 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
   ref
 ) {
   const [scrollTop, setScrollTop] = useState(0)
-  const [measureVersion, setMeasureVersion] = useState(0)
+  const [, bumpMeasuredLayout] = useReducer((count: number) => count + 1, 0)
   const containerRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef(new Map<number, HTMLDivElement>())
   const dynamicStrategyRef = useRef<VirtualListSizeStrategy | null>(null)
@@ -84,10 +85,7 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
 
   const canMeasure = typeof strategy.updateItemHeight === 'function'
 
-  const range = useMemo(
-    () => strategy.getRange(scrollTop, height, itemCount, overscan),
-    [scrollTop, height, itemCount, overscan, strategy, measureVersion]
-  )
+  const range = strategy.getRange(scrollTop, height, itemCount, overscan)
 
   useLayoutEffect(() => {
     if (!canMeasure || !strategy.updateItemHeight) return
@@ -100,7 +98,7 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
         changed = true
       }
     })
-    if (changed) setMeasureVersion((v) => v + 1)
+    if (changed) bumpMeasuredLayout()
   }, [canMeasure, strategy, range.startIndex, range.endIndex, itemCount])
 
   const applyScrollTop = useCallback(

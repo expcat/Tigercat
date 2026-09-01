@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useRef,
   useEffect,
+  useCallback,
   useImperativeHandle,
   useReducer,
   forwardRef
@@ -198,15 +199,18 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const errors = engine.getErrors()
     const errorsByField = useMemo(() => createFormErrorMap(errors), [errors])
 
-    const validateField = async (
-      fieldName: string,
-      rulesOverride?: FormRule | FormRule[],
-      trigger?: FormRuleTrigger
-    ): Promise<void> => {
-      await engine.validateField(fieldName, rulesOverride, trigger)
-    }
+    const validateField = useCallback(
+      async (
+        fieldName: string,
+        rulesOverride?: FormRule | FormRule[],
+        trigger?: FormRuleTrigger
+      ): Promise<void> => {
+        await engine.validateField(fieldName, rulesOverride, trigger)
+      },
+      [engine]
+    )
 
-    const submitForm = async (): Promise<boolean> => {
+    const submitForm = useCallback(async (): Promise<boolean> => {
       if (loading) return false
       const valid = await engine.validate()
       if (!valid) {
@@ -214,7 +218,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       }
       onSubmit?.({ valid, values: engine.getValues(), errors: engine.getErrors() })
       return valid
-    }
+    }, [engine, loading, onSubmit])
 
     useImperativeHandle(
       ref,
@@ -229,10 +233,14 @@ export const Form = forwardRef<FormHandle, FormProps>(
         undo: () => engine.undo(),
         redo: () => engine.redo(),
         snapshotHistory: () => engine.snapshotHistory(),
-        canUndo: engine.canUndo,
-        canRedo: engine.canRedo
+        get canUndo() {
+          return engine.canUndo
+        },
+        get canRedo() {
+          return engine.canRedo
+        }
       }),
-      [engine, engine.canUndo, engine.canRedo]
+      [engine, validateField]
     )
 
     const contextValue = useMemo<FormContextValue>(
@@ -275,7 +283,8 @@ export const Form = forwardRef<FormHandle, FormProps>(
         errors,
         errorsByField,
         engine,
-        submitForm
+        submitForm,
+        validateField
       ]
     )
 

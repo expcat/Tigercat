@@ -184,12 +184,15 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
     [onResize, onResizeEnd, onSizesChange]
   )
 
-  const currentPixels = (liveSize = containerSize): number[] => {
-    if (liveSize > 0) {
-      return layoutPanePixels(ratios, liveSize, gutterSize, min, max)
-    }
-    return resolveInitialPaneSizes(paneCount, 0, gutterSize, controlledSizes, min, max) ?? []
-  }
+  const currentPixels = useCallback(
+    (liveSize = containerSize): number[] => {
+      if (liveSize > 0) {
+        return layoutPanePixels(ratios, liveSize, gutterSize, min, max)
+      }
+      return resolveInitialPaneSizes(paneCount, 0, gutterSize, controlledSizes, min, max) ?? []
+    },
+    [containerSize, controlledSizes, gutterSize, max, min, paneCount, ratios]
+  )
 
   const handlePointerDown = useCallback(
     (index: number, e: React.PointerEvent) => {
@@ -259,13 +262,8 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       cleanupDragSession,
       onResizeStart,
       commitSizes,
-      measured,
-      paneSizes,
-      ratios,
-      gutterSize,
-      min,
-      max,
-      paneCount
+      containerSize,
+      currentPixels
     ]
   )
 
@@ -285,13 +283,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       mins,
       maxes,
       commitSizes,
-      measured,
-      paneSizes,
-      ratios,
-      gutterSize,
-      min,
-      max,
-      paneCount
+      currentPixels
     ]
   )
 

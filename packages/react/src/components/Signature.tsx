@@ -241,7 +241,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
       if (extra?.undo) onUndo?.()
       return payload
     },
-    [exportOptions, onClear, onUndo, setCommitted]
+    [exportOptions, formItemControl, onClear, onUndo, setCommitted]
   )
 
   const clear = useCallback(() => {

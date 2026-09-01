@@ -551,6 +551,7 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
     [
       cancelClose,
       close,
+      contentId,
       disabled,
       hasPanel,
       isOpen,

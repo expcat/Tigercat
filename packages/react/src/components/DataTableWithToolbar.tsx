@@ -188,14 +188,12 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const hasFiltersExtra = Boolean(toolbar?.filtersExtra)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
   const hasColumnSettings = Boolean(toolbar?.showColumnSettings)
-  const sourceRows = (dataSource ?? []) as T[]
-  const viewRows = useMemo(
-    () =>
-      isToolbarSearchRemote(toolbar)
-        ? sourceRows
-        : applyToolbarLocalView(sourceRows, columns, searchValue ?? '', resolvedFilters),
-    [columns, resolvedFilters, searchValue, sourceRows, toolbar]
-  )
+  const viewRows = useMemo(() => {
+    const sourceRows = (dataSource ?? []) as T[]
+    return isToolbarSearchRemote(toolbar)
+      ? sourceRows
+      : applyToolbarLocalView(sourceRows, columns, searchValue ?? '', resolvedFilters)
+  }, [columns, dataSource, resolvedFilters, searchValue, toolbar])
 
   const selectedKeys = resolveToolbarSelectedKeys(
     toolbar?.selectedKeys,

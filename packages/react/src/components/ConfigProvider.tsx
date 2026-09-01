@@ -100,9 +100,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   }
 
   useLayoutEffect(() => {
-    if (!globalLocaleHandleRef.current) {
-      globalLocaleHandleRef.current = createGlobalTigerLocaleHandle(value.locale)
-    }
     return () => {
       globalLocaleHandleRef.current?.dispose()
       globalLocaleHandleRef.current = null

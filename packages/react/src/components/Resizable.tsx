@@ -141,13 +141,13 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
     [onResize, onResizeEnd, setHeight, setWidth]
   )
 
-  const measureBox = (): { width: number; height: number } => {
+  const measureBox = useCallback((): { width: number; height: number } => {
     const rect = rootRef.current?.getBoundingClientRect()
     return {
       width: width ?? rect?.width ?? 0,
       height: height ?? rect?.height ?? 0
     }
-  }
+  }, [height, width])
 
   const handlePointerDown = useCallback(
     (handle: ResizeHandlePosition, e: React.PointerEvent) => {
@@ -248,17 +248,16 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       cleanupDragSession,
       commitSize,
       disabled,
-      height,
       lockAspectRatio,
       maxHeight,
       maxWidth,
+      measureBox,
       minHeight,
       minWidth,
       offset.x,
       offset.y,
       onResizeStart,
-      rtl,
-      width
+      rtl
     ]
   )
 
@@ -297,16 +296,15 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       axis,
       commitSize,
       disabled,
-      height,
       lockAspectRatio,
       maxHeight,
       maxWidth,
+      measureBox,
       minHeight,
       minWidth,
       offset.x,
       offset.y,
-      rtl,
-      width
+      rtl
     ]
   )
 

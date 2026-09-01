@@ -70,9 +70,9 @@ export function useControlledState<T, Args extends unknown[] = []>(
 
   const setValue = useCallback<SetControlledState<T, Args>>((next, ...args) => {
     const prev = valueRef.current
-    const resolved = applyPostState(
-      typeof next === 'function' ? (next as (prev: T) => T)(prev) : next
-    )
+    const resolvedRaw = typeof next === 'function' ? (next as (prev: T) => T)(prev) : next
+    const post = postStateRef.current
+    const resolved = post ? post(resolvedRaw) : resolvedRaw
     if (Object.is(resolved, prev)) return
     valueRef.current = resolved
     if (!isControlledRef.current) {

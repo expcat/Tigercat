@@ -112,7 +112,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
 
   useEffect(() => {
     return createScrollSpyObserver(items, {
-      container: getContainer,
+      container: getContainerRef.current,
       offsetTop: offset,
       bounds,
       onChange: (item) => {
@@ -123,8 +123,9 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
   }, [bounds, emitActive, items, offset, containerKey])
 
   useEffect(() => {
+    const scrollLock = scrollLockRef.current
     return () => {
-      scrollLockRef.current.dispose()
+      scrollLock.dispose()
     }
   }, [])
 

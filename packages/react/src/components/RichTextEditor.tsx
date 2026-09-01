@@ -126,20 +126,46 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
     useImperativeHandle(ref, () => editorRef.current as HTMLDivElement)
 
+    const createOptionsRef = useRef({
+      isControlled,
+      value,
+      defaultValue,
+      mode,
+      readOnly,
+      effectiveDisabled,
+      placeholder,
+      toolbarItems,
+      onRequestUrl,
+      setContent
+    })
+    createOptionsRef.current = {
+      isControlled,
+      value,
+      defaultValue,
+      mode,
+      readOnly,
+      effectiveDisabled,
+      placeholder,
+      toolbarItems,
+      onRequestUrl,
+      setContent
+    }
+
     useEffect(() => {
       if (!editorRef.current) return
+      const options = createOptionsRef.current
       const factory = engine ?? builtinRichTextEngine
       const instance = factory.create({
         element: editorRef.current,
-        initialValue: isControlled ? value! : defaultValue,
-        mode,
-        readOnly,
-        disabled: effectiveDisabled,
-        placeholder,
-        toolbar: toolbarItems,
-        requestUrl: onRequestUrl,
+        initialValue: options.isControlled ? options.value! : options.defaultValue,
+        mode: options.mode,
+        readOnly: options.readOnly,
+        disabled: options.effectiveDisabled,
+        placeholder: options.placeholder,
+        toolbar: options.toolbarItems,
+        requestUrl: options.onRequestUrl,
         notifyChange(html) {
-          setContent(html)
+          createOptionsRef.current.setContent(html)
         },
         notifyActiveFormats(next) {
           setActiveFormats(next)
