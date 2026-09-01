@@ -146,7 +146,9 @@ describe('usage snippets', () => {
   })
 
   it('binds required props instead of listing an empty component', () => {
-    expect(resolveUsageSnippet('Tour', 'Vue', ['steps'], null)).toBe('<Tour :steps="steps" />')
+    expect(resolveUsageSnippet('Tour', 'Vue', ['steps'], null)).toBe(
+      '<Tour v-model:open="open" :steps="steps" />'
+    )
     expect(resolveUsageSnippet('Image', 'React', [], '<Image />')).toBe(
       '<Image src="..." alt="..." />'
     )

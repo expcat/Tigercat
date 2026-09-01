@@ -18,15 +18,7 @@ export default function App() {
       <span id="tour-result-react" className="rounded bg-gray-100 px-3 py-2">
         结果区域
       </span>
-      <Tour
-        open={open}
-        steps={steps}
-        nextText="下一步"
-        prevText="上一步"
-        finishText="完成"
-        showIndicators
-        onOpenChange={setOpen}
-      />
+      <Tour open={open} steps={steps} showIndicators onOpenChange={setOpen} />
     </div>
   )
 }

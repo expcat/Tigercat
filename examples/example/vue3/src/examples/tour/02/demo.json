@@ -1,7 +1,7 @@
 {
   "id": "tour-02",
   "title": "异步与条件步骤",
-  "description": "通过 loadSteps、受控 current、skipWhen、placement 与 mask 构建动态引导流程。",
+  "description": "loadSteps 第一步带 target。closable={false} 只藏 X，Esc / 点 mask 仍关。skipWhen 每次解析现评。受控 current 是原始下标。",
   "order": 2,
   "entry": "App.vue",
   "viewport": {

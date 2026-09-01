@@ -195,11 +195,17 @@ Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`form
 
 ## Tour
 
-`packages/core/src/types/tour.ts` · `TourProps` · 4/11 props
+`packages/core/src/types/tour.ts` · `TourProps` · 8/18 props
 
-| Prop        | Type                   | Default | Notes                                                |
-| ----------- | ---------------------- | ------- | ---------------------------------------------------- |
-| `steps`     | `TourStep[]`           | `-`     | Array of tour steps                                  |
-| `open?`     | `boolean`              | `false` | Whether the tour is open                             |
-| `closable?` | `boolean`              | `true`  | Whether to show the close button                     |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale override; falls back to ConfigProvider locale |
+Note: `current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。
+
+| Prop            | Type                   | Default | Notes                                                                                      |
+| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `steps`         | `TourStep[]`           | `-`     | Array of tour steps                                                                        |
+| `open?`         | `boolean`              | `false` | Whether the tour is open                                                                   |
+| `current?`      | `number`               | `-`     | Current step index (controlled). This is the **original** index in `steps`, not the ind... |
+| `closable?`     | `boolean`              | `true`  | Whether to show the close button. `false` only hides the X — Escape and mask click stil... |
+| `maskClosable?` | `boolean`              | `true`  | Whether clicking the mask closes the tour.                                                 |
+| `keyboard?`     | `boolean`              | `true`  | Whether Escape closes the tour.                                                            |
+| `loadSteps?`    | `TourStepLoader`       | `-`     | Load tour steps asynchronously when the tour opens.                                        |
+| `locale?`       | `Partial<TigerLocale>` | `-`     | Locale override; falls back to ConfigProvider locale                                       |

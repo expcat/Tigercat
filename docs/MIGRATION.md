@@ -4,6 +4,8 @@
 
 ## 未发布
 
+Tour `current` 是 `steps` 的原始下标。非受控关掉再开会回到 0；受控请在 `onOpenChange(false)` / `@close` 里把 `current` 归零。`closable={false}` 只藏关闭钮，Esc 和点遮罩仍关，除非再设 `keyboard={false}` / `maskClosable={false}`。`target` 可以是选择器或 `HTMLElement`，非法选择器不再抛。Finish 事件顺序是 `finish` → `close` → `open=false`。Vue 从主入口引 `TourProps`。删除 `getTourSpotlightStyle`。
+
 Message / notification / LoadingBar 是命令式 API，不是空 `<Message />`。关闭名走 locale 字段（zh-TW 是「關閉訊息」不是「關閉消息」）。`Message.loading({ duration })` 尊重传入的 duration。Vue `MessageContainer` / `NotificationContainer` 发 `close`（`@close`），不要只绑 `:on-close`。LoadingBar 默认名是 `Loading...`；`finish` 后下一次 `start()` 不再粘上一次的 color；需要确定进度用 `set` / `inc`。根入口 `MessageProps` / `NotificationProps` 是组件字段，命令参数用 `MessageOptions` / `NotificationOptions`。
 
 Alert 默认不再是 `role="alert"`。静态 info/success/warning 没有 live region；有内容的 `type="error"` 才是 `alert`。空 `<Alert />` 不是 live。关闭名走 `locale.alert.closeAriaLabel`（en-US `Close alert`，zh-CN `关闭提示`）。点关闭和 `duration` 只发 `onClose` / `close`（都带 Event），组件自己不 `return null`；父级卸载或 `visible={false}`。`duration` 不再要求 `closable`。有 `title` 时默认槽 / children 仍渲染。Vue 从主入口引 `AlertProps`。

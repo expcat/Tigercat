@@ -97,6 +97,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '与 Modal 同一套在场/陷阱/关场。`placement` 含 `start`/`end`。swipe 关闭只在标题栏或对应轴滚到头时成立。`className` 打在 panel。关闭名走 `locale.drawer`（en-US Close）。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。'
   },
+  Tour: {
+    notes:
+      '`current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。'
+  },
   ButtonGroup: {
     notes:
       '直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。'

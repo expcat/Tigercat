@@ -1,7 +1,7 @@
 {
   "id": "tour-01",
-  "title": "基础用法与自定义按钮文字",
-  "description": "合并展示基础用法、自定义按钮文字，减少重复示例块。",
+  "title": "基础用法",
+  "description": "按钮文案走 locale.tour。非受控 current 关掉再开会回到第一步。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {
