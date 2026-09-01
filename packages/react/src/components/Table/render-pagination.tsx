@@ -13,7 +13,7 @@ import { Pagination } from '../Pagination'
 import type { TableContext } from './types'
 
 export interface RenderPaginationViewProps {
-  pagination: PaginationConfig | false
+  pagination: PaginationConfig | false | undefined
   locale?: Partial<TigerLocale>
   disableI18n?: boolean
 }
