@@ -224,6 +224,7 @@ export * from './image-lightbox'
 
 // Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)
 export * from './form-wizard-utils'
+export * from './table-toolbar-utils'
 export * from './crop-upload-utils'
 
 // AspectRatio utilities (v2.1.0+)

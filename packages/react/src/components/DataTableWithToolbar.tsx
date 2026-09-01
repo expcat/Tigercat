@@ -1,18 +1,28 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  applyToolbarLocalView,
+  canSubmitToolbarSearch,
   classNames,
+  getDataTableToolbarBarClasses,
+  getDataTableToolbarWrapperClasses,
   getImmediateTigerLocale,
   getTableLabels,
   isLazyTigerLocale,
+  isToolbarSearchRemote,
   mergeTigerLocale,
   resolveTigerLocale,
-  type TableToolbarProps,
-  type TableToolbarFilter,
-  type TableToolbarFilterRenderContext,
-  type TableToolbarFiltersExtraContext,
-  type TableToolbarFilterValue,
-  type TableToolbarRenderContext,
+  resolveToolbarFilterMap,
+  resolveToolbarPageChange,
+  resolveToolbarSelectedKeys,
+  seedToolbarFilterState,
+  splitCompositeHostAttrs,
+  toggleHiddenColumnKey,
+  toolbarHasSearch,
   type TableToolbarAction,
+  type TableToolbarFilterValue,
+  type TableToolbarFiltersExtraContext,
+  type TableToolbarProps,
+  type TableToolbarRenderContext,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { Table, type TableProps } from './Table'
@@ -21,18 +31,24 @@ import { Select } from './Select'
 import { Button } from './Button'
 import { Popover } from './Popover'
 import { Checkbox } from './Checkbox'
+import { Icon } from './Icon'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
-export interface ReactTableToolbarFilterRenderContext extends Omit<
-  TableToolbarFilterRenderContext,
-  'filter'
-> {
+export interface ReactTableToolbarFilterRenderContext {
   filter: ReactTableToolbarFilter
+  value: TableToolbarFilterValue
+  filters: Record<string, TableToolbarFilterValue>
+  setValue: (value: TableToolbarFilterValue) => void
+  setFilter: (key: string, value: TableToolbarFilterValue) => void
 }
 
 export interface ReactTableToolbarFiltersExtraContext extends TableToolbarFiltersExtraContext {}
 
-export interface ReactTableToolbarFilter extends Omit<TableToolbarFilter, 'render'> {
+export interface ReactTableToolbarFilter extends Omit<
+  NonNullable<TableToolbarProps['filters']>[number],
+  'render'
+> {
   render?: (context: ReactTableToolbarFilterRenderContext) => React.ReactNode
 }
 
@@ -52,32 +68,22 @@ export interface ReactTableToolbarProps extends Omit<
   render?: React.ReactNode | ((context: ReactTableToolbarRenderContext) => React.ReactNode)
 }
 
-export interface DataTableWithToolbarProps<T = Record<string, unknown>>
-  extends
-    Omit<TableProps<T>, 'className' | 'onPageChange'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
+export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends Omit<
+  TableProps<T>,
+  'className' | 'onPageChange' | 'style'
+> {
   /**
    * Toolbar configuration. Business callbacks (search/filters/bulk actions)
    * are configured here via `toolbar.onSearchChange`, `toolbar.onSearch`,
    * `toolbar.onFiltersChange` and `toolbar.onBulkAction`.
    */
   toolbar?: ReactTableToolbarProps
-  /**
-   * Page change handler
-   */
-  onPageChange?: (current: number, pageSize: number) => void
-  /**
-   * Page size change handler
-   */
-  onPageSizeChange?: (current: number, pageSize: number) => void
-  /**
-   * Wrapper class name
-   */
+  onPageChange?: (page: { current: number; pageSize: number }) => void
+  onPageSizeChange?: (page: { current: number; pageSize: number }) => void
   className?: string
-  /**
-   * Table class name
-   */
   tableClassName?: string
+  id?: string
+  style?: React.CSSProperties
 }
 
 export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<string, unknown>>({
@@ -87,33 +93,47 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   hiddenColumnKeys,
   defaultHiddenColumnKeys,
   onHiddenColumnKeysChange,
-  pagination = false,
+  pagination,
   onPageChange,
   onPageSizeChange,
   className,
   tableClassName,
-  ...tableProps
+  rowSelection,
+  dataSource,
+  columns,
+  onSelectionChange,
+  bordered = false,
+  id,
+  style,
+  ...rest
 }: DataTableWithToolbarProps<T>) => {
   const config = useTigerConfig()
+  const { host: hostAttrs, rest: tableRest } = splitCompositeHostAttrs({
+    id,
+    style,
+    ...(rest as Record<string, unknown>)
+  })
   const previousPageSizeRef = useRef(
     pagination && typeof pagination === 'object'
       ? (pagination.pageSize ?? pagination.defaultPageSize ?? 10)
       : undefined
   )
-  const [internalSearch, setInternalSearch] = useState<string>(toolbar?.defaultSearchValue ?? '')
-  const [internalHiddenKeys, setInternalHiddenKeys] = useState<string[]>(
-    defaultHiddenColumnKeys ?? hiddenColumnKeys ?? []
-  )
+  const [searchValue, setSearchValue] = useControlledState({
+    value: toolbar?.searchValue,
+    defaultValue: toolbar?.defaultSearchValue ?? '',
+    onChange: (value) => toolbar?.onSearchChange?.(value)
+  })
+  const [resolvedHiddenKeys, setResolvedHiddenKeys] = useControlledState({
+    value: hiddenColumnKeys,
+    defaultValue: defaultHiddenColumnKeys ?? [],
+    onChange: onHiddenColumnKeysChange
+  })
   const [internalFilters, setInternalFilters] = useState<Record<string, TableToolbarFilterValue>>(
-    () => {
-      const initial: Record<string, TableToolbarFilterValue> = {}
-      toolbar?.filters?.forEach((filter) => {
-        if (filter.value === undefined) {
-          initial[filter.key] = filter.defaultValue ?? null
-        }
-      })
-      return initial
-    }
+    () => seedToolbarFilterState({}, toolbar?.filters)
+  )
+  const [extraFilterKeys, setExtraFilterKeys] = useState<string[]>([])
+  const [internalSelectedKeys, setInternalSelectedKeys] = useState<(string | number)[]>(
+    () => rowSelection?.defaultSelectedRowKeys ?? []
   )
   const immediateTableLocale = useMemo(
     () => (locale ? getImmediateTigerLocale(locale) : undefined),
@@ -146,20 +166,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     () => mergeTigerLocale(config.locale, resolvedTableLocale),
     [config.locale, resolvedTableLocale]
   )
-
   const tableLabels = useMemo(() => getTableLabels(tableLocale, labels), [labels, tableLocale])
-
-  useEffect(() => {
-    if (toolbar?.searchValue !== undefined) {
-      setInternalSearch(toolbar.searchValue ?? '')
-    }
-  }, [toolbar?.searchValue])
-
-  useEffect(() => {
-    if (hiddenColumnKeys !== undefined) {
-      setInternalHiddenKeys(hiddenColumnKeys)
-    }
-  }, [hiddenColumnKeys])
 
   useEffect(() => {
     if (pagination && typeof pagination === 'object') {
@@ -168,85 +175,46 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   }, [pagination])
 
   useEffect(() => {
-    const filters = toolbar?.filters
-    if (!filters) return
-    setInternalFilters((prev) => {
-      const next = { ...prev }
-      filters.forEach((filter) => {
-        if (filter.value === undefined && !(filter.key in next)) {
-          next[filter.key] = filter.defaultValue ?? null
-        }
-      })
-      return next
-    })
+    setInternalFilters((prev) => seedToolbarFilterState(prev, toolbar?.filters))
   }, [toolbar?.filters])
 
-  const searchValue = toolbar?.searchValue !== undefined ? toolbar.searchValue : internalSearch
-
-  const resolvedFilters = useMemo<Record<string, TableToolbarFilterValue>>(() => {
-    const next: Record<string, TableToolbarFilterValue> = { ...internalFilters }
-    toolbar?.filters?.forEach((filter) => {
-      next[filter.key] =
-        filter.value !== undefined
-          ? filter.value
-          : (internalFilters[filter.key] ?? filter.defaultValue ?? null)
-    })
-    return next
-  }, [toolbar?.filters, internalFilters])
-
-  const hasSearch = Boolean(
-    toolbar &&
-    (toolbar.searchPlaceholder ||
-      toolbar.searchValue !== undefined ||
-      toolbar.defaultSearchValue !== undefined ||
-      toolbar.showSearchButton ||
-      toolbar.onSearchChange ||
-      toolbar.onSearch)
+  const resolvedFilters = useMemo(
+    () => resolveToolbarFilterMap(toolbar?.filters, internalFilters, extraFilterKeys),
+    [toolbar?.filters, internalFilters, extraFilterKeys]
   )
+
+  const hasSearch = toolbarHasSearch(toolbar)
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
   const hasFiltersExtra = Boolean(toolbar?.filtersExtra)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
   const hasColumnSettings = Boolean(toolbar?.showColumnSettings)
+  const sourceRows = (dataSource ?? []) as T[]
+  const viewRows = useMemo(
+    () =>
+      isToolbarSearchRemote(toolbar)
+        ? sourceRows
+        : applyToolbarLocalView(sourceRows, columns, searchValue ?? '', resolvedFilters),
+    [columns, resolvedFilters, searchValue, sourceRows, toolbar]
+  )
 
-  const resolvedHiddenKeys = hiddenColumnKeys ?? internalHiddenKeys
-
-  const handleHiddenColumnsChange = (nextHiddenKeys: string[]) => {
-    if (hiddenColumnKeys === undefined) {
-      setInternalHiddenKeys(nextHiddenKeys)
-    }
-    onHiddenColumnKeysChange?.(nextHiddenKeys)
-  }
-
-  const handleToggleColumnVisibility = (columnKey: string, visible: boolean) => {
-    const nextHiddenKeys = visible
-      ? resolvedHiddenKeys.filter((key) => key !== columnKey)
-      : [...resolvedHiddenKeys, columnKey]
-    handleHiddenColumnsChange(nextHiddenKeys)
-  }
-
-  const { bordered = false, ...remainingTableProps } = tableProps
-
-  const selectedKeys = toolbar?.selectedKeys ?? tableProps.rowSelection?.selectedRowKeys ?? []
+  const selectedKeys = resolveToolbarSelectedKeys(
+    toolbar?.selectedKeys,
+    rowSelection?.selectedRowKeys,
+    internalSelectedKeys
+  )
   const selectedCount = toolbar?.selectedCount ?? selectedKeys.length
   const bulkLabel = toolbar?.bulkActionsLabel ?? tableLabels.selectedText
 
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'tiger-data-table-with-toolbar flex flex-col',
-        bordered
-          ? 'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-surface,#ffffff)] shadow-sm'
-          : 'gap-3.5',
-        className
-      ),
-    [className, bordered]
-  )
+  const handleHiddenColumnsChange = (nextHiddenKeys: string[]) => {
+    setResolvedHiddenKeys(nextHiddenKeys)
+  }
+
+  const handleToggleColumnVisibility = (columnKey: string, visible: boolean) => {
+    handleHiddenColumnsChange(toggleHiddenColumnKey(resolvedHiddenKeys, columnKey, visible))
+  }
 
   const handleSearchChange = (value: string) => {
-    if (toolbar?.searchValue === undefined) {
-      setInternalSearch(value)
-    }
-    toolbar?.onSearchChange?.(value)
+    setSearchValue(value)
   }
 
   const handleSearchSubmit = () => {
@@ -258,38 +226,60 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     value: TableToolbarFilterValue,
     filter?: ReactTableToolbarFilter
   ) => {
-    const nextFilters = {
-      ...resolvedFilters,
-      [key]: value
+    const inDefs = toolbar?.filters?.some((item) => item.key === key)
+    if (!inDefs) {
+      setExtraFilterKeys((prev) => (prev.includes(key) ? prev : [...prev, key]))
     }
-
     if (!filter || filter.value === undefined) {
       setInternalFilters((prev) => ({
         ...prev,
         [key]: value
       }))
     }
-
-    toolbar?.onFiltersChange?.(nextFilters)
+    toolbar?.onFiltersChange?.(
+      resolveToolbarFilterMap(
+        toolbar?.filters,
+        { ...internalFilters, [key]: value },
+        inDefs
+          ? extraFilterKeys
+          : extraFilterKeys.includes(key)
+            ? extraFilterKeys
+            : [...extraFilterKeys, key]
+      )
+    )
   }
 
-  const handleFilterSelect = (filter: ReactTableToolbarFilter, value: TableToolbarFilterValue) => {
-    setFilterValue(filter.key, value, filter)
+  const handleSelectionChange = (keys: (string | number)[]) => {
+    if (toolbar?.selectedKeys === undefined && rowSelection?.selectedRowKeys === undefined) {
+      setInternalSelectedKeys(keys)
+    }
+    onSelectionChange?.(keys)
   }
 
   const handleBulkAction = (action: TableToolbarAction) => {
-    const keys = selectedKeys ?? []
-    action.onClick?.(keys)
-    toolbar?.onBulkAction?.(action, keys)
+    action.onClick?.(selectedKeys)
+    toolbar?.onBulkAction?.(action, selectedKeys)
   }
 
-  const handleTablePageChange = ({ current, pageSize }: { current: number; pageSize: number }) => {
-    onPageChange?.(current, pageSize)
-    if (previousPageSizeRef.current !== undefined && previousPageSizeRef.current !== pageSize) {
-      onPageSizeChange?.(current, pageSize)
-    }
-    previousPageSizeRef.current = pageSize
+  const handleTablePageChange = (page: { current: number; pageSize: number }) => {
+    const result = resolveToolbarPageChange(page, previousPageSizeRef.current)
+    previousPageSizeRef.current = page.pageSize
+    if (result.kind === 'size') onPageSizeChange?.(page)
+    else onPageChange?.(page)
   }
+
+  const toolbarContext = (): ReactTableToolbarRenderContext => ({
+    searchValue: searchValue ?? '',
+    setSearch: handleSearchChange,
+    submitSearch: handleSearchSubmit,
+    filters: resolvedFilters,
+    setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value),
+    selectedKeys,
+    selectedCount,
+    dataSource: viewRows,
+    hiddenColumnKeys: resolvedHiddenKeys,
+    setHiddenColumnKeys: handleHiddenColumnsChange
+  })
 
   const renderColumnSettings = () => {
     const lockedKeys = new Set(toolbar?.columnSettings?.lockedColumnKeys ?? [])
@@ -302,7 +292,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         titleContent={panelTitle}
         contentContent={
           <div className="flex flex-col gap-2 min-w-[160px]">
-            {tableProps.columns.map((column) => {
+            {columns.map((column) => {
               const locked = lockedKeys.has(column.key) || column.hideable === false
               return (
                 <Checkbox
@@ -322,24 +312,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
           variant="outline"
           className="shrink-0 px-2"
           aria-label={tableLabels.columnSettingsAriaLabel}>
-          <svg
-            className="w-3.5 h-3.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            aria-hidden="true">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
+          <Icon name="settings" className="w-3.5 h-3.5" />
         </Button>
       </Popover>
     )
@@ -347,20 +320,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
   const renderToolbar = () => {
     if (toolbar?.render !== undefined) {
-      const toolbarContext: ReactTableToolbarRenderContext = {
-        searchValue: searchValue ?? '',
-        setSearch: handleSearchChange,
-        submitSearch: handleSearchSubmit,
-        filters: resolvedFilters,
-        setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value),
-        selectedKeys,
-        selectedCount,
-        hiddenColumnKeys: resolvedHiddenKeys,
-        setHiddenColumnKeys: handleHiddenColumnsChange
-      }
       return (
         <>
-          {typeof toolbar.render === 'function' ? toolbar.render(toolbarContext) : toolbar.render}
+          {typeof toolbar.render === 'function' ? toolbar.render(toolbarContext()) : toolbar.render}
         </>
       )
     }
@@ -371,7 +333,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
     const filtersExtraContext: ReactTableToolbarFiltersExtraContext = {
       filters: resolvedFilters,
-      setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value)
+      setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value),
+      dataSource: viewRows,
+      selectedKeys,
+      hiddenColumnKeys: resolvedHiddenKeys
     }
     const filtersExtra =
       typeof toolbar?.filtersExtra === 'function'
@@ -380,13 +345,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
     return (
       <div
-        className={classNames(
-          'tiger-data-table-toolbar flex flex-wrap items-center gap-3',
-          bordered
-            ? 'bg-[var(--tiger-surface-muted,#f9fafb)] dark:bg-gray-800/10 px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]'
-            : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm',
-          toolbar?.className
-        )}
+        className={getDataTableToolbarBarClasses({
+          bordered,
+          className: toolbar?.className
+        })}
         style={toolbar?.style as React.CSSProperties | undefined}
         role="toolbar"
         aria-label={tableLabels.toolbarAriaLabel}>
@@ -402,26 +364,16 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 size="sm"
                 value={searchValue}
                 placeholder={toolbar?.searchPlaceholder ?? tableLabels.searchPlaceholder}
+                aria-label={toolbar?.searchPlaceholder ?? tableLabels.searchPlaceholder}
                 prefix={
-                  <svg
-                    className="w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)] shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+                  <Icon
+                    name="search"
+                    className="w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)]"
+                  />
                 }
                 onChange={(event) => handleSearchChange(String(event.currentTarget.value))}
                 onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    handleSearchSubmit()
-                  }
+                  if (event.key === 'Enter') handleSearchSubmit()
                 }}
               />
               {(toolbar?.showSearchButton ?? true) ? (
@@ -430,7 +382,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                   variant="primary"
                   className="whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3"
                   onClick={handleSearchSubmit}
-                  disabled={!toolbar?.onSearch}>
+                  disabled={!canSubmitToolbarSearch(toolbar)}>
                   {toolbar?.searchButtonText ?? tableLabels.searchButtonText}
                 </Button>
               ) : null}
@@ -480,10 +432,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                           : undefined
                       }
                       placeholder={filter.placeholder ?? filter.label}
+                      aria-label={filter.label}
                       clearable={clearable}
-                      onChange={(value) => {
-                        handleFilterSelect(filter, value ?? null)
-                      }}
+                      onChange={(value) => setFilterValue(filter.key, value ?? null, filter)}
                     />
                   </div>
                 )
@@ -495,8 +446,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         {hasBulkActions ? (
           <div className="flex items-center gap-2.5 flex-wrap ml-auto shrink-0">
             {selectedCount > 0 ? (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0 transition-all duration-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse" />
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0"
+                aria-live="polite">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse motion-reduce:animate-none" />
                 <span>
                   {bulkLabel} {selectedCount} {tableLabels.selectedItemsText}
                 </span>
@@ -525,16 +478,23 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   }
 
   return (
-    <div className={wrapperClasses} data-tiger-data-table-with-toolbar>
+    <div
+      className={getDataTableToolbarWrapperClasses({ bordered, className })}
+      data-tiger-data-table-with-toolbar
+      {...hostAttrs}>
       {renderToolbar()}
       <Table
-        {...remainingTableProps}
-        locale={locale}
+        {...(tableRest as Omit<TableProps<T>, 'columns' | 'dataSource'>)}
+        columns={columns}
+        dataSource={viewRows}
+        locale={resolvedTableLocale}
         labels={labels}
         bordered={bordered}
+        rowSelection={rowSelection ? { ...rowSelection, selectedRowKeys: selectedKeys } : undefined}
         hiddenColumnKeys={resolvedHiddenKeys}
         pagination={pagination}
         className={classNames(tableClassName, bordered && 'border-none rounded-none shadow-none')}
+        onSelectionChange={handleSelectionChange}
         onPageChange={handleTablePageChange}
       />
     </div>

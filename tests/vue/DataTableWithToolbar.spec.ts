@@ -12,7 +12,7 @@ import { Table } from '@expcat/tigercat-vue/Table'
 import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 interface RowData extends Record<string, unknown> {
   id: number
@@ -20,6 +20,19 @@ interface RowData extends Record<string, unknown> {
 }
 
 const columns: TableColumn<RowData>[] = [{ key: 'name', title: 'Name' }]
+
+function stubCardViewport(isCard: boolean) {
+  window.matchMedia = ((query: string) => ({
+    matches: isCard && query.includes('max-width'),
+    media: query,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    dispatchEvent: () => false,
+    onchange: null
+  })) as typeof window.matchMedia
+}
 
 describe('DataTableWithToolbar (Vue)', () => {
   it('emits filter and pagination changes', async () => {
@@ -58,10 +71,12 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(onFiltersChange).toHaveBeenCalledWith({ status: 'active' })
 
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
-    expect(onPageChange).toHaveBeenCalledWith(2, 10)
+    expect(onPageChange).toHaveBeenCalledWith({ current: 2, pageSize: 10 })
+    expect(onPageSizeChange).not.toHaveBeenCalled()
 
-    await userEvent.selectOptions(screen.getByLabelText('/ page'), '20')
-    expect(onPageSizeChange).toHaveBeenCalledWith(1, 20)
+    await userEvent.selectOptions(screen.getByLabelText('Items per page'), '20')
+    expect(onPageSizeChange).toHaveBeenCalledWith({ current: 1, pageSize: 20 })
+    expect(onPageChange).toHaveBeenCalledTimes(1)
   })
 
   it('renders custom toolbar filters and emits object filter values', async () => {
@@ -175,10 +190,11 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByText('Total 20 items')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
-    expect(onPageChange).toHaveBeenCalledWith(2, 10)
+    expect(onPageChange).toHaveBeenCalledWith({ current: 2, pageSize: 10 })
   })
 
   it('threads responsiveMode, cardBreakpoint and hideInCard through to Table', () => {
+    stubCardViewport(true)
     const cardColumns: TableColumn<RowData>[] = [
       { key: 'name', title: 'Name' },
       { key: 'id', title: 'ID', hideInCard: true }
@@ -195,12 +211,13 @@ describe('DataTableWithToolbar (Vue)', () => {
     })
 
     const cardList = container.querySelector('[data-tiger-table-mobile="card"]')!
-    expect(cardList).toHaveClass('max-lg:grid')
-    expect(container.querySelector('table')).toHaveClass('max-lg:hidden')
+    expect(cardList).toBeTruthy()
+    expect(container.querySelector('table')).not.toBeInTheDocument()
     expect(cardList.textContent).not.toContain('ID')
   })
 
   it('threads cardLayout through to the responsive card grid', () => {
+    stubCardViewport(true)
     const cardColumns: TableColumn<RowData>[] = [
       { key: 'name', title: 'Name', cardTitle: true },
       { key: 'id', title: 'ID', cardGrid: { colSpan: 6, labelPosition: 'top' } }
@@ -407,7 +424,6 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByRole('button', { name: '上一页' })).toBeDisabled()
     expect(screen.getByRole('button', { name: '下一页' })).toBeDisabled()
     expect(screen.getByText('第 1 页，共 1 页')).toBeInTheDocument()
-    expect(screen.getByLabelText('第 1 页，共 1 页')).toBeInTheDocument()
     expect(screen.getByText('10 条/页')).toBeInTheDocument()
   })
 
@@ -826,6 +842,7 @@ describe('DataTableWithToolbar (Vue)', () => {
 
   describe('Card customization passthrough', () => {
     it('forwards declared renderCard and cardClassName props to the inner Table', () => {
+      stubCardViewport(true)
       const { container } = render(DataTableWithToolbar, {
         props: {
           columns,
@@ -844,6 +861,7 @@ describe('DataTableWithToolbar (Vue)', () => {
     })
 
     it('forwards the #card slot through DataTableWithToolbar and prefers it over renderCard', () => {
+      stubCardViewport(true)
       render({
         render() {
           return h(
@@ -868,12 +886,86 @@ describe('DataTableWithToolbar (Vue)', () => {
     })
   })
 
+  it('filters rows locally when search has no callback', async () => {
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [
+          { id: 1, name: 'Ada' },
+          { id: 2, name: 'Lin' }
+        ],
+        toolbar: { searchPlaceholder: 'Find rows' },
+        pagination: false
+      }
+    })
+
+    await userEvent.type(screen.getByRole('searchbox'), 'ada')
+    expect(screen.getByText('Ada')).toBeInTheDocument()
+    expect(screen.queryByText('Lin')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Search' })).toBeEnabled()
+  })
+
+  it('updates bulk count from inner table selection', async () => {
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [{ id: 1, name: 'Ada' }],
+        rowSelection: { type: 'checkbox' },
+        toolbar: { bulkActions: [{ key: 'export', label: 'Export' }] },
+        pagination: false
+      }
+    })
+
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
+    const checkboxes = screen.getAllByRole('checkbox')
+    await userEvent.click(checkboxes[checkboxes.length - 1])
+    expect(screen.getByText(/Selected 1/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Export' })).toBeEnabled()
+  })
+
+  it('enables pagination by default like Table', () => {
+    const rows = Array.from({ length: 12 }, (_, index) => ({ id: index, name: `R${index}` }))
+    render(DataTableWithToolbar, {
+      props: { columns, dataSource: rows }
+    })
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeInTheDocument()
+  })
+
+  it('puts id and style on the outer wrapper', () => {
+    const { container } = render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        pagination: false
+      },
+      attrs: {
+        id: 'members-grid',
+        style: { height: '200px' }
+      }
+    })
+    const root = container.querySelector('#members-grid')
+    expect(root).toHaveAttribute('data-tiger-data-table-with-toolbar')
+    expect(root).toHaveStyle({ height: '200px' })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(DataTableWithToolbar, {
-        props: { columns, dataSource: [{ id: 1, name: 'A' }], pagination: false }
+        props: {
+          columns,
+          dataSource: [{ id: 1, name: 'A' }],
+          rowSelection: { type: 'checkbox' },
+          toolbar: {
+            searchPlaceholder: 'Find rows',
+            filters: [{ key: 'status', label: 'Status', options: [{ label: 'On', value: 'on' }] }],
+            bulkActions: [{ key: 'export', label: 'Export' }],
+            showColumnSettings: true
+          },
+          pagination: false
+        }
       })
-      await expectNoA11yViolationsIsolated(container)
+      await userEvent.click(screen.getByRole('button', { name: 'Column settings' }))
+      await expectNoA11yViolations(container)
     })
   })
 })

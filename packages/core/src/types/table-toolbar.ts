@@ -23,6 +23,12 @@ export interface TableToolbarFilterRenderContext {
 export interface TableToolbarFiltersExtraContext {
   filters: Record<string, TableToolbarFilterValue>
   setFilter: (key: string, value: TableToolbarFilterValue) => void
+  /**
+   * Rows currently passed to the inner Table (after local search/filter).
+   */
+  dataSource: unknown[]
+  selectedKeys: (string | number)[]
+  hiddenColumnKeys: string[]
 }
 
 /**
@@ -59,6 +65,10 @@ export interface TableToolbarRenderContext {
    */
   selectedCount: number
   /**
+   * Rows currently passed to the inner Table (after local search/filter).
+   */
+  dataSource: unknown[]
+  /**
    * Currently hidden column keys
    */
   hiddenColumnKeys: string[]
@@ -94,11 +104,6 @@ export interface TableToolbarFilter {
    * @default true
    */
   clearable?: boolean
-  /**
-   * Label for the clear option
-   * @default '全部'
-   */
-  clearLabel?: string
   /**
    * Controlled filter value
    */
@@ -153,9 +158,27 @@ export interface TableToolbarAction {
 }
 
 /**
+ * How toolbar search and Select filters apply to the inner Table.
+ *
+ * - `local` (default): typing/selecting filters the current `dataSource`
+ * - `remote`: UI only emits `onSearch` / `onSearchChange` / `onFiltersChange`
+ */
+export type TableToolbarSearchMode = 'local' | 'remote'
+
+/**
  * Table toolbar props
  */
 export interface TableToolbarProps {
+  /**
+   * Force the search field on (`true`) or off (`false`).
+   * When omitted, the field is shown if any search prop is set.
+   */
+  search?: boolean
+  /**
+   * Whether search/filter values write through to the inner Table.
+   * @default 'local'
+   */
+  searchMode?: TableToolbarSearchMode
   /**
    * Search value (controlled)
    */
@@ -169,8 +192,7 @@ export interface TableToolbarProps {
    */
   searchPlaceholder?: string
   /**
-   * Search button text
-   * @default '搜索'
+   * Search button text. Defaults to `locale.table.searchButtonText`.
    */
   searchButtonText?: string
   /**
@@ -187,7 +209,9 @@ export interface TableToolbarProps {
    */
   onSearch?: (value: string) => void
   /**
-   * Filter definitions
+   * Toolbar filter controls (Select / `render`). These are **not** Table
+   * column `filters`. In `searchMode: 'local'` a scalar value whose `key`
+   * matches a column key is applied to the inner Table.
    */
   filters?: TableToolbarFilter[]
   /**
@@ -211,8 +235,7 @@ export interface TableToolbarProps {
    */
   selectedCount?: number
   /**
-   * Bulk actions label prefix
-   * @default '已选择'
+   * Bulk actions label prefix. Defaults to `locale.table.selectedText`.
    */
   bulkActionsLabel?: string
   /**
@@ -272,33 +295,38 @@ export interface TableToolbarColumnSettings {
 /**
  * Data table with toolbar props.
  *
- * Business callbacks (search / filters / bulk actions) are configured on the
- * `toolbar` object (React `toolbar.onSearchChange` / `toolbar.onSearch` /
- * `toolbar.onFiltersChange` / `toolbar.onBulkAction`; Vue `@search-change` /
- * `@search` / `@filters-change` / `@bulk-action` events). Everything else is a
- * passthrough to the inner Table plus pagination wiring.
+ * Search / filters / bulk callbacks live on `toolbar` (React
+ * `toolbar.onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction`).
+ * Vue also emits `@search-change` / `@search` / `@filters-change` /
+ * `@bulk-action` from the same handlers. `id` / `style` / `data-*` / `aria-*`
+ * belong on the outer wrapper; `tableClassName` is the inner Table.
+ *
+ * Custom `toolbar.render` / Vue `#toolbar` replace the built-in toolbar
+ * (including `role="toolbar"`). Add that role and an accessible name on the
+ * replacement container.
  */
 export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends Omit<
   TableProps<T>,
-  'pagination'
+  'pagination' | 'onPageChange'
 > {
   /**
    * Toolbar configuration
    */
   toolbar?: TableToolbarProps
   /**
-   * Pagination configuration
-   * Set to false to disable
+   * Pagination configuration. Same default as Table (on, pageSize 10).
+   * Pass `false` to hide the pager.
    */
   pagination?: PaginationConfig | false
   /**
-   * Page change callback
+   * Page change. Same signature as Table. Fired when the page index changes;
+   * a page-size change fires `onPageSizeChange` instead, not both.
    */
-  onPageChange?: (current: number, pageSize: number) => void
+  onPageChange?: (page: { current: number; pageSize: number }) => void
   /**
-   * Page size change callback
+   * Page-size change. Fired only when `pageSize` actually changes.
    */
-  onPageSizeChange?: (current: number, pageSize: number) => void
+  onPageSizeChange?: (page: { current: number; pageSize: number }) => void
   /**
    * Class applied to the inner table element.
    */
