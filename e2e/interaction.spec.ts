@@ -86,7 +86,7 @@ for (const { framework, baseUrl } of exampleApps) {
       await expect(nameHeader).toHaveAttribute('aria-sort', 'ascending')
       await nameHeader.getByText('姓名', { exact: true }).click()
       await expect(nameHeader).toHaveAttribute('aria-sort', 'descending')
-      await preview.getByPlaceholder('搜索姓名...').fill('张')
+      await nameHeader.getByRole('textbox').fill('张')
       await expect(table.locator('tbody tr')).toHaveCount(1)
       await expect(table.locator('tbody tr').first()).toContainText('张伟')
     })
