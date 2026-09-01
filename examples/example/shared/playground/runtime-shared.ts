@@ -1,2 +1,5 @@
 export { countries } from '../constants'
 export { getDemoTigerLocale } from '../tiger-locale'
+export { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+export { enUS } from '@expcat/tigercat-core/locales/en-US'
+export { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
