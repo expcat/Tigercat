@@ -2,43 +2,43 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "142 kB",
+    "limit": "211 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "316 kB",
+    "limit": "405 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "352 kB",
+    "limit": "447 kB",
     "gzip": true
   },
   {
     "name": "Vue Button subpath",
     "path": "packages/vue/dist/components/Button.mjs",
-    "limit": "22 kB",
+    "limit": "36 kB",
     "gzip": true
   },
   {
     "name": "React Button subpath",
     "path": "packages/react/dist/components/Button.mjs",
-    "limit": "20 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
     "name": "Vue Menu subpath",
     "path": "packages/vue/dist/components/Menu.mjs",
-    "limit": "42 kB",
+    "limit": "60 kB",
     "gzip": true
   },
   {
     "name": "React Menu subpath",
     "path": "packages/react/dist/components/Menu.mjs",
-    "limit": "34 kB",
+    "limit": "53 kB",
     "gzip": true
   },
   {
@@ -72,13 +72,13 @@
   {
     "name": "Vue Tree subpath",
     "path": "packages/vue/dist/components/Tree.mjs",
-    "limit": "33 kB",
+    "limit": "56 kB",
     "gzip": true
   },
   {
     "name": "React Tree subpath",
     "path": "packages/react/dist/components/Tree.mjs",
-    "limit": "26 kB",
+    "limit": "50 kB",
     "gzip": true
   },
   {
@@ -98,157 +98,157 @@
   {
     "name": "Vue InputOTP subpath",
     "path": "packages/vue/dist/components/InputOTP.mjs",
-    "limit": "31 kB",
+    "limit": "44 kB",
     "gzip": true
   },
   {
     "name": "React InputOTP subpath",
     "path": "packages/react/dist/components/InputOTP.mjs",
-    "limit": "23 kB",
+    "limit": "37 kB",
     "gzip": true
   },
   {
     "name": "Vue TagsInput subpath",
     "path": "packages/vue/dist/components/TagsInput.mjs",
-    "limit": "32 kB",
+    "limit": "46 kB",
     "gzip": true
   },
   {
     "name": "React TagsInput subpath",
     "path": "packages/react/dist/components/TagsInput.mjs",
-    "limit": "24 kB",
+    "limit": "39 kB",
     "gzip": true
   },
   {
     "name": "Vue MaskInput subpath",
     "path": "packages/vue/dist/components/MaskInput.mjs",
-    "limit": "30 kB",
+    "limit": "45 kB",
     "gzip": true
   },
   {
     "name": "React MaskInput subpath",
     "path": "packages/react/dist/components/MaskInput.mjs",
-    "limit": "22 kB",
+    "limit": "39 kB",
     "gzip": true
   },
   {
     "name": "Vue ScrollArea subpath",
     "path": "packages/vue/dist/components/ScrollArea.mjs",
-    "limit": "28 kB",
+    "limit": "44 kB",
     "gzip": true
   },
   {
     "name": "React ScrollArea subpath",
     "path": "packages/react/dist/components/ScrollArea.mjs",
-    "limit": "21 kB",
+    "limit": "38 kB",
     "gzip": true
   },
   {
     "name": "Vue Masonry subpath",
     "path": "packages/vue/dist/components/Masonry.mjs",
-    "limit": "27 kB",
+    "limit": "41 kB",
     "gzip": true
   },
   {
     "name": "React Masonry subpath",
     "path": "packages/react/dist/components/Masonry.mjs",
-    "limit": "20 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
     "name": "Vue AspectRatio subpath",
     "path": "packages/vue/dist/components/AspectRatio.mjs",
-    "limit": "20 kB",
+    "limit": "33 kB",
     "gzip": true
   },
   {
     "name": "React AspectRatio subpath",
     "path": "packages/react/dist/components/AspectRatio.mjs",
-    "limit": "19 kB",
+    "limit": "33 kB",
     "gzip": true
   },
   {
     "name": "Vue ContextMenu subpath",
     "path": "packages/vue/dist/components/ContextMenu.mjs",
-    "limit": "40 kB",
+    "limit": "54 kB",
     "gzip": true
   },
   {
     "name": "React ContextMenu subpath",
     "path": "packages/react/dist/components/ContextMenu.mjs",
-    "limit": "33 kB",
+    "limit": "47 kB",
     "gzip": true
   },
   {
     "name": "Vue NavigationMenu subpath",
     "path": "packages/vue/dist/components/NavigationMenu.mjs",
-    "limit": "41 kB",
+    "limit": "56 kB",
     "gzip": true
   },
   {
     "name": "React NavigationMenu subpath",
     "path": "packages/react/dist/components/NavigationMenu.mjs",
-    "limit": "34 kB",
+    "limit": "49 kB",
     "gzip": true
   },
   {
     "name": "Vue PageHeader subpath",
     "path": "packages/vue/dist/components/PageHeader.mjs",
-    "limit": "25 kB",
+    "limit": "45 kB",
     "gzip": true
   },
   {
     "name": "React PageHeader subpath",
     "path": "packages/react/dist/components/PageHeader.mjs",
-    "limit": "23 kB",
+    "limit": "38 kB",
     "gzip": true
   },
   {
     "name": "Vue Kbd subpath",
     "path": "packages/vue/dist/components/Kbd.mjs",
-    "limit": "20 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
     "name": "React Kbd subpath",
     "path": "packages/react/dist/components/Kbd.mjs",
-    "limit": "20 kB",
+    "limit": "33 kB",
     "gzip": true
   },
   {
     "name": "Vue Highlight subpath",
     "path": "packages/vue/dist/components/Highlight.mjs",
-    "limit": "20 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
     "name": "React Highlight subpath",
     "path": "packages/react/dist/components/Highlight.mjs",
-    "limit": "20 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
     "name": "Vue Marquee subpath",
     "path": "packages/vue/dist/components/Marquee.mjs",
-    "limit": "24 kB",
+    "limit": "37 kB",
     "gzip": true
   },
   {
     "name": "React Marquee subpath",
     "path": "packages/react/dist/components/Marquee.mjs",
-    "limit": "20 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {
     "name": "Vue ImageCompare subpath",
     "path": "packages/vue/dist/components/ImageCompare.mjs",
-    "limit": "28 kB",
+    "limit": "44 kB",
     "gzip": true
   },
   {
     "name": "React ImageCompare subpath",
     "path": "packages/react/dist/components/ImageCompare.mjs",
-    "limit": "21 kB",
+    "limit": "38 kB",
     "gzip": true
   },
   {
@@ -274,25 +274,25 @@
   {
     "name": "Vue SplitButton subpath",
     "path": "packages/vue/dist/components/SplitButton.mjs",
-    "limit": "41 kB",
+    "limit": "58 kB",
     "gzip": true
   },
   {
     "name": "React SplitButton subpath",
     "path": "packages/react/dist/components/SplitButton.mjs",
-    "limit": "34 kB",
+    "limit": "52 kB",
     "gzip": true
   },
   {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
-    "limit": "3 kB",
+    "limit": "8 kB",
     "gzip": true
   },
   {
     "name": "Core locale (zh-CN) subpath",
     "path": "packages/core/dist/locales/zh-CN.js",
-    "limit": "5 kB",
+    "limit": "6 kB",
     "gzip": true
   },
   {
