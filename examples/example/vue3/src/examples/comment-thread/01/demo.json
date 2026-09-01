@@ -1,7 +1,7 @@
 {
   "id": "comment-thread-01",
   "title": "嵌套评论",
-  "description": "一个 CommentThread 用最小父子数据展示标签、点赞数与默认展开；扁平数据可改传 items。",
+  "description": "只读树：不绑 onReply / onLike，提交不写树，点赞只活在本次挂载。空态有主评论框但发送禁用。",
   "entry": "App.vue",
   "order": 1
 }

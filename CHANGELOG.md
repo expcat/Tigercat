@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Feed 组合（ChatWindow / CommentThread / ActivityFeed / NotificationCenter）**：时间格式一份 `formatCompositeTime`（`0` 合法，ISO 才 parse，Invalid Date 空串，接 locale）。`groups` / `nodes` 一旦传入（含 `[]`）不再回落 `items`。Chat 贴底才跟最新，IME Enter 不发，`onSend` 不 push。评论 overlay 在 `nodes` 换引用后丢弃，Load more 按 `maxReplies` 揭剩余。Activity Vue 点走 `#dot`。NC 光 `items` 走 List，已读钮常显，全部已读管所有组。这不是命令式 `notification` toast。
 - **DataTableWithToolbar**：搜索/筛选/隐列/页尺寸下沉 core。默认 `searchMode: 'local'` 写进当前表；批量订内层勾选。`onPageChange` 与 Table 同签名；省略 pagination 默认开。`id`/`style` 在外壳。Vue 补 `tableClassName`，props 复用 Table。
 - **FormWizard**：导航下沉 core。`isLast` 看未跳过步。`fields` 交给祖先 Form。`beforeNext` 字符串可见。Finish 会提交 Form。Vue 动作图标走 `#icon`。
 - **FileManager**：`currentPath` / `searchText` 与 `selectedKeys` 同一套受控探测，不绑回调时双击文件夹会进入。路径是文件夹 key。搜索 `''` 是真清空，只匹配当前层名称。`draggable` 重排当前层源数组并回写整棵 `files` 树。面包屑是 button，listbox 有 locale 名，越界 roving 会夹紧。根节点 `h-full`，高度/style 进 DOM。

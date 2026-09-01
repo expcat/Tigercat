@@ -51,8 +51,8 @@ export default function App() {
         inputType={inputType}
         inputRows={2}
         virtual
-        virtualItemHeight={88}
-        virtualHeight={320}
+        virtualItemHeight={72}
+        virtualHeight={512}
         showTime
         statusText={`已虚拟渲染 ${messages.length} 条消息 · ${inputType === 'input' ? '单行' : '多行'}输入`}
         placeholder={inputType === 'input' ? '按 Enter 发送' : 'Enter 发送，Shift+Enter 换行'}

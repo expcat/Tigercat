@@ -83,8 +83,9 @@ export default function App() {
       </p>
 
       <NotificationCenter
-        items={view === 'empty' ? [] : items}
-        groupBy={(item) => String(item.type ?? '其他')}
+        items={items}
+        groups={view === 'empty' ? [] : undefined}
+        groupBy={view === 'empty' ? undefined : (item) => String(item.type ?? '其他')}
         groupOrder={['产品', '系统']}
         activeGroupKey={activeGroupKey}
         readFilter={readFilter}

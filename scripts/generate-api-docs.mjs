@@ -333,20 +333,22 @@ const COMPONENT_USAGE_NOTES = {
   ChatWindow: {
     uses: ['Avatar', 'Textarea/Input', 'Button', 'VirtualList', 'Empty'],
     notes:
-      '`virtual` 开启后消息列表走 `VirtualList`；输入区根据 `inputType` 选择 `Textarea` 或 `Input`。'
+      '`messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。'
   },
   ActivityFeed: {
     uses: ['Timeline', 'Avatar', 'Tag', 'Card', 'Text', 'Link', 'Loading'],
-    notes: '时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。'
+    notes:
+      '`groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。'
   },
   CommentThread: {
     uses: ['Avatar', 'Tag', 'Button', 'Textarea', 'Text'],
     notes:
-      '评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。展开状态受控量为 `expandedKeys`：Vue 使用 `update:expandedKeys` / `v-model:expanded-keys`，React 对应历史回调名 `onExpandedChange`。'
+      '`nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。'
   },
   NotificationCenter: {
     uses: ['Card', 'Tabs/TabPane', 'List', 'Text', 'Button', 'Loading'],
-    notes: '传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。'
+    notes:
+      '只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。'
   },
   List: {
     notes:
@@ -602,9 +604,9 @@ const COMPONENT_SNIPPETS = {
       '<AvatarGroup :max="3"><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>',
     Badge: '<Badge :content="5" />',
     Tag: '<Tag closable>标签</Tag>',
-    ChatWindow: '<ChatWindow :messages="messages" />',
+    ChatWindow: '<ChatWindow :messages="messages" @send="onSend" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
-    CommentThread: '<CommentThread :nodes="nodes" />',
+    CommentThread: '<CommentThread :nodes="nodes" @reply="onReply" />',
     NotificationCenter: '<NotificationCenter :items="items" />',
     DataExport: '<DataExport :columns="columns" :data-source="rows" file-name="users" />',
     TableToolbar:
@@ -665,9 +667,9 @@ const COMPONENT_SNIPPETS = {
       '<AvatarGroup max={3}><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>',
     Badge: '<Badge content={5} />',
     Tag: '<Tag closable>标签</Tag>',
-    ChatWindow: '<ChatWindow messages={messages} />',
+    ChatWindow: '<ChatWindow messages={messages} onSend={onSend} />',
     ActivityFeed: '<ActivityFeed items={items} />',
-    CommentThread: '<CommentThread nodes={nodes} />',
+    CommentThread: '<CommentThread nodes={nodes} onReply={onReply} />',
     NotificationCenter: '<NotificationCenter items={items} />',
     DataExport: '<DataExport columns={columns} dataSource={rows} fileName="users" />',
     TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',

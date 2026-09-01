@@ -1,7 +1,7 @@
 {
   "id": "chat-window-01",
   "title": "受控聊天窗口",
-  "description": "一个 ChatWindow 展示受控输入与发送消息；单行模式可改用 inputType=\"input\"。",
+  "description": "一个 ChatWindow 绑定发送回写。根上 h-96 给列表定高；不绑 onSend 时发送钮禁用、列表不动。",
   "entry": "App.tsx",
   "order": 1
 }

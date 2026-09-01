@@ -20,10 +20,14 @@ const items: NotificationItem[] = [
     read: true
   }
 ]
+const groups = [
+  { key: '系统', title: '系统', items: items.filter((item) => item.type === '系统') },
+  { key: '评论', title: '评论', items: items.filter((item) => item.type === '评论') }
+]
 </script>
 
 <template>
   <div class="max-w-lg">
-    <NotificationCenter :items="items" :group-order="['系统', '评论']" manage-read-state />
+    <NotificationCenter :groups="groups" :group-order="['系统', '评论']" manage-read-state />
   </div>
 </template>

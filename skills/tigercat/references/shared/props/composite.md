@@ -11,50 +11,62 @@ description: Compact generated Tigercat Composite props reference
 
 ## ActivityFeed
 
-`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 3/16 props
+`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 7/18 props
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
-Note: 时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。
+Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。
 
-| Prop       | Type                   | Default | Notes                                     |
-| ---------- | ---------------------- | ------- | ----------------------------------------- |
-| `items?`   | `ActivityItem[]`       | `-`     | Activity items (flat list)                |
-| `loading?` | `boolean`              | `false` | Whether to show loading state             |
-| `locale?`  | `Partial<TigerLocale>` | `-`     | Locale overrides for ActivityFeed UI text |
+| Prop          | Type                             | Default | Notes                                               |
+| ------------- | -------------------------------- | ------- | --------------------------------------------------- |
+| `items?`      | `ActivityItem[]`                 | `-`     | Activity items (flat list)                          |
+| `groups?`     | `ActivityGroup[]`                | `-`     | Activity groups                                     |
+| `groupBy?`    | `(item: ActivityItem) => string` | `-`     | Group by function (used when `groups` not provided) |
+| `groupOrder?` | `string[]`                       | `-`     | Optional group order                                |
+| `loading?`    | `boolean`                        | `false` | Whether to show loading state                       |
+| `showTime?`   | `boolean`                        | `true`  | Show time label                                     |
+| `locale?`     | `Partial<TigerLocale>`           | `-`     | Locale overrides for ActivityFeed UI text           |
 
 ## ChatWindow
 
-`packages/core/src/types/chat.ts` · `ChatWindowProps` · 4/32 props
+`packages/core/src/types/chat.ts` · `ChatWindowProps` · 8/33 props
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
-Note: `virtual` 开启后消息列表走 `VirtualList`；输入区根据 `inputType` 选择 `Textarea` 或 `Input`。
+Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
 
-| Prop        | Type                   | Default | Notes                                                                                      |
-| ----------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `value?`    | `string`               | `-`     | Input value (controlled)                                                                   |
-| `disabled?` | `boolean`              | `false` | Whether the input is disabled                                                              |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for ChatWindow UI text                                                    |
-| `virtual?`  | `boolean`              | `false` | Enable virtualized rendering for the message list. Recommended when the conversation ha... |
+| Prop                  | Type                                                | Default | Notes                                                                                      |
+| --------------------- | --------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `messages?`           | `ChatMessage[]`                                     | `-`     | Message list                                                                               |
+| `virtual?`            | `boolean`                                           | `false` | Enable virtualized rendering for the message list. The VirtualList is the only scroller... |
+| `autoScrollToBottom?` | `boolean`                                           | `true`  | Follow the latest message only while the list is pinned to the bottom (within 32px) or...  |
+| `sendOnEnter?`        | `boolean`                                           | `true`  | Send on Enter                                                                              |
+| `labels?`             | `Partial<import('./locale').TigerLocaleChatWindow>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| `value?`              | `string`                                            | `-`     | Input value (controlled)                                                                   |
+| `disabled?`           | `boolean`                                           | `false` | Whether the input is disabled                                                              |
+| `locale?`             | `Partial<TigerLocale>`                              | `-`     | Locale overrides for ChatWindow UI text                                                    |
 
 Events/callback props: `onChange?`, `onSend?`.
 
 ## CommentThread
 
-`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 3/26 props
+`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 7/27 props
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
-Note: 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。展开状态受控量为 `expandedKeys`：Vue 使用 `update:expandedKeys` / `v-model:expanded-keys`，React 对应历史回调名 `onExpandedChange`。
+Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。
 
-| Prop      | Type                   | Default | Notes                                      |
-| --------- | ---------------------- | ------- | ------------------------------------------ |
-| `items?`  | `CommentNode[]`        | `-`     | Comment items (flat list)                  |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale overrides for CommentThread UI text |
-| `nodes?`  | `CommentNode[]`        | `-`     | Comment nodes (tree)                       |
+| Prop            | Type                      | Default | Notes                                                                                     |
+| --------------- | ------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `nodes?`        | `CommentNode[]`           | `-`     | Comment nodes (tree)                                                                      |
+| `items?`        | `CommentNode[]`           | `-`     | Comment items (flat list)                                                                 |
+| `maxReplies?`   | `number`                  | `3`     | Maximum replies to show per node                                                          |
+| `expandedKeys?` | `Array<string \| number>` | `-`     | Expanded reply keys (controlled)                                                          |
+| `showMore?`     | `boolean`                 | `false` | Show more action. Default off; the control is rendered when `onMore` or node `actions`... |
+| `showComposer?` | `boolean`                 | `true`  | Show the root composer (including empty state).                                           |
+| `locale?`       | `Partial<TigerLocale>`    | `-`     | Locale overrides for CommentThread UI text                                                |
 
-Events/callback props: `onLike?`, `onReply?`, `onMore?`, `onAction?`, `onExpandedChange?`, `onLoadMore?`.
+Events/callback props: `onLike?`, `onReply?`, `onUserClick?`, `onMore?`, `onAction?`, `onExpandedChange?`, ....
 
 ## DataTableWithToolbar
 
@@ -128,17 +140,22 @@ Events/callback props: `onChange?`, `onFinish?`.
 
 ## NotificationCenter
 
-`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 3/23 props
+`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 8/23 props
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 
-Note: 传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。
+Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。
 
-| Prop       | Type                   | Default | Notes                                           |
-| ---------- | ---------------------- | ------- | ----------------------------------------------- |
-| `items?`   | `NotificationItem[]`   | `-`     | Notification items (flat list)                  |
-| `loading?` | `boolean`              | `false` | Loading state                                   |
-| `locale?`  | `Partial<TigerLocale>` | `-`     | Locale overrides for NotificationCenter UI text |
+| Prop               | Type                                                        | Default | Notes                                                                                      |
+| ------------------ | ----------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`           | `NotificationItem[]`                                        | `-`     | Notification items (flat list)                                                             |
+| `groups?`          | `NotificationGroup[]`                                       | `-`     | Notification groups                                                                        |
+| `groupBy?`         | `(item: NotificationItem) => string`                        | `-`     | Group by function (used when `groups` not provided)                                        |
+| `manageReadState?` | `boolean`                                                   | `false` | Whether to manage read state internally. When true, the component tracks read/unread st... |
+| `readFilter?`      | `NotificationReadFilter`                                    | `'all'` | Read filter (controlled)                                                                   |
+| `labels?`          | `Partial<import('./locale').TigerLocaleNotificationCenter>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| `loading?`         | `boolean`                                                   | `false` | Loading state                                                                              |
+| `locale?`          | `Partial<TigerLocale>`                                      | `-`     | Locale overrides for NotificationCenter UI text                                            |
 
 Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`, `onItemClick?`, `onItemReadChange?`.
 

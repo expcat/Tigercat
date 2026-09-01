@@ -13,7 +13,7 @@ const groups: ActivityGroup[] = [
         time: '09:30',
         user: { name: '维护者' },
         status: { label: '成功', variant: 'success' },
-        actions: [{ label: '查看详情', href: '#' }]
+        actions: [{ label: '查看详情', href: 'https://example.com' }]
       }
     ]
   }

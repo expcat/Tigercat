@@ -49,8 +49,8 @@ const handleSend = (content: string) => {
       :input-type="inputType"
       :input-rows="2"
       virtual
-      :virtual-item-height="88"
-      :virtual-height="320"
+      :virtual-item-height="72"
+      :virtual-height="512"
       show-time
       :status-text="`已虚拟渲染 ${messages.length} 条消息 · ${inputType === 'input' ? '单行' : '多行'}输入`"
       :placeholder="inputType === 'input' ? '按 Enter 发送' : 'Enter 发送，Shift+Enter 换行'"

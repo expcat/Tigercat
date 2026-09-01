@@ -4,6 +4,12 @@
 
 ## 未发布
 
+ChatWindow `messages` 全受控，`onSend` 不写入列表；不绑发送时发送钮禁用。贴底（距底 32px）才自动滚；`virtual` 时 VirtualList 是唯一 scroller，`virtualItemHeight` 是估计高度。Vue 只发 `update:modelValue` / `send`。列表名走 locale。
+
+CommentThread `nodes={[]}` 不再回落 `items`。`onReply(node, value)` 的 `node` 在主评论框上是 `undefined`。`showMore` 默认 false。点赞 overlay 随 `nodes` 引用重置。
+
+ActivityFeed / NotificationCenter：`groups={[]}` 画面为空。NC 只有传入 `groups` 或 `groupBy` 才 Tabs；光 `items` 是平铺 List。`onMarkAllRead` 第一参在全局语义下可以是 `undefined`。这不是命令式 `notification` toast。
+
 DataTableWithToolbar 搜索/筛选默认写进当前 `dataSource`（`toolbar.searchMode: 'remote'` 才只发回调）。`onPageChange` 与 Table 一样是 `({ current, pageSize })`，不再是两个位置参数；改 pageSize 只发 `onPageSizeChange`。省略 `pagination` 与 Table 相同（默认开）。业务回调在 `toolbar` 上（Vue 仍可 `@search-change` / `@search` / `@filters-change` / `@bulk-action`）。删除未使用的 `clearLabel`。
 
 FormWizard 包在 Form 里时，当前步 `fields` 会 `validateFields`，Finish 会 `validate` + `submit`，`onFinish` 第三参是 values。`beforeNext` 返回的字符串会显示在内容区。最后一步被 skip 时，倒数第二个未跳过步就是 Finish。`clickable` 只能回已走过的步。

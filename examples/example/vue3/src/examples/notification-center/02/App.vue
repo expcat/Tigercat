@@ -82,8 +82,9 @@ const handleMarkAllRead = (
     <NotificationCenter
       v-model:active-group-key="activeGroupKey"
       v-model:read-filter="readFilter"
-      :items="view === 'empty' ? [] : items"
-      :group-by="groupBy"
+      :items="items"
+      :groups="view === 'empty' ? [] : undefined"
+      :group-by="view === 'empty' ? undefined : groupBy"
       :group-order="['产品', '系统']"
       :loading="view === 'loading'"
       loading-text="正在同步通知..."

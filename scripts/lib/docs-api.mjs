@@ -755,6 +755,32 @@ export const COMPONENT_PROP_PRIORITY = {
     'multiple?'
   ],
   ImageAnnotation: ['src', 'value?', 'tool?', 'selectedId?', 'readonly?', 'disabled?'],
+  ChatWindow: [
+    'messages?',
+    'virtual?',
+    'autoScrollToBottom?',
+    'sendOnEnter?',
+    'labels?',
+    'onSend?'
+  ],
+  CommentThread: [
+    'nodes?',
+    'items?',
+    'maxReplies?',
+    'expandedKeys?',
+    'showMore?',
+    'onReply?',
+    'showComposer?'
+  ],
+  ActivityFeed: ['items?', 'groups?', 'groupBy?', 'groupOrder?', 'loading?', 'showTime?'],
+  NotificationCenter: [
+    'items?',
+    'groups?',
+    'groupBy?',
+    'manageReadState?',
+    'readFilter?',
+    'labels?'
+  ],
   Gantt: [
     'scale?',
     'rowHeight?',

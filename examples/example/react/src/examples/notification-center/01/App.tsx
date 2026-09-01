@@ -20,10 +20,15 @@ const items: NotificationItem[] = [
   }
 ]
 
+const groups = [
+  { key: '系统', title: '系统', items: items.filter((item) => item.type === '系统') },
+  { key: '评论', title: '评论', items: items.filter((item) => item.type === '评论') }
+]
+
 export default function App() {
   return (
     <div className="max-w-lg">
-      <NotificationCenter items={items} groupOrder={['系统', '评论']} manageReadState />
+      <NotificationCenter groups={groups} groupOrder={['系统', '评论']} manageReadState />
     </div>
   )
 }
