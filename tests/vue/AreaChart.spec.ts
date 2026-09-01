@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { fireEvent } from '@testing-library/vue'
 import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const basicData = [
   { x: 'Jan', y: 30 },
@@ -49,10 +49,11 @@ describe('AreaChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(AreaChart, {
-      data: basicData
+      data: basicData,
+      title: 'Traffic'
     })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
   it('renders empty state with no data', () => {
@@ -76,15 +77,15 @@ describe('AreaChart', () => {
     const circles = container.querySelectorAll('circle')
     expect(circles.length).toBe(basicData.length)
   })
-  it('renders animation styles when animated is true', () => {
+  it('applies the draw class when animated is true', () => {
     const { container } = renderWithProps(AreaChart, {
       data: basicData,
       animated: true,
       ...defaultSize
     })
 
-    const styleEl = container.querySelector('style')
-    expect(styleEl?.textContent).toContain('tiger-area-animated')
+    expect(container.querySelector('.tiger-area-animated')).toBeTruthy()
+    expect(container.querySelector('style')).toBeNull()
   })
   it('handles series, legend, point, and keyboard interactions', async () => {
     const { container, emitted } = renderWithProps(AreaChart, {
@@ -134,7 +135,8 @@ describe('AreaChart', () => {
       ...defaultSize
     })
     const passivePoint = passive.container.querySelector('circle[data-point-index="0"]')!
-    expect(passivePoint).toHaveAttribute('role', 'img')
+    expect(passivePoint).toHaveAttribute('aria-hidden', 'true')
+    expect(passivePoint).not.toHaveAttribute('role')
     expect(passivePoint).not.toHaveAttribute('tabindex')
 
     const clickable = renderWithProps(AreaChart, {
@@ -148,5 +150,48 @@ describe('AreaChart', () => {
     expect(clickablePoint).toHaveAttribute('tabindex', '0')
     await fireEvent.keyDown(clickablePoint, { key: ' ' })
     expect(clickable.emitted()['point-click']).toBeTruthy()
+  })
+
+  it('does not paint a fill gradient by default and still tracks the plot', async () => {
+    const { container } = renderWithProps(AreaChart, {
+      data: basicData,
+      ...defaultSize
+    })
+    expect(container.querySelector('linearGradient')).toBeNull()
+    await fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, {
+      clientX: 40,
+      clientY: 40
+    })
+    expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
+  })
+
+  it('renders stacked series without rewriting a dashed stroke', () => {
+    const { container } = renderWithProps(AreaChart, {
+      series: [
+        {
+          name: 'A',
+          data: [
+            { x: 'Jan', y: 4 },
+            { x: 'Feb', y: 8 }
+          ]
+        },
+        {
+          name: 'B',
+          data: [
+            { x: 'Jan', y: 2 },
+            { x: 'Mar', y: -1 }
+          ],
+          strokeDasharray: '4 2'
+        }
+      ],
+      stacked: true,
+      curve: 'monotone',
+      animated: true,
+      ...defaultSize
+    })
+    expect(container.querySelectorAll('path[data-area-series]')).toHaveLength(2)
+    const dashed = container.querySelector('path[stroke-dasharray="4 2"]')
+    expect(dashed).toBeTruthy()
+    expect(dashed).not.toHaveAttribute('pathLength')
   })
 })

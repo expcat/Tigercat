@@ -1,20 +1,34 @@
-import { defineComponent, computed, getCurrentInstance, h, PropType, ref, useId } from 'vue'
+import { defineComponent, computed, h, PropType, ref, useId } from 'vue'
 import {
   classNames,
-  createAreaPath,
+  coerceClassValue,
   createLinearScale,
-  createLinePath,
   createPointScale,
-  getChartElementOpacity,
   getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
+  DEFAULT_CHART_PADDING,
   buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
+  defaultChartSeriesName,
+  layoutLineSeries,
+  getCartesianChartShellClasses,
+  findNearestSeriesPoint,
+  flattenChartPoints,
+  chartPointTabIndex,
+  nextChartPointRef,
+  isChartNavigationKey,
+  isNumericChartDomain,
+  CHART_SURFACE_FILL,
+  LINE_DRAW_CLASS,
+  getChartLabels,
+  mergeTigerLocale,
+  formatChartTemplate,
   type ChartCurveType,
   type ChartGridLineStyle,
   type ChartLegendItem,
@@ -34,6 +48,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueLineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -41,14 +56,17 @@ export interface VueLineChartProps extends CoreLineChartProps {
   padding?: ChartPadding
   xScale?: ChartScale
   yScale?: ChartScale
+  onPointClick?: (seriesIndex: number, pointIndex: number, datum: LineChartDatum) => void
 }
+
+export type LineChartProps = VueLineChartProps
 
 // Asymmetric default padding leaves room for the left y-axis tick labels
 // (3-digit / currency values) and the bottom x-axis label so they are not clipped.
-const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 }
 
 export const LineChart = defineComponent({
   name: 'TigerLineChart',
+  inheritAttrs: false,
   props: {
     width: {
       type: Number,
@@ -60,7 +78,7 @@ export const LineChart = defineComponent({
     },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
-      default: () => DEFAULT_CARTESIAN_PADDING
+      default: () => ({ ...DEFAULT_CHART_PADDING })
     },
     responsive: { type: Boolean, default: false },
     data: {
@@ -253,6 +271,11 @@ export const LineChart = defineComponent({
     },
     className: {
       type: String
+    },
+    onPointClick: {
+      type: Function as PropType<
+        (seriesIndex: number, pointIndex: number, datum: LineChartDatum) => void
+      >
     }
   },
   emits: [
@@ -263,9 +286,9 @@ export const LineChart = defineComponent({
     'point-click',
     'point-hover'
   ],
-  setup(props, { emit }) {
-    const instance = getCurrentInstance()
-    // Point-level hover state (not managed by composable)
+  setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
     const hoveredPointInfo = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
     const tooltipPosition = ref({ x: 0, y: 0 })
 
@@ -291,13 +314,13 @@ export const LineChart = defineComponent({
     // Use shared interaction composable for series-level interaction
     const {
       activeIndex,
+      resolvedSelectedIndex,
       handleMouseEnter: handleSeriesHoverEnter,
       handleMouseLeave: handleSeriesHoverLeave,
       handleClick: handleSeriesSelect,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave,
-      wrapperClasses
+      handleLegendLeave
     } = useChartInteraction<LineChartSeries>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -307,12 +330,11 @@ export const LineChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      emit: emit as (event: string, ...args: unknown[]) => void,
+      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       getData: (index: number) => resolvedSeries.value[index],
-      eventNames: {
-        hover: 'series-hover',
-        click: 'series-click'
-      }
+      onHover: (index, datum) => emit('series-hover', index, datum),
+      onClick: (index, datum) => emit('series-click', index, datum)
     })
 
     // Collect all x values and y values
@@ -322,7 +344,7 @@ export const LineChart = defineComponent({
     const yValues = computed(() => allData.value.map((d) => d.y))
 
     // Determine if x axis is numeric or categorical
-    const isXNumeric = computed(() => xValues.value.every((v) => typeof v === 'number'))
+    const isXNumeric = computed(() => isNumericChartDomain(xValues.value))
 
     const resolvedXScale = computed(() => {
       if (props.xScale) return props.xScale
@@ -338,7 +360,9 @@ export const LineChart = defineComponent({
 
     const resolvedYScale = computed(() => {
       if (props.yScale) return props.yScale
-      const extent = getNumberExtent(yValues.value, { includeZero: props.includeZero })
+      const extent = getNumberExtent(yValues.value, {
+        includeZero: props.includeZero || props.showArea
+      })
       return createLinearScale(extent, [innerRect.value.height, 0])
     })
 
@@ -350,55 +374,44 @@ export const LineChart = defineComponent({
       buildChartSeriesKeys(resolvedSeries.value, { prefix: 'line-' })
     )
 
-    // Calculate line paths and points for each series
-    const seriesData = computed(() =>
-      resolvedSeries.value.map((series, seriesIndex) => {
-        const seriesKey = seriesKeys.value[seriesIndex]
-        const color = series.color ?? palette.value[seriesIndex % palette.value.length]
-        const points = series.data.map((datum, pointIndex) => ({
-          x: resolvedXScale.value.map(datum.x),
-          y: resolvedYScale.value.map(datum.y),
-          datum,
-          pointIndex
-        }))
-        const linePath = createLinePath(points, props.curve)
-        const seriesShowArea = series.showArea ?? props.showArea
-        const areaPath = seriesShowArea
-          ? createAreaPath(points, innerRect.value.height, props.curve)
-          : ''
-        const opacity = getChartElementOpacity(seriesIndex, activeIndex.value, {
+    const seriesData = computed(() => {
+      const laidOut = layoutLineSeries(
+        resolvedSeries.value,
+        resolvedXScale.value,
+        resolvedYScale.value,
+        {
+          curve: props.curve,
+          palette: palette.value,
+          activeIndex: activeIndex.value,
+          showArea: props.showArea,
+          areaOpacity: props.areaOpacity,
+          strokeWidth: props.strokeWidth,
+          showPoints: props.showPoints,
+          pointSize: props.pointSize,
+          pointColor: props.pointColor,
+          pointHollow: props.pointHollow,
           activeOpacity: props.activeOpacity,
           inactiveOpacity: props.inactiveOpacity
-        })
-
-        return {
-          series,
-          seriesIndex,
-          seriesKey,
-          color,
-          linePath,
-          areaPath,
-          showArea: seriesShowArea,
-          areaOpacity: series.areaOpacity ?? props.areaOpacity,
-          points,
-          opacity,
-          strokeWidth: series.strokeWidth ?? props.strokeWidth,
-          strokeDasharray: series.strokeDasharray,
-          showPoints: series.showPoints ?? props.showPoints,
-          pointSize: series.pointSize ?? props.pointSize,
-          pointColor: series.pointColor ?? color,
-          pointHollow: series.pointHollow ?? props.pointHollow
         }
-      })
-    )
+      )
+      return laidOut.map((item, seriesIndex) => ({
+        ...item,
+        seriesKey: seriesKeys.value[seriesIndex]
+      }))
+    })
+
+    const flatPoints = computed(() => flattenChartPoints(seriesData.value))
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
         data: resolvedSeries.value,
         palette: palette.value,
         activeIndex: activeIndex.value,
+        selectedIndex: resolvedSelectedIndex.value,
         getLabel: (s, i) =>
-          props.legendFormatter ? props.legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+          props.legendFormatter
+            ? props.legendFormatter(s, i)
+            : (s.name ?? defaultChartSeriesName(i, labels.value.seriesName)),
         getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
       })
     )
@@ -408,7 +421,14 @@ export const LineChart = defineComponent({
         hoveredPointInfo.value,
         resolvedSeries.value,
         props.tooltipFormatter,
-        defaultSeriesXYTooltipFormatter
+        (datum, seriesIndex, pointIndex, s) =>
+          defaultSeriesXYTooltipFormatter(
+            datum,
+            seriesIndex,
+            pointIndex,
+            s,
+            labels.value.seriesName
+          )
       )
     )
 
@@ -443,7 +463,7 @@ export const LineChart = defineComponent({
       seriesIndex: number,
       pointIndex: number
     ) => {
-      if (!props.hoverable) return
+      if (!(props.showTooltip || props.hoverable)) return
       const rect = el.getBoundingClientRect()
       hoveredPointInfo.value = { seriesIndex, pointIndex }
       tooltipPosition.value = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
@@ -456,28 +476,33 @@ export const LineChart = defineComponent({
     }
 
     const handlePointClick = (seriesIndex: number, pointIndex: number) => {
-      emit(
-        'point-click',
-        seriesIndex,
-        pointIndex,
-        resolvedSeries.value[seriesIndex]?.data[pointIndex]
-      )
+      const datum = resolvedSeries.value[seriesIndex]?.data[pointIndex]
+      props.onPointClick?.(seriesIndex, pointIndex, datum)
+      emit('point-click', seriesIndex, pointIndex, datum)
       handleSeriesSelect(seriesIndex)
     }
 
-    const handleKeyDown = (event: KeyboardEvent, seriesIndex: number) => {
-      if (!props.selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleSeriesSelect(seriesIndex)
+    const handlePlotMouseMove = (event: MouseEvent) => {
+      if (!(props.showTooltip || props.hoverable)) return
+      const target = event.currentTarget as SVGGraphicsElement
+      const rect = target.getBoundingClientRect()
+      const width = rect.width || innerRect.value.width
+      const height = rect.height || innerRect.value.height
+      if (width === 0 || height === 0) return
+      const x = ((event.clientX - rect.left) / width) * innerRect.value.width
+      const y = ((event.clientY - rect.top) / height) * innerRect.value.height
+      const nearest = findNearestSeriesPoint(
+        seriesData.value.map((sd) => sd.points),
+        x,
+        y
+      )
+      if (!nearest) return
+      hoveredPointInfo.value = nearest
+      tooltipPosition.value = { x: event.clientX, y: event.clientY }
     }
 
     return () => {
-      // Point-level interaction is gated: tooltip tracking on `showTooltip` or
-      // `hoverable`; highlight/hover events on `hoverable`; click on `selectable`
-      // or an explicit point-click listener (C26-2). Default points stay `role="img"`.
-      const pointClickable =
-        props.selectable || typeof instance?.vnode.props?.onPointClick === 'function'
+      const pointClickable = typeof props.onPointClick === 'function'
       const trackPointHover = props.showTooltip || props.hoverable
       const chart = h(
         ChartCanvas,
@@ -488,7 +513,6 @@ export const LineChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className),
           onResolvedSizeChange
         },
         {
@@ -529,31 +553,20 @@ export const LineChart = defineComponent({
                   })
                 : null,
               // Gradient defs and animation styles
+              trackPointHover
+                ? h('rect', {
+                    width: innerRect.value.width,
+                    height: innerRect.value.height,
+                    fill: 'transparent',
+                    'data-plot-hit': '',
+                    onMousemove: handlePlotMouseMove,
+                    onMouseleave: handlePointMouseLeave
+                  })
+                : null,
               seriesData.value.some((sd) => sd.showArea) ||
-              props.animated ||
               props.strokeGradient ||
               props.pointGradient
                 ? h('defs', null, [
-                    // Animation keyframes
-                    props.animated
-                      ? h(
-                          'style',
-                          null,
-                          `
-                          .tiger-line-animated {
-                            animation: tiger-line-draw var(--tiger-motion-duration-slow,1.2s) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)) forwards;
-                          }
-                          @keyframes tiger-line-draw {
-                            from { stroke-dashoffset: 1; }
-                            to { stroke-dashoffset: 0; }
-                          }
-                          @media (prefers-reduced-motion: reduce) {
-                            .tiger-line-animated { animation-duration: 0ms; }
-                          }
-                        `
-                        )
-                      : null,
-                    // Area fill gradients
                     ...seriesData.value
                       .filter((sd) => sd.showArea)
                       .map((sd) =>
@@ -659,9 +672,7 @@ export const LineChart = defineComponent({
                     ),
                     onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
                     onMouseleave: handleSeriesHoverLeave,
-                    onClick: () => handleSeriesSelect(sd.seriesIndex),
-                    tabindex: props.selectable ? 0 : undefined,
-                    onKeydown: (e: KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)
+                    onClick: () => handleSeriesSelect(sd.seriesIndex)
                   },
                   {
                     default: () => [
@@ -671,7 +682,8 @@ export const LineChart = defineComponent({
                             d: sd.areaPath,
                             fill: `url(#${gradientPrefix}-${sd.seriesKey})`,
                             stroke: 'none',
-                            class: 'transition-opacity duration-300',
+                            class:
+                              'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]',
                             'data-area-series': sd.seriesIndex,
                             'data-series-key': sd.seriesKey
                           })
@@ -684,16 +696,17 @@ export const LineChart = defineComponent({
                           ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})`
                           : sd.color,
                         'stroke-width': sd.strokeWidth,
-                        'stroke-dasharray': props.animated
-                          ? (sd.strokeDasharray ?? '1')
-                          : sd.strokeDasharray,
-                        'stroke-dashoffset': props.animated ? '1' : undefined,
+                        'stroke-dasharray': sd.strokeDasharray,
+                        'stroke-dashoffset':
+                          props.animated && !sd.strokeDasharray ? '1' : undefined,
                         'stroke-linecap': 'round',
                         'stroke-linejoin': 'round',
-                        pathLength: props.animated ? 1 : undefined,
+                        pathLength: props.animated && !sd.strokeDasharray ? 1 : undefined,
                         class: classNames(
-                          'transition-opacity [transition-duration:var(--tiger-motion-duration-base,200ms)]',
-                          props.animated && 'tiger-line-animated'
+                          props.animated && !sd.strokeDasharray
+                            ? undefined
+                            : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]',
+                          props.animated && !sd.strokeDasharray && LINE_DRAW_CLASS
                         ),
                         'data-line-series': sd.seriesIndex,
                         'data-series-key': sd.seriesKey
@@ -707,29 +720,45 @@ export const LineChart = defineComponent({
                             const hoverSize = sd.pointSize + 2
                             const datum =
                               resolvedSeries.value[sd.seriesIndex]?.data?.[point.pointIndex]
-                            const pointInteractive = props.hoverable || pointClickable
+                            const pointInteractive =
+                              props.hoverable || props.selectable || pointClickable
                             return h('circle', {
                               key: `point-${sd.seriesKey}-${point.pointIndex}`,
                               cx: point.x,
                               cy: point.y,
                               r: isHovered ? hoverSize : sd.pointSize,
                               fill: sd.pointHollow
-                                ? 'white'
+                                ? CHART_SURFACE_FILL
                                 : props.pointGradient
                                   ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
                                   : sd.pointColor,
                               stroke: sd.pointHollow ? sd.pointColor : 'none',
                               'stroke-width': sd.pointHollow ? 2 : 0,
                               class: classNames(
-                                linePointTransitionClasses,
+                                props.animated ? linePointTransitionClasses : undefined,
                                 pointInteractive && 'cursor-pointer'
                               ),
                               style: isHovered
                                 ? `filter: drop-shadow(0 0 4px ${sd.color})`
                                 : undefined,
-                              role: pointInteractive ? 'button' : 'img',
-                              'aria-label': datum?.label ?? String(datum?.y ?? ''),
-                              tabindex: pointInteractive ? 0 : undefined,
+                              role: pointInteractive ? 'button' : undefined,
+                              'aria-hidden': pointInteractive ? undefined : true,
+                              'aria-label': pointInteractive
+                                ? (datum?.label ??
+                                  formatChartTemplate(labels.value.pointAriaLabel, {
+                                    index: point.pointIndex + 1,
+                                    x: String(datum?.x ?? ''),
+                                    y: String(datum?.y ?? '')
+                                  }))
+                                : undefined,
+                              tabindex: pointInteractive
+                                ? chartPointTabIndex(
+                                    sd.seriesIndex,
+                                    point.pointIndex,
+                                    hoveredPointInfo.value,
+                                    flatPoints.value
+                                  )
+                                : undefined,
                               'data-point-index': point.pointIndex,
                               'data-series-key': sd.seriesKey,
                               onMouseenter: trackPointHover
@@ -738,13 +767,11 @@ export const LineChart = defineComponent({
                                 : undefined,
                               onMousemove: trackPointHover ? handlePointMouseMove : undefined,
                               onMouseleave: trackPointHover ? handlePointMouseLeave : undefined,
-                              onClick: pointClickable
-                                ? (e: MouseEvent) => {
-                                    e.stopPropagation()
-                                    handlePointClick(sd.seriesIndex, point.pointIndex)
-                                  }
-                                : undefined,
-                              onFocus: props.hoverable
+                              onClick: (e: MouseEvent) => {
+                                e.stopPropagation()
+                                handlePointClick(sd.seriesIndex, point.pointIndex)
+                              },
+                              onFocus: trackPointHover
                                 ? (e: FocusEvent) =>
                                     showPointTooltipFromElement(
                                       e.currentTarget as unknown as SVGGraphicsElement,
@@ -752,9 +779,28 @@ export const LineChart = defineComponent({
                                       point.pointIndex
                                     )
                                 : undefined,
-                              onBlur: props.hoverable ? handlePointMouseLeave : undefined,
+                              onBlur: trackPointHover ? handlePointMouseLeave : undefined,
                               onKeydown: pointInteractive
                                 ? (e: KeyboardEvent) => {
+                                    if (isChartNavigationKey(e.key)) {
+                                      e.preventDefault()
+                                      const next = nextChartPointRef(
+                                        {
+                                          seriesIndex: sd.seriesIndex,
+                                          pointIndex: point.pointIndex
+                                        },
+                                        e.key,
+                                        flatPoints.value
+                                      )
+                                      if (!next) return
+                                      const node = (
+                                        e.currentTarget as SVGElement
+                                      ).ownerSVGElement?.querySelector(
+                                        `[data-series-key="${seriesKeys.value[next.seriesIndex]}"][data-point-index="${next.pointIndex}"]`
+                                      )
+                                      if (node instanceof SVGElement) node.focus()
+                                      return
+                                    }
                                     if (e.key === 'Enter' || e.key === ' ') {
                                       e.preventDefault()
                                       e.stopPropagation()
@@ -767,7 +813,7 @@ export const LineChart = defineComponent({
                                           point.pointIndex
                                         )
                                       }
-                                    } else if (e.key === 'Escape' && props.hoverable) {
+                                    } else if (e.key === 'Escape' && trackPointHover) {
                                       handlePointMouseLeave()
                                     }
                                   }
@@ -792,34 +838,31 @@ export const LineChart = defineComponent({
           })
         : null
 
-      if (!props.showLegend) {
-        return h(
-          'div',
-          {
-            class: classNames(
-              'relative',
-              props.responsive ? 'block w-full min-w-0' : 'inline-block'
-            )
-          },
-          [chart, tooltip]
-        )
-      }
-
       return h(
         'div',
-        { class: classNames(wrapperClasses.value, props.responsive && 'w-full min-w-0') },
+        {
+          class: getCartesianChartShellClasses({
+            showLegend: props.showLegend,
+            legendPosition: props.legendPosition,
+            responsive: props.responsive,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
+        },
         [
           chart,
-          h(ChartLegend, {
-            items: legendItems.value,
-            position: props.legendPosition,
-            markerSize: props.legendMarkerSize,
-            gap: props.legendGap,
-            interactive: props.hoverable || props.selectable,
-            onItemClick: handleLegendClick,
-            onItemHover: handleLegendHover,
-            onItemLeave: handleLegendLeave
-          }),
+          props.showLegend
+            ? h(ChartLegend, {
+                items: legendItems.value,
+                orientation: chartLegendOrientationFromPosition(props.legendPosition),
+                markerSize: props.legendMarkerSize,
+                gap: props.legendGap,
+                interactive: props.hoverable || props.selectable,
+                ariaLabel: labels.value.legendAriaLabel,
+                onItemClick: handleLegendClick,
+                onItemHover: handleLegendHover,
+                onItemLeave: handleLegendLeave
+              })
+            : null,
           tooltip
         ]
       )

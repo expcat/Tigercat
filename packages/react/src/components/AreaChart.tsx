@@ -1,21 +1,34 @@
 import React, { useId, useMemo, useState, useCallback } from 'react'
 import {
   classNames,
-  createAreaPath,
   createLinearScale,
-  createLinePath,
   createPointScale,
-  getChartElementOpacity,
   getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
   stackSeriesData,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
+  DEFAULT_CHART_PADDING,
   buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
+  defaultChartSeriesName,
+  layoutAreaSeries,
+  getCartesianChartShellClasses,
+  findNearestSeriesPoint,
+  flattenChartPoints,
+  chartPointTabIndex,
+  nextChartPointRef,
+  isChartNavigationKey,
+  isNumericChartDomain,
+  CHART_SURFACE_FILL,
+  AREA_DRAW_CLASS,
+  getChartLabels,
+  mergeTigerLocale,
+  formatChartTemplate,
   type LineChartDatum,
   type AreaChartProps as CoreAreaChartProps,
   type AreaChartSeries,
@@ -32,6 +45,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface AreaChartProps extends CoreAreaChartProps {
   data?: LineChartDatum[]
@@ -56,14 +70,10 @@ export interface AreaChartProps extends CoreAreaChartProps {
   pointGradient?: boolean
 }
 
-// Asymmetric default padding leaves room for the left y-axis tick labels
-// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
-const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 } as const
-
 export const AreaChart: React.FC<AreaChartProps> = ({
   width = 320,
   height = 200,
-  padding = DEFAULT_CARTESIAN_PADDING,
+  padding = DEFAULT_CHART_PADDING,
   responsive = false,
   data,
   series,
@@ -104,7 +114,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   legendMarkerSize = 10,
   legendGap = 8,
   showTooltip = true,
-  gradient = true,
+  gradient = false,
   animated = false,
   pointHollow = false,
   strokeGradient = false,
@@ -121,6 +131,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   onPointClick,
   onPointHover
 }) => {
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
   // Point-level hover state (not managed by hook)
   const [hoveredPointInfo, setHoveredPointInfo] = useState<{
     seriesIndex: number
@@ -156,13 +168,13 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   // Use shared interaction hook for series-level interaction
   const {
     activeIndex,
+    resolvedSelectedIndex,
     handleMouseEnter: handleSeriesHoverEnter,
     handleMouseLeave: handleSeriesHoverLeave,
     handleClick: handleSeriesSelect,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<AreaChartSeries>({
     hoverable,
     showTooltip,
@@ -177,26 +189,27 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       onHoveredIndexChange?.(index)
       onSeriesHover?.(index, index !== null ? resolvedSeries[index] : null)
     },
-    onSelectedIndexChange: (index) => {
-      onSelectedIndexChange?.(index)
-      if (index !== null) {
-        onSeriesClick?.(index, resolvedSeries[index])
-      }
+    onSelectedIndexChange,
+    onClick: (index, series) => {
+      if (series) onSeriesClick?.(index, series)
     }
   })
 
+  const stackedData = useMemo(
+    () => (stacked ? stackSeriesData(resolvedSeries.map((s) => s.data)) : null),
+    [stacked, resolvedSeries]
+  )
   const allData = useMemo(() => resolvedSeries.flatMap((s) => s.data), [resolvedSeries])
   const xValues = useMemo(() => allData.map((d) => d.x), [allData])
 
   const yValues = useMemo(() => {
-    if (stacked) {
-      const stackedData = stackSeriesData(resolvedSeries.map((s) => s.data))
-      return stackedData.flatMap((s) => s.map((d) => d.y1))
+    if (stackedData) {
+      return stackedData.flatMap((series) => series.flatMap((item) => [item.y0, item.y1]))
     }
     return allData.map((d) => d.y)
-  }, [stacked, resolvedSeries, allData])
+  }, [stackedData, allData])
 
-  const isXNumeric = useMemo(() => xValues.every((v) => typeof v === 'number'), [xValues])
+  const isXNumeric = useMemo(() => isNumericChartDomain(xValues), [xValues])
 
   const resolvedXScale = useMemo(() => {
     if (xScaleProp) return xScaleProp
@@ -211,11 +224,9 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   const resolvedYScale = useMemo(() => {
     if (yScaleProp) return yScaleProp
-    const extent = getNumberExtent(yValues, { includeZero })
+    const extent = getNumberExtent(yValues, { includeZero: includeZero || stacked })
     return createLinearScale(extent, [innerRect.height, 0])
-  }, [yScaleProp, yValues, includeZero, innerRect.height])
-
-  const baseline = useMemo(() => resolvedYScale.map(0), [resolvedYScale])
+  }, [yScaleProp, yValues, includeZero, stacked, innerRect.height])
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
@@ -227,75 +238,27 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   )
 
   const seriesData = useMemo(() => {
-    const stackedData = stacked ? stackSeriesData(resolvedSeries.map((s) => s.data)) : null
-
-    return resolvedSeries.map((s, seriesIndex) => {
-      const seriesKey = seriesKeys[seriesIndex]
-      const color = s.color ?? palette[seriesIndex % palette.length]
-      const seriesFillColor = s.fillColor ?? color
-      const seriesFillOpacity = s.fillOpacity ?? fillOpacity
-
-      let points: Array<{ x: number; y: number; datum: LineChartDatum; pointIndex: number }>
-      let areaPath: string
-      let linePath: string
-
-      if (stacked && stackedData) {
-        const stackedSeries = stackedData[seriesIndex]
-        points = stackedSeries.map((sd, pointIndex) => ({
-          x: resolvedXScale.map(sd.original.x),
-          y: resolvedYScale.map(sd.y1),
-          datum: sd.original,
-          pointIndex
-        }))
-
-        const topPoints = points.map((p) => ({ x: p.x, y: p.y }))
-        const bottomPoints = stackedSeries
-          .map((sd) => ({
-            x: resolvedXScale.map(sd.original.x),
-            y: resolvedYScale.map(sd.y0)
-          }))
-          .reverse()
-
-        const topPath = createLinePath(topPoints, curve as ChartCurveType)
-        const bottomPath = createLinePath(bottomPoints, curve as ChartCurveType).replace('M', 'L')
-        areaPath = `${topPath} ${bottomPath} Z`
-        linePath = topPath
-      } else {
-        points = s.data.map((datum, pointIndex) => ({
-          x: resolvedXScale.map(datum.x),
-          y: resolvedYScale.map(datum.y),
-          datum,
-          pointIndex
-        }))
-
-        areaPath = createAreaPath(points, baseline, curve as ChartCurveType)
-        linePath = createLinePath(points, curve as ChartCurveType)
-      }
-
-      const opacity = getChartElementOpacity(seriesIndex, activeIndex, {
-        activeOpacity,
-        inactiveOpacity
-      })
-
-      return {
-        series: s,
-        seriesIndex,
-        seriesKey,
-        color,
-        fillColor: seriesFillColor,
-        fillOpacity: seriesFillOpacity,
-        areaPath,
-        linePath,
-        points,
-        opacity,
-        strokeWidth: s.strokeWidth ?? strokeWidth,
-        strokeDasharray: s.strokeDasharray,
-        showPoints: s.showPoints ?? showPoints,
-        pointSize: s.pointSize ?? pointSize,
-        pointColor: s.pointColor ?? color,
-        pointHollow: s.pointHollow ?? pointHollow
-      }
+    const laidOut = layoutAreaSeries(resolvedSeries, resolvedXScale, resolvedYScale, {
+      curve: curve as ChartCurveType,
+      palette,
+      activeIndex,
+      showArea: true,
+      areaOpacity: fillOpacity,
+      strokeWidth,
+      showPoints,
+      pointSize,
+      pointColor,
+      pointHollow,
+      activeOpacity,
+      inactiveOpacity,
+      stacked,
+      fillOpacity,
+      stackedData: stackedData ?? undefined
     })
+    return laidOut.map((item, seriesIndex) => ({
+      ...item,
+      seriesKey: seriesKeys[seriesIndex]
+    }))
   }, [
     resolvedSeries,
     seriesKeys,
@@ -304,7 +267,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     resolvedYScale,
     curve,
     stacked,
-    baseline,
+    stackedData,
     activeIndex,
     activeOpacity,
     inactiveOpacity,
@@ -321,11 +284,21 @@ export const AreaChart: React.FC<AreaChartProps> = ({
         data: resolvedSeries,
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (s, i) =>
-          legendFormatter ? legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+          legendFormatter
+            ? legendFormatter(s, i)
+            : (s.name ?? defaultChartSeriesName(i, labels.seriesName)),
         getColor: (s, i) => s.color ?? palette[i % palette.length]
       }),
-    [resolvedSeries, legendFormatter, palette, activeIndex]
+    [
+      resolvedSeries,
+      legendFormatter,
+      palette,
+      activeIndex,
+      resolvedSelectedIndex,
+      labels.seriesName
+    ]
   )
 
   const tooltipContent = useMemo(
@@ -334,9 +307,10 @@ export const AreaChart: React.FC<AreaChartProps> = ({
         hoveredPointInfo,
         resolvedSeries,
         tooltipFormatter,
-        defaultSeriesXYTooltipFormatter
+        (datum, seriesIndex, pointIndex, s) =>
+          defaultSeriesXYTooltipFormatter(datum, seriesIndex, pointIndex, s, labels.seriesName)
       ),
-    [hoveredPointInfo, resolvedSeries, tooltipFormatter]
+    [hoveredPointInfo, resolvedSeries, tooltipFormatter, labels.seriesName]
   )
 
   const handlePointMouseEnter = useCallback(
@@ -365,13 +339,13 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   // on-screen rect so focused points show the same tooltip as hovered ones.
   const showPointTooltipFromElement = useCallback(
     (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
-      if (!hoverable) return
+      if (!(showTooltip || hoverable)) return
       const rect = el.getBoundingClientRect()
       setHoveredPointInfo({ seriesIndex, pointIndex })
       setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
       onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
     },
-    [hoverable, onPointHover, resolvedSeries]
+    [hoverable, showTooltip, onPointHover, resolvedSeries]
   )
 
   const handlePointClick = useCallback(
@@ -382,21 +356,9 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     [onPointClick, resolvedSeries, handleSeriesSelect]
   )
 
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent, seriesIndex: number) => {
-      if (!selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleSeriesSelect(seriesIndex)
-    },
-    [selectable, handleSeriesSelect]
-  )
-
-  // Point-level interaction is gated: tooltip tracking on `showTooltip` or
-  // `hoverable`; highlight/hover events on `hoverable`; click on `selectable`
-  // or an explicit point-click callback (C26-2). Default points stay `role="img"`.
-  const pointClickable = selectable || !!onPointClick
+  const pointClickable = Boolean(onPointClick)
   const trackPointHover = showTooltip || hoverable
+  const flatPoints = useMemo(() => flattenChartPoints(seriesData), [seriesData])
 
   // Reverse for proper stacking visual
   const reversedSeriesData = useMemo(() => [...seriesData].reverse(), [seriesData])
@@ -409,25 +371,9 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}
       onResolvedSizeChange={onResolvedSizeChange}>
-      {/* Gradient defs and animation styles */}
-      {(gradient || animated || strokeGradient || pointGradient) && (
+      {(gradient || strokeGradient || pointGradient) && (
         <defs>
-          {animated && (
-            <style>{`
-              .tiger-area-animated {
-                animation: tiger-area-draw var(--tiger-motion-duration-slow,1.2s) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)) forwards;
-              }
-              @keyframes tiger-area-draw {
-                from { stroke-dashoffset: 1; }
-                to { stroke-dashoffset: 0; }
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .tiger-area-animated { animation-duration: 0ms; }
-              }
-            `}</style>
-          )}
           {gradient &&
             reversedSeriesData.map((sd) => (
               <linearGradient
@@ -507,51 +453,78 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           label={yAxisLabel}
         />
       )}
-      {/* Layer 1: area fills + line strokes (back to front) */}
-      {reversedSeriesData.map((sd) => (
-        <ChartSeries
-          key={sd.seriesKey}
-          data={sd.series.data}
-          name={sd.series.name}
-          type="area"
-          opacity={sd.opacity}
-          data-series-key={sd.seriesKey}
-          className={classNames(
-            sd.series.className,
-            (hoverable || selectable) && 'cursor-pointer',
-            'outline-none'
-          )}
-          onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
-          onMouseLeave={handleSeriesHoverLeave}
-          onClick={() => handleSeriesSelect(sd.seriesIndex)}
-          tabIndex={selectable ? 0 : undefined}
-          onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)}>
-          <path
-            d={sd.areaPath}
-            fill={gradient ? `url(#${gradientPrefix}-${sd.seriesKey})` : sd.fillColor}
-            fillOpacity={gradient ? 1 : sd.fillOpacity}
-            stroke="none"
-            className="transition-opacity duration-300"
-            data-area-series={sd.seriesIndex}
+      {trackPointHover ? (
+        <rect
+          width={innerRect.width}
+          height={innerRect.height}
+          fill="transparent"
+          data-plot-hit=""
+          onMouseMove={(event) => {
+            const target = event.currentTarget
+            const rect = target.getBoundingClientRect()
+            const width = rect.width || innerRect.width
+            const height = rect.height || innerRect.height
+            if (width === 0 || height === 0) return
+            const x = ((event.clientX - rect.left) / width) * innerRect.width
+            const y = ((event.clientY - rect.top) / height) * innerRect.height
+            const nearest = findNearestSeriesPoint(
+              seriesData.map((sd) => sd.points),
+              x,
+              y
+            )
+            if (!nearest) return
+            setHoveredPointInfo(nearest)
+            setTooltipPosition({ x: event.clientX, y: event.clientY })
+          }}
+          onMouseLeave={handlePointMouseLeave}
+        />
+      ) : null}
+      {reversedSeriesData.map((sd) => {
+        const canAnimateStroke = animated && !sd.strokeDasharray
+        return (
+          <ChartSeries
+            key={sd.seriesKey}
+            data={sd.series.data}
+            name={sd.series.name}
+            type="area"
+            opacity={sd.opacity}
             data-series-key={sd.seriesKey}
-          />
-          <path
-            d={sd.linePath}
-            fill="none"
-            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
-            strokeWidth={sd.strokeWidth}
-            strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
-            strokeDashoffset={animated ? '1' : undefined}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            pathLength={animated ? 1 : undefined}
             className={classNames(
-              'transition-opacity [transition-duration:var(--tiger-motion-duration-base,200ms)]',
-              animated && 'tiger-area-animated'
+              sd.series.className,
+              (hoverable || selectable) && 'cursor-pointer',
+              'outline-none'
             )}
-          />
-        </ChartSeries>
-      ))}
+            onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
+            onMouseLeave={handleSeriesHoverLeave}
+            onClick={() => handleSeriesSelect(sd.seriesIndex)}>
+            <path
+              d={sd.areaPath}
+              fill={gradient ? `url(#${gradientPrefix}-${sd.seriesKey})` : sd.fillColor}
+              fillOpacity={gradient ? 1 : sd.fillOpacity}
+              stroke="none"
+              className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]"
+              data-area-series={sd.seriesIndex}
+              data-series-key={sd.seriesKey}
+            />
+            <path
+              d={sd.linePath}
+              fill="none"
+              stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
+              strokeWidth={sd.strokeWidth}
+              strokeDasharray={sd.strokeDasharray}
+              strokeDashoffset={canAnimateStroke ? '1' : undefined}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              pathLength={canAnimateStroke ? 1 : undefined}
+              className={classNames(
+                canAnimateStroke
+                  ? AREA_DRAW_CLASS
+                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+              )}
+            />
+          </ChartSeries>
+        )
+      })}
       {/* Layer 2: data points on top of all areas (prevents coverage) */}
       {seriesData.map(
         (sd) =>
@@ -562,8 +535,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                   hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
                   hoveredPointInfo?.pointIndex === point.pointIndex
                 const hoverSize = sd.pointSize + 2
-                const datum = resolvedSeries[sd.seriesIndex]?.data?.[point.pointIndex]
-                const pointInteractive = hoverable || pointClickable
+                const datum = point.datum
+                const pointInteractive = hoverable || selectable || pointClickable
                 return (
                   <circle
                     key={`point-${sd.seriesKey}-${point.pointIndex}`}
@@ -572,7 +545,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     r={isHovered ? hoverSize : sd.pointSize}
                     fill={
                       sd.pointHollow
-                        ? 'white'
+                        ? CHART_SURFACE_FILL
                         : pointGradient
                           ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
                           : sd.pointColor
@@ -580,13 +553,32 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     stroke={sd.pointHollow ? sd.pointColor : 'none'}
                     strokeWidth={sd.pointHollow ? 2 : 0}
                     className={classNames(
-                      linePointTransitionClasses,
+                      animated ? linePointTransitionClasses : undefined,
                       pointInteractive && 'cursor-pointer'
                     )}
                     style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
-                    role={pointInteractive ? 'button' : 'img'}
-                    aria-label={datum?.label ?? String(datum?.y ?? '')}
-                    tabIndex={pointInteractive ? 0 : undefined}
+                    role={pointInteractive ? 'button' : undefined}
+                    aria-hidden={pointInteractive ? undefined : true}
+                    aria-label={
+                      pointInteractive
+                        ? (datum?.label ??
+                          formatChartTemplate(labels.pointAriaLabel, {
+                            index: point.pointIndex + 1,
+                            x: String(datum?.x ?? ''),
+                            y: String(datum?.y ?? '')
+                          }))
+                        : undefined
+                    }
+                    tabIndex={
+                      pointInteractive
+                        ? chartPointTabIndex(
+                            sd.seriesIndex,
+                            point.pointIndex,
+                            hoveredPointInfo,
+                            flatPoints
+                          )
+                        : undefined
+                    }
                     data-point-index={point.pointIndex}
                     data-series-key={sd.seriesKey}
                     onMouseEnter={
@@ -596,16 +588,12 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     }
                     onMouseMove={trackPointHover ? handlePointMouseMove : undefined}
                     onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}
-                    onClick={
-                      pointClickable
-                        ? (e) => {
-                            e.stopPropagation()
-                            handlePointClick(sd.seriesIndex, point.pointIndex)
-                          }
-                        : undefined
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handlePointClick(sd.seriesIndex, point.pointIndex)
+                    }}
                     onFocus={
-                      hoverable
+                      trackPointHover
                         ? (e) =>
                             showPointTooltipFromElement(
                               e.currentTarget,
@@ -614,10 +602,24 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                             )
                         : undefined
                     }
-                    onBlur={hoverable ? handlePointMouseLeave : undefined}
+                    onBlur={trackPointHover ? handlePointMouseLeave : undefined}
                     onKeyDown={
                       pointInteractive
                         ? (e) => {
+                            if (isChartNavigationKey(e.key)) {
+                              e.preventDefault()
+                              const next = nextChartPointRef(
+                                { seriesIndex: sd.seriesIndex, pointIndex: point.pointIndex },
+                                e.key,
+                                flatPoints
+                              )
+                              if (!next) return
+                              const node = e.currentTarget.ownerSVGElement?.querySelector(
+                                `[data-series-key="${seriesKeys[next.seriesIndex]}"][data-point-index="${next.pointIndex}"]`
+                              )
+                              if (node instanceof SVGElement) node.focus()
+                              return
+                            }
                             if (e.key === 'Enter' || e.key === ' ') {
                               e.preventDefault()
                               e.stopPropagation()
@@ -630,7 +632,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                                   point.pointIndex
                                 )
                               }
-                            } else if (e.key === 'Escape' && hoverable) {
+                            } else if (e.key === 'Escape' && trackPointHover) {
                               handlePointMouseLeave()
                             }
                           }
@@ -654,28 +656,28 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     />
   )
 
-  if (!showLegend) {
-    return (
-      <div className={classNames('relative', responsive ? 'block w-full min-w-0' : 'inline-block')}>
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
-
   return (
-    <div className={classNames(wrapperClasses, responsive && 'w-full min-w-0')}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        position={legendPosition}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={hoverable || selectable}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={hoverable || selectable}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )

@@ -1,20 +1,33 @@
 import React, { useId, useMemo, useState, useCallback } from 'react'
 import {
   classNames,
-  createAreaPath,
   createLinearScale,
-  createLinePath,
   createPointScale,
-  getChartElementOpacity,
   getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
   resolveChartPalette,
   buildChartLegendItems,
+  chartLegendOrientationFromPosition,
+  DEFAULT_CHART_PADDING,
   buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
+  defaultChartSeriesName,
+  layoutLineSeries,
+  getCartesianChartShellClasses,
+  findNearestSeriesPoint,
+  flattenChartPoints,
+  chartPointTabIndex,
+  nextChartPointRef,
+  isChartNavigationKey,
+  isNumericChartDomain,
+  CHART_SURFACE_FILL,
+  LINE_DRAW_CLASS,
+  getChartLabels,
+  mergeTigerLocale,
+  formatChartTemplate,
   type ChartCurveType,
   type ChartLegendItem,
   type ChartPadding,
@@ -31,6 +44,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface LineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -50,14 +64,10 @@ export interface LineChartProps extends CoreLineChartProps {
   ) => void
 }
 
-// Asymmetric default padding leaves room for the left y-axis tick labels
-// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
-const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 } as const
-
 export const LineChart: React.FC<LineChartProps> = ({
   width = 320,
   height = 200,
-  padding = DEFAULT_CARTESIAN_PADDING,
+  padding = DEFAULT_CHART_PADDING,
   responsive = false,
   data,
   series,
@@ -114,7 +124,8 @@ export const LineChart: React.FC<LineChartProps> = ({
   onPointClick,
   onPointHover
 }) => {
-  // Point-level hover state (not managed by hook)
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
   const [hoveredPointInfo, setHoveredPointInfo] = useState<{
     seriesIndex: number
     pointIndex: number
@@ -149,13 +160,13 @@ export const LineChart: React.FC<LineChartProps> = ({
   // Use shared interaction hook for series-level interaction
   const {
     activeIndex,
+    resolvedSelectedIndex,
     handleMouseEnter: handleSeriesHoverEnter,
     handleMouseLeave: handleSeriesHoverLeave,
     handleClick: handleSeriesSelect,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<LineChartSeries>({
     hoverable,
     showTooltip,
@@ -170,18 +181,16 @@ export const LineChart: React.FC<LineChartProps> = ({
       onHoveredIndexChange?.(index)
       onSeriesHover?.(index, index !== null ? resolvedSeries[index] : null)
     },
-    onSelectedIndexChange: (index) => {
-      onSelectedIndexChange?.(index)
-      if (index !== null) {
-        onSeriesClick?.(index, resolvedSeries[index])
-      }
+    onSelectedIndexChange,
+    onClick: (index, series) => {
+      if (series) onSeriesClick?.(index, series)
     }
   })
 
   const allData = useMemo(() => resolvedSeries.flatMap((s) => s.data), [resolvedSeries])
   const xValues = useMemo(() => allData.map((d) => d.x), [allData])
   const yValues = useMemo(() => allData.map((d) => d.y), [allData])
-  const isXNumeric = useMemo(() => xValues.every((v) => typeof v === 'number'), [xValues])
+  const isXNumeric = useMemo(() => isNumericChartDomain(xValues), [xValues])
 
   const resolvedXScale = useMemo(() => {
     if (xScaleProp) return xScaleProp
@@ -196,9 +205,9 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   const resolvedYScale = useMemo(() => {
     if (yScaleProp) return yScaleProp
-    const extent = getNumberExtent(yValues, { includeZero })
+    const extent = getNumberExtent(yValues, { includeZero: includeZero || showArea })
     return createLinearScale(extent, [innerRect.height, 0])
-  }, [yScaleProp, yValues, includeZero, innerRect.height])
+  }, [yScaleProp, yValues, includeZero, showArea, innerRect.height])
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
@@ -209,65 +218,43 @@ export const LineChart: React.FC<LineChartProps> = ({
     [resolvedSeries]
   )
 
-  const seriesData = useMemo(
-    () =>
-      resolvedSeries.map((s, seriesIndex) => {
-        const seriesKey = seriesKeys[seriesIndex]
-        const color = s.color ?? palette[seriesIndex % palette.length]
-        const points = s.data.map((datum, pointIndex) => ({
-          x: resolvedXScale.map(datum.x),
-          y: resolvedYScale.map(datum.y),
-          datum,
-          pointIndex
-        }))
-        const linePath = createLinePath(points, curve as ChartCurveType)
-        const seriesShowArea = s.showArea ?? showArea
-        const areaPath = seriesShowArea
-          ? createAreaPath(points, innerRect.height, curve as ChartCurveType)
-          : ''
-        const opacity = getChartElementOpacity(seriesIndex, activeIndex, {
-          activeOpacity,
-          inactiveOpacity
-        })
-
-        return {
-          series: s,
-          seriesIndex,
-          seriesKey,
-          color,
-          linePath,
-          areaPath,
-          showArea: seriesShowArea,
-          areaOpacity: s.areaOpacity ?? areaOpacity,
-          points,
-          opacity,
-          strokeWidth: s.strokeWidth ?? strokeWidth,
-          strokeDasharray: s.strokeDasharray,
-          showPoints: s.showPoints ?? showPoints,
-          pointSize: s.pointSize ?? pointSize,
-          pointColor: s.pointColor ?? color,
-          pointHollow: s.pointHollow ?? pointHollow
-        }
-      }),
-    [
-      resolvedSeries,
-      seriesKeys,
+  const seriesData = useMemo(() => {
+    const laidOut = layoutLineSeries(resolvedSeries, resolvedXScale, resolvedYScale, {
+      curve: curve as ChartCurveType,
       palette,
-      resolvedXScale,
-      resolvedYScale,
-      curve,
       activeIndex,
-      activeOpacity,
-      inactiveOpacity,
+      showArea,
+      areaOpacity,
       strokeWidth,
       showPoints,
       pointSize,
-      showArea,
-      areaOpacity,
+      pointColor,
       pointHollow,
-      innerRect.height
-    ]
-  )
+      activeOpacity,
+      inactiveOpacity
+    })
+    return laidOut.map((item, seriesIndex) => ({
+      ...item,
+      seriesKey: seriesKeys[seriesIndex]
+    }))
+  }, [
+    resolvedSeries,
+    seriesKeys,
+    palette,
+    resolvedXScale,
+    resolvedYScale,
+    curve,
+    activeIndex,
+    activeOpacity,
+    inactiveOpacity,
+    strokeWidth,
+    showPoints,
+    pointSize,
+    pointColor,
+    showArea,
+    areaOpacity,
+    pointHollow
+  ])
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
@@ -275,11 +262,21 @@ export const LineChart: React.FC<LineChartProps> = ({
         data: resolvedSeries,
         palette,
         activeIndex,
+        selectedIndex: resolvedSelectedIndex,
         getLabel: (s, i) =>
-          legendFormatter ? legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+          legendFormatter
+            ? legendFormatter(s, i)
+            : (s.name ?? defaultChartSeriesName(i, labels.seriesName)),
         getColor: (s, i) => s.color ?? palette[i % palette.length]
       }),
-    [resolvedSeries, legendFormatter, palette, activeIndex]
+    [
+      resolvedSeries,
+      legendFormatter,
+      palette,
+      activeIndex,
+      resolvedSelectedIndex,
+      labels.seriesName
+    ]
   )
 
   const tooltipContent = useMemo(
@@ -288,9 +285,10 @@ export const LineChart: React.FC<LineChartProps> = ({
         hoveredPointInfo,
         resolvedSeries,
         tooltipFormatter,
-        defaultSeriesXYTooltipFormatter
+        (datum, seriesIndex, pointIndex, s) =>
+          defaultSeriesXYTooltipFormatter(datum, seriesIndex, pointIndex, s, labels.seriesName)
       ),
-    [hoveredPointInfo, resolvedSeries, tooltipFormatter]
+    [hoveredPointInfo, resolvedSeries, tooltipFormatter, labels.seriesName]
   )
 
   const handlePointMouseEnter = useCallback(
@@ -319,13 +317,35 @@ export const LineChart: React.FC<LineChartProps> = ({
   // on-screen rect so focused points show the same tooltip as hovered ones.
   const showPointTooltipFromElement = useCallback(
     (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
-      if (!hoverable) return
+      if (!(showTooltip || hoverable)) return
       const rect = el.getBoundingClientRect()
       setHoveredPointInfo({ seriesIndex, pointIndex })
       setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
       onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
     },
-    [hoverable, onPointHover, resolvedSeries]
+    [hoverable, showTooltip, onPointHover, resolvedSeries]
+  )
+
+  const handlePlotMouseMove = useCallback(
+    (event: React.MouseEvent<SVGRectElement>) => {
+      if (!(showTooltip || hoverable)) return
+      const target = event.currentTarget
+      const rect = target.getBoundingClientRect()
+      const width = rect.width || innerRect.width
+      const height = rect.height || innerRect.height
+      if (width === 0 || height === 0) return
+      const x = ((event.clientX - rect.left) / width) * innerRect.width
+      const y = ((event.clientY - rect.top) / height) * innerRect.height
+      const nearest = findNearestSeriesPoint(
+        seriesData.map((sd) => sd.points),
+        x,
+        y
+      )
+      if (!nearest) return
+      setHoveredPointInfo(nearest)
+      setTooltipPosition({ x: event.clientX, y: event.clientY })
+    },
+    [showTooltip, hoverable, innerRect.width, innerRect.height, seriesData]
   )
 
   const handlePointClick = useCallback(
@@ -336,21 +356,9 @@ export const LineChart: React.FC<LineChartProps> = ({
     [onPointClick, resolvedSeries, handleSeriesSelect]
   )
 
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent, seriesIndex: number) => {
-      if (!selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleSeriesSelect(seriesIndex)
-    },
-    [selectable, handleSeriesSelect]
-  )
-
-  // Point-level interaction is gated: tooltip tracking on `showTooltip` or
-  // `hoverable`; highlight/hover events on `hoverable`; click on `selectable`
-  // or an explicit point-click callback (C26-2). Default points stay `role="img"`.
-  const pointClickable = selectable || !!onPointClick
+  const pointClickable = Boolean(onPointClick)
   const trackPointHover = showTooltip || hoverable
+  const flatPoints = useMemo(() => flattenChartPoints(seriesData), [seriesData])
 
   const chart = (
     <ChartCanvas
@@ -360,25 +368,9 @@ export const LineChart: React.FC<LineChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}
       onResolvedSizeChange={onResolvedSizeChange}>
-      {/* Gradient defs and animation styles */}
-      {(seriesData.some((sd) => sd.showArea) || animated || strokeGradient || pointGradient) && (
+      {(seriesData.some((sd) => sd.showArea) || strokeGradient || pointGradient) && (
         <defs>
-          {animated && (
-            <style>{`
-              .tiger-line-animated {
-                animation: tiger-line-draw var(--tiger-motion-duration-slow,1.2s) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)) forwards;
-              }
-              @keyframes tiger-line-draw {
-                from { stroke-dashoffset: 1; }
-                to { stroke-dashoffset: 0; }
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .tiger-line-animated { animation-duration: 0ms; }
-              }
-            `}</style>
-          )}
           {seriesData
             .filter((sd) => sd.showArea)
             .map((sd) => (
@@ -459,133 +451,177 @@ export const LineChart: React.FC<LineChartProps> = ({
           label={yAxisLabel}
         />
       )}
-      {seriesData.map((sd) => (
-        <ChartSeries
-          key={sd.seriesKey}
-          data={sd.series.data}
-          name={sd.series.name}
-          type="line"
-          opacity={sd.opacity}
-          data-series-key={sd.seriesKey}
-          className={classNames(sd.series.className, (hoverable || selectable) && 'cursor-pointer')}
-          onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
-          onMouseLeave={handleSeriesHoverLeave}
-          onClick={() => handleSeriesSelect(sd.seriesIndex)}
-          tabIndex={selectable ? 0 : undefined}
-          onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)}>
-          {/* Area fill path */}
-          {sd.showArea && sd.areaPath && (
+      {trackPointHover ? (
+        <rect
+          width={innerRect.width}
+          height={innerRect.height}
+          fill="transparent"
+          data-plot-hit=""
+          onMouseMove={handlePlotMouseMove}
+          onMouseLeave={handlePointMouseLeave}
+        />
+      ) : null}
+      {seriesData.map((sd) => {
+        const canAnimateStroke = animated && !sd.strokeDasharray
+        return (
+          <ChartSeries
+            key={sd.seriesKey}
+            data={sd.series.data}
+            name={sd.series.name}
+            type="line"
+            opacity={sd.opacity}
+            data-series-key={sd.seriesKey}
+            className={classNames(
+              sd.series.className,
+              (hoverable || selectable) && 'cursor-pointer'
+            )}
+            onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
+            onMouseLeave={handleSeriesHoverLeave}
+            onClick={() => handleSeriesSelect(sd.seriesIndex)}>
+            {sd.showArea && sd.areaPath && (
+              <path
+                d={sd.areaPath}
+                fill={`url(#${gradientPrefix}-${sd.seriesKey})`}
+                stroke="none"
+                className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]"
+                data-area-series={sd.seriesIndex}
+                data-series-key={sd.seriesKey}
+              />
+            )}
             <path
-              d={sd.areaPath}
-              fill={`url(#${gradientPrefix}-${sd.seriesKey})`}
-              stroke="none"
-              className="transition-opacity duration-300"
-              data-area-series={sd.seriesIndex}
+              d={sd.linePath}
+              fill="none"
+              stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
+              strokeWidth={sd.strokeWidth}
+              strokeDasharray={sd.strokeDasharray}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              pathLength={canAnimateStroke ? 1 : undefined}
+              strokeDashoffset={canAnimateStroke ? '1' : undefined}
+              className={classNames(
+                animated && !sd.strokeDasharray
+                  ? undefined
+                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]',
+                canAnimateStroke && LINE_DRAW_CLASS
+              )}
+              data-line-series={sd.seriesIndex}
               data-series-key={sd.seriesKey}
             />
-          )}
-          <path
-            d={sd.linePath}
-            fill="none"
-            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
-            strokeWidth={sd.strokeWidth}
-            strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
-            strokeDashoffset={animated ? '1' : undefined}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            pathLength={animated ? 1 : undefined}
-            className={classNames(
-              'transition-opacity [transition-duration:var(--tiger-motion-duration-base,200ms)]',
-              animated && 'tiger-line-animated'
-            )}
-            data-line-series={sd.seriesIndex}
-            data-series-key={sd.seriesKey}
-          />
-          {sd.showPoints &&
-            sd.points.map((point) => {
-              const isHovered =
-                hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
-                hoveredPointInfo?.pointIndex === point.pointIndex
-              const hoverSize = sd.pointSize + 2
-              const datum = resolvedSeries[sd.seriesIndex]?.data?.[point.pointIndex]
-              const pointInteractive = hoverable || pointClickable
-              return (
-                <circle
-                  key={`point-${sd.seriesKey}-${point.pointIndex}`}
-                  cx={point.x}
-                  cy={point.y}
-                  r={isHovered ? hoverSize : sd.pointSize}
-                  fill={
-                    sd.pointHollow
-                      ? 'white'
-                      : pointGradient
-                        ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
-                        : sd.pointColor
-                  }
-                  stroke={sd.pointHollow ? sd.pointColor : 'none'}
-                  strokeWidth={sd.pointHollow ? 2 : 0}
-                  className={classNames(
-                    linePointTransitionClasses,
-                    pointInteractive && 'cursor-pointer'
-                  )}
-                  style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
-                  role={pointInteractive ? 'button' : 'img'}
-                  aria-label={datum?.label ?? String(datum?.y ?? '')}
-                  tabIndex={pointInteractive ? 0 : undefined}
-                  data-point-index={point.pointIndex}
-                  data-series-key={sd.seriesKey}
-                  onMouseEnter={
-                    trackPointHover
-                      ? (e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
-                      : undefined
-                  }
-                  onMouseMove={trackPointHover ? handlePointMouseMove : undefined}
-                  onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}
-                  onClick={
-                    pointClickable
-                      ? (e) => {
-                          e.stopPropagation()
-                          handlePointClick(sd.seriesIndex, point.pointIndex)
-                        }
-                      : undefined
-                  }
-                  onFocus={
-                    hoverable
-                      ? (e) =>
-                          showPointTooltipFromElement(
-                            e.currentTarget,
+            {sd.showPoints &&
+              sd.points.map((point) => {
+                const isHovered =
+                  hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
+                  hoveredPointInfo?.pointIndex === point.pointIndex
+                const hoverSize = sd.pointSize + 2
+                const datum = point.datum
+                const pointInteractive = hoverable || selectable || pointClickable
+                return (
+                  <circle
+                    key={`point-${sd.seriesKey}-${point.pointIndex}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={isHovered ? hoverSize : sd.pointSize}
+                    fill={
+                      sd.pointHollow
+                        ? CHART_SURFACE_FILL
+                        : pointGradient
+                          ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
+                          : sd.pointColor
+                    }
+                    stroke={sd.pointHollow ? sd.pointColor : 'none'}
+                    strokeWidth={sd.pointHollow ? 2 : 0}
+                    className={classNames(
+                      animated ? linePointTransitionClasses : undefined,
+                      pointInteractive && 'cursor-pointer'
+                    )}
+                    style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
+                    role={pointInteractive ? 'button' : undefined}
+                    aria-hidden={pointInteractive ? undefined : true}
+                    aria-label={
+                      pointInteractive
+                        ? (datum?.label ??
+                          formatChartTemplate(labels.pointAriaLabel, {
+                            index: point.pointIndex + 1,
+                            x: String(datum?.x ?? ''),
+                            y: String(datum?.y ?? '')
+                          }))
+                        : undefined
+                    }
+                    tabIndex={
+                      pointInteractive
+                        ? chartPointTabIndex(
                             sd.seriesIndex,
-                            point.pointIndex
+                            point.pointIndex,
+                            hoveredPointInfo,
+                            flatPoints
                           )
-                      : undefined
-                  }
-                  onBlur={hoverable ? handlePointMouseLeave : undefined}
-                  onKeyDown={
-                    pointInteractive
-                      ? (e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            if (pointClickable) {
-                              handlePointClick(sd.seriesIndex, point.pointIndex)
-                            } else {
-                              showPointTooltipFromElement(
-                                e.currentTarget,
-                                sd.seriesIndex,
-                                point.pointIndex
+                        : undefined
+                    }
+                    data-point-index={point.pointIndex}
+                    data-series-key={sd.seriesKey}
+                    onMouseEnter={
+                      trackPointHover
+                        ? (e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
+                        : undefined
+                    }
+                    onMouseMove={trackPointHover ? handlePointMouseMove : undefined}
+                    onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handlePointClick(sd.seriesIndex, point.pointIndex)
+                    }}
+                    onFocus={
+                      trackPointHover
+                        ? (e) =>
+                            showPointTooltipFromElement(
+                              e.currentTarget,
+                              sd.seriesIndex,
+                              point.pointIndex
+                            )
+                        : undefined
+                    }
+                    onBlur={trackPointHover ? handlePointMouseLeave : undefined}
+                    onKeyDown={
+                      pointInteractive
+                        ? (e) => {
+                            if (isChartNavigationKey(e.key)) {
+                              e.preventDefault()
+                              const next = nextChartPointRef(
+                                { seriesIndex: sd.seriesIndex, pointIndex: point.pointIndex },
+                                e.key,
+                                flatPoints
                               )
+                              if (!next) return
+                              const node = e.currentTarget.ownerSVGElement?.querySelector(
+                                `[data-series-key="${seriesKeys[next.seriesIndex]}"][data-point-index="${next.pointIndex}"]`
+                              )
+                              if (node instanceof SVGElement) node.focus()
+                              return
                             }
-                          } else if (e.key === 'Escape' && hoverable) {
-                            handlePointMouseLeave()
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              if (pointClickable) {
+                                handlePointClick(sd.seriesIndex, point.pointIndex)
+                              } else {
+                                showPointTooltipFromElement(
+                                  e.currentTarget,
+                                  sd.seriesIndex,
+                                  point.pointIndex
+                                )
+                              }
+                            } else if (e.key === 'Escape' && trackPointHover) {
+                              handlePointMouseLeave()
+                            }
                           }
-                        }
-                      : undefined
-                  }
-                />
-              )
-            })}
-        </ChartSeries>
-      ))}
+                        : undefined
+                    }
+                  />
+                )
+              })}
+          </ChartSeries>
+        )
+      })}
     </ChartCanvas>
   )
 
@@ -598,28 +634,28 @@ export const LineChart: React.FC<LineChartProps> = ({
     />
   )
 
-  if (!showLegend) {
-    return (
-      <div className={classNames('relative', responsive ? 'block w-full min-w-0' : 'inline-block')}>
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
-
   return (
-    <div className={classNames(wrapperClasses, responsive && 'w-full min-w-0')}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        position={legendPosition}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={hoverable || selectable}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={hoverable || selectable}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )

@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { fireEvent, waitFor } from '@testing-library/vue'
 import { LineChart } from '@expcat/tigercat-vue/LineChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
@@ -52,10 +52,11 @@ describe('LineChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(LineChart, {
-      data: basicData
+      data: basicData,
+      title: 'Quarterly trend'
     })
 
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
   it('renders empty state with no data', () => {
@@ -140,7 +141,8 @@ describe('LineChart', () => {
       ...defaultSize
     })
     const passivePoint = passive.container.querySelector('circle[data-point-index="0"]')!
-    expect(passivePoint).toHaveAttribute('role', 'img')
+    expect(passivePoint).toHaveAttribute('aria-hidden', 'true')
+    expect(passivePoint).not.toHaveAttribute('role')
     expect(passivePoint).not.toHaveAttribute('tabindex')
 
     const clickable = renderWithProps(LineChart, {
@@ -207,5 +209,31 @@ describe('LineChart', () => {
         expect(Number(last.getAttribute('cx'))).toBeGreaterThan(500)
       })
     })
+  })
+
+  it('tracks the nearest point on the plot when showPoints is off', async () => {
+    const { container } = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: false,
+      ...defaultSize
+    })
+    await fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, {
+      clientX: 40,
+      clientY: 40
+    })
+    expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
+  })
+
+  it('uses a single tab stop for selectable points', () => {
+    const { container } = renderWithProps(LineChart, {
+      series: [
+        { name: 'A', data: basicData },
+        { name: 'B', data: basicData }
+      ],
+      selectable: true,
+      ...defaultSize
+    })
+    const points = [...container.querySelectorAll('circle[data-point-index]')]
+    expect(points.filter((point) => point.getAttribute('tabindex') === '0')).toHaveLength(1)
   })
 })
