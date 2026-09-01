@@ -13,7 +13,7 @@ import { expectNoA11yViolationsIsolated } from '../utils'
 function renderEditor(props: Record<string, unknown> = {}) {
   return render(MarkdownEditor, {
     props: {
-      value: '# Hello',
+      modelValue: '# Hello',
       ...props
     }
   })
@@ -66,7 +66,7 @@ describe('MarkdownEditor', () => {
     })
 
     it('emits mode updates when mode button is clicked', async () => {
-      const { getByRole, emitted } = renderEditor({ defaultMode: 'edit', value: undefined })
+      const { getByRole, emitted } = renderEditor({ defaultMode: 'edit', modelValue: undefined })
       await fireEvent.click(getByRole('button', { name: 'Preview' }))
       expect(emitted()['update:mode'][0]).toEqual(['preview'])
       expect(emitted()['mode-change'][0]).toEqual(['preview'])
@@ -75,7 +75,7 @@ describe('MarkdownEditor', () => {
 
   describe('Preview', () => {
     it('renders markdown as html', () => {
-      const { container } = renderEditor({ value: '## Title\n\n**Bold**' })
+      const { container } = renderEditor({ modelValue: '## Title\n\n**Bold**' })
       const preview = container.querySelector('[aria-label="Markdown preview"]') as HTMLElement
       expect(preview.innerHTML).toContain('<h2>Title</h2>')
       expect(preview.innerHTML).toContain('<strong>Bold</strong>')
@@ -89,7 +89,7 @@ describe('MarkdownEditor', () => {
     })
 
     it('shows placeholder in empty preview', () => {
-      const { container } = renderEditor({ value: '', placeholder: 'Write markdown...' })
+      const { container } = renderEditor({ modelValue: '', placeholder: 'Write markdown...' })
       expect(container.querySelector('[aria-label="Markdown preview"]')?.textContent).toBe(
         'Write markdown...'
       )
@@ -97,7 +97,7 @@ describe('MarkdownEditor', () => {
 
     it('escapes html in empty-preview placeholder', () => {
       const payload = '<img src=x onerror="alert(1)">'
-      const { container } = renderEditor({ value: '', placeholder: payload })
+      const { container } = renderEditor({ modelValue: '', placeholder: payload })
       const preview = container.querySelector('[aria-label="Markdown preview"]') as HTMLElement
       expect(preview.querySelector('img')).toBeNull()
       expect(preview.innerHTML).not.toContain('<img')
@@ -106,42 +106,63 @@ describe('MarkdownEditor', () => {
   })
 
   describe('Events', () => {
-    it('emits update:value and change on input', async () => {
-      const { container, emitted } = renderEditor({ value: undefined, defaultValue: 'hello' })
+    it('emits update:modelValue and change on input', async () => {
+      const { container, emitted } = renderEditor({ modelValue: undefined, defaultValue: 'hello' })
       const textarea = container.querySelector('textarea')!
       await fireEvent.update(textarea, 'hello world')
-      expect(emitted()['update:value'][0]).toEqual(['hello world'])
+      expect(emitted()['update:modelValue'][0]).toEqual(['hello world'])
       expect(emitted()['change'][0]).toEqual(['hello world'])
     })
 
     it('applies toolbar action to selection', async () => {
       const { container, getByRole, emitted } = renderEditor({
-        value: undefined,
+        modelValue: undefined,
         defaultValue: 'hello'
       })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       textarea.selectionStart = 0
       textarea.selectionEnd = 5
       await fireEvent.click(getByRole('button', { name: 'Bold (Ctrl+B)' }))
-      expect(emitted()['update:value'][0]).toEqual(['**hello**'])
+      expect(emitted()['update:modelValue'][0]).toEqual(['**hello**'])
     })
 
     it('handles keyboard shortcuts', async () => {
-      const { container, emitted } = renderEditor({ value: undefined, defaultValue: 'hello' })
+      const { container, emitted } = renderEditor({ modelValue: undefined, defaultValue: 'hello' })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       textarea.selectionStart = 0
       textarea.selectionEnd = 5
       await fireEvent.keyDown(textarea, { key: 'b', ctrlKey: true })
-      expect(emitted()['update:value'][0]).toEqual(['**hello**'])
+      expect(emitted()['update:modelValue'][0]).toEqual(['**hello**'])
     })
 
     it('inserts spaces for tab', async () => {
-      const { container, emitted } = renderEditor({ value: undefined, defaultValue: 'a' })
+      const { container, emitted } = renderEditor({ modelValue: undefined, defaultValue: 'a' })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       textarea.selectionStart = 1
       textarea.selectionEnd = 1
       await fireEvent.keyDown(textarea, { key: 'Tab' })
-      expect(emitted()['update:value'][0]).toEqual(['a  '])
+      expect(emitted()['update:modelValue'][0]).toEqual(['a  '])
+    })
+
+    it('does not emit on Tab when readOnly', async () => {
+      const { container, emitted } = renderEditor({
+        modelValue: undefined,
+        defaultValue: 'hello',
+        readOnly: true
+      })
+      const textarea = container.querySelector('textarea')!
+      await fireEvent.keyDown(textarea, { key: 'Tab' })
+      expect(emitted()['update:modelValue']).toBeUndefined()
+    })
+
+    it('does not apply formatting in preview mode', async () => {
+      const { queryByRole, emitted } = renderEditor({
+        modelValue: undefined,
+        defaultValue: 'hello',
+        mode: 'preview'
+      })
+      expect(queryByRole('button', { name: 'Bold (Ctrl+B)' })).toBeNull()
+      expect(emitted()['update:modelValue']).toBeUndefined()
     })
   })
 
@@ -173,7 +194,11 @@ describe('MarkdownEditor', () => {
 
   describe('Edge Cases and Boundary', () => {
     it('handles empty uncontrolled content without renderer output', () => {
-      const { container } = renderEditor({ value: undefined, defaultValue: '', placeholder: '' })
+      const { container } = renderEditor({
+        modelValue: undefined,
+        defaultValue: '',
+        placeholder: ''
+      })
 
       expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('')
       expect(container.querySelector('[aria-label="Markdown preview"]')?.textContent).toBe('')
@@ -190,7 +215,9 @@ describe('MarkdownEditor', () => {
     it('uses ConfigProvider locale for editor labels', async () => {
       const { container, getByRole } = render({
         render() {
-          return h(ConfigProvider, { locale: zhCN }, () => h(MarkdownEditor, { value: '# 你好' }))
+          return h(ConfigProvider, { locale: zhCN }, () =>
+            h(MarkdownEditor, { modelValue: '# 你好' })
+          )
         }
       })
 

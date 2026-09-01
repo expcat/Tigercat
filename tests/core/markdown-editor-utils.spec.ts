@@ -129,6 +129,17 @@ describe('MarkdownEditor utilities', () => {
       expect(html).not.toContain('javascript:')
     })
 
+    it('keeps relative paths and hash links', () => {
+      const html = renderMarkdownInline('[docs](/guide) [here](#anchor)')
+      expect(html).toContain('<a href="/guide"')
+      expect(html).toContain('<a href="#anchor"')
+    })
+
+    it('does not format markers inside code spans', () => {
+      const html = renderMarkdownInline('`**x**`')
+      expect(html).toBe('<code>**x**</code>')
+    })
+
     it('renders headings, lists, and blockquotes', () => {
       const html = renderMarkdownToHtml('# Title\n\n- one\n- two\n\n> quote')
       expect(html).toContain('<h1>Title</h1>')
@@ -206,6 +217,15 @@ describe('MarkdownEditor utilities', () => {
         selectionEnd: 6
       })
       expect(result.value).toBe('before\n\n---')
+    })
+
+    it('keeps a blank line before a table inserted after a newline', () => {
+      const result = applyMarkdownToolbarAction('table', {
+        value: 'hello\n',
+        selectionStart: 6,
+        selectionEnd: 6
+      })
+      expect(result.value.startsWith('hello\n\n|')).toBe(true)
     })
 
     it('runs custom toolbar actions', () => {

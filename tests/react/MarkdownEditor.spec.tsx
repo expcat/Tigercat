@@ -133,6 +133,16 @@ describe('MarkdownEditor', () => {
       expect(onChange).toHaveBeenCalledWith('**hello**')
     })
 
+    it('matches Cmd+B as bold', () => {
+      const onChange = vi.fn()
+      const { container } = renderEditor({ value: undefined, defaultValue: 'hello', onChange })
+      const textarea = container.querySelector('textarea') as HTMLTextAreaElement
+      textarea.selectionStart = 0
+      textarea.selectionEnd = 5
+      fireEvent.keyDown(textarea, { key: 'b', metaKey: true })
+      expect(onChange).toHaveBeenCalledWith('**hello**')
+    })
+
     it('inserts spaces for tab', () => {
       const onChange = vi.fn()
       const { container } = renderEditor({ value: undefined, defaultValue: 'a', onChange })
@@ -141,6 +151,29 @@ describe('MarkdownEditor', () => {
       textarea.selectionEnd = 1
       fireEvent.keyDown(textarea, { key: 'Tab' })
       expect(onChange).toHaveBeenCalledWith('a  ')
+    })
+
+    it('does not emit on Tab when readOnly', () => {
+      const onChange = vi.fn()
+      const { container } = renderEditor({
+        value: undefined,
+        defaultValue: 'hello',
+        readOnly: true,
+        onChange
+      })
+      const textarea = container.querySelector('textarea')!
+      fireEvent.keyDown(textarea, { key: 'Tab' })
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('hides formatting toolbar in preview mode', () => {
+      const onChange = vi.fn()
+      const { queryByRole } = renderEditor({
+        mode: 'preview',
+        onChange
+      })
+      expect(queryByRole('button', { name: 'Bold (Ctrl+B)' })).toBeNull()
+      expect(onChange).not.toHaveBeenCalled()
     })
   })
 

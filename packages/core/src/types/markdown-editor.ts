@@ -2,6 +2,8 @@
  * MarkdownEditor shared types
  */
 
+import type { TigerLocale, TigerLocaleMarkdownEditor } from './locale'
+
 /** Editor display mode */
 export type MarkdownEditorMode = 'edit' | 'split' | 'preview'
 
@@ -39,6 +41,9 @@ export interface MarkdownInsertResult {
 export interface MarkdownToolbarButton {
   name: MarkdownToolbarAction | string
   label: string
+  /**
+   * Optional icon HTML. TRUSTED — injected with innerHTML.
+   */
   icon?: string
   tooltip?: string
   hotkey?: string
@@ -53,7 +58,11 @@ export interface MarkdownToolbarSeparator {
 /** Union type for toolbar items: buttons or separators */
 export type MarkdownToolbarItem = MarkdownToolbarButton | MarkdownToolbarSeparator
 
-/** Pluggable markdown preview renderer */
+/**
+ * Pluggable markdown preview renderer. Return value is still passed
+ * through `sanitizeHtml`. Treat custom renderers as TRUSTED if you
+ * disable sanitisation at the call site.
+ */
 export interface MarkdownRenderer {
   render: (markdown: string) => string
 }
@@ -86,4 +95,12 @@ export interface MarkdownEditorProps {
   className?: string
   /** Custom styles */
   style?: Record<string, string | number>
+  /** Tab width in spaces, integer ≥ 1 */
+  tabSize?: number
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleMarkdownEditor>
+  /** Accessible name; falls back to locale then FormItem */
+  ariaLabel?: string
 }

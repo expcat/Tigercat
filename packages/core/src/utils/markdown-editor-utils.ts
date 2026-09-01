@@ -26,7 +26,7 @@ export const markdownEditorToolbarClasses =
 export const markdownEditorToolbarGroupClasses = 'flex flex-wrap items-center gap-1'
 
 export const markdownEditorToolbarButtonBase =
-  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-outline-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary,#2563eb)]'
 
 export const markdownEditorToolbarButtonActive =
   'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
@@ -39,12 +39,12 @@ export const markdownEditorBodyClasses =
   'grid flex-1 min-h-0 bg-[var(--tiger-md-bg,var(--tiger-surface,#ffffff))]'
 
 export const markdownEditorTextareaClasses =
-  'w-full h-full min-h-0 resize-none border-0 outline-none bg-transparent p-4 font-mono text-sm leading-7 text-[var(--tiger-text,#111827)] placeholder:text-[var(--tiger-text-tertiary,#9ca3af)] disabled:cursor-not-allowed'
+  'w-full h-full min-h-0 resize-none border-0 outline-none bg-transparent p-4 font-mono text-sm leading-7 text-[var(--tiger-text,#111827)] placeholder:text-[var(--tiger-text-muted,#9ca3af)] disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary,#2563eb)]'
 
 export const markdownEditorPreviewClasses =
-  'h-full min-h-0 overflow-auto p-4 text-sm leading-7 text-[var(--tiger-text,#111827)] [&_a]:text-[var(--tiger-primary,#2563eb)] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--tiger-border,#d1d5db)] [&_blockquote]:pl-3 [&_blockquote]:text-[var(--tiger-text-secondary,#6b7280)] [&_code]:rounded [&_code]:bg-[var(--tiger-bg-secondary,#f3f4f6)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_hr]:my-4 [&_hr]:border-[var(--tiger-border,#d1d5db)] [&_img]:max-w-full [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_pre]:my-3 [&_pre]:overflow-auto [&_pre]:rounded [&_pre]:bg-[var(--tiger-bg-secondary,#f3f4f6)] [&_pre]:p-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--tiger-border,#d1d5db)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--tiger-border,#d1d5db)] [&_th]:bg-[var(--tiger-bg-secondary,#f9fafb)] [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6'
+  'h-full min-h-0 overflow-auto p-4 text-sm leading-7 text-[var(--tiger-text,#111827)] [&_a]:text-[var(--tiger-primary,#2563eb)] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--tiger-border,#d1d5db)] [&_blockquote]:pl-3 [&_blockquote]:text-[var(--tiger-text-secondary,#6b7280)] [&_code]:rounded [&_code]:bg-[var(--tiger-surface-muted,#f3f4f6)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_hr]:my-4 [&_hr]:border-[var(--tiger-border,#d1d5db)] [&_img]:max-w-full [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_pre]:my-3 [&_pre]:overflow-auto [&_pre]:rounded [&_pre]:bg-[var(--tiger-surface-muted,#f3f4f6)] [&_pre]:p-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--tiger-border,#d1d5db)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--tiger-border,#d1d5db)] [&_th]:bg-[var(--tiger-surface-muted,#f9fafb)] [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6'
 
-export const markdownEditorEmptyPreviewClasses = 'text-[var(--tiger-text-tertiary,#9ca3af)]'
+export const markdownEditorEmptyPreviewClasses = 'text-[var(--tiger-text-muted,#9ca3af)]'
 
 export const markdownEditorSplitDividerClasses = 'border-l border-[var(--tiger-border,#d1d5db)]'
 
@@ -93,12 +93,6 @@ export function createDefaultMarkdownToolbar(
 export const defaultMarkdownToolbar: MarkdownToolbarItem[] = createDefaultMarkdownToolbar(
   enUS.markdownEditor as Required<TigerLocaleMarkdownEditor>
 )
-
-export const markdownModeLabels: Record<MarkdownEditorMode, string> = {
-  edit: 'Edit',
-  split: 'Split',
-  preview: 'Preview'
-}
 
 export function isMarkdownToolbarSeparator(
   item: MarkdownToolbarItem
@@ -153,18 +147,29 @@ function isBlockStart(line: string): boolean {
     /^>\s?/.test(line) ||
     /^\s*[-*+]\s+/.test(line) ||
     /^\s*\d+[.)]\s+/.test(line) ||
-    /^```/.test(line)
+    /^```/.test(line) ||
+    /^\s*\|/.test(line) ||
+    /^\s*\|?\s*:?-{3,}/.test(line)
   )
 }
 
 export function renderMarkdownInline(value: string): string {
   let html = escapeMarkdownHtml(value)
+  const slots: string[] = []
+  const stash = (fragment: string) => {
+    const token = `\u0000MD${slots.length}\u0000`
+    slots.push(fragment)
+    return token
+  }
+  html = html.replace(/`([^`]+)`/g, (_m, code) => stash(`<code>${code}</code>`))
   html = html.replace(
     /!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g,
     (_m, alt, src, title) => {
-      if (!isValidUrl(src)) return _m
+      if (!isValidUrl(src)) return ''
       const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ''
-      return `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${titleAttr} />`
+      return stash(
+        `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${titleAttr} />`
+      )
     }
   )
   html = html.replace(
@@ -172,15 +177,17 @@ export function renderMarkdownInline(value: string): string {
     (_m, text, href, title) => {
       if (!isValidUrl(href)) return text
       const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ''
-      return `<a href="${escapeAttribute(href)}"${titleAttr} target="_blank" rel="noreferrer">${text}</a>`
+      return stash(
+        `<a href="${escapeAttribute(href)}"${titleAttr} target="_blank" rel="noreferrer">${text}</a>`
+      )
     }
   )
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>')
   html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>')
   html = html.replace(/(^|\W)\*([^*]+)\*/g, '$1<em>$2</em>')
   html = html.replace(/(^|\W)_([^_]+)_/g, '$1<em>$2</em>')
+  html = html.replace(/\u0000MD(\d+)\u0000/g, (_m, index) => slots[Number(index)] ?? '')
   return html.replace(/\n/g, '<br />')
 }
 
@@ -373,8 +380,18 @@ function prefixLines(
 function insertBlock(selection: MarkdownSelection, block: string): MarkdownInsertResult {
   const before = selection.value.slice(0, selection.selectionStart)
   const after = selection.value.slice(selection.selectionEnd)
-  const prefix = before && !before.endsWith('\n') ? '\n\n' : ''
-  const suffix = after && !after.startsWith('\n') ? '\n\n' : ''
+  let prefix = ''
+  if (before) {
+    if (before.endsWith('\n\n')) prefix = ''
+    else if (before.endsWith('\n')) prefix = '\n'
+    else prefix = '\n\n'
+  }
+  let suffix = ''
+  if (after) {
+    if (after.startsWith('\n\n')) suffix = ''
+    else if (after.startsWith('\n')) suffix = '\n'
+    else suffix = '\n\n'
+  }
   const value = `${before}${prefix}${block}${suffix}${after}`
   const selectionStart = before.length + prefix.length
   return { value, selectionStart, selectionEnd: selectionStart + block.length }
@@ -382,36 +399,55 @@ function insertBlock(selection: MarkdownSelection, block: string): MarkdownInser
 
 export function applyMarkdownToolbarAction(
   action: MarkdownToolbarButton | string,
-  selection: MarkdownSelection
+  selection: MarkdownSelection,
+  placeholders?: Partial<TigerLocaleMarkdownEditor>
 ): MarkdownInsertResult {
   const name = typeof action === 'string' ? action : action.name
   if (typeof action !== 'string' && action.action) return action.action(selection)
+  const p = placeholders ?? {}
 
   switch (name) {
     case 'bold':
-      return wrapSelection(selection, '**', '**', 'strong text')
+      return wrapSelection(selection, '**', '**', p.placeholderStrong ?? 'strong text')
     case 'italic':
-      return wrapSelection(selection, '*', '*', 'emphasis')
+      return wrapSelection(selection, '*', '*', p.placeholderEmphasis ?? 'emphasis')
     case 'strikethrough':
-      return wrapSelection(selection, '~~', '~~', 'deleted text')
+      return wrapSelection(selection, '~~', '~~', p.placeholderDeleted ?? 'deleted text')
     case 'inlineCode':
-      return wrapSelection(selection, '`', '`', 'code')
+      return wrapSelection(selection, '`', '`', p.placeholderCode ?? 'code')
     case 'heading':
-      return prefixLines(selection, () => '## ', 'Heading')
+      return prefixLines(selection, () => '## ', p.placeholderHeading ?? 'Heading')
     case 'blockquote':
-      return prefixLines(selection, () => '> ', 'Quote')
+      return prefixLines(selection, () => '> ', p.placeholderQuote ?? 'Quote')
     case 'unorderedList':
-      return prefixLines(selection, () => '- ', 'List item')
+      return prefixLines(selection, () => '- ', p.placeholderListItem ?? 'List item')
     case 'orderedList':
-      return prefixLines(selection, (index) => `${index + 1}. `, 'List item')
+      return prefixLines(
+        selection,
+        (index) => `${index + 1}. `,
+        p.placeholderListItem ?? 'List item'
+      )
     case 'codeBlock':
-      return wrapSelection(selection, '```\n', '\n```', 'code')
+      return wrapSelection(selection, '```\n', '\n```', p.placeholderCode ?? 'code')
     case 'link':
-      return wrapSelection(selection, '[', '](https://example.com)', 'link text')
+      return wrapSelection(
+        selection,
+        '[',
+        '](https://example.com)',
+        p.placeholderLinkText ?? 'link text'
+      )
     case 'image':
-      return wrapSelection(selection, '![', '](https://example.com/image.png)', 'alt text')
+      return wrapSelection(
+        selection,
+        '![',
+        '](https://example.com/image.png)',
+        p.placeholderImageAlt ?? 'alt text'
+      )
     case 'table':
-      return insertBlock(selection, '| Column | Value |\n| --- | --- |\n| Name | Tigercat |')
+      return insertBlock(
+        selection,
+        p.placeholderTable ?? '| Column | Value |\n| --- | --- |\n| Name | Tigercat |'
+      )
     case 'horizontalRule':
       return insertBlock(selection, '---')
     default:
@@ -425,11 +461,11 @@ export function markdownHotkeyMatches(
 ): boolean {
   const parts = hotkey.split('+').map((part) => part.trim().toLowerCase())
   const key = parts[parts.length - 1]
-  const wantsMeta = parts.includes('cmd') || parts.includes('meta')
+  const wantsMod = parts.includes('ctrl') || parts.includes('cmd') || parts.includes('meta')
+  const hasMod = event.ctrlKey || event.metaKey
   return (
     event.key.toLowerCase() === key &&
-    event.ctrlKey === parts.includes('ctrl') &&
-    event.metaKey === wantsMeta &&
+    wantsMod === hasMod &&
     event.shiftKey === parts.includes('shift') &&
     event.altKey === parts.includes('alt')
   )
