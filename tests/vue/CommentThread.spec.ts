@@ -80,10 +80,10 @@ describe('CommentThread (Vue)', () => {
 
     await fireEvent.click(screen.getByRole('button', { name: 'Reply' }))
 
-    const input = screen.getByPlaceholderText('写下回复') as HTMLTextAreaElement
+    const input = screen.getAllByPlaceholderText('写下回复').at(-1) as HTMLTextAreaElement
     await fireEvent.update(input, 'Hello')
 
-    await fireEvent.click(screen.getByRole('button', { name: '发送回复' }))
+    await fireEvent.click(screen.getAllByRole('button', { name: '发送回复' }).at(-1)!)
 
     expect(onReply).toHaveBeenCalledTimes(1)
     expect(onReply).toHaveBeenCalledWith(
@@ -134,8 +134,12 @@ describe('CommentThread (Vue)', () => {
       attrs: { onLoadMore }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    expect(screen.queryByText('Child B')).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: /Show remaining 1/ }))
+    expect(screen.getByText('Child B')).toBeInTheDocument()
+    expect(onLoadMore).not.toHaveBeenCalled()
 
+    await fireEvent.click(screen.getByRole('button', { name: 'Load more' }))
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
   })
@@ -214,10 +218,11 @@ describe('CommentThread (Vue)', () => {
     })
 
     await fireEvent.click(screen.getByRole('button', { name: 'Reply' }))
-    expect(screen.getByPlaceholderText('写下回复')).toBeInTheDocument()
+    expect(screen.getAllByPlaceholderText('写下回复').length).toBeGreaterThan(1)
 
     await fireEvent.click(screen.getByRole('button', { name: '取消回复' }))
-    expect(screen.queryByPlaceholderText('写下回复')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '取消回复' })).not.toBeInTheDocument()
+    expect(screen.getAllByPlaceholderText('写下回复')).toHaveLength(1)
   })
 
   it('renders deeply nested replies within maxDepth', () => {
@@ -306,6 +311,26 @@ describe('CommentThread (Vue)', () => {
       await fireEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
       expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /Liked\s+5/ })).not.toBeInTheDocument()
+    })
+
+    it('lets a parent write-back reject the overlay', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const comments = ref<CommentNode[]>([{ ...likeNodes[0] }])
+          const onLike = () => {
+            comments.value = comments.value.map((item) => ({
+              ...item,
+              liked: false,
+              likes: 3
+            }))
+          }
+          return () => h(CommentThread, { nodes: comments.value, onLike })
+        }
+      })
+
+      render(Wrapper)
+      await fireEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+      expect(screen.getByRole('button', { name: /Like\s+3/ })).toBeInTheDocument()
     })
 
     it('uses ConfigProvider zh-CN overlay copy 点赞 3 → 已赞 4', async () => {

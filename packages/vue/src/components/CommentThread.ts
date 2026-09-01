@@ -1,10 +1,14 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue'
+import { defineComponent, computed, h, ref, watch, getCurrentInstance, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  canSubmitCommentReply,
   clipCommentTreeDepth,
+  formatBadgeCountLabel,
   formatCommentTime,
+  getCommentRepliesView,
+  nextCommentRevealedCount,
   resolveCommentNodes,
   getCommentThreadLabels,
   mergeTigerLocale,
@@ -155,6 +159,10 @@ export const CommentThread = defineComponent({
     },
     showMore: {
       type: Boolean,
+      default: false
+    },
+    showComposer: {
+      type: Boolean,
       default: true
     },
     className: {
@@ -166,26 +174,47 @@ export const CommentThread = defineComponent({
       default: undefined
     }
   },
-  emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more'],
+  emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more', 'user-click'],
   setup(props, { emit, attrs }) {
+    const instance = getCurrentInstance()
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getCommentThreadLabels(mergedLocale.value, props.labels))
+    const vnodeProps = () => (instance?.vnode.props ?? {}) as Record<string, unknown>
 
     const innerExpandedKeys = ref<Array<string | number>>([...props.defaultExpandedKeys])
-    const expandedAllKeys = ref(new Set<string | number>())
+    const revealedCounts = ref(new Map<string | number, number>())
     const likeOverlay = ref<CommentLikeOverlay>(new Map())
     const replyingTo = ref<string | number | null>(null)
     const replyValue = ref('')
+    const composerValue = ref('')
+    const replyInFlight = ref(false)
+    const clippedIds = ref(new Set<string | number>())
 
     const mergedExpandedKeys = computed(() => props.expandedKeys ?? innerExpandedKeys.value)
 
     const expandedSet = computed(() => new Set<string | number>(mergedExpandedKeys.value))
 
     const resolvedNodes = computed(() => {
+      const clipped = new Set<string | number>()
       const tree = resolveCommentNodes(props.nodes, props.items)
-      return clipCommentTreeDepth(tree, props.maxDepth)
+      const next = clipCommentTreeDepth(tree, props.maxDepth, clipped)
+      clippedIds.value = clipped
+      return next
     })
+
+    watch(
+      () => [props.nodes, props.items],
+      () => {
+        likeOverlay.value = new Map()
+        revealedCounts.value = new Map()
+      }
+    )
+
+    const hasLoadMoreHandler = computed(() => typeof vnodeProps().onLoadMore === 'function')
+    const hasReplyHandler = computed(() => typeof vnodeProps().onReply === 'function')
+    const hasMoreHandler = computed(() => typeof vnodeProps().onMore === 'function')
+    const hasUserClickHandler = computed(() => typeof vnodeProps().onUserClick === 'function')
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -213,7 +242,19 @@ export const CommentThread = defineComponent({
     }
 
     const handleLoadMore = (node: CommentNode) => {
-      expandedAllKeys.value = new Set([...expandedAllKeys.value, node.id])
+      const children = node.children ?? []
+      const current = revealedCounts.value.get(node.id) ?? props.maxReplies
+      const view = getCommentRepliesView(children, {
+        maxReplies: props.maxReplies,
+        revealedCount: current,
+        hasLoadMoreHandler: hasLoadMoreHandler.value
+      })
+      if (view.loadMoreKind === 'remaining') {
+        const next = new Map(revealedCounts.value)
+        next.set(node.id, nextCommentRevealedCount(current, props.maxReplies, children.length))
+        revealedCounts.value = next
+        return
+      }
       emit('load-more', node)
     }
 
@@ -223,36 +264,45 @@ export const CommentThread = defineComponent({
       emit('like', node, next.liked)
     }
 
-    const handleReplySubmit = (node: CommentNode) => {
-      const trimmed = replyValue.value.trim()
-      if (!trimmed) return
-      emit('reply', node, replyValue.value)
-      replyValue.value = ''
-      replyingTo.value = null
-      if (!expandedSet.value.has(node.id)) {
-        const next = [...mergedExpandedKeys.value, node.id]
-        updateExpandedKeys(next)
+    const handleReplySubmit = (node?: CommentNode) => {
+      const source = node ? replyValue.value : composerValue.value
+      if (!canSubmitCommentReply(source, replyInFlight.value) || !hasReplyHandler.value) return
+      replyInFlight.value = true
+      emit('reply', node, source.trim())
+      if (node) {
+        replyValue.value = ''
+        replyingTo.value = null
+        if (!expandedSet.value.has(node.id)) {
+          updateExpandedKeys([...mergedExpandedKeys.value, node.id])
+        }
+      } else {
+        composerValue.value = ''
       }
+      queueMicrotask(() => {
+        replyInFlight.value = false
+      })
     }
 
     const renderNode = (
       node: CommentNode,
       depth: number,
-      isLast: boolean
+      isLast: boolean,
+      pos: { current: number; total: number }
     ): ReturnType<typeof h> => {
       const children = node.children ?? []
-      const hasChildren = children.length > 0
+      const hasChildren = children.length > 0 || clippedIds.value.has(node.id)
       const isExpanded = expandedSet.value.has(node.id)
-      const showReplies = hasChildren && isExpanded
-      const showAllReplies = expandedAllKeys.value.has(node.id)
+      const repliesView = getCommentRepliesView(children, {
+        maxReplies: props.maxReplies,
+        revealedCount: revealedCounts.value.get(node.id) ?? props.maxReplies,
+        hasLoadMoreHandler: hasLoadMoreHandler.value
+      })
+      const showReplies = hasChildren && isExpanded && children.length > 0
       const repliesId = `tiger-comment-replies-${node.id}`
-      const visibleChildren = showReplies
-        ? props.maxReplies > 0 && !showAllReplies
-          ? children.slice(0, props.maxReplies)
-          : children
-        : []
-      const showLoadMore =
-        showReplies && props.maxReplies > 0 && children.length > props.maxReplies && !showAllReplies
+      const visibleChildren = showReplies ? repliesView.visible : []
+      const showLoadMore = showReplies && repliesView.loadMoreKind != null
+      pos.current += 1
+      const posinset = pos.current
 
       const actions: Array<ReturnType<typeof h>> = []
 
@@ -269,6 +319,7 @@ export const CommentThread = defineComponent({
               key: 'like',
               size: 'sm',
               variant: 'ghost',
+              'aria-pressed': liked,
               className: classNames(
                 commentThreadActionButtonClasses,
                 commentThreadLikeButtonClasses,
@@ -348,7 +399,7 @@ export const CommentThread = defineComponent({
         )
       }
 
-      if (props.showMore) {
+      if (props.showMore && (hasMoreHandler.value || (node.actions && node.actions.length > 0))) {
         actions.push(
           h(
             Button,
@@ -405,8 +456,8 @@ export const CommentThread = defineComponent({
                 ),
                 disabled: action.disabled,
                 onClick: () => {
-                  action.onClick?.(node, action)
-                  emit('action', node, action as CommentAction)
+                  if (action.onClick) action.onClick(node, action)
+                  else emit('action', node, action as CommentAction)
                 }
               },
               { default: () => action.label }
@@ -416,14 +467,16 @@ export const CommentThread = defineComponent({
       }
 
       return h(
-        'div',
+        'article',
         {
           class: classNames(
             'tiger-comment-thread-item',
             depth === 1 && 'py-5',
             depth === 1 && !isLast && props.showDivider && commentThreadDividerClasses
           ),
-          key: node.id
+          key: node.id,
+          'aria-posinset': posinset,
+          'aria-setsize': pos.total
         },
         [
           h('div', { class: 'flex gap-3' }, [
@@ -432,7 +485,8 @@ export const CommentThread = defineComponent({
                   size: depth === 1 ? 'md' : 'sm',
                   src: node.user.avatar,
                   text: node.user.name,
-                  className: commentThreadAvatarClasses
+                  className: commentThreadAvatarClasses,
+                  'aria-hidden': Boolean(node.user.name)
                 })
               : null,
             h('div', { class: 'flex-1 min-w-0' }, [
@@ -551,11 +605,14 @@ export const CommentThread = defineComponent({
                             size: 'sm',
                             variant: 'primary',
                             className: commentThreadSubmitButtonClasses,
+                            disabled:
+                              !canSubmitCommentReply(replyValue.value, false) ||
+                              !hasReplyHandler.value,
                             onClick: () => handleReplySubmit(node)
                           },
                           {
                             default: () =>
-                              resolveLocaleText(labels.value.replyButtonText, props.replyButtonText)
+                              resolveLocaleText(labels.value.replySubmitText, props.replyButtonText)
                           }
                         )
                       ])
@@ -573,20 +630,30 @@ export const CommentThread = defineComponent({
                         commentThreadPrimaryButtonClasses
                       ),
                       'aria-expanded': isExpanded,
-                      'aria-controls': repliesId,
-                      onClick: () => toggleExpanded(node.id)
+                      'aria-controls': children.length > 0 ? repliesId : undefined,
+                      disabled: clippedIds.value.has(node.id) && children.length === 0,
+                      onClick: () => {
+                        if (clippedIds.value.has(node.id) && children.length === 0) return
+                        toggleExpanded(node.id)
+                      }
                     },
                     {
                       default: () =>
-                        isExpanded
-                          ? resolveLocaleText(
-                              labels.value.collapseRepliesText,
-                              props.collapseRepliesText
-                            )
-                          : resolveLocaleText(
-                              labels.value.expandRepliesText,
-                              props.expandRepliesText
-                            ).replace('{count}', String(children.length))
+                        clippedIds.value.has(node.id) && children.length === 0
+                          ? labels.value.maxDepthReachedText
+                          : isExpanded
+                            ? resolveLocaleText(
+                                labels.value.collapseRepliesText,
+                                props.collapseRepliesText
+                              )
+                            : formatBadgeCountLabel(
+                                resolveLocaleText(
+                                  labels.value.expandRepliesText,
+                                  props.expandRepliesText
+                                ),
+                                children.length,
+                                mergedLocale.value?.locale
+                              )
                     }
                   )
                 : null,
@@ -599,7 +666,7 @@ export const CommentThread = defineComponent({
                     },
                     [
                       ...visibleChildren.map((child, index) =>
-                        renderNode(child, depth + 1, index === visibleChildren.length - 1)
+                        renderNode(child, depth + 1, index === visibleChildren.length - 1, pos)
                       ),
                       showLoadMore
                         ? h(
@@ -612,7 +679,13 @@ export const CommentThread = defineComponent({
                             },
                             {
                               default: () =>
-                                resolveLocaleText(labels.value.loadMoreText, props.loadMoreText)
+                                repliesView.loadMoreKind === 'remaining'
+                                  ? formatBadgeCountLabel(
+                                      labels.value.remainingRepliesText,
+                                      repliesView.remaining,
+                                      mergedLocale.value?.locale
+                                    )
+                                  : resolveLocaleText(labels.value.loadMoreText, props.loadMoreText)
                             }
                           )
                         : null
@@ -625,10 +698,57 @@ export const CommentThread = defineComponent({
       )
     }
 
+    const countVisible = (list: CommentNode[]): number =>
+      list.reduce((sum, node) => {
+        if (!expandedSet.value.has(node.id)) return sum + 1
+        const view = getCommentRepliesView(node.children, {
+          maxReplies: props.maxReplies,
+          revealedCount: revealedCounts.value.get(node.id) ?? props.maxReplies,
+          hasLoadMoreHandler: hasLoadMoreHandler.value
+        })
+        return sum + 1 + countVisible(view.visible)
+      }, 0)
+
     return () => {
       const ariaLabel =
         (attrs['aria-label'] as string | undefined) ??
-        (attrs['aria-labelledby'] ? undefined : 'Comment thread')
+        (attrs['aria-labelledby'] ? undefined : labels.value.listAriaLabel)
+      const pos = { current: 0, total: countVisible(resolvedNodes.value) }
+
+      const composer = props.showComposer
+        ? h('div', { class: commentThreadReplyEditorClasses }, [
+            h(Textarea, {
+              rows: 3,
+              modelValue: composerValue.value,
+              placeholder: resolveLocaleText(labels.value.replyPlaceholder, props.replyPlaceholder),
+              className: commentThreadReplyTextareaClasses,
+              'aria-label': resolveLocaleText(
+                labels.value.replyPlaceholder,
+                props.replyPlaceholder
+              ),
+              'onUpdate:modelValue': (value: string) => {
+                composerValue.value = value
+              }
+            }),
+            h('div', { class: 'flex items-center gap-2 justify-end' }, [
+              h(
+                Button,
+                {
+                  size: 'sm',
+                  variant: 'primary',
+                  className: commentThreadSubmitButtonClasses,
+                  disabled:
+                    !canSubmitCommentReply(composerValue.value, false) || !hasReplyHandler.value,
+                  onClick: () => handleReplySubmit()
+                },
+                {
+                  default: () =>
+                    resolveLocaleText(labels.value.replySubmitText, props.replyButtonText)
+                }
+              )
+            ])
+          ])
+        : null
 
       const children =
         resolvedNodes.value.length === 0
@@ -642,6 +762,7 @@ export const CommentThread = defineComponent({
                   h(
                     'svg',
                     {
+                      'aria-hidden': 'true',
                       class: commentThreadEmptyIconClasses,
                       fill: 'none',
                       viewBox: '0 0 24 24',
@@ -667,7 +788,7 @@ export const CommentThread = defineComponent({
               )
             ]
           : resolvedNodes.value.map((node, index) =>
-              renderNode(node, 1, index === resolvedNodes.value.length - 1)
+              renderNode(node, 1, index === resolvedNodes.value.length - 1, pos)
             )
 
       return h(
@@ -680,7 +801,7 @@ export const CommentThread = defineComponent({
           'data-tiger-comment-thread': true,
           'aria-label': ariaLabel
         },
-        children
+        [composer, ...children]
       )
     }
   }

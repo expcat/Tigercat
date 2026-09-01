@@ -1,8 +1,12 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  canSubmitCommentReply,
   clipCommentTreeDepth,
+  formatBadgeCountLabel,
   formatCommentTime,
+  getCommentRepliesView,
+  nextCommentRevealedCount,
   resolveCommentNodes,
   getCommentThreadLabels,
   mergeTigerLocale,
@@ -71,11 +75,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   showDivider = true,
   showLike = true,
   showReply = true,
-  showMore = true,
+  showMore = false,
+  showComposer = true,
   onLike,
   onReply,
   onMore,
   onAction,
+  onUserClick,
   onExpandedChange,
   onLoadMore,
   className,
@@ -93,10 +99,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
 
   const [innerExpandedKeys, setInnerExpandedKeys] =
     useState<Array<string | number>>(defaultExpandedKeys)
-  const [expandedAllKeys, setExpandedAllKeys] = useState<Set<string | number>>(new Set())
+  const [revealedCounts, setRevealedCounts] = useState<Map<string | number, number>>(
+    () => new Map()
+  )
   const [likeOverlay, setLikeOverlay] = useState<CommentLikeOverlay>(() => new Map())
   const [replyingTo, setReplyingTo] = useState<string | number | null>(null)
   const [replyValue, setReplyValue] = useState('')
+  const [composerValue, setComposerValue] = useState('')
+  const replyInFlight = useRef(false)
 
   const mergedExpandedKeys = expandedKeys ?? innerExpandedKeys
   const expandedSet = useMemo(
@@ -104,10 +114,19 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     [mergedExpandedKeys]
   )
 
-  const resolvedNodes = useMemo(() => {
+  const { resolvedNodes, clippedIds } = useMemo(() => {
+    const clipped = new Set<string | number>()
     const tree = resolveCommentNodes(nodes, items)
-    return clipCommentTreeDepth(tree, maxDepth)
-  }, [nodes, items, maxDepth])
+    return {
+      resolvedNodes: clipCommentTreeDepth(tree, maxDepth, clipped),
+      clippedIds: clipped
+    }
+  }, [items, maxDepth, nodes])
+
+  useEffect(() => {
+    setLikeOverlay(new Map())
+    setRevealedCounts(new Map())
+  }, [nodes, items])
 
   const updateExpandedKeys = (next: Array<string | number>) => {
     if (!expandedKeys) {
@@ -123,12 +142,25 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     updateExpandedKeys(next)
   }
 
+  const hasLoadMoreHandler = typeof onLoadMore === 'function'
+  const hasReplyHandler = typeof onReply === 'function'
+
   const handleLoadMore = (node: CommentNode) => {
-    setExpandedAllKeys((prev) => {
-      const next = new Set(prev)
-      next.add(node.id)
-      return next
+    const children = node.children ?? []
+    const current = revealedCounts.get(node.id) ?? maxReplies
+    const view = getCommentRepliesView(children, {
+      maxReplies,
+      revealedCount: current,
+      hasLoadMoreHandler
     })
+    if (view.loadMoreKind === 'remaining') {
+      setRevealedCounts((prev) => {
+        const next = new Map(prev)
+        next.set(node.id, nextCommentRevealedCount(current, maxReplies, children.length))
+        return next
+      })
+      return
+    }
     onLoadMore?.(node)
   }
 
@@ -138,32 +170,43 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     onLike?.(node, next.liked)
   }
 
-  const handleReplySubmit = (node: CommentNode) => {
-    const trimmed = replyValue.trim()
-    if (!trimmed) return
-    onReply?.(node, replyValue)
-    setReplyValue('')
-    setReplyingTo(null)
-    if (!expandedSet.has(node.id)) {
-      const next = [...mergedExpandedKeys, node.id]
-      updateExpandedKeys(next)
+  const handleReplySubmit = (node?: CommentNode) => {
+    const source = node ? replyValue : composerValue
+    if (!canSubmitCommentReply(source, replyInFlight.current) || !hasReplyHandler) return
+    replyInFlight.current = true
+    onReply?.(node, source.trim())
+    if (node) {
+      setReplyValue('')
+      setReplyingTo(null)
+      if (!expandedSet.has(node.id)) updateExpandedKeys([...mergedExpandedKeys, node.id])
+    } else {
+      setComposerValue('')
     }
+    queueMicrotask(() => {
+      replyInFlight.current = false
+    })
   }
 
-  const renderNode = (node: CommentNode, depth: number, isLast: boolean) => {
+  const renderNode = (
+    node: CommentNode,
+    depth: number,
+    isLast: boolean,
+    pos: { current: number; total: number }
+  ) => {
     const children = node.children ?? []
-    const hasChildren = children.length > 0
+    const hasChildren = children.length > 0 || clippedIds.has(node.id)
     const isExpanded = expandedSet.has(node.id)
-    const showReplies = hasChildren && isExpanded
-    const showAllReplies = expandedAllKeys.has(node.id)
+    const repliesView = getCommentRepliesView(children, {
+      maxReplies,
+      revealedCount: revealedCounts.get(node.id) ?? maxReplies,
+      hasLoadMoreHandler
+    })
+    const showReplies = hasChildren && isExpanded && children.length > 0
     const repliesId = `tiger-comment-replies-${node.id}`
-    const visibleChildren = showReplies
-      ? maxReplies > 0 && !showAllReplies
-        ? children.slice(0, maxReplies)
-        : children
-      : []
-    const showLoadMoreBtn =
-      showReplies && maxReplies > 0 && children.length > maxReplies && !showAllReplies
+    const visibleChildren = showReplies ? repliesView.visible : []
+    const showLoadMoreBtn = showReplies && repliesView.loadMoreKind != null
+    pos.current += 1
+    const posinset = pos.current
 
     const actions: React.ReactNode[] = []
 
@@ -178,6 +221,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           key="like"
           size="sm"
           variant="ghost"
+          aria-pressed={liked}
           className={classNames(
             commentThreadActionButtonClasses,
             commentThreadLikeButtonClasses,
@@ -185,6 +229,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           )}
           onClick={() => handleLike(node)}>
           <svg
+            aria-hidden="true"
             className={classNames(
               commentThreadLikeIconClasses,
               liked ? 'fill-current' : 'stroke-current fill-none'
@@ -214,6 +259,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             setReplyValue('')
           }}>
           <svg
+            aria-hidden="true"
             className="w-3.5 h-3.5"
             viewBox="0 0 24 24"
             fill="none"
@@ -230,7 +276,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       )
     }
 
-    if (showMore) {
+    if (showMore && (onMore || (node.actions && node.actions.length > 0))) {
       actions.push(
         <Button
           key="more"
@@ -242,6 +288,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           )}
           onClick={() => onMore?.(node)}>
           <svg
+            aria-hidden="true"
             className="w-3.5 h-3.5"
             viewBox="0 0 24 24"
             fill="none"
@@ -272,8 +319,8 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             )}
             disabled={action.disabled}
             onClick={() => {
-              action.onClick?.(node, action)
-              onAction?.(node, action as CommentAction)
+              if (action.onClick) action.onClick(node, action)
+              else onAction?.(node, action as CommentAction)
             }}>
             {action.label}
           </Button>
@@ -282,13 +329,15 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     }
 
     return (
-      <div
+      <article
         key={node.id}
         className={classNames(
           'tiger-comment-thread-item',
           depth === 1 && 'py-5',
           depth === 1 && !isLast && showDivider && commentThreadDividerClasses
-        )}>
+        )}
+        aria-posinset={posinset}
+        aria-setsize={pos.total}>
         <div className="flex gap-3">
           {showAvatar && node.user ? (
             <Avatar
@@ -296,12 +345,22 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               src={node.user.avatar}
               text={node.user.name}
               className={commentThreadAvatarClasses}
+              aria-hidden={Boolean(node.user.name)}
             />
           ) : null}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {node.user?.name ? (
-                <Text tag="span" size="sm" weight="bold" className={commentThreadAuthorClasses}>
+                <Text
+                  tag={onUserClick ? 'button' : 'span'}
+                  size="sm"
+                  weight="bold"
+                  className={
+                    onUserClick
+                      ? commentThreadAuthorClasses
+                      : commentThreadAuthorClasses.replace('cursor-pointer', '')
+                  }
+                  onClick={onUserClick ? () => onUserClick(node) : undefined}>
                   {node.user.name}
                 </Text>
               ) : null}
@@ -347,6 +406,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   value={replyValue}
                   placeholder={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
                   className={commentThreadReplyTextareaClasses}
+                  aria-label={resolveLocaleText(labels.replyText, replyText)}
                   onChange={(event) => setReplyValue(event.target.value)}
                 />
                 <div className="flex items-center gap-2 justify-end">
@@ -364,8 +424,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                     size="sm"
                     variant="primary"
                     className={commentThreadSubmitButtonClasses}
+                    disabled={!canSubmitCommentReply(replyValue, false) || !hasReplyHandler}
                     onClick={() => handleReplySubmit(node)}>
-                    {resolveLocaleText(labels.replyButtonText, replyButtonText)}
+                    {resolveLocaleText(labels.replySubmitText, replyButtonText)}
                   </Button>
                 </div>
               </div>
@@ -377,21 +438,28 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 variant="ghost"
                 className={classNames('mt-2 font-semibold', commentThreadPrimaryButtonClasses)}
                 aria-expanded={isExpanded}
-                aria-controls={repliesId}
-                onClick={() => toggleExpanded(node.id)}>
-                {isExpanded
-                  ? resolveLocaleText(labels.collapseRepliesText, collapseRepliesText)
-                  : resolveLocaleText(labels.expandRepliesText, expandRepliesText).replace(
-                      '{count}',
-                      String(children.length)
-                    )}
+                aria-controls={children.length > 0 ? repliesId : undefined}
+                disabled={clippedIds.has(node.id) && children.length === 0}
+                onClick={() => {
+                  if (clippedIds.has(node.id) && children.length === 0) return
+                  toggleExpanded(node.id)
+                }}>
+                {clippedIds.has(node.id) && children.length === 0
+                  ? labels.maxDepthReachedText
+                  : isExpanded
+                    ? resolveLocaleText(labels.collapseRepliesText, collapseRepliesText)
+                    : formatBadgeCountLabel(
+                        resolveLocaleText(labels.expandRepliesText, expandRepliesText),
+                        children.length,
+                        mergedLocale?.locale
+                      )}
               </Button>
             ) : null}
 
             {showReplies ? (
               <div id={repliesId} className={commentThreadRepliesClasses}>
                 {visibleChildren.map((child, index) =>
-                  renderNode(child, depth + 1, index === visibleChildren.length - 1)
+                  renderNode(child, depth + 1, index === visibleChildren.length - 1, pos)
                 )}
                 {showLoadMoreBtn ? (
                   <Button
@@ -399,16 +467,58 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                     variant="ghost"
                     className={commentThreadPrimaryButtonClasses}
                     onClick={() => handleLoadMore(node)}>
-                    {resolveLocaleText(labels.loadMoreText, loadMoreText)}
+                    {repliesView.loadMoreKind === 'remaining'
+                      ? formatBadgeCountLabel(
+                          labels.remainingRepliesText,
+                          repliesView.remaining,
+                          mergedLocale?.locale
+                        )
+                      : resolveLocaleText(labels.loadMoreText, loadMoreText)}
                   </Button>
                 ) : null}
               </div>
             ) : null}
           </div>
         </div>
-      </div>
+      </article>
     )
   }
+
+  const countVisible = (list: CommentNode[]): number =>
+    list.reduce((sum, node) => {
+      if (!expandedSet.has(node.id)) return sum + 1
+      const view = getCommentRepliesView(node.children, {
+        maxReplies,
+        revealedCount: revealedCounts.get(node.id) ?? maxReplies,
+        hasLoadMoreHandler
+      })
+      return sum + 1 + countVisible(view.visible)
+    }, 0)
+
+  const pos = { current: 0, total: countVisible(resolvedNodes) }
+
+  const composer = showComposer ? (
+    <div className={commentThreadReplyEditorClasses}>
+      <Textarea
+        rows={3}
+        value={composerValue}
+        placeholder={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
+        className={commentThreadReplyTextareaClasses}
+        aria-label={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
+        onChange={(event) => setComposerValue(event.target.value)}
+      />
+      <div className="flex items-center gap-2 justify-end">
+        <Button
+          size="sm"
+          variant="primary"
+          className={commentThreadSubmitButtonClasses}
+          disabled={!canSubmitCommentReply(composerValue, false) || !hasReplyHandler}
+          onClick={() => handleReplySubmit()}>
+          {resolveLocaleText(labels.replySubmitText, replyButtonText)}
+        </Button>
+      </div>
+    </div>
+  ) : null
 
   return (
     <div
@@ -416,12 +526,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       role={divProps.role ?? 'feed'}
       data-tiger-comment-thread
       aria-label={
-        divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : 'Comment thread')
+        divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : labels.listAriaLabel)
       }
       {...divProps}>
+      {composer}
       {resolvedNodes.length === 0 ? (
         <div className={commentThreadEmptyClasses}>
           <svg
+            aria-hidden="true"
             className={commentThreadEmptyIconClasses}
             fill="none"
             viewBox="0 0 24 24"
@@ -438,7 +550,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           </Text>
         </div>
       ) : (
-        resolvedNodes.map((node, index) => renderNode(node, 1, index === resolvedNodes.length - 1))
+        resolvedNodes.map((node, index) =>
+          renderNode(node, 1, index === resolvedNodes.length - 1, pos)
+        )
       )}
     </div>
   )

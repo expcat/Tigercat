@@ -62,11 +62,19 @@ export {
   buildCommentTree,
   resolveCommentNodes,
   clipCommentTreeDepth,
+  getCommentRepliesView,
+  nextCommentRevealedCount,
+  canSubmitCommentReply,
   resolveCommentLikeState,
   nextCommentLikeState,
   writeCommentLikeOverlay
 } from './comment-thread-utils'
-export type { CommentLikeOverlay, CommentLikeState } from './comment-thread-utils'
+export type {
+  CommentLikeOverlay,
+  CommentLikeState,
+  CommentLoadMoreKind,
+  CommentRepliesView
+} from './comment-thread-utils'
 
 // Composite time helpers
 export * from './composite-time-utils'

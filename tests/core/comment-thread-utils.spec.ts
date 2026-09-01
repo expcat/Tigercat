@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildCommentTree,
   clipCommentTreeDepth,
+  getCommentRepliesView,
   nextCommentLikeState,
   resolveCommentLikeState,
   resolveCommentNodes,
@@ -80,11 +81,36 @@ describe('comment-thread-utils tree', () => {
     expect(tree[0]?.content).toBe('second')
   })
 
-  it('clips children past maxDepth', () => {
+  it('clips children past maxDepth and records clipped ids', () => {
+    const clippedIds = new Set<string | number>()
     const clipped = clipCommentTreeDepth(
       [{ id: 1, content: 'a', children: [{ id: 2, content: 'b' }] }],
-      1
+      1,
+      clippedIds
     )
     expect(clipped[0]?.children).toEqual([])
+    expect(clippedIds.has(1)).toBe(true)
+  })
+
+  it('reveals local remaining replies in maxReplies batches', () => {
+    const children = [
+      { id: 2, content: 'a' },
+      { id: 3, content: 'b' },
+      { id: 4, content: 'c' }
+    ]
+    const first = getCommentRepliesView(children, {
+      maxReplies: 1,
+      revealedCount: 1,
+      hasLoadMoreHandler: true
+    })
+    expect(first.visible).toHaveLength(1)
+    expect(first.remaining).toBe(2)
+    expect(first.loadMoreKind).toBe('remaining')
+    const paged = getCommentRepliesView(children, {
+      maxReplies: 1,
+      revealedCount: 3,
+      hasLoadMoreHandler: true
+    })
+    expect(paged.loadMoreKind).toBe('page')
   })
 })

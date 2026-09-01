@@ -15,9 +15,11 @@ export const resolveCommentLikeState = (
   node: CommentLikeNode,
   overlay?: ReadonlyMap<string | number, CommentLikeState> | null
 ): CommentLikeState => {
+  const nodeState = { liked: !!node.liked, likes: node.likes ?? 0 }
   const entry = overlay?.get(node.id)
-  if (entry) return { liked: entry.liked, likes: entry.likes }
-  return { liked: !!node.liked, likes: node.likes ?? 0 }
+  if (!entry) return nodeState
+  if (entry.liked === nodeState.liked && entry.likes === nodeState.likes) return nodeState
+  return { liked: entry.liked, likes: entry.likes }
 }
 
 export const nextCommentLikeState = (
@@ -90,7 +92,11 @@ export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
   return roots
 }
 
-export const clipCommentTreeDepth = (nodes: CommentNode[] = [], maxDepth = 3): CommentNode[] => {
+export const clipCommentTreeDepth = (
+  nodes: CommentNode[] = [],
+  maxDepth = 3,
+  clippedIds?: Set<string | number>
+): CommentNode[] => {
   if (!nodes || nodes.length === 0) return []
   if (maxDepth <= 0) return []
 
@@ -99,10 +105,53 @@ export const clipCommentTreeDepth = (nodes: CommentNode[] = [], maxDepth = 3): C
     if (node.children && node.children.length > 0 && depth < maxDepth) {
       next.children = node.children.map((child) => cloneNode(child, depth + 1))
     } else {
+      if (node.children && node.children.length > 0) clippedIds?.add(node.id)
       next.children = []
     }
     return next
   }
 
   return nodes.map((node) => cloneNode(node, 1))
+}
+
+export type CommentLoadMoreKind = 'remaining' | 'page' | null
+
+export interface CommentRepliesView {
+  visible: CommentNode[]
+  remaining: number
+  loadMoreKind: CommentLoadMoreKind
+}
+
+/**
+ * Local remaining replies are revealed `maxReplies` at a time. True paging
+ * (`onLoadMore`) is only offered after every local child is visible.
+ */
+export function getCommentRepliesView(
+  children: CommentNode[] | undefined,
+  options: {
+    maxReplies: number
+    revealedCount: number
+    hasLoadMoreHandler: boolean
+  }
+): CommentRepliesView {
+  const list = children ?? EMPTY_COMMENT_NODES
+  const revealed = Math.max(options.maxReplies, options.revealedCount)
+  const visible = list.slice(0, revealed)
+  const remaining = Math.max(0, list.length - visible.length)
+  if (remaining > 0) return { visible, remaining, loadMoreKind: 'remaining' }
+  if (options.hasLoadMoreHandler) return { visible, remaining: 0, loadMoreKind: 'page' }
+  return { visible, remaining: 0, loadMoreKind: null }
+}
+
+export function nextCommentRevealedCount(
+  current: number,
+  maxReplies: number,
+  childCount: number
+): number {
+  const start = Math.max(maxReplies, current)
+  return Math.min(childCount, start + Math.max(1, maxReplies))
+}
+
+export function canSubmitCommentReply(value: string, inFlight: boolean): boolean {
+  return !inFlight && value.trim().length > 0
 }

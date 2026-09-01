@@ -233,18 +233,29 @@ export interface CommentThreadProps {
    */
   showReply?: boolean
   /**
-   * Show more action
-   * @default true
+   * Show more action. Default off; the control is rendered when `onMore` or
+   * node `actions` are present.
+   * @default false
    */
   showMore?: boolean
   /**
-   * Like callback
+   * Show the root composer (including empty state).
+   * @default true
+   */
+  showComposer?: boolean
+  /**
+   * Like callback. Overlay is session-local until `nodes` is replaced.
    */
   onLike?: (node: CommentNode, liked: boolean) => void
   /**
-   * Reply submit callback
+   * Reply / root composer submit. Does **not** push into the tree. `node` is
+   * omitted for a new top-level comment. Omit this and submit stays disabled.
    */
-  onReply?: (node: CommentNode, value: string) => void
+  onReply?: (node: CommentNode | undefined, value: string) => void
+  /**
+   * Author name click. Without this the name is not presented as a control.
+   */
+  onUserClick?: (node: CommentNode) => void
   /**
    * More action callback
    */

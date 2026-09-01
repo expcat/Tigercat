@@ -59,10 +59,10 @@ describe('CommentThread (React)', () => {
     const replyAction = screen.getByRole('button', { name: 'Reply' })
     await userEvent.click(replyAction)
 
-    const input = screen.getByPlaceholderText('写下回复') as HTMLTextAreaElement
+    const input = screen.getAllByPlaceholderText('写下回复').at(-1) as HTMLTextAreaElement
     await userEvent.type(input, 'Hello')
 
-    const submit = screen.getByRole('button', { name: '发送回复' })
+    const submit = screen.getAllByRole('button', { name: '发送回复' }).at(-1)!
     await userEvent.click(submit)
 
     expect(onReply).toHaveBeenCalledTimes(1)
@@ -118,8 +118,12 @@ describe('CommentThread (React)', () => {
       />
     )
 
-    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    expect(screen.queryByText('Child B')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: /Show remaining 1/ }))
+    expect(screen.getByText('Child B')).toBeInTheDocument()
+    expect(onLoadMore).not.toHaveBeenCalled()
 
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
   })
@@ -196,10 +200,11 @@ describe('CommentThread (React)', () => {
     render(<CommentThread nodes={nodes} cancelReplyText="取消回复" replyPlaceholder="写下回复" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Reply' }))
-    expect(screen.getByPlaceholderText('写下回复')).toBeInTheDocument()
+    expect(screen.getAllByPlaceholderText('写下回复').length).toBeGreaterThan(1)
 
     await userEvent.click(screen.getByRole('button', { name: '取消回复' }))
-    expect(screen.queryByPlaceholderText('写下回复')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '取消回复' })).not.toBeInTheDocument()
+    expect(screen.getAllByPlaceholderText('写下回复')).toHaveLength(1)
   })
 
   it('renders deeply nested replies within maxDepth', () => {
@@ -292,6 +297,24 @@ describe('CommentThread (React)', () => {
       await userEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
       expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /Liked\s+5/ })).not.toBeInTheDocument()
+    })
+
+    it('lets a parent write-back reject the overlay', async () => {
+      function Harness() {
+        const [comments, setComments] = React.useState<CommentNode[]>([{ ...likeNodes[0] }])
+        return (
+          <CommentThread
+            nodes={comments}
+            onLike={() => {
+              setComments((current) => current.map((item) => ({ ...item, liked: false, likes: 3 })))
+            }}
+          />
+        )
+      }
+
+      render(<Harness />)
+      await userEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+      expect(screen.getByRole('button', { name: /Like\s+3/ })).toBeInTheDocument()
     })
 
     it('uses ConfigProvider zh-CN overlay copy 点赞 3 → 已赞 4', async () => {
