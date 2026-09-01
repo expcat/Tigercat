@@ -331,9 +331,9 @@ export function getDropIndex(pointerY: number, cardRects: DOMRect[]): number {
  * visible ids (should not happen) fall back to `visibleIndex` or `sourceCards.length`
  * and do not throw.
  */
-export function mapVisibleCardIndexToSource(
-  sourceCards: TaskBoardCard[],
-  visibleCards: TaskBoardCard[],
+export function mapVisibleCardIndexToSource<T extends { id: string | number }>(
+  sourceCards: T[],
+  visibleCards: T[],
   visibleIndex: number
 ): number {
   if (visibleCards.length === 0) {

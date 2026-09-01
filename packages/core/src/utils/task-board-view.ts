@@ -105,7 +105,7 @@ export function mapVisibleColumnIndexToSource(
 ): number {
   return mapVisibleCardIndexToSource(
     sourceColumns,
-    visibleColumnIds.map((id) => ({ id, title: '' })),
+    visibleColumnIds.map((id) => ({ id })),
     visibleIndex
   )
 }
