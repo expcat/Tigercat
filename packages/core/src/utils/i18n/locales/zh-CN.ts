@@ -263,7 +263,8 @@ export const zhCN: TigerLocale = {
     placeholder: '请输入消息',
     sendingText: '发送中',
     sentText: '已送达',
-    failedText: '发送失败'
+    failedText: '发送失败',
+    messageListAriaLabel: '消息列表'
   },
   code: {
     copyLabel: '复制',
@@ -281,11 +282,17 @@ export const zhCN: TigerLocale = {
     moreText: '更多',
     loadMoreText: '加载更多',
     collapseRepliesText: '▾ 收起回复',
-    expandRepliesText: '▸ 展开 {count} 条回复'
+    expandRepliesText: '▸ 展开 {count} 条回复',
+    listAriaLabel: '评论列表',
+    replySubmitText: '发送回复',
+    remainingRepliesText: '显示剩余 {count} 条',
+    maxDepthReachedText: '已到最大回复层'
   },
   activityFeed: {
     emptyText: '暂无动态',
-    loadingText: '加载中...'
+    loadingText: '加载中...',
+    listAriaLabel: '动态',
+    otherGroupTitle: '其他'
   },
   notificationCenter: {
     title: '通知中心',
@@ -296,7 +303,9 @@ export const zhCN: TigerLocale = {
     readLabel: '已读',
     markAllReadText: '全部标记已读',
     markReadText: '标记已读',
-    markUnreadText: '标记未读'
+    markUnreadText: '标记未读',
+    defaultGroupTitle: '默认',
+    unreadCountText: '{count} 条未读'
   },
   select: {
     doneText: '完成',

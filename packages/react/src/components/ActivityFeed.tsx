@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import {
   classNames,
+  EMPTY_ACTIVITY_ITEMS,
   buildActivityGroups,
   formatActivityTime,
   getActivityFeedLabels,
@@ -73,7 +74,7 @@ const renderAction = (item: ActivityItem, action: ActivityAction, index: number)
 }
 
 export const ActivityFeed: React.FC<ActivityFeedProps> = ({
-  items = [],
+  items = EMPTY_ACTIVITY_ITEMS,
   groups,
   groupBy,
   groupOrder,
@@ -103,8 +104,8 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const resolvedEmptyText = resolveLocaleText(labels.emptyText, emptyText)
 
   const resolvedGroups = useMemo(
-    () => buildActivityGroups(items, groups, groupBy, groupOrder),
-    [items, groups, groupBy, groupOrder]
+    () => buildActivityGroups(items, groups, groupBy, groupOrder, labels.otherGroupTitle),
+    [items, groups, groupBy, groupOrder, labels.otherGroupTitle]
   )
 
   const wrapperClasses = classNames(
@@ -130,7 +131,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         : '')
 
     const descriptionText = item.description
-    const timeText = showTime ? formatActivityTime(item.time) : ''
+    const timeText = showTime ? formatActivityTime(item.time, mergedLocale) : ''
 
     const actionNodes = item.actions?.map((action, actionIndex) =>
       renderAction(item, action, actionIndex)

@@ -4,6 +4,11 @@
 
 import type { NotificationGroup, NotificationItem } from '../types/composite'
 
+export const EMPTY_NOTIFICATION_ITEMS: NotificationItem[] = []
+export const EMPTY_NOTIFICATION_GROUPS: NotificationGroup[] = []
+
+const DEFAULT_GROUP_TITLE = 'Default'
+
 export const sortNotificationGroups = (
   groups: NotificationGroup[],
   groupOrder?: string[]
@@ -31,29 +36,62 @@ export const sortNotificationGroups = (
   })
 }
 
+function normalizeNotificationGroups(groups: NotificationGroup[]): NotificationGroup[] {
+  return groups.map((group) => ({ ...group, items: group.items ?? [] }))
+}
+
+/**
+ * Whether the inbox should render Tabs.
+ *
+ * Only an explicit `groups` prop or a `groupBy` function opens Tabs.
+ * Passing `items` alone is a flat List.
+ */
+export function shouldUseNotificationTabs(
+  groups?: NotificationGroup[] | null,
+  groupBy?: (item: NotificationItem) => string
+): boolean {
+  return groups != null || typeof groupBy === 'function'
+}
+
+/**
+ * Resolve grouped notifications.
+ *
+ * `groups` once passed (including `[]`) is the only source — empty groups do
+ * not fall back to `items`. Without `groups` or `groupBy`, returns `[]` so
+ * the renderer can keep a flat List. Empty `groupBy` keys use
+ * `defaultGroupTitle` (locale "Default"), never a source `'default'` / CJK
+ * literal.
+ */
 export const buildNotificationGroups = (
-  items: NotificationItem[] = [],
-  groups?: NotificationGroup[],
+  items?: NotificationItem[],
+  groups?: NotificationGroup[] | null,
   groupBy?: (item: NotificationItem) => string,
-  groupOrder?: string[]
+  groupOrder?: string[],
+  defaultGroupTitle = DEFAULT_GROUP_TITLE
 ): NotificationGroup[] => {
-  if (groups && groups.length > 0) {
-    return sortNotificationGroups(groups, groupOrder)
+  if (groups != null) {
+    return sortNotificationGroups(normalizeNotificationGroups(groups), groupOrder)
   }
 
-  if (!items || items.length === 0) {
-    return []
+  if (typeof groupBy !== 'function') {
+    return EMPTY_NOTIFICATION_GROUPS
   }
 
-  const groupFn = groupBy ?? ((item: NotificationItem) => String(item.type ?? 'default'))
+  const list = items ?? EMPTY_NOTIFICATION_ITEMS
+  if (list.length === 0) {
+    return EMPTY_NOTIFICATION_GROUPS
+  }
+
   const groupMap = new Map<string, NotificationItem[]>()
 
-  items.forEach((item) => {
-    const key = groupFn(item)
-    if (!groupMap.has(key)) {
-      groupMap.set(key, [])
+  list.forEach((item) => {
+    const key = groupBy(item) || defaultGroupTitle
+    const bucket = groupMap.get(key)
+    if (bucket) {
+      bucket.push(item)
+      return
     }
-    groupMap.get(key)?.push(item)
+    groupMap.set(key, [item])
   })
 
   const mappedGroups = Array.from(groupMap.entries()).map(([key, groupItems]) => ({

@@ -258,7 +258,8 @@ export const koKR: TigerLocale = {
     placeholder: '메시지를 입력하세요',
     sendingText: '보내는 중',
     sentText: '전송됨',
-    failedText: '보내기 실패'
+    failedText: '보내기 실패',
+    messageListAriaLabel: '메시지 목록'
   },
   code: {
     copyLabel: '복사',
@@ -276,11 +277,17 @@ export const koKR: TigerLocale = {
     moreText: '더보기',
     loadMoreText: '더 불러오기',
     collapseRepliesText: '▾ 답글 접기',
-    expandRepliesText: '▸ 답글 {count}개 펼치기'
+    expandRepliesText: '▸ 답글 {count}개 펼치기',
+    listAriaLabel: '댓글 목록',
+    replySubmitText: '답글 보내기',
+    remainingRepliesText: '남은 {count}개 보기',
+    maxDepthReachedText: '최대 답글 깊이에 도달했습니다'
   },
   activityFeed: {
     emptyText: '활동이 없습니다',
-    loadingText: '로딩 중...'
+    loadingText: '로딩 중...',
+    listAriaLabel: '활동',
+    otherGroupTitle: '기타'
   },
   notificationCenter: {
     title: '알림',
@@ -291,7 +298,9 @@ export const koKR: TigerLocale = {
     readLabel: '읽음',
     markAllReadText: '모두 읽음으로 표시',
     markReadText: '읽음으로 표시',
-    markUnreadText: '읽지 않음으로 표시'
+    markUnreadText: '읽지 않음으로 표시',
+    defaultGroupTitle: '기본',
+    unreadCountText: '읽지 않음 {count}개'
   },
   select: {
     doneText: '완료',

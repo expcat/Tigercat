@@ -258,7 +258,8 @@ export const arSA: TigerLocale = {
     placeholder: 'اكتب رسالة',
     sendingText: 'جارٍ الإرسال',
     sentText: 'تم التسليم',
-    failedText: 'فشل الإرسال'
+    failedText: 'فشل الإرسال',
+    messageListAriaLabel: 'قائمة الرسائل'
   },
   code: {
     copyLabel: 'نسخ',
@@ -276,11 +277,17 @@ export const arSA: TigerLocale = {
     moreText: 'المزيد',
     loadMoreText: 'تحميل المزيد',
     collapseRepliesText: '▾ طي الردود',
-    expandRepliesText: '▸ توسيع {count} من الردود'
+    expandRepliesText: '▸ توسيع {count} من الردود',
+    listAriaLabel: 'موضوع التعليقات',
+    replySubmitText: 'إرسال الرد',
+    remainingRepliesText: 'عرض المتبقي ({count})',
+    maxDepthReachedText: 'تم بلوغ أقصى عمق للرد'
   },
   activityFeed: {
     emptyText: 'لا يوجد نشاط',
-    loadingText: 'جارٍ التحميل...'
+    loadingText: 'جارٍ التحميل...',
+    listAriaLabel: 'النشاط',
+    otherGroupTitle: 'أخرى'
   },
   notificationCenter: {
     title: 'الإشعارات',
@@ -291,7 +298,9 @@ export const arSA: TigerLocale = {
     readLabel: 'مقروء',
     markAllReadText: 'وضع علامة مقروء على الكل',
     markReadText: 'وضع علامة مقروء',
-    markUnreadText: 'وضع علامة غير مقروء'
+    markUnreadText: 'وضع علامة غير مقروء',
+    defaultGroupTitle: 'افتراضي',
+    unreadCountText: '{count} غير مقروء'
   },
   select: {
     doneText: 'إنهاء',

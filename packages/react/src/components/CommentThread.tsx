@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react'
 import {
   classNames,
-  buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  resolveCommentNodes,
   getCommentThreadLabels,
   mergeTigerLocale,
   nextCommentLikeState,
@@ -105,7 +105,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   )
 
   const resolvedNodes = useMemo(() => {
-    const tree = nodes && nodes.length > 0 ? nodes : buildCommentTree(items ?? [])
+    const tree = resolveCommentNodes(nodes, items)
     return clipCommentTreeDepth(tree, maxDepth)
   }, [nodes, items, maxDepth])
 
@@ -327,9 +327,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   {tag.label}
                 </Tag>
               ))}
-              {node.time ? (
+              {formatCommentTime(node.time, mergedLocale) ? (
                 <Text tag="span" size="xs" color="muted" className={commentThreadTimeClasses}>
-                  {formatCommentTime(node.time)}
+                  {formatCommentTime(node.time, mergedLocale)}
                 </Text>
               ) : null}
             </div>

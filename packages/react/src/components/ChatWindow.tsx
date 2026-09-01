@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
+  EMPTY_CHAT_MESSAGES,
   getChatMessageStatusInfo,
   buildChatMessageStatusInfo,
   getChatStatusBarClasses,
@@ -31,7 +32,7 @@ export interface ChatWindowProps
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({
-  messages = [],
+  messages = EMPTY_CHAT_MESSAGES,
   value,
   defaultValue = '',
   placeholder,
@@ -134,7 +135,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       const statusInfo = message.status
         ? getChatMessageStatusInfo(message.status, statusMap)
         : undefined
-      const timeText = showTime ? formatChatTime(message.time) : ''
+      const timeText = showTime ? formatChatTime(message.time, mergedLocale) : ''
 
       return (
         <div
@@ -185,7 +186,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       )
     },
-    [renderMessage, showAvatar, showName, showTime, statusMap]
+    [mergedLocale, renderMessage, showAvatar, showName, showTime, statusMap]
   )
 
   const messageListRef = useRef<HTMLDivElement | null>(null)

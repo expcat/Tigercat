@@ -147,7 +147,13 @@ export const ActivityFeed = defineComponent({
     const labels = computed(() => getActivityFeedLabels(mergedLocale.value, props.labels))
 
     const resolvedGroups = computed(() =>
-      buildActivityGroups(props.items, props.groups, props.groupBy, props.groupOrder)
+      buildActivityGroups(
+        props.items,
+        props.groups,
+        props.groupBy,
+        props.groupOrder,
+        labels.value.otherGroupTitle
+      )
     )
 
     const wrapperClasses = computed(() =>
@@ -176,7 +182,7 @@ export const ActivityFeed = defineComponent({
           ? String(item.content)
           : '')
       const descriptionText = item.description
-      const timeText = props.showTime ? formatActivityTime(item.time) : ''
+      const timeText = props.showTime ? formatActivityTime(item.time, mergedLocale.value) : ''
       const actionNodes = item.actions?.map((action, actionIndex) =>
         renderAction(item, action, actionIndex)
       )

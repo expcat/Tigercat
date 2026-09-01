@@ -5,6 +5,7 @@ import {
   mergeStyleValues,
   buildNotificationGroups,
   formatActivityTime,
+  shouldUseNotificationTabs,
   getNotificationCenterLabels,
   mergeTigerLocale,
   resolveLocaleText,
@@ -175,7 +176,13 @@ export const NotificationCenter = defineComponent({
     const labels = computed(() => getNotificationCenterLabels(mergedLocale.value, props.labels))
 
     const resolvedGroups = computed(() =>
-      buildNotificationGroups(props.items, props.groups, props.groupBy, props.groupOrder)
+      buildNotificationGroups(
+        props.items,
+        props.groups,
+        props.groupBy,
+        props.groupOrder,
+        labels.value.defaultGroupTitle
+      )
     )
 
     const internalActiveGroupKey = ref<string | number | undefined>(props.defaultActiveGroupKey)
@@ -371,7 +378,7 @@ export const NotificationCenter = defineComponent({
 
     const renderListItem = (item: NotificationItem, _index: number) => {
       const isRead = Boolean(item.read)
-      const timeText = item.time ? formatActivityTime(item.time) : ''
+      const timeText = formatActivityTime(item.time, mergedLocale.value)
 
       return h(
         'div',
@@ -596,8 +603,10 @@ export const NotificationCenter = defineComponent({
               class: notificationCenterLoadingClasses
             })
           ])
-        : resolvedGroups.value.length > 0
-          ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
+        : shouldUseNotificationTabs(props.groups, props.groupBy)
+          ? resolvedGroups.value.length > 0
+            ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
+            : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [renderList([])])
           : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [
               renderList(filteredFlatItems.value)
             ])

@@ -32,6 +32,8 @@ export * from './chat-window-utils'
 
 // ActivityFeed utilities
 export {
+  EMPTY_ACTIVITY_ITEMS,
+  EMPTY_ACTIVITY_GROUPS,
   activityItemClasses,
   activityItemLayoutClasses,
   activityItemBodyClasses,
@@ -39,7 +41,6 @@ export {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
-  formatActivityTime,
   sortActivityGroups,
   buildActivityGroups,
   toActivityTimelineItems
@@ -47,11 +48,19 @@ export {
 export type { ActivityTimelineItem } from './activity-feed-utils'
 
 // NotificationCenter utilities
-export { sortNotificationGroups, buildNotificationGroups } from './notification-center-utils'
+export {
+  EMPTY_NOTIFICATION_ITEMS,
+  EMPTY_NOTIFICATION_GROUPS,
+  sortNotificationGroups,
+  buildNotificationGroups,
+  shouldUseNotificationTabs
+} from './notification-center-utils'
 
 // CommentThread utilities
 export {
+  EMPTY_COMMENT_NODES,
   buildCommentTree,
+  resolveCommentNodes,
   clipCommentTreeDepth,
   resolveCommentLikeState,
   nextCommentLikeState,

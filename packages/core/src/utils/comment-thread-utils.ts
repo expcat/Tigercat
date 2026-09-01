@@ -1,5 +1,7 @@
 import type { CommentNode } from '../types/composite'
 
+export const EMPTY_COMMENT_NODES: CommentNode[] = []
+
 export interface CommentLikeState {
   liked: boolean
   likes: number
@@ -37,6 +39,19 @@ export const writeCommentLikeOverlay = (
   return next
 }
 
+/**
+ * `nodes` once passed (including `[]`) is the tree source. Flat `items` are
+ * used only when `nodes == null`. Flattened items drop any nested `children`
+ * and rebuild from `parentId`.
+ */
+export const resolveCommentNodes = (
+  nodes?: CommentNode[] | null,
+  items?: CommentNode[]
+): CommentNode[] => {
+  if (nodes != null) return nodes
+  return buildCommentTree(items ?? EMPTY_COMMENT_NODES)
+}
+
 export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
   if (!items || items.length === 0) return []
 
@@ -48,7 +63,7 @@ export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
       ...item,
       children: []
     })
-    order.push(item.id)
+    if (!order.includes(item.id)) order.push(item.id)
   })
 
   const roots: CommentNode[] = []
@@ -57,13 +72,13 @@ export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
     const node = nodeMap.get(id)
     if (!node) return
 
-    if (node.parentId === undefined || node.parentId === null) {
+    if (node.parentId === undefined || node.parentId === null || node.parentId === node.id) {
       roots.push(node)
       return
     }
 
     const parent = nodeMap.get(node.parentId)
-    if (!parent) {
+    if (!parent || parent === node) {
       roots.push(node)
       return
     }

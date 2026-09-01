@@ -258,7 +258,8 @@ export const deDE: TigerLocale = {
     placeholder: 'Nachricht eingeben',
     sendingText: 'Senden...',
     sentText: 'Zugestellt',
-    failedText: 'Senden fehlgeschlagen'
+    failedText: 'Senden fehlgeschlagen',
+    messageListAriaLabel: 'Nachrichtenliste'
   },
   code: {
     copyLabel: 'Kopieren',
@@ -276,11 +277,17 @@ export const deDE: TigerLocale = {
     moreText: 'Mehr',
     loadMoreText: 'Mehr laden',
     collapseRepliesText: '▾ Antworten ausblenden',
-    expandRepliesText: '▸ {count} Antworten anzeigen'
+    expandRepliesText: '▸ {count} Antworten anzeigen',
+    listAriaLabel: 'Kommentarverlauf',
+    replySubmitText: 'Antwort senden',
+    remainingRepliesText: '{count} weitere anzeigen',
+    maxDepthReachedText: 'Maximale Antworttiefe erreicht'
   },
   activityFeed: {
     emptyText: 'Keine Aktivität',
-    loadingText: 'Wird geladen...'
+    loadingText: 'Wird geladen...',
+    listAriaLabel: 'Aktivität',
+    otherGroupTitle: 'Sonstiges'
   },
   notificationCenter: {
     title: 'Benachrichtigungen',
@@ -291,7 +298,9 @@ export const deDE: TigerLocale = {
     readLabel: 'Gelesen',
     markAllReadText: 'Alle als gelesen markieren',
     markReadText: 'Als gelesen markieren',
-    markUnreadText: 'Als ungelesen markieren'
+    markUnreadText: 'Als ungelesen markieren',
+    defaultGroupTitle: 'Standard',
+    unreadCountText: '{count} ungelesen'
   },
   select: {
     doneText: 'Fertigstellen',

@@ -277,7 +277,7 @@ export const ChatWindow = defineComponent({
       const statusInfo = message.status
         ? getChatMessageStatusInfo(message.status, statusMap.value)
         : undefined
-      const timeText = props.showTime ? formatChatTime(message.time) : ''
+      const timeText = props.showTime ? formatChatTime(message.time, mergedLocale.value) : ''
       const customContent = slots.message?.({ message, index })
 
       return h(

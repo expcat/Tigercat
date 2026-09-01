@@ -350,6 +350,8 @@ export interface TigerLocaleChatWindow {
   sendingText?: string
   sentText?: string
   failedText?: string
+  /** Accessible name for the message log */
+  messageListAriaLabel?: string
 }
 
 export interface TigerLocaleCode {
@@ -369,13 +371,25 @@ export interface TigerLocaleCommentThread {
   moreText?: string
   loadMoreText?: string
   collapseRepliesText?: string
-  /** Template: supports {count} */
+  /** Template: supports {count} and English {plural} */
   expandRepliesText?: string
+  /** Accessible name for the comment feed */
+  listAriaLabel?: string
+  /** Submit control in the reply composer. Distinct from `replyText`. */
+  replySubmitText?: string
+  /** Local remaining replies. Template: supports {count} */
+  remainingRepliesText?: string
+  /** Shown when `maxDepth` has clipped nested replies */
+  maxDepthReachedText?: string
 }
 
 export interface TigerLocaleActivityFeed {
   emptyText?: string
   loadingText?: string
+  /** Accessible name for the activity feed */
+  listAriaLabel?: string
+  /** Fallback group title when `groupBy` returns an empty key */
+  otherGroupTitle?: string
 }
 
 export interface TigerLocaleNotificationCenter {
@@ -388,6 +402,10 @@ export interface TigerLocaleNotificationCenter {
   markAllReadText?: string
   markReadText?: string
   markUnreadText?: string
+  /** Fallback tab title when `groupBy` returns an empty key */
+  defaultGroupTitle?: string
+  /** Unread badge accessible name. Template: supports {count} */
+  unreadCountText?: string
 }
 
 export interface TigerLocaleSelect {

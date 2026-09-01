@@ -258,7 +258,8 @@ export const viVN: TigerLocale = {
     placeholder: 'Nhập tin nhắn',
     sendingText: 'Đang gửi',
     sentText: 'Đã gửi',
-    failedText: 'Gửi thất bại'
+    failedText: 'Gửi thất bại',
+    messageListAriaLabel: 'Danh sách tin nhắn'
   },
   code: {
     copyLabel: 'Sao chép',
@@ -276,11 +277,17 @@ export const viVN: TigerLocale = {
     moreText: 'Thêm',
     loadMoreText: 'Tải thêm',
     collapseRepliesText: '▾ Thu gọn phản hồi',
-    expandRepliesText: '▸ Mở rộng {count} phản hồi'
+    expandRepliesText: '▸ Mở rộng {count} phản hồi',
+    listAriaLabel: 'Danh sách bình luận',
+    replySubmitText: 'Gửi trả lời',
+    remainingRepliesText: 'Hiện {count} còn lại',
+    maxDepthReachedText: 'Đã đến độ sâu trả lời tối đa'
   },
   activityFeed: {
     emptyText: 'Không có hoạt động',
-    loadingText: 'Đang tải...'
+    loadingText: 'Đang tải...',
+    listAriaLabel: 'Hoạt động',
+    otherGroupTitle: 'Khác'
   },
   notificationCenter: {
     title: 'Thông báo',
@@ -291,7 +298,9 @@ export const viVN: TigerLocale = {
     readLabel: 'Đã đọc',
     markAllReadText: 'Đánh dấu tất cả là đã đọc',
     markReadText: 'Đánh dấu đã đọc',
-    markUnreadText: 'Đánh dấu chưa đọc'
+    markUnreadText: 'Đánh dấu chưa đọc',
+    defaultGroupTitle: 'Mặc định',
+    unreadCountText: '{count} chưa đọc'
   },
   select: {
     doneText: 'Hoàn thành',

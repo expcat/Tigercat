@@ -261,7 +261,8 @@ export const zhTW: TigerLocale = {
     placeholder: '請輸入訊息',
     sendingText: '傳送中',
     sentText: '已送達',
-    failedText: '傳送失敗'
+    failedText: '傳送失敗',
+    messageListAriaLabel: '訊息列表'
   },
   code: {
     copyLabel: '複製',
@@ -279,11 +280,17 @@ export const zhTW: TigerLocale = {
     moreText: '更多',
     loadMoreText: '載入更多',
     collapseRepliesText: '▾ 收合回覆',
-    expandRepliesText: '▸ 展開 {count} 則回覆'
+    expandRepliesText: '▸ 展開 {count} 則回覆',
+    listAriaLabel: '評論列表',
+    replySubmitText: '傳送回覆',
+    remainingRepliesText: '顯示剩餘 {count} 則',
+    maxDepthReachedText: '已到最大回覆層'
   },
   activityFeed: {
     emptyText: '暫無動態',
-    loadingText: '載入中...'
+    loadingText: '載入中...',
+    listAriaLabel: '動態',
+    otherGroupTitle: '其他'
   },
   notificationCenter: {
     title: '通知中心',
@@ -294,7 +301,9 @@ export const zhTW: TigerLocale = {
     readLabel: '已讀',
     markAllReadText: '全部標記已讀',
     markReadText: '標記已讀',
-    markUnreadText: '標記未讀'
+    markUnreadText: '標記未讀',
+    defaultGroupTitle: '預設',
+    unreadCountText: '{count} 則未讀'
   },
   select: {
     doneText: '完成',

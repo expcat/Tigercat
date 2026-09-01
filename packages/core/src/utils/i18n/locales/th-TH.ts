@@ -258,7 +258,8 @@ export const thTH: TigerLocale = {
     placeholder: 'พิมพ์ข้อความ',
     sendingText: 'กำลังส่ง',
     sentText: 'ส่งแล้ว',
-    failedText: 'ส่งไม่สำเร็จ'
+    failedText: 'ส่งไม่สำเร็จ',
+    messageListAriaLabel: 'รายการข้อความ'
   },
   code: {
     copyLabel: 'คัดลอก',
@@ -276,11 +277,17 @@ export const thTH: TigerLocale = {
     moreText: 'เพิ่มเติม',
     loadMoreText: 'โหลดเพิ่ม',
     collapseRepliesText: '▾ ย่อการตอบกลับ',
-    expandRepliesText: '▸ ขยายการตอบกลับ {count} รายการ'
+    expandRepliesText: '▸ ขยายการตอบกลับ {count} รายการ',
+    listAriaLabel: 'รายการความคิดเห็น',
+    replySubmitText: 'ส่งการตอบกลับ',
+    remainingRepliesText: 'แสดงที่เหลือ {count} รายการ',
+    maxDepthReachedText: 'ถึงความลึกสูงสุดของการตอบกลับแล้ว'
   },
   activityFeed: {
     emptyText: 'ไม่มีกิจกรรม',
-    loadingText: 'กำลังโหลด...'
+    loadingText: 'กำลังโหลด...',
+    listAriaLabel: 'กิจกรรม',
+    otherGroupTitle: 'อื่นๆ'
   },
   notificationCenter: {
     title: 'การแจ้งเตือน',
@@ -291,7 +298,9 @@ export const thTH: TigerLocale = {
     readLabel: 'อ่านแล้ว',
     markAllReadText: 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด',
     markReadText: 'ทำเครื่องหมายว่าอ่านแล้ว',
-    markUnreadText: 'ทำเครื่องหมายว่ายังไม่อ่าน'
+    markUnreadText: 'ทำเครื่องหมายว่ายังไม่อ่าน',
+    defaultGroupTitle: 'ค่าเริ่มต้น',
+    unreadCountText: 'ยังไม่อ่าน {count} รายการ'
   },
   select: {
     doneText: 'เสร็จสิ้น',

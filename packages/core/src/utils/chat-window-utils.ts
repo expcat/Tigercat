@@ -2,7 +2,9 @@
  * ChatWindow component utilities
  */
 
-import type { ChatMessageStatus } from '../types/composite'
+import type { ChatMessage, ChatMessageStatus } from '../types/composite'
+
+export const EMPTY_CHAT_MESSAGES: ChatMessage[] = []
 import type { BadgeVariant } from '../types/badge'
 import type { TigerLocaleChatWindow } from '../types/locale'
 import { enUS } from './i18n/locales/en-US'

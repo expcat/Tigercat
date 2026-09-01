@@ -258,7 +258,8 @@ export const jaJP: TigerLocale = {
     placeholder: 'メッセージを入力',
     sendingText: '送信中',
     sentText: '配信済み',
-    failedText: '送信に失敗しました'
+    failedText: '送信に失敗しました',
+    messageListAriaLabel: 'メッセージ一覧'
   },
   code: {
     copyLabel: 'コピー',
@@ -276,11 +277,17 @@ export const jaJP: TigerLocale = {
     moreText: 'その他',
     loadMoreText: 'もっと読み込む',
     collapseRepliesText: '▾ 返信を折りたたむ',
-    expandRepliesText: '▸ {count} 件の返信を展開'
+    expandRepliesText: '▸ {count} 件の返信を展開',
+    listAriaLabel: 'コメント一覧',
+    replySubmitText: '返信を送信',
+    remainingRepliesText: '残り {count} 件を表示',
+    maxDepthReachedText: '返信の最大階層です'
   },
   activityFeed: {
     emptyText: 'アクティビティはありません',
-    loadingText: '読み込み中...'
+    loadingText: '読み込み中...',
+    listAriaLabel: 'アクティビティ',
+    otherGroupTitle: 'その他'
   },
   notificationCenter: {
     title: '通知',
@@ -291,7 +298,9 @@ export const jaJP: TigerLocale = {
     readLabel: '既読',
     markAllReadText: 'すべて既読にする',
     markReadText: '既読にする',
-    markUnreadText: '未読にする'
+    markUnreadText: '未読にする',
+    defaultGroupTitle: 'デフォルト',
+    unreadCountText: '未読 {count} 件'
   },
   select: {
     doneText: '完了',

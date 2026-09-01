@@ -258,7 +258,8 @@ export const ptBR: TigerLocale = {
     placeholder: 'Digite uma mensagem',
     sendingText: 'Enviando',
     sentText: 'Entregue',
-    failedText: 'Falha ao enviar'
+    failedText: 'Falha ao enviar',
+    messageListAriaLabel: 'Lista de mensagens'
   },
   code: {
     copyLabel: 'Copiar',
@@ -276,11 +277,17 @@ export const ptBR: TigerLocale = {
     moreText: 'Mais',
     loadMoreText: 'Carregar mais',
     collapseRepliesText: '▾ Recolher respostas',
-    expandRepliesText: '▸ Expandir {count} respostas'
+    expandRepliesText: '▸ Expandir {count} respostas',
+    listAriaLabel: 'Lista de comentários',
+    replySubmitText: 'Enviar resposta',
+    remainingRepliesText: 'Mostrar {count} restantes',
+    maxDepthReachedText: 'Profundidade máxima de resposta atingida'
   },
   activityFeed: {
     emptyText: 'Nenhuma atividade',
-    loadingText: 'Carregando...'
+    loadingText: 'Carregando...',
+    listAriaLabel: 'Atividade',
+    otherGroupTitle: 'Outros'
   },
   notificationCenter: {
     title: 'Notificações',
@@ -291,7 +298,9 @@ export const ptBR: TigerLocale = {
     readLabel: 'Lidas',
     markAllReadText: 'Marcar todas como lidas',
     markReadText: 'Marcar como lida',
-    markUnreadText: 'Marcar como não lida'
+    markUnreadText: 'Marcar como não lida',
+    defaultGroupTitle: 'Padrão',
+    unreadCountText: '{count} não lidas'
   },
   select: {
     doneText: 'Concluir',

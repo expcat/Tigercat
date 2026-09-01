@@ -258,7 +258,8 @@ export const idID: TigerLocale = {
     placeholder: 'Tulis pesan',
     sendingText: 'Mengirim',
     sentText: 'Terkirim',
-    failedText: 'Gagal mengirim'
+    failedText: 'Gagal mengirim',
+    messageListAriaLabel: 'Daftar pesan'
   },
   code: {
     copyLabel: 'Salin',
@@ -276,11 +277,17 @@ export const idID: TigerLocale = {
     moreText: 'Lainnya',
     loadMoreText: 'Muat lebih banyak',
     collapseRepliesText: '▾ Ciutkan balasan',
-    expandRepliesText: '▸ Perluas {count} balasan'
+    expandRepliesText: '▸ Perluas {count} balasan',
+    listAriaLabel: 'Utas komentar',
+    replySubmitText: 'Kirim balasan',
+    remainingRepliesText: 'Tampilkan sisa {count}',
+    maxDepthReachedText: 'Kedalaman balasan maksimum tercapai'
   },
   activityFeed: {
     emptyText: 'Tidak ada aktivitas',
-    loadingText: 'Memuat...'
+    loadingText: 'Memuat...',
+    listAriaLabel: 'Aktivitas',
+    otherGroupTitle: 'Lainnya'
   },
   notificationCenter: {
     title: 'Notifikasi',
@@ -291,7 +298,9 @@ export const idID: TigerLocale = {
     readLabel: 'Sudah dibaca',
     markAllReadText: 'Tandai semua sudah dibaca',
     markReadText: 'Tandai sudah dibaca',
-    markUnreadText: 'Tandai belum dibaca'
+    markUnreadText: 'Tandai belum dibaca',
+    defaultGroupTitle: 'Bawaan',
+    unreadCountText: '{count} belum dibaca'
   },
   select: {
     doneText: 'Selesai',

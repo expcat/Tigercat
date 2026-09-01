@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   buildNotificationGroups,
+  shouldUseNotificationTabs,
   sortNotificationGroups,
   type NotificationGroup,
   type NotificationItem
@@ -56,21 +57,51 @@ describe('notification-center-utils', () => {
     expect(result.map((group) => group.key)).toEqual(['alerts', 'updates', 'system'])
   })
 
+  it('does not fall back to items when groups is an empty array', () => {
+    expect(buildNotificationGroups([{ id: 'n1', title: 'Still here' }], [])).toEqual([])
+  })
+
+  it('treats a group with missing items as an empty list', () => {
+    const result = buildNotificationGroups(undefined, [{ key: 'alerts', title: 'Alerts' } as never])
+    expect(result[0]?.items).toEqual([])
+  })
+
   it('returns an empty array for empty item input', () => {
     expect(buildNotificationGroups()).toEqual([])
     expect(buildNotificationGroups([])).toEqual([])
   })
 
-  it('groups items by notification type by default', () => {
+  it('opens Tabs only when groups or groupBy is passed', () => {
+    expect(shouldUseNotificationTabs(undefined, undefined)).toBe(false)
+    expect(shouldUseNotificationTabs([], undefined)).toBe(true)
+    expect(shouldUseNotificationTabs(undefined, (item) => String(item.type))).toBe(true)
+  })
+
+  it('does not tab-group items unless groupBy or groups is passed', () => {
     const items: NotificationItem[] = [
       { id: 'n1', title: 'Info', type: 'info' },
       { id: 'n2', title: 'Warning', type: 'warning' },
       { id: 'n3', title: 'Default' }
     ]
 
-    const result = buildNotificationGroups(items, undefined, undefined, ['warning', 'default'])
+    expect(buildNotificationGroups(items)).toEqual([])
+  })
 
-    expect(result.map((group) => group.key)).toEqual(['warning', 'default', 'info'])
+  it('groups items with an explicit groupBy function', () => {
+    const items: NotificationItem[] = [
+      { id: 'n1', title: 'Info', type: 'info' },
+      { id: 'n2', title: 'Warning', type: 'warning' },
+      { id: 'n3', title: 'Default' }
+    ]
+
+    const result = buildNotificationGroups(
+      items,
+      undefined,
+      (item) => String(item.type ?? 'Default'),
+      ['warning', 'Default']
+    )
+
+    expect(result.map((group) => group.key)).toEqual(['warning', 'Default', 'info'])
     expect(result.find((group) => group.key === 'info')?.items).toHaveLength(1)
   })
 

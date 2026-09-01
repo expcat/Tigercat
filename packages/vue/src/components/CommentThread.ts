@@ -3,9 +3,9 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
-  buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  resolveCommentNodes,
   getCommentThreadLabels,
   mergeTigerLocale,
   nextCommentLikeState,
@@ -183,8 +183,7 @@ export const CommentThread = defineComponent({
     const expandedSet = computed(() => new Set<string | number>(mergedExpandedKeys.value))
 
     const resolvedNodes = computed(() => {
-      const tree =
-        props.nodes && props.nodes.length > 0 ? props.nodes : buildCommentTree(props.items ?? [])
+      const tree = resolveCommentNodes(props.nodes, props.items)
       return clipCommentTreeDepth(tree, props.maxDepth)
     })
 
@@ -487,7 +486,7 @@ export const CommentThread = defineComponent({
                     { default: () => tag.label }
                   )
                 ),
-                node.time
+                formatCommentTime(node.time, mergedLocale.value)
                   ? h(
                       Text,
                       {
@@ -496,7 +495,7 @@ export const CommentThread = defineComponent({
                         color: 'muted',
                         class: commentThreadTimeClasses
                       },
-                      { default: () => formatCommentTime(node.time) }
+                      { default: () => formatCommentTime(node.time, mergedLocale.value) }
                     )
                   : null
               ]),

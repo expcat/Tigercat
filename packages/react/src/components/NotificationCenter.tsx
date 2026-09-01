@@ -1,8 +1,10 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import {
   classNames,
+  EMPTY_NOTIFICATION_ITEMS,
   buildNotificationGroups,
   formatActivityTime,
+  shouldUseNotificationTabs,
   getNotificationCenterLabels,
   mergeTigerLocale,
   resolveLocaleText,
@@ -62,7 +64,7 @@ const filterItems = (items: NotificationItem[], filter: NotificationReadFilter) 
 }
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
-  items = [],
+  items = EMPTY_NOTIFICATION_ITEMS,
   groups,
   groupBy,
   groupOrder,
@@ -111,8 +113,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const resolvedMarkUnreadText = resolveLocaleText(labels.markUnreadText, markUnreadText)
 
   const resolvedGroups = useMemo(
-    () => buildNotificationGroups(items, groups, groupBy, groupOrder),
-    [items, groups, groupBy, groupOrder]
+    () => buildNotificationGroups(items, groups, groupBy, groupOrder, labels.defaultGroupTitle),
+    [items, groups, groupBy, groupOrder, labels.defaultGroupTitle]
   )
 
   const firstGroupKey = useMemo(() => {
@@ -259,7 +261,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const renderItem = (item: NotificationItem, _index: number) => {
     const isRead = Boolean(item.read)
-    const timeText = item.time ? formatActivityTime(item.time) : ''
+    const timeText = formatActivityTime(item.time, mergedLocale)
 
     return (
       <div
@@ -357,20 +359,24 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     <div className="flex items-center justify-center py-16">
       <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
     </div>
-  ) : resolvedGroups.length > 0 ? (
-    <div className="-mx-4 -mb-4">
-      <Tabs
-        type="line"
-        size="small"
-        activeKey={currentGroupKey}
-        onActiveKeyChange={handleGroupChange}>
-        {groupTabData.map((tab) => (
-          <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
-            <div className="max-h-[380px] overflow-y-auto">{renderList(tab.filteredItems)}</div>
-          </TabPane>
-        ))}
-      </Tabs>
-    </div>
+  ) : shouldUseNotificationTabs(groups, groupBy) ? (
+    resolvedGroups.length > 0 ? (
+      <div className="-mx-4 -mb-4">
+        <Tabs
+          type="line"
+          size="small"
+          activeKey={currentGroupKey}
+          onActiveKeyChange={handleGroupChange}>
+          {groupTabData.map((tab) => (
+            <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
+              <div className="max-h-[380px] overflow-y-auto">{renderList(tab.filteredItems)}</div>
+            </TabPane>
+          ))}
+        </Tabs>
+      </div>
+    ) : (
+      <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList([])}</div>
+    )
   ) : (
     <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList(filteredFlatItems)}</div>
   )

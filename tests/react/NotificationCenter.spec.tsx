@@ -20,7 +20,7 @@ describe('NotificationCenter (React)', () => {
     ]
 
     const user = userEvent.setup()
-    render(<NotificationCenter items={items} />)
+    render(<NotificationCenter items={items} groupBy={(item) => String(item.type ?? '')} />)
 
     expect(screen.getByRole('tab', { name: /系统/ })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: /评论/ })).toBeInTheDocument()
@@ -53,7 +53,13 @@ describe('NotificationCenter (React)', () => {
     const items: NotificationItem[] = [{ id: 1, title: '系统通知', type: '系统', read: false }]
 
     const user = userEvent.setup()
-    render(<NotificationCenter items={items} onMarkAllRead={onMarkAllRead} />)
+    render(
+      <NotificationCenter
+        items={items}
+        groupBy={(item) => String(item.type ?? '')}
+        onMarkAllRead={onMarkAllRead}
+      />
+    )
 
     await user.click(screen.getByRole('button', { name: 'Mark all as read' }))
 
@@ -134,6 +140,18 @@ describe('NotificationCenter (React)', () => {
     expect(screen.getByRole('button', { name: 'Read' })).toBeInTheDocument()
   })
 
+  it('keeps items-only as a flat list without tabs', () => {
+    const items: NotificationItem[] = [
+      { id: 1, title: '系统通知', type: '系统', read: false },
+      { id: 2, title: '评论通知', type: '评论', read: false }
+    ]
+
+    render(<NotificationCenter items={items} />)
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
+    expect(screen.getByText('系统通知')).toBeInTheDocument()
+    expect(screen.getByText('评论通知')).toBeInTheDocument()
+  })
+
   it('renders multiple notification types as tabs', () => {
     const items: NotificationItem[] = [
       { id: 1, title: '系统通知', type: '系统', read: false },
@@ -141,7 +159,7 @@ describe('NotificationCenter (React)', () => {
       { id: 3, title: '点赞通知', type: '点赞', read: true }
     ]
 
-    render(<NotificationCenter items={items} />)
+    render(<NotificationCenter items={items} groupBy={(item) => String(item.type ?? '')} />)
     expect(screen.getByRole('tab', { name: /系统/ })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: /评论/ })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: /点赞/ })).toBeInTheDocument()
