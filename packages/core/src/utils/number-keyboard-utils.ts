@@ -1,6 +1,7 @@
 import type {
   NumberKeyboardAction,
   NumberKeyboardKey,
+  NumberKeyboardKeyType,
   NumberKeyboardMode
 } from '../types/number-keyboard'
 import { classNames } from './class-names'
