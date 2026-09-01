@@ -1,4 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useEffect,
+  useMemo,
+  useRef
+} from 'react'
 import {
   classNames,
   EMPTY_CHAT_MESSAGES,
@@ -9,8 +16,22 @@ import {
   getChatWindowLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  canSendChatMessage,
+  shouldSendChatOnEnter,
+  isChatScrollerNearBottom,
+  planChatScroll,
+  didChatPrepend,
+  getChatItemKey,
+  getChatMessageRowClasses,
+  getChatBubbleClasses,
+  chatWindowRootClasses,
+  chatMessageListClasses,
+  chatComposerClasses,
+  CHAT_VIRTUAL_ESTIMATED_ITEM_HEIGHT,
   type ChatMessage,
-  type ChatWindowProps as CoreChatWindowProps
+  type ChatWindowHandle,
+  type ChatWindowProps as CoreChatWindowProps,
+  type VirtualListHandle
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
@@ -26,46 +47,54 @@ export interface ChatWindowProps
     CoreChatWindowProps,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   /**
-   * Custom render for message bubble
+   * Custom render for the bubble body (not the whole row).
    */
+  renderBubble?: (message: ChatMessage, index: number) => React.ReactNode
+  /** @deprecated Use `renderBubble`. Replaces only the bubble body. */
   renderMessage?: (message: ChatMessage, index: number) => React.ReactNode
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({
-  messages = EMPTY_CHAT_MESSAGES,
-  value,
-  defaultValue = '',
-  placeholder,
-  disabled = false,
-  maxLength,
-  emptyText,
-  sendText,
-  locale,
-  labels: labelsOverride,
-  messageListAriaLabel,
-  inputAriaLabel,
-  sendAriaLabel,
-  statusText,
-  statusVariant = 'info',
-  showAvatar = true,
-  showName = true,
-  showTime = false,
-  inputType = 'textarea',
-  inputRows = 3,
-  sendOnEnter = true,
-  allowShiftEnter = true,
-  allowEmpty = false,
-  clearOnSend = true,
-  virtual = false,
-  virtualItemHeight = 88,
-  virtualHeight = 400,
-  autoScrollToBottom = true,
-  onChange,
-  onSend,
-  renderMessage,
-  className,
-  ...props
-}) => {
+export type { ChatWindowHandle }
+
+export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function ChatWindow(
+  {
+    messages = EMPTY_CHAT_MESSAGES,
+    value,
+    defaultValue = '',
+    placeholder,
+    disabled = false,
+    maxLength,
+    emptyText,
+    sendText,
+    locale,
+    labels: labelsOverride,
+    messageListAriaLabel,
+    inputAriaLabel,
+    sendAriaLabel,
+    statusText,
+    statusVariant = 'info',
+    showAvatar = true,
+    showName = true,
+    showTime = false,
+    inputType = 'textarea',
+    inputRows = 3,
+    sendOnEnter = true,
+    allowShiftEnter = true,
+    allowEmpty = false,
+    clearOnSend = true,
+    virtual = false,
+    virtualItemHeight = CHAT_VIRTUAL_ESTIMATED_ITEM_HEIGHT,
+    virtualHeight = 400,
+    autoScrollToBottom = true,
+    onChange,
+    onSend,
+    renderBubble,
+    renderMessage,
+    className,
+    ...props
+  },
+  ref
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -79,55 +108,105 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const resolvedPlaceholder = resolveLocaleText(labels.placeholder, placeholder)
   const resolvedEmptyText = resolveLocaleText(labels.emptyText, emptyText)
   const resolvedSendText = resolveLocaleText(labels.sendText, sendText)
+  const listLabel = messageListAriaLabel ?? labels.messageListAriaLabel
 
   const [inputValue, setInputValue] = useControlledState({
     value,
     defaultValue,
     onChange
   })
+  const lastSentRef = useRef<string | null>(null)
+  const [, setSendTick] = React.useState(0)
+  const stickToBottomRef = useRef(true)
+  const messageListRef = useRef<HTMLDivElement | null>(null)
+  const virtualListRef = useRef<VirtualListHandle | null>(null)
+  const previousScrollHeightRef = useRef(0)
+  const previousFirstIdRef = useRef<string | number | undefined>(messages[0]?.id)
+  const previousLengthRef = useRef(messages.length)
 
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden transition-all duration-300',
-        className
-      ),
-    [className]
-  )
+  const hasSendHandler = typeof onSend === 'function'
+  const canSend = canSendChatMessage({
+    disabled,
+    allowEmpty,
+    value: inputValue,
+    sending: false,
+    hasSendHandler,
+    lastSent: lastSentRef.current
+  })
 
-  const canSend = useMemo(() => {
-    if (disabled) return false
-    if (allowEmpty) return true
-    const raw = String(inputValue ?? '')
-    return raw.trim().length > 0
-  }, [allowEmpty, disabled, inputValue])
+  const wrapperClasses = useMemo(() => classNames(chatWindowRootClasses, className), [className])
+
+  const resolveScroller = useCallback((): HTMLElement | null => {
+    if (virtual) return virtualListRef.current?.getScrollElement() ?? null
+    return messageListRef.current
+  }, [virtual])
+
+  const syncStickToBottom = useCallback(() => {
+    const scroller = resolveScroller()
+    if (!scroller) return
+    stickToBottomRef.current = isChatScrollerNearBottom(scroller)
+  }, [resolveScroller])
+
+  const scrollToBottom = useCallback(() => {
+    if (!autoScrollToBottom) return
+    requestAnimationFrame(() => {
+      const scroller = resolveScroller()
+      if (!scroller) return
+      scroller.scrollTop = scroller.scrollHeight
+      stickToBottomRef.current = true
+      previousScrollHeightRef.current = scroller.scrollHeight
+    })
+  }, [autoScrollToBottom, resolveScroller])
+
+  useImperativeHandle(ref, () => ({ scrollToBottom }), [scrollToBottom])
 
   const handleValueChange = useCallback(
     (nextValue: string) => {
+      if (lastSentRef.current != null && nextValue !== lastSentRef.current) {
+        lastSentRef.current = null
+      }
       setInputValue(nextValue)
     },
     [setInputValue]
   )
 
   const handleSend = useCallback(() => {
-    if (!canSend) return
-    const payload = String(inputValue ?? '')
-    onSend?.(payload)
-    if (clearOnSend) {
-      setInputValue('')
+    if (
+      !canSendChatMessage({
+        disabled,
+        allowEmpty,
+        value: inputValue,
+        hasSendHandler,
+        lastSent: lastSentRef.current
+      })
+    ) {
+      return
     }
-  }, [canSend, clearOnSend, inputValue, onSend, setInputValue])
+    const payload = String(inputValue ?? '')
+    lastSentRef.current = payload
+    setSendTick((tick) => tick + 1)
+    onSend?.(payload)
+    if (clearOnSend) setInputValue('')
+  }, [allowEmpty, clearOnSend, disabled, hasSendHandler, inputValue, onSend, setInputValue])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      if (!sendOnEnter) return
-      if (event.key !== 'Enter') return
-      if (inputType === 'textarea' && allowShiftEnter && event.shiftKey) return
+      if (
+        !shouldSendChatOnEnter(event.nativeEvent, {
+          sendOnEnter,
+          inputType,
+          allowShiftEnter
+        })
+      ) {
+        return
+      }
       event.preventDefault()
       handleSend()
     },
     [allowShiftEnter, handleSend, inputType, sendOnEnter]
   )
+
+  const renderBubbleBody = renderBubble ?? renderMessage
 
   const renderMessageItem = useCallback(
     (message: ChatMessage, index: number) => {
@@ -140,18 +219,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       return (
         <div
           key={message.id ?? index}
-          className={classNames(
-            'flex gap-3 items-start',
-            isSelf ? 'flex-row-reverse' : 'justify-start'
-          )}
-          data-tiger-chat-message
-          role="listitem">
+          className={getChatMessageRowClasses(isSelf)}
+          data-tiger-chat-message>
           {showAvatar && message.user ? (
             <Avatar
               size="sm"
               src={message.user.avatar}
               text={message.user.name}
               className="flex-shrink-0"
+              aria-hidden={Boolean(showName && message.user.name)}
             />
           ) : null}
           <div className={classNames('flex flex-col max-w-[75%]', isSelf && 'items-end')}>
@@ -159,76 +235,89 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               <div
                 className={classNames(
                   'text-xs mb-1 text-[var(--tiger-text-muted,#6b7280)]',
-                  isSelf && 'text-right'
+                  isSelf && 'text-end'
                 )}>
                 {message.user.name}
               </div>
             )}
-            <div
-              className={classNames(
-                'rounded-[var(--tiger-radius-lg,0.75rem)] px-4 py-2.5 text-sm break-words shadow-sm transition-all',
-                isSelf
-                  ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-[var(--tiger-radius-sm,0.375rem)]'
-                  : 'bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] rounded-tl-[var(--tiger-radius-sm,0.375rem)]'
-              )}
-              data-tiger-chat-bubble>
-              {renderMessage?.(message, index) ?? message.content}
+            <div className={getChatBubbleClasses(isSelf)} data-tiger-chat-bubble>
+              {renderBubbleBody?.(message, index) ?? message.content}
             </div>
             {statusInfo && (
               <div className={classNames('text-xs mt-1', statusInfo.className)}>
                 {message.statusText || statusInfo.text}
               </div>
             )}
-            {timeText && (
+            {timeText ? (
               <div className="text-xs mt-1 text-[var(--tiger-text-muted,#6b7280)]">{timeText}</div>
-            )}
+            ) : null}
           </div>
         </div>
       )
     },
-    [mergedLocale, renderMessage, showAvatar, showName, showTime, statusMap]
+    [mergedLocale, renderBubbleBody, showAvatar, showName, showTime, statusMap]
   )
 
-  const messageListRef = useRef<HTMLDivElement | null>(null)
+  const lastContent = messages[messages.length - 1]?.content
+  const firstId = messages[0]?.id
 
   useEffect(() => {
-    if (!autoScrollToBottom) return
     const raf = requestAnimationFrame(() => {
-      const el = messageListRef.current
-      if (!el) return
-      // In virtual mode the actual scroller is the inner VirtualList container.
-      const target = (virtual ? (el.firstElementChild as HTMLElement | null) : el) ?? el
-      target.scrollTop = target.scrollHeight
+      const scroller = resolveScroller()
+      if (!scroller) return
+      const prepended = didChatPrepend(
+        previousFirstIdRef.current,
+        firstId,
+        previousLengthRef.current,
+        messages.length
+      )
+      const plan = planChatScroll({
+        stickToBottom: stickToBottomRef.current,
+        autoScrollToBottom,
+        prepended,
+        previousScrollHeight: previousScrollHeightRef.current,
+        nextScrollHeight: scroller.scrollHeight
+      })
+      if (plan.scrollTop != null) {
+        scroller.scrollTop = plan.scrollTop
+        stickToBottomRef.current = true
+      } else if (plan.compensate) {
+        scroller.scrollTop += plan.compensate
+      }
+      previousScrollHeightRef.current = scroller.scrollHeight
+      previousFirstIdRef.current = firstId
+      previousLengthRef.current = messages.length
     })
     return () => cancelAnimationFrame(raf)
-  }, [messages.length, autoScrollToBottom, virtual])
+  }, [autoScrollToBottom, firstId, lastContent, messages.length, resolveScroller])
+
+  const listA11y = {
+    role: 'log' as const,
+    'aria-live': 'polite' as const,
+    'aria-relevant': 'additions text' as const,
+    'aria-label': listLabel
+  }
 
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>
       {virtual && messages.length > 0 ? (
-        <div
-          ref={messageListRef}
-          className="flex-1 overflow-auto bg-[var(--tiger-surface-muted,#f9fafb)]"
-          role="log"
-          aria-live="polite"
-          aria-relevant="additions text"
-          aria-label={messageListAriaLabel ?? 'Message list'}>
-          <VirtualList
-            role="none"
-            itemCount={messages.length}
-            itemHeight={virtualItemHeight}
-            height={virtualHeight}
-            renderItem={({ index }) => renderMessageItem(messages[index], index)}
-          />
-        </div>
+        <VirtualList
+          ref={virtualListRef}
+          className={chatMessageListClasses}
+          itemCount={messages.length}
+          estimatedItemHeight={virtualItemHeight}
+          height={virtualHeight}
+          getItemKey={(index) => getChatItemKey(messages, index)}
+          onScroll={syncStickToBottom}
+          renderItem={({ index }) => renderMessageItem(messages[index], index)}
+          {...listA11y}
+        />
       ) : (
         <div
           ref={messageListRef}
-          className="flex-1 overflow-auto p-5 space-y-4 bg-[var(--tiger-surface-muted,#f9fafb)]"
-          role="log"
-          aria-live="polite"
-          aria-relevant="additions text"
-          aria-label={messageListAriaLabel ?? 'Message list'}>
+          className={chatMessageListClasses}
+          {...listA11y}
+          onScroll={syncStickToBottom}>
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center py-8">
               <Empty description={resolvedEmptyText} />
@@ -238,8 +327,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           )}
         </div>
       )}
-      {statusText && <div className={getChatStatusBarClasses(statusVariant)}>{statusText}</div>}
-      <div className="flex items-end gap-3 px-5 py-4 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg">
+      {statusText ? (
+        <div className={getChatStatusBarClasses(statusVariant)} aria-live="polite">
+          {statusText}
+        </div>
+      ) : null}
+      <div className={chatComposerClasses}>
         <div className="flex-1">
           {inputType === 'input' ? (
             <Input
@@ -273,6 +366,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       </div>
     </div>
   )
-}
+})
+
+ChatWindow.displayName = 'ChatWindow'
 
 export default ChatWindow

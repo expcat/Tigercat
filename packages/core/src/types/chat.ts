@@ -189,37 +189,43 @@ export interface ChatWindowProps {
    */
   clearOnSend?: boolean
   /**
-   * Enable virtualized rendering for the message list. Recommended when the
-   * conversation has more than ~100 messages. When enabled, message item
-   * heights are fixed (`virtualItemHeight`) and the list scroll height is
-   * fixed (`virtualHeight`).
+   * Enable virtualized rendering for the message list. The VirtualList is the
+   * only scroller (`virtualHeight` is its viewport). Rows use dynamic height
+   * with `virtualItemHeight` as the estimate. The root must be given a height
+   * (`h-full min-h-0` or an explicit height) or the list will grow the page.
    * @default false
-   * @since 1.x
    */
   virtual?: boolean
   /**
-   * Pixel height of each virtualized message row.
+   * Estimated pixel height of each virtualized message row.
    * @default 88
    */
   virtualItemHeight?: number
   /**
-   * Pixel height of the virtualized message list viewport.
+   * Pixel height of the virtualized message list viewport. This is the only
+   * scroller when `virtual` is on.
    * @default 400
    */
   virtualHeight?: number
   /**
-   * Automatically scroll to the latest message when the list updates.
-   * Uses `requestAnimationFrame` so it runs after the DOM has been painted.
+   * Follow the latest message only while the list is pinned to the bottom
+   * (within 32px) or has not been scrolled up. `false` turns auto-scroll off.
    * @default true
-   * @since 1.x
    */
   autoScrollToBottom?: boolean
   /**
-   * Input change callback
+   * Input change callback. Controlled parents that want `clearOnSend` must
+   * write `''` here; binding only `onSend` does not clear the field.
    */
   onChange?: (value: string) => void
   /**
-   * Send callback
+   * Send callback. The list is fully controlled: this does **not** push a
+   * message. Omit it and the send control stays disabled.
    */
   onSend?: (value: string) => void
+}
+
+/** Imperative handle: same auto-scroll path as the pin-to-bottom controller. */
+export interface ChatWindowHandle {
+  scrollToBottom: () => void
 }

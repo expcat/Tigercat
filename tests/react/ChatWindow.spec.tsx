@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
@@ -174,9 +174,132 @@ describe('ChatWindow (React)', () => {
     })
   })
 
+  describe('auto-scroll', () => {
+    function getChatScroller(container: HTMLElement): HTMLElement {
+      return container.querySelector('[role="log"]') as HTMLElement
+    }
+
+    function mockScrollerMetrics(
+      el: HTMLElement,
+      metrics: { scrollHeight: number; clientHeight: number }
+    ): { setScrollHeight: (next: number) => void } {
+      let scrollHeight = metrics.scrollHeight
+      Object.defineProperty(el, 'scrollHeight', {
+        configurable: true,
+        get: () => scrollHeight
+      })
+      Object.defineProperty(el, 'clientHeight', {
+        configurable: true,
+        get: () => metrics.clientHeight
+      })
+      return {
+        setScrollHeight(next: number) {
+          scrollHeight = next
+        }
+      }
+    }
+
+    async function flushScrollFrames(): Promise<void> {
+      await act(async () => {
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => resolve())
+        })
+      })
+    }
+
+    function createMessages(count: number): ChatMessage[] {
+      return Array.from({ length: count }, (_, i) => ({
+        id: String(i + 1),
+        content: `msg-${i + 1}`
+      }))
+    }
+
+    it('scrolls to bottom when a new message arrives while pinned', async () => {
+      const messages = createMessages(8)
+      const { container, rerender } = render(<ChatWindow messages={messages} />)
+      const scroller = getChatScroller(container)
+      const metrics = mockScrollerMetrics(scroller, { scrollHeight: 1000, clientHeight: 400 })
+      await flushScrollFrames()
+
+      expect(scroller.scrollTop).toBe(1000)
+
+      metrics.setScrollHeight(1300)
+      rerender(<ChatWindow messages={[...messages, { id: '9', content: 'msg-9' }]} />)
+      await flushScrollFrames()
+
+      expect(scroller.scrollTop).toBe(1300)
+    })
+
+    it('does not scroll to bottom when a new message arrives after the user left the bottom', async () => {
+      const messages = createMessages(8)
+      const { container, rerender } = render(<ChatWindow messages={messages} />)
+      const scroller = getChatScroller(container)
+      const metrics = mockScrollerMetrics(scroller, { scrollHeight: 1000, clientHeight: 400 })
+      await flushScrollFrames()
+
+      scroller.scrollTop = 400
+      fireEvent.scroll(scroller)
+      metrics.setScrollHeight(1300)
+      rerender(<ChatWindow messages={[...messages, { id: '9', content: 'msg-9' }]} />)
+      await flushScrollFrames()
+
+      expect(scroller.scrollTop).toBe(400)
+    })
+  })
+
+  it('does not send composing Enter', async () => {
+    const onSend = vi.fn()
+    render(<ChatWindow onSend={onSend} />)
+    const input = screen.getByPlaceholderText('Type a message')
+    await userEvent.type(input, 'nihao')
+    fireEvent.keyDown(input, { key: 'Enter', isComposing: true, keyCode: 229 })
+    expect(onSend).not.toHaveBeenCalled()
+  })
+
+  it('sends once when clearOnSend is false and the button is clicked twice', async () => {
+    const onSend = vi.fn()
+    render(<ChatWindow allowEmpty clearOnSend={false} onSend={onSend} />)
+    const sendButton = screen.getByRole('button', { name: 'Send' })
+    await userEvent.click(sendButton)
+    await userEvent.click(sendButton)
+    expect(onSend).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables send when onSend is omitted', () => {
+    render(<ChatWindow allowEmpty />)
+    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
+  })
+
+  it('does not put listitem inside the log', () => {
+    render(
+      <ChatWindow
+        messages={[
+          { id: '1', content: 'Hi', direction: 'other' },
+          { id: '2', content: 'Hello', direction: 'self', status: 'failed' }
+        ]}
+      />
+    )
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
+    expect(screen.getByRole('log', { name: 'Message list' })).toBeInTheDocument()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<ChatWindow />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('has no accessibility violations with messages and a failed bubble', async () => {
+      const { container } = render(
+        <ChatWindow
+          messages={[
+            { id: '1', content: 'Hi', direction: 'other' },
+            { id: '2', content: 'Hello', direction: 'self', status: 'failed' }
+          ]}
+          statusText="typing"
+          onSend={() => undefined}
+        />
+      )
       await expectNoA11yViolationsIsolated(container)
     })
   })

@@ -21,12 +21,8 @@ function createMessages(count: number): ChatMessage[] {
   }))
 }
 
-function getChatScroller(container: HTMLElement, virtual = false): HTMLElement {
-  const log = container.querySelector('[role="log"]') as HTMLElement
-  if (virtual) {
-    return (log.firstElementChild as HTMLElement | null) ?? log
-  }
-  return log
+function getChatScroller(container: HTMLElement): HTMLElement {
+  return container.querySelector('[role="log"]') as HTMLElement
 }
 
 function mockScrollerMetrics(
@@ -59,7 +55,8 @@ async function flushScrollFrames(): Promise<void> {
 describe('ChatWindow (Vue)', () => {
   it('renders empty state and emits send', async () => {
     const { emitted } = render(ChatWindow, {
-      props: { messages: [] }
+      props: { messages: [] },
+      attrs: { onSend: () => undefined }
     })
 
     expect(screen.getByText('No messages')).toBeInTheDocument()
@@ -74,7 +71,8 @@ describe('ChatWindow (Vue)', () => {
 
   it('allows sending empty message when allowEmpty is true', async () => {
     const { emitted } = render(ChatWindow, {
-      props: { allowEmpty: true }
+      props: { allowEmpty: true },
+      attrs: { onSend: () => undefined }
     })
 
     const sendButton = screen.getByRole('button', { name: 'Send' })
@@ -95,7 +93,7 @@ describe('ChatWindow (Vue)', () => {
   })
 
   it('handles shift+enter in textarea without sending', async () => {
-    const { emitted } = render(ChatWindow)
+    const { emitted } = render(ChatWindow, { attrs: { onSend: () => undefined } })
 
     const textarea = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'Hello')
@@ -148,7 +146,8 @@ describe('ChatWindow (Vue)', () => {
 
   it('keeps input value when clearOnSend is false', async () => {
     const { emitted } = render(ChatWindow, {
-      props: { inputType: 'input', clearOnSend: false }
+      props: { inputType: 'input', clearOnSend: false },
+      attrs: { onSend: () => undefined }
     })
 
     const input = screen.getByPlaceholderText('Type a message') as HTMLInputElement
@@ -286,7 +285,7 @@ describe('ChatWindow (Vue)', () => {
           virtualItemHeight: 40
         }
       })
-      const scroller = getChatScroller(container, true)
+      const scroller = getChatScroller(container)
       mockScrollerMetrics(scroller, { scrollHeight: 4800, clientHeight: 200 })
       await flushScrollFrames()
 
@@ -365,9 +364,49 @@ describe('ChatWindow (Vue)', () => {
     })
   })
 
+  it('does not send composing Enter', async () => {
+    const { emitted } = render(ChatWindow, { attrs: { onSend: () => undefined } })
+    const textarea = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
+    await fireEvent.update(textarea, 'nihao')
+    await fireEvent.keyDown(textarea, { key: 'Enter', isComposing: true, keyCode: 229 })
+    expect(emitted().send).toBeFalsy()
+  })
+
+  it('disables send when no send listener is bound', () => {
+    render(ChatWindow, { props: { allowEmpty: true } })
+    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
+  })
+
+  it('does not put listitem inside the log', () => {
+    render(ChatWindow, {
+      props: {
+        messages: [
+          { id: '1', content: 'Hi', direction: 'other' },
+          { id: '2', content: 'Hello', direction: 'self', status: 'failed' }
+        ]
+      }
+    })
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
+    expect(screen.getByRole('log', { name: 'Message list' })).toBeInTheDocument()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(ChatWindow)
+      await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('has no accessibility violations with messages and a failed bubble', async () => {
+      const { container } = render(ChatWindow, {
+        props: {
+          messages: [
+            { id: '1', content: 'Hi', direction: 'other' },
+            { id: '2', content: 'Hello', direction: 'self', status: 'failed' }
+          ],
+          statusText: 'typing'
+        },
+        attrs: { onSend: () => undefined }
+      })
       await expectNoA11yViolationsIsolated(container)
     })
   })

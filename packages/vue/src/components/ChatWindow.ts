@@ -1,4 +1,13 @@
-import { defineComponent, h, computed, ref, watch, onMounted, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  computed,
+  ref,
+  watch,
+  onMounted,
+  getCurrentInstance,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -10,11 +19,26 @@ import {
   getChatWindowLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  canSendChatMessage,
+  shouldSendChatOnEnter,
+  isChatScrollerNearBottom,
+  planChatScroll,
+  didChatPrepend,
+  getChatItemKey,
+  getChatMessageRowClasses,
+  getChatBubbleClasses,
+  chatWindowRootClasses,
+  chatMessageListClasses,
+  chatComposerClasses,
+  CHAT_VIRTUAL_ESTIMATED_ITEM_HEIGHT,
+  EMPTY_CHAT_MESSAGES,
   type BadgeVariant,
   type ChatMessage,
+  type ChatWindowHandle,
   type ChatWindowProps as CoreChatWindowProps,
   type TigerLocale,
-  type TigerLocaleChatWindow
+  type TigerLocaleChatWindow,
+  type VirtualListHandle
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
@@ -33,25 +57,7 @@ export interface VueChatWindowProps extends Omit<
   style?: Record<string, string | number>
 }
 
-const CHAT_STICK_TO_BOTTOM_PX = 32
-
-function resolveChatScroller(
-  virtual: boolean,
-  messageList: HTMLElement | null,
-  virtualWrapper: HTMLElement | null
-): HTMLElement | null {
-  if (virtual) {
-    const wrapper = virtualWrapper
-    return (wrapper?.firstElementChild as HTMLElement | null) ?? wrapper
-  }
-  return messageList
-}
-
-function isChatScrollerNearBottom(scroller: HTMLElement): boolean {
-  return (
-    scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight <= CHAT_STICK_TO_BOTTOM_PX
-  )
-}
+export type { ChatWindowHandle }
 
 export const ChatWindow = defineComponent({
   name: 'TigerChatWindow',
@@ -59,7 +65,7 @@ export const ChatWindow = defineComponent({
   props: {
     messages: {
       type: Array as PropType<ChatMessage[]>,
-      default: () => []
+      default: undefined
     },
     modelValue: {
       type: String as PropType<string>
@@ -153,7 +159,7 @@ export const ChatWindow = defineComponent({
     },
     virtualItemHeight: {
       type: Number,
-      default: 88
+      default: CHAT_VIRTUAL_ESTIMATED_ITEM_HEIGHT
     },
     virtualHeight: {
       type: Number,
@@ -171,79 +177,57 @@ export const ChatWindow = defineComponent({
     }
   },
   emits: {
-    'update:modelValue': null,
-    input: null,
-    change: null,
-    send: null
+    'update:modelValue': (_value: string) => true,
+    send: (_value: string) => true
   },
-  setup(props, { emit, attrs, slots }) {
+  setup(props, { emit, attrs, slots, expose }) {
+    const instance = getCurrentInstance()
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChatWindowLabels(mergedLocale.value, props.labels))
     const statusMap = computed(() => buildChatMessageStatusInfo(labels.value))
+    const messages = computed(() => props.messages ?? EMPTY_CHAT_MESSAGES)
 
     const localValue = ref<string>(props.defaultValue ?? '')
+    const lastSent = ref<string | null>(null)
+    const stickToBottom = ref(true)
+    const messageListRef = ref<HTMLElement | null>(null)
+    const virtualListRef = ref<VirtualListHandle | null>(null)
+    const previousScrollHeight = ref(0)
+    const previousFirstId = ref<string | number | undefined>(messages.value[0]?.id)
+    const previousLength = ref(messages.value.length)
 
-    watch(
-      () => props.modelValue,
-      (nextValue) => {
-        if (nextValue !== undefined) localValue.value = nextValue
-      }
+    const hasSendHandler = computed(
+      () =>
+        typeof (instance?.vnode.props as { onSend?: unknown } | undefined)?.onSend === 'function'
     )
-
-    const wrapperClasses = computed(() =>
-      classNames(
-        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden transition-all duration-300',
-        props.className,
-        coerceClassValue(attrs.class)
-      )
-    )
-
-    const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     const inputValue = computed(() =>
       props.modelValue !== undefined ? props.modelValue : localValue.value
     )
 
-    const canSend = computed(() => {
-      if (props.disabled) return false
-      if (props.allowEmpty) return true
-      const raw = String(inputValue.value ?? '')
-      return raw.trim().length > 0
-    })
+    const canSend = computed(() =>
+      canSendChatMessage({
+        disabled: props.disabled,
+        allowEmpty: props.allowEmpty,
+        value: inputValue.value,
+        hasSendHandler: hasSendHandler.value,
+        lastSent: lastSent.value
+      })
+    )
 
-    const handleValueChange = (nextValue: string) => {
-      if (props.modelValue === undefined) {
-        localValue.value = nextValue
-      }
-      emit('update:modelValue', nextValue)
-      emit('input', nextValue)
-      emit('change', nextValue)
+    const wrapperClasses = computed(() =>
+      classNames(chatWindowRootClasses, props.className, coerceClassValue(attrs.class))
+    )
+    const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
+    const listAriaLabel = computed(
+      () => props.messageListAriaLabel ?? labels.value.messageListAriaLabel
+    )
+
+    const resolveScroller = (): HTMLElement | null => {
+      if (props.virtual) return virtualListRef.value?.getScrollElement() ?? null
+      return messageListRef.value
     }
-
-    const handleSend = () => {
-      if (!canSend.value) return
-      const payload = String(inputValue.value ?? '')
-      emit('send', payload)
-      if (props.clearOnSend) {
-        handleValueChange('')
-      }
-    }
-
-    const handleKeydown = (event: KeyboardEvent) => {
-      if (!props.sendOnEnter) return
-      if (event.key !== 'Enter') return
-      if (props.inputType === 'textarea' && props.allowShiftEnter && event.shiftKey) return
-      event.preventDefault()
-      handleSend()
-    }
-
-    const messageListRef = ref<HTMLElement | null>(null)
-    const virtualWrapperRef = ref<HTMLElement | null>(null)
-    const stickToBottom = ref(true)
-
-    const resolveScroller = (): HTMLElement | null =>
-      resolveChatScroller(props.virtual, messageListRef.value, virtualWrapperRef.value)
 
     const syncStickToBottom = () => {
       const scroller = resolveScroller()
@@ -251,24 +235,83 @@ export const ChatWindow = defineComponent({
       stickToBottom.value = isChatScrollerNearBottom(scroller)
     }
 
+    const applyScrollPlan = () => {
+      const scroller = resolveScroller()
+      if (!scroller) return
+      const nextMessages = messages.value
+      const prepended = didChatPrepend(
+        previousFirstId.value,
+        nextMessages[0]?.id,
+        previousLength.value,
+        nextMessages.length
+      )
+      const plan = planChatScroll({
+        stickToBottom: stickToBottom.value,
+        autoScrollToBottom: props.autoScrollToBottom,
+        prepended,
+        previousScrollHeight: previousScrollHeight.value,
+        nextScrollHeight: scroller.scrollHeight
+      })
+      if (plan.scrollTop != null) {
+        scroller.scrollTop = plan.scrollTop
+        stickToBottom.value = true
+      } else if (plan.compensate) {
+        scroller.scrollTop += plan.compensate
+      }
+      previousScrollHeight.value = scroller.scrollHeight
+      previousFirstId.value = nextMessages[0]?.id
+      previousLength.value = nextMessages.length
+    }
+
     const scrollToBottom = () => {
       if (!props.autoScrollToBottom) return
       requestAnimationFrame(() => {
         const scroller = resolveScroller()
-        if (scroller) {
-          scroller.scrollTop = scroller.scrollHeight
-          stickToBottom.value = true
-        }
+        if (!scroller) return
+        scroller.scrollTop = scroller.scrollHeight
+        stickToBottom.value = true
+        previousScrollHeight.value = scroller.scrollHeight
       })
+    }
+
+    const handleValueChange = (nextValue: string) => {
+      if (props.modelValue === undefined) localValue.value = nextValue
+      if (lastSent.value != null && nextValue !== lastSent.value) lastSent.value = null
+      emit('update:modelValue', nextValue)
+    }
+
+    const handleSend = () => {
+      if (!canSend.value) return
+      const payload = String(inputValue.value ?? '')
+      lastSent.value = payload
+      emit('send', payload)
+      if (props.clearOnSend) handleValueChange('')
+    }
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (
+        !shouldSendChatOnEnter(event, {
+          sendOnEnter: props.sendOnEnter,
+          inputType: props.inputType,
+          allowShiftEnter: props.allowShiftEnter
+        })
+      ) {
+        return
+      }
+      event.preventDefault()
+      handleSend()
     }
 
     onMounted(scrollToBottom)
     watch(
-      () => props.messages.length,
+      () =>
+        [
+          messages.value.length,
+          messages.value[0]?.id,
+          messages.value[messages.value.length - 1]?.content
+        ] as const,
       () => {
-        if (!resolveScroller() || stickToBottom.value) {
-          scrollToBottom()
-        }
+        requestAnimationFrame(applyScrollPlan)
       }
     )
 
@@ -278,17 +321,14 @@ export const ChatWindow = defineComponent({
         ? getChatMessageStatusInfo(message.status, statusMap.value)
         : undefined
       const timeText = props.showTime ? formatChatTime(message.time, mergedLocale.value) : ''
-      const customContent = slots.message?.({ message, index })
+      const customContent =
+        slots.bubble?.({ message, index }) ?? slots.message?.({ message, index })
 
       return h(
         'div',
         {
-          class: classNames(
-            'flex gap-3 items-start',
-            isSelf ? 'flex-row-reverse' : 'justify-start'
-          ),
+          class: getChatMessageRowClasses(isSelf),
           'data-tiger-chat-message': '',
-          role: 'listitem',
           key: message.id ?? index
         },
         [
@@ -297,7 +337,8 @@ export const ChatWindow = defineComponent({
                 size: 'sm',
                 src: message.user.avatar,
                 text: message.user.name,
-                className: 'flex-shrink-0'
+                className: 'flex-shrink-0',
+                'aria-hidden': props.showName && message.user.name ? true : undefined
               })
             : null,
           h('div', { class: classNames('flex flex-col max-w-[75%]', isSelf && 'items-end') }, [
@@ -307,7 +348,7 @@ export const ChatWindow = defineComponent({
                   {
                     class: classNames(
                       'text-xs mb-1 text-[var(--tiger-text-muted,#6b7280)]',
-                      isSelf && 'text-right'
+                      isSelf && 'text-end'
                     )
                   },
                   message.user.name
@@ -316,12 +357,7 @@ export const ChatWindow = defineComponent({
             h(
               'div',
               {
-                class: classNames(
-                  'rounded-[var(--tiger-radius-lg,0.75rem)] px-4 py-2.5 text-sm break-words shadow-sm transition-all',
-                  isSelf
-                    ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-[var(--tiger-radius-sm,0.375rem)]'
-                    : 'bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] rounded-tl-[var(--tiger-radius-sm,0.375rem)]'
-                ),
+                class: getChatBubbleClasses(isSelf),
                 'data-tiger-chat-bubble': ''
               },
               customContent ?? message.content
@@ -361,6 +397,17 @@ export const ChatWindow = defineComponent({
       return h(Textarea, { ...commonProps, rows: props.inputRows })
     }
 
+    const listA11y = () => ({
+      role: 'log' as const,
+      'aria-live': 'polite' as const,
+      'aria-relevant': 'additions text',
+      'aria-label': listAriaLabel.value
+    })
+
+    expose({
+      scrollToBottom
+    } satisfies ChatWindowHandle)
+
     return () =>
       h(
         'div',
@@ -371,48 +418,33 @@ export const ChatWindow = defineComponent({
           'data-tiger-chat-window': ''
         },
         [
-          props.virtual && props.messages.length > 0
+          props.virtual && messages.value.length > 0
             ? h(
-                'div',
+                VirtualList,
                 {
-                  ref: virtualWrapperRef,
-                  class: 'flex-1 overflow-auto bg-[var(--tiger-surface-muted,#f9fafb)]',
-                  role: 'log',
-                  'aria-live': 'polite',
-                  'aria-relevant': 'additions text',
-                  'aria-label': props.messageListAriaLabel ?? 'Message list',
-                  onScroll: syncStickToBottom
+                  ref: virtualListRef,
+                  className: chatMessageListClasses,
+                  itemCount: messages.value.length,
+                  estimatedItemHeight: props.virtualItemHeight,
+                  height: props.virtualHeight,
+                  getItemKey: (index: number) => getChatItemKey(messages.value, index),
+                  onScroll: syncStickToBottom,
+                  ...listA11y()
                 },
-                [
-                  h(
-                    VirtualList,
-                    {
-                      role: 'none',
-                      itemCount: props.messages.length,
-                      itemHeight: props.virtualItemHeight,
-                      height: props.virtualHeight,
-                      onScroll: syncStickToBottom
-                    },
-                    {
-                      default: ({ index }: { index: number }) =>
-                        renderMessageItem(props.messages[index], index)
-                    }
-                  )
-                ]
+                {
+                  default: ({ index }: { index: number }) =>
+                    renderMessageItem(messages.value[index], index)
+                }
               )
             : h(
                 'div',
                 {
                   ref: messageListRef,
-                  class:
-                    'flex-1 overflow-auto p-5 space-y-4 bg-[var(--tiger-surface-muted,#f9fafb)]',
-                  role: 'log',
-                  'aria-live': 'polite',
-                  'aria-relevant': 'additions text',
-                  'aria-label': props.messageListAriaLabel ?? 'Message list',
+                  class: chatMessageListClasses,
+                  ...listA11y(),
                   onScroll: syncStickToBottom
                 },
-                props.messages.length === 0
+                messages.value.length === 0
                   ? [
                       h(
                         'div',
@@ -426,37 +458,31 @@ export const ChatWindow = defineComponent({
                         ]
                       )
                     ]
-                  : props.messages.map((message, index) => renderMessageItem(message, index))
+                  : messages.value.map((message, index) => renderMessageItem(message, index))
               ),
           props.statusText
             ? h(
                 'div',
                 {
-                  class: getChatStatusBarClasses(props.statusVariant)
+                  class: getChatStatusBarClasses(props.statusVariant),
+                  'aria-live': 'polite'
                 },
                 props.statusText
               )
             : null,
-          h(
-            'div',
-            {
-              class:
-                'flex items-end gap-3 px-5 py-4 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg'
-            },
-            [
-              h('div', { class: 'flex-1' }, [renderInput()]),
-              h(
-                Button,
-                {
-                  disabled: !canSend.value,
-                  onClick: handleSend,
-                  'aria-label':
-                    props.sendAriaLabel ?? resolveLocaleText(labels.value.sendText, props.sendText)
-                },
-                () => resolveLocaleText(labels.value.sendText, props.sendText)
-              )
-            ]
-          )
+          h('div', { class: chatComposerClasses }, [
+            h('div', { class: 'flex-1' }, [renderInput()]),
+            h(
+              Button,
+              {
+                disabled: !canSend.value,
+                onClick: handleSend,
+                'aria-label':
+                  props.sendAriaLabel ?? resolveLocaleText(labels.value.sendText, props.sendText)
+              },
+              () => resolveLocaleText(labels.value.sendText, props.sendText)
+            )
+          ])
         ]
       )
   }
