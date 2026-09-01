@@ -2,22 +2,26 @@ import { computed, defineComponent, h, type PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  DEFAULT_LOADING_BAR_ARIA_LABEL,
   DEFAULT_LOADING_BAR_COLOR,
   DEFAULT_LOADING_BAR_HEIGHT,
   getLoadingBarContainerClasses,
   getLoadingBarFillClasses,
   getLoadingBarFillStyle,
-  LOADING_BAR_CONTAINER_ID,
+  getLoadingBarProgressValue,
+  getLoadingLabel,
   mergeStyleValues,
   type LoadingBarColor,
-  type LoadingBarContainerProps,
+  type LoadingBarContainerProps as CoreLoadingBarContainerProps,
   type LoadingBarStatus
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
+import { getGlobalTigerLocale } from '../utils/global-locale'
 
-export interface VueLoadingBarContainerProps extends LoadingBarContainerProps {
+export interface VueLoadingBarContainerProps extends CoreLoadingBarContainerProps {
   style?: Record<string, string | number>
 }
+
+export type LoadingBarContainerProps = VueLoadingBarContainerProps
 
 export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
   name: 'TigerLoadingBarContainer',
@@ -53,25 +57,45 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
     }
   },
   setup(props, { attrs }) {
+    const config = useTigerConfig()
     const containerClasses = computed(() =>
       getLoadingBarContainerClasses(classNames(props.className, coerceClassValue(attrs.class)))
     )
     const fillClasses = computed(() => getLoadingBarFillClasses(props.status, props.color))
     const fillStyle = computed(() => getLoadingBarFillStyle(props.percentage, props.height))
-    const resolvedAriaLabel = computed(
-      () => props.ariaLabel?.trim() || DEFAULT_LOADING_BAR_ARIA_LABEL
+    const resolvedAriaLabel = computed(() =>
+      getLoadingLabel(config.value.locale ?? getGlobalTigerLocale(), props.ariaLabel)
     )
+    const valueNow = computed(() => getLoadingBarProgressValue(props.percentage))
 
     return () => {
       const isBusy = props.status === 'loading'
+      const {
+        role: _role,
+        'aria-label': _ariaLabel,
+        'aria-live': _ariaLive,
+        'aria-atomic': _ariaAtomic,
+        'aria-busy': _ariaBusy,
+        'aria-valuenow': _ariaValueNow,
+        'aria-valuemin': _ariaValueMin,
+        'aria-valuemax': _ariaValueMax,
+        class: _class,
+        style: attrStyle,
+        ...domAttrs
+      } = attrs
 
       return h(
         'div',
         {
-          ...attrs,
+          ...domAttrs,
           class: containerClasses.value,
-          style: mergeStyleValues(attrs.style, props.style, { height: `${props.height}px` }),
-          id: LOADING_BAR_CONTAINER_ID,
+          style: mergeStyleValues(attrStyle, props.style, { height: `${props.height}px` }),
+          role: 'progressbar',
+          'aria-label': resolvedAriaLabel.value,
+          'aria-valuemin': 0,
+          'aria-valuemax': 100,
+          'aria-valuenow': valueNow.value,
+          'aria-busy': isBusy ? 'true' : undefined,
           'data-tiger-loading-bar-container': '',
           'data-tiger-loading-bar-status': props.status
         },
@@ -79,14 +103,6 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
           h('div', {
             class: fillClasses.value,
             style: fillStyle.value,
-            role: 'progressbar',
-            'aria-label': resolvedAriaLabel.value,
-            'aria-valuemin': 0,
-            'aria-valuemax': 100,
-            'aria-valuenow': Math.round(props.percentage),
-            'aria-busy': isBusy ? 'true' : undefined,
-            'aria-live': 'polite',
-            'aria-atomic': 'true',
             'data-tiger-loading-bar': '',
             'data-tiger-loading-bar-status': props.status
           })

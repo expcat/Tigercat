@@ -1,124 +1,106 @@
-import { createApp, defineComponent, h, ref, type App } from 'vue'
+import { createApp, defineComponent, h, onBeforeUnmount, shallowRef, type App } from 'vue'
 import {
+  createImperativeHost,
   createLoadingBarController,
   isBrowser,
-  LOADING_BAR_CONTAINER_ROOT_ID,
-  resolveLoadingBarMountTarget,
   type LoadingBarApi,
   type LoadingBarOptions,
   type LoadingBarRuntimeState
 } from '@expcat/tigercat-core'
 import { LoadingBarContainer } from './LoadingBarContainer'
-import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export { LoadingBarContainer } from './LoadingBarContainer'
 export type { VueLoadingBarContainerProps } from './LoadingBarContainer'
 
-export type VueLoadingBarProps = LoadingBarOptions
-
-let containerApp: App<Element> | null = null
 let controller: ReturnType<typeof createLoadingBarController> | null = null
-const barState = ref<LoadingBarRuntimeState | null>(null)
-
-function getDefaultAriaLabel(): string | undefined {
-  return getGlobalTigerLocale()?.common?.loadingText
-}
 
 function getController(): ReturnType<typeof createLoadingBarController> {
   if (!controller) {
     controller = createLoadingBarController()
     controller.subscribe(() => {
-      barState.value = controller?.getState() ?? null
+      if (controller?.getState().visible) return
+      host.teardown()
     })
   }
   return controller
 }
 
+const host = createImperativeHost<App<Element>>({
+  mount(element) {
+    const app = createApp(LoadingBarHost)
+    app.mount(element)
+    return app
+  },
+  unmount(app) {
+    app.unmount()
+  }
+})
+
 const LoadingBarHost = /* @__PURE__ */ defineComponent({
   name: 'TigerLoadingBarHost',
   setup() {
+    const state = shallowRef<LoadingBarRuntimeState>(getController().getState())
+    const stop = getController().subscribe(() => {
+      state.value = getController().getState()
+    })
+    onBeforeUnmount(stop)
+
     return () => {
-      const state = barState.value
-      if (!state?.visible) return null
+      const current = state.value
+      if (!current.visible) return null
       return h(LoadingBarContainer, {
-        percentage: state.percentage,
-        status: state.status,
-        color: state.color,
-        height: state.height,
-        className: state.className,
-        style: state.style,
-        ariaLabel: state.ariaLabel
+        percentage: current.percentage,
+        status: current.status,
+        color: current.color,
+        height: current.height,
+        className: current.className,
+        style: current.style,
+        ariaLabel: current.ariaLabel
       })
     }
   }
 })
 
-function ensureContainer(container?: string | HTMLElement) {
-  if (!isBrowser()) {
-    return
-  }
-
-  const existingRootEl = document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID)
-
-  if (containerApp && !existingRootEl) {
-    containerApp = null
-  }
-
-  if (containerApp) {
-    return
-  }
-
-  let rootEl = existingRootEl
-  if (!rootEl) {
-    rootEl = document.createElement('div')
-    rootEl.id = LOADING_BAR_CONTAINER_ROOT_ID
-    const mountTarget = resolveLoadingBarMountTarget(container) ?? document.body
-    mountTarget.appendChild(rootEl)
-  }
-
-  containerApp = createApp(LoadingBarHost)
-  containerApp.mount(rootEl)
-}
-
-function teardownContainer() {
-  if (containerApp) {
-    containerApp.unmount()
-    containerApp = null
-  }
-  if (isBrowser()) {
-    const rootEl = document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID)
-    if (rootEl?.parentNode) {
-      rootEl.parentNode.removeChild(rootEl)
-    }
-  }
-}
-
-function withAriaLabel(options?: LoadingBarOptions): LoadingBarOptions | undefined {
-  if (options?.ariaLabel) return options
-  const localeLabel = getDefaultAriaLabel()
-  if (!localeLabel && !options) return options
-  return { ...options, ariaLabel: options?.ariaLabel ?? localeLabel }
+function syncHost(container?: string | HTMLElement): void {
+  if (!isBrowser()) return
+  if (!getController().getState().visible) return
+  host.ensure(container)
 }
 
 export const LoadingBar: LoadingBarApi = {
   start(options?: LoadingBarOptions): void {
-    const resolved = withAriaLabel(options)
-    getController().start(resolved)
-    ensureContainer(resolved?.container)
+    if (!isBrowser()) return
+    getController().start(options)
+    syncHost(options?.container ?? getController().getState().container)
+  },
+  set(percentage: number): void {
+    if (!isBrowser()) return
+    getController().set(percentage)
+    syncHost(getController().getState().container)
+  },
+  inc(delta?: number): void {
+    if (!isBrowser()) return
+    getController().inc(delta)
+    syncHost(getController().getState().container)
   },
   finish(): void {
+    if (!isBrowser()) return
     getController().finish()
     if (getController().getState().visible) {
-      ensureContainer()
+      syncHost(getController().getState().container)
     }
   },
   error(): void {
+    if (!isBrowser()) return
     getController().error()
-    ensureContainer()
+    if (getController().getState().visible) {
+      syncHost(getController().getState().container)
+    }
   },
   clear(): void {
+    if (!isBrowser()) return
     getController().clear()
-    teardownContainer()
+    host.teardown()
   }
 }
 

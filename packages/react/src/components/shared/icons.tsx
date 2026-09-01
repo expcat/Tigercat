@@ -38,12 +38,14 @@ export const StatusIcon: React.FC<
 /**
  * Status icon with optional loading-spinner animation.
  */
-export const StatusIconWithLoading: React.FC<{
-  path: string
-  className: string
-  isLoading?: boolean
-  spinnerClass?: string
-}> = ({ path, className, isLoading = false, spinnerClass = '' }) => {
+export const StatusIconWithLoading: React.FC<
+  {
+    path: string
+    className: string
+    isLoading?: boolean
+    spinnerClass?: string
+  } & React.SVGAttributes<SVGSVGElement>
+> = ({ path, className, isLoading = false, spinnerClass = '', ...svgProps }) => {
   const merged = classNames(className, isLoading && spinnerClass)
-  return <StatusIcon path={path} className={merged} />
+  return <StatusIcon path={path} className={merged} {...svgProps} />
 }

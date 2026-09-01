@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
-  ANIMATION_DURATION_MS,
   classNames,
+  getNotificationCloseAriaLabel,
   getNotificationIconPath,
   getNotificationTypeClasses,
+  getToastItemRole,
   notificationActionButtonClasses,
   notificationActionButtonTypeClasses,
   notificationActionsClasses,
@@ -17,62 +18,45 @@ import {
   notificationIconClasses,
   notificationPositionClasses,
   notificationTitleClasses,
+  shouldHandleToastSurfaceEvent,
   type NotificationInstance,
-  type NotificationPosition
+  type NotificationPosition,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
-
-const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
+import { useTigerConfig } from './ConfigProvider'
+import { getGlobalTigerLocale } from '../utils/global-locale'
+import { renderBodyPortal } from '../utils/overlay'
 
 interface NotificationItemProps {
   notification: NotificationInstance
+  locale?: Partial<TigerLocale>
   onClose?: (id: string | number) => void
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClose }) => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 10)
-    return () => clearTimeout(timer)
-  }, [])
-
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, locale, onClose }) => {
   const colorScheme = getNotificationTypeClasses(notification.type)
-
   const notificationClasses = classNames(
     notificationBaseClasses,
     colorScheme.bg,
     colorScheme.border,
-    notification.className,
-    isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+    notification.className
   )
-
   const iconPath = notification.icon || getNotificationIconPath(notification.type)
   const iconClass = classNames(notificationIconClasses, colorScheme.icon)
-
-  const handleClose = () => {
-    setIsVisible(false)
-    setTimeout(() => onClose?.(notification.id), ANIMATION_DURATION_MS)
-  }
-
-  const a11yRole = notification.type === 'error' ? 'alert' : 'status'
-  const ariaLive = notification.type === 'error' ? 'assertive' : 'polite'
+  const a11yRole = getToastItemRole(notification.type)
+  const closeLabel = getNotificationCloseAriaLabel(locale, notification.closeAriaLabel)
+  const close = () => onClose?.(notification.id)
 
   return (
     <div
       className={notificationClasses}
       role={a11yRole}
-      aria-live={ariaLive}
-      aria-atomic="true"
-      onClick={notification.onClick}
-      onKeyDown={(e) => {
+      onClick={(event) => {
         if (!notification.onClick) return
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          notification.onClick()
-        }
+        if (!shouldHandleToastSurfaceEvent(event)) return
+        notification.onClick()
       }}
-      tabIndex={notification.onClick ? 0 : undefined}
       style={notification.onClick ? { cursor: 'pointer' } : undefined}
       data-tiger-notification=""
       data-tiger-notification-type={notification.type}
@@ -102,11 +86,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
                   event.stopPropagation()
                   action.onClick?.({
                     id: notification.id,
-                    close: handleClose
+                    close
                   })
-                  if (action.closeOnClick) {
-                    handleClose()
-                  }
+                  if (action.closeOnClick) close()
                 }}>
                 {action.label}
               </button>
@@ -117,13 +99,18 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
       {notification.closable && (
         <button
           className={notificationCloseButtonClasses}
-          onClick={(e) => {
-            e.stopPropagation()
-            handleClose()
+          onClick={(event) => {
+            event.stopPropagation()
+            close()
           }}
-          aria-label={notification.closeAriaLabel ?? 'Close notification'}
+          aria-label={closeLabel}
           type="button">
-          <StatusIcon path={notificationCloseIconPath} className={notificationCloseIconClasses} />
+          <StatusIcon
+            path={notificationCloseIconPath}
+            className={notificationCloseIconClasses}
+            aria-hidden="true"
+            focusable="false"
+          />
         </button>
       )}
     </div>
@@ -134,31 +121,46 @@ export interface NotificationContainerProps {
   position?: NotificationPosition
   notifications?: NotificationInstance[]
   onClose?: (id: string | number) => void
+  className?: string
+  /**
+   * Portal through the overlay-host chain. Imperative hosts pass `false`.
+   * @default true
+   */
+  portal?: boolean
 }
 
 export const NotificationContainer: React.FC<NotificationContainerProps> = ({
   position = 'top-right',
   notifications = [],
-  onClose
+  onClose,
+  className,
+  portal = true
 }) => {
+  const config = useTigerConfig()
+  const locale = config.locale ?? getGlobalTigerLocale()
   const containerClasses = classNames(
     notificationContainerBaseClasses,
-    notificationPositionClasses[position]
+    notificationPositionClasses[position],
+    className
   )
 
-  return (
+  const node = (
     <div
       className={containerClasses}
-      id={`${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}`}
-      aria-live="polite"
-      aria-relevant="additions"
       data-tiger-notification-container=""
       data-tiger-notification-position={position}>
       {notifications.map((notification) => (
-        <NotificationItem key={notification.id} notification={notification} onClose={onClose} />
+        <NotificationItem
+          key={notification.id}
+          notification={notification}
+          locale={locale}
+          onClose={onClose}
+        />
       ))}
     </div>
   )
+
+  return portal ? renderBodyPortal(node) : node
 }
 
 export default NotificationContainer

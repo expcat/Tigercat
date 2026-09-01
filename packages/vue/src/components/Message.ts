@@ -1,22 +1,20 @@
-import { createApp, defineComponent, h, ref, type App } from 'vue'
+import { createApp, defineComponent, h, onBeforeUnmount, shallowRef, type App } from 'vue'
 import {
-  createInstanceCounter,
+  createImperativeHost,
+  createToastQueue,
   isBrowser,
   normalizeStringOption,
-  resolveAnchoredOverlayTarget,
+  resolveMessageDuration,
   type MessageConfig,
   type MessageInstance,
   type MessageOptions,
   type MessagePosition
 } from '@expcat/tigercat-core'
 import { MessageContainer } from './MessageContainer'
-import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export { MessageContainer } from './MessageContainer'
 export type { VueMessageContainerProps } from './MessageContainer'
 
-const MESSAGE_CONTAINER_ID = 'tiger-message-container'
-const MESSAGE_CONTAINER_ROOT_ID = `${MESSAGE_CONTAINER_ID}-root`
 const MESSAGE_POSITIONS: MessagePosition[] = [
   'top',
   'top-left',
@@ -28,127 +26,69 @@ const MESSAGE_POSITIONS: MessagePosition[] = [
 
 type InternalMessageInstance = MessageInstance & { position: MessagePosition }
 
-const messageInstances = ref<InternalMessageInstance[]>([])
-let containerApp: App<Element> | null = null
-let getNextInstanceId: ReturnType<typeof createInstanceCounter> | null = null
+const messageQueue = createToastQueue<InternalMessageInstance>()
+const host = createImperativeHost<App<Element>>({
+  mount(element) {
+    const app = createApp(MessageHost)
+    app.mount(element)
+    return app
+  },
+  unmount(app) {
+    app.unmount()
+  }
+})
 
-export type VueMessageProps = MessageOptions
-
-function getMessageInstanceId(): string | number {
-  getNextInstanceId ??= createInstanceCounter()
-  return getNextInstanceId()
-}
-
-function getDefaultMessageCloseAriaLabel(): string | undefined {
-  const locale = getGlobalTigerLocale()
-  const closeText = locale?.common?.closeText
-  if (!closeText) return undefined
-  const localeCode = locale.locale?.toLowerCase() ?? ''
-  if (localeCode.startsWith('zh')) return `${closeText}消息`
-  if (localeCode.startsWith('en')) return `${closeText} message`
-  return closeText
-}
+messageQueue.subscribe(() => {
+  if (messageQueue.getSnapshot().length > 0) return
+  queueMicrotask(() => {
+    if (messageQueue.getSnapshot().length === 0) host.teardown()
+  })
+})
 
 const MessageHost = /* @__PURE__ */ defineComponent({
   name: 'TigerMessageHost',
   setup() {
+    const messages = shallowRef<readonly InternalMessageInstance[]>(messageQueue.getSnapshot())
+    const stop = messageQueue.subscribe(() => {
+      messages.value = messageQueue.getSnapshot()
+    })
+    onBeforeUnmount(stop)
+
     return () =>
       MESSAGE_POSITIONS.map((position) => {
-        const positionedMessages = messageInstances.value.filter(
-          (message) => message.position === position
-        )
+        const positionedMessages = messages.value.filter((message) => message.position === position)
         if (positionedMessages.length === 0) return null
         return h(MessageContainer, {
           key: position,
           position,
-          messages: positionedMessages,
-          onClose: removeMessage
+          messages: [...positionedMessages],
+          portal: false,
+          onClose: (id: string | number) => messageQueue.remove(id)
         })
       })
   }
 })
 
-function ensureContainer() {
-  if (!isBrowser()) {
-    return
-  }
-
-  const existingRootEl = document.getElementById(MESSAGE_CONTAINER_ROOT_ID)
-
-  if (containerApp && !existingRootEl) {
-    containerApp = null
-  }
-
-  if (containerApp) {
-    return
-  }
-
-  let rootEl = existingRootEl
-  if (!rootEl) {
-    rootEl = document.createElement('div')
-    rootEl.id = MESSAGE_CONTAINER_ROOT_ID
-    const mountTarget = resolveAnchoredOverlayTarget(null)
-    if (!mountTarget) return
-    mountTarget.appendChild(rootEl)
-  }
-
-  containerApp = createApp(MessageHost)
-  containerApp.mount(rootEl)
-}
-
 function addMessage(config: MessageConfig): () => void {
-  const id = getMessageInstanceId()
+  if (!isBrowser()) return () => undefined
 
-  const instance: InternalMessageInstance = {
-    id,
-    type: config.type || 'info',
+  const type = config.type || 'info'
+  const instance = messageQueue.add({
+    type,
     content: config.content,
-    duration: config.duration !== undefined ? config.duration : 3000,
+    duration: resolveMessageDuration(type, config.duration),
     closable: config.closable || false,
     onClose: config.onClose,
     icon: config.icon,
     className: config.className,
-    closeAriaLabel: config.closeAriaLabel ?? getDefaultMessageCloseAriaLabel(),
+    closeAriaLabel: config.closeAriaLabel,
     position: config.position ?? 'top'
-  }
-
-  messageInstances.value.push(instance)
-  ensureContainer()
-
-  if (instance.duration > 0) {
-    setTimeout(() => {
-      removeMessage(id)
-    }, instance.duration)
-  }
-
-  return () => removeMessage(id)
-}
-
-function removeMessage(id: string | number) {
-  const index = messageInstances.value.findIndex((msg) => msg.id === id)
-  if (index !== -1) {
-    const instance = messageInstances.value[index]
-    messageInstances.value.splice(index, 1)
-    instance.onClose?.()
-  }
-}
-
-function clearAll() {
-  messageInstances.value.forEach((instance) => {
-    instance.onClose?.()
   })
 
-  messageInstances.value = []
-
-  if (containerApp) {
-    containerApp.unmount()
-    containerApp = null
-  }
-  if (isBrowser()) {
-    const rootEl = document.getElementById(MESSAGE_CONTAINER_ROOT_ID)
-    if (rootEl?.parentNode) {
-      rootEl.parentNode.removeChild(rootEl)
-    }
+  if (!instance) return () => undefined
+  host.ensure()
+  return () => {
+    messageQueue.remove(instance.id)
   }
 }
 
@@ -158,27 +98,23 @@ function normalizeOptions(options: MessageOptions): MessageConfig {
 
 export const Message = {
   info(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'info' })
+    return addMessage({ ...normalizeOptions(options), type: 'info' })
   },
   success(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'success' })
+    return addMessage({ ...normalizeOptions(options), type: 'success' })
   },
   warning(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'warning' })
+    return addMessage({ ...normalizeOptions(options), type: 'warning' })
   },
   error(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'error' })
+    return addMessage({ ...normalizeOptions(options), type: 'error' })
   },
   loading(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'loading', duration: 0 })
+    return addMessage({ ...normalizeOptions(options), type: 'loading' })
   },
   clear() {
-    clearAll()
+    messageQueue.clear()
+    host.teardown()
   }
 }
 

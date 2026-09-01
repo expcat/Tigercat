@@ -1,54 +1,59 @@
-import React, { useEffect, useState } from 'react'
+import React, { useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
 import {
+  createImperativeHost,
   createLoadingBarController,
   isBrowser,
-  LOADING_BAR_CONTAINER_ROOT_ID,
-  resolveLoadingBarMountTarget,
   type LoadingBarApi,
   type LoadingBarOptions,
   type LoadingBarRuntimeState
 } from '@expcat/tigercat-core'
 import { LoadingBarContainer } from './LoadingBarContainer'
-import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export { LoadingBarContainer } from './LoadingBarContainer'
 export type { LoadingBarContainerProps } from './LoadingBarContainer'
 
-export type LoadingBarProps = LoadingBarOptions
-
-let containerRoot: Root | null = null
-let updateCallback: (() => void) | null = null
 let controller: ReturnType<typeof createLoadingBarController> | null = null
-
-function getDefaultAriaLabel(): string | undefined {
-  return getGlobalTigerLocale()?.common?.loadingText
-}
 
 function getController(): ReturnType<typeof createLoadingBarController> {
   if (!controller) {
     controller = createLoadingBarController()
     controller.subscribe(() => {
-      updateCallback?.()
+      if (controller?.getState().visible) return
+      host.teardown()
     })
   }
   return controller
 }
 
-const LoadingBarHost: React.FC = () => {
-  const [state, setState] = useState<LoadingBarRuntimeState>(() => getController().getState())
+const host = createImperativeHost<Root>({
+  mount(element) {
+    const root = createRoot(element)
+    flushSync(() => {
+      root.render(<LoadingBarHost />)
+    })
+    return root
+  },
+  unmount(root) {
+    root.unmount()
+  }
+})
 
-  useEffect(() => {
-    updateCallback = () => {
-      setState(getController().getState())
-    }
-    setState(getController().getState())
+function subscribeLoadingBar(onStoreChange: () => void): () => void {
+  return getController().subscribe(onStoreChange)
+}
 
-    return () => {
-      updateCallback = null
-    }
-  }, [])
+function getLoadingBarSnapshot(): LoadingBarRuntimeState {
+  return getController().getState()
+}
+
+function LoadingBarHost() {
+  const state = useSyncExternalStore(
+    subscribeLoadingBar,
+    getLoadingBarSnapshot,
+    getLoadingBarSnapshot
+  )
 
   if (!state.visible) return null
 
@@ -65,92 +70,46 @@ const LoadingBarHost: React.FC = () => {
   )
 }
 
-function ensureContainer(container?: string | HTMLElement) {
-  if (!isBrowser()) {
-    return
-  }
-
-  const existingRootEl = document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID)
-
-  if (containerRoot && !existingRootEl) {
-    containerRoot = null
-    updateCallback = null
-  }
-
-  if (containerRoot) {
-    return
-  }
-
-  let rootEl = existingRootEl
-  if (!rootEl) {
-    rootEl = document.createElement('div')
-    rootEl.id = LOADING_BAR_CONTAINER_ROOT_ID
-    const mountTarget = resolveLoadingBarMountTarget(container) ?? document.body
-    mountTarget.appendChild(rootEl)
-  }
-
-  containerRoot = createRoot(rootEl)
-  flushSync(() => {
-    containerRoot?.render(<LoadingBarHost />)
-  })
-}
-
-function teardownContainer() {
-  if (containerRoot) {
-    containerRoot.unmount()
-    containerRoot = null
-  }
-  updateCallback = null
-
-  if (isBrowser()) {
-    const rootEl = document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID)
-    if (rootEl?.parentNode) {
-      rootEl.parentNode.removeChild(rootEl)
-    }
-  }
-}
-
-function withAriaLabel(options?: LoadingBarOptions): LoadingBarOptions | undefined {
-  if (options?.ariaLabel) return options
-  const localeLabel = getDefaultAriaLabel()
-  if (!localeLabel && !options) return options
-  return { ...options, ariaLabel: options?.ariaLabel ?? localeLabel }
+function syncHost(container?: string | HTMLElement): void {
+  if (!isBrowser()) return
+  if (!getController().getState().visible) return
+  host.ensure(container)
 }
 
 export const LoadingBar: LoadingBarApi = {
   start(options?: LoadingBarOptions): void {
-    const resolved = withAriaLabel(options)
-    const shouldUpdateExistingContainer =
-      isBrowser() &&
-      containerRoot !== null &&
-      document.getElementById(LOADING_BAR_CONTAINER_ROOT_ID) !== null
-
-    getController().start(resolved)
-    ensureContainer(resolved?.container)
-
-    if (shouldUpdateExistingContainer && updateCallback) {
-      updateCallback()
-    }
+    if (!isBrowser()) return
+    getController().start(options)
+    syncHost(options?.container ?? getController().getState().container)
+  },
+  set(percentage: number): void {
+    if (!isBrowser()) return
+    getController().set(percentage)
+    syncHost(getController().getState().container)
+  },
+  inc(delta?: number): void {
+    if (!isBrowser()) return
+    getController().inc(delta)
+    syncHost(getController().getState().container)
   },
   finish(): void {
+    if (!isBrowser()) return
     getController().finish()
-    if (updateCallback) {
-      updateCallback()
-    } else if (getController().getState().visible) {
-      ensureContainer()
+    if (getController().getState().visible) {
+      syncHost(getController().getState().container)
     }
   },
   error(): void {
+    if (!isBrowser()) return
     getController().error()
-    if (updateCallback) {
-      updateCallback()
-    } else {
-      ensureContainer()
+    if (getController().getState().visible) {
+      syncHost(getController().getState().container)
     }
   },
   clear(): void {
+    if (!isBrowser()) return
     getController().clear()
-    teardownContainer()
+    host.teardown()
   }
 }
 

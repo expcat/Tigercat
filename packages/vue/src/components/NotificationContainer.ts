@@ -1,9 +1,11 @@
-import { computed, defineComponent, h, TransitionGroup, type PropType } from 'vue'
+import { computed, defineComponent, h, type PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  getNotificationCloseAriaLabel,
   getNotificationIconPath,
   getNotificationTypeClasses,
+  getToastItemRole,
   notificationActionButtonClasses,
   notificationActionButtonTypeClasses,
   notificationActionsClasses,
@@ -17,27 +19,29 @@ import {
   notificationIconClasses,
   notificationPositionClasses,
   notificationTitleClasses,
+  shouldHandleToastSurfaceEvent,
   type NotificationInstance,
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
 import { renderVueBodyTeleport } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
+import { getGlobalTigerLocale } from '../utils/global-locale'
 
 type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
-
-const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
-const NOTIFICATION_CLOSE_ARIA_LABEL = 'Close notification'
-
-const IS_TEST_ENV = (() => {
-  const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
-  return typeof proc !== 'undefined' && proc.env?.NODE_ENV === 'test'
-})()
 
 export interface VueNotificationContainerProps {
   position?: NotificationPosition
   notifications?: NotificationInstance[]
-  onClose?: (id: string | number) => void
+  className?: string
+  /**
+   * Portal through the overlay-host chain. Imperative hosts pass `false`.
+   * @default true
+   */
+  portal?: boolean
 }
+
+export type NotificationContainerProps = VueNotificationContainerProps
 
 export const NotificationContainer = /* @__PURE__ */ defineComponent({
   name: 'TigerNotificationContainer',
@@ -51,39 +55,46 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
       type: Array as PropType<NotificationInstance[]>,
       default: () => []
     },
-    onClose: Function as PropType<(id: string | number) => void>
+    className: {
+      type: String,
+      default: undefined
+    },
+    portal: {
+      type: Boolean,
+      default: true
+    }
   },
-  setup(props, { attrs }) {
+  emits: ['close'],
+  setup(props, { attrs, emit }) {
+    const config = useTigerConfig()
+    const locale = computed(() => config.value.locale ?? getGlobalTigerLocale())
     const containerClasses = computed(() =>
       classNames(
         notificationContainerBaseClasses,
         notificationPositionClasses[props.position],
+        props.className,
         coerceClassValue(attrs.class)
       )
     )
 
     const renderNotificationItem = (notification: NotificationInstance) => {
       const colorScheme = getNotificationTypeClasses(notification.type)
-
       const notificationClasses = classNames(
         notificationBaseClasses,
         colorScheme.bg,
         colorScheme.border,
         notification.className
       )
-
       const iconPath = notification.icon || getNotificationIconPath(notification.type)
       const iconClass = classNames(notificationIconClasses, colorScheme.icon)
-
-      const a11yRole = notification.type === 'error' ? 'alert' : 'status'
-      const ariaLive = notification.type === 'error' ? 'assertive' : 'polite'
+      const a11yRole = getToastItemRole(notification.type)
+      const closeLabel = getNotificationCloseAriaLabel(locale.value, notification.closeAriaLabel)
+      const close = () => emit('close', notification.id)
 
       const contentChildren = [
         h(
           'div',
-          {
-            class: classNames(notificationTitleClasses, colorScheme.titleText)
-          },
+          { class: classNames(notificationTitleClasses, colorScheme.titleText) },
           notification.title
         )
       ]
@@ -92,9 +103,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
         contentChildren.push(
           h(
             'div',
-            {
-              class: classNames(notificationDescriptionClasses, colorScheme.descriptionText)
-            },
+            { class: classNames(notificationDescriptionClasses, colorScheme.descriptionText) },
             notification.description
           )
         )
@@ -116,15 +125,13 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
                   ),
                   type: 'button',
                   disabled: action.disabled,
-                  onClick: (e: MouseEvent) => {
-                    e.stopPropagation()
+                  onClick: (event: MouseEvent) => {
+                    event.stopPropagation()
                     action.onClick?.({
                       id: notification.id,
-                      close: () => props.onClose?.(notification.id)
+                      close
                     })
-                    if (action.closeOnClick) {
-                      props.onClose?.(notification.id)
-                    }
+                    if (action.closeOnClick) close()
                   }
                 },
                 action.label
@@ -145,11 +152,11 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
             'button',
             {
               class: notificationCloseButtonClasses,
-              onClick: (e: MouseEvent) => {
-                e.stopPropagation()
-                props.onClose?.(notification.id)
+              onClick: (event: MouseEvent) => {
+                event.stopPropagation()
+                close()
               },
-              'aria-label': notification.closeAriaLabel ?? NOTIFICATION_CLOSE_ARIA_LABEL,
+              'aria-label': closeLabel,
               type: 'button'
             },
             createStatusIcon(notificationCloseIconPath, notificationCloseIconClasses, {
@@ -166,18 +173,11 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
           key: notification.id,
           class: notificationClasses,
           role: a11yRole,
-          'aria-live': ariaLive,
-          'aria-atomic': 'true',
-          onClick: notification.onClick,
-          onKeydown: (e: KeyboardEvent) => {
+          onClick: (event: MouseEvent) => {
             if (!notification.onClick) return
-            const key = e.key
-            if (key === 'Enter' || key === ' ') {
-              e.preventDefault()
-              notification.onClick()
-            }
+            if (!shouldHandleToastSurfaceEvent(event)) return
+            notification.onClick()
           },
-          tabindex: notification.onClick ? 0 : undefined,
           style: notification.onClick ? 'cursor: pointer;' : undefined,
           'data-tiger-notification': '',
           'data-tiger-notification-type': notification.type,
@@ -187,32 +187,19 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
       )
     }
 
-    return () =>
-      renderVueBodyTeleport(
-        h(
-          'div',
-          {
-            ...attrs,
-            class: containerClasses.value,
-            id: `${NOTIFICATION_CONTAINER_ID_PREFIX}-${props.position}`,
-            'aria-live': 'polite',
-            'aria-relevant': 'additions',
-            'data-tiger-notification-container': '',
-            'data-tiger-notification-position': props.position
-          },
-          IS_TEST_ENV
-            ? props.notifications.map(renderNotificationItem)
-            : h(
-                TransitionGroup,
-                {
-                  name: 'notification',
-                  tag: 'div',
-                  class: 'flex flex-col gap-3'
-                },
-                () => props.notifications.map(renderNotificationItem)
-              )
-        )
+    return () => {
+      const node = h(
+        'div',
+        {
+          ...attrs,
+          class: containerClasses.value,
+          'data-tiger-notification-container': '',
+          'data-tiger-notification-position': props.position
+        },
+        props.notifications.map(renderNotificationItem)
       )
+      return props.portal ? renderVueBodyTeleport(node) : node
+    }
   }
 })
 

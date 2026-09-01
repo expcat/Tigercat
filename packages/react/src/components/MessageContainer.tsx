@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import {
-  ANIMATION_DURATION_MS,
   classNames,
   defaultMessageThemeColors,
+  getMessageCloseAriaLabel,
   getMessageIconPath,
   getMessageTypeClasses,
+  getToastItemRole,
   messageBaseClasses,
   messageCloseButtonClasses,
   messageCloseIconPath,
@@ -14,54 +15,38 @@ import {
   messageLoadingSpinnerClasses,
   messagePositionClasses,
   type MessageInstance,
-  type MessagePosition
+  type MessagePosition,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { StatusIcon, StatusIconWithLoading } from './shared/icons'
-
-const MESSAGE_CONTAINER_ID = 'tiger-message-container'
-const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
+import { useTigerConfig } from './ConfigProvider'
+import { getGlobalTigerLocale } from '../utils/global-locale'
+import { renderBodyPortal } from '../utils/overlay'
 
 interface MessageItemProps {
   message: MessageInstance
+  locale?: Partial<TigerLocale>
   onClose?: (id: string | number) => void
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 10)
-    return () => clearTimeout(timer)
-  }, [])
-
+const MessageItem: React.FC<MessageItemProps> = ({ message, locale, onClose }) => {
   const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
-
   const messageClasses = classNames(
     messageBaseClasses,
     colorScheme.bg,
     colorScheme.border,
     colorScheme.text,
-    message.className,
-    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+    message.className
   )
-
   const iconPath = message.icon || getMessageIconPath(message.type)
   const iconClass = classNames(messageIconClasses, colorScheme.icon)
-
-  const handleClose = useCallback(() => {
-    setIsVisible(false)
-    setTimeout(() => onClose?.(message.id), ANIMATION_DURATION_MS)
-  }, [message.id, onClose])
-
-  const a11yRole = message.type === 'error' ? 'alert' : 'status'
-  const ariaLive = message.type === 'error' ? 'assertive' : 'polite'
+  const a11yRole = getToastItemRole(message.type)
+  const closeLabel = getMessageCloseAriaLabel(locale, message.closeAriaLabel)
 
   return (
     <div
       className={messageClasses}
       role={a11yRole}
-      aria-live={ariaLive}
-      aria-atomic="true"
       aria-busy={message.type === 'loading' || undefined}
       data-tiger-message
       data-tiger-message-type={message.type}
@@ -71,15 +56,22 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
         className={iconClass}
         isLoading={message.type === 'loading'}
         spinnerClass={messageLoadingSpinnerClasses}
+        aria-hidden="true"
+        focusable="false"
       />
       <div className={messageContentClasses}>{message.content}</div>
       {message.closable && (
         <button
           className={messageCloseButtonClasses}
-          onClick={handleClose}
-          aria-label={message.closeAriaLabel ?? MESSAGE_CLOSE_ARIA_LABEL}
+          onClick={() => onClose?.(message.id)}
+          aria-label={closeLabel}
           type="button">
-          <StatusIcon path={messageCloseIconPath} className="w-4 h-4" />
+          <StatusIcon
+            path={messageCloseIconPath}
+            className="w-4 h-4"
+            aria-hidden="true"
+            focusable="false"
+          />
         </button>
       )}
     </div>
@@ -90,30 +82,36 @@ export interface MessageContainerProps {
   position?: MessagePosition
   messages?: MessageInstance[]
   onClose?: (id: string | number) => void
+  /**
+   * Portal through the overlay-host chain. Imperative hosts pass `false`
+   * because they are already mounted on that target.
+   * @default true
+   */
+  portal?: boolean
 }
 
 export const MessageContainer: React.FC<MessageContainerProps> = ({
   position = 'top',
   messages = [],
-  onClose
+  onClose,
+  portal = true
 }) => {
+  const config = useTigerConfig()
+  const locale = config.locale ?? getGlobalTigerLocale()
   const containerClasses = classNames(messageContainerBaseClasses, messagePositionClasses[position])
-  const containerId =
-    position === 'top' ? MESSAGE_CONTAINER_ID : `${MESSAGE_CONTAINER_ID}-${position}`
 
-  return (
+  const node = (
     <div
       className={containerClasses}
-      id={containerId}
-      aria-live="polite"
-      aria-relevant="additions"
       data-tiger-message-position={position}
       data-tiger-message-container>
       {messages.map((message) => (
-        <MessageItem key={message.id} message={message} onClose={onClose} />
+        <MessageItem key={message.id} message={message} locale={locale} onClose={onClose} />
       ))}
     </div>
   )
+
+  return portal ? renderBodyPortal(node) : node
 }
 
 export default MessageContainer

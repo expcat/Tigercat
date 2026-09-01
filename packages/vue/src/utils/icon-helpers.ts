@@ -71,8 +71,9 @@ export function createStatusIconWithLoading(
   path: string,
   className: string,
   isLoading: boolean,
-  spinnerClass: string
+  spinnerClass: string,
+  extraAttrs?: Record<string, string>
 ): VNode {
   const merged = classNames(className, isLoading && spinnerClass)
-  return createStatusIcon(path, merged)
+  return createStatusIcon(path, merged, extraAttrs)
 }

@@ -1,9 +1,11 @@
-import type { LoadingBarApi, LoadingBarOptions } from '@expcat/tigercat-core'
+import { isBrowser, type LoadingBarApi, type LoadingBarOptions } from '@expcat/tigercat-core'
 
-export type LoadingBarProps = LoadingBarOptions
+export type { LoadingBarOptions }
 
 type LoadingBarCommand =
   | { type: 'start'; options?: LoadingBarOptions }
+  | { type: 'set'; percentage: number }
+  | { type: 'inc'; delta?: number }
   | { type: 'finish' }
   | { type: 'error' }
   | { type: 'clear' }
@@ -22,10 +24,19 @@ function applyCommand(api: LoadingBarApi, command: LoadingBarCommand): void {
     api.start(command.options)
     return
   }
+  if (command.type === 'set') {
+    api.set(command.percentage)
+    return
+  }
+  if (command.type === 'inc') {
+    api.inc(command.delta)
+    return
+  }
   api[command.type]()
 }
 
 function enqueue(command: LoadingBarCommand): void {
+  if (!isBrowser()) return
   if (resolvedApi) {
     applyCommand(resolvedApi, command)
     return
@@ -45,6 +56,12 @@ function enqueue(command: LoadingBarCommand): void {
 export const LoadingBar: LoadingBarApi = {
   start(options) {
     enqueue({ type: 'start', options })
+  },
+  set(percentage) {
+    enqueue({ type: 'set', percentage })
+  },
+  inc(delta) {
+    enqueue({ type: 'inc', delta })
   },
   finish() {
     enqueue({ type: 'finish' })

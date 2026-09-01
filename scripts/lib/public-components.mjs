@@ -540,7 +540,9 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['PrintPageBreak', 'PrintLayout'],
   ['StepsItem', 'Steps'],
   ['SubMenu', 'Menu'],
-  ['TabPane', 'Tabs']
+  ['TabPane', 'Tabs'],
+  ['Message', 'MessageRoot'],
+  ['LoadingBar', 'LoadingBarRoot']
 ])
 
 export const REQUIRED_CORE_PACKAGE_EXPORTS = [
@@ -610,7 +612,9 @@ export function collectPublicComponentExports(indexContent) {
     const specifiers = match[1].split(',').map((specifier) => specifier.trim())
     for (const specifier of specifiers) {
       const name = specifier.split(/\s+as\s+/)[0].trim()
-      if (/^[A-Z]/.test(name) && !/Context$/.test(name)) componentExports.add(name)
+      if (/^[A-Z]/.test(name) && !/Context$/.test(name) && !/Key$/i.test(name)) {
+        componentExports.add(name)
+      }
     }
   }
 

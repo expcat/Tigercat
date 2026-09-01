@@ -495,9 +495,9 @@
       "default": "./dist/components/Loading.mjs"
     },
     "./LoadingBar": {
-      "types": "./dist/components/LoadingBar.d.mts",
-      "import": "./dist/components/LoadingBar.mjs",
-      "default": "./dist/components/LoadingBar.mjs"
+      "types": "./dist/components/LoadingBarRoot.d.mts",
+      "import": "./dist/components/LoadingBarRoot.mjs",
+      "default": "./dist/components/LoadingBarRoot.mjs"
     },
     "./LoadingBarContainer": {
       "types": "./dist/components/LoadingBarContainer.d.mts",
@@ -545,9 +545,9 @@
       "default": "./dist/components/Menu.mjs"
     },
     "./Message": {
-      "types": "./dist/components/Message.d.mts",
-      "import": "./dist/components/Message.mjs",
-      "default": "./dist/components/Message.mjs"
+      "types": "./dist/components/MessageRoot.d.mts",
+      "import": "./dist/components/MessageRoot.mjs",
+      "default": "./dist/components/MessageRoot.mjs"
     },
     "./MessageContainer": {
       "types": "./dist/components/MessageContainer.d.mts",

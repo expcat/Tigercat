@@ -142,18 +142,26 @@ function createCoreRuntimeExport() {
 function createMessageRootExport() {
   wroteMessageRoot = true
 
-  return `function forwardMessage(method, options) {
+  return `let resolvedMessage = null;
+function loadMessage() {
+  return import('./components/Message.mjs').then((module) => {
+    resolvedMessage = module.Message;
+    return module.Message;
+  });
+}
+function forwardMessage(method, options) {
+  if (resolvedMessage) {
+    return resolvedMessage[method](options);
+  }
   let closeMessage = null;
   let requestedClose = false;
-  queueMicrotask(() => {
-    void import('./components/Message.mjs').then(({ Message }) => {
-      const close = Message[method](options);
-      if (requestedClose) {
-        close();
-      } else {
-        closeMessage = close;
-      }
-    });
+  void loadMessage().then((Message) => {
+    const close = Message[method](options);
+    if (requestedClose) {
+      close();
+    } else {
+      closeMessage = close;
+    }
   });
   return () => {
     if (closeMessage) {
@@ -181,10 +189,12 @@ const Message = {
     return forwardMessage('loading', options);
   },
   clear() {
-    queueMicrotask(() => {
-      void import('./components/Message.mjs').then(({ Message }) => {
-        Message.clear();
-      });
+    if (resolvedMessage) {
+      resolvedMessage.clear();
+      return;
+    }
+    void loadMessage().then((Message) => {
+      Message.clear();
     });
   }
 };
@@ -194,18 +204,26 @@ export { Message };`
 function createNotificationRootExport() {
   wroteNotificationRoot = true
 
-  return `function forwardNotification(method, options) {
+  return `let resolvedNotification = null;
+function loadNotification() {
+  return import('./components/Notification.mjs').then((module) => {
+    resolvedNotification = module.notification;
+    return module.notification;
+  });
+}
+function forwardNotification(method, options) {
+  if (resolvedNotification) {
+    return resolvedNotification[method](options);
+  }
   let closeNotification = null;
   let requestedClose = false;
-  queueMicrotask(() => {
-    void import('./components/Notification.mjs').then(({ notification }) => {
-      const close = notification[method](options);
-      if (requestedClose) {
-        close();
-      } else {
-        closeNotification = close;
-      }
-    });
+  void loadNotification().then((notification) => {
+    const close = notification[method](options);
+    if (requestedClose) {
+      close();
+    } else {
+      closeNotification = close;
+    }
   });
   return () => {
     if (closeNotification) {
@@ -230,10 +248,12 @@ const notification = {
     return forwardNotification('info', options);
   },
   clear(position) {
-    queueMicrotask(() => {
-      void import('./components/Notification.mjs').then(({ notification }) => {
-        notification.clear(position);
-      });
+    if (resolvedNotification) {
+      resolvedNotification.clear(position);
+      return;
+    }
+    void loadNotification().then((notification) => {
+      notification.clear(position);
     });
   }
 };
@@ -263,6 +283,14 @@ function applyLoadingBarCommand(api, command) {
     api.start(command.options);
     return;
   }
+  if (command.type === 'set') {
+    api.set(command.percentage);
+    return;
+  }
+  if (command.type === 'inc') {
+    api.inc(command.delta);
+    return;
+  }
   api[command.type]();
 }
 let pendingLoadingBarCommands = [];
@@ -270,6 +298,12 @@ let resolvedLoadingBar = null;
 const LoadingBar = {
   start(options) {
     enqueueLoadingBar({ type: 'start', options });
+  },
+  set(percentage) {
+    enqueueLoadingBar({ type: 'set', percentage });
+  },
+  inc(delta) {
+    enqueueLoadingBar({ type: 'inc', delta });
   },
   finish() {
     enqueueLoadingBar({ type: 'finish' });

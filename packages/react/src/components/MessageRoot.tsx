@@ -1,17 +1,25 @@
-import type { MessageOptions, MessageType } from '@expcat/tigercat-core'
+import { isBrowser, type MessageOptions, type MessageType } from '@expcat/tigercat-core'
 
-export type MessageProps = MessageOptions
+export type { MessageOptions }
 
 type MessageClose = () => void
 
 let messageModulePromise: Promise<typeof import('./Message')> | null = null
+let resolvedMessage: (typeof import('./Message'))['Message'] | null = null
 
 function loadMessageModule(): Promise<typeof import('./Message')> {
-  messageModulePromise ??= import('./Message')
+  messageModulePromise ??= import('./Message').then((module) => {
+    resolvedMessage = module.Message
+    return module
+  })
   return messageModulePromise
 }
 
 function forwardMessage(method: MessageType, options: MessageOptions): MessageClose {
+  if (!isBrowser()) return () => undefined
+  if (resolvedMessage) {
+    return resolvedMessage[method](options)
+  }
   let closeMessage: MessageClose | null = null
   let requestedClose = false
   void loadMessageModule().then(({ Message }) => {
@@ -52,6 +60,11 @@ export const Message: Record<MessageType, (options: MessageOptions) => MessageCl
     return forwardMessage('loading', options)
   },
   clear() {
+    if (!isBrowser()) return
+    if (resolvedMessage) {
+      resolvedMessage.clear()
+      return
+    }
     void loadMessageModule().then(({ Message }) => {
       Message.clear()
     })

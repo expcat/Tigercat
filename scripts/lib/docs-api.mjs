@@ -298,7 +298,11 @@ export const COMPONENT_PROP_PRIORITY = {
   FloatButtonGroup: ['trigger?', 'open?', 'portal?', 'placement?', 'shape?'],
   Spotlight: ['items?', 'open?', 'hotkey?', 'query?'],
   ScrollSpy: ['items?', 'getContainer?', 'direction?', 'activeKey?'],
-  Notification: ['actions?', 'type?', 'position?'],
+  Notification: ['actions?', 'type?', 'position?', 'duration?', 'closable?', 'closeAriaLabel?'],
+  NotificationContainer: ['position?', 'notifications?', 'onClose?'],
+  LoadingBar: ['container?', 'ariaLabel?', 'color?', 'height?'],
+  LoadingBarContainer: ['percentage?', 'status?', 'height?', 'ariaLabel?'],
+  MessageContainer: ['position?', 'messages?', 'onClose?'],
   Table: [
     'dataSource?',
     'pagination?',
@@ -622,7 +626,11 @@ export function getVisiblePropRows(component, propRows) {
 
 export const COMMAND_API_USAGE = {
   Message: { Vue: "Message.info('Saved')", React: "Message.info('Saved')" },
-  LoadingBar: { Vue: 'LoadingBar.start()', React: 'LoadingBar.start()' }
+  LoadingBar: { Vue: 'LoadingBar.start()', React: 'LoadingBar.start()' },
+  Notification: {
+    Vue: "notification.info({ title: 'Saved' })",
+    React: "notification.info({ title: 'Saved' })"
+  }
 }
 
 export const REQUIRED_USAGE_SNIPPETS = {
@@ -652,6 +660,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Progress: '<Progress :percentage="64" />',
     Alert: '<Alert type="info" title="Saved" />',
     Loading: '<Loading :spinning="loading"><slot /></Loading>',
+    MessageContainer: '<MessageContainer :messages="messages" />',
+    NotificationContainer: '<NotificationContainer :notifications="items" />',
+    LoadingBarContainer: '<LoadingBarContainer :percentage="40" />',
     Splitter: '<Splitter :sizes="sizes"><div>A</div><div>B</div></Splitter>',
     Resizable: '<Resizable :default-width="300" :default-height="150"><slot /></Resizable>',
     Input: '<Input v-model="value" />',
@@ -770,6 +781,9 @@ export const REQUIRED_USAGE_SNIPPETS = {
     Progress: '<Progress percentage={64} />',
     Alert: '<Alert type="info" title="Saved" />',
     Loading: '<Loading spinning={loading}>{children}</Loading>',
+    MessageContainer: '<MessageContainer messages={messages} />',
+    NotificationContainer: '<NotificationContainer notifications={items} />',
+    LoadingBarContainer: '<LoadingBarContainer percentage={40} />',
     Splitter: '<Splitter sizes={sizes}><div>A</div><div>B</div></Splitter>',
     Resizable: '<Resizable defaultWidth={300} defaultHeight={150}>{children}</Resizable>',
     Input: '<Input value={value} onChange={(event) => setValue(event.target.value)} />',

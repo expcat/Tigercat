@@ -1,161 +1,75 @@
-import { createApp, defineComponent, h, ref, type App, type PropType } from 'vue'
+import { createApp, defineComponent, h, onBeforeUnmount, shallowRef, type App } from 'vue'
 import {
-  createInstanceCounter,
-  createNotificationStackUpdateScheduler,
+  createImperativeHost,
+  createToastQueue,
   isBrowser,
   normalizeStringOption,
-  resolveAnchoredOverlayTarget,
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { NotificationContainer } from './NotificationContainer'
-import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export { NotificationContainer } from './NotificationContainer'
 export type { VueNotificationContainerProps } from './NotificationContainer'
 
-const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
+const NOTIFICATION_POSITIONS: NotificationPosition[] = [
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right'
+]
 
-const notificationInstancesByPosition: Record<NotificationPosition, NotificationInstance[]> = {
-  'top-left': [],
-  'top-right': [],
-  'bottom-left': [],
-  'bottom-right': []
-}
+const notificationQueue = createToastQueue<NotificationInstance>()
+const host = createImperativeHost<App<Element>>({
+  mount(element) {
+    const app = createApp(NotificationHost)
+    app.mount(element)
+    return app
+  },
+  unmount(app) {
+    app.unmount()
+  }
+})
 
-const containerApps: Record<NotificationPosition, App<Element> | null> = {
-  'top-left': null,
-  'top-right': null,
-  'bottom-left': null,
-  'bottom-right': null
-}
-
-const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
-  'top-left': null,
-  'top-right': null,
-  'bottom-left': null,
-  'bottom-right': null
-}
-let stackUpdateScheduler: ReturnType<typeof createNotificationStackUpdateScheduler> | null = null
-let getNextInstanceId: ReturnType<typeof createInstanceCounter> | null = null
-
-export type VueNotificationProps = NotificationOptions
-
-function getNotificationStackUpdateScheduler(): ReturnType<
-  typeof createNotificationStackUpdateScheduler
-> {
-  stackUpdateScheduler ??= createNotificationStackUpdateScheduler()
-  return stackUpdateScheduler
-}
-
-function getNotificationInstanceId(): string | number {
-  getNextInstanceId ??= createInstanceCounter()
-  return getNextInstanceId()
-}
-
-function getDefaultNotificationCloseAriaLabel(): string | undefined {
-  const locale = getGlobalTigerLocale()
-  const closeText = locale?.common?.closeText
-  if (!closeText) return undefined
-  const localeCode = locale.locale?.toLowerCase() ?? ''
-  if (localeCode.startsWith('zh')) return `${closeText}通知`
-  if (localeCode.startsWith('en')) return `${closeText} notification`
-  return closeText
-}
-
-function scheduleNotificationStackUpdate(position: NotificationPosition): void {
-  const callback = updateCallbacks[position]
-  if (!callback) return
-
-  getNotificationStackUpdateScheduler().schedule(position, callback)
-}
-
-function getContainerRootId(position: NotificationPosition) {
-  return `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
-}
+notificationQueue.subscribe(() => {
+  if (notificationQueue.getSnapshot().length > 0) return
+  queueMicrotask(() => {
+    if (notificationQueue.getSnapshot().length === 0) host.teardown()
+  })
+})
 
 const NotificationHost = /* @__PURE__ */ defineComponent({
   name: 'TigerNotificationHost',
-  props: {
-    position: {
-      type: String as PropType<NotificationPosition>,
-      required: true
-    }
-  },
-  setup(props) {
-    const notifications = ref<NotificationInstance[]>([])
-
-    updateCallbacks[props.position] = () => {
-      notifications.value = [...notificationInstancesByPosition[props.position]]
-    }
-    updateCallbacks[props.position]?.()
+  setup() {
+    const notifications = shallowRef<readonly NotificationInstance[]>(
+      notificationQueue.getSnapshot()
+    )
+    const stop = notificationQueue.subscribe(() => {
+      notifications.value = notificationQueue.getSnapshot()
+    })
+    onBeforeUnmount(stop)
 
     return () =>
-      h(NotificationContainer, {
-        position: props.position,
-        notifications: notifications.value,
-        onClose: (id: string | number) => removeNotification(id, props.position)
+      NOTIFICATION_POSITIONS.map((position) => {
+        const positioned = notifications.value.filter((item) => item.position === position)
+        if (positioned.length === 0) return null
+        return h(NotificationContainer, {
+          key: position,
+          position,
+          notifications: [...positioned],
+          portal: false,
+          onClose: (id: string | number) => notificationQueue.remove(id)
+        })
       })
   }
 })
 
-function ensureContainer(position: NotificationPosition) {
-  if (!isBrowser()) {
-    return
-  }
-
-  const rootId = getContainerRootId(position)
-  const existingRootEl = document.getElementById(rootId)
-
-  if (containerApps[position] && !existingRootEl) {
-    containerApps[position] = null
-    updateCallbacks[position] = null
-    getNotificationStackUpdateScheduler().cancel(position)
-  }
-
-  if (containerApps[position]) {
-    return
-  }
-
-  let rootEl = existingRootEl
-  if (!rootEl) {
-    rootEl = document.createElement('div')
-    rootEl.id = rootId
-    const mountTarget = resolveAnchoredOverlayTarget(null)
-    if (!mountTarget) return
-    mountTarget.appendChild(rootEl)
-  }
-
-  containerApps[position] = createApp(NotificationHost, { position })
-  containerApps[position]!.mount(rootEl)
-}
-
-function destroyContainer(position: NotificationPosition) {
-  const rootId = getContainerRootId(position)
-
-  if (containerApps[position]) {
-    containerApps[position]!.unmount()
-    containerApps[position] = null
-  }
-
-  updateCallbacks[position] = null
-  getNotificationStackUpdateScheduler().cancel(position)
-
-  if (isBrowser()) {
-    document.getElementById(rootId)?.remove()
-  }
-}
-
 function addNotification(config: NotificationConfig): () => void {
-  const id = getNotificationInstanceId()
-  const position = config.position || 'top-right'
+  if (!isBrowser()) return () => undefined
 
-  ensureContainer(position)
-
-  const instance: NotificationInstance = {
-    id,
+  const instance = notificationQueue.add({
     type: config.type || 'info',
     title: config.title,
     description: config.description,
@@ -166,56 +80,14 @@ function addNotification(config: NotificationConfig): () => void {
     actions: config.actions,
     icon: config.icon,
     className: config.className,
-    closeAriaLabel: config.closeAriaLabel ?? getDefaultNotificationCloseAriaLabel(),
-    position
-  }
+    closeAriaLabel: config.closeAriaLabel,
+    position: config.position || 'top-right'
+  })
 
-  notificationInstancesByPosition[position].push(instance)
-  scheduleNotificationStackUpdate(position)
-
-  if (instance.duration > 0) {
-    setTimeout(() => {
-      removeNotification(id, position)
-    }, instance.duration)
-  }
-
-  return () => removeNotification(id, position)
-}
-
-function removeNotification(id: string | number, position: NotificationPosition) {
-  const instances = notificationInstancesByPosition[position]
-  const index = instances.findIndex((notif) => notif.id === id)
-  if (index !== -1) {
-    const instance = instances[index]
-    instances.splice(index, 1)
-    instance.onClose?.()
-
-    if (notificationInstancesByPosition[position].length > 0) {
-      scheduleNotificationStackUpdate(position)
-    }
-  }
-
-  if (notificationInstancesByPosition[position].length === 0) {
-    destroyContainer(position)
-  }
-}
-
-function clearAll(position?: NotificationPosition) {
-  if (position) {
-    notificationInstancesByPosition[position].forEach((instance) => {
-      instance.onClose?.()
-    })
-    notificationInstancesByPosition[position] = []
-    destroyContainer(position)
-  } else {
-    Object.keys(notificationInstancesByPosition).forEach((pos) => {
-      const p = pos as NotificationPosition
-      notificationInstancesByPosition[p].forEach((instance) => {
-        instance.onClose?.()
-      })
-      notificationInstancesByPosition[p] = []
-      destroyContainer(p)
-    })
+  if (!instance) return () => undefined
+  host.ensure()
+  return () => {
+    notificationQueue.remove(instance.id)
   }
 }
 
@@ -225,23 +97,27 @@ function normalizeOptions(options: NotificationOptions): NotificationConfig {
 
 export const notification = {
   info(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options)
-    return addNotification({ ...config, type: 'info' })
+    return addNotification({ ...normalizeOptions(options), type: 'info' })
   },
   success(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options)
-    return addNotification({ ...config, type: 'success' })
+    return addNotification({ ...normalizeOptions(options), type: 'success' })
   },
   warning(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options)
-    return addNotification({ ...config, type: 'warning' })
+    return addNotification({ ...normalizeOptions(options), type: 'warning' })
   },
   error(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options)
-    return addNotification({ ...config, type: 'error' })
+    return addNotification({ ...normalizeOptions(options), type: 'error' })
   },
   clear(position?: NotificationPosition) {
-    clearAll(position)
+    if (position) {
+      notificationQueue
+        .getSnapshot()
+        .filter((item) => item.position === position)
+        .forEach((item) => notificationQueue.remove(item.id))
+      return
+    }
+    notificationQueue.clear()
+    host.teardown()
   }
 }
 

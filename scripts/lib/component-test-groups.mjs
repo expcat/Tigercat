@@ -138,6 +138,8 @@ const CORE_EXTRAS = {
     'floating.spec.ts',
     'focus-utils.spec.ts',
     'imperative-api.spec.ts',
+    'imperative-host.spec.ts',
+    'imperative-host.dom.spec.ts',
     'imperative-side-effects.spec.ts',
     'overlay-scroll-lock.spec.ts',
     'overlay-utils.spec.ts',

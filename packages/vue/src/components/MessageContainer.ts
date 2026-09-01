@@ -1,9 +1,11 @@
-import { computed, defineComponent, h, TransitionGroup, type PropType } from 'vue'
+import { computed, defineComponent, h, type PropType } from 'vue'
 import {
   classNames,
   defaultMessageThemeColors,
+  getMessageCloseAriaLabel,
   getMessageIconPath,
   getMessageTypeClasses,
+  getToastItemRole,
   messageBaseClasses,
   messageCloseButtonClasses,
   messageCloseIconPath,
@@ -17,20 +19,21 @@ import {
 } from '@expcat/tigercat-core'
 import { createStatusIcon, createStatusIconWithLoading } from '../utils/icon-helpers'
 import { renderVueBodyTeleport } from '../utils/overlay'
-
-const MESSAGE_CONTAINER_ID = 'tiger-message-container'
-const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
-
-const IS_TEST_ENV = (() => {
-  const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
-  return typeof proc !== 'undefined' && proc.env?.NODE_ENV === 'test'
-})()
+import { useTigerConfig } from './ConfigProvider'
+import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export interface VueMessageContainerProps {
   position?: MessagePosition
   messages?: MessageInstance[]
-  onClose?: (id: string | number) => void
+  /**
+   * Portal through the overlay-host chain. Imperative hosts pass `false`
+   * because they are already mounted on that target.
+   * @default true
+   */
+  portal?: boolean
 }
+
+export type MessageContainerProps = VueMessageContainerProps
 
 export const MessageContainer = /* @__PURE__ */ defineComponent({
   name: 'TigerMessageContainer',
@@ -43,16 +46,21 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
       type: Array as PropType<MessageInstance[]>,
       default: () => []
     },
-    onClose: Function as PropType<(id: string | number) => void>
+    portal: {
+      type: Boolean,
+      default: true
+    }
   },
-  setup(props) {
-    const containerClasses = computed(() => {
-      return classNames(messageContainerBaseClasses, messagePositionClasses[props.position])
-    })
+  emits: ['close'],
+  setup(props, { emit }) {
+    const config = useTigerConfig()
+    const locale = computed(() => config.value.locale ?? getGlobalTigerLocale())
+    const containerClasses = computed(() =>
+      classNames(messageContainerBaseClasses, messagePositionClasses[props.position])
+    )
 
     const renderMessageItem = (message: MessageInstance) => {
       const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
-
       const messageClasses = classNames(
         messageBaseClasses,
         colorScheme.bg,
@@ -60,19 +68,18 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
         colorScheme.text,
         message.className
       )
-
       const iconPath = message.icon || getMessageIconPath(message.type)
       const iconClass = classNames(messageIconClasses, colorScheme.icon)
-
-      const a11yRole = message.type === 'error' ? 'alert' : 'status'
-      const ariaLive = message.type === 'error' ? 'assertive' : 'polite'
+      const a11yRole = getToastItemRole(message.type)
+      const closeLabel = getMessageCloseAriaLabel(locale.value, message.closeAriaLabel)
 
       const children = [
         createStatusIconWithLoading(
           iconPath,
           iconClass,
           message.type === 'loading',
-          messageLoadingSpinnerClasses
+          messageLoadingSpinnerClasses,
+          { 'aria-hidden': 'true', focusable: 'false' }
         ),
         h('div', { class: messageContentClasses }, message.content)
       ]
@@ -83,11 +90,14 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
             'button',
             {
               class: messageCloseButtonClasses,
-              onClick: () => props.onClose?.(message.id),
-              'aria-label': message.closeAriaLabel ?? MESSAGE_CLOSE_ARIA_LABEL,
+              onClick: () => emit('close', message.id),
+              'aria-label': closeLabel,
               type: 'button'
             },
-            createStatusIcon(messageCloseIconPath, 'w-4 h-4')
+            createStatusIcon(messageCloseIconPath, 'w-4 h-4', {
+              'aria-hidden': 'true',
+              focusable: 'false'
+            })
           )
         )
       }
@@ -98,8 +108,6 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
           key: message.id,
           class: messageClasses,
           role: a11yRole,
-          'aria-live': ariaLive,
-          'aria-atomic': 'true',
           'aria-busy': message.type === 'loading' ? 'true' : undefined,
           'data-tiger-message': '',
           'data-tiger-message-type': message.type,
@@ -109,26 +117,18 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
       )
     }
 
-    return () =>
-      renderVueBodyTeleport(
-        h(
-          'div',
-          {
-            class: containerClasses.value,
-            id:
-              props.position === 'top'
-                ? MESSAGE_CONTAINER_ID
-                : `${MESSAGE_CONTAINER_ID}-${props.position}`,
-            'aria-live': 'polite',
-            'aria-relevant': 'additions',
-            'data-tiger-message-position': props.position,
-            'data-tiger-message-container': ''
-          },
-          IS_TEST_ENV
-            ? props.messages.map(renderMessageItem)
-            : h(TransitionGroup, { name: 'message' }, () => props.messages.map(renderMessageItem))
-        )
+    return () => {
+      const node = h(
+        'div',
+        {
+          class: containerClasses.value,
+          'data-tiger-message-position': props.position,
+          'data-tiger-message-container': ''
+        },
+        props.messages.map(renderMessageItem)
       )
+      return props.portal ? renderVueBodyTeleport(node) : node
+    }
   }
 })
 
