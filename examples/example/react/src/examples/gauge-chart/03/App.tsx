@@ -4,7 +4,7 @@ export default function App() {
   return (
     <div className="flex flex-wrap gap-4">
       <div>
-        <p className="mb-1 text-sm text-gray-500">默认 135°–405° 完整表盘 + gradient</p>
+        <p className="mb-1 text-sm text-gray-500">默认底开口 270° 弧 + gradient</p>
         <GaugeChart value={72} label="CPU" width={280} height={220} arcWidth={22} gradient />
       </div>
       <div>

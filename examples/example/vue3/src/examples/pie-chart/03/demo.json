@@ -1,7 +1,7 @@
 {
   "id": "pie-chart-03",
-  "title": "调色板、标签与提示格式化",
-  "description": "数据不带 color 时用 colors 统一配色；labelPosition=\"inside\" 配合 labelFormatter 自定义扇区标签，tooltipFormatter 自定义提示，gradient 开启渐变填充。",
+  "title": "内部标签、图例与渐变",
+  "description": "showLabels 画占比，gradient 用饼的垂直轴做填充，showLegend 列出各项。value 是数量不是百分数。",
   "entry": "App.vue",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }

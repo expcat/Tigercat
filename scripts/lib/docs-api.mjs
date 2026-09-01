@@ -579,6 +579,76 @@ export const COMPONENT_PROP_PRIORITY = {
     'selectable?',
     'showLegend?',
     'gradient?'
+  ],
+  PieChart: [
+    'showLabels?',
+    'labelPosition?',
+    'startAngle?',
+    'padAngle?',
+    'gradient?',
+    'shadow?',
+    'hoverable?',
+    'selectable?',
+    'showLegend?',
+    'showTooltip?',
+    'title?'
+  ],
+  DonutChart: [
+    'innerRadiusRatio?',
+    'centerValue?',
+    'centerLabel?',
+    'animated?',
+    'showLabels?',
+    'labelPosition?',
+    'showLegend?',
+    'gradient?'
+  ],
+  RadarChart: [
+    'data?',
+    'series?',
+    'maxValue?',
+    'startAngle?',
+    'levels?',
+    'showLabels?',
+    'showGrid?',
+    'gridShape?',
+    'showPoints?',
+    'hoverable?',
+    'selectable?',
+    'showLegend?',
+    'showTooltip?',
+    'gradient?',
+    'padding?',
+    'responsive?',
+    'title?'
+  ],
+  FunnelChart: [
+    'direction?',
+    'gap?',
+    'pinch?',
+    'gradient?',
+    'hoverable?',
+    'selectable?',
+    'showLegend?',
+    'showTooltip?',
+    'padding?',
+    'responsive?',
+    'title?'
+  ],
+  GaugeChart: [
+    'startAngle?',
+    'endAngle?',
+    'segments?',
+    'showTicks?',
+    'tickCount?',
+    'gradient?',
+    'label?',
+    'valueFormatter?',
+    'showTooltip?',
+    'padding?',
+    'responsive?',
+    'animated?',
+    'title?'
   ]
 }
 

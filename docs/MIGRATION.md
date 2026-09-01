@@ -4,6 +4,14 @@
 
 ## 未发布
 
+Pie 默认从 12 点钟起（`startAngle = -Math.PI / 2`）。Donut 默认 `innerRadiusRatio` 是 0.6，色板与 Pie 同一份 `--tiger-chart-*`。扇区不再是 `role="img"`。Vue 从主入口引 `PieChartProps` / `DonutChartProps`。
+
+Radar 多系列共用第一列的角域（或 `indicators`）。负值 / 非有限不再拉进圆心。默认 padding 36。点默认 `aria-hidden`。Vue 从主入口引 `RadarChartProps`。`gradient` 写在 core。
+
+Funnel `direction="horizontal"` 会沿 x 画。缺 label 走 locale `chart.stageName`，core 不再写 `Stage N`。Vue 从主入口引 `FunnelChartProps`。
+
+Gauge 角度：0 = 12 点钟、顺时针。默认 `-135…135` 底开口，不再是右侧缺口的 135–405。根是 `role="meter"`，不再默认进 Tab。删未实现的 `colors`。Vue 从主入口引 `GaugeChartProps`。
+
 Bar / Line / Area / Scatter 默认 padding 与 ChartCanvas 同一份（底/左 52）。`barRadius` 传入后不再被 `--tiger-chart-bar-radius` 盖掉。Area `gradient` 默认是 false。Scatter `datum.size` 默认仍是像素半径并 clamp 到 40；要按数据度量缩放请开 `sizeScale`。点默认不再是 `role="img"`。Vue 从主入口引 `BarChartProps` / `LineChartProps` / `AreaChartProps` / `ScatterChartProps`。`onPointClick` 不必再开 `selectable`。
 
 ChartCanvas `responsive` 观察的是画布宿主，不是外面的 legend 壳。默认 padding 从 `24` 改成 `{ top: 24, right: 24, bottom: 52, left: 52 }`。有 `title` / `aria-label` 时 svg 是 `role="img"`。React children 可以是 `( { innerRect, width, height } ) => node`。

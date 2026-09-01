@@ -7,7 +7,7 @@ const tooltipFormatter = (value: number) => `当前占用 ${value}%`
 <template>
   <div class="flex flex-wrap gap-4">
     <div>
-      <p class="mb-1 text-sm text-gray-500">默认 135°–405° 完整表盘 + gradient</p>
+      <p class="mb-1 text-sm text-gray-500">默认底开口 270° 弧 + gradient</p>
       <GaugeChart :value="72" label="CPU" :width="280" :height="220" :arc-width="22" gradient />
     </div>
     <div>

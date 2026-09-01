@@ -1,7 +1,7 @@
 {
   "id": "pie-chart-02",
-  "title": "内半径、角度与间隔",
-  "description": "innerRadius 挖出环形；startAngle/endAngle 做半圆仪表式扇形；padAngle 与 borderWidth/borderColor 控制扇区间隔。",
+  "title": "半圆与外部标签",
+  "description": "startAngle/endAngle 画出半圆；labelPosition=\"outside\" 把标签放在扇区外。挖环请用 DonutChart。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }

@@ -25,21 +25,5 @@ const series: RadarChartSeries[] = [
 ]
 
 export default function App() {
-  return (
-    <RadarChart
-      series={series}
-      width={380}
-      height={280}
-      maxValue={100}
-      gridShape="circle"
-      showSplitArea
-      showLevelLabels
-      showPoints
-      fillOpacity={0.18}
-      hoverable
-      selectable
-      showLegend
-      legendPosition="right"
-    />
-  )
+  return <RadarChart series={series} width={380} height={280} />
 }

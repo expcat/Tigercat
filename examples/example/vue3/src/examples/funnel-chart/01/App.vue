@@ -11,15 +11,5 @@ const data = [
 </script>
 
 <template>
-  <FunnelChart
-    :data="data"
-    :width="500"
-    :height="220"
-    direction="horizontal"
-    pinch
-    :gap="4"
-    :colors="['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe']"
-    hoverable
-    selectable
-    show-legend />
+  <FunnelChart :data="data" :width="360" :height="300" />
 </template>

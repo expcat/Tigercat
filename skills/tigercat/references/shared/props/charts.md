@@ -116,25 +116,33 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## DonutChart
 
-`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 5/39 props
+`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 8/39 props
 
-| Prop                | Type               | Default | Notes                                                         |
-| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
-| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                    |
-| `innerRadiusRatio?` | `number`           | `0.6`   | Inner radius ratio based on outer radius                      |
-| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the donut center              |
-| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue in the donut center |
-| `animated?`         | `boolean`          | `false` | Enable entrance animation (fade + scale)                      |
+| Prop                | Type                    | Default    | Notes                                                         |
+| ------------------- | ----------------------- | ---------- | ------------------------------------------------------------- |
+| `data`              | `PieChartDatum[]`       | `-`        | Chart data                                                    |
+| `innerRadiusRatio?` | `number`                | `0.6`      | Inner radius ratio based on outer radius                      |
+| `centerValue?`      | `string \| number`      | `-`        | Text shown as the main value in the donut center              |
+| `centerLabel?`      | `string`                | `-`        | Descriptive label shown below centerValue in the donut center |
+| `animated?`         | `boolean`               | `false`    | Enable entrance animation (fade + scale)                      |
+| `showLabels?`       | `boolean`               | `false`    | Whether to show labels                                        |
+| `labelPosition?`    | `'inside' \| 'outside'` | `'inside'` | Label position: inside the slice or outside with leader lines |
+| `showLegend?`       | `boolean`               | `false`    | Whether to show legend                                        |
 
 ## FunnelChart
 
-`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 3/25 props
+`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 8/26 props
 
-| Prop         | Type                         | Default      | Notes                                         |
-| ------------ | ---------------------------- | ------------ | --------------------------------------------- |
-| `data`       | `FunnelChartDatum[]`         | `-`          | Data items — ordered from widest to narrowest |
-| `direction?` | `'vertical' \| 'horizontal'` | `'vertical'` | Vertical or horizontal layout                 |
-| `gap?`       | `number`                     | `2`          | Gap between funnel segments in px             |
+| Prop          | Type                         | Default      | Notes                                                                          |
+| ------------- | ---------------------------- | ------------ | ------------------------------------------------------------------------------ |
+| `data`        | `FunnelChartDatum[]`         | `-`          | Data items — ordered from widest to narrowest                                  |
+| `direction?`  | `'vertical' \| 'horizontal'` | `'vertical'` | Vertical or horizontal layout. Horizontal grows along x; height follows value. |
+| `gap?`        | `number`                     | `2`          | Gap between funnel segments in px                                              |
+| `pinch?`      | `boolean`                    | `false`      | Whether the last segment tapers to a point                                     |
+| `gradient?`   | `boolean`                    | `false`      | Render each segment with a vertical alpha gradient in funnel user space.       |
+| `hoverable?`  | `boolean`                    | `false`      | Enable hover highlight                                                         |
+| `selectable?` | `boolean`                    | `false`      | Enable click selection                                                         |
+| `showLegend?` | `boolean`                    | `false`      | Whether to show legend                                                         |
 
 ## Gantt
 
@@ -148,13 +156,18 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## GaugeChart
 
-`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 3/24 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 8/24 props
 
-| Prop    | Type     | Default | Notes                      |
-| ------- | -------- | ------- | -------------------------- |
-| `value` | `number` | `-`     | Current value              |
-| `min?`  | `number` | `0`     | Minimum value of the scale |
-| `max?`  | `number` | `100`   | Maximum value of the scale |
+| Prop          | Type                                               | Default | Notes                                                                                      |
+| ------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value`       | `number`                                           | `-`     | Current value                                                                              |
+| `startAngle?` | `number`                                           | `-135`  | Start angle in degrees. `0` is 12 o'clock; positive is clockwise. Default is a bottom-o... |
+| `endAngle?`   | `number`                                           | `135`   | End angle in degrees (same convention as `startAngle`)                                     |
+| `segments?`   | `Array<{ range: [number, number] color: string }>` | `-`     | Color segments along the arc. Array of { range: [from, to], color }                        |
+| `showTicks?`  | `boolean`                                          | `true`  | Whether to show tick marks                                                                 |
+| `tickCount?`  | `number`                                           | `5`     | Number of intervals between min and max (renders `tickCount + 1` marks).                   |
+| `gradient?`   | `boolean`                                          | `false` | When true, the value arc is rendered with a vertical alpha gradient in gauge user space... |
+| `label?`      | `string`                                           | `-`     | Label shown below the value                                                                |
 
 ## HeatmapChart
 
@@ -193,23 +206,33 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## PieChart
 
-`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 3/35 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 8/39 props
 
-| Prop           | Type              | Default | Notes                  |
-| -------------- | ----------------- | ------- | ---------------------- |
-| `data`         | `PieChartDatum[]` | `-`     | Chart data             |
-| `innerRadius?` | `number`          | `0`     | Inner radius for donut |
-| `outerRadius?` | `number`          | `-`     | Outer radius           |
+| Prop             | Type                    | Default        | Notes                                                                                      |
+| ---------------- | ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `data`           | `PieChartDatum[]`       | `-`            | Chart data                                                                                 |
+| `showLabels?`    | `boolean`               | `false`        | Whether to show labels                                                                     |
+| `labelPosition?` | `'inside' \| 'outside'` | `'inside'`     | Label position: inside the slice or outside with leader lines                              |
+| `startAngle?`    | `number`                | `-Math.PI / 2` | Start angle in radians. `0` is 3 o'clock; default is 12 o'clock. Sweep is clockwise bec... |
+| `padAngle?`      | `number`                | `0`            | Padding angle in radians                                                                   |
+| `gradient?`      | `boolean`               | `false`        | Fill slices with a vertical alpha gradient in pie user space.                              |
+| `shadow?`        | `boolean`               | `false`        | Enable drop shadow on slices                                                               |
+| `hoverable?`     | `boolean`               | `false`        | Enable hover highlight                                                                     |
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 3/54 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 8/55 props
 
-| Prop        | Type                 | Default | Notes                        |
-| ----------- | -------------------- | ------- | ---------------------------- |
-| `data?`     | `RadarChartDatum[]`  | `-`     | Chart data (single series)   |
-| `series?`   | `RadarChartSeries[]` | `-`     | Multiple series              |
-| `maxValue?` | `number`             | `-`     | Max value for radius scaling |
+| Prop          | Type                    | Default        | Notes                                                   |
+| ------------- | ----------------------- | -------------- | ------------------------------------------------------- |
+| `data?`       | `RadarChartDatum[]`     | `-`            | Chart data (single series)                              |
+| `series?`     | `RadarChartSeries[]`    | `-`            | Multiple series                                         |
+| `maxValue?`   | `number`                | `-`            | Max value for radius scaling                            |
+| `startAngle?` | `number`                | `-Math.PI / 2` | Start angle in radians                                  |
+| `levels?`     | `number`                | `5`            | Grid levels                                             |
+| `showLabels?` | `boolean`               | `true`         | Whether to show labels                                  |
+| `showGrid?`   | `boolean`               | `true`         | Whether to show grid                                    |
+| `gridShape?`  | `'polygon' \| 'circle'` | `'polygon'`    | Grid shape: polygon (default) or circle (ECharts style) |
 
 ## ScatterChart
 

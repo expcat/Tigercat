@@ -1,7 +1,7 @@
 {
   "id": "gauge-chart-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、颜色分段、自定义弧形，减少重复示例块。",
+  "title": "基础仪表盘",
+  "description": "只传 value。默认底开口 270° 弧。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

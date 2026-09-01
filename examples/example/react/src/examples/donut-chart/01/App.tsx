@@ -8,25 +8,6 @@ const data: PieChartDatum[] = [
   { value: 135, label: '视频广告' }
 ]
 
-const total = data.reduce((sum, item) => sum + item.value, 0)
-
 export default function App() {
-  return (
-    <DonutChart
-      data={data}
-      width={380}
-      height={280}
-      innerRadiusRatio={0.5}
-      padAngle={0.06}
-      hoverOffset={14}
-      hoverable
-      selectable
-      showLabels
-      showLegend
-      legendPosition="right"
-      showTooltip
-      centerValue={total}
-      centerLabel="访问量"
-    />
-  )
+  return <DonutChart data={data} width={380} height={280} />
 }

@@ -27,18 +27,5 @@ const series: RadarChartSeries[] = [
 </script>
 
 <template>
-  <RadarChart
-    :series="series"
-    :width="380"
-    :height="280"
-    :max-value="100"
-    grid-shape="circle"
-    show-split-area
-    show-level-labels
-    show-points
-    :fill-opacity="0.18"
-    hoverable
-    selectable
-    show-legend
-    legend-position="right" />
+  <RadarChart :series="series" :width="380" :height="280" />
 </template>
