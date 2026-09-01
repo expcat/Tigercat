@@ -1,21 +1,28 @@
 import React, { useId, useMemo } from 'react'
 import {
-  chartAxisTickTextClasses,
   classNames,
-  computePieHoverOffset,
-  computePieLabelLine,
-  createPieArcPath,
-  getChartElementOpacity,
-  getChartInnerRect,
-  getPieArcs,
   getStableChartGradientPrefix,
-  PIE_BASE_SHADOW,
-  PIE_EMPHASIS_SHADOW,
-  polarToCartesian,
   resolveChartPalette,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
+  getCartesianChartShellClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
+  formatChartTemplate,
+  layoutPieSlices,
+  pieSliceDisplayLabel,
+  pieSliceTransitionClasses,
+  pieSliceLabelInsideClasses,
+  resolvePieRadii,
+  DEFAULT_PIE_START_ANGLE,
+  DONUT_ENTRANCE_CLASS,
+  PIE_BASE_SHADOW,
+  PIE_EMPHASIS_SHADOW,
+  getChartElementOpacity,
   type ChartLegendItem,
   type ChartPadding,
   type PieChartDatum,
@@ -25,6 +32,8 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface PieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -39,10 +48,12 @@ export const PieChart: React.FC<PieChartProps> = ({
   width = 320,
   height = 200,
   padding = 24,
+  responsive = false,
   data,
-  innerRadius = 0,
+  innerRadius,
+  innerRadiusRatio,
   outerRadius,
-  startAngle = 0,
+  startAngle = DEFAULT_PIE_START_ANGLE,
   endAngle = Math.PI * 2,
   padAngle = 0,
   colors,
@@ -67,6 +78,9 @@ export const PieChart: React.FC<PieChartProps> = ({
   showTooltip = true,
   tooltipFormatter,
   legendFormatter,
+  centerValue,
+  centerLabel,
+  animated = false,
   title,
   desc,
   className,
@@ -75,7 +89,15 @@ export const PieChart: React.FC<PieChartProps> = ({
   onSliceClick,
   onSliceHover
 }) => {
-  // Use shared interaction hook
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const interactive = hoverable || selectable || Boolean(onSliceClick)
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('pie', gradientId),
+    [gradientId]
+  )
+
   const {
     tooltipPosition,
     resolvedHoveredIndex,
@@ -88,8 +110,7 @@ export const PieChart: React.FC<PieChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<PieChartDatum>({
     hoverable,
     showTooltip,
@@ -108,210 +129,267 @@ export const PieChart: React.FC<PieChartProps> = ({
     onClick: onSliceClick
   })
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
-
-  const resolvedOuterRadius = useMemo(() => {
-    if (typeof outerRadius === 'number') return Math.max(0, outerRadius)
-    const maxR = Math.min(innerRect.width, innerRect.height) / 2
-    return labelPosition === 'outside' ? maxR * 0.72 : maxR
-  }, [outerRadius, innerRect.width, innerRect.height, labelPosition])
-
-  const resolvedInnerRadius = useMemo(
-    () => Math.min(Math.max(0, innerRadius ?? 0), resolvedOuterRadius),
-    [innerRadius, resolvedOuterRadius]
-  )
-
-  const arcs = useMemo(
+  const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const radii = useMemo(
     () =>
-      getPieArcs(data, {
+      resolvePieRadii({
+        innerWidth: innerRect.width,
+        innerHeight: innerRect.height,
+        innerRadius,
+        outerRadius,
+        innerRadiusRatio,
+        labelPosition,
+        hoverOffset
+      }),
+    [
+      innerRect.width,
+      innerRect.height,
+      innerRadius,
+      outerRadius,
+      innerRadiusRatio,
+      labelPosition,
+      hoverOffset
+    ]
+  )
+  const slices = useMemo(
+    () =>
+      layoutPieSlices(data, {
+        cx: radii.cx,
+        cy: radii.cy,
+        innerRadius: radii.innerRadius,
+        outerRadius: radii.outerRadius,
         startAngle,
         endAngle,
-        padAngle
+        padAngle,
+        palette,
+        gradient,
+        gradientPrefix,
+        hoverOffset,
+        labelPosition
       }),
-    [data, startAngle, endAngle, padAngle]
+    [
+      data,
+      radii.cx,
+      radii.cy,
+      radii.innerRadius,
+      radii.outerRadius,
+      startAngle,
+      endAngle,
+      padAngle,
+      palette,
+      gradient,
+      gradientPrefix,
+      hoverOffset,
+      labelPosition
+    ]
   )
-
-  const palette = useMemo(() => resolveChartPalette(colors), [colors])
-
-  const gradientId = useId()
-  const gradientPrefix = useMemo(
-    () => getStableChartGradientPrefix('pie', gradientId),
-    [gradientId]
-  )
-
-  const cx = innerRect.width / 2
-  const cy = innerRect.height / 2
-  const labelRadius = resolvedInnerRadius + (resolvedOuterRadius - resolvedInnerRadius) / 2
-
-  const total = useMemo(() => data.reduce((sum, d) => sum + d.value, 0), [data])
-
-  const formatLabel =
-    labelFormatter ?? ((value: number, datum: PieChartDatum) => datum.label ?? `${value}`)
+  const total = useMemo(() => slices.reduce((sum, slice) => sum + slice.value, 0), [slices])
+  const sliceName = (datum: PieChartDatum, index: number) =>
+    pieSliceDisplayLabel(datum, index, labels.sliceName)
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
-        data: arcs.map((a) => a.data),
+        data: slices.map((slice) => slice.datum),
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
-        getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? `${i + 1}`)),
+        getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : sliceName(d, i)),
         getColor: (d, i) => d.color ?? palette[i % palette.length]
       }),
-    [arcs, legendFormatter, palette, activeIndex, resolvedSelectedIndex]
+    [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, labels.sliceName]
   )
 
   const tooltipContent = useMemo(
     () =>
       resolveChartTooltipContent(resolvedHoveredIndex, data, tooltipFormatter, (datum, index) => {
-        const label = datum.label ?? `Slice ${index + 1}`
+        const name = sliceName(datum, index)
         const percentage = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
-        return `${label}: ${datum.value} (${percentage}%)`
+        return `${name}: ${datum.value} (${percentage}%)`
       }),
-    [resolvedHoveredIndex, data, tooltipFormatter, total]
+    [resolvedHoveredIndex, data, tooltipFormatter, total, labels.sliceName]
   )
 
-  const interactive = hoverable || selectable
+  const visualActive = slices.findIndex(
+    (slice) => slice.index === (activeIndex ?? resolvedHoveredIndex)
+  )
+  const centerParts = [centerValue, centerLabel].filter((part) => part !== undefined)
+  const resolvedDesc = [desc, ...centerParts.map((part) => String(part))].filter(Boolean).join(' ')
+
+  const handleSliceKeyDown = (event: React.KeyboardEvent<SVGPathElement>, visualIndex: number) => {
+    if (isChartNavigationKey(event.key)) {
+      event.preventDefault()
+      const nextVisual = nextChartRovingIndex(visualIndex, event.key, slices.length)
+      const next = slices[nextVisual]
+      const node = event.currentTarget.parentElement?.querySelector(
+        `[data-pie-slice][data-index="${next.index}"]`
+      )
+      if (node instanceof SVGElement) node.focus()
+      handleMouseEnter(next.index, event)
+      return
+    }
+    handleKeyDown(event, slices[visualIndex].index)
+  }
 
   const chart = (
     <ChartCanvas
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
-      desc={desc}
-      className={classNames(className)}>
-      <g data-series-type="pie">
-        {gradient && (
-          <defs>
-            {arcs.map((arc) => {
-              const color = arc.data.color ?? palette[arc.index % palette.length]
-              return (
-                <linearGradient
-                  key={`pie-grad-${arc.index}`}
-                  id={`${gradientPrefix}-${arc.index}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1">
-                  <stop offset="0%" stopColor={color} stopOpacity={1} />
-                  <stop offset="100%" stopColor={color} stopOpacity={0.7} />
-                </linearGradient>
-              )
-            })}
-          </defs>
-        )}
-        {arcs.map((arc) => {
-          const color = arc.data.color ?? palette[arc.index % palette.length]
-          const path = createPieArcPath({
-            cx,
-            cy,
-            innerRadius: resolvedInnerRadius,
-            outerRadius: resolvedOuterRadius,
-            startAngle: arc.startAngle,
-            endAngle: arc.endAngle
-          })
-          const isEmphasized = activeIndex === arc.index
-          const opacity = getChartElementOpacity(arc.index, activeIndex, {
-            activeOpacity,
-            inactiveOpacity
-          })
-          const { dx, dy } =
-            interactive && isEmphasized && hoverOffset > 0
-              ? computePieHoverOffset(arc.startAngle, arc.endAngle, hoverOffset)
-              : { dx: 0, dy: 0 }
-
-          return (
+      desc={resolvedDesc || undefined}
+      className={animated ? DONUT_ENTRANCE_CLASS : undefined}
+      onResolvedSizeChange={onResolvedSizeChange}>
+      {gradient && (
+        <defs>
+          {slices.map((slice) => (
+            <linearGradient
+              key={`pie-grad-${slice.index}`}
+              id={`${gradientPrefix}-${slice.index}`}
+              gradientUnits="userSpaceOnUse"
+              x1={radii.cx}
+              y1={radii.cy - radii.outerRadius}
+              x2={radii.cx}
+              y2={radii.cy + radii.outerRadius}>
+              <stop offset="0%" stopColor={slice.color} stopOpacity={1} />
+              <stop offset="100%" stopColor={slice.color} stopOpacity={0.7} />
+            </linearGradient>
+          ))}
+        </defs>
+      )}
+      {radii.innerRadius > 0 && centerParts.length > 0 && (
+        <clipPath id={`${gradientPrefix}-center`}>
+          <circle cx={radii.cx} cy={radii.cy} r={radii.innerRadius} />
+        </clipPath>
+      )}
+      {slices.map((slice, visualIndex) => {
+        const isEmphasized = activeIndex === slice.index
+        const ariaLabel = formatChartTemplate(labels.sliceAriaLabel, {
+          label: sliceName(slice.datum, slice.index),
+          value: slice.value,
+          percent: slice.percent.toFixed(1)
+        })
+        return (
+          <g
+            key={`slice-${slice.index}`}
+            transform={
+              interactive && isEmphasized
+                ? `translate(${slice.hoverDx} ${slice.hoverDy})`
+                : undefined
+            }>
             <path
-              key={`slice-${arc.index}`}
-              d={path}
-              fill={gradient ? `url(#${gradientPrefix}-${arc.index})` : color}
-              opacity={opacity}
+              d={slice.path}
+              fill={slice.fill}
+              opacity={getChartElementOpacity(slice.index, activeIndex, {
+                activeOpacity,
+                inactiveOpacity
+              })}
               stroke={borderColor}
               strokeWidth={borderWidth}
               strokeLinejoin="round"
-              className={classNames(interactive && 'cursor-pointer')}
+              data-pie-slice="true"
+              data-index={slice.index}
+              tabIndex={
+                interactive
+                  ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                  : undefined
+              }
+              role={interactive ? 'button' : undefined}
+              aria-hidden={interactive ? undefined : true}
+              aria-label={interactive ? ariaLabel : undefined}
+              className={classNames(interactive && 'cursor-pointer', pieSliceTransitionClasses)}
               style={{
-                transform: isEmphasized
-                  ? `translate(${dx}px, ${dy}px) scale(1.04)`
-                  : `translate(${dx}px, ${dy}px)`,
-                transformOrigin: `${cx}px ${cy}px`,
-                transition:
-                  'transform var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1)), opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-decelerate,ease-out)',
                 filter: shadow ? (isEmphasized ? PIE_EMPHASIS_SHADOW : PIE_BASE_SHADOW) : undefined
               }}
-              tabIndex={selectable ? 0 : undefined}
-              role={selectable ? 'button' : 'img'}
-              aria-label={arc.data.label ?? String(arc.value)}
-              data-pie-slice="true"
-              data-index={arc.index}
-              onMouseEnter={(e) => handleMouseEnter(arc.index, e)}
+              onMouseEnter={(e) => handleMouseEnter(slice.index, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onClick={() => handleClick(arc.index)}
-              onKeyDown={(e) => handleKeyDown(e, arc.index)}
+              onFocus={(e) => handleMouseEnter(slice.index, e)}
+              onClick={() => handleClick(slice.index)}
+              onKeyDown={(e) => handleSliceKeyDown(e, visualIndex)}
             />
-          )
-        })}
-      </g>
+          </g>
+        )
+      })}
       {showLabels &&
         labelPosition === 'outside' &&
-        arcs.map((arc) => {
-          const color = arc.data.color ?? palette[arc.index % palette.length]
-          const line = computePieLabelLine(
-            cx,
-            cy,
-            resolvedOuterRadius,
-            arc.startAngle,
-            arc.endAngle
-          )
-          const pct = total > 0 ? ((arc.value / total) * 100).toFixed(1) : '0'
-          const labelText = labelFormatter
-            ? labelFormatter(arc.value, arc.data, arc.index)
-            : `${arc.data.label ?? arc.value} ${pct}%`
-
+        slices.map((slice) => {
+          const text = labelFormatter
+            ? labelFormatter(slice.value, slice.datum, slice.index)
+            : `${sliceName(slice.datum, slice.index)} ${slice.percent.toFixed(1)}%`
           return (
-            <g key={`label-group-${arc.index}`}>
+            <g key={`label-group-${slice.index}`} aria-hidden="true">
               <polyline
-                points={`${line.anchor.x},${line.anchor.y} ${line.elbow.x},${line.elbow.y} ${line.label.x},${line.label.y}`}
+                points={slice.outside?.points}
                 fill="none"
-                stroke={color}
+                stroke={slice.color}
                 strokeWidth={1}
                 opacity={0.5}
               />
               <text
-                x={line.label.x}
-                y={line.label.y}
-                textAnchor={line.textAnchor}
+                x={slice.outside?.x}
+                y={slice.outside?.y}
+                textAnchor={slice.outside?.textAnchor}
                 dominantBaseline="middle"
-                className="fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs">
-                {labelText}
+                className="fill-[color:var(--tiger-text,#1f2937)] text-xs">
+                {text}
               </text>
             </g>
           )
         })}
       {showLabels &&
         labelPosition !== 'outside' &&
-        arcs.map((arc) => {
-          const angle = (arc.startAngle + arc.endAngle) / 2
-          const { x, y } = polarToCartesian(cx, cy, labelRadius, angle)
-          const label = formatLabel(arc.value, arc.data, arc.index)
-
+        slices.map((slice) => {
+          const text = labelFormatter
+            ? labelFormatter(slice.value, slice.datum, slice.index)
+            : sliceName(slice.datum, slice.index)
           return (
             <text
-              key={`label-${arc.index}`}
-              x={x}
-              y={y}
-              className={chartAxisTickTextClasses}
+              key={`label-${slice.index}`}
+              x={slice.labelX}
+              y={slice.labelY}
+              className={pieSliceLabelInsideClasses}
               textAnchor="middle"
-              dominantBaseline="middle">
-              {label}
+              dominantBaseline="middle"
+              aria-hidden="true">
+              {text}
             </text>
           )
         })}
+      {centerParts.length > 0 && (
+        <g
+          data-donut-center="true"
+          clipPath={radii.innerRadius > 0 ? `url(#${gradientPrefix}-center)` : undefined}
+          aria-hidden="true">
+          {centerValue !== undefined && (
+            <text
+              x={radii.cx}
+              y={centerLabel !== undefined ? radii.cy - 8 : radii.cy}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-[color:var(--tiger-text,#1f2937)] text-xl font-semibold">
+              {`${centerValue}`}
+            </text>
+          )}
+          {centerLabel !== undefined && (
+            <text
+              x={radii.cx}
+              y={centerValue !== undefined ? radii.cy + 12 : radii.cy}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs">
+              {centerLabel}
+            </text>
+          )}
+        </g>
+      )}
     </ChartCanvas>
   )
 
@@ -324,28 +402,30 @@ export const PieChart: React.FC<PieChartProps> = ({
     />
   )
 
-  if (!showLegend) {
-    return (
-      <div className="inline-block relative">
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
-
   return (
-    <div className={wrapperClasses}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}
+      data-pie-chart=""
+      data-donut-chart={radii.innerRadius > 0 ? '' : undefined}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        orientation={chartLegendOrientationFromPosition(legendPosition)}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={interactive}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={hoverable || selectable}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )

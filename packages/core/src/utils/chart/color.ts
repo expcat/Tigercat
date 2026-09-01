@@ -106,13 +106,19 @@ export const RADAR_SPLIT_AREA_COLORS = [
 // ----------------------------------------------------------------------------
 
 /** Drop shadow filter value for emphasized pie slices */
-export const PIE_EMPHASIS_SHADOW = 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
-export const PIE_BASE_SHADOW = 'drop-shadow(0 1px 2px rgba(0,0,0,0.06))'
+export const PIE_EMPHASIS_SHADOW =
+  'drop-shadow(0 4px 8px color-mix(in oklab, var(--tiger-text) 25%, transparent))'
+export const PIE_BASE_SHADOW =
+  'drop-shadow(0 1px 2px color-mix(in oklab, var(--tiger-text) 12%, transparent))'
 
-/** Enhanced donut-specific shadow – deeper & more diffuse for richer emphasis */
-export const DONUT_EMPHASIS_SHADOW =
-  'drop-shadow(0 8px 20px rgba(0,0,0,0.28)) drop-shadow(0 2px 6px rgba(0,0,0,0.12))'
-export const DONUT_BASE_SHADOW = 'drop-shadow(0 2px 8px rgba(0,0,0,0.10))'
+export const pieSliceTransitionClasses =
+  'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+
+export const pieSliceLabelInsideClasses =
+  'fill-[color:var(--tiger-text-inverse,#f9fafb)] text-[11px] font-medium pointer-events-none select-none'
+
+export const funnelSegmentTransitionClasses =
+  'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
 
 // ----------------------------------------------------------------------------
 // Line / area / bar / scatter visual constants
@@ -214,13 +220,22 @@ export const cartesianChartAnimationBaseStyles = {
   '.tiger-bar-animated': {
     transition:
       'y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out)'
+  },
+  '@keyframes tiger-donut-entrance': {
+    from: { opacity: '0', transform: 'scale(0.9)' },
+    to: { opacity: '1', transform: 'scale(1)' }
+  },
+  '.tiger-donut-entrance': {
+    transformBox: 'fill-box',
+    transformOrigin: 'center',
+    animation:
+      'tiger-donut-entrance var(--tiger-motion-duration-slow,500ms) var(--tiger-motion-ease-spring,cubic-bezier(.34,1.56,.64,1)) both'
   }
 } as const
 
 /**
  * CSS animation keyframes and class for the donut entrance animation.
- * The animation scales/fades the chart in; reduced-motion users get no motion.
- * Inject once via a <style> tag when `animated` is enabled.
+ * The plugin owns the keyframes; components must not inject `<style>`.
  */
-export const DONUT_ENTRANCE_KEYFRAMES = `@keyframes tiger-donut-entrance{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}.tiger-donut-entrance{transform-origin:center;animation:tiger-donut-entrance var(--tiger-motion-duration-slow,500ms) var(--tiger-motion-ease-spring,cubic-bezier(.34,1.56,.64,1)) both}@media (prefers-reduced-motion: reduce){.tiger-donut-entrance{animation-duration:0ms}}`
-export const DONUT_ENTRANCE_CLASS = 'tiger-donut-entrance'
+export const DONUT_ENTRANCE_KEYFRAMES = ''
+export const DONUT_ENTRANCE_CLASS = 'tiger-donut-entrance motion-reduce:animate-none'

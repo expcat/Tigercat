@@ -540,6 +540,12 @@ export interface TigerLocaleChart {
   pointAriaLabel?: string
   /** Template: supports {index} */
   seriesName?: string
+  /** Template: supports {index} */
+  sliceName?: string
+  /** Template: supports {label}, {value}, {percent} */
+  sliceAriaLabel?: string
+  /** Template: supports {index} */
+  stageName?: string
 }
 
 export interface TigerLocaleMarkdownEditor {

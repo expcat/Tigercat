@@ -8,10 +8,15 @@ import {
   getBarValueLabelY,
   getScatterPointPath,
   isNumericChartDomain,
+  DEFAULT_DONUT_INNER_RADIUS_RATIO,
+  PIE_OUTSIDE_RADIUS_RATIO,
   layoutAreaSeries,
   layoutBarRects,
   layoutLineSeries,
+  layoutPieSlices,
+  layoutRadar,
   layoutScatterPoints,
+  resolvePieRadii,
   nextChartPointRef,
   reverseSvgPath,
   scatterPointDisplayLabel,
@@ -295,5 +300,119 @@ describe('scatterPointDisplayLabel', () => {
     expect(
       scatterPointDisplayLabel({ x: 10, y: 20, label: 'East' }, 0, 'Point {index}: ({x}, {y})')
     ).toBe('East')
+  })
+})
+
+describe('layoutPieSlices', () => {
+  const palette = ['#111', '#222', '#333']
+
+  it('assigns proportional angles and skips non-positive values', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const slices = layoutPieSlices(
+      [{ value: 1 }, { value: 0 }, { value: Number.NaN }, { value: -4 }, { value: 3 }],
+      {
+        cx: 50,
+        cy: 50,
+        innerRadius: 0,
+        outerRadius: 40,
+        startAngle: 0,
+        endAngle: Math.PI * 2,
+        padAngle: 0,
+        palette
+      }
+    )
+    expect(slices).toHaveLength(2)
+    expect(slices[0].index).toBe(0)
+    expect(slices[1].index).toBe(4)
+    const a0 = slices[0].endAngle - slices[0].startAngle
+    const a1 = slices[1].endAngle - slices[1].startAngle
+    expect(a1).toBeCloseTo(a0 * 3, 5)
+    expect(slices.every((slice) => slice.path && !slice.path.includes('NaN'))).toBe(true)
+    warn.mockRestore()
+  })
+
+  it('draws a full circle with two half-arcs instead of a hairline gap', () => {
+    const slices = layoutPieSlices([{ value: 10 }], {
+      cx: 50,
+      cy: 50,
+      innerRadius: 0,
+      outerRadius: 40,
+      startAngle: 0,
+      endAngle: Math.PI * 2,
+      padAngle: 0,
+      palette
+    })
+    expect(slices).toHaveLength(1)
+    expect(slices[0].path.split(' A ').length).toBeGreaterThan(2)
+    expect(slices[0].path).not.toContain('0.0001')
+  })
+
+  it('shrinks the default outer radius for outside labels', () => {
+    const radii = resolvePieRadii({
+      innerWidth: 200,
+      innerHeight: 200,
+      labelPosition: 'outside',
+      innerRadiusRatio: DEFAULT_DONUT_INNER_RADIUS_RATIO
+    })
+    expect(radii.outerRadius).toBeCloseTo(100 * PIE_OUTSIDE_RADIUS_RATIO, 5)
+    expect(radii.innerRadius).toBeCloseTo(radii.outerRadius * DEFAULT_DONUT_INNER_RADIUS_RATIO, 5)
+    expect(radii.innerRadius).toBeLessThan(radii.outerRadius * 0.72)
+  })
+})
+
+describe('layoutRadar', () => {
+  it('shares one angular domain across uneven series', () => {
+    const laid = layoutRadar(
+      [
+        {
+          name: 'A',
+          data: [
+            { value: 1, label: 'N' },
+            { value: 2, label: 'E' },
+            { value: 3, label: 'S' },
+            { value: 4, label: 'W' },
+            { value: 5, label: 'C' }
+          ]
+        },
+        {
+          name: 'B',
+          data: [
+            { value: 2, label: 'N' },
+            { value: 3, label: 'S' },
+            { value: 1, label: 'C' }
+          ]
+        }
+      ],
+      {
+        innerWidth: 200,
+        innerHeight: 200,
+        startAngle: -Math.PI / 2,
+        levels: 5,
+        gridShape: 'polygon',
+        palette: ['#111', '#222']
+      }
+    )
+    expect(laid.angles).toHaveLength(5)
+    expect(laid.series[0].points).toHaveLength(5)
+    expect(laid.series[1].points).toHaveLength(3)
+    expect(laid.series[1].points.map((point) => point.index)).toEqual([0, 2, 4])
+  })
+
+  it('omits non-finite and negative vertices from the polygon', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const laid = layoutRadar(
+      [{ data: [{ value: 4 }, { value: Number.NaN }, { value: -2 }, { value: 1 }] }],
+      {
+        innerWidth: 200,
+        innerHeight: 200,
+        startAngle: -Math.PI / 2,
+        levels: 4,
+        gridShape: 'polygon',
+        palette: ['#111']
+      }
+    )
+    expect(laid.series[0].points).toHaveLength(2)
+    expect(laid.series[0].path).not.toContain('NaN')
+    warn.mockRestore()
   })
 })

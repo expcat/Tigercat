@@ -76,15 +76,23 @@ export function getPieArcs<T extends { value: number }>(
   const startAngle = options.startAngle ?? 0
   const endAngle = options.endAngle ?? Math.PI * 2
   const padAngle = Math.max(0, options.padAngle ?? 0)
-  const values = data.map((item) => Math.max(0, item.value))
-  const total = values.reduce((sum, value) => sum + value, 0)
+  const valid: Array<{ item: T; index: number; value: number }> = []
+  data.forEach((item, index) => {
+    if (typeof item.value === 'number' && Number.isFinite(item.value) && item.value > 0) {
+      valid.push({ item, index, value: item.value })
+    }
+  })
+  const total = valid.reduce((sum, item) => sum + item.value, 0)
   if (total <= 0) return []
 
-  const cacheKey = getPieArcGeometryCacheKey(values, startAngle, endAngle, padAngle)
+  const cacheValues = valid.map((item) => item.value)
+  const cacheKey = `${getPieArcGeometryCacheKey(cacheValues, startAngle, endAngle, padAngle)}:${valid
+    .map((item) => item.index)
+    .join(',')}`
   const cachedGeometry = pieArcGeometryCache.get(cacheKey)
   if (cachedGeometry) {
     return cachedGeometry.map((geometry, index) => ({
-      data: data[index],
+      data: valid[index].item,
       value: geometry.value,
       startAngle: geometry.startAngle,
       endAngle: geometry.endAngle,
@@ -94,23 +102,22 @@ export function getPieArcs<T extends { value: number }>(
   }
 
   const totalAngle = endAngle - startAngle
-  const totalPadding = padAngle * data.length
+  const totalPadding = padAngle * valid.length
   const availableAngle = Math.max(0, totalAngle - totalPadding)
 
   let current = startAngle
-  const geometry = data.map((_item, index) => {
-    const value = values[index]
-    const sliceAngle = availableAngle * (value / total)
+  const geometry = valid.map((entry) => {
+    const sliceAngle = availableAngle * (entry.value / total)
     const sliceStart = current
     const sliceEnd = sliceStart + sliceAngle
     current = sliceEnd + padAngle
 
     return {
-      value,
+      value: entry.value,
       startAngle: sliceStart,
       endAngle: sliceEnd,
       padAngle,
-      index
+      index: entry.index
     }
   })
 
@@ -125,7 +132,7 @@ export function getPieArcs<T extends { value: number }>(
   pieArcGeometryCache.set(cacheKey, frozenGeometry)
 
   return frozenGeometry.map((item, index) => ({
-    data: data[index],
+    data: valid[index].item,
     value: item.value,
     startAngle: item.startAngle,
     endAngle: item.endAngle,
@@ -144,19 +151,38 @@ export function createPieArcPath(options: {
 }): string {
   const { cx, cy, outerRadius } = options
   const innerRadius = Math.max(0, options.innerRadius ?? 0)
-
-  let startAngle = options.startAngle
-  let endAngle = options.endAngle
-  const fullCircle = Math.PI * 2
-  if (endAngle - startAngle >= fullCircle) {
-    endAngle = startAngle + fullCircle - 0.0001
+  const startAngle = options.startAngle
+  const endAngle = options.endAngle
+  if (
+    ![cx, cy, outerRadius, innerRadius, startAngle, endAngle].every((value) =>
+      Number.isFinite(value)
+    )
+  ) {
+    return ''
   }
 
-  if (endAngle <= startAngle) return ''
+  const sweep = endAngle - startAngle
+  if (sweep <= 0 || outerRadius <= 0) return ''
+
+  const fullCircle = Math.PI * 2
+  if (sweep >= fullCircle - 1e-10) {
+    if (innerRadius <= 0) {
+      const startOuter = polarToCartesian(cx, cy, outerRadius, startAngle)
+      const midOuter = polarToCartesian(cx, cy, outerRadius, startAngle + Math.PI)
+      return [
+        `M ${cx} ${cy}`,
+        `L ${startOuter.x} ${startOuter.y}`,
+        `A ${outerRadius} ${outerRadius} 0 1 1 ${midOuter.x} ${midOuter.y}`,
+        `A ${outerRadius} ${outerRadius} 0 1 1 ${startOuter.x} ${startOuter.y}`,
+        'Z'
+      ].join(' ')
+    }
+    return createCircleRingPath(cx, cy, outerRadius, innerRadius)
+  }
 
   const startOuter = polarToCartesian(cx, cy, outerRadius, startAngle)
   const endOuter = polarToCartesian(cx, cy, outerRadius, endAngle)
-  const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0
+  const largeArcFlag = sweep > Math.PI ? 1 : 0
 
   if (innerRadius <= 0) {
     return [
@@ -257,32 +283,40 @@ export function getRadarPoints<T extends { value: number }>(
     radius: number
     startAngle?: number
     maxValue?: number
+    angles?: number[]
   }
 ): RadarPoint<T>[] {
   if (data.length === 0) return []
 
   const startAngle = options.startAngle ?? -Math.PI / 2
-  const maxValue = Math.max(0, options.maxValue ?? Math.max(...data.map((datum) => datum.value)))
+  const finiteValues = data.map((datum) => datum.value).filter((value) => Number.isFinite(value))
+  const maxValue = Math.max(
+    0,
+    options.maxValue ?? (finiteValues.length > 0 ? Math.max(...finiteValues) : 0)
+  )
   const resolvedMax = maxValue > 0 ? maxValue : 1
-  const step = (Math.PI * 2) / data.length
+  const count = options.angles && options.angles.length > 0 ? options.angles.length : data.length
+  const step = (Math.PI * 2) / count
 
-  return data.map((datum, index) => {
-    const value = Math.max(0, datum.value)
-    const ratio = value / resolvedMax
+  const points: RadarPoint<T>[] = []
+  data.forEach((datum, index) => {
+    if (!Number.isFinite(datum.value) || datum.value < 0) return
+    const ratio = datum.value / resolvedMax
     const radius = options.radius * ratio
-    const angle = startAngle + step * index
+    const angle = options.angles?.[index] ?? startAngle + step * index
     const point = polarToCartesian(options.cx, options.cy, radius, angle)
-
-    return {
+    if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) return
+    points.push({
       data: datum,
-      value,
+      value: datum.value,
       angle,
       radius,
       x: point.x,
       y: point.y,
       index
-    }
+    })
   })
+  return points
 }
 
 export function createPolygonPath(points: Array<{ x: number; y: number }>): string {

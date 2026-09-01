@@ -1,10 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import {
-  classNames,
-  getChartInnerRect,
-  normalizeChartPadding,
-  DONUT_ENTRANCE_KEYFRAMES,
-  DONUT_ENTRANCE_CLASS,
+  DEFAULT_DONUT_INNER_RADIUS_RATIO,
   type ChartPadding,
   type PieChartDatum,
   type DonutChartProps as CoreDonutChartProps
@@ -14,218 +10,17 @@ import { PieChart } from './PieChart'
 export interface DonutChartProps extends CoreDonutChartProps {
   data: PieChartDatum[]
   padding?: ChartPadding
-  /** Text shown as the main value in the donut center */
-  centerValue?: string | number
-  /** Descriptive label shown below centerValue in the donut center */
-  centerLabel?: string
-  /** Enable entrance animation */
-  animated?: boolean
-  // Interaction callbacks
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
   onSliceClick?: (index: number, datum: PieChartDatum) => void
   onSliceHover?: (index: number | null, datum: PieChartDatum | null) => void
 }
 
-/**
- * Default palette for donut charts.
- *
- * Uses theme tokens (`--tiger-chart-1..6`) with ECharts-inspired hex fallbacks
- * so the palette tracks light/dark theme switches and modern preset overrides
- * (PR-12, 2026-04). Slots 7–9 reuse tokens 1–3 to keep nine distinct positions.
- */
-const DONUT_PALETTE = [
-  'var(--tiger-chart-1,#5470c6)',
-  'var(--tiger-chart-2,#91cc75)',
-  'var(--tiger-chart-3,#fac858)',
-  'var(--tiger-chart-4,#ee6666)',
-  'var(--tiger-chart-5,#73c0de)',
-  'var(--tiger-chart-6,#3ba272)',
-  'var(--tiger-chart-1,#fc8452)',
-  'var(--tiger-chart-2,#9a60b4)',
-  'var(--tiger-chart-3,#ea7ccc)'
-]
-
 export const DonutChart: React.FC<DonutChartProps> = ({
-  width = 320,
-  height = 240,
-  padding = 24,
-  data,
-  innerRadius,
-  innerRadiusRatio = 0.62,
-  outerRadius,
-  startAngle = 0,
-  endAngle = Math.PI * 2,
-  padAngle = 0.04,
-  colors,
-  showLabels = false,
-  labelFormatter,
-  labelPosition = 'inside',
-  borderWidth = 0,
-  borderColor = 'var(--tiger-surface,#ffffff)',
-  hoverOffset = 10,
-  shadow = true,
-  // Interaction props
-  hoverable = false,
-  hoveredIndex,
-  activeOpacity = 1,
-  inactiveOpacity = 0.3,
-  selectable = false,
-  selectedIndex,
-  // Legend props
-  showLegend = false,
-  legendPosition = 'bottom',
-  legendMarkerSize = 10,
-  legendGap = 8,
-  legendFormatter,
-  // Tooltip props
-  showTooltip = true,
-  tooltipFormatter,
-  // Accessibility
-  title,
-  desc,
-  className,
-  // DonutChart-specific
-  centerValue,
-  centerLabel,
-  animated = false,
-  // Visual modes (forwarded to PieChart, opt-in per PR-19k(b6/b7))
-  gradient = false,
-  // Callbacks
-  onHoveredIndexChange,
-  onSelectedIndexChange,
-  onSliceClick,
-  onSliceHover
+  innerRadiusRatio = DEFAULT_DONUT_INNER_RADIUS_RATIO,
+  ...props
 }) => {
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
-  )
-
-  const pad = useMemo(() => normalizeChartPadding(padding), [padding])
-
-  const resolvedOuterRadius = useMemo(() => {
-    if (typeof outerRadius === 'number') return Math.max(0, outerRadius)
-    return Math.max(0, Math.min(innerRect.width, innerRect.height) / 2)
-  }, [outerRadius, innerRect.width, innerRect.height])
-
-  const resolvedInnerRadius = useMemo(() => {
-    if (typeof innerRadius === 'number') {
-      return Math.min(Math.max(0, innerRadius), resolvedOuterRadius)
-    }
-    const ratio = Math.min(Math.max(innerRadiusRatio ?? 0.62, 0), 1)
-    return resolvedOuterRadius * ratio
-  }, [innerRadius, innerRadiusRatio, resolvedOuterRadius])
-
-  const resolvedColors = useMemo(
-    () => (colors && colors.length > 0 ? colors : DONUT_PALETTE),
-    [colors]
-  )
-
-  const donutTooltipFormatter = useMemo(() => {
-    if (tooltipFormatter) return tooltipFormatter
-    const total = data.reduce((s, d) => s + d.value, 0)
-    return (datum: PieChartDatum, index: number) => {
-      const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
-      const label = datum.label ?? `#${index + 1}`
-      return `${label}: ${datum.value} (${pct}%)`
-    }
-  }, [tooltipFormatter, data])
-
-  const hasCenterContent = centerValue !== undefined || centerLabel !== undefined
-  const centerX = pad.left + innerRect.width / 2
-  const centerY = pad.top + innerRect.height / 2
-
-  // Entrance animation: enable the class on mount when `animated`. The keyframes
-  // collapse to no motion under `prefers-reduced-motion`.
-  const [entered, setEntered] = useState(false)
-  useEffect(() => {
-    if (animated) setEntered(true)
-  }, [animated])
-
-  return (
-    <div
-      className={classNames('inline-block relative', animated && entered && DONUT_ENTRANCE_CLASS)}
-      data-donut-chart="true">
-      {animated && entered && <style>{DONUT_ENTRANCE_KEYFRAMES}</style>}
-      <PieChart
-        width={width}
-        height={height}
-        padding={padding}
-        data={data}
-        innerRadius={resolvedInnerRadius}
-        outerRadius={outerRadius}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        padAngle={padAngle}
-        colors={resolvedColors}
-        showLabels={showLabels}
-        labelFormatter={labelFormatter}
-        labelPosition={labelPosition}
-        borderWidth={borderWidth}
-        borderColor={borderColor}
-        hoverOffset={hoverOffset}
-        shadow={shadow}
-        gradient={gradient}
-        hoverable={hoverable}
-        hoveredIndex={hoveredIndex}
-        activeOpacity={activeOpacity}
-        inactiveOpacity={inactiveOpacity}
-        selectable={selectable}
-        selectedIndex={selectedIndex}
-        showLegend={showLegend}
-        legendPosition={legendPosition}
-        legendMarkerSize={legendMarkerSize}
-        legendGap={legendGap}
-        legendFormatter={legendFormatter}
-        showTooltip={showTooltip}
-        tooltipFormatter={donutTooltipFormatter}
-        title={title}
-        desc={desc}
-        className={classNames(className)}
-        onHoveredIndexChange={onHoveredIndexChange}
-        onSelectedIndexChange={onSelectedIndexChange}
-        onSliceClick={onSliceClick}
-        onSliceHover={onSliceHover}
-      />
-      {hasCenterContent && (
-        <div
-          data-donut-center="true"
-          style={
-            {
-              position: 'absolute',
-              left: `${centerX}px`,
-              top: `${centerY}px`,
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-              pointerEvents: 'none',
-              lineHeight: '1.3',
-              padding: 'var(--tiger-chart-donut-center-padding, 0)',
-              borderRadius: 'var(--tiger-radius-pill, 9999px)',
-              background: 'var(--tiger-chart-donut-center-bg, transparent)',
-              boxShadow: 'var(--tiger-chart-donut-center-shadow, none)',
-              backdropFilter: 'var(--tiger-chart-donut-center-backdrop, none)',
-              WebkitBackdropFilter: 'var(--tiger-chart-donut-center-backdrop, none)'
-            } as React.CSSProperties
-          }>
-          {centerValue !== undefined && (
-            <div
-              className="text-xl font-semibold text-[color:var(--tiger-text,#1f2937)]"
-              style={{ lineHeight: '1.2' }}>
-              {`${centerValue}`}
-            </div>
-          )}
-          {centerLabel !== undefined && (
-            <div
-              className="text-xs text-[color:var(--tiger-text-secondary,#6b7280)]"
-              style={{ marginTop: '2px' }}>
-              {centerLabel}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
+  return <PieChart innerRadiusRatio={innerRadiusRatio} {...props} />
 }
 
 export default DonutChart

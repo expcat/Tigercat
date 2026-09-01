@@ -324,10 +324,11 @@ export function defaultSeriesXYTooltipFormatter<TSeries extends { name?: string 
 export function defaultRadarTooltipFormatter<TSeries extends { name?: string }>(
   datum: { value: number; label?: string },
   seriesIndex: number,
-  _pointIndex: number,
-  series?: TSeries
+  pointIndex: number,
+  series?: TSeries,
+  seriesNameTemplate = 'Series {index}'
 ): string {
-  const seriesName = series?.name ?? `Series ${seriesIndex + 1}`
-  const label = datum.label ?? `#${_pointIndex + 1}`
+  const seriesName = series?.name ?? defaultChartSeriesName(seriesIndex, seriesNameTemplate)
+  const label = datum.label ?? `#${pointIndex + 1}`
   return `${seriesName} · ${label}: ${datum.value}`
 }

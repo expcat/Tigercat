@@ -358,7 +358,10 @@ export const zhTW: TigerLocale = {
   chart: {
     legendAriaLabel: '圖表圖例',
     pointAriaLabel: '第 {index} 個點：({x}, {y})',
-    seriesName: '系列 {index}'
+    seriesName: '系列 {index}',
+    sliceName: '切片 {index}',
+    sliceAriaLabel: '{label}：{value}（{percent}%）',
+    stageName: '階段 {index}'
   },
   markdownEditor: {
     formattingToolbarAriaLabel: 'Markdown 格式工具列',

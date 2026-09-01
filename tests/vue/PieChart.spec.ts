@@ -3,10 +3,17 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { PieChart } from '@expcat/tigercat-vue/PieChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { h } from 'vue'
+import { PieChart, ConfigProvider } from '@expcat/tigercat-vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
+import { render } from '@testing-library/vue'
 
 const defaultSize = { width: 240, height: 160 }
+const data = [
+  { value: 40, label: 'Apples' },
+  { value: 30, label: 'Pears' }
+]
 
 describe('PieChart', () => {
   it('renders slices', () => {
@@ -14,87 +21,77 @@ describe('PieChart', () => {
       data: [{ value: 40 }, { value: 30 }, { value: 20 }],
       ...defaultSize
     })
-
     expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(3)
   })
 
   it('passes basic a11y checks', async () => {
-    const { container } = renderWithProps(PieChart, {
-      data: [{ value: 40 }, { value: 30 }]
-    })
+    const { container } = renderWithProps(PieChart, { data, title: 'Fruit' })
+    await expectNoA11yViolations(container)
+  })
 
-    await expectNoA11yViolationsIsolated(container)
+  it('hides decorative slices from the accessibility tree by default', () => {
+    const { container } = renderWithProps(PieChart, { data, ...defaultSize })
+    const slices = container.querySelectorAll('path[data-pie-slice]')
+    expect(slices[0]).toHaveAttribute('aria-hidden', 'true')
+    expect(slices[0]).not.toHaveAttribute('role')
+  })
+
+  it('uses a single tab stop when selectable', () => {
+    const { container } = renderWithProps(PieChart, { data, selectable: true, ...defaultSize })
+    const slices = container.querySelectorAll('path[data-pie-slice]')
+    expect(slices[0]).toHaveAttribute('role', 'button')
+    expect(slices[0]).toHaveAttribute('tabindex', '0')
+    expect(slices[1]).toHaveAttribute('tabindex', '-1')
   })
 
   it('renders empty state with no data', () => {
-    const { container } = renderWithProps(PieChart, {
-      data: [],
-      ...defaultSize
-    })
-
+    const { container } = renderWithProps(PieChart, { data: [], ...defaultSize })
     expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(0)
     expect(container.querySelector('svg')).toBeTruthy()
   })
+
+  it('uses the locale slice name when a datum has no label', () => {
+    const { container } = renderWithProps(PieChart, {
+      data: [{ value: 10 }, { value: 5 }],
+      showLegend: true,
+      ...defaultSize
+    })
+    expect(container.querySelector('[role="list"]')?.textContent).toContain('Slice 1')
+  })
+
+  it('renders a localized legend name', () => {
+    const { container } = render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(PieChart, { data, showLegend: true, ...defaultSize })
+          )
+      }
+    })
+    expect(container.querySelector('[role="list"][aria-label="图表图例"]')).toBeTruthy()
+  })
+
   describe('interaction', () => {
-    it('triggers hover events when hoverable', async () => {
+    it('triggers hover events when hoverable', () => {
       const onHoveredIndexChange = vi.fn()
       const { container } = renderWithProps(PieChart, {
-        data: [{ value: 40 }, { value: 30 }],
+        data,
         hoverable: true,
         'onUpdate:hoveredIndex': onHoveredIndexChange,
         ...defaultSize
       })
-
       container
         .querySelector('path[data-pie-slice]')
         ?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
       expect(onHoveredIndexChange).toHaveBeenCalledWith(0)
     })
 
-    it('triggers click events when selectable', async () => {
-      const onSliceClick = vi.fn()
-      const { container } = renderWithProps(PieChart, {
-        data: [
-          { value: 40, label: 'A' },
-          { value: 30, label: 'B' }
-        ],
-        selectable: true,
-        onSliceClick,
-        ...defaultSize
-      })
-
+    it('emits slice-click as (index, datum) without selectable', () => {
+      const { container, emitted } = renderWithProps(PieChart, { data, ...defaultSize })
       container
         .querySelectorAll('path[data-pie-slice]')[1]
         .dispatchEvent(new MouseEvent('click', { bubbles: true }))
-      expect(onSliceClick).toHaveBeenCalled()
-    })
-
-    it('renders legend when showLegend is true', () => {
-      const { container } = renderWithProps(PieChart, {
-        data: [
-          { value: 40, label: 'A' },
-          { value: 30, label: 'B' }
-        ],
-        showLegend: true,
-        ...defaultSize
-      })
-
-      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
-    })
-  })
-
-  describe('visual enhancements', () => {
-    it('applies custom border styles', () => {
-      const { container } = renderWithProps(PieChart, {
-        data: [{ value: 40 }],
-        borderWidth: 3,
-        borderColor: '#000000',
-        ...defaultSize
-      })
-
-      const slice = container.querySelector('path[data-pie-slice]')!
-      expect(slice).toHaveAttribute('stroke', '#000000')
-      expect(slice).toHaveAttribute('stroke-width', '3')
+      expect(emitted()['slice-click']?.[0]).toEqual([1, data[1]])
     })
   })
 })

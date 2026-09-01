@@ -36,8 +36,9 @@ export interface PieChartProps
   outerRadius?: number
 
   /**
-   * Start angle in radians
-   * @default 0
+   * Start angle in radians. `0` is 3 o'clock; default is 12 o'clock.
+   * Sweep is clockwise because SVG y grows downward.
+   * @default -Math.PI / 2
    */
   startAngle?: number
 
@@ -87,7 +88,7 @@ export interface PieChartProps
 
   /**
    * Border color between slices
-   * @default '#ffffff'
+   * @default 'var(--tiger-surface,#ffffff)'
    */
   borderColor?: string
 
@@ -110,11 +111,32 @@ export interface PieChartProps
   shadow?: boolean
 
   /**
-   * Enable per-slice top→bottom alpha gradient fill (1.0 → 0.7).
-   * Opt-in; default `false` keeps the original solid `arc.color` fill.
+   * Fill slices with a vertical alpha gradient in pie user space.
    * @default false
    */
   gradient?: boolean
+
+  /**
+   * Inner radius as a fraction of the resolved outer radius.
+   * Used by Donut when `innerRadius` is omitted.
+   */
+  innerRadiusRatio?: number
+
+  /**
+   * Text shown as the main value in the hole (donut).
+   */
+  centerValue?: string | number
+
+  /**
+   * Descriptive label shown below centerValue.
+   */
+  centerLabel?: string
+
+  /**
+   * Entrance animation on the pie SVG host (not the legend).
+   * @default false
+   */
+  animated?: boolean
 }
 
 export interface DonutChartProps extends PieChartProps {
@@ -141,7 +163,7 @@ export interface DonutChartProps extends PieChartProps {
   animated?: boolean
 }
 
-export interface RadarChartDatum extends ChartSeriesPoint {
+export interface RadarChartDatum {
   value: number
   label?: string
   color?: string
@@ -230,6 +252,11 @@ export interface RadarChartProps
    * Multiple series
    */
   series?: RadarChartSeries[]
+
+  /**
+   * Shared angular domain. Defaults to the first series' labels (or indices).
+   */
+  indicators?: string[]
 
   /**
    * Max value for radius scaling
@@ -430,7 +457,7 @@ export interface RadarChartProps
 
   /**
    * Point border color
-   * @default '#fff'
+   * @default 'var(--tiger-surface,#ffffff)'
    */
   pointBorderColor?: string
 
@@ -461,6 +488,12 @@ export interface RadarChartProps
    * @default false
    */
   pointGradient?: boolean
+
+  /**
+   * Fill each series polygon with a vertical alpha gradient in radar user space.
+   * @default false
+   */
+  gradient?: boolean
 }
 
 // -------------------------------------------------------------------
@@ -468,6 +501,18 @@ export interface RadarChartProps
 // -------------------------------------------------------------------
 
 export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProps {
+  /**
+   * Chart width
+   * @default 280
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 200
+   */
+  height?: number
+
   /**
    * Current value
    */
@@ -486,14 +531,15 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
   max?: number
 
   /**
-   * Start angle in degrees (0 = 3 o'clock, counter-clockwise)
-   * @default 135
+   * Start angle in degrees. `0` is 12 o'clock; positive is clockwise.
+   * Default is a bottom-opening 270° arc.
+   * @default -135
    */
   startAngle?: number
 
   /**
-   * End angle in degrees
-   * @default 405
+   * End angle in degrees (same convention as `startAngle`)
+   * @default 135
    */
   endAngle?: number
 
@@ -510,7 +556,7 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
   showTicks?: boolean
 
   /**
-   * Number of major ticks
+   * Number of intervals between min and max (renders `tickCount + 1` marks).
    * @default 5
    */
   tickCount?: number
@@ -552,15 +598,16 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
   color?: string
 
   /**
-   * Palette of colors
-   */
-  colors?: string[]
-
-  /**
    * When true, the value arc is rendered with a vertical alpha gradient
-   * (top: full opacity → bottom: low opacity) using a per-instance
-   * `<linearGradient>` definition. Opt-in; default keeps the solid arc fill.
+   * in gauge user space. Ignored when `segments` is set (segments paint the
+   * track; the value arc still overlays the current value).
    * @default false
    */
   gradient?: boolean
+
+  /**
+   * Animate the needle when `value` changes. `prefers-reduced-motion` skips.
+   * @default true
+   */
+  animated?: boolean
 }

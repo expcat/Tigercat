@@ -382,10 +382,11 @@ describe('chart-utils', () => {
       expect(getPieArcs([{ value: 0 }, { value: 0 }])).toEqual([])
     })
 
-    it('ignores negative values', () => {
-      const arcs = getPieArcs([{ value: -5 }, { value: 10 }])
-      expect(arcs[0].value).toBe(0)
-      expect(arcs[1].value).toBe(10)
+    it('skips negative and zero values instead of emitting empty arcs', () => {
+      const arcs = getPieArcs([{ value: -5 }, { value: 0 }, { value: 10 }])
+      expect(arcs).toHaveLength(1)
+      expect(arcs[0].value).toBe(10)
+      expect(arcs[0].index).toBe(2)
     })
 
     it('caches arc geometry by values and angle options', () => {
@@ -460,9 +461,11 @@ describe('chart-utils', () => {
       expect(path).toBe('')
     })
 
-    it('handles full circle', () => {
-      const path = createPieArcPath({ ...baseOptions, endAngle: Math.PI * 2 })
+    it('handles full circle with two half-arcs', () => {
+      const path = createPieArcPath({ ...baseOptions, startAngle: 0, endAngle: Math.PI * 2 })
       expect(path.length).toBeGreaterThan(0)
+      expect(path).not.toContain('0.0001')
+      expect(path.split(' A ').length).toBeGreaterThan(2)
     })
   })
 
@@ -579,10 +582,12 @@ describe('chart-utils', () => {
       expect(getRadarPoints([], baseOptions)).toEqual([])
     })
 
-    it('clamps negative values to zero', () => {
+    it('skips negative values instead of pulling vertices to the origin', () => {
       const data = [{ value: -10 }, { value: 20 }]
       const points = getRadarPoints(data, { ...baseOptions, maxValue: 20 })
-      expect(points[0].value).toBe(0)
+      expect(points).toHaveLength(1)
+      expect(points[0].value).toBe(20)
+      expect(points[0].index).toBe(1)
     })
   })
 
