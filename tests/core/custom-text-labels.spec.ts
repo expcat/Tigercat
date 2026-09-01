@@ -296,6 +296,11 @@ describe('custom-text overrides on label resolvers', () => {
       const labels = getTourLabels({ common: { closeText: 'Dismiss' } })
       expect(labels.closeAriaLabel).toBe('Dismiss')
     })
+
+    it('falls back to official en-US including dialog name', () => {
+      expect(getTourLabels().dialogAriaLabel).toBe(enUS.tour?.dialogAriaLabel)
+      expect(getTourLabels().nextText).toBe(enUS.tour?.nextText)
+    })
   })
 
   describe('getModalLabels', () => {

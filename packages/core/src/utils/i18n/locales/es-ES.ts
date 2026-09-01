@@ -172,7 +172,8 @@ export const esES: TigerLocale = {
     prevText: 'Anterior',
     nextText: 'Siguiente',
     finishText: 'Finalizar',
-    closeAriaLabel: 'Cerrar recorrido'
+    closeAriaLabel: 'Cerrar recorrido',
+    dialogAriaLabel: 'Recorrido'
   },
   calendar: {
     previousMonth: 'Mes anterior',

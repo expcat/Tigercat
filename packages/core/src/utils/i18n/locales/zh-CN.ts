@@ -175,7 +175,8 @@ export const zhCN: TigerLocale = {
     prevText: '上一步',
     nextText: '下一步',
     finishText: '完成',
-    closeAriaLabel: '关闭导览'
+    closeAriaLabel: '关闭导览',
+    dialogAriaLabel: '导览'
   },
   calendar: {
     previousMonth: '上个月',

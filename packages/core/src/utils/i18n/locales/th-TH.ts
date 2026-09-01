@@ -172,7 +172,8 @@ export const thTH: TigerLocale = {
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
     finishText: 'เสร็จสิ้น',
-    closeAriaLabel: 'ปิดทัวร์'
+    closeAriaLabel: 'ปิดทัวร์',
+    dialogAriaLabel: 'ทัวร์แนะนำ'
   },
   calendar: {
     previousMonth: 'เดือนก่อนหน้า',

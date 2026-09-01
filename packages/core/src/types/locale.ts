@@ -243,6 +243,7 @@ export interface TigerLocaleTour {
   nextText?: string
   finishText?: string
   closeAriaLabel?: string
+  dialogAriaLabel?: string
 }
 
 export interface TigerLocaleCalendar {

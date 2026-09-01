@@ -1,4 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  useId
+} from 'react'
 import {
   classNames,
   mergeTigerLocale,
@@ -12,50 +20,87 @@ import {
   tourIndicatorClasses,
   tourCloseButtonClasses,
   tourMaskClasses,
-  getTourTargetRect,
-  getTourPopoverPosition,
+  tourPrevButtonGapClass,
+  resolveTourTarget,
+  scrollTourTargetIntoView,
+  getTourRectFromElement,
+  getTourSizeFromElement,
+  getTourPopoverStyle,
   getTourMaskHoleStyle,
-  getActiveTourSteps,
-  getCurrentActiveTourStep,
-  getActiveTourStepPosition,
+  resolveTourNav,
+  getTourStepContext,
+  shouldLockTourOverlay,
+  tourNextEvents,
+  tourPrevEvents,
+  tourCloseEvents,
+  shouldCloseOnMaskClick,
   getTourLabels,
   closeIconPathD,
   type TourProps as CoreTourProps,
   type TourPlacement,
-  type TourRect
+  type TourRect,
+  type TourSize,
+  type TourStepContext,
+  type TourNavEvent
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
-import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import {
+  renderOverlayPortal,
+  useBodyScrollLock,
+  useEscapeKey,
+  useFocusTrap,
+  useOverlayPortalTarget
+} from '../utils/overlay'
+import { composeRefs } from '../utils/overlay-trigger'
+import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface TourProps extends CoreTourProps {
+export interface TourProps
+  extends
+    CoreTourProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'content' | 'children'> {
   /** Callback when open state changes */
   onOpenChange?: (open: boolean) => void
   /** Callback when close button is clicked or tour finishes */
   onClose?: () => void
   /** Callback when tour finishes (last step "Next") */
   onFinish?: () => void
-  /** Callback when current step changes */
+  /** Callback when current step changes (original index) */
   onChange?: (current: number) => void
+  content?: React.ReactNode | ((ctx: TourStepContext) => React.ReactNode)
+  renderTitle?: (ctx: TourStepContext) => React.ReactNode
+  renderDescription?: (ctx: TourStepContext) => React.ReactNode
+  renderFooter?: (ctx: TourStepContext) => React.ReactNode
 }
 
-export const Tour: React.FC<TourProps> = ({
-  steps,
-  loadSteps,
-  open = false,
-  current: controlledCurrent,
-  nextText,
-  prevText,
-  finishText,
-  closable = true,
-  showIndicators = true,
-  locale,
-  className,
-  onOpenChange,
-  onClose,
-  onFinish,
-  onChange
-}) => {
+export const Tour = React.forwardRef<HTMLDivElement, TourProps>(function Tour(
+  {
+    steps,
+    loadSteps,
+    open = false,
+    current: controlledCurrent,
+    nextText,
+    prevText,
+    finishText,
+    closable = true,
+    maskClosable = true,
+    keyboard = true,
+    showIndicators = true,
+    locale,
+    className,
+    style,
+    onOpenChange,
+    onClose,
+    onFinish,
+    onChange,
+    content,
+    renderTitle,
+    renderDescription,
+    renderFooter,
+    ...rest
+  },
+  forwardedRef
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -68,18 +113,26 @@ export const Tour: React.FC<TourProps> = ({
   const [internalStep, setInternalStep] = useState(0)
   const [resolvedSteps, setResolvedSteps] = useState(steps)
   const currentStep = controlledCurrent ?? internalStep
-  const activeSteps = useMemo(() => getActiveTourSteps(resolvedSteps), [resolvedSteps])
-  const activeStepInfo = useMemo(
-    () => getCurrentActiveTourStep(activeSteps, currentStep, resolvedSteps.length),
-    [activeSteps, currentStep, resolvedSteps.length]
-  )
-  const activeStepPosition = getActiveTourStepPosition(activeSteps, activeStepInfo?.index)
-  const step = activeStepInfo?.step
+  const nav = resolveTourNav(resolvedSteps, currentStep)
+  const ctx = getTourStepContext(nav)
+  const step = ctx?.step
+  const visible = shouldLockTourOverlay(open, Boolean(step))
   const [targetRect, setTargetRect] = useState<TourRect | undefined>()
+  const [popoverSize, setPopoverSize] = useState<TourSize | undefined>()
   const rootRef = useRef<HTMLDivElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
+  const wasOpenRef = useRef(false)
+
+  if (open && !wasOpenRef.current) {
+    previousActiveElementRef.current = captureActiveElement()
+  }
+  wasOpenRef.current = open
+  const reactId = useId()
+  const titleId = `tiger-tour-${reactId}-title`
+  const descriptionId = `tiger-tour-${reactId}-description`
+  const { anchorRef, target: portalTarget } = useOverlayPortalTarget()
 
   useEffect(() => {
     if (!loadSteps) {
@@ -89,126 +142,180 @@ export const Tour: React.FC<TourProps> = ({
     if (!open) return
 
     let cancelled = false
-    Promise.resolve(loadSteps()).then((nextSteps) => {
-      if (!cancelled) {
-        setResolvedSteps(nextSteps)
-      }
-    })
+    Promise.resolve(loadSteps())
+      .then((nextSteps) => {
+        if (!cancelled) setResolvedSteps(nextSteps)
+      })
+      .catch(() => undefined)
 
     return () => {
       cancelled = true
     }
   }, [loadSteps, open, steps])
 
-  const updateRect = useCallback(() => {
-    if (step?.target) {
-      setTargetRect(getTourTargetRect(step.target))
+  useLayoutEffect(() => {
+    if (open) return
+    restoreFocus(previousActiveElementRef.current)
+    previousActiveElementRef.current = null
+    setInternalStep(0)
+  }, [open])
+
+  useLayoutEffect(() => {
+    return () => {
+      const previous = previousActiveElementRef.current
+      previousActiveElementRef.current = null
+      queueMicrotask(() => restoreFocus(previous))
+    }
+  }, [])
+
+  const measure = useCallback(() => {
+    if (!open || !step) {
+      setTargetRect(undefined)
+      return
+    }
+    const targetEl = resolveTourTarget(step.target)
+    if (targetEl) {
+      scrollTourTargetIntoView(targetEl)
+      setTargetRect(getTourRectFromElement(targetEl))
     } else {
       setTargetRect(undefined)
     }
-  }, [step])
+    const size = getTourSizeFromElement(popoverRef.current)
+    if (size) setPopoverSize(size)
+  }, [open, step])
+
+  useLayoutEffect(() => {
+    if (visible) measure()
+  }, [visible, measure])
 
   useEffect(() => {
-    if (open) updateRect()
-  }, [open, currentStep, updateRect])
-
-  useEffect(() => {
-    if (!open) return
-    const handler = () => updateRect()
+    if (!visible) return
+    const handler = () => measure()
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(handler) : undefined
+    if (popoverRef.current) observer?.observe(popoverRef.current)
+    const targetEl = resolveTourTarget(step?.target)
+    if (targetEl) observer?.observe(targetEl)
     window.addEventListener('resize', handler)
     window.addEventListener('scroll', handler, true)
     return () => {
+      observer?.disconnect()
       window.removeEventListener('resize', handler)
       window.removeEventListener('scroll', handler, true)
     }
-  }, [open, updateRect])
+  }, [visible, measure, step?.target])
 
-  const goTo = useCallback(
-    (idx: number) => {
-      setInternalStep(idx)
-      onChange?.(idx)
+  useLayoutEffect(() => {
+    if (!visible) return
+    focusFirst([closeButtonRef.current, popoverRef.current])
+  }, [visible])
+
+  const applyNavEvents = useCallback(
+    (events: TourNavEvent[]) => {
+      for (const event of events) {
+        if (event.type === 'change') {
+          setInternalStep(event.index)
+          onChange?.(event.index)
+        } else if (event.type === 'finish') {
+          onFinish?.()
+        } else if (event.type === 'close') {
+          onClose?.()
+        } else {
+          onOpenChange?.(event.open)
+        }
+      }
     },
-    [onChange]
+    [onChange, onFinish, onClose, onOpenChange]
   )
 
-  const next = useCallback(() => {
-    const nextStep = activeSteps[activeStepPosition + 1]
-    if (nextStep) {
-      goTo(nextStep.index)
-    } else {
-      onFinish?.()
-      onOpenChange?.(false)
-      onClose?.()
-    }
-  }, [activeSteps, activeStepPosition, goTo, onFinish, onOpenChange, onClose])
+  const next = useCallback(() => applyNavEvents(tourNextEvents(nav)), [applyNavEvents, nav])
+  const prev = useCallback(() => applyNavEvents(tourPrevEvents(nav)), [applyNavEvents, nav])
+  const close = useCallback(() => applyNavEvents(tourCloseEvents()), [applyNavEvents])
 
-  const prev = useCallback(() => {
-    const prevStep = activeSteps[activeStepPosition - 1]
-    if (prevStep) goTo(prevStep.index)
-  }, [activeSteps, activeStepPosition, goTo])
+  const handleMaskClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (shouldCloseOnMaskClick(event, maskClosable)) close()
+    },
+    [close, maskClosable]
+  )
 
-  const close = useCallback(() => {
-    onOpenChange?.(false)
-    onClose?.()
-  }, [onOpenChange, onClose])
+  useEscapeKey({ enabled: visible && keyboard, onEscape: close, layerRef: rootRef })
+  useBodyScrollLock({ enabled: visible })
+  useFocusTrap({ enabled: visible, containerRef: rootRef, inert: true })
 
-  // Overlay lifecycle: trap focus, lock scroll, close on Escape, and move focus
-  // into the popover on open / restore it on close (mirrors Modal/Drawer).
-  useEffect(() => {
-    if (open) {
-      previousActiveElementRef.current = captureActiveElement()
-      const timer = setTimeout(() => {
-        focusFirst([closeButtonRef.current, popoverRef.current])
-      }, 0)
-      return () => clearTimeout(timer)
-    }
-    restoreFocus(previousActiveElementRef.current)
-  }, [open])
+  const {
+    ['aria-labelledby']: ariaLabelledbyFromRest,
+    ['aria-label']: ariaLabelFromRest,
+    ['aria-describedby']: ariaDescribedbyFromRest,
+    role: _role,
+    tabIndex: _tabIndex,
+    ...dialogRest
+  } = rest
 
-  useEscapeKey({ enabled: open, onEscape: close })
-  useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true })
-
-  if (!open || !step) return null
+  const anchor = <span ref={anchorRef} hidden />
+  if (!visible || !step || !ctx) return anchor
 
   const placement: TourPlacement = step.placement ?? 'bottom'
   const showMask = step.mask !== false
-  const isLast = activeStepPosition === activeSteps.length - 1
-  const isFirst = activeStepPosition <= 0
+  const popoverStyle = {
+    ...getTourPopoverStyle(targetRect, popoverSize, placement),
+    ...style
+  } as React.CSSProperties
+  const hasTitle = Boolean(renderTitle || step.title)
+  const hasDescription = Boolean(renderDescription || step.description)
+  const titleNode = renderTitle ? renderTitle(ctx) : step.title
+  const descriptionNode = renderDescription ? renderDescription(ctx) : step.description
+  const contentNode = typeof content === 'function' ? content(ctx) : content
+  const footerNode = renderFooter ? (
+    renderFooter(ctx)
+  ) : (
+    <div className={tourFooterClasses}>
+      {showIndicators && (
+        <span className={tourIndicatorClasses} aria-live="polite">
+          {ctx.position + 1} / {ctx.total}
+        </span>
+      )}
+      <div className="flex items-center">
+        {!nav.isFirst && (
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            className={tourPrevButtonGapClass}
+            onClick={prev}>
+            {labels.prevText}
+          </Button>
+        )}
+        <Button type="button" size="sm" onClick={next}>
+          {nav.isLast ? labels.finishText : labels.nextText}
+        </Button>
+      </div>
+    </div>
+  )
 
-  let popoverStyle: React.CSSProperties
-  if (targetRect) {
-    const pos = getTourPopoverPosition(targetRect, 320, 160, placement)
-    popoverStyle = { position: 'absolute', top: pos.top, left: pos.left }
-  } else {
-    popoverStyle = {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)'
-    }
-  }
-
-  const content = (
-    <div ref={rootRef} className="contents" data-tiger-overlay-layer="">
-      {/* Full-screen mask; clip-path punches a hole when a target rect exists. */}
+  const overlay = (
+    <div ref={rootRef} className="contents" data-tiger-overlay-layer="" data-tiger-tour-root="">
       {showMask && (
         <div
           className={tourMaskClasses}
           data-tiger-tour-mask=""
           aria-hidden="true"
           style={targetRect ? (getTourMaskHoleStyle(targetRect) as React.CSSProperties) : undefined}
-          onClick={close}
+          onClick={handleMaskClick}
         />
       )}
 
-      {/* Popover */}
       <div
-        ref={popoverRef}
+        {...dialogRest}
+        ref={composeRefs(forwardedRef, popoverRef)}
         className={classNames(tourPopoverClasses, className)}
         style={popoverStyle}
         role="dialog"
-        aria-modal="true">
+        aria-modal="true"
+        aria-labelledby={ariaLabelledbyFromRest ?? (hasTitle ? titleId : undefined)}
+        aria-label={ariaLabelFromRest ?? (hasTitle ? undefined : labels.dialogAriaLabel)}
+        aria-describedby={ariaDescribedbyFromRest ?? (hasDescription ? descriptionId : undefined)}
+        tabIndex={-1}
+        data-tiger-tour="">
         {closable && (
           <button
             ref={closeButtonRef}
@@ -216,40 +323,36 @@ export const Tour: React.FC<TourProps> = ({
             type="button"
             aria-label={labels.closeAriaLabel}
             onClick={close}>
-            <StatusIcon path={closeIconPathD} className="h-4 w-4" />
+            <StatusIcon
+              path={closeIconPathD}
+              className="h-4 w-4"
+              aria-hidden="true"
+              focusable="false"
+            />
           </button>
         )}
 
-        {step.title && <div className={tourTitleClasses}>{step.title}</div>}
-        {step.description && <div className={tourDescriptionClasses}>{step.description}</div>}
-
-        <div className={tourFooterClasses}>
-          {showIndicators && (
-            <span className={tourIndicatorClasses}>
-              {activeStepPosition + 1} / {activeSteps.length}
-            </span>
-          )}
-          <div className="flex items-center">
-            {!isFirst && (
-              <button
-                type="button"
-                className="px-3 py-1.5 text-sm rounded-md border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors mr-2"
-                onClick={prev}>
-                {labels.prevText}
-              </button>
-            )}
-            <button
-              type="button"
-              className="px-3 py-1.5 text-sm rounded-md bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] transition-colors"
-              onClick={next}>
-              {isLast ? labels.finishText : labels.nextText}
-            </button>
+        {titleNode != null && titleNode !== false && (
+          <div id={titleId} className={tourTitleClasses}>
+            {titleNode}
           </div>
-        </div>
+        )}
+        {descriptionNode != null && descriptionNode !== false && (
+          <div id={descriptionId} className={tourDescriptionClasses}>
+            {descriptionNode}
+          </div>
+        )}
+        {contentNode}
+        {footerNode}
       </div>
       <div className="contents" data-tiger-overlay-host="" />
     </div>
   )
 
-  return renderBodyPortal(content)
-}
+  return (
+    <>
+      {anchor}
+      {renderOverlayPortal(overlay, portalTarget)}
+    </>
+  )
+})

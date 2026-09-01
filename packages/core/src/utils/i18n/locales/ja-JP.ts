@@ -172,7 +172,8 @@ export const jaJP: TigerLocale = {
     prevText: '前へ',
     nextText: '次へ',
     finishText: '完了',
-    closeAriaLabel: 'ツアーを閉じる'
+    closeAriaLabel: 'ツアーを閉じる',
+    dialogAriaLabel: 'ツアー'
   },
   calendar: {
     previousMonth: '前月',

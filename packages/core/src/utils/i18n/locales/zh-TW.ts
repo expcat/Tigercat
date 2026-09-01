@@ -175,7 +175,8 @@ export const zhTW: TigerLocale = {
     prevText: '上一步',
     nextText: '下一步',
     finishText: '完成',
-    closeAriaLabel: '關閉導覽'
+    closeAriaLabel: '關閉導覽',
+    dialogAriaLabel: '導覽'
   },
   calendar: {
     previousMonth: '上個月',

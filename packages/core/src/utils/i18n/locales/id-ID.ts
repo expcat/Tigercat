@@ -172,7 +172,8 @@ export const idID: TigerLocale = {
     prevText: 'Sebelumnya',
     nextText: 'Selanjutnya',
     finishText: 'Selesai',
-    closeAriaLabel: 'Tutup tur'
+    closeAriaLabel: 'Tutup tur',
+    dialogAriaLabel: 'Tur panduan'
   },
   calendar: {
     previousMonth: 'Bulan sebelumnya',

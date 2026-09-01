@@ -172,7 +172,8 @@ export const ptBR: TigerLocale = {
     prevText: 'Anterior',
     nextText: 'Próximo',
     finishText: 'Concluir',
-    closeAriaLabel: 'Fechar tour'
+    closeAriaLabel: 'Fechar tour',
+    dialogAriaLabel: 'Percurso'
   },
   calendar: {
     previousMonth: 'Mês anterior',

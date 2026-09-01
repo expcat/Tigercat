@@ -4,17 +4,41 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { h, onMounted, ref, Teleport } from 'vue'
+import userEvent from '@testing-library/user-event'
+import { h, ref } from 'vue'
 import { Tour } from '@expcat/tigercat-vue/Tour'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import type { TourStep } from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated } from '../utils'
+import { expectNoA11yViolations } from '../utils'
 
 const baseSteps: TourStep[] = [
   { title: 'Step 1', description: 'First step description' },
   { title: 'Step 2', description: 'Second step description' },
   { title: 'Step 3', description: 'Last step description' }
 ]
+
+function mountTarget(id = 'tour-target') {
+  const target = document.createElement('div')
+  target.id = id
+  target.getBoundingClientRect = () =>
+    ({
+      top: 100,
+      left: 200,
+      width: 50,
+      height: 30,
+      right: 250,
+      bottom: 130,
+      x: 200,
+      y: 100,
+      toJSON: () => ({})
+    }) as DOMRect
+  document.body.appendChild(target)
+  return target
+}
 
 describe('Tour', () => {
   afterEach(() => {
@@ -28,25 +52,19 @@ describe('Tour', () => {
 
   it('should render the first step when open is true', async () => {
     render(Tour, { props: { steps: baseSteps, open: true } })
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument()
-      expect(screen.getByText('Step 1')).toBeInTheDocument()
-      expect(screen.getByText('First step description')).toBeInTheDocument()
-    })
+    expect(await screen.findByRole('dialog', { name: 'Step 1' })).toBeInTheDocument()
+    expect(screen.getByText('First step description')).toBeInTheDocument()
   })
 
   it('should show indicator with current/total when showIndicators is true', async () => {
     render(Tour, { props: { steps: baseSteps, open: true } })
-    await waitFor(() => {
-      expect(screen.getByText('1 / 3')).toBeInTheDocument()
-    })
+    expect(await screen.findByText('1 / 3')).toBeInTheDocument()
   })
 
   it('should hide indicator when showIndicators is false', async () => {
     render(Tour, { props: { steps: baseSteps, open: true, showIndicators: false } })
-    await waitFor(() => {
-      expect(screen.queryByText('1 / 3')).not.toBeInTheDocument()
-    })
+    await screen.findByRole('dialog')
+    expect(screen.queryByText('1 / 3')).not.toBeInTheDocument()
   })
 
   it('should advance to next step on Next click and emit change events', async () => {
@@ -61,39 +79,26 @@ describe('Tour', () => {
       }
     })
 
-    await waitFor(() => expect(screen.getByText('Next')).toBeInTheDocument())
-    await fireEvent.click(screen.getByText('Next'))
-
+    await fireEvent.click(await screen.findByRole('button', { name: 'Next' }))
     expect(onUpdateCurrent).toHaveBeenCalledWith(1)
     expect(onChange).toHaveBeenCalledWith(1)
-    await waitFor(() => {
-      expect(screen.getByText('Step 2')).toBeInTheDocument()
-      expect(screen.getByText('2 / 3')).toBeInTheDocument()
-    })
+    expect(await screen.findByRole('dialog', { name: 'Step 2' })).toBeInTheDocument()
   })
 
   it('should not show Previous button on the first step', async () => {
     render(Tour, { props: { steps: baseSteps, open: true } })
-    await waitFor(() => {
-      expect(screen.queryByText('Previous')).not.toBeInTheDocument()
-    })
+    await screen.findByRole('dialog')
+    expect(screen.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument()
   })
 
   it('should go back to previous step on Previous click', async () => {
     render(Tour, { props: { steps: baseSteps, open: true } })
-
-    await waitFor(() => expect(screen.getByText('Next')).toBeInTheDocument())
-    await fireEvent.click(screen.getByText('Next'))
-    await waitFor(() => expect(screen.getByText('Previous')).toBeInTheDocument())
-    await fireEvent.click(screen.getByText('Previous'))
-
-    await waitFor(() => {
-      expect(screen.getByText('Step 1')).toBeInTheDocument()
-      expect(screen.getByText('1 / 3')).toBeInTheDocument()
-    })
+    await fireEvent.click(await screen.findByRole('button', { name: 'Next' }))
+    await fireEvent.click(await screen.findByRole('button', { name: 'Previous' }))
+    expect(await screen.findByRole('dialog', { name: 'Step 1' })).toBeInTheDocument()
   })
 
-  it('should show Finish on the last step and emit finish + close + update:open(false)', async () => {
+  it('emits finish then close then update:open on Finish', async () => {
     const onFinish = vi.fn()
     const onClose = vi.fn()
     const onUpdateOpen = vi.fn()
@@ -108,87 +113,128 @@ describe('Tour', () => {
       }
     })
 
-    await waitFor(() => expect(screen.getByText('Finish')).toBeInTheDocument())
-    await fireEvent.click(screen.getByText('Finish'))
-
-    expect(onFinish).toHaveBeenCalled()
-    expect(onClose).toHaveBeenCalled()
+    await fireEvent.click(await screen.findByRole('button', { name: 'Finish' }))
+    expect(onFinish.mock.invocationCallOrder[0]).toBeLessThan(onClose.mock.invocationCallOrder[0])
+    expect(onClose.mock.invocationCallOrder[0]).toBeLessThan(
+      onUpdateOpen.mock.invocationCallOrder[0]
+    )
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
   it('should respect controlled current prop', async () => {
     render(Tour, { props: { steps: baseSteps, open: true, current: 1 } })
-    await waitFor(() => {
-      expect(screen.getByText('Step 2')).toBeInTheDocument()
-      expect(screen.getByText('2 / 3')).toBeInTheDocument()
-    })
+    expect(await screen.findByRole('dialog', { name: 'Step 2' })).toBeInTheDocument()
   })
 
   it('should skip conditional steps while navigating', async () => {
     const onChange = vi.fn()
-    const onUpdateCurrent = vi.fn()
     render(Tour, {
       props: {
         steps: [baseSteps[0], { ...baseSteps[1], skipWhen: true }, baseSteps[2]],
         open: true,
-        onChange,
-        'onUpdate:current': onUpdateCurrent
+        onChange
       }
     })
 
-    await waitFor(() => expect(screen.getByText('1 / 2')).toBeInTheDocument())
-    await fireEvent.click(screen.getByText('Next'))
-
-    expect(onUpdateCurrent).toHaveBeenCalledWith(2)
+    expect(await screen.findByText('1 / 2')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(onChange).toHaveBeenCalledWith(2)
-    await waitFor(() => {
-      expect(screen.getByText('Step 3')).toBeInTheDocument()
-      expect(screen.getByText('2 / 2')).toBeInTheDocument()
-      expect(screen.queryByText('Step 2')).not.toBeInTheDocument()
-    })
+    expect(await screen.findByRole('dialog', { name: 'Step 3' })).toBeInTheDocument()
   })
 
-  it('should load steps asynchronously when opened', async () => {
-    const loadSteps = vi.fn().mockResolvedValue([{ title: 'Loaded', description: 'Async step' }])
-
-    render(Tour, {
-      props: {
-        steps: [],
-        open: true,
-        loadSteps
+  it('re-evaluates skipWhen without reloading steps', async () => {
+    const skip = ref(true)
+    render({
+      setup() {
+        return () => [
+          h('button', { onClick: () => (skip.value = false) }, 'include'),
+          h(Tour, {
+            open: true,
+            steps: [baseSteps[0], { ...baseSteps[1], skipWhen: () => skip.value }, baseSteps[2]]
+          })
+        ]
       }
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Loaded')).toBeInTheDocument()
-      expect(screen.getByText('Async step')).toBeInTheDocument()
-    })
-    expect(loadSteps).toHaveBeenCalled()
+    expect(await screen.findByText('1 / 2')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'include' }))
+    expect(await screen.findByText('1 / 3')).toBeInTheDocument()
   })
 
-  it('should render close button by default and emit close + update:open(false)', async () => {
+  it('traps Tab after loadSteps inserts the first dialog', async () => {
+    const user = userEvent.setup()
+    let resolveSteps: ((next: TourStep[]) => void) | undefined
+    const loadSteps = () =>
+      new Promise<TourStep[]>((resolve) => {
+        resolveSteps = resolve
+      })
+
+    render(Tour, { props: { steps: [], open: true, loadSteps } })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(document.body.style.overflow).not.toBe('hidden')
+
+    resolveSteps?.([{ title: 'Loaded', description: 'Async step' }])
+    const dialog = await screen.findByRole('dialog', { name: 'Loaded' })
+    expect(document.body.style.overflow).toBe('hidden')
+
+    const focusable = dialog.querySelectorAll('button')
+    const last = focusable[focusable.length - 1] as HTMLElement
+    last.focus()
+    await user.tab()
+    expect(focusable[0]).toHaveFocus()
+  })
+
+  it('traps Tab after opening from closed with existing steps', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(Tour, { props: { steps: baseSteps, open: false } })
+    await rerender({ steps: baseSteps, open: true })
+    const dialog = await screen.findByRole('dialog')
+    const focusable = dialog.querySelectorAll('button')
+    const last = focusable[focusable.length - 1] as HTMLElement
+    last.focus()
+    await user.tab()
+    expect(focusable[0]).toHaveFocus()
+  })
+
+  it('resets uncontrolled current when closed and reopened', async () => {
+    const { rerender } = render(Tour, { props: { steps: baseSteps, open: true } })
+    await fireEvent.click(await screen.findByRole('button', { name: 'Next' }))
+    expect(await screen.findByRole('dialog', { name: 'Step 2' })).toBeInTheDocument()
+    await rerender({ steps: baseSteps, open: false })
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await rerender({ steps: baseSteps, open: true })
+    expect(await screen.findByRole('dialog', { name: 'Step 1' })).toBeInTheDocument()
+  })
+
+  it('should render close button by default and emit close then update:open', async () => {
     const onClose = vi.fn()
     const onUpdateOpen = vi.fn()
     render(Tour, {
-      props: {
-        steps: baseSteps,
-        open: true,
-        onClose,
-        'onUpdate:open': onUpdateOpen
-      }
+      props: { steps: baseSteps, open: true, onClose, 'onUpdate:open': onUpdateOpen }
     })
 
-    await waitFor(() => expect(screen.getByLabelText('Close tour')).toBeInTheDocument())
-    await fireEvent.click(screen.getByLabelText('Close tour'))
-
-    expect(onClose).toHaveBeenCalled()
+    await fireEvent.click(await screen.findByRole('button', { name: 'Close tour' }))
+    expect(onClose.mock.invocationCallOrder[0]).toBeLessThan(
+      onUpdateOpen.mock.invocationCallOrder[0]
+    )
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
-  it('should hide close button when closable is false', async () => {
+  it('hides the close button when closable is false and focuses the dialog', async () => {
     render(Tour, { props: { steps: baseSteps, open: true, closable: false } })
-    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
-    expect(screen.queryByLabelText('Close tour')).not.toBeInTheDocument()
+    const dialog = await screen.findByRole('dialog')
+    expect(screen.queryByRole('button', { name: 'Close tour' })).not.toBeInTheDocument()
+    await waitFor(() => expect(dialog).toHaveFocus())
+  })
+
+  it('does not close from Escape when keyboard is false', async () => {
+    const onUpdateOpen = vi.fn()
+    render(Tour, {
+      props: { steps: baseSteps, open: true, keyboard: false, 'onUpdate:open': onUpdateOpen }
+    })
+    await screen.findByRole('dialog')
+    await fireEvent.keyDown(document, { key: 'Escape' })
+    expect(onUpdateOpen).not.toHaveBeenCalled()
   })
 
   it('should support custom button labels', async () => {
@@ -202,11 +248,51 @@ describe('Tour', () => {
         finishText: '完成'
       }
     })
+    expect(await screen.findByRole('button', { name: '下一步' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '上一步' })).toBeInTheDocument()
+  })
 
-    await waitFor(() => {
-      expect(screen.getByText('下一步')).toBeInTheDocument()
-      expect(screen.getByText('上一步')).toBeInTheDocument()
+  it('reads official locale objects for chrome text', async () => {
+    const zh = render({
+      components: { ConfigProvider, Tour },
+      setup: () => ({ locale: zhCN, steps: baseSteps }),
+      template: '<ConfigProvider :locale="locale"><Tour :steps="steps" open /></ConfigProvider>'
     })
+    expect(await screen.findByRole('button', { name: '关闭导览' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '下一步' })).toBeInTheDocument()
+    zh.unmount()
+
+    const tw = render({
+      components: { ConfigProvider, Tour },
+      setup: () => ({ locale: zhTW, steps: baseSteps }),
+      template: '<ConfigProvider :locale="locale"><Tour :steps="steps" open /></ConfigProvider>'
+    })
+    expect(await screen.findByRole('button', { name: '關閉導覽' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '关闭导览' })).not.toBeInTheDocument()
+    tw.unmount()
+
+    render({
+      components: { ConfigProvider, Tour },
+      setup: () => ({ locale: jaJP, steps: baseSteps }),
+      template: '<ConfigProvider :locale="locale"><Tour :steps="steps" open /></ConfigProvider>'
+    })
+    expect(await screen.findByRole('button', { name: 'ツアーを閉じる' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Close tour' })).not.toBeInTheDocument()
+  })
+
+  it('names a dialog without a title', async () => {
+    render(Tour, { props: { steps: [{ description: 'No title here' }], open: true } })
+    expect(await screen.findByRole('dialog', { name: 'Tour' })).toBeInTheDocument()
+  })
+
+  it('merges attrs class and style onto the dialog', async () => {
+    render(Tour, {
+      props: { steps: baseSteps, open: true },
+      attrs: { class: 'from-attrs', style: { color: 'rgb(255, 0, 0)' } }
+    })
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveClass('from-attrs')
+    expect(dialog).toHaveStyle({ color: 'rgb(255, 0, 0)' })
   })
 
   it('should close when clicking the full-screen mask (no target)', async () => {
@@ -221,77 +307,68 @@ describe('Tour', () => {
       }
     })
 
-    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
-
-    const mask = document.querySelector('[data-tiger-tour-mask]')
-    expect(mask).toBeInTheDocument()
-    expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).toBe(mask)
-    await fireEvent.click(mask!)
-
+    await screen.findByRole('dialog')
+    await fireEvent.click(document.querySelector('[data-tiger-tour-mask]')!)
     expect(onClose).toHaveBeenCalled()
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
-  it('should not render mask when step.mask is false', async () => {
+  it('does not close from the mask when maskClosable is false', async () => {
+    const onUpdateOpen = vi.fn()
     render(Tour, {
       props: {
-        steps: [{ title: 'No mask', description: '...', mask: false }],
-        open: true
+        steps: baseSteps,
+        open: true,
+        maskClosable: false,
+        'onUpdate:open': onUpdateOpen
       }
     })
-    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
-    expect(document.querySelector('[data-tiger-tour-mask]')).not.toBeInTheDocument()
-    expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).not.toBeInTheDocument()
+    await screen.findByRole('dialog')
+    await fireEvent.click(document.querySelector('[data-tiger-tour-mask]')!)
+    expect(onUpdateOpen).not.toHaveBeenCalled()
   })
 
-  it('should render spotlight overlay when target rect is found', async () => {
-    const target = document.createElement('div')
-    target.id = 'tour-target'
-    target.getBoundingClientRect = () =>
-      ({
-        top: 100,
-        left: 200,
-        width: 50,
-        height: 30,
-        right: 250,
-        bottom: 130,
-        x: 200,
-        y: 100,
-        toJSON: () => ({})
-      }) as DOMRect
-    document.body.appendChild(target)
-
+  it('should not render mask when step.mask is false', async () => {
     render(Tour, {
-      props: {
-        steps: [{ title: 'With target', description: '...', target: '#tour-target' }],
-        open: true
-      }
+      props: { steps: [{ title: 'No mask', description: '...', mask: false }], open: true }
     })
+    await screen.findByRole('dialog')
+    expect(document.querySelector('[data-tiger-tour-mask]')).not.toBeInTheDocument()
+  })
 
-    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
-    // Overlay is the clip-path mask (aria-hidden); presence indicates target rect resolved.
-    const overlay = document.querySelector('[aria-hidden="true"]')
-    expect(overlay).toBeInTheDocument()
-    expect(overlay).toHaveAttribute('data-tiger-tour-mask')
+  it('punches a mask hole and does not center when the loaded step has a target', async () => {
+    const target = mountTarget()
+    let resolveSteps: ((next: TourStep[]) => void) | undefined
+    const loadSteps = () =>
+      new Promise<TourStep[]>((resolve) => {
+        resolveSteps = resolve
+      })
+
+    render(Tour, { props: { steps: [], open: true, loadSteps } })
+    resolveSteps?.([{ title: 'With target', target: '#tour-target' }])
+
+    const dialog = await screen.findByRole('dialog', { name: 'With target' })
+    await waitFor(() => {
+      const node = document.querySelector('[data-tiger-tour-mask]') as HTMLElement | null
+      expect(node?.style.clipPath).toContain('evenodd')
+      expect(node?.style.clipPath).toContain('196px 96px')
+    })
+    expect(dialog.style.top).not.toBe('50%')
+    target.remove()
+  })
+
+  it('centers instead of throwing on an illegal selector', async () => {
+    render(Tour, { props: { steps: [{ title: 'Broken', target: '##' }], open: true } })
+    const dialog = await screen.findByRole('dialog', { name: 'Broken' })
+    expect(document.querySelector('[data-tiger-tour-mask]')).toBeInTheDocument()
+    expect((document.querySelector('[data-tiger-tour-mask]') as HTMLElement).style.clipPath).toBe(
+      ''
+    )
+    expect(dialog.style.top).not.toBe('')
   })
 
   it('should close when clicking the mask when a target exists', async () => {
-    const target = document.createElement('div')
-    target.id = 'tour-target'
-    target.getBoundingClientRect = () =>
-      ({
-        top: 100,
-        left: 200,
-        width: 50,
-        height: 30,
-        right: 250,
-        bottom: 130,
-        x: 200,
-        y: 100,
-        toJSON: () => ({})
-      }) as DOMRect
-    document.body.appendChild(target)
-
+    const target = mountTarget()
     const onClose = vi.fn()
     const onUpdateOpen = vi.fn()
     render(Tour, {
@@ -303,46 +380,32 @@ describe('Tour', () => {
       }
     })
 
-    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
     const mask = await waitFor(() => {
       const node = document.querySelector('[data-tiger-tour-mask]') as HTMLElement | null
-      expect(node).toBeInTheDocument()
       expect(node?.style.clipPath).toContain('evenodd')
       return node!
     })
     await fireEvent.click(mask)
-
     expect(onClose).toHaveBeenCalled()
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
+    target.remove()
   })
 
   it('should apply custom className to the popover', async () => {
-    render(Tour, {
-      props: { steps: baseSteps, open: true, className: 'my-custom-tour' }
-    })
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toHaveClass('my-custom-tour')
-    })
-  })
-
-  it('should render dialog with role and aria-modal attributes', async () => {
-    render(Tour, { props: { steps: baseSteps, open: true } })
-    await waitFor(() => {
-      const dialog = screen.getByRole('dialog')
-      expect(dialog).toHaveAttribute('aria-modal', 'true')
-    })
+    render(Tour, { props: { steps: baseSteps, open: true, className: 'my-custom-tour' } })
+    expect(await screen.findByRole('dialog')).toHaveClass('my-custom-tour')
   })
 
   it('should render nothing if step does not exist (out-of-range current)', () => {
     render(Tour, { props: { steps: baseSteps, open: true, current: 99 } })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(document.body.style.overflow).not.toBe('hidden')
   })
 
-  // --- Overlay lifecycle (C09-4) ---
   describe('Overlay lifecycle', () => {
     it('moves focus to the close button when opened', async () => {
       render(Tour, { props: { steps: baseSteps, open: true } })
-      const closeButton = await screen.findByLabelText('Close tour')
+      const closeButton = await screen.findByRole('button', { name: 'Close tour' })
       await waitFor(() => expect(closeButton).toHaveFocus())
     })
 
@@ -353,24 +416,21 @@ describe('Tour', () => {
       expect(layer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
     })
 
-    it('portals a nested Dropdown into the tour overlay-host instead of document.body', async () => {
+    it('keeps a content-slot Dropdown inside the tour overlay-host', async () => {
       render({
         setup() {
-          const dialog = ref<HTMLElement | null>(null)
-          onMounted(() => {
-            dialog.value = document.querySelector('[role="dialog"]')
-          })
-          return () => [
-            h(Tour, { steps: baseSteps, open: true }),
-            dialog.value
-              ? h(Teleport, { to: dialog.value }, [
+          return () =>
+            h(
+              Tour,
+              { steps: baseSteps, open: true },
+              {
+                content: () =>
                   h(Dropdown, { defaultOpen: true }, () => [
                     h('button', null, 'Tour menu'),
                     h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Nested action')])
                   ])
-                ])
-              : null
-          ]
+              }
+            )
         }
       })
 
@@ -405,25 +465,43 @@ describe('Tour', () => {
       trigger.textContent = 'Open tour'
       document.body.appendChild(trigger)
       trigger.focus()
-      expect(trigger).toHaveFocus()
 
       const { rerender } = render(Tour, { props: { steps: baseSteps, open: true } })
       await screen.findByRole('dialog')
-
       await rerender({ steps: baseSteps, open: false })
+      await waitFor(() => expect(trigger).toHaveFocus())
+      trigger.remove()
+    })
+
+    it('restores focus when the instance unmounts', async () => {
+      const trigger = document.createElement('button')
+      trigger.textContent = 'Open tour'
+      document.body.appendChild(trigger)
+      trigger.focus()
+
+      const { unmount } = render(Tour, { props: { steps: baseSteps, open: true } })
+      await screen.findByRole('dialog')
+      unmount()
       await waitFor(() => expect(trigger).toHaveFocus())
       trigger.remove()
     })
   })
 
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Tour, {
-        props: {
-          steps: baseSteps
-        }
-      })
-      await expectNoA11yViolationsIsolated(container)
+    it('passes axe for titled, untitled, unclosable, and loaded dialogs', async () => {
+      const { rerender, unmount } = render(Tour, { props: { steps: baseSteps, open: true } })
+      await expectNoA11yViolations(await screen.findByRole('dialog'))
+
+      await rerender({ steps: [{ description: 'No title' }], open: true })
+      await expectNoA11yViolations(await screen.findByRole('dialog', { name: 'Tour' }))
+
+      await rerender({ steps: baseSteps, open: true, closable: false })
+      await expectNoA11yViolations(await screen.findByRole('dialog'))
+      unmount()
+
+      const loadSteps = vi.fn().mockResolvedValue([{ title: 'Loaded' }])
+      render(Tour, { props: { steps: [], open: true, loadSteps } })
+      await expectNoA11yViolations(await screen.findByRole('dialog', { name: 'Loaded' }))
     })
   })
 })

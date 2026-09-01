@@ -172,7 +172,8 @@ export const deDE: TigerLocale = {
     prevText: 'Zurück',
     nextText: 'Weiter',
     finishText: 'Fertigstellen',
-    closeAriaLabel: 'Tour schließen'
+    closeAriaLabel: 'Tour schließen',
+    dialogAriaLabel: 'Rundgang'
   },
   calendar: {
     previousMonth: 'Vorheriger Monat',

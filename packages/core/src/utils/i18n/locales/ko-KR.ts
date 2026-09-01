@@ -172,7 +172,8 @@ export const koKR: TigerLocale = {
     prevText: '이전',
     nextText: '다음',
     finishText: '완료',
-    closeAriaLabel: '투어 닫기'
+    closeAriaLabel: '투어 닫기',
+    dialogAriaLabel: '둘러보기'
   },
   calendar: {
     previousMonth: '이전 달',

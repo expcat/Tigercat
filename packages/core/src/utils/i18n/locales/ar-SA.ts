@@ -172,7 +172,8 @@ export const arSA: TigerLocale = {
     prevText: 'السابق',
     nextText: 'التالي',
     finishText: 'إنهاء',
-    closeAriaLabel: 'إغلاق الجولة'
+    closeAriaLabel: 'إغلاق الجولة',
+    dialogAriaLabel: 'الجولة الإرشادية'
   },
   calendar: {
     previousMonth: 'الشهر السابق',

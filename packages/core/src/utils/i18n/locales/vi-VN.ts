@@ -172,7 +172,8 @@ export const viVN: TigerLocale = {
     prevText: 'Trước',
     nextText: 'Tiếp',
     finishText: 'Hoàn thành',
-    closeAriaLabel: 'Đóng hướng dẫn'
+    closeAriaLabel: 'Đóng hướng dẫn',
+    dialogAriaLabel: 'Hướng dẫn'
   },
   calendar: {
     previousMonth: 'Tháng trước',

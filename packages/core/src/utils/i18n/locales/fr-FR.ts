@@ -172,7 +172,8 @@ export const frFR: TigerLocale = {
     prevText: 'Précédent',
     nextText: 'Suivant',
     finishText: 'Terminer',
-    closeAriaLabel: 'Fermer la visite'
+    closeAriaLabel: 'Fermer la visite',
+    dialogAriaLabel: 'Visite guidée'
   },
   calendar: {
     previousMonth: 'Mois précédent',

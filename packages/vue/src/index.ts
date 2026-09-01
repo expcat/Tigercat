@@ -399,7 +399,7 @@ export type {
 export { Watermark } from './components/Watermark'
 export type { VueWatermarkProps } from './components/Watermark'
 export { Tour } from './components/Tour'
-export type { VueTourProps } from './components/Tour'
+export type { VueTourProps, TourProps } from './components/Tour'
 export { Affix } from './components/Affix'
 export type { VueAffixProps, AffixProps } from './components/Affix'
 

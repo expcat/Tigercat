@@ -175,7 +175,8 @@ export const enUS: TigerLocale = {
     prevText: 'Previous',
     nextText: 'Next',
     finishText: 'Finish',
-    closeAriaLabel: 'Close tour'
+    closeAriaLabel: 'Close tour',
+    dialogAriaLabel: 'Tour'
   },
   calendar: {
     previousMonth: 'Previous month',
