@@ -2,9 +2,6 @@ import { h, type VNodeChild } from 'vue'
 import {
   getSortIconClasses,
   getExpandIconClasses,
-  getSpinnerSVG,
-  normalizeSvgAttrs,
-  getLoadingOverlaySpinnerClasses,
   icon16ViewBox,
   icon24ViewBox,
   sortAscIcon16PathD,
@@ -15,8 +12,6 @@ import {
   lockOpenIcon24PathD,
   type SortDirection
 } from '@expcat/tigercat-core'
-
-const spinnerSvg = getSpinnerSVG('spinner')
 
 export const SortIcon = (direction: SortDirection): VNodeChild => {
   const active = direction !== null
@@ -67,18 +62,5 @@ export const ExpandIcon = (expanded: boolean): VNodeChild => {
       'aria-hidden': 'true'
     },
     [h('path', { d: expandChevronIcon16PathD })]
-  )
-}
-
-export const LoadingSpinner = (): VNodeChild => {
-  return h(
-    'svg',
-    {
-      class: getLoadingOverlaySpinnerClasses(),
-      xmlns: 'http://www.w3.org/2000/svg',
-      fill: 'none',
-      viewBox: spinnerSvg.viewBox
-    },
-    spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
   )
 }

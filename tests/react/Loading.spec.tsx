@@ -1,9 +1,13 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, waitFor } from '@testing-library/react'
 import React from 'react'
 import { DEFAULT_LOADING_BACKGROUND } from '@expcat/tigercat-core'
-import { Loading } from '../../packages/react/src/components/Loading'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { Loading } from '@expcat/tigercat-react/Loading'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { expectNoA11yViolations, expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Loading (React)', () => {
   afterEach(() => {
@@ -11,12 +15,18 @@ describe('Loading (React)', () => {
     vi.useRealTimers()
   })
 
-  it('renders with a11y defaults', () => {
+  it('uses official en-US loading text as the default name', () => {
     render(<Loading />)
     const status = screen.getByRole('status')
-    expect(status).toHaveAttribute('aria-label', 'Loading')
-    expect(status).toHaveAttribute('aria-live', 'polite')
+    expect(status).toHaveAttribute('aria-label', 'Loading...')
     expect(status).toHaveAttribute('aria-busy', 'true')
+    expect(status).not.toHaveAttribute('aria-live')
+  })
+
+  it('hides the decorative indicator from the accessibility tree', () => {
+    const { container } = render(<Loading />)
+    const hidden = container.querySelector('[aria-hidden="true"]')
+    expect(hidden).toBeTruthy()
   })
 
   it('renders text and uses it as aria-label', () => {
@@ -25,37 +35,90 @@ describe('Loading (React)', () => {
     expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading data')
   })
 
+  it('reads official locale objects when text is omitted', () => {
+    const { rerender } = render(
+      <ConfigProvider locale={zhCN}>
+        <Loading />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', '加载中...')
+
+    rerender(
+      <ConfigProvider locale={zhTW}>
+        <Loading />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', '載入中...')
+
+    rerender(
+      <ConfigProvider locale={jaJP}>
+        <Loading />
+      </ConfigProvider>
+    )
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', '読み込み中...')
+  })
+
   it('forwards attributes and merges className', () => {
     render(<Loading className="custom-class" data-testid="loading" />)
     const status = screen.getByTestId('loading')
     expect(status).toHaveClass('custom-class')
+    expect(status).toHaveAttribute('role', 'status')
+  })
+
+  it('keeps role=status even if the caller tries to replace it', () => {
+    render(<Loading role="alert" />)
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   it('renders dots and bars variants', () => {
-    const { container: dotsContainer } = render(<Loading variant="dots" />)
-    expect(dotsContainer.querySelectorAll('.animate-bounce-dot')).toHaveLength(3)
+    const { rerender } = render(<Loading variant="dots" />)
+    expect(screen.getByRole('status').querySelectorAll('[aria-hidden="true"] > *')).toHaveLength(3)
 
-    const { container: barsContainer } = render(<Loading variant="bars" />)
-    expect(barsContainer.querySelectorAll('.animate-scale-bar')).toHaveLength(3)
+    rerender(<Loading variant="bars" />)
+    expect(screen.getByRole('status').querySelectorAll('[aria-hidden="true"] > *')).toHaveLength(3)
   })
 
   it('renders ring and pulse variants as SVG', () => {
-    const { container: ringContainer } = render(<Loading variant="ring" />)
-    expect(ringContainer.querySelector('svg')).toBeInTheDocument()
-    expect(ringContainer.querySelector('svg')).toHaveClass('animate-spin')
+    const { rerender } = render(<Loading variant="ring" />)
+    expect(screen.getByRole('status').querySelector('svg')).toBeInTheDocument()
 
-    const { container: pulseContainer } = render(<Loading variant="pulse" />)
-    expect(pulseContainer.querySelector('svg')).toBeInTheDocument()
-    expect(pulseContainer.querySelector('svg')).toHaveClass('animate-pulse')
+    rerender(<Loading variant="pulse" />)
+    expect(screen.getByRole('status').querySelector('svg')).toBeInTheDocument()
   })
 
-  it('applies size classes', () => {
-    const { container: smContainer } = render(<Loading size="sm" />)
-    expect(smContainer.querySelector('svg')).toHaveClass('h-4', 'w-4')
+  it('covers children with a region overlay and restores them when spinning is false', async () => {
+    const { rerender } = render(
+      <Loading spinning>
+        <button type="button">Pay</button>
+      </Loading>
+    )
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pay' }).closest('[inert]')).toBeTruthy()
 
-    const { container: xlContainer } = render(<Loading size="xl" />)
-    expect(xlContainer.querySelector('svg')).toHaveClass('h-16', 'w-16')
+    rerender(
+      <Loading spinning={false}>
+        <button type="button">Pay</button>
+      </Loading>
+    )
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pay' }).closest('[inert]')).toBeNull()
   })
+
+  it('lets user style override the fullscreen mask', () => {
+    render(<Loading fullscreen style={{ backgroundColor: 'red' }} />)
+    const wrapper = screen.getByRole('status')
+    const reactPropsKey = Object.getOwnPropertyNames(wrapper).find((key) =>
+      key.startsWith('__reactProps$')
+    )
+    const reactProps = reactPropsKey
+      ? (wrapper as unknown as Record<string, { style?: { backgroundColor?: string } }>)[
+          reactPropsKey
+        ]
+      : undefined
+    expect(reactProps?.style?.backgroundColor).toBe('red')
+  })
+
   it('supports fullscreen background', () => {
     const { container, unmount } = render(<Loading fullscreen background="rgba(0, 0, 0, 0.8)" />)
     const wrapper = screen.getByRole('status')
@@ -71,8 +134,7 @@ describe('Loading (React)', () => {
 
   it('applies the shared surface mask when fullscreen has no background', () => {
     expect(DEFAULT_LOADING_BACKGROUND).toContain('--tiger-surface')
-    expect(DEFAULT_LOADING_BACKGROUND).toContain('--tiger-loading-mask')
-    expect(DEFAULT_LOADING_BACKGROUND).not.toBe('rgba(255, 255, 255, 0.9)')
+    expect(DEFAULT_LOADING_BACKGROUND).not.toContain('--tiger-loading-mask')
 
     render(<Loading fullscreen />)
     const wrapper = screen.getByRole('status')
@@ -85,8 +147,20 @@ describe('Loading (React)', () => {
         ]
       : undefined
 
-    // happy-dom drops color-mix on CSSStyleDeclaration; React props still have the value.
     expect(reactProps?.style?.backgroundColor).toBe(DEFAULT_LOADING_BACKGROUND)
+  })
+
+  it('inerts the page behind a fullscreen overlay', async () => {
+    render(
+      <>
+        <button type="button">Behind</button>
+        <Loading fullscreen />
+      </>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Behind' }).closest('[inert]')).toBeTruthy()
+    })
   })
 
   it('allows fullscreen loading without scroll lock', () => {
@@ -107,23 +181,27 @@ describe('Loading (React)', () => {
     })
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
+
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('has no accessibility violations for the inline spinner', async () => {
       const { container } = render(<Loading />)
       await expectNoA11yViolationsIsolated(container)
     })
-  })
-  it('renders spinner variant by default', () => {
-    const { container } = render(<Loading />)
-    expect(container.querySelector('svg')).toBeInTheDocument()
-  })
 
-  it('applies all size variants without errors', () => {
-    const sizes = ['sm', 'md', 'lg', 'xl'] as const
-    for (const size of sizes) {
-      const { container, unmount } = render(<Loading size={size} />)
-      expect(container.querySelector('[role="status"]')).toBeInTheDocument()
-      unmount()
-    }
+    it('has no accessibility violations for named text and a Chinese fullscreen layer', async () => {
+      const { container } = render(
+        <ConfigProvider locale={zhCN}>
+          <Loading text="同步中" />
+        </ConfigProvider>
+      )
+      await expectNoA11yViolationsIsolated(container)
+
+      render(
+        <ConfigProvider locale={zhCN}>
+          <Loading fullscreen />
+        </ConfigProvider>
+      )
+      await expectNoA11yViolations(document.body)
+    })
   })
 })

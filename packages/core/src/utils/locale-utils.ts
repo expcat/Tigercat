@@ -639,6 +639,11 @@ export function getAlertLabels(
   return resolveLocaleSection(enSection('alert'), locale?.alert, overrides)
 }
 
+export function getLoadingLabel(locale?: Partial<TigerLocale>, text?: string): string {
+  if (typeof text === 'string' && text.trim().length > 0) return text
+  return resolveLocaleSection(enSection('common'), locale?.common).loadingText
+}
+
 /**
  * Fill `{count}` with an Intl number and `{plural}` with an English suffix
  * (`''` for `one`, `'s'` otherwise). Locales that write a complete sentence

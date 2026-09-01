@@ -53,6 +53,13 @@ export interface LoadingProps {
   text?: string
 
   /**
+   * Cover children / the default slot with a relative overlay.
+   * When `false`, only the content renders. Ignored without children.
+   * @default true
+   */
+  spinning?: boolean
+
+  /**
    * Whether to show loading as fullscreen overlay
    * @default false
    */
@@ -66,8 +73,8 @@ export interface LoadingProps {
   delay?: number
 
   /**
-   * Custom background color (for fullscreen mode)
-   * @default 'var(--tiger-loading-mask, color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent))'
+   * Custom background color (for fullscreen / region overlay)
+   * @default 'color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent)'
    */
   background?: string
 

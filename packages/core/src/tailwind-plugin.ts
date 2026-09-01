@@ -12,6 +12,7 @@ import { defaultTheme } from './themes/default/theme'
 import { modernTheme } from './themes/modern/theme'
 import { resolvePresetThemeConfig, themeConfigToCssVars } from './themes/manager'
 import { alertCountdownBaseStyles } from './utils/alert-utils'
+import { loadingAnimationBaseStyles } from './utils/loading-utils'
 
 function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {
   return themeConfigToCssVars(resolvePresetThemeConfig(preset ?? defaultTheme, scheme))
@@ -67,7 +68,8 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
     '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
     '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
       MODERN_OVERRIDE_TOKENS_DARK,
-    ...alertCountdownBaseStyles
+    ...alertCountdownBaseStyles,
+    ...loadingAnimationBaseStyles
   })
 })
 

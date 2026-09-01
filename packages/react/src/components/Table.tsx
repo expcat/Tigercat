@@ -45,7 +45,7 @@ import { useTigerConfig } from './ConfigProvider'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { Empty } from './Empty'
-import { LoadingSpinner } from './Table/icons'
+import { Loading } from './Loading'
 import { Radio } from './Radio'
 import { Select } from './Select'
 import { useTableState } from './Table/state'
@@ -839,7 +839,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           role="status"
           aria-live="polite"
           aria-label={tableLabels.loadingText}>
-          <LoadingSpinner />
+          <Loading aria-hidden role="presentation" />
           <span className="sr-only">{tableLabels.loadingText}</span>
         </div>
       )}

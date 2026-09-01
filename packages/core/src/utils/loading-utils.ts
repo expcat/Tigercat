@@ -3,7 +3,6 @@
  */
 
 import { classNames } from './class-names'
-import { isBrowser } from './env'
 import { overlayZIndexClass } from './floating'
 import type { LoadingSize, LoadingColor, LoadingVariant } from '../types/loading'
 
@@ -51,27 +50,26 @@ export const loadingContainerBaseClasses = 'inline-flex flex-col items-center ju
 export const loadingFullscreenBaseClasses = `fixed inset-0 ${overlayZIndexClass.modal} flex items-center justify-center`
 
 /**
- * Default fullscreen mask: 90% of `--tiger-surface`.
- * Optional `--tiger-loading-mask` is a first-level override, not a registered theme var.
- * Last-resort `#ffffff` applies only when `--tiger-surface` is unresolved.
+ * Relative wrapper for the region overlay (children + mask).
+ */
+export const loadingRegionBaseClasses = 'relative'
+
+/**
+ * In-place overlay that covers the region content.
+ */
+export const loadingRegionOverlayClasses =
+  'absolute inset-0 z-10 flex items-center justify-center bg-[color-mix(in_srgb,var(--tiger-surface,#ffffff)_85%,transparent)]'
+
+/**
+ * Default fullscreen / region mask: 90% of `--tiger-surface`.
  */
 export const DEFAULT_LOADING_BACKGROUND =
-  'var(--tiger-loading-mask, color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent))'
+  'color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent)'
 
 /**
  * Base classes for spinner animation
  */
 export const loadingSpinnerBaseClasses = 'tiger-motion-aware animate-spin'
-
-/**
- * Base classes for loading overlay spinner used by components like List/Table
- */
-export const loadingOverlaySpinnerBaseClasses =
-  'tiger-motion-aware animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]'
-
-export function getLoadingOverlaySpinnerClasses(customClassName?: string): string {
-  return classNames(loadingOverlaySpinnerBaseClasses, customClassName)
-}
 
 /**
  * Get loading spinner classes
@@ -92,7 +90,7 @@ export function getLoadingClasses(
     case 'bars':
       return baseClasses
     case 'pulse':
-      return classNames(baseClasses, 'animate-pulse')
+      return classNames(baseClasses, 'tiger-motion-aware animate-pulse')
     case 'spinner':
     case 'ring':
     default:
@@ -100,41 +98,24 @@ export function getLoadingClasses(
   }
 }
 
+export type LoadingSvgElement = {
+  type: 'circle' | 'path'
+  attrs: Record<string, unknown>
+}
+
 /**
- * Get spinner SVG path for different variants
+ * SVG descriptor for spinner / ring / pulse.
+ * `dots` / `bars` return an empty element list — callers should use
+ * {@link getLoadingIndicator} instead of drawing the wrong glyph.
  */
 export function getSpinnerSVG(variant: LoadingVariant): {
   viewBox: string
-  elements: Array<{ type: string; attrs: Record<string, unknown> }>
+  elements: LoadingSvgElement[]
 } {
   switch (variant) {
-    case 'spinner':
-    default:
-      return {
-        viewBox: '0 0 24 24',
-        elements: [
-          {
-            type: 'circle',
-            attrs: {
-              className: 'opacity-25',
-              cx: '12',
-              cy: '12',
-              r: '10',
-              stroke: 'currentColor',
-              strokeWidth: '4',
-              fill: 'none'
-            }
-          },
-          {
-            type: 'path',
-            attrs: {
-              className: 'opacity-75',
-              fill: 'currentColor',
-              d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-            }
-          }
-        ]
-      }
+    case 'dots':
+    case 'bars':
+      return { viewBox: '0 0 24 24', elements: [] }
 
     case 'ring':
       return {
@@ -184,6 +165,34 @@ export function getSpinnerSVG(variant: LoadingVariant): {
           }
         ]
       }
+
+    case 'spinner':
+    default:
+      return {
+        viewBox: '0 0 24 24',
+        elements: [
+          {
+            type: 'circle',
+            attrs: {
+              className: 'opacity-25',
+              cx: '12',
+              cy: '12',
+              r: '10',
+              stroke: 'currentColor',
+              strokeWidth: '4',
+              fill: 'none'
+            }
+          },
+          {
+            type: 'path',
+            attrs: {
+              className: 'opacity-75',
+              fill: 'currentColor',
+              d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+            }
+          }
+        ]
+      }
   }
 }
 
@@ -216,9 +225,9 @@ export const loadingDotsWrapperBaseClasses = 'flex items-center'
 
 export const loadingBarsWrapperBaseClasses = 'flex items-end'
 
-export const loadingDotBaseClasses = 'rounded-full bg-current animate-bounce-dot'
+export const loadingDotBaseClasses = 'tiger-motion-aware rounded-full bg-current animate-bounce-dot'
 
-export const loadingBarBaseClasses = 'rounded-sm bg-current animate-scale-bar'
+export const loadingBarBaseClasses = 'tiger-motion-aware rounded-sm bg-current animate-scale-bar'
 
 export function getLoadingTextClasses(
   size: LoadingSize,
@@ -275,72 +284,79 @@ export const animationDelayClasses = [
   'animation-delay-300'
 ]
 
-/**
- * CSS for custom animation delays
- */
-export const animationDelayStyles = `
-@keyframes bounce-dot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-100%); }
-}
-
-@keyframes scale-bar {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.5); }
-}
-
-.animate-bounce-dot {
-  animation: bounce-dot var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite;
-}
-
-.animate-scale-bar {
-  animation: scale-bar var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite;
-}
-
-.animation-delay-0 {
-  animation-delay: 0s;
-}
-
-.animation-delay-150 {
-  animation-delay: 0.15s;
-}
-
-.animation-delay-300 {
-  animation-delay: 0.3s;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-bounce-dot,
-  .animate-scale-bar {
-    animation-duration: 0ms;
-    animation-delay: 0ms;
-  }
-}
-`
-
-/**
- * Injects animation styles into the document head
- * This is a shared utility to avoid code duplication
- */
-export function injectLoadingAnimationStyles(): void {
-  if (!isBrowser()) {
-    return
-  }
-
-  try {
-    const styleId = 'tiger-loading-animations'
-    if (!document.getElementById(styleId)) {
-      if (!document.head) {
-        console.warn('Tigercat Loading: document.head is not available')
-        return
-      }
-
-      const style = document.createElement('style')
-      style.id = styleId
-      style.textContent = animationDelayStyles
-      document.head.appendChild(style)
+export type LoadingIndicatorNode =
+  | {
+      kind: 'svg'
+      className: string
+      viewBox: string
+      elements: LoadingSvgElement[]
     }
-  } catch (error) {
-    console.error('Tigercat Loading: Failed to inject animation styles', error)
+  | {
+      kind: 'items'
+      className: string
+      items: Array<{ className: string }>
+    }
+
+/**
+ * Framework-agnostic indicator tree. Vue/React only bind elements.
+ */
+export function getLoadingIndicator(options: {
+  variant: LoadingVariant
+  size: LoadingSize
+  color: LoadingColor
+  customColor?: string
+}): LoadingIndicatorNode {
+  const { variant, size, color, customColor } = options
+  const colorClass = customColor ? '' : loadingColorClasses[color]
+  const steps: LoadingAnimationIndex[] = [0, 1, 2]
+
+  if (variant === 'dots') {
+    return {
+      kind: 'items',
+      className: getLoadingDotsWrapperClasses(size),
+      items: steps.map((index) => ({ className: getLoadingDotClasses(size, index, colorClass) }))
+    }
+  }
+
+  if (variant === 'bars') {
+    return {
+      kind: 'items',
+      className: getLoadingBarsWrapperClasses(size),
+      items: steps.map((index) => ({ className: getLoadingBarClasses(size, index, colorClass) }))
+    }
+  }
+
+  const svg = getSpinnerSVG(variant)
+  return {
+    kind: 'svg',
+    className: getLoadingClasses(variant, size, color, customColor),
+    viewBox: svg.viewBox,
+    elements: svg.elements
   }
 }
+
+/**
+ * Plugin keyframes for dots / bars. `tiger-motion-aware` already zeros
+ * duration under prefers-reduced-motion.
+ */
+export const loadingAnimationBaseStyles = {
+  '@keyframes tiger-bounce-dot': {
+    '0%, 100%': { transform: 'translateY(0)' },
+    '50%': { transform: 'translateY(-100%)' }
+  },
+  '@keyframes tiger-scale-bar': {
+    '0%, 100%': { transform: 'scaleY(1)' },
+    '50%': { transform: 'scaleY(1.5)' }
+  },
+  '.animate-bounce-dot': {
+    animation:
+      'tiger-bounce-dot var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite'
+  },
+  '.animate-scale-bar': {
+    animation:
+      'tiger-scale-bar var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite'
+  },
+  '.animation-delay-0': { animationDelay: '0s' },
+  '.animation-delay-150': { animationDelay: '0.15s' },
+  '.animation-delay-300': { animationDelay: '0.3s' }
+} as const

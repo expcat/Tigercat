@@ -2,8 +2,6 @@ import React from 'react'
 import {
   getSortIconClasses,
   getExpandIconClasses,
-  getSpinnerSVG,
-  getLoadingOverlaySpinnerClasses,
   icon16ViewBox,
   icon24ViewBox,
   sortAscIcon16PathD,
@@ -13,8 +11,6 @@ import {
   lockClosedIcon24PathD,
   lockOpenIcon24PathD
 } from '@expcat/tigercat-core'
-
-const spinnerSvg = getSpinnerSVG('spinner')
 
 export const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction }) => {
   const active = direction !== null
@@ -59,17 +55,3 @@ export const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => {
     </svg>
   )
 }
-
-export const LoadingSpinner: React.FC = () => (
-  <svg
-    className={getLoadingOverlaySpinnerClasses()}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox={spinnerSvg.viewBox}>
-    {spinnerSvg.elements.map((el, index) => {
-      if (el.type === 'circle') return <circle key={index} {...el.attrs} />
-      if (el.type === 'path') return <path key={index} {...el.attrs} />
-      return null
-    })}
-  </svg>
-)

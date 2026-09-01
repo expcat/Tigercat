@@ -57,7 +57,7 @@ import { Radio } from './Radio'
 import { Select } from './Select'
 import { tableEmits, tableProps, type VueTableProps } from './Table/props'
 import { useTableState } from './Table/state'
-import { LoadingSpinner } from './Table/icons'
+import { Loading } from './Loading'
 import { renderTableHeader } from './Table/render-header'
 import { renderTableBody } from './Table/render-body'
 import { renderSummaryRow } from './Table/render-summary'
@@ -842,7 +842,10 @@ export const Table = defineComponent({
                 'aria-live': 'polite',
                 'aria-label': tableLabels.value.loadingText
               },
-              [LoadingSpinner(), h('span', { class: 'sr-only' }, tableLabels.value.loadingText)]
+              [
+                h(Loading, { 'aria-hidden': true, role: 'presentation' }),
+                h('span', { class: 'sr-only' }, tableLabels.value.loadingText)
+              ]
             ),
 
           renderPagination(ctx, renderProps, {

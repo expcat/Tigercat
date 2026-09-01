@@ -2,22 +2,18 @@ import { defineComponent, computed, h, PropType, ref, watch, onUnmounted } from 
 import {
   classNames,
   coerceClassValue,
-  getLoadingBarClasses,
-  getLoadingBarsWrapperClasses,
-  getLoadingClasses,
-  getLoadingDotClasses,
-  getLoadingDotsWrapperClasses,
+  getLoadingIndicator,
+  getLoadingLabel,
   getLoadingTextClasses,
-  getSpinnerSVG,
   DEFAULT_LOADING_BACKGROUND,
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
-  loadingColorClasses,
+  loadingRegionBaseClasses,
+  loadingRegionOverlayClasses,
   mergeStyleValues,
-  normalizeSvgAttrs,
-  injectLoadingAnimationStyles,
-  resolveLocaleText,
   mergeTigerLocale,
+  normalizeSvgAttrs,
+  type LoadingIndicatorNode,
   type LoadingProps,
   type LoadingVariant,
   type LoadingSize,
@@ -34,6 +30,31 @@ import { useTigerConfig } from './ConfigProvider'
 export interface VueLoadingProps extends LoadingProps {
   style?: Record<string, string | number>
   locale?: Partial<TigerLocale>
+}
+
+export type { LoadingProps }
+
+function renderIndicator(node: LoadingIndicatorNode) {
+  if (node.kind === 'items') {
+    return h(
+      'div',
+      { class: node.className, 'aria-hidden': 'true' },
+      node.items.map((item) => h('div', { class: item.className }))
+    )
+  }
+
+  return h(
+    'svg',
+    {
+      class: node.className,
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: node.viewBox,
+      'aria-hidden': 'true',
+      focusable: 'false'
+    },
+    node.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
+  )
 }
 
 export const Loading = defineComponent({
@@ -56,6 +77,10 @@ export const Loading = defineComponent({
       type: String,
       default: undefined
     },
+    spinning: {
+      type: Boolean,
+      default: true
+    },
     fullscreen: {
       type: Boolean,
       default: false
@@ -76,10 +101,6 @@ export const Loading = defineComponent({
       type: Boolean,
       default: true
     },
-    disableTeleport: {
-      type: Boolean,
-      default: false
-    },
     className: {
       type: String,
       default: undefined
@@ -93,21 +114,23 @@ export const Loading = defineComponent({
       default: undefined
     }
   },
-  setup(props, { attrs }) {
-    injectLoadingAnimationStyles()
+  setup(props, { attrs, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
     const visible = ref(false)
     const containerRef = ref<HTMLElement | null>(null)
     let timer: ReturnType<typeof setTimeout> | null = null
-    const shouldLockBodyScroll = computed(
-      () => props.fullscreen && visible.value && props.lockScroll
+
+    const hasRegion = computed(() => !!slots.default)
+    const showIndicator = computed(() => visible.value && props.spinning)
+    const showFullscreen = computed(
+      () => props.fullscreen && showIndicator.value && !hasRegion.value
     )
-    const shouldInertBackground = computed(() => props.fullscreen && visible.value)
+    const shouldLockBodyScroll = computed(() => showFullscreen.value && props.lockScroll)
 
     useVueBodyScrollLock(shouldLockBodyScroll)
-    useVueBackgroundInert(shouldInertBackground, containerRef)
+    useVueBackgroundInert(showFullscreen, containerRef)
 
     const clearTimer = () => {
       if (timer) {
@@ -138,128 +161,92 @@ export const Loading = defineComponent({
       clearTimer()
     })
 
-    const spinnerClasses = computed(() => {
-      return getLoadingClasses(props.variant, props.size, props.color, props.customColor)
-    })
+    const indicator = computed(() =>
+      getLoadingIndicator({
+        variant: props.variant,
+        size: props.size,
+        color: props.color,
+        customColor: props.customColor
+      })
+    )
 
     const textClasses = computed(() => {
       return getLoadingTextClasses(props.size, props.color, props.customColor)
     })
 
-    const containerClasses = computed(() => {
-      return classNames(
-        props.fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
-        props.className,
-        coerceClassValue(attrs.class)
-      )
-    })
-
-    const customStyle = computed(() => {
+    const inlineStyle = computed(() => {
       const baseStyle: Record<string, string | number> = {}
-
-      if (props.customColor) {
-        baseStyle.color = props.customColor
-      }
-
-      if (props.fullscreen) {
-        baseStyle.backgroundColor = props.background
-      }
-
-      return mergeStyleValues(attrs.style, props.style, baseStyle)
+      if (props.customColor) baseStyle.color = props.customColor
+      if (props.fullscreen) baseStyle.backgroundColor = props.background
+      return mergeStyleValues(baseStyle, attrs.style, props.style)
     })
 
-    const renderSpinner = () => {
-      const svg = getSpinnerSVG(props.variant)
+    const overlayStyle = computed(() => {
+      const baseStyle: Record<string, string | number> = {}
+      if (props.customColor) baseStyle.color = props.customColor
+      baseStyle.backgroundColor = props.background
+      return mergeStyleValues(baseStyle, attrs.style, props.style)
+    })
 
-      return h(
-        'svg',
-        {
-          class: spinnerClasses.value,
-          xmlns: 'http://www.w3.org/2000/svg',
-          fill: 'none',
-          viewBox: svg.viewBox
-        },
-        svg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-      )
-    }
-
-    const renderDots = () => {
-      const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
-      const steps = [0, 1, 2] as const
-
-      return h(
-        'div',
-        {
-          class: getLoadingDotsWrapperClasses(props.size)
-        },
-        steps.map((i) =>
-          h('div', {
-            class: getLoadingDotClasses(props.size, i, colorClass)
-          })
-        )
-      )
-    }
-
-    const renderBars = () => {
-      const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
-      const steps = [0, 1, 2] as const
-
-      return h(
-        'div',
-        {
-          class: getLoadingBarsWrapperClasses(props.size)
-        },
-        steps.map((i) =>
-          h('div', {
-            class: getLoadingBarClasses(props.size, i, colorClass)
-          })
-        )
-      )
-    }
-
-    const renderIndicator = () => {
-      switch (props.variant) {
-        case 'dots':
-          return renderDots()
-        case 'bars':
-          return renderBars()
-        case 'spinner':
-        case 'ring':
-        case 'pulse':
-        default:
-          return renderSpinner()
-      }
-    }
+    const label = computed(() => getLoadingLabel(mergedLocale.value, props.text))
 
     return () => {
-      if (!visible.value) {
-        return null
-      }
-
-      const children = [renderIndicator()]
-
+      const indicatorNode = renderIndicator(indicator.value)
+      const children = [indicatorNode]
       if (props.text) {
         children.push(h('div', { class: textClasses.value }, props.text))
+      }
+
+      const decorative =
+        attrs['aria-hidden'] === true ||
+        attrs['aria-hidden'] === 'true' ||
+        attrs.role === 'presentation'
+      const statusProps = decorative
+        ? { role: 'presentation', 'aria-hidden': true }
+        : { role: 'status', 'aria-label': label.value, 'aria-busy': true }
+
+      if (hasRegion.value) {
+        const content = slots.default?.()
+        return h('div', { class: classNames(loadingRegionBaseClasses, props.className) }, [
+          h('div', { inert: showIndicator.value || undefined }, content),
+          showIndicator.value
+            ? h(
+                'div',
+                {
+                  ...attrs,
+                  ref: containerRef,
+                  class: classNames(loadingRegionOverlayClasses, coerceClassValue(attrs.class)),
+                  style: overlayStyle.value,
+                  ...statusProps
+                },
+                children
+              )
+            : null
+        ])
+      }
+
+      if (!showIndicator.value) {
+        return null
       }
 
       const loadingNode = h(
         'div',
         {
-          ref: containerRef,
-          role: 'status',
-          'aria-label':
-            props.text || resolveLocaleText('Loading', mergedLocale.value?.common?.loadingText),
-          'aria-live': 'polite',
-          'aria-busy': true,
           ...attrs,
-          class: containerClasses.value,
-          style: customStyle.value
+          ref: containerRef,
+          class: classNames(
+            props.fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
+            props.className,
+            coerceClassValue(attrs.class)
+          ),
+          style: inlineStyle.value,
+          ...statusProps
         },
         children
       )
 
       if (props.fullscreen) {
-        return renderVueBodyTeleport([loadingNode], props.disableTeleport)
+        return renderVueBodyTeleport([loadingNode])
       }
 
       return loadingNode
