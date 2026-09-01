@@ -28,6 +28,7 @@ export default function App() {
       responsiveMode="card"
       cardBreakpoint="lg"
       pagination={false}
+      toolbar={{ searchPlaceholder: '搜索卡片' }}
     />
   )
 }

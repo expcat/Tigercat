@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react'
 import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
 import type { TableColumn } from '@expcat/tigercat-react'
 
@@ -20,19 +19,13 @@ const rows: Row[] = [
 ]
 
 export default function App() {
-  const [keyword, setKeyword] = useState('')
-  const dataSource = useMemo(
-    () => rows.filter((row) => row.name.includes(keyword.trim())),
-    [keyword]
-  )
-
   return (
     <DataTableWithToolbar<Row>
       columns={columns}
-      dataSource={dataSource}
+      dataSource={rows}
+      pagination={false}
       toolbar={{
-        searchValue: keyword,
-        onSearchChange: setKeyword,
+        searchPlaceholder: '筛选成员',
         render: ({ searchValue, setSearch }) => (
           <div
             role="toolbar"
@@ -53,7 +46,6 @@ export default function App() {
           </div>
         )
       }}
-      pagination={false}
     />
   )
 }

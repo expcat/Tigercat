@@ -1,7 +1,7 @@
 {
   "id": "data-table-with-toolbar-01",
   "title": "基础工具栏",
-  "description": "一个表格组合展示搜索、选择过滤与紧凑固定布局；分页和批量操作可按业务需要追加。",
+  "description": "搜索、状态下拉和勾选批量都写进当前表；省略 pagination 时与 Table 一样默认分页。",
   "entry": "App.vue",
   "order": 1
 }

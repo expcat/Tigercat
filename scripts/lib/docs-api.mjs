@@ -728,6 +728,23 @@ export const COMPONENT_PROP_PRIORITY = {
     'placeholder?',
     'readOnly?'
   ],
+  DataTableWithToolbar: [
+    'toolbar?',
+    'pagination?',
+    'tableClassName?',
+    'onPageChange?',
+    'rowSelection?',
+    'hiddenColumnKeys?'
+  ],
+  FormWizard: [
+    'steps',
+    'current?',
+    'beforeNext?',
+    'clickable?',
+    'autoSave?',
+    'labels?',
+    'onFinish?'
+  ],
   FileManager: [
     'files?',
     'currentPath?',

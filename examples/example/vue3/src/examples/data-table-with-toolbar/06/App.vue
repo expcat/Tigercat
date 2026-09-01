@@ -21,9 +21,22 @@ const rows: Row[] = [
 </script>
 
 <template>
-  <DataTableWithToolbar :columns="columns" :data-source="rows" :pagination="false">
-    <template #filters-extra>
-      <DataExport :columns="columns" :data-source="rows" file-name="成员列表" />
+  <DataTableWithToolbar
+    :columns="columns"
+    :data-source="rows"
+    :pagination="false"
+    :row-selection="{ type: 'checkbox' }"
+    :toolbar="{ searchPlaceholder: '搜索', showColumnSettings: true }">
+    <template #filters-extra="{ dataSource, selectedKeys, hiddenColumnKeys }">
+      <DataExport
+        :columns="columns"
+        :data-source="
+          selectedKeys.length
+            ? dataSource.filter((row) => selectedKeys.includes(row.id as number))
+            : dataSource
+        "
+        :hidden-column-keys="hiddenColumnKeys"
+        file-name="成员列表" />
     </template>
   </DataTableWithToolbar>
 </template>

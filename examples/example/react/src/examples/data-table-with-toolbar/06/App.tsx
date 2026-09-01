@@ -23,10 +23,25 @@ export default function App() {
     <DataTableWithToolbar<Row>
       columns={columns}
       dataSource={rows}
-      toolbar={{
-        filtersExtra: <DataExport<Row> columns={columns} dataSource={rows} fileName="成员列表" />
-      }}
       pagination={false}
+      rowSelection={{ type: 'checkbox' }}
+      toolbar={{
+        searchPlaceholder: '搜索',
+        showColumnSettings: true,
+        filtersExtra: ({ dataSource, selectedKeys, hiddenColumnKeys }) => {
+          const selected = selectedKeys.length
+            ? (dataSource as Row[]).filter((row) => selectedKeys.includes(row.id))
+            : (dataSource as Row[])
+          return (
+            <DataExport<Row>
+              columns={columns}
+              dataSource={selected}
+              hiddenColumnKeys={hiddenColumnKeys}
+              fileName="成员列表"
+            />
+          )
+        }
+      }}
     />
   )
 }

@@ -10,7 +10,7 @@ interface Row extends Record<string, unknown> {
 }
 
 const columns: TableColumn<Record<string, unknown>>[] = [
-  { key: 'name', title: '姓名', width: 160, fixed: 'left', hideable: false },
+  { key: 'name', title: '姓名', width: 160 },
   { key: 'email', title: '邮箱', width: 220 },
   { key: 'role', title: '角色', width: 140 }
 ]
@@ -25,11 +25,9 @@ const rows: Row[] = [
   <DataTableWithToolbar
     :columns="columns"
     :data-source="rows"
-    column-lockable
-    :default-hidden-column-keys="['email']"
+    :pagination="false"
     :toolbar="{
       showColumnSettings: true,
       columnSettings: { lockedColumnKeys: ['name'] }
-    }"
-    :pagination="false" />
+    }" />
 </template>

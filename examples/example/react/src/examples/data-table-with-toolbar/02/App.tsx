@@ -30,7 +30,9 @@ export default function App() {
     <DataTableWithToolbar<Row>
       columns={columns}
       dataSource={dataSource}
+      pagination={false}
       toolbar={{
+        searchMode: 'remote',
         filters: [
           {
             key: 'minimumScore',
@@ -51,7 +53,6 @@ export default function App() {
         ],
         onFiltersChange: setFilters
       }}
-      pagination={false}
     />
   )
 }

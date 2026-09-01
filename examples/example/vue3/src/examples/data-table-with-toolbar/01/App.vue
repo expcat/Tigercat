@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
-import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-vue'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -26,32 +25,18 @@ const statusOptions = [
   { label: '在岗', value: 'active' },
   { label: '暂停', value: 'paused' }
 ]
-
-const keyword = ref('')
-const filters = ref<Record<string, TableToolbarFilterValue>>({ status: null })
-const dataSource = computed(() => {
-  const query = keyword.value.trim().toLowerCase()
-  return rows.filter(
-    (row) =>
-      (!query || row.name.toLowerCase().includes(query)) &&
-      (!filters.value.status || row.status === filters.value.status)
-  )
-})
 </script>
 
 <template>
   <DataTableWithToolbar
     :columns="columns"
-    :data-source="dataSource"
+    :data-source="rows"
     bordered
     table-layout="fixed"
+    :row-selection="{ type: 'checkbox' }"
     :toolbar="{
-      searchValue: keyword,
       searchPlaceholder: '搜索姓名',
-      filters: [{ key: 'status', label: '状态', options: statusOptions }]
-    }"
-    :pagination="false"
-    @search-change="keyword = $event"
-    @search="keyword = $event"
-    @filters-change="filters = $event" />
+      filters: [{ key: 'status', label: '状态', options: statusOptions }],
+      bulkActions: [{ key: 'export', label: '导出' }]
+    }" />
 </template>

@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **DataTableWithToolbar**：搜索/筛选/隐列/页尺寸下沉 core。默认 `searchMode: 'local'` 写进当前表；批量订内层勾选。`onPageChange` 与 Table 同签名；省略 pagination 默认开。`id`/`style` 在外壳。Vue 补 `tableClassName`，props 复用 Table。
+- **FormWizard**：导航下沉 core。`isLast` 看未跳过步。`fields` 交给祖先 Form。`beforeNext` 字符串可见。Finish 会提交 Form。Vue 动作图标走 `#icon`。
 - **FileManager**：`currentPath` / `searchText` 与 `selectedKeys` 同一套受控探测，不绑回调时双击文件夹会进入。路径是文件夹 key。搜索 `''` 是真清空，只匹配当前层名称。`draggable` 重排当前层源数组并回写整棵 `files` 树。面包屑是 button，listbox 有 locale 名，越界 roving 会夹紧。根节点 `h-full`，高度/style 进 DOM。
 - **ImageAnnotation**：绘制走 pointer 会话（含触控和 `pointercancel`）。id 不与已有 `value` 撞。读图有 generation / onerror，失败不再无限转圈。`disabled` 时形状不能选。形状名和画布名走 locale。点空白清选中。
 - **编辑器族（CodeEditor / RichTextEditor / MarkdownEditor）**：`sanitizeHtml` 改白名单解析，粘贴写入 DOM 前消毒。CodeEditor 只留一个 scroller，行号与代码对齐；Tab 缩进、`readOnly` 不改值。Vue 三个编辑器都走 `v-model` / `modelValue`。RTE 工具条 `mousedown` 保住选区，engine 的 `mode` / `toolbar` 挂载后仍生效。Markdown 预览放行相对 URL，preview 下隐藏格式工具条。自定义 `highlighter` / `engine` / `renderer` / `icon` 是 TRUSTED。删除 `markdownModeLabels`。

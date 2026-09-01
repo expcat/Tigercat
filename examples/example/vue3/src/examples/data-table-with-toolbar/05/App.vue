@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
 import type { TableColumn } from '@expcat/tigercat-vue'
 
@@ -19,18 +18,10 @@ const rows: Row[] = [
   { id: 2, name: '李娜', role: '编辑' },
   { id: 3, name: '王强', role: '访客' }
 ]
-
-const keyword = ref('')
-const dataSource = computed(() => rows.filter((row) => row.name.includes(keyword.value.trim())))
 </script>
 
 <template>
-  <DataTableWithToolbar
-    :columns="columns"
-    :data-source="dataSource"
-    :toolbar="{ searchValue: keyword }"
-    :pagination="false"
-    @search-change="keyword = $event">
+  <DataTableWithToolbar :columns="columns" :data-source="rows" :pagination="false">
     <template #toolbar="{ searchValue, setSearch }">
       <div
         role="toolbar"

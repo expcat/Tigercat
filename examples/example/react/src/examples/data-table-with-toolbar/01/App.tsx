@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react'
 import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
-import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-react'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -27,35 +26,18 @@ const statusOptions = [
 ]
 
 export default function App() {
-  const [keyword, setKeyword] = useState('')
-  const [filters, setFilters] = useState<Record<string, TableToolbarFilterValue>>({
-    status: null
-  })
-
-  const dataSource = useMemo(() => {
-    const query = keyword.trim().toLowerCase()
-    return rows.filter(
-      (row) =>
-        (!query || row.name.toLowerCase().includes(query)) &&
-        (!filters.status || row.status === filters.status)
-    )
-  }, [filters.status, keyword])
-
   return (
     <DataTableWithToolbar<Row>
       columns={columns}
-      dataSource={dataSource}
+      dataSource={rows}
       bordered
       tableLayout="fixed"
+      rowSelection={{ type: 'checkbox' }}
       toolbar={{
-        searchValue: keyword,
         searchPlaceholder: '搜索姓名',
         filters: [{ key: 'status', label: '状态', options: statusOptions }],
-        onSearchChange: setKeyword,
-        onSearch: setKeyword,
-        onFiltersChange: setFilters
+        bulkActions: [{ key: 'export', label: '导出' }]
       }}
-      pagination={false}
     />
   )
 }

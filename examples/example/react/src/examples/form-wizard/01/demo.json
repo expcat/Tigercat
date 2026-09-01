@@ -1,7 +1,7 @@
 {
   "id": "form-wizard-01",
   "title": "受控步骤表单",
-  "description": "一个 FormWizard 组合展示受控步骤、步骤内容、自定义按钮文案与完成回调；字段校验可通过 beforeNext 接入。",
+  "description": "包在 Form 里，第一步 fields 是 name。空姓名不能继续或提交。",
   "entry": "App.tsx",
   "order": 1
 }

@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, h, ref } from 'vue'
 import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
-import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-vue'
+import type {
+  TableColumn,
+  TableToolbarFilterValue,
+  VueTableToolbarProps
+} from '@expcat/tigercat-vue'
 
 interface Row extends Record<string, unknown> {
   id: number
@@ -26,12 +30,27 @@ const minimumScore = computed(() =>
 )
 const dataSource = computed(() => rows.filter((row) => row.score >= minimumScore.value))
 
-const setMinimumScore = (
-  setFilter: (key: string, value: TableToolbarFilterValue) => void,
-  event: Event
-) => {
-  const value = (event.target as HTMLInputElement).value
-  setFilter('minimumScore', value ? Number(value) : null)
+const toolbar: VueTableToolbarProps = {
+  searchMode: 'remote',
+  filters: [
+    {
+      key: 'minimumScore',
+      label: '最低积分',
+      render: ({ value, setValue }) =>
+        h('input', {
+          type: 'number',
+          'aria-label': '最低积分',
+          class:
+            'w-28 rounded border border-gray-300 bg-transparent px-2 py-1 text-sm dark:border-gray-600',
+          value: typeof value === 'number' ? value : '',
+          placeholder: '最低积分',
+          onInput: (event: Event) => {
+            const next = (event.target as HTMLInputElement).value
+            setValue(next ? Number(next) : null)
+          }
+        })
+    }
+  ]
 }
 </script>
 
@@ -40,15 +59,6 @@ const setMinimumScore = (
     :columns="columns"
     :data-source="dataSource"
     :pagination="false"
-    @filters-change="filters = $event">
-    <template #filters-extra="{ filters: currentFilters, setFilter }">
-      <input
-        type="number"
-        aria-label="最低积分"
-        class="w-28 rounded border border-gray-300 bg-transparent px-2 py-1 text-sm dark:border-gray-600"
-        :value="typeof currentFilters.minimumScore === 'number' ? currentFilters.minimumScore : ''"
-        placeholder="最低积分"
-        @input="setMinimumScore(setFilter, $event)" />
-    </template>
-  </DataTableWithToolbar>
+    :toolbar="toolbar"
+    @filters-change="filters = $event" />
 </template>

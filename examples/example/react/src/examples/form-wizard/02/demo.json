@@ -1,7 +1,7 @@
 {
   "id": "form-wizard-02",
   "title": "异步校验与条件跳步",
-  "description": "beforeNext 在前进前执行异步用户名校验，skipCondition 根据页面状态决定是否跳过团队步骤。",
+  "description": "beforeNext 返回字符串时向导自己画出错误。skipCondition 为真的步在顶栏标已跳过，最后一步被跳过时仍能完成。",
   "entry": "App.tsx",
   "order": 2
 }

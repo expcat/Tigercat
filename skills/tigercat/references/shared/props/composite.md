@@ -58,22 +58,22 @@ Events/callback props: `onLike?`, `onReply?`, `onMore?`, `onAction?`, `onExpande
 
 ## DataTableWithToolbar
 
-`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 8/53 props
+`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 8/54 props
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 透传 Table props（含 `columnLockable`、列级 `column.fixed` 钉列与 `tableLayout`）：开启 `columnLockable` 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列，可与列级 `column.fixed` 配合实现横向滚动钉列，注意这与 `toolbar.columnSettings.lockedColumnKeys`（列设置面板中不可隐藏的可见性锁定）是两个不同概念。卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName` 和 `valueClassName` 做轻量布局调整。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则（含 `pagination.remote` 服务端分页模式，原样透传给内部 Table）；分页由内部 Table 交给 Pagination 组件渲染，页数大于 3 时自动展示可点击页码与跳页输入框（`pagination.simple` / `pagination.showQuickJumper` 可覆盖）。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnKeysChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
+Note: 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。
 
-| Prop              | Type                        | Default | Notes                                                                          |
-| ----------------- | --------------------------- | ------- | ------------------------------------------------------------------------------ |
-| `columns`         | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                    |
-| `toolbar?`        | `TableToolbarProps`         | `-`     | Toolbar configuration                                                          |
-| `pagination?`     | `PaginationConfig \| false` | `-`     | Pagination configuration Set to false to disable                               |
-| `tableClassName?` | `string`                    | `-`     | Class applied to the inner table element.                                      |
-| `dataSource?`     | `T[]`                       | `[]`    | Table data source                                                              |
-| `sort?`           | `SortState`                 | `-`     | Controlled sort state. When provided, internal sort state will not be mutated. |
-| `filters?`        | `Record<string, unknown>`   | `-`     | Controlled filters. When provided, internal filter state will not be mutated.  |
-| `loading?`        | `boolean`                   | `false` | Loading state                                                                  |
+| Prop                | Type                        | Default | Notes                                                                                      |
+| ------------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns`           | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                                |
+| `toolbar?`          | `TableToolbarProps`         | `-`     | Toolbar configuration                                                                      |
+| `pagination?`       | `PaginationConfig \| false` | `-`     | Pagination configuration. Same default as Table (on, pageSize 10). Pass `false` to hide... |
+| `tableClassName?`   | `string`                    | `-`     | Class applied to the inner table element.                                                  |
+| `rowSelection?`     | `RowSelectionConfig<T>`     | `-`     | Row selection configuration                                                                |
+| `hiddenColumnKeys?` | `string[]`                  | `-`     | Controlled hidden column keys (matched against `columns[].key`). When provided, interna... |
+| `dataSource?`       | `T[]`                       | `[]`    | Table data source                                                                          |
+| `sort?`             | `SortState`                 | `-`     | Controlled sort state. When provided, internal sort state will not be mutated.             |
 
 Events/callback props: `onPageChange?`, `onPageSizeChange?`, `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, ....
 
@@ -108,17 +108,21 @@ Vue 通过 `#toolbar` 作用域插槽，React 通过 `toolbar.render`（函数�
 
 ## FormWizard
 
-`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 3/21 props
+`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 7/21 props
 
-Uses: `Steps/StepsItem`, `Button`, `ConfigProvider`.
+Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 
-Note: 按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。
+Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。
 
-| Prop      | Type                   | Default | Notes                                   |
-| --------- | ---------------------- | ------- | --------------------------------------- |
-| `steps`   | `WizardStep[]`         | `-`     | Steps configuration                     |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale overrides for FormWizard UI text |
-| `steps?`  | `WizardStep[]`         | `-`     | -                                       |
+| Prop          | Type                                                           | Default | Notes                                                                                      |
+| ------------- | -------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `steps`       | `WizardStep[]`                                                 | `-`     | Steps configuration                                                                        |
+| `current?`    | `number`                                                       | `-`     | Current step index (0-based)                                                               |
+| `beforeNext?` | `FormWizardValidator`                                          | `-`     | Validation hook before moving to next step. `true` proceeds, `false` blocks, a string b... |
+| `clickable?`  | `boolean`                                                      | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
+| `autoSave?`   | `(current: number, step: WizardStep) => void \| Promise<void>` | `-`     | Called after a successful step change and after Finish. Awaited; a rejection stays on t... |
+| `labels?`     | `Partial<import('./locale').TigerLocaleFormWizard>`            | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+| `locale?`     | `Partial<TigerLocale>`                                         | `-`     | Locale overrides for FormWizard UI text                                                    |
 
 Events/callback props: `onChange?`, `onFinish?`.
 

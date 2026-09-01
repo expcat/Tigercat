@@ -28,5 +28,6 @@ const rows: Row[] = [
     :data-source="rows"
     responsive-mode="card"
     card-breakpoint="lg"
-    :pagination="false" />
+    :pagination="false"
+    :toolbar="{ searchPlaceholder: '搜索卡片' }" />
 </template>

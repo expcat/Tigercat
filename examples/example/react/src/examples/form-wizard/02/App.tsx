@@ -8,7 +8,6 @@ export default function App() {
   const [name, setName] = useState('')
   const [team, setTeam] = useState('')
   const [includeTeam, setIncludeTeam] = useState(false)
-  const [validationMessage, setValidationMessage] = useState('输入至少两个字符后继续。')
   const [finished, setFinished] = useState(false)
 
   const steps = useMemo<WizardStep[]>(
@@ -26,13 +25,8 @@ export default function App() {
 
   const validateBeforeNext = async (index: number) => {
     if (index !== 0) return true
-    setValidationMessage('正在异步检查用户名…')
     await new Promise<void>((resolve) => setTimeout(resolve, 500))
-    if (name.trim().length < 2) {
-      setValidationMessage('校验未通过：用户名至少需要两个字符。')
-      return false
-    }
-    setValidationMessage('校验通过，可以继续。')
+    if (name.trim().length < 2) return '校验未通过：用户名至少需要两个字符。'
     return true
   }
 
@@ -44,7 +38,6 @@ export default function App() {
           checked={includeTeam}
           onChange={(event) => {
             setIncludeTeam(event.currentTarget.checked)
-            setCurrent(0)
             setFinished(false)
           }}
         />
@@ -62,16 +55,11 @@ export default function App() {
         renderStep={(_step, index) => {
           if (index === 0) {
             return (
-              <div className="w-full space-y-2">
-                <Input
-                  value={name}
-                  onChange={(event) => setName(event.currentTarget.value)}
-                  placeholder="请输入用户名"
-                />
-                <p className="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
-                  {validationMessage}
-                </p>
-              </div>
+              <Input
+                value={name}
+                onChange={(event) => setName(event.currentTarget.value)}
+                placeholder="请输入用户名"
+              />
             )
           }
           if (index === 1) {

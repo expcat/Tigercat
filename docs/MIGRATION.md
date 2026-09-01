@@ -4,6 +4,10 @@
 
 ## 未发布
 
+DataTableWithToolbar 搜索/筛选默认写进当前 `dataSource`（`toolbar.searchMode: 'remote'` 才只发回调）。`onPageChange` 与 Table 一样是 `({ current, pageSize })`，不再是两个位置参数；改 pageSize 只发 `onPageSizeChange`。省略 `pagination` 与 Table 相同（默认开）。业务回调在 `toolbar` 上（Vue 仍可 `@search-change` / `@search` / `@filters-change` / `@bulk-action`）。删除未使用的 `clearLabel`。
+
+FormWizard 包在 Form 里时，当前步 `fields` 会 `validateFields`，Finish 会 `validate` + `submit`，`onFinish` 第三参是 values。`beforeNext` 返回的字符串会显示在内容区。最后一步被 skip 时，倒数第二个未跳过步就是 Finish。`clickable` 只能回已走过的步。
+
 FileManager `currentPath` 是文件夹 **key** 数组，不是显示名。省略 `currentPath` / `searchText` 时组件自己记路径和搜索；`''` 是空搜索。`v-model:files` / `onFilesChange` 回写的是整棵树，不是当前页扁列表。`columns` 不再含 `name`。删除写死英文 `File path` / `Empty folder`。
 
 ImageAnnotation 只认 pointer（不再绑 `mouse*`）。`onChange` meta 只剩 `'add' | 'remove'`。形状名走 locale，不再是 `` `${type} annotation` ``。删除 `getImageAnnotationToolLabel`。`selectedId=""` 是受控未选；`disabled` 不能选。
