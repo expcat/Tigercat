@@ -16,33 +16,20 @@ const initialColumns: TaskBoardColumn[] = [
     title: '进行中',
     wipLimit: 2,
     cards: [{ id: 3, title: '运行验证' }]
-  }
+  },
+  { id: 'done', title: '已完成', cards: [] }
 ]
 
 export default function App() {
   const [columns, setColumns] = useState(initialColumns)
 
-  const handleCardAdd = (columnId: string | number) => {
-    setColumns((current) =>
-      current.map((column) =>
-        column.id === columnId
-          ? {
-              ...column,
-              cards: [...column.cards, { id: Date.now(), title: '新任务' }]
-            }
-          : column
-      )
-    )
-  }
-
   return (
     <TaskBoard
       columns={columns}
       onColumnsChange={setColumns}
-      onCardAdd={handleCardAdd}
       allowAddCard
       enforceWipLimit
-      labels={{ addCardText: '新增任务' }}
+      showCardCount
     />
   )
 }

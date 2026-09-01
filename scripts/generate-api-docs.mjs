@@ -381,12 +381,13 @@ const COMPONENT_USAGE_NOTES = {
   },
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities', 'kanban utilities'],
-    notes: '拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。'
+    notes:
+      '过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。'
   },
   Kanban: {
     uses: ['TaskBoard'],
     notes:
-      'Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。'
+      'Kanban 是 TaskBoard 薄封装，默认 `showCardCount` / `allowAddCard`。`swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。'
   }
 }
 

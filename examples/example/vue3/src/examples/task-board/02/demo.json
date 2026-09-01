@@ -1,7 +1,7 @@
 {
   "id": "task-board-02",
   "title": "列拖拽与自定义卡片",
-  "description": "受控 TaskBoard 支持拖拽调整列顺序、按标题或描述过滤卡片，并通过 card slot 展示优先级与负责人。",
+  "description": "过滤只影响显示，列头计数仍是源卡数。列拖拽按下标映回源 id。自定义卡片走 #card。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

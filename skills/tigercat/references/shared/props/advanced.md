@@ -88,20 +88,21 @@ Note: ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`
 
 ## Kanban
 
-`packages/core/src/types/kanban.ts` · `KanbanProps` · 4/22 props
+`packages/core/src/types/kanban.ts` · `KanbanProps` · 5/22 props
 
 Uses: `TaskBoard`.
 
-Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。
+Note: Kanban 是 TaskBoard 薄封装，默认 `showCardCount` / `allowAddCard`。`swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
 
-| Prop             | Type                                      | Default | Notes                                                                                      |
-| ---------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `swimlanes?`     | `KanbanSwimlane[]`                        | `-`     | Enable swim-lane grouping (horizontal lanes across columns)                                |
-| `swimlaneField?` | `string`                                  | `-`     | Card field used to assign swim-lanes                                                       |
-| `columns?`       | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
+| Prop             | Type                                               | Default | Notes                                                                                      |
+| ---------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `swimlanes?`     | `TaskBoardSwimlane[]`                              | `-`     | Group cards inside each column by `swimlaneField`. Not a horizontal row across columns.    |
+| `swimlaneField?` | `string`                                           | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
+| `columns?`       | `TaskBoardColumn[]`                                | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `locale?`        | `Partial<import('./locale').TigerLocale>`          | `-`     | Locale overrides for TaskBoard UI text                                                     |
+| `labels?`        | `Partial<import('./locale').TigerLocaleTaskBoard>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
 
-Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`.
+Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 
 ## MarkdownEditor
 

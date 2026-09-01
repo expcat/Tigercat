@@ -161,16 +161,20 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 
 ## TaskBoard
 
-`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 3/22 props
+`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 7/22 props
 
 Uses: `ConfigProvider`, `task-board drag utilities`, `kanban utilities`.
 
-Note: 拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。
+Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。
 
-| Prop              | Type                                      | Default | Notes                                                                                      |
-| ----------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns?`        | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `locale?`         | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
-| `defaultColumns?` | `TaskBoardColumn[]`                       | `-`     | Initial column data for uncontrolled usage.                                                |
+| Prop               | Type                                      | Default | Notes                                                                                      |
+| ------------------ | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns?`         | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `filterText?`      | `string`                                  | `-`     | Quick filter / search term applied to card titles. When non-empty, only cards whose tit... |
+| `hiddenColumns?`   | `(string \| number)[]`                    | `-`     | Column IDs to hide from the board (e.g. for saved views).                                  |
+| `showCardCount?`   | `boolean`                                 | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
+| `allowAddCard?`    | `boolean`                                 | `false` | Show an inline "add card" button in each column footer. Also shown when `onCardAdd` is...  |
+| `enforceWipLimit?` | `boolean`                                 | `false` | Enforce WIP limit — when `true`, cards cannot be dropped into a column that has already... |
+| `locale?`          | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
 
-Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`.
+Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.

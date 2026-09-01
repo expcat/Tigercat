@@ -4,6 +4,8 @@
 
 ## 未发布
 
+TaskBoard `showCardCount={false}` 不再画无 WIP 列的张数；要数字请开 `showCardCount`。默认加卡标题走 locale（en-US `New task`）。Vue `:on-card-add` 会调用回调。`allowAddColumn` 无回调时会插入一列。Kanban `swimlanes` 是列内分组，不是跨列水平行。删除 `getKanbanContainerClasses` / `kanbanSwimlaneCollapsedClasses`。
+
 ChatWindow `messages` 全受控，`onSend` 不写入列表；不绑发送时发送钮禁用。贴底（距底 32px）才自动滚；`virtual` 时 VirtualList 是唯一 scroller，`virtualItemHeight` 是估计高度。Vue 只发 `update:modelValue` / `send`。列表名走 locale。
 
 CommentThread `nodes={[]}` 不再回落 `items`。`onReply(node, value)` 的 `node` 在主评论框上是 `undefined`。`showMore` 默认 false。点赞 overlay 随 `nodes` 引用重置。

@@ -781,6 +781,16 @@ export const COMPONENT_PROP_PRIORITY = {
     'readFilter?',
     'labels?'
   ],
+  TaskBoard: [
+    'columns?',
+    'filterText?',
+    'hiddenColumns?',
+    'showCardCount?',
+    'allowAddCard?',
+    'enforceWipLimit?',
+    'locale?'
+  ],
+  Kanban: ['swimlanes?', 'swimlaneField?', 'columns?', 'locale?', 'labels?'],
   Gantt: [
     'scale?',
     'rowHeight?',

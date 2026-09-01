@@ -1,7 +1,7 @@
 {
   "id": "kanban-01",
   "title": "受控看板",
-  "description": "一个 Kanban 组合展示受控列、卡片计数、新增卡片和 WIP 限制；拖拽开关可按需调整。",
+  "description": "Kanban 默认显示源卡数并允许加卡。泳道是列内按字段分组（未分组走 locale），不是跨列水平行。空列可键盘放下。",
   "entry": "App.vue",
   "order": 1
 }
