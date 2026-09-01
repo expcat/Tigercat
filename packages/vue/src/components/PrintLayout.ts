@@ -37,9 +37,8 @@ import { useTigerConfig } from './ConfigProvider'
 const PrintLayoutShowPageBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol(
   'tigerPrintShowPageBreaks'
 )
-const PrintLayoutLocaleKey: InjectionKey<ComputedRef<Partial<TigerLocale> | undefined>> = Symbol(
-  'tigerPrintLocale'
-)
+const PrintLayoutLocaleKey: InjectionKey<ComputedRef<Partial<TigerLocale> | undefined>> =
+  Symbol('tigerPrintLocale')
 
 export interface VuePrintLayoutProps extends CorePrintLayoutProps {
   className?: string

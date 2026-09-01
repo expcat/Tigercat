@@ -276,15 +276,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       const newSizes = resizePanes(currentPixels(), gutterIdx, delta, mins, maxes)
       if (newSizes) commitSizes(newSizes, gutterIdx, 'keyboard')
     },
-    [
-      disabled,
-      direction,
-      rtl,
-      mins,
-      maxes,
-      commitSizes,
-      currentPixels
-    ]
+    [disabled, direction, rtl, mins, maxes, commitSizes, currentPixels]
   )
 
   const containerClasses = classNames(getSplitterContainerClasses(direction, className))
