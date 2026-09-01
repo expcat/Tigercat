@@ -63,6 +63,10 @@ export interface FormContextValue {
   clearValidate: (fieldNames?: string | string[]) => void
   getFieldValue: (fieldName: string) => unknown
   updateValue: (fieldName: string, value: unknown) => void
+  validate: () => Promise<boolean>
+  validateFields: (fieldNames: string[]) => Promise<boolean>
+  getValues: () => FormValues
+  submit: () => Promise<boolean>
 }
 
 const FormContext = createContext<FormContextValue | null>(null)
@@ -203,6 +207,16 @@ export const Form = forwardRef<FormHandle, FormProps>(
       await engine.validateField(fieldName, rulesOverride, trigger)
     }
 
+    const submitForm = async (): Promise<boolean> => {
+      if (loading) return false
+      const valid = await engine.validate()
+      if (!valid) {
+        focusFirstInvalidField(formElementRef.current)
+      }
+      onSubmit?.({ valid, values: engine.getValues(), errors: engine.getErrors() })
+      return valid
+    }
+
     useImperativeHandle(
       ref,
       () => ({
@@ -242,7 +256,11 @@ export const Form = forwardRef<FormHandle, FormProps>(
         validateField,
         clearValidate: engine.clearValidate,
         getFieldValue: engine.getFieldValue,
-        updateValue: engine.setFieldValue
+        updateValue: engine.setFieldValue,
+        validate: () => engine.validate(),
+        validateFields: (fieldNames) => engine.validateFields(fieldNames),
+        getValues: () => engine.getValues(),
+        submit: submitForm
       }),
       [
         values,
@@ -257,18 +275,14 @@ export const Form = forwardRef<FormHandle, FormProps>(
         loading,
         errors,
         errorsByField,
-        engine
+        engine,
+        submitForm
       ]
     )
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
       event.preventDefault()
-      if (loading) return
-      const valid = await engine.validate()
-      if (!valid) {
-        focusFirstInvalidField(formElementRef.current)
-      }
-      onSubmit?.({ valid, values: engine.getValues(), errors: engine.getErrors() })
+      await submitForm()
     }
 
     const handleReset = (event: React.FormEvent<HTMLFormElement>): void => {

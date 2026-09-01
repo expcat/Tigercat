@@ -1,90 +1,91 @@
-import React, { useCallback, useMemo } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
+  canClickWizardStep,
   classNames,
+  createAsyncLock,
+  getFormWizardActionsClasses,
+  getFormWizardBodyClasses,
+  getFormWizardHeaderClasses,
   getFormWizardLabels,
+  getFormWizardWrapperClasses,
+  isLastAvailableStep,
   mergeTigerLocale,
   resolveLocaleText,
+  runWizardAdvanceGate,
   clampStepIndex,
   findNextUnskippedStep,
-  runStepValidation,
+  isStepSkipped,
   type FormWizardProps as CoreFormWizardProps,
   type WizardStep
 } from '@expcat/tigercat-core'
-import { Steps, StepsItem } from './Steps'
+import { Steps } from './Steps'
 import { Button } from './Button'
+import { Icon } from './Icon'
 import { useTigerConfig } from './ConfigProvider'
+import { useFormContext } from './Form'
 import { useControlledState } from '../hooks/useControlledState'
 
-const ArrowLeftIcon = () => (
-  <svg
-    className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-0.5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-  </svg>
-)
+export type { WizardStep }
 
-const ArrowRightIcon = () => (
-  <svg
-    className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-  </svg>
-)
-
-const CheckIcon = () => (
-  <svg
-    className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    viewBox="0 0 24 24"
-    aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-  </svg>
-)
+export interface FormWizardHandle {
+  next: () => Promise<void>
+  prev: () => void
+  finish: () => Promise<void>
+}
 
 export interface FormWizardProps
   extends
     Omit<CoreFormWizardProps, 'style'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'style' | 'autoSave'> {
   renderStep?: (step: WizardStep, index: number) => React.ReactNode
+  children?: React.ReactNode | ((step: WizardStep, index: number) => React.ReactNode)
   style?: React.CSSProperties
 }
 
-export const FormWizard: React.FC<FormWizardProps> = ({
-  steps = [],
-  current,
-  defaultCurrent = 0,
-  clickable = false,
-  direction = 'horizontal',
-  size = 'default',
-  simple = false,
-  bordered = true,
-  showSteps = true,
-  showActions = true,
-  prevText,
-  nextText,
-  finishText,
-  locale,
-  labels: labelsOverride,
-  beforeNext,
-  autoSave,
-  onChange,
-  onFinish,
-  renderStep,
-  className,
-  style,
-  ...props
-}) => {
+export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function FormWizard(
+  {
+    steps = [],
+    current,
+    defaultCurrent = 0,
+    clickable = false,
+    direction = 'horizontal',
+    size = 'default',
+    simple = false,
+    bordered = true,
+    showSteps = true,
+    showActions = true,
+    prevText,
+    nextText,
+    finishText,
+    locale,
+    labels: labelsOverride,
+    beforeNext,
+    autoSave,
+    onChange,
+    onFinish,
+    renderStep,
+    children,
+    className,
+    style,
+    ...props
+  },
+  ref
+) {
   const config = useTigerConfig()
+  const form = useFormContext()
+  const titleId = useId()
+  const liveId = useId()
+  const [errorMessage, setErrorMessage] = useState<string | undefined>()
+  const [pending, setPending] = useState(false)
+  const lockRef = useRef(createAsyncLock())
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
@@ -100,140 +101,183 @@ export const FormWizard: React.FC<FormWizardProps> = ({
     defaultValue: defaultCurrent,
     onChange: (next, prev?: number) => {
       onChange?.(next, prev ?? next)
-      if (autoSave && steps[next]) autoSave(next, steps[next])
     },
     postState: (next) => clampStepIndex(next, totalCount)
   })
   const currentStep = steps[currentIndex]
-  const isFirst = currentIndex <= 0
-  const isLast = currentIndex >= totalCount - 1
-
-  const wrapperClasses = classNames(
-    'tiger-form-wizard w-full overflow-hidden transition-all duration-300',
-    bordered
-      ? 'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm'
-      : 'bg-transparent',
-    className
-  )
+  const isFirst =
+    currentIndex <= 0 ||
+    findNextUnskippedStep(currentIndex - 1, -1, steps, currentIndex) === currentIndex
+  const isLast = isLastAvailableStep(currentIndex, steps)
 
   const setCurrent = useCallback(
-    (next: number) => {
-      setIndex(next, currentIndex)
+    async (next: number) => {
+      const prev = currentIndex
+      setIndex(next, prev)
+      if (autoSave && steps[next]) {
+        await autoSave(next, steps[next])
+      }
     },
-    [currentIndex, setIndex]
+    [autoSave, currentIndex, setIndex, steps]
   )
 
-  const runBeforeNext = useCallback(
-    (): Promise<boolean> => runStepValidation(currentIndex, currentStep, steps, beforeNext),
-    [beforeNext, currentIndex, currentStep, steps]
-  )
-
-  const findNextUnskipped = useCallback(
-    (from: number, dir: 1 | -1): number => findNextUnskippedStep(from, dir, steps, currentIndex),
-    [steps, currentIndex]
+  const validateAdvance = useCallback(
+    () =>
+      runWizardAdvanceGate({
+        currentIndex,
+        currentStep,
+        steps,
+        beforeNext,
+        validateFields: form ? (fields) => form.validateFields(fields) : undefined
+      }),
+    [beforeNext, currentIndex, currentStep, form, steps]
   )
 
   const handlePrev = useCallback(() => {
     if (currentIndex <= 0) return
-    const target = findNextUnskipped(currentIndex - 1, -1)
+    const target = findNextUnskippedStep(currentIndex - 1, -1, steps, currentIndex)
     if (target === currentIndex) return
-    setCurrent(target)
-  }, [currentIndex, setCurrent, findNextUnskipped])
+    setErrorMessage(undefined)
+    void setCurrent(target)
+  }, [currentIndex, setCurrent, steps])
+
+  const finishAt = useCallback(
+    async (index: number) => {
+      if (form) {
+        const fields = steps[index]?.fields
+        const valid = fields?.length ? await form.validateFields(fields) : await form.validate()
+        if (!valid) return
+        await form.submit()
+      }
+      onFinish?.(index, steps, form?.getValues())
+      if (autoSave && steps[index]) await autoSave(index, steps[index])
+    },
+    [autoSave, form, onFinish, steps]
+  )
 
   const handleNext = useCallback(async () => {
     if (totalCount === 0) return
-    const ok = await runBeforeNext()
-    if (!ok) return
-    if (isLast) {
-      onFinish?.(currentIndex, steps)
-      return
-    }
-    const target = findNextUnskipped(currentIndex + 1, 1)
-    if (target === currentIndex) return
-    setCurrent(target)
-  }, [
-    currentIndex,
-    totalCount,
-    isLast,
-    onFinish,
-    runBeforeNext,
-    setCurrent,
-    steps,
-    findNextUnskipped
-  ])
+    await lockRef.current.run(async () => {
+      setPending(true)
+      try {
+        const outcome = await validateAdvance()
+        if (!outcome.ok) {
+          setErrorMessage(outcome.message)
+          return
+        }
+        setErrorMessage(undefined)
+        if (isLast) {
+          await finishAt(currentIndex)
+          return
+        }
+        const target = findNextUnskippedStep(currentIndex + 1, 1, steps, currentIndex)
+        if (target === currentIndex) return
+        await setCurrent(target)
+      } finally {
+        setPending(false)
+      }
+    })
+  }, [currentIndex, finishAt, isLast, setCurrent, steps, totalCount, validateAdvance])
 
   const handleStepChange = useCallback(
-    async (nextIndex: number) => {
-      if (nextIndex === currentIndex) return
-      const direction: 1 | -1 = nextIndex > currentIndex ? 1 : -1
-      if (direction === 1) {
-        const ok = await runBeforeNext()
-        if (!ok) return
-      }
-      const target = findNextUnskipped(nextIndex, direction)
-      if (target === currentIndex) return
-      setCurrent(target)
+    (nextIndex: number) => {
+      if (!canClickWizardStep(nextIndex, currentIndex, steps)) return
+      setErrorMessage(undefined)
+      void setCurrent(nextIndex)
     },
-    [currentIndex, runBeforeNext, setCurrent, findNextUnskipped]
+    [currentIndex, setCurrent, steps]
+  )
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      next: () => handleNext(),
+      prev: handlePrev,
+      finish: () => handleNext()
+    }),
+    [handleNext, handlePrev]
   )
 
   const contentNode = useMemo(() => {
     if (!currentStep) return null
     if (renderStep) return renderStep(currentStep, currentIndex)
+    if (typeof children === 'function') return children(currentStep, currentIndex)
+    if (children) return children
     return (currentStep.content as React.ReactNode) ?? null
-  }, [currentIndex, currentStep, renderStep])
+  }, [children, currentIndex, currentStep, renderStep])
 
-  const stepsNodes = useMemo(
+  const stepItems = useMemo(
     () =>
-      steps.map((step, index) => (
-        <StepsItem
-          key={step.key ?? index}
-          title={step.title}
-          description={step.description}
-          status={step.status}
-          icon={step.icon as React.ReactNode}
-          disabled={step.disabled}
-        />
-      )),
-    [steps]
+      steps.map((step, index) => ({
+        key: step.key ?? index,
+        title: step.title,
+        description: isStepSkipped(step) ? labels.skippedText : step.description,
+        status: step.status,
+        icon: step.icon,
+        disabled: step.disabled || isStepSkipped(step) || (clickable && index > currentIndex)
+      })),
+    [clickable, currentIndex, labels.skippedText, steps]
   )
 
+  if (totalCount === 0) {
+    return (
+      <div
+        className={getFormWizardWrapperClasses({ bordered, className })}
+        style={style}
+        data-tiger-form-wizard
+        role="group"
+        aria-label={labels.ariaLabel}
+        {...props}
+      />
+    )
+  }
+
   return (
-    <div className={wrapperClasses} style={style} data-tiger-form-wizard {...props}>
-      {showSteps && steps.length > 0 && (
-        <div
-          className={classNames(
-            'px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
-            bordered ? 'border-b border-[var(--tiger-border,#e5e7eb)]' : ''
-          )}>
+    <div
+      className={getFormWizardWrapperClasses({ bordered, className })}
+      style={style}
+      data-tiger-form-wizard
+      role="group"
+      aria-label={labels.ariaLabel}
+      {...props}>
+      {showSteps ? (
+        <div className={getFormWizardHeaderClasses(bordered)}>
           <Steps
             current={currentIndex}
             direction={direction}
             size={size}
             simple={simple}
             clickable={clickable}
-            onChange={handleStepChange}>
-            {stepsNodes}
-          </Steps>
+            items={stepItems}
+            onChange={handleStepChange}
+          />
         </div>
-      )}
-      <div className="px-8 py-6 flex flex-col items-center w-full min-h-[120px] transition-all duration-300">
+      ) : null}
+      <div className={getFormWizardBodyClasses()} aria-labelledby={titleId}>
+        <div id={titleId} className="sr-only">
+          {currentStep?.title}
+        </div>
+        <div id={liveId} className="sr-only" aria-live="polite">
+          {currentStep?.title}
+        </div>
+        {errorMessage ? (
+          <div role="alert" className="mb-3 w-full text-sm text-[var(--tiger-error,#dc2626)]">
+            {errorMessage}
+          </div>
+        ) : null}
         {contentNode}
       </div>
-      {showActions && (
-        <div
-          className={classNames(
-            'flex items-center justify-between gap-3 px-8 py-4 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
-            bordered ? 'border-t border-[var(--tiger-border,#e5e7eb)]' : ''
-          )}>
+      {showActions ? (
+        <div className={getFormWizardActionsClasses(bordered)} role="group">
           {!isFirst ? (
             <Button
               htmlType="button"
               variant="secondary"
               className="group"
               onClick={handlePrev}
+              disabled={pending}
               size={size === 'small' ? 'sm' : 'md'}
-              icon={<ArrowLeftIcon />}>
+              icon={<Icon name="arrow-left" className="w-3.5 h-3.5" />}>
               {resolveLocaleText(labels.prevText, prevText)}
             </Button>
           ) : (
@@ -243,18 +287,22 @@ export const FormWizard: React.FC<FormWizardProps> = ({
             htmlType="button"
             variant="primary"
             className="group"
-            onClick={handleNext}
+            onClick={() => void handleNext()}
+            loading={pending}
+            disabled={pending}
             size={size === 'small' ? 'sm' : 'md'}
-            icon={isLast ? <CheckIcon /> : <ArrowRightIcon />}
-            iconPosition={isLast ? 'left' : 'right'}>
+            icon={<Icon name={isLast ? 'check' : 'arrow-right'} className="w-3.5 h-3.5" />}
+            iconPosition={isLast ? 'start' : 'end'}>
             {isLast
               ? resolveLocaleText(labels.finishText, finishText)
               : resolveLocaleText(labels.nextText, nextText)}
           </Button>
         </div>
-      )}
+      ) : null}
     </div>
   )
-}
+})
+
+FormWizard.displayName = 'TigerFormWizard'
 
 export default FormWizard

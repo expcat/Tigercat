@@ -66,6 +66,10 @@ export interface FormContext {
   clearValidate: (fieldNames?: string | string[]) => void
   getFieldValue: (fieldName: string) => unknown
   updateValue: (fieldName: string, value: unknown) => void
+  validate: () => Promise<boolean>
+  validateFields: (fieldNames: string[]) => Promise<boolean>
+  getValues: () => FormValues
+  submit: () => Promise<boolean>
 }
 
 export function useFormContext(): ComputedRef<FormContext> | null {
@@ -279,15 +283,20 @@ export const Form = defineComponent({
       await engine().validateField(fieldName, rulesOverride, trigger)
     }
 
-    const handleSubmit = async (event: Event): Promise<void> => {
-      event.preventDefault()
-      if (props.loading) return
+    const submitForm = async (): Promise<boolean> => {
+      if (props.loading) return false
       const current = engine()
       const valid = await current.validate()
       if (!valid) {
         focusFirstInvalidField(formElementRef.value)
       }
       emit('submit', { valid, values: current.getValues(), errors: current.getErrors() })
+      return valid
+    }
+
+    const handleSubmit = async (event: Event): Promise<void> => {
+      event.preventDefault()
+      await submitForm()
     }
 
     const handleReset = (event: Event): void => {
@@ -317,7 +326,11 @@ export const Form = defineComponent({
       validateField,
       clearValidate: (fieldNames) => engine().clearValidate(fieldNames),
       getFieldValue: (fieldName) => engine().getFieldValue(fieldName),
-      updateValue: (fieldName, value) => engine().setFieldValue(fieldName, value)
+      updateValue: (fieldName, value) => engine().setFieldValue(fieldName, value),
+      validate: () => engine().validate(),
+      validateFields: (fieldNames) => engine().validateFields(fieldNames),
+      getValues: () => engine().getValues(),
+      submit: submitForm
     }))
 
     provide<ComputedRef<FormContext>>(FormContextKey, formContextValue)

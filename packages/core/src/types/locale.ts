@@ -236,6 +236,10 @@ export interface TigerLocaleFormWizard {
   prevText?: string
   nextText?: string
   finishText?: string
+  /** Accessible name for the wizard group */
+  ariaLabel?: string
+  /** Header label for a skipped step */
+  skippedText?: string
 }
 
 export interface TigerLocaleTour {

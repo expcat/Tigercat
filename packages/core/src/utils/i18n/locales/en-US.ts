@@ -169,7 +169,9 @@ export const enUS: TigerLocale = {
   formWizard: {
     prevText: 'Previous',
     nextText: 'Next',
-    finishText: 'Finish'
+    finishText: 'Finish',
+    ariaLabel: 'Form wizard',
+    skippedText: 'Skipped'
   },
   tour: {
     prevText: 'Previous',

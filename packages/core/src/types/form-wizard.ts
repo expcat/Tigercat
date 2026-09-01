@@ -38,7 +38,8 @@ export interface WizardStep {
    */
   content?: unknown
   /**
-   * Field names for step-scoped validation
+   * Field names handed to an ancestor Form's `validateFields` before Next/Finish.
+   * Ignored when the wizard is not inside a Form; `beforeNext` still runs.
    */
   fields?: string[]
   /**
@@ -83,7 +84,9 @@ export interface FormWizardProps {
    */
   defaultCurrent?: number
   /**
-   * Whether steps are clickable
+   * Whether step titles are clickable. Only already-reached unskipped steps
+   * can be opened this way; forward movement is Next/Finish so each step's
+   * `fields` / `beforeNext` still run.
    * @default false
    */
   clickable?: boolean
@@ -139,7 +142,8 @@ export interface FormWizardProps {
    */
   labels?: Partial<import('./locale').TigerLocaleFormWizard>
   /**
-   * Validation hook before moving to next step
+   * Validation hook before moving to next step. `true` proceeds, `false`
+   * blocks, a string blocks and is shown in the step body (`role="alert"`).
    */
   beforeNext?: FormWizardValidator
   /**
@@ -147,11 +151,13 @@ export interface FormWizardProps {
    */
   onChange?: (current: number, prev: number) => void
   /**
-   * Finish callback
+   * Finish callback. When the wizard sits in a Form, `values` is the current
+   * model after a successful `validate` / submit.
    */
-  onFinish?: (current: number, steps: WizardStep[]) => void
+  onFinish?: (current: number, steps: WizardStep[], values?: Record<string, unknown>) => void
   /**
-   * Auto-save callback invoked on each step change
+   * Called after a successful step change and after Finish. Awaited; a
+   * rejection stays on the current step.
    */
   autoSave?: (current: number, step: WizardStep) => void | Promise<void>
   /**

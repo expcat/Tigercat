@@ -1,104 +1,41 @@
-import { defineComponent, computed, ref, watch, h, PropType, type Component } from 'vue'
+import { defineComponent, computed, ref, h, PropType, useId, type Component } from 'vue'
 import {
+  canClickWizardStep,
   classNames,
+  clampStepIndex,
   coerceClassValue,
-  mergeStyleValues,
+  createAsyncLock,
+  findNextUnskippedStep,
+  getFormWizardActionsClasses,
+  getFormWizardBodyClasses,
+  getFormWizardHeaderClasses,
   getFormWizardLabels,
+  getFormWizardWrapperClasses,
+  isLastAvailableStep,
+  isStepSkipped,
+  mergeStyleValues,
   mergeTigerLocale,
   resolveLocaleText,
-  clampStepIndex,
-  findNextUnskippedStep,
-  runStepValidation,
+  runWizardAdvanceGate,
   type WizardStep,
   type StepsDirection,
   type StepSize,
   type FormWizardValidator,
+  type FormWizardProps as CoreFormWizardProps,
   type TigerLocale,
   type TigerLocaleFormWizard
 } from '@expcat/tigercat-core'
-import { Steps, StepsItem } from './Steps'
+import { Steps } from './Steps'
 import { Button } from './Button'
+import { Icon } from './Icon'
 import { useTigerConfig } from './ConfigProvider'
+import { useFormContext } from './Form'
 
 type HChildren = Parameters<typeof h>[2]
 
-const renderArrowLeftIcon = () =>
-  h(
-    'svg',
-    {
-      class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-0.5',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      viewBox: '0 0 24 24',
-      'aria-hidden': 'true'
-    },
-    [
-      h('path', {
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
-        d: 'M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18'
-      })
-    ]
-  )
+export type { WizardStep }
 
-const renderArrowRightIcon = () =>
-  h(
-    'svg',
-    {
-      class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      viewBox: '0 0 24 24',
-      'aria-hidden': 'true'
-    },
-    [
-      h('path', {
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
-        d: 'M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3'
-      })
-    ]
-  )
-
-const renderCheckIcon = () =>
-  h(
-    'svg',
-    {
-      class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2.5',
-      viewBox: '0 0 24 24',
-      'aria-hidden': 'true'
-    },
-    [
-      h('path', {
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
-        d: 'M4.5 12.75l6 6 9-13.5'
-      })
-    ]
-  )
-
-export interface VueFormWizardProps {
-  steps?: WizardStep[]
-  current?: number
-  defaultCurrent?: number
-  clickable?: boolean
-  direction?: StepsDirection
-  size?: StepSize
-  simple?: boolean
-  showSteps?: boolean
-  showActions?: boolean
-  prevText?: string
-  nextText?: string
-  finishText?: string
-  beforeNext?: FormWizardValidator
-  locale?: Partial<TigerLocale>
-  labels?: Partial<TigerLocaleFormWizard>
-  className?: string
+export interface VueFormWizardProps extends Omit<CoreFormWizardProps, 'style'> {
   style?: Record<string, string | number>
 }
 
@@ -184,202 +121,247 @@ export const FormWizard = defineComponent({
     }
   },
   emits: ['change', 'update:current', 'finish'],
-  setup(props, { slots, attrs, emit }) {
+  setup(props, { slots, attrs, emit, expose }) {
     const config = useTigerConfig()
+    const formContext = useFormContext()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getFormWizardLabels(mergedLocale.value, props.labels))
-
-    const innerCurrent = ref(props.defaultCurrent)
-    const isControlled = computed(() => props.current !== undefined)
-
-    watch(
-      () => props.current,
-      (value) => {
-        if (value !== undefined) innerCurrent.value = value
-      }
-    )
+    const innerCurrent = ref(clampStepIndex(props.defaultCurrent ?? 0, props.steps.length))
+    const errorMessage = ref<string | undefined>()
+    const pending = ref(false)
+    const lock = createAsyncLock()
+    const titleId = useId()
 
     const totalCount = computed(() => props.steps.length)
     const currentIndex = computed(() =>
-      isControlled.value ? (props.current as number) : (innerCurrent.value ?? 0)
-    )
-    const currentStep = computed(() => props.steps[currentIndex.value])
-
-    const wrapperClasses = computed(() =>
-      classNames(
-        'tiger-form-wizard w-full overflow-hidden transition-all duration-300',
-        props.bordered
-          ? 'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm'
-          : 'bg-transparent',
-        props.className,
-        coerceClassValue((attrs as Record<string, unknown>).class)
+      clampStepIndex(
+        props.current !== undefined ? props.current : innerCurrent.value,
+        totalCount.value
       )
     )
+    const currentStep = computed(() => props.steps[currentIndex.value])
+    const isLast = computed(() => isLastAvailableStep(currentIndex.value, props.steps))
+    const isFirst = computed(() => {
+      if (currentIndex.value <= 0) return true
+      return (
+        findNextUnskippedStep(currentIndex.value - 1, -1, props.steps, currentIndex.value) ===
+        currentIndex.value
+      )
+    })
 
-    const wrapperStyle = computed(() =>
-      mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
+    const wrapperClasses = computed(() =>
+      getFormWizardWrapperClasses({
+        bordered: props.bordered,
+        className: classNames(props.className, coerceClassValue(attrs.class))
+      })
     )
+    const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
-    const setCurrent = (next: number) => {
+    const setCurrent = async (next: number) => {
       const clamped = clampStepIndex(next, totalCount.value)
       const prev = currentIndex.value
-      if (props.current === undefined) {
-        innerCurrent.value = clamped
-      }
+      if (props.current === undefined) innerCurrent.value = clamped
       emit('update:current', clamped)
       emit('change', clamped, prev)
       if (props.autoSave && props.steps[clamped]) {
-        props.autoSave(clamped, props.steps[clamped])
+        await props.autoSave(clamped, props.steps[clamped])
       }
     }
 
-    const runBeforeNext = (): Promise<boolean> =>
-      runStepValidation(currentIndex.value, currentStep.value, props.steps, props.beforeNext)
+    const formApi = () => formContext?.value
 
-    const findNextUnskipped = (from: number, direction: 1 | -1): number =>
-      findNextUnskippedStep(from, direction, props.steps, currentIndex.value)
+    const validateAdvance = () => {
+      const form = formApi()
+      return runWizardAdvanceGate({
+        currentIndex: currentIndex.value,
+        currentStep: currentStep.value,
+        steps: props.steps,
+        beforeNext: props.beforeNext,
+        validateFields: form ? (fields) => form.validateFields(fields) : undefined
+      })
+    }
+
+    const finishAt = async (index: number) => {
+      const form = formApi()
+      if (form) {
+        const fields = props.steps[index]?.fields
+        const valid = fields?.length ? await form.validateFields(fields) : await form.validate()
+        if (!valid) return
+        await form.submit()
+      }
+      emit('finish', index, props.steps, form?.getValues())
+      if (props.autoSave && props.steps[index]) {
+        await props.autoSave(index, props.steps[index])
+      }
+    }
 
     const handlePrev = () => {
       if (currentIndex.value <= 0) return
-      const target = findNextUnskipped(currentIndex.value - 1, -1)
+      const target = findNextUnskippedStep(
+        currentIndex.value - 1,
+        -1,
+        props.steps,
+        currentIndex.value
+      )
       if (target === currentIndex.value) return
-      setCurrent(target)
+      errorMessage.value = undefined
+      void setCurrent(target)
     }
 
     const handleNext = async () => {
       if (totalCount.value === 0) return
-      const isLast = currentIndex.value >= totalCount.value - 1
-      const ok = await runBeforeNext()
-      if (!ok) return
-      if (isLast) {
-        emit('finish', currentIndex.value, props.steps)
-        return
-      }
-      const target = findNextUnskipped(currentIndex.value + 1, 1)
-      if (target === currentIndex.value) return
-      setCurrent(target)
+      await lock.run(async () => {
+        pending.value = true
+        try {
+          const outcome = await validateAdvance()
+          if (!outcome.ok) {
+            errorMessage.value = outcome.message
+            return
+          }
+          errorMessage.value = undefined
+          if (isLast.value) {
+            await finishAt(currentIndex.value)
+            return
+          }
+          const target = findNextUnskippedStep(
+            currentIndex.value + 1,
+            1,
+            props.steps,
+            currentIndex.value
+          )
+          if (target === currentIndex.value) return
+          await setCurrent(target)
+        } finally {
+          pending.value = false
+        }
+      })
     }
 
-    const handleStepChange = async (nextIndex: number) => {
-      if (nextIndex === currentIndex.value) return
-      const direction: 1 | -1 = nextIndex > currentIndex.value ? 1 : -1
-      if (direction === 1) {
-        const ok = await runBeforeNext()
-        if (!ok) return
-      }
-      const target = findNextUnskipped(nextIndex, direction)
-      if (target === currentIndex.value) return
-      setCurrent(target)
+    const handleStepChange = (nextIndex: number) => {
+      if (!canClickWizardStep(nextIndex, currentIndex.value, props.steps)) return
+      errorMessage.value = undefined
+      void setCurrent(nextIndex)
     }
 
-    const renderContent = () => {
-      if (!currentStep.value) {
-        return null
-      }
+    expose({
+      next: handleNext,
+      prev: handlePrev,
+      finish: handleNext
+    })
 
-      if (slots.step) {
-        return slots.step({ step: currentStep.value, index: currentIndex.value })
-      }
-
+    const renderContent = (): HChildren => {
+      if (!currentStep.value) return null
+      if (slots.step)
+        return slots.step({ step: currentStep.value, index: currentIndex.value }) as HChildren
       if (slots.default) {
-        return slots.default({ step: currentStep.value, index: currentIndex.value })
+        return slots.default({ step: currentStep.value, index: currentIndex.value }) as HChildren
       }
-
-      if (currentStep.value.content != null) {
-        return currentStep.value.content as HChildren
-      }
-
+      if (currentStep.value.content != null) return currentStep.value.content as HChildren
       return null
     }
 
     return () => {
-      const stepsNodes = props.steps.map((step, index) =>
-        h(StepsItem as unknown as Component, {
-          key: step.key ?? index,
-          title: step.title,
-          description: step.description,
-          status: step.status,
-          icon: step.icon,
-          disabled: step.disabled
+      const stepItems = props.steps.map((step, index) => ({
+        key: step.key ?? index,
+        title: step.title,
+        description: isStepSkipped(step) ? labels.value.skippedText : step.description,
+        status: step.status,
+        icon: step.icon,
+        disabled:
+          step.disabled || isStepSkipped(step) || (props.clickable && index > currentIndex.value)
+      }))
+
+      const { class: _class, style: _style, ...hostAttrs } = attrs as Record<string, unknown>
+
+      if (totalCount.value === 0) {
+        return h('div', {
+          ...hostAttrs,
+          class: wrapperClasses.value,
+          style: wrapperStyle.value,
+          'data-tiger-form-wizard': '',
+          role: 'group',
+          'aria-label': labels.value.ariaLabel
         })
-      )
-
-      const isFirst = currentIndex.value <= 0
-      const isLast = currentIndex.value >= totalCount.value - 1
-
-      const stepsHeaderClass = classNames(
-        'px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
-        props.bordered ? 'border-b border-[var(--tiger-border,#e5e7eb)]' : ''
-      )
-
-      const actionsContainerClass = classNames(
-        'flex items-center justify-between gap-3 px-8 py-4 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
-        props.bordered ? 'border-t border-[var(--tiger-border,#e5e7eb)]' : ''
-      )
+      }
 
       return h(
         'div',
         {
-          ...attrs,
+          ...hostAttrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
-          'data-tiger-form-wizard': ''
+          'data-tiger-form-wizard': '',
+          role: 'group',
+          'aria-label': labels.value.ariaLabel
         },
         [
-          props.showSteps && props.steps.length > 0
-            ? h('div', { class: stepsHeaderClass }, [
-                h(
-                  Steps,
-                  {
-                    current: currentIndex.value,
-                    direction: props.direction,
-                    size: props.size,
-                    simple: props.simple,
-                    clickable: props.clickable,
-                    'onUpdate:current': handleStepChange
-                  },
-                  { default: () => stepsNodes }
-                )
+          props.showSteps
+            ? h('div', { class: getFormWizardHeaderClasses(props.bordered) }, [
+                h(Steps as unknown as Component, {
+                  current: currentIndex.value,
+                  direction: props.direction,
+                  size: props.size,
+                  simple: props.simple,
+                  clickable: props.clickable,
+                  items: stepItems,
+                  'onUpdate:current': handleStepChange
+                })
               ])
             : null,
-          h(
-            'div',
-            {
-              class:
-                'px-8 py-6 flex flex-col items-center w-full min-h-[120px] transition-all duration-300'
-            },
-            { default: () => renderContent() }
-          ),
+          h('div', { class: getFormWizardBodyClasses(), 'aria-labelledby': titleId }, [
+            h('div', { id: titleId, class: 'sr-only' }, currentStep.value?.title),
+            h('div', { class: 'sr-only', 'aria-live': 'polite' }, currentStep.value?.title),
+            errorMessage.value
+              ? h(
+                  'div',
+                  {
+                    role: 'alert',
+                    class: 'mb-3 w-full text-sm text-[var(--tiger-error,#dc2626)]'
+                  },
+                  errorMessage.value
+                )
+              : null,
+            renderContent()
+          ]),
           props.showActions
-            ? h('div', { class: actionsContainerClass }, [
-                !isFirst
+            ? h('div', { class: getFormWizardActionsClasses(props.bordered), role: 'group' }, [
+                !isFirst.value
                   ? h(
                       Button,
                       {
-                        type: 'button',
+                        htmlType: 'button',
                         variant: 'secondary',
                         class: 'group',
                         onClick: handlePrev,
-                        size: props.size === 'small' ? 'sm' : 'md',
-                        icon: renderArrowLeftIcon()
+                        disabled: pending.value,
+                        size: props.size === 'small' ? 'sm' : 'md'
                       },
-                      { default: () => resolveLocaleText(labels.value.prevText, props.prevText) }
+                      {
+                        icon: () => h(Icon, { name: 'arrow-left', class: 'w-3.5 h-3.5' }),
+                        default: () => resolveLocaleText(labels.value.prevText, props.prevText)
+                      }
                     )
                   : h('div'),
                 h(
                   Button,
                   {
-                    type: 'button',
+                    htmlType: 'button',
                     variant: 'primary',
                     class: 'group',
                     onClick: handleNext,
+                    loading: pending.value,
+                    disabled: pending.value,
                     size: props.size === 'small' ? 'sm' : 'md',
-                    icon: isLast ? renderCheckIcon() : renderArrowRightIcon(),
-                    iconPosition: isLast ? 'left' : 'right'
+                    iconPosition: isLast.value ? 'start' : 'end'
                   },
                   {
+                    icon: () =>
+                      h(Icon, {
+                        name: isLast.value ? 'check' : 'arrow-right',
+                        class: 'w-3.5 h-3.5'
+                      }),
                     default: () =>
-                      isLast
+                      isLast.value
                         ? resolveLocaleText(labels.value.finishText, props.finishText)
                         : resolveLocaleText(labels.value.nextText, props.nextText)
                   }

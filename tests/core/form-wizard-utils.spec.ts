@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
+  canClickWizardStep,
   clampStepIndex,
   findNextUnskippedStep,
+  isLastAvailableStep,
   runStepValidation,
   type WizardStep
 } from '@expcat/tigercat-core'
@@ -24,6 +26,11 @@ describe('form-wizard-utils', () => {
       expect(clampStepIndex(0, 0)).toBe(0)
       expect(clampStepIndex(5, 0)).toBe(0)
       expect(clampStepIndex(-5, 0)).toBe(0)
+    })
+
+    it('treats NaN and Infinity as 0', () => {
+      expect(clampStepIndex(Number.NaN, 3)).toBe(0)
+      expect(clampStepIndex(Number.POSITIVE_INFINITY, 3)).toBe(0)
     })
   })
 
@@ -71,26 +78,29 @@ describe('form-wizard-utils', () => {
 
   describe('runStepValidation', () => {
     it('returns true when no validator', async () => {
-      expect(await runStepValidation(0, step(), [step()], undefined)).toBe(true)
+      expect(await runStepValidation(0, step(), [step()], undefined)).toEqual({ ok: true })
     })
 
     it('returns true when current step is undefined', async () => {
       const validator = vi.fn().mockReturnValue(false)
-      expect(await runStepValidation(0, undefined, [], validator)).toBe(true)
+      expect(await runStepValidation(0, undefined, [], validator)).toEqual({ ok: true })
       expect(validator).not.toHaveBeenCalled()
     })
 
     it('returns true only when validator returns boolean true', async () => {
       const s = step()
-      expect(await runStepValidation(0, s, [s], () => true)).toBe(true)
-      expect(await runStepValidation(0, s, [s], () => false)).toBe(false)
-      expect(await runStepValidation(0, s, [s], () => 'error msg')).toBe(false)
+      expect(await runStepValidation(0, s, [s], () => true)).toEqual({ ok: true })
+      expect(await runStepValidation(0, s, [s], () => false)).toEqual({ ok: false })
+      expect(await runStepValidation(0, s, [s], () => 'error msg')).toEqual({
+        ok: false,
+        message: 'error msg'
+      })
     })
 
     it('awaits async validators', async () => {
       const s = step()
-      expect(await runStepValidation(0, s, [s], async () => true)).toBe(true)
-      expect(await runStepValidation(0, s, [s], async () => false)).toBe(false)
+      expect(await runStepValidation(0, s, [s], async () => true)).toEqual({ ok: true })
+      expect(await runStepValidation(0, s, [s], async () => false)).toEqual({ ok: false })
     })
 
     it('passes correct arguments to validator', async () => {
@@ -98,6 +108,24 @@ describe('form-wizard-utils', () => {
       const steps = [step({ title: 'a' }), step({ title: 'b' })]
       await runStepValidation(1, steps[1], steps, validator)
       expect(validator).toHaveBeenCalledWith(1, steps[1], steps)
+    })
+  })
+
+  describe('isLastAvailableStep', () => {
+    it('treats a skipped tail as last on the previous unskipped step', () => {
+      const steps = [step(), step(), step({ skipCondition: () => true })]
+      expect(isLastAvailableStep(1, steps)).toBe(true)
+      expect(isLastAvailableStep(0, steps)).toBe(false)
+      expect(isLastAvailableStep(0, [])).toBe(false)
+    })
+  })
+
+  describe('canClickWizardStep', () => {
+    it('only allows going back to an unskipped step', () => {
+      const steps = [step(), step({ skipCondition: () => true }), step()]
+      expect(canClickWizardStep(2, 0, steps)).toBe(false)
+      expect(canClickWizardStep(1, 2, steps)).toBe(false)
+      expect(canClickWizardStep(0, 2, steps)).toBe(true)
     })
   })
 })

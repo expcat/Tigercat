@@ -5,9 +5,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
+import React, { useState } from 'react'
 import { FormWizard } from '@expcat/tigercat-react/FormWizard'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { Input } from '@expcat/tigercat-react/Input'
+import { expectNoA11yViolations } from '../utils/react'
 
 const steps = [{ title: 'Step 1' }, { title: 'Step 2' }]
 
@@ -20,10 +23,12 @@ describe('FormWizard (React)', () => {
     )
 
     expect(screen.getByText('Content 1')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Form wizard' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
 
     expect(screen.getByText('Content 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Finish' })).toBeInTheDocument()
   })
 
   it('blocks next step when beforeNext returns false', async () => {
@@ -44,7 +49,7 @@ describe('FormWizard (React)', () => {
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 
-  it('blocks next step when beforeNext returns string (treated as non-true)', async () => {
+  it('shows a string beforeNext result as an alert', async () => {
     const user = userEvent.setup()
     const beforeNext = vi.fn().mockReturnValue('需要先完成校验')
 
@@ -58,165 +63,189 @@ describe('FormWizard (React)', () => {
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
 
-    expect(beforeNext).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('alert')).toHaveTextContent('需要先完成校验')
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 
-  it('supports step-scoped validation metadata', async () => {
+  it('validates step fields through an ancestor Form', async () => {
     const user = userEvent.setup()
-    const stepsWithFields = [
-      { title: 'Step 1', fields: ['name'] },
-      { title: 'Step 2', fields: ['email'] }
+    const onFinish = vi.fn()
+
+    function Example() {
+      const [model, setModel] = useState({ name: '' })
+      return (
+        <Form
+          model={model}
+          rules={{ name: [{ required: true, message: 'Name is required' }] }}
+          onChange={setModel}>
+          <FormWizard
+            steps={[{ title: 'Name', fields: ['name'] }, { title: 'Done' }]}
+            onFinish={onFinish}
+            renderStep={(_step, index) =>
+              index === 0 ? (
+                <FormItem name="name" label="Name">
+                  <Input />
+                </FormItem>
+              ) : (
+                <div>Confirm</div>
+              )
+            }
+          />
+        </Form>
+      )
+    }
+
+    render(<Example />)
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(screen.getByText('Name is required')).toBeInTheDocument()
+    expect(onFinish).not.toHaveBeenCalled()
+  })
+
+  it('shows Finish when the last step is skipped', async () => {
+    const user = userEvent.setup()
+    const onFinish = vi.fn()
+    const stepsWithSkip = [
+      { title: 'Step 1' },
+      { title: 'Step 2' },
+      { title: 'Step 3', skipCondition: () => true }
     ]
-    const beforeNext = vi.fn().mockImplementation((_current, step) => {
-      return !(step.fields as string[]).includes('name')
-    })
 
     render(
       <FormWizard
-        steps={stepsWithFields}
-        beforeNext={beforeNext}
+        steps={stepsWithSkip}
+        onFinish={onFinish}
         renderStep={(_step, index) => <div>Content {index + 1}</div>}
       />
     )
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(screen.getByText('Content 2')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Finish' }))
+    expect(onFinish).toHaveBeenCalledTimes(1)
+  })
 
-    expect(beforeNext).toHaveBeenCalledWith(0, stepsWithFields[0], stepsWithFields)
+  it('skips steps with skipCondition returning true', async () => {
+    const user = userEvent.setup()
+    const stepsWithSkip = [
+      { title: 'Step 1' },
+      { title: 'Step 2', skipCondition: () => true },
+      { title: 'Step 3' }
+    ]
+
+    render(
+      <FormWizard
+        steps={stepsWithSkip}
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
+
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(screen.getByText('Content 3')).toBeInTheDocument()
+  })
+
+  it('does not jump forward by clicking a later step title', async () => {
+    const user = userEvent.setup()
+    const stepsWithSkip = [
+      { title: 'Step 1' },
+      { title: 'Step 2', skipCondition: () => true },
+      { title: 'Step 3' }
+    ]
+
+    render(
+      <FormWizard
+        steps={stepsWithSkip}
+        clickable
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
+
+    await user.click(screen.getByText('Step 3'))
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 
-  // ==================== v0.6.0 Features ====================
-  describe('v0.6.0 Features', () => {
-    it('skips steps with skipCondition returning true', async () => {
-      const user = userEvent.setup()
-      const stepsWithSkip = [
-        { title: 'Step 1' },
-        { title: 'Step 2', skipCondition: () => true },
-        { title: 'Step 3' }
-      ]
+  it('allows clicking back to an earlier unskipped step', async () => {
+    const user = userEvent.setup()
+    const stepsWithSkip = [
+      { title: 'Step 1' },
+      { title: 'Step 2', skipCondition: () => true },
+      { title: 'Step 3' }
+    ]
 
-      render(
-        <FormWizard
-          steps={stepsWithSkip}
-          renderStep={(_step, index) => <div>Content {index + 1}</div>}
-        />
-      )
+    render(
+      <FormWizard
+        steps={stepsWithSkip}
+        clickable
+        defaultCurrent={2}
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
 
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      await user.click(screen.getByRole('button', { name: 'Next' }))
-      // Step 2 should be skipped
-      expect(screen.getByText('Content 3')).toBeInTheDocument()
-    })
-
-    it('clicking a skipped step title walks forward to the next unskipped step', async () => {
-      const user = userEvent.setup()
-      const stepsWithSkip = [
-        { title: 'Step 1' },
-        { title: 'Step 2', skipCondition: () => true },
-        { title: 'Step 3' }
-      ]
-
-      render(
-        <FormWizard
-          steps={stepsWithSkip}
-          clickable
-          renderStep={(_step, index) => <div>Content {index + 1}</div>}
-        />
-      )
-
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      await user.click(screen.getByRole('button', { name: 'Step 2' }))
-      expect(screen.getByText('Content 3')).toBeInTheDocument()
-      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
-    })
-
-    it('clicking a skipped step title walks backward to the previous unskipped step', async () => {
-      const user = userEvent.setup()
-      const stepsWithSkip = [
-        { title: 'Step 1' },
-        { title: 'Step 2', skipCondition: () => true },
-        { title: 'Step 3' }
-      ]
-
-      render(
-        <FormWizard
-          steps={stepsWithSkip}
-          clickable
-          defaultCurrent={2}
-          renderStep={(_step, index) => <div>Content {index + 1}</div>}
-        />
-      )
-
-      expect(screen.getByText('Content 3')).toBeInTheDocument()
-      await user.click(screen.getByRole('button', { name: 'Step 2' }))
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
-    })
-
-    it('clicking a later non-skipped step lands there even if a middle step is skipped', async () => {
-      const user = userEvent.setup()
-      const stepsWithSkip = [
-        { title: 'Step 1' },
-        { title: 'Step 2', skipCondition: () => true },
-        { title: 'Step 3' }
-      ]
-
-      render(
-        <FormWizard
-          steps={stepsWithSkip}
-          clickable
-          renderStep={(_step, index) => <div>Content {index + 1}</div>}
-        />
-      )
-
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      await user.click(screen.getByRole('button', { name: 'Step 3' }))
-      expect(screen.getByText('Content 3')).toBeInTheDocument()
-    })
-
-    it('stays on the current step when clicking a skipped last step with nothing after', async () => {
-      const user = userEvent.setup()
-      const stepsWithSkipLast = [
-        { title: 'Step 1' },
-        { title: 'Step 2' },
-        { title: 'Step 3', skipCondition: () => true }
-      ]
-
-      render(
-        <FormWizard
-          steps={stepsWithSkipLast}
-          clickable
-          renderStep={(_step, index) => <div>Content {index + 1}</div>}
-        />
-      )
-
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      await user.click(screen.getByRole('button', { name: 'Step 3' }))
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      expect(screen.queryByText('Content 3')).not.toBeInTheDocument()
-    })
-
-    it('calls autoSave on step change', async () => {
-      const user = userEvent.setup()
-      const autoSave = vi.fn()
-
-      render(
-        <FormWizard
-          steps={steps}
-          autoSave={autoSave}
-          renderStep={(_step, index) => <div>Content {index + 1}</div>}
-        />
-      )
-
-      await user.click(screen.getByRole('button', { name: 'Next' }))
-      expect(autoSave).toHaveBeenCalledWith(1, steps[1])
-    })
+    expect(screen.getByText('Content 3')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Step 1/ }))
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
+
+  it('calls autoSave on step change and finish', async () => {
+    const user = userEvent.setup()
+    const autoSave = vi.fn()
+    const onFinish = vi.fn()
+
+    render(
+      <FormWizard
+        steps={steps}
+        autoSave={autoSave}
+        onFinish={onFinish}
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(autoSave).toHaveBeenCalledWith(1, steps[1])
+    await user.click(screen.getByRole('button', { name: 'Finish' }))
+    expect(onFinish).toHaveBeenCalledTimes(1)
+    expect(autoSave).toHaveBeenCalledTimes(2)
+  })
+
+  it('only fires Finish once while beforeNext is in flight', async () => {
+    const user = userEvent.setup()
+    let release!: () => void
+    const beforeNext = vi.fn(
+      () =>
+        new Promise<boolean>((resolve) => {
+          release = () => resolve(true)
+        })
+    )
+    const onFinish = vi.fn()
+
+    render(
+      <FormWizard
+        steps={[{ title: 'Only' }]}
+        beforeNext={beforeNext}
+        onFinish={onFinish}
+        renderStep={() => <div>Only</div>}
+      />
+    )
+
+    const finish = screen.getByRole('button', { name: 'Finish' })
+    await user.click(finish)
+    await user.click(finish)
+    release()
+    await vi.waitFor(() => expect(onFinish).toHaveBeenCalledTimes(1))
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<FormWizard />)
-      await expectNoA11yViolationsIsolated(container)
+      const { container } = render(
+        <FormWizard
+          steps={[{ title: 'One' }, { title: 'Two' }, { title: 'Three' }]}
+          clickable
+          beforeNext={() => '需要先完成校验'}
+          renderStep={(_step, index) => <div>Content {index + 1}</div>}
+        />
+      )
+      await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+      await expectNoA11yViolations(container)
     })
   })
 })

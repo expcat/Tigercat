@@ -293,7 +293,7 @@ export type {
   ReactTableToolbarProps
 } from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'
-export type { FormWizardProps } from './components/FormWizard'
+export type { FormWizardProps, FormWizardHandle, WizardStep } from './components/FormWizard'
 export { CropUpload } from './components/CropUpload'
 export type { CropUploadProps } from './components/CropUpload'
 export { ChartCanvas } from './components/ChartCanvas'
