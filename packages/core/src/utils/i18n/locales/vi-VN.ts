@@ -182,7 +182,11 @@ export const viVN: TigerLocale = {
     nextYear: 'Năm sau'
   },
   fileManager: {
-    rootText: 'Gốc'
+    rootText: 'Gốc',
+    pathAriaLabel: 'Đường dẫn tệp',
+    listboxAriaLabel: 'Tệp',
+    searchAriaLabel: 'Tìm tệp',
+    emptyText: 'Thư mục trống'
   },
   imageViewer: {
     dialogAriaLabel: 'Trình xem ảnh',
@@ -224,6 +228,10 @@ export const viVN: TigerLocale = {
     annotationEditorAriaLabel: 'Trình chú thích ảnh',
     annotationCanvasAriaLabel: 'Canvas chú thích',
     loadingAnnotationImageAriaLabel: 'Đang tải ảnh để chú thích',
+    loadAnnotationErrorAriaLabel: 'Không tải được ảnh để chú thích',
+    defaultAnnotationAlt: 'Ảnh cần chú thích',
+    annotationShapeAriaLabel: 'chú thích {type}',
+    annotationLabeledShapeAriaLabel: '{label}, chú thích {type}',
     selectToolText: 'Chọn',
     rectangleToolText: 'Hình chữ nhật',
     ellipseToolText: 'Hình elip',

@@ -182,7 +182,11 @@ export const koKR: TigerLocale = {
     nextYear: '다음 해'
   },
   fileManager: {
-    rootText: '루트'
+    rootText: '루트',
+    pathAriaLabel: '파일 경로',
+    listboxAriaLabel: '파일',
+    searchAriaLabel: '파일 검색',
+    emptyText: '빈 폴더'
   },
   imageViewer: {
     dialogAriaLabel: '이미지 뷰어',
@@ -223,7 +227,11 @@ export const koKR: TigerLocale = {
     annotationToolbarAriaLabel: '주석 도구',
     annotationEditorAriaLabel: '이미지 주석 편집기',
     annotationCanvasAriaLabel: '이미지 주석 캔버스',
-    loadingAnnotationImageAriaLabel: '주석할 이미지 불러오는 중',
+    loadingAnnotationImageAriaLabel: '주석용 이미지를 불러오는 중',
+    loadAnnotationErrorAriaLabel: '주석용 이미지를 불러오지 못했습니다',
+    defaultAnnotationAlt: '주석할 이미지',
+    annotationShapeAriaLabel: '{type} 주석',
+    annotationLabeledShapeAriaLabel: '{label}, {type} 주석',
     selectToolText: '선택',
     rectangleToolText: '사각형',
     ellipseToolText: '타원',

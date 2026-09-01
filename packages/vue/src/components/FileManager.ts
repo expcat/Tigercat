@@ -2,33 +2,45 @@ import { defineComponent, h, ref, computed, nextTick, watch, PropType } from 'vu
 import {
   classNames,
   coerceClassValue,
+  mergeStyleValues,
   getFileManagerContainerClasses,
   getFileItemClasses,
+  getFileManagerContentClasses,
+  getFileManagerGridStyle,
   deriveFileManagerModel,
   toggleFileSelection,
   resolveFileOpen,
-  sliceBreadcrumbPath,
+  buildFileBreadcrumb,
+  applyFileManagerReorder,
+  clampFileManagerFocusIndex,
+  resolveFileManagerItemKeydown,
+  resolveFileItemExtension,
+  resolveFileItemIcon,
   toFileDragItem,
-  reorderSequence,
   formatFileSizeLabel,
   getFileManagerLabels,
+  DEFAULT_FILE_COLUMNS,
+  DEFAULT_FILE_GRID_COLUMNS,
+  EMPTY_FILE_ITEMS,
+  EMPTY_FILE_PATH,
   fileManagerToolbarClasses,
   fileManagerBreadcrumbClasses,
+  fileManagerBreadcrumbListClasses,
   fileManagerBreadcrumbItemClasses,
+  fileManagerBreadcrumbCurrentClasses,
   fileManagerBreadcrumbSeparatorClasses,
-  fileManagerContentClasses,
   fileManagerItemIconClasses,
   fileManagerItemNameClasses,
   fileManagerItemMetaClasses,
   fileManagerEmptyClasses,
   fileManagerLoadingClasses,
   fileManagerSearchClasses,
-  resolveLocaleText,
   mergeTigerLocale,
   type FileItem,
   type FileViewMode,
   type FileSortField,
   type FileSortOrder,
+  type FileColumn,
   type TigerLocale,
   type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
@@ -49,17 +61,19 @@ export type VueFileManagerProps = Omit<
   | 'onCurrentPathChange'
   | 'onSearchTextChange'
   | 'onReorder'
+  | 'onFilesChange'
 >
 
 export const FileManager = defineComponent({
   name: 'TigerFileManager',
   inheritAttrs: false,
   props: {
-    files: { type: Array as PropType<FileItem[]>, default: () => [] },
+    files: { type: Array as PropType<FileItem[]>, default: undefined },
     viewMode: {
       type: String as PropType<FileViewMode>,
       default: 'list'
     },
+    gridColumns: { type: Number, default: DEFAULT_FILE_GRID_COLUMNS },
     selectedKeys: {
       type: Array as PropType<(string | number)[]>
     },
@@ -69,7 +83,7 @@ export const FileManager = defineComponent({
     },
     multiple: { type: Boolean, default: false },
     columns: {
-      type: Array as PropType<FileSortField[]>,
+      type: Array as PropType<FileColumn[]>,
       default: undefined
     },
     sortField: {
@@ -82,14 +96,19 @@ export const FileManager = defineComponent({
     },
     currentPath: {
       type: Array as PropType<string[]>,
-      default: () => []
+      default: undefined
+    },
+    defaultCurrentPath: {
+      type: Array as PropType<string[]>,
+      default: undefined
     },
     showHidden: { type: Boolean, default: false },
     draggable: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     emptyText: { type: String, default: undefined },
     searchable: { type: Boolean, default: false },
-    searchText: { type: String, default: '' },
+    searchText: { type: String, default: undefined },
+    defaultSearchText: { type: String, default: undefined },
     className: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
@@ -103,112 +122,107 @@ export const FileManager = defineComponent({
     'update:files',
     'reorder'
   ],
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getFileManagerLabels(mergedLocale.value))
-    const localSearch = ref(props.searchText)
+    const isRtl = computed(() => mergedLocale.value?.direction === 'rtl')
     const focusedIndex = ref(0)
     const contentRef = ref<HTMLElement | null>(null)
     const innerSelectedKeys = ref<(string | number)[]>([...(props.defaultSelectedKeys ?? [])])
-    const isControlled = computed(() => props.selectedKeys !== undefined)
+    const innerPath = ref<string[]>([...(props.defaultCurrentPath ?? EMPTY_FILE_PATH)])
+    const innerSearch = ref(props.defaultSearchText ?? '')
+    const isKeysControlled = computed(() => props.selectedKeys !== undefined)
+    const isPathControlled = computed(() => props.currentPath !== undefined)
+    const isSearchControlled = computed(() => props.searchText !== undefined)
     const resolvedKeys = computed(() =>
-      isControlled.value ? (props.selectedKeys ?? []) : innerSelectedKeys.value
+      isKeysControlled.value ? (props.selectedKeys ?? []) : innerSelectedKeys.value
     )
-
-    watch(
-      () => props.selectedKeys,
-      (value) => {
-        if (value !== undefined) {
-          innerSelectedKeys.value = [...value]
-        }
-      }
+    const resolvedPath = computed(() =>
+      isPathControlled.value ? (props.currentPath ?? EMPTY_FILE_PATH) : innerPath.value
     )
+    const resolvedSearch = computed(() =>
+      isSearchControlled.value ? (props.searchText ?? '') : innerSearch.value
+    )
+    const tree = computed(() => props.files ?? EMPTY_FILE_ITEMS)
 
     const drag = useDrag({
       containerId: 'files',
       onDrop: (event) => {
-        if (event.fromIndex === event.toIndex) return
-        const reordered = reorderSequence(
-          model.value.processedItems,
+        if (!model.value.canReorder) return
+        const result = applyFileManagerReorder(
+          tree.value,
+          resolvedPath.value,
           event.fromIndex,
-          event.toIndex
+          event.toIndex,
+          model.value.currentItems
         )
-        emit('reorder', reordered, event.fromIndex, event.toIndex)
-        emit('update:files', reordered)
+        if (!result) return
+        emit('reorder', result.layer, event.fromIndex, event.toIndex)
+        emit('update:files', result.files)
       }
     })
 
     function handleDragStart(event: DragEvent, item: FileItem, index: number) {
-      if (!props.draggable || item.disabled) return
+      if (!model.value.canReorder || item.disabled) return
       drag.startDrag(toFileDragItem(item, index, 'files'), event)
     }
 
     function handleDragOver(event: DragEvent, item: FileItem, index: number) {
-      if (!props.draggable) return
+      if (!model.value.canReorder || item.disabled) return
       drag.dragOver(toFileDragItem(item, index, 'files'), event)
     }
 
     const model = computed(() =>
       deriveFileManagerModel({
-        files: props.files,
-        currentPath: props.currentPath,
+        files: tree.value,
+        currentPath: resolvedPath.value,
         selectedKeys: resolvedKeys.value,
         sortField: props.sortField,
         sortOrder: props.sortOrder,
         showHidden: props.showHidden,
-        searchText: localSearch.value || props.searchText
+        searchText: resolvedSearch.value,
+        draggable: props.draggable
       })
     )
+
+    const viewKey = computed(
+      () =>
+        `${resolvedPath.value.join('/')}\0${resolvedSearch.value}\0${model.value.processedItems.length}`
+    )
+
+    watch(viewKey, () => {
+      focusedIndex.value = 0
+    })
 
     const containerClasses = computed(() =>
       classNames(getFileManagerContainerClasses(props.className), coerceClassValue(attrs.class))
     )
+    const containerStyle = computed(() => mergeStyleValues(attrs.style))
+
+    function commitPath(next: string[]) {
+      if (!isPathControlled.value) innerPath.value = next
+      emit('update:currentPath', next)
+      emit('navigate', next)
+    }
 
     function handleSelect(item: FileItem) {
-      if (item.disabled) return
+      if (props.loading || item.disabled) return
       emit('select', item)
       const keys = toggleFileSelection(resolvedKeys.value, item.key, props.multiple)
-      if (!isControlled.value) {
-        innerSelectedKeys.value = keys
-      }
+      if (!isKeysControlled.value) innerSelectedKeys.value = keys
       emit('update:selectedKeys', keys)
     }
 
     function handleOpen(item: FileItem) {
-      const result = resolveFileOpen(item, props.currentPath)
+      if (props.loading) return
+      const result = resolveFileOpen(item, resolvedPath.value)
       if (!result) return
       if (result.type === 'navigate') {
-        emit('update:currentPath', result.path)
-        emit('navigate', result.path)
+        commitPath(result.path!)
       } else {
         emit('open', result.item)
       }
-    }
-
-    function navigateToBreadcrumb(index: number) {
-      const newPath = sliceBreadcrumbPath(props.currentPath, index)
-      emit('update:currentPath', newPath)
-      emit('navigate', newPath)
-    }
-
-    function getFirstEnabledIndex() {
-      return model.value.processedItems.findIndex((item) => !item.disabled)
-    }
-
-    function getLastEnabledIndex() {
-      for (let index = model.value.processedItems.length - 1; index >= 0; index -= 1) {
-        if (!model.value.processedItems[index]?.disabled) {
-          return index
-        }
-      }
-      return -1
-    }
-
-    function getFocusedItemIndex() {
-      return focusedIndex.value >= 0 && !model.value.processedItems[focusedIndex.value]?.disabled
-        ? focusedIndex.value
-        : getFirstEnabledIndex()
     }
 
     function focusItemAt(index: number) {
@@ -217,108 +231,89 @@ export const FileManager = defineComponent({
       })
     }
 
-    function moveFocus(current: number, direction: 1 | -1) {
-      if (model.value.processedItems.length === 0) return
-      let next = current
-      for (let i = 0; i < model.value.processedItems.length; i += 1) {
-        next =
-          (next + direction + model.value.processedItems.length) % model.value.processedItems.length
-        if (!model.value.processedItems[next]?.disabled) {
-          focusedIndex.value = next
-          focusItemAt(next)
-          return
-        }
-      }
-    }
-
     function handleItemKeydown(event: KeyboardEvent, item: FileItem, index: number) {
-      switch (event.key) {
-        case 'ArrowDown':
-        case 'ArrowRight':
-          event.preventDefault()
-          moveFocus(index, 1)
-          return
-        case 'ArrowUp':
-        case 'ArrowLeft':
-          event.preventDefault()
-          moveFocus(index, -1)
-          return
-        case 'Home': {
-          event.preventDefault()
-          const first = getFirstEnabledIndex()
-          if (first >= 0) {
-            focusedIndex.value = first
-            focusItemAt(first)
-          }
-          return
-        }
-        case 'End': {
-          event.preventDefault()
-          const last = getLastEnabledIndex()
-          if (last >= 0) {
-            focusedIndex.value = last
-            focusItemAt(last)
-          }
-          return
-        }
-        case ' ':
-          event.preventDefault()
-          handleSelect(item)
-          return
-        case 'Enter':
-          event.preventDefault()
-          handleSelect(item)
-          handleOpen(item)
-          return
-        default:
-          return
+      if (props.loading) return
+      const action = resolveFileManagerItemKeydown({
+        key: event.key,
+        altKey: event.altKey,
+        viewMode: props.viewMode,
+        gridColumns: props.gridColumns,
+        isRtl: isRtl.value,
+        currentIndex: index,
+        items: model.value.processedItems,
+        currentPath: resolvedPath.value
+      })
+      if (!action) return
+      event.preventDefault()
+      if (action.type === 'move' || action.type === 'home' || action.type === 'end') {
+        focusedIndex.value = action.index
+        focusItemAt(action.index)
+        return
       }
+      if (action.type === 'select') {
+        handleSelect(item)
+        return
+      }
+      if (action.type === 'open') {
+        handleSelect(item)
+        handleOpen(item)
+        return
+      }
+      commitPath(action.path)
     }
 
     return () => {
-      // Breadcrumb
-      const breadcrumbItems = [
-        h(
-          'span',
-          {
-            class: fileManagerBreadcrumbItemClasses,
-            onClick: () => navigateToBreadcrumb(0)
-          },
-          labels.value.rootText
-        ),
-        ...props.currentPath.flatMap((seg, i) => [
-          h('span', { class: fileManagerBreadcrumbSeparatorClasses }, '/'),
-          h(
-            'span',
-            {
-              class: fileManagerBreadcrumbItemClasses,
-              onClick: () => navigateToBreadcrumb(i + 1)
-            },
-            seg
-          )
-        ])
-      ]
-
+      const forwardedAttrs = Object.fromEntries(
+        Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
+      )
+      const breadcrumbs = buildFileBreadcrumb(tree.value, resolvedPath.value, labels.value.rootText)
+      const focusedItem = clampFileManagerFocusIndex(focusedIndex.value, model.value.processedItems)
       const breadcrumb = h(
         'nav',
-        { class: fileManagerBreadcrumbClasses, 'aria-label': 'File path' },
-        breadcrumbItems
+        { class: fileManagerBreadcrumbClasses, 'aria-label': labels.value.pathAriaLabel },
+        h(
+          'ol',
+          { class: fileManagerBreadcrumbListClasses },
+          breadcrumbs.map((segment, index) =>
+            h('li', { key: segment.key || 'root', class: 'flex items-center gap-1' }, [
+              index > 0
+                ? h(
+                    'span',
+                    { class: fileManagerBreadcrumbSeparatorClasses, 'aria-hidden': 'true' },
+                    '/'
+                  )
+                : null,
+              segment.current
+                ? h(
+                    'span',
+                    { class: fileManagerBreadcrumbCurrentClasses, 'aria-current': 'page' },
+                    segment.name
+                  )
+                : h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: fileManagerBreadcrumbItemClasses,
+                      onClick: () => commitPath(segment.path)
+                    },
+                    segment.name
+                  )
+            ])
+          )
+        )
       )
 
-      // Search
       const searchInput = props.searchable
         ? h('input', {
             type: 'text',
             class: fileManagerSearchClasses,
-            placeholder: resolveLocaleText(
-              'Search...',
-              mergedLocale.value?.common?.searchPlaceholder
-            ),
-            value: localSearch.value,
-            onInput: (e: Event) => {
-              const val = (e.target as HTMLInputElement).value
-              localSearch.value = val
-              emit('update:searchText', val)
+            placeholder: mergedLocale.value?.common?.searchPlaceholder,
+            'aria-label': labels.value.searchAriaLabel,
+            value: resolvedSearch.value,
+            onInput: (event: Event) => {
+              const value = (event.target as HTMLInputElement).value
+              if (!isSearchControlled.value) innerSearch.value = value
+              emit('update:searchText', value)
             }
           })
         : null
@@ -329,28 +324,30 @@ export const FileManager = defineComponent({
         searchInput
       ])
 
-      // File icon placeholder
       const fileIcon = (item: FileItem) =>
-        h(
-          'span',
-          { class: fileManagerItemIconClasses, 'aria-hidden': 'true' },
-          item.type === 'folder' ? '📁' : '📄'
-        )
+        slots.icon
+          ? slots.icon({ item })
+          : h(
+              'span',
+              { class: fileManagerItemIconClasses, 'aria-hidden': 'true' },
+              resolveFileItemIcon(item)
+            )
 
-      // File items
       const renderItem = (item: FileItem, index: number) => {
         const isSelected = model.value.selectedSet.has(item.key)
-        const itemClass = getFileItemClasses(props.viewMode, isSelected)
-        const focusedItem = getFocusedItemIndex()
-
+        const itemClass = getFileItemClasses(props.viewMode, isSelected, Boolean(item.disabled))
+        const canDrag = model.value.canReorder && !item.disabled
+        const metaColumns = props.columns ?? DEFAULT_FILE_COLUMNS
         const nameEl = h('span', { class: fileManagerItemNameClasses }, item.name)
-
-        const metaColumns = props.columns ?? ['size', 'modified']
         const metaEls =
           props.viewMode === 'list'
             ? [
                 metaColumns.includes('type')
-                  ? h('span', { class: fileManagerItemMetaClasses }, item.extension ?? item.type)
+                  ? h(
+                      'span',
+                      { class: fileManagerItemMetaClasses },
+                      resolveFileItemExtension(item) || item.type
+                    )
                   : null,
                 metaColumns.includes('size') && item.size !== undefined
                   ? h('span', { class: fileManagerItemMetaClasses }, formatFileSizeLabel(item.size))
@@ -368,7 +365,8 @@ export const FileManager = defineComponent({
             class: itemClass,
             role: 'option',
             'aria-selected': isSelected,
-            tabindex: !item.disabled && index === focusedItem ? 0 : -1,
+            'aria-disabled': item.disabled || undefined,
+            tabindex: !props.loading && !item.disabled && index === focusedItem ? 0 : -1,
             'data-option-index': index,
             'data-disabled': item.disabled || undefined,
             onFocus: () => {
@@ -377,25 +375,22 @@ export const FileManager = defineComponent({
             onKeydown: (event: KeyboardEvent) => handleItemKeydown(event, item, index),
             onClick: () => handleSelect(item),
             onDblclick: () => handleOpen(item),
-            draggable: props.draggable && !item.disabled,
+            draggable: canDrag,
             'data-drag-id': item.key,
             'data-drag-index': index,
             'data-drag-container': 'files',
-            onDragstart: (event: DragEvent) => handleDragStart(event, item, index),
-            onDragover: props.draggable
+            onDragstart: canDrag
+              ? (event: DragEvent) => handleDragStart(event, item, index)
+              : undefined,
+            onDragover: canDrag
               ? (event: DragEvent) => handleDragOver(event, item, index)
               : undefined,
-            onDrop: props.draggable ? (event: DragEvent) => drag.drop(event) : undefined,
-            onDragend: props.draggable ? () => drag.endDrag() : undefined
+            onDrop: canDrag ? (event: DragEvent) => drag.drop(event) : undefined,
+            onDragend: canDrag ? () => drag.endDrag() : undefined
           },
           [fileIcon(item), nameEl, ...metaEls]
         )
       }
-
-      const contentClass =
-        props.viewMode === 'grid'
-          ? `${fileManagerContentClasses} grid grid-cols-4 gap-2`
-          : fileManagerContentClasses
 
       const content =
         model.value.processedItems.length > 0
@@ -403,31 +398,35 @@ export const FileManager = defineComponent({
               'div',
               {
                 ref: contentRef,
-                class: contentClass,
+                class: getFileManagerContentClasses(props.viewMode),
+                style: getFileManagerGridStyle(props.viewMode, props.gridColumns),
                 role: 'listbox',
-                'aria-multiselectable': props.multiple
+                'aria-label': labels.value.listboxAriaLabel,
+                'aria-multiselectable': props.multiple || undefined,
+                'aria-disabled': props.loading || undefined
               },
               model.value.processedItems.map(renderItem)
             )
-          : h(
-              'div',
-              { class: fileManagerEmptyClasses },
-              resolveLocaleText(
-                'Empty folder',
-                props.emptyText,
-                mergedLocale.value?.common?.emptyText
-              )
-            )
+          : h('div', { class: fileManagerEmptyClasses }, props.emptyText ?? labels.value.emptyText)
 
       const loadingEl = props.loading
         ? h(
             'div',
-            { class: fileManagerLoadingClasses },
-            resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
+            { class: fileManagerLoadingClasses, role: 'status' },
+            mergedLocale.value?.common?.loadingText
           )
         : null
 
-      return h('div', { class: containerClasses.value }, [toolbar, content, loadingEl])
+      return h(
+        'div',
+        {
+          ...forwardedAttrs,
+          class: containerClasses.value,
+          style: containerStyle.value,
+          'aria-busy': props.loading || undefined
+        },
+        [toolbar, content, loadingEl]
+      )
     }
   }
 })

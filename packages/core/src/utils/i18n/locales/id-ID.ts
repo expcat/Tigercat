@@ -182,7 +182,11 @@ export const idID: TigerLocale = {
     nextYear: 'Tahun berikutnya'
   },
   fileManager: {
-    rootText: 'Akar'
+    rootText: 'Akar',
+    pathAriaLabel: 'Jalur berkas',
+    listboxAriaLabel: 'Berkas',
+    searchAriaLabel: 'Cari berkas',
+    emptyText: 'Folder kosong'
   },
   imageViewer: {
     dialogAriaLabel: 'Penampil gambar',
@@ -224,6 +228,10 @@ export const idID: TigerLocale = {
     annotationEditorAriaLabel: 'Editor anotasi gambar',
     annotationCanvasAriaLabel: 'Kanvas anotasi',
     loadingAnnotationImageAriaLabel: 'Memuat gambar untuk dianotasi',
+    loadAnnotationErrorAriaLabel: 'Gagal memuat gambar untuk dianotasi',
+    defaultAnnotationAlt: 'Gambar untuk dianotasi',
+    annotationShapeAriaLabel: 'anotasi {type}',
+    annotationLabeledShapeAriaLabel: '{label}, anotasi {type}',
     selectToolText: 'Pilih',
     rectangleToolText: 'Persegi panjang',
     ellipseToolText: 'Elips',

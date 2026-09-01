@@ -182,7 +182,11 @@ export const thTH: TigerLocale = {
     nextYear: 'ปีถัดไป'
   },
   fileManager: {
-    rootText: 'ราก'
+    rootText: 'ราก',
+    pathAriaLabel: 'เส้นทางไฟล์',
+    listboxAriaLabel: 'ไฟล์',
+    searchAriaLabel: 'ค้นหาไฟล์',
+    emptyText: 'โฟลเดอร์ว่าง'
   },
   imageViewer: {
     dialogAriaLabel: 'ตัวดูรูปภาพ',
@@ -224,6 +228,10 @@ export const thTH: TigerLocale = {
     annotationEditorAriaLabel: 'ตัวแก้ไขคำอธิบายรูปภาพ',
     annotationCanvasAriaLabel: 'ผืนผ้าใบคำอธิบาย',
     loadingAnnotationImageAriaLabel: 'กำลังโหลดรูปภาพสำหรับคำอธิบาย',
+    loadAnnotationErrorAriaLabel: 'โหลดรูปภาพสำหรับคำอธิบายไม่สำเร็จ',
+    defaultAnnotationAlt: 'รูปภาพสำหรับคำอธิบาย',
+    annotationShapeAriaLabel: 'คำอธิบาย {type}',
+    annotationLabeledShapeAriaLabel: '{label}, คำอธิบาย {type}',
     selectToolText: 'เลือก',
     rectangleToolText: 'สี่เหลี่ยม',
     ellipseToolText: 'วงรี',

@@ -182,7 +182,11 @@ export const esES: TigerLocale = {
     nextYear: 'Año siguiente'
   },
   fileManager: {
-    rootText: 'Raíz'
+    rootText: 'Raíz',
+    pathAriaLabel: 'Ruta de archivos',
+    listboxAriaLabel: 'Archivos',
+    searchAriaLabel: 'Buscar archivos',
+    emptyText: 'Carpeta vacía'
   },
   imageViewer: {
     dialogAriaLabel: 'Visor de imágenes',
@@ -224,6 +228,10 @@ export const esES: TigerLocale = {
     annotationEditorAriaLabel: 'Editor de anotación de imagen',
     annotationCanvasAriaLabel: 'Lienzo de anotación',
     loadingAnnotationImageAriaLabel: 'Cargando imagen para anotar',
+    loadAnnotationErrorAriaLabel: 'No se pudo cargar la imagen para anotar',
+    defaultAnnotationAlt: 'Imagen para anotar',
+    annotationShapeAriaLabel: 'anotación {type}',
+    annotationLabeledShapeAriaLabel: '{label}, anotación {type}',
     selectToolText: 'Seleccionar',
     rectangleToolText: 'Rectángulo',
     ellipseToolText: 'Elipse',

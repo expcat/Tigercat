@@ -185,7 +185,11 @@ export const enUS: TigerLocale = {
     nextYear: 'Next year'
   },
   fileManager: {
-    rootText: 'Root'
+    rootText: 'Root',
+    pathAriaLabel: 'File path',
+    listboxAriaLabel: 'Files',
+    searchAriaLabel: 'Search files',
+    emptyText: 'Empty folder'
   },
   imageViewer: {
     dialogAriaLabel: 'Image viewer',
@@ -227,6 +231,10 @@ export const enUS: TigerLocale = {
     annotationEditorAriaLabel: 'Image annotation editor',
     annotationCanvasAriaLabel: 'Image annotation canvas',
     loadingAnnotationImageAriaLabel: 'Loading image for annotation',
+    loadAnnotationErrorAriaLabel: 'Failed to load image for annotation',
+    defaultAnnotationAlt: 'Image to annotate',
+    annotationShapeAriaLabel: '{type} annotation',
+    annotationLabeledShapeAriaLabel: '{label}, {type} annotation',
     selectToolText: 'Select',
     rectangleToolText: 'Rectangle',
     ellipseToolText: 'Ellipse',

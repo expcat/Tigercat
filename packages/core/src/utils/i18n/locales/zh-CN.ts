@@ -185,7 +185,11 @@ export const zhCN: TigerLocale = {
     nextYear: '下一年'
   },
   fileManager: {
-    rootText: '根目录'
+    rootText: '根目录',
+    pathAriaLabel: '文件路径',
+    listboxAriaLabel: '文件列表',
+    searchAriaLabel: '搜索文件',
+    emptyText: '空文件夹'
   },
   imageViewer: {
     dialogAriaLabel: '图片查看器',
@@ -227,6 +231,10 @@ export const zhCN: TigerLocale = {
     annotationEditorAriaLabel: '图片标注编辑器',
     annotationCanvasAriaLabel: '图片标注画布',
     loadingAnnotationImageAriaLabel: '正在加载待标注图片',
+    loadAnnotationErrorAriaLabel: '无法加载待标注图片',
+    defaultAnnotationAlt: '待标注图片',
+    annotationShapeAriaLabel: '{type}标注',
+    annotationLabeledShapeAriaLabel: '{label}，{type}标注',
     selectToolText: '选择',
     rectangleToolText: '矩形',
     ellipseToolText: '椭圆',

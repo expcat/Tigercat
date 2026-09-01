@@ -182,7 +182,11 @@ export const arSA: TigerLocale = {
     nextYear: 'السنة التالية'
   },
   fileManager: {
-    rootText: 'الجذر'
+    rootText: 'الجذر',
+    pathAriaLabel: 'مسار الملف',
+    listboxAriaLabel: 'الملفات',
+    searchAriaLabel: 'البحث في الملفات',
+    emptyText: 'مجلد فارغ'
   },
   imageViewer: {
     dialogAriaLabel: 'عارض الصور',
@@ -224,6 +228,10 @@ export const arSA: TigerLocale = {
     annotationEditorAriaLabel: 'محرر تعليق الصورة',
     annotationCanvasAriaLabel: 'لوحة التعليق',
     loadingAnnotationImageAriaLabel: 'جارٍ تحميل الصورة للتعليق',
+    loadAnnotationErrorAriaLabel: 'تعذر تحميل الصورة للتعليق',
+    defaultAnnotationAlt: 'صورة للتعليق',
+    annotationShapeAriaLabel: 'تعليق {type}',
+    annotationLabeledShapeAriaLabel: '{label}، تعليق {type}',
     selectToolText: 'تحديد',
     rectangleToolText: 'مستطيل',
     ellipseToolText: 'قطع ناقص',

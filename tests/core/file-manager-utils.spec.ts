@@ -14,6 +14,11 @@ import {
   toggleFileSelection,
   resolveFileOpen,
   sliceBreadcrumbPath,
+  buildFileBreadcrumb,
+  reorderFileTreeAtPath,
+  applyFileManagerReorder,
+  clampFileManagerFocusIndex,
+  resolveFileManagerItemKeydown,
   toFileDragItem,
   fileManagerContainerClasses,
   fileManagerToolbarClasses,
@@ -150,7 +155,7 @@ describe('file-manager-utils', () => {
     it('shares core byte formatting while preserving FileManager precision', () => {
       expect(formatBytes(1024, { precision: 2 })).toBe('1.00 KB')
       expect(formatBytes(1024, { precision: 2, trimTrailingZeros: true })).toBe('1 KB')
-      expect(formatFileSizeLabel(Number.NaN)).toBe('0 B')
+      expect(formatFileSizeLabel(Number.NaN)).toBe('')
     })
   })
 
@@ -211,6 +216,14 @@ describe('file-manager-utils', () => {
 
     it('returns empty for invalid path', () => {
       expect(navigateToFolder(tree, ['nonexistent']).length).toBe(0)
+    })
+
+    it('looks up folders by key, not display name', () => {
+      const dupes: FileItem[] = [
+        makeFolder('src', [makeFile('first.ts')], { key: 'src-a' }),
+        makeFolder('src', [makeFile('second.ts')], { key: 'src-b' })
+      ]
+      expect(navigateToFolder(dupes, ['src-b']).map((item) => item.name)).toEqual(['second.ts'])
     })
   })
 
@@ -348,6 +361,22 @@ describe('file-manager-utils', () => {
       expect(m.processedItems.find((i) => i.name === '.env')).toBeUndefined()
     })
 
+    it('keeps source order while draggable so drop order is not resorted', () => {
+      const items: FileItem[] = [makeFile('c.txt'), makeFile('a.txt'), makeFolder('z')]
+      const m = deriveFileManagerModel({
+        files: items,
+        currentPath: [],
+        selectedKeys: [],
+        sortField: 'name',
+        sortOrder: 'asc',
+        showHidden: true,
+        searchText: '',
+        draggable: true
+      })
+      expect(m.processedItems.map((item) => item.name)).toEqual(['c.txt', 'a.txt', 'z'])
+      expect(m.canReorder).toBe(true)
+    })
+
     it('filters by search text', () => {
       const m = deriveFileManagerModel({
         files: tree,
@@ -401,8 +430,8 @@ describe('file-manager-utils', () => {
 
   describe('resolveFileOpen', () => {
     it('returns navigate for folder', () => {
-      const result = resolveFileOpen(makeFolder('src'), ['root'])
-      expect(result).toEqual({ type: 'navigate', path: ['root', 'src'] })
+      const result = resolveFileOpen(makeFolder('src', [], { key: 'src-id' }), ['root'])
+      expect(result).toEqual({ type: 'navigate', path: ['root', 'src-id'] })
     })
 
     it('returns open for file', () => {
@@ -430,6 +459,49 @@ describe('file-manager-utils', () => {
   })
 
   // ─── toFileDragItem ───────────────────────────────────────
+
+  describe('breadcrumb and reorder', () => {
+    it('builds breadcrumb labels from names while paths stay keys', () => {
+      const tree: FileItem[] = [
+        makeFolder('Documents', [makeFolder('Work', [makeFile('a.txt')])], { key: 'docs' })
+      ]
+      const crumbs = buildFileBreadcrumb(tree, ['docs'], 'Root')
+      expect(crumbs.map((item) => item.name)).toEqual(['Root', 'Documents'])
+      expect(crumbs[1]?.path).toEqual(['docs'])
+      expect(crumbs[1]?.current).toBe(true)
+    })
+
+    it('rewrites the current folder in the source tree', () => {
+      const tree: FileItem[] = [
+        makeFolder('src', [makeFile('a.ts'), makeFile('b.ts'), makeFile('c.ts')])
+      ]
+      const next = reorderFileTreeAtPath(tree, ['src'], 2, 0)
+      expect(next[0]?.children?.map((item) => item.name)).toEqual(['c.ts', 'a.ts', 'b.ts'])
+      expect(tree[0]?.children?.map((item) => item.name)).toEqual(['a.ts', 'b.ts', 'c.ts'])
+    })
+
+    it('refuses to drop onto a disabled item', () => {
+      const layer = [makeFile('a.ts'), makeFile('locked.ts', { disabled: true }), makeFile('c.ts')]
+      expect(applyFileManagerReorder(layer, [], 2, 1, layer)).toBeNull()
+    })
+
+    it('clamps roving focus onto the first enabled item', () => {
+      const items = [makeFile('a'), makeFile('b')]
+      expect(clampFileManagerFocusIndex(5, items)).toBe(0)
+    })
+
+    it('treats Backspace as navigate to the parent path', () => {
+      const action = resolveFileManagerItemKeydown({
+        key: 'Backspace',
+        viewMode: 'list',
+        gridColumns: 4,
+        currentIndex: 0,
+        items: [makeFile('a')],
+        currentPath: ['src']
+      })
+      expect(action).toEqual({ type: 'up', path: [] })
+    })
+  })
 
   describe('toFileDragItem', () => {
     it('converts FileItem to DragItem', () => {

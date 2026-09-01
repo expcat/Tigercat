@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
-import React from 'react'
+import React, { useState } from 'react'
 import { FileManager } from '@expcat/tigercat-react/FileManager'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import type { FileItem } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const files: FileItem[] = [
@@ -118,8 +120,9 @@ describe('FileManager (React)', () => {
   })
 
   it('shows loading overlay', () => {
-    const { getByText } = render(<FileManager files={files} loading />)
-    expect(getByText('Loading...')).toBeTruthy()
+    const { getByRole } = render(<FileManager files={files} loading />)
+    expect(getByRole('status')).toBeTruthy()
+    expect(getByRole('listbox')).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('renders search input when searchable', () => {
@@ -138,9 +141,14 @@ describe('FileManager (React)', () => {
     expect(queryByText('src')).toBeNull()
   })
 
-  it('has file path aria-label', () => {
-    const { container } = render(<FileManager files={files} />)
-    expect(container.querySelector('nav[aria-label="File path"]')).toBeTruthy()
+  it('names the breadcrumb from locale, not a hardcoded English string', () => {
+    const { getByRole } = render(
+      <ConfigProvider locale={zhCN}>
+        <FileManager files={files} />
+      </ConfigProvider>
+    )
+    expect(getByRole('navigation').getAttribute('aria-label')).toBe(zhCN.fileManager?.pathAriaLabel)
+    expect(getByRole('navigation').getAttribute('aria-label')).not.toBe('File path')
   })
 
   it('has listbox role', () => {
@@ -254,6 +262,113 @@ describe('FileManager (React)', () => {
     ]
     const { getByText } = render(<FileManager files={deepFiles} currentPath={['a', 'b']} />)
     expect(getByText('c.txt')).toBeTruthy()
+  })
+
+  it('enters a folder without a parent path handler', () => {
+    const { getByText, queryByText } = render(<FileManager files={files} />)
+    fireEvent.doubleClick(getByText('src'))
+    expect(getByText('index.ts')).toBeTruthy()
+    expect(queryByText('README.md')).toBeNull()
+  })
+
+  it('clears an uncontrolled search back to the full folder', () => {
+    const { getByText, queryByText, getByRole } = render(
+      <FileManager files={files} searchable showHidden />
+    )
+    const input = getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'README' } })
+    expect(queryByText('src')).toBeNull()
+    fireEvent.change(input, { target: { value: '' } })
+    expect(getByText('src')).toBeTruthy()
+  })
+
+  it('lets a controlled empty search query win over the previous filter', () => {
+    function Harness() {
+      const [text, setText] = useState('README')
+      return (
+        <FileManager
+          files={files}
+          searchable
+          showHidden
+          searchText={text}
+          onSearchTextChange={setText}
+        />
+      )
+    }
+    const { getByText, queryByText, getByRole } = render(<Harness />)
+    expect(queryByText('src')).toBeNull()
+    fireEvent.change(getByRole('textbox'), { target: { value: '' } })
+    expect(getByText('src')).toBeTruthy()
+  })
+
+  it('opens the second same-name folder by key', () => {
+    const dupes: FileItem[] = [
+      {
+        key: 'src-a',
+        name: 'src',
+        type: 'folder',
+        children: [{ key: 'first', name: 'first.ts', type: 'file' }]
+      },
+      {
+        key: 'src-b',
+        name: 'src',
+        type: 'folder',
+        children: [{ key: 'second', name: 'second.ts', type: 'file' }]
+      }
+    ]
+    const { getAllByText, getByText } = render(<FileManager files={dupes} />)
+    fireEvent.doubleClick(getAllByText('src')[1]!)
+    expect(getByText('second.ts')).toBeTruthy()
+  })
+
+  it('resets roving tabindex after entering a one-item folder', () => {
+    const { getAllByRole, getByText } = render(<FileManager files={files} showHidden />)
+    const options = getAllByRole('option')
+    fireEvent.keyDown(options[options.length - 1]!, { key: 'End' })
+    const folder = getByText('src').closest('[role="option"]') as HTMLElement
+    fireEvent.keyDown(folder, { key: 'Enter' })
+    const next = getAllByRole('option')
+    expect(next).toHaveLength(1)
+    expect(next[0]).toHaveAttribute('tabindex', '0')
+    expect(next[0]).toHaveTextContent('index.ts')
+  })
+
+  it('forwards style onto the root', () => {
+    const { container } = render(<FileManager files={files} style={{ height: 200 }} />)
+    expect(container.firstElementChild).toHaveStyle({ height: '200px' })
+  })
+
+  it('reorders the current folder on drop and keeps sibling folders', () => {
+    const onFilesChange = vi.fn()
+    const tree: FileItem[] = [
+      {
+        key: 'src',
+        name: 'src',
+        type: 'folder',
+        children: [
+          { key: 'a', name: 'a.ts', type: 'file' },
+          { key: 'b', name: 'b.ts', type: 'file' },
+          { key: 'c', name: 'c.ts', type: 'file' }
+        ]
+      },
+      { key: 'readme', name: 'README.md', type: 'file' }
+    ]
+    const { getByText } = render(
+      <FileManager files={tree} currentPath={['src']} draggable onFilesChange={onFilesChange} />
+    )
+    const dataTransfer = { setData: vi.fn(), effectAllowed: 'none', dropEffect: 'none' }
+    fireEvent.dragStart(getByText('c.ts').closest('[role="option"]')!, { dataTransfer })
+    fireEvent.dragOver(getByText('a.ts').closest('[role="option"]')!, { dataTransfer })
+    fireEvent.drop(getByText('a.ts').closest('[role="option"]')!, { dataTransfer })
+    expect(onFilesChange).toHaveBeenCalledOnce()
+    const next = onFilesChange.mock.calls[0][0] as FileItem[]
+    expect(next[0]?.children?.map((item) => item.name)).toEqual(['c.ts', 'a.ts', 'b.ts'])
+    expect(next[1]?.name).toBe('README.md')
+  })
+
+  it('lays out grid items with a public column count', () => {
+    const { getByRole } = render(<FileManager files={files} viewMode="grid" gridColumns={2} />)
+    expect(getByRole('listbox')).toHaveStyle({ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' })
   })
 
   it('breadcrumb shows all segments for deep path', () => {

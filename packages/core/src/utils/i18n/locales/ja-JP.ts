@@ -182,7 +182,11 @@ export const jaJP: TigerLocale = {
     nextYear: '翌年'
   },
   fileManager: {
-    rootText: 'ルート'
+    rootText: 'ルート',
+    pathAriaLabel: 'ファイルパス',
+    listboxAriaLabel: 'ファイル',
+    searchAriaLabel: 'ファイルを検索',
+    emptyText: '空のフォルダ'
   },
   imageViewer: {
     dialogAriaLabel: '画像ビューア',
@@ -224,6 +228,10 @@ export const jaJP: TigerLocale = {
     annotationEditorAriaLabel: '画像注釈エディタ',
     annotationCanvasAriaLabel: '画像注釈キャンバス',
     loadingAnnotationImageAriaLabel: '注釈用の画像を読み込み中',
+    loadAnnotationErrorAriaLabel: '注釈用の画像を読み込めませんでした',
+    defaultAnnotationAlt: '注釈する画像',
+    annotationShapeAriaLabel: '{type}の注釈',
+    annotationLabeledShapeAriaLabel: '{label}、{type}の注釈',
     selectToolText: '選択',
     rectangleToolText: '矩形',
     ellipseToolText: '楕円',

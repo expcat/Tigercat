@@ -1,28 +1,38 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getFileManagerContainerClasses,
   getFileItemClasses,
+  getFileManagerContentClasses,
+  getFileManagerGridStyle,
   deriveFileManagerModel,
   toggleFileSelection,
   resolveFileOpen,
-  sliceBreadcrumbPath,
+  buildFileBreadcrumb,
+  applyFileManagerReorder,
+  clampFileManagerFocusIndex,
+  resolveFileManagerItemKeydown,
+  resolveFileItemExtension,
+  resolveFileItemIcon,
   toFileDragItem,
-  reorderSequence,
   formatFileSizeLabel,
   getFileManagerLabels,
+  DEFAULT_FILE_COLUMNS,
+  DEFAULT_FILE_GRID_COLUMNS,
+  EMPTY_FILE_ITEMS,
+  EMPTY_FILE_PATH,
   fileManagerToolbarClasses,
   fileManagerBreadcrumbClasses,
+  fileManagerBreadcrumbListClasses,
   fileManagerBreadcrumbItemClasses,
+  fileManagerBreadcrumbCurrentClasses,
   fileManagerBreadcrumbSeparatorClasses,
-  fileManagerContentClasses,
   fileManagerItemIconClasses,
   fileManagerItemNameClasses,
   fileManagerItemMetaClasses,
   fileManagerEmptyClasses,
   fileManagerLoadingClasses,
   fileManagerSearchClasses,
-  resolveLocaleText,
   mergeTigerLocale,
   type FileItem,
   type FileManagerProps as CoreFileManagerProps
@@ -31,27 +41,33 @@ import { useControlledState } from '../hooks/useControlledState'
 import { useDrag } from '../hooks/useDrag'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface FileManagerProps extends CoreFileManagerProps {
+export interface FileManagerProps
+  extends
+    Omit<CoreFileManagerProps, 'className'>,
+    Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreFileManagerProps | 'onSelect'> {
   /** Custom icon renderer */
   renderIcon?: (item: FileItem) => React.ReactNode
 }
 
 export const FileManager: React.FC<FileManagerProps> = ({
-  files = [],
+  files,
   viewMode = 'list',
+  gridColumns = DEFAULT_FILE_GRID_COLUMNS,
   selectedKeys,
   defaultSelectedKeys,
   multiple = false,
   columns,
   sortField = 'name',
   sortOrder = 'asc',
-  currentPath = [],
+  currentPath,
+  defaultCurrentPath,
   showHidden = false,
   draggable = false,
   loading = false,
   emptyText,
   searchable = false,
-  searchText = '',
+  searchText,
+  defaultSearchText,
   className,
   onSelect,
   onOpen,
@@ -60,26 +76,42 @@ export const FileManager: React.FC<FileManagerProps> = ({
   onCurrentPathChange,
   onSearchTextChange,
   onReorder,
+  onFilesChange,
   renderIcon,
-  locale
+  locale,
+  style,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const [localSearch, setLocalSearch] = useState(searchText)
+  const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
+  const isRtl = mergedLocale?.direction === 'rtl'
+  const tree = files ?? EMPTY_FILE_ITEMS
   const [focusedIndex, setFocusedIndex] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
-  const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
   const [keys, setKeys] = useControlledState({
     value: selectedKeys,
     defaultValue: defaultSelectedKeys ?? [],
     onChange: onSelectedKeysChange
   })
+  const [path, setPath] = useControlledState({
+    value: currentPath,
+    defaultValue: defaultCurrentPath ?? EMPTY_FILE_PATH,
+    onChange: (next) => {
+      onCurrentPathChange?.(next)
+      onNavigate?.(next)
+    }
+  })
+  const [query, setQuery] = useControlledState({
+    value: searchText,
+    defaultValue: defaultSearchText ?? '',
+    onChange: onSearchTextChange
+  })
 
-  // Which meta columns the list view shows (name is always rendered).
-  const metaColumns = columns ?? ['size', 'modified']
+  const metaColumns = columns ?? DEFAULT_FILE_COLUMNS
   const showSizeColumn = metaColumns.includes('size')
   const showModifiedColumn = metaColumns.includes('modified')
   const showTypeColumn = metaColumns.includes('type')
@@ -87,90 +119,78 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const model = useMemo(
     () =>
       deriveFileManagerModel({
-        files,
-        currentPath,
+        files: tree,
+        currentPath: path,
         selectedKeys: keys,
         sortField,
         sortOrder,
         showHidden,
-        searchText: localSearch || searchText
+        searchText: query,
+        draggable
       }),
-    [files, currentPath, keys, sortField, sortOrder, showHidden, localSearch, searchText]
+    [tree, path, keys, sortField, sortOrder, showHidden, query, draggable]
   )
+
+  const viewKey = `${path.join('/')}\0${query}\0${model.processedItems.length}`
+  useEffect(() => {
+    setFocusedIndex(0)
+  }, [viewKey])
 
   const drag = useDrag({
     containerId: 'files',
     onDrop: (event) => {
-      if (event.fromIndex === event.toIndex) return
-      const next = reorderSequence(model.processedItems, event.fromIndex, event.toIndex)
-      onReorder?.(next, event.fromIndex, event.toIndex)
+      if (!model.canReorder) return
+      const result = applyFileManagerReorder(
+        tree,
+        path,
+        event.fromIndex,
+        event.toIndex,
+        model.currentItems
+      )
+      if (!result) return
+      onReorder?.(result.layer, event.fromIndex, event.toIndex)
+      onFilesChange?.(result.files)
     }
   })
 
   const containerClasses = useMemo(() => getFileManagerContainerClasses(className), [className])
+  const contentClass = getFileManagerContentClasses(viewMode)
+  const gridStyle = getFileManagerGridStyle(viewMode, gridColumns)
+  const breadcrumbs = useMemo(
+    () => buildFileBreadcrumb(tree, path, labels.rootText),
+    [tree, path, labels.rootText]
+  )
+  const focusedItem = clampFileManagerFocusIndex(focusedIndex, model.processedItems)
+
+  const commitPath = useCallback(
+    (next: string[]) => {
+      setPath(next)
+    },
+    [setPath]
+  )
 
   const handleSelect = useCallback(
     (item: FileItem) => {
-      if (item.disabled) return
+      if (loading || item.disabled) return
       onSelect?.(item)
       setKeys(toggleFileSelection(keys, item.key, multiple))
     },
-    [keys, multiple, onSelect, setKeys]
+    [keys, loading, multiple, onSelect, setKeys]
   )
 
   const handleOpen = useCallback(
     (item: FileItem) => {
-      const result = resolveFileOpen(item, currentPath)
+      if (loading) return
+      const result = resolveFileOpen(item, path)
       if (!result) return
       if (result.type === 'navigate') {
-        onCurrentPathChange?.(result.path!)
-        onNavigate?.(result.path!)
+        commitPath(result.path!)
       } else {
         onOpen?.(result.item!)
       }
     },
-    [currentPath, onOpen, onNavigate, onCurrentPathChange]
+    [commitPath, loading, onOpen, path]
   )
-
-  const navigateToBreadcrumb = useCallback(
-    (index: number) => {
-      const newPath = sliceBreadcrumbPath(currentPath, index)
-      onCurrentPathChange?.(newPath)
-      onNavigate?.(newPath)
-    },
-    [currentPath, onNavigate, onCurrentPathChange]
-  )
-
-  const breadcrumbItems = [
-    <span
-      key="root"
-      className={fileManagerBreadcrumbItemClasses}
-      onClick={() => navigateToBreadcrumb(0)}>
-      {labels.rootText}
-    </span>,
-    ...currentPath.flatMap((seg, i) => [
-      <span key={`sep-${i}`} className={fileManagerBreadcrumbSeparatorClasses}>
-        /
-      </span>,
-      <span
-        key={`path-${i}`}
-        className={fileManagerBreadcrumbItemClasses}
-        onClick={() => navigateToBreadcrumb(i + 1)}>
-        {seg}
-      </span>
-    ])
-  ]
-
-  const contentClass =
-    viewMode === 'grid'
-      ? `${fileManagerContentClasses} grid grid-cols-4 gap-2`
-      : fileManagerContentClasses
-
-  const firstEnabledIndex = model.processedItems.findIndex((item) => !item.disabled)
-  const focusedItem =
-    focusedIndex >= 0 && !model.processedItems[focusedIndex]?.disabled
-      ? focusedIndex
-      : firstEnabledIndex
 
   const focusItemAt = useCallback((index: number) => {
     requestAnimationFrame(() => {
@@ -178,106 +198,111 @@ export const FileManager: React.FC<FileManagerProps> = ({
     })
   }, [])
 
-  const moveFocus = useCallback(
-    (current: number, direction: 1 | -1) => {
-      if (model.processedItems.length === 0) return
-      let next = current
-      for (let i = 0; i < model.processedItems.length; i += 1) {
-        next = (next + direction + model.processedItems.length) % model.processedItems.length
-        if (!model.processedItems[next]?.disabled) {
-          setFocusedIndex(next)
-          focusItemAt(next)
-          return
-        }
-      }
-    },
-    [focusItemAt, model.processedItems]
-  )
-
   const handleItemKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>, item: FileItem, index: number) => {
-      switch (event.key) {
-        case 'ArrowDown':
-        case 'ArrowRight':
-          event.preventDefault()
-          moveFocus(index, 1)
-          return
-        case 'ArrowUp':
-        case 'ArrowLeft':
-          event.preventDefault()
-          moveFocus(index, -1)
-          return
-        case 'Home':
-          event.preventDefault()
-          if (firstEnabledIndex >= 0) {
-            setFocusedIndex(firstEnabledIndex)
-            focusItemAt(firstEnabledIndex)
-          }
-          return
-        case 'End': {
-          event.preventDefault()
-          let lastEnabledIndex = -1
-          for (let next = model.processedItems.length - 1; next >= 0; next -= 1) {
-            if (!model.processedItems[next]?.disabled) {
-              lastEnabledIndex = next
-              break
-            }
-          }
-          if (lastEnabledIndex >= 0) {
-            setFocusedIndex(lastEnabledIndex)
-            focusItemAt(lastEnabledIndex)
-          }
-          return
-        }
-        case ' ':
-          event.preventDefault()
-          handleSelect(item)
-          return
-        case 'Enter':
-          event.preventDefault()
-          handleSelect(item)
-          handleOpen(item)
-          return
-        default:
-          return
+      if (loading) return
+      const action = resolveFileManagerItemKeydown({
+        key: event.key,
+        altKey: event.altKey,
+        viewMode,
+        gridColumns,
+        isRtl,
+        currentIndex: index,
+        items: model.processedItems,
+        currentPath: path
+      })
+      if (!action) return
+      event.preventDefault()
+      if (action.type === 'move' || action.type === 'home' || action.type === 'end') {
+        setFocusedIndex(action.index)
+        focusItemAt(action.index)
+        return
       }
+      if (action.type === 'select') {
+        handleSelect(item)
+        return
+      }
+      if (action.type === 'open') {
+        handleSelect(item)
+        handleOpen(item)
+        return
+      }
+      commitPath(action.path)
     },
-    [firstEnabledIndex, focusItemAt, handleOpen, handleSelect, model.processedItems, moveFocus]
+    [
+      commitPath,
+      focusItemAt,
+      gridColumns,
+      handleOpen,
+      handleSelect,
+      isRtl,
+      loading,
+      model.processedItems,
+      path,
+      viewMode
+    ]
   )
 
   const handleDragStart = useCallback(
     (event: React.DragEvent<HTMLDivElement>, item: FileItem, index: number) => {
-      if (!draggable || item.disabled) return
+      if (!model.canReorder || item.disabled) return
       drag.startDrag(toFileDragItem(item, index, 'files'), event)
     },
-    [draggable, drag]
+    [drag, model.canReorder]
   )
 
   const handleDragOver = useCallback(
     (event: React.DragEvent<HTMLDivElement>, item: FileItem, index: number) => {
-      if (!draggable) return
+      if (!model.canReorder || item.disabled) return
       drag.dragOver(toFileDragItem(item, index, 'files'), event)
     },
-    [draggable, drag]
+    [drag, model.canReorder]
   )
 
+  const emptyLabel = emptyText ?? labels.emptyText
+  const loadingLabel = mergedLocale?.common?.loadingText
+
   return (
-    <div className={classNames(containerClasses)}>
+    <div
+      {...rest}
+      className={classNames(containerClasses)}
+      style={style}
+      aria-busy={loading || undefined}>
       <div className={fileManagerToolbarClasses}>
-        <nav className={fileManagerBreadcrumbClasses} aria-label="File path">
-          {breadcrumbItems}
+        <nav className={fileManagerBreadcrumbClasses} aria-label={labels.pathAriaLabel}>
+          <ol className={fileManagerBreadcrumbListClasses}>
+            {breadcrumbs.map((segment, index) => (
+              <li key={segment.key || 'root'} className="flex items-center gap-1">
+                {index > 0 ? (
+                  <span className={fileManagerBreadcrumbSeparatorClasses} aria-hidden="true">
+                    /
+                  </span>
+                ) : null}
+                {segment.current ? (
+                  <span className={fileManagerBreadcrumbCurrentClasses} aria-current="page">
+                    {segment.name}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className={fileManagerBreadcrumbItemClasses}
+                    onClick={() => commitPath(segment.path)}>
+                    {segment.name}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ol>
         </nav>
         <div className="flex-1" />
         {searchable && (
           <input
             type="text"
             className={fileManagerSearchClasses}
-            placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
-            value={localSearch}
-            onChange={(e) => {
-              setLocalSearch(e.target.value)
-              onSearchTextChange?.(e.target.value)
-            }}
+            placeholder={mergedLocale?.common?.searchPlaceholder}
+            aria-label={labels.searchAriaLabel}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
           />
         )}
       </div>
@@ -286,18 +311,23 @@ export const FileManager: React.FC<FileManagerProps> = ({
         <div
           ref={contentRef}
           className={contentClass}
+          style={gridStyle}
           role="listbox"
-          aria-multiselectable={multiple}>
+          aria-label={labels.listboxAriaLabel}
+          aria-multiselectable={multiple || undefined}
+          aria-disabled={loading || undefined}>
           {model.processedItems.map((item, index) => {
             const isSelected = model.selectedSet.has(item.key)
-            const itemClass = getFileItemClasses(viewMode, isSelected)
+            const itemClass = getFileItemClasses(viewMode, isSelected, Boolean(item.disabled))
+            const canDrag = model.canReorder && !item.disabled
             return (
               <div
                 key={item.key}
                 className={itemClass}
                 role="option"
                 aria-selected={isSelected}
-                tabIndex={!item.disabled && index === focusedItem ? 0 : -1}
+                aria-disabled={item.disabled || undefined}
+                tabIndex={!loading && !item.disabled && index === focusedItem ? 0 : -1}
                 data-option-index={index}
                 data-disabled={item.disabled || undefined}
                 data-drag-id={item.key}
@@ -309,21 +339,23 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 onKeyDown={(event) => handleItemKeyDown(event, item, index)}
                 onClick={() => handleSelect(item)}
                 onDoubleClick={() => handleOpen(item)}
-                draggable={draggable && !item.disabled}
-                onDragStart={(event) => handleDragStart(event, item, index)}
-                onDragOver={draggable ? (event) => handleDragOver(event, item, index) : undefined}
-                onDrop={draggable ? (event) => drag.drop(event) : undefined}
-                onDragEnd={draggable ? () => drag.endDrag() : undefined}>
+                draggable={canDrag}
+                onDragStart={canDrag ? (event) => handleDragStart(event, item, index) : undefined}
+                onDragOver={canDrag ? (event) => handleDragOver(event, item, index) : undefined}
+                onDrop={canDrag ? (event) => drag.drop(event) : undefined}
+                onDragEnd={canDrag ? () => drag.endDrag() : undefined}>
                 {renderIcon ? (
                   renderIcon(item)
                 ) : (
                   <span className={fileManagerItemIconClasses} aria-hidden="true">
-                    {item.type === 'folder' ? '📁' : '📄'}
+                    {resolveFileItemIcon(item)}
                   </span>
                 )}
                 <span className={fileManagerItemNameClasses}>{item.name}</span>
                 {viewMode === 'list' && showTypeColumn && (
-                  <span className={fileManagerItemMetaClasses}>{item.extension ?? item.type}</span>
+                  <span className={fileManagerItemMetaClasses}>
+                    {resolveFileItemExtension(item) || item.type}
+                  </span>
                 )}
                 {viewMode === 'list' && showSizeColumn && item.size !== undefined && (
                   <span className={fileManagerItemMetaClasses}>
@@ -338,14 +370,12 @@ export const FileManager: React.FC<FileManagerProps> = ({
           })}
         </div>
       ) : (
-        <div className={fileManagerEmptyClasses}>
-          {resolveLocaleText('Empty folder', emptyText, mergedLocale?.common?.emptyText)}
-        </div>
+        <div className={fileManagerEmptyClasses}>{emptyLabel}</div>
       )}
 
       {loading && (
-        <div className={fileManagerLoadingClasses}>
-          {resolveLocaleText('Loading...', mergedLocale?.common?.loadingText)}
+        <div className={fileManagerLoadingClasses} role="status">
+          {loadingLabel}
         </div>
       )}
     </div>

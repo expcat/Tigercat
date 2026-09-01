@@ -255,6 +255,10 @@ export interface TigerLocaleCalendar {
 
 export interface TigerLocaleFileManager {
   rootText?: string
+  pathAriaLabel?: string
+  listboxAriaLabel?: string
+  searchAriaLabel?: string
+  emptyText?: string
 }
 
 export interface TigerLocaleImageViewer {
@@ -300,6 +304,10 @@ export interface TigerLocaleImageEditor {
   annotationEditorAriaLabel?: string
   annotationCanvasAriaLabel?: string
   loadingAnnotationImageAriaLabel?: string
+  loadAnnotationErrorAriaLabel?: string
+  defaultAnnotationAlt?: string
+  annotationShapeAriaLabel?: string
+  annotationLabeledShapeAriaLabel?: string
   selectToolText?: string
   rectangleToolText?: string
   ellipseToolText?: string
