@@ -67,7 +67,7 @@ const exampleProjects = [
     name: 'nextjs example',
     dir: path.join(examplesDir, 'nextjs'),
     buildArgs: ['run', 'build'],
-    prepare: prepareStandardExample
+    prepare: prepareNextExample
   }
 ]
 
@@ -244,12 +244,21 @@ function copyDir(sourceDir, destinationDir) {
   })
 }
 
+function prepareNextExample(exampleDir, tarballs) {
+  prepareStandardExample(exampleDir, tarballs)
+  rewriteTailwindEntry(path.join(exampleDir, 'app', 'globals.css'), '@expcat/tigercat-react')
+}
+
 function prepareVueExample(exampleDir, tarballs) {
   prepareStandardExample(exampleDir, tarballs)
   embedSharedFixture(exampleDir)
   rewriteViteExampleConfig(path.join(exampleDir, 'vite.config.ts'))
   rewriteTsconfig(path.join(exampleDir, 'tsconfig.json'))
   rewriteTailwindEntry(path.join(exampleDir, 'src', 'style.css'), '@expcat/tigercat-vue')
+  rewriteTailwindEntry(
+    path.join(exampleDir, '.publish-shared', 'sandbox.css'),
+    '@expcat/tigercat-vue'
+  )
 }
 
 function prepareReactExample(exampleDir, tarballs) {
@@ -258,6 +267,10 @@ function prepareReactExample(exampleDir, tarballs) {
   rewriteViteExampleConfig(path.join(exampleDir, 'vite.config.ts'))
   rewriteTsconfig(path.join(exampleDir, 'tsconfig.json'))
   rewriteTailwindEntry(path.join(exampleDir, 'src', 'index.css'), '@expcat/tigercat-react')
+  rewriteTailwindEntry(
+    path.join(exampleDir, '.publish-shared', 'sandbox.css'),
+    '@expcat/tigercat-react'
+  )
 }
 
 function embedSharedFixture(exampleDir) {
@@ -376,22 +389,22 @@ function rewriteTsconfig(filePath) {
 }
 
 function rewriteTailwindEntry(filePath, frameworkPackageName) {
+  if (!existsSync(filePath)) {
+    throw new Error(`Missing Tailwind entry ${filePath}`)
+  }
+
   const source = readFileSync(filePath, 'utf-8')
   const next = source
     .replace(
-      '@plugin "../../../../packages/core/src/tailwind-plugin.ts";',
+      /@plugin\s+['"][^'"]*packages\/core\/src\/tailwind-plugin\.ts['"]\s*;/,
       '@plugin "@expcat/tigercat-core/tailwind/modern";'
     )
     .replace(
-      '@source "../../../../packages/vue/src";',
+      /@source\s+['"][^'"]*packages\/(?:vue|react)\/(?:src|dist)['"]\s*;/g,
       `@source "../node_modules/${frameworkPackageName}/dist/**/*.{js,mjs}";`
     )
     .replace(
-      '@source "../../../../packages/react/src";',
-      `@source "../node_modules/${frameworkPackageName}/dist/**/*.{js,mjs}";`
-    )
-    .replace(
-      '@source "../../../../packages/core/src";',
+      /@source\s+['"][^'"]*packages\/core\/(?:src|dist)['"]\s*;/g,
       '@source "../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}";'
     )
 
