@@ -11,10 +11,17 @@ const chartData = [
   { x: 'Hydration', y: 24 },
   { x: 'Nuxt', y: 16 }
 ]
+
+useHead({
+  htmlAttrs: {
+    lang: 'zh-CN',
+    dir: 'ltr'
+  }
+})
 </script>
 
 <template>
-  <ConfigProvider :locale="zhCN">
+  <ConfigProvider :locale="zhCN" color-scheme="light">
     <main class="ssr-shell">
       <section class="ssr-panel">
         <p class="eyebrow">Nuxt 3 SSR</p>
