@@ -2,14 +2,21 @@ import { describe, expect, it } from 'vitest'
 import {
   clampImageAnnotationPoint,
   createImageAnnotationBox,
+  createImageAnnotationId,
   createImageAnnotationPath,
+  finishImageAnnotationDraw,
+  getAnnotationDisplaySize,
   getImageAnnotationCenter,
   getImageAnnotationPathData,
   getImageAnnotationPointFromClient,
+  getImageAnnotationShapeAriaLabel,
   getImageAnnotationToolButtonClasses,
+  getImageEditorLabels,
   getNextImageAnnotationTool,
   normalizeImageAnnotationBox,
-  shouldCommitImageAnnotationBox
+  shouldCommitImageAnnotationBox,
+  shouldCommitImageAnnotationPath,
+  startImageAnnotationDraw
 } from '@expcat/tigercat-core'
 
 describe('image-annotation-utils', () => {
@@ -134,5 +141,38 @@ describe('image-annotation-utils', () => {
     expect(getNextImageAnnotationTool('select', ['select', 'rectangle'])).toBe('rectangle')
     expect(getNextImageAnnotationTool('rectangle', ['select', 'rectangle'])).toBe('select')
     expect(getNextImageAnnotationTool('freehand', ['rectangle'])).toBe('rectangle')
+  })
+
+  it('does not reuse ids that already exist on the value', () => {
+    const id = createImageAnnotationId('rectangle', ['rectangle-1', 'ellipse-1'])
+    expect(id).not.toBe('rectangle-1')
+    expect(id.startsWith('rectangle-')).toBe(true)
+  })
+
+  it('fits the image to the host width and allows upscale', () => {
+    expect(getAnnotationDisplaySize(800, 600, 400)).toEqual({ width: 400, height: 300 })
+    expect(getAnnotationDisplaySize(100, 50, 400)).toEqual({ width: 400, height: 200 })
+  })
+
+  it('rejects a freehand stroke that never moved', () => {
+    const drawing = startImageAnnotationDraw('freehand', { x: 0.2, y: 0.2 })
+    expect(shouldCommitImageAnnotationPath(drawing.points, 0.01)).toBe(false)
+    expect(finishImageAnnotationDraw(drawing, { x: 0.2, y: 0.2 }, 'freehand-1', 0.01)).toBeNull()
+  })
+
+  it('names shapes from locale templates', () => {
+    const labels = getImageEditorLabels()
+    expect(
+      getImageAnnotationShapeAriaLabel(
+        { id: 'a', type: 'rectangle', x: 0, y: 0, width: 0.1, height: 0.1 },
+        labels
+      )
+    ).toBe('Rectangle annotation')
+    expect(
+      getImageAnnotationShapeAriaLabel(
+        { id: 'a', type: 'rectangle', x: 0, y: 0, width: 0.1, height: 0.1, label: 'Face' },
+        labels
+      )
+    ).toBe('Face, Rectangle annotation')
   })
 })

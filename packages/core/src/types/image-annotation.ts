@@ -32,8 +32,12 @@ export interface ImageAnnotationPath extends ImageAnnotationBase {
 
 export type ImageAnnotation = ImageAnnotationBox | ImageAnnotationPath
 
+/**
+ * Emitted with `onChange`. Select / deselect goes through `onSelect`.
+ * The select tool only selects and deletes — it does not move or resize.
+ */
 export interface ImageAnnotationChangeMeta {
-  type: 'add' | 'update' | 'remove' | 'select' | 'clear'
+  type: 'add' | 'remove'
   annotation?: ImageAnnotation
 }
 
@@ -43,11 +47,18 @@ export interface ImageAnnotationProps {
   alt?: string
   value?: ImageAnnotation[]
   defaultValue?: ImageAnnotation[]
+  /**
+   * Controlled selected id. `undefined` is uncontrolled; `''` is controlled none.
+   */
   selectedId?: string
   defaultSelectedId?: string
   tool?: ImageAnnotationTool
   defaultTool?: ImageAnnotationTool
   tools?: ImageAnnotationTool[]
+  /**
+   * Disables drawing, selection, and tab stops on shapes.
+   * `readonly` still allows selection.
+   */
   disabled?: boolean
   readonly?: boolean
   minSize?: number
