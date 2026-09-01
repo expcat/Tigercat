@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { RadarChart } from '@expcat/tigercat-vue/RadarChart'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const singleSeriesData = [
   { label: 'A', value: 80 },
@@ -36,10 +36,10 @@ describe('RadarChart', () => {
 
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(RadarChart, { data: singleSeriesData })
-    await expectNoA11yViolationsIsolated(container)
+    await expectNoA11yViolations(container)
   })
 
-  it('labels points and makes them keyboard-focusable when interactive (C27-4)', () => {
+  it('uses a single tab stop when interactive', () => {
     const { container } = renderWithProps(RadarChart, {
       data: singleSeriesData,
       hoverable: true,
@@ -47,16 +47,18 @@ describe('RadarChart', () => {
     })
     const points = container.querySelectorAll('circle[data-radar-point]')
     expect(points[0].getAttribute('role')).toBe('button')
-    expect(points[0].getAttribute('aria-label')).toBe('A')
     expect(points[0].getAttribute('tabindex')).toBe('0')
+    expect(points[1].getAttribute('tabindex')).toBe('-1')
   })
 
-  it('labels points as images (non-focusable) when not interactive (C27-4)', () => {
-    const { container } = renderWithProps(RadarChart, { data: singleSeriesData })
+  it('hides decorative points from the accessibility tree when tooltip is off', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      showTooltip: false
+    })
     const point = container.querySelector('circle[data-radar-point]')!
-    expect(point.getAttribute('role')).toBe('img')
-    expect(point.getAttribute('aria-label')).toBe('A')
-    expect(point.getAttribute('tabindex')).toBeNull()
+    expect(point.getAttribute('aria-hidden')).toBe('true')
+    expect(point.getAttribute('role')).toBeNull()
   })
   it('applies hover highlight opacity', () => {
     const { container } = renderWithProps(RadarChart, {
@@ -89,11 +91,6 @@ describe('RadarChart', () => {
     const points = container.querySelectorAll('circle[data-radar-point]')
     expect(points).toHaveLength(3)
 
-    // Each point should have cursor-pointer class
-    points.forEach((point) => {
-      expect(point.getAttribute('class')).toContain('cursor-pointer')
-    })
-
     // Hover over a point to show tooltip
     await user.hover(points[0])
 
@@ -101,18 +98,6 @@ describe('RadarChart', () => {
     await vi.waitFor(() => {
       const tooltip = document.querySelector('[data-chart-tooltip]')
       expect(tooltip).toBeTruthy()
-    })
-
-    // When showTooltip is false, points should not be hoverable
-    const { container: noTooltip } = renderWithProps(RadarChart, {
-      data: singleSeriesData.slice(0, 2),
-      showTooltip: false,
-      hoverable: true
-    })
-    const noTooltipPoints = noTooltip.querySelectorAll('circle[data-radar-point]')
-    noTooltipPoints.forEach((point) => {
-      const className = point.getAttribute('class') || ''
-      expect(className).not.toContain('cursor-pointer')
     })
   })
 
@@ -123,7 +108,6 @@ describe('RadarChart', () => {
     })
 
     const point = container.querySelector('circle[data-radar-point][data-point-index="0"]')!
-    expect(point.getAttribute('class') || '').not.toContain('cursor-pointer')
     await fireEvent.mouseEnter(point)
     const tooltip = document.body.querySelector('[data-chart-tooltip]')
     expect(tooltip).toBeTruthy()

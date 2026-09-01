@@ -3,24 +3,30 @@ import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
   classNames,
-  createCircleRingPath,
-  createPolygonPath,
-  createPolygonRingPath,
+  coerceClassValue,
   getChartGridLineDasharray,
-  getChartInnerRect,
-  getRadarAngles,
   getStableChartGradientPrefix,
-  getRadarLabelAlign,
-  getRadarPoints,
-  polarToCartesian,
-  RADAR_SPLIT_AREA_COLORS,
   resolveChartPalette,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
   buildChartSeriesKeys,
-  resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultRadarTooltipFormatter,
+  getCartesianChartShellClasses,
+  chartPointTabIndex,
+  flattenChartPoints,
+  nextChartPointRef,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
+  defaultChartSeriesName,
+  formatChartTemplate,
+  layoutRadar,
+  findNearestPointIndex,
+  polarToCartesian,
+  DEFAULT_POLAR_CHART_PADDING,
+  type ChartGridLineStyle,
+  type ChartLegendPosition,
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
@@ -28,125 +34,63 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
-import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueRadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
   series?: RadarChartSeries[]
   padding?: ChartPadding
+  onSeriesClick?: (index: number, series: RadarChartSeries) => void
 }
+
+export type RadarChartProps = VueRadarChartProps
 
 export const RadarChart = defineComponent({
   name: 'TigerRadarChart',
+  inheritAttrs: false,
   props: {
-    width: {
-      type: Number,
-      default: 320
-    },
-    height: {
-      type: Number,
-      default: 200
-    },
+    width: { type: Number, default: 320 },
+    height: { type: Number, default: 200 },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
-      default: 24
+      default: DEFAULT_POLAR_CHART_PADDING
     },
-    data: {
-      type: Array as PropType<RadarChartDatum[]>
-    },
-    series: {
-      type: Array as PropType<RadarChartSeries[]>
-    },
-    maxValue: {
-      type: Number
-    },
-    startAngle: {
-      type: Number,
-      default: -Math.PI / 2
-    },
-    levels: {
-      type: Number,
-      default: 5
-    },
-    showLevelLabels: {
-      type: Boolean,
-      default: false
-    },
-    showGrid: {
-      type: Boolean,
-      default: true
-    },
-    showAxis: {
-      type: Boolean,
-      default: true
-    },
-    showLabels: {
-      type: Boolean,
-      default: true
-    },
-    labelOffset: {
-      type: Number,
-      default: 12
-    },
+    responsive: { type: Boolean, default: false },
+    data: { type: Array as PropType<RadarChartDatum[]> },
+    series: { type: Array as PropType<RadarChartSeries[]> },
+    indicators: { type: Array as PropType<string[]> },
+    maxValue: { type: Number },
+    startAngle: { type: Number, default: -Math.PI / 2 },
+    levels: { type: Number, default: 5 },
+    showLevelLabels: { type: Boolean, default: false },
+    showGrid: { type: Boolean, default: true },
+    showAxis: { type: Boolean, default: true },
+    showLabels: { type: Boolean, default: true },
+    labelOffset: { type: Number, default: 12 },
     labelFormatter: {
       type: Function as PropType<(datum: RadarChartDatum, index: number) => string>
     },
     levelLabelFormatter: {
       type: Function as PropType<(value: number, level: number) => string>
     },
-    levelLabelOffset: {
-      type: Number,
-      default: 8
-    },
-    hoverable: {
-      type: Boolean,
-      default: false
-    },
-    hoveredIndex: {
-      type: Number as PropType<number | null>,
-      default: undefined
-    },
-    activeOpacity: {
-      type: Number,
-      default: 1
-    },
-    inactiveOpacity: {
-      type: Number,
-      default: 0.25
-    },
-    selectable: {
-      type: Boolean,
-      default: false
-    },
-    selectedIndex: {
-      type: Number as PropType<number | null>,
-      default: undefined
-    },
-    showLegend: {
-      type: Boolean,
-      default: false
-    },
-    legendPosition: {
-      type: String as PropType<'bottom' | 'right'>,
-      default: 'bottom'
-    },
+    levelLabelOffset: { type: Number, default: 8 },
+    hoverable: { type: Boolean, default: false },
+    hoveredIndex: { type: Number as PropType<number | null>, default: undefined },
+    activeOpacity: { type: Number, default: 1 },
+    inactiveOpacity: { type: Number, default: 0.25 },
+    selectable: { type: Boolean, default: false },
+    selectedIndex: { type: Number as PropType<number | null>, default: undefined },
+    showLegend: { type: Boolean, default: false },
+    legendPosition: { type: String as PropType<ChartLegendPosition>, default: 'bottom' },
     legendFormatter: {
       type: Function as PropType<(series: RadarChartSeries, index: number) => string>
     },
-    legendMarkerSize: {
-      type: Number,
-      default: 10
-    },
-    legendGap: {
-      type: Number,
-      default: 8
-    },
-    showTooltip: {
-      type: Boolean,
-      default: true
-    },
+    legendMarkerSize: { type: Number, default: 10 },
+    legendGap: { type: Number, default: 8 },
+    showTooltip: { type: Boolean, default: true },
     tooltipFormatter: {
       type: Function as PropType<
         (
@@ -157,110 +101,39 @@ export const RadarChart = defineComponent({
         ) => string
       >
     },
-    colors: {
-      type: Array as PropType<string[]>
-    },
-    gridLineStyle: {
-      type: String as PropType<'solid' | 'dashed' | 'dotted'>,
-      default: 'solid'
-    },
-    gridStrokeWidth: {
-      type: Number,
-      default: 1
-    },
-    strokeColor: {
-      type: String
-    },
-    strokeWidth: {
-      type: Number,
-      default: 2
-    },
-    fillColor: {
-      type: String
-    },
-    fillOpacity: {
-      type: Number,
-      default: 0.2
-    },
-    showPoints: {
-      type: Boolean,
-      default: true
-    },
-    pointSize: {
-      type: Number,
-      default: 3
-    },
-    pointColor: {
-      type: String
-    },
-    gridShape: {
-      type: String as PropType<'polygon' | 'circle'>,
-      default: 'polygon'
-    },
-    showSplitArea: {
-      type: Boolean,
-      default: false
-    },
-    gradient: {
-      type: Boolean,
-      default: false
-    },
-    strokeGradient: {
-      type: Boolean,
-      default: false
-    },
-    pointGradient: {
-      type: Boolean,
-      default: false
-    },
-    splitAreaOpacity: {
-      type: Number,
-      default: 0.06
-    },
-    splitAreaColors: {
-      type: Array as PropType<string[]>
-    },
-    pointBorderWidth: {
-      type: Number,
-      default: 2
-    },
-    pointBorderColor: {
-      type: String,
-      default: 'var(--tiger-surface,#ffffff)'
-    },
-    pointHoverSize: {
-      type: Number as PropType<number | undefined>,
-      default: undefined
-    },
-    labelAutoAlign: {
-      type: Boolean,
-      default: true
-    },
-    title: {
-      type: String
-    },
-    desc: {
-      type: String
-    },
-    className: {
-      type: String
+    colors: { type: Array as PropType<string[]> },
+    gridLineStyle: { type: String as PropType<ChartGridLineStyle>, default: 'solid' },
+    gridStrokeWidth: { type: Number, default: 1 },
+    strokeColor: { type: String },
+    strokeWidth: { type: Number, default: 2 },
+    fillColor: { type: String },
+    fillOpacity: { type: Number, default: 0.2 },
+    showPoints: { type: Boolean, default: true },
+    pointSize: { type: Number, default: 3 },
+    pointColor: { type: String },
+    gridShape: { type: String as PropType<'polygon' | 'circle'>, default: 'polygon' },
+    showSplitArea: { type: Boolean, default: false },
+    gradient: { type: Boolean, default: false },
+    strokeGradient: { type: Boolean, default: false },
+    pointGradient: { type: Boolean, default: false },
+    splitAreaOpacity: { type: Number, default: 0.06 },
+    splitAreaColors: { type: Array as PropType<string[]> },
+    pointBorderWidth: { type: Number, default: 2 },
+    pointBorderColor: { type: String, default: 'var(--tiger-surface,#ffffff)' },
+    pointHoverSize: { type: Number },
+    labelAutoAlign: { type: Boolean, default: true },
+    title: { type: String },
+    desc: { type: String },
+    className: { type: String },
+    onSeriesClick: {
+      type: Function as PropType<(index: number, series: RadarChartSeries) => void>
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'series-click', 'series-hover'],
-  setup(props, { emit }) {
-    // Unique gradient prefix for radar area fills (avoid id collision across instances)
-    const gradientPrefix = getStableChartGradientPrefix('radar', useId())
-
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
-
-    const radius = computed(() =>
-      Math.max(0, Math.min(innerRect.value.width, innerRect.value.height) / 2)
-    )
-
-    const cx = computed(() => innerRect.value.width / 2)
-    const cy = computed(() => innerRect.value.height / 2)
-
-    const resolvedSeries = computed<RadarChartSeries[]>(() =>
+  setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const resolvedSeries = computed(() =>
       resolveSeriesData<RadarChartDatum, RadarChartSeries>(props.series, props.data, {
         data: [] as RadarChartDatum[]
       } as Partial<Omit<RadarChartSeries, 'data'>>)
@@ -268,10 +141,16 @@ export const RadarChart = defineComponent({
     const seriesKeys = computed(() =>
       buildChartSeriesKeys(resolvedSeries.value, { prefix: 'radar-' })
     )
+    const interactive = computed(
+      () => props.hoverable || props.selectable || typeof props.onSeriesClick === 'function'
+    )
+    const trackPointer = computed(() => props.showTooltip || props.hoverable)
+    const focusable = interactive
+    const hoveredPoint = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
+    const activePoint = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
+    const gradientPrefix = getStableChartGradientPrefix('radar', useId())
 
-    // Use shared interaction composable
     const {
-      resolvedHoveredIndex: _resolvedHoveredIndex,
       resolvedSelectedIndex,
       activeIndex: resolvedActiveIndex,
       tooltipPosition,
@@ -281,8 +160,7 @@ export const RadarChart = defineComponent({
       handleClick: handleSelectIndex,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave,
-      wrapperClasses
+      handleLegendLeave
     } = useChartInteraction<RadarChartSeries>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -292,586 +170,454 @@ export const RadarChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
+      getData: (index) => resolvedSeries.value[index],
+      onHoveredIndexChange: (index) => {
+        emit('update:hoveredIndex', index)
+        emit('series-hover', index, index !== null ? resolvedSeries.value[index] : null)
+      },
       onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
-      getData: (index: number) => resolvedSeries.value[index],
-      onHover: (index, datum) => emit('series-hover', index, datum),
-      onClick: (index, datum) => emit('series-click', index, datum)
+      onClick: (index, item) => {
+        if (item) {
+          props.onSeriesClick?.(index, item)
+          emit('series-click', index, item)
+        }
+      }
     })
 
-    // Point-level hover state for tooltip
-    const hoveredPoint = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
-
-    const handlePointEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
-      if (!props.hoverable && !props.showTooltip) return
-      hoveredPoint.value = { seriesIndex, pointIndex }
-      handleHoverEnter(seriesIndex, event)
-    }
-
-    const handlePointMove = (event: MouseEvent) => {
-      handleMouseMove(event)
-    }
-
-    const handlePointLeave = () => {
-      hoveredPoint.value = null
-      handleHoverLeave()
-    }
-
-    // Keyboard/focus tooltip: synthesize a pointer position from the point's
-    // on-screen rect so focused points show the same tooltip as hovered ones.
-    const showPointTooltipFromElement = (
-      el: SVGGraphicsElement,
-      seriesIndex: number,
-      pointIndex: number
-    ) => {
-      if (!props.hoverable) return
-      const rect = el.getBoundingClientRect()
-      hoveredPoint.value = { seriesIndex, pointIndex }
-      handleHoverEnter(seriesIndex, {
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2
-      } as MouseEvent)
-    }
-
-    const axisData = computed(() => {
-      if (props.series && props.series.length > 0) return props.series[0]?.data ?? []
-      return props.data ?? []
-    })
-
-    const resolvedMaxValue = computed(() => {
-      if (typeof props.maxValue === 'number') return Math.max(0, props.maxValue)
-      const values = resolvedSeries.value.flatMap((item) => item.data.map((datum) => datum.value))
-      const computedMax = values.length > 0 ? Math.max(...values) : 0
-      return computedMax > 0 ? computedMax : 1
-    })
-
-    const angles = computed(() => getRadarAngles(axisData.value.length, props.startAngle))
-
-    const seriesPoints = computed(() =>
-      resolvedSeries.value.map((item, seriesIndex) => ({
-        series: item,
-        seriesKey: seriesKeys.value[seriesIndex],
-        points: getRadarPoints(item.data, {
-          cx: cx.value,
-          cy: cy.value,
-          radius: radius.value,
-          startAngle: props.startAngle,
-          maxValue: resolvedMaxValue.value
-        })
-      }))
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
     )
-
-    const gridPaths = computed(() => {
-      if (!props.showGrid || angles.value.length === 0) return []
-      const resolvedLevels = Math.max(1, Math.floor(props.levels))
-
-      return Array.from({ length: resolvedLevels }, (_, index) => {
-        const levelRadius = radius.value * ((index + 1) / resolvedLevels)
-        if (props.gridShape === 'circle') {
-          return { type: 'circle' as const, cx: cx.value, cy: cy.value, r: levelRadius }
-        }
-        const ringPoints = angles.value.map((angle) =>
-          polarToCartesian(cx.value, cy.value, levelRadius, angle)
-        )
-        return {
-          type: 'polygon' as const,
-          d: createPolygonPath(ringPoints),
-          cx: cx.value,
-          cy: cy.value,
-          r: levelRadius
-        }
-      })
-    })
-
-    const splitAreaPaths = computed(() => {
-      if (!props.showSplitArea || angles.value.length === 0) return []
-      const resolvedLevels = Math.max(1, Math.floor(props.levels))
-      const areaColors =
-        props.splitAreaColors && props.splitAreaColors.length > 0
-          ? props.splitAreaColors
-          : RADAR_SPLIT_AREA_COLORS
-
-      // Build rings from outermost to innermost
-      return Array.from({ length: resolvedLevels }, (_, index) => {
-        const outerIndex = resolvedLevels - 1 - index
-        const outerRadius = radius.value * ((outerIndex + 1) / resolvedLevels)
-        const innerRadius = radius.value * (outerIndex / resolvedLevels)
-        const color = areaColors[outerIndex % areaColors.length]
-
-        if (props.gridShape === 'circle') {
-          return {
-            type: 'circle-ring' as const,
-            cx: cx.value,
-            cy: cy.value,
-            outerRadius,
-            innerRadius,
-            color
-          }
-        }
-        const outerPoints = angles.value.map((angle) =>
-          polarToCartesian(cx.value, cy.value, outerRadius, angle)
-        )
-        const innerPoints =
-          outerIndex > 0
-            ? angles.value.map((angle) => polarToCartesian(cx.value, cy.value, innerRadius, angle))
-            : []
-        return { type: 'polygon-ring' as const, outerPoints, innerPoints, color }
-      })
-    })
-
-    const axisLines = computed(() => {
-      if (!props.showAxis || angles.value.length === 0) return []
-      return angles.value.map((angle) => {
-        const end = polarToCartesian(cx.value, cy.value, radius.value, angle)
-        return {
-          x1: cx.value,
-          y1: cy.value,
-          x2: end.x,
-          y2: end.y
-        }
-      })
-    })
-
-    const labels = computed(() => {
-      if (!props.showLabels || angles.value.length === 0) return []
-      const formatLabel =
-        props.labelFormatter ?? ((datum: RadarChartDatum) => datum.label ?? `${datum.value}`)
-
-      return axisData.value.map((datum, index) => {
-        const angle = angles.value[index]
-        const position = polarToCartesian(
-          cx.value,
-          cy.value,
-          radius.value + props.labelOffset,
-          angle
-        )
-        const align = props.labelAutoAlign
-          ? getRadarLabelAlign(angle)
-          : { textAnchor: 'middle' as const, dominantBaseline: 'middle' as const }
-        return {
-          x: position.x,
-          y: position.y,
-          text: formatLabel(datum, index),
-          textAnchor: align.textAnchor,
-          dominantBaseline: align.dominantBaseline
-        }
-      })
-    })
-
-    const levelLabels = computed(() => {
-      if (!props.showLevelLabels || !props.showGrid || angles.value.length === 0) return []
-      const resolvedLevels = Math.max(1, Math.floor(props.levels))
-      const formatLevel = props.levelLabelFormatter ?? ((value: number) => `${value}`)
-
-      return Array.from({ length: resolvedLevels }, (_, index) => {
-        const ratio = (index + 1) / resolvedLevels
-        const value = resolvedMaxValue.value * ratio
-        const position = polarToCartesian(
-          cx.value,
-          cy.value,
-          radius.value * ratio + props.levelLabelOffset,
-          props.startAngle
-        )
-
-        return {
-          x: position.x,
-          y: position.y,
-          text: formatLevel(value, index)
-        }
-      })
-    })
-
-    const dasharray = computed(() => getChartGridLineDasharray(props.gridLineStyle))
     const palette = computed(() => resolveChartPalette(props.colors))
-
-    const tooltipContent = computed(() =>
-      resolveMultiSeriesTooltipContent(
-        hoveredPoint.value,
-        resolvedSeries.value,
-        props.tooltipFormatter,
-        defaultRadarTooltipFormatter
+    const laid = computed(() =>
+      layoutRadar(resolvedSeries.value, {
+        innerWidth: innerRect.value.width,
+        innerHeight: innerRect.value.height,
+        startAngle: props.startAngle,
+        maxValue: props.maxValue,
+        levels: props.levels,
+        gridShape: props.gridShape,
+        palette: palette.value,
+        gradient: props.gradient,
+        gradientPrefix,
+        indicators: props.indicators,
+        showLabels: props.showLabels,
+        showGrid: props.showGrid,
+        showAxis: props.showAxis,
+        showSplitArea: props.showSplitArea,
+        showLevelLabels: props.showLevelLabels,
+        labelOffset: props.labelOffset,
+        levelLabelOffset: props.levelLabelOffset,
+        labelFormatter: props.labelFormatter,
+        levelLabelFormatter: props.levelLabelFormatter,
+        labelAutoAlign: props.labelAutoAlign,
+        strokeColor: props.strokeColor,
+        fillColor: props.fillColor,
+        fillOpacity: props.fillOpacity,
+        splitAreaColors: props.splitAreaColors,
+        seriesKeys: seriesKeys.value,
+        activeIndex: resolvedActiveIndex.value,
+        activeOpacity: props.activeOpacity,
+        inactiveOpacity: props.inactiveOpacity
+      })
+    )
+    const flatPoints = computed(() =>
+      flattenChartPoints(
+        laid.value.series.map((item) => ({
+          seriesIndex: item.seriesIndex,
+          points: item.points.map((point) => ({ pointIndex: point.index }))
+        }))
       )
     )
-
+    const seriesName = (item: RadarChartSeries, index: number) =>
+      item.name ?? defaultChartSeriesName(index, labels.value.seriesName)
+    const tooltipContent = computed(() => {
+      const hovered = hoveredPoint.value
+      if (!hovered) return ''
+      const seriesItem = laid.value.series[hovered.seriesIndex]
+      const point = seriesItem?.points.find((item) => item.index === hovered.pointIndex)
+      if (!point) return ''
+      if (props.tooltipFormatter) {
+        return props.tooltipFormatter(
+          point.datum,
+          hovered.seriesIndex,
+          hovered.pointIndex,
+          seriesItem.series
+        )
+      }
+      return defaultRadarTooltipFormatter(
+        point.datum,
+        hovered.seriesIndex,
+        hovered.pointIndex,
+        seriesItem.series,
+        labels.value.seriesName
+      )
+    })
     const legendItems = computed(() =>
       buildChartLegendItems<RadarChartSeries>({
         data: resolvedSeries.value,
         palette: palette.value,
         activeIndex: resolvedActiveIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
-        getLabel: (s, i) =>
-          props.legendFormatter ? props.legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
-        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
+        getLabel: (item, index) =>
+          props.legendFormatter ? props.legendFormatter(item, index) : seriesName(item, index),
+        getColor: (item, index) => item.color ?? palette.value[index % palette.value.length]
       })
     )
 
     return () => {
+      const layout = laid.value
+      const dasharray = getChartGridLineDasharray(props.gridLineStyle)
+      const focusableMarks = focusable.value
+      const handlePointEnter = (
+        seriesIndex: number,
+        pointIndex: number,
+        event: MouseEvent | FocusEvent
+      ) => {
+        if (!trackPointer.value) return
+        hoveredPoint.value = { seriesIndex, pointIndex }
+        handleHoverEnter(seriesIndex, event)
+      }
+      const handlePointLeave = () => {
+        hoveredPoint.value = null
+        handleHoverLeave()
+      }
+      const handleAreaMove = (seriesIndex: number, event: MouseEvent) => {
+        if (!trackPointer.value) return
+        const path = event.currentTarget as SVGPathElement
+        const svg = path.ownerSVGElement
+        if (!svg) return
+        const ctm = path.getScreenCTM()
+        if (!ctm) return
+        const pt = svg.createSVGPoint()
+        pt.x = event.clientX
+        pt.y = event.clientY
+        const loc = pt.matrixTransform(ctm.inverse())
+        const axisPoints = layout.angles.map((angle) =>
+          polarToCartesian(layout.cx, layout.cy, layout.radius, angle)
+        )
+        const pointIndex = findNearestPointIndex(axisPoints, loc.x, loc.y)
+        if (pointIndex === null) return
+        hoveredPoint.value = { seriesIndex, pointIndex }
+        handleHoverEnter(seriesIndex, event)
+        handleMouseMove(event)
+      }
+      const handlePointKeyDown = (
+        event: KeyboardEvent,
+        seriesIndex: number,
+        pointIndex: number
+      ) => {
+        if (isChartNavigationKey(event.key)) {
+          event.preventDefault()
+          const next = nextChartPointRef({ seriesIndex, pointIndex }, event.key, flatPoints.value)
+          if (!next) return
+          activePoint.value = next
+          const node = (event.currentTarget as SVGElement).ownerSVGElement?.querySelector(
+            `[data-radar-point][data-series-index="${next.seriesIndex}"][data-point-index="${next.pointIndex}"]`
+          )
+          if (node instanceof SVGElement) node.focus()
+          return
+        }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          handleSelectIndex(seriesIndex)
+        }
+      }
+
+      const defs =
+        props.gradient || props.strokeGradient || props.pointGradient
+          ? h(
+              'defs',
+              null,
+              layout.series.flatMap((item) => {
+                const nodes = []
+                if (props.gradient) {
+                  nodes.push(
+                    h(
+                      'linearGradient',
+                      {
+                        id: `${gradientPrefix}-${item.seriesKey}`,
+                        gradientUnits: 'userSpaceOnUse',
+                        x1: layout.cx,
+                        y1: layout.cy - layout.radius,
+                        x2: layout.cx,
+                        y2: layout.cy + layout.radius
+                      },
+                      [
+                        h('stop', {
+                          offset: '0%',
+                          'stop-color': item.color,
+                          'stop-opacity': String(item.fillOpacity)
+                        }),
+                        h('stop', {
+                          offset: '100%',
+                          'stop-color': `color-mix(in oklab, var(--tiger-bg,#ffffff) 35%, ${item.color})`,
+                          'stop-opacity': '0.02'
+                        })
+                      ]
+                    )
+                  )
+                }
+                if (props.strokeGradient) {
+                  nodes.push(
+                    h(
+                      'linearGradient',
+                      {
+                        id: `${gradientPrefix}-stroke-${item.seriesKey}`,
+                        gradientUnits: 'userSpaceOnUse',
+                        x1: layout.cx,
+                        y1: layout.cy - layout.radius,
+                        x2: layout.cx,
+                        y2: layout.cy + layout.radius
+                      },
+                      [
+                        h('stop', {
+                          offset: '0%',
+                          'stop-color': `color-mix(in oklab, var(--tiger-bg,#ffffff) 20%, ${item.stroke})`
+                        }),
+                        h('stop', { offset: '50%', 'stop-color': item.stroke }),
+                        h('stop', {
+                          offset: '100%',
+                          'stop-color': `color-mix(in oklab, var(--tiger-text,#111827) 12%, ${item.stroke})`
+                        })
+                      ]
+                    )
+                  )
+                }
+                if (props.pointGradient) {
+                  nodes.push(
+                    h('radialGradient', { id: `${gradientPrefix}-point-${item.seriesKey}` }, [
+                      h('stop', {
+                        offset: '0%',
+                        'stop-color': `color-mix(in oklab, var(--tiger-bg,#ffffff) 30%, ${item.color})`
+                      }),
+                      h('stop', { offset: '100%', 'stop-color': item.color })
+                    ])
+                  )
+                }
+                return nodes
+              })
+            )
+          : null
+
       const chart = h(
         ChartCanvas,
         {
           width: props.width,
           height: props.height,
           padding: props.padding,
+          responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          onResolvedSizeChange
         },
         {
-          default: () =>
-            [
-              // Gradient defs for area fills
-              props.gradient || props.strokeGradient || props.pointGradient
-                ? h('defs', null, [
-                    ...(props.gradient
-                      ? seriesPoints.value.map((item, seriesIndex) => {
-                          const seriesColor =
-                            item.series.color ?? palette.value[seriesIndex % palette.value.length]
-                          const resolvedFillColor =
-                            item.series.fillColor ??
-                            seriesColor ??
-                            props.fillColor ??
-                            palette.value[0]
-                          const resolvedFillOpacity = item.series.fillOpacity ?? props.fillOpacity
-                          return h(
-                            'linearGradient',
-                            {
-                              key: `radar-grad-${item.seriesKey}`,
-                              id: `${gradientPrefix}-${item.seriesKey}`,
-                              x1: '0',
-                              y1: '0',
-                              x2: '0',
-                              y2: '1'
-                            },
-                            [
-                              h('stop', {
-                                offset: '0%',
-                                'stop-color': resolvedFillColor,
-                                'stop-opacity': resolvedFillOpacity
-                              }),
-                              h('stop', {
-                                offset: '100%',
-                                'stop-color': resolvedFillColor,
-                                'stop-opacity': 0.02
-                              })
-                            ]
-                          )
-                        })
-                      : []),
-                    ...(props.strokeGradient
-                      ? seriesPoints.value.map((item, seriesIndex) => {
-                          const seriesColor =
-                            item.series.color ?? palette.value[seriesIndex % palette.value.length]
-                          const resolvedStrokeColor =
-                            item.series.strokeColor ??
-                            seriesColor ??
-                            props.strokeColor ??
-                            palette.value[0]
-                          return h(
-                            'linearGradient',
-                            {
-                              key: `radar-stroke-grad-${item.seriesKey}`,
-                              id: `${gradientPrefix}-stroke-${item.seriesKey}`,
-                              x1: '0',
-                              y1: '0',
-                              x2: '0',
-                              y2: '1'
-                            },
-                            [
-                              h('stop', {
-                                offset: '0%',
-                                'stop-color': `color-mix(in oklab, ${resolvedStrokeColor} 100%, white 12%)`
-                              }),
-                              h('stop', {
-                                offset: '50%',
-                                'stop-color': resolvedStrokeColor
-                              }),
-                              h('stop', {
-                                offset: '100%',
-                                'stop-color': `color-mix(in oklab, ${resolvedStrokeColor} 100%, black 8%)`
-                              })
-                            ]
-                          )
-                        })
-                      : []),
-                    ...(props.pointGradient
-                      ? seriesPoints.value.map((item, seriesIndex) => {
-                          const seriesColor =
-                            item.series.color ?? palette.value[seriesIndex % palette.value.length]
-                          const resolvedPointColor =
-                            item.series.pointColor ??
-                            seriesColor ??
-                            props.pointColor ??
-                            palette.value[0]
-                          return h(
-                            'radialGradient',
-                            {
-                              key: `radar-point-grad-${item.seriesKey}`,
-                              id: `${gradientPrefix}-point-${item.seriesKey}`,
-                              cx: '0.5',
-                              cy: '0.5',
-                              r: '0.5'
-                            },
-                            [
-                              h('stop', {
-                                offset: '0%',
-                                'stop-color': `color-mix(in oklab, ${resolvedPointColor} 100%, white 30%)`
-                              }),
-                              h('stop', {
-                                offset: '70%',
-                                'stop-color': resolvedPointColor
-                              }),
-                              h('stop', {
-                                offset: '100%',
-                                'stop-color': `color-mix(in oklab, ${resolvedPointColor} 100%, black 12%)`
-                              })
-                            ]
-                          )
-                        })
-                      : [])
-                  ])
-                : null,
-              // Split area (alternating fills – evenodd ring, transparent inner)
-              ...splitAreaPaths.value.map((area, index) => {
-                const shared = {
-                  key: `split-${index}`,
-                  fill: area.color,
-                  'fill-opacity': props.splitAreaOpacity,
-                  stroke: 'none',
-                  'data-radar-split-area': 'true'
-                }
-                if (area.type === 'circle-ring') {
-                  if (area.innerRadius > 0) {
-                    return h('path', {
-                      ...shared,
-                      d: createCircleRingPath(area.cx, area.cy, area.outerRadius, area.innerRadius),
-                      'fill-rule': 'evenodd'
-                    })
-                  }
-                  return h('circle', {
-                    ...shared,
-                    cx: area.cx,
-                    cy: area.cy,
-                    r: area.outerRadius
+          default: () => [
+            defs,
+            ...layout.splitAreas.map((area, index) =>
+              h('path', {
+                key: `split-${index}`,
+                d: area.d,
+                fill: area.color,
+                'fill-opacity': props.splitAreaOpacity,
+                'fill-rule': 'evenodd',
+                stroke: 'none',
+                'data-radar-split-area': 'true',
+                'aria-hidden': 'true'
+              })
+            ),
+            ...layout.grid.map((grid, index) =>
+              grid.type === 'circle'
+                ? h('circle', {
+                    key: `grid-${index}`,
+                    cx: grid.cx,
+                    cy: grid.cy,
+                    r: grid.r,
+                    class: chartGridLineClasses,
+                    fill: 'none',
+                    'stroke-width': props.gridStrokeWidth,
+                    'stroke-dasharray': dasharray,
+                    'aria-hidden': 'true'
                   })
-                }
-                if (area.innerPoints.length > 0) {
-                  const d = createPolygonRingPath(area.outerPoints, area.innerPoints)
-                  return d ? h('path', { ...shared, d, 'fill-rule': 'evenodd' }) : null
-                }
-                const d = createPolygonPath(area.outerPoints)
-                return d ? h('path', { ...shared, d }) : null
-              }),
-              // Grid lines
-              ...gridPaths.value.map((grid, index) =>
-                grid.type === 'circle'
-                  ? h('circle', {
-                      key: `grid-${index}`,
-                      cx: grid.cx,
-                      cy: grid.cy,
-                      r: grid.r,
-                      class: chartGridLineClasses,
-                      fill: 'none',
-                      'stroke-width': props.gridStrokeWidth,
-                      'stroke-dasharray': dasharray.value
+                : h('path', {
+                    key: `grid-${index}`,
+                    d: grid.d,
+                    class: chartGridLineClasses,
+                    fill: 'none',
+                    'stroke-width': props.gridStrokeWidth,
+                    'stroke-dasharray': dasharray,
+                    'aria-hidden': 'true'
+                  })
+            ),
+            ...layout.axes.map((line, index) =>
+              h('line', {
+                key: `axis-${index}`,
+                x1: line.x1,
+                y1: line.y1,
+                x2: line.x2,
+                y2: line.y2,
+                class: chartGridLineClasses,
+                'stroke-width': props.gridStrokeWidth,
+                'stroke-dasharray': dasharray,
+                'aria-hidden': 'true'
+              })
+            ),
+            ...layout.series.map((item) => {
+              const showSeriesPoints = item.series.showPoints ?? props.showPoints
+              const resolvedPointSize = item.series.pointSize ?? props.pointSize
+              const resolvedPointColor = item.series.pointColor ?? props.pointColor ?? item.color
+              const points = showSeriesPoints
+                ? item.points.map((point) => {
+                    const isHovered =
+                      hoveredPoint.value?.seriesIndex === item.seriesIndex &&
+                      hoveredPoint.value?.pointIndex === point.index
+                    const currentSize = isHovered
+                      ? (props.pointHoverSize ?? resolvedPointSize + 2)
+                      : resolvedPointSize
+                    return h('circle', {
+                      key: `point-${item.seriesKey}-${point.index}`,
+                      cx: point.x,
+                      cy: point.y,
+                      r: currentSize,
+                      fill: props.pointGradient
+                        ? `url(#${gradientPrefix}-point-${item.seriesKey})`
+                        : (point.datum.color ?? resolvedPointColor),
+                      stroke: item.series.pointBorderColor ?? props.pointBorderColor,
+                      'stroke-width': item.series.pointBorderWidth ?? props.pointBorderWidth,
+                      class: 'transition-[r] duration-150 ease-out motion-reduce:transition-none',
+                      'aria-hidden': focusableMarks ? undefined : true,
+                      tabindex: focusableMarks
+                        ? chartPointTabIndex(
+                            item.seriesIndex,
+                            point.index,
+                            activePoint.value,
+                            flatPoints.value
+                          )
+                        : undefined,
+                      role: focusableMarks ? 'button' : undefined,
+                      'aria-label': focusableMarks
+                        ? formatChartTemplate(labels.value.pointAriaLabel, {
+                            index: point.index + 1,
+                            x: seriesName(item.series, item.seriesIndex),
+                            y: point.value
+                          })
+                        : undefined,
+                      'data-radar-point': 'true',
+                      'data-series-index': item.seriesIndex,
+                      'data-point-index': point.index,
+                      onMouseenter: (e: MouseEvent) =>
+                        handlePointEnter(item.seriesIndex, point.index, e),
+                      onMousemove: handleMouseMove,
+                      onMouseleave: handlePointLeave,
+                      onFocus: (e: FocusEvent) =>
+                        handlePointEnter(item.seriesIndex, point.index, e),
+                      onClick: () => handleSelectIndex(item.seriesIndex),
+                      onKeydown: (e: KeyboardEvent) =>
+                        handlePointKeyDown(e, item.seriesIndex, point.index)
                     })
-                  : h('path', {
-                      key: `grid-${index}`,
-                      d: grid.d,
-                      class: chartGridLineClasses,
-                      fill: 'none',
-                      'stroke-width': props.gridStrokeWidth,
-                      'stroke-dasharray': dasharray.value
+                  })
+                : item.points.map((point) =>
+                    h('circle', {
+                      key: `hit-${item.seriesKey}-${point.index}`,
+                      cx: point.x,
+                      cy: point.y,
+                      r: 8,
+                      fill: 'transparent',
+                      'aria-hidden': 'true',
+                      tabindex: focusableMarks
+                        ? chartPointTabIndex(
+                            item.seriesIndex,
+                            point.index,
+                            activePoint.value,
+                            flatPoints.value
+                          )
+                        : undefined,
+                      'data-radar-point': 'true',
+                      'data-series-index': item.seriesIndex,
+                      'data-point-index': point.index,
+                      onFocus: (e: FocusEvent) =>
+                        handlePointEnter(item.seriesIndex, point.index, e),
+                      onKeydown: (e: KeyboardEvent) =>
+                        handlePointKeyDown(e, item.seriesIndex, point.index)
                     })
-              ),
-              ...axisLines.value.map((line, index) =>
-                h('line', {
-                  key: `axis-${index}`,
-                  x1: line.x1,
-                  y1: line.y1,
-                  x2: line.x2,
-                  y2: line.y2,
-                  class: chartGridLineClasses,
-                  'stroke-width': props.gridStrokeWidth,
-                  'stroke-dasharray': dasharray.value
-                })
-              ),
-              ...seriesPoints.value.map((item, seriesIndex) => {
-                const seriesColor =
-                  item.series.color ?? palette.value[seriesIndex % palette.value.length]
-                const resolvedStrokeColor =
-                  item.series.strokeColor ?? seriesColor ?? props.strokeColor ?? palette.value[0]
-                const resolvedFillColor =
-                  item.series.fillColor ?? seriesColor ?? props.fillColor ?? palette.value[0]
-                const resolvedFillOpacity = item.series.fillOpacity ?? props.fillOpacity
-                const resolvedStrokeWidth = item.series.strokeWidth ?? props.strokeWidth
-                const resolvedShowPoints = item.series.showPoints ?? props.showPoints
-                const resolvedPointSize = item.series.pointSize ?? props.pointSize
-                const resolvedPointColor = item.series.pointColor ?? seriesColor ?? props.pointColor
-                const areaPath = createPolygonPath(
-                  item.points.map((point) => ({ x: point.x, y: point.y }))
-                )
-                const resolvedOpacity =
-                  resolvedActiveIndex.value === null
-                    ? undefined
-                    : seriesIndex === resolvedActiveIndex.value
-                      ? props.activeOpacity
-                      : props.inactiveOpacity
-
-                return h(
-                  ChartSeries,
-                  {
-                    key: item.seriesKey,
-                    data: item.series.data,
-                    name: item.series.name,
-                    type: 'radar',
-                    'data-series-key': item.seriesKey,
-                    class: classNames(
-                      item.series.className,
-                      props.hoverable || props.selectable ? 'cursor-pointer' : null
-                    ),
-                    opacity: resolvedOpacity,
-                    onMouseenter: props.hoverable
-                      ? (e: MouseEvent) => handleHoverEnter(seriesIndex, e)
-                      : undefined,
-                    onMouseleave: props.hoverable ? handleHoverLeave : undefined,
-                    onClick: props.selectable ? () => handleSelectIndex(seriesIndex) : undefined,
-                    tabindex: props.selectable ? 0 : undefined,
-                    onKeydown: (event: KeyboardEvent) => {
-                      if (!props.selectable) return
-                      if (event.key !== 'Enter' && event.key !== ' ') return
+                  )
+              return h(
+                'g',
+                {
+                  key: item.seriesKey,
+                  'data-series-type': 'radar',
+                  'data-series-key': item.seriesKey,
+                  'data-series-name': item.series.name,
+                  opacity: item.opacity,
+                  onMouseenter: (e: MouseEvent) => handleHoverEnter(item.seriesIndex, e),
+                  onMouseleave: handlePointLeave,
+                  onClick: () => handleSelectIndex(item.seriesIndex),
+                  onKeydown: (event: KeyboardEvent) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()
-                      handleSelectIndex(seriesIndex)
+                      handleSelectIndex(item.seriesIndex)
                     }
-                  },
-                  {
-                    default: () => [
-                      areaPath
-                        ? h('path', {
-                            d: areaPath,
-                            fill: props.gradient
-                              ? `url(#${gradientPrefix}-${item.seriesKey})`
-                              : resolvedFillColor,
-                            'fill-opacity': props.gradient ? 1 : resolvedFillOpacity,
-                            stroke: props.strokeGradient
-                              ? `url(#${gradientPrefix}-stroke-${item.seriesKey})`
-                              : resolvedStrokeColor,
-                            'stroke-width': resolvedStrokeWidth,
-                            'stroke-linejoin': 'round',
-                            class: 'transition-[fill-opacity,filter] duration-200 ease-out',
-                            style:
-                              resolvedActiveIndex.value === seriesIndex
-                                ? { filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))' }
-                                : undefined,
-                            'data-radar-area': 'true',
-                            'data-series-index': seriesIndex,
-                            'data-series-key': item.seriesKey
-                          })
-                        : null,
-                      resolvedShowPoints
-                        ? item.points.map((point) => {
-                            const isHoveredPoint =
-                              hoveredPoint.value?.seriesIndex === seriesIndex &&
-                              hoveredPoint.value?.pointIndex === point.index
-                            const hoverSize = props.pointHoverSize ?? resolvedPointSize + 2
-                            const currentSize = isHoveredPoint
-                              ? hoverSize
-                              : (point.data.size ?? resolvedPointSize)
-                            const resolvedBorderWidth =
-                              item.series.pointBorderWidth ?? props.pointBorderWidth
-                            const resolvedBorderColor =
-                              item.series.pointBorderColor ?? props.pointBorderColor
-                            return h('circle', {
-                              key: `point-${item.seriesKey}-${point.index}`,
-                              cx: point.x,
-                              cy: point.y,
-                              r: currentSize,
-                              fill: props.pointGradient
-                                ? `url(#${gradientPrefix}-point-${item.seriesKey})`
-                                : (point.data.color ?? resolvedPointColor ?? resolvedStrokeColor),
-                              stroke: resolvedBorderColor,
-                              'stroke-width': resolvedBorderWidth,
-                              class: classNames(
-                                props.showTooltip && props.hoverable ? 'cursor-pointer' : null,
-                                'transition-[r] duration-150 ease-out'
-                              ),
-                              role: props.showTooltip && props.hoverable ? 'button' : 'img',
-                              'aria-label': point.data.label ?? String(point.data.value),
-                              tabindex: props.showTooltip && props.hoverable ? 0 : undefined,
-                              'data-radar-point': 'true',
-                              'data-series-index': seriesIndex,
-                              'data-series-key': item.seriesKey,
-                              'data-point-index': point.index,
-                              onMouseenter:
-                                props.showTooltip || props.hoverable
-                                  ? (e: MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
-                                  : undefined,
-                              onMousemove:
-                                props.showTooltip || props.hoverable ? handlePointMove : undefined,
-                              onMouseleave:
-                                props.showTooltip || props.hoverable ? handlePointLeave : undefined,
-                              onFocus:
-                                props.showTooltip && props.hoverable
-                                  ? (e: FocusEvent) =>
-                                      showPointTooltipFromElement(
-                                        e.currentTarget as unknown as SVGGraphicsElement,
-                                        seriesIndex,
-                                        point.index
-                                      )
-                                  : undefined,
-                              onBlur:
-                                props.showTooltip && props.hoverable ? handlePointLeave : undefined,
-                              onKeydown:
-                                props.showTooltip && props.hoverable
-                                  ? (e: KeyboardEvent) => {
-                                      if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault()
-                                        showPointTooltipFromElement(
-                                          e.currentTarget as unknown as SVGGraphicsElement,
-                                          seriesIndex,
-                                          point.index
-                                        )
-                                      } else if (e.key === 'Escape') {
-                                        handlePointLeave()
-                                      }
-                                    }
-                                  : undefined
-                            })
-                          })
-                        : null
-                    ]
                   }
-                )
-              }),
-              ...labels.value.map((label, index) =>
-                h(
-                  'text',
-                  {
-                    key: `label-${index}`,
-                    x: label.x,
-                    y: label.y,
-                    class: chartAxisTickTextClasses,
-                    'text-anchor': label.textAnchor,
-                    'dominant-baseline': label.dominantBaseline
-                  },
-                  label.text
-                )
-              ),
-              ...levelLabels.value.map((label, index) =>
-                h(
-                  'text',
-                  {
-                    key: `level-${index}`,
-                    x: label.x,
-                    y: label.y,
-                    class: chartAxisTickTextClasses,
-                    'text-anchor': 'middle',
-                    'dominant-baseline': 'middle',
-                    'data-radar-level-label': 'true'
-                  },
-                  label.text
-                )
+                },
+                [
+                  item.path
+                    ? h('path', {
+                        d: item.path,
+                        fill: item.fill,
+                        'fill-opacity': props.gradient ? 1 : item.fillOpacity,
+                        stroke: props.strokeGradient
+                          ? `url(#${gradientPrefix}-stroke-${item.seriesKey})`
+                          : item.stroke,
+                        'stroke-width': item.series.strokeWidth ?? props.strokeWidth,
+                        'stroke-linejoin': 'round',
+                        class: classNames(
+                          'motion-reduce:transition-none',
+                          interactive.value && 'cursor-pointer'
+                        ),
+                        'data-radar-area': 'true',
+                        'data-series-index': item.seriesIndex,
+                        onMouseenter: (e: MouseEvent) => handleHoverEnter(item.seriesIndex, e),
+                        onMousemove: (e: MouseEvent) => handleAreaMove(item.seriesIndex, e),
+                        onMouseleave: handlePointLeave,
+                        onClick: () => handleSelectIndex(item.seriesIndex)
+                      })
+                    : null,
+                  ...points
+                ]
               )
-            ].filter(Boolean)
+            }),
+            ...layout.labels.map((label, index) =>
+              h(
+                'text',
+                {
+                  key: `label-${index}`,
+                  x: label.x,
+                  y: label.y,
+                  'text-anchor': label.textAnchor,
+                  'dominant-baseline': label.dominantBaseline,
+                  class: chartAxisTickTextClasses,
+                  'aria-hidden': 'true'
+                },
+                label.text
+              )
+            ),
+            ...layout.levelLabels.map((label, index) =>
+              h(
+                'text',
+                {
+                  key: `level-${index}`,
+                  x: label.x,
+                  y: label.y,
+                  class: chartAxisTickTextClasses,
+                  'aria-hidden': 'true',
+                  'data-radar-level-label': ''
+                },
+                label.text
+              )
+            )
+          ]
         }
       )
 
@@ -884,24 +630,34 @@ export const RadarChart = defineComponent({
           })
         : null
 
-      if (!props.showLegend) {
-        return h('div', { class: 'inline-block relative' }, [chart, tooltip])
-      }
-
-      return h('div', { class: wrapperClasses.value }, [
-        chart,
-        h(ChartLegend, {
-          items: legendItems.value,
-          orientation: chartLegendOrientationFromPosition(props.legendPosition),
-          markerSize: props.legendMarkerSize,
-          gap: props.legendGap,
-          interactive: props.hoverable || props.selectable,
-          onItemClick: handleLegendClick,
-          onItemHover: handleLegendHover,
-          onItemLeave: handleLegendLeave
-        }),
-        tooltip
-      ])
+      return h(
+        'div',
+        {
+          class: getCartesianChartShellClasses({
+            showLegend: props.showLegend,
+            legendPosition: props.legendPosition,
+            responsive: props.responsive,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
+        },
+        [
+          chart,
+          props.showLegend
+            ? h(ChartLegend, {
+                items: legendItems.value,
+                orientation: chartLegendOrientationFromPosition(props.legendPosition),
+                markerSize: props.legendMarkerSize,
+                gap: props.legendGap,
+                interactive: props.hoverable || props.selectable,
+                ariaLabel: labels.value.legendAriaLabel,
+                onItemClick: handleLegendClick,
+                onItemHover: handleLegendHover,
+                onItemLeave: handleLegendLeave
+              })
+            : null,
+          tooltip
+        ]
+      )
     }
   }
 })

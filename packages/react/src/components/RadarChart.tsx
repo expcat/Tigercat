@@ -1,26 +1,29 @@
-import React, { useId, useMemo, useState, useCallback } from 'react'
+import React, { useCallback, useId, useMemo, useState } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
   classNames,
-  createCircleRingPath,
-  createPolygonPath,
-  createPolygonRingPath,
   getChartGridLineDasharray,
-  getChartInnerRect,
-  getRadarAngles,
   getStableChartGradientPrefix,
-  getRadarLabelAlign,
-  getRadarPoints,
-  polarToCartesian,
-  RADAR_SPLIT_AREA_COLORS,
   resolveChartPalette,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
   buildChartSeriesKeys,
-  resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultRadarTooltipFormatter,
+  getCartesianChartShellClasses,
+  chartPointTabIndex,
+  flattenChartPoints,
+  nextChartPointRef,
+  isChartNavigationKey,
+  getChartLabels,
+  mergeTigerLocale,
+  defaultChartSeriesName,
+  formatChartTemplate,
+  layoutRadar,
+  findNearestPointIndex,
+  polarToCartesian,
+  DEFAULT_POLAR_CHART_PADDING,
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
@@ -28,30 +31,15 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
-import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface RadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
   series?: RadarChartSeries[]
   padding?: ChartPadding
-  showLevelLabels?: boolean
-  levelLabelFormatter?: (value: number, level: number) => string
-  levelLabelOffset?: number
-  gridShape?: 'polygon' | 'circle'
-  showSplitArea?: boolean
-  splitAreaOpacity?: number
-  splitAreaColors?: string[]
-  gradient?: boolean
-  strokeGradient?: boolean
-  pointGradient?: boolean
-  pointBorderWidth?: number
-  pointBorderColor?: string
-  pointHoverSize?: number
-  labelAutoAlign?: boolean
-  title?: string
-  desc?: string
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
   onSeriesClick?: (index: number, series: RadarChartSeries) => void
@@ -61,9 +49,11 @@ export interface RadarChartProps extends CoreRadarChartProps {
 export const RadarChart: React.FC<RadarChartProps> = ({
   width = 320,
   height = 200,
-  padding = 24,
+  padding = DEFAULT_POLAR_CHART_PADDING,
+  responsive = false,
   data,
   series,
+  indicators,
   maxValue,
   startAngle = -Math.PI / 2,
   levels = 5,
@@ -117,7 +107,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   desc,
   className
 }) => {
-  // Resolve series first (needed for hook callbacks)
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
   const resolvedSeries = useMemo<RadarChartSeries[]>(
     () =>
       resolveSeriesData<RadarChartDatum, RadarChartSeries>(series, data, {
@@ -129,10 +120,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     () => buildChartSeriesKeys(resolvedSeries, { prefix: 'radar-' }),
     [resolvedSeries]
   )
+  const interactive = hoverable || selectable || Boolean(onSeriesClick)
+  const trackPointer = showTooltip || hoverable
+  const focusable = interactive
 
-  // Use shared interaction hook for series-based interaction
   const {
-    resolvedHoveredIndex: _resolvedHoveredIndex,
     resolvedSelectedIndex,
     activeIndex: resolvedActiveIndex,
     tooltipPosition,
@@ -142,8 +134,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleClick: handleSelectIndex,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave,
-    wrapperClasses
+    handleLegendLeave
   } = useChartInteraction<RadarChartSeries>({
     hoverable,
     showTooltip,
@@ -159,31 +150,115 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       onSeriesHover?.(index, index !== null ? resolvedSeries[index] : null)
     },
     onSelectedIndexChange,
-    onClick: (index, series) => {
-      if (series) onSeriesClick?.(index, series)
+    onClick: (index, item) => {
+      if (item) onSeriesClick?.(index, item)
     }
   })
 
-  // Point-level hover state for tooltip
   const [hoveredPoint, setHoveredPoint] = useState<{
     seriesIndex: number
     pointIndex: number
   } | null>(null)
+  const [activePoint, setActivePoint] = useState<{
+    seriesIndex: number
+    pointIndex: number
+  } | null>(null)
+
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
+  )
+  const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('radar', gradientId),
+    [gradientId]
+  )
+  const laid = useMemo(
+    () =>
+      layoutRadar(resolvedSeries, {
+        innerWidth: innerRect.width,
+        innerHeight: innerRect.height,
+        startAngle,
+        maxValue,
+        levels,
+        gridShape,
+        palette,
+        gradient,
+        gradientPrefix,
+        indicators,
+        showLabels,
+        showGrid,
+        showAxis,
+        showSplitArea,
+        showLevelLabels,
+        labelOffset,
+        levelLabelOffset,
+        labelFormatter,
+        levelLabelFormatter,
+        labelAutoAlign,
+        strokeColor,
+        fillColor,
+        fillOpacity,
+        splitAreaColors,
+        seriesKeys,
+        activeIndex: resolvedActiveIndex,
+        activeOpacity,
+        inactiveOpacity
+      }),
+    [
+      resolvedSeries,
+      innerRect.width,
+      innerRect.height,
+      startAngle,
+      maxValue,
+      levels,
+      gridShape,
+      palette,
+      gradient,
+      gradientPrefix,
+      indicators,
+      showLabels,
+      showGrid,
+      showAxis,
+      showSplitArea,
+      showLevelLabels,
+      labelOffset,
+      levelLabelOffset,
+      labelFormatter,
+      levelLabelFormatter,
+      labelAutoAlign,
+      strokeColor,
+      fillColor,
+      fillOpacity,
+      splitAreaColors,
+      seriesKeys,
+      resolvedActiveIndex,
+      activeOpacity,
+      inactiveOpacity
+    ]
+  )
+
+  const flatPoints = useMemo(
+    () =>
+      flattenChartPoints(
+        laid.series.map((item) => ({
+          seriesIndex: item.seriesIndex,
+          points: item.points.map((point) => ({ pointIndex: point.index }))
+        }))
+      ),
+    [laid.series]
+  )
 
   const handlePointEnter = useCallback(
-    (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
-      if (!hoverable && !showTooltip) return
+    (seriesIndex: number, pointIndex: number, event: React.MouseEvent | React.FocusEvent) => {
+      if (!trackPointer) return
       setHoveredPoint({ seriesIndex, pointIndex })
       handleHoverEnter(seriesIndex, event)
     },
-    [hoverable, showTooltip, handleHoverEnter]
-  )
-
-  const handlePointMove = useCallback(
-    (event: React.MouseEvent) => {
-      handleMouseMove(event)
-    },
-    [handleMouseMove]
+    [trackPointer, handleHoverEnter]
   )
 
   const handlePointLeave = useCallback(() => {
@@ -191,185 +266,53 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleHoverLeave()
   }, [handleHoverLeave])
 
-  // Keyboard/focus tooltip: synthesize a pointer position from the point's
-  // on-screen rect so focused points show the same tooltip as hovered ones.
-  const showPointTooltipFromElement = useCallback(
-    (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
-      if (!hoverable) return
-      const rect = el.getBoundingClientRect()
+  const handleAreaMove = useCallback(
+    (seriesIndex: number, event: React.MouseEvent<SVGPathElement>) => {
+      if (!trackPointer) return
+      const svg = event.currentTarget.ownerSVGElement
+      if (!svg) return
+      const ctm = event.currentTarget.getScreenCTM()
+      if (!ctm) return
+      const pt = svg.createSVGPoint()
+      pt.x = event.clientX
+      pt.y = event.clientY
+      const loc = pt.matrixTransform(ctm.inverse())
+      const axisPoints = laid.angles.map((angle) =>
+        polarToCartesian(laid.cx, laid.cy, laid.radius, angle)
+      )
+      const pointIndex = findNearestPointIndex(axisPoints, loc.x, loc.y)
+      if (pointIndex === null) return
       setHoveredPoint({ seriesIndex, pointIndex })
-      handleHoverEnter(seriesIndex, {
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2
-      } as React.MouseEvent)
+      handleHoverEnter(seriesIndex, event)
+      handleMouseMove(event)
     },
-    [hoverable, handleHoverEnter]
+    [trackPointer, laid.angles, laid.cx, laid.cy, laid.radius, handleHoverEnter, handleMouseMove]
   )
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
-  )
+  const seriesName = (item: RadarChartSeries, index: number) =>
+    item.name ?? defaultChartSeriesName(index, labels.seriesName)
 
-  const radius = useMemo(
-    () => Math.max(0, Math.min(innerRect.width, innerRect.height) / 2),
-    [innerRect.width, innerRect.height]
-  )
-
-  const cx = innerRect.width / 2
-  const cy = innerRect.height / 2
-
-  const axisData = useMemo(() => {
-    if (series && series.length > 0) return series[0]?.data ?? []
-    return data ?? []
-  }, [series, data])
-
-  const resolvedMaxValue = useMemo(() => {
-    if (typeof maxValue === 'number') return Math.max(0, maxValue)
-    const values = resolvedSeries.flatMap((item) => item.data.map((datum) => datum.value))
-    const computedMax = values.length > 0 ? Math.max(...values) : 0
-    return computedMax > 0 ? computedMax : 1
-  }, [resolvedSeries, maxValue])
-
-  const angles = useMemo(
-    () => getRadarAngles(axisData.length, startAngle),
-    [axisData.length, startAngle]
-  )
-
-  const seriesPoints = useMemo(
-    () =>
-      resolvedSeries.map((item, seriesIndex) => ({
-        series: item,
-        seriesKey: seriesKeys[seriesIndex],
-        points: getRadarPoints(item.data, {
-          cx,
-          cy,
-          radius,
-          startAngle,
-          maxValue: resolvedMaxValue
-        })
-      })),
-    [resolvedSeries, seriesKeys, cx, cy, radius, startAngle, resolvedMaxValue]
-  )
-
-  const gridPaths = useMemo(() => {
-    if (!showGrid || angles.length === 0) return []
-    const resolvedLevels = Math.max(1, Math.floor(levels))
-
-    return Array.from({ length: resolvedLevels }, (_, index) => {
-      const levelRadius = radius * ((index + 1) / resolvedLevels)
-      if (gridShape === 'circle') {
-        return { type: 'circle' as const, cx, cy, r: levelRadius }
-      }
-      const ringPoints = angles.map((angle) => polarToCartesian(cx, cy, levelRadius, angle))
-      return { type: 'polygon' as const, d: createPolygonPath(ringPoints), cx, cy, r: levelRadius }
-    })
-  }, [showGrid, levels, angles, radius, cx, cy, gridShape])
-
-  const splitAreaPaths = useMemo(() => {
-    if (!showSplitArea || angles.length === 0) return []
-    const resolvedLevels = Math.max(1, Math.floor(levels))
-    const areaColors =
-      splitAreaColors && splitAreaColors.length > 0 ? splitAreaColors : RADAR_SPLIT_AREA_COLORS
-
-    return Array.from({ length: resolvedLevels }, (_, index) => {
-      const outerIndex = resolvedLevels - 1 - index
-      const outerRadius = radius * ((outerIndex + 1) / resolvedLevels)
-      const innerRadius = radius * (outerIndex / resolvedLevels)
-      const color = areaColors[outerIndex % areaColors.length]
-
-      if (gridShape === 'circle') {
-        return { type: 'circle-ring' as const, cx, cy, outerRadius, innerRadius, color }
-      }
-      const outerPoints = angles.map((angle) => polarToCartesian(cx, cy, outerRadius, angle))
-      const innerPoints =
-        outerIndex > 0 ? angles.map((angle) => polarToCartesian(cx, cy, innerRadius, angle)) : []
-      return { type: 'polygon-ring' as const, outerPoints, innerPoints, color }
-    })
-  }, [showSplitArea, levels, angles, radius, cx, cy, gridShape, splitAreaColors])
-
-  const axisLines = useMemo(() => {
-    if (!showAxis || angles.length === 0) return []
-    return angles.map((angle) => {
-      const end = polarToCartesian(cx, cy, radius, angle)
-      return {
-        x1: cx,
-        y1: cy,
-        x2: end.x,
-        y2: end.y
-      }
-    })
-  }, [showAxis, angles, cx, cy, radius])
-
-  const labels = useMemo(() => {
-    if (!showLabels || angles.length === 0) return []
-    const formatLabel =
-      labelFormatter ?? ((datum: RadarChartDatum) => datum.label ?? `${datum.value}`)
-
-    return axisData.map((datum, index) => {
-      const angle = angles[index]
-      const position = polarToCartesian(cx, cy, radius + labelOffset, angle)
-      const align = labelAutoAlign
-        ? getRadarLabelAlign(angle)
-        : { textAnchor: 'middle' as const, dominantBaseline: 'middle' as const }
-      return {
-        x: position.x,
-        y: position.y,
-        text: formatLabel(datum, index),
-        textAnchor: align.textAnchor,
-        dominantBaseline: align.dominantBaseline
-      }
-    })
-  }, [showLabels, axisData, angles, cx, cy, radius, labelOffset, labelFormatter, labelAutoAlign])
-
-  const levelLabels = useMemo(() => {
-    if (!showLevelLabels || !showGrid || angles.length === 0) return []
-    const resolvedLevels = Math.max(1, Math.floor(levels))
-    const formatLevel = levelLabelFormatter ?? ((value: number) => `${value}`)
-
-    return Array.from({ length: resolvedLevels }, (_, index) => {
-      const ratio = (index + 1) / resolvedLevels
-      const value = resolvedMaxValue * ratio
-      const position = polarToCartesian(cx, cy, radius * ratio + levelLabelOffset, startAngle)
-
-      return {
-        x: position.x,
-        y: position.y,
-        text: formatLevel(value, index)
-      }
-    })
-  }, [
-    showLevelLabels,
-    showGrid,
-    angles.length,
-    levels,
-    resolvedMaxValue,
-    cx,
-    cy,
-    radius,
-    levelLabelOffset,
-    startAngle,
-    levelLabelFormatter
-  ])
-
-  const dasharray = getChartGridLineDasharray(gridLineStyle)
-  const palette = useMemo(() => resolveChartPalette(colors), [colors])
-  const gradientId = useId()
-  const gradientPrefix = useMemo(
-    () => getStableChartGradientPrefix('radar', gradientId),
-    [gradientId]
-  )
-
-  const tooltipContent = useMemo(
-    () =>
-      resolveMultiSeriesTooltipContent(
-        hoveredPoint,
-        resolvedSeries,
-        tooltipFormatter,
-        defaultRadarTooltipFormatter
-      ),
-    [hoveredPoint, resolvedSeries, tooltipFormatter]
-  )
+  const tooltipContent = useMemo(() => {
+    if (!hoveredPoint) return ''
+    const seriesItem = laid.series[hoveredPoint.seriesIndex]
+    const point = seriesItem?.points.find((item) => item.index === hoveredPoint.pointIndex)
+    if (!point) return ''
+    if (tooltipFormatter) {
+      return tooltipFormatter(
+        point.datum,
+        hoveredPoint.seriesIndex,
+        hoveredPoint.pointIndex,
+        seriesItem.series
+      )
+    }
+    return defaultRadarTooltipFormatter(
+      point.datum,
+      hoveredPoint.seriesIndex,
+      hoveredPoint.pointIndex,
+      seriesItem.series,
+      labels.seriesName
+    )
+  }, [hoveredPoint, laid.series, tooltipFormatter, labels.seriesName])
 
   const legendItems = useMemo(
     () =>
@@ -378,155 +321,118 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         palette,
         activeIndex: resolvedActiveIndex,
         selectedIndex: resolvedSelectedIndex,
-        getLabel: (s, i) =>
-          legendFormatter ? legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
-        getColor: (s, i) => s.color ?? palette[i % palette.length]
+        getLabel: (item, index) =>
+          legendFormatter ? legendFormatter(item, index) : seriesName(item, index),
+        getColor: (item, index) => item.color ?? palette[index % palette.length]
       }),
-    [resolvedSeries, palette, resolvedActiveIndex, resolvedSelectedIndex, legendFormatter]
+    [
+      resolvedSeries,
+      palette,
+      resolvedActiveIndex,
+      resolvedSelectedIndex,
+      legendFormatter,
+      labels.seriesName
+    ]
   )
+
+  const dasharray = getChartGridLineDasharray(gridLineStyle)
+
+  const handlePointKeyDown = (
+    event: React.KeyboardEvent<SVGElement>,
+    seriesIndex: number,
+    pointIndex: number
+  ) => {
+    if (isChartNavigationKey(event.key)) {
+      event.preventDefault()
+      const next = nextChartPointRef({ seriesIndex, pointIndex }, event.key, flatPoints)
+      if (!next) return
+      setActivePoint(next)
+      const node = event.currentTarget.ownerSVGElement?.querySelector(
+        `[data-radar-point][data-series-index="${next.seriesIndex}"][data-point-index="${next.pointIndex}"]`
+      )
+      if (node instanceof SVGElement) node.focus()
+      return
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleSelectIndex(seriesIndex)
+    }
+  }
 
   const chart = (
     <ChartCanvas
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
-      {/* Gradient defs for area fills */}
+      onResolvedSizeChange={onResolvedSizeChange}>
       {(gradient || strokeGradient || pointGradient) && (
         <defs>
-          {gradient &&
-            seriesPoints.map((item, seriesIndex) => {
-              const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
-              const resolvedFillColor =
-                item.series.fillColor ?? seriesColor ?? fillColor ?? palette[0]
-              const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
-              return (
+          {laid.series.map((item) => (
+            <React.Fragment key={item.seriesKey}>
+              {gradient && (
                 <linearGradient
-                  key={`radar-grad-${item.seriesKey}`}
                   id={`${gradientPrefix}-${item.seriesKey}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1">
+                  gradientUnits="userSpaceOnUse"
+                  x1={laid.cx}
+                  y1={laid.cy - laid.radius}
+                  x2={laid.cx}
+                  y2={laid.cy + laid.radius}>
+                  <stop offset="0%" stopColor={item.color} stopOpacity={item.fillOpacity} />
                   <stop
-                    offset="0%"
-                    stopColor={resolvedFillColor}
-                    stopOpacity={resolvedFillOpacity}
+                    offset="100%"
+                    stopColor={`color-mix(in oklab, var(--tiger-bg,#ffffff) 35%, ${item.color})`}
+                    stopOpacity={0.02}
                   />
-                  <stop offset="100%" stopColor={resolvedFillColor} stopOpacity={0.02} />
                 </linearGradient>
-              )
-            })}
-          {strokeGradient &&
-            seriesPoints.map((item, seriesIndex) => {
-              const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
-              const resolvedStrokeColor =
-                item.series.strokeColor ?? seriesColor ?? strokeColor ?? palette[0]
-              return (
+              )}
+              {strokeGradient && (
                 <linearGradient
-                  key={`radar-stroke-grad-${item.seriesKey}`}
                   id={`${gradientPrefix}-stroke-${item.seriesKey}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1">
+                  gradientUnits="userSpaceOnUse"
+                  x1={laid.cx}
+                  y1={laid.cy - laid.radius}
+                  x2={laid.cx}
+                  y2={laid.cy + laid.radius}>
                   <stop
                     offset="0%"
-                    stopColor={`color-mix(in oklab, ${resolvedStrokeColor} 100%, white 12%)`}
+                    stopColor={`color-mix(in oklab, var(--tiger-bg,#ffffff) 20%, ${item.stroke})`}
                   />
-                  <stop offset="50%" stopColor={resolvedStrokeColor} />
+                  <stop offset="50%" stopColor={item.stroke} />
                   <stop
                     offset="100%"
-                    stopColor={`color-mix(in oklab, ${resolvedStrokeColor} 100%, black 8%)`}
+                    stopColor={`color-mix(in oklab, var(--tiger-text,#111827) 12%, ${item.stroke})`}
                   />
                 </linearGradient>
-              )
-            })}
-          {pointGradient &&
-            seriesPoints.map((item, seriesIndex) => {
-              const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
-              const resolvedPointColor =
-                item.series.pointColor ?? seriesColor ?? pointColor ?? palette[0]
-              return (
-                <radialGradient
-                  key={`radar-point-grad-${item.seriesKey}`}
-                  id={`${gradientPrefix}-point-${item.seriesKey}`}
-                  cx="0.5"
-                  cy="0.5"
-                  r="0.5">
+              )}
+              {pointGradient && (
+                <radialGradient id={`${gradientPrefix}-point-${item.seriesKey}`}>
                   <stop
                     offset="0%"
-                    stopColor={`color-mix(in oklab, ${resolvedPointColor} 100%, white 30%)`}
+                    stopColor={`color-mix(in oklab, var(--tiger-bg,#ffffff) 30%, ${item.color})`}
                   />
-                  <stop offset="70%" stopColor={resolvedPointColor} />
-                  <stop
-                    offset="100%"
-                    stopColor={`color-mix(in oklab, ${resolvedPointColor} 100%, black 12%)`}
-                  />
+                  <stop offset="100%" stopColor={item.color} />
                 </radialGradient>
-              )
-            })}
+              )}
+            </React.Fragment>
+          ))}
         </defs>
       )}
-      {/* Split areas: evenodd ring, transparent inner */}
-      {splitAreaPaths.map((area, index) => {
-        if (area.type === 'circle-ring') {
-          if (area.innerRadius > 0) {
-            return (
-              <path
-                key={`split-${index}`}
-                d={createCircleRingPath(area.cx, area.cy, area.outerRadius, area.innerRadius)}
-                fill={area.color}
-                fillOpacity={splitAreaOpacity}
-                fillRule="evenodd"
-                stroke="none"
-                data-radar-split-area="true"
-              />
-            )
-          }
-          return (
-            <circle
-              key={`split-${index}`}
-              cx={area.cx}
-              cy={area.cy}
-              r={area.outerRadius}
-              fill={area.color}
-              fillOpacity={splitAreaOpacity}
-              stroke="none"
-              data-radar-split-area="true"
-            />
-          )
-        }
-        if (area.innerPoints.length > 0) {
-          const ringPath = createPolygonRingPath(area.outerPoints, area.innerPoints)
-          return ringPath ? (
-            <path
-              key={`split-${index}`}
-              d={ringPath}
-              fill={area.color}
-              fillOpacity={splitAreaOpacity}
-              fillRule="evenodd"
-              stroke="none"
-              data-radar-split-area="true"
-            />
-          ) : null
-        }
-        const outerPath = createPolygonPath(area.outerPoints)
-        return outerPath ? (
-          <path
-            key={`split-${index}`}
-            d={outerPath}
-            fill={area.color}
-            fillOpacity={splitAreaOpacity}
-            stroke="none"
-            data-radar-split-area="true"
-          />
-        ) : null
-      })}
-      {/* Grid lines */}
-      {gridPaths.map((grid, index) =>
+      {laid.splitAreas.map((area, index) => (
+        <path
+          key={`split-${index}`}
+          d={area.d}
+          fill={area.color}
+          fillOpacity={splitAreaOpacity}
+          fillRule="evenodd"
+          stroke="none"
+          data-radar-split-area="true"
+          aria-hidden="true"
+        />
+      ))}
+      {laid.grid.map((grid, index) =>
         grid.type === 'circle' ? (
           <circle
             key={`grid-${index}`}
@@ -537,6 +443,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             fill="none"
             strokeWidth={gridStrokeWidth}
             strokeDasharray={dasharray}
+            aria-hidden="true"
           />
         ) : (
           <path
@@ -546,10 +453,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             fill="none"
             strokeWidth={gridStrokeWidth}
             strokeDasharray={dasharray}
+            aria-hidden="true"
           />
         )
       )}
-      {axisLines.map((line, index) => (
+      {laid.axes.map((line, index) => (
         <line
           key={`axis-${index}`}
           x1={line.x1}
@@ -559,82 +467,59 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           className={chartGridLineClasses}
           strokeWidth={gridStrokeWidth}
           strokeDasharray={dasharray}
+          aria-hidden="true"
         />
       ))}
-      {seriesPoints.map((item, seriesIndex) => {
-        const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
-        const resolvedStrokeColor =
-          item.series.strokeColor ?? seriesColor ?? strokeColor ?? palette[0]
-        const resolvedFillColor = item.series.fillColor ?? seriesColor ?? fillColor ?? palette[0]
-        const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
-        const resolvedStrokeWidth = item.series.strokeWidth ?? strokeWidth
-        const resolvedShowPoints = item.series.showPoints ?? showPoints
+      {laid.series.map((item) => {
+        const showSeriesPoints = item.series.showPoints ?? showPoints
         const resolvedPointSize = item.series.pointSize ?? pointSize
-        const resolvedPointColor = item.series.pointColor ?? seriesColor ?? pointColor
-        const areaPath = createPolygonPath(item.points.map((point) => ({ x: point.x, y: point.y })))
-        const resolvedOpacity =
-          resolvedActiveIndex === null
-            ? undefined
-            : seriesIndex === resolvedActiveIndex
-              ? activeOpacity
-              : inactiveOpacity
-
+        const resolvedPointColor = item.series.pointColor ?? pointColor ?? item.color
         return (
-          <ChartSeries
+          <g
             key={item.seriesKey}
+            data-series-type="radar"
             data-series-key={item.seriesKey}
-            data={item.series.data}
-            name={item.series.name}
-            type="radar"
-            className={item.series.className}
-            opacity={resolvedOpacity}
-            style={hoverable || selectable ? { cursor: 'pointer' } : undefined}
-            onMouseEnter={
-              hoverable ? (e: React.MouseEvent) => handleHoverEnter(seriesIndex, e) : undefined
-            }
-            onMouseLeave={hoverable ? handleHoverLeave : undefined}
-            onClick={selectable ? () => handleSelectIndex(seriesIndex) : undefined}
-            tabIndex={selectable ? 0 : undefined}
+            data-series-name={item.series.name}
+            opacity={item.opacity}
+            onMouseEnter={(e) => handleHoverEnter(item.seriesIndex, e)}
+            onMouseLeave={handlePointLeave}
+            onClick={() => handleSelectIndex(item.seriesIndex)}
             onKeyDown={(event) => {
-              if (!selectable) return
-              if (event.key !== 'Enter' && event.key !== ' ') return
-              event.preventDefault()
-              handleSelectIndex(seriesIndex)
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                handleSelectIndex(item.seriesIndex)
+              }
             }}>
-            {areaPath ? (
+            {item.path ? (
               <path
-                d={areaPath}
-                fill={gradient ? `url(#${gradientPrefix}-${item.seriesKey})` : resolvedFillColor}
-                fillOpacity={gradient ? 1 : resolvedFillOpacity}
+                d={item.path}
+                fill={item.fill}
+                fillOpacity={gradient ? 1 : item.fillOpacity}
                 stroke={
-                  strokeGradient
-                    ? `url(#${gradientPrefix}-stroke-${item.seriesKey})`
-                    : resolvedStrokeColor
+                  strokeGradient ? `url(#${gradientPrefix}-stroke-${item.seriesKey})` : item.stroke
                 }
-                strokeWidth={resolvedStrokeWidth}
+                strokeWidth={item.series.strokeWidth ?? strokeWidth}
                 strokeLinejoin="round"
-                className="transition-[fill-opacity,filter] duration-200 ease-out"
-                style={
-                  resolvedActiveIndex === seriesIndex
-                    ? { filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))' }
-                    : undefined
-                }
+                className={classNames(
+                  'motion-reduce:transition-none',
+                  interactive && 'cursor-pointer'
+                )}
                 data-radar-area="true"
-                data-series-index={seriesIndex}
-                data-series-key={item.seriesKey}
+                data-series-index={item.seriesIndex}
+                onMouseEnter={(e) => handleHoverEnter(item.seriesIndex, e)}
+                onMouseMove={(e) => handleAreaMove(item.seriesIndex, e)}
+                onMouseLeave={handlePointLeave}
+                onClick={() => handleSelectIndex(item.seriesIndex)}
               />
             ) : null}
-            {resolvedShowPoints
+            {showSeriesPoints
               ? item.points.map((point) => {
-                  const isHoveredPoint =
-                    hoveredPoint?.seriesIndex === seriesIndex &&
+                  const isHovered =
+                    hoveredPoint?.seriesIndex === item.seriesIndex &&
                     hoveredPoint?.pointIndex === point.index
-                  const hoverSize = pointHoverSize ?? resolvedPointSize + 2
-                  const currentSize = isHoveredPoint
-                    ? hoverSize
-                    : (point.data.size ?? resolvedPointSize)
-                  const resolvedBorderWidth = item.series.pointBorderWidth ?? pointBorderWidth
-                  const resolvedBorderColor = item.series.pointBorderColor ?? pointBorderColor
+                  const currentSize = isHovered
+                    ? (pointHoverSize ?? resolvedPointSize + 2)
+                    : resolvedPointSize
                   return (
                     <circle
                       key={`point-${item.seriesKey}-${point.index}`}
@@ -644,115 +529,124 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       fill={
                         pointGradient
                           ? `url(#${gradientPrefix}-point-${item.seriesKey})`
-                          : (point.data.color ?? resolvedPointColor ?? resolvedStrokeColor)
+                          : (point.datum.color ?? resolvedPointColor)
                       }
-                      stroke={resolvedBorderColor}
-                      strokeWidth={resolvedBorderWidth}
-                      className={classNames(
-                        showTooltip && hoverable ? 'cursor-pointer' : undefined,
-                        'transition-[r] duration-150 ease-out'
-                      )}
-                      role={showTooltip && hoverable ? 'button' : 'img'}
-                      aria-label={point.data.label ?? String(point.data.value)}
-                      tabIndex={showTooltip && hoverable ? 0 : undefined}
+                      stroke={item.series.pointBorderColor ?? pointBorderColor}
+                      strokeWidth={item.series.pointBorderWidth ?? pointBorderWidth}
+                      className="transition-[r] duration-150 ease-out motion-reduce:transition-none"
+                      aria-hidden={focusable ? undefined : true}
+                      tabIndex={
+                        focusable
+                          ? chartPointTabIndex(
+                              item.seriesIndex,
+                              point.index,
+                              activePoint,
+                              flatPoints
+                            )
+                          : undefined
+                      }
+                      role={focusable ? 'button' : undefined}
+                      aria-label={
+                        focusable
+                          ? formatChartTemplate(labels.pointAriaLabel, {
+                              index: point.index + 1,
+                              x: seriesName(item.series, item.seriesIndex),
+                              y: point.value
+                            })
+                          : undefined
+                      }
                       data-radar-point="true"
-                      data-series-index={seriesIndex}
-                      data-series-key={item.seriesKey}
+                      data-series-index={item.seriesIndex}
                       data-point-index={point.index}
-                      onMouseEnter={
-                        showTooltip || hoverable
-                          ? (e: React.MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
-                          : undefined
-                      }
-                      onMouseMove={showTooltip || hoverable ? handlePointMove : undefined}
-                      onMouseLeave={showTooltip || hoverable ? handlePointLeave : undefined}
-                      onFocus={
-                        showTooltip && hoverable
-                          ? (e: React.FocusEvent<SVGCircleElement>) =>
-                              showPointTooltipFromElement(e.currentTarget, seriesIndex, point.index)
-                          : undefined
-                      }
-                      onBlur={showTooltip && hoverable ? handlePointLeave : undefined}
-                      onKeyDown={
-                        showTooltip && hoverable
-                          ? (e: React.KeyboardEvent<SVGCircleElement>) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault()
-                                showPointTooltipFromElement(
-                                  e.currentTarget,
-                                  seriesIndex,
-                                  point.index
-                                )
-                              } else if (e.key === 'Escape') {
-                                handlePointLeave()
-                              }
-                            }
-                          : undefined
-                      }
+                      onMouseEnter={(e) => handlePointEnter(item.seriesIndex, point.index, e)}
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={handlePointLeave}
+                      onFocus={(e) => handlePointEnter(item.seriesIndex, point.index, e)}
+                      onClick={() => handleSelectIndex(item.seriesIndex)}
+                      onKeyDown={(e) => handlePointKeyDown(e, item.seriesIndex, point.index)}
                     />
                   )
                 })
-              : null}
-          </ChartSeries>
+              : item.points.map((point) => (
+                  <circle
+                    key={`hit-${item.seriesKey}-${point.index}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={8}
+                    fill="transparent"
+                    aria-hidden="true"
+                    tabIndex={
+                      focusable
+                        ? chartPointTabIndex(item.seriesIndex, point.index, activePoint, flatPoints)
+                        : undefined
+                    }
+                    data-radar-point="true"
+                    data-series-index={item.seriesIndex}
+                    data-point-index={point.index}
+                    onFocus={(e) => handlePointEnter(item.seriesIndex, point.index, e)}
+                    onKeyDown={(e) => handlePointKeyDown(e, item.seriesIndex, point.index)}
+                  />
+                ))}
+          </g>
         )
       })}
-      {labels.map((label, index) => (
+      {laid.labels.map((label, index) => (
         <text
           key={`label-${index}`}
           x={label.x}
           y={label.y}
-          className={chartAxisTickTextClasses}
           textAnchor={label.textAnchor}
-          dominantBaseline={label.dominantBaseline}>
+          dominantBaseline={label.dominantBaseline}
+          className={chartAxisTickTextClasses}
+          aria-hidden="true">
           {label.text}
         </text>
       ))}
-      {levelLabels.map((label, index) => (
+      {laid.levelLabels.map((label, index) => (
         <text
           key={`level-${index}`}
           x={label.x}
           y={label.y}
           className={chartAxisTickTextClasses}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          data-radar-level-label="true">
+          aria-hidden="true"
+          data-radar-level-label="">
           {label.text}
         </text>
       ))}
     </ChartCanvas>
   )
 
-  const tooltip = showTooltip ? (
+  const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
       open={hoveredPoint !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />
-  ) : null
-
-  if (!showLegend) {
-    return (
-      <div className="inline-block relative">
-        {chart}
-        {tooltip}
-      </div>
-    )
-  }
+  )
 
   return (
-    <div className={wrapperClasses}>
+    <div
+      className={getCartesianChartShellClasses({
+        showLegend,
+        legendPosition,
+        responsive,
+        className
+      })}>
       {chart}
-      <ChartLegend
-        items={legendItems}
-        orientation={chartLegendOrientationFromPosition(legendPosition)}
-        markerSize={legendMarkerSize}
-        gap={legendGap}
-        interactive={hoverable || selectable}
-        onItemClick={handleLegendClick}
-        onItemHover={handleLegendHover}
-        onItemLeave={handleLegendLeave}
-      />
+      {showLegend ? (
+        <ChartLegend
+          items={legendItems}
+          orientation={chartLegendOrientationFromPosition(legendPosition)}
+          markerSize={legendMarkerSize}
+          gap={legendGap}
+          interactive={hoverable || selectable}
+          ariaLabel={labels.legendAriaLabel}
+          onItemClick={handleLegendClick}
+          onItemHover={handleLegendHover}
+          onItemLeave={handleLegendLeave}
+        />
+      ) : null}
       {tooltip}
     </div>
   )
