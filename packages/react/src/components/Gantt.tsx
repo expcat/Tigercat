@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  applyGanttTaskDateOverlay,
   classNames,
   clampGanttDragDeltaX,
   computeGanttLayout,
@@ -11,7 +10,10 @@ import {
   ganttProgressClasses,
   ganttRowClasses,
   ganttTodayLineClasses,
-  getChartInnerRect,
+  getCartesianChartShellClasses,
+  getChartLabels,
+  mergeTigerLocale,
+  normalizeChartPadding,
   getGanttTaskAriaLabel,
   getGanttTaskClasses,
   isBrowser,
@@ -19,10 +21,10 @@ import {
   type ChartPadding,
   type GanttLayoutTask,
   type GanttProps as CoreGanttProps,
-  type GanttTask,
-  type GanttTaskDateOverlayEntry
+  type GanttTask
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { useTigerConfig } from './ConfigProvider'
 
 const GANTT_BAR_CLICK_PX = 4
 
@@ -73,12 +75,14 @@ export function Gantt({
   selectable = false,
   selectedId,
   activeOpacity = 1,
-  inactiveOpacity = 0.35,
+  inactiveOpacity = 0.25,
+  draggable = false,
   dateFormatter,
+  weekStartsOn,
   colors,
   title,
   desc,
-  ariaLabel = 'Gantt chart',
+  ariaLabel,
   className,
   onTaskClick,
   onTaskHover,
@@ -86,11 +90,10 @@ export function Gantt({
   onTaskChange,
   onDataChange
 }: GanttProps): React.ReactElement {
+  const config = useTigerConfig()
+  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
   const [innerSelectedId, setInnerSelectedId] = useState<string | number | null>(null)
   const [hoveredId, setHoveredId] = useState<string | number | null>(null)
-  const [dateOverlay, setDateOverlay] = useState<Map<string | number, GanttTaskDateOverlayEntry>>(
-    () => new Map()
-  )
   const [dragPreview, setDragPreview] = useState<{ id: string | number; deltaX: number } | null>(
     null
   )
@@ -109,8 +112,6 @@ export function Gantt({
   }).current
   const dataRef = useRef(data)
   dataRef.current = data
-  const dateOverlayRef = useRef(dateOverlay)
-  dateOverlayRef.current = dateOverlay
   const onTaskChangeRef = useRef(onTaskChange)
   onTaskChangeRef.current = onTaskChange
   const onDataChangeRef = useRef(onDataChange)
@@ -136,18 +137,13 @@ export function Gantt({
     },
     [onDocumentPointerEnd, onDocumentPointerMove]
   )
-  const resolvedData = useMemo(
-    () => applyGanttTaskDateOverlay(data, dateOverlay),
-    [data, dateOverlay]
-  )
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [height, padding, width]
-  )
+  const canDrag = draggable || Boolean(onTaskChange) || Boolean(onDataChange)
+  const resolvedPadding = normalizeChartPadding(padding)
+  const minPlotWidth = width
   const layout = useMemo(
     () =>
-      computeGanttLayout(resolvedData, {
-        width: innerRect.width,
+      computeGanttLayout(data, {
+        width: Math.max(0, minPlotWidth - resolvedPadding.left - resolvedPadding.right),
         rowHeight,
         barHeight,
         taskLabelWidth,
@@ -158,28 +154,35 @@ export function Gantt({
         scale,
         colors,
         today: showToday ? new Date() : undefined,
-        dateFormatter
+        dateFormatter,
+        weekStartsOn
       }),
     [
       barHeight,
       colors,
+      data,
       dateFormatter,
-      innerRect.width,
       maxDate,
       minBarWidth,
       minDate,
-      resolvedData,
+      minPlotWidth,
+      resolvedPadding.left,
+      resolvedPadding.right,
       rowHeight,
       scale,
       showToday,
       taskLabelWidth,
-      timelineHeight
+      timelineHeight,
+      weekStartsOn
     ]
   )
+  const plotWidth = Math.max(width, layout.width + resolvedPadding.left + resolvedPadding.right)
+  const plotHeight = Math.max(height, layout.height + resolvedPadding.top + resolvedPadding.bottom)
   const activeId = resolvedSelectedId ?? hoveredId
 
   const selectTask = (task: GanttLayoutTask) => {
-    if (selectableRef.current && !task.task.disabled) {
+    if (task.task.disabled) return
+    if (selectableRef.current) {
       const nextId = resolvedSelectedIdRef.current === task.id ? null : task.id
       if (selectedIdRef.current === undefined) setInnerSelectedId(nextId)
       onSelectedIdChangeRef.current?.(nextId)
@@ -283,17 +286,7 @@ export function Gantt({
       return
     }
 
-    const incoming = dataRef.current.find((item) => item.id === nextTask.id)
-    const previous = dateOverlayRef.current.get(nextTask.id)
-    const nextOverlay = new Map(dateOverlayRef.current)
-    nextOverlay.set(nextTask.id, {
-      start: nextTask.start,
-      end: nextTask.end,
-      baseStart: previous?.baseStart ?? incoming?.start ?? session.sourceTask.start,
-      baseEnd: previous?.baseEnd ?? incoming?.end ?? session.sourceTask.end
-    })
-    setDateOverlay(nextOverlay)
-    const nextData = applyGanttTaskDateOverlay(dataRef.current, nextOverlay)
+    const nextData = dataRef.current.map((item) => (item.id === nextTask.id ? nextTask : item))
     onTaskChangeRef.current?.(nextTask)
     onDataChangeRef.current?.(nextData)
   }
@@ -310,7 +303,7 @@ export function Gantt({
   }
 
   const startBarDrag = (event: React.PointerEvent<SVGGElement>, task: GanttLayoutTask) => {
-    if (task.task.disabled || dragSessionRef.current) return
+    if (!canDrag || task.task.disabled || dragSessionRef.current) return
     if (event.button !== undefined && event.button !== 0) return
     event.preventDefault()
     const captureTarget = event.currentTarget instanceof Element ? event.currentTarget : null
@@ -346,132 +339,133 @@ export function Gantt({
   }
 
   return (
-    <ChartCanvas
-      width={width}
-      height={height}
-      padding={padding}
-      title={title}
-      desc={desc}
-      className={classNames(className)}
-      role="img"
-      aria-label={ariaLabel}>
-      <g data-series-type="gantt">
-        <g data-gantt-axis="true">
-          <line
-            x1={taskLabelWidth}
-            x2={layout.width}
-            y1={timelineHeight - 1}
-            y2={timelineHeight - 1}
-            stroke="var(--tiger-border,#d1d5db)"
-          />
-          {layout.ticks.map((tick) => (
-            <g key={`${tick.label}-${tick.x}`}>
-              <line
-                x1={tick.x}
-                x2={tick.x}
-                y1={0}
-                y2={layout.height}
-                stroke="var(--tiger-border,#e5e7eb)"
-              />
-              <text x={tick.x + 4} y={16} className={ganttAxisTextClasses}>
-                {tick.label}
-              </text>
-            </g>
-          ))}
-        </g>
-        <g data-gantt-rows="true">
-          {layout.tasks.map((task) => (
-            <rect
-              key={`row-${task.id}`}
-              x={0}
-              y={timelineHeight + task.index * rowHeight}
-              width={layout.width}
-              height={rowHeight}
-              className={task.index % 2 === 0 ? ganttRowClasses : undefined}
-              opacity={task.index % 2 === 0 ? 0.75 : 0}
+    <div className={getCartesianChartShellClasses({ showLegend: false, className })}>
+      <ChartCanvas
+        width={plotWidth}
+        height={plotHeight}
+        padding={padding}
+        title={title}
+        desc={desc}
+        aria-label={ariaLabel ?? (title ? undefined : labels.ganttAriaLabel)}>
+        <g data-series-type="gantt">
+          <g data-gantt-axis="true">
+            <line
+              x1={taskLabelWidth}
+              x2={layout.width}
+              y1={timelineHeight - 1}
+              y2={timelineHeight - 1}
+              stroke="var(--tiger-border,#d1d5db)"
             />
-          ))}
-        </g>
-        {showToday && layout.todayX !== null ? (
-          <line
-            x1={layout.todayX}
-            x2={layout.todayX}
-            y1={0}
-            y2={layout.height}
-            className={ganttTodayLineClasses}
-            data-gantt-today="true"
-          />
-        ) : null}
-        {showDependencies ? (
-          <g data-gantt-dependencies="true">
-            {layout.dependencies.map((dependency) => (
-              <path
-                key={`${dependency.sourceId}-${dependency.targetId}`}
-                d={dependency.path}
-                className={ganttDependencyClasses}
+            {layout.ticks.map((tick) => (
+              <g key={`${tick.label}-${tick.x}`}>
+                <line
+                  x1={tick.x}
+                  x2={tick.x}
+                  y1={0}
+                  y2={layout.height}
+                  stroke="var(--tiger-border,#e5e7eb)"
+                />
+                <text x={tick.x + 4} y={16} className={ganttAxisTextClasses}>
+                  {tick.label}
+                </text>
+              </g>
+            ))}
+          </g>
+          <g data-gantt-rows="true">
+            {layout.tasks.map((task) => (
+              <rect
+                key={`row-${task.id}`}
+                x={0}
+                y={timelineHeight + task.index * rowHeight}
+                width={layout.width}
+                height={rowHeight}
+                className={task.index % 2 === 0 ? ganttRowClasses : undefined}
+                opacity={task.index % 2 === 0 ? 0.75 : 0}
               />
             ))}
           </g>
-        ) : null}
-        <g data-gantt-tasks="true">
-          {layout.tasks.map((task) => {
-            const selected = resolvedSelectedId === task.id
-            const interactive = (hoverable || selectable) && !task.task.disabled
-            const movable = !task.task.disabled
-            const grabbing = dragPreview?.id === task.id
-            const previewDeltaX = grabbing ? (dragPreview?.deltaX ?? 0) : 0
-            return (
-              <g key={task.id} opacity={getTaskOpacity(task)}>
-                <text x={0} y={task.y + task.height / 2 + 4} className={ganttLabelClasses}>
-                  {task.task.label}
-                </text>
-                <g
-                  className={getGanttTaskClasses(interactive, selected, movable, grabbing)}
-                  role={interactive ? 'button' : 'group'}
-                  tabIndex={interactive ? 0 : undefined}
-                  aria-label={getGanttTaskAriaLabel(task.task)}
-                  data-gantt-task-id={task.id}
-                  transform={previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined}
-                  onMouseEnter={() => setHoveredTask(task)}
-                  onMouseLeave={() => setHoveredTask(null)}
-                  onPointerDown={(event) => startBarDrag(event, task)}
-                  onPointerMove={(event) => moveBarDrag(event.nativeEvent)}
-                  onPointerUp={(event) => finishBarDrag(event.nativeEvent)}
-                  onPointerCancel={(event) => finishBarDrag(event.nativeEvent)}
-                  onClick={(event) => handleBarClick(event, task)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault()
-                      selectTask(task)
-                    }
-                  }}>
-                  <rect
-                    x={task.x}
-                    y={task.y}
-                    width={task.width}
-                    height={task.height}
-                    rx={4}
-                    fill={task.color}
-                    stroke={selected ? 'var(--tiger-text,#111827)' : undefined}
-                    strokeWidth={selected ? 2 : undefined}
-                  />
-                  {showProgress && task.progressWidth > 0 ? (
+          {showToday && layout.todayX !== null ? (
+            <line
+              x1={layout.todayX}
+              x2={layout.todayX}
+              y1={0}
+              y2={layout.height}
+              className={ganttTodayLineClasses}
+              data-gantt-today="true"
+            />
+          ) : null}
+          {showDependencies ? (
+            <g data-gantt-dependencies="true">
+              {layout.dependencies.map((dependency) => (
+                <path
+                  key={`${dependency.sourceId}-${dependency.targetId}`}
+                  d={dependency.path}
+                  className={ganttDependencyClasses}
+                />
+              ))}
+            </g>
+          ) : null}
+          <g data-gantt-tasks="true">
+            {layout.tasks.map((task) => {
+              const selected = resolvedSelectedId === task.id
+              const interactive =
+                (hoverable || selectable || Boolean(onTaskClick)) && !task.task.disabled
+              const movable = canDrag && !task.task.disabled
+              const grabbing = dragPreview?.id === task.id
+              const previewDeltaX = grabbing ? (dragPreview?.deltaX ?? 0) : 0
+              return (
+                <g key={task.id} opacity={getTaskOpacity(task)}>
+                  <text x={0} y={task.y + task.height / 2 + 4} className={ganttLabelClasses}>
+                    {task.task.label}
+                  </text>
+                  <g
+                    className={getGanttTaskClasses(interactive, selected, movable, grabbing)}
+                    role={interactive ? 'button' : 'group'}
+                    tabIndex={interactive ? 0 : undefined}
+                    aria-label={getGanttTaskAriaLabel(task.task)}
+                    data-gantt-task-id={task.id}
+                    transform={previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined}
+                    onMouseEnter={() => setHoveredTask(task)}
+                    onMouseLeave={() => setHoveredTask(null)}
+                    onPointerDown={(event) => startBarDrag(event, task)}
+                    onPointerMove={(event) => moveBarDrag(event.nativeEvent)}
+                    onPointerUp={(event) => finishBarDrag(event.nativeEvent)}
+                    onPointerCancel={(event) => finishBarDrag(event.nativeEvent)}
+                    onClick={(event) => handleBarClick(event, task)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        selectTask(task)
+                      }
+                    }}>
                     <rect
                       x={task.x}
                       y={task.y}
-                      width={task.progressWidth}
+                      width={task.width}
                       height={task.height}
                       rx={4}
-                      className={ganttProgressClasses}
+                      fill={task.color}
+                      stroke={selected ? 'var(--tiger-text,#111827)' : undefined}
+                      strokeWidth={selected ? 2 : undefined}
                     />
-                  ) : null}
+                    {showProgress && task.progressWidth > 0 ? (
+                      <rect
+                        x={task.x}
+                        y={task.y}
+                        width={task.progressWidth}
+                        height={task.height}
+                        rx={4}
+                        className={ganttProgressClasses}
+                      />
+                    ) : null}
+                  </g>
                 </g>
-              </g>
-            )
-          })}
+              )
+            })}
+          </g>
         </g>
-      </g>
-    </ChartCanvas>
+      </ChartCanvas>
+    </div>
   )
 }
 

@@ -73,7 +73,7 @@ describe('Gantt', () => {
       props: { data, colors: ['#ff0000'], className: 'gantt' }
     })
 
-    expect(container.querySelector('svg.gantt')).toBeInTheDocument()
+    expect(container.firstElementChild).toHaveClass('gantt')
     expect(container.querySelector('rect[fill="#ff0000"]')).toBeInTheDocument()
   })
 
@@ -122,7 +122,7 @@ describe('Gantt', () => {
       await fireEvent.click(getByRole('group', { name: 'Design, 01-01 to 01-05, 40%' }))
 
       expect(emitted()['update:selectedId']).toBeUndefined()
-      expect(emitted()['task-click']).toEqual([[disabledData[0]]])
+      expect(emitted()['task-click']).toBeUndefined()
     })
 
     it('renders today marker when the range includes today', () => {
@@ -147,7 +147,8 @@ describe('Gantt', () => {
       data: dragData,
       minDate: '2026-01-01',
       maxDate: '2026-01-31',
-      selectable: true
+      selectable: true,
+      draggable: true
     }
 
     it('moves a bar and emits date changes after a day-scale drag', async () => {
@@ -167,15 +168,15 @@ describe('Gantt', () => {
       expect(emitted()['task-click']).toBeUndefined()
       expect(emitted()['update:selectedId']).toBeUndefined()
 
-      const movedX = Number(
-        container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x')
-      )
-      expect(movedX).not.toBe(startX)
-
-      await rerender(dragProps)
       expect(
         Number(container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x'))
-      ).toBe(movedX)
+      ).toBe(startX)
+
+      const nextData = emitted()['update:data']?.[0]?.[0] as GanttTask[]
+      await rerender({ ...dragProps, data: nextData })
+      expect(
+        Number(container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x'))
+      ).not.toBe(startX)
     })
 
     it('treats a tiny pointer gesture as a click, not a date change', async () => {

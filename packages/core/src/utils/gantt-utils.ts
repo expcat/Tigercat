@@ -1,5 +1,6 @@
 import { classNames } from './class-names'
 import { DEFAULT_CHART_COLORS } from './chart-utils'
+import { devWarn } from './dev-warn'
 import type { GanttDateValue, GanttScale, GanttTask } from '../types/gantt'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -17,6 +18,7 @@ export interface GanttLayoutOptions {
   colors?: string[]
   today?: GanttDateValue
   dateFormatter?: (date: Date, scale: GanttScale) => string
+  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
 }
 
 export interface GanttLayoutTask {
@@ -31,6 +33,8 @@ export interface GanttLayoutTask {
   startMs: number
   endMs: number
   color: string
+  /** Date-end x used for dependency anchors (not minBarWidth). */
+  dateEndX: number
 }
 
 export interface GanttLayoutDependency {
@@ -67,11 +71,12 @@ export const ganttLabelClasses =
 export const ganttAxisTextClasses =
   'pointer-events-none select-none fill-[var(--tiger-text-muted,#6b7280)] text-[11px]'
 export const ganttBarClasses =
-  'transition-[filter,opacity,stroke] duration-150 ease-out focus:outline-none'
-export const ganttProgressClasses = 'fill-black/20'
+  'transition-[filter,opacity,stroke] motion-reduce:transition-none duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
+export const ganttProgressClasses =
+  'fill-[color-mix(in_oklab,var(--tiger-text,#111827)_20%,transparent)]'
 export const ganttDependencyClasses =
   'fill-none stroke-[var(--tiger-text-muted,#6b7280)] stroke-[1.5]'
-export const ganttTodayLineClasses = 'stroke-[var(--tiger-danger,#ef4444)] stroke-2'
+export const ganttTodayLineClasses = 'stroke-[var(--tiger-error,#ef4444)] stroke-2'
 
 export function normalizeGanttDate(value: GanttDateValue): number {
   const date =
@@ -247,8 +252,12 @@ export function applyGanttTaskDateOverlay(
 }
 
 export function getGanttDependencyPath(dependency: Omit<GanttLayoutDependency, 'path'>): string {
-  const midX = dependency.sourceX + Math.max(16, (dependency.targetX - dependency.sourceX) / 2)
-  return `M ${dependency.sourceX} ${dependency.sourceY} L ${midX} ${dependency.sourceY} L ${midX} ${dependency.targetY} L ${dependency.targetX} ${dependency.targetY}`
+  if (dependency.targetX >= dependency.sourceX) {
+    const midX = dependency.sourceX + Math.max(16, (dependency.targetX - dependency.sourceX) / 2)
+    return `M ${dependency.sourceX} ${dependency.sourceY} L ${midX} ${dependency.sourceY} L ${midX} ${dependency.targetY} L ${dependency.targetX} ${dependency.targetY}`
+  }
+  const bypassY = Math.max(dependency.sourceY, dependency.targetY) + 16
+  return `M ${dependency.sourceX} ${dependency.sourceY} L ${dependency.sourceX + 16} ${dependency.sourceY} L ${dependency.sourceX + 16} ${bypassY} L ${dependency.targetX - 16} ${bypassY} L ${dependency.targetX - 16} ${dependency.targetY} L ${dependency.targetX} ${dependency.targetY}`
 }
 
 export function computeGanttLayout(
@@ -274,7 +283,7 @@ export function computeGanttLayout(
   const minBarWidth = Number.isFinite(rawMinBarWidth) ? Math.max(0, rawMinBarWidth) : 0
 
   if (data.length === 0) {
-    const fallbackMin = Date.now()
+    const fallbackMin = startOfLocalDay(Date.now())
     const rawMinMs = normalizeGanttDate(options.minDate ?? fallbackMin)
     const minMs = Number.isFinite(rawMinMs) ? rawMinMs : fallbackMin
     const rawMaxMs = normalizeGanttDate(options.maxDate ?? minMs + DAY_MS)
@@ -292,17 +301,21 @@ export function computeGanttLayout(
     }
   }
 
-  const taskRanges = data.map((task) => {
+  const taskRanges: Array<{ task: GanttTask; startMs: number; endMs: number; index: number }> = []
+  data.forEach((task, index) => {
     const rawStart = normalizeGanttDate(task.start)
     const rawEnd = normalizeGanttDate(task.end)
-    const startFallback = Number.isFinite(rawEnd) ? rawEnd : Date.now()
-    const endFallback = Number.isFinite(rawStart) ? rawStart : startFallback + DAY_MS
-    const safeStart = Number.isFinite(rawStart) ? rawStart : startFallback
-    const safeEnd = Number.isFinite(rawEnd) ? rawEnd : endFallback
-    const startMs = Math.min(safeStart, safeEnd)
-    const endMs = Math.max(safeStart, safeEnd)
-    return { task, startMs, endMs: endMs === startMs ? endMs + DAY_MS : endMs }
+    if (!Number.isFinite(rawStart) || !Number.isFinite(rawEnd)) {
+      devWarn('Gantt.invalidDate', 'Gantt skipped a task with an invalid start or end date')
+      return
+    }
+    const startMs = Math.min(rawStart, rawEnd)
+    const inclusiveEnd = ganttInclusiveEndMs(task.end, Math.max(rawStart, rawEnd), startMs)
+    taskRanges.push({ task, startMs, endMs: inclusiveEnd, index })
   })
+  if (taskRanges.length === 0) {
+    return computeGanttLayout([], options)
+  }
   const inferredMinMs = Math.min(...taskRanges.map((item) => item.startMs))
   const inferredMaxMs = Math.max(...taskRanges.map((item) => item.endMs))
   const rawMinMs = normalizeGanttDate(options.minDate ?? inferredMinMs)
@@ -314,23 +327,37 @@ export function computeGanttLayout(
   const rangeMs = safeMaxMs - minMs
   const xForTime = (time: number) => taskLabelWidth + ((time - minMs) / rangeMs) * timelineWidth
 
-  const tasks = taskRanges.map(({ task, startMs, endMs }, index) => {
-    const x = xForTime(startMs)
-    const rawWidth = xForTime(endMs) - x
-    const barWidth = Math.max(minBarWidth, rawWidth)
-    return {
-      id: task.id,
-      task,
-      index,
-      x,
-      y: timelineHeight + index * rowHeight + (rowHeight - barHeight) / 2,
-      width: barWidth,
-      height: barHeight,
-      progressWidth: barWidth * (clampProgress(task.progress ?? 0) / 100),
-      startMs,
-      endMs,
-      color: task.color ?? colors[index % colors.length]
+  const seenIds = new Set<string>()
+  const tasks = taskRanges.flatMap(({ task, startMs, endMs }, visualIndex) => {
+    const key = String(task.id)
+    if (seenIds.has(key)) {
+      devWarn('Gantt.duplicateId', 'Gantt skipped a duplicate task id')
+      return []
     }
+    seenIds.add(key)
+    const rawX = xForTime(startMs)
+    const dateEndX = xForTime(endMs)
+    const clippedX = Math.max(taskLabelWidth, Math.min(width, rawX))
+    const clippedEndX = Math.max(taskLabelWidth, Math.min(width, dateEndX))
+    const rawWidth = Math.max(0, clippedEndX - clippedX)
+    const barWidth = Math.max(minBarWidth, rawWidth)
+    return [
+      {
+        id: task.id,
+        task,
+        index: visualIndex,
+        x: clippedX,
+        y: timelineHeight + visualIndex * rowHeight + (rowHeight - barHeight) / 2,
+        width: Math.min(barWidth, width - clippedX),
+        height: barHeight,
+        progressWidth:
+          Math.min(barWidth, width - clippedX) * (clampProgress(task.progress ?? 0) / 100),
+        startMs,
+        endMs,
+        color: task.color ?? colors[visualIndex % colors.length],
+        dateEndX: clippedEndX
+      }
+    ]
   })
 
   const taskMap = new Map(tasks.map((task) => [task.id, task]))
@@ -341,7 +368,7 @@ export function computeGanttLayout(
       const dependency = {
         sourceId: source.id,
         targetId: target.id,
-        sourceX: source.x + source.width,
+        sourceX: source.dateEndX,
         sourceY: source.y + source.height / 2,
         targetX: target.x,
         targetY: target.y + target.height / 2
@@ -350,7 +377,9 @@ export function computeGanttLayout(
     })
   )
 
-  const todayMs = options.today === undefined ? null : normalizeGanttDate(options.today)
+  const todaySource = options.today === undefined ? null : normalizeGanttDate(options.today)
+  const todayMs =
+    todaySource !== null && Number.isFinite(todaySource) ? startOfLocalDay(todaySource) : null
   const todayX =
     todayMs !== null && todayMs >= minMs && todayMs <= safeMaxMs ? xForTime(todayMs) : null
 
@@ -363,10 +392,11 @@ export function computeGanttLayout(
       timelineWidth,
       taskLabelWidth,
       scale,
-      dateFormatter
+      dateFormatter,
+      options.weekStartsOn
     ),
     width,
-    height: timelineHeight + data.length * rowHeight,
+    height: timelineHeight + tasks.length * rowHeight,
     timelineWidth,
     minMs,
     maxMs: safeMaxMs,
@@ -380,7 +410,8 @@ export function createGanttTimelineTicks(
   timelineWidth: number,
   taskLabelWidth: number,
   scale: GanttScale,
-  formatter: (date: Date, scale: GanttScale) => string = formatGanttDate
+  formatter: (date: Date, scale: GanttScale) => string = formatGanttDate,
+  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0
 ): GanttTimelineTick[] {
   const safeMinMs = Number.isFinite(minMs) ? minMs : Date.now()
   const safeMaxMs = Number.isFinite(maxMs) && maxMs > safeMinMs ? maxMs : safeMinMs + DAY_MS
@@ -388,7 +419,7 @@ export function createGanttTimelineTicks(
   const safeTaskLabelWidth = Number.isFinite(taskLabelWidth) ? Math.max(0, taskLabelWidth) : 0
   const ticks: GanttTimelineTick[] = []
   const rangeMs = Math.max(DAY_MS, safeMaxMs - safeMinMs)
-  let current = startOfTick(new Date(safeMinMs), scale)
+  let current = startOfTick(new Date(safeMinMs), scale, weekStartsOn)
 
   while (current.getTime() <= safeMaxMs) {
     const currentMs = current.getTime()
@@ -400,7 +431,6 @@ export function createGanttTimelineTicks(
       })
     }
     current = addTick(current, scale)
-    if (ticks.length > 64) break
   }
 
   if (ticks.length === 0) {
@@ -424,7 +454,23 @@ function clampProgress(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)))
 }
 
-function startOfTick(date: Date, scale: GanttScale): Date {
+function startOfLocalDay(ms: number): number {
+  const date = new Date(ms)
+  date.setHours(0, 0, 0, 0)
+  return date.getTime()
+}
+
+function ganttInclusiveEndMs(endValue: GanttDateValue, rawEndMs: number, startMs: number): number {
+  if (isYearMonthDayString(endValue)) return rawEndMs + DAY_MS
+  if (rawEndMs === startMs) return rawEndMs + DAY_MS
+  return rawEndMs > startMs ? rawEndMs : startMs + DAY_MS
+}
+
+function startOfTick(
+  date: Date,
+  scale: GanttScale,
+  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0
+): Date {
   const next = new Date(date)
   next.setHours(0, 0, 0, 0)
   if (scale === 'month') {
@@ -433,7 +479,8 @@ function startOfTick(date: Date, scale: GanttScale): Date {
   }
   if (scale === 'week') {
     const day = next.getDay()
-    next.setDate(next.getDate() - day)
+    const diff = (day - weekStartsOn + 7) % 7
+    next.setDate(next.getDate() - diff)
   }
   return next
 }
@@ -471,5 +518,7 @@ function preserveGanttDateValue(original: GanttDateValue, next: Date): GanttDate
   if (isYearMonthDayString(original)) return toYearMonthDayString(next)
   if (original instanceof Date) return next
   if (typeof original === 'number') return next.getTime()
-  return toYearMonthDayString(next)
+  return next
 }
+
+export const layoutGantt = computeGanttLayout

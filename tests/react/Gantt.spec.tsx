@@ -80,7 +80,7 @@ describe('Gantt', () => {
   it('supports custom colors and className', () => {
     const { container } = render(<Gantt data={data} colors={['#ff0000']} className="gantt" />)
 
-    expect(container.querySelector('svg.gantt')).toBeInTheDocument()
+    expect(container.firstElementChild).toHaveClass('gantt')
     expect(container.querySelector('rect[fill="#ff0000"]')).toBeInTheDocument()
   })
 
@@ -136,7 +136,7 @@ describe('Gantt', () => {
       fireEvent.click(getByRole('group', { name: 'Design, 01-01 to 01-05, 40%' }))
 
       expect(onSelectedIdChange).not.toHaveBeenCalled()
-      expect(onTaskClick).toHaveBeenCalledWith(disabledData[0])
+      expect(onTaskClick).not.toHaveBeenCalled()
     })
 
     it('renders today marker when the range includes today', () => {
@@ -192,14 +192,13 @@ describe('Gantt', () => {
       expect(onTaskClick).not.toHaveBeenCalled()
       expect(onSelectedIdChange).not.toHaveBeenCalled()
 
-      const movedX = Number(
-        container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x')
-      )
-      expect(movedX).not.toBe(startX)
+      expect(
+        Number(container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x'))
+      ).toBe(startX)
 
       rerender(
         <Gantt
-          data={dragData}
+          data={onDataChange.mock.calls[0][0]}
           selectable
           minDate="2026-01-01"
           maxDate="2026-01-31"
@@ -209,7 +208,7 @@ describe('Gantt', () => {
       )
       expect(
         Number(container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x'))
-      ).toBe(movedX)
+      ).not.toBe(startX)
     })
 
     it('treats a tiny pointer gesture as a click, not a date change', () => {

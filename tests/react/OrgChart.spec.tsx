@@ -112,7 +112,7 @@ describe('OrgChart', () => {
       fireEvent.click(getByRole('group', { name: 'Ada, CEO, Platform' }))
 
       expect(onSelectedIdChange).not.toHaveBeenCalled()
-      expect(onNodeClick).toHaveBeenCalledWith(disabledData)
+      expect(onNodeClick).not.toHaveBeenCalled()
     })
 
     it('applies custom aria label to the chart image', () => {

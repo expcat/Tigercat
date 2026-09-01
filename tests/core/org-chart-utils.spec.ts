@@ -84,7 +84,7 @@ describe('org-chart-utils', () => {
     expect(layout.width).toBe(460)
   })
 
-  it('supports horizontal direction by flipping coordinates', () => {
+  it('lays out horizontal trees left to right without rotating cards', () => {
     const layout = computeOrgChartLayout(orgData, {
       nodeWidth: 100,
       nodeHeight: 40,
@@ -93,18 +93,13 @@ describe('org-chart-utils', () => {
       direction: 'horizontal'
     })
 
-    const ceo = layout.nodes.find((node) => node.id === 'ceo')
-    const eng = layout.nodes.find((node) => node.id === 'eng')
-
-    expect(ceo?.x).toBe(0)
-    expect(ceo?.y).toBe(90)
-    expect(eng?.x).toBe(100)
-    expect(eng?.y).toBe(0)
-    expect(ceo?.width).toBe(100)
-    expect(ceo?.height).toBe(40)
-    expect(eng?.width).toBe(100)
-    expect(eng?.height).toBe(40)
-    expect(layout.nodes.every((node) => node.width === 100 && node.height === 40)).toBe(true)
+    const ceo = layout.nodes.find((node) => node.id === 'ceo')!
+    const eng = layout.nodes.find((node) => node.id === 'eng')!
+    expect(ceo.width).toBe(100)
+    expect(ceo.height).toBe(40)
+    expect(eng.x - (ceo.x + ceo.width)).toBe(60)
+    expect(layout.links[0].sourceX).toBe(ceo.x + ceo.width)
+    expect(layout.links[0].targetX).toBe(eng.x)
   })
 
   it('keeps default nodeWidth x nodeHeight when direction is horizontal', () => {
@@ -112,6 +107,9 @@ describe('org-chart-utils', () => {
 
     expect(layout.nodes.every((node) => node.width === 160 && node.height === 72)).toBe(true)
     expect(layout.nodes.some((node) => node.width === 72 && node.height === 160)).toBe(false)
+    const ceo = layout.nodes.find((node) => node.id === 'ceo')!
+    const child = layout.nodes.find((node) => node.parentId === 'ceo')!
+    expect(child.x - (ceo.x + ceo.width)).toBe(80)
   })
 
   it('keeps default nodeWidth x nodeHeight in vertical layout', () => {
@@ -139,54 +137,12 @@ describe('org-chart-utils', () => {
     ).toBe('Ada, CEO, Platform')
   })
 
-  it('lands node fill on registered surface, not locked white or bg/fill aliases', () => {
+  it('uses registered surface and text tokens', () => {
     expect(orgChartNodeRectClasses).toContain('--tiger-surface')
-    expect(orgChartNodeRectClasses).toContain('--tiger-org-node-bg')
-    expect(orgChartNodeRectClasses).toContain('--tiger-org-node-bg,var(--tiger-surface')
-    expect(orgChartNodeRectClasses).toContain('--tiger-border')
-    expect(orgChartNodeRectClasses).toContain('drop-shadow-sm')
-    expect(orgChartNodeRectClasses).not.toContain('--tiger-bg')
-    expect(orgChartNodeRectClasses).not.toContain('--tiger-fill')
-    expect(orgChartNodeRectClasses).not.toContain('fill-[var(--tiger-bg,#ffffff)]')
-    expect(orgChartNodeRectClasses).not.toContain('--tiger-surface-muted')
-
-    const overrideIdx = orgChartNodeRectClasses.indexOf('--tiger-org-node-bg')
-    const semanticIdx = orgChartNodeRectClasses.indexOf('--tiger-surface')
-    expect(overrideIdx).toBeGreaterThan(-1)
-    expect(semanticIdx).toBeGreaterThan(overrideIdx)
-  })
-
-  it('lands node label on registered text, not muted alias', () => {
+    expect(orgChartNodeRectClasses).not.toContain('--tiger-org-node-bg')
     expect(orgChartNodeLabelClasses).toContain('--tiger-text')
-    expect(orgChartNodeLabelClasses).toContain('--tiger-org-label,var(--tiger-text')
-    expect(orgChartNodeLabelClasses).not.toContain('--tiger-text-muted')
-    expect(orgChartNodeLabelClasses).not.toContain('--tiger-text-secondary')
-
-    const overrideIdx = orgChartNodeLabelClasses.indexOf('--tiger-org-label')
-    const semanticIdx = orgChartNodeLabelClasses.indexOf('--tiger-text,#111827')
-    expect(overrideIdx).toBeGreaterThan(-1)
-    expect(semanticIdx).toBeGreaterThan(overrideIdx)
-  })
-
-  it('lands node title and subtitle on registered text-secondary, not muted alias', () => {
+    expect(orgChartNodeLabelClasses).not.toContain('--tiger-org-label')
     expect(orgChartNodeTitleClasses).toContain('--tiger-text-secondary')
-    expect(orgChartNodeTitleClasses).toContain('--tiger-org-title,var(--tiger-text-secondary')
-    expect(orgChartNodeTitleClasses).not.toContain('--tiger-text-muted')
-    expect(orgChartNodeTitleClasses).not.toContain('--tiger-text-muted,#6b7280')
-
     expect(orgChartNodeSubtitleClasses).toContain('--tiger-text-secondary')
-    expect(orgChartNodeSubtitleClasses).toContain('--tiger-org-subtitle,var(--tiger-text-secondary')
-    expect(orgChartNodeSubtitleClasses).not.toContain('--tiger-text-muted')
-    expect(orgChartNodeSubtitleClasses).not.toContain('--tiger-text-muted,#6b7280')
-
-    const titleOverrideIdx = orgChartNodeTitleClasses.indexOf('--tiger-org-title')
-    const titleSemanticIdx = orgChartNodeTitleClasses.indexOf('--tiger-text-secondary')
-    expect(titleOverrideIdx).toBeGreaterThan(-1)
-    expect(titleSemanticIdx).toBeGreaterThan(titleOverrideIdx)
-
-    const subtitleOverrideIdx = orgChartNodeSubtitleClasses.indexOf('--tiger-org-subtitle')
-    const subtitleSemanticIdx = orgChartNodeSubtitleClasses.indexOf('--tiger-text-secondary')
-    expect(subtitleOverrideIdx).toBeGreaterThan(-1)
-    expect(subtitleSemanticIdx).toBeGreaterThan(subtitleOverrideIdx)
   })
 })

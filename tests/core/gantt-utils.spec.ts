@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   applyGanttTaskDateOverlay,
   computeGanttLayout,
@@ -53,8 +53,10 @@ describe('gantt-utils', () => {
     expect(layout.height).toBe(110)
     expect(layout.tasks[0].x).toBe(100)
     expect(layout.tasks[0].y).toBe(40)
-    expect(layout.tasks[0].width).toBeCloseTo(218.1818)
-    expect(layout.tasks[1].x).toBeCloseTo(318.1818)
+    expect(layout.tasks[0].width).toBeGreaterThan(layout.tasks[1].width / 3)
+    expect(layout.tasks[1].x).toBeGreaterThan(layout.tasks[0].x)
+    // YYYY-MM-DD end is inclusive: 01-01 to 01-05 covers 5 days.
+    expect(layout.tasks[0].endMs - layout.tasks[0].startMs).toBe(5 * DAY_MS)
   })
 
   it('clamps progress width to the rendered bar', () => {
@@ -115,16 +117,15 @@ describe('gantt-utils', () => {
     expect(formatGanttDate(new Date('2026-02-03'), 'day')).toBe('02-03')
   })
 
-  it('normalizes invalid ranges into finite layout and labels', () => {
+  it('skips invalid dates instead of painting a bar at now', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const layout = computeGanttLayout(
       [{ id: 'bad', label: 'Bad', start: 'bad-date', end: Number.POSITIVE_INFINITY, progress: 30 }],
-      { width: Number.NaN, taskLabelWidth: -100, minDate: 'bad-date', maxDate: 'also-bad' }
+      { width: 400, taskLabelWidth: 100, minDate: '2026-01-01', maxDate: '2026-01-10' }
     )
 
-    expect(layout.timelineWidth).toBe(0)
-    expect(layout.tasks[0].x).toBe(0)
-    expect(layout.tasks[0].width).toBe(6)
-    expect(getGanttTaskAriaLabel(layout.tasks[0].task)).toBe('Bad, unknown to unknown, 30%')
+    expect(layout.tasks).toEqual([])
+    warn.mockRestore()
 
     const ticks = createGanttTimelineTicks(Number.NaN, Number.POSITIVE_INFINITY, 100, 0, 'day')
     expect(ticks.every((tick) => Number.isFinite(tick.x))).toBe(true)

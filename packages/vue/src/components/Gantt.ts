@@ -1,7 +1,7 @@
 import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
 import {
-  applyGanttTaskDateOverlay,
   classNames,
+  coerceClassValue,
   clampGanttDragDeltaX,
   computeGanttLayout,
   ganttAxisTextClasses,
@@ -11,7 +11,10 @@ import {
   ganttProgressClasses,
   ganttRowClasses,
   ganttTodayLineClasses,
-  getChartInnerRect,
+  getCartesianChartShellClasses,
+  getChartLabels,
+  mergeTigerLocale,
+  normalizeChartPadding,
   getGanttTaskAriaLabel,
   getGanttTaskClasses,
   isBrowser,
@@ -21,10 +24,10 @@ import {
   type GanttLayoutTask,
   type GanttProps as CoreGanttProps,
   type GanttScale,
-  type GanttTask,
-  type GanttTaskDateOverlayEntry
+  type GanttTask
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { useTigerConfig } from './ConfigProvider'
 
 const GANTT_BAR_CLICK_PX = 4
 
@@ -47,10 +50,15 @@ interface GanttBarDragSession {
 
 export interface VueGanttProps extends CoreGanttProps {
   padding?: ChartPadding
+  onTaskClick?: (task: GanttTask) => void
+  onTaskChange?: (task: GanttTask) => void
 }
+
+export type GanttProps = VueGanttProps
 
 export const Gantt = defineComponent({
   name: 'TigerGantt',
+  inheritAttrs: false,
   props: {
     data: { type: Array as PropType<GanttTask[]>, required: true },
     width: { type: Number, default: 760 },
@@ -74,21 +82,26 @@ export const Gantt = defineComponent({
       default: undefined
     },
     activeOpacity: { type: Number, default: 1 },
-    inactiveOpacity: { type: Number, default: 0.35 },
+    inactiveOpacity: { type: Number, default: 0.25 },
+    draggable: { type: Boolean, default: false },
     dateFormatter: {
       type: Function as PropType<(date: Date, scale: GanttScale) => string>
     },
+    weekStartsOn: { type: Number as PropType<0 | 1 | 2 | 3 | 4 | 5 | 6> },
     colors: { type: Array as PropType<string[]> },
     title: { type: String },
     desc: { type: String },
-    ariaLabel: { type: String, default: 'Gantt chart' },
-    className: { type: String }
+    ariaLabel: { type: String },
+    className: { type: String },
+    onTaskClick: { type: Function as PropType<(task: GanttTask) => void> },
+    onTaskChange: { type: Function as PropType<(task: GanttTask) => void> }
   },
   emits: ['update:selectedId', 'task-click', 'task-hover', 'task-change', 'update:data'],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
     const innerSelectedId = ref<string | number | null>(null)
     const hoveredId = ref<string | number | null>(null)
-    const dateOverlay = ref<Map<string | number, GanttTaskDateOverlayEntry>>(new Map())
     const dragSession = ref<GanttBarDragSession | null>(null)
     const dragPreview = ref<{ id: string | number; deltaX: number } | null>(null)
     let documentPointerListening = false
@@ -96,11 +109,11 @@ export const Gantt = defineComponent({
     const resolvedSelectedId = computed(() =>
       props.selectedId === undefined ? innerSelectedId.value : props.selectedId
     )
-    const resolvedData = computed(() => applyGanttTaskDateOverlay(props.data, dateOverlay.value))
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const canDrag = computed(() => props.draggable || typeof props.onTaskChange === 'function')
+    const resolvedPadding = computed(() => normalizeChartPadding(props.padding))
     const layout = computed(() =>
-      computeGanttLayout(resolvedData.value, {
-        width: innerRect.value.width,
+      computeGanttLayout(props.data, {
+        width: Math.max(0, props.width - resolvedPadding.value.left - resolvedPadding.value.right),
         rowHeight: props.rowHeight,
         barHeight: props.barHeight,
         taskLabelWidth: props.taskLabelWidth,
@@ -111,17 +124,32 @@ export const Gantt = defineComponent({
         scale: props.scale,
         colors: props.colors,
         today: props.showToday ? new Date() : undefined,
-        dateFormatter: props.dateFormatter
+        dateFormatter: props.dateFormatter,
+        weekStartsOn: props.weekStartsOn
       })
+    )
+    const plotWidth = computed(() =>
+      Math.max(
+        props.width,
+        layout.value.width + resolvedPadding.value.left + resolvedPadding.value.right
+      )
+    )
+    const plotHeight = computed(() =>
+      Math.max(
+        props.height,
+        layout.value.height + resolvedPadding.value.top + resolvedPadding.value.bottom
+      )
     )
     const activeId = computed(() => resolvedSelectedId.value ?? hoveredId.value)
 
     const selectTask = (task: GanttLayoutTask) => {
-      if (props.selectable && !task.task.disabled) {
+      if (task.task.disabled) return
+      if (props.selectable) {
         const nextId = resolvedSelectedId.value === task.id ? null : task.id
-        innerSelectedId.value = nextId
+        if (props.selectedId === undefined) innerSelectedId.value = nextId
         emit('update:selectedId', nextId)
       }
+      props.onTaskClick?.(task.task)
       emit('task-click', task.task)
     }
 
@@ -214,17 +242,8 @@ export const Gantt = defineComponent({
         return
       }
 
-      const incoming = props.data.find((item) => item.id === nextTask.id)
-      const previous = dateOverlay.value.get(nextTask.id)
-      const nextOverlay = new Map(dateOverlay.value)
-      nextOverlay.set(nextTask.id, {
-        start: nextTask.start,
-        end: nextTask.end,
-        baseStart: previous?.baseStart ?? incoming?.start ?? session.sourceTask.start,
-        baseEnd: previous?.baseEnd ?? incoming?.end ?? session.sourceTask.end
-      })
-      dateOverlay.value = nextOverlay
-      const nextData = applyGanttTaskDateOverlay(props.data, nextOverlay)
+      const nextData = props.data.map((item) => (item.id === nextTask.id ? nextTask : item))
+      props.onTaskChange?.(nextTask)
       emit('task-change', nextTask)
       emit('update:data', nextData)
     }
@@ -254,7 +273,7 @@ export const Gantt = defineComponent({
     }
 
     const startBarDrag = (event: PointerEvent, task: GanttLayoutTask) => {
-      if (task.task.disabled || dragSession.value) return
+      if (!canDrag.value || task.task.disabled || dragSession.value) return
       if (event.button !== undefined && event.button !== 0) return
       event.preventDefault()
       const current = layout.value
@@ -298,150 +317,164 @@ export const Gantt = defineComponent({
 
     return () =>
       h(
-        ChartCanvas,
+        'div',
         {
-          width: props.width,
-          height: props.height,
-          padding: props.padding,
-          title: props.title,
-          desc: props.desc,
-          className: classNames(props.className),
-          role: 'img',
-          'aria-label': props.ariaLabel
+          class: getCartesianChartShellClasses({
+            showLegend: false,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
         },
-        {
-          default: () =>
-            h('g', { 'data-series-type': 'gantt' }, [
-              h('g', { 'data-gantt-axis': 'true' }, [
-                h('line', {
-                  x1: props.taskLabelWidth,
-                  x2: layout.value.width,
-                  y1: props.timelineHeight - 1,
-                  y2: props.timelineHeight - 1,
-                  stroke: 'var(--tiger-border,#d1d5db)'
-                }),
-                ...layout.value.ticks.map((tick) =>
-                  h('g', { key: `${tick.label}-${tick.x}` }, [
+        [
+          h(
+            ChartCanvas,
+            {
+              width: plotWidth.value,
+              height: plotHeight.value,
+              padding: props.padding,
+              title: props.title,
+              desc: props.desc,
+              'aria-label':
+                props.ariaLabel ?? (props.title ? undefined : labels.value.ganttAriaLabel)
+            },
+            {
+              default: () =>
+                h('g', { 'data-series-type': 'gantt' }, [
+                  h('g', { 'data-gantt-axis': 'true' }, [
                     h('line', {
-                      x1: tick.x,
-                      x2: tick.x,
-                      y1: 0,
-                      y2: layout.value.height,
-                      stroke: 'var(--tiger-border,#e5e7eb)'
+                      x1: props.taskLabelWidth,
+                      x2: layout.value.width,
+                      y1: props.timelineHeight - 1,
+                      y2: props.timelineHeight - 1,
+                      stroke: 'var(--tiger-border,#d1d5db)'
                     }),
-                    h('text', { x: tick.x + 4, y: 16, class: ganttAxisTextClasses }, tick.label)
-                  ])
-                )
-              ]),
-              h(
-                'g',
-                { 'data-gantt-rows': 'true' },
-                layout.value.tasks.map((task) =>
-                  h('rect', {
-                    key: `row-${task.id}`,
-                    x: 0,
-                    y: props.timelineHeight + task.index * props.rowHeight,
-                    width: layout.value.width,
-                    height: props.rowHeight,
-                    class: task.index % 2 === 0 ? ganttRowClasses : undefined,
-                    opacity: task.index % 2 === 0 ? 0.75 : 0
-                  })
-                )
-              ),
-              props.showToday && layout.value.todayX !== null
-                ? h('line', {
-                    x1: layout.value.todayX,
-                    x2: layout.value.todayX,
-                    y1: 0,
-                    y2: layout.value.height,
-                    class: ganttTodayLineClasses,
-                    'data-gantt-today': 'true'
-                  })
-                : undefined,
-              props.showDependencies
-                ? h(
+                    ...layout.value.ticks.map((tick) =>
+                      h('g', { key: `${tick.label}-${tick.x}` }, [
+                        h('line', {
+                          x1: tick.x,
+                          x2: tick.x,
+                          y1: 0,
+                          y2: layout.value.height,
+                          stroke: 'var(--tiger-border,#e5e7eb)'
+                        }),
+                        h('text', { x: tick.x + 4, y: 16, class: ganttAxisTextClasses }, tick.label)
+                      ])
+                    )
+                  ]),
+                  h(
                     'g',
-                    { 'data-gantt-dependencies': 'true' },
-                    layout.value.dependencies.map((dependency) =>
-                      h('path', {
-                        key: `${dependency.sourceId}-${dependency.targetId}`,
-                        d: dependency.path,
-                        class: ganttDependencyClasses
+                    { 'data-gantt-rows': 'true' },
+                    layout.value.tasks.map((task) =>
+                      h('rect', {
+                        key: `row-${task.id}`,
+                        x: 0,
+                        y: props.timelineHeight + task.index * props.rowHeight,
+                        width: layout.value.width,
+                        height: props.rowHeight,
+                        class: task.index % 2 === 0 ? ganttRowClasses : undefined,
+                        opacity: task.index % 2 === 0 ? 0.75 : 0
                       })
                     )
-                  )
-                : undefined,
-              h(
-                'g',
-                { 'data-gantt-tasks': 'true' },
-                layout.value.tasks.map((task) => {
-                  const selected = resolvedSelectedId.value === task.id
-                  const interactive = (props.hoverable || props.selectable) && !task.task.disabled
-                  const movable = !task.task.disabled
-                  const grabbing = dragPreview.value?.id === task.id
-                  const previewDeltaX = grabbing ? (dragPreview.value?.deltaX ?? 0) : 0
-                  return h('g', { key: task.id, opacity: getTaskOpacity(task) }, [
-                    h(
-                      'text',
-                      {
-                        x: 0,
-                        y: task.y + task.height / 2 + 4,
-                        class: ganttLabelClasses
-                      },
-                      task.task.label
-                    ),
-                    h(
-                      'g',
-                      {
-                        class: getGanttTaskClasses(interactive, selected, movable, grabbing),
-                        role: interactive ? 'button' : 'group',
-                        tabindex: interactive ? 0 : undefined,
-                        'aria-label': getGanttTaskAriaLabel(task.task),
-                        'data-gantt-task-id': task.id,
-                        transform:
-                          previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined,
-                        onMouseenter: () => setHoveredTask(task),
-                        onMouseleave: () => setHoveredTask(null),
-                        onPointerdown: (event: PointerEvent) => startBarDrag(event, task),
-                        onPointermove: (event: PointerEvent) => moveBarDrag(event),
-                        onPointerup: (event: PointerEvent) => finishBarDrag(event),
-                        onPointercancel: (event: PointerEvent) => finishBarDrag(event),
-                        onClick: (event: MouseEvent) => handleBarClick(event, task),
-                        onKeydown: (event: KeyboardEvent) => {
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault()
-                            selectTask(task)
-                          }
-                        }
-                      },
-                      [
-                        h('rect', {
-                          x: task.x,
-                          y: task.y,
-                          width: task.width,
-                          height: task.height,
-                          rx: 4,
-                          fill: task.color,
-                          stroke: selected ? 'var(--tiger-text,#111827)' : undefined,
-                          strokeWidth: selected ? 2 : undefined
-                        }),
-                        props.showProgress && task.progressWidth > 0
-                          ? h('rect', {
+                  ),
+                  props.showToday && layout.value.todayX !== null
+                    ? h('line', {
+                        x1: layout.value.todayX,
+                        x2: layout.value.todayX,
+                        y1: 0,
+                        y2: layout.value.height,
+                        class: ganttTodayLineClasses,
+                        'data-gantt-today': 'true'
+                      })
+                    : undefined,
+                  props.showDependencies
+                    ? h(
+                        'g',
+                        { 'data-gantt-dependencies': 'true' },
+                        layout.value.dependencies.map((dependency) =>
+                          h('path', {
+                            key: `${dependency.sourceId}-${dependency.targetId}`,
+                            d: dependency.path,
+                            class: ganttDependencyClasses
+                          })
+                        )
+                      )
+                    : undefined,
+                  h(
+                    'g',
+                    { 'data-gantt-tasks': 'true' },
+                    layout.value.tasks.map((task) => {
+                      const selected = resolvedSelectedId.value === task.id
+                      const interactive =
+                        (props.hoverable ||
+                          props.selectable ||
+                          typeof props.onTaskClick === 'function') &&
+                        !task.task.disabled
+                      const movable = canDrag.value && !task.task.disabled
+                      const grabbing = dragPreview.value?.id === task.id
+                      const previewDeltaX = grabbing ? (dragPreview.value?.deltaX ?? 0) : 0
+                      return h('g', { key: task.id, opacity: getTaskOpacity(task) }, [
+                        h(
+                          'text',
+                          {
+                            x: 0,
+                            y: task.y + task.height / 2 + 4,
+                            class: ganttLabelClasses
+                          },
+                          task.task.label
+                        ),
+                        h(
+                          'g',
+                          {
+                            class: getGanttTaskClasses(interactive, selected, movable, grabbing),
+                            role: interactive ? 'button' : 'group',
+                            tabindex: interactive ? 0 : undefined,
+                            'aria-label': getGanttTaskAriaLabel(task.task),
+                            'data-gantt-task-id': task.id,
+                            transform:
+                              previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined,
+                            onMouseenter: () => setHoveredTask(task),
+                            onMouseleave: () => setHoveredTask(null),
+                            onPointerdown: (event: PointerEvent) => startBarDrag(event, task),
+                            onPointermove: (event: PointerEvent) => moveBarDrag(event),
+                            onPointerup: (event: PointerEvent) => finishBarDrag(event),
+                            onPointercancel: (event: PointerEvent) => finishBarDrag(event),
+                            onClick: (event: MouseEvent) => handleBarClick(event, task),
+                            onKeydown: (event: KeyboardEvent) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                selectTask(task)
+                              }
+                            }
+                          },
+                          [
+                            h('rect', {
                               x: task.x,
                               y: task.y,
-                              width: task.progressWidth,
+                              width: task.width,
                               height: task.height,
                               rx: 4,
-                              class: ganttProgressClasses
-                            })
-                          : undefined
-                      ]
-                    )
-                  ])
-                })
-              )
-            ])
-        }
+                              fill: task.color,
+                              stroke: selected ? 'var(--tiger-text,#111827)' : undefined,
+                              strokeWidth: selected ? 2 : undefined
+                            }),
+                            props.showProgress && task.progressWidth > 0
+                              ? h('rect', {
+                                  x: task.x,
+                                  y: task.y,
+                                  width: task.progressWidth,
+                                  height: task.height,
+                                  rx: 4,
+                                  class: ganttProgressClasses
+                                })
+                              : undefined
+                          ]
+                        )
+                      ])
+                    })
+                  )
+                ])
+            }
+          )
+        ]
       )
   }
 })

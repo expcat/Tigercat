@@ -1,8 +1,12 @@
 import { computed, defineComponent, h, PropType, ref } from 'vue'
 import {
   classNames,
+  coerceClassValue,
   computeOrgChartLayout,
-  getChartInnerRect,
+  getCartesianChartShellClasses,
+  getChartLabels,
+  mergeTigerLocale,
+  normalizeChartPadding,
   getOrgChartNodeAriaLabel,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
@@ -16,13 +20,18 @@ import {
   type OrgChartProps as CoreOrgChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueOrgChartProps extends CoreOrgChartProps {
   padding?: ChartPadding
+  onNodeClick?: (node: OrgChartNode) => void
 }
+
+export type OrgChartProps = VueOrgChartProps
 
 export const OrgChart = defineComponent({
   name: 'TigerOrgChart',
+  inheritAttrs: false,
   props: {
     data: { type: [Object, Array] as PropType<OrgChartNode | OrgChartNode[]>, required: true },
     width: { type: Number, default: 720 },
@@ -42,21 +51,23 @@ export const OrgChart = defineComponent({
       default: undefined
     },
     activeOpacity: { type: Number, default: 1 },
-    inactiveOpacity: { type: Number, default: 0.35 },
+    inactiveOpacity: { type: Number, default: 0.25 },
     colors: { type: Array as PropType<string[]> },
     title: { type: String },
     desc: { type: String },
-    ariaLabel: { type: String, default: 'Organization chart' },
-    className: { type: String }
+    ariaLabel: { type: String },
+    className: { type: String },
+    onNodeClick: { type: Function as PropType<(node: OrgChartNode) => void> }
   },
   emits: ['update:selectedId', 'node-click', 'node-hover'],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
     const innerSelectedId = ref<string | number | null>(null)
     const hoveredId = ref<string | number | null>(null)
     const resolvedSelectedId = computed(() =>
       props.selectedId === undefined ? innerSelectedId.value : props.selectedId
     )
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
     const layout = computed(() =>
       computeOrgChartLayout(props.data, {
         nodeWidth: props.nodeWidth,
@@ -67,16 +78,49 @@ export const OrgChart = defineComponent({
         colors: props.colors
       })
     )
-    const offsetX = computed(() => Math.max(0, (innerRect.value.width - layout.value.width) / 2))
-    const offsetY = computed(() => Math.max(0, (innerRect.value.height - layout.value.height) / 2))
+    const resolvedPadding = computed(() => normalizeChartPadding(props.padding))
+    const plotWidth = computed(() =>
+      Math.max(
+        props.width,
+        layout.value.width + resolvedPadding.value.left + resolvedPadding.value.right
+      )
+    )
+    const plotHeight = computed(() =>
+      Math.max(
+        props.height,
+        layout.value.height + resolvedPadding.value.top + resolvedPadding.value.bottom
+      )
+    )
+    const offsetX = computed(() =>
+      Math.max(
+        0,
+        (plotWidth.value -
+          resolvedPadding.value.left -
+          resolvedPadding.value.right -
+          layout.value.width) /
+          2
+      )
+    )
+    const offsetY = computed(() =>
+      Math.max(
+        0,
+        (plotHeight.value -
+          resolvedPadding.value.top -
+          resolvedPadding.value.bottom -
+          layout.value.height) /
+          2
+      )
+    )
     const activeId = computed(() => resolvedSelectedId.value ?? hoveredId.value)
 
     const selectNode = (node: OrgChartLayoutNode) => {
-      if (props.selectable && !node.node.disabled) {
+      if (node.node.disabled) return
+      if (props.selectable) {
         const nextId = resolvedSelectedId.value === node.id ? null : node.id
-        innerSelectedId.value = nextId
+        if (props.selectedId === undefined) innerSelectedId.value = nextId
         emit('update:selectedId', nextId)
       }
+      props.onNodeClick?.(node.node)
       emit('node-click', node.node)
     }
 
@@ -93,111 +137,125 @@ export const OrgChart = defineComponent({
 
     return () =>
       h(
-        ChartCanvas,
+        'div',
         {
-          width: props.width,
-          height: props.height,
-          padding: props.padding,
-          title: props.title,
-          desc: props.desc,
-          className: classNames(props.className),
-          role: 'img',
-          'aria-label': props.ariaLabel
+          class: getCartesianChartShellClasses({
+            showLegend: false,
+            className: classNames(coerceClassValue(attrs.class), props.className)
+          })
         },
-        {
-          default: () =>
-            h(
-              'g',
-              {
-                transform: `translate(${offsetX.value}, ${offsetY.value})`,
-                'data-series-type': 'org-chart'
-              },
-              [
+        [
+          h(
+            ChartCanvas,
+            {
+              width: plotWidth.value,
+              height: plotHeight.value,
+              padding: props.padding,
+              title: props.title,
+              desc: props.desc,
+              'aria-label':
+                props.ariaLabel ?? (props.title ? undefined : labels.value.orgChartAriaLabel)
+            },
+            {
+              default: () =>
                 h(
                   'g',
-                  { 'data-org-chart-links': 'true' },
-                  layout.value.links.map((link) =>
-                    h('path', {
-                      key: `${link.sourceId}-${link.targetId}`,
-                      d: link.path,
-                      class: orgChartLinkClasses
-                    })
-                  )
-                ),
-                h(
-                  'g',
-                  { 'data-org-chart-nodes': 'true' },
-                  layout.value.nodes.map((node) => {
-                    const selected = resolvedSelectedId.value === node.id
-                    const interactive = (props.hoverable || props.selectable) && !node.node.disabled
-                    const textStart = props.showAvatars && node.node.avatar ? 58 : 16
-                    return h(
+                  {
+                    transform: `translate(${offsetX.value}, ${offsetY.value})`,
+                    'data-series-type': 'org-chart'
+                  },
+                  [
+                    h(
                       'g',
-                      {
-                        key: node.id,
-                        transform: `translate(${node.x}, ${node.y})`,
-                        class: getOrgChartNodeClasses(interactive, selected),
-                        opacity: getNodeOpacity(node),
-                        role: interactive ? 'button' : 'group',
-                        tabindex: interactive ? 0 : undefined,
-                        'aria-label': getOrgChartNodeAriaLabel(node.node),
-                        onMouseenter: () => setHoveredNode(node),
-                        onMouseleave: () => setHoveredNode(null),
-                        onClick: () => selectNode(node),
-                        onKeydown: (event: KeyboardEvent) => {
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault()
-                            selectNode(node)
-                          }
-                        }
-                      },
-                      [
-                        h('rect', {
-                          width: node.width,
-                          height: node.height,
-                          rx: 8,
-                          class: orgChartNodeRectClasses,
-                          stroke: selected ? node.color : undefined,
-                          strokeWidth: selected ? 2 : 1
-                        }),
-                        h('rect', { width: 4, height: node.height, rx: 2, fill: node.color }),
-                        props.showAvatars && node.node.avatar
-                          ? h('image', {
-                              href: node.node.avatar,
-                              x: 16,
-                              y: 16,
-                              width: 32,
-                              height: 32,
-                              preserveAspectRatio: 'xMidYMid slice',
-                              'aria-hidden': 'true'
-                            })
-                          : undefined,
-                        h(
-                          'text',
-                          { x: textStart, y: 26, class: orgChartNodeLabelClasses },
-                          node.node.label
-                        ),
-                        node.node.title
-                          ? h(
+                      { 'data-org-chart-links': 'true' },
+                      layout.value.links.map((link) =>
+                        h('path', {
+                          key: `${link.sourceId}-${link.targetId}`,
+                          d: link.path,
+                          class: orgChartLinkClasses
+                        })
+                      )
+                    ),
+                    h(
+                      'g',
+                      { 'data-org-chart-nodes': 'true' },
+                      layout.value.nodes.map((node) => {
+                        const selected = resolvedSelectedId.value === node.id
+                        const interactive =
+                          (props.hoverable ||
+                            props.selectable ||
+                            typeof props.onNodeClick === 'function') &&
+                          !node.node.disabled
+                        const textStart = props.showAvatars && node.node.avatar ? 58 : 16
+                        return h(
+                          'g',
+                          {
+                            key: node.id,
+                            transform: `translate(${node.x}, ${node.y})`,
+                            class: getOrgChartNodeClasses(interactive, selected),
+                            opacity: getNodeOpacity(node),
+                            role: interactive ? 'button' : 'group',
+                            tabindex: interactive ? 0 : undefined,
+                            'aria-label': getOrgChartNodeAriaLabel(node.node),
+                            onMouseenter: () => setHoveredNode(node),
+                            onMouseleave: () => setHoveredNode(null),
+                            onClick: () => selectNode(node),
+                            onKeydown: (event: KeyboardEvent) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                selectNode(node)
+                              }
+                            }
+                          },
+                          [
+                            h('rect', {
+                              width: node.width,
+                              height: node.height,
+                              rx: 8,
+                              class: orgChartNodeRectClasses,
+                              stroke: selected ? node.color : undefined,
+                              strokeWidth: selected ? 2 : 1
+                            }),
+                            h('rect', { width: 4, height: node.height, rx: 2, fill: node.color }),
+                            props.showAvatars && node.node.avatar
+                              ? h('image', {
+                                  href: node.node.avatar,
+                                  x: 16,
+                                  y: 16,
+                                  width: 32,
+                                  height: 32,
+                                  preserveAspectRatio: 'xMidYMid slice',
+                                  'aria-hidden': 'true'
+                                })
+                              : undefined,
+                            h(
                               'text',
-                              { x: textStart, y: 44, class: orgChartNodeTitleClasses },
-                              node.node.title
-                            )
-                          : undefined,
-                        props.showSubtitles && node.node.subtitle
-                          ? h(
-                              'text',
-                              { x: textStart, y: 60, class: orgChartNodeSubtitleClasses },
-                              node.node.subtitle
-                            )
-                          : undefined
-                      ]
+                              { x: textStart, y: 26, class: orgChartNodeLabelClasses },
+                              node.node.label
+                            ),
+                            node.node.title
+                              ? h(
+                                  'text',
+                                  { x: textStart, y: 44, class: orgChartNodeTitleClasses },
+                                  node.node.title
+                                )
+                              : undefined,
+                            props.showSubtitles && node.node.subtitle
+                              ? h(
+                                  'text',
+                                  { x: textStart, y: 60, class: orgChartNodeSubtitleClasses },
+                                  node.node.subtitle
+                                )
+                              : undefined
+                          ]
+                        )
+                      })
                     )
-                  })
+                  ]
                 )
-              ]
-            )
-        }
+            }
+          )
+        ]
       )
   }
 })

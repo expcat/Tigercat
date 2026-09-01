@@ -94,7 +94,7 @@ describe('OrgChart', () => {
       await fireEvent.click(getByRole('group', { name: 'Ada, CEO, Platform' }))
 
       expect(emitted()['update:selectedId']).toBeUndefined()
-      expect(emitted()['node-click']).toEqual([[disabledData]])
+      expect(emitted()['node-click']).toBeUndefined()
     })
 
     it('applies custom aria label to the chart image', () => {
