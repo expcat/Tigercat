@@ -34,13 +34,13 @@ describe('Pagination', () => {
   it('calls onChange when a page button is clicked', async () => {
     const onChange = vi.fn()
     render(<Pagination total={100} pageSize={10} onChange={onChange} />)
-    await fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
   it('sets aria-current on the active page', () => {
     render(<Pagination total={100} pageSize={10} current={3} />)
-    expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: 'Page 3' })).toHaveAttribute('aria-current', 'page')
   })
 
   it('does not emit NaN when current is not a finite page', async () => {
@@ -48,7 +48,7 @@ describe('Pagination', () => {
     render(<Pagination total={100} pageSize={10} current={Number.NaN} onChange={onChange} />)
     await fireEvent.click(screen.getByLabelText('Previous page'))
     expect(onChange).not.toHaveBeenCalled()
-    await fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 

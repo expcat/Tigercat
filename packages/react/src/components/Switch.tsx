@@ -101,7 +101,6 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
           checked={checked}
           disabled={effectiveDisabled}
           value={value}
-          aria-disabled={effectiveDisabled || undefined}
           aria-checked={checked}
           aria-invalid={status === 'error' ? true : props['aria-invalid']}
           aria-required={formItemControl?.required || props['aria-required'] ? true : undefined}

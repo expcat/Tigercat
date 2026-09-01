@@ -400,7 +400,6 @@ export const Pagination: React.FC<PaginationProps> = ({
     <nav
       className={containerClasses}
       {...navProps}
-      role="navigation"
       dir={isRtl ? 'rtl' : 'ltr'}
       aria-label={ariaLabelProp ?? (ariaLabelledbyProp ? undefined : labels.paginationAriaLabel)}
       aria-labelledby={ariaLabelledbyProp}

@@ -49,13 +49,13 @@ describe('Pagination', () => {
       props: { total: 100, pageSize: 10 },
       attrs: { onChange }
     })
-    await fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
   it('sets aria-current on the active page', () => {
     render(Pagination, { props: { total: 100, pageSize: 10, current: 3 } })
-    expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: 'Page 3' })).toHaveAttribute('aria-current', 'page')
   })
 
   it('emits update:current and change together, and never emits NaN', async () => {
@@ -67,7 +67,7 @@ describe('Pagination', () => {
     })
     await fireEvent.click(screen.getByLabelText('Previous page'))
     expect(onChange).not.toHaveBeenCalled()
-    await fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
     expect(onChange).toHaveBeenCalledWith(2, 10)
     expect(onUpdateCurrent).toHaveBeenCalledWith(2)
   })

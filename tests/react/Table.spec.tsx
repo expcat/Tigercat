@@ -530,7 +530,7 @@ describe('Table', () => {
       expect(wrapper.contains(exportButton)).toBe(true)
       expect(scroller.contains(exportButton)).toBe(false)
 
-      const pagination = wrapper.querySelector('nav[role="navigation"]')
+      const pagination = wrapper.querySelector('nav')
       expect(pagination).toBeTruthy()
       expect(wrapper.contains(pagination)).toBe(true)
       expect(scroller.contains(pagination)).toBe(false)

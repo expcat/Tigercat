@@ -637,7 +637,6 @@ export const Pagination = defineComponent({
           ...restAttrs,
           class: containerClasses.value,
           style: mergedStyle.value,
-          role: 'navigation',
           dir: isRtl.value ? 'rtl' : 'ltr',
           'aria-label':
             typeof ariaLabelAttr === 'string' ? ariaLabelAttr : labels.value.paginationAriaLabel

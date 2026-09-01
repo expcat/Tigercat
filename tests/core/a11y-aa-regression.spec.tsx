@@ -163,11 +163,11 @@ describe('Switch a11y regression', () => {
     expect(sw).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('React: disabled switch has aria-disabled', () => {
+  it('React: disabled switch uses the native disabled attribute', () => {
     const { container } = renderReact(<ReactSwitch disabled />)
 
     const sw = container.querySelector('[role="switch"]')
-    expect(sw).toHaveAttribute('aria-disabled', 'true')
+    expect(sw).toBeDisabled()
   })
 
   it('Vue: has role=switch and aria-checked', () => {
@@ -189,13 +189,13 @@ describe('Switch a11y regression', () => {
     expect(sw).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('Vue: disabled switch has aria-disabled', () => {
+  it('Vue: disabled switch uses the native disabled attribute', () => {
     const { container } = renderVue(VueSwitch, {
       props: { disabled: true }
     })
 
     const sw = container.querySelector('[role="switch"]')
-    expect(sw).toHaveAttribute('aria-disabled', 'true')
+    expect(sw).toBeDisabled()
   })
 })
 

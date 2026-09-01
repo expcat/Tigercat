@@ -165,7 +165,6 @@ export const Switch = defineComponent({
               checked: checked.value,
               disabled: effectiveDisabled.value,
               value: props.value,
-              'aria-disabled': effectiveDisabled.value || undefined,
               'aria-checked': checked.value,
               'aria-invalid': status.value === 'error' ? true : restAttrs['aria-invalid'],
               'aria-required': formItemControl?.required.value ? true : restAttrs['aria-required'],
