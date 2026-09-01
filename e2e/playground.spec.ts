@@ -9,17 +9,17 @@ for (const app of exampleApps) {
     const sourceLabel = '提交中'
 
     await expect(preview.getByRole('button', { name: sourceLabel, exact: true })).toBeVisible()
-    await moduleRoot.getByRole('button', { name: '编辑源码', exact: true }).click()
+    await moduleRoot.getByTestId('demo-edit-source').click()
     const editor = moduleRoot.getByRole('textbox', { name: 'Code editor', exact: true })
     const source = await editor.inputValue()
     await editor.fill(source.replace(sourceLabel, editedLabel))
     await expect(moduleRoot.getByText('已修改 · 尚未运行', { exact: true })).toBeVisible()
 
-    await moduleRoot.getByRole('button', { name: '运行', exact: true }).click()
+    await moduleRoot.getByTestId('demo-run').click()
     await expect(preview.getByRole('button', { name: editedLabel, exact: true })).toBeVisible()
     await expect(moduleRoot.locator('[role="alert"]')).toHaveCount(0)
 
-    await moduleRoot.getByRole('button', { name: '重置', exact: true }).click()
+    await moduleRoot.getByTestId('demo-reset').click()
     await expect(preview.getByRole('button', { name: sourceLabel, exact: true })).toBeVisible({
       timeout: 15_000
     })
@@ -44,11 +44,11 @@ test('compile errors preserve the last successful preview', async ({ page }) => 
     'button-01'
   )
   await expect(preview.getByRole('button', { name: '提交中', exact: true })).toBeVisible()
-  await moduleRoot.getByRole('button', { name: '编辑源码', exact: true }).click()
+  await moduleRoot.getByTestId('demo-edit-source').click()
   await moduleRoot
     .getByRole('textbox', { name: 'Code editor', exact: true })
     .fill('export default function App( {')
-  await moduleRoot.getByRole('button', { name: '运行', exact: true }).click()
+  await moduleRoot.getByTestId('demo-run').click()
   await expect(moduleRoot.locator('[role="alert"]')).toBeVisible()
   await expect(preview.getByRole('button', { name: '提交中', exact: true })).toBeVisible()
 })

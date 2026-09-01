@@ -2,6 +2,7 @@ import React from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
 import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
 import type { DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 
 export interface ThemeSwitchProps {
   lang?: DemoLang
@@ -23,7 +24,7 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN', value, onChan
   return (
     <div className="flex items-center gap-2 shrink-0">
       <span className="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
-        {lang === 'zh-CN' ? '主题：' : 'Theme:'}
+        {demoChrome(lang).theme}
       </span>
       <Select
         value={value}

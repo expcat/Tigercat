@@ -592,3 +592,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     ]
   }
 ]
+
+export function listDemoNavItems(): DemoNavItem[] {
+  return DEMO_NAV_GROUPS.flatMap((group) => group.items)
+}
+
+export function findDemoNavItem(pathOrKey: string): DemoNavItem | undefined {
+  const normalized = pathOrKey.startsWith('/') ? pathOrKey : `/${pathOrKey}`
+  return listDemoNavItems().find((item) => item.path === normalized || item.key === pathOrKey)
+}
+
+export function findDemoNavGroup(key: string): DemoNavGroup | undefined {
+  return DEMO_NAV_GROUPS.find((group) => group.key === key)
+}

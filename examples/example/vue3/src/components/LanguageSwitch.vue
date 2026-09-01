@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Select } from '@expcat/tigercat-vue/Select'
 import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 
 const props = defineProps<{ modelValue: DemoLang }>()
 const emit = defineEmits<{ (e: 'update:modelValue', v: DemoLang): void }>()
@@ -15,7 +16,7 @@ const handleChange = (value: string) => {
 <template>
   <div class="flex items-center gap-2 shrink-0">
     <span class="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
-      Lang:
+      {{ demoChrome(props.modelValue).language }}
     </span>
     <Select
       :model-value="props.modelValue"

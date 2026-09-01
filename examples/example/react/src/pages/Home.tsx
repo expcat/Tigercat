@@ -1,14 +1,41 @@
 import React from 'react'
 import { Code } from '@expcat/tigercat-react/Code'
+import { demoChrome } from '@demo-shared/chrome'
+import { useLang } from '../context/lang'
+
+const cssSnippet = `@import 'tailwindcss';
+@plugin '@expcat/tigercat-core/tailwind';
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';`
 
 const Home: React.FC = () => {
+  const { lang } = useLang()
+  const chrome = demoChrome(lang)
+  const usageSnippet = `import { Button } from '@expcat/tigercat-react/Button'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+
+function App() {
+  return (
+    <ConfigProvider theme="default" colorScheme="light">
+      <Button variant="primary">${chrome.homeStart}</Button>
+    </ConfigProvider>
+  )
+}
+`
+
+  const themeSnippet = `import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+
+<ConfigProvider theme="natural" colorScheme="light">
+  <App />
+</ConfigProvider>`
+
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          如何在项目中使用 Tigercat（React）
+          {chrome.homeTitle}（React）
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">按照下面的步骤安装并使用组件库。</p>
+        <p className="mt-2 text-gray-600 dark:text-gray-300">{chrome.homeLead}</p>
       </div>
 
       <div className="mb-6">
@@ -16,68 +43,43 @@ const Home: React.FC = () => {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-base">⚛️</span>
             <span className="text-sm font-semibold text-(--tiger-primary,#2563eb)">
-              当前框架 · React
+              {chrome.homeFramework} · React
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            基于 <code>@expcat/tigercat-react</code>，与 React 19 + ConfigProvider 深度集成。
+            @expcat/tigercat-react · {chrome.homeFrameworkLead}
           </p>
         </div>
       </div>
 
       <div className="mt-6 space-y-6">
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">1. 安装</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {chrome.homeInstall}
+          </h2>
           <Code className="mt-3" code="pnpm add @expcat/tigercat-react @expcat/tigercat-core" />
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            2. 配置 Tailwind v4 CSS
+            {chrome.homeCss}
           </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            在项目的 CSS 入口中加载 Tailwind、Tigercat 插件与组件扫描路径：
-          </p>
-          <Code
-            className="mt-3"
-            code={`@import 'tailwindcss';
-@plugin '@expcat/tigercat-core/tailwind/modern';
-@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';`}
-          />
-        </section>
-
-        <section>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">3. 组件使用</h2>
-
-          <Code
-            className="mt-3"
-            code={`import { Button } from '@expcat/tigercat-react/Button'
-import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
-
-function App() {
-  return (
-    <ConfigProvider>
-      <Button variant="primary">开始使用</Button>
-    </ConfigProvider>
-  )
-}
-`}
-          />
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{chrome.homeCssLead}</p>
+          <Code className="mt-3" code={cssSnippet} />
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            4. 主题色（可选）
+            {chrome.homeUsage}
           </h2>
+          <Code className="mt-3" code={usageSnippet} />
+        </section>
 
-          <Code
-            className="mt-3"
-            code={`:root {
-  --tiger-primary: #2563eb;
-  --tiger-primary-hover: #1d4ed8;
-}`}
-          />
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {chrome.homeTheme}
+          </h2>
+          <Code className="mt-3" code={themeSnippet} />
         </section>
       </div>
     </div>

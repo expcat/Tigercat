@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@expcat/tigercat-react/Button'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 import ThemeSwitch from './ThemeSwitch'
 import DarkModeSwitch from './DarkModeSwitch'
 import LanguageSwitch from './LanguageSwitch'
@@ -33,20 +34,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onToggleSider,
   rightHint
 }) => {
+  const chrome = demoChrome(lang)
   const siderLabel = isMobile
-    ? lang === 'zh-CN'
-      ? '打开菜单'
-      : 'Open menu'
-    : lang === 'zh-CN'
-      ? isSiderCollapsed
-        ? '展开侧边栏'
-        : '收起侧边栏'
-      : isSiderCollapsed
-        ? 'Expand sidebar'
-        : 'Collapse sidebar'
+    ? chrome.openMenu
+    : isSiderCollapsed
+      ? chrome.expandSidebar
+      : chrome.collapseSidebar
 
   const siderIcon = isMobile ? '☰' : isSiderCollapsed ? '»' : '«'
-  const settingsLabel = lang === 'zh-CN' ? '设置' : 'Settings'
+  const settingsLabel = chrome.settings
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 h-14 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">

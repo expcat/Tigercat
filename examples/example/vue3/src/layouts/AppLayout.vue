@@ -6,6 +6,7 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
 import { Anchor } from '@expcat/tigercat-vue/Anchor'
 import {
@@ -79,7 +80,7 @@ const isHome = computed(() => route.path === '/')
 
 const tigerLocale = computed(() => getDemoTigerLocale(lang.value))
 
-const homeLabel = computed(() => (lang.value === 'zh-CN' ? '首页' : 'Home'))
+const homeLabel = computed(() => demoChrome(lang.value).home)
 
 const headerTitle = computed(() => {
   if (pageTitle.value) return pageTitle.value

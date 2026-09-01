@@ -152,10 +152,25 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
       window.addEventListener('unhandledrejection', (event) => {
         send({ type: 'runtime-error', message: event.reason?.stack || stringify(event.reason) })
       })
-      new ResizeObserver(() => {
-        const height = Math.ceil(Math.max(document.body.scrollHeight, document.documentElement.scrollHeight))
-        send({ type: 'resize', height })
-      }).observe(document.body)
+      const measureHeight = () => {
+        let height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+        for (const node of document.querySelectorAll('[data-tiger-overlay-layer]')) {
+          const box = node.getBoundingClientRect()
+          height = Math.max(height, box.bottom + window.scrollY)
+          for (const child of node.querySelectorAll('*')) {
+            const childBox = child.getBoundingClientRect()
+            if (childBox.height > 0) height = Math.max(height, childBox.bottom + window.scrollY)
+          }
+        }
+        return Math.ceil(height)
+      }
+      const sendResize = () => send({ type: 'resize', height: measureHeight() })
+      new ResizeObserver(sendResize).observe(document.body)
+      new MutationObserver(sendResize).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      })
 
       try {
         ${reactRefreshPreamble}

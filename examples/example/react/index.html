@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tigercat React Example</title>
+    <script>
+      ;(function () {
+        try {
+          var lang = localStorage.getItem('tigercat-example-lang')
+          if (lang === 'zh-CN' || lang === 'en-US') document.documentElement.lang = lang
+          var dark = localStorage.getItem('tigercat-example-dark')
+          if (
+            dark === '1' ||
+            (dark !== '0' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          ) {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

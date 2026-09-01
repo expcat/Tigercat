@@ -17,6 +17,7 @@ import {
   setStoredSiderCollapsed,
   setStoredTheme
 } from '@demo-shared/prefs'
+import { demoChrome } from '@demo-shared/chrome'
 import { LangContext } from '../context/lang'
 import AppHeader from '../components/AppHeader'
 import AppSider from '../components/AppSider'
@@ -140,7 +141,7 @@ export const AppLayout: React.FC = () => {
 
   const tigerLocale = getDemoTigerLocale(lang)
 
-  const homeLabel = lang === 'zh-CN' ? '首页' : 'Home'
+  const homeLabel = demoChrome(lang).home
 
   const handleAnchorClick = (_event: React.MouseEvent, href: string) => {
     try {

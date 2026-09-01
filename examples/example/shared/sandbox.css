@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+@plugin "../../../packages/core/src/tailwind-plugin.ts";
+@custom-variant dark (&:where(.dark, .dark *));
+@source "../../../packages/react/src";
+@source "../../../packages/vue/src";
+@source "../../../packages/core/src";
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: transparent;
+}

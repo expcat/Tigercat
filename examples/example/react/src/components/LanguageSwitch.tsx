@@ -1,6 +1,7 @@
 import React from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
 import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 
 const languageOptions = DEMO_LANG_OPTIONS.map((o) => ({ label: o.label, value: o.value }))
 
@@ -18,7 +19,7 @@ export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange 
   return (
     <div className="flex items-center gap-2 shrink-0">
       <span className="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
-        Lang:
+        {demoChrome(value).language}
       </span>
       <Select
         value={value}

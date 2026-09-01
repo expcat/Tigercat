@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
 import type { DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 
 const props = defineProps<{ lang?: DemoLang; modelValue: string }>()
 const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
@@ -25,7 +26,7 @@ const themeOptions = computed(() =>
 <template>
   <div class="flex items-center gap-2 shrink-0">
     <span class="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
-      {{ lang === 'zh-CN' ? '主题：' : 'Theme:' }}
+      {{ demoChrome(lang).theme }}
     </span>
     <Select
       :model-value="props.modelValue"

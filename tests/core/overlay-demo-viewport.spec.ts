@@ -2,75 +2,82 @@
  * @vitest-environment node
  */
 
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import {
+  DEFAULT_DEMO_MIN_HEIGHT,
+  OVERLAY_DEMO_MIN_HEIGHT,
+  isOverlayDemoRoute,
+  resolveDemoViewport
+} from '../../examples/example/shared/playground/viewport'
+import type { DemoViewport } from '../../examples/example/shared/playground/types'
 
 const FRAMEWORK_ROOTS = [
   'examples/example/vue3/src/examples',
   'examples/example/react/src/examples'
 ] as const
 
-const RAISED_DEMOS = [
-  'datepicker/01',
-  'datepicker/02',
-  'datepicker/03',
-  'timepicker/01',
-  'timepicker/02',
-  'cascader/01',
-  'cascader/02',
-  'modal/01',
-  'modal/02',
-  'modal/03',
-  'modal/04',
-  'drawer/01',
-  'drawer/02',
-  'drawer/03',
-  'tour/01',
-  'tour/02',
-  'loading/02',
-  'loading/03',
-  'spotlight/01',
-  'spotlight/02',
-  'dropdown/01',
-  'dropdown/02',
-  'crop-upload/01',
-  'crop-upload/02'
-] as const
-
-const SKIP_DEMOS = ['loading/01', 'button/01'] as const
-
-type DemoViewportFile = {
-  viewport: { mode: string; minHeight: number; maxHeight: number; height?: number }
+function collectDemoJson(root: string): string[] {
+  const files: string[] = []
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(resolve(process.cwd(), dir), { withFileTypes: true })) {
+      const path = `${dir}/${entry.name}`
+      if (entry.isDirectory()) walk(path)
+      else if (entry.name === 'demo.json') files.push(path)
+    }
+  }
+  walk(root)
+  return files
 }
 
-function readDemo(relativePath: string): DemoViewportFile {
-  return JSON.parse(readFileSync(resolve(process.cwd(), relativePath), 'utf-8')) as DemoViewportFile
+function readDemo(relativePath: string): { viewport?: DemoViewport } {
+  return JSON.parse(readFileSync(resolve(process.cwd(), relativePath), 'utf-8')) as {
+    viewport?: DemoViewport
+  }
 }
 
-function demoPaths(demos: readonly string[]): string[] {
-  return FRAMEWORK_ROOTS.flatMap((root) => demos.map((demo) => `${root}/${demo}/demo.json`))
+function routeFromPath(relativePath: string): string {
+  const match = /\/src\/examples\/([^/]+)\//.exec(relativePath)
+  if (!match) throw new Error(`unexpected demo path ${relativePath}`)
+  return match[1]
 }
+
+const allDemos = FRAMEWORK_ROOTS.flatMap(collectDemoJson)
 
 describe('overlay demo viewports', () => {
-  it.each(demoPaths(RAISED_DEMOS))(
-    '%s minHeight fits overlay and does not freeze height',
-    (relativePath) => {
-      const demo = readDemo(relativePath)
-      expect(demo.viewport.mode).toBe('auto')
-      expect(demo.viewport.minHeight).toBeGreaterThanOrEqual(520)
-      expect(demo.viewport.maxHeight).toBeGreaterThanOrEqual(720)
-      expect(demo.viewport).not.toHaveProperty('height')
-    }
-  )
+  it('raises overlay-class routes so an open layer is not clipped at 120', () => {
+    const overlayDemos = allDemos.filter((path) => isOverlayDemoRoute(routeFromPath(path)))
+    expect(overlayDemos.length).toBeGreaterThan(20)
 
-  it.each(demoPaths(SKIP_DEMOS))(
-    '%s stays unraised (not a site-wide iframe bump)',
-    (relativePath) => {
+    for (const relativePath of overlayDemos) {
+      const route = routeFromPath(relativePath)
       const demo = readDemo(relativePath)
-      expect(demo.viewport.mode).toBe('auto')
-      expect(demo.viewport.minHeight).toBeLessThan(200)
-      expect(demo.viewport).not.toHaveProperty('height')
+      const resolved = resolveDemoViewport(route, demo.viewport)
+      expect(resolved.minHeight, relativePath).toBeGreaterThanOrEqual(OVERLAY_DEMO_MIN_HEIGHT)
+      expect(resolved.minHeight, relativePath).toBeGreaterThanOrEqual(200)
     }
-  )
+  })
+
+  it('leaves non-overlay routes such as button/01 unraised', () => {
+    const resolved = resolveDemoViewport('button', {
+      mode: 'auto',
+      minHeight: 120,
+      maxHeight: 720
+    })
+    expect(resolved.minHeight).toBe(DEFAULT_DEMO_MIN_HEIGHT)
+    expect(resolved.minHeight).toBeLessThan(200)
+  })
+
+  it('does not cap chart iframes at 720 unless the demo asked for a fixed viewport', () => {
+    const auto = resolveDemoViewport('bar-chart', { mode: 'auto', minHeight: 120, maxHeight: 720 })
+    expect(auto.maxHeight).toBeUndefined()
+    const fixed = resolveDemoViewport('bar-chart', {
+      mode: 'fixed',
+      height: 400,
+      maxHeight: 400
+    })
+    expect(fixed.maxHeight).toBe(400)
+  })
 })

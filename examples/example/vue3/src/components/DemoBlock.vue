@@ -6,6 +6,8 @@ import { copyTextToClipboard, ThemeManager } from '@expcat/tigercat-core'
 import { collectTigerCssVars } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type { DemoLang } from '@demo-shared/app-config'
+import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
+import { resolveDemoViewport } from '@demo-shared/playground/viewport'
 import type {
   DemoCompileResponse,
   DemoCompileSuccess,
@@ -18,7 +20,7 @@ import {
   getSandboxAttribute,
   isSandboxEvent
 } from '@demo-shared/playground/sandbox'
-import stylesheetUrl from '../style.css?url'
+import stylesheetUrl from '@demo-shared/sandbox.css?url'
 
 const props = defineProps<{
   module: DemoModuleDescriptor
@@ -86,6 +88,9 @@ function languageForFile(
 }
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
+const chrome = computed(() => demoChrome(demoLang.value))
+const viewport = computed(() => resolveDemoViewport(props.module.route, props.module.meta.viewport))
+const moduleTitle = computed(() => demoModuleTitle(props.module.meta, demoLang.value))
 const sectionRef = ref<HTMLElement | null>(null)
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 const visible = ref(false)
@@ -100,7 +105,7 @@ const diagnostics = ref<DemoDiagnostic[]>([])
 const consoleEntries = ref<ConsoleEntry[]>([])
 const compiled = ref<DemoCompileSuccess | null>(null)
 const sandbox = ref<{ channelId: string; document: string } | null>(null)
-const iframeHeight = ref(props.module.meta.viewport?.height ?? 180)
+const iframeHeight = ref(viewport.value.height ?? viewport.value.minHeight)
 const themeVersion = ref(0)
 let latestRun = 0
 let sandboxReady = false
@@ -213,7 +218,7 @@ function onMessage(event: MessageEvent) {
     status.value = isDirty.value ? 'dirty' : 'ready'
   }
   if (event.data.type === 'runtime-error') {
-    diagnostics.value = [{ text: event.data.message ?? '示例运行失败' }]
+    diagnostics.value = [{ text: event.data.message ?? chrome.value.runtimeFailed }]
     status.value = 'runtime-error'
   }
   if (event.data.type === 'console') {
@@ -222,10 +227,11 @@ function onMessage(event: MessageEvent) {
       { level: event.data.level ?? 'log', message: event.data.message ?? '' }
     ].slice(-100)
   }
-  if (event.data.type === 'resize' && props.module.meta.viewport?.mode !== 'fixed') {
-    const min = props.module.meta.viewport?.minHeight ?? 120
-    const max = props.module.meta.viewport?.maxHeight ?? 720
-    iframeHeight.value = Math.min(max, Math.max(min, event.data.height ?? min))
+  if (event.data.type === 'resize' && viewport.value.mode !== 'fixed') {
+    const min = viewport.value.minHeight
+    const next = Math.max(min, event.data.height ?? min)
+    iframeHeight.value =
+      viewport.value.maxHeight === undefined ? next : Math.min(viewport.value.maxHeight, next)
   }
 }
 
@@ -265,8 +271,10 @@ onBeforeUnmount(() => {
 <template>
   <section ref="sectionRef" :class="sectionClasses" :data-demo-id="module.meta.id">
     <div class="mb-4">
-      <h2 class="text-2xl font-bold mb-2 dark:text-gray-100">{{ module.meta.title }}</h2>
-      <p v-if="module.meta.description" class="text-gray-600 dark:text-gray-400">
+      <h2 class="text-2xl font-bold mb-2 dark:text-gray-100">{{ moduleTitle }}</h2>
+      <p
+        v-if="demoLang === 'zh-CN' && module.meta.description"
+        class="text-gray-600 dark:text-gray-400">
         {{ module.meta.description }}
       </p>
     </div>
@@ -278,45 +286,59 @@ onBeforeUnmount(() => {
           v-if="!sandbox"
           class="flex min-h-32 items-center justify-center text-sm text-gray-500"
           role="status">
-          {{ status === 'compile-error' ? '示例编译失败' : '正在准备独立示例…' }}
+          {{ status === 'compile-error' ? chrome.compileFailed : chrome.preparing }}
         </div>
         <iframe
           v-else
           ref="iframeRef"
-          :title="`${module.meta.title} 示例预览`"
+          :title="`${moduleTitle} ${chrome.previewTitle}`"
           :srcdoc="sandbox.document"
           :sandbox="getSandboxAttribute(module.meta)"
           :allow="(module.meta.permissions ?? []).includes('fullscreen') ? 'fullscreen' : undefined"
           class="block w-full border-0 bg-transparent"
-          :style="{ height: `${module.meta.viewport?.height ?? iframeHeight}px` }" />
+          :style="{ height: `${viewport.height ?? iframeHeight}px` }" />
       </div>
 
       <div
         class="flex flex-wrap items-center gap-2 border-t border-gray-200 px-3 py-2 dark:border-gray-800">
-        <Button size="sm" variant="secondary" @click="editorOpen = !editorOpen">
-          {{ editorOpen ? '收起源码' : '编辑源码' }}
+        <Button
+          size="sm"
+          variant="secondary"
+          data-testid="demo-edit-source"
+          @click="editorOpen = !editorOpen">
+          {{ editorOpen ? chrome.hideSource : chrome.editSource }}
         </Button>
         <template v-if="editorOpen">
           <Button
             size="sm"
+            data-testid="demo-run"
             :disabled="!originalBundle || status === 'compiling'"
             @click="handleRun">
-            {{ status === 'compiling' ? '编译中…' : '运行' }}
+            {{ status === 'compiling' ? chrome.compiling : chrome.run }}
           </Button>
-          <Button size="sm" variant="secondary" :disabled="!isDirty" @click="handleReset">
-            重置
+          <Button
+            size="sm"
+            variant="secondary"
+            data-testid="demo-reset"
+            :disabled="!isDirty"
+            @click="handleReset">
+            {{ chrome.reset }}
           </Button>
-          <Button size="sm" variant="secondary" @click="copyTextToClipboard(selectedSource)">
-            复制当前文件
+          <Button
+            size="sm"
+            variant="secondary"
+            data-testid="demo-copy-file"
+            @click="copyTextToClipboard(selectedSource)">
+            {{ chrome.copyFile }}
           </Button>
         </template>
         <span class="ml-auto text-xs text-gray-500" aria-live="polite">
-          {{ isDirty && status !== 'compiling' ? '已修改 · 尚未运行' : status }}
+          {{ isDirty && status !== 'compiling' ? chrome.dirty : status }}
         </span>
       </div>
 
       <div v-if="editorOpen" class="border-t border-gray-200 p-3 dark:border-gray-800">
-        <div class="mb-2 flex flex-wrap gap-1" role="tablist" aria-label="示例文件">
+        <div class="mb-2 flex flex-wrap gap-1" role="tablist" :aria-label="chrome.files">
           <button
             v-for="file in Object.keys(files).sort()"
             :key="file"
@@ -359,7 +381,9 @@ onBeforeUnmount(() => {
       <details
         v-if="editorOpen && consoleEntries.length > 0"
         class="border-t border-gray-200 p-3 text-xs dark:border-gray-800">
-        <summary class="cursor-pointer">控制台（{{ consoleEntries.length }}）</summary>
+        <summary class="cursor-pointer">
+          {{ chrome.console }}（{{ consoleEntries.length }}）
+        </summary>
         <pre class="mt-2 max-h-40 overflow-auto whitespace-pre-wrap">{{
           consoleEntries.map((entry) => `[${entry.level}] ${entry.message}`).join('\n')
         }}</pre>

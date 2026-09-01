@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { demoChrome } from '@demo-shared/chrome'
 import { Button } from '@expcat/tigercat-vue/Button'
 import ThemeSwitch from './ThemeSwitch.vue'
 import DarkModeSwitch from './DarkModeSwitch.vue'
@@ -23,20 +24,17 @@ const emit = defineEmits<{
 }>()
 
 const title = computed(() => DEMO_APP_TITLE[props.lang])
+const chrome = computed(() => demoChrome(props.lang))
 const siderLabel = computed(() => {
-  if (props.isMobile) {
-    if (props.lang === 'zh-CN') return '打开菜单'
-    return 'Open menu'
-  }
-  if (props.lang === 'zh-CN') return props.isSiderCollapsed ? '展开侧边栏' : '收起侧边栏'
-  return props.isSiderCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
+  if (props.isMobile) return chrome.value.openMenu
+  return props.isSiderCollapsed ? chrome.value.expandSidebar : chrome.value.collapseSidebar
 })
 
 const siderIcon = computed(() => {
   if (props.isMobile) return '☰'
   return props.isSiderCollapsed ? '»' : '«'
 })
-const settingsLabel = computed(() => (props.lang === 'zh-CN' ? '设置' : 'Settings'))
+const settingsLabel = computed(() => chrome.value.settings)
 
 const handleLangChange = (v: DemoLang) => {
   emit('update:lang', v)

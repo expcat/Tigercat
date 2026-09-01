@@ -16,8 +16,10 @@ import {
   getSandboxAttribute,
   isSandboxEvent
 } from '@demo-shared/playground/sandbox'
+import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
+import { resolveDemoViewport } from '@demo-shared/playground/viewport'
 import { useLang } from '../context/lang'
-import stylesheetUrl from '../index.css?url'
+import stylesheetUrl from '@demo-shared/sandbox.css?url'
 
 interface DemoBlockProps {
   module: DemoModuleDescriptor
@@ -99,7 +101,12 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   const [consoleEntries, setConsoleEntries] = useState<ConsoleEntry[]>([])
   const [compiled, setCompiled] = useState<DemoCompileSuccess | null>(null)
   const [sandbox, setSandbox] = useState<{ channelId: string; document: string } | null>(null)
-  const [iframeHeight, setIframeHeight] = useState(module.meta.viewport?.height ?? 180)
+  const viewport = useMemo(
+    () => resolveDemoViewport(module.route, module.meta.viewport),
+    [module.meta.viewport, module.route]
+  )
+  const [iframeHeight, setIframeHeight] = useState(viewport.height ?? viewport.minHeight)
+  const chrome = demoChrome(lang)
   const [themeVersion, setThemeVersion] = useState(0)
 
   useEffect(() => {
@@ -219,7 +226,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
         setStatus(isDirty ? 'dirty' : 'ready')
       }
       if (event.data.type === 'runtime-error') {
-        setDiagnostics([{ text: event.data.message ?? '示例运行失败' }])
+        setDiagnostics([{ text: event.data.message ?? chrome.runtimeFailed }])
         setStatus('runtime-error')
       }
       if (event.data.type === 'console') {
@@ -230,15 +237,17 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
           ].slice(-100)
         )
       }
-      if (event.data.type === 'resize' && module.meta.viewport?.mode !== 'fixed') {
-        const min = module.meta.viewport?.minHeight ?? 120
-        const max = module.meta.viewport?.maxHeight ?? 720
-        setIframeHeight(Math.min(max, Math.max(min, event.data.height ?? min)))
+      if (event.data.type === 'resize' && viewport.mode !== 'fixed') {
+        const min = viewport.minHeight
+        const next = Math.max(min, event.data.height ?? min)
+        setIframeHeight(
+          viewport.maxHeight === undefined ? next : Math.min(viewport.maxHeight, next)
+        )
       }
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [isDirty, module.meta.viewport, sandbox])
+  }, [chrome.runtimeFailed, isDirty, sandbox, viewport])
 
   const handleRun = () => {
     if (!originalBundle) return
@@ -258,8 +267,10 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   return (
     <section ref={sectionRef} className={sectionClasses} data-demo-id={module.meta.id}>
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2 dark:text-gray-100">{module.meta.title}</h2>
-        {module.meta.description ? (
+        <h2 className="text-2xl font-bold mb-2 dark:text-gray-100">
+          {demoModuleTitle(module.meta, lang)}
+        </h2>
+        {lang === 'zh-CN' && module.meta.description ? (
           <p className="text-gray-600 dark:text-gray-400">{module.meta.description}</p>
         ) : null}
       </div>
@@ -270,54 +281,65 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
             <div
               className="flex min-h-32 items-center justify-center text-sm text-gray-500"
               role="status">
-              {status === 'compile-error' ? '示例编译失败' : '正在准备独立示例…'}
+              {status === 'compile-error' ? chrome.compileFailed : chrome.preparing}
             </div>
           ) : (
             <iframe
               ref={iframeRef}
-              title={`${module.meta.title} 示例预览`}
+              title={`${demoModuleTitle(module.meta, lang)} ${chrome.previewTitle}`}
               srcDoc={sandbox.document}
               sandbox={getSandboxAttribute(module.meta)}
               allow={
                 (module.meta.permissions ?? []).includes('fullscreen') ? 'fullscreen' : undefined
               }
               className="block w-full border-0 bg-transparent"
-              style={{ height: module.meta.viewport?.height ?? iframeHeight }}
+              style={{ height: viewport.height ?? iframeHeight }}
             />
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 px-3 py-2 dark:border-gray-800">
-          <Button size="sm" variant="secondary" onClick={() => setEditorOpen((open) => !open)}>
-            {editorOpen ? '收起源码' : '编辑源码'}
+          <Button
+            size="sm"
+            variant="secondary"
+            data-testid="demo-edit-source"
+            onClick={() => setEditorOpen((open) => !open)}>
+            {editorOpen ? chrome.hideSource : chrome.editSource}
           </Button>
           {editorOpen ? (
             <>
               <Button
                 size="sm"
+                data-testid="demo-run"
                 onClick={handleRun}
                 disabled={!originalBundle || status === 'compiling'}>
-                {status === 'compiling' ? '编译中…' : '运行'}
-              </Button>
-              <Button size="sm" variant="secondary" onClick={handleReset} disabled={!isDirty}>
-                重置
+                {status === 'compiling' ? chrome.compiling : chrome.run}
               </Button>
               <Button
                 size="sm"
                 variant="secondary"
+                data-testid="demo-reset"
+                onClick={handleReset}
+                disabled={!isDirty}>
+                {chrome.reset}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                data-testid="demo-copy-file"
                 onClick={() => void copyTextToClipboard(selectedSource)}>
-                复制当前文件
+                {chrome.copyFile}
               </Button>
             </>
           ) : null}
           <span className="ml-auto text-xs text-gray-500" aria-live="polite">
-            {isDirty && status !== 'compiling' ? '已修改 · 尚未运行' : status}
+            {isDirty && status !== 'compiling' ? chrome.dirty : status}
           </span>
         </div>
 
         {editorOpen ? (
           <div className="border-t border-gray-200 p-3 dark:border-gray-800">
-            <div className="mb-2 flex flex-wrap gap-1" role="tablist" aria-label="示例文件">
+            <div className="mb-2 flex flex-wrap gap-1" role="tablist" aria-label={chrome.files}>
               {Object.keys(files)
                 .sort()
                 .map((file) => (
@@ -373,7 +395,9 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
 
         {editorOpen && consoleEntries.length > 0 ? (
           <details className="border-t border-gray-200 p-3 text-xs dark:border-gray-800">
-            <summary className="cursor-pointer">控制台（{consoleEntries.length}）</summary>
+            <summary className="cursor-pointer">
+              {chrome.console}（{consoleEntries.length}）
+            </summary>
             <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap">
               {consoleEntries.map((entry) => `[${entry.level}] ${entry.message}`).join('\n')}
             </pre>
