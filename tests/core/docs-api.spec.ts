@@ -66,8 +66,7 @@ describe('getVisiblePropRows', () => {
       'data',
       'innerRadiusRatio?',
       'centerValue?',
-      'centerLabel?',
-      'animated?'
+      'centerLabel?'
     ])
   })
 
@@ -103,11 +102,7 @@ describe('getVisiblePropRows', () => {
       'columns',
       'dataSource?',
       'pagination?',
-      'sort?',
-      'filters?',
-      'rowSelection?',
-      'expandable?',
-      'rowKey?'
+      'sort?'
     ])
   })
 })

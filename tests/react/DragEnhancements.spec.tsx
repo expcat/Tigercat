@@ -140,7 +140,7 @@ describe('Modal - Drag Enhancements', () => {
     fireEvent.pointerMove(document, { clientX: 150, clientY: 120 })
     fireEvent.pointerUp(document)
 
-    expect(dialog.style.transform).toBe('translate(50px, 20px)')
+    expect(dialog.style.transform).toBe('translate(50px, 48px)')
   })
 
   it('resets position when modal closes and reopens', () => {

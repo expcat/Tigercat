@@ -35,7 +35,8 @@ vi.mock('@expcat/tigercat-core', () => ({
   getButtonSpinnerClasses: () => 'animate-spin h-4 w-4',
   getSpinnerSVG: getSpinnerSVGMock,
   omitUnsupportedColorProp: (_component: string, props: Record<string, unknown>) => props,
-  warnMissingAccessibleName: () => {}
+  warnMissingAccessibleName: () => {},
+  TIGER_CHROME_ATTR: 'data-tiger-chrome'
 }))
 
 describe('React Button default spinner lazy creation', () => {

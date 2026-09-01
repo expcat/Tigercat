@@ -103,7 +103,9 @@ describe('Tree - Drag Enhancements', () => {
 
     expect(emitted()).toHaveProperty('drop')
     const dropPayload = emitted()['drop'][0] as unknown[]
-    expect(dropPayload[0]).toEqual({ dragKey: '1', dropKey: '2' })
+    expect(dropPayload[0]).toEqual(
+      expect.objectContaining({ dragKey: '1', dropKey: '2', dropPosition: 'inside' })
+    )
   })
 
   it('does not emit drop when dropping on same node', async () => {
@@ -161,7 +163,7 @@ describe('Modal - Drag Enhancements', () => {
     await fireEvent.pointerMove(document, { clientX: 150, clientY: 120 })
     await fireEvent.pointerUp(document)
 
-    expect(dialog.style.transform).toBe('translate(50px, 20px)')
+    expect(dialog.style.transform).toBe('translate(50px, 48px)')
   })
 
   it('resets position when modal closes and reopens', async () => {

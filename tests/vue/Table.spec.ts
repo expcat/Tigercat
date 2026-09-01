@@ -826,7 +826,7 @@ describe('Table', () => {
       expect(getByText('Person 1')).toBeInTheDocument()
       expect(queryByText('Person 11')).not.toBeInTheDocument()
 
-      await fireEvent.update(getByLabelText('/ page'), '20')
+      await fireEvent.update(getByLabelText('Items per page'), '20')
 
       expect(getByText('Person 1')).toBeInTheDocument()
       expect(getByText('Person 11')).toBeInTheDocument()

@@ -224,7 +224,9 @@ describe('Image', () => {
       })
 
       fireEvent.click(button)
-      expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeTruthy()
+      })
     } finally {
       warnSpy.mockRestore()
     }

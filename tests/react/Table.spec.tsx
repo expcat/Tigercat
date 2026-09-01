@@ -1016,7 +1016,7 @@ describe('Table', () => {
       expect(getByText('Person 1')).toBeInTheDocument()
       expect(queryByText('Person 11')).not.toBeInTheDocument()
 
-      await fireEvent.change(getByLabelText('/ page'), {
+      await fireEvent.change(getByLabelText('Items per page'), {
         target: { value: '20' }
       })
 

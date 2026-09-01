@@ -32,7 +32,7 @@ describe('interactive a11y regression coverage', () => {
 
     await waitFor(() => {
       expect(reactScreen.getByRole('dialog')).toBeInTheDocument()
-      expect(reactScreen.getByRole('button', { name: '确定' })).toBeInTheDocument()
+      expect(reactScreen.getByRole('button', { name: 'OK' })).toBeInTheDocument()
     })
 
     await expectNoA11yViolations(document.body)
@@ -52,7 +52,7 @@ describe('interactive a11y regression coverage', () => {
 
     await waitForVue(() => {
       expect(vueScreen.getByRole('dialog')).toBeInTheDocument()
-      expect(vueScreen.getByRole('button', { name: '确定' })).toBeInTheDocument()
+      expect(vueScreen.getByRole('button', { name: 'OK' })).toBeInTheDocument()
     })
 
     await expectNoA11yViolations(document.body)

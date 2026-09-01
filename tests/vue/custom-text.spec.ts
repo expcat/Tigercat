@@ -396,7 +396,7 @@ describe('custom text (no i18n) — Vue', () => {
 
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
       render(Transfer, { props: { searchable: true } })
-      expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
+      expect(screen.getAllByPlaceholderText('Search').length).toBeGreaterThan(0)
     })
 
     it('List outside a ConfigProvider keeps default English emptyText', () => {

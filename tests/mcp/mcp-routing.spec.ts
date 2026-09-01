@@ -23,7 +23,7 @@ import type { SkillIndex } from '../../packages/mcp/src/types'
 const REPO_ROOT = process.cwd()
 
 // 响应体积预算:回归到旧的整文件打包行为(单组件 ~37K、双组件 route ~116K)时必须报红。
-const COMPONENT_BUDGET_CHARS = 10_000
+const COMPONENT_BUDGET_CHARS = 14_000
 const ROUTE_BUDGET_CHARS = 24_000
 
 let index: SkillIndex

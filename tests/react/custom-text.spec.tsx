@@ -272,7 +272,7 @@ describe('custom text (no i18n) — React', () => {
 
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
       render(<Transfer searchable />)
-      expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
+      expect(screen.getAllByPlaceholderText('Search').length).toBeGreaterThan(0)
     })
 
     it('List outside a ConfigProvider keeps default English emptyText', () => {
