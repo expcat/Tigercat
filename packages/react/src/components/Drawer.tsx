@@ -16,11 +16,15 @@ import {
   getDrawerTitleClasses,
   getGestureTouchPoint,
   isDrawerSwipeCloseGesture,
+  resolveDrawerPlacement,
+  getDrawerSwipeCloseDirection,
   resolveLocaleText,
   resolveSwipeGesture,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
   scheduleOverlayLeave,
+  canStartOverlaySwipeClose,
+  OVERLAY_SWIPE_HANDLE_ATTR,
   shouldCloseOnMaskClick,
   mergeTigerLocale,
   OVERLAY_Z_INDEX,
@@ -171,8 +175,15 @@ export const Drawer: React.FC<DrawerProps> = ({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const bodyRef = useRef<HTMLDivElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
+  const swipeAllowedRef = useRef(false)
+
+  const resolvedPlacement = resolveDrawerPlacement(
+    placement,
+    mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
+  )
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
 
@@ -189,6 +200,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null
     touchCurrentRef.current = null
+    swipeAllowedRef.current = false
   }, [])
 
   const handleTouchStart = useCallback(
@@ -196,11 +208,16 @@ export const Drawer: React.FC<DrawerProps> = ({
       dialogDivProps.onTouchStart?.(event)
       if (!open) return
 
+      swipeAllowedRef.current = canStartOverlaySwipeClose({
+        target: event.target,
+        scrollContainer: bodyRef.current,
+        closeDirection: getDrawerSwipeCloseDirection(resolvedPlacement)
+      })
       const point = getGestureTouchPoint(event.touches)
       touchStartRef.current = point
       touchCurrentRef.current = point
     },
-    [dialogDivProps, open]
+    [dialogDivProps, open, resolvedPlacement]
   )
 
   const handleTouchMove = useCallback(
@@ -225,13 +242,14 @@ export const Drawer: React.FC<DrawerProps> = ({
         { minDistance: 48, minVelocity: 0.15 }
       )
 
+      const allowed = swipeAllowedRef.current
       resetTouchGesture()
 
-      if (isDrawerSwipeCloseGesture(placement, gesture)) {
+      if (allowed && isDrawerSwipeCloseGesture(resolvedPlacement, gesture)) {
         handleClose()
       }
     },
-    [dialogDivProps, handleClose, placement, resetTouchGesture]
+    [dialogDivProps, handleClose, resolvedPlacement, resetTouchGesture]
   )
 
   const handleTouchCancel = useCallback(
@@ -246,7 +264,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const maskClasses = getDrawerMaskClasses(open)
   const panelClasses = classNames(
-    getDrawerPanelClasses(placement, open, size, fullscreenOnMobile),
+    getDrawerPanelClasses(resolvedPlacement, open, size, fullscreenOnMobile),
     'flex flex-col',
     className,
     panelClassName
@@ -287,8 +305,9 @@ export const Drawer: React.FC<DrawerProps> = ({
           ...style,
           ...(width
             ? {
-                [placement === 'left' || placement === 'right' ? 'width' : 'height']:
-                  typeof width === 'number' ? `${width}px` : width
+                [resolvedPlacement === 'left' || resolvedPlacement === 'right'
+                  ? 'width'
+                  : 'height']: typeof width === 'number' ? `${width}px` : width
               }
             : undefined)
         }}
@@ -305,12 +324,16 @@ export const Drawer: React.FC<DrawerProps> = ({
         onTouchCancel={handleTouchCancel}
         data-tiger-drawer="">
         {(title || header || closable) && (
-          <div className={headerClasses}>
-            {(title || header) && (
+          <div className={headerClasses} {...{ [OVERLAY_SWIPE_HANDLE_ATTR]: '' }}>
+            {header ? (
+              <div className={titleClasses} id={titleId}>
+                {header}
+              </div>
+            ) : title ? (
               <h3 className={titleClasses} id={titleId}>
-                {header || title}
+                {title}
               </h3>
-            )}
+            ) : null}
             {closable && (
               <button
                 type="button"
@@ -324,7 +347,11 @@ export const Drawer: React.FC<DrawerProps> = ({
           </div>
         )}
 
-        {children && <div className={bodyClasses}>{children}</div>}
+        {children && (
+          <div className={bodyClasses} ref={bodyRef} data-tiger-drawer-body="">
+            {children}
+          </div>
+        )}
         {footer && <div className={footerClasses}>{footer}</div>}
       </div>
       <div id={overlayHostId} className="contents" data-tiger-overlay-host="" />

@@ -7,7 +7,7 @@ import type { TigerLocale, TigerLocaleDrawer } from './locale'
 /**
  * Drawer placement - where the drawer appears from
  */
-export type DrawerPlacement = 'left' | 'right' | 'top' | 'bottom'
+export type DrawerPlacement = 'left' | 'right' | 'top' | 'bottom' | 'start' | 'end'
 
 /**
  * Drawer size - width for left/right, height for top/bottom

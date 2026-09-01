@@ -36,6 +36,10 @@ import {
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
   scheduleOverlayLeave,
+  canStartOverlaySwipeClose,
+  isOverlayDragHandleEvent,
+  clampOverlayDragOffset,
+  OVERLAY_SWIPE_HANDLE_ATTR,
   createDocumentDragSession,
   type DocumentDragSession,
   type GesturePoint,
@@ -266,11 +270,13 @@ export const Modal = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    const bodyRef = ref<HTMLElement | null>(null)
     let touchStartPoint: GesturePoint | null = null
     let touchCurrentPoint: GesturePoint | null = null
+    let swipeAllowed = false
 
-    // Drag state
     const dragOffset = ref({ x: 0, y: 0 })
+    const dragging = ref(false)
     let dragSession: DocumentDragSession | null = null
 
     const cleanupDragSession = () => {
@@ -279,11 +285,20 @@ export const Modal = defineComponent({
     }
 
     const handleDragPointerDown = (e: PointerEvent) => {
-      if (!props.draggable || e.button !== 0) return
+      if (!props.draggable || e.button !== 0 || !isOverlayDragHandleEvent(e)) return
       e.preventDefault()
       const originX = dragOffset.value.x
       const originY = dragOffset.value.y
+      const startRect = (
+        dialogRef.value ?? (e.currentTarget as HTMLElement)
+      ).getBoundingClientRect()
+      const view = (e.currentTarget as HTMLElement | null)?.ownerDocument.defaultView
+      const viewport = {
+        width: view?.innerWidth ?? startRect.width,
+        height: view?.innerHeight ?? startRect.height
+      }
       cleanupDragSession()
+      dragging.value = true
       dragSession = createDocumentDragSession({
         startX: e.clientX,
         startY: e.clientY,
@@ -291,10 +306,16 @@ export const Modal = defineComponent({
         pointerId: e.pointerId,
         pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
         onMove: ({ deltaX, deltaY }) => {
-          dragOffset.value = { x: originX + deltaX, y: originY + deltaY }
+          dragOffset.value = clampOverlayDragOffset(
+            { x: originX, y: originY },
+            { x: deltaX, y: deltaY },
+            startRect,
+            viewport
+          )
         },
         onEnd: () => {
           dragSession = null
+          dragging.value = false
         }
       })
     }
@@ -328,19 +349,32 @@ export const Modal = defineComponent({
       }
     }
 
+    const callAttrHandler = (name: string, event: TouchEvent) => {
+      const handler = attrs[name]
+      if (typeof handler === 'function') handler(event)
+    }
+
     const resetTouchGesture = () => {
       touchStartPoint = null
       touchCurrentPoint = null
+      swipeAllowed = false
     }
 
     const handleTouchStart = (event: TouchEvent) => {
+      callAttrHandler('onTouchstart', event)
       if (!props.open || !props.mobileSheet) return
+      swipeAllowed = canStartOverlaySwipeClose({
+        target: event.target,
+        scrollContainer: bodyRef.value,
+        closeDirection: 'down'
+      })
       const point = getGestureTouchPoint(event.touches)
       touchStartPoint = point
       touchCurrentPoint = point
     }
 
     const handleTouchMove = (event: TouchEvent) => {
+      callAttrHandler('onTouchmove', event)
       if (!touchStartPoint) return
 
       const point = getGestureTouchPoint(event.touches)
@@ -350,17 +384,24 @@ export const Modal = defineComponent({
     }
 
     const handleTouchEnd = (event: TouchEvent) => {
+      callAttrHandler('onTouchend', event)
       const gesture = resolveSwipeGesture(
         touchStartPoint,
         getGestureTouchPoint(event.changedTouches) ?? touchCurrentPoint,
         { minDistance: 48, minVelocity: 0.15 }
       )
 
+      const allowed = swipeAllowed
       resetTouchGesture()
 
-      if (props.mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
+      if (allowed && props.mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
         handleClose()
       }
+    }
+
+    const handleTouchCancel = (event: TouchEvent) => {
+      callAttrHandler('onTouchcancel', event)
+      resetTouchGesture()
     }
 
     const overlayOpen = computed(() => props.open)
@@ -472,9 +513,10 @@ export const Modal = defineComponent({
               'div',
               {
                 class: modalHeaderClasses,
+                [OVERLAY_SWIPE_HANDLE_ATTR]: '',
                 onPointerdown: props.draggable ? handleDragPointerDown : undefined,
                 style: props.draggable
-                  ? 'cursor: grab; user-select: none; touch-action: none'
+                  ? `cursor: ${dragging.value ? 'grabbing' : 'grab'}; user-select: none; touch-action: none`
                   : undefined
               },
               [
@@ -511,7 +553,13 @@ export const Modal = defineComponent({
             )
           : null
 
-      const body = slots.default ? h('div', { class: modalBodyClasses }, slots.default()) : null
+      const body = slots.default
+        ? h(
+            'div',
+            { class: modalBodyClasses, ref: bodyRef, 'data-tiger-modal-body': '' },
+            slots.default()
+          )
+        : null
 
       const footer = slots.footer
         ? h(
@@ -592,7 +640,7 @@ export const Modal = defineComponent({
                   onTouchstart: handleTouchStart,
                   onTouchmove: handleTouchMove,
                   onTouchend: handleTouchEnd,
-                  onTouchcancel: resetTouchGesture,
+                  onTouchcancel: handleTouchCancel,
                   'data-tiger-modal': ''
                 },
                 [header, body, footer]

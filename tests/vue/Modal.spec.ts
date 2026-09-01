@@ -255,6 +255,32 @@ describe('Modal', () => {
       expect(onCancel).toHaveBeenCalled()
     })
 
+    it('does not close a mobile sheet when the body can still scroll', async () => {
+      const onUpdateOpen = vi.fn()
+      render(Modal, {
+        props: {
+          open: true,
+          title: 'Swipe Sheet',
+          mobileSheet: true,
+          'onUpdate:open': onUpdateOpen
+        },
+        slots: {
+          default: () => h('div', { style: 'height: 800px' }, 'Long')
+        }
+      })
+
+      const body = document.querySelector('[data-tiger-modal-body]') as HTMLElement
+      Object.defineProperty(body, 'scrollTop', { value: 80, configurable: true })
+      Object.defineProperty(body, 'clientHeight', { value: 120, configurable: true })
+      Object.defineProperty(body, 'scrollHeight', { value: 800, configurable: true })
+
+      await fireEvent.touchStart(body, { touches: [{ clientX: 120, clientY: 160 }] })
+      await fireEvent.touchMove(body, { touches: [{ clientX: 124, clientY: 240 }] })
+      await fireEvent.touchEnd(body, { changedTouches: [{ clientX: 124, clientY: 240 }] })
+
+      expect(onUpdateOpen).not.toHaveBeenCalled()
+    })
+
     it('should emit update:open and cancel when mask is clicked (maskClosable=true)', async () => {
       const user = userEvent.setup()
       const onUpdateOpen = vi.fn()

@@ -12,7 +12,11 @@ import {
   shouldCloseOnMaskClick,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
-  scheduleOverlayLeave
+  scheduleOverlayLeave,
+  canStartOverlaySwipeClose,
+  isOverlayDragHandleEvent,
+  clampOverlayDragOffset,
+  resolveDrawerPlacement
 } from '@expcat/tigercat-core'
 
 describe('overlay-utils (core)', () => {
@@ -92,6 +96,69 @@ describe('overlay-utils (core)', () => {
     ).toBe(true)
     expect(isOverlayVisuallyHidden(false, true)).toBe(false)
     expect(isOverlayVisuallyHidden(false, false)).toBe(true)
+  })
+
+  it('canStartOverlaySwipeClose only allows close from a handle or a scroll edge', () => {
+    const handle = document.createElement('div')
+    handle.setAttribute('data-tiger-overlay-handle', '')
+    const inner = document.createElement('span')
+    handle.appendChild(inner)
+
+    const scroller = document.createElement('div')
+    Object.defineProperty(scroller, 'scrollTop', { value: 40, configurable: true })
+    Object.defineProperty(scroller, 'clientHeight', { value: 100, configurable: true })
+    Object.defineProperty(scroller, 'scrollHeight', { value: 400, configurable: true })
+
+    expect(
+      canStartOverlaySwipeClose({
+        target: inner,
+        scrollContainer: scroller,
+        closeDirection: 'down'
+      })
+    ).toBe(true)
+    expect(
+      canStartOverlaySwipeClose({
+        target: scroller,
+        scrollContainer: scroller,
+        closeDirection: 'down'
+      })
+    ).toBe(false)
+
+    Object.defineProperty(scroller, 'scrollTop', { value: 0, configurable: true })
+    expect(
+      canStartOverlaySwipeClose({
+        target: scroller,
+        scrollContainer: scroller,
+        closeDirection: 'down'
+      })
+    ).toBe(true)
+  })
+
+  it('isOverlayDragHandleEvent ignores buttons inside the handle', () => {
+    const handle = document.createElement('div')
+    const button = document.createElement('button')
+    handle.appendChild(button)
+    expect(isOverlayDragHandleEvent({ target: handle })).toBe(true)
+    expect(isOverlayDragHandleEvent({ target: button })).toBe(false)
+  })
+
+  it('clampOverlayDragOffset keeps a strip of the panel in the viewport', () => {
+    const next = clampOverlayDragOffset(
+      { x: 0, y: 0 },
+      { x: 4000, y: 4000 },
+      { left: 100, top: 80, width: 200, height: 120 },
+      { width: 800, height: 600 },
+      48
+    )
+    expect(next.x).toBe(800 - 48 - 100)
+    expect(next.y).toBe(600 - 48 - 80)
+  })
+
+  it('resolveDrawerPlacement maps start/end to the physical edge', () => {
+    expect(resolveDrawerPlacement('start', 'ltr')).toBe('left')
+    expect(resolveDrawerPlacement('start', 'rtl')).toBe('right')
+    expect(resolveDrawerPlacement('end', 'rtl')).toBe('left')
+    expect(resolveDrawerPlacement('bottom', 'rtl')).toBe('bottom')
   })
 
   it('scheduleOverlayLeave finishes immediately when motion is reduced', () => {

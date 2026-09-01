@@ -171,6 +171,26 @@ describe('Drawer', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it('does not close a bottom drawer when the body can still scroll', async () => {
+    const onOpenChange = vi.fn()
+    render(
+      <Drawer open={true} title="Swipe Drawer" placement="bottom" onOpenChange={onOpenChange}>
+        <div style={{ height: 800 }}>Long</div>
+      </Drawer>
+    )
+
+    const body = document.querySelector('[data-tiger-drawer-body]') as HTMLElement
+    Object.defineProperty(body, 'scrollTop', { value: 80, configurable: true })
+    Object.defineProperty(body, 'clientHeight', { value: 120, configurable: true })
+    Object.defineProperty(body, 'scrollHeight', { value: 800, configurable: true })
+
+    fireEvent.touchStart(body, { touches: [{ clientX: 120, clientY: 160 }] })
+    fireEvent.touchMove(body, { touches: [{ clientX: 124, clientY: 240 }] })
+    fireEvent.touchEnd(body, { changedTouches: [{ clientX: 124, clientY: 240 }] })
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
   it('should lock body scroll while open and restore it when closed', async () => {
     const { rerender } = render(<Drawer open={true} title="Test Drawer" />)
 

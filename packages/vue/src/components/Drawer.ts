@@ -36,6 +36,10 @@ import {
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
   scheduleOverlayLeave,
+  canStartOverlaySwipeClose,
+  OVERLAY_SWIPE_HANDLE_ATTR,
+  resolveDrawerPlacement,
+  getDrawerSwipeCloseDirection,
   shouldCloseOnMaskClick,
   type GesturePoint,
   type DrawerPlacement,
@@ -251,8 +255,16 @@ export const Drawer = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    const bodyRef = ref<HTMLElement | null>(null)
     let touchStartPoint: GesturePoint | null = null
     let touchCurrentPoint: GesturePoint | null = null
+    let swipeAllowed = false
+    const resolvedPlacement = computed(() =>
+      resolveDrawerPlacement(
+        props.placement,
+        mergedLocale.value?.direction === 'rtl' ? 'rtl' : 'ltr'
+      )
+    )
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
@@ -276,19 +288,32 @@ export const Drawer = defineComponent({
       }
     }
 
+    const callAttrHandler = (name: string, event: TouchEvent) => {
+      const handler = attrs[name]
+      if (typeof handler === 'function') handler(event)
+    }
+
     const resetTouchGesture = () => {
       touchStartPoint = null
       touchCurrentPoint = null
+      swipeAllowed = false
     }
 
     const handleTouchStart = (event: TouchEvent) => {
+      callAttrHandler('onTouchstart', event)
       if (!props.open) return
+      swipeAllowed = canStartOverlaySwipeClose({
+        target: event.target,
+        scrollContainer: bodyRef.value,
+        closeDirection: getDrawerSwipeCloseDirection(resolvedPlacement.value)
+      })
       const point = getGestureTouchPoint(event.touches)
       touchStartPoint = point
       touchCurrentPoint = point
     }
 
     const handleTouchMove = (event: TouchEvent) => {
+      callAttrHandler('onTouchmove', event)
       if (!touchStartPoint) return
 
       const point = getGestureTouchPoint(event.touches)
@@ -298,25 +323,33 @@ export const Drawer = defineComponent({
     }
 
     const handleTouchEnd = (event: TouchEvent) => {
+      callAttrHandler('onTouchend', event)
       const gesture = resolveSwipeGesture(
         touchStartPoint,
         getGestureTouchPoint(event.changedTouches) ?? touchCurrentPoint,
         { minDistance: 48, minVelocity: 0.15 }
       )
 
+      const allowed = swipeAllowed
       resetTouchGesture()
 
-      if (isDrawerSwipeCloseGesture(props.placement, gesture)) {
+      if (allowed && isDrawerSwipeCloseGesture(resolvedPlacement.value, gesture)) {
         handleClose()
       }
     }
 
+    const handleTouchCancel = (event: TouchEvent) => {
+      callAttrHandler('onTouchcancel', event)
+      resetTouchGesture()
+    }
+
+    const overlayOpen = computed(() => props.open)
     const escapeEnabled = computed(() => props.open && props.keyboard)
     let cleanupEscape: (() => void) | undefined
 
-    useVueBodyScrollLock(escapeEnabled)
+    useVueBodyScrollLock(overlayOpen)
     useVueFocusTrap({
-      enabled: escapeEnabled,
+      enabled: overlayOpen,
       containerRef: rootRef,
       inert: true,
       autoFocus: true
@@ -382,14 +415,19 @@ export const Drawer = defineComponent({
       const maskClasses = getDrawerMaskClasses(props.open)
 
       const panelClasses = classNames(
-        getDrawerPanelClasses(props.placement, props.open, props.size, props.fullscreenOnMobile),
+        getDrawerPanelClasses(
+          resolvedPlacement.value,
+          props.open,
+          props.size,
+          props.fullscreenOnMobile
+        ),
         'flex flex-col',
         props.className,
         props.panelClassName,
         coerceClassValue(attrs.class)
       )
 
-      const isHorizontal = props.placement === 'left' || props.placement === 'right'
+      const isHorizontal = resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
       const widthStyle = props.width
         ? {
             [isHorizontal ? 'width' : 'height']:
@@ -433,17 +471,12 @@ export const Drawer = defineComponent({
 
       const header =
         props.title || slots.header || props.closable
-          ? h('div', { class: headerClasses }, [
-              props.title || slots.header
-                ? h(
-                    'h3',
-                    {
-                      id: titleId.value,
-                      class: titleClasses
-                    },
-                    slots.header ? slots.header() : props.title
-                  )
-                : null,
+          ? h('div', { class: headerClasses, [OVERLAY_SWIPE_HANDLE_ATTR]: '' }, [
+              slots.header
+                ? h('div', { id: titleId.value, class: titleClasses }, slots.header())
+                : props.title
+                  ? h('h3', { id: titleId.value, class: titleClasses }, props.title)
+                  : null,
               props.closable
                 ? h(
                     'button',
@@ -460,7 +493,13 @@ export const Drawer = defineComponent({
             ])
           : null
 
-      const body = slots.default ? h('div', { class: bodyClasses }, slots.default()) : null
+      const body = slots.default
+        ? h(
+            'div',
+            { class: bodyClasses, ref: bodyRef, 'data-tiger-drawer-body': '' },
+            slots.default()
+          )
+        : null
 
       const footer = slots.footer ? h('div', { class: footerClasses }, slots.footer()) : null
 
@@ -488,7 +527,7 @@ export const Drawer = defineComponent({
           onTouchstart: handleTouchStart,
           onTouchmove: handleTouchMove,
           onTouchend: handleTouchEnd,
-          onTouchcancel: resetTouchGesture,
+          onTouchcancel: handleTouchCancel,
           'data-tiger-drawer': ''
         },
         [header, body, footer]

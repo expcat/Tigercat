@@ -27,7 +27,7 @@ export function getDrawerContainerClasses(): string {
  * Get drawer panel classes based on placement and visibility
  */
 export function getDrawerPanelClasses(
-  placement: DrawerPlacement,
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
   visible: boolean,
   size: DrawerSize,
   fullscreenOnMobile: boolean = true
@@ -87,8 +87,19 @@ export function getDrawerPanelClasses(
   )
 }
 
-export function getDrawerSwipeCloseDirection(placement: DrawerPlacement): SwipeDirection {
-  const directionMap: Record<DrawerPlacement, SwipeDirection> = {
+export function resolveDrawerPlacement(
+  placement: DrawerPlacement,
+  direction: 'ltr' | 'rtl' = 'ltr'
+): Exclude<DrawerPlacement, 'start' | 'end'> {
+  if (placement === 'start') return direction === 'rtl' ? 'right' : 'left'
+  if (placement === 'end') return direction === 'rtl' ? 'left' : 'right'
+  return placement
+}
+
+export function getDrawerSwipeCloseDirection(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>
+): SwipeDirection {
+  const directionMap: Record<Exclude<DrawerPlacement, 'start' | 'end'>, SwipeDirection> = {
     left: 'left',
     right: 'right',
     top: 'up',
@@ -99,7 +110,7 @@ export function getDrawerSwipeCloseDirection(placement: DrawerPlacement): SwipeD
 }
 
 export function isDrawerSwipeCloseGesture(
-  placement: DrawerPlacement,
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
   gesture: SwipeGesture | null | undefined
 ): boolean {
   return Boolean(gesture && gesture.direction === getDrawerSwipeCloseDirection(placement))

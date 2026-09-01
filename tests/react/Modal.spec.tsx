@@ -218,6 +218,39 @@ describe('Modal', () => {
       expect(onCancel).toHaveBeenCalled()
     })
 
+    it('does not close a mobile sheet when the body can still scroll', async () => {
+      const onOpenChange = vi.fn()
+      render(
+        <Modal open={true} title="Swipe Sheet" mobileSheet={true} onOpenChange={onOpenChange}>
+          <div style={{ height: 800 }}>Long</div>
+        </Modal>
+      )
+
+      const body = document.querySelector('[data-tiger-modal-body]') as HTMLElement
+      Object.defineProperty(body, 'scrollTop', { value: 80, configurable: true })
+      Object.defineProperty(body, 'clientHeight', { value: 120, configurable: true })
+      Object.defineProperty(body, 'scrollHeight', { value: 800, configurable: true })
+
+      fireEvent.touchStart(body, { touches: [{ clientX: 120, clientY: 160 }] })
+      fireEvent.touchMove(body, { touches: [{ clientX: 124, clientY: 240 }] })
+      fireEvent.touchEnd(body, { changedTouches: [{ clientX: 124, clientY: 240 }] })
+
+      expect(onOpenChange).not.toHaveBeenCalled()
+    })
+
+    it('does not start a drag from the close button', async () => {
+      render(
+        <Modal open={true} title="Drag me" draggable>
+          Body
+        </Modal>
+      )
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      const closeButton = screen.getByRole('button', { name: 'Close' })
+      fireEvent.pointerDown(closeButton, { button: 0, clientX: 40, clientY: 20, pointerId: 1 })
+      fireEvent.pointerMove(document, { clientX: 200, clientY: 80, pointerId: 1 })
+      expect(dialog.style.transform || '').not.toContain('translate(')
+    })
+
     it('should call onOk when OK button in default footer is clicked', async () => {
       const user = userEvent.setup()
       const onOk = vi.fn()

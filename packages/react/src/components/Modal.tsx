@@ -21,6 +21,10 @@ import {
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
   scheduleOverlayLeave,
+  canStartOverlaySwipeClose,
+  isOverlayDragHandleEvent,
+  clampOverlayDragOffset,
+  OVERLAY_SWIPE_HANDLE_ATTR,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   mergeTigerLocale,
@@ -143,6 +147,7 @@ export const Modal: React.FC<ModalProps> = ({
   const [hasOpened, setHasOpened] = React.useState(open)
   const [leaving, setLeaving] = React.useState(false)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
+  const [dragging, setDragging] = React.useState(false)
   const wasOpenRef = useRef(open)
   const afterCloseRef = useRef(onAfterClose)
   afterCloseRef.current = onAfterClose
@@ -177,11 +182,18 @@ export const Modal: React.FC<ModalProps> = ({
 
   const handleDragPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (!isDraggable || e.button !== 0) return
+      if (!isDraggable || e.button !== 0 || !isOverlayDragHandleEvent(e)) return
       e.preventDefault()
       const originX = dragOffset.x
       const originY = dragOffset.y
+      const startRect = (dialogRef.current ?? e.currentTarget).getBoundingClientRect()
+      const view = e.currentTarget.ownerDocument.defaultView
+      const viewport = {
+        width: view?.innerWidth ?? startRect.width,
+        height: view?.innerHeight ?? startRect.height
+      }
       cleanupDragSession()
+      setDragging(true)
       dragSessionRef.current = createDocumentDragSession({
         startX: e.clientX,
         startY: e.clientY,
@@ -189,10 +201,18 @@ export const Modal: React.FC<ModalProps> = ({
         pointerId: e.pointerId,
         pointerTarget: e.currentTarget,
         onMove: ({ deltaX, deltaY }) => {
-          setDragOffset({ x: originX + deltaX, y: originY + deltaY })
+          setDragOffset(
+            clampOverlayDragOffset(
+              { x: originX, y: originY },
+              { x: deltaX, y: deltaY },
+              startRect,
+              viewport
+            )
+          )
         },
         onEnd: () => {
           dragSessionRef.current = null
+          setDragging(false)
         }
       })
     },
@@ -278,8 +298,10 @@ export const Modal: React.FC<ModalProps> = ({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const bodyRef = useRef<HTMLDivElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
+  const swipeAllowedRef = useRef(false)
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
@@ -288,6 +310,7 @@ export const Modal: React.FC<ModalProps> = ({
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null
     touchCurrentRef.current = null
+    swipeAllowedRef.current = false
   }, [])
 
   const handleTouchStart = useCallback(
@@ -295,6 +318,11 @@ export const Modal: React.FC<ModalProps> = ({
       dialogDivProps.onTouchStart?.(event)
       if (!open || !mobileSheet) return
 
+      swipeAllowedRef.current = canStartOverlaySwipeClose({
+        target: event.target,
+        scrollContainer: bodyRef.current,
+        closeDirection: 'down'
+      })
       const point = getGestureTouchPoint(event.touches)
       touchStartRef.current = point
       touchCurrentRef.current = point
@@ -324,9 +352,10 @@ export const Modal: React.FC<ModalProps> = ({
         { minDistance: 48, minVelocity: 0.15 }
       )
 
+      const allowed = swipeAllowedRef.current
       resetTouchGesture()
 
-      if (mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
+      if (allowed && mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
         handleClose()
       }
     },
@@ -409,10 +438,15 @@ export const Modal: React.FC<ModalProps> = ({
           {(title || titleContent || closable) && (
             <div
               className={modalHeaderClasses}
+              {...{ [OVERLAY_SWIPE_HANDLE_ATTR]: '' }}
               onPointerDown={isDraggable ? handleDragPointerDown : undefined}
               style={
                 isDraggable
-                  ? { cursor: 'grab', userSelect: 'none', touchAction: 'none' }
+                  ? {
+                      cursor: dragging ? 'grabbing' : 'grab',
+                      userSelect: 'none',
+                      touchAction: 'none'
+                    }
                   : undefined
               }>
               {/* Title */}
@@ -436,7 +470,11 @@ export const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Body */}
-          {children && <div className={modalBodyClasses}>{children}</div>}
+          {children && (
+            <div className={modalBodyClasses} ref={bodyRef} data-tiger-modal-body="">
+              {children}
+            </div>
+          )}
 
           {/* Footer */}
           {footer ? (

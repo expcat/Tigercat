@@ -74,6 +74,60 @@ export function isOverlayVisuallyHidden(open: boolean, leaving: boolean): boolea
   return !open && !leaving
 }
 
+export const OVERLAY_SWIPE_HANDLE_ATTR = 'data-tiger-overlay-handle'
+
+const OVERLAY_DRAG_INTERACTIVE_SELECTOR = 'a, button, input, textarea, select, [role="button"]'
+
+export function isOverlaySwipeHandleTarget(target: EventTarget | null): boolean {
+  return target instanceof Element && Boolean(target.closest(`[${OVERLAY_SWIPE_HANDLE_ATTR}]`))
+}
+
+export function isScrollAtSwipeCloseEdge(
+  element: HTMLElement,
+  direction: 'left' | 'right' | 'up' | 'down'
+): boolean {
+  const epsilon = 1
+  if (direction === 'down') return element.scrollTop <= epsilon
+  if (direction === 'up') {
+    return element.scrollTop + element.clientHeight >= element.scrollHeight - epsilon
+  }
+  if (direction === 'right') return element.scrollLeft <= epsilon
+  return element.scrollLeft + element.clientWidth >= element.scrollWidth - epsilon
+}
+
+export function canStartOverlaySwipeClose(options: {
+  target: EventTarget | null
+  scrollContainer: HTMLElement | null
+  closeDirection: 'left' | 'right' | 'up' | 'down'
+}): boolean {
+  if (isOverlaySwipeHandleTarget(options.target)) return true
+  if (!options.scrollContainer) return true
+  return isScrollAtSwipeCloseEdge(options.scrollContainer, options.closeDirection)
+}
+
+export function isOverlayDragHandleEvent(event: { target: EventTarget | null }): boolean {
+  const target = event.target
+  if (!(target instanceof Element)) return false
+  return !target.closest(OVERLAY_DRAG_INTERACTIVE_SELECTOR)
+}
+
+export function clampOverlayDragOffset(
+  origin: { x: number; y: number },
+  delta: { x: number; y: number },
+  startRect: { left: number; top: number; width: number; height: number },
+  viewport: { width: number; height: number },
+  minVisible = 48
+): { x: number; y: number } {
+  const minX = minVisible - startRect.width - startRect.left + origin.x
+  const maxX = viewport.width - minVisible - startRect.left + origin.x
+  const minY = minVisible - startRect.height - startRect.top + origin.y
+  const maxY = viewport.height - minVisible - startRect.top + origin.y
+  return {
+    x: Math.min(maxX, Math.max(minX, origin.x + delta.x)),
+    y: Math.min(maxY, Math.max(minY, origin.y + delta.y))
+  }
+}
+
 export function scheduleOverlayLeave(options: {
   onFinish: () => void
   durationMs?: number
