@@ -162,7 +162,9 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
         }
       }
       window.addEventListener('error', (event) => {
-        send({ type: 'runtime-error', message: event.error?.stack || event.message })
+        const message = event.error?.stack || event.message || ''
+        if (/ResizeObserver loop/.test(message)) return
+        send({ type: 'runtime-error', message })
       })
       window.addEventListener('unhandledrejection', (event) => {
         send({ type: 'runtime-error', message: event.reason?.stack || stringify(event.reason) })

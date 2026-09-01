@@ -10,10 +10,10 @@ for (const { framework, baseUrl } of exampleApps) {
 
     test('button renders and responds to clicks', async ({ page }) => {
       const { preview } = await openDemo(page, baseUrl, 'button', 'button-02')
-      const button = preview.getByRole('button', { name: '已点击 0 次', exact: true })
-      await expect(button).toBeEnabled()
-      await button.click()
-      await expect(preview.getByRole('button', { name: '已点击 1 次', exact: true })).toBeVisible()
+      const submit = preview.getByRole('button', { name: '提交', exact: true })
+      await expect(submit).toBeEnabled()
+      await submit.click()
+      await expect(preview.getByText('已提交 Tigercat')).toBeVisible()
     })
 
     test('input accepts text', async ({ page }) => {
@@ -26,7 +26,7 @@ for (const { framework, baseUrl } of exampleApps) {
     test('checkbox and switch toggle', async ({ page }) => {
       let opened = await openDemo(page, baseUrl, 'checkbox', 'checkbox-01')
       const checkbox = opened.preview.locator('input[type="checkbox"]').first()
-      await checkbox.check()
+      await opened.preview.locator('label').filter({ has: checkbox }).click()
       await expect(checkbox).toBeChecked()
 
       opened = await openDemo(page, baseUrl, 'switch', 'switch-01')
