@@ -1,7 +1,12 @@
 {
   "id": "message-05",
   "title": "受控消息容器",
-  "description": "直接传入 messages，并通过 position 与 onClose 管理 MessageContainer 中的消息。",
+  "description": "直接传入 messages，通过 position 与 @close / onClose 管理 MessageContainer。关闭名走 locale，不必手写。",
   "order": 5,
-  "entry": "App.tsx"
+  "entry": "App.tsx",
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 280,
+    "maxHeight": 720
+  }
 }

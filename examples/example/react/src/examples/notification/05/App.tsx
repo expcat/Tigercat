@@ -15,8 +15,6 @@ export default function NotificationContainerExample() {
       duration: 0,
       closable: true,
       position: 'bottom-right',
-      closeAriaLabel: '关闭发布检查通知',
-      onClick: () => setStatus('已打开检查列表'),
       actions: [
         {
           key: 'details',

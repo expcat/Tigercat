@@ -53,35 +53,37 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 ## LoadingBar
 
-`packages/core/src/types/loading-bar.ts` · `LoadingBarProps` · 3/6 props
+`packages/core/src/types/loading-bar.ts` · `LoadingBarProps` · 4/6 props
 
-| Prop         | Type              | Default     | Notes                                                      |
-| ------------ | ----------------- | ----------- | ---------------------------------------------------------- |
-| `color?`     | `LoadingBarColor` | `'primary'` | Fill color while loading. Error status always uses danger. |
-| `height?`    | `number`          | `2`         | Bar height in pixels.                                      |
-| `className?` | `string`          | `-`         | Additional CSS classes merged onto the bar.                |
+| Prop         | Type                    | Default                                            | Notes                                                                                      |
+| ------------ | ----------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `container?` | `string \| HTMLElement` | `-`                                                | Mount parent for the host container. CSS selector or element. Defaults to the overlay t... |
+| `ariaLabel?` | `string`                | `locale \`common.loadingText\` (\`'Loading...'\`)` | Accessible name for the progressbar.                                                       |
+| `color?`     | `LoadingBarColor`       | `'primary'`                                        | Fill color while loading. Error status always uses danger.                                 |
+| `height?`    | `number`                | `2`                                                | Bar height in pixels.                                                                      |
 
 ## LoadingBarContainer
 
-`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 3/7 props
+`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 4/7 props
 
-| Prop          | Type               | Default     | Notes                                       |
-| ------------- | ------------------ | ----------- | ------------------------------------------- |
-| `percentage?` | `number`           | `0`         | Current progress percentage (0-100).        |
-| `status?`     | `LoadingBarStatus` | `'idle'`    | Visual status. Error uses the danger color. |
-| `color?`      | `LoadingBarColor`  | `'primary'` | Fill color while loading.                   |
+| Prop          | Type               | Default                                            | Notes                                       |
+| ------------- | ------------------ | -------------------------------------------------- | ------------------------------------------- |
+| `percentage?` | `number`           | `0`                                                | Current progress percentage (0-100).        |
+| `status?`     | `LoadingBarStatus` | `'idle'`                                           | Visual status. Error uses the danger color. |
+| `height?`     | `number`           | `2`                                                | Bar height in pixels.                       |
+| `ariaLabel?`  | `string`           | `locale \`common.loadingText\` (\`'Loading...'\`)` | Accessible name for the progressbar.        |
 
 ## Message
 
 `packages/core/src/types/message.ts` · `MessageProps` · 5/8 props
 
-| Prop              | Type              | Default           | Notes                                            |
-| ----------------- | ----------------- | ----------------- | ------------------------------------------------ |
-| `type?`           | `MessageType`     | `'info'`          | Message type                                     |
-| `content?`        | `string`          | `-`               | Message content                                  |
-| `closable?`       | `boolean`         | `false`           | Whether the message can be closed manually       |
-| `position?`       | `MessagePosition` | `'top'`           | Message position on screen                       |
-| `closeAriaLabel?` | `string`          | `'Close message'` | Close button aria-label when `closable` is true. |
+| Prop              | Type              | Default                                   | Notes                                            |
+| ----------------- | ----------------- | ----------------------------------------- | ------------------------------------------------ |
+| `type?`           | `MessageType`     | `'info'`                                  | Message type                                     |
+| `content?`        | `string`          | `-`                                       | Message content                                  |
+| `closable?`       | `boolean`         | `false`                                   | Whether the message can be closed manually       |
+| `position?`       | `MessagePosition` | `'top'`                                   | Message position on screen                       |
+| `closeAriaLabel?` | `string`          | `locale \`common.closeMessageAriaLabel\`` | Close button aria-label when `closable` is true. |
 
 Events/callback props: `onClose?`.
 
@@ -89,10 +91,11 @@ Events/callback props: `onClose?`.
 
 `packages/react/src/components/MessageContainer.tsx and packages/vue/src/components/MessageContainer.ts` · `MessageContainerProps / VueMessageContainerProps`
 
-| Prop        | Type                | Default | Notes |
-| ----------- | ------------------- | ------- | ----- |
-| `position?` | `MessagePosition`   | `-`     | -     |
-| `messages?` | `MessageInstance[]` | `-`     | -     |
+| Prop        | Type                | Default | Notes                                                                                      |
+| ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `position?` | `MessagePosition`   | `-`     | -                                                                                          |
+| `messages?` | `MessageInstance[]` | `-`     | -                                                                                          |
+| `portal?`   | `boolean`           | `true`  | Portal through the overlay-host chain. Imperative hosts pass `false` because they are a... |
 
 Events/callback props: `onClose?`.
 
@@ -108,12 +111,13 @@ Events/callback props: `onClose?`.
 
 ## NotificationContainer
 
-`packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts` · `NotificationContainerProps / VueNotificationContainerProps`
+`packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts` · `NotificationContainerProps / VueNotificationContainerProps` · 3/4 props
 
 | Prop             | Type                     | Default | Notes |
 | ---------------- | ------------------------ | ------- | ----- |
 | `position?`      | `NotificationPosition`   | `-`     | -     |
 | `notifications?` | `NotificationInstance[]` | `-`     | -     |
+| `className?`     | `string`                 | `-`     | -     |
 
 Events/callback props: `onClose?`.
 

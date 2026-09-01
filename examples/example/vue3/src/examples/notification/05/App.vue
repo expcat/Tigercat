@@ -15,10 +15,6 @@ const createNotifications = (): NotificationInstance[] => [
     duration: 0,
     closable: true,
     position: 'bottom-right',
-    closeAriaLabel: '关闭发布检查通知',
-    onClick: () => {
-      status.value = '已打开检查列表'
-    },
     actions: [
       {
         key: 'details',
@@ -60,6 +56,6 @@ const removeNotification = (id: string | number) => {
     <NotificationContainer
       position="bottom-right"
       :notifications="notifications"
-      :on-close="removeNotification" />
+      @close="removeNotification" />
   </div>
 </template>

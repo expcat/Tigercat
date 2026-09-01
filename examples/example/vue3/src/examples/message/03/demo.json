@@ -1,7 +1,7 @@
 {
   "id": "message-03",
   "title": "异步流程",
-  "description": "同一流程先显示 loading，完成后关闭它并显示 success；失败时可改用 Message.error。",
+  "description": "没有 in-place update，只能卸掉 loading 再开 success。loading({ duration: 3000 }) 会在 3 秒后自己关；本例仍在完成后手动 close。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

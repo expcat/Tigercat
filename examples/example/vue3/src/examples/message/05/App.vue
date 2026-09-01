@@ -10,8 +10,7 @@ const createMessages = (): MessageInstance[] => [
     type: 'success',
     content: '草稿已保存',
     duration: 0,
-    closable: true,
-    closeAriaLabel: '关闭保存成功消息'
+    closable: true
   },
   {
     id: 'syncing',
@@ -35,6 +34,6 @@ const removeMessage = (id: string | number) => {
       <span role="status" class="text-sm text-gray-500">当前 {{ messages.length }} 条</span>
       <Button size="sm" @click="messages = createMessages()">重置消息</Button>
     </div>
-    <MessageContainer position="bottom-left" :messages="messages" :on-close="removeMessage" />
+    <MessageContainer position="bottom-left" :messages="messages" @close="removeMessage" />
   </div>
 </template>

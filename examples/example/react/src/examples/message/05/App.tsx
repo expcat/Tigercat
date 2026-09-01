@@ -9,8 +9,7 @@ const createMessages = (): MessageInstance[] => [
     type: 'success',
     content: '草稿已保存',
     duration: 0,
-    closable: true,
-    closeAriaLabel: '关闭保存成功消息'
+    closable: true
   },
   {
     id: 'syncing',

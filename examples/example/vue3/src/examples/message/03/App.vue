@@ -10,7 +10,7 @@ const submit = async () => {
   closeMessage.value?.()
   running.value = true
 
-  const closeLoading = Message.loading('正在提交...')
+  const closeLoading = Message.loading({ content: '正在提交...', duration: 3000 })
   closeMessage.value = closeLoading
   await new Promise((resolve) => window.setTimeout(resolve, 1200))
 

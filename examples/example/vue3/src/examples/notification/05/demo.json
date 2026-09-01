@@ -1,7 +1,12 @@
 {
   "id": "notification-05",
   "title": "受控通知容器",
-  "description": "直接管理 notifications 数组，展示 NotificationContainer 的位置、操作按钮、点击和关闭回调。",
+  "description": "直接管理 notifications 数组。关闭名走 locale。操作走内部 button，不要把整张 toast 做成可点 live。",
   "order": 5,
-  "entry": "App.vue"
+  "entry": "App.vue",
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 320,
+    "maxHeight": 720
+  }
 }

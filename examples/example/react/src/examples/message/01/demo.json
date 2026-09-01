@@ -1,12 +1,12 @@
 {
   "id": "message-01",
   "title": "基本消息",
-  "description": "单个成功消息代表基础用法；信息、警告和错误类型可替换调用方法。",
+  "description": "同一次点击连发两条，不必先 close。信息、警告和错误类型可替换调用方法。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {
     "mode": "auto",
-    "minHeight": 120,
+    "minHeight": 220,
     "maxHeight": 720
   }
 }

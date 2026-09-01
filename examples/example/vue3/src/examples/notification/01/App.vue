@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { notification } from '@expcat/tigercat-vue'
 
-const closeNotification = ref<(() => void) | null>(null)
-
-const showNotification = () => {
-  closeNotification.value?.()
-  closeNotification.value = notification.success({
+const showNotifications = () => {
+  notification.success({
     title: '保存成功',
     description: '个人资料已更新。'
+  })
+  notification.info({
+    title: '同步完成',
+    description: '草稿已上传到云端。'
   })
 }
 </script>
 
 <template>
-  <Button variant="primary" @click="showNotification">显示通知</Button>
+  <Button variant="primary" @click="showNotifications">连续显示两条</Button>
 </template>

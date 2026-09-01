@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { Message } from '@expcat/tigercat-vue'
 
-const closeMessage = ref<(() => void) | null>(null)
-
-const showMessage = () => {
-  closeMessage.value?.()
-  closeMessage.value = Message.success('保存成功')
+const showMessages = () => {
+  Message.success('保存成功')
+  Message.info('已写入草稿箱')
 }
 </script>
 
 <template>
-  <Button variant="primary" @click="showMessage">显示消息</Button>
+  <Button variant="primary" @click="showMessages">连续显示两条</Button>
 </template>

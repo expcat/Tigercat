@@ -10,12 +10,12 @@ const showNotification = () => {
   closeNotification.value = notification.warning({
     title: '会话即将过期',
     description: '请在两分钟内保存当前内容。',
-    position: 'bottom-left',
+    position: 'top-left',
     duration: 2500
   })
 }
 </script>
 
 <template>
-  <Button variant="primary" @click="showNotification">在左下角显示 2.5 秒</Button>
+  <Button variant="primary" @click="showNotification">在左上角显示 2.5 秒</Button>
 </template>

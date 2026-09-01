@@ -1,7 +1,7 @@
 {
   "id": "notification-04",
   "title": "操作与回调",
-  "description": "一条通知同时展示 actions 操作和 onClose 回调，点击操作不会创建额外通知。",
+  "description": "actions 默认不 closeOnClick，点了通知还在。要关掉请设 closeOnClick 或自己 close()。",
   "entry": "App.vue",
   "order": 4,
   "viewport": {
