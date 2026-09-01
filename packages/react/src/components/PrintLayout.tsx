@@ -28,7 +28,10 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-const PrintLayoutContext = React.createContext<{ showPageBreaks: boolean }>({
+const PrintLayoutContext = React.createContext<{
+  showPageBreaks: boolean
+  locale?: Partial<TigerLocale>
+}>({
   showPageBreaks: true
 })
 
@@ -63,11 +66,6 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
   ref
 ) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const config = useTigerConfig()
-  const mergedLocale = useMemo(
-    () => mergeTigerLocale(config.locale, locale),
-    [config.locale, locale]
-  )
   const box = useMemo(
     () =>
       resolvePrintPageBox(
@@ -97,7 +95,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
   const footer = showFooter ? footerRender || footerText : null
 
   return (
-    <PrintLayoutContext.Provider value={{ showPageBreaks }}>
+    <PrintLayoutContext.Provider value={{ showPageBreaks, locale }}>
       <div
         {...rest}
         ref={rootRef}
@@ -141,9 +139,11 @@ export const PrintPageBreak = forwardRef<HTMLDivElement, PrintPageBreakProps>(
     { className, locale, children, 'aria-hidden': ariaHidden, ...rest },
     ref
   ) {
-    const { showPageBreaks } = useContext(PrintLayoutContext)
+    const { showPageBreaks, locale: layoutLocale } = useContext(PrintLayoutContext)
     const config = useTigerConfig()
-    const label = getPrintLayoutLabels(mergeTigerLocale(config.locale, locale)).pageBreak
+    const label = getPrintLayoutLabels(
+      mergeTigerLocale(mergeTigerLocale(config.locale, layoutLocale), locale)
+    ).pageBreak
     return (
       <div
         {...rest}

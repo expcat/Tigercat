@@ -36,7 +36,6 @@ import {
   getInputFieldClasses,
   getInputPasswordToggleClasses,
   getInputWrapperClasses,
-  getLocaleDirection,
   getWeekStartsOn,
   icon20ViewBox,
   isDatePickerValueEmpty,

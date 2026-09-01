@@ -236,9 +236,7 @@ export const CodeEditor = defineComponent({
               class: getLineNumberClasses(props.theme),
               'aria-hidden': 'true'
             },
-            lineNums.value.map((n, index) =>
-              h('div', { key: n, class: 'min-h-[1.625rem]' }, String(n))
-            )
+            lineNums.value.map((n) => h('div', { key: n, class: 'min-h-[1.625rem]' }, String(n)))
           )
         : null
 

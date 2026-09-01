@@ -2,7 +2,6 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   TIGER_CHROME_ATTR,
   TREE_SELECT_DEFAULT_HEIGHT,
-  classNames,
   coerceTreeSelectFormValue,
   commitTreeSelectNode,
   getEmptyLabels,

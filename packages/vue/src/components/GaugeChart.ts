@@ -170,6 +170,8 @@ export const GaugeChart = defineComponent({
               height: props.height,
               padding: props.padding,
               responsive: props.responsive,
+              title: props.title,
+              desc: props.desc,
               onResolvedSizeChange
             },
             {

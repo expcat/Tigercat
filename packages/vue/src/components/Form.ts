@@ -214,9 +214,16 @@ export const Form = defineComponent({
       return ownedEngine
     }
 
-    const version = ref(0)
+    const errors = ref(engine().getErrors())
+    const values = ref(engine().getValues())
+    const canUndoNow = ref(engine().canUndo)
+    const canRedoNow = ref(engine().canRedo)
     const stop = engine().subscribe(() => {
-      version.value += 1
+      const current = engine()
+      errors.value = current.getErrors()
+      values.value = current.getValues()
+      canUndoNow.value = current.canUndo
+      canRedoNow.value = current.canRedo
     })
 
     watch(
@@ -257,23 +264,7 @@ export const Form = defineComponent({
       ownedEngine?.dispose()
     })
 
-    const errors = computed(() => {
-      version.value
-      return engine().getErrors()
-    })
     const errorsByField = computed(() => createFormErrorMap(errors.value))
-    const values = computed(() => {
-      version.value
-      return engine().getValues()
-    })
-    const canUndoNow = computed(() => {
-      version.value
-      return engine().canUndo
-    })
-    const canRedoNow = computed(() => {
-      version.value
-      return engine().canRedo
-    })
 
     const validateField = async (
       fieldName: string,

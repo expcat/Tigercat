@@ -183,19 +183,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     [resolvedGroups, applyReadOverrides]
   )
 
-  const effectiveCurrentGroup = useMemo(() => {
-    if (effectiveGroups.length === 0) return undefined
-    if (currentGroupKey === undefined) return effectiveGroups[0]
-    const index = effectiveGroups.findIndex(
-      (group, groupIndex) => getGroupKey(group, groupIndex) === currentGroupKey
-    )
-    return index >= 0 ? effectiveGroups[index] : effectiveGroups[0]
-  }, [currentGroupKey, effectiveGroups])
-
-  const effectiveCurrentGroupItems = useMemo(
-    () => effectiveCurrentGroup?.items ?? [],
-    [effectiveCurrentGroup]
-  )
   const effectiveItems = useMemo(() => applyReadOverrides(items), [items, applyReadOverrides])
 
   const allManagedItems = useMemo(() => {

@@ -17,6 +17,7 @@ import {
   mergeTigerLocale,
   getUploadLabels,
   interpolateUploadLabel,
+  isImageUploadFile,
   formatFileSize,
   getDragAreaClasses,
   getFileListItemClasses,
@@ -347,7 +348,8 @@ export const Upload = defineComponent({
     ]
 
     const actionButtons = (file: UploadFile, picture: boolean) => {
-      const canPreview = Boolean(previewUrls.get(file))
+      const canPreview =
+        Boolean(attrs.onPreview) || (isImageUploadFile(file) && Boolean(previewUrls.get(file)))
       const actionClass = picture
         ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
         : uploadIconActionClasses

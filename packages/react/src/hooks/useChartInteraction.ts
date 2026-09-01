@@ -29,7 +29,7 @@ export interface UseChartInteractionOptions<T = unknown> {
   onClick?: (index: number, datum: T | undefined) => void
 }
 
-export interface UseChartInteractionReturn<T = unknown> {
+export interface UseChartInteractionReturn {
   tooltipPosition: { x: number; y: number }
   resolvedHoveredIndex: number | null
   resolvedSelectedIndex: number | null
@@ -48,7 +48,7 @@ export interface UseChartInteractionReturn<T = unknown> {
 
 export function useChartInteraction<T = unknown>(
   options: UseChartInteractionOptions<T>
-): UseChartInteractionReturn<T> {
+): UseChartInteractionReturn {
   const {
     hoverable,
     showTooltip = true,

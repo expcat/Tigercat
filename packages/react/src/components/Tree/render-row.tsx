@@ -14,8 +14,7 @@ import {
   treeKeyId,
   treeNodeIconClasses,
   treeNodeLabelClasses,
-  treeNodeLabelMatchedClasses,
-  type TreeNode
+  treeNodeLabelMatchedClasses
 } from '@expcat/tigercat-core'
 import { Checkbox } from '../Checkbox'
 import { ExpandIcon, LoadingSpinner } from './icons'

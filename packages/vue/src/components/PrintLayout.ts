@@ -37,6 +37,9 @@ import { useTigerConfig } from './ConfigProvider'
 const PrintLayoutShowPageBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol(
   'tigerPrintShowPageBreaks'
 )
+const PrintLayoutLocaleKey: InjectionKey<ComputedRef<Partial<TigerLocale> | undefined>> = Symbol(
+  'tigerPrintLocale'
+)
 
 export interface VuePrintLayoutProps extends CorePrintLayoutProps {
   className?: string
@@ -63,10 +66,13 @@ export const PrintLayout = defineComponent({
   },
   setup(props, { slots, attrs, expose }) {
     const rootRef = ref<HTMLElement | null>(null)
-    const config = useTigerConfig()
     provide(
       PrintLayoutShowPageBreaksKey,
       computed(() => props.showPageBreaks)
+    )
+    provide(
+      PrintLayoutLocaleKey,
+      computed(() => props.locale)
     )
 
     onMounted(() => injectPrintLayoutStyles())
@@ -132,10 +138,11 @@ export const PrintPageBreak = defineComponent({
   },
   setup(props, { attrs, slots }) {
     const showPageBreaks = inject(PrintLayoutShowPageBreaksKey, null)
+    const layoutLocale = inject(PrintLayoutLocaleKey, null)
     const config = useTigerConfig()
     return () => {
       const label = getPrintLayoutLabels(
-        mergeTigerLocale(config.value.locale, props.locale)
+        mergeTigerLocale(mergeTigerLocale(config.value.locale, layoutLocale?.value), props.locale)
       ).pageBreak
       const hidden = attrs['aria-hidden']
       return h(

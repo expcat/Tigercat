@@ -12,6 +12,7 @@ import {
   getImageCompareKnobClasses,
   getImageCompareLabels,
   getImageCompareLineClasses,
+  getImageComparePointerClientPoint,
   getImageComparePositionFromPointer,
   getImageCompareRootClasses,
   getImageCompareRootStyle,
@@ -254,14 +255,16 @@ export const ImageCompare = defineComponent({
       if (isImageCompareInteractiveTarget(event.target, handleRef.value)) return
 
       event.preventDefault()
-      const next = positionFromPoint(event.clientX, event.clientY)
+      const point = getImageComparePointerClientPoint(event)
+      if (!point) return
+      const next = positionFromPoint(point.clientX, point.clientY)
       if (next !== null) commit(next)
       handleRef.value?.focus()
       dragging.value = true
       dragSession?.dispose()
       dragSession = createDocumentDragSession({
-        startX: event.clientX,
-        startY: event.clientY,
+        startX: point.clientX,
+        startY: point.clientY,
         ownerDocument:
           event.currentTarget instanceof Node ? event.currentTarget.ownerDocument : undefined,
         pointerId: event.pointerId,

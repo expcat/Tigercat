@@ -495,10 +495,15 @@ export const CommentThread = defineComponent({
                   ? h(
                       Text,
                       {
-                        tag: 'span',
+                        tag: hasUserClickHandler.value ? 'button' : 'span',
                         size: 'sm',
                         weight: 'bold',
-                        class: commentThreadAuthorClasses
+                        class: hasUserClickHandler.value
+                          ? commentThreadAuthorClasses
+                          : commentThreadAuthorClasses.replace('cursor-pointer', ''),
+                        onClick: hasUserClickHandler.value
+                          ? () => emit('user-click', node)
+                          : undefined
                       },
                       { default: () => node.user?.name }
                     )

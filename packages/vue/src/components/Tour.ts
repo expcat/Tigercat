@@ -127,7 +127,7 @@ export const Tour = defineComponent({
     const resolvedSteps = ref<TourStep[]>(props.steps)
     const currentStep = computed(() => props.current ?? internalStep.value)
     const nav = computed(() => resolveTourNav(resolvedSteps.value, currentStep.value))
-    const ctx = computed(() => getTourStepContext(nav.value))
+    const ctx = computed((): TourStepContext | undefined => getTourStepContext(nav.value))
     const step = computed(() => ctx.value?.step)
     const visible = computed(() => shouldLockTourOverlay(props.open, Boolean(step.value)))
     const targetRect = ref<TourRect | undefined>()

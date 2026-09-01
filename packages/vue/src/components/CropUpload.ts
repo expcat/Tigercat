@@ -15,7 +15,6 @@ import {
   mergeTigerLocale,
   withCropFile,
   type ImageCropperProps as CoreImageCropperProps,
-  type CropResult,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { Modal } from './Modal'

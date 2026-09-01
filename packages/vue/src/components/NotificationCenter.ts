@@ -255,19 +255,6 @@ export const NotificationCenter = defineComponent({
       }))
     )
 
-    const effectiveCurrentGroup = computed(() => {
-      const groups = effectiveGroups.value
-      if (groups.length === 0) return undefined
-      const activeKey = currentGroupKey.value
-      if (activeKey === undefined) return groups[0]
-      const matchedIndex = groups.findIndex(
-        (group, index) => getGroupKey(group, index) === activeKey
-      )
-      return matchedIndex >= 0 ? groups[matchedIndex] : groups[0]
-    })
-
-    const effectiveCurrentGroupItems = computed(() => effectiveCurrentGroup.value?.items ?? [])
-
     const effectiveItems = computed(() => applyReadOverrides(props.items))
 
     const totalUnread = computed(() => {

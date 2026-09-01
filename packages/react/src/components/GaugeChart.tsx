@@ -167,8 +167,8 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
         height={height}
         padding={padding}
         responsive={responsive}
-        title={undefined}
-        desc={undefined}
+        title={chartTitle}
+        desc={desc}
         onResolvedSizeChange={onResolvedSizeChange}>
         {gradient && valuePath && (
           <defs>

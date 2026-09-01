@@ -39,8 +39,7 @@ import {
   type InputStatus,
   type UploadFile,
   type UploadLabels,
-  type UploadProps as CoreUploadProps,
-  type UploadRejectedFile
+  type UploadProps as CoreUploadProps
 } from '@expcat/tigercat-core'
 
 import { useControlledState } from '../hooks/useControlledState'
@@ -462,7 +461,8 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   )
 
   const renderActions = (file: UploadFile, picture: boolean) => {
-    const canPreview = Boolean(onPreview) || Boolean(previewUrls.current.get(file))
+    const canPreview =
+      Boolean(onPreview) || (isImageUploadFile(file) && Boolean(previewUrls.current.get(file)))
     return (
       <>
         {canPreview ? (

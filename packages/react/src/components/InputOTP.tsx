@@ -298,6 +298,7 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
         onPaste={handlePaste}
         onFocus={handleGroupFocus}
         onBlur={handleGroupBlur}
+        onAnimationEnd={() => containerRef.current?.classList.remove(SHAKE_CLASS)}
         onClick={restOnClick}>
         {slots}
         {effectiveName && (

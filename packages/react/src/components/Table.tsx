@@ -37,7 +37,6 @@ import {
   type ExpandableConfig,
   type TableCardLayoutItem,
   type TableColumn,
-  type PaginationConfig,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'

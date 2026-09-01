@@ -266,7 +266,7 @@ export const Textarea = defineComponent({
         ...restAttrs,
         ref: textareaRef,
         class: textareaClasses.value,
-        style: mergeStyleValues(attrs.style, props.style),
+        style: mergeStyleValues(attrStyle, props.style),
         value: localValue.value,
         disabled: effectiveDisabled.value,
         readonly: props.readonly,

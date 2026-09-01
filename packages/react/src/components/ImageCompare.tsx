@@ -168,14 +168,16 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
         if (isImageCompareInteractiveTarget(event.target, handleRef.current)) return
 
         event.preventDefault()
-        const next = positionFromPoint(event.clientX, event.clientY)
+        const point = getImageComparePointerClientPoint(event)
+        if (!point) return
+        const next = positionFromPoint(point.clientX, point.clientY)
         if (next !== null) commit(next)
         handleRef.current?.focus()
         setDragging(true)
         dragSessionRef.current?.dispose()
         dragSessionRef.current = createDocumentDragSession({
-          startX: event.clientX,
-          startY: event.clientY,
+          startX: point.clientX,
+          startY: point.clientY,
           ownerDocument: event.currentTarget.ownerDocument,
           pointerId: event.pointerId,
           pointerTarget: event.currentTarget,

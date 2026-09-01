@@ -9,7 +9,6 @@ import React, {
 } from 'react'
 import {
   canClickWizardStep,
-  classNames,
   createAsyncLock,
   getFormWizardActionsClasses,
   getFormWizardBodyClasses,

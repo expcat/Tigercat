@@ -339,6 +339,7 @@ export const InputOTP = defineComponent({
           'aria-label': labelledby ? undefined : (props.ariaLabel ?? labels.value.groupLabel),
           'aria-labelledby': labelledby,
           class: getOtpContainerClasses(props.size),
+          onAnimationend: () => containerRef.value?.classList.remove(SHAKE_CLASS),
           onPaste: handlePaste,
           onFocusin: (event: FocusEvent) => {
             if (!containsNode(event.relatedTarget)) emit('focus', event)

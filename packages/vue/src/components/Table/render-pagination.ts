@@ -6,7 +6,6 @@ import {
   resolvePaginationDisplayMode,
   type TigerLocale,
   type TigerLocalePagination,
-  type PaginationConfig,
   type PaginationPageSizeOptionItem
 } from '@expcat/tigercat-core'
 import { Pagination } from '../Pagination'

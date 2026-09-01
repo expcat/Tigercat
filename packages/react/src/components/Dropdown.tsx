@@ -29,7 +29,6 @@ import {
   type DropdownItemProps as CoreDropdownItemProps,
   type DropdownMenuProps as CoreDropdownMenuProps,
   type DropdownProps as CoreDropdownProps,
-  type DropdownTrigger,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'

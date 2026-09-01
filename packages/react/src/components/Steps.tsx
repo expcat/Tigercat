@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useCallback, ReactElement } from 'react'
+import React, { createContext, useContext, useMemo, useCallback } from 'react'
 import {
   classNames,
   getStepContentClasses,
@@ -21,7 +21,6 @@ import {
   type StepStatus,
   type StepSize,
   type StepsProps as CoreStepsProps,
-  type StepItem,
   type TigerLocale,
   type TigerLocaleSteps
 } from '@expcat/tigercat-core'

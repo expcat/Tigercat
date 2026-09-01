@@ -30,7 +30,6 @@ import {
   resolveTigerLocale,
   mergeTigerLocale,
   type PaginationProps as CorePaginationProps,
-  type PaginationPageSizeOptionItem,
   type PaginationIdleValidationScheduler,
   type TigerLocale,
   type TigerLocaleInput

@@ -3,7 +3,6 @@ import {
   CASCADER_DEFAULT_LIST_HEIGHT,
   CASCADER_DEFAULT_SEPARATOR,
   TIGER_CHROME_ATTR,
-  classNames,
   coerceCascaderFormValue,
   filterCascaderOptions,
   flattenCascaderOptions,
