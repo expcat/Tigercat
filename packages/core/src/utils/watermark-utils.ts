@@ -234,7 +234,7 @@ export type WatermarkResizeObserverFactory = (
 export interface WatermarkRenderControllerOptions {
   getRenderOptions: () => WatermarkRenderOptions
   onRender: (base64Url: string | undefined) => void
-  /** Bump overlay mount when the node is removed or its style is stripped. */
+  /** Restore overlay only when the direct child is missing or no longer covering. */
   onTamper?: () => void
   requestFrame?: WatermarkFrameRequest
   cancelFrame?: WatermarkFrameCancel
@@ -273,6 +273,29 @@ function createDefaultWatermarkResizeObserver(
   return new ResizeObserver(callback)
 }
 
+const WATERMARK_OVERLAY_ATTR_FILTER = ['style', 'class', 'hidden'] as const
+
+function findDirectWatermarkOverlay(container: Element): HTMLElement | null {
+  for (const child of Array.from(container.children)) {
+    if (child instanceof HTMLElement && child.dataset.watermark === 'true') {
+      return child
+    }
+  }
+  return null
+}
+
+function watermarkOverlayCoversHost(overlay: HTMLElement): boolean {
+  if (overlay.hidden) return false
+  const { position, pointerEvents, display, visibility, opacity } = overlay.style
+  if (display === 'none' || visibility === 'hidden' || opacity === '0') return false
+  if (position !== 'absolute' || pointerEvents !== 'none') return false
+  if (typeof getComputedStyle === 'function') {
+    const computed = getComputedStyle(overlay)
+    if (computed.display === 'none' || computed.visibility === 'hidden') return false
+  }
+  return true
+}
+
 export function createWatermarkRenderController(
   options: WatermarkRenderControllerOptions
 ): WatermarkRenderController {
@@ -284,6 +307,8 @@ export function createWatermarkRenderController(
   let observer: WatermarkResizeObserverLike | undefined
   let mutationObserver: MutationObserver | undefined
   let observedTarget: Element | undefined
+  let observedOverlay: HTMLElement | undefined
+  let restoring = false
   let frameHandle: number | undefined
   let pending = false
   let renderVersion = 0
@@ -319,7 +344,9 @@ export function createWatermarkRenderController(
     observer = undefined
     mutationObserver?.disconnect()
     mutationObserver = undefined
+    observedOverlay = undefined
     observedTarget = undefined
+    restoring = false
     pending = false
     renderVersion += 1
 
@@ -329,34 +356,45 @@ export function createWatermarkRenderController(
     }
   }
 
+  function watchOverlay(overlay: HTMLElement | null): void {
+    if (!mutationObserver || !observedTarget) return
+    if (overlay === observedOverlay) return
+    mutationObserver.disconnect()
+    mutationObserver.observe(observedTarget, { childList: true })
+    if (overlay) {
+      mutationObserver.observe(overlay, {
+        attributes: true,
+        attributeFilter: [...WATERMARK_OVERLAY_ATTR_FILTER]
+      })
+    }
+    observedOverlay = overlay ?? undefined
+  }
+
+  function restoreIfNeeded(): void {
+    if (!observedTarget || restoring) return
+    const overlay = findDirectWatermarkOverlay(observedTarget)
+    watchOverlay(overlay)
+    if (overlay && watermarkOverlayCoversHost(overlay)) return
+    restoring = true
+    try {
+      options.onTamper?.()
+    } finally {
+      restoring = false
+    }
+  }
+
   function observe(target: Element): void {
-    if (target === observedTarget && observer) return
+    if (target === observedTarget && mutationObserver) return
 
     disconnect()
     observedTarget = target
 
     if (typeof MutationObserver !== 'undefined') {
-      mutationObserver = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          for (const node of Array.from(mutation.removedNodes)) {
-            if ((node as HTMLElement).dataset?.watermark === 'true') {
-              options.onTamper?.()
-              return
-            }
-          }
-          const el = mutation.target as HTMLElement
-          if (mutation.type === 'attributes' && el.dataset?.watermark === 'true') {
-            options.onTamper?.()
-            return
-          }
-        }
+      mutationObserver = new MutationObserver(() => {
+        restoreIfNeeded()
       })
-      mutationObserver.observe(target, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style', 'class', 'hidden']
-      })
+      mutationObserver.observe(target, { childList: true })
+      watchOverlay(findDirectWatermarkOverlay(target))
     }
 
     if (options.createResizeObserver) {

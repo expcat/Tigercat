@@ -38,7 +38,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | Statistic    | -    | `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。                                                                                                                                       |
 | Tag          | -    | 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。                                                                                                                                                                                    |
 | Text         | -    | `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。                                                                                                                                       |
-| Watermark    | -    | `gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。需要打印时 overlay 带 print-color-adjust。                                                                                                                                                                  |
+| Watermark    | -    | `gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。                                                                                                                          |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 

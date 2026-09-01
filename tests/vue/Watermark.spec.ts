@@ -3,7 +3,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/vue'
+import { render, screen, waitFor } from '@testing-library/vue'
 import { Watermark } from '@expcat/tigercat-vue/Watermark'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -87,6 +87,33 @@ describe('Watermark', () => {
     })
     const overlay = container.querySelector('[data-watermark="true"]')
     expect(overlay).toBeInTheDocument()
+  })
+
+  it('keeps the same overlay node after painting', async () => {
+    const { container } = render(Watermark, {
+      props: { content: 'Secret' },
+      slots: { default: 'Protected content' }
+    })
+    const overlay = container.querySelector('[data-watermark="true"]') as HTMLElement
+    expect(overlay).toBeTruthy()
+    overlay.style.backgroundImage = 'url(data:image/png;base64,painted)'
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(container.querySelector('[data-watermark="true"]')).toBe(overlay)
+  })
+
+  it('restores overlay after it is removed', async () => {
+    const { container } = render(Watermark, {
+      props: { content: 'Secret' },
+      slots: { default: 'Protected content' }
+    })
+    const overlay = container.querySelector('[data-watermark="true"]') as HTMLElement
+    expect(overlay).toBeTruthy()
+    overlay.remove()
+    await waitFor(() => {
+      const restored = container.querySelector('[data-watermark="true"]')
+      expect(restored).toBeTruthy()
+      expect(restored).not.toBe(overlay)
+    })
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {

@@ -272,7 +272,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Watermark: {
     notes:
-      '`gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。需要打印时 overlay 带 print-color-adjust。'
+      '`gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。'
   },
   Layout: {
     notes:

@@ -416,4 +416,120 @@ describe('watermark-utils', () => {
     controller.observe(target2)
     expect(resize.observer.observe).toHaveBeenCalledTimes(2)
   })
+
+  function createCoveringOverlay(): HTMLElement {
+    const overlay = document.createElement('div')
+    overlay.dataset.watermark = 'true'
+    overlay.setAttribute('aria-hidden', 'true')
+    overlay.style.position = 'absolute'
+    overlay.style.pointerEvents = 'none'
+    overlay.style.inset = '0'
+    overlay.style.backgroundRepeat = 'repeat'
+    return overlay
+  }
+
+  function createObservedHost(): HTMLElement {
+    const target = document.createElement('div')
+    document.body.appendChild(target)
+    return target
+  }
+
+  async function waitForMutations(): Promise<void> {
+    await Promise.resolve()
+    await Promise.resolve()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  }
+
+  it('does not treat overlay paint or remount as tamper', async () => {
+    const onTamper = vi.fn()
+    const target = createObservedHost()
+    const overlay = createCoveringOverlay()
+    target.appendChild(overlay)
+    const controller = createWatermarkRenderController({
+      getRenderOptions: renderOptions,
+      onRender: vi.fn(),
+      onTamper,
+      render: () => 'data:image/png;base64,x'
+    })
+
+    controller.observe(target)
+    overlay.style.backgroundImage = 'url(data:image/png;base64,x)'
+    await waitForMutations()
+
+    const remounted = createCoveringOverlay()
+    remounted.style.backgroundImage = overlay.style.backgroundImage
+    overlay.remove()
+    target.appendChild(remounted)
+    await waitForMutations()
+
+    expect(onTamper).not.toHaveBeenCalled()
+    controller.disconnect()
+    target.remove()
+  })
+
+  it('restores overlay when the direct child is removed', async () => {
+    const onTamper = vi.fn()
+    const target = createObservedHost()
+    const overlay = createCoveringOverlay()
+    target.appendChild(overlay)
+    const controller = createWatermarkRenderController({
+      getRenderOptions: renderOptions,
+      onRender: vi.fn(),
+      onTamper,
+      render: () => 'data:image/png;base64,x'
+    })
+
+    controller.observe(target)
+    overlay.remove()
+    await vi.waitFor(() => expect(onTamper).toHaveBeenCalledTimes(1))
+
+    controller.disconnect()
+    target.remove()
+  })
+
+  it('restores overlay when covering styles are stripped', async () => {
+    const onTamper = vi.fn()
+    const target = createObservedHost()
+    const overlay = createCoveringOverlay()
+    target.appendChild(overlay)
+    const controller = createWatermarkRenderController({
+      getRenderOptions: renderOptions,
+      onRender: vi.fn(),
+      onTamper,
+      render: () => 'data:image/png;base64,x'
+    })
+
+    controller.observe(target)
+    overlay.setAttribute('style', '')
+    await vi.waitFor(() => expect(onTamper).toHaveBeenCalledTimes(1))
+
+    controller.disconnect()
+    target.remove()
+  })
+
+  it('ignores descendant watermark overlays', async () => {
+    const onTamper = vi.fn()
+    const target = createObservedHost()
+    const overlay = createCoveringOverlay()
+    const content = document.createElement('div')
+    const nested = createCoveringOverlay()
+    content.appendChild(nested)
+    target.appendChild(content)
+    target.appendChild(overlay)
+    const controller = createWatermarkRenderController({
+      getRenderOptions: renderOptions,
+      onRender: vi.fn(),
+      onTamper,
+      render: () => 'data:image/png;base64,x'
+    })
+
+    controller.observe(target)
+    nested.style.backgroundImage = 'url(data:image/png;base64,nested)'
+    nested.remove()
+    await waitForMutations()
+
+    expect(onTamper).not.toHaveBeenCalled()
+    controller.disconnect()
+    target.remove()
+  })
 })
