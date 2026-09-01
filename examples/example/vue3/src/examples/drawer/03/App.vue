@@ -15,10 +15,9 @@ const event = ref('尚未打开')
       v-model:open="open"
       title="生命周期抽屉"
       destroy-on-close
-      defer-destroy-on-close
       @after-enter="event = '打开动画已完成'"
       @after-close="event = '关闭动画已完成'">
-      <p>关闭后内容会在动画结束时销毁。</p>
+      <p>默认会播滑出。destroyOnClose 等到关场结束再卸内容。</p>
     </Drawer>
   </div>
 </template>

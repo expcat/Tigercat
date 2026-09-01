@@ -1,7 +1,7 @@
 {
   "id": "drawer-02",
-  "title": "自定义头部与底部",
-  "description": "用单个筛选抽屉展示 header、footer 插槽和表单内容。",
+  "title": "底部抽屉",
+  "description": "placement=bottom，body 可滚；mask=false 时空区点得透。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

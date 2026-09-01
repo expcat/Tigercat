@@ -32,10 +32,12 @@ export const enUS: TigerLocale = {
   modal: {
     closeAriaLabel: 'Close',
     okText: 'OK',
-    cancelText: 'Cancel'
+    cancelText: 'Cancel',
+    dialogAriaLabel: 'Dialog'
   },
   drawer: {
-    closeAriaLabel: 'Close'
+    closeAriaLabel: 'Close',
+    dialogAriaLabel: 'Drawer'
   },
   alert: {
     closeAriaLabel: 'Close alert'

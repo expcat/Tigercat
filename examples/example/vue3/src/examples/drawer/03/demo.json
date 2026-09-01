@@ -1,7 +1,7 @@
 {
   "id": "drawer-03",
   "title": "生命周期",
-  "description": "展示进入、关闭完成回调，以及关闭动画后销毁内容。",
+  "description": "默认关上会滑出。destroyOnClose 等到关场结束再销毁内容，不必再开 defer 旗。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

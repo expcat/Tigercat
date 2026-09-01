@@ -29,7 +29,7 @@ import {
   modalCloseButtonClasses,
   modalBodyClasses,
   modalFooterClasses,
-  resolveLocaleText,
+  getModalLabels,
   mergeTigerLocale,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
@@ -52,10 +52,11 @@ import {
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 import {
-  renderVueBodyTeleport,
+  renderVueOverlayTeleport,
   useVueBodyScrollLock,
   useVueEscapeKey,
-  useVueFocusTrap
+  useVueFocusTrap,
+  useVueOverlayPortalTarget
 } from '../utils/overlay'
 
 export interface VueModalProps {
@@ -199,8 +200,7 @@ export const Modal = defineComponent({
     },
 
     /**
-     * Close button aria-label
-     * @default 'Close'
+     * Close button aria-label. Defaults to locale.modal.closeAriaLabel (en-US Close).
      */
     closeAriaLabel: {
       type: String,
@@ -208,8 +208,7 @@ export const Modal = defineComponent({
     },
 
     /**
-     * Default OK button text (used in default footer)
-     * @default '确定'
+     * Default OK button text. Defaults to locale.modal.okText (en-US OK).
      */
     okText: {
       type: String,
@@ -217,8 +216,7 @@ export const Modal = defineComponent({
     },
 
     /**
-     * Default Cancel button text (used in default footer)
-     * @default '取消'
+     * Default Cancel button text. Defaults to locale.modal.cancelText (en-US Cancel).
      */
     cancelText: {
       type: String,
@@ -262,11 +260,20 @@ export const Modal = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const modalLabels = computed(() =>
+      getModalLabels(mergedLocale.value, {
+        ...props.labels,
+        ...(props.closeAriaLabel ? { closeAriaLabel: props.closeAriaLabel } : {}),
+        ...(props.okText ? { okText: props.okText } : {}),
+        ...(props.cancelText ? { cancelText: props.cancelText } : {})
+      })
+    )
 
     const instanceId = ref(`tiger-modal-${useId()}`)
     const hasOpened = ref(props.open)
     const leaving = ref(false)
 
+    const { anchorRef, target: portalTarget } = useVueOverlayPortalTarget()
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -462,7 +469,9 @@ export const Modal = defineComponent({
         xmlns: 'http://www.w3.org/2000/svg',
         fill: 'none',
         viewBox: closeIconViewBox,
-        stroke: 'currentColor'
+        stroke: 'currentColor',
+        'aria-hidden': 'true',
+        focusable: 'false'
       },
       [
         h('path', {
@@ -475,8 +484,9 @@ export const Modal = defineComponent({
     )
 
     return () => {
+      const anchor = h('span', { ref: anchorRef, hidden: true })
       if (!shouldRender.value) {
-        return null
+        return anchor
       }
 
       const forwardedAttrs = Object.fromEntries(
@@ -488,8 +498,13 @@ export const Modal = defineComponent({
           ? (attrs['aria-labelledby'] as string)
           : undefined
 
-      const ariaLabelledby =
-        ariaLabelledbyFromAttrs ?? (props.title || slots.title ? titleId.value : undefined)
+      const hasTitle = Boolean(props.title || slots.title)
+      const ariaLabelledby = ariaLabelledbyFromAttrs ?? (hasTitle ? titleId.value : undefined)
+      const ariaLabelFromAttrs =
+        typeof attrs['aria-label'] === 'string' ? (attrs['aria-label'] as string) : undefined
+      const ariaLabel =
+        ariaLabelFromAttrs ?? (hasTitle ? undefined : modalLabels.value.dialogAriaLabel)
+      const bodyId = `${instanceId.value}-body`
       const overlayHostId = `${instanceId.value}-overlay-host`
 
       const mergedClass = classNames(contentClasses.value, coerceClassValue(attrs.class))
@@ -537,13 +552,7 @@ export const Modal = defineComponent({
                         type: 'button',
                         class: modalCloseButtonClasses,
                         onClick: handleClose,
-                        'aria-label': resolveLocaleText(
-                          'Close',
-                          props.closeAriaLabel,
-                          props.labels?.closeAriaLabel,
-                          mergedLocale.value?.modal?.closeAriaLabel,
-                          mergedLocale.value?.common?.closeText
-                        ),
+                        'aria-label': modalLabels.value.closeAriaLabel,
                         ref: closeButtonRef
                       },
                       CloseIcon
@@ -556,7 +565,12 @@ export const Modal = defineComponent({
       const body = slots.default
         ? h(
             'div',
-            { class: modalBodyClasses, ref: bodyRef, 'data-tiger-modal-body': '' },
+            {
+              class: modalBodyClasses,
+              ref: bodyRef,
+              id: bodyId,
+              'data-tiger-modal-body': ''
+            },
             slots.default()
           )
         : null
@@ -573,28 +587,14 @@ export const Modal = defineComponent({
                 Button,
                 { variant: 'secondary', onClick: handleClose },
                 {
-                  default: () =>
-                    resolveLocaleText(
-                      '取消',
-                      props.cancelText,
-                      props.labels?.cancelText,
-                      mergedLocale.value?.modal?.cancelText,
-                      mergedLocale.value?.common?.cancelText
-                    )
+                  default: () => modalLabels.value.cancelText
                 }
               ),
               h(
                 Button,
                 { onClick: handleOk },
                 {
-                  default: () =>
-                    resolveLocaleText(
-                      '确定',
-                      props.okText,
-                      props.labels?.okText,
-                      mergedLocale.value?.modal?.okText,
-                      mergedLocale.value?.common?.okText
-                    )
+                  default: () => modalLabels.value.okText
                 }
               )
             ])
@@ -634,6 +634,8 @@ export const Modal = defineComponent({
                   role: 'dialog',
                   'aria-modal': 'true',
                   'aria-labelledby': ariaLabelledby,
+                  'aria-label': ariaLabel,
+                  'aria-describedby': slots.default ? bodyId : undefined,
                   'aria-owns': overlayHostId,
                   tabindex: -1,
                   ref: dialogRef,
@@ -655,7 +657,7 @@ export const Modal = defineComponent({
         ]
       )
 
-      return renderVueBodyTeleport([renderedWrapper])
+      return [anchor, renderVueOverlayTeleport([renderedWrapper], portalTarget.value)]
     }
   }
 })

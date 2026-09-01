@@ -24,7 +24,6 @@ export default function App() {
           onOpenChange={setInnerOpen}
           title="嵌套确认"
           size="sm"
-          zIndex={1100}
           showDefaultFooter>
           <p>嵌套 Modal 是双实例的唯一例外。</p>
         </Modal>

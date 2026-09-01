@@ -2,6 +2,7 @@ import {
   getFocusTrapNavigation,
   getFocusableElements,
   isEventOutside,
+  isFocusInForeignOverlay,
   lockBodyScroll,
   setBackgroundInert,
   computeFloatingPosition,
@@ -29,6 +30,7 @@ import {
   computed,
   Teleport,
   watch,
+  onMounted,
   onBeforeUnmount,
   toValue,
   type MaybeRefOrGetter,
@@ -172,6 +174,24 @@ export function renderVueOverlayTeleport(
   return h(Teleport as never, { to: target }, [layeredChildren])
 }
 
+/** Resolve the overlay-host chain from an in-tree anchor so nested Modal/Drawer enter the parent host. */
+export function useVueOverlayPortalTarget(): {
+  anchorRef: Ref<HTMLElement | null>
+  target: Ref<HTMLElement | null>
+} {
+  const anchorRef = ref<HTMLElement | null>(null)
+  const target = ref<HTMLElement | null>(isBrowser() ? resolveAnchoredOverlayTarget(null) : null)
+
+  const resolveTarget = () => {
+    target.value = isBrowser() ? resolveAnchoredOverlayTarget(anchorRef.value) : null
+  }
+
+  onMounted(resolveTarget)
+  watch(anchorRef, resolveTarget, { flush: 'post' })
+
+  return { anchorRef, target }
+}
+
 export interface UseVueFocusTrapOptions {
   enabled: Ref<boolean>
   containerRef: Ref<HTMLElement | null>
@@ -238,6 +258,7 @@ export function useVueFocusTrap({
         const inside = activeElement instanceof Node && container.contains(activeElement)
         if (!inside) {
           if (event.key !== 'Tab') return
+          if (isFocusInForeignOverlay(container, activeElement)) return
           event.preventDefault()
           const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
           next?.focus()

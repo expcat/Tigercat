@@ -26,15 +26,20 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Drawer
 
-`packages/core/src/types/drawer.ts` · `DrawerProps` · 3/24 props
+`packages/core/src/types/drawer.ts` · `DrawerProps` · 8/23 props
 
 Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
 
-| Prop        | Type                   | Default | Notes                             |
-| ----------- | ---------------------- | ------- | --------------------------------- |
-| `open?`     | `boolean`              | `false` | Whether the drawer is open        |
-| `closable?` | `boolean`              | `true`  | Whether to show close button      |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for common texts |
+| Prop                  | Type                         | Default   | Notes                                                                                      |
+| --------------------- | ---------------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `open?`               | `boolean`                    | `false`   | Whether the drawer is open                                                                 |
+| `placement?`          | `DrawerPlacement`            | `'right'` | Drawer placement                                                                           |
+| `closable?`           | `boolean`                    | `true`    | Whether to show close button                                                               |
+| `maskClosable?`       | `boolean`                    | `true`    | Whether clicking mask closes the drawer                                                    |
+| `destroyOnClose?`     | `boolean`                    | `false`   | Whether to destroy content on close                                                        |
+| `fullscreenOnMobile?` | `boolean`                    | `true`    | Whether the drawer panel should become fullscreen on mobile viewports.                     |
+| `width?`              | `string \| number`           | `-`       | Custom width/height (overrides size). Accepts CSS value like '400px' or '50%'. Applied...  |
+| `labels?`             | `Partial<TigerLocaleDrawer>` | `-`       | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
 
 ## Loading
 
@@ -101,13 +106,20 @@ Events/callback props: `onClose?`.
 
 ## Modal
 
-`packages/core/src/types/modal.ts` · `ModalProps` · 3/23 props
+`packages/core/src/types/modal.ts` · `ModalProps` · 8/24 props
 
-| Prop        | Type                   | Default | Notes                             |
-| ----------- | ---------------------- | ------- | --------------------------------- |
-| `open?`     | `boolean`              | `false` | Whether the modal is open         |
-| `closable?` | `boolean`              | `true`  | Whether to show the close button  |
-| `locale?`   | `Partial<TigerLocale>` | `-`     | Locale overrides for common texts |
+Note: `open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
+
+| Prop                 | Type                        | Default | Notes                                                                                      |
+| -------------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `closable?`          | `boolean`                   | `true`  | Whether to show the close button                                                           |
+| `maskClosable?`      | `boolean`                   | `true`  | Whether clicking the mask should close the modal                                           |
+| `destroyOnClose?`    | `boolean`                   | `false` | Whether to destroy the modal content when closed                                           |
+| `mobileSheet?`       | `boolean`                   | `false` | Whether the modal should render as a mobile bottom sheet below the md breakpoint.          |
+| `draggable?`         | `boolean`                   | `false` | Whether the modal can be dragged by its title bar                                          |
+| `centered?`          | `boolean`                   | `false` | Whether the modal should be centered vertically                                            |
+| `showDefaultFooter?` | `boolean`                   | `false` | Whether to render a default footer when no `footer` is provided.                           |
+| `labels?`            | `Partial<TigerLocaleModal>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
 
 ## NotificationContainer
 

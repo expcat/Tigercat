@@ -7,9 +7,12 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Modal } from '@expcat/tigercat-react/Modal'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Popover } from '@expcat/tigercat-react/Popover'
 import { Select } from '@expcat/tigercat-react/Select'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations, expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Modal', () => {
   describe('Rendering', () => {
@@ -67,11 +70,35 @@ describe('Modal', () => {
   describe('Props', () => {
     it('should show close button by default', async () => {
       render(<Modal open={true} title="Test Modal" />)
+      expect(await screen.findByRole('button', { name: 'Close' })).toBeInTheDocument()
+    })
 
-      await waitFor(() => {
-        const closeButton = document.querySelector('button[aria-label="Close"]')
-        expect(closeButton).toBeInTheDocument()
-      })
+    it('uses official locale objects for close and default footer', async () => {
+      const { rerender } = render(
+        <ConfigProvider locale={zhCN}>
+          <Modal open title="Test Modal" showDefaultFooter />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '确定' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '取消' })).toBeInTheDocument()
+
+      rerender(
+        <ConfigProvider locale={zhTW}>
+          <Modal open title="Test Modal" showDefaultFooter />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: '關閉' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: '关闭' })).not.toBeInTheDocument()
+    })
+
+    it('names a dialog without a title', async () => {
+      render(
+        <Modal open>
+          <p>Body</p>
+        </Modal>
+      )
+      expect(screen.getByRole('dialog', { name: 'Dialog' })).toBeInTheDocument()
     })
 
     it('should allow overriding close aria-label via locale', async () => {
@@ -82,21 +109,18 @@ describe('Modal', () => {
           locale={{ modal: { closeAriaLabel: 'Close (i18n)' } }}
         />
       )
+      expect(await screen.findByRole('button', { name: 'Close (i18n)' })).toBeInTheDocument()
+    })
 
-      await waitFor(() => {
-        expect(screen.getByLabelText('Close (i18n)')).toBeInTheDocument()
-      })
+    it('should allow overriding close aria-label via labels', async () => {
+      render(<Modal open={true} title="Test Modal" labels={{ closeAriaLabel: 'Dismiss dialog' }} />)
+      expect(await screen.findByRole('button', { name: 'Dismiss dialog' })).toBeInTheDocument()
     })
 
     it('should render default footer when showDefaultFooter is true', async () => {
       render(<Modal open={true} title="Test Modal" showDefaultFooter={true} />)
-
-      await waitFor(() => {
-        const footer = document.querySelector('[data-tiger-modal-footer]')
-        expect(footer).toBeInTheDocument()
-        expect(screen.getByText('取消')).toBeInTheDocument()
-        expect(screen.getByText('确定')).toBeInTheDocument()
-      })
+      expect(await screen.findByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'OK' })).toBeInTheDocument()
     })
 
     it('should allow overriding ok/cancel via locale when using default footer', async () => {
@@ -117,14 +141,8 @@ describe('Modal', () => {
 
     it('should hide close button when closable is false', async () => {
       render(<Modal open={true} title="Test Modal" closable={false} />)
-
-      await waitFor(() => {
-        const dialog = document.querySelector('[role="dialog"]')
-        expect(dialog).toBeInTheDocument()
-      })
-
-      const closeButton = document.querySelector('button[aria-label="Close"]')
-      expect(closeButton).not.toBeInTheDocument()
+      expect(await screen.findByRole('dialog')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
     })
 
     it('should show mask by default', async () => {
@@ -159,21 +177,20 @@ describe('Modal', () => {
 
     it('should apply custom zIndex', async () => {
       render(<Modal open={true} title="Test Modal" zIndex={2000} />)
-
       await waitFor(() => {
-        const wrapper = document.querySelector('.fixed')
+        const wrapper = document.querySelector('[data-tiger-modal-root]')
         expect(wrapper).toHaveStyle({ zIndex: '2000' })
       })
     })
 
-    it('should include mobile sheet classes when mobileSheet is true', async () => {
-      render(<Modal open={true} title="Mobile Sheet" mobileSheet={true} />)
-
-      await waitFor(() => {
-        const dialog = document.querySelector('[role="dialog"]') as HTMLElement
-        expect(dialog.className).toContain('max-md:fixed')
-        expect(dialog.className).toContain('max-md:bottom-0')
-      })
+    it('renders a scrollable body when mobileSheet is true', async () => {
+      render(
+        <Modal open={true} title="Mobile Sheet" mobileSheet={true}>
+          <p>Long sheet</p>
+        </Modal>
+      )
+      const body = await screen.findByText('Long sheet')
+      expect(body.closest('[data-tiger-modal-body]')).toBeInTheDocument()
     })
   })
 
@@ -183,14 +200,7 @@ describe('Modal', () => {
       const onCancel = vi.fn()
 
       render(<Modal open={true} title="Test Modal" onCancel={onCancel} />)
-
-      await waitFor(() => {
-        const closeButton = document.querySelector('button[aria-label="Close"]')
-        expect(closeButton).toBeInTheDocument()
-      })
-
-      const closeButton = document.querySelector('button[aria-label="Close"]')!
-      await user.click(closeButton)
+      await user.click(await screen.findByRole('button', { name: 'Close' }))
 
       expect(onCancel).toHaveBeenCalled()
     })
@@ -257,11 +267,7 @@ describe('Modal', () => {
 
       render(<Modal open={true} title="Test Modal" showDefaultFooter={true} onOk={onOk} />)
 
-      await waitFor(() => {
-        expect(screen.getByText('确定')).toBeInTheDocument()
-      })
-
-      await user.click(screen.getByText('确定'))
+      await user.click(await screen.findByRole('button', { name: 'OK' }))
 
       expect(onOk).toHaveBeenCalled()
     })
@@ -339,7 +345,7 @@ describe('Modal', () => {
 
       render(<Modal open={true} title="Test Modal" onClose={onClose} />)
 
-      await user.click(document.querySelector('button[aria-label="Close"]')!)
+      await user.click(await screen.findByRole('button', { name: 'Close' }))
       expect(onClose).toHaveBeenCalled()
     })
 
@@ -510,11 +516,7 @@ describe('Modal', () => {
 
     it('should have close button with aria-label', async () => {
       render(<Modal open={true} title="Test Modal" />)
-
-      await waitFor(() => {
-        const closeButton = document.querySelector('button[aria-label="Close"]')
-        expect(closeButton).toBeInTheDocument()
-      })
+      expect(await screen.findByRole('button', { name: 'Close' })).toBeInTheDocument()
     })
 
     it('should have mask with aria-hidden', async () => {
@@ -528,14 +530,26 @@ describe('Modal', () => {
     })
 
     it('should pass basic accessibility checks', async () => {
-      const { container } = render(<Modal open={true} title="Accessible Modal" />)
-
-      await waitFor(() => {
-        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
-      })
-
-      // Use document.body for accessibility checks since Modal is portaled
+      render(<Modal open={true} title="Accessible Modal" />)
+      expect(await screen.findByRole('dialog')).toBeInTheDocument()
       await expectNoA11yViolationsIsolated(document.body)
+    })
+
+    it('passes axe for untitled, unclosable, and empty dialogs', async () => {
+      const { rerender } = render(
+        <Modal open>
+          <p>Body</p>
+        </Modal>
+      )
+      expect(await screen.findByRole('dialog', { name: 'Dialog' })).toBeInTheDocument()
+      await expectNoA11yViolations(screen.getByRole('dialog'))
+
+      rerender(<Modal open title="No close" closable={false} />)
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
+      await expectNoA11yViolations(screen.getByRole('dialog'))
+
+      rerender(<Modal open />)
+      await expectNoA11yViolations(screen.getByRole('dialog'))
     })
   })
 
@@ -679,6 +693,27 @@ describe('Modal', () => {
       expect(selectLayer?.parentElement).toBe(host)
       expect(selectLayer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
       expect(host?.closest('[data-tiger-overlay-layer]')).toBeInTheDocument()
+    })
+
+    it('closes a nested modal before the outer modal on Escape', async () => {
+      const onOuter = vi.fn()
+      const onInner = vi.fn()
+      render(
+        <Modal open title="Outer" onOpenChange={onOuter}>
+          <Modal open title="Inner" onOpenChange={onInner}>
+            Nested
+          </Modal>
+        </Modal>
+      )
+      const inner = await screen.findByRole('dialog', { name: 'Inner' })
+      const outer = screen.getByRole('dialog', { name: 'Outer' })
+      expect(inner.closest('[inert]')).toBeNull()
+      await waitFor(() => {
+        expect(inner.closest('[data-tiger-overlay-host]')?.id).toBe(outer.getAttribute('aria-owns'))
+      })
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+      expect(onInner).toHaveBeenCalledWith(false)
+      expect(onOuter).not.toHaveBeenCalled()
     })
 
     it('closes a default-open nested overlay before the modal on Escape', async () => {

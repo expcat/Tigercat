@@ -33,10 +33,12 @@ export const deDE: TigerLocale = {
   modal: {
     closeAriaLabel: 'Schließen',
     okText: 'OK',
-    cancelText: 'Abbrechen'
+    cancelText: 'Abbrechen',
+    dialogAriaLabel: 'Dialogfenster'
   },
   drawer: {
-    closeAriaLabel: 'Schließen'
+    closeAriaLabel: 'Schließen',
+    dialogAriaLabel: 'Schublade'
   },
   alert: {
     closeAriaLabel: 'Warnung schließen'

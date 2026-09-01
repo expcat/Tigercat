@@ -105,4 +105,25 @@ export interface ModalProps {
    * Takes precedence over `locale` and global ConfigProvider text.
    */
   labels?: Partial<TigerLocaleModal>
+
+  /**
+   * Close button accessible name. Defaults to `locale.modal.closeAriaLabel` (en-US `Close`).
+   */
+  closeAriaLabel?: string
+
+  /**
+   * Whether to render a default footer when no `footer` is provided.
+   * @default false
+   */
+  showDefaultFooter?: boolean
+
+  /**
+   * Default OK button text. Defaults to `locale.modal.okText` (en-US `OK`).
+   */
+  okText?: string
+
+  /**
+   * Default Cancel button text. Defaults to `locale.modal.cancelText` (en-US `Cancel`).
+   */
+  cancelText?: string
 }

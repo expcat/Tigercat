@@ -14,7 +14,9 @@ import {
   getNotificationCenterLabels,
   getChatMessageStatusInfo,
   buildChatMessageStatusInfo,
-  getTourLabels
+  getTourLabels,
+  getModalLabels,
+  getDrawerLabels
 } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -293,6 +295,39 @@ describe('custom-text overrides on label resolvers', () => {
     it('can fall back to common.closeText for closeAriaLabel', () => {
       const labels = getTourLabels({ common: { closeText: 'Dismiss' } })
       expect(labels.closeAriaLabel).toBe('Dismiss')
+    })
+  })
+
+  describe('getModalLabels', () => {
+    it('falls back to official en-US, not mixed Chinese', () => {
+      expect(getModalLabels()).toEqual({
+        closeAriaLabel: 'Close',
+        okText: 'OK',
+        cancelText: 'Cancel',
+        dialogAriaLabel: 'Dialog'
+      })
+    })
+
+    it('reads the official zhCN object and ranks labels above locale', () => {
+      expect(getModalLabels(zhCN).okText).toBe('确定')
+      expect(getModalLabels(zhCN).closeAriaLabel).toBe('关闭')
+      expect(
+        getModalLabels(zhCN, { closeAriaLabel: 'Dismiss', okText: 'Confirm' }).closeAriaLabel
+      ).toBe('Dismiss')
+    })
+  })
+
+  describe('getDrawerLabels', () => {
+    it('falls back to official en-US Close, not Close drawer', () => {
+      expect(getDrawerLabels()).toEqual({
+        closeAriaLabel: 'Close',
+        dialogAriaLabel: 'Drawer'
+      })
+    })
+
+    it('reads the official zhCN object', () => {
+      expect(getDrawerLabels(zhCN).closeAriaLabel).toBe('关闭')
+      expect(getDrawerLabels(zhCN).dialogAriaLabel).toBe('抽屉')
     })
   })
 })

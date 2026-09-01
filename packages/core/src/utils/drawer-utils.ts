@@ -57,7 +57,7 @@ export function getDrawerPanelClasses(
   }
 
   // Placement-specific classes
-  const placementClasses: Record<DrawerPlacement, string> = {
+  const placementClasses: Record<Exclude<DrawerPlacement, 'start' | 'end'>, string> = {
     left: classNames(
       'top-0 bottom-0 left-0',
       sizeMap[size].width,

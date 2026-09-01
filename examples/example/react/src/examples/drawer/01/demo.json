@@ -1,7 +1,7 @@
 {
   "id": "drawer-01",
-  "title": "代表配置",
-  "description": "一个受控抽屉复合展示 right 位置、md 尺寸、遮罩和页脚关闭；placement 还支持 left、top、bottom，size 还支持 sm、lg、xl、full。",
+  "title": "受控打开",
+  "description": "一个受控抽屉：open + title + children。不写默认 placement/size。页脚「关闭」关上；X 关钮走 locale。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

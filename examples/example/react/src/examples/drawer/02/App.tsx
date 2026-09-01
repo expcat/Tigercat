@@ -8,29 +8,28 @@ export default function App() {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>编辑筛选条件</Button>
+      <Button onClick={() => setOpen(true)}>从底部打开</Button>
       <Drawer
         open={open}
         onOpenChange={setOpen}
-        size="sm"
-        header={
-          <div>
-            <strong>筛选设置</strong>
-            <p className="text-xs text-gray-500">自定义头部说明</p>
-          </div>
-        }
+        placement="bottom"
+        mask={false}
+        title="筛选条件"
         footer={
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setOpen(false)}>
-              取消
-            </Button>
-            <Button onClick={() => setOpen(false)}>应用</Button>
-          </div>
+          <Button size="sm" onClick={() => setOpen(false)}>
+            应用
+          </Button>
         }>
-        <label className="space-y-1 text-sm">
-          <span>关键词</span>
-          <Input placeholder="输入关键词" />
-        </label>
+        <div className="space-y-3">
+          <p>mask=false 时空区点得透。内容可滚，下滑不会误关。</p>
+          <label className="space-y-1 text-sm">
+            <span>关键词</span>
+            <Input placeholder="输入关键词" />
+          </label>
+          {Array.from({ length: 8 }, (_, index) => (
+            <p key={index}>滚动条目 {index + 1}</p>
+          ))}
+        </div>
       </Drawer>
     </>
   )

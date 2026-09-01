@@ -33,10 +33,12 @@ export const idID: TigerLocale = {
   modal: {
     closeAriaLabel: 'Tutup',
     okText: 'OK',
-    cancelText: 'Batal'
+    cancelText: 'Batal',
+    dialogAriaLabel: 'Kotak dialog'
   },
   drawer: {
-    closeAriaLabel: 'Tutup'
+    closeAriaLabel: 'Tutup',
+    dialogAriaLabel: 'Laci'
   },
   alert: {
     closeAriaLabel: 'Tutup peringatan'

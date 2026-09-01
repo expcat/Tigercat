@@ -120,6 +120,11 @@ export interface DrawerProps {
   labels?: Partial<TigerLocaleDrawer>
 
   /**
+   * Close button accessible name. Defaults to `locale.drawer.closeAriaLabel` (en-US `Close`).
+   */
+  closeAriaLabel?: string
+
+  /**
    * Additional CSS class for the drawer panel.
    */
   panelClassName?: string

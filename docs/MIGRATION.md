@@ -637,17 +637,19 @@ Vue:
 + <Tooltip v-model:open="open" />
 ```
 
-Drawer 的关闭后生命周期和延迟销毁命名已收敛：
+Drawer 关上默认会播滑出，然后 hidden 或卸载。删掉 `deferDestroyOnClose`：`destroyOnClose` 自己等关场结束再卸。
 
 ```diff
-- <Drawer destroyOnClose destroyOnCloseAfterLeave onAfterLeave={handleAfterClose} />
-+ <Drawer destroyOnClose deferDestroyOnClose onAfterClose={handleAfterClose} />
+- <Drawer destroyOnClose deferDestroyOnClose onAfterClose={handleAfterClose} />
++ <Drawer destroyOnClose onAfterClose={handleAfterClose} />
 ```
 
 ```diff
-- <Drawer destroy-on-close destroy-on-close-after-leave @after-leave="handleAfterClose" />
-+ <Drawer destroy-on-close defer-destroy-on-close @after-close="handleAfterClose" />
+- <Drawer destroy-on-close defer-destroy-on-close @after-close="handleAfterClose" />
++ <Drawer destroy-on-close @after-close="handleAfterClose" />
 ```
+
+Modal / Drawer 关闭名走官方 locale（en-US `Close` / `OK` / `Cancel`，不再是 Close + 确定 混用，Drawer 也不再是 `Close drawer`）。`mask={false}` 时空区点得透。`closable={false}` 只藏 X；关掉 Esc 请传 `keyboard={false}`。Vue 从主入口引 `ModalProps` / `DrawerProps`。React `ref` 接到 dialog。`placement` 可写 `start` / `end`。
 
 Modal 现在也提供关闭后生命周期：React 使用 `onAfterClose`，Vue 使用 `@after-close`。外部受控 `open=false` 只表示状态变化，不再触发 close intent；需要记录用户关闭意图时继续监听 React `onClose` / Vue `close`，需要观察动画关闭完成时使用 `onAfterClose` / `after-close`。
 

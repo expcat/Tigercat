@@ -38,10 +38,14 @@ export interface TigerLocaleModal {
   closeAriaLabel?: string
   okText?: string
   cancelText?: string
+  /** Accessible name when the dialog has no visible title */
+  dialogAriaLabel?: string
 }
 
 export interface TigerLocaleDrawer {
   closeAriaLabel?: string
+  /** Accessible name when the drawer has no visible title */
+  dialogAriaLabel?: string
 }
 
 export interface TigerLocaleAlert {

@@ -1,7 +1,7 @@
 {
   "id": "modal-01",
-  "title": "代表配置",
-  "description": "一个受控对话框复合展示 md 尺寸、居中、遮罩和默认页脚；size 还支持 sm、lg、xl、full。",
+  "title": "受控打开",
+  "description": "一个受控对话框：open + title + children。默认不居中、不画默认页脚。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

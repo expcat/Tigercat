@@ -9,6 +9,7 @@ import {
   isEventOutside,
   registerEscapeDismiss,
   setBackgroundInert,
+  isFocusInForeignOverlay,
   shouldCloseOnMaskClick,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
@@ -263,6 +264,37 @@ describe('overlay-utils (core)', () => {
 
     release()
     expect(app.hasAttribute('inert')).toBe(false)
+  })
+
+  it('setBackgroundInert leaves sibling overlay layers interactive', () => {
+    const app = document.createElement('div')
+    const outer = document.createElement('div')
+    outer.setAttribute('data-tiger-overlay-layer', '')
+    const inner = document.createElement('div')
+    inner.setAttribute('data-tiger-overlay-layer', '')
+    document.body.append(app, outer, inner)
+
+    const release = setBackgroundInert(outer)
+    expect(app.hasAttribute('inert')).toBe(true)
+    expect(inner.hasAttribute('inert')).toBe(false)
+    release()
+  })
+
+  it('isFocusInForeignOverlay is true only for a different overlay layer', () => {
+    const outer = document.createElement('div')
+    outer.setAttribute('data-tiger-overlay-layer', '')
+    const inner = document.createElement('div')
+    inner.setAttribute('data-tiger-overlay-layer', '')
+    const button = document.createElement('button')
+    inner.appendChild(button)
+    document.body.append(outer, inner)
+
+    expect(isFocusInForeignOverlay(outer, button)).toBe(true)
+    expect(isFocusInForeignOverlay(inner, button)).toBe(false)
+    expect(isFocusInForeignOverlay(outer, document.body)).toBe(false)
+
+    outer.appendChild(inner)
+    expect(isFocusInForeignOverlay(outer, button)).toBe(true)
   })
 
   it('registerEscapeDismiss should dismiss only the topmost overlay', () => {

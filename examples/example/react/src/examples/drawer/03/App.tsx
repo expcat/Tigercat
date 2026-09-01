@@ -17,10 +17,9 @@ export default function App() {
         onOpenChange={setOpen}
         title="生命周期抽屉"
         destroyOnClose
-        deferDestroyOnClose
         onAfterEnter={() => setEvent('打开动画已完成')}
         onAfterClose={() => setEvent('关闭动画已完成')}>
-        <p>关闭后内容会在动画结束时销毁。</p>
+        <p>默认会播滑出。destroyOnClose 等到关场结束再卸内容。</p>
       </Drawer>
     </div>
   )

@@ -14,17 +14,15 @@ export default function App() {
         open={open}
         onOpenChange={setOpen}
         title="基本抽屉"
-        placement="right"
-        size="md"
         footer={
           <Button size="sm" onClick={() => setOpen(false)}>
             关闭
           </Button>
         }>
         <div className="space-y-4">
-          <p>一个受控实例复合展示位置、尺寸、遮罩和默认关闭行为。</p>
+          <p>受控打开。浮层自动使用 Drawer layer。</p>
           <label className="block space-y-1 text-sm">
-            <span>负责人（浮层自动使用 Drawer layer）</span>
+            <span>负责人</span>
             <Select
               value={assignee}
               options={[

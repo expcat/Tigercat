@@ -18,6 +18,8 @@ import type {
   TigerLocaleLoader,
   TigerLocaleLazyModule,
   TigerLocaleEmpty,
+  TigerLocaleModal,
+  TigerLocaleDrawer,
   TigerLocaleAlert,
   TigerLocaleQRCode,
   TigerLocalePagination,
@@ -630,6 +632,65 @@ export function getStatusLabels(
   overrides?: Partial<TigerLocaleStatus>
 ): Required<TigerLocaleStatus> {
   return resolveLocaleSection(enSection('status'), locale?.status, overrides)
+}
+
+function pickLocaleText(...values: Array<string | undefined>): string {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim().length > 0) return value
+  }
+  return ''
+}
+
+export function getModalLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleModal>
+): Required<TigerLocaleModal> {
+  const en = enSection('modal')
+  return {
+    closeAriaLabel: pickLocaleText(
+      overrides?.closeAriaLabel,
+      locale?.modal?.closeAriaLabel,
+      locale?.common?.closeText,
+      en.closeAriaLabel
+    ),
+    okText: pickLocaleText(
+      overrides?.okText,
+      locale?.modal?.okText,
+      locale?.common?.okText,
+      en.okText
+    ),
+    cancelText: pickLocaleText(
+      overrides?.cancelText,
+      locale?.modal?.cancelText,
+      locale?.common?.cancelText,
+      en.cancelText
+    ),
+    dialogAriaLabel: pickLocaleText(
+      overrides?.dialogAriaLabel,
+      locale?.modal?.dialogAriaLabel,
+      en.dialogAriaLabel
+    )
+  }
+}
+
+export function getDrawerLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleDrawer>
+): Required<TigerLocaleDrawer> {
+  const en = enSection('drawer')
+  return {
+    closeAriaLabel: pickLocaleText(
+      overrides?.closeAriaLabel,
+      locale?.drawer?.closeAriaLabel,
+      locale?.common?.closeText,
+      en.closeAriaLabel
+    ),
+    dialogAriaLabel: pickLocaleText(
+      overrides?.dialogAriaLabel,
+      locale?.drawer?.dialogAriaLabel,
+      en.dialogAriaLabel
+    )
+  }
 }
 
 export function getAlertLabels(

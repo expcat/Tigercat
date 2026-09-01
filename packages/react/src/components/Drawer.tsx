@@ -18,7 +18,7 @@ import {
   isDrawerSwipeCloseGesture,
   resolveDrawerPlacement,
   getDrawerSwipeCloseDirection,
-  resolveLocaleText,
+  getDrawerLabels,
   resolveSwipeGesture,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
@@ -31,7 +31,14 @@ import {
   type GesturePoint,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import {
+  renderOverlayPortal,
+  useBodyScrollLock,
+  useEscapeKey,
+  useFocusTrap,
+  useOverlayPortalTarget
+} from '../utils/overlay'
+import { composeRefs } from '../utils/overlay-trigger'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface DrawerProps
@@ -46,12 +53,6 @@ export interface DrawerProps
   children?: React.ReactNode
   footer?: React.ReactNode
   panelStyle?: React.CSSProperties
-
-  /**
-   * Close button aria-label
-   * @default 'Close drawer'
-   */
-  closeAriaLabel?: string
 }
 
 const CloseIcon: React.FC = () => (
@@ -60,7 +61,9 @@ const CloseIcon: React.FC = () => (
     fill="none"
     stroke="currentColor"
     viewBox={closeIconViewBox}
-    xmlns="http://www.w3.org/2000/svg">
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    focusable="false">
     <path
       strokeLinecap={closeIconPathStrokeLinecap}
       strokeLinejoin={closeIconPathStrokeLinejoin}
@@ -70,37 +73,40 @@ const CloseIcon: React.FC = () => (
   </svg>
 )
 
-export const Drawer: React.FC<DrawerProps> = ({
-  open = false,
-  placement = 'right',
-  size = 'md',
-  width,
-  title,
-  header,
-  closable = true,
-  mask = true,
-  maskClosable = true,
-  keyboard = true,
-  zIndex = OVERLAY_Z_INDEX.modal,
-  className,
-  bodyClassName,
-  bodyPadding,
-  destroyOnClose = false,
-  fullscreenOnMobile = true,
-  panelClassName,
-  panelStyle,
-  onClose,
-  onOpenChange,
-  onAfterEnter,
-  onAfterClose,
-  closeAriaLabel,
-  locale,
-  labels,
-  children,
-  footer,
-  style,
-  ...rest
-}) => {
+export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
+  {
+    open = false,
+    placement = 'right',
+    size = 'md',
+    width,
+    title,
+    header,
+    closable = true,
+    mask = true,
+    maskClosable = true,
+    keyboard = true,
+    zIndex = OVERLAY_Z_INDEX.modal,
+    className,
+    bodyClassName,
+    bodyPadding,
+    destroyOnClose = false,
+    fullscreenOnMobile = true,
+    panelClassName,
+    panelStyle,
+    onClose,
+    onOpenChange,
+    onAfterEnter,
+    onAfterClose,
+    closeAriaLabel,
+    locale,
+    labels,
+    children,
+    footer,
+    style,
+    ...rest
+  },
+  forwardedRef
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -160,18 +166,29 @@ export const Drawer: React.FC<DrawerProps> = ({
   const reactId = useId()
   const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
   const titleId = `${drawerId}-title`
+  const bodyId = `${drawerId}-body`
   const overlayHostId = `${drawerId}-overlay-host`
 
   const {
     ['aria-labelledby']: _ariaLabelledby,
+    ['aria-label']: ariaLabelFromRest,
+    ['aria-describedby']: ariaDescribedbyFromRest,
     role: _role,
     tabIndex: _tabIndex,
     ...dialogDivProps
   } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes
 
+  const drawerLabels = getDrawerLabels(mergedLocale, {
+    ...labels,
+    ...(closeAriaLabel ? { closeAriaLabel } : {})
+  })
+  const hasTitle = Boolean(title || header)
   const ariaLabelledby =
-    (rest as React.AriaAttributes)['aria-labelledby'] ?? (title || header ? titleId : undefined)
+    (rest as React.AriaAttributes)['aria-labelledby'] ?? (hasTitle ? titleId : undefined)
+  const ariaLabel = ariaLabelFromRest ?? (hasTitle ? undefined : drawerLabels.dialogAriaLabel)
+  const ariaDescribedby = ariaDescribedbyFromRest ?? (children ? bodyId : undefined)
 
+  const { anchorRef, target: portalTarget } = useOverlayPortalTarget()
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -187,13 +204,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
 
-  const resolvedCloseAriaLabel = resolveLocaleText(
-    'Close drawer',
-    closeAriaLabel,
-    labels?.closeAriaLabel,
-    mergedLocale?.drawer?.closeAriaLabel,
-    mergedLocale?.common?.closeText
-  )
+  const resolvedCloseAriaLabel = drawerLabels.closeAriaLabel
 
   useFocusTrap({ enabled: open, containerRef: rootRef, inert: true, autoFocus: true })
 
@@ -276,8 +287,10 @@ export const Drawer: React.FC<DrawerProps> = ({
   const closeButtonClasses = getDrawerCloseButtonClasses()
   const titleClasses = getDrawerTitleClasses()
 
+  const anchor = <span ref={anchorRef} hidden />
+
   if (!shouldRender) {
-    return null
+    return anchor
   }
 
   const drawerContent = (
@@ -315,9 +328,11 @@ export const Drawer: React.FC<DrawerProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={ariaLabelledby}
+        aria-label={ariaLabel}
+        aria-describedby={ariaDescribedby}
         aria-owns={overlayHostId}
         tabIndex={-1}
-        ref={dialogRef}
+        ref={composeRefs(forwardedRef, dialogRef)}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -348,7 +363,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         )}
 
         {children && (
-          <div className={bodyClasses} ref={bodyRef} data-tiger-drawer-body="">
+          <div className={bodyClasses} ref={bodyRef} id={bodyId} data-tiger-drawer-body="">
             {children}
           </div>
         )}
@@ -358,5 +373,10 @@ export const Drawer: React.FC<DrawerProps> = ({
     </div>
   )
 
-  return renderBodyPortal(drawerContent)
-}
+  return (
+    <>
+      {anchor}
+      {renderOverlayPortal(drawerContent, portalTarget)}
+    </>
+  )
+})

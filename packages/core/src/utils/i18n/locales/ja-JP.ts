@@ -33,10 +33,12 @@ export const jaJP: TigerLocale = {
   modal: {
     closeAriaLabel: '閉じる',
     okText: 'OK',
-    cancelText: 'キャンセル'
+    cancelText: 'キャンセル',
+    dialogAriaLabel: 'ダイアログ'
   },
   drawer: {
-    closeAriaLabel: '閉じる'
+    closeAriaLabel: '閉じる',
+    dialogAriaLabel: 'ドロワー'
   },
   alert: {
     closeAriaLabel: 'アラートを閉じる'

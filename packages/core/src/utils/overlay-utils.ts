@@ -383,6 +383,22 @@ function isLiveRegionElement(element: HTMLElement): boolean {
   )
 }
 
+function isOverlayLayerElement(element: HTMLElement): boolean {
+  return element.hasAttribute('data-tiger-overlay-layer')
+}
+
+/** True when focus sits in a different overlay layer than `container`. */
+export function isFocusInForeignOverlay(
+  container: HTMLElement,
+  activeElement: Element | null
+): boolean {
+  if (!(activeElement instanceof Element)) return false
+  const foreignLayer = activeElement.closest('[data-tiger-overlay-layer]')
+  if (!foreignLayer) return false
+  const ownLayer = container.closest('[data-tiger-overlay-layer]') ?? container
+  return foreignLayer !== ownLayer
+}
+
 /** Inert every sibling between the overlay and document.body so pointer input cannot leave. */
 export function setBackgroundInert(overlayRoot: HTMLElement): () => void {
   const restored: Array<{ element: HTMLElement; wasInert: boolean }> = []
@@ -397,7 +413,8 @@ export function setBackgroundInert(overlayRoot: HTMLElement): () => void {
         !(child instanceof HTMLElement) ||
         child === current ||
         current.contains(child) ||
-        isLiveRegionElement(child)
+        isLiveRegionElement(child) ||
+        isOverlayLayerElement(child)
       ) {
         continue
       }

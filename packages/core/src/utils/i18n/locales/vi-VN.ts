@@ -33,10 +33,12 @@ export const viVN: TigerLocale = {
   modal: {
     closeAriaLabel: 'Đóng',
     okText: 'Đồng ý',
-    cancelText: 'Hủy'
+    cancelText: 'Hủy',
+    dialogAriaLabel: 'Hộp thoại'
   },
   drawer: {
-    closeAriaLabel: 'Đóng'
+    closeAriaLabel: 'Đóng',
+    dialogAriaLabel: 'Ngăn kéo'
   },
   alert: {
     closeAriaLabel: 'Đóng cảnh báo'

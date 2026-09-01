@@ -9,7 +9,7 @@ import {
   getModalContentClasses,
   getGestureTouchPoint,
   isModalSheetSwipeCloseGesture,
-  resolveLocaleText,
+  getModalLabels,
   modalWrapperClasses,
   modalMaskClasses,
   getModalContainerClasses,
@@ -34,7 +34,14 @@ import {
   type GesturePoint,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import {
+  renderOverlayPortal,
+  useBodyScrollLock,
+  useEscapeKey,
+  useFocusTrap,
+  useOverlayPortalTarget
+} from '../utils/overlay'
+import { composeRefs } from '../utils/overlay-trigger'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -53,9 +60,10 @@ export interface ModalProps
   titleContent?: React.ReactNode
 
   /**
-   * Modal footer content
+   * Modal footer content, or a render function that receives `{ ok, cancel }`.
+   * Default OK always closes.
    */
-  footer?: React.ReactNode
+  footer?: React.ReactNode | ((actions: { ok: () => void; cancel: () => void }) => React.ReactNode)
 
   /**
    * Callback when modal visibility changes
@@ -81,64 +89,43 @@ export interface ModalProps
    * Callback when OK button is clicked
    */
   onOk?: () => void
-
-  /**
-   * Close button aria-label
-   * @default 'Close'
-   */
-  closeAriaLabel?: string
-
-  /**
-   * Whether to render a default footer when no `footer` prop is provided
-   * @default false
-   */
-  showDefaultFooter?: boolean
-
-  /**
-   * Default OK button text (used in default footer)
-   * @default '确定'
-   */
-  okText?: string
-
-  /**
-   * Default Cancel button text (used in default footer)
-   * @default '取消'
-   */
-  cancelText?: string
 }
 
-export const Modal: React.FC<ModalProps> = ({
-  open = false,
-  size = 'md',
-  width,
-  title,
-  titleContent,
-  closable = true,
-  mask = true,
-  maskClosable = true,
-  keyboard = true,
-  centered = false,
-  mobileSheet = false,
-  destroyOnClose = false,
-  zIndex = OVERLAY_Z_INDEX.modal,
-  className,
-  children,
-  footer,
-  onOpenChange,
-  onClose,
-  onAfterClose,
-  onCancel,
-  onOk,
-  closeAriaLabel,
-  showDefaultFooter = false,
-  okText,
-  cancelText,
-  locale,
-  labels,
-  style,
-  draggable: isDraggable = false,
-  ...rest
-}) => {
+export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal(
+  {
+    open = false,
+    size = 'md',
+    width,
+    title,
+    titleContent,
+    closable = true,
+    mask = true,
+    maskClosable = true,
+    keyboard = true,
+    centered = false,
+    mobileSheet = false,
+    destroyOnClose = false,
+    zIndex = OVERLAY_Z_INDEX.modal,
+    className,
+    children,
+    footer,
+    onOpenChange,
+    onClose,
+    onAfterClose,
+    onCancel,
+    onOk,
+    closeAriaLabel,
+    showDefaultFooter = false,
+    okText,
+    cancelText,
+    locale,
+    labels,
+    style,
+    draggable: isDraggable = false,
+    ...rest
+  },
+  forwardedRef
+) {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -254,47 +241,39 @@ export const Modal: React.FC<ModalProps> = ({
 
   const containerClasses = useMemo(() => getModalContainerClasses(centered), [centered])
 
-  const resolvedCloseAriaLabel = resolveLocaleText(
-    'Close',
-    closeAriaLabel,
-    labels?.closeAriaLabel,
-    mergedLocale?.modal?.closeAriaLabel,
-    mergedLocale?.common?.closeText
-  )
-
-  const resolvedCancelText = resolveLocaleText(
-    '取消',
-    cancelText,
-    labels?.cancelText,
-    mergedLocale?.modal?.cancelText,
-    mergedLocale?.common?.cancelText
-  )
-
-  const resolvedOkText = resolveLocaleText(
-    '确定',
-    okText,
-    labels?.okText,
-    mergedLocale?.modal?.okText,
-    mergedLocale?.common?.okText
-  )
+  const modalLabels = getModalLabels(mergedLocale, {
+    ...labels,
+    ...(closeAriaLabel ? { closeAriaLabel } : {}),
+    ...(okText ? { okText } : {}),
+    ...(cancelText ? { cancelText } : {})
+  })
+  const resolvedCloseAriaLabel = modalLabels.closeAriaLabel
+  const resolvedCancelText = modalLabels.cancelText
+  const resolvedOkText = modalLabels.okText
 
   // Unique ids for a11y
   const reactId = useId()
   const modalId = useMemo(() => `tiger-modal-${reactId}`, [reactId])
   const titleId = `${modalId}-title`
+  const bodyId = `${modalId}-body`
   const overlayHostId = `${modalId}-overlay-host`
 
   const {
     ['aria-labelledby']: _ariaLabelledby,
+    ['aria-label']: ariaLabelFromRest,
+    ['aria-describedby']: ariaDescribedbyFromRest,
     role: _role,
     tabIndex: _tabIndex,
     ...dialogDivProps
   } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes
 
+  const hasTitle = Boolean(title || titleContent)
   const ariaLabelledby =
-    (rest as React.AriaAttributes)['aria-labelledby'] ??
-    (title || titleContent ? titleId : undefined)
+    (rest as React.AriaAttributes)['aria-labelledby'] ?? (hasTitle ? titleId : undefined)
+  const ariaLabel = ariaLabelFromRest ?? (hasTitle ? undefined : modalLabels.dialogAriaLabel)
+  const ariaDescribedby = ariaDescribedbyFromRest ?? (children ? bodyId : undefined)
 
+  const { anchorRef, target: portalTarget } = useOverlayPortalTarget()
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -377,7 +356,9 @@ export const Modal: React.FC<ModalProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox={closeIconViewBox}
-      stroke="currentColor">
+      stroke="currentColor"
+      aria-hidden="true"
+      focusable="false">
       <path
         strokeLinecap={closeIconPathStrokeLinecap}
         strokeLinejoin={closeIconPathStrokeLinejoin}
@@ -387,8 +368,10 @@ export const Modal: React.FC<ModalProps> = ({
     </svg>
   )
 
+  const anchor = <span ref={anchorRef} hidden />
+
   if (!shouldRender) {
-    return null
+    return anchor
   }
 
   const modalContent = (
@@ -426,9 +409,11 @@ export const Modal: React.FC<ModalProps> = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby={ariaLabelledby}
+          aria-label={ariaLabel}
+          aria-describedby={ariaDescribedby}
           aria-owns={overlayHostId}
           tabIndex={-1}
-          ref={dialogRef}
+          ref={composeRefs(forwardedRef, dialogRef)}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -471,7 +456,7 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Body */}
           {children && (
-            <div className={modalBodyClasses} ref={bodyRef} data-tiger-modal-body="">
+            <div className={modalBodyClasses} ref={bodyRef} id={bodyId} data-tiger-modal-body="">
               {children}
             </div>
           )}
@@ -479,7 +464,9 @@ export const Modal: React.FC<ModalProps> = ({
           {/* Footer */}
           {footer ? (
             <div className={modalFooterClasses} data-tiger-modal-footer="">
-              {footer}
+              {typeof footer === 'function'
+                ? footer({ ok: handleOk, cancel: handleClose })
+                : footer}
             </div>
           ) : showDefaultFooter ? (
             <div className={modalFooterClasses} data-tiger-modal-footer="">
@@ -495,5 +482,10 @@ export const Modal: React.FC<ModalProps> = ({
     </div>
   )
 
-  return renderBodyPortal(modalContent)
-}
+  return (
+    <>
+      {anchor}
+      {renderOverlayPortal(modalContent, portalTarget)}
+    </>
+  )
+})

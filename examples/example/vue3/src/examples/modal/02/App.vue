@@ -14,7 +14,7 @@ const innerOpen = ref(false)
     <template #footer>
       <Button variant="secondary" @click="outerOpen = false">关闭</Button>
     </template>
-    <Modal v-model:open="innerOpen" title="嵌套确认" size="sm" :z-index="1100" show-default-footer>
+    <Modal v-model:open="innerOpen" title="嵌套确认" size="sm" show-default-footer>
       <p>嵌套 Modal 是双实例的唯一例外。</p>
     </Modal>
   </Modal>

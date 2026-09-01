@@ -295,6 +295,7 @@
       "CancelHandler",
       "canMoveTransferItems",
       "canRedo",
+      "canStartOverlaySwipeClose",
       "canUndo",
       "canUseTableVirtualWindow",
       "captureActiveElement",
@@ -486,6 +487,7 @@
       "clampMasonryColumnCount",
       "clampMasonryGap",
       "clampOtpClickIndex",
+      "clampOverlayDragOffset",
       "clampPaneSize",
       "clampPercentage",
       "clampScale",
@@ -748,6 +750,7 @@
       "createImageAnnotationBox",
       "createImageAnnotationPath",
       "createImageLoadState",
+      "createImperativeHost",
       "createInfiniteScrollObserver",
       "createInitialLoadingBarState",
       "createInstanceCounter",
@@ -784,6 +787,7 @@
       "createTaskBoardDragController",
       "createTigercatPlugin",
       "createTigerLocaleScope",
+      "createToastQueue",
       "createTouchDragTracker",
       "createTreeKeyIdSet",
       "createUploadChunks",
@@ -1574,6 +1578,7 @@
       "getDrawerContainerClasses",
       "getDrawerFooterClasses",
       "getDrawerHeaderClasses",
+      "getDrawerLabels",
       "getDrawerMaskClasses",
       "getDrawerPanelClasses",
       "getDrawerSwipeCloseDirection",
@@ -1744,6 +1749,7 @@
       "getLoadingBarContainerClasses",
       "getLoadingBarFillClasses",
       "getLoadingBarFillStyle",
+      "getLoadingBarProgressValue",
       "getLoadingBarsWrapperClasses",
       "getLoadingClasses",
       "getLoadingDotClasses",
@@ -1793,10 +1799,12 @@
       "getMenuPlainText",
       "getMenuPopupPlacement",
       "getMenuSearchExpandKeys",
+      "getMessageCloseAriaLabel",
       "getMessageIconPath",
       "getMessageTypeClasses",
       "getModalContainerClasses",
       "getModalContentClasses",
+      "getModalLabels",
       "getMonthDays",
       "getMonthNames",
       "getNavigationMenuBarItems",
@@ -1823,6 +1831,7 @@
       "getNextTableSortState",
       "getNextVirtualTableSelection",
       "getNotificationCenterLabels",
+      "getNotificationCloseAriaLabel",
       "getNotificationIconPath",
       "getNotificationTypeClasses",
       "getNumberExtent",
@@ -2122,6 +2131,7 @@
       "getTimePickerOptionAriaLabel",
       "getTimePickerPeriodButtonClasses",
       "getTimePickerRangeTabButtonClasses",
+      "getToastItemRole",
       "getTokenClasses",
       "getToolbarButtonClasses",
       "getToolbarButtons",
@@ -2358,6 +2368,10 @@
       "ImageViewerProps",
       "imageViewerToolbarBtnClasses",
       "imageViewerToolbarClasses",
+      "ImperativeHost",
+      "ImperativeHostAdapter",
+      "ImperativeTimeoutId",
+      "ImperativeTimerHooks",
       "inboxIcon",
       "indexTableDataSource",
       "infiniteScrollContainerClasses",
@@ -2454,6 +2468,7 @@
       "isEscapeKey",
       "isEventOutside",
       "IsEventOutsideOptions",
+      "isFocusInForeignOverlay",
       "isFocusInsideNavigationMenu",
       "isFormItemGroupControl",
       "isFormValidationCancelled",
@@ -2492,6 +2507,9 @@
       "isNextDisabled",
       "isOptionGroup",
       "isOtpComplete",
+      "isOverlayDragHandleEvent",
+      "isOverlaySwipeHandleTarget",
+      "isOverlayVisuallyHidden",
       "isPanelActive",
       "isPercentagePaneSize",
       "isPositiveFinite",
@@ -2507,6 +2525,7 @@
       "isSamePickerDate",
       "isSameScrollRoot",
       "isScrollAreaAxisEnabled",
+      "isScrollAtSwipeCloseEdge",
       "isSecondOptionDisabled",
       "isSelectOptionSelected",
       "isSelectTypeaheadCharacter",
@@ -2651,8 +2670,6 @@
       "listVirtualItemHeight",
       "listWrapperClasses",
       "LiveRegion",
-      "LOADING_BAR_CONTAINER_ID",
-      "LOADING_BAR_CONTAINER_ROOT_ID",
       "LOADING_BAR_FINISH_HIDE_DELAY_MS",
       "LOADING_BAR_MAX_TRICKLE_PERCENTAGE",
       "LOADING_BAR_START_PERCENTAGE",
@@ -2836,6 +2853,7 @@
       "messageIconClasses",
       "messageIconPaths",
       "MessageInstance",
+      "messageLoadingIconPath",
       "messageLoadingSpinnerClasses",
       "MessageOptions",
       "MessagePosition",
@@ -3026,9 +3044,11 @@
       "OtpKeyIntent",
       "OVERLAY_HOST_ATTRIBUTE",
       "OVERLAY_LAYER_ATTRIBUTE",
+      "OVERLAY_SWIPE_HANDLE_ATTR",
       "OVERLAY_Z_INDEX",
       "OverlayFooterSlotContext",
       "OverlayHeaderSlotContext",
+      "OverlayPresence",
       "OverlayTriggerAria",
       "OverlayTriggerAriaOptions",
       "OverlayTriggerHasPopup",
@@ -3382,6 +3402,7 @@
       "ResolvedLightboxImage",
       "ResolvedMotionSequenceStep",
       "resolveDragConfig",
+      "resolveDrawerPlacement",
       "ResolvedScrollRoot",
       "resolveElementDir",
       "resolveEmptyImageMode",
@@ -3410,6 +3431,7 @@
       "resolveImageHoverPlacement",
       "resolveImagePreviewEnabled",
       "resolveImagePreviewSrc",
+      "resolveImperativeMountTarget",
       "resolveInitialExpandedKeys",
       "resolveInitialPaneSizes",
       "resolveInputNumberControlsLayout",
@@ -3451,6 +3473,7 @@
       "resolveMenuIconKind",
       "resolveMenuMode",
       "resolveMenuTabStopKey",
+      "resolveMessageDuration",
       "resolveMotionDuration",
       "resolveMotionEasing",
       "resolveMultiSeriesTooltipContent",
@@ -3588,6 +3611,7 @@
       "ScatterChartDatum",
       "ScatterChartProps",
       "scatterPointTransitionClasses",
+      "scheduleOverlayLeave",
       "SCROLL_AREA_MIN_THUMB_SIZE",
       "SCROLL_AREA_THICKNESS_PX",
       "ScrollAreaAxis",
@@ -3703,6 +3727,7 @@
       "shouldDistributeOtpInput",
       "shouldEmitMaskComplete",
       "shouldHandleAnchorClick",
+      "shouldHandleToastSurfaceEvent",
       "shouldIndentMenuItem",
       "shouldLoadMore",
       "shouldLoadTreeNode",
@@ -3711,6 +3736,7 @@
       "shouldMergeOverlayTriggerChild",
       "shouldOpenMentions",
       "shouldReduceMotion",
+      "shouldRenderOverlay",
       "shouldRenderScrollAreaScrollbar",
       "shouldShowAutoCompleteClear",
       "shouldShowBackTop",
@@ -4246,6 +4272,8 @@
       "to24HourFormat",
       "toActivityTimelineItems",
       "toAsciiDigits",
+      "ToastQueue",
+      "ToastQueueItem",
       "toCalendarDate",
       "toCSSSize",
       "toDragItems",
@@ -5354,9 +5382,10 @@
         "bodyPadding",
         "className",
         "closable",
-        "deferDestroyOnClose",
+        "closeAriaLabel",
         "destroyOnClose",
         "fullscreenOnMobile",
+        "keyboard",
         "labels",
         "locale",
         "mask",
@@ -6082,17 +6111,22 @@
     "ModalProps": {
       "extends": [],
       "props": [
+        "cancelText",
         "centered",
         "className",
         "closable",
+        "closeAriaLabel",
         "destroyOnClose",
         "draggable",
+        "keyboard",
         "labels",
         "locale",
         "mask",
         "maskClosable",
         "mobileSheet",
+        "okText",
         "open",
+        "showDefaultFooter",
         "size",
         "title",
         "width",
@@ -7922,7 +7956,7 @@
       {
         "component": "LoadingBar",
         "subpath": "./LoadingBar",
-        "target": "LoadingBar"
+        "target": "LoadingBarRoot"
       },
       {
         "component": "LoadingBarContainer",
@@ -7972,7 +8006,7 @@
       {
         "component": "Message",
         "subpath": "./Message",
-        "target": "Message"
+        "target": "MessageRoot"
       },
       {
         "component": "MessageContainer",
@@ -8530,6 +8564,7 @@
       "LoadingBar",
       "LoadingBarContainer",
       "LoadingBarContainerProps",
+      "LoadingBarOptions",
       "LoadingBarProps",
       "LoadingProps",
       "MarkdownEditor",
@@ -8553,6 +8588,7 @@
       "Message",
       "MessageContainer",
       "MessageContainerProps",
+      "MessageOptions",
       "MessageProps",
       "Modal",
       "ModalProps",
@@ -8575,6 +8611,7 @@
       "NotificationCenterProps",
       "NotificationContainer",
       "NotificationContainerProps",
+      "NotificationOptions",
       "NotificationProps",
       "NumberKeyboard",
       "NumberKeyboardProps",
@@ -8743,7 +8780,6 @@
       "Affix",
       "Alert",
       "Anchor",
-      "AnchorContextKey",
       "AnchorLink",
       "AreaChart",
       "AspectRatio",
@@ -8754,7 +8790,6 @@
       "Badge",
       "BarChart",
       "Breadcrumb",
-      "BreadcrumbContextKey",
       "BreadcrumbItem",
       "Button",
       "ButtonGroup",
@@ -8775,7 +8810,6 @@
       "CodeEditor",
       "Col",
       "Collapse",
-      "CollapseContextKey",
       "CollapsePanel",
       "ColorPicker",
       "ColorSwatch",
@@ -8806,7 +8840,6 @@
       "FloatButtonGroup",
       "Footer",
       "Form",
-      "FORM_ITEM_CONTROL_INJECTION_KEY",
       "FormItem",
       "FormWizard",
       "FunnelChart",
@@ -8817,7 +8850,6 @@
       "Highlight",
       "Icon",
       "Image",
-      "IMAGE_GROUP_INJECTION_KEY",
       "ImageAnnotation",
       "ImageCompare",
       "ImageCropper",
@@ -8893,7 +8925,6 @@
       "Statistic",
       "Stepper",
       "Steps",
-      "StepsContextKey",
       "StepsItem",
       "SubMenu",
       "SunburstChart",
@@ -8901,7 +8932,6 @@
       "Table",
       "TabPane",
       "Tabs",
-      "TabsContextKey",
       "Tag",
       "TagsInput",
       "TaskBoard",
@@ -8940,11 +8970,6 @@
         "component": "Anchor",
         "subpath": "./Anchor",
         "target": "Anchor"
-      },
-      {
-        "component": "AnchorContextKey",
-        "subpath": "./AnchorContextKey",
-        "target": "AnchorContextKey"
       },
       {
         "component": "AnchorLink",
@@ -8995,11 +9020,6 @@
         "component": "Breadcrumb",
         "subpath": "./Breadcrumb",
         "target": "Breadcrumb"
-      },
-      {
-        "component": "BreadcrumbContextKey",
-        "subpath": "./BreadcrumbContextKey",
-        "target": "BreadcrumbContextKey"
       },
       {
         "component": "BreadcrumbItem",
@@ -9100,11 +9120,6 @@
         "component": "Collapse",
         "subpath": "./Collapse",
         "target": "Collapse"
-      },
-      {
-        "component": "CollapseContextKey",
-        "subpath": "./CollapseContextKey",
-        "target": "CollapseContextKey"
       },
       {
         "component": "CollapsePanel",
@@ -9257,11 +9272,6 @@
         "target": "Form"
       },
       {
-        "component": "FORM_ITEM_CONTROL_INJECTION_KEY",
-        "subpath": "./FORM_ITEM_CONTROL_INJECTION_KEY",
-        "target": "FORM_ITEM_CONTROL_INJECTION_KEY"
-      },
-      {
         "component": "FormItem",
         "subpath": "./FormItem",
         "target": "FormItem"
@@ -9310,11 +9320,6 @@
         "component": "Image",
         "subpath": "./Image",
         "target": "Image"
-      },
-      {
-        "component": "IMAGE_GROUP_INJECTION_KEY",
-        "subpath": "./IMAGE_GROUP_INJECTION_KEY",
-        "target": "IMAGE_GROUP_INJECTION_KEY"
       },
       {
         "component": "ImageAnnotation",
@@ -9414,7 +9419,7 @@
       {
         "component": "LoadingBar",
         "subpath": "./LoadingBar",
-        "target": "LoadingBar"
+        "target": "LoadingBarRoot"
       },
       {
         "component": "LoadingBarContainer",
@@ -9464,7 +9469,7 @@
       {
         "component": "Message",
         "subpath": "./Message",
-        "target": "Message"
+        "target": "MessageRoot"
       },
       {
         "component": "MessageContainer",
@@ -9692,11 +9697,6 @@
         "target": "Steps"
       },
       {
-        "component": "StepsContextKey",
-        "subpath": "./StepsContextKey",
-        "target": "StepsContextKey"
-      },
-      {
         "component": "StepsItem",
         "subpath": "./StepsItem",
         "target": "Steps"
@@ -9730,11 +9730,6 @@
         "component": "Tabs",
         "subpath": "./Tabs",
         "target": "Tabs"
-      },
-      {
-        "component": "TabsContextKey",
-        "subpath": "./TabsContextKey",
-        "target": "TabsContextKey"
       },
       {
         "component": "Tag",
@@ -9912,6 +9907,7 @@
       "DonutChart",
       "Drawer",
       "DrawerPlacement",
+      "DrawerProps",
       "DrawerSize",
       "Dropdown",
       "DropdownItem",
@@ -9964,6 +9960,9 @@
       "Loading",
       "LoadingBar",
       "LoadingBarContainer",
+      "LoadingBarContainerProps",
+      "LoadingBarOptions",
+      "LoadingBarProps",
       "LoadingProps",
       "MarkdownEditor",
       "Marquee",
@@ -9982,7 +9981,11 @@
       "MenuProps",
       "Message",
       "MessageContainer",
+      "MessageContainerProps",
+      "MessageOptions",
+      "MessageProps",
       "Modal",
+      "ModalProps",
       "NavigationMenu",
       "NavigationMenuContent",
       "NavigationMenuItem",
@@ -9994,6 +9997,9 @@
       "notification",
       "NotificationCenter",
       "NotificationContainer",
+      "NotificationContainerProps",
+      "NotificationOptions",
+      "NotificationProps",
       "NumberKeyboard",
       "NumberKeyboardProps",
       "OrgChart",

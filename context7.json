@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 180,
+  "component_count": 173,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -564,21 +564,6 @@
         "Tree"
       ],
       "examples": "skills/tigercat/references/examples/navigation.md"
-    },
-    "other": {
-      "props": "skills/tigercat/references/shared/props/other.md",
-      "vue": "skills/tigercat/references/vue/index.md",
-      "react": "skills/tigercat/references/react/index.md",
-      "components": [
-        "AnchorContextKey",
-        "BreadcrumbContextKey",
-        "CollapseContextKey",
-        "FORM_ITEM_CONTROL_INJECTION_KEY",
-        "IMAGE_GROUP_INJECTION_KEY",
-        "StepsContextKey",
-        "TabsContextKey"
-      ],
-      "examples": "skills/tigercat/references/examples/other.md"
     }
   },
   "components": {
@@ -4050,146 +4035,6 @@
         "componentIndex": "skills/tigercat/references/component-index.md",
         "props": "skills/tigercat/references/shared/props/navigation.md",
         "examples": "skills/tigercat/references/examples/navigation.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "AnchorContextKey": {
-      "name": "AnchorContextKey",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./AnchorContextKey",
-      "packageTarget": "Anchor",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "BreadcrumbContextKey": {
-      "name": "BreadcrumbContextKey",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./BreadcrumbContextKey",
-      "packageTarget": "Breadcrumb",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "CollapseContextKey": {
-      "name": "CollapseContextKey",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./CollapseContextKey",
-      "packageTarget": "Collapse",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "FORM_ITEM_CONTROL_INJECTION_KEY": {
-      "name": "FORM_ITEM_CONTROL_INJECTION_KEY",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./FORM_ITEM_CONTROL_INJECTION_KEY",
-      "packageTarget": "FormItemContext",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "IMAGE_GROUP_INJECTION_KEY": {
-      "name": "IMAGE_GROUP_INJECTION_KEY",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./IMAGE_GROUP_INJECTION_KEY",
-      "packageTarget": "ImageGroup",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "StepsContextKey": {
-      "name": "StepsContextKey",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./StepsContextKey",
-      "packageTarget": "Steps",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "TabsContextKey": {
-      "name": "TabsContextKey",
-      "aliases": [],
-      "category": "Other",
-      "slug": "other",
-      "testGroup": "other",
-      "packageSubpath": "./TabsContextKey",
-      "packageTarget": "Tabs",
-      "typeSource": "unknown",
-      "sourceFiles": [],
-      "propsInterfaces": [],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/other.md",
-        "examples": "skills/tigercat/references/examples/other.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
       }

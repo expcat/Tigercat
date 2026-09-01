@@ -1,7 +1,7 @@
 {
   "id": "modal-02",
   "title": "嵌套对话框",
-  "description": "展示父子确认流程；这是唯一允许同时声明两个 Modal 的结构场景。",
+  "description": "父子确认。嵌套 Modal 进外层 overlay-host，Esc 先关里层，不必抬 zIndex。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

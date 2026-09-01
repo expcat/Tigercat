@@ -33,10 +33,12 @@ export const koKR: TigerLocale = {
   modal: {
     closeAriaLabel: '닫기',
     okText: '확인',
-    cancelText: '취소'
+    cancelText: '취소',
+    dialogAriaLabel: '대화 상자'
   },
   drawer: {
-    closeAriaLabel: '닫기'
+    closeAriaLabel: '닫기',
+    dialogAriaLabel: '서랍'
   },
   alert: {
     closeAriaLabel: '알림 닫기'

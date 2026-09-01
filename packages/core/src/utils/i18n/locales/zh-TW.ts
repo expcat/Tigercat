@@ -33,10 +33,12 @@ export const zhTW: TigerLocale = {
   modal: {
     closeAriaLabel: '關閉',
     okText: '確定',
-    cancelText: '取消'
+    cancelText: '取消',
+    dialogAriaLabel: '對話框'
   },
   drawer: {
-    closeAriaLabel: '關閉'
+    closeAriaLabel: '關閉',
+    dialogAriaLabel: '抽屜'
   },
   alert: {
     closeAriaLabel: '關閉提示'

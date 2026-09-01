@@ -33,10 +33,12 @@ export const ptBR: TigerLocale = {
   modal: {
     closeAriaLabel: 'Fechar',
     okText: 'OK',
-    cancelText: 'Cancelar'
+    cancelText: 'Cancelar',
+    dialogAriaLabel: 'Diálogo'
   },
   drawer: {
-    closeAriaLabel: 'Fechar'
+    closeAriaLabel: 'Fechar',
+    dialogAriaLabel: 'Gaveta'
   },
   alert: {
     closeAriaLabel: 'Fechar alerta'

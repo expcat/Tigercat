@@ -12,6 +12,7 @@ import {
   getFocusTrapNavigation,
   getFocusableElements,
   isEventOutside,
+  isFocusInForeignOverlay,
   lockBodyScroll,
   setBackgroundInert,
   isBrowser,
@@ -139,6 +140,24 @@ export function renderBodyPortal(node: React.ReactNode, disabled = false): React
   return createPortal(layeredNode, target)
 }
 
+/** Resolve the overlay-host chain from an in-tree anchor so nested Modal/Drawer enter the parent host. */
+export function useOverlayPortalTarget(): {
+  anchorRef: React.RefObject<HTMLSpanElement | null>
+  target: HTMLElement | null
+} {
+  const anchorRef = useRef<HTMLSpanElement | null>(null)
+  const [target, setTarget] = useState<HTMLElement | null>(null)
+
+  useLayoutEffect(() => {
+    setTarget(resolveAnchoredOverlayTarget(anchorRef.current))
+  })
+
+  return {
+    anchorRef,
+    target: target ?? (isBrowser() ? resolveAnchoredOverlayTarget(anchorRef.current) : null)
+  }
+}
+
 export function renderOverlayPortal(
   node: React.ReactNode,
   target: HTMLElement | null,
@@ -197,6 +216,7 @@ export function useFocusTrap({
       const inside = activeElement instanceof Node && container.contains(activeElement)
       if (!inside) {
         if (event.key !== 'Tab') return
+        if (isFocusInForeignOverlay(container, activeElement)) return
         event.preventDefault()
         const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
         next?.focus()

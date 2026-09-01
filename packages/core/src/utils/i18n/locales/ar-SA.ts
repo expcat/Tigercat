@@ -33,10 +33,12 @@ export const arSA: TigerLocale = {
   modal: {
     closeAriaLabel: 'إغلاق',
     okText: 'موافق',
-    cancelText: 'إلغاء'
+    cancelText: 'إلغاء',
+    dialogAriaLabel: 'حوار'
   },
   drawer: {
-    closeAriaLabel: 'إغلاق'
+    closeAriaLabel: 'إغلاق',
+    dialogAriaLabel: 'درج'
   },
   alert: {
     closeAriaLabel: 'إغلاق التنبيه'

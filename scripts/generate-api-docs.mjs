@@ -89,6 +89,14 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。'
   },
+  Modal: {
+    notes:
+      '`open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。'
+  },
+  Drawer: {
+    notes:
+      '与 Modal 同一套在场/陷阱/关场。`placement` 含 `start`/`end`。swipe 关闭只在标题栏或对应轴滚到头时成立。`className` 打在 panel。关闭名走 `locale.drawer`（en-US Close）。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。'
+  },
   ButtonGroup: {
     notes:
       '直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。'

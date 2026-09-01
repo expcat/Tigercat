@@ -33,10 +33,12 @@ export const thTH: TigerLocale = {
   modal: {
     closeAriaLabel: 'ปิด',
     okText: 'ตกลง',
-    cancelText: 'ยกเลิก'
+    cancelText: 'ยกเลิก',
+    dialogAriaLabel: 'กล่องโต้ตอบ'
   },
   drawer: {
-    closeAriaLabel: 'ปิด'
+    closeAriaLabel: 'ปิด',
+    dialogAriaLabel: 'ลิ้นชัก'
   },
   alert: {
     closeAriaLabel: 'ปิดการแจ้งเตือน'

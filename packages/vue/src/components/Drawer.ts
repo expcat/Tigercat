@@ -17,7 +17,7 @@ import {
   closeIconPathStrokeLinecap,
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
-  resolveLocaleText,
+  getDrawerLabels,
   mergeTigerLocale,
   mergeStyleValues,
   getDrawerMaskClasses,
@@ -48,10 +48,11 @@ import {
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import {
-  renderVueBodyTeleport,
+  renderVueOverlayTeleport,
   useVueBodyScrollLock,
   useVueEscapeKey,
-  useVueFocusTrap
+  useVueFocusTrap,
+  useVueOverlayPortalTarget
 } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -163,7 +164,7 @@ export const Drawer = defineComponent({
       default: OVERLAY_Z_INDEX.modal
     },
     /**
-     * Additional CSS class for the drawer container
+     * Additional CSS class for the drawer panel (same node as panelClassName)
      */
     className: {
       type: String,
@@ -219,8 +220,7 @@ export const Drawer = defineComponent({
     },
 
     /**
-     * Close button aria-label
-     * @default 'Close drawer'
+     * Close button aria-label. Defaults to locale.drawer.closeAriaLabel (en-US Close).
      */
     closeAriaLabel: {
       type: String,
@@ -247,11 +247,18 @@ export const Drawer = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const drawerLabels = computed(() =>
+      getDrawerLabels(mergedLocale.value, {
+        ...props.labels,
+        ...(props.closeAriaLabel ? { closeAriaLabel: props.closeAriaLabel } : {})
+      })
+    )
 
     const instanceId = ref(`tiger-drawer-${useId()}`)
     const hasOpened = ref(props.open)
     const leaving = ref(false)
 
+    const { anchorRef, target: portalTarget } = useVueOverlayPortalTarget()
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -395,7 +402,8 @@ export const Drawer = defineComponent({
     )
 
     return () => {
-      if (!shouldRender.value) return null
+      const anchor = h('span', { ref: anchorRef, hidden: true })
+      if (!shouldRender.value) return anchor
 
       const forwardedAttrs = Object.fromEntries(
         Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
@@ -406,8 +414,13 @@ export const Drawer = defineComponent({
           ? (attrs['aria-labelledby'] as string)
           : undefined
 
-      const ariaLabelledby =
-        ariaLabelledbyFromAttrs ?? (props.title || slots.header ? titleId.value : undefined)
+      const hasTitle = Boolean(props.title || slots.header)
+      const ariaLabelledby = ariaLabelledbyFromAttrs ?? (hasTitle ? titleId.value : undefined)
+      const ariaLabelFromAttrs =
+        typeof attrs['aria-label'] === 'string' ? (attrs['aria-label'] as string) : undefined
+      const ariaLabel =
+        ariaLabelFromAttrs ?? (hasTitle ? undefined : drawerLabels.value.dialogAriaLabel)
+      const bodyId = `${instanceId.value}-body`
       const overlayHostId = `${instanceId.value}-overlay-host`
 
       const containerClasses = getDrawerContainerClasses()
@@ -442,13 +455,7 @@ export const Drawer = defineComponent({
       const closeButtonClasses = getDrawerCloseButtonClasses()
       const titleClasses = getDrawerTitleClasses()
 
-      const resolvedCloseAriaLabel = resolveLocaleText(
-        'Close drawer',
-        props.closeAriaLabel,
-        props.labels?.closeAriaLabel,
-        mergedLocale.value?.drawer?.closeAriaLabel,
-        mergedLocale.value?.common?.closeText
-      )
+      const resolvedCloseAriaLabel = drawerLabels.value.closeAriaLabel
 
       const closeIcon = h(
         'svg',
@@ -457,7 +464,9 @@ export const Drawer = defineComponent({
           fill: 'none',
           stroke: 'currentColor',
           viewBox: closeIconViewBox,
-          xmlns: 'http://www.w3.org/2000/svg'
+          xmlns: 'http://www.w3.org/2000/svg',
+          'aria-hidden': 'true',
+          focusable: 'false'
         },
         [
           h('path', {
@@ -496,7 +505,7 @@ export const Drawer = defineComponent({
       const body = slots.default
         ? h(
             'div',
-            { class: bodyClasses, ref: bodyRef, 'data-tiger-drawer-body': '' },
+            { class: bodyClasses, ref: bodyRef, id: bodyId, 'data-tiger-drawer-body': '' },
             slots.default()
           )
         : null
@@ -521,6 +530,8 @@ export const Drawer = defineComponent({
           role: 'dialog',
           'aria-modal': 'true',
           'aria-labelledby': ariaLabelledby,
+          'aria-label': ariaLabel,
+          'aria-describedby': slots.default ? bodyId : undefined,
           'aria-owns': overlayHostId,
           tabindex: -1,
           ref: dialogRef,
@@ -555,7 +566,7 @@ export const Drawer = defineComponent({
         ]
       )
 
-      return renderVueBodyTeleport([root])
+      return [anchor, renderVueOverlayTeleport([root], portalTarget.value)]
     }
   }
 })

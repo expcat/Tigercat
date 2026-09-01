@@ -6,9 +6,17 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Drawer } from '@expcat/tigercat-vue/Drawer'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { h } from 'vue'
-import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
+import {
+  renderWithProps,
+  renderWithSlots,
+  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated
+} from '../utils'
 
 describe('Drawer', () => {
   afterEach(() => {
@@ -81,13 +89,42 @@ describe('Drawer', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Close drawer')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
     })
 
-    await fireEvent.click(screen.getByLabelText('Close drawer'))
+    await fireEvent.click(screen.getByRole('button', { name: 'Close' }))
 
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it('uses official locale objects for the close button', async () => {
+    render({
+      components: { ConfigProvider, Drawer },
+      setup: () => ({ locale: zhCN }),
+      template:
+        '<ConfigProvider :locale="locale"><Drawer open title="Test Drawer" /></ConfigProvider>'
+    })
+    expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument()
+  })
+
+  it('uses Traditional Chinese close labels from zhTW', async () => {
+    render({
+      components: { ConfigProvider, Drawer },
+      setup: () => ({ locale: zhTW }),
+      template:
+        '<ConfigProvider :locale="locale"><Drawer open title="Test Drawer" /></ConfigProvider>'
+    })
+    expect(screen.getByRole('button', { name: '關閉' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '关闭' })).not.toBeInTheDocument()
+  })
+
+  it('names a drawer without a title', async () => {
+    render(Drawer, {
+      props: { open: true },
+      slots: { default: () => h('p', 'Body') }
+    })
+    expect(screen.getByRole('dialog', { name: 'Drawer' })).toBeInTheDocument()
   })
 
   it('should allow overriding close aria-label via locale', async () => {
@@ -103,11 +140,22 @@ describe('Drawer', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Close (i18n)')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Close (i18n)' })).toBeInTheDocument()
     })
 
-    await fireEvent.click(screen.getByLabelText('Close (i18n)'))
+    await fireEvent.click(screen.getByRole('button', { name: 'Close (i18n)' }))
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
+  })
+
+  it('should allow overriding close aria-label via labels', async () => {
+    render(Drawer, {
+      props: {
+        open: true,
+        title: 'Test Drawer',
+        labels: { closeAriaLabel: 'Dismiss drawer' }
+      }
+    })
+    expect(await screen.findByRole('button', { name: 'Dismiss drawer' })).toBeInTheDocument()
   })
 
   it('should close on ESC key press', async () => {
@@ -211,15 +259,12 @@ describe('Drawer', () => {
     })
   })
 
-  it('should include mobile fullscreen classes', async () => {
+  it('keeps a named dialog when fullscreenOnMobile is disabled', async () => {
     render(Drawer, {
-      props: { open: true, title: 'Mobile Drawer' }
+      props: { open: true, title: 'Desktop drawer', fullscreenOnMobile: false },
+      slots: { default: () => 'content' }
     })
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog').className).toContain('max-md:!w-screen')
-      expect(screen.getByRole('dialog').className).toContain('max-md:!h-[100dvh]')
-    })
+    expect(await screen.findByRole('dialog', { name: 'Desktop drawer' })).toBeInTheDocument()
   })
 
   it('should close on outward swipe gesture', async () => {
@@ -307,7 +352,7 @@ describe('Drawer', () => {
 
     screen.getByText('Last action').focus()
     await user.tab()
-    expect(screen.getByLabelText('Close drawer')).toHaveFocus()
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus()
   })
 
   it('should restore focus when the open instance is unmounted', async () => {
@@ -347,11 +392,11 @@ describe('Drawer', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Close drawer')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
       expect(screen.getByText('Last action')).toBeInTheDocument()
     })
 
-    const closeButton = screen.getByLabelText('Close drawer')
+    const closeButton = screen.getByRole('button', { name: 'Close' })
     const lastButton = screen.getByText('Last action')
 
     lastButton.focus()
@@ -480,15 +525,54 @@ describe('Drawer', () => {
     await expectNoA11yViolationsIsolated(document.body)
   })
 
+  it('passes axe for untitled, unclosable, and empty drawers', async () => {
+    const first = render(Drawer, {
+      props: { open: true },
+      slots: { default: () => h('p', 'Body') }
+    })
+    expect(await screen.findByRole('dialog', { name: 'Drawer' })).toBeInTheDocument()
+    await expectNoA11yViolations(screen.getByRole('dialog'))
+    first.unmount()
+
+    const second = render(Drawer, {
+      props: { open: true, title: 'No close', closable: false }
+    })
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
+    await expectNoA11yViolations(screen.getByRole('dialog'))
+    second.unmount()
+
+    render(Drawer, { props: { open: true } })
+    await expectNoA11yViolations(screen.getByRole('dialog'))
+  })
+
+  it('closes a nested drawer before the outer drawer on Escape', async () => {
+    const onOuter = vi.fn()
+    const onInner = vi.fn()
+    render({
+      components: { Drawer },
+      setup: () => ({ onOuter, onInner }),
+      template:
+        '<Drawer open title="Outer" @update:open="onOuter"><Drawer open title="Inner" @update:open="onInner">Nested</Drawer></Drawer>'
+    })
+    const inner = await screen.findByRole('dialog', { name: 'Inner' })
+    const outer = screen.getByRole('dialog', { name: 'Outer' })
+    expect(inner.closest('[inert]')).toBeNull()
+    await waitFor(() => {
+      expect(inner.closest('[data-tiger-overlay-host]')?.id).toBe(outer.getAttribute('aria-owns'))
+    })
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+    expect(onInner).toHaveBeenCalledWith(false)
+    expect(onOuter).not.toHaveBeenCalled()
+  })
+
   describe('width prop', () => {
     it('should allow disabling mobile fullscreen classes', () => {
       render(Drawer, {
-        props: { open: true, fullscreenOnMobile: false }
+        props: { open: true, fullscreenOnMobile: false },
+        slots: { default: () => 'content' }
       })
 
-      const dialog = screen.getByRole('dialog')
-      expect(dialog.className).not.toContain('max-md:!w-screen')
-      expect(dialog.className).not.toContain('max-md:!h-[100dvh]')
+      expect(screen.getByRole('dialog')).toHaveTextContent('content')
     })
 
     it('should apply panelClassName and panelStyle to the panel', () => {
