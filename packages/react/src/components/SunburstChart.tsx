@@ -126,7 +126,9 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       onArcHover?.(index, index !== null ? (arcs[index]?.datum ?? null) : null)
     },
     onSelectedIndexChange,
-    onClick: onArcClick
+    onClick: (index, datum) => {
+      if (datum !== undefined) onArcClick?.(index, datum)
+    }
   })
   const roots = useMemo(() => arcs.filter((arc) => arc.depth === 0), [arcs])
   const legendItems = useMemo<ChartLegendItem[]>(

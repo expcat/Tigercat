@@ -448,7 +448,7 @@ export const Steps = defineComponent({
       let itemVNodes: VNode[]
       if (props.items && props.items.length > 0) {
         itemVNodes = props.items.map((item) =>
-          h(StepsItem, {
+          h(StepsItem as unknown as Component, {
             key: item.key ?? item.title,
             title: item.title,
             description: item.description,

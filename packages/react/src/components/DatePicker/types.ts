@@ -12,7 +12,7 @@ export type DatePickerRangeResolvedValue = [Date | null, Date | null]
 
 type DatePickerDomProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  'defaultValue' | 'value' | 'onChange' | 'placeholder'
+  'defaultValue' | 'value' | 'onChange' | 'placeholder' | 'onBlur'
 >
 
 export interface DatePickerBaseProps
@@ -20,6 +20,7 @@ export interface DatePickerBaseProps
     Omit<CoreDatePickerProps, 'value' | 'defaultValue' | 'range' | 'onChange'>,
     DatePickerDomProps {
   onClear?: () => void
+  onBlur?: React.FocusEventHandler<HTMLElement>
 }
 
 export interface DatePickerSingleProps extends DatePickerBaseProps {

@@ -14,12 +14,6 @@ import {
   resolveCommentLikeState,
   resolveLocaleText,
   writeCommentLikeOverlay,
-  type CommentAction,
-  type CommentLikeOverlay,
-  type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps
-} from '@expcat/tigercat-core'
-import {
   commentThreadActionButtonClasses,
   commentThreadPrimaryButtonClasses,
   commentThreadLikeButtonClasses,
@@ -39,8 +33,12 @@ import {
   commentThreadSubmitButtonClasses,
   commentThreadRepliesClasses,
   commentThreadEmptyClasses,
-  commentThreadEmptyIconClasses
-} from '../../../core/src/internal/comment-thread-styles'
+  commentThreadEmptyIconClasses,
+  type CommentAction,
+  type CommentLikeOverlay,
+  type CommentNode,
+  type CommentThreadProps as CoreCommentThreadProps
+} from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
@@ -351,18 +349,24 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {node.user?.name ? (
-                <Text
-                  tag={onUserClick ? 'button' : 'span'}
-                  size="sm"
-                  weight="bold"
-                  className={
-                    onUserClick
-                      ? commentThreadAuthorClasses
-                      : commentThreadAuthorClasses.replace('cursor-pointer', '')
-                  }
-                  onClick={onUserClick ? () => onUserClick(node) : undefined}>
-                  {node.user.name}
-                </Text>
+                onUserClick ? (
+                  <button
+                    type="button"
+                    className={commentThreadAuthorClasses}
+                    onClick={() => onUserClick(node)}>
+                    <Text tag="span" size="sm" weight="bold">
+                      {node.user.name}
+                    </Text>
+                  </button>
+                ) : (
+                  <Text
+                    tag="span"
+                    size="sm"
+                    weight="bold"
+                    className={commentThreadAuthorClasses.replace('cursor-pointer', '')}>
+                    {node.user.name}
+                  </Text>
+                )
               ) : null}
               {node.user?.title ? (
                 <Text tag="span" size="xs" color="muted" className={commentThreadUserTitleClasses}>

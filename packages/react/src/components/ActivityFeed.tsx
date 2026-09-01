@@ -15,13 +15,6 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
-  type ActivityFeedProps as CoreActivityFeedProps,
-  type ActivityGroup,
-  type ActivityItem,
-  type ActivityAction,
-  type ActivityTimelineItem
-} from '@expcat/tigercat-core'
-import {
   activityFeedActionClasses,
   activityFeedItemSurfaceClasses,
   activityFeedAvatarClasses,
@@ -35,8 +28,13 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
-  getActivityFeedDotClasses
-} from '../../../core/src/internal/activity-feed-styles'
+  getActivityFeedDotClasses,
+  type ActivityFeedProps as CoreActivityFeedProps,
+  type ActivityGroup,
+  type ActivityItem,
+  type ActivityAction,
+  type ActivityTimelineItem
+} from '@expcat/tigercat-core'
 import { Timeline } from './Timeline'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'

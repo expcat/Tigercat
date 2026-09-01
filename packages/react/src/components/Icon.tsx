@@ -17,6 +17,39 @@ export interface IconProps extends CoreIconProps, React.HTMLAttributes<HTMLSpanE
   children?: React.ReactNode
 }
 
+type SvgLineCap = NonNullable<React.SVGProps<SVGSVGElement>['strokeLinecap']>
+type SvgLineJoin = NonNullable<React.SVGProps<SVGSVGElement>['strokeLinejoin']>
+
+function asSvgLineCap(value: string | undefined): SvgLineCap | undefined {
+  if (value === 'inherit' || value === 'round' || value === 'butt' || value === 'square') {
+    return value
+  }
+  return undefined
+}
+
+function asSvgLineJoin(value: string | undefined): SvgLineJoin | undefined {
+  if (value === 'inherit' || value === 'round' || value === 'bevel' || value === 'miter') {
+    return value
+  }
+  return undefined
+}
+
+function toReactSvgAttrs(
+  attrs: ReturnType<typeof resolveIconSvgAttrs>
+): React.SVGProps<SVGSVGElement> {
+  return {
+    xmlns: attrs.xmlns,
+    viewBox: attrs.viewBox,
+    fill: attrs.fill,
+    stroke: attrs.stroke,
+    strokeWidth: attrs.strokeWidth,
+    strokeLinecap: asSvgLineCap(attrs.strokeLinecap),
+    strokeLinejoin: asSvgLineJoin(attrs.strokeLinejoin),
+    'aria-hidden': attrs['aria-hidden'],
+    focusable: attrs.focusable
+  }
+}
+
 export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
   { name, icon, size = 'md', color, className, style, children, ...props },
   ref
@@ -41,7 +74,9 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
   const builtInSvg = definition ? (
     <svg
       className={svgClassName}
-      {...resolveIconSvgAttrs({ mode: definition.mode, viewBox: definition.viewBox })}>
+      {...toReactSvgAttrs(
+        resolveIconSvgAttrs({ mode: definition.mode, viewBox: definition.viewBox })
+      )}>
       {definition.paths.map((d, i) => (
         <path key={i} d={d} />
       ))}
@@ -58,7 +93,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
 
     return React.cloneElement(child, {
       ...svgProps,
-      ...merged,
+      ...toReactSvgAttrs(merged),
       className: classNames(svgClassName, svgProps.className)
     })
   })

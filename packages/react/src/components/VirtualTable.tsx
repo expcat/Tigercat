@@ -105,8 +105,8 @@ function VirtualTableInner<T extends Record<string, unknown> = Record<string, un
   }: VirtualTableProps<T>,
   ref: React.ForwardedRef<VirtualTableHandle>
 ) {
-  const dataSource = dataSourceProp ?? (EMPTY_VIRTUAL_TABLE_ROWS as T[])
-  const columns = columnsProp ?? (EMPTY_VIRTUAL_TABLE_COLUMNS as TableColumn<T>[])
+  const dataSource = dataSourceProp ?? (EMPTY_VIRTUAL_TABLE_ROWS as unknown as T[])
+  const columns = columnsProp ?? (EMPTY_VIRTUAL_TABLE_COLUMNS as unknown as TableColumn<T>[])
   const width = resolveVirtualTableWidth(widthProp)
   const config = useTigerConfig()
   const mergedLocale = useMemo(

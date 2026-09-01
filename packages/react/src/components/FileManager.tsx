@@ -45,6 +45,7 @@ export interface FileManagerProps
   extends
     Omit<CoreFileManagerProps, 'className'>,
     Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreFileManagerProps | 'onSelect'> {
+  className?: string
   /** Custom icon renderer */
   renderIcon?: (item: FileItem) => React.ReactNode
 }

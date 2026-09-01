@@ -8,6 +8,7 @@ import {
   formatBadgeCountLabel,
   formatCommentTime,
   getCommentRepliesView,
+  getTextClasses,
   nextCommentRevealedCount,
   resolveCommentNodes,
   getCommentThreadLabels,
@@ -16,14 +17,6 @@ import {
   resolveCommentLikeState,
   resolveLocaleText,
   writeCommentLikeOverlay,
-  type CommentAction,
-  type CommentLikeOverlay,
-  type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps,
-  type TigerLocale,
-  type TigerLocaleCommentThread
-} from '@expcat/tigercat-core'
-import {
   commentThreadActionButtonClasses,
   commentThreadPrimaryButtonClasses,
   commentThreadLikeButtonClasses,
@@ -43,8 +36,14 @@ import {
   commentThreadSubmitButtonClasses,
   commentThreadRepliesClasses,
   commentThreadEmptyClasses,
-  commentThreadEmptyIconClasses
-} from '../../../core/src/internal/comment-thread-styles'
+  commentThreadEmptyIconClasses,
+  type CommentAction,
+  type CommentLikeOverlay,
+  type CommentNode,
+  type CommentThreadProps as CoreCommentThreadProps,
+  type TigerLocale,
+  type TigerLocaleCommentThread
+} from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
@@ -492,21 +491,29 @@ export const CommentThread = defineComponent({
             h('div', { class: 'flex-1 min-w-0' }, [
               h('div', { class: 'flex items-center gap-2 flex-wrap' }, [
                 node.user?.name
-                  ? h(
-                      Text,
-                      {
-                        tag: hasUserClickHandler.value ? 'button' : 'span',
-                        size: 'sm',
-                        weight: 'bold',
-                        class: hasUserClickHandler.value
-                          ? commentThreadAuthorClasses
-                          : commentThreadAuthorClasses.replace('cursor-pointer', ''),
-                        onClick: hasUserClickHandler.value
-                          ? () => emit('user-click', node)
-                          : undefined
-                      },
-                      { default: () => node.user?.name }
-                    )
+                  ? hasUserClickHandler.value
+                    ? h(
+                        'button',
+                        {
+                          type: 'button',
+                          class: classNames(
+                            getTextClasses({ size: 'sm', weight: 'bold' }),
+                            commentThreadAuthorClasses
+                          ),
+                          onClick: () => emit('user-click', node)
+                        },
+                        node.user.name
+                      )
+                    : h(
+                        Text,
+                        {
+                          tag: 'span',
+                          size: 'sm',
+                          weight: 'bold',
+                          class: commentThreadAuthorClasses.replace('cursor-pointer', '')
+                        },
+                        { default: () => node.user?.name }
+                      )
                   : null,
                 node.user?.title
                   ? h(

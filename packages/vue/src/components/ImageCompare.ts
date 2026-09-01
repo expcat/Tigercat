@@ -266,7 +266,9 @@ export const ImageCompare = defineComponent({
         startX: point.clientX,
         startY: point.clientY,
         ownerDocument:
-          event.currentTarget instanceof Node ? event.currentTarget.ownerDocument : undefined,
+          event.currentTarget instanceof Node
+            ? (event.currentTarget.ownerDocument ?? undefined)
+            : undefined,
         pointerId: event.pointerId,
         pointerTarget: event.currentTarget instanceof Element ? event.currentTarget : null,
         onMove: ({ event: moveEvent, currentX, currentY }) => {

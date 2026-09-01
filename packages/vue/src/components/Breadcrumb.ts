@@ -305,7 +305,7 @@ export const Breadcrumb = defineComponent({
       return h(
         'div',
         { class: rootClass, style: mergeStyleValues(attrsRecord.style, props.style) },
-        [nav, h('div', { class: breadcrumbExtraClasses }, extraContent.value)]
+        [nav, h('div', { class: breadcrumbExtraClasses }, extraContent.value ?? undefined)]
       )
     }
   }

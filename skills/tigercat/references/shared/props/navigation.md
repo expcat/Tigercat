@@ -58,7 +58,7 @@ Events/callback props: `onClick?`, `onChange?`.
 
 ## Breadcrumb
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 4/7 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 4/8 props
 
 | Prop         | Type                   | Default | Notes                                                                                      |
 | ------------ | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |

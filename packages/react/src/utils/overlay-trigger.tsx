@@ -1,5 +1,9 @@
 import { cloneElement, isValidElement, type ReactElement, type ReactNode, type Ref } from 'react'
-import { classNames, shouldMergeOverlayTriggerChild } from '@expcat/tigercat-core'
+import {
+  classNames,
+  shouldMergeOverlayTriggerChild,
+  type OverlayTriggerAria
+} from '@expcat/tigercat-core'
 
 type AnyProps = Record<string, unknown>
 
@@ -41,15 +45,15 @@ export interface OverlayTriggerRenderOptions {
   className?: string
   disabled?: boolean
   extraChildren?: ReactNode
-  aria: Record<string, unknown>
+  aria: OverlayTriggerAria
   handlers: {
-    onClick?: (event: React.MouseEvent) => void
-    onKeyDown?: (event: React.KeyboardEvent) => void
-    onMouseEnter?: (event: React.MouseEvent) => void
-    onMouseLeave?: (event: React.MouseEvent) => void
-    onFocus?: (event: React.FocusEvent) => void
-    onBlur?: (event: React.FocusEvent) => void
-    onContextMenu?: (event: React.MouseEvent) => void
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void
+    onKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void
+    onMouseEnter?: (event: React.MouseEvent<HTMLElement>) => void
+    onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void
+    onFocus?: (event: React.FocusEvent<HTMLElement>) => void
+    onBlur?: (event: React.FocusEvent<HTMLElement>) => void
+    onContextMenu?: (event: React.MouseEvent<HTMLElement>) => void
   }
   preventDefaultOnClick?: boolean
 }
@@ -69,7 +73,7 @@ export function renderOverlayTrigger(options: OverlayTriggerRenderOptions): Reac
 
   const mergeable = isValidElement(child) && shouldMergeOverlayTriggerChild(asChild, child.type)
 
-  const onClick = (event: React.MouseEvent) => {
+  const onClick = (event: React.MouseEvent<HTMLElement>) => {
     if (disabled) {
       event.preventDefault()
       event.stopPropagation()

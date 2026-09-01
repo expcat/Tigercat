@@ -2,6 +2,7 @@
  * Image component types and interfaces
  */
 
+import type { ReferrerPolicyAttr } from './base'
 import type { TigerLocale } from './locale'
 
 /**
@@ -145,7 +146,7 @@ export interface ImageProps {
   /**
    * Referrer policy for the inner `<img>`.
    */
-  referrerPolicy?: string
+  referrerPolicy?: ReferrerPolicyAttr
 
   /**
    * Fetch priority for the inner `<img>` (LCP).
@@ -343,6 +344,16 @@ export interface ImageCropperProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Fired after the image has loaded and the cropper is ready to confirm.
+   */
+  onReady?: () => void
+
+  /**
+   * Fired when the image fails to load.
+   */
+  onError?: (error: Error) => void
 }
 
 /**

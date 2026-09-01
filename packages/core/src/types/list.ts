@@ -108,6 +108,11 @@ export interface ListPaginationConfig {
    * Custom total text
    */
   totalText?: (total: number, range: [number, number]) => string
+  /**
+   * Custom text renderer for the simple-mode page indicator.
+   * Defaults to the locale `pageIndicatorText` template.
+   */
+  pageIndicatorText?: (current: number, totalPages: number) => string
 }
 
 /**

@@ -58,7 +58,7 @@ import { useTigerConfig } from './ConfigProvider'
 export interface TourProps
   extends
     CoreTourProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'content' | 'children'> {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'content' | 'children' | 'onChange'> {
   /** Callback when open state changes */
   onOpenChange?: (open: boolean) => void
   /** Callback when close button is clicked or tour finishes */

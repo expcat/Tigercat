@@ -122,11 +122,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const measured = containerSize > 0
   const paneSizes = measured ? layoutPanePixels(ratios, containerSize, gutterSize, min, max) : []
 
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    controlledSizes &&
-    controlledSizes.length !== paneCount
-  ) {
+  if (controlledSizes && controlledSizes.length !== paneCount) {
     devWarn(
       'Splitter.sizes.length',
       `Splitter sizes length (${controlledSizes.length}) does not match pane count (${paneCount}). Extra panes share remaining space.`

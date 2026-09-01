@@ -111,7 +111,7 @@ export const Signature = defineComponent({
         ...props.labels,
         ariaLabel: props.ariaLabel?.trim() || props.labels?.ariaLabel,
         undoText: props.undoText?.trim() || props.labels?.undoText,
-        clearText: props.clearText?.trim() || props.labels?.clearText
+        clearText: props.clearText?.trim() || undefined
       })
     )
 

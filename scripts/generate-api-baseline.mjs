@@ -41,6 +41,7 @@ const OUT_FILE = join(OUT_DIR, 'public-api-baseline.json')
 // Submodules that packages/core/src/index.ts re-exports via `export *`.
 const CORE_EXPORT_TARGETS = [
   'utils',
+  'internal',
   'types',
   'theme-runtime',
   'themes',

@@ -52,7 +52,10 @@ import { useControlledState } from '../hooks/useControlledState'
 export interface ImageAnnotationProps
   extends
     Omit<CoreImageAnnotationProps, 'className' | 'value' | 'defaultValue'>,
-    Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreImageAnnotationProps | 'onChange'> {
+    Omit<
+      React.ComponentPropsWithoutRef<'div'>,
+      keyof CoreImageAnnotationProps | 'onChange' | 'onError' | 'onSelect'
+    > {
   value?: CoreImageAnnotation[]
   defaultValue?: CoreImageAnnotation[]
   className?: string

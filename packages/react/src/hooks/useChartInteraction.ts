@@ -35,7 +35,10 @@ export interface UseChartInteractionReturn {
   resolvedSelectedIndex: number | null
   activeIndex: number | null
   getElementOpacity: (index: number) => number | undefined
-  handleMouseEnter: (index: number, event: React.MouseEvent | React.FocusEvent) => void
+  handleMouseEnter: (
+    index: number,
+    event: React.MouseEvent | React.FocusEvent | React.KeyboardEvent
+  ) => void
   handleMouseMove: (event: React.MouseEvent) => void
   handleMouseLeave: () => void
   handleClick: (index: number) => void
@@ -110,7 +113,7 @@ export function useChartInteraction<T = unknown>(
   )
 
   const handleMouseEnter = useCallback(
-    (index: number, event: React.MouseEvent | React.FocusEvent) => {
+    (index: number, event: React.MouseEvent | React.FocusEvent | React.KeyboardEvent) => {
       applyHover(index, tooltipPositionFromEvent(event))
     },
     [applyHover]

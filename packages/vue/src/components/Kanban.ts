@@ -9,7 +9,7 @@
  * All events and slots fall through to TaskBoard; this wrapper does not
  * keep a second column state machine.
  */
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, type Component } from 'vue'
 import { TaskBoard, type VueTaskBoardProps } from './TaskBoard'
 
 export type VueKanbanProps = VueTaskBoardProps
@@ -24,7 +24,7 @@ export const Kanban = defineComponent({
   setup(props, { attrs, slots }) {
     return () =>
       h(
-        TaskBoard,
+        TaskBoard as unknown as Component,
         {
           ...attrs,
           showCardCount: props.showCardCount,

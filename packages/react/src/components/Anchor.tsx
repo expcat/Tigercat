@@ -55,7 +55,7 @@ export function useAnchorContext(): AnchorContextValue | null {
 
 export interface AnchorLinkProps extends Omit<
   React.AnchorHTMLAttributes<HTMLAnchorElement>,
-  'href'
+  'href' | 'title'
 > {
   href: string
   title?: React.ReactNode

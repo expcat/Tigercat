@@ -102,7 +102,9 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       onSegmentHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    onClick: onSegmentClick
+    onClick: (index, datum) => {
+      if (datum !== undefined) onSegmentClick?.(index, datum)
+    }
   })
 
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(

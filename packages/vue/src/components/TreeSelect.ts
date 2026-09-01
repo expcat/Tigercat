@@ -8,7 +8,8 @@ import {
   nextTick,
   useId,
   type PropType,
-  type CSSProperties
+  type CSSProperties,
+  type VNode
 } from 'vue'
 import {
   SHAKE_CLASS,
@@ -629,47 +630,51 @@ export const TreeSelect = defineComponent({
         'aria-autocomplete': props.searchable ? 'list' : 'none'
       }
       const searchOpen = props.searchable && isOpen.value
-      const trigger = searchOpen
-        ? h('input', {
-            ref: (node: HTMLInputElement | null) => {
-              searchInputRef.value = node
-              triggerRef.value = node
-            },
-            type: 'text',
-            class: classNames(triggerClasses, 'bg-transparent'),
-            disabled: effectiveDisabled.value,
-            value: searchQuery.value,
-            placeholder: displayText.value,
-            onInput: (event: Event) => setSearch((event.target as HTMLInputElement).value),
-            onKeydown: (event: KeyboardEvent) => handleKeyDown(event, true),
+      let trigger: VNode
+      if (searchOpen) {
+        trigger = h('input', {
+          ref: (node) => {
+            const el = node instanceof HTMLInputElement ? node : null
+            searchInputRef.value = el
+            triggerRef.value = el
+          },
+          type: 'text',
+          class: classNames(triggerClasses, 'bg-transparent'),
+          disabled: effectiveDisabled.value,
+          value: searchQuery.value,
+          placeholder: displayText.value,
+          onInput: (event: Event) => setSearch((event.target as HTMLInputElement).value),
+          onKeydown: (event: KeyboardEvent) => handleKeyDown(event, true),
+          onFocusout: handleFocusOut,
+          ...comboboxProps
+        })
+      } else {
+        trigger = h(
+          'div',
+          {
+            ref: triggerRef,
+            tabindex: effectiveDisabled.value ? -1 : 0,
+            class: triggerClasses,
+            onClick: toggleDropdown,
+            onKeydown: (event: KeyboardEvent) => handleKeyDown(event, false),
             onFocusout: handleFocusOut,
             ...comboboxProps
-          })
-        : h(
-            'div',
-            {
-              ref: triggerRef,
-              tabindex: effectiveDisabled.value ? -1 : 0,
-              class: triggerClasses,
-              onClick: toggleDropdown,
-              onKeydown: (event: KeyboardEvent) => handleKeyDown(event, false),
-              onFocusout: handleFocusOut,
-              ...comboboxProps
-            },
-            [
-              h(
-                'span',
-                {
-                  class: classNames(
-                    'flex-1 truncate',
-                    displayText.value === placeholderText.value &&
-                      'text-[var(--tiger-text-muted,#9ca3af)]'
-                  )
-                },
-                displayText.value
-              )
-            ]
-          )
+          },
+          [
+            h(
+              'span',
+              {
+                class: classNames(
+                  'flex-1 truncate',
+                  displayText.value === placeholderText.value &&
+                    'text-[var(--tiger-text-muted,#9ca3af)]'
+                )
+              },
+              displayText.value
+            )
+          ]
+        )
+      }
 
       function renderNode(item: VisibleTreeItem) {
         const selectedNode = selectedKeys.value.includes(item.key)

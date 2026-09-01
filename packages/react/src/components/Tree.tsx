@@ -112,10 +112,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
   )
 
   return (
-    <div
-      {...rest}
-      ref={ref}
-      className={classNames(treeBaseClasses, empty && 'p-4', ctx.className, rest.className)}>
+    <div {...rest} ref={ref} className={classNames(treeBaseClasses, empty && 'p-4', ctx.className)}>
       {search}
       {tree}
     </div>

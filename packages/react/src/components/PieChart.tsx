@@ -126,7 +126,9 @@ export const PieChart: React.FC<PieChartProps> = ({
       onSliceHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    onClick: onSliceClick
+    onClick: (index, datum) => {
+      if (datum !== undefined) onSliceClick?.(index, datum)
+    }
   })
 
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(

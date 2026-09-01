@@ -184,7 +184,9 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       onPointHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    onClick: onPointClick
+    onClick: (index, datum) => {
+      if (datum !== undefined) onPointClick?.(index, datum)
+    }
   })
 
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(

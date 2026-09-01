@@ -342,12 +342,12 @@ export const Tour = defineComponent({
         )
       }
 
-      const titleNode = slots.title?.(current) ?? current.step.title
-      if (titleNode != null && titleNode !== false) {
+      if (hasTitle) {
+        const titleNode = slots.title?.(current) ?? current.step.title
         popoverChildren.push(h('div', { id: titleId, class: tourTitleClasses }, titleNode))
       }
-      const descriptionNode = slots.description?.(current) ?? current.step.description
-      if (descriptionNode != null && descriptionNode !== false) {
+      if (hasDescription) {
+        const descriptionNode = slots.description?.(current) ?? current.step.description
         popoverChildren.push(
           h('div', { id: descriptionId, class: tourDescriptionClasses }, descriptionNode)
         )

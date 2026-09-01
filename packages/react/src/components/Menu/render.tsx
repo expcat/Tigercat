@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  getIconDefinition,
   getMenuCollapsedInitial,
   getMenuPlainText,
   menuCollapsedIconClasses,
@@ -13,12 +14,13 @@ export function renderMenuIcon(icon: unknown, collapsed: boolean): React.ReactNo
   const kind = resolveMenuIconKind(icon)
   if (kind === 'none') return null
   const iconClasses = collapsed ? menuCollapsedIconClasses : menuItemIconClasses
-  if (kind === 'name') {
-    return (
+  if (kind === 'name' && typeof icon === 'string') {
+    const definition = getIconDefinition(icon)
+    return definition ? (
       <span className={iconClasses}>
-        <Icon name={icon as string} />
+        <Icon icon={definition} />
       </span>
-    )
+    ) : null
   }
   return <span className={iconClasses}>{icon as React.ReactNode}</span>
 }

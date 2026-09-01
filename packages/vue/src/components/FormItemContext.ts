@@ -15,5 +15,5 @@ export interface VueFormItemControlContext {
   onBlur: () => void
 }
 
-export const FORM_ITEM_CONTROL_INJECTION_KEY: InjectionKey<VueFormItemControlContext> =
+export const FORM_ITEM_CONTROL_INJECTION_KEY: InjectionKey<VueFormItemControlContext | null> =
   Symbol('TigerFormItemControl')

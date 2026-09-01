@@ -57,7 +57,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
     )
   }
 
-  const [checkedState, setChecked] = useControlledState<boolean>({
+  const [checkedState, setChecked] = useControlledState<
+    boolean,
+    [React.ChangeEvent<HTMLInputElement>]
+  >({
     value: isInGroup ? undefined : checked,
     defaultValue: defaultChecked,
     onChange

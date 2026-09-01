@@ -49,10 +49,11 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
   ...props
 }) => {
   const formItemControl = useFormItemControlContext()
-  const [currentValue, setValue] = useControlledState({
+  const [currentValue, setValue] = useControlledState<string | number | undefined>({
     value,
     defaultValue,
     onChange: (next) => {
+      if (next === undefined) return
       onChange?.(next)
       formItemControl?.onChange?.(next)
     }

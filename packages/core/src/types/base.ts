@@ -22,6 +22,20 @@
 export type ComponentSize = 'sm' | 'md' | 'lg'
 
 /**
+ * Referrer policy values accepted by HTML `referrerpolicy` / React `referrerPolicy`.
+ */
+export type ReferrerPolicyAttr =
+  | ''
+  | 'no-referrer'
+  | 'no-referrer-when-downgrade'
+  | 'origin'
+  | 'origin-when-cross-origin'
+  | 'same-origin'
+  | 'strict-origin'
+  | 'strict-origin-when-cross-origin'
+  | 'unsafe-url'
+
+/**
  * Base props shared by interactive (clickable / focusable) components.
  *
  * Covers: Button, Link, Tag, Badge, etc.

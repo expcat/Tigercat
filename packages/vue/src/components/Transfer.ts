@@ -1,4 +1,14 @@
-import { defineComponent, h, ref, computed, watch, inject, useId, type PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  inject,
+  useId,
+  type PropType,
+  type VNode
+} from 'vue'
 import type {
   TransferItem,
   TransferSearchValue,
@@ -60,7 +70,7 @@ function TransferCheckbox(options: {
   disabled?: boolean
   size: ComponentSize
   onChange: () => void
-  children?: unknown
+  children?: VNode
 }) {
   return h('label', { class: getCheckboxLabelClasses(options.size, Boolean(options.disabled)) }, [
     h('input', {

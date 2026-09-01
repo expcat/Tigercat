@@ -38,7 +38,7 @@ const modes: MarkdownEditorMode[] = ['edit', 'split', 'preview']
 
 export interface MarkdownEditorProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  'onChange' | 'defaultValue'
+  'onChange' | 'defaultValue' | 'onFocus' | 'onBlur'
 > {
   value?: string
   defaultValue?: string
@@ -58,6 +58,8 @@ export interface MarkdownEditorProps extends Omit<
   name?: string
   onChange?: (markdown: string) => void
   onModeChange?: (mode: MarkdownEditorMode) => void
+  onFocus?: React.FocusEventHandler<HTMLElement>
+  onBlur?: React.FocusEventHandler<HTMLElement>
 }
 
 export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProps>(

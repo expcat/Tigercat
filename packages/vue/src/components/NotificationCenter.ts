@@ -10,14 +10,6 @@ import {
   getNotificationCenterLabels,
   mergeTigerLocale,
   resolveLocaleText,
-  type NotificationCenterProps as CoreNotificationCenterProps,
-  type NotificationGroup,
-  type NotificationItem,
-  type NotificationReadFilter,
-  type TigerLocale,
-  type TigerLocaleNotificationCenter
-} from '@expcat/tigercat-core'
-import {
   notificationCenterItemClasses,
   notificationCenterUnreadItemClasses,
   notificationCenterReadItemClasses,
@@ -41,8 +33,14 @@ import {
   notificationCenterFilterGroupClasses,
   notificationCenterFilterButtonClasses,
   notificationCenterFilterActiveClasses,
-  notificationCenterFilterIdleClasses
-} from '../../../core/src/internal/notification-center-styles'
+  notificationCenterFilterIdleClasses,
+  type NotificationCenterProps as CoreNotificationCenterProps,
+  type NotificationGroup,
+  type NotificationItem,
+  type NotificationReadFilter,
+  type TigerLocale,
+  type TigerLocaleNotificationCenter
+} from '@expcat/tigercat-core'
 import { Card } from './Card'
 import { Tabs, TabPane } from './Tabs'
 import { List } from './List'

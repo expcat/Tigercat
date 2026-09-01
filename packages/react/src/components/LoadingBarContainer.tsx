@@ -25,7 +25,6 @@ export const LoadingBarContainer: React.FC<LoadingBarContainerProps> = ({
   className,
   style,
   ariaLabel,
-  role: _role,
   ...rest
 }) => {
   const config = useTigerConfig()

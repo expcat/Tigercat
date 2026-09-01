@@ -19,7 +19,7 @@ import { useTigerConfig } from './ConfigProvider'
 export interface StatisticProps
   extends
     Omit<CoreStatisticProps, 'title' | 'prefix' | 'suffix'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'prefix'> {
   title?: React.ReactNode
   prefix?: React.ReactNode
   suffix?: React.ReactNode

@@ -1,4 +1,13 @@
-import { defineComponent, computed, ref, h, PropType, useId, type Component } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  PropType,
+  useId,
+  type Component,
+  type VNodeChild
+} from 'vue'
 import {
   canClickWizardStep,
   classNames,
@@ -30,8 +39,6 @@ import { Button } from './Button'
 import { Icon } from './Icon'
 import { useTigerConfig } from './ConfigProvider'
 import { useFormContext } from './Form'
-
-type HChildren = Parameters<typeof h>[2]
 
 export type { WizardStep }
 
@@ -249,15 +256,14 @@ export const FormWizard = defineComponent({
       finish: handleNext
     })
 
-    const renderContent = (): HChildren => {
-      if (!currentStep.value) return null
-      if (slots.step)
-        return slots.step({ step: currentStep.value, index: currentIndex.value }) as HChildren
+    const renderContent = (): VNodeChild => {
+      if (!currentStep.value) return undefined
+      if (slots.step) return slots.step({ step: currentStep.value, index: currentIndex.value })
       if (slots.default) {
-        return slots.default({ step: currentStep.value, index: currentIndex.value }) as HChildren
+        return slots.default({ step: currentStep.value, index: currentIndex.value })
       }
-      if (currentStep.value.content != null) return currentStep.value.content as HChildren
-      return null
+      if (currentStep.value.content != null) return currentStep.value.content as VNodeChild
+      return undefined
     }
 
     return () => {
@@ -307,7 +313,7 @@ export const FormWizard = defineComponent({
                   'onUpdate:current': handleStepChange
                 })
               ])
-            : null,
+            : undefined,
           h('div', { class: getFormWizardBodyClasses(), 'aria-labelledby': titleId }, [
             h('div', { id: titleId, class: 'sr-only' }, currentStep.value?.title),
             h('div', { class: 'sr-only', 'aria-live': 'polite' }, currentStep.value?.title),
@@ -320,7 +326,7 @@ export const FormWizard = defineComponent({
                   },
                   errorMessage.value
                 )
-              : null,
+              : undefined,
             renderContent()
           ]),
           props.showActions
@@ -367,7 +373,7 @@ export const FormWizard = defineComponent({
                   }
                 )
               ])
-            : null
+            : undefined
         ]
       )
     }

@@ -43,7 +43,7 @@ export interface UseChartInteractionReturn {
   resolvedSelectedIndex: ComputedRef<number | null>
   activeIndex: ComputedRef<number | null>
   getElementOpacity: (index: number) => number | undefined
-  handleMouseEnter: (index: number, event: MouseEvent | FocusEvent) => void
+  handleMouseEnter: (index: number, event: MouseEvent | FocusEvent | KeyboardEvent) => void
   handleMouseMove: (event: MouseEvent) => void
   handleMouseLeave: () => void
   handleClick: (index: number) => void
@@ -108,7 +108,7 @@ export function useChartInteraction<T = unknown>(
     onHover?.(index, index !== null ? (getData?.(index) ?? null) : null)
   }
 
-  const handleMouseEnter = (index: number, event: MouseEvent | FocusEvent) => {
+  const handleMouseEnter = (index: number, event: MouseEvent | FocusEvent | KeyboardEvent) => {
     applyHover(index, tooltipPositionFromEvent(event))
   }
 

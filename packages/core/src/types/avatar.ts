@@ -2,6 +2,8 @@
  * Avatar component types and interfaces
  */
 
+import type { ReferrerPolicyAttr } from './base'
+
 /**
  * Avatar size types
  */
@@ -64,7 +66,7 @@ export interface AvatarProps {
   srcSet?: string
   sizes?: string
   crossOrigin?: '' | 'anonymous' | 'use-credentials'
-  referrerPolicy?: string
+  referrerPolicy?: ReferrerPolicyAttr
   decoding?: 'async' | 'auto' | 'sync'
   fetchPriority?: 'high' | 'low' | 'auto'
 

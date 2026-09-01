@@ -10,7 +10,7 @@ type TimePickerRangeInputValue = TimePickerRangeTuple | null
 
 type TimePickerDomProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  'defaultValue' | 'value' | 'onChange' | 'placeholder'
+  'defaultValue' | 'value' | 'onChange' | 'placeholder' | 'onBlur'
 >
 
 export interface TimePickerBaseProps
@@ -18,6 +18,7 @@ export interface TimePickerBaseProps
     Omit<CoreTimePickerProps, 'value' | 'defaultValue' | 'range' | 'onChange'>,
     TimePickerDomProps {
   onClear?: () => void
+  onBlur?: React.FocusEventHandler<HTMLElement>
 }
 
 export interface TimePickerSingleProps extends TimePickerBaseProps {

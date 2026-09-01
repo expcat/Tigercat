@@ -93,7 +93,7 @@ function isTabPaneElement(child: React.ReactNode): child is ReactElement<TabPane
   if (!React.isValidElement<TabPaneProps>(child)) return false
   return (
     isTabPaneType(child.type, TabPane) ||
-    isTabPaneChildProps(child.props as Record<string, unknown>)
+    isTabPaneChildProps(child.props as unknown as Record<string, unknown>)
   )
 }
 
@@ -333,7 +333,7 @@ export const Tabs: React.FC<TabsProps> = ({
 
     React.Children.forEach(children, (child) => {
       if (!isTabPaneElement(child)) return
-      const key = readTabPaneKey(child.props as Record<string, unknown>)
+      const key = readTabPaneKey(child.props as unknown as Record<string, unknown>)
       if (key === undefined) return
       records.push({
         key,

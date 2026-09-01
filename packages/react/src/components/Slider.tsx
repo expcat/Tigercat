@@ -32,8 +32,12 @@ import { useTigerConfig } from './ConfigProvider'
 export interface SliderProps
   extends
     CoreSliderProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'value' | 'defaultValue' | 'onChange'> {
+    Omit<
+      React.HTMLAttributes<HTMLDivElement>,
+      'value' | 'defaultValue' | 'onChange' | 'onPointerDown'
+    > {
   onChange?: (value: number | [number, number]) => void
+  onPointerDown?: React.PointerEventHandler<Element>
 }
 
 function displaySliderValue(

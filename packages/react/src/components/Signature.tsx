@@ -124,7 +124,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
         ...labelsOverride,
         ariaLabel: ariaLabel?.trim() || labelsOverride?.ariaLabel,
         undoText: undoText?.trim() || labelsOverride?.undoText,
-        clearText: clearText?.trim() || labelsOverride?.clearText
+        clearText: clearText?.trim()
       }),
     [ariaLabel, clearText, labelsOverride, mergedLocale, undoText]
   )

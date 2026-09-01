@@ -230,9 +230,9 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
     return (
       <button
         ref={forwardedRef as React.Ref<HTMLButtonElement>}
+        {...shared}
         type="button"
-        disabled={isDisabled}
-        {...shared}>
+        disabled={isDisabled}>
         {children}
       </button>
     )

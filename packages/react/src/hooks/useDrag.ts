@@ -112,7 +112,12 @@ export function useDrag(options: UseDragOptions = {}): UseDragReturn {
   }, [])
 
   const getDropZoneProps = useCallback((): Record<string, unknown> => {
-    return controllerRef.current?.getZoneBindings() ?? {}
+    const bindings = controllerRef.current?.getZoneBindings()
+    if (!bindings) return {}
+    return {
+      onDragOver: bindings.onDragOver,
+      onDrop: bindings.onDrop
+    }
   }, [])
 
   return {

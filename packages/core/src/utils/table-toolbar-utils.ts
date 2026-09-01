@@ -15,6 +15,20 @@ import type {
   TableToolbarSearchMode
 } from '../types/table-toolbar'
 
+type ToolbarSearchBits = Pick<
+  TableToolbarProps,
+  | 'search'
+  | 'searchPlaceholder'
+  | 'searchValue'
+  | 'defaultSearchValue'
+  | 'showSearchButton'
+  | 'onSearchChange'
+  | 'onSearch'
+  | 'searchMode'
+>
+
+type ToolbarFilterSeed = Pick<TableToolbarFilter, 'key' | 'value' | 'defaultValue'>
+
 export function splitCompositeHostAttrs(attrs: Record<string, unknown>): {
   host: Record<string, unknown>
   rest: Record<string, unknown>
@@ -39,7 +53,7 @@ export function splitCompositeHostAttrs(attrs: Record<string, unknown>): {
   return { host, rest }
 }
 
-export function toolbarHasSearch(toolbar: TableToolbarProps | undefined): boolean {
+export function toolbarHasSearch(toolbar: ToolbarSearchBits | undefined): boolean {
   if (!toolbar) return false
   if (toolbar.search === true) return true
   if (toolbar.search === false) return false
@@ -54,11 +68,11 @@ export function toolbarHasSearch(toolbar: TableToolbarProps | undefined): boolea
   )
 }
 
-export function isToolbarSearchRemote(toolbar: TableToolbarProps | undefined): boolean {
+export function isToolbarSearchRemote(toolbar: ToolbarSearchBits | undefined): boolean {
   return toolbar?.searchMode === 'remote'
 }
 
-export function canSubmitToolbarSearch(toolbar: TableToolbarProps | undefined): boolean {
+export function canSubmitToolbarSearch(toolbar: ToolbarSearchBits | undefined): boolean {
   if (!toolbarHasSearch(toolbar)) return false
   if (!isToolbarSearchRemote(toolbar)) return true
   return Boolean(toolbar?.onSearch || toolbar?.onSearchChange)
@@ -77,7 +91,7 @@ export function toggleHiddenColumnKey(
 
 export function seedToolbarFilterState(
   prev: Record<string, TableToolbarFilterValue>,
-  defs: readonly TableToolbarFilter[] | undefined
+  defs: readonly ToolbarFilterSeed[] | undefined
 ): Record<string, TableToolbarFilterValue> {
   if (!defs || defs.length === 0) return prev
   let changed = false
@@ -92,7 +106,7 @@ export function seedToolbarFilterState(
 }
 
 export function resolveToolbarFilterMap(
-  defs: readonly TableToolbarFilter[] | undefined,
+  defs: readonly ToolbarFilterSeed[] | undefined,
   internal: Record<string, TableToolbarFilterValue>,
   extraKeys: readonly string[] = []
 ): Record<string, TableToolbarFilterValue> {

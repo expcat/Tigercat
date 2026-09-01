@@ -113,8 +113,8 @@ export const Splitter = defineComponent({
       if (size > 0) containerSize.value = size
     }
 
-    const bindContainer = (el: HTMLElement | null) => {
-      containerRef.value = el
+    const bindContainer = (el: unknown) => {
+      containerRef.value = el instanceof HTMLElement ? el : null
       applyMeasure()
     }
 

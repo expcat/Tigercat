@@ -69,7 +69,8 @@ import {
   type MenuMode,
   type MenuProps as CoreMenuProps,
   type MenuTheme,
-  type SubmenuHeightTransitionController
+  type SubmenuHeightTransitionController,
+  type IconName
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { SidebarContextKey } from '../utils/layout-context'
@@ -146,7 +147,7 @@ function renderMenuIcon(icon: unknown, collapsed: boolean) {
   if (kind === 'none') return null
   const iconClasses = collapsed ? menuCollapsedIconClasses : menuItemIconClasses
   if (kind === 'name') {
-    return h('span', { class: iconClasses }, [h(Icon, { name: icon as string })])
+    return h('span', { class: iconClasses }, [h(Icon, { name: icon as IconName })])
   }
   return h('span', { class: iconClasses }, [icon as VNode])
 }

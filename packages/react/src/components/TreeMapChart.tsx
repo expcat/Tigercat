@@ -128,7 +128,9 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       onNodeHover?.(index, index !== null ? (nodes[index]?.datum ?? null) : null)
     },
     onSelectedIndexChange,
-    onClick: onNodeClick
+    onClick: (index, datum) => {
+      if (datum !== undefined) onNodeClick?.(index, datum)
+    }
   })
   const rootTotal = useMemo(
     () => nodes.filter((node) => node.depth === 0).reduce((sum, node) => sum + node.value, 0),

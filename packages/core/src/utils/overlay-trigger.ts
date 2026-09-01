@@ -21,6 +21,7 @@ export interface OverlayTriggerAria {
   'aria-describedby'?: string
   'data-state': 'open' | 'closed'
   disabled?: boolean
+  [key: string]: string | boolean | undefined
 }
 
 export interface OverlayTriggerAriaOptions {

@@ -144,7 +144,9 @@ export const BarChart: React.FC<BarChartProps> = ({
       onBarHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    onClick: onBarClick
+    onClick: (index, datum) => {
+      if (datum !== undefined) onBarClick?.(index, datum)
+    }
   })
 
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(

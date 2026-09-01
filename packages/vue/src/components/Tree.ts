@@ -6,6 +6,7 @@ import {
   watch,
   nextTick,
   type PropType,
+  type VNode,
   type VNodeChild
 } from 'vue'
 import {
@@ -128,7 +129,7 @@ function sameKeyList(a: readonly TreeNodeKey[], b: readonly TreeNodeKey[]): bool
 }
 
 function renderNodeIcon(icon: unknown): VNodeChild {
-  if (icon == null || typeof icon === 'boolean') return null
+  if (icon == null || typeof icon === 'boolean') return undefined
   if (typeof icon === 'string' || typeof icon === 'number') return icon
   return icon as VNodeChild
 }
@@ -492,7 +493,11 @@ export const Tree = defineComponent({
       emit('search', value)
     }
 
-    function renderLabel(label: string, query: string, matched: boolean): VNodeChild {
+    function renderLabel(
+      label: string,
+      query: string,
+      matched: boolean
+    ): string | (string | VNode)[] {
       if (!query || !matched) return label
       const segments = getHighlightSegments(label, query, { global: true, caseSensitive: false })
       if (segments.length === 0) return label
@@ -669,7 +674,7 @@ export const Tree = defineComponent({
               })
             : null,
           props.showIcon && node.icon != null
-            ? h('span', { class: treeNodeIconClasses }, renderNodeIcon(node.icon))
+            ? h('span', { class: treeNodeIconClasses }, renderNodeIcon(node.icon) ?? undefined)
             : null,
           h(
             'span',

@@ -279,8 +279,8 @@ export const Resizable = defineComponent({
         'div',
         {
           ...attrs,
-          ref: (el: HTMLElement | null) => {
-            rootRef.value = el
+          ref: (el) => {
+            rootRef.value = el instanceof HTMLElement ? el : null
           },
           class: containerClasses.value,
           style: mergeStyleValues(attrs.style, props.style, boxStyle),

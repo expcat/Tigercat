@@ -233,7 +233,7 @@ export const Masonry = defineComponent({
                   ? getMasonryItemPositionStyle(positions.value[index])
                   : undefined,
               'data-masonry-item': index,
-              ref: (el: Element | null) => setItemRef(index, el)
+              ref: (el) => setItemRef(index, el instanceof Element ? el : null)
             },
             [child]
           )

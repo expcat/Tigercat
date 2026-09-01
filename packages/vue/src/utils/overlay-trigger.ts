@@ -1,5 +1,9 @@
-import { cloneVNode, h, isVNode, type VNode } from 'vue'
-import { classNames, shouldMergeOverlayTriggerChild } from '@expcat/tigercat-core'
+import { cloneVNode, h, isVNode, type VNode, type VNodeChild } from 'vue'
+import {
+  classNames,
+  shouldMergeOverlayTriggerChild,
+  type OverlayTriggerAria
+} from '@expcat/tigercat-core'
 
 export function resolveOverlayTriggerElement(el: unknown): HTMLElement | null {
   if (el == null) return null
@@ -15,6 +19,22 @@ export function assignOverlayTriggerRef(target: { value: HTMLElement | null }, e
   target.value = resolveOverlayTriggerElement(el)
 }
 
+export interface OverlayTriggerHandlers {
+  onClick?: (event: MouseEvent) => void
+  onKeyDown?: (event: KeyboardEvent) => void
+  onKeydown?: (event: KeyboardEvent) => void
+  onMouseEnter?: (event: MouseEvent) => void
+  onMouseenter?: (event: MouseEvent) => void
+  onMouseLeave?: (event: MouseEvent) => void
+  onMouseleave?: (event: MouseEvent) => void
+  onFocus?: (event: FocusEvent) => void
+  onFocusin?: (event: FocusEvent) => void
+  onBlur?: (event: FocusEvent) => void
+  onFocusout?: (event: FocusEvent) => void
+  onContextMenu?: (event: MouseEvent) => void
+  onContextmenu?: (event: MouseEvent) => void
+}
+
 export interface OverlayTriggerRenderOptions {
   asChild?: boolean
   child: VNode | VNode[] | string | number | null | undefined
@@ -22,8 +42,8 @@ export interface OverlayTriggerRenderOptions {
   className?: string
   disabled?: boolean
   extraChildren?: VNode | VNode[] | null
-  aria: Record<string, unknown>
-  handlers: Record<string, ((event: Event) => void) | undefined>
+  aria: OverlayTriggerAria
+  handlers: OverlayTriggerHandlers
   preventDefaultOnClick?: boolean
 }
 
@@ -47,7 +67,7 @@ export function renderOverlayTrigger(options: OverlayTriggerRenderOptions): VNod
   const single = Array.isArray(child) && child.length === 1 ? child[0] : child
   const mergeable = isSingleVNode(single) && shouldMergeOverlayTriggerChild(asChild, single.type)
 
-  const onClick = (event: Event) => {
+  const onClick = (event: MouseEvent) => {
     if (disabled) {
       event.preventDefault()
       event.stopPropagation()
@@ -84,7 +104,7 @@ export function renderOverlayTrigger(options: OverlayTriggerRenderOptions): VNod
     })
   }
 
-  const children: unknown[] = []
+  const children: VNodeChild[] = []
   if (Array.isArray(child)) children.push(...child)
   else if (child != null) children.push(child)
   if (extraChildren) {

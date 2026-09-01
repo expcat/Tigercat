@@ -24,7 +24,9 @@ import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
 
 export interface RateProps
-  extends CoreRateProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  extends
+    Omit<CoreRateProps, 'character'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   value?: number
   defaultValue?: number
   onChange?: (value: number) => void

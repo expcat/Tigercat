@@ -202,6 +202,8 @@ Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 
 | `minWidth?`    | `number`                                      | `20`          | Minimum crop width in pixels                                            |
 | `outputType?`  | `'image/png' \| 'image/jpeg' \| 'image/webp'` | `'image/png'` | Output image MIME type                                                  |
 
+Events/callback props: `onReady?`, `onError?`.
+
 ## ImageGroup
 
 `packages/core/src/types/image.ts` · `ImageGroupProps`

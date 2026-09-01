@@ -161,7 +161,7 @@ export const PrintPageBreak = defineComponent({
               { class: classNames(printLayoutPageBreakClasses, printLayoutPageBreakLabelClasses) },
               slots.default?.() ?? label
             )
-          : null
+          : undefined
       )
     }
   }

@@ -32,7 +32,7 @@ export interface SubMenuScopeValue {
 }
 
 export interface MenuProps
-  extends CoreMenuProps, Omit<React.HTMLAttributes<HTMLElement>, 'onSelect'> {
+  extends Omit<CoreMenuProps, 'style'>, Omit<React.HTMLAttributes<HTMLElement>, 'onSelect'> {
   onSelectedKeysChange?: (selectedKeys: MenuKey[]) => void
   onOpenKeysChange?: (openKeys: MenuKey[]) => void
   onSelect?: (key: MenuKey, info: { selectedKeys: MenuKey[] }) => void

@@ -282,7 +282,9 @@ export const ImageCropper = defineComponent({
         startX: event.clientX,
         startY: event.clientY,
         ownerDocument:
-          event.currentTarget instanceof Node ? event.currentTarget.ownerDocument : undefined,
+          event.currentTarget instanceof Node
+            ? (event.currentTarget.ownerDocument ?? undefined)
+            : undefined,
         pointerId: event.pointerId,
         pointerTarget: event.currentTarget instanceof Element ? event.currentTarget : null,
         onMove: ({ event: moveEvent, deltaX, deltaY }) => {

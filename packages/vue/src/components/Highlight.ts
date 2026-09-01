@@ -20,7 +20,8 @@ import {
   resolveHighlightText,
   sliceTextByHighlightRanges,
   type HighlightKeywords,
-  type HighlightRange
+  type HighlightRange,
+  type StyleValue
 } from '@expcat/tigercat-core'
 
 export interface VueHighlightProps {
@@ -66,11 +67,7 @@ function flattenVueText(input: unknown): string {
   return ''
 }
 
-function renderMark(
-  text: string,
-  markClasses: string,
-  markStyle: Record<string, unknown> | undefined
-): VNode {
+function renderMark(text: string, markClasses: string, markStyle: StyleValue | undefined): VNode {
   return h(
     'mark',
     {
@@ -87,7 +84,7 @@ function highlightVueNode(
   ranges: HighlightRange[],
   offset: { value: number },
   markClasses: string,
-  markStyle: Record<string, unknown> | undefined
+  markStyle: StyleValue | undefined
 ): VNodeChild {
   if (input == null || typeof input === 'boolean') return null
   if (typeof input === 'string' || typeof input === 'number') {
@@ -112,12 +109,12 @@ function highlightVueNode(
   }
   if (typeof input.children === 'string' || typeof input.children === 'number') {
     const highlighted = highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
-    return h(input.type as string, input.props, highlighted)
+    return h(input.type as string, input.props ?? undefined, highlighted ?? undefined)
   }
   if (Array.isArray(input.children)) {
     const highlighted = highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
     if (typeof input.type === 'string') {
-      return h(input.type, input.props, highlighted)
+      return h(input.type, input.props ?? undefined, highlighted ?? undefined)
     }
     return cloneVNode(input, null, true)
   }
@@ -235,7 +232,7 @@ export const Highlight = defineComponent({
           'data-highlight-case-sensitive': props.caseSensitive ? 'true' : 'false',
           'data-highlight-global': props.global ? 'true' : 'false'
         },
-        children
+        children ?? undefined
       )
     }
   }

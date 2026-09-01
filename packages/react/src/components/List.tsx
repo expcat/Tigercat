@@ -49,7 +49,7 @@ import { useDrag } from '../hooks/useDrag'
 
 export interface ListProps<T extends ListItem = ListItem>
   extends
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'draggable'>,
     Omit<CoreListProps<T>, 'header' | 'footer'> {
   dataSource?: T[]
   header?: React.ReactNode

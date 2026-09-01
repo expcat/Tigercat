@@ -157,6 +157,7 @@ export interface BreadcrumbProps
     Omit<CoreBreadcrumbProps, 'style' | 'extra'>,
     Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   extra?: React.ReactNode
+  children?: React.ReactNode
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleBreadcrumb>
 }

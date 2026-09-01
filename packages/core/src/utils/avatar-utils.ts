@@ -3,6 +3,7 @@
  * Shared styles and helpers for Avatar components
  */
 
+import type { ReferrerPolicyAttr } from '../types/base'
 import type { AvatarShape, AvatarSize } from '../types/avatar'
 import { mixStatusTowardTextClass } from './status-mix'
 
@@ -175,7 +176,7 @@ export type AvatarImageProps = {
   srcSet?: string
   sizes?: string
   crossOrigin?: '' | 'anonymous' | 'use-credentials'
-  referrerPolicy?: string
+  referrerPolicy?: ReferrerPolicyAttr
   decoding?: 'async' | 'auto' | 'sync'
   fetchPriority?: 'high' | 'low' | 'auto'
 }

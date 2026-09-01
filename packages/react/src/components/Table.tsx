@@ -844,7 +844,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       )}
 
       {renderPagination(ctx, {
-        pagination,
+        pagination: pagination ?? false,
         locale: paginationLocale,
         disableI18n: isPaginationI18nDisabled
       })}

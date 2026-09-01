@@ -26,7 +26,7 @@ export function renderSummaryRow(ctx: TableContext, props: TableInternalProps): 
         key: col.key,
         class: getTableCellClasses(props.size, col.align || 'left', col.className)
       },
-      val as VNodeChild
+      (val as VNodeChild) ?? undefined
     )
   })
   return h('tfoot', [

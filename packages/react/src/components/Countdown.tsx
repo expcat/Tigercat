@@ -20,7 +20,7 @@ import {
 export interface CountdownProps
   extends
     Omit<CoreCountdownProps, 'className' | 'title' | 'prefix' | 'suffix'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'title'> {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'title' | 'prefix'> {
   className?: string
   title?: React.ReactNode
   prefix?: React.ReactNode

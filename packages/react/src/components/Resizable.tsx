@@ -76,12 +76,16 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
   const [width, setWidth] = useControlledState<number | undefined>({
     value: widthProp,
     defaultValue: defaultWidth,
-    onChange: onWidthChange
+    onChange: (next) => {
+      if (next !== undefined) onWidthChange?.(next)
+    }
   })
   const [height, setHeight] = useControlledState<number | undefined>({
     value: heightProp,
     defaultValue: defaultHeight,
-    onChange: onHeightChange
+    onChange: (next) => {
+      if (next !== undefined) onHeightChange?.(next)
+    }
   })
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [draggingHandle, setDraggingHandle] = useState<ResizeHandlePosition | null>(null)
