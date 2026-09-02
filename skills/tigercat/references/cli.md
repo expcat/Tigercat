@@ -1,11 +1,11 @@
 ---
 name: tigercat-cli
-description: Tigercat CLI commands, source files, and validation notes
+description: Tigercat CLI commands and validation notes
 ---
 
 # CLI
 
-Package: `@expcat/tigercat-cli`. Source lives in `packages/cli/src` and tests in `tests/core/cli.spec.ts`.
+Package: `@expcat/tigercat-cli`. CSS / `doctor`: [getting-started.md](getting-started.md).
 
 | Command                          | Purpose                         | Key options                             |
 | -------------------------------- | ------------------------------- | --------------------------------------- |
@@ -17,27 +17,8 @@ Package: `@expcat/tigercat-cli`. Source lives in `packages/cli/src` and tests in
 | `tigercat generate doc-template` | Generate component doc stubs    | `--output`, `--dry-run`                 |
 | `tigercat doctor`                | Validate app environment        | `--json`                                |
 
-## Tailwind v4 Baseline
+CLI templates and `doctor` are Tailwind CSS v4-only. `doctor` fails missing, old, or unverifiable Tailwind and requires `@tailwindcss/vite` v4.
 
-CLI templates and `doctor` are Tailwind CSS v4-only. New app CSS must use:
+Focused checks: `pnpm --filter @expcat/tigercat-cli build`, `pnpm test -- tests/core/cli.spec.ts`, `pnpm lint`.
 
-```css
-@import 'tailwindcss';
-@plugin "@expcat/tigercat-core/tailwind/modern";
-```
-
-`doctor` should fail missing, old, or unverifiable Tailwind setup; it should also require `@tailwindcss/vite` v4.
-
-## Files
-
-| Area      | Files                                                                  |
-| --------- | ---------------------------------------------------------------------- |
-| Entry     | `packages/cli/src/index.ts`, `packages/cli/src/constants.ts`           |
-| Commands  | `packages/cli/src/commands/{create,add,playground,generate,doctor}.ts` |
-| Templates | `packages/cli/src/templates/{vue3,react}.ts`                           |
-| Utilities | `packages/cli/src/utils/{fs,logger}.ts`                                |
-| Tests     | `tests/core/cli.spec.ts`                                               |
-
-## Validate
-
-Use focused validation for CLI changes: `pnpm --filter @expcat/tigercat-cli build`, `pnpm test -- tests/core/cli.spec.ts`, and `pnpm lint` when command source changes.
+Next: [getting-started.md](getting-started.md)

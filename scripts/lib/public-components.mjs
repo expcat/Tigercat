@@ -500,12 +500,7 @@ export const TIGERCAT_TOPIC_ROUTES = {
   },
   commandApis: {
     title: 'Root command APIs',
-    references: [
-      'skills/tigercat/SKILL.md',
-      'skills/tigercat/references/shared/props/feedback.md',
-      'skills/tigercat/references/examples/feedback.md',
-      'skills/tigercat/references/shared/patterns/common.md'
-    ],
+    references: ['skills/tigercat/references/command-apis.md'],
     keywords: [
       'notification',
       'message',

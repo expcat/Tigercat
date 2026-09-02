@@ -6,6 +6,7 @@ description: Common patterns and framework differences for Tigercat UI component
 # Common Patterns
 
 框架共通模式与差异速查。术语表见 [glossary.md](../glossary.md)；组件定位先走 [component-index.md](../../component-index.md)。
+`Message` / `notification` / `LoadingBar` 是命令式 API，见 [command-apis.md](../../command-apis.md)。
 
 ## State And Events
 
@@ -70,11 +71,10 @@ Stable behavior:
 
 Custom trigger state is available through Vue `#trigger="{ open }"` slots and React render props such as Dropdown `renderTrigger={({ open }) => ...}`. Prefer these APIs over internal DOM selectors.
 
-SSR: React body/overlay portals render the layer in place when not in the browser; Vue Teleport is `disabled` outside the browser. Do not expect a first-paint `null` vs Teleport mismatch.
-
 ## SSR And Runtime
 
 - Do not read `window`, `document`, `localStorage`, DOM size, or media queries at module top level.
 - Put client-only Vue work in `onMounted`; React work in `useEffect` or client components.
-- Portal, overlay, drag, copy, and upload behavior should return a stable placeholder or skip mounting outside the browser. `useDrag` wraps `createListReorderController`; see Public hooks in `shared/api-summary.md`.
-- Theme variables may be statically injected; runtime theme reads/writes must be client-only.
+- Portal / overlay: stable placeholder outside the browser. React renders the layer in place; Vue Teleport is `disabled`.
+
+Next: [../glossary.md](../glossary.md) · [../../component-index.md](../../component-index.md) · [../../command-apis.md](../../command-apis.md)

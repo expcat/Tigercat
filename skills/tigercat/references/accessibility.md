@@ -7,10 +7,9 @@ description: Tigercat accessibility keyboard, screen reader, and PR validation c
 
 Use automated tests for regressions and manual assistive-technology checks for complex interaction changes.
 
-Accessibility behavior is not exposed as a feature flag. Components that use
-focus management, keyboard handling, live regions, or ARIA attributes keep those
-semantics when imported; unused components and overlay/focus helpers remain
-tree-shakeable through normal subpath imports.
+Accessibility behavior is not exposed as a feature flag. Components that use focus management,
+keyboard handling, live regions, or ARIA attributes keep those semantics when imported; unused
+components and overlay/focus helpers remain tree-shakeable through normal subpath imports.
 
 ## Keyboard Baseline
 
@@ -54,5 +53,7 @@ Manual flow:
 ## PR Checklist
 
 - Update tests for key keyboard paths and focus restoration.
-- Run axe-based tests for affected components.
+- Run `pnpm test:a11y` for affected components.
 - Add a manual screen-reader note when changing overlays, focus management, ARIA, form validation, notifications, virtual scrolling, drag-and-drop, chart interactions, or editor toolbars.
+
+Next: [ssr.md](ssr.md)

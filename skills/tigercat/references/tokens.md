@@ -36,14 +36,8 @@ Generated outputs (do not hand-edit):
 
 `tokens.css` is optional for apps that already use the Tailwind plugin: the plugin writes the same runtime names. Use `tokens.css` only when you need the layered Figma names in CSS.
 
-Canonical runtime color names (written by the plugin and `ThemeManager`):
-
-`--tiger-primary` (+ hover/active/disabled/foreground), `--tiger-secondary` (same suffixes), `--tiger-error` (+ foreground/hover/disabled/bg-hover), `--tiger-success` / `--tiger-warning` / `--tiger-info`, `--tiger-surface` (+ muted/raised), `--tiger-text` (+ secondary/disabled), `--tiger-border` (+ strong), `--tiger-focus-ring`, `--tiger-chart-1`…`6`, `--tiger-outline-bg-hover`, `--tiger-ghost-bg-hover`.
-
-Aliases (always `var()` of a canonical token): `--tiger-text-muted` → text-secondary, `--tiger-fill` → surface-muted, `--tiger-bg` → surface.
-
-Also written: `--tiger-radius-*`, `--tiger-shadow-*`, `--tiger-font-*`, `--tiger-spacing-*`, `--tiger-motion-duration-*`, `--tiger-transition-*`, `--tiger-breakpoint-*`.
-
-App setup uses the Tailwind v4 plugin from [theme.md](theme.md).
+Canonical runtime names are `--tiger-primary` / `--tiger-radius-*` / `--tiger-transition-*` (written by the plugin and `ThemeManager`). Aliases `--tiger-text-muted`, `--tiger-fill`, `--tiger-bg` are always `var()` of a canonical token. Color switches and motion: [theme.md](theme.md).
 
 Validate token-sensitive changes with `pnpm tokens:check` and the core theme specs (`design-tokens`, `themes-manager`, `theme-contrast`, `theme-css-var-aliases`).
+
+Next: [theme.md](theme.md)

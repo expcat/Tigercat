@@ -7,7 +7,7 @@ pnpm --filter @expcat/tigercat-example-nuxt build
 pnpm --filter @expcat/tigercat-example-nuxt dev
 ```
 
-`assets/main.css` imports Tailwind, `@plugin '@expcat/tigercat-core/tailwind'`, and `@source` on the Vue/core `dist` files. `app.vue` sets `html` `lang="zh-CN"` and `<ConfigProvider :locale="zhCN" color-scheme="light">`. `typescript.typeCheck` is off; this example does not type-check Vue SFCs.
+`assets/main.css` uses the Tailwind recipe in [examples/README.md](../README.md). `app.vue` sets `html` `lang="zh-CN"` and `<ConfigProvider :locale="zhCN" color-scheme="light">`. `typescript.typeCheck` is off; this example does not type-check Vue SFCs.
 
 The page HTML contains a primary Button, a **closed** DatePicker (`model-value="2024-01-15"`, `format="yyyy-MM-dd"` — input formatting, not an open calendar), and a fixed-size `gradient` BarChart. An unbound DatePicker calls `new Date()` during render.
 

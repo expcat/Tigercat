@@ -11,7 +11,16 @@ packages: core, vue, react, cli, mcp
 
 本文件是适用于所有编码代理的通用约束入口。Tigercat 是基于 Tailwind CSS 的跨框架 UI 组件库（Vue 3 + React），采用 pnpm workspace monorepo。
 
-组件 API、Props、示例、主题、i18n、术语表见 `skills/tigercat/SKILL.md`。架构约束与根因修复要求见 `CONTRIBUTING.md`「根因修复与架构约束」。
+## 读取顺序
+
+编码代理按此顺序取事实，不要把正文复制进本文件：
+
+1. 本文件：目录职责、生成物边界、代码风格、交付清单。
+2. 组件 API、主题、i18n、应用配方：`skills/tigercat/SKILL.md`（优先经 MCP 路由，勿通读 references）。
+3. 验证命令：[tests/README.md](tests/README.md#按改动范围验证)。
+4. 脚本与门禁名称：`scripts/README.md`。
+5. PR / Issue / 根因修复：`CONTRIBUTING.md`。
+6. 当前任务：`docs/ROADMAP.md`；breaking change：`docs/MIGRATION.md`；完成历史：`CHANGELOG.md`。
 
 ## 核心规则
 
@@ -52,17 +61,18 @@ packages: core, vue, react, cli, mcp
 
 ### 文档分层：一件事只在一处展开
 
-| 文档                | 拥有的内容                                         |
-| ------------------- | -------------------------------------------------- |
-| `README.md`         | 用户入口：安装、快速开始、兼容性、包清单           |
-| `AGENTS.md`         | 代理约束：目录职责、代码风格、交付清单、生成物边界 |
-| `CONTRIBUTING.md`   | 流程与架构约束：分支、PR、根因修复与架构约束       |
-| `tests/README.md`   | 测试约定、执行模型与「按改动范围验证」命令表       |
-| `scripts/README.md` | 脚本与门禁命令清单                                 |
-| `docs/ROADMAP.md`   | 当前可执行任务与任务登记规则（不存完成历史）       |
-| `docs/MIGRATION.md` | breaking change 与迁移路径                         |
-| `CHANGELOG.md`      | 版本变更与完成历史                                 |
-| `skills/tigercat/`  | 组件 API、Props、示例、主题、i18n                  |
+| 文档                   | 拥有的内容                                               |
+| ---------------------- | -------------------------------------------------------- |
+| `README.md`            | 用户入口：安装、快速开始、兼容性、包清单、MCP 客户端片段 |
+| `AGENTS.md`            | 代理约束：目录职责、代码风格、交付清单、生成物边界       |
+| `CONTRIBUTING.md`      | 流程与架构约束：分支、PR、根因修复与架构约束             |
+| `tests/README.md`      | 测试约定、执行模型与「按改动范围验证」命令表             |
+| `scripts/README.md`    | 脚本与门禁命令清单                                       |
+| `packages/*/README.md` | npm 落地页；安装/兼容性链回根 README，不复制正文         |
+| `docs/ROADMAP.md`      | 当前可执行任务与任务登记规则（不存完成历史）             |
+| `docs/MIGRATION.md`    | breaking change 与迁移路径                               |
+| `CHANGELOG.md`         | 版本变更与完成历史                                       |
+| `skills/tigercat/`     | 组件 API、Props、示例、主题、i18n、命令式 API            |
 
 其他文档引用这些内容时只放链接，不复制正文。
 
@@ -79,6 +89,6 @@ packages: core, vue, react, cli, mcp
 
 新增组件或显著功能需按范围同步完成：Core 类型/工具及导出、Vue 与 React 实现及入口导出、正常/a11y/边界测试、复杂交互的 E2E、有用户可见文案时的 i18n label、`skills/tigercat/references/` 文档与必要 Example，以及受影响的 roadmap、测试清单或 API 文档。E2E 只做功能断言，不新增图片对比基线。
 
-按改动范围选择验证命令见 [tests/README.md](tests/README.md)「按改动范围验证」；命令与脚本清单见 [scripts/README.md](scripts/README.md)。
+按改动范围选择验证命令见 [tests/README.md](tests/README.md#按改动范围验证)；命令与脚本清单见 [scripts/README.md](scripts/README.md)。
 
 不要声称未运行的检查已经通过；构建排错优先定位 `tsup --dts` / `vue-tsc` 的根因。

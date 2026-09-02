@@ -24,6 +24,11 @@ npm install @expcat/tigercat-core
 | **Theme**           | CSS variables (`THEME_CSS_VARS`), color utilities, component theme configs      |
 | **Tailwind Plugin** | `tigercatPlugin` - Tailwind CSS plugin for theme integration                    |
 
+Runtime theme and design tokens are documented in
+[theme.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/theme.md)
+and
+[tokens.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/tokens.md).
+
 ## Tailwind Plugin
 
 ```css
@@ -33,6 +38,11 @@ npm install @expcat/tigercat-core
 
 The modern preset only changes component styling when a consumer sets
 `data-tiger-style="modern"`; the default visual style remains unchanged.
+
+## Next
+
+- Install, compatibility, and MCP client config:
+  [root README](https://github.com/expcat/Tigercat/blob/main/README.md)
 
 ## License
 

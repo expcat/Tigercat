@@ -10,7 +10,7 @@ import {
 const publicComponents = loadPublicComponentExports(__dirname)
 
 // Per-component subpath aliases so a spec can import `@expcat/tigercat-vue/Button`
-// instead of the root barrel, which re-evaluates all 172 components in every
+// instead of the root barrel, which re-evaluates all public components in every
 // file. Generated from the same facts `pnpm exports:check` syncs into each
 // package's `exports` map, so a spec can only reach a genuinely published
 // subpath. Vite matches string aliases by prefix and takes the first hit, so

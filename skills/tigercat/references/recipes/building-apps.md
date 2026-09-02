@@ -16,16 +16,7 @@ description: Recipe for building a complete general-purpose web app with Tigerca
 tigercat create my-app --template react   # 或 --template vue3
 ```
 
-模板只给最小 App。手动接入与 `doctor` 见 [../getting-started.md](../getting-started.md) 与 [../cli.md](../cli.md)。应用 CSS 必须：
-
-```css
-@import 'tailwindcss';
-@plugin '@expcat/tigercat-core/tailwind/modern';
-```
-
-组件导入优先使用 PascalCase 子路径，例如 `@expcat/tigercat-react/Button` 或
-`@expcat/tigercat-vue/Button`；根入口 named exports 只作为小应用便利入口、hooks/composables、命令式
-API 与共享类型入口。
+模板只给最小 App。手动接入、CSS、`doctor` 与组件导入见 [../getting-started.md](../getting-started.md)。
 
 ## 2. App Shell
 
@@ -84,6 +75,6 @@ Tigercat 不绑定数据层：表单值、弹层 `open`、表格选择 / 分页�
 
 Nuxt / Next 直接用包入口，不要在模块顶层读浏览器 API，见 [../ssr.md](../ssr.md)。键盘 / 对比度 / role 默认达标，自定义交互补充见 [../accessibility.md](../accessibility.md)。
 
-## Scope
+完整页面以 `examples/example/{react,vue3}/src` 为事实源；本配方只保留可直接搭应用的稳定路径。
 
-本配方只保留可直接搭应用的稳定路径。需要完整页面时，以 `examples/example/{react,vue3}/src` 作为事实源；未来更完整的模板、数据获取、鉴权或在线编辑演示属于仓库维护计划，不进入普通 Skill 读取路径。
+Next: [../getting-started.md](../getting-started.md) · [../theme.md](../theme.md) · [../i18n.md](../i18n.md) · [../component-index.md](../component-index.md)

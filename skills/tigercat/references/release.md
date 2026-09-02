@@ -5,87 +5,31 @@ description: Tigercat release commands, validation set, and published package sm
 
 # Release
 
-Tigercat uses Changesets for version planning and package publishing. All package versions are fixed together so `@expcat/tigercat-core`, `@expcat/tigercat-vue`, `@expcat/tigercat-react`, `@expcat/tigercat-cli`, and `@expcat/tigercat-mcp` stay aligned.
+Tigercat uses Changesets. All package versions are fixed together so `@expcat/tigercat-core`,
+`@expcat/tigercat-vue`, `@expcat/tigercat-react`, `@expcat/tigercat-cli`, and `@expcat/tigercat-mcp`
+stay aligned. Version history belongs in CHANGELOG, not this page.
 
-## Release Readiness
+## Flow
 
-Run the metadata check before the heavier release gate. It verifies fixed package versions, runtime `version` exports, required package exports, Changesets fixed groups, root release scripts, and release documentation entry points.
+1. Metadata: `pnpm release:check` (fixed versions, runtime `version` exports, required exports,
+   Changesets fixed groups, root scripts, docs entry points).
+2. Full local gate for RC and production: `pnpm quality:release` then `pnpm build`. Do **not** add
+   this (or coverage / SSR / publish smoke) to publish workflows.
+3. Release Candidate: `pnpm release:next` or `pnpm release:canary`; install the prerelease in clean Vue, React,
+   Nuxt, and Next projects.
+4. Stable: write the target with `node scripts/sync-version.mjs <version>`, update CHANGELOG and
+   MIGRATION by hand, remove consumed `.changeset/*.md` so a future `changeset version` cannot
+   mis-bump, run `pnpm quality:release` and `pnpm e2e`, commit `chore: 发布 v<version>`, tag
+   `v<version>`. Pushing the tag publishes (`changeset publish` uses versions already in
+   package.json) and deploys Pages.
+5. After publish: `pnpm smoke:published`.
 
-```bash
-pnpm release:check
-```
-
-Use the full release gate for release candidates and production releases.
-
-```bash
-pnpm quality:release
-pnpm build
-```
-
-`pnpm quality:release` includes quick API/type checks, size-limit, local publish artifact smoke, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix. The publish smoke checks installed package ESM entrypoints and keeps Button component subpaths below their release budgets without pulling imperative APIs, charts, editors, or full locale bundles. It also verifies that `defineText` and DatePicker component subpaths do not pull unused DatePicker locale presets, while explicit DatePicker locale imports still include the requested preset.
-
-Run release validation manually on the local machine before publishing or pushing a release tag. Publish workflows are intentionally kept lightweight and must not add `quality:release`, coverage, SSR, publish smoke, or similar pre-publish validation gates, so GitHub Actions minutes are spent only on the publish operation.
-
-For component-batch work, start with the matching group gate before escalating to the full release gate:
-
-```bash
-pnpm test:group:form
-pnpm test:group -- --group feedback --framework react
-TEST_GROUP=form pnpm test:validate
-```
-
-Available groups are `basic`, `form`, `feedback`, `layout`, `navigation`, `data`, `charts`, `advanced`, `composite`, and `core`. Pair the group run with `pnpm docs:api:check`, the relevant examples check, and changed-file Prettier check. Use `pnpm quality:release` when package exports, generated references, API baselines, size budgets, publish smoke behavior, or release workflows change.
-
-## API Freeze Checklist
-
-- Run `pnpm release:check`, `pnpm types:check`, and `pnpm api:validate`.
-- Confirm root package exports: core `.` / `./tailwind` / `./tailwind/modern` / `./tokens.css` / `./figma-variables.json` and locale subpaths, plus Vue and React root and component subpath exports.
-- Confirm Vue and React public component files have matching props type exports.
-- Do not rename props, events, slots, children, or subpath imports after the freeze unless the change is explicitly listed as Breaking.
-
-## Breaking Changes
-
-Breaking changes must be centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md) and [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
-
-Current v2.1.2 is the published release of the v2 stable API series: package versions including MCP stay fixed together, core / React / Vue publish ESM-only surfaces, and React/Vue use explicit component exports. The full v2.0.0 breaking-change set and every supported replacement path are centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md); release history belongs in [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md), not this operational guide.
-
-Note that v2.0.19 carries `@expcat/tigercat-mcp` behavior changes despite being a patch number: no-argument calls now default to remote skill loading, and tool responses return long references as session-level pointers instead of inlining them. Component packages are unaffected. This is why `pnpm release:check` requires every published version to appear in all three release documents — a patch number is not evidence that nothing user-visible changed.
-
-## SSR And Hydration Matrix
-
-Release candidates must cover both SSR examples:
-
-```bash
-pnpm example:ssr:nuxt
-pnpm example:ssr:next
-```
-
-The aggregate gate is:
-
-```bash
-pnpm quality:ssr
-```
-
-When auditing hydration risk, focus on DatePicker locale/timezone stability, chart SVG id stability, closed-by-default overlay positioning, and client-only theme bootstrap behavior.
-
-## Theme And Token Stability
-
-Token source remains `packages/core/tokens/tokens.json`. After token-sensitive changes, run:
-
-```bash
-pnpm tokens:build
-pnpm build
-```
-
-Before release, confirm `@expcat/tigercat-core` still exports `./tailwind`, `./tailwind/modern`, `./tokens.css`, and `./figma-variables.json`.
-
-## Release Candidate Flow
-
-1. Refresh generated API docs with `pnpm docs:api`, then review the diff.
-2. Run `pnpm release:check`, `pnpm quality:release`, and `pnpm build`.
-3. Create a Changesets snapshot with `pnpm release:next` or `pnpm release:canary`.
-4. Install the prerelease in clean Vue, React, Nuxt, and Next projects or equivalent examples.
-5. Publish the final release after the RC window, then run the npm artifact smoke test.
+`pnpm quality:release` is the one heavy gate: API/type checks, size-limit, local tarball smoke
+(ESM entries, Button subpath budgets, no unused DatePicker locale presets on `defineText` /
+DatePicker subpaths), test checklist, Vue/React examples, and the Nuxt/Next SSR matrix. For
+component-batch work, start with `pnpm test:group:<group>` (`basic`, `form`, `feedback`, `layout`,
+`navigation`, `data`, `charts`, `advanced`, `composite`, `core`) plus `pnpm docs:api:check` before
+escalating.
 
 ```bash
 pnpm changeset
@@ -93,19 +37,32 @@ pnpm version-packages
 pnpm release
 ```
 
-Use prerelease channels for preview builds.
+Stable and RC releases are cut manually, not by `changeset version`.
 
-```bash
-pnpm release:next
-pnpm release:canary
-```
+## API Freeze
 
-Stable and RC releases are cut manually, not by `changeset version`: write the target version everywhere with `node scripts/sync-version.mjs <version>`, update `CHANGELOG.md` and `docs/MIGRATION.md` by hand, remove consumed `.changeset/*.md` entries so a future `changeset version` cannot mis-bump, run `pnpm quality:release` and `pnpm e2e` locally, then commit `chore: 发布 v<version>` and tag `v<version>`. Pushing the tag triggers the publish workflow (`changeset publish` publishes the versions already in package.json) and the Pages deploy.
+- `pnpm release:check`, `pnpm types:check`, `pnpm api:validate`.
+- Exports: core `.` / `./tailwind` / `./tailwind/modern` / `./tokens.css` / `./figma-variables.json`
+  and locale subpaths; Vue/React root and component subpaths; matching props type exports.
+- Do not rename props, events, slots, children, or subpath imports after freeze unless listed as
+  Breaking.
 
-Before publishing, run the validation set appropriate to the release scope locally. For package releases, prefer `pnpm quality:release` so size-limit, local publish smoke, generated-reference drift, API baseline drift, examples, and SSR checks stay aligned. Do not move this gate into publish workflows.
+## Breaking Changes
 
-After publishing, run the published package smoke test when validating npm artifacts.
+Centralize in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md)
+and [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md): affected
+package/component, removed API, replacement, minimal diff.
 
-```bash
-pnpm smoke:published
-```
+v2.0.19 is a historical patch that still changed `@expcat/tigercat-mcp` (no-arg calls default to
+remote skill loading; long references are session pointers). Component packages were unaffected.
+This is why `pnpm release:check` requires `## v<version>` in CHANGELOG and MIGRATION — a patch
+number is not evidence that nothing user-visible changed.
+
+Token source is `packages/core/tokens/tokens.json`; after token edits `pnpm tokens:build` then
+`pnpm build`. Confirm core still exports `./tailwind`, `./tailwind/modern`, `./tokens.css`, and
+`./figma-variables.json`. See [tokens.md](tokens.md).
+
+Hydration audit focus: DatePicker locale/timezone, chart SVG ids, closed overlays, client-only
+theme bootstrap. SSR commands are inside `quality:release` (`pnpm quality:ssr`).
+
+Next: [tokens.md](tokens.md)

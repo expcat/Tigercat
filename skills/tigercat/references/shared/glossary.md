@@ -12,33 +12,7 @@ key-terms: slot/children, emit/callback, attrs/props, v-model/controlled, open, 
 -->
 
 跨框架术语速查。文档和示例中优先使用本页术语，减少 Vue 与 React 写法重复解释。
-
----
-
-## Framework Concepts
-
-| Concept      | Vue Term     | React Term                 | Use In Docs                                 |
-| ------------ | ------------ | -------------------------- | ------------------------------------------- |
-| 组件内容     | slot         | children                   | 描述默认内容区域时写 `slot / children`      |
-| 命名内容区域 | named slot   | render prop / node prop    | 描述 `title`、`footer`、`icon` 等可替换区域 |
-| 事件         | emit / event | callback                   | 事件表写 `Vue Event` 与 `React Callback`    |
-| 双向绑定     | `v-model`    | controlled prop + callback | 表单值、开关状态、弹层 open 状态            |
-| 外部属性     | attrs        | native props               | 透传到根节点或原生元素的属性                |
-| 类名         | `class`      | `className`                | 自定义类名统一说明为 `class / className`    |
-| 内联样式     | `style`      | `style`                    | 两端同名，类型按框架分别处理                |
-| 默认值       | prop default | default prop value         | Props 表统一写 `Default`                    |
-
----
-
-## State Naming
-
-| State        | Vue                                 | React                         | Notes                                    |
-| ------------ | ----------------------------------- | ----------------------------- | ---------------------------------------- |
-| 输入值       | `modelValue` + `@update:modelValue` | `value` + `onChange`          | Input、Select、DatePicker、TimePicker 等 |
-| 选中状态     | `checked` / `modelValue`            | `checked` / `value`           | Checkbox、Radio、Switch 按组件语义选择   |
-| 弹层显示     | `open` + `@update:open`             | `open` + `onOpenChange`       | Modal、Drawer、Popover、Dropdown 等      |
-| 废弃显示别名 | `visible`                           | `visible` / `onVisibleChange` | 仅用于迁移说明，不再新增 API             |
-| 非受控初始值 | `defaultValue`                      | `defaultValue`                | 仅在组件明确支持时记录                   |
+绑定对照见 [patterns/common.md](patterns/common.md)。
 
 ---
 
@@ -94,3 +68,5 @@ key-terms: slot/children, emit/callback, attrs/props, v-model/controlled, open, 
 | Package Subpath    | PascalCase 组件子路径，如 `@expcat/tigercat-react/Button`。            |
 | SSR Guard          | 浏览器 API 访问前使用 `isBrowser()` 或等价守卫。                       |
 | Locale             | 组件文案国际化配置，统一来自 locale 系统。                             |
+
+Next: [patterns/common.md](patterns/common.md)

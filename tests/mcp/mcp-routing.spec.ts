@@ -144,6 +144,21 @@ describe('routeTigercatTask', () => {
     const fallback = result.sources.find((source) => source.path.endsWith('SKILL.md'))
     expect(fallback?.text).toContain('Tigercat')
   })
+
+  it('routes command APIs to the compact command-apis reference', async () => {
+    const result = await routeTigercatTask(index, {
+      task: 'show an imperative notification toast',
+      framework: 'react'
+    })
+
+    expect(result.topics.map((topic) => topic.slug)).toContain('commandApis')
+    const inlined = result.sources.filter((source) => typeof source.text === 'string')
+    expect(inlined.map((source) => source.path)).toContain(
+      'skills/tigercat/references/command-apis.md'
+    )
+    expect(inlined.some((source) => source.path.includes('shared/props/feedback.md'))).toBe(false)
+    expect(JSON.stringify(result).length).toBeLessThan(ROUTE_BUDGET_CHARS)
+  })
 })
 
 describe('searchTigercat', () => {

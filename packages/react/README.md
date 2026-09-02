@@ -35,25 +35,12 @@ function App() {
 
 ## Components
 
-172 public component entries across 9 categories. The authoritative list with
-import subpaths lives in
-[component-index.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/component-index.md)
-(generated); the table below is only a sampler.
+Sampler: Button, Avatar, Badge, Input, Select, DatePicker, Form, Card, Layout, Menu, Tabs, Modal, Drawer, Table, BarChart, LineChart, VirtualTable, RichTextEditor, DataTableWithToolbar, ChatWindow. The generated catalog with import subpaths is
+[component-index.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/component-index.md).
 
-| Category       | Count | Examples                                                      |
-| -------------- | ----- | ------------------------------------------------------------- |
-| **Basic**      | 30    | Button, Alert, Avatar, Badge, Icon, Tag, Text, Result, QRCode |
-| **Form**       | 31    | Input, Select, DatePicker, Form, Upload, InputOTP, TagsInput  |
-| **Layout**     | 19    | Card, Row/Col, Layout, List, Descriptions, Skeleton, Space    |
-| **Navigation** | 33    | Menu, Tabs, Breadcrumb, Pagination, Steps, Dropdown, Tree     |
-| **Feedback**   | 13    | Modal, Drawer, Message, Popover, Tooltip, Progress, Tour      |
-| **Data**       | 7     | Table, Calendar, Collapse, Timeline, DataExport               |
-| **Charts**     | 20    | BarChart, LineChart, PieChart, RadarChart, GaugeChart, Gantt  |
-| **Advanced**   | 12    | VirtualTable, VirtualList, RichTextEditor, CodeEditor         |
-| **Composite**  | 7     | DataTableWithToolbar, ChatWindow, FormWizard, TaskBoard       |
-
-`Message` and `notification` are also available as imperative command APIs from
-the package root; `notification` is a command API, not a component.
+`Message`, `notification`, and `LoadingBar` are root command APIs;
+[command-apis.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/command-apis.md).
+`notification` is not a component.
 
 ## Hooks
 
@@ -62,6 +49,13 @@ the package root; `notification` is a command API, not a component.
 `useMenuContext`, `useTabsContext`, `useCollapseContext`, `useAnchorContext`,
 `useBreadcrumbContext` and `useStepsContext`. Signatures are listed in
 [api-summary.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/shared/api-summary.md).
+
+## Next
+
+- Install, compatibility, and MCP client config:
+  [root README](https://github.com/expcat/Tigercat/blob/main/README.md)
+- Agent docs:
+  [SKILL.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/SKILL.md)
 
 ## License
 

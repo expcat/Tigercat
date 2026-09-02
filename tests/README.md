@@ -2,6 +2,8 @@
 
 本目录包含 framework-agnostic core 测试、React/Vue 绑定测试和共享测试工具。本文是测试约定的唯一入口；脚本行为以 `package.json`、`vitest.config.ts` 与 `scripts/validate-tests.mjs` 为准。
 
+下一跳：脚本与门禁清单见 [scripts/README.md](../scripts/README.md)；代理约束见 [AGENTS.md](../AGENTS.md)。「按改动范围验证」见下文。
+
 ## 目录
 
 ```text

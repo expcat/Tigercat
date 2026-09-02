@@ -89,6 +89,8 @@ SSR 示例（Next 16 / Nuxt 4）必须接上面的 Tailwind 配方。页面 HTML
 运行时换肤走 `ConfigProvider` 的 `theme` / `colorScheme`（或 `ThemeManager`），不要再手写一套 hex 盘。
 `@plugin '@expcat/tigercat-core/tailwind/modern'` 是 modern 预设的 CSS 入口，与 `theme="modern"` 等价。
 
+通用接入步骤见 [getting-started.md](../skills/tigercat/references/getting-started.md)。
+
 ## 维护
 
 新增或修改组件 API 时，同步检查：
@@ -99,8 +101,9 @@ SSR 示例（Next 16 / Nuxt 4）必须接上面的 Tailwind 配方。页面 HTML
 4. 单个模块是否保持小而可复制：只保留自身状态、数据和交互；颜色、尺寸、位置等正交静态变体使用一个代表实例复合展示，其余取值写入说明。
 5. 只有交互方式、数据流或结构真正不同才拆分模块；弹层使用单一受控实例，异步流程、焦点与滚动场景不得依赖同页面其他示例。
 6. 路由页是否继续通过 `React.lazy` / 原生 Vue Router import factory 懒加载，模块源码和浏览器编译器是否保持按需加载。
-7. 对应组件分组测试是否通过，例如 `pnpm test:group:form` 或 `pnpm test:group -- --group feedback --framework react`。
+7. 对应组件分组测试是否通过。
 8. `pnpm example:build` 是否通过；SSR、懒加载或按需导入变更还需要 `pnpm example:ssr:check`。
 9. 本次变更文件是否通过 changed-file Prettier check。
 
-组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)，测试入口见 [tests/README.md](../tests/README.md)。
+组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)。
+按改动范围验证见 [tests/README.md](../tests/README.md)。

@@ -18,6 +18,7 @@
     "skills/tigercat/SKILL.md",
     "skills/tigercat/references/accessibility.md",
     "skills/tigercat/references/cli.md",
+    "skills/tigercat/references/command-apis.md",
     "skills/tigercat/references/component-index.md",
     "skills/tigercat/references/examples/advanced.md",
     "skills/tigercat/references/examples/basic.md",
@@ -217,34 +218,19 @@
       "name": "notification",
       "title": "Imperative notification API",
       "topic": "commandApis",
-      "references": [
-        "skills/tigercat/SKILL.md",
-        "skills/tigercat/references/shared/props/feedback.md",
-        "skills/tigercat/references/examples/feedback.md",
-        "skills/tigercat/references/shared/patterns/common.md"
-      ]
+      "references": ["skills/tigercat/references/command-apis.md"]
     },
     "Message": {
       "name": "Message",
       "title": "Imperative message API",
       "topic": "commandApis",
-      "references": [
-        "skills/tigercat/SKILL.md",
-        "skills/tigercat/references/shared/props/feedback.md",
-        "skills/tigercat/references/examples/feedback.md",
-        "skills/tigercat/references/shared/patterns/common.md"
-      ]
+      "references": ["skills/tigercat/references/command-apis.md"]
     },
     "LoadingBar": {
       "name": "LoadingBar",
       "title": "Imperative loading bar API",
       "topic": "commandApis",
-      "references": [
-        "skills/tigercat/SKILL.md",
-        "skills/tigercat/references/shared/props/feedback.md",
-        "skills/tigercat/references/examples/feedback.md",
-        "skills/tigercat/references/shared/patterns/common.md"
-      ]
+      "references": ["skills/tigercat/references/command-apis.md"]
     }
   },
   "topics": {
@@ -300,12 +286,7 @@
     },
     "commandApis": {
       "title": "Root command APIs",
-      "references": [
-        "skills/tigercat/SKILL.md",
-        "skills/tigercat/references/shared/props/feedback.md",
-        "skills/tigercat/references/examples/feedback.md",
-        "skills/tigercat/references/shared/patterns/common.md"
-      ],
+      "references": ["skills/tigercat/references/command-apis.md"],
       "keywords": [
         "notification",
         "message",

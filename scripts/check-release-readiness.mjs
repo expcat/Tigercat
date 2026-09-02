@@ -389,10 +389,6 @@ function checkReleaseDocs(expectedVersion) {
     const releaseDoc = readText(releaseDocPath)
     check(releaseDoc.includes('Release Candidate'), `${releaseDocPath} must document RC flow`)
     check(
-      releaseDoc.includes(`Current v${expectedVersion}`),
-      `${releaseDocPath} must document v${expectedVersion}`
-    )
-    check(
       releaseDoc.includes('pnpm quality:release'),
       `${releaseDocPath} must document release gate`
     )

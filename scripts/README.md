@@ -2,6 +2,8 @@
 
 此目录只保留跨平台 Node 脚本；旧的 shell 包装脚本已移除，日常使用优先走根目录 `package.json` scripts。
 
+下一跳：测试约定与「按改动范围验证」见 [tests/README.md](../tests/README.md#按改动范围验证)；代理约束见 [AGENTS.md](../AGENTS.md)。
+
 ## 常用入口
 
 | 命令                                        | 脚本                                    | 说明                                                                                            |
@@ -64,27 +66,27 @@ TEST_GROUP=form pnpm test:validate
 
 可用分组：`basic`、`form`、`feedback`、`layout`、`navigation`、`data`、`charts`、`advanced`、`composite`、`core`。`pnpm test:group` 支持 `--group` / `TEST_GROUP`、`--framework` / `TEST_FRAMEWORK`、`--filter` / `TEST_FILTER` 和 `--list`；`pnpm test:validate` 支持同一组参数用于只扫描目标组测试质量。当前 `form` 支持 `primitives` 与 `composite` filter alias。
 
-改动范围 → 验证命令的映射见 [tests/README.md](../tests/README.md)「按改动范围验证」，本文不重复维护。
+改动范围 → 验证命令的映射见 [tests/README.md](../tests/README.md#按改动范围验证)，本文不重复维护。
 
 ## MCP 服务
 
 `@expcat/tigercat-mcp` 是只读的 stdio MCP 服务。默认从 GitHub Pages 的
 `https://expcat.github.io/Tigercat/mcp/` 远程读取 `context7.json` 和
-`skills/tigercat/**`（随 Pages 部署发布，见 `.github/workflows/deploy.yml`）；
-`--root` 切换为读取本地仓库 checkout。服务只做组件/任务到最小 skill references
-的路由，不运行 `docs:api` 也不修改生成文档。
+`skills/tigercat/**`（随 Pages 部署发布，见 `.github/workflows/deploy.yml`）。
+服务只做组件/任务到最小 skill references 的路由，不运行 `docs:api` 也不修改生成文档。
+
+客户端 JSON / `claude mcp add` 片段见 [README.md](../README.md#mcp-接入ai-agent)。
 
 ```bash
 pnpm mcp:build
 pnpm mcp:serve          # 等价于 --root .（本地模式）
 ```
 
-客户端接入方式与 `--root` / `--base-url` / `--doctor` 标志见
-[README.md](../README.md)「MCP 接入（AI Agent）」。
+- 本地/离线：`tigercat-mcp --root /path/to/Tigercat`（读取仓库 checkout；`pnpm mcp:serve` 即此模式）。
+- 镜像：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`。
+- 诊断：`tigercat-mcp --doctor` 校验技能源可达性、清单完整性与远程版本。
 
-维护者需要知道的额外约束：远程 allow-list 由 `context7.json` 的 `skill_files`
-清单驱动，`pnpm docs:api` 生成、`pnpm api:validate` 与磁盘双向校验。改动 skill
-文件集合后必须重跑 `pnpm docs:api`，否则远程模式会读不到新文件。
+远程 allow-list 由 `context7.json` 的 `skill_files` 清单驱动，`pnpm docs:api` 生成、`pnpm api:validate` 与磁盘双向校验。改动 skill 文件集合后必须重跑 `pnpm docs:api`，否则远程模式会读不到新文件。工具调用顺序见 [SKILL.md](../skills/tigercat/SKILL.md)，本文不重复。
 
 ## 内部 helper（仅限仓库脚本）
 

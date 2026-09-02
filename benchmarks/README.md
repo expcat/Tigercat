@@ -1,5 +1,8 @@
 # Benchmark Coverage Map
 
+Agent-facing performance guidance:
+[performance.md](../skills/tigercat/references/performance.md).
+
 Tigercat benchmarks are advisory performance probes. They are not a PR release
 gate and do not define hard regression thresholds because shared CI runners make
 micro-benchmark timings noisy. Use `pnpm bench --run` locally or the scheduled

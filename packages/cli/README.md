@@ -88,77 +88,8 @@ tigercat doctor --json
 template dependency compatibility, and the supported version compatibility matrix. JSON output is
 designed for CI and automated diagnostics.
 
-## Commands
-
-### `tigercat create <name>`
-
-Create a new project with Tigercat pre-configured.
-
-```bash
-tigercat create my-app --template vue3
-tigercat create my-app --template react
-tigercat create my-app --template vue3 --dry-run
-```
-
-### `tigercat add <component>`
-
-Add a component to your project with import boilerplate.
-
-```bash
-tigercat add Button
-tigercat add Form Input Select DatePicker
-tigercat add --framework react --install --snippet src/tigercat-components.ts
-tigercat add Button --dry-run
-```
-
-### `tigercat playground`
-
-Launch an interactive playground for testing components.
-
-```bash
-tigercat playground
-tigercat playground --template react
-tigercat playground --template react --no-open
-tigercat playground --template react --dry-run
-```
-
-### `tigercat generate docs`
-
-Generate API documentation from component type definitions.
-
-```bash
-tigercat generate docs
-tigercat generate docs --output ./docs/api
-tigercat generate docs --output ./docs/api --dry-run
-```
-
-### `tigercat generate test`
-
-Generate Vue and/or React starter test templates for a component.
-
-```bash
-tigercat generate test Button --framework both
-tigercat generate test Button --framework vue3
-tigercat generate test Button --framework react --dry-run
-```
-
-### `tigercat generate doc-template`
-
-Generate a component documentation page template.
-
-```bash
-tigercat generate doc-template Button
-tigercat generate doc-template Button --output docs/components --dry-run
-```
-
-### `tigercat doctor`
-
-Check whether the current project has compatible Node, pnpm, Tailwind CSS, Tigercat peer dependencies, and template tooling.
-
-```bash
-tigercat doctor
-tigercat doctor --json
-```
+The full command matrix for agents is
+[cli.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/cli.md).
 
 ## Windows Support
 
@@ -181,9 +112,8 @@ For local (non-global) installs, run via `npx tigercat`, `pnpm exec tigercat`, o
 `bunx tigercat`. The `#!/usr/bin/env node` shebang in the built output is used by all
 three package managers to locate the Node.js runtime.
 
-> **Note:** If you use Corepack with pnpm on Windows, ensure `shell: true` is passed
-> when spawning pnpm programmatically (the project scripts already handle this via
-> `scripts/utils/pnpm.mjs`).
+On Windows, spawn pnpm with `shell: true` when using Corepack; repo scripts
+already do this via `scripts/utils/pnpm.mjs`.
 
 ## License
 

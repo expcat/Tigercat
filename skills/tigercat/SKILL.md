@@ -9,27 +9,27 @@ Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，
 
 ## MCP First
 
-- Prefer `tigercat_route` for natural-language tasks (pass `framework`), then read only returned sources.
-- Use `tigercat_component` for exact component imports, props, examples, framework notes, and test group.
-- Use `tigercat_search` for fuzzy component/category/topic lookup; `Grid` routes to `Row` + `Col`; Chinese aliases (表单/表格/日期选择 …) route too.
-- Use `tigercat_reference` only for direct allow-listed Skill reference reads; sources marked `"inlined": false` are session-level background — read each at most once.
-- `notification` is a root command API/topic route, not a public component; `Message` remains both component docs and command API context.
-- MCP 默认从 GitHub Pages 远程读取 skills；`--root` 用本地仓库，`--base-url` 可指镜像。
+- Prefer `tigercat_route` (pass `framework`), then read only returned sources.
+- `tigercat_component` for a known name/alias: import subpath, own props section, examples, framework notes, test group.
+- `tigercat_search` for fuzzy lookup; `Grid` → `Row` + `Col`; Chinese aliases (表单/表格/日期选择 …) route too.
+- `tigercat_reference` only for allow-listed paths; `"inlined": false` is session background — read each at most once.
+- `notification` is a command API, not a component. `Message` / `LoadingBar` are both. See [command-apis.md](references/command-apis.md).
+- MCP reads skills from GitHub Pages by default; `--root` is local; `--base-url` is a mirror.
 
 ## Routes
 
-- App shell/routing: [recipes/building-apps.md](references/recipes/building-apps.md).
-- Setup/CLI/theme/i18n/SSR/a11y/perf: `references/{getting-started,cli,theme,i18n,ssr,accessibility,performance}.md`.
-- Component lookup: [component-index.md](references/component-index.md) -> `shared/props/{cat}.md` + `examples/{cat}.md`.
-- Vue/React notes: [vue/index.md](references/vue/index.md) / [react/index.md](references/react/index.md).
-- Binding differences: [shared/patterns/common.md](references/shared/patterns/common.md); terms: [shared/glossary.md](references/shared/glossary.md).
-- Type lookup only: [shared/api-summary.md](references/shared/api-summary.md) (includes public hooks).
-- Table/virtual/toolbar: start from data, advanced, and composite props/examples.
+- App shell: [building-apps.md](references/recipes/building-apps.md)
+- Setup/CLI/theme/i18n/SSR/a11y/perf: `references/{getting-started,cli,theme,i18n,ssr,accessibility,performance}.md`
+- Components: [component-index.md](references/component-index.md) → `shared/props/{cat}.md` + `examples/{cat}.md`
+- Vue/React notes: [vue/index.md](references/vue/index.md) / [react/index.md](references/react/index.md)
+- Bindings: [common.md](references/shared/patterns/common.md); terms: [glossary.md](references/shared/glossary.md)
+- Types/hooks: [api-summary.md](references/shared/api-summary.md)
+- Command APIs: [command-apis.md](references/command-apis.md)
+- Maintainer-only: [release.md](references/release.md), [tokens.md](references/tokens.md)
 
 ## Use Rules
 
-- Component imports prefer PascalCase subpaths such as `@expcat/tigercat-react/Button` or `@expcat/tigercat-vue/Button`.
-- Generated references and `context7.json` are owned by `pnpm docs:api`; change generator/source facts before editing generated docs.
-- Component route facts come from `scripts/lib/public-components.mjs`; keep package subpaths, test groups, Skill docs, and MCP inventory in sync.
-- Maintainer automation must follow `CONTRIBUTING.md` "根因修复与架构约束" in full; do not restate or weaken it here.
-- Maintainer-only package work may need [release.md](references/release.md) or [tokens.md](references/tokens.md).
+- Component imports: `@expcat/tigercat-react/Button` or `@expcat/tigercat-vue/Button`.
+- Generated refs and `context7.json` are owned by `pnpm docs:api`; change generator/source facts first.
+- Component route facts: `scripts/lib/public-components.mjs`.
+- Maintainer automation follows CONTRIBUTING.md「根因修复与架构约束」; do not restate it here.

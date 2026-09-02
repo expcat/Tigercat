@@ -16,6 +16,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 - Test group：组件批次优先运行 `pnpm test:group:{group}`；需要限定框架时使用 `pnpm test:group -- --group {group} --framework react|vue`。
 
 - Package subpath：React/Vue 组件按需使用均优先走 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`；根入口 named exports 仅作为小应用便利入口与非组件 API 入口。
+- Command APIs（`Message` / `notification` / `LoadingBar`）：见 [command-apis.md](command-apis.md)；`notification` 不是公开组件。
 
 | Component             | Category   | Test Group   | Type                                                | Package Subpath         |
 | --------------------- | ---------- | ------------ | --------------------------------------------------- | ----------------------- |

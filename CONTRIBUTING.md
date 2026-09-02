@@ -11,30 +11,13 @@
 
 ## 本地环境
 
-要求：
-
-- Node.js >= 22.13.0
-- pnpm >= 11.9.0
-
-初始化：
+运行时与工具链版本见 [README.md](README.md#性能与兼容性)。初始化仓库：
 
 ```bash
 pnpm setup
 ```
 
-如果只需要手动安装和构建：
-
-```bash
-pnpm install
-pnpm build
-```
-
-运行示例：
-
-```bash
-pnpm example:vue
-pnpm example:react
-```
+只安装与构建可用 `pnpm install` 与 `pnpm build`。运行示例见 [README.md](README.md#本地开发)。
 
 ## 分支和提交
 
@@ -63,7 +46,7 @@ pnpm example:react
 
 ## 测试和验证
 
-按改动范围选择验证命令，不需要为文档-only 改动运行完整测试。测试约定与「按改动范围验证」命令表见 [tests/README.md](tests/README.md)，脚本与门禁清单见 [scripts/README.md](scripts/README.md)。
+按改动范围选择验证命令，不需要为文档-only 改动运行完整测试。测试约定与命令表见 [tests/README.md](tests/README.md#按改动范围验证)，脚本与门禁清单见 [scripts/README.md](scripts/README.md)。
 
 只覆盖具有独立回归价值的渲染、状态、事件和无障碍行为；浏览器测试使用功能断言，不新增图片对比基线。
 

@@ -1420,6 +1420,17 @@ if (existsSync(context7Path)) {
       'context7 必须将 notification 建模为 command API/topic route'
     )
   }
+
+  const commandApiRefs = context7.topics?.commandApis?.references
+  const expectedCommandApiRef = 'skills/tigercat/references/command-apis.md'
+  if (!Array.isArray(commandApiRefs) || commandApiRefs.join(',') !== expectedCommandApiRef) {
+    addIssue(
+      'context7.json',
+      0,
+      'docs-route',
+      `context7 topics.commandApis.references 必须只指向 ${expectedCommandApiRef}，避免整份 feedback props/examples 内联`
+    )
+  }
 }
 
 for (const [componentName, owners] of componentHeadingOwners) {
