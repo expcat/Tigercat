@@ -18,7 +18,6 @@ describe('Link (Vue)', () => {
     expect(link).toBeInTheDocument()
     expect(link?.tagName).toBe('A')
     expect(link).toHaveAttribute('href', '/test')
-    expect(link).toHaveClass('inline-flex')
   })
 
   it('merges attrs.class onto the element', () => {
@@ -28,39 +27,7 @@ describe('Link (Vue)', () => {
     })
 
     const link = container.querySelector('a')
-    expect(link).toHaveClass('inline-flex')
     expect(link).toHaveClass('from-attr')
-  })
-
-  it('applies variant color classes', () => {
-    const { container: c1 } = render(Link, {
-      props: { variant: 'secondary' },
-      slots: { default: 'Sec' }
-    })
-    expect(c1.querySelector('a')?.className).toContain('--tiger-secondary')
-
-    const { container: c2 } = render(Link, {
-      props: { variant: 'default' },
-      slots: { default: 'Def' }
-    })
-    expect(c2.querySelector('a')?.className).toContain('--tiger-text')
-    expect(c2.querySelector('a')?.className).not.toContain('text-gray-')
-  })
-  it('underlines at rest when underline is true', () => {
-    const { container } = render(Link, {
-      slots: { default: 'U' }
-    })
-    expect(container.querySelector('a')).toHaveClass('underline')
-    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
-  })
-
-  it('omits underline when underline=false', () => {
-    const { container } = render(Link, {
-      props: { underline: false },
-      slots: { default: 'U' }
-    })
-    expect(container.querySelector('a')).toHaveClass('no-underline')
-    expect(container.querySelector('a')).not.toHaveClass('underline')
   })
 
   it('emits click event when not disabled', async () => {

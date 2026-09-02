@@ -30,11 +30,6 @@ describe('Badge', () => {
     expect(ref.current?.textContent).toBe('5')
   })
 
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    render(<Badge content={1} size={size} />)
-    expect(screen.getByText('1')).toBeInTheDocument()
-  })
-
   it('renders a decorative dot unless the caller names it', () => {
     const { container } = render(<Badge type="dot" />)
     const badge = container.firstElementChild
@@ -89,7 +84,6 @@ describe('Badge', () => {
     )
     expect(ref.current).toBe(container.firstElementChild)
     expect(container.firstElementChild).toHaveClass('host-class')
-    expect(container.firstElementChild).toHaveClass('relative')
   })
 
   it('warns when children are passed in standalone mode', () => {

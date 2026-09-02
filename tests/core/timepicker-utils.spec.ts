@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import {
-  focusTimePickerOption,
-  getTimePickerItemClasses,
-  getTimePickerPeriodButtonClasses
-} from '@expcat/tigercat-core'
+import { focusTimePickerOption } from '@expcat/tigercat-core'
 
 interface PanelOptions {
   selectedIndex?: number
@@ -99,25 +95,5 @@ describe('focusTimePickerOption', () => {
     expect(() => focusTimePickerOption(null, 'hour', 'next')).not.toThrow()
     expect(() => focusTimePickerOption(panel, 'second', 'next')).not.toThrow()
     expect(document.activeElement).toBe(hours[0])
-  })
-})
-
-describe('time picker item chrome', () => {
-  it('keeps selected items on the primary background while focused', () => {
-    const selected = getTimePickerItemClasses(true, false)
-    expect(selected).toContain('text-[var(--tiger-primary-foreground,#ffffff)]')
-    expect(selected).toContain('focus:text-[var(--tiger-primary-foreground,#ffffff)]')
-    expect(selected).toContain('focus:bg-[var(--tiger-primary,#2563eb)]')
-    expect(selected).not.toContain('focus:bg-[var(--tiger-surface-muted,#f3f4f6)]')
-
-    const period = getTimePickerPeriodButtonClasses(true)
-    expect(period).toContain('focus:text-[var(--tiger-primary-foreground,#ffffff)]')
-    expect(period).toContain('focus:bg-[var(--tiger-primary,#2563eb)]')
-  })
-
-  it('uses muted focus fill only for unselected items', () => {
-    const idle = getTimePickerItemClasses(false, false)
-    expect(idle).toContain('focus:bg-[var(--tiger-surface-muted,#f3f4f6)]')
-    expect(idle).not.toContain('text-[var(--tiger-primary-foreground,#ffffff)]')
   })
 })

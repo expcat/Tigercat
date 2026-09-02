@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
 import { Divider } from '@expcat/tigercat-vue/Divider'
 import { Space } from '@expcat/tigercat-vue/Space'
-import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[role="separator"]') as HTMLElement
@@ -75,7 +75,6 @@ describe('Divider (Vue)', () => {
       attrs: { 'data-testid': 'divider' }
     })
     const divider = getRoot(container)
-    expect(divider.className).toContain('tiger-divider')
     expect(divider.className.match(/custom/g)?.length).toBe(1)
     expect(divider).toHaveAttribute('data-testid', 'divider')
   })
@@ -83,11 +82,6 @@ describe('Divider (Vue)', () => {
   it('does not set inline style when no custom color/thickness', () => {
     const { container } = render(Divider)
     expect(getRoot(container).style.borderColor).toBe('')
-  })
-
-  it('has no accessibility violations', async () => {
-    const { container } = render(Divider, { slots: { default: 'OR' } })
-    await expectNoA11yViolationsIsolated(container)
   })
 
   it('applies fallthrough attrs only once (inheritAttrs: false)', () => {

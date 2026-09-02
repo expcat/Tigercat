@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useFormController } from '@expcat/tigercat-react'
+import { useFormController } from '@expcat/tigercat-react/useFormController'
 
 describe('useFormController (React)', () => {
   describe('values', () => {

@@ -20,15 +20,19 @@ observer、frame 工具不能满足；不再被任何 spec 引用的 helper 应�
 ## 常用命令
 
 ```bash
-pnpm test                         # 全部测试
-pnpm test:core                   # core 测试
+pnpm test                         # 全部单测（本地；跳过逐组件 jest-axe 与 a11y 专用 spec）
+pnpm test:core                   # core 测试（不含 a11y 专用 spec）
 pnpm test:react                  # React 测试
 pnpm test:vue                    # Vue 测试
+pnpm test:a11y                   # 跨组件 axe / ARIA 回归
+TIGER_A11Y=1 pnpm test            # 对全部组件 spec 跑 jest-axe
 pnpm test:group:form             # 指定组件分组
 pnpm test:group -- --group data --framework react
-pnpm test:coverage               # 发布门禁使用的 coverage
+pnpm test:coverage               # 本地发布检查使用的 coverage
 pnpm test:coverage:report        # 按需生成 JSON/HTML 报告
 pnpm test:validate               # 测试质量检查
+pnpm e2e                         # Playwright：Chromium + mobile
+pnpm e2e:full                    # Playwright：全部浏览器引擎
 pnpm test:watch                  # watch mode
 pnpm test:ui                     # Vitest UI
 ```
@@ -48,23 +52,23 @@ pnpm vitest run -t "opens the menu"
 2. 每条测试只覆盖一个独立意图。相同代码路径的 controlled/uncontrolled、键盘/鼠标或多个变体优先合并为代表性用例或 `it.each`。
 3. 不写 snapshot 测试；直接断言需要保护的行为。
 4. 共享纯逻辑只在 `tests/core` 测一次；React/Vue spec 只验证各自的绑定、渲染、事件、slots/children、生命周期和无障碍接线。
-5. 交互组件每个框架保留一条 `expectNoA11yViolations` 检查，并针对真实风险补充键盘与 ARIA 断言。
+5. 交互组件每个框架保留一条 `expectNoA11yViolations` 调用（默认 `pnpm test` 不执行 axe，避免约占全量 20% 的扫描时间）。键盘与 ARIA 断言始终跑。`a11y-aa-regression` / `a11y-interactive-regression` / `composite-a11y-roles` 不进默认 `pnpm test`，只走 `pnpm test:a11y`。需要全量 axe 时用 `TIGER_A11Y=1 pnpm test`。
 6. 不使用任意 timeout 等待；使用 `waitFor`、`findBy*`、observer mock 或 frame scheduler 驱动状态。
 7. 测试必须独立，不依赖执行顺序或跨测试共享的可变状态。
-8. 默认环境是 `happy-dom`。不需要 DOM 的 spec 必须用文件头 docblock 显式声明 `@vitest-environment node`（当前 3 个 spec 如此），不要在 node 环境 spec 里依赖 `window`。
+8. 默认环境是 `happy-dom`。不需要 DOM 的 spec 必须用文件头 docblock 显式声明 `@vitest-environment node`，不要在 node 环境 spec 里依赖 `window`。
 
 `tests/react/ComponentTemplate.spec.tsx.template` 与 `tests/vue/ComponentTemplate.spec.ts.template` 提供最小模板。共享 helper 从 `tests/utils` 导入；新增 helper 前先检查现有 render、a11y、theme、observer 和 frame 工具。
 
-组件 spec 统一从框架根入口导入（`@expcat/tigercat-vue` / `@expcat/tigercat-react`，经 `vitest.config.ts` alias 指向 `packages/*/src`）。这让每个 spec 都要重新求值整个组件库——见 [docs/ROADMAP.md](../docs/ROADMAP.md) 的测试执行成本条目。
+组件 spec 从已发布子路径导入（`@expcat/tigercat-vue/Button` / `@expcat/tigercat-react/Button`），避免根 barrel 求值全部组件。不要在 spec 里 `import('@expcat/tigercat-react')` 动态拉整包。
 
 ## 执行模型
 
 `vitest.config.ts` 把测试拆成两个 project：
 
-| Project     | Pool      | 范围                      | 原因                                                             |
-| ----------- | --------- | ------------------------- | ---------------------------------------------------------------- |
-| `unit`      | `threads` | 除 fork-only 外的 392 个  | worker thread 复用比每文件 fork 进程快得多（全量 73.7s → 54.2s） |
-| `fork-only` | `forks`   | `FORK_ONLY_SPECS` 的 5 个 | 见下                                                             |
+| Project     | Pool      | 范围                      | 原因                                       |
+| ----------- | --------- | ------------------------- | ------------------------------------------ |
+| `unit`      | `threads` | 除 fork-only 外的 spec    | worker thread 复用比每文件 fork 进程快得多 |
+| `fork-only` | `forks`   | `FORK_ONLY_SPECS` 的 5 个 | 见下                                       |
 
 `FORK_ONLY_SPECS` 目前包含：
 
@@ -80,13 +84,25 @@ timeout 掩盖。
 
 coverage 运行额外排除上面 4 个命令式 API spec（`COVERAGE_EXCLUDED_SPECS`），它们由
 `pnpm test:special` 单独运行。排除项写在配置里而不是 CLI `--exclude`：`projects`
-不继承 CLI 的 include/exclude 过滤器。因此 `pnpm test` 是 397 个文件、
-`pnpm test:coverage` 是 393 个。
+不继承 CLI 的 include/exclude 过滤器。因此默认 `pnpm test` 覆盖除 fork-only
+以外的 unit spec，并排除 a11y 专用三件套（它们只走 `pnpm test:a11y`）；
+`pnpm test:coverage` 再少那 4 个命令式 API spec。
 
 **文件级隔离保持开启**：每个 spec 文件都拿到干净的模块注册表。测试之间不得依赖
 执行顺序或跨文件共享的可变状态（模块级缓存、全局 registry、未清理的事件监听）。
 
-## 自动门禁
+测试只在本地运行。不要把 `pnpm test`、coverage 或 Playwright 接到
+`.github/workflows/`；发布 Action 只安装、构建和发布。
+
+## E2E
+
+默认 `pnpm e2e` 只跑 Chromium 与 `mobile-chromium`（触控 spec）。
+`pnpm e2e:full` 才跑 Firefox / WebKit，供本地发版前抽查。`pnpm e2e:smoke` 只跑
+example shell。不要把与单测重复的按钮点击、输入填值、图表 SVG 冒烟写进 e2e；
+e2e 只留真实浏览器才有意义的路径（playground iframe、portal/overlay 碰撞、
+原生滚动条/拖滑块、触控滑动、右键菜单）。
+
+## 自动门禁（仅本地）
 
 `pnpm test:validate` 的硬错误：
 
@@ -113,7 +129,7 @@ Coverage 阈值由 `vitest.config.ts` 统一维护，当前为 lines 85%、state
 | public API、发布面或门禁策略 | `pnpm quality:release`，并按需 `pnpm e2e`                                                                                                    |
 
 发布验证必须在本地手动完成并记录结果。发布 Action 只执行安装、构建和发布；不要向
-`.github/workflows/publish*.yml` 添加 `quality:release`、测试、coverage、SSR 或
-publish smoke 等发布前门禁。
+`.github/workflows/` 添加 `quality:release`、测试、coverage、SSR、e2e 或
+publish smoke 等 CI 门禁。
 
 提交前确认测试保护的是用户可观察行为、没有重复覆盖共享逻辑，也没有通过扩大等待时间掩盖不稳定性。

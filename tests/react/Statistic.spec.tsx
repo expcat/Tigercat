@@ -42,12 +42,6 @@ describe('Statistic', () => {
     expect(container.querySelector('.my-stat')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    render(<Statistic title="T" value={1} size={size} />)
-    expect(screen.getByText('T')).toBeInTheDocument()
-  })
-
   // --- Precision ---
   it('formats value with precision', () => {
     render(<Statistic title="T" value={123.4} precision={2} />)

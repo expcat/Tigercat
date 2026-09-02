@@ -9,6 +9,21 @@ type AxeOptions = NonNullable<Parameters<typeof axe>[1]>
  */
 export { axe }
 
+const DEDICATED_A11Y_SPEC =
+  /a11y-aa-regression|a11y-interactive-regression|composite-a11y-roles|a11y-utils/
+
+/**
+ * Per-component jest-axe is skipped in the default `pnpm test` run (~20% of
+ * suite time). Dedicated a11y specs always scan when executed via
+ * `pnpm test:a11y` (they are excluded from the default unit project). Set
+ * `TIGER_A11Y=1` to scan every component spec locally (`TIGER_A11Y=1 pnpm test`).
+ */
+function shouldRunAxe(): boolean {
+  if (process.env.TIGER_A11Y === '1') return true
+  const testPath = (expect.getState().testPath ?? '').replace(/\\/g, '/')
+  return DEDICATED_A11Y_SPEC.test(testPath)
+}
+
 /**
  * Common accessibility test for components
  * Tests that a component has no accessibility violations using jest-axe
@@ -22,6 +37,7 @@ export { axe }
  * await expectNoA11yViolations(container)
  */
 export async function expectNoA11yViolations(container: HTMLElement): Promise<void> {
+  if (!shouldRunAxe()) return
   const results: AxeResults = await axe(container)
   expect(results).toHaveNoViolations()
 }
@@ -37,6 +53,7 @@ export async function expectNoA11yViolationsIsolated(
   container: HTMLElement,
   options: AxeOptions = {}
 ): Promise<void> {
+  if (!shouldRunAxe()) return
   const results: AxeResults = await axe(container, {
     ...options,
     rules: {

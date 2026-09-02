@@ -5,12 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Slider } from '@expcat/tigercat-vue/Slider'
-import {
-  expectNoA11yViolationsIsolated,
-  componentSizes,
-  setThemeVariables,
-  clearThemeVariables
-} from '../utils'
+import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 const getThumb = (container: HTMLElement) =>
   container.querySelector('[role="slider"]') as HTMLElement
@@ -44,11 +39,6 @@ describe('Slider', () => {
     it('should apply custom className', () => {
       const { container } = render(Slider, { props: { className: 'custom-slider' } })
       expect(container.querySelector('.custom-slider')).toBeInTheDocument()
-    })
-
-    it.each(componentSizes)('should render %s size', (size) => {
-      const { container } = render(Slider, { props: { size } })
-      expect(getThumb(container)).toBeInTheDocument()
     })
   })
 

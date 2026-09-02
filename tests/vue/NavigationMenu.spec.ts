@@ -14,6 +14,7 @@ import {
   NavigationMenuTrigger
 } from '@expcat/tigercat-vue/NavigationMenu'
 import { expectNoA11yViolations } from '../utils'
+import { clickOutsideOverlay } from '../utils/frame-scheduler'
 
 function renderNav(props: Record<string, unknown> = {}) {
   return render(NavigationMenu, {
@@ -243,7 +244,7 @@ describe('NavigationMenu', () => {
     await fireEvent.click(screen.getByText('Disabled'))
     expect(getPanel()).not.toHaveAttribute('hidden')
 
-    await fireEvent.click(document.body)
+    await clickOutsideOverlay()
     expect(getPanel()).toHaveAttribute('hidden')
 
     await fireEvent.click(screen.getByRole('menuitem', { name: 'Products' }))

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, cleanup } from '@testing-library/vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { TabPane, Tabs } from '@expcat/tigercat-vue/Tabs'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -213,22 +213,6 @@ describe('Tabs', () => {
       })
 
       expect(screen.getByRole('tablist')).toHaveClass('justify-center')
-    })
-
-    it('should render tabs in different sizes', () => {
-      const sizes: Array<'small' | 'medium' | 'large'> = ['small', 'medium', 'large']
-
-      sizes.forEach((size) => {
-        render(Tabs, {
-          props: { size },
-          slots: {
-            default: () => [h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1')]
-          }
-        })
-
-        expect(screen.getByRole('tab', { name: 'Tab 1' })).toBeInTheDocument()
-        cleanup()
-      })
     })
   })
 

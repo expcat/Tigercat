@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, render, renderHook, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { useDrag } from '@expcat/tigercat-react'
+import { useDrag } from '@expcat/tigercat-react/useDrag'
 import { clearActiveListDrag, type DragItem } from '@expcat/tigercat-core'
 
 function makeItems(containerId = 'list-a'): DragItem[] {

@@ -12,6 +12,7 @@ import {
   ContextMenuSub
 } from '@expcat/tigercat-vue/ContextMenu'
 import { expectNoA11yViolationsIsolated } from '../utils'
+import { clickOutsideOverlay } from '../utils/frame-scheduler'
 
 function renderMenu(props: Record<string, unknown> = {}, extraItems: ReturnType<typeof h>[] = []) {
   return render(ContextMenu, {
@@ -95,7 +96,7 @@ describe('ContextMenu', () => {
     await fireEvent.click(screen.getByText('Disabled'))
     expect(getMenu()).not.toHaveAttribute('hidden')
 
-    await fireEvent.click(document.body)
+    await clickOutsideOverlay()
     expect(getMenu()).toHaveAttribute('hidden')
 
     await openMenu()

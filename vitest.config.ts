@@ -24,6 +24,26 @@ function buildSubpathAliases(framework: 'vue' | 'react') {
   )
 }
 
+function buildHookAliases(framework: 'vue' | 'react') {
+  const hookDir = framework === 'vue' ? 'composables' : 'hooks'
+  const names =
+    framework === 'vue'
+      ? ['useDrag', 'useFormController', 'useChartInteraction', 'useResponsiveChartSize']
+      : [
+          'useDrag',
+          'useControlledState',
+          'useFormController',
+          'useChartInteraction',
+          'useResponsiveChartSize'
+        ]
+  return Object.fromEntries(
+    names.map((name) => [
+      `@expcat/tigercat-${framework}/${name}`,
+      resolve(__dirname, `./packages/${framework}/src/${hookDir}/${name}`)
+    ])
+  )
+}
+
 const testAliases = {
   '@expcat/tigercat-core/locales': resolve(__dirname, './packages/core/src/utils/i18n/locales'),
   '@expcat/tigercat-core/datepicker-locales': resolve(
@@ -32,6 +52,8 @@ const testAliases = {
   ),
   ...buildSubpathAliases('vue'),
   ...buildSubpathAliases('react'),
+  ...buildHookAliases('vue'),
+  ...buildHookAliases('react'),
   '@expcat/tigercat-core': resolve(__dirname, './packages/core/src'),
   '@expcat/tigercat-vue': resolve(__dirname, './packages/vue/src'),
   '@expcat/tigercat-react': resolve(__dirname, './packages/react/src'),
@@ -55,12 +77,26 @@ const FORK_ONLY_SPECS = [
   'tests/vue/Notification.spec.ts'
 ]
 
+// Dual-framework axe/ARIA regressions. Default `pnpm test` skips them; run via
+// `pnpm test:a11y` (also sets TIGER_A11Y so jest-axe actually scans).
+const A11Y_SUITE_SPECS = [
+  'tests/core/a11y-aa-regression.spec.tsx',
+  'tests/core/a11y-interactive-regression.spec.tsx',
+  'tests/core/composite-a11y-roles.spec.tsx'
+]
+
 // The same imperative-API specs are kept out of the coverage run and executed
 // on their own by `pnpm test:special`. Declared here rather than as CLI
 // `--exclude` flags because `projects` does not inherit CLI include/exclude.
 const COVERAGE_EXCLUDED_SPECS = FORK_ONLY_SPECS.slice(1)
 
 const isCoverageRun = process.argv.includes('--coverage')
+const isA11ySuiteRun = process.argv.some((arg) =>
+  /a11y-aa-regression|a11y-interactive-regression|composite-a11y-roles/.test(arg)
+)
+if (isA11ySuiteRun) {
+  process.env.TIGER_A11Y = '1'
+}
 // The unit project never runs fork-only specs. The fork-only project drops the
 // coverage-excluded ones when coverage is on, so `pnpm test:coverage` sees the
 // same 393 files it did before the pool split.
@@ -91,7 +127,7 @@ export default defineConfig({
           name: 'unit',
           pool: 'threads',
           include: ['tests/**/*.{test,spec}.{js,ts,tsx}'],
-          exclude: FORK_ONLY_SPECS
+          exclude: [...FORK_ONLY_SPECS, ...(isA11ySuiteRun ? [] : A11Y_SUITE_SPECS)]
         },
         resolve: { alias: testAliases }
       },

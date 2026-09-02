@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { createElement } from 'react'
+import { render } from '@testing-library/react'
+import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
 import {
   createTigercatPlugin,
   defaultTheme,
@@ -171,19 +174,15 @@ describe('Modern theme — component class consumption stays token-stable', () =
     document.documentElement.removeAttribute('data-tiger-style')
   })
 
-  it('component-side class strings keep referencing var(--tiger-radius-md, ...) regardless of style', async () => {
-    const { ChatWindow } = await import('@expcat/tigercat-react')
-    const { render } = await import('@testing-library/react')
-    const React = await import('react')
-
-    const { container, rerender } = render(React.createElement(ChatWindow, { messages: [] }))
+  it('component-side class strings keep referencing var(--tiger-radius-md, ...) regardless of style', () => {
+    const { container, rerender } = render(createElement(ChatWindow, { messages: [] }))
     const root = container.querySelector('.tiger-chat-window') as HTMLElement
     expect(root).toBeTruthy()
     const baseClass = root.className
     expect(baseClass).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
 
     document.documentElement.setAttribute('data-tiger-style', 'modern')
-    rerender(React.createElement(ChatWindow, { messages: [] }))
+    rerender(createElement(ChatWindow, { messages: [] }))
     const rootAfter = container.querySelector('.tiger-chat-window') as HTMLElement
     // Class references the same CSS variable — only the resolved value
     // changes via the cascade, not the className itself.

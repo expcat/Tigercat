@@ -7,13 +7,7 @@ import { render, fireEvent } from '@testing-library/vue'
 import { nextTick, defineComponent, h, ref } from 'vue'
 import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
-import {
-  renderWithProps,
-  expectNoA11yViolationsIsolated,
-  componentSizes,
-  setThemeVariables,
-  clearThemeVariables
-} from '../utils'
+import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 const getBox = (container: HTMLElement) =>
   container.querySelector('input[type="checkbox"]') as HTMLInputElement
@@ -43,11 +37,6 @@ describe('Checkbox', () => {
         slots: { default: 'Custom' }
       })
       expect(container.querySelector('label')).toHaveClass('custom-checkbox')
-    })
-
-    it.each(componentSizes)('renders %s size', (size) => {
-      const { container } = renderWithProps(Checkbox, { size }, { slots: { default: 'Checkbox' } })
-      expect(getBox(container)).toBeInTheDocument()
     })
   })
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useChartInteraction } from '@expcat/tigercat-react'
-import type { UseChartInteractionOptions } from '@expcat/tigercat-react'
+import { useChartInteraction } from '@expcat/tigercat-react/useChartInteraction'
+import type { UseChartInteractionOptions } from '@expcat/tigercat-react/useChartInteraction'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
 describe('useChartInteraction (React)', () => {

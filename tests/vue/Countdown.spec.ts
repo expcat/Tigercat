@@ -67,11 +67,6 @@ describe('Countdown', () => {
     expect(screen.getByTestId('countdown')).toBeInTheDocument()
   })
 
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    renderWithProps(Countdown, { title: 'Timer', value: baseTime + 5000, now: baseTime, size })
-    expect(screen.getByText('Timer')).toBeInTheDocument()
-  })
-
   it('supports total-hour default formatting', () => {
     renderWithProps(Countdown, { value: baseTime + 90061000, now: baseTime })
     expect(screen.getByRole('timer')).toHaveTextContent('25:01:01')

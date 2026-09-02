@@ -6,14 +6,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Input } from '@expcat/tigercat-vue/Input'
-import type { InputType, InputStatus } from '@expcat/tigercat-core'
+import type { InputType } from '@expcat/tigercat-core'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
-  clearThemeVariables,
-  edgeCaseData
+  clearThemeVariables
 } from '../utils'
 
 describe('Input', () => {
@@ -126,15 +124,6 @@ describe('Input', () => {
       expect(input?.className).not.toContain('border-[var(--tiger-error')
     })
 
-    it('puts border and radius on the wrapper, not the native input', () => {
-      const { container } = render(Input)
-      const wrapper = container.firstChild as HTMLElement
-      const input = container.querySelector('input')
-      expect(wrapper.className).toContain('border')
-      expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md')
-      expect(input?.className).not.toContain('rounded-[var(--tiger-radius-md')
-    })
-
     it('should render error message below the chrome field', () => {
       const { container } = render(Input, {
         props: { status: 'error', errorMessage: 'Bad input' }
@@ -167,24 +156,9 @@ describe('Input', () => {
       })
       expect(container).toHaveTextContent('Visible suffix')
     })
-
-    it.each(['success', 'warning'] as InputStatus[])('should handle %s status', (status) => {
-      const { container } = render(Input, {
-        props: { status }
-      })
-      const input = container.querySelector('input')
-      expect(input).toBeInTheDocument()
-    })
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { getByRole } = renderWithProps(Input, { size })
-
-      const input = getByRole('textbox')
-      expect(input).toBeInTheDocument()
-    })
-
     it('should handle different input types', () => {
       const types: InputType[] = ['text', 'password', 'email', 'number', 'tel', 'url']
 

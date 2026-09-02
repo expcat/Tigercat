@@ -54,12 +54,6 @@ describe('Statistic', () => {
     expect(root?.getAttribute('data-testid')).toBe('stat')
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    renderWithProps(Statistic, { title: 'T', value: 1, size })
-    expect(screen.getByText('T')).toBeInTheDocument()
-  })
-
   // --- Precision ---
   it('formats value with precision', () => {
     renderWithProps(Statistic, { title: 'T', value: 123.4, precision: 2 })

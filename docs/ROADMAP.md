@@ -44,9 +44,9 @@ source: current repository state after v2.1.1 review-fix patch
 
 ## 发布与验证边界
 
-- `.github/workflows/` 只保留打 tag、发布包和部署 Pages 所需流程;测试在本地执行。
+- `.github/workflows/` 只保留打 tag、发布包和部署 Pages 所需流程;测试在本地执行（`pnpm test` / `pnpm e2e`，全浏览器用 `pnpm e2e:full`）。不要把测试接到 CI。
 - E2E 只验证跨浏览器功能行为,不维护图片对比基线。
-- 发布前本地执行完整门禁 quality:release 与 e2e。按改动范围可先运行 focused/group checks,最终只运行一次完整门禁。
+- 发布前本地执行完整门禁 quality:release，再按需 `pnpm e2e:full`。按改动范围可先运行 focused/group checks，最终只运行一次完整门禁。日常 e2e 用 Chromium：`pnpm e2e`。
 - public API、shared contract、props、events、methods、type aliases 或 helper exports 发生变化时,同步更新 CHANGELOG.md、docs/MIGRATION.md、API baseline、generated Skill references、examples 与对应测试。
 - 生成产物只能通过事实源或生成器重建,不得手改 skills/tigercat/references 生成物或 api-reports 掩盖漂移。
 

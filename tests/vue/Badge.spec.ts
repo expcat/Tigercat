@@ -22,11 +22,6 @@ describe('Badge', () => {
     expect(container.querySelector('.custom-class')).toBeInTheDocument()
   })
 
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    renderWithProps(Badge, { content: 1, size })
-    expect(screen.getByText('1')).toBeInTheDocument()
-  })
-
   it('renders a decorative dot unless the caller names it', () => {
     const { container } = renderWithProps(Badge, { type: 'dot' })
     const badge = container.firstElementChild
@@ -91,7 +86,6 @@ describe('Badge', () => {
       { slots: { default: '<button>消息</button>' } }
     )
     expect(container.firstElementChild).toHaveClass('host-class')
-    expect(container.firstElementChild).toHaveClass('relative')
   })
 
   it('warns when children are passed in standalone mode', () => {

@@ -6,8 +6,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  // Keep the two Vite example servers stable across the three browser engines.
-  // The full suite is a release gate, so determinism matters more than local fan-out.
+  // Keep the two Vite example servers stable across browser engines.
+  // `pnpm e2e` is Chromium-only; `pnpm e2e:full` runs every project below.
   workers: 1,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'html',
   use: {

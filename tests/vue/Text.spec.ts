@@ -40,50 +40,6 @@ describe('Text (Vue)', () => {
     expect(el).toHaveAttribute('aria-label', 'Label')
   })
 
-  it('applies key style props', () => {
-    const { container } = renderWithProps(
-      Text,
-      {
-        tag: 'h1',
-        size: '2xl',
-        weight: 'bold',
-        align: 'center',
-        color: 'primary',
-        underline: true
-      },
-      { slots: { default: 'Heading' } }
-    )
-
-    const heading = container.querySelector('h1')
-    expect(heading?.className).toContain('text-2xl')
-    expect(heading?.className).toContain('font-bold')
-    expect(heading?.className).toContain('text-center')
-    expect(heading).toHaveClass('underline')
-  })
-
-  it('applies text decoration props individually', () => {
-    const { container: c1 } = renderWithProps(
-      Text,
-      { truncate: true },
-      { slots: { default: 'Truncated' } }
-    )
-    expect(c1.querySelector('p')).toHaveClass('truncate')
-
-    const { container: c2 } = renderWithProps(
-      Text,
-      { italic: true },
-      { slots: { default: 'Italic' } }
-    )
-    expect(c2.querySelector('p')).toHaveClass('italic')
-
-    const { container: c3 } = renderWithProps(
-      Text,
-      { lineThrough: true },
-      { slots: { default: 'Deleted' } }
-    )
-    expect(c3.querySelector('p')).toHaveClass('line-through')
-  })
-
   it('has no obvious a11y violations', async () => {
     const { container } = renderWithProps(
       Text,

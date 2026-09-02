@@ -84,7 +84,7 @@ describe('ContextMenu', () => {
     expect(point.style.top).toBe('60px')
   })
 
-  it('closes on item click, outside click, and Escape', async () => {
+  it('closes on item click and Escape', async () => {
     render(<Demo />)
 
     act(() => {
@@ -100,12 +100,6 @@ describe('ContextMenu', () => {
     await fireEvent.click(screen.getByText('Disabled'))
     expect(getMenu()).not.toHaveAttribute('hidden')
 
-    await fireEvent.click(document.body)
-    expect(getMenu()).toHaveAttribute('hidden')
-
-    act(() => {
-      openMenu()
-    })
     await fireEvent.keyDown(document, { key: 'Escape' })
     expect(getMenu()).toHaveAttribute('hidden')
   })

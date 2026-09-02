@@ -5,15 +5,13 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React, { createRef } from 'react'
-import { getEmptyDescription, getEmptyIllustration } from '@expcat/tigercat-core'
+import { getEmptyDescription } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { Empty } from '@expcat/tigercat-react/Empty'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
-
-const galleryPresets = ['default', 'simple', 'no-data', 'no-results', 'error'] as const
 
 describe('Empty (React)', () => {
   describe('Rendering', () => {
@@ -84,21 +82,6 @@ describe('Empty (React)', () => {
       const { container } = render(<Empty preset="simple" />)
       expect(container.querySelector('svg')).not.toBeInTheDocument()
       expect(screen.getByText(getEmptyDescription('simple'))).toBeInTheDocument()
-    })
-
-    it('draws a different illustration for error than default', () => {
-      const defaultPaths = getEmptyIllustration('default')!
-        .paths.map((p) => p.d)
-        .join('|')
-      const { container } = render(<Empty preset="error" />)
-      const d = [...container.querySelectorAll('path')].map((p) => p.getAttribute('d')).join('|')
-      expect(d).toBeTruthy()
-      expect(d).not.toBe(defaultPaths)
-    })
-
-    it.each(galleryPresets)('renders empty/02 gallery preset "%s"', (preset) => {
-      render(<Empty preset={preset} />)
-      expect(screen.getByText(getEmptyDescription(preset))).toBeInTheDocument()
     })
   })
 

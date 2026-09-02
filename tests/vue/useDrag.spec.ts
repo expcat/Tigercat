@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { render, fireEvent } from '@testing-library/vue'
-import { useDrag } from '@expcat/tigercat-vue'
+import { useDrag } from '@expcat/tigercat-vue/useDrag'
 import { clearActiveListDrag, type DragItem } from '@expcat/tigercat-core'
 
 function setupDrag(options = {}) {

@@ -6,7 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { useState } from 'react'
 import { act, render, renderHook } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Switch, useControlledState } from '@expcat/tigercat-react'
+import { Switch } from '@expcat/tigercat-react/Switch'
+import { useControlledState } from '@expcat/tigercat-react/useControlledState'
 
 describe('useControlledState', () => {
   it('uncontrolled: starts from defaultValue, updates internal state and fires onChange', () => {

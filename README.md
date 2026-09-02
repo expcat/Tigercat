@@ -170,7 +170,7 @@ pnpm example:react  # http://localhost:5174
 | `pnpm test:a11y`       | 运行 axe 无障碍回归                  |
 | `pnpm quality:quick`   | 运行静态检查与 core 快速回归         |
 | `pnpm quality:release` | 运行完整本地发布门禁                 |
-| `pnpm e2e`             | 运行跨浏览器功能 E2E                 |
+| `pnpm e2e`             | 本地 Chromium E2E（全引擎用 e2e:full） |
 | `pnpm size`            | 检查 bundle 大小                     |
 | `pnpm docs:api`        | 重新生成 Skill API 摘要              |
 | `pnpm mcp:build`       | 构建 MCP 服务                        |

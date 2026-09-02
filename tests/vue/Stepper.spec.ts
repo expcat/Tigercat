@@ -29,11 +29,6 @@ describe('Stepper', () => {
     expect(container.querySelector('.my-stepper')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    const { container } = renderWithProps(Stepper, { size })
-    expect(container.querySelector('input')).toBeInTheDocument()
-  })
   // --- Increment / Decrement ---
   it('increments on plus click', async () => {
     const onChange = vi.fn()

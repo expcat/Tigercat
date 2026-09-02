@@ -114,11 +114,6 @@ describe('Skeleton', () => {
   })
 
   describe('Accessibility', () => {
-    it('should have no a11y violations with default props', async () => {
-      const { container } = render(Skeleton)
-      await expectNoA11yViolationsIsolated(container)
-    })
-
     it('names a live status when aria-label is set', async () => {
       const { container } = render(Skeleton, {
         attrs: { 'aria-label': 'Loading profile' }

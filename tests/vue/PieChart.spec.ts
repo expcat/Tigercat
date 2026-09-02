@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { h } from 'vue'
-import { PieChart, ConfigProvider } from '@expcat/tigercat-vue'
+import { PieChart } from '@expcat/tigercat-vue/PieChart'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { render } from '@testing-library/vue'

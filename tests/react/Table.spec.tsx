@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { act, render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Table } from '@expcat/tigercat-react/Table'
+import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-react/Dropdown'
 import type { TableColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 import { MockResizeObserver } from '../utils/mock-observers'
@@ -648,7 +649,6 @@ describe('Table', () => {
     })
 
     it('renders portaled dropdown menus from fixed action columns into document.body', async () => {
-      const { Dropdown, DropdownMenu, DropdownItem } = await import('@expcat/tigercat-react')
       const fixedColumns: TableColumn[] = [
         { key: 'name', title: 'Name', width: 140 },
         {

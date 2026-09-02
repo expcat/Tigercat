@@ -104,12 +104,9 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
 
 const CORE_EXTRAS = {
   basic: [
-    'a11y-aa-regression.spec.tsx',
-    'a11y-interactive-regression.spec.tsx',
     'a11y-utils.spec.ts',
     'class-names.spec.ts',
     'coerce-class-value.spec.ts',
-    'composite-a11y-roles.spec.tsx',
     'design-tokens.spec.ts',
     'dev-warn.spec.ts',
     'modern-style-components.spec.tsx',
@@ -166,11 +163,7 @@ const CORE_EXTRAS = {
     'rich-text-engine.spec.ts',
     'virtual-list-strategies.spec.ts'
   ],
-  composite: [
-    'composite-a11y-roles.spec.tsx',
-    'task-board-drag.spec.ts',
-    'task-board-utils.spec.ts'
-  ]
+  composite: ['task-board-drag.spec.ts', 'task-board-utils.spec.ts']
 }
 
 export const GROUP_FILTER_ALIASES = {

@@ -28,39 +28,35 @@ async function inspectRoute(
     }
 
     // A fresh document keeps compiler workers, iframes and overlays isolated per route.
-    const modules = page.locator(`[data-demo-id^="${route}-"]`)
-    await expect(modules.first()).toBeAttached({ timeout: 30_000 })
-    const count = await modules.count()
-    expect(count, `${framework} ${route} should expose demo modules`).toBeGreaterThan(0)
-
-    for (let index = 0; index < count; index++) {
-      const moduleRoot = modules.nth(index)
-      await moduleRoot.scrollIntoViewIfNeeded()
-      await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
-      const status = moduleRoot.locator('[aria-live="polite"]')
-      await expect(status).toHaveText(/^(ready|compile-error|runtime-error)$/, {
-        timeout: 60_000
-      })
-      const finalStatus = await status.textContent()
-      if (finalStatus !== 'ready') {
-        const diagnostics = await moduleRoot.locator('[role="alert"]').allTextContents()
-        const detail = diagnostics.join(' | ')
-        if (transientRuntimeFailure.test(detail)) {
-          throw new Error(detail)
-        }
-        expect(finalStatus, `${framework} ${route} ${index + 1}: ${detail}`).toBe('ready')
+    // Compile of every DemoBlock file is `pnpm example:compile:check`; the browser
+    // job only needs one sandbox per route to prove the iframe actually runs.
+    const moduleRoot = page.locator(`[data-demo-id^="${route}-"]`).first()
+    await expect(moduleRoot).toBeAttached({ timeout: 30_000 })
+    await moduleRoot.scrollIntoViewIfNeeded()
+    await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
+    const status = moduleRoot.locator('[aria-live="polite"]')
+    await expect(status).toHaveText(/^(ready|compile-error|runtime-error)$/, {
+      timeout: 60_000
+    })
+    const finalStatus = await status.textContent()
+    if (finalStatus !== 'ready') {
+      const diagnostics = await moduleRoot.locator('[role="alert"]').allTextContents()
+      const detail = diagnostics.join(' | ')
+      if (transientRuntimeFailure.test(detail)) {
+        throw new Error(detail)
       }
-      await moduleRoot
-        .frameLocator('iframe')
-        .locator('body')
-        .evaluate(
-          () =>
-            new Promise<void>((resolve) => {
-              requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-            })
-        )
-      await expect(moduleRoot.locator('[role="alert"]')).toHaveCount(0)
+      expect(finalStatus, `${framework} ${route}: ${detail}`).toBe('ready')
     }
+    await moduleRoot
+      .frameLocator('iframe')
+      .locator('body')
+      .evaluate(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+          })
+      )
+    await expect(moduleRoot.locator('[role="alert"]')).toHaveCount(0)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     if (attempt >= 2 || !transientRuntimeFailure.test(message)) throw error

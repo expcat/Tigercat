@@ -79,14 +79,4 @@ test.describe('Mobile touch interactions', () => {
     await dispatchTouchSwipe(drawer, 260, 360)
     await expect(preview.locator('[data-tiger-drawer-root]')).toBeHidden()
   })
-
-  test('number keyboard tap changes the bound input on mobile Chromium', async ({
-    page
-  }, testInfo) => {
-    test.skip(testInfo.project.name !== 'mobile-chromium', 'Touch coverage uses mobile Chromium')
-    const { preview } = await openDemo(page, REACT_URL, 'number-keyboard', 'number-keyboard-01')
-    await preview.getByPlaceholder('输入金额').click()
-    await preview.getByRole('button', { name: '1' }).click()
-    await expect(preview.getByPlaceholder('输入金额')).toHaveValue('1')
-  })
 })

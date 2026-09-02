@@ -16,8 +16,7 @@ import {
   scheduleOverlayLeave,
   canStartOverlaySwipeClose,
   isOverlayDragHandleEvent,
-  clampOverlayDragOffset,
-  resolveDrawerPlacement
+  clampOverlayDragOffset
 } from '@expcat/tigercat-core'
 
 describe('overlay-utils (core)', () => {
@@ -153,13 +152,6 @@ describe('overlay-utils (core)', () => {
     )
     expect(next.x).toBe(800 - 48 - 100)
     expect(next.y).toBe(600 - 48 - 80)
-  })
-
-  it('resolveDrawerPlacement maps start/end to the physical edge', () => {
-    expect(resolveDrawerPlacement('start', 'ltr')).toBe('left')
-    expect(resolveDrawerPlacement('start', 'rtl')).toBe('right')
-    expect(resolveDrawerPlacement('end', 'rtl')).toBe('left')
-    expect(resolveDrawerPlacement('bottom', 'rtl')).toBe('bottom')
   })
 
   it('scheduleOverlayLeave finishes immediately when motion is reduced', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { useResponsiveChartSize } from '@expcat/tigercat-vue'
+import { useResponsiveChartSize } from '@expcat/tigercat-vue/useResponsiveChartSize'
 import { DEFAULT_CHART_PADDING } from '@expcat/tigercat-core'
 
 describe('useResponsiveChartSize', () => {

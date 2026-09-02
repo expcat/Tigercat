@@ -15,10 +15,6 @@ import {
   getTableColgroup,
   orderTableFixedColumns,
   resolveTableColumnWidth,
-  getTableFixedCellClasses,
-  getTableFixedHeaderCellClasses,
-  getTableResponsiveCardListClasses,
-  getTableResponsiveTableClasses,
   getTableCardSortValue,
   getTableCardViewportQuery,
   getTableChromeSlots,
@@ -27,17 +23,11 @@ import {
   canUseTableVirtualWindow,
   getTableVirtualRecommendation,
   getTableVirtualWindow,
-  getTableRowClasses,
-  getTableHeaderClasses,
+  getTableFixedCellClasses,
   hasTableSelectionColumn,
-  getExpandedRowClasses,
   getRowKey,
   sortData,
-  tableBaseClasses,
-  tableSummaryRowClasses,
-  tableBackgroundClasses,
   tableFixedCellStripedClasses,
-  tableHeaderBackgroundClasses,
   tableRowGroupHoverClasses,
   tableRowStripedClasses,
   type TableColumn
@@ -440,56 +430,6 @@ describe('table-utils', () => {
         })
       ).toBeUndefined()
     })
-
-    it('builds default and custom classes for fixed header cells', () => {
-      const columns: TableColumn[] = [
-        {
-          key: 'actions',
-          title: 'Actions',
-          fixed: 'right',
-          fixedHeaderClassName: ({ view, fixed, stickyHeader }) =>
-            `${view}-${fixed}-${stickyHeader ? 'sticky' : 'static'}`
-        }
-      ]
-      const fixedInfo = getFixedColumnOffsets(columns)
-
-      const classes = getTableFixedHeaderCellClasses({
-        view: 'virtual-table',
-        column: columns[0],
-        stickyHeader: true,
-        fixedInfo
-      })
-
-      expect(classes).toContain(tableHeaderBackgroundClasses)
-      expect(classes).toContain('virtual-table-right-sticky')
-      expect(
-        getTableFixedHeaderCellClasses({
-          view: 'table',
-          column: { key: 'name', title: 'Name' },
-          stickyHeader: false,
-          fixedInfo
-        })
-      ).toBeUndefined()
-    })
-
-    it('falls back to the table background for non-striped fixed cells', () => {
-      const columns: TableColumn[] = [{ key: 'name', title: 'Name', fixed: 'left' }]
-      const fixedInfo = getFixedColumnOffsets(columns)
-
-      const classes = getTableFixedCellClasses({
-        view: 'table',
-        column: columns[0],
-        record: { id: 1 },
-        rowIndex: 1,
-        striped: true,
-        stripedActive: false,
-        selected: false,
-        hoverable: false,
-        fixedInfo
-      })
-
-      expect(classes).toContain(tableBackgroundClasses)
-    })
   })
 
   describe('getTableVirtualRecommendation', () => {
@@ -656,22 +596,6 @@ describe('table-utils', () => {
   })
 
   describe('responsive card classes', () => {
-    it('maps card mode + breakpoint to the matching max-* hide class', () => {
-      expect(getTableResponsiveTableClasses('card')).toBe('max-sm:hidden')
-      expect(getTableResponsiveTableClasses('card', 'md')).toBe('max-md:hidden')
-      expect(getTableResponsiveTableClasses('card', 'lg')).toBe('max-lg:hidden')
-    })
-
-    it('maps scroll mode to the matching min-w class', () => {
-      expect(getTableResponsiveTableClasses('scroll')).toBe('max-sm:min-w-max')
-      expect(getTableResponsiveTableClasses('scroll', 'md')).toBe('max-md:min-w-max')
-    })
-
-    it('resolves the card list container classes per breakpoint', () => {
-      expect(getTableResponsiveCardListClasses()).toContain('max-sm:grid')
-      expect(getTableResponsiveCardListClasses('lg')).toContain('max-lg:grid')
-    })
-
     it('maps card breakpoints to a max-width media query one pixel below the token', () => {
       expect(getTableCardViewportQuery('sm')).toBe('(max-width: 639px)')
       expect(getTableCardViewportQuery('md')).toBe('(max-width: 767px)')
@@ -709,30 +633,6 @@ describe('table-utils', () => {
         false
       )
       expect(canUseTableVirtualWindow({ groupBy: 'dept' })).toBe(false)
-    })
-  })
-
-  describe('separate border model (sticky stability)', () => {
-    it('uses border-separate so sticky/fixed columns pin reliably', () => {
-      expect(tableBaseClasses).toContain('border-separate')
-      expect(tableBaseClasses).toContain('border-spacing-0')
-      expect(tableBaseClasses).not.toContain('border-collapse')
-    })
-
-    it('puts row separators on cells, not on <tr>', () => {
-      const cls = getTableRowClasses(true, true, true)
-      // border lives on direct <td> children of non-last rows
-      expect(cls).toContain('[&:not(:last-child)>td]:border-b')
-      // no bare row-level border that would not paint under border-separate
-      expect(cls).not.toMatch(/(^|\s)border-b(\s|$)/)
-      expect(cls).not.toContain('last:border-b-0')
-    })
-
-    it('puts header + expanded-row + summary separators on cells', () => {
-      expect(getTableHeaderClasses(false)).toContain('[&_th]:border-b')
-      expect(getExpandedRowClasses()).toContain('[&:not(:last-child)>td]:border-b')
-      expect(tableSummaryRowClasses).toContain('[&>td]:border-t-2')
-      expect(tableSummaryRowClasses).not.toMatch(/(^|\s)border-t-2(\s|$)/)
     })
   })
 

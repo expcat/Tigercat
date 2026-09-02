@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { useFormController } from '@expcat/tigercat-vue'
+import { useFormController } from '@expcat/tigercat-vue/useFormController'
 
 describe('useFormController (Vue)', () => {
   describe('values', () => {

@@ -212,23 +212,6 @@ describe('Tabs', () => {
 
       expect(screen.getByRole('tablist')).toHaveClass('justify-center')
     })
-
-    it('should render tabs in different sizes', () => {
-      const sizes: Array<'small' | 'medium' | 'large'> = ['small', 'medium', 'large']
-
-      sizes.forEach((size) => {
-        render(
-          <Tabs size={size}>
-            <TabPane tabKey="1" label={`Tab ${size}`}>
-              Content 1
-            </TabPane>
-          </Tabs>
-        )
-
-        const tab = screen.getByText(`Tab ${size}`)
-        expect(tab).toBeInTheDocument()
-      })
-    })
   })
 
   describe('Events', () => {

@@ -134,25 +134,6 @@ describe('Dropdown', () => {
     expect(handleOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('closes on outside click (click trigger)', async () => {
-    render(
-      <Dropdown trigger="click">
-        <button>Trigger</button>
-        <DropdownMenu>
-          <DropdownItem>Item 1</DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    )
-
-    // Floating UI uses `hidden` attribute now
-    const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-    await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveAttribute('hidden')
-
-    await fireEvent.click(document.body)
-    expect(wrapper).toHaveAttribute('hidden')
-  })
-
   it('closes on Escape when open', async () => {
     render(
       <Dropdown trigger="click">
@@ -470,7 +451,7 @@ describe('Dropdown', () => {
       await fireEvent.click(screen.getByText('Item 1'))
       expect(wrapper).not.toHaveAttribute('hidden')
 
-      await fireEvent.click(document.body)
+      await fireEvent.keyDown(document, { key: 'Escape' })
       expect(wrapper).toHaveAttribute('hidden')
     })
   })

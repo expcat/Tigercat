@@ -7,7 +7,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Space } from '@expcat/tigercat-react/Space'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[data-tiger-space]') as HTMLElement
@@ -90,7 +89,6 @@ describe('Space (React)', () => {
 
     const el = getRoot(container)
     expect(el.className).toContain('custom')
-    expect(el.className).toContain('tiger-space')
     expect(el.style.backgroundColor).toBe('red')
     expect(el.style.gap).toBe('20px')
   })
@@ -104,12 +102,5 @@ describe('Space (React)', () => {
     expect(el).toHaveAttribute('aria-label', 'space')
     await user.click(el)
     expect(onClick).toHaveBeenCalledTimes(1)
-  })
-
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Space />)
-      await expectNoA11yViolationsIsolated(container)
-    })
   })
 })

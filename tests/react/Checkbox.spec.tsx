@@ -10,7 +10,6 @@ import { Checkbox } from '@expcat/tigercat-react/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
 import {
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
   clearThemeVariables
 } from '../utils/react'
@@ -34,11 +33,6 @@ describe('Checkbox', () => {
     it('applies custom className to the label', () => {
       const { container } = render(<Checkbox className="custom-checkbox">Custom</Checkbox>)
       expect(container.querySelector('label')).toHaveClass('custom-checkbox')
-    })
-
-    it.each(componentSizes)('renders %s size', (size) => {
-      const { container } = render(<Checkbox size={size}>Checkbox</Checkbox>)
-      expect(getBox(container)).toBeInTheDocument()
     })
   })
 

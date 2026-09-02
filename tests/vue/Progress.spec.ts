@@ -24,7 +24,6 @@ describe('Progress', () => {
     expect(progressbar).toHaveAttribute('aria-valuemin', '0')
     expect(progressbar).toHaveAttribute('aria-valuemax', '100')
     expect(progressbar).toHaveAttribute('aria-label', 'Progress')
-    expect(progressbar.className).toContain('w-full')
     expect(fillOf(container)).toHaveStyle({ width: '0%' })
   })
 
@@ -41,21 +40,6 @@ describe('Progress', () => {
   it('clamps NaN to 0', () => {
     renderWithProps(Progress, { percentage: Number.NaN })
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
-  })
-
-  it('applies variant color classes on the fill', () => {
-    const { container } = renderWithProps(Progress, { percentage: 50, variant: 'success' })
-    expect(fillOf(container)?.className).toContain('success')
-  })
-
-  it('status overrides variant color', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 50,
-      variant: 'primary',
-      status: 'exception'
-    })
-    expect(fillOf(container)?.className).toContain('error')
-    expect(fillOf(container)?.className).not.toContain('primary')
   })
 
   it('hides text when showText is false', () => {
@@ -139,41 +123,6 @@ describe('Progress', () => {
     })
     expect(container.querySelector('svg')).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75')
-  })
-
-  it('applies success status color', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 100,
-      status: 'success'
-    })
-    expect(fillOf(container)?.className).toContain('success')
-  })
-
-  it('renders striped without animation', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 50,
-      striped: true,
-      stripedAnimation: false
-    })
-    expect(fillOf(container)?.className).toContain('tiger-progress-striped')
-    expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
-  })
-
-  it('animates stripes and pauses them', async () => {
-    const { container, rerender } = renderWithProps(Progress, {
-      percentage: 50,
-      striped: true,
-      stripedAnimation: true
-    })
-    expect(fillOf(container)?.className).toContain('tiger-progress-striped-animated')
-    await rerender({
-      percentage: 50,
-      striped: true,
-      stripedAnimation: true,
-      status: 'paused'
-    })
-    expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
-    expect(screen.getByRole('progressbar').className).toContain('tiger-progress-paused')
   })
 
   it('passes basic a11y checks', async () => {

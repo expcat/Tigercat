@@ -18,13 +18,6 @@ describe('Icon (React)', () => {
     </svg>
   )
 
-  it('renders SVG with default size classes', () => {
-    const { container } = renderWithChildren(Icon, SimpleSVG)
-    const svg = container.querySelector('svg')
-    expect(svg).toBeInTheDocument()
-    expect(svg).toHaveClass('inline-block', 'w-5', 'h-5')
-  })
-
   it('renders a built-in icon by name', () => {
     const { container } = render(<Icon name="check" />)
     const svg = container.querySelector('svg')
@@ -73,11 +66,6 @@ describe('Icon (React)', () => {
     expect(container.querySelector('span')).toHaveStyle({ color: 'red' })
   })
 
-  it('falls back to md size classes for an unknown size', () => {
-    const { container } = render(<Icon name="check" size={'xxl' as 'md'} />)
-    expect(container.querySelector('svg')).toHaveClass('w-5', 'h-5')
-  })
-
   it('warns for an unknown built-in name and renders an empty decorative span', () => {
     resetDevWarnCache()
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -93,23 +81,6 @@ describe('Icon (React)', () => {
   it('prefers custom children over the icon prop', () => {
     const { container } = render(<Icon icon={logo}>{SimpleSVG}</Icon>)
     expect(container.querySelector('svg path')).toHaveAttribute('d', 'M5 12h14')
-  })
-
-  it('applies each size correctly', () => {
-    const sizes = {
-      sm: ['w-4', 'h-4'],
-      md: ['w-5', 'h-5'],
-      lg: ['w-6', 'h-6'],
-      xl: ['w-8', 'h-8']
-    } as const
-    for (const [size, classes] of Object.entries(sizes)) {
-      const { container } = renderWithProps(Icon, {
-        size: size as 'sm' | 'md' | 'lg' | 'xl',
-        children: SimpleSVG
-      })
-      const svg = container.querySelector('svg')
-      expect(svg).toHaveClass(...classes)
-    }
   })
 
   it('sets wrapper color style and keeps SVG stroke default', () => {

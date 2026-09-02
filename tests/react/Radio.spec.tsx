@@ -11,7 +11,6 @@ import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
 import {
   expectNoA11yViolations,
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
   clearThemeVariables
 } from '../utils/react'
@@ -38,15 +37,6 @@ describe('Radio', () => {
         </Radio>
       )
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
-    })
-
-    it.each(componentSizes)('should render %s size', (size) => {
-      const { container } = render(
-        <Radio value="option1" size={size}>
-          Option
-        </Radio>
-      )
-      expect(getRadio(container)).toBeInTheDocument()
     })
 
     it('should apply the name attribute', () => {

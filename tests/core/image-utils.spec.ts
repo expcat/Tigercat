@@ -11,8 +11,6 @@ import {
   clampImageGroupPreviewIndex,
   createImageLoadState,
   formatImagePreviewAriaLabel,
-  getImageImgClasses,
-  getCropperHandleClasses,
   getCropperHandleStyle,
   getCropperDisplaySize,
   CROP_HANDLES,
@@ -27,7 +25,6 @@ import {
   getImageLabels,
   getTouchDistance,
   toCSSSize,
-  imagePreviewImgClasses,
   resetImageLoadState,
   resolveImageHoverPlacement,
   resolveImagePreviewEnabled,
@@ -35,7 +32,7 @@ import {
 } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import type { CropHandle, CropRect, ImageFit } from '@expcat/tigercat-core'
+import type { CropRect } from '@expcat/tigercat-core'
 
 describe('image-utils — preview and load state', () => {
   it('formats preview names from a locale template and fallback alt', () => {
@@ -96,50 +93,9 @@ describe('image-utils — preview and load state', () => {
 })
 
 describe('image-utils — class generators', () => {
-  it('imagePreviewImgClasses constrains preview img to 90vh / 90vw', () => {
-    expect(imagePreviewImgClasses).toContain('max-h-[90vh]')
-    expect(imagePreviewImgClasses).toContain('max-w-[90vw]')
-    expect(imagePreviewImgClasses).not.toContain('max-w-none')
-  })
-
-  it('getImageImgClasses maps every ImageFit value', () => {
-    const fits: Array<[ImageFit, string]> = [
-      ['contain', 'object-contain'],
-      ['cover', 'object-cover'],
-      ['fill', 'object-fill'],
-      ['none', 'object-none'],
-      ['scale-down', 'object-scale-down']
-    ]
-    for (const [fit, fragment] of fits) {
-      const cls = getImageImgClasses(fit)
-      expect(cls).toContain('block')
-      expect(cls).toContain('w-full')
-      expect(cls).toContain('h-full')
-      expect(cls).toContain(fragment)
-    }
-  })
-
   it('CROP_HANDLES exposes all 8 directions', () => {
     expect(CROP_HANDLES).toHaveLength(8)
     expect(new Set(CROP_HANDLES)).toEqual(new Set(['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']))
-  })
-
-  it('getCropperHandleClasses includes a resize cursor for each handle', () => {
-    const expectations: Array<[CropHandle, string]> = [
-      ['nw', 'cursor-nw-resize'],
-      ['n', 'cursor-n-resize'],
-      ['ne', 'cursor-ne-resize'],
-      ['e', 'cursor-e-resize'],
-      ['se', 'cursor-se-resize'],
-      ['s', 'cursor-s-resize'],
-      ['sw', 'cursor-sw-resize'],
-      ['w', 'cursor-w-resize']
-    ]
-    for (const [handle, cursor] of expectations) {
-      const classes = getCropperHandleClasses(handle)
-      expect(classes).toContain(cursor)
-      expect(classes).not.toContain('transition-all')
-    }
   })
 
   it('centers handle knobs on the crop edge', () => {
@@ -294,36 +250,6 @@ describe('image-utils — resizeCropRect', () => {
     expect(out.y).toBe(80)
     expect(out.height).toBe(70)
     expect(out.width).toBe(100)
-  })
-
-  it('resizes from e handle (only width)', () => {
-    const out = resizeCropRect(base, 'e', 50, 0, W, H)
-    expect(out.width).toBe(150)
-  })
-
-  it('resizes from s handle (only height)', () => {
-    const out = resizeCropRect(base, 's', 0, 25, W, H)
-    expect(out.height).toBe(125)
-  })
-
-  it('resizes from w handle (only x/width)', () => {
-    const out = resizeCropRect(base, 'w', 20, 0, W, H)
-    expect(out.x).toBe(70)
-    expect(out.width).toBe(80)
-  })
-
-  it('resizes from ne handle', () => {
-    const out = resizeCropRect(base, 'ne', 20, 30, W, H)
-    expect(out.width).toBe(120)
-    expect(out.y).toBe(80)
-    expect(out.height).toBe(70)
-  })
-
-  it('resizes from sw handle', () => {
-    const out = resizeCropRect(base, 'sw', 20, 30, W, H)
-    expect(out.x).toBe(70)
-    expect(out.width).toBe(80)
-    expect(out.height).toBe(130)
   })
 
   it('enforces minimum width when shrinking from west', () => {

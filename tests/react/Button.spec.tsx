@@ -2,21 +2,13 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
-import {
-  buttonSizeClasses,
-  getButtonVariantClasses,
-  resetDevWarnCache
-} from '@expcat/tigercat-core'
-import {
-  expectNoA11yViolationsIsolated,
-  setThemeVariables,
-  clearThemeVariables
-} from '../utils/react'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Button', () => {
   it('renders a button and merges className', () => {
@@ -24,8 +16,6 @@ describe('Button', () => {
 
     const button = screen.getByRole('button', { name: 'Click me' })
     expect(button).toBeInTheDocument()
-    expect(button).toHaveClass('inline-flex')
-    expect(button).toHaveClass('whitespace-nowrap')
     expect(button).toHaveClass('custom-class')
   })
 
@@ -54,36 +44,6 @@ describe('Button', () => {
       '[Tigercat] Button does not support color. Use variant instead.'
     )
     warn.mockRestore()
-  })
-
-  it('applies variant classes for each variant', () => {
-    const variants = ['primary', 'secondary', 'outline', 'ghost', 'link'] as const
-    for (const variant of variants) {
-      const { unmount } = render(<Button variant={variant}>{variant}</Button>)
-      const button = screen.getByRole('button', { name: variant })
-      const expected = getButtonVariantClasses(variant)
-      expected.split(' ').forEach((cls) => {
-        expect(button.className).toContain(cls)
-      })
-      unmount()
-    }
-  })
-
-  it('applies size classes for each size', () => {
-    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
-    for (const size of sizes) {
-      const { unmount } = render(<Button size={size}>{size}</Button>)
-      const button = screen.getByRole('button', { name: size })
-      buttonSizeClasses[size].split(' ').forEach((cls) => {
-        expect(button.className).toContain(cls)
-      })
-      unmount()
-    }
-  })
-
-  it('renders block button with full width', () => {
-    render(<Button block>Block</Button>)
-    expect(screen.getByRole('button', { name: 'Block' })).toHaveClass('w-full')
   })
 
   it('respects htmlType prop (submit/reset/button)', () => {
@@ -242,54 +202,11 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables([
-        '--tiger-primary',
-        '--tiger-primary-hover',
-        '--tiger-secondary',
-        '--tiger-secondary-hover'
-      ])
-    })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000',
-        '--tiger-primary-hover': '#cc0000'
-      })
-
-      const { container } = render(<Button variant="primary">Primary Button</Button>)
-
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
-      expect(rootStyles.getPropertyValue('--tiger-primary-hover').trim()).toBe('#cc0000')
-    })
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Button>Accessible Button</Button>)
 
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-
-  describe('danger prop', () => {
-    it('applies danger classes instead of variant classes when danger is true', () => {
-      const { container } = render(<Button danger>Delete</Button>)
-      const button = container.querySelector('button')!
-      expect(button.className).toContain('--tiger-error')
-    })
-
-    it('applies danger classes for outline variant', () => {
-      const { container } = render(
-        <Button danger variant="outline">
-          Delete
-        </Button>
-      )
-      const button = container.querySelector('button')!
-      expect(button.className).toContain('--tiger-error')
-      expect(button.className).toContain('border-2')
     })
   })
 

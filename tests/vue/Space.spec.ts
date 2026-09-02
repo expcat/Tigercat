@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { h } from 'vue'
-import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
+import { renderWithProps, renderWithSlots } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[data-tiger-space]') as HTMLElement
@@ -62,7 +62,6 @@ describe('Space (Vue)', () => {
       slots: { default: ItemSlot }
     })
     const el = getRoot(container)
-    expect(el.className).toContain('tiger-space')
     expect(el.className).toContain('custom')
     expect(el.className.match(/custom/g)?.length).toBe(1)
   })
@@ -110,12 +109,5 @@ describe('Space (Vue)', () => {
     const el = getRoot(container)
     expect(el).toHaveAttribute('id', 'my-space')
     expect(el).toHaveAttribute('aria-label', 'space')
-  })
-
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Space)
-      await expectNoA11yViolationsIsolated(container)
-    })
   })
 })

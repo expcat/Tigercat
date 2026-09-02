@@ -14,28 +14,6 @@ function getRoot(container: HTMLElement): HTMLElement {
 }
 
 describe('Card', () => {
-  it('applies size-based padding by default', () => {
-    const { container } = render(Card, { slots: { default: 'Body' } })
-    expect(getRoot(container).className).toMatch(/\bp-4\b/)
-  })
-
-  it('overrides padding with a custom class', () => {
-    const { container } = render(Card, {
-      props: { padding: 'p-8' },
-      slots: { default: 'Body' }
-    })
-    expect(getRoot(container).className).toMatch(/\bp-8\b/)
-    expect(getRoot(container).className).not.toMatch(/\bp-4\b/)
-  })
-
-  it('removes padding when padding is false', () => {
-    const { container } = render(Card, {
-      props: { padding: false },
-      slots: { default: 'Body' }
-    })
-    expect(getRoot(container).className).not.toMatch(/\bp-4\b/)
-  })
-
   it('puts cover padding on the body column, not the image', () => {
     const { container } = render(Card, {
       props: { cover: 'https://example.com/cover.jpg', size: 'md' },

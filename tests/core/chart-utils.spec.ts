@@ -29,7 +29,6 @@ import {
   createLinePath,
   createAreaPath,
   stackSeriesData,
-  DEFAULT_CHART_COLORS,
   clampBarWidth,
   ensureBarMinHeight,
   getBarValueLabelY,
@@ -118,13 +117,6 @@ describe('chart-utils', () => {
       const scale = createLinearScale([0, 100], [0, 200])
       expect(scale.map('25')).toBe(50)
     })
-
-    it('has correct type and domain/range', () => {
-      const scale = createLinearScale([10, 20], [100, 200])
-      expect(scale.type).toBe('linear')
-      expect(scale.domain).toEqual([10, 20])
-      expect(scale.range).toEqual([100, 200])
-    })
   })
 
   describe('createPointScale', () => {
@@ -151,12 +143,6 @@ describe('chart-utils', () => {
       const scale = createPointScale(['a', 'b'], [0, 100], { padding: 0 })
       expect(scale.map('unknown')).toBe(scale.map('a'))
     })
-
-    it('has correct type and step', () => {
-      const scale = createPointScale(['a', 'b', 'c'], [0, 100], { padding: 0 })
-      expect(scale.type).toBe('point')
-      expect(scale.step).toBe(50)
-    })
   })
 
   describe('createBandScale', () => {
@@ -173,11 +159,6 @@ describe('chart-utils', () => {
         paddingOuter: 0
       })
       expect(scaleWithPad.bandwidth).toBeLessThan(scaleNoPad.bandwidth!)
-    })
-
-    it('has correct type', () => {
-      const scale = createBandScale(['x', 'y'], [0, 200])
-      expect(scale.type).toBe('band')
     })
   })
 
@@ -299,16 +280,12 @@ describe('chart-utils', () => {
   })
 
   describe('getChartGridLineDasharray', () => {
-    it('returns undefined for solid', () => {
-      expect(getChartGridLineDasharray('solid')).toBeUndefined()
-    })
-
-    it('returns dash pattern for dashed', () => {
-      expect(getChartGridLineDasharray('dashed')).toBe('4 4')
-    })
-
-    it('returns dot pattern for dotted', () => {
-      expect(getChartGridLineDasharray('dotted')).toBe('1 4')
+    it.each([
+      ['solid', undefined],
+      ['dashed', '4 4'],
+      ['dotted', '1 4']
+    ] as const)('maps %s dash style', (style, expected) => {
+      expect(getChartGridLineDasharray(style)).toBe(expected)
     })
   })
 
@@ -799,20 +776,6 @@ describe('chart-utils', () => {
 
     it('returns empty array for empty input', () => {
       expect(stackSeriesData([])).toEqual([])
-    })
-  })
-
-  // ==========================================================================
-  // Constants
-  // ==========================================================================
-
-  describe('DEFAULT_CHART_COLORS', () => {
-    it('has 6 colors', () => {
-      expect(DEFAULT_CHART_COLORS.length).toBe(6)
-    })
-
-    it('uses CSS variables with fallbacks', () => {
-      expect(DEFAULT_CHART_COLORS[0]).toMatch(/var\(--tiger-chart-\d+,#[0-9a-f]+\)/i)
     })
   })
 

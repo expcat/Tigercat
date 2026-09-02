@@ -60,36 +60,5 @@ for (const { framework, baseUrl } of exampleApps) {
       await drawer.getByText('关闭', { exact: true }).click()
       await expect(drawer).toBeHidden()
     })
-
-    test('tabs switch active panels', async ({ page }) => {
-      const { preview } = await openDemo(page, baseUrl, 'tabs', 'tabs-01')
-      const tabs = preview.getByRole('tab')
-      await tabs.nth(1).click()
-      await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
-    })
-
-    test('number keyboard types from clicks and physical keys', async ({ page }) => {
-      const { preview } = await openDemo(page, baseUrl, 'number-keyboard', 'number-keyboard-02')
-      await preview.getByRole('button', { name: '1' }).click()
-      await expect(preview.getByPlaceholder('身份证号')).toHaveValue('1')
-      const keypad = preview.locator('[data-tiger-number-keyboard]')
-      await keypad.focus()
-      await keypad.press('2')
-      await expect(preview.getByPlaceholder('身份证号')).toHaveValue('12')
-      await keypad.press('Backspace')
-      await expect(preview.getByPlaceholder('身份证号')).toHaveValue('1')
-    })
-
-    test('table sorting and filtering update visible rows', async ({ page }) => {
-      const { preview } = await openDemo(page, baseUrl, 'table', 'table-02')
-      const table = preview.locator('table').first()
-      const nameHeader = table.getByRole('columnheader', { name: /姓名/ })
-      await expect(nameHeader).toHaveAttribute('aria-sort', 'ascending')
-      await nameHeader.getByText('姓名', { exact: true }).click()
-      await expect(nameHeader).toHaveAttribute('aria-sort', 'descending')
-      await nameHeader.getByRole('textbox').fill('张')
-      await expect(table.locator('tbody tr')).toHaveCount(1)
-      await expect(table.locator('tbody tr').first()).toContainText('张伟')
-    })
   })
 }

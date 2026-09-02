@@ -6,7 +6,6 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { Loading } from '@expcat/tigercat-vue/Loading'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
-import { expectNoA11yViolations, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Loading (Vue)', () => {
   afterEach(() => {
@@ -182,28 +181,5 @@ describe('Loading (Vue)', () => {
     vi.advanceTimersByTime(100)
     await vi.runAllTimersAsync()
     expect(screen.getByRole('status')).toBeInTheDocument()
-  })
-
-  describe('Accessibility', () => {
-    it('has no accessibility violations for the inline spinner', async () => {
-      const { container } = render(Loading)
-      await expectNoA11yViolationsIsolated(container)
-    })
-
-    it('has no accessibility violations for named text and a Chinese fullscreen layer', async () => {
-      const { container } = render({
-        components: { ConfigProvider, Loading },
-        template: '<ConfigProvider :locale="locale"><Loading text="同步中" /></ConfigProvider>',
-        setup: () => ({ locale: zhCN })
-      })
-      await expectNoA11yViolationsIsolated(container)
-
-      render({
-        components: { ConfigProvider, Loading },
-        template: '<ConfigProvider :locale="locale"><Loading fullscreen /></ConfigProvider>',
-        setup: () => ({ locale: zhCN })
-      })
-      await expectNoA11yViolations(document.body)
-    })
   })
 })

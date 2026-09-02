@@ -40,8 +40,19 @@ export function createFrameScheduler() {
 export type FrameScheduler = ReturnType<typeof createFrameScheduler>
 
 /** Overlay outside-dismiss waits one macrotask so the opening click cannot close it. */
-export function flushOverlayOutsideDismiss(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 0))
+export async function flushOverlayOutsideDismiss(): Promise<void> {
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+}
+
+/** Click a sibling of the portaled layer. `document.body` is the portal host, not an outside target. */
+export async function clickOutsideOverlay(): Promise<void> {
+  await flushOverlayOutsideDismiss()
+  const outside = document.createElement('button')
+  outside.type = 'button'
+  document.body.appendChild(outside)
+  outside.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+  outside.remove()
 }
 
 /**

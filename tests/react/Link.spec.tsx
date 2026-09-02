@@ -16,7 +16,6 @@ describe('Link (React)', () => {
     const link = screen.getByRole('link', { name: 'Click' })
     expect(link).toHaveAttribute('href', '/test')
     expect(link.tagName).toBe('A')
-    expect(link).toHaveClass('inline-flex')
   })
 
   it('forwards native attributes', () => {
@@ -24,26 +23,6 @@ describe('Link (React)', () => {
 
     const link = screen.getByTestId('link')
     expect(link).toHaveAttribute('aria-label', 'Custom')
-  })
-
-  it('applies variant color classes', () => {
-    const { container: c1 } = render(<Link variant="secondary">Sec</Link>)
-    expect(c1.querySelector('a')?.className).toContain('--tiger-secondary')
-
-    const { container: c2 } = render(<Link variant="default">Def</Link>)
-    expect(c2.querySelector('a')?.className).toContain('--tiger-text')
-    expect(c2.querySelector('a')?.className).not.toContain('text-gray-')
-  })
-  it('underlines at rest when underline is true', () => {
-    const { container } = render(<Link>U</Link>)
-    expect(container.querySelector('a')).toHaveClass('underline')
-    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
-  })
-
-  it('omits underline when underline=false', () => {
-    const { container } = render(<Link underline={false}>U</Link>)
-    expect(container.querySelector('a')).toHaveClass('no-underline')
-    expect(container.querySelector('a')).not.toHaveClass('underline')
   })
 
   it('fires onClick when not disabled', async () => {

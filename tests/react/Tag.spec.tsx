@@ -11,7 +11,6 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Tag', () => {
   it('renders content without a live region', () => {
@@ -138,16 +137,5 @@ describe('Tag', () => {
   it('applies a pill shape when requested', () => {
     const { container } = render(<Tag pill>Pill</Tag>)
     expect(container.firstElementChild?.className).toContain('--tiger-radius-pill')
-  })
-
-  it('passes a11y baseline checks including closable', async () => {
-    const { container } = render(
-      <>
-        <Tag>Tag</Tag>
-        <Tag closable>Closable Tag</Tag>
-      </>
-    )
-
-    await expectNoA11yViolationsIsolated(container)
   })
 })

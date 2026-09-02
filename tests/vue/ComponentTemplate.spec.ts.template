@@ -25,11 +25,8 @@ import {
   renderWithProps,
   renderWithSlots,
   expectNoA11yViolations,
-  // Import other utilities as needed:
   // setThemeVariables,
-  // clearThemeVariables,
-  // componentSizes,
-  // createMockHandlers,
+  // clearThemeVariables
 } from '../utils'
 
 describe('ComponentName', () => {

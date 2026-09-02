@@ -9,7 +9,6 @@ import React from 'react'
 import { Slider } from '@expcat/tigercat-react/Slider'
 import {
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
   clearThemeVariables
 } from '../utils/react'
@@ -47,11 +46,6 @@ describe('Slider', () => {
     it('should apply custom className', () => {
       const { container } = render(<Slider className="custom-class" />)
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
-    })
-
-    it.each(componentSizes)('should render %s size', (size) => {
-      const { container } = render(<Slider size={size} />)
-      expect(getThumb(container)).toBeInTheDocument()
     })
   })
 

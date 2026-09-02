@@ -123,17 +123,6 @@ describe('SplitButton', () => {
   })
 
   describe('button props', () => {
-    it.each(['primary', 'secondary', 'outline'] as const)(
-      'renders both buttons for variant="%s"',
-      (variant) => {
-        const { container } = renderSplitButton({ variant })
-        expect(getPrimary(container)).toBeInTheDocument()
-        expect(getTrigger(container)).toBeInTheDocument()
-        expect(getPrimary(container)).not.toBeDisabled()
-        expect(getTrigger(container)).not.toBeDisabled()
-      }
-    )
-
     it('disables both the primary action and the menu trigger', async () => {
       const { container, emitted } = renderSplitButton({ disabled: true })
       expect(getPrimary(container)).toBeDisabled()

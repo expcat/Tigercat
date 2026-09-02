@@ -7,7 +7,6 @@ import {
   getFieldError,
   createFormErrorMap,
   clearFieldErrors,
-  hasErrors,
   getErrorFields,
   FORM_VALIDATION_PRESETS,
   createFormValidationRule,
@@ -19,31 +18,16 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 describe('form-validation', () => {
   describe('getValueByPath', () => {
-    it('gets top-level value', () => {
-      expect(getValueByPath({ name: 'John' }, 'name')).toBe('John')
-    })
-
     it('gets nested value with dot notation', () => {
+      expect(getValueByPath({ name: 'John' }, 'name')).toBe('John')
       expect(getValueByPath({ user: { name: 'John' } }, 'user.name')).toBe('John')
-    })
-
-    it('gets deeply nested value', () => {
       expect(getValueByPath({ a: { b: { c: 'deep' } } }, 'a.b.c')).toBe('deep')
     })
 
     it('returns undefined for non-existent path', () => {
       expect(getValueByPath({ name: 'John' }, 'age')).toBe(undefined)
-    })
-
-    it('returns undefined for non-existent nested path', () => {
       expect(getValueByPath({ user: {} }, 'user.name')).toBe(undefined)
-    })
-
-    it('returns undefined for null values', () => {
       expect(getValueByPath(undefined, 'name')).toBe(undefined)
-    })
-
-    it('returns undefined for empty path', () => {
       expect(getValueByPath({ name: 'John' }, '')).toBe(undefined)
     })
 
@@ -426,24 +410,10 @@ describe('form-validation', () => {
       })
     })
 
-    describe('hasErrors', () => {
-      it('returns true when errors exist', () => {
-        expect(hasErrors(sampleErrors)).toBe(true)
-      })
-
-      it('returns false for empty array', () => {
-        expect(hasErrors([])).toBe(false)
-      })
-    })
-
     describe('getErrorFields', () => {
       it('returns array of field names with errors', () => {
         const fields = getErrorFields(sampleErrors)
         expect(fields).toEqual(['name', 'email', 'age'])
-      })
-
-      it('returns empty array for no errors', () => {
-        expect(getErrorFields([])).toEqual([])
       })
     })
   })

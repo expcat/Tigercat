@@ -17,26 +17,6 @@ describe('classNames', () => {
   })
 
   describe('falsy value filtering', () => {
-    it('filters out undefined', () => {
-      expect(classNames('a', undefined, 'b')).toBe('a b')
-    })
-
-    it('filters out null', () => {
-      expect(classNames('a', null, 'b')).toBe('a b')
-    })
-
-    it('filters out false', () => {
-      expect(classNames('a', false, 'b')).toBe('a b')
-    })
-
-    it('filters out empty string', () => {
-      expect(classNames('a', '', 'b')).toBe('a b')
-    })
-
-    it('filters out 0', () => {
-      expect(classNames('a', 0, 'b')).toBe('a b')
-    })
-
     it('handles all falsy values at once', () => {
       expect(classNames('a', undefined, null, false, '', 0, 'b')).toBe('a b')
     })
@@ -88,33 +68,7 @@ describe('classNames', () => {
     })
   })
 
-  describe('Tailwind CSS class patterns', () => {
-    it('handles Tailwind utility classes', () => {
-      expect(classNames('flex', 'items-center', 'justify-between', 'p-4')).toBe(
-        'flex items-center justify-between p-4'
-      )
-    })
-
-    it('handles CSS variable classes', () => {
-      expect(classNames('bg-[var(--tiger-primary,#2563eb)]', 'text-white')).toBe(
-        'bg-[var(--tiger-primary,#2563eb)] text-white'
-      )
-    })
-
-    it('handles responsive and state variants', () => {
-      expect(classNames('md:flex', 'hover:bg-gray-100', 'focus:ring-2')).toBe(
-        'md:flex hover:bg-gray-100 focus:ring-2'
-      )
-    })
-  })
-
   describe('edge cases', () => {
-    it('handles large number of arguments', () => {
-      const classes = Array.from({ length: 100 }, (_, i) => `class-${i}`)
-      const result = classNames(...classes)
-      expect(result.split(' ')).toHaveLength(100)
-    })
-
     it('handles classes with special characters', () => {
       expect(classNames('w-1/2', 'h-[100px]', '-mt-4', '!important')).toBe(
         'w-1/2 h-[100px] -mt-4 !important'

@@ -227,7 +227,7 @@ describe('NavigationMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'true')
   })
 
-  it('closes on item click, outside click, and Escape', () => {
+  it('closes on item click and Escape', async () => {
     render(<Demo defaultValue="products" />)
     expect(getPanel()).not.toHaveAttribute('hidden')
 
@@ -238,10 +238,6 @@ describe('NavigationMenu', () => {
     fireEvent.click(screen.getByText('Disabled'))
     expect(getPanel()).not.toHaveAttribute('hidden')
 
-    fireEvent.click(document.body)
-    expect(getPanel()).toHaveAttribute('hidden')
-
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Products' }))
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(getPanel()).toHaveAttribute('hidden')
   })

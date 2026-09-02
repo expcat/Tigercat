@@ -2,17 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   defaultToolbar,
   createDefaultRichTextToolbar,
-  getRichTextContainerClasses,
-  getToolbarButtonClasses,
-  getEditorAreaClasses,
-  richTextContainerBase,
-  richTextContainerDisabled,
-  richTextToolbarClasses,
-  richTextToolbarButtonBase,
-  richTextToolbarButtonActive,
-  richTextToolbarSeparatorClasses,
-  richTextEditorAreaBase,
-  richTextEditorAreaReadOnly,
   mapToolbarAction,
   isInlineFormat,
   parseHotkey,
@@ -25,7 +14,7 @@ import {
   isToolbarSeparator,
   getToolbarButtons
 } from '@expcat/tigercat-core'
-import type { ToolbarButton, ToolbarSeparator, ToolbarItem } from '@expcat/tigercat-core'
+import type { ToolbarItem } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 // ─── defaultToolbar ───────────────────────────────────────────────
@@ -44,13 +33,6 @@ describe('defaultToolbar', () => {
     expect(names).toContain('clear')
   })
 
-  it('each button has name and label', () => {
-    for (const btn of getToolbarButtons(defaultToolbar)) {
-      expect(btn.name).toBeTruthy()
-      expect(btn.label).toBeTruthy()
-    }
-  })
-
   it('includes image and separators', () => {
     expect(getToolbarButtons(defaultToolbar).some((btn) => btn.name === 'image')).toBe(true)
     expect(defaultToolbar.some((item) => 'type' in item && item.type === 'separator')).toBe(true)
@@ -65,72 +47,6 @@ describe('defaultToolbar', () => {
     const italic = buttons.find((btn) => btn.name === 'italic')
     expect(bold?.label).toBe('加粗')
     expect(italic?.label).toBe('斜体')
-  })
-})
-
-// ─── Class generators ─────────────────────────────────────────────
-
-describe('getRichTextContainerClasses', () => {
-  it('returns base classes when enabled', () => {
-    const result = getRichTextContainerClasses(false)
-    expect(result).toContain(richTextContainerBase)
-    expect(result).not.toContain(richTextContainerDisabled)
-  })
-
-  it('adds disabled class when disabled', () => {
-    const result = getRichTextContainerClasses(true)
-    expect(result).toContain(richTextContainerDisabled)
-  })
-
-  it('appends custom className', () => {
-    const result = getRichTextContainerClasses(false, 'custom-class')
-    expect(result).toContain('custom-class')
-  })
-
-  it('lands container fill on registered surface, not locked white or bg aliases', () => {
-    expect(richTextContainerBase).toContain('--tiger-surface')
-    expect(richTextContainerBase).toContain('--tiger-rte-bg,var(--tiger-surface')
-    expect(richTextContainerBase).not.toContain('bg-[var(--tiger-bg,#ffffff)]')
-    expect(richTextContainerBase).not.toContain('--tiger-bg')
-    expect(richTextContainerBase).not.toContain('--tiger-fill')
-    expect(richTextContainerBase).not.toContain('--tiger-surface-muted')
-
-    const overrideIdx = richTextContainerBase.indexOf('--tiger-rte-bg')
-    const semanticIdx = richTextContainerBase.indexOf('--tiger-surface')
-    expect(overrideIdx).toBeGreaterThan(-1)
-    expect(semanticIdx).toBeGreaterThan(overrideIdx)
-  })
-
-  it('lands toolbar fill on registered surface-muted, not locked bg-secondary', () => {
-    expect(richTextToolbarClasses).toContain('--tiger-surface-muted')
-    expect(richTextToolbarClasses).toContain('--tiger-rte-toolbar-bg,var(--tiger-surface-muted')
-    expect(richTextToolbarClasses).not.toContain('--tiger-bg-secondary')
-    expect(richTextToolbarClasses).not.toContain('--tiger-bg')
-    expect(richTextToolbarClasses).not.toContain('--tiger-fill')
-  })
-})
-
-describe('getToolbarButtonClasses', () => {
-  it('returns base classes when inactive', () => {
-    const result = getToolbarButtonClasses(false)
-    expect(result).toBe(richTextToolbarButtonBase)
-  })
-
-  it('includes active classes when active', () => {
-    const result = getToolbarButtonClasses(true)
-    expect(result).toContain(richTextToolbarButtonActive)
-  })
-})
-
-describe('getEditorAreaClasses', () => {
-  it('returns base classes when editable', () => {
-    const result = getEditorAreaClasses(false)
-    expect(result).toBe(richTextEditorAreaBase)
-  })
-
-  it('includes readonly classes when readonly', () => {
-    const result = getEditorAreaClasses(true)
-    expect(result).toContain(richTextEditorAreaReadOnly)
   })
 })
 
@@ -291,24 +207,6 @@ describe('getToolbarButtons', () => {
   it('returns empty array for all separators', () => {
     const items: ToolbarItem[] = [{ type: 'separator' }, { type: 'separator' }]
     expect(getToolbarButtons(items)).toHaveLength(0)
-  })
-})
-
-describe('richTextToolbarSeparatorClasses', () => {
-  it('is a non-empty string', () => {
-    expect(richTextToolbarSeparatorClasses).toBeTruthy()
-    expect(typeof richTextToolbarSeparatorClasses).toBe('string')
-  })
-})
-
-describe('ToolbarButton.action', () => {
-  it('action field is optional and can be a function', () => {
-    const btn: ToolbarButton = {
-      name: 'custom',
-      label: 'Custom',
-      action: (_el: HTMLElement) => {}
-    }
-    expect(typeof btn.action).toBe('function')
   })
 })
 

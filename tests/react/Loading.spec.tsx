@@ -7,7 +7,6 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { Loading } from '@expcat/tigercat-react/Loading'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
-import { expectNoA11yViolations, expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Loading (React)', () => {
   afterEach(() => {
@@ -180,28 +179,5 @@ describe('Loading (React)', () => {
       vi.advanceTimersByTime(100)
     })
     expect(screen.getByRole('status')).toBeInTheDocument()
-  })
-
-  describe('Accessibility', () => {
-    it('has no accessibility violations for the inline spinner', async () => {
-      const { container } = render(<Loading />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-
-    it('has no accessibility violations for named text and a Chinese fullscreen layer', async () => {
-      const { container } = render(
-        <ConfigProvider locale={zhCN}>
-          <Loading text="同步中" />
-        </ConfigProvider>
-      )
-      await expectNoA11yViolationsIsolated(container)
-
-      render(
-        <ConfigProvider locale={zhCN}>
-          <Loading fullscreen />
-        </ConfigProvider>
-      )
-      await expectNoA11yViolations(document.body)
-    })
   })
 })

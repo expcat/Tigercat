@@ -26,12 +26,6 @@ describe('Segmented', () => {
     expect(container.querySelector('.my-seg')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    const { container } = render(<Segmented options={defaultOptions} size={size} />)
-    expect(container.querySelector('[role="radiogroup"]')).toBeInTheDocument()
-  })
-
   // --- Selection ---
   it('calls onChange on option click', () => {
     const onChange = vi.fn()

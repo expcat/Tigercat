@@ -9,10 +9,8 @@ import { Textarea } from '@expcat/tigercat-vue/Textarea'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
-  clearThemeVariables,
-  edgeCaseData
+  clearThemeVariables
 } from '../utils'
 
 describe('Textarea', () => {
@@ -56,10 +54,6 @@ describe('Textarea', () => {
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('renders %s size', (size) => {
-      const { getByRole } = renderWithProps(Textarea, { size })
-      expect(getByRole('textbox')).toBeInTheDocument()
-    })
     it('defaults rows to 3 and honors a custom rows value', async () => {
       const { getByRole, rerender } = render(Textarea)
       expect(getByRole('textbox')).toHaveAttribute('rows', '3')

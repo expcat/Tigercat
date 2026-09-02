@@ -9,10 +9,8 @@ import React from 'react'
 import { Textarea } from '@expcat/tigercat-react/Textarea'
 import {
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
-  clearThemeVariables,
-  edgeCaseData
+  clearThemeVariables
 } from '../utils/react'
 
 describe('Textarea', () => {
@@ -52,10 +50,6 @@ describe('Textarea', () => {
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('supports size %s', (size) => {
-      render(<Textarea size={size} />)
-      expect(screen.getByRole('textbox')).toBeInTheDocument()
-    })
     it('defaults rows to 3 and honors a custom rows value', () => {
       const { rerender } = render(<Textarea />)
       expect(getTextarea()).toHaveAttribute('rows', '3')

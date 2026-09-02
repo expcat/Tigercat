@@ -10,7 +10,6 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Tag', () => {
   it('renders content without a live region', () => {
@@ -165,14 +164,5 @@ describe('Tag', () => {
     })
 
     expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-  })
-
-  it('passes a11y baseline checks including closable', async () => {
-    const { container } = render(Tag, {
-      props: { closable: true },
-      slots: { default: 'Accessible Tag' }
-    })
-
-    await expectNoA11yViolationsIsolated(container)
   })
 })

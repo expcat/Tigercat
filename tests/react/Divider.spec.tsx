@@ -8,7 +8,6 @@ import React from 'react'
 import { Divider } from '@expcat/tigercat-react/Divider'
 import { Space } from '@expcat/tigercat-react/Space'
 import { renderWithProps } from '../utils/render-helpers-react'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[role="separator"]') as HTMLElement
@@ -85,10 +84,5 @@ describe('Divider (React)', () => {
     const { container } = render(<Divider />)
     const divider = getRoot(container)
     expect(divider.style.borderColor).toBe('')
-  })
-
-  it('has no accessibility violations', async () => {
-    const { container } = render(<Divider>OR</Divider>)
-    await expectNoA11yViolationsIsolated(container)
   })
 })

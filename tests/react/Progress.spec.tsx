@@ -24,7 +24,6 @@ describe('Progress', () => {
     expect(progressbar).toHaveAttribute('aria-valuemin', '0')
     expect(progressbar).toHaveAttribute('aria-valuemax', '100')
     expect(progressbar).toHaveAttribute('aria-label', 'Progress')
-    expect(progressbar.className).toContain('w-full')
     expect(fillOf(container)).toHaveStyle({ width: '0%' })
   })
 
@@ -42,17 +41,6 @@ describe('Progress', () => {
   it('clamps NaN to 0', () => {
     render(<Progress percentage={Number.NaN} />)
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
-  })
-
-  it('applies variant color classes on the fill', () => {
-    const { container } = render(<Progress percentage={50} variant="success" />)
-    expect(fillOf(container)?.className).toContain('success')
-  })
-
-  it('status overrides variant color', () => {
-    const { container } = render(<Progress percentage={50} variant="primary" status="exception" />)
-    expect(fillOf(container)?.className).toContain('error')
-    expect(fillOf(container)?.className).not.toContain('primary')
   })
 
   it('hides text when showText is false', () => {
@@ -122,25 +110,6 @@ describe('Progress', () => {
     const { container } = render(<Progress type="circle" percentage={75} showText />)
     expect(container.querySelector('svg')).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75')
-  })
-
-  it('applies success status color', () => {
-    const { container } = render(<Progress percentage={100} status="success" />)
-    expect(fillOf(container)?.className).toContain('success')
-  })
-
-  it('renders striped without animation', () => {
-    const { container } = render(<Progress percentage={50} striped stripedAnimation={false} />)
-    expect(fillOf(container)?.className).toContain('tiger-progress-striped')
-    expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
-  })
-
-  it('animates stripes and pauses them', () => {
-    const { container, rerender } = render(<Progress percentage={50} striped stripedAnimation />)
-    expect(fillOf(container)?.className).toContain('tiger-progress-striped-animated')
-    rerender(<Progress percentage={50} striped stripedAnimation status="paused" />)
-    expect(fillOf(container)?.className).not.toContain('tiger-progress-striped-animated')
-    expect(screen.getByRole('progressbar').className).toContain('tiger-progress-paused')
   })
 
   it('passes basic a11y checks', async () => {

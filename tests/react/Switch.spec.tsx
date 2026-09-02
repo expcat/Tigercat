@@ -10,7 +10,6 @@ import { Switch } from '@expcat/tigercat-react/Switch'
 import {
   expectNoA11yViolations,
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
   clearThemeVariables
 } from '../utils/react'
@@ -37,11 +36,6 @@ describe('Switch', () => {
     it('applies custom className', () => {
       const { container } = render(<Switch className="custom-class" />)
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
-    })
-
-    it.each(componentSizes)('renders %s size', (size) => {
-      const { container } = render(<Switch size={size} />)
-      expect(getSwitch(container)).toBeInTheDocument()
     })
   })
 

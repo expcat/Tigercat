@@ -52,21 +52,6 @@ describe('Result (React)', () => {
   })
 
   describe('Status variants', () => {
-    it('renders error status', () => {
-      render(<Result status="error" title="Failed" />)
-      expect(screen.getByText('Failed')).toBeInTheDocument()
-    })
-
-    it('renders warning status', () => {
-      render(<Result status="warning" title="Warn" />)
-      expect(screen.getByText('Warn')).toBeInTheDocument()
-    })
-
-    it('renders info status (default)', () => {
-      render(<Result title="Info" />)
-      expect(screen.getByText('Info')).toBeInTheDocument()
-    })
-
     it('renders 404 digits and hides them when a title is present', () => {
       render(<Result status="404" title="Not Found" />)
       const digits = screen.getByText('404')

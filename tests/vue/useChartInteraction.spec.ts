@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { effectScope, ref } from 'vue'
-import { useChartInteraction } from '@expcat/tigercat-vue'
+import { useChartInteraction } from '@expcat/tigercat-vue/useChartInteraction'
 import { installFrameScheduler } from '../utils/frame-scheduler'
 
 function withSetup<T>(factory: () => T): T {

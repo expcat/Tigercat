@@ -16,27 +16,6 @@ describe('Icon (Vue)', () => {
       h('path', { d: 'M5 12h14', stroke: 'currentColor', 'stroke-width': '2' })
     ])
 
-  it('renders SVG with default size classes', () => {
-    const { container } = renderWithSlots(Icon, { default: SimpleSVG })
-    const svg = container.querySelector('svg')
-    expect(svg).toBeInTheDocument()
-    expect(svg).toHaveClass('inline-block', 'w-5', 'h-5')
-  })
-
-  it('applies each size correctly', () => {
-    const sizes = {
-      sm: ['w-4', 'h-4'],
-      md: ['w-5', 'h-5'],
-      lg: ['w-6', 'h-6'],
-      xl: ['w-8', 'h-8']
-    } as const
-    for (const [size, classes] of Object.entries(sizes)) {
-      const { container } = renderWithProps(Icon, { size }, { slots: { default: SimpleSVG } })
-      const svg = container.querySelector('svg')
-      expect(svg).toHaveClass(...classes)
-    }
-  })
-
   it('sets wrapper color via color prop', () => {
     const { container } = renderWithProps(
       Icon,
@@ -196,11 +175,6 @@ describe('Icon (Vue)', () => {
       attrs: { style: { color: 'red' } }
     })
     expect(container.querySelector('span')).toHaveStyle({ color: 'red' })
-  })
-
-  it('falls back to md size classes for an unknown size', () => {
-    const { container } = renderWithProps(Icon, { name: 'check', size: 'xxl' as 'md' })
-    expect(container.querySelector('svg')).toHaveClass('w-5', 'h-5')
   })
 
   it('prefers custom children over the icon prop', () => {

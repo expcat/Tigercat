@@ -46,24 +46,6 @@ describe('Alert', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Failed')
   })
 
-  it('renders each type with an icon', () => {
-    const types = ['info', 'success', 'warning', 'error'] as const
-    for (const type of types) {
-      const { container, unmount } = renderWithProps(Alert, { type, title: type })
-      expect(container.querySelector('svg')).toBeInTheDocument()
-      unmount()
-    }
-  })
-
-  it('renders each size', () => {
-    const sizes = ['sm', 'md', 'lg'] as const
-    for (const size of sizes) {
-      const { unmount } = renderWithProps(Alert, { size, title: size })
-      expect(screen.getByText(size)).toBeInTheDocument()
-      unmount()
-    }
-  })
-
   it('renders slots for title/description', () => {
     renderWithSlots(
       Alert,

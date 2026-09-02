@@ -84,15 +84,3 @@ export async function revealDemoIframe(moduleRoot: Locator): Promise<void> {
     el.scrollIntoView({ block: 'end', inline: 'nearest' })
   })
 }
-
-/** Fire a paste event with clipboardData. Firefox ignores ClipboardEvent's constructor clipboardData. */
-export async function dispatchPaste(locator: Locator, text: string): Promise<void> {
-  await locator.evaluate((el: HTMLElement, value: string) => {
-    const data = new DataTransfer()
-    data.setData('text/plain', value)
-    data.setData('text', value)
-    const event = new Event('paste', { bubbles: true, cancelable: true })
-    Object.defineProperty(event, 'clipboardData', { configurable: true, value: data })
-    el.dispatchEvent(event)
-  }, text)
-}

@@ -20,10 +20,14 @@
 | `pnpm smoke:published`                      | `scripts/publish-check.mjs --published` | 使用同一发布检查脚本校验 npm 上已发布版本                                                       |
 | `pnpm test:core`                            | 根 package scripts                      | 运行 core 测试集合                                                                              |
 | `pnpm test:special`                         | 根 package scripts                      | 运行 coverage 排除的 4 个副作用/命令式 API specs                                                |
+| `pnpm test:a11y`                            | 根 package scripts                      | 本地 axe / ARIA 回归（不进默认 `pnpm test`，不进 CI）                                           |
 | `pnpm test:coverage:report`                 | 根 package scripts                      | 按需生成 text、JSON 与 HTML coverage 报告                                                       |
 | `pnpm test:group`                           | `scripts/run-component-group-tests.mjs` | 按组件组运行 Vitest；支持 `--group`、`--framework`、`--filter` 和 `--list`                      |
 | `pnpm test:validate`                        | `scripts/validate-tests.mjs`            | 按 [测试指南](../tests/README.md) 检查测试文件                                                  |
-| `pnpm example:ssr:check`                    | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，校验产物 HTML/主题 CSS、`next-env.d.ts` 未改写，并跑 hydrate 测     |
+| `pnpm e2e`                                  | Playwright                              | 本地 E2E：Chromium + mobile-chromium（不进 CI）                                                 |
+| `pnpm e2e:full`                             | Playwright                              | 本地 E2E：全部浏览器引擎，发版前抽查                                                            |
+| `pnpm e2e:smoke`                            | Playwright                              | 仅 Chromium 跑 example shell 烟雾                                                               |
+| `pnpm example:ssr:check`                    | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，校验产物 HTML、主题 CSS、`next-env.d.ts` 未改写，并跑 hydrate 测    |
 | `pnpm example:sources:check`                | `scripts/validate-example-sources.mjs`  | 校验 React/Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 契约                        |
 | `node ./scripts/generate-example-index.mjs` | `scripts/generate-example-index.mjs`    | 从 `DEMO_NAV_GROUPS` 生成 `examples/index.html`；`--check` 校验未漂移                           |
 | `pnpm docs:api`                             | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                            |

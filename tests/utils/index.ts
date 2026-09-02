@@ -9,7 +9,6 @@
 export * from './render-helpers'
 export * from './a11y-helpers'
 export * from './theme-helpers'
-export * from './test-fixtures'
 
 // Shared mocks & schedulers
 export * from './mock-observers'

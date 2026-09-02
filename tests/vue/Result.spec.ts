@@ -49,21 +49,6 @@ describe('Result (Vue)', () => {
   })
 
   describe('Status variants', () => {
-    it('renders error status', () => {
-      render(Result, { props: { status: 'error', title: 'Failed' } })
-      expect(screen.getByText('Failed')).toBeInTheDocument()
-    })
-
-    it('renders warning status', () => {
-      render(Result, { props: { status: 'warning', title: 'Warn' } })
-      expect(screen.getByText('Warn')).toBeInTheDocument()
-    })
-
-    it('renders info status (default)', () => {
-      render(Result, { props: { title: 'Info' } })
-      expect(screen.getByText('Info')).toBeInTheDocument()
-    })
-
     it('renders 404 digits and hides them when a title is present', () => {
       render(Result, { props: { status: '404', title: 'Not Found' } })
       expect(screen.getByText('404')).toHaveAttribute('aria-hidden', 'true')

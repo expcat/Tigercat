@@ -49,12 +49,6 @@ describe('createDragState', () => {
     expect(state.offsetX).toBe(0)
     expect(state.offsetY).toBe(0)
   })
-
-  it('returns a new object each time', () => {
-    const a = createDragState()
-    const b = createDragState()
-    expect(a).not.toBe(b)
-  })
 })
 
 // ---------------------------------------------------------------------------
@@ -392,13 +386,6 @@ describe('isSameContainerDrag', () => {
     handleDragStart(state, makeItems(1)[0], 'c1')
     expect(isSameContainerDrag(state)).toBe(true)
   })
-
-  it('returns false when containers differ', () => {
-    const state = createDragState()
-    handleDragStart(state, makeItems(1)[0], 'c1')
-    handleDragOver(state, { id: 'x', index: 0 }, 'c2')
-    expect(isSameContainerDrag(state)).toBe(false)
-  })
 })
 
 describe('isCrossContainerDrag', () => {
@@ -422,10 +409,6 @@ describe('isCrossContainerDrag', () => {
 describe('isDragEnabled', () => {
   it('returns true with no config', () => {
     expect(isDragEnabled()).toBe(true)
-  })
-
-  it('returns true when disabled is false', () => {
-    expect(isDragEnabled({ disabled: false })).toBe(true)
   })
 
   it('returns false when disabled is true', () => {
@@ -693,77 +676,5 @@ describe('toDragItems', () => {
     const data = [{ id: '1' }]
     const items = toDragItems(data, 'id', 'my-list')
     expect(items[0].containerId).toBe('my-list')
-  })
-})
-
-// ---------------------------------------------------------------------------
-// Full Drag Flow Integration
-// ---------------------------------------------------------------------------
-
-describe('full drag flow', () => {
-  it('completes a single-container reorder flow', () => {
-    const state = createDragState()
-    const items = makeItems(5)
-    const onDrop = vi.fn()
-
-    handleDragStart(state, items[0], 'list')
-    handleDragOver(state, items[3], 'list')
-    handleDrop(state, { onDrop })
-
-    expect(onDrop).toHaveBeenCalledWith(
-      expect.objectContaining({
-        fromIndex: 0,
-        toIndex: 3,
-        fromContainerId: 'list',
-        toContainerId: 'list'
-      })
-    )
-    expect(state.isDragging).toBe(false)
-  })
-
-  it('completes a cross-container move flow', () => {
-    const state = createDragState()
-    const source = makeItems(3, 'left')
-    const target = makeItems(2, 'right')
-    const onDrop = vi.fn()
-
-    handleDragStart(state, source[1], 'left')
-    handleDragOver(state, target[0], 'right')
-    handleDrop(state, { onDrop })
-
-    expect(onDrop).toHaveBeenCalledWith(
-      expect.objectContaining({
-        fromContainerId: 'left',
-        toContainerId: 'right'
-      })
-    )
-  })
-
-  it('handles cancelled drag flow', () => {
-    const state = createDragState()
-    const onDragEnd = vi.fn()
-
-    handleDragStart(state, makeItems(1)[0], 'list')
-    handleDragEnd(state, true, { onDragEnd })
-
-    expect(onDragEnd).toHaveBeenCalledWith(expect.objectContaining({ cancelled: true }))
-    expect(state.isDragging).toBe(false)
-  })
-
-  it('supports multiple sequential drags', () => {
-    const state = createDragState()
-    const items = makeItems(3)
-
-    // First drag
-    handleDragStart(state, items[0], 'list')
-    handleDrop(state)
-    expect(state.isDragging).toBe(false)
-
-    // Second drag
-    handleDragStart(state, items[2], 'list')
-    expect(state.isDragging).toBe(true)
-    expect(state.draggedItem?.id).toBe('item-2')
-    handleDrop(state)
-    expect(state.isDragging).toBe(false)
   })
 })

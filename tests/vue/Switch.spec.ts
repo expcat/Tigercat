@@ -8,7 +8,6 @@ import { Switch } from '@expcat/tigercat-vue/Switch'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
   clearThemeVariables
 } from '../utils'
@@ -41,11 +40,6 @@ describe('Switch', () => {
       expect(root).toHaveClass('prop-class')
       expect(root).toHaveClass('attrs-class')
       expect(root).toHaveClass('active')
-    })
-
-    it.each(componentSizes)('renders %s size', (size) => {
-      const { container } = renderWithProps(Switch, { size })
-      expect(getSwitch(container)).toBeInTheDocument()
     })
   })
 

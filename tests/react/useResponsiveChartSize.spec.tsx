@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { useResponsiveChartSize } from '@expcat/tigercat-react'
+import { useResponsiveChartSize } from '@expcat/tigercat-react/useResponsiveChartSize'
 import { DEFAULT_CHART_PADDING } from '@expcat/tigercat-core'
 
 describe('useResponsiveChartSize', () => {

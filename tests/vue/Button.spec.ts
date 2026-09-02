@@ -6,12 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Button } from '@expcat/tigercat-vue/Button'
-import {
-  buttonSizeClasses,
-  getButtonVariantClasses,
-  resetDevWarnCache
-} from '@expcat/tigercat-core'
-import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Button', () => {
   it('renders and merges class/style from props and attrs', () => {
@@ -23,8 +19,6 @@ describe('Button', () => {
 
     const button = container.querySelector('button')
     expect(button).toBeInTheDocument()
-    expect(button).toHaveClass('inline-flex')
-    expect(button).toHaveClass('whitespace-nowrap')
     expect(button).toHaveClass('from-prop')
     expect(button).toHaveClass('from-attr')
   })
@@ -56,44 +50,6 @@ describe('Button', () => {
       '[Tigercat] Button does not support color. Use variant instead.'
     )
     warn.mockRestore()
-  })
-
-  it('applies variant classes for each variant', () => {
-    const variants = ['primary', 'secondary', 'outline', 'ghost', 'link'] as const
-    for (const variant of variants) {
-      const { container } = render(Button, {
-        props: { variant },
-        slots: { default: variant }
-      })
-      const button = container.querySelector('button')!
-      const expected = getButtonVariantClasses(variant)
-      expected.split(' ').forEach((cls) => {
-        expect(button.className).toContain(cls)
-      })
-    }
-  })
-
-  it('applies size classes for each size', () => {
-    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
-    for (const size of sizes) {
-      const { container } = render(Button, {
-        props: { size },
-        slots: { default: size }
-      })
-      const button = container.querySelector('button')!
-      buttonSizeClasses[size].split(' ').forEach((cls) => {
-        expect(button.className).toContain(cls)
-      })
-    }
-  })
-
-  it('renders block button with full width', () => {
-    const { container } = render(Button, {
-      props: { block: true },
-      slots: { default: 'Block' }
-    })
-    const button = container.querySelector('button')
-    expect(button).toHaveClass('w-full')
   })
 
   it('respects htmlType prop (submit/reset/button)', () => {
@@ -260,31 +216,6 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary', '--tiger-primary-hover', '--tiger-primary-disabled'])
-    })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000',
-        '--tiger-primary-hover': '#cc0000'
-      })
-
-      const { container } = render(Button, {
-        props: { variant: 'primary' },
-        slots: { default: 'Themed Button' }
-      })
-
-      const button = container.querySelector('button')
-      expect(button).toBeInTheDocument()
-
-      // Verify theme variables are set
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
-    })
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Button, {
@@ -294,27 +225,6 @@ describe('Button', () => {
       })
 
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-
-  describe('danger prop', () => {
-    it('applies danger classes when danger is true', () => {
-      const { container } = render(Button, {
-        props: { danger: true },
-        slots: { default: 'Delete' }
-      })
-      const button = container.querySelector('button')!
-      expect(button.className).toContain('--tiger-error')
-    })
-
-    it('applies danger classes for outline variant', () => {
-      const { container } = render(Button, {
-        props: { danger: true, variant: 'outline' },
-        slots: { default: 'Delete' }
-      })
-      const button = container.querySelector('button')!
-      expect(button.className).toContain('--tiger-error')
-      expect(button.className).toContain('border-2')
     })
   })
 

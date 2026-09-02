@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **测试套件收口（仅本地）**：默认 `pnpm test` 跳过逐组件 jest-axe（约占全量测试时间 20%）以及 `a11y-aa-regression` / `a11y-interactive-regression` / `composite-a11y-roles`（只走 `pnpm test:a11y`）；去掉 Tailwind class 字符串、无效 Theme 断言和与 `imperative-api` 重复的 instance-counter；Table/现代主题 spec 不再动态 import 根 barrel；`pnpm e2e` 默认 Chromium 且去掉与单测重复的 TagsInput/OTP/Mask/NavigationMenu 冒烟，`pnpm e2e:full` 才跑全引擎。不把测试接入 GitHub Actions。
 - **Example 视觉审查根因修复（TC-M-001–010）**：SplitButton 主按钮与 chevron 同高；ImageCompare 焦点环画在旋钮上；ImageCropper SE 拖到边界不再平移整框、去掉位移 transition；Rate `character` 半星宿主带宽高；Slider tooltip 预留下方空间；Select/Cascader 忽略 Chrome ResizeObserver loop 误报；AutoComplete 打开点击不再立刻关掉列表（overlay 未定位时不命中、outside 延迟绑定）；Cascader 面板按内容撑开；TimePicker 选中项聚焦保持白字主色底；Vue/React Example 默认 iframe 不再加载 `@tailwindcss/browser` Wasm，编译 Worker 在 OOM 后终止并重试。Vue/React。公开视觉/行为修复。无新必填 prop。
 
 ## v2.1.3

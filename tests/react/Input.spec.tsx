@@ -9,14 +9,11 @@ import React from 'react'
 import { Input } from '@expcat/tigercat-react/Input'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import type { InputType, InputStatus } from '@expcat/tigercat-core'
+import type { InputType } from '@expcat/tigercat-core'
 import {
-  renderWithProps,
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
-  clearThemeVariables,
-  edgeCaseData
+  clearThemeVariables
 } from '../utils/react'
 
 describe('Input', () => {
@@ -96,15 +93,6 @@ describe('Input', () => {
       expect(input?.className).not.toContain('border-[var(--tiger-error')
     })
 
-    it('puts border and radius on the wrapper, not the native input', () => {
-      const { container } = render(<Input />)
-      const wrapper = container.firstChild as HTMLElement
-      const input = container.querySelector('input')
-      expect(wrapper.className).toContain('border')
-      expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md')
-      expect(input?.className).not.toContain('rounded-[var(--tiger-radius-md')
-    })
-
     it('should render error message below the chrome field and keep suffix', () => {
       const { container, getByText } = render(
         <Input status="error" errorMessage="Bad input" suffix="Still visible" />
@@ -127,22 +115,9 @@ describe('Input', () => {
       const { getByText } = render(<Input status="error" suffix="Visible" />)
       expect(getByText('Visible')).toBeInTheDocument()
     })
-
-    it.each(['success', 'warning'] as InputStatus[])('should handle %s status', (status) => {
-      const { container } = render(<Input status={status} />)
-      const input = container.querySelector('input')
-      expect(input).toBeInTheDocument()
-    })
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { getByRole } = render(<Input size={size} />)
-
-      const input = getByRole('textbox')
-      expect(input).toBeInTheDocument()
-    })
-
     it('should handle different input types', () => {
       const types: InputType[] = ['text', 'password', 'email', 'number', 'tel', 'url']
 

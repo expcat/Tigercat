@@ -8,13 +8,7 @@ import userEvent from '@testing-library/user-event'
 import { ref, nextTick, defineComponent, h } from 'vue'
 import { Radio } from '@expcat/tigercat-vue/Radio'
 import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
-import {
-  renderWithProps,
-  expectNoA11yViolationsIsolated,
-  componentSizes,
-  setThemeVariables,
-  clearThemeVariables
-} from '../utils'
+import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 const getRadio = (container: HTMLElement) =>
   container.querySelector('input[type="radio"]') as HTMLInputElement
@@ -43,15 +37,6 @@ describe('Radio', () => {
         slots: { default: 'Custom' }
       })
       expect(container.querySelector('label')).toHaveClass('custom-radio')
-    })
-
-    it.each(componentSizes)('should render %s size', (size) => {
-      const { container } = renderWithProps(
-        Radio,
-        { value: 'option1', size },
-        { slots: { default: 'Option' } }
-      )
-      expect(getRadio(container)).toBeInTheDocument()
     })
 
     it('should apply the name attribute', () => {

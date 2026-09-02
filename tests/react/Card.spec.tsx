@@ -26,18 +26,6 @@ describe('Card', () => {
     expect(ref.current).toBe(getRoot(container))
   })
 
-  it('applies size-based padding on the root without a cover', () => {
-    const { container: def } = render(<Card>Body</Card>)
-    expect(getRoot(def).className).toMatch(/\bp-4\b/)
-
-    const { container: custom } = render(<Card padding="p-8">Body</Card>)
-    expect(getRoot(custom).className).toMatch(/\bp-8\b/)
-    expect(getRoot(custom).className).not.toMatch(/\bp-4\b/)
-
-    const { container: none } = render(<Card padding={false}>Body</Card>)
-    expect(getRoot(none).className).not.toMatch(/\bp-4\b/)
-  })
-
   it('puts cover padding on the body column, not the image', () => {
     const { container } = render(
       <Card cover="https://example.com/cover.jpg" size="md">
