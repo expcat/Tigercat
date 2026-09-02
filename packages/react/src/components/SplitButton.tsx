@@ -6,6 +6,7 @@ import {
   getSplitButtonRootClasses,
   getSplitButtonTriggerClasses,
   resolveLocaleText,
+  splitButtonDropdownClasses,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
   resolveSplitButtonVariant,
@@ -160,6 +161,7 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
       </Button>
       {hasMenu ? (
         <Dropdown
+          className={splitButtonDropdownClasses}
           trigger="click"
           showArrow={false}
           asChild

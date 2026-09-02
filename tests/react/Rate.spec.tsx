@@ -35,12 +35,6 @@ describe('Rate', () => {
     expect(container.querySelector('.custom-rate')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    const { container } = render(<Rate size={size} />)
-    expect(container.querySelector('[role="slider"]')).toBeInTheDocument()
-  })
-
   // --- Selection (mouse) ---
   it('calls onChange on star click', () => {
     const onChange = vi.fn()

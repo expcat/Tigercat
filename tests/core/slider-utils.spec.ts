@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getSliderRootClasses,
   sliderGetKeyboardValue,
   sliderGetPercentage,
   sliderGetValueFromPosition,
@@ -10,6 +11,11 @@ import {
 } from '@expcat/tigercat-core'
 
 describe('slider-utils', () => {
+  it('reserves space above the track when the value tooltip is enabled', () => {
+    expect(getSliderRootClasses(false, undefined, true)).toContain('pt-12')
+    expect(getSliderRootClasses(false)).not.toContain('pt-12')
+    expect(getSliderRootClasses(true, undefined, true)).toContain('opacity-50')
+  })
   it('normalizes invalid domains and steps to finite values', () => {
     expect(sliderNormalizeValue(Number.NaN, 100, 0, 0)).toBe(0)
     expect(sliderNormalizeValue(45, 100, 0, -5)).toBe(45)

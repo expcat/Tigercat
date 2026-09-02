@@ -157,8 +157,8 @@ export function getTimePickerItemClasses(isSelected: boolean, isDisabled: boolea
     isDisabled
       ? 'text-[var(--tiger-text-muted,#9ca3af)] opacity-50 cursor-not-allowed'
       : isSelected
-        ? 'bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)] font-medium'
-        : 'text-[var(--tiger-text,#374151)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)] cursor-pointer'
+        ? 'bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)] font-medium focus:bg-[var(--tiger-primary,#2563eb)] focus:text-[var(--tiger-primary-foreground,#ffffff)]'
+        : 'text-[var(--tiger-text,#374151)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)] focus:bg-[var(--tiger-surface-muted,#f3f4f6)] cursor-pointer'
   )
 }
 

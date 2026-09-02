@@ -9,7 +9,6 @@ import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
 import { resolveDemoViewport } from '@demo-shared/playground/viewport'
 import type {
-  DemoCompileResponse,
   DemoCompileSuccess,
   DemoDiagnostic,
   DemoModuleDescriptor,
@@ -20,6 +19,8 @@ import {
   getSandboxAttribute,
   isSandboxEvent
 } from '@demo-shared/playground/sandbox'
+import { createCompilerClient, type CompilerClient } from '@demo-shared/playground/compiler-client'
+import { isBenignSandboxRuntimeError } from '@demo-shared/playground/sandbox-errors'
 import stylesheetUrl from '@demo-shared/sandbox.css?url'
 
 const props = defineProps<{
@@ -32,34 +33,21 @@ interface ConsoleEntry {
   message: string
 }
 
-let compilerWorker: Worker | null = null
-let nextRequestId = 1
-const pendingCompiles = new Map<
-  number,
-  { resolve: (result: DemoCompileSuccess) => void; reject: (diagnostics: DemoDiagnostic[]) => void }
->()
+let compiler: CompilerClient | null = null
 
-function getCompilerWorker(): Worker {
-  if (compilerWorker) return compilerWorker
-  compilerWorker = new Worker(new URL('../playground/compiler.worker.ts', import.meta.url), {
-    type: 'module'
-  })
-  compilerWorker.onmessage = (event: MessageEvent<DemoCompileResponse>) => {
-    const pending = pendingCompiles.get(event.data.requestId)
-    if (!pending) return
-    pendingCompiles.delete(event.data.requestId)
-    if (event.data.type === 'compiled') pending.resolve(event.data)
-    else pending.reject(event.data.diagnostics)
-  }
-  return compilerWorker
+function getCompiler(): CompilerClient {
+  if (compiler) return compiler
+  compiler = createCompilerClient(
+    () =>
+      new Worker(new URL('../playground/compiler.worker.ts', import.meta.url), {
+        type: 'module'
+      })
+  )
+  return compiler
 }
 
 function compileBundle(bundle: DemoSourceBundle): Promise<DemoCompileSuccess> {
-  const requestId = nextRequestId++
-  return new Promise((resolve, reject) => {
-    pendingCompiles.set(requestId, { resolve, reject })
-    getCompilerWorker().postMessage({ type: 'compile', requestId, bundle })
-  })
+  return getCompiler().compile(bundle)
 }
 
 function normalizeDiagnostics(error: unknown): DemoDiagnostic[] {
@@ -144,7 +132,8 @@ function rebuildSandbox(result: DemoCompileSuccess) {
       theme: ThemeManager.getCurrentTheme(),
       colorScheme: ThemeManager.getResolvedColorScheme(),
       cssVars: collectTigerCssVars(document.documentElement),
-      modules: result.modules
+      modules: result.modules,
+      enableTailwindJit: isDirty.value
     })
   }
 }
@@ -219,6 +208,7 @@ function onMessage(event: MessageEvent) {
     status.value = isDirty.value ? 'dirty' : 'ready'
   }
   if (event.data.type === 'runtime-error') {
+    if (isBenignSandboxRuntimeError(event.data.message)) return
     diagnostics.value = [{ text: event.data.message ?? chrome.value.runtimeFailed }]
     status.value = 'runtime-error'
   }

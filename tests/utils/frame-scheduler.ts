@@ -39,6 +39,11 @@ export function createFrameScheduler() {
 
 export type FrameScheduler = ReturnType<typeof createFrameScheduler>
 
+/** Overlay outside-dismiss waits one macrotask so the opening click cannot close it. */
+export function flushOverlayOutsideDismiss(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0))
+}
+
 /**
  * Controllable requestAnimationFrame mock that auto-stubs globals.
  *

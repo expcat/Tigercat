@@ -16,7 +16,8 @@ import {
   splitButtonPrimaryBlockClasses,
   splitButtonRootBlockClasses,
   splitButtonRootClasses,
-  splitButtonTriggerClasses
+  splitButtonTriggerClasses,
+  splitButtonDropdownClasses
 } from '@expcat/tigercat-core'
 
 describe('split-button-utils', () => {
@@ -60,6 +61,12 @@ describe('split-button-utils', () => {
         splitButtonPrimaryBlockClasses
       )
       expect(getSplitButtonPrimaryClasses()).not.toContain(splitButtonPrimaryBlockClasses)
+    })
+
+    it('stretches the chevron trigger to the primary action height', () => {
+      expect(getSplitButtonRootClasses()).toContain('items-stretch')
+      expect(getSplitButtonTriggerClasses()).toContain('h-full')
+      expect(splitButtonDropdownClasses).toContain('self-stretch')
     })
 
     it('keeps the trigger compact and joined to the primary action', () => {

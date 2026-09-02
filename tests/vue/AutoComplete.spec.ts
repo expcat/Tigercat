@@ -59,6 +59,17 @@ describe('AutoComplete', () => {
     expect(input).toHaveValue('App')
   })
 
+  it('stays open through the focusing click', async () => {
+    const { getByRole } = render(AutoComplete, {
+      props: { options, 'aria-label': 'Fruit' }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.focus(input)
+    expect(getByRole('listbox')).toBeInTheDocument()
+    await fireEvent.click(input)
+    expect(getByRole('listbox')).toBeInTheDocument()
+  })
+
   it('does not rewrite the query to a matching option label while typing', async () => {
     const Wrapper = defineComponent({
       setup() {

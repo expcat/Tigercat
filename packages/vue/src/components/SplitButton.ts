@@ -7,6 +7,7 @@ import {
   getSplitButtonRootClasses,
   getSplitButtonTriggerClasses,
   mergeStyleValues,
+  splitButtonDropdownClasses,
   resolveLocaleText,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
@@ -217,6 +218,7 @@ export const SplitButton = defineComponent({
         ? h(
             Dropdown,
             {
+              className: splitButtonDropdownClasses,
               trigger: 'click' as const,
               showArrow: false,
               asChild: true,

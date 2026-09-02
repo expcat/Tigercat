@@ -3,6 +3,7 @@ import type { RateSize } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
   getRateStarClasses,
+  rateCharacterGlyphClasses,
   rateHalfStarInnerClasses,
   rateActiveColor,
   rateInactiveColor,
@@ -127,9 +128,13 @@ export const Rate = defineComponent({
       const isChar = Boolean(slotChar || props.character)
       const glyph = (extraClass?: string) =>
         slotChar
-          ? h('span', { class: extraClass }, slotChar)
+          ? h('span', { class: classNames(rateCharacterGlyphClasses, extraClass) }, slotChar)
           : isChar
-            ? h('span', { class: extraClass }, props.character)
+            ? h(
+                'span',
+                { class: classNames(rateCharacterGlyphClasses, extraClass) },
+                props.character
+              )
             : h(
                 'svg',
                 {

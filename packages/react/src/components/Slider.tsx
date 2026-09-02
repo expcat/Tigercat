@@ -372,7 +372,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     <div
       {...divProps}
       ref={setRootRef}
-      className={getSliderRootClasses(effectiveDisabled, className)}
+      className={getSliderRootClasses(effectiveDisabled, className, tooltip)}
       data-status={status === 'default' ? undefined : status}>
       <div className={sliderHitAreaClasses} onPointerDown={handleTrackPointerDown}>
         <div ref={trackRef} className={trackClasses} onPointerDown={handleTrackPointerDown}>

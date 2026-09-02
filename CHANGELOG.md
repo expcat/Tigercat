@@ -2,6 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## 未发布
+
+- **Example 视觉审查根因修复（TC-M-001–010）**：SplitButton 主按钮与 chevron 同高；ImageCompare 焦点环画在旋钮上；ImageCropper SE 拖到边界不再平移整框、去掉位移 transition；Rate `character` 半星宿主带宽高；Slider tooltip 预留下方空间；Select/Cascader 忽略 Chrome ResizeObserver loop 误报；AutoComplete 打开点击不再立刻关掉列表（overlay 未定位时不命中、outside 延迟绑定）；Cascader 面板按内容撑开；TimePicker 选中项聚焦保持白字主色底；Vue/React Example 默认 iframe 不再加载 `@tailwindcss/browser` Wasm，编译 Worker 在 OOM 后终止并重试。Vue/React。公开视觉/行为修复。无新必填 prop。
+
 ## v2.1.3
 
 v2.1.3：把未发布栏的组件根因修复收成正式版，含 NavigationMenu 键盘、ScrollArea playground 溢出、Watermark 防篡改循环和发版门禁。

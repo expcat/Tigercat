@@ -14,6 +14,7 @@ import {
   getImageCompareImgClasses,
   getImageCompareKeyboardPosition,
   getImageCompareLabels,
+  getImageCompareKnobClasses,
   getImageComparePointerClientPoint,
   getImageComparePositionFromPointer,
   getImageCompareRootClasses,
@@ -218,6 +219,11 @@ describe('image-compare-utils', () => {
       const handle = getImageCompareHandleClasses({ orientation: 'vertical', disabled: true })
       expect(handle).toContain('cursor-ns-resize')
       expect(handle).toContain('cursor-not-allowed')
+      expect(getImageCompareHandleClasses({ orientation: 'horizontal' })).toContain('group')
+      expect(getImageCompareHandleClasses({ orientation: 'horizontal' })).not.toContain(
+        'focus-visible:ring-2'
+      )
+      expect(getImageCompareKnobClasses()).toContain('group-focus-visible:ring-2')
     })
 
     it('reuses Image object-fit classes for pane images', () => {

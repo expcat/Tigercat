@@ -584,7 +584,7 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
             ...(options.outsideRefs ?? [])
           ],
           onOutsideClick: () => dismiss('outside'),
-          defer: false
+          defer: true
         })
       }
       if (optionEnabled(options.dismissOnEscape)) {

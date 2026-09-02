@@ -34,7 +34,10 @@ export const splitButtonPrimaryBlockClasses = 'min-w-0 flex-1'
  * when the group is stretched.
  */
 export const splitButtonTriggerClasses =
-  'tiger-split-button-trigger shrink-0 !rounded-s-none -ms-px'
+  'tiger-split-button-trigger shrink-0 h-full !rounded-s-none -ms-px'
+
+/** Stretch the Dropdown root to the primary action height in the group */
+export const splitButtonDropdownClasses = 'self-stretch'
 
 /** Compact horizontal padding so the chevron trigger stays square-ish */
 export const splitButtonTriggerSizeClasses: Record<ButtonSize, string> = {

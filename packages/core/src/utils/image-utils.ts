@@ -324,7 +324,7 @@ const CROPPER_HANDLE_CURSORS: Record<CropHandle, string> = {
  */
 export function getCropperHandleClasses(handle: CropHandle): string {
   return classNames(
-    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary,#2563eb)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary,#2563eb)] hover:border-white transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary,#2563eb)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary,#2563eb)] hover:border-white transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
     CROPPER_HANDLE_CURSORS[handle]
   )
 }
@@ -502,14 +502,31 @@ export function resizeCropRect(
     }
   }
 
-  return constrainCropRect(
-    { x: left, y: top, width: right - left, height: bottom - top },
-    imageWidth,
-    imageHeight,
-    aspectRatio,
-    minW,
-    minH
-  )
+  left = Math.max(0, left)
+  top = Math.max(0, top)
+  right = Math.min(imageWidth, right)
+  bottom = Math.min(imageHeight, bottom)
+
+  if (right - left < maxW) {
+    if (lockLeft) right = left + maxW
+    else left = right - maxW
+  }
+  if (bottom - top < maxH) {
+    if (lockTop) bottom = top + maxH
+    else top = bottom - maxH
+  }
+
+  left = Math.max(0, left)
+  top = Math.max(0, top)
+  right = Math.min(imageWidth, right)
+  bottom = Math.min(imageHeight, bottom)
+
+  return {
+    x: left,
+    y: top,
+    width: Math.max(0, right - left),
+    height: Math.max(0, bottom - top)
+  }
 }
 
 /**

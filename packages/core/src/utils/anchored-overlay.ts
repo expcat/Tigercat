@@ -82,10 +82,11 @@ export function getAnchoredOverlayLayoutClasses(
   layout: AnchoredOverlayLayout = 'anchored',
   matchReferenceWidth = false
 ): string {
-  // Modal/Drawer roots are pointer-events-none; overlay-host is display:contents,
-  // so the portaled layer must opt back in or clicks fall through to dialog content.
+  // Unpositioned layers must not steal the opening click (AutoComplete flash-close).
+  // Once placed, opt back into hit-testing: Modal/Drawer roots are pointer-events-none
+  // and overlay-host is display:contents, so clicks would otherwise fall through.
   const positioned =
-    'pointer-events-auto absolute left-[var(--tiger-overlay-x)] top-[var(--tiger-overlay-y)] max-w-[var(--tiger-overlay-available-width)]! max-h-[var(--tiger-overlay-available-height)]! invisible data-[positioned=true]:visible'
+    'absolute left-[var(--tiger-overlay-x)] top-[var(--tiger-overlay-y)] max-w-[var(--tiger-overlay-available-width)]! max-h-[var(--tiger-overlay-available-height)]! invisible pointer-events-none data-[positioned=true]:visible data-[positioned=true]:pointer-events-auto'
 
   return classNames(
     positioned,

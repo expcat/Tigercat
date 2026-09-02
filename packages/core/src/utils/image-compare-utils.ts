@@ -43,9 +43,9 @@ export const imageCompareAfterClasses =
 export const imageCompareBeforeClasses =
   'tiger-image-compare-before absolute inset-0 overflow-hidden pointer-events-none [&>img]:pointer-events-none [&>img]:select-none [&>img]:max-w-none'
 
-/** Focusable divider / slider handle */
+/** Focusable divider / slider handle. Ring lives on the knob via group-focus-visible. */
 export const imageCompareHandleClasses =
-  'tiger-image-compare-handle absolute z-10 flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'tiger-image-compare-handle group absolute z-10 flex items-center justify-center outline-none'
 
 /** Horizontal handle hit area. Centering uses inline transform, not a physical -translate-x. */
 export const imageCompareHandleHorizontalClasses = 'inset-y-0 w-6 cursor-ew-resize'
@@ -66,7 +66,7 @@ export const imageCompareLineVerticalClasses = 'inset-x-0 top-1/2 h-0.5 -transla
 
 /** Circular grabber on the divider */
 export const imageCompareKnobClasses =
-  'tiger-image-compare-knob relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--tiger-primary,#2563eb)] text-white shadow pointer-events-none'
+  'tiger-image-compare-knob relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--tiger-primary,#2563eb)] text-white shadow pointer-events-none group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
 const IMAGE_COMPARE_ORIENTATIONS = new Set<ImageCompareOrientation>(['horizontal', 'vertical'])
 

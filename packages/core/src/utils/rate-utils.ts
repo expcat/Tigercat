@@ -30,10 +30,14 @@ export function getRateStarClasses(
 ): string {
   return classNames(
     'relative inline-flex items-center justify-center transition-colors select-none',
-    isCharacter ? sizeText[size] : sizePx[size],
+    sizePx[size],
+    isCharacter && sizeText[size],
     disabled ? 'cursor-default' : 'cursor-pointer'
   )
 }
+
+/** Fill the sized star host so a custom character is not a 0×0 inline glyph. */
+export const rateCharacterGlyphClasses = 'inline-flex h-full w-full items-center justify-center'
 
 /** Inner glyph of a 50% overflow clip: 200% of the clip equals the parent star box. */
 export const rateHalfStarInnerClasses = 'w-[200%] h-full'

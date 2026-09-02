@@ -136,7 +136,9 @@ describe('image-utils — class generators', () => {
       ['w', 'cursor-w-resize']
     ]
     for (const [handle, cursor] of expectations) {
-      expect(getCropperHandleClasses(handle)).toContain(cursor)
+      const classes = getCropperHandleClasses(handle)
+      expect(classes).toContain(cursor)
+      expect(classes).not.toContain('transition-all')
     }
   })
 
@@ -342,6 +344,15 @@ describe('image-utils — resizeCropRect', () => {
     const out = resizeCropRect(small, 'e', -100, 0, W, H, undefined, 20, 20)
     expect(out.width).toBe(20)
     expect(out.x).toBe(50)
+  })
+
+  it('keeps the opposite corner fixed when SE hits the image edge', () => {
+    const nearEdge: CropRect = { x: 160, y: 160, width: 20, height: 20 }
+    const out = resizeCropRect(nearEdge, 'se', 80, 80, 200, 200)
+    expect(out.x).toBe(160)
+    expect(out.y).toBe(160)
+    expect(out.width).toBe(40)
+    expect(out.height).toBe(40)
   })
 
   it('enforces aspect ratio for n handle (width follows height, bottom stays)', () => {

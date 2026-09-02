@@ -40,7 +40,7 @@ const CASCADER_OPTION_PAD_Y: Record<ComponentSize, string> = {
 }
 
 export const cascaderBaseClasses = selectBaseClasses
-export const cascaderDropdownClasses = classNames(selectDropdownBaseClasses, 'min-w-0')
+export const cascaderDropdownClasses = classNames(selectDropdownBaseClasses, 'min-w-0', 'w-max')
 export const cascaderSearchInputClasses = selectSearchInputClasses
 export const cascaderSearchWrapClasses = selectSearchWrapClasses
 export const cascaderEmptyStateClasses = selectEmptyStateClasses

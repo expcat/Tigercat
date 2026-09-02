@@ -563,7 +563,7 @@ export function useAnchoredOverlay({
     enabled: enabled && dismissOnOutside,
     refs: [containerRef, referenceRef, floatingLayerRef, ...outsideRefs],
     onOutsideClick: dismissOutside,
-    defer: false
+    defer: true
   })
   useEscapeKey({
     enabled: enabled && dismissOnEscape,

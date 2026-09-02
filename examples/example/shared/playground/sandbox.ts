@@ -1,4 +1,5 @@
 import type { DemoFramework, DemoModuleMeta, DemoRuntimeUrls, DemoSandboxEvent } from './types'
+import { RESIZE_OBSERVER_LOOP } from './sandbox-errors'
 
 interface SandboxDocumentOptions {
   framework: DemoFramework
@@ -14,6 +15,8 @@ interface SandboxDocumentOptions {
   colorScheme: 'light' | 'dark'
   cssVars: string
   modules?: Record<string, string>
+  /** Load `@tailwindcss/browser` Wasm. Stock demos already have parent CSS. */
+  enableTailwindJit?: boolean
 }
 
 function safeJson(value: unknown): string {
@@ -136,7 +139,11 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
     <link rel="stylesheet" href="${options.stylesheetUrl}" />
     <style>${options.css}</style>
     <style>html,body{margin:0;min-height:100%;background:transparent}body{padding:1rem;box-sizing:border-box}#root{min-height:1px}</style>
-    <script type="module" src="${options.runtimeUrls.tailwind}"></script>
+    ${
+      options.enableTailwindJit
+        ? `<script type="module" src="${options.runtimeUrls.tailwind}"></script>`
+        : ''
+    }
   </head>
   <body>
     <div id="root"></div>
@@ -163,11 +170,17 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
       }
       window.addEventListener('error', (event) => {
         const message = event.error?.stack || event.message || ''
-        if (/ResizeObserver loop/.test(message)) return
+        if (typeof event.message === 'string' && ${RESIZE_OBSERVER_LOOP}.test(event.message)) {
+          event.preventDefault()
+          return
+        }
+        if (${RESIZE_OBSERVER_LOOP}.test(message)) return
         send({ type: 'runtime-error', message })
       })
       window.addEventListener('unhandledrejection', (event) => {
-        send({ type: 'runtime-error', message: event.reason?.stack || stringify(event.reason) })
+        const message = event.reason?.stack || stringify(event.reason)
+        if (typeof message === 'string' && ${RESIZE_OBSERVER_LOOP}.test(message)) return
+        send({ type: 'runtime-error', message })
       })
       const measureHeight = () => {
         let height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)

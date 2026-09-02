@@ -3,6 +3,7 @@ import type { RateProps as CoreRateProps } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
   getRateStarClasses,
+  rateCharacterGlyphClasses,
   rateHalfStarInnerClasses,
   rateActiveColor,
   rateInactiveColor,
@@ -82,7 +83,7 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
 
   const glyph = (extraClass?: string) =>
     isChar ? (
-      <span className={extraClass}>{character}</span>
+      <span className={classNames(rateCharacterGlyphClasses, extraClass)}>{character}</span>
     ) : (
       <svg viewBox={starViewBox} fill="currentColor" className={extraClass ?? 'h-full w-full'}>
         <path d={starPathD} />

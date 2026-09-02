@@ -64,7 +64,8 @@ describe('anchored overlay contract', () => {
     const bottomSheet = getAnchoredOverlayLayoutClasses('bottom-sheet-sm')
 
     expect(anchored).toContain('data-[positioned=true]:visible')
-    expect(anchored).toContain('pointer-events-auto')
+    expect(anchored).toContain('pointer-events-none')
+    expect(anchored).toContain('data-[positioned=true]:pointer-events-auto')
     expect(anchored).toContain('w-[var(--tiger-overlay-reference-width)]')
     expect(fullscreen).toContain('max-sm:fixed')
     expect(fullscreen).toContain('max-sm:inset-0')

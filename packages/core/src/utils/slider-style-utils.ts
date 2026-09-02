@@ -7,6 +7,9 @@ import { classNames } from './class-names'
 
 export const sliderBaseClasses = 'relative w-full'
 
+/** Extra top space so the value tooltip is not clipped by overflow ancestors. */
+export const sliderTooltipReserveClasses = 'pt-12'
+
 export const sliderTrackClasses = 'relative w-full rounded-full bg-[var(--tiger-border,#e5e7eb)]'
 
 export const sliderHitAreaClasses = 'relative w-full py-2 min-h-6'
@@ -77,6 +80,15 @@ export function getSliderTooltipClasses(size: ComponentSize = 'md'): string {
   return classNames(sliderTooltipClasses, sliderSizeClasses[size].tooltip)
 }
 
-export function getSliderRootClasses(disabled: boolean = false, className?: string): string {
-  return classNames(sliderBaseClasses, disabled && sliderDisabledClasses, className)
+export function getSliderRootClasses(
+  disabled: boolean = false,
+  className?: string,
+  tooltip: boolean = false
+): string {
+  return classNames(
+    sliderBaseClasses,
+    disabled && sliderDisabledClasses,
+    tooltip && sliderTooltipReserveClasses,
+    className
+  )
 }

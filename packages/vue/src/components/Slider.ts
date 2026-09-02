@@ -394,7 +394,8 @@ export const Slider = defineComponent({
           ref: rootElement,
           class: getSliderRootClasses(
             effectiveDisabled.value,
-            classNames(props.className, coerceClassValue(attrs.class))
+            classNames(props.className, coerceClassValue(attrs.class)),
+            props.tooltip
           ),
           style: mergeStyleValues(attrs.style, props.style),
           'data-status': status.value === 'default' ? undefined : status.value
