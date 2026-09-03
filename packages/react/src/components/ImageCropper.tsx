@@ -25,6 +25,9 @@ import {
   getImageEditorLabels,
   getInitialCropRect,
   imageCropperContainerClasses,
+  imageCropperSizeHostClasses,
+  planCropperDisplaySize,
+  resolveCropperAvailableSize,
   imageCropperDragAreaClasses,
   imageCropperFrameClasses,
   imageCropperGuideClasses,
@@ -141,10 +144,12 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     const defaultCropRectRef = useRef(defaultCropRect)
     const onReadyRef = useRef(onReady)
     const onErrorRef = useRef(onError)
+    const styleRef = useRef(style)
     aspectRef.current = aspectRatio
     defaultCropRectRef.current = defaultCropRect
     onReadyRef.current = onReady
     onErrorRef.current = onError
+    styleRef.current = style
 
     const [status, setStatus] = useState<CropperStatus>('loading')
     const [displayWidth, setDisplayWidth] = useState(0)
@@ -179,12 +184,12 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       loader.load(src, {
         onLoad: (img, naturalWidth, naturalHeight) => {
           const container = containerRef.current
-          const size = getCropperDisplaySize(
-            naturalWidth,
-            naturalHeight,
+          const box = resolveCropperAvailableSize(
             container?.clientWidth ?? 0,
-            container?.clientHeight ?? 0
+            container?.clientHeight ?? 0,
+            styleRef.current
           )
+          const size = getCropperDisplaySize(naturalWidth, naturalHeight, box.width, box.height)
           if (!size) {
             setStatus('error')
             onErrorRef.current?.(new Error('Image not loaded'))
@@ -228,15 +233,21 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       if (!container || status !== 'ready' || typeof ResizeObserver === 'undefined') return
       const observer = new ResizeObserver(() => {
         const natural = naturalSizeRef.current
-        const next = getCropperDisplaySize(
+        const box = resolveCropperAvailableSize(
+          container.clientWidth,
+          container.clientHeight,
+          styleRef.current
+        )
+        const current = displayDimsRef.current
+        const next = planCropperDisplaySize(
           natural.w,
           natural.h,
-          container.clientWidth,
-          container.clientHeight
+          box.width,
+          box.height,
+          current.w,
+          current.h
         )
         if (!next) return
-        const current = displayDimsRef.current
-        if (next.width === current.w && next.height === current.h) return
         setCropRect((prev) =>
           remapCropRect(
             prev,
@@ -371,13 +382,10 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       [cropRect, setCropRect]
     )
 
-    const containerClasses = classNames(imageCropperContainerClasses, className)
+    const containerClasses = classNames(imageCropperSizeHostClasses, className)
     const rootStyle: React.CSSProperties = { ...style }
     if (status === 'loading' || status === 'error') {
       if (rootStyle.minHeight == null) rootStyle.minHeight = 200
-    } else {
-      if (rootStyle.width == null) rootStyle.width = displayWidth
-      if (rootStyle.height == null) rootStyle.height = displayHeight
     }
 
     if (status !== 'ready') {
@@ -385,7 +393,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         <div
           {...rest}
           ref={containerRef}
-          className={classNames(containerClasses, 'flex items-center justify-center')}
+          className={classNames(containerClasses, 'items-center')}
           style={rootStyle}
           data-image-cropper=""
           data-image-cropper-status={status}
@@ -411,133 +419,138 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         className={containerClasses}
         style={rootStyle}
         data-image-cropper=""
-        data-image-cropper-status="ready"
-        role="group"
-        aria-label={labels.cropperDialogAriaLabel}>
+        data-image-cropper-status="ready">
         <div
-          className={imageCropperFrameClasses}
-          style={{ width: displayWidth, height: displayHeight }}>
-          <img
-            src={src}
-            className={imageCropperImgClasses}
-            style={{ width: displayWidth, height: displayHeight }}
-            draggable={false}
-            alt={labels.imageToCropAriaLabel}
-          />
-          <svg
-            className={imageCropperMaskClasses}
-            width={displayWidth}
-            height={displayHeight}
-            xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <mask id={maskId}>
-                <rect width={displayWidth} height={displayHeight} fill="white" />
-                <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
-              </mask>
-            </defs>
-            <rect
+          className={imageCropperContainerClasses}
+          style={{ width: displayWidth, height: displayHeight }}
+          data-image-cropper-stage=""
+          role="group"
+          aria-label={labels.cropperDialogAriaLabel}>
+          <div
+            className={imageCropperFrameClasses}
+            style={{ width: displayWidth, height: displayHeight }}>
+            <img
+              src={src}
+              className={imageCropperImgClasses}
+              style={{ width: displayWidth, height: displayHeight }}
+              draggable={false}
+              alt={labels.imageToCropAriaLabel}
+            />
+            <svg
+              className={imageCropperMaskClasses}
               width={displayWidth}
               height={displayHeight}
-              fill={IMAGE_CROPPER_MASK_FILL}
-              mask={`url(#${maskId})`}
-            />
-          </svg>
-        </div>
+              xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <mask id={maskId}>
+                  <rect width={displayWidth} height={displayHeight} fill="white" />
+                  <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
+                </mask>
+              </defs>
+              <rect
+                width={displayWidth}
+                height={displayHeight}
+                fill={IMAGE_CROPPER_MASK_FILL}
+                mask={`url(#${maskId})`}
+              />
+            </svg>
+          </div>
 
-        <div
-          className={imageCropperSelectionClasses}
-          style={{
-            left: cr.x,
-            top: cr.y,
-            width: cr.width,
-            height: cr.height
-          }}
-        />
-
-        <div
-          className={imageCropperDragAreaClasses}
-          style={{
-            left: cr.x,
-            top: cr.y,
-            width: cr.width,
-            height: cr.height
-          }}
-          data-crop-move=""
-          role="button"
-          tabIndex={0}
-          aria-label={labels.moveCropAreaAriaLabel}
-          onPointerDown={(event) => startDrag(event, 'move')}
-          onKeyDown={handleMoveKeyDown}
-        />
-
-        {guides && (
-          <>
-            <div
-              className={imageCropperGuideClasses}
-              data-guide="true"
-              style={{
-                left: cr.x,
-                top: cr.y + cr.height / 3,
-                width: cr.width,
-                height: 0,
-                borderTopWidth: 1,
-                borderTopStyle: 'dashed'
-              }}
-            />
-            <div
-              className={imageCropperGuideClasses}
-              data-guide="true"
-              style={{
-                left: cr.x,
-                top: cr.y + (cr.height * 2) / 3,
-                width: cr.width,
-                height: 0,
-                borderTopWidth: 1,
-                borderTopStyle: 'dashed'
-              }}
-            />
-            <div
-              className={imageCropperGuideClasses}
-              data-guide="true"
-              style={{
-                left: cr.x + cr.width / 3,
-                top: cr.y,
-                width: 0,
-                height: cr.height,
-                borderLeftWidth: 1,
-                borderLeftStyle: 'dashed'
-              }}
-            />
-            <div
-              className={imageCropperGuideClasses}
-              data-guide="true"
-              style={{
-                left: cr.x + (cr.width * 2) / 3,
-                top: cr.y,
-                width: 0,
-                height: cr.height,
-                borderLeftWidth: 1,
-                borderLeftStyle: 'dashed'
-              }}
-            />
-          </>
-        )}
-
-        {CROP_HANDLES.map((handle) => (
           <div
-            key={handle}
-            className={getCropperHandleClasses(handle)}
-            style={getCropperHandleStyle(handle, cr)}
-            data-crop-handle={handle}
-            role="button"
-            tabIndex={-1}
-            aria-label={formatCropperResizeAriaLabel(
-              labels.resizeCropAreaAriaLabel,
-              getCropperHandleName(handle, labels)
-            )}
-            onPointerDown={(event) => startDrag(event, 'resize', handle)}
+            className={imageCropperSelectionClasses}
+            style={{
+              left: cr.x,
+              top: cr.y,
+              width: cr.width,
+              height: cr.height
+            }}
           />
-        ))}
+
+          <div
+            className={imageCropperDragAreaClasses}
+            style={{
+              left: cr.x,
+              top: cr.y,
+              width: cr.width,
+              height: cr.height
+            }}
+            data-crop-move=""
+            role="button"
+            tabIndex={0}
+            aria-label={labels.moveCropAreaAriaLabel}
+            onPointerDown={(event) => startDrag(event, 'move')}
+            onKeyDown={handleMoveKeyDown}
+          />
+
+          {guides && (
+            <>
+              <div
+                className={imageCropperGuideClasses}
+                data-guide="true"
+                style={{
+                  left: cr.x,
+                  top: cr.y + cr.height / 3,
+                  width: cr.width,
+                  height: 0,
+                  borderTopWidth: 1,
+                  borderTopStyle: 'dashed'
+                }}
+              />
+              <div
+                className={imageCropperGuideClasses}
+                data-guide="true"
+                style={{
+                  left: cr.x,
+                  top: cr.y + (cr.height * 2) / 3,
+                  width: cr.width,
+                  height: 0,
+                  borderTopWidth: 1,
+                  borderTopStyle: 'dashed'
+                }}
+              />
+              <div
+                className={imageCropperGuideClasses}
+                data-guide="true"
+                style={{
+                  left: cr.x + cr.width / 3,
+                  top: cr.y,
+                  width: 0,
+                  height: cr.height,
+                  borderLeftWidth: 1,
+                  borderLeftStyle: 'dashed'
+                }}
+              />
+              <div
+                className={imageCropperGuideClasses}
+                data-guide="true"
+                style={{
+                  left: cr.x + (cr.width * 2) / 3,
+                  top: cr.y,
+                  width: 0,
+                  height: cr.height,
+                  borderLeftWidth: 1,
+                  borderLeftStyle: 'dashed'
+                }}
+              />
+            </>
+          )}
+
+          {CROP_HANDLES.map((handle) => (
+            <div
+              key={handle}
+              className={getCropperHandleClasses(handle)}
+              style={getCropperHandleStyle(handle, cr)}
+              data-crop-handle={handle}
+              role="button"
+              tabIndex={-1}
+              aria-label={formatCropperResizeAriaLabel(
+                labels.resizeCropAreaAriaLabel,
+                getCropperHandleName(handle, labels)
+              )}
+              onPointerDown={(event) => startDrag(event, 'resize', handle)}
+            />
+          ))}
+        </div>
       </div>
     )
   }

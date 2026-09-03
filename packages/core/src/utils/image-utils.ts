@@ -268,7 +268,13 @@ export function injectImageCropperStyles(): void {
 }
 
 /**
- * Cropper container classes. Overflow clip lives on the bitmap frame so
+ * Observed size host. Width comes from the parent (`w-full`); never write the
+ * fitted bitmap size back onto this node or ResizeObserver will chase itself.
+ */
+export const imageCropperSizeHostClasses = 'relative flex w-full max-w-full justify-center'
+
+/**
+ * Visual crop stage (bitmap-sized). Overflow clip lives on the bitmap frame so
  * handles and their focus rings stay visible at 0/100%.
  */
 export const imageCropperContainerClasses =
@@ -581,8 +587,58 @@ export function getInitialCropRect(
   )
 }
 
+const CROPPER_DISPLAY_SIZE_EPSILON = 0.5
+
+function readStyleField(style: unknown, key: string): unknown {
+  if (!style || typeof style !== 'object' || Array.isArray(style)) return undefined
+  return (style as Record<string, unknown>)[key]
+}
+
+function hasCssLength(value: unknown): boolean {
+  if (typeof value === 'number') return isPositiveFinite(value)
+  if (typeof value !== 'string') return false
+  const trimmed = value.trim().toLowerCase()
+  return trimmed !== '' && trimmed !== 'auto' && trimmed !== 'none'
+}
+
+function readPositivePixelLength(value: unknown): number {
+  if (typeof value === 'number') return isPositiveFinite(value) ? value : 0
+  if (typeof value !== 'string') return 0
+  const trimmed = value.trim()
+  if (trimmed.endsWith('%')) return 0
+  if (!trimmed.endsWith('px') && !/^\d+(\.\d+)?$/.test(trimmed)) return 0
+  const parsed = Number.parseFloat(trimmed)
+  return isPositiveFinite(parsed) ? parsed : 0
+}
+
+/**
+ * Available box for fitting. Height is used only when the caller set an
+ * explicit `height` / `maxHeight` — content-sized host height is the fitted
+ * bitmap, so feeding it back would recreate a ResizeObserver loop.
+ */
+export function resolveCropperAvailableSize(
+  hostWidth: number,
+  hostHeight: number,
+  style?: unknown
+): { width: number; height: number } {
+  const width = isPositiveFinite(hostWidth) ? hostWidth : 0
+  const heightValue = readStyleField(style, 'height')
+  const maxHeightValue = readStyleField(style, 'maxHeight')
+  const parsed = readPositivePixelLength(heightValue) || readPositivePixelLength(maxHeightValue)
+  if (parsed > 0) {
+    return { width, height: parsed }
+  }
+  const heightIsExplicit = hasCssLength(heightValue) || hasCssLength(maxHeightValue)
+  return {
+    width,
+    height: heightIsExplicit && isPositiveFinite(hostHeight) ? hostHeight : 0
+  }
+}
+
 /**
  * Fit a natural-size bitmap into a container without upscaling.
+ * A non-positive `containerHeight` is unconstrained (fit by width only).
+ * A non-positive `containerWidth` falls back to the intrinsic width.
  */
 export function getCropperDisplaySize(
   naturalWidth: number,
@@ -592,12 +648,38 @@ export function getCropperDisplaySize(
 ): { width: number; height: number } | null {
   if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) return null
   const containerW = isPositiveFinite(containerWidth) ? containerWidth : naturalWidth
-  const containerH = isPositiveFinite(containerHeight) ? containerHeight : 400
-  const ratio = Math.min(containerW / naturalWidth, containerH / naturalHeight, 1)
+  const heightRatio = isPositiveFinite(containerHeight)
+    ? containerHeight / naturalHeight
+    : Number.POSITIVE_INFINITY
+  const ratio = Math.min(containerW / naturalWidth, heightRatio, 1)
   const width = naturalWidth * ratio
   const height = naturalHeight * ratio
   if (!isPositiveFinite(ratio) || !isPositiveFinite(width) || !isPositiveFinite(height)) return null
   return { width, height }
+}
+
+/**
+ * Next fitted size after a host resize. Returns null when the host is collapsed
+ * (do not snap back to intrinsic size) or the size did not meaningfully change.
+ */
+export function planCropperDisplaySize(
+  naturalWidth: number,
+  naturalHeight: number,
+  availableWidth: number,
+  availableHeight: number,
+  currentWidth: number,
+  currentHeight: number
+): { width: number; height: number } | null {
+  if (!isPositiveFinite(availableWidth)) return null
+  const next = getCropperDisplaySize(naturalWidth, naturalHeight, availableWidth, availableHeight)
+  if (!next) return null
+  if (
+    Math.abs(next.width - currentWidth) < CROPPER_DISPLAY_SIZE_EPSILON &&
+    Math.abs(next.height - currentHeight) < CROPPER_DISPLAY_SIZE_EPSILON
+  ) {
+    return null
+  }
+  return next
 }
 
 /**

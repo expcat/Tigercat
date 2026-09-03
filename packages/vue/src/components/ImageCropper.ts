@@ -27,6 +27,9 @@ import {
   getImageEditorLabels,
   getInitialCropRect,
   imageCropperContainerClasses,
+  imageCropperSizeHostClasses,
+  planCropperDisplaySize,
+  resolveCropperAvailableSize,
   imageCropperDragAreaClasses,
   imageCropperFrameClasses,
   imageCropperGuideClasses,
@@ -156,6 +159,12 @@ export const ImageCropper = defineComponent({
       }
     )
 
+    const hostStyle = (): unknown =>
+      mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
+
+    const availableSize = (el: HTMLElement | null): { width: number; height: number } =>
+      resolveCropperAvailableSize(el?.clientWidth ?? 0, el?.clientHeight ?? 0, hostStyle())
+
     const applyDisplaySize = (width: number, height: number, resetCrop: boolean): void => {
       displayWidth.value = width
       displayHeight.value = height
@@ -172,13 +181,8 @@ export const ImageCropper = defineComponent({
       imageRef.value = null
       loader.load(props.src, {
         onLoad: (img, nw, nh) => {
-          const container = containerRef.value
-          const size = getCropperDisplaySize(
-            nw,
-            nh,
-            container?.clientWidth ?? 0,
-            container?.clientHeight ?? 0
-          )
+          const box = availableSize(containerRef.value)
+          const size = getCropperDisplaySize(nw, nh, box.width, box.height)
           if (!size) {
             status.value = 'error'
             emit('error', new Error('Image not loaded'))
@@ -206,14 +210,16 @@ export const ImageCropper = defineComponent({
       if (!container || typeof ResizeObserver === 'undefined') return
       resizeObserver = new ResizeObserver(() => {
         if (status.value !== 'ready') return
-        const next = getCropperDisplaySize(
+        const box = availableSize(container)
+        const next = planCropperDisplaySize(
           naturalWidth,
           naturalHeight,
-          container.clientWidth,
-          container.clientHeight
+          box.width,
+          box.height,
+          displayWidth.value,
+          displayHeight.value
         )
         if (!next) return
-        if (next.width === displayWidth.value && next.height === displayHeight.value) return
         const mapped = remapCropRect(
           currentCropRect(),
           displayWidth.value,
@@ -381,7 +387,7 @@ export const ImageCropper = defineComponent({
 
     const containerClasses = computed(() =>
       classNames(
-        imageCropperContainerClasses,
+        imageCropperSizeHostClasses,
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -450,7 +456,7 @@ export const ImageCropper = defineComponent({
           {
             ...forwardedAttrs,
             ref: containerRef,
-            class: classNames(containerClasses.value, 'flex items-center justify-center'),
+            class: classNames(containerClasses.value, 'items-center'),
             style: {
               ...mergedStyle,
               minHeight: mergedStyle.minHeight ?? '200px'
@@ -616,17 +622,23 @@ export const ImageCropper = defineComponent({
           ...forwardedAttrs,
           ref: containerRef,
           class: containerClasses.value,
-          style: {
-            ...mergedStyle,
-            width: mergedStyle.width ?? `${dw}px`,
-            height: mergedStyle.height ?? `${dh}px`
-          },
+          style: mergedStyle,
           'data-image-cropper': '',
-          'data-image-cropper-status': 'ready',
-          role: 'group',
-          'aria-label': labels.value.cropperDialogAriaLabel
+          'data-image-cropper-status': 'ready'
         },
-        [frame, selection, dragArea, ...guideLines, ...handles]
+        [
+          h(
+            'div',
+            {
+              class: imageCropperContainerClasses,
+              style: { width: `${dw}px`, height: `${dh}px` },
+              'data-image-cropper-stage': '',
+              role: 'group',
+              'aria-label': labels.value.cropperDialogAriaLabel
+            },
+            [frame, selection, dragArea, ...guideLines, ...handles]
+          )
+        ]
       )
     }
   }

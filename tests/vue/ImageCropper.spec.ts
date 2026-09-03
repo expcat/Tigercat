@@ -10,6 +10,7 @@ import { ImageCropper } from '@expcat/tigercat-vue/ImageCropper'
 import type { ImageCropperRef } from '@expcat/tigercat-vue/ImageCropper'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
+import { MockResizeObserver } from '../utils/mock-observers'
 
 beforeEach(() => {
   Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
@@ -271,5 +272,51 @@ describe('ImageCropper', () => {
     ].map((mask) => mask.id)
     expect(masks).toHaveLength(2)
     expect(new Set(masks).size).toBe(2)
+  })
+
+  describe('size host layout', () => {
+    beforeEach(() => {
+      MockResizeObserver.reset()
+      vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    })
+
+    it('does not write the fitted bitmap size onto the observed host', async () => {
+      const { container } = await renderLoadedCropper({ props: { src: '/test.jpg' } })
+      const host = container.querySelector('[data-image-cropper]') as HTMLElement
+      const stage = container.querySelector('[data-image-cropper-stage]') as HTMLElement
+      expect(host.style.width).toBe('')
+      expect(host.style.height).toBe('')
+      expect(stage.style.width).toBe('800px')
+      expect(stage.style.height).toBe('600px')
+    })
+
+    it('ignores a collapsed host so the bitmap does not snap to intrinsic size', async () => {
+      const { container, emitted } = await renderLoadedCropper({ props: { src: '/test.jpg' } })
+      const host = container.querySelector('[data-image-cropper]') as HTMLElement
+      const stage = container.querySelector('[data-image-cropper-stage]') as HTMLElement
+      await waitFor(() => expect(MockResizeObserver.instances.length).toBeGreaterThan(0))
+      const before = emitted()['crop-change']?.length ?? 0
+      Object.defineProperty(host, 'clientWidth', { configurable: true, value: 0 })
+      Object.defineProperty(host, 'clientHeight', { configurable: true, value: 0 })
+      MockResizeObserver.instances[0].trigger(0, 0)
+      expect(stage.style.width).toBe('800px')
+      expect(stage.style.height).toBe('600px')
+      expect(emitted()['crop-change']?.length ?? 0).toBe(before)
+    })
+
+    it('remaps the crop when the host actually narrows', async () => {
+      const { container, emitted } = await renderLoadedCropper({ props: { src: '/test.jpg' } })
+      const host = container.querySelector('[data-image-cropper]') as HTMLElement
+      await waitFor(() => expect(MockResizeObserver.instances.length).toBeGreaterThan(0))
+      Object.defineProperty(host, 'clientWidth', { configurable: true, value: 400 })
+      MockResizeObserver.instances[0].trigger(400, 300)
+      await waitFor(() =>
+        expect(container.querySelector('[data-image-cropper-stage]')).toHaveStyle({
+          width: '400px',
+          height: '300px'
+        })
+      )
+      expect(emitted()['crop-change'].at(-1)).toEqual([{ x: 40, y: 30, width: 320, height: 240 }])
+    })
   })
 })

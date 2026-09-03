@@ -13,6 +13,8 @@ import {
   formatImagePreviewAriaLabel,
   getCropperHandleStyle,
   getCropperDisplaySize,
+  planCropperDisplaySize,
+  resolveCropperAvailableSize,
   CROP_HANDLES,
   clampScale,
   calculateTransform,
@@ -121,6 +123,48 @@ describe('image-utils — class generators', () => {
     expect(getCropperDisplaySize(800, 600, 400, 400)).toEqual({ width: 400, height: 300 })
     expect(getCropperDisplaySize(100, 50, 400, 400)).toEqual({ width: 100, height: 50 })
     expect(getCropperDisplaySize(0, 50, 400, 400)).toBeNull()
+  })
+
+  it('fits by width when height is unconstrained', () => {
+    expect(getCropperDisplaySize(800, 600, 800, 0)).toEqual({ width: 800, height: 600 })
+    expect(getCropperDisplaySize(640, 400, 800, 0)).toEqual({ width: 640, height: 400 })
+  })
+})
+
+describe('image-utils — cropper available size and resize plan', () => {
+  it('ignores content-sized host height unless style sets a constraint', () => {
+    expect(resolveCropperAvailableSize(720, 200)).toEqual({ width: 720, height: 0 })
+    expect(resolveCropperAvailableSize(720, 200, { minHeight: 200 })).toEqual({
+      width: 720,
+      height: 0
+    })
+    expect(resolveCropperAvailableSize(720, 200, { height: 300 })).toEqual({
+      width: 720,
+      height: 300
+    })
+    expect(resolveCropperAvailableSize(720, 180, { maxHeight: '240px' })).toEqual({
+      width: 720,
+      height: 240
+    })
+    expect(resolveCropperAvailableSize(720, 180, { height: '100%' })).toEqual({
+      width: 720,
+      height: 180
+    })
+  })
+
+  it('does not shrink when the host width is unchanged', () => {
+    expect(planCropperDisplaySize(800, 600, 400, 0, 400, 300)).toBeNull()
+  })
+
+  it('skips a collapsed host instead of snapping back to intrinsic size', () => {
+    expect(planCropperDisplaySize(800, 600, 0, 0, 10, 8)).toBeNull()
+  })
+
+  it('plans a smaller bitmap when the host actually narrows', () => {
+    expect(planCropperDisplaySize(800, 600, 400, 0, 800, 600)).toEqual({
+      width: 400,
+      height: 300
+    })
   })
 })
 
