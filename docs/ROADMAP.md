@@ -3,8 +3,8 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: competitor-gap conclusions, long-term observations, publish/verify boundaries, task registration
-verified-date: 2026-09-02
-source: current repository state after v2.1.3
+verified-date: 2026-09-03
+source: current repository state after v2.1.4
 -->
 
 本文记录竞品缺口结论、长期观察项与任务边界，不保存完成历史或一次性审查记录。

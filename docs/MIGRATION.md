@@ -4,7 +4,11 @@
 
 ## 未发布
 
-当前没有待组件用户处理的 breaking change。仓库内测试与 Example 收口见 [CHANGELOG.md](../CHANGELOG.md#未发布)。
+当前没有待组件用户处理的 breaking change。
+
+## v2.1.4
+
+v2.1.4 无 breaking change。完整条目亦见 [CHANGELOG.md](../CHANGELOG.md#v214)。
 
 ## v2.1.3
 
