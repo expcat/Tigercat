@@ -89,6 +89,8 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | FormWizard            | Composite  | `composite`  | form-wizard.ts                                      | ./FormWizard            |
 | NotificationCenter    | Composite  | `composite`  | notification-center.ts                              | ./NotificationCenter    |
 | TaskBoard             | Composite  | `composite`  | task-board.ts                                       | ./TaskBoard             |
+| WorkflowActionBar     | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowActionBar     |
+| WorkflowTimeline      | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowTimeline      |
 | Calendar              | Data       | `data`       | calendar.ts                                         | ./Calendar              |
 | Collapse              | Data       | `data`       | collapse.ts                                         | ./Collapse              |
 | CollapsePanel         | Data       | `data`       | collapse.ts                                         | ./CollapsePanel         |

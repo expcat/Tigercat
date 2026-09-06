@@ -161,6 +161,13 @@ export { Descriptions } from './components/Descriptions'
 export type { VueDescriptionsProps, DescriptionsProps } from './components/Descriptions'
 export { Timeline } from './components/Timeline'
 export type { VueTimelineProps, TimelineProps } from './components/Timeline'
+export { WorkflowTimeline, WorkflowActionBar } from './components/WorkflowTimeline'
+export type {
+  VueWorkflowTimelineProps,
+  VueWorkflowActionBarProps,
+  WorkflowTimelineProps,
+  WorkflowActionBarProps
+} from './components/WorkflowTimeline'
 export { Countdown } from './components/Countdown'
 export type { VueCountdownProps, CountdownProps } from './components/Countdown'
 export { Tree } from './components/Tree'

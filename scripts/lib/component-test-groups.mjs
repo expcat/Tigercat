@@ -98,7 +98,9 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'DataTableWithToolbar',
       'FormWizard',
       'NotificationCenter',
-      'TaskBoard'
+      'TaskBoard',
+      'WorkflowActionBar',
+      'WorkflowTimeline'
     ]
   }).flatMap(([group, components]) => components.map((component) => [component, group]))
 )

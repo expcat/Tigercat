@@ -4,10 +4,40 @@
  * existing {@link TimelineItem}.
  */
 
+import type { ButtonVariant } from '../types/button'
+import type { TagVariant } from '../types/tag'
 import type { TimelineItem } from '../types/timeline'
-import type { WorkflowTimelineStep, WorkflowTimelineStepStatus } from '../types/workflow-timeline'
+import type {
+  WorkflowActionBarItem,
+  WorkflowTimelineStep,
+  WorkflowTimelineStepStatus
+} from '../types/workflow-timeline'
 
 export const EMPTY_WORKFLOW_TIMELINE_STEPS: WorkflowTimelineStep[] = []
+
+export const EMPTY_WORKFLOW_ACTION_BAR_ITEMS: WorkflowActionBarItem[] = []
+
+/**
+ * Default English labels for status tags. Bindings may override via locale later.
+ */
+export const WORKFLOW_STEP_STATUS_LABELS: Record<WorkflowTimelineStepStatus, string> = {
+  pending: 'Pending',
+  active: 'Active',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  canceled: 'Canceled'
+}
+
+/**
+ * Tag variants that match approval status cues.
+ */
+export const WORKFLOW_STEP_STATUS_TAG_VARIANTS: Record<WorkflowTimelineStepStatus, TagVariant> = {
+  pending: 'default',
+  active: 'primary',
+  approved: 'success',
+  rejected: 'danger',
+  canceled: 'default'
+}
 
 export const WORKFLOW_STEP_STATUSES: readonly WorkflowTimelineStepStatus[] = [
   'pending',
@@ -249,4 +279,49 @@ export function workflowStepsToTimelineItems(
   const normalized = normalizeWorkflowTimelineSteps(steps)
   if (normalized === EMPTY_WORKFLOW_TIMELINE_STEPS) return []
   return flattenSteps(normalized).map(stepToTimelineItem)
+}
+
+export function workflowStepStatusLabel(status: WorkflowTimelineStepStatus): string {
+  return WORKFLOW_STEP_STATUS_LABELS[status]
+}
+
+export function workflowStepStatusTagVariant(status: WorkflowTimelineStepStatus): TagVariant {
+  return WORKFLOW_STEP_STATUS_TAG_VARIANTS[status]
+}
+
+export interface WorkflowActionButtonProps {
+  variant: ButtonVariant
+  danger: boolean
+}
+
+/**
+ * Map an action-bar item onto Button `variant` / `danger`.
+ * `danger` variant is outline + danger because Button has no danger variant.
+ */
+export function resolveWorkflowActionButtonProps(
+  item: Pick<WorkflowActionBarItem, 'action' | 'variant'>
+): WorkflowActionButtonProps {
+  if (item.variant === 'danger') return { variant: 'outline', danger: true }
+  if (item.variant) return { variant: item.variant, danger: false }
+  if (item.action === 'approve') return { variant: 'primary', danger: false }
+  if (item.action === 'reject' || item.action === 'cancel') {
+    return { variant: 'outline', danger: true }
+  }
+  if (item.action === 'comment') return { variant: 'ghost', danger: false }
+  return { variant: 'outline', danger: false }
+}
+
+/**
+ * Action bar visibility: explicit `showActions` wins; otherwise show when
+ * there are items and an `active` current step.
+ */
+export function shouldShowWorkflowActions(
+  steps: readonly WorkflowTimelineStep[] | undefined,
+  actions: readonly WorkflowActionBarItem[] | undefined,
+  showActions?: boolean
+): boolean {
+  if (showActions === false) return false
+  if (!actions || actions.length === 0) return false
+  if (showActions === true) return true
+  return getCurrentWorkflowStep(steps) != null
 }

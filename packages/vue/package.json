@@ -905,6 +905,16 @@
       "import": "./dist/components/Watermark.mjs",
       "default": "./dist/components/Watermark.mjs"
     },
+    "./WorkflowActionBar": {
+      "types": "./dist/components/WorkflowTimeline.d.mts",
+      "import": "./dist/components/WorkflowTimeline.mjs",
+      "default": "./dist/components/WorkflowTimeline.mjs"
+    },
+    "./WorkflowTimeline": {
+      "types": "./dist/components/WorkflowTimeline.d.mts",
+      "import": "./dist/components/WorkflowTimeline.mjs",
+      "default": "./dist/components/WorkflowTimeline.mjs"
+    },
     "./useDrag": {
       "types": "./dist/composables/useDrag.d.mts",
       "import": "./dist/composables/useDrag.mjs",

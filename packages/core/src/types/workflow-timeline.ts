@@ -6,6 +6,8 @@
  * model and are not added to `TimelineItem`.
  */
 
+import type { TimelineMode } from './timeline'
+
 /**
  * Closed set of approval-step statuses.
  */
@@ -124,4 +126,68 @@ export interface WorkflowActionBarItem {
    * Omitted / empty means unrestricted.
    */
   permission?: string | string[]
+}
+
+/**
+ * Presentational workflow timeline props. Vue/React bindings render these.
+ */
+export interface WorkflowTimelineProps {
+  /**
+   * Approval steps. Normalized and mapped onto Timeline items.
+   */
+  steps?: WorkflowTimelineStep[]
+  /**
+   * Action-bar items. Shown when a step is `active` unless `showActions` overrides.
+   */
+  actions?: WorkflowActionBarItem[]
+  /**
+   * Force the action bar on or off. Omitted: show when `actions` is non-empty
+   * and `getCurrentWorkflowStep` finds an `active` step.
+   */
+  showActions?: boolean
+  /**
+   * Timeline layout mode. Passed through to Timeline.
+   * @default 'left'
+   */
+  mode?: TimelineMode
+  /**
+   * Append Timeline's pending item after the mapped steps.
+   * @default false
+   */
+  pending?: boolean
+  /**
+   * Pending item dot content. Passed through to Timeline.
+   */
+  pendingDot?: unknown
+  /**
+   * Reverse Timeline order. Pending still stays at the DOM end.
+   * @default false
+   */
+  reverse?: boolean
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+/**
+ * Presentational action-bar props. Vue/React bindings render these.
+ */
+export interface WorkflowActionBarProps {
+  /**
+   * Action buttons to render.
+   */
+  items?: WorkflowActionBarItem[]
+  /**
+   * Disable every action, in addition to per-item `disabled`.
+   */
+  disabled?: boolean
+  /**
+   * Accessible name for the toolbar. Defaults to "Workflow actions".
+   */
+  ariaLabel?: string
+  /**
+   * Additional CSS classes
+   */
+  className?: string
 }

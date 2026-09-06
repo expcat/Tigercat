@@ -773,6 +773,8 @@ export const COMPONENT_PROP_PRIORITY = {
     'showComposer?'
   ],
   ActivityFeed: ['items?', 'groups?', 'groupBy?', 'groupOrder?', 'loading?', 'showTime?'],
+  WorkflowTimeline: ['steps?', 'actions?', 'mode?', 'pending?', 'showActions?'],
+  WorkflowActionBar: ['items?', 'disabled?', 'ariaLabel?'],
   NotificationCenter: [
     'items?',
     'groups?',
@@ -950,6 +952,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
       '<Collapse :active-key="keys"><CollapsePanel panel-key="1" header="FAQ">Answer</CollapsePanel></Collapse>',
     CollapsePanel: '<CollapsePanel panel-key="1" header="FAQ">Answer</CollapsePanel>',
     Timeline: '<Timeline :items="items" />',
+    WorkflowTimeline: '<WorkflowTimeline :steps="steps" :actions="actions" />',
+    WorkflowActionBar: '<WorkflowActionBar :items="actions" />',
     Countdown: '<Countdown :value="deadline" />',
     Progress: '<Progress :percentage="64" />',
     Alert: '<Alert type="info" title="Saved" />',
@@ -1084,6 +1088,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
       '<Collapse activeKey={keys}><CollapsePanel panelKey="1" header="FAQ">Answer</CollapsePanel></Collapse>',
     CollapsePanel: '<CollapsePanel panelKey="1" header="FAQ">Answer</CollapsePanel>',
     Timeline: '<Timeline items={items} />',
+    WorkflowTimeline: '<WorkflowTimeline steps={steps} actions={actions} />',
+    WorkflowActionBar: '<WorkflowActionBar items={actions} />',
     Countdown: '<Countdown value={deadline} />',
     Progress: '<Progress percentage={64} />',
     Alert: '<Alert type="info" title="Saved" />',

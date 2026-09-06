@@ -33,6 +33,9 @@
       "@expcat/tigercat-vue/StepsItem": ["../../../packages/vue/src/components/Steps"],
       "@expcat/tigercat-vue/SubMenu": ["../../../packages/vue/src/components/Menu"],
       "@expcat/tigercat-vue/TabPane": ["../../../packages/vue/src/components/Tabs"],
+      "@expcat/tigercat-vue/WorkflowActionBar": [
+        "../../../packages/vue/src/components/WorkflowTimeline"
+      ],
       "@expcat/tigercat-vue/*": ["../../../packages/vue/src/components/*"]
     }
   },

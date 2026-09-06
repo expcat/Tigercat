@@ -1,0 +1,7 @@
+{
+  "id": "timeline-04",
+  "title": "审批工作流",
+  "description": "WorkflowTimeline 把 mock 审批步骤映射到现有 Timeline，当前步骤为 active 时显示操作条。React 对等实现见 slice 6。",
+  "entry": "App.vue",
+  "order": 4
+}

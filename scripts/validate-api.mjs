@@ -184,8 +184,11 @@ for (const filename of reactFiles) {
 // Check that Vue and React have matching component files
 const vueComponentNames = new Set(vueFiles.map((f) => f.replace('.ts', '')))
 const reactComponentNames = new Set(reactFiles.map((f) => f.replace('.tsx', '')))
+// WorkflowTimeline Vue-only until slice 6 React parity — do not implement React here
+const vueOnlyComponents = new Set(['WorkflowTimeline'])
 
 for (const name of vueComponentNames) {
+  if (vueOnlyComponents.has(name)) continue
   if (!reactComponentNames.has(name)) {
     addIssue('cross-framework', 0, 'missing-react', `Vue 组件 "${name}" 在 React 中缺失`)
   }

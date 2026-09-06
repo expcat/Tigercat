@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 7 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 9 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -129,3 +129,32 @@ Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖�
 | `showCardCount?` | `boolean`              | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
+
+## WorkflowActionBar
+
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowActionBarProps` · 3/5 props
+
+Uses: `Button`.
+
+Note: 展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。
+
+| Prop         | Type                      | Default | Notes                                                            |
+| ------------ | ------------------------- | ------- | ---------------------------------------------------------------- |
+| `items?`     | `WorkflowActionBarItem[]` | `-`     | Action buttons to render.                                        |
+| `disabled?`  | `boolean`                 | `-`     | Disable every action, in addition to per-item `disabled`.        |
+| `ariaLabel?` | `string`                  | `-`     | Accessible name for the toolbar. Defaults to "Workflow actions". |
+
+## WorkflowTimeline
+
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/9 props
+
+Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
+
+Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。`actions` 是展示用操作条（通过/驳回/转交/撤销/评论），无 BPM 引擎。默认在当前步骤为 `active` 且传入 `actions` 时显示操作条。
+
+| Prop       | Type                      | Default  | Notes                                                                           |
+| ---------- | ------------------------- | -------- | ------------------------------------------------------------------------------- |
+| `steps?`   | `WorkflowTimelineStep[]`  | `-`      | Approval steps. Normalized and mapped onto Timeline items.                      |
+| `actions?` | `WorkflowActionBarItem[]` | `-`      | Action-bar items. Shown when a step is `active` unless `showActions` overrides. |
+| `mode?`    | `TimelineMode`            | `'left'` | Timeline layout mode. Passed through to Timeline.                               |
+| `pending?` | `boolean`                 | `false`  | Append Timeline's pending item after the mapped steps.                          |

@@ -171,15 +171,16 @@ description: Compact generated route map for Tigercat core type files
 
 ## Composite
 
-| Type File              | Props Interfaces                             |
-| ---------------------- | -------------------------------------------- |
-| activity-feed.ts       | ActivityFeedProps                            |
-| chat.ts                | ChatWindowProps                              |
-| comment-thread.ts      | CommentThreadProps                           |
-| form-wizard.ts         | FormWizardProps                              |
-| notification-center.ts | NotificationCenterProps                      |
-| table-toolbar.ts       | TableToolbarProps, DataTableWithToolbarProps |
-| task-board.ts          | TaskBoardProps                               |
+| Type File              | Props Interfaces                              |
+| ---------------------- | --------------------------------------------- |
+| activity-feed.ts       | ActivityFeedProps                             |
+| chat.ts                | ChatWindowProps                               |
+| comment-thread.ts      | CommentThreadProps                            |
+| form-wizard.ts         | FormWizardProps                               |
+| notification-center.ts | NotificationCenterProps                       |
+| table-toolbar.ts       | TableToolbarProps, DataTableWithToolbarProps  |
+| task-board.ts          | TaskBoardProps                                |
+| workflow-timeline.ts   | WorkflowTimelineProps, WorkflowActionBarProps |
 
 ## Core
 

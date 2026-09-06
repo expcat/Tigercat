@@ -136,7 +136,8 @@ export const CATEGORIES = {
     'form-wizard',
     'notification-center',
     'table-toolbar',
-    'task-board'
+    'task-board',
+    'workflow-timeline'
   ],
   Core: ['base', 'events', 'floating-popup', 'generics', 'locale', 'slots', 'theme']
 }
@@ -290,7 +291,8 @@ const DOC_SECTION_ALIASES = new Map([
   ['NavigationMenuList', 'NavigationMenu'],
   ['FloatButtonGroup', 'FloatButton'],
   ['InputGroupAddon', 'InputGroup'],
-  ['PrintPageBreak', 'PrintLayout']
+  ['PrintPageBreak', 'PrintLayout'],
+  ['WorkflowActionBar', 'WorkflowTimeline']
 ])
 
 // 别名经 MCP normalizeName 归一化后按子串匹配任务文本;中文别名须 ≥2 字且避免
@@ -447,6 +449,9 @@ export const COMPONENT_ROUTE_ALIASES = {
   聊天窗口: ['ChatWindow'],
   评论: ['CommentThread'],
   活动流: ['ActivityFeed'],
+  工作流时间线: ['WorkflowTimeline'],
+  审批时间线: ['WorkflowTimeline'],
+  审批操作条: ['WorkflowActionBar'],
   文件管理: ['FileManager'],
   通知中心: ['NotificationCenter'],
   新手引导: ['Tour'],
@@ -548,7 +553,8 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['SubMenu', 'Menu'],
   ['TabPane', 'Tabs'],
   ['Message', 'MessageRoot'],
-  ['LoadingBar', 'LoadingBarRoot']
+  ['LoadingBar', 'LoadingBarRoot'],
+  ['WorkflowActionBar', 'WorkflowTimeline']
 ])
 
 export const REQUIRED_CORE_PACKAGE_EXPORTS = [

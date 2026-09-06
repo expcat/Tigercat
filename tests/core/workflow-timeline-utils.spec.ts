@@ -12,11 +12,16 @@ import {
   isWorkflowStepTerminal,
   isWorkflowTimelineTerminal,
   normalizeWorkflowTimelineSteps,
+  resolveWorkflowActionButtonProps,
+  shouldShowWorkflowActions,
   sortWorkflowTimelineSteps,
   workflowStepHighlight,
   workflowStepsToTimelineItems,
   workflowStepStatusColor,
+  workflowStepStatusLabel,
+  workflowStepStatusTagVariant,
   WORKFLOW_STEP_STATUS_COLORS,
+  type WorkflowActionBarItem,
   type WorkflowTimeline,
   type WorkflowTimelineStep
 } from '@expcat/tigercat-core'
@@ -281,5 +286,67 @@ describe('workflowStepsToTimelineItems', () => {
     expect(items.map((item) => item.key)).toEqual(['manager', 'cc-a', 'cc-b', 'director'])
     expect(items[1]?.status).toBe('pending')
     expect(items[1]?.content).toBe('CC A')
+  })
+})
+
+describe('workflow step status presentation', () => {
+  it('maps status onto English labels and Tag variants', () => {
+    expect(workflowStepStatusLabel('active')).toBe('Active')
+    expect(workflowStepStatusTagVariant('approved')).toBe('success')
+    expect(workflowStepStatusTagVariant('rejected')).toBe('danger')
+    expect(workflowStepStatusTagVariant('pending')).toBe('default')
+  })
+})
+
+describe('resolveWorkflowActionButtonProps', () => {
+  it('uses explicit variant and maps danger onto outline + danger', () => {
+    expect(resolveWorkflowActionButtonProps({ action: 'approve', variant: 'ghost' })).toEqual({
+      variant: 'ghost',
+      danger: false
+    })
+    expect(resolveWorkflowActionButtonProps({ action: 'comment', variant: 'danger' })).toEqual({
+      variant: 'outline',
+      danger: true
+    })
+  })
+
+  it('defaults variant from the action when variant is omitted', () => {
+    expect(resolveWorkflowActionButtonProps({ action: 'approve' })).toEqual({
+      variant: 'primary',
+      danger: false
+    })
+    expect(resolveWorkflowActionButtonProps({ action: 'reject' })).toEqual({
+      variant: 'outline',
+      danger: true
+    })
+    expect(resolveWorkflowActionButtonProps({ action: 'cancel' })).toEqual({
+      variant: 'outline',
+      danger: true
+    })
+    expect(resolveWorkflowActionButtonProps({ action: 'comment' })).toEqual({
+      variant: 'ghost',
+      danger: false
+    })
+    expect(resolveWorkflowActionButtonProps({ action: 'transfer' })).toEqual({
+      variant: 'outline',
+      danger: false
+    })
+  })
+})
+
+describe('shouldShowWorkflowActions', () => {
+  const actions: WorkflowActionBarItem[] = [{ key: 'approve', label: 'Approve', action: 'approve' }]
+  const active: WorkflowTimeline = [step({ key: 'now', status: 'active' })]
+  const pending: WorkflowTimeline = [step({ key: 'wait', status: 'pending' })]
+
+  it('shows the bar when a step is active and actions exist', () => {
+    expect(shouldShowWorkflowActions(active, actions)).toBe(true)
+    expect(shouldShowWorkflowActions(pending, actions)).toBe(false)
+    expect(shouldShowWorkflowActions(active, [])).toBe(false)
+  })
+
+  it('lets showActions force the bar on or off', () => {
+    expect(shouldShowWorkflowActions(pending, actions, true)).toBe(true)
+    expect(shouldShowWorkflowActions(active, actions, false)).toBe(false)
   })
 })

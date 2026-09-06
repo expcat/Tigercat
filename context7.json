@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 175,
+  "component_count": 177,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -204,6 +204,9 @@
     "聊天窗口": ["ChatWindow"],
     "评论": ["CommentThread"],
     "活动流": ["ActivityFeed"],
+    "工作流时间线": ["WorkflowTimeline"],
+    "审批时间线": ["WorkflowTimeline"],
+    "审批操作条": ["WorkflowActionBar"],
     "文件管理": ["FileManager"],
     "通知中心": ["NotificationCenter"],
     "新手引导": ["Tour"],
@@ -398,7 +401,9 @@
         "DataTableWithToolbar",
         "FormWizard",
         "NotificationCenter",
-        "TaskBoard"
+        "TaskBoard",
+        "WorkflowActionBar",
+        "WorkflowTimeline"
       ],
       "examples": "skills/tigercat/references/examples/composite.md"
     },
@@ -1924,6 +1929,46 @@
       "typeSource": "packages/core/src/types/task-board.ts",
       "sourceFiles": ["packages/core/src/types/task-board.ts"],
       "propsInterfaces": ["TaskBoardProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "WorkflowActionBar": {
+      "name": "WorkflowActionBar",
+      "aliases": ["审批操作条"],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./WorkflowActionBar",
+      "packageTarget": "WorkflowTimeline",
+      "typeSource": "packages/core/src/types/workflow-timeline.ts",
+      "sourceFiles": ["packages/core/src/types/workflow-timeline.ts"],
+      "propsInterfaces": ["WorkflowActionBarProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "WorkflowTimeline": {
+      "name": "WorkflowTimeline",
+      "aliases": ["工作流时间线", "审批时间线"],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./WorkflowTimeline",
+      "packageTarget": "WorkflowTimeline",
+      "typeSource": "packages/core/src/types/workflow-timeline.ts",
+      "sourceFiles": ["packages/core/src/types/workflow-timeline.ts"],
+      "propsInterfaces": ["WorkflowTimelineProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

@@ -1172,6 +1172,7 @@
       "EMPTY_TREE_KEYS",
       "EMPTY_VIRTUAL_TABLE_COLUMNS",
       "EMPTY_VIRTUAL_TABLE_ROWS",
+      "EMPTY_WORKFLOW_ACTION_BAR_ITEMS",
       "EMPTY_WORKFLOW_TIMELINE_STEPS",
       "emptyActionsClasses",
       "emptyBaseClasses",
@@ -3887,6 +3888,7 @@
       "resolveVirtualTableWidth",
       "resolveVisibleResizeHandles",
       "resolveWatermarkFont",
+      "resolveWorkflowActionButtonProps",
       "resolveWorkflowStepStatus",
       "RESPONSIVE_BREAKPOINT_FALLBACK_PX",
       "RESPONSIVE_BREAKPOINT_ORDER",
@@ -4097,6 +4099,7 @@
       "shouldShowMenuSearch",
       "shouldShowSelectClear",
       "shouldShowTreeSelectClear",
+      "shouldShowWorkflowActions",
       "shouldSkipNavigationMenuOpenDelay",
       "shouldSkipTableLocalProcessing",
       "shouldTrackChartPointer",
@@ -4938,19 +4941,26 @@
       "withCropFile",
       "WizardStep",
       "WORKFLOW_STEP_STATUS_COLORS",
+      "WORKFLOW_STEP_STATUS_LABELS",
+      "WORKFLOW_STEP_STATUS_TAG_VARIANTS",
       "WORKFLOW_STEP_STATUSES",
       "WORKFLOW_TERMINAL_STEP_STATUSES",
       "WorkflowActionBarItem",
+      "WorkflowActionBarProps",
       "WorkflowActionBarVariant",
+      "WorkflowActionButtonProps",
       "workflowStepHighlight",
       "WorkflowStepHighlight",
       "workflowStepStatusColor",
       "WorkflowStepStatusCounts",
+      "workflowStepStatusLabel",
+      "workflowStepStatusTagVariant",
       "workflowStepsToTimelineItems",
       "WorkflowTimeline",
       "WorkflowTimelineAction",
       "WorkflowTimelineActor",
       "WorkflowTimelineItem",
+      "WorkflowTimelineProps",
       "WorkflowTimelineStep",
       "WorkflowTimelineStepStatus",
       "writeCommentLikeOverlay",
@@ -7789,6 +7799,23 @@
         "width",
         "zIndex"
       ]
+    },
+    "WorkflowActionBarProps": {
+      "extends": [],
+      "props": ["ariaLabel", "className", "disabled", "items"]
+    },
+    "WorkflowTimelineProps": {
+      "extends": [],
+      "props": [
+        "actions",
+        "className",
+        "mode",
+        "pending",
+        "pendingDot",
+        "reverse",
+        "showActions",
+        "steps"
+      ]
     }
   },
   "react": {
@@ -9456,7 +9483,9 @@
       "Upload",
       "VirtualList",
       "VirtualTable",
-      "Watermark"
+      "Watermark",
+      "WorkflowActionBar",
+      "WorkflowTimeline"
     ],
     "componentSubpaths": [
       {
@@ -10333,6 +10362,16 @@
         "component": "Watermark",
         "subpath": "./Watermark",
         "target": "Watermark"
+      },
+      {
+        "component": "WorkflowActionBar",
+        "subpath": "./WorkflowActionBar",
+        "target": "WorkflowTimeline"
+      },
+      {
+        "component": "WorkflowTimeline",
+        "subpath": "./WorkflowTimeline",
+        "target": "WorkflowTimeline"
       }
     ],
     "exports": [
@@ -10844,7 +10883,13 @@
       "VueVirtualListProps",
       "VueVirtualTableProps",
       "VueWatermarkProps",
-      "Watermark"
+      "VueWorkflowActionBarProps",
+      "VueWorkflowTimelineProps",
+      "Watermark",
+      "WorkflowActionBar",
+      "WorkflowActionBarProps",
+      "WorkflowTimeline",
+      "WorkflowTimelineProps"
     ]
   }
 }

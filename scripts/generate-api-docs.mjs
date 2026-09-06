@@ -195,6 +195,16 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。'
   },
+  WorkflowTimeline: {
+    uses: ['Timeline', 'Button', 'Tag', 'WorkflowActionBar'],
+    notes:
+      '把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。`actions` 是展示用操作条（通过/驳回/转交/撤销/评论），无 BPM 引擎。默认在当前步骤为 `active` 且传入 `actions` 时显示操作条。'
+  },
+  WorkflowActionBar: {
+    uses: ['Button'],
+    notes:
+      '展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。'
+  },
   Countdown: {
     notes:
       '`now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。'

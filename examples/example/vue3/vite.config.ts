@@ -94,6 +94,10 @@ export default defineConfig(({ command }) => ({
         replacement: vueComponentAlias('Tabs')
       },
       {
+        find: '@expcat/tigercat-vue/WorkflowActionBar',
+        replacement: vueComponentAlias('WorkflowTimeline')
+      },
+      {
         find: /^@expcat\/tigercat-vue\/(.+)$/,
         replacement: `${vueComponentsDir}/$1`
       },
