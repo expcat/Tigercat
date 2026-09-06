@@ -1,0 +1,12 @@
+{
+  "id": "menu-04",
+  "title": "后端菜单 Schema",
+  "description": "mock JSON 经 filterMenuByPermission 与 menuSchemaToMenuItems 喂给现有 Menu。切换角色或权限后侧栏树会变。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

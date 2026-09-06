@@ -39,8 +39,6 @@ const failures = []
 const inventories = new Map()
 const allowedPermissions = new Set(['downloads', 'modals', 'popups', 'fullscreen'])
 const reactOnlyModules = new Set(['use-controlled-state/01'])
-// menu/04 Vue schema demo: React parity is slice 3 — do not implement React here
-const vueOnlyModules = new Set(['menu/04'])
 
 function displayPath(path) {
   return relative(process.cwd(), path).split(sep).join('/')
@@ -248,7 +246,6 @@ if (reactInventory && vueInventory) {
     const vueModule = vueInventory.modules.get(moduleKey)
     if (!reactModule || !vueModule) {
       if (reactOnlyModules.has(moduleKey) && reactModule && !vueModule) continue
-      if (vueOnlyModules.has(moduleKey) && vueModule && !reactModule) continue
       failures.push(
         `${moduleKey}: module must exist in both frameworks${reactOnlyModules.has(moduleKey) ? ' with the documented React-only shape' : ''}`
       )

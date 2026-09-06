@@ -15,8 +15,6 @@ import { Menu } from '@expcat/tigercat-vue/Menu'
 import { Segmented } from '@expcat/tigercat-vue/Segmented'
 import { Sidebar } from '@expcat/tigercat-vue/Sidebar'
 
-// React parity is slice 3 — do not implement React here.
-
 const backendSchema: MenuSchema = [
   { key: 'dashboard', label: '工作台', icon: 'dashboard', path: '/dashboard' },
   {
