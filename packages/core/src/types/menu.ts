@@ -65,6 +65,57 @@ export interface MenuItem {
 }
 
 /**
+ * Backend-style dynamic menu node. Maps onto {@link MenuItem} via
+ * `menuSchemaToMenuItems`; extra fields (`path`, `permission`, `hideInMenu`)
+ * stay on the schema and are not added to `MenuItem`.
+ */
+export interface MenuSchemaNode {
+  /**
+   * Stable node id. Copied onto `MenuItem.key`.
+   */
+  key: string
+  /**
+   * Display label. Group nodes also map this to `MenuItem.title`.
+   */
+  label?: string
+  /**
+   * Registered icon name. Kept as a string for the Icon registry; not a
+   * framework node.
+   */
+  icon?: string
+  /**
+   * Internal route path. Used as `MenuItem.href` when `href` is omitted.
+   */
+  path?: string
+  /**
+   * External or explicit link. Wins over `path` when both are set.
+   */
+  href?: string
+  /**
+   * Required permission code, or codes that must all pass.
+   * Omitted / empty means unrestricted.
+   */
+  permission?: string | string[]
+  /**
+   * Discriminator. Same values as {@link MenuItemType}.
+   */
+  type?: MenuItemType
+  /**
+   * When true, omit this node from menu output and promote visible children.
+   */
+  hideInMenu?: boolean
+  /**
+   * Nested schema nodes (submenu or group).
+   */
+  children?: MenuSchemaNode[]
+}
+
+/**
+ * A backend-style menu tree (array of {@link MenuSchemaNode}).
+ */
+export type MenuSchema = MenuSchemaNode[]
+
+/**
  * Base menu props interface
  */
 export interface MenuProps {
