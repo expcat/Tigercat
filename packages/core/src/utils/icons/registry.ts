@@ -171,7 +171,29 @@ export const iconRegistry = {
   users: stroke24(
     'M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z'
   ),
-  dashboard: squares2x2
+  dashboard: squares2x2,
+
+  // --- Admin / shell glyphs (Heroicons-style, 24x24) ---
+  fullscreen: stroke24(
+    'M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15'
+  ),
+  'fullscreen-exit': stroke24(
+    'M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25'
+  ),
+  ticket: stroke24(
+    'M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z'
+  ),
+  bolt: stroke24('m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z'),
+  zap: stroke24('m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z'),
+  'chart-bar': stroke24(
+    'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z'
+  ),
+  chart: stroke24(
+    'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z'
+  ),
+  database: stroke24(
+    'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125'
+  )
 } satisfies Record<string, IconDefinition>
 
 /**
@@ -184,12 +206,46 @@ export type IconName = keyof typeof iconRegistry
  */
 export const iconNames = Object.keys(iconRegistry) as IconName[]
 
+const customIconRegistry = new Map<string, IconDefinition>()
+
 /**
- * Look up a built-in icon definition by name. Returns `undefined` for unknown
- * names so callers can fall back gracefully.
+ * Look up a built-in or {@link registerIcon registered} icon definition.
+ * Returns `undefined` for unknown names so callers can fall back gracefully.
+ * Built-in names win over custom registrations.
  */
 export function getIconDefinition(name: string): IconDefinition | undefined {
-  return (iconRegistry as Record<string, IconDefinition>)[name]
+  return (iconRegistry as Record<string, IconDefinition>)[name] ?? customIconRegistry.get(name)
+}
+
+/**
+ * Register an application-level icon name. Unknown `Icon name="…"` lookups
+ * resolve through this map. Built-in names are not overwritten. Importing
+ * this function from `@expcat/tigercat-core/icons/registry` keeps unused
+ * glyphs tree-shakeable.
+ */
+export function registerIcon(name: string, definition: IconDefinition): void {
+  const trimmed = name.trim()
+  if (!trimmed) return
+  if ((iconRegistry as Record<string, IconDefinition>)[trimmed]) return
+  customIconRegistry.set(trimmed, definition)
+}
+
+export function registerIcons(icons: Record<string, IconDefinition>): void {
+  for (const [name, definition] of Object.entries(icons)) {
+    registerIcon(name, definition)
+  }
+}
+
+export function unregisterIcon(name: string): void {
+  customIconRegistry.delete(name)
+}
+
+export function clearRegisteredIcons(): void {
+  customIconRegistry.clear()
+}
+
+export function registeredIconNames(): string[] {
+  return Array.from(customIconRegistry.keys())
 }
 
 // ---------------------------------------------------------------------------
@@ -220,12 +276,8 @@ export const listIcon = /*#__PURE__*/ stroke24(
 )
 // Heroicons squares-2x2 - same glyph the registry uses for `dashboard`.
 export const gridIcon = squares2x2
-export const fullscreenIcon = /*#__PURE__*/ stroke24(
-  'M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15'
-)
-export const fullscreenExitIcon = /*#__PURE__*/ stroke24(
-  'M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25'
-)
+export const fullscreenIcon = iconRegistry.fullscreen
+export const fullscreenExitIcon = iconRegistry['fullscreen-exit']
 export const zoomInIcon = /*#__PURE__*/ stroke24(
   'm21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6'
 )
@@ -275,9 +327,7 @@ export const archiveIcon = /*#__PURE__*/ stroke24(
 export const inboxIcon = /*#__PURE__*/ stroke24(
   'M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z'
 )
-export const boltIcon = /*#__PURE__*/ stroke24(
-  'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z'
-)
+export const boltIcon = iconRegistry.bolt
 
 // --- Communication & media ---
 
@@ -349,16 +399,12 @@ export const walletIcon = /*#__PURE__*/ stroke24(
 
 // --- Data & tech ---
 
-export const chartBarIcon = /*#__PURE__*/ stroke24(
-  'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z'
-)
+export const chartBarIcon = iconRegistry['chart-bar']
 export const chartPieIcon = /*#__PURE__*/ stroke24(
   'M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z',
   'M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z'
 )
-export const databaseIcon = /*#__PURE__*/ stroke24(
-  'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125'
-)
+export const databaseIcon = iconRegistry.database
 export const serverIcon = /*#__PURE__*/ stroke24(
   'M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z'
 )

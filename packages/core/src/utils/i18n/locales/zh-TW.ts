@@ -184,7 +184,12 @@ export const zhTW: TigerLocale = {
     previousMonth: '上個月',
     nextMonth: '下個月',
     previousYear: '上一年',
-    nextYear: '下一年'
+    nextYear: '下一年',
+    eventCountText: '{n} 個行程'
+  },
+  fullscreen: {
+    enterAriaLabel: '進入全螢幕',
+    exitAriaLabel: '結束全螢幕'
   },
   fileManager: {
     rootText: '根目錄',

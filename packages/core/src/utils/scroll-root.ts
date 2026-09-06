@@ -134,13 +134,69 @@ function resolveSelector(selector: string): ResolvedScrollRoot {
   }
 }
 
+export interface ResolveScrollRootOptions {
+  /**
+   * Element used to walk for the nearest overflow ancestor when `input` is
+   * omitted. Ignored when `input` is an explicit selector / Element / Window.
+   */
+  from?: Element | null
+  depth?: number
+}
+
+const OVERFLOW_RE = /(auto|scroll|overlay)/
+
+/**
+ * Walk ancestors of `from` and return the nearest element whose computed
+ * overflow is auto/scroll/overlay. `html` / `body` are skipped so the
+ * document scroller stays `window`.
+ */
+export function findNearestOverflowAncestor(from?: Element | null): Element | null {
+  if (!from || !isBrowser()) return null
+  let node: Element | null = from.parentElement
+  while (node && node !== document.documentElement && node !== document.body) {
+    let style: CSSStyleDeclaration
+    try {
+      style = getComputedStyle(node)
+    } catch {
+      node = node.parentElement
+      continue
+    }
+    const html = node as HTMLElement
+    const overflowY =
+      style.overflowY || html.style.overflowY || style.overflow || html.style.overflow
+    const overflowX =
+      style.overflowX || html.style.overflowX || style.overflow || html.style.overflow
+    if (OVERFLOW_RE.test(overflowY) || OVERFLOW_RE.test(overflowX)) {
+      return node
+    }
+    node = node.parentElement
+  }
+  return null
+}
+
+function fromElementRoot(from?: Element | null): ResolvedScrollRoot {
+  const ancestor = findNearestOverflowAncestor(from)
+  if (!ancestor) return createWindowScrollRoot()
+  return {
+    target: ancestor,
+    isWindow: false,
+    getRect: () => elementRect(ancestor)
+  }
+}
+
 /**
  * Resolve a scroll root from a CSS selector, Element, Window, Document, or getter.
  *
  * Invalid selectors, empty results, and thrown getters fall back to `window`.
  * Multiple matches use the first node and warn.
+ * When `input` is omitted and `options.from` is set, the nearest overflow
+ * ancestor of `from` is used (then `window`).
  */
-export function resolveScrollRoot(input?: ScrollRootInput, depth: number = 0): ResolvedScrollRoot {
+export function resolveScrollRoot(
+  input?: ScrollRootInput,
+  options: ResolveScrollRootOptions = {}
+): ResolvedScrollRoot {
+  const depth = options.depth ?? 0
   if (depth > MAX_GETTER_DEPTH) {
     devWarn(
       'scrollRoot.cycle',
@@ -149,13 +205,17 @@ export function resolveScrollRoot(input?: ScrollRootInput, depth: number = 0): R
     return createWindowScrollRoot()
   }
 
-  if (input === undefined || input === null) {
+  if (input === undefined) {
+    return fromElementRoot(options.from)
+  }
+
+  if (input === null) {
     return createWindowScrollRoot()
   }
 
   if (typeof input === 'function') {
     try {
-      return resolveScrollRoot(input(), depth + 1)
+      return resolveScrollRoot(input(), { ...options, depth: depth + 1 })
     } catch {
       devWarn('scrollRoot.getter', '[Tigercat] Scroll target getter threw. Falling back to window.')
       return createWindowScrollRoot()

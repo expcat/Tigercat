@@ -2,15 +2,21 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { afterEach, describe, it, expect } from 'vitest'
 import {
   iconRegistry,
   iconNames,
   getIconDefinition,
-  getDrawerBodyClasses
+  getDrawerBodyClasses,
+  registerIcon,
+  unregisterIcon,
+  clearRegisteredIcons
 } from '@expcat/tigercat-core'
 
 describe('icon registry', () => {
+  afterEach(() => {
+    clearRegisteredIcons()
+  })
   it('exposes built-in icon names', () => {
     expect(iconNames.length).toBeGreaterThan(20)
     expect(iconNames).toContain('check')
@@ -23,6 +29,11 @@ describe('icon registry', () => {
     expect(iconNames).toContain('map-pin')
     expect(iconNames).toContain('dashboard')
     expect(iconNames).toContain('users')
+    expect(iconNames).toContain('fullscreen')
+    expect(iconNames).toContain('ticket')
+    expect(iconNames).toContain('bolt')
+    expect(iconNames).toContain('database')
+    expect(iconNames).toContain('chart-bar')
   })
 
   it('supports multi-path glyphs (map-pin pin + dot)', () => {
@@ -45,6 +56,16 @@ describe('icon registry', () => {
 
   it('getIconDefinition returns undefined for unknown names', () => {
     expect(getIconDefinition('definitely-not-an-icon')).toBeUndefined()
+  })
+
+  it('registers application-level names without overwriting built-ins', () => {
+    const custom = { viewBox: '0 0 24 24', paths: ['M4 4h16v16H4z'], mode: 'stroke' as const }
+    registerIcon('ticket-custom', custom)
+    expect(getIconDefinition('ticket-custom')).toEqual(custom)
+    registerIcon('close', custom)
+    expect(getIconDefinition('close')).toBe(iconRegistry.close)
+    unregisterIcon('ticket-custom')
+    expect(getIconDefinition('ticket-custom')).toBeUndefined()
   })
 })
 

@@ -99,8 +99,10 @@ export const BackTop = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labelSet = computed(() => getBackTopLabels(mergedLocale.value, props.labels))
 
+    const hostRef = ref<HTMLElement | null>(null)
+    const resolveRoot = () => resolveScrollRoot(props.target, { from: hostRef.value })
     const resolvedKey = computed(() => {
-      const root = resolveScrollRoot(props.target)
+      const root = resolveRoot()
       return root.isWindow ? 'window' : root.target
     })
     let visibilityController: BackTopVisibilityController | undefined
@@ -117,7 +119,7 @@ export const BackTop = defineComponent({
 
     const bind = () => {
       unbind()
-      const root = resolveScrollRoot(props.target)
+      const root = resolveRoot()
       const eventTarget = getScrollRootEventTarget(root)
       const scrollNode = root.target
       if (!eventTarget || !scrollNode) return
@@ -134,7 +136,7 @@ export const BackTop = defineComponent({
     }
 
     const handleClick = (event: MouseEvent) => {
-      const root = resolveScrollRoot(props.target)
+      const root = resolveRoot()
       if (!root.target) {
         emit('click', event)
         return
@@ -197,6 +199,7 @@ export const BackTop = defineComponent({
         'button',
         {
           ...attrs,
+          ref: hostRef,
           type: 'button',
           class: buttonClasses.value,
           style: mergedStyle.value,

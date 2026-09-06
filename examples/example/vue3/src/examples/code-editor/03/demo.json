@@ -1,0 +1,8 @@
+{
+  "id": "code-editor-03",
+  "title": "可插拔 highlighter",
+  "description": "传入 highlighter 即走引擎路径。最小适配：实现 highlightLine 或 highlightCode，自行转义。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }
+}

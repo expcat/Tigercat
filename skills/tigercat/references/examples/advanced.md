@@ -33,6 +33,6 @@ description: Compact Tigercat Advanced Vue and React usage routes
 | VirtualList     | `<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>` | `<VirtualList itemCount={count} itemHeight={40} renderItem={({ index }) => <div>{index}</div>} />`     |
 | VirtualTable    | `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />`           | `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />` |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：PrintPageBreak.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drag, PrintPageBreak.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -184,7 +184,12 @@ export const deDE: TigerLocale = {
     previousMonth: 'Vorheriger Monat',
     nextMonth: 'Nächster Monat',
     previousYear: 'Vorheriges Jahr',
-    nextYear: 'Nächstes Jahr'
+    nextYear: 'Nächstes Jahr',
+    eventCountText: '{n} Termine'
+  },
+  fullscreen: {
+    enterAriaLabel: 'Vollbild',
+    exitAriaLabel: 'Vollbild beenden'
   },
   fileManager: {
     rootText: 'Stammverzeichnis',

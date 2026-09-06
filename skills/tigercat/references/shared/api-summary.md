@@ -11,7 +11,7 @@ description: Compact generated route map for Tigercat core type files
 
 ## Public hooks
 
-`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue); `useResponsiveChartSize` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. See each hook's types for options.
+`useChartInteraction` (react, vue); `useControlledState` (react); `useDrag` (react, vue); `useFormController` (react, vue); `useFullscreen` (react, vue); `useResponsiveChartSize` (react, vue). `undefined` is uncontrolled; `null` is a legal empty value. See each hook's types for options.
 
 ## Basic
 
@@ -121,6 +121,7 @@ description: Compact generated route map for Tigercat core type files
 | navigation-menu.ts | NavigationMenuProps, NavigationMenuListProps, NavigationMenuItemProps, NavigationMenuTriggerProps, NavigationMenuContentProps, NavigationMenuLinkProps |
 | page-header.ts     | PageHeaderProps                                                                                                                                        |
 | float-button.ts    | FloatButtonProps, FloatButtonGroupProps                                                                                                                |
+| fullscreen.ts      | FullscreenProps                                                                                                                                        |
 | menu.ts            | MenuProps, MenuItemProps, SubMenuProps, MenuItemGroupProps                                                                                             |
 | pagination.ts      | PaginationProps                                                                                                                                        |
 | scroll-spy.ts      | ScrollSpyProps                                                                                                                                         |
@@ -156,6 +157,7 @@ description: Compact generated route map for Tigercat core type files
 | Type File           | Props Interfaces     |
 | ------------------- | -------------------- |
 | code-editor.ts      | CodeEditorProps      |
+| drag.ts             | DragProps            |
 | file-manager.ts     | FileManagerProps     |
 | image-annotation.ts | ImageAnnotationProps |
 | image-viewer.ts     | ImageViewerProps     |

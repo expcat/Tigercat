@@ -3,8 +3,9 @@
  */
 
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Text } from '@expcat/tigercat-react/Text'
 import { renderWithProps } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -80,5 +81,37 @@ describe('Text (React)', () => {
       </Text>
     )
     expect(ref.current).toBeInstanceOf(HTMLSpanElement)
+  })
+
+  it('copies the rendered text from a keyboard-operable button', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true
+    })
+    const onCopy = vi.fn()
+    render(
+      <Text copyable onCopy={onCopy}>
+        user-42
+      </Text>
+    )
+    const button = screen.getByRole('button', { name: 'Copy' })
+    await user.click(button)
+    expect(writeText).toHaveBeenCalledWith('user-42')
+    expect(onCopy).toHaveBeenCalledWith('user-42')
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()
+  })
+
+  it('copies an explicit payload from copyable.text', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true
+    })
+    render(<Text copyable={{ text: 'raw-id', tooltip: 'Copy id' }}>shown</Text>)
+    await user.click(screen.getByRole('button', { name: 'Copy id' }))
+    expect(writeText).toHaveBeenCalledWith('raw-id')
   })
 })

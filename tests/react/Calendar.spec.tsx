@@ -209,3 +209,30 @@ describe('Calendar controlled follow', () => {
     expect(screen.getByText('August 2024')).toBeInTheDocument()
   })
 })
+
+describe('Calendar date cells', () => {
+  it('renders default event dots and includes the count in the aria-label', () => {
+    render(
+      <Calendar
+        value={testDate}
+        now={now}
+        events={[{ title: 'Ship', date: '2024-06-15', color: '#2563eb' }]}
+      />
+    )
+    const cell = dayButton('2024-06-15')
+    expect(cell.getAttribute('aria-label') ?? '').toMatch(/1 events/)
+    expect(cell.querySelectorAll('[aria-hidden="true"] span').length).toBeGreaterThan(0)
+  })
+
+  it('uses dateCellRender instead of default dots', () => {
+    render(
+      <Calendar
+        value={testDate}
+        now={now}
+        events={[{ title: 'Ship', date: '2024-06-15' }]}
+        dateCellRender={(_date, extra) => <span>{extra.events[0]?.title}</span>}
+      />
+    )
+    expect(dayButton('2024-06-15')).toHaveTextContent('Ship')
+  })
+})

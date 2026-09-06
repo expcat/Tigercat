@@ -234,9 +234,8 @@ export const Anchor = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labelSet = computed(() => getAnchorLabels(mergedLocale.value, props.labels))
 
-    const scrollLock = createProgrammaticScrollLock(() =>
-      resolveAnchorScrollContainer(props.getContainer)
-    )
+    const resolveContainer = () => resolveAnchorScrollContainer(props.getContainer, anchorRef.value)
+    const scrollLock = createProgrammaticScrollLock(() => resolveContainer())
     const scrollOffset = computed(() => props.targetOffset ?? props.offsetTop)
     const links = computed(() => sortAnchorHrefsByDocumentOrder(linkEntries.value))
 
@@ -269,7 +268,7 @@ export const Anchor = defineComponent({
 
     const setupObserver = () => {
       stopObserver?.()
-      const container = resolveAnchorScrollContainer(props.getContainer)
+      const container = resolveContainer()
       const root = container === window ? null : (container as Element)
       stopObserver = createAnchorObserver(links.value, {
         offsetTop: scrollOffset.value,
@@ -283,7 +282,7 @@ export const Anchor = defineComponent({
     }
 
     const scrollTo = (href: string) => {
-      scrollToAnchor(href, resolveAnchorScrollContainer(props.getContainer), scrollOffset.value)
+      scrollToAnchor(href, resolveContainer(), scrollOffset.value)
     }
 
     const handleLinkClick = (href: string, event: Event, targetAttr?: string) => {
@@ -321,7 +320,7 @@ export const Anchor = defineComponent({
     }
 
     const resolvedKey = computed(() => {
-      const resolved = resolveScrollRoot(props.getContainer)
+      const resolved = resolveScrollRoot(props.getContainer, { from: anchorRef.value })
       return resolved.isWindow ? 'window' : resolved.target
     })
 

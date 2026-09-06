@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 173,
+  "component_count": 175,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -307,6 +307,7 @@
       "react": "skills/tigercat/references/react/index.md",
       "components": [
         "CodeEditor",
+        "Drag",
         "FileManager",
         "ImageAnnotation",
         "ImageViewer",
@@ -524,6 +525,7 @@
         "DropdownMenu",
         "FloatButton",
         "FloatButtonGroup",
+        "FullscreenButton",
         "Menu",
         "MenuItem",
         "MenuItemGroup",
@@ -559,6 +561,26 @@
       "typeSource": "packages/core/src/types/code-editor.ts",
       "sourceFiles": ["packages/core/src/types/code-editor.ts"],
       "propsInterfaces": ["CodeEditorProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Drag": {
+      "name": "Drag",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./Drag",
+      "packageTarget": "Drag",
+      "typeSource": "packages/core/src/types/drag.ts",
+      "sourceFiles": ["packages/core/src/types/drag.ts"],
+      "propsInterfaces": ["DragProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -3628,6 +3650,29 @@
       "typeSource": "packages/core/src/types/float-button.ts",
       "sourceFiles": ["packages/core/src/types/float-button.ts"],
       "propsInterfaces": ["FloatButtonGroupProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FullscreenButton": {
+      "name": "FullscreenButton",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./FullscreenButton",
+      "packageTarget": "FullscreenButton",
+      "typeSource": "packages/core/src/types/fullscreen.ts",
+      "sourceFiles": [
+        "packages/react/src/components/FullscreenButton.tsx",
+        "packages/vue/src/components/FullscreenButton.ts"
+      ],
+      "propsInterfaces": ["FullscreenButtonProps", "VueFullscreenButtonProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

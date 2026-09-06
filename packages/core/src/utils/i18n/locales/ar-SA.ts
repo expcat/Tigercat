@@ -184,7 +184,12 @@ export const arSA: TigerLocale = {
     previousMonth: 'الشهر السابق',
     nextMonth: 'الشهر التالي',
     previousYear: 'السنة السابقة',
-    nextYear: 'السنة التالية'
+    nextYear: 'السنة التالية',
+    eventCountText: '{n} أحداث'
+  },
+  fullscreen: {
+    enterAriaLabel: 'دخول ملء الشاشة',
+    exitAriaLabel: 'إنهاء ملء الشاشة'
   },
   fileManager: {
     rootText: 'الجذر',

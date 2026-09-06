@@ -315,6 +315,19 @@ describe('Code (React)', () => {
       const { container } = renderWithProps(Code, { code: 'const a = 1', copyable: false })
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('injects highlighter HTML when language and highlighter are set', () => {
+      const { container } = render(
+        <Code
+          code="const x = 1"
+          language="javascript"
+          highlighter={{
+            highlightCode: (code, language) => `<span data-lang="${language}">${code}</span>`
+          }}
+        />
+      )
+      expect(container.querySelector('[data-lang="javascript"]')).toHaveTextContent('const x = 1')
+    })
   })
 
   describe('Edge Cases', () => {

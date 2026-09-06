@@ -1,0 +1,8 @@
+{
+  "id": "text-04",
+  "title": "可复制",
+  "description": "copyable 在文本旁放可键盘操作的复制钮。对象形态可覆盖复制内容和 tooltip。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

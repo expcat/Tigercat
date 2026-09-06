@@ -143,13 +143,13 @@ claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
 
 ## 包
 
-| Package                                                      | Description                                                                          |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| [`@expcat/tigercat-core`](./packages/core/README.md)         | 共享类型、设计 token、主题与 Tailwind 插件                                           |
-| [`@expcat/tigercat-vue`](./packages/vue/README.md)           | Vue 3 组件与 composables                                                             |
-| [`@expcat/tigercat-react`](./packages/react/README.md)       | React 组件与 hooks                                                                   |
-| [`@expcat/tigercat-cli`](./packages/cli/README.md)           | 项目脚手架、组件辅助、playground 与环境诊断                                          |
-| [`@expcat/tigercat-mcp`](./packages/mcp/README.md)           | 面向 LLM 的 Skill reference 路由服务（默认远程读取 GitHub Pages，`--root` 本地模式） |
+| Package                                                | Description                                                                          |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| [`@expcat/tigercat-core`](./packages/core/README.md)   | 共享类型、设计 token、主题与 Tailwind 插件                                           |
+| [`@expcat/tigercat-vue`](./packages/vue/README.md)     | Vue 3 组件与 composables                                                             |
+| [`@expcat/tigercat-react`](./packages/react/README.md) | React 组件与 hooks                                                                   |
+| [`@expcat/tigercat-cli`](./packages/cli/README.md)     | 项目脚手架、组件辅助、playground 与环境诊断                                          |
+| [`@expcat/tigercat-mcp`](./packages/mcp/README.md)     | 面向 LLM 的 Skill reference 路由服务（默认远程读取 GitHub Pages，`--root` 本地模式） |
 
 ## 本地开发
 

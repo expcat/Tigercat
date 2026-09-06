@@ -75,7 +75,7 @@ Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `ari
 
 ## Code
 
-`packages/core/src/types/code.ts` · `CodeProps` · 4/9 props
+`packages/core/src/types/code.ts` · `CodeProps` · 4/11 props
 
 Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。
 
@@ -155,11 +155,11 @@ Note: 需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，�
 
 Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。
 
-| Prop     | Type       | Default | Notes                                                                                      |
-| -------- | ---------- | ------- | ------------------------------------------------------------------------------------------ |
-| `name?`  | `IconName` | `-`     | Built-in icon name. When provided (and no custom SVG children are given), the component... |
-| `size?`  | `IconSize` | `'md'`  | Icon size                                                                                  |
-| `color?` | `string`   | `-`     | Icon color written onto the wrapper. Omitted values inherit CSS `color` (including `sty... |
+| Prop     | Type                        | Default | Notes                                                                                      |
+| -------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `name?`  | `IconName \| (string & {})` | `-`     | Built-in or app-registered icon name (`registerIcon` on the icons/registry subpath). Wh... |
+| `size?`  | `IconSize`                  | `'md'`  | Icon size                                                                                  |
+| `color?` | `string`                    | `-`     | Icon color written onto the wrapper. Omitted values inherit CSS `color` (including `sty... |
 
 Priority: SVG children > `icon` > `name`. Built-in `name` values live in `iconNames`; registry helpers are `@expcat/tigercat-core/icons/registry`. Extended icons are tree-shakeable `*Icon` constants, not global names.
 
@@ -360,7 +360,7 @@ Events/callback props: `onOpenChange?`.
 
 ## Text
 
-`packages/core/src/types/text.ts` · `TextProps` · 4/9 props
+`packages/core/src/types/text.ts` · `TextProps` · 4/10 props
 
 Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。
 

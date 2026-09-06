@@ -161,9 +161,9 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
   getCurrentAnchorRef.current = getCurrentAnchor
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
-  const scrollLockRef = useRef(
-    createProgrammaticScrollLock(() => resolveAnchorScrollContainer(getContainerRef.current))
-  )
+  const resolveContainer = () =>
+    resolveAnchorScrollContainer(getContainerRef.current, anchorRef.current)
+  const scrollLockRef = useRef(createProgrammaticScrollLock(() => resolveContainer()))
 
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -203,7 +203,7 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
 
   const scrollTo = useCallback(
     (href: string) => {
-      const container = resolveAnchorScrollContainer(getContainerRef.current)
+      const container = resolveContainer()
       scrollToAnchor(href, container, scrollOffset)
     },
     [scrollOffset]
@@ -231,11 +231,11 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
     [applyActive, onClick, scrollTo]
   )
 
-  const resolved = resolveScrollRoot(getContainer)
+  const resolved = resolveScrollRoot(getContainer, { from: anchorRef.current })
   const resolvedKey = resolved.isWindow ? 'window' : resolved.target
 
   useEffect(() => {
-    const container = resolveAnchorScrollContainer(getContainerRef.current)
+    const container = resolveContainer()
     const root = container === window ? null : (container as Element)
     const stop = createAnchorObserver(links, {
       offsetTop: scrollOffset,

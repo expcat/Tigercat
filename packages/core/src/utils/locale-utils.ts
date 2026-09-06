@@ -28,6 +28,7 @@ import type {
   TigerLocaleFormWizard,
   TigerLocaleTour,
   TigerLocaleCalendar,
+  TigerLocaleFullscreen,
   TigerLocaleFileManager,
   TigerLocaleImageViewer,
   TigerLocaleImageEditor,
@@ -440,6 +441,13 @@ export function getFloatButtonLabels(
   overrides?: Partial<TigerLocaleFloatButton>
 ): Required<TigerLocaleFloatButton> {
   return resolveLocaleSection(enSection('floatButton'), locale?.floatButton, overrides)
+}
+
+export function getFullscreenLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleFullscreen>
+): Required<TigerLocaleFullscreen> {
+  return resolveLocaleSection(enSection('fullscreen'), locale?.fullscreen, overrides)
 }
 
 export function getSpotlightLabels(

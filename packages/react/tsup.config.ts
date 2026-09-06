@@ -12,6 +12,7 @@ const hookEntries = [
   'src/hooks/useResponsiveChartSize.ts',
   'src/hooks/useControlledState.ts',
   'src/hooks/useDrag.ts',
+  'src/hooks/useFullscreen.ts',
   'src/hooks/useFormController.ts'
 ]
 

@@ -14,11 +14,12 @@ export type IconSize = 'sm' | 'md' | 'lg' | 'xl'
  */
 export interface IconProps {
   /**
-   * Built-in icon name. When provided (and no custom SVG children are given),
-   * the component renders the matching glyph from the built-in icon set.
-   * Custom children always take precedence for backward compatibility.
+   * Built-in or app-registered icon name (`registerIcon` on the icons/registry
+   * subpath). When provided (and no custom SVG children are given), the
+   * component renders the matching glyph. Custom children always take
+   * precedence.
    */
-  name?: IconName
+  name?: IconName | (string & {})
 
   /**
    * Custom icon definition (viewBox + path data), e.g. an application logo.

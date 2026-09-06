@@ -1,0 +1,8 @@
+{
+  "id": "calendar-04",
+  "title": "日期格事件",
+  "description": "events 按本地日匹配；dateCellRender 自定义格子内容，aria-label 含当天事件数。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 320, "maxHeight": 720 }
+}

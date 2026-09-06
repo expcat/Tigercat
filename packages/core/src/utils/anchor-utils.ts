@@ -154,8 +154,11 @@ export function getElementOffsetTop(element: HTMLElement, container: HTMLElement
   )
 }
 
-export function resolveAnchorScrollContainer(input?: ScrollRootInput): HTMLElement | Window {
-  const root = resolveScrollRoot(input)
+export function resolveAnchorScrollContainer(
+  input?: ScrollRootInput,
+  from?: Element | null
+): HTMLElement | Window {
+  const root = resolveScrollRoot(input, { from })
   if (!root.target || root.isWindow) return isBrowser() ? window : (null as unknown as Window)
   return root.target as HTMLElement
 }

@@ -150,6 +150,22 @@ export interface UseDragOptions extends DragCallbacks {
 }
 
 /**
+ * Independent list Drag component. Same item/zone bindings as `useDrag` —
+ * the component is a thin renderer over the hook, not a second drag system.
+ */
+export interface DragProps<T extends DragItem = DragItem> extends UseDragOptions {
+  /** Items to reorder. Each item must have a stable `id` and `index`. */
+  items?: T[]
+  /**
+   * Called with the reordered list after a drop that changed order.
+   * Vue also emits `update:items`.
+   */
+  onItemsChange?: (items: T[]) => void
+  /** Additional CSS classes on the list root */
+  className?: string
+}
+
+/**
  * Minimal drag event shape accepted by list bindings (native or React synthetic).
  */
 export interface DragBindingEvent {

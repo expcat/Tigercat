@@ -184,7 +184,12 @@ export const frFR: TigerLocale = {
     previousMonth: 'Mois précédent',
     nextMonth: 'Mois suivant',
     previousYear: 'Année précédente',
-    nextYear: 'Année suivante'
+    nextYear: 'Année suivante',
+    eventCountText: '{n} événements'
+  },
+  fullscreen: {
+    enterAriaLabel: 'Plein écran',
+    exitAriaLabel: 'Quitter le plein écran'
   },
   fileManager: {
     rootText: 'Racine',

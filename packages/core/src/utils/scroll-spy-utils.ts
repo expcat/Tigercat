@@ -23,6 +23,7 @@ export interface FlatScrollSpyItem extends ScrollSpyItem {
 
 export interface ScrollSpyObserverOptions {
   container?: ScrollRootInput
+  from?: Element | null
   offsetTop?: number
   targetOffset?: number
   bounds?: number
@@ -168,8 +169,11 @@ export function scrollToScrollSpyItem(
   scrollToAnchor(item.href, container, targetOffset)
 }
 
-export function resolveScrollSpyContainer(input?: ScrollRootInput): HTMLElement | Window {
-  const root = resolveScrollRoot(input)
+export function resolveScrollSpyContainer(
+  input?: ScrollRootInput,
+  from?: Element | null
+): HTMLElement | Window {
+  const root = resolveScrollRoot(input, { from })
   if (!root.target || root.isWindow) return isBrowser() ? window : (null as unknown as Window)
   return root.target as HTMLElement
 }
@@ -205,7 +209,7 @@ export function createScrollSpyObserver(
     if (!itemByHref.has(item.href)) itemByHref.set(item.href, item)
   }
   const offset = resolveScrollSpyOffset(options.targetOffset, options.offsetTop)
-  const container = resolveScrollSpyContainer(options.container)
+  const container = resolveScrollSpyContainer(options.container, options.from)
   const root = container === window ? null : (container as Element)
 
   return createAnchorObserver(hrefs, {

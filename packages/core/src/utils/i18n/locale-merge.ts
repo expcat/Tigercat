@@ -43,6 +43,7 @@ export const TIGER_LOCALE_KEY_SET = {
   formWizard: true,
   tour: true,
   calendar: true,
+  fullscreen: true,
   fileManager: true,
   imageViewer: true,
   imageEditor: true,

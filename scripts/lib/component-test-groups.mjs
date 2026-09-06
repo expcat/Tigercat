@@ -62,6 +62,7 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'NavigationMenuList',
       'NavigationMenuTrigger',
       'FloatButtonGroup',
+      'FullscreenButton',
       'MenuItem',
       'MenuItemGroup',
       'StepsItem',

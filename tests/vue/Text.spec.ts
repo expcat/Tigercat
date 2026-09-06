@@ -2,8 +2,9 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { Text } from '@expcat/tigercat-vue/Text'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -73,5 +74,22 @@ describe('Text (Vue)', () => {
     const el = container.querySelector('p') as HTMLElement
     expect(getComputedStyle(el).textAlign).toBe('start')
     style.remove()
+  })
+
+  it('copies the rendered text from a keyboard-operable button', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true
+    })
+    const { emitted } = render(Text, {
+      props: { copyable: true },
+      slots: { default: 'user-42' }
+    })
+    await user.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(writeText).toHaveBeenCalledWith('user-42')
+    expect(emitted().copy?.[0]?.[0]).toBe('user-42')
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()
   })
 })

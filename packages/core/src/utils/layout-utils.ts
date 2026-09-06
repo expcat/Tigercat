@@ -129,6 +129,12 @@ export function getLayoutContentClasses(padding: boolean | string = true): strin
 }
 
 export const layoutFooterClasses = 'tiger-footer'
+export const layoutFooterCompactClasses = 'tiger-footer-compact'
+
+export function getLayoutFooterClasses(size: 'default' | 'compact' = 'default'): string {
+  injectLayoutGridStyles()
+  return classNames(layoutFooterClasses, size === 'compact' && layoutFooterCompactClasses)
+}
 
 export const LAYOUT_CONTENT_TAGS = ['main', 'div', 'section', 'article'] as const
 export const LAYOUT_FOOTER_TAGS = ['footer', 'div'] as const

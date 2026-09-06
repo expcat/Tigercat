@@ -24,6 +24,10 @@ const collapsed = ref(false)
     <Button size="sm" @click="collapsed = !collapsed">
       {{ collapsed ? '展开菜单' : '收起菜单' }}
     </Button>
-    <Menu :items="items" searchable :collapsed="collapsed" :default-selected-keys="['dashboard']" />
+    <Menu
+      :items="items"
+      searchable="auto"
+      :collapsed="collapsed"
+      :default-selected-keys="['dashboard']" />
   </div>
 </template>

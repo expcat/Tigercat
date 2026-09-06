@@ -255,6 +255,13 @@ export interface TigerLocaleCalendar {
   nextMonth?: string
   previousYear?: string
   nextYear?: string
+  /** `{n}` is replaced with the event count for the date-cell aria-label. */
+  eventCountText?: string
+}
+
+export interface TigerLocaleFullscreen {
+  enterAriaLabel?: string
+  exitAriaLabel?: string
 }
 
 export interface TigerLocaleFileManager {
@@ -846,6 +853,7 @@ export interface TigerLocale {
   formWizard?: TigerLocaleFormWizard
   tour?: TigerLocaleTour
   calendar?: TigerLocaleCalendar
+  fullscreen?: TigerLocaleFullscreen
   fileManager?: TigerLocaleFileManager
   imageViewer?: TigerLocaleImageViewer
   imageEditor?: TigerLocaleImageEditor

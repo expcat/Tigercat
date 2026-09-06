@@ -1,8 +1,8 @@
 import React, { forwardRef } from 'react'
 import {
   classNames,
+  getLayoutFooterClasses,
   injectLayoutGridStyles,
-  layoutFooterClasses,
   type FooterProps as CoreFooterProps
 } from '@expcat/tigercat-core'
 
@@ -13,11 +13,11 @@ export interface ReactFooterProps
 }
 
 export const Footer = forwardRef<HTMLElement, ReactFooterProps>(function Footer(
-  { className, height, style, as = 'footer', children, ...props },
+  { className, height, size = 'default', style, as = 'footer', children, ...props },
   ref
 ) {
   injectLayoutGridStyles()
-  const footerClasses = classNames(layoutFooterClasses, className)
+  const footerClasses = classNames(getLayoutFooterClasses(size), className)
   const footerStyle: React.CSSProperties | undefined = height ? { ...style, height } : style
   const Tag = as as React.ElementType
 

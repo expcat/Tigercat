@@ -95,6 +95,7 @@ export const CATEGORIES = {
     'navigation-menu',
     'page-header',
     'float-button',
+    'fullscreen',
     'menu',
     'pagination',
     'scroll-spy',
@@ -247,6 +248,15 @@ export const FRAMEWORK_COMPONENTS = {
       'packages/vue/src/components/Steps.ts'
     ],
     propsInterfaces: ['StepsItemProps', 'VueStepsItemProps']
+  },
+  FullscreenButton: {
+    category: 'Navigation',
+    typeSource: 'packages/core/src/types/fullscreen.ts',
+    sourceFiles: [
+      'packages/react/src/components/FullscreenButton.tsx',
+      'packages/vue/src/components/FullscreenButton.ts'
+    ],
+    propsInterfaces: ['FullscreenButtonProps', 'VueFullscreenButtonProps']
   }
 }
 
@@ -516,6 +526,7 @@ export const TIGERCAT_TOPIC_ROUTES = {
 }
 
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
+  ['Fullscreen', 'FullscreenButton'],
   ['AnchorLink', 'Anchor'],
   ['BreadcrumbItem', 'Breadcrumb'],
   ['DropdownItem', 'Dropdown'],
@@ -641,6 +652,11 @@ function getFrameworkHookPackageExports(framework) {
       types: `./dist/${hookDir}/useDrag.d.mts`,
       import: `./dist/${hookDir}/useDrag.mjs`,
       default: `./dist/${hookDir}/useDrag.mjs`
+    },
+    './useFullscreen': {
+      types: `./dist/${hookDir}/useFullscreen.d.mts`,
+      import: `./dist/${hookDir}/useFullscreen.mjs`,
+      default: `./dist/${hookDir}/useFullscreen.mjs`
     }
   }
 

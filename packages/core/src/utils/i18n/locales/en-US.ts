@@ -184,7 +184,12 @@ export const enUS: TigerLocale = {
     previousMonth: 'Previous month',
     nextMonth: 'Next month',
     previousYear: 'Previous year',
-    nextYear: 'Next year'
+    nextYear: 'Next year',
+    eventCountText: '{n} events'
+  },
+  fullscreen: {
+    enterAriaLabel: 'Enter fullscreen',
+    exitAriaLabel: 'Exit fullscreen'
   },
   fileManager: {
     rootText: 'Root',

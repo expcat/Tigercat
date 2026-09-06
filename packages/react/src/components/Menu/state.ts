@@ -9,7 +9,9 @@ import {
   reconcileSearchOpenKeys,
   resolveMenuCollapsed,
   resolveMenuMode,
+  resolveMenuSearchQuery,
   resolveSearchFilter,
+  shouldShowMenuSearch,
   warnControlledSearchOpenKeys,
   type MenuKey,
   type MenuMode
@@ -102,9 +104,15 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     [setSearchValue]
   )
 
+  const showSearch = shouldShowMenuSearch(searchable, collapsed)
   const { filtered: filteredItems, expandKeys } = useMemo(
-    () => resolveSearchFilter({ items, query: searchValue, filterMode }),
-    [items, searchValue, filterMode]
+    () =>
+      resolveSearchFilter({
+        items,
+        query: resolveMenuSearchQuery(searchable, collapsed, searchValue),
+        filterMode
+      }),
+    [items, searchValue, filterMode, searchable, collapsed]
   )
 
   useEffect(() => {
@@ -199,7 +207,7 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     resolvedMode,
     mode,
     contextValue,
-    searchable,
+    searchable: showSearch,
     searchValue,
     searchPlaceholder: searchPlaceholder ?? locale?.common?.searchPlaceholder ?? 'Search',
     emptyText: emptyText ?? locale?.common?.emptyText ?? 'No data',

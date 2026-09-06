@@ -31,6 +31,7 @@ source: current repository state after v2.1.4
 - headless/unstyled 模式：需先评估与 Tailwind 插件、token 体系的关系。
 - React peer 依赖下探（^18）：收益与测试矩阵成本权衡。
 - 低频候选：TimeSelect、Inplace 就地编辑、CopyButton、Dock；出现真实下游需求时再登记。
+- Admin 上游已推迟：动态 schema 表单（不做表单设计器产品）、人机验证码组件（登录无明示需求）、Chart 基元 axis↔tooltip 共享 scale（高层图已够用）。
 
 ## 发布与验证边界
 

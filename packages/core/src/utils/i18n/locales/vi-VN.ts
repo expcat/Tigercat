@@ -184,7 +184,12 @@ export const viVN: TigerLocale = {
     previousMonth: 'Tháng trước',
     nextMonth: 'Tháng sau',
     previousYear: 'Năm trước',
-    nextYear: 'Năm sau'
+    nextYear: 'Năm sau',
+    eventCountText: '{n} sự kiện'
+  },
+  fullscreen: {
+    enterAriaLabel: 'Vào toàn màn hình',
+    exitAriaLabel: 'Thoát toàn màn hình'
   },
   fileManager: {
     rootText: 'Gốc',

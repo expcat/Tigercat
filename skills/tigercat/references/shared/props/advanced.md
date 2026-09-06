@@ -7,7 +7,7 @@ description: Compact generated Tigercat Advanced props reference
 
 # Advanced Props
 
-编辑器、虚拟化、文件、拖拽、看板和高级工具组件。 共 12 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+编辑器、虚拟化、文件、拖拽、看板和高级工具组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## CodeEditor
 
@@ -19,6 +19,18 @@ description: Compact generated Tigercat Advanced props reference
 | `theme?`    | `CodeEditorTheme` | `'light'` | Editor theme                                 |
 | `wordWrap?` | `boolean`         | `false`   | Whether to wrap long lines                   |
 | `minLines?` | `number`          | `3`       | Minimum number of visible lines              |
+
+## Drag
+
+`packages/core/src/types/drag.ts` · `DragProps` · 3/6 props
+
+| Prop         | Type                                                       | Default | Notes                                                            |
+| ------------ | ---------------------------------------------------------- | ------- | ---------------------------------------------------------------- |
+| `items?`     | `T[]`                                                      | `-`     | Items to reorder. Each item must have a stable `id` and `index`. |
+| `className?` | `string`                                                   | `-`     | Additional CSS classes on the list root                          |
+| `children?`  | `(item: T, context: DragRenderContext) => React.ReactNode` | `-`     | -                                                                |
+
+Events/callback props: `onItemsChange?`.
 
 ## FileManager
 

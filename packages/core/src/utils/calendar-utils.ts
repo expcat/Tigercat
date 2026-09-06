@@ -1,6 +1,11 @@
 import { classNames } from './class-names'
-import { getCalendarDays } from './date-utils'
-import type { WeekStartsOn } from '../types/calendar'
+import { formatDate, getCalendarDays, toCalendarDate } from './date-utils'
+import type { CalendarDateCellExtra, CalendarEvent, WeekStartsOn } from '../types/calendar'
+
+function eventIso(value: Date | string): string | null {
+  const date = toCalendarDate(value)
+  return date ? formatDate(date, 'yyyy-MM-dd') : null
+}
 
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
@@ -49,6 +54,7 @@ export interface CalendarDayClassState {
   isInRange?: boolean
   isRangeStart?: boolean
   isRangeEnd?: boolean
+  hasExtra?: boolean
 }
 
 export function getCalendarDayClasses(state: CalendarDayClassState): string {
@@ -60,11 +66,15 @@ export function getCalendarDayClasses(state: CalendarDayClassState): string {
     isActive,
     isInRange,
     isRangeStart,
-    isRangeEnd
+    isRangeEnd,
+    hasExtra
   } = state
   const selected = isSelected || isRangeStart || isRangeEnd
   return classNames(
-    'inline-flex items-center justify-center w-8 h-8 rounded-full text-sm',
+    'inline-flex items-center justify-center w-8 text-sm',
+    hasExtra
+      ? 'h-auto min-h-8 flex-col gap-0.5 rounded-[var(--tiger-radius-md,0.5rem)] py-0.5'
+      : 'h-8 rounded-full',
     'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]',
     'justify-self-center my-0.5',
     FOCUS_RING,
@@ -79,6 +89,64 @@ export function getCalendarDayClasses(state: CalendarDayClassState): string {
     !selected && isInRange && 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
     isActive && !selected && 'ring-1 ring-inset ring-[var(--tiger-primary,#2563eb)]'
   )
+}
+
+export const calendarDateCellExtraClasses =
+  'flex max-w-full flex-wrap items-center justify-center gap-0.5'
+
+export const calendarDateCellDotClasses = 'h-1.5 w-1.5 shrink-0 rounded-full'
+
+export function getCalendarEventDotStyle(color?: string): { backgroundColor: string } {
+  return { backgroundColor: color?.trim() || 'var(--tiger-primary, #2563eb)' }
+}
+
+export function getCalendarEventsForDate(
+  events: CalendarEvent[] | undefined,
+  date: Date
+): CalendarEvent[] {
+  if (!events || events.length === 0) return []
+  const iso = formatDate(date, 'yyyy-MM-dd')
+  const matched: CalendarEvent[] = []
+  for (const event of events) {
+    if (eventIso(event.date) === iso) matched.push(event)
+  }
+  return matched
+}
+
+export function buildCalendarDateCellExtra(options: {
+  date: Date
+  events?: CalendarEvent[]
+  inCurrentMonth: boolean
+  today: boolean
+  selected: boolean
+  disabled: boolean
+}): CalendarDateCellExtra {
+  return {
+    iso: formatDate(options.date, 'yyyy-MM-dd'),
+    events: getCalendarEventsForDate(options.events, options.date),
+    inCurrentMonth: options.inCurrentMonth,
+    today: options.today,
+    selected: options.selected,
+    disabled: options.disabled
+  }
+}
+
+export function formatCalendarEventCountLabel(
+  eventCount: number,
+  template: string | undefined
+): string {
+  if (eventCount <= 0) return ''
+  const source = template && template.trim() ? template : '{n} events'
+  return source.replace(/\{n\}/g, String(eventCount))
+}
+
+export function appendCalendarEventCountLabel(
+  dayLabel: string,
+  eventCount: number,
+  template: string | undefined
+): string {
+  const extra = formatCalendarEventCountLabel(eventCount, template)
+  return extra ? `${dayLabel}, ${extra}` : dayLabel
 }
 
 export function getCalendarMonthClasses(state: {

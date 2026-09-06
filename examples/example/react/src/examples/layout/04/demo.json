@@ -1,0 +1,8 @@
+{
+  "id": "layout-04",
+  "title": "页脚密度",
+  "description": "Footer 放进 Content 会随内容滚；作为 Layout 直子则钉在壳底。size=compact 缩小垂直 padding。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 280, "maxHeight": 720 }
+}

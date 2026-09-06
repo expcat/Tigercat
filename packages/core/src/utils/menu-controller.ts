@@ -33,6 +33,28 @@ export function resolveMenuCollapsed(mode: MenuMode, collapsed: boolean | undefi
   return true
 }
 
+/**
+ * Collapsed menus never show the search field. `'auto'` means searchable
+ * only while expanded; `true` is the same visually once collapsed.
+ */
+export function shouldShowMenuSearch(
+  searchable: boolean | 'auto' | undefined,
+  collapsed: boolean
+): boolean {
+  if (!searchable) return false
+  if (collapsed) return false
+  return searchable === true || searchable === 'auto'
+}
+
+export function resolveMenuSearchQuery(
+  searchable: boolean | 'auto' | undefined,
+  collapsed: boolean,
+  searchValue: string
+): string {
+  if (collapsed && (searchable === true || searchable === 'auto')) return ''
+  return searchValue
+}
+
 export function isSubmenuPopup(mode: MenuMode, collapsed: boolean): boolean {
   return mode === 'horizontal' || (mode === 'vertical' && collapsed)
 }

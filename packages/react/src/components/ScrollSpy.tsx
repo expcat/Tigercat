@@ -89,14 +89,19 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
   const activeKeyRef = useRef(currentActiveKey)
   activeKeyRef.current = currentActiveKey
 
-  const resolvedContainer = resolveScrollSpyContainer(getContainer)
+  const hostRef = useRef<HTMLElement | null>(null)
+  const setHostRef = (node: HTMLElement | null) => {
+    hostRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }
+  const resolvedContainer = resolveScrollSpyContainer(getContainer, hostRef.current)
   const containerKey = resolvedContainer === window ? 'window' : (resolvedContainer as HTMLElement)
 
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
-  const scrollLockRef = useRef(
-    createProgrammaticScrollLock(() => resolveScrollSpyContainer(getContainerRef.current))
-  )
+  const resolveContainer = () => resolveScrollSpyContainer(getContainerRef.current, hostRef.current)
+  const scrollLockRef = useRef(createProgrammaticScrollLock(() => resolveContainer()))
 
   const emitActive = useCallback(
     (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {
@@ -113,6 +118,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
   useEffect(() => {
     return createScrollSpyObserver(items, {
       container: getContainerRef.current,
+      from: hostRef.current,
       offsetTop: offset,
       bounds,
       onChange: (item) => {
@@ -141,7 +147,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
       onClick?.(item, event)
       emitActive(item, 'click')
       scrollLockRef.current.lock()
-      activateScrollSpyClick(item, resolveScrollSpyContainer(getContainerRef.current), offset)
+      activateScrollSpyClick(item, resolveContainer(), offset)
     },
     [emitActive, offset, onClick]
   )
@@ -186,7 +192,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
   return (
     <nav
       {...rest}
-      ref={ref}
+      ref={setHostRef}
       className={classNames(getScrollSpyRootClasses(sticky, className))}
       style={getScrollSpyRootStyle(sticky, offset, style as Record<string, string | number>)}
       aria-label={ariaLabel ?? labels.ariaLabel}>

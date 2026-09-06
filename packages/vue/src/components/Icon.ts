@@ -33,7 +33,7 @@ export const Icon = defineComponent({
      * set when no custom SVG children are provided.
      */
     name: {
-      type: String as PropType<IconName>,
+      type: String as PropType<IconName | (string & {})>,
       default: undefined
     },
     /**

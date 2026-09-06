@@ -184,7 +184,12 @@ export const idID: TigerLocale = {
     previousMonth: 'Bulan sebelumnya',
     nextMonth: 'Bulan berikutnya',
     previousYear: 'Tahun sebelumnya',
-    nextYear: 'Tahun berikutnya'
+    nextYear: 'Tahun berikutnya',
+    eventCountText: '{n} acara'
+  },
+  fullscreen: {
+    enterAriaLabel: 'Masuk layar penuh',
+    exitAriaLabel: 'Keluar layar penuh'
   },
   fileManager: {
     rootText: 'Akar',

@@ -104,6 +104,14 @@ describe('Menu', () => {
       expect(list?.querySelector('input[type="search"]')).toBeNull()
       expect(screen.getByRole('searchbox')).toBeInTheDocument()
     })
+
+    it('hides search when collapsed even if searchable is true', () => {
+      render(Menu, {
+        attrs: { 'aria-label': 'Site' },
+        props: { items: dataItems, searchable: true, collapsed: true }
+      })
+      expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    })
   })
 
   describe('Selection', () => {

@@ -1,0 +1,8 @@
+{
+  "id": "code-03",
+  "title": "可插拔高亮",
+  "description": "language 只是提示；不传 highlighter 仍是纯文本，高亮引擎不会打进主包。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

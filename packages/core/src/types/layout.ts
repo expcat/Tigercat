@@ -138,4 +138,10 @@ export interface FooterProps {
    * CSS initial value and would block caller `style.height` / class).
    */
   height?: string
+
+  /**
+   * Vertical density. `compact` shrinks padding for App Shell copyright bars.
+   * @default 'default'
+   */
+  size?: 'default' | 'compact'
 }

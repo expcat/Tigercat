@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-react",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "description": "React components for Tigercat UI library",
   "license": "MIT",
   "author": "Yizhe Wang",
@@ -299,6 +299,11 @@
       "import": "./dist/components/DonutChart.mjs",
       "default": "./dist/components/DonutChart.mjs"
     },
+    "./Drag": {
+      "types": "./dist/components/Drag.d.mts",
+      "import": "./dist/components/Drag.mjs",
+      "default": "./dist/components/Drag.mjs"
+    },
     "./Drawer": {
       "types": "./dist/components/Drawer.d.mts",
       "import": "./dist/components/Drawer.mjs",
@@ -358,6 +363,11 @@
       "types": "./dist/components/FormWizard.d.mts",
       "import": "./dist/components/FormWizard.mjs",
       "default": "./dist/components/FormWizard.mjs"
+    },
+    "./FullscreenButton": {
+      "types": "./dist/components/FullscreenButton.d.mts",
+      "import": "./dist/components/FullscreenButton.mjs",
+      "default": "./dist/components/FullscreenButton.mjs"
     },
     "./FunnelChart": {
       "types": "./dist/components/FunnelChart.d.mts",
@@ -898,6 +908,11 @@
       "types": "./dist/hooks/useDrag.d.mts",
       "import": "./dist/hooks/useDrag.mjs",
       "default": "./dist/hooks/useDrag.mjs"
+    },
+    "./useFullscreen": {
+      "types": "./dist/hooks/useFullscreen.d.mts",
+      "import": "./dist/hooks/useFullscreen.mjs",
+      "default": "./dist/hooks/useFullscreen.mjs"
     },
     "./useControlledState": {
       "types": "./dist/hooks/useControlledState.d.mts",

@@ -10,8 +10,10 @@ import {
   getCodeLabels,
   mergeStyleValues,
   mergeTigerLocale,
+  renderCodeHighlightHtml,
   resolveLocaleText,
   type CodeCopyButtonStatus,
+  type CodeHighlighter,
   type CodeProps as CoreCodeProps,
   type TigerLocale,
   type TigerLocaleCode
@@ -34,6 +36,14 @@ export const Code = defineComponent({
     copyable: {
       type: Boolean,
       default: true
+    },
+    language: {
+      type: String,
+      default: undefined
+    },
+    highlighter: {
+      type: Object as PropType<CodeHighlighter>,
+      default: undefined
     },
     copyLabel: {
       type: String,
@@ -123,7 +133,21 @@ export const Code = defineComponent({
           style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
         [
-          h('pre', { class: codeBlockPreClasses }, [h('code', { class: 'block' }, props.code)]),
+          h('pre', { class: codeBlockPreClasses }, [
+            (() => {
+              const highlighted = renderCodeHighlightHtml(
+                props.code,
+                props.language,
+                props.highlighter
+              )
+              return highlighted == null
+                ? h('code', { class: 'block' }, props.code)
+                : h('code', {
+                    class: 'block',
+                    innerHTML: highlighted
+                  })
+            })()
+          ]),
           props.copyable
             ? h(
                 'button',

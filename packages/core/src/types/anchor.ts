@@ -44,7 +44,7 @@ export interface AnchorProps {
   getCurrentAnchor?: (activeLink: string) => string
   /**
    * Scroll container for spy / scrollTo. Selector, Element, Window, or getter.
-   * @default window
+   * When omitted, the nearest overflow ancestor is used, then `window`.
    */
   getContainer?: ScrollRootInput
   /**

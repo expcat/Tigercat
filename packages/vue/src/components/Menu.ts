@@ -48,6 +48,8 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   moveFocusInMenu,
+  resolveMenuSearchQuery,
+  shouldShowMenuSearch,
   nextOpenKeys,
   nextSelectedKeys,
   reconcileSearchOpenKeys,
@@ -197,7 +199,7 @@ export interface VueMenuProps {
   popupPortal?: boolean
   className?: string
   style?: CoreMenuProps['style']
-  searchable?: boolean
+  searchable?: boolean | 'auto'
   searchValue?: string
   defaultSearchValue?: string
   searchPlaceholder?: string
@@ -224,7 +226,7 @@ export const Menu = defineComponent({
     popupPortal: { type: Boolean, default: true },
     className: { type: String, default: undefined },
     style: { type: Object as PropType<CoreMenuProps['style']>, default: undefined },
-    searchable: { type: Boolean, default: false },
+    searchable: { type: [Boolean, String] as PropType<boolean | 'auto'>, default: false },
     searchValue: { type: String, default: undefined },
     defaultSearchValue: { type: String, default: '' },
     searchPlaceholder: { type: String, default: undefined },
@@ -294,10 +296,11 @@ export const Menu = defineComponent({
       emit('search', value)
     }
 
+    const showSearch = computed(() => shouldShowMenuSearch(props.searchable, collapsed.value))
     const searchResult = computed(() =>
       resolveSearchFilter({
         items: props.items,
-        query: currentSearchValue.value,
+        query: resolveMenuSearchQuery(props.searchable, collapsed.value, currentSearchValue.value),
         filterMode: props.filterMode
       })
     )
@@ -434,7 +437,7 @@ export const Menu = defineComponent({
           ...passthroughAttrs.value
         },
         [
-          props.searchable
+          showSearch.value
             ? h('div', { class: menuSearchFieldClasses }, [
                 h('input', {
                   type: 'search',

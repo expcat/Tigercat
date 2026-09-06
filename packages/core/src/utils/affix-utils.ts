@@ -239,7 +239,11 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
   const pinFromFlow = (emitChange: boolean): void => {
     const flow = getFlowRect()
     if (!flow) return
-    const root = resolved ?? resolveScrollRoot(options.getTarget())
+    const root =
+      resolved ??
+      resolveScrollRoot(options.getTarget(), {
+        from: options.getContent() ?? options.getSentinel()
+      })
     const style = buildAffixStyle(
       flow,
       root.getRect(),
@@ -317,7 +321,9 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
     const sentinel = options.getSentinel()
     if (!sentinel) return
 
-    resolved = resolveScrollRoot(options.getTarget())
+    resolved = resolveScrollRoot(options.getTarget(), {
+      from: options.getContent() ?? options.getSentinel()
+    })
     const root = resolved.isWindow ? null : (resolved.target as Element | null)
 
     if (typeof IntersectionObserver === 'undefined') {

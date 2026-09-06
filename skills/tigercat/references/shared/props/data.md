@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Calendar
 
-`packages/core/src/types/calendar.ts` · `CalendarProps` · 4/12 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 4/14 props
 
 | Prop            | Type                     | Default   | Notes                                                                   |
 | --------------- | ------------------------ | --------- | ----------------------------------------------------------------------- |

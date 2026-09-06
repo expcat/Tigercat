@@ -1,0 +1,8 @@
+{
+  "id": "drag-01",
+  "title": "列表拖拽",
+  "description": "独立 Drag 组件与 useDrag 共用同一套 item attrs，落下后回写 items。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

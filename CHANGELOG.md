@@ -2,6 +2,25 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.2.0
+
+v2.2.0：收下 Tigercat_Admin 上游开放项。P1 全部落地；列出的 P2 按建议 API 一次做完，去掉双轨 workaround。Schema 表单、人机验证码、图表基元精细联动本版不做，理由见下。
+
+- **同步 `.size-limit.json` 预算（v2.2.0 实测）**：`Core (full)` 211→213 kB（实测 212.37）、`Vue (full)` 405→409 kB（实测 408）、`React (full)` 447→451 kB（实测 450.1）；若干含子路径因官方 icon 名集与 locale 增补略超，一并按实测上调。
+
+- **Calendar `events` / `dateCellRender` / `#dateCell`**：月视图格子可画事件。`events` 按本地 `yyyy-MM-dd` 匹配；不传自定义渲染时画色点。React `dateCellRender(date, extra)` 与 Vue `#dateCell="{ date, events, extra }"` 对称。格子 `aria-label` 含 `{n} events` / `{n} 个日程`。Vue/React。公开 API 增补，无新必填 prop。
+- **Text `copyable`**：`true` 或 `{ text?, tooltip?, onCopy? }`。复制钮可键盘操作，成功走内部 tooltip + `aria-live`（复用 `locale.code` 文案）。Vue/React。公开 API 增补，无新必填 prop。
+- **滚动祖先自动探测**：Affix / Anchor / BackTop / ScrollSpy 未传 `target` / `getContainer` 时沿 DOM 找最近 overflow 祖先，找不到再回落 `window`。显式选择器 / Element / `null`（window）仍覆盖。core `findNearestOverflowAncestor`。若必须钉 `window`，传 `target={window}` 或 `getContainer={() => window}`。Vue/React。公开行为变化，无新必填 prop。
+- **Icon 覆盖面 + 注册表**：官方 `name` 增加 `fullscreen` / `fullscreen-exit` / `ticket` / `bolt` / `zap` / `chart-bar` / `chart` / `database`。`registerIcon` / `registerIcons` 挂应用级名称（内置名不覆盖），子路径 `@expcat/tigercat-core/icons/registry` tree-shake。Vue/React。公开 API 增补。
+- **Code 可插拔高亮**：可选 `language` + `highlighter`。默认仍纯文本，不高亮引擎进主包。输出按 TRUSTED HTML 注入。Vue/React。公开 API 增补，无新必填 prop。
+- **FullscreenButton / `useFullscreen`**：浏览器全屏，处理 `fullscreenchange`、无权限失败、SSR 空操作；内置 expand/collapse 图标。Vue/React。新组件 + hook。
+- **Menu 折叠态搜索**：`collapsed` 时隐藏搜索框且不按残留 query 过滤。`searchable="auto"` 表示仅展开时搜索。Admin 不必再写 `searchable={!collapsed}`。Vue/React。公开 API 放宽 + 行为修复。
+- **独立 Drag 组件**：与 `useDrag` 同一套 item props/attrs，落下回写 `items`。不是第二套拖拽系统。Vue/React。新组件。
+- **Footer `size="compact"`**：缩小垂直 padding。Layout 示例补「Content 内滚动 + Footer 随内容」和「固定页脚」。
+- **AutoComplete 受控示例**：打字只改 `searchValue`，提交才改 `value`。无第二套 `onInput`。
+- **编辑器 highlighter 示例**：CodeEditor 传入 `builtinCodeHighlighter` 演示最小适配；自定义引擎仍走现有 `highlighter` / `engine` 插口。
+- **本版明确不做**：动态 schema 表单（Admin 不做表单设计器）、人机验证码（Admin 无明示需求）、Chart 基元 axis↔tooltip 共享 scale（高层图已够用）。出现真实下游需求再登记。
+
 ## v2.1.4
 
 v2.1.4：ImageCropper 裁剪画布不再被 ResizeObserver 越缩越小；Example 视觉审查修复与本地测试套件收口一并进本版。

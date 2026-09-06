@@ -151,4 +151,28 @@ describe('Calendar', () => {
     })
     await expectNoA11yViolations(container)
   })
+
+  it('renders default event dots and includes the count in the aria-label', () => {
+    renderCalendar({
+      modelValue: testDate,
+      events: [{ title: 'Ship', date: '2024-06-15', color: '#2563eb' }]
+    })
+    const cell = dayButton('2024-06-15')
+    expect(cell.getAttribute('aria-label') ?? '').toMatch(/1 events/)
+    expect(cell.querySelector('[aria-hidden="true"]')).not.toBeNull()
+  })
+
+  it('uses the dateCell slot instead of default dots', () => {
+    render(Calendar, {
+      props: {
+        modelValue: testDate,
+        now,
+        events: [{ title: 'Ship', date: '2024-06-15' }]
+      },
+      slots: {
+        dateCell: ({ events }: { events: Array<{ title?: string }> }) => events[0]?.title ?? ''
+      }
+    })
+    expect(dayButton('2024-06-15')).toHaveTextContent('Ship')
+  })
 })

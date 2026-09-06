@@ -1,4 +1,5 @@
 export * from './useChartInteraction'
 export * from './useControlledState'
 export * from './useDrag'
+export * from './useFullscreen'
 export * from './useResponsiveChartSize'

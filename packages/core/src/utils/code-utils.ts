@@ -1,3 +1,4 @@
+import type { CodeHighlighter } from '../types/code-editor'
 import { type ClassValue, classNames } from './class-names'
 
 export const codeBlockContainerClasses =
@@ -64,4 +65,31 @@ export function createCopyStatusReset(
     },
     dispose
   }
+}
+
+/**
+ * Render highlighted HTML from a pluggable engine. Returns `null` when no
+ * highlighter is provided so callers keep a plain-text `<code>` node.
+ * Engine output is TRUSTED.
+ */
+export function renderCodeHighlightHtml(
+  code: string,
+  language: string | undefined,
+  highlighter: CodeHighlighter | undefined
+): string | null {
+  if (!highlighter) return null
+  const lang = language ?? 'plain'
+  if (highlighter.highlightCode) {
+    return highlighter.highlightCode(code, lang as never, 'light')
+  }
+  if (highlighter.highlightLine) {
+    const lines = code.split('\n')
+    const parts: string[] = []
+    for (let i = 0; i < lines.length; i++) {
+      if (i > 0) parts.push('\n')
+      parts.push(highlighter.highlightLine(lines[i], lang as never, 'light'))
+    }
+    return parts.join('')
+  }
+  return null
 }

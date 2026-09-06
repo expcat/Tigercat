@@ -59,6 +59,19 @@ export type TextColor =
   'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'muted'
 
 /**
+ * Options for {@link TextProps.copyable}. `text` overrides the copied
+ * payload; `tooltip` is the idle copy-button accessible name; `onCopy`
+ * runs after a successful write.
+ */
+export interface TextCopyableOptions {
+  text?: string
+  tooltip?: string
+  onCopy?: (text: string) => void
+}
+
+export type TextCopyable = boolean | TextCopyableOptions
+
+/**
  * Base text props interface
  */
 export interface TextProps {
@@ -96,6 +109,13 @@ export interface TextProps {
    * @default false
    */
   truncate?: boolean
+
+  /**
+   * Show a keyboard-operable copy control. `true` copies the rendered text;
+   * an object can override the payload, tooltip, and success callback.
+   * @default false
+   */
+  copyable?: TextCopyable
 
   /**
    * Whether text should be italic

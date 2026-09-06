@@ -7,7 +7,7 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 34 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 35 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
@@ -17,7 +17,7 @@ description: Compact generated Tigercat Navigation props reference
 | --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `offsetTop?`    | `number`          | `0`     | Distance from the top of the scroll root to trigger fixed positioning (px). Mutually ex... |
 | `offsetBottom?` | `number`          | `-`     | Distance from the bottom of the scroll root to trigger fixed positioning (px). When `ta... |
-| `target?`       | `ScrollRootInput` | `-`     | The scrollable container. Selector, Element, Window, or getter. Defaults to `window`. I... |
+| `target?`       | `ScrollRootInput` | `-`     | The scrollable container. Selector, Element, Window, or getter. When omitted, the neare... |
 | `zIndex?`       | `number`          | `10`    | Z-index of the affixed element                                                             |
 
 Events/callback props: `onChange?`.
@@ -26,12 +26,12 @@ Events/callback props: `onChange?`.
 
 `packages/core/src/types/anchor.ts` · `AnchorProps` · 4/14 props
 
-| Prop            | Type              | Default      | Notes                                                                      |
-| --------------- | ----------------- | ------------ | -------------------------------------------------------------------------- |
-| `getContainer?` | `ScrollRootInput` | `window`     | Scroll container for spy / scrollTo. Selector, Element, Window, or getter. |
-| `direction?`    | `AnchorDirection` | `'vertical'` | Direction of the anchor navigation                                         |
-| `targetOffset?` | `number`          | `-`          | Offset when scrolling to a target section                                  |
-| `affix?`        | `boolean`         | `true`       | Whether to pin the anchor with Affix (placeholder + live geometry).        |
+| Prop            | Type              | Default      | Notes                                                                                      |
+| --------------- | ----------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `getContainer?` | `ScrollRootInput` | `-`          | Scroll container for spy / scrollTo. Selector, Element, Window, or getter. When omitted... |
+| `direction?`    | `AnchorDirection` | `'vertical'` | Direction of the anchor navigation                                                         |
+| `targetOffset?` | `number`          | `-`          | Offset when scrolling to a target section                                                  |
+| `affix?`        | `boolean`         | `true`       | Whether to pin the anchor with Affix (placeholder + live geometry).                        |
 
 Events/callback props: `onClick?`, `onChange?`.
 
@@ -49,12 +49,12 @@ Events/callback props: `onClick?`, `onChange?`.
 
 `packages/core/src/types/back-top.ts` · `BackTopProps` · 4/11 props
 
-| Prop                | Type                | Default          | Notes                                                                         |
-| ------------------- | ------------------- | ---------------- | ----------------------------------------------------------------------------- |
-| `visibilityHeight?` | `number`            | `400`            | Scroll height to show the BackTop button. Non-finite values fall back to 400. |
-| `target?`           | `ScrollRootInput`   | `-`              | Scroll container. Selector, Element, Window, or getter. Defaults to `window`. |
-| `placement?`        | `ViewportPlacement` | `'bottom-right'` | Viewport corner used when position is auto or fixed.                          |
-| `offset?`           | `ViewportOffset`    | `24`             | Viewport offset used when position is auto or fixed.                          |
+| Prop                | Type                | Default          | Notes                                                                                      |
+| ------------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `visibilityHeight?` | `number`            | `400`            | Scroll height to show the BackTop button. Non-finite values fall back to 400.              |
+| `target?`           | `ScrollRootInput`   | `-`              | Scroll container. Selector, Element, Window, or getter. When omitted, the nearest overf... |
+| `placement?`        | `ViewportPlacement` | `'bottom-right'` | Viewport corner used when position is auto or fixed.                                       |
+| `offset?`           | `ViewportOffset`    | `24`             | Viewport offset used when position is auto or fixed.                                       |
 
 ## Breadcrumb
 
@@ -180,6 +180,16 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 
 Events/callback props: `onOpenChange?`.
 
+## FullscreenButton
+
+`packages/core/src/types/fullscreen.ts` · `FullscreenButtonProps / VueFullscreenButtonProps` · 3/4 props
+
+| Prop      | Type                                                      | Default | Notes |
+| --------- | --------------------------------------------------------- | ------- | ----- |
+| `locale?` | `Partial<TigerLocale>`                                    | `-`     | -     |
+| `target?` | `Element \| (() => Element \| null \| undefined) \| null` | `-`     | -     |
+| `labels?` | `Partial<TigerLocaleFullscreen>`                          | `-`     | -     |
+
 ## Menu
 
 `packages/core/src/types/menu.ts` · `MenuProps` · 4/19 props
@@ -302,12 +312,12 @@ Events/callback props: `onOpenChange?`.
 
 `packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 4/13 props
 
-| Prop            | Type                 | Default | Notes                                                                                    |
-| --------------- | -------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `items?`        | `ScrollSpyItem[]`    | `-`     | Nav tree. Required for a useful TOC.                                                     |
-| `getContainer?` | `ScrollRootInput`    | `-`     | Scroll root: selector, element, window, or getter. Invalid values fall back to `window`. |
-| `direction?`    | `ScrollSpyDirection` | `-`     | -                                                                                        |
-| `activeKey?`    | `ScrollSpyKey`       | `-`     | -                                                                                        |
+| Prop            | Type                 | Default | Notes                                                                                      |
+| --------------- | -------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`        | `ScrollSpyItem[]`    | `-`     | Nav tree. Required for a useful TOC.                                                       |
+| `getContainer?` | `ScrollRootInput`    | `-`     | Scroll root: selector, element, window, or getter. When omitted, the nearest overflow a... |
+| `direction?`    | `ScrollSpyDirection` | `-`     | -                                                                                          |
+| `activeKey?`    | `ScrollSpyKey`       | `-`     | -                                                                                          |
 
 ## Spotlight
 

@@ -115,10 +115,10 @@ export const ScrollSpy = defineComponent({
       currentActiveKey.value === undefined ? '' : getScrollSpyKeyString(currentActiveKey.value)
     )
     const flatItems = computed(() => flattenScrollSpyItems(props.items))
+    const hostRef = ref<HTMLElement | null>(null)
     let stopObserver: (() => void) | null = null
-    const scrollLock = createProgrammaticScrollLock(() =>
-      resolveScrollSpyContainer(props.getContainer)
-    )
+    const resolveContainer = () => resolveScrollSpyContainer(props.getContainer, hostRef.value)
+    const scrollLock = createProgrammaticScrollLock(() => resolveContainer())
 
     const emitActive = (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {
       const nextKeyString = getScrollSpyKeyString(item.key)
@@ -134,6 +134,7 @@ export const ScrollSpy = defineComponent({
       stopObserver?.()
       stopObserver = createScrollSpyObserver(props.items, {
         container: props.getContainer,
+        from: hostRef.value,
         offsetTop: offset.value,
         bounds: props.bounds,
         onChange: (item) => {
@@ -154,7 +155,7 @@ export const ScrollSpy = defineComponent({
       emit('click', item, event)
       emitActive(item, 'click')
       scrollLock.lock()
-      activateScrollSpyClick(item, resolveScrollSpyContainer(props.getContainer), offset.value)
+      activateScrollSpyClick(item, resolveContainer(), offset.value)
     }
 
     onMounted(() => {
@@ -167,7 +168,7 @@ export const ScrollSpy = defineComponent({
         offset,
         () => props.bounds,
         () => {
-          const container = resolveScrollSpyContainer(props.getContainer)
+          const container = resolveContainer()
           return container === window ? 'window' : container
         }
       ],
@@ -232,6 +233,7 @@ export const ScrollSpy = defineComponent({
         'nav',
         {
           ...attrs,
+          ref: hostRef,
           class: classNames(
             getScrollSpyRootClasses(props.sticky, props.className),
             coerceClassValue(attrsRecord.class)

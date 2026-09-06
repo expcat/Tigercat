@@ -1,3 +1,4 @@
+import type { CodeHighlighter } from './code-editor'
 import type { TigerLocale, TigerLocaleCode } from './locale'
 
 export interface CodeProps {
@@ -6,6 +7,17 @@ export interface CodeProps {
    * @default true
    */
   copyable?: boolean
+  /**
+   * Language hint passed to {@link highlighter}. Ignored when no highlighter
+   * is provided — the default remains plain text so highlight engines stay
+   * out of the main bundle.
+   */
+  language?: string
+  /**
+   * Optional pluggable highlighter. Output is TRUSTED HTML injected as-is.
+   * Omit to keep a plain-text `<code>` block.
+   */
+  highlighter?: CodeHighlighter
   copyLabel?: string
   copiedLabel?: string
   copyFailedLabel?: string

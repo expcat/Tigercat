@@ -11,6 +11,8 @@ import {
   TEXT_TAGS,
   type TextAlign,
   type TextColor,
+  type TextCopyable,
+  type TextCopyableOptions,
   type TextProps,
   type TextSize,
   type TextTag,
@@ -78,9 +80,34 @@ export function getTextClasses(props: TextProps): string {
     textWeightClasses[weight],
     align && textAlignClasses[align],
     textColorClasses[color],
-    props.truncate && textDecorationClasses.truncate,
+    props.truncate && !isTextCopyable(props.copyable) && textDecorationClasses.truncate,
     props.italic && textDecorationClasses.italic,
     props.underline && textDecorationClasses.underline,
     props.lineThrough && textDecorationClasses.lineThrough
   )
 }
+
+export function isTextCopyable(copyable?: TextCopyable): boolean {
+  if (copyable === true) return true
+  return Boolean(copyable) && typeof copyable === 'object'
+}
+
+export function resolveTextCopyableOptions(copyable?: TextCopyable): TextCopyableOptions | null {
+  if (copyable === true) return {}
+  if (copyable && typeof copyable === 'object') return copyable
+  return null
+}
+
+export function resolveTextCopyContent(
+  options: TextCopyableOptions | null,
+  fallback: string
+): string {
+  if (options && typeof options.text === 'string') return options.text
+  return fallback
+}
+
+export const textCopyableRootClasses = 'inline-flex max-w-full items-center gap-1'
+export const textCopyableBodyClasses = 'min-w-0'
+export const textCopyableButtonClasses =
+  'inline-flex shrink-0 items-center justify-center min-h-6 min-w-6 rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)] hover:text-[var(--tiger-text,#111827)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+export const textCopyableLiveClasses = 'sr-only'

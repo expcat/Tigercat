@@ -39,8 +39,8 @@ export interface ScrollSpyProps {
   className?: string
   style?: Record<string, string | number>
   /**
-   * Scroll root: selector, element, window, or getter. Invalid values fall
-   * back to `window`.
+   * Scroll root: selector, element, window, or getter. When omitted, the
+   * nearest overflow ancestor is used, then `window`.
    */
   getContainer?: ScrollRootInput
 }

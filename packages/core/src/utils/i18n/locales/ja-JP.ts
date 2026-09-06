@@ -184,7 +184,12 @@ export const jaJP: TigerLocale = {
     previousMonth: '前月',
     nextMonth: '翌月',
     previousYear: '前年',
-    nextYear: '翌年'
+    nextYear: '翌年',
+    eventCountText: '{n} 件の予定'
+  },
+  fullscreen: {
+    enterAriaLabel: '全画面表示',
+    exitAriaLabel: '全画面表示を終了'
   },
   fileManager: {
     rootText: 'ルート',

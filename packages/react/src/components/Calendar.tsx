@@ -2,6 +2,10 @@ import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useS
 import { classNames } from '@expcat/tigercat-core'
 import type { CalendarMode, CalendarProps as CoreCalendarProps } from '@expcat/tigercat-core'
 import {
+  appendCalendarEventCountLabel,
+  buildCalendarDateCellExtra,
+  calendarDateCellDotClasses,
+  calendarDateCellExtraClasses,
   calendarGridClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
@@ -12,6 +16,7 @@ import {
   followCalendarValue,
   formatCalendarDayLabel,
   formatCalendarDayNumber,
+  getCalendarEventDotStyle,
   formatMonthYear,
   getCalendarContainerClasses,
   getCalendarDayClasses,
@@ -61,6 +66,8 @@ function splitCalendarDomProps(props: CalendarProps) {
     now: _now,
     rangeValue: _rangeValue,
     locale: _locale,
+    events: _events,
+    dateCellRender: _dateCellRender,
     onChange: _onChange,
     onPanelChange: _onPanelChange,
     className: _className,
@@ -81,6 +88,8 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
     now: nowProp,
     rangeValue,
     locale,
+    events,
+    dateCellRender,
     onChange,
     onPanelChange,
     className
@@ -380,13 +389,27 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                 )
                 const isTodayDate = today ? isSameDay(date, today) : false
                 const isDisabled = isCalendarDateDisabled(date, disabledDate)
+                const extra = buildCalendarDateCellExtra({
+                  date,
+                  events,
+                  inCurrentMonth: isCurrentMonth,
+                  today: isTodayDate,
+                  selected: isSelected,
+                  disabled: isDisabled
+                })
+                const customCell = dateCellRender?.(date, extra)
+                const hasExtra = Boolean(customCell) || extra.events.length > 0
                 return (
                   <button
                     key={iso}
                     type="button"
                     role="gridcell"
                     data-date={iso}
-                    aria-label={formatCalendarDayLabel(date, localeCode)}
+                    aria-label={appendCalendarEventCountLabel(
+                      formatCalendarDayLabel(date, localeCode),
+                      extra.events.length,
+                      labels.eventCountText
+                    )}
                     aria-selected={isSelected || isRangeStart || isRangeEnd}
                     aria-current={isTodayDate ? 'date' : undefined}
                     disabled={isDisabled}
@@ -399,11 +422,24 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                       isActive: activeIso === iso,
                       isInRange,
                       isRangeStart,
-                      isRangeEnd
+                      isRangeEnd,
+                      hasExtra
                     })}
                     onClick={() => selectDay(date)}
                     onFocus={() => setActiveIso(iso)}>
                     {formatCalendarDayNumber(date, localeCode)}
+                    {(customCell as React.ReactNode) ??
+                      (extra.events.length > 0 ? (
+                        <span className={calendarDateCellExtraClasses} aria-hidden="true">
+                          {extra.events.map((event, index) => (
+                            <span
+                              key={event.key ?? `${extra.iso}-${index}`}
+                              className={calendarDateCellDotClasses}
+                              style={getCalendarEventDotStyle(event.color)}
+                            />
+                          ))}
+                        </span>
+                      ) : null)}
                   </button>
                 )
               })}

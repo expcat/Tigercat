@@ -114,6 +114,8 @@ export * from './config-provider'
 export * from './carousel'
 export * from './back-top'
 export * from './anchor'
+export * from './fullscreen'
+export * from './use-fullscreen'
 
 // Phase 1B/1C components (v0.6.0+)
 export * from './rate'

@@ -24,7 +24,8 @@ export interface AffixProps {
 
   /**
    * The scrollable container. Selector, Element, Window, or getter.
-   * Defaults to `window`. Invalid selectors fall back to window.
+   * When omitted, the nearest overflow ancestor is used, then `window`.
+   * Invalid selectors fall back to window.
    */
   target?: ScrollRootInput
 

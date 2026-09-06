@@ -23,7 +23,12 @@ export default function App() {
       <Button size="sm" onClick={() => setCollapsed((value) => !value)}>
         {collapsed ? '展开菜单' : '收起菜单'}
       </Button>
-      <Menu items={items} searchable collapsed={collapsed} defaultSelectedKeys={['dashboard']} />
+      <Menu
+        items={items}
+        searchable="auto"
+        collapsed={collapsed}
+        defaultSelectedKeys={['dashboard']}
+      />
     </div>
   )
 }

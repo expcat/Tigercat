@@ -1,0 +1,8 @@
+{
+  "id": "icon-03",
+  "title": "具名与注册",
+  "description": "fullscreen / ticket / bolt / chart-bar / database 已进官方 name。应用级名称用 registerIcon，从 icons/registry 子路径引入以保持 tree-shake。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 720 }
+}

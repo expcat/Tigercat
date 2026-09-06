@@ -11,12 +11,17 @@ import {
 } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type {
+  CalendarEvent,
   CalendarMode,
   WeekStartsOn,
   TigerLocale,
   CalendarProps as CoreCalendarProps
 } from '@expcat/tigercat-core'
 import {
+  appendCalendarEventCountLabel,
+  buildCalendarDateCellExtra,
+  calendarDateCellDotClasses,
+  calendarDateCellExtraClasses,
   calendarGridClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
@@ -27,6 +32,7 @@ import {
   followCalendarValue,
   formatCalendarDayLabel,
   formatCalendarDayNumber,
+  getCalendarEventDotStyle,
   formatMonthYear,
   getCalendarContainerClasses,
   getCalendarDayClasses,
@@ -61,7 +67,7 @@ import { useTigerConfig } from './ConfigProvider'
 
 export interface VueCalendarProps extends Omit<
   CoreCalendarProps,
-  'value' | 'onChange' | 'onPanelChange'
+  'value' | 'onChange' | 'onPanelChange' | 'dateCellRender'
 > {
   modelValue?: Date | string | null
 }
@@ -91,10 +97,11 @@ export const Calendar = defineComponent({
       default: undefined
     },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
-    className: { type: String, default: undefined }
+    className: { type: String, default: undefined },
+    events: { type: Array as PropType<CalendarEvent[]>, default: undefined }
   },
   emits: ['update:modelValue', 'update:mode', 'change', 'panel-change'],
-  setup(props, { emit, attrs, expose }) {
+  setup(props, { emit, attrs, expose, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const localeCode = computed(() => mergedLocale.value?.locale)
@@ -406,6 +413,30 @@ export const Calendar = defineComponent({
               )
               const isTodayDate = today.value ? isSameDay(date, today.value) : false
               const isDisabled = isCalendarDateDisabled(date, props.disabledDate)
+              const extra = buildCalendarDateCellExtra({
+                date,
+                events: props.events,
+                inCurrentMonth: isCurrentMonth,
+                today: isTodayDate,
+                selected: isSelected,
+                disabled: isDisabled
+              })
+              const customCell = slots.dateCell?.({ date, events: extra.events, extra })
+              const hasExtra = Boolean(customCell) || extra.events.length > 0
+              const defaultDots =
+                !customCell && extra.events.length > 0
+                  ? h(
+                      'span',
+                      { class: calendarDateCellExtraClasses, 'aria-hidden': 'true' },
+                      extra.events.map((event, index) =>
+                        h('span', {
+                          key: event.key ?? `${extra.iso}-${index}`,
+                          class: calendarDateCellDotClasses,
+                          style: getCalendarEventDotStyle(event.color)
+                        })
+                      )
+                    )
+                  : null
               return h(
                 'button',
                 {
@@ -413,7 +444,11 @@ export const Calendar = defineComponent({
                   type: 'button',
                   role: 'gridcell',
                   'data-date': iso,
-                  'aria-label': formatCalendarDayLabel(date, localeCode.value),
+                  'aria-label': appendCalendarEventCountLabel(
+                    formatCalendarDayLabel(date, localeCode.value),
+                    extra.events.length,
+                    labels.value.eventCountText
+                  ),
                   'aria-selected': isSelected || isRangeStart || isRangeEnd,
                   'aria-current': isTodayDate ? 'date' : undefined,
                   disabled: isDisabled,
@@ -426,12 +461,13 @@ export const Calendar = defineComponent({
                     isActive: activeIso.value === iso,
                     isInRange,
                     isRangeStart,
-                    isRangeEnd
+                    isRangeEnd,
+                    hasExtra
                   }),
                   onClick: () => selectDay(date),
                   onFocus: () => (activeIso.value = iso)
                 },
-                formatCalendarDayNumber(date, localeCode.value)
+                [formatCalendarDayNumber(date, localeCode.value), customCell ?? defaultDots]
               )
             })
           )

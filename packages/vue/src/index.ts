@@ -413,6 +413,12 @@ export { useResponsiveChartSize } from './composables/useResponsiveChartSize'
 export type { ResponsiveChartLayout } from './composables/useResponsiveChartSize'
 export { useDrag } from './composables/useDrag'
 export type { UseDragOptions, UseDragReturn } from './composables/useDrag'
+export { useFullscreen } from './composables/useFullscreen'
+export type { UseFullscreenOptions, UseFullscreenReturn } from './composables/useFullscreen'
+export { FullscreenButton, FullscreenButton as Fullscreen } from './components/FullscreenButton'
+export type { VueFullscreenButtonProps, FullscreenButtonProps } from './components/FullscreenButton'
+export { Drag } from './components/Drag'
+export type { VueDragProps, DragProps } from './components/Drag'
 
 // Splitter (v0.8.0+)
 export { Splitter } from './components/Splitter'
@@ -493,4 +499,4 @@ export type { VueImageViewerProps } from './components/ImageViewer'
 export { AspectRatio } from './components/AspectRatio'
 export type { VueAspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.1.4'
+export const version = '2.2.0'

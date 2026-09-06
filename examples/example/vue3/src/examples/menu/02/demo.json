@@ -1,7 +1,7 @@
 {
   "id": "menu-02",
   "title": "搜索与折叠",
-  "description": "内置搜索会展开匹配子孙的祖先。collapsed 初值展开；收起后 inline/vertical 走 popup。placeholder 走 locale。",
+  "description": "searchable 在展开时显示搜索；collapsed 时自动隐藏，不必 searchable={!collapsed}。placeholder 走 locale。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

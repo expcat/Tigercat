@@ -202,6 +202,9 @@ export const LAYOUT_GRID_CSS = `
   border-top: 1px solid var(--tiger-border, #e5e7eb);
   padding: 1rem;
 }
+.tiger-footer-compact {
+  padding-block: 0.5rem;
+}
 
 .tiger-container {
   width: 100%;

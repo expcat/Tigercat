@@ -9,12 +9,32 @@ export type CalendarMode = 'month' | 'year'
 /** First column of the week. 0 = Sunday … 6 = Saturday. */
 export type WeekStartsOn = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
+/** A date-cell event marker. `date` is a Date or ISO `yyyy-MM-dd` string. */
+export interface CalendarEvent {
+  key?: string | number
+  title?: string
+  date: Date | string
+  color?: string
+}
+
+/** Extra payload passed to `dateCellRender` / the Vue `#dateCell` slot. */
+export interface CalendarDateCellExtra {
+  iso: string
+  events: CalendarEvent[]
+  inCurrentMonth: boolean
+  today: boolean
+  selected: boolean
+  disabled: boolean
+}
+
 /**
  * Shared Calendar props (framework-agnostic single source of truth).
  *
  * React extends this directly (`value` + `onChange`/`onPanelChange` callbacks);
  * Vue binds the selected date with `v-model` (`modelValue`) and the same events
  * as emits, so it reuses everything here except `value`/callbacks.
+ *
+ * Vue uses the `#dateCell` slot instead of `dateCellRender`.
  */
 export interface CalendarProps {
   /** Locale override merged on top of ConfigProvider locale */
@@ -52,6 +72,18 @@ export interface CalendarProps {
    * Range highlight used by DatePicker. Calendar still emits one clicked date.
    */
   rangeValue?: [Date | null, Date | null]
+  /**
+   * Events shown in month-view date cells. Matched by local calendar day
+   * (`yyyy-MM-dd`). Without `dateCellRender` / `#dateCell`, matching days
+   * render colored dots.
+   */
+  events?: CalendarEvent[]
+  /**
+   * Custom month-view date cell content (React). Receives the cell date and
+   * {@link CalendarDateCellExtra}. Vue uses the `#dateCell` slot with the
+   * same payload (`{ date, events, extra }`).
+   */
+  dateCellRender?: (date: Date, extra: CalendarDateCellExtra) => unknown
   /** Called when a date is selected */
   onChange?: (date: Date) => void
   /**

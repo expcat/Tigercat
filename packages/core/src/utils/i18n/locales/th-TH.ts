@@ -184,7 +184,12 @@ export const thTH: TigerLocale = {
     previousMonth: 'เดือนก่อนหน้า',
     nextMonth: 'เดือนถัดไป',
     previousYear: 'ปีก่อนหน้า',
-    nextYear: 'ปีถัดไป'
+    nextYear: 'ปีถัดไป',
+    eventCountText: '{n} รายการ'
+  },
+  fullscreen: {
+    enterAriaLabel: 'เข้าสู่เต็มหน้าจอ',
+    exitAriaLabel: 'ออกจากเต็มหน้าจอ'
   },
   fileManager: {
     rootText: 'ราก',

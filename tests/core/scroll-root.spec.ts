@@ -4,6 +4,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  findNearestOverflowAncestor,
   querySelectorAllSafe,
   querySelectorSafe,
   resolveScrollRoot,
@@ -103,5 +104,33 @@ describe('resolveScrollRoot', () => {
     expect(querySelectorSafe('[')).toBeNull()
     expect(querySelectorAllSafe('##')).toEqual([])
     expect(querySelectorSafe('#missing')).toBeNull()
+  })
+
+  it('walks to the nearest overflow ancestor when input is omitted', () => {
+    const scroller = document.createElement('div')
+    scroller.style.overflowY = 'auto'
+    scroller.style.overflowX = 'hidden'
+    const child = document.createElement('span')
+    scroller.appendChild(child)
+    document.body.appendChild(scroller)
+
+    expect(findNearestOverflowAncestor(child)).toBe(scroller)
+    const resolved = resolveScrollRoot(undefined, { from: child })
+    expect(resolved.isWindow).toBe(false)
+    expect(resolved.target).toBe(scroller)
+
+    scroller.remove()
+  })
+
+  it('keeps an explicit null target on window even when from is set', () => {
+    const scroller = document.createElement('div')
+    scroller.style.overflow = 'scroll'
+    const child = document.createElement('span')
+    scroller.appendChild(child)
+    document.body.appendChild(scroller)
+
+    expect(resolveScrollRoot(null, { from: child }).isWindow).toBe(true)
+
+    scroller.remove()
   })
 })

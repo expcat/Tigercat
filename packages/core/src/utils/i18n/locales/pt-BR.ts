@@ -184,7 +184,12 @@ export const ptBR: TigerLocale = {
     previousMonth: 'Mês anterior',
     nextMonth: 'Próximo mês',
     previousYear: 'Ano anterior',
-    nextYear: 'Próximo ano'
+    nextYear: 'Próximo ano',
+    eventCountText: '{n} eventos'
+  },
+  fullscreen: {
+    enterAriaLabel: 'Tela cheia',
+    exitAriaLabel: 'Sair da tela cheia'
   },
   fileManager: {
     rootText: 'Raiz',

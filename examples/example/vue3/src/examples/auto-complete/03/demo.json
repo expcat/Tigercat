@@ -1,0 +1,8 @@
+{
+  "id": "auto-complete-03",
+  "title": "受控 query 与提交值",
+  "description": "value 只表示已提交值；输入框走 searchValue。打字不改 value，提交才改。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

@@ -11,6 +11,7 @@ const composableEntries = [
   'src/composables/useChartInteraction.ts',
   'src/composables/useResponsiveChartSize.ts',
   'src/composables/useDrag.ts',
+  'src/composables/useFullscreen.ts',
   'src/composables/useFormController.ts'
 ]
 

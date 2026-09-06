@@ -8,6 +8,7 @@ import {
   getCodeBlockCopyButtonClasses,
   getCodeLabels,
   mergeTigerLocale,
+  renderCodeHighlightHtml,
   resolveLocaleText,
   type CodeCopyButtonStatus,
   type CodeProps as CoreCodeProps
@@ -23,6 +24,8 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
   {
     code,
     copyable = true,
+    language,
+    highlighter,
     copyLabel,
     copiedLabel,
     copyFailedLabel,
@@ -82,7 +85,14 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
   return (
     <div ref={ref} className={containerClasses} {...props}>
       <pre className={codeBlockPreClasses}>
-        <code className="block">{code}</code>
+        {(() => {
+          const highlighted = renderCodeHighlightHtml(code, language, highlighter)
+          return highlighted == null ? (
+            <code className="block">{code}</code>
+          ) : (
+            <code className="block" dangerouslySetInnerHTML={{ __html: highlighted }} />
+          )
+        })()}
       </pre>
       {copyable && (
         <>

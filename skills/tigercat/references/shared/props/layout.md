@@ -98,7 +98,7 @@ Note: 默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作�
 
 ## Footer
 
-`packages/core/src/types/layout.ts` · `FooterProps` · 3/4 props
+`packages/core/src/types/layout.ts` · `FooterProps` · 3/5 props
 
 Note: 未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避免多个 `contentinfo`。
 

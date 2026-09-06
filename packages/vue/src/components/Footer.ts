@@ -2,8 +2,8 @@ import { defineComponent, h, PropType, computed } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  getLayoutFooterClasses,
   injectLayoutGridStyles,
-  layoutFooterClasses,
   mergeStyleValues
 } from '@expcat/tigercat-core'
 
@@ -11,6 +11,7 @@ export interface VueFooterProps {
   className?: string
   as?: string
   height?: string
+  size?: 'default' | 'compact'
   style?: Record<string, string | number>
 }
 
@@ -30,6 +31,10 @@ export const Footer = defineComponent({
       type: String as PropType<string>,
       default: undefined
     },
+    size: {
+      type: String as PropType<'default' | 'compact'>,
+      default: 'default'
+    },
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
@@ -39,7 +44,7 @@ export const Footer = defineComponent({
     injectLayoutGridStyles()
     const footerClasses = computed(() =>
       classNames(
-        layoutFooterClasses,
+        getLayoutFooterClasses(props.size),
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )

@@ -184,7 +184,12 @@ export const koKR: TigerLocale = {
     previousMonth: '이전 달',
     nextMonth: '다음 달',
     previousYear: '이전 해',
-    nextYear: '다음 해'
+    nextYear: '다음 해',
+    eventCountText: '{n}개 일정'
+  },
+  fullscreen: {
+    enterAriaLabel: '전체 화면',
+    exitAriaLabel: '전체 화면 종료'
   },
   fileManager: {
     rootText: '루트',

@@ -21,6 +21,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Component             | Category   | Test Group   | Type                                                | Package Subpath         |
 | --------------------- | ---------- | ------------ | --------------------------------------------------- | ----------------------- |
 | CodeEditor            | Advanced   | `advanced`   | code-editor.ts                                      | ./CodeEditor            |
+| Drag                  | Advanced   | `advanced`   | drag.ts                                             | ./Drag                  |
 | FileManager           | Advanced   | `advanced`   | file-manager.ts                                     | ./FileManager           |
 | ImageAnnotation       | Advanced   | `advanced`   | image-annotation.ts                                 | ./ImageAnnotation       |
 | ImageViewer           | Advanced   | `advanced`   | image-viewer.ts                                     | ./ImageViewer           |
@@ -174,6 +175,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | DropdownMenu          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownMenu          |
 | FloatButton           | Navigation | `navigation` | float-button.ts                                     | ./FloatButton           |
 | FloatButtonGroup      | Navigation | `navigation` | float-button.ts                                     | ./FloatButtonGroup      |
+| FullscreenButton      | Navigation | `navigation` | fullscreen.ts                                       | ./FullscreenButton      |
 | Menu                  | Navigation | `navigation` | menu.ts                                             | ./Menu                  |
 | MenuItem              | Navigation | `navigation` | menu.ts                                             | ./MenuItem              |
 | MenuItemGroup         | Navigation | `navigation` | menu.ts                                             | ./MenuItemGroup         |

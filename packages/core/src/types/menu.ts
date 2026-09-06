@@ -134,9 +134,11 @@ export interface MenuProps {
 
   /**
    * Whether to render a built-in search field for filtering data-driven `items`.
+   * `'auto'` shows the field only while the menu is expanded. Collapsed menus
+   * always hide the field so a 64px sider is not squeezed.
    * @default false
    */
-  searchable?: boolean
+  searchable?: boolean | 'auto'
 
   /**
    * Controlled search value used to filter data-driven `items`.

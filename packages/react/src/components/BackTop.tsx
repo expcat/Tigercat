@@ -65,7 +65,13 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
   )
   const labelSet = getBackTopLabels(mergedLocale, labels)
 
-  const resolved = resolveScrollRoot(target)
+  const hostRef = useRef<HTMLButtonElement | null>(null)
+  const setHostRef = (node: HTMLButtonElement | null) => {
+    hostRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }
+  const resolved = resolveScrollRoot(target, { from: hostRef.current })
   const resolvedKey = resolved.isWindow ? 'window' : resolved.target
   const visibilityHeightRef = useRef(visibilityHeight)
   visibilityHeightRef.current = visibilityHeight
@@ -74,7 +80,7 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
   )
 
   useEffect(() => {
-    const root = resolveScrollRoot(target)
+    const root = resolveScrollRoot(target, { from: hostRef.current })
     const eventTarget = getScrollRootEventTarget(root)
     const scrollNode = root.target
     if (!eventTarget || !scrollNode) return undefined
@@ -101,7 +107,7 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
-      const root = resolveScrollRoot(target)
+      const root = resolveScrollRoot(target, { from: hostRef.current })
       if (root.target) scrollToTop(root.target as HTMLElement | Window, duration)
       onClick?.(event)
     },
@@ -133,7 +139,7 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
   return (
     <button
       {...props}
-      ref={ref}
+      ref={setHostRef}
       type="button"
       className={buttonClasses}
       style={buttonStyle}

@@ -23,7 +23,7 @@ export interface BackTopProps {
 
   /**
    * Scroll container. Selector, Element, Window, or getter.
-   * Defaults to `window`.
+   * When omitted, the nearest overflow ancestor is used, then `window`.
    */
   target?: ScrollRootInput
 
