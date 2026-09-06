@@ -159,6 +159,8 @@ export type { DescriptionsProps } from './components/Descriptions'
 
 export { Timeline } from './components/Timeline'
 export type { TimelineProps } from './components/Timeline'
+export { WorkflowTimeline, WorkflowActionBar } from './components/WorkflowTimeline'
+export type { WorkflowTimelineProps, WorkflowActionBarProps } from './components/WorkflowTimeline'
 export { Countdown } from './components/Countdown'
 export type { CountdownProps } from './components/Countdown'
 

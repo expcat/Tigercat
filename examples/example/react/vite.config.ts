@@ -106,6 +106,10 @@ export default defineConfig(({ command }) => ({
         replacement: reactComponentAlias('Tabs')
       },
       {
+        find: '@expcat/tigercat-react/WorkflowActionBar',
+        replacement: reactComponentAlias('WorkflowTimeline')
+      },
+      {
         find: /^@expcat\/tigercat-react\/(.+)$/,
         replacement: `${reactComponentsDir}/$1`
       },

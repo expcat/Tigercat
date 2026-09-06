@@ -1,7 +1,6 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+import { useState } from 'react'
 import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
-import { WorkflowTimeline } from '@expcat/tigercat-vue/WorkflowTimeline'
+import { WorkflowTimeline } from '@expcat/tigercat-react/WorkflowTimeline'
 
 const steps: WorkflowTimelineStep[] = [
   {
@@ -58,18 +57,19 @@ const actions: WorkflowActionBarItem[] = [
   { key: 'cancel', label: '撤销', action: 'cancel', variant: 'danger', disabled: true }
 ]
 
-const lastAction = ref('')
+export default function App() {
+  const [lastAction, setLastAction] = useState('')
 
-function onAction(item: WorkflowActionBarItem) {
-  lastAction.value = item.label
+  function onAction(item: WorkflowActionBarItem) {
+    setLastAction(item.label)
+  }
+
+  return (
+    <div className="space-y-3">
+      <WorkflowTimeline steps={steps} actions={actions} onAction={onAction} />
+      {lastAction ? (
+        <p className="text-sm text-[var(--tiger-text-muted)]">最近操作：{lastAction}</p>
+      ) : null}
+    </div>
+  )
 }
-</script>
-
-<template>
-  <div class="space-y-3">
-    <WorkflowTimeline :steps="steps" :actions="actions" @action="onAction" />
-    <p v-if="lastAction" class="text-sm text-[var(--tiger-text-muted)]">
-      最近操作：{{ lastAction }}
-    </p>
-  </div>
-</template>

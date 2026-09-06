@@ -50,6 +50,9 @@
       "@expcat/tigercat-react/StepsItem": ["../../../packages/react/src/components/Steps"],
       "@expcat/tigercat-react/SubMenu": ["../../../packages/react/src/components/Menu"],
       "@expcat/tigercat-react/TabPane": ["../../../packages/react/src/components/Tabs"],
+      "@expcat/tigercat-react/WorkflowActionBar": [
+        "../../../packages/react/src/components/WorkflowTimeline"
+      ],
       "@expcat/tigercat-react/*": ["../../../packages/react/src/components/*"]
     }
   },

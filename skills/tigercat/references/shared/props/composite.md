@@ -146,7 +146,7 @@ Note: 展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点
 
 ## WorkflowTimeline
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/9 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/13 props
 
 Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
 

@@ -7994,7 +7994,9 @@
       "Upload",
       "VirtualList",
       "VirtualTable",
-      "Watermark"
+      "Watermark",
+      "WorkflowActionBar",
+      "WorkflowTimeline"
     ],
     "componentSubpaths": [
       {
@@ -8871,6 +8873,16 @@
         "component": "Watermark",
         "subpath": "./Watermark",
         "target": "Watermark"
+      },
+      {
+        "component": "WorkflowActionBar",
+        "subpath": "./WorkflowActionBar",
+        "target": "WorkflowTimeline"
+      },
+      {
+        "component": "WorkflowTimeline",
+        "subpath": "./WorkflowTimeline",
+        "target": "WorkflowTimeline"
       }
     ],
     "exports": [
@@ -9304,7 +9316,11 @@
       "VirtualTableProps",
       "Watermark",
       "WatermarkProps",
-      "WizardStep"
+      "WizardStep",
+      "WorkflowActionBar",
+      "WorkflowActionBarProps",
+      "WorkflowTimeline",
+      "WorkflowTimelineProps"
     ]
   },
   "vue": {
