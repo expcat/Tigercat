@@ -506,4 +506,4 @@ export type { VueImageViewerProps } from './components/ImageViewer'
 export { AspectRatio } from './components/AspectRatio'
 export type { VueAspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.2.0'
+export const version = '2.3.0'

@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.3.0
+
+v2.3.0 无 breaking change，无新必填 prop。MenuSchema 与 WorkflowTimeline 是新增 helpers / 组件，现有 Menu / Timeline API 不变。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v230)。
+
 ## v2.2.0
 
 v2.2.0 无新必填 prop。滚动根默认值有行为变化：Affix / Anchor / BackTop / ScrollSpy 省略 `target` / `getContainer` 时改为最近 overflow 祖先，再回落 `window`。若必须钉视口滚动，显式传 `window`。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v220)。

@@ -2,6 +2,13 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.3.0
+
+v2.3.0：中台动态菜单 schema 与审批时间线。MenuSchema 过滤后映射到现有 Menu；WorkflowTimeline / WorkflowActionBar 是展示层，不接 BPM 引擎。Vue/React 对称。
+
+- **MenuSchema helpers**：`MenuSchemaNode` + `filterMenuByPermission` / `menuSchemaToMenuItems`。按权限码过滤、`hideInMenu` 提升子节点、空组修剪；`path` / `permission` 留在 schema，不写进 `MenuItem`。Vue/React 示例 `menu/04` 用 mock 后端 JSON 喂 sidebar Menu。公开 API 增补，无新必填 prop。
+- **WorkflowTimeline / WorkflowActionBar**：core 审批步模型（normalize/sort、status、`workflowStepsToTimelineItems`），映射到现有 Timeline，不 fork `TimelineItem`。Vue/React 组件画步骤时间线 + approve/reject/transfer/cancel/comment 动作条。示例 `timeline/04`。公开 API 增补，无新必填 prop。本版不做 Flowable/Camunda 引擎或流程设计器。
+
 ## v2.2.0
 
 v2.2.0：收下 Tigercat_Admin 上游开放项。P1 全部落地；列出的 P2 按建议 API 一次做完，去掉双轨 workaround。Schema 表单、人机验证码、图表基元精细联动本版不做，理由见下。
