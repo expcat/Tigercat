@@ -2,7 +2,7 @@
 import DemoPage from '../components/DemoPage.vue'
 import { getDemoModules } from '../playground/registry'
 
-// MenuDemo
+// MenuDemo — menu/04 is Vue-only; React parity is slice 3
 const modules = getDemoModules('menu')
 </script>
 
