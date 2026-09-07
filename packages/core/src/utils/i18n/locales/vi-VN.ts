@@ -76,6 +76,15 @@ export const viVN: TigerLocale = {
   timeline: {
     pendingText: 'Đang tải...'
   },
+  workflowTimeline: {
+    pending: 'Đang chờ',
+    active: 'Đang xử lý',
+    approved: 'Đã duyệt',
+    rejected: 'Đã từ chối',
+    canceled: 'Đã hủy',
+    ariaLabel: 'Tiến trình phê duyệt',
+    actionsAriaLabel: 'Thao tác phê duyệt'
+  },
   progress: {
     ariaLabel: 'Tiến độ'
   },

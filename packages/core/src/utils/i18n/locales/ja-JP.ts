@@ -76,6 +76,15 @@ export const jaJP: TigerLocale = {
   timeline: {
     pendingText: '読み込み中...'
   },
+  workflowTimeline: {
+    pending: '保留中',
+    active: '進行中',
+    approved: '承認済み',
+    rejected: '却下',
+    canceled: '取消済み',
+    ariaLabel: 'ワークフロー',
+    actionsAriaLabel: 'ワークフロー操作'
+  },
   progress: {
     ariaLabel: '進捗'
   },

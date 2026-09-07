@@ -3,8 +3,11 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import { h } from 'vue'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { WorkflowActionBar, WorkflowTimeline } from '@expcat/tigercat-vue/WorkflowTimeline'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
 import { expectNoA11yViolations } from '../utils'
 
@@ -62,6 +65,32 @@ describe('WorkflowTimeline (Vue)', () => {
     expect(screen.getByText('Rejected')).toBeInTheDocument()
     expect(screen.getByText('Canceled')).toBeInTheDocument()
     expect(screen.getByLabelText('Workflow timeline')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider locale for status tags', () => {
+    render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () => h(WorkflowTimeline, { steps: mixedSteps }))
+    })
+
+    expect(screen.getByText('已通过')).toBeInTheDocument()
+    expect(screen.getByText('进行中')).toBeInTheDocument()
+    expect(screen.getByText('待处理')).toBeInTheDocument()
+    expect(screen.getByText('已驳回')).toBeInTheDocument()
+    expect(screen.getByText('已撤销')).toBeInTheDocument()
+    expect(screen.getByLabelText('审批进度')).toBeInTheDocument()
+  })
+
+  it('lets labels override locale status tags', () => {
+    render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () =>
+          h(WorkflowTimeline, { steps: mixedSteps, labels: { approved: '通过了' } })
+        )
+    })
+
+    expect(screen.getByText('通过了')).toBeInTheDocument()
+    expect(screen.getByText('进行中')).toBeInTheDocument()
   })
 
   it('shows the action bar when the current step is active', () => {

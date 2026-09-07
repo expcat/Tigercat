@@ -31,6 +31,7 @@ export const TIGER_LOCALE_KEY_SET = {
   scrollArea: true,
   printLayout: true,
   timeline: true,
+  workflowTimeline: true,
   progress: true,
   splitter: true,
   resizable: true,

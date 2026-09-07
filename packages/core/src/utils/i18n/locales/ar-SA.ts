@@ -76,6 +76,15 @@ export const arSA: TigerLocale = {
   timeline: {
     pendingText: 'جار التحميل...'
   },
+  workflowTimeline: {
+    pending: 'قيد الانتظار',
+    active: 'نشط',
+    approved: 'تمت الموافقة',
+    rejected: 'مرفوض',
+    canceled: 'ملغى',
+    ariaLabel: 'الجدول الزمني لسير العمل',
+    actionsAriaLabel: 'إجراءات سير العمل'
+  },
   progress: {
     ariaLabel: 'التقدم'
   },

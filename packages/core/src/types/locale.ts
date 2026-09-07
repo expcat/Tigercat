@@ -105,6 +105,23 @@ export interface TigerLocaleTimeline {
   pendingText?: string
 }
 
+export interface TigerLocaleWorkflowTimeline {
+  /** Status tag: waiting / not started */
+  pending?: string
+  /** Status tag: current step */
+  active?: string
+  /** Status tag: approved */
+  approved?: string
+  /** Status tag: rejected */
+  rejected?: string
+  /** Status tag: canceled / withdrawn */
+  canceled?: string
+  /** Accessible name for the timeline */
+  ariaLabel?: string
+  /** Accessible name for the action toolbar */
+  actionsAriaLabel?: string
+}
+
 export interface TigerLocaleProgress {
   /** Accessible name for the progress widget (does not include the current value) */
   ariaLabel?: string
@@ -841,6 +858,7 @@ export interface TigerLocale {
   scrollArea?: TigerLocaleScrollArea
   printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
+  workflowTimeline?: TigerLocaleWorkflowTimeline
   progress?: TigerLocaleProgress
   splitter?: TigerLocaleSplitter
   resizable?: TigerLocaleResizable

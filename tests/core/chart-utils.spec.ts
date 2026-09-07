@@ -314,10 +314,15 @@ describe('chart-utils', () => {
       expect(max).toBeGreaterThan(50)
     })
 
-    it('applies padding to extend range', () => {
+    it('applies padding to extend range without crossing zero for non-negative data', () => {
       const [min, max] = getNumberExtent([0, 100], { padding: 0.1 })
-      expect(min).toBeLessThan(0)
+      expect(min).toBe(0)
       expect(max).toBeGreaterThan(100)
+    })
+
+    it('keeps an all-zero series on a non-negative domain', () => {
+      expect(getNumberExtent([0, 0, 0])).toEqual([0, 1])
+      expect(getNumberExtent([0, 0, 0], { includeZero: true })).toEqual([0, 1])
     })
   })
 

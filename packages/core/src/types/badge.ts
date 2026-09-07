@@ -39,7 +39,7 @@ export interface BadgeProps {
   max?: number
   /**
    * Whether to show a number badge whose value is `0` or `'0'`.
-   * @default false
+   * Defaults to `true` for standalone count badges and `false` for overlays.
    */
   showZero?: boolean
   /**

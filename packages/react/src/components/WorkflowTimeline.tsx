@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 import {
   classNames,
+  getWorkflowTimelineLabels,
+  mergeTigerLocale,
   resolveWorkflowActionButtonProps,
   shouldShowWorkflowActions,
   timelineDescriptionClasses,
@@ -9,12 +11,14 @@ import {
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
   type TimelineItem,
+  type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
   type WorkflowActionBarProps as CoreWorkflowActionBarProps,
   type WorkflowTimelineItem,
   type WorkflowTimelineProps as CoreWorkflowTimelineProps
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 import { Tag } from './Tag'
 import { Timeline } from './Timeline'
 
@@ -51,10 +55,13 @@ function isWorkflowTimelineItem(item: unknown): item is WorkflowTimelineItem {
   )
 }
 
-function renderStepContent(item: WorkflowTimelineItem) {
+function renderStepContent(
+  item: WorkflowTimelineItem,
+  labels: Required<TigerLocaleWorkflowTimeline>
+) {
   const step = item.step
   const title = step.title ?? step.label
-  const statusLabel = workflowStepStatusLabel(item.status)
+  const statusLabel = workflowStepStatusLabel(item.status, labels)
 
   return (
     <div className="min-w-0">
@@ -81,6 +88,8 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   'aria-label': ariaLabelAttr,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const stepLabels = useMemo(() => getWorkflowTimelineLabels(config.locale), [config.locale])
   const toolbarClasses = useMemo(() => classNames(workflowActionBarClasses, className), [className])
 
   return (
@@ -89,7 +98,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       className={toolbarClasses}
       style={style}
       role="toolbar"
-      aria-label={ariaLabel ?? ariaLabelAttr ?? 'Workflow actions'}>
+      aria-label={ariaLabel ?? ariaLabelAttr ?? stepLabels.actionsAriaLabel}>
       {(items ?? []).map((item) => {
         const buttonProps = resolveWorkflowActionButtonProps(item)
         const isDisabled = Boolean(disabled || item.disabled)
@@ -121,6 +130,8 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   pendingDot,
   pendingContent,
   reverse = false,
+  locale,
+  labels: labelsOverride,
   className,
   style,
   onAction,
@@ -130,13 +141,22 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   'aria-label': ariaLabel,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const stepLabels = useMemo(
+    () => getWorkflowTimelineLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const timelineItems = useMemo(() => workflowStepsToTimelineItems(steps), [steps])
   const showActionBar = shouldShowWorkflowActions(steps, actions, showActions)
   const rootClasses = useMemo(() => classNames(workflowTimelineRootClasses, className), [className])
 
   const handleRenderItem = (item: TimelineItem, index: number) => {
     if (renderItem) return renderItem(item, index)
-    if (isWorkflowTimelineItem(item)) return renderStepContent(item)
+    if (isWorkflowTimelineItem(item)) return renderStepContent(item, stepLabels)
     return null
   }
 
@@ -145,7 +165,11 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
       renderActions ? (
         renderActions(actions)
       ) : (
-        <WorkflowActionBar items={actions} onAction={onAction} />
+        <WorkflowActionBar
+          items={actions}
+          onAction={onAction}
+          ariaLabel={stepLabels.actionsAriaLabel}
+        />
       )
     ) : null
 
@@ -160,7 +184,7 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
         reverse={reverse}
         renderItem={handleRenderItem}
         renderDot={renderDot}
-        aria-label={ariaLabel ?? 'Workflow timeline'}
+        aria-label={ariaLabel ?? stepLabels.ariaLabel}
       />
       {actionBar}
     </div>

@@ -2,7 +2,9 @@ import { computed, defineComponent, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  getWorkflowTimelineLabels,
   mergeStyleValues,
+  mergeTigerLocale,
   resolveWorkflowActionButtonProps,
   shouldShowWorkflowActions,
   timelineDescriptionClasses,
@@ -11,6 +13,8 @@ import {
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
   type TimelineMode,
+  type TigerLocale,
+  type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
   type WorkflowActionBarProps as CoreWorkflowActionBarProps,
   type WorkflowTimelineItem,
@@ -18,6 +22,7 @@ import {
   type WorkflowTimelineStep
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 import { Tag } from './Tag'
 import { Timeline } from './Timeline'
 
@@ -50,10 +55,13 @@ function isWorkflowTimelineItem(item: unknown): item is WorkflowTimelineItem {
   )
 }
 
-function renderStepContent(item: WorkflowTimelineItem) {
+function renderStepContent(
+  item: WorkflowTimelineItem,
+  labels: Required<TigerLocaleWorkflowTimeline>
+) {
   const step = item.step
   const title = step.title ?? step.label
-  const statusLabel = workflowStepStatusLabel(item.status)
+  const statusLabel = workflowStepStatusLabel(item.status, labels)
 
   return h('div', { class: 'min-w-0' }, [
     step.time ? h('div', { class: timelineLabelClasses }, step.time) : null,
@@ -98,6 +106,8 @@ export const WorkflowActionBar = defineComponent({
   },
   emits: ['action'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const stepLabels = computed(() => getWorkflowTimelineLabels(config.value.locale))
     const toolbarClasses = computed(() =>
       classNames(workflowActionBarClasses, props.className, coerceClassValue(attrs.class))
     )
@@ -113,7 +123,9 @@ export const WorkflowActionBar = defineComponent({
           style: toolbarStyle.value,
           role: 'toolbar',
           'aria-label':
-            props.ariaLabel ?? (attrs['aria-label'] as string | undefined) ?? 'Workflow actions'
+            props.ariaLabel ??
+            (attrs['aria-label'] as string | undefined) ??
+            stepLabels.value.actionsAriaLabel
         },
         items.map((item) => {
           const buttonProps = resolveWorkflowActionButtonProps(item)
@@ -171,6 +183,14 @@ export const WorkflowTimeline = defineComponent({
       type: Boolean,
       default: false
     },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleWorkflowTimeline>>,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -182,6 +202,9 @@ export const WorkflowTimeline = defineComponent({
   },
   emits: ['action'],
   setup(props, { emit, slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const stepLabels = computed(() => getWorkflowTimelineLabels(mergedLocale.value, props.labels))
     const timelineItems = computed(() => workflowStepsToTimelineItems(props.steps))
     const showActionBar = computed(() =>
       shouldShowWorkflowActions(props.steps, props.actions, props.showActions)
@@ -197,7 +220,9 @@ export const WorkflowTimeline = defineComponent({
       if (slots.pending) timelineSlots.pending = slots.pending
       timelineSlots.item = (slotProps: { item: unknown; index: number }) => {
         if (slots.item) return slots.item(slotProps)
-        if (isWorkflowTimelineItem(slotProps.item)) return renderStepContent(slotProps.item)
+        if (isWorkflowTimelineItem(slotProps.item)) {
+          return renderStepContent(slotProps.item, stepLabels.value)
+        }
         return null
       }
 
@@ -207,6 +232,7 @@ export const WorkflowTimeline = defineComponent({
             ? slots.actions({ actions: props.actions })
             : h(WorkflowActionBar, {
                 items: props.actions,
+                ariaLabel: stepLabels.value.actionsAriaLabel,
                 onAction: (item: WorkflowActionBarItem) => emit('action', item)
               })
           : null
@@ -235,7 +261,8 @@ export const WorkflowTimeline = defineComponent({
               pendingDot: props.pendingDot,
               reverse: props.reverse,
               'aria-label':
-                (typeof ariaLabel === 'string' ? ariaLabel : undefined) ?? 'Workflow timeline'
+                (typeof ariaLabel === 'string' ? ariaLabel : undefined) ??
+                stepLabels.value.ariaLabel
             },
             timelineSlots
           ),

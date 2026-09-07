@@ -22,12 +22,33 @@ export const messageContainerBaseClasses = `fixed ${overlayZIndexClass.message} 
  * Get position classes for message container
  */
 export const messagePositionClasses: Record<MessagePosition, string> = {
-  top: 'top-6 inset-inline-0 mx-auto w-max',
+  top: 'top-6 w-max max-w-[min(100vw-2rem,36rem)]',
   'top-left': 'top-6 inset-inline-start-6',
   'top-right': 'top-6 inset-inline-end-6',
-  bottom: 'bottom-6 inset-inline-0 mx-auto w-max',
+  bottom: 'bottom-6 w-max max-w-[min(100vw-2rem,36rem)]',
   'bottom-left': 'bottom-6 inset-inline-start-6',
   'bottom-right': 'bottom-6 inset-inline-end-6'
+}
+
+/**
+ * Inline placement so `top` / `bottom` stay centered even when Tailwind
+ * never emits `inset-inline-0` (host apps that do not scan core source).
+ */
+export function getMessagePositionStyle(position: MessagePosition): Record<string, string> {
+  switch (position) {
+    case 'top':
+      return { top: '1.5rem', left: '50%', transform: 'translateX(-50%)' }
+    case 'bottom':
+      return { bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)' }
+    case 'top-left':
+      return { top: '1.5rem', insetInlineStart: '1.5rem' }
+    case 'top-right':
+      return { top: '1.5rem', insetInlineEnd: '1.5rem' }
+    case 'bottom-left':
+      return { bottom: '1.5rem', insetInlineStart: '1.5rem' }
+    case 'bottom-right':
+      return { bottom: '1.5rem', insetInlineEnd: '1.5rem' }
+  }
 }
 
 /**

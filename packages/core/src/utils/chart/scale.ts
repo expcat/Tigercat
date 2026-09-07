@@ -165,6 +165,8 @@ export function getNumberExtent(
 
   let min = Math.min(...values)
   let max = Math.max(...values)
+  const allNonNegative = min >= 0
+  const allNonPositive = max <= 0
 
   if (options.includeZero) {
     min = Math.min(min, 0)
@@ -173,7 +175,12 @@ export function getNumberExtent(
 
   if (min === max) {
     const pad = Math.abs(min) * 0.1 || 1
-    return [min - pad, max + pad]
+    if (min === 0) return [0, pad]
+    let lo = min - pad
+    let hi = max + pad
+    if (allNonNegative) lo = Math.max(lo, 0)
+    if (allNonPositive) hi = Math.min(hi, 0)
+    return [lo, hi]
   }
 
   const padding = options.padding ?? 0
@@ -182,6 +189,9 @@ export function getNumberExtent(
     min -= span * padding
     max += span * padding
   }
+
+  if (allNonNegative) min = Math.max(min, 0)
+  if (allNonPositive) max = Math.min(max, 0)
 
   return [min, max]
 }

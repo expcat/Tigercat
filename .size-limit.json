@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "213 kB",
+    "limit": "214 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "409 kB",
+    "limit": "411 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "451 kB",
+    "limit": "453 kB",
     "gzip": true
   },
   {
@@ -110,7 +110,7 @@
   {
     "name": "Vue TagsInput subpath",
     "path": "packages/vue/dist/components/TagsInput.mjs",
-    "limit": "46 kB",
+    "limit": "47 kB",
     "gzip": true
   },
   {
@@ -182,13 +182,13 @@
   {
     "name": "Vue NavigationMenu subpath",
     "path": "packages/vue/dist/components/NavigationMenu.mjs",
-    "limit": "56 kB",
+    "limit": "57 kB",
     "gzip": true
   },
   {
     "name": "React NavigationMenu subpath",
     "path": "packages/react/dist/components/NavigationMenu.mjs",
-    "limit": "49 kB",
+    "limit": "50 kB",
     "gzip": true
   },
   {
@@ -212,7 +212,7 @@
   {
     "name": "React Kbd subpath",
     "path": "packages/react/dist/components/Kbd.mjs",
-    "limit": "33 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {

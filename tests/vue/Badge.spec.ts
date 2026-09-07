@@ -44,6 +44,11 @@ describe('Badge', () => {
     expect(container.querySelector('span')).toBeNull()
   })
 
+  it('shows standalone zero counts by default', () => {
+    renderWithProps(Badge, { content: 0 })
+    expect(screen.getByText('0')).toBeInTheDocument()
+  })
+
   it('keeps the overlay wrapper when the count hides', async () => {
     const Host = defineComponent({
       setup() {

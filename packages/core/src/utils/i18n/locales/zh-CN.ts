@@ -75,6 +75,15 @@ export const zhCN: TigerLocale = {
   timeline: {
     pendingText: '加载中...'
   },
+  workflowTimeline: {
+    pending: '待处理',
+    active: '进行中',
+    approved: '已通过',
+    rejected: '已驳回',
+    canceled: '已撤销',
+    ariaLabel: '审批进度',
+    actionsAriaLabel: '审批操作'
+  },
   progress: {
     ariaLabel: '进度'
   },

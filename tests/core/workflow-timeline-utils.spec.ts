@@ -296,6 +296,11 @@ describe('workflow step status presentation', () => {
     expect(workflowStepStatusTagVariant('rejected')).toBe('danger')
     expect(workflowStepStatusTagVariant('pending')).toBe('default')
   })
+
+  it('uses overlay labels when provided', () => {
+    expect(workflowStepStatusLabel('approved', { approved: '已通过' })).toBe('已通过')
+    expect(workflowStepStatusLabel('pending', { approved: '已通过' })).toBe('Pending')
+  })
 })
 
 describe('resolveWorkflowActionButtonProps', () => {

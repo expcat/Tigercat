@@ -6,6 +6,7 @@
  * model and are not added to `TimelineItem`.
  */
 
+import type { TigerLocale, TigerLocaleWorkflowTimeline } from './locale'
 import type { TimelineMode } from './timeline'
 
 /**
@@ -164,6 +165,14 @@ export interface WorkflowTimelineProps {
    * @default false
    */
   reverse?: boolean
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+  /**
+   * Status-tag and aria-label overlay. Wins over `locale.workflowTimeline`.
+   */
+  labels?: Partial<TigerLocaleWorkflowTimeline>
   /**
    * Additional CSS classes
    */

@@ -149,4 +149,16 @@ describe('Message (React)', () => {
     expect(host).toBeTruthy()
     expect(host?.textContent).toContain('corner')
   })
+
+  it('centers default top messages with inline style', () => {
+    act(() => {
+      Message.info({ content: 'hello', duration: 0 })
+    })
+    const host = document.querySelector(
+      '[data-tiger-message-container][data-tiger-message-position="top"]'
+    ) as HTMLElement | null
+    expect(host).toBeTruthy()
+    expect(host?.style.left).toBe('50%')
+    expect(host?.style.transform).toBe('translateX(-50%)')
+  })
 })

@@ -79,6 +79,7 @@ import type {
   TigerLocaleSignature,
   TigerLocaleNumberKeyboard,
   TigerLocaleTree,
+  TigerLocaleWorkflowTimeline,
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
@@ -469,6 +470,13 @@ export function getStepsLabels(
   overrides?: Partial<TigerLocaleSteps>
 ): Required<TigerLocaleSteps> {
   return resolveLocaleSection(enSection('steps'), locale?.steps, overrides)
+}
+
+export function getWorkflowTimelineLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleWorkflowTimeline>
+): Required<TigerLocaleWorkflowTimeline> {
+  return resolveLocaleSection(enSection('workflowTimeline'), locale?.workflowTimeline, overrides)
 }
 
 export function getRateLabels(

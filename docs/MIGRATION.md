@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.3.1
+
+v2.3.1 无 breaking change，无新必填 prop。WorkflowTimeline 状态文案改读 locale / `labels`；Message 默认 `top` 居中；非负计数轴不再落到负数；standalone Badge 的 `0` 默认可见。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v231)。
+
 ## v2.3.0
 
 v2.3.0 无 breaking change，无新必填 prop。MenuSchema 与 WorkflowTimeline 是新增 helpers / 组件，现有 Menu / Timeline API 不变。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v230)。

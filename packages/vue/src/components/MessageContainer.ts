@@ -4,6 +4,7 @@ import {
   defaultMessageThemeColors,
   getMessageCloseAriaLabel,
   getMessageIconPath,
+  getMessagePositionStyle,
   getMessageTypeClasses,
   getToastItemRole,
   messageBaseClasses,
@@ -122,6 +123,7 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
         'div',
         {
           class: containerClasses.value,
+          style: getMessagePositionStyle(props.position),
           'data-tiger-message-position': props.position,
           'data-tiger-message-container': ''
         },

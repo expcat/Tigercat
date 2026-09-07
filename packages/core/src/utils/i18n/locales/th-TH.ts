@@ -76,6 +76,15 @@ export const thTH: TigerLocale = {
   timeline: {
     pendingText: 'กำลังโหลด...'
   },
+  workflowTimeline: {
+    pending: 'รอดำเนินการ',
+    active: 'กำลังดำเนินการ',
+    approved: 'อนุมัติแล้ว',
+    rejected: 'ปฏิเสธแล้ว',
+    canceled: 'ยกเลิกแล้ว',
+    ariaLabel: 'ไทม์ไลน์ขั้นตอน',
+    actionsAriaLabel: 'การดำเนินการขั้นตอน'
+  },
   progress: {
     ariaLabel: 'ความคืบหน้า'
   },

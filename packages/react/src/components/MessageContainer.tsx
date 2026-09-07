@@ -4,6 +4,7 @@ import {
   defaultMessageThemeColors,
   getMessageCloseAriaLabel,
   getMessageIconPath,
+  getMessagePositionStyle,
   getMessageTypeClasses,
   getToastItemRole,
   messageBaseClasses,
@@ -103,6 +104,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
   const node = (
     <div
       className={containerClasses}
+      style={getMessagePositionStyle(position)}
       data-tiger-message-position={position}
       data-tiger-message-container>
       {messages.map((message) => (

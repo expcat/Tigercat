@@ -54,7 +54,7 @@ export const Badge = defineComponent({
     },
     showZero: {
       type: Boolean,
-      default: false
+      default: undefined
     },
     position: {
       type: String as PropType<BadgePosition>,
@@ -79,7 +79,7 @@ export const Badge = defineComponent({
         type: props.type,
         content: props.content,
         max: props.max,
-        showZero: props.showZero
+        showZero: props.showZero ?? props.standalone
       })
     )
     const isDot = computed(() => resolved.value.kind === 'dot')

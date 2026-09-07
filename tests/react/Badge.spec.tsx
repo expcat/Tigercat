@@ -50,6 +50,11 @@ describe('Badge', () => {
     expect(container.firstChild).toBeNull()
   })
 
+  it('shows standalone zero counts by default', () => {
+    render(<Badge content={0} />)
+    expect(screen.getByText('0')).toBeInTheDocument()
+  })
+
   it('keeps the overlay wrapper when the count hides', async () => {
     const user = userEvent.setup()
 

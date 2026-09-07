@@ -76,6 +76,15 @@ export const idID: TigerLocale = {
   timeline: {
     pendingText: 'Memuat...'
   },
+  workflowTimeline: {
+    pending: 'Tertunda',
+    active: 'Aktif',
+    approved: 'Disetujui',
+    rejected: 'Ditolak',
+    canceled: 'Dibatalkan',
+    ariaLabel: 'Linimasa alur kerja',
+    actionsAriaLabel: 'Tindakan alur kerja'
+  },
   progress: {
     ariaLabel: 'Progres'
   },

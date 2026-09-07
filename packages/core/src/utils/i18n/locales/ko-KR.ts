@@ -76,6 +76,15 @@ export const koKR: TigerLocale = {
   timeline: {
     pendingText: '로딩 중...'
   },
+  workflowTimeline: {
+    pending: '대기 중',
+    active: '진행 중',
+    approved: '승인됨',
+    rejected: '반려됨',
+    canceled: '취소됨',
+    ariaLabel: '워크플로',
+    actionsAriaLabel: '워크플로 작업'
+  },
   progress: {
     ariaLabel: '진행률'
   },

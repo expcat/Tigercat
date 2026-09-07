@@ -76,6 +76,15 @@ export const ptBR: TigerLocale = {
   timeline: {
     pendingText: 'Carregando...'
   },
+  workflowTimeline: {
+    pending: 'Pendente',
+    active: 'Em andamento',
+    approved: 'Aprovado',
+    rejected: 'Rejeitado',
+    canceled: 'Cancelado',
+    ariaLabel: 'Linha do tempo do fluxo',
+    actionsAriaLabel: 'Ações do fluxo'
+  },
   progress: {
     ariaLabel: 'Progresso'
   },

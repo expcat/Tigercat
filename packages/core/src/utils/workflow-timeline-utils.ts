@@ -5,6 +5,7 @@
  */
 
 import type { ButtonVariant } from '../types/button'
+import type { TigerLocaleWorkflowTimeline } from '../types/locale'
 import type { TagVariant } from '../types/tag'
 import type { TimelineItem } from '../types/timeline'
 import type {
@@ -281,8 +282,11 @@ export function workflowStepsToTimelineItems(
   return flattenSteps(normalized).map(stepToTimelineItem)
 }
 
-export function workflowStepStatusLabel(status: WorkflowTimelineStepStatus): string {
-  return WORKFLOW_STEP_STATUS_LABELS[status]
+export function workflowStepStatusLabel(
+  status: WorkflowTimelineStepStatus,
+  labels?: Partial<Pick<TigerLocaleWorkflowTimeline, WorkflowTimelineStepStatus>>
+): string {
+  return labels?.[status] || WORKFLOW_STEP_STATUS_LABELS[status]
 }
 
 export function workflowStepStatusTagVariant(status: WorkflowTimelineStepStatus): TagVariant {

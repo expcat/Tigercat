@@ -2,6 +2,16 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.3.1
+
+v2.3.1：Admin 审查回流的展示修复。无新必填 prop。
+
+- **WorkflowTimeline 状态 Tag 跟 locale**：`locale.workflowTimeline`（zh-CN「已通过 / 进行中 / 待处理 / 已驳回 / 已撤销」）+ `labels` 覆盖；`workflowStepStatusLabel(status, labels)` 可读 overlay。Vue/React 读 ConfigProvider。公开 API 增补，无新必填 prop。
+- **Message 默认 `top` 居中**：容器用 inline `left:50%; transform:translateX(-50%)`，不再依赖宿主是否扫到 `inset-inline-0`。Guest / Shell 不再钉在视口左上。Vue/React。公开行为修复。
+- **计数折线全 0 时 Y 轴不再到 -1**：`getNumberExtent` 对非负序列不把域扩到负数；全 0 为 `[0, pad]`。Vue/React 笛卡尔图共用。公开行为修复。
+- **Standalone Badge `content={0}` 显示 0**：计数徽章默认 `showZero`；overlay（`standalone={false}`）仍隐藏 0。显式 `showZero` 优先。Vue/React。公开默认值放宽。
+- **同步 `.size-limit.json` 预算（v2.3.1 实测）**：`Core (full)` 213→214 kB（实测 213.76）、`Vue (full)` 409→411 kB（实测 410.05）、`React (full)` 451→453 kB（实测 452.15）；locale 增补带动若干子路径略超，一并按实测上调。
+
 ## v2.3.0
 
 v2.3.0：中台动态菜单 schema 与审批时间线。MenuSchema 过滤后映射到现有 Menu；WorkflowTimeline / WorkflowActionBar 是展示层，不接 BPM 引擎。Vue/React 对称。
