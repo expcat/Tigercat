@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "214 kB",
+    "limit": "216 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "411 kB",
+    "limit": "413 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "453 kB",
+    "limit": "455 kB",
     "gzip": true
   },
   {
@@ -32,7 +32,7 @@
   {
     "name": "Vue Menu subpath",
     "path": "packages/vue/dist/components/Menu.mjs",
-    "limit": "60 kB",
+    "limit": "61 kB",
     "gzip": true
   },
   {
@@ -98,7 +98,7 @@
   {
     "name": "Vue InputOTP subpath",
     "path": "packages/vue/dist/components/InputOTP.mjs",
-    "limit": "44 kB",
+    "limit": "45 kB",
     "gzip": true
   },
   {
@@ -128,7 +128,7 @@
   {
     "name": "React MaskInput subpath",
     "path": "packages/react/dist/components/MaskInput.mjs",
-    "limit": "39 kB",
+    "limit": "40 kB",
     "gzip": true
   },
   {
@@ -200,7 +200,7 @@
   {
     "name": "React PageHeader subpath",
     "path": "packages/react/dist/components/PageHeader.mjs",
-    "limit": "38 kB",
+    "limit": "39 kB",
     "gzip": true
   },
   {
@@ -248,7 +248,7 @@
   {
     "name": "React ImageCompare subpath",
     "path": "packages/react/dist/components/ImageCompare.mjs",
-    "limit": "38 kB",
+    "limit": "39 kB",
     "gzip": true
   },
   {
@@ -292,7 +292,7 @@
   {
     "name": "Core locale (zh-CN) subpath",
     "path": "packages/core/dist/locales/zh-CN.js",
-    "limit": "6 kB",
+    "limit": "7 kB",
     "gzip": true
   },
   {

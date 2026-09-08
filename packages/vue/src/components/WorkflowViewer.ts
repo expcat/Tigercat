@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, PropType } from 'vue'
+import { computed, defineComponent, h, PropType, type VNode } from 'vue'
 import {
   buildWorkflowViewerTree,
   classNames,
@@ -45,7 +45,7 @@ function renderViewerCard(
   labels: Required<TigerLocaleWorkflowTimeline>,
   highlightPath: boolean,
   showRollbackPoint: boolean
-) {
+): VNode {
   const step = node.step
   const title = step.title ?? step.label
   const statusLabel = workflowStepStatusLabel(node.status, labels)
@@ -99,7 +99,7 @@ function renderViewerSequence(
   highlightPath: boolean,
   showRollbackPoint: boolean,
   layout: 'stack' | 'branch'
-) {
+): VNode {
   return h(
     'ol',
     { class: layout === 'branch' ? workflowViewerBranchClasses : workflowViewerListClasses },

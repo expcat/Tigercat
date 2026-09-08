@@ -28,18 +28,18 @@ source: current repository state after v2.1.4
 
 ## 中台递进里程碑
 
-工作流展示 + 动态菜单中台按小版本递进（基线 v2.3.1）。完整计划见工作区 `midplatform-roadmap-2.3.x.md` 与 Admin 副本 [`Tigercat_Admin/docs/midplatform-roadmap.md`](../../Tigercat_Admin/docs/midplatform-roadmap.md)（若同机并列检出）。
+工作流展示 + 动态菜单中台按小版本递进（基线 v2.3.2）。完整计划见工作区 `midplatform-roadmap-2.3.x.md` 与 Admin 副本 [`Tigercat_Admin/docs/midplatform-roadmap.md`](../../Tigercat_Admin/docs/midplatform-roadmap.md)（若同机并列检出）。
 
-| 里程碑 | 版本 | 摘要 |
-| ------ | ---- | ---- |
-| M1 | 2.3.2 | WorkflowViewer + MenuSchema 元数据；Admin 菜单轻页 + 审批 Mock 写回 |
-| M2 | 2.3.3 | Admin mixed 动态路由 / pageMap / 按钮权限；库仅补 M1 暴露缺口 |
-| M3 | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需 |
-| M4 | 2.4.0 | 可选：WorkflowDesigner（simple）；有产品信号再开 |
+| 里程碑 | 版本  | 摘要                                                                |
+| ------ | ----- | ------------------------------------------------------------------- |
+| M1     | 2.3.2 | WorkflowViewer + MenuSchema 元数据；Admin 菜单轻页 + 审批 Mock 写回 |
+| M2     | 2.3.3 | Admin mixed 动态路由 / pageMap / 按钮权限；库仅补 M1 暴露缺口       |
+| M3     | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需                         |
+| M4     | 2.4.0 | 可选：WorkflowDesigner（simple）；有产品信号再开                    |
 
 节奏：Tigercat `2.3.x` 先发版 → Admin 升依赖后跟。明确不做：Flowable/Camunda/BPMN、第二套 Menu/Timeline、租户/组织/字典组件化进库。
 
-下一可执行切片：**M1 / 2.3.2**（待用户 go）。
+Tigercat M1 已随 v2.3.2 发出。下一可执行切片：**M1 Admin**（升 `^2.3.2` 后菜单轻页 + 审批 Mock）；库侧仅当 Admin 暴露缺口再开 M2。
 
 ## 长期观察项（不绑定版本）
 
