@@ -24,6 +24,7 @@ tigercat create my-app --template react   # 或 --template vue3
 
 - 容器：`Layout` / `Header` / `Sidebar` / `Content` / `Footer`（props/examples 见 layout 分类）。
 - 导航：侧栏 `Menu` + `MenuItem` / `SubMenu`，顶部 `Breadcrumb`，页内目录 `Anchor`。
+- 后端菜单树用 `MenuSchemaNode`：`filterMenuByPermission` + `menuSchemaToMenuItems` 喂现有 `Menu`（`hideInMenu` / `flatMenu` 只影响侧栏）。`schemaToRouteRecords` 产出纯路由记录（`meta` 含 `hideInBreadcrumb` / `badge` / `iframeSrc`），宿主自己 `addRoute` / pageMap，库不碰路由器。
 - 路由出口：当前页放进 `Content` —— React 用 react-router `<Outlet/>`，Vue 用 vue-router `<router-view/>`。
 
 React 骨架（精简自 examples/example/react，实际导入建议使用组件子路径）：

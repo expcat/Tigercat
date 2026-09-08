@@ -201,7 +201,7 @@ Events/callback props: `onOpenChange?`.
 | `openKeys?`     | `MenuKey[]`  | `-`     | Currently opened submenu keys (inline, vertical, and popup).                               |
 | `collapsed?`    | `boolean`    | `false` | Collapse vertical/inline menus to icons (or first letter) and popup submenus. Horizonta... |
 
-`collapsed` only applies to vertical/inline (horizontal `devWarn`s). Labels stay `sr-only`; text-only items show a first-letter glyph. `popupPortal` defaults true.
+`collapsed` only applies to vertical/inline (horizontal `devWarn`s). Labels stay `sr-only`; text-only items show a first-letter glyph. `popupPortal` defaults true. Backend trees: `MenuSchemaNode` + `filterMenuByPermission` / `menuSchemaToMenuItems` / `schemaToRouteRecords` (schema-only fields stay off `MenuItem`; no `addRoute`).
 
 ## MenuItem
 

@@ -1,0 +1,12 @@
+{
+  "id": "menu-05",
+  "title": "Schema 路由记录",
+  "description": "hideInBreadcrumb / flatMenu / badge / iframeSrc 留在 schema。schemaToRouteRecords 产出纯路由记录（含 meta），不做 addRoute；flatMenu 把子节点提到当前层。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

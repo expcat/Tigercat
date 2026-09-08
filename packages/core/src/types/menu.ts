@@ -2,6 +2,8 @@
  * Menu component types and interfaces
  */
 
+import type { BadgeType, BadgeVariant } from './badge'
+
 /**
  * Menu mode - determines the layout direction
  */
@@ -65,13 +67,27 @@ export interface MenuItem {
 }
 
 /**
+ * Badge on a schema node. A string/number is count or text content.
+ * Stays on the schema and {@link MenuRouteMeta}; not copied onto {@link MenuItem}.
+ */
+export type MenuSchemaBadge =
+  | string
+  | number
+  | {
+      content?: string | number
+      type?: BadgeType
+      variant?: BadgeVariant
+    }
+
+/**
  * Backend-style dynamic menu node. Maps onto {@link MenuItem} via
- * `menuSchemaToMenuItems`; extra fields (`path`, `permission`, `hideInMenu`)
- * stay on the schema and are not added to `MenuItem`.
+ * `menuSchemaToMenuItems`; extra fields (`path`, `permission`, `hideInMenu`,
+ * `hideInBreadcrumb`, `flatMenu`, `badge`, `iframeSrc`) stay on the schema
+ * and are not added to `MenuItem`.
  */
 export interface MenuSchemaNode {
   /**
-   * Stable node id. Copied onto `MenuItem.key`.
+   * Stable node id. Copied onto `MenuItem.key` and {@link MenuRouteRecord.name}.
    */
   key: string
   /**
@@ -85,10 +101,12 @@ export interface MenuSchemaNode {
   icon?: string
   /**
    * Internal route path. Used as `MenuItem.href` when `href` is omitted.
+   * Copied onto {@link MenuRouteRecord.path} when converting routes.
    */
   path?: string
   /**
    * External or explicit link. Wins over `path` when both are set.
+   * Href-only nodes (no `path`) stay menu links and are not route records.
    */
   href?: string
   /**
@@ -102,8 +120,29 @@ export interface MenuSchemaNode {
   type?: MenuItemType
   /**
    * When true, omit this node from menu output and promote visible children.
+   * The node is still emitted by `schemaToRouteRecords` when it is routable.
    */
   hideInMenu?: boolean
+  /**
+   * When true, apps should omit this node from breadcrumb trails.
+   * Copied onto route meta; not used by `menuSchemaToMenuItems`.
+   */
+  hideInBreadcrumb?: boolean
+  /**
+   * Flatten children one level: menu shows the parent as a leaf (when visible)
+   * and promotes children beside it; route records emit the parent without
+   * nested `children` and lift child records to the same array.
+   */
+  flatMenu?: boolean
+  /**
+   * Optional badge for the host app (count, text, or Badge-shaped object).
+   */
+  badge?: MenuSchemaBadge
+  /**
+   * Iframe URL for an embedded page. Copied onto route meta; set `path` for
+   * the in-app route that hosts the iframe.
+   */
+  iframeSrc?: string
   /**
    * Nested schema nodes (submenu or group).
    */
@@ -114,6 +153,36 @@ export interface MenuSchemaNode {
  * A backend-style menu tree (array of {@link MenuSchemaNode}).
  */
 export type MenuSchema = MenuSchemaNode[]
+
+/**
+ * Route meta copied from {@link MenuSchemaNode}. Framework routers read this
+ * object; Tigercat does not call `addRoute`.
+ */
+export interface MenuRouteMeta {
+  key: string
+  title?: string
+  icon?: string
+  href?: string
+  permission?: string | string[]
+  hideInMenu?: boolean
+  hideInBreadcrumb?: boolean
+  flatMenu?: boolean
+  badge?: MenuSchemaBadge
+  iframeSrc?: string
+  type?: MenuItemType
+}
+
+/**
+ * Framework-agnostic route record produced by `schemaToRouteRecords`.
+ * `name` is the schema `key`; `path` is the schema `path` (empty string when
+ * the record is iframe-only). No `component` — the host binds a pageMap.
+ */
+export interface MenuRouteRecord {
+  name: string
+  path: string
+  meta: MenuRouteMeta
+  children?: MenuRouteRecord[]
+}
 
 /**
  * Base menu props interface

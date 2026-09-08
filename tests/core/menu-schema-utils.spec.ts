@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 import {
   filterMenuByPermission,
   menuSchemaToMenuItems,
+  schemaToRouteRecords,
   type MenuSchema,
   type MenuSchemaNode
 } from '@expcat/tigercat-core'
@@ -299,5 +300,241 @@ describe('menuSchemaToMenuItems', () => {
         children: [{ key: 'home', label: 'Home', icon: 'home', href: '/' }]
       }
     ])
+  })
+
+  it('does not copy schema-only metadata onto MenuItem', () => {
+    const items = menuSchemaToMenuItems([
+      node({
+        key: 'jobs',
+        label: 'Jobs',
+        path: '/jobs',
+        hideInBreadcrumb: true,
+        flatMenu: true,
+        badge: 3,
+        iframeSrc: 'https://example.test/jobs'
+      })
+    ])
+
+    expect(items).toEqual([{ key: 'jobs', label: 'Jobs', href: '/jobs' }])
+    expect(items[0]).not.toHaveProperty('badge')
+    expect(items[0]).not.toHaveProperty('iframeSrc')
+    expect(items[0]).not.toHaveProperty('hideInBreadcrumb')
+    expect(items[0]).not.toHaveProperty('flatMenu')
+  })
+})
+
+describe('filterMenuByPermission flatMenu', () => {
+  it('keeps a visible parent as a leaf and promotes children beside it', () => {
+    const schema: MenuSchema = [
+      node({
+        key: 'ops',
+        label: 'Ops',
+        path: '/ops',
+        icon: 'settings',
+        flatMenu: true,
+        children: [
+          node({ key: 'jobs', label: 'Jobs', path: '/ops/jobs', badge: 3 }),
+          node({ key: 'monitor', label: 'Monitor', path: '/ops/monitor' })
+        ]
+      })
+    ]
+
+    const filtered = filterMenuByPermission(schema, allow())
+
+    expect(filtered.map((item) => item.key)).toEqual(['ops', 'jobs', 'monitor'])
+    expect(filtered[0]?.children).toBeUndefined()
+    expect(filtered[1]?.badge).toBe(3)
+  })
+
+  it('does not emit a label-less layout node when flattening', () => {
+    const schema: MenuSchema = [
+      node({
+        key: 'layout',
+        flatMenu: true,
+        children: [node({ key: 'inbox', label: 'Inbox', path: '/inbox' })]
+      })
+    ]
+
+    expect(filterMenuByPermission(schema, allow()).map((item) => item.key)).toEqual(['inbox'])
+  })
+})
+
+describe('schemaToRouteRecords', () => {
+  it('nests child records and copies schema metadata onto meta', () => {
+    const schema: MenuSchema = [
+      node({
+        key: 'system',
+        label: 'System',
+        icon: 'server',
+        path: '/system',
+        permission: 'system:menu',
+        children: [
+          node({
+            key: 'users',
+            label: 'Users',
+            path: '/system/users',
+            permission: 'user:list',
+            badge: { content: 'NEW', type: 'text', variant: 'success' },
+            hideInBreadcrumb: true
+          }),
+          node({
+            key: 'user-edit',
+            label: 'Edit user',
+            path: '/system/users/edit',
+            hideInMenu: true
+          })
+        ]
+      })
+    ]
+
+    expect(schemaToRouteRecords(schema)).toEqual([
+      {
+        name: 'system',
+        path: '/system',
+        meta: {
+          key: 'system',
+          title: 'System',
+          icon: 'server',
+          permission: 'system:menu'
+        },
+        children: [
+          {
+            name: 'users',
+            path: '/system/users',
+            meta: {
+              key: 'users',
+              title: 'Users',
+              permission: 'user:list',
+              badge: { content: 'NEW', type: 'text', variant: 'success' },
+              hideInBreadcrumb: true
+            }
+          },
+          {
+            name: 'user-edit',
+            path: '/system/users/edit',
+            meta: {
+              key: 'user-edit',
+              title: 'Edit user',
+              hideInMenu: true
+            }
+          }
+        ]
+      }
+    ])
+  })
+
+  it('lifts flatMenu children to sibling records and keeps hideInMenu pages', () => {
+    const schema: MenuSchema = [
+      node({
+        key: 'ops',
+        label: 'Ops',
+        path: '/ops',
+        flatMenu: true,
+        children: [
+          node({ key: 'jobs', label: 'Jobs', path: '/ops/jobs', badge: 8 }),
+          node({ key: 'hidden', label: 'Hidden job', path: '/ops/hidden', hideInMenu: true })
+        ]
+      }),
+      node({
+        key: 'docs',
+        label: 'Docs',
+        path: '/iframe/docs',
+        iframeSrc: 'https://example.test/docs',
+        hideInBreadcrumb: true
+      })
+    ]
+
+    expect(schemaToRouteRecords(schema)).toEqual([
+      {
+        name: 'ops',
+        path: '/ops',
+        meta: { key: 'ops', title: 'Ops', flatMenu: true }
+      },
+      {
+        name: 'jobs',
+        path: '/ops/jobs',
+        meta: { key: 'jobs', title: 'Jobs', badge: 8 }
+      },
+      {
+        name: 'hidden',
+        path: '/ops/hidden',
+        meta: { key: 'hidden', title: 'Hidden job', hideInMenu: true }
+      },
+      {
+        name: 'docs',
+        path: '/iframe/docs',
+        meta: {
+          key: 'docs',
+          title: 'Docs',
+          iframeSrc: 'https://example.test/docs',
+          hideInBreadcrumb: true
+        }
+      }
+    ])
+  })
+
+  it('skips dividers, groups, and href-only menu links', () => {
+    const schema: MenuSchema = [
+      node({ key: 'split', type: 'divider' }),
+      node({
+        key: 'org',
+        type: 'group',
+        label: 'Org',
+        children: [node({ key: 'roles', label: 'Roles', path: '/roles' })]
+      }),
+      node({ key: 'help', label: 'Help', href: 'https://example.test/help' })
+    ]
+
+    expect(schemaToRouteRecords(schema)).toEqual([
+      { name: 'roles', path: '/roles', meta: { key: 'roles', title: 'Roles' } }
+    ])
+  })
+
+  it('drops unauthorized subtrees when a permission checker is passed', () => {
+    const schema: MenuSchema = [
+      node({ key: 'home', label: 'Home', path: '/home' }),
+      node({
+        key: 'admin',
+        label: 'Admin',
+        path: '/admin',
+        permission: 'admin:menu',
+        children: [node({ key: 'audit', label: 'Audit', path: '/admin/audit' })]
+      })
+    ]
+
+    expect(schemaToRouteRecords(schema, allow()).map((item) => item.name)).toEqual(['home'])
+  })
+
+  it('emits iframe-only nodes with an empty path', () => {
+    expect(
+      schemaToRouteRecords([
+        node({ key: 'ext', label: 'Ext', iframeSrc: 'https://example.test/embed' })
+      ])
+    ).toEqual([
+      {
+        name: 'ext',
+        path: '',
+        meta: { key: 'ext', title: 'Ext', iframeSrc: 'https://example.test/embed' }
+      }
+    ])
+  })
+
+  it('does not mutate the input tree and returns a new records array', () => {
+    const child = node({ key: 'jobs', label: 'Jobs', path: '/ops/jobs' })
+    const schema: MenuSchema = [
+      node({
+        key: 'ops',
+        label: 'Ops',
+        path: '/ops',
+        flatMenu: true,
+        children: [child]
+      })
+    ]
+
+    const records = schemaToRouteRecords(schema)
+
+    expect(schema[0]?.children).toEqual([child])
+    expect(records).toHaveLength(2)
+    expect(records[0]?.children).toBeUndefined()
   })
 })

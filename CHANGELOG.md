@@ -5,6 +5,7 @@
 ## Unpublished
 
 - **WorkflowViewer**：只读钉钉风审批树，复用 `WorkflowTimelineStep`（含 children 并行/抄送/条件分支 stub），不另起一套时间线。会签/或签/依次为展示字段；当前路径高亮与驳回回退点只读。`WorkflowActionBar` 可选 `confirm` 确认框配方，文案走 `locale.workflowTimeline`。Vue/React 对称。示例 `timeline/05`。公开 API 增补，无新必填 prop。
+- **MenuSchema 元数据**：`hideInBreadcrumb` / `flatMenu` / `badge` / `iframeSrc` 留在 schema，不写进 `MenuItem`。纯函数 `schemaToRouteRecords` 产出框架无关路由记录（`name` / `path` / `meta`），不做 `addRoute`。`flatMenu` 在菜单里把子节点提到当前层（父级仍作叶子），路由树则把子记录与父级并列；`hideInMenu` 页面仍会进路由记录。Vue/React 示例 `menu/05`。公开 API 增补，无新必填 prop。
 
 ## v2.3.1
 

@@ -420,7 +420,7 @@ Priority: SVG children > \`icon\` > \`name\`. Built-in \`name\` values live in \
 Imperative notification API supports inline toast actions via \`notification.info({ title, actions: [{ label, type, closeOnClick, onClick }] })\`. Action clicks do not trigger the whole-toast \`onClick\`; use \`closeOnClick\` or the callback context \`close()\` to dismiss that toast.
 `,
   Menu: `
-\`collapsed\` only applies to vertical/inline (horizontal \`devWarn\`s). Labels stay \`sr-only\`; text-only items show a first-letter glyph. \`popupPortal\` defaults true.
+\`collapsed\` only applies to vertical/inline (horizontal \`devWarn\`s). Labels stay \`sr-only\`; text-only items show a first-letter glyph. \`popupPortal\` defaults true. Backend trees: \`MenuSchemaNode\` + \`filterMenuByPermission\` / \`menuSchemaToMenuItems\` / \`schemaToRouteRecords\` (schema-only fields stay off \`MenuItem\`; no \`addRoute\`).
 `
 }
 
