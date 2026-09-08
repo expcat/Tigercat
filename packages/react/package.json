@@ -914,6 +914,11 @@
       "import": "./dist/components/WorkflowTimeline.mjs",
       "default": "./dist/components/WorkflowTimeline.mjs"
     },
+    "./WorkflowViewer": {
+      "types": "./dist/components/WorkflowViewer.d.mts",
+      "import": "./dist/components/WorkflowViewer.mjs",
+      "default": "./dist/components/WorkflowViewer.mjs"
+    },
     "./useDrag": {
       "types": "./dist/hooks/useDrag.d.mts",
       "import": "./dist/hooks/useDrag.mjs",

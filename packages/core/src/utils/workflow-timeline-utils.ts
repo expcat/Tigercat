@@ -8,8 +8,12 @@ import type { ButtonVariant } from '../types/button'
 import type { TigerLocaleWorkflowTimeline } from '../types/locale'
 import type { TagVariant } from '../types/tag'
 import type { TimelineItem } from '../types/timeline'
+import { classNames } from './class-names'
 import type {
   WorkflowActionBarItem,
+  WorkflowSignMode,
+  WorkflowStepKind,
+  WorkflowTimelineAction,
   WorkflowTimelineStep,
   WorkflowTimelineStepStatus
 } from '../types/workflow-timeline'
@@ -177,7 +181,9 @@ function copyActor(actor: WorkflowTimelineStep['actor']): WorkflowTimelineStep['
 function copyStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   const next: WorkflowTimelineStep = {
     ...step,
-    status: resolveWorkflowStepStatus(step)
+    status: resolveWorkflowStepStatus(step),
+    kind: resolveWorkflowStepKind(step),
+    signMode: resolveWorkflowSignMode(step)
   }
   if (step.title == null && step.label != null) next.title = step.label
   if (step.actor) next.actor = copyActor(step.actor)
@@ -328,4 +334,288 @@ export function shouldShowWorkflowActions(
   if (!actions || actions.length === 0) return false
   if (showActions === true) return true
   return getCurrentWorkflowStep(steps) != null
+}
+
+export const WORKFLOW_STEP_KINDS: readonly WorkflowStepKind[] = [
+  'start',
+  'approve',
+  'cc',
+  'condition'
+]
+
+export const WORKFLOW_SIGN_MODES: readonly WorkflowSignMode[] = [
+  'sequential',
+  'countersign',
+  'orsign'
+]
+
+const KIND_SET = new Set<string>(WORKFLOW_STEP_KINDS)
+const SIGN_MODE_SET = new Set<string>(WORKFLOW_SIGN_MODES)
+
+export const WORKFLOW_STEP_KIND_LABELS: Record<WorkflowStepKind, string> = {
+  start: 'Start',
+  approve: 'Approval',
+  cc: 'CC',
+  condition: 'Condition'
+}
+
+export const WORKFLOW_SIGN_MODE_LABELS: Record<WorkflowSignMode, string> = {
+  sequential: 'Sequential',
+  countersign: 'Countersign',
+  orsign: 'Or-sign'
+}
+
+export function isWorkflowStepKind(value: unknown): value is WorkflowStepKind {
+  return typeof value === 'string' && KIND_SET.has(value)
+}
+
+export function isWorkflowSignMode(value: unknown): value is WorkflowSignMode {
+  return typeof value === 'string' && SIGN_MODE_SET.has(value)
+}
+
+export function resolveWorkflowStepKind(
+  step: Pick<WorkflowTimelineStep, 'kind'> | undefined
+): WorkflowStepKind {
+  return isWorkflowStepKind(step?.kind) ? step.kind : 'approve'
+}
+
+export function resolveWorkflowSignMode(
+  step: Pick<WorkflowTimelineStep, 'signMode'> | undefined
+): WorkflowSignMode {
+  return isWorkflowSignMode(step?.signMode) ? step.signMode : 'sequential'
+}
+
+export function workflowStepKindLabel(
+  kind: WorkflowStepKind,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): string {
+  if (kind === 'start') return labels?.kindStart || WORKFLOW_STEP_KIND_LABELS.start
+  if (kind === 'cc') return labels?.kindCc || WORKFLOW_STEP_KIND_LABELS.cc
+  if (kind === 'condition') return labels?.kindCondition || WORKFLOW_STEP_KIND_LABELS.condition
+  return labels?.kindApprove || WORKFLOW_STEP_KIND_LABELS.approve
+}
+
+export function workflowSignModeLabel(
+  mode: WorkflowSignMode,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): string {
+  if (mode === 'countersign') {
+    return labels?.signCountersign || WORKFLOW_SIGN_MODE_LABELS.countersign
+  }
+  if (mode === 'orsign') return labels?.signOrsign || WORKFLOW_SIGN_MODE_LABELS.orsign
+  return labels?.signSequential || WORKFLOW_SIGN_MODE_LABELS.sequential
+}
+
+export function workflowActionNeedsConfirm(action: WorkflowTimelineAction): boolean {
+  return action === 'approve' || action === 'reject' || action === 'cancel' || action === 'transfer'
+}
+
+export interface WorkflowActionConfirmCopy {
+  title: string
+  okType: 'primary' | 'danger'
+}
+
+export function getWorkflowActionConfirmCopy(
+  action: WorkflowTimelineAction,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): WorkflowActionConfirmCopy | null {
+  if (action === 'approve') {
+    return { title: labels?.confirmApprove || 'Approve this step?', okType: 'primary' }
+  }
+  if (action === 'reject') {
+    return { title: labels?.confirmReject || 'Reject this request?', okType: 'danger' }
+  }
+  if (action === 'cancel') {
+    return { title: labels?.confirmCancel || 'Withdraw this request?', okType: 'danger' }
+  }
+  if (action === 'transfer') {
+    return { title: labels?.confirmTransfer || 'Transfer this step?', okType: 'primary' }
+  }
+  return null
+}
+
+/**
+ * Per-item `confirm` wins. Otherwise the bar `confirm` flag applies to actions
+ * that use the confirm-dialog recipe (approve / reject / cancel / transfer).
+ */
+export function shouldConfirmWorkflowAction(
+  item: Pick<WorkflowActionBarItem, 'action' | 'confirm'>,
+  barConfirm?: boolean
+): boolean {
+  if (item.confirm === false) return false
+  if (item.confirm === true) return workflowActionNeedsConfirm(item.action)
+  if (barConfirm !== true) return false
+  return workflowActionNeedsConfirm(item.action)
+}
+
+export const EMPTY_WORKFLOW_VIEWER_NODES: WorkflowViewerNode[] = []
+
+export const workflowViewerRootClasses = 'w-full'
+export const workflowViewerListClasses = 'm-0 flex list-none flex-col items-center p-0'
+export const workflowViewerBranchClasses =
+  'm-0 flex list-none flex-row flex-wrap items-start justify-center gap-6 p-0'
+export const workflowViewerItemClasses = 'flex w-full min-w-0 flex-col items-center'
+export const workflowViewerConnectorClasses = 'h-4 w-px bg-[var(--tiger-border,#d1d5db)]'
+export const workflowViewerCardClasses =
+  'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2 shadow-sm'
+export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary,#2563eb)]'
+export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error,#dc2626)]'
+export const workflowViewerCardOffPathClasses = 'opacity-50'
+export const workflowViewerCardActiveClasses =
+  'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
+export const workflowViewerKindRowClasses = 'flex flex-wrap items-center gap-1'
+export const workflowViewerRollbackLabelClasses = 'mt-1 text-xs text-[var(--tiger-error,#dc2626)]'
+
+/**
+ * A tree node derived from {@link WorkflowTimelineStep}. This is a view model
+ * over the existing step list, not a second timeline.
+ */
+export interface WorkflowViewerNode {
+  key: string
+  step: WorkflowTimelineStep
+  status: WorkflowTimelineStepStatus
+  kind: WorkflowStepKind
+  signMode: WorkflowSignMode
+  onPath: boolean
+  rollbackPoint: boolean
+  children: WorkflowViewerNode[]
+}
+
+function isTakenStatus(status: WorkflowTimelineStepStatus): boolean {
+  return (
+    status === 'approved' || status === 'active' || status === 'rejected' || status === 'canceled'
+  )
+}
+
+function findPathToKey(steps: readonly WorkflowTimelineStep[], targetKey: string): string[] | null {
+  const prefix: string[] = []
+  for (const step of steps) {
+    prefix.push(step.key)
+    if (step.key === targetKey) return prefix
+    if (step.children && step.children.length > 0) {
+      const nested = findPathToKey(step.children, targetKey)
+      if (nested) return [...prefix, ...nested]
+    }
+  }
+  return null
+}
+
+/**
+ * Explicit `rollbackPoint: true` wins; otherwise the last rejected step in
+ * display order. `undefined` when the tree has no reject.
+ */
+export function getWorkflowRollbackStep(
+  steps: readonly WorkflowTimelineStep[] | undefined
+): WorkflowTimelineStep | undefined {
+  if (!steps || steps.length === 0) return undefined
+  const normalized = normalizeWorkflowTimelineSteps(steps)
+  let explicit: WorkflowTimelineStep | undefined
+  let lastRejected: WorkflowTimelineStep | undefined
+  visitSteps(normalized, (step) => {
+    if (step.rollbackPoint === true && !explicit) explicit = step
+    if (resolveWorkflowStepStatus(step) === 'rejected') lastRejected = step
+  })
+  return explicit ?? lastRejected
+}
+
+/**
+ * Keys on the taken path: start → current active step, or start → rollback
+ * when no step is active. A fully approved tree uses the last taken step.
+ * Condition siblings that were not taken stay off the path. Parallel / CC
+ * children of an on-path parent that are taken (or pending under an active
+ * parent) join the path.
+ */
+export function getWorkflowCurrentPathKeys(
+  steps: readonly WorkflowTimelineStep[] | undefined
+): Set<string> {
+  const normalized = normalizeWorkflowTimelineSteps(steps)
+  if (normalized === EMPTY_WORKFLOW_TIMELINE_STEPS) return new Set()
+
+  const current = getCurrentWorkflowStep(normalized)
+  const rollback = getWorkflowRollbackStep(normalized)
+  let endKey = current?.key ?? rollback?.key
+  if (endKey == null) {
+    const flat = flattenSteps(normalized)
+    for (let index = flat.length - 1; index >= 0; index -= 1) {
+      const step = flat[index]
+      if (!step) continue
+      const status = resolveWorkflowStepStatus(step)
+      if (status === 'approved' || status === 'canceled') {
+        endKey = step.key
+        break
+      }
+    }
+  }
+  if (endKey == null) return new Set()
+
+  const ancestorPath = findPathToKey(normalized, endKey)
+  if (!ancestorPath) return new Set()
+  const path = new Set(ancestorPath)
+
+  const expand = (list: readonly WorkflowTimelineStep[]): void => {
+    for (const step of list) {
+      if (!path.has(step.key) || !step.children || step.children.length === 0) continue
+      const kind = resolveWorkflowStepKind(step)
+      const status = resolveWorkflowStepStatus(step)
+      for (const child of step.children) {
+        const childStatus = resolveWorkflowStepStatus(child)
+        const include =
+          path.has(child.key) ||
+          isTakenStatus(childStatus) ||
+          (kind !== 'condition' && status === 'active' && childStatus === 'pending')
+        if (include) path.add(child.key)
+      }
+      expand(step.children)
+    }
+  }
+  expand(normalized)
+  return path
+}
+
+export function buildWorkflowViewerTree(
+  steps: readonly WorkflowTimelineStep[] | undefined
+): WorkflowViewerNode[] {
+  const normalized = normalizeWorkflowTimelineSteps(steps)
+  if (normalized === EMPTY_WORKFLOW_TIMELINE_STEPS) return EMPTY_WORKFLOW_VIEWER_NODES
+  const path = getWorkflowCurrentPathKeys(normalized)
+  const rollback = getWorkflowRollbackStep(normalized)
+
+  const mapList = (list: readonly WorkflowTimelineStep[]): WorkflowViewerNode[] =>
+    list.map((step) => ({
+      key: step.key,
+      step,
+      status: resolveWorkflowStepStatus(step),
+      kind: resolveWorkflowStepKind(step),
+      signMode: resolveWorkflowSignMode(step),
+      onPath: path.has(step.key),
+      rollbackPoint: rollback?.key === step.key,
+      children: step.children ? mapList(step.children) : []
+    }))
+
+  return mapList(normalized)
+}
+
+export function workflowViewerChildLayout(node: {
+  children: readonly unknown[]
+}): 'stack' | 'branch' {
+  return node.children.length > 1 ? 'branch' : 'stack'
+}
+
+export function workflowViewerCardClassName(
+  node: Pick<WorkflowViewerNode, 'onPath' | 'rollbackPoint' | 'status'>,
+  options?: { highlightPath?: boolean; showRollbackPoint?: boolean }
+): string {
+  const highlightPath = options?.highlightPath !== false
+  const showRollbackPoint = options?.showRollbackPoint !== false
+  const rollback = showRollbackPoint && node.rollbackPoint
+  return classNames(
+    workflowViewerCardClasses,
+    highlightPath && !node.onPath ? workflowViewerCardOffPathClasses : null,
+    rollback
+      ? workflowViewerCardRollbackClasses
+      : highlightPath && node.onPath
+        ? workflowViewerCardOnPathClasses
+        : null,
+    node.status === 'active' ? workflowViewerCardActiveClasses : null
+  )
 }

@@ -83,7 +83,21 @@ export const jaJP: TigerLocale = {
     rejected: '却下',
     canceled: '取消済み',
     ariaLabel: 'ワークフロー',
-    actionsAriaLabel: 'ワークフロー操作'
+    actionsAriaLabel: 'ワークフロー操作',
+    kindStart: '起票',
+    kindApprove: '承認',
+    kindCc: '同報',
+    kindCondition: '条件',
+    signSequential: '順次承認',
+    signCountersign: '全員承認',
+    signOrsign: 'いずれか承認',
+    viewerAriaLabel: 'ワークフロー',
+    currentPath: '現在の経路',
+    rollbackPoint: '差戻し地点',
+    confirmApprove: 'このステップを承認しますか？',
+    confirmReject: 'この申請を却下しますか？',
+    confirmCancel: 'この申請を取り消しますか？',
+    confirmTransfer: 'このステップを転送しますか？'
   },
   progress: {
     ariaLabel: '進捗'

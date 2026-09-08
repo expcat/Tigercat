@@ -100,7 +100,8 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'NotificationCenter',
       'TaskBoard',
       'WorkflowActionBar',
-      'WorkflowTimeline'
+      'WorkflowTimeline',
+      'WorkflowViewer'
     ]
   }).flatMap(([group, components]) => components.map((component) => [component, group]))
 )

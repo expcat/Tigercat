@@ -20,6 +20,18 @@ export type WorkflowTimelineStepStatus = 'pending' | 'active' | 'approved' | 're
 export type WorkflowTimelineAction = 'approve' | 'reject' | 'transfer' | 'cancel' | 'comment'
 
 /**
+ * Display kind for a workflow tree node. Omitted values normalize to `approve`.
+ * Condition is a branch stub, not a BPMN gateway.
+ */
+export type WorkflowStepKind = 'start' | 'approve' | 'cc' | 'condition'
+
+/**
+ * How an approval node collects signatures. Display-only.
+ * `sequential` = 依次, `countersign` = 会签, `orsign` = 或签.
+ */
+export type WorkflowSignMode = 'sequential' | 'countersign' | 'orsign'
+
+/**
  * Actor on a workflow step. Avatar is an image URL; icon is a registered
  * name string (not a framework node).
  */
@@ -84,8 +96,22 @@ export interface WorkflowTimelineStep {
   order?: number
   /**
    * Nested parallel / CC stubs. Kept minimal; flatten when mapping to Timeline.
+   * WorkflowViewer keeps this tree (parallel / CC / condition branches).
    */
   children?: WorkflowTimelineStep[]
+  /**
+   * Tree-node kind. Omitted / unknown values normalize to `approve`.
+   */
+  kind?: WorkflowStepKind
+  /**
+   * Countersign / or-sign / sequential. Display-only; omitted means sequential.
+   */
+  signMode?: WorkflowSignMode
+  /**
+   * Marks this step as the reject rollback point. Viewer also infers the last
+   * rejected step when no explicit flag is set.
+   */
+  rollbackPoint?: boolean
 }
 
 /**
@@ -127,6 +153,11 @@ export interface WorkflowActionBarItem {
    * Omitted / empty means unrestricted.
    */
   permission?: string | string[]
+  /**
+   * When true, this item always uses the confirm-dialog recipe.
+   * When false, it never does. Omitted: follow the action-bar `confirm` flag.
+   */
+  confirm?: boolean
 }
 
 /**
@@ -146,6 +177,11 @@ export interface WorkflowTimelineProps {
    * and `getCurrentWorkflowStep` finds an `active` step.
    */
   showActions?: boolean
+  /**
+   * Forwarded to the nested action bar confirm-dialog recipe.
+   * @default false
+   */
+  confirm?: boolean
   /**
    * Timeline layout mode. Passed through to Timeline.
    * @default 'left'
@@ -195,6 +231,45 @@ export interface WorkflowActionBarProps {
    * Accessible name for the toolbar. Defaults to "Workflow actions".
    */
   ariaLabel?: string
+  /**
+   * Enable the confirm-dialog recipe for approve / reject / cancel / transfer.
+   * Per-item `confirm` overrides this. Copy comes from `locale.workflowTimeline`.
+   * @default false
+   */
+  confirm?: boolean
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+/**
+ * Read-only DingTalk-style workflow tree. Same {@link WorkflowTimelineStep}
+ * model as WorkflowTimeline — not a second timeline.
+ */
+export interface WorkflowViewerProps {
+  /**
+   * Approval steps. Normalized in place; children stay nested for the tree.
+   */
+  steps?: WorkflowTimelineStep[]
+  /**
+   * Highlight the taken path from start to the current or rollback step.
+   * @default true
+   */
+  highlightPath?: boolean
+  /**
+   * Show the reject rollback-point label when a rejected step exists.
+   * @default true
+   */
+  showRollbackPoint?: boolean
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+  /**
+   * Kind / sign-mode / path overlay. Wins over `locale.workflowTimeline`.
+   */
+  labels?: Partial<TigerLocaleWorkflowTimeline>
   /**
    * Additional CSS classes
    */

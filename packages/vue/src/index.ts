@@ -168,6 +168,8 @@ export type {
   WorkflowTimelineProps,
   WorkflowActionBarProps
 } from './components/WorkflowTimeline'
+export { WorkflowViewer } from './components/WorkflowViewer'
+export type { VueWorkflowViewerProps, WorkflowViewerProps } from './components/WorkflowViewer'
 export { Countdown } from './components/Countdown'
 export type { VueCountdownProps, CountdownProps } from './components/Countdown'
 export { Tree } from './components/Tree'

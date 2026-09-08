@@ -1,12 +1,16 @@
 import React, { useMemo } from 'react'
 import {
   classNames,
+  getWorkflowActionConfirmCopy,
   getWorkflowTimelineLabels,
   mergeTigerLocale,
   resolveWorkflowActionButtonProps,
+  resolveWorkflowSignMode,
+  shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
   timelineDescriptionClasses,
   timelineLabelClasses,
+  workflowSignModeLabel,
   workflowStepsToTimelineItems,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
@@ -19,6 +23,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
+import { Popconfirm } from './Popconfirm'
 import { Tag } from './Tag'
 import { Timeline } from './Timeline'
 
@@ -62,12 +67,19 @@ function renderStepContent(
   const step = item.step
   const title = step.title ?? step.label
   const statusLabel = workflowStepStatusLabel(item.status, labels)
+  const signMode = resolveWorkflowSignMode(step)
+  const showSignMode = signMode !== 'sequential'
 
   return (
     <div className="min-w-0">
       {step.time ? <div className={timelineLabelClasses}>{step.time}</div> : null}
       <div className={workflowStepHeaderClasses}>
         {title ? <div className={timelineDescriptionClasses}>{title}</div> : null}
+        {showSignMode ? (
+          <Tag variant="primary" size="sm" pill>
+            {workflowSignModeLabel(signMode, labels)}
+          </Tag>
+        ) : null}
         <Tag variant={workflowStepStatusTagVariant(item.status)} size="sm" pill>
           {statusLabel}
         </Tag>
@@ -82,6 +94,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   items,
   disabled,
   ariaLabel,
+  confirm,
   className,
   style,
   onAction,
@@ -102,19 +115,41 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       {(items ?? []).map((item) => {
         const buttonProps = resolveWorkflowActionButtonProps(item)
         const isDisabled = Boolean(disabled || item.disabled)
-        return (
+        const confirmCopy = shouldConfirmWorkflowAction(item, confirm)
+          ? getWorkflowActionConfirmCopy(item.action, stepLabels)
+          : null
+        const button = (
           <Button
             key={item.key}
             size="sm"
             variant={buttonProps.variant}
             danger={buttonProps.danger}
             disabled={isDisabled}
-            onClick={() => {
+            onClick={
+              confirmCopy
+                ? undefined
+                : () => {
+                    if (isDisabled) return
+                    onAction?.(item)
+                  }
+            }>
+            {item.label}
+          </Button>
+        )
+        if (!confirmCopy) return button
+        return (
+          <Popconfirm
+            key={item.key}
+            asChild
+            title={confirmCopy.title}
+            okType={confirmCopy.okType}
+            disabled={isDisabled}
+            onConfirm={() => {
               if (isDisabled) return
               onAction?.(item)
             }}>
-            {item.label}
-          </Button>
+            {button}
+          </Popconfirm>
         )
       })}
     </div>
@@ -125,6 +160,7 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   steps,
   actions,
   showActions,
+  confirm,
   mode = 'left',
   pending = false,
   pendingDot,
@@ -167,6 +203,7 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
       ) : (
         <WorkflowActionBar
           items={actions}
+          confirm={confirm}
           onAction={onAction}
           ariaLabel={stepLabels.actionsAriaLabel}
         />

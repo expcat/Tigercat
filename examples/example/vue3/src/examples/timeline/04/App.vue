@@ -67,7 +67,7 @@ function onAction(item: WorkflowActionBarItem) {
 
 <template>
   <div class="space-y-3">
-    <WorkflowTimeline :steps="steps" :actions="actions" @action="onAction" />
+    <WorkflowTimeline :steps="steps" :actions="actions" confirm @action="onAction" />
     <p v-if="lastAction" class="text-sm text-[var(--tiger-text-muted)]">
       最近操作：{{ lastAction }}
     </p>

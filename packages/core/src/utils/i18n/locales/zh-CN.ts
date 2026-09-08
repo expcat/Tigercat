@@ -82,7 +82,21 @@ export const zhCN: TigerLocale = {
     rejected: '已驳回',
     canceled: '已撤销',
     ariaLabel: '审批进度',
-    actionsAriaLabel: '审批操作'
+    actionsAriaLabel: '审批操作',
+    kindStart: '发起',
+    kindApprove: '审批',
+    kindCc: '抄送',
+    kindCondition: '条件',
+    signSequential: '依次审批',
+    signCountersign: '会签',
+    signOrsign: '或签',
+    viewerAriaLabel: '审批流程',
+    currentPath: '当前路径',
+    rollbackPoint: '驳回回退点',
+    confirmApprove: '确认通过该步骤？',
+    confirmReject: '确认驳回该申请？',
+    confirmCancel: '确认撤销该申请？',
+    confirmTransfer: '确认转交该步骤？'
   },
   progress: {
     ariaLabel: '进度'

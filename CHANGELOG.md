@@ -2,6 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## Unpublished
+
+- **WorkflowViewer**：只读钉钉风审批树，复用 `WorkflowTimelineStep`（含 children 并行/抄送/条件分支 stub），不另起一套时间线。会签/或签/依次为展示字段；当前路径高亮与驳回回退点只读。`WorkflowActionBar` 可选 `confirm` 确认框配方，文案走 `locale.workflowTimeline`。Vue/React 对称。示例 `timeline/05`。公开 API 增补，无新必填 prop。
+
 ## v2.3.1
 
 v2.3.1：Admin 审查回流的展示修复。无新必填 prop。

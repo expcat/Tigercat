@@ -83,7 +83,21 @@ export const zhTW: TigerLocale = {
     rejected: '已駁回',
     canceled: '已撤銷',
     ariaLabel: '審批進度',
-    actionsAriaLabel: '審批操作'
+    actionsAriaLabel: '審批操作',
+    kindStart: '發起',
+    kindApprove: '審批',
+    kindCc: '抄送',
+    kindCondition: '條件',
+    signSequential: '依序審批',
+    signCountersign: '會簽',
+    signOrsign: '或簽',
+    viewerAriaLabel: '審批流程',
+    currentPath: '目前路徑',
+    rollbackPoint: '駁回回退點',
+    confirmApprove: '確認通過此步驟？',
+    confirmReject: '確認駁回此申請？',
+    confirmCancel: '確認撤銷此申請？',
+    confirmTransfer: '確認轉交此步驟？'
   },
   progress: {
     ariaLabel: '進度'

@@ -82,7 +82,21 @@ export const enUS: TigerLocale = {
     rejected: 'Rejected',
     canceled: 'Canceled',
     ariaLabel: 'Workflow timeline',
-    actionsAriaLabel: 'Workflow actions'
+    actionsAriaLabel: 'Workflow actions',
+    kindStart: 'Start',
+    kindApprove: 'Approval',
+    kindCc: 'CC',
+    kindCondition: 'Condition',
+    signSequential: 'Sequential',
+    signCountersign: 'Countersign',
+    signOrsign: 'Or-sign',
+    viewerAriaLabel: 'Workflow',
+    currentPath: 'Current path',
+    rollbackPoint: 'Rollback point',
+    confirmApprove: 'Approve this step?',
+    confirmReject: 'Reject this request?',
+    confirmCancel: 'Withdraw this request?',
+    confirmTransfer: 'Transfer this step?'
   },
   progress: {
     ariaLabel: 'Progress'

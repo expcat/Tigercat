@@ -83,7 +83,21 @@ export const viVN: TigerLocale = {
     rejected: 'Đã từ chối',
     canceled: 'Đã hủy',
     ariaLabel: 'Tiến trình phê duyệt',
-    actionsAriaLabel: 'Thao tác phê duyệt'
+    actionsAriaLabel: 'Thao tác phê duyệt',
+    kindStart: 'Khởi tạo',
+    kindApprove: 'Phê duyệt',
+    kindCc: 'Đồng gửi',
+    kindCondition: 'Điều kiện',
+    signSequential: 'Tuần tự',
+    signCountersign: 'Ký duyệt chung',
+    signOrsign: 'Hoặc-ký',
+    viewerAriaLabel: 'Quy trình',
+    currentPath: 'Đường hiện tại',
+    rollbackPoint: 'Điểm hoàn lại',
+    confirmApprove: 'Phê duyệt bước này?',
+    confirmReject: 'Từ chối yêu cầu này?',
+    confirmCancel: 'Rút yêu cầu này?',
+    confirmTransfer: 'Chuyển bước này?'
   },
   progress: {
     ariaLabel: 'Tiến độ'

@@ -120,6 +120,34 @@ export interface TigerLocaleWorkflowTimeline {
   ariaLabel?: string
   /** Accessible name for the action toolbar */
   actionsAriaLabel?: string
+  /** Node kind: start / initiator */
+  kindStart?: string
+  /** Node kind: approval */
+  kindApprove?: string
+  /** Node kind: carbon copy */
+  kindCc?: string
+  /** Node kind: condition branch stub */
+  kindCondition?: string
+  /** Sign mode: sequential approval */
+  signSequential?: string
+  /** Sign mode: all must approve (countersign) */
+  signCountersign?: string
+  /** Sign mode: any one approval (or-sign) */
+  signOrsign?: string
+  /** Accessible name for the read-only workflow tree */
+  viewerAriaLabel?: string
+  /** Current-path highlight label */
+  currentPath?: string
+  /** Reject rollback-point label */
+  rollbackPoint?: string
+  /** ActionBar confirm title: approve */
+  confirmApprove?: string
+  /** ActionBar confirm title: reject */
+  confirmReject?: string
+  /** ActionBar confirm title: cancel / withdraw */
+  confirmCancel?: string
+  /** ActionBar confirm title: transfer */
+  confirmTransfer?: string
 }
 
 export interface TigerLocaleProgress {

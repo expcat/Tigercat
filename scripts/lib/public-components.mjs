@@ -452,6 +452,8 @@ export const COMPONENT_ROUTE_ALIASES = {
   工作流时间线: ['WorkflowTimeline'],
   审批时间线: ['WorkflowTimeline'],
   审批操作条: ['WorkflowActionBar'],
+  工作流视图: ['WorkflowViewer'],
+  审批流程树: ['WorkflowViewer'],
   文件管理: ['FileManager'],
   通知中心: ['NotificationCenter'],
   新手引导: ['Tour'],

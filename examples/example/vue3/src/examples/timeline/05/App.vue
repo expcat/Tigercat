@@ -1,0 +1,100 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
+import { WorkflowActionBar } from '@expcat/tigercat-vue/WorkflowTimeline'
+import { WorkflowViewer } from '@expcat/tigercat-vue/WorkflowViewer'
+
+const steps: WorkflowTimelineStep[] = [
+  {
+    key: 'start',
+    kind: 'start',
+    title: '提交申请',
+    status: 'approved',
+    actor: { name: '张三' },
+    time: '2026-09-01 09:12',
+    order: 1
+  },
+  {
+    key: 'draft',
+    title: '初审',
+    status: 'rejected',
+    rollbackPoint: true,
+    actor: { name: '李四' },
+    comment: '请补充发票后重提。',
+    time: '2026-09-01 11:00',
+    order: 2
+  },
+  {
+    key: 'manager',
+    title: '主管会签',
+    status: 'approved',
+    signMode: 'countersign',
+    actor: { name: '会签组' },
+    time: '2026-09-02 10:00',
+    order: 3,
+    children: [
+      { key: 'm1', title: '李四', status: 'approved', actor: { name: '李四' } },
+      { key: 'm2', title: '钱七', status: 'approved', actor: { name: '钱七' } }
+    ]
+  },
+  {
+    key: 'cc',
+    kind: 'cc',
+    title: '抄送 HR',
+    status: 'canceled',
+    actor: { name: 'HR' },
+    time: '2026-09-02 10:01',
+    order: 4
+  },
+  {
+    key: 'cond',
+    kind: 'condition',
+    title: '金额判断',
+    status: 'approved',
+    order: 5,
+    children: [
+      { key: 'low', title: '≤ 5000 自动', status: 'approved' },
+      { key: 'high', title: '> 5000 加签', status: 'pending' }
+    ]
+  },
+  {
+    key: 'director',
+    title: '总监审批',
+    status: 'active',
+    signMode: 'orsign',
+    actor: { name: '王五' },
+    time: '待处理',
+    order: 6
+  },
+  {
+    key: 'finance',
+    title: '财务复核',
+    status: 'pending',
+    actor: { name: '赵六' },
+    order: 7
+  }
+]
+
+const actions: WorkflowActionBarItem[] = [
+  { key: 'approve', label: '通过', action: 'approve', variant: 'primary' },
+  { key: 'reject', label: '驳回', action: 'reject', variant: 'danger' },
+  { key: 'transfer', label: '转交', action: 'transfer', variant: 'outline' },
+  { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' }
+]
+
+const lastAction = ref('')
+
+function onAction(item: WorkflowActionBarItem) {
+  lastAction.value = item.label
+}
+</script>
+
+<template>
+  <div class="space-y-4">
+    <WorkflowViewer :steps="steps" />
+    <WorkflowActionBar :items="actions" confirm @action="onAction" />
+    <p v-if="lastAction" class="text-sm text-[var(--tiger-text-muted)]">
+      最近操作：{{ lastAction }}
+    </p>
+  </div>
+</template>

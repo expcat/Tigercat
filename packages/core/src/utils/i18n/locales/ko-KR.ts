@@ -83,7 +83,21 @@ export const koKR: TigerLocale = {
     rejected: '반려됨',
     canceled: '취소됨',
     ariaLabel: '워크플로',
-    actionsAriaLabel: '워크플로 작업'
+    actionsAriaLabel: '워크플로 작업',
+    kindStart: '기안',
+    kindApprove: '결재',
+    kindCc: '참조',
+    kindCondition: '조건',
+    signSequential: '순차 결재',
+    signCountersign: '합의',
+    signOrsign: '또는 결재',
+    viewerAriaLabel: '워크플로',
+    currentPath: '현재 경로',
+    rollbackPoint: '반려 되돌림 지점',
+    confirmApprove: '이 단계를 승인할까요?',
+    confirmReject: '이 요청을 반려할까요?',
+    confirmCancel: '이 요청을 취소할까요?',
+    confirmTransfer: '이 단계를 전달할까요?'
   },
   progress: {
     ariaLabel: '진행률'

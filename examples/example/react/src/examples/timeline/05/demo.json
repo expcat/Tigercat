@@ -1,0 +1,7 @@
+{
+  "id": "timeline-05",
+  "title": "审批流程树",
+  "description": "WorkflowViewer 用同一套 step 模型画只读钉钉风树：发起、会签、抄送、条件分支 stub、当前路径与驳回回退点。ActionBar 打开确认框配方。",
+  "entry": "App.tsx",
+  "order": 5
+}

@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 177,
+  "component_count": 178,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -207,6 +207,8 @@
     "工作流时间线": ["WorkflowTimeline"],
     "审批时间线": ["WorkflowTimeline"],
     "审批操作条": ["WorkflowActionBar"],
+    "工作流视图": ["WorkflowViewer"],
+    "审批流程树": ["WorkflowViewer"],
     "文件管理": ["FileManager"],
     "通知中心": ["NotificationCenter"],
     "新手引导": ["Tour"],
@@ -403,7 +405,8 @@
         "NotificationCenter",
         "TaskBoard",
         "WorkflowActionBar",
-        "WorkflowTimeline"
+        "WorkflowTimeline",
+        "WorkflowViewer"
       ],
       "examples": "skills/tigercat/references/examples/composite.md"
     },
@@ -1969,6 +1972,26 @@
       "typeSource": "packages/core/src/types/workflow-timeline.ts",
       "sourceFiles": ["packages/core/src/types/workflow-timeline.ts"],
       "propsInterfaces": ["WorkflowTimelineProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "WorkflowViewer": {
+      "name": "WorkflowViewer",
+      "aliases": ["工作流视图", "审批流程树"],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./WorkflowViewer",
+      "packageTarget": "WorkflowViewer",
+      "typeSource": "packages/core/src/types/workflow-timeline.ts",
+      "sourceFiles": ["packages/core/src/types/workflow-timeline.ts"],
+      "propsInterfaces": ["WorkflowViewerProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

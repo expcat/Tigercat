@@ -201,9 +201,14 @@ const COMPONENT_USAGE_NOTES = {
       '把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。`actions` 是展示用操作条（通过/驳回/转交/撤销/评论），无 BPM 引擎。默认在当前步骤为 `active` 且传入 `actions` 时显示操作条。'
   },
   WorkflowActionBar: {
-    uses: ['Button'],
+    uses: ['Button', 'Popconfirm'],
     notes:
-      '展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。'
+      '展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。`confirm` 打开确认框配方（通过/驳回/撤销/转交），文案走 `locale.workflowTimeline`；逐项 `confirm` 可覆盖。'
+  },
+  WorkflowViewer: {
+    uses: ['Tag'],
+    notes:
+      '只读钉钉风审批树，复用 `WorkflowTimelineStep`（含 children 并行/抄送/条件分支 stub），不另起一套时间线。会签/或签/依次为展示字段。当前路径高亮与驳回回退点只读。无 BPM 引擎。'
   },
   Countdown: {
     notes:

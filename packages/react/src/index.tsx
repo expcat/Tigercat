@@ -161,6 +161,8 @@ export { Timeline } from './components/Timeline'
 export type { TimelineProps } from './components/Timeline'
 export { WorkflowTimeline, WorkflowActionBar } from './components/WorkflowTimeline'
 export type { WorkflowTimelineProps, WorkflowActionBarProps } from './components/WorkflowTimeline'
+export { WorkflowViewer } from './components/WorkflowViewer'
+export type { WorkflowViewerProps } from './components/WorkflowViewer'
 export { Countdown } from './components/Countdown'
 export type { CountdownProps } from './components/Countdown'
 

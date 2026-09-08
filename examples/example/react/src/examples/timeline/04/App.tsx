@@ -66,7 +66,7 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <WorkflowTimeline steps={steps} actions={actions} onAction={onAction} />
+      <WorkflowTimeline steps={steps} actions={actions} confirm onAction={onAction} />
       {lastAction ? (
         <p className="text-sm text-[var(--tiger-text-muted)]">最近操作：{lastAction}</p>
       ) : null}

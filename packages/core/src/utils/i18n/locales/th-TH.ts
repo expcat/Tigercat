@@ -83,7 +83,21 @@ export const thTH: TigerLocale = {
     rejected: 'ปฏิเสธแล้ว',
     canceled: 'ยกเลิกแล้ว',
     ariaLabel: 'ไทม์ไลน์ขั้นตอน',
-    actionsAriaLabel: 'การดำเนินการขั้นตอน'
+    actionsAriaLabel: 'การดำเนินการขั้นตอน',
+    kindStart: 'เริ่มต้น',
+    kindApprove: 'อนุมัติ',
+    kindCc: 'สำเนา',
+    kindCondition: 'เงื่อนไข',
+    signSequential: 'ตามลำดับ',
+    signCountersign: 'ลงนามร่วม',
+    signOrsign: 'หรือ-ลงนาม',
+    viewerAriaLabel: 'เวิร์กโฟลว์',
+    currentPath: 'เส้นทางปัจจุบัน',
+    rollbackPoint: 'จุดย้อนกลับ',
+    confirmApprove: 'อนุมัติขั้นตอนนี้?',
+    confirmReject: 'ปฏิเสธคำขอนี้?',
+    confirmCancel: 'ถอนคำขอนี้?',
+    confirmTransfer: 'โอนขั้นตอนนี้?'
   },
   progress: {
     ariaLabel: 'ความคืบหน้า'

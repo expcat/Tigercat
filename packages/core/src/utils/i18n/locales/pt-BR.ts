@@ -83,7 +83,21 @@ export const ptBR: TigerLocale = {
     rejected: 'Rejeitado',
     canceled: 'Cancelado',
     ariaLabel: 'Linha do tempo do fluxo',
-    actionsAriaLabel: 'Ações do fluxo'
+    actionsAriaLabel: 'Ações do fluxo',
+    kindStart: 'Início',
+    kindApprove: 'Aprovação',
+    kindCc: 'Cópia',
+    kindCondition: 'Condição',
+    signSequential: 'Sequencial',
+    signCountersign: 'Contrainatura',
+    signOrsign: 'Ou-assinatura',
+    viewerAriaLabel: 'Fluxo de trabalho',
+    currentPath: 'Caminho atual',
+    rollbackPoint: 'Ponto de retorno',
+    confirmApprove: 'Aprovar esta etapa?',
+    confirmReject: 'Rejeitar esta solicitação?',
+    confirmCancel: 'Retirar esta solicitação?',
+    confirmTransfer: 'Transferir esta etapa?'
   },
   progress: {
     ariaLabel: 'Progresso'

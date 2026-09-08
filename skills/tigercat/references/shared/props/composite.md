@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 9 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 10 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -132,21 +132,22 @@ Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCa
 
 ## WorkflowActionBar
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowActionBarProps` · 3/5 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowActionBarProps` · 4/6 props
 
-Uses: `Button`.
+Uses: `Button`, `Popconfirm`.
 
-Note: 展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。
+Note: 展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。`confirm` 打开确认框配方（通过/驳回/撤销/转交），文案走 `locale.workflowTimeline`；逐项 `confirm` 可覆盖。
 
-| Prop         | Type                      | Default | Notes                                                            |
-| ------------ | ------------------------- | ------- | ---------------------------------------------------------------- |
-| `items?`     | `WorkflowActionBarItem[]` | `-`     | Action buttons to render.                                        |
-| `disabled?`  | `boolean`                 | `-`     | Disable every action, in addition to per-item `disabled`.        |
-| `ariaLabel?` | `string`                  | `-`     | Accessible name for the toolbar. Defaults to "Workflow actions". |
+| Prop         | Type                      | Default | Notes                                                                                      |
+| ------------ | ------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`     | `WorkflowActionBarItem[]` | `-`     | Action buttons to render.                                                                  |
+| `disabled?`  | `boolean`                 | `-`     | Disable every action, in addition to per-item `disabled`.                                  |
+| `confirm?`   | `boolean`                 | `false` | Enable the confirm-dialog recipe for approve / reject / cancel / transfer. Per-item `co... |
+| `ariaLabel?` | `string`                  | `-`     | Accessible name for the toolbar. Defaults to "Workflow actions".                           |
 
 ## WorkflowTimeline
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/15 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/16 props
 
 Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
 
@@ -158,3 +159,18 @@ Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到�
 | `actions?` | `WorkflowActionBarItem[]` | `-`      | Action-bar items. Shown when a step is `active` unless `showActions` overrides. |
 | `mode?`    | `TimelineMode`            | `'left'` | Timeline layout mode. Passed through to Timeline.                               |
 | `pending?` | `boolean`                 | `false`  | Append Timeline's pending item after the mapped steps.                          |
+
+## WorkflowViewer
+
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowViewerProps` · 4/7 props
+
+Uses: `Tag`.
+
+Note: 只读钉钉风审批树，复用 `WorkflowTimelineStep`（含 children 并行/抄送/条件分支 stub），不另起一套时间线。会签/或签/依次为展示字段。当前路径高亮与驳回回退点只读。无 BPM 引擎。
+
+| Prop                 | Type                                   | Default | Notes                                                                   |
+| -------------------- | -------------------------------------- | ------- | ----------------------------------------------------------------------- |
+| `steps?`             | `WorkflowTimelineStep[]`               | `-`     | Approval steps. Normalized in place; children stay nested for the tree. |
+| `highlightPath?`     | `boolean`                              | `true`  | Highlight the taken path from start to the current or rollback step.    |
+| `showRollbackPoint?` | `boolean`                              | `true`  | Show the reject rollback-point label when a rejected step exists.       |
+| `labels?`            | `Partial<TigerLocaleWorkflowTimeline>` | `-`     | Kind / sign-mode / path overlay. Wins over `locale.workflowTimeline`.   |

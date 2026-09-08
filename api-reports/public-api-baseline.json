@@ -269,6 +269,7 @@
       "buildTimePickerColumns",
       "buildTreeIndex",
       "buildTriggerHandlerMap",
+      "buildWorkflowViewerTree",
       "builtinCodeHighlighter",
       "builtinRichTextEngine",
       "buttonBaseClasses",
@@ -1174,6 +1175,7 @@
       "EMPTY_VIRTUAL_TABLE_ROWS",
       "EMPTY_WORKFLOW_ACTION_BAR_ITEMS",
       "EMPTY_WORKFLOW_TIMELINE_STEPS",
+      "EMPTY_WORKFLOW_VIEWER_NODES",
       "emptyActionsClasses",
       "emptyBaseClasses",
       "emptyDatePickerValue",
@@ -2396,6 +2398,9 @@
       "getVisibleTreeItems",
       "getWatermarkOverlayStyle",
       "getWeekStartsOn",
+      "getWorkflowActionConfirmCopy",
+      "getWorkflowCurrentPathKeys",
+      "getWorkflowRollbackStep",
       "getWorkflowTimelineLabels",
       "giftIcon",
       "GlobalTigerLocaleHandle",
@@ -2780,7 +2785,9 @@
       "isValidUrl",
       "isVirtualTableCellControlTarget",
       "isWipExceeded",
+      "isWorkflowSignMode",
       "isWorkflowStepActive",
+      "isWorkflowStepKind",
       "isWorkflowStepPending",
       "isWorkflowStepTerminal",
       "isWorkflowTimelineStepStatus",
@@ -3891,6 +3898,8 @@
       "resolveVisibleResizeHandles",
       "resolveWatermarkFont",
       "resolveWorkflowActionButtonProps",
+      "resolveWorkflowSignMode",
+      "resolveWorkflowStepKind",
       "resolveWorkflowStepStatus",
       "RESPONSIVE_BREAKPOINT_FALLBACK_PX",
       "RESPONSIVE_BREAKPOINT_ORDER",
@@ -4079,6 +4088,7 @@
       "shouldCloseOnMaskClick",
       "shouldCommitImageAnnotationBox",
       "shouldCommitImageAnnotationPath",
+      "shouldConfirmWorkflowAction",
       "shouldDistributeOtpInput",
       "shouldEmitMaskComplete",
       "shouldHandleAnchorClick",
@@ -4943,6 +4953,10 @@
       "wifiIcon",
       "withCropFile",
       "WizardStep",
+      "WORKFLOW_SIGN_MODE_LABELS",
+      "WORKFLOW_SIGN_MODES",
+      "WORKFLOW_STEP_KIND_LABELS",
+      "WORKFLOW_STEP_KINDS",
       "WORKFLOW_STEP_STATUS_COLORS",
       "WORKFLOW_STEP_STATUS_LABELS",
       "WORKFLOW_STEP_STATUS_TAG_VARIANTS",
@@ -4952,8 +4966,14 @@
       "WorkflowActionBarProps",
       "WorkflowActionBarVariant",
       "WorkflowActionButtonProps",
+      "WorkflowActionConfirmCopy",
+      "workflowActionNeedsConfirm",
+      "WorkflowSignMode",
+      "workflowSignModeLabel",
       "workflowStepHighlight",
       "WorkflowStepHighlight",
+      "WorkflowStepKind",
+      "workflowStepKindLabel",
       "workflowStepStatusColor",
       "WorkflowStepStatusCounts",
       "workflowStepStatusLabel",
@@ -4966,6 +4986,22 @@
       "WorkflowTimelineProps",
       "WorkflowTimelineStep",
       "WorkflowTimelineStepStatus",
+      "workflowViewerBranchClasses",
+      "workflowViewerCardActiveClasses",
+      "workflowViewerCardClasses",
+      "workflowViewerCardClassName",
+      "workflowViewerCardOffPathClasses",
+      "workflowViewerCardOnPathClasses",
+      "workflowViewerCardRollbackClasses",
+      "workflowViewerChildLayout",
+      "workflowViewerConnectorClasses",
+      "workflowViewerItemClasses",
+      "workflowViewerKindRowClasses",
+      "workflowViewerListClasses",
+      "WorkflowViewerNode",
+      "WorkflowViewerProps",
+      "workflowViewerRollbackLabelClasses",
+      "workflowViewerRootClasses",
       "writeCommentLikeOverlay",
       "yieldDataExportFrame",
       "ZH_CN_DATEPICKER_LOCALE",
@@ -7805,13 +7841,14 @@
     },
     "WorkflowActionBarProps": {
       "extends": [],
-      "props": ["ariaLabel", "className", "disabled", "items"]
+      "props": ["ariaLabel", "className", "confirm", "disabled", "items"]
     },
     "WorkflowTimelineProps": {
       "extends": [],
       "props": [
         "actions",
         "className",
+        "confirm",
         "labels",
         "locale",
         "mode",
@@ -7821,6 +7858,10 @@
         "showActions",
         "steps"
       ]
+    },
+    "WorkflowViewerProps": {
+      "extends": [],
+      "props": ["className", "highlightPath", "labels", "locale", "showRollbackPoint", "steps"]
     }
   },
   "react": {
@@ -8001,7 +8042,8 @@
       "VirtualTable",
       "Watermark",
       "WorkflowActionBar",
-      "WorkflowTimeline"
+      "WorkflowTimeline",
+      "WorkflowViewer"
     ],
     "componentSubpaths": [
       {
@@ -8888,6 +8930,11 @@
         "component": "WorkflowTimeline",
         "subpath": "./WorkflowTimeline",
         "target": "WorkflowTimeline"
+      },
+      {
+        "component": "WorkflowViewer",
+        "subpath": "./WorkflowViewer",
+        "target": "WorkflowViewer"
       }
     ],
     "exports": [
@@ -9325,7 +9372,9 @@
       "WorkflowActionBar",
       "WorkflowActionBarProps",
       "WorkflowTimeline",
-      "WorkflowTimelineProps"
+      "WorkflowTimelineProps",
+      "WorkflowViewer",
+      "WorkflowViewerProps"
     ]
   },
   "vue": {
@@ -9506,7 +9555,8 @@
       "VirtualTable",
       "Watermark",
       "WorkflowActionBar",
-      "WorkflowTimeline"
+      "WorkflowTimeline",
+      "WorkflowViewer"
     ],
     "componentSubpaths": [
       {
@@ -10393,6 +10443,11 @@
         "component": "WorkflowTimeline",
         "subpath": "./WorkflowTimeline",
         "target": "WorkflowTimeline"
+      },
+      {
+        "component": "WorkflowViewer",
+        "subpath": "./WorkflowViewer",
+        "target": "WorkflowViewer"
       }
     ],
     "exports": [
@@ -10906,11 +10961,14 @@
       "VueWatermarkProps",
       "VueWorkflowActionBarProps",
       "VueWorkflowTimelineProps",
+      "VueWorkflowViewerProps",
       "Watermark",
       "WorkflowActionBar",
       "WorkflowActionBarProps",
       "WorkflowTimeline",
-      "WorkflowTimelineProps"
+      "WorkflowTimelineProps",
+      "WorkflowViewer",
+      "WorkflowViewerProps"
     ]
   }
 }

@@ -83,7 +83,21 @@ export const idID: TigerLocale = {
     rejected: 'Ditolak',
     canceled: 'Dibatalkan',
     ariaLabel: 'Linimasa alur kerja',
-    actionsAriaLabel: 'Tindakan alur kerja'
+    actionsAriaLabel: 'Tindakan alur kerja',
+    kindStart: 'Mulai',
+    kindApprove: 'Persetujuan',
+    kindCc: 'Tembusan',
+    kindCondition: 'Kondisi',
+    signSequential: 'Berurutan',
+    signCountersign: 'Tanda tangan bersama',
+    signOrsign: 'Atau-tanda tangan',
+    viewerAriaLabel: 'Alur kerja',
+    currentPath: 'Jalur saat ini',
+    rollbackPoint: 'Titik pengembalian',
+    confirmApprove: 'Setujui langkah ini?',
+    confirmReject: 'Tolak permintaan ini?',
+    confirmCancel: 'Tarik permintaan ini?',
+    confirmTransfer: 'Alihkan langkah ini?'
   },
   progress: {
     ariaLabel: 'Progres'

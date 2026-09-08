@@ -2,13 +2,17 @@ import { computed, defineComponent, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  getWorkflowActionConfirmCopy,
   getWorkflowTimelineLabels,
   mergeStyleValues,
   mergeTigerLocale,
   resolveWorkflowActionButtonProps,
+  resolveWorkflowSignMode,
+  shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
   timelineDescriptionClasses,
   timelineLabelClasses,
+  workflowSignModeLabel,
   workflowStepsToTimelineItems,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
@@ -23,6 +27,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
+import { Popconfirm } from './Popconfirm'
 import { Tag } from './Tag'
 import { Timeline } from './Timeline'
 
@@ -62,11 +67,20 @@ function renderStepContent(
   const step = item.step
   const title = step.title ?? step.label
   const statusLabel = workflowStepStatusLabel(item.status, labels)
+  const signMode = resolveWorkflowSignMode(step)
+  const showSignMode = signMode !== 'sequential'
 
   return h('div', { class: 'min-w-0' }, [
     step.time ? h('div', { class: timelineLabelClasses }, step.time) : null,
     h('div', { class: workflowStepHeaderClasses }, [
       title ? h('div', { class: timelineDescriptionClasses }, title as unknown as HChildren) : null,
+      showSignMode
+        ? h(
+            Tag,
+            { variant: 'primary', size: 'sm', pill: true },
+            { default: () => workflowSignModeLabel(signMode, labels) }
+          )
+        : null,
       h(
         Tag,
         {
@@ -95,6 +109,7 @@ export const WorkflowActionBar = defineComponent({
       type: String,
       default: undefined
     },
+    confirm: Boolean,
     className: {
       type: String,
       default: undefined
@@ -130,7 +145,10 @@ export const WorkflowActionBar = defineComponent({
         items.map((item) => {
           const buttonProps = resolveWorkflowActionButtonProps(item)
           const disabled = Boolean(props.disabled || item.disabled)
-          return h(
+          const confirmCopy = shouldConfirmWorkflowAction(item, props.confirm)
+            ? getWorkflowActionConfirmCopy(item.action, stepLabels.value)
+            : null
+          const button = h(
             Button,
             {
               key: item.key,
@@ -138,12 +156,30 @@ export const WorkflowActionBar = defineComponent({
               variant: buttonProps.variant,
               danger: buttonProps.danger,
               disabled,
-              onClick: () => {
+              onClick: confirmCopy
+                ? undefined
+                : () => {
+                    if (disabled) return
+                    emit('action', item)
+                  }
+            },
+            { default: () => item.label }
+          )
+          if (!confirmCopy) return button
+          return h(
+            Popconfirm,
+            {
+              key: item.key,
+              asChild: true,
+              title: confirmCopy.title,
+              okType: confirmCopy.okType,
+              disabled,
+              onConfirm: () => {
                 if (disabled) return
                 emit('action', item)
               }
             },
-            { default: () => item.label }
+            { default: () => button }
           )
         })
       )
@@ -167,6 +203,7 @@ export const WorkflowTimeline = defineComponent({
       type: Boolean,
       default: undefined
     },
+    confirm: Boolean,
     mode: {
       type: String as PropType<TimelineMode>,
       default: 'left' as TimelineMode
@@ -232,6 +269,7 @@ export const WorkflowTimeline = defineComponent({
             ? slots.actions({ actions: props.actions })
             : h(WorkflowActionBar, {
                 items: props.actions,
+                confirm: props.confirm,
                 ariaLabel: stepLabels.value.actionsAriaLabel,
                 onAction: (item: WorkflowActionBarItem) => emit('action', item)
               })

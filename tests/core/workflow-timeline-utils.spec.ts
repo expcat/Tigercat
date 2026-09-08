@@ -4,18 +4,28 @@
 
 import { describe, expect, it } from 'vitest'
 import {
+  buildWorkflowViewerTree,
   countWorkflowStepsByStatus,
   EMPTY_WORKFLOW_TIMELINE_STEPS,
   getCurrentWorkflowStep,
+  getWorkflowActionConfirmCopy,
+  getWorkflowCurrentPathKeys,
+  getWorkflowRollbackStep,
   isWorkflowStepActive,
   isWorkflowStepPending,
   isWorkflowStepTerminal,
   isWorkflowTimelineTerminal,
   normalizeWorkflowTimelineSteps,
   resolveWorkflowActionButtonProps,
+  resolveWorkflowSignMode,
+  resolveWorkflowStepKind,
+  shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
   sortWorkflowTimelineSteps,
+  workflowActionNeedsConfirm,
+  workflowSignModeLabel,
   workflowStepHighlight,
+  workflowStepKindLabel,
   workflowStepsToTimelineItems,
   workflowStepStatusColor,
   workflowStepStatusLabel,
@@ -353,5 +363,159 @@ describe('shouldShowWorkflowActions', () => {
   it('lets showActions force the bar on or off', () => {
     expect(shouldShowWorkflowActions(pending, actions, true)).toBe(true)
     expect(shouldShowWorkflowActions(active, actions, false)).toBe(false)
+  })
+})
+
+describe('workflow step kind and sign mode', () => {
+  it('defaults omitted kind to approve and sign mode to sequential', () => {
+    expect(resolveWorkflowStepKind(step({ key: 'a' }))).toBe('approve')
+    expect(resolveWorkflowSignMode(step({ key: 'a' }))).toBe('sequential')
+    expect(resolveWorkflowStepKind(step({ key: 's', kind: 'start' }))).toBe('start')
+    expect(resolveWorkflowSignMode(step({ key: 'c', signMode: 'countersign' }))).toBe('countersign')
+    expect(resolveWorkflowStepKind(step({ key: 'bad', kind: 'gateway' as never }))).toBe('approve')
+  })
+
+  it('fills kind and signMode when normalizing', () => {
+    const normalized = normalizeWorkflowTimelineSteps([
+      step({ key: 'start', kind: 'start', title: 'Start' }),
+      step({ key: 'cc', kind: 'cc', signMode: 'orsign' })
+    ])
+    expect(normalized.map((item) => ({ kind: item.kind, signMode: item.signMode }))).toEqual([
+      { kind: 'start', signMode: 'sequential' },
+      { kind: 'cc', signMode: 'orsign' }
+    ])
+  })
+
+  it('reads kind and sign-mode labels from overlay', () => {
+    expect(workflowStepKindLabel('cc')).toBe('CC')
+    expect(workflowStepKindLabel('start', { kindStart: '发起' })).toBe('发起')
+    expect(workflowSignModeLabel('countersign')).toBe('Countersign')
+    expect(workflowSignModeLabel('orsign', { signOrsign: '或签' })).toBe('或签')
+  })
+})
+
+describe('workflow action confirm recipe', () => {
+  it('needs confirm for approve reject cancel transfer but not comment', () => {
+    expect(workflowActionNeedsConfirm('approve')).toBe(true)
+    expect(workflowActionNeedsConfirm('reject')).toBe(true)
+    expect(workflowActionNeedsConfirm('cancel')).toBe(true)
+    expect(workflowActionNeedsConfirm('transfer')).toBe(true)
+    expect(workflowActionNeedsConfirm('comment')).toBe(false)
+  })
+
+  it('returns confirm copy and danger okType for reject and cancel', () => {
+    expect(getWorkflowActionConfirmCopy('comment')).toBeNull()
+    expect(getWorkflowActionConfirmCopy('approve')?.okType).toBe('primary')
+    expect(getWorkflowActionConfirmCopy('reject')?.okType).toBe('danger')
+    expect(getWorkflowActionConfirmCopy('reject', { confirmReject: '确认驳回？' })?.title).toBe(
+      '确认驳回？'
+    )
+  })
+
+  it('lets per-item confirm override the bar flag', () => {
+    expect(shouldConfirmWorkflowAction({ action: 'approve' })).toBe(false)
+    expect(shouldConfirmWorkflowAction({ action: 'approve' }, true)).toBe(true)
+    expect(shouldConfirmWorkflowAction({ action: 'comment' }, true)).toBe(false)
+    expect(shouldConfirmWorkflowAction({ action: 'reject', confirm: false }, true)).toBe(false)
+    expect(shouldConfirmWorkflowAction({ action: 'reject', confirm: true }, false)).toBe(true)
+  })
+})
+
+describe('workflow current path and rollback', () => {
+  it('marks the path from start to the active step and parallel taken children', () => {
+    const steps: WorkflowTimeline = [
+      step({
+        key: 'start',
+        kind: 'start',
+        status: 'approved',
+        children: [step({ key: 'cc', kind: 'cc', status: 'canceled' })]
+      }),
+      step({
+        key: 'manager',
+        status: 'active',
+        signMode: 'countersign',
+        children: [step({ key: 'a', status: 'approved' }), step({ key: 'b', status: 'pending' })]
+      }),
+      step({ key: 'finance', status: 'pending' })
+    ]
+
+    expect([...getWorkflowCurrentPathKeys(steps)].sort()).toEqual([
+      'a',
+      'b',
+      'cc',
+      'manager',
+      'start'
+    ])
+    expect(getWorkflowRollbackStep(steps)).toBeUndefined()
+  })
+
+  it('stops at the rollback point when no step is active', () => {
+    const steps: WorkflowTimeline = [
+      step({ key: 'start', kind: 'start', status: 'approved' }),
+      step({ key: 'manager', status: 'rejected', rollbackPoint: true }),
+      step({ key: 'finance', status: 'pending' })
+    ]
+
+    expect([...getWorkflowCurrentPathKeys(steps)]).toEqual(['start', 'manager'])
+    expect(getWorkflowRollbackStep(steps)?.key).toBe('manager')
+  })
+
+  it('keeps untaken condition branches off the current path', () => {
+    const steps: WorkflowTimeline = [
+      step({ key: 'start', kind: 'start', status: 'approved' }),
+      step({
+        key: 'cond',
+        kind: 'condition',
+        status: 'approved',
+        children: [
+          step({ key: 'yes', title: '<=5000', status: 'approved' }),
+          step({ key: 'no', title: '>5000', status: 'pending' })
+        ]
+      }),
+      step({ key: 'now', status: 'active' })
+    ]
+
+    const keys = getWorkflowCurrentPathKeys(steps)
+    expect(keys.has('yes')).toBe(true)
+    expect(keys.has('no')).toBe(false)
+    expect(keys.has('now')).toBe(true)
+  })
+
+  it('infers the last rejected step as the rollback point', () => {
+    expect(getWorkflowRollbackStep(undefined)).toBeUndefined()
+    expect(
+      getWorkflowRollbackStep([
+        step({ key: 'a', status: 'approved' }),
+        step({ key: 'b', status: 'rejected' }),
+        step({ key: 'c', status: 'rejected' })
+      ])?.key
+    ).toBe('c')
+  })
+})
+
+describe('buildWorkflowViewerTree', () => {
+  it('keeps children nested and annotates path plus rollback', () => {
+    const tree = buildWorkflowViewerTree([
+      step({
+        key: 'start',
+        kind: 'start',
+        status: 'approved',
+        children: [step({ key: 'cc', kind: 'cc', status: 'canceled' })]
+      }),
+      step({ key: 'reject', status: 'rejected' }),
+      step({ key: 'later', status: 'pending' })
+    ])
+
+    expect(tree.map((node) => node.key)).toEqual(['start', 'reject', 'later'])
+    expect(tree[0]?.children[0]?.kind).toBe('cc')
+    expect(tree[0]?.onPath).toBe(true)
+    expect(tree[1]?.rollbackPoint).toBe(true)
+    expect(tree[1]?.onPath).toBe(true)
+    expect(tree[2]?.onPath).toBe(false)
+  })
+
+  it('returns the shared empty list for missing steps', () => {
+    expect(buildWorkflowViewerTree(undefined)).toEqual([])
+    expect(buildWorkflowViewerTree([])).toEqual([])
   })
 })

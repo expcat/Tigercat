@@ -83,7 +83,21 @@ export const arSA: TigerLocale = {
     rejected: 'مرفوض',
     canceled: 'ملغى',
     ariaLabel: 'الجدول الزمني لسير العمل',
-    actionsAriaLabel: 'إجراءات سير العمل'
+    actionsAriaLabel: 'إجراءات سير العمل',
+    kindStart: 'بدء',
+    kindApprove: 'موافقة',
+    kindCc: 'نسخة',
+    kindCondition: 'شرط',
+    signSequential: 'بالتتابع',
+    signCountersign: 'توقيع جماعي',
+    signOrsign: 'أو-توقيع',
+    viewerAriaLabel: 'سير العمل',
+    currentPath: 'المسار الحالي',
+    rollbackPoint: 'نقطة التراجع',
+    confirmApprove: 'الموافقة على هذه الخطوة؟',
+    confirmReject: 'رفض هذا الطلب؟',
+    confirmCancel: 'سحب هذا الطلب؟',
+    confirmTransfer: 'تحويل هذه الخطوة؟'
   },
   progress: {
     ariaLabel: 'التقدم'
