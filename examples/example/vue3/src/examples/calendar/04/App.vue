@@ -10,7 +10,7 @@ const events = [
 
 <template>
   <Calendar :default-value="june" :now="june" :events="events" fullscreen>
-    <template #dateCell="{ date, events: cellEvents }">
+    <template #dateCell="{ events: cellEvents }">
       <span v-if="cellEvents.length" class="text-[10px] leading-none">
         {{ cellEvents.length }}
       </span>

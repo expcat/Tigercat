@@ -93,7 +93,7 @@ function flattenRecords(records: MenuRouteRecord[], rows: RouteRow[] = []): Rout
   return rows
 }
 
-const columns: TableColumn<RouteRow>[] = [
+const columns: TableColumn[] = [
   { key: 'path', title: 'path', width: 140 },
   { key: 'title', title: 'title', width: 96 },
   { key: 'flags', title: 'meta' },
