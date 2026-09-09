@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, PropType } from 'vue'
+import { computed, defineComponent, h, PropType, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -11,8 +11,10 @@ import {
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
+  shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
+  sortWorkflowActionBarItems,
   timelineDescriptionClasses,
   timelineLabelClasses,
   workflowSignModeLabel,
@@ -40,6 +42,7 @@ import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 import { Popconfirm } from './Popconfirm'
 import { Tag } from './Tag'
+import { Textarea } from './Textarea'
 import { Timeline } from './Timeline'
 
 type HChildren = Parameters<typeof h>[2]
@@ -154,8 +157,14 @@ export const WorkflowActionBar = defineComponent({
       default: undefined
     },
     confirm: Boolean,
-    commentInput: Boolean,
-    commentRequired: Boolean,
+    commentInput: {
+      type: Boolean,
+      default: undefined
+    },
+    commentRequired: {
+      type: Boolean,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -175,9 +184,10 @@ export const WorkflowActionBar = defineComponent({
       classNames(workflowActionBarClasses, props.className, coerceClassValue(attrs.class))
     )
     const toolbarStyle = computed(() => mergeStyleValues(attrs.style, props.style))
+    const comments = ref<Record<string, string>>({})
 
     return () => {
-      const items = props.items ?? []
+      const items = sortWorkflowActionBarItems(props.items ?? [])
       return h(
         'div',
         {
@@ -194,8 +204,28 @@ export const WorkflowActionBar = defineComponent({
           const buttonProps = resolveWorkflowActionButtonProps(item)
           const disabled = Boolean(props.disabled || item.disabled)
           const confirmCopy = shouldConfirmWorkflowAction(item, props.confirm)
-            ? getWorkflowActionConfirmCopy(item.action, stepLabels.value)
+            ? getWorkflowActionConfirmCopy(item.action, stepLabels.value, {
+                commentRequired: props.commentRequired
+              })
             : null
+          const showComment =
+            confirmCopy != null &&
+            shouldShowWorkflowActionCommentInput(item.action, props.commentInput)
+
+          const emitAction = () => {
+            if (disabled) return
+            if (showComment) {
+              emit('action', item, { comment: comments.value[item.key] ?? '' })
+              if (item.key in comments.value) {
+                const next = { ...comments.value }
+                delete next[item.key]
+                comments.value = next
+              }
+              return
+            }
+            emit('action', item)
+          }
+
           const button = h(
             Button,
             {
@@ -204,30 +234,45 @@ export const WorkflowActionBar = defineComponent({
               variant: buttonProps.variant,
               danger: buttonProps.danger,
               disabled,
-              onClick: confirmCopy
-                ? undefined
-                : () => {
-                    if (disabled) return
-                    emit('action', item)
-                  }
+              onClick: confirmCopy ? undefined : emitAction
             },
             { default: () => item.label }
           )
           if (!confirmCopy) return button
+
+          const popconfirmSlots: Record<string, () => unknown> = {
+            default: () => button
+          }
+          if (showComment) {
+            popconfirmSlots.description = () => [
+              confirmCopy.description ? h('div', null, confirmCopy.description) : null,
+              h(Textarea, {
+                size: 'sm',
+                rows: 2,
+                className: 'mt-2 w-full',
+                modelValue: comments.value[item.key] ?? '',
+                placeholder: confirmCopy.commentPlaceholder,
+                'aria-label': confirmCopy.commentPlaceholder,
+                'aria-required': props.commentRequired ? true : undefined,
+                'onUpdate:modelValue': (value: string) => {
+                  comments.value = { ...comments.value, [item.key]: value }
+                }
+              })
+            ]
+          }
+
           return h(
             Popconfirm,
             {
               key: item.key,
               asChild: true,
               title: confirmCopy.title,
+              description: showComment ? undefined : confirmCopy.description,
               okType: confirmCopy.okType,
               disabled,
-              onConfirm: () => {
-                if (disabled) return
-                emit('action', item)
-              }
+              onConfirm: emitAction
             },
-            { default: () => button }
+            popconfirmSlots
           )
         })
       )
@@ -252,6 +297,14 @@ export const WorkflowTimeline = defineComponent({
       default: undefined
     },
     confirm: Boolean,
+    commentInput: {
+      type: Boolean,
+      default: undefined
+    },
+    commentRequired: {
+      type: Boolean,
+      default: undefined
+    },
     mode: {
       type: String as PropType<TimelineMode>,
       default: 'left' as TimelineMode
@@ -285,12 +338,15 @@ export const WorkflowTimeline = defineComponent({
       default: undefined
     }
   },
-  emits: ['action'],
+  emits: {
+    action: (_item: WorkflowActionBarItem, _payload?: { comment?: string }) => true
+  },
   setup(props, { emit, slots, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const stepLabels = computed(() => getWorkflowTimelineLabels(mergedLocale.value, props.labels))
     const timelineItems = computed(() => workflowStepsToTimelineItems(props.steps))
+    const sortedActions = computed(() => sortWorkflowActionBarItems(props.actions ?? []))
     const showActionBar = computed(() =>
       shouldShowWorkflowActions(props.steps, props.actions, props.showActions)
     )
@@ -314,12 +370,17 @@ export const WorkflowTimeline = defineComponent({
       const actionBar =
         showActionBar.value && props.actions
           ? slots.actions
-            ? slots.actions({ actions: props.actions })
+            ? slots.actions({ actions: sortedActions.value })
             : h(WorkflowActionBar, {
-                items: props.actions,
+                items: sortedActions.value,
                 confirm: props.confirm,
+                commentInput: props.commentInput,
+                commentRequired: props.commentRequired,
                 ariaLabel: stepLabels.value.actionsAriaLabel,
-                onAction: (item: WorkflowActionBarItem) => emit('action', item)
+                onAction: (item: WorkflowActionBarItem, payload?: { comment?: string }) => {
+                  if (payload) emit('action', item, payload)
+                  else emit('action', item)
+                }
               })
           : null
 

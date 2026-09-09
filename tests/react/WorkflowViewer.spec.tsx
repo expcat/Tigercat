@@ -161,11 +161,15 @@ describe('WorkflowViewer (React)', () => {
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
+      expect(screen.getByText('The requester will be notified.')).toBeVisible()
+      expect(screen.getByPlaceholderText('Comment (optional)')).toBeInTheDocument()
       expect(onAction).not.toHaveBeenCalled()
 
       await user.click(screen.getByRole('button', { name: 'OK' }))
       await waitFor(() =>
-        expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'reject' }))
+        expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'reject' }), {
+          comment: ''
+        })
       )
     })
 
@@ -174,6 +178,7 @@ describe('WorkflowViewer (React)', () => {
       render(<WorkflowActionBar items={actions} confirm onAction={onAction} />)
       fireEvent.click(screen.getByRole('button', { name: 'Comment' }))
       expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'comment' }))
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
   })
 

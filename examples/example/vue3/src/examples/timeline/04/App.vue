@@ -51,11 +51,11 @@ const steps: WorkflowTimelineStep[] = [
 ]
 
 const actions: WorkflowActionBarItem[] = [
-  { key: 'approve', label: '通过', action: 'approve', variant: 'primary' },
-  { key: 'reject', label: '驳回', action: 'reject', variant: 'danger' },
+  { key: 'approve', label: '同意', action: 'approve', variant: 'primary' },
+  { key: 'reject', label: '拒绝', action: 'reject', variant: 'danger' },
   { key: 'transfer', label: '转交', action: 'transfer', variant: 'outline' },
   { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' },
-  { key: 'cancel', label: '撤销', action: 'cancel', variant: 'danger', disabled: true }
+  { key: 'cancel', label: '撤回', action: 'cancel', variant: 'danger', disabled: true }
 ]
 
 const lastAction = ref('')

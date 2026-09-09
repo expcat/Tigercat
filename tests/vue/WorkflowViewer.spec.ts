@@ -159,16 +159,21 @@ describe('WorkflowViewer (Vue)', () => {
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
+      expect(screen.getByText('The requester will be notified.')).toBeVisible()
+      expect(screen.getByPlaceholderText('Comment (optional)')).toBeInTheDocument()
       expect(emitted().action).toBeFalsy()
 
       await user.click(screen.getByRole('button', { name: 'OK' }))
       await waitFor(() => expect(emitted().action?.[0]?.[0]).toMatchObject({ action: 'reject' }))
+      expect(emitted().action?.[0]?.[1]).toEqual({ comment: '' })
     })
 
     it('emits comment immediately because comment is not in the recipe', async () => {
       const { emitted } = render(WorkflowActionBar, { props: { items: actions, confirm: true } })
       await fireEvent.click(screen.getByRole('button', { name: 'Comment' }))
       expect(emitted().action?.[0]?.[0]).toMatchObject({ action: 'comment' })
+      expect(emitted().action?.[0]?.[1]).toBeUndefined()
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
   })
 

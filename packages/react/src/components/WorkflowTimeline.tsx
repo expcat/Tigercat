@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   classNames,
   getWorkflowActionConfirmCopy,
@@ -9,8 +9,10 @@ import {
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
+  shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
+  sortWorkflowActionBarItems,
   timelineDescriptionClasses,
   timelineLabelClasses,
   workflowSignModeLabel,
@@ -36,6 +38,7 @@ import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 import { Popconfirm } from './Popconfirm'
 import { Tag } from './Tag'
+import { Textarea } from './Textarea'
 import { Timeline } from './Timeline'
 
 export interface WorkflowActionBarProps
@@ -51,6 +54,8 @@ export interface WorkflowTimelineProps
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   pendingDot?: React.ReactNode
   pendingContent?: React.ReactNode
+  commentInput?: boolean
+  commentRequired?: boolean
   onAction?: (item: WorkflowActionBarItem, payload?: { comment?: string }) => void
   renderItem?: (item: TimelineItem, index: number) => React.ReactNode
   renderDot?: (item: TimelineItem, options: { pending: boolean }) => React.ReactNode
@@ -143,8 +148,8 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   disabled,
   ariaLabel,
   confirm,
-  commentInput: _commentInput,
-  commentRequired: _commentRequired,
+  commentInput,
+  commentRequired,
   className,
   style,
   onAction,
@@ -154,6 +159,8 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   const config = useTigerConfig()
   const stepLabels = useMemo(() => getWorkflowTimelineLabels(config.locale), [config.locale])
   const toolbarClasses = useMemo(() => classNames(workflowActionBarClasses, className), [className])
+  const sortedItems = useMemo(() => sortWorkflowActionBarItems(items ?? []), [items])
+  const [comments, setComments] = useState<Record<string, string>>({})
 
   return (
     <div
@@ -162,12 +169,30 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       style={style}
       role="toolbar"
       aria-label={ariaLabel ?? ariaLabelAttr ?? stepLabels.actionsAriaLabel}>
-      {(items ?? []).map((item) => {
+      {sortedItems.map((item) => {
         const buttonProps = resolveWorkflowActionButtonProps(item)
         const isDisabled = Boolean(disabled || item.disabled)
         const confirmCopy = shouldConfirmWorkflowAction(item, confirm)
-          ? getWorkflowActionConfirmCopy(item.action, stepLabels)
+          ? getWorkflowActionConfirmCopy(item.action, stepLabels, { commentRequired })
           : null
+        const showComment =
+          confirmCopy != null && shouldShowWorkflowActionCommentInput(item.action, commentInput)
+
+        const emitAction = () => {
+          if (isDisabled) return
+          if (showComment) {
+            onAction?.(item, { comment: comments[item.key] ?? '' })
+            setComments((prev) => {
+              if (!(item.key in prev)) return prev
+              const next = { ...prev }
+              delete next[item.key]
+              return next
+            })
+            return
+          }
+          onAction?.(item)
+        }
+
         const button = (
           <Button
             key={item.key}
@@ -175,29 +200,41 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
             variant={buttonProps.variant}
             danger={buttonProps.danger}
             disabled={isDisabled}
-            onClick={
-              confirmCopy
-                ? undefined
-                : () => {
-                    if (isDisabled) return
-                    onAction?.(item)
-                  }
-            }>
+            onClick={confirmCopy ? undefined : emitAction}>
             {item.label}
           </Button>
         )
         if (!confirmCopy) return button
+
+        const descriptionContent = showComment ? (
+          <>
+            {confirmCopy.description ? <div>{confirmCopy.description}</div> : null}
+            <Textarea
+              size="sm"
+              rows={2}
+              className="mt-2 w-full"
+              value={comments[item.key] ?? ''}
+              placeholder={confirmCopy.commentPlaceholder}
+              aria-label={confirmCopy.commentPlaceholder}
+              aria-required={commentRequired || undefined}
+              onInput={(event) => {
+                const value = event.currentTarget.value
+                setComments((prev) => ({ ...prev, [item.key]: value }))
+              }}
+            />
+          </>
+        ) : undefined
+
         return (
           <Popconfirm
             key={item.key}
             asChild
             title={confirmCopy.title}
+            description={showComment ? undefined : confirmCopy.description}
+            descriptionContent={descriptionContent}
             okType={confirmCopy.okType}
             disabled={isDisabled}
-            onConfirm={() => {
-              if (isDisabled) return
-              onAction?.(item)
-            }}>
+            onConfirm={emitAction}>
             {button}
           </Popconfirm>
         )
@@ -211,6 +248,8 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   actions,
   showActions,
   confirm,
+  commentInput,
+  commentRequired,
   mode = 'left',
   pending = false,
   pendingDot,
@@ -237,6 +276,7 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
     [mergedLocale, labelsOverride]
   )
   const timelineItems = useMemo(() => workflowStepsToTimelineItems(steps), [steps])
+  const sortedActions = useMemo(() => sortWorkflowActionBarItems(actions ?? []), [actions])
   const showActionBar = shouldShowWorkflowActions(steps, actions, showActions)
   const rootClasses = useMemo(() => classNames(workflowTimelineRootClasses, className), [className])
 
@@ -249,11 +289,13 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   const actionBar =
     showActionBar && actions ? (
       renderActions ? (
-        renderActions(actions)
+        renderActions(sortedActions)
       ) : (
         <WorkflowActionBar
-          items={actions}
+          items={sortedActions}
           confirm={confirm}
+          commentInput={commentInput}
+          commentRequired={commentRequired}
           onAction={onAction}
           ariaLabel={stepLabels.actionsAriaLabel}
         />

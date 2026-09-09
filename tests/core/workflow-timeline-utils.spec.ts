@@ -24,6 +24,7 @@ import {
   resolveWorkflowStepActors,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
+  shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
   sortWorkflowActionBarItems,
@@ -646,6 +647,18 @@ describe('workflow action confirm recipe', () => {
     expect(shouldConfirmWorkflowAction({ action: 'comment' }, true)).toBe(false)
     expect(shouldConfirmWorkflowAction({ action: 'reject', confirm: false }, true)).toBe(false)
     expect(shouldConfirmWorkflowAction({ action: 'reject', confirm: true }, false)).toBe(true)
+  })
+
+  it('shows the comment field for reject by default and never for comment', () => {
+    expect(shouldShowWorkflowActionCommentInput('reject')).toBe(true)
+    expect(shouldShowWorkflowActionCommentInput('approve')).toBe(false)
+    expect(shouldShowWorkflowActionCommentInput('transfer')).toBe(false)
+    expect(shouldShowWorkflowActionCommentInput('cancel')).toBe(false)
+    expect(shouldShowWorkflowActionCommentInput('comment')).toBe(false)
+    expect(shouldShowWorkflowActionCommentInput('approve', true)).toBe(true)
+    expect(shouldShowWorkflowActionCommentInput('cancel', true)).toBe(true)
+    expect(shouldShowWorkflowActionCommentInput('comment', true)).toBe(false)
+    expect(shouldShowWorkflowActionCommentInput('reject', false)).toBe(false)
   })
 })
 

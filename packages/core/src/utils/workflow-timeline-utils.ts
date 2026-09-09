@@ -654,6 +654,21 @@ export function shouldConfirmWorkflowAction(
   return workflowActionNeedsConfirm(item.action)
 }
 
+/**
+ * Comment field in the confirm dialog. Omitted `commentInput` shows it for
+ * reject only; `true` opts in approve / transfer / cancel; `false` hides it.
+ * `comment` never uses Popconfirm, so this is always false for that action.
+ */
+export function shouldShowWorkflowActionCommentInput(
+  action: WorkflowTimelineAction,
+  commentInput?: boolean
+): boolean {
+  if (!workflowActionNeedsConfirm(action)) return false
+  if (commentInput === false) return false
+  if (commentInput === true) return true
+  return action === 'reject'
+}
+
 export const EMPTY_WORKFLOW_VIEWER_NODES: WorkflowViewerNode[] = []
 
 export const workflowViewerRootClasses = 'w-full'

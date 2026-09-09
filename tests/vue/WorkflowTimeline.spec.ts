@@ -4,7 +4,8 @@
 
 import { describe, it, expect } from 'vitest'
 import { h } from 'vue'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { WorkflowActionBar, WorkflowTimeline } from '@expcat/tigercat-vue/WorkflowTimeline'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -166,6 +167,91 @@ describe('WorkflowTimeline (Vue)', () => {
       expect(screen.getByRole('toolbar', { name: 'Workflow actions' })).toBeInTheDocument()
       await fireEvent.click(screen.getByRole('button', { name: 'Reject' }))
       expect(emitted().action?.[0]?.[0]).toMatchObject({ key: 'reject', action: 'reject' })
+      expect(emitted().action?.[0]?.[1]).toBeUndefined()
+    })
+
+    it('sorts items approve → reject → transfer → cancel → comment and keeps variants', () => {
+      const shuffled: WorkflowActionBarItem[] = [
+        { key: 'comment', label: 'Comment', action: 'comment' },
+        { key: 'cancel', label: 'Cancel', action: 'cancel' },
+        { key: 'transfer', label: 'Transfer', action: 'transfer' },
+        { key: 'reject', label: 'Reject', action: 'reject' },
+        { key: 'approve', label: 'Approve', action: 'approve' }
+      ]
+      render(WorkflowActionBar, { props: { items: shuffled } })
+
+      const buttons = within(screen.getByRole('toolbar')).getAllByRole('button')
+      expect(buttons.map((button) => button.textContent)).toEqual([
+        'Approve',
+        'Reject',
+        'Transfer',
+        'Cancel',
+        'Comment'
+      ])
+      expect(screen.getByRole('button', { name: 'Approve' }).className).not.toContain(
+        'text-[var(--tiger-error,#dc2626)]'
+      )
+      expect(screen.getByRole('button', { name: 'Reject' }).className).toContain(
+        'text-[var(--tiger-error,#dc2626)]'
+      )
+    })
+
+    it('shows reject confirm description and danger OK', async () => {
+      const user = userEvent.setup()
+      render({
+        render: () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(WorkflowActionBar, { items: actions, confirm: true })
+          )
+      })
+
+      await user.click(screen.getByRole('button', { name: 'Reject' }))
+      await waitFor(() => expect(screen.getByText('确认拒绝该申请？')).toBeVisible())
+      expect(screen.getByText('意见将通知发起人。')).toBeVisible()
+      expect(screen.queryByText(/该步骤/)).not.toBeInTheDocument()
+      expect(screen.getByPlaceholderText('请输入审批意见（选填）')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '确定' }).className).toContain(
+        'bg-[var(--tiger-error,#dc2626)]'
+      )
+    })
+
+    it('submits an empty comment from the reject confirm dialog', async () => {
+      const user = userEvent.setup()
+      const { emitted } = render(WorkflowActionBar, { props: { items: actions, confirm: true } })
+
+      await user.click(screen.getByRole('button', { name: 'Reject' }))
+      await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
+      expect(screen.getByText('The requester will be notified.')).toBeVisible()
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() => expect(emitted().action?.[0]?.[0]).toMatchObject({ action: 'reject' }))
+      expect(emitted().action?.[0]?.[1]).toEqual({ comment: '' })
+    })
+
+    it('passes typed comment on confirm', async () => {
+      const user = userEvent.setup()
+      const { emitted } = render(WorkflowActionBar, { props: { items: actions, confirm: true } })
+
+      await user.click(screen.getByRole('button', { name: 'Reject' }))
+      const textarea = await screen.findByPlaceholderText('Comment (optional)')
+      await user.type(textarea, 'need receipts')
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() => expect(emitted().action?.[0]?.[0]).toMatchObject({ action: 'reject' }))
+      expect(emitted().action?.[0]?.[1]).toEqual({ comment: 'need receipts' })
+    })
+
+    it('does not block empty submit when commentRequired', async () => {
+      const user = userEvent.setup()
+      const { emitted } = render(WorkflowActionBar, {
+        props: { items: actions, confirm: true, commentRequired: true }
+      })
+
+      await user.click(screen.getByRole('button', { name: 'Reject' }))
+      const textarea = await screen.findByPlaceholderText('Comment required')
+      expect(textarea).toHaveAttribute('aria-required', 'true')
+      expect(textarea).not.toHaveAttribute('required')
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() => expect(emitted().action?.[0]?.[0]).toMatchObject({ action: 'reject' }))
+      expect(emitted().action?.[0]?.[1]).toEqual({ comment: '' })
     })
   })
 
