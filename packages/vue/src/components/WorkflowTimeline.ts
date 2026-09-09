@@ -3,17 +3,25 @@ import {
   classNames,
   coerceClassValue,
   getWorkflowActionConfirmCopy,
+  getWorkflowStepActorsPresentation,
   getWorkflowTimelineLabels,
   mergeStyleValues,
   mergeTigerLocale,
   resolveWorkflowActionButtonProps,
   resolveWorkflowSignMode,
+  resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
+  shouldShowWorkflowSignMode,
   timelineDescriptionClasses,
   timelineLabelClasses,
   workflowSignModeLabel,
+  workflowStepActorProgressClasses,
+  workflowStepActorRowClasses,
+  workflowStepActorsListClasses,
   workflowStepsToTimelineItems,
+  workflowStepStatusColor,
+  workflowStepStatusDotClasses,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
   type TimelineMode,
@@ -21,10 +29,13 @@ import {
   type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
   type WorkflowActionBarProps as CoreWorkflowActionBarProps,
+  type WorkflowStepActorsPresentation,
   type WorkflowTimelineItem,
   type WorkflowTimelineProps as CoreWorkflowTimelineProps,
-  type WorkflowTimelineStep
+  type WorkflowTimelineStep,
+  type WorkflowTimelineStepStatus
 } from '@expcat/tigercat-core'
+import { Avatar } from './Avatar'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 import { Popconfirm } from './Popconfirm'
@@ -60,15 +71,48 @@ function isWorkflowTimelineItem(item: unknown): item is WorkflowTimelineItem {
   )
 }
 
+function renderStatusDot(status: WorkflowTimelineStepStatus): ReturnType<typeof h> {
+  return h('span', {
+    class: workflowStepStatusDotClasses,
+    style: { backgroundColor: workflowStepStatusColor(status) },
+    'aria-hidden': 'true'
+  })
+}
+
+function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) {
+  if (presentation.actors.length === 0) return null
+  if (!presentation.list) {
+    const only = presentation.actors[0]
+    if (!only?.name) return null
+    return h('div', { class: workflowStepActorClasses }, only.name)
+  }
+
+  return h('div', { class: workflowStepActorsListClasses }, [
+    presentation.progressLabel
+      ? h('div', { class: workflowStepActorProgressClasses }, presentation.progressLabel)
+      : null,
+    ...presentation.actors.map((actor) =>
+      h('div', { key: actor.key, class: workflowStepActorRowClasses }, [
+        actor.avatar
+          ? h(Avatar, { size: 'sm', src: actor.avatar, alt: '', 'aria-hidden': true })
+          : null,
+        renderStatusDot(actor.status),
+        actor.name ? h('span', null, actor.name) : null
+      ])
+    )
+  ])
+}
+
 function renderStepContent(
   item: WorkflowTimelineItem,
   labels: Required<TigerLocaleWorkflowTimeline>
 ) {
   const step = item.step
   const title = step.title ?? step.label
-  const statusLabel = workflowStepStatusLabel(item.status, labels)
+  const kind = resolveWorkflowStepKind(step)
+  const statusLabel = workflowStepStatusLabel(item.status, labels, kind)
   const signMode = resolveWorkflowSignMode(step)
-  const showSignMode = signMode !== 'sequential'
+  const showSignMode = shouldShowWorkflowSignMode(kind, signMode)
 
   return h('div', { class: 'min-w-0' }, [
     step.time ? h('div', { class: timelineLabelClasses }, step.time) : null,
@@ -91,7 +135,7 @@ function renderStepContent(
         { default: () => statusLabel }
       )
     ]),
-    step.actor?.name ? h('div', { class: workflowStepActorClasses }, step.actor.name) : null,
+    renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels)),
     step.comment ? h('div', { class: workflowStepCommentClasses }, step.comment) : null
   ])
 }

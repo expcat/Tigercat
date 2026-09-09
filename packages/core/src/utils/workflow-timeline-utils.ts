@@ -250,6 +250,81 @@ export function workflowActorProgress(
   return { approved: status === 'approved' ? 1 : 0, total: 1 }
 }
 
+export function formatWorkflowActorsProgress(
+  template: string | undefined,
+  progress: WorkflowActorProgress
+): string {
+  return (template || '{approved}/{total} signed')
+    .replace('{approved}', String(progress.approved))
+    .replace('{total}', String(progress.total))
+}
+
+export interface WorkflowStepActorView {
+  key: string
+  name: string
+  status: WorkflowTimelineStepStatus
+  avatar?: string
+}
+
+export interface WorkflowStepActorsPresentation {
+  actors: WorkflowStepActorView[]
+  list: boolean
+  progressLabel?: string
+}
+
+function workflowActorAvatarUrl(
+  actor: Pick<WorkflowTimelineActor, 'avatar'> | undefined
+): string | undefined {
+  const value = actor?.avatar
+  if (typeof value !== 'string') return undefined
+  const trimmed = value.trim()
+  return trimmed ? trimmed : undefined
+}
+
+function resolveWorkflowActorStatus(
+  actor: Pick<WorkflowTimelineActor, 'status'> | undefined
+): WorkflowTimelineStepStatus {
+  return isWorkflowTimelineStepStatus(actor?.status) ? actor.status : 'pending'
+}
+
+/**
+ * In-card / inline actor presentation. A list is used when there are two or
+ * more names (countersign / or-sign / sequential). Countersign also gets N/M.
+ * People are never modeled as `children`.
+ */
+export function getWorkflowStepActorsPresentation(
+  step: Pick<WorkflowTimelineStep, 'actor' | 'actors' | 'status' | 'signMode'> | undefined,
+  labels?: Pick<TigerLocaleWorkflowTimeline, 'actorsProgress'>
+): WorkflowStepActorsPresentation {
+  const resolved = resolveWorkflowStepActors(step)
+  const actors: WorkflowStepActorView[] = resolved.map((actor, index) => {
+    const view: WorkflowStepActorView = {
+      key: String(actor.id ?? actor.name ?? index),
+      name: actor.name ?? '',
+      status: resolveWorkflowActorStatus(actor)
+    }
+    const avatar = workflowActorAvatarUrl(actor)
+    if (avatar) view.avatar = avatar
+    return view
+  })
+  const list = actors.length > 1
+  const presentation: WorkflowStepActorsPresentation = { actors, list }
+  if (list && resolveWorkflowSignMode(step) === 'countersign') {
+    presentation.progressLabel = formatWorkflowActorsProgress(
+      labels?.actorsProgress,
+      workflowActorProgress(step)
+    )
+  }
+  return presentation
+}
+
+export function shouldShowWorkflowSignMode(
+  kind: WorkflowStepKind,
+  signMode: WorkflowSignMode
+): boolean {
+  return kind === 'approve' && signMode !== 'sequential'
+}
+
 /**
  * Copy steps, default unknown/omitted status to `pending`, fill `title` from
  * `label` when needed, and stably sort each sibling list. Does not mutate input.
@@ -589,6 +664,8 @@ export const workflowViewerItemClasses = 'flex w-full min-w-0 flex-col items-cen
 export const workflowViewerConnectorClasses = 'h-4 w-px bg-[var(--tiger-border,#d1d5db)]'
 export const workflowViewerCardClasses =
   'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2 shadow-sm'
+export const workflowViewerCardCcClasses =
+  'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface-muted,#f9fafb)] px-3 py-2 shadow-none'
 export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary,#2563eb)]'
 export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error,#dc2626)]'
 export const workflowViewerCardOffPathClasses = 'opacity-50'
@@ -596,6 +673,67 @@ export const workflowViewerCardActiveClasses =
   'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
 export const workflowViewerKindRowClasses = 'flex flex-wrap items-center gap-1'
 export const workflowViewerRollbackLabelClasses = 'mt-1 text-xs text-[var(--tiger-error,#dc2626)]'
+export const workflowViewerActiveTitleClasses = 'text-[var(--tiger-primary,#2563eb)]'
+export const workflowViewerLegendClasses =
+  'mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowViewerLegendItemClasses = 'inline-flex items-center gap-1.5'
+export const workflowViewerLegendSwatchClasses =
+  'inline-block h-2.5 w-4 shrink-0 rounded-sm border bg-[var(--tiger-bg,#fff)]'
+export const workflowViewerLegendCurrentSwatchClasses = 'border-[var(--tiger-primary,#2563eb)]'
+export const workflowViewerLegendOffPathSwatchClasses =
+  'border-[var(--tiger-border,#d1d5db)] opacity-50'
+export const workflowViewerLegendRollbackSwatchClasses = 'border-[var(--tiger-error,#dc2626)]'
+export const workflowStepStatusDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
+export const workflowStepActorsListClasses = 'mt-1 flex flex-col gap-0.5'
+export const workflowStepActorRowClasses =
+  'flex items-center gap-1.5 text-sm text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowStepActorProgressClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
+
+export type WorkflowViewerLegendKey = 'currentPath' | 'offPath' | 'rollbackPoint'
+
+export interface WorkflowViewerLegendItem {
+  key: WorkflowViewerLegendKey
+  label: string
+  swatchClassName: string
+}
+
+/**
+ * Path legend rows. Current path and off-path always; rollback only when asked.
+ */
+export function getWorkflowViewerLegendItems(
+  labels: Pick<TigerLocaleWorkflowTimeline, 'currentPath' | 'offPath' | 'rollbackPoint'>,
+  options?: { showRollbackPoint?: boolean }
+): WorkflowViewerLegendItem[] {
+  const items: WorkflowViewerLegendItem[] = [
+    {
+      key: 'currentPath',
+      label: labels.currentPath || 'Current path',
+      swatchClassName: classNames(
+        workflowViewerLegendSwatchClasses,
+        workflowViewerLegendCurrentSwatchClasses
+      )
+    },
+    {
+      key: 'offPath',
+      label: labels.offPath || 'Untaken branch',
+      swatchClassName: classNames(
+        workflowViewerLegendSwatchClasses,
+        workflowViewerLegendOffPathSwatchClasses
+      )
+    }
+  ]
+  if (options?.showRollbackPoint) {
+    items.push({
+      key: 'rollbackPoint',
+      label: labels.rollbackPoint || 'Rollback point',
+      swatchClassName: classNames(
+        workflowViewerLegendSwatchClasses,
+        workflowViewerLegendRollbackSwatchClasses
+      )
+    })
+  }
+  return items
+}
 
 /**
  * A tree node derived from {@link WorkflowTimelineStep}. This is a view model
@@ -733,14 +871,16 @@ export function workflowViewerChildLayout(node: {
 }
 
 export function workflowViewerCardClassName(
-  node: Pick<WorkflowViewerNode, 'onPath' | 'rollbackPoint' | 'status'>,
+  node: Pick<WorkflowViewerNode, 'onPath' | 'rollbackPoint' | 'status'> & {
+    kind?: WorkflowStepKind
+  },
   options?: { highlightPath?: boolean; showRollbackPoint?: boolean }
 ): string {
   const highlightPath = options?.highlightPath !== false
   const showRollbackPoint = options?.showRollbackPoint !== false
   const rollback = showRollbackPoint && node.rollbackPoint
   return classNames(
-    workflowViewerCardClasses,
+    node.kind === 'cc' ? workflowViewerCardCcClasses : workflowViewerCardClasses,
     highlightPath && !node.onPath ? workflowViewerCardOffPathClasses : null,
     rollback
       ? workflowViewerCardRollbackClasses

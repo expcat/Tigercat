@@ -7,10 +7,13 @@ import {
   buildWorkflowViewerTree,
   countWorkflowStepsByStatus,
   EMPTY_WORKFLOW_TIMELINE_STEPS,
+  formatWorkflowActorsProgress,
   getCurrentWorkflowStep,
   getWorkflowActionConfirmCopy,
   getWorkflowCurrentPathKeys,
   getWorkflowRollbackStep,
+  getWorkflowStepActorsPresentation,
+  getWorkflowViewerLegendItems,
   isWorkflowStepActive,
   isWorkflowStepPending,
   isWorkflowStepTerminal,
@@ -22,6 +25,7 @@ import {
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
+  shouldShowWorkflowSignMode,
   sortWorkflowActionBarItems,
   sortWorkflowTimelineSteps,
   workflowActorProgress,
@@ -33,6 +37,8 @@ import {
   workflowStepStatusColor,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
+  workflowViewerCardClassName,
+  workflowViewerCardOffPathClasses,
   WORKFLOW_STEP_STATUS_COLORS,
   type WorkflowActionBarItem,
   type WorkflowTimeline,
@@ -402,6 +408,102 @@ describe('workflowActorProgress', () => {
         })
       )
     ).toEqual({ approved: 1, total: 1 })
+  })
+})
+
+describe('getWorkflowStepActorsPresentation', () => {
+  it('lists countersign names with N/M and ignores children', () => {
+    const presentation = getWorkflowStepActorsPresentation(
+      step({
+        key: 'manager',
+        signMode: 'countersign',
+        actors: [
+          { name: 'Lin', status: 'approved' },
+          { name: 'Chen', status: 'pending' }
+        ],
+        children: [
+          { key: 'fake-a', title: 'Not an actor' },
+          { key: 'fake-b', title: 'Also not' }
+        ]
+      }),
+      { actorsProgress: '{approved}/{total} signed' }
+    )
+    expect(presentation.list).toBe(true)
+    expect(presentation.progressLabel).toBe('1/2 signed')
+    expect(presentation.actors.map((actor) => actor.name)).toEqual(['Lin', 'Chen'])
+    expect(formatWorkflowActorsProgress('{approved}/{total} 已签', { approved: 1, total: 2 })).toBe(
+      '1/2 已签'
+    )
+  })
+
+  it('keeps a single actor as a name, not a list', () => {
+    const presentation = getWorkflowStepActorsPresentation(
+      step({ key: 'one', actor: { name: 'Ada' } })
+    )
+    expect(presentation.list).toBe(false)
+    expect(presentation.progressLabel).toBeUndefined()
+    expect(presentation.actors[0]?.name).toBe('Ada')
+  })
+
+  it('lists or-sign / sequential names without countersign progress', () => {
+    const orsign = getWorkflowStepActorsPresentation(
+      step({
+        key: 'or',
+        signMode: 'orsign',
+        actors: [{ name: 'Wu' }, { name: 'Qian' }]
+      })
+    )
+    expect(orsign.list).toBe(true)
+    expect(orsign.progressLabel).toBeUndefined()
+  })
+})
+
+describe('workflow viewer presentation helpers', () => {
+  it('shows sign mode only on approve nodes that are not sequential', () => {
+    expect(shouldShowWorkflowSignMode('approve', 'countersign')).toBe(true)
+    expect(shouldShowWorkflowSignMode('approve', 'orsign')).toBe(true)
+    expect(shouldShowWorkflowSignMode('approve', 'sequential')).toBe(false)
+    expect(shouldShowWorkflowSignMode('cc', 'countersign')).toBe(false)
+  })
+
+  it('builds a path legend with rollback only when requested', () => {
+    const labels = {
+      currentPath: 'Current path',
+      offPath: 'Untaken branch',
+      rollbackPoint: 'Rollback point'
+    }
+    expect(getWorkflowViewerLegendItems(labels).map((item) => item.key)).toEqual([
+      'currentPath',
+      'offPath'
+    ])
+    expect(
+      getWorkflowViewerLegendItems(labels, { showRollbackPoint: true }).map((item) => item.key)
+    ).toEqual(['currentPath', 'offPath', 'rollbackPoint'])
+  })
+
+  it('weakens cc chrome, dims off-path siblings, and rings the active step', () => {
+    expect(
+      workflowViewerCardClassName({
+        onPath: true,
+        rollbackPoint: false,
+        status: 'canceled',
+        kind: 'cc'
+      })
+    ).toContain('shadow-none')
+    expect(
+      workflowViewerCardClassName({
+        onPath: false,
+        rollbackPoint: false,
+        status: 'pending'
+      })
+    ).toContain(workflowViewerCardOffPathClasses)
+    expect(
+      workflowViewerCardClassName({
+        onPath: true,
+        rollbackPoint: false,
+        status: 'active'
+      })
+    ).toContain('ring-2')
   })
 })
 

@@ -129,6 +129,36 @@ describe('WorkflowTimeline (Vue)', () => {
     expect(emitted().action).toBeFalsy()
   })
 
+  it('lists countersign actors inline without extra timeline points', () => {
+    const countersign: WorkflowTimelineStep[] = [
+      {
+        key: 'manager',
+        title: 'Manager',
+        status: 'active',
+        signMode: 'countersign',
+        actors: [
+          { name: 'Lin', status: 'approved' },
+          { name: 'Chen', status: 'pending' }
+        ]
+      }
+    ]
+    render(WorkflowTimeline, { props: { steps: countersign } })
+
+    expect(screen.getByText('Lin')).toBeInTheDocument()
+    expect(screen.getByText('Chen')).toBeInTheDocument()
+    expect(screen.getByText('1/2 signed')).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem')).toHaveLength(1)
+  })
+
+  it('uses CC sent for a terminal carbon-copy step', () => {
+    render(WorkflowTimeline, {
+      props: { steps: [{ key: 'hr', kind: 'cc', title: 'HR', status: 'canceled' }] }
+    })
+
+    expect(screen.getByText('CC sent')).toBeInTheDocument()
+    expect(screen.queryByText('Canceled')).not.toBeInTheDocument()
+  })
+
   describe('WorkflowActionBar', () => {
     it('renders labelled buttons and emits the clicked item', async () => {
       const { emitted } = render(WorkflowActionBar, { props: { items: actions } })

@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { h } from 'vue'
-import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { WorkflowViewer } from '@expcat/tigercat-vue/WorkflowViewer'
 import { WorkflowActionBar } from '@expcat/tigercat-vue/WorkflowTimeline'
@@ -26,9 +26,9 @@ const treeSteps: WorkflowTimelineStep[] = [
     title: 'Manager',
     status: 'approved',
     signMode: 'countersign',
-    children: [
-      { key: 'a', title: 'Lin', status: 'approved' },
-      { key: 'b', title: 'Chen', status: 'approved' }
+    actors: [
+      { name: 'Lin', status: 'approved' },
+      { name: 'Chen', status: 'pending' }
     ]
   },
   {
@@ -90,9 +90,43 @@ describe('WorkflowViewer (Vue)', () => {
   it('marks the active step and shows the rollback point', () => {
     render(WorkflowViewer, { props: { steps: treeSteps } })
 
-    expect(screen.getByText('Director').closest('[aria-current="step"]')).toBeTruthy()
-    expect(screen.getByText('Rollback point')).toBeInTheDocument()
+    const active = screen.getByText('Director').closest('[aria-current="step"]')
+    expect(active).toBeTruthy()
+    expect(within(active as HTMLElement).getByText('Active')).toBeInTheDocument()
+    expect(screen.getAllByText('Rollback point').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Need receipts')).toBeInTheDocument()
+  })
+
+  it('lists countersign actors in the card with progress instead of sibling branches', () => {
+    render(WorkflowViewer, { props: { steps: treeSteps } })
+
+    const card = screen.getByText('Manager').parentElement?.parentElement
+    expect(card).toBeTruthy()
+    expect(within(card as HTMLElement).getByText('Lin')).toBeInTheDocument()
+    expect(within(card as HTMLElement).getByText('Chen')).toBeInTheDocument()
+    expect(within(card as HTMLElement).getByText('1/2 signed')).toBeInTheDocument()
+    expect(screen.getByText('Lin').closest('[aria-current]')).toBeNull()
+    expect(screen.getByText('<= 5000')).toBeInTheDocument()
+    expect(screen.getByText('> 5000')).toBeInTheDocument()
+  })
+
+  it('renders a path legend for current, off-path, and rollback', () => {
+    render(WorkflowViewer, { props: { steps: treeSteps } })
+
+    const legend = screen.getByRole('group', { name: 'Path legend' })
+    expect(legend).toHaveTextContent('Current path')
+    expect(legend).toHaveTextContent('Untaken branch')
+    expect(legend).toHaveTextContent('Rollback point')
+  })
+
+  it('labels a terminal CC step as notified without a sign-mode tag', () => {
+    render(WorkflowViewer, { props: { steps: treeSteps } })
+
+    const card = screen.getByText('HR').parentElement?.parentElement
+    expect(card).toBeTruthy()
+    expect(within(card as HTMLElement).getByText('CC sent')).toBeInTheDocument()
+    expect(within(card as HTMLElement).queryByText('Countersign')).not.toBeInTheDocument()
+    expect(within(card as HTMLElement).queryByText('Or-sign')).not.toBeInTheDocument()
   })
 
   it('uses ConfigProvider locale for kind, sign mode, and rollback copy', () => {
@@ -105,8 +139,11 @@ describe('WorkflowViewer (Vue)', () => {
     expect(screen.getByText('抄送')).toBeInTheDocument()
     expect(screen.getByText('条件')).toBeInTheDocument()
     expect(screen.getByText('会签')).toBeInTheDocument()
-    expect(screen.getByText('驳回回退点')).toBeInTheDocument()
+    expect(screen.getAllByText('驳回回退点').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByLabelText('审批流程')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: '路径图例' })).toHaveTextContent('当前路径')
+    expect(screen.getByRole('group', { name: '路径图例' })).toHaveTextContent('未走分支')
+    expect(screen.getByText('已抄送')).toBeInTheDocument()
   })
 
   it('hides the rollback label when showRollbackPoint is false', () => {

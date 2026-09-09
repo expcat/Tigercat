@@ -28,12 +28,11 @@ const steps: WorkflowTimelineStep[] = [
     title: '主管会签',
     status: 'approved',
     signMode: 'countersign',
-    actor: { name: '会签组' },
     time: '2026-09-02 10:00',
     order: 3,
-    children: [
-      { key: 'm1', title: '李四', status: 'approved', actor: { name: '李四' } },
-      { key: 'm2', title: '钱七', status: 'approved', actor: { name: '钱七' } }
+    actors: [
+      { name: '李四', status: 'approved' },
+      { name: '钱七', status: 'approved' }
     ]
   },
   {

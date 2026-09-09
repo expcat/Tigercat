@@ -2,25 +2,36 @@ import React, { useMemo } from 'react'
 import {
   classNames,
   getWorkflowActionConfirmCopy,
+  getWorkflowStepActorsPresentation,
   getWorkflowTimelineLabels,
   mergeTigerLocale,
   resolveWorkflowActionButtonProps,
   resolveWorkflowSignMode,
+  resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
+  shouldShowWorkflowSignMode,
   timelineDescriptionClasses,
   timelineLabelClasses,
   workflowSignModeLabel,
+  workflowStepActorProgressClasses,
+  workflowStepActorRowClasses,
+  workflowStepActorsListClasses,
   workflowStepsToTimelineItems,
+  workflowStepStatusColor,
+  workflowStepStatusDotClasses,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
   type TimelineItem,
   type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
   type WorkflowActionBarProps as CoreWorkflowActionBarProps,
+  type WorkflowStepActorsPresentation,
   type WorkflowTimelineItem,
-  type WorkflowTimelineProps as CoreWorkflowTimelineProps
+  type WorkflowTimelineProps as CoreWorkflowTimelineProps,
+  type WorkflowTimelineStepStatus
 } from '@expcat/tigercat-core'
+import { Avatar } from './Avatar'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 import { Popconfirm } from './Popconfirm'
@@ -62,15 +73,50 @@ function isWorkflowTimelineItem(item: unknown): item is WorkflowTimelineItem {
   )
 }
 
+function StatusDot({ status }: { status: WorkflowTimelineStepStatus }) {
+  return (
+    <span
+      className={workflowStepStatusDotClasses}
+      style={{ backgroundColor: workflowStepStatusColor(status) }}
+      aria-hidden="true"
+    />
+  )
+}
+
+function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) {
+  if (presentation.actors.length === 0) return null
+  if (!presentation.list) {
+    const only = presentation.actors[0]
+    if (!only?.name) return null
+    return <div className={workflowStepActorClasses}>{only.name}</div>
+  }
+
+  return (
+    <div className={workflowStepActorsListClasses}>
+      {presentation.progressLabel ? (
+        <div className={workflowStepActorProgressClasses}>{presentation.progressLabel}</div>
+      ) : null}
+      {presentation.actors.map((actor) => (
+        <div key={actor.key} className={workflowStepActorRowClasses}>
+          {actor.avatar ? <Avatar size="sm" src={actor.avatar} alt="" aria-hidden="true" /> : null}
+          <StatusDot status={actor.status} />
+          {actor.name ? <span>{actor.name}</span> : null}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function renderStepContent(
   item: WorkflowTimelineItem,
   labels: Required<TigerLocaleWorkflowTimeline>
 ) {
   const step = item.step
   const title = step.title ?? step.label
-  const statusLabel = workflowStepStatusLabel(item.status, labels)
+  const kind = resolveWorkflowStepKind(step)
+  const statusLabel = workflowStepStatusLabel(item.status, labels, kind)
   const signMode = resolveWorkflowSignMode(step)
-  const showSignMode = signMode !== 'sequential'
+  const showSignMode = shouldShowWorkflowSignMode(kind, signMode)
 
   return (
     <div className="min-w-0">
@@ -86,7 +132,7 @@ function renderStepContent(
           {statusLabel}
         </Tag>
       </div>
-      {step.actor?.name ? <div className={workflowStepActorClasses}>{step.actor.name}</div> : null}
+      {renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels))}
       {step.comment ? <div className={workflowStepCommentClasses}>{step.comment}</div> : null}
     </div>
   )
