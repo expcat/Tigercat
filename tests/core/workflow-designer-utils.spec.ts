@@ -6,16 +6,20 @@ import { describe, expect, it } from 'vitest'
 import {
   applyWorkflowDesignerView,
   buildWorkflowDesignerNodes,
+  cloneWorkflowDesignerActors,
   cloneWorkflowSteps,
   collectWorkflowStepKeys,
   createWorkflowDesignerStep,
+  findWorkflowDesignerNode,
   getWorkflowStepAtPath,
   insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
   moveWorkflowStepAtPath,
   patchWorkflowStepAtPath,
   removeWorkflowStepAtPath,
-  resolveWorkflowDesignerView
+  resolveWorkflowDesignerView,
+  workflowDesignerKindColor,
+  workflowDesignerSignModeHint
 } from '@expcat/tigercat-core'
 import {
   applyWorkflowDesignerView as applyFromSubpath,
@@ -143,5 +147,36 @@ describe('workflow-designer helpers', () => {
     expect(next).toEqual([{ key: 'only', title: 'One' }])
     const after = insertAfterFromSubpath(tree, ['start'], { key: 'extra', title: 'Extra' })
     expect(after.map((item) => item.key)).toEqual(['start', 'extra', 'manager', 'finance'])
+  })
+
+  it('patches actors and keeps actor in sync with the first name', () => {
+    const next = patchWorkflowStepAtPath(tree, ['manager'], {
+      actors: [{ name: 'Lin' }, { name: 'Chen' }]
+    })
+    expect(next[1]?.actors?.map((actor) => actor.name)).toEqual(['Lin', 'Chen'])
+    expect(next[1]?.actor?.name).toBe('Lin')
+    expect(next[1]?.children).toHaveLength(2)
+
+    const cleared = patchWorkflowStepAtPath(next, ['manager'], { actors: [] })
+    expect(cleared[1]?.actors).toBeUndefined()
+    expect(cleared[1]?.actor).toBeUndefined()
+  })
+
+  it('finds a nested designer node by full path in a subpath view', () => {
+    const nodes = buildWorkflowDesignerNodes(tree[1]!.children ?? [], ['manager'])
+    expect(findWorkflowDesignerNode(nodes, ['manager', 'b'])?.title).toBe('Chen')
+    expect(findWorkflowDesignerNode(nodes, ['manager'])).toBeUndefined()
+  })
+
+  it('maps kind colors and sign-mode hints', () => {
+    expect(workflowDesignerKindColor('start')).not.toBe(workflowDesignerKindColor('condition'))
+    expect(
+      workflowDesignerSignModeHint('countersign', {
+        signCountersignHint: 'all must approve',
+        signOrsignHint: 'any one',
+        signSequentialHint: 'one after another'
+      })
+    ).toBe('all must approve')
+    expect(cloneWorkflowDesignerActors({ actor: { name: 'Ada' } })).toEqual([{ name: 'Ada' }])
   })
 })

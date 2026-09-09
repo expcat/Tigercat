@@ -5,9 +5,11 @@
 
 import { classNames } from './class-names'
 import type { WorkflowDesignerPath, WorkflowDesignerStepPatch } from '../types/workflow-designer'
+import type { TigerLocaleWorkflowTimeline } from '../types/locale'
 import type {
   WorkflowSignMode,
   WorkflowStepKind,
+  WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '../types/workflow-timeline'
 import {
@@ -23,24 +25,64 @@ import {
 export const EMPTY_WORKFLOW_DESIGNER_STEPS: WorkflowTimelineStep[] = []
 
 export const workflowDesignerRootClasses = 'tiger-workflow-designer w-full'
+export const workflowDesignerShellClasses = 'flex flex-col gap-3 lg:flex-row lg:items-start'
+export const workflowDesignerTreeClasses = 'flex min-w-0 flex-1 flex-col gap-3'
 export const workflowDesignerListClasses = 'm-0 flex list-none flex-col gap-3 p-0'
 export const workflowDesignerItemClasses = 'flex min-w-0 flex-col gap-2'
 export const workflowDesignerCardClasses =
-  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2 shadow-sm'
+  'min-w-0 cursor-pointer rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2 shadow-sm'
 export const workflowDesignerCardSelectedClasses =
   'border-[var(--tiger-primary,#2563eb)] ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
+export const workflowDesignerSummaryClasses = 'flex min-w-0 flex-col gap-1'
+export const workflowDesignerSummaryRowClasses = 'flex min-w-0 items-center gap-2'
+export const workflowDesignerSummaryTitleClasses =
+  'min-w-0 truncate text-sm font-medium text-[var(--tiger-text,#111827)]'
+export const workflowDesignerSummaryActorsClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowDesignerKindDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
 export const workflowDesignerToolbarClasses = 'mt-2 flex flex-wrap items-center gap-1'
-export const workflowDesignerFieldsClasses = 'mt-2 grid gap-2 sm:grid-cols-2'
+export const workflowDesignerInsertRowClasses = 'flex justify-start'
+export const workflowDesignerPanelClasses =
+  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-3 lg:w-80 lg:shrink-0'
+export const workflowDesignerFieldsClasses = 'flex flex-col gap-2'
 export const workflowDesignerFieldClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerLabelClasses =
   'text-xs font-medium text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowDesignerHintClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
 export const workflowDesignerControlClasses =
   'w-full rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-sm text-[var(--tiger-text,#111827)]'
+export const workflowDesignerActorRowClasses = 'flex min-w-0 items-center gap-1'
 export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
 export const workflowDesignerChildrenClasses =
   'ms-4 border-s border-[var(--tiger-border,#d1d5db)] ps-3'
 export const workflowDesignerActionButtonClasses =
   'inline-flex items-center rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
+
+export const WORKFLOW_DESIGNER_KIND_COLORS: Record<WorkflowStepKind, string> = {
+  start: 'var(--tiger-primary,#2563eb)',
+  approve: 'var(--tiger-success,#16a34a)',
+  cc: 'var(--tiger-text-muted,#6b7280)',
+  condition: 'var(--tiger-warning,#d97706)'
+}
+
+export function workflowDesignerKindColor(kind: WorkflowStepKind): string {
+  return WORKFLOW_DESIGNER_KIND_COLORS[kind]
+}
+
+export function workflowDesignerPathKey(path: WorkflowDesignerPath): string {
+  return path.join('\0')
+}
+
+export function workflowDesignerSignModeHint(
+  mode: WorkflowSignMode,
+  labels: Pick<
+    TigerLocaleWorkflowTimeline,
+    'signSequentialHint' | 'signCountersignHint' | 'signOrsignHint'
+  >
+): string {
+  if (mode === 'countersign') return labels.signCountersignHint ?? ''
+  if (mode === 'orsign') return labels.signOrsignHint ?? ''
+  return labels.signSequentialHint ?? ''
+}
 
 export interface WorkflowDesignerNode {
   key: string
@@ -171,13 +213,28 @@ export function patchWorkflowStepAtPath(
   return updateListAt(steps, parentPath, (list) =>
     list.map((step) => {
       if (step.key !== key) return step
-      const nextActor =
-        patch.actor === undefined
-          ? step.actor
-          : patch.actor == null
+      const nextActors =
+        patch.actors === undefined
+          ? step.actors
+          : patch.actors == null || patch.actors.length === 0
             ? undefined
-            : { ...step.actor, ...patch.actor }
-      return { ...step, ...patch, actor: nextActor, key: step.key, children: step.children }
+            : patch.actors.map((actor) => ({ ...actor }))
+      const nextActor =
+        patch.actors !== undefined
+          ? nextActors?.[0]
+          : patch.actor === undefined
+            ? step.actor
+            : patch.actor == null
+              ? undefined
+              : { ...step.actor, ...patch.actor }
+      return {
+        ...step,
+        ...patch,
+        actor: nextActor,
+        actors: nextActors,
+        key: step.key,
+        children: step.children
+      }
     })
   )
 }
@@ -308,6 +365,25 @@ export function buildWorkflowDesignerNodes(
       children: buildWorkflowDesignerNodes(children, path)
     }
   })
+}
+
+export function findWorkflowDesignerNode(
+  nodes: readonly WorkflowDesignerNode[],
+  path: WorkflowDesignerPath | undefined
+): WorkflowDesignerNode | undefined {
+  if (!path || path.length === 0) return undefined
+  for (const node of nodes) {
+    if (workflowDesignerPathKey(node.path) === workflowDesignerPathKey(path)) return node
+    const nested = findWorkflowDesignerNode(node.children, path)
+    if (nested) return nested
+  }
+  return undefined
+}
+
+export function cloneWorkflowDesignerActors(
+  step: Pick<WorkflowTimelineStep, 'actor' | 'actors'> | undefined
+): WorkflowTimelineActor[] {
+  return resolveWorkflowStepActors(step).map((actor) => ({ ...actor }))
 }
 
 export function workflowDesignerCardClassName(selected: boolean): string {

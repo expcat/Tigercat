@@ -2,11 +2,14 @@ import { computed, defineComponent, h, ref, watch, type PropType, type VNode } f
 import {
   buildWorkflowDesignerNodes,
   classNames,
+  cloneWorkflowDesignerActors,
   cloneWorkflowSteps,
   coerceClassValue,
   createWorkflowDesignerStep,
+  findWorkflowDesignerNode,
   getWorkflowDesignerLabels,
   getWorkflowTimelineLabels,
+  insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
   mergeStyleValues,
   mergeTigerLocale,
@@ -15,19 +18,34 @@ import {
   removeWorkflowStepAtPath,
   resolveWorkflowDesignerView,
   workflowDesignerActionButtonClasses,
+  workflowDesignerActorRowClasses,
   workflowDesignerCardClassName,
   workflowDesignerChildrenClasses,
   workflowDesignerControlClasses,
   workflowDesignerEmptyClasses,
   workflowDesignerFieldClasses,
   workflowDesignerFieldsClasses,
+  workflowDesignerHintClasses,
+  workflowDesignerInsertRowClasses,
   workflowDesignerItemClasses,
+  workflowDesignerKindColor,
+  workflowDesignerKindDotClasses,
   workflowDesignerKindOptions,
   workflowDesignerLabelClasses,
   workflowDesignerListClasses,
+  workflowDesignerPanelClasses,
+  workflowDesignerPathKey,
   workflowDesignerRootClasses,
+  workflowDesignerShellClasses,
+  workflowDesignerSignModeHint,
   workflowDesignerSignModeOptions,
+  workflowDesignerSummaryActorsClasses,
+  workflowDesignerSummaryClasses,
+  workflowDesignerSummaryRowClasses,
+  workflowDesignerSummaryTitleClasses,
   workflowDesignerToolbarClasses,
+  workflowDesignerTreeClasses,
+  workflowSignModeLabel,
   type TigerLocale,
   type TigerLocaleWorkflowDesigner,
   type WorkflowDesignerNode,
@@ -39,6 +57,7 @@ import {
   type WorkflowTimelineStep
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { Tag } from './Tag'
 
 export interface VueWorkflowDesignerProps extends Omit<
   CoreWorkflowDesignerProps,
@@ -50,18 +69,23 @@ export interface VueWorkflowDesignerProps extends Omit<
 
 export type WorkflowDesignerProps = VueWorkflowDesignerProps
 
-function pathKey(path: WorkflowDesignerPath): string {
-  return path.join('\0')
-}
-
-function renderActionButton(label: string, disabled: boolean, onClick: () => void): VNode {
+function renderActionButton(
+  label: string,
+  disabled: boolean,
+  onClick: () => void,
+  ariaLabel?: string
+): VNode {
   return h(
     'button',
     {
       type: 'button',
       class: workflowDesignerActionButtonClasses,
       disabled,
-      onClick
+      'aria-label': ariaLabel,
+      onClick: (event: Event) => {
+        event.stopPropagation()
+        onClick()
+      }
     },
     label
   )
@@ -142,6 +166,10 @@ export const WorkflowDesigner = defineComponent({
     const rootStyle = computed(() => mergeStyleValues(attrs.style, props.style))
     const kindOptions = computed(() => workflowDesignerKindOptions(timelineLabels.value))
     const signModeOptions = computed(() => workflowDesignerSignModeOptions(timelineLabels.value))
+    const selectedNode = computed(() => {
+      if (!selectedKey.value) return undefined
+      return findWorkflowDesignerNode(nodes.value, selectedKey.value.split('\0'))
+    })
 
     function commit(next: WorkflowTimelineStep[]): void {
       if (props.modelValue === undefined) innerValue.value = next
@@ -154,88 +182,162 @@ export const WorkflowDesigner = defineComponent({
     }
 
     function selectNode(node: WorkflowDesignerNode): void {
-      selectedKey.value = pathKey(node.path)
+      selectedKey.value = workflowDesignerPathKey(node.path)
       emit('select', node.path, node.step)
     }
 
-    function renderFields(node: WorkflowDesignerNode): VNode {
+    function insertSibling(path: WorkflowDesignerPath): void {
+      const created = createWorkflowDesignerStep(sourceSteps.value)
+      commit(insertWorkflowStepAfterPath(sourceSteps.value, path, created))
+      const nextPath = [...path.slice(0, -1), created.key]
+      selectedKey.value = workflowDesignerPathKey(nextPath)
+      emit('select', nextPath, created)
+    }
+
+    function renderSummary(node: WorkflowDesignerNode): VNode {
+      const groupName = node.title || node.key
+      return h('div', { class: workflowDesignerSummaryClasses }, [
+        h('div', { class: workflowDesignerSummaryRowClasses }, [
+          h('span', {
+            class: workflowDesignerKindDotClasses,
+            style: { backgroundColor: workflowDesignerKindColor(node.kind) },
+            'aria-hidden': 'true'
+          }),
+          h('span', { class: workflowDesignerSummaryTitleClasses }, groupName),
+          node.kind === 'approve'
+            ? h(
+                Tag,
+                { variant: 'primary', size: 'sm', pill: true },
+                { default: () => workflowSignModeLabel(node.signMode, timelineLabels.value) }
+              )
+            : null
+        ]),
+        node.actorName
+          ? h('div', { class: workflowDesignerSummaryActorsClasses }, node.actorName)
+          : null
+      ])
+    }
+
+    function renderEditPanel(node: WorkflowDesignerNode): VNode {
       const labels = designerLabels.value
       const lockedNow = locked.value
-      return h('div', { class: workflowDesignerFieldsClasses }, [
-        h('label', { class: workflowDesignerFieldClasses }, [
-          h('span', { class: workflowDesignerLabelClasses }, labels.titleLabel),
-          h('input', {
-            class: workflowDesignerControlClasses,
-            value: node.title,
-            placeholder: labels.titlePlaceholder,
-            disabled: lockedNow,
-            'aria-label': labels.titleLabel,
-            onInput: (event: Event) => {
-              patchNode(node.path, { title: (event.target as HTMLInputElement).value })
-            }
-          })
-        ]),
-        h('label', { class: workflowDesignerFieldClasses }, [
-          h('span', { class: workflowDesignerLabelClasses }, labels.kindLabel),
-          h(
-            'select',
-            {
-              class: workflowDesignerControlClasses,
-              value: node.kind,
-              disabled: lockedNow,
-              'aria-label': labels.kindLabel,
-              onChange: (event: Event) => {
-                patchNode(node.path, {
-                  kind: (event.target as HTMLSelectElement).value as WorkflowStepKind
-                })
-              }
-            },
-            kindOptions.value.map((option) => h('option', { value: option.value }, option.label))
-          )
-        ]),
-        node.kind === 'approve'
-          ? h('label', { class: workflowDesignerFieldClasses }, [
-              h('span', { class: workflowDesignerLabelClasses }, labels.signModeLabel),
+      const actors = cloneWorkflowDesignerActors(node.step)
+      const showSignMode = node.kind === 'approve'
+      const showActors = node.kind !== 'condition'
+
+      return h(
+        'div',
+        {
+          class: workflowDesignerPanelClasses,
+          role: 'region',
+          'aria-label': labels.editPanelAriaLabel
+        },
+        [
+          h('div', { class: workflowDesignerFieldsClasses }, [
+            h('label', { class: workflowDesignerFieldClasses }, [
+              h('span', { class: workflowDesignerLabelClasses }, labels.titleLabel),
+              h('input', {
+                class: workflowDesignerControlClasses,
+                value: node.title,
+                placeholder: labels.titlePlaceholder,
+                disabled: lockedNow,
+                'aria-label': labels.titleLabel,
+                onInput: (event: Event) => {
+                  patchNode(node.path, { title: (event.target as HTMLInputElement).value })
+                }
+              })
+            ]),
+            h('label', { class: workflowDesignerFieldClasses }, [
+              h('span', { class: workflowDesignerLabelClasses }, labels.kindLabel),
               h(
                 'select',
                 {
                   class: workflowDesignerControlClasses,
-                  value: node.signMode,
+                  value: node.kind,
                   disabled: lockedNow,
-                  'aria-label': labels.signModeLabel,
+                  'aria-label': labels.kindLabel,
                   onChange: (event: Event) => {
                     patchNode(node.path, {
-                      signMode: (event.target as HTMLSelectElement).value as WorkflowSignMode
+                      kind: (event.target as HTMLSelectElement).value as WorkflowStepKind
                     })
                   }
                 },
-                signModeOptions.value.map((option) =>
+                kindOptions.value.map((option) =>
                   h('option', { value: option.value }, option.label)
                 )
               )
-            ])
-          : null,
-        h('label', { class: workflowDesignerFieldClasses }, [
-          h('span', { class: workflowDesignerLabelClasses }, labels.actorLabel),
-          h('input', {
-            class: workflowDesignerControlClasses,
-            value: node.actorName,
-            placeholder: labels.actorPlaceholder,
-            disabled: lockedNow,
-            'aria-label': labels.actorLabel,
-            onInput: (event: Event) => {
-              patchNode(node.path, {
-                actor: { ...node.step.actor, name: (event.target as HTMLInputElement).value }
-              })
-            }
-          })
-        ])
-      ])
+            ]),
+            showSignMode
+              ? h('label', { class: workflowDesignerFieldClasses }, [
+                  h('span', { class: workflowDesignerLabelClasses }, labels.signModeLabel),
+                  h(
+                    'select',
+                    {
+                      class: workflowDesignerControlClasses,
+                      value: node.signMode,
+                      disabled: lockedNow,
+                      'aria-label': labels.signModeLabel,
+                      onChange: (event: Event) => {
+                        patchNode(node.path, {
+                          signMode: (event.target as HTMLSelectElement).value as WorkflowSignMode
+                        })
+                      }
+                    },
+                    signModeOptions.value.map((option) =>
+                      h('option', { value: option.value }, option.label)
+                    )
+                  ),
+                  h(
+                    'span',
+                    { class: workflowDesignerHintClasses },
+                    workflowDesignerSignModeHint(node.signMode, timelineLabels.value)
+                  )
+                ])
+              : null,
+            showActors
+              ? h('div', { class: workflowDesignerFieldClasses }, [
+                  h('span', { class: workflowDesignerLabelClasses }, labels.actorsLabel),
+                  ...actors.map((actor, index) =>
+                    h('div', { key: index, class: workflowDesignerActorRowClasses }, [
+                      h('input', {
+                        class: workflowDesignerControlClasses,
+                        value: actor.name ?? '',
+                        placeholder: labels.actorPlaceholder,
+                        disabled: lockedNow,
+                        'aria-label': `${labels.actorsLabel} ${index + 1}`,
+                        onInput: (event: Event) => {
+                          const next = cloneWorkflowDesignerActors(node.step)
+                          const current = next[index]
+                          if (!current) return
+                          next[index] = {
+                            ...current,
+                            name: (event.target as HTMLInputElement).value
+                          }
+                          patchNode(node.path, { actors: next })
+                        }
+                      }),
+                      renderActionButton(labels.removeActor, lockedNow, () => {
+                        const next = cloneWorkflowDesignerActors(node.step).filter(
+                          (_, actorIndex) => actorIndex !== index
+                        )
+                        patchNode(node.path, { actors: next })
+                      })
+                    ])
+                  ),
+                  renderActionButton(labels.addActor, lockedNow, () => {
+                    const next = [...cloneWorkflowDesignerActors(node.step), { name: '' }]
+                    patchNode(node.path, { actors: next })
+                  })
+                ])
+              : null
+          ])
+        ]
+      )
     }
 
     function renderNode(node: WorkflowDesignerNode): VNode {
       const labels = designerLabels.value
-      const selected = selectedKey.value === pathKey(node.path)
+      const selected = selectedKey.value === workflowDesignerPathKey(node.path)
       const groupName = node.title || node.key
       return h('li', { class: workflowDesignerItemClasses }, [
         h(
@@ -248,7 +350,7 @@ export const WorkflowDesigner = defineComponent({
             onClick: () => selectNode(node)
           },
           [
-            renderFields(node),
+            renderSummary(node),
             h('div', { class: workflowDesignerToolbarClasses }, [
               renderActionButton(labels.moveUp, locked.value || !node.canMoveUp, () => {
                 commit(moveWorkflowStepAtPath(sourceSteps.value, node.path, -1))
@@ -266,7 +368,9 @@ export const WorkflowDesigner = defineComponent({
                 )
               }),
               renderActionButton(labels.removeStep, locked.value, () => {
-                if (selectedKey.value === pathKey(node.path)) selectedKey.value = null
+                if (selectedKey.value === workflowDesignerPathKey(node.path)) {
+                  selectedKey.value = null
+                }
                 commit(removeWorkflowStepAtPath(sourceSteps.value, node.path))
               })
             ])
@@ -274,7 +378,15 @@ export const WorkflowDesigner = defineComponent({
         ),
         node.children.length > 0
           ? h('div', { class: workflowDesignerChildrenClasses }, [renderList(node.children)])
-          : null
+          : null,
+        h('div', { class: workflowDesignerInsertRowClasses }, [
+          renderActionButton(
+            labels.insertSibling,
+            locked.value,
+            () => insertSibling(node.path),
+            `${labels.insertSibling} (${groupName})`
+          )
+        ])
       ])
     }
 
@@ -294,8 +406,9 @@ export const WorkflowDesigner = defineComponent({
         ...restAttrs
       } = attrs as Record<string, unknown>
       const labels = designerLabels.value
-      const emptyCopy = view.value.valid ? labels.emptyText : labels.subpathEmpty
+      const emptyCopy = view.value.valid ? labels.emptyHint : labels.subpathEmpty
       const showEmpty = nodes.value.length === 0
+      const editing = selectedNode.value
 
       return h(
         'div',
@@ -310,15 +423,20 @@ export const WorkflowDesigner = defineComponent({
             labels.ariaLabel
         },
         [
-          showEmpty ? h('p', { class: workflowDesignerEmptyClasses }, emptyCopy) : null,
-          showEmpty ? null : renderList(nodes.value),
-          renderActionButton(labels.addStep, locked.value || !view.value.valid, () => {
-            const created = createWorkflowDesignerStep(sourceSteps.value)
-            if (view.value.parentPath.length === 0 && sourceSteps.value.length === 0) {
-              created.kind = 'start'
-            }
-            commit(insertWorkflowStepAtPath(sourceSteps.value, view.value.parentPath, created))
-          })
+          h('div', { class: workflowDesignerShellClasses }, [
+            h('div', { class: workflowDesignerTreeClasses }, [
+              showEmpty ? h('p', { class: workflowDesignerEmptyClasses }, emptyCopy) : null,
+              showEmpty ? null : renderList(nodes.value),
+              renderActionButton(labels.addStep, locked.value || !view.value.valid, () => {
+                const created = createWorkflowDesignerStep(sourceSteps.value)
+                if (view.value.parentPath.length === 0 && sourceSteps.value.length === 0) {
+                  created.kind = 'start'
+                }
+                commit(insertWorkflowStepAtPath(sourceSteps.value, view.value.parentPath, created))
+              })
+            ]),
+            editing ? renderEditPanel(editing) : null
+          ])
         ]
       )
     }
