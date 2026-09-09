@@ -1,0 +1,7 @@
+{
+  "id": "schema-form-01",
+  "title": "Schema 字段与校验",
+  "description": "用 JSON schema 渲 Form。姓名必填，提交走 Form 校验。",
+  "entry": "App.vue",
+  "order": 1
+}

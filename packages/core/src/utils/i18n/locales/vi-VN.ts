@@ -212,6 +212,11 @@ export const viVN: TigerLocale = {
     ariaLabel: 'Trình hướng dẫn biểu mẫu',
     skippedText: 'Đã bỏ qua'
   },
+  schemaForm: {
+    submitText: 'Gửi',
+    resetText: 'Đặt lại',
+    ariaLabel: 'Biểu mẫu schema'
+  },
   tour: {
     prevText: 'Trước',
     nextText: 'Tiếp',

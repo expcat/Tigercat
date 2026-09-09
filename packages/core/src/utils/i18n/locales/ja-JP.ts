@@ -212,6 +212,11 @@ export const jaJP: TigerLocale = {
     ariaLabel: 'フォームウィザード',
     skippedText: 'スキップ済み'
   },
+  schemaForm: {
+    submitText: '送信',
+    resetText: 'リセット',
+    ariaLabel: 'スキーマフォーム'
+  },
   tour: {
     prevText: '前へ',
     nextText: '次へ',

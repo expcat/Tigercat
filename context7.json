@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 179,
+  "component_count": 180,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -108,6 +108,9 @@
     "表单": ["Form"],
     "表单项": ["FormItem"],
     "表单向导": ["FormWizard"],
+    "动态表单": ["SchemaForm"],
+    "Schema表单": ["SchemaForm"],
+    "表单schema": ["SchemaForm"],
     "表格": ["Table"],
     "虚拟表格": ["VirtualTable"],
     "表格工具栏": ["DataTableWithToolbar"],
@@ -406,6 +409,7 @@
         "DataTableWithToolbar",
         "FormWizard",
         "NotificationCenter",
+        "SchemaForm",
         "TaskBoard",
         "WorkflowActionBar",
         "WorkflowDesigner",
@@ -1916,6 +1920,26 @@
       "typeSource": "packages/core/src/types/notification-center.ts",
       "sourceFiles": ["packages/core/src/types/notification-center.ts"],
       "propsInterfaces": ["NotificationCenterProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "SchemaForm": {
+      "name": "SchemaForm",
+      "aliases": ["动态表单", "Schema表单", "表单schema"],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./SchemaForm",
+      "packageTarget": "SchemaForm",
+      "typeSource": "packages/core/src/types/schema-form.ts",
+      "sourceFiles": ["packages/core/src/types/schema-form.ts"],
+      "propsInterfaces": ["SchemaFormProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

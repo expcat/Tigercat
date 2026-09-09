@@ -212,6 +212,11 @@ export const arSA: TigerLocale = {
     ariaLabel: 'معالج النموذج',
     skippedText: 'تم التخطي'
   },
+  schemaForm: {
+    submitText: 'إرسال',
+    resetText: 'إعادة تعيين',
+    ariaLabel: 'نموذج مخطط'
+  },
   tour: {
     prevText: 'السابق',
     nextText: 'التالي',

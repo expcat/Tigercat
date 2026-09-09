@@ -177,6 +177,7 @@ description: Compact generated route map for Tigercat core type files
 | chat.ts                | ChatWindowProps                                                    |
 | comment-thread.ts      | CommentThreadProps                                                 |
 | form-wizard.ts         | FormWizardProps                                                    |
+| schema-form.ts         | SchemaFormProps                                                    |
 | notification-center.ts | NotificationCenterProps                                            |
 | table-toolbar.ts       | TableToolbarProps, DataTableWithToolbarProps                       |
 | task-board.ts          | TaskBoardProps                                                     |

@@ -39,6 +39,7 @@ export const BEHAVIOR_PROP_STEMS = new Set([
   'virtual',
   'conditions',
   'rules',
+  'schema',
   'name',
   'animated',
   'collapsed',
@@ -745,6 +746,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'labels?',
     'onFinish?'
   ],
+  SchemaForm: ['schema', 'model?', 'rules?', 'onSubmit?'],
   FileManager: [
     'files?',
     'currentPath?',
@@ -958,6 +960,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowActionBar: '<WorkflowActionBar :items="actions" />',
     WorkflowViewer: '<WorkflowViewer :steps="steps" />',
     WorkflowDesigner: '<WorkflowDesigner v-model="steps" />',
+    SchemaForm: '<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />',
     Countdown: '<Countdown :value="deadline" />',
     Progress: '<Progress :percentage="64" />',
     Alert: '<Alert type="info" title="Saved" />',
@@ -1096,6 +1099,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowActionBar: '<WorkflowActionBar items={actions} />',
     WorkflowViewer: '<WorkflowViewer steps={steps} />',
     WorkflowDesigner: '<WorkflowDesigner value={steps} onChange={setSteps} />',
+    SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
     Countdown: '<Countdown value={deadline} />',
     Progress: '<Progress percentage={64} />',
     Alert: '<Alert type="info" title="Saved" />',

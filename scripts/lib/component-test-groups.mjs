@@ -97,6 +97,7 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'CommentThread',
       'DataTableWithToolbar',
       'FormWizard',
+      'SchemaForm',
       'NotificationCenter',
       'TaskBoard',
       'WorkflowActionBar',

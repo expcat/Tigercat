@@ -7,6 +7,7 @@
 包版本仍为 2.3.2，本条在打 tag 前不发版。
 
 - **WorkflowDesigner**：简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`（不是 BPMN / Flowable / Camunda）。可选 `path` 只编辑该节点的 children 并回写整树。Core helpers 可从 `@expcat/tigercat-core/workflow-designer` tree-shake。Vue `v-model` / React `value`+`onChange`。示例 `workflow-designer/01` `02`。公开 API 增补，无新必填 prop。
+- **SchemaForm**：schema 驱动表单，复用 Form / FormItem 校验与条件 DSL。字段定义、布局 groups（可嵌套）、点路径嵌套值、`valuePath` / `mapIn` / `mapOut` 值映射。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。示例 `schema-form/01` `02`。公开 API 增补；Captcha 未做。无新必填 prop（对已有 Form API）。
 
 ## v2.3.2
 

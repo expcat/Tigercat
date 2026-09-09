@@ -40,6 +40,7 @@ export default defineConfig({
     'utils/table-export': 'src/utils/table-export.ts',
     'utils/data-export': 'src/utils/data-export.ts',
     'workflow-designer': 'src/workflow-designer.ts',
+    'schema-form': 'src/schema-form.ts',
     ...localeEntries,
     ...datePickerLocaleEntries,
     ...iconEntries

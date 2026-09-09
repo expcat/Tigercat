@@ -212,6 +212,11 @@ export const thTH: TigerLocale = {
     ariaLabel: 'ตัวช่วยสร้างฟอร์ม',
     skippedText: 'ข้ามแล้ว'
   },
+  schemaForm: {
+    submitText: 'ส่ง',
+    resetText: 'รีเซ็ต',
+    ariaLabel: 'ฟอร์มสคีมา'
+  },
   tour: {
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',

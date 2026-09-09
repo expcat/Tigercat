@@ -177,6 +177,10 @@
     "./workflow-designer": {
       "types": "./dist/workflow-designer.d.ts",
       "import": "./dist/workflow-designer.js"
+    },
+    "./schema-form": {
+      "types": "./dist/schema-form.d.ts",
+      "import": "./dist/schema-form.js"
     }
   },
   "files": [

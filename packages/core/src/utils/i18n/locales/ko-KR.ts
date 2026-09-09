@@ -212,6 +212,11 @@ export const koKR: TigerLocale = {
     ariaLabel: '양식 마법사',
     skippedText: '건너뜀'
   },
+  schemaForm: {
+    submitText: '제출',
+    resetText: '초기화',
+    ariaLabel: '스키마 폼'
+  },
   tour: {
     prevText: '이전',
     nextText: '다음',

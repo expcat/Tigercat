@@ -318,6 +318,15 @@ export interface TigerLocaleFormWizard {
   skippedText?: string
 }
 
+export interface TigerLocaleSchemaForm {
+  /** Submit action text */
+  submitText?: string
+  /** Reset action text */
+  resetText?: string
+  /** Accessible name for the schema form */
+  ariaLabel?: string
+}
+
 export interface TigerLocaleTour {
   prevText?: string
   nextText?: string
@@ -929,6 +938,7 @@ export interface TigerLocale {
   timePicker?: TigerLocaleTimePicker
   dataExport?: TigerLocaleDataExport
   formWizard?: TigerLocaleFormWizard
+  schemaForm?: TigerLocaleSchemaForm
   tour?: TigerLocaleTour
   calendar?: TigerLocaleCalendar
   fullscreen?: TigerLocaleFullscreen

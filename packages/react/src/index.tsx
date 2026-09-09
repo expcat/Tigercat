@@ -298,6 +298,8 @@ export type {
 } from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'
 export type { FormWizardProps, FormWizardHandle, WizardStep } from './components/FormWizard'
+export { SchemaForm } from './components/SchemaForm'
+export type { SchemaFormProps } from './components/SchemaForm'
 export { CropUpload } from './components/CropUpload'
 export type { CropUploadProps } from './components/CropUpload'
 export { ChartCanvas } from './components/ChartCanvas'

@@ -212,6 +212,11 @@ export const deDE: TigerLocale = {
     ariaLabel: 'Formularassistent',
     skippedText: 'Übersprungen'
   },
+  schemaForm: {
+    submitText: 'Absenden',
+    resetText: 'Zurücksetzen',
+    ariaLabel: 'Schema-Formular'
+  },
   tour: {
     prevText: 'Zurück',
     nextText: 'Weiter',

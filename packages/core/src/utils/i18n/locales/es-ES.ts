@@ -212,6 +212,11 @@ export const esES: TigerLocale = {
     ariaLabel: 'Asistente de formulario',
     skippedText: 'Omitido'
   },
+  schemaForm: {
+    submitText: 'Enviar',
+    resetText: 'Restablecer',
+    ariaLabel: 'Formulario de esquema'
+  },
   tour: {
     prevText: 'Anterior',
     nextText: 'Siguiente',

@@ -212,6 +212,11 @@ export const zhTW: TigerLocale = {
     ariaLabel: '表單精靈',
     skippedText: '已跳過'
   },
+  schemaForm: {
+    submitText: '提交',
+    resetText: '重設',
+    ariaLabel: '動態表單'
+  },
   tour: {
     prevText: '上一步',
     nextText: '下一步',

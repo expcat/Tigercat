@@ -1,0 +1,7 @@
+{
+  "id": "schema-form-02",
+  "title": "分组与嵌套路径",
+  "description": "groups 可嵌套；address.city 写入嵌套对象。role 控制 company 显示。",
+  "entry": "App.tsx",
+  "order": 2
+}

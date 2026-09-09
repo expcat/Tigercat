@@ -710,6 +710,11 @@
       "import": "./dist/components/ScatterChart.mjs",
       "default": "./dist/components/ScatterChart.mjs"
     },
+    "./SchemaForm": {
+      "types": "./dist/components/SchemaForm.d.mts",
+      "import": "./dist/components/SchemaForm.mjs",
+      "default": "./dist/components/SchemaForm.mjs"
+    },
     "./ScrollArea": {
       "types": "./dist/components/ScrollArea.d.mts",
       "import": "./dist/components/ScrollArea.mjs",

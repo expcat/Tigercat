@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 11 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 12 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -112,6 +112,23 @@ Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups
 | `manageReadState?` | `boolean`                            | `false` | Whether to manage read state internally. When true, the component tracks read/unread st... |
 
 Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`, `onItemClick?`, `onItemReadChange?`.
+
+## SchemaForm
+
+`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/27 props
+
+Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
+
+Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。
+
+| Prop          | Type               | Default | Notes                                                                   |
+| ------------- | ------------------ | ------- | ----------------------------------------------------------------------- |
+| `schema`      | `SchemaFormSchema` | `-`     | Field / group schema.                                                   |
+| `model?`      | `FormValues`       | `-`     | Form values. Controlled when passed (including `{}`).                   |
+| `rules?`      | `FormRules`        | `-`     | Extra rules merged over schema-derived rules (caller wins on conflict). |
+| `conditions?` | `FormConditions`   | `-`     | Extra conditions merged over schema-derived conditions.                 |
+
+Events/callback props: `onChange?`, `onSubmit?`, `onReset?`.
 
 ## TaskBoard
 

@@ -311,6 +311,8 @@ export type {
 } from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'
 export type { VueFormWizardProps } from './components/FormWizard'
+export { SchemaForm } from './components/SchemaForm'
+export type { VueSchemaFormProps, SchemaFormProps } from './components/SchemaForm'
 export { CropUpload } from './components/CropUpload'
 export type { VueCropUploadProps, CropUploadProps } from './components/CropUpload'
 export { ChartCanvas } from './components/ChartCanvas'

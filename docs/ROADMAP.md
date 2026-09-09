@@ -35,18 +35,18 @@ source: current repository state after v2.1.4
 | M1     | 2.3.2 | WorkflowViewer + MenuSchema 元数据；Admin 菜单轻页 + 审批 Mock 写回 |
 | M2     | 2.3.3 | Admin mixed 动态路由 / pageMap / 按钮权限；库仅补 M1 暴露缺口       |
 | M3     | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需                         |
-| M4     | 2.4.0 | WorkflowDesigner（simple JSON 树）；库 S1 已落地，未发版            |
+| M4     | 2.4.0 | WorkflowDesigner + SchemaForm；库已落地，未发版                     |
 
 节奏：Tigercat `2.3.x` 先发版 → Admin 升依赖后跟。明确不做：Flowable/Camunda/BPMN、第二套 Menu/Timeline、租户/组织/字典组件化进库。
 
-Tigercat M1 已随 v2.3.2 发出。M4-S1 已在库内落地 WorkflowDesigner（simple JSON 树），包版本仍为 2.3.2、未打 tag。下一可执行切片见工作区 M4 状态。
+Tigercat M1 已随 v2.3.2 发出。M4-S1 已落地 WorkflowDesigner，M4-S2 已落地 SchemaForm（包版本仍为 2.3.2、未打 tag）。下一可执行切片见工作区 M4 状态。
 
 ## 长期观察项（不绑定版本）
 
 - headless/unstyled 模式：需先评估与 Tailwind 插件、token 体系的关系。
 - React peer 依赖下探（^18）：收益与测试矩阵成本权衡。
 - 低频候选：TimeSelect、Inplace 就地编辑、CopyButton、Dock；出现真实下游需求时再登记。
-- Admin 上游已推迟：动态 schema 表单（不做表单设计器产品）、人机验证码组件（登录无明示需求）、Chart 基元 axis↔tooltip 共享 scale（高层图已够用）。
+- Admin 上游已推迟：人机验证码组件（登录无明示需求）、Chart 基元 axis↔tooltip 共享 scale（高层图已够用）。动态 schema 表单已作为库组件 SchemaForm 落地（不是表单设计器）。
 
 ## 发布与验证边界
 

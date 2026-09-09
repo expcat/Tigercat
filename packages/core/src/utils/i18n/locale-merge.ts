@@ -43,6 +43,7 @@ export const TIGER_LOCALE_KEY_SET = {
   timePicker: true,
   dataExport: true,
   formWizard: true,
+  schemaForm: true,
   tour: true,
   calendar: true,
   fullscreen: true,

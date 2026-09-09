@@ -4,6 +4,7 @@ import {
   getPaginationLabels,
   getTableLabels,
   getFormWizardLabels,
+  getSchemaFormLabels,
   getTaskBoardLabels,
   getSelectLabels,
   getColorPickerLabels,
@@ -57,6 +58,18 @@ describe('custom-text overrides on label resolvers', () => {
       expect(labels.prevText).toBe('override-prev')
       expect(labels.nextText).toBe('locale-next')
       expect(labels.finishText).toBe(enUS.formWizard?.finishText)
+    })
+  })
+
+  describe('getSchemaFormLabels', () => {
+    it('ranks overrides above locale and default', () => {
+      const labels = getSchemaFormLabels(
+        { schemaForm: { submitText: 'locale-submit', resetText: 'locale-reset' } },
+        { submitText: 'override-submit' }
+      )
+      expect(labels.submitText).toBe('override-submit')
+      expect(labels.resetText).toBe('locale-reset')
+      expect(labels.ariaLabel).toBe(enUS.schemaForm?.ariaLabel)
     })
   })
 

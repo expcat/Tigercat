@@ -212,6 +212,11 @@ export const idID: TigerLocale = {
     ariaLabel: 'Wisaya formulir',
     skippedText: 'Dilewati'
   },
+  schemaForm: {
+    submitText: 'Kirim',
+    resetText: 'Atur ulang',
+    ariaLabel: 'Formulir skema'
+  },
   tour: {
     prevText: 'Sebelumnya',
     nextText: 'Selanjutnya',

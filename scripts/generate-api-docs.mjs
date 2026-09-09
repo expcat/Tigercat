@@ -398,6 +398,11 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。'
   },
+  SchemaForm: {
+    uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],
+    notes:
+      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
+  },
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities', 'kanban utilities'],
     notes:
@@ -545,6 +550,7 @@ const COMPONENT_SNIPPETS = {
       '<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />',
     Table: '<Table :columns="columns" :data-source="rows" row-key="id" :pagination="false" />',
     FormWizard: '<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />',
+    SchemaForm: '<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />',
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
     VirtualTable:
@@ -607,6 +613,7 @@ const COMPONENT_SNIPPETS = {
       '<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />',
     Table: '<Table columns={columns} dataSource={rows} rowKey="id" pagination={false} />',
     FormWizard: '<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />',
+    SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
     TaskBoard: '<TaskBoard columns={columns} />',
     Kanban: '<Kanban columns={columns} />',
     VirtualTable:

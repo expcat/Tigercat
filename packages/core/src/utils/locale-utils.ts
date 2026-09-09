@@ -26,6 +26,7 @@ import type {
   TigerLocaleTable,
   TigerLocaleDataExport,
   TigerLocaleFormWizard,
+  TigerLocaleSchemaForm,
   TigerLocaleTour,
   TigerLocaleCalendar,
   TigerLocaleFullscreen,
@@ -248,6 +249,13 @@ export function getFormWizardLabels(
   overrides?: Partial<TigerLocaleFormWizard>
 ): Required<TigerLocaleFormWizard> {
   return resolveLocaleSection(enSection('formWizard'), locale?.formWizard, overrides)
+}
+
+export function getSchemaFormLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSchemaForm>
+): Required<TigerLocaleSchemaForm> {
+  return resolveLocaleSection(enSection('schemaForm'), locale?.schemaForm, overrides)
 }
 
 export function getPaginationLabels(
