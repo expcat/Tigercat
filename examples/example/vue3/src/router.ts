@@ -125,6 +125,10 @@ const router = createRouter({
         { path: 'affix', component: () => import('./pages/AffixDemo.vue') },
         { path: 'tour', component: () => import('./pages/TourDemo.vue') },
         { path: 'float-button', component: () => import('./pages/FloatButtonDemo.vue') },
+        {
+          path: 'fullscreen-button',
+          component: () => import('./pages/FullscreenButtonDemo.vue')
+        },
         { path: 'spotlight', component: () => import('./pages/SpotlightDemo.vue') },
         { path: 'scroll-spy', component: () => import('./pages/ScrollSpyDemo.vue') },
         // Feedback
@@ -166,6 +170,7 @@ const router = createRouter({
         { path: 'org-chart', component: () => import('./pages/OrgChartDemo.vue') },
         { path: 'gantt', component: () => import('./pages/GanttDemo.vue') },
         // Advanced
+        { path: 'drag', component: () => import('./pages/DragDemo.vue') },
         { path: 'resizable', component: () => import('./pages/ResizableDemo.vue') },
         { path: 'virtual-list', component: () => import('./pages/VirtualListDemo.vue') },
         {

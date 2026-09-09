@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "219 kB",
+    "limit": "220 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "418 kB",
+    "limit": "420 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "460 kB",
+    "limit": "462 kB",
     "gzip": true
   },
   {

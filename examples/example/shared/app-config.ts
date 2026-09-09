@@ -351,6 +351,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'FloatButton 浮动按钮', 'en-US': 'FloatButton' }
       },
       {
+        key: 'fullscreen-button',
+        path: '/fullscreen-button',
+        label: { 'zh-CN': 'FullscreenButton 全屏', 'en-US': 'FullscreenButton' }
+      },
+      {
         key: 'spotlight',
         path: '/spotlight',
         label: { 'zh-CN': 'Spotlight 命令面板', 'en-US': 'Spotlight' }
@@ -478,6 +483,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     key: 'advanced',
     label: { 'zh-CN': '高级交互', 'en-US': 'Advanced' },
     items: [
+      {
+        key: 'drag',
+        path: '/drag',
+        label: { 'zh-CN': 'Drag 拖拽', 'en-US': 'Drag' }
+      },
       {
         key: 'splitter',
         path: '/splitter',

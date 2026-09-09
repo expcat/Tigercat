@@ -101,6 +101,7 @@ const BackTopDemo = lazy(() => import('./pages/BackTopDemo'))
 const AffixDemo = lazy(() => import('./pages/AffixDemo'))
 const TourDemo = lazy(() => import('./pages/TourDemo'))
 const FloatButtonDemo = lazy(() => import('./pages/FloatButtonDemo'))
+const FullscreenButtonDemo = lazy(() => import('./pages/FullscreenButtonDemo'))
 const SpotlightDemo = lazy(() => import('./pages/SpotlightDemo'))
 const ScrollSpyDemo = lazy(() => import('./pages/ScrollSpyDemo'))
 
@@ -133,6 +134,7 @@ const OrgChartDemo = lazy(() => import('./pages/OrgChartDemo'))
 const GanttDemo = lazy(() => import('./pages/GanttDemo'))
 
 // Advanced
+const DragDemo = lazy(() => import('./pages/DragDemo'))
 const ResizableDemo = lazy(() => import('./pages/ResizableDemo'))
 const VirtualListDemo = lazy(() => import('./pages/VirtualListDemo'))
 const InfiniteScrollDemo = lazy(() => import('./pages/InfiniteScrollDemo'))
@@ -259,6 +261,7 @@ const router = createHashRouter([
       { path: 'affix', element: <AffixDemo /> },
       { path: 'tour', element: <TourDemo /> },
       { path: 'float-button', element: <FloatButtonDemo /> },
+      { path: 'fullscreen-button', element: <FullscreenButtonDemo /> },
       { path: 'spotlight', element: <SpotlightDemo /> },
       { path: 'scroll-spy', element: <ScrollSpyDemo /> },
       // Feedback
@@ -288,6 +291,7 @@ const router = createHashRouter([
       { path: 'org-chart', element: <OrgChartDemo /> },
       { path: 'gantt', element: <GanttDemo /> },
       // Advanced
+      { path: 'drag', element: <DragDemo /> },
       { path: 'resizable', element: <ResizableDemo /> },
       { path: 'virtual-list', element: <VirtualListDemo /> },
       { path: 'infinite-scroll', element: <InfiniteScrollDemo /> },
