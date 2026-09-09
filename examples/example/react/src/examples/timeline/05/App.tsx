@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
+import type {
+  WorkflowActionBarItem,
+  WorkflowActionPayload,
+  WorkflowTimelineStep
+} from '@expcat/tigercat-core'
 import { WorkflowActionBar } from '@expcat/tigercat-react/WorkflowTimeline'
 import { WorkflowViewer } from '@expcat/tigercat-react/WorkflowViewer'
 
@@ -52,7 +56,7 @@ const steps: WorkflowTimelineStep[] = [
     order: 5,
     children: [
       { key: 'low', title: '≤ 5000 自动', status: 'approved' },
-      { key: 'high', title: '> 5000 加签', status: 'pending' }
+      { key: 'high', title: '> 5000 总监审批', status: 'pending' }
     ]
   },
   {
@@ -77,14 +81,16 @@ const actions: WorkflowActionBarItem[] = [
   { key: 'approve', label: '同意', action: 'approve', variant: 'primary' },
   { key: 'reject', label: '拒绝', action: 'reject', variant: 'danger' },
   { key: 'transfer', label: '转交', action: 'transfer', variant: 'outline' },
-  { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' }
+  { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' },
+  { key: 'cancel', label: '撤回', action: 'cancel', variant: 'danger', disabled: true }
 ]
 
 export default function App() {
   const [lastAction, setLastAction] = useState('')
 
-  function onAction(item: WorkflowActionBarItem) {
-    setLastAction(item.label)
+  function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) {
+    const comment = payload?.comment?.trim()
+    setLastAction(comment ? `${item.label}（${comment}）` : item.label)
   }
 
   return (

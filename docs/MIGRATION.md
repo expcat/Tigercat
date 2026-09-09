@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.4.2
+
+v2.4.2 无 breaking change，无新必填 prop。可选 `actors[]`（会签名单；缺省仍用单数 `actor`）。ActionBar `confirm` 增加 description 与可选意见框，`onAction` 第二参 `{ comment? }` 可选。Designer 摘要卡与兄弟插入不改 `path` 语义。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v242)。
+
 ## v2.4.0
 
 v2.4.0 无 breaking change，无新必填 prop。WorkflowDesigner（simple JSON 树，可选 `path` 子路径编辑）与 SchemaForm（schema 驱动表单，Captcha 未做）是新增 API。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v240)。

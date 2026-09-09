@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
+import type {
+  WorkflowActionBarItem,
+  WorkflowActionPayload,
+  WorkflowTimelineStep
+} from '@expcat/tigercat-core'
 import { WorkflowTimeline } from '@expcat/tigercat-react/WorkflowTimeline'
 
 const steps: WorkflowTimelineStep[] = [
@@ -15,9 +19,13 @@ const steps: WorkflowTimelineStep[] = [
   },
   {
     key: 'manager',
-    title: '主管审批',
+    title: '主管会签',
     status: 'approved',
-    actor: { name: '李四' },
+    signMode: 'countersign',
+    actors: [
+      { name: '李四', status: 'approved' },
+      { name: '钱七', status: 'approved' }
+    ],
     comment: '同意，金额合理。',
     time: '2026-09-01 14:30',
     action: 'approve',
@@ -25,6 +33,7 @@ const steps: WorkflowTimelineStep[] = [
     children: [
       {
         key: 'cc',
+        kind: 'cc',
         title: '抄送 HR',
         status: 'canceled',
         actor: { name: 'HR' },
@@ -60,8 +69,9 @@ const actions: WorkflowActionBarItem[] = [
 export default function App() {
   const [lastAction, setLastAction] = useState('')
 
-  function onAction(item: WorkflowActionBarItem) {
-    setLastAction(item.label)
+  function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) {
+    const comment = payload?.comment?.trim()
+    setLastAction(comment ? `${item.label}（${comment}）` : item.label)
   }
 
   return (

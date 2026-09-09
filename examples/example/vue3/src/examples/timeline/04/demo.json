@@ -1,7 +1,7 @@
 {
   "id": "timeline-04",
   "title": "审批工作流",
-  "description": "WorkflowTimeline 把 mock 审批步骤映射到现有 Timeline，当前步骤为 active 时显示操作条。",
+  "description": "WorkflowTimeline 把 mock 审批步骤映射到现有 Timeline。会签人用 actors 列在项内；当前步骤为 active 时显示操作条，确认含后果句与意见框。",
   "entry": "App.vue",
   "order": 4
 }

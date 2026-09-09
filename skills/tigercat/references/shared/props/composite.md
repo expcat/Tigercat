@@ -149,24 +149,26 @@ Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCa
 
 ## WorkflowActionBar
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowActionBarProps` · 4/6 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowActionBarProps` · 4/8 props
 
-Uses: `Button`, `Popconfirm`.
+Uses: `Button`, `Popconfirm`, `Textarea`.
 
-Note: 展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。`confirm` 打开确认框配方（通过/驳回/撤销/转交），文案走 `locale.workflowTimeline`；逐项 `confirm` 可覆盖。
+Note: 展示用审批按钮条。默认视觉序同意→拒绝→转交→撤回→评论。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。`confirm` 打开 title + description（拒绝可意见框），文案走 `locale.workflowTimeline`；逐项 `confirm` 可覆盖。`onAction` 第二参 `{ comment? }` 可选。无加签引擎。
 
 | Prop         | Type                      | Default | Notes                                                                                      |
 | ------------ | ------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `items?`     | `WorkflowActionBarItem[]` | `-`     | Action buttons to render.                                                                  |
+| `items?`     | `WorkflowActionBarItem[]` | `-`     | Action buttons to render. Sorted approve → reject → transfer → cancel → comment unless...  |
 | `disabled?`  | `boolean`                 | `-`     | Disable every action, in addition to per-item `disabled`.                                  |
 | `confirm?`   | `boolean`                 | `false` | Enable the confirm-dialog recipe for approve / reject / cancel / transfer. Per-item `co... |
 | `ariaLabel?` | `string`                  | `-`     | Accessible name for the toolbar. Defaults to "Workflow actions".                           |
+
+Events/callback props: `onAction?`.
 
 ## WorkflowDesigner
 
 `packages/core/src/types/workflow-designer.ts` · `WorkflowDesignerProps` · 4/11 props
 
-Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。
+Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。未选中摘要卡，点选后编辑 title/kind/signMode/actors；兄弟 `+` 插入。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。
 
 | Prop        | Type                                   | Default | Notes                                                                                      |
 | ----------- | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -179,11 +181,11 @@ Events/callback props: `onChange?`, `onSelect?`.
 
 ## WorkflowTimeline
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/16 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/18 props
 
 Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
 
-Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。`actions` 是展示用操作条（通过/驳回/转交/撤销/评论），无 BPM 引擎。默认在当前步骤为 `active` 且传入 `actions` 时显示操作条。
+Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。会签人用 `actors` 列在项内，不要把人做成 children。`actions` 是展示用操作条（同意/拒绝/转交/撤回/评论），无 BPM / 加签引擎。默认在当前步骤为 `active` 且传入 `actions` 时显示操作条。
 
 | Prop       | Type                      | Default  | Notes                                                                           |
 | ---------- | ------------------------- | -------- | ------------------------------------------------------------------------------- |
@@ -198,7 +200,7 @@ Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到�
 
 Uses: `Tag`.
 
-Note: 只读钉钉风审批树，复用 `WorkflowTimelineStep`（含 children 并行/抄送/条件分支 stub），不另起一套时间线。会签/或签/依次为展示字段。当前路径高亮与驳回回退点只读。无 BPM 引擎。
+Note: 只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors`，不要把人做成横向子卡。当前节点色点/「进行中」+ 路径图例；cc 弱化。无第二套时间线，无 BPM / 加签引擎。
 
 | Prop                 | Type                                   | Default | Notes                                                                   |
 | -------------------- | -------------------------------------- | ------- | ----------------------------------------------------------------------- |

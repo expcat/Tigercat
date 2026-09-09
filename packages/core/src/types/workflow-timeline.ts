@@ -235,10 +235,13 @@ export interface WorkflowActionPayload {
 
 /**
  * Presentational action-bar props. Vue/React bindings render these.
+ * Display order is approve → reject → transfer → cancel → comment, then
+ * remaining keys in original relative order. Not a BPM / add-sign engine.
  */
 export interface WorkflowActionBarProps {
   /**
-   * Action buttons to render.
+   * Action buttons to render. Sorted approve → reject → transfer → cancel →
+   * comment unless a custom `renderActions` replaces the bar.
    */
   items?: WorkflowActionBarItem[]
   /**
@@ -251,7 +254,8 @@ export interface WorkflowActionBarProps {
   ariaLabel?: string
   /**
    * Enable the confirm-dialog recipe for approve / reject / cancel / transfer.
-   * Per-item `confirm` overrides this. Copy comes from `locale.workflowTimeline`.
+   * Per-item `confirm` overrides this. Copy is `locale.workflowTimeline` title +
+   * description; reject shows a comment field unless `commentInput` is false.
    * @default false
    */
   confirm?: boolean
@@ -278,7 +282,8 @@ export interface WorkflowActionBarProps {
 
 /**
  * Read-only DingTalk-style workflow tree. Same {@link WorkflowTimelineStep}
- * model as WorkflowTimeline — not a second timeline.
+ * model as WorkflowTimeline — not a second timeline. Countersign people use
+ * `actors`; `children` are parallel / CC / condition branches.
  */
 export interface WorkflowViewerProps {
   /**

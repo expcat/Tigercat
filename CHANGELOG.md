@@ -2,6 +2,15 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.4.2
+
+v2.4.2（即将发布，包版本仍为 2.4.0 直至发版切片）：审批详情扫读。Viewer 状态色点/进行中 + 路径图例；会签人用 `actors` 列在卡内；ActionBar 主次序 + 确认 description / 意见框；Designer 摘要卡 + 选中编辑 + 兄弟插入。无新必填 prop。不是 BPMN，不是加签引擎。
+
+- **WorkflowViewer / WorkflowTimeline**：当前节点可扫读（状态色点 +「进行中」，不只 ring）；`highlightPath` 时图例含当前路径 / 未走分支 / 驳回回退点。会签/或签/依次在卡内列 `actors`（countersign 显示 N/M），不要把人做成 `children` 并行卡。`kind=cc` 状态「已抄送」、视觉弱化。同一套 `WorkflowTimelineStep`，不另起 Timeline。示例 `timeline/04` `05`。公开 API 增补（可选 `actors`），无新必填 prop。
+- **WorkflowActionBar**：默认视觉序同意→拒绝→转交→撤回→评论；`confirm` 为 title + description（拒绝/撤回 danger）；拒绝可意见框，空意见仍提交；`commentRequired` 只换文案/aria。`onAction(item, payload?)` 第二参可选。示例 `timeline/04` `05`。默认集合不加签/退回选节点。公开 API 增补，无新必填 prop。
+- **WorkflowDesigner**：未选中摘要卡（kind 色点、标题、审批人名、signMode Tag）；选中后右侧/下方编辑 title / kind / signMode / actors。兄弟 `+` 调用 `insertWorkflowStepAfterPath`。仍是 simple JSON 树，不是 BPMN / Flowable / Camunda。示例 `workflow-designer/01` `02`。公开 API 增补，无新必填 prop。
+- **同步 `.size-limit.json` 预算（v2.4.2 实测）**：`Core (full)` 216→219 kB（实测 218.23）、`Vue (full)` 413→418 kB（实测 417.12）、`React (full)` 455→460 kB（实测 459.2）；locale / Viewer / Designer 增补带动若干子路径略超，一并按实测上调。
+
 ## v2.4.0
 
 v2.4.0：WorkflowDesigner 简单 JSON 树流程编辑器；SchemaForm schema 驱动表单。无新必填 prop。Captcha 未做。

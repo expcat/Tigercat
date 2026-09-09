@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
+import type {
+  WorkflowActionBarItem,
+  WorkflowActionPayload,
+  WorkflowTimelineStep
+} from '@expcat/tigercat-core'
 import { WorkflowActionBar } from '@expcat/tigercat-vue/WorkflowTimeline'
 import { WorkflowViewer } from '@expcat/tigercat-vue/WorkflowViewer'
 
@@ -53,7 +57,7 @@ const steps: WorkflowTimelineStep[] = [
     order: 5,
     children: [
       { key: 'low', title: '≤ 5000 自动', status: 'approved' },
-      { key: 'high', title: '> 5000 加签', status: 'pending' }
+      { key: 'high', title: '> 5000 总监审批', status: 'pending' }
     ]
   },
   {
@@ -78,13 +82,15 @@ const actions: WorkflowActionBarItem[] = [
   { key: 'approve', label: '同意', action: 'approve', variant: 'primary' },
   { key: 'reject', label: '拒绝', action: 'reject', variant: 'danger' },
   { key: 'transfer', label: '转交', action: 'transfer', variant: 'outline' },
-  { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' }
+  { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' },
+  { key: 'cancel', label: '撤回', action: 'cancel', variant: 'danger', disabled: true }
 ]
 
 const lastAction = ref('')
 
-function onAction(item: WorkflowActionBarItem) {
-  lastAction.value = item.label
+function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) {
+  const comment = payload?.comment?.trim()
+  lastAction.value = comment ? `${item.label}（${comment}）` : item.label
 }
 </script>
 

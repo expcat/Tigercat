@@ -21,6 +21,8 @@ export type WorkflowDesignerStepPatch = Omit<Partial<WorkflowTimelineStep>, 'chi
 /**
  * Shared WorkflowDesigner props. Vue binds `modelValue` / `update:modelValue`.
  *
+ * Unselected nodes are summary cards; select one to edit title / kind /
+ * signMode / actors. Sibling insert is still a JSON tree, not BPMN.
  * Optional `path` scopes editing to that node's children; `onChange` still
  * emits the full tree so the parent can tree-shake this editor via subpath.
  */
