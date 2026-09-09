@@ -541,6 +541,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'FormWizard 表单向导', 'en-US': 'FormWizard' }
       },
       {
+        key: 'workflow-designer',
+        path: '/workflow-designer',
+        label: { 'zh-CN': 'WorkflowDesigner 流程设计器', 'en-US': 'WorkflowDesigner' }
+      },
+      {
         key: 'chat-window',
         path: '/chat-window',
         label: { 'zh-CN': 'ChatWindow 聊天窗口', 'en-US': 'ChatWindow' }

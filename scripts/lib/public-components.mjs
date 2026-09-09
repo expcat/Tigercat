@@ -137,7 +137,8 @@ export const CATEGORIES = {
     'notification-center',
     'table-toolbar',
     'task-board',
-    'workflow-timeline'
+    'workflow-timeline',
+    'workflow-designer'
   ],
   Core: ['base', 'events', 'floating-popup', 'generics', 'locale', 'slots', 'theme']
 }
@@ -454,6 +455,9 @@ export const COMPONENT_ROUTE_ALIASES = {
   审批操作条: ['WorkflowActionBar'],
   工作流视图: ['WorkflowViewer'],
   审批流程树: ['WorkflowViewer'],
+  工作流设计器: ['WorkflowDesigner'],
+  流程设计器: ['WorkflowDesigner'],
+  审批设计器: ['WorkflowDesigner'],
   文件管理: ['FileManager'],
   通知中心: ['NotificationCenter'],
   新手引导: ['Tour'],

@@ -90,6 +90,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | NotificationCenter    | Composite  | `composite`  | notification-center.ts                              | ./NotificationCenter    |
 | TaskBoard             | Composite  | `composite`  | task-board.ts                                       | ./TaskBoard             |
 | WorkflowActionBar     | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowActionBar     |
+| WorkflowDesigner      | Composite  | `composite`  | workflow-designer.ts                                | ./WorkflowDesigner      |
 | WorkflowTimeline      | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowTimeline      |
 | WorkflowViewer        | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowViewer        |
 | Calendar              | Data       | `data`       | calendar.ts                                         | ./Calendar              |

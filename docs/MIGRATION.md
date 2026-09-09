@@ -4,7 +4,7 @@
 
 ## 未发布
 
-当前没有待组件用户处理的 breaking change。
+当前没有待组件用户处理的 breaking change。WorkflowDesigner 是新增 API（simple JSON 树，可选 `path` 子路径编辑），无新必填 prop。
 
 ## v2.3.2
 

@@ -99,6 +99,22 @@ export const koKR: TigerLocale = {
     confirmCancel: '이 요청을 취소할까요?',
     confirmTransfer: '이 단계를 전달할까요?'
   },
+  workflowDesigner: {
+    ariaLabel: '워크플로 설계기',
+    addStep: '단계 추가',
+    addChild: '하위 단계 추가',
+    removeStep: '삭제',
+    moveUp: '위로',
+    moveDown: '아래로',
+    titleLabel: '제목',
+    titlePlaceholder: '단계 제목',
+    kindLabel: '종류',
+    signModeLabel: '결재 방식',
+    actorLabel: '담당자',
+    actorPlaceholder: '담당자 이름',
+    emptyText: '단계가 없습니다. 시작 노드를 추가하세요.',
+    subpathEmpty: '이 경로에 하위 트리가 없습니다.'
+  },
   progress: {
     ariaLabel: '진행률'
   },

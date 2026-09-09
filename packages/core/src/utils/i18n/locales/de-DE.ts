@@ -99,6 +99,22 @@ export const deDE: TigerLocale = {
     confirmCancel: 'Diesen Antrag zurückziehen?',
     confirmTransfer: 'Diesen Schritt weiterleiten?'
   },
+  workflowDesigner: {
+    ariaLabel: 'Workflow-Designer',
+    addStep: 'Schritt hinzufügen',
+    addChild: 'Unterschritt hinzufügen',
+    removeStep: 'Entfernen',
+    moveUp: 'Nach oben',
+    moveDown: 'Nach unten',
+    titleLabel: 'Titel',
+    titlePlaceholder: 'Schritttitel',
+    kindLabel: 'Art',
+    signModeLabel: 'Freigabemodus',
+    actorLabel: 'Bearbeiter',
+    actorPlaceholder: 'Name des Bearbeiters',
+    emptyText: 'Noch keine Schritte. Fügen Sie einen Startknoten hinzu.',
+    subpathEmpty: 'Kein Teilbaum auf diesem Pfad.'
+  },
   progress: {
     ariaLabel: 'Fortschritt'
   },

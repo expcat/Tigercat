@@ -39,6 +39,7 @@ export default defineConfig({
     'tailwind/modern': 'src/tailwind-entry-modern.ts',
     'utils/table-export': 'src/utils/table-export.ts',
     'utils/data-export': 'src/utils/data-export.ts',
+    'workflow-designer': 'src/workflow-designer.ts',
     ...localeEntries,
     ...datePickerLocaleEntries,
     ...iconEntries

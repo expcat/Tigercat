@@ -98,6 +98,22 @@ export const enUS: TigerLocale = {
     confirmCancel: 'Withdraw this request?',
     confirmTransfer: 'Transfer this step?'
   },
+  workflowDesigner: {
+    ariaLabel: 'Workflow designer',
+    addStep: 'Add step',
+    addChild: 'Add child',
+    removeStep: 'Remove',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    titleLabel: 'Title',
+    titlePlaceholder: 'Step title',
+    kindLabel: 'Kind',
+    signModeLabel: 'Sign mode',
+    actorLabel: 'Actor',
+    actorPlaceholder: 'Actor name',
+    emptyText: 'No steps yet. Add a start node to begin.',
+    subpathEmpty: 'No subtree at this path.'
+  },
   progress: {
     ariaLabel: 'Progress'
   },

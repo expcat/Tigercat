@@ -99,6 +99,22 @@ export const thTH: TigerLocale = {
     confirmCancel: 'ถอนคำขอนี้?',
     confirmTransfer: 'โอนขั้นตอนนี้?'
   },
+  workflowDesigner: {
+    ariaLabel: 'ตัวออกแบบเวิร์กโฟลว์',
+    addStep: 'เพิ่มขั้นตอน',
+    addChild: 'เพิ่มขั้นตอนย่อย',
+    removeStep: 'ลบ',
+    moveUp: 'ย้ายขึ้น',
+    moveDown: 'ย้ายลง',
+    titleLabel: 'ชื่อ',
+    titlePlaceholder: 'ชื่อขั้นตอน',
+    kindLabel: 'ชนิด',
+    signModeLabel: 'โหมดลงนาม',
+    actorLabel: 'ผู้ดำเนินการ',
+    actorPlaceholder: 'ชื่อผู้ดำเนินการ',
+    emptyText: 'ยังไม่มีขั้นตอน เพิ่มโหนดเริ่มต้นเพื่อเริ่มออกแบบ',
+    subpathEmpty: 'ไม่มีต้นไม้ย่อยที่เส้นทางนี้'
+  },
   progress: {
     ariaLabel: 'ความคืบหน้า'
   },

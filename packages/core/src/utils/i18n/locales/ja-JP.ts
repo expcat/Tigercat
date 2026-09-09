@@ -99,6 +99,22 @@ export const jaJP: TigerLocale = {
     confirmCancel: 'この申請を取り消しますか？',
     confirmTransfer: 'このステップを転送しますか？'
   },
+  workflowDesigner: {
+    ariaLabel: 'ワークフロー設計',
+    addStep: 'ステップを追加',
+    addChild: '子ステップを追加',
+    removeStep: '削除',
+    moveUp: '上へ',
+    moveDown: '下へ',
+    titleLabel: 'タイトル',
+    titlePlaceholder: 'ステップ名',
+    kindLabel: '種類',
+    signModeLabel: '承認方式',
+    actorLabel: '担当者',
+    actorPlaceholder: '担当者名',
+    emptyText: 'ステップがありません。開始ノードを追加してください。',
+    subpathEmpty: 'このパスに部分ツリーはありません。'
+  },
   progress: {
     ariaLabel: '進捗'
   },

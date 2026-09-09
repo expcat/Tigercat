@@ -181,6 +181,7 @@ description: Compact generated route map for Tigercat core type files
 | table-toolbar.ts       | TableToolbarProps, DataTableWithToolbarProps                       |
 | task-board.ts          | TaskBoardProps                                                     |
 | workflow-timeline.ts   | WorkflowTimelineProps, WorkflowActionBarProps, WorkflowViewerProps |
+| workflow-designer.ts   | WorkflowDesignerProps                                              |
 
 ## Core
 

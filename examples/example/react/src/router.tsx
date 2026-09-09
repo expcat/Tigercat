@@ -146,6 +146,7 @@ const ImageAnnotationDemo = lazy(() => import('./pages/ImageAnnotationDemo'))
 // Composite
 const DataTableWithToolbarDemo = lazy(() => import('./pages/DataTableWithToolbarDemo'))
 const FormWizardDemo = lazy(() => import('./pages/FormWizardDemo'))
+const WorkflowDesignerDemo = lazy(() => import('./pages/WorkflowDesignerDemo'))
 const ChatWindowDemo = lazy(() => import('./pages/ChatWindowDemo'))
 const CommentThreadDemo = lazy(() => import('./pages/CommentThreadDemo'))
 const ActivityFeedDemo = lazy(() => import('./pages/ActivityFeedDemo'))
@@ -298,6 +299,7 @@ const router = createHashRouter([
       // Composite
       { path: 'data-table-with-toolbar', element: <DataTableWithToolbarDemo /> },
       { path: 'form-wizard', element: <FormWizardDemo /> },
+      { path: 'workflow-designer', element: <WorkflowDesignerDemo /> },
       { path: 'chat-window', element: <ChatWindowDemo /> },
       { path: 'comment-thread', element: <CommentThreadDemo /> },
       { path: 'activity-feed', element: <ActivityFeedDemo /> },

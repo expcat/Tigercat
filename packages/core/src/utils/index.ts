@@ -248,6 +248,7 @@ export * from './image-lightbox'
 
 // Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)
 export * from './form-wizard-utils'
+export * from './workflow-designer-utils'
 export * from './table-toolbar-utils'
 export * from './crop-upload-utils'
 

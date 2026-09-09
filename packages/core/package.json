@@ -173,6 +173,10 @@
     "./utils/data-export": {
       "types": "./dist/utils/data-export.d.ts",
       "import": "./dist/utils/data-export.js"
+    },
+    "./workflow-designer": {
+      "types": "./dist/workflow-designer.d.ts",
+      "import": "./dist/workflow-designer.js"
     }
   },
   "files": [

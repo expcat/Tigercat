@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 10 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 11 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -144,6 +144,21 @@ Note: 展示用审批按钮条。`disabled` 与逐项 `disabled` 都会挡住点
 | `disabled?`  | `boolean`                 | `-`     | Disable every action, in addition to per-item `disabled`.                                  |
 | `confirm?`   | `boolean`                 | `false` | Enable the confirm-dialog recipe for approve / reject / cancel / transfer. Per-item `co... |
 | `ariaLabel?` | `string`                  | `-`     | Accessible name for the toolbar. Defaults to "Workflow actions".                           |
+
+## WorkflowDesigner
+
+`packages/core/src/types/workflow-designer.ts` · `WorkflowDesignerProps` · 4/11 props
+
+Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。
+
+| Prop        | Type                                   | Default | Notes                                                                                      |
+| ----------- | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`    | `WorkflowTimelineStep[]`               | `-`     | Full workflow tree. Controlled when passed (including `[]`).                               |
+| `path?`     | `WorkflowDesignerPath`                 | `-`     | Parent path of the list being edited. Omitted / `[]` edits the root list. When set, the... |
+| `disabled?` | `boolean`                              | `false` | -                                                                                          |
+| `labels?`   | `Partial<TigerLocaleWorkflowDesigner>` | `-`     | Designer chrome overlay. Wins over `locale.workflowDesigner`.                              |
+
+Events/callback props: `onChange?`, `onSelect?`.
 
 ## WorkflowTimeline
 

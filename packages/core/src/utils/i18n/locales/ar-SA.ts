@@ -99,6 +99,22 @@ export const arSA: TigerLocale = {
     confirmCancel: 'سحب هذا الطلب؟',
     confirmTransfer: 'تحويل هذه الخطوة؟'
   },
+  workflowDesigner: {
+    ariaLabel: 'مصمم سير العمل',
+    addStep: 'إضافة خطوة',
+    addChild: 'إضافة خطوة فرعية',
+    removeStep: 'حذف',
+    moveUp: 'تحريك لأعلى',
+    moveDown: 'تحريك لأسفل',
+    titleLabel: 'العنوان',
+    titlePlaceholder: 'عنوان الخطوة',
+    kindLabel: 'النوع',
+    signModeLabel: 'وضع التوقيع',
+    actorLabel: 'المسؤول',
+    actorPlaceholder: 'اسم المسؤول',
+    emptyText: 'لا توجد خطوات بعد. أضف عقدة بدء للبدء.',
+    subpathEmpty: 'لا توجد شجرة فرعية في هذا المسار.'
+  },
   progress: {
     ariaLabel: 'التقدم'
   },

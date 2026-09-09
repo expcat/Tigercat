@@ -210,6 +210,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '只读钉钉风审批树，复用 `WorkflowTimelineStep`（含 children 并行/抄送/条件分支 stub），不另起一套时间线。会签/或签/依次为展示字段。当前路径高亮与驳回回退点只读。无 BPM 引擎。'
   },
+  WorkflowDesigner: {
+    notes:
+      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。'
+  },
   Countdown: {
     notes:
       '`now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。'

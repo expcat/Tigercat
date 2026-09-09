@@ -1,0 +1,7 @@
+{
+  "id": "workflow-designer-01",
+  "title": "编辑审批树",
+  "description": "WorkflowDesigner 用同一套 WorkflowTimelineStep JSON 树增删改节点。不是 BPMN。",
+  "entry": "App.vue",
+  "order": 1
+}

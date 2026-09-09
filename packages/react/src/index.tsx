@@ -163,6 +163,8 @@ export { WorkflowTimeline, WorkflowActionBar } from './components/WorkflowTimeli
 export type { WorkflowTimelineProps, WorkflowActionBarProps } from './components/WorkflowTimeline'
 export { WorkflowViewer } from './components/WorkflowViewer'
 export type { WorkflowViewerProps } from './components/WorkflowViewer'
+export { WorkflowDesigner } from './components/WorkflowDesigner'
+export type { WorkflowDesignerProps } from './components/WorkflowDesigner'
 export { Countdown } from './components/Countdown'
 export type { CountdownProps } from './components/Countdown'
 

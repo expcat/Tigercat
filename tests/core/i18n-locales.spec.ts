@@ -319,6 +319,7 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('fullscreen')
     expect(TIGER_LOCALE_KEYS).toContain('alert')
     expect(TIGER_LOCALE_KEYS).toContain('workflowTimeline')
+    expect(TIGER_LOCALE_KEYS).toContain('workflowDesigner')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

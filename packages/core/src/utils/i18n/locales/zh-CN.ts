@@ -98,6 +98,22 @@ export const zhCN: TigerLocale = {
     confirmCancel: '确认撤销该申请？',
     confirmTransfer: '确认转交该步骤？'
   },
+  workflowDesigner: {
+    ariaLabel: '流程设计器',
+    addStep: '添加步骤',
+    addChild: '添加子步骤',
+    removeStep: '删除',
+    moveUp: '上移',
+    moveDown: '下移',
+    titleLabel: '标题',
+    titlePlaceholder: '步骤标题',
+    kindLabel: '类型',
+    signModeLabel: '签批方式',
+    actorLabel: '处理人',
+    actorPlaceholder: '处理人姓名',
+    emptyText: '暂无步骤。添加发起节点开始设计。',
+    subpathEmpty: '该路径下没有子树。'
+  },
   progress: {
     ariaLabel: '进度'
   },

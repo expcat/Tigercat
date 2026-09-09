@@ -909,6 +909,11 @@
       "import": "./dist/components/WorkflowTimeline.mjs",
       "default": "./dist/components/WorkflowTimeline.mjs"
     },
+    "./WorkflowDesigner": {
+      "types": "./dist/components/WorkflowDesigner.d.mts",
+      "import": "./dist/components/WorkflowDesigner.mjs",
+      "default": "./dist/components/WorkflowDesigner.mjs"
+    },
     "./WorkflowTimeline": {
       "types": "./dist/components/WorkflowTimeline.d.mts",
       "import": "./dist/components/WorkflowTimeline.mjs",

@@ -150,6 +150,37 @@ export interface TigerLocaleWorkflowTimeline {
   confirmTransfer?: string
 }
 
+export interface TigerLocaleWorkflowDesigner {
+  /** Accessible name for the designer region */
+  ariaLabel?: string
+  /** Add a sibling step to the current list */
+  addStep?: string
+  /** Add a child under this step */
+  addChild?: string
+  /** Remove this step */
+  removeStep?: string
+  /** Move this step up among siblings */
+  moveUp?: string
+  /** Move this step down among siblings */
+  moveDown?: string
+  /** Title field label */
+  titleLabel?: string
+  /** Title field placeholder */
+  titlePlaceholder?: string
+  /** Kind field label */
+  kindLabel?: string
+  /** Sign-mode field label */
+  signModeLabel?: string
+  /** Actor field label */
+  actorLabel?: string
+  /** Actor field placeholder */
+  actorPlaceholder?: string
+  /** Empty root list copy */
+  emptyText?: string
+  /** Empty / invalid subpath copy */
+  subpathEmpty?: string
+}
+
 export interface TigerLocaleProgress {
   /** Accessible name for the progress widget (does not include the current value) */
   ariaLabel?: string
@@ -887,6 +918,7 @@ export interface TigerLocale {
   printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
   workflowTimeline?: TigerLocaleWorkflowTimeline
+  workflowDesigner?: TigerLocaleWorkflowDesigner
   progress?: TigerLocaleProgress
   splitter?: TigerLocaleSplitter
   resizable?: TigerLocaleResizable

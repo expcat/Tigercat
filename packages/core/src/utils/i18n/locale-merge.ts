@@ -32,6 +32,7 @@ export const TIGER_LOCALE_KEY_SET = {
   printLayout: true,
   timeline: true,
   workflowTimeline: true,
+  workflowDesigner: true,
   progress: true,
   splitter: true,
   resizable: true,

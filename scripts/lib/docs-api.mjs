@@ -776,6 +776,7 @@ export const COMPONENT_PROP_PRIORITY = {
   WorkflowTimeline: ['steps?', 'actions?', 'mode?', 'pending?', 'showActions?'],
   WorkflowActionBar: ['items?', 'disabled?', 'confirm?', 'ariaLabel?'],
   WorkflowViewer: ['steps?', 'highlightPath?', 'showRollbackPoint?', 'labels?'],
+  WorkflowDesigner: ['value?', 'path?', 'disabled?', 'labels?'],
   NotificationCenter: [
     'items?',
     'groups?',
@@ -956,6 +957,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowTimeline: '<WorkflowTimeline :steps="steps" :actions="actions" />',
     WorkflowActionBar: '<WorkflowActionBar :items="actions" />',
     WorkflowViewer: '<WorkflowViewer :steps="steps" />',
+    WorkflowDesigner: '<WorkflowDesigner v-model="steps" />',
     Countdown: '<Countdown :value="deadline" />',
     Progress: '<Progress :percentage="64" />',
     Alert: '<Alert type="info" title="Saved" />',
@@ -1093,6 +1095,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowTimeline: '<WorkflowTimeline steps={steps} actions={actions} />',
     WorkflowActionBar: '<WorkflowActionBar items={actions} />',
     WorkflowViewer: '<WorkflowViewer steps={steps} />',
+    WorkflowDesigner: '<WorkflowDesigner value={steps} onChange={setSteps} />',
     Countdown: '<Countdown value={deadline} />',
     Progress: '<Progress percentage={64} />',
     Alert: '<Alert type="info" title="Saved" />',

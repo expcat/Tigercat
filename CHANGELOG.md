@@ -2,6 +2,12 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## Unreleased (2.4.0)
+
+包版本仍为 2.3.2，本条在打 tag 前不发版。
+
+- **WorkflowDesigner**：简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`（不是 BPMN / Flowable / Camunda）。可选 `path` 只编辑该节点的 children 并回写整树。Core helpers 可从 `@expcat/tigercat-core/workflow-designer` tree-shake。Vue `v-model` / React `value`+`onChange`。示例 `workflow-designer/01` `02`。公开 API 增补，无新必填 prop。
+
 ## v2.3.2
 
 v2.3.2：中台展示加深。WorkflowViewer 只读审批树 + ActionBar 确认配方；MenuSchema 元数据与 `schemaToRouteRecords`。无新必填 prop。

@@ -99,6 +99,22 @@ export const esES: TigerLocale = {
     confirmCancel: '¿Retirar esta solicitud?',
     confirmTransfer: '¿Transferir este paso?'
   },
+  workflowDesigner: {
+    ariaLabel: 'Diseñador de flujo de trabajo',
+    addStep: 'Añadir paso',
+    addChild: 'Añadir hijo',
+    removeStep: 'Eliminar',
+    moveUp: 'Subir',
+    moveDown: 'Bajar',
+    titleLabel: 'Título',
+    titlePlaceholder: 'Título del paso',
+    kindLabel: 'Tipo',
+    signModeLabel: 'Modo de firma',
+    actorLabel: 'Responsable',
+    actorPlaceholder: 'Nombre del responsable',
+    emptyText: 'Aún no hay pasos. Añada un nodo de inicio.',
+    subpathEmpty: 'No hay subárbol en esta ruta.'
+  },
   progress: {
     ariaLabel: 'Progreso'
   },

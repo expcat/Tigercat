@@ -1,0 +1,7 @@
+{
+  "id": "workflow-designer-02",
+  "title": "子路径编辑",
+  "description": "path 指向父节点时只编辑其 children，onChange 仍返回完整 JSON 树。",
+  "entry": "App.tsx",
+  "order": 2
+}

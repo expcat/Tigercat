@@ -99,6 +99,22 @@ export const idID: TigerLocale = {
     confirmCancel: 'Tarik permintaan ini?',
     confirmTransfer: 'Alihkan langkah ini?'
   },
+  workflowDesigner: {
+    ariaLabel: 'Perancang alur kerja',
+    addStep: 'Tambah langkah',
+    addChild: 'Tambah langkah anak',
+    removeStep: 'Hapus',
+    moveUp: 'Naikkan',
+    moveDown: 'Turunkan',
+    titleLabel: 'Judul',
+    titlePlaceholder: 'Judul langkah',
+    kindLabel: 'Jenis',
+    signModeLabel: 'Mode tanda tangan',
+    actorLabel: 'Pelaksana',
+    actorPlaceholder: 'Nama pelaksana',
+    emptyText: 'Belum ada langkah. Tambah simpul awal untuk mulai.',
+    subpathEmpty: 'Tidak ada subtree di jalur ini.'
+  },
   progress: {
     ariaLabel: 'Progres'
   },

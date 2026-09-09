@@ -80,6 +80,7 @@ import type {
   TigerLocaleNumberKeyboard,
   TigerLocaleTree,
   TigerLocaleWorkflowTimeline,
+  TigerLocaleWorkflowDesigner,
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
@@ -477,6 +478,13 @@ export function getWorkflowTimelineLabels(
   overrides?: Partial<TigerLocaleWorkflowTimeline>
 ): Required<TigerLocaleWorkflowTimeline> {
   return resolveLocaleSection(enSection('workflowTimeline'), locale?.workflowTimeline, overrides)
+}
+
+export function getWorkflowDesignerLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleWorkflowDesigner>
+): Required<TigerLocaleWorkflowDesigner> {
+  return resolveLocaleSection(enSection('workflowDesigner'), locale?.workflowDesigner, overrides)
 }
 
 export function getRateLabels(

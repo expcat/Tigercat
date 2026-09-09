@@ -193,6 +193,10 @@ const router = createRouter({
           component: () => import('./pages/DataTableWithToolbarDemo.vue')
         },
         { path: 'form-wizard', component: () => import('./pages/FormWizardDemo.vue') },
+        {
+          path: 'workflow-designer',
+          component: () => import('./pages/WorkflowDesignerDemo.vue')
+        },
         { path: 'chat-window', component: () => import('./pages/ChatWindowDemo.vue') },
         {
           path: 'comment-thread',

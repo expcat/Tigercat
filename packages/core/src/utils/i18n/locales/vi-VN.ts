@@ -99,6 +99,22 @@ export const viVN: TigerLocale = {
     confirmCancel: 'Rút yêu cầu này?',
     confirmTransfer: 'Chuyển bước này?'
   },
+  workflowDesigner: {
+    ariaLabel: 'Trình thiết kế quy trình',
+    addStep: 'Thêm bước',
+    addChild: 'Thêm bước con',
+    removeStep: 'Xóa',
+    moveUp: 'Chuyển lên',
+    moveDown: 'Chuyển xuống',
+    titleLabel: 'Tiêu đề',
+    titlePlaceholder: 'Tiêu đề bước',
+    kindLabel: 'Loại',
+    signModeLabel: 'Cách ký duyệt',
+    actorLabel: 'Người xử lý',
+    actorPlaceholder: 'Tên người xử lý',
+    emptyText: 'Chưa có bước. Thêm nút khởi tạo để bắt đầu.',
+    subpathEmpty: 'Không có cây con tại đường dẫn này.'
+  },
   progress: {
     ariaLabel: 'Tiến độ'
   },
