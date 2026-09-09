@@ -94,10 +94,23 @@ export const viVN: TigerLocale = {
     viewerAriaLabel: 'Quy trình',
     currentPath: 'Đường hiện tại',
     rollbackPoint: 'Điểm hoàn lại',
-    confirmApprove: 'Phê duyệt bước này?',
+    confirmApprove: 'Đồng ý yêu cầu này?',
     confirmReject: 'Từ chối yêu cầu này?',
     confirmCancel: 'Rút yêu cầu này?',
-    confirmTransfer: 'Chuyển bước này?'
+    confirmTransfer: 'Chuyển yêu cầu này?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'Người gửi sẽ được thông báo.',
+    confirmCancelDescription: 'Rút lại sẽ kết thúc yêu cầu này.',
+    confirmTransferDescription: 'Sau khi chuyển, bạn sẽ không còn là người phê duyệt.',
+    commentPlaceholder: 'Ý kiến phê duyệt (không bắt buộc)',
+    commentRequired: 'Vui lòng nhập ý kiến phê duyệt',
+    offPath: 'Nhánh chưa đi',
+    ccNotified: 'Đã đồng gửi',
+    signCountersignHint: 'Ký duyệt chung (tất cả phải đồng ý)',
+    signOrsignHint: 'Hoặc-ký (chỉ cần một người duyệt)',
+    signSequentialHint: 'Tuần tự (theo danh sách)',
+    legendAriaLabel: 'Chú giải đường đi',
+    actorsProgress: '{approved}/{total} đã ký'
   },
   workflowDesigner: {
     ariaLabel: 'Trình thiết kế quy trình',
@@ -113,7 +126,13 @@ export const viVN: TigerLocale = {
     actorLabel: 'Người xử lý',
     actorPlaceholder: 'Tên người xử lý',
     emptyText: 'Chưa có bước. Thêm nút khởi tạo để bắt đầu.',
-    subpathEmpty: 'Không có cây con tại đường dẫn này.'
+    subpathEmpty: 'Không có cây con tại đường dẫn này.',
+    insertSibling: 'Chèn phía sau',
+    editPanelAriaLabel: 'Cài đặt nút',
+    actorsLabel: 'Người phê duyệt',
+    addActor: 'Thêm người phê duyệt',
+    removeActor: 'Gỡ',
+    emptyHint: 'Thêm khởi tạo trước, rồi + người phê duyệt bên dưới'
   },
   progress: {
     ariaLabel: 'Tiến độ'

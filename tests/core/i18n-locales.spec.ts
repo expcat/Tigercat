@@ -21,6 +21,8 @@ import {
   getCronEditorLabels,
   getDataExportLabels,
   getEmptyDescription,
+  getWorkflowDesignerLabels,
+  getWorkflowTimelineLabels,
   getTimePickerLabels,
   getLocaleDirection,
   isRtlLocale,
@@ -77,7 +79,8 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
     `${locale}:colorPicker.formatHex`,
     `${locale}:colorPicker.formatRgb`,
     `${locale}:colorPicker.formatHsl`,
-    `${locale}:table.groupHeaderText`
+    `${locale}:table.groupHeaderText`,
+    `${locale}:workflowTimeline.confirmApproveDescription`
   ])
 ])
 
@@ -320,6 +323,23 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('alert')
     expect(TIGER_LOCALE_KEYS).toContain('workflowTimeline')
     expect(TIGER_LOCALE_KEYS).toContain('workflowDesigner')
+  })
+
+  it('workflow timeline and designer packs include 2.4.2 scanability keys', () => {
+    expect(enUS.workflowTimeline?.confirmApprove).toBe('Approve this request?')
+    expect(enUS.workflowTimeline?.confirmApprove).not.toMatch(/step/i)
+    expect(enUS.workflowTimeline?.ccNotified).toBe('CC sent')
+    expect(enUS.workflowTimeline?.actorsProgress).toBe('{approved}/{total} signed')
+    expect(zhCN.workflowTimeline?.confirmApprove).toBe('确认同意？')
+    expect(zhCN.workflowTimeline?.confirmReject).toBe('确认拒绝该申请？')
+    expect(zhCN.workflowTimeline?.ccNotified).toBe('已抄送')
+    expect(zhCN.workflowTimeline?.offPath).toBe('未走分支')
+    expect(zhCN.workflowDesigner?.insertSibling).toBe('在后方插入')
+    expect(zhCN.workflowDesigner?.actorsLabel).toBe('审批人')
+    expect(enUS.workflowDesigner?.emptyHint).toBe('Add a start node, then insert approvers')
+    expect(getWorkflowTimelineLabels(enUS).commentPlaceholder).toBe('Comment (optional)')
+    expect(getWorkflowTimelineLabels(zhCN).commentRequired).toBe('请输入审批意见')
+    expect(getWorkflowDesignerLabels(zhCN).editPanelAriaLabel).toBe('节点设置')
   })
 
   it('mergeTigerLocale(zhCN, {}) keeps dataExport', () => {

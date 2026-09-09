@@ -94,10 +94,23 @@ export const idID: TigerLocale = {
     viewerAriaLabel: 'Alur kerja',
     currentPath: 'Jalur saat ini',
     rollbackPoint: 'Titik pengembalian',
-    confirmApprove: 'Setujui langkah ini?',
+    confirmApprove: 'Setujui permintaan ini?',
     confirmReject: 'Tolak permintaan ini?',
     confirmCancel: 'Tarik permintaan ini?',
-    confirmTransfer: 'Alihkan langkah ini?'
+    confirmTransfer: 'Alihkan permintaan ini?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'Pemohon akan diberi tahu.',
+    confirmCancelDescription: 'Penarikan mengakhiri permintaan ini.',
+    confirmTransferDescription: 'Setelah dialihkan, Anda bukan lagi pemberi persetujuan.',
+    commentPlaceholder: 'Komentar (opsional)',
+    commentRequired: 'Komentar wajib',
+    offPath: 'Cabang yang tidak dilalui',
+    ccNotified: 'Tembusan terkirim',
+    signCountersignHint: 'Tanda tangan bersama (semua harus menyetujui)',
+    signOrsignHint: 'Atau-tanda tangan (satu persetujuan cukup)',
+    signSequentialHint: 'Berurutan (sesuai daftar)',
+    legendAriaLabel: 'Legenda jalur',
+    actorsProgress: '{approved}/{total} ditandatangani'
   },
   workflowDesigner: {
     ariaLabel: 'Perancang alur kerja',
@@ -113,7 +126,13 @@ export const idID: TigerLocale = {
     actorLabel: 'Pelaksana',
     actorPlaceholder: 'Nama pelaksana',
     emptyText: 'Belum ada langkah. Tambah simpul awal untuk mulai.',
-    subpathEmpty: 'Tidak ada subtree di jalur ini.'
+    subpathEmpty: 'Tidak ada subtree di jalur ini.',
+    insertSibling: 'Sisipkan setelah',
+    editPanelAriaLabel: 'Pengaturan simpul',
+    actorsLabel: 'Pemberi persetujuan',
+    addActor: 'Tambah pemberi persetujuan',
+    removeActor: 'Keluarkan',
+    emptyHint: 'Tambah simpul mulai, lalu sisipkan pemberi persetujuan di bawah'
   },
   progress: {
     ariaLabel: 'Progres'

@@ -94,10 +94,23 @@ export const deDE: TigerLocale = {
     viewerAriaLabel: 'Arbeitsablauf',
     currentPath: 'Aktueller Pfad',
     rollbackPoint: 'Rücksprung',
-    confirmApprove: 'Diesen Schritt freigeben?',
+    confirmApprove: 'Diesen Antrag freigeben?',
     confirmReject: 'Diesen Antrag ablehnen?',
     confirmCancel: 'Diesen Antrag zurückziehen?',
-    confirmTransfer: 'Diesen Schritt weiterleiten?'
+    confirmTransfer: 'Diesen Antrag weiterleiten?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'Der Antragsteller wird benachrichtigt.',
+    confirmCancelDescription: 'Nach dem Zurückziehen ist eine erneute Einreichung nötig.',
+    confirmTransferDescription: 'Nach der Weiterleitung sind Sie nicht mehr der Freigeber.',
+    commentPlaceholder: 'Freigabekommentar (optional)',
+    commentRequired: 'Freigabekommentar erforderlich',
+    offPath: 'Nicht genommener Zweig',
+    ccNotified: 'Kopie gesendet',
+    signCountersignHint: 'Gegenzeichnung (alle müssen zustimmen)',
+    signOrsignHint: 'Oder-Zeichen (eine Zustimmung genügt)',
+    signSequentialHint: 'Nacheinander (gemäß Liste)',
+    legendAriaLabel: 'Pfadlegende',
+    actorsProgress: '{approved}/{total} gezeichnet'
   },
   workflowDesigner: {
     ariaLabel: 'Workflow-Designer',
@@ -113,7 +126,13 @@ export const deDE: TigerLocale = {
     actorLabel: 'Bearbeiter',
     actorPlaceholder: 'Name des Bearbeiters',
     emptyText: 'Noch keine Schritte. Fügen Sie einen Startknoten hinzu.',
-    subpathEmpty: 'Kein Teilbaum auf diesem Pfad.'
+    subpathEmpty: 'Kein Teilbaum auf diesem Pfad.',
+    insertSibling: 'Dahinter einfügen',
+    editPanelAriaLabel: 'Knoteneinstellungen',
+    actorsLabel: 'Freigeber',
+    addActor: 'Freigeber hinzufügen',
+    removeActor: 'Entfernen',
+    emptyHint: 'Zuerst Startknoten, dann darunter + Freigeber'
   },
   progress: {
     ariaLabel: 'Fortschritt'

@@ -19,6 +19,7 @@ export {
   collectWorkflowStepKeys,
   createWorkflowDesignerStep,
   getWorkflowStepAtPath,
+  insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
   moveWorkflowStepAtPath,
   patchWorkflowStepAtPath,

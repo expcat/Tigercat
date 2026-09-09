@@ -14,6 +14,7 @@ import type {
   WorkflowSignMode,
   WorkflowStepKind,
   WorkflowTimelineAction,
+  WorkflowTimelineActor,
   WorkflowTimelineStep,
   WorkflowTimelineStepStatus
 } from '../types/workflow-timeline'
@@ -178,6 +179,13 @@ function copyActor(actor: WorkflowTimelineStep['actor']): WorkflowTimelineStep['
   return actor == null ? actor : { ...actor }
 }
 
+function copyActors(
+  actors: WorkflowTimelineActor[] | undefined
+): WorkflowTimelineActor[] | undefined {
+  if (!actors) return undefined
+  return actors.map((actor) => ({ ...actor }))
+}
+
 function copyStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   const next: WorkflowTimelineStep = {
     ...step,
@@ -187,10 +195,59 @@ function copyStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   }
   if (step.title == null && step.label != null) next.title = step.label
   if (step.actor) next.actor = copyActor(step.actor)
+  if (step.actors) next.actors = copyActors(step.actors)
   if (step.children) {
     next.children = normalizeWorkflowTimelineSteps(step.children)
   }
   return next
+}
+
+/**
+ * Approver list for display. Non-empty `actors` wins; otherwise wrap singular
+ * `actor`. Empty `actors` falls through so older single-actor data still works.
+ */
+export function resolveWorkflowStepActors(
+  step: Pick<WorkflowTimelineStep, 'actor' | 'actors'> | undefined
+): WorkflowTimelineActor[] {
+  if (step?.actors && step.actors.length > 0) return step.actors
+  if (step?.actor) return [step.actor]
+  return []
+}
+
+export interface WorkflowActorProgress {
+  approved: number
+  total: number
+}
+
+function isApprovedActorStatus(status: WorkflowTimelineActor['status']): boolean {
+  return status === 'approved'
+}
+
+/**
+ * Countersign progress from the actor list. Children are never counted.
+ * No names → `{ approved: 0, total: 0 }`. A singular `actor` uses that
+ * actor's status, then the step status, as a 0/1 or 1/1.
+ */
+export function workflowActorProgress(
+  step: Pick<WorkflowTimelineStep, 'actor' | 'actors' | 'status'> | undefined
+): WorkflowActorProgress {
+  const fromList = Boolean(step?.actors && step.actors.length > 0)
+  const actors = resolveWorkflowStepActors(step)
+  if (actors.length === 0) return { approved: 0, total: 0 }
+
+  if (fromList) {
+    let approved = 0
+    for (const actor of actors) {
+      if (isApprovedActorStatus(actor.status)) approved += 1
+    }
+    return { approved, total: actors.length }
+  }
+
+  const actorStatus = actors[0]?.status
+  const status = isWorkflowTimelineStepStatus(actorStatus)
+    ? actorStatus
+    : resolveWorkflowStepStatus(step)
+  return { approved: status === 'approved' ? 1 : 0, total: 1 }
 }
 
 /**
@@ -290,8 +347,12 @@ export function workflowStepsToTimelineItems(
 
 export function workflowStepStatusLabel(
   status: WorkflowTimelineStepStatus,
-  labels?: Partial<Pick<TigerLocaleWorkflowTimeline, WorkflowTimelineStepStatus>>
+  labels?: Partial<TigerLocaleWorkflowTimeline>,
+  kind?: WorkflowStepKind
 ): string {
+  if (kind === 'cc' && TERMINAL_STATUS_SET.has(status)) {
+    return labels?.ccNotified || 'CC sent'
+  }
   return labels?.[status] || WORKFLOW_STEP_STATUS_LABELS[status]
 }
 
@@ -412,26 +473,96 @@ export function workflowActionNeedsConfirm(action: WorkflowTimelineAction): bool
 
 export interface WorkflowActionConfirmCopy {
   title: string
+  description?: string
   okType: 'primary' | 'danger'
+  commentPlaceholder?: string
+}
+
+function resolveConfirmCommentPlaceholder(
+  labels?: Partial<TigerLocaleWorkflowTimeline>,
+  commentRequired?: boolean
+): string {
+  if (commentRequired) return labels?.commentRequired || 'Comment required'
+  return labels?.commentPlaceholder || 'Comment (optional)'
+}
+
+function confirmCopy(
+  title: string,
+  description: string,
+  okType: 'primary' | 'danger',
+  commentPlaceholder: string
+): WorkflowActionConfirmCopy {
+  const copy: WorkflowActionConfirmCopy = { title, okType, commentPlaceholder }
+  if (description) copy.description = description
+  return copy
 }
 
 export function getWorkflowActionConfirmCopy(
   action: WorkflowTimelineAction,
-  labels?: Partial<TigerLocaleWorkflowTimeline>
+  labels?: Partial<TigerLocaleWorkflowTimeline>,
+  options?: { commentRequired?: boolean }
 ): WorkflowActionConfirmCopy | null {
+  const commentPlaceholder = resolveConfirmCommentPlaceholder(labels, options?.commentRequired)
   if (action === 'approve') {
-    return { title: labels?.confirmApprove || 'Approve this step?', okType: 'primary' }
+    return confirmCopy(
+      labels?.confirmApprove || 'Approve this request?',
+      labels?.confirmApproveDescription || '',
+      'primary',
+      commentPlaceholder
+    )
   }
   if (action === 'reject') {
-    return { title: labels?.confirmReject || 'Reject this request?', okType: 'danger' }
+    return confirmCopy(
+      labels?.confirmReject || 'Reject this request?',
+      labels?.confirmRejectDescription || 'The requester will be notified.',
+      'danger',
+      commentPlaceholder
+    )
   }
   if (action === 'cancel') {
-    return { title: labels?.confirmCancel || 'Withdraw this request?', okType: 'danger' }
+    return confirmCopy(
+      labels?.confirmCancel || 'Withdraw this request?',
+      labels?.confirmCancelDescription || 'Withdrawing ends this request.',
+      'danger',
+      commentPlaceholder
+    )
   }
   if (action === 'transfer') {
-    return { title: labels?.confirmTransfer || 'Transfer this step?', okType: 'primary' }
+    return confirmCopy(
+      labels?.confirmTransfer || 'Transfer this request?',
+      labels?.confirmTransferDescription || 'After transfer you will no longer be the approver.',
+      'primary',
+      commentPlaceholder
+    )
   }
   return null
+}
+
+const ACTION_BAR_SORT_ORDER: Record<WorkflowTimelineAction, number> = {
+  approve: 0,
+  reject: 1,
+  transfer: 2,
+  cancel: 3,
+  comment: 4
+}
+
+/**
+ * Stable visual order: approve → reject → transfer → cancel → comment.
+ * Unknown / extra actions keep their relative input order after those.
+ */
+export function sortWorkflowActionBarItems(
+  items: readonly WorkflowActionBarItem[]
+): WorkflowActionBarItem[] {
+  if (items.length <= 1) return [...items]
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const aOrder = ACTION_BAR_SORT_ORDER[a.item.action] ?? Number.POSITIVE_INFINITY
+      const bOrder = ACTION_BAR_SORT_ORDER[b.item.action] ?? Number.POSITIVE_INFINITY
+      if (aOrder !== bOrder) return aOrder - bOrder
+      return a.index - b.index
+    })
+    .map(({ item }) => item)
 }
 
 /**

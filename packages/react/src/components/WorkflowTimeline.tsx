@@ -29,7 +29,9 @@ import { Timeline } from './Timeline'
 
 export interface WorkflowActionBarProps
   extends CoreWorkflowActionBarProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
-  onAction?: (item: WorkflowActionBarItem) => void
+  commentInput?: boolean
+  commentRequired?: boolean
+  onAction?: (item: WorkflowActionBarItem, payload?: { comment?: string }) => void
 }
 
 export interface WorkflowTimelineProps
@@ -38,7 +40,7 @@ export interface WorkflowTimelineProps
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   pendingDot?: React.ReactNode
   pendingContent?: React.ReactNode
-  onAction?: (item: WorkflowActionBarItem) => void
+  onAction?: (item: WorkflowActionBarItem, payload?: { comment?: string }) => void
   renderItem?: (item: TimelineItem, index: number) => React.ReactNode
   renderDot?: (item: TimelineItem, options: { pending: boolean }) => React.ReactNode
   renderActions?: (actions: WorkflowActionBarItem[]) => React.ReactNode
@@ -95,6 +97,8 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   disabled,
   ariaLabel,
   confirm,
+  commentInput: _commentInput,
+  commentRequired: _commentRequired,
   className,
   style,
   onAction,

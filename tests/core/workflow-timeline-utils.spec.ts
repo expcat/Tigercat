@@ -18,10 +18,13 @@ import {
   normalizeWorkflowTimelineSteps,
   resolveWorkflowActionButtonProps,
   resolveWorkflowSignMode,
+  resolveWorkflowStepActors,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
   shouldShowWorkflowActions,
+  sortWorkflowActionBarItems,
   sortWorkflowTimelineSteps,
+  workflowActorProgress,
   workflowActionNeedsConfirm,
   workflowSignModeLabel,
   workflowStepHighlight,
@@ -311,6 +314,95 @@ describe('workflow step status presentation', () => {
     expect(workflowStepStatusLabel('approved', { approved: '已通过' })).toBe('已通过')
     expect(workflowStepStatusLabel('pending', { approved: '已通过' })).toBe('Pending')
   })
+
+  it('uses ccNotified for terminal carbon-copy steps', () => {
+    expect(workflowStepStatusLabel('approved', undefined, 'cc')).toBe('CC sent')
+    expect(workflowStepStatusLabel('rejected', { ccNotified: '已抄送' }, 'cc')).toBe('已抄送')
+    expect(workflowStepStatusLabel('canceled', { ccNotified: 'CC sent' }, 'cc')).toBe('CC sent')
+    expect(workflowStepStatusLabel('active', { ccNotified: '已抄送' }, 'cc')).toBe('Active')
+    expect(workflowStepStatusLabel('approved', { ccNotified: '已抄送' }, 'approve')).toBe(
+      'Approved'
+    )
+  })
+})
+
+describe('resolveWorkflowStepActors', () => {
+  it('prefers actors, wraps a singular actor, and returns empty when neither is set', () => {
+    expect(resolveWorkflowStepActors(undefined)).toEqual([])
+    expect(resolveWorkflowStepActors(step({ key: 'none' }))).toEqual([])
+    expect(
+      resolveWorkflowStepActors(step({ key: 'one', actor: { id: 'u1', name: 'Ada' } }))
+    ).toEqual([{ id: 'u1', name: 'Ada' }])
+    expect(
+      resolveWorkflowStepActors(
+        step({
+          key: 'list',
+          actors: [
+            { id: 'u2', name: 'Lin' },
+            { id: 'u3', name: 'Chen' }
+          ]
+        })
+      ).map((actor) => actor.name)
+    ).toEqual(['Lin', 'Chen'])
+    expect(
+      resolveWorkflowStepActors(
+        step({
+          key: 'both',
+          actor: { id: 'u1', name: 'Ada' },
+          actors: [{ id: 'u2', name: 'Lin' }]
+        })
+      )
+    ).toEqual([{ id: 'u2', name: 'Lin' }])
+    expect(
+      resolveWorkflowStepActors(
+        step({
+          key: 'empty-list',
+          actor: { id: 'u1', name: 'Ada' },
+          actors: []
+        })
+      )
+    ).toEqual([{ id: 'u1', name: 'Ada' }])
+  })
+})
+
+describe('workflowActorProgress', () => {
+  it('counts approved actors for countersign and ignores children', () => {
+    expect(workflowActorProgress(undefined)).toEqual({ approved: 0, total: 0 })
+    expect(workflowActorProgress(step({ key: 'none' }))).toEqual({ approved: 0, total: 0 })
+
+    const countersign = step({
+      key: 'manager',
+      status: 'active',
+      signMode: 'countersign',
+      actors: [
+        { id: 'u1', name: 'Lin', status: 'approved' },
+        { id: 'u2', name: 'Chen', status: 'pending' }
+      ],
+      children: [
+        { key: 'fake-a', title: 'Not an actor', status: 'approved' },
+        { key: 'fake-b', title: 'Also not', status: 'approved' }
+      ]
+    })
+    expect(workflowActorProgress(countersign)).toEqual({ approved: 1, total: 2 })
+  })
+
+  it('uses singular actor plus step status when there is no actors list', () => {
+    expect(
+      workflowActorProgress(step({ key: 'one', actor: { name: 'Ada' }, status: 'approved' }))
+    ).toEqual({ approved: 1, total: 1 })
+    expect(
+      workflowActorProgress(step({ key: 'open', actor: { name: 'Ada' }, status: 'active' }))
+    ).toEqual({ approved: 0, total: 1 })
+    expect(
+      workflowActorProgress(
+        step({
+          key: 'actor-status',
+          actor: { name: 'Ada', status: 'approved' },
+          status: 'pending'
+        })
+      )
+    ).toEqual({ approved: 1, total: 1 })
+  })
 })
 
 describe('resolveWorkflowActionButtonProps', () => {
@@ -410,6 +502,40 @@ describe('workflow action confirm recipe', () => {
     expect(getWorkflowActionConfirmCopy('reject', { confirmReject: '确认驳回？' })?.title).toBe(
       '确认驳回？'
     )
+  })
+
+  it('includes a reject description and drops the this-step wording', () => {
+    const reject = getWorkflowActionConfirmCopy('reject')
+    expect(reject?.okType).toBe('danger')
+    expect(reject?.description).toBe('The requester will be notified.')
+    expect(getWorkflowActionConfirmCopy('approve')?.title).toBe('Approve this request?')
+    expect(getWorkflowActionConfirmCopy('approve')?.title).not.toMatch(/step/i)
+    expect(getWorkflowActionConfirmCopy('transfer')?.title).not.toMatch(/step/i)
+    expect(getWorkflowActionConfirmCopy('approve')?.description).toBeUndefined()
+    expect(
+      getWorkflowActionConfirmCopy('reject', undefined, { commentRequired: true })
+        ?.commentPlaceholder
+    ).toBe('Comment required')
+  })
+
+  it('sorts action-bar items approve reject transfer cancel comment without shuffling extras', () => {
+    const items: WorkflowActionBarItem[] = [
+      { key: 'c', label: 'Comment', action: 'comment' },
+      { key: 't', label: 'Transfer', action: 'transfer' },
+      { key: 'r', label: 'Reject', action: 'reject' },
+      { key: 'a', label: 'Approve', action: 'approve' },
+      { key: 'x', label: 'Extra', action: 'comment' },
+      { key: 'n', label: 'Cancel', action: 'cancel' }
+    ]
+    expect(sortWorkflowActionBarItems(items).map((item) => item.key)).toEqual([
+      'a',
+      'r',
+      't',
+      'n',
+      'c',
+      'x'
+    ])
+    expect(items.map((item) => item.key)).toEqual(['c', 't', 'r', 'a', 'x', 'n'])
   })
 
   it('lets per-item confirm override the bar flag', () => {

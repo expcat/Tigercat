@@ -110,6 +110,8 @@ export const WorkflowActionBar = defineComponent({
       default: undefined
     },
     confirm: Boolean,
+    commentInput: Boolean,
+    commentRequired: Boolean,
     className: {
       type: String,
       default: undefined
@@ -119,7 +121,9 @@ export const WorkflowActionBar = defineComponent({
       default: undefined
     }
   },
-  emits: ['action'],
+  emits: {
+    action: (_item: WorkflowActionBarItem, _payload?: { comment?: string }) => true
+  },
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const stepLabels = computed(() => getWorkflowTimelineLabels(config.value.locale))

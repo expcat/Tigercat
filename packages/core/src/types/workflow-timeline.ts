@@ -52,6 +52,11 @@ export interface WorkflowTimelineActor {
    * Registered icon name. Kept as a string for the Icon registry.
    */
   icon?: string
+  /**
+   * Per-actor approval status for countersign / or-sign lists.
+   * Omitted values are treated as pending by progress helpers.
+   */
+  status?: WorkflowTimelineStepStatus
 }
 
 /**
@@ -78,6 +83,12 @@ export interface WorkflowTimelineStep {
    * Person or role associated with the step.
    */
   actor?: WorkflowTimelineActor
+  /**
+   * Approver list for countersign / or-sign / sequential display.
+   * When non-empty, this wins over singular {@link actor}.
+   * People belong here — do not model approvers as `children`.
+   */
+  actors?: WorkflowTimelineActor[]
   /**
    * Action taken on this step, when known.
    */
@@ -216,6 +227,13 @@ export interface WorkflowTimelineProps {
 }
 
 /**
+ * Optional comment collected from the action-bar confirm dialog.
+ */
+export interface WorkflowActionPayload {
+  comment?: string
+}
+
+/**
  * Presentational action-bar props. Vue/React bindings render these.
  */
 export interface WorkflowActionBarProps {
@@ -237,6 +255,21 @@ export interface WorkflowActionBarProps {
    * @default false
    */
   confirm?: boolean
+  /**
+   * Show a comment field in the confirm dialog. Omitted: reject shows it when
+   * `confirm` is on; approve / transfer may opt in; `comment` never uses Popconfirm.
+   */
+  commentInput?: boolean
+  /**
+   * Switch placeholder / aria copy to the required locale string.
+   * Does **not** block empty submit in the library.
+   */
+  commentRequired?: boolean
+  /**
+   * Fired after an action is confirmed (or immediately when confirm is off).
+   * `payload` is omitted for callers that do not collect a comment.
+   */
+  onAction?: (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => void
   /**
    * Additional CSS classes
    */

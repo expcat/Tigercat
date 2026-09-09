@@ -12,6 +12,7 @@ import type {
 } from '../types/workflow-timeline'
 import {
   resolveWorkflowSignMode,
+  resolveWorkflowStepActors,
   resolveWorkflowStepKind,
   workflowSignModeLabel,
   workflowStepKindLabel,
@@ -49,6 +50,7 @@ export interface WorkflowDesignerNode {
   signMode: WorkflowSignMode
   title: string
   actorName: string
+  actorNames: string[]
   index: number
   canMoveUp: boolean
   canMoveDown: boolean
@@ -65,8 +67,17 @@ function cloneStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   return {
     ...step,
     actor: step.actor ? { ...step.actor } : undefined,
+    actors: step.actors ? step.actors.map((actor) => ({ ...actor })) : undefined,
     children: step.children ? cloneWorkflowSteps(step.children) : undefined
   }
+}
+
+function workflowDesignerActorNames(step: WorkflowTimelineStep): string[] {
+  const names: string[] = []
+  for (const actor of resolveWorkflowStepActors(step)) {
+    if (typeof actor.name === 'string' && actor.name.trim() !== '') names.push(actor.name)
+  }
+  return names
 }
 
 export function cloneWorkflowSteps(
@@ -185,6 +196,28 @@ export function insertWorkflowStepAtPath(
   })
 }
 
+/**
+ * Insert `step` as a sibling after the node at `path`.
+ * Does not nest the new node under the target.
+ */
+export function insertWorkflowStepAfterPath(
+  steps: readonly WorkflowTimelineStep[],
+  path: WorkflowDesignerPath,
+  step: WorkflowTimelineStep
+): WorkflowTimelineStep[] {
+  if (path.length === 0) return cloneWorkflowSteps(steps)
+  const parentPath = path.slice(0, -1)
+  const key = path[path.length - 1]
+  if (key == null) return cloneWorkflowSteps(steps)
+
+  const siblings =
+    parentPath.length === 0 ? steps : (getWorkflowStepAtPath(steps, parentPath)?.children ?? null)
+  if (!siblings) return cloneWorkflowSteps(steps)
+  const index = findIndexByKey(siblings, key)
+  if (index < 0) return cloneWorkflowSteps(steps)
+  return insertWorkflowStepAtPath(steps, parentPath, step, index + 1)
+}
+
 export function removeWorkflowStepAtPath(
   steps: readonly WorkflowTimelineStep[],
   path: WorkflowDesignerPath
@@ -259,6 +292,7 @@ export function buildWorkflowDesignerNodes(
   return list.map((step, index) => {
     const path = [...parentPath, step.key]
     const children = step.children ?? EMPTY_WORKFLOW_DESIGNER_STEPS
+    const actorNames = workflowDesignerActorNames(step)
     return {
       key: step.key,
       path,
@@ -266,7 +300,8 @@ export function buildWorkflowDesignerNodes(
       kind: resolveWorkflowStepKind(step),
       signMode: resolveWorkflowSignMode(step),
       title: step.title ?? step.label ?? '',
-      actorName: step.actor?.name ?? '',
+      actorName: actorNames.join(', '),
+      actorNames,
       index,
       canMoveUp: index > 0,
       canMoveDown: index < list.length - 1,

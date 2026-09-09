@@ -94,10 +94,23 @@ export const esES: TigerLocale = {
     viewerAriaLabel: 'Flujo de trabajo',
     currentPath: 'Ruta actual',
     rollbackPoint: 'Punto de retorno',
-    confirmApprove: '¿Aprobar este paso?',
+    confirmApprove: '¿Aprobar esta solicitud?',
     confirmReject: '¿Rechazar esta solicitud?',
     confirmCancel: '¿Retirar esta solicitud?',
-    confirmTransfer: '¿Transferir este paso?'
+    confirmTransfer: '¿Transferir esta solicitud?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'Se notificará al solicitante.',
+    confirmCancelDescription: 'Al retirarla, esta solicitud termina.',
+    confirmTransferDescription: 'Tras la transferencia ya no será el aprobador.',
+    commentPlaceholder: 'Comentario (opcional)',
+    commentRequired: 'Comentario obligatorio',
+    offPath: 'Rama no tomada',
+    ccNotified: 'Copia enviada',
+    signCountersignHint: 'Contrafirma (todos deben aprobar)',
+    signOrsignHint: 'O-firma (basta una aprobación)',
+    signSequentialHint: 'Secuencial (según la lista)',
+    legendAriaLabel: 'Leyenda de la ruta',
+    actorsProgress: '{approved}/{total} firmado(s)'
   },
   workflowDesigner: {
     ariaLabel: 'Diseñador de flujo de trabajo',
@@ -113,7 +126,13 @@ export const esES: TigerLocale = {
     actorLabel: 'Responsable',
     actorPlaceholder: 'Nombre del responsable',
     emptyText: 'Aún no hay pasos. Añada un nodo de inicio.',
-    subpathEmpty: 'No hay subárbol en esta ruta.'
+    subpathEmpty: 'No hay subárbol en esta ruta.',
+    insertSibling: 'Insertar después',
+    editPanelAriaLabel: 'Ajustes del nodo',
+    actorsLabel: 'Aprobadores',
+    addActor: 'Añadir aprobador',
+    removeActor: 'Quitar',
+    emptyHint: 'Añada un inicio y luego + aprobadores debajo'
   },
   progress: {
     ariaLabel: 'Progreso'

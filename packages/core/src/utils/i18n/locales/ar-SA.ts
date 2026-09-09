@@ -94,10 +94,23 @@ export const arSA: TigerLocale = {
     viewerAriaLabel: 'سير العمل',
     currentPath: 'المسار الحالي',
     rollbackPoint: 'نقطة التراجع',
-    confirmApprove: 'الموافقة على هذه الخطوة؟',
+    confirmApprove: 'الموافقة على هذا الطلب؟',
     confirmReject: 'رفض هذا الطلب؟',
     confirmCancel: 'سحب هذا الطلب؟',
-    confirmTransfer: 'تحويل هذه الخطوة؟'
+    confirmTransfer: 'تحويل هذا الطلب؟',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'سيتم إشعار مقدم الطلب.',
+    confirmCancelDescription: 'السحب ينهي هذا الطلب.',
+    confirmTransferDescription: 'بعد التحويل لن تعود المعتمد.',
+    commentPlaceholder: 'ملاحظة الاعتماد (اختياري)',
+    commentRequired: 'ملاحظة الاعتماد مطلوبة',
+    offPath: 'فرع غير مأخوذ',
+    ccNotified: 'تم إرسال النسخة',
+    signCountersignHint: 'توقيع جماعي (يجب موافقة الجميع)',
+    signOrsignHint: 'أو-توقيع (تكفي موافقة واحدة)',
+    signSequentialHint: 'بالتتابع (حسب القائمة)',
+    legendAriaLabel: 'مفتاح المسار',
+    actorsProgress: '{approved}/{total} تم التوقيع'
   },
   workflowDesigner: {
     ariaLabel: 'مصمم سير العمل',
@@ -113,7 +126,13 @@ export const arSA: TigerLocale = {
     actorLabel: 'المسؤول',
     actorPlaceholder: 'اسم المسؤول',
     emptyText: 'لا توجد خطوات بعد. أضف عقدة بدء للبدء.',
-    subpathEmpty: 'لا توجد شجرة فرعية في هذا المسار.'
+    subpathEmpty: 'لا توجد شجرة فرعية في هذا المسار.',
+    insertSibling: 'إدراج بعد',
+    editPanelAriaLabel: 'إعدادات العقدة',
+    actorsLabel: 'المعتمدون',
+    addActor: 'إضافة معتمد',
+    removeActor: 'إزالة',
+    emptyHint: 'أضف عقدة بدء ثم أدرج المعتمدين بالأسفل'
   },
   progress: {
     ariaLabel: 'التقدم'

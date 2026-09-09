@@ -94,10 +94,23 @@ export const frFR: TigerLocale = {
     viewerAriaLabel: 'Flux de travail',
     currentPath: 'Chemin actuel',
     rollbackPoint: 'Point de retour',
-    confirmApprove: 'Approuver cette étape ?',
+    confirmApprove: 'Approuver cette demande ?',
     confirmReject: 'Rejeter cette demande ?',
     confirmCancel: 'Retirer cette demande ?',
-    confirmTransfer: 'Transférer cette étape ?'
+    confirmTransfer: 'Transférer cette demande ?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'Le demandeur sera notifié.',
+    confirmCancelDescription: 'Le retrait clôture cette demande.',
+    confirmTransferDescription: 'Après le transfert, vous ne serez plus l’approbateur.',
+    commentPlaceholder: 'Commentaire (facultatif)',
+    commentRequired: 'Commentaire obligatoire',
+    offPath: 'Branche non empruntée',
+    ccNotified: 'Copie envoyée',
+    signCountersignHint: 'Cosignature (tous doivent approuver)',
+    signOrsignHint: 'Ou-signature (une seule approbation)',
+    signSequentialHint: 'Séquentiel (dans l’ordre de la liste)',
+    legendAriaLabel: 'Légende du chemin',
+    actorsProgress: '{approved}/{total} signé(s)'
   },
   workflowDesigner: {
     ariaLabel: 'Concepteur de workflow',
@@ -113,7 +126,13 @@ export const frFR: TigerLocale = {
     actorLabel: 'Intervenant',
     actorPlaceholder: "Nom de l'intervenant",
     emptyText: 'Aucune étape. Ajoutez un nœud de départ.',
-    subpathEmpty: 'Aucun sous-arbre sur ce chemin.'
+    subpathEmpty: 'Aucun sous-arbre sur ce chemin.',
+    insertSibling: 'Insérer après',
+    editPanelAriaLabel: 'Paramètres du nœud',
+    actorsLabel: 'Approbateurs',
+    addActor: 'Ajouter un approbateur',
+    removeActor: 'Retirer',
+    emptyHint: 'Ajoutez d’abord un démarrage, puis + des approbateurs'
   },
   progress: {
     ariaLabel: 'Progression'

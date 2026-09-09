@@ -94,10 +94,23 @@ export const koKR: TigerLocale = {
     viewerAriaLabel: '워크플로',
     currentPath: '현재 경로',
     rollbackPoint: '반려 되돌림 지점',
-    confirmApprove: '이 단계를 승인할까요?',
+    confirmApprove: '이 요청을 승인할까요?',
     confirmReject: '이 요청을 반려할까요?',
-    confirmCancel: '이 요청을 취소할까요?',
-    confirmTransfer: '이 단계를 전달할까요?'
+    confirmCancel: '이 요청을 철회할까요?',
+    confirmTransfer: '이 요청을 전달할까요?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: '요청자에게 알림이 갑니다.',
+    confirmCancelDescription: '철회 후 다시 제출해야 합니다.',
+    confirmTransferDescription: '전달 후에는 더 이상 결재자가 아닙니다.',
+    commentPlaceholder: '결재 의견 (선택)',
+    commentRequired: '결재 의견을 입력하세요',
+    offPath: '미선택 분기',
+    ccNotified: '참조 완료',
+    signCountersignHint: '합의 (모든 결재자 동의 필요)',
+    signOrsignHint: '또는 결재 (한 명의 승인으로 가능)',
+    signSequentialHint: '순차 결재 (명단 순서)',
+    legendAriaLabel: '경로 범례',
+    actorsProgress: '{approved}/{total} 서명'
   },
   workflowDesigner: {
     ariaLabel: '워크플로 설계기',
@@ -113,7 +126,13 @@ export const koKR: TigerLocale = {
     actorLabel: '담당자',
     actorPlaceholder: '담당자 이름',
     emptyText: '단계가 없습니다. 시작 노드를 추가하세요.',
-    subpathEmpty: '이 경로에 하위 트리가 없습니다.'
+    subpathEmpty: '이 경로에 하위 트리가 없습니다.',
+    insertSibling: '뒤에 삽입',
+    editPanelAriaLabel: '노드 설정',
+    actorsLabel: '결재자',
+    addActor: '결재자 추가',
+    removeActor: '제외',
+    emptyHint: '먼저 기안을 추가한 다음 아래 + 로 결재자를 넣으세요'
   },
   progress: {
     ariaLabel: '진행률'

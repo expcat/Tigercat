@@ -94,10 +94,23 @@ export const thTH: TigerLocale = {
     viewerAriaLabel: 'เวิร์กโฟลว์',
     currentPath: 'เส้นทางปัจจุบัน',
     rollbackPoint: 'จุดย้อนกลับ',
-    confirmApprove: 'อนุมัติขั้นตอนนี้?',
+    confirmApprove: 'อนุมัติคำขอนี้?',
     confirmReject: 'ปฏิเสธคำขอนี้?',
     confirmCancel: 'ถอนคำขอนี้?',
-    confirmTransfer: 'โอนขั้นตอนนี้?'
+    confirmTransfer: 'โอนคำขอนี้?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'ผู้ขอจะได้รับการแจ้งเตือน',
+    confirmCancelDescription: 'การถอนจะสิ้นสุดคำขอนี้',
+    confirmTransferDescription: 'หลังโอนแล้ว คุณจะไม่ใช่ผู้อนุมัติอีกต่อไป',
+    commentPlaceholder: 'ความเห็นการอนุมัติ (ไม่บังคับ)',
+    commentRequired: 'ต้องระบุความเห็นการอนุมัติ',
+    offPath: 'สาขาที่ไม่ได้เลือก',
+    ccNotified: 'ส่งสำเนาแล้ว',
+    signCountersignHint: 'ลงนามร่วม (ต้องได้รับความเห็นชอบจากทุกคน)',
+    signOrsignHint: 'หรือ-ลงนาม (อนุมัติคนใดคนหนึ่งก็ได้)',
+    signSequentialHint: 'ตามลำดับ (ตามรายชื่อ)',
+    legendAriaLabel: 'คำอธิบายเส้นทาง',
+    actorsProgress: '{approved}/{total} ลงนามแล้ว'
   },
   workflowDesigner: {
     ariaLabel: 'ตัวออกแบบเวิร์กโฟลว์',
@@ -113,7 +126,13 @@ export const thTH: TigerLocale = {
     actorLabel: 'ผู้ดำเนินการ',
     actorPlaceholder: 'ชื่อผู้ดำเนินการ',
     emptyText: 'ยังไม่มีขั้นตอน เพิ่มโหนดเริ่มต้นเพื่อเริ่มออกแบบ',
-    subpathEmpty: 'ไม่มีต้นไม้ย่อยที่เส้นทางนี้'
+    subpathEmpty: 'ไม่มีต้นไม้ย่อยที่เส้นทางนี้',
+    insertSibling: 'แทรกด้านหลัง',
+    editPanelAriaLabel: 'การตั้งค่าโหนด',
+    actorsLabel: 'ผู้อนุมัติ',
+    addActor: 'เพิ่มผู้อนุมัติ',
+    removeActor: 'เอาออก',
+    emptyHint: 'เพิ่มโหนดเริ่มต้น แล้วกด + ผู้อนุมัติด้านล่าง'
   },
   progress: {
     ariaLabel: 'ความคืบหน้า'

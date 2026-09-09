@@ -93,10 +93,23 @@ export const zhCN: TigerLocale = {
     viewerAriaLabel: '审批流程',
     currentPath: '当前路径',
     rollbackPoint: '驳回回退点',
-    confirmApprove: '确认通过该步骤？',
-    confirmReject: '确认驳回该申请？',
-    confirmCancel: '确认撤销该申请？',
-    confirmTransfer: '确认转交该步骤？'
+    confirmApprove: '确认同意？',
+    confirmReject: '确认拒绝该申请？',
+    confirmCancel: '确认撤回该申请？',
+    confirmTransfer: '确认转交？',
+    confirmApproveDescription: '',
+    confirmRejectDescription: '意见将通知发起人。',
+    confirmCancelDescription: '撤回后需重新提交。',
+    confirmTransferDescription: '转交后你将不再处理。',
+    commentPlaceholder: '请输入审批意见（选填）',
+    commentRequired: '请输入审批意见',
+    offPath: '未走分支',
+    ccNotified: '已抄送',
+    signCountersignHint: '会签（需所有审批人同意）',
+    signOrsignHint: '或签（一名审批人同意即可）',
+    signSequentialHint: '依次审批（按名单顺序）',
+    legendAriaLabel: '路径图例',
+    actorsProgress: '{approved}/{total} 已签'
   },
   workflowDesigner: {
     ariaLabel: '流程设计器',
@@ -112,7 +125,13 @@ export const zhCN: TigerLocale = {
     actorLabel: '处理人',
     actorPlaceholder: '处理人姓名',
     emptyText: '暂无步骤。添加发起节点开始设计。',
-    subpathEmpty: '该路径下没有子树。'
+    subpathEmpty: '该路径下没有子树。',
+    insertSibling: '在后方插入',
+    editPanelAriaLabel: '节点设置',
+    actorsLabel: '审批人',
+    addActor: '添加审批人',
+    removeActor: '移除',
+    emptyHint: '先加发起，再在下方 + 审批人'
   },
   progress: {
     ariaLabel: '进度'

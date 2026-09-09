@@ -93,10 +93,23 @@ export const enUS: TigerLocale = {
     viewerAriaLabel: 'Workflow',
     currentPath: 'Current path',
     rollbackPoint: 'Rollback point',
-    confirmApprove: 'Approve this step?',
+    confirmApprove: 'Approve this request?',
     confirmReject: 'Reject this request?',
     confirmCancel: 'Withdraw this request?',
-    confirmTransfer: 'Transfer this step?'
+    confirmTransfer: 'Transfer this request?',
+    confirmApproveDescription: '',
+    confirmRejectDescription: 'The requester will be notified.',
+    confirmCancelDescription: 'Withdrawing ends this request.',
+    confirmTransferDescription: 'After transfer you will no longer be the approver.',
+    commentPlaceholder: 'Comment (optional)',
+    commentRequired: 'Comment required',
+    offPath: 'Untaken branch',
+    ccNotified: 'CC sent',
+    signCountersignHint: 'Countersign (all must approve)',
+    signOrsignHint: 'Or-sign (any one approval)',
+    signSequentialHint: 'Sequential (one after another)',
+    legendAriaLabel: 'Path legend',
+    actorsProgress: '{approved}/{total} signed'
   },
   workflowDesigner: {
     ariaLabel: 'Workflow designer',
@@ -112,7 +125,13 @@ export const enUS: TigerLocale = {
     actorLabel: 'Actor',
     actorPlaceholder: 'Actor name',
     emptyText: 'No steps yet. Add a start node to begin.',
-    subpathEmpty: 'No subtree at this path.'
+    subpathEmpty: 'No subtree at this path.',
+    insertSibling: 'Insert after',
+    editPanelAriaLabel: 'Node settings',
+    actorsLabel: 'Approvers',
+    addActor: 'Add approver',
+    removeActor: 'Remove',
+    emptyHint: 'Add a start node, then insert approvers'
   },
   progress: {
     ariaLabel: 'Progress'

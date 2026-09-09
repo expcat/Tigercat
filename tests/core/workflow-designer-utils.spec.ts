@@ -10,6 +10,7 @@ import {
   collectWorkflowStepKeys,
   createWorkflowDesignerStep,
   getWorkflowStepAtPath,
+  insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
   moveWorkflowStepAtPath,
   patchWorkflowStepAtPath,
@@ -18,7 +19,8 @@ import {
 } from '@expcat/tigercat-core'
 import {
   applyWorkflowDesignerView as applyFromSubpath,
-  getWorkflowStepAtPath as getFromSubpath
+  getWorkflowStepAtPath as getFromSubpath,
+  insertWorkflowStepAfterPath as insertAfterFromSubpath
 } from '@expcat/tigercat-core/workflow-designer'
 import type { WorkflowTimelineStep } from '@expcat/tigercat-core'
 
@@ -111,9 +113,35 @@ describe('workflow-designer helpers', () => {
     expect(nodes[2]?.canMoveDown).toBe(false)
   })
 
+  it('joins actor names from actors when building designer nodes', () => {
+    const nodes = buildWorkflowDesignerNodes([
+      {
+        key: 'manager',
+        title: 'Manager',
+        actor: { name: 'Ada' },
+        actors: [{ name: 'Lin' }, { name: 'Chen' }]
+      }
+    ])
+    expect(nodes[0]?.actorNames).toEqual(['Lin', 'Chen'])
+    expect(nodes[0]?.actorName).toBe('Lin, Chen')
+  })
+
+  it('inserts a sibling after the path instead of nesting a child', () => {
+    const created = createWorkflowDesignerStep(tree, { title: 'HR', kind: 'cc' })
+    const next = insertWorkflowStepAfterPath(tree, ['manager'], created)
+    expect(next.map((item) => item.key)).toEqual(['start', 'manager', created.key, 'finance'])
+    expect(next[1]?.children?.map((item) => item.key)).toEqual(['a', 'b'])
+    expect(tree.map((item) => item.key)).toEqual(['start', 'manager', 'finance'])
+
+    const nested = insertWorkflowStepAfterPath(tree, ['manager', 'a'], created)
+    expect(nested[1]?.children?.map((item) => item.key)).toEqual(['a', created.key, 'b'])
+  })
+
   it('re-exports path helpers from the tree-shake subpath', () => {
     expect(getFromSubpath(tree, ['finance'])?.title).toBe('Finance')
     const next = applyFromSubpath(tree, [], [{ key: 'only', title: 'One' }])
     expect(next).toEqual([{ key: 'only', title: 'One' }])
+    const after = insertAfterFromSubpath(tree, ['start'], { key: 'extra', title: 'Extra' })
+    expect(after.map((item) => item.key)).toEqual(['start', 'extra', 'manager', 'finance'])
   })
 })

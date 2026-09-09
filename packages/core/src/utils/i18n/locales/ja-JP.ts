@@ -94,10 +94,23 @@ export const jaJP: TigerLocale = {
     viewerAriaLabel: 'ワークフロー',
     currentPath: '現在の経路',
     rollbackPoint: '差戻し地点',
-    confirmApprove: 'このステップを承認しますか？',
+    confirmApprove: 'この申請を承認しますか？',
     confirmReject: 'この申請を却下しますか？',
     confirmCancel: 'この申請を取り消しますか？',
-    confirmTransfer: 'このステップを転送しますか？'
+    confirmTransfer: 'この申請を転送しますか？',
+    confirmApproveDescription: '',
+    confirmRejectDescription: '申請者に通知されます。',
+    confirmCancelDescription: '取り消し後は再提出が必要です。',
+    confirmTransferDescription: '転送後、あなたは承認者ではなくなります。',
+    commentPlaceholder: '承認コメント（任意）',
+    commentRequired: '承認コメントを入力してください',
+    offPath: '未選択の分岐',
+    ccNotified: '同報済み',
+    signCountersignHint: '全員承認（全員の同意が必要）',
+    signOrsignHint: 'いずれか承認（1人の承認で可）',
+    signSequentialHint: '順次承認（名簿の順）',
+    legendAriaLabel: '経路の凡例',
+    actorsProgress: '{approved}/{total} 承認済み'
   },
   workflowDesigner: {
     ariaLabel: 'ワークフロー設計',
@@ -113,7 +126,13 @@ export const jaJP: TigerLocale = {
     actorLabel: '担当者',
     actorPlaceholder: '担当者名',
     emptyText: 'ステップがありません。開始ノードを追加してください。',
-    subpathEmpty: 'このパスに部分ツリーはありません。'
+    subpathEmpty: 'このパスに部分ツリーはありません。',
+    insertSibling: '後ろに挿入',
+    editPanelAriaLabel: 'ノード設定',
+    actorsLabel: '承認者',
+    addActor: '承認者を追加',
+    removeActor: '除外',
+    emptyHint: 'まず起票を追加し、下の + で承認者を挿入'
   },
   progress: {
     ariaLabel: '進捗'

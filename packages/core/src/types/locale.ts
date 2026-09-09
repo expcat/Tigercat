@@ -148,6 +148,32 @@ export interface TigerLocaleWorkflowTimeline {
   confirmCancel?: string
   /** ActionBar confirm title: transfer */
   confirmTransfer?: string
+  /** ActionBar confirm description: approve. May be empty. */
+  confirmApproveDescription?: string
+  /** ActionBar confirm description: reject */
+  confirmRejectDescription?: string
+  /** ActionBar confirm description: cancel / withdraw */
+  confirmCancelDescription?: string
+  /** ActionBar confirm description: transfer */
+  confirmTransferDescription?: string
+  /** Optional-comment placeholder */
+  commentPlaceholder?: string
+  /** Required-comment placeholder / aria copy. Does not block submit. */
+  commentRequired?: string
+  /** Legend / path: branch that was not taken */
+  offPath?: string
+  /** Status tag for a terminal CC node */
+  ccNotified?: string
+  /** Sign-mode hint: countersign */
+  signCountersignHint?: string
+  /** Sign-mode hint: or-sign */
+  signOrsignHint?: string
+  /** Sign-mode hint: sequential */
+  signSequentialHint?: string
+  /** Accessible name for the Viewer path legend */
+  legendAriaLabel?: string
+  /** Countersign progress template. Supports {approved} and {total}. */
+  actorsProgress?: string
 }
 
 export interface TigerLocaleWorkflowDesigner {
@@ -179,6 +205,18 @@ export interface TigerLocaleWorkflowDesigner {
   emptyText?: string
   /** Empty / invalid subpath copy */
   subpathEmpty?: string
+  /** Insert a sibling after the current node */
+  insertSibling?: string
+  /** Accessible name for the selected-node editor */
+  editPanelAriaLabel?: string
+  /** Approver list field label */
+  actorsLabel?: string
+  /** Add an approver to the list */
+  addActor?: string
+  /** Remove an approver from the list */
+  removeActor?: string
+  /** Empty-root hint that points at sibling insert */
+  emptyHint?: string
 }
 
 export interface TigerLocaleProgress {

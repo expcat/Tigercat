@@ -94,10 +94,23 @@ export const zhTW: TigerLocale = {
     viewerAriaLabel: '審批流程',
     currentPath: '目前路徑',
     rollbackPoint: '駁回回退點',
-    confirmApprove: '確認通過此步驟？',
-    confirmReject: '確認駁回此申請？',
-    confirmCancel: '確認撤銷此申請？',
-    confirmTransfer: '確認轉交此步驟？'
+    confirmApprove: '確認同意？',
+    confirmReject: '確認拒絕該申請？',
+    confirmCancel: '確認撤回該申請？',
+    confirmTransfer: '確認轉交？',
+    confirmApproveDescription: '',
+    confirmRejectDescription: '意見將通知發起人。',
+    confirmCancelDescription: '撤回後需重新提交。',
+    confirmTransferDescription: '轉交後你將不再處理。',
+    commentPlaceholder: '請輸入審批意見（選填）',
+    commentRequired: '請輸入審批意見',
+    offPath: '未走分支',
+    ccNotified: '已抄送',
+    signCountersignHint: '會簽（需所有審批人同意）',
+    signOrsignHint: '或簽（一名審批人同意即可）',
+    signSequentialHint: '依序審批（按名單順序）',
+    legendAriaLabel: '路徑圖例',
+    actorsProgress: '{approved}/{total} 已簽'
   },
   workflowDesigner: {
     ariaLabel: '流程設計器',
@@ -113,7 +126,13 @@ export const zhTW: TigerLocale = {
     actorLabel: '處理人',
     actorPlaceholder: '處理人姓名',
     emptyText: '尚無步驟。新增發起節點開始設計。',
-    subpathEmpty: '此路徑下沒有子樹。'
+    subpathEmpty: '此路徑下沒有子樹。',
+    insertSibling: '在後方插入',
+    editPanelAriaLabel: '節點設定',
+    actorsLabel: '審批人',
+    addActor: '新增審批人',
+    removeActor: '移除',
+    emptyHint: '先加發起，再在下方 + 審批人'
   },
   progress: {
     ariaLabel: '進度'
