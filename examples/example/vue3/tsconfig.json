@@ -20,6 +20,7 @@
       "@demo-shared/*": ["../shared/*"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
       "@expcat/tigercat-core/locales/*": ["../../../packages/core/src/utils/i18n/locales/*"],
+      "@expcat/tigercat-core/icons/*": ["../../../packages/core/src/utils/icons/*"],
       "@expcat/tigercat-vue": ["../../../packages/vue/src/index.ts"],
       "@expcat/tigercat-vue/AnchorLink": ["../../../packages/vue/src/components/Anchor"],
       "@expcat/tigercat-vue/BreadcrumbItem": ["../../../packages/vue/src/components/Breadcrumb"],

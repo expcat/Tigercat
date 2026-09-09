@@ -29,6 +29,7 @@
       "@demo-runtime/context": ["./src/playground/runtime-context.ts"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
       "@expcat/tigercat-core/locales/*": ["../../../packages/core/src/utils/i18n/locales/*"],
+      "@expcat/tigercat-core/icons/*": ["../../../packages/core/src/utils/icons/*"],
       "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
       "@expcat/tigercat-react/AnchorLink": ["../../../packages/react/src/components/Anchor"],
       "@expcat/tigercat-react/BreadcrumbItem": [
