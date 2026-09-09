@@ -4,7 +4,11 @@
 
 ## 未发布
 
-当前没有待组件用户处理的 breaking change。WorkflowDesigner 是新增 API（simple JSON 树，可选 `path` 子路径编辑），无新必填 prop。
+当前没有待组件用户处理的 breaking change。
+
+## v2.4.0
+
+v2.4.0 无 breaking change，无新必填 prop。WorkflowDesigner（simple JSON 树，可选 `path` 子路径编辑）与 SchemaForm（schema 驱动表单，Captcha 未做）是新增 API。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v240)。
 
 ## v2.3.2
 

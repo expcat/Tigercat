@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { SchemaForm } from '@expcat/tigercat-react/SchemaForm'
-import type { SchemaFormSchema, SchemaFormSubmitEvent } from '@expcat/tigercat-core'
+import type { FormValues, SchemaFormSchema, SchemaFormSubmitEvent } from '@expcat/tigercat-core'
 
 const schema: SchemaFormSchema = {
   groups: [
@@ -46,7 +46,7 @@ const schema: SchemaFormSchema = {
 }
 
 export default function App() {
-  const [model, setModel] = useState({
+  const [model, setModel] = useState<FormValues>({
     name: '',
     role: 'staff',
     company: '',

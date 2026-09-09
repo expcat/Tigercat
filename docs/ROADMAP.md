@@ -35,11 +35,11 @@ source: current repository state after v2.1.4
 | M1     | 2.3.2 | WorkflowViewer + MenuSchema 元数据；Admin 菜单轻页 + 审批 Mock 写回 |
 | M2     | 2.3.3 | Admin mixed 动态路由 / pageMap / 按钮权限；库仅补 M1 暴露缺口       |
 | M3     | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需                         |
-| M4     | 2.4.0 | WorkflowDesigner + SchemaForm；库已落地，未发版                     |
+| M4     | 2.4.0 | WorkflowDesigner + SchemaForm                                       |
 
 节奏：Tigercat `2.3.x` 先发版 → Admin 升依赖后跟。明确不做：Flowable/Camunda/BPMN、第二套 Menu/Timeline、租户/组织/字典组件化进库。
 
-Tigercat M1 已随 v2.3.2 发出。M4-S1 已落地 WorkflowDesigner，M4-S2 已落地 SchemaForm（包版本仍为 2.3.2、未打 tag）。下一可执行切片见工作区 M4 状态。
+Tigercat M4 已随 v2.4.0 发出（WorkflowDesigner + SchemaForm；Captcha 未做）。下一可执行切片见工作区 M4 状态（Admin 升 `^2.4.0` 后 Designer + SchemaForm demos）。
 
 ## 长期观察项（不绑定版本）
 
