@@ -2,6 +2,18 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.5.0
+
+v2.5.0：工作流一流完整版。Designer Inspector 四 Tab；ActionBar 完整动作（加签 / 退回 / 退回修改）；按人 `tasks`；字段权限 × SchemaForm；可选 `WorkflowDetailShell`。不是 2.4.2 的补丁包。不是 BPMN / Flowable / Camunda。组织 / 字典不进主包。有计划的行为变化见 [docs/MIGRATION-2.5.md](docs/MIGRATION-2.5.md)。无新必填 prop。
+
+- **Core 模型 / `reduceWorkflowAction`**：节点可配 `approverPolicy`（`ApproverSource` 契约，宿主 `resolveApprovers`）、`buttonPolicy`、`fieldPermissions`、`advanced` 策略枚举。运行态可选 `tasks[]`（per-actor：assignee / status / actedAt / comment）；`workflowActorProgress` 以 tasks 为准，缺省回落 `actors` + 节点 status（兼容 2.4.2）。纯函数 `reduceWorkflowAction` 覆盖 approve / reject / transfer / addsign（前/后） / return（选节点） / cancel / comment / request_changes。locale 全量键一次写完。不是 BPM 引擎，不跑组织解析。
+- **WorkflowActionBar**：默认视觉序同意→拒绝→转交→退回→加签→撤回→评论；`request_changes` 可选。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` **空意见拦住 `onAction`**（相对 2.4.2「只换文案」有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`；`addsign` / `transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before / after。缺 `buttonPolicy` 仍用 2.4.2 默认集（不含加签/退回）。示例 `timeline/04` `05`。Vue/React 对称。公开 API 增补，无新必填 prop。
+- **WorkflowViewer / WorkflowTimeline**：会签每人一行（`tasks` 优先，否则 `actors`）；加签临时节点标记、退回目标高亮、条件未走支弱化。仍同一套 `WorkflowTimelineStep`，不另起 Timeline。示例 `timeline/04` `05`。公开 API 增补，无新必填 prop。
+- **WorkflowDesigner**：画布摘要卡 + 右侧 Inspector 四 Tab（审批人 / 操作按钮 / 表单权限 / 高级）；调色板 + 节点间 `+` + 复制/删除；`buttonPolicy` / `fieldPermissions` / `approverPolicy` 可编辑；缺发起/缺结束/空审批人/无分支阻塞提示。仍是 simple JSON 树，不是 BPMN / Flowable / Camunda。示例 `workflow-designer/01` `02`。公开 API 增补，无新必填 prop。
+- **字段权限 × SchemaForm / WorkflowDetailShell**：`applyWorkflowFieldPermissions(schema, permissions, mode)`（`initiate` / `approve` / `readonly`）派生 SchemaForm；可选 `WorkflowDetailShell` 布局配方（header / form / tabs / sticky action）。不是表单设计器，不是第二套 Timeline。示例 `schema-form` 与 timeline 联合。公开 API 增补，无新必填 prop。
+- **本版明确不做**：嵌入 Flowable / Camunda / Activiti；BPMN 2.0 画布；第二套 Timeline / Menu；租户 / 部门 / 岗位 / 字典作为 Tigercat 组件；把 SchemaForm 做成飞书式表单设计器。加签 / 退回自本版起为正式目标。
+- **同步 `.size-limit.json` 预算（v2.5.0 实测）**：`Core (full)` 220→230 kB（实测 229.64）、`Vue (full)` 420→434 kB（实测 433.6）、`React (full)` 462→477 kB（实测 476.18）；locale / ActionBar / Designer / DetailShell 增补带动若干子路径略超，一并按实测上调。
+
 ## v2.4.2
 
 v2.4.2：审批详情扫读。Viewer 状态色点/进行中 + 路径图例；会签人用 `actors` 列在卡内；ActionBar 主次序 + 确认 description / 意见框；Designer 摘要卡 + 选中编辑 + 兄弟插入。无新必填 prop。不是 BPMN，不是加签引擎。

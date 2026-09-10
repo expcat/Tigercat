@@ -1096,7 +1096,7 @@ export function isWorkflowActionVisible(
   const role = options?.viewerRole ?? 'approver'
   if (role === 'cc') return action === 'comment'
   if (action === 'cancel') return role === 'starter' || options?.isStarter === true
-  if (role === 'starter') return action === 'cancel' || action === 'comment'
+  if (role === 'starter') return action === 'comment'
   return true
 }
 

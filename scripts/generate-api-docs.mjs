@@ -208,7 +208,7 @@ const COMPONENT_USAGE_NOTES = {
   WorkflowViewer: {
     uses: ['Tag'],
     notes:
-      '只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors`，不要把人做成横向子卡。当前节点色点/「进行中」+ 路径图例；cc 弱化。无第二套时间线，无 BPM / 加签引擎。'
+      '只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors` 或 `tasks` 列行，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。'
   },
   WorkflowDesigner: {
     notes:

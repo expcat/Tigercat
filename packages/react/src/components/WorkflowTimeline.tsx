@@ -478,7 +478,10 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
     )
   }
 
-  const renderActionControl = (item: WorkflowActionBarItem, trigger: React.ReactElement) => {
+  const renderActionControl = (
+    item: WorkflowActionBarItem,
+    trigger: React.ReactElement<Record<string, unknown>>
+  ) => {
     const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
     const reason = workflowActionBarItemDisabledReason(item, {
       ...disableOptions,

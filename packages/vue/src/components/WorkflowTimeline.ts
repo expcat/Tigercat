@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, PropType, ref } from 'vue'
+import { computed, defineComponent, h, PropType, ref, type VNodeChild } from 'vue'
 import {
   assertWorkflowActionComment,
   buildWorkflowActionPayload,
@@ -471,8 +471,8 @@ export const WorkflowActionBar = defineComponent({
           onChange: (actor) => patchDraft(item, { assignee: actor, error: undefined }),
           multiple: item.action === 'addsign'
         }
-        const customReturn = returnPickerFn?.(returnPickerCtx)
-        const customAssignee = assigneePickerFn?.(assigneeCtx)
+        const customReturn = returnPickerFn?.(returnPickerCtx) as VNodeChild | undefined
+        const customAssignee = assigneePickerFn?.(assigneeCtx) as VNodeChild | undefined
 
         return [
           copyDescription ? h('div', null, copyDescription) : null,

@@ -35,7 +35,7 @@ import { ConfigProvider, Button } from '@expcat/tigercat-vue'
 
 ## Components
 
-Sampler: Button, Avatar, Badge, Input, Select, DatePicker, Form, Card, Layout, Menu, Tabs, Modal, Drawer, Table, BarChart, LineChart, VirtualTable, RichTextEditor, DataTableWithToolbar, ChatWindow. The generated catalog with import subpaths is
+Sampler: Button, Avatar, Badge, Input, Select, DatePicker, Form, Card, Layout, Menu, Tabs, Modal, Drawer, Table, BarChart, LineChart, VirtualTable, RichTextEditor, DataTableWithToolbar, ChatWindow, WorkflowDesigner, WorkflowDetailShell. The generated catalog with import subpaths is
 [component-index.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/component-index.md).
 
 `Message`, `notification`, and `LoadingBar` are root command APIs;

@@ -3,8 +3,8 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: competitor-gap conclusions, long-term observations, publish/verify boundaries, task registration
-verified-date: 2026-09-03
-source: current repository state after v2.1.4
+verified-date: 2026-09-10
+source: current repository state after v2.5.0
 -->
 
 本文记录竞品缺口结论、长期观察项与任务边界，不保存完成历史或一次性审查记录。
@@ -30,17 +30,18 @@ source: current repository state after v2.1.4
 
 工作流展示 + 动态菜单中台按小版本递进（基线 v2.3.2）。完整计划见工作区 `midplatform-roadmap-2.3.x.md` 与 Admin 副本 [`Tigercat_Admin/docs/midplatform-roadmap.md`](../../Tigercat_Admin/docs/midplatform-roadmap.md)（若同机并列检出）。
 
-| 里程碑 | 版本  | 摘要                                                                              |
-| ------ | ----- | --------------------------------------------------------------------------------- |
-| M1     | 2.3.2 | WorkflowViewer + MenuSchema 元数据；Admin 菜单轻页 + 审批 Mock 写回               |
-| M2     | 2.3.3 | Admin mixed 动态路由 / pageMap / 按钮权限；库仅补 M1 暴露缺口                     |
-| M3     | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需                                       |
-| M4     | 2.4.0 | WorkflowDesigner + SchemaForm                                                     |
-| M242   | 2.4.2 | 展示扫读（Viewer 图例/会签 actors、ActionBar 确认、Designer 摘要）+ Admin 详情 IA |
+| 里程碑 | 版本  | 摘要                                                                                |
+| ------ | ----- | ----------------------------------------------------------------------------------- |
+| M1     | 2.3.2 | WorkflowViewer + MenuSchema 元数据；Admin 菜单轻页 + 审批 Mock 写回                 |
+| M2     | 2.3.3 | Admin mixed 动态路由 / pageMap / 按钮权限；库仅补 M1 暴露缺口                       |
+| M3     | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需                                         |
+| M4     | 2.4.0 | WorkflowDesigner + SchemaForm                                                       |
+| M5     | 2.5.0 | 工作流一流完整版：Inspector Designer / 按人任务 / 加签退回 / 字段权限 + DetailShell |
+| M242   | 2.4.2 | 展示扫读（Viewer 图例/会签 actors、ActionBar 确认、Designer 摘要）+ Admin 详情 IA   |
 
-节奏：Tigercat `2.3.x` 先发版 → Admin 升依赖后跟。明确不做：Flowable/Camunda/BPMN、第二套 Menu/Timeline、租户/组织/字典组件化进库、运行时加签引擎。
+节奏：Tigercat 库侧先发版 → Admin 升依赖后跟。明确不做：Flowable/Camunda/BPMN、第二套 Menu/Timeline、租户/组织/字典组件化进库。加签 / 退回 / 字段权限 / 节点按钮配置自 v2.5.0 起为正式目标。
 
-Tigercat M242 库侧已随 v2.4.2 发出（Viewer 扫读 / ActionBar 确认 / Designer 摘要；非 BPMN、非加签引擎）。Admin 升 `^2.4.2` 后做详情 Tab + sticky ActionBar。
+Tigercat M5 库侧已随 v2.5.0 发出（Inspector Designer / 按人 `tasks` / ActionBar 完整动作含加签退回 / 字段权限 + DetailShell；非 BPMN、非组织组件）。Admin 升 `^2.5.0` 后接 Runtime 状态机与详情壳。
 
 ## 长期观察项（不绑定版本）
 

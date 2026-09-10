@@ -1120,7 +1120,7 @@ const SKILL_DOC_BUDGETS = {
   entryBytes: 2600,
   roadmapLines: 24,
   totalMarkdownLines: 3800,
-  apiSummaryBytes: 16000,
+  apiSummaryBytes: 16500,
   propsCategoryLines: 400,
   handReferenceLines: 120
 }

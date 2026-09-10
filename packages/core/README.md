@@ -17,12 +17,13 @@ npm install @expcat/tigercat-core
 
 ## Exports
 
-| Module              | Description                                                                     |
-| ------------------- | ------------------------------------------------------------------------------- |
-| **Utils**           | `classNames`, `coerceClassValue`, `copyText`, animation helpers, a11y utilities |
-| **Types**           | Shared TypeScript types for all components (Button, Input, Modal, Table, etc.)  |
-| **Theme**           | CSS variables (`THEME_CSS_VARS`), color utilities, component theme configs      |
-| **Tailwind Plugin** | `tigercatPlugin` - Tailwind CSS plugin for theme integration                    |
+| Module              | Description                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Utils**           | `classNames`, `coerceClassValue`, `copyText`, animation helpers, a11y utilities                                                                                |
+| **Types**           | Shared TypeScript types for all components (Button, Input, Modal, Table, etc.)                                                                                 |
+| **Workflow**        | `reduceWorkflowAction`, `applyWorkflowFieldPermissions`, Designer / Timeline helpers; tree-shake `@expcat/tigercat-core/workflow-designer` and `./schema-form` |
+| **Theme**           | CSS variables (`THEME_CSS_VARS`), color utilities, component theme configs                                                                                     |
+| **Tailwind Plugin** | `tigercatPlugin` - Tailwind CSS plugin for theme integration                                                                                                   |
 
 Runtime theme and design tokens are documented in
 [theme.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/theme.md)

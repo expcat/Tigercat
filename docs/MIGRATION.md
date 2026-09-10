@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.5.0
+
+v2.5.0 允许有计划的行为变化（minor）。新增 action 字面量 `addsign` / `return` / `request_changes`；可选 `tasks[]` / `buttonPolicy` / `fieldPermissions` / `approverPolicy`。`actor` 继续可读；缺 `buttonPolicy` 用 2.4.2 默认按钮集（不含加签/退回）；缺 `tasks` 时节点级写回。`commentRequired` 空意见会拦住提交（相对 2.4.2「只换文案」）。2.6 可能移除「仅节点级同意」的隐式行为。无新必填 prop。逐步说明见 [MIGRATION-2.5.md](MIGRATION-2.5.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v250)。
+
 ## v2.4.2
 
 v2.4.2 无 breaking change，无新必填 prop。可选 `actors[]`（会签名单；缺省仍用单数 `actor`）。ActionBar `confirm` 增加 description 与可选意见框，`onAction` 第二参 `{ comment? }` 可选。Designer 摘要卡与兄弟插入不改 `path` 语义。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v242)。

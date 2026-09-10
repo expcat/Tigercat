@@ -25,7 +25,10 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface WorkflowDetailShellProps
-  extends CoreWorkflowDetailShellProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  extends
+    Omit<CoreWorkflowDetailShellProps, 'style'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'style'> {
+  style?: React.CSSProperties
   header?: React.ReactNode
   form?: React.ReactNode
   tabs?: React.ReactNode
@@ -62,7 +65,7 @@ export const WorkflowDetailShell = forwardRef<HTMLDivElement, WorkflowDetailShel
         {...rest}
         ref={ref}
         className={classNames(getWorkflowDetailShellRootClasses(className))}
-        style={style as React.CSSProperties}
+        style={style}
         role="region"
         aria-label={ariaLabel || WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL}
         data-tiger-workflow-detail-shell="">
