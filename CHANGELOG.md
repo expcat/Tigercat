@@ -2,6 +2,16 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.5.1
+
+v2.5.1：审批/工单扫读小修。Descriptions 标签不拆字；SchemaForm extra 进控件列；Designer 操作按钮 nowrap；Badge primary 实底对比度。无新必填 prop。不是 BPMN。
+
+- **Descriptions**：水平/垂直标签 `whitespace-nowrap`，窄列不再逐字折行。
+- **SchemaForm / FormItem**：`extra` 画在控件列（输入框下方），不再与下一字段 label 抢位。FormItem 新增可选 `extra`。
+- **WorkflowDesigner**：Inspector 操作按钮 `whitespace-nowrap`，避免「移除」竖排。
+- **Badge**：`primary` 使用实底 `--tiger-primary`，独立数字对比度可读。
+- **WorkflowActionBar**：同意确认为 `info` 图标 + `top-end`，不再用警告三角。拒绝仍为 error/danger。
+
 ## v2.5.0
 
 v2.5.0：工作流一流完整版。Designer Inspector 四 Tab；ActionBar 完整动作（加签 / 退回 / 退回修改）；按人 `tasks`；字段权限 × SchemaForm；可选 `WorkflowDetailShell`。不是 2.4.2 的补丁包。不是 BPMN / Flowable / Camunda。组织 / 字典不进主包。有计划的行为变化见 [docs/MIGRATION-2.5.md](docs/MIGRATION-2.5.md)。无新必填 prop。

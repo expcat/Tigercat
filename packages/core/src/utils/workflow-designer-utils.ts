@@ -82,7 +82,7 @@ export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-mute
 export const workflowDesignerChildrenClasses =
   'ms-4 border-s border-[var(--tiger-border,#d1d5db)] ps-3'
 export const workflowDesignerActionButtonClasses =
-  'inline-flex items-center rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
 
 export const WORKFLOW_DESIGNER_KIND_COLORS: Record<WorkflowStepKind, string> = {
   start: 'var(--tiger-primary,#2563eb)',

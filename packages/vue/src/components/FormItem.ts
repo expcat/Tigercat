@@ -29,6 +29,7 @@ import {
   hasRequiredRule,
   isFormItemGroupControl,
   mergeAriaDescribedBy,
+  schemaFormExtraClasses,
   type FormRule,
   type FormFieldCondition,
   type ComponentSize,
@@ -50,6 +51,7 @@ export interface VueFormItemProps {
   size?: ComponentSize
   errorDisplayMode?: FormErrorDisplayMode
   condition?: FormFieldCondition
+  extra?: string
 }
 
 export const FormItem = defineComponent({
@@ -88,6 +90,9 @@ export const FormItem = defineComponent({
     condition: {
       type: Object as PropType<FormFieldCondition>,
       default: undefined
+    },
+    extra: {
+      type: String
     }
   },
   setup(props, { slots }) {
@@ -415,7 +420,11 @@ export const FormItem = defineComponent({
             }
           }
         },
-        [h('div', fieldWrapper, fieldChildren), errorElement]
+        [
+          h('div', fieldWrapper, fieldChildren),
+          props.extra ? h('p', { class: schemaFormExtraClasses }, props.extra) : null,
+          errorElement
+        ]
       )
 
       return h('div', { class: formItemClasses.value }, [labelElement, contentElement])

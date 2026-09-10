@@ -24,7 +24,6 @@ import {
   resolveSchemaFormLayout,
   resolveSchemaFormWidgetType,
   schemaFormActionsClasses,
-  schemaFormExtraClasses,
   schemaFormGroupClasses,
   schemaFormGroupDescriptionClasses,
   schemaFormGroupTitleClasses,
@@ -308,11 +307,11 @@ export const SchemaForm = defineComponent({
               label: field.label,
               required: field.required,
               rules: field.rules,
-              condition: field.condition
+              condition: field.condition,
+              extra: field.extra
             },
             { default: () => control }
-          ),
-          field.extra ? h('p', { class: schemaFormExtraClasses }, field.extra) : null
+          )
         ]
       )
     }

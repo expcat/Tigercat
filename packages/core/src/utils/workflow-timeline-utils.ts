@@ -5,6 +5,7 @@
  */
 
 import type { ButtonVariant } from '../types/button'
+import type { PopconfirmIconType } from '../types/popconfirm'
 import type { TigerLocaleWorkflowTimeline } from '../types/locale'
 import type { TagVariant } from '../types/tag'
 import type { TimelineItem } from '../types/timeline'
@@ -859,6 +860,7 @@ export interface WorkflowActionConfirmCopy {
   title: string
   description?: string
   okType: 'primary' | 'danger'
+  icon: PopconfirmIconType
   commentPlaceholder?: string
 }
 
@@ -874,9 +876,10 @@ function confirmCopy(
   title: string,
   description: string,
   okType: 'primary' | 'danger',
-  commentPlaceholder: string
+  commentPlaceholder: string,
+  icon: PopconfirmIconType
 ): WorkflowActionConfirmCopy {
-  const copy: WorkflowActionConfirmCopy = { title, okType, commentPlaceholder }
+  const copy: WorkflowActionConfirmCopy = { title, okType, icon, commentPlaceholder }
   if (description) copy.description = description
   return copy
 }
@@ -892,7 +895,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmApprove || 'Approve this request?',
       labels?.confirmApproveDescription || '',
       'primary',
-      commentPlaceholder
+      commentPlaceholder,
+      'info'
     )
   }
   if (action === 'reject') {
@@ -900,7 +904,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmReject || 'Reject this request?',
       labels?.confirmRejectDescription || 'The requester will be notified.',
       'danger',
-      commentPlaceholder
+      commentPlaceholder,
+      'error'
     )
   }
   if (action === 'cancel') {
@@ -908,7 +913,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmCancel || 'Withdraw this request?',
       labels?.confirmCancelDescription || 'Withdrawing ends this request.',
       'danger',
-      commentPlaceholder
+      commentPlaceholder,
+      'warning'
     )
   }
   if (action === 'transfer') {
@@ -916,7 +922,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmTransfer || 'Transfer this request?',
       labels?.confirmTransferDescription || 'After transfer you will no longer be the approver.',
       'primary',
-      commentPlaceholder
+      commentPlaceholder,
+      'question'
     )
   }
   if (action === 'addsign') {
@@ -924,7 +931,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmAddsign || 'Add an approver?',
       labels?.confirmAddsignDescription || 'The added person will approve on a temporary node.',
       'primary',
-      commentPlaceholder
+      commentPlaceholder,
+      'question'
     )
   }
   if (action === 'return') {
@@ -933,7 +941,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmReturnDescription ||
         'The instance stays open and restarts from the selected node.',
       'danger',
-      commentPlaceholder
+      commentPlaceholder,
+      'warning'
     )
   }
   if (action === 'request_changes') {
@@ -942,7 +951,8 @@ export function getWorkflowActionConfirmCopy(
       labels?.confirmRequestChangesDescription ||
         'The starter can edit and resubmit this instance.',
       'danger',
-      commentPlaceholder
+      commentPlaceholder,
+      'warning'
     )
   }
   return null

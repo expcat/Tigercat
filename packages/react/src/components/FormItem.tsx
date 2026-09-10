@@ -14,6 +14,7 @@ import {
   hasRequiredRule,
   isFormItemGroupControl,
   mergeAriaDescribedBy,
+  schemaFormExtraClasses,
   type ComponentSize,
   type FormItemProps as CoreFormItemProps,
   type InputStatus
@@ -59,6 +60,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   className,
   style,
   condition,
+  extra,
   ...rest
 }) => {
   const formContext = useFormContext()
@@ -357,6 +359,7 @@ export const FormItem: React.FC<FormItemProps> = ({
         <div className={FIELD_CLASSES} {...fieldWrapperProps}>
           <FormItemControlProvider value={controlValue}>{enhancedChild}</FormItemControlProvider>
         </div>
+        {extra ? <p className={schemaFormExtraClasses}>{extra}</p> : null}
         {errorNode}
       </div>
     </div>

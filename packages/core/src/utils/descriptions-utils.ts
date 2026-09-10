@@ -32,7 +32,7 @@ export const descriptionsCellSizeClasses: Record<ComponentSize, string> = {
 } as const
 
 export const descriptionsLabelClasses =
-  'font-medium bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)]'
+  'w-[1%] whitespace-nowrap align-middle font-medium bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)]'
 
 export const descriptionsLabelBorderedClasses = 'border border-[var(--tiger-border,#e5e7eb)]'
 
@@ -46,7 +46,7 @@ export const descriptionsVerticalItemClasses =
   'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0 min-w-0'
 
 export const descriptionsVerticalLabelClasses =
-  'font-medium mb-1 text-[var(--tiger-text-muted,#6b7280)]'
+  'whitespace-nowrap font-medium mb-1 text-[var(--tiger-text-muted,#6b7280)]'
 
 export const descriptionsVerticalContentClasses = 'text-[var(--tiger-text,#111827)]'
 

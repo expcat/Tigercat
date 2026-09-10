@@ -770,7 +770,9 @@ describe('workflow action confirm recipe', () => {
   it('returns confirm copy and danger okType for reject and cancel', () => {
     expect(getWorkflowActionConfirmCopy('comment')).toBeNull()
     expect(getWorkflowActionConfirmCopy('approve')?.okType).toBe('primary')
+    expect(getWorkflowActionConfirmCopy('approve')?.icon).toBe('info')
     expect(getWorkflowActionConfirmCopy('reject')?.okType).toBe('danger')
+    expect(getWorkflowActionConfirmCopy('reject')?.icon).toBe('error')
     expect(getWorkflowActionConfirmCopy('reject', { confirmReject: '确认驳回？' })?.title).toBe(
       '确认驳回？'
     )

@@ -20,7 +20,6 @@ import {
   resolveSchemaFormLayout,
   resolveSchemaFormWidgetType,
   schemaFormActionsClasses,
-  schemaFormExtraClasses,
   schemaFormGroupClasses,
   schemaFormGroupDescriptionClasses,
   schemaFormGroupTitleClasses,
@@ -116,10 +115,10 @@ function SchemaFormFieldCell({
         label={field.label}
         required={field.required}
         rules={field.rules}
-        condition={field.condition}>
+        condition={field.condition}
+        extra={field.extra}>
         {control}
       </FormItem>
-      {field.extra ? <p className={schemaFormExtraClasses}>{field.extra}</p> : null}
     </div>
   )
 }

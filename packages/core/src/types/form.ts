@@ -397,6 +397,11 @@ export interface FormItemProps {
    * Conditional behavior for this field. Merged over form-level `conditions[name]`.
    */
   condition?: FormFieldCondition
+
+  /**
+   * Help text rendered in the control column, under the field.
+   */
+  extra?: string
 }
 
 // ---------------------------------------------------------------------------

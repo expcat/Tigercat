@@ -501,7 +501,7 @@ export const defaultBadgeThemeColors: BadgeThemeColors = {
     text: 'text-[var(--tiger-secondary-foreground,#ffffff)]'
   },
   primary: {
-    bg: mixStatusTowardTextClass('bg', '--tiger-primary', '#2563eb'),
+    bg: 'bg-[var(--tiger-primary,#2563eb)]',
     text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
   },
   success: {

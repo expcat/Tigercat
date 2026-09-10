@@ -621,6 +621,8 @@ export const WorkflowActionBar = defineComponent({
             title: confirmCopy.title,
             description: extra ? undefined : confirmCopy.description,
             okType: confirmCopy.okType,
+            icon: confirmCopy.icon,
+            placement: 'top-end',
             disabled: itemDisabled,
             onConfirm: (event?: { preventDefault: () => void }) => emitReadyAction(item, event)
           },
@@ -697,6 +699,8 @@ export const WorkflowActionBar = defineComponent({
                   title: moreConfirmCopy?.title,
                   description: moreExtra ? undefined : moreConfirmCopy?.description,
                   okType: moreConfirmCopy?.okType,
+                  icon: moreConfirmCopy?.icon,
+                  placement: 'top-end',
                   disabled: pendingMore == null,
                   'onUpdate:open': (open: boolean) => {
                     if (!open) {

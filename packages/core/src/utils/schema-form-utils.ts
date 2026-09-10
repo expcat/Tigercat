@@ -45,7 +45,7 @@ export const schemaFormGroupDescriptionClasses =
 export const schemaFormNestedGroupClasses =
   'tiger-schema-form__nested ps-3 border-s border-[var(--tiger-border,#e5e7eb)] space-y-4'
 export const schemaFormExtraClasses =
-  'tiger-schema-form__extra mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'tiger-schema-form__extra mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)] min-w-0'
 export const schemaFormActionsClasses =
   'tiger-schema-form__actions flex items-center justify-end gap-3 pt-2'
 
