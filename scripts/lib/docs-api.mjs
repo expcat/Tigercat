@@ -779,6 +779,7 @@ export const COMPONENT_PROP_PRIORITY = {
   WorkflowActionBar: ['items?', 'buttonPolicy?', 'confirm?', 'commentRequired?'],
   WorkflowViewer: ['steps?', 'highlightPath?', 'showRollbackPoint?', 'labels?'],
   WorkflowDesigner: ['value?', 'path?', 'disabled?', 'labels?'],
+  WorkflowDetailShell: ['showActions?', 'ariaLabel?', 'className?', 'style?'],
   NotificationCenter: [
     'items?',
     'groups?',
@@ -960,6 +961,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowActionBar: '<WorkflowActionBar :items="actions" />',
     WorkflowViewer: '<WorkflowViewer :steps="steps" />',
     WorkflowDesigner: '<WorkflowDesigner v-model="steps" />',
+    WorkflowDetailShell:
+      '<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>',
     SchemaForm: '<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />',
     Countdown: '<Countdown :value="deadline" />',
     Progress: '<Progress :percentage="64" />',
@@ -1099,6 +1102,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowActionBar: '<WorkflowActionBar items={actions} />',
     WorkflowViewer: '<WorkflowViewer steps={steps} />',
     WorkflowDesigner: '<WorkflowDesigner value={steps} onChange={setSteps} />',
+    WorkflowDetailShell: '<WorkflowDetailShell form={form} tabs={tabs} action={actions} />',
     SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
     Countdown: '<Countdown value={deadline} />',
     Progress: '<Progress percentage={64} />',

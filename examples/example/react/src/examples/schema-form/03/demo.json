@@ -1,0 +1,7 @@
+{
+  "id": "schema-form-03",
+  "title": "工作流字段权限",
+  "description": "applyWorkflowFieldPermissions 按节点矩阵派生 SchemaForm：发起可编、审批人隐藏金额/只读原因、抄送与已办强制只读。不是表单设计器。",
+  "entry": "App.tsx",
+  "order": 3
+}

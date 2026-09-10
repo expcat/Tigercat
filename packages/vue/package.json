@@ -920,6 +920,11 @@
       "import": "./dist/components/WorkflowDesigner.mjs",
       "default": "./dist/components/WorkflowDesigner.mjs"
     },
+    "./WorkflowDetailShell": {
+      "types": "./dist/components/WorkflowDetailShell.d.mts",
+      "import": "./dist/components/WorkflowDetailShell.mjs",
+      "default": "./dist/components/WorkflowDetailShell.mjs"
+    },
     "./WorkflowTimeline": {
       "types": "./dist/components/WorkflowTimeline.d.mts",
       "import": "./dist/components/WorkflowTimeline.mjs",

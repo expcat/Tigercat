@@ -103,7 +103,8 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'WorkflowActionBar',
       'WorkflowTimeline',
       'WorkflowViewer',
-      'WorkflowDesigner'
+      'WorkflowDesigner',
+      'WorkflowDetailShell'
     ]
   }).flatMap(([group, components]) => components.map((component) => [component, group]))
 )
@@ -169,7 +170,11 @@ const CORE_EXTRAS = {
     'rich-text-engine.spec.ts',
     'virtual-list-strategies.spec.ts'
   ],
-  composite: ['task-board-drag.spec.ts', 'task-board-utils.spec.ts']
+  composite: [
+    'task-board-drag.spec.ts',
+    'task-board-utils.spec.ts',
+    'workflow-field-permissions.spec.ts'
+  ]
 }
 
 export const GROUP_FILTER_ALIASES = {

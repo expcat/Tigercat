@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 12 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -119,7 +119,7 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 
-Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。
+Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。
 
 | Prop          | Type               | Default | Notes                                                                   |
 | ------------- | ------------------ | ------- | ----------------------------------------------------------------------- |
@@ -178,6 +178,21 @@ Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BP
 | `labels?`   | `Partial<TigerLocaleWorkflowDesigner>` | `-`     | Designer chrome overlay. Wins over `locale.workflowDesigner`.                              |
 
 Events/callback props: `onChange?`, `onSelect?`.
+
+## WorkflowDetailShell
+
+`packages/core/src/types/workflow-detail-shell.ts` · `WorkflowDetailShellProps` · 4/9 props
+
+Uses: `SchemaForm`, `Tabs`, `WorkflowTimeline`, `WorkflowViewer`, `WorkflowActionBar`.
+
+Note: 可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。
+
+| Prop           | Type                      | Default             | Notes                                                                     |
+| -------------- | ------------------------- | ------------------- | ------------------------------------------------------------------------- |
+| `showActions?` | `boolean`                 | `true`              | When false, the sticky action region is omitted even if a slot is filled. |
+| `ariaLabel?`   | `string`                  | `'Workflow detail'` | Accessible name for the detail region.                                    |
+| `className?`   | `string`                  | `-`                 | Additional CSS classes on the root.                                       |
+| `style?`       | `Record<string, unknown>` | `-`                 | Custom styles on the root.                                                |
 
 ## WorkflowTimeline
 

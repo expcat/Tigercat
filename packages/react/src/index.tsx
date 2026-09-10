@@ -165,6 +165,8 @@ export { WorkflowViewer } from './components/WorkflowViewer'
 export type { WorkflowViewerProps } from './components/WorkflowViewer'
 export { WorkflowDesigner } from './components/WorkflowDesigner'
 export type { WorkflowDesignerProps } from './components/WorkflowDesigner'
+export { WorkflowDetailShell } from './components/WorkflowDetailShell'
+export type { WorkflowDetailShellProps } from './components/WorkflowDetailShell'
 export { Countdown } from './components/Countdown'
 export type { CountdownProps } from './components/Countdown'
 

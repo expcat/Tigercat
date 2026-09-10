@@ -1,6 +1,10 @@
 /**
  * Framework-agnostic SchemaForm helpers: flatten fields, layout groups,
  * validation rules, conditions, and value mapping.
+ *
+ * Workflow node field permissions are a separate helper:
+ * `applyWorkflowFieldPermissions` in `workflow-field-permissions.ts`.
+ * Do not turn this module into a form designer.
  */
 
 import { classNames } from './class-names'

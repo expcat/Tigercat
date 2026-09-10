@@ -139,6 +139,7 @@ export const CATEGORIES = {
     'table-toolbar',
     'task-board',
     'workflow-timeline',
+    'workflow-detail-shell',
     'workflow-designer'
   ],
   Core: ['base', 'events', 'floating-popup', 'generics', 'locale', 'slots', 'theme']
@@ -462,6 +463,8 @@ export const COMPONENT_ROUTE_ALIASES = {
   工作流设计器: ['WorkflowDesigner'],
   流程设计器: ['WorkflowDesigner'],
   审批设计器: ['WorkflowDesigner'],
+  工作流详情壳: ['WorkflowDetailShell'],
+  审批详情壳: ['WorkflowDetailShell'],
   文件管理: ['FileManager'],
   通知中心: ['NotificationCenter'],
   新手引导: ['Tour'],

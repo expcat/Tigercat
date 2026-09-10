@@ -131,6 +131,8 @@
       "applyWheelZoom",
       "applyWorkflowDesignerFieldPermissionColumn",
       "applyWorkflowDesignerView",
+      "applyWorkflowFieldPermissions",
+      "applyWorkflowFieldPermissionsFromStep",
       "ApproverResolveContext",
       "ApproverSource",
       "AR_SA_DATEPICKER_LOCALE",
@@ -1081,6 +1083,7 @@
       "defaultTotalText",
       "defaultTransferFilter",
       "defaultWorkflowButtonPlacement",
+      "defaultWorkflowFieldPermission",
       "defaultXYTooltipFormatter",
       "defineLocale",
       "defineText",
@@ -2437,6 +2440,7 @@
       "getWorkflowActionConfirmCopy",
       "getWorkflowCurrentPathKeys",
       "getWorkflowDesignerLabels",
+      "getWorkflowDetailShellRootClasses",
       "getWorkflowReturnCandidates",
       "getWorkflowReturnTargetStep",
       "getWorkflowRollbackStep",
@@ -2838,6 +2842,7 @@
       "isWorkflowActionVisible",
       "isWorkflowAddsignAfterAllowed",
       "isWorkflowAddsignStep",
+      "isWorkflowFieldPermissionMode",
       "isWorkflowSignMode",
       "isWorkflowStepActive",
       "isWorkflowStepKind",
@@ -2985,6 +2990,7 @@
       "ListRowKey",
       "listSizeClasses",
       "listVirtualItemHeight",
+      "listWorkflowEditableFieldNames",
       "listWorkflowReturnTargets",
       "listWrapperClasses",
       "LiveRegion",
@@ -3171,6 +3177,7 @@
       "mergeTablePagination",
       "mergeThemeConfig",
       "mergeTigerLocale",
+      "mergeWorkflowFormValues",
       "messageBaseClasses",
       "messageCloseButtonClasses",
       "messageCloseIconPath",
@@ -3973,6 +3980,8 @@
       "resolveWorkflowButtonPolicy",
       "resolveWorkflowDesignerFieldPermission",
       "resolveWorkflowDesignerView",
+      "resolveWorkflowFieldPermission",
+      "resolveWorkflowFieldPermissionMode",
       "resolveWorkflowSignMode",
       "resolveWorkflowStepActors",
       "resolveWorkflowStepKind",
@@ -5059,7 +5068,9 @@
       "WORKFLOW_DESIGNER_INSPECTOR_TABS",
       "WORKFLOW_DESIGNER_KIND_COLORS",
       "WORKFLOW_DESIGNER_PALETTE_KINDS",
+      "WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL",
       "WORKFLOW_EMPTY_APPROVERS",
+      "WORKFLOW_FIELD_PERMISSION_MODES",
       "WORKFLOW_FIELD_PERMISSIONS",
       "WORKFLOW_SIGN_MODE_LABELS",
       "WORKFLOW_SIGN_MODES",
@@ -5164,7 +5175,15 @@
       "workflowDesignerToolbarClasses",
       "workflowDesignerTreeClasses",
       "WorkflowDesignerView",
+      "workflowDetailShellActionClasses",
+      "workflowDetailShellBodyClasses",
+      "workflowDetailShellFormClasses",
+      "workflowDetailShellHeaderClasses",
+      "WorkflowDetailShellProps",
+      "workflowDetailShellRootClasses",
+      "workflowDetailShellTabsClasses",
       "WorkflowEmptyApprover",
+      "WorkflowFieldPermissionMode",
       "WorkflowHistoryEntry",
       "WorkflowInstance",
       "WorkflowInstanceStatus",
@@ -8135,6 +8154,10 @@
         "value"
       ]
     },
+    "WorkflowDetailShellProps": {
+      "extends": [],
+      "props": ["ariaLabel", "className", "showActions", "style"]
+    },
     "WorkflowTimelineProps": {
       "extends": [],
       "props": [
@@ -8352,6 +8375,7 @@
       "Watermark",
       "WorkflowActionBar",
       "WorkflowDesigner",
+      "WorkflowDetailShell",
       "WorkflowTimeline",
       "WorkflowViewer"
     ],
@@ -9245,6 +9269,11 @@
         "component": "WorkflowDesigner",
         "subpath": "./WorkflowDesigner",
         "target": "WorkflowDesigner"
+      },
+      {
+        "component": "WorkflowDetailShell",
+        "subpath": "./WorkflowDetailShell",
+        "target": "WorkflowDetailShell"
       },
       {
         "component": "WorkflowTimeline",
@@ -9695,6 +9724,8 @@
       "WorkflowActionBarProps",
       "WorkflowDesigner",
       "WorkflowDesignerProps",
+      "WorkflowDetailShell",
+      "WorkflowDetailShellProps",
       "WorkflowTimeline",
       "WorkflowTimelineProps",
       "WorkflowViewer",
@@ -9881,6 +9912,7 @@
       "Watermark",
       "WorkflowActionBar",
       "WorkflowDesigner",
+      "WorkflowDetailShell",
       "WorkflowTimeline",
       "WorkflowViewer"
     ],
@@ -10774,6 +10806,11 @@
         "component": "WorkflowDesigner",
         "subpath": "./WorkflowDesigner",
         "target": "WorkflowDesigner"
+      },
+      {
+        "component": "WorkflowDetailShell",
+        "subpath": "./WorkflowDetailShell",
+        "target": "WorkflowDetailShell"
       },
       {
         "component": "WorkflowTimeline",
@@ -11300,6 +11337,7 @@
       "VueWatermarkProps",
       "VueWorkflowActionBarProps",
       "VueWorkflowDesignerProps",
+      "VueWorkflowDetailShellProps",
       "VueWorkflowTimelineProps",
       "VueWorkflowViewerProps",
       "Watermark",
@@ -11307,6 +11345,8 @@
       "WorkflowActionBarProps",
       "WorkflowDesigner",
       "WorkflowDesignerProps",
+      "WorkflowDetailShell",
+      "WorkflowDetailShellProps",
       "WorkflowTimeline",
       "WorkflowTimelineProps",
       "WorkflowViewer",

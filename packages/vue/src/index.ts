@@ -172,6 +172,11 @@ export { WorkflowViewer } from './components/WorkflowViewer'
 export type { VueWorkflowViewerProps, WorkflowViewerProps } from './components/WorkflowViewer'
 export { WorkflowDesigner } from './components/WorkflowDesigner'
 export type { VueWorkflowDesignerProps, WorkflowDesignerProps } from './components/WorkflowDesigner'
+export { WorkflowDetailShell } from './components/WorkflowDetailShell'
+export type {
+  VueWorkflowDetailShellProps,
+  WorkflowDetailShellProps
+} from './components/WorkflowDetailShell'
 export { Countdown } from './components/Countdown'
 export type { VueCountdownProps, CountdownProps } from './components/Countdown'
 export { Tree } from './components/Tree'

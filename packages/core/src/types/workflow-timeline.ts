@@ -46,6 +46,15 @@ export type WorkflowSignMode = 'sequential' | 'countersign' | 'orsign'
 export type FieldPermission = 'editable' | 'readonly' | 'hidden'
 
 /**
+ * How to derive a SchemaForm schema from node `fieldPermissions`.
+ *
+ * - `initiate` — starter form. Unmapped fields stay editable.
+ * - `approve` — current-node permissions. Unmapped fields are readonly.
+ * - `readonly` — CC / done / ended. Force at least readonly; `hidden` stays hidden.
+ */
+export type WorkflowFieldPermissionMode = 'initiate' | 'approve' | 'readonly'
+
+/**
  * Where an action button renders. `more` is the overflow menu.
  */
 export type WorkflowButtonPlacement = 'bar' | 'more'

@@ -1,0 +1,7 @@
+{
+  "id": "timeline-06",
+  "title": "审批详情壳",
+  "description": "WorkflowDetailShell 布局配方：header + 权限派生表单 + Timeline/Viewer Tab + 底部 sticky ActionBar。Admin 后续切片接真页。",
+  "entry": "App.tsx",
+  "order": 6
+}

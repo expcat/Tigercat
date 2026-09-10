@@ -214,6 +214,11 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。'
   },
+  WorkflowDetailShell: {
+    uses: ['SchemaForm', 'Tabs', 'WorkflowTimeline', 'WorkflowViewer', 'WorkflowActionBar'],
+    notes:
+      '可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。'
+  },
   Countdown: {
     notes:
       '`now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。'
@@ -401,7 +406,7 @@ const COMPONENT_USAGE_NOTES = {
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],
     notes:
-      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
+      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
   },
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities', 'kanban utilities'],
@@ -551,6 +556,8 @@ const COMPONENT_SNIPPETS = {
     Table: '<Table :columns="columns" :data-source="rows" row-key="id" :pagination="false" />',
     FormWizard: '<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />',
     SchemaForm: '<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />',
+    WorkflowDetailShell:
+      '<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>',
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
     VirtualTable:
@@ -614,6 +621,7 @@ const COMPONENT_SNIPPETS = {
     Table: '<Table columns={columns} dataSource={rows} rowKey="id" pagination={false} />',
     FormWizard: '<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />',
     SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
+    WorkflowDetailShell: '<WorkflowDetailShell form={form} tabs={tabs} action={actions} />',
     TaskBoard: '<TaskBoard columns={columns} />',
     Kanban: '<Kanban columns={columns} />',
     VirtualTable:

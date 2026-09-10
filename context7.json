@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 180,
+  "component_count": 181,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -215,6 +215,8 @@
     "工作流设计器": ["WorkflowDesigner"],
     "流程设计器": ["WorkflowDesigner"],
     "审批设计器": ["WorkflowDesigner"],
+    "工作流详情壳": ["WorkflowDetailShell"],
+    "审批详情壳": ["WorkflowDetailShell"],
     "文件管理": ["FileManager"],
     "通知中心": ["NotificationCenter"],
     "新手引导": ["Tour"],
@@ -413,6 +415,7 @@
         "TaskBoard",
         "WorkflowActionBar",
         "WorkflowDesigner",
+        "WorkflowDetailShell",
         "WorkflowTimeline",
         "WorkflowViewer"
       ],
@@ -2000,6 +2003,26 @@
       "typeSource": "packages/core/src/types/workflow-designer.ts",
       "sourceFiles": ["packages/core/src/types/workflow-designer.ts"],
       "propsInterfaces": ["WorkflowDesignerProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "WorkflowDetailShell": {
+      "name": "WorkflowDetailShell",
+      "aliases": ["工作流详情壳", "审批详情壳"],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./WorkflowDetailShell",
+      "packageTarget": "WorkflowDetailShell",
+      "typeSource": "packages/core/src/types/workflow-detail-shell.ts",
+      "sourceFiles": ["packages/core/src/types/workflow-detail-shell.ts"],
+      "propsInterfaces": ["WorkflowDetailShellProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
