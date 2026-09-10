@@ -2,6 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.5.2
+
+v2.5.2：与 2.5.1 同内容。2.5.1 在 npm 上只写出元数据、tarball 404（staged 409），故再发一版。
+
 ## v2.5.1
 
 v2.5.1：审批/工单扫读小修。Descriptions 标签不拆字；SchemaForm extra 进控件列；Designer 操作按钮 nowrap；Badge primary 实底对比度。无新必填 prop。不是 BPMN。
