@@ -3,8 +3,10 @@ import {
   buildWorkflowViewerTree,
   classNames,
   coerceClassValue,
+  getWorkflowReturnTargetStep,
   getWorkflowRollbackStep,
   getWorkflowStepActorsPresentation,
+  getWorkflowStepRuntimeChrome,
   getWorkflowTimelineLabels,
   getWorkflowViewerLegendItems,
   mergeStyleValues,
@@ -12,6 +14,8 @@ import {
   shouldShowWorkflowSignMode,
   timelineDescriptionClasses,
   workflowSignModeLabel,
+  workflowStepActorCurrentClasses,
+  workflowStepActorMetaClasses,
   workflowStepActorProgressClasses,
   workflowStepActorRowClasses,
   workflowStepActorsListClasses,
@@ -20,6 +24,7 @@ import {
   workflowStepStatusDotClasses,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
+  workflowTaskRowStatusLabel,
   workflowViewerActiveTitleClasses,
   workflowViewerBranchClasses,
   workflowViewerCardClassName,
@@ -30,11 +35,13 @@ import {
   workflowViewerLegendClasses,
   workflowViewerLegendItemClasses,
   workflowViewerListClasses,
+  workflowViewerReturnTargetLabelClasses,
   workflowViewerRollbackLabelClasses,
   workflowViewerRootClasses,
   type TigerLocale,
   type TigerLocaleWorkflowTimeline,
   type WorkflowStepActorsPresentation,
+  type WorkflowTask,
   type WorkflowTimelineStep,
   type WorkflowTimelineStepStatus,
   type WorkflowViewerLegendItem,
@@ -64,7 +71,10 @@ function renderStatusDot(status: WorkflowTimelineStepStatus): VNode {
   })
 }
 
-function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation): VNode | null {
+function renderWorkflowStepActors(
+  presentation: WorkflowStepActorsPresentation,
+  labels: Required<TigerLocaleWorkflowTimeline>
+): VNode | null {
   if (presentation.actors.length === 0) return null
   if (!presentation.list) {
     const only = presentation.actors[0]
@@ -77,13 +87,44 @@ function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation):
       ? h('div', { class: workflowStepActorProgressClasses }, presentation.progressLabel)
       : null,
     ...presentation.actors.map((actor) =>
-      h('div', { key: actor.key, class: workflowStepActorRowClasses }, [
-        actor.avatar
-          ? h(Avatar, { size: 'sm', src: actor.avatar, alt: '', 'aria-hidden': true })
-          : null,
-        renderStatusDot(actor.status),
-        actor.name ? h('span', null, actor.name) : null
-      ])
+      h(
+        'div',
+        {
+          key: actor.key,
+          class: classNames(
+            workflowStepActorRowClasses,
+            actor.current ? workflowStepActorCurrentClasses : null
+          ),
+          'data-workflow-current': actor.current ? 'true' : undefined
+        },
+        [
+          actor.avatar
+            ? h(Avatar, { size: 'sm', src: actor.avatar, alt: '', 'aria-hidden': true })
+            : null,
+          renderStatusDot(actor.status),
+          h('div', { class: 'min-w-0 flex-1' }, [
+            h('div', { class: 'flex flex-wrap items-center gap-1.5' }, [
+              actor.name ? h('span', null, actor.name) : null,
+              actor.addsign
+                ? h(
+                    Tag,
+                    { variant: 'primary', size: 'sm', pill: true },
+                    { default: () => labels.addsignTag }
+                  )
+                : null,
+              presentation.fromTasks
+                ? h(
+                    'span',
+                    { class: workflowStepActorMetaClasses },
+                    workflowTaskRowStatusLabel(actor, labels)
+                  )
+                : null
+            ]),
+            actor.actedAt ? h('div', { class: workflowStepActorMetaClasses }, actor.actedAt) : null,
+            actor.comment ? h('div', { class: workflowStepCommentClasses }, actor.comment) : null
+          ])
+        ]
+      )
     )
   ])
 }
@@ -106,7 +147,8 @@ function renderViewerCard(
   node: WorkflowViewerNode,
   labels: Required<TigerLocaleWorkflowTimeline>,
   highlightPath: boolean,
-  showRollbackPoint: boolean
+  showRollbackPoint: boolean,
+  tasks?: WorkflowTask[]
 ): VNode {
   const step = node.step
   const title = step.title ?? step.label
@@ -115,12 +157,21 @@ function renderViewerCard(
   const showSignMode = shouldShowWorkflowSignMode(node.kind, node.signMode)
   const rollbackLabel = showRollbackPoint && node.rollbackPoint ? labels.rollbackPoint : null
   const isActive = node.status === 'active'
+  const chrome = getWorkflowStepRuntimeChrome(step, labels, {
+    onPath: node.onPath,
+    returnTarget: node.returnTarget,
+    conditionBranch: node.conditionBranch,
+    highlightPath
+  })
 
   return h(
     'div',
     {
       class: workflowViewerCardClassName(node, { highlightPath, showRollbackPoint }),
-      'aria-current': isActive ? 'step' : undefined
+      'aria-current': isActive ? 'step' : undefined,
+      'data-workflow-path': node.onPath ? 'on' : 'off',
+      'data-workflow-addsign': chrome.addsign ? (step.origin?.position ?? 'true') : undefined,
+      'data-workflow-return-target': node.returnTarget ? 'true' : undefined
     },
     [
       h('div', { class: workflowViewerKindRowClasses }, [
@@ -131,6 +182,27 @@ function renderViewerCard(
               Tag,
               { variant: 'primary', size: 'sm', pill: true },
               { default: () => workflowSignModeLabel(node.signMode, labels) }
+            )
+          : null,
+        chrome.addsignTag
+          ? h(
+              Tag,
+              { variant: 'primary', size: 'sm', pill: true },
+              { default: () => chrome.addsignTag }
+            )
+          : null,
+        chrome.addsignPositionLabel
+          ? h(
+              Tag,
+              { variant: 'default', size: 'sm', pill: true },
+              { default: () => chrome.addsignPositionLabel }
+            )
+          : null,
+        chrome.branchPathLabel
+          ? h(
+              Tag,
+              { variant: node.onPath ? 'success' : 'default', size: 'sm', pill: true },
+              { default: () => chrome.branchPathLabel }
             )
           : null,
         h(
@@ -156,9 +228,15 @@ function renderViewerCard(
             title as unknown as HChildren
           )
         : null,
-      renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels)),
+      renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels, tasks), labels),
       step.comment ? h('div', { class: workflowStepCommentClasses }, step.comment) : null,
-      rollbackLabel ? h('div', { class: workflowViewerRollbackLabelClasses }, rollbackLabel) : null
+      rollbackLabel ? h('div', { class: workflowViewerRollbackLabelClasses }, rollbackLabel) : null,
+      chrome.returnTargetLabel
+        ? h('div', { class: workflowViewerReturnTargetLabelClasses }, chrome.returnTargetLabel)
+        : null,
+      chrome.pendingAfterAddsignLabel
+        ? h('div', { class: workflowStepActorMetaClasses }, chrome.pendingAfterAddsignLabel)
+        : null
     ]
   )
 }
@@ -168,7 +246,8 @@ function renderViewerSequence(
   labels: Required<TigerLocaleWorkflowTimeline>,
   highlightPath: boolean,
   showRollbackPoint: boolean,
-  layout: 'stack' | 'branch'
+  layout: 'stack' | 'branch',
+  tasks?: WorkflowTask[]
 ): VNode {
   return h(
     'ol',
@@ -178,7 +257,7 @@ function renderViewerSequence(
         layout === 'stack' && index > 0
           ? h('div', { class: workflowViewerConnectorClasses, 'aria-hidden': 'true' })
           : null,
-        renderViewerCard(node, labels, highlightPath, showRollbackPoint),
+        renderViewerCard(node, labels, highlightPath, showRollbackPoint, tasks),
         node.children.length > 0
           ? [
               h('div', { class: workflowViewerConnectorClasses, 'aria-hidden': 'true' }),
@@ -187,7 +266,8 @@ function renderViewerSequence(
                 labels,
                 highlightPath,
                 showRollbackPoint,
-                workflowViewerChildLayout(node)
+                workflowViewerChildLayout(node),
+                tasks
               )
             ]
           : null
@@ -202,6 +282,10 @@ export const WorkflowViewer = defineComponent({
   props: {
     steps: {
       type: Array as PropType<WorkflowTimelineStep[]>,
+      default: undefined
+    },
+    tasks: {
+      type: Array as PropType<WorkflowTask[]>,
       default: undefined
     },
     highlightPath: {
@@ -233,7 +317,7 @@ export const WorkflowViewer = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const stepLabels = computed(() => getWorkflowTimelineLabels(mergedLocale.value, props.labels))
-    const tree = computed(() => buildWorkflowViewerTree(props.steps))
+    const tree = computed(() => buildWorkflowViewerTree(props.steps, { tasks: props.tasks }))
     const rootClasses = computed(() =>
       classNames(workflowViewerRootClasses, props.className, coerceClassValue(attrs.class))
     )
@@ -242,7 +326,8 @@ export const WorkflowViewer = defineComponent({
       if (props.highlightPath === false) return []
       return getWorkflowViewerLegendItems(stepLabels.value, {
         showRollbackPoint:
-          props.showRollbackPoint !== false && getWorkflowRollbackStep(props.steps) != null
+          props.showRollbackPoint !== false && getWorkflowRollbackStep(props.steps) != null,
+        showReturnTarget: getWorkflowReturnTargetStep(props.steps, props.tasks) != null
       })
     })
 
@@ -272,7 +357,8 @@ export const WorkflowViewer = defineComponent({
             stepLabels.value,
             props.highlightPath !== false,
             props.showRollbackPoint !== false,
-            'stack'
+            'stack',
+            props.tasks
           )
         ]
       )

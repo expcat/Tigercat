@@ -2,14 +2,18 @@ import React, { useMemo } from 'react'
 import {
   buildWorkflowViewerTree,
   classNames,
+  getWorkflowReturnTargetStep,
   getWorkflowRollbackStep,
   getWorkflowStepActorsPresentation,
+  getWorkflowStepRuntimeChrome,
   getWorkflowTimelineLabels,
   getWorkflowViewerLegendItems,
   mergeTigerLocale,
   shouldShowWorkflowSignMode,
   timelineDescriptionClasses,
   workflowSignModeLabel,
+  workflowStepActorCurrentClasses,
+  workflowStepActorMetaClasses,
   workflowStepActorProgressClasses,
   workflowStepActorRowClasses,
   workflowStepActorsListClasses,
@@ -18,6 +22,7 @@ import {
   workflowStepStatusDotClasses,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
+  workflowTaskRowStatusLabel,
   workflowViewerActiveTitleClasses,
   workflowViewerBranchClasses,
   workflowViewerCardClassName,
@@ -28,10 +33,12 @@ import {
   workflowViewerLegendClasses,
   workflowViewerLegendItemClasses,
   workflowViewerListClasses,
+  workflowViewerReturnTargetLabelClasses,
   workflowViewerRollbackLabelClasses,
   workflowViewerRootClasses,
   type TigerLocaleWorkflowTimeline,
   type WorkflowStepActorsPresentation,
+  type WorkflowTask,
   type WorkflowTimelineStep,
   type WorkflowTimelineStepStatus,
   type WorkflowViewerLegendItem,
@@ -60,16 +67,21 @@ function StatusDot({ status }: { status: WorkflowTimelineStepStatus }) {
 
 function StepActors({
   step,
-  labels
+  labels,
+  tasks
 }: {
   step: WorkflowTimelineStep
   labels: Required<TigerLocaleWorkflowTimeline>
+  tasks?: WorkflowTask[]
 }) {
-  const presentation = getWorkflowStepActorsPresentation(step, labels)
-  return renderWorkflowStepActors(presentation)
+  const presentation = getWorkflowStepActorsPresentation(step, labels, tasks)
+  return renderWorkflowStepActors(presentation, labels)
 }
 
-function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) {
+function renderWorkflowStepActors(
+  presentation: WorkflowStepActorsPresentation,
+  labels: Required<TigerLocaleWorkflowTimeline>
+) {
   if (presentation.actors.length === 0) return null
   if (!presentation.list) {
     const only = presentation.actors[0]
@@ -83,10 +95,36 @@ function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) 
         <div className={workflowStepActorProgressClasses}>{presentation.progressLabel}</div>
       ) : null}
       {presentation.actors.map((actor) => (
-        <div key={actor.key} className={workflowStepActorRowClasses}>
+        <div
+          key={actor.key}
+          className={classNames(
+            workflowStepActorRowClasses,
+            actor.current ? workflowStepActorCurrentClasses : null
+          )}
+          data-workflow-current={actor.current ? 'true' : undefined}>
           {actor.avatar ? <Avatar size="sm" src={actor.avatar} alt="" aria-hidden="true" /> : null}
           <StatusDot status={actor.status} />
-          {actor.name ? <span>{actor.name}</span> : null}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {actor.name ? <span>{actor.name}</span> : null}
+              {actor.addsign ? (
+                <Tag variant="primary" size="sm" pill>
+                  {labels.addsignTag}
+                </Tag>
+              ) : null}
+              {presentation.fromTasks ? (
+                <span className={workflowStepActorMetaClasses}>
+                  {workflowTaskRowStatusLabel(actor, labels)}
+                </span>
+              ) : null}
+            </div>
+            {actor.actedAt ? (
+              <div className={workflowStepActorMetaClasses}>{actor.actedAt}</div>
+            ) : null}
+            {actor.comment ? (
+              <div className={workflowStepCommentClasses}>{actor.comment}</div>
+            ) : null}
+          </div>
         </div>
       ))}
     </div>
@@ -117,12 +155,14 @@ function ViewerCard({
   node,
   labels,
   highlightPath,
-  showRollbackPoint
+  showRollbackPoint,
+  tasks
 }: {
   node: WorkflowViewerNode
   labels: Required<TigerLocaleWorkflowTimeline>
   highlightPath: boolean
   showRollbackPoint: boolean
+  tasks?: WorkflowTask[]
 }) {
   const step = node.step
   const title = step.title ?? step.label
@@ -131,11 +171,20 @@ function ViewerCard({
   const showSignMode = shouldShowWorkflowSignMode(node.kind, node.signMode)
   const rollbackLabel = showRollbackPoint && node.rollbackPoint ? labels.rollbackPoint : null
   const isActive = node.status === 'active'
+  const chrome = getWorkflowStepRuntimeChrome(step, labels, {
+    onPath: node.onPath,
+    returnTarget: node.returnTarget,
+    conditionBranch: node.conditionBranch,
+    highlightPath
+  })
 
   return (
     <div
       className={workflowViewerCardClassName(node, { highlightPath, showRollbackPoint })}
-      aria-current={isActive ? 'step' : undefined}>
+      aria-current={isActive ? 'step' : undefined}
+      data-workflow-path={node.onPath ? 'on' : 'off'}
+      data-workflow-addsign={chrome.addsign ? (step.origin?.position ?? 'true') : undefined}
+      data-workflow-return-target={node.returnTarget ? 'true' : undefined}>
       <div className={workflowViewerKindRowClasses}>
         <StatusDot status={node.status} />
         <Tag variant="default" size="sm" pill>
@@ -144,6 +193,21 @@ function ViewerCard({
         {showSignMode ? (
           <Tag variant="primary" size="sm" pill>
             {workflowSignModeLabel(node.signMode, labels)}
+          </Tag>
+        ) : null}
+        {chrome.addsignTag ? (
+          <Tag variant="primary" size="sm" pill>
+            {chrome.addsignTag}
+          </Tag>
+        ) : null}
+        {chrome.addsignPositionLabel ? (
+          <Tag variant="default" size="sm" pill>
+            {chrome.addsignPositionLabel}
+          </Tag>
+        ) : null}
+        {chrome.branchPathLabel ? (
+          <Tag variant={node.onPath ? 'success' : 'default'} size="sm" pill>
+            {chrome.branchPathLabel}
           </Tag>
         ) : null}
         <Tag variant={workflowStepStatusTagVariant(node.status)} size="sm" pill>
@@ -160,10 +224,16 @@ function ViewerCard({
           {title}
         </div>
       ) : null}
-      <StepActors step={step} labels={labels} />
+      <StepActors step={step} labels={labels} tasks={tasks} />
       {step.comment ? <div className={workflowStepCommentClasses}>{step.comment}</div> : null}
       {rollbackLabel ? (
         <div className={workflowViewerRollbackLabelClasses}>{rollbackLabel}</div>
+      ) : null}
+      {chrome.returnTargetLabel ? (
+        <div className={workflowViewerReturnTargetLabelClasses}>{chrome.returnTargetLabel}</div>
+      ) : null}
+      {chrome.pendingAfterAddsignLabel ? (
+        <div className={workflowStepActorMetaClasses}>{chrome.pendingAfterAddsignLabel}</div>
       ) : null}
     </div>
   )
@@ -174,13 +244,15 @@ function ViewerSequence({
   labels,
   highlightPath,
   showRollbackPoint,
-  layout
+  layout,
+  tasks
 }: {
   nodes: WorkflowViewerNode[]
   labels: Required<TigerLocaleWorkflowTimeline>
   highlightPath: boolean
   showRollbackPoint: boolean
   layout: 'stack' | 'branch'
+  tasks?: WorkflowTask[]
 }) {
   return (
     <ol className={layout === 'branch' ? workflowViewerBranchClasses : workflowViewerListClasses}>
@@ -194,6 +266,7 @@ function ViewerSequence({
             labels={labels}
             highlightPath={highlightPath}
             showRollbackPoint={showRollbackPoint}
+            tasks={tasks}
           />
           {node.children.length > 0 ? (
             <>
@@ -204,6 +277,7 @@ function ViewerSequence({
                 highlightPath={highlightPath}
                 showRollbackPoint={showRollbackPoint}
                 layout={workflowViewerChildLayout(node)}
+                tasks={tasks}
               />
             </>
           ) : null}
@@ -215,6 +289,7 @@ function ViewerSequence({
 
 export const WorkflowViewer: React.FC<WorkflowViewerProps> = ({
   steps,
+  tasks,
   highlightPath = true,
   showRollbackPoint = true,
   locale,
@@ -233,14 +308,15 @@ export const WorkflowViewer: React.FC<WorkflowViewerProps> = ({
     () => getWorkflowTimelineLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const tree = useMemo(() => buildWorkflowViewerTree(steps), [steps])
+  const tree = useMemo(() => buildWorkflowViewerTree(steps, { tasks }), [steps, tasks])
   const rootClasses = useMemo(() => classNames(workflowViewerRootClasses, className), [className])
   const legendItems = useMemo(() => {
     if (highlightPath === false) return []
     return getWorkflowViewerLegendItems(stepLabels, {
-      showRollbackPoint: showRollbackPoint !== false && getWorkflowRollbackStep(steps) != null
+      showRollbackPoint: showRollbackPoint !== false && getWorkflowRollbackStep(steps) != null,
+      showReturnTarget: getWorkflowReturnTargetStep(steps, tasks) != null
     })
-  }, [highlightPath, showRollbackPoint, stepLabels, steps])
+  }, [highlightPath, showRollbackPoint, stepLabels, steps, tasks])
 
   return (
     <div
@@ -256,6 +332,7 @@ export const WorkflowViewer: React.FC<WorkflowViewerProps> = ({
         highlightPath={highlightPath}
         showRollbackPoint={showRollbackPoint}
         layout="stack"
+        tasks={tasks}
       />
     </div>
   )

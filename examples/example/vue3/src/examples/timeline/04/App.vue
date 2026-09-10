@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type {
   WorkflowActionBarItem,
   WorkflowActionPayload,
+  WorkflowTask,
   WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '@expcat/tigercat-core'
@@ -24,18 +25,29 @@ const steps: WorkflowTimelineStep[] = [
     order: 1
   },
   {
+    key: 'add-before',
+    title: '专家前加签',
+    status: 'approved',
+    temporary: true,
+    origin: { type: 'addsign', position: 'before', fromNodeKey: 'manager' },
+    actor: { id: 'expert', name: '专家' },
+    comment: '补充材料已核。',
+    time: '2026-09-01 13:20',
+    action: 'approve',
+    order: 2
+  },
+  {
     key: 'manager',
     title: '主管会签',
-    status: 'approved',
+    status: 'active',
     signMode: 'countersign',
+    time: '进行中',
+    order: 3,
     actors: [
       { id: 'li', name: '李四', status: 'approved' },
-      { id: 'qian', name: '钱七', status: 'approved' }
+      { id: 'qian', name: '钱七', status: 'approved' },
+      { id: 'wu', name: '吴八', status: 'pending' }
     ],
-    comment: '同意，金额合理。',
-    time: '2026-09-01 14:30',
-    action: 'approve',
-    order: 2,
     children: [
       {
         key: 'cc',
@@ -50,17 +62,41 @@ const steps: WorkflowTimelineStep[] = [
   {
     key: 'director',
     title: '总监审批',
-    status: 'active',
+    status: 'pending',
     actor: { id: 'wang', name: '王五' },
-    time: '待处理',
-    order: 3
+    order: 4
   },
   {
     key: 'finance',
     title: '财务复核',
     status: 'pending',
     actor: { name: '赵六' },
-    order: 4
+    order: 5
+  }
+]
+
+const tasks: WorkflowTask[] = [
+  {
+    id: 't-li',
+    nodeKey: 'manager',
+    assignee: { id: 'li', name: '李四' },
+    status: 'approved',
+    actedAt: '2026-09-01 14:30',
+    comment: '同意，金额合理。'
+  },
+  {
+    id: 't-qian',
+    nodeKey: 'manager',
+    assignee: { id: 'qian', name: '钱七' },
+    status: 'approved',
+    actedAt: '2026-09-01 15:10',
+    comment: '附议。'
+  },
+  {
+    id: 't-wu',
+    nodeKey: 'manager',
+    assignee: { id: 'wu', name: '吴八' },
+    status: 'pending'
   }
 ]
 
@@ -113,6 +149,7 @@ function pickPerson(
   <div class="space-y-3">
     <WorkflowTimeline
       :steps="steps"
+      :tasks="tasks"
       :actions="actions"
       :return-targets="returnTargets"
       :addsign-positions="['before', 'after']"

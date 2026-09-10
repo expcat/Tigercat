@@ -156,6 +156,54 @@ describe('WorkflowTimeline (Vue)', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(1)
   })
 
+  it('keeps a single flatten Timeline while showing tasks, add-sign, and return-to', () => {
+    const steps: WorkflowTimelineStep[] = [
+      {
+        key: 'add',
+        title: 'Expert',
+        status: 'approved',
+        temporary: true,
+        origin: { type: 'addsign', position: 'after', fromNodeKey: 'start' }
+      },
+      {
+        key: 'cs',
+        title: 'Countersign',
+        status: 'active',
+        signMode: 'countersign',
+        returnTarget: true
+      }
+    ]
+    render(WorkflowTimeline, {
+      props: {
+        steps,
+        tasks: [
+          {
+            id: 't1',
+            nodeKey: 'cs',
+            assignee: { name: 'Lin' },
+            status: 'approved',
+            actedAt: '11:00',
+            comment: 'task-ok'
+          },
+          {
+            id: 't2',
+            nodeKey: 'cs',
+            assignee: { name: 'Chen' },
+            status: 'pending'
+          }
+        ]
+      }
+    })
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(2)
+    expect(screen.getByText('Added approver')).toBeInTheDocument()
+    expect(screen.getByText('After')).toBeInTheDocument()
+    expect(screen.getByText('Returned here')).toBeInTheDocument()
+    expect(screen.getByText('1/2 signed')).toBeInTheDocument()
+    expect(screen.getByText('task-ok')).toBeInTheDocument()
+    expect(screen.getByText('11:00')).toBeInTheDocument()
+  })
+
   it('uses CC sent for a terminal carbon-copy step', () => {
     render(WorkflowTimeline, {
       props: { steps: [{ key: 'hr', kind: 'cc', title: 'HR', status: 'canceled' }] }

@@ -23,6 +23,8 @@ import type {
   WorkflowSignMode,
   WorkflowStepKind,
   WorkflowTask,
+  WorkflowTaskOrigin,
+  WorkflowTaskStatus,
   WorkflowTimelineAction,
   WorkflowTimelineActor,
   WorkflowTimelineStep,
@@ -94,6 +96,10 @@ export type WorkflowStepStatusCounts = Record<WorkflowTimelineStepStatus, number
 export interface WorkflowTimelineItem extends TimelineItem {
   status: WorkflowTimelineStepStatus
   step: WorkflowTimelineStep
+  onPath: boolean
+  returnTarget: boolean
+  temporary: boolean
+  conditionBranch: boolean
 }
 
 export function isWorkflowTimelineStepStatus(value: unknown): value is WorkflowTimelineStepStatus {
@@ -353,12 +359,19 @@ export interface WorkflowStepActorView {
   name: string
   status: WorkflowTimelineStepStatus
   avatar?: string
+  actedAt?: string
+  comment?: string
+  origin?: WorkflowTaskOrigin
+  blocked?: boolean
+  current?: boolean
+  addsign?: boolean
 }
 
 export interface WorkflowStepActorsPresentation {
   actors: WorkflowStepActorView[]
   list: boolean
   progressLabel?: string
+  fromTasks?: boolean
 }
 
 function workflowActorAvatarUrl(
@@ -376,15 +389,79 @@ function resolveWorkflowActorStatus(
   return isWorkflowTimelineStepStatus(actor?.status) ? actor.status : 'pending'
 }
 
+export function resolveWorkflowTaskDisplayStatus(
+  status: WorkflowTaskStatus | undefined
+): WorkflowTimelineStepStatus {
+  if (status === 'blocked') return 'pending'
+  return isWorkflowTimelineStepStatus(status) ? status : 'pending'
+}
+
+function tasksForStep(
+  step: Pick<WorkflowTimelineStep, 'key' | 'tasks'> | undefined,
+  tasks?: readonly WorkflowTask[]
+): WorkflowTask[] | undefined {
+  if (tasks && step?.key != null) {
+    const matched = tasks.filter((task) => task.nodeKey === step.key)
+    if (matched.length > 0) return matched
+  }
+  if (step?.tasks && step.tasks.length > 0) return step.tasks
+  return undefined
+}
+
+function markSequentialCurrent(actors: WorkflowStepActorView[]): void {
+  const current = actors.find(
+    (actor) =>
+      actor.status !== 'approved' && actor.status !== 'rejected' && actor.status !== 'canceled'
+  )
+  if (current) current.current = true
+}
+
+function actorViewFromTask(task: WorkflowTask, index: number): WorkflowStepActorView {
+  const view: WorkflowStepActorView = {
+    key: task.id || String(task.assignee.id ?? task.assignee.name ?? index),
+    name: task.assignee.name ?? '',
+    status: resolveWorkflowTaskDisplayStatus(task.status)
+  }
+  const avatar = workflowActorAvatarUrl(task.assignee)
+  if (avatar) view.avatar = avatar
+  if (task.actedAt) view.actedAt = task.actedAt
+  if (task.comment) view.comment = task.comment
+  if (task.origin) view.origin = task.origin
+  if (task.status === 'blocked') view.blocked = true
+  if (task.origin === 'addsign') view.addsign = true
+  return view
+}
+
 /**
- * In-card / inline actor presentation. A list is used when there are two or
- * more names (countersign / or-sign / sequential). Countersign also gets N/M.
+ * In-card / inline actor presentation. Prefers `tasks` (argument, then
+ * `step.tasks`) so each person is a status row; falls back to `actors[]`.
+ * Countersign gets N/M; or-sign gets "any one"; sequential highlights current.
  * People are never modeled as `children`.
  */
 export function getWorkflowStepActorsPresentation(
-  step: Pick<WorkflowTimelineStep, 'actor' | 'actors' | 'status' | 'signMode'> | undefined,
-  labels?: Pick<TigerLocaleWorkflowTimeline, 'actorsProgress'>
+  step:
+    | Pick<WorkflowTimelineStep, 'actor' | 'actors' | 'status' | 'signMode' | 'key' | 'tasks'>
+    | undefined,
+  labels?: Pick<TigerLocaleWorkflowTimeline, 'actorsProgress' | 'signOrsignAny'>,
+  tasks?: readonly WorkflowTask[]
 ): WorkflowStepActorsPresentation {
+  const signMode = resolveWorkflowSignMode(step)
+  const nodeTasks = tasksForStep(step, tasks)
+  if (nodeTasks && nodeTasks.length > 0) {
+    const actors = nodeTasks.map((task, index) => actorViewFromTask(task, index))
+    if (signMode === 'sequential') markSequentialCurrent(actors)
+    const presentation: WorkflowStepActorsPresentation = { actors, list: true, fromTasks: true }
+    if (signMode === 'countersign') {
+      presentation.progressLabel = formatWorkflowActorsProgress(
+        labels?.actorsProgress,
+        workflowActorProgress(step, tasks)
+      )
+    } else if (signMode === 'orsign') {
+      presentation.progressLabel = labels?.signOrsignAny || 'Any one'
+    }
+    return presentation
+  }
+
   const resolved = resolveWorkflowStepActors(step)
   const actors: WorkflowStepActorView[] = resolved.map((actor, index) => {
     const view: WorkflowStepActorView = {
@@ -397,12 +474,15 @@ export function getWorkflowStepActorsPresentation(
     return view
   })
   const list = actors.length > 1
+  if (list && signMode === 'sequential') markSequentialCurrent(actors)
   const presentation: WorkflowStepActorsPresentation = { actors, list }
-  if (list && resolveWorkflowSignMode(step) === 'countersign') {
+  if (list && signMode === 'countersign') {
     presentation.progressLabel = formatWorkflowActorsProgress(
       labels?.actorsProgress,
       workflowActorProgress(step)
     )
+  } else if (list && signMode === 'orsign') {
+    presentation.progressLabel = labels?.signOrsignAny || 'Any one'
   }
   return presentation
 }
@@ -483,13 +563,20 @@ export function countWorkflowStepsByStatus(
   return counts
 }
 
-function stepToTimelineItem(step: WorkflowTimelineStep): WorkflowTimelineItem {
+function stepToTimelineItem(
+  step: WorkflowTimelineStep,
+  extras: Pick<WorkflowTimelineItem, 'onPath' | 'returnTarget' | 'temporary' | 'conditionBranch'>
+): WorkflowTimelineItem {
   const status = resolveWorkflowStepStatus(step)
   const item: WorkflowTimelineItem = {
     key: step.key,
     color: workflowStepStatusColor(status),
     status,
-    step
+    step,
+    onPath: extras.onPath,
+    returnTarget: extras.returnTarget,
+    temporary: extras.temporary,
+    conditionBranch: extras.conditionBranch
   }
   if (step.time != null) item.label = step.time
   const content = step.title ?? step.label
@@ -500,13 +587,124 @@ function stepToTimelineItem(step: WorkflowTimelineStep): WorkflowTimelineItem {
 /**
  * Convert approval steps to {@link TimelineItem} rows.
  * Nested children flatten after their parent. Color/status are data hints.
+ * Annotates on-path / return-to / add-sign / condition-branch for the same
+ * Timeline — not a second component.
  */
 export function workflowStepsToTimelineItems(
-  steps: readonly WorkflowTimelineStep[] | undefined
+  steps: readonly WorkflowTimelineStep[] | undefined,
+  options?: { tasks?: readonly WorkflowTask[] }
 ): WorkflowTimelineItem[] {
   const normalized = normalizeWorkflowTimelineSteps(steps)
   if (normalized === EMPTY_WORKFLOW_TIMELINE_STEPS) return []
-  return flattenSteps(normalized).map(stepToTimelineItem)
+  const path = getWorkflowCurrentPathKeys(normalized)
+  const returnTarget = getWorkflowReturnTargetStep(normalized, options?.tasks)
+
+  const flatten = (
+    list: readonly WorkflowTimelineStep[],
+    parentKind?: WorkflowStepKind
+  ): WorkflowTimelineItem[] => {
+    const items: WorkflowTimelineItem[] = []
+    for (const step of list) {
+      items.push(
+        stepToTimelineItem(step, {
+          onPath: path.has(step.key),
+          returnTarget: returnTarget?.key === step.key,
+          temporary: Boolean(step.temporary),
+          conditionBranch: parentKind === 'condition'
+        })
+      )
+      if (step.children && step.children.length > 0) {
+        items.push(...flatten(step.children, resolveWorkflowStepKind(step)))
+      }
+    }
+    return items
+  }
+
+  return flatten(normalized)
+}
+
+export function isWorkflowAddsignStep(
+  step: Pick<WorkflowTimelineStep, 'temporary' | 'origin'> | undefined
+): boolean {
+  return Boolean(step?.temporary && step.origin?.type === 'addsign')
+}
+
+export function workflowAddsignPositionOf(
+  step: Pick<WorkflowTimelineStep, 'temporary' | 'origin'> | undefined
+): WorkflowAddsignPosition | undefined {
+  if (!isWorkflowAddsignStep(step)) return undefined
+  return step?.origin?.position
+}
+
+/**
+ * Explicit `returnTarget: true` wins; otherwise the active step whose tasks
+ * have `origin: 'return'`.
+ */
+export function getWorkflowReturnTargetStep(
+  steps: readonly WorkflowTimelineStep[] | undefined,
+  tasks?: readonly WorkflowTask[]
+): WorkflowTimelineStep | undefined {
+  if (!steps || steps.length === 0) return undefined
+  const normalized = normalizeWorkflowTimelineSteps(steps)
+  let explicit: WorkflowTimelineStep | undefined
+  visitSteps(normalized, (step) => {
+    if (step.returnTarget === true && !explicit) explicit = step
+  })
+  if (explicit) return explicit
+
+  const current = getCurrentWorkflowStep(normalized)
+  if (!current) return undefined
+  const nodeTasks = tasksForStep(current, tasks)
+  if (nodeTasks?.some((task) => task.origin === 'return')) return current
+  return undefined
+}
+
+export interface WorkflowStepRuntimeChrome {
+  addsign: boolean
+  addsignTag?: string
+  addsignPositionLabel?: string
+  returnTarget: boolean
+  returnTargetLabel?: string
+  conditionBranch: boolean
+  onPath: boolean
+  branchPathLabel?: string
+  pendingAfterAddsignLabel?: string
+}
+
+export function getWorkflowStepRuntimeChrome(
+  step: Pick<WorkflowTimelineStep, 'temporary' | 'origin' | 'pendingAfterAddsign'>,
+  labels: Partial<TigerLocaleWorkflowTimeline>,
+  options: {
+    onPath: boolean
+    returnTarget: boolean
+    conditionBranch: boolean
+    highlightPath?: boolean
+  }
+): WorkflowStepRuntimeChrome {
+  const chrome: WorkflowStepRuntimeChrome = {
+    addsign: isWorkflowAddsignStep(step),
+    returnTarget: options.returnTarget,
+    conditionBranch: options.conditionBranch,
+    onPath: options.onPath
+  }
+  if (chrome.addsign) {
+    chrome.addsignTag = labels.addsignTag || 'Added approver'
+    const position = workflowAddsignPositionOf(step)
+    if (position === 'after') chrome.addsignPositionLabel = labels.addsignAfter || 'After'
+    else if (position === 'before') chrome.addsignPositionLabel = labels.addsignBefore || 'Before'
+  }
+  if (options.returnTarget) {
+    chrome.returnTargetLabel = labels.returnTarget || 'Returned here'
+  }
+  if (options.highlightPath !== false && options.conditionBranch) {
+    chrome.branchPathLabel = options.onPath
+      ? labels.currentPath || 'Current path'
+      : labels.offPath || 'Untaken branch'
+  }
+  if (step.pendingAfterAddsign) {
+    chrome.pendingAfterAddsignLabel = labels.addsignAfter || 'After'
+  }
+  return chrome
 }
 
 export function workflowStepStatusLabel(
@@ -518,6 +716,14 @@ export function workflowStepStatusLabel(
     return labels?.ccNotified || 'CC sent'
   }
   return labels?.[status] || WORKFLOW_STEP_STATUS_LABELS[status]
+}
+
+export function workflowTaskRowStatusLabel(
+  actor: Pick<WorkflowStepActorView, 'status' | 'blocked'>,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): string {
+  if (actor.blocked) return labels?.taskBlocked || 'Waiting on added approver'
+  return workflowStepStatusLabel(actor.status, labels)
 }
 
 export function workflowStepStatusTagVariant(status: WorkflowTimelineStepStatus): TagVariant {
@@ -1024,11 +1230,14 @@ export const workflowViewerCardCcClasses =
   'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface-muted,#f9fafb)] px-3 py-2 shadow-none'
 export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary,#2563eb)]'
 export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error,#dc2626)]'
+export const workflowViewerCardReturnTargetClasses = 'border-[var(--tiger-warning,#d97706)]'
 export const workflowViewerCardOffPathClasses = 'opacity-50'
 export const workflowViewerCardActiveClasses =
   'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
 export const workflowViewerKindRowClasses = 'flex flex-wrap items-center gap-1'
 export const workflowViewerRollbackLabelClasses = 'mt-1 text-xs text-[var(--tiger-error,#dc2626)]'
+export const workflowViewerReturnTargetLabelClasses =
+  'mt-1 text-xs text-[var(--tiger-warning,#d97706)]'
 export const workflowViewerActiveTitleClasses = 'text-[var(--tiger-primary,#2563eb)]'
 export const workflowViewerLegendClasses =
   'mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--tiger-text-muted,#6b7280)]'
@@ -1039,13 +1248,17 @@ export const workflowViewerLegendCurrentSwatchClasses = 'border-[var(--tiger-pri
 export const workflowViewerLegendOffPathSwatchClasses =
   'border-[var(--tiger-border,#d1d5db)] opacity-50'
 export const workflowViewerLegendRollbackSwatchClasses = 'border-[var(--tiger-error,#dc2626)]'
+export const workflowViewerLegendReturnSwatchClasses = 'border-[var(--tiger-warning,#d97706)]'
 export const workflowStepStatusDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
 export const workflowStepActorsListClasses = 'mt-1 flex flex-col gap-0.5'
 export const workflowStepActorRowClasses =
   'flex items-center gap-1.5 text-sm text-[var(--tiger-text-muted,#6b7280)]'
 export const workflowStepActorProgressClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowStepActorCurrentClasses = 'font-medium text-[var(--tiger-primary,#2563eb)]'
+export const workflowStepActorMetaClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowTimelineOffPathClasses = 'opacity-50'
 
-export type WorkflowViewerLegendKey = 'currentPath' | 'offPath' | 'rollbackPoint'
+export type WorkflowViewerLegendKey = 'currentPath' | 'offPath' | 'rollbackPoint' | 'returnTarget'
 
 export interface WorkflowViewerLegendItem {
   key: WorkflowViewerLegendKey
@@ -1054,11 +1267,15 @@ export interface WorkflowViewerLegendItem {
 }
 
 /**
- * Path legend rows. Current path and off-path always; rollback only when asked.
+ * Path legend rows. Current path and off-path always; rollback / return-to
+ * only when asked.
  */
 export function getWorkflowViewerLegendItems(
-  labels: Pick<TigerLocaleWorkflowTimeline, 'currentPath' | 'offPath' | 'rollbackPoint'>,
-  options?: { showRollbackPoint?: boolean }
+  labels: Pick<
+    TigerLocaleWorkflowTimeline,
+    'currentPath' | 'offPath' | 'rollbackPoint' | 'returnTarget'
+  >,
+  options?: { showRollbackPoint?: boolean; showReturnTarget?: boolean }
 ): WorkflowViewerLegendItem[] {
   const items: WorkflowViewerLegendItem[] = [
     {
@@ -1088,6 +1305,16 @@ export function getWorkflowViewerLegendItems(
       )
     })
   }
+  if (options?.showReturnTarget) {
+    items.push({
+      key: 'returnTarget',
+      label: labels.returnTarget || 'Returned here',
+      swatchClassName: classNames(
+        workflowViewerLegendSwatchClasses,
+        workflowViewerLegendReturnSwatchClasses
+      )
+    })
+  }
   return items
 }
 
@@ -1103,6 +1330,9 @@ export interface WorkflowViewerNode {
   signMode: WorkflowSignMode
   onPath: boolean
   rollbackPoint: boolean
+  returnTarget: boolean
+  temporary: boolean
+  conditionBranch: boolean
   children: WorkflowViewerNode[]
 }
 
@@ -1198,24 +1428,35 @@ export function getWorkflowCurrentPathKeys(
 }
 
 export function buildWorkflowViewerTree(
-  steps: readonly WorkflowTimelineStep[] | undefined
+  steps: readonly WorkflowTimelineStep[] | undefined,
+  options?: { tasks?: readonly WorkflowTask[] }
 ): WorkflowViewerNode[] {
   const normalized = normalizeWorkflowTimelineSteps(steps)
   if (normalized === EMPTY_WORKFLOW_TIMELINE_STEPS) return EMPTY_WORKFLOW_VIEWER_NODES
   const path = getWorkflowCurrentPathKeys(normalized)
   const rollback = getWorkflowRollbackStep(normalized)
+  const returnTarget = getWorkflowReturnTargetStep(normalized, options?.tasks)
 
-  const mapList = (list: readonly WorkflowTimelineStep[]): WorkflowViewerNode[] =>
-    list.map((step) => ({
-      key: step.key,
-      step,
-      status: resolveWorkflowStepStatus(step),
-      kind: resolveWorkflowStepKind(step),
-      signMode: resolveWorkflowSignMode(step),
-      onPath: path.has(step.key),
-      rollbackPoint: rollback?.key === step.key,
-      children: step.children ? mapList(step.children) : []
-    }))
+  const mapList = (
+    list: readonly WorkflowTimelineStep[],
+    parentKind?: WorkflowStepKind
+  ): WorkflowViewerNode[] =>
+    list.map((step) => {
+      const kind = resolveWorkflowStepKind(step)
+      return {
+        key: step.key,
+        step,
+        status: resolveWorkflowStepStatus(step),
+        kind,
+        signMode: resolveWorkflowSignMode(step),
+        onPath: path.has(step.key),
+        rollbackPoint: rollback?.key === step.key,
+        returnTarget: returnTarget?.key === step.key,
+        temporary: Boolean(step.temporary),
+        conditionBranch: parentKind === 'condition',
+        children: step.children ? mapList(step.children, kind) : []
+      }
+    })
 
   return mapList(normalized)
 }
@@ -1229,20 +1470,24 @@ export function workflowViewerChildLayout(node: {
 export function workflowViewerCardClassName(
   node: Pick<WorkflowViewerNode, 'onPath' | 'rollbackPoint' | 'status'> & {
     kind?: WorkflowStepKind
+    returnTarget?: boolean
   },
   options?: { highlightPath?: boolean; showRollbackPoint?: boolean }
 ): string {
   const highlightPath = options?.highlightPath !== false
   const showRollbackPoint = options?.showRollbackPoint !== false
   const rollback = showRollbackPoint && node.rollbackPoint
+  const returned = Boolean(node.returnTarget) && !rollback
   return classNames(
     node.kind === 'cc' ? workflowViewerCardCcClasses : workflowViewerCardClasses,
     highlightPath && !node.onPath ? workflowViewerCardOffPathClasses : null,
     rollback
       ? workflowViewerCardRollbackClasses
-      : highlightPath && node.onPath
-        ? workflowViewerCardOnPathClasses
-        : null,
+      : returned
+        ? workflowViewerCardReturnTargetClasses
+        : highlightPath && node.onPath
+          ? workflowViewerCardOnPathClasses
+          : null,
     node.status === 'active' ? workflowViewerCardActiveClasses : null
   )
 }

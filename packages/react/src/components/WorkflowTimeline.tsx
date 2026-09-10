@@ -5,6 +5,7 @@ import {
   classNames,
   getWorkflowActionConfirmCopy,
   getWorkflowStepActorsPresentation,
+  getWorkflowStepRuntimeChrome,
   getWorkflowTimelineLabels,
   isWorkflowActionBarItemDisabled,
   listWorkflowReturnTargets,
@@ -26,6 +27,8 @@ import {
   workflowActionBarItemDisabledReason,
   workflowActionNeedsPicker,
   workflowSignModeLabel,
+  workflowStepActorCurrentClasses,
+  workflowStepActorMetaClasses,
   workflowStepActorProgressClasses,
   workflowStepActorRowClasses,
   workflowStepActorsListClasses,
@@ -34,6 +37,9 @@ import {
   workflowStepStatusDotClasses,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
+  workflowTaskRowStatusLabel,
+  workflowTimelineOffPathClasses,
+  workflowViewerReturnTargetLabelClasses,
   type TimelineItem,
   type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
@@ -44,6 +50,7 @@ import {
   type WorkflowReturnPickerContext,
   type WorkflowReturnTarget,
   type WorkflowStepActorsPresentation,
+  type WorkflowTask,
   type WorkflowTimelineActor,
   type WorkflowTimelineItem,
   type WorkflowTimelineProps as CoreWorkflowTimelineProps,
@@ -120,7 +127,10 @@ function StatusDot({ status }: { status: WorkflowTimelineStepStatus }) {
   )
 }
 
-function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) {
+function renderWorkflowStepActors(
+  presentation: WorkflowStepActorsPresentation,
+  labels: Required<TigerLocaleWorkflowTimeline>
+) {
   if (presentation.actors.length === 0) return null
   if (!presentation.list) {
     const only = presentation.actors[0]
@@ -134,10 +144,36 @@ function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) 
         <div className={workflowStepActorProgressClasses}>{presentation.progressLabel}</div>
       ) : null}
       {presentation.actors.map((actor) => (
-        <div key={actor.key} className={workflowStepActorRowClasses}>
+        <div
+          key={actor.key}
+          className={classNames(
+            workflowStepActorRowClasses,
+            actor.current ? workflowStepActorCurrentClasses : null
+          )}
+          data-workflow-current={actor.current ? 'true' : undefined}>
           {actor.avatar ? <Avatar size="sm" src={actor.avatar} alt="" aria-hidden="true" /> : null}
           <StatusDot status={actor.status} />
-          {actor.name ? <span>{actor.name}</span> : null}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {actor.name ? <span>{actor.name}</span> : null}
+              {actor.addsign ? (
+                <Tag variant="primary" size="sm" pill>
+                  {labels.addsignTag}
+                </Tag>
+              ) : null}
+              {presentation.fromTasks ? (
+                <span className={workflowStepActorMetaClasses}>
+                  {workflowTaskRowStatusLabel(actor, labels)}
+                </span>
+              ) : null}
+            </div>
+            {actor.actedAt ? (
+              <div className={workflowStepActorMetaClasses}>{actor.actedAt}</div>
+            ) : null}
+            {actor.comment ? (
+              <div className={workflowStepCommentClasses}>{actor.comment}</div>
+            ) : null}
+          </div>
         </div>
       ))}
     </div>
@@ -146,7 +182,8 @@ function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) 
 
 function renderStepContent(
   item: WorkflowTimelineItem,
-  labels: Required<TigerLocaleWorkflowTimeline>
+  labels: Required<TigerLocaleWorkflowTimeline>,
+  tasks?: WorkflowTask[]
 ) {
   const step = item.step
   const title = step.title ?? step.label
@@ -154,9 +191,18 @@ function renderStepContent(
   const statusLabel = workflowStepStatusLabel(item.status, labels, kind)
   const signMode = resolveWorkflowSignMode(step)
   const showSignMode = shouldShowWorkflowSignMode(kind, signMode)
+  const chrome = getWorkflowStepRuntimeChrome(step, labels, {
+    onPath: item.onPath,
+    returnTarget: item.returnTarget,
+    conditionBranch: item.conditionBranch
+  })
 
   return (
-    <div className="min-w-0">
+    <div
+      className={classNames('min-w-0', !item.onPath ? workflowTimelineOffPathClasses : null)}
+      data-workflow-path={item.onPath ? 'on' : 'off'}
+      data-workflow-addsign={chrome.addsign ? workflowAddsignData(step) : undefined}
+      data-workflow-return-target={item.returnTarget ? 'true' : undefined}>
       {step.time ? <div className={timelineLabelClasses}>{step.time}</div> : null}
       <div className={workflowStepHeaderClasses}>
         {title ? <div className={timelineDescriptionClasses}>{title}</div> : null}
@@ -165,14 +211,39 @@ function renderStepContent(
             {workflowSignModeLabel(signMode, labels)}
           </Tag>
         ) : null}
+        {chrome.addsignTag ? (
+          <Tag variant="primary" size="sm" pill>
+            {chrome.addsignTag}
+          </Tag>
+        ) : null}
+        {chrome.addsignPositionLabel ? (
+          <Tag variant="default" size="sm" pill>
+            {chrome.addsignPositionLabel}
+          </Tag>
+        ) : null}
+        {chrome.branchPathLabel ? (
+          <Tag variant={item.onPath ? 'success' : 'default'} size="sm" pill>
+            {chrome.branchPathLabel}
+          </Tag>
+        ) : null}
         <Tag variant={workflowStepStatusTagVariant(item.status)} size="sm" pill>
           {statusLabel}
         </Tag>
       </div>
-      {renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels))}
+      {renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels, tasks), labels)}
       {step.comment ? <div className={workflowStepCommentClasses}>{step.comment}</div> : null}
+      {chrome.returnTargetLabel ? (
+        <div className={workflowViewerReturnTargetLabelClasses}>{chrome.returnTargetLabel}</div>
+      ) : null}
+      {chrome.pendingAfterAddsignLabel ? (
+        <div className={workflowStepActorMetaClasses}>{chrome.pendingAfterAddsignLabel}</div>
+      ) : null}
     </div>
   )
+}
+
+function workflowAddsignData(step: WorkflowTimelineItem['step']): string {
+  return step.origin?.position ?? 'true'
 }
 
 function emptyDraft(
@@ -562,6 +633,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
 
 export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   steps,
+  tasks,
   actions,
   showActions,
   confirm,
@@ -599,7 +671,10 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
     () => getWorkflowTimelineLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const timelineItems = useMemo(() => workflowStepsToTimelineItems(steps), [steps])
+  const timelineItems = useMemo(
+    () => workflowStepsToTimelineItems(steps, { tasks }),
+    [steps, tasks]
+  )
   const resolvedActions = useMemo(
     () =>
       resolveWorkflowActionBarItems({
@@ -624,7 +699,7 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
 
   const handleRenderItem = (item: TimelineItem, index: number) => {
     if (renderItem) return renderItem(item, index)
-    if (isWorkflowTimelineItem(item)) return renderStepContent(item, stepLabels)
+    if (isWorkflowTimelineItem(item)) return renderStepContent(item, stepLabels, tasks)
     return null
   }
 

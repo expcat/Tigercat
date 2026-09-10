@@ -12,8 +12,11 @@ import {
   getWorkflowActionConfirmCopy,
   getWorkflowCurrentPathKeys,
   getWorkflowRollbackStep,
+  getWorkflowReturnTargetStep,
   getWorkflowStepActorsPresentation,
+  getWorkflowStepRuntimeChrome,
   getWorkflowViewerLegendItems,
+  isWorkflowAddsignStep,
   isWorkflowStepActive,
   isWorkflowStepPending,
   isWorkflowStepTerminal,
@@ -46,6 +49,7 @@ import {
   workflowStepStatusTagVariant,
   workflowViewerCardClassName,
   workflowViewerCardOffPathClasses,
+  workflowViewerCardReturnTargetClasses,
   WORKFLOW_STEP_STATUS_COLORS,
   type WorkflowActionBarItem,
   type WorkflowTimeline,
@@ -313,6 +317,33 @@ describe('workflowStepsToTimelineItems', () => {
     expect(items[1]?.status).toBe('pending')
     expect(items[1]?.content).toBe('CC A')
   })
+
+  it('annotates on-path, return-to, add-sign, and condition branches on flattened items', () => {
+    const items = workflowStepsToTimelineItems([
+      step({ key: 'start', kind: 'start', status: 'approved' }),
+      step({
+        key: 'add',
+        status: 'approved',
+        temporary: true,
+        origin: { type: 'addsign', position: 'after', fromNodeKey: 'start' }
+      }),
+      step({
+        key: 'cond',
+        kind: 'condition',
+        status: 'approved',
+        children: [step({ key: 'yes', status: 'approved' }), step({ key: 'no', status: 'pending' })]
+      }),
+      step({ key: 'manager', status: 'active', returnTarget: true })
+    ])
+    const byKey = Object.fromEntries(items.map((item) => [item.key, item]))
+    expect(byKey.add?.temporary).toBe(true)
+    expect(isWorkflowAddsignStep(byKey.add?.step)).toBe(true)
+    expect(byKey.manager?.returnTarget).toBe(true)
+    expect(byKey.yes?.conditionBranch).toBe(true)
+    expect(byKey.yes?.onPath).toBe(true)
+    expect(byKey.no?.onPath).toBe(false)
+    expect(byKey.no?.conditionBranch).toBe(true)
+  })
 })
 
 describe('workflow step status presentation', () => {
@@ -461,7 +492,75 @@ describe('getWorkflowStepActorsPresentation', () => {
       })
     )
     expect(orsign.list).toBe(true)
-    expect(orsign.progressLabel).toBeUndefined()
+    expect(orsign.progressLabel).toBe('Any one')
+  })
+
+  it('prefers tasks rows with actedAt, comment, blocked, and sequential current', () => {
+    const presentation = getWorkflowStepActorsPresentation(
+      step({
+        key: 'cs',
+        signMode: 'countersign',
+        actors: [
+          { id: 'a', name: 'Lin' },
+          { id: 'b', name: 'Chen' },
+          { id: 'c', name: 'Wu' }
+        ]
+      }),
+      { actorsProgress: '{approved}/{total} signed' },
+      [
+        {
+          id: 't1',
+          nodeKey: 'cs',
+          assignee: { id: 'a', name: 'Lin' },
+          status: 'approved',
+          actedAt: '10:00',
+          comment: 'ok'
+        },
+        {
+          id: 't2',
+          nodeKey: 'cs',
+          assignee: { id: 'b', name: 'Chen' },
+          status: 'approved',
+          actedAt: '10:05',
+          comment: 'lgtm'
+        },
+        {
+          id: 't3',
+          nodeKey: 'cs',
+          assignee: { id: 'c', name: 'Wu' },
+          status: 'pending'
+        }
+      ]
+    )
+    expect(presentation.fromTasks).toBe(true)
+    expect(presentation.list).toBe(true)
+    expect(presentation.progressLabel).toBe('2/3 signed')
+    expect(presentation.actors.map((actor) => actor.name)).toEqual(['Lin', 'Chen', 'Wu'])
+    expect(presentation.actors[0]?.actedAt).toBe('10:00')
+    expect(presentation.actors[0]?.comment).toBe('ok')
+    expect(presentation.actors[2]?.status).toBe('pending')
+
+    const sequential = getWorkflowStepActorsPresentation(
+      step({ key: 'seq', signMode: 'sequential' }),
+      undefined,
+      [
+        {
+          id: 's1',
+          nodeKey: 'seq',
+          assignee: { name: 'Ada' },
+          status: 'approved'
+        },
+        {
+          id: 's2',
+          nodeKey: 'seq',
+          assignee: { name: 'Lin' },
+          status: 'blocked'
+        }
+      ]
+    )
+    expect(sequential.actors[1]?.blocked).toBe(true)
+    expect(sequential.actors[1]?.current).toBe(true)
+    expect(sequential.actors[0]?.current).toBeFalsy()
   })
 })
 
@@ -486,6 +585,12 @@ describe('workflow viewer presentation helpers', () => {
     expect(
       getWorkflowViewerLegendItems(labels, { showRollbackPoint: true }).map((item) => item.key)
     ).toEqual(['currentPath', 'offPath', 'rollbackPoint'])
+    expect(
+      getWorkflowViewerLegendItems(
+        { ...labels, returnTarget: 'Returned here' },
+        { showReturnTarget: true }
+      ).map((item) => item.key)
+    ).toEqual(['currentPath', 'offPath', 'returnTarget'])
   })
 
   it('weakens cc chrome, dims off-path siblings, and rings the active step', () => {
@@ -511,6 +616,62 @@ describe('workflow viewer presentation helpers', () => {
         status: 'active'
       })
     ).toContain('ring-2')
+    expect(
+      workflowViewerCardClassName({
+        onPath: true,
+        rollbackPoint: false,
+        returnTarget: true,
+        status: 'active'
+      })
+    ).toContain(workflowViewerCardReturnTargetClasses)
+  })
+
+  it('exposes add-sign and return-to chrome copy', () => {
+    const addsign = getWorkflowStepRuntimeChrome(
+      {
+        temporary: true,
+        origin: { type: 'addsign', position: 'before', fromNodeKey: 'n' }
+      },
+      { addsignTag: 'Added approver', addsignBefore: 'Before' },
+      { onPath: true, returnTarget: false, conditionBranch: false }
+    )
+    expect(addsign.addsign).toBe(true)
+    expect(addsign.addsignTag).toBe('Added approver')
+    expect(addsign.addsignPositionLabel).toBe('Before')
+
+    const returned = getWorkflowStepRuntimeChrome(
+      {},
+      { returnTarget: 'Returned here', offPath: 'Untaken branch' },
+      { onPath: false, returnTarget: true, conditionBranch: true }
+    )
+    expect(returned.returnTargetLabel).toBe('Returned here')
+    expect(returned.branchPathLabel).toBe('Untaken branch')
+  })
+
+  it('infers the return-to step from explicit flag or task origin', () => {
+    expect(
+      getWorkflowReturnTargetStep([
+        step({ key: 'start', kind: 'start', status: 'approved' }),
+        step({ key: 'manager', status: 'active', returnTarget: true })
+      ])?.key
+    ).toBe('manager')
+    expect(
+      getWorkflowReturnTargetStep(
+        [
+          step({ key: 'start', kind: 'start', status: 'approved' }),
+          step({ key: 'mgr', status: 'active' })
+        ],
+        [
+          {
+            id: 't1',
+            nodeKey: 'mgr',
+            assignee: { name: 'Lin' },
+            status: 'pending',
+            origin: 'return'
+          }
+        ]
+      )?.key
+    ).toBe('mgr')
   })
 })
 
@@ -840,5 +1001,40 @@ describe('buildWorkflowViewerTree', () => {
   it('returns the shared empty list for missing steps', () => {
     expect(buildWorkflowViewerTree(undefined)).toEqual([])
     expect(buildWorkflowViewerTree([])).toEqual([])
+  })
+
+  it('marks add-sign temporary nodes, return-to, and condition off-path', () => {
+    const tree = buildWorkflowViewerTree([
+      step({ key: 'start', kind: 'start', status: 'approved' }),
+      step({
+        key: 'add',
+        title: 'Expert',
+        status: 'approved',
+        temporary: true,
+        origin: { type: 'addsign', position: 'before', fromNodeKey: 'manager' }
+      }),
+      step({
+        key: 'cond',
+        kind: 'condition',
+        status: 'approved',
+        children: [
+          step({ key: 'yes', title: 'low', status: 'approved' }),
+          step({ key: 'no', title: 'high', status: 'pending' })
+        ]
+      }),
+      step({
+        key: 'manager',
+        status: 'active',
+        returnTarget: true,
+        signMode: 'countersign'
+      })
+    ])
+
+    expect(tree[1]?.temporary).toBe(true)
+    expect(tree[3]?.returnTarget).toBe(true)
+    expect(tree[2]?.children[0]?.onPath).toBe(true)
+    expect(tree[2]?.children[0]?.conditionBranch).toBe(true)
+    expect(tree[2]?.children[1]?.onPath).toBe(false)
+    expect(tree[2]?.children[1]?.conditionBranch).toBe(true)
   })
 })

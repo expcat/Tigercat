@@ -140,6 +140,8 @@ export interface TigerLocaleWorkflowTimeline {
   currentPath?: string
   /** Reject rollback-point label */
   rollbackPoint?: string
+  /** Return-to node highlight (live instance, not reject) */
+  returnTarget?: string
   /** ActionBar confirm title: approve */
   confirmApprove?: string
   /** ActionBar confirm title: reject */
@@ -168,6 +170,8 @@ export interface TigerLocaleWorkflowTimeline {
   signCountersignHint?: string
   /** Sign-mode hint: or-sign */
   signOrsignHint?: string
+  /** Or-sign progress: any one person */
+  signOrsignAny?: string
   /** Sign-mode hint: sequential */
   signSequentialHint?: string
   /** Accessible name for the Viewer path legend */

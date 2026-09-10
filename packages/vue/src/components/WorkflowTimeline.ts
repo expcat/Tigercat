@@ -6,6 +6,7 @@ import {
   coerceClassValue,
   getWorkflowActionConfirmCopy,
   getWorkflowStepActorsPresentation,
+  getWorkflowStepRuntimeChrome,
   getWorkflowTimelineLabels,
   isWorkflowActionBarItemDisabled,
   listWorkflowReturnTargets,
@@ -28,6 +29,8 @@ import {
   workflowActionBarItemDisabledReason,
   workflowActionNeedsPicker,
   workflowSignModeLabel,
+  workflowStepActorCurrentClasses,
+  workflowStepActorMetaClasses,
   workflowStepActorProgressClasses,
   workflowStepActorRowClasses,
   workflowStepActorsListClasses,
@@ -36,6 +39,9 @@ import {
   workflowStepStatusDotClasses,
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
+  workflowTaskRowStatusLabel,
+  workflowTimelineOffPathClasses,
+  workflowViewerReturnTargetLabelClasses,
   type TimelineMode,
   type TigerLocale,
   type TigerLocaleWorkflowTimeline,
@@ -50,6 +56,7 @@ import {
   type WorkflowReturnTarget,
   type WorkflowSignMode,
   type WorkflowStepActorsPresentation,
+  type WorkflowTask,
   type WorkflowTimelineActor,
   type WorkflowTimelineItem,
   type WorkflowTimelineProps as CoreWorkflowTimelineProps,
@@ -128,7 +135,10 @@ function renderStatusDot(status: WorkflowTimelineStepStatus): ReturnType<typeof 
   })
 }
 
-function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) {
+function renderWorkflowStepActors(
+  presentation: WorkflowStepActorsPresentation,
+  labels: Required<TigerLocaleWorkflowTimeline>
+) {
   if (presentation.actors.length === 0) return null
   if (!presentation.list) {
     const only = presentation.actors[0]
@@ -141,20 +151,52 @@ function renderWorkflowStepActors(presentation: WorkflowStepActorsPresentation) 
       ? h('div', { class: workflowStepActorProgressClasses }, presentation.progressLabel)
       : null,
     ...presentation.actors.map((actor) =>
-      h('div', { key: actor.key, class: workflowStepActorRowClasses }, [
-        actor.avatar
-          ? h(Avatar, { size: 'sm', src: actor.avatar, alt: '', 'aria-hidden': true })
-          : null,
-        renderStatusDot(actor.status),
-        actor.name ? h('span', null, actor.name) : null
-      ])
+      h(
+        'div',
+        {
+          key: actor.key,
+          class: classNames(
+            workflowStepActorRowClasses,
+            actor.current ? workflowStepActorCurrentClasses : null
+          ),
+          'data-workflow-current': actor.current ? 'true' : undefined
+        },
+        [
+          actor.avatar
+            ? h(Avatar, { size: 'sm', src: actor.avatar, alt: '', 'aria-hidden': true })
+            : null,
+          renderStatusDot(actor.status),
+          h('div', { class: 'min-w-0 flex-1' }, [
+            h('div', { class: 'flex flex-wrap items-center gap-1.5' }, [
+              actor.name ? h('span', null, actor.name) : null,
+              actor.addsign
+                ? h(
+                    Tag,
+                    { variant: 'primary', size: 'sm', pill: true },
+                    { default: () => labels.addsignTag }
+                  )
+                : null,
+              presentation.fromTasks
+                ? h(
+                    'span',
+                    { class: workflowStepActorMetaClasses },
+                    workflowTaskRowStatusLabel(actor, labels)
+                  )
+                : null
+            ]),
+            actor.actedAt ? h('div', { class: workflowStepActorMetaClasses }, actor.actedAt) : null,
+            actor.comment ? h('div', { class: workflowStepCommentClasses }, actor.comment) : null
+          ])
+        ]
+      )
     )
   ])
 }
 
 function renderStepContent(
   item: WorkflowTimelineItem,
-  labels: Required<TigerLocaleWorkflowTimeline>
+  labels: Required<TigerLocaleWorkflowTimeline>,
+  tasks?: WorkflowTask[]
 ) {
   const step = item.step
   const title = step.title ?? step.label
@@ -162,31 +204,74 @@ function renderStepContent(
   const statusLabel = workflowStepStatusLabel(item.status, labels, kind)
   const signMode = resolveWorkflowSignMode(step)
   const showSignMode = shouldShowWorkflowSignMode(kind, signMode)
+  const chrome = getWorkflowStepRuntimeChrome(step, labels, {
+    onPath: item.onPath,
+    returnTarget: item.returnTarget,
+    conditionBranch: item.conditionBranch
+  })
 
-  return h('div', { class: 'min-w-0' }, [
-    step.time ? h('div', { class: timelineLabelClasses }, step.time) : null,
-    h('div', { class: workflowStepHeaderClasses }, [
-      title ? h('div', { class: timelineDescriptionClasses }, title as unknown as HChildren) : null,
-      showSignMode
-        ? h(
-            Tag,
-            { variant: 'primary', size: 'sm', pill: true },
-            { default: () => workflowSignModeLabel(signMode, labels) }
-          )
+  return h(
+    'div',
+    {
+      class: classNames('min-w-0', !item.onPath ? workflowTimelineOffPathClasses : null),
+      'data-workflow-path': item.onPath ? 'on' : 'off',
+      'data-workflow-addsign': chrome.addsign ? (step.origin?.position ?? 'true') : undefined,
+      'data-workflow-return-target': item.returnTarget ? 'true' : undefined
+    },
+    [
+      step.time ? h('div', { class: timelineLabelClasses }, step.time) : null,
+      h('div', { class: workflowStepHeaderClasses }, [
+        title
+          ? h('div', { class: timelineDescriptionClasses }, title as unknown as HChildren)
+          : null,
+        showSignMode
+          ? h(
+              Tag,
+              { variant: 'primary', size: 'sm', pill: true },
+              { default: () => workflowSignModeLabel(signMode, labels) }
+            )
+          : null,
+        chrome.addsignTag
+          ? h(
+              Tag,
+              { variant: 'primary', size: 'sm', pill: true },
+              { default: () => chrome.addsignTag }
+            )
+          : null,
+        chrome.addsignPositionLabel
+          ? h(
+              Tag,
+              { variant: 'default', size: 'sm', pill: true },
+              { default: () => chrome.addsignPositionLabel }
+            )
+          : null,
+        chrome.branchPathLabel
+          ? h(
+              Tag,
+              { variant: item.onPath ? 'success' : 'default', size: 'sm', pill: true },
+              { default: () => chrome.branchPathLabel }
+            )
+          : null,
+        h(
+          Tag,
+          {
+            variant: workflowStepStatusTagVariant(item.status),
+            size: 'sm',
+            pill: true
+          },
+          { default: () => statusLabel }
+        )
+      ]),
+      renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels, tasks), labels),
+      step.comment ? h('div', { class: workflowStepCommentClasses }, step.comment) : null,
+      chrome.returnTargetLabel
+        ? h('div', { class: workflowViewerReturnTargetLabelClasses }, chrome.returnTargetLabel)
         : null,
-      h(
-        Tag,
-        {
-          variant: workflowStepStatusTagVariant(item.status),
-          size: 'sm',
-          pill: true
-        },
-        { default: () => statusLabel }
-      )
-    ]),
-    renderWorkflowStepActors(getWorkflowStepActorsPresentation(step, labels)),
-    step.comment ? h('div', { class: workflowStepCommentClasses }, step.comment) : null
-  ])
+      chrome.pendingAfterAddsignLabel
+        ? h('div', { class: workflowStepActorMetaClasses }, chrome.pendingAfterAddsignLabel)
+        : null
+    ]
+  )
 }
 
 export const WorkflowActionBar = defineComponent({
@@ -671,6 +756,10 @@ export const WorkflowTimeline = defineComponent({
       type: Array as PropType<WorkflowTimelineStep[]>,
       default: undefined
     },
+    tasks: {
+      type: Array as PropType<WorkflowTask[]>,
+      default: undefined
+    },
     actions: {
       type: Array as PropType<WorkflowActionBarItem[]>,
       default: undefined
@@ -753,7 +842,9 @@ export const WorkflowTimeline = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const stepLabels = computed(() => getWorkflowTimelineLabels(mergedLocale.value, props.labels))
-    const timelineItems = computed(() => workflowStepsToTimelineItems(props.steps))
+    const timelineItems = computed(() =>
+      workflowStepsToTimelineItems(props.steps, { tasks: props.tasks })
+    )
     const resolvedActions = computed(() =>
       resolveWorkflowActionBarItems({
         items: props.actions,
@@ -784,7 +875,7 @@ export const WorkflowTimeline = defineComponent({
       timelineSlots.item = (slotProps: { item: unknown; index: number }) => {
         if (slots.item) return slots.item(slotProps)
         if (isWorkflowTimelineItem(slotProps.item)) {
-          return renderStepContent(slotProps.item, stepLabels.value)
+          return renderStepContent(slotProps.item, stepLabels.value, props.tasks)
         }
         return null
       }

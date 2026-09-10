@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type {
   WorkflowActionBarItem,
   WorkflowActionPayload,
+  WorkflowTask,
   WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '@expcat/tigercat-core'
@@ -23,25 +24,38 @@ const steps: WorkflowTimelineStep[] = [
     order: 1
   },
   {
-    key: 'draft',
-    title: '初审',
-    status: 'rejected',
-    rollbackPoint: true,
-    actor: { name: '李四' },
-    comment: '请补充发票后重提。',
-    time: '2026-09-01 11:00',
+    key: 'add-after',
+    title: '专家后加签',
+    status: 'approved',
+    temporary: true,
+    origin: { type: 'addsign', position: 'after', fromNodeKey: 'start' },
+    actor: { id: 'expert', name: '专家' },
+    comment: '已会签补充意见。',
+    time: '2026-09-01 10:40',
     order: 2
+  },
+  {
+    key: 'cond',
+    kind: 'condition',
+    title: '金额判断',
+    status: 'approved',
+    order: 3,
+    children: [
+      { key: 'low', title: '≤ 5000 自动', status: 'approved' },
+      { key: 'high', title: '> 5000 总监审批', status: 'pending' }
+    ]
   },
   {
     key: 'manager',
     title: '主管会签',
-    status: 'approved',
+    status: 'active',
     signMode: 'countersign',
-    time: '2026-09-02 10:00',
-    order: 3,
+    returnTarget: true,
+    time: '退回后重审',
+    order: 4,
     actors: [
-      { id: 'li', name: '李四', status: 'approved' },
-      { id: 'qian', name: '钱七', status: 'approved' }
+      { id: 'li', name: '李四', status: 'pending' },
+      { id: 'qian', name: '钱七', status: 'pending' }
     ]
   },
   {
@@ -51,26 +65,14 @@ const steps: WorkflowTimelineStep[] = [
     status: 'canceled',
     actor: { name: 'HR' },
     time: '2026-09-02 10:01',
-    order: 4
-  },
-  {
-    key: 'cond',
-    kind: 'condition',
-    title: '金额判断',
-    status: 'approved',
-    order: 5,
-    children: [
-      { key: 'low', title: '≤ 5000 自动', status: 'approved' },
-      { key: 'high', title: '> 5000 总监审批', status: 'pending' }
-    ]
+    order: 5
   },
   {
     key: 'director',
     title: '总监审批',
-    status: 'active',
+    status: 'pending',
     signMode: 'orsign',
     actor: { id: 'wang', name: '王五' },
-    time: '待处理',
     order: 6
   },
   {
@@ -79,6 +81,23 @@ const steps: WorkflowTimelineStep[] = [
     status: 'pending',
     actor: { name: '赵六' },
     order: 7
+  }
+]
+
+const tasks: WorkflowTask[] = [
+  {
+    id: 't-li',
+    nodeKey: 'manager',
+    assignee: { id: 'li', name: '李四' },
+    status: 'pending',
+    origin: 'return'
+  },
+  {
+    id: 't-qian',
+    nodeKey: 'manager',
+    assignee: { id: 'qian', name: '钱七' },
+    status: 'pending',
+    origin: 'return'
   }
 ]
 
@@ -129,7 +148,7 @@ function pickPerson(
 
 <template>
   <div class="space-y-4">
-    <WorkflowViewer :steps="steps" />
+    <WorkflowViewer :steps="steps" :tasks="tasks" />
     <WorkflowActionBar
       :items="actions"
       :return-targets="returnTargets"

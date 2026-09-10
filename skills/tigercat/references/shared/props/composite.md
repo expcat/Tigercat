@@ -181,7 +181,7 @@ Events/callback props: `onChange?`, `onSelect?`.
 
 ## WorkflowTimeline
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/25 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/26 props
 
 Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
 
@@ -196,7 +196,7 @@ Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到�
 
 ## WorkflowViewer
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowViewerProps` · 4/7 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowViewerProps` · 4/8 props
 
 Uses: `Tag`.
 

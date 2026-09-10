@@ -328,6 +328,11 @@ export interface WorkflowTimelineStep {
    */
   rollbackPoint?: boolean
   /**
+   * Marks this step as the return-to node after a `return` action. Viewer also
+   * infers the active node whose tasks have `origin: 'return'`.
+   */
+  returnTarget?: boolean
+  /**
    * Who should approve this node. Keys only; host resolves via `resolveApprovers`.
    */
   approverPolicy?: ApproverSource | ApproverSource[]
@@ -426,6 +431,11 @@ export interface WorkflowTimelineProps {
    * Approval steps. Normalized and mapped onto Timeline items.
    */
   steps?: WorkflowTimelineStep[]
+  /**
+   * Instance-level per-actor tasks. When present, each person is a row
+   * (status / actedAt / comment). Wins over `step.tasks` / `actors`.
+   */
+  tasks?: WorkflowTask[]
   /**
    * Action-bar items. Shown when a step is `active` unless `showActions` overrides.
    */
@@ -645,13 +655,20 @@ export interface WorkflowActionBarProps {
 /**
  * Read-only DingTalk-style workflow tree. Same {@link WorkflowTimelineStep}
  * model as WorkflowTimeline — not a second timeline. Countersign people use
- * `actors`; `children` are parallel / CC / condition branches.
+ * `actors` or runtime `tasks`; `children` are parallel / CC / condition
+ * branches. Temporary add-sign nodes get an add-sign tag; the return-to node
+ * is highlighted; untaken condition branches are dimmed.
  */
 export interface WorkflowViewerProps {
   /**
    * Approval steps. Normalized in place; children stay nested for the tree.
    */
   steps?: WorkflowTimelineStep[]
+  /**
+   * Instance-level per-actor tasks. When present, each person is a row
+   * (status / actedAt / comment). Wins over `step.tasks` / `actors`.
+   */
+  tasks?: WorkflowTask[]
   /**
    * Highlight the taken path from start to the current or rollback step.
    * @default true

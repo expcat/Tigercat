@@ -152,6 +152,80 @@ describe('WorkflowViewer (Vue)', () => {
     expect(screen.getByText('Prior reject')).toBeInTheDocument()
   })
 
+  it('renders per-actor task rows, add-sign tags, return-to, and off-path branch labels', () => {
+    const steps: WorkflowTimelineStep[] = [
+      { key: 'start', kind: 'start', title: 'Submit', status: 'approved' },
+      {
+        key: 'add',
+        title: 'Expert',
+        status: 'approved',
+        temporary: true,
+        origin: { type: 'addsign', position: 'before', fromNodeKey: 'cs' }
+      },
+      {
+        key: 'cond',
+        kind: 'condition',
+        title: 'Amount',
+        status: 'approved',
+        children: [
+          { key: 'low', title: 'Low', status: 'approved' },
+          { key: 'high', title: 'High', status: 'pending' }
+        ]
+      },
+      {
+        key: 'cs',
+        title: 'Finance',
+        status: 'active',
+        signMode: 'countersign',
+        returnTarget: true
+      }
+    ]
+    const tasks = [
+      {
+        id: 't1',
+        nodeKey: 'cs',
+        assignee: { id: 'a', name: 'Lin' },
+        status: 'approved' as const,
+        actedAt: '10:00',
+        comment: 'ok-lin'
+      },
+      {
+        id: 't2',
+        nodeKey: 'cs',
+        assignee: { id: 'b', name: 'Chen' },
+        status: 'pending' as const
+      },
+      {
+        id: 't3',
+        nodeKey: 'cs',
+        assignee: { id: 'c', name: 'Wu' },
+        status: 'pending' as const
+      }
+    ]
+    render(WorkflowViewer, { props: { steps, tasks } })
+
+    const finance = screen.getByText('Finance').closest('[data-workflow-return-target="true"]')
+    expect(finance).toBeTruthy()
+    expect(within(finance as HTMLElement).getByText('Lin')).toBeInTheDocument()
+    expect(within(finance as HTMLElement).getByText('10:00')).toBeInTheDocument()
+    expect(within(finance as HTMLElement).getByText('ok-lin')).toBeInTheDocument()
+    expect(within(finance as HTMLElement).getByText('1/3 signed')).toBeInTheDocument()
+    expect(screen.getAllByText('Returned here').length).toBeGreaterThanOrEqual(1)
+
+    const expert = screen.getByText('Expert').closest('[data-workflow-addsign="before"]')
+    expect(expert).toBeTruthy()
+    expect(within(expert as HTMLElement).getByText('Added approver')).toBeInTheDocument()
+    expect(within(expert as HTMLElement).getByText('Before')).toBeInTheDocument()
+
+    const high = screen.getByText('High').closest('[data-workflow-path="off"]')
+    expect(high).toBeTruthy()
+    expect(within(high as HTMLElement).getByText('Untaken branch')).toBeInTheDocument()
+    const low = screen.getByText('Low').closest('[data-workflow-path="on"]')
+    expect(low).toBeTruthy()
+    expect(within(low as HTMLElement).getByText('Current path')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Path legend' })).toHaveTextContent('Returned here')
+  })
+
   describe('WorkflowActionBar confirm recipe', () => {
     it('opens a confirm dialog before emitting reject', async () => {
       const user = userEvent.setup()
