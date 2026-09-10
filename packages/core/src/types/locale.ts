@@ -174,6 +174,74 @@ export interface TigerLocaleWorkflowTimeline {
   legendAriaLabel?: string
   /** Countersign progress template. Supports {approved} and {total}. */
   actorsProgress?: string
+  /** Default action-bar label: approve */
+  actionApprove?: string
+  /** Default action-bar label: reject */
+  actionReject?: string
+  /** Default action-bar label: transfer */
+  actionTransfer?: string
+  /** Default action-bar label: cancel / withdraw */
+  actionCancel?: string
+  /** Default action-bar label: comment */
+  actionComment?: string
+  /** Default action-bar label: add-sign */
+  actionAddsign?: string
+  /** Default action-bar label: return to a prior node */
+  actionReturn?: string
+  /** Default action-bar label: request changes (return to start, direct resume) */
+  actionRequestChanges?: string
+  /** Add-sign position: before the current node */
+  addsignBefore?: string
+  /** Add-sign position: after the current node */
+  addsignAfter?: string
+  /** Tag on a temporary add-sign node */
+  addsignTag?: string
+  /** ActionBar confirm title: add-sign */
+  confirmAddsign?: string
+  /** ActionBar confirm description: add-sign */
+  confirmAddsignDescription?: string
+  /** ActionBar confirm title: return */
+  confirmReturn?: string
+  /** ActionBar confirm description: return */
+  confirmReturnDescription?: string
+  /** ActionBar confirm title: request changes */
+  confirmRequestChanges?: string
+  /** ActionBar confirm description: request changes */
+  confirmRequestChangesDescription?: string
+  /** Return-target picker heading */
+  returnPickerTitle?: string
+  /** Return button disabled: no eligible node */
+  returnNoTargets?: string
+  /** Resume after return: redo every node from the target */
+  returnResumeResequence?: string
+  /** Resume after return: jump back to the returner */
+  returnResumeDirect?: string
+  /** Field permission: editable */
+  fieldEditable?: string
+  /** Field permission: read-only */
+  fieldReadonly?: string
+  /** Field permission: hidden */
+  fieldHidden?: string
+  /** Advanced: manual approval */
+  autoDecideManual?: string
+  /** Advanced: auto-approve the node */
+  autoDecideAutoPass?: string
+  /** Advanced: auto-reject the instance */
+  autoDecideAutoReject?: string
+  /** Empty approver: skip and pass */
+  emptyApproverSkipPass?: string
+  /** Empty approver: pause */
+  emptyApproverPause?: string
+  /** Empty approver: transfer to admin */
+  emptyApproverTransferAdmin?: string
+  /** Empty approver: transfer to a designated user */
+  emptyApproverTransferUser?: string
+  /** Overflow menu trigger */
+  moreActions?: string
+  /** Task waiting on a before-addsign node */
+  taskBlocked?: string
+  /** Intercept copy when commentRequired is set and the comment is empty */
+  commentRequiredBlock?: string
 }
 
 export interface TigerLocaleWorkflowDesigner {
@@ -217,6 +285,14 @@ export interface TigerLocaleWorkflowDesigner {
   removeActor?: string
   /** Empty-root hint that points at sibling insert */
   emptyHint?: string
+  /** Inspector tab: approvers */
+  tabApprovers?: string
+  /** Inspector tab: action buttons */
+  tabButtons?: string
+  /** Inspector tab: form field permissions */
+  tabFieldPermissions?: string
+  /** Inspector tab: advanced */
+  tabAdvanced?: string
 }
 
 export interface TigerLocaleProgress {

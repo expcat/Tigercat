@@ -15,9 +15,18 @@ import type { TimelineMode } from './timeline'
 export type WorkflowTimelineStepStatus = 'pending' | 'active' | 'approved' | 'rejected' | 'canceled'
 
 /**
- * Closed set of approval actions a step or action-bar item may represent.
+ * Closed set of approval actions a step, task, or action-bar item may represent.
+ * `addsign` / `return` / `request_changes` are 2.5.0 runtime actions.
  */
-export type WorkflowTimelineAction = 'approve' | 'reject' | 'transfer' | 'cancel' | 'comment'
+export type WorkflowTimelineAction =
+  | 'approve'
+  | 'reject'
+  | 'transfer'
+  | 'cancel'
+  | 'comment'
+  | 'addsign'
+  | 'return'
+  | 'request_changes'
 
 /**
  * Display kind for a workflow tree node. Omitted values normalize to `approve`.
@@ -30,6 +39,201 @@ export type WorkflowStepKind = 'start' | 'approve' | 'cc' | 'condition'
  * `sequential` = 依次, `countersign` = 会签, `orsign` = 或签.
  */
 export type WorkflowSignMode = 'sequential' | 'countersign' | 'orsign'
+
+/**
+ * Per-field form permission relative to the initiate SchemaForm schema.
+ */
+export type FieldPermission = 'editable' | 'readonly' | 'hidden'
+
+/**
+ * Where an action button renders. `more` is the overflow menu.
+ */
+export type WorkflowButtonPlacement = 'bar' | 'more'
+
+/**
+ * Add-sign position. 2.5.0 supports before / after only (no concurrent add-sign).
+ */
+export type WorkflowAddsignPosition = 'before' | 'after'
+
+/**
+ * After a return, how the instance resumes once the target is done.
+ * `resequence` = redo every node from the target; `direct` = skip ahead to the returner.
+ */
+export type WorkflowReturnResume = 'resequence' | 'direct'
+
+/**
+ * Node auto-decision. Display + Mock; core does not run a scheduler.
+ */
+export type WorkflowAutoDecide = 'manual' | 'auto_pass' | 'auto_reject'
+
+/**
+ * What to do when `resolveApprovers` returns nobody.
+ */
+export type WorkflowEmptyApprover = 'skip_pass' | 'pause' | 'transfer_admin' | 'transfer_user'
+
+/**
+ * Timeout policy action. Display only — core does not tick a clock.
+ */
+export type WorkflowTimeoutAction = 'remind' | 'auto_pass' | 'auto_reject' | 'transfer'
+
+/**
+ * Approver source contract. Hosts inject `resolveApprovers`; Tigercat stores
+ * keys only and does not ship org / tenant / directory components.
+ */
+export type ApproverSource =
+  | { type: 'fixed'; actors: Array<{ id: string; name?: string }> }
+  | { type: 'self' }
+  | { type: 'starter_pick'; multiple?: boolean; signMode?: WorkflowSignMode }
+  | { type: 'role'; key: string }
+  | { type: 'group'; key: string }
+  | { type: 'dept_leader'; level?: number }
+  | { type: 'manager_chain'; upTo?: number }
+
+/**
+ * Context passed to a host `resolveApprovers` implementation.
+ */
+export interface ApproverResolveContext {
+  starter: WorkflowTimelineActor
+  formValues: Record<string, unknown>
+}
+
+/**
+ * Host-injected resolver. Core never calls a directory.
+ */
+export type ResolveApprovers = (
+  source: ApproverSource | ApproverSource[],
+  ctx: ApproverResolveContext
+) => WorkflowTimelineActor[]
+
+/**
+ * One action-bar row in a node's button policy.
+ */
+export interface WorkflowButtonConfig {
+  action: WorkflowTimelineAction
+  enabled: boolean
+  label?: string
+  commentRequired?: boolean
+  placement?: WorkflowButtonPlacement
+}
+
+/**
+ * Per-node button table plus add-sign / return sub-options.
+ */
+export interface WorkflowNodeButtonPolicy {
+  buttons: WorkflowButtonConfig[]
+  addsign?: { positions: WorkflowAddsignPosition[] }
+  returnResume?: WorkflowReturnResume
+}
+
+/**
+ * Inspector "advanced" enums. Timeout is a label + action, not a job queue.
+ */
+export interface WorkflowNodeAdvanced {
+  emptyApprover?: WorkflowEmptyApprover
+  autoDecide?: WorkflowAutoDecide
+  timeout?: {
+    action?: WorkflowTimeoutAction
+    durationLabel?: string
+  }
+  returnResume?: WorkflowReturnResume
+}
+
+/**
+ * Per-actor runtime task. `blocked` is waiting on a before-addsign node.
+ */
+export type WorkflowTaskStatus =
+  'pending' | 'active' | 'approved' | 'rejected' | 'canceled' | 'blocked'
+
+export type WorkflowTaskOrigin = 'definition' | 'addsign' | 'transfer' | 'return'
+
+/**
+ * One person's work on one node. Instance-level `tasks[]` is the source of
+ * truth when present; node `tasks[]` is an optional mirror.
+ */
+export interface WorkflowTask {
+  id: string
+  nodeKey: string
+  assignee: WorkflowTimelineActor
+  status: WorkflowTaskStatus
+  action?: WorkflowTimelineAction
+  comment?: string
+  actedAt?: string
+  origin?: WorkflowTaskOrigin
+}
+
+/**
+ * Origin of a temporary add-sign node inserted into the instance tree.
+ */
+export interface WorkflowAddsignOrigin {
+  type: 'addsign'
+  position: WorkflowAddsignPosition
+  fromNodeKey: string
+  fromTaskId?: string
+}
+
+/**
+ * After-addsign intent parked on a countersign node that is not yet complete.
+ */
+export interface WorkflowPendingAfterAddsign {
+  assignees: WorkflowTimelineActor[]
+  signMode?: WorkflowSignMode
+  comment?: string
+  fromTaskId?: string
+  tempNodeKey?: string
+}
+
+/**
+ * Instance-level status. Same closed set as a step, applied to the whole run.
+ */
+export type WorkflowInstanceStatus = WorkflowTimelineStepStatus
+
+export interface WorkflowHistoryEntry {
+  at: string
+  actorId: string
+  action: WorkflowTimelineAction | string
+  comment?: string
+  nodeKey?: string
+  taskId?: string
+}
+
+/**
+ * Runtime instance. `steps` is the live tree (may include temporary add-sign
+ * nodes). Omit `tasks` to keep 2.4.2 node-level writeback.
+ */
+export interface WorkflowInstance {
+  id?: string
+  status?: WorkflowInstanceStatus
+  steps: WorkflowTimelineStep[]
+  tasks?: WorkflowTask[]
+  cursor?: { nodeKey: string }
+  history?: WorkflowHistoryEntry[]
+  formValues?: Record<string, unknown>
+  starter?: WorkflowTimelineActor
+  /**
+   * Set by a `direct` return. Completing the return target jumps here instead
+   * of the next sequential node.
+   */
+  resumeToNodeKey?: string
+}
+
+/**
+ * Input to {@link reduceWorkflowAction}. Pure — pass `at` for stable timestamps.
+ */
+export interface WorkflowRuntimeAction {
+  action: WorkflowTimelineAction
+  actorId?: string | number
+  taskId?: string
+  nodeKey?: string
+  comment?: string
+  at?: string
+  assignee?: WorkflowTimelineActor
+  assignees?: WorkflowTimelineActor[]
+  position?: WorkflowAddsignPosition
+  signMode?: WorkflowSignMode
+  targetNodeKey?: string
+  resume?: WorkflowReturnResume
+  tempNodeKey?: string
+}
 
 /**
  * Actor on a workflow step. Avatar is an image URL; icon is a registered
@@ -123,6 +327,38 @@ export interface WorkflowTimelineStep {
    * rejected step when no explicit flag is set.
    */
   rollbackPoint?: boolean
+  /**
+   * Who should approve this node. Keys only; host resolves via `resolveApprovers`.
+   */
+  approverPolicy?: ApproverSource | ApproverSource[]
+  /**
+   * Per-node action buttons. Omitted: 2.4.2 default set (no add-sign / return).
+   */
+  buttonPolicy?: WorkflowNodeButtonPolicy
+  /**
+   * Field path → permission. Missing paths: start=`editable`, others=`readonly`.
+   */
+  fieldPermissions?: Record<string, FieldPermission>
+  /**
+   * Empty-approver / auto-decide / timeout display enums.
+   */
+  advanced?: WorkflowNodeAdvanced
+  /**
+   * Optional per-node task mirror. Instance-level `tasks[]` wins at runtime.
+   */
+  tasks?: WorkflowTask[]
+  /**
+   * Temporary add-sign node inserted into the instance tree only.
+   */
+  temporary?: boolean
+  /**
+   * Why a temporary node exists. Not written onto the published definition.
+   */
+  origin?: WorkflowAddsignOrigin
+  /**
+   * After-addsign parked until this countersign node completes.
+   */
+  pendingAfterAddsign?: WorkflowPendingAfterAddsign
 }
 
 /**
@@ -227,21 +463,29 @@ export interface WorkflowTimelineProps {
 }
 
 /**
- * Optional comment collected from the action-bar confirm dialog.
+ * Optional payload collected from the action-bar confirm dialog / picker slots.
  */
 export interface WorkflowActionPayload {
   comment?: string
+  assignee?: WorkflowTimelineActor
+  assignees?: WorkflowTimelineActor[]
+  position?: WorkflowAddsignPosition
+  signMode?: WorkflowSignMode
+  targetNodeKey?: string
+  resume?: WorkflowReturnResume
+  taskId?: string
+  actorId?: string | number
 }
 
 /**
  * Presentational action-bar props. Vue/React bindings render these.
- * Display order is approve → reject → transfer → cancel → comment, then
- * remaining keys in original relative order. Not a BPM / add-sign engine.
+ * Display order is approve → reject → transfer → return → addsign → cancel →
+ * comment, then remaining keys in original relative order. Not a BPM engine.
  */
 export interface WorkflowActionBarProps {
   /**
-   * Action buttons to render. Sorted approve → reject → transfer → cancel →
-   * comment unless a custom `renderActions` replaces the bar.
+   * Action buttons to render. Sorted approve → reject → transfer → return →
+   * addsign → cancel → comment unless a custom `renderActions` replaces the bar.
    */
   items?: WorkflowActionBarItem[]
   /**

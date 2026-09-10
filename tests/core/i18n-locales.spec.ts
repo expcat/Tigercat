@@ -325,6 +325,24 @@ describe('i18n locale presets', () => {
     expect(TIGER_LOCALE_KEYS).toContain('workflowDesigner')
   })
 
+  it('workflow timeline and designer packs include 2.5.0 runtime keys', () => {
+    expect(enUS.workflowTimeline?.actionAddsign).toBe('Add approver')
+    expect(enUS.workflowTimeline?.addsignBefore).toBe('Before')
+    expect(enUS.workflowTimeline?.returnResumeResequence).toBe('Re-approve in sequence')
+    expect(enUS.workflowTimeline?.fieldHidden).toBe('Hidden')
+    expect(enUS.workflowDesigner?.tabApprovers).toBe('Approvers')
+    expect(zhCN.workflowTimeline?.actionAddsign).toBe('加签')
+    expect(zhCN.workflowTimeline?.addsignBefore).toBe('前加签')
+    expect(zhCN.workflowTimeline?.addsignAfter).toBe('后加签')
+    expect(zhCN.workflowTimeline?.actionReturn).toBe('退回')
+    expect(zhCN.workflowTimeline?.returnResumeDirect).toBe('从当前节点审批')
+    expect(zhCN.workflowTimeline?.autoDecideAutoPass).toBe('自动通过')
+    expect(zhCN.workflowDesigner?.tabButtons).toBe('操作按钮')
+    expect(zhCN.workflowDesigner?.tabFieldPermissions).toBe('表单权限')
+    expect(getWorkflowTimelineLabels(zhCN).commentRequiredBlock).toBe('请填写审批意见')
+    expect(getWorkflowDesignerLabels(enUS).tabAdvanced).toBe('Advanced')
+  })
+
   it('workflow timeline and designer packs include 2.4.2 scanability keys', () => {
     expect(enUS.workflowTimeline?.confirmApprove).toBe('Approve this request?')
     expect(enUS.workflowTimeline?.confirmApprove).not.toMatch(/step/i)

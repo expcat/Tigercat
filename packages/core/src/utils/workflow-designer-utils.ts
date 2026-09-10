@@ -106,12 +106,50 @@ export interface WorkflowDesignerView {
 }
 
 function cloneStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
-  return {
+  const next: WorkflowTimelineStep = {
     ...step,
     actor: step.actor ? { ...step.actor } : undefined,
     actors: step.actors ? step.actors.map((actor) => ({ ...actor })) : undefined,
     children: step.children ? cloneWorkflowSteps(step.children) : undefined
   }
+  if (step.tasks) {
+    next.tasks = step.tasks.map((task) => ({ ...task, assignee: { ...task.assignee } }))
+  }
+  if (step.fieldPermissions) next.fieldPermissions = { ...step.fieldPermissions }
+  if (step.buttonPolicy) {
+    next.buttonPolicy = {
+      ...step.buttonPolicy,
+      buttons: step.buttonPolicy.buttons.map((button) => ({ ...button })),
+      addsign: step.buttonPolicy.addsign
+        ? { positions: [...step.buttonPolicy.addsign.positions] }
+        : step.buttonPolicy.addsign
+    }
+  }
+  if (step.approverPolicy) {
+    next.approverPolicy = Array.isArray(step.approverPolicy)
+      ? step.approverPolicy.map((source) =>
+          source.type === 'fixed'
+            ? { type: 'fixed', actors: source.actors.map((actor) => ({ ...actor })) }
+            : { ...source }
+        )
+      : step.approverPolicy.type === 'fixed'
+        ? { type: 'fixed', actors: step.approverPolicy.actors.map((actor) => ({ ...actor })) }
+        : { ...step.approverPolicy }
+  }
+  if (step.advanced) {
+    next.advanced = {
+      ...step.advanced,
+      timeout: step.advanced.timeout ? { ...step.advanced.timeout } : step.advanced.timeout
+    }
+  }
+  if (step.origin) next.origin = { ...step.origin }
+  if (step.pendingAfterAddsign) {
+    next.pendingAfterAddsign = {
+      ...step.pendingAfterAddsign,
+      assignees: step.pendingAfterAddsign.assignees.map((actor) => ({ ...actor }))
+    }
+  }
+  return next
 }
 
 function workflowDesignerActorNames(step: WorkflowTimelineStep): string[] {

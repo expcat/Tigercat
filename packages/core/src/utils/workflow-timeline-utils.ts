@@ -10,9 +10,14 @@ import type { TagVariant } from '../types/tag'
 import type { TimelineItem } from '../types/timeline'
 import { classNames } from './class-names'
 import type {
+  ApproverSource,
   WorkflowActionBarItem,
+  WorkflowNodeAdvanced,
+  WorkflowNodeButtonPolicy,
+  WorkflowPendingAfterAddsign,
   WorkflowSignMode,
   WorkflowStepKind,
+  WorkflowTask,
   WorkflowTimelineAction,
   WorkflowTimelineActor,
   WorkflowTimelineStep,
@@ -186,6 +191,49 @@ function copyActors(
   return actors.map((actor) => ({ ...actor }))
 }
 
+function copyApproverSource(source: ApproverSource): ApproverSource {
+  if (source.type === 'fixed') {
+    return { type: 'fixed', actors: source.actors.map((actor) => ({ ...actor })) }
+  }
+  return { ...source }
+}
+
+function copyButtonPolicy(
+  policy: WorkflowNodeButtonPolicy | undefined
+): WorkflowNodeButtonPolicy | undefined {
+  if (!policy) return undefined
+  return {
+    ...policy,
+    buttons: policy.buttons.map((button) => ({ ...button })),
+    addsign: policy.addsign ? { positions: [...policy.addsign.positions] } : policy.addsign
+  }
+}
+
+function copyAdvanced(
+  advanced: WorkflowNodeAdvanced | undefined
+): WorkflowNodeAdvanced | undefined {
+  if (!advanced) return undefined
+  return {
+    ...advanced,
+    timeout: advanced.timeout ? { ...advanced.timeout } : advanced.timeout
+  }
+}
+
+function copyTasks(tasks: WorkflowTask[] | undefined): WorkflowTask[] | undefined {
+  if (!tasks) return undefined
+  return tasks.map((task) => ({ ...task, assignee: { ...task.assignee } }))
+}
+
+function copyPendingAfter(
+  pending: WorkflowPendingAfterAddsign | undefined
+): WorkflowPendingAfterAddsign | undefined {
+  if (!pending) return undefined
+  return {
+    ...pending,
+    assignees: pending.assignees.map((actor) => ({ ...actor }))
+  }
+}
+
 function copyStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   const next: WorkflowTimelineStep = {
     ...step,
@@ -199,6 +247,18 @@ function copyStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   if (step.children) {
     next.children = normalizeWorkflowTimelineSteps(step.children)
   }
+  if (step.tasks) next.tasks = copyTasks(step.tasks)
+  if (step.fieldPermissions) next.fieldPermissions = { ...step.fieldPermissions }
+  if (step.buttonPolicy) next.buttonPolicy = copyButtonPolicy(step.buttonPolicy)
+  if (step.approverPolicy) {
+    next.approverPolicy = Array.isArray(step.approverPolicy)
+      ? step.approverPolicy.map(copyApproverSource)
+      : copyApproverSource(step.approverPolicy)
+  }
+  if (step.advanced) next.advanced = copyAdvanced(step.advanced)
+  if (step.origin) next.origin = { ...step.origin }
+  if (step.pendingAfterAddsign)
+    next.pendingAfterAddsign = copyPendingAfter(step.pendingAfterAddsign)
   return next
 }
 
@@ -223,14 +283,38 @@ function isApprovedActorStatus(status: WorkflowTimelineActor['status']): boolean
   return status === 'approved'
 }
 
+function taskProgressForNode(
+  step: Pick<WorkflowTimelineStep, 'key'> | undefined,
+  tasks: readonly WorkflowTask[]
+): WorkflowActorProgress | undefined {
+  const nodeTasks =
+    step?.key != null ? tasks.filter((task) => task.nodeKey === step.key) : [...tasks]
+  if (nodeTasks.length === 0) return undefined
+  const countable = nodeTasks.filter((task) => task.status !== 'canceled')
+  const pool = countable.length > 0 ? countable : nodeTasks
+  let approved = 0
+  for (const task of pool) {
+    if (task.status === 'approved') approved += 1
+  }
+  return { approved, total: pool.length }
+}
+
 /**
- * Countersign progress from the actor list. Children are never counted.
- * No names → `{ approved: 0, total: 0 }`. A singular `actor` uses that
- * actor's status, then the step status, as a 0/1 or 1/1.
+ * Countersign progress. Prefers `tasks` (argument, then `step.tasks`); falls
+ * back to `actors[]` + node status for 2.4.2 JSON without tasks. Children are
+ * never counted.
  */
 export function workflowActorProgress(
-  step: Pick<WorkflowTimelineStep, 'actor' | 'actors' | 'status'> | undefined
+  step: Pick<WorkflowTimelineStep, 'actor' | 'actors' | 'status' | 'key' | 'tasks'> | undefined,
+  tasks?: readonly WorkflowTask[]
 ): WorkflowActorProgress {
+  const fromArg = tasks !== undefined ? taskProgressForNode(step, tasks) : undefined
+  if (fromArg) return fromArg
+  if (step?.tasks && step.tasks.length > 0) {
+    const fromStep = taskProgressForNode(step, step.tasks)
+    if (fromStep) return fromStep
+  }
+
   const fromList = Boolean(step?.actors && step.actors.length > 0)
   const actors = resolveWorkflowStepActors(step)
   if (actors.length === 0) return { approved: 0, total: 0 }
@@ -542,8 +626,19 @@ export function workflowSignModeLabel(
   return labels?.signSequential || WORKFLOW_SIGN_MODE_LABELS.sequential
 }
 
+export const WORKFLOW_TIMELINE_ACTIONS: readonly WorkflowTimelineAction[] = [
+  'approve',
+  'reject',
+  'transfer',
+  'return',
+  'addsign',
+  'cancel',
+  'comment',
+  'request_changes'
+]
+
 export function workflowActionNeedsConfirm(action: WorkflowTimelineAction): boolean {
-  return action === 'approve' || action === 'reject' || action === 'cancel' || action === 'transfer'
+  return action !== 'comment'
 }
 
 export interface WorkflowActionConfirmCopy {
@@ -610,6 +705,32 @@ export function getWorkflowActionConfirmCopy(
       commentPlaceholder
     )
   }
+  if (action === 'addsign') {
+    return confirmCopy(
+      labels?.confirmAddsign || 'Add an approver?',
+      labels?.confirmAddsignDescription || 'The added person will approve on a temporary node.',
+      'primary',
+      commentPlaceholder
+    )
+  }
+  if (action === 'return') {
+    return confirmCopy(
+      labels?.confirmReturn || 'Return this request?',
+      labels?.confirmReturnDescription ||
+        'The instance stays open and restarts from the selected node.',
+      'danger',
+      commentPlaceholder
+    )
+  }
+  if (action === 'request_changes') {
+    return confirmCopy(
+      labels?.confirmRequestChanges || 'Request changes?',
+      labels?.confirmRequestChangesDescription ||
+        'The starter can edit and resubmit this instance.',
+      'danger',
+      commentPlaceholder
+    )
+  }
   return null
 }
 
@@ -617,13 +738,17 @@ const ACTION_BAR_SORT_ORDER: Record<WorkflowTimelineAction, number> = {
   approve: 0,
   reject: 1,
   transfer: 2,
-  cancel: 3,
-  comment: 4
+  return: 3,
+  addsign: 4,
+  cancel: 5,
+  comment: 6,
+  request_changes: 7
 }
 
 /**
- * Stable visual order: approve → reject → transfer → cancel → comment.
- * Unknown / extra actions keep their relative input order after those.
+ * Stable visual order: approve → reject → transfer → return → addsign →
+ * cancel → comment. Unknown / extra actions keep their relative input order
+ * after those.
  */
 export function sortWorkflowActionBarItems(
   items: readonly WorkflowActionBarItem[]
@@ -656,8 +781,8 @@ export function shouldConfirmWorkflowAction(
 
 /**
  * Comment field in the confirm dialog. Omitted `commentInput` shows it for
- * reject only; `true` opts in approve / transfer / cancel; `false` hides it.
- * `comment` never uses Popconfirm, so this is always false for that action.
+ * reject / return / request_changes; `true` opts in other confirming actions;
+ * `false` hides it. `comment` never uses Popconfirm.
  */
 export function shouldShowWorkflowActionCommentInput(
   action: WorkflowTimelineAction,
@@ -666,7 +791,7 @@ export function shouldShowWorkflowActionCommentInput(
   if (!workflowActionNeedsConfirm(action)) return false
   if (commentInput === false) return false
   if (commentInput === true) return true
-  return action === 'reject'
+  return action === 'reject' || action === 'return' || action === 'request_changes'
 }
 
 export const EMPTY_WORKFLOW_VIEWER_NODES: WorkflowViewerNode[] = []
