@@ -5,13 +5,25 @@
 
 import { classNames } from './class-names'
 import type { WorkflowDesignerPath, WorkflowDesignerStepPatch } from '../types/workflow-designer'
-import type { TigerLocaleWorkflowTimeline } from '../types/locale'
+import type { SchemaFormSchema } from '../types/schema-form'
+import type { TigerLocaleWorkflowDesigner, TigerLocaleWorkflowTimeline } from '../types/locale'
 import type {
+  ApproverSource,
+  FieldPermission,
+  WorkflowAutoDecide,
+  WorkflowButtonConfig,
+  WorkflowEmptyApprover,
+  WorkflowNodeAdvanced,
+  WorkflowNodeButtonPolicy,
   WorkflowSignMode,
   WorkflowStepKind,
+  WorkflowTimeoutAction,
+  WorkflowTimelineAction,
   WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '../types/workflow-timeline'
+import { flattenSchemaFormFields } from './schema-form-utils'
+import { createFullWorkflowButtonPolicy, listApproverSources } from './workflow-runtime'
 import {
   resolveWorkflowSignMode,
   resolveWorkflowStepActors,
@@ -42,7 +54,22 @@ export const workflowDesignerKindDotClasses = 'inline-block h-2 w-2 shrink-0 rou
 export const workflowDesignerToolbarClasses = 'mt-2 flex flex-wrap items-center gap-1'
 export const workflowDesignerInsertRowClasses = 'flex justify-start'
 export const workflowDesignerPanelClasses =
-  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-3 lg:w-80 lg:shrink-0'
+  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-3 lg:w-[24rem] lg:shrink-0'
+export const workflowDesignerPaletteClasses = 'flex flex-wrap items-center gap-1'
+export const workflowDesignerTabListClasses =
+  'mb-3 flex flex-wrap gap-1 border-b border-[var(--tiger-border,#d1d5db)] pb-2'
+export const workflowDesignerTabClasses =
+  'inline-flex items-center rounded-md px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
+export const workflowDesignerTabSelectedClasses =
+  'bg-[var(--tiger-primary-soft,#dbeafe)] text-[var(--tiger-primary,#2563eb)]'
+export const workflowDesignerIssueBannerClasses =
+  'rounded-md border border-[var(--tiger-error,#dc2626)] bg-[var(--tiger-error-soft,#fef2f2)] px-3 py-2 text-sm text-[var(--tiger-error,#dc2626)]'
+export const workflowDesignerIssueListClasses = 'm-0 list-disc space-y-1 ps-4'
+export const workflowDesignerTableClasses = 'w-full border-collapse text-sm'
+export const workflowDesignerTableHeadClasses =
+  'border-b border-[var(--tiger-border,#d1d5db)] py-1 text-start text-xs font-medium text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowDesignerTableCellClasses =
+  'border-b border-[var(--tiger-border,#e5e7eb)] py-1 align-middle'
 export const workflowDesignerFieldsClasses = 'flex flex-col gap-2'
 export const workflowDesignerFieldClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerLabelClasses =
@@ -61,7 +88,64 @@ export const WORKFLOW_DESIGNER_KIND_COLORS: Record<WorkflowStepKind, string> = {
   start: 'var(--tiger-primary,#2563eb)',
   approve: 'var(--tiger-success,#16a34a)',
   cc: 'var(--tiger-text-muted,#6b7280)',
-  condition: 'var(--tiger-warning,#d97706)'
+  condition: 'var(--tiger-warning,#d97706)',
+  end: 'var(--tiger-text,#111827)'
+}
+
+export const WORKFLOW_DESIGNER_PALETTE_KINDS: readonly WorkflowStepKind[] = WORKFLOW_STEP_KINDS
+
+export const WORKFLOW_DESIGNER_INSPECTOR_TABS = [
+  'approvers',
+  'buttons',
+  'fieldPermissions',
+  'advanced'
+] as const
+
+export type WorkflowDesignerInspectorTab = (typeof WORKFLOW_DESIGNER_INSPECTOR_TABS)[number]
+
+export const WORKFLOW_APPROVER_SOURCE_TYPES: readonly ApproverSource['type'][] = [
+  'fixed',
+  'self',
+  'starter_pick',
+  'role',
+  'group',
+  'dept_leader',
+  'manager_chain'
+]
+
+export const WORKFLOW_AUTO_DECIDES: readonly WorkflowAutoDecide[] = [
+  'manual',
+  'auto_pass',
+  'auto_reject'
+]
+
+export const WORKFLOW_EMPTY_APPROVERS: readonly WorkflowEmptyApprover[] = [
+  'skip_pass',
+  'pause',
+  'transfer_admin',
+  'transfer_user'
+]
+
+export const WORKFLOW_TIMEOUT_ACTIONS: readonly WorkflowTimeoutAction[] = [
+  'remind',
+  'auto_pass',
+  'auto_reject',
+  'transfer'
+]
+
+export type WorkflowDesignerIssueCode =
+  'missing_start' | 'missing_end' | 'empty_approvers' | 'missing_branches' | 'buttons_all_disabled'
+
+export interface WorkflowDesignerIssue {
+  code: WorkflowDesignerIssueCode
+  path: string[]
+  blocking: boolean
+}
+
+export interface WorkflowDesignerFieldPermissionRow {
+  name: string
+  label: string
+  permission: FieldPermission
 }
 
 export function workflowDesignerKindColor(kind: WorkflowStepKind): string {
@@ -437,12 +521,465 @@ export function workflowDesignerKindOptions(
     kindApprove?: string
     kindCc?: string
     kindCondition?: string
+    kindEnd?: string
   }>
 ): Array<{ value: WorkflowStepKind; label: string }> {
   return WORKFLOW_STEP_KINDS.map((kind) => ({
     value: kind,
     label: workflowStepKindLabel(kind, labels)
   }))
+}
+
+export function workflowDesignerTabClassName(selected: boolean): string {
+  return classNames(
+    workflowDesignerTabClasses,
+    selected ? workflowDesignerTabSelectedClasses : null
+  )
+}
+
+export function workflowDesignerInspectorTabLabel(
+  tab: WorkflowDesignerInspectorTab,
+  labels: Pick<
+    TigerLocaleWorkflowDesigner,
+    'tabApprovers' | 'tabButtons' | 'tabFieldPermissions' | 'tabAdvanced'
+  >
+): string {
+  if (tab === 'approvers') return labels.tabApprovers ?? 'Approvers'
+  if (tab === 'buttons') return labels.tabButtons ?? 'Actions'
+  if (tab === 'fieldPermissions') return labels.tabFieldPermissions ?? 'Form permissions'
+  return labels.tabAdvanced ?? 'Advanced'
+}
+
+export function workflowDesignerInspectorTabEnabled(
+  tab: WorkflowDesignerInspectorTab,
+  kind: WorkflowStepKind
+): boolean {
+  if (kind === 'condition' || kind === 'end') return tab === 'advanced'
+  if (kind === 'cc') return tab !== 'buttons'
+  return true
+}
+
+export function workflowDesignerDefaultInspectorTab(
+  kind: WorkflowStepKind
+): WorkflowDesignerInspectorTab {
+  return workflowDesignerInspectorTabEnabled('approvers', kind) ? 'approvers' : 'advanced'
+}
+
+function uniqueDesignerKey(used: Set<string>, seed?: string): string {
+  const base = seed && seed.trim() !== '' ? `${seed}-copy` : 'step'
+  if (!used.has(base)) return base
+  let next = 1
+  while (used.has(`${base}-${next}`)) next += 1
+  return `${base}-${next}`
+}
+
+function remapWorkflowStepKeys(
+  step: WorkflowTimelineStep,
+  used: Set<string>
+): WorkflowTimelineStep {
+  const key = uniqueDesignerKey(used, step.key)
+  used.add(key)
+  const next = cloneStep(step)
+  next.key = key
+  if (step.children && step.children.length > 0) {
+    next.children = step.children.map((child) => remapWorkflowStepKeys(child, used))
+  }
+  return next
+}
+
+export function cloneWorkflowDesignerStepWithNewKeys(
+  step: WorkflowTimelineStep,
+  existing: readonly WorkflowTimelineStep[] | undefined = EMPTY_WORKFLOW_DESIGNER_STEPS
+): WorkflowTimelineStep {
+  return remapWorkflowStepKeys(step, collectWorkflowStepKeys(existing))
+}
+
+export function duplicateWorkflowStepAfterPath(
+  steps: readonly WorkflowTimelineStep[],
+  path: WorkflowDesignerPath
+): WorkflowTimelineStep[] {
+  const source = getWorkflowStepAtPath(steps, path)
+  if (!source || path.length === 0) return cloneWorkflowSteps(steps)
+  const copy = cloneWorkflowDesignerStepWithNewKeys(source, steps)
+  return insertWorkflowStepAfterPath(steps, path, copy)
+}
+
+export function createWorkflowDesignerPaletteStep(
+  existing: readonly WorkflowTimelineStep[] | undefined,
+  kind: WorkflowStepKind,
+  labels?: Partial<TigerLocaleWorkflowTimeline & TigerLocaleWorkflowDesigner>
+): WorkflowTimelineStep {
+  const title = workflowStepKindLabel(kind, labels)
+  if (kind !== 'condition') {
+    return createWorkflowDesignerStep(existing, { kind, title })
+  }
+  const branchTitle = labels?.branchLabel || 'Branch'
+  const first = createWorkflowDesignerStep(existing, {
+    kind: 'approve',
+    title: `${branchTitle} 1`,
+    expression: ''
+  })
+  const second = createWorkflowDesignerStep([...(existing ?? []), first], {
+    kind: 'approve',
+    title: `${branchTitle} 2`,
+    expression: ''
+  })
+  return createWorkflowDesignerStep([...(existing ?? []), first, second], {
+    kind,
+    title,
+    children: [first, second]
+  })
+}
+
+export function insertWorkflowDesignerPaletteStep(
+  steps: readonly WorkflowTimelineStep[],
+  path: WorkflowDesignerPath,
+  kind: WorkflowStepKind,
+  labels?: Partial<TigerLocaleWorkflowTimeline & TigerLocaleWorkflowDesigner>
+): { steps: WorkflowTimelineStep[]; path: string[] } {
+  const created = createWorkflowDesignerPaletteStep(steps, kind, labels)
+  if (path.length === 0) {
+    const next = insertWorkflowStepAtPath(steps, [], created)
+    return { steps: next, path: [created.key] }
+  }
+  const next = insertWorkflowStepAfterPath(steps, path, created)
+  return { steps: next, path: [...path.slice(0, -1), created.key] }
+}
+
+function approverSourceIsResolvable(source: ApproverSource): boolean {
+  if (source.type === 'fixed') {
+    return source.actors.some((actor) => Boolean(actor.id || actor.name))
+  }
+  if (source.type === 'role' || source.type === 'group') return Boolean(source.key)
+  return true
+}
+
+function workflowDesignerHasApprovers(step: WorkflowTimelineStep): boolean {
+  const sources = listApproverSources(step.approverPolicy)
+  if (sources.some(approverSourceIsResolvable)) return true
+  return resolveWorkflowStepActors(step).some((actor) => Boolean(actor.id || actor.name))
+}
+
+function workflowDesignerEmptyApproverBlocks(step: WorkflowTimelineStep): boolean {
+  const policy = step.advanced?.emptyApprover ?? 'pause'
+  return policy === 'pause'
+}
+
+export function validateWorkflowDesigner(
+  steps: readonly WorkflowTimelineStep[] | undefined
+): WorkflowDesignerIssue[] {
+  const issues: WorkflowDesignerIssue[] = []
+  let hasStart = false
+  let hasEnd = false
+
+  const visit = (
+    list: readonly WorkflowTimelineStep[],
+    parentPath: string[],
+    parentKind?: WorkflowStepKind
+  ): void => {
+    for (const step of list) {
+      const path = [...parentPath, step.key]
+      const kind = resolveWorkflowStepKind(step)
+      if (kind === 'start') hasStart = true
+      if (kind === 'end') hasEnd = true
+      if (kind === 'approve' && parentKind !== 'condition') {
+        if (!workflowDesignerHasApprovers(step) && workflowDesignerEmptyApproverBlocks(step)) {
+          issues.push({ code: 'empty_approvers', path, blocking: true })
+        }
+        const buttons = step.buttonPolicy?.buttons
+        if (buttons && buttons.length > 0 && buttons.every((button) => !button.enabled)) {
+          issues.push({ code: 'buttons_all_disabled', path, blocking: true })
+        }
+      }
+      if (kind === 'condition' && (!step.children || step.children.length === 0)) {
+        issues.push({ code: 'missing_branches', path, blocking: true })
+      }
+      if (step.children && step.children.length > 0) visit(step.children, path, kind)
+    }
+  }
+
+  visit(steps ?? [], [])
+  if (!hasEnd) issues.unshift({ code: 'missing_end', path: [], blocking: true })
+  if (!hasStart) issues.unshift({ code: 'missing_start', path: [], blocking: true })
+  return issues
+}
+
+export function workflowDesignerBlockingIssues(
+  issues: readonly WorkflowDesignerIssue[]
+): WorkflowDesignerIssue[] {
+  return issues.filter((issue) => issue.blocking)
+}
+
+export function workflowDesignerIssueMessage(
+  issue: WorkflowDesignerIssue,
+  labels: Pick<
+    TigerLocaleWorkflowDesigner,
+    | 'validationMissingStart'
+    | 'validationMissingEnd'
+    | 'validationEmptyApprovers'
+    | 'validationMissingBranches'
+    | 'validationButtonsAllDisabled'
+  >
+): string {
+  if (issue.code === 'missing_start') return labels.validationMissingStart ?? 'Add a start node'
+  if (issue.code === 'missing_end') return labels.validationMissingEnd ?? 'Add an end node'
+  if (issue.code === 'empty_approvers') {
+    return labels.validationEmptyApprovers ?? 'This approval node has no approvers'
+  }
+  if (issue.code === 'missing_branches') {
+    return labels.validationMissingBranches ?? 'This condition node has no branches'
+  }
+  return labels.validationButtonsAllDisabled ?? 'All action buttons are disabled'
+}
+
+export function workflowDesignerApproverSourceFromStep(step: WorkflowTimelineStep): ApproverSource {
+  const existing = listApproverSources(step.approverPolicy)[0]
+  if (existing) return existing
+  const actors = resolveWorkflowStepActors(step)
+    .filter((actor) => actor.id != null || (typeof actor.name === 'string' && actor.name !== ''))
+    .map((actor) => ({
+      id: String(actor.id ?? actor.name ?? ''),
+      name: actor.name
+    }))
+  return { type: 'fixed', actors }
+}
+
+export function workflowDesignerApproverSourceOfType(
+  type: ApproverSource['type'],
+  previous?: ApproverSource
+): ApproverSource {
+  if (type === 'fixed') {
+    return {
+      type: 'fixed',
+      actors: previous?.type === 'fixed' ? previous.actors.map((actor) => ({ ...actor })) : []
+    }
+  }
+  if (type === 'self') return { type: 'self' }
+  if (type === 'starter_pick') {
+    return previous?.type === 'starter_pick' ? { ...previous } : { type: 'starter_pick' }
+  }
+  if (type === 'role') {
+    return {
+      type: 'role',
+      key: previous && 'key' in previous ? String(previous.key ?? '') : ''
+    }
+  }
+  if (type === 'group') {
+    return {
+      type: 'group',
+      key: previous && 'key' in previous ? String(previous.key ?? '') : ''
+    }
+  }
+  if (type === 'dept_leader') {
+    return {
+      type: 'dept_leader',
+      level: previous?.type === 'dept_leader' ? previous.level : 1
+    }
+  }
+  return {
+    type: 'manager_chain',
+    upTo: previous?.type === 'manager_chain' ? previous.upTo : 1
+  }
+}
+
+export function workflowDesignerApproverSummary(
+  step: WorkflowTimelineStep,
+  labels?: Partial<TigerLocaleWorkflowDesigner>
+): string {
+  const source = listApproverSources(step.approverPolicy)[0]
+  if (source) {
+    if (source.type === 'fixed') {
+      return source.actors
+        .map((actor) => actor.name || actor.id)
+        .filter((name) => name != null && String(name).trim() !== '')
+        .join(', ')
+    }
+    if (source.type === 'self') return labels?.sourceSelf ?? 'Submitter'
+    if (source.type === 'starter_pick') return labels?.sourceStarterPick ?? 'Submitter picks'
+    if (source.type === 'role') {
+      const prefix = labels?.sourceRole ?? 'Role'
+      return source.key ? `${prefix}: ${source.key}` : prefix
+    }
+    if (source.type === 'group') {
+      const prefix = labels?.sourceGroup ?? 'Group'
+      return source.key ? `${prefix}: ${source.key}` : prefix
+    }
+    if (source.type === 'dept_leader') return labels?.sourceDeptLeader ?? 'Department leader'
+    return labels?.sourceManagerChain ?? 'Manager chain'
+  }
+  return workflowDesignerActorNames(step).join(', ')
+}
+
+export function workflowDesignerEditableButtonPolicy(
+  step: WorkflowTimelineStep
+): WorkflowNodeButtonPolicy {
+  if (step.buttonPolicy?.buttons && step.buttonPolicy.buttons.length > 0) {
+    return {
+      ...step.buttonPolicy,
+      buttons: step.buttonPolicy.buttons.map((button) => ({ ...button })),
+      addsign: step.buttonPolicy.addsign
+        ? { positions: [...step.buttonPolicy.addsign.positions] }
+        : step.buttonPolicy.addsign
+    }
+  }
+  if (resolveWorkflowStepKind(step) === 'start') {
+    return {
+      buttons: [
+        { action: 'cancel', enabled: true, placement: 'bar' },
+        { action: 'comment', enabled: true, placement: 'bar' }
+      ]
+    }
+  }
+  return createFullWorkflowButtonPolicy()
+}
+
+export function patchWorkflowDesignerButton(
+  policy: WorkflowNodeButtonPolicy,
+  action: WorkflowTimelineAction,
+  patch: Partial<WorkflowButtonConfig>
+): WorkflowNodeButtonPolicy {
+  const buttons = policy.buttons.map((button) =>
+    button.action === action ? { ...button, ...patch, action } : { ...button }
+  )
+  const has = buttons.some((button) => button.action === action)
+  return {
+    ...policy,
+    buttons: has ? buttons : [...buttons, { action, enabled: true, ...patch }]
+  }
+}
+
+export function resolveWorkflowDesignerFieldPermission(
+  kind: WorkflowStepKind,
+  permissions: Record<string, FieldPermission> | undefined,
+  fieldPath: string
+): FieldPermission {
+  const current = permissions?.[fieldPath]
+  if (current === 'editable' || current === 'readonly' || current === 'hidden') return current
+  return kind === 'start' ? 'editable' : 'readonly'
+}
+
+export function workflowDesignerFieldPermissionRows(
+  schema: SchemaFormSchema | undefined,
+  step: WorkflowTimelineStep
+): WorkflowDesignerFieldPermissionRow[] {
+  const kind = resolveWorkflowStepKind(step)
+  return flattenSchemaFormFields(schema).map((field) => ({
+    name: field.name,
+    label: field.label || field.name,
+    permission: resolveWorkflowDesignerFieldPermission(kind, step.fieldPermissions, field.name)
+  }))
+}
+
+export function applyWorkflowDesignerFieldPermissionColumn(
+  schema: SchemaFormSchema | undefined,
+  permissions: Record<string, FieldPermission> | undefined,
+  permission: FieldPermission
+): Record<string, FieldPermission> {
+  const next: Record<string, FieldPermission> = { ...permissions }
+  for (const field of flattenSchemaFormFields(schema)) {
+    next[field.name] = permission
+  }
+  return next
+}
+
+export function workflowDesignerAdvancedFromStep(step: WorkflowTimelineStep): WorkflowNodeAdvanced {
+  return {
+    emptyApprover: step.advanced?.emptyApprover,
+    autoDecide: step.advanced?.autoDecide ?? 'manual',
+    timeout: step.advanced?.timeout
+      ? { ...step.advanced.timeout }
+      : { action: 'remind', durationLabel: '' },
+    returnResume: step.advanced?.returnResume
+  }
+}
+
+export function workflowDesignerApproverSourceOptions(
+  labels?: Partial<TigerLocaleWorkflowDesigner>
+): Array<{ value: ApproverSource['type']; label: string }> {
+  return WORKFLOW_APPROVER_SOURCE_TYPES.map((type) => {
+    if (type === 'fixed') return { value: type, label: labels?.sourceFixed ?? 'Specified members' }
+    if (type === 'self') return { value: type, label: labels?.sourceSelf ?? 'Submitter' }
+    if (type === 'starter_pick') {
+      return { value: type, label: labels?.sourceStarterPick ?? 'Submitter picks' }
+    }
+    if (type === 'role') return { value: type, label: labels?.sourceRole ?? 'Role' }
+    if (type === 'group') return { value: type, label: labels?.sourceGroup ?? 'Group' }
+    if (type === 'dept_leader') {
+      return { value: type, label: labels?.sourceDeptLeader ?? 'Department leader' }
+    }
+    return { value: type, label: labels?.sourceManagerChain ?? 'Manager chain' }
+  })
+}
+
+export function workflowDesignerEmptyApproverOptions(
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): Array<{ value: WorkflowEmptyApprover; label: string }> {
+  return WORKFLOW_EMPTY_APPROVERS.map((value) => {
+    if (value === 'skip_pass') {
+      return { value, label: labels?.emptyApproverSkipPass ?? 'Skip and pass' }
+    }
+    if (value === 'pause') return { value, label: labels?.emptyApproverPause ?? 'Pause' }
+    if (value === 'transfer_admin') {
+      return { value, label: labels?.emptyApproverTransferAdmin ?? 'Transfer to admin' }
+    }
+    return { value, label: labels?.emptyApproverTransferUser ?? 'Transfer to user' }
+  })
+}
+
+export function workflowDesignerAutoDecideOptions(
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): Array<{ value: WorkflowAutoDecide; label: string }> {
+  return WORKFLOW_AUTO_DECIDES.map((value) => {
+    if (value === 'auto_pass') return { value, label: labels?.autoDecideAutoPass ?? 'Auto-approve' }
+    if (value === 'auto_reject') {
+      return { value, label: labels?.autoDecideAutoReject ?? 'Auto-reject' }
+    }
+    return { value, label: labels?.autoDecideManual ?? 'Manual' }
+  })
+}
+
+export function workflowDesignerTimeoutActionOptions(
+  labels?: Partial<TigerLocaleWorkflowDesigner & TigerLocaleWorkflowTimeline>
+): Array<{ value: WorkflowTimeoutAction; label: string }> {
+  return WORKFLOW_TIMEOUT_ACTIONS.map((value) => {
+    if (value === 'auto_pass') return { value, label: labels?.autoDecideAutoPass ?? 'Auto-approve' }
+    if (value === 'auto_reject') {
+      return { value, label: labels?.autoDecideAutoReject ?? 'Auto-reject' }
+    }
+    if (value === 'transfer') return { value, label: labels?.actionTransfer ?? 'Transfer' }
+    return { value, label: labels?.timeoutRemind ?? 'Remind' }
+  })
+}
+
+export function workflowDesignerActionLabel(
+  action: WorkflowTimelineAction,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): string {
+  if (action === 'reject') return labels?.actionReject ?? 'Reject'
+  if (action === 'transfer') return labels?.actionTransfer ?? 'Transfer'
+  if (action === 'cancel') return labels?.actionCancel ?? 'Withdraw'
+  if (action === 'comment') return labels?.actionComment ?? 'Comment'
+  if (action === 'addsign') return labels?.actionAddsign ?? 'Add approver'
+  if (action === 'return') return labels?.actionReturn ?? 'Return'
+  if (action === 'request_changes') return labels?.actionRequestChanges ?? 'Request changes'
+  return labels?.actionApprove ?? 'Approve'
+}
+
+export function workflowDesignerFieldPermissionLabel(
+  permission: FieldPermission,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): string {
+  if (permission === 'readonly') return labels?.fieldReadonly ?? 'Read-only'
+  if (permission === 'hidden') return labels?.fieldHidden ?? 'Hidden'
+  return labels?.fieldEditable ?? 'Editable'
+}
+
+export function actorsFromApproverSource(
+  source: ApproverSource
+): WorkflowTimelineActor[] | undefined {
+  if (source.type !== 'fixed') return undefined
+  if (source.actors.length === 0) return undefined
+  return source.actors.map((actor) => ({ id: actor.id, name: actor.name }))
 }
 
 export function workflowDesignerSignModeOptions(

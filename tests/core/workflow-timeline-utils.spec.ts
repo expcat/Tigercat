@@ -750,7 +750,9 @@ describe('workflow step kind and sign mode', () => {
 
   it('reads kind and sign-mode labels from overlay', () => {
     expect(workflowStepKindLabel('cc')).toBe('CC')
+    expect(workflowStepKindLabel('end')).toBe('End')
     expect(workflowStepKindLabel('start', { kindStart: '发起' })).toBe('发起')
+    expect(workflowStepKindLabel('end', { kindEnd: '结束' })).toBe('结束')
     expect(workflowSignModeLabel('countersign')).toBe('Countersign')
     expect(workflowSignModeLabel('orsign', { signOrsign: '或签' })).toBe('或签')
   })

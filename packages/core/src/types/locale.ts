@@ -128,6 +128,8 @@ export interface TigerLocaleWorkflowTimeline {
   kindCc?: string
   /** Node kind: condition branch stub */
   kindCondition?: string
+  /** Node kind: end / terminator */
+  kindEnd?: string
   /** Sign mode: sequential approval */
   signSequential?: string
   /** Sign mode: all must approve (countersign) */
@@ -297,6 +299,94 @@ export interface TigerLocaleWorkflowDesigner {
   tabFieldPermissions?: string
   /** Inspector tab: advanced */
   tabAdvanced?: string
+  /** Duplicate this node as a sibling */
+  copyStep?: string
+  /** Accessible name for the insert palette */
+  paletteAriaLabel?: string
+  /** Inspector empty state when no node is selected */
+  inspectorEmpty?: string
+  /** Accessible name for the publish-validation list */
+  validationAriaLabel?: string
+  /** Missing start node */
+  validationMissingStart?: string
+  /** Missing end node */
+  validationMissingEnd?: string
+  /** Approve node has no resolvable approvers */
+  validationEmptyApprovers?: string
+  /** Condition node has no branches */
+  validationMissingBranches?: string
+  /** Every buttonPolicy row is disabled */
+  validationButtonsAllDisabled?: string
+  /** Approver source strategy */
+  sourceLabel?: string
+  /** Specified members */
+  sourceFixed?: string
+  /** Submitter themself */
+  sourceSelf?: string
+  /** Submitter picks at start */
+  sourceStarterPick?: string
+  /** Role key */
+  sourceRole?: string
+  /** Group key */
+  sourceGroup?: string
+  /** Department leader */
+  sourceDeptLeader?: string
+  /** Manager chain */
+  sourceManagerChain?: string
+  /** Reference key for role / group */
+  sourceKeyLabel?: string
+  /** Placeholder for a reference key */
+  sourceKeyPlaceholder?: string
+  /** Department-leader level */
+  sourceLevelLabel?: string
+  /** Manager-chain depth */
+  sourceUpToLabel?: string
+  /** Starter-pick allows multiple people */
+  sourceMultiple?: string
+  /** Empty-approver policy */
+  emptyApproverLabel?: string
+  /** Placeholder for a member id */
+  actorIdPlaceholder?: string
+  /** Button row: enabled */
+  buttonEnabled?: string
+  /** Button row: display name */
+  buttonDisplayName?: string
+  /** Button row: comment required */
+  buttonCommentRequired?: string
+  /** Button row: bar vs more */
+  buttonPlacement?: string
+  /** Placement: action bar */
+  buttonPlacementBar?: string
+  /** Placement: overflow menu */
+  buttonPlacementMore?: string
+  /** Add-sign before / after */
+  addsignPositions?: string
+  /** Field-permissions empty copy */
+  fieldPermissionsEmpty?: string
+  /** Select-all column header */
+  fieldPermissionAll?: string
+  /** Timeout action */
+  timeoutActionLabel?: string
+  /** Timeout duration display string */
+  timeoutDurationLabel?: string
+  /** Timeout action: remind */
+  timeoutRemind?: string
+  /** Auto-approve / auto-reject */
+  autoDecideLabel?: string
+  /** Add a condition branch */
+  addBranch?: string
+  /** Remove a condition branch */
+  removeBranch?: string
+  /** Branch display name */
+  branchLabel?: string
+  /** Branch expression stub */
+  branchExpression?: string
+  /** Expression placeholder */
+  branchExpressionPlaceholder?: string
+  /** Tab disabled for this kind */
+  tabNotApplicable?: string
+  /** Publish blocked summary */
+  publishBlocked?: string
 }
 
 export interface TigerLocaleProgress {

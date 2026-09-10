@@ -4,6 +4,7 @@
  */
 
 import type { TigerLocale, TigerLocaleWorkflowDesigner } from './locale'
+import type { SchemaFormSchema } from './schema-form'
 import type { WorkflowTimelineStep } from './workflow-timeline'
 
 /**
@@ -21,10 +22,11 @@ export type WorkflowDesignerStepPatch = Omit<Partial<WorkflowTimelineStep>, 'chi
 /**
  * Shared WorkflowDesigner props. Vue binds `modelValue` / `update:modelValue`.
  *
- * Unselected nodes are summary cards; select one to edit title / kind /
- * signMode / actors. Sibling insert is still a JSON tree, not BPMN.
- * Optional `path` scopes editing to that node's children; `onChange` still
- * emits the full tree so the parent can tree-shake this editor via subpath.
+ * Canvas is summary cards (kind color, title, approver summary, signMode).
+ * Selecting a node opens the right Inspector (approvers / buttons / field
+ * permissions / advanced). Sibling `+` opens a kind palette. Still a JSON
+ * tree, not BPMN. Optional `path` scopes editing to that node's children;
+ * `onChange` still emits the full tree.
  */
 export interface WorkflowDesignerProps {
   /**
@@ -57,6 +59,11 @@ export interface WorkflowDesignerProps {
    * Designer chrome overlay. Wins over `locale.workflowDesigner`.
    */
   labels?: Partial<TigerLocaleWorkflowDesigner>
+  /**
+   * Starter SchemaForm schema used by the field-permissions matrix.
+   * Omitted: the permissions tab shows an empty hint.
+   */
+  schema?: SchemaFormSchema
   /**
    * Accessible name for the designer region.
    */

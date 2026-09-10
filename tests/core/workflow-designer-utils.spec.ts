@@ -7,17 +7,27 @@ import {
   applyWorkflowDesignerView,
   buildWorkflowDesignerNodes,
   cloneWorkflowDesignerActors,
+  cloneWorkflowDesignerStepWithNewKeys,
   cloneWorkflowSteps,
   collectWorkflowStepKeys,
+  createWorkflowDesignerPaletteStep,
   createWorkflowDesignerStep,
+  duplicateWorkflowStepAfterPath,
   findWorkflowDesignerNode,
   getWorkflowStepAtPath,
+  insertWorkflowDesignerPaletteStep,
   insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
   moveWorkflowStepAtPath,
+  patchWorkflowDesignerButton,
   patchWorkflowStepAtPath,
   removeWorkflowStepAtPath,
   resolveWorkflowDesignerView,
+  validateWorkflowDesigner,
+  workflowDesignerApproverSourceFromStep,
+  workflowDesignerApproverSummary,
+  workflowDesignerEditableButtonPolicy,
+  workflowDesignerFieldPermissionRows,
   workflowDesignerKindColor,
   workflowDesignerSignModeHint
 } from '@expcat/tigercat-core'
@@ -170,6 +180,7 @@ describe('workflow-designer helpers', () => {
 
   it('maps kind colors and sign-mode hints', () => {
     expect(workflowDesignerKindColor('start')).not.toBe(workflowDesignerKindColor('condition'))
+    expect(workflowDesignerKindColor('end')).not.toBe(workflowDesignerKindColor('cc'))
     expect(
       workflowDesignerSignModeHint('countersign', {
         signCountersignHint: 'all must approve',
@@ -178,5 +189,136 @@ describe('workflow-designer helpers', () => {
       })
     ).toBe('all must approve')
     expect(cloneWorkflowDesignerActors({ actor: { name: 'Ada' } })).toEqual([{ name: 'Ada' }])
+  })
+
+  it('inserts palette kinds as siblings after the path', () => {
+    const result = insertWorkflowDesignerPaletteStep(tree, ['manager'], 'cc')
+    expect(result.steps.map((item) => item.key)).toEqual([
+      'start',
+      'manager',
+      result.path[0],
+      'finance'
+    ])
+    expect(getWorkflowStepAtPath(result.steps, result.path)?.kind).toBe('cc')
+    expect(result.steps[1]?.children?.map((item) => item.key)).toEqual(['a', 'b'])
+  })
+
+  it('creates a condition node with two branch stubs', () => {
+    const created = createWorkflowDesignerPaletteStep(tree, 'condition')
+    expect(created.kind).toBe('condition')
+    expect(created.children).toHaveLength(2)
+    expect(created.children?.every((child) => child.expression === '')).toBe(true)
+  })
+
+  it('copies a node after the path with new keys', () => {
+    const next = duplicateWorkflowStepAfterPath(tree, ['manager'])
+    expect(next.map((item) => item.key)).toEqual(['start', 'manager', 'manager-copy', 'finance'])
+    expect(next[2]?.children?.map((item) => item.key)).toEqual(['a-copy', 'b-copy'])
+    expect(tree.map((item) => item.key)).toEqual(['start', 'manager', 'finance'])
+    const remapped = cloneWorkflowDesignerStepWithNewKeys(tree[1]!, next)
+    expect(remapped.key).toBe('manager-copy-1')
+  })
+
+  it('blocks publish when start, end, approvers, or branches are missing', () => {
+    const issues = validateWorkflowDesigner(tree)
+    expect(issues.map((issue) => issue.code)).toEqual(
+      expect.arrayContaining(['missing_end', 'empty_approvers'])
+    )
+    expect(issues.every((issue) => issue.blocking)).toBe(true)
+
+    const empty = validateWorkflowDesigner([])
+    expect(empty.map((issue) => issue.code)).toEqual(['missing_start', 'missing_end'])
+
+    const complete: WorkflowTimelineStep[] = [
+      { key: 'start', kind: 'start', title: 'Start' },
+      {
+        key: 'manager',
+        kind: 'approve',
+        title: 'Manager',
+        approverPolicy: { type: 'fixed', actors: [{ id: 'lin', name: 'Lin' }] }
+      },
+      {
+        key: 'split',
+        kind: 'condition',
+        title: 'Amount',
+        children: [
+          { key: 'high', title: 'High', expression: 'amount > 1000' },
+          { key: 'low', title: 'Low', expression: '' }
+        ]
+      },
+      { key: 'end', kind: 'end', title: 'End' }
+    ]
+    expect(validateWorkflowDesigner(complete)).toEqual([])
+
+    const noBranches = validateWorkflowDesigner([
+      { key: 'start', kind: 'start' },
+      { key: 'split', kind: 'condition', title: 'Split' },
+      { key: 'end', kind: 'end' }
+    ])
+    expect(noBranches.some((issue) => issue.code === 'missing_branches')).toBe(true)
+  })
+
+  it('does not block empty approvers when empty policy skips', () => {
+    const issues = validateWorkflowDesigner([
+      { key: 'start', kind: 'start' },
+      { key: 'manager', kind: 'approve', advanced: { emptyApprover: 'skip_pass' } },
+      { key: 'end', kind: 'end' }
+    ])
+    expect(issues.some((issue) => issue.code === 'empty_approvers')).toBe(false)
+  })
+
+  it('blocks when every button is disabled', () => {
+    const issues = validateWorkflowDesigner([
+      { key: 'start', kind: 'start' },
+      {
+        key: 'manager',
+        kind: 'approve',
+        approverPolicy: { type: 'self' },
+        buttonPolicy: {
+          buttons: [
+            { action: 'approve', enabled: false },
+            { action: 'reject', enabled: false }
+          ]
+        }
+      },
+      { key: 'end', kind: 'end' }
+    ])
+    expect(issues.some((issue) => issue.code === 'buttons_all_disabled')).toBe(true)
+  })
+
+  it('summarizes approverPolicy and edits button / field matrices', () => {
+    const step: WorkflowTimelineStep = {
+      key: 'finance',
+      kind: 'approve',
+      approverPolicy: { type: 'role', key: 'finance' },
+      buttonPolicy: {
+        buttons: [{ action: 'approve', enabled: true, label: 'OK' }]
+      },
+      fieldPermissions: { amount: 'hidden' }
+    }
+    expect(workflowDesignerApproverSummary(step, { sourceRole: 'Role' })).toBe('Role: finance')
+    expect(workflowDesignerApproverSourceFromStep(step).type).toBe('role')
+    const buttons = patchWorkflowDesignerButton(
+      workflowDesignerEditableButtonPolicy(step),
+      'reject',
+      {
+        enabled: true,
+        commentRequired: true
+      }
+    )
+    expect(buttons.buttons.find((button) => button.action === 'reject')?.commentRequired).toBe(true)
+    const rows = workflowDesignerFieldPermissionRows(
+      {
+        fields: [
+          { name: 'amount', label: 'Amount' },
+          { name: 'reason', label: 'Reason' }
+        ]
+      },
+      step
+    )
+    expect(rows).toEqual([
+      { name: 'amount', label: 'Amount', permission: 'hidden' },
+      { name: 'reason', label: 'Reason', permission: 'readonly' }
+    ])
   })
 })

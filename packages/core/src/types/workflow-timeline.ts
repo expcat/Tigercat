@@ -30,9 +30,9 @@ export type WorkflowTimelineAction =
 
 /**
  * Display kind for a workflow tree node. Omitted values normalize to `approve`.
- * Condition is a branch stub, not a BPMN gateway.
+ * Condition is a branch stub, not a BPMN gateway. `end` is a terminator card.
  */
-export type WorkflowStepKind = 'start' | 'approve' | 'cc' | 'condition'
+export type WorkflowStepKind = 'start' | 'approve' | 'cc' | 'condition' | 'end'
 
 /**
  * How an approval node collects signatures. Display-only.
@@ -318,6 +318,10 @@ export interface WorkflowTimelineStep {
    * Tree-node kind. Omitted / unknown values normalize to `approve`.
    */
   kind?: WorkflowStepKind
+  /**
+   * Condition-branch expression stub. Document convention only — not an engine.
+   */
+  expression?: string
   /**
    * Countersign / or-sign / sequential. Display-only; omitted means sequential.
    */

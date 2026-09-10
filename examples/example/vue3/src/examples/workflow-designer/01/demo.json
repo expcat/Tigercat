@@ -1,7 +1,7 @@
 {
   "id": "workflow-designer-01",
-  "title": "编辑审批树",
-  "description": "摘要卡扫读，点选后编辑节点与审批人；兄弟插入仍是 JSON 树。不是 BPMN。",
+  "title": "Inspector 设计审批树",
+  "description": "摘要卡 + 右侧四 Tab 编辑审批人来源、按钮、表单权限与高级策略；调色板插入。不是 BPMN。",
   "entry": "App.vue",
   "order": 1
 }

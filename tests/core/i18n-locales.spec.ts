@@ -80,7 +80,8 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
     `${locale}:colorPicker.formatRgb`,
     `${locale}:colorPicker.formatHsl`,
     `${locale}:table.groupHeaderText`,
-    `${locale}:workflowTimeline.confirmApproveDescription`
+    `${locale}:workflowTimeline.confirmApproveDescription`,
+    `${locale}:workflowDesigner.branchExpressionPlaceholder`
   ])
 ])
 

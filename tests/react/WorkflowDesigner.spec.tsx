@@ -65,11 +65,64 @@ describe('WorkflowDesigner (React)', () => {
     render(<WorkflowDesigner value={treeSteps} onChange={onChange} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Insert after (Manager)' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Approval' }))
 
     const next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
     expect(next.map((step) => step.key)).toEqual(['start', 'manager', 'step-1', 'finance'])
     expect(next[1]?.children?.map((step) => step.key)).toEqual(['a', 'b'])
     expect(next[2]?.kind).toBe('approve')
+  })
+
+  it('exposes inspector tabs and writes approverPolicy, buttonPolicy, and fieldPermissions', () => {
+    const onChange = vi.fn()
+    render(
+      <WorkflowDesigner
+        defaultValue={treeSteps}
+        schema={{ fields: [{ name: 'amount', label: 'Amount' }] }}
+        onChange={onChange}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('group', { name: 'Manager' }))
+    const panel = screen.getByRole('region', { name: 'Node settings' })
+    expect(within(panel).getByRole('tab', { name: 'Approvers' })).toBeInTheDocument()
+    expect(within(panel).getByRole('tab', { name: 'Actions' })).toBeInTheDocument()
+    expect(within(panel).getByRole('tab', { name: 'Form permissions' })).toBeInTheDocument()
+    expect(within(panel).getByRole('tab', { name: 'Advanced' })).toBeInTheDocument()
+
+    fireEvent.change(within(panel).getByLabelText('Approver source'), { target: { value: 'self' } })
+    let next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    expect(next.find((step) => step.key === 'manager')?.approverPolicy).toEqual({ type: 'self' })
+
+    fireEvent.click(within(panel).getByRole('tab', { name: 'Actions' }))
+    fireEvent.change(within(panel).getByLabelText('Approve Display name'), {
+      target: { value: 'OK' }
+    })
+    next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    expect(
+      next
+        .find((step) => step.key === 'manager')
+        ?.buttonPolicy?.buttons.find((button) => button.action === 'approve')?.label
+    ).toBe('OK')
+
+    fireEvent.click(within(panel).getByRole('tab', { name: 'Form permissions' }))
+    fireEvent.click(within(panel).getByLabelText('Amount Hidden'))
+    next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    expect(next.find((step) => step.key === 'manager')?.fieldPermissions?.amount).toBe('hidden')
+  })
+
+  it('copies a node and shows publish validation', () => {
+    const onChange = vi.fn()
+    render(<WorkflowDesigner defaultValue={treeSteps} onChange={onChange} />)
+
+    expect(screen.getByRole('status', { name: 'Publish checks' })).toBeInTheDocument()
+    expect(screen.getByText('Add an end node')).toBeInTheDocument()
+
+    fireEvent.click(
+      within(screen.getByRole('group', { name: 'Manager' })).getByRole('button', { name: 'Copy' })
+    )
+    const next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    expect(next.map((step) => step.key)).toEqual(['start', 'manager', 'manager-copy', 'finance'])
   })
 
   it.each(['cc', 'start', 'condition'] as const)('hides sign mode for kind=%s', (kind) => {

@@ -771,7 +771,8 @@ export const WORKFLOW_STEP_KINDS: readonly WorkflowStepKind[] = [
   'start',
   'approve',
   'cc',
-  'condition'
+  'condition',
+  'end'
 ]
 
 export const WORKFLOW_SIGN_MODES: readonly WorkflowSignMode[] = [
@@ -787,7 +788,8 @@ export const WORKFLOW_STEP_KIND_LABELS: Record<WorkflowStepKind, string> = {
   start: 'Start',
   approve: 'Approval',
   cc: 'CC',
-  condition: 'Condition'
+  condition: 'Condition',
+  end: 'End'
 }
 
 export const WORKFLOW_SIGN_MODE_LABELS: Record<WorkflowSignMode, string> = {
@@ -823,6 +825,7 @@ export function workflowStepKindLabel(
   if (kind === 'start') return labels?.kindStart || WORKFLOW_STEP_KIND_LABELS.start
   if (kind === 'cc') return labels?.kindCc || WORKFLOW_STEP_KIND_LABELS.cc
   if (kind === 'condition') return labels?.kindCondition || WORKFLOW_STEP_KIND_LABELS.condition
+  if (kind === 'end') return labels?.kindEnd || WORKFLOW_STEP_KIND_LABELS.end
   return labels?.kindApprove || WORKFLOW_STEP_KIND_LABELS.approve
 }
 

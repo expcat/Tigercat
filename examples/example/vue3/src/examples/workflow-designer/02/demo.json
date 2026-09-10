@@ -1,7 +1,7 @@
 {
   "id": "workflow-designer-02",
-  "title": "子路径编辑",
-  "description": "path 指向父节点时只编辑其 children（抄送/并行，不是审批人），onChange 仍返回完整 JSON 树。会签人用父节点 actors。",
+  "title": "子路径 + Inspector",
+  "description": "path 指向父节点时只编辑其 children；右侧 Inspector 四 Tab 仍可改选中节点并回写整树。",
   "entry": "App.vue",
   "order": 2
 }
