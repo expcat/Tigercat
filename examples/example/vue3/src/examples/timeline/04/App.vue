@@ -3,16 +3,21 @@ import { ref } from 'vue'
 import type {
   WorkflowActionBarItem,
   WorkflowActionPayload,
+  WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '@expcat/tigercat-core'
+import { listWorkflowReturnTargets } from '@expcat/tigercat-core'
+import { Radio } from '@expcat/tigercat-vue/Radio'
+import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
 import { WorkflowTimeline } from '@expcat/tigercat-vue/WorkflowTimeline'
 
 const steps: WorkflowTimelineStep[] = [
   {
     key: 'submit',
+    kind: 'start',
     title: '提交申请',
     status: 'approved',
-    actor: { name: '张三' },
+    actor: { id: 'zhang', name: '张三' },
     comment: '请审批差旅报销。',
     time: '2026-09-01 09:12',
     action: 'approve',
@@ -24,8 +29,8 @@ const steps: WorkflowTimelineStep[] = [
     status: 'approved',
     signMode: 'countersign',
     actors: [
-      { name: '李四', status: 'approved' },
-      { name: '钱七', status: 'approved' }
+      { id: 'li', name: '李四', status: 'approved' },
+      { id: 'qian', name: '钱七', status: 'approved' }
     ],
     comment: '同意，金额合理。',
     time: '2026-09-01 14:30',
@@ -46,7 +51,7 @@ const steps: WorkflowTimelineStep[] = [
     key: 'director',
     title: '总监审批',
     status: 'active',
-    actor: { name: '王五' },
+    actor: { id: 'wang', name: '王五' },
     time: '待处理',
     order: 3
   },
@@ -61,23 +66,70 @@ const steps: WorkflowTimelineStep[] = [
 
 const actions: WorkflowActionBarItem[] = [
   { key: 'approve', label: '同意', action: 'approve', variant: 'primary' },
-  { key: 'reject', label: '拒绝', action: 'reject', variant: 'danger' },
-  { key: 'transfer', label: '转交', action: 'transfer', variant: 'outline' },
+  { key: 'reject', label: '拒绝', action: 'reject', variant: 'danger', commentRequired: true },
   { key: 'comment', label: '评论', action: 'comment', variant: 'ghost' },
-  { key: 'cancel', label: '撤回', action: 'cancel', variant: 'danger', disabled: true }
+  { key: 'cancel', label: '撤回', action: 'cancel', variant: 'danger' },
+  { key: 'transfer', label: '转交', action: 'transfer', variant: 'outline', placement: 'more' },
+  { key: 'addsign', label: '加签', action: 'addsign', variant: 'outline', placement: 'more' },
+  { key: 'return', label: '退回', action: 'return', variant: 'outline', placement: 'more' },
+  {
+    key: 'request_changes',
+    label: '退回修改',
+    action: 'request_changes',
+    variant: 'outline',
+    placement: 'more'
+  }
 ]
 
+const people: WorkflowTimelineActor[] = [
+  { id: 'li', name: '李四' },
+  { id: 'qian', name: '钱七' },
+  { id: 'expert', name: '专家' }
+]
+
+const returnTargets = listWorkflowReturnTargets(steps)
 const lastAction = ref('')
 
 function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) {
+  const bits = [item.label]
+  if (payload?.position === 'before') bits.push('前加签')
+  if (payload?.position === 'after') bits.push('后加签')
+  if (payload?.assignee?.name) bits.push(payload.assignee.name)
+  if (payload?.targetNodeKey) bits.push(payload.targetNodeKey)
   const comment = payload?.comment?.trim()
-  lastAction.value = comment ? `${item.label}（${comment}）` : item.label
+  if (comment) bits.push(comment)
+  lastAction.value = bits.join(' · ')
+}
+
+function pickPerson(
+  id: string | number,
+  onChange: (actor: WorkflowTimelineActor | undefined) => void
+) {
+  onChange(people.find((person) => String(person.id) === String(id)))
 }
 </script>
 
 <template>
   <div class="space-y-3">
-    <WorkflowTimeline :steps="steps" :actions="actions" confirm @action="onAction" />
+    <WorkflowTimeline
+      :steps="steps"
+      :actions="actions"
+      :return-targets="returnTargets"
+      :addsign-positions="['before', 'after']"
+      confirm
+      is-starter
+      @action="onAction">
+      <template #assigneePicker="{ value, onChange }">
+        <RadioGroup
+          size="sm"
+          :model-value="value?.id"
+          @update:model-value="(id) => pickPerson(id, onChange)">
+          <Radio v-for="person in people" :key="String(person.id)" :value="String(person.id)">
+            {{ person.name }}
+          </Radio>
+        </RadioGroup>
+      </template>
+    </WorkflowTimeline>
     <p v-if="lastAction" class="text-sm text-[var(--tiger-text-muted)]">
       最近操作：{{ lastAction }}
     </p>

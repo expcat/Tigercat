@@ -10,6 +10,13 @@ import type { BaseFloatingPopupProps } from './floating-popup'
 export type PopconfirmIconType = 'warning' | 'info' | 'error' | 'success' | 'question'
 
 /**
+ * Confirm-layer event. `preventDefault()` keeps the dialog open (validation).
+ */
+export interface PopconfirmConfirmEvent {
+  preventDefault: () => void
+}
+
+/**
  * Base popconfirm props interface
  */
 export interface PopconfirmProps extends Omit<BaseFloatingPopupProps, 'trigger'> {
@@ -52,10 +59,11 @@ export interface PopconfirmProps extends Omit<BaseFloatingPopupProps, 'trigger'>
   okType?: 'primary' | 'danger'
 
   /**
-   * Called when the user confirms. Return a Promise to keep the layer open
-   * and show loading on OK until it settles; reject leaves the layer open.
+   * Called when the user confirms. Call `event.preventDefault()` to keep the
+   * layer open (validation). Return a Promise to show loading on OK until it
+   * settles; reject also leaves the layer open.
    */
-  onConfirm?: () => void | Promise<void>
+  onConfirm?: (event: PopconfirmConfirmEvent) => void | Promise<void>
 
   /**
    * Called when the user cancels.

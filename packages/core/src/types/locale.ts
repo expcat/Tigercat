@@ -158,7 +158,7 @@ export interface TigerLocaleWorkflowTimeline {
   confirmTransferDescription?: string
   /** Optional-comment placeholder */
   commentPlaceholder?: string
-  /** Required-comment placeholder / aria copy. Does not block submit. */
+  /** Required-comment placeholder / aria copy. Empty submit is blocked. */
   commentRequired?: string
   /** Legend / path: branch that was not taken */
   offPath?: string

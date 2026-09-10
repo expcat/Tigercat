@@ -776,7 +776,7 @@ export const COMPONENT_PROP_PRIORITY = {
   ],
   ActivityFeed: ['items?', 'groups?', 'groupBy?', 'groupOrder?', 'loading?', 'showTime?'],
   WorkflowTimeline: ['steps?', 'actions?', 'mode?', 'pending?', 'showActions?'],
-  WorkflowActionBar: ['items?', 'disabled?', 'confirm?', 'ariaLabel?'],
+  WorkflowActionBar: ['items?', 'buttonPolicy?', 'confirm?', 'commentRequired?'],
   WorkflowViewer: ['steps?', 'highlightPath?', 'showRollbackPoint?', 'labels?'],
   WorkflowDesigner: ['value?', 'path?', 'disabled?', 'labels?'],
   NotificationCenter: [

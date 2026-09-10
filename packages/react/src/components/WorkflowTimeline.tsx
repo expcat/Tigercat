@@ -1,20 +1,30 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import {
+  assertWorkflowActionComment,
+  buildWorkflowActionPayload,
   classNames,
   getWorkflowActionConfirmCopy,
   getWorkflowStepActorsPresentation,
   getWorkflowTimelineLabels,
+  isWorkflowActionBarItemDisabled,
+  listWorkflowReturnTargets,
   mergeTigerLocale,
+  resolveAddsignPositions,
+  resolveWorkflowActionBarItems,
   resolveWorkflowActionButtonProps,
+  sortWorkflowActionBarItems,
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
   shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
-  sortWorkflowActionBarItems,
+  splitWorkflowActionBarItems,
   timelineDescriptionClasses,
   timelineLabelClasses,
+  workflowActionBarCommentRequired,
+  workflowActionBarItemDisabledReason,
+  workflowActionNeedsPicker,
   workflowSignModeLabel,
   workflowStepActorProgressClasses,
   workflowStepActorRowClasses,
@@ -28,7 +38,13 @@ import {
   type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
   type WorkflowActionBarProps as CoreWorkflowActionBarProps,
+  type WorkflowActionPayload,
+  type WorkflowAddsignPosition,
+  type WorkflowAssigneePickerContext,
+  type WorkflowReturnPickerContext,
+  type WorkflowReturnTarget,
   type WorkflowStepActorsPresentation,
+  type WorkflowTimelineActor,
   type WorkflowTimelineItem,
   type WorkflowTimelineProps as CoreWorkflowTimelineProps,
   type WorkflowTimelineStepStatus
@@ -36,7 +52,10 @@ import {
 import { Avatar } from './Avatar'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
+import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 import { Popconfirm } from './Popconfirm'
+import { Radio } from './Radio'
+import { RadioGroup } from './RadioGroup'
 import { Tag } from './Tag'
 import { Textarea } from './Textarea'
 import { Timeline } from './Timeline'
@@ -45,7 +64,9 @@ export interface WorkflowActionBarProps
   extends CoreWorkflowActionBarProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   commentInput?: boolean
   commentRequired?: boolean
-  onAction?: (item: WorkflowActionBarItem, payload?: { comment?: string }) => void
+  onAction?: (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => void
+  renderReturnPicker?: (ctx: WorkflowReturnPickerContext) => React.ReactNode
+  renderAssigneePicker?: (ctx: WorkflowAssigneePickerContext) => React.ReactNode
 }
 
 export interface WorkflowTimelineProps
@@ -56,10 +77,21 @@ export interface WorkflowTimelineProps
   pendingContent?: React.ReactNode
   commentInput?: boolean
   commentRequired?: boolean
-  onAction?: (item: WorkflowActionBarItem, payload?: { comment?: string }) => void
+  onAction?: (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => void
   renderItem?: (item: TimelineItem, index: number) => React.ReactNode
   renderDot?: (item: TimelineItem, options: { pending: boolean }) => React.ReactNode
   renderActions?: (actions: WorkflowActionBarItem[]) => React.ReactNode
+  renderReturnPicker?: (ctx: WorkflowReturnPickerContext) => React.ReactNode
+  renderAssigneePicker?: (ctx: WorkflowAssigneePickerContext) => React.ReactNode
+}
+
+interface ActionDraft {
+  comment: string
+  targetNodeKey?: string
+  position?: WorkflowAddsignPosition
+  signMode?: string
+  assignee?: WorkflowTimelineActor
+  error?: string
 }
 
 const workflowTimelineRootClasses = 'flex flex-col gap-4'
@@ -143,24 +175,322 @@ function renderStepContent(
   )
 }
 
+function emptyDraft(
+  item: WorkflowActionBarItem,
+  returnTargets: WorkflowReturnTarget[],
+  addsignPositions: WorkflowAddsignPosition[]
+): ActionDraft {
+  const draft: ActionDraft = { comment: '' }
+  if (item.action === 'return' && returnTargets[0]) draft.targetNodeKey = returnTargets[0].key
+  if (item.action === 'addsign' && addsignPositions[0]) draft.position = addsignPositions[0]
+  return draft
+}
+
 export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   items,
+  buttonPolicy,
   disabled,
   ariaLabel,
   confirm,
   commentInput,
   commentRequired,
+  returnTargets,
+  addsignPositions,
+  currentSignMode,
+  isStarter,
+  viewerRole,
+  moreLabel,
   className,
   style,
   onAction,
+  renderReturnPicker,
+  renderAssigneePicker,
   'aria-label': ariaLabelAttr,
   ...rest
 }) => {
   const config = useTigerConfig()
   const stepLabels = useMemo(() => getWorkflowTimelineLabels(config.locale), [config.locale])
   const toolbarClasses = useMemo(() => classNames(workflowActionBarClasses, className), [className])
-  const sortedItems = useMemo(() => sortWorkflowActionBarItems(items ?? []), [items])
-  const [comments, setComments] = useState<Record<string, string>>({})
+  const resolvedItems = useMemo(
+    () =>
+      resolveWorkflowActionBarItems({
+        items,
+        buttonPolicy,
+        labels: stepLabels,
+        isStarter,
+        viewerRole
+      }),
+    [items, buttonPolicy, stepLabels, isStarter, viewerRole]
+  )
+  const { bar, more } = useMemo(() => splitWorkflowActionBarItems(resolvedItems), [resolvedItems])
+  const targets = returnTargets ?? []
+  const hasReturnPicker = renderReturnPicker != null || returnTargets != null
+  const hasAssigneePicker = renderAssigneePicker != null
+  const positions = useMemo(
+    () => resolveAddsignPositions(addsignPositions, buttonPolicy),
+    [addsignPositions, buttonPolicy]
+  )
+  const [drafts, setDrafts] = useState<Record<string, ActionDraft>>({})
+  const [moreItem, setMoreItem] = useState<WorkflowActionBarItem | null>(null)
+  const moreWrapRef = useRef<HTMLDivElement>(null)
+
+  const disableOptions = {
+    barDisabled: disabled,
+    hasReturnPicker,
+    hasAssigneePicker,
+    returnTargetCount: returnTargets == null ? undefined : targets.length
+  }
+
+  const getDraft = (item: WorkflowActionBarItem): ActionDraft =>
+    drafts[item.key] ?? emptyDraft(item, targets, positions)
+
+  const patchDraft = (item: WorkflowActionBarItem, patch: Partial<ActionDraft>) => {
+    setDrafts((prev) => ({
+      ...prev,
+      [item.key]: {
+        ...(prev[item.key] ?? emptyDraft(item, targets, positions)),
+        ...patch
+      }
+    }))
+  }
+
+  const clearDraft = (item: WorkflowActionBarItem) => {
+    setDrafts((prev) => {
+      if (!(item.key in prev)) return prev
+      const next = { ...prev }
+      delete next[item.key]
+      return next
+    })
+  }
+
+  const emitReadyAction = (
+    item: WorkflowActionBarItem,
+    event?: { preventDefault: () => void }
+  ): boolean => {
+    if (isWorkflowActionBarItemDisabled(item, disableOptions)) return false
+    const confirming = shouldConfirmWorkflowAction(item, confirm)
+    if (!confirming) {
+      onAction?.(item)
+      return true
+    }
+    const required = workflowActionBarCommentRequired(item, commentRequired)
+    const showComment = shouldShowWorkflowActionCommentInput(item.action, commentInput, required)
+    const draft = getDraft(item)
+    const picker = workflowActionNeedsPicker(item.action)
+
+    if (showComment && !assertWorkflowActionComment(draft.comment, required)) {
+      patchDraft(item, { error: stepLabels.commentRequiredBlock })
+      event?.preventDefault()
+      return false
+    }
+    if (picker === 'return' && !draft.targetNodeKey) {
+      patchDraft(item, { error: stepLabels.returnNoTargets })
+      event?.preventDefault()
+      return false
+    }
+    if (picker === 'assignee' && !draft.assignee) {
+      event?.preventDefault()
+      return false
+    }
+
+    const payload = buildWorkflowActionPayload({
+      action: item.action,
+      comment: draft.comment,
+      showComment,
+      targetNodeKey: draft.targetNodeKey,
+      position: draft.position,
+      signMode: (draft.signMode as WorkflowActionPayload['signMode']) ?? currentSignMode,
+      assignee: draft.assignee,
+      assignees: draft.assignee ? [draft.assignee] : undefined
+    })
+    if (payload) onAction?.(item, payload)
+    else onAction?.(item)
+    clearDraft(item)
+    return true
+  }
+
+  const renderPickerFields = (item: WorkflowActionBarItem, copyDescription?: string) => {
+    const required = workflowActionBarCommentRequired(item, commentRequired)
+    const showComment = shouldShowWorkflowActionCommentInput(item.action, commentInput, required)
+    const draft = getDraft(item)
+    const picker = workflowActionNeedsPicker(item.action)
+    const confirmCopy = getWorkflowActionConfirmCopy(item.action, stepLabels, {
+      commentRequired: required
+    })
+
+    const returnPickerCtx: WorkflowReturnPickerContext = {
+      targets,
+      value: draft.targetNodeKey,
+      onChange: (key) => patchDraft(item, { targetNodeKey: key, error: undefined }),
+      emptyText: stepLabels.returnNoTargets,
+      title: stepLabels.returnPickerTitle
+    }
+
+    const assigneeCtx: WorkflowAssigneePickerContext = {
+      action: item.action,
+      value: draft.assignee,
+      values: draft.assignee ? [draft.assignee] : undefined,
+      onChange: (actor) => patchDraft(item, { assignee: actor, error: undefined }),
+      multiple: item.action === 'addsign'
+    }
+
+    return (
+      <>
+        {copyDescription ? <div>{copyDescription}</div> : null}
+        {picker === 'return' ? (
+          <div className="mt-2">
+            <div className="mb-1 text-sm font-medium">{stepLabels.returnPickerTitle}</div>
+            {renderReturnPicker ? (
+              renderReturnPicker(returnPickerCtx)
+            ) : targets.length === 0 ? (
+              <div className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+                {stepLabels.returnNoTargets}
+              </div>
+            ) : (
+              <RadioGroup
+                size="sm"
+                value={draft.targetNodeKey}
+                aria-label={stepLabels.returnPickerTitle}
+                onChange={(value) =>
+                  patchDraft(item, { targetNodeKey: String(value), error: undefined })
+                }>
+                {targets.map((target) => (
+                  <Radio key={target.key} value={target.key}>
+                    {target.title ?? target.key}
+                    {target.actorName ? `  ${target.actorName}` : ''}
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )}
+          </div>
+        ) : null}
+        {item.action === 'addsign' && positions.length > 1 ? (
+          <div className="mt-2">
+            <RadioGroup
+              size="sm"
+              value={draft.position}
+              aria-label={stepLabels.actionAddsign}
+              onChange={(value) =>
+                patchDraft(item, { position: value as WorkflowAddsignPosition, error: undefined })
+              }>
+              {positions.map((position) => (
+                <Radio key={position} value={position}>
+                  {position === 'after' ? stepLabels.addsignAfter : stepLabels.addsignBefore}
+                </Radio>
+              ))}
+            </RadioGroup>
+          </div>
+        ) : null}
+        {picker === 'assignee' && renderAssigneePicker ? (
+          <div className="mt-2">{renderAssigneePicker(assigneeCtx)}</div>
+        ) : null}
+        {showComment ? (
+          <Textarea
+            size="sm"
+            rows={2}
+            className="mt-2 w-full"
+            value={draft.comment}
+            placeholder={confirmCopy?.commentPlaceholder}
+            aria-label={confirmCopy?.commentPlaceholder}
+            aria-required={required || undefined}
+            onInput={(event) => {
+              patchDraft(item, { comment: event.currentTarget.value, error: undefined })
+            }}
+          />
+        ) : null}
+        {draft.error ? (
+          <div role="alert" className="mt-2 text-sm text-[var(--tiger-error,#dc2626)]">
+            {draft.error}
+          </div>
+        ) : null}
+      </>
+    )
+  }
+
+  const renderActionControl = (item: WorkflowActionBarItem, trigger: React.ReactElement) => {
+    const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
+    const reason = workflowActionBarItemDisabledReason(item, {
+      ...disableOptions,
+      returnNoTargets: stepLabels.returnNoTargets
+    })
+    const required = workflowActionBarCommentRequired(item, commentRequired)
+    const confirmCopy = shouldConfirmWorkflowAction(item, confirm)
+      ? getWorkflowActionConfirmCopy(item.action, stepLabels, { commentRequired: required })
+      : null
+    const showComment =
+      confirmCopy != null &&
+      shouldShowWorkflowActionCommentInput(item.action, commentInput, required)
+    const extra =
+      confirmCopy != null &&
+      (showComment ||
+        workflowActionNeedsPicker(item.action) != null ||
+        (item.action === 'addsign' && positions.length > 1))
+
+    const labeledTrigger = reason
+      ? React.cloneElement(trigger, { title: reason, 'aria-description': reason })
+      : trigger
+
+    if (!confirmCopy) {
+      return React.cloneElement(labeledTrigger, {
+        key: item.key,
+        onClick: () => {
+          emitReadyAction(item)
+        }
+      })
+    }
+
+    return (
+      <Popconfirm
+        key={item.key}
+        asChild
+        title={confirmCopy.title}
+        description={extra ? undefined : confirmCopy.description}
+        descriptionContent={extra ? renderPickerFields(item, confirmCopy.description) : undefined}
+        okType={confirmCopy.okType}
+        disabled={itemDisabled}
+        onConfirm={(event) => {
+          emitReadyAction(item, event)
+        }}>
+        {labeledTrigger}
+      </Popconfirm>
+    )
+  }
+
+  const renderBarButton = (item: WorkflowActionBarItem) => {
+    const buttonProps = resolveWorkflowActionButtonProps(item)
+    const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
+    const button = (
+      <Button
+        key={item.key}
+        size="sm"
+        variant={buttonProps.variant}
+        danger={buttonProps.danger}
+        disabled={itemDisabled}>
+        {item.label}
+      </Button>
+    )
+    return renderActionControl(item, button)
+  }
+
+  const moreConfirmCopy =
+    moreItem && shouldConfirmWorkflowAction(moreItem, confirm)
+      ? getWorkflowActionConfirmCopy(moreItem.action, stepLabels, {
+          commentRequired: workflowActionBarCommentRequired(moreItem, commentRequired)
+        })
+      : null
+  const moreRequired = moreItem
+    ? workflowActionBarCommentRequired(moreItem, commentRequired)
+    : false
+  const moreShowComment =
+    moreItem != null &&
+    moreConfirmCopy != null &&
+    shouldShowWorkflowActionCommentInput(moreItem.action, commentInput, moreRequired)
+  const moreExtra =
+    moreItem != null &&
+    moreConfirmCopy != null &&
+    (moreShowComment ||
+      workflowActionNeedsPicker(moreItem.action) != null ||
+      (moreItem.action === 'addsign' && positions.length > 1))
 
   return (
     <div
@@ -169,76 +499,63 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       style={style}
       role="toolbar"
       aria-label={ariaLabel ?? ariaLabelAttr ?? stepLabels.actionsAriaLabel}>
-      {sortedItems.map((item) => {
-        const buttonProps = resolveWorkflowActionButtonProps(item)
-        const isDisabled = Boolean(disabled || item.disabled)
-        const confirmCopy = shouldConfirmWorkflowAction(item, confirm)
-          ? getWorkflowActionConfirmCopy(item.action, stepLabels, { commentRequired })
-          : null
-        const showComment =
-          confirmCopy != null && shouldShowWorkflowActionCommentInput(item.action, commentInput)
-
-        const emitAction = () => {
-          if (isDisabled) return
-          if (showComment) {
-            onAction?.(item, { comment: comments[item.key] ?? '' })
-            setComments((prev) => {
-              if (!(item.key in prev)) return prev
-              const next = { ...prev }
-              delete next[item.key]
-              return next
-            })
-            return
-          }
-          onAction?.(item)
-        }
-
-        const button = (
-          <Button
-            key={item.key}
-            size="sm"
-            variant={buttonProps.variant}
-            danger={buttonProps.danger}
-            disabled={isDisabled}
-            onClick={confirmCopy ? undefined : emitAction}>
-            {item.label}
-          </Button>
-        )
-        if (!confirmCopy) return button
-
-        const descriptionContent = showComment ? (
-          <>
-            {confirmCopy.description ? <div>{confirmCopy.description}</div> : null}
-            <Textarea
-              size="sm"
-              rows={2}
-              className="mt-2 w-full"
-              value={comments[item.key] ?? ''}
-              placeholder={confirmCopy.commentPlaceholder}
-              aria-label={confirmCopy.commentPlaceholder}
-              aria-required={commentRequired || undefined}
-              onInput={(event) => {
-                const value = event.currentTarget.value
-                setComments((prev) => ({ ...prev, [item.key]: value }))
-              }}
-            />
-          </>
-        ) : undefined
-
-        return (
+      {bar.map((item) => renderBarButton(item))}
+      {more.length > 0 ? (
+        <div ref={moreWrapRef} className="relative inline-flex">
+          <Dropdown asChild>
+            <Button size="sm" variant="outline">
+              {moreLabel ?? stepLabels.moreActions}
+            </Button>
+            <DropdownMenu>
+              {more.map((item) => {
+                const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
+                const reason = workflowActionBarItemDisabledReason(item, {
+                  ...disableOptions,
+                  returnNoTargets: stepLabels.returnNoTargets
+                })
+                const needsDialog = shouldConfirmWorkflowAction(item, confirm)
+                return (
+                  <DropdownItem
+                    key={item.key}
+                    disabled={itemDisabled}
+                    title={reason}
+                    onClick={() => {
+                      if (itemDisabled) return
+                      if (needsDialog) setMoreItem(item)
+                      else emitReadyAction(item)
+                    }}>
+                    {item.label}
+                  </DropdownItem>
+                )
+              })}
+            </DropdownMenu>
+          </Dropdown>
           <Popconfirm
-            key={item.key}
-            asChild
-            title={confirmCopy.title}
-            description={showComment ? undefined : confirmCopy.description}
-            descriptionContent={descriptionContent}
-            okType={confirmCopy.okType}
-            disabled={isDisabled}
-            onConfirm={emitAction}>
-            {button}
+            open={moreItem != null}
+            onOpenChange={(open) => {
+              if (!open) {
+                setMoreItem(null)
+                const trigger = moreWrapRef.current?.querySelector('button')
+                trigger?.focus()
+              }
+            }}
+            title={moreConfirmCopy?.title}
+            description={moreExtra ? undefined : moreConfirmCopy?.description}
+            descriptionContent={
+              moreItem && moreExtra
+                ? renderPickerFields(moreItem, moreConfirmCopy?.description)
+                : undefined
+            }
+            okType={moreConfirmCopy?.okType}
+            disabled={moreItem == null}
+            onConfirm={(event) => {
+              if (!moreItem) return
+              if (emitReadyAction(moreItem, event)) setMoreItem(null)
+            }}>
+            <span className="pointer-events-none absolute inset-0" aria-hidden="true" />
           </Popconfirm>
-        )
-      })}
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -250,6 +567,11 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   confirm,
   commentInput,
   commentRequired,
+  buttonPolicy,
+  returnTargets,
+  addsignPositions,
+  isStarter,
+  viewerRole,
   mode = 'left',
   pending = false,
   pendingDot,
@@ -263,6 +585,8 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   renderItem,
   renderDot,
   renderActions,
+  renderReturnPicker,
+  renderAssigneePicker,
   'aria-label': ariaLabel,
   ...rest
 }) => {
@@ -276,8 +600,26 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
     [mergedLocale, labelsOverride]
   )
   const timelineItems = useMemo(() => workflowStepsToTimelineItems(steps), [steps])
-  const sortedActions = useMemo(() => sortWorkflowActionBarItems(actions ?? []), [actions])
-  const showActionBar = shouldShowWorkflowActions(steps, actions, showActions)
+  const resolvedActions = useMemo(
+    () =>
+      resolveWorkflowActionBarItems({
+        items: actions,
+        buttonPolicy,
+        labels: stepLabels,
+        isStarter,
+        viewerRole
+      }),
+    [actions, buttonPolicy, stepLabels, isStarter, viewerRole]
+  )
+  const sortedActions = useMemo(
+    () => sortWorkflowActionBarItems(resolvedActions),
+    [resolvedActions]
+  )
+  const derivedReturnTargets = useMemo(
+    () => (returnTargets !== undefined ? returnTargets : listWorkflowReturnTargets(steps)),
+    [returnTargets, steps]
+  )
+  const showActionBar = shouldShowWorkflowActions(steps, sortedActions, showActions)
   const rootClasses = useMemo(() => classNames(workflowTimelineRootClasses, className), [className])
 
   const handleRenderItem = (item: TimelineItem, index: number) => {
@@ -287,16 +629,23 @@ export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
   }
 
   const actionBar =
-    showActionBar && actions ? (
+    showActionBar && sortedActions.length > 0 ? (
       renderActions ? (
         renderActions(sortedActions)
       ) : (
         <WorkflowActionBar
           items={sortedActions}
+          buttonPolicy={buttonPolicy}
           confirm={confirm}
           commentInput={commentInput}
           commentRequired={commentRequired}
+          returnTargets={derivedReturnTargets}
+          addsignPositions={addsignPositions}
+          isStarter={isStarter}
+          viewerRole={viewerRole}
           onAction={onAction}
+          renderReturnPicker={renderReturnPicker}
+          renderAssigneePicker={renderAssigneePicker}
           ariaLabel={stepLabels.actionsAriaLabel}
         />
       )

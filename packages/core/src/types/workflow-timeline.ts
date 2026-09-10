@@ -405,6 +405,17 @@ export interface WorkflowActionBarItem {
    * When false, it never does. Omitted: follow the action-bar `confirm` flag.
    */
   confirm?: boolean
+  /**
+   * Where this item renders. Omitted items stay on the bar (2.4.2 compat).
+   * `buttonPolicy` rows default transfer / addsign / return / request_changes
+   * to `more`.
+   */
+  placement?: WorkflowButtonPlacement
+  /**
+   * Per-item opinion requirement. Wins over the bar `commentRequired` flag
+   * and over action defaults (reject / return / request_changes).
+   */
+  commentRequired?: boolean
 }
 
 /**
@@ -429,6 +440,34 @@ export interface WorkflowTimelineProps {
    * @default false
    */
   confirm?: boolean
+  /**
+   * Forwarded to the nested action bar.
+   */
+  commentInput?: boolean
+  /**
+   * Forwarded to the nested action bar. Empty required comments are blocked.
+   */
+  commentRequired?: boolean
+  /**
+   * Forwarded to the nested action bar when `actions` is omitted.
+   */
+  buttonPolicy?: WorkflowNodeButtonPolicy
+  /**
+   * Forwarded to the nested action bar. Omitted: derived from `steps`.
+   */
+  returnTargets?: WorkflowReturnTarget[]
+  /**
+   * Forwarded to the nested action bar.
+   */
+  addsignPositions?: WorkflowAddsignPosition[]
+  /**
+   * Forwarded to the nested action bar.
+   */
+  isStarter?: boolean
+  /**
+   * Forwarded to the nested action bar.
+   */
+  viewerRole?: WorkflowActionBarViewerRole
   /**
    * Timeline layout mode. Passed through to Timeline.
    * @default 'left'
@@ -460,6 +499,46 @@ export interface WorkflowTimelineProps {
    * Additional CSS classes
    */
   className?: string
+}
+
+/**
+ * Who is looking at the action bar. Used when deriving items from `buttonPolicy`.
+ */
+export type WorkflowActionBarViewerRole = 'starter' | 'approver' | 'cc'
+
+/**
+ * One node the return picker may target.
+ */
+export interface WorkflowReturnTarget {
+  key: string
+  title?: string
+  kind?: WorkflowStepKind
+  actorName?: string
+  status?: WorkflowTimelineStepStatus
+}
+
+/**
+ * Built-in / slot context for the return-to-node radio list.
+ */
+export interface WorkflowReturnPickerContext {
+  targets: WorkflowReturnTarget[]
+  value?: string
+  onChange: (key: string) => void
+  disabled?: boolean
+  emptyText: string
+  title: string
+}
+
+/**
+ * Host slot context for transfer / add-sign people. Tigercat does not ship
+ * an org directory — hosts pass a picker (or a demo radio of mock names).
+ */
+export interface WorkflowAssigneePickerContext {
+  action: WorkflowTimelineAction
+  value?: WorkflowTimelineActor
+  values?: WorkflowTimelineActor[]
+  onChange: (actor: WorkflowTimelineActor | undefined) => void
+  multiple?: boolean
 }
 
 /**
@@ -497,25 +576,64 @@ export interface WorkflowActionBarProps {
    */
   ariaLabel?: string
   /**
-   * Enable the confirm-dialog recipe for approve / reject / cancel / transfer.
+   * Enable the confirm-dialog recipe for confirming actions.
    * Per-item `confirm` overrides this. Copy is `locale.workflowTimeline` title +
-   * description; reject shows a comment field unless `commentInput` is false.
+   * description. Return / add-sign / transfer still open a dialog when they
+   * need picker input even if this flag is off.
    * @default false
    */
   confirm?: boolean
   /**
-   * Show a comment field in the confirm dialog. Omitted: reject shows it when
-   * `confirm` is on; approve / transfer may opt in; `comment` never uses Popconfirm.
+   * Show a comment field in the confirm dialog. Omitted: reject / return /
+   * request_changes show it when `confirm` is on; `true` opts in other
+   * confirming actions; `false` hides it unless the action requires a comment.
+   * `comment` never uses Popconfirm.
    */
   commentInput?: boolean
   /**
-   * Switch placeholder / aria copy to the required locale string.
-   * Does **not** block empty submit in the library.
+   * Require a non-empty comment before `onAction` fires. Per-item
+   * `commentRequired` wins. When omitted, reject / return / request_changes
+   * require a comment. Empty submit is blocked (2.5.0 upgrade vs 2.4.2).
    */
   commentRequired?: boolean
   /**
+   * Node button table. Used when `items` is omitted / empty. Enabled rows
+   * become action-bar items; `placement: 'more'` folds into the overflow menu.
+   */
+  buttonPolicy?: WorkflowNodeButtonPolicy
+  /**
+   * Eligible return-to nodes for the built-in radio list. Passing an array
+   * (including empty) enables the picker; omit both this and a return-picker
+   * slot to keep `return` disabled.
+   */
+  returnTargets?: WorkflowReturnTarget[]
+  /**
+   * Add-sign positions offered in the confirm dialog. One value hides the
+   * radio; two values show before / after. Omitted: `buttonPolicy.addsign`
+   * or `['before', 'after']`.
+   */
+  addsignPositions?: WorkflowAddsignPosition[]
+  /**
+   * Current node sign mode. Used as the default when add-sign has ≥2 people.
+   */
+  currentSignMode?: WorkflowSignMode
+  /**
+   * When true, `cancel` stays visible while deriving items from `buttonPolicy`.
+   */
+  isStarter?: boolean
+  /**
+   * Viewer role used when deriving items from `buttonPolicy`.
+   * `cc` keeps comment only; `starter` keeps cancel + comment.
+   * @default 'approver'
+   */
+  viewerRole?: WorkflowActionBarViewerRole
+  /**
+   * Overflow menu trigger label. Defaults to `locale.workflowTimeline.moreActions`.
+   */
+  moreLabel?: string
+  /**
    * Fired after an action is confirmed (or immediately when confirm is off).
-   * `payload` is omitted for callers that do not collect a comment.
+   * Empty required comments and missing pickers do **not** fire this.
    */
   onAction?: (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => void
   /**

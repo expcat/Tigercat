@@ -53,7 +53,7 @@ export type PopconfirmProps = Omit<
     titleContent?: React.ReactNode
     descriptionContent?: React.ReactNode
     onOpenChange?: (open: boolean) => void
-    onConfirm?: () => void | Promise<void>
+    onConfirm?: (event: { preventDefault: () => void }) => void | Promise<void>
     onCancel?: () => void
     placement?: FloatingPlacement
     offset?: number
@@ -152,11 +152,21 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
   }, [currentVisible, floatingRef])
 
   const handleConfirm = async () => {
-    const result = onConfirm?.()
+    let prevented = false
+    const result = onConfirm?.({
+      preventDefault() {
+        prevented = true
+      }
+    })
+    if (prevented) return
     if (result && typeof (result as Promise<void>).then === 'function') {
       setConfirming(true)
       try {
         await result
+        if (prevented) {
+          setConfirming(false)
+          return
+        }
         closeAndRestoreFocus()
       } catch {
         setConfirming(false)

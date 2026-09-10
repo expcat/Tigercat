@@ -1,12 +1,18 @@
 import { computed, defineComponent, h, PropType, ref } from 'vue'
 import {
+  assertWorkflowActionComment,
+  buildWorkflowActionPayload,
   classNames,
   coerceClassValue,
   getWorkflowActionConfirmCopy,
   getWorkflowStepActorsPresentation,
   getWorkflowTimelineLabels,
+  isWorkflowActionBarItemDisabled,
+  listWorkflowReturnTargets,
   mergeStyleValues,
   mergeTigerLocale,
+  resolveAddsignPositions,
+  resolveWorkflowActionBarItems,
   resolveWorkflowActionButtonProps,
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
@@ -15,8 +21,12 @@ import {
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
   sortWorkflowActionBarItems,
+  splitWorkflowActionBarItems,
   timelineDescriptionClasses,
   timelineLabelClasses,
+  workflowActionBarCommentRequired,
+  workflowActionBarItemDisabledReason,
+  workflowActionNeedsPicker,
   workflowSignModeLabel,
   workflowStepActorProgressClasses,
   workflowStepActorRowClasses,
@@ -31,7 +41,16 @@ import {
   type TigerLocaleWorkflowTimeline,
   type WorkflowActionBarItem,
   type WorkflowActionBarProps as CoreWorkflowActionBarProps,
+  type WorkflowActionBarViewerRole,
+  type WorkflowActionPayload,
+  type WorkflowAddsignPosition,
+  type WorkflowAssigneePickerContext,
+  type WorkflowNodeButtonPolicy,
+  type WorkflowReturnPickerContext,
+  type WorkflowReturnTarget,
+  type WorkflowSignMode,
   type WorkflowStepActorsPresentation,
+  type WorkflowTimelineActor,
   type WorkflowTimelineItem,
   type WorkflowTimelineProps as CoreWorkflowTimelineProps,
   type WorkflowTimelineStep,
@@ -40,7 +59,10 @@ import {
 import { Avatar } from './Avatar'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
+import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 import { Popconfirm } from './Popconfirm'
+import { Radio } from './Radio'
+import { RadioGroup } from './RadioGroup'
 import { Tag } from './Tag'
 import { Textarea } from './Textarea'
 import { Timeline } from './Timeline'
@@ -49,10 +71,34 @@ type HChildren = Parameters<typeof h>[2]
 
 export interface VueWorkflowActionBarProps extends CoreWorkflowActionBarProps {
   style?: Record<string, unknown>
+  renderReturnPicker?: (ctx: WorkflowReturnPickerContext) => unknown
+  renderAssigneePicker?: (ctx: WorkflowAssigneePickerContext) => unknown
 }
 
 export interface VueWorkflowTimelineProps extends CoreWorkflowTimelineProps {
   style?: Record<string, unknown>
+  renderReturnPicker?: (ctx: WorkflowReturnPickerContext) => unknown
+  renderAssigneePicker?: (ctx: WorkflowAssigneePickerContext) => unknown
+}
+
+interface ActionDraft {
+  comment: string
+  targetNodeKey?: string
+  position?: WorkflowAddsignPosition
+  signMode?: WorkflowSignMode
+  assignee?: WorkflowTimelineActor
+  error?: string
+}
+
+function emptyActionDraft(
+  item: WorkflowActionBarItem,
+  returnTargets: WorkflowReturnTarget[],
+  addsignPositions: WorkflowAddsignPosition[]
+): ActionDraft {
+  const draft: ActionDraft = { comment: '' }
+  if (item.action === 'return' && returnTargets[0]) draft.targetNodeKey = returnTargets[0].key
+  if (item.action === 'addsign' && addsignPositions[0]) draft.position = addsignPositions[0]
+  return draft
 }
 
 export type WorkflowActionBarProps = VueWorkflowActionBarProps
@@ -151,6 +197,10 @@ export const WorkflowActionBar = defineComponent({
       type: Array as PropType<WorkflowActionBarItem[]>,
       default: undefined
     },
+    buttonPolicy: {
+      type: Object as PropType<WorkflowNodeButtonPolicy>,
+      default: undefined
+    },
     disabled: Boolean,
     ariaLabel: {
       type: String,
@@ -165,6 +215,35 @@ export const WorkflowActionBar = defineComponent({
       type: Boolean,
       default: undefined
     },
+    returnTargets: {
+      type: Array as PropType<WorkflowReturnTarget[]>,
+      default: undefined
+    },
+    addsignPositions: {
+      type: Array as PropType<WorkflowAddsignPosition[]>,
+      default: undefined
+    },
+    currentSignMode: {
+      type: String as PropType<WorkflowSignMode>,
+      default: undefined
+    },
+    isStarter: Boolean,
+    viewerRole: {
+      type: String as PropType<WorkflowActionBarViewerRole>,
+      default: undefined
+    },
+    moreLabel: {
+      type: String,
+      default: undefined
+    },
+    renderReturnPicker: {
+      type: Function as PropType<(ctx: WorkflowReturnPickerContext) => unknown>,
+      default: undefined
+    },
+    renderAssigneePicker: {
+      type: Function as PropType<(ctx: WorkflowAssigneePickerContext) => unknown>,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -175,19 +254,397 @@ export const WorkflowActionBar = defineComponent({
     }
   },
   emits: {
-    action: (_item: WorkflowActionBarItem, _payload?: { comment?: string }) => true
+    action: (_item: WorkflowActionBarItem, _payload?: WorkflowActionPayload) => true
   },
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, slots }) {
     const config = useTigerConfig()
     const stepLabels = computed(() => getWorkflowTimelineLabels(config.value.locale))
     const toolbarClasses = computed(() =>
       classNames(workflowActionBarClasses, props.className, coerceClassValue(attrs.class))
     )
     const toolbarStyle = computed(() => mergeStyleValues(attrs.style, props.style))
-    const comments = ref<Record<string, string>>({})
+    const drafts = ref<Record<string, ActionDraft>>({})
+    const moreItem = ref<WorkflowActionBarItem | null>(null)
+    const moreWrapEl = ref<HTMLElement | null>(null)
+
+    const resolvedItems = computed(() =>
+      resolveWorkflowActionBarItems({
+        items: props.items,
+        buttonPolicy: props.buttonPolicy,
+        labels: stepLabels.value,
+        isStarter: props.isStarter,
+        viewerRole: props.viewerRole
+      })
+    )
+    const splitItems = computed(() => splitWorkflowActionBarItems(resolvedItems.value))
+    const positions = computed(() =>
+      resolveAddsignPositions(props.addsignPositions, props.buttonPolicy)
+    )
 
     return () => {
-      const items = sortWorkflowActionBarItems(props.items ?? [])
+      const labels = stepLabels.value
+      const targets = props.returnTargets ?? []
+      const returnPickerFn = props.renderReturnPicker ?? slots.returnPicker
+      const assigneePickerFn = props.renderAssigneePicker ?? slots.assigneePicker
+      const hasReturnPicker = returnPickerFn != null || props.returnTargets != null
+      const hasAssigneePicker = assigneePickerFn != null
+      const disableOptions = {
+        barDisabled: props.disabled,
+        hasReturnPicker,
+        hasAssigneePicker,
+        returnTargetCount: props.returnTargets == null ? undefined : targets.length
+      }
+
+      const getDraft = (item: WorkflowActionBarItem): ActionDraft =>
+        drafts.value[item.key] ?? emptyActionDraft(item, targets, positions.value)
+
+      const patchDraft = (item: WorkflowActionBarItem, patch: Partial<ActionDraft>) => {
+        drafts.value = {
+          ...drafts.value,
+          [item.key]: { ...getDraft(item), ...patch }
+        }
+      }
+
+      const clearDraft = (item: WorkflowActionBarItem) => {
+        if (!(item.key in drafts.value)) return
+        const next = { ...drafts.value }
+        delete next[item.key]
+        drafts.value = next
+      }
+
+      const emitReadyAction = (
+        item: WorkflowActionBarItem,
+        event?: { preventDefault: () => void }
+      ): boolean => {
+        if (isWorkflowActionBarItemDisabled(item, disableOptions)) return false
+        const confirming = shouldConfirmWorkflowAction(item, props.confirm)
+        if (!confirming) {
+          emit('action', item)
+          return true
+        }
+        const required = workflowActionBarCommentRequired(item, props.commentRequired)
+        const showComment = shouldShowWorkflowActionCommentInput(
+          item.action,
+          props.commentInput,
+          required
+        )
+        const draft = getDraft(item)
+        const picker = workflowActionNeedsPicker(item.action)
+        if (showComment && !assertWorkflowActionComment(draft.comment, required)) {
+          patchDraft(item, { error: labels.commentRequiredBlock })
+          event?.preventDefault()
+          return false
+        }
+        if (picker === 'return' && !draft.targetNodeKey) {
+          patchDraft(item, { error: labels.returnNoTargets })
+          event?.preventDefault()
+          return false
+        }
+        if (picker === 'assignee' && !draft.assignee) {
+          event?.preventDefault()
+          return false
+        }
+        const payload = buildWorkflowActionPayload({
+          action: item.action,
+          comment: draft.comment,
+          showComment,
+          targetNodeKey: draft.targetNodeKey,
+          position: draft.position,
+          signMode: draft.signMode ?? props.currentSignMode,
+          assignee: draft.assignee,
+          assignees: draft.assignee ? [draft.assignee] : undefined
+        })
+        if (payload) emit('action', item, payload)
+        else emit('action', item)
+        clearDraft(item)
+        return true
+      }
+
+      const renderPickerFields = (item: WorkflowActionBarItem, copyDescription?: string) => {
+        const required = workflowActionBarCommentRequired(item, props.commentRequired)
+        const showComment = shouldShowWorkflowActionCommentInput(
+          item.action,
+          props.commentInput,
+          required
+        )
+        const draft = getDraft(item)
+        const picker = workflowActionNeedsPicker(item.action)
+        const confirmCopy = getWorkflowActionConfirmCopy(item.action, labels, {
+          commentRequired: required
+        })
+        const returnPickerCtx: WorkflowReturnPickerContext = {
+          targets,
+          value: draft.targetNodeKey,
+          onChange: (key) => patchDraft(item, { targetNodeKey: key, error: undefined }),
+          emptyText: labels.returnNoTargets,
+          title: labels.returnPickerTitle
+        }
+        const assigneeCtx: WorkflowAssigneePickerContext = {
+          action: item.action,
+          value: draft.assignee,
+          values: draft.assignee ? [draft.assignee] : undefined,
+          onChange: (actor) => patchDraft(item, { assignee: actor, error: undefined }),
+          multiple: item.action === 'addsign'
+        }
+        const customReturn = returnPickerFn?.(returnPickerCtx)
+        const customAssignee = assigneePickerFn?.(assigneeCtx)
+
+        return [
+          copyDescription ? h('div', null, copyDescription) : null,
+          picker === 'return'
+            ? h('div', { class: 'mt-2' }, [
+                h('div', { class: 'mb-1 text-sm font-medium' }, labels.returnPickerTitle),
+                customReturn
+                  ? customReturn
+                  : targets.length === 0
+                    ? h(
+                        'div',
+                        { class: 'text-sm text-[var(--tiger-text-muted,#6b7280)]' },
+                        labels.returnNoTargets
+                      )
+                    : h(
+                        RadioGroup,
+                        {
+                          size: 'sm',
+                          modelValue: draft.targetNodeKey,
+                          'aria-label': labels.returnPickerTitle,
+                          'onUpdate:modelValue': (value: string | number) =>
+                            patchDraft(item, { targetNodeKey: String(value), error: undefined })
+                        },
+                        {
+                          default: () =>
+                            targets.map((target) =>
+                              h(
+                                Radio,
+                                { key: target.key, value: target.key },
+                                {
+                                  default: () =>
+                                    `${target.title ?? target.key}${
+                                      target.actorName ? `  ${target.actorName}` : ''
+                                    }`
+                                }
+                              )
+                            )
+                        }
+                      )
+              ])
+            : null,
+          item.action === 'addsign' && positions.value.length > 1
+            ? h('div', { class: 'mt-2' }, [
+                h(
+                  RadioGroup,
+                  {
+                    size: 'sm',
+                    modelValue: draft.position,
+                    'aria-label': labels.actionAddsign,
+                    'onUpdate:modelValue': (value: string | number) =>
+                      patchDraft(item, {
+                        position: value as WorkflowAddsignPosition,
+                        error: undefined
+                      })
+                  },
+                  {
+                    default: () =>
+                      positions.value.map((position) =>
+                        h(
+                          Radio,
+                          { key: position, value: position },
+                          {
+                            default: () =>
+                              position === 'after' ? labels.addsignAfter : labels.addsignBefore
+                          }
+                        )
+                      )
+                  }
+                )
+              ])
+            : null,
+          picker === 'assignee' && customAssignee
+            ? h('div', { class: 'mt-2' }, [customAssignee])
+            : null,
+          showComment
+            ? h(Textarea, {
+                size: 'sm',
+                rows: 2,
+                className: 'mt-2 w-full',
+                modelValue: draft.comment,
+                placeholder: confirmCopy?.commentPlaceholder,
+                'aria-label': confirmCopy?.commentPlaceholder,
+                'aria-required': required ? true : undefined,
+                'onUpdate:modelValue': (value: string) =>
+                  patchDraft(item, { comment: value, error: undefined })
+              })
+            : null,
+          draft.error
+            ? h(
+                'div',
+                { role: 'alert', class: 'mt-2 text-sm text-[var(--tiger-error,#dc2626)]' },
+                draft.error
+              )
+            : null
+        ]
+      }
+
+      const renderBarButton = (item: WorkflowActionBarItem) => {
+        const buttonProps = resolveWorkflowActionButtonProps(item)
+        const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
+        const reason = workflowActionBarItemDisabledReason(item, {
+          ...disableOptions,
+          returnNoTargets: labels.returnNoTargets
+        })
+        const required = workflowActionBarCommentRequired(item, props.commentRequired)
+        const confirmCopy = shouldConfirmWorkflowAction(item, props.confirm)
+          ? getWorkflowActionConfirmCopy(item.action, labels, { commentRequired: required })
+          : null
+        const showComment =
+          confirmCopy != null &&
+          shouldShowWorkflowActionCommentInput(item.action, props.commentInput, required)
+        const extra =
+          confirmCopy != null &&
+          (showComment ||
+            workflowActionNeedsPicker(item.action) != null ||
+            (item.action === 'addsign' && positions.value.length > 1))
+
+        const button = h(
+          Button,
+          {
+            key: item.key,
+            size: 'sm',
+            variant: buttonProps.variant,
+            danger: buttonProps.danger,
+            disabled: itemDisabled,
+            title: reason,
+            'aria-description': reason,
+            onClick: confirmCopy ? undefined : () => emitReadyAction(item)
+          },
+          { default: () => item.label }
+        )
+        if (!confirmCopy) return button
+
+        const popconfirmSlots: Record<string, () => unknown> = {
+          default: () => button
+        }
+        if (extra) {
+          popconfirmSlots.description = () => renderPickerFields(item, confirmCopy.description)
+        }
+
+        return h(
+          Popconfirm,
+          {
+            key: item.key,
+            asChild: true,
+            title: confirmCopy.title,
+            description: extra ? undefined : confirmCopy.description,
+            okType: confirmCopy.okType,
+            disabled: itemDisabled,
+            onConfirm: (event?: { preventDefault: () => void }) => emitReadyAction(item, event)
+          },
+          popconfirmSlots
+        )
+      }
+
+      const pendingMore = moreItem.value
+      const moreRequired = pendingMore
+        ? workflowActionBarCommentRequired(pendingMore, props.commentRequired)
+        : false
+      const moreConfirmCopy =
+        pendingMore && shouldConfirmWorkflowAction(pendingMore, props.confirm)
+          ? getWorkflowActionConfirmCopy(pendingMore.action, labels, {
+              commentRequired: moreRequired
+            })
+          : null
+      const moreShowComment =
+        pendingMore != null &&
+        moreConfirmCopy != null &&
+        shouldShowWorkflowActionCommentInput(pendingMore.action, props.commentInput, moreRequired)
+      const moreExtra =
+        pendingMore != null &&
+        moreConfirmCopy != null &&
+        (moreShowComment ||
+          workflowActionNeedsPicker(pendingMore.action) != null ||
+          (pendingMore.action === 'addsign' && positions.value.length > 1))
+
+      const moreNode =
+        splitItems.value.more.length > 0
+          ? h('div', { ref: moreWrapEl, class: 'relative inline-flex' }, [
+              h(
+                Dropdown,
+                { asChild: true },
+                {
+                  default: () => [
+                    h(
+                      Button,
+                      { size: 'sm', variant: 'outline' },
+                      () => props.moreLabel ?? labels.moreActions
+                    ),
+                    h(DropdownMenu, null, {
+                      default: () =>
+                        splitItems.value.more.map((item) => {
+                          const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
+                          const reason = workflowActionBarItemDisabledReason(item, {
+                            ...disableOptions,
+                            returnNoTargets: labels.returnNoTargets
+                          })
+                          const needsDialog = shouldConfirmWorkflowAction(item, props.confirm)
+                          return h(
+                            DropdownItem,
+                            {
+                              key: item.key,
+                              disabled: itemDisabled,
+                              title: reason,
+                              onClick: () => {
+                                if (itemDisabled) return
+                                if (needsDialog) moreItem.value = item
+                                else emitReadyAction(item)
+                              }
+                            },
+                            { default: () => item.label }
+                          )
+                        })
+                    })
+                  ]
+                }
+              ),
+              h(
+                Popconfirm,
+                {
+                  open: pendingMore != null,
+                  title: moreConfirmCopy?.title,
+                  description: moreExtra ? undefined : moreConfirmCopy?.description,
+                  okType: moreConfirmCopy?.okType,
+                  disabled: pendingMore == null,
+                  'onUpdate:open': (open: boolean) => {
+                    if (!open) {
+                      moreItem.value = null
+                      moreWrapEl.value?.querySelector('button')?.focus()
+                    }
+                  },
+                  'onOpen-change': (open: boolean) => {
+                    if (!open) {
+                      moreItem.value = null
+                      moreWrapEl.value?.querySelector('button')?.focus()
+                    }
+                  },
+                  onConfirm: (event?: { preventDefault: () => void }) => {
+                    if (!moreItem.value) return
+                    if (emitReadyAction(moreItem.value, event)) moreItem.value = null
+                  }
+                },
+                {
+                  default: () =>
+                    h('span', {
+                      class: 'pointer-events-none absolute inset-0',
+                      'aria-hidden': 'true'
+                    }),
+                  description:
+                    pendingMore && moreExtra
+                      ? () => renderPickerFields(pendingMore, moreConfirmCopy?.description)
+                      : undefined
+                }
+              )
+            ])
+          : null
+
       return h(
         'div',
         {
@@ -198,83 +655,9 @@ export const WorkflowActionBar = defineComponent({
           'aria-label':
             props.ariaLabel ??
             (attrs['aria-label'] as string | undefined) ??
-            stepLabels.value.actionsAriaLabel
+            labels.actionsAriaLabel
         },
-        items.map((item) => {
-          const buttonProps = resolveWorkflowActionButtonProps(item)
-          const disabled = Boolean(props.disabled || item.disabled)
-          const confirmCopy = shouldConfirmWorkflowAction(item, props.confirm)
-            ? getWorkflowActionConfirmCopy(item.action, stepLabels.value, {
-                commentRequired: props.commentRequired
-              })
-            : null
-          const showComment =
-            confirmCopy != null &&
-            shouldShowWorkflowActionCommentInput(item.action, props.commentInput)
-
-          const emitAction = () => {
-            if (disabled) return
-            if (showComment) {
-              emit('action', item, { comment: comments.value[item.key] ?? '' })
-              if (item.key in comments.value) {
-                const next = { ...comments.value }
-                delete next[item.key]
-                comments.value = next
-              }
-              return
-            }
-            emit('action', item)
-          }
-
-          const button = h(
-            Button,
-            {
-              key: item.key,
-              size: 'sm',
-              variant: buttonProps.variant,
-              danger: buttonProps.danger,
-              disabled,
-              onClick: confirmCopy ? undefined : emitAction
-            },
-            { default: () => item.label }
-          )
-          if (!confirmCopy) return button
-
-          const popconfirmSlots: Record<string, () => unknown> = {
-            default: () => button
-          }
-          if (showComment) {
-            popconfirmSlots.description = () => [
-              confirmCopy.description ? h('div', null, confirmCopy.description) : null,
-              h(Textarea, {
-                size: 'sm',
-                rows: 2,
-                className: 'mt-2 w-full',
-                modelValue: comments.value[item.key] ?? '',
-                placeholder: confirmCopy.commentPlaceholder,
-                'aria-label': confirmCopy.commentPlaceholder,
-                'aria-required': props.commentRequired ? true : undefined,
-                'onUpdate:modelValue': (value: string) => {
-                  comments.value = { ...comments.value, [item.key]: value }
-                }
-              })
-            ]
-          }
-
-          return h(
-            Popconfirm,
-            {
-              key: item.key,
-              asChild: true,
-              title: confirmCopy.title,
-              description: showComment ? undefined : confirmCopy.description,
-              okType: confirmCopy.okType,
-              disabled,
-              onConfirm: emitAction
-            },
-            popconfirmSlots
-          )
-        })
+        [...splitItems.value.bar.map((item) => renderBarButton(item)), moreNode]
       )
     }
   }
@@ -303,6 +686,31 @@ export const WorkflowTimeline = defineComponent({
     },
     commentRequired: {
       type: Boolean,
+      default: undefined
+    },
+    buttonPolicy: {
+      type: Object as PropType<WorkflowNodeButtonPolicy>,
+      default: undefined
+    },
+    returnTargets: {
+      type: Array as PropType<WorkflowReturnTarget[]>,
+      default: undefined
+    },
+    addsignPositions: {
+      type: Array as PropType<WorkflowAddsignPosition[]>,
+      default: undefined
+    },
+    isStarter: Boolean,
+    viewerRole: {
+      type: String as PropType<WorkflowActionBarViewerRole>,
+      default: undefined
+    },
+    renderReturnPicker: {
+      type: Function as PropType<(ctx: WorkflowReturnPickerContext) => unknown>,
+      default: undefined
+    },
+    renderAssigneePicker: {
+      type: Function as PropType<(ctx: WorkflowAssigneePickerContext) => unknown>,
       default: undefined
     },
     mode: {
@@ -339,16 +747,30 @@ export const WorkflowTimeline = defineComponent({
     }
   },
   emits: {
-    action: (_item: WorkflowActionBarItem, _payload?: { comment?: string }) => true
+    action: (_item: WorkflowActionBarItem, _payload?: WorkflowActionPayload) => true
   },
   setup(props, { emit, slots, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const stepLabels = computed(() => getWorkflowTimelineLabels(mergedLocale.value, props.labels))
     const timelineItems = computed(() => workflowStepsToTimelineItems(props.steps))
-    const sortedActions = computed(() => sortWorkflowActionBarItems(props.actions ?? []))
+    const resolvedActions = computed(() =>
+      resolveWorkflowActionBarItems({
+        items: props.actions,
+        buttonPolicy: props.buttonPolicy,
+        labels: stepLabels.value,
+        isStarter: props.isStarter,
+        viewerRole: props.viewerRole
+      })
+    )
+    const sortedActions = computed(() => sortWorkflowActionBarItems(resolvedActions.value))
+    const derivedReturnTargets = computed(() =>
+      props.returnTargets !== undefined
+        ? props.returnTargets
+        : listWorkflowReturnTargets(props.steps)
+    )
     const showActionBar = computed(() =>
-      shouldShowWorkflowActions(props.steps, props.actions, props.showActions)
+      shouldShowWorkflowActions(props.steps, sortedActions.value, props.showActions)
     )
     const rootClasses = computed(() =>
       classNames(workflowTimelineRootClasses, props.className, coerceClassValue(attrs.class))
@@ -368,20 +790,34 @@ export const WorkflowTimeline = defineComponent({
       }
 
       const actionBar =
-        showActionBar.value && props.actions
+        showActionBar.value && sortedActions.value.length > 0
           ? slots.actions
             ? slots.actions({ actions: sortedActions.value })
-            : h(WorkflowActionBar, {
-                items: sortedActions.value,
-                confirm: props.confirm,
-                commentInput: props.commentInput,
-                commentRequired: props.commentRequired,
-                ariaLabel: stepLabels.value.actionsAriaLabel,
-                onAction: (item: WorkflowActionBarItem, payload?: { comment?: string }) => {
-                  if (payload) emit('action', item, payload)
-                  else emit('action', item)
+            : h(
+                WorkflowActionBar,
+                {
+                  items: sortedActions.value,
+                  buttonPolicy: props.buttonPolicy,
+                  confirm: props.confirm,
+                  commentInput: props.commentInput,
+                  commentRequired: props.commentRequired,
+                  returnTargets: derivedReturnTargets.value,
+                  addsignPositions: props.addsignPositions,
+                  isStarter: props.isStarter,
+                  viewerRole: props.viewerRole,
+                  renderReturnPicker: props.renderReturnPicker,
+                  renderAssigneePicker: props.renderAssigneePicker,
+                  ariaLabel: stepLabels.value.actionsAriaLabel,
+                  onAction: (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => {
+                    if (payload) emit('action', item, payload)
+                    else emit('action', item)
+                  }
+                },
+                {
+                  returnPicker: slots.returnPicker,
+                  assigneePicker: slots.assigneePicker
                 }
-              })
+              )
           : null
 
       const {

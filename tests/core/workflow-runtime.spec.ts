@@ -5,8 +5,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   assertWorkflowActionComment,
+  createFullWorkflowButtonPolicy,
+  FULL_WORKFLOW_BUTTONS,
   getWorkflowReturnCandidates,
   isWorkflowAddsignAfterAllowed,
+  listWorkflowReturnTargets,
   reduceWorkflowAction,
   resolveWorkflowButtonPolicy,
   workflowActorProgress,
@@ -93,6 +96,17 @@ describe('assertWorkflowActionComment', () => {
       'cancel',
       'comment'
     ])
+    expect(FULL_WORKFLOW_BUTTONS.map((button) => button.action)).toEqual([
+      'approve',
+      'reject',
+      'transfer',
+      'addsign',
+      'return',
+      'cancel',
+      'comment',
+      'request_changes'
+    ])
+    expect(createFullWorkflowButtonPolicy().addsign?.positions).toEqual(['before', 'after'])
   })
 })
 
@@ -470,6 +484,11 @@ describe('reduceWorkflowAction — return path', () => {
   it('lists start plus approved approve nodes as return candidates', () => {
     const keys = getWorkflowReturnCandidates(chain()).map((step) => step.key)
     expect(keys).toEqual(['start', 'a', 'b'])
+    expect(listWorkflowReturnTargets(chain().steps, 'c').map((target) => target.key)).toEqual([
+      'start',
+      'a',
+      'b'
+    ])
   })
 
   it('resequence rebuilds pending tasks from the target through the returner', () => {

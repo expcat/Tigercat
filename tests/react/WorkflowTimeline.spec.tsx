@@ -9,7 +9,12 @@ import React from 'react'
 import { WorkflowActionBar, WorkflowTimeline } from '@expcat/tigercat-react/WorkflowTimeline'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import type { WorkflowActionBarItem, WorkflowTimelineStep } from '@expcat/tigercat-core'
+import type {
+  WorkflowActionBarItem,
+  WorkflowReturnTarget,
+  WorkflowTimelineActor,
+  WorkflowTimelineStep
+} from '@expcat/tigercat-core'
 import { expectNoA11yViolations } from '../utils/react'
 
 const mixedSteps: WorkflowTimelineStep[] = [
@@ -198,7 +203,7 @@ describe('WorkflowTimeline (React)', () => {
       )
     })
 
-    it('shows reject confirm description, danger OK, and submits an empty comment', async () => {
+    it('shows reject confirm description, danger OK, and required comment copy', async () => {
       const user = userEvent.setup()
       const onAction = vi.fn()
       render(
@@ -211,16 +216,9 @@ describe('WorkflowTimeline (React)', () => {
       await waitFor(() => expect(screen.getByText('确认拒绝该申请？')).toBeVisible())
       expect(screen.getByText('意见将通知发起人。')).toBeVisible()
       expect(screen.queryByText(/该步骤/)).not.toBeInTheDocument()
-      expect(screen.getByPlaceholderText('请输入审批意见（选填）')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('请输入审批意见')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: '确定' }).className).toContain(
         'bg-[var(--tiger-error,#dc2626)]'
-      )
-
-      await user.click(screen.getByRole('button', { name: '确定' }))
-      await waitFor(() =>
-        expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'reject' }), {
-          comment: ''
-        })
       )
     })
 
@@ -230,7 +228,7 @@ describe('WorkflowTimeline (React)', () => {
       render(<WorkflowActionBar items={actions} confirm onAction={onAction} />)
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
-      const textarea = await screen.findByPlaceholderText('Comment (optional)')
+      const textarea = await screen.findByPlaceholderText('Comment required')
       await user.type(textarea, 'need receipts')
       await user.click(screen.getByRole('button', { name: 'OK' }))
       await waitFor(() =>
@@ -240,21 +238,122 @@ describe('WorkflowTimeline (React)', () => {
       )
     })
 
-    it('does not block empty submit when commentRequired', async () => {
+    it('blocks empty submit when commentRequired and keeps the dialog open', async () => {
       const user = userEvent.setup()
       const onAction = vi.fn()
       render(<WorkflowActionBar items={actions} confirm commentRequired onAction={onAction} />)
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
-      const textarea = await screen.findByPlaceholderText('Comment required')
+      await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
+      const dialog = screen
+        .getByText('Reject this request?')
+        .closest('[role="dialog"]') as HTMLElement
+      const textarea = within(dialog).getByPlaceholderText('Comment required')
       expect(textarea).toHaveAttribute('aria-required', 'true')
       expect(textarea).not.toHaveAttribute('required')
-      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await user.click(within(dialog).getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('A comment is required')
+      )
+      expect(onAction).not.toHaveBeenCalled()
+      expect(screen.getByText('Reject this request?')).toBeVisible()
+    })
+
+    it('allows empty reject when the item opts out of commentRequired', async () => {
+      const user = userEvent.setup()
+      const onAction = vi.fn()
+      const optionalReject: WorkflowActionBarItem[] = [
+        { key: 'reject', label: 'Reject', action: 'reject', commentRequired: false }
+      ]
+      render(<WorkflowActionBar items={optionalReject} confirm onAction={onAction} />)
+
+      await user.click(screen.getByRole('button', { name: 'Reject' }))
+      await user.click(await screen.findByRole('button', { name: 'OK' }))
       await waitFor(() =>
         expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'reject' }), {
           comment: ''
         })
       )
+    })
+
+    it('folds more actions and collects return / addsign payload', async () => {
+      const user = userEvent.setup()
+      const onAction = vi.fn()
+      const people: WorkflowTimelineActor[] = [
+        { id: 'lin', name: 'Lin' },
+        { id: 'expert', name: 'Expert' }
+      ]
+      const full: WorkflowActionBarItem[] = [
+        { key: 'approve', label: 'Approve', action: 'approve' },
+        { key: 'return', label: 'Return', action: 'return', placement: 'more' },
+        { key: 'addsign', label: 'Add approver', action: 'addsign', placement: 'more' }
+      ]
+      const targets: WorkflowReturnTarget[] = [
+        { key: 'start', title: 'Start', actorName: 'Ada' },
+        { key: 'manager', title: 'Manager', actorName: 'Lin' }
+      ]
+      render(
+        <WorkflowActionBar
+          items={full}
+          confirm
+          returnTargets={targets}
+          addsignPositions={['before', 'after']}
+          onAction={onAction}
+          renderAssigneePicker={({ value, onChange }) => (
+            <div>
+              {people.map((person) => (
+                <button key={String(person.id)} type="button" onClick={() => onChange(person)}>
+                  Pick {person.name}
+                </button>
+              ))}
+              {value ? <span>Selected {value.name}</span> : null}
+            </div>
+          )}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: 'Approve' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Return' })).not.toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Return' }))
+      await waitFor(() => expect(screen.getByText('Return this request?')).toBeVisible())
+      expect(screen.getByRole('radio', { name: /Start/ })).toBeInTheDocument()
+      await user.click(screen.getByRole('radio', { name: /Manager/ }))
+      await user.type(screen.getByPlaceholderText('Comment required'), 'send back')
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'return' }), {
+          comment: 'send back',
+          targetNodeKey: 'manager'
+        })
+      )
+
+      onAction.mockClear()
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Add approver' }))
+      await waitFor(() => expect(screen.getByText('Add an approver?')).toBeVisible())
+      await user.click(screen.getByRole('radio', { name: 'After' }))
+      await user.click(screen.getByRole('button', { name: 'Pick Expert' }))
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(onAction).toHaveBeenCalledWith(
+          expect.objectContaining({ action: 'addsign' }),
+          expect.objectContaining({
+            position: 'after',
+            assignee: expect.objectContaining({ id: 'expert' })
+          })
+        )
+      )
+    })
+
+    it('disables return without a picker and addsign without an assignee slot', () => {
+      const items: WorkflowActionBarItem[] = [
+        { key: 'return', label: 'Return', action: 'return' },
+        { key: 'addsign', label: 'Add approver', action: 'addsign' }
+      ]
+      render(<WorkflowActionBar items={items} confirm />)
+      expect(screen.getByRole('button', { name: 'Return' })).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Add approver' })).toBeDisabled()
     })
   })
 

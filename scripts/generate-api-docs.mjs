@@ -198,12 +198,12 @@ const COMPONENT_USAGE_NOTES = {
   WorkflowTimeline: {
     uses: ['Timeline', 'Button', 'Tag', 'WorkflowActionBar'],
     notes:
-      '把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。会签人用 `actors` 列在项内，不要把人做成 children。`actions` 是展示用操作条（同意/拒绝/转交/撤回/评论），无 BPM / 加签引擎。默认在当前步骤为 `active` 且传入 `actions` 时显示操作条。'
+      '把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。会签人用 `actors` 列在项内，不要把人做成 children。`actions` / `buttonPolicy` 是展示用操作条（同意/拒绝/转交/加签/退回/撤回/评论/退回修改），无 BPM 引擎。默认在当前步骤为 `active` 且有动作时显示操作条。退回 picker 与加签选人槽可转发到 ActionBar。'
   },
   WorkflowActionBar: {
-    uses: ['Button', 'Popconfirm', 'Textarea'],
+    uses: ['Button', 'Popconfirm', 'Textarea', 'Dropdown', 'Radio'],
     notes:
-      '展示用审批按钮条。默认视觉序同意→拒绝→转交→撤回→评论。`disabled` 与逐项 `disabled` 都会挡住点击；`danger` 变体映射到 Button outline + danger。`confirm` 打开 title + description（拒绝可意见框），文案走 `locale.workflowTimeline`；逐项 `confirm` 可覆盖。`onAction` 第二参 `{ comment? }` 可选。无加签引擎。'
+      '完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。'
   },
   WorkflowViewer: {
     uses: ['Tag'],

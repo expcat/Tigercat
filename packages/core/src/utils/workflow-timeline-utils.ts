@@ -12,6 +12,11 @@ import { classNames } from './class-names'
 import type {
   ApproverSource,
   WorkflowActionBarItem,
+  WorkflowActionBarViewerRole,
+  WorkflowActionPayload,
+  WorkflowAddsignPosition,
+  WorkflowButtonConfig,
+  WorkflowButtonPlacement,
   WorkflowNodeAdvanced,
   WorkflowNodeButtonPolicy,
   WorkflowPendingAfterAddsign,
@@ -767,7 +772,8 @@ export function sortWorkflowActionBarItems(
 
 /**
  * Per-item `confirm` wins. Otherwise the bar `confirm` flag applies to actions
- * that use the confirm-dialog recipe (approve / reject / cancel / transfer).
+ * that use the confirm-dialog recipe. Return / add-sign / transfer still open
+ * a dialog when they need picker input, even if the bar flag is off.
  */
 export function shouldConfirmWorkflowAction(
   item: Pick<WorkflowActionBarItem, 'action' | 'confirm'>,
@@ -775,6 +781,7 @@ export function shouldConfirmWorkflowAction(
 ): boolean {
   if (item.confirm === false) return false
   if (item.confirm === true) return workflowActionNeedsConfirm(item.action)
+  if (workflowActionNeedsPicker(item.action) != null) return workflowActionNeedsConfirm(item.action)
   if (barConfirm !== true) return false
   return workflowActionNeedsConfirm(item.action)
 }
@@ -782,16 +789,225 @@ export function shouldConfirmWorkflowAction(
 /**
  * Comment field in the confirm dialog. Omitted `commentInput` shows it for
  * reject / return / request_changes; `true` opts in other confirming actions;
- * `false` hides it. `comment` never uses Popconfirm.
+ * `false` hides it unless `commentRequired` is set. `comment` never uses
+ * Popconfirm.
  */
 export function shouldShowWorkflowActionCommentInput(
   action: WorkflowTimelineAction,
-  commentInput?: boolean
+  commentInput?: boolean,
+  commentRequired?: boolean
 ): boolean {
   if (!workflowActionNeedsConfirm(action)) return false
+  if (commentRequired) return true
   if (commentInput === false) return false
   if (commentInput === true) return true
   return action === 'reject' || action === 'return' || action === 'request_changes'
+}
+
+const WORKFLOW_ACTION_FALLBACK_LABELS: Record<WorkflowTimelineAction, string> = {
+  approve: 'Approve',
+  reject: 'Reject',
+  transfer: 'Transfer',
+  cancel: 'Withdraw',
+  comment: 'Comment',
+  addsign: 'Add approver',
+  return: 'Return',
+  request_changes: 'Request changes'
+}
+
+export function defaultWorkflowButtonPlacement(
+  action: WorkflowTimelineAction
+): WorkflowButtonPlacement {
+  if (
+    action === 'transfer' ||
+    action === 'addsign' ||
+    action === 'return' ||
+    action === 'request_changes'
+  ) {
+    return 'more'
+  }
+  return 'bar'
+}
+
+export function workflowActionBarItemPlacement(
+  item: Pick<WorkflowActionBarItem, 'action' | 'placement'>
+): WorkflowButtonPlacement {
+  return item.placement ?? 'bar'
+}
+
+export function splitWorkflowActionBarItems(items: readonly WorkflowActionBarItem[]): {
+  bar: WorkflowActionBarItem[]
+  more: WorkflowActionBarItem[]
+} {
+  const sorted = sortWorkflowActionBarItems(items)
+  return {
+    bar: sorted.filter((item) => workflowActionBarItemPlacement(item) !== 'more'),
+    more: sorted.filter((item) => workflowActionBarItemPlacement(item) === 'more')
+  }
+}
+
+export function workflowActionBarItemLabel(
+  action: WorkflowTimelineAction,
+  labels?: Partial<TigerLocaleWorkflowTimeline>,
+  explicit?: string
+): string {
+  if (explicit != null && explicit.trim() !== '') return explicit
+  if (action === 'approve') return labels?.actionApprove || WORKFLOW_ACTION_FALLBACK_LABELS.approve
+  if (action === 'reject') return labels?.actionReject || WORKFLOW_ACTION_FALLBACK_LABELS.reject
+  if (action === 'transfer')
+    return labels?.actionTransfer || WORKFLOW_ACTION_FALLBACK_LABELS.transfer
+  if (action === 'cancel') return labels?.actionCancel || WORKFLOW_ACTION_FALLBACK_LABELS.cancel
+  if (action === 'comment') return labels?.actionComment || WORKFLOW_ACTION_FALLBACK_LABELS.comment
+  if (action === 'addsign') return labels?.actionAddsign || WORKFLOW_ACTION_FALLBACK_LABELS.addsign
+  if (action === 'return') return labels?.actionReturn || WORKFLOW_ACTION_FALLBACK_LABELS.return
+  return labels?.actionRequestChanges || WORKFLOW_ACTION_FALLBACK_LABELS.request_changes
+}
+
+export function workflowActionBarCommentRequired(
+  item: Pick<WorkflowActionBarItem, 'action' | 'commentRequired'>,
+  barCommentRequired?: boolean
+): boolean {
+  if (item.commentRequired != null) return item.commentRequired
+  if (barCommentRequired != null) return barCommentRequired
+  return item.action === 'reject' || item.action === 'return' || item.action === 'request_changes'
+}
+
+export function workflowActionNeedsPicker(
+  action: WorkflowTimelineAction
+): 'return' | 'assignee' | null {
+  if (action === 'return') return 'return'
+  if (action === 'addsign' || action === 'transfer') return 'assignee'
+  return null
+}
+
+export function isWorkflowActionVisible(
+  action: WorkflowTimelineAction,
+  options?: { isStarter?: boolean; viewerRole?: WorkflowActionBarViewerRole }
+): boolean {
+  const role = options?.viewerRole ?? 'approver'
+  if (role === 'cc') return action === 'comment'
+  if (action === 'cancel') return role === 'starter' || options?.isStarter === true
+  if (role === 'starter') return action === 'cancel' || action === 'comment'
+  return true
+}
+
+export function workflowButtonConfigToActionBarItem(
+  config: WorkflowButtonConfig,
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+): WorkflowActionBarItem {
+  const item: WorkflowActionBarItem = {
+    key: config.action,
+    label: workflowActionBarItemLabel(config.action, labels, config.label),
+    action: config.action,
+    placement: config.placement ?? defaultWorkflowButtonPlacement(config.action)
+  }
+  if (config.commentRequired != null) item.commentRequired = config.commentRequired
+  if (config.action === 'approve') item.variant = 'primary'
+  else if (config.action === 'reject' || config.action === 'cancel') item.variant = 'danger'
+  else if (config.action === 'comment') item.variant = 'ghost'
+  else item.variant = 'outline'
+  return item
+}
+
+export function workflowButtonConfigsToActionBarItems(
+  buttons: readonly WorkflowButtonConfig[],
+  labels?: Partial<TigerLocaleWorkflowTimeline>,
+  options?: { isStarter?: boolean; viewerRole?: WorkflowActionBarViewerRole }
+): WorkflowActionBarItem[] {
+  return buttons
+    .filter((button) => button.enabled !== false)
+    .filter((button) => isWorkflowActionVisible(button.action, options))
+    .map((button) => workflowButtonConfigToActionBarItem(button, labels))
+}
+
+export function resolveWorkflowActionBarItems(options: {
+  items?: readonly WorkflowActionBarItem[]
+  buttonPolicy?: WorkflowNodeButtonPolicy
+  labels?: Partial<TigerLocaleWorkflowTimeline>
+  isStarter?: boolean
+  viewerRole?: WorkflowActionBarViewerRole
+}): WorkflowActionBarItem[] {
+  if (options.items && options.items.length > 0) return [...options.items]
+  if (options.buttonPolicy) {
+    return workflowButtonConfigsToActionBarItems(options.buttonPolicy.buttons, options.labels, {
+      isStarter: options.isStarter,
+      viewerRole: options.viewerRole
+    })
+  }
+  return []
+}
+
+export function isWorkflowActionBarItemDisabled(
+  item: Pick<WorkflowActionBarItem, 'action' | 'disabled'>,
+  options?: {
+    barDisabled?: boolean
+    hasReturnPicker?: boolean
+    hasAssigneePicker?: boolean
+    returnTargetCount?: number
+  }
+): boolean {
+  if (options?.barDisabled || item.disabled) return true
+  const picker = workflowActionNeedsPicker(item.action)
+  if (picker === 'return') {
+    if (!options?.hasReturnPicker) return true
+    if (options.returnTargetCount === 0) return true
+  }
+  if (picker === 'assignee' && !options?.hasAssigneePicker) return true
+  return false
+}
+
+export function workflowActionBarItemDisabledReason(
+  item: Pick<WorkflowActionBarItem, 'action' | 'disabled'>,
+  options: {
+    barDisabled?: boolean
+    hasReturnPicker?: boolean
+    hasAssigneePicker?: boolean
+    returnTargetCount?: number
+    returnNoTargets: string
+  }
+): string | undefined {
+  if (item.disabled || options.barDisabled) return undefined
+  if (item.action === 'return' && options.hasReturnPicker && options.returnTargetCount === 0) {
+    return options.returnNoTargets
+  }
+  return undefined
+}
+
+export function resolveAddsignPositions(
+  explicit?: readonly WorkflowAddsignPosition[],
+  policy?: WorkflowNodeButtonPolicy
+): WorkflowAddsignPosition[] {
+  if (explicit && explicit.length > 0) return [...explicit]
+  const fromPolicy = policy?.addsign?.positions
+  if (fromPolicy && fromPolicy.length > 0) return [...fromPolicy]
+  return ['before', 'after']
+}
+
+export function buildWorkflowActionPayload(input: {
+  comment?: string
+  showComment?: boolean
+  targetNodeKey?: string
+  position?: WorkflowAddsignPosition
+  signMode?: WorkflowSignMode
+  assignee?: WorkflowTimelineActor
+  assignees?: WorkflowTimelineActor[]
+  action: WorkflowTimelineAction
+}): WorkflowActionPayload | undefined {
+  const payload: WorkflowActionPayload = {}
+  if (input.showComment) payload.comment = input.comment ?? ''
+  if (input.action === 'return' && input.targetNodeKey) {
+    payload.targetNodeKey = input.targetNodeKey
+  }
+  if (input.action === 'addsign') {
+    if (input.position) payload.position = input.position
+    if (input.signMode) payload.signMode = input.signMode
+  }
+  if (input.action === 'addsign' || input.action === 'transfer') {
+    if (input.assignee) payload.assignee = input.assignee
+    const many = input.assignees ?? (input.assignee ? [input.assignee] : undefined)
+    if (many && many.length > 0) payload.assignees = many
+  }
+  return Object.keys(payload).length > 0 ? payload : undefined
 }
 
 export const EMPTY_WORKFLOW_VIEWER_NODES: WorkflowViewerNode[] = []

@@ -13,6 +13,7 @@ import type {
   WorkflowNodeButtonPolicy,
   WorkflowPendingAfterAddsign,
   WorkflowReturnResume,
+  WorkflowReturnTarget,
   WorkflowRuntimeAction,
   WorkflowTask,
   WorkflowTaskStatus,
@@ -51,6 +52,31 @@ export const DEFAULT_WORKFLOW_BUTTONS: WorkflowButtonConfig[] = [
   { action: 'cancel', enabled: true, placement: 'bar' },
   { action: 'comment', enabled: true, placement: 'bar' }
 ]
+
+/**
+ * Complete 2.5.0 action set for demos. Not the omitted-policy 2.4.2 default.
+ * `request_changes` is on `more` so the full set is visible without crowding.
+ */
+export const FULL_WORKFLOW_BUTTONS: WorkflowButtonConfig[] = [
+  { action: 'approve', enabled: true, placement: 'bar' },
+  { action: 'reject', enabled: true, placement: 'bar', commentRequired: true },
+  { action: 'transfer', enabled: true, placement: 'more' },
+  { action: 'addsign', enabled: true, placement: 'more' },
+  { action: 'return', enabled: true, placement: 'more', commentRequired: true },
+  { action: 'cancel', enabled: true, placement: 'bar' },
+  { action: 'comment', enabled: true, placement: 'bar' },
+  { action: 'request_changes', enabled: true, placement: 'more', commentRequired: true }
+]
+
+export function createFullWorkflowButtonPolicy(
+  overrides?: Partial<WorkflowNodeButtonPolicy>
+): WorkflowNodeButtonPolicy {
+  return {
+    buttons: (overrides?.buttons ?? FULL_WORKFLOW_BUTTONS).map((button) => ({ ...button })),
+    addsign: overrides?.addsign ?? { positions: ['before', 'after'] },
+    returnResume: overrides?.returnResume ?? 'resequence'
+  }
+}
 
 const TERMINAL_INSTANCE = new Set<string>(['approved', 'rejected', 'canceled'])
 const OPEN_TASK = new Set<WorkflowTaskStatus>(['pending', 'active'])
@@ -695,6 +721,35 @@ export function getWorkflowReturnCandidates(instance: WorkflowInstance): Workflo
   const currentKey = instance.cursor?.nodeKey ?? getCurrentWorkflowStep(instance.steps)?.key
   if (!currentKey) return []
   return flattenRuntimeSteps(instance.steps).filter((step) => eligibleReturnNode(step, currentKey))
+}
+
+export function workflowReturnTargetFromStep(step: WorkflowTimelineStep): WorkflowReturnTarget {
+  const actors = resolveWorkflowStepActors(step)
+  const names = actors
+    .map((actor) => actor.name)
+    .filter((name): name is string => Boolean(name && name.trim()))
+  const target: WorkflowReturnTarget = { key: step.key }
+  const title = step.title ?? step.label
+  if (title) target.title = title
+  target.kind = resolveWorkflowStepKind(step)
+  if (names.length > 0) target.actorName = names.join(', ')
+  target.status = resolveWorkflowStepStatus(step)
+  return target
+}
+
+/**
+ * Presentational return-picker rows. Uses the same eligibility as the reducer.
+ */
+export function listWorkflowReturnTargets(
+  steps: readonly WorkflowTimelineStep[] | undefined,
+  currentKey?: string
+): WorkflowReturnTarget[] {
+  if (!steps || steps.length === 0) return []
+  const cursorKey = currentKey ?? getCurrentWorkflowStep(steps)?.key
+  if (!cursorKey) return []
+  return getWorkflowReturnCandidates({ steps: [...steps], cursor: { nodeKey: cursorKey } }).map(
+    workflowReturnTargetFromStep
+  )
 }
 
 function resetNodeForReturn(

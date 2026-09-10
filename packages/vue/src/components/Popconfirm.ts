@@ -149,8 +149,13 @@ export const Popconfirm = defineComponent({
     )
 
     const handleConfirm = () => {
-      emit('confirm')
-      closeAndRestoreFocus()
+      let prevented = false
+      emit('confirm', {
+        preventDefault() {
+          prevented = true
+        }
+      })
+      if (!prevented) closeAndRestoreFocus()
     }
 
     const handleCancel = () => {

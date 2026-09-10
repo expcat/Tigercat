@@ -162,13 +162,15 @@ describe('WorkflowViewer (React)', () => {
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
       expect(screen.getByText('The requester will be notified.')).toBeVisible()
-      expect(screen.getByPlaceholderText('Comment (optional)')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Comment required')).toBeInTheDocument()
       expect(onAction).not.toHaveBeenCalled()
 
+      const textarea = screen.getByPlaceholderText('Comment required')
+      await user.type(textarea, 'need receipts')
       await user.click(screen.getByRole('button', { name: 'OK' }))
       await waitFor(() =>
         expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ action: 'reject' }), {
-          comment: ''
+          comment: 'need receipts'
         })
       )
     })

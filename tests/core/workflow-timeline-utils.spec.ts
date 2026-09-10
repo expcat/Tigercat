@@ -28,6 +28,12 @@ import {
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
   sortWorkflowActionBarItems,
+  splitWorkflowActionBarItems,
+  workflowActionBarCommentRequired,
+  workflowButtonConfigsToActionBarItems,
+  isWorkflowActionBarItemDisabled,
+  isWorkflowActionVisible,
+  defaultWorkflowButtonPlacement,
   sortWorkflowTimelineSteps,
   workflowActorProgress,
   workflowActionNeedsConfirm,
@@ -659,6 +665,82 @@ describe('workflow action confirm recipe', () => {
     expect(shouldShowWorkflowActionCommentInput('cancel', true)).toBe(true)
     expect(shouldShowWorkflowActionCommentInput('comment', true)).toBe(false)
     expect(shouldShowWorkflowActionCommentInput('reject', false)).toBe(false)
+    expect(shouldShowWorkflowActionCommentInput('approve', false, true)).toBe(true)
+  })
+
+  it('forces a confirm dialog for return / addsign / transfer so pickers can run', () => {
+    expect(shouldConfirmWorkflowAction({ action: 'return' })).toBe(true)
+    expect(shouldConfirmWorkflowAction({ action: 'addsign' })).toBe(true)
+    expect(shouldConfirmWorkflowAction({ action: 'transfer' })).toBe(true)
+    expect(shouldConfirmWorkflowAction({ action: 'return', confirm: false })).toBe(false)
+    expect(shouldConfirmWorkflowAction({ action: 'approve' })).toBe(false)
+  })
+
+  it('splits more placement off the bar and keeps omitted placement on the bar', () => {
+    const items: WorkflowActionBarItem[] = [
+      { key: 'approve', label: 'Approve', action: 'approve' },
+      { key: 'return', label: 'Return', action: 'return', placement: 'more' },
+      { key: 'addsign', label: 'Add', action: 'addsign', placement: 'more' },
+      { key: 'comment', label: 'Comment', action: 'comment' }
+    ]
+    const split = splitWorkflowActionBarItems(items)
+    expect(split.bar.map((item) => item.key)).toEqual(['approve', 'comment'])
+    expect(split.more.map((item) => item.key)).toEqual(['return', 'addsign'])
+    expect(defaultWorkflowButtonPlacement('transfer')).toBe('more')
+    expect(defaultWorkflowButtonPlacement('approve')).toBe('bar')
+  })
+
+  it('maps button policy rows to labelled items and hides cancel unless starter', () => {
+    const items = workflowButtonConfigsToActionBarItems(
+      [
+        { action: 'approve', enabled: true },
+        { action: 'return', enabled: true, placement: 'more' },
+        { action: 'cancel', enabled: true },
+        { action: 'comment', enabled: false }
+      ],
+      { actionApprove: '同意' }
+    )
+    expect(items.map((item) => item.action)).toEqual(['approve', 'return'])
+    expect(items[0]?.label).toBe('同意')
+    expect(
+      workflowButtonConfigsToActionBarItems([{ action: 'cancel', enabled: true }], undefined, {
+        isStarter: true
+      }).map((item) => item.action)
+    ).toEqual(['cancel'])
+    expect(isWorkflowActionVisible('cancel', { viewerRole: 'approver' })).toBe(false)
+    expect(isWorkflowActionVisible('approve', { viewerRole: 'cc' })).toBe(false)
+  })
+
+  it('disables return without a picker and addsign without an assignee slot', () => {
+    expect(
+      isWorkflowActionBarItemDisabled(
+        { action: 'return' },
+        { hasReturnPicker: false, hasAssigneePicker: true }
+      )
+    ).toBe(true)
+    expect(
+      isWorkflowActionBarItemDisabled(
+        { action: 'return' },
+        { hasReturnPicker: true, returnTargetCount: 0, hasAssigneePicker: true }
+      )
+    ).toBe(true)
+    expect(
+      isWorkflowActionBarItemDisabled(
+        { action: 'addsign' },
+        { hasReturnPicker: true, hasAssigneePicker: false }
+      )
+    ).toBe(true)
+    expect(
+      isWorkflowActionBarItemDisabled(
+        { action: 'approve' },
+        { hasReturnPicker: false, hasAssigneePicker: false }
+      )
+    ).toBe(false)
+    expect(workflowActionBarCommentRequired({ action: 'reject' })).toBe(true)
+    expect(workflowActionBarCommentRequired({ action: 'approve' }, true)).toBe(true)
+    expect(
+      workflowActionBarCommentRequired({ action: 'reject', commentRequired: false }, true)
+    ).toBe(false)
   })
 })
 
