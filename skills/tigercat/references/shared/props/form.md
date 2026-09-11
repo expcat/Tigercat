@@ -124,7 +124,7 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## FormItem
 
-`packages/core/src/types/form.ts` · `FormItemProps` · 4/13 props
+`packages/core/src/types/form.ts` · `FormItemProps` · 4/14 props
 
 | Prop        | Type                     | Default | Notes                                     |
 | ----------- | ------------------------ | ------- | ----------------------------------------- |

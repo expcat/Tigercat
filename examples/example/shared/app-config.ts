@@ -558,7 +558,7 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       {
         key: 'workflow-designer',
         path: '/workflow-designer',
-        label: { 'zh-CN': 'WorkflowDesigner 流程设计器', 'en-US': 'WorkflowDesigner' }
+        label: { 'zh-CN': 'WorkflowDesigner 纵向流程画布', 'en-US': 'WorkflowDesigner' }
       },
       {
         key: 'chat-window',

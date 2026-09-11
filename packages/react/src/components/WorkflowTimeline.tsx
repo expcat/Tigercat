@@ -102,7 +102,7 @@ interface ActionDraft {
 }
 
 const workflowTimelineRootClasses = 'flex flex-col gap-4'
-const workflowActionBarClasses = 'flex flex-wrap items-center gap-2'
+const workflowActionBarClasses = 'flex flex-nowrap items-center gap-2 overflow-x-auto'
 const workflowStepHeaderClasses = 'flex flex-wrap items-center gap-2'
 const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
 const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary,#4b5563)] mt-1'

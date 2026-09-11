@@ -2,8 +2,8 @@
  * Optional workflow detail layout recipe.
  *
  * Hosts compose SchemaForm + Timeline/Viewer tabs + sticky ActionBar.
- * This is not a second Timeline, not a form designer, and not an Admin page
- * (Admin wires a real detail shell in a later slice).
+ * Give the shell a bounded height (`h-full` on a flex-1 parent). Do not
+ * hand-calc magic rem. This is not a second Timeline or a form designer.
  */
 
 /**

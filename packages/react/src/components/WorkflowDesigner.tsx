@@ -37,11 +37,14 @@ import {
   workflowDesignerEditableButtonPolicy,
   workflowDesignerEmptyApproverOptions,
   workflowDesignerEmptyClasses,
+  workflowDesignerEmptyInspectorClasses,
   workflowDesignerFieldClasses,
   workflowDesignerFieldPermissionLabel,
   workflowDesignerFieldPermissionRows,
   workflowDesignerFieldsClasses,
   workflowDesignerHintClasses,
+  workflowDesignerInsertButtonClasses,
+  workflowDesignerInsertGlyph,
   workflowDesignerInsertRowClasses,
   workflowDesignerInspectorTabEnabled,
   workflowDesignerInspectorTabLabel,
@@ -116,18 +119,20 @@ function ActionButton({
   ariaLabel,
   disabled,
   expanded,
+  className,
   onClick
 }: {
   label: string
   ariaLabel?: string
   disabled: boolean
   expanded?: boolean
+  className?: string
   onClick: () => void
 }) {
   return (
     <button
       type="button"
-      className={workflowDesignerActionButtonClasses}
+      className={className ?? workflowDesignerActionButtonClasses}
       disabled={disabled}
       aria-label={ariaLabel}
       aria-expanded={expanded}
@@ -254,10 +259,11 @@ function DesignerNode({
       ) : null}
       <div className={workflowDesignerInsertRowClasses}>
         <ActionButton
-          label={labels.insertSibling}
+          label={workflowDesignerInsertGlyph}
           ariaLabel={`${labels.insertSibling} (${groupName})`}
           disabled={locked}
           expanded={insertOpen}
+          className={workflowDesignerInsertButtonClasses}
           onClick={() => onToggleInsert(node.path)}
         />
         {insertOpen ? (
@@ -845,7 +851,8 @@ function DesignerEditPanel({
     <div
       className={workflowDesignerPanelClasses}
       role="region"
-      aria-label={labels.editPanelAriaLabel}>
+      aria-label={labels.editPanelAriaLabel}
+      data-slot="inspector">
       <div className={workflowDesignerFieldsClasses}>
         <label className={workflowDesignerFieldClasses}>
           <span className={workflowDesignerLabelClasses}>{labels.titleLabel}</span>
@@ -1084,7 +1091,7 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
         </div>
       ) : null}
       <div className={workflowDesignerShellClasses}>
-        <div className={workflowDesignerTreeClasses}>
+        <div className={workflowDesignerTreeClasses} data-slot="canvas">
           <div
             className={workflowDesignerPaletteClasses}
             role="toolbar"
@@ -1148,7 +1155,15 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
             }}
             onRemovePath={handleRemove}
           />
-        ) : null}
+        ) : (
+          <div
+            className={workflowDesignerPanelClasses}
+            role="region"
+            aria-label={designerLabels.editPanelAriaLabel}
+            data-slot="inspector">
+            <p className={workflowDesignerEmptyInspectorClasses}>{designerLabels.inspectorEmpty}</p>
+          </div>
+        )}
       </div>
     </div>
   )

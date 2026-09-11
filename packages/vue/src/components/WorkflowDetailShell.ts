@@ -7,8 +7,9 @@
  * - `action` — sticky WorkflowActionBar
  * - default — extra body content after form/tabs
  *
- * Not a second Timeline and not a form designer. Give the shell a bounded
- * height so the action region stays pinned while form/tabs scroll.
+ * Not a second Timeline and not a form designer. Host gives a bounded height
+ * (`h-full` / `flex-1 min-h-0`); do not hand-calc magic rem. Action stays pinned
+ * while form/tabs scroll.
  */
 
 import { computed, defineComponent, h, PropType } from 'vue'

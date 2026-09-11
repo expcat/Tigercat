@@ -2,6 +2,16 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.6.0
+
+v2.6.0：审批详情一流粘底 + Designer 纵向流程画布观感。无新必填 prop。不是 BPMN / Flowable / Camunda。
+
+- **WorkflowDetailShell**：根布局 `h-full flex-col`；body `flex-1 min-h-0 overflow-auto`；action `shrink-0 sticky bottom`。宿主给有界高度（`flex-1 min-h-0` / 父级 `h-[32rem]`）即可，**勿再手算 magic rem**。示例 `timeline/06`。单测覆盖「固定壳高内 action 在 body 外」。Vue/React 对称。
+- **WorkflowDesigner**：纵向摘要卡流程画布（轨道 + 节点间圆形 `+` 插入点）+ 右侧 Inspector 同屏；未选中时 Inspector 显示 `inspectorEmpty`。减弱 Card `shadow` 列表感。仍是 simple JSON 树，四 Tab / validate API 不变。示例 `workflow-designer/01`。Vue/React 对称。
+- **WorkflowActionBar**：主条 `flex-nowrap overflow-x-auto`，窄屏不再折行把次按钮挤出首屏。Vue/React 对称。
+- 行为变化（非 breaking、无新必填 prop）见 [docs/MIGRATION-2.6.md](docs/MIGRATION-2.6.md)。
+- **size-limit**：本版实测 `Core (full)` 229.9 / `Vue (full)` 433.92 / `React (full)` 476.51 kB gzip，仍低于 v2.5.0 上限（230 / 434 / 477），未调预算。
+
 ## v2.5.4
 
 v2.5.4：与 2.5.3 同内容。2.5.3 在 npm 上 `@expcat/tigercat-react` 只写出元数据、tarball 404，故再发一版。

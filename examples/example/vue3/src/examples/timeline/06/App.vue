@@ -81,34 +81,36 @@ function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) 
 </script>
 
 <template>
-  <WorkflowDetailShell class="h-[32rem]" aria-label="请假审批详情">
-    <template #header>
-      <div class="flex flex-wrap items-center gap-2">
-        <strong>请假申请</strong>
-        <Tag variant="primary" size="sm">审批中</Tag>
-        <span class="text-sm text-[var(--tiger-text-muted,#6b7280)]">金额字段对本节点隐藏</span>
-      </div>
-    </template>
-    <template #form>
-      <SchemaForm :schema="schema" :model="model" :show-actions="false" />
-    </template>
-    <template #tabs>
-      <Tabs default-active-key="timeline">
-        <TabPane tab-key="timeline" label="进度">
-          <WorkflowTimeline :steps="steps" :tasks="tasks" :show-actions="false" />
-        </TabPane>
-        <TabPane tab-key="viewer" label="结构">
-          <WorkflowViewer :steps="steps" :tasks="tasks" />
-        </TabPane>
-      </Tabs>
-    </template>
-    <template #action>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <p v-if="lastAction" class="m-0 text-sm text-[var(--tiger-text-muted,#6b7280)]">
-          最近操作：{{ lastAction }}
-        </p>
-        <WorkflowActionBar :items="actions" confirm @action="onAction" />
-      </div>
-    </template>
-  </WorkflowDetailShell>
+  <div class="flex h-[32rem] min-h-0 flex-col">
+    <WorkflowDetailShell class="h-full min-h-0" aria-label="请假审批详情">
+      <template #header>
+        <div class="flex flex-wrap items-center gap-2">
+          <strong>请假申请</strong>
+          <Tag variant="primary" size="sm">审批中</Tag>
+          <span class="text-sm text-[var(--tiger-text-muted,#6b7280)]">金额字段对本节点隐藏</span>
+        </div>
+      </template>
+      <template #form>
+        <SchemaForm :schema="schema" :model="model" :show-actions="false" />
+      </template>
+      <template #tabs>
+        <Tabs default-active-key="timeline">
+          <TabPane tab-key="timeline" label="进度">
+            <WorkflowTimeline :steps="steps" :tasks="tasks" :show-actions="false" />
+          </TabPane>
+          <TabPane tab-key="viewer" label="结构">
+            <WorkflowViewer :steps="steps" :tasks="tasks" />
+          </TabPane>
+        </Tabs>
+      </template>
+      <template #action>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p v-if="lastAction" class="m-0 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+            最近操作：{{ lastAction }}
+          </p>
+          <WorkflowActionBar :items="actions" confirm @action="onAction" />
+        </div>
+      </template>
+    </WorkflowDetailShell>
+  </div>
 </template>

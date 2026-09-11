@@ -36,7 +36,9 @@ describe('WorkflowDesigner (Vue)', () => {
     expect(screen.getByText('Add step')).toBeInTheDocument()
     expect(screen.queryByLabelText('Title')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Kind')).not.toBeInTheDocument()
-    expect(screen.queryByRole('region', { name: 'Node settings' })).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Node settings' })).toHaveTextContent(
+      'Select a node to edit'
+    )
   })
 
   it('opens the edit panel and writes title plus actors into the full tree', async () => {

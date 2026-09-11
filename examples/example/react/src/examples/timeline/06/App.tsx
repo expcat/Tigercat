@@ -80,41 +80,43 @@ export default function App() {
   }
 
   return (
-    <WorkflowDetailShell
-      className="h-[32rem]"
-      ariaLabel="请假审批详情"
-      header={
-        <div className="flex flex-wrap items-center gap-2">
-          <strong>请假申请</strong>
-          <Tag variant="primary" size="sm">
-            审批中
-          </Tag>
-          <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
-            金额字段对本节点隐藏
-          </span>
-        </div>
-      }
-      form={<SchemaForm schema={schema} model={model} onChange={setModel} showActions={false} />}
-      tabs={
-        <Tabs defaultActiveKey="timeline">
-          <TabPane tabKey="timeline" label="进度">
-            <WorkflowTimeline steps={steps} tasks={tasks} showActions={false} />
-          </TabPane>
-          <TabPane tabKey="viewer" label="结构">
-            <WorkflowViewer steps={steps} tasks={tasks} />
-          </TabPane>
-        </Tabs>
-      }
-      action={
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {lastAction ? (
-            <p className="m-0 text-sm text-[var(--tiger-text-muted,#6b7280)]">
-              最近操作：{lastAction}
-            </p>
-          ) : null}
-          <WorkflowActionBar items={actions} confirm onAction={onAction} />
-        </div>
-      }
-    />
+    <div className="flex h-[32rem] min-h-0 flex-col">
+      <WorkflowDetailShell
+        className="h-full min-h-0"
+        ariaLabel="请假审批详情"
+        header={
+          <div className="flex flex-wrap items-center gap-2">
+            <strong>请假申请</strong>
+            <Tag variant="primary" size="sm">
+              审批中
+            </Tag>
+            <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+              金额字段对本节点隐藏
+            </span>
+          </div>
+        }
+        form={<SchemaForm schema={schema} model={model} onChange={setModel} showActions={false} />}
+        tabs={
+          <Tabs defaultActiveKey="timeline">
+            <TabPane tabKey="timeline" label="进度">
+              <WorkflowTimeline steps={steps} tasks={tasks} showActions={false} />
+            </TabPane>
+            <TabPane tabKey="viewer" label="结构">
+              <WorkflowViewer steps={steps} tasks={tasks} />
+            </TabPane>
+          </Tabs>
+        }
+        action={
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {lastAction ? (
+              <p className="m-0 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+                最近操作：{lastAction}
+              </p>
+            ) : null}
+            <WorkflowActionBar items={actions} confirm onAction={onAction} />
+          </div>
+        }
+      />
+    </div>
   )
 }

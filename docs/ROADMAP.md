@@ -37,6 +37,7 @@ source: current repository state after v2.5.0
 | M3     | 2.3.4 | 体验与工程债（followups、同屏打磨）；库按需                                         |
 | M4     | 2.4.0 | WorkflowDesigner + SchemaForm                                                       |
 | M5     | 2.5.0 | 工作流一流完整版：Inspector Designer / 按人任务 / 加签退回 / 字段权限 + DetailShell |
+| M6     | 2.6.0 | 体验完善：DetailShell 一流粘底配方；Designer 纵向流程画布观感（仍非 BPMN） |
 | M242   | 2.4.2 | 展示扫读（Viewer 图例/会签 actors、ActionBar 确认、Designer 摘要）+ Admin 详情 IA   |
 
 节奏：Tigercat 库侧先发版 → Admin 升依赖后跟。明确不做：Flowable/Camunda/BPMN、第二套 Menu/Timeline、租户/组织/字典组件化进库。加签 / 退回 / 字段权限 / 节点按钮配置自 v2.5.0 起为正式目标。

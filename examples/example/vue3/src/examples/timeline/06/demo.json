@@ -1,7 +1,7 @@
 {
   "id": "timeline-06",
   "title": "审批详情壳",
-  "description": "WorkflowDetailShell 布局配方：header + 权限派生表单 + Timeline/Viewer Tab + 底部 sticky ActionBar。Admin 后续切片接真页。",
+  "description": "WorkflowDetailShell 一流粘底：宿主给有界高度（flex 列 h-[32rem]），壳 h-full，body 自滚、ActionBar 钉底。勿手算 magic rem。不是 BPMN。",
   "entry": "App.vue",
   "order": 6
 }

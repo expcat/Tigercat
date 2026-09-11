@@ -40,11 +40,14 @@ import {
   workflowDesignerEditableButtonPolicy,
   workflowDesignerEmptyApproverOptions,
   workflowDesignerEmptyClasses,
+  workflowDesignerEmptyInspectorClasses,
   workflowDesignerFieldClasses,
   workflowDesignerFieldPermissionLabel,
   workflowDesignerFieldPermissionRows,
   workflowDesignerFieldsClasses,
   workflowDesignerHintClasses,
+  workflowDesignerInsertButtonClasses,
+  workflowDesignerInsertGlyph,
   workflowDesignerInsertRowClasses,
   workflowDesignerInspectorTabEnabled,
   workflowDesignerInspectorTabLabel,
@@ -117,13 +120,14 @@ function renderActionButton(
   disabled: boolean,
   onClick: () => void,
   ariaLabel?: string,
-  expanded?: boolean
+  expanded?: boolean,
+  className?: string
 ): VNode {
   return h(
     'button',
     {
       type: 'button',
-      class: workflowDesignerActionButtonClasses,
+      class: className ?? workflowDesignerActionButtonClasses,
       disabled,
       'aria-label': ariaLabel,
       'aria-expanded': expanded,
@@ -851,6 +855,20 @@ export const WorkflowDesigner = defineComponent({
       ])
     }
 
+    function renderEmptyInspector(): VNode {
+      const labels = designerLabels.value
+      return h(
+        'div',
+        {
+          class: workflowDesignerPanelClasses,
+          role: 'region',
+          'aria-label': labels.editPanelAriaLabel,
+          'data-slot': 'inspector'
+        },
+        [h('p', { class: workflowDesignerEmptyInspectorClasses }, labels.inspectorEmpty)]
+      )
+    }
+
     function renderEditPanel(node: WorkflowDesignerNode): VNode {
       const labels = designerLabels.value
       const lockedNow = locked.value
@@ -862,10 +880,11 @@ export const WorkflowDesigner = defineComponent({
         {
           class: workflowDesignerPanelClasses,
           role: 'region',
-          'aria-label': labels.editPanelAriaLabel
+          'aria-label': labels.editPanelAriaLabel,
+          'data-slot': 'inspector'
         },
         [
-          h('div', { class: workflowDesignerFieldsClasses }, [
+          h('div', { class: workflowDesignerFieldsClasses, 'data-slot': 'inspector-fields' }, [
             h('label', { class: workflowDesignerFieldClasses }, [
               h('span', { class: workflowDesignerLabelClasses }, labels.titleLabel),
               h('input', {
@@ -988,13 +1007,14 @@ export const WorkflowDesigner = defineComponent({
           : null,
         h('div', { class: workflowDesignerInsertRowClasses }, [
           renderActionButton(
-            labels.insertSibling,
+            workflowDesignerInsertGlyph,
             locked.value,
             () => {
               insertMenuPath.value = insertOpen ? null : pathKey
             },
             `${labels.insertSibling} (${groupName})`,
-            insertOpen
+            insertOpen,
+            workflowDesignerInsertButtonClasses
           ),
           insertOpen
             ? h(
@@ -1086,7 +1106,7 @@ export const WorkflowDesigner = defineComponent({
               )
             : null,
           h('div', { class: workflowDesignerShellClasses }, [
-            h('div', { class: workflowDesignerTreeClasses }, [
+            h('div', { class: workflowDesignerTreeClasses, 'data-slot': 'canvas' }, [
               h(
                 'div',
                 {
@@ -1124,7 +1144,7 @@ export const WorkflowDesigner = defineComponent({
                 commit(insertWorkflowStepAtPath(sourceSteps.value, view.value.parentPath, created))
               })
             ]),
-            editing ? renderEditPanel(editing) : null
+            editing ? renderEditPanel(editing) : renderEmptyInspector()
           ])
         ]
       )

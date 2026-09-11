@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.6.0
+
+v2.6.0 无新必填 prop。DetailShell 根增加 `h-full`（宿主给有界高度，勿 magic rem）；Designer Inspector 列始终在（未选中显示 `inspectorEmpty`）；插入点可见字形为 `+`（可访问名不变）；ActionBar 窄屏 nowrap 横滑。不是 BPMN。逐步说明见 [MIGRATION-2.6.md](MIGRATION-2.6.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v260)。
+
 ## v2.5.4
 
 v2.5.4 无 breaking change，无新必填 prop。与 2.5.3 同内容（react tarball 补发）。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v254)。

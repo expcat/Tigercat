@@ -479,4 +479,4 @@ export type { ImageViewerProps } from './components/ImageViewer'
 export { AspectRatio } from './components/AspectRatio'
 export type { AspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.5.4'
+export const version = '2.6.0'

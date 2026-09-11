@@ -37,14 +37,17 @@ import {
 export const EMPTY_WORKFLOW_DESIGNER_STEPS: WorkflowTimelineStep[] = []
 
 export const workflowDesignerRootClasses = 'tiger-workflow-designer w-full'
-export const workflowDesignerShellClasses = 'flex flex-col gap-3 lg:flex-row lg:items-start'
-export const workflowDesignerTreeClasses = 'flex min-w-0 flex-1 flex-col gap-3'
-export const workflowDesignerListClasses = 'm-0 flex list-none flex-col gap-3 p-0'
-export const workflowDesignerItemClasses = 'flex min-w-0 flex-col gap-2'
+export const workflowDesignerShellClasses = 'flex flex-col gap-3 lg:flex-row lg:items-stretch'
+export const workflowDesignerTreeClasses =
+  'tiger-workflow-designer__canvas relative flex min-w-0 flex-1 flex-col gap-2 rounded-lg bg-[var(--tiger-fill,#f3f4f6)] px-4 py-3'
+export const workflowDesignerListClasses =
+  'tiger-workflow-designer__flow relative m-0 flex list-none flex-col gap-0 border-s-2 border-[var(--tiger-primary,#2563eb)]/35 p-0 ps-4'
+export const workflowDesignerItemClasses =
+  'tiger-workflow-designer__node relative flex min-w-0 flex-col'
 export const workflowDesignerCardClasses =
-  'min-w-0 cursor-pointer rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2 shadow-sm'
+  'min-w-0 cursor-pointer rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2'
 export const workflowDesignerCardSelectedClasses =
-  'border-[var(--tiger-primary,#2563eb)] ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
+  'border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary-soft,#eff6ff)] ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
 export const workflowDesignerSummaryClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerSummaryRowClasses = 'flex min-w-0 items-center gap-2'
 export const workflowDesignerSummaryTitleClasses =
@@ -52,9 +55,15 @@ export const workflowDesignerSummaryTitleClasses =
 export const workflowDesignerSummaryActorsClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
 export const workflowDesignerKindDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
 export const workflowDesignerToolbarClasses = 'mt-2 flex flex-wrap items-center gap-1'
-export const workflowDesignerInsertRowClasses = 'flex justify-start'
+export const workflowDesignerInsertRowClasses =
+  'relative z-[1] -ms-[1.15rem] flex items-center gap-1 py-1'
+export const workflowDesignerInsertButtonClasses =
+  'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] text-xs font-medium leading-none text-[var(--tiger-text-muted,#6b7280)] disabled:cursor-not-allowed disabled:opacity-50'
+export const workflowDesignerInsertGlyph = '+'
+export const workflowDesignerEmptyInspectorClasses =
+  'flex min-h-[12rem] items-center justify-center px-3 text-center text-sm text-[var(--tiger-text-muted,#6b7280)]'
 export const workflowDesignerPanelClasses =
-  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-3 lg:w-[24rem] lg:shrink-0'
+  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-3 lg:sticky lg:top-0 lg:w-[24rem] lg:shrink-0'
 export const workflowDesignerPaletteClasses = 'flex flex-wrap items-center gap-1'
 export const workflowDesignerTabListClasses =
   'mb-3 flex flex-wrap gap-1 border-b border-[var(--tiger-border,#d1d5db)] pb-2'
@@ -80,7 +89,7 @@ export const workflowDesignerControlClasses =
 export const workflowDesignerActorRowClasses = 'flex min-w-0 items-center gap-1'
 export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
 export const workflowDesignerChildrenClasses =
-  'ms-4 border-s border-[var(--tiger-border,#d1d5db)] ps-3'
+  'ms-5 border-s-2 border-[var(--tiger-border,#d1d5db)] ps-3'
 export const workflowDesignerActionButtonClasses =
   'inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
 

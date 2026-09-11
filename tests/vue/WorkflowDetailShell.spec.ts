@@ -26,6 +26,34 @@ describe('WorkflowDetailShell (Vue)', () => {
     expect(root.querySelector('[data-slot="tabs"]')).toHaveTextContent('Timeline tab')
     expect(root.querySelector('[data-slot="action"]')?.tagName).toBe('FOOTER')
     expect(screen.getByRole('button', { name: 'Approve' })).toBeInTheDocument()
+    expect(root.querySelector('[data-slot="body"]')?.nextElementSibling).toBe(
+      root.querySelector('[data-slot="action"]')
+    )
+  })
+
+  it('keeps the action footer inside a bounded-height host', () => {
+    const { container } = render({
+      render: () =>
+        h('div', { style: { height: '320px', display: 'flex', flexDirection: 'column' } }, [
+          h(
+            WorkflowDetailShell,
+            {},
+            {
+              header: () => h('h2', 'Leave request'),
+              form: () => h('p', { style: { minHeight: '480px' } }, 'Tall form'),
+              action: () => h('button', 'Approve')
+            }
+          )
+        ])
+    })
+
+    const host = container.firstElementChild as HTMLElement
+    const root = screen.getByRole('region', { name: 'Workflow detail' })
+    const action = root.querySelector('[data-slot="action"]') as HTMLElement
+    expect(action).toBeTruthy()
+    expect(root.parentElement).toBe(host)
+    expect(action.tagName).toBe('FOOTER')
+    expect(root.querySelector('[data-slot="body"]')?.contains(action)).toBe(false)
   })
 
   it('omits empty regions and hides the action slot when showActions is false', () => {
