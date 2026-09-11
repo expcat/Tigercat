@@ -2,6 +2,12 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.5.3
+
+v2.5.3：WorkflowActionBar 溢出确认层不再渲染隐藏/不可见 trigger（0×0 disabled 无名按钮）。无新必填 prop。不是 BPMN。
+
+- **WorkflowActionBar**：`placement: more` 的 Popconfirm 仅在确认打开时渲染，关闭时不留下 disabled 幽灵按钮。Vue/React 对称。
+
 ## v2.5.2
 
 v2.5.2：与 2.5.1 同内容。2.5.1 在 npm 上只写出元数据、tarball 404（staged 409），故再发一版。

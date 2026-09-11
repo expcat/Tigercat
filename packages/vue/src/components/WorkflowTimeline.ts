@@ -692,45 +692,46 @@ export const WorkflowActionBar = defineComponent({
                   ]
                 }
               ),
-              h(
-                Popconfirm,
-                {
-                  open: pendingMore != null,
-                  title: moreConfirmCopy?.title,
-                  description: moreExtra ? undefined : moreConfirmCopy?.description,
-                  okType: moreConfirmCopy?.okType,
-                  icon: moreConfirmCopy?.icon,
-                  placement: 'top-end',
-                  disabled: pendingMore == null,
-                  'onUpdate:open': (open: boolean) => {
-                    if (!open) {
-                      moreItem.value = null
-                      moreWrapEl.value?.querySelector('button')?.focus()
+              pendingMore
+                ? h(
+                    Popconfirm,
+                    {
+                      open: true,
+                      asChild: true,
+                      title: moreConfirmCopy?.title,
+                      description: moreExtra ? undefined : moreConfirmCopy?.description,
+                      okType: moreConfirmCopy?.okType,
+                      icon: moreConfirmCopy?.icon,
+                      placement: 'top-end',
+                      'onUpdate:open': (open: boolean) => {
+                        if (!open) {
+                          moreItem.value = null
+                          moreWrapEl.value?.querySelector('button')?.focus()
+                        }
+                      },
+                      'onOpen-change': (open: boolean) => {
+                        if (!open) {
+                          moreItem.value = null
+                          moreWrapEl.value?.querySelector('button')?.focus()
+                        }
+                      },
+                      onConfirm: (event?: { preventDefault: () => void }) => {
+                        if (!moreItem.value) return
+                        if (emitReadyAction(moreItem.value, event)) moreItem.value = null
+                      }
+                    },
+                    {
+                      default: () =>
+                        h('span', {
+                          class: 'pointer-events-none absolute inset-0',
+                          'aria-hidden': 'true'
+                        }),
+                      description: moreExtra
+                        ? () => renderPickerFields(pendingMore, moreConfirmCopy?.description)
+                        : undefined
                     }
-                  },
-                  'onOpen-change': (open: boolean) => {
-                    if (!open) {
-                      moreItem.value = null
-                      moreWrapEl.value?.querySelector('button')?.focus()
-                    }
-                  },
-                  onConfirm: (event?: { preventDefault: () => void }) => {
-                    if (!moreItem.value) return
-                    if (emitReadyAction(moreItem.value, event)) moreItem.value = null
-                  }
-                },
-                {
-                  default: () =>
-                    h('span', {
-                      class: 'pointer-events-none absolute inset-0',
-                      'aria-hidden': 'true'
-                    }),
-                  description:
-                    pendingMore && moreExtra
-                      ? () => renderPickerFields(pendingMore, moreConfirmCopy?.description)
-                      : undefined
-                }
-              )
+                  )
+                : null
             ])
           : null
 

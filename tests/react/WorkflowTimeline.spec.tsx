@@ -403,6 +403,24 @@ describe('WorkflowTimeline (React)', () => {
       expect(screen.getByRole('button', { name: 'Return' })).toBeDisabled()
       expect(screen.getByRole('button', { name: 'Add approver' })).toBeDisabled()
     })
+
+    it('does not render a nameless 0×0 overflow confirm trigger', () => {
+      const items: WorkflowActionBarItem[] = [
+        { key: 'approve', label: 'Approve', action: 'approve' },
+        { key: 'return', label: 'Return', action: 'return', placement: 'more' }
+      ]
+      render(
+        <WorkflowActionBar
+          items={items}
+          confirm
+          returnTargets={[{ key: 'start', title: 'Start' }]}
+        />
+      )
+      const toolbar = screen.getByRole('toolbar', { name: 'Workflow actions' })
+      const buttons = within(toolbar).getAllByRole('button')
+      expect(buttons.map((button) => button.textContent?.trim())).toEqual(['Approve', 'More'])
+      expect(buttons.every((button) => Boolean(button.textContent?.trim()))).toBe(true)
+    })
   })
 
   describe('Accessibility', () => {

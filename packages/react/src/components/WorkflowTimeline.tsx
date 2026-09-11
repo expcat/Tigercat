@@ -606,32 +606,31 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
               })}
             </DropdownMenu>
           </Dropdown>
-          <Popconfirm
-            open={moreItem != null}
-            onOpenChange={(open) => {
-              if (!open) {
-                setMoreItem(null)
-                const trigger = moreWrapRef.current?.querySelector('button')
-                trigger?.focus()
+          {moreItem ? (
+            <Popconfirm
+              open
+              asChild
+              onOpenChange={(open) => {
+                if (!open) {
+                  setMoreItem(null)
+                  const trigger = moreWrapRef.current?.querySelector('button')
+                  trigger?.focus()
+                }
+              }}
+              title={moreConfirmCopy?.title}
+              description={moreExtra ? undefined : moreConfirmCopy?.description}
+              descriptionContent={
+                moreExtra ? renderPickerFields(moreItem, moreConfirmCopy?.description) : undefined
               }
-            }}
-            title={moreConfirmCopy?.title}
-            description={moreExtra ? undefined : moreConfirmCopy?.description}
-            descriptionContent={
-              moreItem && moreExtra
-                ? renderPickerFields(moreItem, moreConfirmCopy?.description)
-                : undefined
-            }
-            okType={moreConfirmCopy?.okType}
-            icon={moreConfirmCopy?.icon}
-            placement="top-end"
-            disabled={moreItem == null}
-            onConfirm={(event) => {
-              if (!moreItem) return
-              if (emitReadyAction(moreItem, event)) setMoreItem(null)
-            }}>
-            <span className="pointer-events-none absolute inset-0" aria-hidden="true" />
-          </Popconfirm>
+              okType={moreConfirmCopy?.okType}
+              icon={moreConfirmCopy?.icon}
+              placement="top-end"
+              onConfirm={(event) => {
+                if (emitReadyAction(moreItem, event)) setMoreItem(null)
+              }}>
+              <span className="pointer-events-none absolute inset-0" aria-hidden="true" />
+            </Popconfirm>
+          ) : null}
         </div>
       ) : null}
     </div>
