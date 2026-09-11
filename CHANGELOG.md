@@ -2,6 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.6.1
+
+v2.6.1：与 2.6.0 同内容。2.6.0 在 npm 上 `@expcat/tigercat-core` 只写出元数据、tarball 404，故再发一版。
+
 ## v2.6.0
 
 v2.6.0：审批详情一流粘底 + Designer 纵向流程画布观感。无新必填 prop。不是 BPMN / Flowable / Camunda。
