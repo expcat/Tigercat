@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.5.4
+
+v2.5.4 无 breaking change，无新必填 prop。与 2.5.3 同内容（react tarball 补发）。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v254)。
+
 ## v2.5.3
 
 v2.5.3 无 breaking change，无新必填 prop。WorkflowActionBar 溢出菜单的确认层不再渲染隐藏 trigger。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v253)。
