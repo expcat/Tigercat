@@ -264,6 +264,22 @@ export interface ImagePreviewProps extends ImageViewerBaseProps {
 }
 
 /**
+ * Public ImageViewer surface. Same chrome as ImagePreview.
+ * `minZoom` / `maxZoom` map onto `minScale` / `maxScale`.
+ */
+export interface ImageViewerProps extends ImagePreviewProps {
+  /**
+   * Alias of `minScale`. Prefer `minScale` on new call sites.
+   */
+  minZoom?: number
+
+  /**
+   * Alias of `maxScale`. Prefer `maxScale` on new call sites.
+   */
+  maxZoom?: number
+}
+
+/**
  * ImageGroup component props
  */
 export interface ImageGroupProps {

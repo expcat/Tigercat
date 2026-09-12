@@ -24,9 +24,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Drag                  | Advanced   | `advanced`   | drag.ts                                             | ./Drag                  |
 | FileManager           | Advanced   | `advanced`   | file-manager.ts                                     | ./FileManager           |
 | ImageAnnotation       | Advanced   | `advanced`   | image-annotation.ts                                 | ./ImageAnnotation       |
-| ImageViewer           | Advanced   | `advanced`   | image-viewer.ts                                     | ./ImageViewer           |
 | InfiniteScroll        | Advanced   | `advanced`   | infinite-scroll.ts                                  | ./InfiniteScroll        |
-| Kanban                | Advanced   | `advanced`   | kanban.ts                                           | ./Kanban                |
 | MarkdownEditor        | Advanced   | `advanced`   | markdown-editor.ts                                  | ./MarkdownEditor        |
 | PrintLayout           | Advanced   | `advanced`   | print-layout.ts                                     | ./PrintLayout           |
 | PrintPageBreak        | Advanced   | `advanced`   | PrintLayout.tsx, PrintLayout.ts                     | ./PrintPageBreak        |
@@ -50,6 +48,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | ImageCropper          | Basic      | `basic`      | image.ts                                            | ./ImageCropper          |
 | ImageGroup            | Basic      | `basic`      | image.ts                                            | ./ImageGroup            |
 | ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |
+| ImageViewer           | Basic      | `basic`      | image.ts                                            | ./ImageViewer           |
 | Kbd                   | Basic      | `basic`      | kbd.ts                                              | ./Kbd                   |
 | Link                  | Basic      | `basic`      | link.ts                                             | ./Link                  |
 | Marquee               | Basic      | `basic`      | marquee.ts                                          | ./Marquee               |
@@ -87,6 +86,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | CommentThread         | Composite  | `composite`  | comment-thread.ts                                   | ./CommentThread         |
 | DataTableWithToolbar  | Composite  | `composite`  | table-toolbar.ts                                    | ./DataTableWithToolbar  |
 | FormWizard            | Composite  | `composite`  | form-wizard.ts                                      | ./FormWizard            |
+| Kanban                | Composite  | `composite`  | task-board.ts                                       | ./Kanban                |
 | NotificationCenter    | Composite  | `composite`  | notification-center.ts                              | ./NotificationCenter    |
 | SchemaForm            | Composite  | `composite`  | schema-form.ts                                      | ./SchemaForm            |
 | TaskBoard             | Composite  | `composite`  | task-board.ts                                       | ./TaskBoard             |

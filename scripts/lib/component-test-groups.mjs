@@ -44,7 +44,8 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'CropUpload',
       'ImageCropper',
       'ImageGroup',
-      'ImagePreview'
+      'ImagePreview',
+      'ImageViewer'
     ],
     form: ['CheckboxGroup', 'FormItem', 'InputGroupAddon', 'RadioGroup'],
     layout: ['Col', 'Content', 'Footer', 'Header', 'Row', 'Sidebar'],
@@ -100,6 +101,7 @@ const COMPONENT_GROUP_OVERRIDES = new Map(
       'SchemaForm',
       'NotificationCenter',
       'TaskBoard',
+      'Kanban',
       'WorkflowActionBar',
       'WorkflowTimeline',
       'WorkflowViewer',

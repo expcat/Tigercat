@@ -236,6 +236,29 @@ export const imagePreviewCloseBtnClasses =
  */
 export const imagePreviewCounterClasses = 'text-sm text-white/80 mx-2 tabular-nums'
 
+/** ImageViewer public class aliases of the ImagePreview chrome set. */
+export const imageViewerBackdropClasses = imagePreviewWrapperClasses
+export const imageViewerImgClasses = imagePreviewImgClasses
+export const imageViewerToolbarClasses = imagePreviewToolbarClasses
+export const imageViewerToolbarBtnClasses = imagePreviewToolbarBtnClasses
+export const imageViewerNavBtnClasses = imagePreviewNavBtnClasses
+export const imageViewerCloseBtnClasses = imagePreviewCloseBtnClasses
+export const imageViewerCounterClasses = imagePreviewCounterClasses
+
+/**
+ * SVG icon paths for ImagePreview / ImageViewer.
+ * Zoom/prev/next/close reuse the Image path constants; rotate paths are unique.
+ */
+export const imageViewerIcons = {
+  zoomIn: zoomInIconPath,
+  zoomOut: zoomOutIconPath,
+  rotateLeft: 'M3 10h7V3M21 14h-7v7M16.7 7.3A8 8 0 004.1 9.9M7.3 16.7A8 8 0 0019.9 14.1',
+  rotateRight: 'M14 10h7V3M10 14H3v7M7.3 7.3A8 8 0 0119.9 9.9M16.7 16.7A8 8 0 014.1 14.1',
+  close: previewCloseIconPath,
+  prev: prevIconPath,
+  next: nextIconPath
+}
+
 // ============================================================================
 // ImageCropper styles
 // ============================================================================
@@ -868,4 +891,114 @@ export function getTouchDistance(touch1: TouchPoint, touch2: TouchPoint): number
 export function toCSSSize(value: number | string | undefined): string | undefined {
   if (value === undefined) return undefined
   return typeof value === 'number' ? `${value}px` : value
+}
+
+export function normalizeRotation(rotation: number): number {
+  return ((rotation % 360) + 360) % 360
+}
+
+export interface GestureTransform {
+  scale: number
+  translateX: number
+  translateY: number
+  rotation: number
+}
+
+export function createDefaultTransform(): GestureTransform {
+  return { scale: 1, translateX: 0, translateY: 0, rotation: 0 }
+}
+
+export function getImageTransformStyle(t: GestureTransform): string {
+  return `translate(${t.translateX}px, ${t.translateY}px) scale(${t.scale}) rotate(${t.rotation}deg)`
+}
+
+export interface WheelZoomOptions {
+  minScale: number
+  maxScale: number
+  /** Zoom step per wheel delta (default 0.001) */
+  step?: number
+}
+
+export function applyWheelZoom(
+  currentScale: number,
+  deltaY: number,
+  options: WheelZoomOptions
+): number {
+  const step = options.step ?? 0.001
+  const delta = -deltaY * step
+  return clampScale(currentScale + delta, options.minScale, options.maxScale)
+}
+
+export interface PanState {
+  isPanning: boolean
+  startX: number
+  startY: number
+  startTranslateX: number
+  startTranslateY: number
+}
+
+export function createPanState(): PanState {
+  return { isPanning: false, startX: 0, startY: 0, startTranslateX: 0, startTranslateY: 0 }
+}
+
+export function startPan(
+  clientX: number,
+  clientY: number,
+  currentTranslateX: number,
+  currentTranslateY: number
+): PanState {
+  return {
+    isPanning: true,
+    startX: clientX,
+    startY: clientY,
+    startTranslateX: currentTranslateX,
+    startTranslateY: currentTranslateY
+  }
+}
+
+export interface PanResult {
+  translateX: number
+  translateY: number
+}
+
+export function movePan(pan: PanState, clientX: number, clientY: number): PanResult {
+  return {
+    translateX: pan.startTranslateX + (clientX - pan.startX),
+    translateY: pan.startTranslateY + (clientY - pan.startY)
+  }
+}
+
+export interface PinchState {
+  isPinching: boolean
+  initialDistance: number
+  initialScale: number
+}
+
+export function createPinchState(): PinchState {
+  return { isPinching: false, initialDistance: 0, initialScale: 1 }
+}
+
+export function startPinch(
+  t1: { clientX: number; clientY: number },
+  t2: { clientX: number; clientY: number },
+  currentScale: number
+): PinchState {
+  return {
+    isPinching: true,
+    initialDistance: getTouchDistance(t1, t2),
+    initialScale: currentScale
+  }
+}
+
+export function movePinch(
+  pinch: PinchState,
+  t1: { clientX: number; clientY: number },
+  t2: { clientX: number; clientY: number },
+  minScale: number,
+  maxScale: number
+): number {
+  if (pinch.initialDistance === 0) return pinch.initialScale
+  const currentDistance = getTouchDistance(t1, t2)
+  const ratio = currentDistance / pinch.initialDistance
+  return clampScale(pinch.initialScale * ratio, minScale, maxScale)
 }

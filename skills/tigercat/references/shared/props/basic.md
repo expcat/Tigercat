@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 29 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 30 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Avatar
 
@@ -227,6 +227,19 @@ Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。
 | `open?`     | `boolean`             | `-`     | Whether the preview is open                                            |
 | `minScale?` | `number`              | `0.25`  | Minimum scale factor                                                   |
 | `maxScale?` | `number`              | `5`     | Maximum scale factor                                                   |
+
+## ImageViewer
+
+`packages/core/src/types/image.ts` · `ImageViewerProps` · 4/19 props
+
+Note: Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。
+
+| Prop            | Type                  | Default | Notes                                                                                     |
+| --------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `images`        | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
+| `open?`         | `boolean`             | `-`     | Whether the preview is open                                                               |
+| `currentIndex?` | `number`              | `0`     | Current image index (for multi-image preview)                                             |
+| `showNav?`      | `boolean`             | `true`  | Whether previous/next controls and arrow-key navigation are shown. Hidden for a single... |
 
 ## Kbd
 

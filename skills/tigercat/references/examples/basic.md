@@ -28,6 +28,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | ImageCropper | -    | `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。                                                                                                                                                                                                                                   |
 | ImageGroup   | -    | 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。                                                                                                                                                                                                                   |
 | ImagePreview | -    | `images` 必填（`string \| { src, alt? }`）。未传 `open` 视为关。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。                                                                                                              |
+| ImageViewer  | -    | Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。                                                                                                                                                                   |
 | Kbd          | -    | 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。                                                                                                                                                                               |
 | Link         | -    | `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。                                                                                                                                                                    |
 | Marquee      | -    | `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。 |
@@ -71,5 +72,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | Watermark    | `<Watermark content="机密" />`                                                                       | `<Watermark content="机密" />`                                                                       |
 
 标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：ConfigProvider, Divider, Empty, ImageGroup.
+
+Compat aliases (still importable; prefer the keeper in new code): `ImageViewer` → `ImagePreview`. Public names remain; examples and new code use the keeper.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -242,8 +242,8 @@ export * from './chart'
 // PrintLayout utilities (v0.9.0+)
 export * from './print-layout-utils'
 
-// ImageViewer utilities (v0.9.0+)
-export * from './image-viewer-utils'
+// ImageViewer utilities live in image-utils (same public names).
+// `image-viewer-utils.ts` remains a re-export for deep source imports.
 export * from './image-lightbox'
 
 // Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)

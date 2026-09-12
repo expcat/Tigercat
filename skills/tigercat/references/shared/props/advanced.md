@@ -7,7 +7,7 @@ description: Compact generated Tigercat Advanced props reference
 
 # Advanced Props
 
-编辑器、虚拟化、文件、拖拽、看板和高级工具组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+编辑器、虚拟化、文件、拖拽、看板和高级工具组件。 共 11 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## CodeEditor
 
@@ -56,19 +56,6 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 | `tool?`       | `ImageAnnotationTool` | `-`     | -                                                                             |
 | `selectedId?` | `string`              | `-`     | Controlled selected id. `undefined` is uncontrolled; `''` is controlled none. |
 
-## ImageViewer
-
-`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 4/19 props
-
-Note: Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。
-
-| Prop            | Type                  | Default | Notes                                                                                     |
-| --------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `images`        | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
-| `open?`         | `boolean`             | `-`     | Whether the preview is open                                                               |
-| `currentIndex?` | `number`              | `0`     | Current image index (for multi-image preview)                                             |
-| `showNav?`      | `boolean`             | `true`  | Whether previous/next controls and arrow-key navigation are shown. Hidden for a single... |
-
 ## InfiniteScroll
 
 `packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/15 props
@@ -79,23 +66,6 @@ Note: Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`.
 | `loading?`   | `boolean`                    | `-`     | Whether a load is currently in progress                    |
 | `direction?` | `'vertical' \| 'horizontal'` | `-`     | Scroll direction                                           |
 | `inverse?`   | `boolean`                    | `-`     | Inverse scroll (load at the start edge, e.g. chat history) |
-
-## Kanban
-
-`packages/core/src/types/kanban.ts` · `KanbanProps` · 4/22 props
-
-Uses: `TaskBoard`.
-
-Note: Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
-
-| Prop             | Type                                      | Default | Notes                                                                                      |
-| ---------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `swimlanes?`     | `TaskBoardSwimlane[]`                     | `-`     | Group cards inside each column by `swimlaneField`. Not a horizontal row across columns.    |
-| `swimlaneField?` | `string`                                  | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
-| `columns?`       | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
-
-Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 
 ## MarkdownEditor
 

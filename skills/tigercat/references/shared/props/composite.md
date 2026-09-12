@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 14 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -95,6 +95,23 @@ Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finis
 | `clickable?`  | `boolean`             | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
 
 Events/callback props: `onChange?`, `onFinish?`.
+
+## Kanban
+
+`packages/core/src/types/task-board.ts` · `KanbanProps` · 4/22 props
+
+Uses: `TaskBoard`.
+
+Note: Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
+
+| Prop             | Type                                      | Default | Notes                                                                                      |
+| ---------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `swimlanes?`     | `TaskBoardSwimlane[]`                     | `-`     | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
+| `swimlaneField?` | `string`                                  | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
+| `columns?`       | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
+
+Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 
 ## NotificationCenter
 

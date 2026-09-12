@@ -324,9 +324,7 @@
         "Drag",
         "FileManager",
         "ImageAnnotation",
-        "ImageViewer",
         "InfiniteScroll",
-        "Kanban",
         "MarkdownEditor",
         "PrintLayout",
         "PrintPageBreak",
@@ -358,6 +356,7 @@
         "ImageCropper",
         "ImageGroup",
         "ImagePreview",
+        "ImageViewer",
         "Kbd",
         "Link",
         "Marquee",
@@ -411,6 +410,7 @@
         "CommentThread",
         "DataTableWithToolbar",
         "FormWizard",
+        "Kanban",
         "NotificationCenter",
         "SchemaForm",
         "TaskBoard",
@@ -650,26 +650,6 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
-    "ImageViewer": {
-      "name": "ImageViewer",
-      "aliases": [],
-      "category": "Advanced",
-      "slug": "advanced",
-      "testGroup": "advanced",
-      "packageSubpath": "./ImageViewer",
-      "packageTarget": "ImagePreview",
-      "typeSource": "packages/core/src/types/image-viewer.ts",
-      "sourceFiles": ["packages/core/src/types/image-viewer.ts"],
-      "propsInterfaces": ["ImageViewerProps"],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/advanced.md",
-        "examples": "skills/tigercat/references/examples/advanced.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
     "InfiniteScroll": {
       "name": "InfiniteScroll",
       "aliases": ["无限滚动"],
@@ -681,26 +661,6 @@
       "typeSource": "packages/core/src/types/infinite-scroll.ts",
       "sourceFiles": ["packages/core/src/types/infinite-scroll.ts"],
       "propsInterfaces": ["InfiniteScrollProps"],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/advanced.md",
-        "examples": "skills/tigercat/references/examples/advanced.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "Kanban": {
-      "name": "Kanban",
-      "aliases": [],
-      "category": "Advanced",
-      "slug": "advanced",
-      "testGroup": "advanced",
-      "packageSubpath": "./Kanban",
-      "packageTarget": "TaskBoard",
-      "typeSource": "packages/core/src/types/kanban.ts",
-      "sourceFiles": ["packages/core/src/types/kanban.ts"],
-      "propsInterfaces": ["KanbanProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -1164,6 +1124,26 @@
       "typeSource": "packages/core/src/types/image.ts",
       "sourceFiles": ["packages/core/src/types/image.ts"],
       "propsInterfaces": ["ImagePreviewProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageViewer": {
+      "name": "ImageViewer",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ImageViewer",
+      "packageTarget": "ImagePreview",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": ["packages/core/src/types/image.ts"],
+      "propsInterfaces": ["ImageViewerProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -1904,6 +1884,26 @@
       "typeSource": "packages/core/src/types/form-wizard.ts",
       "sourceFiles": ["packages/core/src/types/form-wizard.ts"],
       "propsInterfaces": ["FormWizardProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Kanban": {
+      "name": "Kanban",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./Kanban",
+      "packageTarget": "TaskBoard",
+      "typeSource": "packages/core/src/types/task-board.ts",
+      "sourceFiles": ["packages/core/src/types/task-board.ts"],
+      "propsInterfaces": ["KanbanProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

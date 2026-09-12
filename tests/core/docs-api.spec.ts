@@ -32,31 +32,26 @@ describe('mergeHeritageMembers', () => {
         {
           name: 'DonutChartProps',
           heritage: ['PieChartProps'],
-          members: [row('innerRadiusRatio?'), row('animated?')]
+          members: []
         }
       ]
     ])
 
     const merged = mergeHeritageMembers('DonutChartProps', details)
 
-    expect(merged.map((member) => member.name)).toEqual([
-      'innerRadiusRatio?',
-      'animated?',
-      'data',
-      'innerRadius?'
-    ])
+    expect(merged.map((member) => member.name)).toEqual(['data', 'innerRadius?'])
     expect(merged.find((member) => member.name === 'data')?.origin).toBe('inherited')
-    expect(merged.find((member) => member.name === 'animated?')?.origin).toBe('own')
+    expect(merged.every((member) => member.origin === 'inherited')).toBe(true)
   })
 })
 
 describe('getVisiblePropRows', () => {
-  it('keeps required inherited data and thin-extend own fields', () => {
+  it('keeps required inherited data and Donut priority hole fields', () => {
     const visible = getVisiblePropRows('DonutChart', [
-      row('innerRadiusRatio?'),
-      row('centerValue?'),
-      row('centerLabel?'),
-      row('animated?'),
+      row('innerRadiusRatio?', 'inherited'),
+      row('centerValue?', 'inherited'),
+      row('centerLabel?', 'inherited'),
+      row('animated?', 'inherited'),
       row('data', 'inherited'),
       row('width?', 'inherited'),
       row('height?', 'inherited'),

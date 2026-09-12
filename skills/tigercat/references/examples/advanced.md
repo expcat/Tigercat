@@ -13,8 +13,6 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 | Component    | Uses                                                          | Notes                                                                                                                                                                                                                                                                             |
 | ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ImageViewer  | -                                                             | Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。                                                                                                                                        |
-| Kanban       | `TaskBoard`                                                   | Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。                                                                                                    |
 | VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。 |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
@@ -32,7 +30,5 @@ description: Compact Tigercat Advanced Vue and React usage routes
 | VirtualTable    | `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />`           | `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />` |
 
 标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drag, PrintPageBreak.
-
-Compat aliases (still importable; prefer the keeper in new code): `ImageViewer` → `ImagePreview`; `Kanban` → `TaskBoard`. Public names remain; examples and new code use the keeper.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

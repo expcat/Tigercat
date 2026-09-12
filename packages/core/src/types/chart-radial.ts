@@ -139,29 +139,11 @@ export interface PieChartProps
   animated?: boolean
 }
 
-export interface DonutChartProps extends PieChartProps {
-  /**
-   * Inner radius ratio based on outer radius
-   * @default 0.6
-   */
-  innerRadiusRatio?: number
-
-  /**
-   * Text shown as the main value in the donut center
-   */
-  centerValue?: string | number
-
-  /**
-   * Descriptive label shown below centerValue in the donut center
-   */
-  centerLabel?: string
-
-  /**
-   * Enable entrance animation (fade + scale)
-   * @default false
-   */
-  animated?: boolean
-}
+/**
+ * Donut is PieChart with a default `innerRadiusRatio` of 0.6.
+ * Hole/center/animation fields live on {@link PieChartProps}.
+ */
+export interface DonutChartProps extends PieChartProps {}
 
 export interface RadarChartDatum {
   value: number

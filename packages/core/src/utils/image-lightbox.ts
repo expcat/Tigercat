@@ -4,8 +4,8 @@
  */
 
 import { isBrowser } from './env'
-import { clampScale } from './image-utils'
 import {
+  clampScale,
   createPanState,
   createPinchState,
   movePan,
@@ -14,7 +14,7 @@ import {
   startPinch,
   type PanState,
   type PinchState
-} from './image-viewer-utils'
+} from './image-utils'
 import type { ImageLightboxItem, PreviewNavState } from '../types/image'
 
 export const LIGHTBOX_MIN_SCALE = 0.25

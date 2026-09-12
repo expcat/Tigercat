@@ -110,12 +110,12 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 Note: Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieChart + `innerRadiusRatio`.
 
-| Prop                | Type               | Default | Notes                                                         |
-| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
-| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                    |
-| `innerRadiusRatio?` | `number`           | `0.6`   | Inner radius ratio based on outer radius                      |
-| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the donut center              |
-| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue in the donut center |
+| Prop                | Type               | Default | Notes                                                                                      |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                                                 |
+| `innerRadiusRatio?` | `number`           | `-`     | Inner radius as a fraction of the resolved outer radius. Used by Donut when `innerRadiu... |
+| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the hole (donut).                                          |
+| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue.                                                 |
 
 ## FunnelChart
 
