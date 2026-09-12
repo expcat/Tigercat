@@ -93,7 +93,7 @@ export function useCartesianSeriesPoints<T>({
   )
 
   const handlePointKeydown = useCallback(
-    (event: React.KeyboardEvent, seriesIndex: number, pointIndex: number) => {
+    (event: React.KeyboardEvent<SVGElement>, seriesIndex: number, pointIndex: number) => {
       if (isChartNavigationKey(event.key)) {
         event.preventDefault()
         const next = nextChartPointRef({ seriesIndex, pointIndex }, event.key, getFlatPoints())
@@ -112,7 +112,7 @@ export function useCartesianSeriesPoints<T>({
           onPointActivate(seriesIndex, pointIndex)
         } else {
           showPointTooltipFromElement(
-            event.currentTarget as unknown as SVGGraphicsElement,
+            event.currentTarget as SVGGraphicsElement,
             seriesIndex,
             pointIndex
           )
