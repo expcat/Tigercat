@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { DOC_COMPONENT_ALIASES } from '../../scripts/lib/public-components.mjs'
 import {
   MAX_COMPACT_PROPS,
   buildRequiredPropSnippet,
@@ -126,6 +127,18 @@ describe('shouldUseFrameworkRuntimeProps', () => {
     expect(shouldUseFrameworkRuntimeProps('PieChartProps', coreByName, ['CorePieChartProps'])).toBe(
       false
     )
+  })
+})
+
+describe('DOC_COMPONENT_ALIASES', () => {
+  it('demotes only the three compat component names, not subpath-only aliases', () => {
+    expect(Object.fromEntries(DOC_COMPONENT_ALIASES)).toEqual({
+      ImageViewer: 'ImagePreview',
+      Kanban: 'TaskBoard',
+      DonutChart: 'PieChart'
+    })
+    expect(DOC_COMPONENT_ALIASES.has('TabPane')).toBe(false)
+    expect(DOC_COMPONENT_ALIASES.has('WorkflowActionBar')).toBe(false)
   })
 })
 

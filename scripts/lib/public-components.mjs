@@ -439,7 +439,7 @@ export const COMPONENT_ROUTE_ALIASES = {
   折线图: ['LineChart'],
   柱状图: ['BarChart'],
   饼图: ['PieChart'],
-  环形图: ['DonutChart'],
+  环形图: ['PieChart'],
   面积图: ['AreaChart'],
   散点图: ['ScatterChart'],
   雷达图: ['RadarChart'],
@@ -450,8 +450,10 @@ export const COMPONENT_ROUTE_ALIASES = {
   矩形树图: ['TreeMapChart'],
   甘特图: ['Gantt'],
   组织架构图: ['OrgChart'],
-  看板: ['Kanban'],
+  看板: ['TaskBoard'],
   任务看板: ['TaskBoard'],
+  全屏看图: ['ImagePreview'],
+  图片预览: ['ImagePreview'],
   聊天窗口: ['ChatWindow'],
   评论: ['CommentThread'],
   活动流: ['ActivityFeed'],
@@ -542,6 +544,17 @@ export const TIGERCAT_TOPIC_ROUTES = {
     ]
   }
 }
+
+/**
+ * Compat public names that remain importable but should not be taught as
+ * first-class usage in generated docs. Distinct from PACKAGE_EXPORT_TARGET_ALIASES,
+ * which also maps subcomponents (TabPane → Tabs) and command roots.
+ */
+export const DOC_COMPONENT_ALIASES = new Map([
+  ['ImageViewer', 'ImagePreview'],
+  ['Kanban', 'TaskBoard'],
+  ['DonutChart', 'PieChart']
+])
 
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['Fullscreen', 'FullscreenButton'],

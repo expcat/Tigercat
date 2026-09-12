@@ -77,7 +77,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'fit?',
     'height?'
   ],
-  ImagePreview: ['images', 'open?', 'currentIndex?', 'maskClosable?', 'minScale?', 'locale?'],
+  ImagePreview: ['images', 'open?', 'minScale?', 'maxScale?', 'currentIndex?', 'maskClosable?'],
   ImageViewer: ['images', 'open?', 'currentIndex?', 'showNav?', 'minZoom?', 'locale?'],
   ImageCompare: [
     'beforeSrc?',
@@ -582,6 +582,9 @@ export const COMPONENT_PROP_PRIORITY = {
     'gradient?'
   ],
   PieChart: [
+    'innerRadiusRatio?',
+    'centerValue?',
+    'centerLabel?',
     'showLabels?',
     'labelPosition?',
     'startAngle?',
@@ -790,10 +793,12 @@ export const COMPONENT_PROP_PRIORITY = {
   ],
   TaskBoard: [
     'columns?',
-    'filterText?',
-    'hiddenColumns?',
+    'swimlanes?',
+    'swimlaneField?',
     'showCardCount?',
     'allowAddCard?',
+    'filterText?',
+    'hiddenColumns?',
     'enforceWipLimit?',
     'locale?'
   ],

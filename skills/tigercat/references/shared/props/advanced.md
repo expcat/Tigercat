@@ -60,7 +60,7 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 `packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 4/19 props
 
-Note: ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。
+Note: Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。
 
 | Prop            | Type                  | Default | Notes                                                                                     |
 | --------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
@@ -86,7 +86,7 @@ Note: ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`
 
 Uses: `TaskBoard`.
 
-Note: Kanban 是 TaskBoard 薄封装，默认 `showCardCount` / `allowAddCard`。`swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
+Note: Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
 
 | Prop             | Type                                      | Default | Notes                                                                                      |
 | ---------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |

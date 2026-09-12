@@ -134,16 +134,16 @@ Events/callback props: `onChange?`, `onSubmit?`, `onReset?`.
 
 `packages/core/src/types/task-board.ts` · `TaskBoardProps` · 4/22 props
 
-Uses: `ConfigProvider`, `task-board drag utilities`, `kanban utilities`.
+Uses: `ConfigProvider`, `task-board drag utilities`.
 
-Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。
+Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。Kanban 是默认值别名，新代码用 TaskBoard。
 
-| Prop             | Type                   | Default | Notes                                                                                      |
-| ---------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns?`       | `TaskBoardColumn[]`    | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `filterText?`    | `string`               | `-`     | Quick filter / search term applied to card titles. When non-empty, only cards whose tit... |
-| `hiddenColumns?` | `(string \| number)[]` | `-`     | Column IDs to hide from the board (e.g. for saved views).                                  |
-| `showCardCount?` | `boolean`              | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
+| Prop             | Type                  | Default | Notes                                                                                      |
+| ---------------- | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `columns?`       | `TaskBoardColumn[]`   | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `swimlanes?`     | `TaskBoardSwimlane[]` | `-`     | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
+| `swimlaneField?` | `string`              | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
+| `showCardCount?` | `boolean`             | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 

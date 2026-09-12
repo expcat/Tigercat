@@ -219,14 +219,14 @@ Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再
 
 `packages/core/src/types/image.ts` · `ImagePreviewProps` · 4/16 props
 
-Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。与 ImageViewer 同一 dialog。到头 disable；空列表关闭。
+Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。
 
-| Prop            | Type                  | Default | Notes                                                                  |
-| --------------- | --------------------- | ------- | ---------------------------------------------------------------------- |
-| `images`        | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog. |
-| `open?`         | `boolean`             | `-`     | Whether the preview is open                                            |
-| `currentIndex?` | `number`              | `0`     | Current image index (for multi-image preview)                          |
-| `maskClosable?` | `boolean`             | `true`  | Whether clicking the mask closes the preview                           |
+| Prop        | Type                  | Default | Notes                                                                  |
+| ----------- | --------------------- | ------- | ---------------------------------------------------------------------- |
+| `images`    | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog. |
+| `open?`     | `boolean`             | `-`     | Whether the preview is open                                            |
+| `minScale?` | `number`              | `0.25`  | Minimum scale factor                                                   |
+| `maxScale?` | `number`              | `5`     | Maximum scale factor                                                   |
 
 ## Kbd
 

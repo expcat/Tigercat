@@ -108,6 +108,8 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 `packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 4/39 props
 
+Note: Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieChart + `innerRadiusRatio`.
+
 | Prop                | Type               | Default | Notes                                                         |
 | ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
 | `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                    |
@@ -185,12 +187,14 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 `packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/39 props
 
-| Prop             | Type                    | Default        | Notes                                                                                      |
-| ---------------- | ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| `data`           | `PieChartDatum[]`       | `-`            | Chart data                                                                                 |
-| `showLabels?`    | `boolean`               | `false`        | Whether to show labels                                                                     |
-| `labelPosition?` | `'inside' \| 'outside'` | `'inside'`     | Label position: inside the slice or outside with leader lines                              |
-| `startAngle?`    | `number`                | `-Math.PI / 2` | Start angle in radians. `0` is 3 o'clock; default is 12 o'clock. Sweep is clockwise bec... |
+Note: `innerRadiusRatio` 做环形（0.6 即原 Donut）。`centerValue`/`centerLabel` 写在洞里。DonutChart 是默认 `innerRadiusRatio=0.6` 的别名，新代码用 PieChart。
+
+| Prop                | Type               | Default | Notes                                                                                      |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                                                 |
+| `innerRadiusRatio?` | `number`           | `-`     | Inner radius as a fraction of the resolved outer radius. Used by Donut when `innerRadiu... |
+| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the hole (donut).                                          |
+| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue.                                                 |
 
 ## RadarChart
 

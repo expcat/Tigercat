@@ -30,6 +30,7 @@ import {
 import {
   CATEGORIES,
   CATEGORY_SLUGS,
+  DOC_COMPONENT_ALIASES,
   buildTigercatContext7,
   buildPublicComponentEntries,
   formatComponentIndexType,
@@ -245,11 +246,19 @@ const COMPONENT_USAGE_NOTES = {
   },
   ImagePreview: {
     notes:
-      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。与 ImageViewer 同一 dialog。到头 disable；空列表关闭。'
+      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。'
   },
   ImageViewer: {
     notes:
-      'ImagePreview 别名。`minZoom`/`maxZoom` 映射 `minScale`/`maxScale`。`showNav={false}` 键盘也不切图。'
+      'Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。'
+  },
+  PieChart: {
+    notes:
+      '`innerRadiusRatio` 做环形（0.6 即原 Donut）。`centerValue`/`centerLabel` 写在洞里。DonutChart 是默认 `innerRadiusRatio=0.6` 的别名，新代码用 PieChart。'
+  },
+  DonutChart: {
+    notes:
+      'Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieChart + `innerRadiusRatio`.'
   },
   ImageCompare: {
     notes:
@@ -409,14 +418,14 @@ const COMPONENT_USAGE_NOTES = {
       '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
   },
   TaskBoard: {
-    uses: ['ConfigProvider', 'task-board drag utilities', 'kanban utilities'],
+    uses: ['ConfigProvider', 'task-board drag utilities'],
     notes:
-      '过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。'
+      '过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。Kanban 是默认值别名，新代码用 TaskBoard。'
   },
   Kanban: {
     uses: ['TaskBoard'],
     notes:
-      'Kanban 是 TaskBoard 薄封装，默认 `showCardCount` / `allowAddCard`。`swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。'
+      'Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。'
   }
 }
 
@@ -559,7 +568,6 @@ const COMPONENT_SNIPPETS = {
     WorkflowDetailShell:
       '<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>',
     TaskBoard: '<TaskBoard :columns="columns" />',
-    Kanban: '<Kanban :columns="columns" />',
     VirtualTable:
       '<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />',
     AreaChart: '<AreaChart :data="data" />',
@@ -569,7 +577,6 @@ const COMPONENT_SNIPPETS = {
     ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />',
     ChartLegend: '<ChartLegend :items="items" />',
     ChartSeries: '<ChartSeries :data="data" type="bar"><slot /></ChartSeries>',
-    DonutChart: '<DonutChart :data="data" />',
     FunnelChart: '<FunnelChart :data="data" />',
     Gantt: '<Gantt :data="tasks" />',
     GaugeChart: '<GaugeChart :value="72" />',
@@ -623,7 +630,6 @@ const COMPONENT_SNIPPETS = {
     SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
     WorkflowDetailShell: '<WorkflowDetailShell form={form} tabs={tabs} action={actions} />',
     TaskBoard: '<TaskBoard columns={columns} />',
-    Kanban: '<Kanban columns={columns} />',
     VirtualTable:
       '<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />',
     AreaChart: '<AreaChart data={data} />',
@@ -633,7 +639,6 @@ const COMPONENT_SNIPPETS = {
     ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />',
     ChartLegend: '<ChartLegend items={items} />',
     ChartSeries: '<ChartSeries data={data} type="bar">{marks}</ChartSeries>',
-    DonutChart: '<DonutChart data={data} />',
     FunnelChart: '<FunnelChart data={data} />',
     Gantt: '<Gantt data={tasks} />',
     GaugeChart: '<GaugeChart value={72} />',
@@ -1227,7 +1232,10 @@ function generateExamples(category, componentEntries, interfaceDetails) {
   markdownText += `${EXAMPLE_NOTES[category] || 'Use the props reference for exact field names.'}\n\n`
   markdownText += generateComponentNotesTable(components)
 
-  const snippetRows = components
+  const aliasComponents = components.filter((component) => DOC_COMPONENT_ALIASES.has(component))
+  const primaryComponents = components.filter((component) => !DOC_COMPONENT_ALIASES.has(component))
+
+  const snippetRows = primaryComponents
     .map((component) => {
       const requiredNames = getRequiredPropNames(
         entriesByComponent.get(component),
@@ -1245,7 +1253,7 @@ function generateExamples(category, componentEntries, interfaceDetails) {
         !isEmptyComponentSnippet(row.component, row.vue) ||
         !isEmptyComponentSnippet(row.component, row.react)
     )
-  const trivialComponents = components.filter(
+  const trivialComponents = primaryComponents.filter(
     (component) => !snippetRows.some((row) => row.component === component)
   )
 
@@ -1261,6 +1269,15 @@ function generateExamples(category, componentEntries, interfaceDetails) {
 
   if (trivialComponents.length > 0) {
     markdownText += `标准用法 \`<Component />\`（Vue/React 同名，绑定差异见 \`shared/patterns/common.md\`）：${trivialComponents.join(', ')}.\n\n`
+  }
+
+  if (aliasComponents.length > 0) {
+    markdownText +=
+      'Compat aliases (still importable; prefer the keeper in new code): ' +
+      aliasComponents
+        .map((component) => `\`${component}\` → \`${DOC_COMPONENT_ALIASES.get(component)}\``)
+        .join('; ') +
+      '. Public names remain; examples and new code use the keeper.\n\n'
   }
 
   markdownText +=
