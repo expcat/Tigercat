@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DonutChart } from '@expcat/tigercat-vue/DonutChart'
+import { DonutChart } from '@expcat/tigercat-vue/DonutChart' // alias of PieChart
 import type { PieChartDatum } from '@expcat/tigercat-vue'
 
 const data: PieChartDatum[] = [

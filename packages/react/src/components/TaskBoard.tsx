@@ -667,3 +667,17 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 }
 
 export default TaskBoard
+
+export type KanbanProps = TaskBoardProps
+
+/**
+ * Thin wrapper around TaskBoard with Kanban-friendly defaults
+ * (`showCardCount` / `allowAddCard` default true). Prefer TaskBoard in new code.
+ */
+export const Kanban: React.FC<KanbanProps> = ({
+  showCardCount = true,
+  allowAddCard = true,
+  ...props
+}) => {
+  return <TaskBoard showCardCount={showCardCount} allowAddCard={allowAddCard} {...props} />
+}

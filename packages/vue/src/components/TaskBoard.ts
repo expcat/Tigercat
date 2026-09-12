@@ -7,7 +7,8 @@ import {
   PropType,
   onMounted,
   onBeforeUnmount,
-  getCurrentInstance
+  getCurrentInstance,
+  type Component
 } from 'vue'
 import {
   classNames,
@@ -648,3 +649,30 @@ export const TaskBoard = defineComponent({
 })
 
 export default TaskBoard
+
+export type VueKanbanProps = VueTaskBoardProps
+
+/**
+ * Thin wrapper around TaskBoard with Kanban-friendly defaults
+ * (`showCardCount` / `allowAddCard` default true). Prefer TaskBoard in new code.
+ */
+export const Kanban = defineComponent({
+  name: 'TigerKanban',
+  inheritAttrs: false,
+  props: {
+    showCardCount: { type: Boolean, default: true },
+    allowAddCard: { type: Boolean, default: true }
+  },
+  setup(props, { attrs, slots }) {
+    return () =>
+      h(
+        TaskBoard as unknown as Component,
+        {
+          ...attrs,
+          showCardCount: props.showCardCount,
+          allowAddCard: props.allowAddCard
+        },
+        slots
+      )
+  }
+})

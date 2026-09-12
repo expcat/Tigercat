@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
-import { ImageViewer } from '@expcat/tigercat-react/ImageViewer'
+import { ImageViewer } from '@expcat/tigercat-react/ImageViewer' // alias of ImagePreview
 
 const images = [
   { src: 'https://picsum.photos/seed/tiger-viewer-1/800/600', alt: '林间小径' },

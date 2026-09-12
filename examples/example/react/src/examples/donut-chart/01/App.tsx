@@ -1,4 +1,4 @@
-import { DonutChart } from '@expcat/tigercat-react/DonutChart'
+import { DonutChart } from '@expcat/tigercat-react/DonutChart' // alias of PieChart
 import type { PieChartDatum } from '@expcat/tigercat-react'
 
 const data: PieChartDatum[] = [

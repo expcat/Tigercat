@@ -2,6 +2,17 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.7.0
+
+v2.7.0：组件瘦身。三组薄别名收进保留件（ImageViewer→ImagePreview、Kanban→TaskBoard、DonutChart→PieChart）；CSV escape 与看板 swimlane helpers 单源。公开别名仍可 import。无新必填 prop。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。
+
+- **ImageViewer**：实现迁入 `ImagePreview`；`./ImageViewer` 子路径指向 Preview dist。`minZoom`/`maxZoom` 映射不变。新代码用 ImagePreview。Vue/React 对称。
+- **Kanban**：实现迁入 `TaskBoard`；`./Kanban` 子路径指向 TaskBoard dist。默认 `showCardCount`/`allowAddCard` 仍为 true。新代码用 TaskBoard。Vue/React 对称。
+- **DonutChart**：实现迁入 `PieChart`；`./DonutChart` 子路径指向 PieChart dist。默认 `innerRadiusRatio` 仍 0.6。新代码用 PieChart。Vue/React 对称。
+- **core**：Table CSV 与 DataExport CSV 共用 `escapeCsvValue`；`kanban-*` 类名/泳道 helpers 实现并入 `task-board-view`（公开名不变）。
+- **WorkflowDetailShell**：header / action 槽改为 `div[data-slot]`（壳已是 `role="region"`，不再嵌套 banner/contentinfo landmark）。粘底布局 class 不变。Vue/React 对称。
+- 行为变化（非 breaking、无新必填 prop）见 [docs/MIGRATION-2.7.md](docs/MIGRATION-2.7.md)。
+
 ## v2.6.1
 
 v2.6.1：与 2.6.0 同内容。2.6.0 在 npm 上 `@expcat/tigercat-core` 只写出元数据、tarball 404，故再发一版。

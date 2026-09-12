@@ -46,7 +46,8 @@ import {
   zoomInIconPath,
   zoomOutIconPath,
   type GestureTransform,
-  type ImagePreviewProps as CoreImagePreviewProps
+  type ImagePreviewProps as CoreImagePreviewProps,
+  type ImageViewerProps as CoreImageViewerProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
@@ -464,5 +465,46 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         </div>
       )}
     </div>
+  )
+}
+
+export interface ImageViewerProps extends CoreImageViewerProps {
+  onOpenChange?: (open: boolean) => void
+  onClose?: () => void
+  onCurrentIndexChange?: (index: number) => void
+  onScaleChange?: (scale: number) => void
+}
+
+/**
+ * Configuration alias of ImagePreview. Same dialog tree; `minZoom`/`maxZoom`
+ * map onto `minScale`/`maxScale`. Prefer ImagePreview in new code.
+ */
+export const ImageViewer: React.FC<ImageViewerProps> = ({
+  minZoom,
+  maxZoom,
+  minScale,
+  maxScale,
+  onOpenChange,
+  onClose,
+  onCurrentIndexChange,
+  onScaleChange,
+  ...rest
+}) => {
+  const scaleRange = resolveLightboxScaleRange({ minScale, maxScale, minZoom, maxZoom })
+
+  const handleOpenChange = (next: boolean) => {
+    onOpenChange?.(next)
+    if (!next) onClose?.()
+  }
+
+  return (
+    <ImagePreview
+      {...(rest as ImagePreviewProps)}
+      minScale={scaleRange.minScale}
+      maxScale={scaleRange.maxScale}
+      onOpenChange={handleOpenChange}
+      onCurrentIndexChange={onCurrentIndexChange}
+      onScaleChange={onScaleChange}
+    />
   )
 }

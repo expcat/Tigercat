@@ -56,6 +56,22 @@ export function sanitizeDataExportText(value: unknown): string {
   return str
 }
 
+function needsCsvQuotes(value: string): boolean {
+  return /[",\n\r]/.test(value)
+}
+
+/**
+ * Escape a value for RFC 4180 CSV output (quotes, commas, newlines).
+ * Shared by Table CSV and DataExport CSV.
+ */
+export function escapeCsvValue(value: unknown): string {
+  const str = sanitizeDataExportText(formatDataExportCellValue(value))
+  if (needsCsvQuotes(str)) {
+    return `"${str.replace(/"/g, '""')}"`
+  }
+  return str
+}
+
 /**
  * Action columns that only have `render` and no record field are not exported.
  */

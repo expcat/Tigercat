@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.7.0
+
+v2.7.0 无新必填 prop。ImageViewer / Kanban / DonutChart 仍是公开别名，实现收进 ImagePreview / TaskBoard / PieChart；子路径指向保留件 dist。不要 deep-import 已删除的 `dist/components/ImageViewer.mjs` 等文件名。工作流 API 不变。不是 BPMN。逐步说明见 [MIGRATION-2.7.md](MIGRATION-2.7.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v270)。
+
 ## v2.6.0
 
 v2.6.0 无新必填 prop。DetailShell 根增加 `h-full`（宿主给有界高度，勿 magic rem）；Designer Inspector 列始终在（未选中显示 `inspectorEmpty`）；插入点可见字形为 `+`（可访问名不变）；ActionBar 窄屏 nowrap 横滑。不是 BPMN。逐步说明见 [MIGRATION-2.6.md](MIGRATION-2.6.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v260)。

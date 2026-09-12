@@ -24,7 +24,7 @@ describe('WorkflowDetailShell (React)', () => {
     expect(root.querySelector('[data-slot="header"]')).toHaveTextContent('Leave request')
     expect(root.querySelector('[data-slot="form"]')).toHaveTextContent('Form body')
     expect(root.querySelector('[data-slot="tabs"]')).toHaveTextContent('Timeline tab')
-    expect(root.querySelector('[data-slot="action"]')?.tagName).toBe('FOOTER')
+    expect(root.querySelector('[data-slot="action"]')?.tagName).toBe('DIV')
     expect(screen.getByRole('button', { name: 'Approve' })).toBeInTheDocument()
     expect(root.querySelector('[data-slot="body"]')?.nextElementSibling).toBe(
       root.querySelector('[data-slot="action"]')
@@ -47,7 +47,7 @@ describe('WorkflowDetailShell (React)', () => {
     const action = root.querySelector('[data-slot="action"]') as HTMLElement
     expect(action).toBeTruthy()
     expect(root.parentElement).toBe(host)
-    expect(action.tagName).toBe('FOOTER')
+    expect(action.tagName).toBe('DIV')
     expect(root.querySelector('[data-slot="body"]')?.contains(action)).toBe(false)
   })
 

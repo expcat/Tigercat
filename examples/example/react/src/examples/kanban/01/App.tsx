@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Kanban } from '@expcat/tigercat-react/Kanban'
+import { Kanban } from '@expcat/tigercat-react/Kanban' // alias of TaskBoard
 import type { TaskBoardColumn, TaskBoardSwimlane } from '@expcat/tigercat-core'
 
 const swimlanes: TaskBoardSwimlane[] = [

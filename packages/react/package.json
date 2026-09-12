@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-react",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "React components for Tigercat UI library",
   "license": "MIT",
   "author": "Yizhe Wang",
@@ -295,9 +295,9 @@
       "default": "./dist/components/Divider.mjs"
     },
     "./DonutChart": {
-      "types": "./dist/components/DonutChart.d.mts",
-      "import": "./dist/components/DonutChart.mjs",
-      "default": "./dist/components/DonutChart.mjs"
+      "types": "./dist/components/PieChart.d.mts",
+      "import": "./dist/components/PieChart.mjs",
+      "default": "./dist/components/PieChart.mjs"
     },
     "./Drag": {
       "types": "./dist/components/Drag.d.mts",
@@ -435,9 +435,9 @@
       "default": "./dist/components/ImagePreview.mjs"
     },
     "./ImageViewer": {
-      "types": "./dist/components/ImageViewer.d.mts",
-      "import": "./dist/components/ImageViewer.mjs",
-      "default": "./dist/components/ImageViewer.mjs"
+      "types": "./dist/components/ImagePreview.d.mts",
+      "import": "./dist/components/ImagePreview.mjs",
+      "default": "./dist/components/ImagePreview.mjs"
     },
     "./InfiniteScroll": {
       "types": "./dist/components/InfiniteScroll.d.mts",
@@ -470,9 +470,9 @@
       "default": "./dist/components/InputOTP.mjs"
     },
     "./Kanban": {
-      "types": "./dist/components/Kanban.d.mts",
-      "import": "./dist/components/Kanban.mjs",
-      "default": "./dist/components/Kanban.mjs"
+      "types": "./dist/components/TaskBoard.d.mts",
+      "import": "./dist/components/TaskBoard.mjs",
+      "default": "./dist/components/TaskBoard.mjs"
     },
     "./Kbd": {
       "types": "./dist/components/Kbd.d.mts",

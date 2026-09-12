@@ -16,25 +16,13 @@ import { isBrowser } from './env'
 import { devWarn } from './dev-warn'
 import {
   DATA_EXPORT_SOFT_CELL_LIMIT,
-  formatDataExportCellValue,
+  escapeCsvValue,
   getDataExportCellValue,
   isDataExportFormat,
   resolveDataExportColumns,
   resolveDataExportFilename,
   sanitizeDataExportText
 } from './data-export-value'
-
-function needsCsvQuotes(value: string): boolean {
-  return /[",\n\r]/.test(value)
-}
-
-function escapeExportCsvValue(value: unknown): string {
-  const str = sanitizeDataExportText(formatDataExportCellValue(value))
-  if (needsCsvQuotes(str)) {
-    return `"${str.replace(/"/g, '""')}"`
-  }
-  return str
-}
 
 function getCellValue<T>(
   record: T,
@@ -306,11 +294,9 @@ export function exportDataToCsv<T>(
   options?: DataExportOptions<T>
 ): string {
   const exportColumns = resolveExportColumns(columns, data, options)
-  const headers = exportColumns.map((column) => escapeExportCsvValue(column.title))
+  const headers = exportColumns.map((column) => escapeCsvValue(column.title))
   const rows = data.map((record) =>
-    exportColumns
-      .map((column) => escapeExportCsvValue(getCellValue(record, column, options)))
-      .join(',')
+    exportColumns.map((column) => escapeCsvValue(getCellValue(record, column, options))).join(',')
   )
   return `\uFEFF${[headers.join(','), ...rows].join('\r\n')}`
 }

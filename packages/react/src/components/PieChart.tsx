@@ -23,10 +23,12 @@ import {
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   getChartElementOpacity,
+  DEFAULT_DONUT_INNER_RADIUS_RATIO,
   type ChartLegendItem,
   type ChartPadding,
   type PieChartDatum,
-  type PieChartProps as CorePieChartProps
+  type PieChartProps as CorePieChartProps,
+  type DonutChartProps as CoreDonutChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
@@ -436,3 +438,22 @@ export const PieChart: React.FC<PieChartProps> = ({
 }
 
 export default PieChart
+
+export interface DonutChartProps extends CoreDonutChartProps {
+  data: PieChartDatum[]
+  padding?: ChartPadding
+  onHoveredIndexChange?: (index: number | null) => void
+  onSelectedIndexChange?: (index: number | null) => void
+  onSliceClick?: (index: number, datum: PieChartDatum) => void
+  onSliceHover?: (index: number | null, datum: PieChartDatum | null) => void
+}
+
+/**
+ * PieChart alias with a default inner radius. Prefer PieChart + `innerRadiusRatio` in new code.
+ */
+export const DonutChart: React.FC<DonutChartProps> = ({
+  innerRadiusRatio = DEFAULT_DONUT_INNER_RADIUS_RATIO,
+  ...props
+}) => {
+  return <PieChart innerRadiusRatio={innerRadiusRatio} {...props} />
+}

@@ -200,8 +200,8 @@ export * from './markdown-editor-utils'
 // RichTextEditor engine (PR-17)
 export * from './rich-text-engine'
 
-// Kanban utilities (v0.8.0+)
-export * from './kanban-utils'
+// Kanban helpers (v0.8.0+) now live on task-board-view (same public names).
+// `kanban-utils.ts` remains a re-export for deep source imports.
 
 // VirtualTable utilities (v0.8.0+)
 export * from './virtual-table-utils'

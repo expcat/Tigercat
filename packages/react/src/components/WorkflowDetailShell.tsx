@@ -71,9 +71,9 @@ export const WorkflowDetailShell = forwardRef<HTMLDivElement, WorkflowDetailShel
         aria-label={ariaLabel || WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL}
         data-tiger-workflow-detail-shell="">
         {hasNode(header) ? (
-          <header className={workflowDetailShellHeaderClasses} data-slot="header">
+          <div className={workflowDetailShellHeaderClasses} data-slot="header">
             {header}
-          </header>
+          </div>
         ) : null}
         <div className={workflowDetailShellBodyClasses} data-slot="body">
           {hasNode(form) ? (
@@ -89,9 +89,9 @@ export const WorkflowDetailShell = forwardRef<HTMLDivElement, WorkflowDetailShel
           {children}
         </div>
         {showAction ? (
-          <footer className={workflowDetailShellActionClasses} data-slot="action">
+          <div className={workflowDetailShellActionClasses} data-slot="action">
             {action}
-          </footer>
+          </div>
         ) : null}
       </div>
     )

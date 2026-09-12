@@ -147,8 +147,8 @@ export { Image } from './components/Image'
 export type { VueImageProps } from './components/Image'
 export { ImageCompare } from './components/ImageCompare'
 export type { VueImageCompareProps } from './components/ImageCompare'
-export { ImagePreview } from './components/ImagePreview'
-export type { VueImagePreviewProps } from './components/ImagePreview'
+export { ImagePreview, ImageViewer } from './components/ImagePreview'
+export type { VueImagePreviewProps, VueImageViewerProps } from './components/ImagePreview'
 export { ImageGroup, IMAGE_GROUP_INJECTION_KEY } from './components/ImageGroup'
 export type { VueImageGroupProps, ImageGroupContext } from './components/ImageGroup'
 export { ImageCropper } from './components/ImageCropper'
@@ -332,10 +332,13 @@ export { BarChart } from './components/BarChart'
 export type { VueBarChartProps, BarChartProps } from './components/BarChart'
 export { ScatterChart } from './components/ScatterChart'
 export type { VueScatterChartProps, ScatterChartProps } from './components/ScatterChart'
-export { PieChart } from './components/PieChart'
-export type { VuePieChartProps, PieChartProps } from './components/PieChart'
-export { DonutChart } from './components/DonutChart'
-export type { VueDonutChartProps, DonutChartProps } from './components/DonutChart'
+export { PieChart, DonutChart } from './components/PieChart'
+export type {
+  VuePieChartProps,
+  PieChartProps,
+  VueDonutChartProps,
+  DonutChartProps
+} from './components/PieChart'
 export { RadarChart } from './components/RadarChart'
 export type { VueRadarChartProps, RadarChartProps } from './components/RadarChart'
 export { LineChart } from './components/LineChart'
@@ -371,8 +374,8 @@ export type {
   AnchorContext
 } from './components/Anchor'
 export { AnchorContextKey } from './components/Anchor'
-export { TaskBoard } from './components/TaskBoard'
-export type { VueTaskBoardProps } from './components/TaskBoard'
+export { TaskBoard, Kanban } from './components/TaskBoard'
+export type { VueTaskBoardProps, VueKanbanProps } from './components/TaskBoard'
 
 // Phase 1B/1C components (v0.6.0+)
 export { Rate } from './components/Rate'
@@ -470,10 +473,6 @@ export type { VueRichTextEditorProps } from './components/RichTextEditor'
 export { MarkdownEditor } from './components/MarkdownEditor'
 export type { VueMarkdownEditorProps } from './components/MarkdownEditor'
 
-// Kanban (v0.8.0+)
-export { Kanban } from './components/Kanban'
-export type { VueKanbanProps } from './components/Kanban'
-
 // VirtualTable (v0.8.0+)
 export { VirtualTable } from './components/VirtualTable'
 export type {
@@ -509,12 +508,8 @@ export type {
 } from './components/PrintLayout'
 export type { PrintLayoutInstance } from '@expcat/tigercat-core'
 
-// ImageViewer (v0.9.0+)
-export { ImageViewer } from './components/ImageViewer'
-export type { VueImageViewerProps } from './components/ImageViewer'
-
 // AspectRatio (v2.1.0+)
 export { AspectRatio } from './components/AspectRatio'
 export type { VueAspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.6.1'
+export const version = '2.7.0'

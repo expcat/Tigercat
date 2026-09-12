@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Kanban } from '@expcat/tigercat-vue/Kanban'
+import { Kanban } from '@expcat/tigercat-vue/Kanban' // alias of TaskBoard
 import type { TaskBoardColumn, TaskBoardSwimlane } from '@expcat/tigercat-core'
 
 const swimlanes: TaskBoardSwimlane[] = [

@@ -567,7 +567,10 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['TabPane', 'Tabs'],
   ['Message', 'MessageRoot'],
   ['LoadingBar', 'LoadingBarRoot'],
-  ['WorkflowActionBar', 'WorkflowTimeline']
+  ['WorkflowActionBar', 'WorkflowTimeline'],
+  ['ImageViewer', 'ImagePreview'],
+  ['Kanban', 'TaskBoard'],
+  ['DonutChart', 'PieChart']
 ])
 
 export const REQUIRED_CORE_PACKAGE_EXPORTS = [

@@ -936,9 +936,7 @@ const R19_VIEWER_FILES = [
   'packages/core/src/types/image.ts',
   'packages/core/src/types/image-viewer.ts',
   'packages/react/src/components/ImagePreview.tsx',
-  'packages/react/src/components/ImageViewer.tsx',
-  'packages/vue/src/components/ImagePreview.ts',
-  'packages/vue/src/components/ImageViewer.ts'
+  'packages/vue/src/components/ImagePreview.ts'
 ]
 
 const R19_VIEWER_FORBIDDEN = [

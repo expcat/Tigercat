@@ -142,8 +142,8 @@ export { Image } from './components/Image'
 export type { ImageProps } from './components/Image'
 export { ImageCompare } from './components/ImageCompare'
 export type { ImageCompareProps } from './components/ImageCompare'
-export { ImagePreview } from './components/ImagePreview'
-export type { ImagePreviewProps } from './components/ImagePreview'
+export { ImagePreview, ImageViewer } from './components/ImagePreview'
+export type { ImagePreviewProps, ImageViewerProps } from './components/ImagePreview'
 export { ImageGroup, ImageGroupContext } from './components/ImageGroup'
 export type { ImageGroupProps, ImageGroupContextValue } from './components/ImageGroup'
 export { ImageCropper } from './components/ImageCropper'
@@ -316,10 +316,8 @@ export { BarChart } from './components/BarChart'
 export type { BarChartProps } from './components/BarChart'
 export { ScatterChart } from './components/ScatterChart'
 export type { ScatterChartProps } from './components/ScatterChart'
-export { PieChart } from './components/PieChart'
-export type { PieChartProps } from './components/PieChart'
-export { DonutChart } from './components/DonutChart'
-export type { DonutChartProps } from './components/DonutChart'
+export { PieChart, DonutChart } from './components/PieChart'
+export type { PieChartProps, DonutChartProps } from './components/PieChart'
 export { RadarChart } from './components/RadarChart'
 export type { RadarChartProps } from './components/RadarChart'
 export { LineChart } from './components/LineChart'
@@ -348,8 +346,8 @@ export { BackTop } from './components/BackTop'
 export type { BackTopProps } from './components/BackTop'
 export { Anchor, AnchorLink, useAnchorContext } from './components/Anchor'
 export type { AnchorProps, AnchorLinkProps, AnchorContextValue } from './components/Anchor'
-export { TaskBoard } from './components/TaskBoard'
-export type { TaskBoardProps } from './components/TaskBoard'
+export { TaskBoard, Kanban } from './components/TaskBoard'
+export type { TaskBoardProps, KanbanProps } from './components/TaskBoard'
 
 // Phase 1B/1C components (v0.6.0+)
 export { Rate } from './components/Rate'
@@ -437,10 +435,6 @@ export type { RichTextEditorProps } from './components/RichTextEditor'
 export { MarkdownEditor } from './components/MarkdownEditor'
 export type { MarkdownEditorProps } from './components/MarkdownEditor'
 
-// Kanban (v0.8.0+)
-export { Kanban } from './components/Kanban'
-export type { KanbanProps } from './components/Kanban'
-
 // VirtualTable (v0.8.0+)
 export { VirtualTable } from './components/VirtualTable'
 export type { VirtualTableProps, VirtualTableHandle } from './components/VirtualTable'
@@ -471,12 +465,8 @@ export type {
   PrintLayoutInstance
 } from './components/PrintLayout'
 
-// ImageViewer (v0.9.0+)
-export { ImageViewer } from './components/ImageViewer'
-export type { ImageViewerProps } from './components/ImageViewer'
-
 // AspectRatio (v2.1.0+)
 export { AspectRatio } from './components/AspectRatio'
 export type { AspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.6.1'
+export const version = '2.7.0'

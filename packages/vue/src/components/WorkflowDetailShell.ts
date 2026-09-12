@@ -88,19 +88,11 @@ export const WorkflowDetailShell = defineComponent({
         },
         [
           hasSlotContent(header)
-            ? h(
-                'header',
-                { class: workflowDetailShellHeaderClasses, 'data-slot': 'header' },
-                header
-              )
+            ? h('div', { class: workflowDetailShellHeaderClasses, 'data-slot': 'header' }, header)
             : null,
           h('div', { class: workflowDetailShellBodyClasses, 'data-slot': 'body' }, body),
           hasSlotContent(action)
-            ? h(
-                'footer',
-                { class: workflowDetailShellActionClasses, 'data-slot': 'action' },
-                action
-              )
+            ? h('div', { class: workflowDetailShellActionClasses, 'data-slot': 'action' }, action)
             : null
         ]
       )

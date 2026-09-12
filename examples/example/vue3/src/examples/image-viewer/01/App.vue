@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
-import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
+import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer' // alias of ImagePreview
 
 const open = ref(false)
 const images = [

@@ -8652,7 +8652,7 @@
       {
         "component": "DonutChart",
         "subpath": "./DonutChart",
-        "target": "DonutChart"
+        "target": "PieChart"
       },
       {
         "component": "Drag",
@@ -8792,7 +8792,7 @@
       {
         "component": "ImageViewer",
         "subpath": "./ImageViewer",
-        "target": "ImageViewer"
+        "target": "ImagePreview"
       },
       {
         "component": "InfiniteScroll",
@@ -8827,7 +8827,7 @@
       {
         "component": "Kanban",
         "subpath": "./Kanban",
-        "target": "Kanban"
+        "target": "TaskBoard"
       },
       {
         "component": "Kbd",
@@ -10189,7 +10189,7 @@
       {
         "component": "DonutChart",
         "subpath": "./DonutChart",
-        "target": "DonutChart"
+        "target": "PieChart"
       },
       {
         "component": "Drag",
@@ -10329,7 +10329,7 @@
       {
         "component": "ImageViewer",
         "subpath": "./ImageViewer",
-        "target": "ImageViewer"
+        "target": "ImagePreview"
       },
       {
         "component": "InfiniteScroll",
@@ -10364,7 +10364,7 @@
       {
         "component": "Kanban",
         "subpath": "./Kanban",
-        "target": "Kanban"
+        "target": "TaskBoard"
       },
       {
         "component": "Kbd",
