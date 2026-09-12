@@ -2,6 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.7.1
+
+v2.7.1：与 2.7.0 同内容。2.7.0 在 npm 上版本被 staged 后 tarball 404（重发遇 E409），故再发一版。
+
 ## v2.7.0
 
 v2.7.0：组件瘦身。三组薄别名收进保留件（ImageViewer→ImagePreview、Kanban→TaskBoard、DonutChart→PieChart）；CSV escape 与看板 swimlane helpers 单源。公开别名仍可 import。无新必填 prop。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。
