@@ -6,9 +6,9 @@
  */
 
 import type { TableColumn } from '../types/table'
-import { isBrowser } from './env'
 import { getTableColumnDataKey } from './table-utils'
 import { escapeCsvValue, resolveDataExportFilename } from './data-export-value'
+import { downloadBrowserFile } from './file-utils'
 
 export { escapeCsvValue }
 
@@ -42,27 +42,12 @@ export function exportTableData<T>(columns: TableColumn<T>[], data: T[]): string
   return exportTableToCsv(columns, data)
 }
 
-function downloadBlob(content: string, filename: string, mime: string): void {
-  if (!isBrowser()) return
-
-  const blob = new Blob([content], { type: mime })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.style.display = 'none'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-}
-
 /**
  * Trigger a CSV file download in the browser.
  * Existing `.csv` suffixes are not duplicated.
  */
 export function downloadCsv(csvContent: string, filename: string = 'export'): void {
-  downloadBlob(csvContent, withCsvExtension(filename), 'text/csv;charset=utf-8;')
+  downloadBrowserFile(csvContent, withCsvExtension(filename), 'text/csv;charset=utf-8;')
 }
 
 export function downloadTableExport(content: string, filename: string = 'export'): void {

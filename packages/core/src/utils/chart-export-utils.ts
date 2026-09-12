@@ -1,4 +1,5 @@
 import { isBrowser } from './env'
+import { downloadBrowserFile } from './file-utils'
 
 export type ChartExportFormat = 'svg' | 'png'
 
@@ -87,17 +88,7 @@ export async function downloadChartPng(
 }
 
 export function downloadChartBlob(blob: Blob, filename: string): void {
-  if (!isBrowser()) return
-
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.style.display = 'none'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  downloadBrowserFile(blob, filename)
 }
 
 function resolveSvgLength(svg: SVGSVGElement, attribute: 'width' | 'height'): number {

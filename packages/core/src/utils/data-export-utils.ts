@@ -13,6 +13,7 @@
 import type { TableColumn } from '../types/table'
 import type { DataExportFormat, DataExportOptions } from '../types/data-export'
 import { isBrowser } from './env'
+import { downloadBrowserFile } from './file-utils'
 import { devWarn } from './dev-warn'
 import {
   DATA_EXPORT_SOFT_CELL_LIMIT,
@@ -343,16 +344,7 @@ export function downloadDataExport(
   }
 
   const meta = DATA_EXPORT_FILE_META[format]
-  const blob = new Blob([content as BlobPart], { type: meta.mime })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = resolveDataExportFilename(filename, meta.extension)
-  link.style.display = 'none'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  downloadBrowserFile(content, resolveDataExportFilename(filename, meta.extension), meta.mime)
 }
 
 export interface RunDataExportInput<T = Record<string, unknown>> extends DataExportOptions<T> {

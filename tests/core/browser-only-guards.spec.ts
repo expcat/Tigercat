@@ -13,6 +13,8 @@ import {
   downloadChartPng,
   downloadChartSvg,
   createTableResizeObserverController,
+  downloadBrowserFile,
+  downloadChartBlob,
   downloadCsv,
   downloadTableExport,
   exportChartPng,
@@ -56,6 +58,8 @@ describe('browser-only utility guards', () => {
 
     expect(() => downloadCsv('name\nAda')).not.toThrow()
     expect(() => downloadTableExport('name\nAda')).not.toThrow()
+    expect(() => downloadBrowserFile('name\nAda', 'export.csv', 'text/csv')).not.toThrow()
+    expect(() => downloadChartBlob({} as Blob, 'chart.svg')).not.toThrow()
     expect(() => {
       const controller = createTableResizeObserverController({ onResize: () => {} })
       controller.observe({} as HTMLElement)
