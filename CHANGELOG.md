@@ -4,6 +4,12 @@
 
 ## 未发布
 
+## v2.8.1
+
+v2.8.1：React Line/Area 共用 cartesian 点键盘事件类型修正。GitHub Pages 示例 `tsc` 可通过。无运行时行为变化。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。Vue/React 对称。
+
+- **React**：`useCartesianSeriesPoints` 的 `handlePointKeydown` 使用 `React.KeyboardEvent<SVGElement>`，`ownerSVGElement` 类型正确。Vue 侧本已 `as SVGElement`。
+
 ## v2.8.0
 
 v2.8.0：内部内聚。生成文档降格三别名；下载 Blob 单源；看图/看板类型与 utils 折进保留件；Line/Area 笛卡尔尺度与点交互共用。公开别名仍可 import。无新必填 prop。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。Vue/React 对称。

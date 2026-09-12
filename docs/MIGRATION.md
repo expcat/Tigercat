@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.8.1
+
+v2.8.1 无 breaking change，无新必填 prop。React cartesian 点键盘事件类型修正，示例 tsc 可通过。公开别名仍可 import。不是 BPMN。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v281)。
+
 ## v2.8.0
 
 v2.8.0 无新必填 prop。公开别名 `ImageViewer` / `Kanban` / `DonutChart` 仍可 import。生成文档不再把它们当一等用法。Vue AreaChart 的 `onPointClick` 现在会调用（与 Line / React 对齐）。工作流 API 不变。不是 BPMN。见 [MIGRATION-2.8.md](MIGRATION-2.8.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v280)。
