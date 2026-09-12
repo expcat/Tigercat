@@ -4,6 +4,13 @@
 
 ## 未发布
 
+## v2.8.5
+
+v2.8.5：Steps / WorkflowDesigner 竖向连接线彻底修复。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。Vue/React 对称。
+
+- **Steps**：竖/横连接线几何改由 Tailwind plugin 注入（`.tiger-step-tail*` / `.tiger-step-icon-col*`），不再依赖 `inset-inline-start-*` 等易被 JIT 漏扫的 utility。竖线穿过图标列中轴。消费者须加载 `@plugin "@expcat/tigercat-core/tailwind"` 或 `/tailwind/modern`。
+- **WorkflowDesigner**：画布脊线改为穿过节点卡片水平中心；节点间 `+` 落在同一中轴。嵌套子树共用中心轨，去掉左侧 `border-s-2` 孤儿轨。几何走 plugin CSS。仍是 simple JSON 树。
+
 ## v2.8.4
 
 v2.8.4：与 2.8.2/2.8.3 同内容。2.8.3 在 npm 上 `latest` 已指向该版本，但 core/vue/react tarball 持续 404，故再发一版把 latest 落到可安装包。

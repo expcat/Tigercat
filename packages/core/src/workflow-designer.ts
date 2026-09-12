@@ -61,6 +61,7 @@ export {
   workflowDesignerApproverSummary,
   workflowDesignerAutoDecideOptions,
   workflowDesignerBlockingIssues,
+  workflowDesignerCanvasBaseStyles,
   workflowDesignerCardClassName,
   workflowDesignerCardClasses,
   workflowDesignerCardSelectedClasses,

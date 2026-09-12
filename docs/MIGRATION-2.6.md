@@ -37,3 +37,5 @@ v2.6.0 是体验完善 minor：DetailShell 一流粘底配方 + Designer 纵向�
 ### Designer
 
 打开即是左画布 + 右 Inspector。无需新 prop。若曾依赖「未选中时没有 Node settings region」，改为读空态文案或等 `select` 后再填表单。
+
+画布脊线：2.6.0 曾把轨道放在卡片 start 侧（`border-s-2` + 插入钮 `-ms-[1.15rem]`）。后续修复改为卡片水平中轴——plugin CSS `.tiger-workflow-designer__flow::before` 画中心轨，节点间 `+`（`.tiger-workflow-designer__insert`）与嵌套子树（`.tiger-workflow-designer__children`）共用该轴，不再出现左侧孤儿轨。消费者须加载 Tailwind plugin。不是 BPMN。

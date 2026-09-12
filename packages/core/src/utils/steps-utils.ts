@@ -22,6 +22,98 @@ export const stepFinishIconStrokeWidth = '3'
 /** SVG path `d` for the StepsItem "finish" checkmark icon */
 export const stepFinishIconPathD = 'M4.5 12.75l6 6 9-13.5'
 
+/** Size token used by tail / icon-column modifiers and `data-tiger-step-size`. */
+export type StepSizeToken = 'simple' | 'sm' | 'md'
+
+/**
+ * Map `size` + `simple` to the stable modifier token used by plugin CSS.
+ * `simple` wins (24px icon); `small` → sm (32px); otherwise md (40px).
+ */
+export function getStepSizeToken(size: StepSize, simple: boolean): StepSizeToken {
+  if (simple) return 'simple'
+  return size === 'small' ? 'sm' : 'md'
+}
+
+/** Value for `data-tiger-step-size` (`simple` or the `size` prop). */
+export function getStepSizeDataValue(size: StepSize, simple: boolean): 'simple' | StepSize {
+  if (simple) return 'simple'
+  return size === 'small' ? 'small' : 'default'
+}
+
+/**
+ * Plugin CSS for Steps tail + icon-column geometry.
+ *
+ * Connector coordinates used to live in JIT utilities (`inset-inline-start-4`,
+ * `left-1/2`, `top-8`, …). Consumers that scan dist JS often miss those
+ * strings, so the absolute line collapsed to the icon-column start edge.
+ * Geometry now ships with `@plugin "@expcat/tigercat-core/tailwind"` so any
+ * app that already loads the plugin gets a centered connector without
+ * depending on purged utilities.
+ */
+export const stepConnectorBaseStyles = {
+  '.tiger-steps': {
+    '--tiger-step-gap': '1.5rem'
+  },
+  '.tiger-step-icon-col': {
+    position: 'relative',
+    flexShrink: '0',
+    alignSelf: 'stretch',
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  '.tiger-step-icon-col--simple': {
+    width: '1.5rem',
+    '--tiger-step-icon-size': '1.5rem'
+  },
+  '.tiger-step-icon-col--sm': {
+    width: '2rem',
+    '--tiger-step-icon-size': '2rem'
+  },
+  '.tiger-step-icon-col--md': {
+    width: '2.5rem',
+    '--tiger-step-icon-size': '2.5rem'
+  },
+  '.tiger-step-item--gap': {
+    paddingBottom: 'var(--tiger-step-gap, 1.5rem)'
+  },
+  '.tiger-step-tail': {
+    position: 'absolute',
+    pointerEvents: 'none'
+  },
+  '.tiger-step-tail--last': {
+    display: 'none'
+  },
+  '.tiger-step-tail--finish': {
+    backgroundColor: 'var(--tiger-primary, #2563eb)'
+  },
+  '.tiger-step-tail--wait': {
+    backgroundColor: 'var(--tiger-border, #e5e7eb)'
+  },
+  '.tiger-step-tail--simple': {
+    '--tiger-step-icon-size': '1.5rem'
+  },
+  '.tiger-step-tail--sm': {
+    '--tiger-step-icon-size': '2rem'
+  },
+  '.tiger-step-tail--md': {
+    '--tiger-step-icon-size': '2.5rem'
+  },
+  '.tiger-step-tail--vertical': {
+    left: '50%',
+    width: '0.125rem',
+    top: 'var(--tiger-step-icon-size, 2.5rem)',
+    bottom: 'calc(-1 * var(--tiger-step-gap, 1.5rem))',
+    height: 'auto',
+    transform: 'translateX(-50%)'
+  },
+  '.tiger-step-tail--horizontal': {
+    left: '50%',
+    width: '100%',
+    height: '0.125rem',
+    top: 'calc(var(--tiger-step-icon-size, 2.5rem) / 2)'
+  }
+} as const
+
 /**
  * Get Steps container classes
  */
@@ -36,13 +128,21 @@ export function getStepsContainerClasses(direction: StepsDirection): string {
 }
 
 /**
+ * Icon-column wrapper (vertical Steps). Width matches the icon so the tail's
+ * `left: 50%` + `translateX(-50%)` sits on the icon center axis.
+ */
+export function getStepIconColumnClasses(size: StepSize, simple: boolean): string {
+  return `tiger-step-icon-col tiger-step-icon-col--${getStepSizeToken(size, simple)}`
+}
+
+/**
  * Get Step item container classes
  */
 export function getStepItemClasses(direction: StepsDirection, isLast: boolean): string {
   const baseClasses = 'tiger-step-item relative group'
 
   if (direction === 'vertical') {
-    return `${baseClasses} flex flex-row ${!isLast ? 'pb-6' : ''}`
+    return `${baseClasses} flex flex-row ${!isLast ? 'tiger-step-item--gap' : ''}`.trim()
   }
 
   return `${baseClasses} flex flex-col flex-1 items-center`
@@ -86,7 +186,10 @@ export function getStepIconClasses(
 }
 
 /**
- * Get Step tail/connector line classes
+ * Get Step tail/connector line classes.
+ *
+ * Returns stable semantic tokens only. Geometry (center axis, size offsets,
+ * finish/wait color) lives in {@link stepConnectorBaseStyles} via the plugin.
  */
 export function getStepTailClasses(
   direction: StepsDirection,
@@ -95,31 +198,14 @@ export function getStepTailClasses(
   size: StepSize,
   simple: boolean
 ): string {
-  if (isLast) return 'hidden'
+  if (isLast) return 'tiger-step-tail tiger-step-tail--last'
 
-  const colorClasses =
-    status === 'finish' ? 'bg-[var(--tiger-primary,#2563eb)]' : 'bg-[var(--tiger-border,#e5e7eb)]'
+  const sizeMod = getStepSizeToken(size, simple)
+  const dirMod =
+    direction === 'vertical' ? 'tiger-step-tail--vertical' : 'tiger-step-tail--horizontal'
+  const colorMod = status === 'finish' ? 'tiger-step-tail--finish' : 'tiger-step-tail--wait'
 
-  // Icon sizes: simple → w-6(24px), small → w-8(32px), default → w-10(40px)
-  // Center offset: simple → 12px(top-3/left-3), small → 16px(top-4/left-4), default → 20px(top-5/left-5)
-  // Below-icon offset: simple → 24px(top-6), small → 32px(top-8), default → 40px(top-10)
-  // Use full class strings so Tailwind JIT can detect them
-  if (direction === 'vertical') {
-    const verticalClasses = simple
-      ? 'absolute inset-inline-start-3 top-6 w-0.5 h-full'
-      : size === 'small'
-        ? 'absolute inset-inline-start-4 top-8 w-0.5 h-full'
-        : 'absolute inset-inline-start-5 top-10 w-0.5 h-full'
-    return `tiger-step-tail ${verticalClasses} ${colorClasses}`
-  }
-
-  const horizontalClasses = simple
-    ? 'absolute top-3 inset-inline-start-1/2 w-full h-0.5'
-    : size === 'small'
-      ? 'absolute top-4 inset-inline-start-1/2 w-full h-0.5'
-      : 'absolute top-5 inset-inline-start-1/2 w-full h-0.5'
-
-  return `tiger-step-tail ${horizontalClasses} ${colorClasses}`
+  return `tiger-step-tail ${dirMod} tiger-step-tail--${sizeMod} ${colorMod}`
 }
 
 /**

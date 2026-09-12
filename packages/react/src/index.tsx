@@ -469,4 +469,4 @@ export type {
 export { AspectRatio } from './components/AspectRatio'
 export type { AspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.8.4'
+export const version = '2.8.5'

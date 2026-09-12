@@ -181,6 +181,22 @@ describe('WorkflowDesigner (React)', () => {
     })
   })
 
+  it('lays out a center-axis canvas rail with insert controls on the spine', () => {
+    const { container } = render(<WorkflowDesigner value={treeSteps} />)
+    const flow = container.querySelector('.tiger-workflow-designer__flow')
+    const insert = container.querySelector('.tiger-workflow-designer__insert')
+    const children = container.querySelector('.tiger-workflow-designer__children')
+    const nestedFlow = children?.querySelector('.tiger-workflow-designer__flow')
+    expect(flow).toBeTruthy()
+    expect(insert).toBeTruthy()
+    expect(children).toBeTruthy()
+    expect(nestedFlow).toBeTruthy()
+    expect(flow?.className).not.toMatch(/border-s-2/)
+    expect(insert?.className).not.toMatch(/-ms-\[/)
+    expect(children?.className).not.toMatch(/border-s-2/)
+    expect(container.querySelector('.tiger-workflow-designer__card')).toBeTruthy()
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       const onChange = vi.fn()

@@ -28,8 +28,14 @@ import {
   workflowDesignerApproverSummary,
   workflowDesignerEditableButtonPolicy,
   workflowDesignerFieldPermissionRows,
+  workflowDesignerCanvasBaseStyles,
+  workflowDesignerCardClasses,
+  workflowDesignerChildrenClasses,
+  workflowDesignerInsertRowClasses,
   workflowDesignerKindColor,
-  workflowDesignerSignModeHint
+  workflowDesignerListClasses,
+  workflowDesignerSignModeHint,
+  tigercatPlugin
 } from '@expcat/tigercat-core'
 import {
   applyWorkflowDesignerView as applyFromSubpath,
@@ -320,5 +326,56 @@ describe('workflow-designer helpers', () => {
       { name: 'amount', label: 'Amount', permission: 'hidden' },
       { name: 'reason', label: 'Reason', permission: 'readonly' }
     ])
+  })
+})
+
+describe('WorkflowDesigner center-rail class tokens', () => {
+  it('uses semantic flow/insert/children tokens without a left-edge spine', () => {
+    expect(workflowDesignerListClasses).toBe('tiger-workflow-designer__flow')
+    expect(workflowDesignerInsertRowClasses).toBe('tiger-workflow-designer__insert')
+    expect(workflowDesignerChildrenClasses).toBe('tiger-workflow-designer__children')
+    expect(workflowDesignerCardClasses).toContain('tiger-workflow-designer__card')
+    expect(workflowDesignerListClasses).not.toMatch(/border-s-2/)
+    expect(workflowDesignerInsertRowClasses).not.toMatch(/-ms-\[/)
+    expect(workflowDesignerChildrenClasses).not.toMatch(/border-s-2/)
+  })
+
+  it('centers the canvas rail and insert control in plugin CSS', () => {
+    expect(
+      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__flow::before']
+    ).toMatchObject({
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '0.125rem'
+    })
+    expect(workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__insert']).toMatchObject({
+      display: 'grid',
+      gridTemplateColumns: '1fr auto 1fr'
+    })
+    expect(
+      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__insert > :first-child']
+    ).toMatchObject({
+      gridColumn: '2',
+      justifySelf: 'center'
+    })
+    expect(
+      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__children']
+    ).not.toHaveProperty('borderLeft')
+    expect(
+      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__children']
+    ).not.toHaveProperty('borderInlineStart')
+  })
+
+  it('is injected by the default Tailwind plugin', () => {
+    const rules: Record<string, unknown> = {}
+    type PluginInstance = {
+      handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
+    }
+    const plugin = tigercatPlugin as unknown as PluginInstance
+    plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
+    expect(rules['.tiger-workflow-designer__flow::before']).toMatchObject({
+      left: '50%',
+      transform: 'translateX(-50%)'
+    })
   })
 })

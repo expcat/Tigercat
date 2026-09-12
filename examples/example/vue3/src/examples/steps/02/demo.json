@@ -1,7 +1,7 @@
 {
   "id": "steps-02",
   "title": "纵向可点步骤",
-  "description": "纵向 Steps 可点整项（含圆圈）。中间项 error，末项 disabled。也可用上一步/下一步推进。",
+  "description": "纵向 Steps 可点整项（含圆圈）。连接线穿过图标中轴（plugin 几何）。中间项 error，末项 disabled。也可用上一步/下一步推进。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

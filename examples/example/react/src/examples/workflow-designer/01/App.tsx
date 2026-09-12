@@ -57,7 +57,7 @@ export default function App() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
-        纵向摘要卡流程画布（轨道连接）+ 右侧 Inspector 四 Tab（审批人 / 操作按钮 / 表单权限 /
+        纵向摘要卡流程画布（中轴轨道穿过卡片中心）+ 右侧 Inspector 四 Tab（审批人 / 操作按钮 / 表单权限 /
         高级）。节点间 + 打开调色板插入。不是 BPMN。
       </p>
       <WorkflowDesigner value={steps} schema={schema} onChange={setSteps} />

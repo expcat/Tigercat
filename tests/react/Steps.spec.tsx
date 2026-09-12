@@ -57,6 +57,26 @@ describe('Steps', () => {
 
       const stepsContainer = container.querySelector('.tiger-steps')
       expect(stepsContainer).toHaveClass('flex-col')
+      expect(stepsContainer).toHaveAttribute('data-direction', 'vertical')
+    })
+
+    it('should render a centered vertical tail with plugin class tokens', () => {
+      const { container } = render(
+        <Steps direction="vertical" size="small">
+          <StepsItem title="Step 1" />
+          <StepsItem title="Step 2" />
+        </Steps>
+      )
+
+      const tail = container.querySelector('.tiger-step-tail')
+      expect(tail).toHaveClass('tiger-step-tail--vertical')
+      expect(tail).toHaveClass('tiger-step-tail--sm')
+      expect(tail?.className).not.toMatch(/inset-inline-start/)
+      expect(container.querySelector('.tiger-step-icon-col')).toHaveClass('tiger-step-icon-col--sm')
+      expect(container.querySelector('.tiger-steps')).toHaveAttribute(
+        'data-tiger-step-size',
+        'small'
+      )
     })
   })
 
@@ -75,7 +95,7 @@ describe('Steps', () => {
     })
 
     it('should render simple mode without descriptions', () => {
-      const { container } = render(
+      render(
         <Steps simple>
           <StepsItem title="Step 1" description="Description 1" />
           <StepsItem title="Step 2" description="Description 2" />

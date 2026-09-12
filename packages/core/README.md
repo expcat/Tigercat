@@ -40,6 +40,12 @@ and
 The modern preset only changes component styling when a consumer sets
 `data-tiger-style="modern"`; the default visual style remains unchanged.
 
+The plugin also ships component geometry that must not depend on JIT-scanned
+utilities: Steps connector tails (`.tiger-step-tail*`, icon-column centering)
+and the WorkflowDesigner center-axis canvas rail. Load the plugin (this line
+or `@plugin "@expcat/tigercat-core/tailwind"`) so those connectors render
+through node/icon centers.
+
 ## Next
 
 - Install, compatibility, and MCP client config:

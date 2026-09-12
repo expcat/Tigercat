@@ -4,7 +4,9 @@ import {
   getStepContentClasses,
   getStepDescriptionClasses,
   getStepIconClasses,
+  getStepIconColumnClasses,
   getStepItemClasses,
+  getStepSizeDataValue,
   getStepTailClasses,
   getStepTitleClasses,
   getStepsContainerClasses,
@@ -123,6 +125,8 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     stepsContext.size,
     stepsContext.simple
   )
+  const iconColumnClasses = getStepIconColumnClasses(stepsContext.size, stepsContext.simple)
+  const sizeDataValue = getStepSizeDataValue(stepsContext.size, stepsContext.simple)
   const contentClasses = getStepContentClasses(stepsContext.direction)
   const titleClasses = getStepTitleClasses(stepStatus, stepsContext.size, isClickable)
   const descriptionClasses = getStepDescriptionClasses(stepStatus, stepsContext.size)
@@ -171,7 +175,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   const body = (
     <>
       {stepsContext.direction === 'vertical' ? (
-        <div className="relative">
+        <div className={iconColumnClasses} data-tiger-step-size={sizeDataValue}>
           {renderIcon()}
           <div className={tailClasses} />
         </div>
@@ -198,7 +202,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
           type="button"
           className={
             stepsContext.direction === 'vertical'
-              ? 'flex w-full flex-row items-start bg-transparent p-0 text-start'
+              ? 'flex w-full flex-row items-stretch bg-transparent p-0 text-start'
               : 'flex w-full flex-col items-center bg-transparent p-0'
           }
           onClick={handleClick}>
@@ -323,6 +327,8 @@ export const Steps: React.FC<StepsProps> = ({
         className={containerClasses}
         style={style}
         role="list"
+        data-direction={direction}
+        data-tiger-step-size={getStepSizeDataValue(size, simple)}
         aria-label={ariaLabelProp ?? stepLabels.ariaLabel}>
         {stepsWithProps}
       </ol>

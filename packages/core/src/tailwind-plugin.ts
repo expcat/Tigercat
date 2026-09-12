@@ -14,6 +14,16 @@ import { resolvePresetThemeConfig, themeConfigToCssVars } from './themes/manager
 import { alertCountdownBaseStyles } from './utils/alert-utils'
 import { cartesianChartAnimationBaseStyles } from './utils/chart/color'
 import { loadingAnimationBaseStyles } from './utils/loading-utils'
+import { stepConnectorBaseStyles } from './utils/steps-utils'
+import { workflowDesignerCanvasBaseStyles } from './utils/workflow-designer-utils'
+
+const tigercatComponentBaseStyles = {
+  ...alertCountdownBaseStyles,
+  ...loadingAnimationBaseStyles,
+  ...cartesianChartAnimationBaseStyles,
+  ...stepConnectorBaseStyles,
+  ...workflowDesignerCanvasBaseStyles
+}
 
 function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {
   return themeConfigToCssVars(resolvePresetThemeConfig(preset ?? defaultTheme, scheme))
@@ -69,9 +79,7 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
     '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
     '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
       MODERN_OVERRIDE_TOKENS_DARK,
-    ...alertCountdownBaseStyles,
-    ...loadingAnimationBaseStyles,
-    ...cartesianChartAnimationBaseStyles
+    ...tigercatComponentBaseStyles
   })
 })
 
@@ -124,9 +132,7 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
       },
       ...tigercatDirectionBase,
       ...tigercatReducedMotionBase,
-      ...alertCountdownBaseStyles,
-      ...loadingAnimationBaseStyles,
-      ...cartesianChartAnimationBaseStyles
+      ...tigercatComponentBaseStyles
     })
 
     // Always emit the attribute layer so existing `data-tiger-style="modern"`

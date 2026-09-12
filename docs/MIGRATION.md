@@ -4,7 +4,11 @@
 
 ## 未发布
 
-当前没有待组件用户处理的 breaking change。
+当前没有待组件用户处理的 breaking change。无新必填 prop。
+
+**Steps 连接线**：竖/横 connector 几何改由 Tailwind plugin 注入（`.tiger-step-tail*`、`.tiger-step-icon-col*`）。消费者必须加载 `@plugin "@expcat/tigercat-core/tailwind"` 或 `/tailwind/modern`（Admin 已加载）。不要依赖 `inset-inline-start-*` / `left-1/2` JIT 类来画连线。
+
+**WorkflowDesigner 画布**：纵向脊线改为穿过节点卡片水平中心；`+` 插入钮落在同一中轴。嵌套子树共用中心轨，不再使用左侧 `border-s-2` 孤儿轨。见 [MIGRATION-2.6.md](MIGRATION-2.6.md#designer)。
 
 ## v2.8.4
 

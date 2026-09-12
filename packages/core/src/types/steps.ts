@@ -66,7 +66,9 @@ export interface StepsProps {
    */
   status?: StepStatus
   /**
-   * Steps direction/orientation
+   * Steps direction/orientation.
+   * Vertical/horizontal connector geometry ships via the Tailwind plugin
+   * (`.tiger-step-tail*`); load `@plugin "@expcat/tigercat-core/tailwind"`.
    * @default 'horizontal'
    */
   direction?: StepsDirection

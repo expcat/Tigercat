@@ -41,6 +41,11 @@ Tailwind integration must use Tailwind CSS v4 and `@tailwindcss/vite`.
 @source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
 
+The plugin also injects Steps connector geometry (vertical/horizontal tails
+centered on the icon column) and the WorkflowDesigner center-axis canvas
+rail. Do not rely on JIT-scanned utilities such as `inset-inline-start-4`
+for those connectors.
+
 Runtime theme switching uses `ConfigProvider` `theme` / `colorScheme` (or `ThemeManager`).
 `@plugin "@expcat/tigercat-core/tailwind/modern"` is the CSS equivalent of `theme="modern"`.
 

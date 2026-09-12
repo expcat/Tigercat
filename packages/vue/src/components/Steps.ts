@@ -17,6 +17,8 @@ import {
   mergeStyleValues,
   getStepItemClasses,
   getStepIconClasses,
+  getStepIconColumnClasses,
+  getStepSizeDataValue,
   getStepTailClasses,
   getStepContentClasses,
   getStepTitleClasses,
@@ -242,8 +244,22 @@ export const StepsItem = defineComponent({
       } else if (stepStatus.value === 'error') inner = h('span', { 'aria-hidden': 'true' }, '!')
       else inner = h('span', { 'aria-hidden': 'true' }, String(props.stepIndex + 1))
 
-      return h('div', { class: iconClasses.value, 'aria-hidden': 'true' }, inner as RawChildren)
+      return h(
+        'div',
+        {
+          class: iconClasses.value,
+          'aria-hidden': 'true'
+        },
+        inner as RawChildren
+      )
     }
+
+    const iconColumnClasses = computed(() =>
+      getStepIconColumnClasses(stepsContext.size, stepsContext.simple)
+    )
+    const sizeDataValue = computed(() =>
+      getStepSizeDataValue(stepsContext.size, stepsContext.simple)
+    )
 
     const renderContent = () => {
       const children = [h('div', { class: titleClasses.value }, props.title)]
@@ -267,10 +283,14 @@ export const StepsItem = defineComponent({
       const body =
         stepsContext.direction === 'vertical'
           ? [
-              h('div', { class: 'relative' }, [
-                renderIcon(),
-                h('div', { class: tailClasses.value })
-              ]),
+              h(
+                'div',
+                {
+                  class: iconColumnClasses.value,
+                  'data-tiger-step-size': sizeDataValue.value
+                },
+                [renderIcon(), h('div', { class: tailClasses.value })]
+              ),
               renderContent(),
               h(
                 'span',
@@ -307,7 +327,7 @@ export const StepsItem = defineComponent({
                   type: 'button',
                   class:
                     stepsContext.direction === 'vertical'
-                      ? 'flex w-full flex-row items-start bg-transparent p-0 text-start'
+                      ? 'flex w-full flex-row items-stretch bg-transparent p-0 text-start'
                       : 'flex w-full flex-col items-center bg-transparent p-0',
                   onClick: handleClick
                 },
@@ -489,6 +509,8 @@ export const Steps = defineComponent({
           class: containerClasses.value,
           style: mergedStyle.value,
           role: 'list',
+          'data-direction': props.direction,
+          'data-tiger-step-size': getStepSizeDataValue(props.size, props.simple),
           'aria-label':
             typeof ariaLabelAttr === 'string' ? ariaLabelAttr : stepLabels.value.ariaLabel,
           ...restAttrs

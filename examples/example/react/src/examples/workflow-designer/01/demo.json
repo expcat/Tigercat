@@ -1,7 +1,7 @@
 {
   "id": "workflow-designer-01",
   "title": "Inspector 设计审批树",
-  "description": "纵向摘要卡流程画布（轨道 + 节点间 +）与右侧 Inspector 同屏；四 Tab 编辑审批人/按钮/表单权限/高级。不是 BPMN。",
+  "description": "纵向摘要卡流程画布（中轴轨道穿过卡片中心 + 节点间 +）与右侧 Inspector 同屏；四 Tab 编辑审批人/按钮/表单权限/高级。不是 BPMN。",
   "entry": "App.tsx",
   "order": 1
 }
