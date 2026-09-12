@@ -1132,6 +1132,7 @@
       "DonutChartProps",
       "dotSizeClasses",
       "dotsVariantConfig",
+      "downloadBrowserFile",
       "downloadChartBlob",
       "downloadChartPng",
       "downloadChartSvg",
@@ -3040,6 +3041,7 @@
       "LongPressGestureOptions",
       "lookupTreeNode",
       "manageLiveRegion",
+      "mapPointerToPlotPoint",
       "mapSchemaFormValuesIn",
       "mapSchemaFormValuesOut",
       "mapToolbarAction",
@@ -3635,6 +3637,7 @@
       "qrNeedsContrastWarning",
       "qrRsRemainder",
       "qrViewBoxSize",
+      "queryChartPointElement",
       "querySelectorAllSafe",
       "querySelectorSafe",
       "RADAR_SPLIT_AREA_COLORS",
@@ -3780,6 +3783,8 @@
       "resolveCarouselRegion",
       "resolveCarouselSwipeDirection",
       "resolveCarouselTabKeyboardNavigation",
+      "resolveCartesianSeriesScales",
+      "ResolveCartesianSeriesScalesInput",
       "resolveCascaderActivePath",
       "resolveCascaderSearchLimit",
       "resolveChartActiveIndex",
@@ -6083,7 +6088,7 @@
     },
     "DonutChartProps": {
       "extends": ["PieChartProps"],
-      "props": ["animated", "centerLabel", "centerValue", "innerRadiusRatio"]
+      "props": []
     },
     "DragProps": {
       "extends": ["DragItem = DragItem> extends UseDragOptions"],
@@ -6615,7 +6620,7 @@
     },
     "KanbanProps": {
       "extends": ["TaskBoardProps"],
-      "props": ["swimlaneField", "swimlanes"]
+      "props": []
     },
     "KbdProps": {
       "extends": [],

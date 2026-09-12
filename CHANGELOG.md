@@ -4,7 +4,15 @@
 
 ## 未发布
 
-- **examples / 文档硬切别名演示**：Pages 不再挂 `/image-viewer`、`/kanban`、`/donut-chart`。看图走 `/image-preview`（ImagePreview，`minScale`/`maxScale`），看板走 `/task-board`（含泳道），环形走 `/pie-chart` + `innerRadiusRatio`。新代码与示例一律用 ImagePreview / TaskBoard / PieChart。公开导出名 `ImageViewer` / `Kanban` / `DonutChart` 仍可 import（未删 package export），但文档/示例不再推荐、不再挂入口。Vue/React 对称。
+## v2.8.0
+
+v2.8.0：内部内聚。生成文档降格三别名；下载 Blob 单源；看图/看板类型与 utils 折进保留件；Line/Area 笛卡尔尺度与点交互共用。公开别名仍可 import。无新必填 prop。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。Vue/React 对称。
+
+- **文档**：`docs:api` 不再把 ImageViewer / Kanban / DonutChart 写成一等用法片段。关键词「环形图」「看板」指向 PieChart / TaskBoard。component-index 仍列出公开名。保留件 compact props 补上 `minScale`、`swimlanes`、`innerRadiusRatio`。
+- **core**：`downloadBrowserFile` 单源（Table CSV / DataExport / chart export）。`imageViewer*` 手势与类名并入 `image-utils`；`image-viewer-utils.ts` / `types/image-viewer.ts` / `types/kanban.ts` 改为 re-export。`DonutChartProps` / `KanbanProps` 去掉与父接口重复的字段声明。
+- **Charts**：LineChart / AreaChart 共用 `resolveCartesianSeriesScales` 与 `useCartesianSeriesPoints`。公开图种 API 不变。Vue AreaChart 的 `onPointClick` 现在会调用（与 Line / React Area 对齐）。
+- **别名**：`ImageViewer` / `Kanban` / `DonutChart` 公开名与子路径 **未删**。examples 仍走 `/image-preview` `/task-board` `/pie-chart`（2.7.2 硬切）。
+- 行为变化（非 breaking、无新必填 prop）见 [docs/MIGRATION-2.8.md](docs/MIGRATION-2.8.md)。
 
 ## v2.7.2
 

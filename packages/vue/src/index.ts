@@ -512,4 +512,4 @@ export type { PrintLayoutInstance } from '@expcat/tigercat-core'
 export { AspectRatio } from './components/AspectRatio'
 export type { VueAspectRatioProps } from './components/AspectRatio'
 
-export const version = '2.7.0'
+export const version = '2.8.0'
