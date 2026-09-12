@@ -464,14 +464,14 @@ describe('image-utils — getTouchDistance', () => {
   })
 })
 
-describe('image preview / image-viewer demo viewports', () => {
+describe('image preview demo viewports', () => {
   it.each([
     'examples/example/vue3/src/examples/image/05/demo.json',
-    'examples/example/vue3/src/examples/image-viewer/01/demo.json',
-    'examples/example/vue3/src/examples/image-viewer/02/demo.json',
+    'examples/example/vue3/src/examples/image-preview/01/demo.json',
+    'examples/example/vue3/src/examples/image-preview/02/demo.json',
     'examples/example/react/src/examples/image/05/demo.json',
-    'examples/example/react/src/examples/image-viewer/01/demo.json',
-    'examples/example/react/src/examples/image-viewer/02/demo.json'
+    'examples/example/react/src/examples/image-preview/01/demo.json',
+    'examples/example/react/src/examples/image-preview/02/demo.json'
   ])('%s minHeight fits 90vh preview and does not freeze height', (relativePath) => {
     const demo = JSON.parse(readFileSync(resolve(process.cwd(), relativePath), 'utf-8')) as {
       viewport: { mode: string; minHeight: number; maxHeight: number; height?: number }

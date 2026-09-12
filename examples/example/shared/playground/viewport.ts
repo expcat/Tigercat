@@ -23,7 +23,7 @@ export const OVERLAY_DEMO_ROUTES = new Set([
   'mentions',
   'number-keyboard',
   'crop-upload',
-  'image-viewer',
+  'image-preview',
   'navigation-menu',
   'menu'
 ])

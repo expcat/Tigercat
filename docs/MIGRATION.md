@@ -4,11 +4,11 @@
 
 ## 未发布
 
-当前没有待组件用户处理的 breaking change。
+当前没有待组件用户处理的 breaking change。examples 不再演示 ImageViewer / Kanban / DonutChart 别名路由；新代码与示例用 ImagePreview / TaskBoard / PieChart。见 [MIGRATION-2.7.md](MIGRATION-2.7.md)。
 
 ## v2.7.0
 
-v2.7.0 无新必填 prop。ImageViewer / Kanban / DonutChart 仍是公开别名，实现收进 ImagePreview / TaskBoard / PieChart；子路径指向保留件 dist。不要 deep-import 已删除的 `dist/components/ImageViewer.mjs` 等文件名。工作流 API 不变。不是 BPMN。逐步说明见 [MIGRATION-2.7.md](MIGRATION-2.7.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v270)。
+v2.7.0 无新必填 prop。ImageViewer / Kanban / DonutChart 仍是公开别名，实现收进 ImagePreview / TaskBoard / PieChart；子路径指向保留件 dist。不要 deep-import 已删除的 `dist/components/ImageViewer.mjs` 等文件名。新代码与 examples 一律用 ImagePreview / TaskBoard / PieChart（`/image-preview`、`/task-board`、`/pie-chart`）；文档/示例不再演示别名路由，也不再推荐 `minZoom`。公开导出名仍可 import。工作流 API 不变。不是 BPMN。逐步说明见 [MIGRATION-2.7.md](MIGRATION-2.7.md)。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v270)。
 
 ## v2.6.0
 

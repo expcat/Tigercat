@@ -1,0 +1,8 @@
+{
+  "id": "image-preview-01",
+  "title": "全屏预览",
+  "description": "独立 ImagePreview：open + 带 alt 的 images。关掉 showNav 后键盘也不切图。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }
+}

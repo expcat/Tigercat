@@ -26,4 +26,6 @@ import { PieChart } from '@expcat/tigercat-vue/PieChart'
 - 看板：需要张数/加卡时显式传 `showCardCount` / `allowAddCard`。
 - 环形图：`PieChart` + `innerRadiusRatio`（默认实心；0.6 即原 Donut）。
 
+文档与 examples **不再**演示别名路由：入口是 `/image-preview`、`/task-board`、`/pie-chart`，不再挂 `/image-viewer`、`/kanban`、`/donut-chart`。公开导出名 `ImageViewer` / `Kanban` / `DonutChart` 仍存在于 package（本次未删 export），但文档/示例不再推荐、不再挂入口。
+
 3.0 可能去掉独立别名子路径叙事；2.7 **不删**公开名。

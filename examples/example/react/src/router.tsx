@@ -18,7 +18,7 @@ const MarqueeDemo = lazy(() => import('./pages/MarqueeDemo'))
 const ImageDemo = lazy(() => import('./pages/ImageDemo'))
 const ImageCompareDemo = lazy(() => import('./pages/ImageCompareDemo'))
 const ImageCropperDemo = lazy(() => import('./pages/ImageCropperDemo'))
-const ImageViewerDemo = lazy(() => import('./pages/ImageViewerDemo'))
+const ImagePreviewDemo = lazy(() => import('./pages/ImagePreviewDemo'))
 const AvatarDemo = lazy(() => import('./pages/AvatarDemo'))
 const BadgeDemo = lazy(() => import('./pages/BadgeDemo'))
 const TagDemo = lazy(() => import('./pages/TagDemo'))
@@ -122,7 +122,6 @@ const BarChartDemo = lazy(() => import('./pages/BarChartDemo'))
 const LineChartDemo = lazy(() => import('./pages/LineChartDemo'))
 const AreaChartDemo = lazy(() => import('./pages/AreaChartDemo'))
 const PieChartDemo = lazy(() => import('./pages/PieChartDemo'))
-const DonutChartDemo = lazy(() => import('./pages/DonutChartDemo'))
 const ScatterChartDemo = lazy(() => import('./pages/ScatterChartDemo'))
 const RadarChartDemo = lazy(() => import('./pages/RadarChartDemo'))
 const FunnelChartDemo = lazy(() => import('./pages/FunnelChartDemo'))
@@ -141,7 +140,6 @@ const InfiniteScrollDemo = lazy(() => import('./pages/InfiniteScrollDemo'))
 const CodeEditorDemo = lazy(() => import('./pages/CodeEditorDemo'))
 const RichTextEditorDemo = lazy(() => import('./pages/RichTextEditorDemo'))
 const MarkdownEditorDemo = lazy(() => import('./pages/MarkdownEditorDemo'))
-const KanbanDemo = lazy(() => import('./pages/KanbanDemo'))
 const FileManagerDemo = lazy(() => import('./pages/FileManagerDemo'))
 const ImageAnnotationDemo = lazy(() => import('./pages/ImageAnnotationDemo'))
 
@@ -182,7 +180,7 @@ const router = createHashRouter([
       { path: 'image', element: <ImageDemo /> },
       { path: 'image-compare', element: <ImageCompareDemo /> },
       { path: 'image-cropper', element: <ImageCropperDemo /> },
-      { path: 'image-viewer', element: <ImageViewerDemo /> },
+      { path: 'image-preview', element: <ImagePreviewDemo /> },
       { path: 'avatar', element: <AvatarDemo /> },
       { path: 'badge', element: <BadgeDemo /> },
       { path: 'tag', element: <TagDemo /> },
@@ -280,7 +278,6 @@ const router = createHashRouter([
       { path: 'line-chart', element: <LineChartDemo /> },
       { path: 'area-chart', element: <AreaChartDemo /> },
       { path: 'pie-chart', element: <PieChartDemo /> },
-      { path: 'donut-chart', element: <DonutChartDemo /> },
       { path: 'scatter-chart', element: <ScatterChartDemo /> },
       { path: 'radar-chart', element: <RadarChartDemo /> },
       { path: 'funnel-chart', element: <FunnelChartDemo /> },
@@ -298,7 +295,6 @@ const router = createHashRouter([
       { path: 'code-editor', element: <CodeEditorDemo /> },
       { path: 'rich-text-editor', element: <RichTextEditorDemo /> },
       { path: 'markdown-editor', element: <MarkdownEditorDemo /> },
-      { path: 'kanban', element: <KanbanDemo /> },
       { path: 'file-manager', element: <FileManagerDemo /> },
       { path: 'image-annotation', element: <ImageAnnotationDemo /> },
       // Composite

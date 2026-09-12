@@ -7,7 +7,7 @@ export default function PieChartDemo() {
   return (
     <DemoPage
       title="PieChart 饼图"
-      description="ECharts 风格饼图：悬停偏移、边框分隔、外部标签引导线、阴影等特效。"
+      description="饼图与环形图：innerRadiusRatio 挖环，外部标签引导线、中心文案、图例与渐变。"
       modules={modules}
     />
   )

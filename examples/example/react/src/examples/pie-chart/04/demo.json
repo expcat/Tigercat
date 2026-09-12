@@ -1,0 +1,12 @@
+{
+  "id": "pie-chart-04",
+  "title": "基础环形图",
+  "description": "innerRadiusRatio=0.6 挖出中心留空。实心饼图省略该 prop。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

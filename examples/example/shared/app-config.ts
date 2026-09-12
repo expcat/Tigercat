@@ -65,9 +65,9 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'ImageCropper 裁剪', 'en-US': 'ImageCropper' }
       },
       {
-        key: 'image-viewer',
-        path: '/image-viewer',
-        label: { 'zh-CN': 'ImageViewer 查看器', 'en-US': 'ImageViewer' }
+        key: 'image-preview',
+        path: '/image-preview',
+        label: { 'zh-CN': 'ImagePreview 图片预览', 'en-US': 'ImagePreview' }
       },
       { key: 'avatar', path: '/avatar', label: { 'zh-CN': 'Avatar 头像', 'en-US': 'Avatar' } },
       { key: 'badge', path: '/badge', label: { 'zh-CN': 'Badge 徽标', 'en-US': 'Badge' } },
@@ -428,11 +428,6 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'PieChart 饼图', 'en-US': 'PieChart' }
       },
       {
-        key: 'donut-chart',
-        path: '/donut-chart',
-        label: { 'zh-CN': 'DonutChart 环形图', 'en-US': 'DonutChart' }
-      },
-      {
         key: 'scatter-chart',
         path: '/scatter-chart',
         label: { 'zh-CN': 'ScatterChart 散点图', 'en-US': 'ScatterChart' }
@@ -523,7 +518,6 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         path: '/markdown-editor',
         label: { 'zh-CN': 'MarkdownEditor Markdown 编辑器', 'en-US': 'MarkdownEditor' }
       },
-      { key: 'kanban', path: '/kanban', label: { 'zh-CN': 'Kanban 看板', 'en-US': 'Kanban' } },
       {
         key: 'file-manager',
         path: '/file-manager',

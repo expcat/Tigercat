@@ -34,7 +34,7 @@ const router = createRouter({
           path: 'image-cropper',
           component: () => import('./pages/ImageCropperDemo.vue')
         },
-        { path: 'image-viewer', component: () => import('./pages/ImageViewerDemo.vue') },
+        { path: 'image-preview', component: () => import('./pages/ImagePreviewDemo.vue') },
         { path: 'avatar', component: () => import('./pages/AvatarDemo.vue') },
         { path: 'badge', component: () => import('./pages/BadgeDemo.vue') },
         { path: 'tag', component: () => import('./pages/TagDemo.vue') },
@@ -147,7 +147,6 @@ const router = createRouter({
         { path: 'line-chart', component: () => import('./pages/LineChartDemo.vue') },
         { path: 'area-chart', component: () => import('./pages/AreaChartDemo.vue') },
         { path: 'pie-chart', component: () => import('./pages/PieChartDemo.vue') },
-        { path: 'donut-chart', component: () => import('./pages/DonutChartDemo.vue') },
         {
           path: 'scatter-chart',
           component: () => import('./pages/ScatterChartDemo.vue')
@@ -186,7 +185,6 @@ const router = createRouter({
           path: 'markdown-editor',
           component: () => import('./pages/MarkdownEditorDemo.vue')
         },
-        { path: 'kanban', component: () => import('./pages/KanbanDemo.vue') },
         { path: 'file-manager', component: () => import('./pages/FileManagerDemo.vue') },
         {
           path: 'image-annotation',

@@ -2,6 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## 未发布
+
+- **examples / 文档硬切别名演示**：Pages 不再挂 `/image-viewer`、`/kanban`、`/donut-chart`。看图走 `/image-preview`（ImagePreview，`minScale`/`maxScale`），看板走 `/task-board`（含泳道），环形走 `/pie-chart` + `innerRadiusRatio`。新代码与示例一律用 ImagePreview / TaskBoard / PieChart。公开导出名 `ImageViewer` / `Kanban` / `DonutChart` 仍可 import（未删 package export），但文档/示例不再推荐、不再挂入口。Vue/React 对称。
+
 ## v2.7.2
 
 v2.7.2：与 2.7.0/2.7.1 同内容。2.7.1 在 npm 上 core/vue tarball 持续 404，故再发一版把 latest 落到可安装包。
@@ -12,11 +16,11 @@ v2.7.1：与 2.7.0 同内容。2.7.0 在 npm 上版本被 staged 后 tarball 404
 
 ## v2.7.0
 
-v2.7.0：组件瘦身。三组薄别名收进保留件（ImageViewer→ImagePreview、Kanban→TaskBoard、DonutChart→PieChart）；CSV escape 与看板 swimlane helpers 单源。公开别名仍可 import。无新必填 prop。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。
+v2.7.0：组件瘦身。三组薄别名收进保留件（ImageViewer→ImagePreview、Kanban→TaskBoard、DonutChart→PieChart）；CSV escape 与看板 swimlane helpers 单源。公开别名仍可 import。无新必填 prop。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。examples 现已不再演示别名路由（见上方未发布条目）。
 
-- **ImageViewer**：实现迁入 `ImagePreview`；`./ImageViewer` 子路径指向 Preview dist。`minZoom`/`maxZoom` 映射不变。新代码用 ImagePreview。Vue/React 对称。
-- **Kanban**：实现迁入 `TaskBoard`；`./Kanban` 子路径指向 TaskBoard dist。默认 `showCardCount`/`allowAddCard` 仍为 true。新代码用 TaskBoard。Vue/React 对称。
-- **DonutChart**：实现迁入 `PieChart`；`./DonutChart` 子路径指向 PieChart dist。默认 `innerRadiusRatio` 仍 0.6。新代码用 PieChart。Vue/React 对称。
+- **ImageViewer**：实现迁入 `ImagePreview`；`./ImageViewer` 子路径指向 Preview dist。`minZoom`/`maxZoom` 映射不变。新代码与示例用 ImagePreview。Vue/React 对称。
+- **Kanban**：实现迁入 `TaskBoard`；`./Kanban` 子路径指向 TaskBoard dist。默认 `showCardCount`/`allowAddCard` 仍为 true。新代码与示例用 TaskBoard。Vue/React 对称。
+- **DonutChart**：实现迁入 `PieChart`；`./DonutChart` 子路径指向 PieChart dist。默认 `innerRadiusRatio` 仍 0.6。新代码与示例用 PieChart。Vue/React 对称。
 - **core**：Table CSV 与 DataExport CSV 共用 `escapeCsvValue`；`kanban-*` 类名/泳道 helpers 实现并入 `task-board-view`（公开名不变）。
 - **WorkflowDetailShell**：header / action 槽改为 `div[data-slot]`（壳已是 `role="region"`，不再嵌套 banner/contentinfo landmark）。粘底布局 class 不变。Vue/React 对称。
 - 行为变化（非 breaking、无新必填 prop）见 [docs/MIGRATION-2.7.md](docs/MIGRATION-2.7.md)。

@@ -1,8 +1,0 @@
-{
-  "id": "image-viewer-01",
-  "title": "同一套全屏层",
-  "description": "ImageViewer 是 ImagePreview 的配置别名。这里关掉 showNav，键盘也不切图。",
-  "entry": "App.tsx",
-  "order": 1,
-  "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }
-}

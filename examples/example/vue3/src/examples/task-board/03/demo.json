@@ -1,0 +1,7 @@
+{
+  "id": "task-board-03",
+  "title": "列内泳道分组",
+  "description": "swimlanes 是列内按字段分组（未分组走 locale），不是跨列水平行。空列可键盘放下。showCardCount 显示源卡数。",
+  "entry": "App.vue",
+  "order": 3
+}

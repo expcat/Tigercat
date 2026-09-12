@@ -9,6 +9,6 @@ const modules = getDemoModules('task-board')
 <template>
   <DemoPage
     title="TaskBoard 任务看板"
-    description="可拖拽的任务看板，支持卡片跨列流转、列排序、WIP 限制等。"
+    description="可拖拽的任务看板，支持卡片跨列流转、列排序、WIP 限制、列内泳道分组。"
     :modules="modules" />
 </template>
