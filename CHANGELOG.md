@@ -4,6 +4,10 @@
 
 ## 未发布
 
+## v2.8.3
+
+v2.8.3：与 2.8.2 同内容。2.8.2 在 npm 上 `@expcat/tigercat-{core,vue,react}` tarball 404（changeset 报成功），故再发一版把 latest 落到可安装包。
+
 ## v2.8.2
 
 v2.8.2：Line/Area 图 `data-plot-hit` 在 `hoverable` 时触发 `onPointHover` / `point-hover`（tooltip 行为不变）。Vue cartesian 点焦点/键盘去掉 `SVGGraphicsElement` 双断言。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。Vue/React 对称。

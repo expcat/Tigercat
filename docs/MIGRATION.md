@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.8.3
+
+v2.8.3 无 breaking change，无新必填 prop。与 2.8.2 同内容（npm tarball 补发）。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v283)。
+
 ## v2.8.2
 
 v2.8.2 无 breaking change，无新必填 prop。Line/Area `data-plot-hit` 在 `hoverable` 时会触发 `onPointHover` / `point-hover`（原先仅更新 tooltip）。公开别名仍可 import。不是 BPMN。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v282)。
