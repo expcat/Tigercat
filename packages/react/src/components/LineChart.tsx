@@ -1,10 +1,7 @@
-import React, { useId, useMemo, useState, useCallback } from 'react'
+import React, { useId, useMemo, useCallback } from 'react'
 import {
   classNames,
-  createLinearScale,
-  createPointScale,
   getStableChartGradientPrefix,
-  getNumberExtent,
   linePointTransitionClasses,
   resolveChartPalette,
   buildChartLegendItems,
@@ -17,12 +14,9 @@ import {
   defaultChartSeriesName,
   layoutLineSeries,
   getCartesianChartShellClasses,
-  findNearestSeriesPoint,
   flattenChartPoints,
   chartPointTabIndex,
-  nextChartPointRef,
-  isChartNavigationKey,
-  isNumericChartDomain,
+  resolveCartesianSeriesScales,
   CHART_SURFACE_FILL,
   LINE_DRAW_CLASS,
   getChartLabels,
@@ -42,6 +36,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useCartesianSeriesPoints } from '../hooks/useCartesianSeriesPoints'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -126,11 +121,6 @@ export const LineChart: React.FC<LineChartProps> = ({
 }) => {
   const config = useTigerConfig()
   const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
-  const [hoveredPointInfo, setHoveredPointInfo] = useState<{
-    seriesIndex: number
-    pointIndex: number
-  } | null>(null)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
 
   // Unique gradient prefix for area fills
   const gradientId = useId()
@@ -190,24 +180,28 @@ export const LineChart: React.FC<LineChartProps> = ({
   const allData = useMemo(() => resolvedSeries.flatMap((s) => s.data), [resolvedSeries])
   const xValues = useMemo(() => allData.map((d) => d.x), [allData])
   const yValues = useMemo(() => allData.map((d) => d.y), [allData])
-  const isXNumeric = useMemo(() => isNumericChartDomain(xValues), [xValues])
-
-  const resolvedXScale = useMemo(() => {
-    if (xScaleProp) return xScaleProp
-    if (isXNumeric) {
-      const extent = getNumberExtent(xValues as number[], { includeZero: false })
-      return createLinearScale(extent, [0, innerRect.width])
-    } else {
-      const categories = [...new Set(xValues.map(String))]
-      return createPointScale(categories, [0, innerRect.width], { padding: 0 })
-    }
-  }, [xScaleProp, isXNumeric, xValues, innerRect.width])
-
-  const resolvedYScale = useMemo(() => {
-    if (yScaleProp) return yScaleProp
-    const extent = getNumberExtent(yValues, { includeZero: includeZero || showArea })
-    return createLinearScale(extent, [innerRect.height, 0])
-  }, [yScaleProp, yValues, includeZero, showArea, innerRect.height])
+  const { xScale: resolvedXScale, yScale: resolvedYScale } = useMemo(
+    () =>
+      resolveCartesianSeriesScales({
+        xValues,
+        yValues,
+        innerWidth: innerRect.width,
+        innerHeight: innerRect.height,
+        xScale: xScaleProp,
+        yScale: yScaleProp,
+        includeZero: Boolean(includeZero || showArea)
+      }),
+    [
+      xValues,
+      yValues,
+      innerRect.width,
+      innerRect.height,
+      xScaleProp,
+      yScaleProp,
+      includeZero,
+      showArea
+    ]
+  )
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
@@ -279,75 +273,6 @@ export const LineChart: React.FC<LineChartProps> = ({
     ]
   )
 
-  const tooltipContent = useMemo(
-    () =>
-      resolveMultiSeriesTooltipContent(
-        hoveredPointInfo,
-        resolvedSeries,
-        tooltipFormatter,
-        (datum, seriesIndex, pointIndex, s) =>
-          defaultSeriesXYTooltipFormatter(datum, seriesIndex, pointIndex, s, labels.seriesName)
-      ),
-    [hoveredPointInfo, resolvedSeries, tooltipFormatter, labels.seriesName]
-  )
-
-  const handlePointMouseEnter = useCallback(
-    (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
-      setHoveredPointInfo({ seriesIndex, pointIndex })
-      setTooltipPosition({ x: event.clientX, y: event.clientY })
-      if (hoverable) {
-        onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
-      }
-    },
-    [hoverable, onPointHover, resolvedSeries]
-  )
-
-  const handlePointMouseMove = useCallback((event: React.MouseEvent) => {
-    setTooltipPosition({ x: event.clientX, y: event.clientY })
-  }, [])
-
-  const handlePointMouseLeave = useCallback(() => {
-    setHoveredPointInfo(null)
-    if (hoverable) {
-      onPointHover?.(null, null, null)
-    }
-  }, [hoverable, onPointHover])
-
-  // Keyboard/focus tooltip: synthesize a pointer position from the point's
-  // on-screen rect so focused points show the same tooltip as hovered ones.
-  const showPointTooltipFromElement = useCallback(
-    (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
-      if (!(showTooltip || hoverable)) return
-      const rect = el.getBoundingClientRect()
-      setHoveredPointInfo({ seriesIndex, pointIndex })
-      setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
-      onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
-    },
-    [hoverable, showTooltip, onPointHover, resolvedSeries]
-  )
-
-  const handlePlotMouseMove = useCallback(
-    (event: React.MouseEvent<SVGRectElement>) => {
-      if (!(showTooltip || hoverable)) return
-      const target = event.currentTarget
-      const rect = target.getBoundingClientRect()
-      const width = rect.width || innerRect.width
-      const height = rect.height || innerRect.height
-      if (width === 0 || height === 0) return
-      const x = ((event.clientX - rect.left) / width) * innerRect.width
-      const y = ((event.clientY - rect.top) / height) * innerRect.height
-      const nearest = findNearestSeriesPoint(
-        seriesData.map((sd) => sd.points),
-        x,
-        y
-      )
-      if (!nearest) return
-      setHoveredPointInfo(nearest)
-      setTooltipPosition({ x: event.clientX, y: event.clientY })
-    },
-    [showTooltip, hoverable, innerRect.width, innerRect.height, seriesData]
-  )
-
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
@@ -359,6 +284,39 @@ export const LineChart: React.FC<LineChartProps> = ({
   const pointClickable = Boolean(onPointClick)
   const trackPointHover = showTooltip || hoverable
   const flatPoints = useMemo(() => flattenChartPoints(seriesData), [seriesData])
+  const {
+    hoveredPointInfo,
+    tooltipPosition,
+    handlePointMouseEnter,
+    handlePointMouseMove,
+    handlePointMouseLeave,
+    showPointTooltipFromElement,
+    handlePlotMouseMove,
+    handlePointKeydown
+  } = useCartesianSeriesPoints({
+    showTooltip,
+    hoverable,
+    innerRect,
+    getSeriesPoints: () => seriesData,
+    getDatum: (seriesIndex, pointIndex) => resolvedSeries[seriesIndex]?.data[pointIndex],
+    getSeriesKeys: () => seriesKeys,
+    getFlatPoints: () => flatPoints,
+    onPointHover,
+    onPointActivate: handlePointClick,
+    pointClickable
+  })
+
+  const tooltipContent = useMemo(
+    () =>
+      resolveMultiSeriesTooltipContent(
+        hoveredPointInfo,
+        resolvedSeries,
+        tooltipFormatter,
+        (datum, seriesIndex, pointIndex, s) =>
+          defaultSeriesXYTooltipFormatter(datum, seriesIndex, pointIndex, s, labels.seriesName)
+      ),
+    [hoveredPointInfo, resolvedSeries, tooltipFormatter, labels.seriesName]
+  )
 
   const chart = (
     <ChartCanvas
@@ -583,37 +541,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                     onBlur={trackPointHover ? handlePointMouseLeave : undefined}
                     onKeyDown={
                       pointInteractive
-                        ? (e) => {
-                            if (isChartNavigationKey(e.key)) {
-                              e.preventDefault()
-                              const next = nextChartPointRef(
-                                { seriesIndex: sd.seriesIndex, pointIndex: point.pointIndex },
-                                e.key,
-                                flatPoints
-                              )
-                              if (!next) return
-                              const node = e.currentTarget.ownerSVGElement?.querySelector(
-                                `[data-series-key="${seriesKeys[next.seriesIndex]}"][data-point-index="${next.pointIndex}"]`
-                              )
-                              if (node instanceof SVGElement) node.focus()
-                              return
-                            }
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              if (pointClickable) {
-                                handlePointClick(sd.seriesIndex, point.pointIndex)
-                              } else {
-                                showPointTooltipFromElement(
-                                  e.currentTarget,
-                                  sd.seriesIndex,
-                                  point.pointIndex
-                                )
-                              }
-                            } else if (e.key === 'Escape' && trackPointHover) {
-                              handlePointMouseLeave()
-                            }
-                          }
+                        ? (e) => handlePointKeydown(e, sd.seriesIndex, point.pointIndex)
                         : undefined
                     }
                   />

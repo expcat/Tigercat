@@ -1,11 +1,8 @@
-import { defineComponent, computed, h, PropType, ref, useId } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  createLinearScale,
-  createPointScale,
   getStableChartGradientPrefix,
-  getNumberExtent,
   linePointTransitionClasses,
   stackSeriesData,
   layoutAreaSeries,
@@ -19,12 +16,9 @@ import {
   defaultSeriesXYTooltipFormatter,
   defaultChartSeriesName,
   getCartesianChartShellClasses,
-  findNearestSeriesPoint,
   flattenChartPoints,
   chartPointTabIndex,
-  nextChartPointRef,
-  isChartNavigationKey,
-  isNumericChartDomain,
+  resolveCartesianSeriesScales,
   CHART_SURFACE_FILL,
   AREA_DRAW_CLASS,
   getChartLabels,
@@ -47,6 +41,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useCartesianSeriesPoints } from '../composables/useCartesianSeriesPoints'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -289,8 +284,6 @@ export const AreaChart = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
-    const hoveredPointInfo = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
-    const tooltipPosition = ref({ x: 0, y: 0 })
     const gradientPrefix = getStableChartGradientPrefix('area', useId())
 
     const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
@@ -349,27 +342,19 @@ export const AreaChart = defineComponent({
       }
       return allData.value.map((d) => d.y)
     })
-    const isXNumeric = computed(() => isNumericChartDomain(xValues.value))
-
-    const resolvedXScale = computed(() => {
-      if (props.xScale) return props.xScale
-
-      if (isXNumeric.value) {
-        const extent = getNumberExtent(xValues.value as number[], { includeZero: false })
-        return createLinearScale(extent, [0, innerRect.value.width])
-      } else {
-        const categories = [...new Set(xValues.value.map(String))]
-        return createPointScale(categories, [0, innerRect.value.width], { padding: 0 })
-      }
-    })
-
-    const resolvedYScale = computed(() => {
-      if (props.yScale) return props.yScale
-      const extent = getNumberExtent(yValues.value, {
-        includeZero: props.includeZero || props.stacked
+    const resolvedScales = computed(() =>
+      resolveCartesianSeriesScales({
+        xValues: xValues.value,
+        yValues: yValues.value,
+        innerWidth: innerRect.value.width,
+        innerHeight: innerRect.value.height,
+        xScale: props.xScale,
+        yScale: props.yScale,
+        includeZero: Boolean(props.includeZero || props.stacked)
       })
-      return createLinearScale(extent, [innerRect.value.height, 0])
-    })
+    )
+    const resolvedXScale = computed(() => resolvedScales.value.xScale)
+    const resolvedYScale = computed(() => resolvedScales.value.yScale)
 
     const shouldShowXAxis = computed(() => props.showAxis && props.showXAxis)
     const shouldShowYAxis = computed(() => props.showAxis && props.showYAxis)
@@ -424,6 +409,36 @@ export const AreaChart = defineComponent({
       })
     )
 
+    const handlePointClick = (seriesIndex: number, pointIndex: number) => {
+      const datum = resolvedSeries.value[seriesIndex]?.data[pointIndex]
+      props.onPointClick?.(seriesIndex, pointIndex, datum)
+      emit('point-click', seriesIndex, pointIndex, datum)
+      handleSeriesSelect(seriesIndex)
+    }
+
+    const {
+      hoveredPointInfo,
+      tooltipPosition,
+      handlePointMouseEnter,
+      handlePointMouseMove,
+      handlePointMouseLeave,
+      showPointTooltipFromElement,
+      handlePlotMouseMove,
+      handlePointKeydown
+    } = useCartesianSeriesPoints({
+      showTooltip: () => props.showTooltip,
+      hoverable: () => props.hoverable,
+      innerRect,
+      getSeriesPoints: () => seriesData.value,
+      getDatum: (seriesIndex, pointIndex) => resolvedSeries.value[seriesIndex]?.data[pointIndex],
+      getSeriesKeys: () => seriesKeys.value,
+      getFlatPoints: () => flatPoints.value,
+      onPointHover: (seriesIndex, pointIndex, datum) =>
+        emit('point-hover', seriesIndex, pointIndex, datum),
+      onPointActivate: handlePointClick,
+      pointClickable: () => typeof props.onPointClick === 'function'
+    })
+
     const tooltipContent = computed(() =>
       resolveMultiSeriesTooltipContent(
         hoveredPointInfo.value,
@@ -439,78 +454,6 @@ export const AreaChart = defineComponent({
           )
       )
     )
-
-    const handlePointMouseEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
-      hoveredPointInfo.value = { seriesIndex, pointIndex }
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-      if (props.hoverable) {
-        emit(
-          'point-hover',
-          seriesIndex,
-          pointIndex,
-          resolvedSeries.value[seriesIndex]?.data[pointIndex]
-        )
-      }
-    }
-
-    const handlePointMouseMove = (event: MouseEvent) => {
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-    }
-
-    const handlePointMouseLeave = () => {
-      hoveredPointInfo.value = null
-      if (props.hoverable) {
-        emit('point-hover', null, null, null)
-      }
-    }
-
-    // Keyboard/focus tooltip: synthesize a pointer position from the point's
-    // on-screen rect so focused points show the same tooltip as hovered ones.
-    const showPointTooltipFromElement = (
-      el: SVGGraphicsElement,
-      seriesIndex: number,
-      pointIndex: number
-    ) => {
-      if (!(props.showTooltip || props.hoverable)) return
-      const rect = el.getBoundingClientRect()
-      hoveredPointInfo.value = { seriesIndex, pointIndex }
-      tooltipPosition.value = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
-      emit(
-        'point-hover',
-        seriesIndex,
-        pointIndex,
-        resolvedSeries.value[seriesIndex]?.data[pointIndex]
-      )
-    }
-
-    const handlePointClick = (seriesIndex: number, pointIndex: number) => {
-      emit(
-        'point-click',
-        seriesIndex,
-        pointIndex,
-        resolvedSeries.value[seriesIndex]?.data[pointIndex]
-      )
-      handleSeriesSelect(seriesIndex)
-    }
-
-    const handlePlotMouseMove = (event: MouseEvent) => {
-      if (!(props.showTooltip || props.hoverable)) return
-      const target = event.currentTarget as SVGGraphicsElement
-      const rect = target.getBoundingClientRect()
-      const width = rect.width || innerRect.value.width
-      const height = rect.height || innerRect.value.height
-      if (width === 0 || height === 0) return
-      const x = ((event.clientX - rect.left) / width) * innerRect.value.width
-      const y = ((event.clientY - rect.top) / height) * innerRect.value.height
-      const nearest = findNearestSeriesPoint(
-        seriesData.value.map((sd) => sd.points),
-        x,
-        y
-      )
-      if (!nearest) return
-      hoveredPointInfo.value = nearest
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-    }
 
     return () => {
       const pointClickable = typeof props.onPointClick === 'function'
@@ -800,42 +743,8 @@ export const AreaChart = defineComponent({
                           : undefined,
                         onBlur: trackPointHover ? handlePointMouseLeave : undefined,
                         onKeydown: pointInteractive
-                          ? (e: KeyboardEvent) => {
-                              if (isChartNavigationKey(e.key)) {
-                                e.preventDefault()
-                                const next = nextChartPointRef(
-                                  {
-                                    seriesIndex: sd.seriesIndex,
-                                    pointIndex: point.pointIndex
-                                  },
-                                  e.key,
-                                  flatPoints.value
-                                )
-                                if (!next) return
-                                const node = (
-                                  e.currentTarget as SVGElement
-                                ).ownerSVGElement?.querySelector(
-                                  `[data-series-key="${seriesKeys.value[next.seriesIndex]}"][data-point-index="${next.pointIndex}"]`
-                                )
-                                if (node instanceof SVGElement) node.focus()
-                                return
-                              }
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                if (pointClickable) {
-                                  handlePointClick(sd.seriesIndex, point.pointIndex)
-                                } else {
-                                  showPointTooltipFromElement(
-                                    e.currentTarget as unknown as SVGGraphicsElement,
-                                    sd.seriesIndex,
-                                    point.pointIndex
-                                  )
-                                }
-                              } else if (e.key === 'Escape' && trackPointHover) {
-                                handlePointMouseLeave()
-                              }
-                            }
+                          ? (e: KeyboardEvent) =>
+                              handlePointKeydown(e, sd.seriesIndex, point.pointIndex)
                           : undefined
                       })
                     })

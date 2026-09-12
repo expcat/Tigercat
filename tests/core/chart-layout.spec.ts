@@ -8,6 +8,8 @@ import {
   getBarValueLabelY,
   getScatterPointPath,
   isNumericChartDomain,
+  mapPointerToPlotPoint,
+  resolveCartesianSeriesScales,
   DEFAULT_DONUT_INNER_RADIUS_RATIO,
   PIE_OUTSIDE_RADIUS_RATIO,
   layoutAreaSeries,
@@ -269,6 +271,71 @@ describe('formatChartTemplate', () => {
     expect(formatChartTemplate('Point {index}: ({x}, {y})', { index: 1, x: 2, y: 3 })).toBe(
       'Point 1: (2, 3)'
     )
+  })
+})
+
+describe('resolveCartesianSeriesScales', () => {
+  it('builds linear x and y when x is numeric', () => {
+    const { xScale, yScale } = resolveCartesianSeriesScales({
+      xValues: [0, 10],
+      yValues: [2, 8],
+      innerWidth: 100,
+      innerHeight: 50,
+      includeZero: false
+    })
+    expect(xScale.type).toBe('linear')
+    expect(yScale.type).toBe('linear')
+    expect(xScale.map(0)).toBe(0)
+    expect(xScale.map(10)).toBe(100)
+    expect(yScale.map(2)).toBe(50)
+    expect(yScale.map(8)).toBe(0)
+  })
+
+  it('uses a point scale for categorical x and respects includeZero on y', () => {
+    const { xScale, yScale } = resolveCartesianSeriesScales({
+      xValues: ['a', 'b'],
+      yValues: [4, 8],
+      innerWidth: 100,
+      innerHeight: 40,
+      includeZero: true
+    })
+    expect(xScale.type).toBe('point')
+    expect(yScale.domain[0]).toBe(0)
+  })
+
+  it('keeps explicit scales', () => {
+    const xScale = createLinearScale([0, 1], [0, 10])
+    const yScale = createLinearScale([0, 1], [10, 0])
+    const resolved = resolveCartesianSeriesScales({
+      xValues: [0, 1],
+      yValues: [0, 1],
+      innerWidth: 100,
+      innerHeight: 100,
+      xScale,
+      yScale,
+      includeZero: false
+    })
+    expect(resolved.xScale).toBe(xScale)
+    expect(resolved.yScale).toBe(yScale)
+  })
+})
+
+describe('mapPointerToPlotPoint', () => {
+  it('maps a pointer into inner plot coordinates', () => {
+    expect(
+      mapPointerToPlotPoint(
+        25,
+        15,
+        { left: 5, top: 5, width: 40, height: 20 },
+        { width: 80, height: 40 }
+      )
+    ).toEqual({ x: 40, y: 20 })
+  })
+
+  it('returns null for a zero-size target', () => {
+    expect(
+      mapPointerToPlotPoint(0, 0, { left: 0, top: 0, width: 0, height: 0 }, { width: 0, height: 0 })
+    ).toBeNull()
   })
 })
 

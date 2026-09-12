@@ -20,7 +20,7 @@ import {
   ensureBarMinHeight,
   getScatterPointPath
 } from './path'
-import { scaleContainsValue } from './scale'
+import { createLinearScale, createPointScale, getNumberExtent, scaleContainsValue } from './scale'
 
 export const CHART_SURFACE_FILL = 'var(--tiger-bg,#ffffff)'
 export const SCATTER_MAX_PIXEL_RADIUS = 40
@@ -56,6 +56,69 @@ export function nextChartRovingIndex(current: number, key: string, count: number
 
 export function isNumericChartDomain(values: unknown[]): boolean {
   return values.length > 0 && values.every((value) => typeof value === 'number')
+}
+
+export interface ResolveCartesianSeriesScalesInput {
+  xValues: ChartScaleValue[]
+  yValues: number[]
+  innerWidth: number
+  innerHeight: number
+  xScale?: ChartScale
+  yScale?: ChartScale
+  includeZero: boolean
+}
+
+/** Shared Line/Area x/y scale resolution. Public chart APIs stay per figure. */
+export function resolveCartesianSeriesScales(input: ResolveCartesianSeriesScalesInput): {
+  xScale: ChartScale
+  yScale: ChartScale
+} {
+  const xScale = input.xScale
+    ? input.xScale
+    : isNumericChartDomain(input.xValues)
+      ? createLinearScale(getNumberExtent(input.xValues as number[], { includeZero: false }), [
+          0,
+          input.innerWidth
+        ])
+      : createPointScale([...new Set(input.xValues.map(String))], [0, input.innerWidth], {
+          padding: 0
+        })
+
+  const yScale = input.yScale
+    ? input.yScale
+    : createLinearScale(getNumberExtent(input.yValues, { includeZero: input.includeZero }), [
+        input.innerHeight,
+        0
+      ])
+
+  return { xScale, yScale }
+}
+
+export function mapPointerToPlotPoint(
+  clientX: number,
+  clientY: number,
+  targetRect: { left: number; top: number; width: number; height: number },
+  inner: { width: number; height: number }
+): { x: number; y: number } | null {
+  const width = targetRect.width || inner.width
+  const height = targetRect.height || inner.height
+  if (width === 0 || height === 0) return null
+  return {
+    x: ((clientX - targetRect.left) / width) * inner.width,
+    y: ((clientY - targetRect.top) / height) * inner.height
+  }
+}
+
+export function queryChartPointElement(
+  root: ParentNode | null | undefined,
+  seriesKey: string,
+  pointIndex: number
+): SVGElement | null {
+  if (!root) return null
+  const node = root.querySelector(
+    `[data-series-key="${seriesKey}"][data-point-index="${pointIndex}"]`
+  )
+  return node instanceof SVGElement ? node : null
 }
 
 export interface ChartPointRef {
