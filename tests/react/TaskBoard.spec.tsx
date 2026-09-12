@@ -651,6 +651,54 @@ describe('TaskBoard (React)', () => {
     })
   })
 
+  describe('Swimlanes', () => {
+    const swimlaneColumns: TaskBoardColumn[] = [
+      {
+        id: 'todo',
+        title: 'To Do',
+        cards: [
+          { id: '1', title: 'Bug task', type: 'bug' },
+          { id: '2', title: 'Feature task', type: 'feature' },
+          { id: '3', title: 'Unassigned task' }
+        ]
+      }
+    ]
+
+    it('groups cards by swimlane field', () => {
+      const { container, getByText } = render(
+        <TaskBoard
+          columns={swimlaneColumns}
+          swimlaneField="type"
+          swimlanes={[
+            { id: 'bug', label: 'Bugs', color: '#ef4444' },
+            { id: 'feature', label: 'Features' }
+          ]}
+        />
+      )
+
+      expect(container.querySelectorAll('[data-tiger-kanban-swimlane]').length).toBe(3)
+      expect(getByText('Bugs')).toBeTruthy()
+      expect(getByText('Features')).toBeTruthy()
+      expect(getByText('Unassigned')).toBeTruthy()
+      expect(getByText('Bug task')).toBeTruthy()
+      expect(getByText('Feature task')).toBeTruthy()
+      expect(getByText('Unassigned task')).toBeTruthy()
+    })
+
+    it('hides cards for collapsed swimlanes', () => {
+      const { container, queryByText } = render(
+        <TaskBoard
+          columns={swimlaneColumns}
+          swimlaneField="type"
+          swimlanes={[{ id: 'bug', label: 'Bugs', collapsed: true }]}
+        />
+      )
+      const lane = container.querySelector('[data-tiger-kanban-swimlane-id="bug"]')
+      expect(lane?.querySelector('[data-tiger-taskboard-card]')).toBeNull()
+      expect(queryByText('Bug task')).not.toBeInTheDocument()
+    })
+  })
+
   describe('Column description', () => {
     it('renders column description when provided', () => {
       const colsWithDesc: TaskBoardColumn[] = [

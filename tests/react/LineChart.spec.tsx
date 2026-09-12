@@ -226,6 +226,24 @@ describe('LineChart', () => {
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 
+  it('fires onPointHover from the plot hit target when hoverable', () => {
+    const onPointHover = vi.fn()
+    const { container } = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: false,
+      hoverable: true,
+      onPointHover,
+      ...defaultSize
+    })
+    fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, { clientX: 40, clientY: 40 })
+    expect(onPointHover).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.any(Number),
+      expect.any(Object)
+    )
+    expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
+  })
+
   it('uses a single tab stop for selectable points', () => {
     const { container } = renderWithProps(LineChart, {
       series: [

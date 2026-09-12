@@ -60,7 +60,7 @@ export function useCartesianSeriesPoints<T>({
   }, [hoverable, onPointHover])
 
   const showPointTooltipFromElement = useCallback(
-    (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
+    (el: SVGElement, seriesIndex: number, pointIndex: number) => {
       if (!trackHover) return
       const rect = el.getBoundingClientRect()
       setHoveredPointInfo({ seriesIndex, pointIndex })
@@ -88,8 +88,15 @@ export function useCartesianSeriesPoints<T>({
       if (!nearest) return
       setHoveredPointInfo(nearest)
       setTooltipPosition({ x: event.clientX, y: event.clientY })
+      if (hoverable) {
+        onPointHover?.(
+          nearest.seriesIndex,
+          nearest.pointIndex,
+          getDatum(nearest.seriesIndex, nearest.pointIndex) ?? null
+        )
+      }
     },
-    [getSeriesPoints, innerRect, trackHover]
+    [getDatum, getSeriesPoints, hoverable, innerRect, onPointHover, trackHover]
   )
 
   const handlePointKeydown = useCallback(
@@ -111,11 +118,7 @@ export function useCartesianSeriesPoints<T>({
         if (pointClickable) {
           onPointActivate(seriesIndex, pointIndex)
         } else {
-          showPointTooltipFromElement(
-            event.currentTarget as SVGGraphicsElement,
-            seriesIndex,
-            pointIndex
-          )
+          showPointTooltipFromElement(event.currentTarget, seriesIndex, pointIndex)
         }
       } else if (event.key === 'Escape' && trackHover) {
         handlePointMouseLeave()

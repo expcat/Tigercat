@@ -734,12 +734,15 @@ export const AreaChart = defineComponent({
                           handlePointClick(sd.seriesIndex, point.pointIndex)
                         },
                         onFocus: trackPointHover
-                          ? (e: FocusEvent) =>
-                              showPointTooltipFromElement(
-                                e.currentTarget as unknown as SVGGraphicsElement,
-                                sd.seriesIndex,
-                                point.pointIndex
-                              )
+                          ? (e: FocusEvent) => {
+                              if (e.currentTarget instanceof SVGElement) {
+                                showPointTooltipFromElement(
+                                  e.currentTarget,
+                                  sd.seriesIndex,
+                                  point.pointIndex
+                                )
+                              }
+                            }
                           : undefined,
                         onBlur: trackPointHover ? handlePointMouseLeave : undefined,
                         onKeydown: pointInteractive

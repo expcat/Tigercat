@@ -95,4 +95,29 @@ describe('PieChart', () => {
       expect(emitted()['slice-click']?.[0]).toEqual([1, data[1]])
     })
   })
+
+  it('renders a ring and center copy when innerRadiusRatio is set', () => {
+    const { container } = renderWithProps(PieChart, {
+      data: [{ value: 60 }, { value: 40 }],
+      innerRadiusRatio: 0.6,
+      centerValue: '100',
+      centerLabel: '总计',
+      ...defaultSize
+    })
+    const path = container.querySelector('path[data-pie-slice]')?.getAttribute('d') ?? ''
+    expect((path.match(/A/g) ?? []).length).toBeGreaterThanOrEqual(2)
+    const center = container.querySelector('[data-donut-center]')
+    expect(center).toBeTruthy()
+    expect(center!.textContent).toContain('100')
+    expect(center!.textContent).toContain('总计')
+  })
+
+  it('does not render center content when center props are absent', () => {
+    const { container } = renderWithProps(PieChart, {
+      data: [{ value: 50 }, { value: 50 }],
+      innerRadiusRatio: 0.6,
+      ...defaultSize
+    })
+    expect(container.querySelector('[data-donut-center]')).toBeNull()
+  })
 })

@@ -4,6 +4,15 @@
 
 ## 未发布
 
+## v2.8.2
+
+v2.8.2：Line/Area 图 `data-plot-hit` 在 `hoverable` 时触发 `onPointHover` / `point-hover`（tooltip 行为不变）。Vue cartesian 点焦点/键盘去掉 `SVGGraphicsElement` 双断言。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。Vue/React 对称。
+
+- **Charts**：`useCartesianSeriesPoints` 的 plot-hit 移动在 `hoverable` 时调用 `onPointHover`（Vue 发 `point-hover`）。默认仅 tooltip 的路径不变。
+- **Vue**：cartesian 点 `focus`/`keydown` 使用 `SVGElement`（`instanceof`），与 React `KeyboardEvent<SVGElement>` 对齐。
+- **测试**：PieChart 补 `innerRadiusRatio` + 中心文案；TaskBoard 补泳道 DOM（Kanban spec 保留）。
+- **发布**：已发布 changeset 迁到 `.changeset/published/`，避免误跑 `changeset version` 把 2.7+2.8 叠成 2.9。版本仍用 `scripts/sync-version.mjs`。
+
 ## v2.8.1
 
 v2.8.1：React Line/Area 共用 cartesian 点键盘事件类型修正。GitHub Pages 示例 `tsc` 可通过。无运行时行为变化。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。不砍工作流 2.5/2.6 能力。Vue/React 对称。

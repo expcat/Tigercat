@@ -224,6 +224,23 @@ describe('LineChart', () => {
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 
+  it('emits point-hover from the plot hit target when hoverable', async () => {
+    const { container, emitted } = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: false,
+      hoverable: true,
+      ...defaultSize
+    })
+    await fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, {
+      clientX: 40,
+      clientY: 40
+    })
+    expect(emitted()['point-hover']).toBeTruthy()
+    expect(emitted()['point-hover']?.[0]?.[0]).toEqual(expect.any(Number))
+    expect(emitted()['point-hover']?.[0]?.[1]).toEqual(expect.any(Number))
+    expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
+  })
+
   it('uses a single tab stop for selectable points', () => {
     const { container } = renderWithProps(LineChart, {
       series: [

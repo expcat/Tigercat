@@ -50,11 +50,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     }
   }
 
-  const showPointTooltipFromElement = (
-    el: SVGGraphicsElement,
-    seriesIndex: number,
-    pointIndex: number
-  ) => {
+  const showPointTooltipFromElement = (el: SVGElement, seriesIndex: number, pointIndex: number) => {
     if (!trackHover()) return
     const rect = el.getBoundingClientRect()
     hoveredPointInfo.value = { seriesIndex, pointIndex }
@@ -68,7 +64,8 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
 
   const handlePlotMouseMove = (event: MouseEvent) => {
     if (!trackHover()) return
-    const target = event.currentTarget as SVGGraphicsElement
+    const target = event.currentTarget
+    if (!(target instanceof Element)) return
     const mapped = mapPointerToPlotPoint(
       event.clientX,
       event.clientY,
@@ -84,6 +81,13 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     if (!nearest) return
     hoveredPointInfo.value = nearest
     tooltipPosition.value = { x: event.clientX, y: event.clientY }
+    if (toValue(options.hoverable)) {
+      options.onPointHover?.(
+        nearest.seriesIndex,
+        nearest.pointIndex,
+        options.getDatum(nearest.seriesIndex, nearest.pointIndex) ?? null
+      )
+    }
   }
 
   const handlePointKeydown = (event: KeyboardEvent, seriesIndex: number, pointIndex: number) => {
@@ -108,12 +112,8 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
       event.stopPropagation()
       if (toValue(options.pointClickable)) {
         options.onPointActivate(seriesIndex, pointIndex)
-      } else {
-        showPointTooltipFromElement(
-          event.currentTarget as unknown as SVGGraphicsElement,
-          seriesIndex,
-          pointIndex
-        )
+      } else if (event.currentTarget instanceof SVGElement) {
+        showPointTooltipFromElement(event.currentTarget, seriesIndex, pointIndex)
       }
     } else if (event.key === 'Escape' && trackHover()) {
       handlePointMouseLeave()

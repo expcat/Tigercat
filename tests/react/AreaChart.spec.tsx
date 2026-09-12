@@ -180,6 +180,23 @@ describe('AreaChart', () => {
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 
+  it('fires onPointHover from the plot hit target when hoverable', () => {
+    const onPointHover = vi.fn()
+    const { container } = renderWithProps(AreaChart, {
+      data: basicData,
+      hoverable: true,
+      onPointHover,
+      ...defaultSize
+    })
+    fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, { clientX: 40, clientY: 40 })
+    expect(onPointHover).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.any(Number),
+      expect.any(Object)
+    )
+    expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
+  })
+
   it('renders stacked series without rewriting a dashed stroke', () => {
     const { container } = renderWithProps(AreaChart, {
       series: [

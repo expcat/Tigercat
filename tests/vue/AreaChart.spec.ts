@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { fireEvent } from '@testing-library/vue'
 import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
@@ -139,16 +139,18 @@ describe('AreaChart', () => {
     expect(passivePoint).not.toHaveAttribute('role')
     expect(passivePoint).not.toHaveAttribute('tabindex')
 
+    const onPointClick = vi.fn()
     const clickable = renderWithProps(AreaChart, {
       data: basicData,
       showPoints: true,
-      onPointClick: () => {},
+      onPointClick,
       ...defaultSize
     })
     const clickablePoint = clickable.container.querySelector('circle[data-point-index="0"]')!
     expect(clickablePoint).toHaveAttribute('role', 'button')
     expect(clickablePoint).toHaveAttribute('tabindex', '0')
     await fireEvent.keyDown(clickablePoint, { key: ' ' })
+    expect(onPointClick).toHaveBeenCalledWith(0, 0, expect.any(Object))
     expect(clickable.emitted()['point-click']).toBeTruthy()
   })
 
@@ -162,6 +164,22 @@ describe('AreaChart', () => {
       clientX: 40,
       clientY: 40
     })
+    expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
+  })
+
+  it('emits point-hover from the plot hit target when hoverable', async () => {
+    const { container, emitted } = renderWithProps(AreaChart, {
+      data: basicData,
+      hoverable: true,
+      ...defaultSize
+    })
+    await fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, {
+      clientX: 40,
+      clientY: 40
+    })
+    expect(emitted()['point-hover']).toBeTruthy()
+    expect(emitted()['point-hover']?.[0]?.[0]).toEqual(expect.any(Number))
+    expect(emitted()['point-hover']?.[0]?.[1]).toEqual(expect.any(Number))
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 

@@ -4,13 +4,14 @@ v2.8.0 是内部内聚 minor：生成文档降格三别名、下载 Blob 单源�
 
 ## 兼容期（可先不改）
 
-| 2.7.x 写法                                                       | 2.8.0 行为                                              |
-| ---------------------------------------------------------------- | ------------------------------------------------------- |
-| `import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'` | 仍导出。`minZoom`/`maxZoom` 仍映射。                    |
-| `import { Kanban } from '@expcat/tigercat-react/Kanban'`         | 仍导出。默认 `showCardCount`/`allowAddCard` 仍为 true。 |
-| `import { DonutChart } from '@expcat/tigercat-vue/DonutChart'`   | 仍导出。默认 `innerRadiusRatio` 仍为 0.6。              |
-| Vue `AreaChart` `onPointClick`                                   | 现在会调用（与 Line / React Area 对齐）。               |
-| 工作流 Viewer / Timeline / ActionBar / Designer / DetailShell    | **不变**                                                |
+| 2.7.x 写法                                                       | 2.8.0 行为                                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'` | 仍导出。`minZoom`/`maxZoom` 仍映射。                                |
+| `import { Kanban } from '@expcat/tigercat-react/Kanban'`         | 仍导出。默认 `showCardCount`/`allowAddCard` 仍为 true。             |
+| `import { DonutChart } from '@expcat/tigercat-vue/DonutChart'`   | 仍导出。默认 `innerRadiusRatio` 仍为 0.6。                          |
+| Vue `AreaChart` `onPointClick`                                   | 现在会调用（与 Line / React Area 对齐）。                           |
+| Line/Area `data-plot-hit` + `hoverable`                          | 2.8.2 起同时触发 `onPointHover` / `point-hover`（原先仅 tooltip）。 |
+| 工作流 Viewer / Timeline / ActionBar / Designer / DetailShell    | **不变**                                                            |
 
 无新必填 prop。不要依赖未文档化的 dist 文件名。
 
