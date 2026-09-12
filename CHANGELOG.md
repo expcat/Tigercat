@@ -4,6 +4,10 @@
 
 ## 未发布
 
+## v2.8.4
+
+v2.8.4：与 2.8.2/2.8.3 同内容。2.8.3 在 npm 上 `latest` 已指向该版本，但 core/vue/react tarball 持续 404，故再发一版把 latest 落到可安装包。
+
 ## v2.8.3
 
 v2.8.3：与 2.8.2 同内容。2.8.2 在 npm 上 `@expcat/tigercat-{core,vue,react}` tarball 404（changeset 报成功），故再发一版把 latest 落到可安装包。

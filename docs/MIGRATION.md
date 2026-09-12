@@ -6,6 +6,10 @@
 
 当前没有待组件用户处理的 breaking change。
 
+## v2.8.4
+
+v2.8.4 无 breaking change，无新必填 prop。与 2.8.2 同内容（npm tarball 补发）。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v284)。
+
 ## v2.8.3
 
 v2.8.3 无 breaking change，无新必填 prop。与 2.8.2 同内容（npm tarball 补发）。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v283)。
