@@ -16,7 +16,9 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface CardProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'>, Omit<CoreCardProps, 'cover'> {
+  extends
+    Omit<React.HTMLAttributes<HTMLElement>, 'onClick' | 'title'>,
+    Omit<CoreCardProps, 'cover'> {
   children?: React.ReactNode
   header?: React.ReactNode
   footer?: React.ReactNode
@@ -60,6 +62,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     href,
     padding,
     header,
+    title,
+    htmlTitle,
     footer,
     actions,
     className,
@@ -85,7 +89,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
 
   const bodyContent = (
     <>
-      {header != null && <div className={cardHeaderClasses}>{header}</div>}
+      {(header != null || title) && (
+        <div className={cardHeaderClasses}>{header ?? title}</div>
+      )}
       {children != null && <div>{children}</div>}
       {footer != null && <div className={cardFooterClasses}>{footer}</div>}
       {actions != null && (
@@ -127,6 +133,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
 
   const shared = {
     ...props,
+    title: htmlTitle,
     className: cardClasses,
     onClick,
     onKeyDown: handleKeyDown,

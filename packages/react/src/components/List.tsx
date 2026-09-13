@@ -86,7 +86,7 @@ function ListInner<T extends ListItem>(
     virtualHeight = 400,
     virtualItemHeight,
     virtualOverscan = 5,
-    rowKey = 'key',
+    rowKey = 'id',
     hoverable = false,
     renderItem,
     onItemClick,

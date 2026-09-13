@@ -53,7 +53,10 @@ export interface TreeSelectProps {
   size?: ComponentSize
   /** Whether the component is disabled */
   disabled?: boolean
-  /** Whether to show clear button */
+  /**
+   * Whether to show clear button. Same default as Select / Cascader.
+   * @default true
+   */
   clearable?: boolean
   /**
    * Multiple selection with checkboxes.
@@ -63,7 +66,7 @@ export interface TreeSelectProps {
   multiple?: boolean
   /**
    * When true, checking a node does not cascade to parent/children.
-   * @default true
+   * @default false
    */
   checkStrictly?: boolean
   /**

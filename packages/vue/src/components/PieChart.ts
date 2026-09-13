@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, useId } from 'vue'
+import { defineComponent, computed, getCurrentInstance, h, PropType, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -100,7 +100,13 @@ export const PieChart = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
-    const interactive = computed(() => props.hoverable || props.selectable)
+    const instance = getCurrentInstance()
+    const interactive = computed(
+      () =>
+        props.hoverable ||
+        props.selectable ||
+        Boolean(instance?.vnode.props?.onSliceClick)
+    )
     const gradientPrefix = getStableChartGradientPrefix('pie', useId())
 
     const {

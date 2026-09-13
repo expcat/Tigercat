@@ -196,7 +196,8 @@ export interface ListProps<T extends ListItem = ListItem> {
    */
   grid?: ListGrid
   /**
-   * Function to get item key
+   * Row identity. String form reads `item[rowKey]`.
+   * @default 'id'
    */
   rowKey?: ListRowKey<T>
   /**

@@ -104,7 +104,7 @@ export const List = defineComponent({
       type: [String, Function] as PropType<
         string | ((item: ListItem, index: number) => string | number)
       >,
-      default: 'key'
+      default: 'id'
     },
     hoverable: { type: Boolean, default: false },
     className: { type: String, default: undefined },

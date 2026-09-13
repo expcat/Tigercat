@@ -27,6 +27,8 @@ export interface VueCardProps {
   cover?: string
   coverAlt?: string
   href?: string
+  title?: string
+  htmlTitle?: string
   padding?: boolean | string
   className?: string
   style?: Record<string, string | number>
@@ -65,6 +67,14 @@ export const Card = defineComponent({
       default: ''
     },
     href: {
+      type: String,
+      default: undefined
+    },
+    title: {
+      type: String,
+      default: undefined
+    },
+    htmlTitle: {
       type: String,
       default: undefined
     },
@@ -118,8 +128,13 @@ export const Card = defineComponent({
           )
         : null
 
+      const headerNode = slots.header
+        ? h('div', { class: cardHeaderClasses }, slots.header())
+        : props.title
+          ? h('div', { class: cardHeaderClasses }, props.title)
+          : null
       const bodyChildren = [
-        slots.header ? h('div', { class: cardHeaderClasses }, slots.header()) : null,
+        headerNode,
         slots.default ? h('div', {}, slots.default()) : null,
         slots.footer ? h('div', { class: cardFooterClasses }, slots.footer()) : null,
         slots.actions
@@ -173,6 +188,7 @@ export const Card = defineComponent({
           class: cardClasses,
           style: mergeStyleValues(attrsRecord.style, props.style),
           href: root.tag === 'a' ? props.href : undefined,
+          title: props.htmlTitle,
           role: root.role,
           tabindex: root.tabIndex,
           'data-tiger-card': '',

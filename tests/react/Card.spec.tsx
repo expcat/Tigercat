@@ -20,6 +20,16 @@ describe('Card', () => {
     expect(getRoot(container).className).toContain('custom-class')
   })
 
+  it('paints title as a visual header, not an HTML tooltip', () => {
+    const { container } = render(
+      <Card title="任务流转" htmlTitle="native tip">
+        Body
+      </Card>
+    )
+    expect(screen.getByText('任务流转')).toBeInTheDocument()
+    expect(getRoot(container).getAttribute('title')).toBe('native tip')
+  })
+
   it('forwards the ref to the root', () => {
     const ref = React.createRef<HTMLElement>()
     const { container } = render(<Card ref={ref}>Body</Card>)

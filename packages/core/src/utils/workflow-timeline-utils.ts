@@ -1146,7 +1146,7 @@ export function resolveWorkflowActionBarItems(options: {
   isStarter?: boolean
   viewerRole?: WorkflowActionBarViewerRole
 }): WorkflowActionBarItem[] {
-  if (options.items && options.items.length > 0) return [...options.items]
+  if (options.items !== undefined) return [...options.items]
   if (options.buttonPolicy) {
     return workflowButtonConfigsToActionBarItems(options.buttonPolicy.buttons, options.labels, {
       isStarter: options.isStarter,

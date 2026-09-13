@@ -51,6 +51,17 @@ export interface CardProps {
   direction?: BaseLayoutProps['direction']
 
   /**
+   * Visual header text. Slot / `header` node wins when both are set.
+   * Native HTML tooltip is `htmlTitle`.
+   */
+  title?: string
+
+  /**
+   * Native HTML `title` tooltip. Not a visual header.
+   */
+  htmlTitle?: string
+
+  /**
    * Cover image URL. Framework layers also accept a custom node / `#cover` slot.
    */
   cover?: string

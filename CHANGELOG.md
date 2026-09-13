@@ -12,6 +12,11 @@
 - **FormWizard**：步变化改为 `onStepChange` / Vue `step-change`，删除 Wizard `onChange`。`finish()` 仅在最后一步生效。
 - **Size**：Pagination / Tabs / Steps / FormWizard 统一为 `sm|md|lg`（默认 `md`）。删除 `small|medium|large` 与 Steps `default`。Table 内置分页跟随 Table `size`。
 - **公开别名**：删除 `Kanban` / `DonutChart` / `ImageViewer` / `Fullscreen`（`as`）。请用 `TaskBoard`、`PieChart` + `innerRadiusRatio`、`ImagePreview`、`FullscreenButton`。
+- **TreeSelect**：`clearable` 默认 true（与 Select/Cascader 相同）；`checkStrictly` 默认 false（与 Tree 级联相同）。
+- **List**：`rowKey` 默认 `'id'`（与 Table 相同）。
+- **ActionBar**：`items={[]}` 表示没有按钮，不再回落到 `buttonPolicy`。
+- **PieChart（Vue）**：有 `slice-click` 监听时与 React 一样可交互。
+- **Card**：`title` 是可视标题；原生 tooltip 用 `htmlTitle`。
 
 ## v2.9.0
 
