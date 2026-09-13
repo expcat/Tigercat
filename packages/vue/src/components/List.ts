@@ -413,7 +413,7 @@ export const List = defineComponent({
           formatPaginationTotal(paginationLabels.totalText, value, range, localeCode))
       return h('div', { class: getBuiltInPaginationContainerClasses() }, [
         h(Pagination, {
-          size: props.size === 'lg' ? 'large' : props.size === 'sm' ? 'small' : 'medium',
+          size: props.size,
           align: 'right',
           current: currentPage.value,
           pageSize: currentPageSize.value,

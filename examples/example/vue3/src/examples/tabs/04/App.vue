@@ -26,7 +26,7 @@ import { TabPane } from '@expcat/tigercat-vue/TabPane'
         <div class="p-3 text-sm text-gray-600">日志面板。</div>
       </TabPane>
     </Tabs>
-    <Tabs default-active-key="a" size="small" centered type="pills">
+    <Tabs default-active-key="a" size="sm" centered type="pills">
       <TabPane tabKey="a" label="全部">
         <div class="p-2 text-sm text-gray-600">size=small · centered</div>
       </TabPane>

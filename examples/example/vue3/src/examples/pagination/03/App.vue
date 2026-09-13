@@ -4,9 +4,9 @@ import { Pagination } from '@expcat/tigercat-vue/Pagination'
 
 const current = ref(2)
 const rows = [
-  { size: 'small', align: 'start' },
-  { size: 'medium', align: 'center' },
-  { size: 'large', align: 'end' }
+  { size: 'sm', align: 'start' },
+  { size: 'md', align: 'center' },
+  { size: 'lg', align: 'end' }
 ] as const
 </script>
 

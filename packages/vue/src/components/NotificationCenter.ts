@@ -530,7 +530,7 @@ export const NotificationCenter = defineComponent({
         Tabs,
         {
           type: 'line',
-          size: 'small',
+          size: 'sm',
           swipeable: false,
           activeKey: currentGroupKey.value,
           onChange: handleGroupChange

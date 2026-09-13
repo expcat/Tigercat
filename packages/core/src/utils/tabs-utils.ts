@@ -64,9 +64,9 @@ export const tabItemBaseClasses =
   'relative z-10 cursor-pointer transition-all duration-200 motion-reduce:transition-none select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
 
 export const tabItemSizeClasses = {
-  small: 'text-sm px-3 py-1.5',
-  medium: 'text-base px-4 py-2',
-  large: 'text-lg px-5 py-2.5'
+  sm: 'text-sm px-3 py-1.5',
+  md: 'text-base px-4 py-2',
+  lg: 'text-lg px-5 py-2.5'
 }
 
 export const tabItemLineClasses =

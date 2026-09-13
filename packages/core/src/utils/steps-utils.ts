@@ -27,17 +27,17 @@ export type StepSizeToken = 'simple' | 'sm' | 'md'
 
 /**
  * Map `size` + `simple` to the stable modifier token used by plugin CSS.
- * `simple` wins (24px icon); `small` → sm (32px); otherwise md (40px).
+ * `simple` wins (24px icon); `sm` → sm (32px); `md`/`lg` → md (40px).
  */
 export function getStepSizeToken(size: StepSize, simple: boolean): StepSizeToken {
   if (simple) return 'simple'
-  return size === 'small' ? 'sm' : 'md'
+  return size === 'sm' ? 'sm' : 'md'
 }
 
 /** Value for `data-tiger-step-size` (`simple` or the `size` prop). */
 export function getStepSizeDataValue(size: StepSize, simple: boolean): 'simple' | StepSize {
   if (simple) return 'simple'
-  return size === 'small' ? 'small' : 'default'
+  return size
 }
 
 /**
@@ -163,9 +163,11 @@ export function getStepIconClasses(
   // Size classes
   const sizeClasses = simple
     ? 'w-6 h-6 text-xs'
-    : size === 'small'
+    : size === 'sm'
       ? 'w-8 h-8 text-sm'
-      : 'w-10 h-10 text-base'
+      : size === 'lg'
+        ? 'w-12 h-12 text-lg'
+        : 'w-10 h-10 text-base'
 
   // Custom icon might need less padding
   const iconClasses = isCustomIcon ? '' : 'font-medium'
@@ -231,7 +233,7 @@ export function getStepTitleClasses(
 ): string {
   const baseClasses = 'tiger-step-title font-medium'
 
-  const sizeClasses = size === 'small' ? 'text-sm' : 'text-base'
+  const sizeClasses = size === 'sm' ? 'text-sm' : 'text-base'
 
   const statusClasses = {
     wait: 'text-[var(--tiger-text-muted,#6b7280)] transition-colors duration-300 motion-reduce:transition-none',
@@ -255,7 +257,7 @@ export function getStepTitleClasses(
 export function getStepDescriptionClasses(status: StepStatus, size: StepSize): string {
   const baseClasses = 'tiger-step-description mt-1'
 
-  const sizeClasses = size === 'small' ? 'text-xs' : 'text-sm'
+  const sizeClasses = size === 'sm' ? 'text-xs' : 'text-sm'
 
   const statusClass =
     status === 'error'

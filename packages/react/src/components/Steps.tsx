@@ -242,7 +242,7 @@ export const Steps: React.FC<StepsProps> = ({
   current = 0,
   status = 'process',
   direction = 'horizontal',
-  size = 'default',
+  size = 'md',
   simple = false,
   clickable = false,
   items,

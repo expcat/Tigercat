@@ -68,7 +68,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   totalText,
   simple = false,
   pageIndicatorText,
-  size = 'medium',
+  size = 'md',
   align = 'center',
   disabled = false,
   hideOnSinglePage = false,

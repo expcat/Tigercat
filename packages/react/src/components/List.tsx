@@ -358,7 +358,7 @@ function ListInner<T extends ListItem>(
     return (
       <div className={getBuiltInPaginationContainerClasses()}>
         <Pagination
-          size={size === 'lg' ? 'large' : size === 'sm' ? 'small' : 'medium'}
+          size={size}
           align="right"
           current={currentPage}
           pageSize={currentPageSize}

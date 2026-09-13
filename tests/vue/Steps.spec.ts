@@ -67,7 +67,7 @@ describe('Steps', () => {
 
     it('should render a centered vertical tail with plugin class tokens', () => {
       const { container } = render(Steps, {
-        props: { direction: 'vertical', size: 'small' },
+        props: { direction: 'vertical', size: 'sm' },
         slots: {
           default: () => [h(StepsItem, { title: 'Step 1' }), h(StepsItem, { title: 'Step 2' })]
         }
@@ -80,7 +80,7 @@ describe('Steps', () => {
       expect(container.querySelector('.tiger-step-icon-col')).toHaveClass('tiger-step-icon-col--sm')
       expect(container.querySelector('.tiger-steps')).toHaveAttribute(
         'data-tiger-step-size',
-        'small'
+        'sm'
       )
     })
   })
@@ -124,7 +124,7 @@ describe('Steps', () => {
 
     it('should render small size', () => {
       const { container } = render(Steps, {
-        props: { size: 'small' },
+        props: { size: 'sm' },
         slots: {
           default: () => [h(StepsItem, { title: 'Step 1' })]
         }
@@ -137,7 +137,7 @@ describe('Steps', () => {
 
     it('should render default size', () => {
       const { container } = render(Steps, {
-        props: { size: 'default' },
+        props: { size: 'md' },
         slots: {
           default: () => [h(StepsItem, { title: 'Step 1' })]
         }

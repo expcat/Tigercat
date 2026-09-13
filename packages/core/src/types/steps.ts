@@ -2,6 +2,8 @@
  * Steps component types and interfaces
  */
 
+import type { ComponentSize } from './base'
+
 /**
  * Steps direction/orientation types
  */
@@ -13,9 +15,9 @@ export type StepsDirection = 'horizontal' | 'vertical'
 export type StepStatus = 'wait' | 'process' | 'finish' | 'error'
 
 /**
- * Step size types
+ * Step size. Same tokens as {@link ComponentSize}.
  */
-export type StepSize = 'small' | 'default'
+export type StepSize = ComponentSize
 
 /**
  * Step item interface
@@ -74,7 +76,7 @@ export interface StepsProps {
   direction?: StepsDirection
   /**
    * Step size
-   * @default 'default'
+   * @default 'md'
    */
   size?: StepSize
   /**

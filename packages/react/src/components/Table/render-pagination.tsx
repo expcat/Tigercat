@@ -16,6 +16,7 @@ export interface RenderPaginationViewProps {
   pagination: PaginationConfig | false | undefined
   locale?: Partial<TigerLocale>
   disableI18n?: boolean
+  size?: 'sm' | 'md' | 'lg'
 }
 
 export function renderPagination(
@@ -67,7 +68,7 @@ export function renderPagination(
   return (
     <div className={getBuiltInPaginationContainerClasses()}>
       <Pagination
-        size="small"
+        size={view.size ?? 'md'}
         align="right"
         current={ctx.currentPage}
         pageSize={ctx.currentPageSize}

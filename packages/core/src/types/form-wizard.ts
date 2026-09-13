@@ -97,7 +97,7 @@ export interface FormWizardProps {
   direction?: StepsDirection
   /**
    * Steps size
-   * @default 'default'
+   * @default 'md'
    */
   size?: StepSize
   /**

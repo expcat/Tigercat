@@ -287,13 +287,13 @@ export function getPaginationContainerClasses(
  * Get base button classes for pagination buttons
  */
 export function getPaginationButtonBaseClasses(
-  size: PaginationSize = 'medium',
+  size: PaginationSize = 'md',
   active = false
 ): string {
   const sizeClasses = {
-    small: 'min-w-7 h-7 text-sm px-2',
-    medium: 'min-w-8 h-8 text-base px-2.5',
-    large: 'min-w-10 h-10 text-lg px-3'
+    sm: 'min-w-7 h-7 text-sm px-2',
+    md: 'min-w-8 h-8 text-base px-2.5',
+    lg: 'min-w-10 h-10 text-lg px-3'
   }
 
   // Active/inactive color utilities are mutually exclusive so a button never
@@ -335,11 +335,11 @@ export function getPaginationButtonActiveClasses(): string {
 /**
  * Get ellipsis classes
  */
-export function getPaginationEllipsisClasses(size: PaginationSize = 'medium'): string {
+export function getPaginationEllipsisClasses(size: PaginationSize = 'md'): string {
   const sizeClasses = {
-    small: 'min-w-7 h-7 text-sm',
-    medium: 'min-w-8 h-8 text-base',
-    large: 'min-w-10 h-10 text-lg'
+    sm: 'min-w-7 h-7 text-sm',
+    md: 'min-w-8 h-8 text-base',
+    lg: 'min-w-10 h-10 text-lg'
   }
 
   return classNames(
@@ -352,11 +352,11 @@ export function getPaginationEllipsisClasses(size: PaginationSize = 'medium'): s
 /**
  * Get quick jumper input classes
  */
-export function getQuickJumperInputClasses(size: PaginationSize = 'medium'): string {
+export function getQuickJumperInputClasses(size: PaginationSize = 'md'): string {
   const sizeClasses = {
-    small: 'w-12 h-7 text-sm',
-    medium: 'w-14 h-8 text-base',
-    large: 'w-16 h-10 text-lg'
+    sm: 'w-12 h-7 text-sm',
+    md: 'w-14 h-8 text-base',
+    lg: 'w-16 h-10 text-lg'
   }
 
   return classNames(
@@ -375,11 +375,11 @@ export function getQuickJumperInputClasses(size: PaginationSize = 'medium'): str
 /**
  * Get page size selector classes
  */
-export function getPageSizeSelectorClasses(size: PaginationSize = 'medium'): string {
+export function getPageSizeSelectorClasses(size: PaginationSize = 'md'): string {
   const sizeClasses = {
-    small: 'h-7 text-sm',
-    medium: 'h-8 text-base',
-    large: 'h-10 text-lg'
+    sm: 'h-7 text-sm',
+    md: 'h-8 text-base',
+    lg: 'h-10 text-lg'
   }
 
   return classNames(
@@ -398,11 +398,11 @@ export function getPageSizeSelectorClasses(size: PaginationSize = 'medium'): str
 /**
  * Get text size class for a given pagination size
  */
-export function getSizeTextClasses(size: PaginationSize = 'medium'): string {
+export function getSizeTextClasses(size: PaginationSize = 'md'): string {
   const sizeClasses = {
-    small: 'text-sm',
-    medium: 'text-base',
-    large: 'text-lg'
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg'
   }
   return sizeClasses[size]
 }
@@ -410,11 +410,11 @@ export function getSizeTextClasses(size: PaginationSize = 'medium'): string {
 /**
  * Get total text classes
  */
-export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
+export function getTotalTextClasses(size: PaginationSize = 'md'): string {
   return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'me-2', getSizeTextClasses(size))
 }
 
-export function getQuickJumperPrefixClasses(size: PaginationSize = 'medium'): string {
+export function getQuickJumperPrefixClasses(size: PaginationSize = 'md'): string {
   return classNames('ms-2', getSizeTextClasses(size))
 }
 

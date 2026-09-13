@@ -284,7 +284,7 @@ export const Tabs: React.FC<TabsProps> = ({
   defaultActiveKey,
   type = 'line',
   tabPosition = 'top',
-  size = 'medium',
+  size = 'md',
   closable = false,
   centered = false,
   destroyInactiveTabPane = false,

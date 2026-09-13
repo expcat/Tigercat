@@ -2,12 +2,13 @@
  * Pagination component types and interfaces
  */
 
+import type { ComponentSize } from './base'
 import type { TigerLocaleInput, TigerLocalePagination } from './locale'
 
 /**
- * Pagination size type
+ * Pagination size. Same tokens as {@link ComponentSize}.
  */
-export type PaginationSize = 'small' | 'medium' | 'large'
+export type PaginationSize = ComponentSize
 
 /**
  * Pagination alignment. `left`/`right` are aliases of logical `start`/`end`.

@@ -33,15 +33,15 @@ describe('steps-utils', () => {
 
 describe('Steps connector class tokens', () => {
   it('maps size + simple to stable modifier tokens', () => {
-    expect(getStepSizeToken('default', false)).toBe('md')
-    expect(getStepSizeToken('small', false)).toBe('sm')
-    expect(getStepSizeToken('small', true)).toBe('simple')
-    expect(getStepSizeDataValue('small', false)).toBe('small')
-    expect(getStepSizeDataValue('default', true)).toBe('simple')
+    expect(getStepSizeToken('md', false)).toBe('md')
+    expect(getStepSizeToken('sm', false)).toBe('sm')
+    expect(getStepSizeToken('sm', true)).toBe('simple')
+    expect(getStepSizeDataValue('sm', false)).toBe('sm')
+    expect(getStepSizeDataValue('md', true)).toBe('simple')
   })
 
   it('returns semantic vertical tail tokens and does not emit JIT insets', () => {
-    const vertical = getStepTailClasses('vertical', 'process', false, 'small', false)
+    const vertical = getStepTailClasses('vertical', 'process', false, 'sm', false)
     expect(vertical.split(' ')).toEqual(
       expect.arrayContaining([
         'tiger-step-tail',
@@ -57,7 +57,7 @@ describe('Steps connector class tokens', () => {
   })
 
   it('returns semantic horizontal tail tokens (purge-proof)', () => {
-    const horizontal = getStepTailClasses('horizontal', 'finish', false, 'default', false)
+    const horizontal = getStepTailClasses('horizontal', 'finish', false, 'md', false)
     expect(horizontal).toContain('tiger-step-tail--horizontal')
     expect(horizontal).toContain('tiger-step-tail--md')
     expect(horizontal).toContain('tiger-step-tail--finish')
@@ -66,16 +66,16 @@ describe('Steps connector class tokens', () => {
   })
 
   it('hides the last tail with a semantic modifier', () => {
-    expect(getStepTailClasses('vertical', 'wait', true, 'default', false)).toBe(
+    expect(getStepTailClasses('vertical', 'wait', true, 'md', false)).toBe(
       'tiger-step-tail tiger-step-tail--last'
     )
   })
 
   it('sizes the icon column with semantic modifiers', () => {
-    expect(getStepIconColumnClasses('small', false)).toBe(
+    expect(getStepIconColumnClasses('sm', false)).toBe(
       'tiger-step-icon-col tiger-step-icon-col--sm'
     )
-    expect(getStepIconColumnClasses('default', true)).toBe(
+    expect(getStepIconColumnClasses('md', true)).toBe(
       'tiger-step-icon-col tiger-step-icon-col--simple'
     )
     expect(getStepItemClasses('vertical', false)).toContain('tiger-step-item--gap')

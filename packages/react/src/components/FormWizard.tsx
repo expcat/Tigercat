@@ -59,7 +59,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     defaultCurrent = 0,
     clickable = false,
     direction = 'horizontal',
-    size = 'default',
+    size = 'md',
     simple = false,
     bordered = true,
     showSteps = true,
@@ -281,7 +281,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
               className="group"
               onClick={handlePrev}
               disabled={pending}
-              size={size === 'small' ? 'sm' : 'md'}
+              size={size}
               icon={<Icon name="arrow-left" className="w-3.5 h-3.5" />}>
               {resolveLocaleText(labels.prevText, prevText)}
             </Button>
@@ -295,7 +295,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
             onClick={() => void handleNext()}
             loading={pending}
             disabled={pending}
-            size={size === 'small' ? 'sm' : 'md'}
+            size={size}
             icon={<Icon name={isLast ? 'check' : 'arrow-right'} className="w-3.5 h-3.5" />}
             iconPosition={isLast ? 'start' : 'end'}>
             {isLast

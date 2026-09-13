@@ -25,7 +25,7 @@ export default function App() {
           <div className="p-3 text-sm text-gray-600">日志面板。</div>
         </TabPane>
       </Tabs>
-      <Tabs defaultActiveKey="a" size="small" centered type="pills">
+      <Tabs defaultActiveKey="a" size="sm" centered type="pills">
         <TabPane tabKey="a" label="全部">
           <div className="p-2 text-sm text-gray-600">size=small · centered</div>
         </TabPane>

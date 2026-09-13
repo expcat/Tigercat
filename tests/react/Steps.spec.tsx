@@ -62,7 +62,7 @@ describe('Steps', () => {
 
     it('should render a centered vertical tail with plugin class tokens', () => {
       const { container } = render(
-        <Steps direction="vertical" size="small">
+        <Steps direction="vertical" size="sm">
           <StepsItem title="Step 1" />
           <StepsItem title="Step 2" />
         </Steps>
@@ -75,7 +75,7 @@ describe('Steps', () => {
       expect(container.querySelector('.tiger-step-icon-col')).toHaveClass('tiger-step-icon-col--sm')
       expect(container.querySelector('.tiger-steps')).toHaveAttribute(
         'data-tiger-step-size',
-        'small'
+        'sm'
       )
     })
   })
@@ -113,7 +113,7 @@ describe('Steps', () => {
 
     it('should render small size', () => {
       const { container } = render(
-        <Steps size="small">
+        <Steps size="sm">
           <StepsItem title="Step 1" />
         </Steps>
       )
@@ -125,7 +125,7 @@ describe('Steps', () => {
 
     it('should render default size', () => {
       const { container } = render(
-        <Steps size="default">
+        <Steps size="md">
           <StepsItem title="Step 1" />
         </Steps>
       )

@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Pagination } from '@expcat/tigercat-react/Pagination'
 
 const rows = [
-  { size: 'small', align: 'start' },
-  { size: 'medium', align: 'center' },
-  { size: 'large', align: 'end' }
+  { size: 'sm', align: 'start' },
+  { size: 'md', align: 'center' },
+  { size: 'lg', align: 'end' }
 ] as const
 
 export default function App() {

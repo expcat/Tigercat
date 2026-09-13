@@ -2,6 +2,8 @@
  * Tabs component types and interfaces
  */
 
+import type { ComponentSize } from './base'
+
 /**
  * Tab type - determines the style of the tabs
  */
@@ -13,9 +15,9 @@ export type TabType = 'line' | 'card' | 'editable-card' | 'pills'
 export type TabPosition = 'top' | 'bottom' | 'left' | 'right'
 
 /**
- * Tab size - determines the size of the tabs
+ * Tab size. Same tokens as {@link ComponentSize}.
  */
-export type TabSize = 'small' | 'medium' | 'large'
+export type TabSize = ComponentSize
 
 /**
  * Base tabs props interface
@@ -40,8 +42,8 @@ export interface TabsProps {
    */
   tabPosition?: TabPosition
   /**
-   * Tab size - small, medium, or large
-   * @default 'medium'
+   * Tab size
+   * @default 'md'
    */
   size?: TabSize
   /**

@@ -374,7 +374,7 @@ export const Steps = defineComponent({
      */
     size: {
       type: String as PropType<StepSize>,
-      default: 'default' as StepSize
+      default: 'md' as StepSize
     },
     /**
      * Whether to use simple style (no description, smaller icons)

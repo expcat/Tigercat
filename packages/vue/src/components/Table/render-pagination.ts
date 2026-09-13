@@ -65,7 +65,7 @@ export function renderPagination(
 
   return h('div', { class: getBuiltInPaginationContainerClasses() }, [
     h(Pagination, {
-      size: 'small',
+      size: props.size ?? 'md',
       align: 'right',
       current: ctx.currentPage.value,
       pageSize: ctx.currentPageSize.value,

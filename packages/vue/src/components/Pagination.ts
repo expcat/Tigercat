@@ -189,11 +189,11 @@ export const Pagination = defineComponent({
     },
     /**
      * Size of pagination
-     * @default 'medium'
+     * @default 'md'
      */
     size: {
       type: String as PropType<PaginationSize>,
-      default: 'medium' as PaginationSize
+      default: 'md' as PaginationSize
     },
     /**
      * Alignment of pagination

@@ -72,7 +72,7 @@ export const FormWizard = defineComponent({
     },
     size: {
       type: String as PropType<StepSize>,
-      default: 'default' as StepSize
+      default: 'md' as StepSize
     },
     simple: {
       type: Boolean,
@@ -343,7 +343,7 @@ export const FormWizard = defineComponent({
                         class: 'group',
                         onClick: handlePrev,
                         disabled: pending.value,
-                        size: props.size === 'small' ? 'sm' : 'md'
+                        size: props.size
                       },
                       {
                         icon: () => h(Icon, { name: 'arrow-left', class: 'w-3.5 h-3.5' }),
@@ -360,7 +360,7 @@ export const FormWizard = defineComponent({
                     onClick: handleNext,
                     loading: pending.value,
                     disabled: pending.value,
-                    size: props.size === 'small' ? 'sm' : 'md',
+                    size: props.size,
                     iconPosition: isLast.value ? 'start' : 'end'
                   },
                   {

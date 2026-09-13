@@ -355,7 +355,7 @@ export const Tabs = defineComponent({
     },
     size: {
       type: String as PropType<TabSize>,
-      default: 'medium' as TabSize
+      default: 'md' as TabSize
     },
     closable: {
       type: Boolean,

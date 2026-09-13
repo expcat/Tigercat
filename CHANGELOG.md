@@ -10,6 +10,7 @@
 - **Input / Textarea（React）**：`onChange` 改为值（string/number），不再发 DOM 事件。原生事件走 `onInput`。
 - **Tabs（React）**：`onChange(activeKey)` 替代 `onActiveKeyChange`。
 - **FormWizard**：步变化改为 `onStepChange` / Vue `step-change`，删除 Wizard `onChange`。`finish()` 仅在最后一步生效。
+- **Size**：Pagination / Tabs / Steps / FormWizard 统一为 `sm|md|lg`（默认 `md`）。删除 `small|medium|large` 与 Steps `default`。Table 内置分页跟随 Table `size`。
 
 ## v2.9.0
 

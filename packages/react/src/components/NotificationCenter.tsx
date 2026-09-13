@@ -360,7 +360,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       <div className="-mx-4 -mb-4">
         <Tabs
           type="line"
-          size="small"
+          size="sm"
           swipeable={false}
           activeKey={currentGroupKey}
           onChange={handleGroupChange}>

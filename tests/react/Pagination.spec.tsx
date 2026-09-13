@@ -170,7 +170,7 @@ describe('Pagination', () => {
   })
 
   it('applies size classes', () => {
-    const { container } = render(<Pagination total={100} pageSize={10} size="small" />)
+    const { container } = render(<Pagination total={100} pageSize={10} size="sm" />)
     expect(container.querySelector('button')).toHaveClass('h-7')
   })
 
