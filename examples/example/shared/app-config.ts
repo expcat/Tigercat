@@ -555,6 +555,21 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'WorkflowDesigner 纵向流程画布', 'en-US': 'WorkflowDesigner' }
       },
       {
+        key: 'workflow-timeline',
+        path: '/workflow-timeline',
+        label: { 'zh-CN': 'WorkflowTimeline 审批时间线', 'en-US': 'WorkflowTimeline' }
+      },
+      {
+        key: 'workflow-viewer',
+        path: '/workflow-viewer',
+        label: { 'zh-CN': 'WorkflowViewer 审批树', 'en-US': 'WorkflowViewer' }
+      },
+      {
+        key: 'workflow-detail-shell',
+        path: '/workflow-detail-shell',
+        label: { 'zh-CN': 'WorkflowDetailShell 审批详情壳', 'en-US': 'WorkflowDetailShell' }
+      },
+      {
         key: 'chat-window',
         path: '/chat-window',
         label: { 'zh-CN': 'ChatWindow 聊天窗口', 'en-US': 'ChatWindow' }

@@ -648,6 +648,7 @@ export interface TableProps<T = Record<string, unknown>> {
   /**
    * Pagination configuration. Omit to use the default pager (`pageSize` 10).
    * Set to `false` to disable pagination.
+   * @default { pageSize: 10 }
    */
   pagination?: PaginationConfig | false
 

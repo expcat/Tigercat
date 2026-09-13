@@ -13,6 +13,8 @@ description: Compact generated Tigercat Feedback props reference
 
 `packages/core/src/types/alert.ts` · `AlertProps` · 4/17 props
 
+Note: 省略 `open` 时展示；`open={false}` 才不渲染。关闭不会内部隐藏——父级卸载或设 `open={false}`。与 ImagePreview「省略即关」相反。
+
 | Prop        | Type        | Default  | Notes                                                                                      |
 | ----------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |
 | `type?`     | `AlertType` | `'info'` | Alert type (success, warning, error, info)                                                 |

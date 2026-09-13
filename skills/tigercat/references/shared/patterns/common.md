@@ -77,4 +77,29 @@ Custom trigger state is available through Vue `#trigger="{ open }"` slots and Re
 - Put client-only Vue work in `onMounted`; React work in `useEffect` or client components.
 - Portal / overlay: stable placeholder outside the browser. React renders the layer in place; Vue Teleport is `disabled`.
 
+## Framework deltas
+
+These are binding or seed differences, not two products. Compact Notes on each component stay the source of traps.
+
+| Topic                       | Vue                                                                          | React                                                            |
+| --------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Field value                 | `v-model` / `modelValue`                                                     | `value` / `checked` + `onChange`                                 |
+| Input / Textarea `onChange` | emits the next string                                                        | DOM `ChangeEvent` (`event.target.value`)                         |
+| Form values                 | `model` / `v-model:model`                                                    | `model` + `onChange`                                             |
+| Overlay open                | `v-model:open`                                                               | `open` + `onOpenChange`                                          |
+| Named content               | slots (`#header`, `#content`)                                                | node / render props (`header`, `renderContent`)                  |
+| Uncontrolled seed           | most fields have `defaultValue`; Input/Textarea currently start at `''`      | Input/Textarea already have `defaultValue`                       |
+| Readonly spelling           | `readonly` on Input/Signature; Rate is `readOnly`                            | Input accepts both via `resolveReadOnlyFlag`; Rate is `readOnly` |
+| Native `type` on Button     | attr `type`                                                                  | `htmlType` wins over `type`                                      |
+| SchemaForm submit errors    | action-button path currently emits `errors: []`; Enter/Form submit is filled | native submit fills engine errors                                |
+| RichTextEditor FormItem     | seeds the engine from context                                                | FormItem-only value does not seed the engine yet                 |
+| RichTextEditor `style`      | merges after height                                                          | leftover `style` can replace height                              |
+| SplitButton `type`          | lands on the primary                                                         | leftover `type` currently hits the group `div`                   |
+
+Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
+
+Empty sentinels are per widget: Select unselected is `undefined` (multi `[]`); DatePicker range empty is `[null, null]`; TimePicker range empty is `null`; ImagePreview omit `open` is closed; Alert omit `open` is shown.
+
+Kanban / DonutChart / ImageViewer remain importable aliases of TaskBoard / PieChart / ImagePreview.
+
 Next: [../glossary.md](../glossary.md) · [../../component-index.md](../../component-index.md) · [../../command-apis.md](../../command-apis.md)

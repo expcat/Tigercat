@@ -13,6 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 | Component    | Uses                                                          | Notes                                                                                                                                                                                                                                                                             |
 | ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PrintLayout  | -                                                             | `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。                                                                                                                              |
 | VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。 |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。

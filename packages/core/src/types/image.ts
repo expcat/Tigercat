@@ -169,7 +169,8 @@ export interface ImageViewerBaseProps {
   locale?: Partial<TigerLocale>
 
   /**
-   * Whether the preview is open
+   * Whether the preview is open. Omit to keep the dialog closed (unlike Alert, which shows when `open` is omitted).
+   * @default false
    * @since 0.9.0
    */
   open?: boolean

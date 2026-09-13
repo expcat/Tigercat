@@ -166,7 +166,9 @@ export interface ListProps<T extends ListItem = ListItem> {
    */
   footer?: unknown
   /**
-   * Pagination configuration, set to false to disable
+   * Pagination configuration, set to false to disable.
+   * Omit or `false` leaves the list unpaginated (unlike Table, which paginates by default).
+   * @default false
    */
   pagination?: ListPaginationConfig | false
   /**

@@ -102,6 +102,8 @@ Events/callback props: `onChange?`, `onValidate?`.
 
 `packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/29 props
 
+Note: 空范围是 `[null, null]`，不要用 `null`。TimePicker 空范围才是 `null`。日期是本地日历日。
+
 | Prop            | Type                           | Default        | Notes |
 | --------------- | ------------------------------ | -------------- | ----- |
 | `value?`        | `DatePickerModelValue \| null` | `-`            | -     |
@@ -115,6 +117,8 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 `packages/core/src/types/form.ts` · `FormProps` · 4/18 props
 
+Note: 值对象是 `model`（Vue `v-model:model`），不是 `modelValue`。Wizard `onChange` 是步下标，不是表单 values。Form `size` 是 `sm|md|lg`，与 Steps/Wizard `small|default`、Pagination `small|medium|large` 不是同一套字符串。
+
 | Prop          | Type             | Default | Notes                                                                                      |
 | ------------- | ---------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `model?`      | `FormValues`     | `-`     | Form values                                                                                |
@@ -126,6 +130,8 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 `packages/core/src/types/form.ts` · `FormItemProps` · 4/14 props
 
+Note: 具名 FormItem 注入 context。Input/Select/DatePicker/Signature 在省略公开 value 时从 model 取值。Checkbox/Switch/RadioGroup/Slider/Upload/Transfer 目前只写 `onChange`，不读 context——SchemaForm 的 checkbox/switch/radio 在点选前会画成未选。字段请用 RadioGroup，不要把单颗 Radio 当 field。
+
 | Prop        | Type                     | Default | Notes                                     |
 | ----------- | ------------------------ | ------- | ----------------------------------------- |
 | `name?`     | `string`                 | `-`     | Field name (must match key in form model) |
@@ -136,6 +142,8 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 ## Input
 
 `packages/core/src/types/input.ts` · `InputProps` · 4/26 props
+
+Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Rate 用 `readOnly`，Input/Signature 用 `readonly`。
 
 | Prop            | Type        | Default  | Notes                                                                        |
 | --------------- | ----------- | -------- | ---------------------------------------------------------------------------- |
@@ -251,14 +259,14 @@ Events/callback props: `onChange?`, `onOpenChange?`.
 
 `packages/vue/src/components/Select.ts` · `VueSelectProps` · 4/33 props
 
-Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。
+Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职 prop 叫 `height`。
 
-| Prop            | Type               | Default | Notes |
-| --------------- | ------------------ | ------- | ----- |
-| `options?`      | `SelectOptions`    | `-`     | -     |
-| `defaultValue?` | `SelectModelValue` | `-`     | -     |
-| `multiple?`     | `boolean`          | `-`     | -     |
-| `searchable?`   | `boolean`          | `-`     | -     |
+| Prop            | Type               | Default | Notes                                      |
+| --------------- | ------------------ | ------- | ------------------------------------------ |
+| `options?`      | `SelectOptions`    | `[]`    | Options list (can be flat list or grouped) |
+| `defaultValue?` | `SelectModelValue` | `-`     | -                                          |
+| `multiple?`     | `boolean`          | `false` | Whether to allow multiple selection        |
+| `searchable?`   | `boolean`          | `false` | Whether to allow search/filter             |
 
 ## Signature
 
@@ -323,6 +331,8 @@ Events/callback props: `onChange?`.
 
 `packages/core/src/types/textarea.ts` · `TextareaProps` · 4/25 props
 
+Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。与 Input 同一套 status / showCount / autoResize。
+
 | Prop          | Type          | Default     | Notes                             |
 | ------------- | ------------- | ----------- | --------------------------------- |
 | `rows?`       | `number`      | `3`         | Number of visible text rows       |
@@ -334,7 +344,7 @@ Events/callback props: `onChange?`.
 
 `packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/31 props
 
-Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。
+Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`（DatePicker 空范围是 `[null, null]`）。`locale` 只收官方对象。
 
 | Prop            | Type                           | Default | Notes                                                    |
 | --------------- | ------------------------------ | ------- | -------------------------------------------------------- |
@@ -354,13 +364,13 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 | `dataSource?` | `TransferItem[]`       | `-`     | All available data items                                                                   |
 | `value?`      | `(string \| number)[]` | `-`     | Controlled target keys. `undefined` is uncontrolled; `[]` is a real empty target list.     |
 | `targetKeys?` | `(string \| number)[]` | `-`     | Keys of items in the right (target) list. Alias of `value` with lower priority. Both se... |
-| `searchable?` | `boolean`              | `-`     | Whether to show search input in each panel                                                 |
+| `searchable?` | `boolean`              | `false` | Whether to show search input in each panel                                                 |
 
 ## TreeSelect
 
 `packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/36 props
 
-Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。
+Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），Select/Cascader 同职 prop 叫 `listHeight`。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。
 
 | Prop            | Type              | Default | Notes                                                                                      |
 | --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |

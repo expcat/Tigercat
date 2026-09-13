@@ -9,9 +9,15 @@ export type RateSize = 'sm' | 'md' | 'lg'
 export interface RateProps {
   /** Number of stars */
   count?: number
-  /** Whether to allow half stars */
+  /**
+   * Whether to allow half stars
+   * @default false
+   */
   allowHalf?: boolean
-  /** Whether the component is disabled */
+  /**
+   * Whether the component is disabled
+   * @default false
+   */
   disabled?: boolean
   /**
    * Read-only: stays in tab order and exposes the value, but does not change it.

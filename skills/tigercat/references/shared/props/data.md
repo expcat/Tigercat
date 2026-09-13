@@ -18,7 +18,7 @@ description: Compact generated Tigercat Data props reference
 | `value?`        | `Date \| string \| null` | `-`       | Currently selected date (controlled). Invalid Date is treated as empty. |
 | `defaultValue?` | `Date \| string \| null` | `-`       | Initial selected date when `value` is omitted                           |
 | `mode?`         | `CalendarMode`           | `'month'` | Calendar display mode.                                                  |
-| `fullscreen?`   | `boolean`                | `-`       | Whether the calendar is full-screen or card-style                       |
+| `fullscreen?`   | `boolean`                | `false`   | Whether the calendar is full-screen or card-style                       |
 
 Events/callback props: `onChange?`, `onPanelChange?`.
 
@@ -67,7 +67,7 @@ Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后�
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
-Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。
+Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉（不含 csv）；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。locale `triggerAriaLabel` 目前未接到触发器。
 
 | Prop         | Type                 | Default                | Notes                                                                                      |
 | ------------ | -------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
@@ -82,14 +82,14 @@ Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 
-Note: `column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；`remote: true` 不做本地筛排切。内置导出只出 CSV。
+Note: `column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；List 分页默认关。`pagination.remote: true` 不做本地筛排切（与工具栏 `toolbar.searchMode: 'remote'` 不是同一个 remote）。内置导出只出 CSV。
 
-| Prop          | Type                        | Default | Notes                                                                                      |
-| ------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns`     | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                                |
-| `dataSource?` | `T[]`                       | `[]`    | Table data source                                                                          |
-| `pagination?` | `PaginationConfig \| false` | `-`     | Pagination configuration. Omit to use the default pager (`pageSize` 10). Set to `false`... |
-| `sort?`       | `SortState`                 | `-`     | Controlled sort state. When provided, internal sort state will not be mutated.             |
+| Prop          | Type                        | Default            | Notes                                                                                      |
+| ------------- | --------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| `columns`     | `TableColumn<T>[]`          | `-`                | Table columns configuration                                                                |
+| `dataSource?` | `T[]`                       | `[]`               | Table data source                                                                          |
+| `pagination?` | `PaginationConfig \| false` | `{ pageSize: 10 }` | Pagination configuration. Omit to use the default pager (`pageSize` 10). Set to `false`... |
+| `sort?`       | `SortState`                 | `-`                | Controlled sort state. When provided, internal sort state will not be mutated.             |
 
 Events/callback props: `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, `onFilterChange?`, `onHiddenColumnKeysChange?`, ....
 
@@ -97,7 +97,7 @@ Events/callback props: `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSort
 
 `packages/core/src/types/timeline.ts` · `TimelineProps` · 4/11 props
 
-Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。
+Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。审批配方 playground 在 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`；本页 01–03 才是时间线骨架。
 
 | Prop       | Type             | Default  | Notes                                                                                      |
 | ---------- | ---------------- | -------- | ------------------------------------------------------------------------------------------ |

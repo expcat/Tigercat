@@ -201,6 +201,18 @@ const router = createRouter({
           path: 'workflow-designer',
           component: () => import('./pages/WorkflowDesignerDemo.vue')
         },
+        {
+          path: 'workflow-timeline',
+          component: () => import('./pages/WorkflowTimelineDemo.vue')
+        },
+        {
+          path: 'workflow-viewer',
+          component: () => import('./pages/WorkflowViewerDemo.vue')
+        },
+        {
+          path: 'workflow-detail-shell',
+          component: () => import('./pages/WorkflowDetailShellDemo.vue')
+        },
         { path: 'chat-window', component: () => import('./pages/ChatWindowDemo.vue') },
         {
           path: 'comment-thread',

@@ -79,7 +79,7 @@ const COMPONENT_USAGE_NOTES = {
   DataExport: {
     uses: ['Dropdown', 'DropdownMenu', 'DropdownItem'],
     notes:
-      "将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。"
+      "将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉（不含 csv）；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。locale `triggerAriaLabel` 目前未接到触发器。"
   },
   Dropdown: {
     uses: ['DropdownMenu', 'DropdownItem'],
@@ -130,13 +130,33 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       "受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。"
   },
+  Form: {
+    notes:
+      '值对象是 `model`（Vue `v-model:model`），不是 `modelValue`。Wizard `onChange` 是步下标，不是表单 values。Form `size` 是 `sm|md|lg`，与 Steps/Wizard `small|default`、Pagination `small|medium|large` 不是同一套字符串。'
+  },
+  FormItem: {
+    notes:
+      '具名 FormItem 注入 context。Input/Select/DatePicker/Signature 在省略公开 value 时从 model 取值。Checkbox/Switch/RadioGroup/Slider/Upload/Transfer 目前只写 `onChange`，不读 context——SchemaForm 的 checkbox/switch/radio 在点选前会画成未选。字段请用 RadioGroup，不要把单颗 Radio 当 field。'
+  },
+  Input: {
+    notes:
+      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Rate 用 `readOnly`，Input/Signature 用 `readonly`。'
+  },
+  Textarea: {
+    notes:
+      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。与 Input 同一套 status / showCount / autoResize。'
+  },
+  DatePicker: {
+    notes:
+      '空范围是 `[null, null]`，不要用 `null`。TimePicker 空范围才是 `null`。日期是本地日历日。'
+  },
   NumberKeyboard: {
     notes:
       '配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。'
   },
   Select: {
     notes:
-      "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。"
+      "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职 prop 叫 `height`。"
   },
   AutoComplete: {
     notes:
@@ -148,11 +168,11 @@ const COMPONENT_USAGE_NOTES = {
   },
   TreeSelect: {
     notes:
-      "选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。"
+      "选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），Select/Cascader 同职 prop 叫 `listHeight`。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。"
   },
   TimePicker: {
     notes:
-      '值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空值 `null`。`locale` 只收官方对象。'
+      '值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`（DatePicker 空范围是 `[null, null]`）。`locale` 只收官方对象。'
   },
   Icon: {
     notes:
@@ -194,7 +214,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Timeline: {
     notes:
-      '需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。'
+      '需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。审批配方 playground 在 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`；本页 01–03 才是时间线骨架。'
   },
   WorkflowTimeline: {
     uses: ['Timeline', 'Button', 'Tag', 'WorkflowActionBar'],
@@ -204,7 +224,7 @@ const COMPONENT_USAGE_NOTES = {
   WorkflowActionBar: {
     uses: ['Button', 'Popconfirm', 'Textarea', 'Dropdown', 'Radio'],
     notes:
-      '完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。'
+      '完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。`items={[]}` / 空数组回落到 `buttonPolicy`；要覆盖策略请传非空 `items`。'
   },
   WorkflowViewer: {
     uses: ['Tag'],
@@ -213,7 +233,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   WorkflowDesigner: {
     notes:
-      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。'
+      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。'
   },
   WorkflowDetailShell: {
     uses: ['SchemaForm', 'Tabs', 'WorkflowTimeline', 'WorkflowViewer', 'WorkflowActionBar'],
@@ -246,7 +266,30 @@ const COMPONENT_USAGE_NOTES = {
   },
   ImagePreview: {
     notes:
-      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。'
+      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。'
+  },
+  Alert: {
+    notes:
+      '省略 `open` 时展示；`open={false}` 才不渲染。关闭不会内部隐藏——父级卸载或设 `open={false}`。与 ImagePreview「省略即关」相反。'
+  },
+  Masonry: {
+    notes: '`columnClassName` 目前是 no-op（声明了但不打到列节点）。列数/缝用 `columns` / `gap`。'
+  },
+  PrintLayout: {
+    notes:
+      '`ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。'
+  },
+  CropUpload: {
+    notes:
+      'FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。'
+  },
+  Pagination: {
+    notes:
+      '`size` 是 `small|medium|large`，不是 Form/Button 的 `sm|md|lg`。Table 内置分页默认开；List 默认关。'
+  },
+  Tree: {
+    notes:
+      '`checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。'
   },
   ImageViewer: {
     notes:
@@ -358,7 +401,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Card: {
     notes:
-      '`hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。'
+      '`hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。'
   },
   Drawer: {
     notes: '`bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。'
@@ -385,7 +428,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   List: {
     notes:
-      '内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。'
+      "分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `pagination` 才渲染 Pagination：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`（与 Table `pagination.remote`、工具栏 `toolbar.searchMode: 'remote'` 是三套独立开关）：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。虚拟窗高是 `virtualHeight`，不是 TreeSelect overlay `height` / Select `listHeight`。"
   },
   TableToolbar: {
     uses: ['Input', 'Select', 'Button', 'Popover', 'Checkbox'],
@@ -400,7 +443,7 @@ const COMPONENT_USAGE_NOTES = {
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '`column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；`remote: true` 不做本地筛排切。内置导出只出 CSV。'
+      '`column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；List 分页默认关。`pagination.remote: true` 不做本地筛排切（与工具栏 `toolbar.searchMode: \'remote\'` 不是同一个 remote）。内置导出只出 CSV。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -410,7 +453,7 @@ const COMPONENT_USAGE_NOTES = {
   FormWizard: {
     uses: ['Steps/StepsItem', 'Button', 'Form', 'ConfigProvider'],
     notes:
-      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。'
+      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。'
   },
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],

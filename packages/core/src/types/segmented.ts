@@ -20,9 +20,15 @@ export interface SegmentedOption {
 export interface SegmentedProps {
   /** Available options */
   options?: SegmentedOption[]
-  /** Whether the whole control is disabled */
+  /**
+   * Whether the whole control is disabled
+   * @default false
+   */
   disabled?: boolean
-  /** Component size */
+  /**
+   * Component size
+   * @default 'md'
+   */
   size?: ComponentSize
   /**
    * Whether the control fills full width

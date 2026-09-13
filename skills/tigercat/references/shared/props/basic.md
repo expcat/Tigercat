@@ -101,6 +101,8 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 
 `packages/core/src/types/image.ts` · `CropUploadProps` · 4/10 props
 
+Note: FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。
+
 | Prop            | Type                                      | Default     | Notes                                                                                      |
 | --------------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
 | `accept?`       | `string`                                  | `'image/*'` | Accepted file types                                                                        |
@@ -219,14 +221,14 @@ Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再
 
 `packages/core/src/types/image.ts` · `ImagePreviewProps` · 4/16 props
 
-Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。
+Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。
 
-| Prop        | Type                  | Default | Notes                                                                  |
-| ----------- | --------------------- | ------- | ---------------------------------------------------------------------- |
-| `images`    | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog. |
-| `open?`     | `boolean`             | `-`     | Whether the preview is open                                            |
-| `minScale?` | `number`              | `0.25`  | Minimum scale factor                                                   |
-| `maxScale?` | `number`              | `5`     | Maximum scale factor                                                   |
+| Prop        | Type                  | Default | Notes                                                                                     |
+| ----------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `images`    | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
+| `open?`     | `boolean`             | `false` | Whether the preview is open. Omit to keep the dialog closed (unlike Alert, which shows... |
+| `minScale?` | `number`              | `0.25`  | Minimum scale factor                                                                      |
+| `maxScale?` | `number`              | `5`     | Maximum scale factor                                                                      |
 
 ## ImageViewer
 
@@ -237,7 +239,7 @@ Note: Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`.
 | Prop            | Type                  | Default | Notes                                                                                     |
 | --------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
 | `images`        | `ImageLightboxItem[]` | `-`     | Gallery entries to preview. Required; an empty list closes the dialog.                    |
-| `open?`         | `boolean`             | `-`     | Whether the preview is open                                                               |
+| `open?`         | `boolean`             | `false` | Whether the preview is open. Omit to keep the dialog closed (unlike Alert, which shows... |
 | `currentIndex?` | `number`              | `0`     | Current image index (for multi-image preview)                                             |
 | `showNav?`      | `boolean`             | `true`  | Whether previous/next controls and arrow-key navigation are shown. Hidden for a single... |
 
@@ -301,7 +303,7 @@ Note: `readOnly` 可聚焦不改值；`disabled` 才出 Tab。半星与方向键
 
 | Prop          | Type      | Default | Notes                                                                        |
 | ------------- | --------- | ------- | ---------------------------------------------------------------------------- |
-| `allowHalf?`  | `boolean` | `-`     | Whether to allow half stars                                                  |
+| `allowHalf?`  | `boolean` | `false` | Whether to allow half stars                                                  |
 | `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                         |
 | `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
 | `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
@@ -329,8 +331,8 @@ Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labell
 | ----------- | ------------------- | ------- | ------------------------------------- |
 | `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
 | `block?`    | `boolean`           | `false` | Whether the control fills full width  |
-| `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
-| `size?`     | `ComponentSize`     | `-`     | Component size                        |
+| `disabled?` | `boolean`           | `false` | Whether the whole control is disabled |
+| `size?`     | `ComponentSize`     | `'md'`  | Component size                        |
 
 ## SplitButton
 
@@ -353,8 +355,8 @@ Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat`
 | ----------------- | ------------------ | ------- | --------------------------------------------------------- |
 | `title?`          | `string`           | `-`     | Title / label of the metric. Not the native HTML tooltip. |
 | `value?`          | `string \| number` | `-`     | The numeric or text value                                 |
-| `groupSeparator?` | `boolean`          | `-`     | Whether to show grouping separator (e.g. 1,000)           |
-| `animated?`       | `boolean`          | `-`     | Whether to animate numeric values                         |
+| `groupSeparator?` | `boolean`          | `false` | Whether to show grouping separator (e.g. 1,000)           |
+| `animated?`       | `boolean`          | `false` | Whether to animate numeric values                         |
 
 ## Tag
 

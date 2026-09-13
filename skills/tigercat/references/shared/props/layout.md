@@ -25,7 +25,7 @@ Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `ove
 
 `packages/core/src/types/card.ts` · `CardProps` · 4/14 props
 
-Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。
+Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
 
 | Prop         | Type                           | Default      | Notes                                                                                      |
 | ------------ | ------------------------------ | ------------ | ------------------------------------------------------------------------------------------ |
@@ -128,7 +128,7 @@ Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSide
 
 | Prop          | Type              | Default | Notes                                                                                      |
 | ------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `hasSider?`   | `boolean`         | `-`     | Treat this Layout as having a sider even if Sidebar is wrapped.                            |
+| `hasSider?`   | `boolean`         | `-`     | Treat this Layout as having a sider even if Sidebar is wrapped. Omit to detect a direct... |
 | `fullHeight?` | `boolean`         | `false` | Viewport-height app shell: `h-dvh overflow-hidden` so Content becomes the scroller. Nes... |
 | `direction?`  | `LayoutDirection` | `-`     | Force a horizontal shell (Sidebar beside Content). When omitted, a direct Sidebar child... |
 
@@ -136,18 +136,20 @@ Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSide
 
 `packages/core/src/types/list.ts` · `ListProps` · 4/22 props
 
-Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。
+Note: 分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `pagination` 才渲染 Pagination：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`（与 Table `pagination.remote`、工具栏 `toolbar.searchMode: 'remote'` 是三套独立开关）：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。虚拟窗高是 `virtualHeight`，不是 TreeSelect overlay `height` / Select `listHeight`。
 
-| Prop          | Type                            | Default        | Notes                                             |
-| ------------- | ------------------------------- | -------------- | ------------------------------------------------- |
-| `dataSource?` | `T[]`                           | `-`            | List data source                                  |
-| `pagination?` | `ListPaginationConfig \| false` | `-`            | Pagination configuration, set to false to disable |
-| `grid?`       | `ListGrid`                      | `-`            | Grid configuration for grid layout                |
-| `itemLayout?` | `ListItemLayout`                | `'horizontal'` | Item layout                                       |
+| Prop          | Type                            | Default        | Notes                                                                                      |
+| ------------- | ------------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `dataSource?` | `T[]`                           | `-`            | List data source                                                                           |
+| `pagination?` | `ListPaginationConfig \| false` | `false`        | Pagination configuration, set to false to disable. Omit or `false` leaves the list unpa... |
+| `grid?`       | `ListGrid`                      | `-`            | Grid configuration for grid layout                                                         |
+| `itemLayout?` | `ListItemLayout`                | `'horizontal'` | Item layout                                                                                |
 
 ## Masonry
 
 `packages/core/src/types/masonry.ts` · `MasonryProps` · 4/5 props
+
+Note: `columnClassName` 目前是 no-op（声明了但不打到列节点）。列数/缝用 `columns` / `gap`。
 
 | Prop               | Type                     | Default | Notes                                                                            |
 | ------------------ | ------------------------ | ------- | -------------------------------------------------------------------------------- |

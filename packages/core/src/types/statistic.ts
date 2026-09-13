@@ -17,9 +17,15 @@ export interface StatisticProps {
   prefix?: string
   /** Suffix text or symbol after the value */
   suffix?: string
-  /** Whether to show grouping separator (e.g. 1,000) */
+  /**
+   * Whether to show grouping separator (e.g. 1,000)
+   * @default false
+   */
   groupSeparator?: boolean
-  /** Whether to animate numeric values */
+  /**
+   * Whether to animate numeric values
+   * @default false
+   */
   animated?: boolean
   /** Numeric animation duration in milliseconds */
   animationDuration?: number

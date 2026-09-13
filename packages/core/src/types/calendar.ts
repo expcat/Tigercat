@@ -53,7 +53,10 @@ export interface CalendarProps {
    * @default 'month'
    */
   defaultMode?: CalendarMode
-  /** Whether the calendar is full-screen or card-style */
+  /**
+   * Whether the calendar is full-screen or card-style
+   * @default false
+   */
   fullscreen?: boolean
   /** Function that determines if a date is disabled */
   disabledDate?: (date: Date) => boolean

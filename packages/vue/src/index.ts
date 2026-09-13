@@ -504,6 +504,7 @@ export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
 export type {
   VuePrintLayoutProps,
   PrintLayoutProps,
+  VuePrintPageBreakProps,
   PrintPageBreakProps
 } from './components/PrintLayout'
 export type { PrintLayoutInstance } from '@expcat/tigercat-core'

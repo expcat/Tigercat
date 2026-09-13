@@ -69,7 +69,10 @@ export interface TransferProps {
   size?: ComponentSize
   /** Whether the component is disabled */
   disabled?: boolean
-  /** Whether to show search input in each panel */
+  /**
+   * Whether to show search input in each panel
+   * @default false
+   */
   searchable?: boolean
   /** Controlled search input values for source and target panels */
   searchValue?: TransferSearchValue

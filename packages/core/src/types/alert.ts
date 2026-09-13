@@ -72,7 +72,8 @@ export interface AlertProps {
 
   /**
    * When `false`, the alert is not rendered. Closing never hides internally —
-   * the parent unmounts or sets `open={false}`.
+   * the parent unmounts or sets `open={false}`. Omit to show the alert (unlike ImagePreview, which stays closed when `open` is omitted).
+   * @default true
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void

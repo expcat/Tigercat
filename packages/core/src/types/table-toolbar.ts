@@ -316,6 +316,7 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends 
   /**
    * Pagination configuration. Same default as Table (on, pageSize 10).
    * Pass `false` to hide the pager.
+   * @default { pageSize: 10 }
    */
   pagination?: PaginationConfig | false
   /**

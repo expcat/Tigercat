@@ -238,9 +238,7 @@ export const FRAMEWORK_COMPONENTS = {
       'packages/react/src/components/PrintLayout.tsx',
       'packages/vue/src/components/PrintLayout.ts'
     ],
-    propsInterfaces: ['PrintPageBreakProps'],
-    passThroughNote:
-      'Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps extends div attributes.'
+    propsInterfaces: ['PrintPageBreakProps']
   },
   StepsItem: {
     category: 'Navigation',
@@ -262,9 +260,7 @@ export const FRAMEWORK_COMPONENTS = {
   }
 }
 
-export const PUBLIC_PROPS_TYPE_EXCEPTIONS = new Map([
-  ['vue:PrintPageBreak', 'Vue PrintPageBreak is an attrs/pass-through component.']
-])
+export const PUBLIC_PROPS_TYPE_EXCEPTIONS = new Map()
 
 const DOC_SECTION_ALIASES = new Map([
   ['Header', 'Layout'],

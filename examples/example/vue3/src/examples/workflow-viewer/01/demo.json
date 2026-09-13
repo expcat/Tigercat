@@ -1,7 +1,7 @@
 {
-  "id": "timeline-05",
+  "id": "workflow-viewer-01",
   "title": "审批流程树",
   "description": "WorkflowViewer 用同一套 step 模型画只读钉钉风树（不是第二套 Timeline）：退回目标高亮、后加签临时节点、条件已走/未走分支、会签 tasks 行。ActionBar 展示完整动作集，意见必填会拦住提交。",
-  "entry": "App.tsx",
-  "order": 5
+  "entry": "App.vue",
+  "order": 1
 }

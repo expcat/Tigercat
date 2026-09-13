@@ -122,7 +122,13 @@ export const PrintLayout = defineComponent({
 })
 
 export interface VuePrintPageBreakProps {
+  /**
+   * Additional CSS classes on the break marker
+   */
   className?: string
+  /**
+   * Locale overlay for the on-screen page-break label
+   */
   locale?: Partial<TigerLocale>
 }
 

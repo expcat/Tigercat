@@ -92,6 +92,8 @@ export interface TaskBoardProps {
    * Controlled column data (with nested cards).
    * When provided the component is fully controlled — the consumer must
    * update this value in response to move events.
+   * `undefined` is uncontrolled (`defaultColumns`); `[]` is a controlled empty board.
+   * @default undefined
    */
   columns?: TaskBoardColumn[]
   /**

@@ -301,6 +301,8 @@ Events/callback props: `onOpenChange?`.
 
 `packages/core/src/types/pagination.ts` · `PaginationProps` · 4/22 props
 
+Note: `size` 是 `small|medium|large`，不是 Form/Button 的 `sm|md|lg`。Table 内置分页默认开；List 默认关。
+
 | Prop        | Type      | Default | Notes                                     |
 | ----------- | --------- | ------- | ----------------------------------------- |
 | `total?`    | `number`  | `0`     | Total number of items                     |
@@ -334,12 +336,12 @@ Events/callback props: `onOpenChange?`.
 
 `packages/core/src/types/steps.ts` · `StepsProps` · 4/12 props
 
-| Prop         | Type             | Default        | Notes                                      |
-| ------------ | ---------------- | -------------- | ------------------------------------------ |
-| `current?`   | `number`         | `0`            | Current step index (0-based)               |
-| `clickable?` | `boolean`        | `false`        | Whether steps are clickable for navigation |
-| `status?`    | `StepStatus`     | `'process'`    | Step status (for current step)             |
-| `direction?` | `StepsDirection` | `'horizontal'` | Steps direction/orientation                |
+| Prop         | Type             | Default        | Notes                                                                                      |
+| ------------ | ---------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `current?`   | `number`         | `0`            | Current step index (0-based)                                                               |
+| `clickable?` | `boolean`        | `false`        | Whether steps are clickable for navigation                                                 |
+| `status?`    | `StepStatus`     | `'process'`    | Step status (for current step)                                                             |
+| `direction?` | `StepsDirection` | `'horizontal'` | Steps direction/orientation. Vertical/horizontal connector geometry ships via the Tailw... |
 
 ## StepsItem
 
@@ -388,6 +390,8 @@ Events/callback props: `onOpenChange?`.
 ## Tree
 
 `packages/core/src/types/tree.ts` · `TreeProps` · 4/35 props
+
+Note: `checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。
 
 | Prop            | Type                                | Default | Notes                                                                                      |
 | --------------- | ----------------------------------- | ------- | ------------------------------------------------------------------------------------------ |

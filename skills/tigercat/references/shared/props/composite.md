@@ -66,12 +66,12 @@ Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
 Note: 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。
 
-| Prop              | Type                        | Default | Notes                                                                                      |
-| ----------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns`         | `TableColumn<T>[]`          | `-`     | Table columns configuration                                                                |
-| `toolbar?`        | `TableToolbarProps`         | `-`     | Toolbar configuration                                                                      |
-| `pagination?`     | `PaginationConfig \| false` | `-`     | Pagination configuration. Same default as Table (on, pageSize 10). Pass `false` to hide... |
-| `tableClassName?` | `string`                    | `-`     | Class applied to the inner table element.                                                  |
+| Prop              | Type                        | Default            | Notes                                                                                      |
+| ----------------- | --------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| `columns`         | `TableColumn<T>[]`          | `-`                | Table columns configuration                                                                |
+| `toolbar?`        | `TableToolbarProps`         | `-`                | Toolbar configuration                                                                      |
+| `pagination?`     | `PaginationConfig \| false` | `{ pageSize: 10 }` | Pagination configuration. Same default as Table (on, pageSize 10). Pass `false` to hide... |
+| `tableClassName?` | `string`                    | `-`                | Class applied to the inner table element.                                                  |
 
 Events/callback props: `onPageChange?`, `onPageSizeChange?`, `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, ....
 
@@ -85,7 +85,7 @@ Events/callback props: `onPageChange?`, `onPageSizeChange?`, `onChange?`, `onRow
 
 Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 
-Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。
+Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。
 
 | Prop          | Type                  | Default | Notes                                                                                      |
 | ------------- | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -104,12 +104,12 @@ Uses: `TaskBoard`.
 
 Note: Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
 
-| Prop             | Type                                      | Default | Notes                                                                                      |
-| ---------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `swimlanes?`     | `TaskBoardSwimlane[]`                     | `-`     | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
-| `swimlaneField?` | `string`                                  | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
-| `columns?`       | `TaskBoardColumn[]`                       | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`     | Locale overrides for TaskBoard UI text                                                     |
+| Prop             | Type                                      | Default     | Notes                                                                                      |
+| ---------------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `swimlanes?`     | `TaskBoardSwimlane[]`                     | `-`         | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
+| `swimlaneField?` | `string`                                  | `-`         | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
+| `columns?`       | `TaskBoardColumn[]`                       | `undefined` | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`         | Locale overrides for TaskBoard UI text                                                     |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 
@@ -155,12 +155,12 @@ Uses: `ConfigProvider`, `task-board drag utilities`.
 
 Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。Kanban 是默认值别名，新代码用 TaskBoard。
 
-| Prop             | Type                  | Default | Notes                                                                                      |
-| ---------------- | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `columns?`       | `TaskBoardColumn[]`   | `-`     | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `swimlanes?`     | `TaskBoardSwimlane[]` | `-`     | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
-| `swimlaneField?` | `string`              | `-`     | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
-| `showCardCount?` | `boolean`             | `false` | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
+| Prop             | Type                  | Default     | Notes                                                                                      |
+| ---------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `columns?`       | `TaskBoardColumn[]`   | `undefined` | Controlled column data (with nested cards). When provided the component is fully contro... |
+| `swimlanes?`     | `TaskBoardSwimlane[]` | `-`         | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
+| `swimlaneField?` | `string`              | `-`         | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
+| `showCardCount?` | `boolean`             | `false`     | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
 
 Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
 
@@ -170,7 +170,7 @@ Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCa
 
 Uses: `Button`, `Popconfirm`, `Textarea`, `Dropdown`, `Radio`.
 
-Note: 完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。
+Note: 完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。`items={[]}` / 空数组回落到 `buttonPolicy`；要覆盖策略请传非空 `items`。
 
 | Prop               | Type                       | Default | Notes                                                                                      |
 | ------------------ | -------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -185,7 +185,7 @@ Events/callback props: `onAction?`.
 
 `packages/core/src/types/workflow-designer.ts` · `WorkflowDesignerProps` · 4/12 props
 
-Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。
+Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。
 
 | Prop        | Type                                   | Default | Notes                                                                                      |
 | ----------- | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |

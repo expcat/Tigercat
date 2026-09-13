@@ -116,13 +116,25 @@ export interface VueSelectProps {
   defaultValue?: SelectModelValue
   open?: boolean
   defaultOpen?: boolean
+  /**
+   * Options list (can be flat list or grouped)
+   * @default []
+   */
   options?: SelectOptions
   size?: ComponentSize
   disabled?: boolean
   placeholder?: string
+  /**
+   * Whether to allow search/filter
+   * @default false
+   */
   searchable?: boolean
   searchValue?: string
   defaultSearchValue?: string
+  /**
+   * Whether to allow multiple selection
+   * @default false
+   */
   multiple?: boolean
   clearable?: boolean
   emptyText?: string

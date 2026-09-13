@@ -36,12 +36,12 @@ Events/callback props: `onItemsChange?`.
 
 `packages/core/src/types/file-manager.ts` · `FileManagerProps` · 4/21 props
 
-| Prop            | Type                   | Default | Notes                                                                                      |
-| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `files?`        | `FileItem[]`           | `-`     | File/folder tree data                                                                      |
-| `currentPath?`  | `string[]`             | `-`     | Current directory as folder **keys** (controlled). Omit for an internal path buffer. Do... |
-| `selectedKeys?` | `(string \| number)[]` | `-`     | Currently selected file keys (controlled)                                                  |
-| `searchable?`   | `boolean`              | `-`     | Searchable                                                                                 |
+| Prop            | Type                   | Default     | Notes                                                                                      |
+| --------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `files?`        | `FileItem[]`           | `undefined` | File/folder tree data. `undefined` is an empty uncontrolled tree; `[]` is a controlled...  |
+| `currentPath?`  | `string[]`             | `-`         | Current directory as folder **keys** (controlled). Omit for an internal path buffer. Do... |
+| `selectedKeys?` | `(string \| number)[]` | `-`         | Currently selected file keys (controlled)                                                  |
+| `searchable?`   | `boolean`              | `false`     | Searchable                                                                                 |
 
 Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, ....
 
@@ -82,6 +82,8 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 `packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/14 props
 
+Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。
+
 | Prop           | Type               | Default      | Notes                                                    |
 | -------------- | ------------------ | ------------ | -------------------------------------------------------- |
 | `pageSize?`    | `PrintPageSize`    | `'A4'`       | Page size preset                                         |
@@ -93,12 +95,10 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 `packages/react/src/components/PrintLayout.tsx and packages/vue/src/components/PrintLayout.ts` · `PrintPageBreakProps`
 
-| Prop         | Type                   | Default | Notes |
-| ------------ | ---------------------- | ------- | ----- |
-| `locale?`    | `Partial<TigerLocale>` | `-`     | -     |
-| `className?` | `string`               | `-`     | -     |
-
-Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps extends div attributes.
+| Prop         | Type                   | Default | Notes                                      |
+| ------------ | ---------------------- | ------- | ------------------------------------------ |
+| `locale?`    | `Partial<TigerLocale>` | `-`     | -                                          |
+| `className?` | `string`               | `-`     | Additional CSS classes on the break marker |
 
 ## RichTextEditor
 

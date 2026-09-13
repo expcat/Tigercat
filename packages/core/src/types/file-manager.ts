@@ -51,7 +51,11 @@ export interface FileItem {
 }
 
 export interface FileManagerProps {
-  /** File/folder tree data */
+  /**
+   * File/folder tree data.
+   * `undefined` is an empty uncontrolled tree; `[]` is a controlled empty tree.
+   * @default undefined
+   */
   files?: FileItem[]
   /** View mode */
   viewMode?: FileViewMode
@@ -95,7 +99,10 @@ export interface FileManagerProps {
   loading?: boolean
   /** Empty text */
   emptyText?: string
-  /** Searchable */
+  /**
+   * Searchable
+   * @default false
+   */
   searchable?: boolean
   /**
    * Search text (controlled). `''` is a real empty query.

@@ -23,6 +23,7 @@ export interface LayoutProps {
 
   /**
    * Treat this Layout as having a sider even if Sidebar is wrapped.
+   * Omit to detect a direct Sidebar child.
    */
   hasSider?: boolean
 

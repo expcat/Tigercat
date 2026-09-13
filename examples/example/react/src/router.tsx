@@ -148,6 +148,9 @@ const DataTableWithToolbarDemo = lazy(() => import('./pages/DataTableWithToolbar
 const FormWizardDemo = lazy(() => import('./pages/FormWizardDemo'))
 const SchemaFormDemo = lazy(() => import('./pages/SchemaFormDemo'))
 const WorkflowDesignerDemo = lazy(() => import('./pages/WorkflowDesignerDemo'))
+const WorkflowTimelineDemo = lazy(() => import('./pages/WorkflowTimelineDemo'))
+const WorkflowViewerDemo = lazy(() => import('./pages/WorkflowViewerDemo'))
+const WorkflowDetailShellDemo = lazy(() => import('./pages/WorkflowDetailShellDemo'))
 const ChatWindowDemo = lazy(() => import('./pages/ChatWindowDemo'))
 const CommentThreadDemo = lazy(() => import('./pages/CommentThreadDemo'))
 const ActivityFeedDemo = lazy(() => import('./pages/ActivityFeedDemo'))
@@ -302,6 +305,9 @@ const router = createHashRouter([
       { path: 'form-wizard', element: <FormWizardDemo /> },
       { path: 'schema-form', element: <SchemaFormDemo /> },
       { path: 'workflow-designer', element: <WorkflowDesignerDemo /> },
+      { path: 'workflow-timeline', element: <WorkflowTimelineDemo /> },
+      { path: 'workflow-viewer', element: <WorkflowViewerDemo /> },
+      { path: 'workflow-detail-shell', element: <WorkflowDetailShellDemo /> },
       { path: 'chat-window', element: <ChatWindowDemo /> },
       { path: 'comment-thread', element: <CommentThreadDemo /> },
       { path: 'activity-feed', element: <ActivityFeedDemo /> },
