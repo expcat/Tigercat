@@ -16,6 +16,7 @@ import {
   mergeTigerLocale,
   getRateLabels,
   formatRateValueText,
+  resolveReadOnlyFlag,
   sliderGetKeyboardValue,
   sliderNormalizeValue,
   getLocaleDirection,
@@ -35,7 +36,8 @@ export const Rate = defineComponent({
     count: { type: Number, default: 5 },
     allowHalf: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    readOnly: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: undefined },
+    readonly: { type: Boolean, default: undefined },
     size: { type: String as PropType<RateSize>, default: 'md' },
     allowClear: { type: Boolean, default: true },
     character: { type: String, default: undefined },
@@ -55,7 +57,8 @@ export const Rate = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getRateLabels(mergedLocale.value, props.labels))
     const rtl = computed(() => getLocaleDirection(mergedLocale.value) === 'rtl')
-    const locked = computed(() => props.disabled || props.readOnly)
+    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly, props.readOnly))
+    const locked = computed(() => props.disabled || isReadOnly.value)
     const step = computed(() => (props.allowHalf ? 0.5 : 1))
     const normalized = computed(() =>
       sliderNormalizeValue(currentValue.value, 0, props.count, step.value)
@@ -206,7 +209,7 @@ export const Rate = defineComponent({
           'aria-valuenow': normalized.value,
           'aria-valuetext': valueText,
           'aria-disabled': props.disabled || undefined,
-          'aria-readonly': props.readOnly || undefined,
+          'aria-readonly': isReadOnly.value || undefined,
           'aria-orientation': 'horizontal',
           tabindex: props.disabled ? -1 : 0,
           onKeydown: handleKeydown,

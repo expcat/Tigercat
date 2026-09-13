@@ -10,6 +10,13 @@
 - **SchemaForm**：Vue action Submit 的 `errors` 与引擎一致（不再硬编码 `[]`）。
 - **RichTextEditor**：React 省略 `value` 时从 FormItem 播种引擎。
 - **Slider**：`status` 接到视觉 / `aria-invalid` / shake。
+- **Input / Textarea**：Vue 增加非受控 `defaultValue`（有 `modelValue` 或 FormItem 值时忽略）。
+- **Rate / Signature / Mentions**：同时接受 `readonly` 与 `readOnly`；冲突时用 `readonly`。
+- **CronEditorSize / RateSize**：类型别名为 `ComponentSize`（导出名保留）。
+- **TreeSelect**：`listHeight` 是 overlay `height` 的别名（两者都传时 `listHeight` 胜出）。
+- **Mentions**：补齐 Textarea 字段 props（`autoResize` / `maxLength` / `showCount` / `readonly` / `clearable`）。
+- **RadioGroup / CheckboxGroup**：可传 `options[]`；有 children / 默认插槽时忽略 options。SchemaForm radio 走同一路径。
+- **SchemaForm**：转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。
 
 ## v2.8.5
 

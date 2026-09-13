@@ -94,4 +94,15 @@ export interface CheckboxGroupProps {
    * @default 'default'
    */
   status?: InputStatus
+
+  /**
+   * Option list. Ignored when children / default slot are present.
+   */
+  options?: CheckboxGroupOption[]
+}
+
+export interface CheckboxGroupOption {
+  label: string
+  value: CheckboxValue
+  disabled?: boolean
 }

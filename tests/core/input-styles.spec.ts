@@ -58,6 +58,11 @@ describe('resolveReadOnlyFlag', () => {
     expect(resolveReadOnlyFlag(true, undefined)).toBe(true)
     expect(resolveReadOnlyFlag(undefined, undefined)).toBe(false)
   })
+
+  it('prefers readonly when the two spellings disagree', () => {
+    expect(resolveReadOnlyFlag(true, false)).toBe(true)
+    expect(resolveReadOnlyFlag(false, true)).toBe(false)
+  })
 })
 
 describe('input-styles trailing buttons', () => {

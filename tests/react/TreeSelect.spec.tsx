@@ -50,6 +50,21 @@ describe('TreeSelect', () => {
     expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
   })
 
+  it('applies listHeight as the overlay height, winning over height', async () => {
+    const user = userEvent.setup()
+    const { getByRole } = render(
+      <TreeSelect
+        treeData={treeData}
+        defaultExpandAll
+        height={200}
+        listHeight={120}
+        aria-label="Height"
+      />
+    )
+    await user.click(getByRole('combobox'))
+    expect(getByRole('tree')).toHaveStyle({ maxHeight: '120px' })
+  })
+
   it('treats empty string as a legal key', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()

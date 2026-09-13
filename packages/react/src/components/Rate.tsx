@@ -15,6 +15,7 @@ import {
   mergeTigerLocale,
   getRateLabels,
   formatRateValueText,
+  resolveReadOnlyFlag,
   sliderGetKeyboardValue,
   sliderNormalizeValue,
   getLocaleDirection,
@@ -44,7 +45,8 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
     count = 5,
     allowHalf = false,
     disabled = false,
-    readOnly = false,
+    readOnly,
+    readonly,
     size = 'md',
     allowClear = true,
     character,
@@ -75,7 +77,8 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
     [mergedLocale, labelsOverride]
   )
   const rtl = getLocaleDirection(mergedLocale) === 'rtl'
-  const locked = disabled || readOnly
+  const isReadOnly = resolveReadOnlyFlag(readonly, readOnly)
+  const locked = disabled || isReadOnly
   const step = allowHalf ? 0.5 : 1
   const normalized = sliderNormalizeValue(currentValue, 0, count, step)
   const displayValue = hoverValue > 0 ? hoverValue : normalized
@@ -160,7 +163,7 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
       aria-valuenow={normalized}
       aria-valuetext={valueText}
       aria-disabled={disabled || undefined}
-      aria-readonly={readOnly || undefined}
+      aria-readonly={isReadOnly || undefined}
       aria-orientation="horizontal"
       tabIndex={disabled ? -1 : 0}
       {...rest}

@@ -297,16 +297,16 @@ Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Ref
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 4/12 props
+`packages/core/src/types/rate.ts` · `RateProps` · 4/13 props
 
 Note: `readOnly` 可聚焦不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。
 
-| Prop          | Type      | Default | Notes                                                                        |
-| ------------- | --------- | ------- | ---------------------------------------------------------------------------- |
-| `allowHalf?`  | `boolean` | `false` | Whether to allow half stars                                                  |
-| `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                         |
-| `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
-| `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
+| Prop          | Type      | Default | Notes                                                                                      |
+| ------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `allowHalf?`  | `boolean` | `false` | Whether to allow half stars                                                                |
+| `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                                       |
+| `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon                       |
+| `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. `readonly`... |
 
 ## Result
 

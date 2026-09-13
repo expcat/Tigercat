@@ -26,7 +26,11 @@ import {
   coerceClassValue,
   extractMentionQuery,
   filterMentionOptions,
+  autoResizeTextarea,
+  clearTextareaAutoResize,
+  formatInputCountText,
   getEmptyLabels,
+  getInputCountClasses,
   getInitialMentionsActiveIndex,
   getInputErrorClasses,
   getMentionOptionKey,
@@ -47,6 +51,7 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   resolveLocaleText,
+  resolveReadOnlyFlag,
   runShakeAnimation,
   shouldOpenMentions
 } from '@expcat/tigercat-core'
@@ -66,6 +71,14 @@ export interface VueMentionsProps {
   disabled?: boolean
   size?: ComponentSize
   rows?: number
+  autoResize?: boolean
+  maxRows?: number
+  minRows?: number
+  maxLength?: number
+  showCount?: boolean
+  readonly?: boolean
+  readOnly?: boolean
+  clearable?: boolean
   status?: InputStatus
   errorMessage?: string
   name?: string
@@ -97,6 +110,14 @@ export const Mentions = defineComponent({
     disabled: Boolean,
     size: { type: String as PropType<ComponentSize>, default: 'md' },
     rows: { type: Number, default: 3 },
+    autoResize: { type: Boolean, default: false },
+    maxRows: { type: Number, default: undefined },
+    minRows: { type: Number, default: undefined },
+    maxLength: { type: Number, default: undefined },
+    showCount: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: undefined },
+    readOnly: { type: Boolean, default: undefined },
+    clearable: { type: Boolean, default: false },
     status: { type: String as PropType<InputStatus>, default: undefined },
     errorMessage: String,
     name: String,
@@ -191,7 +212,13 @@ export const Mentions = defineComponent({
         })
     )
     const activeError = computed(() => status.value === 'error' && !!props.errorMessage)
-    const hasExtras = computed(() => activeError.value)
+    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly, props.readOnly))
+    const hasExtras = computed(
+      () =>
+        activeError.value ||
+        props.showCount ||
+        (props.clearable && currentValue.value.length > 0 && !effectiveDisabled.value)
+    )
 
     watch(
       () => [props.modelValue, formValue.value] as const,
@@ -200,6 +227,24 @@ export const Mentions = defineComponent({
           model !== undefined ? model : typeof controlValue === 'string' ? controlValue : undefined
         if (source === undefined) return
         if (source !== localValue.value) localValue.value = source
+      }
+    )
+
+    watch(
+      () =>
+        [currentValue.value, props.autoResize, props.minRows, props.maxRows, props.rows] as const,
+      () => {
+        nextTick(() => {
+          if (!textareaRef.value) return
+          if (!props.autoResize) {
+            clearTextareaAutoResize(textareaRef.value)
+            return
+          }
+          autoResizeTextarea(textareaRef.value, {
+            minRows: props.minRows ?? props.rows,
+            maxRows: props.maxRows
+          })
+        })
       }
     )
 
@@ -421,6 +466,7 @@ export const Mentions = defineComponent({
             status: status.value,
             inGroup: inGroup.value && !hasExtras.value
           }),
+          props.autoResize ? 'resize-none' : undefined,
           !hasExtras.value ? props.className : undefined,
           !hasExtras.value ? coerceClassValue(attrClass) : undefined
         ),
@@ -428,6 +474,8 @@ export const Mentions = defineComponent({
         value: currentValue.value,
         placeholder: props.placeholder,
         disabled: effectiveDisabled.value,
+        readonly: isReadOnly.value || undefined,
+        maxlength: props.maxLength,
         rows: props.rows,
         name: effectiveName,
         id: effectiveId,
@@ -526,6 +574,18 @@ export const Mentions = defineComponent({
         },
         [
           textarea,
+          props.clearable && currentValue.value && !effectiveDisabled.value && !isReadOnly.value
+            ? h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'self-end text-sm text-[var(--tiger-text-muted,#6b7280)]',
+                  'aria-label': 'Clear',
+                  onClick: () => commitValue('')
+                },
+                '×'
+              )
+            : null,
           activeError.value
             ? h(
                 'div',
@@ -535,6 +595,17 @@ export const Mentions = defineComponent({
                   'aria-live': 'polite'
                 },
                 props.errorMessage
+              )
+            : null,
+          props.showCount
+            ? h(
+                'div',
+                {
+                  class: getInputCountClasses(
+                    props.maxLength !== undefined && currentValue.value.length > props.maxLength
+                  )
+                },
+                formatInputCountText(currentValue.value.length, props.maxLength)
               )
             : null,
           dropdown

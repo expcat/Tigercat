@@ -42,7 +42,6 @@ import { Textarea } from './Textarea'
 import { Select } from './Select'
 import { Checkbox } from './Checkbox'
 import { Switch } from './Switch'
-import { Radio } from './Radio'
 import { RadioGroup } from './RadioGroup'
 import { Button } from './Button'
 
@@ -54,6 +53,7 @@ export interface SchemaFormProps
   onChange?: (values: FormValues) => void
   onSubmit?: (event: SchemaFormSubmitEvent) => void
   onReset?: () => void
+  onValidate?: (fieldName: string, valid: boolean, error?: string | null) => void
   style?: React.CSSProperties
 }
 
@@ -82,15 +82,7 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
     return <Switch disabled={disabled} />
   }
   if (type === 'radio') {
-    return (
-      <RadioGroup disabled={disabled}>
-        {(field.options ?? []).map((option) => (
-          <Radio key={String(option.value)} value={option.value} disabled={option.disabled}>
-            {option.label}
-          </Radio>
-        ))}
-      </RadioGroup>
-    )
+    return <RadioGroup disabled={disabled} options={field.options} />
   }
   return <Input placeholder={placeholder} disabled={disabled} />
 }
@@ -175,6 +167,11 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     disabled = false,
     loading = false,
     validateDebounce,
+    controller,
+    undoable,
+    maxHistorySize,
+    fieldDependencies,
+    onValidate,
     showActions = true,
     submitText,
     resetText,
@@ -276,6 +273,11 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
       disabled={disabled}
       loading={loading}
       validateDebounce={validateDebounce}
+      controller={controller}
+      undoable={undoable}
+      maxHistorySize={maxHistorySize}
+      fieldDependencies={fieldDependencies}
+      onValidate={onValidate}
       locale={locale}
       className={classNames(schemaFormRootClasses, className)}
       style={style}

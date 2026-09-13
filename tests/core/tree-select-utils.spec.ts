@@ -5,6 +5,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   TREE_SELECT_DEFAULT_HEIGHT,
+  resolveTreeSelectListHeight,
   alignTreeSelectVirtualScroll,
   getTreeSelectDisplayLabel,
   getTreeSelectOpenExpandedKeys,
@@ -33,6 +34,13 @@ const treeData: TreeNode[] = [
 describe('tree-select helpers', () => {
   it('keeps overlay-family virtual defaults', () => {
     expect(TREE_SELECT_DEFAULT_HEIGHT).toBe(256)
+  })
+
+  it('resolves listHeight as an alias of height, with listHeight winning', () => {
+    expect(resolveTreeSelectListHeight()).toBe(TREE_SELECT_DEFAULT_HEIGHT)
+    expect(resolveTreeSelectListHeight(120)).toBe(120)
+    expect(resolveTreeSelectListHeight(undefined, 80)).toBe(80)
+    expect(resolveTreeSelectListHeight(120, 80)).toBe(80)
   })
 
   it('treats isLeaf true as not expandable even with children', () => {

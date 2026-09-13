@@ -3,12 +3,12 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import { reactive } from 'vue'
+import { defineComponent, h, reactive } from 'vue'
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { SchemaForm } from '@expcat/tigercat-vue/SchemaForm'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import type { SchemaFormSchema } from '@expcat/tigercat-core'
+import type { FormHandle, SchemaFormSchema } from '@expcat/tigercat-core'
 import { expectNoA11yViolations } from '../utils'
 
 const basicSchema: SchemaFormSchema = {
@@ -98,6 +98,79 @@ describe('SchemaForm (Vue)', () => {
       }
     })
     expect(screen.getByRole('checkbox')).toBeChecked()
+  })
+
+  it('paints schema radio options without a field slot', () => {
+    render(SchemaForm, {
+      props: {
+        schema: {
+          fields: [
+            {
+              name: 'plan',
+              label: 'Plan',
+              type: 'radio',
+              defaultValue: 'pro',
+              options: [
+                { label: 'Free', value: 'free' },
+                { label: 'Pro', value: 'pro' }
+              ]
+            }
+          ]
+        },
+        showActions: false
+      }
+    })
+    const radios = screen.getAllByRole('radio') as HTMLInputElement[]
+    expect(radios).toHaveLength(2)
+    expect(screen.getByText('Pro')).toBeInTheDocument()
+    expect(radios[1].checked).toBe(true)
+  })
+
+  it('forwards undoable onto the inner Form engine', async () => {
+    let formRef: FormHandle | null = null
+    const Demo = defineComponent({
+      setup() {
+        return () =>
+          h(SchemaForm, {
+            schema: {
+              fields: [{ name: 'name', label: 'Name', defaultValue: 'Ada' }]
+            },
+            undoable: true,
+            showActions: false,
+            ref: (el: unknown) => {
+              formRef = el as FormHandle
+            }
+          })
+      }
+    })
+    render(Demo)
+    expect(formRef!.canUndo).toBe(false)
+    await fireEvent.update(screen.getByLabelText(/Name/), 'Grace')
+    expect(formRef!.canUndo).toBe(true)
+    formRef!.undo()
+    expect(formRef!.canUndo).toBe(false)
+    expect(formRef!.canRedo).toBe(true)
+  })
+
+  it('emits validate from the inner Form', async () => {
+    const onValidate = vi.fn()
+    let formRef: FormHandle | null = null
+    const Demo = defineComponent({
+      setup() {
+        return () =>
+          h(SchemaForm, {
+            schema: basicSchema,
+            showActions: false,
+            onValidate,
+            ref: (el: unknown) => {
+              formRef = el as FormHandle
+            }
+          })
+      }
+    })
+    render(Demo)
+    await formRef!.validateField('name')
+    expect(onValidate).toHaveBeenCalledWith('name', false, expect.any(String))
   })
 
   it('renders nested groups and dotted paths', async () => {

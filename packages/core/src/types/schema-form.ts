@@ -193,6 +193,10 @@ export interface SchemaFormProps extends Pick<
   | 'loading'
   | 'validateDebounce'
   | 'locale'
+  | 'controller'
+  | 'undoable'
+  | 'maxHistorySize'
+  | 'fieldDependencies'
 > {
   /**
    * Field / group schema.

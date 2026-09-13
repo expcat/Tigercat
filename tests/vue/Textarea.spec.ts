@@ -84,6 +84,19 @@ describe('Textarea', () => {
       expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('')
     })
 
+    it('renders with defaultValue when modelValue is omitted', () => {
+      const { getByRole } = renderWithProps(Textarea, { defaultValue: 'Default value' })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('Default value')
+    })
+
+    it('does not reset to defaultValue on rerender after typing', async () => {
+      const { getByRole, rerender } = renderWithProps(Textarea, { defaultValue: 'start' })
+      const textarea = getByRole('textbox') as HTMLTextAreaElement
+      await fireEvent.update(textarea, 'start more')
+      await rerender({ defaultValue: 'start' })
+      expect(textarea.value).toBe('start more')
+    })
+
     it('preserves multiline text', () => {
       const multiline = 'Line 1\nLine 2\nLine 3'
       const { getByRole } = renderWithProps(Textarea, { modelValue: multiline })

@@ -155,6 +155,34 @@ describe('Radio', () => {
       expect(getRadios(container)).toHaveLength(2)
     })
 
+    it('renders options when the default slot is empty', () => {
+      const { container, getByText } = render(RadioGroup, {
+        props: {
+          options: [
+            { label: 'Monthly', value: 'monthly' },
+            { label: 'Yearly', value: 'yearly', disabled: true }
+          ],
+          defaultValue: 'monthly'
+        }
+      })
+      const inputs = getRadios(container)
+      expect(inputs).toHaveLength(2)
+      expect(getByText('Monthly')).toBeInTheDocument()
+      expect(inputs[0].checked).toBe(true)
+      expect(inputs[1]).toBeDisabled()
+    })
+
+    it('ignores options when children are present', () => {
+      const { container, getByText, queryByText } = renderGroup(`
+        <RadioGroup :options="[{ label: 'From options', value: 'opt' }]">
+          <Radio value="slot">From slot</Radio>
+        </RadioGroup>
+      `)
+      expect(getRadios(container)).toHaveLength(1)
+      expect(getByText('From slot')).toBeInTheDocument()
+      expect(queryByText('From options')).not.toBeInTheDocument()
+    })
+
     it('should select and switch values (uncontrolled)', async () => {
       const { container } = renderGroup(`
         <RadioGroup default-value="a">

@@ -26,6 +26,7 @@ import {
   clampSignatureLineWidth,
   clearSignatureStrokes,
   coerceClassValue,
+  resolveReadOnlyFlag,
   createDocumentDragSession,
   createSignatureChangePayload,
   createSignatureSession,
@@ -75,7 +76,8 @@ export const Signature = defineComponent({
     backgroundColor: { type: String, default: undefined },
     lineWidth: { type: Number, default: 2 },
     disabled: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: undefined },
+    readOnly: { type: Boolean, default: undefined },
     clearable: { type: Boolean, default: true },
     exportType: {
       type: String as PropType<SignatureExportType>,
@@ -123,11 +125,12 @@ export const Signature = defineComponent({
     )
     const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
     const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
+    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly, props.readOnly))
 
     const innerValue = ref(props.defaultValue ?? '')
     const observedWidth = ref(0)
     const logicalWidth = computed(() => props.width ?? observedWidth.value)
-    const isInteractive = computed(() => !effectiveDisabled.value && !props.readonly)
+    const isInteractive = computed(() => !effectiveDisabled.value && !isReadOnly.value)
     const normalizedLineWidth = computed(() => clampSignatureLineWidth(props.lineWidth))
 
     const committed = computed(() => {
@@ -244,14 +247,14 @@ export const Signature = defineComponent({
     }
 
     function clear() {
-      if (effectiveDisabled.value || props.readonly) return
+      if (effectiveDisabled.value || isReadOnly.value) return
       dragDispose?.()
       dragDispose = undefined
       emitPayload(clearSignatureStrokes(), { clear: true })
     }
 
     function undo() {
-      if (effectiveDisabled.value || props.readonly) return
+      if (effectiveDisabled.value || isReadOnly.value) return
       dragDispose?.()
       dragDispose = undefined
       emitPayload(undoSignatureStroke(session.value), { undo: true })
@@ -346,7 +349,7 @@ export const Signature = defineComponent({
     })
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (!props.clearable || effectiveDisabled.value || props.readonly) return
+      if (!props.clearable || effectiveDisabled.value || isReadOnly.value) return
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
         event.preventDefault()
         undo()
@@ -427,7 +430,7 @@ export const Signature = defineComponent({
             {
               ref: wrapRef,
               class: classNames(
-                getSignatureCanvasWrapClasses(effectiveDisabled.value, props.readonly),
+                getSignatureCanvasWrapClasses(effectiveDisabled.value, isReadOnly.value),
                 getSignatureCanvasStatusClasses(status.value)
               )
             },
@@ -445,7 +448,7 @@ export const Signature = defineComponent({
                 'aria-labelledby': labelledby,
                 'aria-describedby': describedBy,
                 'aria-disabled': effectiveDisabled.value || undefined,
-                'aria-readonly': props.readonly || undefined,
+                'aria-readonly': isReadOnly.value || undefined,
                 'aria-invalid': status.value === 'error' ? true : undefined,
                 'aria-required': formItemControl?.required.value ? true : undefined,
                 onPointerdown: handlePointerDown,
@@ -464,7 +467,7 @@ export const Signature = defineComponent({
                   {
                     type: 'button',
                     class: signatureToolbarButtonClasses,
-                    disabled: effectiveDisabled.value || props.readonly || empty,
+                    disabled: effectiveDisabled.value || isReadOnly.value || empty,
                     onClick: undo
                   },
                   labels.value.undoText
@@ -474,7 +477,7 @@ export const Signature = defineComponent({
                   {
                     type: 'button',
                     class: signatureToolbarButtonClasses,
-                    disabled: effectiveDisabled.value || props.readonly || empty,
+                    disabled: effectiveDisabled.value || isReadOnly.value || empty,
                     onClick: clear
                   },
                   labels.value.clearText

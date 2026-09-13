@@ -16,7 +16,11 @@ import type {
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
+  autoResizeTextarea,
   classNames,
+  clearTextareaAutoResize,
+  formatInputCountText,
+  getInputCountClasses,
   extractMentionQuery,
   filterMentionOptions,
   getEmptyLabels,
@@ -39,6 +43,7 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   resolveLocaleText,
+  resolveReadOnlyFlag,
   runShakeAnimation,
   shouldOpenMentions
 } from '@expcat/tigercat-core'
@@ -81,6 +86,14 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       disabled = false,
       size = 'md',
       rows = 3,
+      autoResize = false,
+      maxRows,
+      minRows,
+      maxLength,
+      showCount = false,
+      readonly: readonlyProp,
+      readOnly: readOnlyProp,
+      clearable = false,
       status: statusProp,
       errorMessage: errorMessageProp,
       name,
@@ -121,6 +134,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
     const errorMessage = errorMessageProp
     const shakeTrigger = formItemControl?.shakeTrigger
     const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+    const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
     const effectiveId = id ?? formItemControl?.id
     const effectiveName = name ?? formItemControl?.name
     const formBoundValue = formItemControl?.value
@@ -350,7 +364,17 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
     }
 
     const activeError = status === 'error' && !!errorMessage
-    const hasExtras = activeError
+    const hasExtras =
+      activeError || showCount || (clearable && currentValue.length > 0 && !effectiveDisabled)
+
+    useLayoutEffect(() => {
+      if (!textareaRef.current) return
+      if (!autoResize) {
+        clearTextareaAutoResize(textareaRef.current)
+        return
+      }
+      autoResizeTextarea(textareaRef.current, { minRows: minRows ?? rows, maxRows })
+    }, [autoResize, currentValue, minRows, maxRows, rows])
     const labelledby =
       typeof rest['aria-labelledby'] === 'string' && rest['aria-labelledby'].trim()
         ? rest['aria-labelledby']
@@ -382,12 +406,15 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
             status,
             inGroup: inGroup && !hasExtras
           }),
+          autoResize ? 'resize-none' : undefined,
           !hasExtras ? className : undefined
         )}
         style={!hasExtras ? style : undefined}
         value={currentValue}
         placeholder={placeholder}
         disabled={effectiveDisabled}
+        readOnly={isReadOnly || undefined}
+        maxLength={maxLength}
         rows={rows}
         name={effectiveName}
         id={effectiveId}
@@ -475,9 +502,26 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         )}
         style={style}>
         {textarea}
+        {clearable && currentValue && !effectiveDisabled && !isReadOnly ? (
+          <button
+            type="button"
+            className="self-end text-sm text-[var(--tiger-text-muted,#6b7280)]"
+            aria-label="Clear"
+            onClick={() => commitValue('')}>
+            ×
+          </button>
+        ) : null}
         {activeError ? (
           <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
             {errorMessage}
+          </div>
+        ) : null}
+        {showCount ? (
+          <div
+            className={getInputCountClasses(
+              maxLength !== undefined && currentValue.length > maxLength
+            )}>
+            {formatInputCountText(currentValue.length, maxLength)}
           </div>
         ) : null}
         {dropdown}

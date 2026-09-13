@@ -15,6 +15,7 @@ import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
   TREE_SELECT_DEFAULT_HEIGHT,
+  resolveTreeSelectListHeight,
   classNames,
   coerceClassValue,
   coerceTreeSelectFormValue,
@@ -126,6 +127,7 @@ export interface VueTreeSelectProps {
   defaultExpandedKeys?: (string | number)[]
   virtual?: boolean
   height?: number
+  listHeight?: number
   itemHeight?: number
   loading?: boolean
   loadData?: TreeLoadDataFn
@@ -173,6 +175,7 @@ export const TreeSelect = defineComponent({
     defaultExpandedKeys: { type: Array as PropType<(string | number)[]>, default: undefined },
     virtual: Boolean,
     height: { type: Number, default: TREE_SELECT_DEFAULT_HEIGHT },
+    listHeight: { type: Number, default: undefined },
     itemHeight: { type: Number, default: undefined },
     loading: Boolean,
     loadData: { type: Function as PropType<TreeLoadDataFn> },
@@ -282,6 +285,9 @@ export const TreeSelect = defineComponent({
     )
     const itemHeight = computed(
       () => props.itemHeight ?? getTreeSelectVirtualItemHeight(props.size)
+    )
+    const overlayHeight = computed(() =>
+      resolveTreeSelectListHeight(props.height, props.listHeight)
     )
     const hasLoadData = computed(() => typeof props.loadData === 'function')
 
@@ -753,7 +759,7 @@ export const TreeSelect = defineComponent({
               'div',
               {
                 class: treeSelectTreeClasses,
-                style: { maxHeight: `${props.height}px` },
+                style: { maxHeight: `${overlayHeight.value}px` },
                 ...treeAria
               },
               visibleItems.value.map(renderNode)

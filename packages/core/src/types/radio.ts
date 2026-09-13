@@ -88,8 +88,19 @@ export interface RadioGroupProps {
   direction?: ChoiceGroupDirection
 
   /**
+   * Option list. Ignored when children / default slot are present.
+   */
+  options?: RadioGroupOption[]
+
+  /**
    * Validation status
    * @default 'default'
    */
   status?: InputStatus
+}
+
+export interface RadioGroupOption {
+  label: string
+  value: string | number
+  disabled?: boolean
 }

@@ -1,0 +1,12 @@
+{
+  "id": "mentions-03",
+  "title": "字数、清空与只读",
+  "description": "Mentions 对齐 Textarea 的 maxLength / showCount / clearable / readonly。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 220,
+    "maxHeight": 720
+  }
+}

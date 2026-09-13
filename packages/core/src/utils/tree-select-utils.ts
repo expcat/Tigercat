@@ -31,6 +31,10 @@ import {
 
 export const TREE_SELECT_DEFAULT_HEIGHT = 256
 
+export function resolveTreeSelectListHeight(height?: number, listHeight?: number): number {
+  return listHeight ?? height ?? TREE_SELECT_DEFAULT_HEIGHT
+}
+
 export const treeSelectBaseClasses = selectBaseClasses
 export const treeSelectDropdownClasses = classNames(selectDropdownBaseClasses, 'min-w-0')
 export const treeSelectSearchClasses = selectSearchInputClasses

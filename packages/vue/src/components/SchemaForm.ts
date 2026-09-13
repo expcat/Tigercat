@@ -31,6 +31,8 @@ import {
   schemaFormRootClasses,
   type ComponentSize,
   type FormConditions,
+  type FormController,
+  type FormFieldDependencies,
   type FormHandle,
   type FormLabelAlign,
   type FormLabelPosition,
@@ -54,7 +56,6 @@ import { Textarea } from './Textarea'
 import { Select } from './Select'
 import { Checkbox } from './Checkbox'
 import { Switch } from './Switch'
-import { Radio } from './Radio'
 import { RadioGroup } from './RadioGroup'
 import { Button } from './Button'
 
@@ -90,16 +91,7 @@ function renderWidget(field: SchemaFormField): VNode {
     return h(Switch, { disabled })
   }
   if (type === 'radio') {
-    return h(
-      RadioGroup,
-      { disabled },
-      {
-        default: () =>
-          (field.options ?? []).map((option) =>
-            h(Radio, { value: option.value, disabled: option.disabled }, () => option.label)
-          )
-      }
-    )
+    return h(RadioGroup, { disabled, options: field.options })
   }
   return h(Input, { placeholder, disabled })
 }
@@ -164,6 +156,22 @@ export const SchemaForm = defineComponent({
       type: Number,
       default: undefined
     },
+    controller: {
+      type: Object as PropType<FormController>,
+      default: undefined
+    },
+    undoable: {
+      type: Boolean,
+      default: undefined
+    },
+    maxHistorySize: {
+      type: Number,
+      default: undefined
+    },
+    fieldDependencies: {
+      type: Object as PropType<FormFieldDependencies>,
+      default: undefined
+    },
     showActions: {
       type: Boolean,
       default: true
@@ -201,7 +209,9 @@ export const SchemaForm = defineComponent({
     'update:model': (_values: FormValues) => true,
     change: (_values: FormValues) => true,
     submit: (_event: SchemaFormSubmitEvent) => true,
-    reset: () => true
+    reset: () => true,
+    validate: (fieldName: string, isValid: boolean, _errorMessage?: string) =>
+      typeof fieldName === 'string' && typeof isValid === 'boolean'
   },
   setup(props, { attrs, emit, slots, expose }) {
     const config = useTigerConfig()
@@ -365,7 +375,13 @@ export const SchemaForm = defineComponent({
               disabled: props.disabled,
               loading: props.loading,
               validateDebounce: props.validateDebounce,
+              controller: props.controller,
+              undoable: props.undoable,
+              maxHistorySize: props.maxHistorySize,
+              fieldDependencies: props.fieldDependencies,
               locale: props.locale,
+              onValidate: (fieldName: string, valid: boolean, error?: string | null) =>
+                emit('validate', fieldName, valid, error ?? undefined),
               'aria-label': props.ariaLabel ?? chromeLabels.value.ariaLabel,
               'onUpdate:model': handleModelUpdate,
               onSubmit: publishSubmit

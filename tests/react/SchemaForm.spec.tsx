@@ -3,11 +3,12 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { SchemaForm } from '@expcat/tigercat-react/SchemaForm'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import type { FormHandle } from '@expcat/tigercat-react/Form'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import type { SchemaFormSchema } from '@expcat/tigercat-core'
 import { expectNoA11yViolations } from '../utils/react'
@@ -102,6 +103,62 @@ describe('SchemaForm (React)', () => {
       />
     )
     expect(screen.getByRole('checkbox')).toBeChecked()
+  })
+
+  it('paints schema radio options without a field slot', () => {
+    render(
+      <SchemaForm
+        schema={{
+          fields: [
+            {
+              name: 'plan',
+              label: 'Plan',
+              type: 'radio',
+              defaultValue: 'pro',
+              options: [
+                { label: 'Free', value: 'free' },
+                { label: 'Pro', value: 'pro' }
+              ]
+            }
+          ]
+        }}
+        showActions={false}
+      />
+    )
+    const radios = screen.getAllByRole('radio') as HTMLInputElement[]
+    expect(radios).toHaveLength(2)
+    expect(screen.getByText('Pro')).toBeInTheDocument()
+    expect(radios[1].checked).toBe(true)
+  })
+
+  it('forwards undoable onto the inner Form engine', async () => {
+    const user = userEvent.setup()
+    const formRef = React.createRef<FormHandle>()
+    render(
+      <SchemaForm
+        ref={formRef}
+        undoable
+        showActions={false}
+        schema={{ fields: [{ name: 'name', label: 'Name', defaultValue: 'Ada' }] }}
+      />
+    )
+    expect(formRef.current?.canUndo).toBe(false)
+    const input = screen.getByLabelText(/Name/) as HTMLInputElement
+    await user.clear(input)
+    await user.type(input, 'Grace')
+    expect(formRef.current?.canUndo).toBe(true)
+  })
+
+  it('forwards onValidate from the inner Form', async () => {
+    const onValidate = vi.fn()
+    const formRef = React.createRef<FormHandle>()
+    render(
+      <SchemaForm ref={formRef} schema={basicSchema} onValidate={onValidate} showActions={false} />
+    )
+    await act(async () => {
+      await formRef.current?.validateField('name')
+    })
+    expect(onValidate).toHaveBeenCalledWith('name', false, expect.any(String))
   })
 
   it('renders nested groups and dotted paths', async () => {

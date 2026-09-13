@@ -23,9 +23,11 @@ import {
   mergeAriaDescribedBy,
   mergeStyleValues,
   type ChoiceGroupDirection,
+  type RadioGroupOption,
   type ComponentSize,
   type InputStatus
 } from '@expcat/tigercat-core'
+import { Radio } from './Radio'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export const RadioGroupKey = Symbol('RadioGroup')
@@ -46,6 +48,7 @@ export interface VueRadioGroupProps {
   size?: ComponentSize
   direction?: ChoiceGroupDirection
   status?: InputStatus
+  options?: RadioGroupOption[]
   className?: string
   style?: Record<string, string | number>
 }
@@ -78,6 +81,10 @@ export const RadioGroup = markFormItemGroupControl(
       },
       status: {
         type: String as PropType<InputStatus>
+      },
+      options: {
+        type: Array as PropType<RadioGroupOption[]>,
+        default: undefined
       },
       className: {
         type: String
@@ -196,7 +203,13 @@ export const RadioGroup = markFormItemGroupControl(
             'aria-disabled': effectiveDisabled.value || undefined,
             onKeydown: handleKeyDown
           },
-          slots.default?.()
+          (() => {
+            const slotted = slots.default?.()
+            if (slotted && slotted.length > 0) return slotted
+            return (props.options ?? []).map((option) =>
+              h(Radio, { value: option.value, disabled: option.disabled }, () => option.label)
+            )
+          })()
         )
       }
     }

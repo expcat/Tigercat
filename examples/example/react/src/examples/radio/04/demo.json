@@ -1,0 +1,12 @@
+{
+  "id": "radio-04",
+  "title": "options 列表",
+  "description": "RadioGroup 可传 options；有 children 时仍以子节点为准。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

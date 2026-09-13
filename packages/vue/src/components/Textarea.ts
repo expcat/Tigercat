@@ -34,6 +34,7 @@ import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from 
 
 export interface VueTextareaProps {
   modelValue?: string
+  defaultValue?: string
   size?: ComponentSize
   status?: InputStatus
   errorMessage?: string
@@ -62,6 +63,10 @@ export const Textarea = defineComponent({
   props: {
     modelValue: {
       type: String
+    },
+    defaultValue: {
+      type: String,
+      default: undefined
     },
     size: {
       type: String as PropType<ComponentSize>,
@@ -170,7 +175,8 @@ export const Textarea = defineComponent({
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
     const errorMsgId = `tiger-textarea-error-${useId()}`
     const localValue = ref<string>(
-      props.modelValue ?? (typeof formValue.value === 'string' ? formValue.value : '')
+      props.modelValue ??
+        (typeof formValue.value === 'string' ? formValue.value : (props.defaultValue ?? ''))
     )
 
     expose({

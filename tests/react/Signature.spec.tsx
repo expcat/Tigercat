@@ -155,6 +155,17 @@ describe('Signature', () => {
     expect(pad()).toHaveAttribute('tabIndex', '0')
   })
 
+  it('honors the readOnly alias the same as readonly', () => {
+    const onChange = vi.fn()
+    render(<Signature readOnly value={sampleValue} onChange={onChange} />)
+
+    drawSignature(pad())
+
+    expect(onChange).not.toHaveBeenCalled()
+    expect(pad()).toHaveAttribute('aria-readonly', 'true')
+    expect(pad()).toHaveAttribute('tabIndex', '0')
+  })
+
   it('keeps the clear button disabled while empty', () => {
     render(<Signature />)
     expect(screen.getByRole('button', { name: enUS.common.clearText })).toBeDisabled()

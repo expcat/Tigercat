@@ -72,6 +72,36 @@ export interface MentionsProps {
   size?: ComponentSize
   /** Number of visible rows */
   rows?: number
+  /**
+   * Auto-resize the textarea to fit content.
+   * @default false
+   */
+  autoResize?: boolean
+  /** Maximum auto-resize rows */
+  maxRows?: number
+  /** Minimum auto-resize rows */
+  minRows?: number
+  /** Maximum character length */
+  maxLength?: number
+  /**
+   * Show character count (requires maxLength to show current/max).
+   * @default false
+   */
+  showCount?: boolean
+  /**
+   * Non-editable, still tabbable.
+   * @default false
+   */
+  readonly?: boolean
+  /**
+   * Alias of {@link MentionsProps.readonly}.
+   */
+  readOnly?: boolean
+  /**
+   * Show a clear control. Default false.
+   * @default false
+   */
+  clearable?: boolean
   /** Validation status */
   status?: InputStatus
   /** Error message rendered under the textarea */

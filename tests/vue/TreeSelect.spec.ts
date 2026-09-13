@@ -44,6 +44,20 @@ describe('TreeSelect', () => {
     expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
   })
 
+  it('applies listHeight as the overlay height, winning over height', async () => {
+    const { getByRole } = render(TreeSelect, {
+      props: {
+        treeData,
+        defaultExpandAll: true,
+        height: 200,
+        listHeight: 120,
+        'aria-label': 'Height'
+      }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByRole('tree')).toHaveStyle({ maxHeight: '120px' })
+  })
+
   it('expands a parent from the chevron button', async () => {
     const { getByRole, queryByRole } = render(TreeSelect, {
       props: { treeData, 'aria-label': 'Expand' }

@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo } from 'react'
+import React, { Children, useCallback, useId, useMemo } from 'react'
 import {
   coerceChoiceFormValue,
   collectRadioGroupInputs,
@@ -11,8 +11,10 @@ import {
   type ChoiceGroupDirection,
   type ComponentSize,
   type InputStatus,
+  type RadioGroupOption,
   type RadioGroupProps as CoreRadioGroupProps
 } from '@expcat/tigercat-core'
+import { Radio } from './Radio'
 import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
 
@@ -21,6 +23,7 @@ export interface RadioGroupProps
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'defaultValue'>,
     CoreRadioGroupProps {
   onChange?: (value: string | number) => void
+  options?: RadioGroupOption[]
   children?: React.ReactNode
   className?: string
   direction?: ChoiceGroupDirection
@@ -45,6 +48,7 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
   direction = 'vertical',
   status: statusProp,
   onChange,
+  options,
   children,
   className,
   onKeyDown,
@@ -139,7 +143,13 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
         aria-invalid={status === 'error' ? true : props['aria-invalid']}
         aria-disabled={effectiveDisabled || undefined}
         onKeyDown={handleKeyDown}>
-        {children}
+        {Children.count(children) > 0
+          ? children
+          : options?.map((option) => (
+              <Radio key={String(option.value)} value={option.value} disabled={option.disabled}>
+                {option.label}
+              </Radio>
+            ))}
       </div>
     </RadioGroupContext.Provider>
   )

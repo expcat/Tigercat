@@ -152,6 +152,18 @@ describe('Signature', () => {
     expect(pad()).not.toHaveAttribute('aria-disabled')
   })
 
+  it('honors the readOnly alias the same as readonly', async () => {
+    const { emitted } = render(Signature, {
+      props: { readOnly: true, modelValue: sampleValue, width: 280, height: 140 }
+    })
+
+    await drawSignature(pad())
+
+    expect(emitted().change).toBeUndefined()
+    expect(pad()).toHaveAttribute('aria-readonly', 'true')
+    expect(pad()).toHaveAttribute('tabIndex', '0')
+  })
+
   it('clears to an empty string, not a blank image', async () => {
     const { emitted } = render(Signature, { props: { width: 480, height: 180 } })
     await drawSignature(pad())

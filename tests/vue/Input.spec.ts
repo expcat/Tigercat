@@ -33,6 +33,29 @@ describe('Input', () => {
       expect(input.value).toBe('Initial value')
     })
 
+    it('should render with defaultValue when modelValue is omitted', () => {
+      const { getByRole } = renderWithProps(Input, {
+        defaultValue: 'Default value'
+      })
+      expect((getByRole('textbox') as HTMLInputElement).value).toBe('Default value')
+    })
+
+    it('ignores defaultValue when modelValue is set', () => {
+      const { getByRole } = renderWithProps(Input, {
+        modelValue: 'controlled',
+        defaultValue: 'default'
+      })
+      expect((getByRole('textbox') as HTMLInputElement).value).toBe('controlled')
+    })
+
+    it('does not reset to defaultValue on rerender after typing', async () => {
+      const { getByRole, rerender } = renderWithProps(Input, { defaultValue: 'start' })
+      const input = getByRole('textbox') as HTMLInputElement
+      await fireEvent.update(input, 'start more')
+      await rerender({ defaultValue: 'start' })
+      expect(input.value).toBe('start more')
+    })
+
     it('should forward attrs (data/aria/title)', () => {
       const { getByRole } = render(Input, {
         attrs: {

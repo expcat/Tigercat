@@ -50,7 +50,9 @@ Events/callback props: `onOpenChange?`.
 
 ## CheckboxGroup
 
-`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 4/10 props
+`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 4/11 props
+
+Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。
 
 | Prop            | Type                 | Default | Notes                                         |
 | --------------- | -------------------- | ------- | --------------------------------------------- |
@@ -143,7 +145,7 @@ Note: 具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` �
 
 `packages/core/src/types/input.ts` · `InputProps` · 4/26 props
 
-Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Rate 用 `readOnly`，Input/Signature 用 `readonly`。
+Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
 
 | Prop            | Type        | Default  | Notes                                                                        |
 | --------------- | ----------- | -------- | ---------------------------------------------------------------------------- |
@@ -209,7 +211,9 @@ Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是�
 
 ## Mentions
 
-`packages/core/src/types/mentions.ts` · `MentionsProps` · 4/24 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 4/32 props
+
+Note: 插入的是 `prefix + option.value + 空格`。字段 props 与 Textarea 对齐：`autoResize` / `maxLength` / `showCount` / `readonly`（`readOnly` 别名）/ `clearable`（默认 false）。不要把 `prefix` 当成 Input 的前缀槽。
 
 | Prop            | Type                   | Default | Notes                                                                    |
 | --------------- | ---------------------- | ------- | ------------------------------------------------------------------------ |
@@ -246,7 +250,9 @@ Events/callback props: `onChange?`, `onOpenChange?`.
 
 ## RadioGroup
 
-`packages/core/src/types/radio.ts` · `RadioGroupProps` · 4/11 props
+`packages/core/src/types/radio.ts` · `RadioGroupProps` · 4/12 props
+
+Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。字段请用 RadioGroup，不要把单颗 Radio 当 FormItem。
 
 | Prop            | Type               | Default | Notes                                        |
 | --------------- | ------------------ | ------- | -------------------------------------------- |
@@ -259,7 +265,7 @@ Events/callback props: `onChange?`, `onOpenChange?`.
 
 `packages/vue/src/components/Select.ts` · `VueSelectProps` · 4/33 props
 
-Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职 prop 叫 `height`。
+Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职是 `height`，也接受 `listHeight`。
 
 | Prop            | Type               | Default | Notes                                      |
 | --------------- | ------------------ | ------- | ------------------------------------------ |
@@ -270,16 +276,16 @@ Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React �
 
 ## Signature
 
-`packages/core/src/types/signature.ts` · `SignatureProps` · 4/21 props
+`packages/core/src/types/signature.ts` · `SignatureProps` · 4/22 props
 
-Note: 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。
+Note: 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）；可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。
 
-| Prop            | Type                  | Default       | Notes                                                                |
-| --------------- | --------------------- | ------------- | -------------------------------------------------------------------- |
-| `value?`        | `string`              | `-`           | Controlled value. SVG data URL or `''`. `undefined` is uncontrolled. |
-| `defaultValue?` | `string`              | `-`           | Initial SVG data URL for uncontrolled mode.                          |
-| `exportType?`   | `SignatureExportType` | `'image/png'` | Format for `toDataURL()`. The controlled `value` is always SVG.      |
-| `readonly?`     | `boolean`             | `false`       | Focusable, not drawable. Distinct from `disabled`.                   |
+| Prop            | Type                  | Default       | Notes                                                                                      |
+| --------------- | --------------------- | ------------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `string`              | `-`           | Controlled value. SVG data URL or `''`. `undefined` is uncontrolled.                       |
+| `defaultValue?` | `string`              | `-`           | Initial SVG data URL for uncontrolled mode.                                                |
+| `exportType?`   | `SignatureExportType` | `'image/png'` | Format for `toDataURL()`. The controlled `value` is always SVG.                            |
+| `readonly?`     | `boolean`             | `false`       | Focusable, not drawable. Distinct from `disabled`. `readOnly` is the same flag (React/D... |
 
 Events/callback props: `onChange?`.
 
@@ -331,7 +337,7 @@ Events/callback props: `onChange?`.
 
 `packages/core/src/types/textarea.ts` · `TextareaProps` · 4/25 props
 
-Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。与 Input 同一套 status / showCount / autoResize。
+Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。
 
 | Prop          | Type          | Default     | Notes                             |
 | ------------- | ------------- | ----------- | --------------------------------- |
@@ -368,9 +374,9 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/36 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/37 props
 
-Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），Select/Cascader 同职 prop 叫 `listHeight`。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。
+Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），`listHeight` 是同职别名（两者都传时 `listHeight` 胜出）。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。
 
 | Prop            | Type              | Default | Notes                                                                                      |
 | --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |

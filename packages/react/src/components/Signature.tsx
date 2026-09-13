@@ -35,6 +35,7 @@ import {
   isSignatureEmpty,
   mergeAriaDescribedBy,
   mergeTigerLocale,
+  resolveReadOnlyFlag,
   resolveSignaturePenColor,
   resolveSignatureSurfaceColor,
   runShakeAnimation,
@@ -88,7 +89,8 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
     backgroundColor,
     lineWidth = 2,
     disabled = false,
-    readonly = false,
+    readonly,
+    readOnly,
     clearable = true,
     exportType = 'image/png',
     quality = 0.92,
@@ -163,7 +165,8 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   const [strokes, setStrokes] = useState(() => signatureValueToStrokes(committed))
   const [observedWidth, setObservedWidth] = useState(0)
   const logicalWidth = widthProp ?? observedWidth
-  const isInteractive = !effectiveDisabled && !readonly
+  const isReadOnly = resolveReadOnlyFlag(readonly, readOnly)
+  const isInteractive = !effectiveDisabled && !isReadOnly
   const normalizedLineWidth = clampSignatureLineWidth(lineWidth)
 
   const exportOptions = useCallback(
@@ -245,20 +248,20 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   )
 
   const clear = useCallback(() => {
-    if (effectiveDisabled || readonly) return
+    if (effectiveDisabled || isReadOnly) return
     dragDisposeRef.current?.()
     dragDisposeRef.current = undefined
     const session = clearSignatureStrokes()
     emitPayload(session, { clear: true })
-  }, [effectiveDisabled, emitPayload, readonly])
+  }, [effectiveDisabled, emitPayload, isReadOnly])
 
   const undo = useCallback(() => {
-    if (effectiveDisabled || readonly) return
+    if (effectiveDisabled || isReadOnly) return
     dragDisposeRef.current?.()
     dragDisposeRef.current = undefined
     const session = undoSignatureStroke(sessionRef.current)
     emitPayload(session, { undo: true })
-  }, [effectiveDisabled, emitPayload, readonly])
+  }, [effectiveDisabled, emitPayload, isReadOnly])
 
   const toSVG = useCallback(
     () => signatureStrokesToSvg(sessionRef.current.strokes, exportOptions()),
@@ -353,7 +356,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   useEffect(() => () => dragDisposeRef.current?.(), [])
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
-    if (!clearable || effectiveDisabled || readonly) return
+    if (!clearable || effectiveDisabled || isReadOnly) return
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
       event.preventDefault()
       undo()
@@ -391,7 +394,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
       <div
         ref={wrapRef}
         className={classNames(
-          getSignatureCanvasWrapClasses(effectiveDisabled, readonly),
+          getSignatureCanvasWrapClasses(effectiveDisabled, isReadOnly),
           getSignatureCanvasStatusClasses(status)
         )}>
         <canvas
@@ -407,7 +410,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
           aria-labelledby={labelledby}
           aria-describedby={describedBy}
           aria-disabled={effectiveDisabled || undefined}
-          aria-readonly={readonly || undefined}
+          aria-readonly={isReadOnly || undefined}
           aria-invalid={status === 'error' ? true : undefined}
           aria-required={formItemControl?.required || undefined}
           onPointerDown={handlePointerDown}
@@ -423,14 +426,14 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
           <button
             type="button"
             className={signatureToolbarButtonClasses}
-            disabled={effectiveDisabled || readonly || empty}
+            disabled={effectiveDisabled || isReadOnly || empty}
             onClick={undo}>
             {labels.undoText}
           </button>
           <button
             type="button"
             className={signatureToolbarButtonClasses}
-            disabled={effectiveDisabled || readonly || empty}
+            disabled={effectiveDisabled || isReadOnly || empty}
             onClick={clear}>
             {labels.clearText}
           </button>

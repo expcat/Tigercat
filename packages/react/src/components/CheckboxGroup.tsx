@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react'
+import React, { Children, createContext, useContext } from 'react'
 import {
   coerceArrayFormValue,
   getChoiceGroupClasses,
@@ -6,6 +6,7 @@ import {
   resolveFormItemSeed,
   mergeAriaDescribedBy,
   toggleCheckboxGroupValue,
+  type CheckboxGroupOption,
   type CheckboxGroupValue,
   type ChoiceGroupDirection,
   type ComponentSize,
@@ -13,6 +14,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
+import { Checkbox } from './Checkbox'
 
 export interface CheckboxGroupContext {
   value: CheckboxGroupValue
@@ -38,6 +40,7 @@ export interface CheckboxGroupProps extends Omit<
   direction?: ChoiceGroupDirection
   status?: InputStatus
   onChange?: (value: CheckboxGroupValue) => void
+  options?: CheckboxGroupOption[]
   children?: React.ReactNode
 }
 
@@ -49,6 +52,7 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
   direction = 'vertical',
   status: statusProp,
   onChange,
+  options,
   children,
   className,
   ...props
@@ -101,7 +105,13 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
         aria-disabled={effectiveDisabled || undefined}
         aria-invalid={status === 'error' ? true : props['aria-invalid']}
         className={getChoiceGroupClasses({ direction, className })}>
-        {children}
+        {Children.count(children) > 0
+          ? children
+          : options?.map((option) => (
+              <Checkbox key={String(option.value)} value={option.value} disabled={option.disabled}>
+                {option.label}
+              </Checkbox>
+            ))}
       </div>
     </CheckboxGroupContextProvider.Provider>
   )

@@ -102,6 +102,34 @@ describe('Checkbox', () => {
       expect(getBoxes(container)).toHaveLength(2)
     })
 
+    it('renders options when children are omitted', () => {
+      const { container, getByText } = render(
+        <CheckboxGroup
+          defaultValue={['email']}
+          options={[
+            { label: 'Email', value: 'email' },
+            { label: 'SMS', value: 'sms', disabled: true }
+          ]}
+        />
+      )
+      const inputs = getBoxes(container)
+      expect(inputs).toHaveLength(2)
+      expect(getByText('Email')).toBeInTheDocument()
+      expect(inputs[0].checked).toBe(true)
+      expect(inputs[1]).toBeDisabled()
+    })
+
+    it('ignores options when children are present', () => {
+      const { container, getByText, queryByText } = render(
+        <CheckboxGroup options={[{ label: 'From options', value: 'opt' }]}>
+          <Checkbox value="slot">From slot</Checkbox>
+        </CheckboxGroup>
+      )
+      expect(getBoxes(container)).toHaveLength(1)
+      expect(getByText('From slot')).toBeInTheDocument()
+      expect(queryByText('From options')).not.toBeInTheDocument()
+    })
+
     it('selects and deselects items (uncontrolled)', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()

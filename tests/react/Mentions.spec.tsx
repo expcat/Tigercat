@@ -209,6 +209,41 @@ describe('Mentions', () => {
     expect(getByRole('combobox')).toHaveAttribute('rows', '5')
   })
 
+  it('honors maxLength, showCount, and both readonly spellings', () => {
+    const { getByRole, getByText, rerender } = render(
+      <Mentions
+        options={defaultOptions}
+        defaultValue="hello"
+        maxLength={10}
+        showCount
+        aria-label="Members"
+      />
+    )
+    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    expect(textarea).toHaveAttribute('maxLength', '10')
+    expect(getByText('5 / 10')).toBeInTheDocument()
+
+    rerender(
+      <Mentions options={defaultOptions} defaultValue="hello" readonly aria-label="Members" />
+    )
+    expect(getByRole('combobox')).toHaveAttribute('readonly')
+
+    rerender(
+      <Mentions options={defaultOptions} defaultValue="hello" readOnly aria-label="Members" />
+    )
+    expect(getByRole('combobox')).toHaveAttribute('readonly')
+  })
+
+  it('clears the value when clearable', async () => {
+    const user = userEvent.setup()
+    const { getByRole, getByLabelText } = render(
+      <Mentions options={defaultOptions} defaultValue="hello" clearable aria-label="Members" />
+    )
+    expect(getByRole('combobox')).toHaveValue('hello')
+    await user.click(getByLabelText('Clear'))
+    expect(getByRole('combobox')).toHaveValue('')
+  })
+
   it('closes on Escape and Tab leave', async () => {
     const { getByRole } = render(<Mentions options={defaultOptions} aria-label="Members" />)
     const textarea = getByRole('combobox') as HTMLTextAreaElement

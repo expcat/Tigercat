@@ -39,6 +39,7 @@ import { Icon } from './Icon'
 
 export interface VueInputProps {
   modelValue?: string | number
+  defaultValue?: string | number
   size?: ComponentSize
   type?: InputType
   status?: InputStatus
@@ -68,6 +69,10 @@ export const Input = defineComponent({
   props: {
     modelValue: {
       type: [String, Number] as PropType<string | number>
+    },
+    defaultValue: {
+      type: [String, Number] as PropType<string | number>,
+      default: undefined
     },
     size: {
       type: String as PropType<ComponentSize>,
@@ -153,7 +158,7 @@ export const Input = defineComponent({
       props.modelValue ??
         (typeof formValue.value === 'string' || typeof formValue.value === 'number'
           ? formValue.value
-          : '')
+          : (props.defaultValue ?? ''))
     )
     const passwordVisible = ref(false)
     const errorMsgId = `tiger-input-error-${useId()}`

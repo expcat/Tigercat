@@ -1,7 +1,8 @@
+import type { ComponentSize } from './base'
 import type { InputStatus } from './input'
 import type { TigerLocale, TigerLocaleCronEditor } from './locale'
 
-export type CronEditorSize = 'sm' | 'md' | 'lg'
+export type CronEditorSize = ComponentSize
 
 export type CronFieldKey = 'minute' | 'hour' | 'dayOfMonth' | 'month' | 'dayOfWeek'
 

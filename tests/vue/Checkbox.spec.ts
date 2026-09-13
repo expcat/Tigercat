@@ -157,6 +157,34 @@ describe('Checkbox', () => {
       expect(getBoxes(container)).toHaveLength(2)
     })
 
+    it('renders options when the default slot is empty', () => {
+      const { container, getByText } = render(CheckboxGroup, {
+        props: {
+          options: [
+            { label: 'Email', value: 'email' },
+            { label: 'SMS', value: 'sms', disabled: true }
+          ],
+          defaultValue: ['email']
+        }
+      })
+      const inputs = getBoxes(container)
+      expect(inputs).toHaveLength(2)
+      expect(getByText('Email')).toBeInTheDocument()
+      expect(inputs[0].checked).toBe(true)
+      expect(inputs[1]).toBeDisabled()
+    })
+
+    it('ignores options when children are present', () => {
+      const { container, getByText, queryByText } = renderGroup(`
+        <CheckboxGroup :options="[{ label: 'From options', value: 'opt' }]">
+          <Checkbox value="slot">From slot</Checkbox>
+        </CheckboxGroup>
+      `)
+      expect(getBoxes(container)).toHaveLength(1)
+      expect(getByText('From slot')).toBeInTheDocument()
+      expect(queryByText('From options')).not.toBeInTheDocument()
+    })
+
     it('selects and deselects items (uncontrolled)', async () => {
       const onUpdate = vi.fn()
       const Wrapper = defineComponent({

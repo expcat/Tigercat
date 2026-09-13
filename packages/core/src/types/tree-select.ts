@@ -100,9 +100,15 @@ export interface TreeSelectProps {
   virtual?: boolean
   /**
    * Pixel height of the tree content area (virtual and non-virtual).
+   * Same job as Select/Cascader `listHeight`.
    * @default 256
    */
   height?: number
+  /**
+   * Alias of {@link TreeSelectProps.height} (Select/Cascader overlay list synonym).
+   * Wins when both are set.
+   */
+  listHeight?: number
   /**
    * Pixel height of each virtualized tree row.
    * Defaults to the rendered size map (sm/md/lg).

@@ -128,7 +128,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Signature: {
     notes:
-      "受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。"
+      "受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）；可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。"
   },
   Form: {
     notes:
@@ -136,15 +136,30 @@ const COMPONENT_USAGE_NOTES = {
   },
   FormItem: {
     notes:
-      '具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `\'\'` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。'
+      "具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `''` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。"
   },
   Input: {
     notes:
-      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Rate 用 `readOnly`，Input/Signature 用 `readonly`。'
+      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。'
   },
   Textarea: {
     notes:
-      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。与 Input 同一套 status / showCount / autoResize。'
+      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。'
+  },
+  Mentions: {
+    notes:
+      '插入的是 `prefix + option.value + 空格`。字段 props 与 Textarea 对齐：`autoResize` / `maxLength` / `showCount` / `readonly`（`readOnly` 别名）/ `clearable`（默认 false）。不要把 `prefix` 当成 Input 的前缀槽。'
+  },
+  Rate: {
+    notes:
+      '`readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可聚焦、不改值。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。'
+  },
+  RadioGroup: {
+    notes:
+      '可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。字段请用 RadioGroup，不要把单颗 Radio 当 FormItem。'
+  },
+  CheckboxGroup: {
+    notes: '可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。'
   },
   DatePicker: {
     notes:
@@ -156,7 +171,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Select: {
     notes:
-      "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职 prop 叫 `height`。"
+      "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职是 `height`，也接受 `listHeight`。"
   },
   AutoComplete: {
     notes:
@@ -168,7 +183,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   TreeSelect: {
     notes:
-      "选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），Select/Cascader 同职 prop 叫 `listHeight`。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。"
+      "选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），`listHeight` 是同职别名（两者都传时 `listHeight` 胜出）。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。"
   },
   TimePicker: {
     notes:
@@ -458,7 +473,7 @@ const COMPONENT_USAGE_NOTES = {
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],
     notes:
-      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
+      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
   },
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities'],
