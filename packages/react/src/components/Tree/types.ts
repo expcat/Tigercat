@@ -42,7 +42,6 @@ export interface TreeProps extends Omit<
   allowDeselect?: boolean
   loadData?: TreeLoadDataFn
   loadedKeys?: TreeNodeKey[]
-  filterValue?: string
   searchValue?: string
   defaultSearchValue?: string
   searchable?: boolean

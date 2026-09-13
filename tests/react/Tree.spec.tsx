@@ -152,7 +152,7 @@ describe('Tree', () => {
     it('should navigate only visible items when filtering', async () => {
       const user = userEvent.setup()
 
-      render(<Tree treeData={sampleTreeData} filterValue="Child 1" autoExpandParent />)
+      render(<Tree treeData={sampleTreeData} searchValue="Child 1" autoExpandParent />)
 
       expect(screen.queryByText('Parent 2')).not.toBeInTheDocument()
 
@@ -441,13 +441,13 @@ describe('Tree', () => {
   describe('Filter', () => {
     it('should filter nodes based on filter value', async () => {
       const { getByText, queryByText, rerender } = render(
-        <Tree treeData={sampleTreeData} defaultExpandAll filterValue="" />
+        <Tree treeData={sampleTreeData} defaultExpandAll searchValue="" />
       )
 
       expect(getByText('Parent 1')).toBeInTheDocument()
       expect(getByText('Parent 2')).toBeInTheDocument()
 
-      rerender(<Tree treeData={sampleTreeData} defaultExpandAll filterValue="Parent 1" />)
+      rerender(<Tree treeData={sampleTreeData} defaultExpandAll searchValue="Parent 1" />)
 
       await waitFor(() => {
         expect(getByText('Parent 1')).toBeInTheDocument()
@@ -812,7 +812,7 @@ describe('Tree', () => {
     })
 
     it('shows children after searching a parent label', async () => {
-      render(<Tree treeData={sampleTreeData} defaultExpandAll filterValue="Parent 1" />)
+      render(<Tree treeData={sampleTreeData} defaultExpandAll searchValue="Parent 1" />)
       expect(screen.getByText('Parent 1')).toBeInTheDocument()
       expect(screen.getByText('Child 1-1')).toBeInTheDocument()
       expect(screen.queryByText('Parent 2')).not.toBeInTheDocument()

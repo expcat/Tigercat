@@ -180,7 +180,7 @@ describe('Tree', () => {
       const { container } = render(Tree, {
         props: {
           treeData: sampleTreeData,
-          filterValue: 'Child 1',
+          searchValue: 'Child 1',
           autoExpandParent: true
         }
       })
@@ -508,7 +508,7 @@ describe('Tree', () => {
         props: {
           treeData: sampleTreeData,
           defaultExpandAll: true,
-          filterValue: ''
+          searchValue: ''
         }
       })
 
@@ -516,7 +516,7 @@ describe('Tree', () => {
       expect(getByText('Parent 2')).toBeInTheDocument()
 
       await rerender({
-        filterValue: 'Parent 1'
+        searchValue: 'Parent 1'
       })
       await nextTick()
 

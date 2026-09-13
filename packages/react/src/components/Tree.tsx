@@ -34,7 +34,6 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
     allowDeselect: _allowDeselect,
     loadData: _loadData,
     loadedKeys: _loadedKeys,
-    filterValue: _filterValue,
     searchValue: _searchValue,
     defaultSearchValue: _defaultSearchValue,
     searchable: _searchable,

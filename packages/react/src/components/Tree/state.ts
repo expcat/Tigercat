@@ -68,7 +68,6 @@ export function useTreeState(props: TreeProps): TreeContext & {
     allowDeselect = false,
     loadData,
     loadedKeys: controlledLoadedKeys,
-    filterValue,
     searchValue,
     defaultSearchValue,
     searchable = false,
@@ -176,12 +175,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
       ? resolveCheckedInput(derivedTree, controlledCheckedKeys, undefined, checkStrictly)
       : internalChecked
 
-  const searchQuery =
-    searchValue !== undefined
-      ? searchValue
-      : filterValue !== undefined
-        ? filterValue
-        : internalSearch
+  const searchQuery = searchValue !== undefined ? searchValue : internalSearch
 
   const matchedKeys = useMemo(
     () =>
@@ -490,10 +484,10 @@ export function useTreeState(props: TreeProps): TreeContext & {
 
   const setSearchQuery = useCallback(
     (value: string) => {
-      if (searchValue === undefined && filterValue === undefined) setInternalSearch(value)
+      if (searchValue === undefined) setInternalSearch(value)
       onSearch?.(value)
     },
-    [searchValue, filterValue, onSearch]
+    [searchValue, onSearch]
   )
 
   return {

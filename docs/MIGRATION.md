@@ -4,7 +4,37 @@
 
 ## 未发布
 
-当前没有待组件用户处理的 breaking change。无新必填 prop。
+将作为 **v3.0.0**。Breaking map 见下方 v3.0.0。不是 BPMN。无 `file:` 双轨。
+
+## v3.0.0
+
+公开契约 breaking。Vue/React 对称。无新必填 prop（若干默认与 payload 翻转）。
+
+| 旧 | 新 |
+| --- | --- |
+| Form / SchemaForm Vue `model` / `v-model:model` / `update:model` | `modelValue` / `v-model` / `update:modelValue` |
+| Form / SchemaForm React `model` | `value` |
+| SchemaForm `defaultModel` | `defaultValue` |
+| React Input / Textarea `onChange(event)` | `onChange(value)`；原生事件用 `onInput` |
+| React Tabs `onActiveKeyChange` | `onChange(activeKey)` |
+| FormWizard `onChange(current, prev)` / Vue `change` | `onStepChange` / Vue `step-change` |
+| FormWizard `finish()` ≡ `next()` | `finish()` 仅最后一步走 Finish |
+| Pagination / Tabs `small\|medium\|large` | `sm\|md\|lg`（默认 `md`） |
+| Steps / FormWizard `small\|default` | `sm\|md\|lg`（默认 `md`） |
+| `Kanban` | `TaskBoard`（需要时显式 `showCardCount` / `allowAddCard`） |
+| `DonutChart` | `PieChart innerRadiusRatio={0.6}` |
+| `ImageViewer` | `ImagePreview`（`minScale`/`maxScale`，不要 `minZoom`） |
+| `Fullscreen`（`as` export） | `FullscreenButton` |
+| TreeSelect `clearable` 默认 false | 默认 **true** |
+| TreeSelect `checkStrictly` 默认 true | 默认 **false**（与 Tree 级联一致） |
+| List `rowKey` 默认 `'key'` | `'id'` |
+| ActionBar `items={[]}` 回落到 `buttonPolicy` | `[]` 表示没有按钮；省略 `items` 才用 policy |
+| Card leftover `title=` HTML tooltip | `title` 是可视标题；tooltip 用 `htmlTitle` |
+| Tree `filterValue` | `searchValue` |
+
+ScrollSpy 仍用 `onActiveKeyChange`（不是 Tabs）。Footer `size` 仍是 `default\|compact`。Modal/Drawer `size` 仍是面板宽度（含 `xl\|full`）。
+
+不是 BPMN / Flowable / Camunda。Admin 不要 `file:` 双轨。
 
 ## v2.9.0
 

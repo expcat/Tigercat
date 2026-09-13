@@ -209,11 +209,7 @@ export interface TreeProps {
    */
   loadedKeys?: TreeNodeKey[]
   /**
-   * Filter query that **hides** unmatched nodes. Same channel as `searchValue`.
-   */
-  filterValue?: string
-  /**
-   * Controlled search / filter query. Same channel as `filterValue`.
+   * Controlled search / filter query that hides unmatched nodes.
    */
   searchValue?: string
   /**

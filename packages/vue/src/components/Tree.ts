@@ -102,7 +102,6 @@ export interface VueTreeProps {
   allowDeselect?: boolean
   loadData?: TreeLoadDataFn
   loadedKeys?: TreeNodeKey[]
-  filterValue?: string
   searchValue?: string
   defaultSearchValue?: string
   searchable?: boolean
@@ -157,7 +156,6 @@ export const Tree = defineComponent({
     allowDeselect: { type: Boolean, default: false },
     loadData: { type: Function as PropType<TreeLoadDataFn> },
     loadedKeys: { type: Array as PropType<TreeNodeKey[]> },
-    filterValue: { type: String, default: undefined },
     searchValue: { type: String, default: undefined },
     defaultSearchValue: { type: String, default: undefined },
     searchable: { type: Boolean, default: false },
@@ -271,11 +269,7 @@ export const Tree = defineComponent({
         : internalChecked.value
     )
     const searchQuery = computed(() =>
-      props.searchValue !== undefined
-        ? props.searchValue
-        : props.filterValue !== undefined
-          ? props.filterValue
-          : internalSearch.value
+      props.searchValue !== undefined ? props.searchValue : internalSearch.value
     )
 
     const matchedKeys = computed(() =>
@@ -486,7 +480,7 @@ export const Tree = defineComponent({
     })
 
     function setSearchQuery(value: string): void {
-      if (props.searchValue === undefined && props.filterValue === undefined) {
+      if (props.searchValue === undefined) {
         internalSearch.value = value
       }
       emit('update:searchValue', value)

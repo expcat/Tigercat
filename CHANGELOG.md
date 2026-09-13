@@ -17,6 +17,7 @@
 - **ActionBar**：`items={[]}` 表示没有按钮，不再回落到 `buttonPolicy`。
 - **PieChart（Vue）**：有 `slice-click` 监听时与 React 一样可交互。
 - **Card**：`title` 是可视标题；原生 tooltip 用 `htmlTitle`。
+- **Tree**：删除 `filterValue`；查询只走 `searchValue`。
 
 ## v2.9.0
 
