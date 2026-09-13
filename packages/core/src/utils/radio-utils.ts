@@ -1,5 +1,6 @@
 import { classNames } from './class-names'
 import { type ComponentSize } from '../types/base'
+import { type InputStatus } from '../types/input'
 import { type RadioColorScheme } from './theme-colors'
 
 export const radioRootBaseClasses = 'inline-flex items-center'
@@ -49,23 +50,27 @@ export interface GetRadioVisualClassesOptions {
   checked: boolean
   disabled: boolean
   colors: RadioColorScheme
+  status?: InputStatus
 }
 
 export const getRadioVisualClasses = ({
   size,
   checked,
   disabled,
-  colors
-}: GetRadioVisualClassesOptions) =>
-  classNames(
+  colors,
+  status = 'default'
+}: GetRadioVisualClassesOptions) => {
+  const error = status === 'error' && !disabled && !checked
+  return classNames(
     radioVisualBaseClasses,
     radioFocusVisibleClasses,
     radioSizeClasses[size].radio,
-    checked ? colors.borderChecked : colors.border,
+    checked ? colors.borderChecked : error ? 'border-[var(--tiger-error,#dc2626)]' : colors.border,
     checked ? colors.bgChecked : colors.bg,
     disabled && colors.disabled,
     disabled ? radioDisabledCursorClasses : radioHoverBorderClasses
   )
+}
 
 export interface GetRadioDotClassesOptions {
   size: ComponentSize

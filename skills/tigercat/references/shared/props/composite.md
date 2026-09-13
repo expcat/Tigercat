@@ -7,7 +7,7 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 14 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
@@ -94,24 +94,7 @@ Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finis
 | `beforeNext?` | `FormWizardValidator` | `-`     | Validation hook before moving to next step. `true` proceeds, `false` blocks, a string b... |
 | `clickable?`  | `boolean`             | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
 
-Events/callback props: `onChange?`, `onFinish?`.
-
-## Kanban
-
-`packages/core/src/types/task-board.ts` · `KanbanProps` · 4/22 props
-
-Uses: `TaskBoard`.
-
-Note: Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。
-
-| Prop             | Type                                      | Default     | Notes                                                                                      |
-| ---------------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `swimlanes?`     | `TaskBoardSwimlane[]`                     | `-`         | Group cards inside each column by this field on the card. Lanes are per-column, not a h... |
-| `swimlaneField?` | `string`                                  | `-`         | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
-| `columns?`       | `TaskBoardColumn[]`                       | `undefined` | Controlled column data (with nested cards). When provided the component is fully contro... |
-| `locale?`        | `Partial<import('./locale').TigerLocale>` | `-`         | Locale overrides for TaskBoard UI text                                                     |
-
-Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
+Events/callback props: `onStepChange?`, `onFinish?`.
 
 ## NotificationCenter
 
@@ -132,18 +115,18 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 
 ## SchemaForm
 
-`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/27 props
+`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/28 props
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 
-Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。
+Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。
 
-| Prop          | Type               | Default | Notes                                                                   |
-| ------------- | ------------------ | ------- | ----------------------------------------------------------------------- |
-| `schema`      | `SchemaFormSchema` | `-`     | Field / group schema.                                                   |
-| `model?`      | `FormValues`       | `-`     | Form values. Controlled when passed (including `{}`).                   |
-| `rules?`      | `FormRules`        | `-`     | Extra rules merged over schema-derived rules (caller wins on conflict). |
-| `conditions?` | `FormConditions`   | `-`     | Extra conditions merged over schema-derived conditions.                 |
+| Prop          | Type               | Default | Notes                                                                                      |
+| ------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `schema`      | `SchemaFormSchema` | `-`     | Field / group schema.                                                                      |
+| `rules?`      | `FormRules`        | `-`     | Extra rules merged over schema-derived rules (caller wins on conflict).                    |
+| `value?`      | `FormValues`       | `-`     | Form values. Controlled when passed (including `{}`). Vue: `modelValue` / `v-model`. Re... |
+| `conditions?` | `FormConditions`   | `-`     | Extra conditions merged over schema-derived conditions.                                    |
 
 Events/callback props: `onChange?`, `onSubmit?`, `onReset?`.
 
@@ -153,7 +136,7 @@ Events/callback props: `onChange?`, `onSubmit?`, `onReset?`.
 
 Uses: `ConfigProvider`, `task-board drag utilities`.
 
-Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。Kanban 是默认值别名，新代码用 TaskBoard。
+Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。
 
 | Prop             | Type                  | Default     | Notes                                                                                      |
 | ---------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |

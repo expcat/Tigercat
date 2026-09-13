@@ -113,7 +113,7 @@ describe('VirtualTable (Vue)', () => {
     expect(emitted()['selection-change']?.[0]).toEqual([[1, 2]])
   })
 
-  it('does not write an index when the row has no id', async () => {
+  it('falls back to the dataSource index when the row has no id', async () => {
     const { container, emitted } = render(VirtualTable, {
       props: {
         dataSource: [{ name: 'ghost' }],
@@ -122,7 +122,7 @@ describe('VirtualTable (Vue)', () => {
       }
     })
     await fireEvent.click(dataRowsOf(container)[0])
-    expect(emitted()['selection-change']).toBeUndefined()
+    expect(emitted()['selection-change']?.[0]).toEqual([[0]])
   })
 
   it('exposes scrollToIndex', async () => {

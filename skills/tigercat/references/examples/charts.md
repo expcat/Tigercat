@@ -16,8 +16,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 | ChartCanvas  | -    | `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。 |
 | ChartLegend  | -    | 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。                                      |
 | ChartTooltip | -    | `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。                                                                        |
-| DonutChart   | -    | Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieChart + `innerRadiusRatio`.                                                                            |
-| PieChart     | -    | `innerRadiusRatio` 做环形（0.6 即原 Donut）。`centerValue`/`centerLabel` 写在洞里。DonutChart 是默认 `innerRadiusRatio=0.6` 的别名，新代码用 PieChart。                        |
+| PieChart     | -    | `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。                                                                                              |
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
@@ -42,7 +41,5 @@ description: Compact Tigercat Charts Vue and React usage routes
 | ScatterChart  | `<ScatterChart :data="data" />`                                                     | `<ScatterChart data={data} />`                                                 |
 | SunburstChart | `<SunburstChart :data="data" />`                                                    | `<SunburstChart data={data} />`                                                |
 | TreeMapChart  | `<TreeMapChart :data="data" />`                                                     | `<TreeMapChart data={data} />`                                                 |
-
-Compat aliases (still importable; prefer the keeper in new code): `DonutChart` → `PieChart`. Public names remain; examples and new code use the keeper.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

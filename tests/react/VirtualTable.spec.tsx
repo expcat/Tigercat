@@ -119,7 +119,7 @@ describe('VirtualTable (React)', () => {
     expect(onSelectionChange).toHaveBeenCalledWith([1, 2])
   })
 
-  it('does not write an index when the row has no id', () => {
+  it('falls back to the dataSource index when the row has no id', () => {
     const onSelectionChange = vi.fn()
     const { container } = render(
       <VirtualTable
@@ -130,7 +130,7 @@ describe('VirtualTable (React)', () => {
       />
     )
     fireEvent.click(dataRowsOf(container)[0])
-    expect(onSelectionChange).not.toHaveBeenCalled()
+    expect(onSelectionChange).toHaveBeenCalledWith([0])
   })
 
   it('scrollToIndex reveals a distant row', () => {

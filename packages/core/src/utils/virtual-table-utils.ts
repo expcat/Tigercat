@@ -240,9 +240,9 @@ export function resolveVirtualTableRowIdentity<T>(
 
   devWarn(
     'VirtualTable.rowKey',
-    `Row at index ${index} has no "${String(resolved)}" identity; selection is skipped`
+    `Row at index ${index} has no "${String(resolved)}" identity; falling back to dataSource index`
   )
-  return { key: undefined, domKey: index }
+  return { key: index, domKey: index }
 }
 
 /**

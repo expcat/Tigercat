@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, forwardRef } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, forwardRef } from 'react'
 import {
   classNames,
   defaultRadioColors,
@@ -9,6 +9,8 @@ import {
   mergeAriaDescribedBy,
   radioRootBaseClasses,
   resolveRadioInputName,
+  runShakeAnimation,
+  SHAKE_CLASS,
   type RadioProps as CoreRadioProps
 } from '@expcat/tigercat-core'
 import { RadioGroupContext } from './RadioGroup'
@@ -70,6 +72,12 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   const actualDisabled = Boolean(disabled || groupContext?.disabled || formItemControl?.disabled)
   const actualName = resolveRadioInputName(name, groupContext?.name)
   const status = statusProp ?? formItemControl?.status ?? 'default'
+  const shakeTrigger = formItemControl?.shakeTrigger
+  const rootRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, shakeTrigger])
 
   const isChecked = isInGroup ? groupContext!.value === value : checkedState
 
@@ -79,9 +87,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
         size: actualSize,
         checked: isChecked,
         disabled: actualDisabled,
-        colors: defaultRadioColors
+        colors: defaultRadioColors,
+        status
       }),
-    [actualSize, isChecked, actualDisabled]
+    [actualSize, isChecked, actualDisabled, status]
   )
 
   const dotClasses = useMemo(
@@ -158,7 +167,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
   if (!children) {
     return (
-      <span className={classNames(radioRootBaseClasses, className)} style={style}>
+      <span
+        ref={rootRef as React.RefObject<HTMLSpanElement>}
+        className={classNames(radioRootBaseClasses, className)}
+        style={style}>
         {input}
         {visual}
       </span>
@@ -166,7 +178,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   }
 
   return (
-    <label className={classNames(radioRootBaseClasses, className)} style={style}>
+    <label
+      ref={rootRef as React.RefObject<HTMLLabelElement>}
+      className={classNames(radioRootBaseClasses, className)}
+      style={style}>
       {input}
       {visual}
       <span className={labelClasses}>{children}</span>

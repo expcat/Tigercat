@@ -117,16 +117,16 @@ Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
 
 ## Form
 
-`packages/core/src/types/form.ts` · `FormProps` · 4/18 props
+`packages/core/src/types/form.ts` · `FormProps` · 4/19 props
 
-Note: 值对象是 `model`（Vue `v-model:model`），不是 `modelValue`。Wizard `onChange` 是步下标，不是表单 values。Form `size` 是 `sm|md|lg`，与 Steps/Wizard `small|default`、Pagination `small|medium|large` 不是同一套字符串。
+Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。Wizard 步下标走 `onStepChange`，不是表单 values。Form `size` 是 `sm|md|lg`。
 
 | Prop          | Type             | Default | Notes                                                                                      |
 | ------------- | ---------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `model?`      | `FormValues`     | `-`     | Form values                                                                                |
 | `rules?`      | `FormRules`      | `-`     | Form validation rules                                                                      |
 | `conditions?` | `FormConditions` | `-`     | Conditional field behavior DSL for visibility, disabled state, and dynamic required rules. |
 | `disabled?`   | `boolean`        | `false` | Whether to disable the entire form                                                         |
+| `loading?`    | `boolean`        | `false` | Whether the form is in a loading state (prevents submit)                                   |
 
 ## FormItem
 
@@ -145,7 +145,7 @@ Note: 具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` �
 
 `packages/core/src/types/input.ts` · `InputProps` · 4/26 props
 
-Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
+Note: React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
 
 | Prop            | Type        | Default  | Notes                                                                        |
 | --------------- | ----------- | -------- | ---------------------------------------------------------------------------- |
@@ -337,7 +337,7 @@ Events/callback props: `onChange?`.
 
 `packages/core/src/types/textarea.ts` · `TextareaProps` · 4/25 props
 
-Note: React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。
+Note: React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。
 
 | Prop          | Type          | Default     | Notes                             |
 | ------------- | ------------- | ----------- | --------------------------------- |

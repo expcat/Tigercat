@@ -23,7 +23,7 @@ Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `ove
 
 ## Card
 
-`packages/core/src/types/card.ts` · `CardProps` · 4/14 props
+`packages/core/src/types/card.ts` · `CardProps` · 4/16 props
 
 Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
 

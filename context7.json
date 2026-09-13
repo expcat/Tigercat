@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 181,
+  "component_count": 178,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -356,7 +356,6 @@
         "ImageCropper",
         "ImageGroup",
         "ImagePreview",
-        "ImageViewer",
         "Kbd",
         "Link",
         "Marquee",
@@ -385,7 +384,6 @@
         "ChartLegend",
         "ChartSeries",
         "ChartTooltip",
-        "DonutChart",
         "FunnelChart",
         "Gantt",
         "GaugeChart",
@@ -410,7 +408,6 @@
         "CommentThread",
         "DataTableWithToolbar",
         "FormWizard",
-        "Kanban",
         "NotificationCenter",
         "SchemaForm",
         "TaskBoard",
@@ -1133,26 +1130,6 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
-    "ImageViewer": {
-      "name": "ImageViewer",
-      "aliases": [],
-      "category": "Basic",
-      "slug": "basic",
-      "testGroup": "basic",
-      "packageSubpath": "./ImageViewer",
-      "packageTarget": "ImagePreview",
-      "typeSource": "packages/core/src/types/image.ts",
-      "sourceFiles": ["packages/core/src/types/image.ts"],
-      "propsInterfaces": ["ImageViewerProps"],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
-        "examples": "skills/tigercat/references/examples/basic.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
     "Kbd": {
       "name": "Kbd",
       "aliases": ["按键", "快捷键", "键盘按键"],
@@ -1553,26 +1530,6 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
-    "DonutChart": {
-      "name": "DonutChart",
-      "aliases": [],
-      "category": "Charts",
-      "slug": "charts",
-      "testGroup": "charts",
-      "packageSubpath": "./DonutChart",
-      "packageTarget": "PieChart",
-      "typeSource": "packages/core/src/types/chart-radial.ts",
-      "sourceFiles": ["packages/core/src/types/chart-radial.ts"],
-      "propsInterfaces": ["DonutChartProps"],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/charts.md",
-        "examples": "skills/tigercat/references/examples/charts.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
     "FunnelChart": {
       "name": "FunnelChart",
       "aliases": ["漏斗图"],
@@ -1884,26 +1841,6 @@
       "typeSource": "packages/core/src/types/form-wizard.ts",
       "sourceFiles": ["packages/core/src/types/form-wizard.ts"],
       "propsInterfaces": ["FormWizardProps"],
-      "frameworks": ["react", "vue"],
-      "references": {
-        "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/composite.md",
-        "examples": "skills/tigercat/references/examples/composite.md",
-        "react": "skills/tigercat/references/react/index.md",
-        "vue": "skills/tigercat/references/vue/index.md"
-      }
-    },
-    "Kanban": {
-      "name": "Kanban",
-      "aliases": [],
-      "category": "Composite",
-      "slug": "composite",
-      "testGroup": "composite",
-      "packageSubpath": "./Kanban",
-      "packageTarget": "TaskBoard",
-      "typeSource": "packages/core/src/types/task-board.ts",
-      "sourceFiles": ["packages/core/src/types/task-board.ts"],
-      "propsInterfaces": ["KanbanProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

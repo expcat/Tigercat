@@ -303,7 +303,7 @@ Events/callback props: `onOpenChange?`.
 
 `packages/core/src/types/pagination.ts` · `PaginationProps` · 4/22 props
 
-Note: `size` 是 `small|medium|large`，不是 Form/Button 的 `sm|md|lg`。Table 内置分页默认开；List 默认关。
+Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。
 
 | Prop        | Type      | Default | Notes                                     |
 | ----------- | --------- | ------- | ----------------------------------------- |
@@ -391,7 +391,7 @@ Note: `size` 是 `small|medium|large`，不是 Form/Button 的 `sm|md|lg`。Tabl
 
 ## Tree
 
-`packages/core/src/types/tree.ts` · `TreeProps` · 4/35 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 4/34 props
 
 Note: `checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。
 

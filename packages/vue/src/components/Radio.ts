@@ -21,6 +21,7 @@ import {
   mergeStyleValues,
   radioRootBaseClasses,
   resolveRadioInputName,
+  runShakeAnimation,
   type ComponentSize,
   type InputStatus
 } from '@expcat/tigercat-core'
@@ -121,17 +122,28 @@ export const Radio = defineComponent({
     })
 
     const inputRef = ref<HTMLInputElement | null>(null)
+    const rootRef = ref<HTMLElement | null>(null)
     expose({
       focus: () => inputRef.value?.focus(),
       input: inputRef
     })
+
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      ([nextStatus], oldValue) => {
+        if (oldValue === undefined) return
+        if (nextStatus === 'error') runShakeAnimation(rootRef.value)
+      },
+      { flush: 'post' }
+    )
 
     const radioClasses = computed(() =>
       getRadioVisualClasses({
         size: actualSize.value,
         checked: !!isChecked.value,
         disabled: actualDisabled.value,
-        colors: defaultRadioColors
+        colors: defaultRadioColors,
+        status: status.value
       })
     )
     const dotClasses = computed(() =>
@@ -212,10 +224,10 @@ export const Radio = defineComponent({
       const children = slots.default?.()
 
       if (!children) {
-        return h('span', { class: rootClass, style: rootStyle }, [input, visual])
+        return h('span', { ref: rootRef, class: rootClass, style: rootStyle }, [input, visual])
       }
 
-      return h('label', { class: rootClass, style: rootStyle }, [
+      return h('label', { ref: rootRef, class: rootClass, style: rootStyle }, [
         input,
         visual,
         h('span', { class: labelClasses.value }, children)

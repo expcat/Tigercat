@@ -48,7 +48,6 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | ImageCropper          | Basic      | `basic`      | image.ts                                            | ./ImageCropper          |
 | ImageGroup            | Basic      | `basic`      | image.ts                                            | ./ImageGroup            |
 | ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |
-| ImageViewer           | Basic      | `basic`      | image.ts                                            | ./ImageViewer           |
 | Kbd                   | Basic      | `basic`      | kbd.ts                                              | ./Kbd                   |
 | Link                  | Basic      | `basic`      | link.ts                                             | ./Link                  |
 | Marquee               | Basic      | `basic`      | marquee.ts                                          | ./Marquee               |
@@ -69,7 +68,6 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | ChartLegend           | Charts     | `charts`     | chart-core.ts                                       | ./ChartLegend           |
 | ChartSeries           | Charts     | `charts`     | chart-core.ts                                       | ./ChartSeries           |
 | ChartTooltip          | Charts     | `charts`     | chart-core.ts                                       | ./ChartTooltip          |
-| DonutChart            | Charts     | `charts`     | chart-radial.ts                                     | ./DonutChart            |
 | FunnelChart           | Charts     | `charts`     | chart-visualization.ts                              | ./FunnelChart           |
 | Gantt                 | Charts     | `charts`     | gantt.ts                                            | ./Gantt                 |
 | GaugeChart            | Charts     | `charts`     | chart-radial.ts                                     | ./GaugeChart            |
@@ -86,7 +84,6 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | CommentThread         | Composite  | `composite`  | comment-thread.ts                                   | ./CommentThread         |
 | DataTableWithToolbar  | Composite  | `composite`  | table-toolbar.ts                                    | ./DataTableWithToolbar  |
 | FormWizard            | Composite  | `composite`  | form-wizard.ts                                      | ./FormWizard            |
-| Kanban                | Composite  | `composite`  | task-board.ts                                       | ./Kanban                |
 | NotificationCenter    | Composite  | `composite`  | notification-center.ts                              | ./NotificationCenter    |
 | SchemaForm            | Composite  | `composite`  | schema-form.ts                                      | ./SchemaForm            |
 | TaskBoard             | Composite  | `composite`  | task-board.ts                                       | ./TaskBoard             |

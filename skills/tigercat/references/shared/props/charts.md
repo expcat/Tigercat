@@ -7,7 +7,7 @@ description: Compact generated Tigercat Charts props reference
 
 # Charts Props
 
-图表画布、图例、工具提示和可视化组件。 共 20 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+图表画布、图例、工具提示和可视化组件。 共 19 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## AreaChart
 
@@ -104,19 +104,6 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `x?`       | `number`  | `0`     | Viewport X position                                                        |
 | `y?`       | `number`  | `0`     | Viewport Y position                                                        |
 
-## DonutChart
-
-`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 4/39 props
-
-Note: Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieChart + `innerRadiusRatio`.
-
-| Prop                | Type               | Default | Notes                                                                                      |
-| ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `data`              | `PieChartDatum[]`  | `-`     | Chart data                                                                                 |
-| `innerRadiusRatio?` | `number`           | `-`     | Inner radius as a fraction of the resolved outer radius. Used by Donut when `innerRadiu... |
-| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the hole (donut).                                          |
-| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue.                                                 |
-
 ## FunnelChart
 
 `packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/26 props
@@ -187,7 +174,7 @@ Note: Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieCh
 
 `packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/39 props
 
-Note: `innerRadiusRatio` 做环形（0.6 即原 Donut）。`centerValue`/`centerLabel` 写在洞里。DonutChart 是默认 `innerRadiusRatio=0.6` 的别名，新代码用 PieChart。
+Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。
 
 | Prop                | Type               | Default | Notes                                                                                      |
 | ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |

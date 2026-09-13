@@ -4,7 +4,9 @@
 
 ## 未发布
 
-将作为 **v3.0.0** 发布（公开契约 breaking）。不是 BPMN。
+## v3.0.0
+
+v3.0.0：深检完美重审 breaking。不是 BPMN / Flowable / Camunda。Vue/React 对称。迁移见 [docs/MIGRATION.md](docs/MIGRATION.md#v300)。
 
 - **Form / SchemaForm**：Vue 值对象改为 `modelValue`（`v-model`），删除 `model` / `update:model`。React 改为 `value` + `onChange`，删除 `model`。SchemaForm 非受控种子改为 `defaultValue`（原 `defaultModel`）。
 - **Input / Textarea（React）**：`onChange` 改为值（string/number），不再发 DOM 事件。原生事件走 `onInput`。
@@ -18,6 +20,8 @@
 - **PieChart（Vue）**：有 `slice-click` 监听时与 React 一样可交互。
 - **Card**：`title` 是可视标题；原生 tooltip 用 `htmlTitle`。
 - **Tree**：删除 `filterValue`；查询只走 `searchValue`。
+- **Radio**：`status` 有错误描边与 shake，与 Checkbox/Slider 一致。
+- **VirtualTable**：缺少 `id` 时回落到 dataSource 下标，选择仍可用。
 
 ## v2.9.0
 
