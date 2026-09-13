@@ -7,6 +7,9 @@
 将作为 **v3.0.0** 发布（公开契约 breaking）。不是 BPMN。
 
 - **Form / SchemaForm**：Vue 值对象改为 `modelValue`（`v-model`），删除 `model` / `update:model`。React 改为 `value` + `onChange`，删除 `model`。SchemaForm 非受控种子改为 `defaultValue`（原 `defaultModel`）。
+- **Input / Textarea（React）**：`onChange` 改为值（string/number），不再发 DOM 事件。原生事件走 `onInput`。
+- **Tabs（React）**：`onChange(activeKey)` 替代 `onActiveKeyChange`。
+- **FormWizard**：步变化改为 `onStepChange` / Vue `step-change`，删除 Wizard `onChange`。`finish()` 仅在最后一步生效。
 
 ## v2.9.0
 
