@@ -91,7 +91,7 @@ describe('Popover', () => {
     it('should render with custom content', async () => {
       const user = userEvent.setup()
       const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
-        contentContent: <div>Custom content</div>
+        content: <div>Custom content</div>
       })
 
       await user.click(getByText('Trigger'))
@@ -105,7 +105,7 @@ describe('Popover', () => {
       const user = userEvent.setup()
       const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
         titleContent: <span>Custom Title</span>,
-        contentContent: <div>Content</div>
+        content: <div>Content</div>
       })
 
       await user.click(getByText('Trigger'))
@@ -524,7 +524,7 @@ describe('Popover', () => {
       const user = userEvent.setup()
       const { getByText, queryByText } = renderWithProps(Popover, {
         trigger: 'click',
-        contentContent: <button>Inside</button>,
+        content: <button>Inside</button>,
         children: <button>Trigger</button>
       })
 
@@ -556,7 +556,7 @@ describe('Popover', () => {
       const { getByText } = render(
         <Popover
           defaultOpen
-          contentContent={
+          content={
             <div>
               <span>Parent content</span>
               <Select options={[{ label: 'Nested option', value: 'nested' }]} />

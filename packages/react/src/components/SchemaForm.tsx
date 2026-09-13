@@ -159,6 +159,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     schema,
     value,
     defaultValue,
+    source,
     rules,
     conditions,
     labelWidth,
@@ -202,8 +203,8 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     [mergedLocale, labelsOverride]
   )
   const initialModel = useMemo(
-    () => createSchemaFormModel(schema, defaultValue),
-    [schema, defaultValue]
+    () => createSchemaFormModel(schema, defaultValue, source),
+    [schema, defaultValue, source]
   )
   const [innerModel, setInnerModel] = useState<FormValues>(initialModel)
   const controlled = value !== undefined
@@ -235,7 +236,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
 
   const handleReset = useCallback(() => {
     formRef.current?.resetFields()
-    if (!controlled) setInnerModel(createSchemaFormModel(schema, defaultValue))
+    if (!controlled) setInnerModel(createSchemaFormModel(schema, defaultValue, source))
     onReset?.()
   }, [controlled, defaultValue, onReset, schema])
 

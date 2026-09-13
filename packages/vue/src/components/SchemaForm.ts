@@ -114,6 +114,10 @@ export const SchemaForm = defineComponent({
       type: Object as PropType<FormValues>,
       default: undefined
     },
+    source: {
+      type: Object as PropType<FormValues>,
+      default: undefined
+    },
     rules: {
       type: Object as PropType<FormRules>,
       default: undefined
@@ -218,7 +222,9 @@ export const SchemaForm = defineComponent({
   setup(props, { attrs, emit, slots, expose }) {
     const config = useTigerConfig()
     const formRef = ref<FormHandle | null>(null)
-    const innerModel = reactive<FormValues>(createSchemaFormModel(props.schema, props.defaultValue))
+    const innerModel = reactive<FormValues>(
+      createSchemaFormModel(props.schema, props.defaultValue, props.source)
+    )
 
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const chromeLabels = computed(() => getSchemaFormLabels(mergedLocale.value, props.labels))
@@ -353,66 +359,59 @@ export const SchemaForm = defineComponent({
         ...hostAttrs
       } = attrs as Record<string, unknown>
       return h(
-        'div',
+        Form,
         {
           ...hostAttrs,
+          ref: formRef,
           class: rootClasses.value,
           style: rootStyle.value,
-          'data-tiger-schema-form': ''
+          'data-tiger-schema-form': '',
+          modelValue: formModel.value,
+          rules: formRules.value,
+          conditions: formConditions.value,
+          labelWidth: props.labelWidth,
+          labelPosition: props.labelPosition,
+          labelAlign: props.labelAlign,
+          size: props.size,
+          inlineMessage: props.inlineMessage,
+          showRequiredAsterisk: props.showRequiredAsterisk,
+          disabled: props.disabled,
+          loading: props.loading,
+          validateDebounce: props.validateDebounce,
+          controller: props.controller,
+          undoable: props.undoable,
+          maxHistorySize: props.maxHistorySize,
+          fieldDependencies: props.fieldDependencies,
+          locale: props.locale,
+          onValidate: (fieldName: string, valid: boolean, error?: string | null) =>
+            emit('validate', fieldName, valid, error ?? undefined),
+          'aria-label': props.ariaLabel ?? chromeLabels.value.ariaLabel,
+          'onUpdate:modelValue': handleModelUpdate,
+          onSubmit: publishSubmit
         },
-        [
-          h(
-            Form,
-            {
-              ref: formRef,
-              modelValue: formModel.value,
-              rules: formRules.value,
-              conditions: formConditions.value,
-              labelWidth: props.labelWidth,
-              labelPosition: props.labelPosition,
-              labelAlign: props.labelAlign,
-              size: props.size,
-              inlineMessage: props.inlineMessage,
-              showRequiredAsterisk: props.showRequiredAsterisk,
-              disabled: props.disabled,
-              loading: props.loading,
-              validateDebounce: props.validateDebounce,
-              controller: props.controller,
-              undoable: props.undoable,
-              maxHistorySize: props.maxHistorySize,
-              fieldDependencies: props.fieldDependencies,
-              locale: props.locale,
-              onValidate: (fieldName: string, valid: boolean, error?: string | null) =>
-                emit('validate', fieldName, valid, error ?? undefined),
-              'aria-label': props.ariaLabel ?? chromeLabels.value.ariaLabel,
-              'onUpdate:modelValue': handleModelUpdate,
-              onSubmit: publishSubmit
-            },
-            {
-              default: () => [
-                ...layout.value.map((group) => renderGroup(group, false)),
-                props.showActions
-                  ? h('div', { class: schemaFormActionsClasses }, [
-                      h(
-                        Button,
-                        { htmlType: 'button', variant: 'outline', onClick: handleReset },
-                        () => props.resetText ?? chromeLabels.value.resetText
-                      ),
-                      h(
-                        Button,
-                        {
-                          htmlType: 'submit',
-                          variant: 'primary',
-                          loading: props.loading
-                        },
-                        () => props.submitText ?? chromeLabels.value.submitText
-                      )
-                    ])
-                  : null
-              ]
-            }
-          )
-        ]
+        {
+          default: () => [
+            ...layout.value.map((group) => renderGroup(group, false)),
+            props.showActions
+              ? h('div', { class: schemaFormActionsClasses }, [
+                  h(
+                    Button,
+                    { htmlType: 'button', variant: 'outline', onClick: handleReset },
+                    () => props.resetText ?? chromeLabels.value.resetText
+                  ),
+                  h(
+                    Button,
+                    {
+                      htmlType: 'submit',
+                      variant: 'primary',
+                      loading: props.loading
+                    },
+                    () => props.submitText ?? chromeLabels.value.submitText
+                  )
+                ])
+              : null
+          ]
+        }
       )
     }
   }

@@ -288,7 +288,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         trigger="click"
         placement="bottom-end"
         titleContent={panelTitle}
-        contentContent={
+        content={
           <div className="flex flex-col gap-2 min-w-[160px]">
             {columns.map((column) => {
               const locked = lockedKeys.has(column.key) || column.hideable === false

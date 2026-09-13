@@ -212,6 +212,10 @@ export interface SchemaFormProps extends Pick<
    */
   defaultValue?: FormValues
   /**
+   * Remote/DTO object run through field `mapIn` / `valuePath`. Form `value` still wins.
+   */
+  source?: FormValues
+  /**
    * Extra rules merged over schema-derived rules (caller wins on conflict).
    */
   rules?: FormRules

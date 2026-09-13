@@ -23,6 +23,8 @@ v3.0.0：深检完美重审 breaking。不是 BPMN / Flowable / Camunda。Vue/Re
 - **Radio**：`status` 有错误描边与 shake，与 Checkbox/Slider 一致。
 - **VirtualTable**：缺少 `id` 时回落到 dataSource 下标，选择仍可用。
 - **DataExport**：默认 formats 含 csv；下拉触发器绑定 `triggerAriaLabel`；`customExport` 可替换内置序列化。
+- **Popover（React）**：节点内容走 `content`，删除 `contentContent`。
+- **SchemaForm**：Vue 根就是 Form（`data-tiger-schema-form` 打在 form 上）；`source` 跑 `mapIn`。
 
 ## v2.9.0
 

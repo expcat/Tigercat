@@ -16,11 +16,14 @@ import {
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 
-export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
-  Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'title'> & {
+export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement' | 'content'> &
+  Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    'children' | 'className' | 'style' | 'title' | 'content'
+  > & {
     children?: React.ReactNode | ((state: { open: boolean }) => React.ReactNode)
     titleContent?: React.ReactNode
-    contentContent?: React.ReactNode
+    content?: React.ReactNode
     className?: string
     style?: React.CSSProperties
     placement?: FloatingPlacement
@@ -45,7 +48,6 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     style,
     children,
     titleContent,
-    contentContent,
     onOpenChange,
     ...divProps
   },
@@ -97,7 +99,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children
 
   const hasTitle = Boolean(title || titleContent)
-  const hasContent = Boolean(content || contentContent)
+  const hasContent = Boolean(content)
   const triggerAria = getOverlayTriggerAria({
     kind: 'dialog',
     open: Boolean(currentVisible),
@@ -148,7 +150,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
               )}
               {hasContent && (
                 <div id={contentId} className={POPOVER_TEXT_CLASSES}>
-                  {contentContent || content}
+                  {content}
                 </div>
               )}
             </div>
